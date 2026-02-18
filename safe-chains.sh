@@ -44,6 +44,7 @@ ASDF_READ_ONLY = {"current", "which", "help", "list", "--version"}
 GEM_READ_ONLY = {"list", "info", "environment", "which", "pristine"}
 BREW_READ_ONLY = {"list", "info", "--version"}
 CARGO_SAFE = {"clippy", "test", "build", "check", "doc", "search", "--version", "bench"}
+NPX_SAFE = {"eslint", "@herb-tools/linter", "karma"}
 
 TIMEOUT_FLAGS_WITH_ARG = {"-s", "--signal", "-k", "--kill-after"}
 
@@ -138,10 +139,7 @@ def is_safe(segment):
             if tokens[i].startswith("-"):
                 i += 1
                 continue
-            inner_cmd = tokens[i].split("/")[-1]
-            if inner_cmd in ("sh", "bash"):
-                return is_safe(" ".join(tokens[i:]))
-            return inner_cmd in SAFE_CMDS
+            return is_safe(" ".join(tokens[i:]))
         return True
 
     if cmd == "gh":
@@ -253,6 +251,27 @@ def is_safe(segment):
         if len(tokens) < 2:
             return False
         return tokens[1] in CARGO_SAFE
+
+    if cmd == "npx":
+        if len(tokens) < 2:
+            return False
+        i = 1
+        while i < len(tokens):
+            if tokens[i] in ("--package", "-p"):
+                i += 2
+                continue
+            if tokens[i] in ("--yes", "-y", "--no", "--ignore-existing", "-q", "--quiet"):
+                i += 1
+                continue
+            if tokens[i] == "--":
+                i += 1
+                break
+            if tokens[i].startswith("-"):
+                return False
+            break
+        if i >= len(tokens):
+            return False
+        return tokens[i] in NPX_SAFE
 
     if cmd in ("timeout", "time"):
         i = 1
