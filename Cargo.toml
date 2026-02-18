@@ -1,0 +1,26 @@
+[package]
+name = "claude-safe-chains"
+version = "1.0.0"
+edition = "2024"
+rust-version = "1.91"
+
+[[bin]]
+name = "safe-chains"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+shell-words = "1"
+
+[lints.clippy]
+struct-excessive-bools = "deny"
+fn-params-excessive-bools = "deny"
+match_bool = "warn"
+bool_to_int_with_if = "warn"
+cognitive-complexity = "warn"
+too-many-lines = "warn"
+collapsible-if = "deny"
+too-many-arguments = "deny"
+needless-range-loop = "deny"
+extend_with_drain = "deny"

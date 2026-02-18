@@ -1,0 +1,172 @@
+use std::collections::HashSet;
+use std::sync::LazyLock;
+
+static TIMEOUT_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> =
+    LazyLock::new(|| HashSet::from(["-s", "--signal", "-k", "--kill-after"]));
+
+const SELF_TEST: &str = "test_safe_chains.py";
+
+pub fn is_safe_env(tokens: &[String]) -> bool {
+    tokens.len() == 1
+}
+
+pub fn is_safe_python(tokens: &[String]) -> bool {
+    if tokens.len() != 2 {
+        return false;
+    }
+    let script = tokens[1].rsplit('/').next().unwrap_or(&tokens[1]);
+    script == SELF_TEST
+}
+
+pub fn is_safe_timeout(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+    let mut i = 1;
+    while i < tokens.len() && tokens[i].starts_with('-') {
+        if TIMEOUT_FLAGS_WITH_ARG.contains(tokens[i].as_str()) {
+            i += 2;
+        } else {
+            i += 1;
+        }
+    }
+    i += 1;
+    if i >= tokens.len() {
+        return false;
+    }
+    let inner = tokens[i..].join(" ");
+    is_safe(&inner)
+}
+
+pub fn is_safe_time(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+    let mut i = 1;
+    if i < tokens.len() && tokens[i] == "-p" {
+        i += 1;
+    }
+    if i >= tokens.len() {
+        return false;
+    }
+    let inner = tokens[i..].join(" ");
+    is_safe(&inner)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::is_safe;
+
+    fn check(cmd: &str) -> bool {
+        is_safe(cmd)
+    }
+
+    #[test]
+    fn timeout_bundle_exec() {
+        assert!(check("timeout 120 bundle exec rspec"));
+    }
+
+    #[test]
+    fn timeout_git_log() {
+        assert!(check("timeout 30 git log --oneline"));
+    }
+
+    #[test]
+    fn timeout_signal_flag() {
+        assert!(check("timeout -s KILL 60 bundle exec rspec"));
+    }
+
+    #[test]
+    fn timeout_preserve_status() {
+        assert!(check("timeout --preserve-status 120 git status"));
+    }
+
+    #[test]
+    fn timeout_git_push_denied() {
+        assert!(!check("timeout 120 git push origin main"));
+    }
+
+    #[test]
+    fn timeout_rm_denied() {
+        assert!(!check("timeout 60 rm -rf /"));
+    }
+
+    #[test]
+    fn time_bundle_exec() {
+        assert!(check("time bundle exec rspec"));
+    }
+
+    #[test]
+    fn time_git_log() {
+        assert!(check("time git log --oneline -5"));
+    }
+
+    #[test]
+    fn time_git_push_denied() {
+        assert!(!check("time git push"));
+    }
+
+    #[test]
+    fn time_rm_denied() {
+        assert!(!check("time rm file"));
+    }
+
+    #[test]
+    fn env_bare() {
+        assert!(check("env"));
+    }
+
+    #[test]
+    fn env_rm_denied() {
+        assert!(!check("env rm -rf /"));
+    }
+
+    #[test]
+    fn env_sh_denied() {
+        assert!(!check("env sh -c 'rm -rf /'"));
+    }
+
+    #[test]
+    fn env_python_denied() {
+        assert!(!check("env python3 evil.py"));
+    }
+
+    #[test]
+    fn python_self_test() {
+        assert!(check("python3 test_safe_chains.py"));
+    }
+
+    #[test]
+    fn python_self_test_path() {
+        assert!(check("python3 /some/path/test_safe_chains.py"));
+    }
+
+    #[test]
+    fn python_self_test_python2() {
+        assert!(check("python test_safe_chains.py"));
+    }
+
+    #[test]
+    fn python_with_args_denied() {
+        assert!(!check("python3 test_safe_chains.py --verbose"));
+    }
+
+    #[test]
+    fn python_script_denied() {
+        assert!(!check("python3 script.py"));
+    }
+
+    #[test]
+    fn python_manage_denied() {
+        assert!(!check("python3 manage.py"));
+    }
+
+    #[test]
+    fn python_c_denied() {
+        assert!(!check("python3 -c 'import os'"));
+    }
+
+    #[test]
+    fn bare_python_denied() {
+        assert!(!check("python3"));
+    }
+
+    #[test]
+    fn python_other_test_denied() {
+        assert!(!check("python3 test_other.py"));
+    }
+}

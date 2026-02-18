@@ -3,14 +3,29 @@
 ## Testing
 
 ```bash
-python3 test_safe_chains.py
+cargo test
 ```
 
 All tests must pass before committing.
 
+## Linting
+
+```bash
+cargo clippy -- -D warnings
+```
+
+Must pass with no warnings before committing.
+
+## After changes
+
+```bash
+cargo install --path .
+```
+
+Updates the installed binary.
+
 ## Development
 
-- The hook is Python 3, stdlib only, no external dependencies
-- When adding a new command handler: add the handler in `safe-chains.sh`, add test cases in `test_safe_chains.py` covering both allow and deny, run the test suite
+- When adding a new command handler: add the handler in the appropriate `src/handlers/` module, register in `src/handlers/mod.rs` dispatch, add `#[cfg(test)]` tests covering both allow and deny, run the test suite and clippy
 - Do not add comments to code
 - All files must end with a newline

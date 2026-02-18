@@ -2,21 +2,12 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-HOOK_DIR="$HOME/.claude/hooks"
-HOOK_PATH="$HOOK_DIR/safe-chains.sh"
 
-mkdir -p "$HOOK_DIR"
-
-if [ -f "$HOOK_PATH" ] && [ ! -L "$HOOK_PATH" ]; then
-    echo "Backing up existing $HOOK_PATH to $HOOK_PATH.bak"
-    mv "$HOOK_PATH" "$HOOK_PATH.bak"
-fi
-
-ln -sf "$SCRIPT_DIR/safe-chains.sh" "$HOOK_PATH"
-echo "Symlinked $HOOK_PATH -> $SCRIPT_DIR/safe-chains.sh"
+echo "Building and installing safe-chains..."
+cargo install --path "$SCRIPT_DIR"
 
 if [ -f "$HOME/.claude/settings.json" ]; then
-    if grep -q "safe-chains.sh" "$HOME/.claude/settings.json"; then
+    if grep -q "safe-chains" "$HOME/.claude/settings.json"; then
         echo "Hook config found in settings.json."
     else
         echo ""
@@ -29,7 +20,7 @@ if [ -f "$HOME/.claude/settings.json" ]; then
         echo '        "hooks": ['
         echo '          {'
         echo '            "type": "command",'
-        echo "            \"command\": \"$HOOK_PATH\""
+        echo '            "command": "safe-chains"'
         echo '          }'
         echo '        ]'
         echo '      }'
