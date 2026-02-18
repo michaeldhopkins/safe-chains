@@ -98,6 +98,16 @@ mod tests {
     }
 
     #[test]
+    fn fd_redirects() {
+        assert!(is_safe("ls 2>&1"));
+        assert!(is_safe("cargo clippy 2>&1"));
+        assert!(is_safe("git log 2>&1"));
+        assert!(is_safe_command("cd /tmp && cargo clippy -- -D warnings 2>&1"));
+        assert!(!is_safe("echo hello > file.txt"));
+        assert!(!is_safe("ls 2> errors.txt"));
+    }
+
+    #[test]
     fn unsafe_shell_syntax() {
         assert!(!is_safe("echo hello > file.txt"));
         assert!(!is_safe("cat file >> output.txt"));

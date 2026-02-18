@@ -33,7 +33,7 @@ pub fn split_outside_quotes(cmd: &str) -> Vec<String> {
                 current.clear();
                 continue;
             }
-            if c == '&' {
+            if c == '&' && !current.ends_with('>') {
                 segments.push(current.clone());
                 current.clear();
                 if chars.peek() == Some(&'&') {
