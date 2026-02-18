@@ -7,6 +7,12 @@ static READ_ONLY_SUBCOMMANDS: LazyLock<HashSet<&'static str>> =
 static READ_ONLY_ACTIONS: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["view", "list", "status", "diff", "checks"]));
 
+static ALWAYS_SAFE_SUBCOMMANDS: LazyLock<HashSet<&'static str>> =
+    LazyLock::new(|| HashSet::from(["search"]));
+
+static AUTH_SAFE_ACTIONS: LazyLock<HashSet<&'static str>> =
+    LazyLock::new(|| HashSet::from(["status", "token"]));
+
 static API_BODY_FLAGS: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["-f", "-F", "--field", "--raw-field", "--input"]));
 
@@ -18,6 +24,14 @@ pub fn is_safe_gh(tokens: &[String]) -> bool {
 
     if READ_ONLY_SUBCOMMANDS.contains(subcmd.as_str()) {
         return tokens.len() >= 3 && READ_ONLY_ACTIONS.contains(tokens[2].as_str());
+    }
+
+    if ALWAYS_SAFE_SUBCOMMANDS.contains(subcmd.as_str()) {
+        return true;
+    }
+
+    if subcmd == "auth" {
+        return tokens.len() >= 3 && AUTH_SAFE_ACTIONS.contains(tokens[2].as_str());
     }
 
     if subcmd == "api" {
@@ -95,6 +109,21 @@ mod tests {
     #[test]
     fn issue_list() {
         assert!(check("gh issue list"));
+    }
+
+    #[test]
+    fn auth_status() {
+        assert!(check("gh auth status"));
+    }
+
+    #[test]
+    fn search_issues() {
+        assert!(check("gh search issues foo"));
+    }
+
+    #[test]
+    fn search_prs() {
+        assert!(check("gh search prs bar"));
     }
 
     #[test]
