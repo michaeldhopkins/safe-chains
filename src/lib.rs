@@ -22,7 +22,7 @@ pub fn is_safe(segment: &str) -> bool {
 
     let cmd = tokens[0].rsplit('/').next().unwrap_or(&tokens[0]);
 
-    if tokens.len() == 2 && tokens[1] == "--version" {
+    if tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--help") {
         return true;
     }
 
@@ -95,6 +95,25 @@ mod tests {
     fn version_only_two_tokens() {
         assert!(!is_safe("node --version --extra"));
         assert!(!is_safe("node -v"));
+    }
+
+    #[test]
+    fn help_shortcut() {
+        assert!(is_safe("node --help"));
+        assert!(is_safe("ruby --help"));
+        assert!(is_safe("rm --help"));
+        assert!(is_safe("cargo --help"));
+    }
+
+    #[test]
+    fn help_only_two_tokens() {
+        assert!(!is_safe("node --help --extra"));
+    }
+
+    #[test]
+    fn cucumber_safe() {
+        assert!(is_safe("cucumber features/login.feature"));
+        assert!(is_safe("cucumber --format progress"));
     }
 
     #[test]
