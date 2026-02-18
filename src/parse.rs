@@ -86,6 +86,14 @@ pub fn has_unsafe_shell_syntax(segment: &str) -> bool {
         }
         if !in_single && !in_double {
             if c == '>' || c == '<' {
+                let next = chars.get(i + 1);
+                if next == Some(&'&')
+                    && chars
+                        .get(i + 2)
+                        .is_some_and(|ch| ch.is_ascii_digit() || *ch == '-')
+                {
+                    continue;
+                }
                 return true;
             }
             if c == '`' {
@@ -201,6 +209,21 @@ mod tests {
     #[test]
     fn unsafe_redirect() {
         assert!(has_unsafe_shell_syntax("echo hello > file.txt"));
+    }
+
+    #[test]
+    fn safe_fd_redirect_stderr_to_stdout() {
+        assert!(!has_unsafe_shell_syntax("cargo clippy 2>&1"));
+    }
+
+    #[test]
+    fn safe_fd_redirect_close() {
+        assert!(!has_unsafe_shell_syntax("cmd 2>&-"));
+    }
+
+    #[test]
+    fn unsafe_redirect_ampersand_no_digit() {
+        assert!(has_unsafe_shell_syntax("echo hello >& file.txt"));
     }
 
     #[test]
