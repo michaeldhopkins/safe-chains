@@ -33,6 +33,24 @@ static GIT_REMOTE_MUTATING: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     ])
 });
 
+static GIT_BRANCH_MUTATING: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
+    HashSet::from([
+        "-d",
+        "-D",
+        "--delete",
+        "-m",
+        "-M",
+        "--move",
+        "-c",
+        "-C",
+        "--copy",
+        "-u",
+        "--set-upstream-to",
+        "--unset-upstream",
+        "--edit-description",
+    ])
+});
+
 static JJ_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["log", "diff", "show", "status", "st", "help", "--version"]));
 
@@ -58,6 +76,14 @@ pub fn is_safe_git(tokens: &[String]) -> bool {
     }
     if subcmd == "remote" {
         return args.get(1).is_none_or(|a| !GIT_REMOTE_MUTATING.contains(a.as_str()));
+    }
+    if subcmd == "branch" {
+        return args[1..].iter().all(|a| {
+            !GIT_BRANCH_MUTATING.contains(a.as_str())
+                && !GIT_BRANCH_MUTATING
+                    .iter()
+                    .any(|f| f.starts_with("--") && a.starts_with(&format!("{f}=")))
+        });
     }
     false
 }
@@ -232,8 +258,48 @@ mod tests {
     }
 
     #[test]
+    fn git_branch_list() {
+        assert!(check("git branch"));
+    }
+
+    #[test]
+    fn git_branch_list_all() {
+        assert!(check("git branch -a"));
+    }
+
+    #[test]
+    fn git_branch_list_verbose() {
+        assert!(check("git branch -v"));
+    }
+
+    #[test]
+    fn git_branch_contains() {
+        assert!(check("git branch --contains abc123"));
+    }
+
+    #[test]
     fn git_branch_d_denied() {
         assert!(!check("git branch -D feature"));
+    }
+
+    #[test]
+    fn git_branch_delete_denied() {
+        assert!(!check("git branch --delete feature"));
+    }
+
+    #[test]
+    fn git_branch_move_denied() {
+        assert!(!check("git branch -m old new"));
+    }
+
+    #[test]
+    fn git_branch_copy_denied() {
+        assert!(!check("git branch -c old new"));
+    }
+
+    #[test]
+    fn git_branch_set_upstream_denied() {
+        assert!(!check("git branch --set-upstream-to=origin/main"));
     }
 
     #[test]
