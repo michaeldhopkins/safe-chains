@@ -68,6 +68,8 @@ TESTS = {
         ("xargs rm", DENY),
         ("xargs curl", DENY),
         ("xargs -0 grep foo", ALLOW),
+        ("xargs npx @herb-tools/linter", ALLOW),
+        ("xargs npx cowsay", DENY),
     ],
     "gh": [
         ("gh pr view 123", ALLOW),
@@ -251,6 +253,19 @@ TESTS = {
         ("time git log --oneline -5", ALLOW),
         ("time git push", DENY),
         ("time rm file", DENY),
+    ],
+    "npx": [
+        ("npx @herb-tools/linter app/views/foo.html.erb", ALLOW),
+        ("npx eslint src/", ALLOW),
+        ("npx karma start", ALLOW),
+        ("npx --yes eslint src/", ALLOW),
+        ("npx -y @herb-tools/linter .", ALLOW),
+        ("npx --package @herb-tools/linter @herb-tools/linter .", ALLOW),
+        ("npx -- eslint src/", ALLOW),
+        ("npx react-scripts start", DENY),
+        ("npx cowsay hello", DENY),
+        ("npx", DENY),
+        ("npx --yes", DENY),
     ],
     "env prefix": [
         ("RACK_ENV=test bundle exec rspec spec/foo_spec.rb", ALLOW),
