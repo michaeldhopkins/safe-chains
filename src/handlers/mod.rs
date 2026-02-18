@@ -13,7 +13,7 @@ static SAFE_CMDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
         "grep", "rg", "fd", "head", "tail", "cat", "ls", "wc", "uniq", "tr", "cut", "echo",
         "dirname", "basename", "realpath", "file", "stat", "du", "df", "printenv", "which",
         "whoami", "date", "pwd", "tree", "lsof", "jq", "base64", "xxd", "pgrep", "getconf",
-        "ps", "uuidgen", "mdfind", "identify",
+        "ps", "uuidgen", "mdfind", "identify", "cd",
     ])
 });
 
