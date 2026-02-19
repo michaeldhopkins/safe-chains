@@ -127,7 +127,7 @@ fn is_dev_null_target(chars: &[char], start: usize, redirect_char: char) -> bool
         return false;
     }
     let end = j + DEV_NULL.len();
-    end >= chars.len() || !chars[end].is_alphanumeric()
+    end >= chars.len() || chars[end].is_whitespace() || ";|&)".contains(chars[end])
 }
 
 pub fn has_flag(tokens: &[String], short: &str, long: Option<&str>) -> bool {
@@ -307,6 +307,16 @@ mod tests {
     #[test]
     fn unsafe_redirect_dev_null_prefix() {
         assert!(has_unsafe_shell_syntax("cmd > /dev/nullicious"));
+    }
+
+    #[test]
+    fn unsafe_redirect_dev_null_path_traversal() {
+        assert!(has_unsafe_shell_syntax("cmd > /dev/null/../etc/passwd"));
+    }
+
+    #[test]
+    fn unsafe_redirect_dev_null_subpath() {
+        assert!(has_unsafe_shell_syntax("cmd > /dev/null/foo"));
     }
 
     #[test]
