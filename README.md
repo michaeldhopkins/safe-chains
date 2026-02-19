@@ -1,8 +1,6 @@
-# claude-safe-chains
+# `safe-chains`
 
 A Claude Code pre-hook that auto-allows safe, read-only bash commands without prompting. This is a great hook for people who are sick of approving `Git -C ...`, `for...do...end` and the like dozens of times every time they work on a new project. As a bonus, it keeps your approved commands list shorter ergo more interesting in your settings files.
-
-## What it does
 
 When Claude Code wants to run a bash command, this hook intercepts it and checks if every segment of the command is safe. If so, the command runs without asking for permission. If any segment is unsafe, the normal permission flow takes over. Commands in piped chains, `&&`, and `;` sequences are each validated independently.
 
@@ -36,19 +34,16 @@ This builds the `safe-chains` binary into `~/.cargo/bin/` and outputs the hook c
 
 If the hook is already configured, the script will skip this step.
 
-## Running tests
+You'll need to restart your Claude Code sessions to use the new hook, but once you do this, you'll be able to update `safe-chains` and benefit from the new version right away.
+
+## Developing 
 
 ```bash
 cargo test
-```
-
-## Linting
-
-```bash
 cargo clippy -- -D warnings
 ```
 
-## Adding a new command
+Adding a new command:
 
 1. Add constants and handler function in the appropriate `src/handlers/` module
 2. Register it in the dispatch match in `src/handlers/mod.rs`
