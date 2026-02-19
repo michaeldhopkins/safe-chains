@@ -6,8 +6,28 @@ static TIMEOUT_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> =
 
 const SELF_TEST: &str = "test_safe_chains.py";
 
-pub fn is_safe_env(tokens: &[String]) -> bool {
-    tokens.len() == 1
+pub fn is_safe_env(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+    if tokens.len() == 1 {
+        return true;
+    }
+    let mut i = 1;
+    while i < tokens.len() && tokens[i].starts_with('-') {
+        if tokens[i] == "-i" || tokens[i] == "--ignore-environment" {
+            i += 1;
+        } else if tokens[i] == "-u" || tokens[i] == "--unset" {
+            i += 2;
+        } else {
+            i += 1;
+        }
+    }
+    while i < tokens.len() && !tokens[i].starts_with('-') && tokens[i].contains('=') {
+        i += 1;
+    }
+    if i >= tokens.len() {
+        return true;
+    }
+    let inner = tokens[i..].join(" ");
+    is_safe(&inner)
 }
 
 pub fn is_safe_python(tokens: &[String]) -> bool {
@@ -39,6 +59,22 @@ pub fn is_safe_time(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     let mut i = 1;
     if i < tokens.len() && tokens[i] == "-p" {
         i += 1;
+    }
+    if i >= tokens.len() {
+        return false;
+    }
+    let inner = tokens[i..].join(" ");
+    is_safe(&inner)
+}
+
+pub fn is_safe_nice(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+    let mut i = 1;
+    while i < tokens.len() && tokens[i].starts_with('-') {
+        if tokens[i] == "-n" || tokens[i] == "--adjustment" {
+            i += 2;
+        } else {
+            i += 1;
+        }
     }
     if i >= tokens.len() {
         return false;
@@ -111,6 +147,36 @@ mod tests {
     }
 
     #[test]
+    fn env_safe_command() {
+        assert!(check("env ls -la"));
+    }
+
+    #[test]
+    fn env_with_var() {
+        assert!(check("env FOO=bar ls -la"));
+    }
+
+    #[test]
+    fn env_multiple_vars() {
+        assert!(check("env FOO=bar BAZ=qux git status"));
+    }
+
+    #[test]
+    fn env_ignore_flag() {
+        assert!(check("env -i PATH=/usr/bin ls"));
+    }
+
+    #[test]
+    fn env_unset_flag() {
+        assert!(check("env -u FOO git log"));
+    }
+
+    #[test]
+    fn env_vars_only() {
+        assert!(check("env FOO=bar"));
+    }
+
+    #[test]
     fn env_rm_denied() {
         assert!(!check("env rm -rf /"));
     }
@@ -123,6 +189,11 @@ mod tests {
     #[test]
     fn env_python_denied() {
         assert!(!check("env python3 evil.py"));
+    }
+
+    #[test]
+    fn env_var_rm_denied() {
+        assert!(!check("env FOO=bar rm -rf /"));
     }
 
     #[test]
@@ -168,5 +239,35 @@ mod tests {
     #[test]
     fn python_other_test_denied() {
         assert!(!check("python3 test_other.py"));
+    }
+
+    #[test]
+    fn nice_safe_command() {
+        assert!(check("nice git log"));
+    }
+
+    #[test]
+    fn nice_with_priority() {
+        assert!(check("nice -n 10 cargo test"));
+    }
+
+    #[test]
+    fn nice_rm_denied() {
+        assert!(!check("nice rm -rf /"));
+    }
+
+    #[test]
+    fn nice_with_priority_rm_denied() {
+        assert!(!check("nice -n 10 rm -rf /"));
+    }
+
+    #[test]
+    fn ionice_safe_command() {
+        assert!(check("ionice git log"));
+    }
+
+    #[test]
+    fn ionice_rm_denied() {
+        assert!(!check("ionice rm -rf /"));
     }
 }

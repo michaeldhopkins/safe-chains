@@ -94,6 +94,9 @@ pub fn has_unsafe_shell_syntax(segment: &str) -> bool {
                 {
                     continue;
                 }
+                if is_dev_null_target(&chars, i + 1, c) {
+                    continue;
+                }
                 return true;
             }
             if c == '`' {
@@ -105,6 +108,26 @@ pub fn has_unsafe_shell_syntax(segment: &str) -> bool {
         }
     }
     false
+}
+
+const DEV_NULL: [char; 9] = ['/', 'd', 'e', 'v', '/', 'n', 'u', 'l', 'l'];
+
+fn is_dev_null_target(chars: &[char], start: usize, redirect_char: char) -> bool {
+    let mut j = start;
+    if redirect_char == '>' && j < chars.len() && chars[j] == '>' {
+        j += 1;
+    }
+    while j < chars.len() && chars[j] == ' ' {
+        j += 1;
+    }
+    if j + DEV_NULL.len() > chars.len() {
+        return false;
+    }
+    if chars[j..j + DEV_NULL.len()] != DEV_NULL {
+        return false;
+    }
+    let end = j + DEV_NULL.len();
+    end >= chars.len() || !chars[end].is_alphanumeric()
 }
 
 pub fn has_flag(tokens: &[String], short: &str, long: Option<&str>) -> bool {
@@ -249,6 +272,46 @@ mod tests {
     #[test]
     fn safe_no_special_chars() {
         assert!(!has_unsafe_shell_syntax("grep pattern file"));
+    }
+
+    #[test]
+    fn safe_redirect_to_dev_null() {
+        assert!(!has_unsafe_shell_syntax("cmd >/dev/null"));
+    }
+
+    #[test]
+    fn safe_redirect_stderr_to_dev_null() {
+        assert!(!has_unsafe_shell_syntax("cmd 2>/dev/null"));
+    }
+
+    #[test]
+    fn safe_redirect_append_to_dev_null() {
+        assert!(!has_unsafe_shell_syntax("cmd >>/dev/null"));
+    }
+
+    #[test]
+    fn safe_redirect_space_dev_null() {
+        assert!(!has_unsafe_shell_syntax("cmd > /dev/null"));
+    }
+
+    #[test]
+    fn safe_redirect_input_dev_null() {
+        assert!(!has_unsafe_shell_syntax("cmd < /dev/null"));
+    }
+
+    #[test]
+    fn safe_redirect_both_dev_null() {
+        assert!(!has_unsafe_shell_syntax("cmd 2>/dev/null"));
+    }
+
+    #[test]
+    fn unsafe_redirect_dev_null_prefix() {
+        assert!(has_unsafe_shell_syntax("cmd > /dev/nullicious"));
+    }
+
+    #[test]
+    fn unsafe_redirect_to_file() {
+        assert!(has_unsafe_shell_syntax("cmd > output.txt"));
     }
 
     #[test]

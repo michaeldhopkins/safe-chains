@@ -1,14 +1,30 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
-static READ_ONLY_SUBCOMMANDS: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["pr", "issue", "repo", "release", "run", "workflow"]));
+static READ_ONLY_SUBCOMMANDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
+    HashSet::from([
+        "pr",
+        "issue",
+        "repo",
+        "release",
+        "run",
+        "workflow",
+        "label",
+        "codespace",
+        "variable",
+        "extension",
+        "cache",
+        "attestation",
+        "gpg-key",
+        "ssh-key",
+    ])
+});
 
 static READ_ONLY_ACTIONS: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["view", "list", "status", "diff", "checks"]));
+    LazyLock::new(|| HashSet::from(["view", "list", "status", "diff", "checks", "verify"]));
 
 static ALWAYS_SAFE_SUBCOMMANDS: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["search"]));
+    LazyLock::new(|| HashSet::from(["search", "status"]));
 
 static AUTH_SAFE_ACTIONS: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["status", "token"]));
@@ -32,6 +48,10 @@ pub fn is_safe_gh(tokens: &[String]) -> bool {
 
     if subcmd == "auth" {
         return tokens.len() >= 3 && AUTH_SAFE_ACTIONS.contains(tokens[2].as_str());
+    }
+
+    if subcmd == "browse" {
+        return tokens[2..].iter().any(|t| t == "--no-browser");
     }
 
     if subcmd == "api" {
@@ -134,6 +154,66 @@ mod tests {
     #[test]
     fn release_list() {
         assert!(check("gh release list"));
+    }
+
+    #[test]
+    fn label_list() {
+        assert!(check("gh label list"));
+    }
+
+    #[test]
+    fn codespace_list() {
+        assert!(check("gh codespace list"));
+    }
+
+    #[test]
+    fn variable_list() {
+        assert!(check("gh variable list"));
+    }
+
+    #[test]
+    fn extension_list() {
+        assert!(check("gh extension list"));
+    }
+
+    #[test]
+    fn cache_list() {
+        assert!(check("gh cache list"));
+    }
+
+    #[test]
+    fn attestation_verify() {
+        assert!(check("gh attestation verify artifact.tar.gz"));
+    }
+
+    #[test]
+    fn gpg_key_list() {
+        assert!(check("gh gpg-key list"));
+    }
+
+    #[test]
+    fn ssh_key_list() {
+        assert!(check("gh ssh-key list"));
+    }
+
+    #[test]
+    fn status_safe() {
+        assert!(check("gh status"));
+    }
+
+    #[test]
+    fn browse_no_browser() {
+        assert!(check("gh browse --no-browser"));
+    }
+
+    #[test]
+    fn browse_no_browser_with_path() {
+        assert!(check("gh browse src/main.rs --no-browser"));
+    }
+
+    #[test]
+    fn browse_without_flag_denied() {
+        assert!(!check("gh browse"));
     }
 
     #[test]
