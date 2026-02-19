@@ -37,6 +37,37 @@ pub fn is_safe_xmllint(tokens: &[String]) -> bool {
     !tokens[1..].iter().any(|t| t == "--output" || t.starts_with("--output="))
 }
 
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![
+        CommandDoc {
+            name: "find",
+            kind: DocKind::Handler,
+            description: "Safe unless dangerous flags: -delete, -exec, -execdir, -ok, -okdir, -fls, -fprint, -fprint0, -fprintf.",
+        },
+        CommandDoc {
+            name: "sed",
+            kind: DocKind::Handler,
+            description: "Safe unless -i/--in-place flag.",
+        },
+        CommandDoc {
+            name: "sort",
+            kind: DocKind::Handler,
+            description: "Safe unless -o/--output flag.",
+        },
+        CommandDoc {
+            name: "yq",
+            kind: DocKind::Handler,
+            description: "Safe unless -i/--inplace flag.",
+        },
+        CommandDoc {
+            name: "xmllint",
+            kind: DocKind::Handler,
+            description: "Safe unless --output flag.",
+        },
+    ]
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;

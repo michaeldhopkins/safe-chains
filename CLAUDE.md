@@ -19,13 +19,14 @@ Must pass with no warnings before committing.
 ## After changes
 
 ```bash
+./generate-docs.sh
 cargo install --path .
 ```
 
-Updates the installed binary.
+Regenerates COMMANDS.md and updates the installed binary.
 
 ## Development
 
-- When adding a new command handler: add the handler in the appropriate `src/handlers/` module, register in `src/handlers/mod.rs` dispatch, add `#[cfg(test)]` tests covering both allow and deny, run the test suite and clippy
+- When adding a new command handler: add the handler in the appropriate `src/handlers/` module, register in `src/handlers/mod.rs` dispatch, add `command_docs()` entries, add `#[cfg(test)]` tests covering both allow and deny, run the test suite, clippy, and `./generate-docs.sh`
 - Do not add comments to code
 - All files must end with a newline

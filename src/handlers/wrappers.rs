@@ -4,8 +4,6 @@ use std::sync::LazyLock;
 static TIMEOUT_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["-s", "--signal", "-k", "--kill-after"]));
 
-const SELF_TEST: &str = "test_safe_chains.py";
-
 pub fn is_safe_env(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     if tokens.len() == 1 {
         return true;
@@ -30,13 +28,6 @@ pub fn is_safe_env(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     is_safe(&inner)
 }
 
-pub fn is_safe_python(tokens: &[String]) -> bool {
-    if tokens.len() != 2 {
-        return false;
-    }
-    let script = tokens[1].rsplit('/').next().unwrap_or(&tokens[1]);
-    script == SELF_TEST
-}
 
 pub fn is_safe_timeout(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     let mut i = 1;
@@ -81,6 +72,32 @@ pub fn is_safe_nice(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     }
     let inner = tokens[i..].join(" ");
     is_safe(&inner)
+}
+
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![
+        CommandDoc {
+            name: "env",
+            kind: DocKind::Handler,
+            description: "Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare `env` allowed.",
+        },
+        CommandDoc {
+            name: "timeout",
+            kind: DocKind::Handler,
+            description: "Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recursively validates the inner command.",
+        },
+        CommandDoc {
+            name: "time",
+            kind: DocKind::Handler,
+            description: "Skips -p flag, then recursively validates the inner command.",
+        },
+        CommandDoc {
+            name: "nice / ionice",
+            kind: DocKind::Handler,
+            description: "Skips priority flags (-n/--adjustment), then recursively validates the inner command.",
+        },
+    ]
 }
 
 #[cfg(test)]
@@ -194,51 +211,6 @@ mod tests {
     #[test]
     fn env_var_rm_denied() {
         assert!(!check("env FOO=bar rm -rf /"));
-    }
-
-    #[test]
-    fn python_self_test() {
-        assert!(check("python3 test_safe_chains.py"));
-    }
-
-    #[test]
-    fn python_self_test_path() {
-        assert!(check("python3 /some/path/test_safe_chains.py"));
-    }
-
-    #[test]
-    fn python_self_test_python2() {
-        assert!(check("python test_safe_chains.py"));
-    }
-
-    #[test]
-    fn python_with_args_denied() {
-        assert!(!check("python3 test_safe_chains.py --verbose"));
-    }
-
-    #[test]
-    fn python_script_denied() {
-        assert!(!check("python3 script.py"));
-    }
-
-    #[test]
-    fn python_manage_denied() {
-        assert!(!check("python3 manage.py"));
-    }
-
-    #[test]
-    fn python_c_denied() {
-        assert!(!check("python3 -c 'import os'"));
-    }
-
-    #[test]
-    fn bare_python_denied() {
-        assert!(!check("python3"));
-    }
-
-    #[test]
-    fn python_other_test_denied() {
-        assert!(!check("python3 test_other.py"));
     }
 
     #[test]

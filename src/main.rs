@@ -17,6 +17,12 @@ struct HookInput {
 }
 
 fn main() {
+    if std::env::args().any(|a| a == "--list-commands") {
+        let docs = claude_safe_chains::docs::all_command_docs();
+        print!("{}", claude_safe_chains::docs::render_markdown(&docs));
+        return;
+    }
+
     let input: HookInput = match serde_json::from_reader(io::stdin()) {
         Ok(v) => v,
         Err(_) => process::exit(0),

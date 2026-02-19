@@ -22,6 +22,15 @@ pub fn is_safe_composer(tokens: &[String]) -> bool {
     tokens.len() >= 2 && COMPOSER_SAFE.contains(tokens[1].as_str())
 }
 
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![CommandDoc {
+        name: "composer",
+        kind: DocKind::Handler,
+        description: "Allowed: show, info, diagnose, outdated, licenses, check-platform-reqs, suggests, fund, audit, --version, about, help.",
+    }]
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;

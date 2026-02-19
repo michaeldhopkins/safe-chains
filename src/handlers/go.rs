@@ -9,6 +9,15 @@ pub fn is_safe_go(tokens: &[String]) -> bool {
     tokens.len() >= 2 && GO_SAFE.contains(tokens[1].as_str())
 }
 
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![CommandDoc {
+        name: "go",
+        kind: DocKind::Handler,
+        description: "Allowed: version, env, list, vet, test, build, doc.",
+    }]
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;

@@ -17,6 +17,15 @@ pub fn is_safe_dotnet(tokens: &[String]) -> bool {
     tokens.len() >= 2 && DOTNET_SAFE.contains(tokens[1].as_str())
 }
 
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![CommandDoc {
+        name: "dotnet",
+        kind: DocKind::Handler,
+        description: "Allowed: --version, --info, --list-sdks, --list-runtimes, build, test, list.",
+    }]
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;

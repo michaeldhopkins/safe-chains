@@ -18,7 +18,7 @@ pub mod wrappers;
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
-static SAFE_CMDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
+pub(crate) static SAFE_CMDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
         "grep", "rg", "fd", "head", "tail", "cat", "ls", "wc", "uniq", "tr", "cut", "echo",
         "dirname", "basename", "realpath", "file", "stat", "du", "df", "printenv", "which",
@@ -69,7 +69,6 @@ pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) ->
         "poetry" => python::is_safe_poetry(tokens),
         "pyenv" => python::is_safe_pyenv(tokens),
         "conda" => python::is_safe_conda(tokens),
-        "python" | "python3" => wrappers::is_safe_python(tokens),
 
         "cargo" => rust::is_safe_cargo(tokens),
         "rustup" => rust::is_safe_rustup(tokens),
@@ -103,4 +102,25 @@ pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) ->
 
         _ => SAFE_CMDS.contains(cmd),
     }
+}
+
+pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
+    let mut docs = Vec::new();
+    docs.extend(vcs::command_docs());
+    docs.extend(gh::command_docs());
+    docs.extend(node::command_docs());
+    docs.extend(ruby::command_docs());
+    docs.extend(python::command_docs());
+    docs.extend(rust::command_docs());
+    docs.extend(go::command_docs());
+    docs.extend(jvm::command_docs());
+    docs.extend(php::command_docs());
+    docs.extend(swift::command_docs());
+    docs.extend(dotnet::command_docs());
+    docs.extend(containers::command_docs());
+    docs.extend(system::command_docs());
+    docs.extend(coreutils::command_docs());
+    docs.extend(shell::command_docs());
+    docs.extend(wrappers::command_docs());
+    docs
 }

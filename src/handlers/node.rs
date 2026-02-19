@@ -139,6 +139,58 @@ pub fn is_safe_volta(tokens: &[String]) -> bool {
     tokens.len() >= 2 && VOLTA_SAFE.contains(tokens[1].as_str())
 }
 
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![
+        CommandDoc {
+            name: "npm",
+            kind: DocKind::Handler,
+            description: "Read-only: view, info, list, ls, test, audit, outdated, explain, why, fund, prefix, root, doctor. \
+                          Guarded: config (list/get only), run/run-script (test/test:* only).",
+        },
+        CommandDoc {
+            name: "yarn",
+            kind: DocKind::Handler,
+            description: "Read-only: list, info, why, --version. Also allowed: test, test:*.",
+        },
+        CommandDoc {
+            name: "pnpm",
+            kind: DocKind::Handler,
+            description: "Allowed: list, why, audit, outdated, --version.",
+        },
+        CommandDoc {
+            name: "bun",
+            kind: DocKind::Handler,
+            description: "Allowed: --version, test. Multi-word: pm ls/hash/cache.",
+        },
+        CommandDoc {
+            name: "deno",
+            kind: DocKind::Handler,
+            description: "Allowed: --version, info, doc, lint, check, test. Guarded: fmt (requires --check).",
+        },
+        CommandDoc {
+            name: "npx",
+            kind: DocKind::Handler,
+            description: "Whitelisted packages only: eslint, @herb-tools/linter, karma. Skips flags: --yes/-y/--no/--package/-p.",
+        },
+        CommandDoc {
+            name: "nvm",
+            kind: DocKind::Handler,
+            description: "Allowed: ls, list, current, which, version, --version, ls-remote.",
+        },
+        CommandDoc {
+            name: "fnm",
+            kind: DocKind::Handler,
+            description: "Allowed: list, current, default, --version, ls-remote.",
+        },
+        CommandDoc {
+            name: "volta",
+            kind: DocKind::Handler,
+            description: "Allowed: list, which, --version.",
+        },
+    ]
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;

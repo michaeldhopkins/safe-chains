@@ -36,6 +36,22 @@ pub fn is_safe_mvn(tokens: &[String]) -> bool {
     tokens.len() >= 2 && MVN_SAFE.contains(tokens[1].as_str())
 }
 
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![
+        CommandDoc {
+            name: "gradle / gradlew",
+            kind: DocKind::Handler,
+            description: "Allowed: tasks, dependencies, properties, --version, test, build, check.",
+        },
+        CommandDoc {
+            name: "mvn / mvnw",
+            kind: DocKind::Handler,
+            description: "Allowed: --version, -v, dependency:tree, dependency:list, help:describe, validate, test, compile, verify, test-compile.",
+        },
+    ]
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;

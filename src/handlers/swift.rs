@@ -23,6 +23,15 @@ pub fn is_safe_swift(tokens: &[String]) -> bool {
     false
 }
 
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![CommandDoc {
+        name: "swift",
+        kind: DocKind::Handler,
+        description: "Allowed: --version, test, build. Multi-word: package describe/dump-package/show-dependencies.",
+    }]
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;
