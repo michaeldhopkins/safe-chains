@@ -93,6 +93,17 @@ fn is_safe_gh_api(tokens: &[String]) -> bool {
     true
 }
 
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![CommandDoc {
+        name: "gh",
+        kind: DocKind::Handler,
+        description: "Read-only subcommands (view/list/status/diff/checks/verify): pr, issue, repo, release, run, workflow, label, codespace, variable, extension, cache, attestation, gpg-key, ssh-key. \
+                      Always safe: search, status. \
+                      Guarded: auth (status/token only), browse (requires --no-browser), api (GET only, no body flags).",
+    }]
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;

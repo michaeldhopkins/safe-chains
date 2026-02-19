@@ -1,3 +1,4 @@
+pub mod docs;
 mod handlers;
 pub mod parse;
 

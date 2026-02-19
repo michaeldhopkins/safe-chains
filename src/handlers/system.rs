@@ -72,6 +72,47 @@ pub fn is_safe_cmake(tokens: &[String]) -> bool {
     tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--system-information")
 }
 
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![
+        CommandDoc {
+            name: "brew",
+            kind: DocKind::Handler,
+            description: "Allowed: list, info, --version, search, deps, uses, leaves, outdated, cat, desc, home, formulae, casks, config, doctor, log, tap, shellenv.",
+        },
+        CommandDoc {
+            name: "mise",
+            kind: DocKind::Handler,
+            description: "Allowed: ls, list, current, which, doctor, --version. Multi-word: settings get.",
+        },
+        CommandDoc {
+            name: "asdf",
+            kind: DocKind::Handler,
+            description: "Allowed: current, which, help, list, --version.",
+        },
+        CommandDoc {
+            name: "defaults",
+            kind: DocKind::Handler,
+            description: "Allowed: read, read-type, domains, find, export.",
+        },
+        CommandDoc {
+            name: "sysctl",
+            kind: DocKind::Handler,
+            description: "Safe unless -w/--write flag or key=value assignment syntax.",
+        },
+        CommandDoc {
+            name: "xcodebuild",
+            kind: DocKind::Handler,
+            description: "Allowed: -version, -showsdks, -showBuildSettings, -showdestinations, -list.",
+        },
+        CommandDoc {
+            name: "cmake",
+            kind: DocKind::Handler,
+            description: "Allowed: --version, --system-information (single argument only).",
+        },
+    ]
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;

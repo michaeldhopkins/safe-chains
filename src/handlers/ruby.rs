@@ -66,6 +66,28 @@ pub fn is_safe_rbenv(tokens: &[String]) -> bool {
     tokens.len() >= 2 && RBENV_SAFE.contains(tokens[1].as_str())
 }
 
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![
+        CommandDoc {
+            name: "bundle",
+            kind: DocKind::Handler,
+            description: "Read-only: list, info, show, check. \
+                          Guarded: exec (rspec, standardrb, cucumber, brakeman, erb_lint, herb only).",
+        },
+        CommandDoc {
+            name: "gem",
+            kind: DocKind::Handler,
+            description: "Allowed: list, info, environment, which, pristine, search, specification, dependency, contents, sources, stale, outdated, help.",
+        },
+        CommandDoc {
+            name: "rbenv",
+            kind: DocKind::Handler,
+            description: "Allowed: versions, version, which, root, shims, --version, help.",
+        },
+    ]
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;

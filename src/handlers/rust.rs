@@ -62,6 +62,23 @@ pub fn is_safe_rustup(tokens: &[String]) -> bool {
     false
 }
 
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{CommandDoc, DocKind};
+    vec![
+        CommandDoc {
+            name: "cargo",
+            kind: DocKind::Handler,
+            description: "Allowed: clippy, test, build, check, doc, search, --version, bench, tree, metadata, verify-project, pkgid, locate-project, read-manifest, audit, deny. \
+                          Guarded: fmt (requires --check).",
+        },
+        CommandDoc {
+            name: "rustup",
+            kind: DocKind::Handler,
+            description: "Allowed: show, which, doc, --version. Multi-word: component/target/toolchain list.",
+        },
+    ]
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;
