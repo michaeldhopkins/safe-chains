@@ -19,6 +19,15 @@ static GIT_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
         "describe",
         "blame",
         "reflog",
+        "ls-files",
+        "ls-remote",
+        "diff-tree",
+        "cat-file",
+        "name-rev",
+        "for-each-ref",
+        "count-objects",
+        "verify-commit",
+        "verify-tag",
     ])
 });
 
@@ -51,6 +60,28 @@ static GIT_BRANCH_MUTATING: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     ])
 });
 
+static GIT_STASH_SAFE: LazyLock<HashSet<&'static str>> =
+    LazyLock::new(|| HashSet::from(["list", "show"]));
+
+static GIT_TAG_MUTATING: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
+    HashSet::from([
+        "-d",
+        "--delete",
+        "-a",
+        "--annotate",
+        "-s",
+        "--sign",
+        "-f",
+        "--force",
+    ])
+});
+
+static GIT_CONFIG_SAFE: LazyLock<HashSet<&'static str>> =
+    LazyLock::new(|| HashSet::from(["--list", "--get", "--get-all", "--get-regexp", "-l"]));
+
+static GIT_NOTES_SAFE: LazyLock<HashSet<&'static str>> =
+    LazyLock::new(|| HashSet::from(["show", "list"]));
+
 static JJ_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["log", "diff", "show", "status", "st", "help", "--version"]));
 
@@ -58,9 +89,13 @@ static JJ_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> = LazyLock
     vec![
         ("op", HashSet::from(["log"])),
         ("file", HashSet::from(["show"])),
-        ("config", HashSet::from(["get"])),
+        ("config", HashSet::from(["get", "list"])),
+        ("bookmark", HashSet::from(["list"])),
     ]
 });
+
+static JJ_TRIPLE: LazyLock<Vec<(&'static str, &'static str, HashSet<&'static str>)>> =
+    LazyLock::new(|| vec![("git", "remote", HashSet::from(["list"]))]);
 
 pub fn is_safe_git(tokens: &[String]) -> bool {
     let mut args = &tokens[1..];
@@ -85,6 +120,24 @@ pub fn is_safe_git(tokens: &[String]) -> bool {
                     .any(|f| f.starts_with("--") && a.starts_with(&format!("{f}=")))
         });
     }
+    if subcmd == "stash" {
+        return args.get(1).is_some_and(|a| GIT_STASH_SAFE.contains(a.as_str()));
+    }
+    if subcmd == "tag" {
+        if args.len() == 1 {
+            return true;
+        }
+        return args[1..].iter().all(|a| !GIT_TAG_MUTATING.contains(a.as_str()));
+    }
+    if subcmd == "config" {
+        return args.get(1).is_some_and(|a| GIT_CONFIG_SAFE.contains(a.as_str()));
+    }
+    if subcmd == "worktree" {
+        return args.get(1).is_some_and(|a| a == "list");
+    }
+    if subcmd == "notes" {
+        return args.get(1).is_some_and(|a| GIT_NOTES_SAFE.contains(a.as_str()));
+    }
     false
 }
 
@@ -99,6 +152,11 @@ pub fn is_safe_jj(tokens: &[String]) -> bool {
     for (prefix, actions) in JJ_MULTI.iter() {
         if subcmd == *prefix {
             return tokens.get(2).is_some_and(|a| actions.contains(a.as_str()));
+        }
+    }
+    for (first, second, actions) in JJ_TRIPLE.iter() {
+        if subcmd == *first && tokens.get(2).is_some_and(|t| t == *second) {
+            return tokens.get(3).is_some_and(|a| actions.contains(a.as_str()));
         }
     }
     false
@@ -193,6 +251,51 @@ mod tests {
     }
 
     #[test]
+    fn git_ls_files() {
+        assert!(check("git ls-files"));
+    }
+
+    #[test]
+    fn git_ls_remote() {
+        assert!(check("git ls-remote origin"));
+    }
+
+    #[test]
+    fn git_diff_tree() {
+        assert!(check("git diff-tree --no-commit-id -r HEAD"));
+    }
+
+    #[test]
+    fn git_cat_file() {
+        assert!(check("git cat-file -p HEAD"));
+    }
+
+    #[test]
+    fn git_name_rev() {
+        assert!(check("git name-rev HEAD"));
+    }
+
+    #[test]
+    fn git_for_each_ref() {
+        assert!(check("git for-each-ref refs/heads"));
+    }
+
+    #[test]
+    fn git_count_objects() {
+        assert!(check("git count-objects -v"));
+    }
+
+    #[test]
+    fn git_verify_commit() {
+        assert!(check("git verify-commit HEAD"));
+    }
+
+    #[test]
+    fn git_verify_tag() {
+        assert!(check("git verify-tag v1.0"));
+    }
+
+    #[test]
     fn git_c_flag() {
         assert!(check("git -C /some/repo diff --stat"));
     }
@@ -220,6 +323,151 @@ mod tests {
     #[test]
     fn git_remote_show() {
         assert!(check("git remote show origin"));
+    }
+
+    #[test]
+    fn git_branch_list() {
+        assert!(check("git branch"));
+    }
+
+    #[test]
+    fn git_branch_list_all() {
+        assert!(check("git branch -a"));
+    }
+
+    #[test]
+    fn git_branch_list_verbose() {
+        assert!(check("git branch -v"));
+    }
+
+    #[test]
+    fn git_branch_contains() {
+        assert!(check("git branch --contains abc123"));
+    }
+
+    #[test]
+    fn git_stash_list() {
+        assert!(check("git stash list"));
+    }
+
+    #[test]
+    fn git_stash_show() {
+        assert!(check("git stash show -p"));
+    }
+
+    #[test]
+    fn git_stash_bare_denied() {
+        assert!(!check("git stash"));
+    }
+
+    #[test]
+    fn git_stash_push_denied() {
+        assert!(!check("git stash push"));
+    }
+
+    #[test]
+    fn git_stash_pop_denied() {
+        assert!(!check("git stash pop"));
+    }
+
+    #[test]
+    fn git_stash_drop_denied() {
+        assert!(!check("git stash drop"));
+    }
+
+    #[test]
+    fn git_tag_list() {
+        assert!(check("git tag"));
+    }
+
+    #[test]
+    fn git_tag_list_pattern() {
+        assert!(check("git tag -l 'v1.*'"));
+    }
+
+    #[test]
+    fn git_tag_list_long() {
+        assert!(check("git tag --list"));
+    }
+
+    #[test]
+    fn git_tag_delete_denied() {
+        assert!(!check("git tag -d v1.0"));
+    }
+
+    #[test]
+    fn git_tag_annotate_denied() {
+        assert!(!check("git tag -a v1.0 -m 'release'"));
+    }
+
+    #[test]
+    fn git_tag_sign_denied() {
+        assert!(!check("git tag -s v1.0"));
+    }
+
+    #[test]
+    fn git_tag_force_denied() {
+        assert!(!check("git tag -f v1.0"));
+    }
+
+    #[test]
+    fn git_config_list() {
+        assert!(check("git config --list"));
+    }
+
+    #[test]
+    fn git_config_get() {
+        assert!(check("git config --get user.name"));
+    }
+
+    #[test]
+    fn git_config_get_all() {
+        assert!(check("git config --get-all remote.origin.url"));
+    }
+
+    #[test]
+    fn git_config_get_regexp() {
+        assert!(check("git config --get-regexp 'remote.*'"));
+    }
+
+    #[test]
+    fn git_config_l() {
+        assert!(check("git config -l"));
+    }
+
+    #[test]
+    fn git_config_set_denied() {
+        assert!(!check("git config user.name foo"));
+    }
+
+    #[test]
+    fn git_config_unset_denied() {
+        assert!(!check("git config --unset user.name"));
+    }
+
+    #[test]
+    fn git_worktree_list() {
+        assert!(check("git worktree list"));
+    }
+
+    #[test]
+    fn git_worktree_add_denied() {
+        assert!(!check("git worktree add ../new-branch"));
+    }
+
+    #[test]
+    fn git_notes_show() {
+        assert!(check("git notes show HEAD"));
+    }
+
+    #[test]
+    fn git_notes_list() {
+        assert!(check("git notes list"));
+    }
+
+    #[test]
+    fn git_notes_add_denied() {
+        assert!(!check("git notes add -m 'note'"));
     }
 
     #[test]
@@ -255,26 +503,6 @@ mod tests {
     #[test]
     fn git_stash_denied() {
         assert!(!check("git stash"));
-    }
-
-    #[test]
-    fn git_branch_list() {
-        assert!(check("git branch"));
-    }
-
-    #[test]
-    fn git_branch_list_all() {
-        assert!(check("git branch -a"));
-    }
-
-    #[test]
-    fn git_branch_list_verbose() {
-        assert!(check("git branch -v"));
-    }
-
-    #[test]
-    fn git_branch_contains() {
-        assert!(check("git branch --contains abc123"));
     }
 
     #[test]
@@ -382,6 +610,21 @@ mod tests {
     #[test]
     fn jj_config_get() {
         assert!(check("jj config get user.name"));
+    }
+
+    #[test]
+    fn jj_config_list() {
+        assert!(check("jj config list"));
+    }
+
+    #[test]
+    fn jj_bookmark_list() {
+        assert!(check("jj bookmark list"));
+    }
+
+    #[test]
+    fn jj_git_remote_list() {
+        assert!(check("jj git remote list"));
     }
 
     #[test]

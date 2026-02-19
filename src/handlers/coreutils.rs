@@ -29,6 +29,14 @@ pub fn is_safe_sort(tokens: &[String]) -> bool {
     !has_flag(tokens, "-o", Some("--output"))
 }
 
+pub fn is_safe_yq(tokens: &[String]) -> bool {
+    !has_flag(tokens, "-i", Some("--inplace"))
+}
+
+pub fn is_safe_xmllint(tokens: &[String]) -> bool {
+    !tokens[1..].iter().any(|t| t == "--output" || t.starts_with("--output="))
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe;
@@ -205,5 +213,45 @@ mod tests {
     #[test]
     fn sort_rno_combined_denied() {
         assert!(!check("sort -rno sorted.txt file.txt"));
+    }
+
+    #[test]
+    fn yq_read() {
+        assert!(check("yq '.key' file.yaml"));
+    }
+
+    #[test]
+    fn yq_eval() {
+        assert!(check("yq eval '.metadata.name' deployment.yaml"));
+    }
+
+    #[test]
+    fn yq_inplace_denied() {
+        assert!(!check("yq -i '.key = \"value\"' file.yaml"));
+    }
+
+    #[test]
+    fn yq_inplace_long_denied() {
+        assert!(!check("yq --inplace '.key = \"value\"' file.yaml"));
+    }
+
+    #[test]
+    fn xmllint_read() {
+        assert!(check("xmllint --xpath '//name' file.xml"));
+    }
+
+    #[test]
+    fn xmllint_format() {
+        assert!(check("xmllint --format file.xml"));
+    }
+
+    #[test]
+    fn xmllint_output_denied() {
+        assert!(!check("xmllint --output result.xml file.xml"));
+    }
+
+    #[test]
+    fn xmllint_output_eq_denied() {
+        assert!(!check("xmllint --output=result.xml file.xml"));
     }
 }

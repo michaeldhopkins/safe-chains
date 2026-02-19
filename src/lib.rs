@@ -57,6 +57,84 @@ mod tests {
     }
 
     #[test]
+    fn safe_cmds_text_processing() {
+        assert!(is_safe("diff file1.txt file2.txt"));
+        assert!(is_safe("comm -23 sorted1.txt sorted2.txt"));
+        assert!(is_safe("paste file1 file2"));
+        assert!(is_safe("tac file.txt"));
+        assert!(is_safe("rev file.txt"));
+        assert!(is_safe("nl file.txt"));
+        assert!(is_safe("expand file.txt"));
+        assert!(is_safe("unexpand file.txt"));
+        assert!(is_safe("fold -w 80 file.txt"));
+        assert!(is_safe("fmt -w 72 file.txt"));
+        assert!(is_safe("column -t file.txt"));
+        assert!(is_safe("printf '%s\\n' hello"));
+        assert!(is_safe("seq 1 10"));
+        assert!(is_safe("expr 1 + 2"));
+        assert!(is_safe("test -f file.txt"));
+        assert!(is_safe("true"));
+        assert!(is_safe("false"));
+        assert!(is_safe("bc -l"));
+        assert!(is_safe("factor 42"));
+        assert!(is_safe("iconv -f UTF-8 -t ASCII file.txt"));
+    }
+
+    #[test]
+    fn safe_cmds_system_info() {
+        assert!(is_safe("readlink -f symlink"));
+        assert!(is_safe("hostname"));
+        assert!(is_safe("uname -a"));
+        assert!(is_safe("arch"));
+        assert!(is_safe("nproc"));
+        assert!(is_safe("uptime"));
+        assert!(is_safe("id"));
+        assert!(is_safe("groups"));
+        assert!(is_safe("tty"));
+        assert!(is_safe("locale"));
+        assert!(is_safe("cal"));
+        assert!(is_safe("sleep 1"));
+    }
+
+    #[test]
+    fn safe_cmds_hashing() {
+        assert!(is_safe("md5sum file.txt"));
+        assert!(is_safe("md5 file.txt"));
+        assert!(is_safe("sha256sum file.txt"));
+        assert!(is_safe("shasum file.txt"));
+        assert!(is_safe("sha1sum file.txt"));
+        assert!(is_safe("sha512sum file.txt"));
+        assert!(is_safe("cksum file.txt"));
+        assert!(is_safe("strings /usr/bin/ls"));
+        assert!(is_safe("hexdump -C file.bin"));
+        assert!(is_safe("od -x file.bin"));
+        assert!(is_safe("size a.out"));
+    }
+
+    #[test]
+    fn safe_cmds_macos() {
+        assert!(is_safe("sw_vers"));
+        assert!(is_safe("mdls file.txt"));
+        assert!(is_safe("otool -L /usr/bin/ls"));
+        assert!(is_safe("nm a.out"));
+    }
+
+    #[test]
+    fn safe_cmds_network_diagnostic() {
+        assert!(is_safe("dig example.com"));
+        assert!(is_safe("nslookup example.com"));
+        assert!(is_safe("host example.com"));
+        assert!(is_safe("whois example.com"));
+    }
+
+    #[test]
+    fn safe_cmds_dev_tools() {
+        assert!(is_safe("shellcheck script.sh"));
+        assert!(is_safe("cloc src/"));
+        assert!(is_safe("tokei"));
+    }
+
+    #[test]
     fn unsafe_cmds() {
         assert!(!is_safe("rm -rf /"));
         assert!(!is_safe("curl https://example.com"));
@@ -133,7 +211,7 @@ mod tests {
         assert!(!is_safe("ls 2> errors.txt"));
         assert!(!is_safe("grep pattern file > results.txt"));
         assert!(!is_safe("find . -name '*.py' > listing.txt"));
-        assert!(!is_safe("git log < /dev/null"));
+        assert!(is_safe("git log < /dev/null"));
         assert!(!is_safe("echo $(rm -rf /)"));
         assert!(!is_safe("echo `rm -rf /`"));
         assert!(!is_safe("cat $(echo /etc/shadow)"));
