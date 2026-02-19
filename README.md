@@ -8,6 +8,8 @@ See [COMMANDS.md](COMMANDS.md) for the full list of supported commands.
 
 ## Installation
 
+Requires [Rust](https://rustup.rs/) to `cargo install` the binary.
+
 ```bash
 git clone git@github.com:michaeldhopkins/claude-safe-chains.git ~/workspace/claude-safe-chains
 cd ~/workspace/claude-safe-chains
