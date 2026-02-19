@@ -1,6 +1,6 @@
 # `safe-chains`
 
-A Claude Code pre-hook that auto-allows safe, read-only bash commands without prompting. This is a great hook for people who are sick of approving `Git -C ...`, `for...do...end` and the like dozens of times every time they work on a new project. As a bonus, it keeps your approved commands list shorter ergo more interesting in your settings files.
+A Claude Code pre-hook that auto-allows safe, read-only bash commands without prompting. This is a great hook for people who are sick of approving `Git -C ...`, `for...do...end` and the like dozens of times every time they work on a new project. This will also auto-approve piped commands, which Claude Code either will ask about every time or only allow approving "similar" commands that somehow never match future commands. Bonus: because you'll hardly need it, your approved commands list in settings will be shorter and more interesting. Stay frosty!
 
 When Claude Code wants to run a bash command, this hook intercepts it and checks if every segment of the command is safe. If so, the command runs without asking for permission. If any segment is unsafe, the normal permission flow takes over. Commands in piped chains, `&&`, and `;` sequences are each validated independently.
 
