@@ -107,7 +107,10 @@ pub fn is_safe_git(tokens: &[String]) -> bool {
     }
     let subcmd = args[0].as_str();
     if GIT_READ_ONLY.contains(subcmd) {
-        return true;
+        let has_dangerous = args[1..].iter().any(|a| {
+            a.starts_with("--upload-p") || a.starts_with("--receive-p")
+        });
+        return !has_dangerous;
     }
     if subcmd == "remote" {
         return args.get(1).is_none_or(|a| !GIT_REMOTE_MUTATING.contains(a.as_str()));
@@ -487,6 +490,31 @@ mod tests {
     #[test]
     fn git_notes_add_denied() {
         assert!(!check("git notes add -m 'note'"));
+    }
+
+    #[test]
+    fn git_ls_remote_upload_pack_denied() {
+        assert!(!check("git ls-remote --upload-pack=malicious origin"));
+    }
+
+    #[test]
+    fn git_ls_remote_upload_pack_space_denied() {
+        assert!(!check("git ls-remote --upload-pack malicious origin"));
+    }
+
+    #[test]
+    fn git_fetch_upload_pack_denied() {
+        assert!(!check("git fetch --upload-pack=malicious origin"));
+    }
+
+    #[test]
+    fn git_fetch_receive_pack_denied() {
+        assert!(!check("git fetch --receive-pack=malicious origin"));
+    }
+
+    #[test]
+    fn git_ls_remote_upload_pack_abbreviated_denied() {
+        assert!(!check("git ls-remote --upload-pa=malicious origin"));
     }
 
     #[test]
