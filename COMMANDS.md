@@ -330,11 +330,11 @@ Allowed: find-identity, find-certificate, find-generic-password, find-internet-p
 
 ### `sed`
 
-Safe unless -i/--in-place flag.
+Safe unless -i/--in-place flag or 'e' modifier on substitutions (executes replacement as shell command).
 
 ### `sort`
 
-Safe unless -o/--output flag.
+Safe unless -o/--output or --compress-program flag.
 
 ### `swift`
 

@@ -21,12 +21,60 @@ pub fn is_safe_find(tokens: &[String]) -> bool {
     !tokens[1..].iter().any(|t| FIND_DANGEROUS_FLAGS.contains(t.as_str()))
 }
 
+fn sed_has_exec_modifier(tokens: &[String]) -> bool {
+    for token in &tokens[1..] {
+        if token.starts_with('-') {
+            continue;
+        }
+        let bytes = token.as_bytes();
+        if bytes == b"e"
+            || (bytes.last() == Some(&b'e')
+                && bytes.len() >= 2
+                && matches!(bytes[bytes.len() - 2], b'0'..=b'9' | b'/' | b'$'))
+        {
+            return true;
+        }
+        if bytes.len() < 4 || bytes[0] != b's' {
+            continue;
+        }
+        let delim = bytes[1];
+        let mut count = 0;
+        let mut escaped = false;
+        let mut flags_start = None;
+        for (i, &b) in bytes[2..].iter().enumerate() {
+            if escaped {
+                escaped = false;
+                continue;
+            }
+            if b == b'\\' {
+                escaped = true;
+                continue;
+            }
+            if b == delim {
+                count += 1;
+                if count == 2 {
+                    flags_start = Some(i + 3);
+                    break;
+                }
+            }
+        }
+        if let Some(start) = flags_start
+            && start < bytes.len()
+            && bytes[start..].contains(&b'e')
+        {
+            return true;
+        }
+    }
+    false
+}
+
 pub fn is_safe_sed(tokens: &[String]) -> bool {
-    !has_flag(tokens, "-i", Some("--in-place"))
+    !has_flag(tokens, "-i", Some("--in-place")) && !sed_has_exec_modifier(tokens)
 }
 
 pub fn is_safe_sort(tokens: &[String]) -> bool {
     !has_flag(tokens, "-o", Some("--output"))
+        && !tokens[1..].iter().any(|t| t == "--compress-program" || t.starts_with("--compress-program="))
 }
 
 pub fn is_safe_yq(tokens: &[String]) -> bool {
@@ -65,12 +113,12 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "sed",
             kind: DocKind::Handler,
-            description: "Safe unless -i/--in-place flag.",
+            description: "Safe unless -i/--in-place flag or 'e' modifier on substitutions (executes replacement as shell command).",
         },
         CommandDoc {
             name: "sort",
             kind: DocKind::Handler,
-            description: "Safe unless -o/--output flag.",
+            description: "Safe unless -o/--output or --compress-program flag.",
         },
         CommandDoc {
             name: "yq",
@@ -229,6 +277,81 @@ mod tests {
     }
 
     #[test]
+    fn sed_exec_modifier_denied() {
+        assert!(!check("sed 's/test/touch \\/tmp\\/pwned/e'"));
+    }
+
+    #[test]
+    fn sed_exec_with_global_denied() {
+        assert!(!check("sed 's/foo/bar/ge'"));
+    }
+
+    #[test]
+    fn sed_exec_alternate_delim_denied() {
+        assert!(!check("sed 's|test|touch /tmp/pwned|e'"));
+    }
+
+    #[test]
+    fn sed_exec_via_e_flag_denied() {
+        assert!(!check("sed -e 's/test/touch tmp/e'"));
+    }
+
+    #[test]
+    fn sed_exec_with_w_flag_denied() {
+        assert!(!check("sed 's/test/cmd/we'"));
+    }
+
+    #[test]
+    fn sed_standalone_e_command_denied() {
+        assert!(!check("sed e"));
+    }
+
+    #[test]
+    fn sed_address_e_command_denied() {
+        assert!(!check("sed 1e"));
+    }
+
+    #[test]
+    fn sed_regex_address_e_denied() {
+        assert!(!check("sed '/pattern/e'"));
+    }
+
+    #[test]
+    fn sed_range_address_e_denied() {
+        assert!(!check("sed '1,5e'"));
+    }
+
+    #[test]
+    fn sed_dollar_address_e_denied() {
+        assert!(!check("sed '$e'"));
+    }
+
+    #[test]
+    fn sed_e_via_flag_denied() {
+        assert!(!check("sed -e e"));
+    }
+
+    #[test]
+    fn sed_filename_starting_with_e_allowed() {
+        assert!(check("sed 's/foo/bar/' error.log"));
+    }
+
+    #[test]
+    fn sed_filename_ending_with_e_allowed() {
+        assert!(check("sed 's/foo/bar/' Makefile"));
+    }
+
+    #[test]
+    fn sed_no_exec_allowed() {
+        assert!(check("sed 's/foo/bar/g'"));
+    }
+
+    #[test]
+    fn sed_no_exec_print_allowed() {
+        assert!(check("sed 's/foo/bar/gp'"));
+    }
+
+    #[test]
     fn sort_basic() {
         assert!(check("sort file.txt"));
     }
@@ -266,6 +389,16 @@ mod tests {
     #[test]
     fn sort_rno_combined_denied() {
         assert!(!check("sort -rno sorted.txt file.txt"));
+    }
+
+    #[test]
+    fn sort_compress_program_denied() {
+        assert!(!check("sort --compress-program sh file.txt"));
+    }
+
+    #[test]
+    fn sort_compress_program_eq_denied() {
+        assert!(!check("sort --compress-program=gzip file.txt"));
     }
 
     #[test]
