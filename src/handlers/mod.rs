@@ -34,6 +34,7 @@ pub(crate) static SAFE_CMDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| 
         "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat",
         "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route",
         "shellcheck", "cloc", "tokei",
+        "safe-chains",
     ])
 });
 

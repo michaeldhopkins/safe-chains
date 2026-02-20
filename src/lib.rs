@@ -143,6 +143,7 @@ mod tests {
         assert!(is_safe("shellcheck script.sh"));
         assert!(is_safe("cloc src/"));
         assert!(is_safe("tokei"));
+        assert!(is_safe("safe-chains \"ls -la\""));
     }
 
     #[test]

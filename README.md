@@ -1,8 +1,8 @@
 # `safe-chains`
 
-A Claude Code pre-hook that auto-allows safe, read-only bash commands without prompting. This is a great hook for people who are sick of approving `Git -C ...`, `for...do...end` and the like dozens of times every time they work on a new project. This will also auto-approve piped commands, which Claude Code either will ask about every time or only allow approving "similar" commands that somehow never match future commands. Bonus: because you'll hardly need it, your approved commands list in settings will be shorter and more interesting. Stay frosty!
+A command safety checker that auto-allows safe, read-only bash commands without prompting. Works as a Claude Code pre-hook, a CLI tool, or an OpenCode plugin.
 
-When Claude Code wants to run a bash command, this hook intercepts it and checks if every segment of the command is safe. If so, the command runs without asking for permission. If any segment is unsafe, the normal permission flow takes over. Commands in piped chains, `&&`, and `;` sequences are each validated independently.
+When an agentic tool wants to run a bash command, safe-chains checks if every segment of the command is safe. If so, the command runs without asking for permission. If any segment is unsafe, the normal permission flow takes over. Commands in piped chains, `&&`, and `;` sequences are each validated independently.
 
 See [COMMANDS.md](COMMANDS.md) for the full list of supported commands.
 
@@ -38,7 +38,26 @@ If the hook is already configured, the script will skip this step.
 
 You'll need to restart your Claude Code sessions to use the new hook, but once you do this, you'll be able to update `safe-chains` and benefit from the new version right away.
 
-## Developing 
+## Usage
+
+### Claude Code (hook mode)
+
+With the hook configured above, safe-chains reads JSON from stdin and responds with a permission decision. No arguments needed.
+
+### CLI mode
+
+Pass a command as a positional argument. Exit code 0 means safe, exit code 1 means unsafe.
+
+```bash
+safe-chains "ls -la | head -5"    # exit 0 = safe
+safe-chains "rm -rf /"            # exit 1 = unsafe
+```
+
+### OpenCode
+
+Copy `opencode-plugin.js` to `.opencode/plugins/` in your project (requires `safe-chains` in PATH).
+
+## Developing
 
 ```bash
 cargo test
