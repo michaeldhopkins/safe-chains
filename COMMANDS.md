@@ -162,7 +162,7 @@ Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requ
 
 ### `cargo`
 
-Allowed: clippy, test, build, check, doc, search, --version, bench, tree, metadata, verify-project, pkgid, locate-project, read-manifest, audit, deny. Guarded: fmt (requires --check).
+Allowed: clippy, test, build, check, doc, search, --version, bench, tree, metadata, verify-project, pkgid, locate-project, read-manifest, audit, deny, license. Guarded: fmt (requires --check).
 
 ### `cmake`
 

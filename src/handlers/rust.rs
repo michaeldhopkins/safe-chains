@@ -19,6 +19,7 @@ static CARGO_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
         "read-manifest",
         "audit",
         "deny",
+        "license",
     ])
 });
 
@@ -68,7 +69,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "cargo",
             kind: DocKind::Handler,
-            description: "Allowed: clippy, test, build, check, doc, search, --version, bench, tree, metadata, verify-project, pkgid, locate-project, read-manifest, audit, deny. \
+            description: "Allowed: clippy, test, build, check, doc, search, --version, bench, tree, metadata, verify-project, pkgid, locate-project, read-manifest, audit, deny, license. \
                           Guarded: fmt (requires --check).",
         },
         CommandDoc {
@@ -165,6 +166,11 @@ mod tests {
     #[test]
     fn cargo_deny() {
         assert!(check("cargo deny check"));
+    }
+
+    #[test]
+    fn cargo_license() {
+        assert!(check("cargo license"));
     }
 
     #[test]

@@ -12,6 +12,7 @@ All tests must pass before committing.
 
 ```bash
 cargo clippy -- -D warnings
+cargo deny check licenses
 ```
 
 Must pass with no warnings before committing.
