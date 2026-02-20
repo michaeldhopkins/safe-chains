@@ -125,11 +125,15 @@ Allowed: list, info, --version, search, deps, uses, leaves, outdated, cat, desc,
 
 ### `bun`
 
-Allowed: --version, test. Multi-word: pm ls/hash/cache.
+Allowed: --version, test, outdated. Multi-word: pm ls/hash/cache/bin, x (delegates to bunx logic).
 
 ### `bundle`
 
 Read-only: list, info, show, check. Guarded: exec (rspec, standardrb, cucumber, brakeman, erb_lint, herb only).
+
+### `bunx`
+
+Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p.
 
 ### `cargo`
 
@@ -217,7 +221,7 @@ Read-only: view, info, list, ls, test, audit, outdated, explain, why, fund, pref
 
 ### `npx`
 
-Whitelisted packages only: eslint, @herb-tools/linter, karma. Skips flags: --yes/-y/--no/--package/-p.
+Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p.
 
 ### `nvm`
 
