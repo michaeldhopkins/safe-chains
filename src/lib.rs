@@ -21,15 +21,34 @@ pub fn is_safe(segment: &str) -> bool {
         return true;
     }
 
+    let tokens: Vec<String> = tokens
+        .into_iter()
+        .filter(|t| !is_fd_redirect(t))
+        .collect();
+    if tokens.is_empty() {
+        return true;
+    }
+
     let cmd = tokens[0].rsplit('/').next().unwrap_or(&tokens[0]);
 
     if let Some(last) = tokens.last()
-        && (last == "--version" || last == "--help")
+        && (last == "--version" || last == "--help" || last == "--dry-run")
     {
         return true;
     }
 
     handlers::dispatch(cmd, &tokens, &is_safe)
+}
+
+fn is_fd_redirect(token: &str) -> bool {
+    let bytes = token.as_bytes();
+    if bytes.len() < 3 {
+        return false;
+    }
+    let start = usize::from(bytes[0].is_ascii_digit());
+    bytes.get(start) == Some(&b'>')
+        && bytes.get(start + 1) == Some(&b'&')
+        && bytes[start + 2..].iter().all(|b| b.is_ascii_digit() || *b == b'-')
 }
 
 pub fn is_safe_command(command: &str) -> bool {
@@ -193,6 +212,12 @@ mod tests {
     }
 
     #[test]
+    fn version_with_fd_redirect() {
+        assert!(is_safe("node --version 2>&1"));
+        assert!(is_safe("cargo --version 2>&1"));
+    }
+
+    #[test]
     fn version_not_last_token() {
         assert!(!is_safe("node --version --extra"));
         assert!(!is_safe("node -v"));
@@ -213,8 +238,30 @@ mod tests {
     }
 
     #[test]
+    fn help_with_fd_redirect() {
+        assert!(is_safe("cargo login --help 2>&1"));
+    }
+
+    #[test]
     fn help_not_last_token() {
         assert!(!is_safe("node --help --extra"));
+    }
+
+    #[test]
+    fn dry_run_shortcut() {
+        assert!(is_safe("cargo publish --dry-run"));
+        assert!(is_safe("terraform apply --dry-run"));
+        assert!(is_safe("rm -rf / --dry-run"));
+    }
+
+    #[test]
+    fn dry_run_with_fd_redirect() {
+        assert!(is_safe("cargo publish --dry-run 2>&1"));
+    }
+
+    #[test]
+    fn dry_run_not_last_token() {
+        assert!(!is_safe("cargo publish --dry-run --force"));
     }
 
     #[test]
