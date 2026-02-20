@@ -168,6 +168,10 @@ Allowed: clippy, test, build, check, doc, search, --version, bench, tree, metada
 
 Allowed: --version, --system-information (single argument only).
 
+### `codesign`
+
+Allowed: -d/--display, -v/--verify. Denied if -s/--sign, --remove-signature, or -f/--force present.
+
 ### `composer`
 
 Allowed: show, info, diagnose, outdated, licenses, check-platform-reqs, suggests, fund, audit, --version, about, help.
@@ -244,6 +248,14 @@ Read-only: log, diff, show, status, st, help, --version. Multi-word: op log, fil
 
 Allowed: list, print, print-cache, print-disabled, dumpstate, blame, hostinfo, resolveport, examine, version, help, error.
 
+### `lipo`
+
+Allowed: -info, -detailed_info, -archs, -verify_arch. Denied if -output flag present.
+
+### `log`
+
+Allowed: help, show, stats, stream. Denied: config, erase, collect.
+
 ### `mise`
 
 Allowed: ls, list, current, which, doctor, --version. Multi-word: settings get.
@@ -275,6 +287,14 @@ Allowed: ls, list, current, which, version, --version, ls-remote.
 ### `pip / pip3`
 
 Read-only: list, show, freeze, check, index, debug, inspect, help. Guarded: config (list/get only).
+
+### `pkgutil`
+
+Allowed: --pkgs/--packages, --pkgs-plist, --files, --export-plist, --pkg-info, --pkg-groups, --groups, --group-pkgs, --file-info, --payload-files, --check-signature. Denied: --forget, --learn, --expand, --flatten.
+
+### `plutil`
+
+Allowed: -lint, -p, -type, -help. Denied: -convert, -insert, -replace, -remove, -create.
 
 ### `pnpm`
 
@@ -336,9 +356,17 @@ Allowed: list, which, --version.
 
 Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n, -P, -s, -E, -d, -0, -r, -t, -p, -x).
 
+### `xcode-select`
+
+Allowed: -p/--print-path, -v/--version. Denied: -s/--switch, -r/--reset, --install.
+
 ### `xcodebuild`
 
 Allowed: -version, -showsdks, -showBuildSettings, -showdestinations, -list.
+
+### `xcrun`
+
+Allowed: --find, --show-sdk-path, --show-sdk-version, --show-sdk-build-version, --show-sdk-platform-path, --show-sdk-platform-version, --show-toolchain-path, simctl list. Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.
 
 ### `xmllint`
 

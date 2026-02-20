@@ -101,6 +101,13 @@ pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) ->
         "diskutil" => system::is_safe_diskutil(tokens),
         "security" => system::is_safe_security(tokens),
         "csrutil" => system::is_safe_csrutil(tokens),
+        "log" => system::is_safe_log(tokens),
+        "plutil" => system::is_safe_plutil(tokens),
+        "xcode-select" => system::is_safe_xcode_select(tokens),
+        "xcrun" => system::is_safe_xcrun(tokens),
+        "pkgutil" => system::is_safe_pkgutil(tokens),
+        "lipo" => system::is_safe_lipo(tokens),
+        "codesign" => system::is_safe_codesign(tokens),
 
         "find" => coreutils::is_safe_find(tokens),
         "sed" => coreutils::is_safe_sed(tokens),
