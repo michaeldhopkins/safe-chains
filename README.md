@@ -11,8 +11,8 @@ See [COMMANDS.md](COMMANDS.md) for the full list of supported commands.
 Requires [Rust](https://rustup.rs/) to `cargo install` the binary.
 
 ```bash
-git clone git@github.com:michaeldhopkins/claude-safe-chains.git ~/workspace/claude-safe-chains
-cd ~/workspace/claude-safe-chains
+git clone git@github.com:michaeldhopkins/safe-chains.git ~/workspace/safe-chains
+cd ~/workspace/safe-chains
 ./install.sh
 ```
 
