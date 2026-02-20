@@ -74,6 +74,53 @@ pub fn is_safe_nice(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     is_safe(&inner)
 }
 
+static HYPERFINE_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
+    HashSet::from([
+        "-w", "--warmup", "-r", "--runs", "-m", "--min-runs", "-M", "--max-runs",
+        "-p", "--prepare", "-c", "--cleanup", "-s", "--setup",
+        "-n", "--command-name", "--min-benchmarking-time", "--style", "--sort",
+        "--time-unit", "--export-json", "--export-csv", "--export-markdown",
+        "--export-asciidoc", "--shell", "-S", "--output",
+    ])
+});
+
+pub fn is_safe_hyperfine(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = &tokens[i];
+        if t == "--" {
+            i += 1;
+            break;
+        }
+        if t.starts_with('-') {
+            if t.contains('=') {
+                i += 1;
+                continue;
+            }
+            if HYPERFINE_FLAGS_WITH_ARG.contains(t.as_str()) {
+                if ["-p", "--prepare", "-c", "--cleanup", "-s", "--setup"].contains(&t.as_str()) {
+                    return false;
+                }
+                i += 2;
+            } else {
+                i += 1;
+            }
+            continue;
+        }
+        if !is_safe(t) {
+            return false;
+        }
+        i += 1;
+    }
+    while i < tokens.len() {
+        if !is_safe(&tokens[i]) {
+            return false;
+        }
+        i += 1;
+    }
+    true
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocKind};
     vec![
@@ -91,6 +138,11 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             name: "time",
             kind: DocKind::Handler,
             description: "Skips -p flag, then recursively validates the inner command.",
+        },
+        CommandDoc {
+            name: "hyperfine",
+            kind: DocKind::Handler,
+            description: "Recursively validates each benchmarked command. Denied if --prepare, --cleanup, or --setup flags are used (arbitrary shell execution).",
         },
         CommandDoc {
             name: "nice / ionice",
@@ -241,5 +293,40 @@ mod tests {
     #[test]
     fn ionice_rm_denied() {
         assert!(!check("ionice rm -rf /"));
+    }
+
+    #[test]
+    fn hyperfine_safe_command() {
+        assert!(check("hyperfine 'ls -la'"));
+    }
+
+    #[test]
+    fn hyperfine_with_warmup() {
+        assert!(check("hyperfine --warmup 3 'git status'"));
+    }
+
+    #[test]
+    fn hyperfine_multiple_safe_commands() {
+        assert!(check("hyperfine 'fd . src' 'find src'"));
+    }
+
+    #[test]
+    fn hyperfine_unsafe_command_denied() {
+        assert!(!check("hyperfine 'rm -rf /'"));
+    }
+
+    #[test]
+    fn hyperfine_prepare_denied() {
+        assert!(!check("hyperfine --prepare 'make clean' 'make'"));
+    }
+
+    #[test]
+    fn hyperfine_cleanup_denied() {
+        assert!(!check("hyperfine --cleanup 'rm tmp' 'ls'"));
+    }
+
+    #[test]
+    fn hyperfine_setup_denied() {
+        assert!(!check("hyperfine --setup 'compile' 'run'"));
     }
 }

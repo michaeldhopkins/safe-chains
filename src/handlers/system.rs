@@ -84,6 +84,67 @@ pub fn is_safe_cmake(tokens: &[String]) -> bool {
     tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--system-information")
 }
 
+static SECURITY_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
+    HashSet::from([
+        "find-identity", "find-certificate", "find-generic-password", "find-internet-password",
+        "show-keychain-info", "dump-keychain", "list-keychains", "dump-trust-settings",
+        "smartcard", "verify-cert", "cms",
+    ])
+});
+
+pub fn is_safe_security(tokens: &[String]) -> bool {
+    tokens.len() >= 2 && SECURITY_READ_ONLY.contains(tokens[1].as_str())
+}
+
+static CSRUTIL_READ_ONLY: LazyLock<HashSet<&'static str>> =
+    LazyLock::new(|| HashSet::from(["status", "report", "authenticated-root"]));
+
+pub fn is_safe_csrutil(tokens: &[String]) -> bool {
+    tokens.len() >= 2 && CSRUTIL_READ_ONLY.contains(tokens[1].as_str())
+}
+
+static DISKUTIL_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
+    HashSet::from(["list", "info", "activity", "listFilesystems", "apfs"])
+});
+
+static DISKUTIL_APFS_READ_ONLY: LazyLock<HashSet<&'static str>> =
+    LazyLock::new(|| HashSet::from(["list", "listCryptoUsers", "listSnapshots", "listVolumeGroups"]));
+
+pub fn is_safe_diskutil(tokens: &[String]) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    let sub = tokens[1].as_str();
+    if sub == "apfs" {
+        return tokens.get(2).is_some_and(|a| DISKUTIL_APFS_READ_ONLY.contains(a.as_str()));
+    }
+    DISKUTIL_READ_ONLY.contains(sub)
+}
+
+static LAUNCHCTL_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
+    HashSet::from([
+        "list", "print", "print-cache", "print-disabled", "dumpstate", "blame", "hostinfo",
+        "resolveport", "examine", "version", "help", "error",
+    ])
+});
+
+pub fn is_safe_launchctl(tokens: &[String]) -> bool {
+    tokens.len() >= 2 && LAUNCHCTL_READ_ONLY.contains(tokens[1].as_str())
+}
+
+pub fn is_safe_networksetup(tokens: &[String]) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    let sub = tokens[1].as_str();
+    sub.starts_with("-list")
+        || sub.starts_with("-get")
+        || sub.starts_with("-show")
+        || sub.starts_with("-print")
+        || sub == "-version"
+        || sub == "-help"
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocKind};
     vec![
@@ -121,6 +182,31 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             name: "cmake",
             kind: DocKind::Handler,
             description: "Allowed: --version, --system-information (single argument only).",
+        },
+        CommandDoc {
+            name: "security",
+            kind: DocKind::Handler,
+            description: "Allowed: find-identity, find-certificate, find-generic-password, find-internet-password, show-keychain-info, dump-keychain, list-keychains, dump-trust-settings, smartcard, verify-cert, cms.",
+        },
+        CommandDoc {
+            name: "csrutil",
+            kind: DocKind::Handler,
+            description: "Allowed: status, report, authenticated-root.",
+        },
+        CommandDoc {
+            name: "diskutil",
+            kind: DocKind::Handler,
+            description: "Allowed: list, info, activity, listFilesystems. Multi-word: apfs list, apfs listCryptoUsers, apfs listSnapshots, apfs listVolumeGroups.",
+        },
+        CommandDoc {
+            name: "launchctl",
+            kind: DocKind::Handler,
+            description: "Allowed: list, print, print-cache, print-disabled, dumpstate, blame, hostinfo, resolveport, examine, version, help, error.",
+        },
+        CommandDoc {
+            name: "networksetup",
+            kind: DocKind::Handler,
+            description: "Allowed: subcommands starting with -list, -get, -show, -print, plus -version and -help.",
         },
     ]
 }
@@ -436,5 +522,200 @@ mod tests {
     #[test]
     fn cmake_generate_denied() {
         assert!(!check("cmake ."));
+    }
+
+    #[test]
+    fn networksetup_listallhardwareports() {
+        assert!(check("networksetup -listallhardwareports"));
+    }
+
+    #[test]
+    fn networksetup_listallnetworkservices() {
+        assert!(check("networksetup -listallnetworkservices"));
+    }
+
+    #[test]
+    fn networksetup_getinfo() {
+        assert!(check("networksetup -getinfo Wi-Fi"));
+    }
+
+    #[test]
+    fn networksetup_getdnsservers() {
+        assert!(check("networksetup -getdnsservers Wi-Fi"));
+    }
+
+    #[test]
+    fn networksetup_version() {
+        assert!(check("networksetup -version"));
+    }
+
+    #[test]
+    fn networksetup_help() {
+        assert!(check("networksetup -help"));
+    }
+
+    #[test]
+    fn networksetup_setdnsservers_denied() {
+        assert!(!check("networksetup -setdnsservers Wi-Fi 8.8.8.8"));
+    }
+
+    #[test]
+    fn networksetup_setairportpower_denied() {
+        assert!(!check("networksetup -setairportpower en0 on"));
+    }
+
+    #[test]
+    fn networksetup_no_args_denied() {
+        assert!(!check("networksetup"));
+    }
+
+    #[test]
+    fn launchctl_list() {
+        assert!(check("launchctl list"));
+    }
+
+    #[test]
+    fn launchctl_print() {
+        assert!(check("launchctl print system"));
+    }
+
+    #[test]
+    fn launchctl_blame() {
+        assert!(check("launchctl blame system/com.apple.Finder"));
+    }
+
+    #[test]
+    fn launchctl_version() {
+        assert!(check("launchctl version"));
+    }
+
+    #[test]
+    fn launchctl_load_denied() {
+        assert!(!check("launchctl load /Library/LaunchDaemons/foo.plist"));
+    }
+
+    #[test]
+    fn launchctl_start_denied() {
+        assert!(!check("launchctl start com.apple.Finder"));
+    }
+
+    #[test]
+    fn launchctl_stop_denied() {
+        assert!(!check("launchctl stop com.apple.Finder"));
+    }
+
+    #[test]
+    fn launchctl_no_args_denied() {
+        assert!(!check("launchctl"));
+    }
+
+    #[test]
+    fn diskutil_list() {
+        assert!(check("diskutil list"));
+    }
+
+    #[test]
+    fn diskutil_info() {
+        assert!(check("diskutil info disk0"));
+    }
+
+    #[test]
+    fn diskutil_apfs_list() {
+        assert!(check("diskutil apfs list"));
+    }
+
+    #[test]
+    fn diskutil_apfs_list_snapshots() {
+        assert!(check("diskutil apfs listSnapshots disk1s1"));
+    }
+
+    #[test]
+    fn diskutil_erase_denied() {
+        assert!(!check("diskutil eraseDisk JHFS+ Untitled disk2"));
+    }
+
+    #[test]
+    fn diskutil_mount_denied() {
+        assert!(!check("diskutil mount disk2s1"));
+    }
+
+    #[test]
+    fn diskutil_unmount_denied() {
+        assert!(!check("diskutil unmount disk2s1"));
+    }
+
+    #[test]
+    fn diskutil_apfs_delete_denied() {
+        assert!(!check("diskutil apfs deleteVolume disk1s2"));
+    }
+
+    #[test]
+    fn diskutil_no_args_denied() {
+        assert!(!check("diskutil"));
+    }
+
+    #[test]
+    fn security_find_identity() {
+        assert!(check("security find-identity -v -p codesigning"));
+    }
+
+    #[test]
+    fn security_find_certificate() {
+        assert!(check("security find-certificate -a"));
+    }
+
+    #[test]
+    fn security_list_keychains() {
+        assert!(check("security list-keychains"));
+    }
+
+    #[test]
+    fn security_verify_cert() {
+        assert!(check("security verify-cert -c cert.pem"));
+    }
+
+    #[test]
+    fn security_add_denied() {
+        assert!(!check("security add-certificates cert.pem"));
+    }
+
+    #[test]
+    fn security_delete_denied() {
+        assert!(!check("security delete-keychain test.keychain"));
+    }
+
+    #[test]
+    fn security_no_args_denied() {
+        assert!(!check("security"));
+    }
+
+    #[test]
+    fn csrutil_status() {
+        assert!(check("csrutil status"));
+    }
+
+    #[test]
+    fn csrutil_report() {
+        assert!(check("csrutil report"));
+    }
+
+    #[test]
+    fn csrutil_enable_denied() {
+        assert!(!check("csrutil enable"));
+    }
+
+    #[test]
+    fn csrutil_disable_denied() {
+        assert!(!check("csrutil disable"));
+    }
+
+    #[test]
+    fn csrutil_clear_denied() {
+        assert!(!check("csrutil clear"));
+    }
+
+    #[test]
+    fn csrutil_no_args_denied() {
+        assert!(!check("csrutil"));
     }
 }
