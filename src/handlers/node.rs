@@ -12,7 +12,7 @@ static NPM_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
 });
 
 static NPX_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["eslint", "@herb-tools/linter", "karma"]));
+    LazyLock::new(|| HashSet::from(["eslint", "@herb-tools/linter", "karma", "playwright"]));
 
 static NPX_FLAGS_NO_ARG: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["--yes", "-y", "--no", "--ignore-existing", "-q", "--quiet"]));
@@ -171,7 +171,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "npx",
             kind: DocKind::Handler,
-            description: "Whitelisted packages only: eslint, @herb-tools/linter, karma. Skips flags: --yes/-y/--no/--package/-p.",
+            description: "Whitelisted packages only: eslint, @herb-tools/linter, karma, playwright. Skips flags: --yes/-y/--no/--package/-p.",
         },
         CommandDoc {
             name: "nvm",
@@ -377,6 +377,11 @@ mod tests {
     #[test]
     fn npx_karma() {
         assert!(check("npx karma start"));
+    }
+
+    #[test]
+    fn npx_playwright() {
+        assert!(check("npx playwright --version"));
     }
 
     #[test]
