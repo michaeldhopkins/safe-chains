@@ -3,15 +3,6 @@
 version = 4
 
 [[package]]
-name = "claude-safe-chains"
-version = "1.0.0"
-dependencies = [
- "serde",
- "serde_json",
- "shell-words",
-]
-
-[[package]]
 name = "itoa"
 version = "1.0.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -39,6 +30,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "21b2ebcf727b7760c461f091f9f0f539b77b8e87f2fd88131e7f1b433b3cece4"
 dependencies = [
  "proc-macro2",
+]
+
+[[package]]
+name = "safe-chains"
+version = "1.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "shell-words",
 ]
 
 [[package]]
