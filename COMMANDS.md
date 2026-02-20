@@ -252,6 +252,10 @@ Allowed: list, print, print-cache, print-disabled, dumpstate, blame, hostinfo, r
 
 Allowed: -info, -detailed_info, -archs, -verify_arch. Denied if -output flag present.
 
+### `llm`
+
+Allowed: models, plugins, templates, aliases, logs, collections. Denied: prompt, chat, keys, install, embed.
+
 ### `log`
 
 Allowed: help, show, stats, stream. Denied: config, erase, collect.
@@ -283,6 +287,10 @@ Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requ
 ### `nvm`
 
 Allowed: ls, list, current, which, version, --version, ls-remote.
+
+### `ollama`
+
+Allowed: list, show, ps. Denied: run, pull, rm, create, serve, push, cp.
 
 ### `pip / pip3`
 
