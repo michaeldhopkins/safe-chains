@@ -382,7 +382,7 @@ Safe unless --output flag.
 
 ### `yarn`
 
-Read-only: list, info, why, --version. Also allowed: test, test:*.
+Read-only: list, ls, info, why, --version. Also allowed: test, test:*.
 
 ### `yq`
 

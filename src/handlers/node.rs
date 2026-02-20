@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::sync::LazyLock;
 
 static YARN_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["list", "info", "why", "--version"]));
+    LazyLock::new(|| HashSet::from(["list", "ls", "info", "why", "--version"]));
 
 static NPM_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
@@ -18,7 +18,7 @@ static NPX_FLAGS_NO_ARG: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["--yes", "-y", "--no", "--ignore-existing", "-q", "--quiet"]));
 
 static PNPM_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["list", "why", "audit", "outdated", "--version"]));
+    LazyLock::new(|| HashSet::from(["list", "ls", "why", "audit", "outdated", "--version"]));
 
 static BUN_SAFE: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["--version", "test", "outdated"]));
@@ -188,7 +188,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "yarn",
             kind: DocKind::Handler,
-            description: "Read-only: list, info, why, --version. Also allowed: test, test:*.",
+            description: "Read-only: list, ls, info, why, --version. Also allowed: test, test:*.",
         },
         CommandDoc {
             name: "pnpm",
@@ -244,6 +244,7 @@ mod tests {
     #[test]
     fn yarn_list() {
         assert!(check("yarn list --depth=0"));
+        assert!(check("yarn ls bootstrap"));
     }
 
     #[test]
