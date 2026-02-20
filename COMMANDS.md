@@ -113,7 +113,7 @@ These commands are allowed with specific subcommands or flags.
 
 ### `asdf`
 
-Allowed: current, which, help, list, --version.
+Allowed: current, which, help, list, --version, plugin-list, plugin-list-all. Multi-word: plugin list.
 
 ### `bash / sh`
 
