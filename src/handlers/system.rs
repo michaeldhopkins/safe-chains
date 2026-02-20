@@ -52,7 +52,19 @@ pub fn is_safe_mise(tokens: &[String]) -> bool {
 }
 
 pub fn is_safe_asdf(tokens: &[String]) -> bool {
-    tokens.len() >= 2 && ASDF_READ_ONLY.contains(tokens[1].as_str())
+    if tokens.len() < 2 {
+        return false;
+    }
+    if ASDF_READ_ONLY.contains(tokens[1].as_str()) {
+        return true;
+    }
+    if tokens[1] == "plugin" {
+        return tokens.get(2).is_some_and(|a| a == "list");
+    }
+    if tokens[1] == "plugin-list" || tokens[1] == "plugin-list-all" {
+        return true;
+    }
+    false
 }
 
 pub fn is_safe_defaults(tokens: &[String]) -> bool {
@@ -88,7 +100,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "asdf",
             kind: DocKind::Handler,
-            description: "Allowed: current, which, help, list, --version.",
+            description: "Allowed: current, which, help, list, --version, plugin-list, plugin-list-all. Multi-word: plugin list.",
         },
         CommandDoc {
             name: "defaults",
@@ -284,6 +296,31 @@ mod tests {
     #[test]
     fn asdf_version() {
         assert!(check("asdf --version"));
+    }
+
+    #[test]
+    fn asdf_plugin_list() {
+        assert!(check("asdf plugin list"));
+    }
+
+    #[test]
+    fn asdf_plugin_list_all() {
+        assert!(check("asdf plugin list all"));
+    }
+
+    #[test]
+    fn asdf_plugin_list_legacy() {
+        assert!(check("asdf plugin-list"));
+    }
+
+    #[test]
+    fn asdf_plugin_list_all_legacy() {
+        assert!(check("asdf plugin-list-all"));
+    }
+
+    #[test]
+    fn asdf_plugin_add_denied() {
+        assert!(!check("asdf plugin add ruby"));
     }
 
     #[test]
