@@ -23,7 +23,9 @@ pub fn is_safe(segment: &str) -> bool {
 
     let cmd = tokens[0].rsplit('/').next().unwrap_or(&tokens[0]);
 
-    if tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--help") {
+    if let Some(last) = tokens.last()
+        && (last == "--version" || last == "--help")
+    {
         return true;
     }
 
@@ -171,7 +173,14 @@ mod tests {
     }
 
     #[test]
-    fn version_only_two_tokens() {
+    fn version_multi_token() {
+        assert!(is_safe("npx playwright --version"));
+        assert!(is_safe("git -C /repo --version"));
+        assert!(is_safe("docker compose --version"));
+    }
+
+    #[test]
+    fn version_not_last_token() {
         assert!(!is_safe("node --version --extra"));
         assert!(!is_safe("node -v"));
     }
@@ -185,7 +194,13 @@ mod tests {
     }
 
     #[test]
-    fn help_only_two_tokens() {
+    fn help_multi_token() {
+        assert!(is_safe("npx playwright --help"));
+        assert!(is_safe("cargo install --help"));
+    }
+
+    #[test]
+    fn help_not_last_token() {
         assert!(!is_safe("node --help --extra"));
     }
 
