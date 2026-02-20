@@ -1,3 +1,4 @@
+pub mod ai;
 pub mod containers;
 pub mod coreutils;
 pub mod dotnet;
@@ -89,6 +90,9 @@ pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) ->
 
         "docker" | "podman" => containers::is_safe_docker(tokens),
 
+        "ollama" => ai::is_safe_ollama(tokens),
+        "llm" => ai::is_safe_llm(tokens),
+
         "brew" => system::is_safe_brew(tokens),
         "mise" => system::is_safe_mise(tokens),
         "asdf" => system::is_safe_asdf(tokens),
@@ -134,6 +138,7 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(swift::command_docs());
     docs.extend(dotnet::command_docs());
     docs.extend(containers::command_docs());
+    docs.extend(ai::command_docs());
     docs.extend(system::command_docs());
     docs.extend(coreutils::command_docs());
     docs.extend(shell::command_docs());
