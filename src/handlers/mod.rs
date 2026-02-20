@@ -113,7 +113,7 @@ pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) ->
         "lipo" => system::is_safe_lipo(tokens),
         "codesign" => system::is_safe_codesign(tokens),
 
-        "find" => coreutils::is_safe_find(tokens),
+        "find" => coreutils::is_safe_find(tokens, is_safe),
         "sed" => coreutils::is_safe_sed(tokens),
         "sort" => coreutils::is_safe_sort(tokens),
         "yq" => coreutils::is_safe_yq(tokens),

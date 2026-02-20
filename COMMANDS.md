@@ -210,7 +210,7 @@ Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner 
 
 ### `find`
 
-Safe unless dangerous flags: -delete, -exec, -execdir, -ok, -okdir, -fls, -fprint, -fprint0, -fprintf.
+Safe unless dangerous flags: -delete, -ok, -okdir, -fls, -fprint, -fprint0, -fprintf. -exec/-execdir allowed when the executed command is itself safe.
 
 ### `fnm`
 

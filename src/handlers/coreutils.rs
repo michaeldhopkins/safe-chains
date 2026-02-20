@@ -6,8 +6,6 @@ use crate::parse::has_flag;
 static FIND_DANGEROUS_FLAGS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
         "-delete",
-        "-exec",
-        "-execdir",
         "-ok",
         "-okdir",
         "-fls",
@@ -17,8 +15,36 @@ static FIND_DANGEROUS_FLAGS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| 
     ])
 });
 
-pub fn is_safe_find(tokens: &[String]) -> bool {
-    !tokens[1..].iter().any(|t| FIND_DANGEROUS_FLAGS.contains(t.as_str()))
+pub fn is_safe_find(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+    let mut i = 1;
+    while i < tokens.len() {
+        if FIND_DANGEROUS_FLAGS.contains(tokens[i].as_str()) {
+            return false;
+        }
+        if tokens[i] == "-exec" || tokens[i] == "-execdir" {
+            let cmd_start = i + 1;
+            let cmd_end = tokens[cmd_start..]
+                .iter()
+                .position(|t| t == ";" || t == "+")
+                .map(|p| cmd_start + p)
+                .unwrap_or(tokens.len());
+            if cmd_start >= cmd_end {
+                return false;
+            }
+            let exec_cmd = tokens[cmd_start..cmd_end]
+                .iter()
+                .map(|t| if t == "{}" { "file" } else { t.as_str() })
+                .collect::<Vec<_>>()
+                .join(" ");
+            if !is_safe(&exec_cmd) {
+                return false;
+            }
+            i = cmd_end + 1;
+            continue;
+        }
+        i += 1;
+    }
+    true
 }
 
 fn sed_has_exec_modifier(tokens: &[String]) -> bool {
@@ -108,7 +134,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "find",
             kind: DocKind::Handler,
-            description: "Safe unless dangerous flags: -delete, -exec, -execdir, -ok, -okdir, -fls, -fprint, -fprint0, -fprintf.",
+            description: "Safe unless dangerous flags: -delete, -ok, -okdir, -fls, -fprint, -fprint0, -fprintf. \
+                          -exec/-execdir allowed when the executed command is itself safe.",
         },
         CommandDoc {
             name: "sed",
@@ -177,13 +204,27 @@ mod tests {
     }
 
     #[test]
-    fn find_exec_denied() {
-        assert!(!check("find . -exec rm {} \\;"));
+    fn find_exec_safe_command() {
+        assert!(check("find . -name '*.rb' -exec grep -l pattern {} \\;"));
+        assert!(check("find . -name '*.rb' -exec grep -l pattern {} +"));
+        assert!(check("find . -exec cat {} \\;"));
     }
 
     #[test]
-    fn find_execdir_denied() {
-        assert!(!check("find . -execdir cat {} \\;"));
+    fn find_execdir_safe_command() {
+        assert!(check("find . -execdir cat {} \\;"));
+        assert!(check("find . -execdir grep pattern {} \\;"));
+    }
+
+    #[test]
+    fn find_exec_unsafe_denied() {
+        assert!(!check("find . -exec rm {} \\;"));
+        assert!(!check("find . -exec rm -rf {} +"));
+    }
+
+    #[test]
+    fn find_execdir_unsafe_denied() {
+        assert!(!check("find . -execdir rm {} \\;"));
     }
 
     #[test]
@@ -197,8 +238,8 @@ mod tests {
     }
 
     #[test]
-    fn find_exec_grep_denied() {
-        assert!(!check("find . -name '*.py' -exec grep pattern {} +"));
+    fn find_exec_grep_safe() {
+        assert!(check("find . -name '*.py' -exec grep pattern {} +"));
     }
 
     #[test]
