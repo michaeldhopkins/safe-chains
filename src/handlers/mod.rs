@@ -56,6 +56,7 @@ pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) ->
         "bun" => node::is_safe_bun(tokens),
         "deno" => node::is_safe_deno(tokens),
         "npx" => node::is_safe_npx(tokens),
+        "bunx" => node::is_safe_bunx(tokens),
         "nvm" => node::is_safe_nvm(tokens),
         "fnm" => node::is_safe_fnm(tokens),
         "volta" => node::is_safe_volta(tokens),

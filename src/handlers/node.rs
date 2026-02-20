@@ -21,10 +21,13 @@ static PNPM_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["list", "why", "audit", "outdated", "--version"]));
 
 static BUN_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["--version", "test"]));
+    LazyLock::new(|| HashSet::from(["--version", "test", "outdated"]));
 
 static BUN_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> =
-    LazyLock::new(|| vec![("pm", HashSet::from(["ls", "hash", "cache"]))]);
+    LazyLock::new(|| vec![("pm", HashSet::from(["ls", "hash", "cache", "bin"]))]);
+
+static BUNX_FLAGS_NO_ARG: LazyLock<HashSet<&'static str>> =
+    LazyLock::new(|| HashSet::from(["--bun", "--no-install", "--verbose", "--silent"]));
 
 static DENO_SAFE: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["--version", "info", "doc", "lint", "check", "test"]));
@@ -69,30 +72,60 @@ pub fn is_safe_npm(tokens: &[String]) -> bool {
     false
 }
 
-pub fn is_safe_npx(tokens: &[String]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let mut i = 1;
+fn find_runner_package_index(
+    tokens: &[String],
+    start: usize,
+    flags: &HashSet<&str>,
+) -> Option<usize> {
+    let mut i = start;
     while i < tokens.len() {
         if tokens[i] == "--package" || tokens[i] == "-p" {
             i += 2;
             continue;
         }
-        if NPX_FLAGS_NO_ARG.contains(tokens[i].as_str()) {
+        if flags.contains(tokens[i].as_str()) {
             i += 1;
             continue;
         }
         if tokens[i] == "--" {
-            i += 1;
-            break;
+            return Some(i + 1);
         }
         if tokens[i].starts_with('-') {
-            return false;
+            return None;
         }
-        break;
+        return Some(i);
     }
-    i < tokens.len() && NPX_SAFE.contains(tokens[i].as_str())
+    None
+}
+
+fn is_safe_runner_package(tokens: &[String], pkg_idx: usize) -> bool {
+    if pkg_idx >= tokens.len() {
+        return false;
+    }
+    let pkg = tokens[pkg_idx].as_str();
+    if NPX_SAFE.contains(pkg) {
+        return true;
+    }
+    if pkg == "tsc" {
+        return tokens[pkg_idx + 1..].iter().any(|t| t == "--noEmit");
+    }
+    false
+}
+
+pub fn is_safe_npx(tokens: &[String]) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    find_runner_package_index(tokens, 1, &NPX_FLAGS_NO_ARG)
+        .is_some_and(|idx| is_safe_runner_package(tokens, idx))
+}
+
+pub fn is_safe_bunx(tokens: &[String]) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    find_runner_package_index(tokens, 1, &BUNX_FLAGS_NO_ARG)
+        .is_some_and(|idx| is_safe_runner_package(tokens, idx))
 }
 
 pub fn is_safe_pnpm(tokens: &[String]) -> bool {
@@ -102,6 +135,10 @@ pub fn is_safe_pnpm(tokens: &[String]) -> bool {
 pub fn is_safe_bun(tokens: &[String]) -> bool {
     if tokens.len() < 2 {
         return false;
+    }
+    if tokens[1] == "x" {
+        return find_runner_package_index(tokens, 2, &BUNX_FLAGS_NO_ARG)
+            .is_some_and(|idx| is_safe_runner_package(tokens, idx));
     }
     if BUN_SAFE.contains(tokens[1].as_str()) {
         return true;
@@ -161,7 +198,12 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "bun",
             kind: DocKind::Handler,
-            description: "Allowed: --version, test. Multi-word: pm ls/hash/cache.",
+            description: "Allowed: --version, test, outdated. Multi-word: pm ls/hash/cache/bin, x (delegates to bunx logic).",
+        },
+        CommandDoc {
+            name: "bunx",
+            kind: DocKind::Handler,
+            description: "Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p.",
         },
         CommandDoc {
             name: "deno",
@@ -171,7 +213,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "npx",
             kind: DocKind::Handler,
-            description: "Whitelisted packages only: eslint, @herb-tools/linter, karma. Skips flags: --yes/-y/--no/--package/-p.",
+            description: "Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p.",
         },
         CommandDoc {
             name: "nvm",
@@ -488,6 +530,36 @@ mod tests {
     }
 
     #[test]
+    fn bun_pm_bin() {
+        assert!(check("bun pm bin"));
+    }
+
+    #[test]
+    fn bun_outdated() {
+        assert!(check("bun outdated"));
+    }
+
+    #[test]
+    fn bun_x_eslint() {
+        assert!(check("bun x eslint src/"));
+    }
+
+    #[test]
+    fn bun_x_tsc_noemit() {
+        assert!(check("bun x tsc --noEmit"));
+    }
+
+    #[test]
+    fn bun_x_tsc_denied() {
+        assert!(!check("bun x tsc"));
+    }
+
+    #[test]
+    fn bun_x_cowsay_denied() {
+        assert!(!check("bun x cowsay hello"));
+    }
+
+    #[test]
     fn bun_install_denied() {
         assert!(!check("bun install"));
     }
@@ -650,5 +722,70 @@ mod tests {
     #[test]
     fn volta_pin_denied() {
         assert!(!check("volta pin node@18"));
+    }
+
+    #[test]
+    fn bunx_eslint() {
+        assert!(check("bunx eslint src/"));
+    }
+
+    #[test]
+    fn bunx_tsc_noemit() {
+        assert!(check("bunx tsc --noEmit"));
+    }
+
+    #[test]
+    fn bunx_tsc_project_noemit() {
+        assert!(check("bunx tsc --project tsconfig.json --noEmit"));
+    }
+
+    #[test]
+    fn bunx_bun_flag() {
+        assert!(check("bunx --bun eslint src/"));
+    }
+
+    #[test]
+    fn bunx_no_install_flag() {
+        assert!(check("bunx --no-install eslint ."));
+    }
+
+    #[test]
+    fn bunx_package_flag() {
+        assert!(check("bunx --package eslint eslint src/"));
+    }
+
+    #[test]
+    fn bunx_double_dash() {
+        assert!(check("bunx -- eslint src/"));
+    }
+
+    #[test]
+    fn bunx_tsc_without_noemit_denied() {
+        assert!(!check("bunx tsc"));
+    }
+
+    #[test]
+    fn bunx_tsc_with_other_flags_denied() {
+        assert!(!check("bunx tsc --pretty"));
+    }
+
+    #[test]
+    fn bunx_cowsay_denied() {
+        assert!(!check("bunx cowsay hello"));
+    }
+
+    #[test]
+    fn bare_bunx_denied() {
+        assert!(!check("bunx"));
+    }
+
+    #[test]
+    fn npx_tsc_noemit() {
+        assert!(check("npx tsc --noEmit"));
+    }
+
+    #[test]
+    fn npx_tsc_without_noemit_denied() {
+        assert!(!check("npx tsc"));
     }
 }
