@@ -6,17 +6,35 @@ When an agentic tool wants to run a bash command, safe-chains checks if every se
 
 See [COMMANDS.md](COMMANDS.md) for the full list of supported commands.
 
-## Installation
+## Install
 
-Requires [Rust](https://rustup.rs/) to `cargo install` the binary.
+Requires [Rust](https://rustup.rs/).
+
+### From crates.io
 
 ```bash
-git clone git@github.com:michaeldhopkins/safe-chains.git ~/workspace/safe-chains
-cd ~/workspace/safe-chains
-./install.sh
+cargo install safe-chains
 ```
 
-This builds the `safe-chains` binary into `~/.cargo/bin/` and outputs the hook configuration you need to add to `~/.claude/settings.json`:
+### From source
+
+```bash
+git clone git@github.com:michaeldhopkins/safe-chains.git
+cd safe-chains
+cargo install --path .
+```
+
+Both methods build the `safe-chains` binary and place it in `~/.cargo/bin/`.
+
+### What about install.sh?
+
+The repo includes an `install.sh` convenience script. All it does is run `cargo install --path .` and then check whether your `~/.claude/settings.json` already has the hook configured. If not, it prints the JSON snippet you need to add. It does not modify any files.
+
+## Configure
+
+### Claude Code
+
+Add this to `~/.claude/settings.json`:
 
 ```json
 "hooks": {
@@ -34,9 +52,11 @@ This builds the `safe-chains` binary into `~/.cargo/bin/` and outputs the hook c
 }
 ```
 
-If the hook is already configured, the script will skip this step.
+Restart your Claude Code sessions to activate the hook. Once configured, updating the `safe-chains` binary takes effect immediately.
 
-You'll need to restart your Claude Code sessions to use the new hook, but once you do this, you'll be able to update `safe-chains` and benefit from the new version right away.
+### OpenCode
+
+Copy `opencode-plugin.js` from this repo to `.opencode/plugins/` in your project. Requires `safe-chains` in PATH.
 
 ## Usage
 
@@ -52,10 +72,6 @@ Pass a command as a positional argument. Exit code 0 means safe, exit code 1 mea
 safe-chains "ls -la | head -5"    # exit 0 = safe
 safe-chains "rm -rf /"            # exit 1 = unsafe
 ```
-
-### OpenCode
-
-Copy `opencode-plugin.js` to `.opencode/plugins/` in your project (requires `safe-chains` in PATH).
 
 ## Developing
 
