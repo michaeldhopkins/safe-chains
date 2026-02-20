@@ -4,6 +4,8 @@ version = "0.9.2"
 edition = "2024"
 rust-version = "1.91"
 license = "MIT OR Apache-2.0"
+description = "Auto-allow safe, read-only bash commands in agentic coding tools"
+repository = "https://github.com/michaeldhopkins/safe-chains"
 
 [[bin]]
 name = "safe-chains"
