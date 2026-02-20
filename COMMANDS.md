@@ -217,7 +217,7 @@ Read-only: view, info, list, ls, test, audit, outdated, explain, why, fund, pref
 
 ### `npx`
 
-Whitelisted packages only: eslint, @herb-tools/linter, karma. Skips flags: --yes/-y/--no/--package/-p.
+Whitelisted packages only: eslint, @herb-tools/linter, karma, playwright. Skips flags: --yes/-y/--no/--package/-p.
 
 ### `nvm`
 
