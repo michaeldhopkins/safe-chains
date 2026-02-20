@@ -90,6 +90,7 @@ These commands are allowed with any arguments.
 | `rev` | Reverse lines |
 | `rg` | Ripgrep search |
 | `route` | Safe read-only utility |
+| `safe-chains` | Safe read-only utility |
 | `seq` | Print number sequence |
 | `sha1sum` | SHA-1 checksum |
 | `sha256sum` | SHA-256 checksum |

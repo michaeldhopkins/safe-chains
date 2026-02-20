@@ -16,13 +16,32 @@ struct HookInput {
     tool_input: ToolInput,
 }
 
-fn main() {
-    if std::env::args().any(|a| a == "--list-commands") {
-        let docs = claude_safe_chains::docs::all_command_docs();
-        print!("{}", claude_safe_chains::docs::render_markdown(&docs));
-        return;
-    }
+enum Mode {
+    ListCommands,
+    Cli(String),
+    ClaudeHook,
+}
 
+fn detect_mode(args: &[String]) -> Mode {
+    if args.iter().any(|a| a == "--list-commands") {
+        return Mode::ListCommands;
+    }
+    match args.iter().find(|a| !a.starts_with('-')) {
+        Some(command) => Mode::Cli(command.clone()),
+        None => Mode::ClaudeHook,
+    }
+}
+
+fn print_docs() {
+    let docs = claude_safe_chains::docs::all_command_docs();
+    print!("{}", claude_safe_chains::docs::render_markdown(&docs));
+}
+
+fn run_cli(command: &str) {
+    process::exit(i32::from(!is_safe_command(command)));
+}
+
+fn run_claude_hook() {
     let input: HookInput = match serde_json::from_reader(io::stdin()) {
         Ok(v) => v,
         Err(_) => process::exit(0),
@@ -41,4 +60,48 @@ fn main() {
     });
 
     serde_json::to_writer(io::stdout(), &output).ok();
+}
+
+fn main() {
+    let args: Vec<String> = std::env::args().skip(1).collect();
+    match detect_mode(&args) {
+        Mode::ListCommands => print_docs(),
+        Mode::Cli(command) => run_cli(&command),
+        Mode::ClaudeHook => run_claude_hook(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn detect_list_commands_mode() {
+        let args = vec!["--list-commands".to_string()];
+        assert!(matches!(detect_mode(&args), Mode::ListCommands));
+    }
+
+    #[test]
+    fn detect_cli_mode() {
+        let args = vec!["ls -la".to_string()];
+        assert!(matches!(detect_mode(&args), Mode::Cli(cmd) if cmd == "ls -la"));
+    }
+
+    #[test]
+    fn detect_cli_mode_skips_flags() {
+        let args = vec!["--verbose".to_string(), "ls -la".to_string()];
+        assert!(matches!(detect_mode(&args), Mode::Cli(cmd) if cmd == "ls -la"));
+    }
+
+    #[test]
+    fn detect_claude_hook_mode() {
+        let args: Vec<String> = vec![];
+        assert!(matches!(detect_mode(&args), Mode::ClaudeHook));
+    }
+
+    #[test]
+    fn detect_claude_hook_mode_with_only_flags() {
+        let args = vec!["--verbose".to_string()];
+        assert!(matches!(detect_mode(&args), Mode::ClaudeHook));
+    }
 }
