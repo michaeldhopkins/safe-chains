@@ -20,19 +20,19 @@ use std::sync::LazyLock;
 
 pub(crate) static SAFE_CMDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
-        "grep", "rg", "fd", "head", "tail", "cat", "ls", "wc", "uniq", "tr", "cut", "echo",
+        "grep", "rg", "fd", "bat", "eza", "exa", "head", "tail", "cat", "ls", "wc", "uniq", "tr", "cut", "echo",
         "dirname", "basename", "realpath", "file", "stat", "du", "df", "printenv", "which",
         "whoami", "date", "pwd", "tree", "lsof", "jq", "base64", "xxd", "pgrep", "getconf",
-        "ps", "uuidgen", "mdfind", "identify", "cd", "command", "cucumber", "branchdiff",
-        "diff", "comm", "paste", "tac", "rev", "nl", "expand", "unexpand", "fold", "fmt",
+        "ps", "top", "htop", "iotop", "procs", "dust", "uuidgen", "mdfind", "identify", "cd", "command", "cucumber", "branchdiff",
+        "diff", "delta", "comm", "paste", "tac", "rev", "nl", "expand", "unexpand", "fold", "fmt",
         "column", "printf", "seq", "expr", "test", "true", "false", "bc", "factor",
         "colordiff", "iconv",
         "readlink", "hostname", "uname", "arch", "nproc", "uptime", "id", "groups", "tty",
-        "locale", "cal", "sleep",
+        "locale", "cal", "sleep", "who", "w", "last", "lastlog",
         "md5sum", "md5", "sha256sum", "shasum", "sha1sum", "sha512sum", "cksum", "b2sum",
         "sum", "strings", "hexdump", "od", "size",
-        "sw_vers", "mdls", "otool", "nm",
-        "dig", "nslookup", "host", "whois",
+        "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat",
+        "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route",
         "shellcheck", "cloc", "tokei",
     ])
 });
@@ -45,6 +45,7 @@ pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) ->
         "time" => wrappers::is_safe_time(tokens, is_safe),
         "env" => wrappers::is_safe_env(tokens, is_safe),
         "nice" | "ionice" => wrappers::is_safe_nice(tokens, is_safe),
+        "hyperfine" => wrappers::is_safe_hyperfine(tokens, is_safe),
 
         "git" => vcs::is_safe_git(tokens),
         "jj" => vcs::is_safe_jj(tokens),
@@ -94,12 +95,18 @@ pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) ->
         "sysctl" => system::is_safe_sysctl(tokens),
         "xcodebuild" => system::is_safe_xcodebuild(tokens),
         "cmake" => system::is_safe_cmake(tokens),
+        "networksetup" => system::is_safe_networksetup(tokens),
+        "launchctl" => system::is_safe_launchctl(tokens),
+        "diskutil" => system::is_safe_diskutil(tokens),
+        "security" => system::is_safe_security(tokens),
+        "csrutil" => system::is_safe_csrutil(tokens),
 
         "find" => coreutils::is_safe_find(tokens),
         "sed" => coreutils::is_safe_sed(tokens),
         "sort" => coreutils::is_safe_sort(tokens),
         "yq" => coreutils::is_safe_yq(tokens),
         "xmllint" => coreutils::is_safe_xmllint(tokens),
+        "awk" | "gawk" | "mawk" | "nawk" => coreutils::is_safe_awk(tokens),
 
         _ => SAFE_CMDS.contains(cmd),
     }

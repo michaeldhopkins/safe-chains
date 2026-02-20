@@ -53,6 +53,7 @@ mod tests {
         assert!(is_safe("wc -l file.txt"));
         assert!(is_safe("ps aux"));
         assert!(is_safe("ps -ef"));
+        assert!(is_safe("top -l 1 -n 10"));
         assert!(is_safe("uuidgen"));
         assert!(is_safe("mdfind 'kMDItemKind == Application'"));
         assert!(is_safe("identify image.png"));
@@ -97,6 +98,10 @@ mod tests {
         assert!(is_safe("locale"));
         assert!(is_safe("cal"));
         assert!(is_safe("sleep 1"));
+        assert!(is_safe("who"));
+        assert!(is_safe("w"));
+        assert!(is_safe("last -5"));
+        assert!(is_safe("lastlog"));
     }
 
     #[test]
@@ -120,6 +125,9 @@ mod tests {
         assert!(is_safe("mdls file.txt"));
         assert!(is_safe("otool -L /usr/bin/ls"));
         assert!(is_safe("nm a.out"));
+        assert!(is_safe("system_profiler SPHardwareDataType"));
+        assert!(is_safe("ioreg -l -w 0"));
+        assert!(is_safe("vm_stat"));
     }
 
     #[test]
@@ -149,8 +157,12 @@ mod tests {
     }
 
     #[test]
-    fn awk_denied() {
-        assert!(!is_safe("awk '{print $1}' file.txt"));
+    fn awk_safe_print() {
+        assert!(is_safe("awk '{print $1}' file.txt"));
+    }
+
+    #[test]
+    fn awk_system_denied() {
         assert!(!is_safe("awk 'BEGIN{system(\"rm\")}'"));
     }
 

@@ -37,6 +37,23 @@ pub fn is_safe_xmllint(tokens: &[String]) -> bool {
     !tokens[1..].iter().any(|t| t == "--output" || t.starts_with("--output="))
 }
 
+static AWK_DANGEROUS: &[&str] = &["system", "getline", "|", ">", ">>"];
+
+pub fn is_safe_awk(tokens: &[String]) -> bool {
+    if has_flag(tokens, "-f", None) {
+        return false;
+    }
+    for token in &tokens[1..] {
+        if token.starts_with('-') {
+            continue;
+        }
+        if AWK_DANGEROUS.iter().any(|d| token.contains(d)) {
+            return false;
+        }
+    }
+    true
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocKind};
     vec![
@@ -59,6 +76,11 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             name: "yq",
             kind: DocKind::Handler,
             description: "Safe unless -i/--inplace flag.",
+        },
+        CommandDoc {
+            name: "awk / gawk / mawk / nawk",
+            kind: DocKind::Handler,
+            description: "Safe unless program contains system, getline, |, >, >>, or -f flag (file-based program).",
         },
         CommandDoc {
             name: "xmllint",
@@ -284,5 +306,80 @@ mod tests {
     #[test]
     fn xmllint_output_eq_denied() {
         assert!(!check("xmllint --output=result.xml file.xml"));
+    }
+
+    #[test]
+    fn awk_print_field() {
+        assert!(check("awk '{print $1}' file.txt"));
+    }
+
+    #[test]
+    fn awk_print_multiple_fields() {
+        assert!(check("awk '{print $1, $3}' file.txt"));
+    }
+
+    #[test]
+    fn awk_field_separator() {
+        assert!(check("awk -F: '{print $1}' /etc/passwd"));
+    }
+
+    #[test]
+    fn awk_pattern() {
+        assert!(check("awk '/error/ {print $0}' log.txt"));
+    }
+
+    #[test]
+    fn awk_nr() {
+        assert!(check("awk 'NR==5' file.txt"));
+    }
+
+    #[test]
+    fn awk_begin_end_safe() {
+        assert!(check("awk 'BEGIN{n=0} {n++} END{print n}' file.txt"));
+    }
+
+    #[test]
+    fn awk_system_denied() {
+        assert!(!check("awk 'BEGIN{system(\"rm -rf /\")}'"));
+    }
+
+    #[test]
+    fn awk_getline_denied() {
+        assert!(!check("awk '{getline line < \"/etc/shadow\"; print line}'"));
+    }
+
+    #[test]
+    fn awk_pipe_output_denied() {
+        assert!(!check("awk '{print $0 | \"mail user@host\"}'"));
+    }
+
+    #[test]
+    fn awk_redirect_denied() {
+        assert!(!check("awk '{print $0 > \"output.txt\"}'"));
+    }
+
+    #[test]
+    fn awk_append_denied() {
+        assert!(!check("awk '{print $0 >> \"output.txt\"}'"));
+    }
+
+    #[test]
+    fn awk_file_program_denied() {
+        assert!(!check("awk -f script.awk data.txt"));
+    }
+
+    #[test]
+    fn gawk_safe() {
+        assert!(check("gawk '{print $2}' file.txt"));
+    }
+
+    #[test]
+    fn gawk_system_denied() {
+        assert!(!check("gawk 'BEGIN{system(\"rm\")}'"));
+    }
+
+    #[test]
+    fn awk_netstat_pipeline() {
+        assert!(check("awk '{print $6}'"));
     }
 }

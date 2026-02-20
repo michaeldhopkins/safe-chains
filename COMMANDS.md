@@ -14,6 +14,7 @@ These commands are allowed with any arguments.
 | `b2sum` | BLAKE2 checksum |
 | `base64` | Base64 encode/decode |
 | `basename` | Strip directory from path |
+| `bat` | Safe read-only utility |
 | `bc` | Calculator |
 | `branchdiff` | Branch diff tool |
 | `cal` | Display calendar |
@@ -28,14 +29,18 @@ These commands are allowed with any arguments.
 | `cucumber` | BDD test runner |
 | `cut` | Extract fields from lines |
 | `date` | Display date and time |
+| `delta` | Safe read-only utility |
 | `df` | Disk free space |
 | `diff` | Compare files |
 | `dig` | DNS lookup |
 | `dirname` | Strip filename from path |
 | `du` | Disk usage |
+| `dust` | Safe read-only utility |
 | `echo` | Print text |
+| `exa` | Safe read-only utility |
 | `expand` | Convert tabs to spaces |
 | `expr` | Evaluate expression |
+| `eza` | Safe read-only utility |
 | `factor` | Print prime factors |
 | `false` | Return failure exit code |
 | `fd` | Find files |
@@ -49,10 +54,16 @@ These commands are allowed with any arguments.
 | `hexdump` | Display file in hex |
 | `host` | DNS lookup |
 | `hostname` | Print hostname |
+| `htop` | Safe read-only utility |
 | `iconv` | Convert character encoding |
 | `id` | Print user/group IDs |
 | `identify` | ImageMagick identify |
+| `ifconfig` | Safe read-only utility |
+| `ioreg` | Safe read-only utility |
+| `iotop` | Safe read-only utility |
 | `jq` | JSON processor |
+| `last` | Safe read-only utility |
+| `lastlog` | Safe read-only utility |
 | `locale` | Print locale info |
 | `ls` | List directory |
 | `lsof` | List open files |
@@ -60,6 +71,7 @@ These commands are allowed with any arguments.
 | `md5sum` | MD5 checksum |
 | `mdfind` | Spotlight search (macOS) |
 | `mdls` | File metadata (macOS) |
+| `netstat` | Safe read-only utility |
 | `nl` | Number lines |
 | `nm` | List object file symbols |
 | `nproc` | Print number of CPUs |
@@ -70,12 +82,14 @@ These commands are allowed with any arguments.
 | `pgrep` | Search for processes |
 | `printenv` | Print environment variables |
 | `printf` | Format and print text |
+| `procs` | Safe read-only utility |
 | `ps` | List processes |
 | `pwd` | Print working directory |
 | `readlink` | Resolve symlink |
 | `realpath` | Resolve path |
 | `rev` | Reverse lines |
 | `rg` | Ripgrep search |
+| `route` | Safe read-only utility |
 | `seq` | Print number sequence |
 | `sha1sum` | SHA-1 checksum |
 | `sha256sum` | SHA-256 checksum |
@@ -84,14 +98,17 @@ These commands are allowed with any arguments.
 | `shellcheck` | Shell script linter |
 | `size` | Object file section sizes |
 | `sleep` | Pause execution |
+| `ss` | Safe read-only utility |
 | `stat` | File status |
 | `strings` | Find printable strings in binary |
 | `sum` | File checksum |
 | `sw_vers` | macOS version info |
+| `system_profiler` | Safe read-only utility |
 | `tac` | Print file in reverse |
 | `tail` | Print last lines |
 | `test` | Evaluate conditional expression |
 | `tokei` | Code statistics |
+| `top` | Safe read-only utility |
 | `tr` | Translate characters |
 | `tree` | Directory tree |
 | `true` | Return success exit code |
@@ -101,8 +118,11 @@ These commands are allowed with any arguments.
 | `uniq` | Filter duplicate lines |
 | `uptime` | System uptime |
 | `uuidgen` | Generate UUID |
+| `vm_stat` | Safe read-only utility |
+| `w` | Safe read-only utility |
 | `wc` | Count lines/words/bytes |
 | `which` | Locate command |
+| `who` | Safe read-only utility |
 | `whoami` | Print current user |
 | `whois` | Domain registration lookup |
 | `xxd` | Hex dump |
@@ -114,6 +134,10 @@ These commands are allowed with specific subcommands or flags.
 ### `asdf`
 
 Allowed: current, which, help, list, --version, plugin-list, plugin-list-all. Multi-word: plugin list.
+
+### `awk / gawk / mawk / nawk`
+
+Safe unless program contains system, getline, |, >, >>, or -f flag (file-based program).
 
 ### `bash / sh`
 
@@ -151,6 +175,10 @@ Allowed: show, info, diagnose, outdated, licenses, check-platform-reqs, suggests
 
 Allowed: list, info, --version. Guarded: config (--show/--show-sources only).
 
+### `csrutil`
+
+Allowed: status, report, authenticated-root.
+
 ### `defaults`
 
 Allowed: read, read-type, domains, find, export.
@@ -158,6 +186,10 @@ Allowed: read, read-type, domains, find, export.
 ### `deno`
 
 Allowed: --version, info, doc, lint, check, test. Guarded: fmt (requires --check).
+
+### `diskutil`
+
+Allowed: list, info, activity, listFilesystems. Multi-word: apfs list, apfs listCryptoUsers, apfs listSnapshots, apfs listVolumeGroups.
 
 ### `docker / podman`
 
@@ -199,9 +231,17 @@ Allowed: version, env, list, vet, test, build, doc.
 
 Allowed: tasks, dependencies, properties, --version, test, build, check.
 
+### `hyperfine`
+
+Recursively validates each benchmarked command. Denied if --prepare, --cleanup, or --setup flags are used (arbitrary shell execution).
+
 ### `jj`
 
 Read-only: log, diff, show, status, st, help, --version. Multi-word: op log, file show, config get/list, bookmark list, git remote list.
+
+### `launchctl`
+
+Allowed: list, print, print-cache, print-disabled, dumpstate, blame, hostinfo, resolveport, examine, version, help, error.
 
 ### `mise`
 
@@ -210,6 +250,10 @@ Allowed: ls, list, current, which, doctor, --version. Multi-word: settings get.
 ### `mvn / mvnw`
 
 Allowed: --version, -v, dependency:tree, dependency:list, help:describe, validate, test, compile, verify, test-compile.
+
+### `networksetup`
+
+Allowed: subcommands starting with -list, -get, -show, -print, plus -version and -help.
 
 ### `nice / ionice`
 
@@ -250,6 +294,10 @@ Allowed: versions, version, which, root, shims, --version, help.
 ### `rustup`
 
 Allowed: show, which, doc, --version. Multi-word: component/target/toolchain list.
+
+### `security`
+
+Allowed: find-identity, find-certificate, find-generic-password, find-internet-password, show-keychain-info, dump-keychain, list-keychains, dump-trust-settings, smartcard, verify-cert, cms.
 
 ### `sed`
 
