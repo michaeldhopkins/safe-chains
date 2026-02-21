@@ -133,22 +133,11 @@ pub fn is_safe_pnpm(tokens: &[String]) -> bool {
 }
 
 pub fn is_safe_bun(tokens: &[String]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if tokens[1] == "x" {
+    if tokens.len() >= 2 && tokens[1] == "x" {
         return find_runner_package_index(tokens, 2, &BUNX_FLAGS_NO_ARG)
             .is_some_and(|idx| is_safe_runner_package(tokens, idx));
     }
-    if BUN_SAFE.contains(tokens[1].as_str()) {
-        return true;
-    }
-    for (prefix, actions) in BUN_MULTI.iter() {
-        if tokens[1] == *prefix {
-            return tokens.get(2).is_some_and(|a| actions.contains(a.as_str()));
-        }
-    }
-    false
+    super::check_subcmd(tokens, &BUN_SAFE, &BUN_MULTI)
 }
 
 pub fn is_safe_deno(tokens: &[String]) -> bool {

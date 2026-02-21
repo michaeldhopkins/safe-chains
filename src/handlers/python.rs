@@ -53,33 +53,11 @@ pub fn is_safe_pip(tokens: &[String]) -> bool {
 }
 
 pub fn is_safe_uv(tokens: &[String]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if UV_SAFE.contains(tokens[1].as_str()) {
-        return true;
-    }
-    for (prefix, actions) in UV_MULTI.iter() {
-        if tokens[1] == *prefix {
-            return tokens.get(2).is_some_and(|a| actions.contains(a.as_str()));
-        }
-    }
-    false
+    super::check_subcmd(tokens, &UV_SAFE, &UV_MULTI)
 }
 
 pub fn is_safe_poetry(tokens: &[String]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if POETRY_SAFE.contains(tokens[1].as_str()) {
-        return true;
-    }
-    for (prefix, actions) in POETRY_MULTI.iter() {
-        if tokens[1] == *prefix {
-            return tokens.get(2).is_some_and(|a| actions.contains(a.as_str()));
-        }
-    }
-    false
+    super::check_subcmd(tokens, &POETRY_SAFE, &POETRY_MULTI)
 }
 
 pub fn is_safe_pyenv(tokens: &[String]) -> bool {

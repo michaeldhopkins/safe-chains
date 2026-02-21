@@ -49,18 +49,7 @@ pub fn is_safe_cargo(tokens: &[String]) -> bool {
 }
 
 pub fn is_safe_rustup(tokens: &[String]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if RUSTUP_SAFE.contains(tokens[1].as_str()) {
-        return true;
-    }
-    for (prefix, actions) in RUSTUP_MULTI.iter() {
-        if tokens[1] == *prefix {
-            return tokens.get(2).is_some_and(|a| actions.contains(a.as_str()));
-        }
-    }
-    false
+    super::check_subcmd(tokens, &RUSTUP_SAFE, &RUSTUP_MULTI)
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

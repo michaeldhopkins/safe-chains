@@ -12,16 +12,7 @@ static LLM_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["models", "plugins", "templates", "aliases", "logs", "collections"]));
 
 pub fn is_safe_llm(tokens: &[String]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if LLM_READ_ONLY.contains(tokens[1].as_str()) {
-        return true;
-    }
-    if tokens[1] == "models" {
-        return tokens.get(2).is_some_and(|a| a == "list" || a == "default");
-    }
-    false
+    tokens.len() >= 2 && LLM_READ_ONLY.contains(tokens[1].as_str())
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
