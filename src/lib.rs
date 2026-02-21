@@ -1,6 +1,7 @@
 pub mod docs;
 mod handlers;
 pub mod parse;
+pub mod settings;
 
 use parse::{has_unsafe_shell_syntax, split_outside_quotes, strip_env_prefix, tokenize};
 
@@ -40,7 +41,7 @@ pub fn is_safe(segment: &str) -> bool {
     handlers::dispatch(cmd, &tokens, &is_safe)
 }
 
-fn is_fd_redirect(token: &str) -> bool {
+pub fn is_fd_redirect(token: &str) -> bool {
     let bytes = token.as_bytes();
     if bytes.len() < 3 {
         return false;

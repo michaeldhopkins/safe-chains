@@ -4,7 +4,7 @@ use std::process;
 use serde::Deserialize;
 use serde_json::json;
 
-use safe_chains::is_safe_command;
+use safe_chains::{is_safe, is_safe_command};
 
 #[derive(Deserialize)]
 struct ToolInput {
@@ -41,25 +41,43 @@ fn run_cli(command: &str) {
     process::exit(i32::from(!is_safe_command(command)));
 }
 
+fn emit_allow(reason: &str) {
+    let output = json!({
+        "hookSpecificOutput": {
+            "hookEventName": "PreToolUse",
+            "permissionDecision": "allow",
+            "permissionDecisionReason": reason,
+        }
+    });
+    serde_json::to_writer(io::stdout(), &output).ok();
+}
+
 fn run_claude_hook() {
     let input: HookInput = match serde_json::from_reader(io::stdin()) {
         Ok(v) => v,
         Err(_) => process::exit(0),
     };
 
-    if !is_safe_command(&input.tool_input.command) {
+    if is_safe_command(&input.tool_input.command) {
+        emit_allow("All commands in chain are safe read-only utilities");
+        return;
+    }
+
+    let patterns = safe_chains::settings::ApprovedPatterns::load();
+    if patterns.is_empty() {
         process::exit(0);
     }
 
-    let output = json!({
-        "hookSpecificOutput": {
-            "hookEventName": "PreToolUse",
-            "permissionDecision": "allow",
-            "permissionDecisionReason": "All commands in chain are safe read-only utilities",
-        }
+    let segments = safe_chains::parse::split_outside_quotes(&input.tool_input.command);
+    let all_covered = segments.iter().all(|s| {
+        is_safe(s) || (!safe_chains::parse::has_unsafe_shell_syntax(s) && patterns.matches(s))
     });
 
-    serde_json::to_writer(io::stdout(), &output).ok();
+    if all_covered {
+        emit_allow("All commands covered by safe-chains rules or user-approved settings");
+    } else {
+        process::exit(0);
+    }
 }
 
 fn main() {
