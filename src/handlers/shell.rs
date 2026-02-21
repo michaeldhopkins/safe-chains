@@ -36,7 +36,7 @@ pub fn is_safe_xargs(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool 
             i += 1;
             continue;
         }
-        let inner = tokens[i..].join(" ");
+        let inner = shell_words::join(&tokens[i..]);
         return is_safe(&inner);
     }
     true
@@ -159,5 +159,15 @@ mod tests {
     #[test]
     fn xargs_sort_output_denied() {
         assert!(!check("xargs sort -o out.txt"));
+    }
+
+    #[test]
+    fn xargs_nested_bash_chain_denied() {
+        assert!(!check("xargs bash -c 'ls && rm -rf /'"));
+    }
+
+    #[test]
+    fn xargs_nested_bash_safe() {
+        assert!(check("xargs bash -c 'git status'"));
     }
 }

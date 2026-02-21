@@ -31,11 +31,11 @@ pub fn is_safe_find(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
             if cmd_start >= cmd_end {
                 return false;
             }
-            let exec_cmd = tokens[cmd_start..cmd_end]
+            let exec_tokens: Vec<&str> = tokens[cmd_start..cmd_end]
                 .iter()
                 .map(|t| if t == "{}" { "file" } else { t.as_str() })
-                .collect::<Vec<_>>()
-                .join(" ");
+                .collect();
+            let exec_cmd = shell_words::join(&exec_tokens);
             if !is_safe(&exec_cmd) {
                 return false;
             }
@@ -240,6 +240,16 @@ mod tests {
     #[test]
     fn find_exec_grep_safe() {
         assert!(check("find . -name '*.py' -exec grep pattern {} +"));
+    }
+
+    #[test]
+    fn find_exec_nested_bash_chain_denied() {
+        assert!(!check("find . -exec bash -c 'ls && rm -rf /' \\;"));
+    }
+
+    #[test]
+    fn find_exec_nested_bash_safe() {
+        assert!(check("find . -exec bash -c 'git status' \\;"));
     }
 
     #[test]
