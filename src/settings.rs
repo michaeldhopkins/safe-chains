@@ -72,7 +72,7 @@ impl ApprovedPatterns {
     }
 
     pub fn matches(&self, segment: &str) -> bool {
-        let normalized = strip_fd_redirects(crate::parse::strip_env_prefix(segment).trim());
+        let normalized = crate::parse::strip_fd_redirects(crate::parse::strip_env_prefix(segment).trim());
         if normalized.is_empty() {
             return false;
         }
@@ -86,17 +86,6 @@ impl ApprovedPatterns {
 
     pub fn is_empty(&self) -> bool {
         self.exact.is_empty() && self.globs.is_empty()
-    }
-}
-
-fn strip_fd_redirects(s: &str) -> String {
-    match crate::parse::tokenize(s) {
-        Some(tokens) => tokens
-            .into_iter()
-            .filter(|t| !crate::is_fd_redirect(t))
-            .collect::<Vec<_>>()
-            .join(" "),
-        None => s.to_string(),
     }
 }
 

@@ -15,6 +15,7 @@ pub mod swift;
 pub mod system;
 pub mod vcs;
 pub mod wrappers;
+pub mod xcode;
 
 use std::collections::HashSet;
 use std::sync::LazyLock;
@@ -38,6 +39,25 @@ pub(crate) static SAFE_CMDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| 
         "safe-chains",
     ])
 });
+
+pub(crate) fn check_subcmd(
+    tokens: &[String],
+    simple: &HashSet<&str>,
+    multi: &[(&str, HashSet<&str>)],
+) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    if simple.contains(tokens[1].as_str()) {
+        return true;
+    }
+    for (prefix, actions) in multi {
+        if tokens[1] == *prefix {
+            return tokens.get(2).is_some_and(|a| actions.contains(a.as_str()));
+        }
+    }
+    false
+}
 
 pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     match cmd {
@@ -98,7 +118,6 @@ pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) ->
         "asdf" => system::is_safe_asdf(tokens),
         "defaults" => system::is_safe_defaults(tokens),
         "sysctl" => system::is_safe_sysctl(tokens),
-        "xcodebuild" => system::is_safe_xcodebuild(tokens),
         "cmake" => system::is_safe_cmake(tokens),
         "networksetup" => system::is_safe_networksetup(tokens),
         "launchctl" => system::is_safe_launchctl(tokens),
@@ -106,12 +125,14 @@ pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) ->
         "security" => system::is_safe_security(tokens),
         "csrutil" => system::is_safe_csrutil(tokens),
         "log" => system::is_safe_log(tokens),
-        "plutil" => system::is_safe_plutil(tokens),
-        "xcode-select" => system::is_safe_xcode_select(tokens),
-        "xcrun" => system::is_safe_xcrun(tokens),
-        "pkgutil" => system::is_safe_pkgutil(tokens),
-        "lipo" => system::is_safe_lipo(tokens),
-        "codesign" => system::is_safe_codesign(tokens),
+
+        "xcodebuild" => xcode::is_safe_xcodebuild(tokens),
+        "plutil" => xcode::is_safe_plutil(tokens),
+        "xcode-select" => xcode::is_safe_xcode_select(tokens),
+        "xcrun" => xcode::is_safe_xcrun(tokens),
+        "pkgutil" => xcode::is_safe_pkgutil(tokens),
+        "lipo" => xcode::is_safe_lipo(tokens),
+        "codesign" => xcode::is_safe_codesign(tokens),
 
         "find" => coreutils::is_safe_find(tokens, is_safe),
         "sed" => coreutils::is_safe_sed(tokens),
@@ -140,6 +161,7 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(containers::command_docs());
     docs.extend(ai::command_docs());
     docs.extend(system::command_docs());
+    docs.extend(xcode::command_docs());
     docs.extend(coreutils::command_docs());
     docs.extend(shell::command_docs());
     docs.extend(wrappers::command_docs());

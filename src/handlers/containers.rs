@@ -29,18 +29,7 @@ static DOCKER_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> = Lazy
 });
 
 pub fn is_safe_docker(tokens: &[String]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if DOCKER_READ_ONLY.contains(tokens[1].as_str()) {
-        return true;
-    }
-    for (prefix, actions) in DOCKER_MULTI.iter() {
-        if tokens[1] == *prefix {
-            return tokens.get(2).is_some_and(|a| actions.contains(a.as_str()));
-        }
-    }
-    false
+    super::check_subcmd(tokens, &DOCKER_READ_ONLY, &DOCKER_MULTI)
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

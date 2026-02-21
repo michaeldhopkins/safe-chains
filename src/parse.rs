@@ -148,6 +148,28 @@ pub fn has_flag(tokens: &[String], short: &str, long: Option<&str>) -> bool {
     false
 }
 
+pub fn is_fd_redirect(token: &str) -> bool {
+    let bytes = token.as_bytes();
+    if bytes.len() < 3 {
+        return false;
+    }
+    let start = usize::from(bytes[0].is_ascii_digit());
+    bytes.get(start) == Some(&b'>')
+        && bytes.get(start + 1) == Some(&b'&')
+        && bytes[start + 2..].iter().all(|b| b.is_ascii_digit() || *b == b'-')
+}
+
+pub fn strip_fd_redirects(s: &str) -> String {
+    match tokenize(s) {
+        Some(tokens) => tokens
+            .into_iter()
+            .filter(|t| !is_fd_redirect(t))
+            .collect::<Vec<_>>()
+            .join(" "),
+        None => s.to_string(),
+    }
+}
+
 pub fn strip_env_prefix(segment: &str) -> &str {
     let mut rest = segment;
     loop {

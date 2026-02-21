@@ -3,7 +3,7 @@ mod handlers;
 pub mod parse;
 pub mod settings;
 
-use parse::{has_unsafe_shell_syntax, split_outside_quotes, strip_env_prefix, tokenize};
+use parse::{has_unsafe_shell_syntax, is_fd_redirect, split_outside_quotes, strip_env_prefix, tokenize};
 
 pub fn is_safe(segment: &str) -> bool {
     if has_unsafe_shell_syntax(segment) {
@@ -39,17 +39,6 @@ pub fn is_safe(segment: &str) -> bool {
     }
 
     handlers::dispatch(cmd, &tokens, &is_safe)
-}
-
-pub fn is_fd_redirect(token: &str) -> bool {
-    let bytes = token.as_bytes();
-    if bytes.len() < 3 {
-        return false;
-    }
-    let start = usize::from(bytes[0].is_ascii_digit());
-    bytes.get(start) == Some(&b'>')
-        && bytes.get(start + 1) == Some(&b'&')
-        && bytes[start + 2..].iter().all(|b| b.is_ascii_digit() || *b == b'-')
 }
 
 pub fn is_safe_command(command: &str) -> bool {
