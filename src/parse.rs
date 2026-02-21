@@ -161,11 +161,13 @@ pub fn is_fd_redirect(token: &str) -> bool {
 
 pub fn strip_fd_redirects(s: &str) -> String {
     match tokenize(s) {
-        Some(tokens) => tokens
-            .into_iter()
-            .filter(|t| !is_fd_redirect(t))
-            .collect::<Vec<_>>()
-            .join(" "),
+        Some(tokens) => {
+            let filtered: Vec<_> = tokens
+                .into_iter()
+                .filter(|t| !is_fd_redirect(t))
+                .collect();
+            shell_words::join(&filtered)
+        }
         None => s.to_string(),
     }
 }
