@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::Token;
+
 static GIT_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
         "log",
@@ -97,7 +99,7 @@ static JJ_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> = LazyLock
 static JJ_TRIPLE: LazyLock<Vec<(&'static str, &'static str, HashSet<&'static str>)>> =
     LazyLock::new(|| vec![("git", "remote", HashSet::from(["list"]))]);
 
-pub fn is_safe_git(tokens: &[String]) -> bool {
+pub fn is_safe_git(tokens: &[Token]) -> bool {
     let mut args = &tokens[1..];
     while args.len() >= 2 && args[0] == "-C" {
         args = &args[2..];
@@ -144,7 +146,7 @@ pub fn is_safe_git(tokens: &[String]) -> bool {
     false
 }
 
-pub fn is_safe_jj(tokens: &[String]) -> bool {
+pub fn is_safe_jj(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -186,10 +188,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

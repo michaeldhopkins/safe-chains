@@ -1,12 +1,12 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
-use crate::parse::split_outside_quotes;
+use crate::parse::{Segment, Token};
 
 static TIMEOUT_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["-s", "--signal", "-k", "--kill-after"]));
 
-pub fn is_safe_env(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+pub fn is_safe_env(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     if tokens.len() == 1 {
         return true;
     }
@@ -26,12 +26,12 @@ pub fn is_safe_env(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     if i >= tokens.len() {
         return true;
     }
-    let inner = shell_words::join(&tokens[i..]);
+    let inner = Token::join(&tokens[i..]);
     is_safe(&inner)
 }
 
 
-pub fn is_safe_timeout(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+pub fn is_safe_timeout(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     let mut i = 1;
     while i < tokens.len() && tokens[i].starts_with('-') {
         if TIMEOUT_FLAGS_WITH_ARG.contains(tokens[i].as_str()) {
@@ -44,11 +44,11 @@ pub fn is_safe_timeout(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> boo
     if i >= tokens.len() {
         return false;
     }
-    let inner = shell_words::join(&tokens[i..]);
+    let inner = Token::join(&tokens[i..]);
     is_safe(&inner)
 }
 
-pub fn is_safe_time(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+pub fn is_safe_time(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     let mut i = 1;
     if i < tokens.len() && tokens[i] == "-p" {
         i += 1;
@@ -56,11 +56,11 @@ pub fn is_safe_time(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     if i >= tokens.len() {
         return false;
     }
-    let inner = shell_words::join(&tokens[i..]);
+    let inner = Token::join(&tokens[i..]);
     is_safe(&inner)
 }
 
-pub fn is_safe_nice(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+pub fn is_safe_nice(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     let mut i = 1;
     while i < tokens.len() && tokens[i].starts_with('-') {
         if tokens[i] == "-n" || tokens[i] == "--adjustment" {
@@ -72,7 +72,7 @@ pub fn is_safe_nice(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     if i >= tokens.len() {
         return false;
     }
-    let inner = shell_words::join(&tokens[i..]);
+    let inner = Token::join(&tokens[i..]);
     is_safe(&inner)
 }
 
@@ -86,11 +86,11 @@ static HYPERFINE_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> = LazyLock::new
     ])
 });
 
-pub fn is_safe_hyperfine(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+pub fn is_safe_hyperfine(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     let mut i = 1;
     while i < tokens.len() {
         let t = &tokens[i];
-        if t == "--" {
+        if *t == "--" {
             i += 1;
             break;
         }
@@ -109,13 +109,13 @@ pub fn is_safe_hyperfine(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> b
             }
             continue;
         }
-        if !split_outside_quotes(t).iter().all(|s| is_safe(s)) {
+        if !t.as_command_line().segments().iter().all(is_safe) {
             return false;
         }
         i += 1;
     }
     while i < tokens.len() {
-        if !split_outside_quotes(&tokens[i]).iter().all(|s| is_safe(s)) {
+        if !tokens[i].as_command_line().segments().iter().all(is_safe) {
             return false;
         }
         i += 1;
@@ -156,10 +156,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

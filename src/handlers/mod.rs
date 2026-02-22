@@ -20,6 +20,8 @@ pub mod xcode;
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::{Segment, Token};
+
 pub(crate) static SAFE_CMDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
         "grep", "rg", "fd", "bat", "eza", "exa", "head", "tail", "cat", "ls", "wc", "uniq", "tr", "cut", "echo",
@@ -41,7 +43,7 @@ pub(crate) static SAFE_CMDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| 
 });
 
 pub(crate) fn check_subcmd(
-    tokens: &[String],
+    tokens: &[Token],
     simple: &HashSet<&str>,
     multi: &[(&str, HashSet<&str>)],
 ) -> bool {
@@ -59,7 +61,8 @@ pub(crate) fn check_subcmd(
     false
 }
 
-pub fn dispatch(cmd: &str, tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    let cmd = tokens[0].command_name();
     match cmd {
         "sh" | "bash" => shell::is_safe_shell(tokens, is_safe),
         "xargs" => shell::is_safe_xargs(tokens, is_safe),

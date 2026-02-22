@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::Token;
+
 static BUNDLE_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["list", "info", "show", "check"]));
 
@@ -45,7 +47,7 @@ static RBENV_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     ])
 });
 
-pub fn is_safe_bundle(tokens: &[String]) -> bool {
+pub fn is_safe_bundle(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -58,11 +60,11 @@ pub fn is_safe_bundle(tokens: &[String]) -> bool {
             .is_some_and(|t| BUNDLE_EXEC_SAFE.contains(t.as_str()))
 }
 
-pub fn is_safe_gem(tokens: &[String]) -> bool {
+pub fn is_safe_gem(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && GEM_READ_ONLY.contains(tokens[1].as_str())
 }
 
-pub fn is_safe_rbenv(tokens: &[String]) -> bool {
+pub fn is_safe_rbenv(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && RBENV_SAFE.contains(tokens[1].as_str())
 }
 
@@ -90,10 +92,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

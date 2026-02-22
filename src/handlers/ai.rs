@@ -1,17 +1,19 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::Token;
+
 static OLLAMA_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["list", "show", "ps"]));
 
-pub fn is_safe_ollama(tokens: &[String]) -> bool {
+pub fn is_safe_ollama(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && OLLAMA_READ_ONLY.contains(tokens[1].as_str())
 }
 
 static LLM_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["models", "plugins", "templates", "aliases", "logs", "collections"]));
 
-pub fn is_safe_llm(tokens: &[String]) -> bool {
+pub fn is_safe_llm(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && LLM_READ_ONLY.contains(tokens[1].as_str())
 }
 
@@ -33,10 +35,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

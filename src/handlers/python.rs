@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::Token;
+
 static PIP_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from(["list", "show", "freeze", "check", "index", "debug", "inspect", "help"])
 });
@@ -37,7 +39,7 @@ static PYENV_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
 static CONDA_SAFE: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["list", "info", "--version"]));
 
-pub fn is_safe_pip(tokens: &[String]) -> bool {
+pub fn is_safe_pip(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -52,19 +54,19 @@ pub fn is_safe_pip(tokens: &[String]) -> bool {
     false
 }
 
-pub fn is_safe_uv(tokens: &[String]) -> bool {
+pub fn is_safe_uv(tokens: &[Token]) -> bool {
     super::check_subcmd(tokens, &UV_SAFE, &UV_MULTI)
 }
 
-pub fn is_safe_poetry(tokens: &[String]) -> bool {
+pub fn is_safe_poetry(tokens: &[Token]) -> bool {
     super::check_subcmd(tokens, &POETRY_SAFE, &POETRY_MULTI)
 }
 
-pub fn is_safe_pyenv(tokens: &[String]) -> bool {
+pub fn is_safe_pyenv(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && PYENV_SAFE.contains(tokens[1].as_str())
 }
 
-pub fn is_safe_conda(tokens: &[String]) -> bool {
+pub fn is_safe_conda(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -111,10 +113,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

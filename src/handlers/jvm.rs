@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::Token;
+
 static GRADLE_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
         "tasks",
@@ -28,11 +30,11 @@ static MVN_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     ])
 });
 
-pub fn is_safe_gradle(tokens: &[String]) -> bool {
+pub fn is_safe_gradle(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && GRADLE_SAFE.contains(tokens[1].as_str())
 }
 
-pub fn is_safe_mvn(tokens: &[String]) -> bool {
+pub fn is_safe_mvn(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && MVN_SAFE.contains(tokens[1].as_str())
 }
 
@@ -54,10 +56,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

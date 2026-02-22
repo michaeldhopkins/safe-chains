@@ -68,9 +68,10 @@ fn run_claude_hook() {
         process::exit(0);
     }
 
-    let segments = safe_chains::parse::split_outside_quotes(&input.tool_input.command);
+    let cmd_line = safe_chains::parse::CommandLine::new(&input.tool_input.command);
+    let segments = cmd_line.segments();
     let all_covered = segments.iter().all(|s| {
-        is_safe(s) || (!safe_chains::parse::has_unsafe_shell_syntax(s) && patterns.matches(s))
+        is_safe(s) || (!s.has_unsafe_shell_syntax() && patterns.matches(s))
     });
 
     if all_covered {

