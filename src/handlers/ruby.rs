@@ -1,71 +1,41 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Token, WordSet};
 
-use crate::parse::Token;
+static BUNDLE_READ_ONLY: WordSet =
+    WordSet::new(&["--version", "check", "info", "list", "show"]);
 
-static BUNDLE_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["list", "info", "show", "check"]));
+static BUNDLE_EXEC_SAFE: WordSet = WordSet::new(&[
+    "brakeman", "cucumber", "erb_lint", "herb", "rspec", "standardrb",
+]);
 
-static BUNDLE_EXEC_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "rspec",
-        "standardrb",
-        "cucumber",
-        "brakeman",
-        "erb_lint",
-        "herb",
-    ])
-});
+static GEM_READ_ONLY: WordSet = WordSet::new(&[
+    "--version", "contents", "dependency", "environment", "help", "info",
+    "list", "outdated", "pristine", "search", "sources", "specification",
+    "stale", "which",
+]);
 
-static GEM_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "list",
-        "info",
-        "environment",
-        "which",
-        "pristine",
-        "search",
-        "specification",
-        "dependency",
-        "contents",
-        "sources",
-        "stale",
-        "outdated",
-        "help",
-    ])
-});
-
-static RBENV_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "versions",
-        "version",
-        "which",
-        "root",
-        "shims",
-        "--version",
-        "help",
-    ])
-});
+static RBENV_SAFE: WordSet = WordSet::new(&[
+    "--version", "help", "root", "shims", "version", "versions", "which",
+]);
 
 pub fn is_safe_bundle(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if BUNDLE_READ_ONLY.contains(tokens[1].as_str()) {
+    if BUNDLE_READ_ONLY.contains(&tokens[1]) {
         return true;
     }
     tokens[1] == "exec"
         && tokens
             .get(2)
-            .is_some_and(|t| BUNDLE_EXEC_SAFE.contains(t.as_str()))
+            .is_some_and(|t| BUNDLE_EXEC_SAFE.contains(t))
 }
 
 pub fn is_safe_gem(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && GEM_READ_ONLY.contains(tokens[1].as_str())
+    tokens.len() >= 2 && GEM_READ_ONLY.contains(&tokens[1])
 }
 
 pub fn is_safe_rbenv(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && RBENV_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && RBENV_SAFE.contains(&tokens[1])
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -74,13 +44,13 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "bundle",
             kind: DocKind::Handler,
-            description: "Read-only: list, info, show, check. \
+            description: "Read-only: list, info, show, check, --version. \
                           Guarded: exec (rspec, standardrb, cucumber, brakeman, erb_lint, herb only).",
         },
         CommandDoc {
             name: "gem",
             kind: DocKind::Handler,
-            description: "Allowed: list, info, environment, which, pristine, search, specification, dependency, contents, sources, stale, outdated, help.",
+            description: "Allowed: list, info, environment, which, pristine, search, specification, dependency, contents, sources, stale, outdated, help, --version.",
         },
         CommandDoc {
             name: "rbenv",
@@ -151,6 +121,11 @@ mod tests {
     #[test]
     fn bundle_exec_herb() {
         assert!(check("bundle exec herb app/views/foo.html.erb"));
+    }
+
+    #[test]
+    fn bundle_version() {
+        assert!(check("bundle --version"));
     }
 
     #[test]
@@ -241,6 +216,11 @@ mod tests {
     #[test]
     fn gem_help() {
         assert!(check("gem help"));
+    }
+
+    #[test]
+    fn gem_version() {
+        assert!(check("gem --version"));
     }
 
     #[test]

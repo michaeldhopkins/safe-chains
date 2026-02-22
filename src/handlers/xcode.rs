@@ -1,47 +1,32 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{FlagCheck, Token, WordSet};
 
-use crate::parse::Token;
-
-static XCODEBUILD_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "-version",
-        "-showsdks",
-        "-showBuildSettings",
-        "-showdestinations",
-        "-list",
-    ])
-});
+static XCODEBUILD_SAFE: WordSet = WordSet::new(&[
+    "-list", "-showBuildSettings", "-showdestinations", "-showsdks", "-version",
+]);
 
 pub fn is_safe_xcodebuild(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && XCODEBUILD_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && XCODEBUILD_SAFE.contains(&tokens[1])
 }
 
-static PLUTIL_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["-lint", "-p", "-type", "-help"]));
+static PLUTIL_READ_ONLY: WordSet =
+    WordSet::new(&["-help", "-lint", "-p", "-type"]);
 
 pub fn is_safe_plutil(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && PLUTIL_READ_ONLY.contains(tokens[1].as_str())
+    tokens.len() >= 2 && PLUTIL_READ_ONLY.contains(&tokens[1])
 }
 
 pub fn is_safe_xcode_select(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    matches!(tokens[1].as_str(), "-p" | "--print-path" | "-v" | "--version")
+    tokens[1].is_one_of(&["-p", "--print-path", "-v", "--version"])
 }
 
-static XCRUN_SHOW_FLAGS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "--find",
-        "--show-sdk-path",
-        "--show-sdk-version",
-        "--show-sdk-build-version",
-        "--show-sdk-platform-path",
-        "--show-sdk-platform-version",
-        "--show-toolchain-path",
-    ])
-});
+static XCRUN_SHOW_FLAGS: WordSet = WordSet::new(&[
+    "--find", "--show-sdk-build-version", "--show-sdk-path",
+    "--show-sdk-platform-path", "--show-sdk-platform-version",
+    "--show-sdk-version", "--show-toolchain-path",
+]);
 
 pub fn is_safe_xcrun(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
@@ -53,7 +38,7 @@ pub fn is_safe_xcrun(tokens: &[Token]) -> bool {
             i += 2;
             continue;
         }
-        if tokens[i] == "-v" || tokens[i] == "--verbose" || tokens[i] == "-l" || tokens[i] == "--log" || tokens[i] == "-n" || tokens[i] == "--no-cache" {
+        if tokens[i].is_one_of(&["-v", "--verbose", "-l", "--log", "-n", "--no-cache"]) {
             i += 1;
             continue;
         }
@@ -62,7 +47,7 @@ pub fn is_safe_xcrun(tokens: &[Token]) -> bool {
     if i >= tokens.len() {
         return false;
     }
-    if XCRUN_SHOW_FLAGS.contains(tokens[i].as_str()) {
+    if XCRUN_SHOW_FLAGS.contains(&tokens[i]) {
         return true;
     }
     if tokens[i] == "simctl" {
@@ -71,44 +56,47 @@ pub fn is_safe_xcrun(tokens: &[Token]) -> bool {
     false
 }
 
-static PKGUTIL_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "--pkgs", "--packages", "--pkgs-plist",
-        "--files", "--export-plist",
-        "--pkg-info", "--pkg-info-plist",
-        "--pkg-groups", "--groups", "--groups-plist", "--group-pkgs",
+static PKGUTIL_CHECK: FlagCheck = FlagCheck::new(
+    &[
+        "--check-signature", "--export-plist",
         "--file-info", "--file-info-plist",
-        "--payload-files", "--check-signature",
-    ])
-});
+        "--files", "--group-pkgs", "--groups", "--groups-plist",
+        "--packages", "--payload-files",
+        "--pkg-groups", "--pkg-info", "--pkg-info-plist",
+        "--pkgs", "--pkgs-plist",
+    ],
+    &["--expand", "--flatten", "--forget", "--learn"],
+);
 
 pub fn is_safe_pkgutil(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    tokens[1..].iter().any(|t| PKGUTIL_READ_ONLY.contains(t.as_str()))
-        && !tokens[1..].iter().any(|t| t == "--forget" || t == "--learn" || t == "--expand" || t == "--flatten")
+    PKGUTIL_CHECK.is_safe(&tokens[1..])
 }
 
-static LIPO_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["-info", "-detailed_info", "-archs", "-verify_arch"]));
+static LIPO_CHECK: FlagCheck = FlagCheck::new(
+    &["-archs", "-detailed_info", "-info", "-verify_arch"],
+    &["-output"],
+);
 
 pub fn is_safe_lipo(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    tokens[1..].iter().any(|t| LIPO_READ_ONLY.contains(t.as_str()))
-        && !tokens[1..].iter().any(|t| t == "-output")
+    LIPO_CHECK.is_safe(&tokens[1..])
 }
+
+static CODESIGN_CHECK: FlagCheck = FlagCheck::new(
+    &["--display", "--verify", "-d", "-v"],
+    &["--force", "--remove-signature", "--sign", "-f", "-s"],
+);
 
 pub fn is_safe_codesign(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    let has_display = tokens[1..].iter().any(|t| t == "-d" || t == "--display");
-    let has_verify = tokens[1..].iter().any(|t| t == "-v" || t == "--verify");
-    let has_sign = tokens[1..].iter().any(|t| t == "-s" || t == "--sign" || t == "--remove-signature" || t == "-f" || t == "--force");
-    (has_display || has_verify) && !has_sign
+    CODESIGN_CHECK.is_safe(&tokens[1..])
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

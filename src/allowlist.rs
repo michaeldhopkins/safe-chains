@@ -3,14 +3,14 @@ use std::path::Path;
 
 use crate::parse::Segment;
 
-pub struct ApprovedPatterns {
+pub struct Matcher {
     exact: HashSet<String>,
     globs: Vec<Vec<String>>,
 }
 
-impl ApprovedPatterns {
+impl Matcher {
     pub fn load() -> Self {
-        let mut patterns = ApprovedPatterns {
+        let mut patterns = Matcher {
             exact: HashSet::new(),
             globs: Vec::new(),
         };
@@ -129,8 +129,8 @@ mod tests {
 
     use crate::parse::{CommandLine, Segment};
 
-    fn empty() -> ApprovedPatterns {
-        ApprovedPatterns {
+    fn empty() -> Matcher {
+        Matcher {
             exact: HashSet::new(),
             globs: Vec::new(),
         }
@@ -353,7 +353,7 @@ mod tests {
         assert!(!all_covered);
     }
 
-    fn is_covered(segment: &Segment, patterns: &ApprovedPatterns) -> bool {
+    fn is_covered(segment: &Segment, patterns: &Matcher) -> bool {
         crate::is_safe(segment)
             || (!segment.has_unsafe_shell_syntax() && patterns.matches(segment))
     }

@@ -20,45 +20,166 @@ pub mod xcode;
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
-use crate::parse::{Segment, Token};
+use crate::parse::{Segment, Token, WordSet};
+
+pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str)] = &[
+    ("grep", "Search file contents"),
+    ("rg", "Ripgrep search"),
+    ("fd", "Find files"),
+    ("bat", "Syntax-highlighted cat"),
+    ("eza", "Modern ls replacement"),
+    ("exa", "Modern ls replacement"),
+
+    ("head", "Print first lines"),
+    ("tail", "Print last lines"),
+    ("cat", "Print file contents"),
+    ("ls", "List directory"),
+    ("wc", "Count lines/words/bytes"),
+    ("uniq", "Filter duplicate lines"),
+    ("tr", "Translate characters"),
+    ("cut", "Extract fields from lines"),
+
+    ("diff", "Compare files"),
+    ("delta", "Syntax-highlighted diff viewer"),
+    ("colordiff", "Colorized diff"),
+    ("comm", "Compare sorted files"),
+    ("paste", "Merge lines of files"),
+
+    ("tac", "Print file in reverse"),
+    ("rev", "Reverse lines"),
+    ("nl", "Number lines"),
+    ("expand", "Convert tabs to spaces"),
+    ("unexpand", "Convert spaces to tabs"),
+    ("fold", "Wrap lines"),
+    ("fmt", "Reformat text"),
+    ("column", "Format into columns"),
+    ("iconv", "Convert character encoding"),
+
+    ("echo", "Print text"),
+    ("printf", "Format and print text"),
+    ("seq", "Print number sequence"),
+    ("expr", "Evaluate expression"),
+    ("test", "Evaluate conditional expression"),
+    ("true", "Return success exit code"),
+    ("false", "Return failure exit code"),
+    ("bc", "Calculator"),
+    ("factor", "Print prime factors"),
+
+    ("dirname", "Strip filename from path"),
+    ("basename", "Strip directory from path"),
+    ("realpath", "Resolve path"),
+    ("readlink", "Resolve symlink"),
+    ("file", "Detect file type"),
+    ("stat", "File status"),
+    ("du", "Disk usage"),
+    ("df", "Disk free space"),
+
+    ("printenv", "Print environment variables"),
+    ("which", "Locate command"),
+    ("whoami", "Print current user"),
+    ("date", "Display date and time"),
+    ("pwd", "Print working directory"),
+    ("tree", "Directory tree"),
+    ("cd", "Change directory"),
+    ("command", "Run command or check existence"),
+
+    ("hostname", "Print hostname"),
+    ("uname", "System information"),
+    ("arch", "Print machine architecture"),
+    ("nproc", "Print number of CPUs"),
+    ("uptime", "System uptime"),
+    ("id", "Print user/group IDs"),
+    ("groups", "Print group memberships"),
+    ("tty", "Print terminal name"),
+    ("locale", "Print locale info"),
+    ("cal", "Display calendar"),
+    ("sleep", "Pause execution"),
+    ("who", "Show logged-in users"),
+    ("w", "Show logged-in users and activity"),
+    ("last", "Show login history"),
+    ("lastlog", "Show last login for all users"),
+
+    ("ps", "List processes"),
+    ("top", "Process monitor"),
+    ("htop", "Interactive process viewer"),
+    ("iotop", "I/O usage monitor"),
+    ("procs", "Modern process viewer"),
+    ("dust", "Disk usage viewer"),
+    ("lsof", "List open files"),
+    ("pgrep", "Search for processes"),
+
+    ("jq", "JSON processor"),
+    ("base64", "Base64 encode/decode"),
+    ("xxd", "Hex dump"),
+    ("getconf", "Get system configuration values"),
+    ("uuidgen", "Generate UUID"),
+
+    ("md5sum", "MD5 checksum"),
+    ("md5", "MD5 checksum (macOS)"),
+    ("sha256sum", "SHA-256 checksum"),
+    ("shasum", "SHA checksum"),
+    ("sha1sum", "SHA-1 checksum"),
+    ("sha512sum", "SHA-512 checksum"),
+    ("cksum", "File checksum"),
+    ("b2sum", "BLAKE2 checksum"),
+    ("sum", "File checksum"),
+    ("strings", "Find printable strings in binary"),
+    ("hexdump", "Display file in hex"),
+    ("od", "Octal dump"),
+    ("size", "Object file section sizes"),
+
+    ("sw_vers", "macOS version info"),
+    ("mdls", "File metadata (macOS)"),
+    ("otool", "Object file tool (macOS)"),
+    ("nm", "List object file symbols"),
+    ("system_profiler", "macOS hardware/software info"),
+    ("ioreg", "macOS I/O Registry viewer"),
+    ("vm_stat", "Virtual memory statistics"),
+    ("mdfind", "Spotlight search (macOS)"),
+
+    ("dig", "DNS lookup"),
+    ("nslookup", "DNS lookup"),
+    ("host", "DNS lookup"),
+    ("whois", "Domain registration lookup"),
+    ("netstat", "Network connections and statistics"),
+    ("ss", "Socket statistics"),
+    ("ifconfig", "Network interface info"),
+    ("route", "Routing table"),
+
+    ("identify", "ImageMagick identify"),
+    ("shellcheck", "Shell script linter"),
+    ("cloc", "Count lines of code"),
+    ("tokei", "Code statistics"),
+    ("cucumber", "BDD test runner"),
+    ("branchdiff", "Branch diff tool"),
+    ("safe-chains", "Safe command checker"),
+];
 
 pub(crate) static SAFE_CMDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "grep", "rg", "fd", "bat", "eza", "exa", "head", "tail", "cat", "ls", "wc", "uniq", "tr", "cut", "echo",
-        "dirname", "basename", "realpath", "file", "stat", "du", "df", "printenv", "which",
-        "whoami", "date", "pwd", "tree", "lsof", "jq", "base64", "xxd", "pgrep", "getconf",
-        "ps", "top", "htop", "iotop", "procs", "dust", "uuidgen", "mdfind", "identify", "cd", "command", "cucumber", "branchdiff",
-        "diff", "delta", "comm", "paste", "tac", "rev", "nl", "expand", "unexpand", "fold", "fmt",
-        "column", "printf", "seq", "expr", "test", "true", "false", "bc", "factor",
-        "colordiff", "iconv",
-        "readlink", "hostname", "uname", "arch", "nproc", "uptime", "id", "groups", "tty",
-        "locale", "cal", "sleep", "who", "w", "last", "lastlog",
-        "md5sum", "md5", "sha256sum", "shasum", "sha1sum", "sha512sum", "cksum", "b2sum",
-        "sum", "strings", "hexdump", "od", "size",
-        "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat",
-        "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route",
-        "shellcheck", "cloc", "tokei",
-        "safe-chains",
-    ])
+    SAFE_CMD_ENTRIES.iter().map(|&(name, _)| name).collect()
 });
 
-pub(crate) fn check_subcmd(
+pub(crate) fn is_safe_subcmd(
     tokens: &[Token],
-    simple: &HashSet<&str>,
-    multi: &[(&str, HashSet<&str>)],
+    simple: &WordSet,
+    multi: &[(&str, WordSet)],
 ) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if simple.contains(tokens[1].as_str()) {
+    if simple.contains(&tokens[1]) {
         return true;
     }
     for (prefix, actions) in multi {
         if tokens[1] == *prefix {
-            return tokens.get(2).is_some_and(|a| actions.contains(a.as_str()));
+            return tokens.get(2).is_some_and(|a| actions.contains(a));
         }
     }
     false
+}
+
+fn is_bare_info_request(tokens: &[Token]) -> bool {
+    tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--help")
 }
 
 pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
@@ -144,9 +265,30 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         "xmllint" => coreutils::is_safe_xmllint(tokens),
         "awk" | "gawk" | "mawk" | "nawk" => coreutils::is_safe_awk(tokens),
 
-        _ => SAFE_CMDS.contains(cmd),
+        _ => SAFE_CMDS.contains(cmd) || is_bare_info_request(tokens),
     }
 }
+
+#[cfg(test)]
+const HANDLED_CMDS: &[&str] = &[
+    "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine",
+    "git", "jj", "gh",
+    "npm", "yarn", "pnpm", "bun", "deno", "npx", "bunx", "nvm", "fnm", "volta",
+    "bundle", "gem", "rbenv",
+    "pip", "pip3", "uv", "poetry", "pyenv", "conda",
+    "cargo", "rustup",
+    "go",
+    "gradle", "gradlew", "mvn", "mvnw",
+    "composer",
+    "swift",
+    "dotnet",
+    "docker", "podman",
+    "ollama", "llm",
+    "brew", "mise", "asdf", "defaults", "sysctl", "cmake",
+    "networksetup", "launchctl", "diskutil", "security", "csrutil", "log",
+    "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign",
+    "find", "sed", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
+];
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs = Vec::new();
@@ -169,4 +311,48 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(shell::command_docs());
     docs.extend(wrappers::command_docs());
     docs
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::HashSet;
+
+    #[test]
+    fn safe_cmd_entries_no_duplicates() {
+        let mut seen = HashSet::new();
+        for &(name, _) in SAFE_CMD_ENTRIES {
+            assert!(seen.insert(name), "duplicate SAFE_CMD_ENTRIES name: {name}");
+        }
+    }
+
+    #[test]
+    fn safe_cmd_entries_no_empty_descriptions() {
+        for &(name, desc) in SAFE_CMD_ENTRIES {
+            assert!(!desc.is_empty(), "empty description for SAFE_CMD_ENTRIES: {name}");
+        }
+    }
+
+    #[test]
+    fn safe_cmd_entries_no_overlap_with_handlers() {
+        let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
+        for &(name, _) in SAFE_CMD_ENTRIES {
+            assert!(
+                !handled.contains(name),
+                "{name} is in both SAFE_CMD_ENTRIES and dispatch — the dispatch handler shadows it"
+            );
+        }
+    }
+
+    #[test]
+    fn handled_cmds_matches_dispatch() {
+        let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
+        let safe: HashSet<&str> = SAFE_CMD_ENTRIES.iter().map(|&(n, _)| n).collect();
+        for name in &handled {
+            assert!(
+                !safe.contains(name),
+                "{name} is in both HANDLED_CMDS and SAFE_CMD_ENTRIES"
+            );
+        }
+    }
 }

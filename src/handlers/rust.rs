@@ -1,57 +1,49 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{FlagCheck, Token, WordSet};
 
-use crate::parse::Token;
+static CARGO_SAFE: WordSet = WordSet::new(&[
+    "--version", "audit", "bench", "build", "check", "clippy", "deny",
+    "doc", "license", "locate-project", "metadata", "pkgid",
+    "read-manifest", "search", "test", "tree", "verify-project",
+]);
 
-static CARGO_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "clippy",
-        "test",
-        "build",
-        "check",
-        "doc",
-        "search",
-        "--version",
-        "bench",
-        "tree",
-        "metadata",
-        "verify-project",
-        "pkgid",
-        "locate-project",
-        "read-manifest",
-        "audit",
-        "deny",
-        "license",
-    ])
-});
+static CARGO_FMT: FlagCheck =
+    FlagCheck::new(&["--check"], &[]);
 
-static RUSTUP_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["show", "which", "doc", "--version"]));
+static CARGO_PUBLISH_DRY: FlagCheck =
+    FlagCheck::new(&["--dry-run"], &["--force", "--no-verify"]);
 
-static RUSTUP_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> =
-    LazyLock::new(|| {
-        vec![
-            ("component", HashSet::from(["list"])),
-            ("target", HashSet::from(["list"])),
-            ("toolchain", HashSet::from(["list"])),
-        ]
-    });
+static RUSTUP_SAFE: WordSet =
+    WordSet::new(&["--version", "doc", "show", "which"]);
+
+static RUSTUP_MULTI: &[(&str, WordSet)] = &[
+    ("component", WordSet::new(&["list"])),
+    ("target", WordSet::new(&["list"])),
+    ("toolchain", WordSet::new(&["list"])),
+];
 
 pub fn is_safe_cargo(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if CARGO_SAFE.contains(tokens[1].as_str()) {
+    if tokens.last().is_some_and(|t| *t == "--help")
+        && !tokens.iter().any(|t| *t == "--")
+    {
+        return true;
+    }
+    if CARGO_SAFE.contains(&tokens[1]) {
         return true;
     }
     if tokens[1] == "fmt" {
-        return tokens[2..].iter().any(|t| t == "--check");
+        return CARGO_FMT.is_safe(&tokens[2..]);
+    }
+    if tokens[1] == "publish" {
+        return CARGO_PUBLISH_DRY.is_safe(&tokens[2..]);
     }
     false
 }
 
 pub fn is_safe_rustup(tokens: &[Token]) -> bool {
-    super::check_subcmd(tokens, &RUSTUP_SAFE, &RUSTUP_MULTI)
+    super::is_safe_subcmd(tokens, &RUSTUP_SAFE, RUSTUP_MULTI)
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -61,7 +53,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             name: "cargo",
             kind: DocKind::Handler,
             description: "Allowed: clippy, test, build, check, doc, search, --version, bench, tree, metadata, verify-project, pkgid, locate-project, read-manifest, audit, deny, license. \
-                          Guarded: fmt (requires --check).",
+                          Guarded: fmt (requires --check), publish (requires --dry-run, denies --force/--no-verify). \
+                          Any subcommand with --help is safe (unless -- separator is present).",
         },
         CommandDoc {
             name: "rustup",
@@ -187,6 +180,51 @@ mod tests {
     #[test]
     fn cargo_clean_denied() {
         assert!(!check("cargo clean"));
+    }
+
+    #[test]
+    fn cargo_help() {
+        assert!(check("cargo --help"));
+    }
+
+    #[test]
+    fn cargo_install_help() {
+        assert!(check("cargo install --help"));
+    }
+
+    #[test]
+    fn cargo_publish_dry_run() {
+        assert!(check("cargo publish --dry-run"));
+    }
+
+    #[test]
+    fn cargo_publish_dry_run_redirect() {
+        assert!(check("cargo publish --dry-run 2>&1"));
+    }
+
+    #[test]
+    fn cargo_publish_dry_run_force_denied() {
+        assert!(!check("cargo publish --dry-run --force"));
+    }
+
+    #[test]
+    fn cargo_publish_no_verify_denied() {
+        assert!(!check("cargo publish --dry-run --no-verify"));
+    }
+
+    #[test]
+    fn cargo_publish_denied() {
+        assert!(!check("cargo publish"));
+    }
+
+    #[test]
+    fn cargo_run_double_dash_help_denied() {
+        assert!(!check("cargo run -- --help"));
+    }
+
+    #[test]
+    fn cargo_run_help_safe() {
+        assert!(check("cargo run --help"));
     }
 
     #[test]

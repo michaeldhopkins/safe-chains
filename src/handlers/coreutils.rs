@@ -1,24 +1,19 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Segment, Token, WordSet, has_flag};
 
-use crate::parse::{Segment, Token, has_flag};
-
-static FIND_DANGEROUS_FLAGS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "-delete",
-        "-ok",
-        "-okdir",
-        "-fls",
-        "-fprint",
-        "-fprint0",
-        "-fprintf",
-    ])
-});
+static FIND_DANGEROUS_FLAGS: WordSet = WordSet::new(&[
+    "-delete",
+    "-fls",
+    "-fprint",
+    "-fprint0",
+    "-fprintf",
+    "-ok",
+    "-okdir",
+]);
 
 pub fn is_safe_find(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     let mut i = 1;
     while i < tokens.len() {
-        if FIND_DANGEROUS_FLAGS.contains(tokens[i].as_str()) {
+        if FIND_DANGEROUS_FLAGS.contains(&tokens[i]) {
             return false;
         }
         if tokens[i] == "-exec" || tokens[i] == "-execdir" {
@@ -31,11 +26,7 @@ pub fn is_safe_find(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> boo
             if cmd_start >= cmd_end {
                 return false;
             }
-            let words: Vec<&str> = tokens[cmd_start..cmd_end]
-                .iter()
-                .map(|t| if *t == "{}" { "file" } else { t.as_str() })
-                .collect();
-            let exec_cmd = Segment::from_words(&words);
+            let exec_cmd = Segment::from_tokens_replacing(&tokens[cmd_start..cmd_end], "{}", "file");
             if !is_safe(&exec_cmd) {
                 return false;
             }
@@ -47,81 +38,105 @@ pub fn is_safe_find(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> boo
     true
 }
 
+fn expr_has_exec(token: &Token) -> bool {
+    let bytes = token.as_bytes();
+    if bytes == b"e"
+        || (bytes.last() == Some(&b'e')
+            && bytes.len() >= 2
+            && matches!(bytes[bytes.len() - 2], b'0'..=b'9' | b'/' | b'$'))
+    {
+        return true;
+    }
+    if bytes.len() < 4 || bytes[0] != b's' {
+        return false;
+    }
+    let delim = bytes[1];
+    let mut count = 0;
+    let mut escaped = false;
+    let mut flags_start = None;
+    for (i, &b) in bytes[2..].iter().enumerate() {
+        if escaped {
+            escaped = false;
+            continue;
+        }
+        if b == b'\\' {
+            escaped = true;
+            continue;
+        }
+        if b == delim {
+            count += 1;
+            if count == 2 {
+                flags_start = Some(i + 3);
+                break;
+            }
+        }
+    }
+    flags_start.is_some_and(|start| start < bytes.len() && bytes[start..].contains(&b'e'))
+}
+
 fn sed_has_exec_modifier(tokens: &[Token]) -> bool {
-    for token in &tokens[1..] {
-        if token.starts_with('-') {
+    let mut i = 1;
+    let mut saw_script = false;
+
+    while i < tokens.len() {
+        let token = &tokens[i];
+
+        if *token == "-e" || *token == "--expression" {
+            if tokens.get(i + 1).is_some_and(expr_has_exec) {
+                return true;
+            }
+            saw_script = true;
+            i += 2;
             continue;
         }
-        let bytes = token.as_bytes();
-        if bytes == b"e"
-            || (bytes.last() == Some(&b'e')
-                && bytes.len() >= 2
-                && matches!(bytes[bytes.len() - 2], b'0'..=b'9' | b'/' | b'$'))
-        {
-            return true;
-        }
-        if bytes.len() < 4 || bytes[0] != b's' {
+
+        if token.starts_with("-") {
+            i += 1;
             continue;
         }
-        let delim = bytes[1];
-        let mut count = 0;
-        let mut escaped = false;
-        let mut flags_start = None;
-        for (i, &b) in bytes[2..].iter().enumerate() {
-            if escaped {
-                escaped = false;
-                continue;
+
+        if !saw_script {
+            if expr_has_exec(token) {
+                return true;
             }
-            if b == b'\\' {
-                escaped = true;
-                continue;
-            }
-            if b == delim {
-                count += 1;
-                if count == 2 {
-                    flags_start = Some(i + 3);
-                    break;
-                }
-            }
+            saw_script = true;
         }
-        if let Some(start) = flags_start
-            && start < bytes.len()
-            && bytes[start..].contains(&b'e')
-        {
-            return true;
-        }
+        i += 1;
     }
     false
 }
 
 pub fn is_safe_sed(tokens: &[Token]) -> bool {
-    !has_flag(tokens, "-i", Some("--in-place")) && !sed_has_exec_modifier(tokens)
+    !has_flag(tokens, Some("-i"), Some("--in-place")) && !sed_has_exec_modifier(tokens)
 }
 
 pub fn is_safe_sort(tokens: &[Token]) -> bool {
-    !has_flag(tokens, "-o", Some("--output"))
-        && !tokens[1..].iter().any(|t| *t == "--compress-program" || t.starts_with("--compress-program="))
+    !has_flag(tokens, Some("-o"), Some("--output"))
+        && !has_flag(tokens, None, Some("--compress-program"))
 }
 
 pub fn is_safe_yq(tokens: &[Token]) -> bool {
-    !has_flag(tokens, "-i", Some("--inplace"))
+    !has_flag(tokens, Some("-i"), Some("--inplace"))
 }
 
 pub fn is_safe_xmllint(tokens: &[Token]) -> bool {
-    !tokens[1..].iter().any(|t| *t == "--output" || t.starts_with("--output="))
+    !has_flag(tokens, None, Some("--output"))
 }
 
-static AWK_DANGEROUS: &[&str] = &["system", "getline", "|", ">", ">>"];
+fn awk_has_dangerous_construct(token: &Token) -> bool {
+    let code = token.content_outside_double_quotes();
+    code.contains("system") || code.contains("getline") || code.contains('|') || code.contains('>')
+}
 
 pub fn is_safe_awk(tokens: &[Token]) -> bool {
-    if has_flag(tokens, "-f", None) {
+    if has_flag(tokens, Some("-f"), None) {
         return false;
     }
     for token in &tokens[1..] {
-        if token.starts_with('-') {
+        if token.starts_with("-") {
             continue;
         }
-        if AWK_DANGEROUS.iter().any(|d| token.contains(d)) {
+        if awk_has_dangerous_construct(token) {
             return false;
         }
     }
@@ -565,5 +580,70 @@ mod tests {
     #[test]
     fn awk_netstat_pipeline() {
         assert!(check("awk '{print $6}'"));
+    }
+
+    #[test]
+    fn awk_string_literal_system() {
+        assert!(check("awk 'BEGIN{print \"system failed\"}'"));
+    }
+
+    #[test]
+    fn awk_string_literal_redirect() {
+        assert!(check("awk '{print \">\"}'"));
+    }
+
+    #[test]
+    fn awk_string_literal_pipe() {
+        assert!(check("awk '{print \"a | b\"}'"));
+    }
+
+    #[test]
+    fn awk_string_literal_getline() {
+        assert!(check("awk 'BEGIN{print \"getline is a keyword\"}'"));
+    }
+
+    #[test]
+    fn awk_system_call_denied() {
+        assert!(!check("awk 'BEGIN{system(\"rm\")}'"));
+    }
+
+    #[test]
+    fn awk_system_space_paren_denied() {
+        assert!(!check("awk 'BEGIN{system (\"rm\")}'"));
+    }
+
+    #[test]
+    fn awk_pipe_outside_string_denied() {
+        assert!(!check("awk '{print $0 | \"cmd\"}'"));
+    }
+
+    #[test]
+    fn awk_redirect_outside_string_denied() {
+        assert!(!check("awk '{print $0 > \"file\"}'"));
+    }
+
+    #[test]
+    fn sed_filename_1e_after_script() {
+        assert!(check("sed 's/foo/bar/' 1e"));
+    }
+
+    #[test]
+    fn sed_expression_flag_with_filename() {
+        assert!(check("sed -e 's/foo/bar/' filename"));
+    }
+
+    #[test]
+    fn sed_expression_flag_exec_denied() {
+        assert!(!check("sed -e 's/foo/bar/e'"));
+    }
+
+    #[test]
+    fn sed_multiple_expressions_exec_denied() {
+        assert!(!check("sed -e 's/foo/bar/' -e 's/x/y/e'"));
+    }
+
+    #[test]
+    fn sed_expression_flag_then_safe_filename() {
+        assert!(check("sed -e 's/foo/bar/' 1e 2e"));
     }
 }

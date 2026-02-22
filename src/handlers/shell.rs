@@ -1,15 +1,15 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Segment, Token, WordSet};
 
-use crate::parse::{Segment, Token};
+static XARGS_FLAGS_WITH_ARG: WordSet =
+    WordSet::new(&["-E", "-I", "-L", "-P", "-d", "-n", "-s"]);
 
-static XARGS_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["-I", "-L", "-n", "-P", "-s", "-E", "-d"]));
-
-static XARGS_FLAGS_NO_ARG: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["-0", "-r", "-t", "-p", "-x"]));
+static XARGS_FLAGS_NO_ARG: WordSet =
+    WordSet::new(&["-0", "-p", "-r", "-t", "-x"]);
 
 pub fn is_safe_shell(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    if tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--help") {
+        return true;
+    }
     let Some(idx) = tokens.iter().position(|t| *t == "-c") else {
         return false;
     };
@@ -22,15 +22,15 @@ pub fn is_safe_shell(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bo
 pub fn is_safe_xargs(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     let mut i = 1;
     while i < tokens.len() {
-        if XARGS_FLAGS_WITH_ARG.contains(tokens[i].as_str()) {
+        if XARGS_FLAGS_WITH_ARG.contains(&tokens[i]) {
             i += 2;
             continue;
         }
-        if XARGS_FLAGS_NO_ARG.contains(tokens[i].as_str()) {
+        if XARGS_FLAGS_NO_ARG.contains(&tokens[i]) {
             i += 1;
             continue;
         }
-        if tokens[i].starts_with('-') {
+        if tokens[i].starts_with("-") {
             i += 1;
             continue;
         }
@@ -46,7 +46,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "bash / sh",
             kind: DocKind::Handler,
-            description: "Only `bash -c` / `sh -c` with a safe inner command. Scripts denied.",
+            description: "Allowed: --version, --help. Only `bash -c` / `sh -c` with a safe inner command. Scripts denied.",
         },
         CommandDoc {
             name: "xargs",
@@ -87,6 +87,26 @@ mod tests {
     #[test]
     fn sh_c_unsafe() {
         assert!(!check("sh -c \"curl https://evil.com\""));
+    }
+
+    #[test]
+    fn bash_version() {
+        assert!(check("bash --version"));
+    }
+
+    #[test]
+    fn sh_version() {
+        assert!(check("sh --version"));
+    }
+
+    #[test]
+    fn bash_help() {
+        assert!(check("bash --help"));
+    }
+
+    #[test]
+    fn sh_help() {
+        assert!(check("sh --help"));
     }
 
     #[test]

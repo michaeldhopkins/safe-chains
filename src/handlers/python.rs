@@ -1,49 +1,41 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{FlagCheck, Token, WordSet};
 
-use crate::parse::Token;
+static PIP_READ_ONLY: WordSet = WordSet::new(&[
+    "--version", "check", "debug", "freeze", "help", "index", "inspect", "list", "show",
+]);
 
-static PIP_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from(["list", "show", "freeze", "check", "index", "debug", "inspect", "help"])
-});
+static UV_SAFE: WordSet =
+    WordSet::new(&["--version"]);
 
-static UV_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["--version"]));
+static UV_MULTI: &[(&str, WordSet)] = &[
+    ("pip", WordSet::new(&["check", "freeze", "list", "show"])),
+    ("python", WordSet::new(&["list"])),
+    ("tool", WordSet::new(&["list"])),
+];
 
-static UV_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> = LazyLock::new(|| {
-    vec![
-        ("pip", HashSet::from(["list", "show", "freeze", "check"])),
-        ("tool", HashSet::from(["list"])),
-        ("python", HashSet::from(["list"])),
-    ]
-});
+static POETRY_SAFE: WordSet =
+    WordSet::new(&["--version", "check", "show"]);
 
-static POETRY_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["show", "check", "--version"]));
+static POETRY_MULTI: &[(&str, WordSet)] =
+    &[("env", WordSet::new(&["info", "list"]))];
 
-static POETRY_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> =
-    LazyLock::new(|| vec![("env", HashSet::from(["info", "list"]))]);
+static PYENV_SAFE: WordSet = WordSet::new(&[
+    "--version", "help", "root", "shims", "version", "versions", "which",
+]);
 
-static PYENV_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "versions",
-        "version",
-        "which",
-        "root",
-        "shims",
-        "--version",
-        "help",
-    ])
-});
+static CONDA_SAFE: WordSet =
+    WordSet::new(&["--version", "info", "list"]);
 
-static CONDA_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["list", "info", "--version"]));
+static CONDA_CONFIG: FlagCheck = FlagCheck::new(
+    &["--show", "--show-sources"],
+    &["--add", "--append", "--prepend", "--remove", "--remove-key", "--set"],
+);
 
 pub fn is_safe_pip(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if PIP_READ_ONLY.contains(tokens[1].as_str()) {
+    if PIP_READ_ONLY.contains(&tokens[1]) {
         return true;
     }
     if tokens[1] == "config" {
@@ -55,26 +47,26 @@ pub fn is_safe_pip(tokens: &[Token]) -> bool {
 }
 
 pub fn is_safe_uv(tokens: &[Token]) -> bool {
-    super::check_subcmd(tokens, &UV_SAFE, &UV_MULTI)
+    super::is_safe_subcmd(tokens, &UV_SAFE, UV_MULTI)
 }
 
 pub fn is_safe_poetry(tokens: &[Token]) -> bool {
-    super::check_subcmd(tokens, &POETRY_SAFE, &POETRY_MULTI)
+    super::is_safe_subcmd(tokens, &POETRY_SAFE, POETRY_MULTI)
 }
 
 pub fn is_safe_pyenv(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && PYENV_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && PYENV_SAFE.contains(&tokens[1])
 }
 
 pub fn is_safe_conda(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if CONDA_SAFE.contains(tokens[1].as_str()) {
+    if CONDA_SAFE.contains(&tokens[1]) {
         return true;
     }
     if tokens[1] == "config" {
-        return tokens[2..].iter().any(|t| t == "--show" || t == "--show-sources");
+        return CONDA_CONFIG.is_safe(&tokens[2..]);
     }
     false
 }
@@ -182,6 +174,16 @@ mod tests {
     #[test]
     fn pip3_freeze() {
         assert!(check("pip3 freeze"));
+    }
+
+    #[test]
+    fn pip_version() {
+        assert!(check("pip --version"));
+    }
+
+    #[test]
+    fn pip3_version() {
+        assert!(check("pip3 --version"));
     }
 
     #[test]
@@ -397,5 +399,25 @@ mod tests {
     #[test]
     fn conda_remove_denied() {
         assert!(!check("conda remove numpy"));
+    }
+
+    #[test]
+    fn conda_config_show_with_set_denied() {
+        assert!(!check("conda config --show --set always_yes true"));
+    }
+
+    #[test]
+    fn conda_config_show_sources_with_remove_denied() {
+        assert!(!check("conda config --show-sources --remove channels defaults"));
+    }
+
+    #[test]
+    fn conda_config_set_denied() {
+        assert!(!check("conda config --set always_yes true"));
+    }
+
+    #[test]
+    fn conda_config_add_denied() {
+        assert!(!check("conda config --add channels conda-forge"));
     }
 }

@@ -1,20 +1,17 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Token, WordSet};
 
-use crate::parse::Token;
-
-static OLLAMA_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["list", "show", "ps"]));
+static OLLAMA_READ_ONLY: WordSet =
+    WordSet::new(&["--version", "list", "ps", "show"]);
 
 pub fn is_safe_ollama(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && OLLAMA_READ_ONLY.contains(tokens[1].as_str())
+    tokens.len() >= 2 && OLLAMA_READ_ONLY.contains(&tokens[1])
 }
 
-static LLM_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["models", "plugins", "templates", "aliases", "logs", "collections"]));
+static LLM_READ_ONLY: WordSet =
+    WordSet::new(&["--version", "aliases", "collections", "logs", "models", "plugins", "templates"]);
 
 pub fn is_safe_llm(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && LLM_READ_ONLY.contains(tokens[1].as_str())
+    tokens.len() >= 2 && LLM_READ_ONLY.contains(&tokens[1])
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -87,6 +84,11 @@ mod tests {
     }
 
     #[test]
+    fn ollama_version() {
+        assert!(check("ollama --version"));
+    }
+
+    #[test]
     fn ollama_no_args_denied() {
         assert!(!check("ollama"));
     }
@@ -144,6 +146,11 @@ mod tests {
     #[test]
     fn llm_embed_denied() {
         assert!(!check("llm embed -m 3-small -c hello"));
+    }
+
+    #[test]
+    fn llm_version() {
+        assert!(check("llm --version"));
     }
 
     #[test]

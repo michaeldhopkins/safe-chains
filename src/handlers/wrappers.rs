@@ -1,17 +1,14 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Segment, Token, WordSet};
 
-use crate::parse::{Segment, Token};
-
-static TIMEOUT_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["-s", "--signal", "-k", "--kill-after"]));
+static TIMEOUT_FLAGS_WITH_ARG: WordSet =
+    WordSet::new(&["--kill-after", "--signal", "-k", "-s"]);
 
 pub fn is_safe_env(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     if tokens.len() == 1 {
         return true;
     }
     let mut i = 1;
-    while i < tokens.len() && tokens[i].starts_with('-') {
+    while i < tokens.len() && tokens[i].starts_with("-") {
         if tokens[i] == "-i" || tokens[i] == "--ignore-environment" {
             i += 1;
         } else if tokens[i] == "-u" || tokens[i] == "--unset" {
@@ -20,7 +17,7 @@ pub fn is_safe_env(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool
             i += 1;
         }
     }
-    while i < tokens.len() && !tokens[i].starts_with('-') && tokens[i].contains('=') {
+    while i < tokens.len() && !tokens[i].starts_with("-") && tokens[i].contains("=") {
         i += 1;
     }
     if i >= tokens.len() {
@@ -33,8 +30,8 @@ pub fn is_safe_env(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool
 
 pub fn is_safe_timeout(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     let mut i = 1;
-    while i < tokens.len() && tokens[i].starts_with('-') {
-        if TIMEOUT_FLAGS_WITH_ARG.contains(tokens[i].as_str()) {
+    while i < tokens.len() && tokens[i].starts_with("-") {
+        if TIMEOUT_FLAGS_WITH_ARG.contains(&tokens[i]) {
             i += 2;
         } else {
             i += 1;
@@ -62,7 +59,7 @@ pub fn is_safe_time(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> boo
 
 pub fn is_safe_nice(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     let mut i = 1;
-    while i < tokens.len() && tokens[i].starts_with('-') {
+    while i < tokens.len() && tokens[i].starts_with("-") {
         if tokens[i] == "-n" || tokens[i] == "--adjustment" {
             i += 2;
         } else {
@@ -76,15 +73,14 @@ pub fn is_safe_nice(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> boo
     is_safe(&inner)
 }
 
-static HYPERFINE_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "-w", "--warmup", "-r", "--runs", "-m", "--min-runs", "-M", "--max-runs",
-        "-p", "--prepare", "-c", "--cleanup", "-s", "--setup",
-        "-n", "--command-name", "--min-benchmarking-time", "--style", "--sort",
-        "--time-unit", "--export-json", "--export-csv", "--export-markdown",
-        "--export-asciidoc", "--shell", "-S", "--output",
-    ])
-});
+static HYPERFINE_FLAGS_WITH_ARG: WordSet = WordSet::new(&[
+    "--cleanup", "--command-name", "--export-asciidoc", "--export-csv",
+    "--export-json", "--export-markdown", "--max-runs",
+    "--min-benchmarking-time", "--min-runs", "--output", "--prepare",
+    "--runs", "--setup", "--shell", "--sort", "--style",
+    "--time-unit", "--warmup",
+    "-M", "-S", "-c", "-m", "-n", "-p", "-r", "-s", "-w",
+]);
 
 pub fn is_safe_hyperfine(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     let mut i = 1;
@@ -94,13 +90,13 @@ pub fn is_safe_hyperfine(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -
             i += 1;
             break;
         }
-        if t.starts_with('-') {
-            if t.contains('=') {
+        if t.starts_with("-") {
+            if t.contains("=") {
                 i += 1;
                 continue;
             }
-            if HYPERFINE_FLAGS_WITH_ARG.contains(t.as_str()) {
-                if ["-p", "--prepare", "-c", "--cleanup", "-s", "--setup"].contains(&t.as_str()) {
+            if HYPERFINE_FLAGS_WITH_ARG.contains(t) {
+                if t.is_one_of(&["-p", "--prepare", "-c", "--cleanup", "-s", "--setup"]) {
                     return false;
                 }
                 i += 2;

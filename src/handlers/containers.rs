@@ -1,37 +1,24 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Token, WordSet};
 
-use crate::parse::Token;
+static DOCKER_READ_ONLY: WordSet = WordSet::new(&[
+    "--version", "diff", "history", "images", "info", "inspect", "logs",
+    "port", "ps", "stats", "top", "version",
+]);
 
-static DOCKER_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "ps", "images", "logs", "inspect", "info", "version", "top", "stats", "history", "port",
-        "diff",
-    ])
-});
-
-static DOCKER_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> = LazyLock::new(|| {
-    vec![
-        ("network", HashSet::from(["ls", "inspect"])),
-        ("volume", HashSet::from(["ls", "inspect"])),
-        (
-            "container",
-            HashSet::from(["ls", "list", "inspect", "logs", "top", "stats", "diff", "port"]),
-        ),
-        ("image", HashSet::from(["ls", "list", "inspect", "history"])),
-        ("system", HashSet::from(["info", "df"])),
-        (
-            "compose",
-            HashSet::from(["config", "ps", "ls", "top", "images", "version"]),
-        ),
-        ("context", HashSet::from(["ls", "inspect", "show"])),
-        ("manifest", HashSet::from(["inspect"])),
-        ("buildx", HashSet::from(["ls", "inspect", "version"])),
-    ]
-});
+static DOCKER_MULTI: &[(&str, WordSet)] = &[
+    ("buildx", WordSet::new(&["--version", "inspect", "ls", "version"])),
+    ("compose", WordSet::new(&["--version", "config", "images", "ls", "ps", "top", "version"])),
+    ("container", WordSet::new(&["diff", "inspect", "list", "logs", "ls", "port", "stats", "top"])),
+    ("context", WordSet::new(&["inspect", "ls", "show"])),
+    ("image", WordSet::new(&["history", "inspect", "list", "ls"])),
+    ("manifest", WordSet::new(&["inspect"])),
+    ("network", WordSet::new(&["inspect", "ls"])),
+    ("system", WordSet::new(&["df", "info"])),
+    ("volume", WordSet::new(&["inspect", "ls"])),
+];
 
 pub fn is_safe_docker(tokens: &[Token]) -> bool {
-    super::check_subcmd(tokens, &DOCKER_READ_ONLY, &DOCKER_MULTI)
+    super::is_safe_subcmd(tokens, &DOCKER_READ_ONLY, DOCKER_MULTI)
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -282,5 +269,25 @@ mod tests {
     #[test]
     fn bare_docker_denied() {
         assert!(!check("docker"));
+    }
+
+    #[test]
+    fn docker_version_flag() {
+        assert!(check("docker --version"));
+    }
+
+    #[test]
+    fn docker_compose_version_flag() {
+        assert!(check("docker compose --version"));
+    }
+
+    #[test]
+    fn docker_buildx_version_flag() {
+        assert!(check("docker buildx --version"));
+    }
+
+    #[test]
+    fn docker_run_version_bypass_denied() {
+        assert!(!check("docker run evil --version"));
     }
 }

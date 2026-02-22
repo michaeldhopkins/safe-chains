@@ -1,40 +1,36 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Token, WordSet, has_flag};
 
-use crate::parse::{has_flag, Token};
+static BREW_READ_ONLY: WordSet = WordSet::new(&[
+    "--version", "casks", "cat", "config", "deps", "desc", "doctor",
+    "formulae", "home", "info", "leaves", "list", "log", "outdated",
+    "search", "shellenv", "tap", "uses",
+]);
 
-static BREW_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "list", "info", "--version", "search", "deps", "uses", "leaves", "outdated", "cat",
-        "desc", "home", "formulae", "casks", "config", "doctor", "log", "tap", "shellenv",
-    ])
-});
+static MISE_READ_ONLY: WordSet =
+    WordSet::new(&["--version", "current", "doctor", "list", "ls", "which"]);
 
-static MISE_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["ls", "list", "current", "which", "doctor", "--version"]));
+static MISE_MULTI: &[(&str, WordSet)] =
+    &[("settings", WordSet::new(&["get"]))];
 
-static MISE_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> =
-    LazyLock::new(|| vec![("settings", HashSet::from(["get"]))]);
+static ASDF_READ_ONLY: WordSet =
+    WordSet::new(&["--version", "current", "help", "list", "which"]);
 
-static ASDF_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["current", "which", "help", "list", "--version"]));
-
-static DEFAULTS_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["read", "read-type", "domains", "find", "export"]));
+static DEFAULTS_SAFE: WordSet =
+    WordSet::new(&["domains", "export", "find", "read", "read-type"]);
 
 pub fn is_safe_brew(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && BREW_READ_ONLY.contains(tokens[1].as_str())
+    tokens.len() >= 2 && BREW_READ_ONLY.contains(&tokens[1])
 }
 
 pub fn is_safe_mise(tokens: &[Token]) -> bool {
-    super::check_subcmd(tokens, &MISE_READ_ONLY, &MISE_MULTI)
+    super::is_safe_subcmd(tokens, &MISE_READ_ONLY, MISE_MULTI)
 }
 
 pub fn is_safe_asdf(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if ASDF_READ_ONLY.contains(tokens[1].as_str()) {
+    if ASDF_READ_ONLY.contains(&tokens[1]) {
         return true;
     }
     if tokens[1] == "plugin" {
@@ -47,84 +43,77 @@ pub fn is_safe_asdf(tokens: &[Token]) -> bool {
 }
 
 pub fn is_safe_defaults(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && DEFAULTS_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && DEFAULTS_SAFE.contains(&tokens[1])
 }
 
 pub fn is_safe_sysctl(tokens: &[Token]) -> bool {
-    !has_flag(tokens, "-w", Some("--write"))
-        && !tokens[1..].iter().any(|t| t.contains('='))
+    !has_flag(tokens, Some("-w"), Some("--write"))
+        && !tokens[1..].iter().any(|t| t.contains("="))
 }
 
 pub fn is_safe_cmake(tokens: &[Token]) -> bool {
     tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--system-information")
 }
 
-static SECURITY_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "find-identity", "find-certificate", "find-generic-password", "find-internet-password",
-        "show-keychain-info", "dump-keychain", "list-keychains", "dump-trust-settings",
-        "smartcard", "verify-cert", "cms",
-    ])
-});
+static SECURITY_READ_ONLY: WordSet = WordSet::new(&[
+    "cms", "dump-keychain", "dump-trust-settings", "find-certificate",
+    "find-generic-password", "find-identity", "find-internet-password",
+    "list-keychains", "show-keychain-info", "smartcard", "verify-cert",
+]);
 
 pub fn is_safe_security(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && SECURITY_READ_ONLY.contains(tokens[1].as_str())
+    tokens.len() >= 2 && SECURITY_READ_ONLY.contains(&tokens[1])
 }
 
-static CSRUTIL_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["status", "report", "authenticated-root"]));
+static CSRUTIL_READ_ONLY: WordSet =
+    WordSet::new(&["authenticated-root", "report", "status"]);
 
 pub fn is_safe_csrutil(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && CSRUTIL_READ_ONLY.contains(tokens[1].as_str())
+    tokens.len() >= 2 && CSRUTIL_READ_ONLY.contains(&tokens[1])
 }
 
-static DISKUTIL_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from(["list", "info", "activity", "listFilesystems", "apfs"])
-});
+static DISKUTIL_READ_ONLY: WordSet =
+    WordSet::new(&["activity", "apfs", "info", "list", "listFilesystems"]);
 
-static DISKUTIL_APFS_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["list", "listCryptoUsers", "listSnapshots", "listVolumeGroups"]));
+static DISKUTIL_APFS_READ_ONLY: WordSet =
+    WordSet::new(&["list", "listCryptoUsers", "listSnapshots", "listVolumeGroups"]);
 
 pub fn is_safe_diskutil(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    let sub = tokens[1].as_str();
-    if sub == "apfs" {
-        return tokens.get(2).is_some_and(|a| DISKUTIL_APFS_READ_ONLY.contains(a.as_str()));
+    if tokens[1] == "apfs" {
+        return tokens.get(2).is_some_and(|a| DISKUTIL_APFS_READ_ONLY.contains(a));
     }
-    DISKUTIL_READ_ONLY.contains(sub)
+    DISKUTIL_READ_ONLY.contains(&tokens[1])
 }
 
-static LAUNCHCTL_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "list", "print", "print-cache", "print-disabled", "dumpstate", "blame", "hostinfo",
-        "resolveport", "examine", "version", "help", "error",
-    ])
-});
+static LAUNCHCTL_READ_ONLY: WordSet = WordSet::new(&[
+    "blame", "dumpstate", "error", "examine", "help", "hostinfo",
+    "list", "print", "print-cache", "print-disabled", "resolveport", "version",
+]);
 
 pub fn is_safe_launchctl(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && LAUNCHCTL_READ_ONLY.contains(tokens[1].as_str())
+    tokens.len() >= 2 && LAUNCHCTL_READ_ONLY.contains(&tokens[1])
 }
 
 pub fn is_safe_networksetup(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    let sub = tokens[1].as_str();
-    sub.starts_with("-list")
-        || sub.starts_with("-get")
-        || sub.starts_with("-show")
-        || sub.starts_with("-print")
-        || sub == "-version"
-        || sub == "-help"
+    tokens[1].starts_with("-list")
+        || tokens[1].starts_with("-get")
+        || tokens[1].starts_with("-show")
+        || tokens[1].starts_with("-print")
+        || tokens[1] == "-version"
+        || tokens[1] == "-help"
 }
 
-static LOG_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["help", "show", "stats", "stream"]));
+static LOG_READ_ONLY: WordSet =
+    WordSet::new(&["help", "show", "stats", "stream"]);
 
 pub fn is_safe_log(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && LOG_READ_ONLY.contains(tokens[1].as_str())
+    tokens.len() >= 2 && LOG_READ_ONLY.contains(&tokens[1])
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -705,5 +694,4 @@ mod tests {
     fn log_no_args_denied() {
         assert!(!check("log"));
     }
-
 }

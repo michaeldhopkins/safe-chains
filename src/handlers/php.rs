@@ -1,27 +1,12 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Token, WordSet};
 
-use crate::parse::Token;
-
-static COMPOSER_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "show",
-        "info",
-        "diagnose",
-        "outdated",
-        "licenses",
-        "check-platform-reqs",
-        "suggests",
-        "fund",
-        "audit",
-        "--version",
-        "about",
-        "help",
-    ])
-});
+static COMPOSER_SAFE: WordSet = WordSet::new(&[
+    "--version", "about", "audit", "check-platform-reqs", "diagnose",
+    "fund", "help", "info", "licenses", "outdated", "show", "suggests",
+]);
 
 pub fn is_safe_composer(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && COMPOSER_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && COMPOSER_SAFE.contains(&tokens[1])
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
