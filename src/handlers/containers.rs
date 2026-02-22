@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::Token;
+
 static DOCKER_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
         "ps", "images", "logs", "inspect", "info", "version", "top", "stats", "history", "port",
@@ -28,7 +30,7 @@ static DOCKER_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> = Lazy
     ]
 });
 
-pub fn is_safe_docker(tokens: &[String]) -> bool {
+pub fn is_safe_docker(tokens: &[Token]) -> bool {
     super::check_subcmd(tokens, &DOCKER_READ_ONLY, &DOCKER_MULTI)
 }
 
@@ -46,10 +48,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

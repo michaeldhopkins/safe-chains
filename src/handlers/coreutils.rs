@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
-use crate::parse::has_flag;
+use crate::parse::{Segment, Token, has_flag};
 
 static FIND_DANGEROUS_FLAGS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
@@ -15,7 +15,7 @@ static FIND_DANGEROUS_FLAGS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| 
     ])
 });
 
-pub fn is_safe_find(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+pub fn is_safe_find(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     let mut i = 1;
     while i < tokens.len() {
         if FIND_DANGEROUS_FLAGS.contains(tokens[i].as_str()) {
@@ -25,17 +25,17 @@ pub fn is_safe_find(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
             let cmd_start = i + 1;
             let cmd_end = tokens[cmd_start..]
                 .iter()
-                .position(|t| t == ";" || t == "+")
+                .position(|t| *t == ";" || *t == "+")
                 .map(|p| cmd_start + p)
                 .unwrap_or(tokens.len());
             if cmd_start >= cmd_end {
                 return false;
             }
-            let exec_tokens: Vec<&str> = tokens[cmd_start..cmd_end]
+            let words: Vec<&str> = tokens[cmd_start..cmd_end]
                 .iter()
-                .map(|t| if t == "{}" { "file" } else { t.as_str() })
+                .map(|t| if *t == "{}" { "file" } else { t.as_str() })
                 .collect();
-            let exec_cmd = shell_words::join(&exec_tokens);
+            let exec_cmd = Segment::from_words(&words);
             if !is_safe(&exec_cmd) {
                 return false;
             }
@@ -47,7 +47,7 @@ pub fn is_safe_find(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
     true
 }
 
-fn sed_has_exec_modifier(tokens: &[String]) -> bool {
+fn sed_has_exec_modifier(tokens: &[Token]) -> bool {
     for token in &tokens[1..] {
         if token.starts_with('-') {
             continue;
@@ -94,26 +94,26 @@ fn sed_has_exec_modifier(tokens: &[String]) -> bool {
     false
 }
 
-pub fn is_safe_sed(tokens: &[String]) -> bool {
+pub fn is_safe_sed(tokens: &[Token]) -> bool {
     !has_flag(tokens, "-i", Some("--in-place")) && !sed_has_exec_modifier(tokens)
 }
 
-pub fn is_safe_sort(tokens: &[String]) -> bool {
+pub fn is_safe_sort(tokens: &[Token]) -> bool {
     !has_flag(tokens, "-o", Some("--output"))
-        && !tokens[1..].iter().any(|t| t == "--compress-program" || t.starts_with("--compress-program="))
+        && !tokens[1..].iter().any(|t| *t == "--compress-program" || t.starts_with("--compress-program="))
 }
 
-pub fn is_safe_yq(tokens: &[String]) -> bool {
+pub fn is_safe_yq(tokens: &[Token]) -> bool {
     !has_flag(tokens, "-i", Some("--inplace"))
 }
 
-pub fn is_safe_xmllint(tokens: &[String]) -> bool {
-    !tokens[1..].iter().any(|t| t == "--output" || t.starts_with("--output="))
+pub fn is_safe_xmllint(tokens: &[Token]) -> bool {
+    !tokens[1..].iter().any(|t| *t == "--output" || t.starts_with("--output="))
 }
 
 static AWK_DANGEROUS: &[&str] = &["system", "getline", "|", ">", ">>"];
 
-pub fn is_safe_awk(tokens: &[String]) -> bool {
+pub fn is_safe_awk(tokens: &[Token]) -> bool {
     if has_flag(tokens, "-f", None) {
         return false;
     }
@@ -167,10 +167,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
-use crate::parse::split_outside_quotes;
+use crate::parse::{Segment, Token};
 
 static XARGS_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["-I", "-L", "-n", "-P", "-s", "-E", "-d"]));
@@ -9,19 +9,17 @@ static XARGS_FLAGS_WITH_ARG: LazyLock<HashSet<&'static str>> =
 static XARGS_FLAGS_NO_ARG: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["-0", "-r", "-t", "-p", "-x"]));
 
-pub fn is_safe_shell(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
-    let Some(idx) = tokens.iter().position(|t| t == "-c") else {
+pub fn is_safe_shell(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    let Some(idx) = tokens.iter().position(|t| *t == "-c") else {
         return false;
     };
     let Some(script) = tokens.get(idx + 1) else {
         return false;
     };
-    split_outside_quotes(script)
-        .iter()
-        .all(|s| is_safe(s))
+    script.as_command_line().segments().iter().all(is_safe)
 }
 
-pub fn is_safe_xargs(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool {
+pub fn is_safe_xargs(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     let mut i = 1;
     while i < tokens.len() {
         if XARGS_FLAGS_WITH_ARG.contains(tokens[i].as_str()) {
@@ -36,7 +34,7 @@ pub fn is_safe_xargs(tokens: &[String], is_safe: &dyn Fn(&str) -> bool) -> bool 
             i += 1;
             continue;
         }
-        let inner = shell_words::join(&tokens[i..]);
+        let inner = Token::join(&tokens[i..]);
         return is_safe(&inner);
     }
     true
@@ -60,10 +58,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

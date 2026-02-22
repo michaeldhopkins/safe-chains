@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::Token;
+
 static SWIFT_SAFE: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["--version", "test", "build"]));
 
@@ -8,7 +10,7 @@ static SWIFT_PACKAGE_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from(["describe", "dump-package", "show-dependencies"])
 });
 
-pub fn is_safe_swift(tokens: &[String]) -> bool {
+pub fn is_safe_swift(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -34,10 +36,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

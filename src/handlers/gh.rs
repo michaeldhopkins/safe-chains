@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::Token;
+
 static READ_ONLY_SUBCOMMANDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
         "pr",
@@ -32,7 +34,7 @@ static AUTH_SAFE_ACTIONS: LazyLock<HashSet<&'static str>> =
 static API_BODY_FLAGS: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["-f", "-F", "--field", "--raw-field", "--input"]));
 
-pub fn is_safe_gh(tokens: &[String]) -> bool {
+pub fn is_safe_gh(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -61,7 +63,7 @@ pub fn is_safe_gh(tokens: &[String]) -> bool {
     false
 }
 
-fn is_safe_gh_api(tokens: &[String]) -> bool {
+fn is_safe_gh_api(tokens: &[Token]) -> bool {
     for (i, token) in tokens[2..].iter().enumerate() {
         let abs_i = i + 2;
 
@@ -106,10 +108,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::Token;
+
 static XCODEBUILD_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
         "-version",
@@ -11,18 +13,18 @@ static XCODEBUILD_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     ])
 });
 
-pub fn is_safe_xcodebuild(tokens: &[String]) -> bool {
+pub fn is_safe_xcodebuild(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && XCODEBUILD_SAFE.contains(tokens[1].as_str())
 }
 
 static PLUTIL_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["-lint", "-p", "-type", "-help"]));
 
-pub fn is_safe_plutil(tokens: &[String]) -> bool {
+pub fn is_safe_plutil(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && PLUTIL_READ_ONLY.contains(tokens[1].as_str())
 }
 
-pub fn is_safe_xcode_select(tokens: &[String]) -> bool {
+pub fn is_safe_xcode_select(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -41,7 +43,7 @@ static XCRUN_SHOW_FLAGS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     ])
 });
 
-pub fn is_safe_xcrun(tokens: &[String]) -> bool {
+pub fn is_safe_xcrun(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -80,7 +82,7 @@ static PKGUTIL_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     ])
 });
 
-pub fn is_safe_pkgutil(tokens: &[String]) -> bool {
+pub fn is_safe_pkgutil(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -91,7 +93,7 @@ pub fn is_safe_pkgutil(tokens: &[String]) -> bool {
 static LIPO_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["-info", "-detailed_info", "-archs", "-verify_arch"]));
 
-pub fn is_safe_lipo(tokens: &[String]) -> bool {
+pub fn is_safe_lipo(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -99,7 +101,7 @@ pub fn is_safe_lipo(tokens: &[String]) -> bool {
         && !tokens[1..].iter().any(|t| t == "-output")
 }
 
-pub fn is_safe_codesign(tokens: &[String]) -> bool {
+pub fn is_safe_codesign(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -156,10 +158,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

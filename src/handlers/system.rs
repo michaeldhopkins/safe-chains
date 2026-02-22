@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
-use crate::parse::has_flag;
+use crate::parse::{has_flag, Token};
 
 static BREW_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
@@ -22,15 +22,15 @@ static ASDF_READ_ONLY: LazyLock<HashSet<&'static str>> =
 static DEFAULTS_SAFE: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["read", "read-type", "domains", "find", "export"]));
 
-pub fn is_safe_brew(tokens: &[String]) -> bool {
+pub fn is_safe_brew(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && BREW_READ_ONLY.contains(tokens[1].as_str())
 }
 
-pub fn is_safe_mise(tokens: &[String]) -> bool {
+pub fn is_safe_mise(tokens: &[Token]) -> bool {
     super::check_subcmd(tokens, &MISE_READ_ONLY, &MISE_MULTI)
 }
 
-pub fn is_safe_asdf(tokens: &[String]) -> bool {
+pub fn is_safe_asdf(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -46,16 +46,16 @@ pub fn is_safe_asdf(tokens: &[String]) -> bool {
     false
 }
 
-pub fn is_safe_defaults(tokens: &[String]) -> bool {
+pub fn is_safe_defaults(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && DEFAULTS_SAFE.contains(tokens[1].as_str())
 }
 
-pub fn is_safe_sysctl(tokens: &[String]) -> bool {
+pub fn is_safe_sysctl(tokens: &[Token]) -> bool {
     !has_flag(tokens, "-w", Some("--write"))
         && !tokens[1..].iter().any(|t| t.contains('='))
 }
 
-pub fn is_safe_cmake(tokens: &[String]) -> bool {
+pub fn is_safe_cmake(tokens: &[Token]) -> bool {
     tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--system-information")
 }
 
@@ -67,14 +67,14 @@ static SECURITY_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     ])
 });
 
-pub fn is_safe_security(tokens: &[String]) -> bool {
+pub fn is_safe_security(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && SECURITY_READ_ONLY.contains(tokens[1].as_str())
 }
 
 static CSRUTIL_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["status", "report", "authenticated-root"]));
 
-pub fn is_safe_csrutil(tokens: &[String]) -> bool {
+pub fn is_safe_csrutil(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && CSRUTIL_READ_ONLY.contains(tokens[1].as_str())
 }
 
@@ -85,7 +85,7 @@ static DISKUTIL_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
 static DISKUTIL_APFS_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["list", "listCryptoUsers", "listSnapshots", "listVolumeGroups"]));
 
-pub fn is_safe_diskutil(tokens: &[String]) -> bool {
+pub fn is_safe_diskutil(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -103,11 +103,11 @@ static LAUNCHCTL_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     ])
 });
 
-pub fn is_safe_launchctl(tokens: &[String]) -> bool {
+pub fn is_safe_launchctl(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && LAUNCHCTL_READ_ONLY.contains(tokens[1].as_str())
 }
 
-pub fn is_safe_networksetup(tokens: &[String]) -> bool {
+pub fn is_safe_networksetup(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -123,7 +123,7 @@ pub fn is_safe_networksetup(tokens: &[String]) -> bool {
 static LOG_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["help", "show", "stats", "stream"]));
 
-pub fn is_safe_log(tokens: &[String]) -> bool {
+pub fn is_safe_log(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && LOG_READ_ONLY.contains(tokens[1].as_str())
 }
 
@@ -195,10 +195,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

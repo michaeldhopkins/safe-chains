@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::Token;
+
 static DOTNET_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
         "--version",
@@ -13,7 +15,7 @@ static DOTNET_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     ])
 });
 
-pub fn is_safe_dotnet(tokens: &[String]) -> bool {
+pub fn is_safe_dotnet(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && DOTNET_SAFE.contains(tokens[1].as_str())
 }
 
@@ -28,10 +30,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

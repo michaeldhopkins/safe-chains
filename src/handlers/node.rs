@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
+use crate::parse::Token;
+
 static YARN_READ_ONLY: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["list", "ls", "info", "why", "--version"]));
 
@@ -42,7 +44,7 @@ static FNM_SAFE: LazyLock<HashSet<&'static str>> =
 static VOLTA_SAFE: LazyLock<HashSet<&'static str>> =
     LazyLock::new(|| HashSet::from(["list", "which", "--version"]));
 
-pub fn is_safe_yarn(tokens: &[String]) -> bool {
+pub fn is_safe_yarn(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -52,7 +54,7 @@ pub fn is_safe_yarn(tokens: &[String]) -> bool {
     tokens[1] == "test" || tokens[1].starts_with("test:")
 }
 
-pub fn is_safe_npm(tokens: &[String]) -> bool {
+pub fn is_safe_npm(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -73,7 +75,7 @@ pub fn is_safe_npm(tokens: &[String]) -> bool {
 }
 
 fn find_runner_package_index(
-    tokens: &[String],
+    tokens: &[Token],
     start: usize,
     flags: &HashSet<&str>,
 ) -> Option<usize> {
@@ -98,7 +100,7 @@ fn find_runner_package_index(
     None
 }
 
-fn is_safe_runner_package(tokens: &[String], pkg_idx: usize) -> bool {
+fn is_safe_runner_package(tokens: &[Token], pkg_idx: usize) -> bool {
     if pkg_idx >= tokens.len() {
         return false;
     }
@@ -112,7 +114,7 @@ fn is_safe_runner_package(tokens: &[String], pkg_idx: usize) -> bool {
     false
 }
 
-pub fn is_safe_npx(tokens: &[String]) -> bool {
+pub fn is_safe_npx(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -120,7 +122,7 @@ pub fn is_safe_npx(tokens: &[String]) -> bool {
         .is_some_and(|idx| is_safe_runner_package(tokens, idx))
 }
 
-pub fn is_safe_bunx(tokens: &[String]) -> bool {
+pub fn is_safe_bunx(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -128,11 +130,11 @@ pub fn is_safe_bunx(tokens: &[String]) -> bool {
         .is_some_and(|idx| is_safe_runner_package(tokens, idx))
 }
 
-pub fn is_safe_pnpm(tokens: &[String]) -> bool {
+pub fn is_safe_pnpm(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && PNPM_READ_ONLY.contains(tokens[1].as_str())
 }
 
-pub fn is_safe_bun(tokens: &[String]) -> bool {
+pub fn is_safe_bun(tokens: &[Token]) -> bool {
     if tokens.len() >= 2 && tokens[1] == "x" {
         return find_runner_package_index(tokens, 2, &BUNX_FLAGS_NO_ARG)
             .is_some_and(|idx| is_safe_runner_package(tokens, idx));
@@ -140,7 +142,7 @@ pub fn is_safe_bun(tokens: &[String]) -> bool {
     super::check_subcmd(tokens, &BUN_SAFE, &BUN_MULTI)
 }
 
-pub fn is_safe_deno(tokens: &[String]) -> bool {
+pub fn is_safe_deno(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
@@ -153,15 +155,15 @@ pub fn is_safe_deno(tokens: &[String]) -> bool {
     false
 }
 
-pub fn is_safe_nvm(tokens: &[String]) -> bool {
+pub fn is_safe_nvm(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && NVM_SAFE.contains(tokens[1].as_str())
 }
 
-pub fn is_safe_fnm(tokens: &[String]) -> bool {
+pub fn is_safe_fnm(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && FNM_SAFE.contains(tokens[1].as_str())
 }
 
-pub fn is_safe_volta(tokens: &[String]) -> bool {
+pub fn is_safe_volta(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && VOLTA_SAFE.contains(tokens[1].as_str())
 }
 
@@ -224,10 +226,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 mod tests {
-    use crate::is_safe;
+    use crate::is_safe_command;
 
     fn check(cmd: &str) -> bool {
-        is_safe(cmd)
+        is_safe_command(cmd)
     }
 
     #[test]

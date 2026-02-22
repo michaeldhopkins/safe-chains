@@ -3,34 +3,45 @@ mod handlers;
 pub mod parse;
 pub mod settings;
 
-use parse::{has_unsafe_shell_syntax, is_fd_redirect, split_outside_quotes, strip_env_prefix, tokenize};
+use parse::{CommandLine, Segment, Token};
 
-pub fn is_safe(segment: &str) -> bool {
-    if has_unsafe_shell_syntax(segment) {
+pub fn is_safe(segment: &Segment) -> bool {
+    if segment.has_unsafe_shell_syntax() {
         return false;
     }
 
-    let stripped = strip_env_prefix(segment).trim();
+    let stripped = segment.strip_env_prefix();
     if stripped.is_empty() {
         return true;
     }
 
-    let Some(tokens) = tokenize(stripped) else {
+    let Some(tokens) = stripped.tokenize() else {
         return false;
     };
     if tokens.is_empty() {
         return true;
     }
 
-    let tokens: Vec<String> = tokens
-        .into_iter()
-        .filter(|t| !is_fd_redirect(t))
-        .collect();
+    let tokens: Vec<Token> = {
+        let mut result = Vec::new();
+        let mut iter = tokens.into_iter().peekable();
+        while let Some(token) = iter.next() {
+            if token.is_fd_redirect() || token.is_dev_null_redirect() {
+                continue;
+            }
+            if token.is_redirect_operator()
+                && iter.peek().is_some_and(|next| *next == "/dev/null")
+            {
+                iter.next();
+                continue;
+            }
+            result.push(token);
+        }
+        result
+    };
     if tokens.is_empty() {
         return true;
     }
-
-    let cmd = tokens[0].rsplit('/').next().unwrap_or(&tokens[0]);
 
     if let Some(last) = tokens.last()
         && (last == "--version" || last == "--help" || last == "--dry-run")
@@ -38,259 +49,282 @@ pub fn is_safe(segment: &str) -> bool {
         return true;
     }
 
-    handlers::dispatch(cmd, &tokens, &is_safe)
+    handlers::dispatch(&tokens, &is_safe)
 }
 
 pub fn is_safe_command(command: &str) -> bool {
-    split_outside_quotes(command).iter().all(|s| is_safe(s))
+    CommandLine::new(command).segments().iter().all(is_safe)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    fn check(cmd: &str) -> bool {
+        is_safe_command(cmd)
+    }
+
     #[test]
     fn safe_cmds() {
-        assert!(is_safe("grep foo file.txt"));
-        assert!(is_safe("cat /etc/hosts"));
-        assert!(is_safe("jq '.key' file.json"));
-        assert!(is_safe("base64 -d"));
-        assert!(is_safe("xxd some/file"));
-        assert!(is_safe("pgrep -l ruby"));
-        assert!(is_safe("getconf PAGE_SIZE"));
-        assert!(is_safe("ls -la"));
-        assert!(is_safe("wc -l file.txt"));
-        assert!(is_safe("ps aux"));
-        assert!(is_safe("ps -ef"));
-        assert!(is_safe("top -l 1 -n 10"));
-        assert!(is_safe("uuidgen"));
-        assert!(is_safe("mdfind 'kMDItemKind == Application'"));
-        assert!(is_safe("identify image.png"));
-        assert!(is_safe("identify -verbose photo.jpg"));
+        assert!(check("grep foo file.txt"));
+        assert!(check("cat /etc/hosts"));
+        assert!(check("jq '.key' file.json"));
+        assert!(check("base64 -d"));
+        assert!(check("xxd some/file"));
+        assert!(check("pgrep -l ruby"));
+        assert!(check("getconf PAGE_SIZE"));
+        assert!(check("ls -la"));
+        assert!(check("wc -l file.txt"));
+        assert!(check("ps aux"));
+        assert!(check("ps -ef"));
+        assert!(check("top -l 1 -n 10"));
+        assert!(check("uuidgen"));
+        assert!(check("mdfind 'kMDItemKind == Application'"));
+        assert!(check("identify image.png"));
+        assert!(check("identify -verbose photo.jpg"));
     }
 
     #[test]
     fn safe_cmds_text_processing() {
-        assert!(is_safe("diff file1.txt file2.txt"));
-        assert!(is_safe("comm -23 sorted1.txt sorted2.txt"));
-        assert!(is_safe("paste file1 file2"));
-        assert!(is_safe("tac file.txt"));
-        assert!(is_safe("rev file.txt"));
-        assert!(is_safe("nl file.txt"));
-        assert!(is_safe("expand file.txt"));
-        assert!(is_safe("unexpand file.txt"));
-        assert!(is_safe("fold -w 80 file.txt"));
-        assert!(is_safe("fmt -w 72 file.txt"));
-        assert!(is_safe("column -t file.txt"));
-        assert!(is_safe("printf '%s\\n' hello"));
-        assert!(is_safe("seq 1 10"));
-        assert!(is_safe("expr 1 + 2"));
-        assert!(is_safe("test -f file.txt"));
-        assert!(is_safe("true"));
-        assert!(is_safe("false"));
-        assert!(is_safe("bc -l"));
-        assert!(is_safe("factor 42"));
-        assert!(is_safe("iconv -f UTF-8 -t ASCII file.txt"));
+        assert!(check("diff file1.txt file2.txt"));
+        assert!(check("comm -23 sorted1.txt sorted2.txt"));
+        assert!(check("paste file1 file2"));
+        assert!(check("tac file.txt"));
+        assert!(check("rev file.txt"));
+        assert!(check("nl file.txt"));
+        assert!(check("expand file.txt"));
+        assert!(check("unexpand file.txt"));
+        assert!(check("fold -w 80 file.txt"));
+        assert!(check("fmt -w 72 file.txt"));
+        assert!(check("column -t file.txt"));
+        assert!(check("printf '%s\\n' hello"));
+        assert!(check("seq 1 10"));
+        assert!(check("expr 1 + 2"));
+        assert!(check("test -f file.txt"));
+        assert!(check("true"));
+        assert!(check("false"));
+        assert!(check("bc -l"));
+        assert!(check("factor 42"));
+        assert!(check("iconv -f UTF-8 -t ASCII file.txt"));
     }
 
     #[test]
     fn safe_cmds_system_info() {
-        assert!(is_safe("readlink -f symlink"));
-        assert!(is_safe("hostname"));
-        assert!(is_safe("uname -a"));
-        assert!(is_safe("arch"));
-        assert!(is_safe("nproc"));
-        assert!(is_safe("uptime"));
-        assert!(is_safe("id"));
-        assert!(is_safe("groups"));
-        assert!(is_safe("tty"));
-        assert!(is_safe("locale"));
-        assert!(is_safe("cal"));
-        assert!(is_safe("sleep 1"));
-        assert!(is_safe("who"));
-        assert!(is_safe("w"));
-        assert!(is_safe("last -5"));
-        assert!(is_safe("lastlog"));
+        assert!(check("readlink -f symlink"));
+        assert!(check("hostname"));
+        assert!(check("uname -a"));
+        assert!(check("arch"));
+        assert!(check("nproc"));
+        assert!(check("uptime"));
+        assert!(check("id"));
+        assert!(check("groups"));
+        assert!(check("tty"));
+        assert!(check("locale"));
+        assert!(check("cal"));
+        assert!(check("sleep 1"));
+        assert!(check("who"));
+        assert!(check("w"));
+        assert!(check("last -5"));
+        assert!(check("lastlog"));
     }
 
     #[test]
     fn safe_cmds_hashing() {
-        assert!(is_safe("md5sum file.txt"));
-        assert!(is_safe("md5 file.txt"));
-        assert!(is_safe("sha256sum file.txt"));
-        assert!(is_safe("shasum file.txt"));
-        assert!(is_safe("sha1sum file.txt"));
-        assert!(is_safe("sha512sum file.txt"));
-        assert!(is_safe("cksum file.txt"));
-        assert!(is_safe("strings /usr/bin/ls"));
-        assert!(is_safe("hexdump -C file.bin"));
-        assert!(is_safe("od -x file.bin"));
-        assert!(is_safe("size a.out"));
+        assert!(check("md5sum file.txt"));
+        assert!(check("md5 file.txt"));
+        assert!(check("sha256sum file.txt"));
+        assert!(check("shasum file.txt"));
+        assert!(check("sha1sum file.txt"));
+        assert!(check("sha512sum file.txt"));
+        assert!(check("cksum file.txt"));
+        assert!(check("strings /usr/bin/ls"));
+        assert!(check("hexdump -C file.bin"));
+        assert!(check("od -x file.bin"));
+        assert!(check("size a.out"));
     }
 
     #[test]
     fn safe_cmds_macos() {
-        assert!(is_safe("sw_vers"));
-        assert!(is_safe("mdls file.txt"));
-        assert!(is_safe("otool -L /usr/bin/ls"));
-        assert!(is_safe("nm a.out"));
-        assert!(is_safe("system_profiler SPHardwareDataType"));
-        assert!(is_safe("ioreg -l -w 0"));
-        assert!(is_safe("vm_stat"));
+        assert!(check("sw_vers"));
+        assert!(check("mdls file.txt"));
+        assert!(check("otool -L /usr/bin/ls"));
+        assert!(check("nm a.out"));
+        assert!(check("system_profiler SPHardwareDataType"));
+        assert!(check("ioreg -l -w 0"));
+        assert!(check("vm_stat"));
     }
 
     #[test]
     fn safe_cmds_network_diagnostic() {
-        assert!(is_safe("dig example.com"));
-        assert!(is_safe("nslookup example.com"));
-        assert!(is_safe("host example.com"));
-        assert!(is_safe("whois example.com"));
+        assert!(check("dig example.com"));
+        assert!(check("nslookup example.com"));
+        assert!(check("host example.com"));
+        assert!(check("whois example.com"));
     }
 
     #[test]
     fn safe_cmds_dev_tools() {
-        assert!(is_safe("shellcheck script.sh"));
-        assert!(is_safe("cloc src/"));
-        assert!(is_safe("tokei"));
-        assert!(is_safe("safe-chains \"ls -la\""));
+        assert!(check("shellcheck script.sh"));
+        assert!(check("cloc src/"));
+        assert!(check("tokei"));
+        assert!(check("safe-chains \"ls -la\""));
     }
 
     #[test]
     fn unsafe_cmds() {
-        assert!(!is_safe("rm -rf /"));
-        assert!(!is_safe("curl https://example.com"));
-        assert!(!is_safe("ruby script.rb"));
-        assert!(!is_safe("python3 script.py"));
-        assert!(!is_safe("node app.js"));
-        assert!(!is_safe("tee output.txt"));
-        assert!(!is_safe("tee -a logfile"));
+        assert!(!check("rm -rf /"));
+        assert!(!check("curl https://example.com"));
+        assert!(!check("ruby script.rb"));
+        assert!(!check("python3 script.py"));
+        assert!(!check("node app.js"));
+        assert!(!check("tee output.txt"));
+        assert!(!check("tee -a logfile"));
     }
 
     #[test]
     fn awk_safe_print() {
-        assert!(is_safe("awk '{print $1}' file.txt"));
+        assert!(check("awk '{print $1}' file.txt"));
     }
 
     #[test]
     fn awk_system_denied() {
-        assert!(!is_safe("awk 'BEGIN{system(\"rm\")}'"));
+        assert!(!check("awk 'BEGIN{system(\"rm\")}'"));
     }
 
     #[test]
     fn version_shortcut() {
-        assert!(is_safe("node --version"));
-        assert!(is_safe("python --version"));
-        assert!(is_safe("python3 --version"));
-        assert!(is_safe("ruby --version"));
-        assert!(is_safe("rustc --version"));
-        assert!(is_safe("java --version"));
-        assert!(is_safe("go --version"));
-        assert!(is_safe("php --version"));
-        assert!(is_safe("perl --version"));
-        assert!(is_safe("swift --version"));
-        assert!(is_safe("gcc --version"));
-        assert!(is_safe("rm --version"));
-        assert!(is_safe("dd --version"));
-        assert!(is_safe("chmod --version"));
+        assert!(check("node --version"));
+        assert!(check("python --version"));
+        assert!(check("python3 --version"));
+        assert!(check("ruby --version"));
+        assert!(check("rustc --version"));
+        assert!(check("java --version"));
+        assert!(check("go --version"));
+        assert!(check("php --version"));
+        assert!(check("perl --version"));
+        assert!(check("swift --version"));
+        assert!(check("gcc --version"));
+        assert!(check("rm --version"));
+        assert!(check("dd --version"));
+        assert!(check("chmod --version"));
     }
 
     #[test]
     fn version_multi_token() {
-        assert!(is_safe("npx playwright --version"));
-        assert!(is_safe("git -C /repo --version"));
-        assert!(is_safe("docker compose --version"));
+        assert!(check("npx playwright --version"));
+        assert!(check("git -C /repo --version"));
+        assert!(check("docker compose --version"));
     }
 
     #[test]
     fn version_with_fd_redirect() {
-        assert!(is_safe("node --version 2>&1"));
-        assert!(is_safe("cargo --version 2>&1"));
+        assert!(check("node --version 2>&1"));
+        assert!(check("cargo --version 2>&1"));
     }
 
     #[test]
     fn version_not_last_token() {
-        assert!(!is_safe("node --version --extra"));
-        assert!(!is_safe("node -v"));
+        assert!(!check("node --version --extra"));
+        assert!(!check("node -v"));
     }
 
     #[test]
     fn help_shortcut() {
-        assert!(is_safe("node --help"));
-        assert!(is_safe("ruby --help"));
-        assert!(is_safe("rm --help"));
-        assert!(is_safe("cargo --help"));
+        assert!(check("node --help"));
+        assert!(check("ruby --help"));
+        assert!(check("rm --help"));
+        assert!(check("cargo --help"));
     }
 
     #[test]
     fn help_multi_token() {
-        assert!(is_safe("npx playwright --help"));
-        assert!(is_safe("cargo install --help"));
+        assert!(check("npx playwright --help"));
+        assert!(check("cargo install --help"));
     }
 
     #[test]
     fn help_with_fd_redirect() {
-        assert!(is_safe("cargo login --help 2>&1"));
+        assert!(check("cargo login --help 2>&1"));
     }
 
     #[test]
     fn help_not_last_token() {
-        assert!(!is_safe("node --help --extra"));
+        assert!(!check("node --help --extra"));
     }
 
     #[test]
     fn dry_run_shortcut() {
-        assert!(is_safe("cargo publish --dry-run"));
-        assert!(is_safe("terraform apply --dry-run"));
-        assert!(is_safe("rm -rf / --dry-run"));
+        assert!(check("cargo publish --dry-run"));
+        assert!(check("terraform apply --dry-run"));
+        assert!(check("rm -rf / --dry-run"));
     }
 
     #[test]
     fn dry_run_with_fd_redirect() {
-        assert!(is_safe("cargo publish --dry-run 2>&1"));
+        assert!(check("cargo publish --dry-run 2>&1"));
     }
 
     #[test]
     fn dry_run_not_last_token() {
-        assert!(!is_safe("cargo publish --dry-run --force"));
+        assert!(!check("cargo publish --dry-run --force"));
     }
 
     #[test]
     fn cucumber_safe() {
-        assert!(is_safe("cucumber features/login.feature"));
-        assert!(is_safe("cucumber --format progress"));
+        assert!(check("cucumber features/login.feature"));
+        assert!(check("cucumber --format progress"));
     }
 
     #[test]
     fn fd_redirects() {
-        assert!(is_safe("ls 2>&1"));
-        assert!(is_safe("cargo clippy 2>&1"));
-        assert!(is_safe("git log 2>&1"));
+        assert!(check("ls 2>&1"));
+        assert!(check("cargo clippy 2>&1"));
+        assert!(check("git log 2>&1"));
         assert!(is_safe_command("cd /tmp && cargo clippy -- -D warnings 2>&1"));
-        assert!(!is_safe("echo hello > file.txt"));
-        assert!(!is_safe("ls 2> errors.txt"));
+        assert!(!check("echo hello > file.txt"));
+        assert!(!check("ls 2> errors.txt"));
+    }
+
+    #[test]
+    fn dev_null_redirects() {
+        assert!(check("echo hello > /dev/null"));
+        assert!(check("echo hello 2> /dev/null"));
+        assert!(check("echo hello >> /dev/null"));
+        assert!(check("grep pattern file > /dev/null"));
+        assert!(check("git log > /dev/null 2>&1"));
+        assert!(check("awk '{print $1}' file.txt > /dev/null"));
+        assert!(check("sed 's/foo/bar/' > /dev/null"));
+        assert!(check("sort file.txt > /dev/null"));
+    }
+
+    #[test]
+    fn env_prefix_quoted_values() {
+        assert!(check("FOO='bar baz' ls -la"));
+        assert!(check("FOO=\"bar baz\" ls -la"));
+        assert!(!check("FOO='bar baz' rm -rf /"));
     }
 
     #[test]
     fn unsafe_shell_syntax() {
-        assert!(!is_safe("echo hello > file.txt"));
-        assert!(!is_safe("cat file >> output.txt"));
-        assert!(!is_safe("ls 2> errors.txt"));
-        assert!(!is_safe("grep pattern file > results.txt"));
-        assert!(!is_safe("find . -name '*.py' > listing.txt"));
-        assert!(is_safe("git log < /dev/null"));
-        assert!(!is_safe("echo $(rm -rf /)"));
-        assert!(!is_safe("echo `rm -rf /`"));
-        assert!(!is_safe("cat $(echo /etc/shadow)"));
-        assert!(!is_safe("ls `pwd`"));
+        assert!(!check("echo hello > file.txt"));
+        assert!(!check("cat file >> output.txt"));
+        assert!(!check("ls 2> errors.txt"));
+        assert!(!check("grep pattern file > results.txt"));
+        assert!(!check("find . -name '*.py' > listing.txt"));
+        assert!(check("git log < /dev/null"));
+        assert!(!check("echo $(rm -rf /)"));
+        assert!(!check("echo `rm -rf /`"));
+        assert!(!check("cat $(echo /etc/shadow)"));
+        assert!(!check("ls `pwd`"));
     }
 
     #[test]
     fn safe_quoted_shell_syntax() {
-        assert!(is_safe("echo 'greater > than' test"));
-        assert!(is_safe("echo '$(safe)' arg"));
-        assert!(is_safe("echo hello"));
-        assert!(is_safe("cat file.txt"));
-        assert!(is_safe("grep pattern file"));
+        assert!(check("echo 'greater > than' test"));
+        assert!(check("echo '$(safe)' arg"));
+        assert!(check("echo hello"));
+        assert!(check("cat file.txt"));
+        assert!(check("grep pattern file"));
     }
 
     #[test]
