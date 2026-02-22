@@ -1,11 +1,78 @@
+use std::ops::Deref;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CommandLine(String);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Segment(String);
 
-#[derive(Debug, Clone, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Token(String);
+
+impl Deref for Token {
+    type Target = str;
+    fn deref(&self) -> &str {
+        &self.0
+    }
+}
+
+pub struct WordSet(&'static [&'static str]);
+
+impl WordSet {
+    pub const fn new(words: &'static [&'static str]) -> Self {
+        let mut i = 1;
+        while i < words.len() {
+            assert!(
+                const_less(words[i - 1].as_bytes(), words[i].as_bytes()),
+                "WordSet: entries must be sorted, no duplicates"
+            );
+            i += 1;
+        }
+        Self(words)
+    }
+
+    pub fn contains(&self, s: &str) -> bool {
+        self.0.binary_search(&s).is_ok()
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &'static str> + '_ {
+        self.0.iter().copied()
+    }
+}
+
+const fn const_less(a: &[u8], b: &[u8]) -> bool {
+    let min = if a.len() < b.len() { a.len() } else { b.len() };
+    let mut i = 0;
+    while i < min {
+        if a[i] < b[i] {
+            return true;
+        }
+        if a[i] > b[i] {
+            return false;
+        }
+        i += 1;
+    }
+    a.len() < b.len()
+}
+
+pub struct FlagCheck {
+    required: WordSet,
+    denied: WordSet,
+}
+
+impl FlagCheck {
+    pub const fn new(required: &'static [&'static str], denied: &'static [&'static str]) -> Self {
+        Self {
+            required: WordSet::new(required),
+            denied: WordSet::new(denied),
+        }
+    }
+
+    pub fn is_safe(&self, tokens: &[Token]) -> bool {
+        tokens.iter().any(|t| self.required.contains(t))
+            && !tokens.iter().any(|t| self.denied.contains(t))
+    }
+}
 
 impl CommandLine {
     pub fn new(s: impl Into<String>) -> Self {
@@ -51,6 +118,14 @@ impl Segment {
         Segment(strip_env_prefix_str(self.as_str()).trim().to_string())
     }
 
+    pub fn from_tokens_replacing(tokens: &[Token], find: &str, replace: &str) -> Self {
+        let words: Vec<&str> = tokens
+            .iter()
+            .map(|t| if t.as_str() == find { replace } else { t.as_str() })
+            .collect();
+        Self::from_words(&words)
+    }
+
     pub fn strip_fd_redirects(&self) -> Segment {
         match self.tokenize() {
             Some(tokens) => {
@@ -71,7 +146,7 @@ impl Token {
     }
 
     pub fn join(tokens: &[Token]) -> Segment {
-        Segment::from_words(tokens)
+        Segment(shell_words::join(tokens.iter().map(|t| t.as_str())))
     }
 
     pub fn as_command_line(&self) -> CommandLine {
@@ -79,7 +154,42 @@ impl Token {
     }
 
     pub fn command_name(&self) -> &str {
-        self.rsplit('/').next().unwrap_or(self.as_str())
+        self.as_str().rsplit('/').next().unwrap_or(self.as_str())
+    }
+
+    pub fn is_one_of(&self, options: &[&str]) -> bool {
+        options.contains(&self.as_str())
+    }
+
+    pub fn split_value(&self, sep: &str) -> Option<&str> {
+        self.as_str().split_once(sep).map(|(_, v)| v)
+    }
+
+    pub fn content_outside_double_quotes(&self) -> String {
+        let bytes = self.as_str().as_bytes();
+        let mut result = Vec::with_capacity(bytes.len());
+        let mut i = 0;
+        while i < bytes.len() {
+            if bytes[i] == b'"' {
+                result.push(b' ');
+                i += 1;
+                while i < bytes.len() {
+                    if bytes[i] == b'\\' && i + 1 < bytes.len() {
+                        i += 2;
+                        continue;
+                    }
+                    if bytes[i] == b'"' {
+                        i += 1;
+                        break;
+                    }
+                    i += 1;
+                }
+            } else {
+                result.push(bytes[i]);
+                i += 1;
+            }
+        }
+        String::from_utf8(result).unwrap_or_default()
     }
 
     pub fn is_fd_redirect(&self) -> bool {
@@ -105,25 +215,6 @@ impl Token {
         let s = self.as_str();
         let rest = s.trim_start_matches(|c: char| c.is_ascii_digit());
         matches!(rest, ">" | ">>" | "<")
-    }
-}
-
-impl std::ops::Deref for Token {
-    type Target = str;
-    fn deref(&self) -> &str {
-        &self.0
-    }
-}
-
-impl AsRef<str> for Token {
-    fn as_ref(&self) -> &str {
-        &self.0
-    }
-}
-
-impl PartialEq for Token {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
     }
 }
 
@@ -157,8 +248,7 @@ impl std::fmt::Display for Token {
     }
 }
 
-pub fn has_flag(tokens: &[Token], short: &str, long: Option<&str>) -> bool {
-    let short_char = short.trim_start_matches('-');
+pub fn has_flag(tokens: &[Token], short: Option<&str>, long: Option<&str>) -> bool {
     for token in &tokens[1..] {
         if token == "--" {
             return false;
@@ -168,8 +258,14 @@ pub fn has_flag(tokens: &[Token], short: &str, long: Option<&str>) -> bool {
         {
             return true;
         }
-        if token.starts_with('-') && !token.starts_with("--") && token[1..].contains(short_char) {
-            return true;
+        if let Some(short_flag) = short {
+            let short_char = short_flag.trim_start_matches('-');
+            if token.starts_with('-')
+                && !token.starts_with("--")
+                && token[1..].contains(short_char)
+            {
+                return true;
+            }
         }
     }
     false
@@ -507,25 +603,43 @@ mod tests {
     #[test]
     fn has_flag_short() {
         let tokens = toks(&["sed", "-i", "s/foo/bar/"]);
-        assert!(has_flag(&tokens, "-i", Some("--in-place")));
+        assert!(has_flag(&tokens, Some("-i"), Some("--in-place")));
     }
 
     #[test]
     fn has_flag_long_with_eq() {
         let tokens = toks(&["sed", "--in-place=.bak", "s/foo/bar/"]);
-        assert!(has_flag(&tokens, "-i", Some("--in-place")));
+        assert!(has_flag(&tokens, Some("-i"), Some("--in-place")));
     }
 
     #[test]
     fn has_flag_combined_short() {
         let tokens = toks(&["sed", "-ni", "s/foo/bar/p"]);
-        assert!(has_flag(&tokens, "-i", Some("--in-place")));
+        assert!(has_flag(&tokens, Some("-i"), Some("--in-place")));
     }
 
     #[test]
     fn has_flag_stops_at_double_dash() {
         let tokens = toks(&["cmd", "--", "-i"]);
-        assert!(!has_flag(&tokens, "-i", Some("--in-place")));
+        assert!(!has_flag(&tokens, Some("-i"), Some("--in-place")));
+    }
+
+    #[test]
+    fn has_flag_long_only() {
+        let tokens = toks(&["sort", "--compress-program", "gzip", "file.txt"]);
+        assert!(has_flag(&tokens, None, Some("--compress-program")));
+    }
+
+    #[test]
+    fn has_flag_long_only_eq() {
+        let tokens = toks(&["sort", "--compress-program=gzip", "file.txt"]);
+        assert!(has_flag(&tokens, None, Some("--compress-program")));
+    }
+
+    #[test]
+    fn has_flag_long_only_absent() {
+        let tokens = toks(&["sort", "-r", "file.txt"]);
+        assert!(!has_flag(&tokens, None, Some("--compress-program")));
     }
 
     #[test]
@@ -672,5 +786,133 @@ mod tests {
         assert!("world" != t);
         let s: &str = "hello";
         assert!(s == t);
+    }
+
+    #[test]
+    fn token_deref() {
+        let t = tok("--flag");
+        assert!(t.starts_with("--"));
+        assert!(t.contains("fl"));
+        assert_eq!(t.len(), 6);
+        assert!(!t.is_empty());
+        assert_eq!(t.as_bytes()[0], b'-');
+        assert!(t.eq_ignore_ascii_case("--FLAG"));
+        assert_eq!(t.get(2..), Some("flag"));
+    }
+
+    #[test]
+    fn token_is_one_of() {
+        assert!(tok("-v").is_one_of(&["-v", "--verbose"]));
+        assert!(!tok("-q").is_one_of(&["-v", "--verbose"]));
+    }
+
+    #[test]
+    fn token_split_value() {
+        assert_eq!(tok("--method=GET").split_value("="), Some("GET"));
+        assert_eq!(tok("--flag").split_value("="), None);
+    }
+
+    #[test]
+    fn word_set_contains() {
+        let set = WordSet::new(&["list", "show", "view"]);
+        assert!(set.contains(&tok("list")));
+        assert!(set.contains(&tok("view")));
+        assert!(!set.contains(&tok("delete")));
+        assert!(set.contains("list"));
+        assert!(!set.contains("delete"));
+    }
+
+    #[test]
+    fn word_set_iter() {
+        let set = WordSet::new(&["a", "b", "c"]);
+        let items: Vec<&str> = set.iter().collect();
+        assert_eq!(items, vec!["a", "b", "c"]);
+    }
+
+    #[test]
+    fn token_as_command_line() {
+        let cl = tok("ls -la | grep foo").as_command_line();
+        let segs = cl.segments();
+        assert_eq!(segs, vec![seg("ls -la"), seg("grep foo")]);
+    }
+
+    #[test]
+    fn segment_from_tokens_replacing() {
+        let tokens = toks(&["find", ".", "-name", "{}", "-print"]);
+        let result = Segment::from_tokens_replacing(&tokens, "{}", "file");
+        assert_eq!(result.tokenize().unwrap(), toks(&["find", ".", "-name", "file", "-print"]));
+    }
+
+    #[test]
+    fn segment_strip_fd_redirects() {
+        assert_eq!(
+            seg("cargo test 2>&1").strip_fd_redirects(),
+            seg("cargo test")
+        );
+        assert_eq!(
+            seg("cmd 2>&1 >&2").strip_fd_redirects(),
+            seg("cmd")
+        );
+        assert_eq!(
+            seg("ls -la").strip_fd_redirects(),
+            seg("ls -la")
+        );
+    }
+
+    #[test]
+    fn flag_check_required_present_no_denied() {
+        let fc = FlagCheck::new(&["--show"], &["--set"]);
+        assert!(fc.is_safe(&toks(&["--show"])));
+    }
+
+    #[test]
+    fn flag_check_required_absent() {
+        let fc = FlagCheck::new(&["--show"], &["--set"]);
+        assert!(!fc.is_safe(&toks(&["--verbose"])));
+    }
+
+    #[test]
+    fn flag_check_denied_present() {
+        let fc = FlagCheck::new(&["--show"], &["--set"]);
+        assert!(!fc.is_safe(&toks(&["--show", "--set", "key", "val"])));
+    }
+
+    #[test]
+    fn flag_check_empty_denied() {
+        let fc = FlagCheck::new(&["--check"], &[]);
+        assert!(fc.is_safe(&toks(&["--check", "--all"])));
+    }
+
+    #[test]
+    fn flag_check_empty_tokens() {
+        let fc = FlagCheck::new(&["--show"], &[]);
+        assert!(!fc.is_safe(&[]));
+    }
+
+    #[test]
+    fn content_outside_double_quotes_strips_string() {
+        assert_eq!(tok(r#""system""#).content_outside_double_quotes(), " ");
+    }
+
+    #[test]
+    fn content_outside_double_quotes_preserves_code() {
+        let result = tok(r#"{print "hello"} END{print NR}"#).content_outside_double_quotes();
+        assert_eq!(result, r#"{print  } END{print NR}"#);
+    }
+
+    #[test]
+    fn content_outside_double_quotes_escaped() {
+        let result = tok(r#"{print "he said \"hi\""}"#).content_outside_double_quotes();
+        assert_eq!(result, "{print  }");
+    }
+
+    #[test]
+    fn content_outside_double_quotes_no_quotes() {
+        assert_eq!(tok("{print $1}").content_outside_double_quotes(), "{print $1}");
+    }
+
+    #[test]
+    fn content_outside_double_quotes_empty() {
+        assert_eq!(tok("").content_outside_double_quotes(), "");
     }
 }

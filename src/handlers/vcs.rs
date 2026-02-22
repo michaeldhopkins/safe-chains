@@ -1,103 +1,49 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Token, WordSet};
 
-use crate::parse::Token;
+static GIT_READ_ONLY: WordSet = WordSet::new(&[
+    "--version", "blame", "cat-file", "count-objects", "describe",
+    "diff", "diff-tree", "fetch", "for-each-ref", "grep", "help",
+    "log", "ls-files", "ls-remote", "ls-tree", "merge-base", "merge-tree",
+    "name-rev", "reflog", "rev-parse", "shortlog", "show", "status",
+    "verify-commit", "verify-tag",
+]);
 
-static GIT_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "log",
-        "diff",
-        "show",
-        "status",
-        "ls-tree",
-        "grep",
-        "rev-parse",
-        "merge-base",
-        "merge-tree",
-        "fetch",
-        "help",
-        "--version",
-        "shortlog",
-        "describe",
-        "blame",
-        "reflog",
-        "ls-files",
-        "ls-remote",
-        "diff-tree",
-        "cat-file",
-        "name-rev",
-        "for-each-ref",
-        "count-objects",
-        "verify-commit",
-        "verify-tag",
-    ])
-});
+static GIT_REMOTE_MUTATING: WordSet = WordSet::new(&[
+    "add", "prune", "remove", "rename", "set-branches", "set-url",
+]);
 
-static GIT_REMOTE_MUTATING: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "add",
-        "remove",
-        "rename",
-        "set-url",
-        "set-branches",
-        "prune",
-    ])
-});
+static GIT_BRANCH_MUTATING: WordSet = WordSet::new(&[
+    "--copy", "--delete", "--edit-description", "--move",
+    "--set-upstream-to", "--unset-upstream",
+    "-C", "-D", "-M", "-c", "-d", "-m", "-u",
+]);
 
-static GIT_BRANCH_MUTATING: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "-d",
-        "-D",
-        "--delete",
-        "-m",
-        "-M",
-        "--move",
-        "-c",
-        "-C",
-        "--copy",
-        "-u",
-        "--set-upstream-to",
-        "--unset-upstream",
-        "--edit-description",
-    ])
-});
+static GIT_STASH_SAFE: WordSet =
+    WordSet::new(&["list", "show"]);
 
-static GIT_STASH_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["list", "show"]));
+static GIT_TAG_MUTATING: WordSet = WordSet::new(&[
+    "--annotate", "--delete", "--force", "--sign",
+    "-a", "-d", "-f", "-s",
+]);
 
-static GIT_TAG_MUTATING: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "-d",
-        "--delete",
-        "-a",
-        "--annotate",
-        "-s",
-        "--sign",
-        "-f",
-        "--force",
-    ])
-});
+static GIT_CONFIG_SAFE: WordSet =
+    WordSet::new(&["--get", "--get-all", "--get-regexp", "--list", "-l"]);
 
-static GIT_CONFIG_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["--list", "--get", "--get-all", "--get-regexp", "-l"]));
+static GIT_NOTES_SAFE: WordSet =
+    WordSet::new(&["list", "show"]);
 
-static GIT_NOTES_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["show", "list"]));
+static JJ_READ_ONLY: WordSet =
+    WordSet::new(&["--version", "diff", "help", "log", "show", "st", "status"]);
 
-static JJ_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["log", "diff", "show", "status", "st", "help", "--version"]));
+static JJ_MULTI: &[(&str, WordSet)] = &[
+    ("bookmark", WordSet::new(&["list"])),
+    ("config", WordSet::new(&["get", "list"])),
+    ("file", WordSet::new(&["show"])),
+    ("op", WordSet::new(&["log"])),
+];
 
-static JJ_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> = LazyLock::new(|| {
-    vec![
-        ("op", HashSet::from(["log"])),
-        ("file", HashSet::from(["show"])),
-        ("config", HashSet::from(["get", "list"])),
-        ("bookmark", HashSet::from(["list"])),
-    ]
-});
-
-static JJ_TRIPLE: LazyLock<Vec<(&'static str, &'static str, HashSet<&'static str>)>> =
-    LazyLock::new(|| vec![("git", "remote", HashSet::from(["list"]))]);
+static JJ_TRIPLE: &[(&str, &str, WordSet)] =
+    &[("git", "remote", WordSet::new(&["list"]))];
 
 pub fn is_safe_git(tokens: &[Token]) -> bool {
     let mut args = &tokens[1..];
@@ -107,7 +53,7 @@ pub fn is_safe_git(tokens: &[Token]) -> bool {
     if args.is_empty() {
         return false;
     }
-    let subcmd = args[0].as_str();
+    let subcmd = args[0].command_name();
     if GIT_READ_ONLY.contains(subcmd) {
         let has_dangerous = args[1..].iter().any(|a| {
             a.starts_with("--upload-p") || a.starts_with("--receive-p")
@@ -115,33 +61,33 @@ pub fn is_safe_git(tokens: &[Token]) -> bool {
         return !has_dangerous;
     }
     if subcmd == "remote" {
-        return args.get(1).is_none_or(|a| !GIT_REMOTE_MUTATING.contains(a.as_str()));
+        return args.get(1).is_none_or(|a| !GIT_REMOTE_MUTATING.contains(a));
     }
     if subcmd == "branch" {
         return args[1..].iter().all(|a| {
-            !GIT_BRANCH_MUTATING.contains(a.as_str())
+            !GIT_BRANCH_MUTATING.contains(a)
                 && !GIT_BRANCH_MUTATING
                     .iter()
                     .any(|f| f.starts_with("--") && a.starts_with(&format!("{f}=")))
         });
     }
     if subcmd == "stash" {
-        return args.get(1).is_some_and(|a| GIT_STASH_SAFE.contains(a.as_str()));
+        return args.get(1).is_some_and(|a| GIT_STASH_SAFE.contains(a));
     }
     if subcmd == "tag" {
         if args.len() == 1 {
             return true;
         }
-        return args[1..].iter().all(|a| !GIT_TAG_MUTATING.contains(a.as_str()));
+        return args[1..].iter().all(|a| !GIT_TAG_MUTATING.contains(a));
     }
     if subcmd == "config" {
-        return args.get(1).is_some_and(|a| GIT_CONFIG_SAFE.contains(a.as_str()));
+        return args.get(1).is_some_and(|a| GIT_CONFIG_SAFE.contains(a));
     }
     if subcmd == "worktree" {
         return args.get(1).is_some_and(|a| a == "list");
     }
     if subcmd == "notes" {
-        return args.get(1).is_some_and(|a| GIT_NOTES_SAFE.contains(a.as_str()));
+        return args.get(1).is_some_and(|a| GIT_NOTES_SAFE.contains(a));
     }
     false
 }
@@ -150,18 +96,17 @@ pub fn is_safe_jj(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    let subcmd = tokens[1].as_str();
-    if JJ_READ_ONLY.contains(subcmd) {
+    if JJ_READ_ONLY.contains(&tokens[1]) {
         return true;
     }
     for (prefix, actions) in JJ_MULTI.iter() {
-        if subcmd == *prefix {
-            return tokens.get(2).is_some_and(|a| actions.contains(a.as_str()));
+        if tokens[1] == *prefix {
+            return tokens.get(2).is_some_and(|a| actions.contains(a));
         }
     }
     for (first, second, actions) in JJ_TRIPLE.iter() {
-        if subcmd == *first && tokens.get(2).is_some_and(|t| t == *second) {
-            return tokens.get(3).is_some_and(|a| actions.contains(a.as_str()));
+        if tokens[1] == *first && tokens.get(2).is_some_and(|t| t == *second) {
+            return tokens.get(3).is_some_and(|a| actions.contains(a));
         }
     }
     false

@@ -1,14 +1,10 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Token, WordSet};
 
-use crate::parse::Token;
-
-static GO_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from(["version", "env", "list", "vet", "test", "build", "doc"])
-});
+static GO_SAFE: WordSet =
+    WordSet::new(&["--version", "build", "doc", "env", "list", "test", "version", "vet"]);
 
 pub fn is_safe_go(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && GO_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && GO_SAFE.contains(&tokens[1])
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -16,7 +12,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![CommandDoc {
         name: "go",
         kind: DocKind::Handler,
-        description: "Allowed: version, env, list, vet, test, build, doc.",
+        description: "Allowed: version, --version, env, list, vet, test, build, doc.",
     }]
 }
 
@@ -106,5 +102,10 @@ mod tests {
     #[test]
     fn bare_go_denied() {
         assert!(!check("go"));
+    }
+
+    #[test]
+    fn go_version_flag() {
+        assert!(check("go --version"));
     }
 }

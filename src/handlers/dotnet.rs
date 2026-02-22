@@ -1,22 +1,12 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Token, WordSet};
 
-use crate::parse::Token;
-
-static DOTNET_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "--version",
-        "--info",
-        "--list-sdks",
-        "--list-runtimes",
-        "build",
-        "test",
-        "list",
-    ])
-});
+static DOTNET_SAFE: WordSet = WordSet::new(&[
+    "--info", "--list-runtimes", "--list-sdks", "--version",
+    "build", "list", "test",
+]);
 
 pub fn is_safe_dotnet(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && DOTNET_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && DOTNET_SAFE.contains(&tokens[1])
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

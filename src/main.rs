@@ -63,7 +63,7 @@ fn run_claude_hook() {
         return;
     }
 
-    let patterns = safe_chains::settings::ApprovedPatterns::load();
+    let patterns = safe_chains::allowlist::Matcher::load();
     if patterns.is_empty() {
         process::exit(0);
     }

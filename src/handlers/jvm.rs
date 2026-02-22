@@ -1,41 +1,20 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Token, WordSet};
 
-use crate::parse::Token;
+static GRADLE_SAFE: WordSet = WordSet::new(&[
+    "--version", "build", "check", "dependencies", "properties", "tasks", "test",
+]);
 
-static GRADLE_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "tasks",
-        "dependencies",
-        "properties",
-        "--version",
-        "test",
-        "build",
-        "check",
-    ])
-});
-
-static MVN_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "--version",
-        "-v",
-        "dependency:tree",
-        "dependency:list",
-        "help:describe",
-        "validate",
-        "test",
-        "compile",
-        "verify",
-        "test-compile",
-    ])
-});
+static MVN_SAFE: WordSet = WordSet::new(&[
+    "--version", "-v", "compile", "dependency:list", "dependency:tree",
+    "help:describe", "test", "test-compile", "validate", "verify",
+]);
 
 pub fn is_safe_gradle(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && GRADLE_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && GRADLE_SAFE.contains(&tokens[1])
 }
 
 pub fn is_safe_mvn(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && MVN_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && MVN_SAFE.contains(&tokens[1])
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

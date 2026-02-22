@@ -1,54 +1,54 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{FlagCheck, Token, WordSet};
 
-use crate::parse::Token;
+static YARN_READ_ONLY: WordSet =
+    WordSet::new(&["--version", "info", "list", "ls", "why"]);
 
-static YARN_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["list", "ls", "info", "why", "--version"]));
+static NPM_READ_ONLY: WordSet = WordSet::new(&[
+    "--version", "audit", "doctor", "explain", "fund", "info", "list", "ls",
+    "outdated", "prefix", "root", "test", "view", "why",
+]);
 
-static NPM_READ_ONLY: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "view", "info", "list", "ls", "test", "audit", "outdated", "explain", "why", "fund",
-        "prefix", "root", "doctor",
-    ])
-});
+static NPX_SAFE: WordSet =
+    WordSet::new(&["@herb-tools/linter", "eslint", "karma"]);
 
-static NPX_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["eslint", "@herb-tools/linter", "karma"]));
+static NPX_FLAGS_NO_ARG: WordSet =
+    WordSet::new(&["--ignore-existing", "--no", "--quiet", "--yes", "-q", "-y"]);
 
-static NPX_FLAGS_NO_ARG: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["--yes", "-y", "--no", "--ignore-existing", "-q", "--quiet"]));
+static PNPM_READ_ONLY: WordSet =
+    WordSet::new(&["--version", "audit", "list", "ls", "outdated", "why"]);
 
-static PNPM_READ_ONLY: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["list", "ls", "why", "audit", "outdated", "--version"]));
+static BUN_SAFE: WordSet =
+    WordSet::new(&["--version", "outdated", "test"]);
 
-static BUN_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["--version", "test", "outdated"]));
+static BUN_MULTI: &[(&str, WordSet)] =
+    &[("pm", WordSet::new(&["bin", "cache", "hash", "ls"]))];
 
-static BUN_MULTI: LazyLock<Vec<(&'static str, HashSet<&'static str>)>> =
-    LazyLock::new(|| vec![("pm", HashSet::from(["ls", "hash", "cache", "bin"]))]);
+static BUNX_FLAGS_NO_ARG: WordSet =
+    WordSet::new(&["--bun", "--no-install", "--silent", "--verbose"]);
 
-static BUNX_FLAGS_NO_ARG: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["--bun", "--no-install", "--verbose", "--silent"]));
+static DENO_SAFE: WordSet =
+    WordSet::new(&["--version", "check", "doc", "info", "lint", "test"]);
 
-static DENO_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["--version", "info", "doc", "lint", "check", "test"]));
+static DENO_FMT: FlagCheck =
+    FlagCheck::new(&["--check"], &[]);
 
-static NVM_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from(["ls", "list", "current", "which", "version", "--version", "ls-remote"])
-});
+static TSC_CHECK: FlagCheck =
+    FlagCheck::new(&["--noEmit"], &[]);
 
-static FNM_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["list", "current", "default", "--version", "ls-remote"]));
+static NVM_SAFE: WordSet =
+    WordSet::new(&["--version", "current", "list", "ls", "ls-remote", "version", "which"]);
 
-static VOLTA_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["list", "which", "--version"]));
+static FNM_SAFE: WordSet =
+    WordSet::new(&["--version", "current", "default", "list", "ls-remote"]);
+
+static VOLTA_SAFE: WordSet =
+    WordSet::new(&["--version", "list", "which"]);
 
 pub fn is_safe_yarn(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if YARN_READ_ONLY.contains(tokens[1].as_str()) {
+    if YARN_READ_ONLY.contains(&tokens[1]) {
         return true;
     }
     tokens[1] == "test" || tokens[1].starts_with("test:")
@@ -58,7 +58,7 @@ pub fn is_safe_npm(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if NPM_READ_ONLY.contains(tokens[1].as_str()) {
+    if NPM_READ_ONLY.contains(&tokens[1]) {
         return true;
     }
     if tokens[1] == "config" {
@@ -77,7 +77,7 @@ pub fn is_safe_npm(tokens: &[Token]) -> bool {
 fn find_runner_package_index(
     tokens: &[Token],
     start: usize,
-    flags: &HashSet<&str>,
+    flags: &WordSet,
 ) -> Option<usize> {
     let mut i = start;
     while i < tokens.len() {
@@ -85,14 +85,14 @@ fn find_runner_package_index(
             i += 2;
             continue;
         }
-        if flags.contains(tokens[i].as_str()) {
+        if flags.contains(&tokens[i]) {
             i += 1;
             continue;
         }
         if tokens[i] == "--" {
             return Some(i + 1);
         }
-        if tokens[i].starts_with('-') {
+        if tokens[i].starts_with("-") {
             return None;
         }
         return Some(i);
@@ -104,12 +104,11 @@ fn is_safe_runner_package(tokens: &[Token], pkg_idx: usize) -> bool {
     if pkg_idx >= tokens.len() {
         return false;
     }
-    let pkg = tokens[pkg_idx].as_str();
-    if NPX_SAFE.contains(pkg) {
+    if NPX_SAFE.contains(&tokens[pkg_idx]) {
         return true;
     }
-    if pkg == "tsc" {
-        return tokens[pkg_idx + 1..].iter().any(|t| t == "--noEmit");
+    if tokens[pkg_idx] == "tsc" {
+        return TSC_CHECK.is_safe(&tokens[pkg_idx + 1..]);
     }
     false
 }
@@ -117,6 +116,9 @@ fn is_safe_runner_package(tokens: &[Token], pkg_idx: usize) -> bool {
 pub fn is_safe_npx(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
+    }
+    if tokens.len() == 2 && tokens[1] == "--version" {
+        return true;
     }
     find_runner_package_index(tokens, 1, &NPX_FLAGS_NO_ARG)
         .is_some_and(|idx| is_safe_runner_package(tokens, idx))
@@ -126,12 +128,15 @@ pub fn is_safe_bunx(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
+    if tokens.len() == 2 && tokens[1] == "--version" {
+        return true;
+    }
     find_runner_package_index(tokens, 1, &BUNX_FLAGS_NO_ARG)
         .is_some_and(|idx| is_safe_runner_package(tokens, idx))
 }
 
 pub fn is_safe_pnpm(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && PNPM_READ_ONLY.contains(tokens[1].as_str())
+    tokens.len() >= 2 && PNPM_READ_ONLY.contains(&tokens[1])
 }
 
 pub fn is_safe_bun(tokens: &[Token]) -> bool {
@@ -139,32 +144,32 @@ pub fn is_safe_bun(tokens: &[Token]) -> bool {
         return find_runner_package_index(tokens, 2, &BUNX_FLAGS_NO_ARG)
             .is_some_and(|idx| is_safe_runner_package(tokens, idx));
     }
-    super::check_subcmd(tokens, &BUN_SAFE, &BUN_MULTI)
+    super::is_safe_subcmd(tokens, &BUN_SAFE, BUN_MULTI)
 }
 
 pub fn is_safe_deno(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if DENO_SAFE.contains(tokens[1].as_str()) {
+    if DENO_SAFE.contains(&tokens[1]) {
         return true;
     }
     if tokens[1] == "fmt" {
-        return tokens[2..].iter().any(|t| t == "--check");
+        return DENO_FMT.is_safe(&tokens[2..]);
     }
     false
 }
 
 pub fn is_safe_nvm(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && NVM_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && NVM_SAFE.contains(&tokens[1])
 }
 
 pub fn is_safe_fnm(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && FNM_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && FNM_SAFE.contains(&tokens[1])
 }
 
 pub fn is_safe_volta(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && VOLTA_SAFE.contains(tokens[1].as_str())
+    tokens.len() >= 2 && VOLTA_SAFE.contains(&tokens[1])
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -194,7 +199,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "bunx",
             kind: DocKind::Handler,
-            description: "Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p.",
+            description: "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p.",
         },
         CommandDoc {
             name: "deno",
@@ -204,7 +209,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "npx",
             kind: DocKind::Handler,
-            description: "Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p.",
+            description: "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p.",
         },
         CommandDoc {
             name: "nvm",
@@ -374,6 +379,11 @@ mod tests {
     }
 
     #[test]
+    fn npm_version() {
+        assert!(check("npm --version"));
+    }
+
+    #[test]
     fn npm_install_denied() {
         assert!(!check("npm install react"));
     }
@@ -434,6 +444,11 @@ mod tests {
     #[test]
     fn npx_double_dash() {
         assert!(check("npx -- eslint src/"));
+    }
+
+    #[test]
+    fn npx_version() {
+        assert!(check("npx --version"));
     }
 
     #[test]
@@ -749,6 +764,11 @@ mod tests {
     #[test]
     fn bunx_double_dash() {
         assert!(check("bunx -- eslint src/"));
+    }
+
+    #[test]
+    fn bunx_version() {
+        assert!(check("bunx --version"));
     }
 
     #[test]

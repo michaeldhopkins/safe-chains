@@ -14,7 +14,7 @@ These commands are allowed with any arguments.
 | `b2sum` | BLAKE2 checksum |
 | `base64` | Base64 encode/decode |
 | `basename` | Strip directory from path |
-| `bat` | Safe read-only utility |
+| `bat` | Syntax-highlighted cat |
 | `bc` | Calculator |
 | `branchdiff` | Branch diff tool |
 | `cal` | Display calendar |
@@ -29,18 +29,18 @@ These commands are allowed with any arguments.
 | `cucumber` | BDD test runner |
 | `cut` | Extract fields from lines |
 | `date` | Display date and time |
-| `delta` | Safe read-only utility |
+| `delta` | Syntax-highlighted diff viewer |
 | `df` | Disk free space |
 | `diff` | Compare files |
 | `dig` | DNS lookup |
 | `dirname` | Strip filename from path |
 | `du` | Disk usage |
-| `dust` | Safe read-only utility |
+| `dust` | Disk usage viewer |
 | `echo` | Print text |
-| `exa` | Safe read-only utility |
+| `exa` | Modern ls replacement |
 | `expand` | Convert tabs to spaces |
 | `expr` | Evaluate expression |
-| `eza` | Safe read-only utility |
+| `eza` | Modern ls replacement |
 | `factor` | Print prime factors |
 | `false` | Return failure exit code |
 | `fd` | Find files |
@@ -54,16 +54,16 @@ These commands are allowed with any arguments.
 | `hexdump` | Display file in hex |
 | `host` | DNS lookup |
 | `hostname` | Print hostname |
-| `htop` | Safe read-only utility |
+| `htop` | Interactive process viewer |
 | `iconv` | Convert character encoding |
 | `id` | Print user/group IDs |
 | `identify` | ImageMagick identify |
-| `ifconfig` | Safe read-only utility |
-| `ioreg` | Safe read-only utility |
-| `iotop` | Safe read-only utility |
+| `ifconfig` | Network interface info |
+| `ioreg` | macOS I/O Registry viewer |
+| `iotop` | I/O usage monitor |
 | `jq` | JSON processor |
-| `last` | Safe read-only utility |
-| `lastlog` | Safe read-only utility |
+| `last` | Show login history |
+| `lastlog` | Show last login for all users |
 | `locale` | Print locale info |
 | `ls` | List directory |
 | `lsof` | List open files |
@@ -71,7 +71,7 @@ These commands are allowed with any arguments.
 | `md5sum` | MD5 checksum |
 | `mdfind` | Spotlight search (macOS) |
 | `mdls` | File metadata (macOS) |
-| `netstat` | Safe read-only utility |
+| `netstat` | Network connections and statistics |
 | `nl` | Number lines |
 | `nm` | List object file symbols |
 | `nproc` | Print number of CPUs |
@@ -82,15 +82,15 @@ These commands are allowed with any arguments.
 | `pgrep` | Search for processes |
 | `printenv` | Print environment variables |
 | `printf` | Format and print text |
-| `procs` | Safe read-only utility |
+| `procs` | Modern process viewer |
 | `ps` | List processes |
 | `pwd` | Print working directory |
 | `readlink` | Resolve symlink |
 | `realpath` | Resolve path |
 | `rev` | Reverse lines |
 | `rg` | Ripgrep search |
-| `route` | Safe read-only utility |
-| `safe-chains` | Safe read-only utility |
+| `route` | Routing table |
+| `safe-chains` | Safe command checker |
 | `seq` | Print number sequence |
 | `sha1sum` | SHA-1 checksum |
 | `sha256sum` | SHA-256 checksum |
@@ -99,17 +99,17 @@ These commands are allowed with any arguments.
 | `shellcheck` | Shell script linter |
 | `size` | Object file section sizes |
 | `sleep` | Pause execution |
-| `ss` | Safe read-only utility |
+| `ss` | Socket statistics |
 | `stat` | File status |
 | `strings` | Find printable strings in binary |
 | `sum` | File checksum |
 | `sw_vers` | macOS version info |
-| `system_profiler` | Safe read-only utility |
+| `system_profiler` | macOS hardware/software info |
 | `tac` | Print file in reverse |
 | `tail` | Print last lines |
 | `test` | Evaluate conditional expression |
 | `tokei` | Code statistics |
-| `top` | Safe read-only utility |
+| `top` | Process monitor |
 | `tr` | Translate characters |
 | `tree` | Directory tree |
 | `true` | Return success exit code |
@@ -119,11 +119,11 @@ These commands are allowed with any arguments.
 | `uniq` | Filter duplicate lines |
 | `uptime` | System uptime |
 | `uuidgen` | Generate UUID |
-| `vm_stat` | Safe read-only utility |
-| `w` | Safe read-only utility |
+| `vm_stat` | Virtual memory statistics |
+| `w` | Show logged-in users and activity |
 | `wc` | Count lines/words/bytes |
 | `which` | Locate command |
-| `who` | Safe read-only utility |
+| `who` | Show logged-in users |
 | `whoami` | Print current user |
 | `whois` | Domain registration lookup |
 | `xxd` | Hex dump |
@@ -142,7 +142,7 @@ Safe unless program contains system, getline, |, >, >>, or -f flag (file-based p
 
 ### `bash / sh`
 
-Only `bash -c` / `sh -c` with a safe inner command. Scripts denied.
+Allowed: --version, --help. Only `bash -c` / `sh -c` with a safe inner command. Scripts denied.
 
 ### `brew`
 
@@ -154,15 +154,15 @@ Allowed: --version, test, outdated. Multi-word: pm ls/hash/cache/bin, x (delegat
 
 ### `bundle`
 
-Read-only: list, info, show, check. Guarded: exec (rspec, standardrb, cucumber, brakeman, erb_lint, herb only).
+Read-only: list, info, show, check, --version. Guarded: exec (rspec, standardrb, cucumber, brakeman, erb_lint, herb only).
 
 ### `bunx`
 
-Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p.
+Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p.
 
 ### `cargo`
 
-Allowed: clippy, test, build, check, doc, search, --version, bench, tree, metadata, verify-project, pkgid, locate-project, read-manifest, audit, deny, license. Guarded: fmt (requires --check).
+Allowed: clippy, test, build, check, doc, search, --version, bench, tree, metadata, verify-project, pkgid, locate-project, read-manifest, audit, deny, license. Guarded: fmt (requires --check), publish (requires --dry-run, denies --force/--no-verify). Any subcommand with --help is safe (unless -- separator is present).
 
 ### `cmake`
 
@@ -218,7 +218,7 @@ Allowed: list, current, default, --version, ls-remote.
 
 ### `gem`
 
-Allowed: list, info, environment, which, pristine, search, specification, dependency, contents, sources, stale, outdated, help.
+Allowed: list, info, environment, which, pristine, search, specification, dependency, contents, sources, stale, outdated, help, --version.
 
 ### `gh`
 
@@ -230,7 +230,7 @@ Read-only: log, diff, show, status, ls-tree, grep, rev-parse, merge-base, merge-
 
 ### `go`
 
-Allowed: version, env, list, vet, test, build, doc.
+Allowed: version, --version, env, list, vet, test, build, doc.
 
 ### `gradle / gradlew`
 
@@ -282,7 +282,7 @@ Read-only: view, info, list, ls, test, audit, outdated, explain, why, fund, pref
 
 ### `npx`
 
-Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p.
+Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p.
 
 ### `nvm`
 

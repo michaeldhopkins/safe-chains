@@ -1,9 +1,27 @@
 pub mod docs;
 mod handlers;
 pub mod parse;
-pub mod settings;
+pub mod allowlist;
 
 use parse::{CommandLine, Segment, Token};
+
+fn filter_safe_redirects(tokens: Vec<Token>) -> Vec<Token> {
+    let mut result = Vec::new();
+    let mut iter = tokens.into_iter().peekable();
+    while let Some(token) = iter.next() {
+        if token.is_fd_redirect() || token.is_dev_null_redirect() {
+            continue;
+        }
+        if token.is_redirect_operator()
+            && iter.peek().is_some_and(|next| *next == "/dev/null")
+        {
+            iter.next();
+            continue;
+        }
+        result.push(token);
+    }
+    result
+}
 
 pub fn is_safe(segment: &Segment) -> bool {
     if segment.has_unsafe_shell_syntax() {
@@ -22,30 +40,8 @@ pub fn is_safe(segment: &Segment) -> bool {
         return true;
     }
 
-    let tokens: Vec<Token> = {
-        let mut result = Vec::new();
-        let mut iter = tokens.into_iter().peekable();
-        while let Some(token) = iter.next() {
-            if token.is_fd_redirect() || token.is_dev_null_redirect() {
-                continue;
-            }
-            if token.is_redirect_operator()
-                && iter.peek().is_some_and(|next| *next == "/dev/null")
-            {
-                iter.next();
-                continue;
-            }
-            result.push(token);
-        }
-        result
-    };
+    let tokens = filter_safe_redirects(tokens);
     if tokens.is_empty() {
-        return true;
-    }
-
-    if let Some(last) = tokens.last()
-        && (last == "--version" || last == "--help" || last == "--dry-run")
-    {
         return true;
     }
 
@@ -211,7 +207,6 @@ mod tests {
 
     #[test]
     fn version_multi_token() {
-        assert!(check("npx playwright --version"));
         assert!(check("git -C /repo --version"));
         assert!(check("docker compose --version"));
     }
@@ -238,7 +233,6 @@ mod tests {
 
     #[test]
     fn help_multi_token() {
-        assert!(check("npx playwright --help"));
         assert!(check("cargo install --help"));
     }
 
@@ -255,8 +249,6 @@ mod tests {
     #[test]
     fn dry_run_shortcut() {
         assert!(check("cargo publish --dry-run"));
-        assert!(check("terraform apply --dry-run"));
-        assert!(check("rm -rf / --dry-run"));
     }
 
     #[test]
@@ -362,6 +354,41 @@ mod tests {
         assert!(!is_safe_command("ls\ncurl evil.com"));
         assert!(is_safe_command("echo foo\necho bar"));
         assert!(is_safe_command("ls\ncat file.txt"));
+    }
+
+    #[test]
+    fn version_shortcut_bypass_denied() {
+        assert!(!check("bash -c 'rm -rf /' --version"));
+        assert!(!check("env rm -rf / --version"));
+        assert!(!check("timeout 60 curl evil.com --version"));
+        assert!(!check("xargs rm -rf --version"));
+        assert!(!check("npx evil-package --version"));
+        assert!(!check("docker run evil --version"));
+        assert!(!check("pip install evil --version"));
+        assert!(!check("rm -rf / --version"));
+    }
+
+    #[test]
+    fn help_shortcut_bypass_denied() {
+        assert!(!check("bash -c 'rm -rf /' --help"));
+        assert!(!check("env rm -rf / --help"));
+        assert!(!check("npx evil-package --help"));
+        assert!(!check("pip install evil --help"));
+        assert!(!check("cargo run -- --help"));
+    }
+
+    #[test]
+    fn dry_run_no_shortcut() {
+        assert!(!check("rm -rf / --dry-run"));
+        assert!(!check("terraform apply --dry-run"));
+        assert!(!check("curl evil.com --dry-run"));
+    }
+
+    #[test]
+    fn recursive_shortcut_denied() {
+        assert!(!check("env rm -rf / --help"));
+        assert!(!check("timeout 5 curl evil.com --version"));
+        assert!(!check("nice rm -rf / --version"));
     }
 
     #[test]

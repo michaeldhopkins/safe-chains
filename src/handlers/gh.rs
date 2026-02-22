@@ -1,38 +1,24 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{FlagCheck, Token, WordSet};
 
-use crate::parse::Token;
+static READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
+    "attestation", "cache", "codespace", "extension", "gpg-key",
+    "issue", "label", "pr", "release", "repo", "run",
+    "ssh-key", "variable", "workflow",
+]);
 
-static READ_ONLY_SUBCOMMANDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from([
-        "pr",
-        "issue",
-        "repo",
-        "release",
-        "run",
-        "workflow",
-        "label",
-        "codespace",
-        "variable",
-        "extension",
-        "cache",
-        "attestation",
-        "gpg-key",
-        "ssh-key",
-    ])
-});
+static READ_ONLY_ACTIONS: WordSet =
+    WordSet::new(&["checks", "diff", "list", "status", "verify", "view"]);
 
-static READ_ONLY_ACTIONS: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["view", "list", "status", "diff", "checks", "verify"]));
+static ALWAYS_SAFE_SUBCOMMANDS: WordSet =
+    WordSet::new(&["--version", "search", "status"]);
 
-static ALWAYS_SAFE_SUBCOMMANDS: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["search", "status"]));
+static AUTH_SAFE_ACTIONS: WordSet =
+    WordSet::new(&["status", "token"]);
 
-static AUTH_SAFE_ACTIONS: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["status", "token"]));
+static GH_BROWSE: FlagCheck =
+    FlagCheck::new(&["--no-browser"], &[]);
 
-static API_BODY_FLAGS: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["-f", "-F", "--field", "--raw-field", "--input"]));
+static API_BODY_FLAGS: &[&str] = &["-f", "-F", "--field", "--raw-field", "--input"];
 
 pub fn is_safe_gh(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
@@ -40,20 +26,20 @@ pub fn is_safe_gh(tokens: &[Token]) -> bool {
     }
     let subcmd = &tokens[1];
 
-    if READ_ONLY_SUBCOMMANDS.contains(subcmd.as_str()) {
-        return tokens.len() >= 3 && READ_ONLY_ACTIONS.contains(tokens[2].as_str());
+    if READ_ONLY_SUBCOMMANDS.contains(subcmd) {
+        return tokens.len() >= 3 && READ_ONLY_ACTIONS.contains(&tokens[2]);
     }
 
-    if ALWAYS_SAFE_SUBCOMMANDS.contains(subcmd.as_str()) {
+    if ALWAYS_SAFE_SUBCOMMANDS.contains(subcmd) {
         return true;
     }
 
     if subcmd == "auth" {
-        return tokens.len() >= 3 && AUTH_SAFE_ACTIONS.contains(tokens[2].as_str());
+        return tokens.len() >= 3 && AUTH_SAFE_ACTIONS.contains(&tokens[2]);
     }
 
     if subcmd == "browse" {
-        return tokens[2..].iter().any(|t| t == "--no-browser");
+        return GH_BROWSE.is_safe(&tokens[2..]);
     }
 
     if subcmd == "api" {
@@ -73,14 +59,16 @@ fn is_safe_gh_api(tokens: &[Token]) -> bool {
                 .is_some_and(|m| m.eq_ignore_ascii_case("GET"));
         }
         if token.starts_with("-X") && token.len() > 2 && !token.starts_with("-X=") {
-            return token[2..].eq_ignore_ascii_case("GET");
+            return token
+                .get(2..)
+                .is_some_and(|s| s.eq_ignore_ascii_case("GET"));
         }
         if token.starts_with("-X=") || token.starts_with("--method=") {
-            let val = token.split_once('=').map(|(_, v)| v).unwrap_or("");
+            let val = token.split_value("=").unwrap_or("");
             return val.eq_ignore_ascii_case("GET");
         }
 
-        for flag in API_BODY_FLAGS.iter() {
+        for flag in API_BODY_FLAGS {
             if token == *flag {
                 return false;
             }
@@ -297,6 +285,11 @@ mod tests {
     #[test]
     fn auth_login_denied() {
         assert!(!check("gh auth login"));
+    }
+
+    #[test]
+    fn gh_version() {
+        assert!(check("gh --version"));
     }
 
     #[test]

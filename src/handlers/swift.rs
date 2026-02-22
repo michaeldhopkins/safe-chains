@@ -1,26 +1,22 @@
-use std::collections::HashSet;
-use std::sync::LazyLock;
+use crate::parse::{Token, WordSet};
 
-use crate::parse::Token;
+static SWIFT_SAFE: WordSet =
+    WordSet::new(&["--version", "build", "test"]);
 
-static SWIFT_SAFE: LazyLock<HashSet<&'static str>> =
-    LazyLock::new(|| HashSet::from(["--version", "test", "build"]));
-
-static SWIFT_PACKAGE_SAFE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    HashSet::from(["describe", "dump-package", "show-dependencies"])
-});
+static SWIFT_PACKAGE_SAFE: WordSet =
+    WordSet::new(&["describe", "dump-package", "show-dependencies"]);
 
 pub fn is_safe_swift(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if SWIFT_SAFE.contains(tokens[1].as_str()) {
+    if SWIFT_SAFE.contains(&tokens[1]) {
         return true;
     }
     if tokens[1] == "package" {
         return tokens
             .get(2)
-            .is_some_and(|a| SWIFT_PACKAGE_SAFE.contains(a.as_str()));
+            .is_some_and(|a| SWIFT_PACKAGE_SAFE.contains(a));
     }
     false
 }
