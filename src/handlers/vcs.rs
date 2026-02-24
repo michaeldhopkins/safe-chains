@@ -32,6 +32,14 @@ static GIT_CONFIG_SAFE: WordSet =
 static GIT_NOTES_SAFE: WordSet =
     WordSet::new(&["list", "show"]);
 
+static JJ_GLOBAL_STANDALONE: WordSet = WordSet::new(&[
+    "--debug", "--ignore-immutable", "--ignore-working-copy",
+    "--no-pager", "--quiet", "--verbose",
+]);
+
+static JJ_GLOBAL_VALUED: WordSet =
+    WordSet::new(&["--at-op", "--at-operation", "--color", "--repository", "-R"]);
+
 static JJ_READ_ONLY: WordSet =
     WordSet::new(&["--version", "diff", "help", "log", "show", "st", "status"]);
 
@@ -93,20 +101,43 @@ pub fn is_safe_git(tokens: &[Token]) -> bool {
 }
 
 pub fn is_safe_jj(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
+    let mut args = &tokens[1..];
+    loop {
+        if args.is_empty() {
+            return false;
+        }
+        if JJ_GLOBAL_STANDALONE.contains(&args[0]) {
+            args = &args[1..];
+        } else if JJ_GLOBAL_VALUED.contains(&args[0]) {
+            if args.len() < 2 {
+                return false;
+            }
+            args = &args[2..];
+        } else if let Some(prefix) = args[0].split_value("=") {
+            let flag = args[0].as_str().split_once('=').unwrap().0;
+            if JJ_GLOBAL_VALUED.contains(flag) && !prefix.is_empty() {
+                args = &args[1..];
+            } else {
+                break;
+            }
+        } else {
+            break;
+        }
+    }
+    if args.is_empty() {
         return false;
     }
-    if JJ_READ_ONLY.contains(&tokens[1]) {
+    if JJ_READ_ONLY.contains(&args[0]) {
         return true;
     }
     for (prefix, actions) in JJ_MULTI.iter() {
-        if tokens[1] == *prefix {
-            return tokens.get(2).is_some_and(|a| actions.contains(a));
+        if args[0] == *prefix {
+            return args.get(1).is_some_and(|a| actions.contains(a));
         }
     }
     for (first, second, actions) in JJ_TRIPLE.iter() {
-        if tokens[1] == *first && tokens.get(2).is_some_and(|t| t == *second) {
-            return tokens.get(3).is_some_and(|a| actions.contains(a));
+        if args[0] == *first && args.get(1).is_some_and(|t| t == *second) {
+            return args.get(2).is_some_and(|a| actions.contains(a));
         }
     }
     false
@@ -126,7 +157,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             name: "jj",
             kind: DocKind::Handler,
             description: "Read-only: log, diff, show, status, st, help, --version. \
-                          Multi-word: op log, file show, config get/list, bookmark list, git remote list.",
+                          Multi-word: op log, file show, config get/list, bookmark list, git remote list. \
+                          Skips global flags: --ignore-working-copy, --no-pager, --quiet, --verbose, --debug, --ignore-immutable, --color, -R/--repository, --at-op/--at-operation.",
         },
     ]
 }
@@ -619,6 +651,56 @@ mod tests {
     #[test]
     fn jj_git_remote_list() {
         assert!(check("jj git remote list"));
+    }
+
+    #[test]
+    fn jj_ignore_working_copy_diff() {
+        assert!(check("jj --ignore-working-copy diff --from 'trunk()' --to '@' --summary"));
+    }
+
+    #[test]
+    fn jj_no_pager_log() {
+        assert!(check("jj --no-pager log"));
+    }
+
+    #[test]
+    fn jj_repository_flag() {
+        assert!(check("jj -R /some/repo status"));
+    }
+
+    #[test]
+    fn jj_color_valued() {
+        assert!(check("jj --color auto log"));
+    }
+
+    #[test]
+    fn jj_color_eq() {
+        assert!(check("jj --color=auto log"));
+    }
+
+    #[test]
+    fn jj_at_op() {
+        assert!(check("jj --at-op @- diff"));
+    }
+
+    #[test]
+    fn jj_multiple_global_flags() {
+        assert!(check("jj --no-pager --ignore-working-copy --color=auto diff"));
+    }
+
+    #[test]
+    fn jj_global_flag_no_subcommand_denied() {
+        assert!(!check("jj --ignore-working-copy"));
+    }
+
+    #[test]
+    fn jj_global_flag_mutating_denied() {
+        assert!(!check("jj --ignore-working-copy new master"));
+    }
+
+    #[test]
+    fn jj_global_flag_multi_word() {
+        assert!(check("jj --no-pager bookmark list"));
     }
 
     #[test]
