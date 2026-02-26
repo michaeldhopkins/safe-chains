@@ -1,14 +1,74 @@
 use crate::handlers;
+use crate::parse::{FlagCheck, WordSet};
 
 pub struct CommandDoc {
     pub name: &'static str,
     pub kind: DocKind,
-    pub description: &'static str,
+    pub description: String,
 }
 
 pub enum DocKind {
     AlwaysSafe,
     Handler,
+}
+
+impl CommandDoc {
+    pub fn handler(name: &'static str, description: impl Into<String>) -> Self {
+        Self { name, kind: DocKind::Handler, description: description.into() }
+    }
+
+    pub fn wordset(name: &'static str, words: &WordSet) -> Self {
+        Self::handler(name, describe_wordset(words))
+    }
+
+    pub fn wordset_multi(name: &'static str, words: &WordSet, multi: &[(&str, WordSet)]) -> Self {
+        Self::handler(name, describe_wordset_multi(words, multi))
+    }
+
+    pub fn flagcheck(name: &'static str, check: &FlagCheck) -> Self {
+        Self::handler(name, describe_flagcheck(check))
+    }
+
+    pub fn always_safe(name: &'static str, description: &str) -> Self {
+        Self { name, kind: DocKind::AlwaysSafe, description: description.into() }
+    }
+}
+
+pub fn describe_wordset(words: &WordSet) -> String {
+    let items: Vec<&str> = words.iter().collect();
+    format!("Allowed: {}.", items.join(", "))
+}
+
+pub fn describe_wordset_multi(words: &WordSet, multi: &[(&str, WordSet)]) -> String {
+    let mut parts = Vec::new();
+    let simple: Vec<&str> = words.iter().collect();
+    if !simple.is_empty() {
+        parts.push(format!("Allowed: {}", simple.join(", ")));
+    }
+    if !multi.is_empty() {
+        let multi_strs: Vec<String> = multi
+            .iter()
+            .map(|(prefix, actions)| {
+                let acts: Vec<&str> = actions.iter().collect();
+                format!("{} {}", prefix, acts.join("/"))
+            })
+            .collect();
+        parts.push(format!("Multi-word: {}", multi_strs.join(", ")));
+    }
+    format!("{}.", parts.join(". "))
+}
+
+pub fn describe_flagcheck(check: &FlagCheck) -> String {
+    let mut parts = Vec::new();
+    let req: Vec<&str> = check.required().iter().collect();
+    if !req.is_empty() {
+        parts.push(format!("Requires: {}", req.join(", ")));
+    }
+    let denied: Vec<&str> = check.denied().iter().collect();
+    if !denied.is_empty() {
+        parts.push(format!("Denied: {}", denied.join(", ")));
+    }
+    format!("{}.", parts.join(". "))
 }
 
 pub fn all_command_docs() -> Vec<CommandDoc> {
@@ -50,10 +110,43 @@ pub fn render_markdown(docs: &[CommandDoc]) -> String {
 fn safe_cmd_docs() -> Vec<CommandDoc> {
     handlers::SAFE_CMD_ENTRIES
         .iter()
-        .map(|&(name, description)| CommandDoc {
-            name,
-            kind: DocKind::AlwaysSafe,
-            description,
-        })
+        .map(|&(name, description)| CommandDoc::always_safe(name, description))
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn wordset_description() {
+        let ws = WordSet::new(&["--version", "list", "show"]);
+        assert_eq!(describe_wordset(&ws), "Allowed: --version, list, show.");
+    }
+
+    #[test]
+    fn wordset_multi_description() {
+        let simple = WordSet::new(&["--version", "show"]);
+        let multi: &[(&str, WordSet)] =
+            &[("config", WordSet::new(&["get", "list"]))];
+        assert_eq!(
+            describe_wordset_multi(&simple, multi),
+            "Allowed: --version, show. Multi-word: config get/list."
+        );
+    }
+
+    #[test]
+    fn flagcheck_description() {
+        let fc = FlagCheck::new(&["--check"], &["--force"]);
+        assert_eq!(
+            describe_flagcheck(&fc),
+            "Requires: --check. Denied: --force."
+        );
+    }
+
+    #[test]
+    fn flagcheck_required_only() {
+        let fc = FlagCheck::new(&["--check"], &[]);
+        assert_eq!(describe_flagcheck(&fc), "Requires: --check.");
+    }
 }

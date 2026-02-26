@@ -47,20 +47,16 @@ pub fn is_safe_rustup(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
+    use crate::docs::{CommandDoc, describe_wordset, describe_flagcheck};
     vec![
-        CommandDoc {
-            name: "cargo",
-            kind: DocKind::Handler,
-            description: "Allowed: clippy, test, build, check, doc, search, --version, bench, tree, metadata, verify-project, pkgid, locate-project, read-manifest, audit, deny, license. \
-                          Guarded: fmt (requires --check), publish (requires --dry-run, denies --force/--no-verify). \
-                          Any subcommand with --help is safe (unless -- separator is present).",
-        },
-        CommandDoc {
-            name: "rustup",
-            kind: DocKind::Handler,
-            description: "Allowed: show, which, doc, --version. Multi-word: component/target/toolchain list.",
-        },
+        CommandDoc::handler("cargo", format!(
+            "{} Guarded: fmt ({}), publish ({}). \
+             Any subcommand with --help is safe (unless -- separator is present).",
+            describe_wordset(&CARGO_SAFE),
+            describe_flagcheck(&CARGO_FMT).trim_end_matches('.'),
+            describe_flagcheck(&CARGO_PUBLISH_DRY).trim_end_matches('.'),
+        )),
+        CommandDoc::wordset_multi("rustup", &RUSTUP_SAFE, RUSTUP_MULTI),
     ]
 }
 

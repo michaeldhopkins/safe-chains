@@ -8,12 +8,8 @@ pub fn is_safe_go(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
-    vec![CommandDoc {
-        name: "go",
-        kind: DocKind::Handler,
-        description: "Allowed: version, --version, env, list, vet, test, build, doc.",
-    }]
+    use crate::docs::CommandDoc;
+    vec![CommandDoc::wordset("go", &GO_SAFE)]
 }
 
 #[cfg(test)]

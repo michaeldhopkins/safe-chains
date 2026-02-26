@@ -15,18 +15,10 @@ pub fn is_safe_llm(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
+    use crate::docs::CommandDoc;
     vec![
-        CommandDoc {
-            name: "ollama",
-            kind: DocKind::Handler,
-            description: "Allowed: list, show, ps. Denied: run, pull, rm, create, serve, push, cp.",
-        },
-        CommandDoc {
-            name: "llm",
-            kind: DocKind::Handler,
-            description: "Allowed: models, plugins, templates, aliases, logs, collections. Denied: prompt, chat, keys, install, embed.",
-        },
+        CommandDoc::wordset("ollama", &OLLAMA_READ_ONLY),
+        CommandDoc::wordset("llm", &LLM_READ_ONLY),
     ]
 }
 

@@ -120,33 +120,18 @@ pub fn is_safe_hyperfine(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
+    use crate::docs::CommandDoc;
     vec![
-        CommandDoc {
-            name: "env",
-            kind: DocKind::Handler,
-            description: "Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare `env` allowed.",
-        },
-        CommandDoc {
-            name: "timeout",
-            kind: DocKind::Handler,
-            description: "Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recursively validates the inner command.",
-        },
-        CommandDoc {
-            name: "time",
-            kind: DocKind::Handler,
-            description: "Skips -p flag, then recursively validates the inner command.",
-        },
-        CommandDoc {
-            name: "hyperfine",
-            kind: DocKind::Handler,
-            description: "Recursively validates each benchmarked command. Denied if --prepare, --cleanup, or --setup flags are used (arbitrary shell execution).",
-        },
-        CommandDoc {
-            name: "nice / ionice",
-            kind: DocKind::Handler,
-            description: "Skips priority flags (-n/--adjustment), then recursively validates the inner command.",
-        },
+        CommandDoc::handler("env",
+            "Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare `env` allowed."),
+        CommandDoc::handler("timeout",
+            "Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recursively validates the inner command."),
+        CommandDoc::handler("time",
+            "Skips -p flag, then recursively validates the inner command."),
+        CommandDoc::handler("hyperfine",
+            "Recursively validates each benchmarked command. Denied if --prepare, --cleanup, or --setup flags are used (arbitrary shell execution)."),
+        CommandDoc::handler("nice / ionice",
+            "Skips priority flags (-n/--adjustment), then recursively validates the inner command."),
     ]
 }
 

@@ -144,39 +144,21 @@ pub fn is_safe_awk(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
+    use crate::docs::CommandDoc;
     vec![
-        CommandDoc {
-            name: "find",
-            kind: DocKind::Handler,
-            description: "Safe unless dangerous flags: -delete, -ok, -okdir, -fls, -fprint, -fprint0, -fprintf. \
-                          -exec/-execdir allowed when the executed command is itself safe.",
-        },
-        CommandDoc {
-            name: "sed",
-            kind: DocKind::Handler,
-            description: "Safe unless -i/--in-place flag or 'e' modifier on substitutions (executes replacement as shell command).",
-        },
-        CommandDoc {
-            name: "sort",
-            kind: DocKind::Handler,
-            description: "Safe unless -o/--output or --compress-program flag.",
-        },
-        CommandDoc {
-            name: "yq",
-            kind: DocKind::Handler,
-            description: "Safe unless -i/--inplace flag.",
-        },
-        CommandDoc {
-            name: "awk / gawk / mawk / nawk",
-            kind: DocKind::Handler,
-            description: "Safe unless program contains system, getline, |, >, >>, or -f flag (file-based program).",
-        },
-        CommandDoc {
-            name: "xmllint",
-            kind: DocKind::Handler,
-            description: "Safe unless --output flag.",
-        },
+        CommandDoc::handler("find",
+            "Safe unless dangerous flags: -delete, -ok, -okdir, -fls, -fprint, -fprint0, -fprintf. \
+             -exec/-execdir allowed when the executed command is itself safe."),
+        CommandDoc::handler("sed",
+            "Safe unless -i/--in-place flag or 'e' modifier on substitutions (executes replacement as shell command)."),
+        CommandDoc::handler("sort",
+            "Safe unless -o/--output or --compress-program flag."),
+        CommandDoc::handler("yq",
+            "Safe unless -i/--inplace flag."),
+        CommandDoc::handler("awk / gawk / mawk / nawk",
+            "Safe unless program contains system, getline, |, >, >>, or -f flag (file-based program)."),
+        CommandDoc::handler("xmllint",
+            "Safe unless --output flag."),
     ]
 }
 

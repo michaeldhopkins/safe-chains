@@ -1,9 +1,9 @@
 use crate::parse::{Token, WordSet, has_flag};
 
 static BREW_READ_ONLY: WordSet = WordSet::new(&[
-    "--version", "casks", "cat", "config", "deps", "desc", "doctor",
-    "formulae", "home", "info", "leaves", "list", "log", "outdated",
-    "search", "shellenv", "tap", "uses",
+    "--prefix", "--version", "casks", "cat", "config", "deps", "desc",
+    "doctor", "formulae", "home", "info", "leaves", "list", "log",
+    "outdated", "search", "shellenv", "tap", "uses",
 ]);
 
 static MISE_READ_ONLY: WordSet =
@@ -117,68 +117,30 @@ pub fn is_safe_log(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
+    use crate::docs::{CommandDoc, describe_wordset};
     vec![
-        CommandDoc {
-            name: "brew",
-            kind: DocKind::Handler,
-            description: "Allowed: list, info, --version, search, deps, uses, leaves, outdated, cat, desc, home, formulae, casks, config, doctor, log, tap, shellenv.",
-        },
-        CommandDoc {
-            name: "mise",
-            kind: DocKind::Handler,
-            description: "Allowed: ls, list, current, which, doctor, --version. Multi-word: settings get.",
-        },
-        CommandDoc {
-            name: "asdf",
-            kind: DocKind::Handler,
-            description: "Allowed: current, help, info, list, version, which, --version, plugin-list, plugin-list-all. Multi-word: plugin list.",
-        },
-        CommandDoc {
-            name: "defaults",
-            kind: DocKind::Handler,
-            description: "Allowed: read, read-type, domains, find, export.",
-        },
-        CommandDoc {
-            name: "sysctl",
-            kind: DocKind::Handler,
-            description: "Safe unless -w/--write flag or key=value assignment syntax.",
-        },
-        CommandDoc {
-            name: "cmake",
-            kind: DocKind::Handler,
-            description: "Allowed: --version, --system-information (single argument only).",
-        },
-        CommandDoc {
-            name: "security",
-            kind: DocKind::Handler,
-            description: "Allowed: find-identity, find-certificate, find-generic-password, find-internet-password, show-keychain-info, dump-keychain, list-keychains, dump-trust-settings, smartcard, verify-cert, cms.",
-        },
-        CommandDoc {
-            name: "csrutil",
-            kind: DocKind::Handler,
-            description: "Allowed: status, report, authenticated-root.",
-        },
-        CommandDoc {
-            name: "diskutil",
-            kind: DocKind::Handler,
-            description: "Allowed: list, info, activity, listFilesystems. Multi-word: apfs list, apfs listCryptoUsers, apfs listSnapshots, apfs listVolumeGroups.",
-        },
-        CommandDoc {
-            name: "launchctl",
-            kind: DocKind::Handler,
-            description: "Allowed: list, print, print-cache, print-disabled, dumpstate, blame, hostinfo, resolveport, examine, version, help, error.",
-        },
-        CommandDoc {
-            name: "networksetup",
-            kind: DocKind::Handler,
-            description: "Allowed: subcommands starting with -list, -get, -show, -print, plus -version and -help.",
-        },
-        CommandDoc {
-            name: "log",
-            kind: DocKind::Handler,
-            description: "Allowed: help, show, stats, stream. Denied: config, erase, collect.",
-        },
+        CommandDoc::wordset("brew", &BREW_READ_ONLY),
+        CommandDoc::wordset_multi("mise", &MISE_READ_ONLY, MISE_MULTI),
+        CommandDoc::handler("asdf", format!(
+            "{} Also: plugin-list, plugin-list-all. Multi-word: plugin list.",
+            describe_wordset(&ASDF_READ_ONLY),
+        )),
+        CommandDoc::wordset("defaults", &DEFAULTS_SAFE),
+        CommandDoc::handler("sysctl",
+            "Safe unless -w/--write flag or key=value assignment syntax."),
+        CommandDoc::handler("cmake",
+            "Allowed: --version, --system-information (single argument only)."),
+        CommandDoc::wordset("security", &SECURITY_READ_ONLY),
+        CommandDoc::wordset("csrutil", &CSRUTIL_READ_ONLY),
+        CommandDoc::handler("diskutil", format!(
+            "{} Multi-word: apfs {}.",
+            describe_wordset(&DISKUTIL_READ_ONLY),
+            DISKUTIL_APFS_READ_ONLY.iter().collect::<Vec<_>>().join("/"),
+        )),
+        CommandDoc::wordset("launchctl", &LAUNCHCTL_READ_ONLY),
+        CommandDoc::handler("networksetup",
+            "Allowed: subcommands starting with -list, -get, -show, -print, plus -version and -help."),
+        CommandDoc::wordset("log", &LOG_READ_ONLY),
     ]
 }
 
@@ -258,6 +220,16 @@ mod tests {
     #[test]
     fn brew_shellenv() {
         assert!(check("brew shellenv"));
+    }
+
+    #[test]
+    fn brew_prefix() {
+        assert!(check("brew --prefix"));
+    }
+
+    #[test]
+    fn brew_prefix_formula() {
+        assert!(check("brew --prefix libiconv"));
     }
 
     #[test]
