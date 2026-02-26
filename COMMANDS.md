@@ -134,7 +134,7 @@ These commands are allowed with specific subcommands or flags.
 
 ### `asdf`
 
-Allowed: current, which, help, list, --version, plugin-list, plugin-list-all. Multi-word: plugin list.
+Allowed: current, help, info, list, version, which, --version, plugin-list, plugin-list-all. Multi-word: plugin list.
 
 ### `awk / gawk / mawk / nawk`
 

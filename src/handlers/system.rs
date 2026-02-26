@@ -13,7 +13,7 @@ static MISE_MULTI: &[(&str, WordSet)] =
     &[("settings", WordSet::new(&["get"]))];
 
 static ASDF_READ_ONLY: WordSet =
-    WordSet::new(&["--version", "current", "help", "list", "which"]);
+    WordSet::new(&["--version", "current", "help", "info", "list", "version", "which"]);
 
 static DEFAULTS_SAFE: WordSet =
     WordSet::new(&["domains", "export", "find", "read", "read-type"]);
@@ -132,7 +132,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc {
             name: "asdf",
             kind: DocKind::Handler,
-            description: "Allowed: current, which, help, list, --version, plugin-list, plugin-list-all. Multi-word: plugin list.",
+            description: "Allowed: current, help, info, list, version, which, --version, plugin-list, plugin-list-all. Multi-word: plugin list.",
         },
         CommandDoc {
             name: "defaults",
@@ -353,6 +353,16 @@ mod tests {
     #[test]
     fn asdf_version() {
         assert!(check("asdf --version"));
+    }
+
+    #[test]
+    fn asdf_version_bare() {
+        assert!(check("asdf version"));
+    }
+
+    #[test]
+    fn asdf_info() {
+        assert!(check("asdf info"));
     }
 
     #[test]
