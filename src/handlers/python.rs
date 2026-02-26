@@ -72,34 +72,20 @@ pub fn is_safe_conda(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
+    use crate::docs::{CommandDoc, describe_wordset};
     vec![
-        CommandDoc {
-            name: "pip / pip3",
-            kind: DocKind::Handler,
-            description: "Read-only: list, show, freeze, check, index, debug, inspect, help. \
-                          Guarded: config (list/get only).",
-        },
-        CommandDoc {
-            name: "uv",
-            kind: DocKind::Handler,
-            description: "Allowed: --version. Multi-word: pip list/show/freeze/check, tool list, python list.",
-        },
-        CommandDoc {
-            name: "poetry",
-            kind: DocKind::Handler,
-            description: "Allowed: show, check, --version. Multi-word: env info/list.",
-        },
-        CommandDoc {
-            name: "pyenv",
-            kind: DocKind::Handler,
-            description: "Allowed: versions, version, which, root, shims, --version, help.",
-        },
-        CommandDoc {
-            name: "conda",
-            kind: DocKind::Handler,
-            description: "Allowed: list, info, --version. Guarded: config (--show/--show-sources only).",
-        },
+        CommandDoc::handler("pip / pip3", format!(
+            "{} Guarded: config (list/get only).",
+            describe_wordset(&PIP_READ_ONLY),
+        )),
+        CommandDoc::wordset_multi("uv", &UV_SAFE, UV_MULTI),
+        CommandDoc::wordset_multi("poetry", &POETRY_SAFE, POETRY_MULTI),
+        CommandDoc::wordset("pyenv", &PYENV_SAFE),
+        CommandDoc::handler("conda", format!(
+            "{} Guarded: config ({} only).",
+            describe_wordset(&CONDA_SAFE),
+            CONDA_CONFIG.required().iter().collect::<Vec<_>>().join(", "),
+        )),
     ]
 }
 

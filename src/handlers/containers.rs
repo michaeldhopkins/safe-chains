@@ -22,15 +22,8 @@ pub fn is_safe_docker(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
-    vec![CommandDoc {
-        name: "docker / podman",
-        kind: DocKind::Handler,
-        description: "Read-only: ps, images, logs, inspect, info, version, top, stats, history, port, diff. \
-                      Multi-word: network ls/inspect, volume ls/inspect, container ls/list/inspect/logs/top/stats/diff/port, \
-                      image ls/list/inspect/history, system info/df, compose config/ps/ls/top/images/version, \
-                      context ls/inspect/show, manifest inspect, buildx ls/inspect/version.",
-    }]
+    use crate::docs::CommandDoc;
+    vec![CommandDoc::wordset_multi("docker / podman", &DOCKER_READ_ONLY, DOCKER_MULTI)]
 }
 
 #[cfg(test)]

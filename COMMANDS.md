@@ -134,7 +134,7 @@ These commands are allowed with specific subcommands or flags.
 
 ### `asdf`
 
-Allowed: current, help, info, list, version, which, --version, plugin-list, plugin-list-all. Multi-word: plugin list.
+Allowed: --version, current, help, info, list, version, which. Also: plugin-list, plugin-list-all. Multi-word: plugin list.
 
 ### `awk / gawk / mawk / nawk`
 
@@ -146,15 +146,15 @@ Allowed: --version, --help. Only `bash -c` / `sh -c` with a safe inner command. 
 
 ### `brew`
 
-Allowed: list, info, --version, search, deps, uses, leaves, outdated, cat, desc, home, formulae, casks, config, doctor, log, tap, shellenv.
+Allowed: --prefix, --version, casks, cat, config, deps, desc, doctor, formulae, home, info, leaves, list, log, outdated, search, shellenv, tap, uses.
 
 ### `bun`
 
-Allowed: --version, test, outdated. Multi-word: pm ls/hash/cache/bin, x (delegates to bunx logic).
+Allowed: --version, outdated, test. Multi-word: pm bin/cache/hash/ls. x delegates to bunx logic.
 
 ### `bundle`
 
-Read-only: list, info, show, check, --version. Guarded: exec (rspec, standardrb, cucumber, brakeman, erb_lint, herb only).
+Allowed: --version, check, info, list, show. Guarded: exec (brakeman, cucumber, erb_lint, herb, rspec, standardrb only).
 
 ### `bunx`
 
@@ -162,7 +162,7 @@ Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma
 
 ### `cargo`
 
-Allowed: clippy, test, build, check, doc, search, --version, bench, tree, metadata, verify-project, pkgid, locate-project, read-manifest, audit, deny, license. Guarded: fmt (requires --check), publish (requires --dry-run, denies --force/--no-verify). Any subcommand with --help is safe (unless -- separator is present).
+Allowed: --version, audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. Guarded: fmt (Requires: --check), publish (Requires: --dry-run. Denied: --force, --no-verify). Any subcommand with --help is safe (unless -- separator is present).
 
 ### `cmake`
 
@@ -170,39 +170,39 @@ Allowed: --version, --system-information (single argument only).
 
 ### `codesign`
 
-Allowed: -d/--display, -v/--verify. Denied if -s/--sign, --remove-signature, or -f/--force present.
+Requires: --display, --verify, -d, -v. Denied: --force, --remove-signature, --sign, -f, -s.
 
 ### `composer`
 
-Allowed: show, info, diagnose, outdated, licenses, check-platform-reqs, suggests, fund, audit, --version, about, help.
+Allowed: --version, about, audit, check-platform-reqs, diagnose, fund, help, info, licenses, outdated, show, suggests.
 
 ### `conda`
 
-Allowed: list, info, --version. Guarded: config (--show/--show-sources only).
+Allowed: --version, info, list. Guarded: config (--show, --show-sources only).
 
 ### `csrutil`
 
-Allowed: status, report, authenticated-root.
+Allowed: authenticated-root, report, status.
 
 ### `defaults`
 
-Allowed: read, read-type, domains, find, export.
+Allowed: domains, export, find, read, read-type.
 
 ### `deno`
 
-Allowed: --version, info, doc, lint, check, test. Guarded: fmt (requires --check).
+Allowed: --version, check, doc, info, lint, test. Guarded: fmt (requires --check).
 
 ### `diskutil`
 
-Allowed: list, info, activity, listFilesystems. Multi-word: apfs list, apfs listCryptoUsers, apfs listSnapshots, apfs listVolumeGroups.
+Allowed: activity, apfs, info, list, listFilesystems. Multi-word: apfs list/listCryptoUsers/listSnapshots/listVolumeGroups.
 
 ### `docker / podman`
 
-Read-only: ps, images, logs, inspect, info, version, top, stats, history, port, diff. Multi-word: network ls/inspect, volume ls/inspect, container ls/list/inspect/logs/top/stats/diff/port, image ls/list/inspect/history, system info/df, compose config/ps/ls/top/images/version, context ls/inspect/show, manifest inspect, buildx ls/inspect/version.
+Allowed: --version, diff, history, images, info, inspect, logs, port, ps, stats, top, version. Multi-word: buildx --version/inspect/ls/version, compose --version/config/images/ls/ps/top/version, container diff/inspect/list/logs/ls/port/stats/top, context inspect/ls/show, image history/inspect/list/ls, manifest inspect, network inspect/ls, system df/info, volume inspect/ls.
 
 ### `dotnet`
 
-Allowed: --version, --info, --list-sdks, --list-runtimes, build, test, list.
+Allowed: --info, --list-runtimes, --list-sdks, --version, build, list, test.
 
 ### `env`
 
@@ -214,11 +214,11 @@ Safe unless dangerous flags: -delete, -ok, -okdir, -fls, -fprint, -fprint0, -fpr
 
 ### `fnm`
 
-Allowed: list, current, default, --version, ls-remote.
+Allowed: --version, current, default, list, ls-remote.
 
 ### `gem`
 
-Allowed: list, info, environment, which, pristine, search, specification, dependency, contents, sources, stale, outdated, help, --version.
+Allowed: --version, contents, dependency, environment, help, info, list, outdated, pristine, search, sources, specification, stale, which.
 
 ### `gh`
 
@@ -230,11 +230,11 @@ Read-only: log, diff, show, status, ls-tree, grep, rev-parse, merge-base, merge-
 
 ### `go`
 
-Allowed: version, --version, env, list, vet, test, build, doc.
+Allowed: --version, build, doc, env, list, test, version, vet.
 
 ### `gradle / gradlew`
 
-Allowed: tasks, dependencies, properties, --version, test, build, check.
+Allowed: --version, build, check, dependencies, properties, tasks, test.
 
 ### `hyperfine`
 
@@ -246,27 +246,27 @@ Read-only: log, diff, show, status, st, help, --version. Multi-word: op log, fil
 
 ### `launchctl`
 
-Allowed: list, print, print-cache, print-disabled, dumpstate, blame, hostinfo, resolveport, examine, version, help, error.
+Allowed: blame, dumpstate, error, examine, help, hostinfo, list, print, print-cache, print-disabled, resolveport, version.
 
 ### `lipo`
 
-Allowed: -info, -detailed_info, -archs, -verify_arch. Denied if -output flag present.
+Requires: -archs, -detailed_info, -info, -verify_arch. Denied: -output.
 
 ### `llm`
 
-Allowed: models, plugins, templates, aliases, logs, collections. Denied: prompt, chat, keys, install, embed.
+Allowed: --version, aliases, collections, logs, models, plugins, templates.
 
 ### `log`
 
-Allowed: help, show, stats, stream. Denied: config, erase, collect.
+Allowed: help, show, stats, stream.
 
 ### `mise`
 
-Allowed: ls, list, current, which, doctor, --version. Multi-word: settings get.
+Allowed: --version, current, doctor, list, ls, which. Multi-word: settings get.
 
 ### `mvn / mvnw`
 
-Allowed: --version, -v, dependency:tree, dependency:list, help:describe, validate, test, compile, verify, test-compile.
+Allowed: --version, -v, compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify.
 
 ### `networksetup`
 
@@ -278,7 +278,7 @@ Skips priority flags (-n/--adjustment), then recursively validates the inner com
 
 ### `npm`
 
-Read-only: view, info, list, ls, test, audit, outdated, explain, why, fund, prefix, root, doctor. Guarded: config (list/get only), run/run-script (test/test:* only).
+Allowed: --version, audit, doctor, explain, fund, info, list, ls, outdated, prefix, root, test, view, why. Guarded: config (list/get only), run/run-script (test/test:* only).
 
 ### `npx`
 
@@ -286,47 +286,47 @@ Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma
 
 ### `nvm`
 
-Allowed: ls, list, current, which, version, --version, ls-remote.
+Allowed: --version, current, list, ls, ls-remote, version, which.
 
 ### `ollama`
 
-Allowed: list, show, ps. Denied: run, pull, rm, create, serve, push, cp.
+Allowed: --version, list, ps, show.
 
 ### `pip / pip3`
 
-Read-only: list, show, freeze, check, index, debug, inspect, help. Guarded: config (list/get only).
+Allowed: --version, check, debug, freeze, help, index, inspect, list, show. Guarded: config (list/get only).
 
 ### `pkgutil`
 
-Allowed: --pkgs/--packages, --pkgs-plist, --files, --export-plist, --pkg-info, --pkg-groups, --groups, --group-pkgs, --file-info, --payload-files, --check-signature. Denied: --forget, --learn, --expand, --flatten.
+Requires: --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist. Denied: --expand, --flatten, --forget, --learn.
 
 ### `plutil`
 
-Allowed: -lint, -p, -type, -help. Denied: -convert, -insert, -replace, -remove, -create.
+Allowed: -help, -lint, -p, -type.
 
 ### `pnpm`
 
-Allowed: list, why, audit, outdated, --version.
+Allowed: --version, audit, list, ls, outdated, why.
 
 ### `poetry`
 
-Allowed: show, check, --version. Multi-word: env info/list.
+Allowed: --version, check, show. Multi-word: env info/list.
 
 ### `pyenv`
 
-Allowed: versions, version, which, root, shims, --version, help.
+Allowed: --version, help, root, shims, version, versions, which.
 
 ### `rbenv`
 
-Allowed: versions, version, which, root, shims, --version, help.
+Allowed: --version, help, root, shims, version, versions, which.
 
 ### `rustup`
 
-Allowed: show, which, doc, --version. Multi-word: component/target/toolchain list.
+Allowed: --version, doc, show, which. Multi-word: component list, target list, toolchain list.
 
 ### `security`
 
-Allowed: find-identity, find-certificate, find-generic-password, find-internet-password, show-keychain-info, dump-keychain, list-keychains, dump-trust-settings, smartcard, verify-cert, cms.
+Allowed: cms, dump-keychain, dump-trust-settings, find-certificate, find-generic-password, find-identity, find-internet-password, list-keychains, show-keychain-info, smartcard, verify-cert.
 
 ### `sed`
 
@@ -338,7 +338,7 @@ Safe unless -o/--output or --compress-program flag.
 
 ### `swift`
 
-Allowed: --version, test, build. Multi-word: package describe/dump-package/show-dependencies.
+Allowed: --version, build, test. Multi-word: package describe/dump-package/show-dependencies.
 
 ### `sysctl`
 
@@ -354,11 +354,11 @@ Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recu
 
 ### `uv`
 
-Allowed: --version. Multi-word: pip list/show/freeze/check, tool list, python list.
+Allowed: --version. Multi-word: pip check/freeze/list/show, python list, tool list.
 
 ### `volta`
 
-Allowed: list, which, --version.
+Allowed: --version, list, which.
 
 ### `xargs`
 
@@ -370,11 +370,11 @@ Allowed: -p/--print-path, -v/--version. Denied: -s/--switch, -r/--reset, --insta
 
 ### `xcodebuild`
 
-Allowed: -version, -showsdks, -showBuildSettings, -showdestinations, -list.
+Allowed: -list, -showBuildSettings, -showdestinations, -showsdks, -version.
 
 ### `xcrun`
 
-Allowed: --find, --show-sdk-path, --show-sdk-version, --show-sdk-build-version, --show-sdk-platform-path, --show-sdk-platform-version, --show-toolchain-path, simctl list. Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.
+Allowed: --find, --show-sdk-build-version, --show-sdk-path, --show-sdk-platform-path, --show-sdk-platform-version, --show-sdk-version, --show-toolchain-path. Also: simctl list. Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.
 
 ### `xmllint`
 
@@ -382,7 +382,7 @@ Safe unless --output flag.
 
 ### `yarn`
 
-Read-only: list, ls, info, why, --version. Also allowed: test, test:*.
+Allowed: --version, info, list, ls, why. Also allowed: test, test:*.
 
 ### `yq`
 

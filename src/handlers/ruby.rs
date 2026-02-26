@@ -39,24 +39,15 @@ pub fn is_safe_rbenv(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
+    use crate::docs::{CommandDoc, describe_wordset};
     vec![
-        CommandDoc {
-            name: "bundle",
-            kind: DocKind::Handler,
-            description: "Read-only: list, info, show, check, --version. \
-                          Guarded: exec (rspec, standardrb, cucumber, brakeman, erb_lint, herb only).",
-        },
-        CommandDoc {
-            name: "gem",
-            kind: DocKind::Handler,
-            description: "Allowed: list, info, environment, which, pristine, search, specification, dependency, contents, sources, stale, outdated, help, --version.",
-        },
-        CommandDoc {
-            name: "rbenv",
-            kind: DocKind::Handler,
-            description: "Allowed: versions, version, which, root, shims, --version, help.",
-        },
+        CommandDoc::handler("bundle", format!(
+            "{} Guarded: exec ({} only).",
+            describe_wordset(&BUNDLE_READ_ONLY),
+            BUNDLE_EXEC_SAFE.iter().collect::<Vec<_>>().join(", "),
+        )),
+        CommandDoc::wordset("gem", &GEM_READ_ONLY),
+        CommandDoc::wordset("rbenv", &RBENV_SAFE),
     ]
 }
 

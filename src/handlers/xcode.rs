@@ -100,47 +100,19 @@ pub fn is_safe_codesign(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
+    use crate::docs::{CommandDoc, describe_wordset};
     vec![
-        CommandDoc {
-            name: "xcodebuild",
-            kind: DocKind::Handler,
-            description: "Allowed: -version, -showsdks, -showBuildSettings, -showdestinations, -list.",
-        },
-        CommandDoc {
-            name: "plutil",
-            kind: DocKind::Handler,
-            description: "Allowed: -lint, -p, -type, -help. Denied: -convert, -insert, -replace, -remove, -create.",
-        },
-        CommandDoc {
-            name: "xcode-select",
-            kind: DocKind::Handler,
-            description: "Allowed: -p/--print-path, -v/--version. Denied: -s/--switch, -r/--reset, --install.",
-        },
-        CommandDoc {
-            name: "xcrun",
-            kind: DocKind::Handler,
-            description: "Allowed: --find, --show-sdk-path, --show-sdk-version, --show-sdk-build-version, \
-                          --show-sdk-platform-path, --show-sdk-platform-version, --show-toolchain-path, simctl list. \
-                          Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.",
-        },
-        CommandDoc {
-            name: "pkgutil",
-            kind: DocKind::Handler,
-            description: "Allowed: --pkgs/--packages, --pkgs-plist, --files, --export-plist, --pkg-info, \
-                          --pkg-groups, --groups, --group-pkgs, --file-info, --payload-files, --check-signature. \
-                          Denied: --forget, --learn, --expand, --flatten.",
-        },
-        CommandDoc {
-            name: "lipo",
-            kind: DocKind::Handler,
-            description: "Allowed: -info, -detailed_info, -archs, -verify_arch. Denied if -output flag present.",
-        },
-        CommandDoc {
-            name: "codesign",
-            kind: DocKind::Handler,
-            description: "Allowed: -d/--display, -v/--verify. Denied if -s/--sign, --remove-signature, or -f/--force present.",
-        },
+        CommandDoc::wordset("xcodebuild", &XCODEBUILD_SAFE),
+        CommandDoc::wordset("plutil", &PLUTIL_READ_ONLY),
+        CommandDoc::handler("xcode-select",
+            "Allowed: -p/--print-path, -v/--version. Denied: -s/--switch, -r/--reset, --install."),
+        CommandDoc::handler("xcrun", format!(
+            "{} Also: simctl list. Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.",
+            describe_wordset(&XCRUN_SHOW_FLAGS),
+        )),
+        CommandDoc::flagcheck("pkgutil", &PKGUTIL_CHECK),
+        CommandDoc::flagcheck("lipo", &LIPO_CHECK),
+        CommandDoc::flagcheck("codesign", &CODESIGN_CHECK),
     ]
 }
 

@@ -173,59 +173,32 @@ pub fn is_safe_volta(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
+    use crate::docs::{CommandDoc, describe_wordset, describe_wordset_multi};
     vec![
-        CommandDoc {
-            name: "npm",
-            kind: DocKind::Handler,
-            description: "Read-only: view, info, list, ls, test, audit, outdated, explain, why, fund, prefix, root, doctor. \
-                          Guarded: config (list/get only), run/run-script (test/test:* only).",
-        },
-        CommandDoc {
-            name: "yarn",
-            kind: DocKind::Handler,
-            description: "Read-only: list, ls, info, why, --version. Also allowed: test, test:*.",
-        },
-        CommandDoc {
-            name: "pnpm",
-            kind: DocKind::Handler,
-            description: "Allowed: list, why, audit, outdated, --version.",
-        },
-        CommandDoc {
-            name: "bun",
-            kind: DocKind::Handler,
-            description: "Allowed: --version, test, outdated. Multi-word: pm ls/hash/cache/bin, x (delegates to bunx logic).",
-        },
-        CommandDoc {
-            name: "bunx",
-            kind: DocKind::Handler,
-            description: "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p.",
-        },
-        CommandDoc {
-            name: "deno",
-            kind: DocKind::Handler,
-            description: "Allowed: --version, info, doc, lint, check, test. Guarded: fmt (requires --check).",
-        },
-        CommandDoc {
-            name: "npx",
-            kind: DocKind::Handler,
-            description: "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p.",
-        },
-        CommandDoc {
-            name: "nvm",
-            kind: DocKind::Handler,
-            description: "Allowed: ls, list, current, which, version, --version, ls-remote.",
-        },
-        CommandDoc {
-            name: "fnm",
-            kind: DocKind::Handler,
-            description: "Allowed: list, current, default, --version, ls-remote.",
-        },
-        CommandDoc {
-            name: "volta",
-            kind: DocKind::Handler,
-            description: "Allowed: list, which, --version.",
-        },
+        CommandDoc::handler("npm", format!(
+            "{} Guarded: config (list/get only), run/run-script (test/test:* only).",
+            describe_wordset(&NPM_READ_ONLY),
+        )),
+        CommandDoc::handler("yarn", format!(
+            "{} Also allowed: test, test:*.",
+            describe_wordset(&YARN_READ_ONLY),
+        )),
+        CommandDoc::wordset("pnpm", &PNPM_READ_ONLY),
+        CommandDoc::handler("bun", format!(
+            "{} x delegates to bunx logic.",
+            describe_wordset_multi(&BUN_SAFE, BUN_MULTI),
+        )),
+        CommandDoc::handler("bunx",
+            "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p."),
+        CommandDoc::handler("deno", format!(
+            "{} Guarded: fmt (requires --check).",
+            describe_wordset(&DENO_SAFE),
+        )),
+        CommandDoc::handler("npx",
+            "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p."),
+        CommandDoc::wordset("nvm", &NVM_SAFE),
+        CommandDoc::wordset("fnm", &FNM_SAFE),
+        CommandDoc::wordset("volta", &VOLTA_SAFE),
     ]
 }
 

@@ -68,6 +68,14 @@ impl FlagCheck {
         }
     }
 
+    pub fn required(&self) -> &WordSet {
+        &self.required
+    }
+
+    pub fn denied(&self) -> &WordSet {
+        &self.denied
+    }
+
     pub fn is_safe(&self, tokens: &[Token]) -> bool {
         tokens.iter().any(|t| self.required.contains(t))
             && !tokens.iter().any(|t| self.denied.contains(t))

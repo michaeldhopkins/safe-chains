@@ -10,12 +10,8 @@ pub fn is_safe_dotnet(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
-    vec![CommandDoc {
-        name: "dotnet",
-        kind: DocKind::Handler,
-        description: "Allowed: --version, --info, --list-sdks, --list-runtimes, build, test, list.",
-    }]
+    use crate::docs::CommandDoc;
+    vec![CommandDoc::wordset("dotnet", &DOTNET_SAFE)]
 }
 
 #[cfg(test)]

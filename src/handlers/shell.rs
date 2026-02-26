@@ -41,18 +41,12 @@ pub fn is_safe_xargs(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bo
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
+    use crate::docs::CommandDoc;
     vec![
-        CommandDoc {
-            name: "bash / sh",
-            kind: DocKind::Handler,
-            description: "Allowed: --version, --help. Only `bash -c` / `sh -c` with a safe inner command. Scripts denied.",
-        },
-        CommandDoc {
-            name: "xargs",
-            kind: DocKind::Handler,
-            description: "Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n, -P, -s, -E, -d, -0, -r, -t, -p, -x).",
-        },
+        CommandDoc::handler("bash / sh",
+            "Allowed: --version, --help. Only `bash -c` / `sh -c` with a safe inner command. Scripts denied."),
+        CommandDoc::handler("xargs",
+            "Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n, -P, -s, -E, -d, -0, -r, -t, -p, -x)."),
     ]
 }
 

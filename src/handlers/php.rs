@@ -10,12 +10,8 @@ pub fn is_safe_composer(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocKind};
-    vec![CommandDoc {
-        name: "composer",
-        kind: DocKind::Handler,
-        description: "Allowed: show, info, diagnose, outdated, licenses, check-platform-reqs, suggests, fund, audit, --version, about, help.",
-    }]
+    use crate::docs::CommandDoc;
+    vec![CommandDoc::wordset("composer", &COMPOSER_SAFE)]
 }
 
 #[cfg(test)]
