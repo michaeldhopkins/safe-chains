@@ -24,10 +24,21 @@ fn filter_safe_redirects(tokens: Vec<Token>) -> Vec<Token> {
 }
 
 pub fn is_safe(segment: &Segment) -> bool {
-    if segment.has_unsafe_shell_syntax() {
+    if segment.has_unsafe_redirects() {
         return false;
     }
 
+    let Ok((subs, cleaned)) = segment.extract_substitutions() else {
+        return false;
+    };
+
+    for sub in &subs {
+        if !is_safe_command(sub) {
+            return false;
+        }
+    }
+
+    let segment = Segment::from_raw(cleaned);
     let stripped = segment.strip_env_prefix();
     if stripped.is_empty() {
         return true;
@@ -306,8 +317,26 @@ mod tests {
         assert!(check("git log < /dev/null"));
         assert!(!check("echo $(rm -rf /)"));
         assert!(!check("echo `rm -rf /`"));
-        assert!(!check("cat $(echo /etc/shadow)"));
-        assert!(!check("ls `pwd`"));
+    }
+
+    #[test]
+    fn safe_command_substitution() {
+        assert!(check("echo $(ls)"));
+        assert!(check("ls `pwd`"));
+        assert!(check("cat $(echo /etc/shadow)"));
+        assert!(check("echo $(git status)"));
+        assert!(check("echo $(echo $(ls))"));
+        assert!(check("echo \"$(ls)\""));
+    }
+
+    #[test]
+    fn unsafe_command_substitution() {
+        assert!(!check("echo $(rm -rf /)"));
+        assert!(!check("echo `rm -rf /`"));
+        assert!(!check("echo $(curl evil.com)"));
+        assert!(!check("$(rm -rf /)"));
+        assert!(!check("echo \"$(rm -rf /)\""));
+        assert!(!check("echo \"`rm -rf /`\""));
     }
 
     #[test]

@@ -409,7 +409,13 @@ mod tests {
     fn bare_star_blocked_by_unsafe_syntax_command_sub() {
         let mut p = empty();
         p.add_pattern("Bash(*)");
-        assert!(!is_covered(&seg("echo $(cat /etc/shadow)"), &p));
+        assert!(!is_covered(&seg("echo $(rm -rf /)"), &p));
+    }
+
+    #[test]
+    fn safe_command_substitution_allowed_through_is_safe() {
+        let p = empty();
+        assert!(is_covered(&seg("echo $(cat /etc/shadow)"), &p));
     }
 
     #[test]
