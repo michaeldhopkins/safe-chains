@@ -6,6 +6,7 @@ pub mod gh;
 pub mod go;
 pub mod jvm;
 pub mod node;
+pub mod perl;
 pub mod php;
 pub mod python;
 pub mod ruby;
@@ -258,6 +259,8 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         "lipo" => xcode::is_safe_lipo(tokens),
         "codesign" => xcode::is_safe_codesign(tokens),
 
+        "perl" => perl::is_safe_perl(tokens),
+
         "find" => coreutils::is_safe_find(tokens, is_safe),
         "sed" => coreutils::is_safe_sed(tokens),
         "sort" => coreutils::is_safe_sort(tokens),
@@ -287,6 +290,7 @@ const HANDLED_CMDS: &[&str] = &[
     "brew", "mise", "asdf", "defaults", "sysctl", "cmake",
     "networksetup", "launchctl", "diskutil", "security", "csrutil", "log",
     "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign",
+    "perl",
     "find", "sed", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
 ];
 
@@ -307,6 +311,7 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(ai::command_docs());
     docs.extend(system::command_docs());
     docs.extend(xcode::command_docs());
+    docs.extend(perl::command_docs());
     docs.extend(coreutils::command_docs());
     docs.extend(shell::command_docs());
     docs.extend(wrappers::command_docs());

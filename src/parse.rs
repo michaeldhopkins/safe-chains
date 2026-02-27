@@ -108,6 +108,10 @@ impl Segment {
         self.0.is_empty()
     }
 
+    pub fn from_raw(s: String) -> Self {
+        Segment(s)
+    }
+
     pub fn from_words<S: AsRef<str>>(words: &[S]) -> Self {
         Segment(shell_words::join(words))
     }
@@ -120,6 +124,14 @@ impl Segment {
 
     pub fn has_unsafe_shell_syntax(&self) -> bool {
         check_unsafe_shell_syntax(&self.0)
+    }
+
+    pub fn has_unsafe_redirects(&self) -> bool {
+        check_unsafe_redirects(&self.0)
+    }
+
+    pub(crate) fn extract_substitutions(&self) -> Result<(Vec<String>, String), ()> {
+        extract_substitutions(&self.0)
     }
 
     pub fn strip_env_prefix(&self) -> Segment {
@@ -382,6 +394,183 @@ fn check_unsafe_shell_syntax(segment: &str) -> bool {
         }
     }
     false
+}
+
+fn check_unsafe_redirects(segment: &str) -> bool {
+    let mut in_single = false;
+    let mut in_double = false;
+    let mut escaped = false;
+    let chars: Vec<char> = segment.chars().collect();
+
+    for (i, &c) in chars.iter().enumerate() {
+        if escaped {
+            escaped = false;
+            continue;
+        }
+        if c == '\\' && !in_single {
+            escaped = true;
+            continue;
+        }
+        if c == '\'' && !in_double {
+            in_single = !in_single;
+            continue;
+        }
+        if c == '"' && !in_single {
+            in_double = !in_double;
+            continue;
+        }
+        if !in_single && !in_double && (c == '>' || c == '<') {
+            let next = chars.get(i + 1);
+            if next == Some(&'&')
+                && chars
+                    .get(i + 2)
+                    .is_some_and(|ch| ch.is_ascii_digit() || *ch == '-')
+            {
+                continue;
+            }
+            if is_dev_null_target(&chars, i + 1, c) {
+                continue;
+            }
+            return true;
+        }
+    }
+    false
+}
+
+fn extract_substitutions(segment: &str) -> Result<(Vec<String>, String), ()> {
+    let mut subs = Vec::new();
+    let mut cleaned = String::with_capacity(segment.len());
+    let mut in_single = false;
+    let mut in_double = false;
+    let mut escaped = false;
+    let chars: Vec<char> = segment.chars().collect();
+    let mut i = 0;
+
+    while i < chars.len() {
+        if escaped {
+            escaped = false;
+            cleaned.push(chars[i]);
+            i += 1;
+            continue;
+        }
+        if chars[i] == '\\' && !in_single {
+            escaped = true;
+            cleaned.push(chars[i]);
+            i += 1;
+            continue;
+        }
+        if chars[i] == '\'' && !in_double {
+            in_single = !in_single;
+            cleaned.push(chars[i]);
+            i += 1;
+            continue;
+        }
+        if chars[i] == '"' && !in_single {
+            in_double = !in_double;
+            cleaned.push(chars[i]);
+            i += 1;
+            continue;
+        }
+        if !in_single {
+            if chars[i] == '`' {
+                let start = i + 1;
+                let end = find_matching_backtick(&chars, start).ok_or(())?;
+                let inner: String = chars[start..end].iter().collect();
+                subs.push(inner);
+                cleaned.push('_');
+                i = end + 1;
+                continue;
+            }
+            if chars[i] == '$' && chars.get(i + 1) == Some(&'(') {
+                let start = i + 2;
+                let end = find_matching_paren(&chars, start).ok_or(())?;
+                let inner: String = chars[start..end].iter().collect();
+                subs.push(inner);
+                cleaned.push('_');
+                i = end + 1;
+                continue;
+            }
+        }
+        cleaned.push(chars[i]);
+        i += 1;
+    }
+    Ok((subs, cleaned))
+}
+
+fn find_matching_backtick(chars: &[char], start: usize) -> Option<usize> {
+    let mut in_single = false;
+    let mut in_double = false;
+    let mut escaped = false;
+    let mut i = start;
+    while i < chars.len() {
+        if escaped {
+            escaped = false;
+            i += 1;
+            continue;
+        }
+        if chars[i] == '\\' && !in_single {
+            escaped = true;
+            i += 1;
+            continue;
+        }
+        if chars[i] == '\'' && !in_double {
+            in_single = !in_single;
+            i += 1;
+            continue;
+        }
+        if chars[i] == '"' && !in_single {
+            in_double = !in_double;
+            i += 1;
+            continue;
+        }
+        if !in_single && !in_double && chars[i] == '`' {
+            return Some(i);
+        }
+        i += 1;
+    }
+    None
+}
+
+fn find_matching_paren(chars: &[char], start: usize) -> Option<usize> {
+    let mut depth = 1u32;
+    let mut in_single = false;
+    let mut in_double = false;
+    let mut escaped = false;
+    let mut i = start;
+    while i < chars.len() {
+        if escaped {
+            escaped = false;
+            i += 1;
+            continue;
+        }
+        if chars[i] == '\\' && !in_single {
+            escaped = true;
+            i += 1;
+            continue;
+        }
+        if chars[i] == '\'' && !in_double {
+            in_single = !in_single;
+            i += 1;
+            continue;
+        }
+        if chars[i] == '"' && !in_single {
+            in_double = !in_double;
+            i += 1;
+            continue;
+        }
+        if !in_single && !in_double {
+            if chars[i] == '(' {
+                depth += 1;
+            } else if chars[i] == ')' {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(i);
+                }
+            }
+        }
+        i += 1;
+    }
+    None
 }
 
 const DEV_NULL: [char; 9] = ['/', 'd', 'e', 'v', '/', 'n', 'u', 'l', 'l'];
@@ -922,5 +1111,82 @@ mod tests {
     #[test]
     fn content_outside_double_quotes_empty() {
         assert_eq!(tok("").content_outside_double_quotes(), "");
+    }
+
+    #[test]
+    fn extract_subs_none() {
+        let (subs, cleaned) = seg("echo hello").extract_substitutions().unwrap();
+        assert!(subs.is_empty());
+        assert_eq!(cleaned, "echo hello");
+    }
+
+    #[test]
+    fn extract_subs_dollar_paren() {
+        let (subs, cleaned) = seg("echo $(ls)").extract_substitutions().unwrap();
+        assert_eq!(subs, vec!["ls"]);
+        assert_eq!(cleaned, "echo _");
+    }
+
+    #[test]
+    fn extract_subs_backtick() {
+        let (subs, cleaned) = seg("ls `pwd`").extract_substitutions().unwrap();
+        assert_eq!(subs, vec!["pwd"]);
+        assert_eq!(cleaned, "ls _");
+    }
+
+    #[test]
+    fn extract_subs_multiple() {
+        let (subs, cleaned) = seg("echo $(cmd1) $(cmd2)").extract_substitutions().unwrap();
+        assert_eq!(subs, vec!["cmd1", "cmd2"]);
+        assert_eq!(cleaned, "echo _ _");
+    }
+
+    #[test]
+    fn extract_subs_nested() {
+        let (subs, cleaned) = seg("echo $(echo $(ls))").extract_substitutions().unwrap();
+        assert_eq!(subs, vec!["echo $(ls)"]);
+        assert_eq!(cleaned, "echo _");
+    }
+
+    #[test]
+    fn extract_subs_quoted_skipped() {
+        let (subs, cleaned) = seg("echo '$(safe)' arg").extract_substitutions().unwrap();
+        assert!(subs.is_empty());
+        assert_eq!(cleaned, "echo '$(safe)' arg");
+    }
+
+    #[test]
+    fn extract_subs_unmatched_backtick() {
+        assert!(seg("echo `unclosed").extract_substitutions().is_err());
+    }
+
+    #[test]
+    fn extract_subs_unmatched_paren() {
+        assert!(seg("echo $(unclosed").extract_substitutions().is_err());
+    }
+
+    #[test]
+    fn unsafe_redirects_to_file() {
+        assert!(seg("echo hello > file.txt").has_unsafe_redirects());
+    }
+
+    #[test]
+    fn unsafe_redirects_dev_null_ok() {
+        assert!(!seg("cmd > /dev/null").has_unsafe_redirects());
+    }
+
+    #[test]
+    fn unsafe_redirects_fd_ok() {
+        assert!(!seg("cmd 2>&1").has_unsafe_redirects());
+    }
+
+    #[test]
+    fn unsafe_redirects_no_backtick_check() {
+        assert!(!seg("echo `ls`").has_unsafe_redirects());
+    }
+
+    #[test]
+    fn unsafe_redirects_no_dollar_paren_check() {
+        assert!(!seg("echo $(ls)").has_unsafe_redirects());
     }
 }

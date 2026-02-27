@@ -292,6 +292,10 @@ Allowed: --version, current, list, ls, ls-remote, version, which.
 
 Allowed: --version, list, ps, show.
 
+### `perl`
+
+Allowed: -e/-E inline one-liners with safe code, --version, --help, -v, -V. Blocked: script files (no -e/-E), -i (in-place edit), s///e modifier, backticks, and code containing identifiers not in the safe built-in allowlist.
+
 ### `pip / pip3`
 
 Allowed: --version, check, debug, freeze, help, index, inspect, list, show. Guarded: config (list/get only).
