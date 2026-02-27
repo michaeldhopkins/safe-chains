@@ -242,7 +242,7 @@ Recursively validates each benchmarked command. Denied if --prepare, --cleanup, 
 
 ### `jj`
 
-Read-only: log, diff, show, status, st, help, --version. Multi-word: op log, file show, config get/list, bookmark list, git remote list. Skips global flags: --ignore-working-copy, --no-pager, --quiet, --verbose, --debug, --ignore-immutable, --color, -R/--repository, --at-op/--at-operation.
+Read-only: log, diff, show, status, st, help, --version. Multi-word: op log, file show, config get/list, bookmark list, git fetch, git remote list. Skips global flags: --ignore-working-copy, --no-pager, --quiet, --verbose, --debug, --ignore-immutable, --color, -R/--repository, --at-op/--at-operation.
 
 ### `launchctl`
 
