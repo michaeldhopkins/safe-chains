@@ -47,6 +47,7 @@ static JJ_MULTI: &[(&str, WordSet)] = &[
     ("bookmark", WordSet::new(&["list"])),
     ("config", WordSet::new(&["get", "list"])),
     ("file", WordSet::new(&["show"])),
+    ("git", WordSet::new(&["fetch"])),
     ("op", WordSet::new(&["log"])),
 ];
 
@@ -131,8 +132,8 @@ pub fn is_safe_jj(tokens: &[Token]) -> bool {
         return true;
     }
     for (prefix, actions) in JJ_MULTI.iter() {
-        if args[0] == *prefix {
-            return args.get(1).is_some_and(|a| actions.contains(a));
+        if args[0] == *prefix && args.get(1).is_some_and(|a| actions.contains(a)) {
+            return true;
         }
     }
     for (first, second, actions) in JJ_TRIPLE.iter() {
@@ -152,7 +153,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
              Supports `-C <dir>` prefix."),
         CommandDoc::handler("jj",
             "Read-only: log, diff, show, status, st, help, --version. \
-             Multi-word: op log, file show, config get/list, bookmark list, git remote list. \
+             Multi-word: op log, file show, config get/list, bookmark list, git fetch, git remote list. \
              Skips global flags: --ignore-working-copy, --no-pager, --quiet, --verbose, --debug, --ignore-immutable, --color, -R/--repository, --at-op/--at-operation."),
     ]
 }
@@ -728,8 +729,13 @@ mod tests {
     }
 
     #[test]
-    fn jj_git_fetch_denied() {
-        assert!(!check("jj git fetch"));
+    fn jj_git_fetch() {
+        assert!(check("jj git fetch"));
+    }
+
+    #[test]
+    fn jj_git_fetch_with_global_flags() {
+        assert!(check("jj --no-pager git fetch"));
     }
 
     #[test]
