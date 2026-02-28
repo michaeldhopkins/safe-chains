@@ -126,6 +126,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+          merge-multiple: true
 
       - name: Create git tag
         run: |
@@ -135,9 +136,6 @@ jobs:
       - name: Generate checksums
         run: |
           cd artifacts
-          for dir in */; do
-            mv "$dir"/*.tar.gz .
-          done
           sha256sum *.tar.gz > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
