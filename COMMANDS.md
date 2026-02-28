@@ -162,7 +162,7 @@ Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma
 
 ### `cargo`
 
-Allowed: --version, audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. Guarded: fmt (Requires: --check), package (Requires: --list), publish (Requires: --dry-run. Denied: --force, --no-verify). Any subcommand with --help is safe (unless -- separator is present).
+Allowed: --version, audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. Guarded: fmt (Requires: --check), package (Requires: --list), publish (Requires: --dry-run. Denied: --force, --no-verify). +toolchain selectors (e.g. +nightly, +stable) are skipped. Any subcommand with --help is safe (unless -- separator is present).
 
 ### `cmake`
 
