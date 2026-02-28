@@ -128,3 +128,7 @@ Adding a new command:
 4. Run `cargo test` and `cargo clippy -- -D warnings`
 5. Run `./generate-docs.sh` to regenerate COMMANDS.md
 6. Run `cargo install --path .` to update the installed binary
+
+---
+
+Copyright 2026 Michael Hopkins
