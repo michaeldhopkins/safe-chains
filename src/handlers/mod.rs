@@ -2,7 +2,7 @@ pub mod ai;
 pub mod containers;
 pub mod coreutils;
 pub mod dotnet;
-pub mod gh;
+pub mod forges;
 pub mod go;
 pub mod jvm;
 pub mod node;
@@ -196,9 +196,9 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
 
         "git" => vcs::is_safe_git(tokens),
         "jj" => vcs::is_safe_jj(tokens),
-        "gh" => gh::is_safe_gh(tokens),
-        "glab" => gh::is_safe_glab(tokens),
-        "tea" => gh::is_safe_tea(tokens),
+        "gh" => forges::is_safe_gh(tokens),
+        "glab" => forges::is_safe_glab(tokens),
+        "tea" => forges::is_safe_tea(tokens),
 
         "npm" => node::is_safe_npm(tokens),
         "yarn" => node::is_safe_yarn(tokens),
@@ -299,7 +299,7 @@ const HANDLED_CMDS: &[&str] = &[
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs = Vec::new();
     docs.extend(vcs::command_docs());
-    docs.extend(gh::command_docs());
+    docs.extend(forges::command_docs());
     docs.extend(node::command_docs());
     docs.extend(ruby::command_docs());
     docs.extend(python::command_docs());
