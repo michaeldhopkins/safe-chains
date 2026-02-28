@@ -1,11 +1,11 @@
 [package]
 name = "safe-chains"
-version = "0.22.1"
+version = "0.23.0"
 edition = "2024"
 rust-version = "1.91"
 license = "MIT OR Apache-2.0"
 description = "Auto-allow safe, read-only bash commands in agentic coding tools"
-repository = "https://github.com/michaeldhopkins/safe-chains"
+repository = "https://github.com/michaeldhopkins/claude-safe-chains"
 
 [[bin]]
 name = "safe-chains"
