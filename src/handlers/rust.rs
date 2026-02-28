@@ -28,22 +28,26 @@ pub fn is_safe_cargo(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
+    let sub = if tokens[1].starts_with('+') { 2 } else { 1 };
+    if tokens.len() < sub + 1 {
+        return false;
+    }
     if tokens.last().is_some_and(|t| *t == "--help")
         && !tokens.iter().any(|t| *t == "--")
     {
         return true;
     }
-    if CARGO_SAFE.contains(&tokens[1]) {
+    if CARGO_SAFE.contains(&tokens[sub]) {
         return true;
     }
-    if tokens[1] == "fmt" {
-        return CARGO_FMT.is_safe(&tokens[2..]);
+    if tokens[sub] == "fmt" {
+        return CARGO_FMT.is_safe(&tokens[sub + 1..]);
     }
-    if tokens[1] == "package" {
-        return CARGO_PACKAGE_LIST.is_safe(&tokens[2..]);
+    if tokens[sub] == "package" {
+        return CARGO_PACKAGE_LIST.is_safe(&tokens[sub + 1..]);
     }
-    if tokens[1] == "publish" {
-        return CARGO_PUBLISH_DRY.is_safe(&tokens[2..]);
+    if tokens[sub] == "publish" {
+        return CARGO_PUBLISH_DRY.is_safe(&tokens[sub + 1..]);
     }
     false
 }
@@ -57,6 +61,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         CommandDoc::handler("cargo", format!(
             "{} Guarded: fmt ({}), package ({}), publish ({}). \
+             +toolchain selectors (e.g. +nightly, +stable) are skipped. \
              Any subcommand with --help is safe (unless -- separator is present).",
             describe_wordset(&CARGO_SAFE),
             describe_flagcheck(&CARGO_FMT).trim_end_matches('.'),
@@ -243,6 +248,66 @@ mod tests {
     #[test]
     fn cargo_run_help_safe() {
         assert!(check("cargo run --help"));
+    }
+
+    #[test]
+    fn cargo_nightly_check() {
+        assert!(check("cargo +nightly check"));
+    }
+
+    #[test]
+    fn cargo_stable_test() {
+        assert!(check("cargo +stable test"));
+    }
+
+    #[test]
+    fn cargo_pinned_build() {
+        assert!(check("cargo +1.91 build --release"));
+    }
+
+    #[test]
+    fn cargo_nightly_clippy() {
+        assert!(check("cargo +nightly clippy -- -D warnings"));
+    }
+
+    #[test]
+    fn cargo_nightly_fmt_check() {
+        assert!(check("cargo +nightly fmt --check"));
+    }
+
+    #[test]
+    fn cargo_nightly_fmt_denied() {
+        assert!(!check("cargo +nightly fmt"));
+    }
+
+    #[test]
+    fn cargo_nightly_publish_dry_run() {
+        assert!(check("cargo +nightly publish --dry-run"));
+    }
+
+    #[test]
+    fn cargo_nightly_publish_denied() {
+        assert!(!check("cargo +nightly publish"));
+    }
+
+    #[test]
+    fn cargo_nightly_run_denied() {
+        assert!(!check("cargo +nightly run"));
+    }
+
+    #[test]
+    fn cargo_nightly_install_help() {
+        assert!(check("cargo +nightly install --help"));
+    }
+
+    #[test]
+    fn cargo_nightly_package_list() {
+        assert!(check("cargo +nightly package --list"));
+    }
+
+    #[test]
+    fn cargo_bare_toolchain_denied() {
+        assert!(!check("cargo +nightly"));
     }
 
     #[test]
