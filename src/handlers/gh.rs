@@ -20,6 +20,43 @@ static GH_BROWSE: FlagCheck =
 
 static API_BODY_FLAGS: &[&str] = &["-f", "-F", "--field", "--raw-field", "--input"];
 
+static GLAB_READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
+    "ci", "cluster", "deploy-key", "gpg-key", "incident", "issue",
+    "iteration", "label", "milestone", "mr", "release", "repo",
+    "schedule", "snippet", "ssh-key", "stack", "variable",
+]);
+
+static GLAB_READ_ONLY_ACTIONS: WordSet =
+    WordSet::new(&["diff", "issues", "list", "status", "view"]);
+
+static GLAB_ALWAYS_SAFE: WordSet =
+    WordSet::new(&["--version", "-v", "check-update", "version"]);
+
+static GLAB_AUTH_SAFE: WordSet =
+    WordSet::new(&["status"]);
+
+static TEA_READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
+    "b", "branch", "branches",
+    "i", "issue", "issues",
+    "label", "labels",
+    "milestone", "milestones", "ms",
+    "n", "notification", "notifications",
+    "org", "organization", "organizations",
+    "pr", "pull", "pulls",
+    "r", "release", "releases",
+    "repo", "repos",
+    "t", "time", "times",
+]);
+
+static TEA_READ_ONLY_ACTIONS: WordSet =
+    WordSet::new(&["list", "view"]);
+
+static TEA_ALWAYS_SAFE: WordSet =
+    WordSet::new(&["--version", "-v", "whoami"]);
+
+static TEA_LOGIN_SAFE: WordSet =
+    WordSet::new(&["list"]);
+
 pub fn is_safe_gh(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
@@ -83,12 +120,71 @@ fn is_safe_gh_api(tokens: &[Token]) -> bool {
     true
 }
 
+pub fn is_safe_glab(tokens: &[Token]) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    let subcmd = &tokens[1];
+
+    if GLAB_READ_ONLY_SUBCOMMANDS.contains(subcmd) {
+        return tokens.len() >= 3 && GLAB_READ_ONLY_ACTIONS.contains(&tokens[2]);
+    }
+
+    if GLAB_ALWAYS_SAFE.contains(subcmd) {
+        return true;
+    }
+
+    if subcmd == "auth" {
+        return tokens.len() >= 3 && GLAB_AUTH_SAFE.contains(&tokens[2]);
+    }
+
+    if subcmd == "api" {
+        return is_safe_gh_api(tokens);
+    }
+
+    false
+}
+
+pub fn is_safe_tea(tokens: &[Token]) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    let subcmd = &tokens[1];
+
+    if TEA_READ_ONLY_SUBCOMMANDS.contains(subcmd) {
+        if tokens.len() == 2 {
+            return true;
+        }
+        return TEA_READ_ONLY_ACTIONS.contains(&tokens[2]);
+    }
+
+    if TEA_ALWAYS_SAFE.contains(subcmd) {
+        return true;
+    }
+
+    if subcmd == "logins" || subcmd == "login" {
+        return tokens.len() >= 3 && TEA_LOGIN_SAFE.contains(&tokens[2]);
+    }
+
+    false
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
-    vec![CommandDoc::handler("gh",
-        "Read-only subcommands (view/list/status/diff/checks/verify): pr, issue, repo, release, run, workflow, label, codespace, variable, extension, cache, attestation, gpg-key, ssh-key. \
-         Always safe: search, status. \
-         Guarded: auth (status/token only), browse (requires --no-browser), api (GET only, no body flags).")]
+    vec![
+        CommandDoc::handler("gh",
+            "Read-only subcommands (view/list/status/diff/checks/verify): pr, issue, repo, release, run, workflow, label, codespace, variable, extension, cache, attestation, gpg-key, ssh-key. \
+             Always safe: search, status. \
+             Guarded: auth (status/token only), browse (requires --no-browser), api (GET only, no body flags)."),
+        CommandDoc::handler("glab",
+            "Read-only subcommands (view/list/status/diff/issues): mr, issue, repo, release, ci, label, milestone, snippet, variable, deploy-key, gpg-key, ssh-key, incident, iteration, cluster, schedule, stack. \
+             Always safe: version, check-update. \
+             Guarded: auth (status only), api (GET only, no body flags)."),
+        CommandDoc::handler("tea",
+            "Read-only subcommands (list/view): issues, pulls, labels, milestones, releases, times, organizations, repos, branches, notifications. \
+             Bare subcommand (no action) also safe for read-only subcommands. \
+             Always safe: whoami. Guarded: logins/login (list only)."),
+    ]
 }
 
 #[cfg(test)]
@@ -292,5 +388,245 @@ mod tests {
     #[test]
     fn bare_gh_denied() {
         assert!(!check("gh"));
+    }
+
+    #[test]
+    fn glab_mr_list() {
+        assert!(check("glab mr list"));
+    }
+
+    #[test]
+    fn glab_mr_view() {
+        assert!(check("glab mr view 123"));
+    }
+
+    #[test]
+    fn glab_mr_diff() {
+        assert!(check("glab mr diff 123"));
+    }
+
+    #[test]
+    fn glab_issue_list() {
+        assert!(check("glab issue list"));
+    }
+
+    #[test]
+    fn glab_issue_view() {
+        assert!(check("glab issue view 456"));
+    }
+
+    #[test]
+    fn glab_ci_status() {
+        assert!(check("glab ci status"));
+    }
+
+    #[test]
+    fn glab_ci_list() {
+        assert!(check("glab ci list"));
+    }
+
+    #[test]
+    fn glab_release_list() {
+        assert!(check("glab release list"));
+    }
+
+    #[test]
+    fn glab_label_list() {
+        assert!(check("glab label list"));
+    }
+
+    #[test]
+    fn glab_milestone_list() {
+        assert!(check("glab milestone list"));
+    }
+
+    #[test]
+    fn glab_snippet_view() {
+        assert!(check("glab snippet view 1"));
+    }
+
+    #[test]
+    fn glab_variable_list() {
+        assert!(check("glab variable list"));
+    }
+
+    #[test]
+    fn glab_auth_status() {
+        assert!(check("glab auth status"));
+    }
+
+    #[test]
+    fn glab_version() {
+        assert!(check("glab --version"));
+    }
+
+    #[test]
+    fn glab_version_subcommand() {
+        assert!(check("glab version"));
+    }
+
+    #[test]
+    fn glab_check_update() {
+        assert!(check("glab check-update"));
+    }
+
+    #[test]
+    fn glab_api_get_implicit() {
+        assert!(check("glab api projects/1/merge_requests"));
+    }
+
+    #[test]
+    fn glab_api_explicit_get() {
+        assert!(check("glab api projects/1/issues -X GET"));
+    }
+
+    #[test]
+    fn glab_mr_create_denied() {
+        assert!(!check("glab mr create --title test"));
+    }
+
+    #[test]
+    fn glab_mr_merge_denied() {
+        assert!(!check("glab mr merge 123"));
+    }
+
+    #[test]
+    fn glab_issue_create_denied() {
+        assert!(!check("glab issue create --title test"));
+    }
+
+    #[test]
+    fn glab_auth_login_denied() {
+        assert!(!check("glab auth login"));
+    }
+
+    #[test]
+    fn glab_api_post_denied() {
+        assert!(!check("glab api projects/1/issues -X POST"));
+    }
+
+    #[test]
+    fn glab_api_field_denied() {
+        assert!(!check("glab api projects/1/issues -f title=x"));
+    }
+
+    #[test]
+    fn bare_glab_denied() {
+        assert!(!check("glab"));
+    }
+
+    #[test]
+    fn tea_issue_list() {
+        assert!(check("tea issue list"));
+    }
+
+    #[test]
+    fn tea_issues_list() {
+        assert!(check("tea issues list"));
+    }
+
+    #[test]
+    fn tea_issue_view() {
+        assert!(check("tea issue view 1"));
+    }
+
+    #[test]
+    fn tea_pull_list() {
+        assert!(check("tea pull list"));
+    }
+
+    #[test]
+    fn tea_pr_view() {
+        assert!(check("tea pr view 1"));
+    }
+
+    #[test]
+    fn tea_release_list() {
+        assert!(check("tea release list"));
+    }
+
+    #[test]
+    fn tea_repo_bare() {
+        assert!(check("tea repo"));
+    }
+
+    #[test]
+    fn tea_repo_list() {
+        assert!(check("tea repos list"));
+    }
+
+    #[test]
+    fn tea_branch_list() {
+        assert!(check("tea branch list"));
+    }
+
+    #[test]
+    fn tea_label_list() {
+        assert!(check("tea labels list"));
+    }
+
+    #[test]
+    fn tea_milestone_list() {
+        assert!(check("tea milestones list"));
+    }
+
+    #[test]
+    fn tea_org_list() {
+        assert!(check("tea org list"));
+    }
+
+    #[test]
+    fn tea_notifications_bare() {
+        assert!(check("tea notifications"));
+    }
+
+    #[test]
+    fn tea_times_list() {
+        assert!(check("tea times list"));
+    }
+
+    #[test]
+    fn tea_whoami() {
+        assert!(check("tea whoami"));
+    }
+
+    #[test]
+    fn tea_version() {
+        assert!(check("tea --version"));
+    }
+
+    #[test]
+    fn tea_login_list() {
+        assert!(check("tea login list"));
+    }
+
+    #[test]
+    fn tea_logins_list() {
+        assert!(check("tea logins list"));
+    }
+
+    #[test]
+    fn tea_issue_create_denied() {
+        assert!(!check("tea issue create --title test"));
+    }
+
+    #[test]
+    fn tea_pull_create_denied() {
+        assert!(!check("tea pull create"));
+    }
+
+    #[test]
+    fn tea_login_add_denied() {
+        assert!(!check("tea login add"));
+    }
+
+    #[test]
+    fn tea_logout_denied() {
+        assert!(!check("tea logout"));
+    }
+
+    #[test]
+    fn bare_tea_denied() {
+        assert!(!check("tea"));
     }
 }

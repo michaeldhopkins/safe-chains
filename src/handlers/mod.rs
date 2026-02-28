@@ -197,6 +197,8 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         "git" => vcs::is_safe_git(tokens),
         "jj" => vcs::is_safe_jj(tokens),
         "gh" => gh::is_safe_gh(tokens),
+        "glab" => gh::is_safe_glab(tokens),
+        "tea" => gh::is_safe_tea(tokens),
 
         "npm" => node::is_safe_npm(tokens),
         "yarn" => node::is_safe_yarn(tokens),
@@ -275,7 +277,7 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
 #[cfg(test)]
 const HANDLED_CMDS: &[&str] = &[
     "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine",
-    "git", "jj", "gh",
+    "git", "jj", "gh", "glab", "tea",
     "npm", "yarn", "pnpm", "bun", "deno", "npx", "bunx", "nvm", "fnm", "volta",
     "bundle", "gem", "rbenv",
     "pip", "pip3", "uv", "poetry", "pyenv", "conda",
