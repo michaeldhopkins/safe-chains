@@ -9,6 +9,9 @@ static CARGO_SAFE: WordSet = WordSet::new(&[
 static CARGO_FMT: FlagCheck =
     FlagCheck::new(&["--check"], &[]);
 
+static CARGO_PACKAGE_LIST: FlagCheck =
+    FlagCheck::new(&["--list"], &[]);
+
 static CARGO_PUBLISH_DRY: FlagCheck =
     FlagCheck::new(&["--dry-run"], &["--force", "--no-verify"]);
 
@@ -36,6 +39,9 @@ pub fn is_safe_cargo(tokens: &[Token]) -> bool {
     if tokens[1] == "fmt" {
         return CARGO_FMT.is_safe(&tokens[2..]);
     }
+    if tokens[1] == "package" {
+        return CARGO_PACKAGE_LIST.is_safe(&tokens[2..]);
+    }
     if tokens[1] == "publish" {
         return CARGO_PUBLISH_DRY.is_safe(&tokens[2..]);
     }
@@ -50,10 +56,11 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, describe_wordset, describe_flagcheck};
     vec![
         CommandDoc::handler("cargo", format!(
-            "{} Guarded: fmt ({}), publish ({}). \
+            "{} Guarded: fmt ({}), package ({}), publish ({}). \
              Any subcommand with --help is safe (unless -- separator is present).",
             describe_wordset(&CARGO_SAFE),
             describe_flagcheck(&CARGO_FMT).trim_end_matches('.'),
+            describe_flagcheck(&CARGO_PACKAGE_LIST).trim_end_matches('.'),
             describe_flagcheck(&CARGO_PUBLISH_DRY).trim_end_matches('.'),
         )),
         CommandDoc::wordset_multi("rustup", &RUSTUP_SAFE, RUSTUP_MULTI),
@@ -186,6 +193,21 @@ mod tests {
     #[test]
     fn cargo_install_help() {
         assert!(check("cargo install --help"));
+    }
+
+    #[test]
+    fn cargo_package_list() {
+        assert!(check("cargo package --list"));
+    }
+
+    #[test]
+    fn cargo_package_list_redirect() {
+        assert!(check("cargo package --list 2>&1"));
+    }
+
+    #[test]
+    fn cargo_package_denied() {
+        assert!(!check("cargo package"));
     }
 
     #[test]
