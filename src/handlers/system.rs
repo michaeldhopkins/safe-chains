@@ -73,7 +73,7 @@ pub fn is_safe_csrutil(tokens: &[Token]) -> bool {
 }
 
 static DISKUTIL_READ_ONLY: WordSet =
-    WordSet::new(&["activity", "apfs", "info", "list", "listFilesystems"]);
+    WordSet::new(&["activity", "info", "list", "listFilesystems"]);
 
 static DISKUTIL_APFS_READ_ONLY: WordSet =
     WordSet::new(&["list", "listCryptoUsers", "listSnapshots", "listVolumeGroups"]);
@@ -117,14 +117,16 @@ pub fn is_safe_log(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, describe_wordset};
+    use crate::docs::{CommandDoc, doc};
     vec![
         CommandDoc::wordset("brew", &BREW_READ_ONLY),
         CommandDoc::wordset_multi("mise", &MISE_READ_ONLY, MISE_MULTI),
-        CommandDoc::handler("asdf", format!(
-            "{} Also: plugin-list, plugin-list-all. Multi-word: plugin list.",
-            describe_wordset(&ASDF_READ_ONLY),
-        )),
+        CommandDoc::handler("asdf",
+            doc(&ASDF_READ_ONLY)
+                .multi_word(&[("plugin", WordSet::new(&["list"]))])
+                .subcommand("plugin-list")
+                .subcommand("plugin-list-all")
+                .build()),
         CommandDoc::wordset("defaults", &DEFAULTS_SAFE),
         CommandDoc::handler("sysctl",
             "Safe unless -w/--write flag or key=value assignment syntax."),
@@ -132,11 +134,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             "Allowed: --version, --system-information (single argument only)."),
         CommandDoc::wordset("security", &SECURITY_READ_ONLY),
         CommandDoc::wordset("csrutil", &CSRUTIL_READ_ONLY),
-        CommandDoc::handler("diskutil", format!(
-            "{} Multi-word: apfs {}.",
-            describe_wordset(&DISKUTIL_READ_ONLY),
-            DISKUTIL_APFS_READ_ONLY.iter().collect::<Vec<_>>().join("/"),
-        )),
+        CommandDoc::handler("diskutil",
+            doc(&DISKUTIL_READ_ONLY)
+                .multi_word(&[("apfs", DISKUTIL_APFS_READ_ONLY)])
+                .build()),
         CommandDoc::wordset("launchctl", &LAUNCHCTL_READ_ONLY),
         CommandDoc::handler("networksetup",
             "Allowed: subcommands starting with -list, -get, -show, -print, plus -version and -help."),
@@ -550,6 +551,11 @@ mod tests {
     #[test]
     fn diskutil_apfs_list_snapshots() {
         assert!(check("diskutil apfs listSnapshots disk1s1"));
+    }
+
+    #[test]
+    fn diskutil_apfs_bare_denied() {
+        assert!(!check("diskutil apfs"));
     }
 
     #[test]

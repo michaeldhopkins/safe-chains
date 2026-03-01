@@ -72,20 +72,20 @@ pub fn is_safe_conda(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, describe_wordset};
+    use crate::docs::{CommandDoc, doc};
     vec![
-        CommandDoc::handler("pip / pip3", format!(
-            "{} Guarded: config (list/get only).",
-            describe_wordset(&PIP_READ_ONLY),
-        )),
+        CommandDoc::handler("pip / pip3",
+            doc(&PIP_READ_ONLY)
+                .section("Guarded: config (list/get only).")
+                .build()),
         CommandDoc::wordset_multi("uv", &UV_SAFE, UV_MULTI),
         CommandDoc::wordset_multi("poetry", &POETRY_SAFE, POETRY_MULTI),
         CommandDoc::wordset("pyenv", &PYENV_SAFE),
-        CommandDoc::handler("conda", format!(
-            "{} Guarded: config ({} only).",
-            describe_wordset(&CONDA_SAFE),
-            CONDA_CONFIG.required().iter().collect::<Vec<_>>().join(", "),
-        )),
+        CommandDoc::handler("conda",
+            doc(&CONDA_SAFE)
+                .section(format!("Guarded: config ({} only).",
+                    CONDA_CONFIG.required().iter().collect::<Vec<_>>().join(", ")))
+                .build()),
     ]
 }
 

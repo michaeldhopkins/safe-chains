@@ -22,12 +22,11 @@ pub fn is_safe_swift(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, describe_wordset};
-    vec![CommandDoc::handler("swift", format!(
-        "{} Multi-word: package {}.",
-        describe_wordset(&SWIFT_SAFE),
-        SWIFT_PACKAGE_SAFE.iter().collect::<Vec<_>>().join("/"),
-    ))]
+    use crate::docs::{CommandDoc, doc};
+    vec![CommandDoc::handler("swift",
+        doc(&SWIFT_SAFE)
+            .multi_word(&[("package", SWIFT_PACKAGE_SAFE)])
+            .build())]
 }
 
 #[cfg(test)]

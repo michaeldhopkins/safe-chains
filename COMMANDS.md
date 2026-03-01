@@ -134,7 +134,7 @@ These commands are allowed with specific subcommands or flags.
 
 ### `asdf`
 
-Allowed: --version, current, help, info, list, version, which. Also: plugin-list, plugin-list-all. Multi-word: plugin list.
+Subcommands: current, help, info, list, plugin list, plugin-list, plugin-list-all, version, which. Flags: --version.
 
 ### `awk / gawk / mawk / nawk`
 
@@ -146,15 +146,23 @@ Allowed: --version, --help. Only `bash -c` / `sh -c` with a safe inner command. 
 
 ### `brew`
 
-Allowed: --prefix, --version, casks, cat, config, deps, desc, doctor, formulae, home, info, leaves, list, log, outdated, search, shellenv, tap, uses.
+Subcommands: casks, cat, config, deps, desc, doctor, formulae, home, info, leaves, list, log, outdated, search, shellenv, tap, uses. Flags: --prefix, --version.
 
 ### `bun`
 
-Allowed: --version, outdated, test. Multi-word: pm bin/cache/hash/ls. x delegates to bunx logic.
+Subcommands: outdated, pm bin, pm cache, pm hash, pm ls, test.
+
+Flags: --version.
+
+x delegates to bunx logic.
 
 ### `bundle`
 
-Allowed: --version, check, info, list, show. Guarded: exec (brakeman, cucumber, erb_lint, herb, rspec, standardrb only).
+Subcommands: check, info, list, show.
+
+Flags: --version.
+
+Guarded: exec (brakeman, cucumber, erb_lint, herb, rspec, standardrb only).
 
 ### `bunx`
 
@@ -162,7 +170,13 @@ Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma
 
 ### `cargo`
 
-Allowed: --version, audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. Guarded: fmt (Requires: --check), package (Requires: --list), publish (Requires: --dry-run. Denied: --force, --no-verify). +toolchain selectors (e.g. +nightly, +stable) are skipped. Any subcommand with --help is safe (unless -- separator is present).
+Subcommands: audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project.
+
+Flags: --version.
+
+Guarded: fmt (Requires: --check), package (Requires: --list), publish (Requires: --dry-run. Denied: --force, --no-verify).
++toolchain selectors (e.g. +nightly, +stable) are skipped.
+Any subcommand with --help is safe (unless -- separator is present).
 
 ### `cmake`
 
@@ -174,35 +188,43 @@ Requires: --display, --verify, -d, -v. Denied: --force, --remove-signature, --si
 
 ### `composer`
 
-Allowed: --version, about, audit, check-platform-reqs, diagnose, fund, help, info, licenses, outdated, show, suggests.
+Subcommands: about, audit, check-platform-reqs, diagnose, fund, help, info, licenses, outdated, show, suggests. Flags: --version.
 
 ### `conda`
 
-Allowed: --version, info, list. Guarded: config (--show, --show-sources only).
+Subcommands: info, list.
+
+Flags: --version.
+
+Guarded: config (--show, --show-sources only).
 
 ### `csrutil`
 
-Allowed: authenticated-root, report, status.
+Subcommands: authenticated-root, report, status.
 
 ### `defaults`
 
-Allowed: domains, export, find, read, read-type.
+Subcommands: domains, export, find, read, read-type.
 
 ### `deno`
 
-Allowed: --version, check, doc, info, lint, test. Guarded: fmt (requires --check).
+Subcommands: check, doc, info, lint, test.
+
+Flags: --version.
+
+Guarded: fmt (requires --check).
 
 ### `diskutil`
 
-Allowed: activity, apfs, info, list, listFilesystems. Multi-word: apfs list/listCryptoUsers/listSnapshots/listVolumeGroups.
+Subcommands: activity, apfs list, apfs listCryptoUsers, apfs listSnapshots, apfs listVolumeGroups, info, list, listFilesystems.
 
 ### `docker / podman`
 
-Allowed: --version, diff, history, images, info, inspect, logs, port, ps, stats, top, version. Multi-word: buildx --version/inspect/ls/version, compose --version/config/images/ls/ps/top/version, container diff/inspect/list/logs/ls/port/stats/top, context inspect/ls/show, image history/inspect/list/ls, manifest inspect, network inspect/ls, system df/info, volume inspect/ls.
+Subcommands: buildx --version, buildx inspect, buildx ls, buildx version, compose --version, compose config, compose images, compose ls, compose ps, compose top, compose version, container diff, container inspect, container list, container logs, container ls, container port, container stats, container top, context inspect, context ls, context show, diff, history, image history, image inspect, image list, image ls, images, info, inspect, logs, manifest inspect, network inspect, network ls, port, ps, stats, system df, system info, top, version, volume inspect, volume ls. Flags: --version.
 
 ### `dotnet`
 
-Allowed: --info, --list-runtimes, --list-sdks, --version, build, list, test.
+Subcommands: build, list, test. Flags: --info, --list-runtimes, --list-sdks, --version.
 
 ### `env`
 
@@ -214,31 +236,43 @@ Safe unless dangerous flags: -delete, -ok, -okdir, -fls, -fprint, -fprint0, -fpr
 
 ### `fnm`
 
-Allowed: --version, current, default, list, ls-remote.
+Subcommands: current, default, list, ls-remote. Flags: --version.
 
 ### `gem`
 
-Allowed: --version, contents, dependency, environment, help, info, list, outdated, pristine, search, sources, specification, stale, which.
+Subcommands: contents, dependency, environment, help, info, list, outdated, pristine, search, sources, specification, stale, which. Flags: --version.
 
 ### `gh`
 
-Read-only subcommands (checks, diff, list, status, verify, view): attestation, cache, codespace, extension, gpg-key, issue, label, pr, release, repo, run, ssh-key, variable, workflow. Always safe: --version, search, status. Guarded: auth (status, token only), browse (requires: --no-browser), api (GET only, no body flags).
+Subcommands attestation, cache, codespace, extension, gpg-key, issue, label, pr, release, repo, run, ssh-key, variable, workflow are allowed with actions: checks, diff, list, status, verify, view.
+
+Always safe: --version, search, status.
+
+Guarded: auth (status, token only), browse (requires: --no-browser), api (GET only, no body flags).
 
 ### `git`
 
-Allowed: --version, blame, cat-file, check-ignore, count-objects, describe, diff, diff-tree, fetch, for-each-ref, grep, help, log, ls-files, ls-remote, ls-tree, merge-base, merge-tree, name-rev, reflog, rev-parse, shortlog, show, status, verify-commit, verify-tag. Guarded: remote (deny add, prune, remove, rename, set-branches, set-url), branch (deny --copy, --delete, --edit-description, --move, --set-upstream-to, --unset-upstream, -C, -D, -M, -c, -d, -m, -u), stash (list, show only), tag (list only, deny --annotate, --delete, --force, --sign, -a, -d, -f, -s), config (--get, --get-all, --get-regexp, --list, -l only), worktree (list only), notes (list, show only). Supports `-C <dir>` prefix.
+Subcommands: blame, cat-file, check-ignore, count-objects, describe, diff, diff-tree, fetch, for-each-ref, grep, help, log, ls-files, ls-remote, ls-tree, merge-base, merge-tree, name-rev, reflog, rev-parse, shortlog, show, status, verify-commit, verify-tag.
+
+Flags: --version.
+
+Guarded: remote (deny add, prune, remove, rename, set-branches, set-url), branch (deny --copy, --delete, --edit-description, --move, --set-upstream-to, --unset-upstream, -C, -D, -M, -c, -d, -m, -u), stash (list, show only), tag (list only, deny --annotate, --delete, --force, --sign, -a, -d, -f, -s), config (--get, --get-all, --get-regexp, --list, -l only), worktree (list only), notes (list, show only). Supports `-C <dir>` prefix.
 
 ### `glab`
 
-Read-only subcommands (diff, issues, list, status, view): ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable. Always safe: --version, -v, check-update, version. Guarded: auth (status only), api (GET only, no body flags).
+Subcommands ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable are allowed with actions: diff, issues, list, status, view.
+
+Always safe: --version, -v, check-update, version.
+
+Guarded: auth (status only), api (GET only, no body flags).
 
 ### `go`
 
-Allowed: --version, build, doc, env, list, test, version, vet.
+Subcommands: build, doc, env, list, test, version, vet. Flags: --version.
 
 ### `gradle / gradlew`
 
-Allowed: --version, build, check, dependencies, properties, tasks, test.
+Subcommands: build, check, dependencies, properties, tasks, test. Flags: --version.
 
 ### `hyperfine`
 
@@ -246,11 +280,15 @@ Recursively validates each benchmarked command. Denied if --prepare, --cleanup, 
 
 ### `jj`
 
-Allowed: --version, diff, help, log, show, st, status. Multi-word: bookmark list, config get/list, file show, git fetch, op log. Skips global flags: standalone (--debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose), valued (--at-op, --at-operation, --color, --repository, -R).
+Subcommands: bookmark list, config get, config list, diff, file show, git fetch, git remote list, help, log, op log, show, st, status.
+
+Flags: --version.
+
+Skips global flags: standalone (--debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose), valued (--at-op, --at-operation, --color, --repository, -R).
 
 ### `launchctl`
 
-Allowed: blame, dumpstate, error, examine, help, hostinfo, list, print, print-cache, print-disabled, resolveport, version.
+Subcommands: blame, dumpstate, error, examine, help, hostinfo, list, print, print-cache, print-disabled, resolveport, version.
 
 ### `lipo`
 
@@ -258,19 +296,19 @@ Requires: -archs, -detailed_info, -info, -verify_arch. Denied: -output.
 
 ### `llm`
 
-Allowed: --version, aliases, collections, logs, models, plugins, templates.
+Subcommands: aliases, collections, logs, models, plugins, templates. Flags: --version.
 
 ### `log`
 
-Allowed: help, show, stats, stream.
+Subcommands: help, show, stats, stream.
 
 ### `mise`
 
-Allowed: --version, current, doctor, list, ls, which. Multi-word: settings get.
+Subcommands: current, doctor, list, ls, settings get, which. Flags: --version.
 
 ### `mvn / mvnw`
 
-Allowed: --version, -v, compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify.
+Subcommands: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify. Flags: --version, -v.
 
 ### `networksetup`
 
@@ -282,7 +320,11 @@ Skips priority flags (-n/--adjustment), then recursively validates the inner com
 
 ### `npm`
 
-Allowed: --version, audit, doctor, explain, fund, info, list, ls, outdated, prefix, root, test, view, why. Guarded: config (list/get only), run/run-script (test/test:* only).
+Subcommands: audit, doctor, explain, fund, info, list, ls, outdated, prefix, root, test, view, why.
+
+Flags: --version.
+
+Guarded: config (list/get only), run/run-script (test/test:* only).
 
 ### `npx`
 
@@ -290,11 +332,11 @@ Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma
 
 ### `nvm`
 
-Allowed: --version, current, list, ls, ls-remote, version, which.
+Subcommands: current, list, ls, ls-remote, version, which. Flags: --version.
 
 ### `ollama`
 
-Allowed: --version, list, ps, show.
+Subcommands: list, ps, show. Flags: --version.
 
 ### `perl`
 
@@ -302,7 +344,11 @@ Allowed: -e/-E inline one-liners with safe code, --version, --help, -v, -V. Bloc
 
 ### `pip / pip3`
 
-Allowed: --version, check, debug, freeze, help, index, inspect, list, show. Guarded: config (list/get only).
+Subcommands: check, debug, freeze, help, index, inspect, list, show.
+
+Flags: --version.
+
+Guarded: config (list/get only).
 
 ### `pkgutil`
 
@@ -310,31 +356,31 @@ Requires: --check-signature, --export-plist, --file-info, --file-info-plist, --f
 
 ### `plutil`
 
-Allowed: -help, -lint, -p, -type.
+Flags: -help, -lint, -p, -type.
 
 ### `pnpm`
 
-Allowed: --version, audit, list, ls, outdated, why.
+Subcommands: audit, list, ls, outdated, why. Flags: --version.
 
 ### `poetry`
 
-Allowed: --version, check, show. Multi-word: env info/list.
+Subcommands: check, env info, env list, show. Flags: --version.
 
 ### `pyenv`
 
-Allowed: --version, help, root, shims, version, versions, which.
+Subcommands: help, root, shims, version, versions, which. Flags: --version.
 
 ### `rbenv`
 
-Allowed: --version, help, root, shims, version, versions, which.
+Subcommands: help, root, shims, version, versions, which. Flags: --version.
 
 ### `rustup`
 
-Allowed: --version, doc, show, which. Multi-word: component list, target list, toolchain list.
+Subcommands: component list, doc, show, target list, toolchain list, which. Flags: --version.
 
 ### `security`
 
-Allowed: cms, dump-keychain, dump-trust-settings, find-certificate, find-generic-password, find-identity, find-internet-password, list-keychains, show-keychain-info, smartcard, verify-cert.
+Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, find-generic-password, find-identity, find-internet-password, list-keychains, show-keychain-info, smartcard, verify-cert.
 
 ### `sed`
 
@@ -346,7 +392,7 @@ Safe unless -o/--output or --compress-program flag.
 
 ### `swift`
 
-Allowed: --version, build, test. Multi-word: package describe/dump-package/show-dependencies.
+Subcommands: build, package describe, package dump-package, package show-dependencies, test. Flags: --version.
 
 ### `sysctl`
 
@@ -354,7 +400,11 @@ Safe unless -w/--write flag or key=value assignment syntax.
 
 ### `tea`
 
-Read-only subcommands (list, view): b, branch, branches, i, issue, issues, label, labels, milestone, milestones, ms, n, notification, notifications, org, organization, organizations, pr, pull, pulls, r, release, releases, repo, repos, t, time, times. Bare subcommand (no action) also safe for read-only subcommands. Always safe: --version, -v, whoami. Guarded: logins/login (list only).
+Subcommands b, branch, branches, i, issue, issues, label, labels, milestone, milestones, ms, n, notification, notifications, org, organization, organizations, pr, pull, pulls, r, release, releases, repo, repos, t, time, times are allowed with actions: list, view. Bare subcommand (no action) is also safe.
+
+Always safe: --version, -v, whoami.
+
+Guarded: logins/login (list only).
 
 ### `time`
 
@@ -366,11 +416,11 @@ Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recu
 
 ### `uv`
 
-Allowed: --version. Multi-word: pip check/freeze/list/show, python list, tool list.
+Subcommands: pip check, pip freeze, pip list, pip show, python list, tool list. Flags: --version.
 
 ### `volta`
 
-Allowed: --version, list, which.
+Subcommands: list, which. Flags: --version.
 
 ### `xargs`
 
@@ -382,11 +432,15 @@ Allowed: -p/--print-path, -v/--version. Denied: -s/--switch, -r/--reset, --insta
 
 ### `xcodebuild`
 
-Allowed: -list, -showBuildSettings, -showdestinations, -showsdks, -version.
+Flags: -list, -showBuildSettings, -showdestinations, -showsdks, -version.
 
 ### `xcrun`
 
-Allowed: --find, --show-sdk-build-version, --show-sdk-path, --show-sdk-platform-path, --show-sdk-platform-version, --show-sdk-version, --show-toolchain-path. Also: simctl list. Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.
+Subcommands: simctl list.
+
+Flags: --find, --show-sdk-build-version, --show-sdk-path, --show-sdk-platform-path, --show-sdk-platform-version, --show-sdk-version, --show-toolchain-path.
+
+Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.
 
 ### `xmllint`
 
@@ -394,7 +448,11 @@ Safe unless --output flag.
 
 ### `yarn`
 
-Allowed: --version, info, list, ls, why. Also allowed: test, test:*.
+Subcommands: info, list, ls, why.
+
+Flags: --version.
+
+Also allowed: test, test:*.
 
 ### `yq`
 
