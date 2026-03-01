@@ -170,20 +170,36 @@ pub fn is_safe_tea(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
+    use crate::docs::{CommandDoc, describe_wordset, describe_flagcheck};
+    let actions = describe_wordset(&READ_ONLY_ACTIONS).trim_start_matches("Allowed: ").trim_end_matches('.').to_string();
     vec![
-        CommandDoc::handler("gh",
-            "Read-only subcommands (view/list/status/diff/checks/verify): pr, issue, repo, release, run, workflow, label, codespace, variable, extension, cache, attestation, gpg-key, ssh-key. \
-             Always safe: search, status. \
-             Guarded: auth (status/token only), browse (requires --no-browser), api (GET only, no body flags)."),
-        CommandDoc::handler("glab",
-            "Read-only subcommands (view/list/status/diff/issues): mr, issue, repo, release, ci, label, milestone, snippet, variable, deploy-key, gpg-key, ssh-key, incident, iteration, cluster, schedule, stack. \
-             Always safe: version, check-update. \
-             Guarded: auth (status only), api (GET only, no body flags)."),
-        CommandDoc::handler("tea",
-            "Read-only subcommands (list/view): issues, pulls, labels, milestones, releases, times, organizations, repos, branches, notifications. \
+        CommandDoc::handler("gh", format!(
+            "Read-only subcommands ({actions}): {}. \
+             Always safe: {}. \
+             Guarded: auth ({} only), browse ({}), api (GET only, no body flags).",
+            describe_wordset(&READ_ONLY_SUBCOMMANDS).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&ALWAYS_SAFE_SUBCOMMANDS).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&AUTH_SAFE_ACTIONS).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_flagcheck(&GH_BROWSE).trim_end_matches('.').to_lowercase(),
+        )),
+        CommandDoc::handler("glab", format!(
+            "Read-only subcommands ({}): {}. \
+             Always safe: {}. \
+             Guarded: auth ({} only), api (GET only, no body flags).",
+            describe_wordset(&GLAB_READ_ONLY_ACTIONS).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&GLAB_READ_ONLY_SUBCOMMANDS).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&GLAB_ALWAYS_SAFE).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&GLAB_AUTH_SAFE).trim_start_matches("Allowed: ").trim_end_matches('.'),
+        )),
+        CommandDoc::handler("tea", format!(
+            "Read-only subcommands ({}): {}. \
              Bare subcommand (no action) also safe for read-only subcommands. \
-             Always safe: whoami. Guarded: logins/login (list only)."),
+             Always safe: {}. Guarded: logins/login ({} only).",
+            describe_wordset(&TEA_READ_ONLY_ACTIONS).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&TEA_READ_ONLY_SUBCOMMANDS).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&TEA_ALWAYS_SAFE).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&TEA_LOGIN_SAFE).trim_start_matches("Allowed: ").trim_end_matches('.'),
+        )),
     ]
 }
 

@@ -222,15 +222,15 @@ Allowed: --version, contents, dependency, environment, help, info, list, outdate
 
 ### `gh`
 
-Read-only subcommands (view/list/status/diff/checks/verify): pr, issue, repo, release, run, workflow, label, codespace, variable, extension, cache, attestation, gpg-key, ssh-key. Always safe: search, status. Guarded: auth (status/token only), browse (requires --no-browser), api (GET only, no body flags).
+Read-only subcommands (checks, diff, list, status, verify, view): attestation, cache, codespace, extension, gpg-key, issue, label, pr, release, repo, run, ssh-key, variable, workflow. Always safe: --version, search, status. Guarded: auth (status, token only), browse (requires: --no-browser), api (GET only, no body flags).
 
 ### `git`
 
-Read-only: log, diff, show, status, ls-tree, grep, rev-parse, merge-base, merge-tree, fetch, help, shortlog, describe, blame, reflog, ls-files, ls-remote, diff-tree, cat-file, check-ignore, name-rev, for-each-ref, count-objects, verify-commit, verify-tag. Guarded: remote (deny add/remove/rename/set-url/prune), branch (deny -d/-m/-c/--delete/--move/--copy), stash (list, show only), tag (list only, deny -d/-a/-s/-f), config (--list/--get/--get-all/--get-regexp/-l only), worktree (list only), notes (show, list only). Supports `-C <dir>` prefix.
+Allowed: --version, blame, cat-file, check-ignore, count-objects, describe, diff, diff-tree, fetch, for-each-ref, grep, help, log, ls-files, ls-remote, ls-tree, merge-base, merge-tree, name-rev, reflog, rev-parse, shortlog, show, status, verify-commit, verify-tag. Guarded: remote (deny add, prune, remove, rename, set-branches, set-url), branch (deny --copy, --delete, --edit-description, --move, --set-upstream-to, --unset-upstream, -C, -D, -M, -c, -d, -m, -u), stash (list, show only), tag (list only, deny --annotate, --delete, --force, --sign, -a, -d, -f, -s), config (--get, --get-all, --get-regexp, --list, -l only), worktree (list only), notes (list, show only). Supports `-C <dir>` prefix.
 
 ### `glab`
 
-Read-only subcommands (view/list/status/diff/issues): mr, issue, repo, release, ci, label, milestone, snippet, variable, deploy-key, gpg-key, ssh-key, incident, iteration, cluster, schedule, stack. Always safe: version, check-update. Guarded: auth (status only), api (GET only, no body flags).
+Read-only subcommands (diff, issues, list, status, view): ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable. Always safe: --version, -v, check-update, version. Guarded: auth (status only), api (GET only, no body flags).
 
 ### `go`
 
@@ -246,7 +246,7 @@ Recursively validates each benchmarked command. Denied if --prepare, --cleanup, 
 
 ### `jj`
 
-Read-only: log, diff, show, status, st, help, --version. Multi-word: op log, file show, config get/list, bookmark list, git fetch, git remote list. Skips global flags: --ignore-working-copy, --no-pager, --quiet, --verbose, --debug, --ignore-immutable, --color, -R/--repository, --at-op/--at-operation.
+Allowed: --version, diff, help, log, show, st, status. Multi-word: bookmark list, config get/list, file show, git fetch, op log. Skips global flags: standalone (--debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose), valued (--at-op, --at-operation, --color, --repository, -R).
 
 ### `launchctl`
 
@@ -354,7 +354,7 @@ Safe unless -w/--write flag or key=value assignment syntax.
 
 ### `tea`
 
-Read-only subcommands (list/view): issues, pulls, labels, milestones, releases, times, organizations, repos, branches, notifications. Bare subcommand (no action) also safe for read-only subcommands. Always safe: whoami. Guarded: logins/login (list only).
+Read-only subcommands (list, view): b, branch, branches, i, issue, issues, label, labels, milestone, milestones, ms, n, notification, notifications, org, organization, organizations, pr, pull, pulls, r, release, releases, repo, repos, t, time, times. Bare subcommand (no action) also safe for read-only subcommands. Always safe: --version, -v, whoami. Guarded: logins/login (list only).
 
 ### `time`
 
