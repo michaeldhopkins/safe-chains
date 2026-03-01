@@ -155,558 +155,120 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn brew_list() {
-        assert!(check("brew list"));
-    }
-
-    #[test]
-    fn brew_info() {
-        assert!(check("brew info node"));
-    }
-
-    #[test]
-    fn brew_version() {
-        assert!(check("brew --version"));
-    }
-
-    #[test]
-    fn brew_search() {
-        assert!(check("brew search node"));
-    }
-
-    #[test]
-    fn brew_deps() {
-        assert!(check("brew deps node"));
-    }
-
-    #[test]
-    fn brew_uses() {
-        assert!(check("brew uses --installed openssl"));
-    }
-
-    #[test]
-    fn brew_leaves() {
-        assert!(check("brew leaves"));
-    }
-
-    #[test]
-    fn brew_outdated() {
-        assert!(check("brew outdated"));
-    }
-
-    #[test]
-    fn brew_cat() {
-        assert!(check("brew cat node"));
-    }
-
-    #[test]
-    fn brew_desc() {
-        assert!(check("brew desc node"));
-    }
-
-    #[test]
-    fn brew_config() {
-        assert!(check("brew config"));
-    }
-
-    #[test]
-    fn brew_doctor() {
-        assert!(check("brew doctor"));
-    }
-
-    #[test]
-    fn brew_tap() {
-        assert!(check("brew tap"));
-    }
-
-    #[test]
-    fn brew_shellenv() {
-        assert!(check("brew shellenv"));
-    }
-
-    #[test]
-    fn brew_prefix() {
-        assert!(check("brew --prefix"));
-    }
-
-    #[test]
-    fn brew_prefix_formula() {
-        assert!(check("brew --prefix libiconv"));
-    }
-
-    #[test]
-    fn brew_install_denied() {
-        assert!(!check("brew install node"));
-    }
-
-    #[test]
-    fn brew_uninstall_denied() {
-        assert!(!check("brew uninstall node"));
-    }
-
-    #[test]
-    fn brew_services_denied() {
-        assert!(!check("brew services list"));
-    }
-
-    #[test]
-    fn brew_upgrade_denied() {
-        assert!(!check("brew upgrade"));
-    }
-
-    #[test]
-    fn mise_ls() {
-        assert!(check("mise ls"));
-    }
-
-    #[test]
-    fn mise_list() {
-        assert!(check("mise list ruby"));
-    }
-
-    #[test]
-    fn mise_current() {
-        assert!(check("mise current ruby"));
-    }
-
-    #[test]
-    fn mise_which() {
-        assert!(check("mise which ruby"));
-    }
-
-    #[test]
-    fn mise_doctor() {
-        assert!(check("mise doctor"));
-    }
-
-    #[test]
-    fn mise_version() {
-        assert!(check("mise --version"));
-    }
-
-    #[test]
-    fn mise_settings_get() {
-        assert!(check("mise settings get experimental"));
-    }
-
-    #[test]
-    fn mise_install_denied() {
-        assert!(!check("mise install ruby@3.4"));
-    }
-
-    #[test]
-    fn mise_exec_denied() {
-        assert!(!check("mise exec -- ruby foo.rb"));
-    }
-
-    #[test]
-    fn mise_use_denied() {
-        assert!(!check("mise use ruby@3.4"));
-    }
-
-    #[test]
-    fn mise_env() {
-        assert!(check("mise env"));
-    }
-
-    #[test]
-    fn mise_config_ls() {
-        assert!(check("mise config ls"));
-    }
-
-    #[test]
-    fn mise_config_list() {
-        assert!(check("mise config list"));
-    }
-
-    #[test]
-    fn mise_config_set_denied() {
-        assert!(!check("mise config set key value"));
-    }
-
-    #[test]
-    fn mise_config_bare_denied() {
-        assert!(!check("mise config"));
-    }
-
-    #[test]
-    fn asdf_current() {
-        assert!(check("asdf current ruby"));
-    }
-
-    #[test]
-    fn asdf_which() {
-        assert!(check("asdf which ruby"));
-    }
-
-    #[test]
-    fn asdf_help() {
-        assert!(check("asdf help"));
-    }
-
-    #[test]
-    fn asdf_list() {
-        assert!(check("asdf list ruby"));
-    }
-
-    #[test]
-    fn asdf_version() {
-        assert!(check("asdf --version"));
-    }
-
-    #[test]
-    fn asdf_version_bare() {
-        assert!(check("asdf version"));
-    }
-
-    #[test]
-    fn asdf_info() {
-        assert!(check("asdf info"));
-    }
-
-    #[test]
-    fn asdf_plugin_list() {
-        assert!(check("asdf plugin list"));
-    }
-
-    #[test]
-    fn asdf_plugin_list_all() {
-        assert!(check("asdf plugin list all"));
-    }
-
-    #[test]
-    fn asdf_plugin_list_legacy() {
-        assert!(check("asdf plugin-list"));
-    }
-
-    #[test]
-    fn asdf_plugin_list_all_legacy() {
-        assert!(check("asdf plugin-list-all"));
-    }
-
-    #[test]
-    fn asdf_plugin_add_denied() {
-        assert!(!check("asdf plugin add ruby"));
-    }
-
-    #[test]
-    fn asdf_install_denied() {
-        assert!(!check("asdf install ruby 3.4"));
-    }
-
-    #[test]
-    fn defaults_read() {
-        assert!(check("defaults read com.apple.finder"));
-    }
-
-    #[test]
-    fn defaults_read_type() {
-        assert!(check("defaults read-type com.apple.finder ShowPathbar"));
-    }
-
-    #[test]
-    fn defaults_domains() {
-        assert!(check("defaults domains"));
-    }
-
-    #[test]
-    fn defaults_find() {
-        assert!(check("defaults find finder"));
-    }
-
-    #[test]
-    fn defaults_export() {
-        assert!(check("defaults export com.apple.finder -"));
-    }
-
-    #[test]
-    fn defaults_write_denied() {
-        assert!(!check("defaults write com.apple.finder ShowPathbar -bool true"));
-    }
-
-    #[test]
-    fn defaults_delete_denied() {
-        assert!(!check("defaults delete com.apple.finder"));
-    }
-
-    #[test]
-    fn sysctl_read() {
-        assert!(check("sysctl kern.maxproc"));
-    }
-
-    #[test]
-    fn sysctl_all() {
-        assert!(check("sysctl -a"));
-    }
-
-    #[test]
-    fn sysctl_write_denied() {
-        assert!(!check("sysctl -w kern.maxproc=2048"));
-    }
-
-    #[test]
-    fn sysctl_write_long_denied() {
-        assert!(!check("sysctl --write kern.maxproc=2048"));
-    }
-
-    #[test]
-    fn sysctl_assign_denied() {
-        assert!(!check("sysctl kern.maxproc=2048"));
-    }
-
-    #[test]
-    fn cmake_version() {
-        assert!(check("cmake --version"));
-    }
-
-    #[test]
-    fn cmake_system_information() {
-        assert!(check("cmake --system-information"));
-    }
-
-    #[test]
-    fn cmake_build_denied() {
-        assert!(!check("cmake --build ."));
-    }
-
-    #[test]
-    fn cmake_generate_denied() {
-        assert!(!check("cmake ."));
-    }
-
-    #[test]
-    fn networksetup_listallhardwareports() {
-        assert!(check("networksetup -listallhardwareports"));
-    }
-
-    #[test]
-    fn networksetup_listallnetworkservices() {
-        assert!(check("networksetup -listallnetworkservices"));
-    }
-
-    #[test]
-    fn networksetup_getinfo() {
-        assert!(check("networksetup -getinfo Wi-Fi"));
-    }
-
-    #[test]
-    fn networksetup_getdnsservers() {
-        assert!(check("networksetup -getdnsservers Wi-Fi"));
-    }
-
-    #[test]
-    fn networksetup_version() {
-        assert!(check("networksetup -version"));
-    }
-
-    #[test]
-    fn networksetup_help() {
-        assert!(check("networksetup -help"));
-    }
-
-    #[test]
-    fn networksetup_setdnsservers_denied() {
-        assert!(!check("networksetup -setdnsservers Wi-Fi 8.8.8.8"));
-    }
-
-    #[test]
-    fn networksetup_setairportpower_denied() {
-        assert!(!check("networksetup -setairportpower en0 on"));
-    }
-
-    #[test]
-    fn networksetup_no_args_denied() {
-        assert!(!check("networksetup"));
-    }
-
-    #[test]
-    fn launchctl_list() {
-        assert!(check("launchctl list"));
-    }
-
-    #[test]
-    fn launchctl_print() {
-        assert!(check("launchctl print system"));
-    }
-
-    #[test]
-    fn launchctl_blame() {
-        assert!(check("launchctl blame system/com.apple.Finder"));
-    }
-
-    #[test]
-    fn launchctl_version() {
-        assert!(check("launchctl version"));
-    }
-
-    #[test]
-    fn launchctl_load_denied() {
-        assert!(!check("launchctl load /Library/LaunchDaemons/foo.plist"));
-    }
-
-    #[test]
-    fn launchctl_start_denied() {
-        assert!(!check("launchctl start com.apple.Finder"));
-    }
-
-    #[test]
-    fn launchctl_stop_denied() {
-        assert!(!check("launchctl stop com.apple.Finder"));
-    }
-
-    #[test]
-    fn launchctl_no_args_denied() {
-        assert!(!check("launchctl"));
-    }
-
-    #[test]
-    fn diskutil_list() {
-        assert!(check("diskutil list"));
-    }
-
-    #[test]
-    fn diskutil_info() {
-        assert!(check("diskutil info disk0"));
-    }
-
-    #[test]
-    fn diskutil_apfs_list() {
-        assert!(check("diskutil apfs list"));
-    }
-
-    #[test]
-    fn diskutil_apfs_list_snapshots() {
-        assert!(check("diskutil apfs listSnapshots disk1s1"));
-    }
-
-    #[test]
-    fn diskutil_apfs_bare_denied() {
-        assert!(!check("diskutil apfs"));
-    }
-
-    #[test]
-    fn diskutil_erase_denied() {
-        assert!(!check("diskutil eraseDisk JHFS+ Untitled disk2"));
-    }
-
-    #[test]
-    fn diskutil_mount_denied() {
-        assert!(!check("diskutil mount disk2s1"));
-    }
-
-    #[test]
-    fn diskutil_unmount_denied() {
-        assert!(!check("diskutil unmount disk2s1"));
-    }
-
-    #[test]
-    fn diskutil_apfs_delete_denied() {
-        assert!(!check("diskutil apfs deleteVolume disk1s2"));
-    }
-
-    #[test]
-    fn diskutil_no_args_denied() {
-        assert!(!check("diskutil"));
-    }
-
-    #[test]
-    fn security_find_identity() {
-        assert!(check("security find-identity -v -p codesigning"));
-    }
-
-    #[test]
-    fn security_find_certificate() {
-        assert!(check("security find-certificate -a"));
-    }
-
-    #[test]
-    fn security_list_keychains() {
-        assert!(check("security list-keychains"));
-    }
-
-    #[test]
-    fn security_verify_cert() {
-        assert!(check("security verify-cert -c cert.pem"));
-    }
-
-    #[test]
-    fn security_add_denied() {
-        assert!(!check("security add-certificates cert.pem"));
-    }
-
-    #[test]
-    fn security_delete_denied() {
-        assert!(!check("security delete-keychain test.keychain"));
-    }
-
-    #[test]
-    fn security_no_args_denied() {
-        assert!(!check("security"));
-    }
-
-    #[test]
-    fn csrutil_status() {
-        assert!(check("csrutil status"));
-    }
-
-    #[test]
-    fn csrutil_report() {
-        assert!(check("csrutil report"));
-    }
-
-    #[test]
-    fn csrutil_enable_denied() {
-        assert!(!check("csrutil enable"));
-    }
-
-    #[test]
-    fn csrutil_disable_denied() {
-        assert!(!check("csrutil disable"));
-    }
-
-    #[test]
-    fn csrutil_clear_denied() {
-        assert!(!check("csrutil clear"));
-    }
-
-    #[test]
-    fn csrutil_no_args_denied() {
-        assert!(!check("csrutil"));
-    }
-
-    #[test]
-    fn log_help() {
-        assert!(check("log help"));
-    }
-
-    #[test]
-    fn log_show() {
-        assert!(check("log show --predicate 'process == \"Safari\"' --last 1h"));
-    }
-
-    #[test]
-    fn log_stats() {
-        assert!(check("log stats"));
-    }
-
-    #[test]
-    fn log_stream() {
-        assert!(check("log stream --level debug"));
-    }
-
-    #[test]
-    fn log_config_denied() {
-        assert!(!check("log config --mode level:debug"));
-    }
-
-    #[test]
-    fn log_erase_denied() {
-        assert!(!check("log erase --all"));
-    }
-
-    #[test]
-    fn log_no_args_denied() {
-        assert!(!check("log"));
+    safe! {
+        brew_list: "brew list",
+        brew_info: "brew info node",
+        brew_version: "brew --version",
+        brew_search: "brew search node",
+        brew_deps: "brew deps node",
+        brew_uses: "brew uses --installed openssl",
+        brew_leaves: "brew leaves",
+        brew_outdated: "brew outdated",
+        brew_cat: "brew cat node",
+        brew_desc: "brew desc node",
+        brew_config: "brew config",
+        brew_doctor: "brew doctor",
+        brew_tap: "brew tap",
+        brew_shellenv: "brew shellenv",
+        brew_prefix: "brew --prefix",
+        brew_prefix_formula: "brew --prefix libiconv",
+        mise_ls: "mise ls",
+        mise_list: "mise list ruby",
+        mise_current: "mise current ruby",
+        mise_which: "mise which ruby",
+        mise_doctor: "mise doctor",
+        mise_version: "mise --version",
+        mise_settings_get: "mise settings get experimental",
+        mise_env: "mise env",
+        mise_config_ls: "mise config ls",
+        mise_config_list: "mise config list",
+        asdf_current: "asdf current ruby",
+        asdf_which: "asdf which ruby",
+        asdf_help: "asdf help",
+        asdf_list: "asdf list ruby",
+        asdf_version: "asdf --version",
+        asdf_version_bare: "asdf version",
+        asdf_info: "asdf info",
+        asdf_plugin_list: "asdf plugin list",
+        asdf_plugin_list_all: "asdf plugin list all",
+        asdf_plugin_list_legacy: "asdf plugin-list",
+        asdf_plugin_list_all_legacy: "asdf plugin-list-all",
+        defaults_read: "defaults read com.apple.finder",
+        defaults_read_type: "defaults read-type com.apple.finder ShowPathbar",
+        defaults_domains: "defaults domains",
+        defaults_find: "defaults find finder",
+        defaults_export: "defaults export com.apple.finder -",
+        sysctl_read: "sysctl kern.maxproc",
+        sysctl_all: "sysctl -a",
+        cmake_version: "cmake --version",
+        cmake_system_information: "cmake --system-information",
+        networksetup_listallhardwareports: "networksetup -listallhardwareports",
+        networksetup_listallnetworkservices: "networksetup -listallnetworkservices",
+        networksetup_getinfo: "networksetup -getinfo Wi-Fi",
+        networksetup_getdnsservers: "networksetup -getdnsservers Wi-Fi",
+        networksetup_version: "networksetup -version",
+        networksetup_help: "networksetup -help",
+        launchctl_list: "launchctl list",
+        launchctl_print: "launchctl print system",
+        launchctl_blame: "launchctl blame system/com.apple.Finder",
+        launchctl_version: "launchctl version",
+        diskutil_list: "diskutil list",
+        diskutil_info: "diskutil info disk0",
+        diskutil_apfs_list: "diskutil apfs list",
+        diskutil_apfs_list_snapshots: "diskutil apfs listSnapshots disk1s1",
+        security_find_identity: "security find-identity -v -p codesigning",
+        security_find_certificate: "security find-certificate -a",
+        security_list_keychains: "security list-keychains",
+        security_verify_cert: "security verify-cert -c cert.pem",
+        csrutil_status: "csrutil status",
+        csrutil_report: "csrutil report",
+        log_help: "log help",
+        log_show: "log show --predicate 'process == \"Safari\"' --last 1h",
+        log_stats: "log stats",
+        log_stream: "log stream --level debug",
+    }
+
+    denied! {
+        brew_install_denied: "brew install node",
+        brew_uninstall_denied: "brew uninstall node",
+        brew_services_denied: "brew services list",
+        brew_upgrade_denied: "brew upgrade",
+        mise_install_denied: "mise install ruby@3.4",
+        mise_exec_denied: "mise exec -- ruby foo.rb",
+        mise_use_denied: "mise use ruby@3.4",
+        mise_config_set_denied: "mise config set key value",
+        mise_config_bare_denied: "mise config",
+        asdf_plugin_add_denied: "asdf plugin add ruby",
+        asdf_install_denied: "asdf install ruby 3.4",
+        defaults_write_denied: "defaults write com.apple.finder ShowPathbar -bool true",
+        defaults_delete_denied: "defaults delete com.apple.finder",
+        sysctl_write_denied: "sysctl -w kern.maxproc=2048",
+        sysctl_write_long_denied: "sysctl --write kern.maxproc=2048",
+        sysctl_assign_denied: "sysctl kern.maxproc=2048",
+        cmake_build_denied: "cmake --build .",
+        cmake_generate_denied: "cmake .",
+        networksetup_setdnsservers_denied: "networksetup -setdnsservers Wi-Fi 8.8.8.8",
+        networksetup_setairportpower_denied: "networksetup -setairportpower en0 on",
+        networksetup_no_args_denied: "networksetup",
+        launchctl_load_denied: "launchctl load /Library/LaunchDaemons/foo.plist",
+        launchctl_start_denied: "launchctl start com.apple.Finder",
+        launchctl_stop_denied: "launchctl stop com.apple.Finder",
+        launchctl_no_args_denied: "launchctl",
+        diskutil_apfs_bare_denied: "diskutil apfs",
+        diskutil_erase_denied: "diskutil eraseDisk JHFS+ Untitled disk2",
+        diskutil_mount_denied: "diskutil mount disk2s1",
+        diskutil_unmount_denied: "diskutil unmount disk2s1",
+        diskutil_apfs_delete_denied: "diskutil apfs deleteVolume disk1s2",
+        diskutil_no_args_denied: "diskutil",
+        security_add_denied: "security add-certificates cert.pem",
+        security_delete_denied: "security delete-keychain test.keychain",
+        security_no_args_denied: "security",
+        csrutil_enable_denied: "csrutil enable",
+        csrutil_disable_denied: "csrutil disable",
+        csrutil_clear_denied: "csrutil clear",
+        csrutil_no_args_denied: "csrutil",
+        log_config_denied: "log config --mode level:debug",
+        log_erase_denied: "log erase --all",
+        log_no_args_denied: "log",
     }
 }

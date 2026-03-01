@@ -22,98 +22,28 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn composer_show() {
-        assert!(check("composer show"));
+    safe! {
+        composer_show: "composer show",
+        composer_show_package: "composer show laravel/framework",
+        composer_info: "composer info",
+        composer_diagnose: "composer diagnose",
+        composer_outdated: "composer outdated",
+        composer_licenses: "composer licenses",
+        composer_check_platform_reqs: "composer check-platform-reqs",
+        composer_suggests: "composer suggests",
+        composer_fund: "composer fund",
+        composer_audit: "composer audit",
+        composer_version: "composer --version",
+        composer_about: "composer about",
+        composer_help: "composer help",
     }
 
-    #[test]
-    fn composer_show_package() {
-        assert!(check("composer show laravel/framework"));
-    }
-
-    #[test]
-    fn composer_info() {
-        assert!(check("composer info"));
-    }
-
-    #[test]
-    fn composer_diagnose() {
-        assert!(check("composer diagnose"));
-    }
-
-    #[test]
-    fn composer_outdated() {
-        assert!(check("composer outdated"));
-    }
-
-    #[test]
-    fn composer_licenses() {
-        assert!(check("composer licenses"));
-    }
-
-    #[test]
-    fn composer_check_platform_reqs() {
-        assert!(check("composer check-platform-reqs"));
-    }
-
-    #[test]
-    fn composer_suggests() {
-        assert!(check("composer suggests"));
-    }
-
-    #[test]
-    fn composer_fund() {
-        assert!(check("composer fund"));
-    }
-
-    #[test]
-    fn composer_audit() {
-        assert!(check("composer audit"));
-    }
-
-    #[test]
-    fn composer_version() {
-        assert!(check("composer --version"));
-    }
-
-    #[test]
-    fn composer_about() {
-        assert!(check("composer about"));
-    }
-
-    #[test]
-    fn composer_help() {
-        assert!(check("composer help"));
-    }
-
-    #[test]
-    fn composer_install_denied() {
-        assert!(!check("composer install"));
-    }
-
-    #[test]
-    fn composer_update_denied() {
-        assert!(!check("composer update"));
-    }
-
-    #[test]
-    fn composer_require_denied() {
-        assert!(!check("composer require laravel/framework"));
-    }
-
-    #[test]
-    fn composer_remove_denied() {
-        assert!(!check("composer remove laravel/framework"));
-    }
-
-    #[test]
-    fn composer_run_script_denied() {
-        assert!(!check("composer run-script test"));
-    }
-
-    #[test]
-    fn bare_composer_denied() {
-        assert!(!check("composer"));
+    denied! {
+        composer_install_denied: "composer install",
+        composer_update_denied: "composer update",
+        composer_require_denied: "composer require laravel/framework",
+        composer_remove_denied: "composer remove laravel/framework",
+        composer_run_script_denied: "composer run-script test",
+        bare_composer_denied: "composer",
     }
 }

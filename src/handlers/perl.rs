@@ -330,223 +330,53 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn perl_version() {
-        assert!(check("perl --version"));
+    safe! {
+        perl_version: "perl --version",
+        perl_help: "perl --help",
+        perl_v: "perl -v",
+        perl_big_v: "perl -V",
+        perl_print_hello: "perl -e 'print \"hello\\n\"'",
+        perl_say: "perl -E 'say \"hello\"'",
+        perl_ne_grep: "perl -ne 'print if /pattern/' file.txt",
+        perl_pe_substitute: "perl -pe 's/foo/bar/g' file.txt",
+        perl_lane_field: "perl -lane 'print $F[0]' file.txt",
+        perl_chomp_split_join: "perl -ne 'chomp; print join(\",\", split(/\\t/)), \"\\n\"'",
+        perl_tr_transliterate: "perl -pe 'tr/a-z/A-Z/' file.txt",
+        perl_begin_end_count: "perl -ne 'BEGIN{$n=0} $n++; END{print $n}'",
+        perl_ne_word_pattern: "perl -ne 'print if /\\berror\\b/' log.txt",
+        perl_my_variable: "perl -e 'my $x = 1; print $x'",
+        perl_keys_values: "perl -e 'my %h; print keys %h'",
+        perl_string_containing_system: "perl -e 'print \"system is down\\n\"'",
+        perl_substitute_alternate_delim: "perl -pe 's{error_count}{warning_count}g' file.txt",
+        perl_match_with_if: "perl -ne 'print if /TODO/' file.txt",
+        perl_match_after_unless: "perl -ne 'print unless /^#/' file.txt",
+        perl_module_flag: "perl -MList::Util -e 'print length \"test\"'",
+        perl_include_flag: "perl -Ilib -e 'print \"ok\\n\"'",
     }
 
-    #[test]
-    fn perl_help() {
-        assert!(check("perl --help"));
-    }
-
-    #[test]
-    fn perl_v() {
-        assert!(check("perl -v"));
-    }
-
-    #[test]
-    fn perl_big_v() {
-        assert!(check("perl -V"));
-    }
-
-    #[test]
-    fn perl_print_hello() {
-        assert!(check("perl -e 'print \"hello\\n\"'"));
-    }
-
-    #[test]
-    fn perl_say() {
-        assert!(check("perl -E 'say \"hello\"'"));
-    }
-
-    #[test]
-    fn perl_ne_grep() {
-        assert!(check("perl -ne 'print if /pattern/' file.txt"));
-    }
-
-    #[test]
-    fn perl_pe_substitute() {
-        assert!(check("perl -pe 's/foo/bar/g' file.txt"));
-    }
-
-    #[test]
-    fn perl_lane_field() {
-        assert!(check("perl -lane 'print $F[0]' file.txt"));
-    }
-
-    #[test]
-    fn perl_chomp_split_join() {
-        assert!(check("perl -ne 'chomp; print join(\",\", split(/\\t/)), \"\\n\"'"));
-    }
-
-    #[test]
-    fn perl_tr_transliterate() {
-        assert!(check("perl -pe 'tr/a-z/A-Z/' file.txt"));
-    }
-
-    #[test]
-    fn perl_begin_end_count() {
-        assert!(check("perl -ne 'BEGIN{$n=0} $n++; END{print $n}'"));
-    }
-
-    #[test]
-    fn perl_ne_word_pattern() {
-        assert!(check("perl -ne 'print if /\\berror\\b/' log.txt"));
-    }
-
-    #[test]
-    fn perl_my_variable() {
-        assert!(check("perl -e 'my $x = 1; print $x'"));
-    }
-
-    #[test]
-    fn perl_keys_values() {
-        assert!(check("perl -e 'my %h; print keys %h'"));
-    }
-
-    #[test]
-    fn perl_string_containing_system() {
-        assert!(check("perl -e 'print \"system is down\\n\"'"));
-    }
-
-    #[test]
-    fn perl_substitute_alternate_delim() {
-        assert!(check("perl -pe 's{error_count}{warning_count}g' file.txt"));
-    }
-
-    #[test]
-    fn perl_match_with_if() {
-        assert!(check("perl -ne 'print if /TODO/' file.txt"));
-    }
-
-    #[test]
-    fn perl_match_after_unless() {
-        assert!(check("perl -ne 'print unless /^#/' file.txt"));
-    }
-
-    #[test]
-    fn perl_module_flag() {
-        assert!(check("perl -MList::Util -e 'print length \"test\"'"));
-    }
-
-    #[test]
-    fn perl_include_flag() {
-        assert!(check("perl -Ilib -e 'print \"ok\\n\"'"));
-    }
-
-    #[test]
-    fn perl_script_file_denied() {
-        assert!(!check("perl script.pl"));
-    }
-
-    #[test]
-    fn perl_no_e_flag_denied() {
-        assert!(!check("perl -n file.txt"));
-    }
-
-    #[test]
-    fn perl_inplace_denied() {
-        assert!(!check("perl -i -pe 's/foo/bar/' file.txt"));
-    }
-
-    #[test]
-    fn perl_inplace_backup_denied() {
-        assert!(!check("perl -i.bak -pe 's/foo/bar/' file.txt"));
-    }
-
-    #[test]
-    fn perl_pie_inplace_denied() {
-        assert!(!check("perl -pie 's/foo/bar/' file.txt"));
-    }
-
-    #[test]
-    fn perl_system_denied() {
-        assert!(!check("perl -e 'system(\"rm -rf /\")'"));
-    }
-
-    #[test]
-    fn perl_exec_denied() {
-        assert!(!check("perl -e 'exec(\"bad\")'"));
-    }
-
-    #[test]
-    fn perl_backtick_denied() {
-        assert!(!check("perl -e 'print `ls`'"));
-    }
-
-    #[test]
-    fn perl_qx_denied() {
-        assert!(!check("perl -e 'qx(ls)'"));
-    }
-
-    #[test]
-    fn perl_eval_denied() {
-        assert!(!check("perl -e 'eval(\"bad code\")'"));
-    }
-
-    #[test]
-    fn perl_open_denied() {
-        assert!(!check("perl -e 'open(FH, \">file\")'"));
-    }
-
-    #[test]
-    fn perl_unlink_denied() {
-        assert!(!check("perl -e 'unlink(\"file\")'"));
-    }
-
-    #[test]
-    fn perl_rename_denied() {
-        assert!(!check("perl -e 'rename(\"a\", \"b\")'"));
-    }
-
-    #[test]
-    fn perl_mkdir_denied() {
-        assert!(!check("perl -e 'mkdir(\"dir\")'"));
-    }
-
-    #[test]
-    fn perl_rmdir_denied() {
-        assert!(!check("perl -e 'rmdir(\"dir\")'"));
-    }
-
-    #[test]
-    fn perl_chmod_denied() {
-        assert!(!check("perl -e 'chmod(0755, \"file\")'"));
-    }
-
-    #[test]
-    fn perl_truncate_denied() {
-        assert!(!check("perl -e 'truncate(\"file\", 0)'"));
-    }
-
-    #[test]
-    fn perl_substitution_eval_denied() {
-        assert!(!check("perl -pe 's/foo/bar/e' file.txt"));
-    }
-
-    #[test]
-    fn perl_substitution_eval_global_denied() {
-        assert!(!check("perl -pe 's/foo/bar/ge' file.txt"));
-    }
-
-    #[test]
-    fn perl_use_denied() {
-        assert!(!check("perl -e 'use POSIX'"));
-    }
-
-    #[test]
-    fn perl_require_denied() {
-        assert!(!check("perl -e 'require POSIX'"));
-    }
-
-    #[test]
-    fn perl_fork_denied() {
-        assert!(!check("perl -e 'fork()'"));
-    }
-
-    #[test]
-    fn perl_socket_denied() {
-        assert!(!check("perl -e 'socket(S, 2, 1, 0)'"));
+    denied! {
+        perl_script_file_denied: "perl script.pl",
+        perl_no_e_flag_denied: "perl -n file.txt",
+        perl_inplace_denied: "perl -i -pe 's/foo/bar/' file.txt",
+        perl_inplace_backup_denied: "perl -i.bak -pe 's/foo/bar/' file.txt",
+        perl_pie_inplace_denied: "perl -pie 's/foo/bar/' file.txt",
+        perl_system_denied: "perl -e 'system(\"rm -rf /\")'",
+        perl_exec_denied: "perl -e 'exec(\"bad\")'",
+        perl_backtick_denied: "perl -e 'print `ls`'",
+        perl_qx_denied: "perl -e 'qx(ls)'",
+        perl_eval_denied: "perl -e 'eval(\"bad code\")'",
+        perl_open_denied: "perl -e 'open(FH, \">file\")'",
+        perl_unlink_denied: "perl -e 'unlink(\"file\")'",
+        perl_rename_denied: "perl -e 'rename(\"a\", \"b\")'",
+        perl_mkdir_denied: "perl -e 'mkdir(\"dir\")'",
+        perl_rmdir_denied: "perl -e 'rmdir(\"dir\")'",
+        perl_chmod_denied: "perl -e 'chmod(0755, \"file\")'",
+        perl_truncate_denied: "perl -e 'truncate(\"file\", 0)'",
+        perl_substitution_eval_denied: "perl -pe 's/foo/bar/e' file.txt",
+        perl_substitution_eval_global_denied: "perl -pe 's/foo/bar/ge' file.txt",
+        perl_use_denied: "perl -e 'use POSIX'",
+        perl_require_denied: "perl -e 'require POSIX'",
+        perl_fork_denied: "perl -e 'fork()'",
+        perl_socket_denied: "perl -e 'socket(S, 2, 1, 0)'",
     }
 }

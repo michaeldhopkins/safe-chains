@@ -30,123 +30,33 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn ollama_list() {
-        assert!(check("ollama list"));
+    safe! {
+        ollama_list: "ollama list",
+        ollama_show: "ollama show llama3",
+        ollama_ps: "ollama ps",
+        ollama_version: "ollama --version",
+        llm_models: "llm models",
+        llm_plugins: "llm plugins",
+        llm_templates: "llm templates",
+        llm_aliases: "llm aliases",
+        llm_logs: "llm logs",
+        llm_collections: "llm collections",
+        llm_version: "llm --version",
     }
 
-    #[test]
-    fn ollama_show() {
-        assert!(check("ollama show llama3"));
-    }
-
-    #[test]
-    fn ollama_ps() {
-        assert!(check("ollama ps"));
-    }
-
-    #[test]
-    fn ollama_run_denied() {
-        assert!(!check("ollama run llama3"));
-    }
-
-    #[test]
-    fn ollama_pull_denied() {
-        assert!(!check("ollama pull llama3"));
-    }
-
-    #[test]
-    fn ollama_rm_denied() {
-        assert!(!check("ollama rm llama3"));
-    }
-
-    #[test]
-    fn ollama_create_denied() {
-        assert!(!check("ollama create mymodel"));
-    }
-
-    #[test]
-    fn ollama_serve_denied() {
-        assert!(!check("ollama serve"));
-    }
-
-    #[test]
-    fn ollama_push_denied() {
-        assert!(!check("ollama push mymodel"));
-    }
-
-    #[test]
-    fn ollama_version() {
-        assert!(check("ollama --version"));
-    }
-
-    #[test]
-    fn ollama_no_args_denied() {
-        assert!(!check("ollama"));
-    }
-
-    #[test]
-    fn llm_models() {
-        assert!(check("llm models"));
-    }
-
-    #[test]
-    fn llm_plugins() {
-        assert!(check("llm plugins"));
-    }
-
-    #[test]
-    fn llm_templates() {
-        assert!(check("llm templates"));
-    }
-
-    #[test]
-    fn llm_aliases() {
-        assert!(check("llm aliases"));
-    }
-
-    #[test]
-    fn llm_logs() {
-        assert!(check("llm logs"));
-    }
-
-    #[test]
-    fn llm_collections() {
-        assert!(check("llm collections"));
-    }
-
-    #[test]
-    fn llm_prompt_denied() {
-        assert!(!check("llm prompt hello"));
-    }
-
-    #[test]
-    fn llm_chat_denied() {
-        assert!(!check("llm chat"));
-    }
-
-    #[test]
-    fn llm_keys_denied() {
-        assert!(!check("llm keys set openai"));
-    }
-
-    #[test]
-    fn llm_install_denied() {
-        assert!(!check("llm install llm-claude-3"));
-    }
-
-    #[test]
-    fn llm_embed_denied() {
-        assert!(!check("llm embed -m 3-small -c hello"));
-    }
-
-    #[test]
-    fn llm_version() {
-        assert!(check("llm --version"));
-    }
-
-    #[test]
-    fn llm_no_args_denied() {
-        assert!(!check("llm"));
+    denied! {
+        ollama_run_denied: "ollama run llama3",
+        ollama_pull_denied: "ollama pull llama3",
+        ollama_rm_denied: "ollama rm llama3",
+        ollama_create_denied: "ollama create mymodel",
+        ollama_serve_denied: "ollama serve",
+        ollama_push_denied: "ollama push mymodel",
+        ollama_no_args_denied: "ollama",
+        llm_prompt_denied: "llm prompt hello",
+        llm_chat_denied: "llm chat",
+        llm_keys_denied: "llm keys set openai",
+        llm_install_denied: "llm install llm-claude-3",
+        llm_embed_denied: "llm embed -m 3-small -c hello",
+        llm_no_args_denied: "llm",
     }
 }

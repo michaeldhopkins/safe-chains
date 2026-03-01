@@ -20,88 +20,26 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn go_version() {
-        assert!(check("go version"));
+    safe! {
+        go_version: "go version",
+        go_env: "go env GOPATH",
+        go_env_bare: "go env",
+        go_list: "go list ./...",
+        go_vet: "go vet ./...",
+        go_test: "go test ./...",
+        go_test_verbose: "go test -v ./...",
+        go_build: "go build ./...",
+        go_doc: "go doc fmt.Println",
+        go_version_flag: "go --version",
     }
 
-    #[test]
-    fn go_env() {
-        assert!(check("go env GOPATH"));
-    }
-
-    #[test]
-    fn go_env_bare() {
-        assert!(check("go env"));
-    }
-
-    #[test]
-    fn go_list() {
-        assert!(check("go list ./..."));
-    }
-
-    #[test]
-    fn go_vet() {
-        assert!(check("go vet ./..."));
-    }
-
-    #[test]
-    fn go_test() {
-        assert!(check("go test ./..."));
-    }
-
-    #[test]
-    fn go_test_verbose() {
-        assert!(check("go test -v ./..."));
-    }
-
-    #[test]
-    fn go_build() {
-        assert!(check("go build ./..."));
-    }
-
-    #[test]
-    fn go_doc() {
-        assert!(check("go doc fmt.Println"));
-    }
-
-    #[test]
-    fn go_run_denied() {
-        assert!(!check("go run main.go"));
-    }
-
-    #[test]
-    fn go_install_denied() {
-        assert!(!check("go install golang.org/x/tools/...@latest"));
-    }
-
-    #[test]
-    fn go_get_denied() {
-        assert!(!check("go get golang.org/x/tools"));
-    }
-
-    #[test]
-    fn go_clean_denied() {
-        assert!(!check("go clean"));
-    }
-
-    #[test]
-    fn go_generate_denied() {
-        assert!(!check("go generate ./..."));
-    }
-
-    #[test]
-    fn go_mod_tidy_denied() {
-        assert!(!check("go mod tidy"));
-    }
-
-    #[test]
-    fn bare_go_denied() {
-        assert!(!check("go"));
-    }
-
-    #[test]
-    fn go_version_flag() {
-        assert!(check("go --version"));
+    denied! {
+        go_run_denied: "go run main.go",
+        go_install_denied: "go install golang.org/x/tools/...@latest",
+        go_get_denied: "go get golang.org/x/tools",
+        go_clean_denied: "go clean",
+        go_generate_denied: "go generate ./...",
+        go_mod_tidy_denied: "go mod tidy",
+        bare_go_denied: "go",
     }
 }

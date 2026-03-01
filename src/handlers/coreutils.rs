@@ -170,462 +170,104 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn find_name() {
-        assert!(check("find . -name '*.rb'"));
-    }
-
-    #[test]
-    fn find_type_name() {
-        assert!(check("find . -type f -name '*.py'"));
-    }
-
-    #[test]
-    fn find_maxdepth() {
-        assert!(check("find /tmp -maxdepth 2"));
-    }
-
-    #[test]
-    fn find_print() {
-        assert!(check("find . -name '*.log' -print"));
-    }
-
-    #[test]
-    fn find_print0() {
-        assert!(check("find . -name '*.log' -print0"));
-    }
-
-    #[test]
-    fn find_delete_denied() {
-        assert!(!check("find . -name '*.tmp' -delete"));
-    }
-
-    #[test]
-    fn find_exec_safe_command() {
-        assert!(check("find . -name '*.rb' -exec grep -l pattern {} \\;"));
-        assert!(check("find . -name '*.rb' -exec grep -l pattern {} +"));
-        assert!(check("find . -exec cat {} \\;"));
-    }
-
-    #[test]
-    fn find_execdir_safe_command() {
-        assert!(check("find . -execdir cat {} \\;"));
-        assert!(check("find . -execdir grep pattern {} \\;"));
-    }
-
-    #[test]
-    fn find_exec_unsafe_denied() {
-        assert!(!check("find . -exec rm {} \\;"));
-        assert!(!check("find . -exec rm -rf {} +"));
-    }
-
-    #[test]
-    fn find_execdir_unsafe_denied() {
-        assert!(!check("find . -execdir rm {} \\;"));
-    }
-
-    #[test]
-    fn find_ok_denied() {
-        assert!(!check("find . -ok rm {} \\;"));
-    }
-
-    #[test]
-    fn find_okdir_denied() {
-        assert!(!check("find . -okdir rm {} \\;"));
-    }
-
-    #[test]
-    fn find_exec_grep_safe() {
-        assert!(check("find . -name '*.py' -exec grep pattern {} +"));
-    }
-
-    #[test]
-    fn find_exec_nested_bash_chain_denied() {
-        assert!(!check("find . -exec bash -c 'ls && rm -rf /' \\;"));
-    }
-
-    #[test]
-    fn find_exec_nested_bash_safe() {
-        assert!(check("find . -exec bash -c 'git status' \\;"));
-    }
-
-    #[test]
-    fn find_type_delete_denied() {
-        assert!(!check("find . -type f -name '*.bak' -delete"));
-    }
-
-    #[test]
-    fn find_fprint_denied() {
-        assert!(!check("find . -fprint /tmp/list.txt"));
-    }
-
-    #[test]
-    fn find_fprint0_denied() {
-        assert!(!check("find . -fprint0 /tmp/list.txt"));
-    }
-
-    #[test]
-    fn find_fls_denied() {
-        assert!(!check("find . -fls /tmp/list.txt"));
-    }
-
-    #[test]
-    fn find_fprintf_denied() {
-        assert!(!check("find . -fprintf /tmp/list.txt '%p'"));
-    }
-
-    #[test]
-    fn sed_substitute() {
-        assert!(check("sed 's/foo/bar/'"));
-    }
-
-    #[test]
-    fn sed_n_flag() {
-        assert!(check("sed -n 's/foo/bar/p'"));
-    }
-
-    #[test]
-    fn sed_e_flag() {
-        assert!(check("sed -e 's/foo/bar/' -e 's/baz/qux/'"));
-    }
-
-    #[test]
-    fn sed_extended() {
-        assert!(check("sed -E 's/[0-9]+/NUM/g'"));
-    }
-
-    #[test]
-    fn sed_inplace_denied() {
-        assert!(!check("sed -i 's/foo/bar/' file.txt"));
-    }
-
-    #[test]
-    fn sed_in_place_long_denied() {
-        assert!(!check("sed --in-place 's/foo/bar/' file.txt"));
-    }
-
-    #[test]
-    fn sed_inplace_backup_denied() {
-        assert!(!check("sed -i.bak 's/foo/bar/' file.txt"));
-    }
-
-    #[test]
-    fn sed_ni_combined_denied() {
-        assert!(!check("sed -ni 's/foo/bar/p' file.txt"));
-    }
-
-    #[test]
-    fn sed_in_combined_denied() {
-        assert!(!check("sed -in 's/foo/bar/' file.txt"));
-    }
-
-    #[test]
-    fn sed_in_place_eq_denied() {
-        assert!(!check("sed --in-place=.bak 's/foo/bar/' file.txt"));
-    }
-
-    #[test]
-    fn sed_exec_modifier_denied() {
-        assert!(!check("sed 's/test/touch \\/tmp\\/pwned/e'"));
-    }
-
-    #[test]
-    fn sed_exec_with_global_denied() {
-        assert!(!check("sed 's/foo/bar/ge'"));
-    }
-
-    #[test]
-    fn sed_exec_alternate_delim_denied() {
-        assert!(!check("sed 's|test|touch /tmp/pwned|e'"));
-    }
-
-    #[test]
-    fn sed_exec_via_e_flag_denied() {
-        assert!(!check("sed -e 's/test/touch tmp/e'"));
-    }
-
-    #[test]
-    fn sed_exec_with_w_flag_denied() {
-        assert!(!check("sed 's/test/cmd/we'"));
-    }
-
-    #[test]
-    fn sed_standalone_e_command_denied() {
-        assert!(!check("sed e"));
-    }
-
-    #[test]
-    fn sed_address_e_command_denied() {
-        assert!(!check("sed 1e"));
-    }
-
-    #[test]
-    fn sed_regex_address_e_denied() {
-        assert!(!check("sed '/pattern/e'"));
-    }
-
-    #[test]
-    fn sed_range_address_e_denied() {
-        assert!(!check("sed '1,5e'"));
-    }
-
-    #[test]
-    fn sed_dollar_address_e_denied() {
-        assert!(!check("sed '$e'"));
-    }
-
-    #[test]
-    fn sed_e_via_flag_denied() {
-        assert!(!check("sed -e e"));
-    }
-
-    #[test]
-    fn sed_filename_starting_with_e_allowed() {
-        assert!(check("sed 's/foo/bar/' error.log"));
-    }
-
-    #[test]
-    fn sed_filename_ending_with_e_allowed() {
-        assert!(check("sed 's/foo/bar/' Makefile"));
-    }
-
-    #[test]
-    fn sed_no_exec_allowed() {
-        assert!(check("sed 's/foo/bar/g'"));
-    }
-
-    #[test]
-    fn sed_no_exec_print_allowed() {
-        assert!(check("sed 's/foo/bar/gp'"));
-    }
-
-    #[test]
-    fn sort_basic() {
-        assert!(check("sort file.txt"));
-    }
-
-    #[test]
-    fn sort_reverse() {
-        assert!(check("sort -r file.txt"));
-    }
-
-    #[test]
-    fn sort_n_u() {
-        assert!(check("sort -n -u file.txt"));
-    }
-
-    #[test]
-    fn sort_field() {
-        assert!(check("sort -t: -k2 /etc/passwd"));
-    }
-
-    #[test]
-    fn sort_output_denied() {
-        assert!(!check("sort -o output.txt file.txt"));
-    }
-
-    #[test]
-    fn sort_output_long_denied() {
-        assert!(!check("sort --output=result.txt file.txt"));
-    }
-
-    #[test]
-    fn sort_output_long_space_denied() {
-        assert!(!check("sort --output result.txt file.txt"));
-    }
-
-    #[test]
-    fn sort_rno_combined_denied() {
-        assert!(!check("sort -rno sorted.txt file.txt"));
-    }
-
-    #[test]
-    fn sort_compress_program_denied() {
-        assert!(!check("sort --compress-program sh file.txt"));
-    }
-
-    #[test]
-    fn sort_compress_program_eq_denied() {
-        assert!(!check("sort --compress-program=gzip file.txt"));
-    }
-
-    #[test]
-    fn yq_read() {
-        assert!(check("yq '.key' file.yaml"));
-    }
-
-    #[test]
-    fn yq_eval() {
-        assert!(check("yq eval '.metadata.name' deployment.yaml"));
-    }
-
-    #[test]
-    fn yq_inplace_denied() {
-        assert!(!check("yq -i '.key = \"value\"' file.yaml"));
-    }
-
-    #[test]
-    fn yq_inplace_long_denied() {
-        assert!(!check("yq --inplace '.key = \"value\"' file.yaml"));
-    }
-
-    #[test]
-    fn xmllint_read() {
-        assert!(check("xmllint --xpath '//name' file.xml"));
-    }
-
-    #[test]
-    fn xmllint_format() {
-        assert!(check("xmllint --format file.xml"));
-    }
-
-    #[test]
-    fn xmllint_output_denied() {
-        assert!(!check("xmllint --output result.xml file.xml"));
-    }
-
-    #[test]
-    fn xmllint_output_eq_denied() {
-        assert!(!check("xmllint --output=result.xml file.xml"));
-    }
-
-    #[test]
-    fn awk_print_field() {
-        assert!(check("awk '{print $1}' file.txt"));
-    }
-
-    #[test]
-    fn awk_print_multiple_fields() {
-        assert!(check("awk '{print $1, $3}' file.txt"));
-    }
-
-    #[test]
-    fn awk_field_separator() {
-        assert!(check("awk -F: '{print $1}' /etc/passwd"));
-    }
-
-    #[test]
-    fn awk_pattern() {
-        assert!(check("awk '/error/ {print $0}' log.txt"));
-    }
-
-    #[test]
-    fn awk_nr() {
-        assert!(check("awk 'NR==5' file.txt"));
-    }
-
-    #[test]
-    fn awk_begin_end_safe() {
-        assert!(check("awk 'BEGIN{n=0} {n++} END{print n}' file.txt"));
-    }
-
-    #[test]
-    fn awk_system_denied() {
-        assert!(!check("awk 'BEGIN{system(\"rm -rf /\")}'"));
-    }
-
-    #[test]
-    fn awk_getline_denied() {
-        assert!(!check("awk '{getline line < \"/etc/shadow\"; print line}'"));
-    }
-
-    #[test]
-    fn awk_pipe_output_denied() {
-        assert!(!check("awk '{print $0 | \"mail user@host\"}'"));
-    }
-
-    #[test]
-    fn awk_redirect_denied() {
-        assert!(!check("awk '{print $0 > \"output.txt\"}'"));
-    }
-
-    #[test]
-    fn awk_append_denied() {
-        assert!(!check("awk '{print $0 >> \"output.txt\"}'"));
-    }
-
-    #[test]
-    fn awk_file_program_denied() {
-        assert!(!check("awk -f script.awk data.txt"));
-    }
-
-    #[test]
-    fn gawk_safe() {
-        assert!(check("gawk '{print $2}' file.txt"));
-    }
-
-    #[test]
-    fn gawk_system_denied() {
-        assert!(!check("gawk 'BEGIN{system(\"rm\")}'"));
-    }
-
-    #[test]
-    fn awk_netstat_pipeline() {
-        assert!(check("awk '{print $6}'"));
-    }
-
-    #[test]
-    fn awk_string_literal_system() {
-        assert!(check("awk 'BEGIN{print \"system failed\"}'"));
-    }
-
-    #[test]
-    fn awk_string_literal_redirect() {
-        assert!(check("awk '{print \">\"}'"));
-    }
-
-    #[test]
-    fn awk_string_literal_pipe() {
-        assert!(check("awk '{print \"a | b\"}'"));
-    }
-
-    #[test]
-    fn awk_string_literal_getline() {
-        assert!(check("awk 'BEGIN{print \"getline is a keyword\"}'"));
-    }
-
-    #[test]
-    fn awk_system_call_denied() {
-        assert!(!check("awk 'BEGIN{system(\"rm\")}'"));
-    }
-
-    #[test]
-    fn awk_system_space_paren_denied() {
-        assert!(!check("awk 'BEGIN{system (\"rm\")}'"));
-    }
-
-    #[test]
-    fn awk_pipe_outside_string_denied() {
-        assert!(!check("awk '{print $0 | \"cmd\"}'"));
-    }
-
-    #[test]
-    fn awk_redirect_outside_string_denied() {
-        assert!(!check("awk '{print $0 > \"file\"}'"));
-    }
-
-    #[test]
-    fn sed_filename_1e_after_script() {
-        assert!(check("sed 's/foo/bar/' 1e"));
-    }
-
-    #[test]
-    fn sed_expression_flag_with_filename() {
-        assert!(check("sed -e 's/foo/bar/' filename"));
-    }
-
-    #[test]
-    fn sed_expression_flag_exec_denied() {
-        assert!(!check("sed -e 's/foo/bar/e'"));
-    }
-
-    #[test]
-    fn sed_multiple_expressions_exec_denied() {
-        assert!(!check("sed -e 's/foo/bar/' -e 's/x/y/e'"));
-    }
-
-    #[test]
-    fn sed_expression_flag_then_safe_filename() {
-        assert!(check("sed -e 's/foo/bar/' 1e 2e"));
+    safe! {
+        find_name: "find . -name '*.rb'",
+        find_type_name: "find . -type f -name '*.py'",
+        find_maxdepth: "find /tmp -maxdepth 2",
+        find_print: "find . -name '*.log' -print",
+        find_print0: "find . -name '*.log' -print0",
+        find_exec_grep_l: "find . -name '*.rb' -exec grep -l pattern {} \\;",
+        find_exec_grep_l_plus: "find . -name '*.rb' -exec grep -l pattern {} +",
+        find_exec_cat: "find . -exec cat {} \\;",
+        find_execdir_cat: "find . -execdir cat {} \\;",
+        find_execdir_grep: "find . -execdir grep pattern {} \\;",
+        find_exec_grep_safe: "find . -name '*.py' -exec grep pattern {} +",
+        find_exec_nested_bash_safe: "find . -exec bash -c 'git status' \\;",
+        sed_substitute: "sed 's/foo/bar/'",
+        sed_n_flag: "sed -n 's/foo/bar/p'",
+        sed_e_flag: "sed -e 's/foo/bar/' -e 's/baz/qux/'",
+        sed_extended: "sed -E 's/[0-9]+/NUM/g'",
+        sed_filename_starting_with_e_allowed: "sed 's/foo/bar/' error.log",
+        sed_filename_ending_with_e_allowed: "sed 's/foo/bar/' Makefile",
+        sed_no_exec_allowed: "sed 's/foo/bar/g'",
+        sed_no_exec_print_allowed: "sed 's/foo/bar/gp'",
+        sed_filename_1e_after_script: "sed 's/foo/bar/' 1e",
+        sed_expression_flag_with_filename: "sed -e 's/foo/bar/' filename",
+        sed_expression_flag_then_safe_filename: "sed -e 's/foo/bar/' 1e 2e",
+        sort_basic: "sort file.txt",
+        sort_reverse: "sort -r file.txt",
+        sort_n_u: "sort -n -u file.txt",
+        sort_field: "sort -t: -k2 /etc/passwd",
+        yq_read: "yq '.key' file.yaml",
+        yq_eval: "yq eval '.metadata.name' deployment.yaml",
+        xmllint_read: "xmllint --xpath '//name' file.xml",
+        xmllint_format: "xmllint --format file.xml",
+        awk_print_field: "awk '{print $1}' file.txt",
+        awk_print_multiple_fields: "awk '{print $1, $3}' file.txt",
+        awk_field_separator: "awk -F: '{print $1}' /etc/passwd",
+        awk_pattern: "awk '/error/ {print $0}' log.txt",
+        awk_nr: "awk 'NR==5' file.txt",
+        awk_begin_end_safe: "awk 'BEGIN{n=0} {n++} END{print n}' file.txt",
+        gawk_safe: "gawk '{print $2}' file.txt",
+        awk_netstat_pipeline: "awk '{print $6}'",
+        awk_string_literal_system: "awk 'BEGIN{print \"system failed\"}'",
+        awk_string_literal_redirect: "awk '{print \">\"}'",
+        awk_string_literal_pipe: "awk '{print \"a | b\"}'",
+        awk_string_literal_getline: "awk 'BEGIN{print \"getline is a keyword\"}'",
+    }
+
+    denied! {
+        find_delete_denied: "find . -name '*.tmp' -delete",
+        find_exec_rm: "find . -exec rm {} \\;",
+        find_exec_rm_rf: "find . -exec rm -rf {} +",
+        find_execdir_unsafe_denied: "find . -execdir rm {} \\;",
+        find_ok_denied: "find . -ok rm {} \\;",
+        find_okdir_denied: "find . -okdir rm {} \\;",
+        find_exec_nested_bash_chain_denied: "find . -exec bash -c 'ls && rm -rf /' \\;",
+        find_type_delete_denied: "find . -type f -name '*.bak' -delete",
+        find_fprint_denied: "find . -fprint /tmp/list.txt",
+        find_fprint0_denied: "find . -fprint0 /tmp/list.txt",
+        find_fls_denied: "find . -fls /tmp/list.txt",
+        find_fprintf_denied: "find . -fprintf /tmp/list.txt '%p'",
+        sed_inplace_denied: "sed -i 's/foo/bar/' file.txt",
+        sed_in_place_long_denied: "sed --in-place 's/foo/bar/' file.txt",
+        sed_inplace_backup_denied: "sed -i.bak 's/foo/bar/' file.txt",
+        sed_ni_combined_denied: "sed -ni 's/foo/bar/p' file.txt",
+        sed_in_combined_denied: "sed -in 's/foo/bar/' file.txt",
+        sed_in_place_eq_denied: "sed --in-place=.bak 's/foo/bar/' file.txt",
+        sed_exec_modifier_denied: "sed 's/test/touch \\/tmp\\/pwned/e'",
+        sed_exec_with_global_denied: "sed 's/foo/bar/ge'",
+        sed_exec_alternate_delim_denied: "sed 's|test|touch /tmp/pwned|e'",
+        sed_exec_via_e_flag_denied: "sed -e 's/test/touch tmp/e'",
+        sed_exec_with_w_flag_denied: "sed 's/test/cmd/we'",
+        sed_standalone_e_command_denied: "sed e",
+        sed_address_e_command_denied: "sed 1e",
+        sed_regex_address_e_denied: "sed '/pattern/e'",
+        sed_range_address_e_denied: "sed '1,5e'",
+        sed_dollar_address_e_denied: "sed '$e'",
+        sed_e_via_flag_denied: "sed -e e",
+        sed_expression_flag_exec_denied: "sed -e 's/foo/bar/e'",
+        sed_multiple_expressions_exec_denied: "sed -e 's/foo/bar/' -e 's/x/y/e'",
+        sort_output_denied: "sort -o output.txt file.txt",
+        sort_output_long_denied: "sort --output=result.txt file.txt",
+        sort_output_long_space_denied: "sort --output result.txt file.txt",
+        sort_rno_combined_denied: "sort -rno sorted.txt file.txt",
+        sort_compress_program_denied: "sort --compress-program sh file.txt",
+        sort_compress_program_eq_denied: "sort --compress-program=gzip file.txt",
+        yq_inplace_denied: "yq -i '.key = \"value\"' file.yaml",
+        yq_inplace_long_denied: "yq --inplace '.key = \"value\"' file.yaml",
+        xmllint_output_denied: "xmllint --output result.xml file.xml",
+        xmllint_output_eq_denied: "xmllint --output=result.xml file.xml",
+        awk_system_denied: "awk 'BEGIN{system(\"rm -rf /\")}'",
+        awk_getline_denied: "awk '{getline line < \"/etc/shadow\"; print line}'",
+        awk_pipe_output_denied: "awk '{print $0 | \"mail user@host\"}'",
+        awk_redirect_denied: "awk '{print $0 > \"output.txt\"}'",
+        awk_append_denied: "awk '{print $0 >> \"output.txt\"}'",
+        awk_file_program_denied: "awk -f script.awk data.txt",
+        gawk_system_denied: "gawk 'BEGIN{system(\"rm\")}'",
+        awk_system_call_denied: "awk 'BEGIN{system(\"rm\")}'",
+        awk_system_space_paren_denied: "awk 'BEGIN{system (\"rm\")}'",
+        awk_pipe_outside_string_denied: "awk '{print $0 | \"cmd\"}'",
+        awk_redirect_outside_string_denied: "awk '{print $0 > \"file\"}'",
     }
 }

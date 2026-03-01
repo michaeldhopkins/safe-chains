@@ -22,73 +22,23 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn dotnet_version() {
-        assert!(check("dotnet --version"));
+    safe! {
+        dotnet_version: "dotnet --version",
+        dotnet_info: "dotnet --info",
+        dotnet_list_sdks: "dotnet --list-sdks",
+        dotnet_list_runtimes: "dotnet --list-runtimes",
+        dotnet_build: "dotnet build",
+        dotnet_test: "dotnet test",
+        dotnet_list: "dotnet list package",
     }
 
-    #[test]
-    fn dotnet_info() {
-        assert!(check("dotnet --info"));
-    }
-
-    #[test]
-    fn dotnet_list_sdks() {
-        assert!(check("dotnet --list-sdks"));
-    }
-
-    #[test]
-    fn dotnet_list_runtimes() {
-        assert!(check("dotnet --list-runtimes"));
-    }
-
-    #[test]
-    fn dotnet_build() {
-        assert!(check("dotnet build"));
-    }
-
-    #[test]
-    fn dotnet_test() {
-        assert!(check("dotnet test"));
-    }
-
-    #[test]
-    fn dotnet_list() {
-        assert!(check("dotnet list package"));
-    }
-
-    #[test]
-    fn dotnet_run_denied() {
-        assert!(!check("dotnet run"));
-    }
-
-    #[test]
-    fn dotnet_new_denied() {
-        assert!(!check("dotnet new console"));
-    }
-
-    #[test]
-    fn dotnet_add_denied() {
-        assert!(!check("dotnet add package Newtonsoft.Json"));
-    }
-
-    #[test]
-    fn dotnet_publish_denied() {
-        assert!(!check("dotnet publish"));
-    }
-
-    #[test]
-    fn dotnet_clean_denied() {
-        assert!(!check("dotnet clean"));
-    }
-
-    #[test]
-    fn dotnet_restore_denied() {
-        assert!(!check("dotnet restore"));
-    }
-
-    #[test]
-    fn bare_dotnet_denied() {
-        assert!(!check("dotnet"));
+    denied! {
+        dotnet_run_denied: "dotnet run",
+        dotnet_new_denied: "dotnet new console",
+        dotnet_add_denied: "dotnet add package Newtonsoft.Json",
+        dotnet_publish_denied: "dotnet publish",
+        dotnet_clean_denied: "dotnet clean",
+        dotnet_restore_denied: "dotnet restore",
+        bare_dotnet_denied: "dotnet",
     }
 }

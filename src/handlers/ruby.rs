@@ -59,218 +59,52 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn bundle_list() {
-        assert!(check("bundle list"));
+    safe! {
+        bundle_list: "bundle list",
+        bundle_info: "bundle info rails",
+        bundle_show: "bundle show actionpack",
+        bundle_check: "bundle check",
+        bundle_exec_rspec: "bundle exec rspec spec/models/foo_spec.rb",
+        bundle_exec_standardrb: "bundle exec standardrb app/models/foo.rb",
+        bundle_exec_standardrb_fix: "bundle exec standardrb --fix app/models/foo.rb",
+        bundle_exec_cucumber: "bundle exec cucumber",
+        bundle_exec_brakeman: "bundle exec brakeman",
+        bundle_exec_erb_lint: "bundle exec erb_lint app/views/foo.html.erb",
+        bundle_exec_herb: "bundle exec herb app/views/foo.html.erb",
+        bundle_version: "bundle --version",
+        gem_list: "gem list",
+        gem_info: "gem info rails",
+        gem_environment: "gem environment",
+        gem_which: "gem which bundler",
+        gem_pristine: "gem pristine --all",
+        gem_search: "gem search rails",
+        gem_specification: "gem specification rails",
+        gem_dependency: "gem dependency rails",
+        gem_contents: "gem contents rails",
+        gem_sources: "gem sources",
+        gem_stale: "gem stale",
+        gem_outdated: "gem outdated",
+        gem_help: "gem help",
+        gem_version: "gem --version",
+        rbenv_versions: "rbenv versions",
+        rbenv_version: "rbenv version",
+        rbenv_which: "rbenv which ruby",
+        rbenv_root: "rbenv root",
+        rbenv_shims: "rbenv shims",
+        rbenv_version_flag: "rbenv --version",
+        rbenv_help: "rbenv help",
     }
 
-    #[test]
-    fn bundle_info() {
-        assert!(check("bundle info rails"));
-    }
-
-    #[test]
-    fn bundle_show() {
-        assert!(check("bundle show actionpack"));
-    }
-
-    #[test]
-    fn bundle_check() {
-        assert!(check("bundle check"));
-    }
-
-    #[test]
-    fn bundle_exec_rspec() {
-        assert!(check("bundle exec rspec spec/models/foo_spec.rb"));
-    }
-
-    #[test]
-    fn bundle_exec_standardrb() {
-        assert!(check("bundle exec standardrb app/models/foo.rb"));
-    }
-
-    #[test]
-    fn bundle_exec_standardrb_fix() {
-        assert!(check("bundle exec standardrb --fix app/models/foo.rb"));
-    }
-
-    #[test]
-    fn bundle_exec_cucumber() {
-        assert!(check("bundle exec cucumber"));
-    }
-
-    #[test]
-    fn bundle_exec_brakeman() {
-        assert!(check("bundle exec brakeman"));
-    }
-
-    #[test]
-    fn bundle_exec_erb_lint() {
-        assert!(check("bundle exec erb_lint app/views/foo.html.erb"));
-    }
-
-    #[test]
-    fn bundle_exec_herb() {
-        assert!(check("bundle exec herb app/views/foo.html.erb"));
-    }
-
-    #[test]
-    fn bundle_version() {
-        assert!(check("bundle --version"));
-    }
-
-    #[test]
-    fn bundle_install_denied() {
-        assert!(!check("bundle install"));
-    }
-
-    #[test]
-    fn bundle_update_denied() {
-        assert!(!check("bundle update"));
-    }
-
-    #[test]
-    fn bundle_exec_rails_console_denied() {
-        assert!(!check("bundle exec rails console"));
-    }
-
-    #[test]
-    fn bundle_exec_rake_denied() {
-        assert!(!check("bundle exec rake db:drop"));
-    }
-
-    #[test]
-    fn bundle_exec_ruby_denied() {
-        assert!(!check("bundle exec ruby script.rb"));
-    }
-
-    #[test]
-    fn gem_list() {
-        assert!(check("gem list"));
-    }
-
-    #[test]
-    fn gem_info() {
-        assert!(check("gem info rails"));
-    }
-
-    #[test]
-    fn gem_environment() {
-        assert!(check("gem environment"));
-    }
-
-    #[test]
-    fn gem_which() {
-        assert!(check("gem which bundler"));
-    }
-
-    #[test]
-    fn gem_pristine() {
-        assert!(check("gem pristine --all"));
-    }
-
-    #[test]
-    fn gem_search() {
-        assert!(check("gem search rails"));
-    }
-
-    #[test]
-    fn gem_specification() {
-        assert!(check("gem specification rails"));
-    }
-
-    #[test]
-    fn gem_dependency() {
-        assert!(check("gem dependency rails"));
-    }
-
-    #[test]
-    fn gem_contents() {
-        assert!(check("gem contents rails"));
-    }
-
-    #[test]
-    fn gem_sources() {
-        assert!(check("gem sources"));
-    }
-
-    #[test]
-    fn gem_stale() {
-        assert!(check("gem stale"));
-    }
-
-    #[test]
-    fn gem_outdated() {
-        assert!(check("gem outdated"));
-    }
-
-    #[test]
-    fn gem_help() {
-        assert!(check("gem help"));
-    }
-
-    #[test]
-    fn gem_version() {
-        assert!(check("gem --version"));
-    }
-
-    #[test]
-    fn gem_install_denied() {
-        assert!(!check("gem install rails"));
-    }
-
-    #[test]
-    fn gem_uninstall_denied() {
-        assert!(!check("gem uninstall rails"));
-    }
-
-    #[test]
-    fn rbenv_versions() {
-        assert!(check("rbenv versions"));
-    }
-
-    #[test]
-    fn rbenv_version() {
-        assert!(check("rbenv version"));
-    }
-
-    #[test]
-    fn rbenv_which() {
-        assert!(check("rbenv which ruby"));
-    }
-
-    #[test]
-    fn rbenv_root() {
-        assert!(check("rbenv root"));
-    }
-
-    #[test]
-    fn rbenv_shims() {
-        assert!(check("rbenv shims"));
-    }
-
-    #[test]
-    fn rbenv_version_flag() {
-        assert!(check("rbenv --version"));
-    }
-
-    #[test]
-    fn rbenv_help() {
-        assert!(check("rbenv help"));
-    }
-
-    #[test]
-    fn rbenv_install_denied() {
-        assert!(!check("rbenv install 3.3.0"));
-    }
-
-    #[test]
-    fn rbenv_global_denied() {
-        assert!(!check("rbenv global 3.3.0"));
-    }
-
-    #[test]
-    fn rbenv_local_denied() {
-        assert!(!check("rbenv local 3.3.0"));
+    denied! {
+        bundle_install_denied: "bundle install",
+        bundle_update_denied: "bundle update",
+        bundle_exec_rails_console_denied: "bundle exec rails console",
+        bundle_exec_rake_denied: "bundle exec rake db:drop",
+        bundle_exec_ruby_denied: "bundle exec ruby script.rb",
+        gem_install_denied: "gem install rails",
+        gem_uninstall_denied: "gem uninstall rails",
+        rbenv_install_denied: "rbenv install 3.3.0",
+        rbenv_global_denied: "rbenv global 3.3.0",
+        rbenv_local_denied: "rbenv local 3.3.0",
     }
 }

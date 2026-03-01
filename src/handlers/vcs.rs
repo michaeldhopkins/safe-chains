@@ -181,605 +181,129 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn git_log() {
-        assert!(check("git log --oneline -5"));
-    }
-
-    #[test]
-    fn git_diff() {
-        assert!(check("git diff --stat"));
-    }
-
-    #[test]
-    fn git_show() {
-        assert!(check("git show HEAD:some/file.rb"));
-    }
-
-    #[test]
-    fn git_status() {
-        assert!(check("git status --porcelain"));
-    }
-
-    #[test]
-    fn git_fetch() {
-        assert!(check("git fetch origin master"));
-    }
-
-    #[test]
-    fn git_ls_tree() {
-        assert!(check("git ls-tree HEAD"));
-    }
-
-    #[test]
-    fn git_grep() {
-        assert!(check("git grep pattern"));
-    }
-
-    #[test]
-    fn git_rev_parse() {
-        assert!(check("git rev-parse HEAD"));
-    }
-
-    #[test]
-    fn git_merge_base() {
-        assert!(check("git merge-base master HEAD"));
-    }
-
-    #[test]
-    fn git_merge_tree() {
-        assert!(check("git merge-tree HEAD~1 HEAD master"));
-    }
-
-    #[test]
-    fn git_version() {
-        assert!(check("git --version"));
-    }
-
-    #[test]
-    fn git_help() {
-        assert!(check("git help log"));
-    }
-
-    #[test]
-    fn git_shortlog() {
-        assert!(check("git shortlog -s"));
-    }
-
-    #[test]
-    fn git_describe() {
-        assert!(check("git describe --tags"));
-    }
-
-    #[test]
-    fn git_blame() {
-        assert!(check("git blame file.rb"));
-    }
-
-    #[test]
-    fn git_reflog() {
-        assert!(check("git reflog"));
-    }
-
-    #[test]
-    fn git_ls_files() {
-        assert!(check("git ls-files"));
-    }
-
-    #[test]
-    fn git_ls_remote() {
-        assert!(check("git ls-remote origin"));
-    }
-
-    #[test]
-    fn git_diff_tree() {
-        assert!(check("git diff-tree --no-commit-id -r HEAD"));
-    }
-
-    #[test]
-    fn git_cat_file() {
-        assert!(check("git cat-file -p HEAD"));
-    }
-
-    #[test]
-    fn git_check_ignore() {
-        assert!(check("git check-ignore .jj/"));
-    }
-
-    #[test]
-    fn git_name_rev() {
-        assert!(check("git name-rev HEAD"));
-    }
-
-    #[test]
-    fn git_for_each_ref() {
-        assert!(check("git for-each-ref refs/heads"));
-    }
-
-    #[test]
-    fn git_count_objects() {
-        assert!(check("git count-objects -v"));
-    }
-
-    #[test]
-    fn git_verify_commit() {
-        assert!(check("git verify-commit HEAD"));
-    }
-
-    #[test]
-    fn git_verify_tag() {
-        assert!(check("git verify-tag v1.0"));
-    }
-
-    #[test]
-    fn git_c_flag() {
-        assert!(check("git -C /some/repo diff --stat"));
-    }
-
-    #[test]
-    fn git_c_nested() {
-        assert!(check("git -C /some/repo -C nested log"));
-    }
-
-    #[test]
-    fn git_remote_bare() {
-        assert!(check("git remote"));
-    }
-
-    #[test]
-    fn git_remote_v() {
-        assert!(check("git remote -v"));
-    }
-
-    #[test]
-    fn git_remote_get_url() {
-        assert!(check("git remote get-url origin"));
-    }
-
-    #[test]
-    fn git_remote_show() {
-        assert!(check("git remote show origin"));
-    }
-
-    #[test]
-    fn git_branch_list() {
-        assert!(check("git branch"));
-    }
-
-    #[test]
-    fn git_branch_list_all() {
-        assert!(check("git branch -a"));
-    }
-
-    #[test]
-    fn git_branch_list_verbose() {
-        assert!(check("git branch -v"));
-    }
-
-    #[test]
-    fn git_branch_contains() {
-        assert!(check("git branch --contains abc123"));
-    }
-
-    #[test]
-    fn git_stash_list() {
-        assert!(check("git stash list"));
-    }
-
-    #[test]
-    fn git_stash_show() {
-        assert!(check("git stash show -p"));
-    }
-
-    #[test]
-    fn git_stash_bare_denied() {
-        assert!(!check("git stash"));
-    }
-
-    #[test]
-    fn git_stash_push_denied() {
-        assert!(!check("git stash push"));
-    }
-
-    #[test]
-    fn git_stash_pop_denied() {
-        assert!(!check("git stash pop"));
-    }
-
-    #[test]
-    fn git_stash_drop_denied() {
-        assert!(!check("git stash drop"));
-    }
-
-    #[test]
-    fn git_tag_list() {
-        assert!(check("git tag"));
-    }
-
-    #[test]
-    fn git_tag_list_pattern() {
-        assert!(check("git tag -l 'v1.*'"));
-    }
-
-    #[test]
-    fn git_tag_list_long() {
-        assert!(check("git tag --list"));
-    }
-
-    #[test]
-    fn git_tag_delete_denied() {
-        assert!(!check("git tag -d v1.0"));
-    }
-
-    #[test]
-    fn git_tag_annotate_denied() {
-        assert!(!check("git tag -a v1.0 -m 'release'"));
-    }
-
-    #[test]
-    fn git_tag_sign_denied() {
-        assert!(!check("git tag -s v1.0"));
-    }
-
-    #[test]
-    fn git_tag_force_denied() {
-        assert!(!check("git tag -f v1.0"));
-    }
-
-    #[test]
-    fn git_config_list() {
-        assert!(check("git config --list"));
-    }
-
-    #[test]
-    fn git_config_get() {
-        assert!(check("git config --get user.name"));
-    }
-
-    #[test]
-    fn git_config_get_all() {
-        assert!(check("git config --get-all remote.origin.url"));
-    }
-
-    #[test]
-    fn git_config_get_regexp() {
-        assert!(check("git config --get-regexp 'remote.*'"));
-    }
-
-    #[test]
-    fn git_config_l() {
-        assert!(check("git config -l"));
-    }
-
-    #[test]
-    fn git_config_set_denied() {
-        assert!(!check("git config user.name foo"));
-    }
-
-    #[test]
-    fn git_config_unset_denied() {
-        assert!(!check("git config --unset user.name"));
-    }
-
-    #[test]
-    fn git_worktree_list() {
-        assert!(check("git worktree list"));
-    }
-
-    #[test]
-    fn git_worktree_add_denied() {
-        assert!(!check("git worktree add ../new-branch"));
-    }
-
-    #[test]
-    fn git_notes_show() {
-        assert!(check("git notes show HEAD"));
-    }
-
-    #[test]
-    fn git_notes_list() {
-        assert!(check("git notes list"));
-    }
-
-    #[test]
-    fn git_notes_add_denied() {
-        assert!(!check("git notes add -m 'note'"));
-    }
-
-    #[test]
-    fn git_ls_remote_upload_pack_denied() {
-        assert!(!check("git ls-remote --upload-pack=malicious origin"));
-    }
-
-    #[test]
-    fn git_ls_remote_upload_pack_space_denied() {
-        assert!(!check("git ls-remote --upload-pack malicious origin"));
-    }
-
-    #[test]
-    fn git_fetch_upload_pack_denied() {
-        assert!(!check("git fetch --upload-pack=malicious origin"));
-    }
-
-    #[test]
-    fn git_fetch_receive_pack_denied() {
-        assert!(!check("git fetch --receive-pack=malicious origin"));
-    }
-
-    #[test]
-    fn git_ls_remote_upload_pack_abbreviated_denied() {
-        assert!(!check("git ls-remote --upload-pa=malicious origin"));
-    }
-
-    #[test]
-    fn git_push_denied() {
-        assert!(!check("git push origin main"));
-    }
-
-    #[test]
-    fn git_reset_denied() {
-        assert!(!check("git reset --hard HEAD~1"));
-    }
-
-    #[test]
-    fn git_add_denied() {
-        assert!(!check("git add ."));
-    }
-
-    #[test]
-    fn git_commit_denied() {
-        assert!(!check("git commit -m 'test'"));
-    }
-
-    #[test]
-    fn git_checkout_denied() {
-        assert!(!check("git checkout -- file.rb"));
-    }
-
-    #[test]
-    fn git_rebase_denied() {
-        assert!(!check("git rebase origin/master"));
-    }
-
-    #[test]
-    fn git_stash_denied() {
-        assert!(!check("git stash"));
-    }
-
-    #[test]
-    fn git_branch_d_denied() {
-        assert!(!check("git branch -D feature"));
-    }
-
-    #[test]
-    fn git_branch_delete_denied() {
-        assert!(!check("git branch --delete feature"));
-    }
-
-    #[test]
-    fn git_branch_move_denied() {
-        assert!(!check("git branch -m old new"));
-    }
-
-    #[test]
-    fn git_branch_copy_denied() {
-        assert!(!check("git branch -c old new"));
-    }
-
-    #[test]
-    fn git_branch_set_upstream_denied() {
-        assert!(!check("git branch --set-upstream-to=origin/main"));
-    }
-
-    #[test]
-    fn git_rm_denied() {
-        assert!(!check("git rm file.rb"));
-    }
-
-    #[test]
-    fn git_remote_add_denied() {
-        assert!(!check(
-            "git remote add upstream https://github.com/foo/bar"
-        ));
-    }
-
-    #[test]
-    fn git_remote_remove_denied() {
-        assert!(!check("git remote remove upstream"));
-    }
-
-    #[test]
-    fn git_remote_rename_denied() {
-        assert!(!check("git remote rename origin upstream"));
-    }
-
-    #[test]
-    fn git_config_flag_denied() {
-        assert!(!check("git -c user.name=foo log"));
-    }
-
-    #[test]
-    fn bare_git_denied() {
-        assert!(!check("git"));
-    }
-
-    #[test]
-    fn jj_log() {
-        assert!(check("jj log"));
-    }
-
-    #[test]
-    fn jj_diff() {
-        assert!(check("jj diff --stat"));
-    }
-
-    #[test]
-    fn jj_show() {
-        assert!(check("jj show abc123"));
-    }
-
-    #[test]
-    fn jj_status() {
-        assert!(check("jj status"));
-    }
-
-    #[test]
-    fn jj_st() {
-        assert!(check("jj st"));
-    }
-
-    #[test]
-    fn jj_help() {
-        assert!(check("jj help"));
-    }
-
-    #[test]
-    fn jj_version() {
-        assert!(check("jj --version"));
-    }
-
-    #[test]
-    fn jj_op_log() {
-        assert!(check("jj op log"));
-    }
-
-    #[test]
-    fn jj_file_show() {
-        assert!(check("jj file show some/path"));
-    }
-
-    #[test]
-    fn jj_config_get() {
-        assert!(check("jj config get user.name"));
-    }
-
-    #[test]
-    fn jj_config_list() {
-        assert!(check("jj config list"));
-    }
-
-    #[test]
-    fn jj_bookmark_list() {
-        assert!(check("jj bookmark list"));
-    }
-
-    #[test]
-    fn jj_git_remote_list() {
-        assert!(check("jj git remote list"));
-    }
-
-    #[test]
-    fn jj_ignore_working_copy_diff() {
-        assert!(check("jj --ignore-working-copy diff --from 'trunk()' --to '@' --summary"));
-    }
-
-    #[test]
-    fn jj_no_pager_log() {
-        assert!(check("jj --no-pager log"));
-    }
-
-    #[test]
-    fn jj_repository_flag() {
-        assert!(check("jj -R /some/repo status"));
-    }
-
-    #[test]
-    fn jj_color_valued() {
-        assert!(check("jj --color auto log"));
-    }
-
-    #[test]
-    fn jj_color_eq() {
-        assert!(check("jj --color=auto log"));
-    }
-
-    #[test]
-    fn jj_at_op() {
-        assert!(check("jj --at-op @- diff"));
-    }
-
-    #[test]
-    fn jj_multiple_global_flags() {
-        assert!(check("jj --no-pager --ignore-working-copy --color=auto diff"));
-    }
-
-    #[test]
-    fn jj_global_flag_no_subcommand_denied() {
-        assert!(!check("jj --ignore-working-copy"));
-    }
-
-    #[test]
-    fn jj_global_flag_mutating_denied() {
-        assert!(!check("jj --ignore-working-copy new master"));
-    }
-
-    #[test]
-    fn jj_global_flag_multi_word() {
-        assert!(check("jj --no-pager bookmark list"));
-    }
-
-    #[test]
-    fn jj_new_denied() {
-        assert!(!check("jj new master"));
-    }
-
-    #[test]
-    fn jj_edit_denied() {
-        assert!(!check("jj edit abc123"));
-    }
-
-    #[test]
-    fn jj_squash_denied() {
-        assert!(!check("jj squash"));
-    }
-
-    #[test]
-    fn jj_describe_denied() {
-        assert!(!check("jj describe -m 'test'"));
-    }
-
-    #[test]
-    fn jj_bookmark_denied() {
-        assert!(!check("jj bookmark set my-branch"));
-    }
-
-    #[test]
-    fn jj_git_push_denied() {
-        assert!(!check("jj git push"));
-    }
-
-    #[test]
-    fn jj_git_fetch() {
-        assert!(check("jj git fetch"));
-    }
-
-    #[test]
-    fn jj_git_fetch_with_global_flags() {
-        assert!(check("jj --no-pager git fetch"));
-    }
-
-    #[test]
-    fn jj_rebase_denied() {
-        assert!(!check("jj rebase -d master"));
-    }
-
-    #[test]
-    fn jj_restore_denied() {
-        assert!(!check("jj restore file.rb"));
-    }
-
-    #[test]
-    fn jj_abandon_denied() {
-        assert!(!check("jj abandon"));
-    }
-
-    #[test]
-    fn jj_config_set_denied() {
-        assert!(!check("jj config set user.name foo"));
-    }
-
-    #[test]
-    fn bare_jj_denied() {
-        assert!(!check("jj"));
+    safe! {
+        git_log: "git log --oneline -5",
+        git_diff: "git diff --stat",
+        git_show: "git show HEAD:some/file.rb",
+        git_status: "git status --porcelain",
+        git_fetch: "git fetch origin master",
+        git_ls_tree: "git ls-tree HEAD",
+        git_grep: "git grep pattern",
+        git_rev_parse: "git rev-parse HEAD",
+        git_merge_base: "git merge-base master HEAD",
+        git_merge_tree: "git merge-tree HEAD~1 HEAD master",
+        git_version: "git --version",
+        git_help: "git help log",
+        git_shortlog: "git shortlog -s",
+        git_describe: "git describe --tags",
+        git_blame: "git blame file.rb",
+        git_reflog: "git reflog",
+        git_ls_files: "git ls-files",
+        git_ls_remote: "git ls-remote origin",
+        git_diff_tree: "git diff-tree --no-commit-id -r HEAD",
+        git_cat_file: "git cat-file -p HEAD",
+        git_check_ignore: "git check-ignore .jj/",
+        git_name_rev: "git name-rev HEAD",
+        git_for_each_ref: "git for-each-ref refs/heads",
+        git_count_objects: "git count-objects -v",
+        git_verify_commit: "git verify-commit HEAD",
+        git_verify_tag: "git verify-tag v1.0",
+        git_c_flag: "git -C /some/repo diff --stat",
+        git_c_nested: "git -C /some/repo -C nested log",
+        git_remote_bare: "git remote",
+        git_remote_v: "git remote -v",
+        git_remote_get_url: "git remote get-url origin",
+        git_remote_show: "git remote show origin",
+        git_branch_list: "git branch",
+        git_branch_list_all: "git branch -a",
+        git_branch_list_verbose: "git branch -v",
+        git_branch_contains: "git branch --contains abc123",
+        git_stash_list: "git stash list",
+        git_stash_show: "git stash show -p",
+        git_tag_list: "git tag",
+        git_tag_list_pattern: "git tag -l 'v1.*'",
+        git_tag_list_long: "git tag --list",
+        git_config_list: "git config --list",
+        git_config_get: "git config --get user.name",
+        git_config_get_all: "git config --get-all remote.origin.url",
+        git_config_get_regexp: "git config --get-regexp 'remote.*'",
+        git_config_l: "git config -l",
+        git_worktree_list: "git worktree list",
+        git_notes_show: "git notes show HEAD",
+        git_notes_list: "git notes list",
+        jj_log: "jj log",
+        jj_diff: "jj diff --stat",
+        jj_show: "jj show abc123",
+        jj_status: "jj status",
+        jj_st: "jj st",
+        jj_help: "jj help",
+        jj_version: "jj --version",
+        jj_op_log: "jj op log",
+        jj_file_show: "jj file show some/path",
+        jj_config_get: "jj config get user.name",
+        jj_config_list: "jj config list",
+        jj_bookmark_list: "jj bookmark list",
+        jj_git_remote_list: "jj git remote list",
+        jj_ignore_working_copy_diff: "jj --ignore-working-copy diff --from 'trunk()' --to '@' --summary",
+        jj_no_pager_log: "jj --no-pager log",
+        jj_repository_flag: "jj -R /some/repo status",
+        jj_color_valued: "jj --color auto log",
+        jj_color_eq: "jj --color=auto log",
+        jj_at_op: "jj --at-op @- diff",
+        jj_multiple_global_flags: "jj --no-pager --ignore-working-copy --color=auto diff",
+        jj_global_flag_multi_word: "jj --no-pager bookmark list",
+        jj_git_fetch: "jj git fetch",
+        jj_git_fetch_with_global_flags: "jj --no-pager git fetch",
+    }
+
+    denied! {
+        git_stash_bare_denied: "git stash",
+        git_stash_push_denied: "git stash push",
+        git_stash_pop_denied: "git stash pop",
+        git_stash_drop_denied: "git stash drop",
+        git_tag_delete_denied: "git tag -d v1.0",
+        git_tag_annotate_denied: "git tag -a v1.0 -m 'release'",
+        git_tag_sign_denied: "git tag -s v1.0",
+        git_tag_force_denied: "git tag -f v1.0",
+        git_config_set_denied: "git config user.name foo",
+        git_config_unset_denied: "git config --unset user.name",
+        git_worktree_add_denied: "git worktree add ../new-branch",
+        git_notes_add_denied: "git notes add -m 'note'",
+        git_ls_remote_upload_pack_denied: "git ls-remote --upload-pack=malicious origin",
+        git_ls_remote_upload_pack_space_denied: "git ls-remote --upload-pack malicious origin",
+        git_fetch_upload_pack_denied: "git fetch --upload-pack=malicious origin",
+        git_fetch_receive_pack_denied: "git fetch --receive-pack=malicious origin",
+        git_ls_remote_upload_pack_abbreviated_denied: "git ls-remote --upload-pa=malicious origin",
+        git_push_denied: "git push origin main",
+        git_reset_denied: "git reset --hard HEAD~1",
+        git_add_denied: "git add .",
+        git_commit_denied: "git commit -m 'test'",
+        git_checkout_denied: "git checkout -- file.rb",
+        git_rebase_denied: "git rebase origin/master",
+        git_stash_denied: "git stash",
+        git_branch_d_denied: "git branch -D feature",
+        git_branch_delete_denied: "git branch --delete feature",
+        git_branch_move_denied: "git branch -m old new",
+        git_branch_copy_denied: "git branch -c old new",
+        git_branch_set_upstream_denied: "git branch --set-upstream-to=origin/main",
+        git_rm_denied: "git rm file.rb",
+        git_remote_add_denied: "git remote add upstream https://github.com/foo/bar",
+        git_remote_remove_denied: "git remote remove upstream",
+        git_remote_rename_denied: "git remote rename origin upstream",
+        git_config_flag_denied: "git -c user.name=foo log",
+        bare_git_denied: "git",
+        jj_global_flag_no_subcommand_denied: "jj --ignore-working-copy",
+        jj_global_flag_mutating_denied: "jj --ignore-working-copy new master",
+        jj_new_denied: "jj new master",
+        jj_edit_denied: "jj edit abc123",
+        jj_squash_denied: "jj squash",
+        jj_describe_denied: "jj describe -m 'test'",
+        jj_bookmark_denied: "jj bookmark set my-branch",
+        jj_git_push_denied: "jj git push",
+        jj_rebase_denied: "jj rebase -d master",
+        jj_restore_denied: "jj restore file.rb",
+        jj_abandon_denied: "jj abandon",
+        jj_config_set_denied: "jj config set user.name foo",
+        bare_jj_denied: "jj",
     }
 }
