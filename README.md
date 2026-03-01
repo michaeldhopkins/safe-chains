@@ -10,9 +10,19 @@ See [COMMANDS.md](COMMANDS.md) for the full list of supported commands.
 
 ## Install
 
-Requires [Rust](https://rustup.rs/).
+### Pre-built binary (recommended)
 
-### From crates.io
+Download from [GitHub Releases](https://github.com/michaeldhopkins/safe-chains/releases/latest). Binaries are available for macOS (Apple Silicon and Intel) and Linux (x86_64 and aarch64).
+
+```bash
+# Example for macOS Apple Silicon:
+curl -L https://github.com/michaeldhopkins/safe-chains/releases/latest/download/safe-chains-aarch64-apple-darwin.tar.gz | tar xz
+mv safe-chains ~/.cargo/bin/   # or anywhere in your PATH
+```
+
+### With Cargo
+
+Requires [Rust](https://rustup.rs/).
 
 ```bash
 cargo install safe-chains
@@ -25,12 +35,6 @@ git clone git@github.com:michaeldhopkins/safe-chains.git
 cd safe-chains
 cargo install --path .
 ```
-
-Both methods build the `safe-chains` binary and place it in `~/.cargo/bin/`.
-
-### What about install.sh?
-
-The repo includes an `install.sh` convenience script. All it does is run `cargo install --path .` and then check whether your `~/.claude/settings.json` already has the hook configured. If not, it prints the JSON snippet you need to add. It does not modify any files.
 
 ## Configure
 
