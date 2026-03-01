@@ -222,7 +222,7 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         "conda" => python::is_safe_conda(tokens),
 
         "cargo" => rust::is_safe_cargo(tokens),
-        "rustup" => rust::is_safe_rustup(tokens),
+        "rustup" => rust::is_safe_rustup(tokens, is_safe),
 
         "go" => go::is_safe_go(tokens),
 

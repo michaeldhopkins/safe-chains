@@ -7,10 +7,12 @@ static BREW_READ_ONLY: WordSet = WordSet::new(&[
 ]);
 
 static MISE_READ_ONLY: WordSet =
-    WordSet::new(&["--version", "current", "doctor", "list", "ls", "which"]);
+    WordSet::new(&["--version", "current", "doctor", "env", "list", "ls", "which"]);
 
-static MISE_MULTI: &[(&str, WordSet)] =
-    &[("settings", WordSet::new(&["get"]))];
+static MISE_MULTI: &[(&str, WordSet)] = &[
+    ("config", WordSet::new(&["list", "ls"])),
+    ("settings", WordSet::new(&["get"])),
+];
 
 static ASDF_READ_ONLY: WordSet =
     WordSet::new(&["--version", "current", "help", "info", "list", "version", "which"]);
@@ -301,6 +303,31 @@ mod tests {
     #[test]
     fn mise_use_denied() {
         assert!(!check("mise use ruby@3.4"));
+    }
+
+    #[test]
+    fn mise_env() {
+        assert!(check("mise env"));
+    }
+
+    #[test]
+    fn mise_config_ls() {
+        assert!(check("mise config ls"));
+    }
+
+    #[test]
+    fn mise_config_list() {
+        assert!(check("mise config list"));
+    }
+
+    #[test]
+    fn mise_config_set_denied() {
+        assert!(!check("mise config set key value"));
+    }
+
+    #[test]
+    fn mise_config_bare_denied() {
+        assert!(!check("mise config"));
     }
 
     #[test]

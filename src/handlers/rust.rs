@@ -1,4 +1,4 @@
-use crate::parse::{FlagCheck, Token, WordSet};
+use crate::parse::{FlagCheck, Segment, Token, WordSet};
 
 static CARGO_SAFE: WordSet = WordSet::new(&[
     "--version", "audit", "bench", "build", "check", "clippy", "deny",
@@ -52,12 +52,19 @@ pub fn is_safe_cargo(tokens: &[Token]) -> bool {
     false
 }
 
-pub fn is_safe_rustup(tokens: &[Token]) -> bool {
-    super::is_safe_subcmd(tokens, &RUSTUP_SAFE, RUSTUP_MULTI)
+pub fn is_safe_rustup(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    if super::is_safe_subcmd(tokens, &RUSTUP_SAFE, RUSTUP_MULTI) {
+        return true;
+    }
+    if tokens.len() >= 4 && tokens[1] == "run" {
+        let inner = Token::join(&tokens[3..]);
+        return is_safe(&inner);
+    }
+    false
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, doc, describe_flagcheck};
+    use crate::docs::{CommandDoc, doc, doc_multi, describe_flagcheck};
     vec![
         CommandDoc::handler("cargo",
             doc(&CARGO_SAFE)
@@ -70,7 +77,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                     describe_flagcheck(&CARGO_PUBLISH_DRY).trim_end_matches('.'),
                 ))
                 .build()),
-        CommandDoc::wordset_multi("rustup", &RUSTUP_SAFE, RUSTUP_MULTI),
+        CommandDoc::handler("rustup",
+            doc_multi(&RUSTUP_SAFE, RUSTUP_MULTI)
+                .section("run <toolchain> delegates to inner command validation.")
+                .build()),
     ]
 }
 
@@ -370,5 +380,70 @@ mod tests {
     #[test]
     fn rustup_self_denied() {
         assert!(!check("rustup self update"));
+    }
+
+    #[test]
+    fn rustup_run_rustc_version() {
+        assert!(check("rustup run stable rustc --version"));
+    }
+
+    #[test]
+    fn rustup_run_cargo_test() {
+        assert!(check("rustup run nightly cargo test"));
+    }
+
+    #[test]
+    fn rustup_run_cargo_clippy() {
+        assert!(check("rustup run stable cargo clippy -- -D warnings"));
+    }
+
+    #[test]
+    fn rustup_run_cargo_fmt_check() {
+        assert!(check("rustup run nightly cargo fmt --check"));
+    }
+
+    #[test]
+    fn rustup_run_cargo_fmt_denied() {
+        assert!(!check("rustup run nightly cargo fmt"));
+    }
+
+    #[test]
+    fn rustup_run_unsafe_inner_denied() {
+        assert!(!check("rustup run stable rm -rf /"));
+    }
+
+    #[test]
+    fn rustup_run_no_inner_denied() {
+        assert!(!check("rustup run stable"));
+    }
+
+    #[test]
+    fn rustup_run_no_toolchain_denied() {
+        assert!(!check("rustup run"));
+    }
+
+    #[test]
+    fn rustup_run_cargo_publish_denied() {
+        assert!(!check("rustup run nightly cargo publish"));
+    }
+
+    #[test]
+    fn rustup_run_bash_c_denied() {
+        assert!(!check("rustup run stable bash -c 'rm -rf /'"));
+    }
+
+    #[test]
+    fn rustup_run_env_unsafe_denied() {
+        assert!(!check("rustup run stable env rm foo"));
+    }
+
+    #[test]
+    fn rustup_run_nested_denied() {
+        assert!(!check("rustup run nightly rustup run stable rm -rf /"));
+    }
+
+    #[test]
+    fn rustup_run_env_cargo_test() {
+        assert!(check("rustup run stable env FOO=bar cargo test"));
     }
 }
