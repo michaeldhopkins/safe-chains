@@ -83,6 +83,7 @@ pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str)] = &[
     ("tree", "Directory tree"),
     ("cd", "Change directory"),
     ("command", "Run command or check existence"),
+    ("unset", "Unset environment variables"),
 
     ("hostname", "Print hostname"),
     ("uname", "System information"),

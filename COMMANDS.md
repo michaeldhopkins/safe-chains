@@ -117,6 +117,7 @@ These commands are allowed with any arguments.
 | `uname` | System information |
 | `unexpand` | Convert spaces to tabs |
 | `uniq` | Filter duplicate lines |
+| `unset` | Unset environment variables |
 | `uptime` | System uptime |
 | `uuidgen` | Generate UUID |
 | `vm_stat` | Virtual memory statistics |
