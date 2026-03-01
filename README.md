@@ -10,7 +10,7 @@ See [COMMANDS.md](COMMANDS.md) for the full list of supported commands.
 
 ## Install
 
-### Pre-built binary (recommended)
+### Pre-built binary
 
 Download from [GitHub Releases](https://github.com/michaeldhopkins/safe-chains/releases/latest). Binaries are available for macOS (Apple Silicon and Intel) and Linux (x86_64 and aarch64).
 
