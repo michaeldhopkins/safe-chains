@@ -1,7 +1,7 @@
 use crate::parse::{Token, WordSet};
 
 static GIT_READ_ONLY: WordSet = WordSet::new(&[
-    "--version", "blame", "cat-file", "count-objects", "describe",
+    "--version", "blame", "cat-file", "check-ignore", "count-objects", "describe",
     "diff", "diff-tree", "fetch", "for-each-ref", "grep", "help",
     "log", "ls-files", "ls-remote", "ls-tree", "merge-base", "merge-tree",
     "name-rev", "reflog", "rev-parse", "shortlog", "show", "status",
@@ -148,7 +148,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("git",
-            "Read-only: log, diff, show, status, ls-tree, grep, rev-parse, merge-base, merge-tree, fetch, help, shortlog, describe, blame, reflog, ls-files, ls-remote, diff-tree, cat-file, name-rev, for-each-ref, count-objects, verify-commit, verify-tag. \
+            "Read-only: log, diff, show, status, ls-tree, grep, rev-parse, merge-base, merge-tree, fetch, help, shortlog, describe, blame, reflog, ls-files, ls-remote, diff-tree, cat-file, check-ignore, name-rev, for-each-ref, count-objects, verify-commit, verify-tag. \
              Guarded: remote (deny add/remove/rename/set-url/prune), branch (deny -d/-m/-c/--delete/--move/--copy), stash (list, show only), tag (list only, deny -d/-a/-s/-f), config (--list/--get/--get-all/--get-regexp/-l only), worktree (list only), notes (show, list only). \
              Supports `-C <dir>` prefix."),
         CommandDoc::handler("jj",
@@ -264,6 +264,11 @@ mod tests {
     #[test]
     fn git_cat_file() {
         assert!(check("git cat-file -p HEAD"));
+    }
+
+    #[test]
+    fn git_check_ignore() {
+        assert!(check("git check-ignore .jj/"));
     }
 
     #[test]

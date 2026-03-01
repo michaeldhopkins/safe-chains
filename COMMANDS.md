@@ -226,7 +226,7 @@ Read-only subcommands (view/list/status/diff/checks/verify): pr, issue, repo, re
 
 ### `git`
 
-Read-only: log, diff, show, status, ls-tree, grep, rev-parse, merge-base, merge-tree, fetch, help, shortlog, describe, blame, reflog, ls-files, ls-remote, diff-tree, cat-file, name-rev, for-each-ref, count-objects, verify-commit, verify-tag. Guarded: remote (deny add/remove/rename/set-url/prune), branch (deny -d/-m/-c/--delete/--move/--copy), stash (list, show only), tag (list only, deny -d/-a/-s/-f), config (--list/--get/--get-all/--get-regexp/-l only), worktree (list only), notes (show, list only). Supports `-C <dir>` prefix.
+Read-only: log, diff, show, status, ls-tree, grep, rev-parse, merge-base, merge-tree, fetch, help, shortlog, describe, blame, reflog, ls-files, ls-remote, diff-tree, cat-file, check-ignore, name-rev, for-each-ref, count-objects, verify-commit, verify-tag. Guarded: remote (deny add/remove/rename/set-url/prune), branch (deny -d/-m/-c/--delete/--move/--copy), stash (list, show only), tag (list only, deny -d/-a/-s/-f), config (--list/--get/--get-all/--get-regexp/-l only), worktree (list only), notes (show, list only). Supports `-C <dir>` prefix.
 
 ### `glab`
 
