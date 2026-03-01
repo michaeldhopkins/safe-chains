@@ -173,29 +173,31 @@ pub fn is_safe_volta(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, describe_wordset, describe_wordset_multi};
+    use crate::docs::{CommandDoc, doc, doc_multi};
     vec![
-        CommandDoc::handler("npm", format!(
-            "{} Guarded: config (list/get only), run/run-script (test/test:* only).",
-            describe_wordset(&NPM_READ_ONLY),
-        )),
-        CommandDoc::handler("yarn", format!(
-            "{} Also allowed: test, test:*.",
-            describe_wordset(&YARN_READ_ONLY),
-        )),
+        CommandDoc::handler("npm",
+            doc(&NPM_READ_ONLY)
+                .section("Guarded: config (list/get only), run/run-script (test/test:* only).")
+                .build()),
+        CommandDoc::handler("yarn",
+            doc(&YARN_READ_ONLY)
+                .section("Also allowed: test, test:*.")
+                .build()),
         CommandDoc::wordset("pnpm", &PNPM_READ_ONLY),
-        CommandDoc::handler("bun", format!(
-            "{} x delegates to bunx logic.",
-            describe_wordset_multi(&BUN_SAFE, BUN_MULTI),
-        )),
+        CommandDoc::handler("bun",
+            doc_multi(&BUN_SAFE, BUN_MULTI)
+                .section("x delegates to bunx logic.")
+                .build()),
         CommandDoc::handler("bunx",
-            "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p."),
-        CommandDoc::handler("deno", format!(
-            "{} Guarded: fmt (requires --check).",
-            describe_wordset(&DENO_SAFE),
-        )),
+            "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. \
+             Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p."),
+        CommandDoc::handler("deno",
+            doc(&DENO_SAFE)
+                .section("Guarded: fmt (requires --check).")
+                .build()),
         CommandDoc::handler("npx",
-            "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p."),
+            "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. \
+             Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p."),
         CommandDoc::wordset("nvm", &NVM_SAFE),
         CommandDoc::wordset("fnm", &FNM_SAFE),
         CommandDoc::wordset("volta", &VOLTA_SAFE),

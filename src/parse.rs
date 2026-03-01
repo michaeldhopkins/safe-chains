@@ -16,6 +16,7 @@ impl Deref for Token {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct WordSet(&'static [&'static str]);
 
 impl WordSet {

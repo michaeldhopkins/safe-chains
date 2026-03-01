@@ -100,16 +100,17 @@ pub fn is_safe_codesign(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, describe_wordset};
+    use crate::docs::{CommandDoc, doc};
     vec![
         CommandDoc::wordset("xcodebuild", &XCODEBUILD_SAFE),
         CommandDoc::wordset("plutil", &PLUTIL_READ_ONLY),
         CommandDoc::handler("xcode-select",
             "Allowed: -p/--print-path, -v/--version. Denied: -s/--switch, -r/--reset, --install."),
-        CommandDoc::handler("xcrun", format!(
-            "{} Also: simctl list. Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.",
-            describe_wordset(&XCRUN_SHOW_FLAGS),
-        )),
+        CommandDoc::handler("xcrun",
+            doc(&XCRUN_SHOW_FLAGS)
+                .multi_word(&[("simctl", WordSet::new(&["list"]))])
+                .section("Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.")
+                .build()),
         CommandDoc::flagcheck("pkgutil", &PKGUTIL_CHECK),
         CommandDoc::flagcheck("lipo", &LIPO_CHECK),
         CommandDoc::flagcheck("codesign", &CODESIGN_CHECK),

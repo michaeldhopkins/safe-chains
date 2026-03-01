@@ -18,11 +18,11 @@ impl CommandDoc {
     }
 
     pub fn wordset(name: &'static str, words: &WordSet) -> Self {
-        Self::handler(name, describe_wordset(words))
+        Self::handler(name, doc(words).build())
     }
 
     pub fn wordset_multi(name: &'static str, words: &WordSet, multi: &[(&str, WordSet)]) -> Self {
-        Self::handler(name, describe_wordset_multi(words, multi))
+        Self::handler(name, doc_multi(words, multi).build())
     }
 
     pub fn flagcheck(name: &'static str, check: &FlagCheck) -> Self {
@@ -34,28 +34,90 @@ impl CommandDoc {
     }
 }
 
-pub fn describe_wordset(words: &WordSet) -> String {
-    let items: Vec<&str> = words.iter().collect();
-    format!("Allowed: {}.", items.join(", "))
+#[derive(Default)]
+pub struct DocBuilder {
+    subcommands: Vec<String>,
+    flags: Vec<String>,
+    sections: Vec<String>,
 }
 
-pub fn describe_wordset_multi(words: &WordSet, multi: &[(&str, WordSet)]) -> String {
-    let mut parts = Vec::new();
-    let simple: Vec<&str> = words.iter().collect();
-    if !simple.is_empty() {
-        parts.push(format!("Allowed: {}", simple.join(", ")));
+impl DocBuilder {
+    pub fn new() -> Self {
+        Self::default()
     }
-    if !multi.is_empty() {
-        let multi_strs: Vec<String> = multi
-            .iter()
-            .map(|(prefix, actions)| {
-                let acts: Vec<&str> = actions.iter().collect();
-                format!("{} {}", prefix, acts.join("/"))
-            })
-            .collect();
-        parts.push(format!("Multi-word: {}", multi_strs.join(", ")));
+
+    pub fn wordset(mut self, words: &WordSet) -> Self {
+        for item in words.iter() {
+            if item.starts_with('-') {
+                self.flags.push(item.to_string());
+            } else {
+                self.subcommands.push(item.to_string());
+            }
+        }
+        self
     }
-    format!("{}.", parts.join(". "))
+
+    pub fn multi_word(mut self, multi: &[(&str, WordSet)]) -> Self {
+        for (prefix, actions) in multi {
+            for action in actions.iter() {
+                self.subcommands.push(format!("{prefix} {action}"));
+            }
+        }
+        self
+    }
+
+    pub fn triple_word(mut self, triples: &[(&str, &str, WordSet)]) -> Self {
+        for (a, b, actions) in triples {
+            for action in actions.iter() {
+                self.subcommands.push(format!("{a} {b} {action}"));
+            }
+        }
+        self
+    }
+
+    pub fn subcommand(mut self, name: impl Into<String>) -> Self {
+        self.subcommands.push(name.into());
+        self
+    }
+
+    pub fn section(mut self, text: impl Into<String>) -> Self {
+        let s = text.into();
+        if !s.is_empty() {
+            self.sections.push(s);
+        }
+        self
+    }
+
+    pub fn build(self) -> String {
+        let mut all_sections = Vec::new();
+        if !self.subcommands.is_empty() {
+            let mut subs = self.subcommands;
+            subs.sort();
+            all_sections.push(format!("Subcommands: {}.", subs.join(", ")));
+        }
+        if !self.flags.is_empty() {
+            all_sections.push(format!("Flags: {}.", self.flags.join(", ")));
+        }
+        all_sections.extend(self.sections);
+        if all_sections.len() > 2 {
+            all_sections.join("\n\n")
+        } else {
+            all_sections.join(" ")
+        }
+    }
+}
+
+pub fn doc(words: &WordSet) -> DocBuilder {
+    DocBuilder::new().wordset(words)
+}
+
+pub fn doc_multi(words: &WordSet, multi: &[(&str, WordSet)]) -> DocBuilder {
+    DocBuilder::new().wordset(words).multi_word(multi)
+}
+
+pub fn wordset_items(words: &WordSet) -> String {
+    let items: Vec<&str> = words.iter().collect();
+    items.join(", ")
 }
 
 pub fn describe_flagcheck(check: &FlagCheck) -> String {
@@ -119,19 +181,92 @@ mod tests {
     use super::*;
 
     #[test]
-    fn wordset_description() {
+    fn builder_two_sections_inline() {
         let ws = WordSet::new(&["--version", "list", "show"]);
-        assert_eq!(describe_wordset(&ws), "Allowed: --version, list, show.");
+        assert_eq!(doc(&ws).build(), "Subcommands: list, show. Flags: --version.");
     }
 
     #[test]
-    fn wordset_multi_description() {
-        let simple = WordSet::new(&["--version", "show"]);
+    fn builder_subcommands_only() {
+        let ws = WordSet::new(&["list", "show"]);
+        assert_eq!(doc(&ws).build(), "Subcommands: list, show.");
+    }
+
+    #[test]
+    fn builder_flags_only() {
+        let ws = WordSet::new(&["--check", "--version"]);
+        assert_eq!(doc(&ws).build(), "Flags: --check, --version.");
+    }
+
+    #[test]
+    fn builder_three_sections_newlines() {
+        let ws = WordSet::new(&["--version", "list", "show"]);
+        assert_eq!(
+            doc(&ws).section("Guarded: foo (bar only).").build(),
+            "Subcommands: list, show.\n\nFlags: --version.\n\nGuarded: foo (bar only)."
+        );
+    }
+
+    #[test]
+    fn builder_multi_word_merged() {
+        let ws = WordSet::new(&["--version", "info", "show"]);
         let multi: &[(&str, WordSet)] =
             &[("config", WordSet::new(&["get", "list"]))];
         assert_eq!(
-            describe_wordset_multi(&simple, multi),
-            "Allowed: --version, show. Multi-word: config get/list."
+            doc_multi(&ws, multi).build(),
+            "Subcommands: config get, config list, info, show. Flags: --version."
+        );
+    }
+
+    #[test]
+    fn builder_multi_word_with_extra_section() {
+        let ws = WordSet::new(&["--version", "show"]);
+        let multi: &[(&str, WordSet)] =
+            &[("config", WordSet::new(&["get", "list"]))];
+        assert_eq!(
+            doc_multi(&ws, multi).section("Guarded: foo.").build(),
+            "Subcommands: config get, config list, show.\n\nFlags: --version.\n\nGuarded: foo."
+        );
+    }
+
+    #[test]
+    fn builder_no_flags_with_extra_stays_inline() {
+        let ws = WordSet::new(&["list", "show"]);
+        assert_eq!(
+            doc(&ws).section("Also: foo.").build(),
+            "Subcommands: list, show. Also: foo."
+        );
+    }
+
+    #[test]
+    fn builder_custom_sections_only() {
+        assert_eq!(
+            DocBuilder::new()
+                .section("Read-only: foo.")
+                .section("Always safe: bar.")
+                .section("Guarded: baz.")
+                .build(),
+            "Read-only: foo.\n\nAlways safe: bar.\n\nGuarded: baz."
+        );
+    }
+
+    #[test]
+    fn builder_triple_word() {
+        let ws = WordSet::new(&["--version", "diff"]);
+        let triples: &[(&str, &str, WordSet)] =
+            &[("git", "remote", WordSet::new(&["list"]))];
+        assert_eq!(
+            doc(&ws).triple_word(triples).build(),
+            "Subcommands: diff, git remote list. Flags: --version."
+        );
+    }
+
+    #[test]
+    fn builder_subcommand_method() {
+        let ws = WordSet::new(&["--version", "list"]);
+        assert_eq!(
+            doc(&ws).subcommand("plugin-list").build(),
+            "Subcommands: list, plugin-list. Flags: --version."
         );
     }
 

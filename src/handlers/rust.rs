@@ -57,17 +57,19 @@ pub fn is_safe_rustup(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, describe_wordset, describe_flagcheck};
+    use crate::docs::{CommandDoc, doc, describe_flagcheck};
     vec![
-        CommandDoc::handler("cargo", format!(
-            "{} Guarded: fmt ({}), package ({}), publish ({}). \
-             +toolchain selectors (e.g. +nightly, +stable) are skipped. \
-             Any subcommand with --help is safe (unless -- separator is present).",
-            describe_wordset(&CARGO_SAFE),
-            describe_flagcheck(&CARGO_FMT).trim_end_matches('.'),
-            describe_flagcheck(&CARGO_PACKAGE_LIST).trim_end_matches('.'),
-            describe_flagcheck(&CARGO_PUBLISH_DRY).trim_end_matches('.'),
-        )),
+        CommandDoc::handler("cargo",
+            doc(&CARGO_SAFE)
+                .section(format!(
+                    "Guarded: fmt ({}), package ({}), publish ({}).\n\
+                     +toolchain selectors (e.g. +nightly, +stable) are skipped.\n\
+                     Any subcommand with --help is safe (unless -- separator is present).",
+                    describe_flagcheck(&CARGO_FMT).trim_end_matches('.'),
+                    describe_flagcheck(&CARGO_PACKAGE_LIST).trim_end_matches('.'),
+                    describe_flagcheck(&CARGO_PUBLISH_DRY).trim_end_matches('.'),
+                ))
+                .build()),
         CommandDoc::wordset_multi("rustup", &RUSTUP_SAFE, RUSTUP_MULTI),
     ]
 }

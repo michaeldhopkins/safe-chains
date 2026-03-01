@@ -170,36 +170,40 @@ pub fn is_safe_tea(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, describe_wordset, describe_flagcheck};
-    let actions = describe_wordset(&READ_ONLY_ACTIONS).trim_start_matches("Allowed: ").trim_end_matches('.').to_string();
+    use crate::docs::{CommandDoc, DocBuilder, describe_flagcheck, wordset_items};
     vec![
-        CommandDoc::handler("gh", format!(
-            "Read-only subcommands ({actions}): {}. \
-             Always safe: {}. \
-             Guarded: auth ({} only), browse ({}), api (GET only, no body flags).",
-            describe_wordset(&READ_ONLY_SUBCOMMANDS).trim_start_matches("Allowed: ").trim_end_matches('.'),
-            describe_wordset(&ALWAYS_SAFE_SUBCOMMANDS).trim_start_matches("Allowed: ").trim_end_matches('.'),
-            describe_wordset(&AUTH_SAFE_ACTIONS).trim_start_matches("Allowed: ").trim_end_matches('.'),
-            describe_flagcheck(&GH_BROWSE).trim_end_matches('.').to_lowercase(),
-        )),
-        CommandDoc::handler("glab", format!(
-            "Read-only subcommands ({}): {}. \
-             Always safe: {}. \
-             Guarded: auth ({} only), api (GET only, no body flags).",
-            describe_wordset(&GLAB_READ_ONLY_ACTIONS).trim_start_matches("Allowed: ").trim_end_matches('.'),
-            describe_wordset(&GLAB_READ_ONLY_SUBCOMMANDS).trim_start_matches("Allowed: ").trim_end_matches('.'),
-            describe_wordset(&GLAB_ALWAYS_SAFE).trim_start_matches("Allowed: ").trim_end_matches('.'),
-            describe_wordset(&GLAB_AUTH_SAFE).trim_start_matches("Allowed: ").trim_end_matches('.'),
-        )),
-        CommandDoc::handler("tea", format!(
-            "Read-only subcommands ({}): {}. \
-             Bare subcommand (no action) also safe for read-only subcommands. \
-             Always safe: {}. Guarded: logins/login ({} only).",
-            describe_wordset(&TEA_READ_ONLY_ACTIONS).trim_start_matches("Allowed: ").trim_end_matches('.'),
-            describe_wordset(&TEA_READ_ONLY_SUBCOMMANDS).trim_start_matches("Allowed: ").trim_end_matches('.'),
-            describe_wordset(&TEA_ALWAYS_SAFE).trim_start_matches("Allowed: ").trim_end_matches('.'),
-            describe_wordset(&TEA_LOGIN_SAFE).trim_start_matches("Allowed: ").trim_end_matches('.'),
-        )),
+        CommandDoc::handler("gh",
+            DocBuilder::new()
+                .section(format!("Subcommands {} are allowed with actions: {}.",
+                    wordset_items(&READ_ONLY_SUBCOMMANDS),
+                    wordset_items(&READ_ONLY_ACTIONS)))
+                .section(format!("Always safe: {}.",
+                    wordset_items(&ALWAYS_SAFE_SUBCOMMANDS)))
+                .section(format!("Guarded: auth ({} only), browse ({}), api (GET only, no body flags).",
+                    wordset_items(&AUTH_SAFE_ACTIONS),
+                    describe_flagcheck(&GH_BROWSE).trim_end_matches('.').to_lowercase()))
+                .build()),
+        CommandDoc::handler("glab",
+            DocBuilder::new()
+                .section(format!("Subcommands {} are allowed with actions: {}.",
+                    wordset_items(&GLAB_READ_ONLY_SUBCOMMANDS),
+                    wordset_items(&GLAB_READ_ONLY_ACTIONS)))
+                .section(format!("Always safe: {}.",
+                    wordset_items(&GLAB_ALWAYS_SAFE)))
+                .section(format!("Guarded: auth ({} only), api (GET only, no body flags).",
+                    wordset_items(&GLAB_AUTH_SAFE)))
+                .build()),
+        CommandDoc::handler("tea",
+            DocBuilder::new()
+                .section(format!("Subcommands {} are allowed with actions: {}. \
+                    Bare subcommand (no action) is also safe.",
+                    wordset_items(&TEA_READ_ONLY_SUBCOMMANDS),
+                    wordset_items(&TEA_READ_ONLY_ACTIONS)))
+                .section(format!("Always safe: {}.",
+                    wordset_items(&TEA_ALWAYS_SAFE)))
+                .section(format!("Guarded: logins/login ({} only).",
+                    wordset_items(&TEA_LOGIN_SAFE)))
+                .build()),
     ]
 }
 
