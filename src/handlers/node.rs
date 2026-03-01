@@ -173,7 +173,7 @@ pub fn is_safe_volta(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, doc, doc_multi};
+    use crate::docs::{CommandDoc, DocBuilder, doc, doc_multi, wordset_items};
     vec![
         CommandDoc::handler("npm",
             doc(&NPM_READ_ONLY)
@@ -189,15 +189,21 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                 .section("x delegates to bunx logic.")
                 .build()),
         CommandDoc::handler("bunx",
-            "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. \
-             Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p."),
+            DocBuilder::new()
+                .section(format!("Allowed packages: {}.", wordset_items(&NPX_SAFE)))
+                .section("Guarded: tsc (requires --noEmit).")
+                .section("Skips flags: --bun/--no-install/--package/-p.")
+                .build()),
         CommandDoc::handler("deno",
             doc(&DENO_SAFE)
                 .section("Guarded: fmt (requires --check).")
                 .build()),
         CommandDoc::handler("npx",
-            "Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. \
-             Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p."),
+            DocBuilder::new()
+                .section(format!("Allowed packages: {}.", wordset_items(&NPX_SAFE)))
+                .section("Guarded: tsc (requires --noEmit).")
+                .section("Skips flags: --yes/-y/--no/--package/-p.")
+                .build()),
         CommandDoc::wordset("nvm", &NVM_SAFE),
         CommandDoc::wordset("fnm", &FNM_SAFE),
         CommandDoc::wordset("volta", &VOLTA_SAFE),

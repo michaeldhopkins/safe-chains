@@ -166,7 +166,11 @@ Guarded: exec (brakeman, cucumber, erb_lint, herb, rspec, standardrb only).
 
 ### `bunx`
 
-Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --bun/--no-install/--package/-p.
+Allowed packages: @herb-tools/linter, eslint, karma.
+
+Guarded: tsc (requires --noEmit).
+
+Skips flags: --bun/--no-install/--package/-p.
 
 ### `cargo`
 
@@ -328,7 +332,11 @@ Guarded: config (list/get only), run/run-script (test/test:* only).
 
 ### `npx`
 
-Allowed: --version. Whitelisted packages only: eslint, @herb-tools/linter, karma. Guarded: tsc (requires --noEmit). Skips flags: --yes/-y/--no/--package/-p.
+Allowed packages: @herb-tools/linter, eslint, karma.
+
+Guarded: tsc (requires --noEmit).
+
+Skips flags: --yes/-y/--no/--package/-p.
 
 ### `nvm`
 
