@@ -145,16 +145,28 @@ pub fn is_safe_jj(tokens: &[Token]) -> bool {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
+    use crate::docs::{CommandDoc, describe_wordset, describe_wordset_multi};
     vec![
-        CommandDoc::handler("git",
-            "Read-only: log, diff, show, status, ls-tree, grep, rev-parse, merge-base, merge-tree, fetch, help, shortlog, describe, blame, reflog, ls-files, ls-remote, diff-tree, cat-file, check-ignore, name-rev, for-each-ref, count-objects, verify-commit, verify-tag. \
-             Guarded: remote (deny add/remove/rename/set-url/prune), branch (deny -d/-m/-c/--delete/--move/--copy), stash (list, show only), tag (list only, deny -d/-a/-s/-f), config (--list/--get/--get-all/--get-regexp/-l only), worktree (list only), notes (show, list only). \
-             Supports `-C <dir>` prefix."),
-        CommandDoc::handler("jj",
-            "Read-only: log, diff, show, status, st, help, --version. \
-             Multi-word: op log, file show, config get/list, bookmark list, git fetch, git remote list. \
-             Skips global flags: --ignore-working-copy, --no-pager, --quiet, --verbose, --debug, --ignore-immutable, --color, -R/--repository, --at-op/--at-operation."),
+        CommandDoc::handler("git", format!(
+            "{} \
+             Guarded: remote (deny {}), branch (deny {}), stash ({} only), \
+             tag (list only, deny {}), config ({} only), worktree (list only), notes ({} only). \
+             Supports `-C <dir>` prefix.",
+            describe_wordset(&GIT_READ_ONLY),
+            describe_wordset(&GIT_REMOTE_MUTATING).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&GIT_BRANCH_MUTATING).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&GIT_STASH_SAFE).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&GIT_TAG_MUTATING).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&GIT_CONFIG_SAFE).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&GIT_NOTES_SAFE).trim_start_matches("Allowed: ").trim_end_matches('.'),
+        )),
+        CommandDoc::handler("jj", format!(
+            "{} \
+             Skips global flags: standalone ({}), valued ({}).",
+            describe_wordset_multi(&JJ_READ_ONLY, JJ_MULTI),
+            describe_wordset(&JJ_GLOBAL_STANDALONE).trim_start_matches("Allowed: ").trim_end_matches('.'),
+            describe_wordset(&JJ_GLOBAL_VALUED).trim_start_matches("Allowed: ").trim_end_matches('.'),
+        )),
     ]
 }
 
