@@ -308,7 +308,7 @@ Subcommands: help, show, stats, stream.
 
 ### `mise`
 
-Subcommands: current, doctor, list, ls, settings get, which. Flags: --version.
+Subcommands: config list, config ls, current, doctor, env, list, ls, settings get, which. Flags: --version.
 
 ### `mvn / mvnw`
 
@@ -384,7 +384,11 @@ Subcommands: help, root, shims, version, versions, which. Flags: --version.
 
 ### `rustup`
 
-Subcommands: component list, doc, show, target list, toolchain list, which. Flags: --version.
+Subcommands: component list, doc, show, target list, toolchain list, which.
+
+Flags: --version.
+
+run <toolchain> delegates to inner command validation.
 
 ### `security`
 
