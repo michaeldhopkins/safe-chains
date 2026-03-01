@@ -33,143 +33,37 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn gradle_tasks() {
-        assert!(check("gradle tasks"));
+    safe! {
+        gradle_tasks: "gradle tasks",
+        gradle_dependencies: "gradle dependencies",
+        gradle_properties: "gradle properties",
+        gradle_version: "gradle --version",
+        gradle_test: "gradle test",
+        gradle_build: "gradle build",
+        gradle_check: "gradle check",
+        gradlew_test: "gradlew test",
+        gradlew_version: "gradlew --version",
+        mvn_version: "mvn --version",
+        mvn_version_short: "mvn -v",
+        mvn_dependency_tree: "mvn dependency:tree",
+        mvn_dependency_list: "mvn dependency:list",
+        mvn_help_describe: "mvn help:describe -Dplugin=compiler",
+        mvn_validate: "mvn validate",
+        mvn_test: "mvn test",
+        mvn_compile: "mvn compile",
+        mvn_verify: "mvn verify",
+        mvn_test_compile: "mvn test-compile",
+        mvnw_test: "mvnw test",
     }
 
-    #[test]
-    fn gradle_dependencies() {
-        assert!(check("gradle dependencies"));
-    }
-
-    #[test]
-    fn gradle_properties() {
-        assert!(check("gradle properties"));
-    }
-
-    #[test]
-    fn gradle_version() {
-        assert!(check("gradle --version"));
-    }
-
-    #[test]
-    fn gradle_test() {
-        assert!(check("gradle test"));
-    }
-
-    #[test]
-    fn gradle_build() {
-        assert!(check("gradle build"));
-    }
-
-    #[test]
-    fn gradle_check() {
-        assert!(check("gradle check"));
-    }
-
-    #[test]
-    fn gradlew_test() {
-        assert!(check("gradlew test"));
-    }
-
-    #[test]
-    fn gradlew_version() {
-        assert!(check("gradlew --version"));
-    }
-
-    #[test]
-    fn gradle_clean_denied() {
-        assert!(!check("gradle clean"));
-    }
-
-    #[test]
-    fn gradle_publish_denied() {
-        assert!(!check("gradle publish"));
-    }
-
-    #[test]
-    fn gradle_run_denied() {
-        assert!(!check("gradle run"));
-    }
-
-    #[test]
-    fn bare_gradle_denied() {
-        assert!(!check("gradle"));
-    }
-
-    #[test]
-    fn mvn_version() {
-        assert!(check("mvn --version"));
-    }
-
-    #[test]
-    fn mvn_version_short() {
-        assert!(check("mvn -v"));
-    }
-
-    #[test]
-    fn mvn_dependency_tree() {
-        assert!(check("mvn dependency:tree"));
-    }
-
-    #[test]
-    fn mvn_dependency_list() {
-        assert!(check("mvn dependency:list"));
-    }
-
-    #[test]
-    fn mvn_help_describe() {
-        assert!(check("mvn help:describe -Dplugin=compiler"));
-    }
-
-    #[test]
-    fn mvn_validate() {
-        assert!(check("mvn validate"));
-    }
-
-    #[test]
-    fn mvn_test() {
-        assert!(check("mvn test"));
-    }
-
-    #[test]
-    fn mvn_compile() {
-        assert!(check("mvn compile"));
-    }
-
-    #[test]
-    fn mvn_verify() {
-        assert!(check("mvn verify"));
-    }
-
-    #[test]
-    fn mvn_test_compile() {
-        assert!(check("mvn test-compile"));
-    }
-
-    #[test]
-    fn mvnw_test() {
-        assert!(check("mvnw test"));
-    }
-
-    #[test]
-    fn mvn_deploy_denied() {
-        assert!(!check("mvn deploy"));
-    }
-
-    #[test]
-    fn mvn_install_denied() {
-        assert!(!check("mvn install"));
-    }
-
-    #[test]
-    fn mvn_clean_denied() {
-        assert!(!check("mvn clean"));
-    }
-
-    #[test]
-    fn bare_mvn_denied() {
-        assert!(!check("mvn"));
+    denied! {
+        gradle_clean_denied: "gradle clean",
+        gradle_publish_denied: "gradle publish",
+        gradle_run_denied: "gradle run",
+        bare_gradle_denied: "gradle",
+        mvn_deploy_denied: "mvn deploy",
+        mvn_install_denied: "mvn install",
+        mvn_clean_denied: "mvn clean",
+        bare_mvn_denied: "mvn",
     }
 }

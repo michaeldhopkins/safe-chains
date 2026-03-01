@@ -125,283 +125,65 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn xcodebuild_version() {
-        assert!(check("xcodebuild -version"));
+    safe! {
+        xcodebuild_version: "xcodebuild -version",
+        xcodebuild_showsdks: "xcodebuild -showsdks",
+        xcodebuild_show_build_settings: "xcodebuild -showBuildSettings",
+        xcodebuild_list: "xcodebuild -list",
+        plutil_lint: "plutil -lint file.plist",
+        plutil_print: "plutil -p file.plist",
+        plutil_type: "plutil -type keypath file.plist",
+        plutil_help: "plutil -help",
+        xcode_select_print_path: "xcode-select -p",
+        xcode_select_print_path_long: "xcode-select --print-path",
+        xcode_select_version: "xcode-select -v",
+        xcrun_find: "xcrun --find clang",
+        xcrun_show_sdk_path: "xcrun --show-sdk-path",
+        xcrun_show_sdk_version: "xcrun --show-sdk-version",
+        xcrun_show_sdk_platform_path: "xcrun --show-sdk-platform-path",
+        xcrun_show_toolchain_path: "xcrun --show-toolchain-path",
+        xcrun_sdk_flag_with_find: "xcrun --sdk iphoneos --find clang",
+        xcrun_simctl_list: "xcrun simctl list",
+        pkgutil_pkgs: "pkgutil --pkgs",
+        pkgutil_files: "pkgutil --files com.apple.pkg.CLTools_Executables",
+        pkgutil_pkg_info: "pkgutil --pkg-info com.apple.pkg.CLTools_Executables",
+        pkgutil_check_signature: "pkgutil --check-signature /path/to/pkg",
+        pkgutil_groups: "pkgutil --groups",
+        lipo_info: "lipo -info /usr/bin/ls",
+        lipo_detailed_info: "lipo -detailed_info binary",
+        lipo_archs: "lipo -archs binary",
+        lipo_verify_arch: "lipo -verify_arch x86_64 arm64 binary",
+        codesign_display: "codesign -d /Applications/Safari.app",
+        codesign_display_long: "codesign --display --verbose=4 /usr/bin/ls",
+        codesign_verify: "codesign -v /usr/bin/ls",
+        codesign_verify_long: "codesign --verify --deep /Applications/Xcode.app",
     }
 
-    #[test]
-    fn xcodebuild_showsdks() {
-        assert!(check("xcodebuild -showsdks"));
-    }
-
-    #[test]
-    fn xcodebuild_show_build_settings() {
-        assert!(check("xcodebuild -showBuildSettings"));
-    }
-
-    #[test]
-    fn xcodebuild_list() {
-        assert!(check("xcodebuild -list"));
-    }
-
-    #[test]
-    fn xcodebuild_build_denied() {
-        assert!(!check("xcodebuild build"));
-    }
-
-    #[test]
-    fn xcodebuild_clean_denied() {
-        assert!(!check("xcodebuild clean"));
-    }
-
-    #[test]
-    fn plutil_lint() {
-        assert!(check("plutil -lint file.plist"));
-    }
-
-    #[test]
-    fn plutil_print() {
-        assert!(check("plutil -p file.plist"));
-    }
-
-    #[test]
-    fn plutil_type() {
-        assert!(check("plutil -type keypath file.plist"));
-    }
-
-    #[test]
-    fn plutil_help() {
-        assert!(check("plutil -help"));
-    }
-
-    #[test]
-    fn plutil_convert_denied() {
-        assert!(!check("plutil -convert xml1 file.plist"));
-    }
-
-    #[test]
-    fn plutil_insert_denied() {
-        assert!(!check("plutil -insert key -string value file.plist"));
-    }
-
-    #[test]
-    fn plutil_replace_denied() {
-        assert!(!check("plutil -replace key -string value file.plist"));
-    }
-
-    #[test]
-    fn plutil_remove_denied() {
-        assert!(!check("plutil -remove key file.plist"));
-    }
-
-    #[test]
-    fn plutil_no_args_denied() {
-        assert!(!check("plutil"));
-    }
-
-    #[test]
-    fn xcode_select_print_path() {
-        assert!(check("xcode-select -p"));
-    }
-
-    #[test]
-    fn xcode_select_print_path_long() {
-        assert!(check("xcode-select --print-path"));
-    }
-
-    #[test]
-    fn xcode_select_version() {
-        assert!(check("xcode-select -v"));
-    }
-
-    #[test]
-    fn xcode_select_switch_denied() {
-        assert!(!check("xcode-select -s /Applications/Xcode.app"));
-    }
-
-    #[test]
-    fn xcode_select_install_denied() {
-        assert!(!check("xcode-select --install"));
-    }
-
-    #[test]
-    fn xcode_select_reset_denied() {
-        assert!(!check("xcode-select --reset"));
-    }
-
-    #[test]
-    fn xcode_select_no_args_denied() {
-        assert!(!check("xcode-select"));
-    }
-
-    #[test]
-    fn xcrun_find() {
-        assert!(check("xcrun --find clang"));
-    }
-
-    #[test]
-    fn xcrun_show_sdk_path() {
-        assert!(check("xcrun --show-sdk-path"));
-    }
-
-    #[test]
-    fn xcrun_show_sdk_version() {
-        assert!(check("xcrun --show-sdk-version"));
-    }
-
-    #[test]
-    fn xcrun_show_sdk_platform_path() {
-        assert!(check("xcrun --show-sdk-platform-path"));
-    }
-
-    #[test]
-    fn xcrun_show_toolchain_path() {
-        assert!(check("xcrun --show-toolchain-path"));
-    }
-
-    #[test]
-    fn xcrun_sdk_flag_with_find() {
-        assert!(check("xcrun --sdk iphoneos --find clang"));
-    }
-
-    #[test]
-    fn xcrun_simctl_list() {
-        assert!(check("xcrun simctl list"));
-    }
-
-    #[test]
-    fn xcrun_simctl_delete_denied() {
-        assert!(!check("xcrun simctl delete all"));
-    }
-
-    #[test]
-    fn xcrun_simctl_boot_denied() {
-        assert!(!check("xcrun simctl boot DEVICE_ID"));
-    }
-
-    #[test]
-    fn xcrun_arbitrary_tool_denied() {
-        assert!(!check("xcrun clang file.c"));
-    }
-
-    #[test]
-    fn xcrun_no_args_denied() {
-        assert!(!check("xcrun"));
-    }
-
-    #[test]
-    fn pkgutil_pkgs() {
-        assert!(check("pkgutil --pkgs"));
-    }
-
-    #[test]
-    fn pkgutil_files() {
-        assert!(check("pkgutil --files com.apple.pkg.CLTools_Executables"));
-    }
-
-    #[test]
-    fn pkgutil_pkg_info() {
-        assert!(check("pkgutil --pkg-info com.apple.pkg.CLTools_Executables"));
-    }
-
-    #[test]
-    fn pkgutil_check_signature() {
-        assert!(check("pkgutil --check-signature /path/to/pkg"));
-    }
-
-    #[test]
-    fn pkgutil_groups() {
-        assert!(check("pkgutil --groups"));
-    }
-
-    #[test]
-    fn pkgutil_forget_denied() {
-        assert!(!check("pkgutil --forget com.example.pkg"));
-    }
-
-    #[test]
-    fn pkgutil_expand_denied() {
-        assert!(!check("pkgutil --expand pkg.pkg /tmp/expanded"));
-    }
-
-    #[test]
-    fn pkgutil_no_args_denied() {
-        assert!(!check("pkgutil"));
-    }
-
-    #[test]
-    fn lipo_info() {
-        assert!(check("lipo -info /usr/bin/ls"));
-    }
-
-    #[test]
-    fn lipo_detailed_info() {
-        assert!(check("lipo -detailed_info binary"));
-    }
-
-    #[test]
-    fn lipo_archs() {
-        assert!(check("lipo -archs binary"));
-    }
-
-    #[test]
-    fn lipo_verify_arch() {
-        assert!(check("lipo -verify_arch x86_64 arm64 binary"));
-    }
-
-    #[test]
-    fn lipo_create_denied() {
-        assert!(!check("lipo -create a.o b.o -output universal.o"));
-    }
-
-    #[test]
-    fn lipo_thin_denied() {
-        assert!(!check("lipo -thin arm64 -output thin binary"));
-    }
-
-    #[test]
-    fn lipo_no_args_denied() {
-        assert!(!check("lipo"));
-    }
-
-    #[test]
-    fn codesign_display() {
-        assert!(check("codesign -d /Applications/Safari.app"));
-    }
-
-    #[test]
-    fn codesign_display_long() {
-        assert!(check("codesign --display --verbose=4 /usr/bin/ls"));
-    }
-
-    #[test]
-    fn codesign_verify() {
-        assert!(check("codesign -v /usr/bin/ls"));
-    }
-
-    #[test]
-    fn codesign_verify_long() {
-        assert!(check("codesign --verify --deep /Applications/Xcode.app"));
-    }
-
-    #[test]
-    fn codesign_sign_denied() {
-        assert!(!check("codesign -s - binary"));
-    }
-
-    #[test]
-    fn codesign_remove_signature_denied() {
-        assert!(!check("codesign --remove-signature binary"));
-    }
-
-    #[test]
-    fn codesign_force_denied() {
-        assert!(!check("codesign -f -s - binary"));
-    }
-
-    #[test]
-    fn codesign_no_args_denied() {
-        assert!(!check("codesign"));
+    denied! {
+        xcodebuild_build_denied: "xcodebuild build",
+        xcodebuild_clean_denied: "xcodebuild clean",
+        plutil_convert_denied: "plutil -convert xml1 file.plist",
+        plutil_insert_denied: "plutil -insert key -string value file.plist",
+        plutil_replace_denied: "plutil -replace key -string value file.plist",
+        plutil_remove_denied: "plutil -remove key file.plist",
+        plutil_no_args_denied: "plutil",
+        xcode_select_switch_denied: "xcode-select -s /Applications/Xcode.app",
+        xcode_select_install_denied: "xcode-select --install",
+        xcode_select_reset_denied: "xcode-select --reset",
+        xcode_select_no_args_denied: "xcode-select",
+        xcrun_simctl_delete_denied: "xcrun simctl delete all",
+        xcrun_simctl_boot_denied: "xcrun simctl boot DEVICE_ID",
+        xcrun_arbitrary_tool_denied: "xcrun clang file.c",
+        xcrun_no_args_denied: "xcrun",
+        pkgutil_forget_denied: "pkgutil --forget com.example.pkg",
+        pkgutil_expand_denied: "pkgutil --expand pkg.pkg /tmp/expanded",
+        pkgutil_no_args_denied: "pkgutil",
+        lipo_create_denied: "lipo -create a.o b.o -output universal.o",
+        lipo_thin_denied: "lipo -thin arm64 -output thin binary",
+        lipo_no_args_denied: "lipo",
+        codesign_sign_denied: "codesign -s - binary",
+        codesign_remove_signature_denied: "codesign --remove-signature binary",
+        codesign_force_denied: "codesign -f -s - binary",
+        codesign_no_args_denied: "codesign",
     }
 }

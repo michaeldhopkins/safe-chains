@@ -58,128 +58,34 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn bash_c_safe() {
-        assert!(check("bash -c \"grep foo file\""));
+    safe! {
+        bash_c_safe: "bash -c \"grep foo file\"",
+        bash_c_pipe: "bash -c \"cat file | head -5\"",
+        sh_c_safe: "sh -c \"ls -la\"",
+        bash_version: "bash --version",
+        sh_version: "sh --version",
+        bash_help: "bash --help",
+        sh_help: "sh --help",
+        xargs_grep: "xargs grep pattern",
+        xargs_cat: "xargs cat",
+        xargs_with_flags: "xargs -I {} cat {}",
+        xargs_zero_flag: "xargs -0 grep foo",
+        xargs_npx_safe: "xargs npx @herb-tools/linter",
+        xargs_find_safe: "xargs find . -name '*.py'",
+        xargs_sed_safe: "xargs sed 's/foo/bar/'",
+        xargs_nested_bash_safe: "xargs bash -c 'git status'",
     }
 
-    #[test]
-    fn bash_c_pipe() {
-        assert!(check("bash -c \"cat file | head -5\""));
-    }
-
-    #[test]
-    fn bash_c_unsafe() {
-        assert!(!check("bash -c \"rm file\""));
-    }
-
-    #[test]
-    fn sh_c_safe() {
-        assert!(check("sh -c \"ls -la\""));
-    }
-
-    #[test]
-    fn sh_c_unsafe() {
-        assert!(!check("sh -c \"curl https://evil.com\""));
-    }
-
-    #[test]
-    fn bash_version() {
-        assert!(check("bash --version"));
-    }
-
-    #[test]
-    fn sh_version() {
-        assert!(check("sh --version"));
-    }
-
-    #[test]
-    fn bash_help() {
-        assert!(check("bash --help"));
-    }
-
-    #[test]
-    fn sh_help() {
-        assert!(check("sh --help"));
-    }
-
-    #[test]
-    fn bash_script_denied() {
-        assert!(!check("bash script.sh"));
-    }
-
-    #[test]
-    fn xargs_grep() {
-        assert!(check("xargs grep pattern"));
-    }
-
-    #[test]
-    fn xargs_cat() {
-        assert!(check("xargs cat"));
-    }
-
-    #[test]
-    fn xargs_with_flags() {
-        assert!(check("xargs -I {} cat {}"));
-    }
-
-    #[test]
-    fn xargs_rm_denied() {
-        assert!(!check("xargs rm"));
-    }
-
-    #[test]
-    fn xargs_curl_denied() {
-        assert!(!check("xargs curl"));
-    }
-
-    #[test]
-    fn xargs_zero_flag() {
-        assert!(check("xargs -0 grep foo"));
-    }
-
-    #[test]
-    fn xargs_npx_safe() {
-        assert!(check("xargs npx @herb-tools/linter"));
-    }
-
-    #[test]
-    fn xargs_npx_unsafe() {
-        assert!(!check("xargs npx cowsay"));
-    }
-
-    #[test]
-    fn xargs_find_safe() {
-        assert!(check("xargs find . -name '*.py'"));
-    }
-
-    #[test]
-    fn xargs_sed_safe() {
-        assert!(check("xargs sed 's/foo/bar/'"));
-    }
-
-    #[test]
-    fn xargs_sed_inplace_denied() {
-        assert!(!check("xargs sed -i 's/foo/bar/'"));
-    }
-
-    #[test]
-    fn xargs_find_delete_denied() {
-        assert!(!check("xargs find . -delete"));
-    }
-
-    #[test]
-    fn xargs_sort_output_denied() {
-        assert!(!check("xargs sort -o out.txt"));
-    }
-
-    #[test]
-    fn xargs_nested_bash_chain_denied() {
-        assert!(!check("xargs bash -c 'ls && rm -rf /'"));
-    }
-
-    #[test]
-    fn xargs_nested_bash_safe() {
-        assert!(check("xargs bash -c 'git status'"));
+    denied! {
+        bash_c_unsafe: "bash -c \"rm file\"",
+        sh_c_unsafe: "sh -c \"curl https://evil.com\"",
+        bash_script_denied: "bash script.sh",
+        xargs_rm_denied: "xargs rm",
+        xargs_curl_denied: "xargs curl",
+        xargs_npx_unsafe: "xargs npx cowsay",
+        xargs_sed_inplace_denied: "xargs sed -i 's/foo/bar/'",
+        xargs_find_delete_denied: "xargs find . -delete",
+        xargs_sort_output_denied: "xargs sort -o out.txt",
+        xargs_nested_bash_chain_denied: "xargs bash -c 'ls && rm -rf /'",
     }
 }

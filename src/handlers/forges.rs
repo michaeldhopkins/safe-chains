@@ -215,438 +215,96 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn pr_view() {
-        assert!(check("gh pr view 123"));
-    }
-
-    #[test]
-    fn pr_list() {
-        assert!(check("gh pr list"));
-    }
-
-    #[test]
-    fn pr_diff() {
-        assert!(check("gh pr diff 123"));
-    }
-
-    #[test]
-    fn pr_checks() {
-        assert!(check("gh pr checks 123"));
-    }
-
-    #[test]
-    fn issue_view() {
-        assert!(check("gh issue view 456"));
-    }
-
-    #[test]
-    fn issue_list() {
-        assert!(check("gh issue list"));
-    }
-
-    #[test]
-    fn auth_status() {
-        assert!(check("gh auth status"));
-    }
-
-    #[test]
-    fn search_issues() {
-        assert!(check("gh search issues foo"));
-    }
-
-    #[test]
-    fn search_prs() {
-        assert!(check("gh search prs bar"));
-    }
-
-    #[test]
-    fn run_view() {
-        assert!(check("gh run view 789"));
-    }
-
-    #[test]
-    fn release_list() {
-        assert!(check("gh release list"));
-    }
-
-    #[test]
-    fn label_list() {
-        assert!(check("gh label list"));
-    }
-
-    #[test]
-    fn codespace_list() {
-        assert!(check("gh codespace list"));
-    }
-
-    #[test]
-    fn variable_list() {
-        assert!(check("gh variable list"));
-    }
-
-    #[test]
-    fn extension_list() {
-        assert!(check("gh extension list"));
-    }
-
-    #[test]
-    fn cache_list() {
-        assert!(check("gh cache list"));
-    }
-
-    #[test]
-    fn attestation_verify() {
-        assert!(check("gh attestation verify artifact.tar.gz"));
-    }
-
-    #[test]
-    fn gpg_key_list() {
-        assert!(check("gh gpg-key list"));
-    }
-
-    #[test]
-    fn ssh_key_list() {
-        assert!(check("gh ssh-key list"));
-    }
-
-    #[test]
-    fn status_safe() {
-        assert!(check("gh status"));
-    }
-
-    #[test]
-    fn browse_no_browser() {
-        assert!(check("gh browse --no-browser"));
-    }
-
-    #[test]
-    fn browse_no_browser_with_path() {
-        assert!(check("gh browse src/main.rs --no-browser"));
-    }
-
-    #[test]
-    fn browse_without_flag_denied() {
-        assert!(!check("gh browse"));
-    }
-
-    #[test]
-    fn api_get_implicit() {
-        assert!(check("gh api repos/o/r/pulls/1"));
-    }
-
-    #[test]
-    fn api_jq() {
-        assert!(check("gh api repos/o/r/contents/f --jq '.content'"));
-    }
-
-    #[test]
-    fn api_explicit_get() {
-        assert!(check("gh api repos/o/r/pulls -X GET"));
-    }
-
-    #[test]
-    fn api_paginate() {
-        assert!(check("gh api repos/o/r/pulls --paginate"));
-    }
-
-    #[test]
-    fn api_xget_short() {
-        assert!(check("gh api repos/o/r/pulls -XGET"));
-    }
-
-    #[test]
-    fn pr_create_denied() {
-        assert!(!check("gh pr create --title test"));
-    }
-
-    #[test]
-    fn pr_merge_denied() {
-        assert!(!check("gh pr merge 123"));
-    }
-
-    #[test]
-    fn api_patch_denied() {
-        assert!(!check("gh api repos/o/r/pulls/1 -X PATCH -f body=x"));
-    }
-
-    #[test]
-    fn api_post_denied() {
-        assert!(!check("gh api repos/o/r/pulls/1 -X POST"));
-    }
-
-    #[test]
-    fn api_field_denied() {
-        assert!(!check("gh api repos/o/r/issues -f title=x"));
-    }
-
-    #[test]
-    fn api_method_eq_patch_denied() {
-        assert!(!check("gh api repos/o/r/pulls/1 --method=PATCH"));
-    }
-
-    #[test]
-    fn api_xpost_short_denied() {
-        assert!(!check("gh api repos/o/r/pulls -XPOST"));
-    }
-
-    #[test]
-    fn api_xpatch_short_denied() {
-        assert!(!check("gh api repos/o/r/pulls -XPATCH"));
-    }
-
-    #[test]
-    fn auth_login_denied() {
-        assert!(!check("gh auth login"));
-    }
-
-    #[test]
-    fn gh_version() {
-        assert!(check("gh --version"));
-    }
-
-    #[test]
-    fn bare_gh_denied() {
-        assert!(!check("gh"));
-    }
-
-    #[test]
-    fn glab_mr_list() {
-        assert!(check("glab mr list"));
-    }
-
-    #[test]
-    fn glab_mr_view() {
-        assert!(check("glab mr view 123"));
-    }
-
-    #[test]
-    fn glab_mr_diff() {
-        assert!(check("glab mr diff 123"));
-    }
-
-    #[test]
-    fn glab_issue_list() {
-        assert!(check("glab issue list"));
-    }
-
-    #[test]
-    fn glab_issue_view() {
-        assert!(check("glab issue view 456"));
-    }
-
-    #[test]
-    fn glab_ci_status() {
-        assert!(check("glab ci status"));
-    }
-
-    #[test]
-    fn glab_ci_list() {
-        assert!(check("glab ci list"));
-    }
-
-    #[test]
-    fn glab_release_list() {
-        assert!(check("glab release list"));
-    }
-
-    #[test]
-    fn glab_label_list() {
-        assert!(check("glab label list"));
-    }
-
-    #[test]
-    fn glab_milestone_list() {
-        assert!(check("glab milestone list"));
-    }
-
-    #[test]
-    fn glab_snippet_view() {
-        assert!(check("glab snippet view 1"));
-    }
-
-    #[test]
-    fn glab_variable_list() {
-        assert!(check("glab variable list"));
-    }
-
-    #[test]
-    fn glab_auth_status() {
-        assert!(check("glab auth status"));
-    }
-
-    #[test]
-    fn glab_version() {
-        assert!(check("glab --version"));
-    }
-
-    #[test]
-    fn glab_version_subcommand() {
-        assert!(check("glab version"));
-    }
-
-    #[test]
-    fn glab_check_update() {
-        assert!(check("glab check-update"));
-    }
-
-    #[test]
-    fn glab_api_get_implicit() {
-        assert!(check("glab api projects/1/merge_requests"));
-    }
-
-    #[test]
-    fn glab_api_explicit_get() {
-        assert!(check("glab api projects/1/issues -X GET"));
-    }
-
-    #[test]
-    fn glab_mr_create_denied() {
-        assert!(!check("glab mr create --title test"));
-    }
-
-    #[test]
-    fn glab_mr_merge_denied() {
-        assert!(!check("glab mr merge 123"));
-    }
-
-    #[test]
-    fn glab_issue_create_denied() {
-        assert!(!check("glab issue create --title test"));
-    }
-
-    #[test]
-    fn glab_auth_login_denied() {
-        assert!(!check("glab auth login"));
-    }
-
-    #[test]
-    fn glab_api_post_denied() {
-        assert!(!check("glab api projects/1/issues -X POST"));
-    }
-
-    #[test]
-    fn glab_api_field_denied() {
-        assert!(!check("glab api projects/1/issues -f title=x"));
-    }
-
-    #[test]
-    fn bare_glab_denied() {
-        assert!(!check("glab"));
-    }
-
-    #[test]
-    fn tea_issue_list() {
-        assert!(check("tea issue list"));
-    }
-
-    #[test]
-    fn tea_issues_list() {
-        assert!(check("tea issues list"));
-    }
-
-    #[test]
-    fn tea_issue_view() {
-        assert!(check("tea issue view 1"));
-    }
-
-    #[test]
-    fn tea_pull_list() {
-        assert!(check("tea pull list"));
-    }
-
-    #[test]
-    fn tea_pr_view() {
-        assert!(check("tea pr view 1"));
-    }
-
-    #[test]
-    fn tea_release_list() {
-        assert!(check("tea release list"));
-    }
-
-    #[test]
-    fn tea_repo_bare() {
-        assert!(check("tea repo"));
-    }
-
-    #[test]
-    fn tea_repo_list() {
-        assert!(check("tea repos list"));
-    }
-
-    #[test]
-    fn tea_branch_list() {
-        assert!(check("tea branch list"));
-    }
-
-    #[test]
-    fn tea_label_list() {
-        assert!(check("tea labels list"));
-    }
-
-    #[test]
-    fn tea_milestone_list() {
-        assert!(check("tea milestones list"));
-    }
-
-    #[test]
-    fn tea_org_list() {
-        assert!(check("tea org list"));
-    }
-
-    #[test]
-    fn tea_notifications_bare() {
-        assert!(check("tea notifications"));
-    }
-
-    #[test]
-    fn tea_times_list() {
-        assert!(check("tea times list"));
-    }
-
-    #[test]
-    fn tea_whoami() {
-        assert!(check("tea whoami"));
-    }
-
-    #[test]
-    fn tea_version() {
-        assert!(check("tea --version"));
-    }
-
-    #[test]
-    fn tea_login_list() {
-        assert!(check("tea login list"));
-    }
-
-    #[test]
-    fn tea_logins_list() {
-        assert!(check("tea logins list"));
-    }
-
-    #[test]
-    fn tea_issue_create_denied() {
-        assert!(!check("tea issue create --title test"));
-    }
-
-    #[test]
-    fn tea_pull_create_denied() {
-        assert!(!check("tea pull create"));
-    }
-
-    #[test]
-    fn tea_login_add_denied() {
-        assert!(!check("tea login add"));
-    }
-
-    #[test]
-    fn tea_logout_denied() {
-        assert!(!check("tea logout"));
-    }
-
-    #[test]
-    fn bare_tea_denied() {
-        assert!(!check("tea"));
+    safe! {
+        pr_view: "gh pr view 123",
+        pr_list: "gh pr list",
+        pr_diff: "gh pr diff 123",
+        pr_checks: "gh pr checks 123",
+        issue_view: "gh issue view 456",
+        issue_list: "gh issue list",
+        auth_status: "gh auth status",
+        search_issues: "gh search issues foo",
+        search_prs: "gh search prs bar",
+        run_view: "gh run view 789",
+        release_list: "gh release list",
+        label_list: "gh label list",
+        codespace_list: "gh codespace list",
+        variable_list: "gh variable list",
+        extension_list: "gh extension list",
+        cache_list: "gh cache list",
+        attestation_verify: "gh attestation verify artifact.tar.gz",
+        gpg_key_list: "gh gpg-key list",
+        ssh_key_list: "gh ssh-key list",
+        status_safe: "gh status",
+        browse_no_browser: "gh browse --no-browser",
+        browse_no_browser_with_path: "gh browse src/main.rs --no-browser",
+        api_get_implicit: "gh api repos/o/r/pulls/1",
+        api_jq: "gh api repos/o/r/contents/f --jq '.content'",
+        api_explicit_get: "gh api repos/o/r/pulls -X GET",
+        api_paginate: "gh api repos/o/r/pulls --paginate",
+        api_xget_short: "gh api repos/o/r/pulls -XGET",
+        gh_version: "gh --version",
+        glab_mr_list: "glab mr list",
+        glab_mr_view: "glab mr view 123",
+        glab_mr_diff: "glab mr diff 123",
+        glab_issue_list: "glab issue list",
+        glab_issue_view: "glab issue view 456",
+        glab_ci_status: "glab ci status",
+        glab_ci_list: "glab ci list",
+        glab_release_list: "glab release list",
+        glab_label_list: "glab label list",
+        glab_milestone_list: "glab milestone list",
+        glab_snippet_view: "glab snippet view 1",
+        glab_variable_list: "glab variable list",
+        glab_auth_status: "glab auth status",
+        glab_version: "glab --version",
+        glab_version_subcommand: "glab version",
+        glab_check_update: "glab check-update",
+        glab_api_get_implicit: "glab api projects/1/merge_requests",
+        glab_api_explicit_get: "glab api projects/1/issues -X GET",
+        tea_issue_list: "tea issue list",
+        tea_issues_list: "tea issues list",
+        tea_issue_view: "tea issue view 1",
+        tea_pull_list: "tea pull list",
+        tea_pr_view: "tea pr view 1",
+        tea_release_list: "tea release list",
+        tea_repo_bare: "tea repo",
+        tea_repo_list: "tea repos list",
+        tea_branch_list: "tea branch list",
+        tea_label_list: "tea labels list",
+        tea_milestone_list: "tea milestones list",
+        tea_org_list: "tea org list",
+        tea_notifications_bare: "tea notifications",
+        tea_times_list: "tea times list",
+        tea_whoami: "tea whoami",
+        tea_version: "tea --version",
+        tea_login_list: "tea login list",
+        tea_logins_list: "tea logins list",
+    }
+
+    denied! {
+        browse_without_flag_denied: "gh browse",
+        pr_create_denied: "gh pr create --title test",
+        pr_merge_denied: "gh pr merge 123",
+        api_patch_denied: "gh api repos/o/r/pulls/1 -X PATCH -f body=x",
+        api_post_denied: "gh api repos/o/r/pulls/1 -X POST",
+        api_field_denied: "gh api repos/o/r/issues -f title=x",
+        api_method_eq_patch_denied: "gh api repos/o/r/pulls/1 --method=PATCH",
+        api_xpost_short_denied: "gh api repos/o/r/pulls -XPOST",
+        api_xpatch_short_denied: "gh api repos/o/r/pulls -XPATCH",
+        auth_login_denied: "gh auth login",
+        bare_gh_denied: "gh",
+        glab_mr_create_denied: "glab mr create --title test",
+        glab_mr_merge_denied: "glab mr merge 123",
+        glab_issue_create_denied: "glab issue create --title test",
+        glab_auth_login_denied: "glab auth login",
+        glab_api_post_denied: "glab api projects/1/issues -X POST",
+        glab_api_field_denied: "glab api projects/1/issues -f title=x",
+        bare_glab_denied: "glab",
+        tea_issue_create_denied: "tea issue create --title test",
+        tea_pull_create_denied: "tea pull create",
+        tea_login_add_denied: "tea login add",
+        tea_logout_denied: "tea logout",
+        bare_tea_denied: "tea",
     }
 }

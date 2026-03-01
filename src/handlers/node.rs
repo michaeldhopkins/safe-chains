@@ -218,567 +218,122 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn yarn_list() {
-        assert!(check("yarn list --depth=0"));
-        assert!(check("yarn ls bootstrap"));
-    }
-
-    #[test]
-    fn yarn_info() {
-        assert!(check("yarn info react"));
-    }
-
-    #[test]
-    fn yarn_why() {
-        assert!(check("yarn why lodash"));
-    }
-
-    #[test]
-    fn yarn_version() {
-        assert!(check("yarn --version"));
-    }
-
-    #[test]
-    fn yarn_test() {
-        assert!(check("yarn test"));
-    }
-
-    #[test]
-    fn yarn_test_watch() {
-        assert!(check("yarn test:watch"));
-    }
-
-    #[test]
-    fn yarn_test_with_args() {
-        assert!(check("yarn test --testPathPattern=Foo"));
-    }
-
-    #[test]
-    fn yarn_install_denied() {
-        assert!(!check("yarn install"));
-    }
-
-    #[test]
-    fn yarn_add_denied() {
-        assert!(!check("yarn add react"));
-    }
-
-    #[test]
-    fn yarn_remove_denied() {
-        assert!(!check("yarn remove lodash"));
-    }
-
-    #[test]
-    fn yarn_upgrade_denied() {
-        assert!(!check("yarn upgrade"));
-    }
-
-    #[test]
-    fn npm_view() {
-        assert!(check("npm view react version"));
-    }
-
-    #[test]
-    fn npm_info() {
-        assert!(check("npm info lodash"));
-    }
-
-    #[test]
-    fn npm_list() {
-        assert!(check("npm list --depth=0"));
-    }
-
-    #[test]
-    fn npm_ls() {
-        assert!(check("npm ls"));
-    }
-
-    #[test]
-    fn npm_test() {
-        assert!(check("npm test"));
-    }
-
-    #[test]
-    fn npm_audit() {
-        assert!(check("npm audit"));
-    }
-
-    #[test]
-    fn npm_outdated() {
-        assert!(check("npm outdated"));
-    }
-
-    #[test]
-    fn npm_explain() {
-        assert!(check("npm explain lodash"));
-    }
-
-    #[test]
-    fn npm_why() {
-        assert!(check("npm why lodash"));
-    }
-
-    #[test]
-    fn npm_fund() {
-        assert!(check("npm fund"));
-    }
-
-    #[test]
-    fn npm_prefix() {
-        assert!(check("npm prefix"));
-    }
-
-    #[test]
-    fn npm_root() {
-        assert!(check("npm root"));
-    }
-
-    #[test]
-    fn npm_doctor() {
-        assert!(check("npm doctor"));
-    }
-
-    #[test]
-    fn npm_config_list() {
-        assert!(check("npm config list"));
-    }
-
-    #[test]
-    fn npm_config_get() {
-        assert!(check("npm config get registry"));
-    }
-
-    #[test]
-    fn npm_run_test() {
-        assert!(check("npm run test"));
-    }
-
-    #[test]
-    fn npm_run_test_colon() {
-        assert!(check("npm run test:unit"));
-    }
-
-    #[test]
-    fn npm_version() {
-        assert!(check("npm --version"));
-    }
-
-    #[test]
-    fn npm_install_denied() {
-        assert!(!check("npm install react"));
-    }
-
-    #[test]
-    fn npm_uninstall_denied() {
-        assert!(!check("npm uninstall lodash"));
-    }
-
-    #[test]
-    fn npm_run_build_denied() {
-        assert!(!check("npm run build"));
-    }
-
-    #[test]
-    fn npm_run_start_denied() {
-        assert!(!check("npm run start"));
-    }
-
-    #[test]
-    fn npm_config_set_denied() {
-        assert!(!check("npm config set registry https://example.com"));
-    }
-
-    #[test]
-    fn npx_herb_linter() {
-        assert!(check("npx @herb-tools/linter app/views/foo.html.erb"));
-    }
-
-    #[test]
-    fn npx_eslint() {
-        assert!(check("npx eslint src/"));
-    }
-
-    #[test]
-    fn npx_karma() {
-        assert!(check("npx karma start"));
-    }
-
-
-    #[test]
-    fn npx_yes_flag() {
-        assert!(check("npx --yes eslint src/"));
-    }
-
-    #[test]
-    fn npx_y_flag() {
-        assert!(check("npx -y @herb-tools/linter ."));
-    }
-
-    #[test]
-    fn npx_package_flag() {
-        assert!(check(
-            "npx --package @herb-tools/linter @herb-tools/linter ."
-        ));
-    }
-
-    #[test]
-    fn npx_double_dash() {
-        assert!(check("npx -- eslint src/"));
-    }
-
-    #[test]
-    fn npx_version() {
-        assert!(check("npx --version"));
-    }
-
-    #[test]
-    fn npx_react_scripts_denied() {
-        assert!(!check("npx react-scripts start"));
-    }
-
-    #[test]
-    fn npx_cowsay_denied() {
-        assert!(!check("npx cowsay hello"));
-    }
-
-    #[test]
-    fn bare_npx_denied() {
-        assert!(!check("npx"));
-    }
-
-    #[test]
-    fn npx_only_flags_denied() {
-        assert!(!check("npx --yes"));
-    }
-
-    #[test]
-    fn pnpm_list() {
-        assert!(check("pnpm list"));
-    }
-
-    #[test]
-    fn pnpm_why() {
-        assert!(check("pnpm why lodash"));
-    }
-
-    #[test]
-    fn pnpm_audit() {
-        assert!(check("pnpm audit"));
-    }
-
-    #[test]
-    fn pnpm_outdated() {
-        assert!(check("pnpm outdated"));
-    }
-
-    #[test]
-    fn pnpm_version() {
-        assert!(check("pnpm --version"));
-    }
-
-    #[test]
-    fn pnpm_install_denied() {
-        assert!(!check("pnpm install"));
-    }
-
-    #[test]
-    fn pnpm_add_denied() {
-        assert!(!check("pnpm add react"));
-    }
-
-    #[test]
-    fn pnpm_run_denied() {
-        assert!(!check("pnpm run build"));
-    }
-
-    #[test]
-    fn bun_version() {
-        assert!(check("bun --version"));
-    }
-
-    #[test]
-    fn bun_test() {
-        assert!(check("bun test"));
-    }
-
-    #[test]
-    fn bun_pm_ls() {
-        assert!(check("bun pm ls"));
-    }
-
-    #[test]
-    fn bun_pm_hash() {
-        assert!(check("bun pm hash"));
-    }
-
-    #[test]
-    fn bun_pm_cache() {
-        assert!(check("bun pm cache"));
-    }
-
-    #[test]
-    fn bun_pm_bin() {
-        assert!(check("bun pm bin"));
-    }
-
-    #[test]
-    fn bun_outdated() {
-        assert!(check("bun outdated"));
-    }
-
-    #[test]
-    fn bun_x_eslint() {
-        assert!(check("bun x eslint src/"));
-    }
-
-    #[test]
-    fn bun_x_tsc_noemit() {
-        assert!(check("bun x tsc --noEmit"));
-    }
-
-    #[test]
-    fn bun_x_tsc_denied() {
-        assert!(!check("bun x tsc"));
-    }
-
-    #[test]
-    fn bun_x_cowsay_denied() {
-        assert!(!check("bun x cowsay hello"));
-    }
-
-    #[test]
-    fn bun_install_denied() {
-        assert!(!check("bun install"));
-    }
-
-    #[test]
-    fn bun_run_denied() {
-        assert!(!check("bun run build"));
-    }
-
-    #[test]
-    fn bun_add_denied() {
-        assert!(!check("bun add react"));
-    }
-
-    #[test]
-    fn deno_version() {
-        assert!(check("deno --version"));
-    }
-
-    #[test]
-    fn deno_info() {
-        assert!(check("deno info"));
-    }
-
-    #[test]
-    fn deno_doc() {
-        assert!(check("deno doc mod.ts"));
-    }
-
-    #[test]
-    fn deno_lint() {
-        assert!(check("deno lint"));
-    }
-
-    #[test]
-    fn deno_check() {
-        assert!(check("deno check main.ts"));
-    }
-
-    #[test]
-    fn deno_test() {
-        assert!(check("deno test"));
-    }
-
-    #[test]
-    fn deno_fmt_check() {
-        assert!(check("deno fmt --check"));
-    }
-
-    #[test]
-    fn deno_fmt_denied() {
-        assert!(!check("deno fmt"));
-    }
-
-    #[test]
-    fn deno_run_denied() {
-        assert!(!check("deno run main.ts"));
-    }
-
-    #[test]
-    fn deno_install_denied() {
-        assert!(!check("deno install"));
-    }
-
-    #[test]
-    fn deno_compile_denied() {
-        assert!(!check("deno compile main.ts"));
-    }
-
-    #[test]
-    fn nvm_ls() {
-        assert!(check("nvm ls"));
-    }
-
-    #[test]
-    fn nvm_list() {
-        assert!(check("nvm list"));
-    }
-
-    #[test]
-    fn nvm_current() {
-        assert!(check("nvm current"));
-    }
-
-    #[test]
-    fn nvm_which() {
-        assert!(check("nvm which 18"));
-    }
-
-    #[test]
-    fn nvm_version() {
-        assert!(check("nvm version"));
-    }
-
-    #[test]
-    fn nvm_ls_remote() {
-        assert!(check("nvm ls-remote"));
-    }
-
-    #[test]
-    fn nvm_install_denied() {
-        assert!(!check("nvm install 18"));
-    }
-
-    #[test]
-    fn nvm_use_denied() {
-        assert!(!check("nvm use 18"));
-    }
-
-    #[test]
-    fn fnm_list() {
-        assert!(check("fnm list"));
-    }
-
-    #[test]
-    fn fnm_current() {
-        assert!(check("fnm current"));
-    }
-
-    #[test]
-    fn fnm_default() {
-        assert!(check("fnm default"));
-    }
-
-    #[test]
-    fn fnm_version() {
-        assert!(check("fnm --version"));
-    }
-
-    #[test]
-    fn fnm_install_denied() {
-        assert!(!check("fnm install 18"));
-    }
-
-    #[test]
-    fn fnm_use_denied() {
-        assert!(!check("fnm use 18"));
-    }
-
-    #[test]
-    fn volta_list() {
-        assert!(check("volta list"));
-    }
-
-    #[test]
-    fn volta_which() {
-        assert!(check("volta which node"));
-    }
-
-    #[test]
-    fn volta_version() {
-        assert!(check("volta --version"));
-    }
-
-    #[test]
-    fn volta_install_denied() {
-        assert!(!check("volta install node@18"));
-    }
-
-    #[test]
-    fn volta_pin_denied() {
-        assert!(!check("volta pin node@18"));
-    }
-
-    #[test]
-    fn bunx_eslint() {
-        assert!(check("bunx eslint src/"));
-    }
-
-    #[test]
-    fn bunx_tsc_noemit() {
-        assert!(check("bunx tsc --noEmit"));
-    }
-
-    #[test]
-    fn bunx_tsc_project_noemit() {
-        assert!(check("bunx tsc --project tsconfig.json --noEmit"));
-    }
-
-    #[test]
-    fn bunx_bun_flag() {
-        assert!(check("bunx --bun eslint src/"));
-    }
-
-    #[test]
-    fn bunx_no_install_flag() {
-        assert!(check("bunx --no-install eslint ."));
-    }
-
-    #[test]
-    fn bunx_package_flag() {
-        assert!(check("bunx --package eslint eslint src/"));
-    }
-
-    #[test]
-    fn bunx_double_dash() {
-        assert!(check("bunx -- eslint src/"));
-    }
-
-    #[test]
-    fn bunx_version() {
-        assert!(check("bunx --version"));
-    }
-
-    #[test]
-    fn bunx_tsc_without_noemit_denied() {
-        assert!(!check("bunx tsc"));
-    }
-
-    #[test]
-    fn bunx_tsc_with_other_flags_denied() {
-        assert!(!check("bunx tsc --pretty"));
-    }
-
-    #[test]
-    fn bunx_cowsay_denied() {
-        assert!(!check("bunx cowsay hello"));
-    }
-
-    #[test]
-    fn bare_bunx_denied() {
-        assert!(!check("bunx"));
-    }
-
-    #[test]
-    fn npx_tsc_noemit() {
-        assert!(check("npx tsc --noEmit"));
-    }
-
-    #[test]
-    fn npx_tsc_without_noemit_denied() {
-        assert!(!check("npx tsc"));
+    safe! {
+        yarn_list: "yarn list --depth=0",
+        yarn_ls: "yarn ls bootstrap",
+        yarn_info: "yarn info react",
+        yarn_why: "yarn why lodash",
+        yarn_version: "yarn --version",
+        yarn_test: "yarn test",
+        yarn_test_watch: "yarn test:watch",
+        yarn_test_with_args: "yarn test --testPathPattern=Foo",
+        npm_view: "npm view react version",
+        npm_info: "npm info lodash",
+        npm_list: "npm list --depth=0",
+        npm_ls: "npm ls",
+        npm_test: "npm test",
+        npm_audit: "npm audit",
+        npm_outdated: "npm outdated",
+        npm_explain: "npm explain lodash",
+        npm_why: "npm why lodash",
+        npm_fund: "npm fund",
+        npm_prefix: "npm prefix",
+        npm_root: "npm root",
+        npm_doctor: "npm doctor",
+        npm_config_list: "npm config list",
+        npm_config_get: "npm config get registry",
+        npm_run_test: "npm run test",
+        npm_run_test_colon: "npm run test:unit",
+        npm_version: "npm --version",
+        npx_herb_linter: "npx @herb-tools/linter app/views/foo.html.erb",
+        npx_eslint: "npx eslint src/",
+        npx_karma: "npx karma start",
+        npx_yes_flag: "npx --yes eslint src/",
+        npx_y_flag: "npx -y @herb-tools/linter .",
+        npx_package_flag: "npx --package @herb-tools/linter @herb-tools/linter .",
+        npx_double_dash: "npx -- eslint src/",
+        npx_version: "npx --version",
+        npx_tsc_noemit: "npx tsc --noEmit",
+        pnpm_list: "pnpm list",
+        pnpm_why: "pnpm why lodash",
+        pnpm_audit: "pnpm audit",
+        pnpm_outdated: "pnpm outdated",
+        pnpm_version: "pnpm --version",
+        bun_version: "bun --version",
+        bun_test: "bun test",
+        bun_pm_ls: "bun pm ls",
+        bun_pm_hash: "bun pm hash",
+        bun_pm_cache: "bun pm cache",
+        bun_pm_bin: "bun pm bin",
+        bun_outdated: "bun outdated",
+        bun_x_eslint: "bun x eslint src/",
+        bun_x_tsc_noemit: "bun x tsc --noEmit",
+        deno_version: "deno --version",
+        deno_info: "deno info",
+        deno_doc: "deno doc mod.ts",
+        deno_lint: "deno lint",
+        deno_check: "deno check main.ts",
+        deno_test: "deno test",
+        deno_fmt_check: "deno fmt --check",
+        nvm_ls: "nvm ls",
+        nvm_list: "nvm list",
+        nvm_current: "nvm current",
+        nvm_which: "nvm which 18",
+        nvm_version: "nvm version",
+        nvm_ls_remote: "nvm ls-remote",
+        fnm_list: "fnm list",
+        fnm_current: "fnm current",
+        fnm_default: "fnm default",
+        fnm_version: "fnm --version",
+        volta_list: "volta list",
+        volta_which: "volta which node",
+        volta_version: "volta --version",
+        bunx_eslint: "bunx eslint src/",
+        bunx_tsc_noemit: "bunx tsc --noEmit",
+        bunx_tsc_project_noemit: "bunx tsc --project tsconfig.json --noEmit",
+        bunx_bun_flag: "bunx --bun eslint src/",
+        bunx_no_install_flag: "bunx --no-install eslint .",
+        bunx_package_flag: "bunx --package eslint eslint src/",
+        bunx_double_dash: "bunx -- eslint src/",
+        bunx_version: "bunx --version",
+    }
+
+    denied! {
+        yarn_install_denied: "yarn install",
+        yarn_add_denied: "yarn add react",
+        yarn_remove_denied: "yarn remove lodash",
+        yarn_upgrade_denied: "yarn upgrade",
+        npm_install_denied: "npm install react",
+        npm_uninstall_denied: "npm uninstall lodash",
+        npm_run_build_denied: "npm run build",
+        npm_run_start_denied: "npm run start",
+        npm_config_set_denied: "npm config set registry https://example.com",
+        npx_react_scripts_denied: "npx react-scripts start",
+        npx_cowsay_denied: "npx cowsay hello",
+        bare_npx_denied: "npx",
+        npx_only_flags_denied: "npx --yes",
+        npx_tsc_without_noemit_denied: "npx tsc",
+        pnpm_install_denied: "pnpm install",
+        pnpm_add_denied: "pnpm add react",
+        pnpm_run_denied: "pnpm run build",
+        bun_x_tsc_denied: "bun x tsc",
+        bun_x_cowsay_denied: "bun x cowsay hello",
+        bun_install_denied: "bun install",
+        bun_run_denied: "bun run build",
+        bun_add_denied: "bun add react",
+        deno_fmt_denied: "deno fmt",
+        deno_run_denied: "deno run main.ts",
+        deno_install_denied: "deno install",
+        deno_compile_denied: "deno compile main.ts",
+        nvm_install_denied: "nvm install 18",
+        nvm_use_denied: "nvm use 18",
+        fnm_install_denied: "fnm install 18",
+        fnm_use_denied: "fnm use 18",
+        volta_install_denied: "volta install node@18",
+        volta_pin_denied: "volta pin node@18",
+        bunx_tsc_without_noemit_denied: "bunx tsc",
+        bunx_tsc_with_other_flags_denied: "bunx tsc --pretty",
+        bunx_cowsay_denied: "bunx cowsay hello",
+        bare_bunx_denied: "bunx",
     }
 }

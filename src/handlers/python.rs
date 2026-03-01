@@ -97,313 +97,71 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn pip_list() {
-        assert!(check("pip list"));
+    safe! {
+        pip_list: "pip list",
+        pip_show: "pip show requests",
+        pip_freeze: "pip freeze",
+        pip_check: "pip check",
+        pip_index: "pip index versions requests",
+        pip_debug: "pip debug",
+        pip_inspect: "pip inspect",
+        pip_help: "pip help",
+        pip_config_list: "pip config list",
+        pip_config_get: "pip config get global.index-url",
+        pip3_list: "pip3 list",
+        pip3_show: "pip3 show flask",
+        pip3_freeze: "pip3 freeze",
+        pip_version: "pip --version",
+        pip3_version: "pip3 --version",
+        uv_version: "uv --version",
+        uv_pip_list: "uv pip list",
+        uv_pip_show: "uv pip show requests",
+        uv_pip_freeze: "uv pip freeze",
+        uv_pip_check: "uv pip check",
+        uv_tool_list: "uv tool list",
+        uv_python_list: "uv python list",
+        poetry_show: "poetry show",
+        poetry_check: "poetry check",
+        poetry_version: "poetry --version",
+        poetry_env_info: "poetry env info",
+        poetry_env_list: "poetry env list",
+        pyenv_versions: "pyenv versions",
+        pyenv_version: "pyenv version",
+        pyenv_which: "pyenv which python",
+        pyenv_root: "pyenv root",
+        pyenv_shims: "pyenv shims",
+        pyenv_version_flag: "pyenv --version",
+        pyenv_help: "pyenv help",
+        conda_list: "conda list",
+        conda_info: "conda info",
+        conda_version: "conda --version",
+        conda_config_show: "conda config --show",
+        conda_config_show_sources: "conda config --show-sources",
     }
 
-    #[test]
-    fn pip_show() {
-        assert!(check("pip show requests"));
-    }
-
-    #[test]
-    fn pip_freeze() {
-        assert!(check("pip freeze"));
-    }
-
-    #[test]
-    fn pip_check() {
-        assert!(check("pip check"));
-    }
-
-    #[test]
-    fn pip_index() {
-        assert!(check("pip index versions requests"));
-    }
-
-    #[test]
-    fn pip_debug() {
-        assert!(check("pip debug"));
-    }
-
-    #[test]
-    fn pip_inspect() {
-        assert!(check("pip inspect"));
-    }
-
-    #[test]
-    fn pip_help() {
-        assert!(check("pip help"));
-    }
-
-    #[test]
-    fn pip_config_list() {
-        assert!(check("pip config list"));
-    }
-
-    #[test]
-    fn pip_config_get() {
-        assert!(check("pip config get global.index-url"));
-    }
-
-    #[test]
-    fn pip3_list() {
-        assert!(check("pip3 list"));
-    }
-
-    #[test]
-    fn pip3_show() {
-        assert!(check("pip3 show flask"));
-    }
-
-    #[test]
-    fn pip3_freeze() {
-        assert!(check("pip3 freeze"));
-    }
-
-    #[test]
-    fn pip_version() {
-        assert!(check("pip --version"));
-    }
-
-    #[test]
-    fn pip3_version() {
-        assert!(check("pip3 --version"));
-    }
-
-    #[test]
-    fn pip_install_denied() {
-        assert!(!check("pip install requests"));
-    }
-
-    #[test]
-    fn pip_uninstall_denied() {
-        assert!(!check("pip uninstall flask"));
-    }
-
-    #[test]
-    fn pip3_install_denied() {
-        assert!(!check("pip3 install django"));
-    }
-
-    #[test]
-    fn bare_pip_denied() {
-        assert!(!check("pip"));
-    }
-
-    #[test]
-    fn pip_config_set_denied() {
-        assert!(!check("pip config set global.index-url https://example.com"));
-    }
-
-    #[test]
-    fn uv_version() {
-        assert!(check("uv --version"));
-    }
-
-    #[test]
-    fn uv_pip_list() {
-        assert!(check("uv pip list"));
-    }
-
-    #[test]
-    fn uv_pip_show() {
-        assert!(check("uv pip show requests"));
-    }
-
-    #[test]
-    fn uv_pip_freeze() {
-        assert!(check("uv pip freeze"));
-    }
-
-    #[test]
-    fn uv_pip_check() {
-        assert!(check("uv pip check"));
-    }
-
-    #[test]
-    fn uv_tool_list() {
-        assert!(check("uv tool list"));
-    }
-
-    #[test]
-    fn uv_python_list() {
-        assert!(check("uv python list"));
-    }
-
-    #[test]
-    fn uv_pip_install_denied() {
-        assert!(!check("uv pip install requests"));
-    }
-
-    #[test]
-    fn uv_run_denied() {
-        assert!(!check("uv run script.py"));
-    }
-
-    #[test]
-    fn uv_venv_denied() {
-        assert!(!check("uv venv"));
-    }
-
-    #[test]
-    fn uv_add_denied() {
-        assert!(!check("uv add requests"));
-    }
-
-    #[test]
-    fn bare_uv_denied() {
-        assert!(!check("uv"));
-    }
-
-    #[test]
-    fn poetry_show() {
-        assert!(check("poetry show"));
-    }
-
-    #[test]
-    fn poetry_check() {
-        assert!(check("poetry check"));
-    }
-
-    #[test]
-    fn poetry_version() {
-        assert!(check("poetry --version"));
-    }
-
-    #[test]
-    fn poetry_env_info() {
-        assert!(check("poetry env info"));
-    }
-
-    #[test]
-    fn poetry_env_list() {
-        assert!(check("poetry env list"));
-    }
-
-    #[test]
-    fn poetry_install_denied() {
-        assert!(!check("poetry install"));
-    }
-
-    #[test]
-    fn poetry_add_denied() {
-        assert!(!check("poetry add requests"));
-    }
-
-    #[test]
-    fn poetry_build_denied() {
-        assert!(!check("poetry build"));
-    }
-
-    #[test]
-    fn pyenv_versions() {
-        assert!(check("pyenv versions"));
-    }
-
-    #[test]
-    fn pyenv_version() {
-        assert!(check("pyenv version"));
-    }
-
-    #[test]
-    fn pyenv_which() {
-        assert!(check("pyenv which python"));
-    }
-
-    #[test]
-    fn pyenv_root() {
-        assert!(check("pyenv root"));
-    }
-
-    #[test]
-    fn pyenv_shims() {
-        assert!(check("pyenv shims"));
-    }
-
-    #[test]
-    fn pyenv_version_flag() {
-        assert!(check("pyenv --version"));
-    }
-
-    #[test]
-    fn pyenv_help() {
-        assert!(check("pyenv help"));
-    }
-
-    #[test]
-    fn pyenv_install_denied() {
-        assert!(!check("pyenv install 3.12"));
-    }
-
-    #[test]
-    fn pyenv_global_denied() {
-        assert!(!check("pyenv global 3.12"));
-    }
-
-    #[test]
-    fn pyenv_local_denied() {
-        assert!(!check("pyenv local 3.12"));
-    }
-
-    #[test]
-    fn conda_list() {
-        assert!(check("conda list"));
-    }
-
-    #[test]
-    fn conda_info() {
-        assert!(check("conda info"));
-    }
-
-    #[test]
-    fn conda_version() {
-        assert!(check("conda --version"));
-    }
-
-    #[test]
-    fn conda_config_show() {
-        assert!(check("conda config --show"));
-    }
-
-    #[test]
-    fn conda_config_show_sources() {
-        assert!(check("conda config --show-sources"));
-    }
-
-    #[test]
-    fn conda_install_denied() {
-        assert!(!check("conda install numpy"));
-    }
-
-    #[test]
-    fn conda_create_denied() {
-        assert!(!check("conda create -n myenv"));
-    }
-
-    #[test]
-    fn conda_remove_denied() {
-        assert!(!check("conda remove numpy"));
-    }
-
-    #[test]
-    fn conda_config_show_with_set_denied() {
-        assert!(!check("conda config --show --set always_yes true"));
-    }
-
-    #[test]
-    fn conda_config_show_sources_with_remove_denied() {
-        assert!(!check("conda config --show-sources --remove channels defaults"));
-    }
-
-    #[test]
-    fn conda_config_set_denied() {
-        assert!(!check("conda config --set always_yes true"));
-    }
-
-    #[test]
-    fn conda_config_add_denied() {
-        assert!(!check("conda config --add channels conda-forge"));
+    denied! {
+        pip_install_denied: "pip install requests",
+        pip_uninstall_denied: "pip uninstall flask",
+        pip3_install_denied: "pip3 install django",
+        bare_pip_denied: "pip",
+        pip_config_set_denied: "pip config set global.index-url https://example.com",
+        uv_pip_install_denied: "uv pip install requests",
+        uv_run_denied: "uv run script.py",
+        uv_venv_denied: "uv venv",
+        uv_add_denied: "uv add requests",
+        bare_uv_denied: "uv",
+        poetry_install_denied: "poetry install",
+        poetry_add_denied: "poetry add requests",
+        poetry_build_denied: "poetry build",
+        pyenv_install_denied: "pyenv install 3.12",
+        pyenv_global_denied: "pyenv global 3.12",
+        pyenv_local_denied: "pyenv local 3.12",
+        conda_install_denied: "conda install numpy",
+        conda_create_denied: "conda create -n myenv",
+        conda_remove_denied: "conda remove numpy",
+        conda_config_show_with_set_denied: "conda config --show --set always_yes true",
+        conda_config_show_sources_with_remove_denied: "conda config --show-sources --remove channels defaults",
+        conda_config_set_denied: "conda config --set always_yes true",
+        conda_config_add_denied: "conda config --add channels conda-forge",
     }
 }

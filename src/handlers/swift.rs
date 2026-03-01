@@ -37,58 +37,20 @@ mod tests {
         is_safe_command(cmd)
     }
 
-    #[test]
-    fn swift_version() {
-        assert!(check("swift --version"));
+    safe! {
+        swift_version: "swift --version",
+        swift_test: "swift test",
+        swift_build: "swift build",
+        swift_package_describe: "swift package describe",
+        swift_package_dump_package: "swift package dump-package",
+        swift_package_show_dependencies: "swift package show-dependencies",
     }
 
-    #[test]
-    fn swift_test() {
-        assert!(check("swift test"));
-    }
-
-    #[test]
-    fn swift_build() {
-        assert!(check("swift build"));
-    }
-
-    #[test]
-    fn swift_package_describe() {
-        assert!(check("swift package describe"));
-    }
-
-    #[test]
-    fn swift_package_dump_package() {
-        assert!(check("swift package dump-package"));
-    }
-
-    #[test]
-    fn swift_package_show_dependencies() {
-        assert!(check("swift package show-dependencies"));
-    }
-
-    #[test]
-    fn swift_run_denied() {
-        assert!(!check("swift run"));
-    }
-
-    #[test]
-    fn swift_package_init_denied() {
-        assert!(!check("swift package init"));
-    }
-
-    #[test]
-    fn swift_package_update_denied() {
-        assert!(!check("swift package update"));
-    }
-
-    #[test]
-    fn swift_package_resolve_denied() {
-        assert!(!check("swift package resolve"));
-    }
-
-    #[test]
-    fn bare_swift_denied() {
-        assert!(!check("swift"));
+    denied! {
+        swift_run_denied: "swift run",
+        swift_package_init_denied: "swift package init",
+        swift_package_update_denied: "swift package update",
+        swift_package_resolve_denied: "swift package resolve",
+        bare_swift_denied: "swift",
     }
 }
