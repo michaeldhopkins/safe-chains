@@ -190,9 +190,9 @@ jobs:
           cp target/${{ matrix.target }}/release/safe-chains staging/
           cp dist-assets/safe-chains.1 staging/
           cp dist-assets/completions/* staging/completions/
-          cp README.md LICENSE-MIT LICENSE-APACHE staging/
+          cp README.md LICENSE-MIT LICENSE-APACHE opencode-plugin.js staging/
           cd staging
-          tar czf ../${{ matrix.archive }} safe-chains safe-chains.1 completions/ README.md LICENSE-MIT LICENSE-APACHE
+          tar czf ../${{ matrix.archive }} safe-chains safe-chains.1 completions/ opencode-plugin.js README.md LICENSE-MIT LICENSE-APACHE
 
       - name: Package binary (windows)
         if: runner.os == 'Windows'

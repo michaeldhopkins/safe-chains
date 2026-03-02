@@ -16,7 +16,7 @@ See [COMMANDS.md](COMMANDS.md) for the full list of supported commands.
 brew install michaeldhopkins/tap/safe-chains
 ```
 
-This installs the binary, man page, and shell completions, and automatically configures the Claude Code hook in `~/.claude/settings.json`.
+This installs the binary, man page, shell completions, and the OpenCode plugin. If Claude Code is detected (`~/.claude` exists), the hook is automatically configured. If OpenCode is detected, setup instructions are printed.
 
 ### Pre-built binary
 
@@ -70,7 +70,18 @@ Restart your Claude Code sessions to activate the hook. Once configured, updatin
 
 ### OpenCode
 
-Copy `opencode-plugin.js` from this repo to `.opencode/plugins/` in your project. Requires `safe-chains` in PATH.
+If you installed via Homebrew, the plugin is available at `$(brew --prefix)/share/safe-chains/opencode-plugin.js`. Copy it to your project:
+
+```bash
+mkdir -p .opencode/plugins
+cp $(brew --prefix)/share/safe-chains/opencode-plugin.js .opencode/plugins/
+```
+
+If you installed via cargo or from source, copy `opencode-plugin.js` from the repository to `.opencode/plugins/` in your project.
+
+The plugin intercepts bash commands before OpenCode executes them. Safe commands run without prompting; unsafe commands are blocked and OpenCode's normal permission flow takes over.
+
+Requires `safe-chains` in PATH.
 
 ## Usage
 
