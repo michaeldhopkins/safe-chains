@@ -53,8 +53,16 @@ pub fn is_safe_xcrun(tokens: &[Token]) -> bool {
     if tokens[i] == "simctl" {
         return tokens.get(i + 1).is_some_and(|a| a == "list");
     }
+    if tokens[i] == "stapler" {
+        return tokens.get(i + 1).is_some_and(|a| a == "validate");
+    }
+    if tokens[i] == "notarytool" {
+        return tokens.get(i + 1).is_some_and(|a| NOTARYTOOL_SAFE.contains(a));
+    }
     false
 }
+
+static NOTARYTOOL_SAFE: WordSet = WordSet::new(&["history", "info", "log"]);
 
 static PKGUTIL_CHECK: FlagCheck = FlagCheck::new(
     &[
@@ -99,6 +107,18 @@ pub fn is_safe_codesign(tokens: &[Token]) -> bool {
     CODESIGN_CHECK.is_safe(&tokens[1..])
 }
 
+static SPCTL_CHECK: FlagCheck = FlagCheck::new(
+    &["--assess", "-a"],
+    &["--add", "--disable", "--enable", "--master-disable", "--master-enable", "--remove"],
+);
+
+pub fn is_safe_spctl(tokens: &[Token]) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    SPCTL_CHECK.is_safe(&tokens[1..])
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, doc};
     vec![
@@ -108,12 +128,17 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             "Allowed: -p/--print-path, -v/--version. Denied: -s/--switch, -r/--reset, --install."),
         CommandDoc::handler("xcrun",
             doc(&XCRUN_SHOW_FLAGS)
-                .multi_word(&[("simctl", WordSet::new(&["list"]))])
+                .multi_word(&[
+                    ("notarytool", NOTARYTOOL_SAFE),
+                    ("simctl", WordSet::new(&["list"])),
+                    ("stapler", WordSet::new(&["validate"])),
+                ])
                 .section("Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.")
                 .build()),
         CommandDoc::flagcheck("pkgutil", &PKGUTIL_CHECK),
         CommandDoc::flagcheck("lipo", &LIPO_CHECK),
         CommandDoc::flagcheck("codesign", &CODESIGN_CHECK),
+        CommandDoc::flagcheck("spctl", &SPCTL_CHECK),
     ]
 }
 
@@ -144,6 +169,13 @@ mod tests {
         xcrun_show_toolchain_path: "xcrun --show-toolchain-path",
         xcrun_sdk_flag_with_find: "xcrun --sdk iphoneos --find clang",
         xcrun_simctl_list: "xcrun simctl list",
+        xcrun_stapler_validate: "xcrun stapler validate /tmp/app",
+        xcrun_notarytool_history: "xcrun notarytool history",
+        xcrun_notarytool_info: "xcrun notarytool info abc-123",
+        xcrun_notarytool_log: "xcrun notarytool log abc-123",
+        spctl_assess: "spctl --assess -v /tmp/binary",
+        spctl_assess_short: "spctl -a /tmp/binary",
+        spctl_assess_type: "spctl --assess --type execute -v /tmp/binary",
         pkgutil_pkgs: "pkgutil --pkgs",
         pkgutil_files: "pkgutil --files com.apple.pkg.CLTools_Executables",
         pkgutil_pkg_info: "pkgutil --pkg-info com.apple.pkg.CLTools_Executables",
@@ -175,6 +207,14 @@ mod tests {
         xcrun_simctl_boot_denied: "xcrun simctl boot DEVICE_ID",
         xcrun_arbitrary_tool_denied: "xcrun clang file.c",
         xcrun_no_args_denied: "xcrun",
+        xcrun_stapler_staple_denied: "xcrun stapler staple /tmp/app",
+        xcrun_notarytool_submit_denied: "xcrun notarytool submit app.zip",
+        xcrun_notarytool_bare_denied: "xcrun notarytool",
+        spctl_add_denied: "spctl --add /tmp/binary",
+        spctl_remove_denied: "spctl --remove /tmp/binary",
+        spctl_enable_denied: "spctl --enable",
+        spctl_master_disable_denied: "spctl --master-disable",
+        spctl_no_args_denied: "spctl",
         pkgutil_forget_denied: "pkgutil --forget com.example.pkg",
         pkgutil_expand_denied: "pkgutil --expand pkg.pkg /tmp/expanded",
         pkgutil_no_args_denied: "pkgutil",
