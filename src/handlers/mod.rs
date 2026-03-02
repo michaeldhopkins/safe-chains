@@ -261,6 +261,7 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         "pkgutil" => xcode::is_safe_pkgutil(tokens),
         "lipo" => xcode::is_safe_lipo(tokens),
         "codesign" => xcode::is_safe_codesign(tokens),
+        "spctl" => xcode::is_safe_spctl(tokens),
 
         "perl" => perl::is_safe_perl(tokens),
 
@@ -292,7 +293,7 @@ const HANDLED_CMDS: &[&str] = &[
     "ollama", "llm",
     "brew", "mise", "asdf", "defaults", "sysctl", "cmake",
     "networksetup", "launchctl", "diskutil", "security", "csrutil", "log",
-    "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign",
+    "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign", "spctl",
     "perl",
     "find", "sed", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
 ];

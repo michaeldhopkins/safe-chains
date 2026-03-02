@@ -403,6 +403,10 @@ Safe unless -i/--in-place flag or 'e' modifier on substitutions (executes replac
 
 Safe unless -o/--output or --compress-program flag.
 
+### `spctl`
+
+Requires: --assess, -a. Denied: --add, --disable, --enable, --master-disable, --master-enable, --remove.
+
 ### `swift`
 
 Subcommands: build, package describe, package dump-package, package show-dependencies, test. Flags: --version.
@@ -449,7 +453,7 @@ Flags: -list, -showBuildSettings, -showdestinations, -showsdks, -version.
 
 ### `xcrun`
 
-Subcommands: simctl list.
+Subcommands: notarytool history, notarytool info, notarytool log, simctl list, stapler validate.
 
 Flags: --find, --show-sdk-build-version, --show-sdk-path, --show-sdk-platform-path, --show-sdk-platform-version, --show-sdk-version, --show-toolchain-path.
 
