@@ -41,7 +41,7 @@ static JJ_GLOBAL_VALUED: WordSet =
     WordSet::new(&["--at-op", "--at-operation", "--color", "--repository", "-R"]);
 
 static JJ_READ_ONLY: WordSet =
-    WordSet::new(&["--version", "diff", "help", "log", "show", "st", "status"]);
+    WordSet::new(&["--version", "diff", "help", "log", "show", "st", "status", "version"]);
 
 static JJ_MULTI: &[(&str, WordSet)] = &[
     ("bookmark", WordSet::new(&["list"])),
@@ -238,6 +238,7 @@ mod tests {
         jj_st: "jj st",
         jj_help: "jj help",
         jj_version: "jj --version",
+        jj_version_subcmd: "jj version",
         jj_op_log: "jj op log",
         jj_file_show: "jj file show some/path",
         jj_config_get: "jj config get user.name",
