@@ -75,6 +75,7 @@ These commands are allowed with any arguments.
 | `nl` | Number lines |
 | `nm` | List object file symbols |
 | `nproc` | Print number of CPUs |
+| `nroff` | Text formatter |
 | `nslookup` | DNS lookup |
 | `od` | Octal dump |
 | `otool` | Object file tool (macOS) |

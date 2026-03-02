@@ -53,6 +53,7 @@ pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str)] = &[
     ("unexpand", "Convert spaces to tabs"),
     ("fold", "Wrap lines"),
     ("fmt", "Reformat text"),
+    ("nroff", "Text formatter"),
     ("column", "Format into columns"),
     ("iconv", "Convert character encoding"),
 
