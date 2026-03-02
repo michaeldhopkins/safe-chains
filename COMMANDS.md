@@ -249,7 +249,7 @@ Subcommands: contents, dependency, environment, help, info, list, outdated, pris
 
 ### `gh`
 
-Subcommands attestation, cache, codespace, extension, gpg-key, issue, label, pr, release, repo, run, ssh-key, variable, workflow are allowed with actions: checks, diff, list, status, verify, view.
+Subcommands attestation, cache, codespace, extension, gpg-key, issue, label, pr, release, repo, run, ssh-key, variable, workflow are allowed with actions: checks, diff, list, status, verify, view, watch.
 
 Always safe: --version, search, status.
 
@@ -285,7 +285,7 @@ Recursively validates each benchmarked command. Denied if --prepare, --cleanup, 
 
 ### `jj`
 
-Subcommands: bookmark list, config get, config list, diff, file show, git fetch, git remote list, help, log, op log, show, st, status.
+Subcommands: bookmark list, config get, config list, diff, file show, git fetch, git remote list, help, log, op log, show, st, status, version.
 
 Flags: --version.
 

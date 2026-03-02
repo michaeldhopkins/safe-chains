@@ -7,7 +7,7 @@ static READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
 ]);
 
 static READ_ONLY_ACTIONS: WordSet =
-    WordSet::new(&["checks", "diff", "list", "status", "verify", "view"]);
+    WordSet::new(&["checks", "diff", "list", "status", "verify", "view", "watch"]);
 
 static ALWAYS_SAFE_SUBCOMMANDS: WordSet =
     WordSet::new(&["--version", "search", "status"]);
@@ -226,6 +226,7 @@ mod tests {
         search_issues: "gh search issues foo",
         search_prs: "gh search prs bar",
         run_view: "gh run view 789",
+        run_watch: "gh run watch 123 --repo owner/repo",
         release_list: "gh release list",
         label_list: "gh label list",
         codespace_list: "gh codespace list",
