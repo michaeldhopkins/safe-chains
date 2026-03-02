@@ -9,7 +9,6 @@ env:
 
 permissions:
   contents: write
-  workflows: write
 
 jobs:
   check-version:
