@@ -1,9 +1,11 @@
 use std::io;
 use std::process;
 
+use clap::Parser;
 use serde::Deserialize;
 use serde_json::json;
 
+use safe_chains::cli::Cli;
 use safe_chains::{is_safe, is_safe_command};
 
 #[derive(Deserialize)]
@@ -14,22 +16,6 @@ struct ToolInput {
 #[derive(Deserialize)]
 struct HookInput {
     tool_input: ToolInput,
-}
-
-enum Mode {
-    ListCommands,
-    Cli(String),
-    ClaudeHook,
-}
-
-fn detect_mode(args: &[String]) -> Mode {
-    if args.iter().any(|a| a == "--list-commands") {
-        return Mode::ListCommands;
-    }
-    match args.iter().find(|a| !a.starts_with('-')) {
-        Some(command) => Mode::Cli(command.clone()),
-        None => Mode::ClaudeHook,
-    }
 }
 
 fn print_docs() {
@@ -82,45 +68,25 @@ fn run_claude_hook() {
 }
 
 fn main() {
-    let args: Vec<String> = std::env::args().skip(1).collect();
-    match detect_mode(&args) {
-        Mode::ListCommands => print_docs(),
-        Mode::Cli(command) => run_cli(&command),
-        Mode::ClaudeHook => run_claude_hook(),
-    }
-}
+    let cli = Cli::try_parse();
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn detect_list_commands_mode() {
-        let args = vec!["--list-commands".to_string()];
-        assert!(matches!(detect_mode(&args), Mode::ListCommands));
-    }
-
-    #[test]
-    fn detect_cli_mode() {
-        let args = vec!["ls -la".to_string()];
-        assert!(matches!(detect_mode(&args), Mode::Cli(cmd) if cmd == "ls -la"));
-    }
-
-    #[test]
-    fn detect_cli_mode_skips_flags() {
-        let args = vec!["--verbose".to_string(), "ls -la".to_string()];
-        assert!(matches!(detect_mode(&args), Mode::Cli(cmd) if cmd == "ls -la"));
-    }
-
-    #[test]
-    fn detect_claude_hook_mode() {
-        let args: Vec<String> = vec![];
-        assert!(matches!(detect_mode(&args), Mode::ClaudeHook));
-    }
-
-    #[test]
-    fn detect_claude_hook_mode_with_only_flags() {
-        let args = vec!["--verbose".to_string()];
-        assert!(matches!(detect_mode(&args), Mode::ClaudeHook));
+    match cli {
+        Ok(cli) => {
+            if cli.list_commands {
+                print_docs();
+            } else if let Some(command) = cli.command {
+                run_cli(&command);
+            } else {
+                run_claude_hook();
+            }
+        }
+        Err(e) if e.kind() == clap::error::ErrorKind::DisplayHelp
+              || e.kind() == clap::error::ErrorKind::DisplayVersion =>
+        {
+            print!("{e}");
+        }
+        Err(_) => {
+            run_claude_hook();
+        }
     }
 }

@@ -12,6 +12,7 @@ macro_rules! denied {
     };
 }
 
+pub mod cli;
 pub mod docs;
 mod handlers;
 pub mod parse;
