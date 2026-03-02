@@ -64,6 +64,14 @@ jobs:
       - name: cargo deny check licenses
         run: cargo deny check licenses
 
+      - name: Verify COMMANDS.md is up to date
+        run: |
+          cargo run --locked -- --list-commands > COMMANDS.md.check
+          diff -u COMMANDS.md COMMANDS.md.check || {
+            echo "::error::COMMANDS.md is out of date. Run ./generate-docs.sh and commit."
+            exit 1
+          }
+
       - name: Generate distribution assets
         run: cargo run --locked --example generate_assets
 
