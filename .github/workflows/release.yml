@@ -64,6 +64,16 @@ jobs:
       - name: cargo deny check licenses
         run: cargo deny check licenses
 
+      - name: Generate distribution assets
+        run: cargo run --locked --example generate_assets
+
+      - name: Upload distribution assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-assets
+          path: target/assets/
+          retention-days: 1
+
   build:
     name: Build ${{ matrix.target }}
     needs: ci
@@ -74,9 +84,11 @@ jobs:
           - target: x86_64-apple-darwin
             runner: macos-14
             archive: safe-chains-x86_64-apple-darwin.tar.gz
+            is_macos: true
           - target: aarch64-apple-darwin
             runner: macos-14
             archive: safe-chains-aarch64-apple-darwin.tar.gz
+            is_macos: true
           - target: x86_64-unknown-linux-gnu
             runner: ubuntu-latest
             archive: safe-chains-x86_64-unknown-linux-gnu.tar.gz
@@ -102,11 +114,72 @@ jobs:
             cargo build --release --locked --target ${{ matrix.target }}
           fi
 
+      - name: Import Apple certificate
+        if: matrix.is_macos && env.APPLE_CERT != ''
+        env:
+          APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          APPLE_CERT_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+        run: |
+          KEYCHAIN_PATH="$RUNNER_TEMP/app-signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(openssl rand -hex 16)"
+
+          echo "KEYCHAIN_PATH=$KEYCHAIN_PATH" >> "$GITHUB_ENV"
+          echo "KEYCHAIN_PASSWORD=$KEYCHAIN_PASSWORD" >> "$GITHUB_ENV"
+
+          echo "$APPLE_CERT" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
+
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security import "$RUNNER_TEMP/certificate.p12" -P "$APPLE_CERT_PASSWORD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+
+          rm "$RUNNER_TEMP/certificate.p12"
+
+      - name: Sign binary
+        if: matrix.is_macos && env.APPLE_CERT != ''
+        env:
+          APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+        run: |
+          BINARY="target/${{ matrix.target }}/release/safe-chains"
+          IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" | head -1 | sed 's/.*"\(.*\)".*/\1/')
+          echo "Signing with identity: $IDENTITY"
+          codesign --force --options=runtime --sign "$IDENTITY" --timestamp "$BINARY"
+          codesign -v --verify --deep --strict "$BINARY"
+
+      - name: Notarize binary
+        if: matrix.is_macos && env.APPLE_CERT != ''
+        env:
+          APPLE_CERT: ${{ secrets.APPLE_CERTIFICATE_BASE64 }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          BINARY="target/${{ matrix.target }}/release/safe-chains"
+          /usr/bin/ditto -c -k "$BINARY" "$RUNNER_TEMP/safe-chains.zip"
+          xcrun notarytool submit "$RUNNER_TEMP/safe-chains.zip" \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_ID_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+          rm "$RUNNER_TEMP/safe-chains.zip"
+
+      - name: Download distribution assets
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-assets
+          path: dist-assets
+
       - name: Package binary
         run: |
-          cd target/${{ matrix.target }}/release
-          tar czf ../../../${{ matrix.archive }} safe-chains
-          cd ../../..
+          mkdir -p staging/completions
+          cp target/${{ matrix.target }}/release/safe-chains staging/
+          cp dist-assets/safe-chains.1 staging/
+          cp dist-assets/completions/* staging/completions/
+          cp README.md LICENSE-MIT LICENSE-APACHE staging/
+          cd staging
+          tar czf ../${{ matrix.archive }} safe-chains safe-chains.1 completions/ README.md LICENSE-MIT LICENSE-APACHE
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -115,12 +188,25 @@ jobs:
           path: ${{ matrix.archive }}
           retention-days: 1
 
+      - name: Cleanup keychain
+        if: always() && matrix.is_macos && env.KEYCHAIN_PATH != ''
+        run: security delete-keychain "$KEYCHAIN_PATH"
+
   release:
     name: Create release and publish
     needs: [check-version, build]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Publish to crates.io
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -133,6 +219,11 @@ jobs:
           git tag "v${{ needs.check-version.outputs.version }}"
           git push origin "v${{ needs.check-version.outputs.version }}"
 
+      - name: Generate release notes
+        run: |
+          cargo install git-cliff
+          git cliff --latest --strip all > RELEASE_NOTES.md
+
       - name: Generate checksums
         run: |
           cd artifacts
@@ -144,14 +235,18 @@ jobs:
         with:
           tag_name: v${{ needs.check-version.outputs.version }}
           name: v${{ needs.check-version.outputs.version }}
-          generate_release_notes: true
+          body_path: RELEASE_NOTES.md
           files: |
             artifacts/*.tar.gz
             artifacts/SHA256SUMS.txt
 
-      - uses: dtolnay/rust-toolchain@stable
-
-      - name: Publish to crates.io
-        run: cargo publish --allow-dirty
+      - name: Trigger Homebrew tap update
+        if: env.TAP_TOKEN != ''
         env:
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.TAP_GITHUB_TOKEN }}
+          repository: michaeldhopkins/homebrew-tap
+          event-type: update-formula
+          client-payload: '{"formula": "safe-chains", "repo": "michaeldhopkins/safe-chains", "version": "${{ needs.check-version.outputs.version }}"}'
