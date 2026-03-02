@@ -10,9 +10,17 @@ See [COMMANDS.md](COMMANDS.md) for the full list of supported commands.
 
 ## Install
 
+### Homebrew (macOS)
+
+```bash
+brew install michaeldhopkins/tap/safe-chains
+```
+
+This installs the binary, man page, and shell completions, and automatically configures the Claude Code hook in `~/.claude/settings.json`.
+
 ### Pre-built binary
 
-Download from [GitHub Releases](https://github.com/michaeldhopkins/safe-chains/releases/latest). Binaries are available for macOS (Apple Silicon and Intel) and Linux (x86_64 and aarch64).
+Download signed, notarized binaries from [GitHub Releases](https://github.com/michaeldhopkins/safe-chains/releases/latest). Available for macOS (Apple Silicon and Intel) and Linux (x86_64 and aarch64).
 
 ```bash
 # Example for macOS Apple Silicon:
@@ -40,7 +48,7 @@ cargo install --path .
 
 ### Claude Code
 
-Add this to `~/.claude/settings.json`:
+If you installed via Homebrew, the hook is already configured. Otherwise, add this to `~/.claude/settings.json`:
 
 ```json
 "hooks": {
