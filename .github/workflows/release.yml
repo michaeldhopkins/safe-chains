@@ -103,6 +103,9 @@ jobs:
           - target: aarch64-unknown-linux-gnu
             runner: ubuntu-latest
             archive: safe-chains-aarch64-unknown-linux-gnu.tar.gz
+          - target: x86_64-pc-windows-msvc
+            runner: windows-latest
+            archive: safe-chains-x86_64-pc-windows-msvc.zip
     steps:
       - uses: actions/checkout@v4
 
@@ -115,6 +118,7 @@ jobs:
         uses: taiki-e/install-action@cross
 
       - name: Build binary
+        shell: bash
         run: |
           if [ "${{ matrix.target }}" = "aarch64-unknown-linux-gnu" ]; then
             cross build --release --locked --target ${{ matrix.target }}
@@ -179,7 +183,8 @@ jobs:
           name: dist-assets
           path: dist-assets
 
-      - name: Package binary
+      - name: Package binary (unix)
+        if: runner.os != 'Windows'
         run: |
           mkdir -p staging/completions
           cp target/${{ matrix.target }}/release/safe-chains staging/
@@ -188,6 +193,12 @@ jobs:
           cp README.md LICENSE-MIT LICENSE-APACHE staging/
           cd staging
           tar czf ../${{ matrix.archive }} safe-chains safe-chains.1 completions/ README.md LICENSE-MIT LICENSE-APACHE
+
+      - name: Package binary (windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path "target/${{ matrix.target }}/release/safe-chains.exe" -DestinationPath "${{ matrix.archive }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -235,7 +246,7 @@ jobs:
       - name: Generate checksums
         run: |
           cd artifacts
-          sha256sum *.tar.gz > SHA256SUMS.txt
+          sha256sum *.tar.gz *.zip > SHA256SUMS.txt
           cat SHA256SUMS.txt
 
       - name: Create GitHub release
@@ -246,6 +257,7 @@ jobs:
           body_path: RELEASE_NOTES.md
           files: |
             artifacts/*.tar.gz
+            artifacts/*.zip
             artifacts/SHA256SUMS.txt
 
       - name: Trigger Homebrew tap update
