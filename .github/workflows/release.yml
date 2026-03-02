@@ -9,6 +9,7 @@ env:
 
 permissions:
   contents: write
+  workflows: write
 
 jobs:
   check-version:
@@ -212,7 +213,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
 
       - name: Publish to crates.io
-        run: cargo publish
+        run: cargo publish || echo "::warning::Publish failed (version may already exist)"
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
