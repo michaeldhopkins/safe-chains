@@ -288,7 +288,7 @@ Recursively validates each benchmarked command. Denied if --prepare, --cleanup, 
 
 ### `jj`
 
-Subcommands: bookmark list, config get, config list, diff, file show, git fetch, git remote list, help, log, op log, show, st, status, version.
+Subcommands: bookmark list, config get, config list, diff, file list, file show, git fetch, git remote list, help, log, op log, root, show, st, status, version, workspace list.
 
 Flags: --version.
 

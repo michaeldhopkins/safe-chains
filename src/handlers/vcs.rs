@@ -41,14 +41,15 @@ static JJ_GLOBAL_VALUED: WordSet =
     WordSet::new(&["--at-op", "--at-operation", "--color", "--repository", "-R"]);
 
 static JJ_READ_ONLY: WordSet =
-    WordSet::new(&["--version", "diff", "help", "log", "show", "st", "status", "version"]);
+    WordSet::new(&["--version", "diff", "help", "log", "root", "show", "st", "status", "version"]);
 
 static JJ_MULTI: &[(&str, WordSet)] = &[
     ("bookmark", WordSet::new(&["list"])),
     ("config", WordSet::new(&["get", "list"])),
-    ("file", WordSet::new(&["show"])),
+    ("file", WordSet::new(&["list", "show"])),
     ("git", WordSet::new(&["fetch"])),
     ("op", WordSet::new(&["log"])),
+    ("workspace", WordSet::new(&["list"])),
 ];
 
 static JJ_TRIPLE: &[(&str, &str, WordSet)] =
@@ -255,6 +256,11 @@ mod tests {
         jj_global_flag_multi_word: "jj --no-pager bookmark list",
         jj_git_fetch: "jj git fetch",
         jj_git_fetch_with_global_flags: "jj --no-pager git fetch",
+        jj_root: "jj root",
+        jj_file_list: "jj file list",
+        jj_file_list_with_flags: "jj --no-pager file list",
+        jj_workspace_list: "jj workspace list",
+        jj_workspace_list_with_flags: "jj --no-pager workspace list",
     }
 
     denied! {
@@ -305,6 +311,9 @@ mod tests {
         jj_restore_denied: "jj restore file.rb",
         jj_abandon_denied: "jj abandon",
         jj_config_set_denied: "jj config set user.name foo",
+        jj_workspace_add_denied: "jj workspace add ../new",
+        jj_workspace_forget_denied: "jj workspace forget default",
+        jj_file_annotate_denied: "jj file annotate",
         bare_jj_denied: "jj",
     }
 }
