@@ -56,6 +56,11 @@ static JJ_TRIPLE: &[(&str, &str, WordSet)] =
     &[("git", "remote", WordSet::new(&["list"]))];
 
 pub fn is_safe_git(tokens: &[Token]) -> bool {
+    if tokens.last().is_some_and(|t| *t == "--help")
+        && !tokens.iter().any(|t| *t == "--")
+    {
+        return true;
+    }
     let mut args = &tokens[1..];
     while args.len() >= 2 && args[0] == "-C" {
         args = &args[2..];
@@ -103,6 +108,11 @@ pub fn is_safe_git(tokens: &[Token]) -> bool {
 }
 
 pub fn is_safe_jj(tokens: &[Token]) -> bool {
+    if tokens.last().is_some_and(|t| *t == "--help" || *t == "-h")
+        && !tokens.iter().any(|t| *t == "--")
+    {
+        return true;
+    }
     let mut args = &tokens[1..];
     loop {
         if args.is_empty() {
@@ -261,6 +271,12 @@ mod tests {
         jj_file_list_with_flags: "jj --no-pager file list",
         jj_workspace_list: "jj workspace list",
         jj_workspace_list_with_flags: "jj --no-pager workspace list",
+        git_worktree_help: "git worktree --help",
+        git_subcommand_help: "git rebase --help",
+        git_push_help: "git push --help",
+        jj_workspace_help: "jj workspace --help",
+        jj_new_help: "jj new --help",
+        jj_workspace_help_h: "jj workspace -h",
     }
 
     denied! {
@@ -314,6 +330,8 @@ mod tests {
         jj_workspace_add_denied: "jj workspace add ../new",
         jj_workspace_forget_denied: "jj workspace forget default",
         jj_file_annotate_denied: "jj file annotate",
+        git_help_bypass_denied: "git push -- --help",
+        jj_help_bypass_denied: "jj new -- --help",
         bare_jj_denied: "jj",
     }
 }
