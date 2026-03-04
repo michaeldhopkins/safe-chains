@@ -210,6 +210,14 @@ Guarded: config (--show, --show-sources only).
 
 Subcommands: authenticated-root, report, status.
 
+### `curl`
+
+Allowed standalone flags: --compressed, --fail, --globoff, --head, --insecure, --ipv4, --ipv6, --location, --no-buffer, --no-progress-meter, --show-error, --silent, --verbose, -4, -6, -I, -L, -N, -S, -f, -g, -k, -s, -v.
+
+Allowed valued flags: --connect-timeout, --max-time, --write-out, -m, -w.
+
+Allowed methods (-X/--request): GET, HEAD, OPTIONS.
+
 ### `defaults`
 
 Subcommands: domains, export, find, read, read-type.
