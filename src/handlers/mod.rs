@@ -5,6 +5,7 @@ pub mod dotnet;
 pub mod forges;
 pub mod go;
 pub mod jvm;
+pub mod network;
 pub mod node;
 pub mod perl;
 pub mod php;
@@ -246,6 +247,8 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
 
         "docker" | "podman" => containers::is_safe_docker(tokens),
 
+        "curl" => network::is_safe_curl(tokens),
+
         "ollama" => ai::is_safe_ollama(tokens),
         "llm" => ai::is_safe_llm(tokens),
 
@@ -300,6 +303,7 @@ const HANDLED_CMDS: &[&str] = &[
     "composer",
     "swift",
     "dotnet",
+    "curl",
     "docker", "podman",
     "ollama", "llm",
     "brew", "mise", "asdf", "defaults", "pmset", "sysctl", "cmake",
@@ -325,6 +329,7 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(dotnet::command_docs());
     docs.extend(containers::command_docs());
     docs.extend(ai::command_docs());
+    docs.extend(network::command_docs());
     docs.extend(system::command_docs());
     docs.extend(xcode::command_docs());
     docs.extend(perl::command_docs());
