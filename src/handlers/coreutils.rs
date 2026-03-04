@@ -269,5 +269,11 @@ mod tests {
         awk_system_space_paren_denied: "awk 'BEGIN{system (\"rm\")}'",
         awk_pipe_outside_string_denied: "awk '{print $0 | \"cmd\"}'",
         awk_redirect_outside_string_denied: "awk '{print $0 > \"file\"}'",
+        awk_system_trailing_help_denied: "awk 'BEGIN{system(\"rm\")}' --help",
+        awk_system_trailing_version_denied: "awk 'BEGIN{system(\"rm\")}' --version",
+        sed_inplace_trailing_help_denied: "sed -i 's/foo/bar/' file --help",
+        sed_inplace_trailing_version_denied: "sed -i 's/foo/bar/' file --version",
+        sort_output_trailing_help_denied: "sort -o output.txt file --help",
+        sort_output_trailing_version_denied: "sort -o output.txt file --version",
     }
 }

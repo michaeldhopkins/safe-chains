@@ -56,7 +56,7 @@ static JJ_TRIPLE: &[(&str, &str, WordSet)] =
     &[("git", "remote", WordSet::new(&["list"]))];
 
 pub fn is_safe_git(tokens: &[Token]) -> bool {
-    if tokens.last().is_some_and(|t| *t == "--help" || *t == "-h")
+    if tokens.last().is_some_and(|t| *t == "-h")
         && !tokens.iter().any(|t| *t == "--")
     {
         return true;
@@ -108,7 +108,7 @@ pub fn is_safe_git(tokens: &[Token]) -> bool {
 }
 
 pub fn is_safe_jj(tokens: &[Token]) -> bool {
-    if tokens.last().is_some_and(|t| *t == "--help" || *t == "-h")
+    if tokens.last().is_some_and(|t| *t == "-h")
         && !tokens.iter().any(|t| *t == "--")
     {
         return true;

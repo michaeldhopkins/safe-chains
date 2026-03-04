@@ -378,5 +378,7 @@ mod tests {
         perl_require_denied: "perl -e 'require POSIX'",
         perl_fork_denied: "perl -e 'fork()'",
         perl_socket_denied: "perl -e 'socket(S, 2, 1, 0)'",
+        perl_system_trailing_help_denied: "perl -e 'system(\"rm\")' --help",
+        perl_system_trailing_version_denied: "perl -e 'system(\"rm\")' --version",
     }
 }

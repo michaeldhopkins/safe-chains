@@ -184,7 +184,6 @@ Flags: --version.
 
 Guarded: fmt (Requires: --check), package (Requires: --list), publish (Requires: --dry-run. Denied: --force, --no-verify).
 +toolchain selectors (e.g. +nightly, +stable) are skipped.
-Any subcommand with --help is safe (unless -- separator is present).
 
 ### `cmake`
 

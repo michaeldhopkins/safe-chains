@@ -32,11 +32,6 @@ pub fn is_safe_cargo(tokens: &[Token]) -> bool {
     if tokens.len() < sub + 1 {
         return false;
     }
-    if tokens.last().is_some_and(|t| *t == "--help")
-        && !tokens.iter().any(|t| *t == "--")
-    {
-        return true;
-    }
     if CARGO_SAFE.contains(&tokens[sub]) {
         return true;
     }
@@ -70,8 +65,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             doc(&CARGO_SAFE)
                 .section(format!(
                     "Guarded: fmt ({}), package ({}), publish ({}).\n\
-                     +toolchain selectors (e.g. +nightly, +stable) are skipped.\n\
-                     Any subcommand with --help is safe (unless -- separator is present).",
+                     +toolchain selectors (e.g. +nightly, +stable) are skipped.",
                     describe_flagcheck(&CARGO_FMT).trim_end_matches('.'),
                     describe_flagcheck(&CARGO_PACKAGE_LIST).trim_end_matches('.'),
                     describe_flagcheck(&CARGO_PUBLISH_DRY).trim_end_matches('.'),

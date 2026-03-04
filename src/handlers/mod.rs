@@ -190,11 +190,44 @@ fn is_bare_info_request(tokens: &[Token]) -> bool {
     tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--help")
 }
 
+static HELP_ELIGIBLE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
+    [
+        "asdf",
+        "brew", "bun", "bundle",
+        "cargo", "cmake", "codesign", "composer", "conda", "csrutil", "curl",
+        "defaults", "deno", "diskutil", "dotnet",
+        "fnm",
+        "gem", "gh", "git", "glab", "go", "gradle", "gradlew",
+        "jj",
+        "launchctl", "lipo", "llm", "log",
+        "magick", "mise", "mvn", "mvnw",
+        "networksetup", "npm", "nvm",
+        "ollama",
+        "pip", "pip3", "pkgutil", "plutil", "pmset", "pnpm", "poetry", "pyenv",
+        "rbenv",
+        "security", "spctl", "swift", "sysctl",
+        "tea",
+        "uv",
+        "volta",
+        "xcode-select", "xcodebuild", "xcrun", "xmllint",
+        "yarn", "yq",
+    ].into_iter().collect()
+});
+
+fn is_trailing_info_request(tokens: &[Token]) -> bool {
+    tokens.len() >= 2
+        && tokens.last().is_some_and(|t| *t == "--help" || *t == "--version")
+        && !tokens.iter().any(|t| *t == "--")
+}
+
 pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     if is_bare_info_request(tokens) {
         return true;
     }
     let cmd = tokens[0].command_name();
+    if is_trailing_info_request(tokens) && HELP_ELIGIBLE.contains(cmd) {
+        return true;
+    }
     match cmd {
         "sh" | "bash" => shell::is_safe_shell(tokens, is_safe),
         "xargs" => shell::is_safe_xargs(tokens, is_safe),
@@ -382,6 +415,42 @@ mod tests {
                 "{name} is in both HANDLED_CMDS and SAFE_CMD_ENTRIES"
             );
         }
+    }
+
+    const HELP_EXCLUDED: &[&str] = &[
+        "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine",
+        "rustup", "find",
+        "npx", "bunx",
+        "docker", "podman",
+        "awk", "gawk", "mawk", "nawk", "sed", "sort", "perl",
+    ];
+
+    #[test]
+    fn help_eligible_plus_excluded_equals_handled() {
+        let eligible: HashSet<&str> = HELP_ELIGIBLE.iter().copied().collect();
+        let excluded: HashSet<&str> = HELP_EXCLUDED.iter().copied().collect();
+        let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
+
+        let combined: HashSet<&str> = eligible.union(&excluded).copied().collect();
+
+        let missing: Vec<&&str> = handled.difference(&combined).collect();
+        assert!(
+            missing.is_empty(),
+            "handled commands not in HELP_ELIGIBLE or HELP_EXCLUDED: {missing:?} — \
+             add each to one of the two sets"
+        );
+
+        let extra: Vec<&&str> = combined.difference(&handled).collect();
+        assert!(
+            extra.is_empty(),
+            "commands in HELP_ELIGIBLE/HELP_EXCLUDED but not in HANDLED_CMDS: {extra:?}"
+        );
+
+        let overlap: Vec<&&str> = eligible.intersection(&excluded).collect();
+        assert!(
+            overlap.is_empty(),
+            "commands in both HELP_ELIGIBLE and HELP_EXCLUDED: {overlap:?}"
+        );
     }
 }
 
