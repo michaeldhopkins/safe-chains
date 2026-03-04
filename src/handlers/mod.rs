@@ -23,6 +23,8 @@ use std::sync::LazyLock;
 
 use crate::parse::{Segment, Token, WordSet};
 
+static MAGICK_SAFE: WordSet = WordSet::new(&["--help", "--version", "identify"]);
+
 pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str)] = &[
     ("grep", "Search file contents"),
     ("rg", "Ripgrep search"),
@@ -275,6 +277,8 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         "xmllint" => coreutils::is_safe_xmllint(tokens),
         "awk" | "gawk" | "mawk" | "nawk" => coreutils::is_safe_awk(tokens),
 
+        "magick" => is_safe_subcmd(tokens, &MAGICK_SAFE, &[]),
+
         _ => SAFE_CMDS.contains(cmd) || is_bare_info_request(tokens),
     }
 }
@@ -299,6 +303,7 @@ const HANDLED_CMDS: &[&str] = &[
     "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign", "spctl",
     "perl",
     "find", "sed", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
+    "magick",
 ];
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
@@ -322,6 +327,8 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(coreutils::command_docs());
     docs.extend(shell::command_docs());
     docs.extend(wrappers::command_docs());
+    docs.push(crate::docs::CommandDoc::handler("magick",
+        crate::docs::doc(&MAGICK_SAFE).build()));
     docs
 }
 
@@ -366,5 +373,30 @@ mod tests {
                 "{name} is in both HANDLED_CMDS and SAFE_CMD_ENTRIES"
             );
         }
+    }
+}
+
+#[cfg(test)]
+mod magick_tests {
+    use crate::is_safe_command;
+
+    fn check(cmd: &str) -> bool {
+        is_safe_command(cmd)
+    }
+
+    safe! {
+        magick_identify: "magick identify /tmp/image.png",
+        magick_identify_verbose: "magick identify -verbose /tmp/image.png",
+        magick_identify_multi: "magick identify /tmp/a.png /tmp/b.png",
+        magick_help: "magick --help",
+        magick_version: "magick --version",
+    }
+
+    denied! {
+        magick_convert_denied: "magick input.png output.jpg",
+        magick_mogrify_denied: "magick mogrify -resize 50% image.png",
+        magick_composite_denied: "magick composite overlay.png base.png result.png",
+        magick_conjure_denied: "magick conjure script.msl",
+        bare_magick_denied: "magick",
     }
 }

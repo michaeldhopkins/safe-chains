@@ -310,6 +310,10 @@ Subcommands: aliases, collections, logs, models, plugins, templates. Flags: --ve
 
 Subcommands: help, show, stats, stream.
 
+### `magick`
+
+Subcommands: identify. Flags: --help, --version.
+
 ### `mise`
 
 Subcommands: config list, config ls, current, doctor, env, list, ls, settings get, which. Flags: --version.

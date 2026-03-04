@@ -56,7 +56,7 @@ static JJ_TRIPLE: &[(&str, &str, WordSet)] =
     &[("git", "remote", WordSet::new(&["list"]))];
 
 pub fn is_safe_git(tokens: &[Token]) -> bool {
-    if tokens.last().is_some_and(|t| *t == "--help")
+    if tokens.last().is_some_and(|t| *t == "--help" || *t == "-h")
         && !tokens.iter().any(|t| *t == "--")
     {
         return true;
@@ -277,6 +277,8 @@ mod tests {
         jj_workspace_help: "jj workspace --help",
         jj_new_help: "jj new --help",
         jj_workspace_help_h: "jj workspace -h",
+        git_worktree_help_h: "git worktree -h",
+        git_push_help_h: "git push -h",
     }
 
     denied! {
