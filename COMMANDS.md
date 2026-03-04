@@ -115,6 +115,7 @@ These commands are allowed with any arguments.
 | `tree` | Directory tree |
 | `true` | Return success exit code |
 | `tty` | Print terminal name |
+| `type` | Identify command type |
 | `uname` | System information |
 | `unexpand` | Convert spaces to tabs |
 | `uniq` | Filter duplicate lines |
@@ -124,6 +125,7 @@ These commands are allowed with any arguments.
 | `vm_stat` | Virtual memory statistics |
 | `w` | Show logged-in users and activity |
 | `wc` | Count lines/words/bytes |
+| `whereis` | Locate binary, source, and man page |
 | `which` | Locate command |
 | `who` | Show logged-in users |
 | `whoami` | Print current user |

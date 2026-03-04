@@ -77,6 +77,8 @@ pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str)] = &[
     ("df", "Disk free space"),
 
     ("printenv", "Print environment variables"),
+    ("type", "Identify command type"),
+    ("whereis", "Locate binary, source, and man page"),
     ("which", "Locate command"),
     ("whoami", "Print current user"),
     ("date", "Display date and time"),
