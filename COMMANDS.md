@@ -374,6 +374,10 @@ Requires: --check-signature, --export-plist, --file-info, --file-info-plist, --f
 
 Flags: -help, -lint, -p, -type.
 
+### `pmset`
+
+Allowed: -g (get/display settings only).
+
 ### `pnpm`
 
 Subcommands: audit, list, ls, outdated, why. Flags: --version.
