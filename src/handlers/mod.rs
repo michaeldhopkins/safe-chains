@@ -190,6 +190,9 @@ fn is_bare_info_request(tokens: &[Token]) -> bool {
 }
 
 pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    if is_bare_info_request(tokens) {
+        return true;
+    }
     let cmd = tokens[0].command_name();
     match cmd {
         "sh" | "bash" => shell::is_safe_shell(tokens, is_safe),
@@ -279,7 +282,7 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
 
         "magick" => is_safe_subcmd(tokens, &MAGICK_SAFE, &[]),
 
-        _ => SAFE_CMDS.contains(cmd) || is_bare_info_request(tokens),
+        _ => SAFE_CMDS.contains(cmd),
     }
 }
 
