@@ -1,0 +1,38 @@
+name: Command Request
+description: Request a new command or subcommand to be added to the safe list
+labels: ["command-request"]
+body:
+  - type: input
+    id: command
+    attributes:
+      label: Command
+      description: The full command (and subcommands/flags if applicable) you want added
+      placeholder: "e.g., brew info, or cargo doc --open"
+    validations:
+      required: true
+
+  - type: textarea
+    id: safety
+    attributes:
+      label: Why is this safe?
+      description: Explain why this command is read-only or non-destructive
+      placeholder: "e.g., 'brew info' only displays package metadata — it doesn't install or modify anything"
+    validations:
+      required: true
+
+  - type: input
+    id: docs
+    attributes:
+      label: Documentation link
+      description: Link to official docs for this command
+      placeholder: "https://docs.brew.sh/Manpage#info"
+    validations:
+      required: false
+
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: Screenshot of the command being blocked in your agentic coding tool (drag and drop an image)
+    validations:
+      required: false
