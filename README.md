@@ -106,6 +106,8 @@ safe-chains knows 130+ read-only commands (`grep`, `cat`, `ls`, `jq`, ...) that 
 
 Commands containing shell operators (`&&`, `|`, `;`) are split into segments, and each segment is validated independently. Segments containing output redirection (`>`), input redirection (`<`), backticks, or command substitution (`$(...)`) are always rejected.
 
+Found a safe command safe-chains should support? [Submit an issue.](https://github.com/michaeldhopkins/safe-chains/issues/new?template=command-request.yml)
+
 ### Settings-aware chain approval
 
 `safe-chains` lets you significantly tighten up your approved bash commands and also makes your remaining allowed commands more useful. When a chain doesn't fully pass built-in rules, safe-chains reads your Claude Code settings and checks each segment independently against your approved patterns. For example, given `cargo test && npm run build && ./generate-docs.sh`:
