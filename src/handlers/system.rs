@@ -48,6 +48,10 @@ pub fn is_safe_defaults(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && DEFAULTS_SAFE.contains(&tokens[1])
 }
 
+pub fn is_safe_pmset(tokens: &[Token]) -> bool {
+    tokens.len() >= 2 && tokens[1] == "-g"
+}
+
 pub fn is_safe_sysctl(tokens: &[Token]) -> bool {
     !has_flag(tokens, Some("-w"), Some("--write"))
         && !tokens[1..].iter().any(|t| t.contains("="))
@@ -130,6 +134,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                 .subcommand("plugin-list-all")
                 .build()),
         CommandDoc::wordset("defaults", &DEFAULTS_SAFE),
+        CommandDoc::handler("pmset",
+            "Allowed: -g (get/display settings only)."),
         CommandDoc::handler("sysctl",
             "Safe unless -w/--write flag or key=value assignment syntax."),
         CommandDoc::handler("cmake",
@@ -198,6 +204,9 @@ mod tests {
         defaults_domains: "defaults domains",
         defaults_find: "defaults find finder",
         defaults_export: "defaults export com.apple.finder -",
+        pmset_get: "pmset -g",
+        pmset_get_assertions: "pmset -g assertions",
+        pmset_get_batt: "pmset -g batt",
         sysctl_read: "sysctl kern.maxproc",
         sysctl_all: "sysctl -a",
         cmake_version: "cmake --version",
@@ -242,6 +251,9 @@ mod tests {
         asdf_install_denied: "asdf install ruby 3.4",
         defaults_write_denied: "defaults write com.apple.finder ShowPathbar -bool true",
         defaults_delete_denied: "defaults delete com.apple.finder",
+        pmset_sleep_denied: "pmset sleepnow",
+        pmset_set_denied: "pmset -a displaysleep 10",
+        bare_pmset_denied: "pmset",
         sysctl_write_denied: "sysctl -w kern.maxproc=2048",
         sysctl_write_long_denied: "sysctl --write kern.maxproc=2048",
         sysctl_assign_denied: "sysctl kern.maxproc=2048",
