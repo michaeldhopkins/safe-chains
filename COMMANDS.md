@@ -159,11 +159,7 @@ Subcommands: about, audit, check-platform-reqs, diagnose, fund, help, info, lice
 
 ### `conda`
 
-Subcommands: info, list.
-
-Flags: --version.
-
-Guarded: config (--show, --show-sources only).
+Subcommands: config (--show/--show-sources only), info, list. Each has an explicit flag allowlist.
 
 ### `csrutil`
 
@@ -243,7 +239,7 @@ Subcommands: activity, apfs list, apfs listCryptoUsers, apfs listSnapshots, apfs
 
 ### `docker / podman`
 
-Subcommands: buildx --version, buildx inspect, buildx ls, buildx version, compose --version, compose config, compose images, compose ls, compose ps, compose top, compose version, container diff, container inspect, container list, container logs, container ls, container port, container stats, container top, context inspect, context ls, context show, diff, history, image history, image inspect, image list, image ls, images, info, inspect, logs, manifest inspect, network inspect, network ls, port, ps, stats, system df, system info, top, version, volume inspect, volume ls. Flags: --version.
+Top-level: diff, history, images, info, inspect, logs, port, ps, stats, top, version. Multi-level: buildx, compose, container, context, image, manifest, network, system, volume. Each subcommand/action has an explicit flag allowlist.
 
 ### `dotnet`
 
@@ -643,11 +639,7 @@ Allowed standalone flags: --count, --delimiter, --full, --inverse, --lightweight
 
 ### `pip / pip3`
 
-Subcommands: check, debug, freeze, help, index, inspect, list, show.
-
-Flags: --version.
-
-Guarded: config (list/get only).
+Subcommands: check, config (list/get), debug, freeze, help, index, inspect, list, show. Each has an explicit flag allowlist.
 
 ### `pkgutil`
 
@@ -667,7 +659,7 @@ Subcommands: audit, list, ls, outdated, why. Flags: --version.
 
 ### `poetry`
 
-Subcommands: check, env info, env list, show. Flags: --version.
+Subcommands: check, env info/list, show. Each has an explicit flag allowlist.
 
 ### `printenv`
 
@@ -699,7 +691,7 @@ Allowed standalone flags: -L, -P. Bare invocation allowed.
 
 ### `pyenv`
 
-Subcommands: help, root, shims, version, versions, which. Flags: --version.
+Subcommands: help, root, shims, version, versions, which. Minimal flags allowed (--bare).
 
 ### `rbenv`
 
@@ -927,7 +919,7 @@ Bare invocation allowed.
 
 ### `uv`
 
-Subcommands: pip check, pip freeze, pip list, pip show, python list, tool list. Flags: --version.
+Subcommands: pip check/freeze/list/show, python list, tool list. Each has an explicit flag allowlist.
 
 ### `vm_stat`
 
