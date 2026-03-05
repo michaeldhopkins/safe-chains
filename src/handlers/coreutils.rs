@@ -1,4 +1,5 @@
 use crate::parse::{Segment, Token, WordSet, has_flag};
+use crate::policy::{self, FlagPolicy};
 
 static FIND_DANGEROUS_FLAGS: WordSet = WordSet::new(&[
     "-delete",
@@ -161,21 +162,366 @@ pub fn is_safe_hostname(tokens: &[Token]) -> bool {
     tokens[1..].iter().all(|t| HOSTNAME_DISPLAY.contains(t))
 }
 
+static GREP_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--basic-regexp", "--binary", "--byte-offset", "--color", "--colour",
+        "--count", "--dereference-recursive", "--extended-regexp",
+        "--files-with-matches", "--files-without-match", "--fixed-strings",
+        "--ignore-case", "--initial-tab", "--invert-match", "--line-buffered",
+        "--line-number", "--line-regexp", "--no-filename", "--no-messages",
+        "--null", "--null-data", "--only-matching", "--perl-regexp", "--quiet",
+        "--recursive", "--silent", "--text", "--with-filename", "--word-regexp",
+        "-E", "-F", "-G", "-H", "-I", "-J", "-L", "-P", "-R", "-S",
+        "-T", "-U", "-V", "-Z",
+        "-a", "-b", "-c", "-h", "-i", "-l", "-n", "-o", "-p", "-q",
+        "-r", "-s", "-v", "-w", "-x", "-z",
+    ]),
+    standalone_short: b"EFGHIJLPRSTUVZabchilnopqrsvwxz",
+    valued: WordSet::new(&[
+        "--after-context", "--before-context", "--binary-files", "--color",
+        "--colour", "--context", "--devices", "--directories", "--exclude",
+        "--exclude-dir", "--exclude-from", "--file", "--group-separator",
+        "--include", "--label", "--max-count", "--regexp",
+        "-A", "-B", "-C", "-D", "-d", "-e", "-f", "-m",
+    ]),
+    valued_short: b"ABCDdefm",
+    bare: false,
+    max_positional: None,
+};
+
+pub fn is_safe_grep(tokens: &[Token]) -> bool {
+    policy::check(tokens, &GREP_POLICY)
+}
+
+static RG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--binary", "--block-buffered", "--byte-offset", "--case-sensitive",
+        "--column", "--count", "--count-matches", "--crlf", "--debug",
+        "--files", "--files-with-matches", "--files-without-match",
+        "--fixed-strings", "--follow", "--glob-case-insensitive", "--heading",
+        "--hidden", "--ignore-case", "--ignore-file-case-insensitive",
+        "--include-zero", "--invert-match", "--json", "--line-buffered",
+        "--line-number", "--line-regexp", "--max-columns-preview", "--mmap",
+        "--multiline", "--multiline-dotall", "--no-config", "--no-filename",
+        "--no-heading", "--no-ignore", "--no-ignore-dot", "--no-ignore-exclude",
+        "--no-ignore-files", "--no-ignore-global", "--no-ignore-messages",
+        "--no-ignore-parent", "--no-ignore-vcs", "--no-line-number",
+        "--no-messages", "--no-mmap", "--no-pcre2-unicode", "--no-require-git",
+        "--no-unicode", "--null", "--null-data", "--one-file-system",
+        "--only-matching", "--passthru", "--pcre2", "--pcre2-version",
+        "--pretty", "--quiet", "--search-zip", "--smart-case", "--sort-files",
+        "--stats", "--text", "--trim", "--type-list", "--unicode",
+        "--unrestricted", "--vimgrep", "--with-filename", "--word-regexp",
+        "-F", "-H", "-I", "-L", "-N", "-P", "-S", "-U", "-V",
+        "-a", "-b", "-c", "-h", "-i", "-l", "-n", "-o", "-p", "-q",
+        "-s", "-u", "-v", "-w", "-x", "-z",
+    ]),
+    standalone_short: b"FHILNPSUVabchilnopqsuvwxz",
+    valued: WordSet::new(&[
+        "--after-context", "--before-context", "--color", "--colors",
+        "--context", "--context-separator", "--dfa-size-limit", "--encoding",
+        "--engine", "--field-context-separator", "--field-match-separator",
+        "--file", "--glob", "--iglob", "--ignore-file", "--max-columns",
+        "--max-count", "--max-depth", "--max-filesize", "--path-separator",
+        "--regex-size-limit", "--regexp", "--replace", "--sort", "--sortr",
+        "--threads", "--type", "--type-add", "--type-clear", "--type-not",
+        "-A", "-B", "-C", "-E", "-M", "-T",
+        "-e", "-f", "-g", "-j", "-m", "-r", "-t",
+    ]),
+    valued_short: b"ABCEMTefgjmrt",
+    bare: false,
+    max_positional: None,
+};
+
+pub fn is_safe_rg(tokens: &[Token]) -> bool {
+    policy::check(tokens, &RG_POLICY)
+}
+
+static CAT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--number", "--number-nonblank", "--show-all", "--show-ends",
+        "--show-nonprinting", "--show-tabs", "--squeeze-blank",
+        "-A", "-E", "-T",
+        "-b", "-e", "-l", "-n", "-s", "-t", "-u", "-v",
+    ]),
+    standalone_short: b"AETbelnstuv",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_cat(tokens: &[Token]) -> bool {
+    policy::check(tokens, &CAT_POLICY)
+}
+
+static HEAD_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--quiet", "--silent", "--verbose", "--zero-terminated",
+        "-q", "-v", "-z",
+    ]),
+    standalone_short: b"0123456789qvz",
+    valued: WordSet::new(&[
+        "--bytes", "--lines",
+        "-c", "-n",
+    ]),
+    valued_short: b"cn",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_head(tokens: &[Token]) -> bool {
+    policy::check(tokens, &HEAD_POLICY)
+}
+
+static TAIL_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--follow", "--quiet", "--retry", "--silent", "--verbose",
+        "--zero-terminated",
+        "-F", "-f", "-q", "-r", "-v", "-z",
+    ]),
+    standalone_short: b"0123456789Ffqrvz",
+    valued: WordSet::new(&[
+        "--bytes", "--lines", "--max-unchanged-stats", "--pid",
+        "--sleep-interval",
+        "-b", "-c", "-n",
+    ]),
+    valued_short: b"bcn",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_tail(tokens: &[Token]) -> bool {
+    policy::check(tokens, &TAIL_POLICY)
+}
+
+static WC_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--bytes", "--chars", "--lines", "--max-line-length", "--words",
+        "--zero-terminated",
+        "-L", "-c", "-l", "-m", "-w",
+    ]),
+    standalone_short: b"Lclmw",
+    valued: WordSet::new(&["--files0-from"]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_wc(tokens: &[Token]) -> bool {
+    policy::check(tokens, &WC_POLICY)
+}
+
+static CUT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--complement", "--only-delimited", "--zero-terminated",
+        "-n", "-s", "-w", "-z",
+    ]),
+    standalone_short: b"nswz",
+    valued: WordSet::new(&[
+        "--bytes", "--characters", "--delimiter", "--fields",
+        "--output-delimiter",
+        "-b", "-c", "-d", "-f",
+    ]),
+    valued_short: b"bcdf",
+    bare: false,
+    max_positional: None,
+};
+
+pub fn is_safe_cut(tokens: &[Token]) -> bool {
+    policy::check(tokens, &CUT_POLICY)
+}
+
+static TR_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--complement", "--delete", "--squeeze-repeats", "--truncate-set1",
+        "-C", "-c", "-d", "-s",
+    ]),
+    standalone_short: b"Ccds",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+pub fn is_safe_tr(tokens: &[Token]) -> bool {
+    policy::check(tokens, &TR_POLICY)
+}
+
+static UNIQ_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--count", "--ignore-case", "--repeated", "--unique",
+        "--zero-terminated",
+        "-D", "-c", "-d", "-i", "-u", "-z",
+    ]),
+    standalone_short: b"Dcdiuz",
+    valued: WordSet::new(&[
+        "--all-repeated", "--check-chars", "--group", "--skip-chars",
+        "--skip-fields",
+        "-f", "-s", "-w",
+    ]),
+    valued_short: b"fsw",
+    bare: true,
+    max_positional: Some(1),
+};
+
+pub fn is_safe_uniq(tokens: &[Token]) -> bool {
+    policy::check(tokens, &UNIQ_POLICY)
+}
+
+static DIFF_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--brief", "--ed", "--expand-tabs", "--ignore-all-space",
+        "--ignore-blank-lines", "--ignore-case", "--ignore-space-change",
+        "--ignore-tab-expansion", "--left-column", "--minimal",
+        "--new-file", "--no-dereference", "--no-ignore-file-name-case",
+        "--normal", "--paginate", "--rcs", "--recursive",
+        "--report-identical-files", "--show-c-function", "--side-by-side",
+        "--speed-large-files", "--strip-trailing-cr",
+        "--suppress-blank-empty", "--suppress-common-lines", "--text",
+        "--unidirectional-new-file",
+        "-B", "-E", "-N", "-P", "-T",
+        "-a", "-b", "-c", "-d", "-e", "-f", "-i", "-l", "-n", "-p",
+        "-q", "-r", "-s", "-t", "-u", "-w", "-y",
+    ]),
+    standalone_short: b"BENPTabcdefilnpqrstuwy",
+    valued: WordSet::new(&[
+        "--changed-group-format", "--color", "--context", "--exclude",
+        "--exclude-from", "--from-file", "--ifdef", "--ignore-matching-lines",
+        "--label", "--line-format", "--new-group-format", "--new-line-format",
+        "--old-group-format", "--old-line-format", "--show-function-line",
+        "--starting-file", "--tabsize", "--to-file", "--unchanged-group-format",
+        "--unchanged-line-format", "--unified", "--width",
+        "-C", "-D", "-F", "-I", "-L", "-S", "-U", "-W", "-X", "-x",
+    ]),
+    valued_short: b"CDFILSUWXx",
+    bare: false,
+    max_positional: None,
+};
+
+pub fn is_safe_diff(tokens: &[Token]) -> bool {
+    policy::check(tokens, &DIFF_POLICY)
+}
+
+static COMM_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--check-order", "--nocheck-order", "--total", "--zero-terminated",
+        "-1", "-2", "-3", "-i", "-z",
+    ]),
+    standalone_short: b"123iz",
+    valued: WordSet::new(&["--output-delimiter"]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+pub fn is_safe_comm(tokens: &[Token]) -> bool {
+    policy::check(tokens, &COMM_POLICY)
+}
+
+static PASTE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--serial", "--zero-terminated",
+        "-s", "-z",
+    ]),
+    standalone_short: b"sz",
+    valued: WordSet::new(&[
+        "--delimiters",
+        "-d",
+    ]),
+    valued_short: b"d",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_paste(tokens: &[Token]) -> bool {
+    policy::check(tokens, &PASTE_POLICY)
+}
+
+static TAC_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--before", "--regex",
+        "-b", "-r",
+    ]),
+    standalone_short: b"br",
+    valued: WordSet::new(&[
+        "--separator",
+        "-s",
+    ]),
+    valued_short: b"s",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_tac(tokens: &[Token]) -> bool {
+    policy::check(tokens, &TAC_POLICY)
+}
+
+static REV_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_rev(tokens: &[Token]) -> bool {
+    policy::check(tokens, &REV_POLICY)
+}
+
+static NL_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--no-renumber",
+        "-p",
+    ]),
+    standalone_short: b"p",
+    valued: WordSet::new(&[
+        "--body-numbering", "--footer-numbering", "--header-numbering",
+        "--join-blank-lines", "--line-increment", "--number-format",
+        "--number-separator", "--number-width", "--section-delimiter",
+        "--starting-line-number",
+        "-b", "-d", "-f", "-h", "-i", "-l", "-n", "-s", "-v", "-w",
+    ]),
+    valued_short: b"bdfhilnsvw",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_nl(tokens: &[Token]) -> bool {
+    policy::check(tokens, &NL_POLICY)
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("arch",
             "Allowed: bare `arch` only (prints machine architecture). Flags denied (can execute commands under different architectures)."),
+        CommandDoc::handler("cat", CAT_POLICY.describe()),
+        CommandDoc::handler("comm", COMM_POLICY.describe()),
         CommandDoc::handler("command",
             "Allowed: -v, -V (check if command exists). Bare `command` and execution of other commands denied."),
-        CommandDoc::wordset("hostname", &HOSTNAME_DISPLAY),
+        CommandDoc::handler("cut", CUT_POLICY.describe()),
+        CommandDoc::handler("diff", DIFF_POLICY.describe()),
         CommandDoc::handler("find",
             "Safe unless dangerous flags: -delete, -ok, -okdir, -fls, -fprint, -fprint0, -fprintf. \
              -exec/-execdir allowed when the executed command is itself safe."),
+        CommandDoc::handler("grep", GREP_POLICY.describe()),
+        CommandDoc::handler("head", HEAD_POLICY.describe()),
+        CommandDoc::wordset("hostname", &HOSTNAME_DISPLAY),
+        CommandDoc::handler("nl", NL_POLICY.describe()),
+        CommandDoc::handler("paste", PASTE_POLICY.describe()),
+        CommandDoc::handler("rev", REV_POLICY.describe()),
+        CommandDoc::handler("rg", RG_POLICY.describe()),
         CommandDoc::handler("sed",
             "Safe unless -i/--in-place flag or 'e' modifier on substitutions (executes replacement as shell command)."),
         CommandDoc::handler("sort",
             "Safe unless -o/--output or --compress-program flag."),
+        CommandDoc::handler("tac", TAC_POLICY.describe()),
+        CommandDoc::handler("tail", TAIL_POLICY.describe()),
+        CommandDoc::handler("tr", TR_POLICY.describe()),
+        CommandDoc::handler("uniq", format!("{} Max 1 positional arg (second would be output file).", UNIQ_POLICY.describe())),
+        CommandDoc::handler("wc", WC_POLICY.describe()),
         CommandDoc::handler("yq",
             "Safe unless -i/--inplace flag."),
         CommandDoc::handler("awk / gawk / mawk / nawk",
@@ -194,6 +540,112 @@ mod tests {
     }
 
     safe! {
+        grep_pattern: "grep pattern file.txt",
+        grep_recursive: "grep -rn pattern .",
+        grep_combined: "grep -inl pattern .",
+        grep_context: "grep -A 3 -B 3 pattern file",
+        grep_extended: "grep -E 'foo|bar' file",
+        grep_fixed: "grep -F exact file",
+        grep_count: "grep -c pattern file",
+        grep_file_pattern: "grep -f patterns.txt file",
+        grep_exclude: "grep --exclude='*.o' pattern .",
+        grep_color: "grep --color pattern file",
+        grep_color_eq: "grep --color=always pattern file",
+        grep_max_count: "grep --max-count=5 pattern file",
+        grep_null: "grep --null -l pattern .",
+        grep_perl: "grep -P '\\d+' file",
+        egrep_safe: "egrep 'foo|bar' file",
+        fgrep_safe: "fgrep exact file",
+
+        rg_pattern: "rg pattern",
+        rg_fixed: "rg -F literal .",
+        rg_context: "rg -A 5 -B 5 pattern",
+        rg_type: "rg -t rust pattern",
+        rg_glob: "rg -g '*.rs' pattern",
+        rg_max_count: "rg -m 10 pattern",
+        rg_replace: "rg -r replacement pattern",
+        rg_json: "rg --json pattern",
+        rg_multiline: "rg -U pattern",
+        rg_files: "rg --files",
+        rg_type_list: "rg --type-list",
+        rg_combined: "rg -inl pattern .",
+        rg_color: "rg --color always pattern",
+        rg_threads: "rg -j 4 pattern",
+
+        cat_file: "cat file.txt",
+        cat_number: "cat -n file.txt",
+        cat_bare: "cat",
+        cat_show_all: "cat -A file.txt",
+        cat_combined: "cat -bns file.txt",
+
+        head_default: "head file.txt",
+        head_lines: "head -n 20 file.txt",
+        head_bytes: "head -c 100 file.txt",
+        head_numeric: "head -5 file.txt",
+        head_bare: "head",
+        head_quiet: "head -q file1 file2",
+
+        tail_default: "tail file.txt",
+        tail_lines: "tail -n 20 file.txt",
+        tail_follow: "tail -f logfile",
+        tail_follow_upper: "tail -F logfile",
+        tail_numeric: "tail -20 logfile",
+        tail_bare: "tail",
+
+        wc_default: "wc file.txt",
+        wc_lines: "wc -l file.txt",
+        wc_words: "wc -w file.txt",
+        wc_chars: "wc -m file.txt",
+        wc_combined: "wc -lw file.txt",
+        wc_bare: "wc",
+
+        cut_fields: "cut -f 1 file.txt",
+        cut_delim: "cut -d: -f1 /etc/passwd",
+        cut_bytes: "cut -b 1-10 file",
+        cut_complement: "cut --complement -f 1 file",
+
+        tr_lower: "tr A-Z a-z",
+        tr_delete: "tr -d '\\n'",
+        tr_squeeze: "tr -s ' '",
+
+        uniq_bare: "uniq",
+        uniq_input: "uniq sorted.txt",
+        uniq_count: "uniq -c sorted.txt",
+        uniq_skip: "uniq -f 1 sorted.txt",
+        uniq_ignore_case: "uniq -i sorted.txt",
+        uniq_combined: "uniq -cu sorted.txt",
+
+        diff_files: "diff file1.txt file2.txt",
+        diff_unified: "diff -u file1 file2",
+        diff_context: "diff -C 3 file1 file2",
+        diff_recursive: "diff -r dir1 dir2",
+        diff_brief: "diff --brief dir1 dir2",
+        diff_side: "diff -y file1 file2",
+        diff_color: "diff --color file1 file2",
+
+        comm_default: "comm file1 file2",
+        comm_suppress: "comm -23 file1 file2",
+        comm_combined: "comm -12 file1 file2",
+
+        paste_files: "paste file1 file2",
+        paste_serial: "paste -s file",
+        paste_delim: "paste -d, file1 file2",
+        paste_bare: "paste",
+
+        tac_file: "tac file.txt",
+        tac_bare: "tac",
+        tac_separator: "tac -s '---' file",
+        tac_before: "tac -b file",
+
+        rev_file: "rev file.txt",
+        rev_bare: "rev",
+
+        nl_file: "nl file.txt",
+        nl_bare: "nl",
+        nl_body: "nl -b a file.txt",
+        nl_format: "nl -n rz file.txt",
+        nl_width: "nl -w 4 file.txt",
+
         arch_bare: "arch",
         arch_help: "arch --help",
         arch_version: "arch --version",
@@ -257,6 +709,42 @@ mod tests {
     }
 
     denied! {
+        grep_unknown_flag_denied: "grep --output=file pattern",
+        grep_unknown_short_denied: "grep -Y pattern file",
+
+        rg_pre_denied: "rg --pre cat pattern",
+        rg_pre_glob_denied: "rg --pre cat --pre-glob '*.pdf' pattern",
+        rg_unknown_denied: "rg --unknown-flag pattern",
+
+        cat_unknown_denied: "cat --unknown file",
+
+        head_unknown_denied: "head --output file.txt",
+        head_unknown_short_denied: "head -X file",
+
+        tail_unknown_denied: "tail --unknown file",
+
+        wc_unknown_denied: "wc --unknown file",
+
+        cut_unknown_denied: "cut --unknown file",
+
+        tr_unknown_denied: "tr --unknown a b",
+
+        uniq_output_file_denied: "uniq input.txt output.txt",
+        uniq_unknown_denied: "uniq --unknown sorted.txt",
+
+        diff_unknown_denied: "diff --unknown file1 file2",
+
+        comm_unknown_denied: "comm --unknown file1 file2",
+
+        paste_unknown_denied: "paste --unknown file",
+
+        tac_unknown_denied: "tac --unknown file",
+
+        rev_unknown_denied: "rev --unknown file",
+        rev_unknown_short_denied: "rev -x file",
+
+        nl_unknown_denied: "nl --unknown file",
+
         arch_exec_denied: "arch -x86_64 rm -rf /",
         arch_flag_denied: "arch -arm64 echo hello",
         arch_any_flag_denied: "arch -x86_64",
