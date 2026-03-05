@@ -202,13 +202,6 @@ pub fn is_safe_codesign(tokens: &[Token]) -> bool {
     if !tokens[1..].iter().any(|t| CODESIGN_SAFE.contains(t)) {
         return false;
     }
-    if tokens[1..].iter().any(|t| {
-        t == "--force" || t == "-f"
-            || t == "--sign" || t == "-s"
-            || t == "--remove-signature"
-    }) {
-        return false;
-    }
     policy::check(tokens, &CODESIGN_POLICY)
 }
 
@@ -232,13 +225,6 @@ pub fn is_safe_spctl(tokens: &[Token]) -> bool {
     }
     static SPCTL_SAFE: WordSet = WordSet::new(&["--assess", "-a"]);
     if !tokens[1..].iter().any(|t| SPCTL_SAFE.contains(t)) {
-        return false;
-    }
-    if tokens[1..].iter().any(|t| {
-        t == "--add" || t == "--disable" || t == "--enable"
-            || t == "--master-disable" || t == "--master-enable"
-            || t == "--remove"
-    }) {
         return false;
     }
     policy::check(tokens, &SPCTL_POLICY)
@@ -275,16 +261,16 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
              Prefix flags --sdk/--toolchain (with arg), -v/-l/-n are skipped."),
         CommandDoc::handler("pkgutil",
             "Requires a read-only flag (--pkgs, --files, --pkg-info, etc.). \
-             Explicit flag allowlist; --expand/--flatten/--forget/--learn denied."),
+             Explicit flag allowlist."),
         CommandDoc::handler("lipo",
             "Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch). \
-             -output and -create denied."),
+             Explicit flag allowlist."),
         CommandDoc::handler("codesign",
             "Requires --display/-d or --verify/-v. \
-             --sign/-s, --force/-f, --remove-signature denied."),
+             Explicit flag allowlist."),
         CommandDoc::handler("spctl",
             "Requires --assess/-a. \
-             --add, --remove, --enable, --disable, --master-* denied."),
+             Explicit flag allowlist."),
     ]
 }
 

@@ -52,7 +52,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("bash / sh",
-            "Allowed: --version, --help. Only `bash -c` / `sh -c` with a safe inner command. Scripts denied."),
+            "Allowed: --version, --help, `bash -c` / `sh -c` with a safe inner command."),
         CommandDoc::handler("xargs",
             "Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n, -P, -s, -E, -d, -0, -r, -t, -p, -x)."),
     ]

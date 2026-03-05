@@ -1,5 +1,5 @@
 use crate::handlers;
-use crate::parse::{FlagCheck, WordSet};
+use crate::parse::WordSet;
 
 pub struct CommandDoc {
     pub name: &'static str,
@@ -24,9 +24,6 @@ impl CommandDoc {
         Self::handler(name, doc_multi(words, multi).build())
     }
 
-    pub fn flagcheck(name: &'static str, check: &FlagCheck) -> Self {
-        Self::handler(name, describe_flagcheck(check))
-    }
 
 }
 
@@ -116,18 +113,6 @@ pub fn wordset_items(words: &WordSet) -> String {
     items.join(", ")
 }
 
-pub fn describe_flagcheck(check: &FlagCheck) -> String {
-    let mut parts = Vec::new();
-    let req: Vec<&str> = check.required().iter().collect();
-    if !req.is_empty() {
-        parts.push(format!("Requires: {}", req.join(", ")));
-    }
-    let denied: Vec<&str> = check.denied().iter().collect();
-    if !denied.is_empty() {
-        parts.push(format!("Denied: {}", denied.join(", ")));
-    }
-    format!("{}.", parts.join(". "))
-}
 
 pub fn all_command_docs() -> Vec<CommandDoc> {
     let mut docs = handlers::handler_docs();
@@ -248,18 +233,4 @@ mod tests {
         );
     }
 
-    #[test]
-    fn flagcheck_description() {
-        let fc = FlagCheck::new(&["--check"], &["--force"]);
-        assert_eq!(
-            describe_flagcheck(&fc),
-            "Requires: --check. Denied: --force."
-        );
-    }
-
-    #[test]
-    fn flagcheck_required_only() {
-        let fc = FlagCheck::new(&["--check"], &[]);
-        assert_eq!(describe_flagcheck(&fc), "Requires: --check.");
-    }
 }

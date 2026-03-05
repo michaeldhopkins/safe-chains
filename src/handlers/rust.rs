@@ -1,4 +1,4 @@
-use crate::parse::{FlagCheck, Segment, Token, WordSet};
+use crate::parse::{Segment, Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy};
 
 static CARGO_BUILD_POLICY: FlagPolicy = FlagPolicy {
@@ -199,14 +199,51 @@ static CARGO_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
 };
 
-static CARGO_FMT: FlagCheck =
-    FlagCheck::new(&["--check"], &[]);
+static CARGO_FMT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--all", "--check"]),
+    standalone_short: b"qv",
+    valued: WordSet::new(&[
+        "--manifest-path", "--message-format", "--package",
+    ]),
+    valued_short: b"p",
+    bare: false,
+    max_positional: None,
+};
 
-static CARGO_PACKAGE_LIST: FlagCheck =
-    FlagCheck::new(&["--list"], &[]);
+static CARGO_PACKAGE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all-features", "--frozen", "--keep-going",
+        "--list", "--locked", "--no-default-features",
+        "--no-metadata", "--offline", "--workspace",
+    ]),
+    standalone_short: b"lqv",
+    valued: WordSet::new(&[
+        "--color", "--config", "--exclude", "--features",
+        "--jobs", "--manifest-path", "--message-format",
+        "--package", "--target", "--target-dir",
+    ]),
+    valued_short: b"jFZp",
+    bare: false,
+    max_positional: None,
+};
 
-static CARGO_PUBLISH_DRY: FlagCheck =
-    FlagCheck::new(&["--dry-run"], &["--force", "--no-verify"]);
+static CARGO_PUBLISH_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all-features", "--dry-run", "--frozen",
+        "--keep-going", "--locked", "--no-default-features",
+        "--offline", "--workspace",
+    ]),
+    standalone_short: b"nqv",
+    valued: WordSet::new(&[
+        "--color", "--config", "--exclude", "--features",
+        "--index", "--jobs", "--manifest-path",
+        "--package", "--registry", "--target",
+        "--target-dir",
+    ]),
+    valued_short: b"jFZp",
+    bare: false,
+    max_positional: None,
+};
 
 pub fn is_safe_cargo(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
@@ -233,9 +270,9 @@ pub fn is_safe_cargo(tokens: &[Token]) -> bool {
         "license" | "locate-project" | "pkgid" | "read-manifest" | "verify-project" => {
             policy::check(rest, &CARGO_SIMPLE_POLICY)
         }
-        "fmt" => CARGO_FMT.is_safe(&rest[1..]),
-        "package" => CARGO_PACKAGE_LIST.is_safe(&rest[1..]),
-        "publish" => CARGO_PUBLISH_DRY.is_safe(&rest[1..]),
+        "fmt" => has_flag(rest, None, Some("--check")) && policy::check(rest, &CARGO_FMT_POLICY),
+        "package" => has_flag(rest, Some("-l"), Some("--list")) && policy::check(rest, &CARGO_PACKAGE_POLICY),
+        "publish" => has_flag(rest, Some("-n"), Some("--dry-run")) && policy::check(rest, &CARGO_PUBLISH_POLICY),
         _ => false,
     }
 }
@@ -328,8 +365,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             "Subcommands: audit, bench, build, check, clippy, deny, doc, license, \
              locate-project, metadata, pkgid, read-manifest, search, test, tree, \
              verify-project. Each has an explicit flag allowlist. \
-             Guarded: fmt (--check only), package (--list only), \
-             publish (--dry-run only, --force/--no-verify denied). \
+             fmt (requires --check), package (requires --list), \
+             publish (requires --dry-run). \
              +toolchain selectors (e.g. +nightly) are skipped."),
         CommandDoc::handler("rustup",
             "Subcommands: doc, show, which. Multi-level: component list, \

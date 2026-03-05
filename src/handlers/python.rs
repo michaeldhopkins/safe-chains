@@ -1,4 +1,4 @@
-use crate::parse::{FlagCheck, Segment, Token, WordSet};
+use crate::parse::{Segment, Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy};
 
 static PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -221,10 +221,16 @@ static CONDA_INFO_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
 };
 
-static CONDA_CONFIG: FlagCheck = FlagCheck::new(
-    &["--show", "--show-sources"],
-    &["--add", "--append", "--prepend", "--remove", "--remove-key", "--set"],
-);
+static CONDA_CONFIG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--json", "--quiet", "--show", "--show-sources", "--verbose",
+    ]),
+    standalone_short: b"qv",
+    valued: WordSet::new(&["--env", "--file", "--name", "--prefix"]),
+    valued_short: b"fnp",
+    bare: false,
+    max_positional: None,
+};
 
 pub fn is_safe_conda(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
@@ -233,7 +239,9 @@ pub fn is_safe_conda(tokens: &[Token]) -> bool {
     match tokens[1].as_str() {
         "list" => policy::check(&tokens[1..], &CONDA_LIST_POLICY),
         "info" => policy::check(&tokens[1..], &CONDA_INFO_POLICY),
-        "config" => CONDA_CONFIG.is_safe(&tokens[2..]),
+        "config" => (has_flag(&tokens[1..], None, Some("--show"))
+                || has_flag(&tokens[1..], None, Some("--show-sources")))
+            && policy::check(&tokens[1..], &CONDA_CONFIG_POLICY),
         _ => false,
     }
 }
