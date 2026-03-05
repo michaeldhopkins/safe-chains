@@ -8,6 +8,7 @@ pub struct CommandDoc {
 }
 
 pub enum DocKind {
+    BareInfo,
     AlwaysSafe,
     Handler,
 }
@@ -27,6 +28,10 @@ impl CommandDoc {
 
     pub fn flagcheck(name: &'static str, check: &FlagCheck) -> Self {
         Self::handler(name, describe_flagcheck(check))
+    }
+
+    pub fn bare_info(name: &'static str, description: &str) -> Self {
+        Self { name, kind: DocKind::BareInfo, description: description.into() }
     }
 
     pub fn always_safe(name: &'static str, description: &str) -> Self {
@@ -148,9 +153,22 @@ pub fn render_markdown(docs: &[CommandDoc]) -> String {
          \n\
          Any command with only `--version` or `--help` as its sole argument is always allowed.\n\
          \n\
-         ## Unconditionally Safe\n\
+         ## Bare Safe\n\
          \n\
-         These commands are allowed with any arguments.\n\
+         These commands take no flags or subcommands.\n\
+         \n\
+         | Command | Description |\n\
+         |---------|-------------|\n",
+    );
+
+    for doc in docs.iter().filter(|d| matches!(d.kind, DocKind::BareInfo)) {
+        out.push_str(&format!("| `{}` | {} |\n", doc.name, doc.description));
+    }
+
+    out.push_str(
+        "\n## Unconditionally Safe\n\
+         \n\
+         These commands are allowed with any arguments. All operations are read-only.\n\
          \n\
          | Command | Description |\n\
          |---------|-------------|\n",
@@ -172,7 +190,10 @@ pub fn render_markdown(docs: &[CommandDoc]) -> String {
 fn safe_cmd_docs() -> Vec<CommandDoc> {
     handlers::SAFE_CMD_ENTRIES
         .iter()
-        .map(|&(name, description)| CommandDoc::always_safe(name, description))
+        .map(|&(name, description, kind)| match kind {
+            handlers::SafeKind::Bare => CommandDoc::bare_info(name, description),
+            handlers::SafeKind::AnyArgs => CommandDoc::always_safe(name, description),
+        })
         .collect()
 }
 

@@ -26,142 +26,150 @@ use crate::parse::{Segment, Token, WordSet};
 
 static MAGICK_SAFE: WordSet = WordSet::new(&["--help", "--version", "identify"]);
 
-pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str)] = &[
-    ("grep", "Search file contents"),
-    ("rg", "Ripgrep search"),
-    ("fd", "Find files"),
-    ("bat", "Syntax-highlighted cat"),
-    ("eza", "Modern ls replacement"),
-    ("exa", "Modern ls replacement"),
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(crate) enum SafeKind {
+    Bare,
+    AnyArgs,
+}
 
-    ("head", "Print first lines"),
-    ("tail", "Print last lines"),
-    ("cat", "Print file contents"),
-    ("ls", "List directory"),
-    ("wc", "Count lines/words/bytes"),
-    ("uniq", "Filter duplicate lines"),
-    ("tr", "Translate characters"),
-    ("cut", "Extract fields from lines"),
+use SafeKind::{AnyArgs, Bare};
 
-    ("diff", "Compare files"),
-    ("delta", "Syntax-highlighted diff viewer"),
-    ("colordiff", "Colorized diff"),
-    ("comm", "Compare sorted files"),
-    ("paste", "Merge lines of files"),
+pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str, SafeKind)] = &[
+    ("grep", "Search file contents", AnyArgs),
+    ("rg", "Ripgrep search", AnyArgs),
+    ("fd", "Find files", AnyArgs),
+    ("bat", "Syntax-highlighted cat", AnyArgs),
+    ("eza", "Modern ls replacement", AnyArgs),
+    ("exa", "Modern ls replacement", AnyArgs),
 
-    ("tac", "Print file in reverse"),
-    ("rev", "Reverse lines"),
-    ("nl", "Number lines"),
-    ("expand", "Convert tabs to spaces"),
-    ("unexpand", "Convert spaces to tabs"),
-    ("fold", "Wrap lines"),
-    ("fmt", "Reformat text"),
-    ("nroff", "Text formatter"),
-    ("column", "Format into columns"),
-    ("iconv", "Convert character encoding"),
+    ("head", "Print first lines", AnyArgs),
+    ("tail", "Print last lines", AnyArgs),
+    ("cat", "Print file contents", AnyArgs),
+    ("ls", "List directory", AnyArgs),
+    ("wc", "Count lines/words/bytes", AnyArgs),
+    ("uniq", "Filter duplicate lines", AnyArgs),
+    ("tr", "Translate characters", AnyArgs),
+    ("cut", "Extract fields from lines", AnyArgs),
 
-    ("echo", "Print text"),
-    ("printf", "Format and print text"),
-    ("seq", "Print number sequence"),
-    ("expr", "Evaluate expression"),
-    ("test", "Evaluate conditional expression"),
-    ("true", "Return success exit code"),
-    ("false", "Return failure exit code"),
-    ("bc", "Calculator"),
-    ("factor", "Print prime factors"),
+    ("diff", "Compare files", AnyArgs),
+    ("delta", "Syntax-highlighted diff viewer", AnyArgs),
+    ("colordiff", "Colorized diff", AnyArgs),
+    ("comm", "Compare sorted files", AnyArgs),
+    ("paste", "Merge lines of files", AnyArgs),
 
-    ("dirname", "Strip filename from path"),
-    ("basename", "Strip directory from path"),
-    ("realpath", "Resolve path"),
-    ("readlink", "Resolve symlink"),
-    ("file", "Detect file type"),
-    ("stat", "File status"),
-    ("du", "Disk usage"),
-    ("df", "Disk free space"),
+    ("tac", "Print file in reverse", AnyArgs),
+    ("rev", "Reverse lines", AnyArgs),
+    ("nl", "Number lines", AnyArgs),
+    ("expand", "Convert tabs to spaces", AnyArgs),
+    ("unexpand", "Convert spaces to tabs", AnyArgs),
+    ("fold", "Wrap lines", AnyArgs),
+    ("fmt", "Reformat text", AnyArgs),
+    ("nroff", "Text formatter", AnyArgs),
+    ("column", "Format into columns", AnyArgs),
+    ("iconv", "Convert character encoding", AnyArgs),
 
-    ("printenv", "Print environment variables"),
-    ("type", "Identify command type"),
-    ("whereis", "Locate binary, source, and man page"),
-    ("which", "Locate command"),
-    ("whoami", "Print current user"),
-    ("date", "Display date and time"),
-    ("pwd", "Print working directory"),
-    ("tree", "Directory tree"),
-    ("cd", "Change directory"),
-    ("unset", "Unset environment variables"),
+    ("echo", "Print text", AnyArgs),
+    ("printf", "Format and print text", AnyArgs),
+    ("seq", "Print number sequence", AnyArgs),
+    ("expr", "Evaluate expression", AnyArgs),
+    ("test", "Evaluate conditional expression", AnyArgs),
+    ("true", "Return success exit code", Bare),
+    ("false", "Return failure exit code", Bare),
+    ("bc", "Calculator", AnyArgs),
+    ("factor", "Print prime factors", AnyArgs),
 
-    ("uname", "System information"),
-    ("nproc", "Print number of CPUs"),
-    ("uptime", "System uptime"),
-    ("id", "Print user/group IDs"),
-    ("groups", "Print group memberships"),
-    ("tty", "Print terminal name"),
-    ("locale", "Print locale info"),
-    ("cal", "Display calendar"),
-    ("sleep", "Pause execution"),
-    ("who", "Show logged-in users"),
-    ("w", "Show logged-in users and activity"),
-    ("last", "Show login history"),
-    ("lastlog", "Show last login for all users"),
+    ("dirname", "Strip filename from path", AnyArgs),
+    ("basename", "Strip directory from path", AnyArgs),
+    ("realpath", "Resolve path", AnyArgs),
+    ("readlink", "Resolve symlink", AnyArgs),
+    ("file", "Detect file type", AnyArgs),
+    ("stat", "File status", AnyArgs),
+    ("du", "Disk usage", AnyArgs),
+    ("df", "Disk free space", AnyArgs),
 
-    ("ps", "List processes"),
-    ("top", "Process monitor"),
-    ("htop", "Interactive process viewer"),
-    ("iotop", "I/O usage monitor"),
-    ("procs", "Modern process viewer"),
-    ("dust", "Disk usage viewer"),
-    ("lsof", "List open files"),
-    ("pgrep", "Search for processes"),
+    ("printenv", "Print environment variables", AnyArgs),
+    ("type", "Identify command type", AnyArgs),
+    ("whereis", "Locate binary, source, and man page", AnyArgs),
+    ("which", "Locate command", AnyArgs),
+    ("whoami", "Print current user", Bare),
+    ("date", "Display date and time", AnyArgs),
+    ("pwd", "Print working directory", AnyArgs),
+    ("tree", "Directory tree", AnyArgs),
+    ("cd", "Change directory", AnyArgs),
+    ("unset", "Unset environment variables", AnyArgs),
 
-    ("jq", "JSON processor"),
-    ("base64", "Base64 encode/decode"),
-    ("xxd", "Hex dump"),
-    ("getconf", "Get system configuration values"),
-    ("uuidgen", "Generate UUID"),
+    ("uname", "System information", AnyArgs),
+    ("nproc", "Print number of CPUs", AnyArgs),
+    ("uptime", "System uptime", AnyArgs),
+    ("id", "Print user/group IDs", AnyArgs),
+    ("groups", "Print group memberships", AnyArgs),
+    ("tty", "Print terminal name", AnyArgs),
+    ("locale", "Print locale info", AnyArgs),
+    ("cal", "Display calendar", AnyArgs),
+    ("sleep", "Pause execution", AnyArgs),
+    ("who", "Show logged-in users", AnyArgs),
+    ("w", "Show logged-in users and activity", AnyArgs),
+    ("last", "Show login history", AnyArgs),
+    ("lastlog", "Show last login for all users", AnyArgs),
 
-    ("md5sum", "MD5 checksum"),
-    ("md5", "MD5 checksum (macOS)"),
-    ("sha256sum", "SHA-256 checksum"),
-    ("shasum", "SHA checksum"),
-    ("sha1sum", "SHA-1 checksum"),
-    ("sha512sum", "SHA-512 checksum"),
-    ("cksum", "File checksum"),
-    ("b2sum", "BLAKE2 checksum"),
-    ("sum", "File checksum"),
-    ("strings", "Find printable strings in binary"),
-    ("hexdump", "Display file in hex"),
-    ("od", "Octal dump"),
-    ("size", "Object file section sizes"),
+    ("ps", "List processes", AnyArgs),
+    ("top", "Process monitor", AnyArgs),
+    ("htop", "Interactive process viewer", AnyArgs),
+    ("iotop", "I/O usage monitor", AnyArgs),
+    ("procs", "Modern process viewer", AnyArgs),
+    ("dust", "Disk usage viewer", AnyArgs),
+    ("lsof", "List open files", AnyArgs),
+    ("pgrep", "Search for processes", AnyArgs),
 
-    ("sw_vers", "macOS version info"),
-    ("mdls", "File metadata (macOS)"),
-    ("otool", "Object file tool (macOS)"),
-    ("nm", "List object file symbols"),
-    ("system_profiler", "macOS hardware/software info"),
-    ("ioreg", "macOS I/O Registry viewer"),
-    ("vm_stat", "Virtual memory statistics"),
-    ("mdfind", "Spotlight search (macOS)"),
+    ("jq", "JSON processor", AnyArgs),
+    ("base64", "Base64 encode/decode", AnyArgs),
+    ("xxd", "Hex dump", AnyArgs),
+    ("getconf", "Get system configuration values", AnyArgs),
+    ("uuidgen", "Generate UUID", AnyArgs),
 
-    ("dig", "DNS lookup"),
-    ("nslookup", "DNS lookup"),
-    ("host", "DNS lookup"),
-    ("whois", "Domain registration lookup"),
-    ("netstat", "Network connections and statistics"),
-    ("ss", "Socket statistics"),
-    ("ifconfig", "Network interface info"),
-    ("route", "Routing table"),
+    ("md5sum", "MD5 checksum", AnyArgs),
+    ("md5", "MD5 checksum (macOS)", AnyArgs),
+    ("sha256sum", "SHA-256 checksum", AnyArgs),
+    ("shasum", "SHA checksum", AnyArgs),
+    ("sha1sum", "SHA-1 checksum", AnyArgs),
+    ("sha512sum", "SHA-512 checksum", AnyArgs),
+    ("cksum", "File checksum", AnyArgs),
+    ("b2sum", "BLAKE2 checksum", AnyArgs),
+    ("sum", "File checksum", AnyArgs),
+    ("strings", "Find printable strings in binary", AnyArgs),
+    ("hexdump", "Display file in hex", AnyArgs),
+    ("od", "Octal dump", AnyArgs),
+    ("size", "Object file section sizes", AnyArgs),
 
-    ("identify", "ImageMagick identify"),
-    ("shellcheck", "Shell script linter"),
-    ("cloc", "Count lines of code"),
-    ("tokei", "Code statistics"),
-    ("cucumber", "BDD test runner"),
-    ("branchdiff", "Branch diff tool"),
-    ("safe-chains", "Safe command checker"),
+    ("sw_vers", "macOS version info", AnyArgs),
+    ("mdls", "File metadata (macOS)", AnyArgs),
+    ("otool", "Object file tool (macOS)", AnyArgs),
+    ("nm", "List object file symbols", AnyArgs),
+    ("system_profiler", "macOS hardware/software info", AnyArgs),
+    ("ioreg", "macOS I/O Registry viewer", AnyArgs),
+    ("vm_stat", "Virtual memory statistics", AnyArgs),
+    ("mdfind", "Spotlight search (macOS)", AnyArgs),
+
+    ("dig", "DNS lookup", AnyArgs),
+    ("nslookup", "DNS lookup", AnyArgs),
+    ("host", "DNS lookup", AnyArgs),
+    ("whois", "Domain registration lookup", AnyArgs),
+    ("netstat", "Network connections and statistics", AnyArgs),
+    ("ss", "Socket statistics", AnyArgs),
+    ("ifconfig", "Network interface info", AnyArgs),
+    ("route", "Routing table", AnyArgs),
+
+    ("identify", "ImageMagick identify", AnyArgs),
+    ("shellcheck", "Shell script linter", AnyArgs),
+    ("cloc", "Count lines of code", AnyArgs),
+    ("tokei", "Code statistics", AnyArgs),
+    ("cucumber", "BDD test runner", AnyArgs),
+    ("branchdiff", "Branch diff tool", AnyArgs),
+    ("safe-chains", "Safe command checker", AnyArgs),
 ];
 
 pub(crate) static SAFE_CMDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    SAFE_CMD_ENTRIES.iter().map(|&(name, _)| name).collect()
+    SAFE_CMD_ENTRIES.iter().map(|&(name, _, _)| name).collect()
 });
 
 pub(crate) fn is_safe_subcmd(
@@ -384,14 +392,14 @@ mod tests {
     #[test]
     fn safe_cmd_entries_no_duplicates() {
         let mut seen = HashSet::new();
-        for &(name, _) in SAFE_CMD_ENTRIES {
+        for &(name, _, _) in SAFE_CMD_ENTRIES {
             assert!(seen.insert(name), "duplicate SAFE_CMD_ENTRIES name: {name}");
         }
     }
 
     #[test]
     fn safe_cmd_entries_no_empty_descriptions() {
-        for &(name, desc) in SAFE_CMD_ENTRIES {
+        for &(name, desc, _) in SAFE_CMD_ENTRIES {
             assert!(!desc.is_empty(), "empty description for SAFE_CMD_ENTRIES: {name}");
         }
     }
@@ -399,7 +407,7 @@ mod tests {
     #[test]
     fn safe_cmd_entries_no_overlap_with_handlers() {
         let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
-        for &(name, _) in SAFE_CMD_ENTRIES {
+        for &(name, _, _) in SAFE_CMD_ENTRIES {
             assert!(
                 !handled.contains(name),
                 "{name} is in both SAFE_CMD_ENTRIES and dispatch — the dispatch handler shadows it"
@@ -410,7 +418,7 @@ mod tests {
     #[test]
     fn handled_cmds_matches_dispatch() {
         let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
-        let safe: HashSet<&str> = SAFE_CMD_ENTRIES.iter().map(|&(n, _)| n).collect();
+        let safe: HashSet<&str> = SAFE_CMD_ENTRIES.iter().map(|&(n, _, _)| n).collect();
         for name in &handled {
             assert!(
                 !safe.contains(name),
