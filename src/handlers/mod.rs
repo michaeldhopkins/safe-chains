@@ -5,6 +5,7 @@ pub mod dotnet;
 pub mod forges;
 pub mod go;
 pub mod jvm;
+pub mod magick;
 pub mod network;
 pub mod node;
 pub mod perl;
@@ -22,28 +23,7 @@ pub mod xcode;
 use std::collections::HashSet;
 use std::sync::LazyLock;
 
-use crate::parse::{Segment, Token, WordSet};
-
-static MAGICK_SAFE: WordSet = WordSet::new(&["--help", "--version", "identify"]);
-
-pub(crate) fn is_safe_subcmd(
-    tokens: &[Token],
-    simple: &WordSet,
-    multi: &[(&str, WordSet)],
-) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if simple.contains(&tokens[1]) {
-        return true;
-    }
-    for (prefix, actions) in multi {
-        if tokens[1] == *prefix {
-            return tokens.get(2).is_some_and(|a| actions.contains(a));
-        }
-    }
-    false
-}
+use crate::parse::{Segment, Token};
 
 fn is_bare_info_request(tokens: &[Token]) -> bool {
     tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--help")
@@ -108,15 +88,8 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         .or_else(|| xcode::dispatch(cmd, tokens, is_safe))
         .or_else(|| perl::dispatch(cmd, tokens, is_safe))
         .or_else(|| coreutils::dispatch(cmd, tokens, is_safe))
-        .or_else(|| dispatch_magick(cmd, tokens))
+        .or_else(|| magick::dispatch(cmd, tokens))
         .unwrap_or(false)
-}
-
-fn dispatch_magick(cmd: &str, tokens: &[Token]) -> Option<bool> {
-    match cmd {
-        "magick" => Some(is_safe_subcmd(tokens, &MAGICK_SAFE, &[])),
-        _ => None,
-    }
 }
 
 #[cfg(test)]
@@ -185,8 +158,7 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(coreutils::command_docs());
     docs.extend(shell::command_docs());
     docs.extend(wrappers::command_docs());
-    docs.push(crate::docs::CommandDoc::handler("magick",
-        crate::docs::doc(&MAGICK_SAFE).build()));
+    docs.extend(magick::command_docs());
     docs
 }
 
@@ -249,30 +221,5 @@ mod tests {
             overlap.is_empty(),
             "commands in both HELP_ELIGIBLE and HELP_EXCLUDED: {overlap:?}"
         );
-    }
-}
-
-#[cfg(test)]
-mod magick_tests {
-    use crate::is_safe_command;
-
-    fn check(cmd: &str) -> bool {
-        is_safe_command(cmd)
-    }
-
-    safe! {
-        magick_identify: "magick identify /tmp/image.png",
-        magick_identify_verbose: "magick identify -verbose /tmp/image.png",
-        magick_identify_multi: "magick identify /tmp/a.png /tmp/b.png",
-        magick_help: "magick --help",
-        magick_version: "magick --version",
-    }
-
-    denied! {
-        magick_convert_denied: "magick input.png output.jpg",
-        magick_mogrify_denied: "magick mogrify -resize 50% image.png",
-        magick_composite_denied: "magick composite overlay.png base.png result.png",
-        magick_conjure_denied: "magick conjure script.msl",
-        bare_magick_denied: "magick",
     }
 }
