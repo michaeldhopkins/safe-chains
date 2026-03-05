@@ -1,4 +1,4 @@
-use crate::parse::{Token, WordSet};
+use crate::parse::{Segment, Token, WordSet};
 
 static OLLAMA_READ_ONLY: WordSet =
     WordSet::new(&["--version", "list", "ps", "show"]);
@@ -12,6 +12,14 @@ static LLM_READ_ONLY: WordSet =
 
 pub fn is_safe_llm(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && LLM_READ_ONLY.contains(&tokens[1])
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "ollama" => Some(is_safe_ollama(tokens)),
+        "llm" => Some(is_safe_llm(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

@@ -119,6 +119,17 @@ pub fn is_safe_hyperfine(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -
     true
 }
 
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "timeout" => Some(is_safe_timeout(tokens, is_safe)),
+        "time" => Some(is_safe_time(tokens, is_safe)),
+        "env" => Some(is_safe_env(tokens, is_safe)),
+        "nice" | "ionice" => Some(is_safe_nice(tokens, is_safe)),
+        "hyperfine" => Some(is_safe_hyperfine(tokens, is_safe)),
+        _ => None,
+    }
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![

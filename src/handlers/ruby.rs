@@ -1,4 +1,4 @@
-use crate::parse::{Token, WordSet};
+use crate::parse::{Segment, Token, WordSet};
 
 static BUNDLE_READ_ONLY: WordSet =
     WordSet::new(&["--version", "check", "info", "list", "show"]);
@@ -36,6 +36,15 @@ pub fn is_safe_gem(tokens: &[Token]) -> bool {
 
 pub fn is_safe_rbenv(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && RBENV_SAFE.contains(&tokens[1])
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "bundle" => Some(is_safe_bundle(tokens)),
+        "gem" => Some(is_safe_gem(tokens)),
+        "rbenv" => Some(is_safe_rbenv(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

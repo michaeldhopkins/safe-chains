@@ -40,6 +40,14 @@ pub fn is_safe_xargs(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bo
     true
 }
 
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "sh" | "bash" => Some(is_safe_shell(tokens, is_safe)),
+        "xargs" => Some(is_safe_xargs(tokens, is_safe)),
+        _ => None,
+    }
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![

@@ -745,6 +745,51 @@ pub fn is_safe_bat(tokens: &[Token]) -> bool {
     policy::check(tokens, &BAT_POLICY)
 }
 
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "grep" | "egrep" | "fgrep" => Some(is_safe_grep(tokens)),
+        "rg" => Some(is_safe_rg(tokens)),
+        "cat" => Some(is_safe_cat(tokens)),
+        "head" => Some(is_safe_head(tokens)),
+        "tail" => Some(is_safe_tail(tokens)),
+        "wc" => Some(is_safe_wc(tokens)),
+        "cut" => Some(is_safe_cut(tokens)),
+        "tr" => Some(is_safe_tr(tokens)),
+        "uniq" => Some(is_safe_uniq(tokens)),
+        "diff" => Some(is_safe_diff(tokens)),
+        "comm" => Some(is_safe_comm(tokens)),
+        "paste" => Some(is_safe_paste(tokens)),
+        "tac" => Some(is_safe_tac(tokens)),
+        "rev" => Some(is_safe_rev(tokens)),
+        "nl" => Some(is_safe_nl(tokens)),
+        "expand" => Some(is_safe_expand(tokens)),
+        "unexpand" => Some(is_safe_unexpand(tokens)),
+        "fold" => Some(is_safe_fold(tokens)),
+        "fmt" => Some(is_safe_fmt(tokens)),
+        "column" => Some(is_safe_column(tokens)),
+        "iconv" => Some(is_safe_iconv(tokens)),
+        "nroff" => Some(is_safe_nroff(tokens)),
+        "echo" => Some(is_safe_echo(tokens)),
+        "printf" => Some(is_safe_printf(tokens)),
+        "seq" => Some(is_safe_seq(tokens)),
+        "test" => Some(is_safe_test(tokens)),
+        "expr" => Some(is_safe_expr(tokens)),
+        "bc" => Some(is_safe_bc(tokens)),
+        "factor" => Some(is_safe_factor(tokens)),
+        "bat" => Some(is_safe_bat(tokens)),
+        "arch" => Some(is_safe_arch(tokens)),
+        "command" => Some(is_safe_command_builtin(tokens)),
+        "hostname" => Some(is_safe_hostname(tokens)),
+        "find" => Some(is_safe_find(tokens, is_safe)),
+        "sed" => Some(is_safe_sed(tokens)),
+        "sort" => Some(is_safe_sort(tokens)),
+        "yq" => Some(is_safe_yq(tokens)),
+        "xmllint" => Some(is_safe_xmllint(tokens)),
+        "awk" | "gawk" | "mawk" | "nawk" => Some(is_safe_awk(tokens)),
+        _ => None,
+    }
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![

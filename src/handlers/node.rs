@@ -1,4 +1,4 @@
-use crate::parse::{FlagCheck, Token, WordSet};
+use crate::parse::{FlagCheck, Segment, Token, WordSet};
 
 static YARN_READ_ONLY: WordSet =
     WordSet::new(&["--version", "info", "list", "ls", "why"]);
@@ -170,6 +170,22 @@ pub fn is_safe_fnm(tokens: &[Token]) -> bool {
 
 pub fn is_safe_volta(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && VOLTA_SAFE.contains(&tokens[1])
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "npm" => Some(is_safe_npm(tokens)),
+        "yarn" => Some(is_safe_yarn(tokens)),
+        "pnpm" => Some(is_safe_pnpm(tokens)),
+        "bun" => Some(is_safe_bun(tokens)),
+        "deno" => Some(is_safe_deno(tokens)),
+        "npx" => Some(is_safe_npx(tokens)),
+        "bunx" => Some(is_safe_bunx(tokens)),
+        "nvm" => Some(is_safe_nvm(tokens)),
+        "fnm" => Some(is_safe_fnm(tokens)),
+        "volta" => Some(is_safe_volta(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

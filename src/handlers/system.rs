@@ -1,4 +1,4 @@
-use crate::parse::{Token, WordSet, has_flag};
+use crate::parse::{Segment, Token, WordSet, has_flag};
 
 static BREW_READ_ONLY: WordSet = WordSet::new(&[
     "--prefix", "--version", "casks", "cat", "config", "deps", "desc",
@@ -120,6 +120,25 @@ static LOG_READ_ONLY: WordSet =
 
 pub fn is_safe_log(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && LOG_READ_ONLY.contains(&tokens[1])
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "brew" => Some(is_safe_brew(tokens)),
+        "mise" => Some(is_safe_mise(tokens)),
+        "asdf" => Some(is_safe_asdf(tokens)),
+        "defaults" => Some(is_safe_defaults(tokens)),
+        "pmset" => Some(is_safe_pmset(tokens)),
+        "sysctl" => Some(is_safe_sysctl(tokens)),
+        "cmake" => Some(is_safe_cmake(tokens)),
+        "security" => Some(is_safe_security(tokens)),
+        "csrutil" => Some(is_safe_csrutil(tokens)),
+        "diskutil" => Some(is_safe_diskutil(tokens)),
+        "launchctl" => Some(is_safe_launchctl(tokens)),
+        "networksetup" => Some(is_safe_networksetup(tokens)),
+        "log" => Some(is_safe_log(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

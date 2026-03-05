@@ -1,4 +1,4 @@
-use crate::parse::{Token, WordSet};
+use crate::parse::{Segment, Token, WordSet};
 
 static COMPOSER_SAFE: WordSet = WordSet::new(&[
     "--version", "about", "audit", "check-platform-reqs", "diagnose",
@@ -7,6 +7,13 @@ static COMPOSER_SAFE: WordSet = WordSet::new(&[
 
 pub fn is_safe_composer(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && COMPOSER_SAFE.contains(&tokens[1])
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "composer" => Some(is_safe_composer(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

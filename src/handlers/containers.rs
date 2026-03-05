@@ -1,4 +1,4 @@
-use crate::parse::{Token, WordSet};
+use crate::parse::{Segment, Token, WordSet};
 
 static DOCKER_READ_ONLY: WordSet = WordSet::new(&[
     "--version", "diff", "history", "images", "info", "inspect", "logs",
@@ -19,6 +19,13 @@ static DOCKER_MULTI: &[(&str, WordSet)] = &[
 
 pub fn is_safe_docker(tokens: &[Token]) -> bool {
     super::is_safe_subcmd(tokens, &DOCKER_READ_ONLY, DOCKER_MULTI)
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "docker" | "podman" => Some(is_safe_docker(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

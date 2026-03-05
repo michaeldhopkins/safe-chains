@@ -1,4 +1,4 @@
-use crate::parse::{Token, WordSet};
+use crate::parse::{Segment, Token, WordSet};
 
 static DOTNET_SAFE: WordSet = WordSet::new(&[
     "--info", "--list-runtimes", "--list-sdks", "--version",
@@ -7,6 +7,13 @@ static DOTNET_SAFE: WordSet = WordSet::new(&[
 
 pub fn is_safe_dotnet(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && DOTNET_SAFE.contains(&tokens[1])
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "dotnet" => Some(is_safe_dotnet(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

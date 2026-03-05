@@ -1,4 +1,4 @@
-use crate::parse::{Token, WordSet};
+use crate::parse::{Segment, Token, WordSet};
 
 static GIT_READ_ONLY: WordSet = WordSet::new(&[
     "--version", "blame", "cat-file", "check-ignore", "count-objects", "describe",
@@ -153,6 +153,14 @@ pub fn is_safe_jj(tokens: &[Token]) -> bool {
         }
     }
     false
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "git" => Some(is_safe_git(tokens)),
+        "jj" => Some(is_safe_jj(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
