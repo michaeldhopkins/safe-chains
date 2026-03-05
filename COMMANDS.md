@@ -10,7 +10,7 @@ These commands are allowed with specific subcommands or flags.
 
 ### `arch`
 
-Bare invocation only (prints machine architecture).
+Bare invocation allowed.
 
 ### `asdf`
 
@@ -62,7 +62,7 @@ Bare invocation allowed.
 
 ### `branchdiff`
 
-Bare invocation only.
+Bare invocation allowed.
 
 ### `brew`
 
@@ -254,7 +254,7 @@ Allowed standalone flags: -E, -e, -n. Bare invocation allowed.
 
 ### `env`
 
-Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare `env` allowed.
+Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed.
 
 ### `expand`
 
@@ -850,7 +850,7 @@ Safe unless -o flag (write output to file).
 
 ### `true / false`
 
-Bare invocation only.
+Bare invocation allowed.
 
 ### `tty`
 
@@ -934,7 +934,7 @@ Allowed standalone flags: --all, --boot, --count, --dead, --heading, --login, --
 
 ### `whoami`
 
-Bare invocation only.
+Bare invocation allowed.
 
 ### `whois`
 

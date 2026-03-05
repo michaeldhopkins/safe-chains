@@ -40,6 +40,6 @@ Doc strings in `command_docs()` must only describe what is **allowed**. This is 
 - Never use: "denied", "blocked", "rejected", "forbidden", "dangerous", "unsafe", "not allowed", "Guarded"
 - Never say "no flags", "no arguments", "no extra flags"
 - Instead of "X denied" → just omit it (unlisted = not allowed)
-- Instead of "No flags allowed" → "Bare invocation only." or just list the subcommands
+- Instead of "No flags allowed" → "Bare invocation allowed." or just list the subcommands
 - Instead of "Guarded: fmt (--check only)" → "fmt (requires --check)"
 - Don't say "explicit flag allowlist" — the whole program is an allowlist, this is redundant

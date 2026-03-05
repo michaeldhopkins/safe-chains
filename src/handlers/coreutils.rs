@@ -2099,13 +2099,13 @@ fn policy_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("du", DU_POLICY.describe()),
         CommandDoc::handler("df", DF_POLICY.describe()),
         CommandDoc::handler("true / false",
-            "Bare invocation only."),
+            "Bare invocation allowed."),
         CommandDoc::handler("printenv", PRINTENV_POLICY.describe()),
         CommandDoc::handler("type", TYPE_POLICY.describe()),
         CommandDoc::handler("whereis", WHEREIS_POLICY.describe()),
         CommandDoc::handler("which", WHICH_POLICY.describe()),
         CommandDoc::handler("whoami",
-            "Bare invocation only."),
+            "Bare invocation allowed."),
         CommandDoc::handler("pwd", PWD_POLICY.describe()),
         CommandDoc::handler("cd", CD_POLICY.describe()),
         CommandDoc::handler("unset", UNSET_POLICY.describe()),
@@ -2168,7 +2168,7 @@ fn policy_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("tokei", TOKEI_POLICY.describe()),
         CommandDoc::handler("cucumber", CUCUMBER_POLICY.describe()),
         CommandDoc::handler("branchdiff",
-            "Bare invocation only."),
+            "Bare invocation allowed."),
         CommandDoc::handler("safe-chains",
             "Any arguments allowed (safe-chains is this tool)."),
     ]
@@ -2178,7 +2178,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     let mut docs = vec![
         CommandDoc::handler("arch",
-            "Bare invocation only (prints machine architecture)."),
+            "Bare invocation allowed."),
         CommandDoc::handler("cat", CAT_POLICY.describe()),
         CommandDoc::handler("comm", COMM_POLICY.describe()),
         CommandDoc::handler("command",

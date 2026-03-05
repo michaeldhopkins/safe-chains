@@ -134,7 +134,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("env",
-            "Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare `env` allowed."),
+            "Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed."),
         CommandDoc::handler("timeout",
             "Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recursively validates the inner command."),
         CommandDoc::handler("time",
