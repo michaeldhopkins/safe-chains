@@ -129,6 +129,15 @@ pub fn is_safe_brew(tokens: &[Token]) -> bool {
     policy::check(&tokens[1..], policy)
 }
 
+static MISE_RESHIM_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--force"]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
 static MISE_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
     standalone_short: b"qv",
@@ -166,6 +175,7 @@ pub fn is_safe_mise(tokens: &[Token]) -> bool {
     match tokens[1].as_str() {
         "list" | "ls" => policy::check(&tokens[1..], &MISE_LIST_POLICY),
         "current" | "which" | "doctor" => policy::check(&tokens[1..], &MISE_SIMPLE_POLICY),
+        "reshim" => policy::check(&tokens[1..], &MISE_RESHIM_POLICY),
         "env" => policy::check(&tokens[1..], &MISE_ENV_POLICY),
         "config" => {
             tokens.get(2).is_some_and(|a| a == "list" || a == "ls")
@@ -526,10 +536,24 @@ pub fn is_safe_log(tokens: &[Token]) -> bool {
     policy::check(&tokens[1..], policy)
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
     match cmd {
         "brew" => Some(is_safe_brew(tokens)),
-        "mise" => Some(is_safe_mise(tokens)),
+        "mise" => {
+            if tokens.len() >= 2 && tokens[1] == "exec" {
+                let sep = tokens[2..].iter().position(|t| *t == "--");
+                if let Some(pos) = sep {
+                    let inner_start = 2 + pos + 1;
+                    if inner_start >= tokens.len() {
+                        return Some(false);
+                    }
+                    let inner = Token::join(&tokens[inner_start..]);
+                    return Some(is_safe(&inner));
+                }
+                return Some(false);
+            }
+            Some(is_safe_mise(tokens))
+        }
         "asdf" => Some(is_safe_asdf(tokens)),
         "defaults" => Some(is_safe_defaults(tokens)),
         "pmset" => Some(is_safe_pmset(tokens)),
@@ -553,9 +577,9 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
              leaves, list, log, outdated, search, shellenv, tap, uses. \
             "),
         CommandDoc::handler("mise",
-            "Subcommands: current, doctor, env, list/ls, which. \
+            "Subcommands: current, doctor, env, exec, list/ls, reshim, which. \
              Multi-level: config list/ls, settings get. \
-            "),
+             exec recursively validates the inner command after --."),
         CommandDoc::handler("asdf",
             "Subcommands: current, help, info, list, version, which. \
              Multi-level: plugin list. Also: plugin-list, plugin-list-all. \
@@ -652,6 +676,11 @@ mod tests {
         mise_env_shell: "mise env --shell bash",
         mise_config_ls: "mise config ls",
         mise_config_list: "mise config list",
+        mise_reshim: "mise reshim",
+        mise_reshim_force: "mise reshim --force",
+        mise_exec_git_status: "mise exec -- git status",
+        mise_exec_node_version: "mise exec node@20 -- node --version",
+        mise_exec_bundle_rspec: "mise exec -- bundle exec rspec spec/foo_spec.rb --no-color",
         asdf_current: "asdf current ruby",
         asdf_which: "asdf which ruby",
         asdf_help: "asdf help",
@@ -731,12 +760,17 @@ mod tests {
         brew_outdated_unknown_denied: "brew outdated --unknown",
         bare_brew_denied: "brew",
         mise_install_denied: "mise install ruby@3.4",
-        mise_exec_denied: "mise exec -- ruby foo.rb",
+        mise_exec_rm_denied: "mise exec -- rm -rf /",
+        mise_exec_no_inner_denied: "mise exec --",
+        mise_exec_no_separator_denied: "mise exec ruby foo.rb",
+        mise_exec_bare_denied: "mise exec",
+        mise_exec_ruby_denied: "mise exec -- ruby foo.rb",
         mise_use_denied: "mise use ruby@3.4",
         mise_config_set_denied: "mise config set key value",
         mise_config_bare_denied: "mise config",
         mise_ls_unknown_denied: "mise ls --unknown",
         mise_env_unknown_denied: "mise env --unknown",
+        mise_reshim_unknown_denied: "mise reshim --unknown",
         asdf_plugin_add_denied: "asdf plugin add ruby",
         asdf_install_denied: "asdf install ruby 3.4",
         asdf_list_unknown_denied: "asdf list ruby --unknown",

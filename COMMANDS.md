@@ -350,7 +350,7 @@ auth status, api (GET only).
 
 ### `go`
 
-Subcommands: build, doc, env, list, test, version, vet. 
+Subcommands: build, doc, env, help, list, test, version, vet.
 
 ### `gradle / gradlew`
 
@@ -500,6 +500,10 @@ Bare invocation allowed.
 
 Subcommand: identify.
 
+### `man`
+
+Allowed standalone flags: --all, --apropos, --default, --local-file, --regex, --update, --whatis, --where, --where-cat, --wildcard, -a, -f, -k, -l, -u, -w. Allowed valued flags: --config-file, --encoding, --extension, --locale, --manpath, --sections, --systems, -C, -E, -L, -M, -S, -e, -m.
+
 ### `md5`
 
 Allowed standalone flags: -n, -p, -q, -r, -t.
@@ -522,7 +526,7 @@ Allowed standalone flags: --raw, -r. Allowed valued flags: --name, --nullMarker,
 
 ### `mise`
 
-Subcommands: current, doctor, env, list/ls, which. Multi-level: config list/ls, settings get. 
+Subcommands: current, doctor, env, exec, list/ls, reshim, which. Multi-level: config list/ls, settings get. exec recursively validates the inner command after --.
 
 ### `mvn / mvnw`
 

@@ -1714,6 +1714,24 @@ static MDFIND_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
 };
 
+static MAN_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--apropos", "--default", "--local-file",
+        "--regex", "--update", "--whatis", "--where", "--where-cat",
+        "--wildcard",
+        "-a", "-f", "-k", "-l", "-u", "-w",
+    ]),
+    standalone_short: b"afkluw",
+    valued: WordSet::new(&[
+        "--config-file", "--encoding", "--extension", "--locale",
+        "--manpath", "--sections", "--systems",
+        "-C", "-E", "-L", "-M", "-S", "-e", "-m",
+    ]),
+    valued_short: b"CELMS",
+    bare: false,
+    max_positional: None,
+};
+
 static DIG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "-4", "-6", "-m", "-r", "-u", "-v",
@@ -2013,6 +2031,7 @@ fn dispatch_policy(cmd: &str, tokens: &[Token]) -> Option<bool> {
         "system_profiler" => Some(policy::check(tokens, &SYSTEM_PROFILER_POLICY)),
         "ioreg" => Some(policy::check(tokens, &IOREG_POLICY)),
         "vm_stat" => Some(policy::check(tokens, &VM_STAT_POLICY)),
+        "man" => Some(policy::check(tokens, &MAN_POLICY)),
         "mdfind" => Some(policy::check(tokens, &MDFIND_POLICY)),
         "dig" => Some(policy::check(tokens, &DIG_POLICY)),
         "host" => Some(policy::check(tokens, &HOST_POLICY)),
@@ -2190,6 +2209,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
              -exec/-execdir allowed when the executed command is itself safe."),
         CommandDoc::handler("grep", GREP_POLICY.describe()),
         CommandDoc::handler("head", HEAD_POLICY.describe()),
+        CommandDoc::handler("man", MAN_POLICY.describe()),
         CommandDoc::wordset("hostname", &HOSTNAME_DISPLAY),
         CommandDoc::handler("nl", NL_POLICY.describe()),
         CommandDoc::handler("paste", PASTE_POLICY.describe()),
@@ -2867,6 +2887,17 @@ mod tests {
         ss_bare: "ss",
         ss_listen: "ss -tlnp",
         identify_file: "identify image.png",
+        man_page: "man ls",
+        man_section: "man 3 printf",
+        man_keyword_search: "man -k printf",
+        man_whatis: "man -f ls",
+        man_all: "man -a ls",
+        man_sections_flag: "man -S 1:8 intro",
+        man_where: "man --where ls",
+        man_where_short: "man -w ls",
+        man_local_file: "man -l /usr/share/man/man1/ls.1",
+        man_manpath: "man -M /usr/share/man ls",
+        man_encoding: "man -E utf-8 ls",
         shellcheck_file: "shellcheck script.sh",
         shellcheck_format: "shellcheck -f json script.sh",
         cloc_dir: "cloc src/",
@@ -2892,5 +2923,11 @@ mod tests {
         nslookup_unknown_denied: "nslookup -unknown example.com",
         mdls_plist_denied: "mdls -plist output.plist file.txt",
         sleep_bare_denied: "sleep",
+        man_bare_denied: "man",
+        man_pager_denied: "man -P /bin/evil ls",
+        man_pager_long_denied: "man --pager evil ls",
+        man_html_denied: "man -H ls",
+        man_preprocessor_denied: "man -p tbl ls",
+        man_unknown_denied: "man --unknown ls",
     }
 }

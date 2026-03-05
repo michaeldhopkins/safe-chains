@@ -110,6 +110,7 @@ pub fn is_safe_go(tokens: &[Token]) -> bool {
         return false;
     }
     let policy = match tokens[1].as_str() {
+        "help" => return true,
         "build" => &GO_BUILD_POLICY,
         "doc" => &GO_DOC_POLICY,
         "env" => &GO_ENV_POLICY,
@@ -132,8 +133,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![CommandDoc::handler("go",
-        "Subcommands: build, doc, env, list, test, version, vet. \
-        ")]
+        "Subcommands: build, doc, env, help, list, test, version, vet.")]
 }
 
 #[cfg(test)]
@@ -145,6 +145,10 @@ mod tests {
     }
 
     safe! {
+        go_help_bare: "go help",
+        go_help_build: "go help build",
+        go_help_modules: "go help modules",
+        go_help_test: "go help test",
         go_version: "go version",
         go_version_flag: "go --version",
         go_version_m: "go version -m /usr/local/go/bin/go",

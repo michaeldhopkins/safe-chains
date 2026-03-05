@@ -39,7 +39,7 @@ static HELP_ELIGIBLE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
         "gem", "gh", "git", "glab", "go", "gradle", "gradlew", "hostname",
         "jj",
         "launchctl", "lipo", "llm", "log",
-        "magick", "mise", "mvn", "mvnw",
+        "magick", "man", "mise", "mvn", "mvnw",
         "networksetup", "npm", "nvm",
         "ollama",
         "pip", "pip3", "pkgutil", "plutil", "pmset", "pnpm", "poetry", "pyenv",
@@ -131,7 +131,7 @@ const HANDLED_CMDS: &[&str] = &[
     "jq", "base64", "xxd", "getconf", "uuidgen",
     "md5sum", "md5", "sha256sum", "shasum", "sha1sum", "sha512sum",
     "cksum", "b2sum", "sum", "strings", "hexdump", "od", "size",
-    "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat", "mdfind",
+    "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat", "mdfind", "man",
     "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route",
     "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "safe-chains",
 ];
