@@ -1,4 +1,4 @@
-use crate::parse::{FlagCheck, Token, WordSet};
+use crate::parse::{FlagCheck, Segment, Token, WordSet};
 
 static READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
     "attestation", "cache", "codespace", "extension", "gpg-key",
@@ -167,6 +167,15 @@ pub fn is_safe_tea(tokens: &[Token]) -> bool {
     }
 
     false
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "gh" => Some(is_safe_gh(tokens)),
+        "glab" => Some(is_safe_glab(tokens)),
+        "tea" => Some(is_safe_tea(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

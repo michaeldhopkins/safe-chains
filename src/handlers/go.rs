@@ -1,10 +1,17 @@
-use crate::parse::{Token, WordSet};
+use crate::parse::{Segment, Token, WordSet};
 
 static GO_SAFE: WordSet =
     WordSet::new(&["--version", "build", "doc", "env", "list", "test", "version", "vet"]);
 
 pub fn is_safe_go(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && GO_SAFE.contains(&tokens[1])
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "go" => Some(is_safe_go(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

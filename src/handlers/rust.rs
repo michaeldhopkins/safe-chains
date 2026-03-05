@@ -58,6 +58,14 @@ pub fn is_safe_rustup(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> b
     false
 }
 
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "cargo" => Some(is_safe_cargo(tokens)),
+        "rustup" => Some(is_safe_rustup(tokens, is_safe)),
+        _ => None,
+    }
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, doc, doc_multi, describe_flagcheck};
     vec![

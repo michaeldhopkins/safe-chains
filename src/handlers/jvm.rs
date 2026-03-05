@@ -1,4 +1,4 @@
-use crate::parse::{Token, WordSet};
+use crate::parse::{Segment, Token, WordSet};
 
 static GRADLE_SAFE: WordSet = WordSet::new(&[
     "--version", "build", "check", "dependencies", "properties", "tasks", "test",
@@ -15,6 +15,14 @@ pub fn is_safe_gradle(tokens: &[Token]) -> bool {
 
 pub fn is_safe_mvn(tokens: &[Token]) -> bool {
     tokens.len() >= 2 && MVN_SAFE.contains(&tokens[1])
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "gradle" | "gradlew" => Some(is_safe_gradle(tokens)),
+        "mvn" | "mvnw" => Some(is_safe_mvn(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

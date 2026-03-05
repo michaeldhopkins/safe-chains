@@ -1,4 +1,4 @@
-use crate::parse::{FlagCheck, Token, WordSet};
+use crate::parse::{FlagCheck, Segment, Token, WordSet};
 
 static PIP_READ_ONLY: WordSet = WordSet::new(&[
     "--version", "check", "debug", "freeze", "help", "index", "inspect", "list", "show",
@@ -69,6 +69,17 @@ pub fn is_safe_conda(tokens: &[Token]) -> bool {
         return CONDA_CONFIG.is_safe(&tokens[2..]);
     }
     false
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "pip" | "pip3" => Some(is_safe_pip(tokens)),
+        "uv" => Some(is_safe_uv(tokens)),
+        "poetry" => Some(is_safe_poetry(tokens)),
+        "pyenv" => Some(is_safe_pyenv(tokens)),
+        "conda" => Some(is_safe_conda(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

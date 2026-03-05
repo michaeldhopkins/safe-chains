@@ -1,4 +1,4 @@
-use crate::parse::{FlagCheck, Token, WordSet};
+use crate::parse::{FlagCheck, Segment, Token, WordSet};
 
 static XCODEBUILD_SAFE: WordSet = WordSet::new(&[
     "-list", "-showBuildSettings", "-showdestinations", "-showsdks", "-version",
@@ -117,6 +117,20 @@ pub fn is_safe_spctl(tokens: &[Token]) -> bool {
         return false;
     }
     SPCTL_CHECK.is_safe(&tokens[1..])
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "xcodebuild" => Some(is_safe_xcodebuild(tokens)),
+        "plutil" => Some(is_safe_plutil(tokens)),
+        "xcode-select" => Some(is_safe_xcode_select(tokens)),
+        "xcrun" => Some(is_safe_xcrun(tokens)),
+        "pkgutil" => Some(is_safe_pkgutil(tokens)),
+        "lipo" => Some(is_safe_lipo(tokens)),
+        "codesign" => Some(is_safe_codesign(tokens)),
+        "spctl" => Some(is_safe_spctl(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

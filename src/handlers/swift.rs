@@ -1,4 +1,4 @@
-use crate::parse::{Token, WordSet};
+use crate::parse::{Segment, Token, WordSet};
 
 static SWIFT_SAFE: WordSet =
     WordSet::new(&["--version", "build", "test"]);
@@ -19,6 +19,13 @@ pub fn is_safe_swift(tokens: &[Token]) -> bool {
             .is_some_and(|a| SWIFT_PACKAGE_SAFE.contains(a));
     }
     false
+}
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    match cmd {
+        "swift" => Some(is_safe_swift(tokens)),
+        _ => None,
+    }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

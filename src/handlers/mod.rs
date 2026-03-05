@@ -194,7 +194,6 @@ fn is_trailing_info_request(tokens: &[Token]) -> bool {
         && !tokens.iter().any(|t| *t == "--")
 }
 
-#[allow(clippy::too_many_lines)]
 pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     if is_bare_info_request(tokens) {
         return true;
@@ -203,133 +202,35 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     if is_trailing_info_request(tokens) && HELP_ELIGIBLE.contains(cmd) {
         return true;
     }
+    None
+        .or_else(|| shell::dispatch(cmd, tokens, is_safe))
+        .or_else(|| wrappers::dispatch(cmd, tokens, is_safe))
+        .or_else(|| vcs::dispatch(cmd, tokens, is_safe))
+        .or_else(|| forges::dispatch(cmd, tokens, is_safe))
+        .or_else(|| node::dispatch(cmd, tokens, is_safe))
+        .or_else(|| ruby::dispatch(cmd, tokens, is_safe))
+        .or_else(|| python::dispatch(cmd, tokens, is_safe))
+        .or_else(|| rust::dispatch(cmd, tokens, is_safe))
+        .or_else(|| go::dispatch(cmd, tokens, is_safe))
+        .or_else(|| jvm::dispatch(cmd, tokens, is_safe))
+        .or_else(|| php::dispatch(cmd, tokens, is_safe))
+        .or_else(|| swift::dispatch(cmd, tokens, is_safe))
+        .or_else(|| dotnet::dispatch(cmd, tokens, is_safe))
+        .or_else(|| containers::dispatch(cmd, tokens, is_safe))
+        .or_else(|| network::dispatch(cmd, tokens, is_safe))
+        .or_else(|| ai::dispatch(cmd, tokens, is_safe))
+        .or_else(|| system::dispatch(cmd, tokens, is_safe))
+        .or_else(|| xcode::dispatch(cmd, tokens, is_safe))
+        .or_else(|| perl::dispatch(cmd, tokens, is_safe))
+        .or_else(|| coreutils::dispatch(cmd, tokens, is_safe))
+        .or_else(|| dispatch_magick(cmd, tokens))
+        .unwrap_or_else(|| SAFE_CMDS.contains(cmd))
+}
+
+fn dispatch_magick(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
-        "sh" | "bash" => shell::is_safe_shell(tokens, is_safe),
-        "xargs" => shell::is_safe_xargs(tokens, is_safe),
-        "timeout" => wrappers::is_safe_timeout(tokens, is_safe),
-        "time" => wrappers::is_safe_time(tokens, is_safe),
-        "env" => wrappers::is_safe_env(tokens, is_safe),
-        "nice" | "ionice" => wrappers::is_safe_nice(tokens, is_safe),
-        "hyperfine" => wrappers::is_safe_hyperfine(tokens, is_safe),
-
-        "git" => vcs::is_safe_git(tokens),
-        "jj" => vcs::is_safe_jj(tokens),
-        "gh" => forges::is_safe_gh(tokens),
-        "glab" => forges::is_safe_glab(tokens),
-        "tea" => forges::is_safe_tea(tokens),
-
-        "npm" => node::is_safe_npm(tokens),
-        "yarn" => node::is_safe_yarn(tokens),
-        "pnpm" => node::is_safe_pnpm(tokens),
-        "bun" => node::is_safe_bun(tokens),
-        "deno" => node::is_safe_deno(tokens),
-        "npx" => node::is_safe_npx(tokens),
-        "bunx" => node::is_safe_bunx(tokens),
-        "nvm" => node::is_safe_nvm(tokens),
-        "fnm" => node::is_safe_fnm(tokens),
-        "volta" => node::is_safe_volta(tokens),
-
-        "bundle" => ruby::is_safe_bundle(tokens),
-        "gem" => ruby::is_safe_gem(tokens),
-        "rbenv" => ruby::is_safe_rbenv(tokens),
-
-        "pip" | "pip3" => python::is_safe_pip(tokens),
-        "uv" => python::is_safe_uv(tokens),
-        "poetry" => python::is_safe_poetry(tokens),
-        "pyenv" => python::is_safe_pyenv(tokens),
-        "conda" => python::is_safe_conda(tokens),
-
-        "cargo" => rust::is_safe_cargo(tokens),
-        "rustup" => rust::is_safe_rustup(tokens, is_safe),
-
-        "go" => go::is_safe_go(tokens),
-
-        "gradle" | "gradlew" => jvm::is_safe_gradle(tokens),
-        "mvn" | "mvnw" => jvm::is_safe_mvn(tokens),
-
-        "composer" => php::is_safe_composer(tokens),
-
-        "swift" => swift::is_safe_swift(tokens),
-
-        "dotnet" => dotnet::is_safe_dotnet(tokens),
-
-        "docker" | "podman" => containers::is_safe_docker(tokens),
-
-        "curl" => network::is_safe_curl(tokens),
-
-        "ollama" => ai::is_safe_ollama(tokens),
-        "llm" => ai::is_safe_llm(tokens),
-
-        "brew" => system::is_safe_brew(tokens),
-        "mise" => system::is_safe_mise(tokens),
-        "asdf" => system::is_safe_asdf(tokens),
-        "defaults" => system::is_safe_defaults(tokens),
-        "pmset" => system::is_safe_pmset(tokens),
-        "sysctl" => system::is_safe_sysctl(tokens),
-        "cmake" => system::is_safe_cmake(tokens),
-        "networksetup" => system::is_safe_networksetup(tokens),
-        "launchctl" => system::is_safe_launchctl(tokens),
-        "diskutil" => system::is_safe_diskutil(tokens),
-        "security" => system::is_safe_security(tokens),
-        "csrutil" => system::is_safe_csrutil(tokens),
-        "log" => system::is_safe_log(tokens),
-
-        "xcodebuild" => xcode::is_safe_xcodebuild(tokens),
-        "plutil" => xcode::is_safe_plutil(tokens),
-        "xcode-select" => xcode::is_safe_xcode_select(tokens),
-        "xcrun" => xcode::is_safe_xcrun(tokens),
-        "pkgutil" => xcode::is_safe_pkgutil(tokens),
-        "lipo" => xcode::is_safe_lipo(tokens),
-        "codesign" => xcode::is_safe_codesign(tokens),
-        "spctl" => xcode::is_safe_spctl(tokens),
-
-        "perl" => perl::is_safe_perl(tokens),
-
-        "grep" | "egrep" | "fgrep" => coreutils::is_safe_grep(tokens),
-        "rg" => coreutils::is_safe_rg(tokens),
-        "cat" => coreutils::is_safe_cat(tokens),
-        "head" => coreutils::is_safe_head(tokens),
-        "tail" => coreutils::is_safe_tail(tokens),
-        "wc" => coreutils::is_safe_wc(tokens),
-        "cut" => coreutils::is_safe_cut(tokens),
-        "tr" => coreutils::is_safe_tr(tokens),
-        "uniq" => coreutils::is_safe_uniq(tokens),
-        "diff" => coreutils::is_safe_diff(tokens),
-        "comm" => coreutils::is_safe_comm(tokens),
-        "paste" => coreutils::is_safe_paste(tokens),
-        "tac" => coreutils::is_safe_tac(tokens),
-        "rev" => coreutils::is_safe_rev(tokens),
-        "nl" => coreutils::is_safe_nl(tokens),
-        "expand" => coreutils::is_safe_expand(tokens),
-        "unexpand" => coreutils::is_safe_unexpand(tokens),
-        "fold" => coreutils::is_safe_fold(tokens),
-        "fmt" => coreutils::is_safe_fmt(tokens),
-        "column" => coreutils::is_safe_column(tokens),
-        "iconv" => coreutils::is_safe_iconv(tokens),
-        "nroff" => coreutils::is_safe_nroff(tokens),
-        "echo" => coreutils::is_safe_echo(tokens),
-        "printf" => coreutils::is_safe_printf(tokens),
-        "seq" => coreutils::is_safe_seq(tokens),
-        "test" => coreutils::is_safe_test(tokens),
-        "expr" => coreutils::is_safe_expr(tokens),
-        "bc" => coreutils::is_safe_bc(tokens),
-        "factor" => coreutils::is_safe_factor(tokens),
-        "bat" => coreutils::is_safe_bat(tokens),
-
-        "arch" => coreutils::is_safe_arch(tokens),
-        "command" => coreutils::is_safe_command_builtin(tokens),
-        "hostname" => coreutils::is_safe_hostname(tokens),
-
-        "find" => coreutils::is_safe_find(tokens, is_safe),
-        "sed" => coreutils::is_safe_sed(tokens),
-        "sort" => coreutils::is_safe_sort(tokens),
-        "yq" => coreutils::is_safe_yq(tokens),
-        "xmllint" => coreutils::is_safe_xmllint(tokens),
-        "awk" | "gawk" | "mawk" | "nawk" => coreutils::is_safe_awk(tokens),
-
-        "magick" => is_safe_subcmd(tokens, &MAGICK_SAFE, &[]),
-
-        _ => SAFE_CMDS.contains(cmd),
+        "magick" => Some(is_safe_subcmd(tokens, &MAGICK_SAFE, &[])),
+        _ => None,
     }
 }
 
