@@ -35,26 +35,8 @@ pub(crate) enum SafeKind {
 use SafeKind::{AnyArgs, Bare};
 
 pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str, SafeKind)] = &[
-    ("fd", "Find files", AnyArgs),
-    ("eza", "Modern ls replacement", AnyArgs),
-    ("exa", "Modern ls replacement", AnyArgs),
-
-    ("ls", "List directory", AnyArgs),
-
-    ("delta", "Syntax-highlighted diff viewer", AnyArgs),
-    ("colordiff", "Colorized diff", AnyArgs),
-
     ("true", "Return success exit code", Bare),
     ("false", "Return failure exit code", Bare),
-
-    ("dirname", "Strip filename from path", AnyArgs),
-    ("basename", "Strip directory from path", AnyArgs),
-    ("realpath", "Resolve path", AnyArgs),
-    ("readlink", "Resolve symlink", AnyArgs),
-    ("file", "Detect file type", AnyArgs),
-    ("stat", "File status", AnyArgs),
-    ("du", "Disk usage", AnyArgs),
-    ("df", "Disk free space", AnyArgs),
 
     ("printenv", "Print environment variables", AnyArgs),
     ("type", "Identify command type", AnyArgs),
@@ -63,7 +45,6 @@ pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str, SafeKind)] = &[
     ("whoami", "Print current user", Bare),
     ("date", "Display date and time", AnyArgs),
     ("pwd", "Print working directory", AnyArgs),
-    ("tree", "Directory tree", AnyArgs),
     ("cd", "Change directory", AnyArgs),
     ("unset", "Unset environment variables", AnyArgs),
 
@@ -262,6 +243,9 @@ const HANDLED_CMDS: &[&str] = &[
     "arch", "command", "hostname",
     "find", "sed", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
     "magick",
+    "fd", "eza", "exa", "ls", "delta", "colordiff",
+    "dirname", "basename", "realpath", "readlink",
+    "file", "stat", "du", "df", "tree",
 ];
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
@@ -346,6 +330,9 @@ mod tests {
         "awk", "gawk", "mawk", "nawk", "sed", "sort", "perl",
         "expand", "unexpand", "fold", "fmt", "column", "iconv", "nroff",
         "echo", "printf", "seq", "test", "expr", "bc", "factor", "bat",
+        "fd", "eza", "exa", "ls", "delta", "colordiff",
+        "dirname", "basename", "realpath", "readlink",
+        "file", "stat", "du", "df", "tree",
     ];
 
     #[test]
