@@ -1,12 +1,163 @@
 use crate::parse::{FlagCheck, Segment, Token, WordSet};
+use crate::policy::{self, FlagPolicy};
 
-static YARN_READ_ONLY: WordSet =
-    WordSet::new(&["--version", "info", "list", "ls", "why"]);
+static NPM_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--json", "--link", "--long", "--omit",
+        "--parseable", "--production", "--unicode",
+    ]),
+    standalone_short: b"al",
+    valued: WordSet::new(&["--depth", "--prefix"]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
 
-static NPM_READ_ONLY: WordSet = WordSet::new(&[
-    "--version", "audit", "doctor", "explain", "fund", "info", "list", "ls",
-    "outdated", "prefix", "root", "test", "view", "why",
-]);
+static NPM_VIEW_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--json"]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static NPM_AUDIT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--json", "--omit", "--production",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&["--audit-level"]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static NPM_BARE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--json"]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static NPM_TEST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_npm(tokens: &[Token]) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    match tokens[1].as_str() {
+        "list" | "ls" => policy::check(&tokens[1..], &NPM_LIST_POLICY),
+        "view" | "info" => policy::check(&tokens[1..], &NPM_VIEW_POLICY),
+        "audit" => policy::check(&tokens[1..], &NPM_AUDIT_POLICY),
+        "test" => policy::check(&tokens[1..], &NPM_TEST_POLICY),
+        "doctor" | "explain" | "fund" | "outdated" | "prefix"
+        | "root" | "why" => policy::check(&tokens[1..], &NPM_BARE_POLICY),
+        "config" => tokens.get(2).is_some_and(|a| a == "list" || a == "get"),
+        "run" | "run-script" => tokens
+            .get(2)
+            .is_some_and(|a| a == "test" || a.starts_with("test:")),
+        _ => false,
+    }
+}
+
+static YARN_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--json", "--long", "--production"]),
+    standalone_short: b"",
+    valued: WordSet::new(&["--depth", "--pattern"]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static YARN_BARE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--json"]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_yarn(tokens: &[Token]) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    match tokens[1].as_str() {
+        "list" | "ls" => policy::check(&tokens[1..], &YARN_LIST_POLICY),
+        "info" | "why" => policy::check(&tokens[1..], &YARN_BARE_POLICY),
+        "test" => true,
+        _ => tokens[1].starts_with("test:"),
+    }
+}
+
+static PNPM_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--dev", "--json", "--long", "--no-optional",
+        "--parseable", "--production", "--recursive",
+    ]),
+    standalone_short: b"Pr",
+    valued: WordSet::new(&["--depth", "--filter"]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static PNPM_BARE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--json", "--recursive"]),
+    standalone_short: b"r",
+    valued: WordSet::new(&["--filter"]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_pnpm(tokens: &[Token]) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    match tokens[1].as_str() {
+        "list" | "ls" => policy::check(&tokens[1..], &PNPM_LIST_POLICY),
+        "audit" | "outdated" | "why" => policy::check(&tokens[1..], &PNPM_BARE_POLICY),
+        _ => false,
+    }
+}
+
+static BUN_TEST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--bail", "--only", "--rerun-each", "--todo"]),
+    standalone_short: b"",
+    valued: WordSet::new(&["--preload", "--timeout"]),
+    valued_short: b"t",
+    bare: true,
+    max_positional: None,
+};
+
+static BUN_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static BUN_PM_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
 
 static NPX_SAFE: WordSet =
     WordSet::new(&["@herb-tools/linter", "eslint", "karma"]);
@@ -14,65 +165,11 @@ static NPX_SAFE: WordSet =
 static NPX_FLAGS_NO_ARG: WordSet =
     WordSet::new(&["--ignore-existing", "--no", "--quiet", "--yes", "-q", "-y"]);
 
-static PNPM_READ_ONLY: WordSet =
-    WordSet::new(&["--version", "audit", "list", "ls", "outdated", "why"]);
-
-static BUN_SAFE: WordSet =
-    WordSet::new(&["--version", "outdated", "test"]);
-
-static BUN_MULTI: &[(&str, WordSet)] =
-    &[("pm", WordSet::new(&["bin", "cache", "hash", "ls"]))];
-
 static BUNX_FLAGS_NO_ARG: WordSet =
     WordSet::new(&["--bun", "--no-install", "--silent", "--verbose"]);
 
-static DENO_SAFE: WordSet =
-    WordSet::new(&["--version", "check", "doc", "info", "lint", "test"]);
-
-static DENO_FMT: FlagCheck =
-    FlagCheck::new(&["--check"], &[]);
-
 static TSC_CHECK: FlagCheck =
     FlagCheck::new(&["--noEmit"], &[]);
-
-static NVM_SAFE: WordSet =
-    WordSet::new(&["--version", "current", "list", "ls", "ls-remote", "version", "which"]);
-
-static FNM_SAFE: WordSet =
-    WordSet::new(&["--version", "current", "default", "list", "ls-remote"]);
-
-static VOLTA_SAFE: WordSet =
-    WordSet::new(&["--version", "list", "which"]);
-
-pub fn is_safe_yarn(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if YARN_READ_ONLY.contains(&tokens[1]) {
-        return true;
-    }
-    tokens[1] == "test" || tokens[1].starts_with("test:")
-}
-
-pub fn is_safe_npm(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if NPM_READ_ONLY.contains(&tokens[1]) {
-        return true;
-    }
-    if tokens[1] == "config" {
-        return tokens
-            .get(2)
-            .is_some_and(|a| a == "list" || a == "get");
-    }
-    if tokens[1] == "run" || tokens[1] == "run-script" {
-        return tokens
-            .get(2)
-            .is_some_and(|a| a == "test" || a.starts_with("test:"));
-    }
-    false
-}
 
 fn find_runner_package_index(
     tokens: &[Token],
@@ -135,41 +232,118 @@ pub fn is_safe_bunx(tokens: &[Token]) -> bool {
         .is_some_and(|idx| is_safe_runner_package(tokens, idx))
 }
 
-pub fn is_safe_pnpm(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && PNPM_READ_ONLY.contains(&tokens[1])
-}
-
 pub fn is_safe_bun(tokens: &[Token]) -> bool {
-    if tokens.len() >= 2 && tokens[1] == "x" {
+    if tokens.len() < 2 {
+        return false;
+    }
+    if tokens[1] == "x" {
         return find_runner_package_index(tokens, 2, &BUNX_FLAGS_NO_ARG)
             .is_some_and(|idx| is_safe_runner_package(tokens, idx));
     }
-    super::is_safe_subcmd(tokens, &BUN_SAFE, BUN_MULTI)
+    match tokens[1].as_str() {
+        "test" => policy::check(&tokens[1..], &BUN_TEST_POLICY),
+        "outdated" => policy::check(&tokens[1..], &BUN_OUTDATED_POLICY),
+        "pm" => {
+            if tokens.len() < 3 {
+                return false;
+            }
+            static BUN_PM_SAFE: WordSet = WordSet::new(&["bin", "cache", "hash", "ls"]);
+            if !BUN_PM_SAFE.contains(&tokens[2]) {
+                return false;
+            }
+            policy::check(&tokens[2..], &BUN_PM_POLICY)
+        }
+        _ => false,
+    }
 }
+
+static DENO_SAFE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--json", "--no-lock", "--quiet", "--unstable",
+    ]),
+    standalone_short: b"q",
+    valued: WordSet::new(&["--config", "--import-map"]),
+    valued_short: b"c",
+    bare: true,
+    max_positional: None,
+};
+
+static DENO_FMT: FlagCheck =
+    FlagCheck::new(&["--check"], &[]);
 
 pub fn is_safe_deno(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if DENO_SAFE.contains(&tokens[1]) {
-        return true;
+    match tokens[1].as_str() {
+        "check" | "doc" | "info" | "lint" | "test" => {
+            policy::check(&tokens[1..], &DENO_SAFE_POLICY)
+        }
+        "fmt" => DENO_FMT.is_safe(&tokens[2..]),
+        _ => false,
     }
-    if tokens[1] == "fmt" {
-        return DENO_FMT.is_safe(&tokens[2..]);
-    }
-    false
 }
+
+static NVM_BARE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--lts", "--no-colors"]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
 
 pub fn is_safe_nvm(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && NVM_SAFE.contains(&tokens[1])
+    if tokens.len() < 2 {
+        return false;
+    }
+    static NVM_SAFE: WordSet =
+        WordSet::new(&["current", "list", "ls", "ls-remote", "version", "which"]);
+    if !NVM_SAFE.contains(&tokens[1]) {
+        return false;
+    }
+    policy::check(&tokens[1..], &NVM_BARE_POLICY)
 }
+
+static FNM_BARE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
 
 pub fn is_safe_fnm(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && FNM_SAFE.contains(&tokens[1])
+    if tokens.len() < 2 {
+        return false;
+    }
+    static FNM_SAFE: WordSet =
+        WordSet::new(&["current", "default", "list", "ls-remote"]);
+    if !FNM_SAFE.contains(&tokens[1]) {
+        return false;
+    }
+    policy::check(&tokens[1..], &FNM_BARE_POLICY)
 }
 
+static VOLTA_BARE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--current", "--default"]),
+    standalone_short: b"cd",
+    valued: WordSet::new(&["--format"]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
 pub fn is_safe_volta(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && VOLTA_SAFE.contains(&tokens[1])
+    if tokens.len() < 2 {
+        return false;
+    }
+    static VOLTA_SAFE: WordSet = WordSet::new(&["list", "which"]);
+    if !VOLTA_SAFE.contains(&tokens[1]) {
+        return false;
+    }
+    policy::check(&tokens[1..], &VOLTA_BARE_POLICY)
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
@@ -189,21 +363,21 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) 
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocBuilder, doc, doc_multi, wordset_items};
+    use crate::docs::{CommandDoc, DocBuilder, wordset_items};
     vec![
         CommandDoc::handler("npm",
-            doc(&NPM_READ_ONLY)
-                .section("Guarded: config (list/get only), run/run-script (test/test:* only).")
-                .build()),
+            "Subcommands: audit, config (list/get), doctor, explain, fund, info, list, ls, \
+             outdated, prefix, root, run/run-script (test only), test, view, why. \
+             Each has an explicit flag allowlist."),
         CommandDoc::handler("yarn",
-            doc(&YARN_READ_ONLY)
-                .section("Also allowed: test, test:*.")
-                .build()),
-        CommandDoc::wordset("pnpm", &PNPM_READ_ONLY),
+            "Subcommands: info, list, ls, test, test:*, why. \
+             Each has an explicit flag allowlist."),
+        CommandDoc::handler("pnpm",
+            "Subcommands: audit, list, ls, outdated, why. \
+             Each has an explicit flag allowlist."),
         CommandDoc::handler("bun",
-            doc_multi(&BUN_SAFE, BUN_MULTI)
-                .section("x delegates to bunx logic.")
-                .build()),
+            "Subcommands: outdated, pm (bin/cache/hash/ls), test. \
+             x delegates to bunx logic. Each has an explicit flag allowlist."),
         CommandDoc::handler("bunx",
             DocBuilder::new()
                 .section(format!("Allowed packages: {}.", wordset_items(&NPX_SAFE)))
@@ -211,18 +385,21 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                 .section("Skips flags: --bun/--no-install/--package/-p.")
                 .build()),
         CommandDoc::handler("deno",
-            doc(&DENO_SAFE)
-                .section("Guarded: fmt (requires --check).")
-                .build()),
+            "Subcommands: check, doc, info, lint, test. \
+             Guarded: fmt (requires --check). Each has an explicit flag allowlist."),
         CommandDoc::handler("npx",
             DocBuilder::new()
                 .section(format!("Allowed packages: {}.", wordset_items(&NPX_SAFE)))
                 .section("Guarded: tsc (requires --noEmit).")
                 .section("Skips flags: --yes/-y/--no/--package/-p.")
                 .build()),
-        CommandDoc::wordset("nvm", &NVM_SAFE),
-        CommandDoc::wordset("fnm", &FNM_SAFE),
-        CommandDoc::wordset("volta", &VOLTA_SAFE),
+        CommandDoc::handler("nvm",
+            "Subcommands: current, list, ls, ls-remote, version, which. \
+             Minimal flags allowed."),
+        CommandDoc::handler("fnm",
+            "Subcommands: current, default, list, ls-remote. No extra flags allowed."),
+        CommandDoc::handler("volta",
+            "Subcommands: list, which. Flags: --current, --default, --format."),
     ]
 }
 
@@ -236,19 +413,25 @@ mod tests {
 
     safe! {
         yarn_list: "yarn list --depth=0",
+        yarn_list_json: "yarn list --json",
         yarn_ls: "yarn ls bootstrap",
         yarn_info: "yarn info react",
+        yarn_info_json: "yarn info react --json",
         yarn_why: "yarn why lodash",
         yarn_version: "yarn --version",
         yarn_test: "yarn test",
         yarn_test_watch: "yarn test:watch",
         yarn_test_with_args: "yarn test --testPathPattern=Foo",
         npm_view: "npm view react version",
+        npm_view_json: "npm view react --json",
         npm_info: "npm info lodash",
         npm_list: "npm list --depth=0",
+        npm_list_json: "npm list --json",
+        npm_list_all: "npm list --all",
         npm_ls: "npm ls",
         npm_test: "npm test",
         npm_audit: "npm audit",
+        npm_audit_json: "npm audit --json",
         npm_outdated: "npm outdated",
         npm_explain: "npm explain lodash",
         npm_why: "npm why lodash",
@@ -271,12 +454,16 @@ mod tests {
         npx_version: "npx --version",
         npx_tsc_noemit: "npx tsc --noEmit",
         pnpm_list: "pnpm list",
+        pnpm_list_json: "pnpm list --json",
+        pnpm_list_depth: "pnpm list --depth 0",
         pnpm_why: "pnpm why lodash",
         pnpm_audit: "pnpm audit",
         pnpm_outdated: "pnpm outdated",
         pnpm_version: "pnpm --version",
         bun_version: "bun --version",
         bun_test: "bun test",
+        bun_test_bail: "bun test --bail",
+        bun_test_timeout: "bun test --timeout 5000",
         bun_pm_ls: "bun pm ls",
         bun_pm_hash: "bun pm hash",
         bun_pm_cache: "bun pm cache",
@@ -286,10 +473,12 @@ mod tests {
         bun_x_tsc_noemit: "bun x tsc --noEmit",
         deno_version: "deno --version",
         deno_info: "deno info",
+        deno_info_json: "deno info --json",
         deno_doc: "deno doc mod.ts",
         deno_lint: "deno lint",
         deno_check: "deno check main.ts",
         deno_test: "deno test",
+        deno_test_quiet: "deno test --quiet",
         deno_fmt_check: "deno fmt --check",
         nvm_ls: "nvm ls",
         nvm_list: "nvm list",
@@ -297,11 +486,13 @@ mod tests {
         nvm_which: "nvm which 18",
         nvm_version: "nvm version",
         nvm_ls_remote: "nvm ls-remote",
+        nvm_ls_remote_lts: "nvm ls-remote --lts",
         fnm_list: "fnm list",
         fnm_current: "fnm current",
         fnm_default: "fnm default",
         fnm_version: "fnm --version",
         volta_list: "volta list",
+        volta_list_current: "volta list --current",
         volta_which: "volta which node",
         volta_version: "volta --version",
         bunx_eslint: "bunx eslint src/",
@@ -319,11 +510,14 @@ mod tests {
         yarn_add_denied: "yarn add react",
         yarn_remove_denied: "yarn remove lodash",
         yarn_upgrade_denied: "yarn upgrade",
+        yarn_list_unknown_denied: "yarn list --unknown",
         npm_install_denied: "npm install react",
         npm_uninstall_denied: "npm uninstall lodash",
         npm_run_build_denied: "npm run build",
         npm_run_start_denied: "npm run start",
         npm_config_set_denied: "npm config set registry https://example.com",
+        npm_list_unknown_denied: "npm list --unknown",
+        npm_audit_unknown_denied: "npm audit --unknown",
         npx_react_scripts_denied: "npx react-scripts start",
         npx_cowsay_denied: "npx cowsay hello",
         bare_npx_denied: "npx",
@@ -332,21 +526,27 @@ mod tests {
         pnpm_install_denied: "pnpm install",
         pnpm_add_denied: "pnpm add react",
         pnpm_run_denied: "pnpm run build",
+        pnpm_list_unknown_denied: "pnpm list --unknown",
         bun_x_tsc_denied: "bun x tsc",
         bun_x_cowsay_denied: "bun x cowsay hello",
         bun_install_denied: "bun install",
         bun_run_denied: "bun run build",
         bun_add_denied: "bun add react",
+        bun_test_unknown_denied: "bun test --unknown",
         deno_fmt_denied: "deno fmt",
         deno_run_denied: "deno run main.ts",
         deno_install_denied: "deno install",
         deno_compile_denied: "deno compile main.ts",
+        deno_test_unknown_denied: "deno test --unknown",
         nvm_install_denied: "nvm install 18",
         nvm_use_denied: "nvm use 18",
+        nvm_ls_unknown_denied: "nvm ls --unknown",
         fnm_install_denied: "fnm install 18",
         fnm_use_denied: "fnm use 18",
+        fnm_list_unknown_denied: "fnm list --unknown",
         volta_install_denied: "volta install node@18",
         volta_pin_denied: "volta pin node@18",
+        volta_list_unknown_denied: "volta list --unknown",
         bunx_tsc_without_noemit_denied: "bunx tsc",
         bunx_tsc_with_other_flags_denied: "bunx tsc --pretty",
         bunx_cowsay_denied: "bunx cowsay hello",

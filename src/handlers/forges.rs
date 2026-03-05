@@ -1,4 +1,182 @@
 use crate::parse::{FlagCheck, Segment, Token, WordSet};
+use crate::policy::{self, FlagPolicy};
+
+static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--comments", "--draft", "--web",
+    ]),
+    standalone_short: b"qw",
+    valued: WordSet::new(&[
+        "--app", "--assignee", "--author", "--base", "--head",
+        "--jq", "--json", "--label", "--limit", "--milestone",
+        "--repo", "--search", "--state", "--template",
+    ]),
+    valued_short: b"BHLRS",
+    bare: true,
+    max_positional: None,
+};
+
+static GH_VIEW_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--comments", "--web",
+    ]),
+    standalone_short: b"cqw",
+    valued: WordSet::new(&[
+        "--jq", "--json", "--repo", "--template",
+    ]),
+    valued_short: b"R",
+    bare: false,
+    max_positional: None,
+};
+
+static GH_DIFF_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--name-only", "--patch", "--web",
+    ]),
+    standalone_short: b"w",
+    valued: WordSet::new(&[
+        "--color", "--repo",
+    ]),
+    valued_short: b"R",
+    bare: false,
+    max_positional: None,
+};
+
+static GH_CHECKS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--fail-fast", "--required", "--watch", "--web",
+    ]),
+    standalone_short: b"w",
+    valued: WordSet::new(&[
+        "--interval", "--jq", "--json", "--repo", "--template",
+    ]),
+    valued_short: b"iR",
+    bare: false,
+    max_positional: None,
+};
+
+static GH_STATUS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--exit-status", "--log", "--log-failed", "--web",
+    ]),
+    standalone_short: b"w",
+    valued: WordSet::new(&[
+        "--jq", "--json", "--repo", "--template",
+    ]),
+    valued_short: b"R",
+    bare: false,
+    max_positional: None,
+};
+
+static GH_RUN_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"q",
+    valued: WordSet::new(&[
+        "--branch", "--commit", "--created", "--event",
+        "--jq", "--json", "--limit", "--repo",
+        "--status", "--template", "--user", "--workflow",
+    ]),
+    valued_short: b"bLRuw",
+    bare: true,
+    max_positional: None,
+};
+
+static GH_RUN_VIEW_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--exit-status", "--log", "--log-failed", "--verbose", "--web",
+    ]),
+    standalone_short: b"vw",
+    valued: WordSet::new(&[
+        "--attempt", "--job", "--jq", "--json", "--repo", "--template",
+    ]),
+    valued_short: b"jR",
+    bare: false,
+    max_positional: None,
+};
+
+static GH_RUN_WATCH_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--exit-status",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&[
+        "--interval", "--repo",
+    ]),
+    valued_short: b"iR",
+    bare: false,
+    max_positional: None,
+};
+
+static GH_RELEASE_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--exclude-drafts", "--exclude-pre-releases",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&[
+        "--jq", "--json", "--limit", "--order", "--repo", "--template",
+    ]),
+    valued_short: b"LR",
+    bare: true,
+    max_positional: None,
+};
+
+static GH_RELEASE_VIEW_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--web",
+    ]),
+    standalone_short: b"w",
+    valued: WordSet::new(&[
+        "--jq", "--json", "--repo", "--template",
+    ]),
+    valued_short: b"R",
+    bare: false,
+    max_positional: None,
+};
+
+static GH_SEARCH_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--archived", "--include-forks", "--web",
+    ]),
+    standalone_short: b"w",
+    valued: WordSet::new(&[
+        "--assignee", "--author", "--closed", "--committer",
+        "--created", "--filename", "--followers", "--forks",
+        "--good-first-issues", "--hash", "--help-wanted-issues",
+        "--include", "--interactions", "--jq", "--json",
+        "--label", "--language", "--license", "--limit",
+        "--match", "--mentions", "--merged", "--milestone",
+        "--no-assignee", "--number", "--order", "--owner",
+        "--parent", "--reactions", "--repo", "--review-requested",
+        "--reviewed-by", "--size", "--sort", "--stars",
+        "--state", "--team-review-requested", "--template",
+        "--topic", "--updated", "--visibility",
+    ]),
+    valued_short: b"LR",
+    bare: false,
+    max_positional: None,
+};
+
+static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"q",
+    valued: WordSet::new(&[
+        "--jq", "--json", "--limit", "--repo", "--template",
+    ]),
+    valued_short: b"LR",
+    bare: true,
+    max_positional: None,
+};
+
+static GH_SIMPLE_VIEW_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--web"]),
+    standalone_short: b"w",
+    valued: WordSet::new(&[
+        "--jq", "--json", "--repo", "--template",
+    ]),
+    valued_short: b"R",
+    bare: false,
+    max_positional: None,
+};
 
 static READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
     "attestation", "cache", "codespace", "extension", "gpg-key",
@@ -12,50 +190,39 @@ static READ_ONLY_ACTIONS: WordSet =
 static ALWAYS_SAFE_SUBCOMMANDS: WordSet =
     WordSet::new(&["--version", "search", "status"]);
 
-static AUTH_SAFE_ACTIONS: WordSet =
-    WordSet::new(&["status", "token"]);
-
 static GH_BROWSE: FlagCheck =
     FlagCheck::new(&["--no-browser"], &[]);
 
 static API_BODY_FLAGS: &[&str] = &["-f", "-F", "--field", "--raw-field", "--input"];
 
-static GLAB_READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
-    "ci", "cluster", "deploy-key", "gpg-key", "incident", "issue",
-    "iteration", "label", "milestone", "mr", "release", "repo",
-    "schedule", "snippet", "ssh-key", "stack", "variable",
-]);
+fn gh_action_policy(action: &str) -> &'static FlagPolicy {
+    match action {
+        "list" => &GH_LIST_POLICY,
+        "view" => &GH_VIEW_POLICY,
+        "diff" => &GH_DIFF_POLICY,
+        "checks" => &GH_CHECKS_POLICY,
+        "status" => &GH_STATUS_POLICY,
+        "verify" | "watch" => &GH_SIMPLE_VIEW_POLICY,
+        _ => &GH_SIMPLE_LIST_POLICY,
+    }
+}
 
-static GLAB_READ_ONLY_ACTIONS: WordSet =
-    WordSet::new(&["diff", "issues", "list", "status", "view"]);
+fn gh_run_action_policy(action: &str) -> &'static FlagPolicy {
+    match action {
+        "list" => &GH_RUN_LIST_POLICY,
+        "view" => &GH_RUN_VIEW_POLICY,
+        "watch" => &GH_RUN_WATCH_POLICY,
+        _ => &GH_SIMPLE_VIEW_POLICY,
+    }
+}
 
-static GLAB_ALWAYS_SAFE: WordSet =
-    WordSet::new(&["--version", "-v", "check-update", "version"]);
-
-static GLAB_AUTH_SAFE: WordSet =
-    WordSet::new(&["status"]);
-
-static TEA_READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
-    "b", "branch", "branches",
-    "i", "issue", "issues",
-    "label", "labels",
-    "milestone", "milestones", "ms",
-    "n", "notification", "notifications",
-    "org", "organization", "organizations",
-    "pr", "pull", "pulls",
-    "r", "release", "releases",
-    "repo", "repos",
-    "t", "time", "times",
-]);
-
-static TEA_READ_ONLY_ACTIONS: WordSet =
-    WordSet::new(&["list", "view"]);
-
-static TEA_ALWAYS_SAFE: WordSet =
-    WordSet::new(&["--version", "-v", "whoami"]);
-
-static TEA_LOGIN_SAFE: WordSet =
-    WordSet::new(&["list"]);
+fn gh_release_action_policy(action: &str) -> &'static FlagPolicy {
+    match action {
+        "list" => &GH_RELEASE_LIST_POLICY,
+        "view" => &GH_RELEASE_VIEW_POLICY,
+        _ => &GH_SIMPLE_LIST_POLICY,
+    }
+}
 
 pub fn is_safe_gh(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
@@ -63,16 +230,40 @@ pub fn is_safe_gh(tokens: &[Token]) -> bool {
     }
     let subcmd = &tokens[1];
 
-    if READ_ONLY_SUBCOMMANDS.contains(subcmd) {
-        return tokens.len() >= 3 && READ_ONLY_ACTIONS.contains(&tokens[2]);
+    if subcmd == "search" {
+        return tokens.len() >= 3 && policy::check(&tokens[2..], &GH_SEARCH_POLICY);
     }
 
-    if ALWAYS_SAFE_SUBCOMMANDS.contains(subcmd) {
-        return true;
+    if subcmd == "status" {
+        return policy::check(&tokens[1..], &GH_SIMPLE_LIST_POLICY);
+    }
+
+    if READ_ONLY_SUBCOMMANDS.contains(subcmd) {
+        if tokens.len() < 3 || !READ_ONLY_ACTIONS.contains(&tokens[2]) {
+            return false;
+        }
+        let action = tokens[2].as_str();
+        let policy = if subcmd == "run" {
+            gh_run_action_policy(action)
+        } else if subcmd == "release" {
+            gh_release_action_policy(action)
+        } else {
+            gh_action_policy(action)
+        };
+        return policy::check(&tokens[2..], policy);
     }
 
     if subcmd == "auth" {
-        return tokens.len() >= 3 && AUTH_SAFE_ACTIONS.contains(&tokens[2]);
+        if tokens.len() < 3 {
+            return false;
+        }
+        if tokens[2] == "status" {
+            return policy::check(&tokens[2..], &GH_SIMPLE_LIST_POLICY);
+        }
+        if tokens[2] == "token" {
+            return policy::check(&tokens[2..], &GH_SIMPLE_LIST_POLICY);
+        }
+        return false;
     }
 
     if subcmd == "browse" {
@@ -120,6 +311,86 @@ fn is_safe_gh_api(tokens: &[Token]) -> bool {
     true
 }
 
+static GLAB_READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
+    "ci", "cluster", "deploy-key", "gpg-key", "incident", "issue",
+    "iteration", "label", "milestone", "mr", "release", "repo",
+    "schedule", "snippet", "ssh-key", "stack", "variable",
+]);
+
+static GLAB_READ_ONLY_ACTIONS: WordSet =
+    WordSet::new(&["diff", "issues", "list", "status", "view"]);
+
+static GLAB_ALWAYS_SAFE: WordSet =
+    WordSet::new(&["--version", "-v", "check-update", "version"]);
+
+static GLAB_AUTH_SAFE: WordSet =
+    WordSet::new(&["status"]);
+
+static GLAB_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--closed", "--draft", "--merged",
+    ]),
+    standalone_short: b"AacdgMq",
+    valued: WordSet::new(&[
+        "--assignee", "--author", "--group", "--label",
+        "--milestone", "--not-label", "--order", "--output",
+        "--page", "--per-page", "--repo", "--reviewer",
+        "--search", "--sort", "--source-branch", "--state",
+        "--target-branch",
+    ]),
+    valued_short: b"aFglmoPpRrSst",
+    bare: true,
+    max_positional: None,
+};
+
+static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--comments", "--resolved", "--system-logs",
+        "--unresolved", "--web",
+    ]),
+    standalone_short: b"cpsw",
+    valued: WordSet::new(&[
+        "--output", "--page", "--per-page", "--repo",
+    ]),
+    valued_short: b"FPpR",
+    bare: false,
+    max_positional: None,
+};
+
+static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--raw",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&[
+        "--color", "--repo",
+    ]),
+    valued_short: b"R",
+    bare: false,
+    max_positional: None,
+};
+
+static GLAB_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"q",
+    valued: WordSet::new(&[
+        "--output", "--page", "--per-page", "--repo",
+    ]),
+    valued_short: b"FPpR",
+    bare: true,
+    max_positional: None,
+};
+
+fn glab_action_policy(action: &str) -> &'static FlagPolicy {
+    match action {
+        "list" | "issues" => &GLAB_LIST_POLICY,
+        "view" => &GLAB_VIEW_POLICY,
+        "diff" => &GLAB_DIFF_POLICY,
+        "status" => &GLAB_SIMPLE_POLICY,
+        _ => &GLAB_SIMPLE_POLICY,
+    }
+}
+
 pub fn is_safe_glab(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
@@ -127,15 +398,22 @@ pub fn is_safe_glab(tokens: &[Token]) -> bool {
     let subcmd = &tokens[1];
 
     if GLAB_READ_ONLY_SUBCOMMANDS.contains(subcmd) {
-        return tokens.len() >= 3 && GLAB_READ_ONLY_ACTIONS.contains(&tokens[2]);
+        if tokens.len() < 3 || !GLAB_READ_ONLY_ACTIONS.contains(&tokens[2]) {
+            return false;
+        }
+        let policy = glab_action_policy(tokens[2].as_str());
+        return policy::check(&tokens[2..], policy);
     }
 
     if GLAB_ALWAYS_SAFE.contains(subcmd) {
-        return true;
+        return tokens.len() == 2;
     }
 
     if subcmd == "auth" {
-        return tokens.len() >= 3 && GLAB_AUTH_SAFE.contains(&tokens[2]);
+        if tokens.len() < 3 || !GLAB_AUTH_SAFE.contains(&tokens[2]) {
+            return false;
+        }
+        return policy::check(&tokens[2..], &GLAB_SIMPLE_POLICY);
     }
 
     if subcmd == "api" {
@@ -144,6 +422,53 @@ pub fn is_safe_glab(tokens: &[Token]) -> bool {
 
     false
 }
+
+static TEA_READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
+    "b", "branch", "branches",
+    "i", "issue", "issues",
+    "label", "labels",
+    "milestone", "milestones", "ms",
+    "n", "notification", "notifications",
+    "org", "organization", "organizations",
+    "pr", "pull", "pulls",
+    "r", "release", "releases",
+    "repo", "repos",
+    "t", "time", "times",
+]);
+
+static TEA_READ_ONLY_ACTIONS: WordSet =
+    WordSet::new(&["list", "view"]);
+
+static TEA_ALWAYS_SAFE: WordSet =
+    WordSet::new(&["--version", "-v", "whoami"]);
+
+static TEA_LOGIN_SAFE: WordSet =
+    WordSet::new(&["list"]);
+
+static TEA_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[
+        "--fields", "--limit", "--login", "--output",
+        "--page", "--repo", "--state",
+    ]),
+    valued_short: b"flLoopRs",
+    bare: true,
+    max_positional: None,
+};
+
+static TEA_VIEW_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--comments",
+    ]),
+    standalone_short: b"c",
+    valued: WordSet::new(&[
+        "--login", "--output", "--repo",
+    ]),
+    valued_short: b"loR",
+    bare: false,
+    max_positional: None,
+};
 
 pub fn is_safe_tea(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
@@ -155,15 +480,26 @@ pub fn is_safe_tea(tokens: &[Token]) -> bool {
         if tokens.len() == 2 {
             return true;
         }
-        return TEA_READ_ONLY_ACTIONS.contains(&tokens[2]);
+        if !TEA_READ_ONLY_ACTIONS.contains(&tokens[2]) {
+            return false;
+        }
+        let policy = if tokens[2] == "view" {
+            &TEA_VIEW_POLICY
+        } else {
+            &TEA_LIST_POLICY
+        };
+        return policy::check(&tokens[2..], policy);
     }
 
     if TEA_ALWAYS_SAFE.contains(subcmd) {
-        return true;
+        return tokens.len() == 2;
     }
 
     if subcmd == "logins" || subcmd == "login" {
-        return tokens.len() >= 3 && TEA_LOGIN_SAFE.contains(&tokens[2]);
+        if tokens.len() < 3 || !TEA_LOGIN_SAFE.contains(&tokens[2]) {
+            return false;
+        }
+        return policy::check(&tokens[2..], &TEA_LIST_POLICY);
     }
 
     false
@@ -179,7 +515,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) 
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocBuilder, describe_flagcheck, wordset_items};
+    use crate::docs::{CommandDoc, DocBuilder, wordset_items};
     vec![
         CommandDoc::handler("gh",
             DocBuilder::new()
@@ -188,9 +524,9 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                     wordset_items(&READ_ONLY_ACTIONS)))
                 .section(format!("Always safe: {}.",
                     wordset_items(&ALWAYS_SAFE_SUBCOMMANDS)))
-                .section(format!("Guarded: auth ({} only), browse ({}), api (GET only, no body flags).",
-                    wordset_items(&AUTH_SAFE_ACTIONS),
-                    describe_flagcheck(&GH_BROWSE).trim_end_matches('.').to_lowercase()))
+                .section("Guarded: auth (status/token only), browse (--no-browser only), \
+                          api (GET only, no body flags).")
+                .section("Each action has an explicit flag allowlist.")
                 .build()),
         CommandDoc::handler("glab",
             DocBuilder::new()
@@ -199,8 +535,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                     wordset_items(&GLAB_READ_ONLY_ACTIONS)))
                 .section(format!("Always safe: {}.",
                     wordset_items(&GLAB_ALWAYS_SAFE)))
-                .section(format!("Guarded: auth ({} only), api (GET only, no body flags).",
-                    wordset_items(&GLAB_AUTH_SAFE)))
+                .section("Guarded: auth (status only), api (GET only, no body flags).")
+                .section("Each action has an explicit flag allowlist.")
                 .build()),
         CommandDoc::handler("tea",
             DocBuilder::new()
@@ -210,8 +546,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                     wordset_items(&TEA_READ_ONLY_ACTIONS)))
                 .section(format!("Always safe: {}.",
                     wordset_items(&TEA_ALWAYS_SAFE)))
-                .section(format!("Guarded: logins/login ({} only).",
-                    wordset_items(&TEA_LOGIN_SAFE)))
+                .section("Guarded: logins/login (list only).")
+                .section("Each action has an explicit flag allowlist.")
                 .build()),
     ]
 }
@@ -226,17 +562,48 @@ mod tests {
 
     safe! {
         pr_view: "gh pr view 123",
+        pr_view_json: "gh pr view 123 --json title,body",
+        pr_view_web: "gh pr view 123 --web",
+        pr_view_comments: "gh pr view 123 --comments",
         pr_list: "gh pr list",
+        pr_list_state: "gh pr list --state open",
+        pr_list_label: "gh pr list --label bug",
+        pr_list_author: "gh pr list --author user",
+        pr_list_json: "gh pr list --json number,title --jq '.[].title'",
+        pr_list_limit: "gh pr list --limit 50",
+        pr_list_search: "gh pr list --search 'is:draft'",
         pr_diff: "gh pr diff 123",
+        pr_diff_color: "gh pr diff 123 --color always",
+        pr_diff_name_only: "gh pr diff 123 --name-only",
         pr_checks: "gh pr checks 123",
+        pr_checks_watch: "gh pr checks 123 --watch",
+        pr_checks_required: "gh pr checks 123 --required",
         issue_view: "gh issue view 456",
         issue_list: "gh issue list",
+        issue_list_state: "gh issue list --state closed",
         auth_status: "gh auth status",
+        auth_token: "gh auth token",
         search_issues: "gh search issues foo",
+        search_issues_state: "gh search issues foo --state open",
+        search_issues_json: "gh search issues foo --json number,title",
         search_prs: "gh search prs bar",
+        search_repos: "gh search repos baz --language rust",
         run_view: "gh run view 789",
-        run_watch: "gh run watch 123 --repo owner/repo",
+        run_view_log: "gh run view 789 --log",
+        run_view_log_failed: "gh run view 789 --log-failed",
+        run_view_exit_status: "gh run view 789 --exit-status",
+        run_view_json: "gh run view 789 --json conclusion",
+        run_watch: "gh run watch 123",
+        run_watch_repo: "gh run watch 123 --repo owner/repo",
+        run_watch_exit: "gh run watch 123 --exit-status",
+        run_list: "gh run list",
+        run_list_workflow: "gh run list --workflow ci.yml",
+        run_list_branch: "gh run list --branch main",
+        run_list_status: "gh run list --status completed",
         release_list: "gh release list",
+        release_list_limit: "gh release list --limit 10",
+        release_view: "gh release view v1.0",
+        release_view_web: "gh release view v1.0 --web",
         label_list: "gh label list",
         codespace_list: "gh codespace list",
         variable_list: "gh variable list",
@@ -255,9 +622,18 @@ mod tests {
         api_xget_short: "gh api repos/o/r/pulls -XGET",
         gh_version: "gh --version",
         glab_mr_list: "glab mr list",
+        glab_mr_list_state: "glab mr list --state opened",
+        glab_mr_list_author: "glab mr list --author user",
+        glab_mr_list_label: "glab mr list --label bug",
+        glab_mr_list_output: "glab mr list --output json",
         glab_mr_view: "glab mr view 123",
+        glab_mr_view_web: "glab mr view 123 --web",
+        glab_mr_view_comments: "glab mr view 123 --comments",
         glab_mr_diff: "glab mr diff 123",
+        glab_mr_diff_color: "glab mr diff 123 --color always",
+        glab_mr_diff_raw: "glab mr diff 123 --raw",
         glab_issue_list: "glab issue list",
+        glab_issue_list_state: "glab issue list --state opened",
         glab_issue_view: "glab issue view 456",
         glab_ci_status: "glab ci status",
         glab_ci_list: "glab ci list",
@@ -275,7 +651,9 @@ mod tests {
         tea_issue_list: "tea issue list",
         tea_issues_list: "tea issues list",
         tea_issue_view: "tea issue view 1",
+        tea_issue_view_comments: "tea issue view 1 --comments",
         tea_pull_list: "tea pull list",
+        tea_pull_list_state: "tea pull list --state open",
         tea_pr_view: "tea pr view 1",
         tea_release_list: "tea release list",
         tea_repo_bare: "tea repo",
@@ -304,6 +682,14 @@ mod tests {
         api_xpatch_short_denied: "gh api repos/o/r/pulls -XPATCH",
         auth_login_denied: "gh auth login",
         bare_gh_denied: "gh",
+        gh_pr_list_unknown_denied: "gh pr list --unknown",
+        gh_pr_view_unknown_denied: "gh pr view 123 --unknown",
+        gh_pr_diff_unknown_denied: "gh pr diff 123 --unknown",
+        gh_issue_list_unknown_denied: "gh issue list --unknown",
+        gh_run_view_unknown_denied: "gh run view 789 --unknown",
+        gh_search_unknown_denied: "gh search issues foo --unknown",
+        gh_status_unknown_denied: "gh status --unknown",
+        gh_auth_status_unknown_denied: "gh auth status --unknown",
         glab_mr_create_denied: "glab mr create --title test",
         glab_mr_merge_denied: "glab mr merge 123",
         glab_issue_create_denied: "glab issue create --title test",
@@ -311,10 +697,19 @@ mod tests {
         glab_api_post_denied: "glab api projects/1/issues -X POST",
         glab_api_field_denied: "glab api projects/1/issues -f title=x",
         bare_glab_denied: "glab",
+        glab_mr_list_unknown_denied: "glab mr list --unknown",
+        glab_mr_view_unknown_denied: "glab mr view 123 --unknown",
+        glab_issue_list_unknown_denied: "glab issue list --unknown",
+        glab_version_with_extra_denied: "glab version --extra",
+        glab_check_update_with_extra_denied: "glab check-update --extra",
         tea_issue_create_denied: "tea issue create --title test",
         tea_pull_create_denied: "tea pull create",
         tea_login_add_denied: "tea login add",
         tea_logout_denied: "tea logout",
         bare_tea_denied: "tea",
+        tea_issue_list_unknown_denied: "tea issue list --unknown",
+        tea_issue_view_unknown_denied: "tea issue view 1 --unknown",
+        tea_login_list_unknown_denied: "tea login list --unknown",
+        tea_whoami_with_extra_denied: "tea whoami --extra",
     }
 }

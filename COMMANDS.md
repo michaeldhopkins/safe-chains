@@ -70,11 +70,7 @@ Subcommands: casks, cat, config, deps, desc, doctor, formulae, home, info, leave
 
 ### `bun`
 
-Subcommands: outdated, pm bin, pm cache, pm hash, pm ls, test.
-
-Flags: --version.
-
-x delegates to bunx logic.
+Subcommands: outdated, pm (bin/cache/hash/ls), test. x delegates to bunx logic. Each has an explicit flag allowlist.
 
 ### `bundle`
 
@@ -98,12 +94,7 @@ Bare invocation allowed.
 
 ### `cargo`
 
-Subcommands: audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project.
-
-Flags: --version.
-
-Guarded: fmt (Requires: --check), package (Requires: --list), publish (Requires: --dry-run. Denied: --force, --no-verify).
-+toolchain selectors (e.g. +nightly, +stable) are skipped.
+Subcommands: audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. Each has an explicit flag allowlist. Guarded: fmt (--check only), package (--list only), publish (--dry-run only, --force/--no-verify denied). +toolchain selectors (e.g. +nightly) are skipped.
 
 ### `cat`
 
@@ -203,11 +194,7 @@ Bare invocation allowed.
 
 ### `deno`
 
-Subcommands: check, doc, info, lint, test.
-
-Flags: --version.
-
-Guarded: fmt (requires --check).
+Subcommands: check, doc, info, lint, test. Guarded: fmt (requires --check). Each has an explicit flag allowlist.
 
 ### `df`
 
@@ -315,7 +302,7 @@ Bare invocation allowed.
 
 ### `fnm`
 
-Subcommands: current, default, list, ls-remote. Flags: --version.
+Subcommands: current, default, list, ls-remote. No extra flags allowed.
 
 ### `fold`
 
@@ -343,7 +330,9 @@ Subcommands attestation, cache, codespace, extension, gpg-key, issue, label, pr,
 
 Always safe: --version, search, status.
 
-Guarded: auth (status, token only), browse (requires: --no-browser), api (GET only, no body flags).
+Guarded: auth (status/token only), browse (--no-browser only), api (GET only, no body flags).
+
+Each action has an explicit flag allowlist.
 
 ### `git`
 
@@ -360,6 +349,8 @@ Subcommands ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label,
 Always safe: --version, -v, check-update, version.
 
 Guarded: auth (status only), api (GET only, no body flags).
+
+Each action has an explicit flag allowlist.
 
 ### `go`
 
@@ -571,11 +562,7 @@ Allowed standalone flags: --debug-syms, --defined-only, --demangle, --dynamic, -
 
 ### `npm`
 
-Subcommands: audit, doctor, explain, fund, info, list, ls, outdated, prefix, root, test, view, why.
-
-Flags: --version.
-
-Guarded: config (list/get only), run/run-script (test/test:* only).
+Subcommands: audit, config (list/get), doctor, explain, fund, info, list, ls, outdated, prefix, root, run/run-script (test only), test, view, why. Each has an explicit flag allowlist.
 
 ### `nproc`
 
@@ -603,7 +590,7 @@ Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -qu
 
 ### `nvm`
 
-Subcommands: current, list, ls, ls-remote, version, which. Flags: --version.
+Subcommands: current, list, ls, ls-remote, version, which. Minimal flags allowed.
 
 ### `od`
 
@@ -655,7 +642,7 @@ Allowed: -g (get/display settings only).
 
 ### `pnpm`
 
-Subcommands: audit, list, ls, outdated, why. Flags: --version.
+Subcommands: audit, list, ls, outdated, why. Each has an explicit flag allowlist.
 
 ### `poetry`
 
@@ -719,11 +706,7 @@ Allowed subcommands: get, monitor, print, show. Allowed flags: -4, -6, -n, -v. B
 
 ### `rustup`
 
-Subcommands: component list, doc, show, target list, toolchain list, which.
-
-Flags: --version.
-
-run <toolchain> delegates to inner command validation.
+Subcommands: doc, show, which. Multi-level: component list, target list, toolchain list. Each has an explicit flag allowlist. run <toolchain> delegates to inner command validation.
 
 ### `safe-chains`
 
@@ -833,6 +816,8 @@ Always safe: --version, -v, whoami.
 
 Guarded: logins/login (list only).
 
+Each action has an explicit flag allowlist.
+
 ### `test`
 
 Allowed: any arguments (test uses operators like -f, -d as conditionals, not flags).
@@ -927,7 +912,7 @@ Allowed valued flags: -c. Bare invocation allowed.
 
 ### `volta`
 
-Subcommands: list, which. Flags: --version.
+Subcommands: list, which. Flags: --current, --default, --format.
 
 ### `w`
 
@@ -995,11 +980,7 @@ Bare invocation allowed.
 
 ### `yarn`
 
-Subcommands: info, list, ls, why.
-
-Flags: --version.
-
-Also allowed: test, test:*.
+Subcommands: info, list, ls, test, test:*, why. Each has an explicit flag allowlist.
 
 ### `yq`
 
