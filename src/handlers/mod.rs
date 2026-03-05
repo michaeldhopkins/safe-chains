@@ -26,102 +26,6 @@ use crate::parse::{Segment, Token, WordSet};
 
 static MAGICK_SAFE: WordSet = WordSet::new(&["--help", "--version", "identify"]);
 
-#[derive(Clone, Copy, PartialEq, Eq)]
-pub(crate) enum SafeKind {
-    Bare,
-    AnyArgs,
-}
-
-use SafeKind::{AnyArgs, Bare};
-
-pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str, SafeKind)] = &[
-    ("true", "Return success exit code", Bare),
-    ("false", "Return failure exit code", Bare),
-
-    ("printenv", "Print environment variables", AnyArgs),
-    ("type", "Identify command type", AnyArgs),
-    ("whereis", "Locate binary, source, and man page", AnyArgs),
-    ("which", "Locate command", AnyArgs),
-    ("whoami", "Print current user", Bare),
-    ("date", "Display date and time", AnyArgs),
-    ("pwd", "Print working directory", AnyArgs),
-    ("cd", "Change directory", AnyArgs),
-    ("unset", "Unset environment variables", AnyArgs),
-
-    ("uname", "System information", AnyArgs),
-    ("nproc", "Print number of CPUs", AnyArgs),
-    ("uptime", "System uptime", AnyArgs),
-    ("id", "Print user/group IDs", AnyArgs),
-    ("groups", "Print group memberships", AnyArgs),
-    ("tty", "Print terminal name", AnyArgs),
-    ("locale", "Print locale info", AnyArgs),
-    ("cal", "Display calendar", AnyArgs),
-    ("sleep", "Pause execution", AnyArgs),
-    ("who", "Show logged-in users", AnyArgs),
-    ("w", "Show logged-in users and activity", AnyArgs),
-    ("last", "Show login history", AnyArgs),
-    ("lastlog", "Show last login for all users", AnyArgs),
-
-    ("ps", "List processes", AnyArgs),
-    ("top", "Process monitor", AnyArgs),
-    ("htop", "Interactive process viewer", AnyArgs),
-    ("iotop", "I/O usage monitor", AnyArgs),
-    ("procs", "Modern process viewer", AnyArgs),
-    ("dust", "Disk usage viewer", AnyArgs),
-    ("lsof", "List open files", AnyArgs),
-    ("pgrep", "Search for processes", AnyArgs),
-
-    ("jq", "JSON processor", AnyArgs),
-    ("base64", "Base64 encode/decode", AnyArgs),
-    ("xxd", "Hex dump", AnyArgs),
-    ("getconf", "Get system configuration values", AnyArgs),
-    ("uuidgen", "Generate UUID", AnyArgs),
-
-    ("md5sum", "MD5 checksum", AnyArgs),
-    ("md5", "MD5 checksum (macOS)", AnyArgs),
-    ("sha256sum", "SHA-256 checksum", AnyArgs),
-    ("shasum", "SHA checksum", AnyArgs),
-    ("sha1sum", "SHA-1 checksum", AnyArgs),
-    ("sha512sum", "SHA-512 checksum", AnyArgs),
-    ("cksum", "File checksum", AnyArgs),
-    ("b2sum", "BLAKE2 checksum", AnyArgs),
-    ("sum", "File checksum", AnyArgs),
-    ("strings", "Find printable strings in binary", AnyArgs),
-    ("hexdump", "Display file in hex", AnyArgs),
-    ("od", "Octal dump", AnyArgs),
-    ("size", "Object file section sizes", AnyArgs),
-
-    ("sw_vers", "macOS version info", AnyArgs),
-    ("mdls", "File metadata (macOS)", AnyArgs),
-    ("otool", "Object file tool (macOS)", AnyArgs),
-    ("nm", "List object file symbols", AnyArgs),
-    ("system_profiler", "macOS hardware/software info", AnyArgs),
-    ("ioreg", "macOS I/O Registry viewer", AnyArgs),
-    ("vm_stat", "Virtual memory statistics", AnyArgs),
-    ("mdfind", "Spotlight search (macOS)", AnyArgs),
-
-    ("dig", "DNS lookup", AnyArgs),
-    ("nslookup", "DNS lookup", AnyArgs),
-    ("host", "DNS lookup", AnyArgs),
-    ("whois", "Domain registration lookup", AnyArgs),
-    ("netstat", "Network connections and statistics", AnyArgs),
-    ("ss", "Socket statistics", AnyArgs),
-    ("ifconfig", "Network interface info", AnyArgs),
-    ("route", "Routing table", AnyArgs),
-
-    ("identify", "ImageMagick identify", AnyArgs),
-    ("shellcheck", "Shell script linter", AnyArgs),
-    ("cloc", "Count lines of code", AnyArgs),
-    ("tokei", "Code statistics", AnyArgs),
-    ("cucumber", "BDD test runner", AnyArgs),
-    ("branchdiff", "Branch diff tool", AnyArgs),
-    ("safe-chains", "Safe command checker", AnyArgs),
-];
-
-pub(crate) static SAFE_CMDS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    SAFE_CMD_ENTRIES.iter().map(|&(name, _, _)| name).collect()
-});
-
 pub(crate) fn is_safe_subcmd(
     tokens: &[Token],
     simple: &WordSet,
@@ -205,7 +109,7 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         .or_else(|| perl::dispatch(cmd, tokens, is_safe))
         .or_else(|| coreutils::dispatch(cmd, tokens, is_safe))
         .or_else(|| dispatch_magick(cmd, tokens))
-        .unwrap_or_else(|| SAFE_CMDS.contains(cmd))
+        .unwrap_or(false)
 }
 
 fn dispatch_magick(cmd: &str, tokens: &[Token]) -> Option<bool> {
@@ -246,6 +150,17 @@ const HANDLED_CMDS: &[&str] = &[
     "fd", "eza", "exa", "ls", "delta", "colordiff",
     "dirname", "basename", "realpath", "readlink",
     "file", "stat", "du", "df", "tree",
+    "true", "false",
+    "printenv", "type", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
+    "uname", "nproc", "uptime", "id", "groups", "tty", "locale", "cal", "sleep",
+    "who", "w", "last", "lastlog",
+    "ps", "top", "htop", "iotop", "procs", "dust", "lsof", "pgrep",
+    "jq", "base64", "xxd", "getconf", "uuidgen",
+    "md5sum", "md5", "sha256sum", "shasum", "sha1sum", "sha512sum",
+    "cksum", "b2sum", "sum", "strings", "hexdump", "od", "size",
+    "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat", "mdfind",
+    "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route",
+    "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "safe-chains",
 ];
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
@@ -280,44 +195,6 @@ mod tests {
     use super::*;
     use std::collections::HashSet;
 
-    #[test]
-    fn safe_cmd_entries_no_duplicates() {
-        let mut seen = HashSet::new();
-        for &(name, _, _) in SAFE_CMD_ENTRIES {
-            assert!(seen.insert(name), "duplicate SAFE_CMD_ENTRIES name: {name}");
-        }
-    }
-
-    #[test]
-    fn safe_cmd_entries_no_empty_descriptions() {
-        for &(name, desc, _) in SAFE_CMD_ENTRIES {
-            assert!(!desc.is_empty(), "empty description for SAFE_CMD_ENTRIES: {name}");
-        }
-    }
-
-    #[test]
-    fn safe_cmd_entries_no_overlap_with_handlers() {
-        let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
-        for &(name, _, _) in SAFE_CMD_ENTRIES {
-            assert!(
-                !handled.contains(name),
-                "{name} is in both SAFE_CMD_ENTRIES and dispatch — the dispatch handler shadows it"
-            );
-        }
-    }
-
-    #[test]
-    fn handled_cmds_matches_dispatch() {
-        let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
-        let safe: HashSet<&str> = SAFE_CMD_ENTRIES.iter().map(|&(n, _, _)| n).collect();
-        for name in &handled {
-            assert!(
-                !safe.contains(name),
-                "{name} is in both HANDLED_CMDS and SAFE_CMD_ENTRIES"
-            );
-        }
-    }
-
     const HELP_EXCLUDED: &[&str] = &[
         "arch",
         "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine",
@@ -333,6 +210,17 @@ mod tests {
         "fd", "eza", "exa", "ls", "delta", "colordiff",
         "dirname", "basename", "realpath", "readlink",
         "file", "stat", "du", "df", "tree",
+        "true", "false",
+        "printenv", "type", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
+        "uname", "nproc", "uptime", "id", "groups", "tty", "locale", "cal", "sleep",
+        "who", "w", "last", "lastlog",
+        "ps", "top", "htop", "iotop", "procs", "dust", "lsof", "pgrep",
+        "jq", "base64", "xxd", "getconf", "uuidgen",
+        "md5sum", "md5", "sha256sum", "shasum", "sha1sum", "sha512sum",
+        "cksum", "b2sum", "sum", "strings", "hexdump", "od", "size",
+        "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat", "mdfind",
+        "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route",
+        "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "safe-chains",
     ];
 
     #[test]

@@ -745,10 +745,24 @@ pub fn is_safe_bat(tokens: &[Token]) -> bool {
     policy::check(tokens, &BAT_POLICY)
 }
 
-static FD_EXEC_FLAGS: WordSet = WordSet::new(&["--exec", "--exec-batch", "-X", "-x"]);
+static FD_EXEC_LONG: WordSet = WordSet::new(&["--exec", "--exec-batch"]);
 
 pub fn is_safe_fd(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && !tokens[1..].iter().any(|t| FD_EXEC_FLAGS.contains(t))
+    if tokens.len() < 2 {
+        return false;
+    }
+    for t in &tokens[1..] {
+        if FD_EXEC_LONG.contains(t) {
+            return false;
+        }
+        if t.starts_with('-')
+            && !t.starts_with("--")
+            && t.as_bytes()[1..].iter().any(|&b| b == b'x' || b == b'X')
+        {
+            return false;
+        }
+    }
+    true
 }
 
 pub fn is_safe_tree(tokens: &[Token]) -> bool {
@@ -759,6 +773,43 @@ pub fn is_safe_file_cmd(tokens: &[Token]) -> bool {
     !has_flag(tokens, Some("-C"), Some("--compile"))
 }
 
+pub fn is_safe_date(tokens: &[Token]) -> bool {
+    !has_flag(tokens, Some("-s"), Some("--set"))
+}
+
+static ROUTE_SAFE_FLAGS: WordSet = WordSet::new(&["-4", "-6", "-n", "-v"]);
+
+static ROUTE_SAFE_SUBCMDS: WordSet = WordSet::new(&["get", "monitor", "print", "show"]);
+
+pub fn is_safe_route(tokens: &[Token]) -> bool {
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = &tokens[i];
+        if ROUTE_SAFE_FLAGS.contains(t) {
+            i += 1;
+            continue;
+        }
+        if ROUTE_SAFE_SUBCMDS.contains(t) {
+            return true;
+        }
+        return false;
+    }
+    true
+}
+
+static IFCONFIG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-L", "-a", "-l", "-s", "-v"]),
+    standalone_short: b"Lalsv",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(1),
+};
+
+pub fn is_safe_ifconfig(tokens: &[Token]) -> bool {
+    policy::check(tokens, &IFCONFIG_POLICY)
+}
+
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
     match cmd {
         "fd" => Some(is_safe_fd(tokens)),
@@ -767,6 +818,27 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
         "ls" | "eza" | "exa" | "delta" | "colordiff" => Some(true),
         "dirname" | "basename" | "realpath" | "readlink" => Some(true),
         "stat" | "du" | "df" => Some(true),
+        "date" => Some(is_safe_date(tokens)),
+        "true" | "false" => Some(true),
+        "printenv" | "type" | "whereis" | "which" | "whoami" => Some(true),
+        "pwd" | "cd" | "unset" => Some(true),
+        "uname" | "nproc" | "uptime" | "id" | "groups" => Some(true),
+        "tty" | "locale" | "cal" | "sleep" => Some(true),
+        "who" | "w" | "last" | "lastlog" => Some(true),
+        "ps" | "top" | "htop" | "iotop" | "procs" | "dust" => Some(true),
+        "lsof" | "pgrep" => Some(true),
+        "jq" | "base64" | "xxd" | "getconf" | "uuidgen" => Some(true),
+        "md5sum" | "md5" | "sha256sum" | "shasum" | "sha1sum" => Some(true),
+        "sha512sum" | "cksum" | "b2sum" | "sum" => Some(true),
+        "strings" | "hexdump" | "od" | "size" => Some(true),
+        "sw_vers" | "mdls" | "otool" | "nm" => Some(true),
+        "system_profiler" | "ioreg" | "vm_stat" | "mdfind" => Some(true),
+        "dig" | "nslookup" | "host" | "whois" => Some(true),
+        "netstat" | "ss" => Some(true),
+        "ifconfig" => Some(is_safe_ifconfig(tokens)),
+        "route" => Some(is_safe_route(tokens)),
+        "identify" | "shellcheck" | "cloc" | "tokei" => Some(true),
+        "cucumber" | "branchdiff" | "safe-chains" => Some(true),
         "grep" | "egrep" | "fgrep" => Some(is_safe_grep(tokens)),
         "rg" => Some(is_safe_rg(tokens)),
         "cat" => Some(is_safe_cat(tokens)),
@@ -869,6 +941,11 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             "Safe unless -o flag (write output to file)."),
         CommandDoc::handler("file",
             "Safe unless -C/--compile flag (write compiled magic file)."),
+        CommandDoc::handler("date",
+            "Safe unless -s/--set flag (set system date)."),
+        CommandDoc::handler("route",
+            "Allowed subcommands: get, monitor, print, show. Allowed flags: -4, -6, -n, -v. Bare invocation allowed."),
+        CommandDoc::handler("ifconfig", IFCONFIG_POLICY.describe()),
     ]
 }
 
@@ -1296,9 +1373,61 @@ mod tests {
         fd_exec_short_denied: "fd pattern -x rm",
         fd_exec_batch_denied: "fd -t f pattern --exec-batch rm",
         fd_exec_batch_short_denied: "fd pattern -X rm",
+        fd_exec_combined_denied: "fd -xH pattern",
+        fd_exec_batch_combined_denied: "fd -HX pattern",
         fd_bare_denied: "fd",
         tree_output_denied: "tree -o tree.txt",
         file_compile_denied: "file -C",
         file_compile_long_denied: "file --compile",
+    }
+
+    safe! {
+        date_bare: "date",
+        date_format: "date '+%Y-%m-%d'",
+        date_utc: "date -u",
+        date_reference: "date -r file.txt",
+    }
+
+    denied! {
+        date_set_denied: "date -s '2025-01-01'",
+        date_set_long_denied: "date --set='2025-01-01'",
+        date_set_long_space_denied: "date --set '2025-01-01'",
+    }
+
+    safe! {
+        route_bare: "route",
+        route_n: "route -n",
+        route_print: "route print",
+        route_get: "route get 8.8.8.8",
+        route_show: "route show",
+        route_monitor: "route monitor",
+        route_dash_v: "route -v",
+        route_n_get: "route -n get 8.8.8.8",
+        route_4_get: "route -4 get 8.8.8.8",
+        ifconfig_bare: "ifconfig",
+        ifconfig_iface: "ifconfig eth0",
+        ifconfig_lo: "ifconfig lo0",
+        ifconfig_all: "ifconfig -a",
+        ifconfig_short: "ifconfig -s",
+        ifconfig_verbose: "ifconfig -v",
+        ifconfig_list: "ifconfig -l",
+    }
+
+    denied! {
+        route_add_denied: "route add default 192.168.1.1",
+        route_del_denied: "route del default",
+        route_delete_denied: "route delete default",
+        route_change_denied: "route change default 192.168.1.1",
+        route_flush_denied: "route flush",
+        route_replace_denied: "route replace default via 192.168.1.1",
+        route_n_add_denied: "route -n add default 192.168.1.1",
+        route_unknown_subcmd_denied: "route foo",
+        ifconfig_up_denied: "ifconfig eth0 up",
+        ifconfig_down_denied: "ifconfig eth0 down",
+        ifconfig_set_ip_denied: "ifconfig eth0 192.168.1.1",
+        ifconfig_netmask_denied: "ifconfig eth0 192.168.1.1 netmask 255.255.255.0",
+        ifconfig_mtu_denied: "ifconfig eth0 mtu 1500",
+        ifconfig_promisc_denied: "ifconfig eth0 promisc",
+        ifconfig_unknown_flag_denied: "ifconfig --unknown",
     }
 }
