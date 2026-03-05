@@ -159,7 +159,7 @@ Allowed: -v, -V (check if command exists). Bare `command` and execution of other
 
 ### `composer`
 
-Subcommands: about, audit, check-platform-reqs, diagnose, fund, help, info, licenses, outdated, show, suggests. Flags: --version.
+Subcommands: about, audit, check-platform-reqs, diagnose, fund, help, info, licenses, outdated, show, suggests. Each has an explicit flag allowlist.
 
 ### `conda`
 
@@ -251,7 +251,7 @@ Subcommands: buildx --version, buildx inspect, buildx ls, buildx version, compos
 
 ### `dotnet`
 
-Subcommands: build, list, test. Flags: --info, --list-runtimes, --list-sdks, --version.
+Subcommands: build, list, test. Info flags: --info, --list-runtimes, --list-sdks. Each subcommand has an explicit flag allowlist.
 
 ### `du`
 
@@ -371,7 +371,7 @@ Guarded: auth (status only), api (GET only, no body flags).
 
 ### `go`
 
-Subcommands: build, doc, env, list, test, version, vet. Flags: --version.
+Subcommands: build, doc, env, list, test, version, vet. Each subcommand has an explicit flag allowlist. Denied: -exec (test), -toolexec (build/test/list/vet), -w/-u (env).
 
 ### `gradle / gradlew`
 
@@ -491,7 +491,7 @@ Requires: -archs, -detailed_info, -info, -verify_arch. Denied: -output.
 
 ### `llm`
 
-Subcommands: aliases, collections, logs, models, plugins, templates. Flags: --version.
+Subcommands: aliases, collections, logs, models, plugins, templates. Each has an explicit flag allowlist.
 
 ### `locale`
 
@@ -623,7 +623,7 @@ Bare invocation allowed.
 
 ### `ollama`
 
-Subcommands: list, ps, show. Flags: --version.
+Subcommands: list, ps, show. Each has an explicit flag allowlist.
 
 ### `otool`
 
@@ -807,7 +807,7 @@ Allowed standalone flags: --buildVersion, --productName, --productVersion, --pro
 
 ### `swift`
 
-Subcommands: build, package describe, package dump-package, package show-dependencies, test. Flags: --version.
+Subcommands: build, test, package describe, package dump-package, package show-dependencies. Each has an explicit flag allowlist.
 
 ### `sysctl`
 

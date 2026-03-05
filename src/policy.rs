@@ -60,7 +60,7 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
         }
 
         if let Some(flag) = t.as_str().split_once('=').map(|(f, _)| f) {
-            if flag.starts_with("--") && policy.valued.contains(flag) {
+            if policy.valued.contains(flag) {
                 i += 1;
                 continue;
             }
