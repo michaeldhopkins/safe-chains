@@ -35,31 +35,16 @@ pub(crate) enum SafeKind {
 use SafeKind::{AnyArgs, Bare};
 
 pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str, SafeKind)] = &[
-    ("grep", "Search file contents", AnyArgs),
-    ("rg", "Ripgrep search", AnyArgs),
     ("fd", "Find files", AnyArgs),
     ("bat", "Syntax-highlighted cat", AnyArgs),
     ("eza", "Modern ls replacement", AnyArgs),
     ("exa", "Modern ls replacement", AnyArgs),
 
-    ("head", "Print first lines", AnyArgs),
-    ("tail", "Print last lines", AnyArgs),
-    ("cat", "Print file contents", AnyArgs),
     ("ls", "List directory", AnyArgs),
-    ("wc", "Count lines/words/bytes", AnyArgs),
-    ("uniq", "Filter duplicate lines", AnyArgs),
-    ("tr", "Translate characters", AnyArgs),
-    ("cut", "Extract fields from lines", AnyArgs),
 
-    ("diff", "Compare files", AnyArgs),
     ("delta", "Syntax-highlighted diff viewer", AnyArgs),
     ("colordiff", "Colorized diff", AnyArgs),
-    ("comm", "Compare sorted files", AnyArgs),
-    ("paste", "Merge lines of files", AnyArgs),
 
-    ("tac", "Print file in reverse", AnyArgs),
-    ("rev", "Reverse lines", AnyArgs),
-    ("nl", "Number lines", AnyArgs),
     ("expand", "Convert tabs to spaces", AnyArgs),
     ("unexpand", "Convert spaces to tabs", AnyArgs),
     ("fold", "Wrap lines", AnyArgs),
@@ -315,6 +300,22 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
 
         "perl" => perl::is_safe_perl(tokens),
 
+        "grep" | "egrep" | "fgrep" => coreutils::is_safe_grep(tokens),
+        "rg" => coreutils::is_safe_rg(tokens),
+        "cat" => coreutils::is_safe_cat(tokens),
+        "head" => coreutils::is_safe_head(tokens),
+        "tail" => coreutils::is_safe_tail(tokens),
+        "wc" => coreutils::is_safe_wc(tokens),
+        "cut" => coreutils::is_safe_cut(tokens),
+        "tr" => coreutils::is_safe_tr(tokens),
+        "uniq" => coreutils::is_safe_uniq(tokens),
+        "diff" => coreutils::is_safe_diff(tokens),
+        "comm" => coreutils::is_safe_comm(tokens),
+        "paste" => coreutils::is_safe_paste(tokens),
+        "tac" => coreutils::is_safe_tac(tokens),
+        "rev" => coreutils::is_safe_rev(tokens),
+        "nl" => coreutils::is_safe_nl(tokens),
+
         "arch" => coreutils::is_safe_arch(tokens),
         "command" => coreutils::is_safe_command_builtin(tokens),
         "hostname" => coreutils::is_safe_hostname(tokens),
@@ -352,6 +353,9 @@ const HANDLED_CMDS: &[&str] = &[
     "networksetup", "launchctl", "diskutil", "security", "csrutil", "log",
     "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign", "spctl",
     "perl",
+    "grep", "egrep", "fgrep", "rg",
+    "cat", "head", "tail", "wc", "cut", "tr", "uniq",
+    "diff", "comm", "paste", "tac", "rev", "nl",
     "arch", "command", "hostname",
     "find", "sed", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
     "magick",
@@ -433,6 +437,9 @@ mod tests {
         "rustup", "find",
         "npx", "bunx",
         "docker", "podman",
+        "grep", "egrep", "fgrep", "rg",
+        "cat", "head", "tail", "wc", "cut", "tr", "uniq",
+        "diff", "comm", "paste", "tac", "rev", "nl",
         "awk", "gawk", "mawk", "nawk", "sed", "sort", "perl",
     ];
 

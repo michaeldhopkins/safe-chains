@@ -27,19 +27,15 @@ These commands are allowed with any arguments. All operations are read-only.
 | `bc` | Calculator |
 | `branchdiff` | Branch diff tool |
 | `cal` | Display calendar |
-| `cat` | Print file contents |
 | `cd` | Change directory |
 | `cksum` | File checksum |
 | `cloc` | Count lines of code |
 | `colordiff` | Colorized diff |
 | `column` | Format into columns |
-| `comm` | Compare sorted files |
 | `cucumber` | BDD test runner |
-| `cut` | Extract fields from lines |
 | `date` | Display date and time |
 | `delta` | Syntax-highlighted diff viewer |
 | `df` | Disk free space |
-| `diff` | Compare files |
 | `dig` | DNS lookup |
 | `dirname` | Strip filename from path |
 | `du` | Disk usage |
@@ -55,9 +51,7 @@ These commands are allowed with any arguments. All operations are read-only.
 | `fmt` | Reformat text |
 | `fold` | Wrap lines |
 | `getconf` | Get system configuration values |
-| `grep` | Search file contents |
 | `groups` | Print group memberships |
-| `head` | Print first lines |
 | `hexdump` | Display file in hex |
 | `host` | DNS lookup |
 | `htop` | Interactive process viewer |
@@ -78,14 +72,12 @@ These commands are allowed with any arguments. All operations are read-only.
 | `mdfind` | Spotlight search (macOS) |
 | `mdls` | File metadata (macOS) |
 | `netstat` | Network connections and statistics |
-| `nl` | Number lines |
 | `nm` | List object file symbols |
 | `nproc` | Print number of CPUs |
 | `nroff` | Text formatter |
 | `nslookup` | DNS lookup |
 | `od` | Octal dump |
 | `otool` | Object file tool (macOS) |
-| `paste` | Merge lines of files |
 | `pgrep` | Search for processes |
 | `printenv` | Print environment variables |
 | `printf` | Format and print text |
@@ -94,8 +86,6 @@ These commands are allowed with any arguments. All operations are read-only.
 | `pwd` | Print working directory |
 | `readlink` | Resolve symlink |
 | `realpath` | Resolve path |
-| `rev` | Reverse lines |
-| `rg` | Ripgrep search |
 | `route` | Routing table |
 | `safe-chains` | Safe command checker |
 | `seq` | Print number sequence |
@@ -112,24 +102,19 @@ These commands are allowed with any arguments. All operations are read-only.
 | `sum` | File checksum |
 | `sw_vers` | macOS version info |
 | `system_profiler` | macOS hardware/software info |
-| `tac` | Print file in reverse |
-| `tail` | Print last lines |
 | `test` | Evaluate conditional expression |
 | `tokei` | Code statistics |
 | `top` | Process monitor |
-| `tr` | Translate characters |
 | `tree` | Directory tree |
 | `tty` | Print terminal name |
 | `type` | Identify command type |
 | `uname` | System information |
 | `unexpand` | Convert spaces to tabs |
-| `uniq` | Filter duplicate lines |
 | `unset` | Unset environment variables |
 | `uptime` | System uptime |
 | `uuidgen` | Generate UUID |
 | `vm_stat` | Virtual memory statistics |
 | `w` | Show logged-in users and activity |
-| `wc` | Count lines/words/bytes |
 | `whereis` | Locate binary, source, and man page |
 | `which` | Locate command |
 | `who` | Show logged-in users |
@@ -193,6 +178,10 @@ Flags: --version.
 Guarded: fmt (Requires: --check), package (Requires: --list), publish (Requires: --dry-run. Denied: --force, --no-verify).
 +toolchain selectors (e.g. +nightly, +stable) are skipped.
 
+### `cat`
+
+Allowed standalone flags: --number, --number-nonblank, --show-all, --show-ends, --show-nonprinting, --show-tabs, --squeeze-blank, -A, -E, -T, -b, -e, -l, -n, -s, -t, -u, -v. Bare invocation allowed.
+
 ### `cmake`
 
 Allowed: --version, --system-information (single argument only).
@@ -200,6 +189,10 @@ Allowed: --version, --system-information (single argument only).
 ### `codesign`
 
 Requires: --display, --verify, -d, -v. Denied: --force, --remove-signature, --sign, -f, -s.
+
+### `comm`
+
+Allowed standalone flags: --check-order, --nocheck-order, --total, --zero-terminated, -1, -2, -3, -i, -z. Allowed valued flags: --output-delimiter.
 
 ### `command`
 
@@ -229,6 +222,10 @@ Allowed valued flags: --connect-timeout, --max-time, --write-out, -m, -w.
 
 Allowed methods (-X/--request): GET, HEAD, OPTIONS.
 
+### `cut`
+
+Allowed standalone flags: --complement, --only-delimited, --zero-terminated, -n, -s, -w, -z. Allowed valued flags: --bytes, --characters, --delimiter, --fields, --output-delimiter, -b, -c, -d, -f.
+
 ### `defaults`
 
 Subcommands: domains, export, find, read, read-type.
@@ -240,6 +237,10 @@ Subcommands: check, doc, info, lint, test.
 Flags: --version.
 
 Guarded: fmt (requires --check).
+
+### `diff`
+
+Allowed standalone flags: --brief, --ed, --expand-tabs, --ignore-all-space, --ignore-blank-lines, --ignore-case, --ignore-space-change, --ignore-tab-expansion, --left-column, --minimal, --new-file, --no-dereference, --no-ignore-file-name-case, --normal, --paginate, --rcs, --recursive, --report-identical-files, --show-c-function, --side-by-side, --speed-large-files, --strip-trailing-cr, --suppress-blank-empty, --suppress-common-lines, --text, --unidirectional-new-file, -B, -E, -N, -P, -T, -a, -b, -c, -d, -e, -f, -i, -l, -n, -p, -q, -r, -s, -t, -u, -w, -y. Allowed valued flags: --changed-group-format, --color, --context, --exclude, --exclude-from, --from-file, --ifdef, --ignore-matching-lines, --label, --line-format, --new-group-format, --new-line-format, --old-group-format, --old-line-format, --show-function-line, --starting-file, --tabsize, --to-file, --unchanged-group-format, --unchanged-line-format, --unified, --width, -C, -D, -F, -I, -L, -S, -U, -W, -X, -x.
 
 ### `diskutil`
 
@@ -301,6 +302,18 @@ Subcommands: build, doc, env, list, test, version, vet. Flags: --version.
 
 Subcommands: build, check, dependencies, properties, tasks, test. Flags: --version.
 
+### `grep`
+
+Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z. Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m.
+
+### `head`
+
+Allowed standalone flags: --quiet, --silent, --verbose, --zero-terminated, -q, -v, -z.
+
+Allowed valued flags: --bytes, --lines, -c, -n.
+
+Bare invocation allowed.
+
 ### `hostname`
 
 Flags: -A, -I, -d, -f, -i, -s.
@@ -353,6 +366,14 @@ Allowed: subcommands starting with -list, -get, -show, -print, plus -version and
 
 Skips priority flags (-n/--adjustment), then recursively validates the inner command.
 
+### `nl`
+
+Allowed standalone flags: --no-renumber, -p.
+
+Allowed valued flags: --body-numbering, --footer-numbering, --header-numbering, --join-blank-lines, --line-increment, --number-format, --number-separator, --number-width, --section-delimiter, --starting-line-number, -b, -d, -f, -h, -i, -l, -n, -s, -v, -w.
+
+Bare invocation allowed.
+
 ### `npm`
 
 Subcommands: audit, doctor, explain, fund, info, list, ls, outdated, prefix, root, test, view, why.
@@ -376,6 +397,14 @@ Subcommands: current, list, ls, ls-remote, version, which. Flags: --version.
 ### `ollama`
 
 Subcommands: list, ps, show. Flags: --version.
+
+### `paste`
+
+Allowed standalone flags: --serial, --zero-terminated, -s, -z.
+
+Allowed valued flags: --delimiters, -d.
+
+Bare invocation allowed.
 
 ### `perl`
 
@@ -417,6 +446,14 @@ Subcommands: help, root, shims, version, versions, which. Flags: --version.
 
 Subcommands: help, root, shims, version, versions, which. Flags: --version.
 
+### `rev`
+
+Bare invocation allowed.
+
+### `rg`
+
+Allowed standalone flags: --binary, --block-buffered, --byte-offset, --case-sensitive, --column, --count, --count-matches, --crlf, --debug, --files, --files-with-matches, --files-without-match, --fixed-strings, --follow, --glob-case-insensitive, --heading, --hidden, --ignore-case, --ignore-file-case-insensitive, --include-zero, --invert-match, --json, --line-buffered, --line-number, --line-regexp, --max-columns-preview, --mmap, --multiline, --multiline-dotall, --no-config, --no-filename, --no-heading, --no-ignore, --no-ignore-dot, --no-ignore-exclude, --no-ignore-files, --no-ignore-global, --no-ignore-messages, --no-ignore-parent, --no-ignore-vcs, --no-line-number, --no-messages, --no-mmap, --no-pcre2-unicode, --no-require-git, --no-unicode, --null, --null-data, --one-file-system, --only-matching, --passthru, --pcre2, --pcre2-version, --pretty, --quiet, --search-zip, --smart-case, --sort-files, --stats, --text, --trim, --type-list, --unicode, --unrestricted, --vimgrep, --with-filename, --word-regexp, -F, -H, -I, -L, -N, -P, -S, -U, -V, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -s, -u, -v, -w, -x, -z. Allowed valued flags: --after-context, --before-context, --color, --colors, --context, --context-separator, --dfa-size-limit, --encoding, --engine, --field-context-separator, --field-match-separator, --file, --glob, --iglob, --ignore-file, --max-columns, --max-count, --max-depth, --max-filesize, --path-separator, --regex-size-limit, --regexp, --replace, --sort, --sortr, --threads, --type, --type-add, --type-clear, --type-not, -A, -B, -C, -E, -M, -T, -e, -f, -g, -j, -m, -r, -t.
+
 ### `rustup`
 
 Subcommands: component list, doc, show, target list, toolchain list, which.
@@ -449,6 +486,22 @@ Subcommands: build, package describe, package dump-package, package show-depende
 
 Safe unless -w/--write flag or key=value assignment syntax.
 
+### `tac`
+
+Allowed standalone flags: --before, --regex, -b, -r.
+
+Allowed valued flags: --separator, -s.
+
+Bare invocation allowed.
+
+### `tail`
+
+Allowed standalone flags: --follow, --quiet, --retry, --silent, --verbose, --zero-terminated, -F, -f, -q, -r, -v, -z.
+
+Allowed valued flags: --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval, -b, -c, -n.
+
+Bare invocation allowed.
+
 ### `tea`
 
 Subcommands b, branch, branches, i, issue, issues, label, labels, milestone, milestones, ms, n, notification, notifications, org, organization, organizations, pr, pull, pulls, r, release, releases, repo, repos, t, time, times are allowed with actions: list, view. Bare subcommand (no action) is also safe.
@@ -465,6 +518,18 @@ Skips -p flag, then recursively validates the inner command.
 
 Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recursively validates the inner command.
 
+### `tr`
+
+Allowed standalone flags: --complement, --delete, --squeeze-repeats, --truncate-set1, -C, -c, -d, -s.
+
+### `uniq`
+
+Allowed standalone flags: --count, --ignore-case, --repeated, --unique, --zero-terminated, -D, -c, -d, -i, -u, -z.
+
+Allowed valued flags: --all-repeated, --check-chars, --group, --skip-chars, --skip-fields, -f, -s, -w.
+
+Bare invocation allowed. Max 1 positional arg (second would be output file).
+
 ### `uv`
 
 Subcommands: pip check, pip freeze, pip list, pip show, python list, tool list. Flags: --version.
@@ -472,6 +537,14 @@ Subcommands: pip check, pip freeze, pip list, pip show, python list, tool list. 
 ### `volta`
 
 Subcommands: list, which. Flags: --version.
+
+### `wc`
+
+Allowed standalone flags: --bytes, --chars, --lines, --max-line-length, --words, --zero-terminated, -L, -c, -l, -m, -w.
+
+Allowed valued flags: --files0-from.
+
+Bare invocation allowed.
 
 ### `xargs`
 
