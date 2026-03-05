@@ -548,7 +548,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("tea",
             DocBuilder::new()
                 .section(format!("Subcommands {} are allowed with actions: {}. \
-                    Bare subcommand (no action) is also safe.",
+                    Bare subcommand (no action) allowed.",
                     wordset_items(&TEA_READ_ONLY_SUBCOMMANDS),
                     wordset_items(&TEA_READ_ONLY_ACTIONS)))
                 .section(format!("Always safe: {}.",

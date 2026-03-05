@@ -806,7 +806,7 @@ Bare invocation allowed.
 
 ### `tea`
 
-Subcommands b, branch, branches, i, issue, issues, label, labels, milestone, milestones, ms, n, notification, notifications, org, organization, organizations, pr, pull, pulls, r, release, releases, repo, repos, t, time, times are allowed with actions: list, view. Bare subcommand (no action) is also safe.
+Subcommands b, branch, branches, i, issue, issues, label, labels, milestone, milestones, ms, n, notification, notifications, org, organization, organizations, pr, pull, pulls, r, release, releases, repo, repos, t, time, times are allowed with actions: list, view. Bare subcommand (no action) allowed.
 
 Always safe: --version, -v, whoami.
 
