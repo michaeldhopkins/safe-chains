@@ -78,11 +78,7 @@ x delegates to bunx logic.
 
 ### `bundle`
 
-Subcommands: check, info, list, show.
-
-Flags: --version.
-
-Guarded: exec (brakeman, cucumber, erb_lint, herb, rspec, standardrb only).
+Subcommands: check, info, list, show. Each has an explicit flag allowlist. Guarded: exec (brakeman, cucumber, erb_lint, herb, rspec, standardrb only).
 
 ### `bunx`
 
@@ -335,7 +331,7 @@ Bare invocation allowed.
 
 ### `gem`
 
-Subcommands: contents, dependency, environment, help, info, list, outdated, pristine, search, sources, specification, stale, which. Flags: --version.
+Subcommands: contents, dependency, environment, help, info, list, outdated, pristine, search, sources, specification, stale, which. Each has an explicit flag allowlist.
 
 ### `getconf`
 
@@ -375,7 +371,7 @@ Subcommands: build, doc, env, list, test, version, vet. Each subcommand has an e
 
 ### `gradle / gradlew`
 
-Subcommands: build, check, dependencies, properties, tasks, test. Flags: --version.
+Subcommands: build, check, dependencies, properties, tasks, test. Each has an explicit flag allowlist.
 
 ### `grep`
 
@@ -547,7 +543,7 @@ Subcommands: config list, config ls, current, doctor, env, list, ls, settings ge
 
 ### `mvn / mvnw`
 
-Subcommands: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify. Flags: --version, -v.
+Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify. Each has an explicit flag allowlist.
 
 ### `netstat`
 
@@ -707,7 +703,7 @@ Subcommands: help, root, shims, version, versions, which. Flags: --version.
 
 ### `rbenv`
 
-Subcommands: help, root, shims, version, versions, which. Flags: --version.
+Subcommands: help, root, shims, version, versions, which. No flags allowed beyond the subcommand.
 
 ### `readlink`
 
