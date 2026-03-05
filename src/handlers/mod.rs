@@ -88,12 +88,9 @@ pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str)] = &[
     ("pwd", "Print working directory"),
     ("tree", "Directory tree"),
     ("cd", "Change directory"),
-    ("command", "Run command or check existence"),
     ("unset", "Unset environment variables"),
 
-    ("hostname", "Print hostname"),
     ("uname", "System information"),
-    ("arch", "Print machine architecture"),
     ("nproc", "Print number of CPUs"),
     ("uptime", "System uptime"),
     ("id", "Print user/group IDs"),
@@ -194,10 +191,10 @@ static HELP_ELIGIBLE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     [
         "asdf",
         "brew", "bun", "bundle",
-        "cargo", "cmake", "codesign", "composer", "conda", "csrutil", "curl",
+        "cargo", "cmake", "codesign", "command", "composer", "conda", "csrutil", "curl",
         "defaults", "deno", "diskutil", "dotnet",
         "fnm",
-        "gem", "gh", "git", "glab", "go", "gradle", "gradlew",
+        "gem", "gh", "git", "glab", "go", "gradle", "gradlew", "hostname",
         "jj",
         "launchctl", "lipo", "llm", "log",
         "magick", "mise", "mvn", "mvnw",
@@ -310,6 +307,10 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
 
         "perl" => perl::is_safe_perl(tokens),
 
+        "arch" => coreutils::is_safe_arch(tokens),
+        "command" => coreutils::is_safe_command_builtin(tokens),
+        "hostname" => coreutils::is_safe_hostname(tokens),
+
         "find" => coreutils::is_safe_find(tokens, is_safe),
         "sed" => coreutils::is_safe_sed(tokens),
         "sort" => coreutils::is_safe_sort(tokens),
@@ -343,6 +344,7 @@ const HANDLED_CMDS: &[&str] = &[
     "networksetup", "launchctl", "diskutil", "security", "csrutil", "log",
     "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign", "spctl",
     "perl",
+    "arch", "command", "hostname",
     "find", "sed", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
     "magick",
 ];
@@ -418,6 +420,7 @@ mod tests {
     }
 
     const HELP_EXCLUDED: &[&str] = &[
+        "arch",
         "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine",
         "rustup", "find",
         "npx", "bunx",

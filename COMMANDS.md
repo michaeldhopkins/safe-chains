@@ -10,7 +10,6 @@ These commands are allowed with any arguments.
 
 | Command | Description |
 |---------|-------------|
-| `arch` | Print machine architecture |
 | `b2sum` | BLAKE2 checksum |
 | `base64` | Base64 encode/decode |
 | `basename` | Strip directory from path |
@@ -25,7 +24,6 @@ These commands are allowed with any arguments.
 | `colordiff` | Colorized diff |
 | `column` | Format into columns |
 | `comm` | Compare sorted files |
-| `command` | Run command or check existence |
 | `cucumber` | BDD test runner |
 | `cut` | Extract fields from lines |
 | `date` | Display date and time |
@@ -53,7 +51,6 @@ These commands are allowed with any arguments.
 | `head` | Print first lines |
 | `hexdump` | Display file in hex |
 | `host` | DNS lookup |
-| `hostname` | Print hostname |
 | `htop` | Interactive process viewer |
 | `iconv` | Convert character encoding |
 | `id` | Print user/group IDs |
@@ -136,6 +133,10 @@ These commands are allowed with any arguments.
 
 These commands are allowed with specific subcommands or flags.
 
+### `arch`
+
+Allowed: bare `arch` only (prints machine architecture). Flags denied (can execute commands under different architectures).
+
 ### `asdf`
 
 Subcommands: current, help, info, list, plugin list, plugin-list, plugin-list-all, version, which. Flags: --version.
@@ -192,6 +193,10 @@ Allowed: --version, --system-information (single argument only).
 ### `codesign`
 
 Requires: --display, --verify, -d, -v. Denied: --force, --remove-signature, --sign, -f, -s.
+
+### `command`
+
+Allowed: -v, -V (check if command exists). Bare `command` and execution of other commands denied.
 
 ### `composer`
 
@@ -288,6 +293,10 @@ Subcommands: build, doc, env, list, test, version, vet. Flags: --version.
 ### `gradle / gradlew`
 
 Subcommands: build, check, dependencies, properties, tasks, test. Flags: --version.
+
+### `hostname`
+
+Flags: -A, -I, -d, -f, -i, -s.
 
 ### `hyperfine`
 

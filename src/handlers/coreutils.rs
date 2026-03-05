@@ -143,9 +143,32 @@ pub fn is_safe_awk(tokens: &[Token]) -> bool {
     true
 }
 
+pub fn is_safe_arch(tokens: &[Token]) -> bool {
+    tokens.len() == 1
+}
+
+static HOSTNAME_DISPLAY: WordSet = WordSet::new(&["-A", "-I", "-d", "-f", "-i", "-s"]);
+
+pub fn is_safe_command_builtin(tokens: &[Token]) -> bool {
+    tokens.len() >= 3
+        && (tokens[1] == "-v" || tokens[1] == "-V")
+}
+
+pub fn is_safe_hostname(tokens: &[Token]) -> bool {
+    if tokens.len() == 1 {
+        return true;
+    }
+    tokens[1..].iter().all(|t| HOSTNAME_DISPLAY.contains(t))
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
+        CommandDoc::handler("arch",
+            "Allowed: bare `arch` only (prints machine architecture). Flags denied (can execute commands under different architectures)."),
+        CommandDoc::handler("command",
+            "Allowed: -v, -V (check if command exists). Bare `command` and execution of other commands denied."),
+        CommandDoc::wordset("hostname", &HOSTNAME_DISPLAY),
         CommandDoc::handler("find",
             "Safe unless dangerous flags: -delete, -ok, -okdir, -fls, -fprint, -fprint0, -fprintf. \
              -exec/-execdir allowed when the executed command is itself safe."),
@@ -171,6 +194,23 @@ mod tests {
     }
 
     safe! {
+        arch_bare: "arch",
+        arch_help: "arch --help",
+        arch_version: "arch --version",
+        command_help: "command --help",
+        command_version: "command --version",
+        command_v: "command -v git",
+        command_v_upper: "command -V git",
+        command_v_path: "command -v /usr/bin/git",
+        hostname_help: "hostname --help",
+        hostname_version: "hostname --version",
+        hostname_bare: "hostname",
+        hostname_fqdn: "hostname -f",
+        hostname_short: "hostname -s",
+        hostname_domain: "hostname -d",
+        hostname_ip: "hostname -i",
+        hostname_all_ip: "hostname -I",
+        hostname_all_addr: "hostname -A",
         find_name: "find . -name '*.rb'",
         find_type_name: "find . -type f -name '*.py'",
         find_maxdepth: "find /tmp -maxdepth 2",
@@ -217,6 +257,16 @@ mod tests {
     }
 
     denied! {
+        arch_exec_denied: "arch -x86_64 rm -rf /",
+        arch_flag_denied: "arch -arm64 echo hello",
+        arch_any_flag_denied: "arch -x86_64",
+        command_bare_denied: "command",
+        command_exec_denied: "command git status",
+        command_exec_rm_denied: "command rm -rf /",
+        command_only_flag_denied: "command -v",
+        hostname_set_denied: "hostname evil",
+        hostname_set_fqdn_denied: "hostname new.example.com",
+        hostname_flag_with_name_denied: "hostname -f evil",
         find_delete_denied: "find . -name '*.tmp' -delete",
         find_exec_rm: "find . -exec rm {} \\;",
         find_exec_rm_rf: "find . -exec rm -rf {} +",
