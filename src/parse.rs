@@ -56,32 +56,6 @@ const fn const_less(a: &[u8], b: &[u8]) -> bool {
     a.len() < b.len()
 }
 
-pub struct FlagCheck {
-    required: WordSet,
-    denied: WordSet,
-}
-
-impl FlagCheck {
-    pub const fn new(required: &'static [&'static str], denied: &'static [&'static str]) -> Self {
-        Self {
-            required: WordSet::new(required),
-            denied: WordSet::new(denied),
-        }
-    }
-
-    pub fn required(&self) -> &WordSet {
-        &self.required
-    }
-
-    pub fn denied(&self) -> &WordSet {
-        &self.denied
-    }
-
-    pub fn is_safe(&self, tokens: &[Token]) -> bool {
-        tokens.iter().any(|t| self.required.contains(t))
-            && !tokens.iter().any(|t| self.denied.contains(t))
-    }
-}
 
 impl CommandLine {
     pub fn new(s: impl Into<String>) -> Self {
@@ -1060,36 +1034,6 @@ mod tests {
             seg("ls -la").strip_fd_redirects(),
             seg("ls -la")
         );
-    }
-
-    #[test]
-    fn flag_check_required_present_no_denied() {
-        let fc = FlagCheck::new(&["--show"], &["--set"]);
-        assert!(fc.is_safe(&toks(&["--show"])));
-    }
-
-    #[test]
-    fn flag_check_required_absent() {
-        let fc = FlagCheck::new(&["--show"], &["--set"]);
-        assert!(!fc.is_safe(&toks(&["--verbose"])));
-    }
-
-    #[test]
-    fn flag_check_denied_present() {
-        let fc = FlagCheck::new(&["--show"], &["--set"]);
-        assert!(!fc.is_safe(&toks(&["--show", "--set", "key", "val"])));
-    }
-
-    #[test]
-    fn flag_check_empty_denied() {
-        let fc = FlagCheck::new(&["--check"], &[]);
-        assert!(fc.is_safe(&toks(&["--check", "--all"])));
-    }
-
-    #[test]
-    fn flag_check_empty_tokens() {
-        let fc = FlagCheck::new(&["--show"], &[]);
-        assert!(!fc.is_safe(&[]));
     }
 
     #[test]
