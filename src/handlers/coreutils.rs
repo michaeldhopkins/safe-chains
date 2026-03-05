@@ -810,35 +810,1237 @@ pub fn is_safe_ifconfig(tokens: &[Token]) -> bool {
     policy::check(tokens, &IFCONFIG_POLICY)
 }
 
+static BARE_ONLY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static LS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--almost-all", "--author", "--classify",
+        "--context", "--dereference", "--dereference-command-line",
+        "--dereference-command-line-symlink-to-dir", "--directory",
+        "--escape", "--file-type", "--full-time",
+        "--group-directories-first", "--hide-control-chars",
+        "--human-readable", "--indicator-style",
+        "--inode", "--kibibytes", "--literal", "--no-group",
+        "--numeric-uid-gid", "--quote-name", "--recursive",
+        "--reverse", "--show-control-chars", "--si", "--size",
+        "-1", "-A", "-B", "-C", "-F", "-G", "-H", "-L",
+        "-N", "-Q", "-R", "-S", "-U", "-X", "-Z",
+        "-a", "-c", "-d", "-f", "-g", "-h", "-i", "-k",
+        "-l", "-m", "-n", "-o", "-p", "-q", "-r", "-s",
+        "-t", "-u", "-v", "-x",
+    ]),
+    standalone_short: b"1ABCFGHLNQRSUXZacdfghiklmnopqrstuvx",
+    valued: WordSet::new(&[
+        "--block-size", "--color", "--format", "--hide",
+        "--hyperlink", "--ignore",
+        "--quoting-style", "--sort", "--tabsize", "--time",
+        "--time-style", "--width",
+        "-I", "-T", "-w",
+    ]),
+    valued_short: b"ITw",
+    bare: true,
+    max_positional: None,
+};
+
+static EZA_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--accessed", "--all", "--binary", "--blocks", "--blocksize",
+        "--bytes", "--changed", "--classify", "--color-scale", "--color-scale-mode",
+        "--context", "--created", "--dereference", "--extended", "--flags",
+        "--follow-symlinks", "--git", "--git-ignore", "--git-repos", "--git-repos-no-status",
+        "--group", "--group-directories-first", "--header", "--hyperlink", "--icons",
+        "--inode", "--links", "--list-dirs", "--long", "--modified",
+        "--mounts", "--no-filesize", "--no-git", "--no-icons", "--no-permissions",
+        "--no-quotes", "--no-time", "--no-user", "--numeric", "--octal-permissions",
+        "--oneline", "--only-dirs", "--only-files", "--recurse", "--reverse",
+        "--tree", "-1", "-@", "-A", "-B",
+        "-D", "-F", "-G", "-H", "-I",
+        "-M", "-R", "-S", "-T", "-U",
+        "-Z", "-a", "-b", "-d", "-f",
+        "-g", "-h", "-i", "-l", "-m",
+        "-r", "-s", "-u", "-x",
+    ]),
+    standalone_short: b"1@ABDFGHIMRSTUZabdfghilmrsux",
+    valued: WordSet::new(&[
+        "--color", "--colour", "--git-ignore-glob", "--grid-columns",
+        "--group-directories-first-dirs", "--ignore-glob", "--level",
+        "--smart-group", "--sort", "--time", "--time-style",
+        "--total-size", "--width",
+        "-L", "-X", "-t", "-w",
+    ]),
+    valued_short: b"LXtw",
+    bare: true,
+    max_positional: None,
+};
+
+static DELTA_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--blame-code-style", "--blame-palette",
+        "--color-only", "--dark", "--diff-highlight",
+        "--diff-so-fancy", "--hyperlinks", "--keep-plus-minus-markers",
+        "--light", "--line-numbers", "--list-languages",
+        "--list-syntax-themes", "--navigate", "--no-gitconfig",
+        "--raw", "--relative-paths", "--show-config",
+        "--show-syntax-themes", "--side-by-side",
+        "-n", "-s",
+    ]),
+    standalone_short: b"ns",
+    valued: WordSet::new(&[
+        "--commit-decoration-style", "--commit-style", "--config",
+        "--diff-stat-align-width", "--features", "--file-added-label",
+        "--file-decoration-style", "--file-modified-label",
+        "--file-removed-label", "--file-renamed-label",
+        "--file-style", "--file-transformation",
+        "--hunk-header-decoration-style", "--hunk-header-file-style",
+        "--hunk-header-line-number-style", "--hunk-header-style",
+        "--hunk-label", "--inline-hint-style",
+        "--inspect-raw-lines", "--line-buffer-size",
+        "--line-fill-method", "--line-numbers-left-format",
+        "--line-numbers-left-style", "--line-numbers-minus-style",
+        "--line-numbers-plus-style", "--line-numbers-right-format",
+        "--line-numbers-right-style", "--line-numbers-zero-style",
+        "--map-styles", "--max-line-distance", "--max-line-length",
+        "--merge-conflict-begin-symbol", "--merge-conflict-end-symbol",
+        "--merge-conflict-ours-diff-header-decoration-style",
+        "--merge-conflict-ours-diff-header-style",
+        "--merge-conflict-theirs-diff-header-decoration-style",
+        "--merge-conflict-theirs-diff-header-style",
+        "--minus-emph-style", "--minus-empty-line-marker-style",
+        "--minus-non-emph-style", "--minus-style",
+        "--paging", "--plus-emph-style",
+        "--plus-empty-line-marker-style", "--plus-non-emph-style",
+        "--plus-style", "--syntax-theme", "--tabs",
+        "--true-color", "--whitespace-error-style", "--width",
+        "-w",
+    ]),
+    valued_short: b"w",
+    bare: true,
+    max_positional: None,
+};
+
+static COLORDIFF_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--brief", "--ed", "--expand-tabs", "--initial-tab",
+        "--left-column", "--minimal", "--normal",
+        "--paginate", "--rcs", "--report-identical-files",
+        "--side-by-side", "--speed-large-files",
+        "--strip-trailing-cr", "--suppress-blank-empty",
+        "--suppress-common-lines", "--text",
+        "-B", "-E", "-N", "-P", "-T", "-Z",
+        "-a", "-b", "-c", "-d", "-e", "-i", "-l", "-n",
+        "-p", "-q", "-r", "-s", "-t", "-u", "-v", "-w", "-y",
+    ]),
+    standalone_short: b"BENPTZabcdefilnpqrstuvwy",
+    valued: WordSet::new(&[
+        "--changed-group-format", "--color", "--context",
+        "--from-file", "--horizon-lines", "--ifdef",
+        "--ignore-matching-lines", "--label", "--line-format",
+        "--new-group-format", "--new-line-format",
+        "--old-group-format", "--old-line-format",
+        "--show-function-line", "--starting-file",
+        "--tabsize", "--to-file", "--unchanged-group-format",
+        "--unchanged-line-format", "--unified", "--width",
+        "-C", "-D", "-F", "-I", "-L", "-S", "-U", "-W",
+    ]),
+    valued_short: b"CDFILSUW",
+    bare: false,
+    max_positional: None,
+};
+
+static DIRNAME_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--zero", "-z"]),
+    standalone_short: b"z",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+static BASENAME_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--multiple", "--zero", "-a", "-z"]),
+    standalone_short: b"az",
+    valued: WordSet::new(&["--suffix", "-s"]),
+    valued_short: b"s",
+    bare: false,
+    max_positional: None,
+};
+
+static REALPATH_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--canonicalize-existing", "--canonicalize-missing",
+        "--logical", "--no-symlinks", "--physical", "--quiet",
+        "--strip", "--zero",
+        "-L", "-P", "-e", "-m", "-q", "-s", "-z",
+    ]),
+    standalone_short: b"LPemqsz",
+    valued: WordSet::new(&["--relative-base", "--relative-to"]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+static READLINK_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--canonicalize", "--canonicalize-existing",
+        "--canonicalize-missing", "--no-newline", "--verbose", "--zero",
+        "-e", "-f", "-m", "-n", "-v", "-z",
+    ]),
+    standalone_short: b"efmnvz",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+static STAT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--dereference", "--file-system", "--terse",
+        "-F", "-L", "-l", "-n", "-q", "-r", "-s", "-x",
+    ]),
+    standalone_short: b"FLlnqrsx",
+    valued: WordSet::new(&[
+        "--format", "--printf",
+        "-c", "-f", "-t",
+    ]),
+    valued_short: b"cft",
+    bare: false,
+    max_positional: None,
+};
+
+static DU_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--apparent-size", "--bytes", "--count-links",
+        "--dereference", "--dereference-args", "--human-readable",
+        "--inodes", "--no-dereference", "--null",
+        "--one-file-system", "--separate-dirs", "--si",
+        "--summarize", "--total",
+        "-0", "-D", "-H", "-L", "-P", "-S", "-a", "-b",
+        "-c", "-h", "-k", "-l", "-m", "-s", "-x",
+    ]),
+    standalone_short: b"0DHLPSabchklmsx",
+    valued: WordSet::new(&[
+        "--block-size", "--exclude", "--files0-from",
+        "--max-depth", "--threshold", "--time",
+        "--time-style",
+        "-B", "-d", "-t",
+    ]),
+    valued_short: b"Bdt",
+    bare: true,
+    max_positional: None,
+};
+
+static DF_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--human-readable", "--inodes", "--local",
+        "--no-sync", "--portability", "--print-type",
+        "--si", "--sync", "--total",
+        "-H", "-P", "-T", "-a", "-h", "-i", "-k", "-l",
+    ]),
+    standalone_short: b"HPTahikl",
+    valued: WordSet::new(&[
+        "--block-size", "--exclude-type", "--output", "--type",
+        "-B", "-t", "-x",
+    ]),
+    valued_short: b"Btx",
+    bare: true,
+    max_positional: None,
+};
+
+static PWD_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-L", "-P"]),
+    standalone_short: b"LP",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static CD_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-L", "-P", "-e"]),
+    standalone_short: b"LPe",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(1),
+};
+
+static UNSET_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-f", "-n", "-v"]),
+    standalone_short: b"fnv",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static PRINTENV_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--null", "-0"]),
+    standalone_short: b"0",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static TYPE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-P", "-a", "-f", "-p", "-t"]),
+    standalone_short: b"Pafpt",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+static WHEREIS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-b", "-l", "-m", "-s", "-u"]),
+    standalone_short: b"blmsu",
+    valued: WordSet::new(&["-B", "-M", "-S", "-f"]),
+    valued_short: b"BMSf",
+    bare: false,
+    max_positional: None,
+};
+
+static WHICH_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--all", "-a", "-s"]),
+    standalone_short: b"as",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+static UNAME_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--kernel-name", "--kernel-release",
+        "--kernel-version", "--machine", "--nodename",
+        "--operating-system", "--processor",
+        "-a", "-m", "-n", "-o", "-p", "-r", "-s", "-v",
+    ]),
+    standalone_short: b"amnoprsv",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static NPROC_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--all"]),
+    standalone_short: b"",
+    valued: WordSet::new(&["--ignore"]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static UPTIME_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--pretty", "--since", "-p", "-s"]),
+    standalone_short: b"ps",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static ID_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--context", "--group", "--groups", "--name",
+        "--real", "--user", "--zero",
+        "-G", "-Z", "-g", "-n", "-p", "-r", "-u", "-z",
+    ]),
+    standalone_short: b"GZgnpruz",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(1),
+};
+
+static GROUPS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static TTY_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--quiet", "--silent", "-s"]),
+    standalone_short: b"s",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static LOCALE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all-locales", "--category-name", "--charmaps",
+        "--keyword-name", "--verbose",
+        "-a", "-c", "-k", "-m", "-v",
+    ]),
+    standalone_short: b"ackmv",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static CAL_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--monday", "--sunday", "--three", "--year",
+        "-1", "-3", "-h", "-j", "-m", "-s", "-w", "-y",
+    ]),
+    standalone_short: b"13hjmswy",
+    valued: WordSet::new(&[
+        "-A", "-B", "-d", "-n",
+    ]),
+    valued_short: b"ABdn",
+    bare: true,
+    max_positional: Some(2),
+};
+
+static SLEEP_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+static WHO_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--boot", "--count", "--dead", "--heading",
+        "--login", "--lookup", "--mesg", "--message", "--process",
+        "--runlevel", "--short", "--time", "--users", "--writable",
+        "-H", "-T", "-a", "-b", "-d",
+        "-l", "-m", "-p", "-q", "-r",
+        "-s", "-t", "-u", "-w",
+    ]),
+    standalone_short: b"HTSabdlmpqrstuw",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(2),
+};
+
+static W_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--from", "--ip-addr", "--no-current", "--no-header",
+        "--old-style", "--short",
+        "-f", "-h", "-i", "-o", "-s", "-u",
+    ]),
+    standalone_short: b"fhiosu",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(1),
+};
+
+static LAST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--dns", "--fullnames", "--fulltimes", "--hostlast",
+        "--ip", "--nohostname", "--system", "--time-format",
+        "-F", "-R", "-a", "-d", "-i", "-w", "-x",
+    ]),
+    standalone_short: b"0123456789FRadiwx",
+    valued: WordSet::new(&[
+        "--limit", "--present", "--since", "--time-format", "--until",
+        "-f", "-n", "-p", "-s", "-t",
+    ]),
+    valued_short: b"fnpst",
+    bare: true,
+    max_positional: None,
+};
+
+static LASTLOG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&["--before", "--time", "--user", "-b", "-t", "-u"]),
+    valued_short: b"btu",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static PS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--cumulative", "--deselect", "--forest", "--headers", "--info",
+        "--no-headers", "-A", "-C", "-H", "-L",
+        "-M", "-N", "-S", "-T", "-Z",
+        "-a", "-c", "-d", "-e", "-f",
+        "-j", "-l", "-m", "-r", "-v",
+        "-w", "-x",
+    ]),
+    standalone_short: b"ACHLMNSTZacdefjlmrvwx",
+    valued: WordSet::new(&[
+        "--cols", "--columns", "--format", "--group", "--pid",
+        "--ppid", "--rows", "--sid", "--sort", "--tty", "--user",
+        "--width",
+        "-G", "-O", "-U", "-g", "-n", "-o", "-p", "-s",
+        "-t", "-u",
+    ]),
+    valued_short: b"GOUnopstug",
+    bare: true,
+    max_positional: None,
+};
+
+static TOP_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-1", "-B", "-E", "-H", "-S", "-b", "-c", "-e",
+        "-i",
+    ]),
+    standalone_short: b"1BEHSbcei",
+    valued: WordSet::new(&[
+        "-F", "-O", "-U", "-d", "-f",
+        "-l", "-n", "-o", "-p", "-s", "-u", "-w",
+    ]),
+    valued_short: b"FOUdflnopsuw",
+    bare: true,
+    max_positional: None,
+};
+
+static HTOP_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--no-color", "--no-mouse", "--no-unicode", "--tree",
+        "-C", "-H", "-M", "-t",
+    ]),
+    standalone_short: b"CHMt",
+    valued: WordSet::new(&[
+        "--delay", "--filter", "--highlight-changes",
+        "--pid", "--sort-key", "--user",
+        "-F", "-d", "-p", "-s", "-u",
+    ]),
+    valued_short: b"Fdpsu",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static IOTOP_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--accumulated", "--batch", "--kilobytes", "--only",
+        "--processes", "--quiet",
+        "-P", "-a", "-b", "-k", "-o", "-q", "-t",
+    ]),
+    standalone_short: b"Pabkoqt",
+    valued: WordSet::new(&[
+        "--delay", "--iter", "--pid", "--user",
+        "-d", "-n", "-p", "-u",
+    ]),
+    valued_short: b"dnpu",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static PROCS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--no-header", "--or", "--tree", "--watch-interval",
+        "-l", "-t",
+    ]),
+    standalone_short: b"lt",
+    valued: WordSet::new(&[
+        "--color", "--completion", "--config", "--gen-completion",
+        "--insert", "--only", "--pager", "--sorta", "--sortd",
+        "--theme",
+        "-i", "-w",
+    ]),
+    valued_short: b"iw",
+    bare: true,
+    max_positional: None,
+};
+
+static DUST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--bars-on-right", "--files0-from", "--ignore-all-in-file", "--invert-filter", "--no-colors",
+        "--no-percent-bars", "--only-dir", "--only-file", "--skip-total", "-D",
+        "-F", "-H", "-P", "-R", "-S",
+        "-b", "-c", "-f", "-i", "-p",
+        "-r", "-s",
+    ]),
+    standalone_short: b"DFHPbcfiprRsS",
+    valued: WordSet::new(&[
+        "--depth", "--exclude", "--filter", "--terminal_width",
+        "-M", "-X", "-d", "-e", "-n", "-t", "-v", "-w", "-z",
+    ]),
+    valued_short: b"MXdentvwz",
+    bare: true,
+    max_positional: None,
+};
+
+static LSOF_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-C", "-G", "-M", "-N", "-O", "-P", "-R",
+        "-U", "-V", "-X", "-b", "-h",
+        "-l", "-n", "-t", "-w", "-x",
+    ]),
+    standalone_short: b"CGMNOPRUVXbhlntwx",
+    valued: WordSet::new(&[
+        "-F", "-S", "-T", "-a", "-c", "-d", "-g",
+        "-i", "-k", "-o", "-p", "-r", "-s", "-u",
+    ]),
+    valued_short: b"FSTacdgikoprsug",
+    bare: true,
+    max_positional: None,
+};
+
+static PGREP_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--count", "--delimiter", "--full", "--inverse",
+        "--lightweight", "--list-full", "--list-name",
+        "--newest", "--oldest",
+        "-L", "-a", "-c", "-f", "-i", "-l", "-n",
+        "-o", "-v", "-w", "-x",
+    ]),
+    standalone_short: b"Lacfilnovwx",
+    valued: WordSet::new(&[
+        "--euid", "--group", "--parent", "--pgroup", "--pidfile",
+        "--session", "--terminal", "--uid", "-F", "-G",
+        "-P", "-U", "-d", "-g", "-s",
+        "-t", "-u",
+    ]),
+    valued_short: b"FGPdgstUu",
+    bare: false,
+    max_positional: None,
+};
+
+static JQ_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--ascii-output", "--color-output", "--compact-output", "--exit-status", "--join-output",
+        "--monochrome-output", "--null-input", "--raw-input", "--raw-output", "--raw-output0",
+        "--seq", "--slurp", "--sort-keys", "--tab", "-C",
+        "-M", "-R", "-S", "-c", "-e",
+        "-j", "-n", "-r", "-s",
+    ]),
+    standalone_short: b"CMRScegjnrs",
+    valued: WordSet::new(&[
+        "--arg", "--argjson", "--args", "--from-file",
+        "--indent", "--jsonargs", "--rawfile",
+        "--slurpfile", "-f",
+    ]),
+    valued_short: b"f",
+    bare: true,
+    max_positional: None,
+};
+
+static BASE64_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--decode", "--ignore-garbage",
+        "-D", "-d", "-i",
+    ]),
+    standalone_short: b"Ddi",
+    valued: WordSet::new(&["--wrap", "-b", "-w"]),
+    valued_short: b"bw",
+    bare: true,
+    max_positional: None,
+};
+
+static XXD_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--autoskip", "--bits", "--capitalize", "--decimal",
+        "--ebcdic", "--include", "--little-endian", "--plain",
+        "--postscript", "--revert", "--uppercase",
+        "-C", "-E", "-a", "-b", "-d", "-e", "-i", "-p",
+        "-r", "-u",
+    ]),
+    standalone_short: b"CEabdeipru",
+    valued: WordSet::new(&[
+        "--color", "--cols", "--groupsize", "--len",
+        "--name", "--offset", "--seek",
+        "-R", "-c", "-g", "-l", "-n", "-o", "-s",
+    ]),
+    valued_short: b"Rcglnos",
+    bare: true,
+    max_positional: None,
+};
+
+static GETCONF_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-a"]),
+    standalone_short: b"a",
+    valued: WordSet::new(&["-v"]),
+    valued_short: b"v",
+    bare: true,
+    max_positional: None,
+};
+
+static UUIDGEN_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--random", "--time", "-r", "-t"]),
+    standalone_short: b"rt",
+    valued: WordSet::new(&[
+        "--md5", "--name", "--namespace", "--sha1", "-N",
+        "-m", "-n", "-s",
+    ]),
+    valued_short: b"mnNs",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static GNU_HASH_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--binary", "--check", "--ignore-missing", "--quiet",
+        "--status", "--strict", "--tag", "--text", "--warn",
+        "--zero",
+        "-b", "-c", "-t", "-w", "-z",
+    ]),
+    standalone_short: b"bctwz",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static MD5_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-n", "-p", "-q", "-r", "-t"]),
+    standalone_short: b"npqrt",
+    valued: WordSet::new(&["-s"]),
+    valued_short: b"s",
+    bare: true,
+    max_positional: None,
+};
+
+static SHASUM_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--binary", "--check", "--portable", "--status",
+        "--strict", "--tag", "--text", "--warn",
+        "-0", "-b", "-c", "-p", "-s", "-t",
+    ]),
+    standalone_short: b"0bcpst",
+    valued: WordSet::new(&["--algorithm", "-a"]),
+    valued_short: b"a",
+    bare: true,
+    max_positional: None,
+};
+
+static CKSUM_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--base64", "--check", "--raw", "--strict",
+        "--tag", "--untagged", "--warn", "--zero",
+        "-c", "-w", "-z",
+    ]),
+    standalone_short: b"cwz",
+    valued: WordSet::new(&["--algorithm", "--length", "-a", "-l"]),
+    valued_short: b"al",
+    bare: true,
+    max_positional: None,
+};
+
+static B2SUM_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--binary", "--check", "--ignore-missing", "--quiet",
+        "--status", "--strict", "--tag", "--text", "--warn",
+        "--zero",
+        "-b", "-c", "-t", "-w", "-z",
+    ]),
+    standalone_short: b"bctwz",
+    valued: WordSet::new(&["--length", "-l"]),
+    valued_short: b"l",
+    bare: true,
+    max_positional: None,
+};
+
+static SUM_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--sysv", "-r", "-s"]),
+    standalone_short: b"rs",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static STRINGS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--include-all-whitespace", "--print-file-name",
+        "-a", "-f", "-w",
+    ]),
+    standalone_short: b"afw",
+    valued: WordSet::new(&[
+        "--bytes", "--encoding", "--output-separator",
+        "--radix", "--target",
+        "-T", "-e", "-n", "-o", "-s", "-t",
+    ]),
+    valued_short: b"Tenost",
+    bare: false,
+    max_positional: None,
+};
+
+static HEXDUMP_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-C", "-b", "-c", "-d", "-o", "-v", "-x",
+    ]),
+    standalone_short: b"Cbcdovx",
+    valued: WordSet::new(&[
+        "-L", "-e", "-f", "-n", "-s",
+    ]),
+    valued_short: b"Lefns",
+    bare: true,
+    max_positional: None,
+};
+
+static OD_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--output-duplicates", "--traditional",
+        "-b", "-c", "-d", "-f", "-i", "-l", "-o",
+        "-s", "-v", "-x",
+    ]),
+    standalone_short: b"bcdfilosvx",
+    valued: WordSet::new(&[
+        "--address-radix", "--endian", "--format",
+        "--read-bytes", "--skip-bytes", "--strings",
+        "--width",
+        "-A", "-N", "-S", "-j", "-t", "-w",
+    ]),
+    valued_short: b"ANSjtw",
+    bare: true,
+    max_positional: None,
+};
+
+static SIZE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--common", "--totals",
+        "-A", "-B", "-G", "-d", "-o", "-t", "-x",
+    ]),
+    standalone_short: b"ABGdotx",
+    valued: WordSet::new(&[
+        "--format", "--radix", "--target",
+    ]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+static SW_VERS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--buildVersion", "--productName",
+        "--productVersion", "--productVersionExtra",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static MDLS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--raw", "-r"]),
+    standalone_short: b"r",
+    valued: WordSet::new(&["--name", "--nullMarker", "-n"]),
+    valued_short: b"n",
+    bare: false,
+    max_positional: None,
+};
+
+static OTOOL_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-D", "-I", "-L", "-V", "-X", "-a", "-c", "-d",
+        "-f", "-h", "-l", "-o", "-r", "-t", "-v", "-x",
+    ]),
+    standalone_short: b"DILVXacdfhlortvx",
+    valued: WordSet::new(&["-p", "-s"]),
+    valued_short: b"ps",
+    bare: false,
+    max_positional: None,
+};
+
+static NM_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--debug-syms", "--defined-only", "--demangle",
+        "--dynamic", "--extern-only", "--line-numbers",
+        "--no-demangle", "--no-llvm-bc", "--no-sort",
+        "--numeric-sort", "--portability", "--print-armap",
+        "--print-file-name", "--print-size", "--reverse-sort",
+        "--special-syms", "--undefined-only",
+        "-A", "-B", "-C", "-D", "-P", "-S",
+        "-a", "-g", "-j", "-l", "-m", "-n", "-o",
+        "-p", "-r", "-s", "-u", "-v", "-x",
+    ]),
+    standalone_short: b"ABCDPSagjlmnoprsuvx",
+    valued: WordSet::new(&[
+        "--format", "--radix", "--size-sort", "--target",
+        "-f", "-t",
+    ]),
+    valued_short: b"ft",
+    bare: false,
+    max_positional: None,
+};
+
+static SYSTEM_PROFILER_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--json", "--xml", "-json", "-listDataTypes",
+        "-nospinner", "-xml",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&["-detailLevel", "-timeout"]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static IOREG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-S", "-a", "-b", "-f", "-i", "-l", "-r",
+        "-t", "-x",
+    ]),
+    standalone_short: b"Sabfilrtx",
+    valued: WordSet::new(&[
+        "-c", "-d", "-k", "-n", "-p", "-w",
+    ]),
+    valued_short: b"cdknpw",
+    bare: true,
+    max_positional: Some(0),
+};
+
+static VM_STAT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&["-c"]),
+    valued_short: b"c",
+    bare: true,
+    max_positional: Some(1),
+};
+
+static MDFIND_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-0", "-count", "-interpret", "-literal", "-live",
+    ]),
+    standalone_short: b"0",
+    valued: WordSet::new(&["-attr", "-name", "-onlyin", "-s"]),
+    valued_short: b"s",
+    bare: false,
+    max_positional: None,
+};
+
+static DIG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-4", "-6", "-m", "-r", "-u", "-v",
+    ]),
+    standalone_short: b"46mruv",
+    valued: WordSet::new(&[
+        "-b", "-c", "-f", "-k", "-p", "-q", "-t", "-x", "-y",
+    ]),
+    valued_short: b"bcfkpqtxy",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_nslookup(tokens: &[Token]) -> bool {
+    for t in &tokens[1..] {
+        let s = t.as_str();
+        if !s.starts_with('-') {
+            continue;
+        }
+        if s == "-debug" || s == "-nodebug" || s == "-d2" {
+            continue;
+        }
+        if s.starts_with("-type=")
+            || s.starts_with("-query=")
+            || s.starts_with("-port=")
+            || s.starts_with("-timeout=")
+            || s.starts_with("-retry=")
+            || s.starts_with("-class=")
+            || s.starts_with("-domain=")
+            || s.starts_with("-querytype=")
+        {
+            continue;
+        }
+        return false;
+    }
+    true
+}
+
+static HOST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-4", "-6", "-C", "-a", "-c", "-d", "-l",
+        "-r", "-s", "-v",
+    ]),
+    standalone_short: b"46Cacdlrsv",
+    valued: WordSet::new(&[
+        "-D", "-N", "-R", "-T", "-W", "-i", "-m", "-t",
+    ]),
+    valued_short: b"DNRTWimt",
+    bare: false,
+    max_positional: None,
+};
+
+static WHOIS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-A", "-B", "-G", "-H", "-I", "-K", "-L",
+        "-M", "-Q", "-R", "-S", "-a", "-b", "-c",
+        "-d", "-f", "-g", "-l", "-m", "-r", "-x",
+    ]),
+    standalone_short: b"ABGHIKLMQRSabcdfglmrx",
+    valued: WordSet::new(&[
+        "-T", "-V", "-h", "-i", "-p", "-s", "-t",
+    ]),
+    valued_short: b"TVhipst",
+    bare: false,
+    max_positional: None,
+};
+
+static NETSTAT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--continuous", "--extend", "--groups",
+        "--interfaces", "--listening", "--masquerade",
+        "--numeric", "--numeric-hosts", "--numeric-ports",
+        "--numeric-users", "--program", "--route",
+        "--statistics", "--symbolic", "--tcp", "--timers",
+        "--udp", "--unix", "--verbose", "--wide",
+        "-A", "-C", "-L", "-M", "-N", "-R", "-S", "-W",
+        "-Z",
+        "-a", "-b", "-c", "-d", "-e", "-f", "-g", "-i",
+        "-l", "-m", "-n", "-o", "-p", "-q", "-r",
+        "-s", "-t", "-u", "-v", "-w", "-x",
+    ]),
+    standalone_short: b"ACLMNRSWZabcdefgilmnopqrstuvwx",
+    valued: WordSet::new(&[
+        "-I",
+    ]),
+    valued_short: b"I",
+    bare: true,
+    max_positional: None,
+};
+
+static SS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--dccp", "--extended", "--family", "--help",
+        "--info", "--ipv4", "--ipv6", "--listening", "--memory",
+        "--no-header", "--numeric", "--oneline", "--options",
+        "--packet", "--processes", "--raw", "--resolve",
+        "--sctp", "--summary", "--tcp", "--tipc", "--udp",
+        "--unix", "--version", "--vsock",
+        "-0", "-4", "-6", "-E", "-H", "-O", "-V",
+        "-a", "-e", "-i", "-l", "-m", "-n", "-o",
+        "-p", "-r", "-s", "-t", "-u", "-w", "-x",
+    ]),
+    standalone_short: b"046EHOVaeilmnoprstuwx",
+    valued: WordSet::new(&[
+        "--filter", "--query",
+        "-A", "-F", "-f",
+    ]),
+    valued_short: b"AFf",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_ss(tokens: &[Token]) -> bool {
+    if has_flag(tokens, Some("-K"), Some("--kill")) {
+        return false;
+    }
+    policy::check(tokens, &SS_POLICY)
+}
+
+static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--verbose", "-ping", "-quiet", "-regard-warnings",
+        "-verbose",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&[
+        "-channel", "-define", "-density", "-depth",
+        "-features", "-format", "-fuzz", "-interlace",
+        "-limit", "-list", "-log", "-moments",
+        "-monitor", "-precision", "-seed", "-set",
+        "-size", "-strip", "-unique",
+        "-virtual-pixel",
+    ]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+static SHELLCHECK_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--color", "--external-sources", "--list-optional",
+        "--norc", "--severity", "--wiki-link-count",
+        "-C", "-a", "-x",
+    ]),
+    standalone_short: b"Cax",
+    valued: WordSet::new(&[
+        "--enable", "--exclude", "--format", "--include",
+        "--rcfile", "--severity", "--shell", "--source-path",
+        "--wiki-link-count",
+        "-P", "-S", "-W", "-e", "-f", "-i", "-o", "-s",
+    ]),
+    valued_short: b"PSWefios",
+    bare: false,
+    max_positional: None,
+};
+
+static CLOC_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--3", "--autoconf", "--by-file", "--by-file-by-lang", "--by-percent",
+        "--categorized", "--counted", "--diff", "--diff-list-file", "--docstring-as-code",
+        "--follow-links", "--force-lang-def", "--found-langs", "--git", "--hide-rate",
+        "--ignored", "--include-content", "--json", "--md", "--no-autogen",
+        "--no3", "--opt-match-d", "--opt-match-f", "--opt-not-match-d", "--opt-not-match-f",
+        "--original-dir", "--progress-rate", "--quiet", "--sdir", "--show-ext",
+        "--show-lang", "--show-os", "--show-stored-lang", "--skip-uniqueness", "--sql-append",
+        "--strip-comments", "--sum-one", "--sum-reports", "--unicode", "--use-sloccount",
+        "--v", "--vcs", "--xml", "--yaml",
+    ]),
+    standalone_short: b"v",
+    valued: WordSet::new(&[
+        "--config", "--csv-delimiter", "--diff-alignment",
+        "--diff-timeout", "--exclude-content",
+        "--exclude-dir", "--exclude-ext",
+        "--exclude-lang", "--exclude-list-file",
+        "--force-lang", "--fullpath",
+        "--include-ext", "--include-lang",
+        "--lang-no-ext", "--list-file", "--match-d",
+        "--match-f", "--not-match-d", "--not-match-f",
+        "--out", "--read-binary-files", "--read-lang-def",
+        "--report-file", "--script-lang", "--skip-archive",
+        "--sql", "--sql-project", "--sql-style",
+        "--timeout", "--write-lang-def",
+    ]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+static TOKEI_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--compact", "--files", "--hidden", "--no-ignore",
+        "--no-ignore-dot", "--no-ignore-parent",
+        "--no-ignore-vcs", "--verbose",
+        "-C", "-V", "-f",
+    ]),
+    standalone_short: b"CVf",
+    valued: WordSet::new(&[
+        "--columns", "--exclude", "--input",
+        "--languages", "--num-format", "--output",
+        "--sort", "--type",
+        "-c", "-e", "-i", "-l", "-o", "-s", "-t",
+    ]),
+    valued_short: b"ceilost",
+    bare: true,
+    max_positional: None,
+};
+
+static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--backtrace", "--color", "--dry-run", "--expand",
+        "--guess", "--i18n-keywords", "--i18n-languages",
+        "--init", "--no-color", "--no-diff", "--no-multiline",
+        "--no-snippets", "--no-source", "--no-strict",
+        "--publish", "--publish-quiet", "--quiet",
+        "--retry", "--snippets", "--strict", "--verbose",
+        "--wip",
+        "-b", "-d", "-e", "-q",
+    ]),
+    standalone_short: b"bdeq",
+    valued: WordSet::new(&[
+        "--ci-environment", "--format", "--format-options",
+        "--language", "--lines", "--name", "--order",
+        "--out", "--profile", "--require",
+        "--require-module", "--retry", "--tags",
+        "-f", "-i", "-l", "-n", "-o", "-p", "-r", "-t",
+    ]),
+    valued_short: b"filnoprt",
+    bare: true,
+    max_positional: None,
+};
+
+fn dispatch_policy(cmd: &str, tokens: &[Token]) -> Option<bool> {
+    match cmd {
+        "ls" => Some(policy::check(tokens, &LS_POLICY)),
+        "eza" | "exa" => Some(policy::check(tokens, &EZA_POLICY)),
+        "delta" => Some(policy::check(tokens, &DELTA_POLICY)),
+        "colordiff" => Some(policy::check(tokens, &COLORDIFF_POLICY)),
+        "dirname" => Some(policy::check(tokens, &DIRNAME_POLICY)),
+        "basename" => Some(policy::check(tokens, &BASENAME_POLICY)),
+        "realpath" => Some(policy::check(tokens, &REALPATH_POLICY)),
+        "readlink" => Some(policy::check(tokens, &READLINK_POLICY)),
+        "stat" => Some(policy::check(tokens, &STAT_POLICY)),
+        "du" => Some(policy::check(tokens, &DU_POLICY)),
+        "df" => Some(policy::check(tokens, &DF_POLICY)),
+        "true" | "false" | "whoami" | "branchdiff" => {
+            Some(policy::check(tokens, &BARE_ONLY))
+        }
+        "printenv" => Some(policy::check(tokens, &PRINTENV_POLICY)),
+        "type" => Some(policy::check(tokens, &TYPE_POLICY)),
+        "whereis" => Some(policy::check(tokens, &WHEREIS_POLICY)),
+        "which" => Some(policy::check(tokens, &WHICH_POLICY)),
+        "pwd" => Some(policy::check(tokens, &PWD_POLICY)),
+        "cd" => Some(policy::check(tokens, &CD_POLICY)),
+        "unset" => Some(policy::check(tokens, &UNSET_POLICY)),
+        "uname" => Some(policy::check(tokens, &UNAME_POLICY)),
+        "nproc" => Some(policy::check(tokens, &NPROC_POLICY)),
+        "uptime" => Some(policy::check(tokens, &UPTIME_POLICY)),
+        "id" => Some(policy::check(tokens, &ID_POLICY)),
+        "groups" => Some(policy::check(tokens, &GROUPS_POLICY)),
+        "tty" => Some(policy::check(tokens, &TTY_POLICY)),
+        "locale" => Some(policy::check(tokens, &LOCALE_POLICY)),
+        "cal" => Some(policy::check(tokens, &CAL_POLICY)),
+        "sleep" => Some(policy::check(tokens, &SLEEP_POLICY)),
+        "who" => Some(policy::check(tokens, &WHO_POLICY)),
+        "w" => Some(policy::check(tokens, &W_POLICY)),
+        "last" => Some(policy::check(tokens, &LAST_POLICY)),
+        "lastlog" => Some(policy::check(tokens, &LASTLOG_POLICY)),
+        "ps" => Some(policy::check(tokens, &PS_POLICY)),
+        "top" => Some(policy::check(tokens, &TOP_POLICY)),
+        "htop" => Some(policy::check(tokens, &HTOP_POLICY)),
+        "iotop" => Some(policy::check(tokens, &IOTOP_POLICY)),
+        "procs" => Some(policy::check(tokens, &PROCS_POLICY)),
+        "dust" => Some(policy::check(tokens, &DUST_POLICY)),
+        "lsof" => Some(policy::check(tokens, &LSOF_POLICY)),
+        "pgrep" => Some(policy::check(tokens, &PGREP_POLICY)),
+        "jq" => Some(policy::check(tokens, &JQ_POLICY)),
+        "base64" => Some(policy::check(tokens, &BASE64_POLICY)),
+        "xxd" => Some(policy::check(tokens, &XXD_POLICY)),
+        "getconf" => Some(policy::check(tokens, &GETCONF_POLICY)),
+        "uuidgen" => Some(policy::check(tokens, &UUIDGEN_POLICY)),
+        "md5sum" | "sha256sum" | "sha1sum" | "sha512sum" => {
+            Some(policy::check(tokens, &GNU_HASH_POLICY))
+        }
+        "md5" => Some(policy::check(tokens, &MD5_POLICY)),
+        "shasum" => Some(policy::check(tokens, &SHASUM_POLICY)),
+        "cksum" => Some(policy::check(tokens, &CKSUM_POLICY)),
+        "b2sum" => Some(policy::check(tokens, &B2SUM_POLICY)),
+        "sum" => Some(policy::check(tokens, &SUM_POLICY)),
+        "strings" => Some(policy::check(tokens, &STRINGS_POLICY)),
+        "hexdump" => Some(policy::check(tokens, &HEXDUMP_POLICY)),
+        "od" => Some(policy::check(tokens, &OD_POLICY)),
+        "size" => Some(policy::check(tokens, &SIZE_POLICY)),
+        "sw_vers" => Some(policy::check(tokens, &SW_VERS_POLICY)),
+        "mdls" => Some(policy::check(tokens, &MDLS_POLICY)),
+        "otool" => Some(policy::check(tokens, &OTOOL_POLICY)),
+        "nm" => Some(policy::check(tokens, &NM_POLICY)),
+        "system_profiler" => Some(policy::check(tokens, &SYSTEM_PROFILER_POLICY)),
+        "ioreg" => Some(policy::check(tokens, &IOREG_POLICY)),
+        "vm_stat" => Some(policy::check(tokens, &VM_STAT_POLICY)),
+        "mdfind" => Some(policy::check(tokens, &MDFIND_POLICY)),
+        "dig" => Some(policy::check(tokens, &DIG_POLICY)),
+        "host" => Some(policy::check(tokens, &HOST_POLICY)),
+        "whois" => Some(policy::check(tokens, &WHOIS_POLICY)),
+        "netstat" => Some(policy::check(tokens, &NETSTAT_POLICY)),
+        "identify" => Some(policy::check(tokens, &IDENTIFY_POLICY)),
+        "shellcheck" => Some(policy::check(tokens, &SHELLCHECK_POLICY)),
+        "cloc" => Some(policy::check(tokens, &CLOC_POLICY)),
+        "tokei" => Some(policy::check(tokens, &TOKEI_POLICY)),
+        "cucumber" => Some(policy::check(tokens, &CUCUMBER_POLICY)),
+        _ => None,
+    }
+}
+
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    if let result @ Some(_) = dispatch_policy(cmd, tokens) {
+        return result;
+    }
     match cmd {
         "fd" => Some(is_safe_fd(tokens)),
         "tree" => Some(is_safe_tree(tokens)),
         "file" => Some(is_safe_file_cmd(tokens)),
-        "ls" | "eza" | "exa" | "delta" | "colordiff" => Some(true),
-        "dirname" | "basename" | "realpath" | "readlink" => Some(true),
-        "stat" | "du" | "df" => Some(true),
         "date" => Some(is_safe_date(tokens)),
-        "true" | "false" => Some(true),
-        "printenv" | "type" | "whereis" | "which" | "whoami" => Some(true),
-        "pwd" | "cd" | "unset" => Some(true),
-        "uname" | "nproc" | "uptime" | "id" | "groups" => Some(true),
-        "tty" | "locale" | "cal" | "sleep" => Some(true),
-        "who" | "w" | "last" | "lastlog" => Some(true),
-        "ps" | "top" | "htop" | "iotop" | "procs" | "dust" => Some(true),
-        "lsof" | "pgrep" => Some(true),
-        "jq" | "base64" | "xxd" | "getconf" | "uuidgen" => Some(true),
-        "md5sum" | "md5" | "sha256sum" | "shasum" | "sha1sum" => Some(true),
-        "sha512sum" | "cksum" | "b2sum" | "sum" => Some(true),
-        "strings" | "hexdump" | "od" | "size" => Some(true),
-        "sw_vers" | "mdls" | "otool" | "nm" => Some(true),
-        "system_profiler" | "ioreg" | "vm_stat" | "mdfind" => Some(true),
-        "dig" | "nslookup" | "host" | "whois" => Some(true),
-        "netstat" | "ss" => Some(true),
+        "nslookup" => Some(is_safe_nslookup(tokens)),
+        "ss" => Some(is_safe_ss(tokens)),
         "ifconfig" => Some(is_safe_ifconfig(tokens)),
         "route" => Some(is_safe_route(tokens)),
-        "identify" | "shellcheck" | "cloc" | "tokei" => Some(true),
-        "cucumber" | "branchdiff" | "safe-chains" => Some(true),
+        "safe-chains" => Some(true),
         "grep" | "egrep" | "fgrep" => Some(is_safe_grep(tokens)),
         "rg" => Some(is_safe_rg(tokens)),
         "cat" => Some(is_safe_cat(tokens)),
@@ -882,9 +2084,99 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
     }
 }
 
-pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+fn policy_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
+        CommandDoc::handler("ls", LS_POLICY.describe()),
+        CommandDoc::handler("eza / exa", EZA_POLICY.describe()),
+        CommandDoc::handler("delta", DELTA_POLICY.describe()),
+        CommandDoc::handler("colordiff", COLORDIFF_POLICY.describe()),
+        CommandDoc::handler("dirname", DIRNAME_POLICY.describe()),
+        CommandDoc::handler("basename", BASENAME_POLICY.describe()),
+        CommandDoc::handler("realpath", REALPATH_POLICY.describe()),
+        CommandDoc::handler("readlink", READLINK_POLICY.describe()),
+        CommandDoc::handler("stat", STAT_POLICY.describe()),
+        CommandDoc::handler("du", DU_POLICY.describe()),
+        CommandDoc::handler("df", DF_POLICY.describe()),
+        CommandDoc::handler("true / false",
+            "Bare invocation only. No flags or arguments allowed."),
+        CommandDoc::handler("printenv", PRINTENV_POLICY.describe()),
+        CommandDoc::handler("type", TYPE_POLICY.describe()),
+        CommandDoc::handler("whereis", WHEREIS_POLICY.describe()),
+        CommandDoc::handler("which", WHICH_POLICY.describe()),
+        CommandDoc::handler("whoami",
+            "Bare invocation only. No flags or arguments allowed."),
+        CommandDoc::handler("pwd", PWD_POLICY.describe()),
+        CommandDoc::handler("cd", CD_POLICY.describe()),
+        CommandDoc::handler("unset", UNSET_POLICY.describe()),
+        CommandDoc::handler("uname", UNAME_POLICY.describe()),
+        CommandDoc::handler("nproc", NPROC_POLICY.describe()),
+        CommandDoc::handler("uptime", UPTIME_POLICY.describe()),
+        CommandDoc::handler("id", ID_POLICY.describe()),
+        CommandDoc::handler("groups",
+            "Any positional arguments (usernames). No flags."),
+        CommandDoc::handler("tty", TTY_POLICY.describe()),
+        CommandDoc::handler("locale", LOCALE_POLICY.describe()),
+        CommandDoc::handler("cal", CAL_POLICY.describe()),
+        CommandDoc::handler("sleep",
+            "Positional duration arguments only. No flags."),
+        CommandDoc::handler("who", WHO_POLICY.describe()),
+        CommandDoc::handler("w", W_POLICY.describe()),
+        CommandDoc::handler("last", LAST_POLICY.describe()),
+        CommandDoc::handler("lastlog", format!("{} Denied: -C/--clear, -S/--set.", LASTLOG_POLICY.describe())),
+        CommandDoc::handler("ps", PS_POLICY.describe()),
+        CommandDoc::handler("top", TOP_POLICY.describe()),
+        CommandDoc::handler("htop", HTOP_POLICY.describe()),
+        CommandDoc::handler("iotop", IOTOP_POLICY.describe()),
+        CommandDoc::handler("procs", PROCS_POLICY.describe()),
+        CommandDoc::handler("dust", DUST_POLICY.describe()),
+        CommandDoc::handler("lsof", LSOF_POLICY.describe()),
+        CommandDoc::handler("pgrep", PGREP_POLICY.describe()),
+        CommandDoc::handler("jq", JQ_POLICY.describe()),
+        CommandDoc::handler("base64", BASE64_POLICY.describe()),
+        CommandDoc::handler("xxd", XXD_POLICY.describe()),
+        CommandDoc::handler("getconf", GETCONF_POLICY.describe()),
+        CommandDoc::handler("uuidgen", UUIDGEN_POLICY.describe()),
+        CommandDoc::handler("md5sum / sha256sum / sha1sum / sha512sum", GNU_HASH_POLICY.describe()),
+        CommandDoc::handler("md5", MD5_POLICY.describe()),
+        CommandDoc::handler("shasum", SHASUM_POLICY.describe()),
+        CommandDoc::handler("cksum", CKSUM_POLICY.describe()),
+        CommandDoc::handler("b2sum", B2SUM_POLICY.describe()),
+        CommandDoc::handler("sum", SUM_POLICY.describe()),
+        CommandDoc::handler("strings", STRINGS_POLICY.describe()),
+        CommandDoc::handler("hexdump", HEXDUMP_POLICY.describe()),
+        CommandDoc::handler("od", OD_POLICY.describe()),
+        CommandDoc::handler("size", SIZE_POLICY.describe()),
+        CommandDoc::handler("sw_vers", SW_VERS_POLICY.describe()),
+        CommandDoc::handler("mdls", MDLS_POLICY.describe()),
+        CommandDoc::handler("otool", OTOOL_POLICY.describe()),
+        CommandDoc::handler("nm", NM_POLICY.describe()),
+        CommandDoc::handler("system_profiler", SYSTEM_PROFILER_POLICY.describe()),
+        CommandDoc::handler("ioreg", IOREG_POLICY.describe()),
+        CommandDoc::handler("vm_stat", VM_STAT_POLICY.describe()),
+        CommandDoc::handler("mdfind", MDFIND_POLICY.describe()),
+        CommandDoc::handler("dig", DIG_POLICY.describe()),
+        CommandDoc::handler("nslookup",
+            "Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -query=, -port=, -timeout=, -retry=, -class=, -domain=, -querytype=)."),
+        CommandDoc::handler("host", HOST_POLICY.describe()),
+        CommandDoc::handler("whois", WHOIS_POLICY.describe()),
+        CommandDoc::handler("netstat", NETSTAT_POLICY.describe()),
+        CommandDoc::handler("ss", format!("{} Denied: -K/--kill, -D/--diag.", SS_POLICY.describe())),
+        CommandDoc::handler("identify", IDENTIFY_POLICY.describe()),
+        CommandDoc::handler("shellcheck", SHELLCHECK_POLICY.describe()),
+        CommandDoc::handler("cloc", CLOC_POLICY.describe()),
+        CommandDoc::handler("tokei", TOKEI_POLICY.describe()),
+        CommandDoc::handler("cucumber", CUCUMBER_POLICY.describe()),
+        CommandDoc::handler("branchdiff",
+            "Bare invocation only. No flags or arguments allowed."),
+        CommandDoc::handler("safe-chains",
+            "Any arguments allowed (safe-chains is this tool)."),
+    ]
+}
+
+pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::CommandDoc;
+    let mut docs = vec![
         CommandDoc::handler("arch",
             "Allowed: bare `arch` only (prints machine architecture). Flags denied (can execute commands under different architectures)."),
         CommandDoc::handler("cat", CAT_POLICY.describe()),
@@ -946,7 +2238,9 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("route",
             "Allowed subcommands: get, monitor, print, show. Allowed flags: -4, -6, -n, -v. Bare invocation allowed."),
         CommandDoc::handler("ifconfig", IFCONFIG_POLICY.describe()),
-    ]
+    ];
+    docs.extend(policy_docs());
+    docs
 }
 
 #[cfg(test)]
@@ -1429,5 +2723,174 @@ mod tests {
         ifconfig_mtu_denied: "ifconfig eth0 mtu 1500",
         ifconfig_promisc_denied: "ifconfig eth0 promisc",
         ifconfig_unknown_flag_denied: "ifconfig --unknown",
+    }
+
+    safe! {
+        ls_long: "ls -la",
+        ls_human: "ls -lh /tmp",
+        ls_color: "ls --color=auto",
+        ls_recursive_bare: "ls -R",
+        ls_sort: "ls --sort=size",
+        ls_bare: "ls",
+        eza_long: "eza --long --git",
+        eza_tree: "eza --tree",
+        delta_files: "delta file1 file2",
+        colordiff_unified: "colordiff -u file1 file2",
+        dirname_zero: "dirname -z /usr/bin/ls",
+        basename_suffix: "basename -s .rs file.rs",
+        readlink_canon: "readlink -f /usr/bin/python",
+        stat_format: "stat -c '%s' file.txt",
+        du_human: "du -sh /tmp",
+        du_depth: "du -d 1 .",
+        df_human: "df -h",
+        df_type: "df -t ext4",
+        true_bare: "true",
+        false_bare: "false",
+        printenv_bare: "printenv",
+        printenv_var: "printenv HOME",
+        printenv_null: "printenv -0",
+        type_cmd: "type ls",
+        type_all: "type -a ls",
+        whereis_cmd: "whereis ls",
+        which_cmd: "which ls",
+        which_all: "which -a ls",
+        whoami_bare: "whoami",
+        pwd_bare: "pwd",
+        pwd_logical: "pwd -L",
+        cd_dir: "cd /tmp",
+        cd_bare: "cd",
+        unset_var: "unset FOO",
+        unset_func: "unset -f myfunc",
+        uname_all: "uname -a",
+        uname_machine: "uname -m",
+        uname_bare: "uname",
+        nproc_bare: "nproc",
+        nproc_all: "nproc --all",
+        uptime_bare: "uptime",
+        uptime_pretty: "uptime -p",
+        id_bare: "id",
+        id_user: "id -u",
+        id_name: "id -un",
+        groups_bare: "groups",
+        groups_user: "groups root",
+        tty_bare: "tty",
+        tty_silent: "tty -s",
+        locale_bare: "locale",
+        locale_all: "locale -a",
+        cal_bare: "cal",
+        cal_year: "cal -y",
+        cal_three: "cal -3",
+        sleep_duration: "sleep 1",
+        sleep_multiple: "sleep 1s 2s",
+        who_bare: "who",
+        who_all: "who -a",
+        who_am_i: "who am i",
+        w_bare: "w",
+        w_short: "w -s",
+        last_bare: "last",
+        last_n: "last -n 5",
+        last_numeric: "last -5",
+        last_file: "last -f /var/log/wtmp",
+        lastlog_bare: "lastlog",
+        lastlog_user: "lastlog -u root",
+        ps_bare: "ps",
+        ps_aux: "ps aux",
+        ps_ef: "ps -ef",
+        top_batch: "top -bn1",
+        htop_bare: "htop",
+        iotop_batch: "iotop -b -n 1",
+        procs_bare: "procs",
+        dust_bare: "dust",
+        dust_depth: "dust -d 2",
+        lsof_bare: "lsof",
+        lsof_port: "lsof -i :8080",
+        pgrep_name: "pgrep firefox",
+        pgrep_full: "pgrep -f 'python.*server'",
+        jq_filter: "jq '.name' file.json",
+        jq_compact: "jq -c . file.json",
+        jq_raw: "jq -r '.url' file.json",
+        jq_slurp: "jq -s '.[0]' file.json",
+        base64_decode: "base64 -d file.txt",
+        base64_encode: "base64 file.txt",
+        xxd_file: "xxd file.bin",
+        xxd_bits: "xxd -b file.bin",
+        xxd_revert: "xxd -r file.hex",
+        getconf_bare: "getconf",
+        getconf_var: "getconf PAGE_SIZE",
+        uuidgen_bare: "uuidgen",
+        uuidgen_random: "uuidgen -r",
+        md5sum_file: "md5sum file.txt",
+        md5sum_check: "md5sum -c checksums.md5",
+        sha256sum_file: "sha256sum file.txt",
+        sha1sum_file: "sha1sum file.txt",
+        sha512sum_file: "sha512sum file.txt",
+        md5_file: "md5 file.txt",
+        md5_string: "md5 -s hello",
+        shasum_file: "shasum file.txt",
+        shasum_algo: "shasum -a 256 file.txt",
+        cksum_file: "cksum file.txt",
+        b2sum_file: "b2sum file.txt",
+        sum_file: "sum file.txt",
+        strings_file: "strings binary.exe",
+        strings_bytes: "strings -n 8 binary.exe",
+        hexdump_file: "hexdump -C file.bin",
+        od_file: "od -x file.bin",
+        size_file: "size binary.o",
+        sw_vers_bare: "sw_vers",
+        sw_vers_name: "sw_vers --productName",
+        mdls_file: "mdls file.txt",
+        mdls_name: "mdls -name kMDItemContentType file.txt",
+        otool_headers: "otool -h binary",
+        otool_libs: "otool -L binary",
+        nm_file: "nm binary.o",
+        nm_extern: "nm -g binary.o",
+        system_profiler_bare: "system_profiler",
+        system_profiler_hw: "system_profiler SPHardwareDataType",
+        ioreg_bare: "ioreg",
+        ioreg_tree: "ioreg -t",
+        vm_stat_bare: "vm_stat",
+        vm_stat_interval: "vm_stat 5",
+        mdfind_query: "mdfind 'kMDItemContentType == public.image'",
+        mdfind_name: "mdfind -name README",
+        dig_domain: "dig example.com",
+        dig_type: "dig -t MX example.com",
+        dig_at_server: "dig @8.8.8.8 example.com",
+        nslookup_domain: "nslookup example.com",
+        nslookup_server: "nslookup example.com 8.8.8.8",
+        nslookup_type: "nslookup -type=MX example.com",
+        host_domain: "host example.com",
+        host_type: "host -t AAAA example.com",
+        whois_domain: "whois example.com",
+        netstat_bare: "netstat",
+        netstat_listen: "netstat -tlnp",
+        netstat_all: "netstat -an",
+        ss_bare: "ss",
+        ss_listen: "ss -tlnp",
+        identify_file: "identify image.png",
+        shellcheck_file: "shellcheck script.sh",
+        shellcheck_format: "shellcheck -f json script.sh",
+        cloc_dir: "cloc src/",
+        tokei_bare: "tokei",
+        tokei_sort: "tokei -s lines",
+        branchdiff_bare: "branchdiff",
+    }
+
+    denied! {
+        true_with_args_denied: "true --extra",
+        false_with_args_denied: "false something",
+        whoami_flag_denied: "whoami --unknown",
+        ls_unknown_flag_denied: "ls --execute-cmd",
+        branchdiff_flag_denied: "branchdiff --unknown",
+        ss_kill_denied: "ss --kill",
+        ss_kill_short_denied: "ss -K",
+        ss_diag_denied: "ss -D /tmp/dump",
+        ss_diag_long_denied: "ss --diag=/tmp/dump",
+        lastlog_clear_denied: "lastlog -C",
+        lastlog_set_denied: "lastlog -S",
+        lastlog_clear_long_denied: "lastlog --clear",
+        lastlog_set_long_denied: "lastlog --set",
+        nslookup_unknown_denied: "nslookup -unknown example.com",
+        mdls_plist_denied: "mdls -plist output.plist file.txt",
+        sleep_bare_denied: "sleep",
     }
 }
