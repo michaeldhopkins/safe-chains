@@ -169,13 +169,11 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("git",
             doc(&GIT_READ_ONLY)
                 .section(format!(
-                    "Guarded: remote (deny {}), branch (deny {}), stash ({} only), \
-                     tag (list only, deny {}), config ({} only), worktree (list only), \
+                    "Restricted subcommands: remote (read-only actions), \
+                     branch (read-only flags), stash ({} only), \
+                     tag (list only), config ({} only), worktree (list only), \
                      notes ({} only). Supports `-C <dir>` prefix.",
-                    wordset_items(&GIT_REMOTE_MUTATING),
-                    wordset_items(&GIT_BRANCH_MUTATING),
                     wordset_items(&GIT_STASH_SAFE),
-                    wordset_items(&GIT_TAG_MUTATING),
                     wordset_items(&GIT_CONFIG_SAFE),
                     wordset_items(&GIT_NOTES_SAFE),
                 ))

@@ -275,7 +275,7 @@ pub fn is_safe_sysctl(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    if tokens[1..].iter().any(|t| t == "-w" || t == "--write" || t.contains("=")) {
+    if tokens[1..].iter().any(|t| t.contains("=")) {
         return false;
     }
     policy::check(tokens, &SYSCTL_POLICY)
@@ -566,8 +566,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("pmset",
             "Allowed: -g (get/display settings only). No extra flags."),
         CommandDoc::handler("sysctl",
-            "Read-only usage allowed. Denied: -w/--write and key=value assignments. \
-             Explicit flag allowlist for read flags."),
+            "Read-only usage. Explicit flag allowlist; key=value assignments rejected."),
         CommandDoc::handler("cmake",
             "Allowed: --version, --system-information (single argument only)."),
         CommandDoc::handler("security",

@@ -1,4 +1,4 @@
-use crate::parse::{FlagCheck, Segment, Token, WordSet};
+use crate::parse::{Segment, Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy};
 
 static NPM_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -168,8 +168,25 @@ static NPX_FLAGS_NO_ARG: WordSet =
 static BUNX_FLAGS_NO_ARG: WordSet =
     WordSet::new(&["--bun", "--no-install", "--silent", "--verbose"]);
 
-static TSC_CHECK: FlagCheck =
-    FlagCheck::new(&["--noEmit"], &[]);
+static TSC_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--allowJs", "--checkJs", "--esModuleInterop",
+        "--forceConsistentCasingInFileNames", "--incremental",
+        "--isolatedModules", "--noEmit", "--noFallthroughCasesInSwitch",
+        "--noImplicitAny", "--noImplicitReturns", "--noUnusedLocals",
+        "--noUnusedParameters", "--pretty", "--resolveJsonModule",
+        "--skipLibCheck", "--strict", "--strictNullChecks",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&[
+        "--baseUrl", "--jsx", "--lib", "--module",
+        "--moduleResolution", "--project",
+        "--rootDir", "--target",
+    ]),
+    valued_short: b"p",
+    bare: false,
+    max_positional: None,
+};
 
 fn find_runner_package_index(
     tokens: &[Token],
@@ -205,7 +222,8 @@ fn is_safe_runner_package(tokens: &[Token], pkg_idx: usize) -> bool {
         return true;
     }
     if tokens[pkg_idx] == "tsc" {
-        return TSC_CHECK.is_safe(&tokens[pkg_idx + 1..]);
+        return has_flag(&tokens[pkg_idx..], None, Some("--noEmit"))
+            && policy::check(&tokens[pkg_idx..], &TSC_POLICY);
     }
     false
 }
@@ -268,8 +286,20 @@ static DENO_SAFE_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
 };
 
-static DENO_FMT: FlagCheck =
-    FlagCheck::new(&["--check"], &[]);
+static DENO_FMT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--check", "--no-semicolons", "--single-quote",
+        "--unstable",
+    ]),
+    standalone_short: b"q",
+    valued: WordSet::new(&[
+        "--config", "--ext", "--ignore", "--indent-width",
+        "--line-width", "--log-level", "--prose-wrap",
+    ]),
+    valued_short: b"c",
+    bare: false,
+    max_positional: None,
+};
 
 pub fn is_safe_deno(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
@@ -279,7 +309,8 @@ pub fn is_safe_deno(tokens: &[Token]) -> bool {
         "check" | "doc" | "info" | "lint" | "test" => {
             policy::check(&tokens[1..], &DENO_SAFE_POLICY)
         }
-        "fmt" => DENO_FMT.is_safe(&tokens[2..]),
+        "fmt" => has_flag(&tokens[1..], None, Some("--check"))
+            && policy::check(&tokens[1..], &DENO_FMT_POLICY),
         _ => false,
     }
 }
@@ -381,16 +412,16 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("bunx",
             DocBuilder::new()
                 .section(format!("Allowed packages: {}.", wordset_items(&NPX_SAFE)))
-                .section("Guarded: tsc (requires --noEmit).")
+                .section("tsc allowed with --noEmit (explicit flag allowlist).")
                 .section("Skips flags: --bun/--no-install/--package/-p.")
                 .build()),
         CommandDoc::handler("deno",
             "Subcommands: check, doc, info, lint, test. \
-             Guarded: fmt (requires --check). Each has an explicit flag allowlist."),
+             fmt allowed with --check. Each has an explicit flag allowlist."),
         CommandDoc::handler("npx",
             DocBuilder::new()
                 .section(format!("Allowed packages: {}.", wordset_items(&NPX_SAFE)))
-                .section("Guarded: tsc (requires --noEmit).")
+                .section("tsc allowed with --noEmit (explicit flag allowlist).")
                 .section("Skips flags: --yes/-y/--no/--package/-p.")
                 .build()),
         CommandDoc::handler("nvm",

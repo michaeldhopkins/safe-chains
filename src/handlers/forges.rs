@@ -1,4 +1,4 @@
-use crate::parse::{FlagCheck, Segment, Token, WordSet};
+use crate::parse::{Segment, Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy};
 
 static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -190,8 +190,17 @@ static READ_ONLY_ACTIONS: WordSet =
 static ALWAYS_SAFE_SUBCOMMANDS: WordSet =
     WordSet::new(&["--version", "search", "status"]);
 
-static GH_BROWSE: FlagCheck =
-    FlagCheck::new(&["--no-browser"], &[]);
+static GH_BROWSE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--actions", "--no-browser", "--projects",
+        "--releases", "--settings", "--wiki",
+    ]),
+    standalone_short: b"acnprsw",
+    valued: WordSet::new(&["--branch", "--commit", "--repo"]),
+    valued_short: b"bR",
+    bare: false,
+    max_positional: None,
+};
 
 static API_BODY_FLAGS: &[&str] = &["-f", "-F", "--field", "--raw-field", "--input"];
 
@@ -264,7 +273,8 @@ pub fn is_safe_gh(tokens: &[Token]) -> bool {
     }
 
     if subcmd == "browse" {
-        return GH_BROWSE.is_safe(&tokens[2..]);
+        return has_flag(&tokens[1..], Some("-n"), Some("--no-browser"))
+            && policy::check(&tokens[1..], &GH_BROWSE_POLICY);
     }
 
     if subcmd == "api" {
@@ -521,7 +531,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                     wordset_items(&READ_ONLY_ACTIONS)))
                 .section(format!("Always safe: {}.",
                     wordset_items(&ALWAYS_SAFE_SUBCOMMANDS)))
-                .section("Guarded: auth (status/token only), browse (--no-browser only), \
+                .section("auth status, browse (requires --no-browser), \
                           api (GET only, no body flags).")
                 .section("Each action has an explicit flag allowlist.")
                 .build()),
@@ -532,7 +542,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                     wordset_items(&GLAB_READ_ONLY_ACTIONS)))
                 .section(format!("Always safe: {}.",
                     wordset_items(&GLAB_ALWAYS_SAFE)))
-                .section("Guarded: auth (status only), api (GET only, no body flags).")
+                .section("auth status, api (GET only, no body flags).")
                 .section("Each action has an explicit flag allowlist.")
                 .build()),
         CommandDoc::handler("tea",
@@ -543,7 +553,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                     wordset_items(&TEA_READ_ONLY_ACTIONS)))
                 .section(format!("Always safe: {}.",
                     wordset_items(&TEA_ALWAYS_SAFE)))
-                .section("Guarded: logins/login (list only).")
+                .section("logins/login (list only).")
                 .section("Each action has an explicit flag allowlist.")
                 .build()),
     ]

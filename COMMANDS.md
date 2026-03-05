@@ -10,7 +10,7 @@ These commands are allowed with specific subcommands or flags.
 
 ### `arch`
 
-Allowed: bare `arch` only (prints machine architecture). Flags denied (can execute commands under different architectures).
+Bare invocation only (prints machine architecture).
 
 ### `asdf`
 
@@ -42,7 +42,7 @@ Allowed standalone flags: --multiple, --zero, -a, -z. Allowed valued flags: --su
 
 ### `bash / sh`
 
-Allowed: --version, --help. Only `bash -c` / `sh -c` with a safe inner command. Scripts denied.
+Allowed: --version, --help, `bash -c` / `sh -c` with a safe inner command.
 
 ### `bat`
 
@@ -74,13 +74,13 @@ Subcommands: outdated, pm (bin/cache/hash/ls), test. x delegates to bunx logic. 
 
 ### `bundle`
 
-Subcommands: check, info, list, show. Each has an explicit flag allowlist. Guarded: exec (brakeman, cucumber, erb_lint, herb, rspec, standardrb only).
+Subcommands: check, info, list, show. Each has an explicit flag allowlist. exec allowed for: brakeman, cucumber, erb_lint, herb, rspec, standardrb.
 
 ### `bunx`
 
 Allowed packages: @herb-tools/linter, eslint, karma.
 
-Guarded: tsc (requires --noEmit).
+tsc allowed with --noEmit (explicit flag allowlist).
 
 Skips flags: --bun/--no-install/--package/-p.
 
@@ -94,7 +94,7 @@ Bare invocation allowed.
 
 ### `cargo`
 
-Subcommands: audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. Each has an explicit flag allowlist. Guarded: fmt (--check only), package (--list only), publish (--dry-run only, --force/--no-verify denied). +toolchain selectors (e.g. +nightly) are skipped.
+Subcommands: audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. Each has an explicit flag allowlist. fmt (requires --check), package (requires --list), publish (requires --dry-run). +toolchain selectors (e.g. +nightly) are skipped.
 
 ### `cat`
 
@@ -122,7 +122,7 @@ Allowed: --version, --system-information (single argument only).
 
 ### `codesign`
 
-Requires --display/-d or --verify/-v. --sign/-s, --force/-f, --remove-signature denied.
+Requires --display/-d or --verify/-v. Explicit flag allowlist.
 
 ### `colordiff`
 
@@ -142,7 +142,7 @@ Allowed standalone flags: --check-order, --nocheck-order, --total, --zero-termin
 
 ### `command`
 
-Allowed: -v, -V (check if command exists). Bare `command` and execution of other commands denied.
+Allowed: -v, -V (check if command exists).
 
 ### `composer`
 
@@ -194,7 +194,7 @@ Bare invocation allowed.
 
 ### `deno`
 
-Subcommands: check, doc, info, lint, test. Guarded: fmt (requires --check). Each has an explicit flag allowlist.
+Subcommands: check, doc, info, lint, test. fmt allowed with --check. Each has an explicit flag allowlist.
 
 ### `df`
 
@@ -290,7 +290,7 @@ Safe unless -C/--compile flag (write compiled magic file).
 
 ### `find`
 
-Safe unless dangerous flags: -delete, -ok, -okdir, -fls, -fprint, -fprint0, -fprintf. -exec/-execdir allowed when the executed command is itself safe.
+Positional predicates allowed. -exec/-execdir allowed when the executed command is itself safe.
 
 ### `fmt`
 
@@ -330,7 +330,7 @@ Subcommands attestation, cache, codespace, extension, gpg-key, issue, label, pr,
 
 Always safe: --version, search, status.
 
-Guarded: auth (status/token only), browse (--no-browser only), api (GET only, no body flags).
+auth status, browse (requires --no-browser), api (GET only, no body flags).
 
 Each action has an explicit flag allowlist.
 
@@ -340,7 +340,7 @@ Subcommands: blame, cat-file, check-ignore, count-objects, describe, diff, diff-
 
 Flags: --version.
 
-Guarded: remote (deny add, prune, remove, rename, set-branches, set-url), branch (deny --copy, --delete, --edit-description, --move, --set-upstream-to, --unset-upstream, -C, -D, -M, -c, -d, -m, -u), stash (list, show only), tag (list only, deny --annotate, --delete, --force, --sign, -a, -d, -f, -s), config (--get, --get-all, --get-regexp, --list, -l only), worktree (list only), notes (list, show only). Supports `-C <dir>` prefix.
+Restricted subcommands: remote (read-only actions), branch (read-only flags), stash (list, show only), tag (list only), config (--get, --get-all, --get-regexp, --list, -l only), worktree (list only), notes (list, show only). Supports `-C <dir>` prefix.
 
 ### `glab`
 
@@ -348,13 +348,13 @@ Subcommands ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label,
 
 Always safe: --version, -v, check-update, version.
 
-Guarded: auth (status only), api (GET only, no body flags).
+auth status, api (GET only, no body flags).
 
 Each action has an explicit flag allowlist.
 
 ### `go`
 
-Subcommands: build, doc, env, list, test, version, vet. Each subcommand has an explicit flag allowlist. Denied: -exec (test), -toolexec (build/test/list/vet), -w/-u (env).
+Subcommands: build, doc, env, list, test, version, vet. Each subcommand has an explicit flag allowlist.
 
 ### `gradle / gradlew`
 
@@ -402,7 +402,7 @@ Bare invocation allowed.
 
 ### `hyperfine`
 
-Recursively validates each benchmarked command. Denied if --prepare, --cleanup, or --setup flags are used (arbitrary shell execution).
+Recursively validates each benchmarked command. Only benchmarking flags allowed (no --prepare, --cleanup, --setup).
 
 ### `iconv`
 
@@ -462,7 +462,7 @@ Bare invocation allowed.
 
 ### `lastlog`
 
-Allowed valued flags: --before, --time, --user, -b, -t, -u. Bare invocation allowed. Denied: -C/--clear, -S/--set.
+Allowed valued flags: --before, --time, --user, -b, -t, -u. Bare invocation allowed.
 
 ### `launchctl`
 
@@ -470,7 +470,7 @@ Subcommands: blame, dumpstate, error, examine, help, hostinfo, list, print, prin
 
 ### `lipo`
 
-Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch). -output and -create denied.
+Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch). Explicit flag allowlist.
 
 ### `llm`
 
@@ -576,7 +576,7 @@ Bare invocation allowed.
 
 Allowed packages: @herb-tools/linter, eslint, karma.
 
-Guarded: tsc (requires --noEmit).
+tsc allowed with --noEmit (explicit flag allowlist).
 
 Skips flags: --yes/-y/--no/--package/-p.
 
@@ -618,7 +618,7 @@ Bare invocation allowed.
 
 ### `perl`
 
-Allowed: -e/-E inline one-liners with safe code, --version, --help, -v, -V. Blocked: script files (no -e/-E), -i (in-place edit), s///e modifier, backticks, and code containing identifiers not in the safe built-in allowlist.
+Allowed: -e/-E inline one-liners with safe built-in functions, --version, --help, -v, -V. Requires -e/-E (no script files). Code is validated against a safe identifier allowlist.
 
 ### `pgrep`
 
@@ -630,7 +630,7 @@ Subcommands: check, config (list/get), debug, freeze, help, index, inspect, list
 
 ### `pkgutil`
 
-Requires a read-only flag (--pkgs, --files, --pkg-info, etc.). Explicit flag allowlist; --expand/--flatten/--forget/--learn denied.
+Requires a read-only flag (--pkgs, --files, --pkg-info, etc.). Explicit flag allowlist.
 
 ### `plutil`
 
@@ -718,7 +718,7 @@ Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, find-gen
 
 ### `sed`
 
-Safe unless -i/--in-place flag or 'e' modifier on substitutions (executes replacement as shell command).
+Read-only usage: requires no -i/--in-place flag, no 'e' modifier on substitutions.
 
 ### `seq`
 
@@ -750,7 +750,7 @@ Safe unless -o/--output or --compress-program flag.
 
 ### `spctl`
 
-Requires --assess/-a. --add, --remove, --enable, --disable, --master-* denied.
+Requires --assess/-a. Explicit flag allowlist.
 
 ### `ss`
 
@@ -758,7 +758,7 @@ Allowed standalone flags: --all, --dccp, --extended, --family, --help, --info, -
 
 Allowed valued flags: --filter, --query, -A, -F, -f.
 
-Bare invocation allowed. Denied: -K/--kill, -D/--diag.
+Bare invocation allowed.
 
 ### `stat`
 
@@ -782,7 +782,7 @@ Subcommands: build, test, package describe, package dump-package, package show-d
 
 ### `sysctl`
 
-Read-only usage allowed. Denied: -w/--write and key=value assignments. Explicit flag allowlist for read flags.
+Read-only usage. Explicit flag allowlist; key=value assignments rejected.
 
 ### `system_profiler`
 
@@ -814,7 +814,7 @@ Subcommands b, branch, branches, i, issue, issues, label, labels, milestone, mil
 
 Always safe: --version, -v, whoami.
 
-Guarded: logins/login (list only).
+logins/login (list only).
 
 Each action has an explicit flag allowlist.
 

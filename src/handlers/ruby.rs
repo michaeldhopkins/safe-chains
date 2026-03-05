@@ -153,7 +153,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("bundle",
             DocBuilder::new()
                 .section("Subcommands: check, info, list, show. Each has an explicit flag allowlist.")
-                .section(format!("Guarded: exec ({} only).",
+                .section(format!("exec allowed for: {}.",
                     wordset_items(&BUNDLE_EXEC_SAFE)))
                 .build()),
         CommandDoc::handler("gem",
