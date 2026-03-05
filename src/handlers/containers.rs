@@ -236,7 +236,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![CommandDoc::handler("docker / podman",
         "Top-level: diff, history, images, info, inspect, logs, port, ps, stats, top, version. \
          Multi-level: buildx, compose, container, context, image, manifest, network, system, volume. \
-         Each subcommand/action has an explicit flag allowlist.")]
+        ")]
 }
 
 #[cfg(test)]

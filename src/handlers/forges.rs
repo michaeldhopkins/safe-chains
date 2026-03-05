@@ -532,8 +532,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                 .section(format!("Always safe: {}.",
                     wordset_items(&ALWAYS_SAFE_SUBCOMMANDS)))
                 .section("auth status, browse (requires --no-browser), \
-                          api (GET only, no body flags).")
-                .section("Each action has an explicit flag allowlist.")
+                          api (GET only).")
+                .section("")
                 .build()),
         CommandDoc::handler("glab",
             DocBuilder::new()
@@ -542,8 +542,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                     wordset_items(&GLAB_READ_ONLY_ACTIONS)))
                 .section(format!("Always safe: {}.",
                     wordset_items(&GLAB_ALWAYS_SAFE)))
-                .section("auth status, api (GET only, no body flags).")
-                .section("Each action has an explicit flag allowlist.")
+                .section("auth status, api (GET only).")
+                .section("")
                 .build()),
         CommandDoc::handler("tea",
             DocBuilder::new()
@@ -554,7 +554,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                 .section(format!("Always safe: {}.",
                     wordset_items(&TEA_ALWAYS_SAFE)))
                 .section("logins/login (list only).")
-                .section("Each action has an explicit flag allowlist.")
+                .section("")
                 .build()),
     ]
 }

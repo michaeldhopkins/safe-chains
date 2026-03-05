@@ -133,7 +133,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![CommandDoc::handler("go",
         "Subcommands: build, doc, env, list, test, version, vet. \
-         Each subcommand has an explicit flag allowlist.")]
+        ")]
 }
 
 #[cfg(test)]

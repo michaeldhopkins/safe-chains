@@ -98,7 +98,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![CommandDoc::handler("swift",
         "Subcommands: build, test, package describe, package dump-package, \
-         package show-dependencies. Each has an explicit flag allowlist.")]
+         package show-dependencies.")]
 }
 
 #[cfg(test)]

@@ -110,10 +110,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("ollama",
-            "Subcommands: list, ps, show. Each has an explicit flag allowlist."),
+            "Subcommands: list, ps, show."),
         CommandDoc::handler("llm",
             "Subcommands: aliases, collections, logs, models, plugins, templates. \
-             Each has an explicit flag allowlist."),
+            "),
     ]
 }
 

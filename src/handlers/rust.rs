@@ -364,13 +364,13 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("cargo",
             "Subcommands: audit, bench, build, check, clippy, deny, doc, license, \
              locate-project, metadata, pkgid, read-manifest, search, test, tree, \
-             verify-project. Each has an explicit flag allowlist. \
+             verify-project. \
              fmt (requires --check), package (requires --list), \
              publish (requires --dry-run). \
              +toolchain selectors (e.g. +nightly) are skipped."),
         CommandDoc::handler("rustup",
             "Subcommands: doc, show, which. Multi-level: component list, \
-             target list, toolchain list. Each has an explicit flag allowlist. \
+             target list, toolchain list. \
              run <toolchain> delegates to inner command validation."),
     ]
 }

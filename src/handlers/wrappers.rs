@@ -140,7 +140,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("time",
             "Skips -p flag, then recursively validates the inner command."),
         CommandDoc::handler("hyperfine",
-            "Recursively validates each benchmarked command. Only benchmarking flags allowed (no --prepare, --cleanup, --setup)."),
+            "Recursively validates each benchmarked command."),
         CommandDoc::handler("nice / ionice",
             "Skips priority flags (-n/--adjustment), then recursively validates the inner command."),
     ]

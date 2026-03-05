@@ -14,7 +14,7 @@ Bare invocation only (prints machine architecture).
 
 ### `asdf`
 
-Subcommands: current, help, info, list, version, which. Multi-level: plugin list. Also: plugin-list, plugin-list-all. No extra flags allowed.
+Subcommands: current, help, info, list, version, which. Multi-level: plugin list. Also: plugin-list, plugin-list-all. 
 
 ### `awk / gawk / mawk / nawk`
 
@@ -62,25 +62,25 @@ Bare invocation allowed.
 
 ### `branchdiff`
 
-Bare invocation only. No flags or arguments allowed.
+Bare invocation only.
 
 ### `brew`
 
-Subcommands: cat, casks, config, deps, desc, doctor, formulae, home, info, leaves, list, log, outdated, search, shellenv, tap, uses. Each has an explicit flag allowlist.
+Subcommands: cat, casks, config, deps, desc, doctor, formulae, home, info, leaves, list, log, outdated, search, shellenv, tap, uses. 
 
 ### `bun`
 
-Subcommands: outdated, pm (bin/cache/hash/ls), test. x delegates to bunx logic. Each has an explicit flag allowlist.
+Subcommands: outdated, pm (bin/cache/hash/ls), test. x delegates to bunx logic.
 
 ### `bundle`
 
-Subcommands: check, info, list, show. Each has an explicit flag allowlist. exec allowed for: brakeman, cucumber, erb_lint, herb, rspec, standardrb.
+Subcommands: check, info, list, show. exec allowed for: brakeman, cucumber, erb_lint, herb, rspec, standardrb.
 
 ### `bunx`
 
 Allowed packages: @herb-tools/linter, eslint, karma.
 
-tsc allowed with --noEmit (explicit flag allowlist).
+tsc allowed with --noEmit.
 
 Skips flags: --bun/--no-install/--package/-p.
 
@@ -94,7 +94,7 @@ Bare invocation allowed.
 
 ### `cargo`
 
-Subcommands: audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. Each has an explicit flag allowlist. fmt (requires --check), package (requires --list), publish (requires --dry-run). +toolchain selectors (e.g. +nightly) are skipped.
+Subcommands: audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. fmt (requires --check), package (requires --list), publish (requires --dry-run). +toolchain selectors (e.g. +nightly) are skipped.
 
 ### `cat`
 
@@ -122,7 +122,7 @@ Allowed: --version, --system-information (single argument only).
 
 ### `codesign`
 
-Requires --display/-d or --verify/-v. Explicit flag allowlist.
+Requires --display/-d or --verify/-v.
 
 ### `colordiff`
 
@@ -146,15 +146,15 @@ Allowed: -v, -V (check if command exists).
 
 ### `composer`
 
-Subcommands: about, audit, check-platform-reqs, diagnose, fund, help, info, licenses, outdated, show, suggests. Each has an explicit flag allowlist.
+Subcommands: about, audit, check-platform-reqs, diagnose, fund, help, info, licenses, outdated, show, suggests.
 
 ### `conda`
 
-Subcommands: config (--show/--show-sources only), info, list. Each has an explicit flag allowlist.
+Subcommands: config (--show/--show-sources only), info, list. 
 
 ### `csrutil`
 
-Subcommands: authenticated-root, report, status. No extra flags.
+Subcommands: authenticated-root, report, status.
 
 ### `cucumber`
 
@@ -182,7 +182,7 @@ Safe unless -s/--set flag (set system date).
 
 ### `defaults`
 
-Subcommands: domains, export, find, read, read-type. Each has an explicit flag allowlist.
+Subcommands: domains, export, find, read, read-type. 
 
 ### `delta`
 
@@ -194,7 +194,7 @@ Bare invocation allowed.
 
 ### `deno`
 
-Subcommands: check, doc, info, lint, test. fmt allowed with --check. Each has an explicit flag allowlist.
+Subcommands: check, doc, info, lint, test. fmt allowed with --check.
 
 ### `df`
 
@@ -222,15 +222,15 @@ Allowed standalone flags: --zero, -z.
 
 ### `diskutil`
 
-Subcommands: activity, info, list, listFilesystems. Multi-level: apfs list/listCryptoUsers/listSnapshots/listVolumeGroups. Each has an explicit flag allowlist.
+Subcommands: activity, info, list, listFilesystems. Multi-level: apfs list/listCryptoUsers/listSnapshots/listVolumeGroups. 
 
 ### `docker / podman`
 
-Top-level: diff, history, images, info, inspect, logs, port, ps, stats, top, version. Multi-level: buildx, compose, container, context, image, manifest, network, system, volume. Each subcommand/action has an explicit flag allowlist.
+Top-level: diff, history, images, info, inspect, logs, port, ps, stats, top, version. Multi-level: buildx, compose, container, context, image, manifest, network, system, volume. 
 
 ### `dotnet`
 
-Subcommands: build, list, test. Info flags: --info, --list-runtimes, --list-sdks. Each subcommand has an explicit flag allowlist.
+Subcommands: build, list, test. Info flags: --info, --list-runtimes, --list-sdks. 
 
 ### `du`
 
@@ -302,7 +302,7 @@ Bare invocation allowed.
 
 ### `fnm`
 
-Subcommands: current, default, list, ls-remote. No extra flags allowed.
+Subcommands: current, default, list, ls-remote.
 
 ### `fold`
 
@@ -314,7 +314,7 @@ Bare invocation allowed.
 
 ### `gem`
 
-Subcommands: contents, dependency, environment, help, info, list, outdated, pristine, search, sources, specification, stale, which. Each has an explicit flag allowlist.
+Subcommands: contents, dependency, environment, help, info, list, outdated, pristine, search, sources, specification, stale, which. 
 
 ### `getconf`
 
@@ -330,9 +330,7 @@ Subcommands attestation, cache, codespace, extension, gpg-key, issue, label, pr,
 
 Always safe: --version, search, status.
 
-auth status, browse (requires --no-browser), api (GET only, no body flags).
-
-Each action has an explicit flag allowlist.
+auth status, browse (requires --no-browser), api (GET only).
 
 ### `git`
 
@@ -348,17 +346,15 @@ Subcommands ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label,
 
 Always safe: --version, -v, check-update, version.
 
-auth status, api (GET only, no body flags).
-
-Each action has an explicit flag allowlist.
+auth status, api (GET only).
 
 ### `go`
 
-Subcommands: build, doc, env, list, test, version, vet. Each subcommand has an explicit flag allowlist.
+Subcommands: build, doc, env, list, test, version, vet. 
 
 ### `gradle / gradlew`
 
-Subcommands: build, check, dependencies, properties, tasks, test. Each has an explicit flag allowlist.
+Subcommands: build, check, dependencies, properties, tasks, test. 
 
 ### `grep`
 
@@ -366,7 +362,7 @@ Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --co
 
 ### `groups`
 
-Any positional arguments (usernames). No flags.
+Positional arguments (usernames) only.
 
 ### `head`
 
@@ -402,7 +398,7 @@ Bare invocation allowed.
 
 ### `hyperfine`
 
-Recursively validates each benchmarked command. Only benchmarking flags allowed (no --prepare, --cleanup, --setup).
+Recursively validates each benchmarked command.
 
 ### `iconv`
 
@@ -466,15 +462,15 @@ Allowed valued flags: --before, --time, --user, -b, -t, -u. Bare invocation allo
 
 ### `launchctl`
 
-Subcommands: blame, dumpstate, error, examine, help, hostinfo, list, print, print-cache, print-disabled, resolveport, version. No extra flags.
+Subcommands: blame, dumpstate, error, examine, help, hostinfo, list, print, print-cache, print-disabled, resolveport, version. 
 
 ### `lipo`
 
-Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch). Explicit flag allowlist.
+Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch).
 
 ### `llm`
 
-Subcommands: aliases, collections, logs, models, plugins, templates. Each has an explicit flag allowlist.
+Subcommands: aliases, collections, logs, models, plugins, templates. 
 
 ### `locale`
 
@@ -482,7 +478,7 @@ Allowed standalone flags: --all-locales, --category-name, --charmaps, --keyword-
 
 ### `log`
 
-Subcommands: help, show, stats, stream. show and stream have explicit flag allowlists.
+Subcommands: help, show, stats, stream. 
 
 ### `ls`
 
@@ -502,7 +498,7 @@ Bare invocation allowed.
 
 ### `magick`
 
-Subcommand: identify (with explicit flag allowlist).
+Subcommand: identify.
 
 ### `md5`
 
@@ -526,11 +522,11 @@ Allowed standalone flags: --raw, -r. Allowed valued flags: --name, --nullMarker,
 
 ### `mise`
 
-Subcommands: current, doctor, env, list/ls, which. Multi-level: config list/ls, settings get. Each has an explicit flag allowlist.
+Subcommands: current, doctor, env, list/ls, which. Multi-level: config list/ls, settings get. 
 
 ### `mvn / mvnw`
 
-Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify. Each has an explicit flag allowlist.
+Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify.
 
 ### `netstat`
 
@@ -562,7 +558,7 @@ Allowed standalone flags: --debug-syms, --defined-only, --demangle, --dynamic, -
 
 ### `npm`
 
-Subcommands: audit, config (list/get), doctor, explain, fund, info, list, ls, outdated, prefix, root, run/run-script (test only), test, view, why. Each has an explicit flag allowlist.
+Subcommands: audit, config (list/get), doctor, explain, fund, info, list, ls, outdated, prefix, root, run/run-script (test only), test, view, why. 
 
 ### `nproc`
 
@@ -576,7 +572,7 @@ Bare invocation allowed.
 
 Allowed packages: @herb-tools/linter, eslint, karma.
 
-tsc allowed with --noEmit (explicit flag allowlist).
+tsc allowed with --noEmit.
 
 Skips flags: --yes/-y/--no/--package/-p.
 
@@ -602,7 +598,7 @@ Bare invocation allowed.
 
 ### `ollama`
 
-Subcommands: list, ps, show. Each has an explicit flag allowlist.
+Subcommands: list, ps, show.
 
 ### `otool`
 
@@ -618,7 +614,7 @@ Bare invocation allowed.
 
 ### `perl`
 
-Allowed: -e/-E inline one-liners with safe built-in functions, --version, --help, -v, -V. Requires -e/-E (no script files). Code is validated against a safe identifier allowlist.
+Allowed: -e/-E inline one-liners with safe built-in functions, --version, --help, -v, -V. Requires -e/-E flag. Code is validated against a safe identifier allowlist.
 
 ### `pgrep`
 
@@ -626,27 +622,27 @@ Allowed standalone flags: --count, --delimiter, --full, --inverse, --lightweight
 
 ### `pip / pip3`
 
-Subcommands: check, config (list/get), debug, freeze, help, index, inspect, list, show. Each has an explicit flag allowlist.
+Subcommands: check, config (list/get), debug, freeze, help, index, inspect, list, show.
 
 ### `pkgutil`
 
-Requires a read-only flag (--pkgs, --files, --pkg-info, etc.). Explicit flag allowlist.
+Requires a read-only flag (--pkgs, --files, --pkg-info, etc.).
 
 ### `plutil`
 
-Subcommands: -help, -lint, -p, -type. Each has an explicit flag allowlist.
+Subcommands: -help, -lint, -p, -type. 
 
 ### `pmset`
 
-Allowed: -g (get/display settings only). No extra flags.
+Allowed: -g (get/display settings only).
 
 ### `pnpm`
 
-Subcommands: audit, list, ls, outdated, why. Each has an explicit flag allowlist.
+Subcommands: audit, list, ls, outdated, why. 
 
 ### `poetry`
 
-Subcommands: check, env info/list, show. Each has an explicit flag allowlist.
+Subcommands: check, env info/list, show.
 
 ### `printenv`
 
@@ -682,7 +678,7 @@ Subcommands: help, root, shims, version, versions, which. Minimal flags allowed 
 
 ### `rbenv`
 
-Subcommands: help, root, shims, version, versions, which. No flags allowed beyond the subcommand.
+Subcommands: help, root, shims, version, versions, which.
 
 ### `readlink`
 
@@ -706,7 +702,7 @@ Allowed subcommands: get, monitor, print, show. Allowed flags: -4, -6, -n, -v. B
 
 ### `rustup`
 
-Subcommands: doc, show, which. Multi-level: component list, target list, toolchain list. Each has an explicit flag allowlist. run <toolchain> delegates to inner command validation.
+Subcommands: doc, show, which. Multi-level: component list, target list, toolchain list. run <toolchain> delegates to inner command validation.
 
 ### `safe-chains`
 
@@ -714,11 +710,11 @@ Any arguments allowed (safe-chains is this tool).
 
 ### `security`
 
-Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, find-generic-password, find-identity, find-internet-password, list-keychains, show-keychain-info, smartcard, verify-cert. Each has an explicit flag allowlist.
+Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, find-generic-password, find-identity, find-internet-password, list-keychains, show-keychain-info, smartcard, verify-cert. 
 
 ### `sed`
 
-Read-only usage: requires no -i/--in-place flag, no 'e' modifier on substitutions.
+Read-only usage. Explicit validation of inline expressions.
 
 ### `seq`
 
@@ -742,7 +738,7 @@ Allowed standalone flags: --common, --totals, -A, -B, -G, -d, -o, -t, -x. Allowe
 
 ### `sleep`
 
-Positional duration arguments only. No flags.
+Positional duration arguments only.
 
 ### `sort`
 
@@ -750,7 +746,7 @@ Safe unless -o/--output or --compress-program flag.
 
 ### `spctl`
 
-Requires --assess/-a. Explicit flag allowlist.
+Requires --assess/-a.
 
 ### `ss`
 
@@ -778,11 +774,11 @@ Allowed standalone flags: --buildVersion, --productName, --productVersion, --pro
 
 ### `swift`
 
-Subcommands: build, test, package describe, package dump-package, package show-dependencies. Each has an explicit flag allowlist.
+Subcommands: build, test, package describe, package dump-package, package show-dependencies.
 
 ### `sysctl`
 
-Read-only usage. Explicit flag allowlist; key=value assignments rejected.
+Read-only usage.
 
 ### `system_profiler`
 
@@ -815,8 +811,6 @@ Subcommands b, branch, branches, i, issue, issues, label, labels, milestone, mil
 Always safe: --version, -v, whoami.
 
 logins/login (list only).
-
-Each action has an explicit flag allowlist.
 
 ### `test`
 
@@ -856,7 +850,7 @@ Safe unless -o flag (write output to file).
 
 ### `true / false`
 
-Bare invocation only. No flags or arguments allowed.
+Bare invocation only.
 
 ### `tty`
 
@@ -904,7 +898,7 @@ Bare invocation allowed.
 
 ### `uv`
 
-Subcommands: pip check/freeze/list/show, python list, tool list. Each has an explicit flag allowlist.
+Subcommands: pip check/freeze/list/show, python list, tool list. 
 
 ### `vm_stat`
 
@@ -940,7 +934,7 @@ Allowed standalone flags: --all, --boot, --count, --dead, --heading, --login, --
 
 ### `whoami`
 
-Bare invocation only. No flags or arguments allowed.
+Bare invocation only.
 
 ### `whois`
 
@@ -956,7 +950,7 @@ Allowed: -p/--print-path, -v/--version (single argument only).
 
 ### `xcodebuild`
 
-Subcommands: -list, -showBuildSettings, -showdestinations, -showsdks, -version. Each has an explicit flag allowlist.
+Subcommands: -list, -showBuildSettings, -showdestinations, -showsdks, -version. 
 
 ### `xcrun`
 
@@ -976,7 +970,7 @@ Bare invocation allowed.
 
 ### `yarn`
 
-Subcommands: info, list, ls, test, test:*, why. Each has an explicit flag allowlist.
+Subcommands: info, list, ls, test, test:*, why. 
 
 ### `yq`
 

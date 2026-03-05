@@ -78,7 +78,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![CommandDoc::handler("dotnet",
         "Subcommands: build, list, test. Info flags: --info, --list-runtimes, --list-sdks. \
-         Each subcommand has an explicit flag allowlist.")]
+        ")]
 }
 
 #[cfg(test)]

@@ -38,7 +38,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         crate::docs::CommandDoc::handler("magick",
-            "Subcommand: identify (with explicit flag allowlist)."),
+            "Subcommand: identify."),
     ]
 }
 

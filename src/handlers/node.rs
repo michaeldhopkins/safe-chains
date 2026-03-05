@@ -399,36 +399,36 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("npm",
             "Subcommands: audit, config (list/get), doctor, explain, fund, info, list, ls, \
              outdated, prefix, root, run/run-script (test only), test, view, why. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("yarn",
             "Subcommands: info, list, ls, test, test:*, why. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("pnpm",
             "Subcommands: audit, list, ls, outdated, why. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("bun",
             "Subcommands: outdated, pm (bin/cache/hash/ls), test. \
-             x delegates to bunx logic. Each has an explicit flag allowlist."),
+             x delegates to bunx logic."),
         CommandDoc::handler("bunx",
             DocBuilder::new()
                 .section(format!("Allowed packages: {}.", wordset_items(&NPX_SAFE)))
-                .section("tsc allowed with --noEmit (explicit flag allowlist).")
+                .section("tsc allowed with --noEmit.")
                 .section("Skips flags: --bun/--no-install/--package/-p.")
                 .build()),
         CommandDoc::handler("deno",
             "Subcommands: check, doc, info, lint, test. \
-             fmt allowed with --check. Each has an explicit flag allowlist."),
+             fmt allowed with --check."),
         CommandDoc::handler("npx",
             DocBuilder::new()
                 .section(format!("Allowed packages: {}.", wordset_items(&NPX_SAFE)))
-                .section("tsc allowed with --noEmit (explicit flag allowlist).")
+                .section("tsc allowed with --noEmit.")
                 .section("Skips flags: --yes/-y/--no/--package/-p.")
                 .build()),
         CommandDoc::handler("nvm",
             "Subcommands: current, list, ls, ls-remote, version, which. \
              Minimal flags allowed."),
         CommandDoc::handler("fnm",
-            "Subcommands: current, default, list, ls-remote. No extra flags allowed."),
+            "Subcommands: current, default, list, ls-remote."),
         CommandDoc::handler("volta",
             "Subcommands: list, which. Flags: --current, --default, --format."),
     ]

@@ -141,10 +141,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         CommandDoc::handler("gradle / gradlew",
             "Subcommands: build, check, dependencies, properties, tasks, test. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("mvn / mvnw",
             "Phases: compile, dependency:list, dependency:tree, help:describe, \
-             test, test-compile, validate, verify. Each has an explicit flag allowlist."),
+             test, test-compile, validate, verify."),
     ]
 }
 

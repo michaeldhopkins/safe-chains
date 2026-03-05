@@ -262,18 +262,18 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         CommandDoc::handler("pip / pip3",
             "Subcommands: check, config (list/get), debug, freeze, help, index, inspect, \
-             list, show. Each has an explicit flag allowlist."),
+             list, show."),
         CommandDoc::handler("uv",
             "Subcommands: pip check/freeze/list/show, python list, tool list. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("poetry",
-            "Subcommands: check, env info/list, show. Each has an explicit flag allowlist."),
+            "Subcommands: check, env info/list, show."),
         CommandDoc::handler("pyenv",
             "Subcommands: help, root, shims, version, versions, which. \
              Minimal flags allowed (--bare)."),
         CommandDoc::handler("conda",
             "Subcommands: config (--show/--show-sources only), info, list. \
-             Each has an explicit flag allowlist."),
+            "),
     ]
 }
 

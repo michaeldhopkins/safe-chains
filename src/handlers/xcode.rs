@@ -249,10 +249,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         CommandDoc::handler("xcodebuild",
             "Subcommands: -list, -showBuildSettings, -showdestinations, -showsdks, -version. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("plutil",
             "Subcommands: -help, -lint, -p, -type. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("xcode-select",
             "Allowed: -p/--print-path, -v/--version (single argument only)."),
         CommandDoc::handler("xcrun",
@@ -260,17 +260,13 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
              Multi-level: notarytool history/info/log, simctl list, stapler validate. \
              Prefix flags --sdk/--toolchain (with arg), -v/-l/-n are skipped."),
         CommandDoc::handler("pkgutil",
-            "Requires a read-only flag (--pkgs, --files, --pkg-info, etc.). \
-             Explicit flag allowlist."),
+            "Requires a read-only flag (--pkgs, --files, --pkg-info, etc.)."),
         CommandDoc::handler("lipo",
-            "Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch). \
-             Explicit flag allowlist."),
+            "Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch)."),
         CommandDoc::handler("codesign",
-            "Requires --display/-d or --verify/-v. \
-             Explicit flag allowlist."),
+            "Requires --display/-d or --verify/-v."),
         CommandDoc::handler("spctl",
-            "Requires --assess/-a. \
-             Explicit flag allowlist."),
+            "Requires --assess/-a."),
     ]
 }
 

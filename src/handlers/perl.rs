@@ -324,7 +324,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         CommandDoc::handler("perl",
             "Allowed: -e/-E inline one-liners with safe built-in functions, --version, --help, -v, -V. \
-             Requires -e/-E (no script files). Code is validated against a safe identifier allowlist."),
+             Requires -e/-E flag. Code is validated against a safe identifier allowlist."),
     ]
 }
 

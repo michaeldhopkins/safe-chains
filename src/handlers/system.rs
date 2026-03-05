@@ -551,45 +551,45 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("brew",
             "Subcommands: cat, casks, config, deps, desc, doctor, formulae, home, info, \
              leaves, list, log, outdated, search, shellenv, tap, uses. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("mise",
             "Subcommands: current, doctor, env, list/ls, which. \
              Multi-level: config list/ls, settings get. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("asdf",
             "Subcommands: current, help, info, list, version, which. \
              Multi-level: plugin list. Also: plugin-list, plugin-list-all. \
-             No extra flags allowed."),
+"),
         CommandDoc::handler("defaults",
             "Subcommands: domains, export, find, read, read-type. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("pmset",
-            "Allowed: -g (get/display settings only). No extra flags."),
+            "Allowed: -g (get/display settings only)."),
         CommandDoc::handler("sysctl",
-            "Read-only usage. Explicit flag allowlist; key=value assignments rejected."),
+            "Read-only usage."),
         CommandDoc::handler("cmake",
             "Allowed: --version, --system-information (single argument only)."),
         CommandDoc::handler("security",
             "Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, \
              find-generic-password, find-identity, find-internet-password, \
              list-keychains, show-keychain-info, smartcard, verify-cert. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("csrutil",
-            "Subcommands: authenticated-root, report, status. No extra flags."),
+            "Subcommands: authenticated-root, report, status."),
         CommandDoc::handler("diskutil",
             "Subcommands: activity, info, list, listFilesystems. \
              Multi-level: apfs list/listCryptoUsers/listSnapshots/listVolumeGroups. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("launchctl",
             "Subcommands: blame, dumpstate, error, examine, help, hostinfo, \
              list, print, print-cache, print-disabled, resolveport, version. \
-             No extra flags."),
+"),
         CommandDoc::handler("networksetup",
             "Allowed: subcommands starting with -list, -get, -show, -print, \
              plus -version and -help."),
         CommandDoc::handler("log",
             "Subcommands: help, show, stats, stream. \
-             show and stream have explicit flag allowlists."),
+"),
     ]
 }
 

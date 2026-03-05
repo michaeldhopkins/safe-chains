@@ -152,17 +152,16 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         CommandDoc::handler("bundle",
             DocBuilder::new()
-                .section("Subcommands: check, info, list, show. Each has an explicit flag allowlist.")
+                .section("Subcommands: check, info, list, show.")
                 .section(format!("exec allowed for: {}.",
                     wordset_items(&BUNDLE_EXEC_SAFE)))
                 .build()),
         CommandDoc::handler("gem",
             "Subcommands: contents, dependency, environment, help, info, list, outdated, \
              pristine, search, sources, specification, stale, which. \
-             Each has an explicit flag allowlist."),
+            "),
         CommandDoc::handler("rbenv",
-            "Subcommands: help, root, shims, version, versions, which. \
-             No flags allowed beyond the subcommand."),
+            "Subcommands: help, root, shims, version, versions, which."),
     ]
 }
 

@@ -72,7 +72,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![CommandDoc::handler("composer",
         "Subcommands: about, audit, check-platform-reqs, diagnose, fund, help, info, \
-         licenses, outdated, show, suggests. Each has an explicit flag allowlist.")]
+         licenses, outdated, show, suggests.")]
 }
 
 #[cfg(test)]
