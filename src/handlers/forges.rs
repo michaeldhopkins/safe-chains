@@ -260,9 +260,6 @@ pub fn is_safe_gh(tokens: &[Token]) -> bool {
         if tokens[2] == "status" {
             return policy::check(&tokens[2..], &GH_SIMPLE_LIST_POLICY);
         }
-        if tokens[2] == "token" {
-            return policy::check(&tokens[2..], &GH_SIMPLE_LIST_POLICY);
-        }
         return false;
     }
 
@@ -582,7 +579,6 @@ mod tests {
         issue_list: "gh issue list",
         issue_list_state: "gh issue list --state closed",
         auth_status: "gh auth status",
-        auth_token: "gh auth token",
         search_issues: "gh search issues foo",
         search_issues_state: "gh search issues foo --state open",
         search_issues_json: "gh search issues foo --json number,title",
@@ -681,6 +677,7 @@ mod tests {
         api_xpost_short_denied: "gh api repos/o/r/pulls -XPOST",
         api_xpatch_short_denied: "gh api repos/o/r/pulls -XPATCH",
         auth_login_denied: "gh auth login",
+        auth_token_denied: "gh auth token",
         bare_gh_denied: "gh",
         gh_pr_list_unknown_denied: "gh pr list --unknown",
         gh_pr_view_unknown_denied: "gh pr view 123 --unknown",

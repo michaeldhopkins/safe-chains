@@ -14,7 +14,7 @@ Allowed: bare `arch` only (prints machine architecture). Flags denied (can execu
 
 ### `asdf`
 
-Subcommands: current, help, info, list, plugin list, plugin-list, plugin-list-all, version, which. Flags: --version.
+Subcommands: current, help, info, list, version, which. Multi-level: plugin list. Also: plugin-list, plugin-list-all. No extra flags allowed.
 
 ### `awk / gawk / mawk / nawk`
 
@@ -66,7 +66,7 @@ Bare invocation only. No flags or arguments allowed.
 
 ### `brew`
 
-Subcommands: casks, cat, config, deps, desc, doctor, formulae, home, info, leaves, list, log, outdated, search, shellenv, tap, uses. Flags: --prefix, --version.
+Subcommands: cat, casks, config, deps, desc, doctor, formulae, home, info, leaves, list, log, outdated, search, shellenv, tap, uses. Each has an explicit flag allowlist.
 
 ### `bun`
 
@@ -122,7 +122,7 @@ Allowed: --version, --system-information (single argument only).
 
 ### `codesign`
 
-Requires: --display, --verify, -d, -v. Denied: --force, --remove-signature, --sign, -f, -s.
+Requires --display/-d or --verify/-v. --sign/-s, --force/-f, --remove-signature denied.
 
 ### `colordiff`
 
@@ -154,7 +154,7 @@ Subcommands: config (--show/--show-sources only), info, list. Each has an explic
 
 ### `csrutil`
 
-Subcommands: authenticated-root, report, status.
+Subcommands: authenticated-root, report, status. No extra flags.
 
 ### `cucumber`
 
@@ -182,7 +182,7 @@ Safe unless -s/--set flag (set system date).
 
 ### `defaults`
 
-Subcommands: domains, export, find, read, read-type.
+Subcommands: domains, export, find, read, read-type. Each has an explicit flag allowlist.
 
 ### `delta`
 
@@ -222,7 +222,7 @@ Allowed standalone flags: --zero, -z.
 
 ### `diskutil`
 
-Subcommands: activity, apfs list, apfs listCryptoUsers, apfs listSnapshots, apfs listVolumeGroups, info, list, listFilesystems.
+Subcommands: activity, info, list, listFilesystems. Multi-level: apfs list/listCryptoUsers/listSnapshots/listVolumeGroups. Each has an explicit flag allowlist.
 
 ### `docker / podman`
 
@@ -466,11 +466,11 @@ Allowed valued flags: --before, --time, --user, -b, -t, -u. Bare invocation allo
 
 ### `launchctl`
 
-Subcommands: blame, dumpstate, error, examine, help, hostinfo, list, print, print-cache, print-disabled, resolveport, version.
+Subcommands: blame, dumpstate, error, examine, help, hostinfo, list, print, print-cache, print-disabled, resolveport, version. No extra flags.
 
 ### `lipo`
 
-Requires: -archs, -detailed_info, -info, -verify_arch. Denied: -output.
+Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch). -output and -create denied.
 
 ### `llm`
 
@@ -482,7 +482,7 @@ Allowed standalone flags: --all-locales, --category-name, --charmaps, --keyword-
 
 ### `log`
 
-Subcommands: help, show, stats, stream.
+Subcommands: help, show, stats, stream. show and stream have explicit flag allowlists.
 
 ### `ls`
 
@@ -526,7 +526,7 @@ Allowed standalone flags: --raw, -r. Allowed valued flags: --name, --nullMarker,
 
 ### `mise`
 
-Subcommands: config list, config ls, current, doctor, env, list, ls, settings get, which. Flags: --version.
+Subcommands: current, doctor, env, list/ls, which. Multi-level: config list/ls, settings get. Each has an explicit flag allowlist.
 
 ### `mvn / mvnw`
 
@@ -630,15 +630,15 @@ Subcommands: check, config (list/get), debug, freeze, help, index, inspect, list
 
 ### `pkgutil`
 
-Requires: --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist. Denied: --expand, --flatten, --forget, --learn.
+Requires a read-only flag (--pkgs, --files, --pkg-info, etc.). Explicit flag allowlist; --expand/--flatten/--forget/--learn denied.
 
 ### `plutil`
 
-Flags: -help, -lint, -p, -type.
+Subcommands: -help, -lint, -p, -type. Each has an explicit flag allowlist.
 
 ### `pmset`
 
-Allowed: -g (get/display settings only).
+Allowed: -g (get/display settings only). No extra flags.
 
 ### `pnpm`
 
@@ -714,7 +714,7 @@ Any arguments allowed (safe-chains is this tool).
 
 ### `security`
 
-Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, find-generic-password, find-identity, find-internet-password, list-keychains, show-keychain-info, smartcard, verify-cert.
+Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, find-generic-password, find-identity, find-internet-password, list-keychains, show-keychain-info, smartcard, verify-cert. Each has an explicit flag allowlist.
 
 ### `sed`
 
@@ -750,7 +750,7 @@ Safe unless -o/--output or --compress-program flag.
 
 ### `spctl`
 
-Requires: --assess, -a. Denied: --add, --disable, --enable, --master-disable, --master-enable, --remove.
+Requires --assess/-a. --add, --remove, --enable, --disable, --master-* denied.
 
 ### `ss`
 
@@ -782,7 +782,7 @@ Subcommands: build, test, package describe, package dump-package, package show-d
 
 ### `sysctl`
 
-Safe unless -w/--write flag or key=value assignment syntax.
+Read-only usage allowed. Denied: -w/--write and key=value assignments. Explicit flag allowlist for read flags.
 
 ### `system_profiler`
 
@@ -952,19 +952,15 @@ Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n,
 
 ### `xcode-select`
 
-Allowed: -p/--print-path, -v/--version. Denied: -s/--switch, -r/--reset, --install.
+Allowed: -p/--print-path, -v/--version (single argument only).
 
 ### `xcodebuild`
 
-Flags: -list, -showBuildSettings, -showdestinations, -showsdks, -version.
+Subcommands: -list, -showBuildSettings, -showdestinations, -showsdks, -version. Each has an explicit flag allowlist.
 
 ### `xcrun`
 
-Subcommands: notarytool history, notarytool info, notarytool log, simctl list, stapler validate.
-
-Flags: --find, --show-sdk-build-version, --show-sdk-path, --show-sdk-platform-path, --show-sdk-platform-version, --show-sdk-version, --show-toolchain-path.
-
-Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.
+Allowed: --find, --show-sdk-*, --show-toolchain-path. Multi-level: notarytool history/info/log, simctl list, stapler validate. Prefix flags --sdk/--toolchain (with arg), -v/-l/-n are skipped.
 
 ### `xmllint`
 

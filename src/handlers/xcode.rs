@@ -1,25 +1,83 @@
-use crate::parse::{FlagCheck, Segment, Token, WordSet};
+use crate::parse::{Segment, Token, WordSet};
+use crate::policy::{self, FlagPolicy};
 
-static XCODEBUILD_SAFE: WordSet = WordSet::new(&[
-    "-list", "-showBuildSettings", "-showdestinations", "-showsdks", "-version",
-]);
+static XCODEBUILD_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-json"]),
+    standalone_short: b"",
+    valued: WordSet::new(&["-project", "-workspace"]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static XCODEBUILD_SHOW_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-json"]),
+    standalone_short: b"",
+    valued: WordSet::new(&[
+        "-configuration", "-destination", "-project",
+        "-scheme", "-sdk", "-target", "-workspace",
+    ]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+static XCODEBUILD_VERSION_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
 
 pub fn is_safe_xcodebuild(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && XCODEBUILD_SAFE.contains(&tokens[1])
-}
-
-static PLUTIL_READ_ONLY: WordSet =
-    WordSet::new(&["-help", "-lint", "-p", "-type"]);
-
-pub fn is_safe_plutil(tokens: &[Token]) -> bool {
-    tokens.len() >= 2 && PLUTIL_READ_ONLY.contains(&tokens[1])
-}
-
-pub fn is_safe_xcode_select(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    tokens[1].is_one_of(&["-p", "--print-path", "-v", "--version"])
+    let policy = match tokens[1].as_str() {
+        "-list" => &XCODEBUILD_LIST_POLICY,
+        "-showBuildSettings" | "-showdestinations" | "-showsdks" => &XCODEBUILD_SHOW_POLICY,
+        "-version" => &XCODEBUILD_VERSION_POLICY,
+        _ => return false,
+    };
+    policy::check(&tokens[1..], policy)
+}
+
+static PLUTIL_LINT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-s"]),
+    standalone_short: b"s",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+static PLUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+pub fn is_safe_plutil(tokens: &[Token]) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    let policy = match tokens[1].as_str() {
+        "-lint" => &PLUTIL_LINT_POLICY,
+        "-p" | "-type" => &PLUTIL_SIMPLE_POLICY,
+        "-help" => return tokens.len() == 2,
+        _ => return false,
+    };
+    policy::check(&tokens[1..], policy)
+}
+
+pub fn is_safe_xcode_select(tokens: &[Token]) -> bool {
+    tokens.len() == 2
+        && tokens[1].is_one_of(&["-p", "--print-path", "-v", "--version"])
 }
 
 static XCRUN_SHOW_FLAGS: WordSet = WordSet::new(&[
@@ -28,17 +86,20 @@ static XCRUN_SHOW_FLAGS: WordSet = WordSet::new(&[
     "--show-sdk-version", "--show-toolchain-path",
 ]);
 
+static NOTARYTOOL_SAFE: WordSet = WordSet::new(&["history", "info", "log"]);
+
 pub fn is_safe_xcrun(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
     let mut i = 1;
     while i < tokens.len() {
-        if tokens[i] == "--sdk" || tokens[i] == "--toolchain" {
+        let t = &tokens[i];
+        if t == "--sdk" || t == "--toolchain" {
             i += 2;
             continue;
         }
-        if tokens[i].is_one_of(&["-v", "--verbose", "-l", "--log", "-n", "--no-cache"]) {
+        if t.is_one_of(&["-v", "--verbose", "-l", "--log", "-n", "--no-cache"]) {
             i += 1;
             continue;
         }
@@ -62,61 +123,125 @@ pub fn is_safe_xcrun(tokens: &[Token]) -> bool {
     false
 }
 
-static NOTARYTOOL_SAFE: WordSet = WordSet::new(&["history", "info", "log"]);
+static PKGUTIL_SAFE: WordSet = WordSet::new(&[
+    "--check-signature", "--export-plist",
+    "--file-info", "--file-info-plist",
+    "--files", "--group-pkgs", "--groups", "--groups-plist",
+    "--packages", "--payload-files",
+    "--pkg-groups", "--pkg-info", "--pkg-info-plist",
+    "--pkgs", "--pkgs-plist",
+]);
 
-static PKGUTIL_CHECK: FlagCheck = FlagCheck::new(
-    &[
+static PKGUTIL_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
         "--check-signature", "--export-plist",
         "--file-info", "--file-info-plist",
         "--files", "--group-pkgs", "--groups", "--groups-plist",
         "--packages", "--payload-files",
         "--pkg-groups", "--pkg-info", "--pkg-info-plist",
         "--pkgs", "--pkgs-plist",
-    ],
-    &["--expand", "--flatten", "--forget", "--learn"],
-);
+        "--regexp",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&["--volume"]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
 
 pub fn is_safe_pkgutil(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    PKGUTIL_CHECK.is_safe(&tokens[1..])
+    if !tokens[1..].iter().any(|t| PKGUTIL_SAFE.contains(t)) {
+        return false;
+    }
+    policy::check(tokens, &PKGUTIL_POLICY)
 }
 
-static LIPO_CHECK: FlagCheck = FlagCheck::new(
-    &["-archs", "-detailed_info", "-info", "-verify_arch"],
-    &["-output"],
-);
+static LIPO_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-archs", "-detailed_info", "-info", "-verify_arch",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
 
 pub fn is_safe_lipo(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    LIPO_CHECK.is_safe(&tokens[1..])
+    static LIPO_SAFE: WordSet =
+        WordSet::new(&["-archs", "-detailed_info", "-info", "-verify_arch"]);
+    if !tokens[1..].iter().any(|t| LIPO_SAFE.contains(t)) {
+        return false;
+    }
+    policy::check(tokens, &LIPO_POLICY)
 }
 
-static CODESIGN_CHECK: FlagCheck = FlagCheck::new(
-    &["--display", "--verify", "-d", "-v"],
-    &["--force", "--remove-signature", "--sign", "-f", "-s"],
-);
+static CODESIGN_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--deep", "--display", "--verify",
+        "-R", "-d", "-v",
+    ]),
+    standalone_short: b"Rdv",
+    valued: WordSet::new(&["--verbose"]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
 
 pub fn is_safe_codesign(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    CODESIGN_CHECK.is_safe(&tokens[1..])
+    static CODESIGN_SAFE: WordSet = WordSet::new(&["--display", "--verify", "-d", "-v"]);
+    if !tokens[1..].iter().any(|t| CODESIGN_SAFE.contains(t)) {
+        return false;
+    }
+    if tokens[1..].iter().any(|t| {
+        t == "--force" || t == "-f"
+            || t == "--sign" || t == "-s"
+            || t == "--remove-signature"
+    }) {
+        return false;
+    }
+    policy::check(tokens, &CODESIGN_POLICY)
 }
 
-static SPCTL_CHECK: FlagCheck = FlagCheck::new(
-    &["--assess", "-a"],
-    &["--add", "--disable", "--enable", "--master-disable", "--master-enable", "--remove"],
-);
+static SPCTL_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--assess", "--verbose",
+        "-a", "-v",
+    ]),
+    standalone_short: b"av",
+    valued: WordSet::new(&[
+        "--context", "--type",
+    ]),
+    valued_short: b"t",
+    bare: false,
+    max_positional: None,
+};
 
 pub fn is_safe_spctl(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
-    SPCTL_CHECK.is_safe(&tokens[1..])
+    static SPCTL_SAFE: WordSet = WordSet::new(&["--assess", "-a"]);
+    if !tokens[1..].iter().any(|t| SPCTL_SAFE.contains(t)) {
+        return false;
+    }
+    if tokens[1..].iter().any(|t| {
+        t == "--add" || t == "--disable" || t == "--enable"
+            || t == "--master-disable" || t == "--master-enable"
+            || t == "--remove"
+    }) {
+        return false;
+    }
+    policy::check(tokens, &SPCTL_POLICY)
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
@@ -134,25 +259,32 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) 
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, doc};
+    use crate::docs::CommandDoc;
     vec![
-        CommandDoc::wordset("xcodebuild", &XCODEBUILD_SAFE),
-        CommandDoc::wordset("plutil", &PLUTIL_READ_ONLY),
+        CommandDoc::handler("xcodebuild",
+            "Subcommands: -list, -showBuildSettings, -showdestinations, -showsdks, -version. \
+             Each has an explicit flag allowlist."),
+        CommandDoc::handler("plutil",
+            "Subcommands: -help, -lint, -p, -type. \
+             Each has an explicit flag allowlist."),
         CommandDoc::handler("xcode-select",
-            "Allowed: -p/--print-path, -v/--version. Denied: -s/--switch, -r/--reset, --install."),
+            "Allowed: -p/--print-path, -v/--version (single argument only)."),
         CommandDoc::handler("xcrun",
-            doc(&XCRUN_SHOW_FLAGS)
-                .multi_word(&[
-                    ("notarytool", NOTARYTOOL_SAFE),
-                    ("simctl", WordSet::new(&["list"])),
-                    ("stapler", WordSet::new(&["validate"])),
-                ])
-                .section("Skips flags: --sdk/--toolchain (with arg), -v/-l/-n.")
-                .build()),
-        CommandDoc::flagcheck("pkgutil", &PKGUTIL_CHECK),
-        CommandDoc::flagcheck("lipo", &LIPO_CHECK),
-        CommandDoc::flagcheck("codesign", &CODESIGN_CHECK),
-        CommandDoc::flagcheck("spctl", &SPCTL_CHECK),
+            "Allowed: --find, --show-sdk-*, --show-toolchain-path. \
+             Multi-level: notarytool history/info/log, simctl list, stapler validate. \
+             Prefix flags --sdk/--toolchain (with arg), -v/-l/-n are skipped."),
+        CommandDoc::handler("pkgutil",
+            "Requires a read-only flag (--pkgs, --files, --pkg-info, etc.). \
+             Explicit flag allowlist; --expand/--flatten/--forget/--learn denied."),
+        CommandDoc::handler("lipo",
+            "Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch). \
+             -output and -create denied."),
+        CommandDoc::handler("codesign",
+            "Requires --display/-d or --verify/-v. \
+             --sign/-s, --force/-f, --remove-signature denied."),
+        CommandDoc::handler("spctl",
+            "Requires --assess/-a. \
+             --add, --remove, --enable, --disable, --master-* denied."),
     ]
 }
 
@@ -168,8 +300,14 @@ mod tests {
         xcodebuild_version: "xcodebuild -version",
         xcodebuild_showsdks: "xcodebuild -showsdks",
         xcodebuild_show_build_settings: "xcodebuild -showBuildSettings",
+        xcodebuild_show_build_settings_scheme: "xcodebuild -showBuildSettings -scheme MyApp",
+        xcodebuild_show_build_settings_json: "xcodebuild -showBuildSettings -json",
         xcodebuild_list: "xcodebuild -list",
+        xcodebuild_list_project: "xcodebuild -list -project MyApp.xcodeproj",
+        xcodebuild_list_json: "xcodebuild -list -json",
+        xcodebuild_showdestinations: "xcodebuild -showdestinations -scheme MyApp",
         plutil_lint: "plutil -lint file.plist",
+        plutil_lint_silent: "plutil -lint -s file.plist",
         plutil_print: "plutil -p file.plist",
         plutil_type: "plutil -type keypath file.plist",
         plutil_help: "plutil -help",
@@ -202,17 +340,20 @@ mod tests {
         codesign_display: "codesign -d /Applications/Safari.app",
         codesign_display_long: "codesign --display --verbose=4 /usr/bin/ls",
         codesign_verify: "codesign -v /usr/bin/ls",
-        codesign_verify_long: "codesign --verify --deep /Applications/Xcode.app",
+        codesign_verify_long: "codesign --verify --deep /usr/bin/ls",
     }
 
     denied! {
         xcodebuild_build_denied: "xcodebuild build",
         xcodebuild_clean_denied: "xcodebuild clean",
+        xcodebuild_list_unknown_denied: "xcodebuild -list --unknown",
+        xcodebuild_showsdks_unknown_denied: "xcodebuild -showsdks --unknown",
         plutil_convert_denied: "plutil -convert xml1 file.plist",
         plutil_insert_denied: "plutil -insert key -string value file.plist",
         plutil_replace_denied: "plutil -replace key -string value file.plist",
         plutil_remove_denied: "plutil -remove key file.plist",
         plutil_no_args_denied: "plutil",
+        plutil_lint_unknown_denied: "plutil -lint --unknown file.plist",
         xcode_select_switch_denied: "xcode-select -s /Applications/Xcode.app",
         xcode_select_install_denied: "xcode-select --install",
         xcode_select_reset_denied: "xcode-select --reset",
@@ -229,12 +370,15 @@ mod tests {
         spctl_enable_denied: "spctl --enable",
         spctl_master_disable_denied: "spctl --master-disable",
         spctl_no_args_denied: "spctl",
+        spctl_assess_unknown_denied: "spctl --assess --unknown",
         pkgutil_forget_denied: "pkgutil --forget com.example.pkg",
         pkgutil_expand_denied: "pkgutil --expand pkg.pkg /tmp/expanded",
         pkgutil_no_args_denied: "pkgutil",
+        pkgutil_unknown_denied: "pkgutil --unknown",
         lipo_create_denied: "lipo -create a.o b.o -output universal.o",
         lipo_thin_denied: "lipo -thin arm64 -output thin binary",
         lipo_no_args_denied: "lipo",
+        lipo_unknown_denied: "lipo --unknown binary",
         codesign_sign_denied: "codesign -s - binary",
         codesign_remove_signature_denied: "codesign --remove-signature binary",
         codesign_force_denied: "codesign -f -s - binary",

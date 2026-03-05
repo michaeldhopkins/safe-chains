@@ -57,7 +57,7 @@ static CARGO_CHECK_POLICY: FlagPolicy = FlagPolicy {
 
 static CARGO_CLIPPY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
-        "--all-features", "--all-targets", "--fix", "--frozen",
+        "--all-features", "--all-targets", "--frozen",
         "--future-incompat-report", "--ignore-rust-version", "--keep-going",
         "--locked", "--no-default-features", "--no-deps", "--offline",
         "--release", "--timings", "--unit-graph",
@@ -178,7 +178,7 @@ static CARGO_DENY_POLICY: FlagPolicy = FlagPolicy {
     standalone_short: b"qv",
     valued: WordSet::new(&[
         "--color", "--config", "--exclude", "--features",
-        "--format", "--graph", "--manifest-path", "--target",
+        "--format", "--manifest-path", "--target",
         "--workspace",
     ]),
     valued_short: b"",
@@ -410,7 +410,6 @@ mod tests {
         cargo_nightly_install_help: "cargo +nightly install --help",
         cargo_nightly_package_list: "cargo +nightly package --list",
         cargo_clippy_no_deps: "cargo clippy --no-deps",
-        cargo_clippy_fix: "cargo clippy --fix",
         rustup_show: "rustup show",
         rustup_show_installed: "rustup show --installed",
         rustup_which: "rustup which rustc",
@@ -454,7 +453,9 @@ mod tests {
         cargo_metadata_unknown_denied: "cargo metadata --unknown",
         cargo_search_unknown_denied: "cargo search serde --unknown",
         cargo_audit_unknown_denied: "cargo audit --unknown",
+        cargo_deny_graph_denied: "cargo deny check --graph /tmp/out.dot",
         cargo_deny_unknown_denied: "cargo deny check --unknown",
+        cargo_clippy_fix_denied: "cargo clippy --fix",
         rustup_install_denied: "rustup install stable",
         rustup_update_denied: "rustup update",
         rustup_default_denied: "rustup default nightly",
