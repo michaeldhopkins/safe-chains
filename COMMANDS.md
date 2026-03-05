@@ -502,7 +502,7 @@ Bare invocation allowed.
 
 ### `magick`
 
-Subcommands: identify. Flags: --help, --version.
+Subcommand: identify (with explicit flag allowlist).
 
 ### `md5`
 
