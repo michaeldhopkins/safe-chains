@@ -23,15 +23,12 @@ These commands are allowed with any arguments. All operations are read-only.
 | `b2sum` | BLAKE2 checksum |
 | `base64` | Base64 encode/decode |
 | `basename` | Strip directory from path |
-| `bat` | Syntax-highlighted cat |
-| `bc` | Calculator |
 | `branchdiff` | Branch diff tool |
 | `cal` | Display calendar |
 | `cd` | Change directory |
 | `cksum` | File checksum |
 | `cloc` | Count lines of code |
 | `colordiff` | Colorized diff |
-| `column` | Format into columns |
 | `cucumber` | BDD test runner |
 | `date` | Display date and time |
 | `delta` | Syntax-highlighted diff viewer |
@@ -40,22 +37,15 @@ These commands are allowed with any arguments. All operations are read-only.
 | `dirname` | Strip filename from path |
 | `du` | Disk usage |
 | `dust` | Disk usage viewer |
-| `echo` | Print text |
 | `exa` | Modern ls replacement |
-| `expand` | Convert tabs to spaces |
-| `expr` | Evaluate expression |
 | `eza` | Modern ls replacement |
-| `factor` | Print prime factors |
 | `fd` | Find files |
 | `file` | Detect file type |
-| `fmt` | Reformat text |
-| `fold` | Wrap lines |
 | `getconf` | Get system configuration values |
 | `groups` | Print group memberships |
 | `hexdump` | Display file in hex |
 | `host` | DNS lookup |
 | `htop` | Interactive process viewer |
-| `iconv` | Convert character encoding |
 | `id` | Print user/group IDs |
 | `identify` | ImageMagick identify |
 | `ifconfig` | Network interface info |
@@ -74,13 +64,11 @@ These commands are allowed with any arguments. All operations are read-only.
 | `netstat` | Network connections and statistics |
 | `nm` | List object file symbols |
 | `nproc` | Print number of CPUs |
-| `nroff` | Text formatter |
 | `nslookup` | DNS lookup |
 | `od` | Octal dump |
 | `otool` | Object file tool (macOS) |
 | `pgrep` | Search for processes |
 | `printenv` | Print environment variables |
-| `printf` | Format and print text |
 | `procs` | Modern process viewer |
 | `ps` | List processes |
 | `pwd` | Print working directory |
@@ -88,7 +76,6 @@ These commands are allowed with any arguments. All operations are read-only.
 | `realpath` | Resolve path |
 | `route` | Routing table |
 | `safe-chains` | Safe command checker |
-| `seq` | Print number sequence |
 | `sha1sum` | SHA-1 checksum |
 | `sha256sum` | SHA-256 checksum |
 | `sha512sum` | SHA-512 checksum |
@@ -102,14 +89,12 @@ These commands are allowed with any arguments. All operations are read-only.
 | `sum` | File checksum |
 | `sw_vers` | macOS version info |
 | `system_profiler` | macOS hardware/software info |
-| `test` | Evaluate conditional expression |
 | `tokei` | Code statistics |
 | `top` | Process monitor |
 | `tree` | Directory tree |
 | `tty` | Print terminal name |
 | `type` | Identify command type |
 | `uname` | System information |
-| `unexpand` | Convert spaces to tabs |
 | `unset` | Unset environment variables |
 | `uptime` | System uptime |
 | `uuidgen` | Generate UUID |
@@ -140,6 +125,22 @@ Safe unless program contains system, getline, |, >, >>, or -f flag (file-based p
 ### `bash / sh`
 
 Allowed: --version, --help. Only `bash -c` / `sh -c` with a safe inner command. Scripts denied.
+
+### `bat`
+
+Allowed standalone flags: --diff, --list-languages, --list-themes, --no-config, --number, --plain, --show-all, -A, -P, -d, -n, -p, -u.
+
+Allowed valued flags: --color, --decorations, --diff-context, --file-name, --highlight-line, --italic-text, --language, --line-range, --map-syntax, --paging, --style, --tabs, --terminal-width, --theme, --wrap, -H, -l, -m, -r.
+
+Bare invocation allowed.
+
+### `bc`
+
+Allowed standalone flags: --digit-clamp, --global-stacks, --interactive, --mathlib, --no-digit-clamp, --no-line-length, --no-prompt, --no-read-prompt, --quiet, --standard, --warn, -C, -P, -R, -c, -g, -i, -l, -q, -s, -w.
+
+Allowed valued flags: --expression, --file, --ibase, --obase, --redefine, --scale, --seed, -E, -I, -O, -S, -e, -f, -r.
+
+Bare invocation allowed.
 
 ### `brew`
 
@@ -189,6 +190,14 @@ Allowed: --version, --system-information (single argument only).
 ### `codesign`
 
 Requires: --display, --verify, -d, -v. Denied: --force, --remove-signature, --sign, -f, -s.
+
+### `column`
+
+Allowed standalone flags: --fillrows, --json, --keep-empty-lines, --table, --table-noextreme, --table-noheadings, --table-right-all, -J, -L, -R, -e, -n, -t, -x.
+
+Allowed valued flags: --output-separator, --separator, --table-columns, --table-empty-lines, --table-hide, --table-name, --table-order, --table-right, --table-truncate, --table-wrap, -E, -H, -O, -W, -c, -d, -o, -r, -s.
+
+Bare invocation allowed.
 
 ### `comm`
 
@@ -254,17 +263,53 @@ Subcommands: buildx --version, buildx inspect, buildx ls, buildx version, compos
 
 Subcommands: build, list, test. Flags: --info, --list-runtimes, --list-sdks, --version.
 
+### `echo`
+
+Allowed standalone flags: -E, -e, -n. Bare invocation allowed.
+
 ### `env`
 
 Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare `env` allowed.
+
+### `expand`
+
+Allowed standalone flags: --initial, -i.
+
+Allowed valued flags: --tabs, -t.
+
+Bare invocation allowed.
+
+### `expr`
+
+Allowed: any arguments (expr uses operators as expressions, not flags). Requires at least one argument.
+
+### `factor`
+
+Allowed standalone flags: --exponents, -h. Bare invocation allowed.
 
 ### `find`
 
 Safe unless dangerous flags: -delete, -ok, -okdir, -fls, -fprint, -fprint0, -fprintf. -exec/-execdir allowed when the executed command is itself safe.
 
+### `fmt`
+
+Allowed standalone flags: --crown-margin, --split-only, --tagged-paragraph, --uniform-spacing, -c, -m, -n, -s, -u.
+
+Allowed valued flags: --goal, --prefix, --width, -d, -g, -l, -p, -t, -w.
+
+Bare invocation allowed.
+
 ### `fnm`
 
 Subcommands: current, default, list, ls-remote. Flags: --version.
+
+### `fold`
+
+Allowed standalone flags: --bytes, --spaces, -b, -s.
+
+Allowed valued flags: --width, -w.
+
+Bare invocation allowed.
 
 ### `gem`
 
@@ -321,6 +366,10 @@ Flags: -A, -I, -d, -f, -i, -s.
 ### `hyperfine`
 
 Recursively validates each benchmarked command. Denied if --prepare, --cleanup, or --setup flags are used (arbitrary shell execution).
+
+### `iconv`
+
+Allowed standalone flags: --list, --silent, -c, -l, -s. Allowed valued flags: --from-code, --to-code, -f, -t.
 
 ### `jj`
 
@@ -390,6 +439,10 @@ Guarded: tsc (requires --noEmit).
 
 Skips flags: --yes/-y/--no/--package/-p.
 
+### `nroff`
+
+Allowed standalone flags: -S, -c, -h, -i, -k, -p, -q, -t. Allowed valued flags: -M, -P, -T, -d, -m, -n, -o, -r, -w.
+
 ### `nvm`
 
 Subcommands: current, list, ls, ls-remote, version, which. Flags: --version.
@@ -438,6 +491,10 @@ Subcommands: audit, list, ls, outdated, why. Flags: --version.
 
 Subcommands: check, env info, env list, show. Flags: --version.
 
+### `printf`
+
+
+
 ### `pyenv`
 
 Subcommands: help, root, shims, version, versions, which. Flags: --version.
@@ -469,6 +526,10 @@ Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, find-gen
 ### `sed`
 
 Safe unless -i/--in-place flag or 'e' modifier on substitutions (executes replacement as shell command).
+
+### `seq`
+
+Allowed standalone flags: --equal-width, -w. Allowed valued flags: --format, --separator, -f, -s, -t.
 
 ### `sort`
 
@@ -510,6 +571,10 @@ Always safe: --version, -v, whoami.
 
 Guarded: logins/login (list only).
 
+### `test`
+
+Allowed: any arguments (test uses operators like -f, -d as conditionals, not flags).
+
 ### `time`
 
 Skips -p flag, then recursively validates the inner command.
@@ -521,6 +586,14 @@ Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recu
 ### `tr`
 
 Allowed standalone flags: --complement, --delete, --squeeze-repeats, --truncate-set1, -C, -c, -d, -s.
+
+### `unexpand`
+
+Allowed standalone flags: --all, --first-only, -a.
+
+Allowed valued flags: --tabs, -t.
+
+Bare invocation allowed.
 
 ### `uniq`
 

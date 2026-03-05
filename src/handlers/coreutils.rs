@@ -492,6 +492,259 @@ pub fn is_safe_nl(tokens: &[Token]) -> bool {
     policy::check(tokens, &NL_POLICY)
 }
 
+static EXPAND_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--initial",
+        "-i",
+    ]),
+    standalone_short: b"i",
+    valued: WordSet::new(&[
+        "--tabs",
+        "-t",
+    ]),
+    valued_short: b"t",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_expand(tokens: &[Token]) -> bool {
+    policy::check(tokens, &EXPAND_POLICY)
+}
+
+static UNEXPAND_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--first-only",
+        "-a",
+    ]),
+    standalone_short: b"a",
+    valued: WordSet::new(&[
+        "--tabs",
+        "-t",
+    ]),
+    valued_short: b"t",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_unexpand(tokens: &[Token]) -> bool {
+    policy::check(tokens, &UNEXPAND_POLICY)
+}
+
+static FOLD_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--bytes", "--spaces",
+        "-b", "-s",
+    ]),
+    standalone_short: b"bs",
+    valued: WordSet::new(&[
+        "--width",
+        "-w",
+    ]),
+    valued_short: b"w",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_fold(tokens: &[Token]) -> bool {
+    policy::check(tokens, &FOLD_POLICY)
+}
+
+static FMT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--crown-margin", "--split-only", "--tagged-paragraph",
+        "--uniform-spacing",
+        "-c", "-m", "-n", "-s", "-u",
+    ]),
+    standalone_short: b"cmnsu",
+    valued: WordSet::new(&[
+        "--goal", "--prefix", "--width",
+        "-d", "-g", "-l", "-p", "-t", "-w",
+    ]),
+    valued_short: b"dglptw",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_fmt(tokens: &[Token]) -> bool {
+    policy::check(tokens, &FMT_POLICY)
+}
+
+static COLUMN_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--fillrows", "--json", "--keep-empty-lines", "--table",
+        "--table-noextreme", "--table-noheadings", "--table-right-all",
+        "-J", "-L", "-R", "-e", "-n", "-t", "-x",
+    ]),
+    standalone_short: b"JLRentx",
+    valued: WordSet::new(&[
+        "--output-separator", "--separator", "--table-columns",
+        "--table-empty-lines", "--table-hide", "--table-name",
+        "--table-order", "--table-right", "--table-truncate", "--table-wrap",
+        "-E", "-H", "-O", "-W", "-c", "-d", "-o", "-r", "-s",
+    ]),
+    valued_short: b"EHOWcdors",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_column(tokens: &[Token]) -> bool {
+    policy::check(tokens, &COLUMN_POLICY)
+}
+
+static ICONV_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--list", "--silent",
+        "-c", "-l", "-s",
+    ]),
+    standalone_short: b"cls",
+    valued: WordSet::new(&[
+        "--from-code", "--to-code",
+        "-f", "-t",
+    ]),
+    valued_short: b"ft",
+    bare: false,
+    max_positional: None,
+};
+
+pub fn is_safe_iconv(tokens: &[Token]) -> bool {
+    policy::check(tokens, &ICONV_POLICY)
+}
+
+static NROFF_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-S", "-c", "-h", "-i", "-k", "-p", "-q", "-t",
+    ]),
+    standalone_short: b"Schikpqt",
+    valued: WordSet::new(&[
+        "-M", "-P", "-T", "-d", "-m", "-n", "-o", "-r", "-w",
+    ]),
+    valued_short: b"MPTdmnorw",
+    bare: false,
+    max_positional: None,
+};
+
+pub fn is_safe_nroff(tokens: &[Token]) -> bool {
+    policy::check(tokens, &NROFF_POLICY)
+}
+
+static ECHO_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-E", "-e", "-n",
+    ]),
+    standalone_short: b"Een",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_echo(tokens: &[Token]) -> bool {
+    policy::check(tokens, &ECHO_POLICY)
+}
+
+static PRINTF_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+pub fn is_safe_printf(tokens: &[Token]) -> bool {
+    policy::check(tokens, &PRINTF_POLICY)
+}
+
+static SEQ_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--equal-width",
+        "-w",
+    ]),
+    standalone_short: b"w",
+    valued: WordSet::new(&[
+        "--format", "--separator",
+        "-f", "-s", "-t",
+    ]),
+    valued_short: b"fst",
+    bare: false,
+    max_positional: None,
+};
+
+pub fn is_safe_seq(tokens: &[Token]) -> bool {
+    policy::check(tokens, &SEQ_POLICY)
+}
+
+pub fn is_safe_test(tokens: &[Token]) -> bool {
+    !tokens.is_empty()
+}
+
+pub fn is_safe_expr(tokens: &[Token]) -> bool {
+    tokens.len() >= 2
+}
+
+static BC_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--digit-clamp", "--global-stacks", "--interactive", "--mathlib",
+        "--no-digit-clamp", "--no-line-length", "--no-prompt",
+        "--no-read-prompt", "--quiet", "--standard", "--warn",
+        "-C", "-P", "-R",
+        "-c", "-g", "-i", "-l", "-q", "-s", "-w",
+    ]),
+    standalone_short: b"CPRcgilqsw",
+    valued: WordSet::new(&[
+        "--expression", "--file", "--ibase", "--obase", "--redefine",
+        "--scale", "--seed",
+        "-E", "-I", "-O", "-S",
+        "-e", "-f", "-r",
+    ]),
+    valued_short: b"EIOSefr",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_bc(tokens: &[Token]) -> bool {
+    policy::check(tokens, &BC_POLICY)
+}
+
+static FACTOR_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--exponents",
+        "-h",
+    ]),
+    standalone_short: b"h",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_factor(tokens: &[Token]) -> bool {
+    policy::check(tokens, &FACTOR_POLICY)
+}
+
+static BAT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--diff", "--list-languages", "--list-themes", "--no-config",
+        "--number", "--plain", "--show-all",
+        "-A", "-P", "-d", "-n", "-p", "-u",
+    ]),
+    standalone_short: b"APdnpu",
+    valued: WordSet::new(&[
+        "--color", "--decorations", "--diff-context", "--file-name",
+        "--highlight-line", "--italic-text", "--language", "--line-range",
+        "--map-syntax", "--paging", "--style", "--tabs",
+        "--terminal-width", "--theme", "--wrap",
+        "-H", "-l", "-m", "-r",
+    ]),
+    valued_short: b"Hlmr",
+    bare: true,
+    max_positional: None,
+};
+
+pub fn is_safe_bat(tokens: &[Token]) -> bool {
+    policy::check(tokens, &BAT_POLICY)
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
@@ -528,6 +781,23 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             "Safe unless program contains system, getline, |, >, >>, or -f flag (file-based program)."),
         CommandDoc::handler("xmllint",
             "Safe unless --output flag."),
+        CommandDoc::handler("expand", EXPAND_POLICY.describe()),
+        CommandDoc::handler("unexpand", UNEXPAND_POLICY.describe()),
+        CommandDoc::handler("fold", FOLD_POLICY.describe()),
+        CommandDoc::handler("fmt", FMT_POLICY.describe()),
+        CommandDoc::handler("column", COLUMN_POLICY.describe()),
+        CommandDoc::handler("iconv", ICONV_POLICY.describe()),
+        CommandDoc::handler("nroff", NROFF_POLICY.describe()),
+        CommandDoc::handler("echo", ECHO_POLICY.describe()),
+        CommandDoc::handler("printf", PRINTF_POLICY.describe()),
+        CommandDoc::handler("seq", SEQ_POLICY.describe()),
+        CommandDoc::handler("test",
+            "Allowed: any arguments (test uses operators like -f, -d as conditionals, not flags)."),
+        CommandDoc::handler("expr",
+            "Allowed: any arguments (expr uses operators as expressions, not flags). Requires at least one argument."),
+        CommandDoc::handler("bc", BC_POLICY.describe()),
+        CommandDoc::handler("factor", FACTOR_POLICY.describe()),
+        CommandDoc::handler("bat", BAT_POLICY.describe()),
     ]
 }
 
@@ -813,5 +1083,100 @@ mod tests {
         sed_inplace_trailing_version_denied: "sed -i 's/foo/bar/' file --version",
         sort_output_trailing_help_denied: "sort -o output.txt file --help",
         sort_output_trailing_version_denied: "sort -o output.txt file --version",
+    }
+
+    safe! {
+        expand_file: "expand file.txt",
+        expand_initial: "expand -i file.txt",
+        expand_tabs: "expand -t 4 file.txt",
+        expand_bare: "expand",
+
+        unexpand_file: "unexpand file.txt",
+        unexpand_all: "unexpand -a file.txt",
+        unexpand_tabs: "unexpand --tabs 8 file.txt",
+        unexpand_bare: "unexpand",
+
+        fold_file: "fold file.txt",
+        fold_width: "fold -w 80 file.txt",
+        fold_bytes: "fold -b file.txt",
+        fold_spaces: "fold -s file.txt",
+        fold_bare: "fold",
+
+        fmt_file: "fmt file.txt",
+        fmt_width: "fmt -w 72 file.txt",
+        fmt_split: "fmt -s file.txt",
+        fmt_bare: "fmt",
+
+        column_file: "column file.txt",
+        column_table: "column -t file.txt",
+        column_separator: "column -s, file.txt",
+        column_json: "column -J file.txt",
+        column_bare: "column",
+
+        iconv_convert: "iconv -f UTF-8 -t ASCII file.txt",
+        iconv_list: "iconv -l",
+        iconv_silent: "iconv -s -f LATIN1 -t UTF-8 file",
+
+        nroff_file: "nroff -man page.1",
+        nroff_macro: "nroff -m mandoc page.1",
+        nroff_term: "nroff -T ascii page.1",
+
+        echo_hello: "echo hello world",
+        echo_no_newline: "echo -n hello",
+        echo_escape: "echo -e 'hello\\nworld'",
+        echo_bare: "echo",
+
+        printf_format: "printf '%s\\n' hello",
+        printf_number: "printf '%d' 42",
+
+        seq_range: "seq 1 10",
+        seq_step: "seq 1 2 10",
+        seq_format: "seq -f '%.2f' 1 0.5 5",
+        seq_separator: "seq -s, 1 5",
+        seq_equal_width: "seq -w 1 10",
+
+        test_file: "test -f file.txt",
+        test_dir: "test -d /tmp",
+        test_eq: "test 1 -eq 1",
+        test_bare: "test",
+
+        expr_add: "expr 1 + 2",
+        expr_match: "expr hello : 'h.*'",
+        expr_length: "expr length hello",
+
+        bc_bare: "bc",
+        bc_mathlib: "bc -l",
+        bc_quiet: "bc -q",
+        bc_file: "bc -l calc.bc",
+
+        factor_number: "factor 42",
+        factor_multiple: "factor 42 100",
+        factor_bare: "factor",
+
+        bat_file: "bat file.txt",
+        bat_plain: "bat -p file.txt",
+        bat_language: "bat -l rust file.txt",
+        bat_line_range: "bat -r 10:20 file.txt",
+        bat_theme: "bat --theme=gruvbox file.txt",
+        bat_number: "bat -n file.txt",
+        bat_bare: "bat",
+    }
+
+    denied! {
+        expand_unknown_denied: "expand --unknown file",
+        unexpand_unknown_denied: "unexpand --unknown file",
+        fold_unknown_denied: "fold --unknown file",
+        fmt_unknown_denied: "fmt --unknown file",
+        column_unknown_denied: "column --unknown file",
+        iconv_output_denied: "iconv -o output.txt file",
+        iconv_unknown_denied: "iconv --unknown file",
+        nroff_unknown_denied: "nroff --unknown file",
+        echo_unknown_denied: "echo --unknown hello",
+        printf_bare_denied: "printf",
+        seq_unknown_denied: "seq --unknown 1 10",
+        bc_unknown_denied: "bc --unknown",
+        factor_unknown_denied: "factor --unknown",
+        bat_pager_denied: "bat --pager 'rm -rf /' file",
+        bat_unknown_denied: "bat --unknown file",
     }
 }

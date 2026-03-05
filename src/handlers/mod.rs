@@ -36,7 +36,6 @@ use SafeKind::{AnyArgs, Bare};
 
 pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str, SafeKind)] = &[
     ("fd", "Find files", AnyArgs),
-    ("bat", "Syntax-highlighted cat", AnyArgs),
     ("eza", "Modern ls replacement", AnyArgs),
     ("exa", "Modern ls replacement", AnyArgs),
 
@@ -45,23 +44,8 @@ pub(crate) static SAFE_CMD_ENTRIES: &[(&str, &str, SafeKind)] = &[
     ("delta", "Syntax-highlighted diff viewer", AnyArgs),
     ("colordiff", "Colorized diff", AnyArgs),
 
-    ("expand", "Convert tabs to spaces", AnyArgs),
-    ("unexpand", "Convert spaces to tabs", AnyArgs),
-    ("fold", "Wrap lines", AnyArgs),
-    ("fmt", "Reformat text", AnyArgs),
-    ("nroff", "Text formatter", AnyArgs),
-    ("column", "Format into columns", AnyArgs),
-    ("iconv", "Convert character encoding", AnyArgs),
-
-    ("echo", "Print text", AnyArgs),
-    ("printf", "Format and print text", AnyArgs),
-    ("seq", "Print number sequence", AnyArgs),
-    ("expr", "Evaluate expression", AnyArgs),
-    ("test", "Evaluate conditional expression", AnyArgs),
     ("true", "Return success exit code", Bare),
     ("false", "Return failure exit code", Bare),
-    ("bc", "Calculator", AnyArgs),
-    ("factor", "Print prime factors", AnyArgs),
 
     ("dirname", "Strip filename from path", AnyArgs),
     ("basename", "Strip directory from path", AnyArgs),
@@ -210,6 +194,7 @@ fn is_trailing_info_request(tokens: &[Token]) -> bool {
         && !tokens.iter().any(|t| *t == "--")
 }
 
+#[allow(clippy::too_many_lines)]
 pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
     if is_bare_info_request(tokens) {
         return true;
@@ -315,6 +300,21 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         "tac" => coreutils::is_safe_tac(tokens),
         "rev" => coreutils::is_safe_rev(tokens),
         "nl" => coreutils::is_safe_nl(tokens),
+        "expand" => coreutils::is_safe_expand(tokens),
+        "unexpand" => coreutils::is_safe_unexpand(tokens),
+        "fold" => coreutils::is_safe_fold(tokens),
+        "fmt" => coreutils::is_safe_fmt(tokens),
+        "column" => coreutils::is_safe_column(tokens),
+        "iconv" => coreutils::is_safe_iconv(tokens),
+        "nroff" => coreutils::is_safe_nroff(tokens),
+        "echo" => coreutils::is_safe_echo(tokens),
+        "printf" => coreutils::is_safe_printf(tokens),
+        "seq" => coreutils::is_safe_seq(tokens),
+        "test" => coreutils::is_safe_test(tokens),
+        "expr" => coreutils::is_safe_expr(tokens),
+        "bc" => coreutils::is_safe_bc(tokens),
+        "factor" => coreutils::is_safe_factor(tokens),
+        "bat" => coreutils::is_safe_bat(tokens),
 
         "arch" => coreutils::is_safe_arch(tokens),
         "command" => coreutils::is_safe_command_builtin(tokens),
@@ -356,6 +356,8 @@ const HANDLED_CMDS: &[&str] = &[
     "grep", "egrep", "fgrep", "rg",
     "cat", "head", "tail", "wc", "cut", "tr", "uniq",
     "diff", "comm", "paste", "tac", "rev", "nl",
+    "expand", "unexpand", "fold", "fmt", "column", "iconv", "nroff",
+    "echo", "printf", "seq", "test", "expr", "bc", "factor", "bat",
     "arch", "command", "hostname",
     "find", "sed", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
     "magick",
@@ -441,6 +443,8 @@ mod tests {
         "cat", "head", "tail", "wc", "cut", "tr", "uniq",
         "diff", "comm", "paste", "tac", "rev", "nl",
         "awk", "gawk", "mawk", "nawk", "sed", "sort", "perl",
+        "expand", "unexpand", "fold", "fmt", "column", "iconv", "nroff",
+        "echo", "printf", "seq", "test", "expr", "bc", "factor", "bat",
     ];
 
     #[test]
