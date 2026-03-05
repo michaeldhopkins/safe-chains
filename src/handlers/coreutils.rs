@@ -745,8 +745,28 @@ pub fn is_safe_bat(tokens: &[Token]) -> bool {
     policy::check(tokens, &BAT_POLICY)
 }
 
+static FD_EXEC_FLAGS: WordSet = WordSet::new(&["--exec", "--exec-batch", "-X", "-x"]);
+
+pub fn is_safe_fd(tokens: &[Token]) -> bool {
+    tokens.len() >= 2 && !tokens[1..].iter().any(|t| FD_EXEC_FLAGS.contains(t))
+}
+
+pub fn is_safe_tree(tokens: &[Token]) -> bool {
+    !has_flag(tokens, Some("-o"), None)
+}
+
+pub fn is_safe_file_cmd(tokens: &[Token]) -> bool {
+    !has_flag(tokens, Some("-C"), Some("--compile"))
+}
+
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
     match cmd {
+        "fd" => Some(is_safe_fd(tokens)),
+        "tree" => Some(is_safe_tree(tokens)),
+        "file" => Some(is_safe_file_cmd(tokens)),
+        "ls" | "eza" | "exa" | "delta" | "colordiff" => Some(true),
+        "dirname" | "basename" | "realpath" | "readlink" => Some(true),
+        "stat" | "du" | "df" => Some(true),
         "grep" | "egrep" | "fgrep" => Some(is_safe_grep(tokens)),
         "rg" => Some(is_safe_rg(tokens)),
         "cat" => Some(is_safe_cat(tokens)),
@@ -843,6 +863,12 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("bc", BC_POLICY.describe()),
         CommandDoc::handler("factor", FACTOR_POLICY.describe()),
         CommandDoc::handler("bat", BAT_POLICY.describe()),
+        CommandDoc::handler("fd",
+            "Safe unless --exec/-x or --exec-batch/-X flags (execute arbitrary commands)."),
+        CommandDoc::handler("tree",
+            "Safe unless -o flag (write output to file)."),
+        CommandDoc::handler("file",
+            "Safe unless -C/--compile flag (write compiled magic file)."),
     ]
 }
 
@@ -1223,5 +1249,56 @@ mod tests {
         factor_unknown_denied: "factor --unknown",
         bat_pager_denied: "bat --pager 'rm -rf /' file",
         bat_unknown_denied: "bat --unknown file",
+    }
+
+    safe! {
+        fd_pattern: "fd pattern",
+        fd_hidden: "fd -H pattern",
+        fd_type: "fd -t f pattern",
+        fd_extension: "fd -e rs pattern",
+        fd_glob: "fd -g '*.rs'",
+        fd_follow: "fd -L pattern",
+        fd_absolute: "fd -a pattern",
+        fd_color: "fd --color auto pattern",
+        fd_max_depth: "fd --max-depth 3 pattern",
+
+        tree_basic: "tree",
+        tree_depth: "tree -L 3",
+        tree_dirs: "tree -d",
+        tree_all: "tree -a",
+        tree_pattern: "tree -P '*.rs'",
+        tree_json: "tree -J",
+
+        file_basic: "file README.md",
+        file_brief: "file -b README.md",
+        file_mime: "file --mime README.md",
+        file_multiple: "file *.txt",
+        file_dereference: "file -L symlink",
+
+        ls_basic: "ls",
+        ls_all: "ls -la",
+        ls_recursive: "ls -R /tmp",
+        eza_basic: "eza --long",
+        exa_tree: "exa --tree",
+        delta_diff: "delta file1 file2",
+        colordiff_files: "colordiff file1 file2",
+        dirname_path: "dirname /usr/bin/ls",
+        basename_path: "basename /usr/bin/ls",
+        realpath_path: "realpath ./relative",
+        readlink_path: "readlink /usr/bin/python",
+        stat_file: "stat file.txt",
+        du_dir: "du -sh /tmp",
+        df_all: "df -h",
+    }
+
+    denied! {
+        fd_exec_denied: "fd pattern --exec rm",
+        fd_exec_short_denied: "fd pattern -x rm",
+        fd_exec_batch_denied: "fd -t f pattern --exec-batch rm",
+        fd_exec_batch_short_denied: "fd pattern -X rm",
+        fd_bare_denied: "fd",
+        tree_output_denied: "tree -o tree.txt",
+        file_compile_denied: "file -C",
+        file_compile_long_denied: "file --compile",
     }
 }
