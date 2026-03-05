@@ -16,6 +16,7 @@ pub mod cli;
 pub mod docs;
 mod handlers;
 pub mod parse;
+pub mod policy;
 pub mod allowlist;
 
 use parse::{CommandLine, Segment, Token};

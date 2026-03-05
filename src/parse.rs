@@ -162,6 +162,11 @@ impl Segment {
 }
 
 impl Token {
+    #[cfg(test)]
+    pub(crate) fn from_test(s: &str) -> Self {
+        Self(s.to_string())
+    }
+
     pub fn as_str(&self) -> &str {
         &self.0
     }
