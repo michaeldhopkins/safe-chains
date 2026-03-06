@@ -35,21 +35,22 @@ static HELP_ELIGIBLE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
         "asdf",
         "brew", "bun", "bundle",
         "cargo", "cmake", "codesign", "command", "composer", "conda", "craft", "csrutil", "curl",
-        "ddev", "defaults", "deno", "diskutil", "dotnet",
-        "fnm",
-        "gem", "gh", "git", "glab", "go", "gradle", "gradlew", "hf", "hostname",
+        "dcli", "ddev", "defaults", "deno", "diskutil", "dotnet",
+        "fly", "flyctl", "fnm",
+        "gem", "gh", "git", "glab", "go", "gradle", "gradlew", "heroku", "hf", "hostname",
         "jj",
+        "kubectl",
         "launchctl", "lipo", "llm", "log",
         "magick", "man", "mise", "mvn", "mvnw",
         "networksetup", "npm", "nvm",
         "ollama",
-        "pip", "pip3", "pkgutil", "plutil", "pmset", "pnpm", "poetry", "pyenv",
+        "periphery", "pip", "pip3", "pkgutil", "plutil", "pmset", "pnpm", "pod", "poetry", "pyenv",
         "rbenv",
-        "security", "spctl", "swift", "sysctl",
-        "tea",
+        "security", "spctl", "swift", "swiftlint", "sysctl",
+        "tea", "terraform", "tuist",
         "uv",
-        "volta",
-        "xcode-select", "xcodebuild", "xcrun", "xmllint",
+        "vercel", "volta",
+        "xcode-select", "xcodebuild", "xcodegen", "xcrun", "xmllint",
         "yarn", "yq",
     ].into_iter().collect()
 });
@@ -108,12 +109,14 @@ const HANDLED_CMDS: &[&str] = &[
     "swift",
     "dotnet",
     "curl",
-    "docker", "podman",
+    "docker", "podman", "kubectl",
     "ollama", "llm", "hf",
-    "ddev",
+    "ddev", "dcli",
     "brew", "mise", "asdf", "defaults", "pmset", "sysctl", "cmake",
+    "terraform", "heroku", "vercel", "flyctl", "fly",
     "networksetup", "launchctl", "diskutil", "security", "csrutil", "log",
     "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign", "spctl",
+    "xcodegen", "tuist", "pod", "swiftlint", "swiftformat", "periphery", "xcbeautify", "agvtool", "simctl",
     "perl",
     "R", "Rscript",
     "grep", "egrep", "fgrep", "rg",
@@ -194,7 +197,7 @@ use crate::command::CommandDef;
 #[cfg(test)]
 const COMMAND_DEFS: &[&CommandDef] = &[
     &ai::OLLAMA, &ai::LLM, &ai::HF,
-    &containers::DOCKER, &containers::PODMAN,
+    &containers::DOCKER, &containers::PODMAN, &containers::KUBECTL,
     &dotnet::DOTNET,
     &go::GO,
     &jvm::GRADLE, &jvm::GRADLEW,
@@ -208,10 +211,14 @@ const COMMAND_DEFS: &[&CommandDef] = &[
     &rust::CARGO, &rust::RUSTUP,
     &vcs::GIT,
     &swift::SWIFT,
-    &system::BREW, &system::MISE, &system::ASDF, &system::DDEV, &system::CMAKE, &system::DEFAULTS,
+    &system::BREW, &system::MISE, &system::ASDF, &system::DDEV, &system::DCLI, &system::CMAKE,
+    &system::DEFAULTS, &system::TERRAFORM, &system::HEROKU, &system::VERCEL,
+    &system::FLYCTL, &system::FLY,
     &system::SECURITY, &system::CSRUTIL, &system::DISKUTIL,
     &system::LAUNCHCTL, &system::LOG,
     &xcode::XCODEBUILD, &xcode::PLUTIL, &xcode::XCODE_SELECT,
+    &xcode::XCODEGEN, &xcode::TUIST, &xcode::POD, &xcode::SWIFTLINT,
+    &xcode::PERIPHERY, &xcode::AGVTOOL, &xcode::SIMCTL,
 ];
 
 #[cfg(test)]
@@ -335,6 +342,9 @@ mod tests {
         for def in coreutils::all_flat_defs() {
             def.auto_test_reject_unknown();
         }
+        for def in xcode::xcbeautify_flat_defs() {
+            def.auto_test_reject_unknown();
+        }
     }
 
     #[test]
@@ -354,6 +364,9 @@ mod tests {
             all_cmds.insert(def.name);
         }
         for def in coreutils::all_flat_defs() {
+            all_cmds.insert(def.name);
+        }
+        for def in xcode::xcbeautify_flat_defs() {
             all_cmds.insert(def.name);
         }
         let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
@@ -391,6 +404,7 @@ mod tests {
         "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat", "mdfind",
         "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route",
         "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "safe-chains",
+        "swiftformat", "xcbeautify", "agvtool", "simctl",
     ];
 
     #[test]
