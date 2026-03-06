@@ -1,12 +1,570 @@
 use crate::parse::{Segment, Token, WordSet};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
-static GIT_READ_ONLY: WordSet = WordSet::new(&[
-    "--version", "blame", "cat-file", "check-ignore", "count-objects", "describe",
-    "diff", "diff-tree", "fetch", "for-each-ref", "grep", "help",
-    "log", "ls-files", "ls-remote", "ls-tree", "merge-base", "merge-tree",
-    "name-rev", "reflog", "rev-parse", "shortlog", "show", "status",
-    "verify-commit", "verify-tag",
-]);
+static GIT_LOG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--abbrev-commit", "--all", "--ancestry-path",
+        "--author-date-order", "--bisect", "--boundary",
+        "--branches", "--cherry", "--cherry-mark", "--cherry-pick",
+        "--children", "--clear-decorations",
+        "--compact-summary", "--cumulative",
+        "--date-order",
+        "--dense", "--do-walk",
+        "--early-output",
+        "--first-parent", "--follow", "--full-diff", "--full-history",
+        "--graph",
+        "--ignore-missing",
+        "--left-only", "--left-right", "--log-size",
+        "--mailmap",
+        "--merges", "--minimal",
+        "--name-only", "--name-status",
+        "--no-abbrev-commit",
+        "--no-color", "--no-decorate",
+        "--no-expand-tabs", "--no-ext-diff", "--no-merges",
+        "--no-notes", "--no-patch", "--no-prefix",
+        "--no-renames", "--no-walk",
+        "--numstat",
+        "--oneline",
+        "--parents", "--patch", "--patch-with-raw",
+        "--patch-with-stat", "--patience",
+        "--raw", "--reflog", "--relative-date", "--remotes",
+        "--reverse",
+        "--shortstat", "--show-linear-break", "--show-notes",
+        "--show-pulls", "--show-signature", "--simplify-by-decoration",
+        "--simplify-merges", "--source", "--sparse", "--stat",
+        "--stdin", "--summary",
+        "--tags", "--text", "--topo-order",
+        "--use-mailmap",
+        "-p", "-q", "-u",
+    ]),
+    standalone_short: b"0123456789pqu",
+    valued: WordSet::new(&[
+        "--abbrev", "--after", "--author", "--before",
+        "--color", "--committer", "--date",
+        "--decorate", "--decorate-refs", "--decorate-refs-exclude",
+        "--diff-algorithm", "--diff-filter",
+        "--encoding", "--exclude",
+        "--format", "--glob", "--grep",
+        "--max-count", "--max-parents", "--min-parents",
+        "--pretty",
+        "--since", "--skip", "--until",
+        "-L", "-n",
+    ]),
+    valued_short: b"Ln",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_DIFF_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--cached", "--check", "--compact-summary", "--cumulative",
+        "--dirstat-by-file",
+        "--exit-code",
+        "--find-copies-harder", "--full-index",
+        "--ignore-all-space", "--ignore-blank-lines",
+        "--ignore-cr-at-eol", "--ignore-space-at-eol",
+        "--ignore-space-change",
+        "--merge-base", "--minimal",
+        "--name-only", "--name-status", "--no-color",
+        "--no-ext-diff", "--no-index", "--no-patch",
+        "--no-prefix", "--no-renames",
+        "--numstat",
+        "--patch", "--patch-with-raw", "--patch-with-stat",
+        "--patience", "--pickaxe-all",
+        "--raw",
+        "--shortstat", "--staged", "--stat", "--summary",
+        "--text",
+        "-B", "-C", "-M", "-R",
+        "-a", "-b", "-p", "-u", "-w", "-z",
+    ]),
+    standalone_short: b"BCMRabpuwz",
+    valued: WordSet::new(&[
+        "--abbrev", "--color", "--diff-algorithm", "--diff-filter",
+        "--dirstat", "--dst-prefix",
+        "--inter-hunk-context",
+        "--line-prefix",
+        "--output-indicator-new", "--output-indicator-old",
+        "--relative", "--src-prefix",
+        "--stat-width",
+        "--unified", "--word-diff", "--word-diff-regex",
+        "-G", "-O", "-S", "-U",
+    ]),
+    valued_short: b"GOSU",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_SHOW_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--abbrev-commit", "--compact-summary", "--cumulative",
+        "--expand-tabs", "--full-index",
+        "--ignore-all-space", "--ignore-blank-lines",
+        "--ignore-space-at-eol", "--ignore-space-change",
+        "--mailmap", "--minimal",
+        "--name-only", "--name-status", "--no-color",
+        "--no-ext-diff", "--no-notes", "--no-patch",
+        "--no-prefix", "--no-renames",
+        "--numstat",
+        "--patch", "--patch-with-raw", "--patch-with-stat",
+        "--patience", "--raw",
+        "--shortstat", "--show-notes", "--show-signature",
+        "--source", "--stat", "--summary",
+        "--text", "--use-mailmap",
+        "-p", "-q", "-u", "-w",
+    ]),
+    standalone_short: b"pquw",
+    valued: WordSet::new(&[
+        "--abbrev", "--color",
+        "--decorate", "--decorate-refs", "--decorate-refs-exclude",
+        "--diff-algorithm", "--diff-filter",
+        "--encoding", "--format",
+        "--notes", "--pretty",
+        "-O",
+    ]),
+    valued_short: b"O",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_STATUS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--ahead-behind", "--branch",
+        "--ignore-submodules",
+        "--long", "--no-ahead-behind",
+        "--no-renames", "--null",
+        "--renames",
+        "--short", "--show-stash",
+        "--verbose",
+        "-b", "-s", "-v", "-z",
+    ]),
+    standalone_short: b"bsvz",
+    valued: WordSet::new(&[
+        "--column", "--find-renames",
+        "--ignored",
+        "--porcelain",
+        "--untracked-files",
+        "-M", "-u",
+    ]),
+    valued_short: b"Mu",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_BLAME_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--color-by-age", "--color-lines",
+        "--incremental",
+        "--line-porcelain",
+        "--minimal",
+        "--porcelain", "--progress",
+        "--root",
+        "--show-email", "--show-name", "--show-number",
+        "--show-stats",
+        "-b", "-c", "-e", "-f", "-l", "-n", "-p", "-s", "-t", "-w",
+    ]),
+    standalone_short: b"bcefklnpstw",
+    valued: WordSet::new(&[
+        "--abbrev",
+        "--contents",
+        "--ignore-rev", "--ignore-revs-file",
+        "-C", "-L", "-M", "-S",
+    ]),
+    valued_short: b"CLMS",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_GREP_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all-match", "--and",
+        "--basic-regexp", "--break",
+        "--cached", "--column", "--count",
+        "--exclude-standard", "--extended-regexp",
+        "--files-with-matches", "--files-without-match",
+        "--fixed-strings", "--full-name", "--function-context",
+        "--heading",
+        "--ignore-case", "--index", "--invert-match",
+        "--line-number",
+        "--name-only", "--no-color", "--no-index", "--null",
+        "--only-matching",
+        "--perl-regexp",
+        "--quiet",
+        "--recurse-submodules", "--recursive",
+        "--show-function",
+        "--text", "--textconv",
+        "--untracked",
+        "--word-regexp",
+        "-E", "-F", "-G", "-H", "-I", "-L", "-P", "-W",
+        "-a", "-c", "-h", "-i", "-l", "-n", "-o",
+        "-p", "-q", "-r", "-v", "-w", "-z",
+    ]),
+    standalone_short: b"EFGHILPWachilnopqrvwz",
+    valued: WordSet::new(&[
+        "--after-context", "--before-context",
+        "--color", "--context",
+        "--max-count", "--max-depth",
+        "--open-files-in-pager", "--threads",
+        "-A", "-B", "-C", "-O",
+        "-e", "-f", "-m",
+    ]),
+    valued_short: b"ABCOefm",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_FETCH_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--append", "--atomic",
+        "--dry-run",
+        "--force",
+        "--ipv4", "--ipv6",
+        "--keep",
+        "--multiple",
+        "--negotiate-only", "--no-auto-gc", "--no-auto-maintenance",
+        "--no-show-forced-updates", "--no-tags", "--no-write-fetch-head",
+        "--porcelain", "--prefetch", "--progress",
+        "--prune", "--prune-tags",
+        "--quiet",
+        "--refetch",
+        "--set-upstream", "--show-forced-updates", "--stdin",
+        "--tags",
+        "--unshallow", "--update-head-ok", "--update-shallow",
+        "--verbose", "--write-commit-graph", "--write-fetch-head",
+        "-4", "-6",
+        "-P", "-a", "-f", "-k", "-m", "-n", "-p", "-q", "-t", "-u", "-v",
+    ]),
+    standalone_short: b"46Pafkmnpqtuv",
+    valued: WordSet::new(&[
+        "--deepen", "--depth",
+        "--filter",
+        "--jobs", "--negotiation-tip",
+        "--recurse-submodules", "--refmap",
+        "--server-option",
+        "--shallow-exclude", "--shallow-since",
+        "-j", "-o",
+    ]),
+    valued_short: b"jo",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_SHORTLOG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--committer", "--email", "--numbered", "--summary",
+        "-c", "-e", "-n", "-s",
+    ]),
+    standalone_short: b"cens",
+    valued: WordSet::new(&[
+        "--format", "--group",
+    ]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_LS_FILES_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--cached", "--debug", "--deduplicate", "--deleted",
+        "--directory", "--empty-directory", "--eol",
+        "--error-unmatch", "--exclude-standard",
+        "--full-name",
+        "--ignored",
+        "--killed",
+        "--modified",
+        "--no-empty-directory",
+        "--others",
+        "--recurse-submodules", "--resolve-undo",
+        "--sparse", "--stage",
+        "--unmerged",
+        "-c", "-d", "-f", "-i", "-k", "-m", "-o", "-s", "-t", "-u", "-v", "-z",
+    ]),
+    standalone_short: b"cdfikmorstuvz",
+    valued: WordSet::new(&[
+        "--abbrev",
+        "--exclude", "--exclude-from", "--exclude-per-directory",
+        "--format",
+        "--with-tree",
+        "-X", "-x",
+    ]),
+    valued_short: b"Xx",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_LS_REMOTE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--branches",
+        "--exit-code",
+        "--get-url",
+        "--quiet",
+        "--refs",
+        "--symref",
+        "--tags",
+        "-b", "-q", "-t",
+    ]),
+    standalone_short: b"bqt",
+    valued: WordSet::new(&[
+        "--server-option", "--sort",
+        "-o",
+    ]),
+    valued_short: b"o",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_LS_TREE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--full-name", "--full-tree",
+        "--long",
+        "--name-only", "--name-status",
+        "--object-only",
+        "-d", "-l", "-r", "-t", "-z",
+    ]),
+    standalone_short: b"dlrtz",
+    valued: WordSet::new(&[
+        "--abbrev", "--format",
+    ]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_CAT_FILE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--batch-all-objects", "--buffer",
+        "--filters", "--follow-symlinks",
+        "--mailmap",
+        "--textconv", "--unordered", "--use-mailmap",
+        "-Z", "-e", "-p", "-s", "-t",
+    ]),
+    standalone_short: b"Zepst",
+    valued: WordSet::new(&[
+        "--batch", "--batch-check", "--batch-command",
+        "--filter", "--path",
+    ]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--always", "--contains",
+        "--debug",
+        "--exact-match", "--first-parent",
+        "--long",
+        "--tags",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&[
+        "--abbrev", "--broken",
+        "--candidates", "--dirty",
+        "--exclude", "--match",
+    ]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_MERGE_BASE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--fork-point",
+        "--independent", "--is-ancestor",
+        "--octopus",
+        "-a",
+    ]),
+    standalone_short: b"a",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_FOR_EACH_REF_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--ignore-case", "--include-root-refs",
+        "--omit-empty",
+        "--perl", "--python",
+        "--shell", "--stdin",
+        "--tcl",
+        "-p", "-s",
+    ]),
+    standalone_short: b"ps",
+    valued: WordSet::new(&[
+        "--color", "--contains", "--count",
+        "--exclude", "--format",
+        "--merged", "--no-contains", "--no-merged",
+        "--points-at", "--sort",
+    ]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_DIFF_TREE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--cc", "--combined-all-paths",
+        "--find-copies-harder", "--full-index",
+        "--ignore-all-space", "--ignore-space-at-eol",
+        "--ignore-space-change",
+        "--merge-base", "--minimal",
+        "--name-only", "--name-status", "--no-commit-id",
+        "--no-ext-diff", "--no-patch", "--no-renames",
+        "--numstat",
+        "--patch", "--patch-with-raw", "--patch-with-stat",
+        "--pickaxe-all",
+        "--raw", "--root",
+        "--shortstat", "--stat", "--stdin", "--summary",
+        "--text",
+        "-B", "-C", "-M", "-R",
+        "-a", "-c", "-m", "-p", "-r", "-s", "-t", "-u", "-v", "-z",
+    ]),
+    standalone_short: b"BCMRacmprstuvz",
+    valued: WordSet::new(&[
+        "--abbrev", "--diff-algorithm", "--diff-filter",
+        "--pretty",
+        "-O", "-S",
+    ]),
+    valued_short: b"OS",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_NAME_REV_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--all", "--always", "--annotate-stdin",
+        "--name-only", "--tags", "--undefined",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&[
+        "--exclude", "--refs",
+    ]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_COUNT_OBJECTS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--human-readable", "--verbose",
+        "-H", "-v",
+    ]),
+    standalone_short: b"Hv",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_CHECK_IGNORE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--no-index", "--non-matching",
+        "--quiet", "--stdin", "--verbose",
+        "-n", "-q", "-v", "-z",
+    ]),
+    standalone_short: b"nqvz",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_MERGE_TREE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--allow-unrelated-histories",
+        "--messages", "--name-only",
+        "--quiet",
+        "--stdin", "--trivial-merge", "--write-tree",
+        "-z",
+    ]),
+    standalone_short: b"z",
+    valued: WordSet::new(&[
+        "--merge-base",
+        "-X",
+    ]),
+    valued_short: b"X",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_VERIFY_COMMIT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--raw", "--verbose",
+        "-v",
+    ]),
+    standalone_short: b"v",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_VERIFY_TAG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--raw", "--verbose",
+        "-v",
+    ]),
+    standalone_short: b"v",
+    valued: WordSet::new(&[
+        "--format",
+    ]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_REV_PARSE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--absolute-git-dir",
+        "--all",
+        "--branches",
+        "--git-common-dir", "--git-dir", "--git-path",
+        "--is-bare-repository", "--is-inside-git-dir",
+        "--is-inside-work-tree", "--is-shallow-repository",
+        "--local-env-vars",
+        "--quiet",
+        "--remotes",
+        "--shared-index-path", "--show-cdup", "--show-prefix",
+        "--show-superproject-working-tree", "--show-toplevel",
+        "--symbolic", "--symbolic-full-name",
+        "--tags", "--verify",
+        "-q",
+    ]),
+    standalone_short: b"q",
+    valued: WordSet::new(&[
+        "--abbrev-ref", "--after", "--before",
+        "--default", "--exclude",
+        "--glob", "--prefix",
+        "--resolve-git-dir", "--short",
+        "--since", "--until",
+    ]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Positional,
+};
 
 static GIT_REMOTE_MUTATING: WordSet = WordSet::new(&[
     "add", "prune", "remove", "rename", "set-branches", "set-url",
@@ -55,6 +613,36 @@ static JJ_MULTI: &[(&str, WordSet)] = &[
 static JJ_TRIPLE: &[(&str, &str, WordSet)] =
     &[("git", "remote", WordSet::new(&["list"]))];
 
+fn git_subcommand_policy(subcmd: &str) -> Option<&'static FlagPolicy> {
+    match subcmd {
+        "blame" => Some(&GIT_BLAME_POLICY),
+        "cat-file" => Some(&GIT_CAT_FILE_POLICY),
+        "check-ignore" => Some(&GIT_CHECK_IGNORE_POLICY),
+        "count-objects" => Some(&GIT_COUNT_OBJECTS_POLICY),
+        "describe" => Some(&GIT_DESCRIBE_POLICY),
+        "diff" => Some(&GIT_DIFF_POLICY),
+        "diff-tree" => Some(&GIT_DIFF_TREE_POLICY),
+        "fetch" => Some(&GIT_FETCH_POLICY),
+        "for-each-ref" => Some(&GIT_FOR_EACH_REF_POLICY),
+        "grep" => Some(&GIT_GREP_POLICY),
+        "log" => Some(&GIT_LOG_POLICY),
+        "ls-files" => Some(&GIT_LS_FILES_POLICY),
+        "ls-remote" => Some(&GIT_LS_REMOTE_POLICY),
+        "ls-tree" => Some(&GIT_LS_TREE_POLICY),
+        "merge-base" => Some(&GIT_MERGE_BASE_POLICY),
+        "merge-tree" => Some(&GIT_MERGE_TREE_POLICY),
+        "name-rev" => Some(&GIT_NAME_REV_POLICY),
+        "reflog" => Some(&GIT_LOG_POLICY),
+        "rev-parse" => Some(&GIT_REV_PARSE_POLICY),
+        "shortlog" => Some(&GIT_SHORTLOG_POLICY),
+        "show" => Some(&GIT_SHOW_POLICY),
+        "status" => Some(&GIT_STATUS_POLICY),
+        "verify-commit" => Some(&GIT_VERIFY_COMMIT_POLICY),
+        "verify-tag" => Some(&GIT_VERIFY_TAG_POLICY),
+        _ => None,
+    }
+}
+
 pub fn is_safe_git(tokens: &[Token]) -> bool {
     if tokens.last().is_some_and(|t| *t == "-h")
         && !tokens.iter().any(|t| *t == "--")
@@ -68,12 +656,12 @@ pub fn is_safe_git(tokens: &[Token]) -> bool {
     if args.is_empty() {
         return false;
     }
+    if args[0] == "--version" || args[0] == "help" {
+        return true;
+    }
     let subcmd = args[0].command_name();
-    if GIT_READ_ONLY.contains(subcmd) {
-        let has_dangerous = args[1..].iter().any(|a| {
-            a.starts_with("--upload-p") || a.starts_with("--receive-p")
-        });
-        return !has_dangerous;
+    if let Some(p) = git_subcommand_policy(subcmd) {
+        return policy::check(args, p);
     }
     if subcmd == "remote" {
         return args.get(1).is_none_or(|a| !GIT_REMOTE_MUTATING.contains(a));
@@ -164,20 +752,22 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) 
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, doc, doc_multi, wordset_items};
+    use crate::docs::{CommandDoc, doc_multi, wordset_items};
     vec![
         CommandDoc::handler("git",
-            doc(&GIT_READ_ONLY)
-                .section(format!(
-                    "Restricted subcommands: remote (read-only actions), \
-                     branch (read-only flags), stash ({} only), \
-                     tag (list only), config ({} only), worktree (list only), \
-                     notes ({} only). Supports `-C <dir>` prefix.",
-                    wordset_items(&GIT_STASH_SAFE),
-                    wordset_items(&GIT_CONFIG_SAFE),
-                    wordset_items(&GIT_NOTES_SAFE),
-                ))
-                .build()),
+            format!(
+                "Subcommands with flag allowlists: blame, cat-file, check-ignore, count-objects, \
+                 describe, diff, diff-tree, fetch, for-each-ref, grep, help, log, ls-files, \
+                 ls-remote, ls-tree, merge-base, merge-tree, name-rev, reflog, rev-parse, \
+                 shortlog, show, status, verify-commit, verify-tag. \
+                 Restricted subcommands: remote (read-only actions), \
+                 branch (read-only flags), stash ({} only), \
+                 tag (list only), config ({} only), worktree (list only), \
+                 notes ({} only). Supports `-C <dir>` prefix.",
+                wordset_items(&GIT_STASH_SAFE),
+                wordset_items(&GIT_CONFIG_SAFE),
+                wordset_items(&GIT_NOTES_SAFE),
+            )),
         CommandDoc::handler("jj",
             doc_multi(&JJ_READ_ONLY, JJ_MULTI)
                 .triple_word(JJ_TRIPLE)
@@ -200,31 +790,54 @@ mod tests {
 
     safe! {
         git_log: "git log --oneline -5",
+        git_log_graph: "git log --graph --all --oneline",
+        git_log_author: "git log --author=foo --since=2024-01-01",
+        git_log_format: "git log --format='%H %s' -n 10",
+        git_log_stat: "git log --stat --no-merges",
+        git_log_bare: "git log",
         git_diff: "git diff --stat",
+        git_diff_cached: "git diff --cached --name-only",
+        git_diff_algorithm: "git diff --diff-algorithm=patience",
         git_show: "git show HEAD:some/file.rb",
+        git_show_stat: "git show --stat HEAD",
         git_status: "git status --porcelain",
+        git_status_short: "git status -sb",
         git_fetch: "git fetch origin master",
+        git_fetch_all: "git fetch --all --prune",
         git_ls_tree: "git ls-tree HEAD",
+        git_ls_tree_r: "git ls-tree -r --name-only HEAD",
         git_grep: "git grep pattern",
+        git_grep_flags: "git grep -n -i --count pattern",
         git_rev_parse: "git rev-parse HEAD",
+        git_rev_parse_toplevel: "git rev-parse --show-toplevel",
         git_merge_base: "git merge-base master HEAD",
         git_merge_tree: "git merge-tree HEAD~1 HEAD master",
         git_version: "git --version",
         git_help: "git help log",
         git_shortlog: "git shortlog -s",
+        git_shortlog_ne: "git shortlog -sne",
         git_describe: "git describe --tags",
+        git_describe_always: "git describe --always --abbrev=7",
         git_blame: "git blame file.rb",
+        git_blame_flags: "git blame -L 10,20 -w file.rb",
         git_reflog: "git reflog",
+        git_reflog_n: "git reflog -n 10",
         git_ls_files: "git ls-files",
+        git_ls_files_others: "git ls-files --others --exclude-standard",
         git_ls_remote: "git ls-remote origin",
+        git_ls_remote_tags: "git ls-remote --tags origin",
         git_diff_tree: "git diff-tree --no-commit-id -r HEAD",
         git_cat_file: "git cat-file -p HEAD",
+        git_cat_file_t: "git cat-file -t HEAD",
         git_check_ignore: "git check-ignore .jj/",
+        git_check_ignore_v: "git check-ignore -v .gitignore",
         git_name_rev: "git name-rev HEAD",
         git_for_each_ref: "git for-each-ref refs/heads",
+        git_for_each_ref_format: "git for-each-ref --format='%(refname)' --sort=-committerdate",
         git_count_objects: "git count-objects -v",
         git_verify_commit: "git verify-commit HEAD",
         git_verify_tag: "git verify-tag v1.0",
+        git_merge_base_all: "git merge-base --all HEAD main",
         git_c_flag: "git -C /some/repo diff --stat",
         git_c_nested: "git -C /some/repo -C nested log",
         git_remote_bare: "git remote",
@@ -288,6 +901,30 @@ mod tests {
     }
 
     denied! {
+        git_log_unknown: "git log --xyzzy-unknown",
+        git_diff_unknown: "git diff --xyzzy-unknown",
+        git_show_unknown: "git show --xyzzy-unknown HEAD",
+        git_status_unknown: "git status --xyzzy-unknown",
+        git_fetch_unknown: "git fetch --xyzzy-unknown",
+        git_grep_unknown: "git grep --xyzzy-unknown pattern",
+        git_blame_unknown: "git blame --xyzzy-unknown file.rb",
+        git_ls_files_unknown: "git ls-files --xyzzy-unknown",
+        git_ls_remote_unknown: "git ls-remote --xyzzy-unknown origin",
+        git_ls_tree_unknown: "git ls-tree --xyzzy-unknown HEAD",
+        git_cat_file_unknown: "git cat-file --xyzzy-unknown HEAD",
+        git_describe_unknown: "git describe --xyzzy-unknown",
+        git_merge_base_unknown: "git merge-base --xyzzy-unknown HEAD",
+        git_for_each_ref_unknown: "git for-each-ref --xyzzy-unknown",
+        git_diff_tree_unknown: "git diff-tree --xyzzy-unknown HEAD",
+        git_name_rev_unknown: "git name-rev --xyzzy-unknown HEAD",
+        git_count_objects_unknown: "git count-objects --xyzzy-unknown",
+        git_check_ignore_unknown: "git check-ignore --xyzzy-unknown foo",
+        git_merge_tree_unknown: "git merge-tree --xyzzy-unknown HEAD HEAD",
+        git_verify_commit_unknown: "git verify-commit --xyzzy-unknown HEAD",
+        git_verify_tag_unknown: "git verify-tag --xyzzy-unknown v1.0",
+        git_shortlog_unknown: "git shortlog --xyzzy-unknown",
+        git_fetch_upload_pack_denied: "git fetch --upload-pack=malicious origin",
+        git_ls_remote_upload_pack_denied: "git ls-remote --upload-pack malicious origin",
         git_stash_bare_denied: "git stash",
         git_stash_push_denied: "git stash push",
         git_stash_pop_denied: "git stash pop",
@@ -300,11 +937,6 @@ mod tests {
         git_config_unset_denied: "git config --unset user.name",
         git_worktree_add_denied: "git worktree add ../new-branch",
         git_notes_add_denied: "git notes add -m 'note'",
-        git_ls_remote_upload_pack_denied: "git ls-remote --upload-pack=malicious origin",
-        git_ls_remote_upload_pack_space_denied: "git ls-remote --upload-pack malicious origin",
-        git_fetch_upload_pack_denied: "git fetch --upload-pack=malicious origin",
-        git_fetch_receive_pack_denied: "git fetch --receive-pack=malicious origin",
-        git_ls_remote_upload_pack_abbreviated_denied: "git ls-remote --upload-pa=malicious origin",
         git_push_denied: "git push origin main",
         git_reset_denied: "git reset --hard HEAD~1",
         git_add_denied: "git add .",
