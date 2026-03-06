@@ -627,17 +627,6 @@ pub fn is_safe_nroff(tokens: &[Token]) -> bool {
     policy::check(tokens, &NROFF_POLICY)
 }
 
-static ECHO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
-        "-E", "-e", "-n",
-    ]),
-    standalone_short: b"Een",
-    valued: WordSet::new(&[]),
-    valued_short: b"",
-    bare: true,
-    max_positional: None,
-};
-
 pub fn is_safe_echo(_tokens: &[Token]) -> bool {
     true
 }
@@ -2237,7 +2226,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("column", COLUMN_POLICY.describe()),
         CommandDoc::handler("iconv", ICONV_POLICY.describe()),
         CommandDoc::handler("nroff", NROFF_POLICY.describe()),
-        CommandDoc::handler("echo", ECHO_POLICY.describe()),
+        CommandDoc::handler("echo", "All arguments accepted."),
         CommandDoc::handler("printf", PRINTF_POLICY.describe()),
         CommandDoc::handler("seq", SEQ_POLICY.describe()),
         CommandDoc::handler("test",

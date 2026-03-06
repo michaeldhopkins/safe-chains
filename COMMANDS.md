@@ -250,7 +250,7 @@ Bare invocation allowed.
 
 ### `echo`
 
-Allowed standalone flags: -E, -e, -n. Bare invocation allowed.
+All arguments accepted.
 
 ### `env`
 
