@@ -700,6 +700,22 @@ pub fn is_safe_column(tokens: &[Token]) -> bool {
     policy::check(tokens, &COLUMN_POLICY)
 }
 
+static COL_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "-b", "-f", "-h", "-p", "-x",
+    ]),
+    standalone_short: b"bfhpx",
+    valued: WordSet::new(&["-l"]),
+    valued_short: b"l",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+pub fn is_safe_col(tokens: &[Token]) -> bool {
+    policy::check(tokens, &COL_POLICY)
+}
+
 static ICONV_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--list", "--silent",
@@ -2348,6 +2364,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
         "unexpand" => Some(is_safe_unexpand(tokens)),
         "fold" => Some(is_safe_fold(tokens)),
         "fmt" => Some(is_safe_fmt(tokens)),
+        "col" => Some(is_safe_col(tokens)),
         "column" => Some(is_safe_column(tokens)),
         "iconv" => Some(is_safe_iconv(tokens)),
         "nroff" => Some(is_safe_nroff(tokens)),
@@ -2499,6 +2516,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("unexpand", UNEXPAND_POLICY.describe()),
         CommandDoc::handler("fold", FOLD_POLICY.describe()),
         CommandDoc::handler("fmt", FMT_POLICY.describe()),
+        CommandDoc::handler("col", COL_POLICY.describe()),
         CommandDoc::handler("column", COLUMN_POLICY.describe()),
         CommandDoc::handler("iconv", ICONV_POLICY.describe()),
         CommandDoc::handler("nroff", NROFF_POLICY.describe()),
@@ -2829,6 +2847,11 @@ mod tests {
         fmt_split: "fmt -s file.txt",
         fmt_bare: "fmt",
 
+        col_bare: "col",
+        col_strip_backspaces: "col -b",
+        col_flags: "col -bfx",
+        col_lines: "col -l 200",
+
         column_file: "column file.txt",
         column_table: "column -t file.txt",
         column_separator: "column -s, file.txt",
@@ -2891,6 +2914,7 @@ mod tests {
         unexpand_unknown_denied: "unexpand --unknown file",
         fold_unknown_denied: "fold --unknown file",
         fmt_unknown_denied: "fmt --unknown file",
+        col_unknown_denied: "col -Z",
         column_unknown_denied: "column --unknown file",
         iconv_output_denied: "iconv -o output.txt file",
         iconv_unknown_denied: "iconv --unknown file",

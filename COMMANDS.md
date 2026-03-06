@@ -124,6 +124,14 @@ Allowed: --version, --system-information (single argument only).
 
 Requires --display/-d or --verify/-v.
 
+### `col`
+
+Allowed standalone flags: -b, -f, -h, -p, -x.
+
+Allowed valued flags: -l.
+
+Bare invocation allowed.
+
 ### `colordiff`
 
 Allowed standalone flags: --brief, --ed, --expand-tabs, --initial-tab, --left-column, --minimal, --normal, --paginate, --rcs, --report-identical-files, --side-by-side, --speed-large-files, --strip-trailing-cr, --suppress-blank-empty, --suppress-common-lines, --text, -B, -E, -N, -P, -T, -Z, -a, -b, -c, -d, -e, -i, -l, -n, -p, -q, -r, -s, -t, -u, -v, -w, -y. Allowed valued flags: --changed-group-format, --color, --context, --from-file, --horizon-lines, --ifdef, --ignore-matching-lines, --label, --line-format, --new-group-format, --new-line-format, --old-group-format, --old-line-format, --show-function-line, --starting-file, --tabsize, --to-file, --unchanged-group-format, --unchanged-line-format, --unified, --width, -C, -D, -F, -I, -L, -S, -U, -W.
