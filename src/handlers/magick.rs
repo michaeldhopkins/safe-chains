@@ -1,5 +1,6 @@
+use crate::command::{CommandDef, SubDef};
 use crate::parse::{Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{FlagPolicy, FlagStyle};
 
 static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -19,36 +20,26 @@ static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_magick(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if tokens[1] == "identify" {
-        return policy::check(&tokens[1..], &IDENTIFY_POLICY);
-    }
-    false
-}
+pub(crate) static MAGICK: CommandDef = CommandDef {
+    name: "magick",
+    subs: &[
+        SubDef::Policy { name: "identify", policy: &IDENTIFY_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
-    match cmd {
-        "magick" => Some(is_safe_magick(tokens)),
-        _ => None,
+    if cmd == MAGICK.name {
+        Some(MAGICK.check(tokens, &|_| false))
+    } else {
+        None
     }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    vec![
-        crate::docs::CommandDoc::handler("magick",
-            "Subcommand: identify."),
-    ]
+    vec![MAGICK.to_doc()]
 }
-
-#[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "magick", subs: &[
-        super::SubEntry::Policy { name: "identify" },
-    ]},
-];
 
 #[cfg(test)]
 mod tests {

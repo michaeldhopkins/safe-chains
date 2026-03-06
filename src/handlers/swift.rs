@@ -1,5 +1,6 @@
+use crate::command::{CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{FlagPolicy, FlagStyle};
 
 static SWIFT_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -67,57 +68,28 @@ static SWIFT_PACKAGE_SHOW_DEPS_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_swift(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if tokens[1] == "build" {
-        return policy::check(&tokens[1..], &SWIFT_BUILD_POLICY);
-    }
-    if tokens[1] == "test" {
-        return policy::check(&tokens[1..], &SWIFT_TEST_POLICY);
-    }
-    if tokens[1] == "package" {
-        if tokens.len() < 3 {
-            return false;
-        }
-        let policy = match tokens[2].as_str() {
-            "describe" => &SWIFT_PACKAGE_DESCRIBE_POLICY,
-            "dump-package" => &SWIFT_PACKAGE_DUMP_POLICY,
-            "show-dependencies" => &SWIFT_PACKAGE_SHOW_DEPS_POLICY,
-            _ => return false,
-        };
-        return policy::check(&tokens[2..], policy);
-    }
-    false
-}
+pub(crate) static SWIFT: CommandDef = CommandDef {
+    name: "swift",
+    subs: &[
+        SubDef::Policy { name: "build", policy: &SWIFT_BUILD_POLICY },
+        SubDef::Nested { name: "package", subs: &[
+            SubDef::Policy { name: "describe", policy: &SWIFT_PACKAGE_DESCRIBE_POLICY },
+            SubDef::Policy { name: "dump-package", policy: &SWIFT_PACKAGE_DUMP_POLICY },
+            SubDef::Policy { name: "show-dependencies", policy: &SWIFT_PACKAGE_SHOW_DEPS_POLICY },
+        ]},
+        SubDef::Policy { name: "test", policy: &SWIFT_TEST_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "swift" => Some(is_safe_swift(tokens)),
-        _ => None,
-    }
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    SWIFT.dispatch(cmd, tokens, is_safe)
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
-    vec![CommandDoc::handler("swift",
-        "Subcommands: build, test, package describe, package dump-package, \
-         package show-dependencies.")]
+    vec![SWIFT.to_doc()]
 }
-
-#[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "swift", subs: &[
-        super::SubEntry::Policy { name: "build" },
-        super::SubEntry::Policy { name: "test" },
-        super::SubEntry::Nested { name: "package", subs: &[
-            super::SubEntry::Policy { name: "describe" },
-            super::SubEntry::Policy { name: "dump-package" },
-            super::SubEntry::Policy { name: "show-dependencies" },
-        ]},
-    ]},
-];
 
 #[cfg(test)]
 mod tests {

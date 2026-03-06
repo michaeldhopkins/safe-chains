@@ -1,3 +1,4 @@
+use crate::command::{CheckFn, CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
@@ -49,23 +50,34 @@ static PIP_BARE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_pip(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    match tokens[1].as_str() {
-        "list" => policy::check(&tokens[1..], &PIP_LIST_POLICY),
-        "show" => policy::check(&tokens[1..], &PIP_SHOW_POLICY),
-        "freeze" => policy::check(&tokens[1..], &PIP_FREEZE_POLICY),
-        "check" | "debug" | "help" | "index" | "inspect" => {
-            policy::check(&tokens[1..], &PIP_BARE_POLICY)
-        }
-        "config" => tokens
-            .get(2)
-            .is_some_and(|a| a == "list" || a == "get"),
-        _ => false,
-    }
-}
+static PIP_SUBS: &[SubDef] = &[
+    SubDef::Policy { name: "list", policy: &PIP_LIST_POLICY },
+    SubDef::Policy { name: "show", policy: &PIP_SHOW_POLICY },
+    SubDef::Policy { name: "freeze", policy: &PIP_FREEZE_POLICY },
+    SubDef::Policy { name: "check", policy: &PIP_BARE_POLICY },
+    SubDef::Nested { name: "config", subs: &[
+        SubDef::Policy { name: "get", policy: &PIP_BARE_POLICY },
+        SubDef::Policy { name: "list", policy: &PIP_BARE_POLICY },
+    ]},
+    SubDef::Policy { name: "debug", policy: &PIP_BARE_POLICY },
+    SubDef::Policy { name: "help", policy: &PIP_BARE_POLICY },
+    SubDef::Policy { name: "index", policy: &PIP_BARE_POLICY },
+    SubDef::Policy { name: "inspect", policy: &PIP_BARE_POLICY },
+];
+
+pub(crate) static PIP: CommandDef = CommandDef {
+    name: "pip",
+    subs: PIP_SUBS,
+    bare_flags: &[],
+    help_eligible: true,
+};
+
+pub(crate) static PIP3: CommandDef = CommandDef {
+    name: "pip3",
+    subs: PIP_SUBS,
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static UV_PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -110,32 +122,25 @@ static UV_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_uv(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if tokens[1] == "pip" {
-        if tokens.len() < 3 {
-            return false;
-        }
-        let policy = match tokens[2].as_str() {
-            "list" => &UV_PIP_LIST_POLICY,
-            "show" => &UV_PIP_SHOW_POLICY,
-            "check" | "freeze" => &UV_PIP_SIMPLE_POLICY,
-            _ => return false,
-        };
-        return policy::check(&tokens[2..], policy);
-    }
-    if tokens[1] == "python" {
-        return tokens.get(2).is_some_and(|a| a == "list")
-            && policy::check(&tokens[2..], &UV_SIMPLE_POLICY);
-    }
-    if tokens[1] == "tool" {
-        return tokens.get(2).is_some_and(|a| a == "list")
-            && policy::check(&tokens[2..], &UV_SIMPLE_POLICY);
-    }
-    false
-}
+pub(crate) static UV: CommandDef = CommandDef {
+    name: "uv",
+    subs: &[
+        SubDef::Nested { name: "pip", subs: &[
+            SubDef::Policy { name: "list", policy: &UV_PIP_LIST_POLICY },
+            SubDef::Policy { name: "show", policy: &UV_PIP_SHOW_POLICY },
+            SubDef::Policy { name: "check", policy: &UV_PIP_SIMPLE_POLICY },
+            SubDef::Policy { name: "freeze", policy: &UV_PIP_SIMPLE_POLICY },
+        ]},
+        SubDef::Nested { name: "python", subs: &[
+            SubDef::Policy { name: "list", policy: &UV_SIMPLE_POLICY },
+        ]},
+        SubDef::Nested { name: "tool", subs: &[
+            SubDef::Policy { name: "list", policy: &UV_SIMPLE_POLICY },
+        ]},
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static POETRY_SHOW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -170,22 +175,19 @@ static POETRY_ENV_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_poetry(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if tokens[1] == "show" {
-        return policy::check(&tokens[1..], &POETRY_SHOW_POLICY);
-    }
-    if tokens[1] == "check" {
-        return policy::check(&tokens[1..], &POETRY_CHECK_POLICY);
-    }
-    if tokens[1] == "env" {
-        return tokens.get(2).is_some_and(|a| a == "info" || a == "list")
-            && policy::check(&tokens[2..], &POETRY_ENV_POLICY);
-    }
-    false
-}
+pub(crate) static POETRY: CommandDef = CommandDef {
+    name: "poetry",
+    subs: &[
+        SubDef::Policy { name: "show", policy: &POETRY_SHOW_POLICY },
+        SubDef::Policy { name: "check", policy: &POETRY_CHECK_POLICY },
+        SubDef::Nested { name: "env", subs: &[
+            SubDef::Policy { name: "info", policy: &POETRY_ENV_POLICY },
+            SubDef::Policy { name: "list", policy: &POETRY_ENV_POLICY },
+        ]},
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static PYENV_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--bare"]),
@@ -197,18 +199,19 @@ static PYENV_BARE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_pyenv(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    static PYENV_SAFE: WordSet = WordSet::new(&[
-        "help", "root", "shims", "version", "versions", "which",
-    ]);
-    if !PYENV_SAFE.contains(&tokens[1]) {
-        return false;
-    }
-    policy::check(&tokens[1..], &PYENV_BARE_POLICY)
-}
+pub(crate) static PYENV: CommandDef = CommandDef {
+    name: "pyenv",
+    subs: &[
+        SubDef::Policy { name: "help", policy: &PYENV_BARE_POLICY },
+        SubDef::Policy { name: "root", policy: &PYENV_BARE_POLICY },
+        SubDef::Policy { name: "shims", policy: &PYENV_BARE_POLICY },
+        SubDef::Policy { name: "version", policy: &PYENV_BARE_POLICY },
+        SubDef::Policy { name: "versions", policy: &PYENV_BARE_POLICY },
+        SubDef::Policy { name: "which", policy: &PYENV_BARE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static CONDA_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -247,111 +250,37 @@ static CONDA_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_conda(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    match tokens[1].as_str() {
-        "list" => policy::check(&tokens[1..], &CONDA_LIST_POLICY),
-        "info" => policy::check(&tokens[1..], &CONDA_INFO_POLICY),
-        "config" => (has_flag(&tokens[1..], None, Some("--show"))
-                || has_flag(&tokens[1..], None, Some("--show-sources")))
-            && policy::check(&tokens[1..], &CONDA_CONFIG_POLICY),
-        _ => false,
-    }
+fn check_conda_config(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    (has_flag(tokens, None, Some("--show"))
+        || has_flag(tokens, None, Some("--show-sources")))
+        && policy::check(tokens, &CONDA_CONFIG_POLICY)
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "pip" | "pip3" => Some(is_safe_pip(tokens)),
-        "uv" => Some(is_safe_uv(tokens)),
-        "poetry" => Some(is_safe_poetry(tokens)),
-        "pyenv" => Some(is_safe_pyenv(tokens)),
-        "conda" => Some(is_safe_conda(tokens)),
-        _ => None,
-    }
+pub(crate) static CONDA: CommandDef = CommandDef {
+    name: "conda",
+    subs: &[
+        SubDef::Policy { name: "list", policy: &CONDA_LIST_POLICY },
+        SubDef::Policy { name: "info", policy: &CONDA_INFO_POLICY },
+        SubDef::Custom { name: "config", check: check_conda_config as CheckFn, doc: "config (--show/--show-sources only).", test_suffix: Some("--show") },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    PIP.dispatch(cmd, tokens, is_safe)
+        .or_else(|| PIP3.dispatch(cmd, tokens, is_safe))
+        .or_else(|| UV.dispatch(cmd, tokens, is_safe))
+        .or_else(|| POETRY.dispatch(cmd, tokens, is_safe))
+        .or_else(|| PYENV.dispatch(cmd, tokens, is_safe))
+        .or_else(|| CONDA.dispatch(cmd, tokens, is_safe))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
-    vec![
-        CommandDoc::handler("pip / pip3",
-            "Subcommands: check, config (list/get), debug, freeze, help, index, inspect, \
-             list, show."),
-        CommandDoc::handler("uv",
-            "Subcommands: pip check/freeze/list/show, python list, tool list. \
-            "),
-        CommandDoc::handler("poetry",
-            "Subcommands: check, env info/list, show."),
-        CommandDoc::handler("pyenv",
-            "Subcommands: help, root, shims, version, versions, which. \
-             Minimal flags allowed (--bare)."),
-        CommandDoc::handler("conda",
-            "Subcommands: config (--show/--show-sources only), info, list. \
-            "),
-    ]
+    let mut pip_doc = PIP.to_doc();
+    pip_doc.name = "pip / pip3";
+    vec![pip_doc, UV.to_doc(), POETRY.to_doc(), PYENV.to_doc(), CONDA.to_doc()]
 }
-
-#[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "pip", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "show" },
-        super::SubEntry::Policy { name: "freeze" },
-        super::SubEntry::Policy { name: "check" },
-        super::SubEntry::Policy { name: "debug" },
-        super::SubEntry::Policy { name: "help" },
-        super::SubEntry::Policy { name: "index" },
-        super::SubEntry::Policy { name: "inspect" },
-        super::SubEntry::Positional { name: "config" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "pip3", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "show" },
-        super::SubEntry::Policy { name: "freeze" },
-        super::SubEntry::Policy { name: "check" },
-        super::SubEntry::Policy { name: "debug" },
-        super::SubEntry::Policy { name: "help" },
-        super::SubEntry::Policy { name: "index" },
-        super::SubEntry::Policy { name: "inspect" },
-        super::SubEntry::Positional { name: "config" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "uv", subs: &[
-        super::SubEntry::Nested { name: "pip", subs: &[
-            super::SubEntry::Policy { name: "list" },
-            super::SubEntry::Policy { name: "show" },
-            super::SubEntry::Policy { name: "check" },
-            super::SubEntry::Policy { name: "freeze" },
-        ]},
-        super::SubEntry::Nested { name: "python", subs: &[
-            super::SubEntry::Policy { name: "list" },
-        ]},
-        super::SubEntry::Nested { name: "tool", subs: &[
-            super::SubEntry::Policy { name: "list" },
-        ]},
-    ]},
-    super::CommandEntry::Subcommand { cmd: "poetry", subs: &[
-        super::SubEntry::Policy { name: "show" },
-        super::SubEntry::Policy { name: "check" },
-        super::SubEntry::Nested { name: "env", subs: &[
-            super::SubEntry::Policy { name: "info" },
-            super::SubEntry::Policy { name: "list" },
-        ]},
-    ]},
-    super::CommandEntry::Subcommand { cmd: "pyenv", subs: &[
-        super::SubEntry::Policy { name: "help" },
-        super::SubEntry::Policy { name: "root" },
-        super::SubEntry::Policy { name: "shims" },
-        super::SubEntry::Policy { name: "version" },
-        super::SubEntry::Policy { name: "versions" },
-        super::SubEntry::Policy { name: "which" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "conda", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Guarded { name: "config", valid_suffix: "--show" },
-    ]},
-];
 
 #[cfg(test)]
 mod tests {

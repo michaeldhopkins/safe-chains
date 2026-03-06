@@ -1,3 +1,4 @@
+use crate::command::{CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
@@ -34,18 +35,18 @@ static XCODEBUILD_VERSION_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_xcodebuild(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let policy = match tokens[1].as_str() {
-        "-list" => &XCODEBUILD_LIST_POLICY,
-        "-showBuildSettings" | "-showdestinations" | "-showsdks" => &XCODEBUILD_SHOW_POLICY,
-        "-version" => &XCODEBUILD_VERSION_POLICY,
-        _ => return false,
-    };
-    policy::check(&tokens[1..], policy)
-}
+pub(crate) static XCODEBUILD: CommandDef = CommandDef {
+    name: "xcodebuild",
+    subs: &[
+        SubDef::Policy { name: "-list", policy: &XCODEBUILD_LIST_POLICY },
+        SubDef::Policy { name: "-showBuildSettings", policy: &XCODEBUILD_SHOW_POLICY },
+        SubDef::Policy { name: "-showdestinations", policy: &XCODEBUILD_SHOW_POLICY },
+        SubDef::Policy { name: "-showsdks", policy: &XCODEBUILD_SHOW_POLICY },
+        SubDef::Policy { name: "-version", policy: &XCODEBUILD_VERSION_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static PLUTIL_LINT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["-s"]),
@@ -67,18 +68,16 @@ static PLUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_plutil(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let policy = match tokens[1].as_str() {
-        "-lint" => &PLUTIL_LINT_POLICY,
-        "-p" | "-type" => &PLUTIL_SIMPLE_POLICY,
-        "-help" => return tokens.len() == 2,
-        _ => return false,
-    };
-    policy::check(&tokens[1..], policy)
-}
+pub(crate) static PLUTIL: CommandDef = CommandDef {
+    name: "plutil",
+    subs: &[
+        SubDef::Policy { name: "-lint", policy: &PLUTIL_LINT_POLICY },
+        SubDef::Policy { name: "-p", policy: &PLUTIL_SIMPLE_POLICY },
+        SubDef::Policy { name: "-type", policy: &PLUTIL_SIMPLE_POLICY },
+    ],
+    bare_flags: &["-help"],
+    help_eligible: true,
+};
 
 pub fn is_safe_xcode_select(tokens: &[Token]) -> bool {
     tokens.len() == 2
@@ -239,29 +238,25 @@ pub fn is_safe_spctl(tokens: &[Token]) -> bool {
     policy::check(tokens, &SPCTL_POLICY)
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "xcodebuild" => Some(is_safe_xcodebuild(tokens)),
-        "plutil" => Some(is_safe_plutil(tokens)),
-        "xcode-select" => Some(is_safe_xcode_select(tokens)),
-        "xcrun" => Some(is_safe_xcrun(tokens)),
-        "pkgutil" => Some(is_safe_pkgutil(tokens)),
-        "lipo" => Some(is_safe_lipo(tokens)),
-        "codesign" => Some(is_safe_codesign(tokens)),
-        "spctl" => Some(is_safe_spctl(tokens)),
-        _ => None,
-    }
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    XCODEBUILD.dispatch(cmd, tokens, is_safe)
+        .or_else(|| PLUTIL.dispatch(cmd, tokens, is_safe))
+        .or_else(|| match cmd {
+            "xcode-select" => Some(is_safe_xcode_select(tokens)),
+            "xcrun" => Some(is_safe_xcrun(tokens)),
+            "pkgutil" => Some(is_safe_pkgutil(tokens)),
+            "lipo" => Some(is_safe_lipo(tokens)),
+            "codesign" => Some(is_safe_codesign(tokens)),
+            "spctl" => Some(is_safe_spctl(tokens)),
+            _ => None,
+        })
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
-        CommandDoc::handler("xcodebuild",
-            "Subcommands: -list, -showBuildSettings, -showdestinations, -showsdks, -version. \
-            "),
-        CommandDoc::handler("plutil",
-            "Subcommands: -help, -lint, -p, -type. \
-            "),
+        XCODEBUILD.to_doc(),
+        PLUTIL.to_doc(),
         CommandDoc::handler("xcode-select",
             "Allowed: -p/--print-path, -v/--version (single argument only)."),
         CommandDoc::handler("xcrun",
@@ -281,18 +276,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "xcodebuild", subs: &[
-        super::SubEntry::Policy { name: "-list" },
-        super::SubEntry::Policy { name: "-showBuildSettings" },
-        super::SubEntry::Policy { name: "-showdestinations" },
-        super::SubEntry::Policy { name: "-showsdks" },
-        super::SubEntry::Policy { name: "-version" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "plutil", subs: &[
-        super::SubEntry::Policy { name: "-lint" },
-        super::SubEntry::Policy { name: "-p" },
-        super::SubEntry::Policy { name: "-type" },
-    ]},
     super::CommandEntry::Custom { cmd: "xcode-select", valid_prefix: None },
     super::CommandEntry::Positional { cmd: "xcrun" },
     super::CommandEntry::Custom { cmd: "pkgutil", valid_prefix: Some("pkgutil --pkgs") },

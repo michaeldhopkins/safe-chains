@@ -1,5 +1,6 @@
+use crate::command::{CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{FlagPolicy, FlagStyle};
 
 static DOCKER_PS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -136,199 +137,99 @@ static DOCKER_COMPOSE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_docker_subcmd(tokens: &[Token], subcmd_pos: usize) -> bool {
-    if subcmd_pos >= tokens.len() {
-        return false;
-    }
-    let subcmd = tokens[subcmd_pos].as_str();
-    let rest = &tokens[subcmd_pos..];
-    let policy = match subcmd {
-        "ps" => &DOCKER_PS_POLICY,
-        "images" => &DOCKER_IMAGES_POLICY,
-        "logs" => &DOCKER_LOGS_POLICY,
-        "inspect" => &DOCKER_INSPECT_POLICY,
-        "info" => &DOCKER_INFO_POLICY,
-        "version" => &DOCKER_VERSION_POLICY,
-        "top" | "port" | "diff" => &DOCKER_SIMPLE_POLICY,
-        "stats" => &DOCKER_STATS_POLICY,
-        "history" => &DOCKER_HISTORY_POLICY,
-        _ => return false,
-    };
-    policy::check(rest, policy)
+fn check_docker_version_flag(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    tokens.len() == 1
 }
 
-fn check_docker_multi(tokens: &[Token]) -> bool {
-    if tokens.len() < 3 {
-        return false;
-    }
-    let group = tokens[1].as_str();
-    let action = tokens[2].as_str();
-    let rest = &tokens[2..];
+static DOCKER_SUBS: &[SubDef] = &[
+    SubDef::Nested { name: "buildx", subs: &[
+        SubDef::Custom { name: "--version", check: check_docker_version_flag, doc: "", test_suffix: None },
+        SubDef::Policy { name: "inspect", policy: &DOCKER_SIMPLE_POLICY },
+        SubDef::Policy { name: "ls", policy: &DOCKER_SIMPLE_POLICY },
+        SubDef::Policy { name: "version", policy: &DOCKER_SIMPLE_POLICY },
+    ]},
+    SubDef::Nested { name: "compose", subs: &[
+        SubDef::Custom { name: "--version", check: check_docker_version_flag, doc: "", test_suffix: None },
+        SubDef::Policy { name: "config", policy: &DOCKER_COMPOSE_CONFIG_POLICY },
+        SubDef::Policy { name: "images", policy: &DOCKER_SIMPLE_POLICY },
+        SubDef::Policy { name: "ls", policy: &DOCKER_SIMPLE_POLICY },
+        SubDef::Policy { name: "ps", policy: &DOCKER_COMPOSE_PS_POLICY },
+        SubDef::Policy { name: "top", policy: &DOCKER_SIMPLE_POLICY },
+        SubDef::Policy { name: "version", policy: &DOCKER_SIMPLE_POLICY },
+    ]},
+    SubDef::Nested { name: "container", subs: &[
+        SubDef::Policy { name: "diff", policy: &DOCKER_SIMPLE_POLICY },
+        SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY },
+        SubDef::Policy { name: "list", policy: &DOCKER_PS_POLICY },
+        SubDef::Policy { name: "logs", policy: &DOCKER_LOGS_POLICY },
+        SubDef::Policy { name: "ls", policy: &DOCKER_PS_POLICY },
+        SubDef::Policy { name: "port", policy: &DOCKER_SIMPLE_POLICY },
+        SubDef::Policy { name: "stats", policy: &DOCKER_STATS_POLICY },
+        SubDef::Policy { name: "top", policy: &DOCKER_SIMPLE_POLICY },
+    ]},
+    SubDef::Nested { name: "context", subs: &[
+        SubDef::Policy { name: "inspect", policy: &DOCKER_LS_POLICY },
+        SubDef::Policy { name: "ls", policy: &DOCKER_LS_POLICY },
+        SubDef::Policy { name: "show", policy: &DOCKER_LS_POLICY },
+    ]},
+    SubDef::Policy { name: "diff", policy: &DOCKER_SIMPLE_POLICY },
+    SubDef::Policy { name: "history", policy: &DOCKER_HISTORY_POLICY },
+    SubDef::Nested { name: "image", subs: &[
+        SubDef::Policy { name: "history", policy: &DOCKER_HISTORY_POLICY },
+        SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY },
+        SubDef::Policy { name: "list", policy: &DOCKER_IMAGES_POLICY },
+        SubDef::Policy { name: "ls", policy: &DOCKER_IMAGES_POLICY },
+    ]},
+    SubDef::Policy { name: "images", policy: &DOCKER_IMAGES_POLICY },
+    SubDef::Policy { name: "info", policy: &DOCKER_INFO_POLICY },
+    SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY },
+    SubDef::Policy { name: "logs", policy: &DOCKER_LOGS_POLICY },
+    SubDef::Nested { name: "manifest", subs: &[
+        SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY },
+    ]},
+    SubDef::Nested { name: "network", subs: &[
+        SubDef::Policy { name: "inspect", policy: &DOCKER_LS_POLICY },
+        SubDef::Policy { name: "ls", policy: &DOCKER_LS_POLICY },
+    ]},
+    SubDef::Policy { name: "port", policy: &DOCKER_SIMPLE_POLICY },
+    SubDef::Policy { name: "ps", policy: &DOCKER_PS_POLICY },
+    SubDef::Policy { name: "stats", policy: &DOCKER_STATS_POLICY },
+    SubDef::Nested { name: "system", subs: &[
+        SubDef::Policy { name: "df", policy: &DOCKER_INFO_POLICY },
+        SubDef::Policy { name: "info", policy: &DOCKER_INFO_POLICY },
+    ]},
+    SubDef::Policy { name: "top", policy: &DOCKER_SIMPLE_POLICY },
+    SubDef::Policy { name: "version", policy: &DOCKER_VERSION_POLICY },
+    SubDef::Nested { name: "volume", subs: &[
+        SubDef::Policy { name: "inspect", policy: &DOCKER_LS_POLICY },
+        SubDef::Policy { name: "ls", policy: &DOCKER_LS_POLICY },
+    ]},
+];
 
-    match group {
-        "compose" => match action {
-            "--version" => tokens.len() == 3,
-            "ps" => policy::check(rest, &DOCKER_COMPOSE_PS_POLICY),
-            "config" => policy::check(rest, &DOCKER_COMPOSE_CONFIG_POLICY),
-            "images" | "ls" | "top" | "version" => {
-                policy::check(rest, &DOCKER_SIMPLE_POLICY)
-            }
-            _ => false,
-        },
-        "container" => match action {
-            "diff" | "inspect" | "list" | "logs" | "ls"
-            | "port" | "stats" | "top" => {
-                let mapped = match action {
-                    "list" | "ls" => &DOCKER_PS_POLICY,
-                    "logs" => &DOCKER_LOGS_POLICY,
-                    "inspect" => &DOCKER_INSPECT_POLICY,
-                    "stats" => &DOCKER_STATS_POLICY,
-                    _ => &DOCKER_SIMPLE_POLICY,
-                };
-                policy::check(rest, mapped)
-            }
-            _ => false,
-        },
-        "image" => match action {
-            "history" | "inspect" | "list" | "ls" => {
-                let mapped = match action {
-                    "list" | "ls" => &DOCKER_IMAGES_POLICY,
-                    "inspect" => &DOCKER_INSPECT_POLICY,
-                    "history" => &DOCKER_HISTORY_POLICY,
-                    _ => &DOCKER_SIMPLE_POLICY,
-                };
-                policy::check(rest, mapped)
-            }
-            _ => false,
-        },
-        "context" => match action {
-            "inspect" | "ls" | "show" => policy::check(rest, &DOCKER_LS_POLICY),
-            _ => false,
-        },
-        "network" | "volume" => match action {
-            "inspect" | "ls" => policy::check(rest, &DOCKER_LS_POLICY),
-            _ => false,
-        },
-        "system" => match action {
-            "df" | "info" => policy::check(rest, &DOCKER_INFO_POLICY),
-            _ => false,
-        },
-        "buildx" => match action {
-            "--version" => tokens.len() == 3,
-            "inspect" | "ls" | "version" => policy::check(rest, &DOCKER_SIMPLE_POLICY),
-            _ => false,
-        },
-        "manifest" => match action {
-            "inspect" => policy::check(rest, &DOCKER_INSPECT_POLICY),
-            _ => false,
-        },
-        _ => false,
-    }
-}
+pub(crate) static DOCKER: CommandDef = CommandDef {
+    name: "docker",
+    subs: DOCKER_SUBS,
+    bare_flags: &[],
+    help_eligible: false,
+};
 
-pub fn is_safe_docker(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if check_docker_subcmd(tokens, 1) {
-        return true;
-    }
-    check_docker_multi(tokens)
-}
+pub(crate) static PODMAN: CommandDef = CommandDef {
+    name: "podman",
+    subs: DOCKER_SUBS,
+    bare_flags: &[],
+    help_eligible: false,
+};
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "docker" | "podman" => Some(is_safe_docker(tokens)),
-        _ => None,
-    }
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    DOCKER.dispatch(cmd, tokens, is_safe)
+        .or_else(|| PODMAN.dispatch(cmd, tokens, is_safe))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
-    vec![CommandDoc::handler("docker / podman",
-        "Top-level: diff, history, images, info, inspect, logs, port, ps, stats, top, version. \
-         Multi-level: buildx, compose, container, context, image, manifest, network, system, volume. \
-        ")]
+    let mut doc = DOCKER.to_doc();
+    doc.name = "docker / podman";
+    vec![doc]
 }
-
-#[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "docker", subs: &[
-        super::SubEntry::Policy { name: "ps" },
-        super::SubEntry::Policy { name: "images" },
-        super::SubEntry::Policy { name: "logs" },
-        super::SubEntry::Policy { name: "inspect" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Policy { name: "version" },
-        super::SubEntry::Policy { name: "top" },
-        super::SubEntry::Policy { name: "port" },
-        super::SubEntry::Policy { name: "diff" },
-        super::SubEntry::Policy { name: "stats" },
-        super::SubEntry::Policy { name: "history" },
-        super::SubEntry::Nested { name: "compose", subs: &[
-            super::SubEntry::Policy { name: "ps" },
-            super::SubEntry::Policy { name: "config" },
-            super::SubEntry::Policy { name: "images" },
-            super::SubEntry::Policy { name: "ls" },
-            super::SubEntry::Policy { name: "top" },
-            super::SubEntry::Policy { name: "version" },
-        ]},
-        super::SubEntry::Nested { name: "container", subs: &[
-            super::SubEntry::Policy { name: "diff" },
-            super::SubEntry::Policy { name: "inspect" },
-            super::SubEntry::Policy { name: "list" },
-            super::SubEntry::Policy { name: "logs" },
-            super::SubEntry::Policy { name: "ls" },
-            super::SubEntry::Policy { name: "port" },
-            super::SubEntry::Policy { name: "stats" },
-            super::SubEntry::Policy { name: "top" },
-        ]},
-        super::SubEntry::Nested { name: "image", subs: &[
-            super::SubEntry::Policy { name: "history" },
-            super::SubEntry::Policy { name: "inspect" },
-            super::SubEntry::Policy { name: "list" },
-            super::SubEntry::Policy { name: "ls" },
-        ]},
-        super::SubEntry::Nested { name: "context", subs: &[
-            super::SubEntry::Policy { name: "inspect" },
-            super::SubEntry::Policy { name: "ls" },
-            super::SubEntry::Policy { name: "show" },
-        ]},
-        super::SubEntry::Nested { name: "network", subs: &[
-            super::SubEntry::Policy { name: "inspect" },
-            super::SubEntry::Policy { name: "ls" },
-        ]},
-        super::SubEntry::Nested { name: "volume", subs: &[
-            super::SubEntry::Policy { name: "inspect" },
-            super::SubEntry::Policy { name: "ls" },
-        ]},
-        super::SubEntry::Nested { name: "system", subs: &[
-            super::SubEntry::Policy { name: "df" },
-            super::SubEntry::Policy { name: "info" },
-        ]},
-        super::SubEntry::Nested { name: "buildx", subs: &[
-            super::SubEntry::Policy { name: "inspect" },
-            super::SubEntry::Policy { name: "ls" },
-            super::SubEntry::Policy { name: "version" },
-        ]},
-        super::SubEntry::Nested { name: "manifest", subs: &[
-            super::SubEntry::Policy { name: "inspect" },
-        ]},
-    ]},
-    super::CommandEntry::Subcommand { cmd: "podman", subs: &[
-        super::SubEntry::Policy { name: "ps" },
-        super::SubEntry::Policy { name: "images" },
-        super::SubEntry::Policy { name: "logs" },
-        super::SubEntry::Policy { name: "inspect" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Policy { name: "version" },
-        super::SubEntry::Policy { name: "top" },
-        super::SubEntry::Policy { name: "port" },
-        super::SubEntry::Policy { name: "diff" },
-        super::SubEntry::Policy { name: "stats" },
-        super::SubEntry::Policy { name: "history" },
-    ]},
-];
 
 #[cfg(test)]
 mod tests {

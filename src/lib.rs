@@ -13,6 +13,7 @@ macro_rules! denied {
 }
 
 pub mod cli;
+pub mod command;
 pub mod compound;
 pub mod docs;
 mod handlers;

@@ -1,5 +1,6 @@
+use crate::command::{CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{FlagPolicy, FlagStyle};
 
 static GO_VERSION_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["-m", "-v"]),
@@ -112,50 +113,33 @@ static GO_TEST_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_go(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let policy = match tokens[1].as_str() {
-        "help" => return true,
-        "build" => &GO_BUILD_POLICY,
-        "doc" => &GO_DOC_POLICY,
-        "env" => &GO_ENV_POLICY,
-        "list" => &GO_LIST_POLICY,
-        "test" => &GO_TEST_POLICY,
-        "version" => &GO_VERSION_POLICY,
-        "vet" => &GO_VET_POLICY,
-        _ => return false,
-    };
-    policy::check(&tokens[1..], policy)
+fn check_go_help(_tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    true
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "go" => Some(is_safe_go(tokens)),
-        _ => None,
-    }
+pub(crate) static GO: CommandDef = CommandDef {
+    name: "go",
+    subs: &[
+        SubDef::Policy { name: "build", policy: &GO_BUILD_POLICY },
+        SubDef::Policy { name: "doc", policy: &GO_DOC_POLICY },
+        SubDef::Policy { name: "env", policy: &GO_ENV_POLICY },
+        SubDef::Custom { name: "help", check: check_go_help, doc: "", test_suffix: None },
+        SubDef::Policy { name: "list", policy: &GO_LIST_POLICY },
+        SubDef::Policy { name: "test", policy: &GO_TEST_POLICY },
+        SubDef::Policy { name: "version", policy: &GO_VERSION_POLICY },
+        SubDef::Policy { name: "vet", policy: &GO_VET_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
+
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    GO.dispatch(cmd, tokens, is_safe)
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
-    vec![CommandDoc::handler("go",
-        "Subcommands: build, doc, env, help, list, test, version, vet.")]
+    vec![GO.to_doc()]
 }
-
-#[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "go", subs: &[
-        super::SubEntry::Policy { name: "build" },
-        super::SubEntry::Policy { name: "doc" },
-        super::SubEntry::Policy { name: "env" },
-        super::SubEntry::Positional { name: "help" },
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "test" },
-        super::SubEntry::Policy { name: "version" },
-        super::SubEntry::Policy { name: "vet" },
-    ]},
-];
 
 #[cfg(test)]
 mod tests {

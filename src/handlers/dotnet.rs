@@ -1,5 +1,6 @@
+use crate::command::{CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{FlagPolicy, FlagStyle};
 
 static DOTNET_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -57,41 +58,24 @@ static DOTNET_LIST_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_dotnet(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    match tokens[1].as_str() {
-        "--info" | "--list-runtimes" | "--list-sdks" => tokens.len() == 2,
-        "build" => policy::check(&tokens[1..], &DOTNET_BUILD_POLICY),
-        "test" => policy::check(&tokens[1..], &DOTNET_TEST_POLICY),
-        "list" => policy::check(&tokens[1..], &DOTNET_LIST_POLICY),
-        _ => false,
-    }
-}
+pub(crate) static DOTNET: CommandDef = CommandDef {
+    name: "dotnet",
+    subs: &[
+        SubDef::Policy { name: "build", policy: &DOTNET_BUILD_POLICY },
+        SubDef::Policy { name: "list", policy: &DOTNET_LIST_POLICY },
+        SubDef::Policy { name: "test", policy: &DOTNET_TEST_POLICY },
+    ],
+    bare_flags: &["--info", "--list-runtimes", "--list-sdks"],
+    help_eligible: true,
+};
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "dotnet" => Some(is_safe_dotnet(tokens)),
-        _ => None,
-    }
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    DOTNET.dispatch(cmd, tokens, is_safe)
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
-    vec![CommandDoc::handler("dotnet",
-        "Subcommands: build, list, test. Info flags: --info, --list-runtimes, --list-sdks. \
-        ")]
+    vec![DOTNET.to_doc()]
 }
-
-#[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "dotnet", subs: &[
-        super::SubEntry::Policy { name: "build" },
-        super::SubEntry::Policy { name: "test" },
-        super::SubEntry::Policy { name: "list" },
-    ]},
-];
 
 #[cfg(test)]
 mod tests {

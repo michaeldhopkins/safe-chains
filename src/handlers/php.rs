@@ -1,5 +1,6 @@
+use crate::command::{CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{FlagPolicy, FlagStyle};
 
 static COMPOSER_SHOW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -50,51 +51,32 @@ static COMPOSER_BARE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_composer(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let policy = match tokens[1].as_str() {
-        "show" | "info" => &COMPOSER_SHOW_POLICY,
-        "outdated" => &COMPOSER_OUTDATED_POLICY,
-        "audit" => &COMPOSER_AUDIT_POLICY,
-        "about" | "check-platform-reqs" | "diagnose" | "fund"
-        | "help" | "licenses" | "suggests" => &COMPOSER_BARE_POLICY,
-        _ => return false,
-    };
-    policy::check(&tokens[1..], policy)
-}
+pub(crate) static COMPOSER: CommandDef = CommandDef {
+    name: "composer",
+    subs: &[
+        SubDef::Policy { name: "about", policy: &COMPOSER_BARE_POLICY },
+        SubDef::Policy { name: "audit", policy: &COMPOSER_AUDIT_POLICY },
+        SubDef::Policy { name: "check-platform-reqs", policy: &COMPOSER_BARE_POLICY },
+        SubDef::Policy { name: "diagnose", policy: &COMPOSER_BARE_POLICY },
+        SubDef::Policy { name: "fund", policy: &COMPOSER_BARE_POLICY },
+        SubDef::Policy { name: "help", policy: &COMPOSER_BARE_POLICY },
+        SubDef::Policy { name: "info", policy: &COMPOSER_SHOW_POLICY },
+        SubDef::Policy { name: "licenses", policy: &COMPOSER_BARE_POLICY },
+        SubDef::Policy { name: "outdated", policy: &COMPOSER_OUTDATED_POLICY },
+        SubDef::Policy { name: "show", policy: &COMPOSER_SHOW_POLICY },
+        SubDef::Policy { name: "suggests", policy: &COMPOSER_BARE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "composer" => Some(is_safe_composer(tokens)),
-        _ => None,
-    }
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    COMPOSER.dispatch(cmd, tokens, is_safe)
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
-    vec![CommandDoc::handler("composer",
-        "Subcommands: about, audit, check-platform-reqs, diagnose, fund, help, info, \
-         licenses, outdated, show, suggests.")]
+    vec![COMPOSER.to_doc()]
 }
-
-#[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "composer", subs: &[
-        super::SubEntry::Policy { name: "show" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Policy { name: "outdated" },
-        super::SubEntry::Policy { name: "audit" },
-        super::SubEntry::Policy { name: "about" },
-        super::SubEntry::Policy { name: "check-platform-reqs" },
-        super::SubEntry::Policy { name: "diagnose" },
-        super::SubEntry::Policy { name: "fund" },
-        super::SubEntry::Policy { name: "help" },
-        super::SubEntry::Policy { name: "licenses" },
-        super::SubEntry::Policy { name: "suggests" },
-    ]},
-];
 
 #[cfg(test)]
 mod tests {
