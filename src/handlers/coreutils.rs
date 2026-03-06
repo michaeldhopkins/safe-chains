@@ -107,21 +107,110 @@ fn sed_has_exec_modifier(tokens: &[Token]) -> bool {
     false
 }
 
+static SED_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--debug", "--posix", "--quiet", "--sandbox",
+        "--silent", "--unbuffered",
+        "-E", "-n", "-r", "-u", "-z",
+    ]),
+    standalone_short: b"Enruz",
+    valued: WordSet::new(&[
+        "--expression", "--file", "--line-length",
+        "-e", "-f", "-l",
+    ]),
+    valued_short: b"efl",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
 pub fn is_safe_sed(tokens: &[Token]) -> bool {
-    !has_flag(tokens, Some("-i"), Some("--in-place")) && !sed_has_exec_modifier(tokens)
+    !sed_has_exec_modifier(tokens) && policy::check(tokens, &SED_POLICY)
 }
+
+static SORT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--check", "--debug", "--dictionary-order",
+        "--general-numeric-sort", "--human-numeric-sort",
+        "--ignore-case", "--ignore-leading-blanks",
+        "--ignore-nonprinting", "--merge", "--month-sort",
+        "--numeric-sort", "--random-sort", "--reverse",
+        "--stable", "--unique", "--version-sort",
+        "--zero-terminated",
+        "-C", "-M", "-R", "-V", "-b", "-c", "-d",
+        "-f", "-g", "-h", "-i", "-m", "-n", "-r",
+        "-s", "-u", "-z",
+    ]),
+    standalone_short: b"CMRVbcdfghimnrsuz",
+    valued: WordSet::new(&[
+        "--batch-size", "--buffer-size", "--field-separator",
+        "--files0-from", "--key", "--parallel",
+        "--random-source", "--sort", "--temporary-directory",
+        "-S", "-T", "-k", "-t",
+    ]),
+    valued_short: b"STkt",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
 
 pub fn is_safe_sort(tokens: &[Token]) -> bool {
-    !has_flag(tokens, Some("-o"), Some("--output"))
-        && !has_flag(tokens, None, Some("--compress-program"))
+    policy::check(tokens, &SORT_POLICY)
 }
+
+static YQ_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--colors", "--exit-status", "--help",
+        "--no-colors", "--no-doc", "--null-input",
+        "--prettyPrint", "--version",
+        "-C", "-M", "-N", "-P", "-e", "-r",
+    ]),
+    standalone_short: b"CMNPer",
+    valued: WordSet::new(&[
+        "--arg", "--argjson", "--expression",
+        "--front-matter", "--indent", "--input-format",
+        "--output-format",
+        "-I", "-p",
+    ]),
+    valued_short: b"Ip",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
 
 pub fn is_safe_yq(tokens: &[Token]) -> bool {
-    !has_flag(tokens, Some("-i"), Some("--inplace"))
+    policy::check(tokens, &YQ_POLICY)
 }
 
+static XMLLINT_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--auto", "--catalogs", "--compress", "--copy",
+        "--debug", "--debugent", "--dropdtd", "--format",
+        "--html", "--htmlout", "--huge", "--load-trace",
+        "--loaddtd", "--memory", "--noblanks", "--nocatalogs",
+        "--nocdata", "--nocompact", "--nodefdtd", "--noenc",
+        "--noent", "--nonet", "--noout", "--nowarning",
+        "--nowrap", "--nsclean", "--oldxml10", "--postvalid",
+        "--push", "--pushsmall", "--quiet", "--recover",
+        "--repeat", "--sax", "--sax1", "--stream",
+        "--testIO", "--timing", "--valid", "--version",
+        "--walker", "--xinclude", "--xmlout",
+    ]),
+    standalone_short: b"",
+    valued: WordSet::new(&[
+        "--dtdvalid", "--dtdvalidfpi", "--encode",
+        "--maxmem", "--path", "--pattern",
+        "--pretty", "--relaxng", "--schema",
+        "--schematron", "--xpath",
+    ]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
 pub fn is_safe_xmllint(tokens: &[Token]) -> bool {
-    !has_flag(tokens, None, Some("--output"))
+    policy::check(tokens, &XMLLINT_POLICY)
 }
 
 fn awk_has_dangerous_construct(token: &Token) -> bool {
@@ -649,8 +738,18 @@ pub fn is_safe_nroff(tokens: &[Token]) -> bool {
     policy::check(tokens, &NROFF_POLICY)
 }
 
-pub fn is_safe_echo(_tokens: &[Token]) -> bool {
-    true
+static ECHO_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["-E", "-e", "-n"]),
+    standalone_short: b"Een",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Positional,
+};
+
+pub fn is_safe_echo(tokens: &[Token]) -> bool {
+    policy::check(tokens, &ECHO_POLICY)
 }
 
 static PRINTF_POLICY: FlagPolicy = FlagPolicy {
@@ -687,12 +786,32 @@ pub fn is_safe_seq(tokens: &[Token]) -> bool {
     policy::check(tokens, &SEQ_POLICY)
 }
 
+static TEST_CMD_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Positional,
+};
+
 pub fn is_safe_test(tokens: &[Token]) -> bool {
-    !tokens.is_empty()
+    policy::check(tokens, &TEST_CMD_POLICY)
 }
 
+static EXPR_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Positional,
+};
+
 pub fn is_safe_expr(tokens: &[Token]) -> bool {
-    tokens.len() >= 2
+    policy::check(tokens, &EXPR_POLICY)
 }
 
 static BC_POLICY: FlagPolicy = FlagPolicy {
@@ -781,16 +900,78 @@ pub fn is_safe_fd(tokens: &[Token]) -> bool {
     true
 }
 
+static TREE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--charset", "--dirsfirst", "--du", "--filelimit",
+        "--fromfile", "--gitignore", "--help", "--inodes",
+        "--matchdirs", "--noreport", "--prune", "--si",
+        "--sort", "--timefmt", "--version",
+        "-A", "-C", "-D", "-F", "-J", "-N", "-Q", "-S",
+        "-X", "-a", "-d", "-f", "-g", "-h", "-i", "-l",
+        "-n", "-p", "-q", "-r", "-s", "-t", "-u", "-v",
+        "-x",
+    ]),
+    standalone_short: b"ACDFJNQSXadfghilnpqrstuvx",
+    valued: WordSet::new(&[
+        "--filesfrom",
+        "-H", "-I", "-L", "-P", "-T",
+    ]),
+    valued_short: b"HILPT",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
 pub fn is_safe_tree(tokens: &[Token]) -> bool {
-    !has_flag(tokens, Some("-o"), None)
+    policy::check(tokens, &TREE_POLICY)
 }
+
+static FILE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--brief", "--debug", "--dereference", "--extension",
+        "--keep-going", "--list", "--mime", "--mime-encoding",
+        "--mime-type", "--no-buffer", "--no-dereference",
+        "--no-pad", "--no-sandbox", "--preserve-date",
+        "--print0", "--raw", "--special-files",
+        "--uncompress", "--uncompress-noreport",
+        "-0", "-D", "-I", "-L", "-N", "-S",
+        "-b", "-d", "-h", "-i", "-k", "-l",
+        "-n", "-p", "-r", "-s", "-z",
+    ]),
+    standalone_short: b"0DILNSbdhiklnprsz",
+    valued: WordSet::new(&[
+        "--exclude", "--exclude-quiet", "--files-from",
+        "--magic-file", "--parameter", "--separator",
+        "-F", "-P", "-Z", "-e", "-f", "-m",
+    ]),
+    valued_short: b"FPZefm",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
 
 pub fn is_safe_file_cmd(tokens: &[Token]) -> bool {
-    !has_flag(tokens, Some("-C"), Some("--compile"))
+    policy::check(tokens, &FILE_POLICY)
 }
 
+static DATE_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--rfc-2822", "--rfc-email", "--universal", "--utc",
+        "-R", "-j", "-n", "-u",
+    ]),
+    standalone_short: b"Rjnu",
+    valued: WordSet::new(&[
+        "--date", "--iso-8601", "--reference", "--rfc-3339",
+        "-I", "-d", "-f", "-r", "-v", "-z",
+    ]),
+    valued_short: b"Idfrvz",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
 pub fn is_safe_date(tokens: &[Token]) -> bool {
-    !has_flag(tokens, Some("-s"), Some("--set"))
+    policy::check(tokens, &DATE_POLICY)
 }
 
 static ROUTE_SAFE_FLAGS: WordSet = WordSet::new(&["-4", "-6", "-n", "-v"]);
@@ -1931,9 +2112,6 @@ static SS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub fn is_safe_ss(tokens: &[Token]) -> bool {
-    if has_flag(tokens, Some("-K"), Some("--kill")) {
-        return false;
-    }
     policy::check(tokens, &SS_POLICY)
 }
 
@@ -2306,21 +2484,17 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("paste", PASTE_POLICY.describe()),
         CommandDoc::handler("rev", REV_POLICY.describe()),
         CommandDoc::handler("rg", RG_POLICY.describe()),
-        CommandDoc::handler("sed",
-            "Read-only usage. Explicit validation of inline expressions."),
-        CommandDoc::handler("sort",
-            "Safe unless -o/--output or --compress-program flag."),
+        CommandDoc::handler("sed", format!("{} Inline expressions validated for safety.", SED_POLICY.describe())),
+        CommandDoc::handler("sort", SORT_POLICY.describe()),
         CommandDoc::handler("tac", TAC_POLICY.describe()),
         CommandDoc::handler("tail", TAIL_POLICY.describe()),
         CommandDoc::handler("tr", TR_POLICY.describe()),
         CommandDoc::handler("uniq", format!("{} Max 1 positional arg (second would be output file).", UNIQ_POLICY.describe())),
         CommandDoc::handler("wc", WC_POLICY.describe()),
-        CommandDoc::handler("yq",
-            "Safe unless -i/--inplace flag."),
+        CommandDoc::handler("yq", YQ_POLICY.describe()),
         CommandDoc::handler("awk / gawk / mawk / nawk",
             "Safe unless program contains system, getline, |, >, >>, or -f flag (file-based program)."),
-        CommandDoc::handler("xmllint",
-            "Safe unless --output flag."),
+        CommandDoc::handler("xmllint", XMLLINT_POLICY.describe()),
         CommandDoc::handler("expand", EXPAND_POLICY.describe()),
         CommandDoc::handler("unexpand", UNEXPAND_POLICY.describe()),
         CommandDoc::handler("fold", FOLD_POLICY.describe()),
@@ -2328,24 +2502,19 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("column", COLUMN_POLICY.describe()),
         CommandDoc::handler("iconv", ICONV_POLICY.describe()),
         CommandDoc::handler("nroff", NROFF_POLICY.describe()),
-        CommandDoc::handler("echo", "All arguments accepted."),
+        CommandDoc::handler("echo", ECHO_POLICY.describe()),
         CommandDoc::handler("printf", PRINTF_POLICY.describe()),
         CommandDoc::handler("seq", SEQ_POLICY.describe()),
-        CommandDoc::handler("test",
-            "Allowed: any arguments (test uses operators like -f, -d as conditionals, not flags)."),
-        CommandDoc::handler("expr",
-            "Allowed: any arguments (expr uses operators as expressions, not flags). Requires at least one argument."),
+        CommandDoc::handler("test", TEST_CMD_POLICY.describe()),
+        CommandDoc::handler("expr", EXPR_POLICY.describe()),
         CommandDoc::handler("bc", BC_POLICY.describe()),
         CommandDoc::handler("factor", FACTOR_POLICY.describe()),
         CommandDoc::handler("bat", BAT_POLICY.describe()),
         CommandDoc::handler("fd",
             "Safe unless --exec/-x or --exec-batch/-X flags (execute arbitrary commands)."),
-        CommandDoc::handler("tree",
-            "Safe unless -o flag (write output to file)."),
-        CommandDoc::handler("file",
-            "Safe unless -C/--compile flag (write compiled magic file)."),
-        CommandDoc::handler("date",
-            "Safe unless -s/--set flag (set system date)."),
+        CommandDoc::handler("tree", TREE_POLICY.describe()),
+        CommandDoc::handler("file", FILE_POLICY.describe()),
+        CommandDoc::handler("date", DATE_POLICY.describe()),
         CommandDoc::handler("route",
             "Allowed subcommands: get, monitor, print, show. Allowed flags: -4, -6, -n, -v. Bare invocation allowed."),
         CommandDoc::handler("ifconfig", IFCONFIG_POLICY.describe()),
