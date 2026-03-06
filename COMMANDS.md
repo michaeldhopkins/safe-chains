@@ -18,7 +18,7 @@ Subcommands: current, help, info, list, version, which. Multi-level: plugin list
 
 ### `awk / gawk / mawk / nawk`
 
-Safe unless program contains system, getline, |, >, >>, or -f flag (file-based program).
+Program validated: system, getline, |, > constructs checked. Allowed standalone flags: --characters-as-bytes, --copyright, --gen-pot, --lint, --no-optimize, --optimize, --posix, --re-interval, --sandbox, --traditional, --use-lc-numeric, --version, -C, -N, -O, -P, -S, -V, -b, -c, -g, -r, -s, -t. Allowed valued flags: --assign, --field-separator, -F, -v.
 
 ### `b2sum`
 
@@ -350,11 +350,7 @@ auth status, browse (requires --no-browser), api (GET only).
 
 ### `git`
 
-Subcommands: blame, cat-file, check-ignore, count-objects, describe, diff, diff-tree, fetch, for-each-ref, grep, help, log, ls-files, ls-remote, ls-tree, merge-base, merge-tree, name-rev, reflog, rev-parse, shortlog, show, status, verify-commit, verify-tag.
-
-Flags: --version.
-
-Restricted subcommands: remote (read-only actions), branch (read-only flags), stash (list, show only), tag (list only), config (--get, --get-all, --get-regexp, --list, -l only), worktree (list only), notes (list, show only). Supports `-C <dir>` prefix.
+Subcommands with flag allowlists: blame, cat-file, check-ignore, count-objects, describe, diff, diff-tree, fetch, for-each-ref, grep, help, log, ls-files, ls-remote, ls-tree, merge-base, merge-tree, name-rev, reflog, rev-parse, shortlog, show, status, verify-commit, verify-tag. Restricted subcommands: remote (read-only actions), branch (read-only flags), stash (list, show only), tag (list only), config (--get, --get-all, --get-regexp, --list, -l only), worktree (list only), notes (list, show only). Supports `-C <dir>` prefix.
 
 ### `glab`
 
