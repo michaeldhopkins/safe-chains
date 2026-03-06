@@ -220,17 +220,6 @@ pub(crate) static PODMAN: CommandDef = CommandDef {
     help_eligible: false,
 };
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    DOCKER.dispatch(cmd, tokens, is_safe)
-        .or_else(|| PODMAN.dispatch(cmd, tokens, is_safe))
-}
-
-pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    let mut doc = DOCKER.to_doc();
-    doc.name = "docker / podman";
-    vec![doc]
-}
-
 #[cfg(test)]
 mod tests {
     use crate::is_safe_command;

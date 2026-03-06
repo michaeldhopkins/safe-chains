@@ -214,13 +214,13 @@ fn full_registry() -> Vec<&'static CommandEntry> {
     let mut entries = Vec::new();
     entries.extend(shell::REGISTRY);
     entries.extend(wrappers::REGISTRY);
-    entries.extend(vcs::REGISTRY);
-    entries.extend(forges::REGISTRY);
-    entries.extend(node::REGISTRY);
-    entries.extend(jvm::REGISTRY);
+    entries.extend(vcs::full_registry());
+    entries.extend(forges::full_registry());
+    entries.extend(node::full_registry());
+    entries.extend(jvm::full_registry());
     entries.extend(network::REGISTRY);
-    entries.extend(system::REGISTRY);
-    entries.extend(xcode::REGISTRY);
+    entries.extend(system::full_registry());
+    entries.extend(xcode::full_registry());
     entries.extend(perl::REGISTRY);
     entries.extend(coreutils::full_registry());
     entries
