@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet, has_flag};
+use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static FIND_DANGEROUS_FLAGS: WordSet = WordSet::new(&[
@@ -218,19 +218,33 @@ fn awk_has_dangerous_construct(token: &Token) -> bool {
     code.contains("system") || code.contains("getline") || code.contains('|') || code.contains('>')
 }
 
+static AWK_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--characters-as-bytes", "--copyright", "--gen-pot",
+        "--lint", "--no-optimize", "--optimize",
+        "--posix", "--re-interval", "--sandbox",
+        "--traditional", "--use-lc-numeric", "--version",
+        "-C", "-N", "-O", "-P", "-S", "-V",
+        "-b", "-c", "-g", "-r", "-s", "-t",
+    ]),
+    standalone_short: b"CNOPSVbcgrst",
+    valued: WordSet::new(&[
+        "--assign", "--field-separator",
+        "-F", "-v",
+    ]),
+    valued_short: b"Fv",
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
 pub fn is_safe_awk(tokens: &[Token]) -> bool {
-    if has_flag(tokens, Some("-f"), None) {
-        return false;
-    }
     for token in &tokens[1..] {
-        if token.starts_with("-") {
-            continue;
-        }
-        if awk_has_dangerous_construct(token) {
+        if !token.starts_with("-") && awk_has_dangerous_construct(token) {
             return false;
         }
     }
-    true
+    policy::check(tokens, &AWK_POLICY)
 }
 
 pub fn is_safe_arch(tokens: &[Token]) -> bool {
@@ -2510,7 +2524,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("wc", WC_POLICY.describe()),
         CommandDoc::handler("yq", YQ_POLICY.describe()),
         CommandDoc::handler("awk / gawk / mawk / nawk",
-            "Safe unless program contains system, getline, |, >, >>, or -f flag (file-based program)."),
+            format!("Program validated: system, getline, |, > constructs checked. {}", AWK_POLICY.describe())),
         CommandDoc::handler("xmllint", XMLLINT_POLICY.describe()),
         CommandDoc::handler("expand", EXPAND_POLICY.describe()),
         CommandDoc::handler("unexpand", UNEXPAND_POLICY.describe()),
