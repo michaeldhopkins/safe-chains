@@ -184,6 +184,31 @@ pub(crate) enum SubEntry {
 }
 
 #[cfg(test)]
+use crate::command::CommandDef;
+
+#[cfg(test)]
+const COMMAND_DEFS: &[&CommandDef] = &[
+    &ai::OLLAMA, &ai::LLM,
+    &containers::DOCKER, &containers::PODMAN,
+    &dotnet::DOTNET,
+    &go::GO,
+    &jvm::GRADLE, &jvm::GRADLEW,
+    &magick::MAGICK,
+    &node::NPM, &node::PNPM, &node::BUN, &node::DENO,
+    &node::NVM, &node::FNM, &node::VOLTA,
+    &php::COMPOSER,
+    &python::PIP, &python::PIP3, &python::UV, &python::POETRY,
+    &python::PYENV, &python::CONDA,
+    &ruby::BUNDLE, &ruby::GEM, &ruby::RBENV,
+    &rust::CARGO, &rust::RUSTUP,
+    &swift::SWIFT,
+    &system::BREW, &system::MISE, &system::ASDF, &system::DEFAULTS,
+    &system::SECURITY, &system::CSRUTIL, &system::DISKUTIL,
+    &system::LAUNCHCTL, &system::LOG,
+    &xcode::XCODEBUILD, &xcode::PLUTIL,
+];
+
+#[cfg(test)]
 fn full_registry() -> Vec<&'static CommandEntry> {
     let mut entries = Vec::new();
     entries.extend(shell::REGISTRY);
@@ -191,22 +216,12 @@ fn full_registry() -> Vec<&'static CommandEntry> {
     entries.extend(vcs::REGISTRY);
     entries.extend(forges::REGISTRY);
     entries.extend(node::REGISTRY);
-    entries.extend(ruby::REGISTRY);
-    entries.extend(python::REGISTRY);
-    entries.extend(rust::REGISTRY);
-    entries.extend(go::REGISTRY);
     entries.extend(jvm::REGISTRY);
-    entries.extend(php::REGISTRY);
-    entries.extend(swift::REGISTRY);
-    entries.extend(dotnet::REGISTRY);
-    entries.extend(containers::REGISTRY);
     entries.extend(network::REGISTRY);
-    entries.extend(ai::REGISTRY);
     entries.extend(system::REGISTRY);
     entries.extend(xcode::REGISTRY);
     entries.extend(perl::REGISTRY);
     entries.extend(coreutils::REGISTRY);
-    entries.extend(magick::REGISTRY);
     entries
 }
 
@@ -302,9 +317,16 @@ mod tests {
     }
 
     #[test]
+    fn command_defs_reject_unknown() {
+        for def in COMMAND_DEFS {
+            def.auto_test_reject_unknown();
+        }
+    }
+
+    #[test]
     fn registry_covers_handled_commands() {
         let registry = full_registry();
-        let registry_cmds: HashSet<&str> = registry
+        let mut all_cmds: HashSet<&str> = registry
             .iter()
             .map(|e| match e {
                 CommandEntry::Policy { cmd }
@@ -314,12 +336,15 @@ mod tests {
                 | CommandEntry::Delegation { cmd } => *cmd,
             })
             .collect();
+        for def in COMMAND_DEFS {
+            all_cmds.insert(def.name);
+        }
         let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
 
-        let missing: Vec<_> = handled.difference(&registry_cmds).collect();
-        assert!(missing.is_empty(), "not in registry: {missing:?}");
+        let missing: Vec<_> = handled.difference(&all_cmds).collect();
+        assert!(missing.is_empty(), "not in registry or COMMAND_DEFS: {missing:?}");
 
-        let extra: Vec<_> = registry_cmds.difference(&handled).collect();
+        let extra: Vec<_> = all_cmds.difference(&handled).collect();
         assert!(extra.is_empty(), "not in HANDLED_CMDS: {extra:?}");
     }
 

@@ -14,7 +14,7 @@ Bare invocation allowed.
 
 ### `asdf`
 
-Subcommands: current, help, info, list, version, which. Multi-level: plugin list. Also: plugin-list, plugin-list-all. 
+Subcommands: current, help, info, list, plugin-list, plugin-list-all, version, which. Multi-level: plugin list.
 
 ### `awk / gawk / mawk / nawk`
 
@@ -66,11 +66,11 @@ Bare invocation allowed.
 
 ### `brew`
 
-Subcommands: cat, casks, config, deps, desc, doctor, formulae, home, info, leaves, list, log, outdated, search, shellenv, tap, uses. 
+Subcommands: --prefix, abv, casks, cat, config, deps, desc, doctor, formulae, home, info, leaves, list, log, ls, outdated, search, shellenv, tap, uses.
 
 ### `bun`
 
-Subcommands: outdated, pm (bin/cache/hash/ls), test. x delegates to bunx logic.
+Subcommands: outdated, test. Multi-level: pm bin, pm cache, pm hash, pm ls. x delegates to bunx logic.
 
 ### `bundle`
 
@@ -158,7 +158,7 @@ Subcommands: about, audit, check-platform-reqs, diagnose, fund, help, info, lice
 
 ### `conda`
 
-Subcommands: config (--show/--show-sources only), info, list. 
+Subcommands: info, list. config (--show/--show-sources only).
 
 ### `csrutil`
 
@@ -194,7 +194,7 @@ Bare invocation allowed.
 
 ### `defaults`
 
-Subcommands: domains, export, find, read, read-type. 
+Subcommands: domains, export, find, read, read-type.
 
 ### `delta`
 
@@ -206,7 +206,7 @@ Bare invocation allowed.
 
 ### `deno`
 
-Subcommands: check, doc, info, lint, test. fmt allowed with --check.
+Subcommands: check, doc, info, lint, test. fmt (requires --check).
 
 ### `df`
 
@@ -234,15 +234,15 @@ Allowed standalone flags: --zero, -z.
 
 ### `diskutil`
 
-Subcommands: activity, info, list, listFilesystems. Multi-level: apfs list/listCryptoUsers/listSnapshots/listVolumeGroups. 
+Subcommands: activity, info, list, listFilesystems. Multi-level: apfs list, apfs listCryptoUsers, apfs listSnapshots, apfs listVolumeGroups.
 
 ### `docker / podman`
 
-Top-level: diff, history, images, info, inspect, logs, port, ps, stats, top, version. Multi-level: buildx, compose, container, context, image, manifest, network, system, volume. 
+Subcommands: diff, history, images, info, inspect, logs, port, ps, stats, top, version. Multi-level: buildx inspect, buildx ls, buildx version, compose, container, context inspect, context ls, context show, image history, image inspect, image list, image ls, manifest inspect, network inspect, network ls, system df, system info, volume inspect, volume ls.
 
 ### `dotnet`
 
-Subcommands: build, list, test. Info flags: --info, --list-runtimes, --list-sdks. 
+Subcommands: build, list, test. Info flags: --info, --list-runtimes, --list-sdks.
 
 ### `du`
 
@@ -330,7 +330,7 @@ Bare invocation allowed.
 
 ### `gem`
 
-Subcommands: contents, dependency, environment, help, info, list, outdated, pristine, search, sources, specification, stale, which. 
+Subcommands: contents, dependency, environment, help, info, list, outdated, pristine, search, sources, specification, stale, which.
 
 ### `getconf`
 
@@ -366,7 +366,7 @@ Subcommands: build, doc, env, help, list, test, version, vet.
 
 ### `gradle / gradlew`
 
-Subcommands: build, check, dependencies, properties, tasks, test. 
+Subcommands: build, check, dependencies, properties, tasks, test.
 
 ### `grep`
 
@@ -474,7 +474,7 @@ Allowed valued flags: --before, --time, --user, -b, -t, -u. Bare invocation allo
 
 ### `launchctl`
 
-Subcommands: blame, dumpstate, error, examine, help, hostinfo, list, print, print-cache, print-disabled, resolveport, version. 
+Subcommands: blame, dumpstate, error, examine, help, hostinfo, list, print, print-cache, print-disabled, resolveport, version.
 
 ### `lipo`
 
@@ -482,7 +482,7 @@ Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch).
 
 ### `llm`
 
-Subcommands: aliases, collections, logs, models, plugins, templates. 
+Subcommands: aliases, collections, logs, models, plugins, templates.
 
 ### `locale`
 
@@ -490,7 +490,7 @@ Allowed standalone flags: --all-locales, --category-name, --charmaps, --keyword-
 
 ### `log`
 
-Subcommands: help, show, stats, stream. 
+Subcommands: help, show, stats, stream.
 
 ### `ls`
 
@@ -510,7 +510,7 @@ Bare invocation allowed.
 
 ### `magick`
 
-Subcommand: identify.
+Subcommands: identify.
 
 ### `man`
 
@@ -538,7 +538,7 @@ Allowed standalone flags: --raw, -r. Allowed valued flags: --name, --nullMarker,
 
 ### `mise`
 
-Subcommands: current, doctor, env, exec, list/ls, reshim, which. Multi-level: config list/ls, settings get. exec recursively validates the inner command after --.
+Subcommands: current, doctor, env, list, ls, reshim, which. Multi-level: config list, config ls, settings get. exec delegates after --.
 
 ### `mvn / mvnw`
 
@@ -574,7 +574,7 @@ Allowed standalone flags: --debug-syms, --defined-only, --demangle, --dynamic, -
 
 ### `npm`
 
-Subcommands: audit, config (list/get), doctor, explain, fund, info, list, ls, outdated, prefix, root, run/run-script (test only), test, view, why. 
+Subcommands: audit, doctor, explain, fund, info, list, ls, outdated, prefix, root, test, view, why. Multi-level: config get, config list. run/run-script (test only).
 
 ### `nproc`
 
@@ -602,7 +602,7 @@ Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -qu
 
 ### `nvm`
 
-Subcommands: current, list, ls, ls-remote, version, which. Minimal flags allowed.
+Subcommands: current, list, ls, ls-remote, version, which.
 
 ### `od`
 
@@ -638,7 +638,7 @@ Allowed standalone flags: --count, --delimiter, --full, --inverse, --lightweight
 
 ### `pip / pip3`
 
-Subcommands: check, config (list/get), debug, freeze, help, index, inspect, list, show.
+Subcommands: check, debug, freeze, help, index, inspect, list, show. Multi-level: config get, config list.
 
 ### `pkgutil`
 
@@ -646,7 +646,7 @@ Requires a read-only flag (--pkgs, --files, --pkg-info, etc.).
 
 ### `plutil`
 
-Subcommands: -help, -lint, -p, -type. 
+Subcommands: -lint, -p, -type. Info flags: -help.
 
 ### `pmset`
 
@@ -654,11 +654,11 @@ Allowed: -g (get/display settings only).
 
 ### `pnpm`
 
-Subcommands: audit, list, ls, outdated, why. 
+Subcommands: audit, list, ls, outdated, why.
 
 ### `poetry`
 
-Subcommands: check, env info/list, show.
+Subcommands: check, show. Multi-level: env info, env list.
 
 ### `printenv`
 
@@ -690,7 +690,7 @@ Allowed standalone flags: -L, -P. Bare invocation allowed.
 
 ### `pyenv`
 
-Subcommands: help, root, shims, version, versions, which. Minimal flags allowed (--bare).
+Subcommands: help, root, shims, version, versions, which.
 
 ### `rbenv`
 
@@ -718,7 +718,7 @@ Allowed subcommands: get, monitor, print, show. Allowed flags: -4, -6, -n, -v. B
 
 ### `rustup`
 
-Subcommands: doc, show, which. Multi-level: component list, target list, toolchain list. run <toolchain> delegates to inner command validation.
+Subcommands: doc, show, which. Multi-level: component list, target list, toolchain list. run <toolchain> delegates to inner command.
 
 ### `safe-chains`
 
@@ -726,7 +726,7 @@ Any arguments allowed (safe-chains is this tool).
 
 ### `security`
 
-Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, find-generic-password, find-identity, find-internet-password, list-keychains, show-keychain-info, smartcard, verify-cert. 
+Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, find-generic-password, find-identity, find-internet-password, list-keychains, show-keychain-info, smartcard, verify-cert.
 
 ### `sed`
 
@@ -794,7 +794,7 @@ Allowed standalone flags: --buildVersion, --productName, --productVersion, --pro
 
 ### `swift`
 
-Subcommands: build, test, package describe, package dump-package, package show-dependencies.
+Subcommands: build, test. Multi-level: package describe, package dump-package, package show-dependencies.
 
 ### `sysctl`
 
@@ -922,7 +922,7 @@ Bare invocation allowed.
 
 ### `uv`
 
-Subcommands: pip check/freeze/list/show, python list, tool list. 
+Multi-level: pip check, pip freeze, pip list, pip show, python list, tool list.
 
 ### `vm_stat`
 
@@ -930,7 +930,7 @@ Allowed valued flags: -c. Bare invocation allowed.
 
 ### `volta`
 
-Subcommands: list, which. Flags: --current, --default, --format.
+Subcommands: list, which.
 
 ### `w`
 
@@ -974,7 +974,7 @@ Allowed: -p/--print-path, -v/--version (single argument only).
 
 ### `xcodebuild`
 
-Subcommands: -list, -showBuildSettings, -showdestinations, -showsdks, -version. 
+Subcommands: -list, -showBuildSettings, -showdestinations, -showsdks, -version.
 
 ### `xcrun`
 
@@ -994,7 +994,7 @@ Bare invocation allowed.
 
 ### `yarn`
 
-Subcommands: info, list, ls, test, test:*, why. 
+Subcommands: info, list, ls, test, test:*, why.
 
 ### `yq`
 

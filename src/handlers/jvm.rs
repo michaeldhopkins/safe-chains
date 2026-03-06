@@ -1,5 +1,6 @@
+use crate::command::{CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{FlagPolicy, FlagStyle};
 
 static GRADLE_TASKS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -58,19 +59,28 @@ static GRADLE_BUILD_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_gradle(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let policy = match tokens[1].as_str() {
-        "tasks" => &GRADLE_TASKS_POLICY,
-        "dependencies" => &GRADLE_DEPS_POLICY,
-        "properties" => &GRADLE_PROPS_POLICY,
-        "build" | "check" | "test" => &GRADLE_BUILD_POLICY,
-        _ => return false,
-    };
-    policy::check(&tokens[1..], policy)
-}
+static GRADLE_SUBS: &[SubDef] = &[
+    SubDef::Policy { name: "build", policy: &GRADLE_BUILD_POLICY },
+    SubDef::Policy { name: "check", policy: &GRADLE_BUILD_POLICY },
+    SubDef::Policy { name: "dependencies", policy: &GRADLE_DEPS_POLICY },
+    SubDef::Policy { name: "properties", policy: &GRADLE_PROPS_POLICY },
+    SubDef::Policy { name: "tasks", policy: &GRADLE_TASKS_POLICY },
+    SubDef::Policy { name: "test", policy: &GRADLE_BUILD_POLICY },
+];
+
+pub(crate) static GRADLE: CommandDef = CommandDef {
+    name: "gradle",
+    subs: GRADLE_SUBS,
+    bare_flags: &[],
+    help_eligible: true,
+};
+
+pub(crate) static GRADLEW: CommandDef = CommandDef {
+    name: "gradlew",
+    subs: GRADLE_SUBS,
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static MVN_STANDALONE: WordSet = WordSet::new(&[
     "--also-make", "--also-make-dependents", "--batch-mode",
@@ -132,20 +142,21 @@ pub fn is_safe_mvn(tokens: &[Token]) -> bool {
     true
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "gradle" | "gradlew" => Some(is_safe_gradle(tokens)),
-        "mvn" | "mvnw" => Some(is_safe_mvn(tokens)),
-        _ => None,
-    }
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    GRADLE.dispatch(cmd, tokens, is_safe)
+        .or_else(|| GRADLEW.dispatch(cmd, tokens, is_safe))
+        .or_else(|| match cmd {
+            "mvn" | "mvnw" => Some(is_safe_mvn(tokens)),
+            _ => None,
+        })
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
+    let mut doc = GRADLE.to_doc();
+    doc.name = "gradle / gradlew";
     vec![
-        CommandDoc::handler("gradle / gradlew",
-            "Subcommands: build, check, dependencies, properties, tasks, test. \
-            "),
+        doc,
         CommandDoc::handler("mvn / mvnw",
             "Phases: compile, dependency:list, dependency:tree, help:describe, \
              test, test-compile, validate, verify."),
@@ -154,22 +165,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "gradle", subs: &[
-        super::SubEntry::Policy { name: "tasks" },
-        super::SubEntry::Policy { name: "dependencies" },
-        super::SubEntry::Policy { name: "properties" },
-        super::SubEntry::Policy { name: "build" },
-        super::SubEntry::Policy { name: "check" },
-        super::SubEntry::Policy { name: "test" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "gradlew", subs: &[
-        super::SubEntry::Policy { name: "tasks" },
-        super::SubEntry::Policy { name: "dependencies" },
-        super::SubEntry::Policy { name: "properties" },
-        super::SubEntry::Policy { name: "build" },
-        super::SubEntry::Policy { name: "check" },
-        super::SubEntry::Policy { name: "test" },
-    ]},
     super::CommandEntry::Custom { cmd: "mvn", valid_prefix: Some("mvn test") },
     super::CommandEntry::Custom { cmd: "mvnw", valid_prefix: Some("mvnw test") },
 ];

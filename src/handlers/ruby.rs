@@ -1,5 +1,6 @@
+use crate::command::{CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{FlagPolicy, FlagStyle};
 
 static BUNDLE_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--name-only", "--paths"]),
@@ -45,21 +46,27 @@ static BUNDLE_EXEC_SAFE: WordSet = WordSet::new(&[
     "brakeman", "cucumber", "erb_lint", "herb", "rspec", "standardrb",
 ]);
 
-pub fn is_safe_bundle(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    match tokens[1].as_str() {
-        "list" => policy::check(&tokens[1..], &BUNDLE_LIST_POLICY),
-        "info" => policy::check(&tokens[1..], &BUNDLE_INFO_POLICY),
-        "show" => policy::check(&tokens[1..], &BUNDLE_SHOW_POLICY),
-        "check" => policy::check(&tokens[1..], &BUNDLE_CHECK_POLICY),
-        "exec" => tokens
-            .get(2)
-            .is_some_and(|t| BUNDLE_EXEC_SAFE.contains(t)),
-        _ => false,
-    }
+fn check_bundle_exec(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    tokens.get(1).is_some_and(|t| BUNDLE_EXEC_SAFE.contains(t))
 }
+
+pub(crate) static BUNDLE: CommandDef = CommandDef {
+    name: "bundle",
+    subs: &[
+        SubDef::Policy { name: "check", policy: &BUNDLE_CHECK_POLICY },
+        SubDef::Custom {
+            name: "exec",
+            check: check_bundle_exec,
+            doc: "exec allowed for: brakeman, cucumber, erb_lint, herb, rspec, standardrb.",
+            test_suffix: None,
+        },
+        SubDef::Policy { name: "info", policy: &BUNDLE_INFO_POLICY },
+        SubDef::Policy { name: "list", policy: &BUNDLE_LIST_POLICY },
+        SubDef::Policy { name: "show", policy: &BUNDLE_SHOW_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static GEM_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -109,20 +116,26 @@ static GEM_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_gem(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let policy = match tokens[1].as_str() {
-        "list" => &GEM_LIST_POLICY,
-        "info" => &GEM_INFO_POLICY,
-        "search" => &GEM_SEARCH_POLICY,
-        "contents" | "dependency" | "environment" | "help" | "outdated"
-        | "pristine" | "sources" | "specification" | "stale" | "which" => &GEM_SIMPLE_POLICY,
-        _ => return false,
-    };
-    policy::check(&tokens[1..], policy)
-}
+pub(crate) static GEM: CommandDef = CommandDef {
+    name: "gem",
+    subs: &[
+        SubDef::Policy { name: "contents", policy: &GEM_SIMPLE_POLICY },
+        SubDef::Policy { name: "dependency", policy: &GEM_SIMPLE_POLICY },
+        SubDef::Policy { name: "environment", policy: &GEM_SIMPLE_POLICY },
+        SubDef::Policy { name: "help", policy: &GEM_SIMPLE_POLICY },
+        SubDef::Policy { name: "info", policy: &GEM_INFO_POLICY },
+        SubDef::Policy { name: "list", policy: &GEM_LIST_POLICY },
+        SubDef::Policy { name: "outdated", policy: &GEM_SIMPLE_POLICY },
+        SubDef::Policy { name: "pristine", policy: &GEM_SIMPLE_POLICY },
+        SubDef::Policy { name: "search", policy: &GEM_SEARCH_POLICY },
+        SubDef::Policy { name: "sources", policy: &GEM_SIMPLE_POLICY },
+        SubDef::Policy { name: "specification", policy: &GEM_SIMPLE_POLICY },
+        SubDef::Policy { name: "stale", policy: &GEM_SIMPLE_POLICY },
+        SubDef::Policy { name: "which", policy: &GEM_SIMPLE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static RBENV_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
@@ -134,79 +147,29 @@ static RBENV_BARE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_rbenv(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    static RBENV_SAFE: WordSet = WordSet::new(&[
-        "help", "root", "shims", "version", "versions", "which",
-    ]);
-    if !RBENV_SAFE.contains(&tokens[1]) {
-        return false;
-    }
-    policy::check(&tokens[1..], &RBENV_BARE_POLICY)
-}
+pub(crate) static RBENV: CommandDef = CommandDef {
+    name: "rbenv",
+    subs: &[
+        SubDef::Policy { name: "help", policy: &RBENV_BARE_POLICY },
+        SubDef::Policy { name: "root", policy: &RBENV_BARE_POLICY },
+        SubDef::Policy { name: "shims", policy: &RBENV_BARE_POLICY },
+        SubDef::Policy { name: "version", policy: &RBENV_BARE_POLICY },
+        SubDef::Policy { name: "versions", policy: &RBENV_BARE_POLICY },
+        SubDef::Policy { name: "which", policy: &RBENV_BARE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "bundle" => Some(is_safe_bundle(tokens)),
-        "gem" => Some(is_safe_gem(tokens)),
-        "rbenv" => Some(is_safe_rbenv(tokens)),
-        _ => None,
-    }
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    BUNDLE.dispatch(cmd, tokens, is_safe)
+        .or_else(|| GEM.dispatch(cmd, tokens, is_safe))
+        .or_else(|| RBENV.dispatch(cmd, tokens, is_safe))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocBuilder, wordset_items};
-    vec![
-        CommandDoc::handler("bundle",
-            DocBuilder::new()
-                .section("Subcommands: check, info, list, show.")
-                .section(format!("exec allowed for: {}.",
-                    wordset_items(&BUNDLE_EXEC_SAFE)))
-                .build()),
-        CommandDoc::handler("gem",
-            "Subcommands: contents, dependency, environment, help, info, list, outdated, \
-             pristine, search, sources, specification, stale, which. \
-            "),
-        CommandDoc::handler("rbenv",
-            "Subcommands: help, root, shims, version, versions, which."),
-    ]
+    vec![BUNDLE.to_doc(), GEM.to_doc(), RBENV.to_doc()]
 }
-
-#[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "bundle", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Policy { name: "show" },
-        super::SubEntry::Policy { name: "check" },
-        super::SubEntry::Delegation { name: "exec" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "gem", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Policy { name: "search" },
-        super::SubEntry::Policy { name: "contents" },
-        super::SubEntry::Policy { name: "dependency" },
-        super::SubEntry::Policy { name: "environment" },
-        super::SubEntry::Policy { name: "help" },
-        super::SubEntry::Policy { name: "outdated" },
-        super::SubEntry::Policy { name: "pristine" },
-        super::SubEntry::Policy { name: "sources" },
-        super::SubEntry::Policy { name: "specification" },
-        super::SubEntry::Policy { name: "stale" },
-        super::SubEntry::Policy { name: "which" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "rbenv", subs: &[
-        super::SubEntry::Policy { name: "help" },
-        super::SubEntry::Policy { name: "root" },
-        super::SubEntry::Policy { name: "shims" },
-        super::SubEntry::Policy { name: "version" },
-        super::SubEntry::Policy { name: "versions" },
-        super::SubEntry::Policy { name: "which" },
-    ]},
-];
 
 #[cfg(test)]
 mod tests {

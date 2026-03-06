@@ -1,5 +1,6 @@
+use crate::command::{CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{FlagPolicy, FlagStyle};
 
 static OLLAMA_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--json"]),
@@ -78,68 +79,39 @@ static LLM_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_ollama(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let policy = match tokens[1].as_str() {
-        "list" => &OLLAMA_LIST_POLICY,
-        "ps" => &OLLAMA_PS_POLICY,
-        "show" => &OLLAMA_SHOW_POLICY,
-        _ => return false,
-    };
-    policy::check(&tokens[1..], policy)
-}
+pub(crate) static OLLAMA: CommandDef = CommandDef {
+    name: "ollama",
+    subs: &[
+        SubDef::Policy { name: "list", policy: &OLLAMA_LIST_POLICY },
+        SubDef::Policy { name: "ps", policy: &OLLAMA_PS_POLICY },
+        SubDef::Policy { name: "show", policy: &OLLAMA_SHOW_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
-pub fn is_safe_llm(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let policy = match tokens[1].as_str() {
-        "aliases" | "collections" | "templates" => &LLM_SIMPLE_LIST_POLICY,
-        "logs" => &LLM_LOGS_POLICY,
-        "models" => &LLM_MODELS_POLICY,
-        "plugins" => &LLM_PLUGINS_POLICY,
-        _ => return false,
-    };
-    policy::check(&tokens[1..], policy)
-}
+pub(crate) static LLM: CommandDef = CommandDef {
+    name: "llm",
+    subs: &[
+        SubDef::Policy { name: "aliases", policy: &LLM_SIMPLE_LIST_POLICY },
+        SubDef::Policy { name: "collections", policy: &LLM_SIMPLE_LIST_POLICY },
+        SubDef::Policy { name: "logs", policy: &LLM_LOGS_POLICY },
+        SubDef::Policy { name: "models", policy: &LLM_MODELS_POLICY },
+        SubDef::Policy { name: "plugins", policy: &LLM_PLUGINS_POLICY },
+        SubDef::Policy { name: "templates", policy: &LLM_SIMPLE_LIST_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "ollama" => Some(is_safe_ollama(tokens)),
-        "llm" => Some(is_safe_llm(tokens)),
-        _ => None,
-    }
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    OLLAMA.dispatch(cmd, tokens, is_safe)
+        .or_else(|| LLM.dispatch(cmd, tokens, is_safe))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
-    vec![
-        CommandDoc::handler("ollama",
-            "Subcommands: list, ps, show."),
-        CommandDoc::handler("llm",
-            "Subcommands: aliases, collections, logs, models, plugins, templates. \
-            "),
-    ]
+    vec![OLLAMA.to_doc(), LLM.to_doc()]
 }
-
-#[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "ollama", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "ps" },
-        super::SubEntry::Policy { name: "show" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "llm", subs: &[
-        super::SubEntry::Policy { name: "aliases" },
-        super::SubEntry::Policy { name: "collections" },
-        super::SubEntry::Policy { name: "logs" },
-        super::SubEntry::Policy { name: "models" },
-        super::SubEntry::Policy { name: "plugins" },
-        super::SubEntry::Policy { name: "templates" },
-    ]},
-];
 
 #[cfg(test)]
 mod tests {

@@ -1,3 +1,4 @@
+use crate::command::{CheckFn, CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
@@ -117,26 +118,33 @@ static BREW_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_brew(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let policy = match tokens[1].as_str() {
-        "list" | "ls" => &BREW_LIST_POLICY,
-        "info" | "abv" => &BREW_INFO_POLICY,
-        "search" => &BREW_SEARCH_POLICY,
-        "deps" => &BREW_DEPS_POLICY,
-        "uses" => &BREW_USES_POLICY,
-        "outdated" => &BREW_OUTDATED_POLICY,
-        "desc" => &BREW_DESC_POLICY,
-        "log" => &BREW_LOG_POLICY,
-        "cat" | "casks" | "config" | "doctor" | "formulae"
-        | "home" | "leaves" | "shellenv" | "tap" => &BREW_SIMPLE_POLICY,
-        "--prefix" => &BREW_SIMPLE_POLICY,
-        _ => return false,
-    };
-    policy::check(&tokens[1..], policy)
-}
+pub(crate) static BREW: CommandDef = CommandDef {
+    name: "brew",
+    subs: &[
+        SubDef::Policy { name: "list", policy: &BREW_LIST_POLICY },
+        SubDef::Policy { name: "ls", policy: &BREW_LIST_POLICY },
+        SubDef::Policy { name: "info", policy: &BREW_INFO_POLICY },
+        SubDef::Policy { name: "abv", policy: &BREW_INFO_POLICY },
+        SubDef::Policy { name: "search", policy: &BREW_SEARCH_POLICY },
+        SubDef::Policy { name: "deps", policy: &BREW_DEPS_POLICY },
+        SubDef::Policy { name: "uses", policy: &BREW_USES_POLICY },
+        SubDef::Policy { name: "outdated", policy: &BREW_OUTDATED_POLICY },
+        SubDef::Policy { name: "desc", policy: &BREW_DESC_POLICY },
+        SubDef::Policy { name: "log", policy: &BREW_LOG_POLICY },
+        SubDef::Policy { name: "cat", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Policy { name: "casks", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Policy { name: "config", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Policy { name: "doctor", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Policy { name: "formulae", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Policy { name: "home", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Policy { name: "leaves", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Policy { name: "shellenv", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Policy { name: "tap", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Policy { name: "--prefix", policy: &BREW_SIMPLE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static MISE_RESHIM_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--force"]),
@@ -181,26 +189,41 @@ static MISE_ENV_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_mise(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    match tokens[1].as_str() {
-        "list" | "ls" => policy::check(&tokens[1..], &MISE_LIST_POLICY),
-        "current" | "which" | "doctor" => policy::check(&tokens[1..], &MISE_SIMPLE_POLICY),
-        "reshim" => policy::check(&tokens[1..], &MISE_RESHIM_POLICY),
-        "env" => policy::check(&tokens[1..], &MISE_ENV_POLICY),
-        "config" => {
-            tokens.get(2).is_some_and(|a| a == "list" || a == "ls")
-                && policy::check(&tokens[2..], &MISE_SIMPLE_POLICY)
+fn check_mise_exec(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    let sep = tokens[1..].iter().position(|t| *t == "--");
+    if let Some(pos) = sep {
+        let inner_start = 1 + pos + 1;
+        if inner_start >= tokens.len() {
+            return false;
         }
-        "settings" => {
-            tokens.get(2).is_some_and(|a| a == "get")
-                && policy::check(&tokens[2..], &MISE_SIMPLE_POLICY)
-        }
-        _ => false,
+        let inner = Token::join(&tokens[inner_start..]);
+        return is_safe(&inner);
     }
+    false
 }
+
+pub(crate) static MISE: CommandDef = CommandDef {
+    name: "mise",
+    subs: &[
+        SubDef::Policy { name: "list", policy: &MISE_LIST_POLICY },
+        SubDef::Policy { name: "ls", policy: &MISE_LIST_POLICY },
+        SubDef::Policy { name: "current", policy: &MISE_SIMPLE_POLICY },
+        SubDef::Policy { name: "which", policy: &MISE_SIMPLE_POLICY },
+        SubDef::Policy { name: "doctor", policy: &MISE_SIMPLE_POLICY },
+        SubDef::Policy { name: "reshim", policy: &MISE_RESHIM_POLICY },
+        SubDef::Policy { name: "env", policy: &MISE_ENV_POLICY },
+        SubDef::Nested { name: "config", subs: &[
+            SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY },
+            SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY },
+        ]},
+        SubDef::Nested { name: "settings", subs: &[
+            SubDef::Policy { name: "get", policy: &MISE_SIMPLE_POLICY },
+        ]},
+        SubDef::Custom { name: "exec", check: check_mise_exec as CheckFn, doc: "exec delegates after --.", test_suffix: None },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static ASDF_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
@@ -212,26 +235,24 @@ static ASDF_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_asdf(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    static ASDF_SAFE: WordSet = WordSet::new(&[
-        "current", "help", "info", "list", "version",
-    ]);
-    match tokens[1].as_str() {
-        s if ASDF_SAFE.contains(s) => policy::check(&tokens[1..], &ASDF_SIMPLE_POLICY),
-        "plugin" => {
-            tokens.get(2).is_some_and(|a| a == "list")
-                && policy::check(&tokens[2..], &ASDF_SIMPLE_POLICY)
-        }
-        "plugin-list" | "plugin-list-all" => {
-            policy::check(&tokens[1..], &ASDF_SIMPLE_POLICY)
-        }
-        "which" => policy::check(&tokens[1..], &ASDF_SIMPLE_POLICY),
-        _ => false,
-    }
-}
+pub(crate) static ASDF: CommandDef = CommandDef {
+    name: "asdf",
+    subs: &[
+        SubDef::Policy { name: "current", policy: &ASDF_SIMPLE_POLICY },
+        SubDef::Policy { name: "help", policy: &ASDF_SIMPLE_POLICY },
+        SubDef::Policy { name: "info", policy: &ASDF_SIMPLE_POLICY },
+        SubDef::Policy { name: "list", policy: &ASDF_SIMPLE_POLICY },
+        SubDef::Policy { name: "version", policy: &ASDF_SIMPLE_POLICY },
+        SubDef::Policy { name: "which", policy: &ASDF_SIMPLE_POLICY },
+        SubDef::Nested { name: "plugin", subs: &[
+            SubDef::Policy { name: "list", policy: &ASDF_SIMPLE_POLICY },
+        ]},
+        SubDef::Policy { name: "plugin-list", policy: &ASDF_SIMPLE_POLICY },
+        SubDef::Policy { name: "plugin-list-all", policy: &ASDF_SIMPLE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static DEFAULTS_READ_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["-g", "-globalDomain"]),
@@ -253,18 +274,18 @@ static DEFAULTS_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_defaults(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    match tokens[1].as_str() {
-        "read" | "read-type" | "export" | "find" => {
-            policy::check(&tokens[1..], &DEFAULTS_READ_POLICY)
-        }
-        "domains" => policy::check(&tokens[1..], &DEFAULTS_SIMPLE_POLICY),
-        _ => false,
-    }
-}
+pub(crate) static DEFAULTS: CommandDef = CommandDef {
+    name: "defaults",
+    subs: &[
+        SubDef::Policy { name: "read", policy: &DEFAULTS_READ_POLICY },
+        SubDef::Policy { name: "read-type", policy: &DEFAULTS_READ_POLICY },
+        SubDef::Policy { name: "export", policy: &DEFAULTS_READ_POLICY },
+        SubDef::Policy { name: "find", policy: &DEFAULTS_READ_POLICY },
+        SubDef::Policy { name: "domains", policy: &DEFAULTS_SIMPLE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static PMSET_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
@@ -386,22 +407,24 @@ static SECURITY_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_security(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let policy = match tokens[1].as_str() {
-        "find-certificate" => &SECURITY_FIND_CERT_POLICY,
-        "find-identity" => &SECURITY_FIND_IDENTITY_POLICY,
-        "find-generic-password" | "find-internet-password" => &SECURITY_FIND_PASSWORD_POLICY,
-        "list-keychains" => &SECURITY_LIST_POLICY,
-        "dump-keychain" | "dump-trust-settings" => &SECURITY_DUMP_POLICY,
-        "verify-cert" => &SECURITY_VERIFY_CERT_POLICY,
-        "cms" | "show-keychain-info" | "smartcard" => &SECURITY_SIMPLE_POLICY,
-        _ => return false,
-    };
-    policy::check(&tokens[1..], policy)
-}
+pub(crate) static SECURITY: CommandDef = CommandDef {
+    name: "security",
+    subs: &[
+        SubDef::Policy { name: "find-certificate", policy: &SECURITY_FIND_CERT_POLICY },
+        SubDef::Policy { name: "find-identity", policy: &SECURITY_FIND_IDENTITY_POLICY },
+        SubDef::Policy { name: "find-generic-password", policy: &SECURITY_FIND_PASSWORD_POLICY },
+        SubDef::Policy { name: "find-internet-password", policy: &SECURITY_FIND_PASSWORD_POLICY },
+        SubDef::Policy { name: "list-keychains", policy: &SECURITY_LIST_POLICY },
+        SubDef::Policy { name: "dump-keychain", policy: &SECURITY_DUMP_POLICY },
+        SubDef::Policy { name: "dump-trust-settings", policy: &SECURITY_DUMP_POLICY },
+        SubDef::Policy { name: "verify-cert", policy: &SECURITY_VERIFY_CERT_POLICY },
+        SubDef::Policy { name: "cms", policy: &SECURITY_SIMPLE_POLICY },
+        SubDef::Policy { name: "show-keychain-info", policy: &SECURITY_SIMPLE_POLICY },
+        SubDef::Policy { name: "smartcard", policy: &SECURITY_SIMPLE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static CSRUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
@@ -413,17 +436,16 @@ static CSRUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_csrutil(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    static CSRUTIL_SAFE: WordSet =
-        WordSet::new(&["authenticated-root", "report", "status"]);
-    if !CSRUTIL_SAFE.contains(&tokens[1]) {
-        return false;
-    }
-    policy::check(&tokens[1..], &CSRUTIL_SIMPLE_POLICY)
-}
+pub(crate) static CSRUTIL: CommandDef = CommandDef {
+    name: "csrutil",
+    subs: &[
+        SubDef::Policy { name: "authenticated-root", policy: &CSRUTIL_SIMPLE_POLICY },
+        SubDef::Policy { name: "report", policy: &CSRUTIL_SIMPLE_POLICY },
+        SubDef::Policy { name: "status", policy: &CSRUTIL_SIMPLE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static DISKUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
@@ -455,23 +477,23 @@ static DISKUTIL_INFO_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_diskutil(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    match tokens[1].as_str() {
-        "list" | "listFilesystems" => policy::check(&tokens[1..], &DISKUTIL_LIST_POLICY),
-        "info" => policy::check(&tokens[1..], &DISKUTIL_INFO_POLICY),
-        "activity" => policy::check(&tokens[1..], &DISKUTIL_SIMPLE_POLICY),
-        "apfs" => {
-            static APFS_SAFE: WordSet =
-                WordSet::new(&["list", "listCryptoUsers", "listSnapshots", "listVolumeGroups"]);
-            tokens.get(2).is_some_and(|a| APFS_SAFE.contains(a))
-                && policy::check(&tokens[2..], &DISKUTIL_SIMPLE_POLICY)
-        }
-        _ => false,
-    }
-}
+pub(crate) static DISKUTIL: CommandDef = CommandDef {
+    name: "diskutil",
+    subs: &[
+        SubDef::Policy { name: "list", policy: &DISKUTIL_LIST_POLICY },
+        SubDef::Policy { name: "listFilesystems", policy: &DISKUTIL_LIST_POLICY },
+        SubDef::Policy { name: "info", policy: &DISKUTIL_INFO_POLICY },
+        SubDef::Policy { name: "activity", policy: &DISKUTIL_SIMPLE_POLICY },
+        SubDef::Nested { name: "apfs", subs: &[
+            SubDef::Policy { name: "list", policy: &DISKUTIL_SIMPLE_POLICY },
+            SubDef::Policy { name: "listCryptoUsers", policy: &DISKUTIL_SIMPLE_POLICY },
+            SubDef::Policy { name: "listSnapshots", policy: &DISKUTIL_SIMPLE_POLICY },
+            SubDef::Policy { name: "listVolumeGroups", policy: &DISKUTIL_SIMPLE_POLICY },
+        ]},
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static LAUNCHCTL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
@@ -483,19 +505,25 @@ static LAUNCHCTL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_launchctl(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    static LAUNCHCTL_SAFE: WordSet = WordSet::new(&[
-        "blame", "dumpstate", "error", "examine", "help", "hostinfo",
-        "list", "print", "print-cache", "print-disabled", "resolveport", "version",
-    ]);
-    if !LAUNCHCTL_SAFE.contains(&tokens[1]) {
-        return false;
-    }
-    policy::check(&tokens[1..], &LAUNCHCTL_SIMPLE_POLICY)
-}
+pub(crate) static LAUNCHCTL: CommandDef = CommandDef {
+    name: "launchctl",
+    subs: &[
+        SubDef::Policy { name: "blame", policy: &LAUNCHCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "dumpstate", policy: &LAUNCHCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "error", policy: &LAUNCHCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "examine", policy: &LAUNCHCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "help", policy: &LAUNCHCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "hostinfo", policy: &LAUNCHCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "list", policy: &LAUNCHCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "print", policy: &LAUNCHCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "print-cache", policy: &LAUNCHCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "print-disabled", policy: &LAUNCHCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "resolveport", policy: &LAUNCHCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "version", policy: &LAUNCHCTL_SIMPLE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 pub fn is_safe_networksetup(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
@@ -556,215 +584,67 @@ static LOG_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_log(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let policy = match tokens[1].as_str() {
-        "show" => &LOG_SHOW_POLICY,
-        "stream" => &LOG_STREAM_POLICY,
-        "help" | "stats" => &LOG_SIMPLE_POLICY,
-        _ => return false,
-    };
-    policy::check(&tokens[1..], policy)
-}
+pub(crate) static LOG: CommandDef = CommandDef {
+    name: "log",
+    subs: &[
+        SubDef::Policy { name: "show", policy: &LOG_SHOW_POLICY },
+        SubDef::Policy { name: "stream", policy: &LOG_STREAM_POLICY },
+        SubDef::Policy { name: "help", policy: &LOG_SIMPLE_POLICY },
+        SubDef::Policy { name: "stats", policy: &LOG_SIMPLE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "brew" => Some(is_safe_brew(tokens)),
-        "mise" => {
-            if tokens.len() >= 2 && tokens[1] == "exec" {
-                let sep = tokens[2..].iter().position(|t| *t == "--");
-                if let Some(pos) = sep {
-                    let inner_start = 2 + pos + 1;
-                    if inner_start >= tokens.len() {
-                        return Some(false);
-                    }
-                    let inner = Token::join(&tokens[inner_start..]);
-                    return Some(is_safe(&inner));
-                }
-                return Some(false);
-            }
-            Some(is_safe_mise(tokens))
-        }
-        "asdf" => Some(is_safe_asdf(tokens)),
-        "defaults" => Some(is_safe_defaults(tokens)),
-        "pmset" => Some(is_safe_pmset(tokens)),
-        "sysctl" => Some(is_safe_sysctl(tokens)),
-        "cmake" => Some(is_safe_cmake(tokens)),
-        "security" => Some(is_safe_security(tokens)),
-        "csrutil" => Some(is_safe_csrutil(tokens)),
-        "diskutil" => Some(is_safe_diskutil(tokens)),
-        "launchctl" => Some(is_safe_launchctl(tokens)),
-        "networksetup" => Some(is_safe_networksetup(tokens)),
-        "log" => Some(is_safe_log(tokens)),
-        _ => None,
-    }
+    BREW.dispatch(cmd, tokens, is_safe)
+        .or_else(|| MISE.dispatch(cmd, tokens, is_safe))
+        .or_else(|| ASDF.dispatch(cmd, tokens, is_safe))
+        .or_else(|| DEFAULTS.dispatch(cmd, tokens, is_safe))
+        .or_else(|| SECURITY.dispatch(cmd, tokens, is_safe))
+        .or_else(|| CSRUTIL.dispatch(cmd, tokens, is_safe))
+        .or_else(|| DISKUTIL.dispatch(cmd, tokens, is_safe))
+        .or_else(|| LAUNCHCTL.dispatch(cmd, tokens, is_safe))
+        .or_else(|| LOG.dispatch(cmd, tokens, is_safe))
+        .or_else(|| match cmd {
+            "pmset" => Some(is_safe_pmset(tokens)),
+            "sysctl" => Some(is_safe_sysctl(tokens)),
+            "cmake" => Some(is_safe_cmake(tokens)),
+            "networksetup" => Some(is_safe_networksetup(tokens)),
+            _ => None,
+        })
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
-        CommandDoc::handler("brew",
-            "Subcommands: cat, casks, config, deps, desc, doctor, formulae, home, info, \
-             leaves, list, log, outdated, search, shellenv, tap, uses. \
-            "),
-        CommandDoc::handler("mise",
-            "Subcommands: current, doctor, env, exec, list/ls, reshim, which. \
-             Multi-level: config list/ls, settings get. \
-             exec recursively validates the inner command after --."),
-        CommandDoc::handler("asdf",
-            "Subcommands: current, help, info, list, version, which. \
-             Multi-level: plugin list. Also: plugin-list, plugin-list-all. \
-"),
-        CommandDoc::handler("defaults",
-            "Subcommands: domains, export, find, read, read-type. \
-            "),
+        BREW.to_doc(),
+        MISE.to_doc(),
+        ASDF.to_doc(),
+        DEFAULTS.to_doc(),
         CommandDoc::handler("pmset",
             "Allowed: -g (get/display settings only)."),
         CommandDoc::handler("sysctl",
             "Read-only usage."),
         CommandDoc::handler("cmake",
             "Allowed: --version, --system-information (single argument only)."),
-        CommandDoc::handler("security",
-            "Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, \
-             find-generic-password, find-identity, find-internet-password, \
-             list-keychains, show-keychain-info, smartcard, verify-cert. \
-            "),
-        CommandDoc::handler("csrutil",
-            "Subcommands: authenticated-root, report, status."),
-        CommandDoc::handler("diskutil",
-            "Subcommands: activity, info, list, listFilesystems. \
-             Multi-level: apfs list/listCryptoUsers/listSnapshots/listVolumeGroups. \
-            "),
-        CommandDoc::handler("launchctl",
-            "Subcommands: blame, dumpstate, error, examine, help, hostinfo, \
-             list, print, print-cache, print-disabled, resolveport, version. \
-"),
+        SECURITY.to_doc(),
+        CSRUTIL.to_doc(),
+        DISKUTIL.to_doc(),
+        LAUNCHCTL.to_doc(),
         CommandDoc::handler("networksetup",
             "Allowed: subcommands starting with -list, -get, -show, -print, \
              plus -version and -help."),
-        CommandDoc::handler("log",
-            "Subcommands: help, show, stats, stream. \
-"),
+        LOG.to_doc(),
     ]
 }
 
 #[cfg(test)]
 pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "brew", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "ls" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Policy { name: "abv" },
-        super::SubEntry::Policy { name: "search" },
-        super::SubEntry::Policy { name: "deps" },
-        super::SubEntry::Policy { name: "uses" },
-        super::SubEntry::Policy { name: "outdated" },
-        super::SubEntry::Policy { name: "desc" },
-        super::SubEntry::Policy { name: "log" },
-        super::SubEntry::Policy { name: "cat" },
-        super::SubEntry::Policy { name: "casks" },
-        super::SubEntry::Policy { name: "config" },
-        super::SubEntry::Policy { name: "doctor" },
-        super::SubEntry::Policy { name: "formulae" },
-        super::SubEntry::Policy { name: "home" },
-        super::SubEntry::Policy { name: "leaves" },
-        super::SubEntry::Policy { name: "shellenv" },
-        super::SubEntry::Policy { name: "tap" },
-        super::SubEntry::Policy { name: "--prefix" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "mise", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "ls" },
-        super::SubEntry::Policy { name: "current" },
-        super::SubEntry::Policy { name: "which" },
-        super::SubEntry::Policy { name: "doctor" },
-        super::SubEntry::Policy { name: "reshim" },
-        super::SubEntry::Policy { name: "env" },
-        super::SubEntry::Nested { name: "config", subs: &[
-            super::SubEntry::Policy { name: "list" },
-            super::SubEntry::Policy { name: "ls" },
-        ]},
-        super::SubEntry::Nested { name: "settings", subs: &[
-            super::SubEntry::Policy { name: "get" },
-        ]},
-        super::SubEntry::Delegation { name: "exec" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "asdf", subs: &[
-        super::SubEntry::Policy { name: "current" },
-        super::SubEntry::Policy { name: "help" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "version" },
-        super::SubEntry::Policy { name: "which" },
-        super::SubEntry::Nested { name: "plugin", subs: &[
-            super::SubEntry::Policy { name: "list" },
-        ]},
-        super::SubEntry::Policy { name: "plugin-list" },
-        super::SubEntry::Policy { name: "plugin-list-all" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "defaults", subs: &[
-        super::SubEntry::Policy { name: "read" },
-        super::SubEntry::Policy { name: "read-type" },
-        super::SubEntry::Policy { name: "export" },
-        super::SubEntry::Policy { name: "find" },
-        super::SubEntry::Policy { name: "domains" },
-    ]},
     super::CommandEntry::Positional { cmd: "pmset" },
     super::CommandEntry::Custom { cmd: "sysctl", valid_prefix: Some("sysctl kern.maxproc") },
     super::CommandEntry::Custom { cmd: "cmake", valid_prefix: None },
-    super::CommandEntry::Subcommand { cmd: "security", subs: &[
-        super::SubEntry::Policy { name: "find-certificate" },
-        super::SubEntry::Policy { name: "find-identity" },
-        super::SubEntry::Policy { name: "find-generic-password" },
-        super::SubEntry::Policy { name: "find-internet-password" },
-        super::SubEntry::Policy { name: "list-keychains" },
-        super::SubEntry::Policy { name: "dump-keychain" },
-        super::SubEntry::Policy { name: "dump-trust-settings" },
-        super::SubEntry::Policy { name: "verify-cert" },
-        super::SubEntry::Policy { name: "cms" },
-        super::SubEntry::Policy { name: "show-keychain-info" },
-        super::SubEntry::Policy { name: "smartcard" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "csrutil", subs: &[
-        super::SubEntry::Policy { name: "authenticated-root" },
-        super::SubEntry::Policy { name: "report" },
-        super::SubEntry::Policy { name: "status" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "diskutil", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "listFilesystems" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Policy { name: "activity" },
-        super::SubEntry::Nested { name: "apfs", subs: &[
-            super::SubEntry::Policy { name: "list" },
-            super::SubEntry::Policy { name: "listCryptoUsers" },
-            super::SubEntry::Policy { name: "listSnapshots" },
-            super::SubEntry::Policy { name: "listVolumeGroups" },
-        ]},
-    ]},
-    super::CommandEntry::Subcommand { cmd: "launchctl", subs: &[
-        super::SubEntry::Policy { name: "blame" },
-        super::SubEntry::Policy { name: "dumpstate" },
-        super::SubEntry::Policy { name: "error" },
-        super::SubEntry::Policy { name: "examine" },
-        super::SubEntry::Policy { name: "help" },
-        super::SubEntry::Policy { name: "hostinfo" },
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "print" },
-        super::SubEntry::Policy { name: "print-cache" },
-        super::SubEntry::Policy { name: "print-disabled" },
-        super::SubEntry::Policy { name: "resolveport" },
-        super::SubEntry::Policy { name: "version" },
-    ]},
     super::CommandEntry::Positional { cmd: "networksetup" },
-    super::CommandEntry::Subcommand { cmd: "log", subs: &[
-        super::SubEntry::Policy { name: "show" },
-        super::SubEntry::Policy { name: "stream" },
-        super::SubEntry::Policy { name: "help" },
-        super::SubEntry::Policy { name: "stats" },
-    ]},
 ];
 
 #[cfg(test)]

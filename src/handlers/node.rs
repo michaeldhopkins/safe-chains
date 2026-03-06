@@ -1,3 +1,4 @@
+use crate::command::{CheckFn, CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
@@ -56,24 +57,46 @@ static NPM_TEST_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_npm(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    match tokens[1].as_str() {
-        "list" | "ls" => policy::check(&tokens[1..], &NPM_LIST_POLICY),
-        "view" | "info" => policy::check(&tokens[1..], &NPM_VIEW_POLICY),
-        "audit" => policy::check(&tokens[1..], &NPM_AUDIT_POLICY),
-        "test" => policy::check(&tokens[1..], &NPM_TEST_POLICY),
-        "doctor" | "explain" | "fund" | "outdated" | "prefix"
-        | "root" | "why" => policy::check(&tokens[1..], &NPM_BARE_POLICY),
-        "config" => tokens.get(2).is_some_and(|a| a == "list" || a == "get"),
-        "run" | "run-script" => tokens
-            .get(2)
-            .is_some_and(|a| a == "test" || a.starts_with("test:")),
-        _ => false,
-    }
+static NPM_CONFIG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&["--json", "--long"]),
+    standalone_short: b"l",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+fn check_npm_run(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    tokens.get(1).is_some_and(|a| a == "test" || a.starts_with("test:"))
 }
+
+pub(crate) static NPM: CommandDef = CommandDef {
+    name: "npm",
+    subs: &[
+        SubDef::Policy { name: "list", policy: &NPM_LIST_POLICY },
+        SubDef::Policy { name: "ls", policy: &NPM_LIST_POLICY },
+        SubDef::Policy { name: "view", policy: &NPM_VIEW_POLICY },
+        SubDef::Policy { name: "info", policy: &NPM_VIEW_POLICY },
+        SubDef::Policy { name: "audit", policy: &NPM_AUDIT_POLICY },
+        SubDef::Policy { name: "test", policy: &NPM_TEST_POLICY },
+        SubDef::Policy { name: "doctor", policy: &NPM_BARE_POLICY },
+        SubDef::Policy { name: "explain", policy: &NPM_BARE_POLICY },
+        SubDef::Policy { name: "fund", policy: &NPM_BARE_POLICY },
+        SubDef::Policy { name: "outdated", policy: &NPM_BARE_POLICY },
+        SubDef::Policy { name: "prefix", policy: &NPM_BARE_POLICY },
+        SubDef::Policy { name: "root", policy: &NPM_BARE_POLICY },
+        SubDef::Policy { name: "why", policy: &NPM_BARE_POLICY },
+        SubDef::Nested { name: "config", subs: &[
+            SubDef::Policy { name: "get", policy: &NPM_CONFIG_POLICY },
+            SubDef::Policy { name: "list", policy: &NPM_CONFIG_POLICY },
+        ]},
+        SubDef::Custom { name: "run", check: check_npm_run as CheckFn, doc: "run/run-script (test only).", test_suffix: None },
+        SubDef::Custom { name: "run-script", check: check_npm_run as CheckFn, doc: " ", test_suffix: None },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static YARN_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--json", "--long", "--production"]),
@@ -130,16 +153,18 @@ static PNPM_BARE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_pnpm(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    match tokens[1].as_str() {
-        "list" | "ls" => policy::check(&tokens[1..], &PNPM_LIST_POLICY),
-        "audit" | "outdated" | "why" => policy::check(&tokens[1..], &PNPM_BARE_POLICY),
-        _ => false,
-    }
-}
+pub(crate) static PNPM: CommandDef = CommandDef {
+    name: "pnpm",
+    subs: &[
+        SubDef::Policy { name: "list", policy: &PNPM_LIST_POLICY },
+        SubDef::Policy { name: "ls", policy: &PNPM_LIST_POLICY },
+        SubDef::Policy { name: "audit", policy: &PNPM_BARE_POLICY },
+        SubDef::Policy { name: "outdated", policy: &PNPM_BARE_POLICY },
+        SubDef::Policy { name: "why", policy: &PNPM_BARE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static BUN_TEST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--bail", "--only", "--rerun-each", "--todo"]),
@@ -263,30 +288,27 @@ pub fn is_safe_bunx(tokens: &[Token]) -> bool {
         .is_some_and(|idx| is_safe_runner_package(tokens, idx))
 }
 
-pub fn is_safe_bun(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if tokens[1] == "x" {
-        return find_runner_package_index(tokens, 2, &BUNX_FLAGS_NO_ARG)
-            .is_some_and(|idx| is_safe_runner_package(tokens, idx));
-    }
-    match tokens[1].as_str() {
-        "test" => policy::check(&tokens[1..], &BUN_TEST_POLICY),
-        "outdated" => policy::check(&tokens[1..], &BUN_OUTDATED_POLICY),
-        "pm" => {
-            if tokens.len() < 3 {
-                return false;
-            }
-            static BUN_PM_SAFE: WordSet = WordSet::new(&["bin", "cache", "hash", "ls"]);
-            if !BUN_PM_SAFE.contains(&tokens[2]) {
-                return false;
-            }
-            policy::check(&tokens[2..], &BUN_PM_POLICY)
-        }
-        _ => false,
-    }
+fn check_bun_x(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    find_runner_package_index(tokens, 1, &BUNX_FLAGS_NO_ARG)
+        .is_some_and(|idx| is_safe_runner_package(tokens, idx))
 }
+
+pub(crate) static BUN: CommandDef = CommandDef {
+    name: "bun",
+    subs: &[
+        SubDef::Policy { name: "test", policy: &BUN_TEST_POLICY },
+        SubDef::Policy { name: "outdated", policy: &BUN_OUTDATED_POLICY },
+        SubDef::Nested { name: "pm", subs: &[
+            SubDef::Policy { name: "bin", policy: &BUN_PM_POLICY },
+            SubDef::Policy { name: "cache", policy: &BUN_PM_POLICY },
+            SubDef::Policy { name: "hash", policy: &BUN_PM_POLICY },
+            SubDef::Policy { name: "ls", policy: &BUN_PM_POLICY },
+        ]},
+        SubDef::Custom { name: "x", check: check_bun_x as CheckFn, doc: "x delegates to bunx logic.", test_suffix: None },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static DENO_SAFE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -316,19 +338,19 @@ static DENO_FMT_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_deno(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    match tokens[1].as_str() {
-        "check" | "doc" | "info" | "lint" | "test" => {
-            policy::check(&tokens[1..], &DENO_SAFE_POLICY)
-        }
-        "fmt" => has_flag(&tokens[1..], None, Some("--check"))
-            && policy::check(&tokens[1..], &DENO_FMT_POLICY),
-        _ => false,
-    }
-}
+pub(crate) static DENO: CommandDef = CommandDef {
+    name: "deno",
+    subs: &[
+        SubDef::Policy { name: "check", policy: &DENO_SAFE_POLICY },
+        SubDef::Policy { name: "doc", policy: &DENO_SAFE_POLICY },
+        SubDef::Policy { name: "info", policy: &DENO_SAFE_POLICY },
+        SubDef::Policy { name: "lint", policy: &DENO_SAFE_POLICY },
+        SubDef::Policy { name: "test", policy: &DENO_SAFE_POLICY },
+        SubDef::Guarded { name: "fmt", guard_short: None, guard_long: "--check", policy: &DENO_FMT_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static NVM_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--lts", "--no-colors"]),
@@ -340,17 +362,19 @@ static NVM_BARE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_nvm(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    static NVM_SAFE: WordSet =
-        WordSet::new(&["current", "list", "ls", "ls-remote", "version", "which"]);
-    if !NVM_SAFE.contains(&tokens[1]) {
-        return false;
-    }
-    policy::check(&tokens[1..], &NVM_BARE_POLICY)
-}
+pub(crate) static NVM: CommandDef = CommandDef {
+    name: "nvm",
+    subs: &[
+        SubDef::Policy { name: "current", policy: &NVM_BARE_POLICY },
+        SubDef::Policy { name: "list", policy: &NVM_BARE_POLICY },
+        SubDef::Policy { name: "ls", policy: &NVM_BARE_POLICY },
+        SubDef::Policy { name: "ls-remote", policy: &NVM_BARE_POLICY },
+        SubDef::Policy { name: "version", policy: &NVM_BARE_POLICY },
+        SubDef::Policy { name: "which", policy: &NVM_BARE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static FNM_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
@@ -362,17 +386,17 @@ static FNM_BARE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_fnm(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    static FNM_SAFE: WordSet =
-        WordSet::new(&["current", "default", "list", "ls-remote"]);
-    if !FNM_SAFE.contains(&tokens[1]) {
-        return false;
-    }
-    policy::check(&tokens[1..], &FNM_BARE_POLICY)
-}
+pub(crate) static FNM: CommandDef = CommandDef {
+    name: "fnm",
+    subs: &[
+        SubDef::Policy { name: "current", policy: &FNM_BARE_POLICY },
+        SubDef::Policy { name: "default", policy: &FNM_BARE_POLICY },
+        SubDef::Policy { name: "list", policy: &FNM_BARE_POLICY },
+        SubDef::Policy { name: "ls-remote", policy: &FNM_BARE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static VOLTA_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--current", "--default"]),
@@ -384,94 +408,64 @@ static VOLTA_BARE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_volta(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    static VOLTA_SAFE: WordSet = WordSet::new(&["list", "which"]);
-    if !VOLTA_SAFE.contains(&tokens[1]) {
-        return false;
-    }
-    policy::check(&tokens[1..], &VOLTA_BARE_POLICY)
-}
+pub(crate) static VOLTA: CommandDef = CommandDef {
+    name: "volta",
+    subs: &[
+        SubDef::Policy { name: "list", policy: &VOLTA_BARE_POLICY },
+        SubDef::Policy { name: "which", policy: &VOLTA_BARE_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: true,
+};
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    match cmd {
-        "npm" => Some(is_safe_npm(tokens)),
-        "yarn" => Some(is_safe_yarn(tokens)),
-        "pnpm" => Some(is_safe_pnpm(tokens)),
-        "bun" => Some(is_safe_bun(tokens)),
-        "deno" => Some(is_safe_deno(tokens)),
-        "npx" => Some(is_safe_npx(tokens)),
-        "bunx" => Some(is_safe_bunx(tokens)),
-        "nvm" => Some(is_safe_nvm(tokens)),
-        "fnm" => Some(is_safe_fnm(tokens)),
-        "volta" => Some(is_safe_volta(tokens)),
-        _ => None,
-    }
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    NPM.dispatch(cmd, tokens, is_safe)
+        .or_else(|| match cmd {
+            "yarn" => Some(is_safe_yarn(tokens)),
+            _ => None,
+        })
+        .or_else(|| PNPM.dispatch(cmd, tokens, is_safe))
+        .or_else(|| BUN.dispatch(cmd, tokens, is_safe))
+        .or_else(|| DENO.dispatch(cmd, tokens, is_safe))
+        .or_else(|| match cmd {
+            "npx" => Some(is_safe_npx(tokens)),
+            "bunx" => Some(is_safe_bunx(tokens)),
+            _ => None,
+        })
+        .or_else(|| NVM.dispatch(cmd, tokens, is_safe))
+        .or_else(|| FNM.dispatch(cmd, tokens, is_safe))
+        .or_else(|| VOLTA.dispatch(cmd, tokens, is_safe))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocBuilder, wordset_items};
     vec![
-        CommandDoc::handler("npm",
-            "Subcommands: audit, config (list/get), doctor, explain, fund, info, list, ls, \
-             outdated, prefix, root, run/run-script (test only), test, view, why. \
-            "),
+        NPM.to_doc(),
         CommandDoc::handler("yarn",
-            "Subcommands: info, list, ls, test, test:*, why. \
-            "),
-        CommandDoc::handler("pnpm",
-            "Subcommands: audit, list, ls, outdated, why. \
-            "),
-        CommandDoc::handler("bun",
-            "Subcommands: outdated, pm (bin/cache/hash/ls), test. \
-             x delegates to bunx logic."),
+            "Subcommands: info, list, ls, test, test:*, why."),
+        PNPM.to_doc(),
+        BUN.to_doc(),
         CommandDoc::handler("bunx",
             DocBuilder::new()
                 .section(format!("Allowed packages: {}.", wordset_items(&NPX_SAFE)))
                 .section("tsc allowed with --noEmit.")
                 .section("Skips flags: --bun/--no-install/--package/-p.")
                 .build()),
-        CommandDoc::handler("deno",
-            "Subcommands: check, doc, info, lint, test. \
-             fmt allowed with --check."),
+        DENO.to_doc(),
         CommandDoc::handler("npx",
             DocBuilder::new()
                 .section(format!("Allowed packages: {}.", wordset_items(&NPX_SAFE)))
                 .section("tsc allowed with --noEmit.")
                 .section("Skips flags: --yes/-y/--no/--package/-p.")
                 .build()),
-        CommandDoc::handler("nvm",
-            "Subcommands: current, list, ls, ls-remote, version, which. \
-             Minimal flags allowed."),
-        CommandDoc::handler("fnm",
-            "Subcommands: current, default, list, ls-remote."),
-        CommandDoc::handler("volta",
-            "Subcommands: list, which. Flags: --current, --default, --format."),
+        NVM.to_doc(),
+        FNM.to_doc(),
+        VOLTA.to_doc(),
     ]
 }
 
 #[cfg(test)]
 pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "npm", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "ls" },
-        super::SubEntry::Policy { name: "view" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Policy { name: "audit" },
-        super::SubEntry::Policy { name: "test" },
-        super::SubEntry::Policy { name: "doctor" },
-        super::SubEntry::Policy { name: "explain" },
-        super::SubEntry::Policy { name: "fund" },
-        super::SubEntry::Policy { name: "outdated" },
-        super::SubEntry::Policy { name: "prefix" },
-        super::SubEntry::Policy { name: "root" },
-        super::SubEntry::Policy { name: "why" },
-        super::SubEntry::Positional { name: "config" },
-        super::SubEntry::Positional { name: "run" },
-        super::SubEntry::Positional { name: "run-script" },
-    ]},
     super::CommandEntry::Subcommand { cmd: "yarn", subs: &[
         super::SubEntry::Policy { name: "list" },
         super::SubEntry::Policy { name: "ls" },
@@ -479,52 +473,8 @@ pub(super) const REGISTRY: &[super::CommandEntry] = &[
         super::SubEntry::Policy { name: "why" },
         super::SubEntry::Positional { name: "test" },
     ]},
-    super::CommandEntry::Subcommand { cmd: "pnpm", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "ls" },
-        super::SubEntry::Policy { name: "audit" },
-        super::SubEntry::Policy { name: "outdated" },
-        super::SubEntry::Policy { name: "why" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "bun", subs: &[
-        super::SubEntry::Policy { name: "test" },
-        super::SubEntry::Policy { name: "outdated" },
-        super::SubEntry::Nested { name: "pm", subs: &[
-            super::SubEntry::Policy { name: "bin" },
-            super::SubEntry::Policy { name: "cache" },
-            super::SubEntry::Policy { name: "hash" },
-            super::SubEntry::Policy { name: "ls" },
-        ]},
-        super::SubEntry::Delegation { name: "x" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "deno", subs: &[
-        super::SubEntry::Policy { name: "check" },
-        super::SubEntry::Policy { name: "doc" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Policy { name: "lint" },
-        super::SubEntry::Policy { name: "test" },
-        super::SubEntry::Guarded { name: "fmt", valid_suffix: "--check" },
-    ]},
     super::CommandEntry::Positional { cmd: "npx" },
     super::CommandEntry::Positional { cmd: "bunx" },
-    super::CommandEntry::Subcommand { cmd: "nvm", subs: &[
-        super::SubEntry::Policy { name: "current" },
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "ls" },
-        super::SubEntry::Policy { name: "ls-remote" },
-        super::SubEntry::Policy { name: "version" },
-        super::SubEntry::Policy { name: "which" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "fnm", subs: &[
-        super::SubEntry::Policy { name: "current" },
-        super::SubEntry::Policy { name: "default" },
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "ls-remote" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "volta", subs: &[
-        super::SubEntry::Policy { name: "list" },
-        super::SubEntry::Policy { name: "which" },
-    ]},
 ];
 
 #[cfg(test)]

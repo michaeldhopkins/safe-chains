@@ -1,5 +1,6 @@
-use crate::parse::{Segment, Token, WordSet, has_flag};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::command::{CommandDef, SubDef};
+use crate::parse::{Segment, Token, WordSet};
+use crate::policy::{FlagPolicy, FlagStyle};
 
 static CARGO_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -274,38 +275,62 @@ static CARGO_PUBLISH_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_cargo(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    let sub = if tokens[1].starts_with('+') { 2 } else { 1 };
+fn check_cargo_sub(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    let sub = usize::from(!tokens.is_empty() && tokens[0].starts_with('+'));
     if tokens.len() < sub + 1 {
         return false;
     }
     let rest = &tokens[sub..];
-    let subcmd = rest[0].as_str();
-    match subcmd {
-        "build" => policy::check(rest, &CARGO_BUILD_POLICY),
-        "test" => policy::check(rest, &CARGO_TEST_POLICY),
-        "check" => policy::check(rest, &CARGO_CHECK_POLICY),
-        "clippy" => policy::check(rest, &CARGO_CLIPPY_POLICY),
-        "bench" => policy::check(rest, &CARGO_BENCH_POLICY),
-        "doc" => policy::check(rest, &CARGO_DOC_POLICY),
-        "tree" => policy::check(rest, &CARGO_TREE_POLICY),
-        "metadata" => policy::check(rest, &CARGO_METADATA_POLICY),
-        "search" => policy::check(rest, &CARGO_SEARCH_POLICY),
-        "info" => policy::check(rest, &CARGO_INFO_POLICY),
-        "audit" => policy::check(rest, &CARGO_AUDIT_POLICY),
-        "deny" => policy::check(rest, &CARGO_DENY_POLICY),
-        "license" | "locate-project" | "pkgid" | "read-manifest" | "verify-project" => {
-            policy::check(rest, &CARGO_SIMPLE_POLICY)
-        }
-        "fmt" => has_flag(rest, None, Some("--check")) && policy::check(rest, &CARGO_FMT_POLICY),
-        "package" => has_flag(rest, Some("-l"), Some("--list")) && policy::check(rest, &CARGO_PACKAGE_POLICY),
-        "publish" => has_flag(rest, Some("-n"), Some("--dry-run")) && policy::check(rest, &CARGO_PUBLISH_POLICY),
-        _ => false,
-    }
+    CARGO_SUBS
+        .iter()
+        .find(|s| s.name() == rest[0].as_str())
+        .is_some_and(|s| s.check(rest, is_safe))
 }
+
+static CARGO_SUBS: &[SubDef] = &[
+    SubDef::Policy { name: "audit", policy: &CARGO_AUDIT_POLICY },
+    SubDef::Policy { name: "bench", policy: &CARGO_BENCH_POLICY },
+    SubDef::Policy { name: "build", policy: &CARGO_BUILD_POLICY },
+    SubDef::Policy { name: "check", policy: &CARGO_CHECK_POLICY },
+    SubDef::Policy { name: "clippy", policy: &CARGO_CLIPPY_POLICY },
+    SubDef::Policy { name: "deny", policy: &CARGO_DENY_POLICY },
+    SubDef::Policy { name: "doc", policy: &CARGO_DOC_POLICY },
+    SubDef::Guarded {
+        name: "fmt",
+        guard_short: None,
+        guard_long: "--check",
+        policy: &CARGO_FMT_POLICY,
+    },
+    SubDef::Policy { name: "info", policy: &CARGO_INFO_POLICY },
+    SubDef::Policy { name: "license", policy: &CARGO_SIMPLE_POLICY },
+    SubDef::Policy { name: "locate-project", policy: &CARGO_SIMPLE_POLICY },
+    SubDef::Policy { name: "metadata", policy: &CARGO_METADATA_POLICY },
+    SubDef::Guarded {
+        name: "package",
+        guard_short: Some("-l"),
+        guard_long: "--list",
+        policy: &CARGO_PACKAGE_POLICY,
+    },
+    SubDef::Policy { name: "pkgid", policy: &CARGO_SIMPLE_POLICY },
+    SubDef::Guarded {
+        name: "publish",
+        guard_short: Some("-n"),
+        guard_long: "--dry-run",
+        policy: &CARGO_PUBLISH_POLICY,
+    },
+    SubDef::Policy { name: "read-manifest", policy: &CARGO_SIMPLE_POLICY },
+    SubDef::Policy { name: "search", policy: &CARGO_SEARCH_POLICY },
+    SubDef::Policy { name: "test", policy: &CARGO_TEST_POLICY },
+    SubDef::Policy { name: "tree", policy: &CARGO_TREE_POLICY },
+    SubDef::Policy { name: "verify-project", policy: &CARGO_SIMPLE_POLICY },
+];
+
+pub(crate) static CARGO: CommandDef = CommandDef {
+    name: "cargo",
+    subs: CARGO_SUBS,
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 static RUSTUP_SHOW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--installed"]),
@@ -352,103 +377,49 @@ static RUSTUP_LIST_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_rustup(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    match tokens[1].as_str() {
-        "show" => policy::check(&tokens[1..], &RUSTUP_SHOW_POLICY),
-        "which" => policy::check(&tokens[1..], &RUSTUP_WHICH_POLICY),
-        "doc" => policy::check(&tokens[1..], &RUSTUP_DOC_POLICY),
-        "component" => {
-            tokens.get(2).is_some_and(|a| a == "list")
-                && policy::check(&tokens[2..], &RUSTUP_LIST_POLICY)
-        }
-        "target" => {
-            tokens.get(2).is_some_and(|a| a == "list")
-                && policy::check(&tokens[2..], &RUSTUP_LIST_POLICY)
-        }
-        "toolchain" => {
-            tokens.get(2).is_some_and(|a| a == "list")
-                && policy::check(&tokens[2..], &RUSTUP_LIST_POLICY)
-        }
-        "run" => {
-            if tokens.len() >= 4 {
-                let inner = Token::join(&tokens[3..]);
-                is_safe(&inner)
-            } else {
-                false
-            }
-        }
-        _ => false,
-    }
-}
+pub(crate) static RUSTUP: CommandDef = CommandDef {
+    name: "rustup",
+    subs: &[
+        SubDef::Nested { name: "component", subs: &[
+            SubDef::Policy { name: "list", policy: &RUSTUP_LIST_POLICY },
+        ]},
+        SubDef::Policy { name: "doc", policy: &RUSTUP_DOC_POLICY },
+        SubDef::Delegation { name: "run", skip: 2, doc: "run <toolchain> delegates to inner command." },
+        SubDef::Policy { name: "show", policy: &RUSTUP_SHOW_POLICY },
+        SubDef::Nested { name: "target", subs: &[
+            SubDef::Policy { name: "list", policy: &RUSTUP_LIST_POLICY },
+        ]},
+        SubDef::Nested { name: "toolchain", subs: &[
+            SubDef::Policy { name: "list", policy: &RUSTUP_LIST_POLICY },
+        ]},
+        SubDef::Policy { name: "which", policy: &RUSTUP_WHICH_POLICY },
+    ],
+    bare_flags: &[],
+    help_eligible: false,
+};
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
     match cmd {
-        "cargo" => Some(is_safe_cargo(tokens)),
-        "rustup" => Some(is_safe_rustup(tokens, is_safe)),
+        "cargo" => {
+            if tokens.len() < 2 {
+                return Some(false);
+            }
+            let sub = if tokens[1].starts_with('+') { 2 } else { 1 };
+            if tokens.len() < sub + 1 {
+                return Some(false);
+            }
+            Some(check_cargo_sub(&tokens[sub..], is_safe))
+        }
+        "rustup" => RUSTUP.dispatch(cmd, tokens, is_safe),
         _ => None,
     }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
-    vec![
-        CommandDoc::handler("cargo",
-            "Subcommands: audit, bench, build, check, clippy, deny, doc, info, license, \
-             locate-project, metadata, pkgid, read-manifest, search, test, tree, \
-             verify-project. \
-             fmt (requires --check), package (requires --list), \
-             publish (requires --dry-run). \
-             +toolchain selectors (e.g. +nightly) are skipped."),
-        CommandDoc::handler("rustup",
-            "Subcommands: doc, show, which. Multi-level: component list, \
-             target list, toolchain list. \
-             run <toolchain> delegates to inner command validation."),
-    ]
+    let mut cargo_doc = CARGO.to_doc();
+    cargo_doc.description.push_str(" +toolchain selectors (e.g. +nightly) are skipped.");
+    vec![cargo_doc, RUSTUP.to_doc()]
 }
-
-#[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "cargo", subs: &[
-        super::SubEntry::Policy { name: "build" },
-        super::SubEntry::Policy { name: "test" },
-        super::SubEntry::Policy { name: "check" },
-        super::SubEntry::Policy { name: "clippy" },
-        super::SubEntry::Policy { name: "bench" },
-        super::SubEntry::Policy { name: "doc" },
-        super::SubEntry::Policy { name: "tree" },
-        super::SubEntry::Policy { name: "metadata" },
-        super::SubEntry::Policy { name: "search" },
-        super::SubEntry::Policy { name: "info" },
-        super::SubEntry::Policy { name: "audit" },
-        super::SubEntry::Policy { name: "deny" },
-        super::SubEntry::Policy { name: "license" },
-        super::SubEntry::Policy { name: "locate-project" },
-        super::SubEntry::Policy { name: "pkgid" },
-        super::SubEntry::Policy { name: "read-manifest" },
-        super::SubEntry::Policy { name: "verify-project" },
-        super::SubEntry::Guarded { name: "fmt", valid_suffix: "--check" },
-        super::SubEntry::Guarded { name: "package", valid_suffix: "--list" },
-        super::SubEntry::Guarded { name: "publish", valid_suffix: "--dry-run" },
-    ]},
-    super::CommandEntry::Subcommand { cmd: "rustup", subs: &[
-        super::SubEntry::Policy { name: "show" },
-        super::SubEntry::Policy { name: "which" },
-        super::SubEntry::Policy { name: "doc" },
-        super::SubEntry::Nested { name: "component", subs: &[
-            super::SubEntry::Policy { name: "list" },
-        ]},
-        super::SubEntry::Nested { name: "target", subs: &[
-            super::SubEntry::Policy { name: "list" },
-        ]},
-        super::SubEntry::Nested { name: "toolchain", subs: &[
-            super::SubEntry::Policy { name: "list" },
-        ]},
-        super::SubEntry::Delegation { name: "run" },
-    ]},
-];
 
 #[cfg(test)]
 mod tests {
