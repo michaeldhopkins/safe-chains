@@ -638,8 +638,8 @@ static ECHO_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
 };
 
-pub fn is_safe_echo(tokens: &[Token]) -> bool {
-    policy::check(tokens, &ECHO_POLICY)
+pub fn is_safe_echo(_tokens: &[Token]) -> bool {
+    true
 }
 
 static PRINTF_POLICY: FlagPolicy = FlagPolicy {
@@ -2587,6 +2587,8 @@ mod tests {
         echo_no_newline: "echo -n hello",
         echo_escape: "echo -e 'hello\\nworld'",
         echo_bare: "echo",
+        echo_dashes: "echo ---",
+        echo_flag_like_arg: "echo --unknown hello",
 
         printf_format: "printf '%s\\n' hello",
         printf_number: "printf '%d' 42",
@@ -2633,7 +2635,6 @@ mod tests {
         iconv_output_denied: "iconv -o output.txt file",
         iconv_unknown_denied: "iconv --unknown file",
         nroff_unknown_denied: "nroff --unknown file",
-        echo_unknown_denied: "echo --unknown hello",
         printf_bare_denied: "printf",
         seq_unknown_denied: "seq --unknown 1 10",
         bc_unknown_denied: "bc --unknown",

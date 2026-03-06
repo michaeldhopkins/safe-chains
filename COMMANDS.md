@@ -94,7 +94,7 @@ Bare invocation allowed.
 
 ### `cargo`
 
-Subcommands: audit, bench, build, check, clippy, deny, doc, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. fmt (requires --check), package (requires --list), publish (requires --dry-run). +toolchain selectors (e.g. +nightly) are skipped.
+Subcommands: audit, bench, build, check, clippy, deny, doc, info, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. fmt (requires --check), package (requires --list), publish (requires --dry-run). +toolchain selectors (e.g. +nightly) are skipped.
 
 ### `cat`
 

@@ -5,7 +5,7 @@ static CARGO_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--all-features", "--all-targets", "--build-plan", "--frozen",
         "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-        "--locked", "--no-default-features", "--offline", "--release",
+        "--lib", "--locked", "--no-default-features", "--offline", "--release",
         "--timings", "--unit-graph",
     ]),
     standalone_short: b"qv",
@@ -23,7 +23,7 @@ static CARGO_TEST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--all-features", "--all-targets", "--doc", "--frozen",
         "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-        "--locked", "--no-default-features", "--no-fail-fast", "--no-run",
+        "--lib", "--locked", "--no-default-features", "--no-fail-fast", "--no-run",
         "--offline", "--release", "--timings", "--unit-graph",
     ]),
     standalone_short: b"qv",
@@ -41,7 +41,7 @@ static CARGO_CHECK_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--all-features", "--all-targets", "--frozen",
         "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-        "--locked", "--no-default-features", "--offline", "--release",
+        "--lib", "--locked", "--no-default-features", "--offline", "--release",
         "--timings", "--unit-graph",
     ]),
     standalone_short: b"qv",
@@ -59,7 +59,7 @@ static CARGO_CLIPPY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--all-features", "--all-targets", "--frozen",
         "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-        "--locked", "--no-default-features", "--no-deps", "--offline",
+        "--lib", "--locked", "--no-default-features", "--no-deps", "--offline",
         "--release", "--timings", "--unit-graph",
     ]),
     standalone_short: b"qv",
@@ -77,7 +77,7 @@ static CARGO_BENCH_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--all-features", "--all-targets", "--frozen",
         "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-        "--locked", "--no-default-features", "--no-fail-fast", "--no-run",
+        "--lib", "--locked", "--no-default-features", "--no-fail-fast", "--no-run",
         "--offline", "--release", "--timings", "--unit-graph",
     ]),
     standalone_short: b"qv",
@@ -151,6 +151,19 @@ static CARGO_SEARCH_POLICY: FlagPolicy = FlagPolicy {
     valued: WordSet::new(&[
         "--color", "--config", "--index", "--limit",
         "--registry",
+    ]),
+    valued_short: b"",
+    bare: false,
+    max_positional: None,
+};
+
+static CARGO_INFO_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--frozen", "--locked", "--offline",
+    ]),
+    standalone_short: b"qv",
+    valued: WordSet::new(&[
+        "--color", "--config", "--index", "--registry",
     ]),
     valued_short: b"",
     bare: false,
@@ -265,6 +278,7 @@ pub fn is_safe_cargo(tokens: &[Token]) -> bool {
         "tree" => policy::check(rest, &CARGO_TREE_POLICY),
         "metadata" => policy::check(rest, &CARGO_METADATA_POLICY),
         "search" => policy::check(rest, &CARGO_SEARCH_POLICY),
+        "info" => policy::check(rest, &CARGO_INFO_POLICY),
         "audit" => policy::check(rest, &CARGO_AUDIT_POLICY),
         "deny" => policy::check(rest, &CARGO_DENY_POLICY),
         "license" | "locate-project" | "pkgid" | "read-manifest" | "verify-project" => {
@@ -362,7 +376,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("cargo",
-            "Subcommands: audit, bench, build, check, clippy, deny, doc, license, \
+            "Subcommands: audit, bench, build, check, clippy, deny, doc, info, license, \
              locate-project, metadata, pkgid, read-manifest, search, test, tree, \
              verify-project. \
              fmt (requires --check), package (requires --list), \
@@ -447,6 +461,13 @@ mod tests {
         cargo_nightly_install_help: "cargo +nightly install --help",
         cargo_nightly_package_list: "cargo +nightly package --list",
         cargo_clippy_no_deps: "cargo clippy --no-deps",
+        cargo_clippy_lib: "cargo clippy --lib",
+        cargo_test_lib: "cargo test --lib",
+        cargo_check_lib: "cargo check --lib",
+        cargo_build_lib: "cargo build --lib",
+        cargo_bench_lib: "cargo bench --lib",
+        cargo_info: "cargo info serde",
+        cargo_info_registry: "cargo info serde --registry crates-io",
         rustup_show: "rustup show",
         rustup_show_installed: "rustup show --installed",
         rustup_which: "rustup which rustc",
@@ -492,6 +513,8 @@ mod tests {
         cargo_audit_unknown_denied: "cargo audit --unknown",
         cargo_deny_graph_denied: "cargo deny check --graph /tmp/out.dot",
         cargo_deny_unknown_denied: "cargo deny check --unknown",
+        cargo_info_bare_denied: "cargo info",
+        cargo_info_unknown_denied: "cargo info serde --unknown",
         cargo_clippy_fix_denied: "cargo clippy --fix",
         rustup_install_denied: "rustup install stable",
         rustup_update_denied: "rustup update",
