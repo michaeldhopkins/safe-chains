@@ -952,7 +952,9 @@ Supports `-C <dir>` prefix.
 
 ### `route`
 
-- Allowed subcommands: get, monitor, print, show. Allowed flags: -4, -6, -n, -v. Bare invocation allowed.
+- Allowed subcommands: get, monitor, print, show
+- Allowed flags: -4, -6, -n, -v
+- Bare invocation allowed
 
 ### `rustup`
 

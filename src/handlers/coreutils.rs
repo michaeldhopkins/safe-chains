@@ -2271,7 +2271,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("nslookup",
             "Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -query=, -port=, -timeout=, -retry=, -class=, -domain=, -querytype=)."),
         CommandDoc::handler("route",
-            "Allowed subcommands: get, monitor, print, show. Allowed flags: -4, -6, -n, -v. Bare invocation allowed."),
+            "- Allowed subcommands: get, monitor, print, show\n- Allowed flags: -4, -6, -n, -v\n- Bare invocation allowed"),
         CommandDoc::handler("safe-chains",
             "Any arguments allowed (safe-chains is this tool)."),
         CommandDoc::handler("sed", format!("{}\n- Inline expressions validated for safety", SED_POLICY.describe())),
