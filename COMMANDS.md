@@ -178,7 +178,11 @@ Allowed standalone flags: --complement, --only-delimited, --zero-terminated, -n,
 
 ### `date`
 
-Safe unless -s/--set flag (set system date).
+Allowed standalone flags: --rfc-2822, --rfc-email, --universal, --utc, -R, -j, -n, -u.
+
+Allowed valued flags: --date, --iso-8601, --reference, --rfc-3339, -I, -d, -f, -r, -v, -z.
+
+Bare invocation allowed.
 
 ### `defaults`
 
@@ -250,7 +254,11 @@ Bare invocation allowed.
 
 ### `echo`
 
-All arguments accepted.
+Allowed standalone flags: -E, -e, -n.
+
+Bare invocation allowed.
+
+Hyphen-prefixed positional arguments accepted.
 
 ### `env`
 
@@ -266,7 +274,7 @@ Bare invocation allowed.
 
 ### `expr`
 
-Allowed: any arguments (expr uses operators as expressions, not flags). Requires at least one argument.
+Hyphen-prefixed positional arguments accepted.
 
 ### `eza / exa`
 
@@ -286,7 +294,7 @@ Safe unless --exec/-x or --exec-batch/-X flags (execute arbitrary commands).
 
 ### `file`
 
-Safe unless -C/--compile flag (write compiled magic file).
+Allowed standalone flags: --brief, --debug, --dereference, --extension, --keep-going, --list, --mime, --mime-encoding, --mime-type, --no-buffer, --no-dereference, --no-pad, --no-sandbox, --preserve-date, --print0, --raw, --special-files, --uncompress, --uncompress-noreport, -0, -D, -I, -L, -N, -S, -b, -d, -h, -i, -k, -l, -n, -p, -r, -s, -z. Allowed valued flags: --exclude, --exclude-quiet, --files-from, --magic-file, --parameter, --separator, -F, -P, -Z, -e, -f, -m.
 
 ### `find`
 
@@ -718,7 +726,7 @@ Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, find-gen
 
 ### `sed`
 
-Read-only usage. Explicit validation of inline expressions.
+Allowed standalone flags: --debug, --posix, --quiet, --sandbox, --silent, --unbuffered, -E, -n, -r, -u, -z. Allowed valued flags: --expression, --file, --line-length, -e, -f, -l. Inline expressions validated for safety.
 
 ### `seq`
 
@@ -746,7 +754,11 @@ Positional duration arguments only.
 
 ### `sort`
 
-Safe unless -o/--output or --compress-program flag.
+Allowed standalone flags: --check, --debug, --dictionary-order, --general-numeric-sort, --human-numeric-sort, --ignore-case, --ignore-leading-blanks, --ignore-nonprinting, --merge, --month-sort, --numeric-sort, --random-sort, --reverse, --stable, --unique, --version-sort, --zero-terminated, -C, -M, -R, -V, -b, -c, -d, -f, -g, -h, -i, -m, -n, -r, -s, -u, -z.
+
+Allowed valued flags: --batch-size, --buffer-size, --field-separator, --files0-from, --key, --parallel, --random-source, --sort, --temporary-directory, -S, -T, -k, -t.
+
+Bare invocation allowed.
 
 ### `spctl`
 
@@ -818,7 +830,7 @@ logins/login (list only).
 
 ### `test`
 
-Allowed: any arguments (test uses operators like -f, -d as conditionals, not flags).
+Bare invocation allowed. Hyphen-prefixed positional arguments accepted.
 
 ### `time`
 
@@ -850,7 +862,11 @@ Allowed standalone flags: --complement, --delete, --squeeze-repeats, --truncate-
 
 ### `tree`
 
-Safe unless -o flag (write output to file).
+Allowed standalone flags: --charset, --dirsfirst, --du, --filelimit, --fromfile, --gitignore, --help, --inodes, --matchdirs, --noreport, --prune, --si, --sort, --timefmt, --version, -A, -C, -D, -F, -J, -N, -Q, -S, -X, -a, -d, -f, -g, -h, -i, -l, -n, -p, -q, -r, -s, -t, -u, -v, -x.
+
+Allowed valued flags: --filesfrom, -H, -I, -L, -P, -T.
+
+Bare invocation allowed.
 
 ### `true / false`
 
@@ -962,7 +978,7 @@ Allowed: --find, --show-sdk-*, --show-toolchain-path. Multi-level: notarytool hi
 
 ### `xmllint`
 
-Safe unless --output flag.
+Allowed standalone flags: --auto, --catalogs, --compress, --copy, --debug, --debugent, --dropdtd, --format, --html, --htmlout, --huge, --load-trace, --loaddtd, --memory, --noblanks, --nocatalogs, --nocdata, --nocompact, --nodefdtd, --noenc, --noent, --nonet, --noout, --nowarning, --nowrap, --nsclean, --oldxml10, --postvalid, --push, --pushsmall, --quiet, --recover, --repeat, --sax, --sax1, --stream, --testIO, --timing, --valid, --version, --walker, --xinclude, --xmlout. Allowed valued flags: --dtdvalid, --dtdvalidfpi, --encode, --maxmem, --path, --pattern, --pretty, --relaxng, --schema, --schematron, --xpath.
 
 ### `xxd`
 
@@ -978,5 +994,5 @@ Subcommands: info, list, ls, test, test:*, why.
 
 ### `yq`
 
-Safe unless -i/--inplace flag.
+Allowed standalone flags: --colors, --exit-status, --help, --no-colors, --no-doc, --null-input, --prettyPrint, --version, -C, -M, -N, -P, -e, -r. Allowed valued flags: --arg, --argjson, --expression, --front-matter, --indent, --input-format, --output-format, -I, -p.
 
