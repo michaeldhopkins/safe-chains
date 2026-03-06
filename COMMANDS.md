@@ -294,7 +294,7 @@ Safe unless --exec/-x or --exec-batch/-X flags (execute arbitrary commands).
 
 ### `file`
 
-Allowed standalone flags: --brief, --debug, --dereference, --extension, --keep-going, --list, --mime, --mime-encoding, --mime-type, --no-buffer, --no-dereference, --no-pad, --no-sandbox, --preserve-date, --print0, --raw, --special-files, --uncompress, --uncompress-noreport, -0, -D, -I, -L, -N, -S, -b, -d, -h, -i, -k, -l, -n, -p, -r, -s, -z. Allowed valued flags: --exclude, --exclude-quiet, --files-from, --magic-file, --parameter, --separator, -F, -P, -Z, -e, -f, -m.
+Allowed standalone flags: --brief, --debug, --dereference, --extension, --keep-going, --list, --mime, --mime-encoding, --mime-type, --no-buffer, --no-dereference, --no-pad, --no-sandbox, --preserve-date, --print0, --raw, --special-files, --uncompress, --uncompress-noreport, -0, -D, -I, -L, -N, -S, -Z, -b, -d, -h, -i, -k, -l, -n, -p, -r, -s, -z. Allowed valued flags: --exclude, --exclude-quiet, --files-from, --magic-file, --parameter, --separator, -F, -P, -e, -f, -m.
 
 ### `find`
 
@@ -862,9 +862,9 @@ Allowed standalone flags: --complement, --delete, --squeeze-repeats, --truncate-
 
 ### `tree`
 
-Allowed standalone flags: --charset, --dirsfirst, --du, --filelimit, --fromfile, --gitignore, --help, --inodes, --matchdirs, --noreport, --prune, --si, --sort, --timefmt, --version, -A, -C, -D, -F, -J, -N, -Q, -S, -X, -a, -d, -f, -g, -h, -i, -l, -n, -p, -q, -r, -s, -t, -u, -v, -x.
+Allowed standalone flags: --dirsfirst, --du, --fromfile, --gitignore, --help, --inodes, --matchdirs, --noreport, --prune, --si, --version, -A, -C, -D, -F, -J, -N, -Q, -S, -X, -a, -d, -f, -g, -h, -i, -l, -n, -p, -q, -r, -s, -t, -u, -v, -x.
 
-Allowed valued flags: --filesfrom, -H, -I, -L, -P, -T.
+Allowed valued flags: --charset, --filelimit, --filesfrom, --sort, --timefmt, -H, -I, -L, -P, -T.
 
 Bare invocation allowed.
 
