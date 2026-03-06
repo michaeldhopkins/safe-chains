@@ -2259,7 +2259,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("arch",
             "Bare invocation allowed."),
         CommandDoc::handler("awk / gawk / mawk / nawk",
-            format!("Program validated: system, getline, |, > constructs checked. {}", AWK_POLICY.describe())),
+            format!("- Program validated: system, getline, |, > constructs checked\n{}", AWK_POLICY.describe())),
         CommandDoc::handler("command",
             "Allowed: -v, -V (check if command exists)."),
         CommandDoc::handler("fd",
@@ -2274,7 +2274,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             "Allowed subcommands: get, monitor, print, show. Allowed flags: -4, -6, -n, -v. Bare invocation allowed."),
         CommandDoc::handler("safe-chains",
             "Any arguments allowed (safe-chains is this tool)."),
-        CommandDoc::handler("sed", format!("{} Inline expressions validated for safety.", SED_POLICY.describe())),
+        CommandDoc::handler("sed", format!("{}\n- Inline expressions validated for safety", SED_POLICY.describe())),
     ]);
     docs
 }

@@ -18,27 +18,26 @@ pub struct FlagPolicy {
 
 impl FlagPolicy {
     pub fn describe(&self) -> String {
-        use crate::docs::{wordset_items, DocBuilder};
-        let mut builder = DocBuilder::new();
+        use crate::docs::wordset_items;
+        let mut lines = Vec::new();
         let standalone = wordset_items(&self.standalone);
         if !standalone.is_empty() {
-            builder = builder.section(format!("Allowed standalone flags: {standalone}."));
+            lines.push(format!("- Allowed standalone flags: {standalone}"));
         }
         let valued = wordset_items(&self.valued);
         if !valued.is_empty() {
-            builder = builder.section(format!("Allowed valued flags: {valued}."));
+            lines.push(format!("- Allowed valued flags: {valued}"));
         }
         if self.bare {
-            builder = builder.section("Bare invocation allowed.".to_string());
+            lines.push("- Bare invocation allowed".to_string());
         }
         if self.flag_style == FlagStyle::Positional {
-            builder = builder.section("Hyphen-prefixed positional arguments accepted.".to_string());
+            lines.push("- Hyphen-prefixed positional arguments accepted".to_string());
         }
-        let result = builder.build();
-        if result.is_empty() && !self.bare {
-            return "Positional arguments only.".to_string();
+        if lines.is_empty() && !self.bare {
+            return "- Positional arguments only".to_string();
         }
-        result
+        lines.join("\n")
     }
 
     pub fn flag_summary(&self) -> String {

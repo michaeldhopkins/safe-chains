@@ -13,7 +13,19 @@ pub enum DocKind {
 
 impl CommandDoc {
     pub fn handler(name: &'static str, description: impl Into<String>) -> Self {
-        Self { name, kind: DocKind::Handler, description: description.into() }
+        let raw = description.into();
+        let description = raw
+            .lines()
+            .map(|line| {
+                if line.is_empty() || line.starts_with("- ") {
+                    line.to_string()
+                } else {
+                    format!("- {line}")
+                }
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+        Self { name, kind: DocKind::Handler, description }
     }
 
     pub fn wordset(name: &'static str, words: &WordSet) -> Self {
@@ -82,21 +94,23 @@ impl DocBuilder {
     }
 
     pub fn build(self) -> String {
-        let mut all_sections = Vec::new();
+        let mut lines = Vec::new();
         if !self.subcommands.is_empty() {
             let mut subs = self.subcommands;
             subs.sort();
-            all_sections.push(format!("Subcommands: {}.", subs.join(", ")));
+            lines.push(format!("- Subcommands: {}", subs.join(", ")));
         }
         if !self.flags.is_empty() {
-            all_sections.push(format!("Flags: {}.", self.flags.join(", ")));
+            lines.push(format!("- Flags: {}", self.flags.join(", ")));
         }
-        all_sections.extend(self.sections);
-        if all_sections.len() > 2 {
-            all_sections.join("\n\n")
-        } else {
-            all_sections.join(" ")
+        for s in self.sections {
+            if s.starts_with("- ") {
+                lines.push(s);
+            } else {
+                lines.push(format!("- {s}"));
+            }
         }
+        lines.join("\n")
     }
 }
 
@@ -144,29 +158,29 @@ mod tests {
     use super::*;
 
     #[test]
-    fn builder_two_sections_inline() {
+    fn builder_two_sections() {
         let ws = WordSet::new(&["--version", "list", "show"]);
-        assert_eq!(doc(&ws).build(), "Subcommands: list, show. Flags: --version.");
+        assert_eq!(doc(&ws).build(), "- Subcommands: list, show\n- Flags: --version");
     }
 
     #[test]
     fn builder_subcommands_only() {
         let ws = WordSet::new(&["list", "show"]);
-        assert_eq!(doc(&ws).build(), "Subcommands: list, show.");
+        assert_eq!(doc(&ws).build(), "- Subcommands: list, show");
     }
 
     #[test]
     fn builder_flags_only() {
         let ws = WordSet::new(&["--check", "--version"]);
-        assert_eq!(doc(&ws).build(), "Flags: --check, --version.");
+        assert_eq!(doc(&ws).build(), "- Flags: --check, --version");
     }
 
     #[test]
-    fn builder_three_sections_newlines() {
+    fn builder_three_sections() {
         let ws = WordSet::new(&["--version", "list", "show"]);
         assert_eq!(
             doc(&ws).section("Guarded: foo (bar only).").build(),
-            "Subcommands: list, show.\n\nFlags: --version.\n\nGuarded: foo (bar only)."
+            "- Subcommands: list, show\n- Flags: --version\n- Guarded: foo (bar only)."
         );
     }
 
@@ -177,7 +191,7 @@ mod tests {
             &[("config", WordSet::new(&["get", "list"]))];
         assert_eq!(
             doc_multi(&ws, multi).build(),
-            "Subcommands: config get, config list, info, show. Flags: --version."
+            "- Subcommands: config get, config list, info, show\n- Flags: --version"
         );
     }
 
@@ -188,16 +202,16 @@ mod tests {
             &[("config", WordSet::new(&["get", "list"]))];
         assert_eq!(
             doc_multi(&ws, multi).section("Guarded: foo.").build(),
-            "Subcommands: config get, config list, show.\n\nFlags: --version.\n\nGuarded: foo."
+            "- Subcommands: config get, config list, show\n- Flags: --version\n- Guarded: foo."
         );
     }
 
     #[test]
-    fn builder_no_flags_with_extra_stays_inline() {
+    fn builder_no_flags_with_extra() {
         let ws = WordSet::new(&["list", "show"]);
         assert_eq!(
             doc(&ws).section("Also: foo.").build(),
-            "Subcommands: list, show. Also: foo."
+            "- Subcommands: list, show\n- Also: foo."
         );
     }
 
@@ -209,7 +223,7 @@ mod tests {
                 .section("Always safe: bar.")
                 .section("Guarded: baz.")
                 .build(),
-            "Read-only: foo.\n\nAlways safe: bar.\n\nGuarded: baz."
+            "- Read-only: foo.\n- Always safe: bar.\n- Guarded: baz."
         );
     }
 
@@ -220,7 +234,7 @@ mod tests {
             &[("git", "remote", WordSet::new(&["list"]))];
         assert_eq!(
             doc(&ws).triple_word(triples).build(),
-            "Subcommands: diff, git remote list. Flags: --version."
+            "- Subcommands: diff, git remote list\n- Flags: --version"
         );
     }
 
@@ -229,7 +243,7 @@ mod tests {
         let ws = WordSet::new(&["--version", "list"]);
         assert_eq!(
             doc(&ws).subcommand("plugin-list").build(),
-            "Subcommands: list, plugin-list. Flags: --version."
+            "- Subcommands: list, plugin-list\n- Flags: --version"
         );
     }
 

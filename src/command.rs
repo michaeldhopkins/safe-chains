@@ -115,7 +115,7 @@ impl CommandDef {
         let mut lines = Vec::new();
 
         if !self.bare_flags.is_empty() {
-            lines.push(format!("Info flags: {}.", self.bare_flags.join(", ")));
+            lines.push(format!("- Info flags: {}", self.bare_flags.join(", ")));
         }
 
         let mut sub_lines: Vec<String> = Vec::new();
@@ -546,7 +546,7 @@ mod tests {
         assert_eq!(doc.name, "mycmd");
         assert_eq!(
             doc.description,
-            "Info flags: --info.\n- **build**: Flags: --verbose. Valued: --output"
+            "- Info flags: --info\n- **build**: Flags: --verbose. Valued: --output"
         );
     }
 
