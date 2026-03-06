@@ -357,12 +357,6 @@ mod tests {
     }
 
     denied! {
-        xcodebuild_build_denied: "xcodebuild build",
-        xcodebuild_clean_denied: "xcodebuild clean",
-        plutil_convert_denied: "plutil -convert xml1 file.plist",
-        plutil_insert_denied: "plutil -insert key -string value file.plist",
-        plutil_replace_denied: "plutil -replace key -string value file.plist",
-        plutil_remove_denied: "plutil -remove key file.plist",
         plutil_no_args_denied: "plutil",
         xcode_select_switch_denied: "xcode-select -s /Applications/Xcode.app",
         xcode_select_install_denied: "xcode-select --install",

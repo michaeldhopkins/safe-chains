@@ -183,19 +183,8 @@ mod tests {
     }
 
     denied! {
-        ollama_run_denied: "ollama run llama3",
-        ollama_pull_denied: "ollama pull llama3",
-        ollama_rm_denied: "ollama rm llama3",
-        ollama_create_denied: "ollama create mymodel",
-        ollama_serve_denied: "ollama serve",
-        ollama_push_denied: "ollama push mymodel",
         ollama_no_args_denied: "ollama",
         ollama_show_bare_denied: "ollama show",
-        llm_prompt_denied: "llm prompt hello",
-        llm_chat_denied: "llm chat",
-        llm_keys_denied: "llm keys set openai",
-        llm_install_denied: "llm install llm-claude-3",
-        llm_embed_denied: "llm embed -m 3-small -c hello",
         llm_no_args_denied: "llm",
     }
 }

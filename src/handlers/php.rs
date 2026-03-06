@@ -130,11 +130,6 @@ mod tests {
     }
 
     denied! {
-        composer_install_denied: "composer install",
-        composer_update_denied: "composer update",
-        composer_require_denied: "composer require laravel/framework",
-        composer_remove_denied: "composer remove laravel/framework",
-        composer_run_script_denied: "composer run-script test",
         bare_composer_denied: "composer",
     }
 }

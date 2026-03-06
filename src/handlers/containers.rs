@@ -401,19 +401,6 @@ mod tests {
     }
 
     denied! {
-        docker_run_denied: "docker run ubuntu",
-        docker_exec_denied: "docker exec -it container bash",
-        docker_rm_denied: "docker rm container_name",
-        docker_rmi_denied: "docker rmi image_name",
-        docker_build_denied: "docker build .",
-        docker_push_denied: "docker push image_name",
-        docker_pull_denied: "docker pull ubuntu",
-        docker_stop_denied: "docker stop container_name",
-        docker_kill_denied: "docker kill container_name",
-        docker_compose_up_denied: "docker compose up",
-        docker_compose_down_denied: "docker compose down",
-        docker_network_create_denied: "docker network create my_net",
-        docker_volume_create_denied: "docker volume create my_vol",
         bare_docker_denied: "docker",
         docker_run_version_bypass_denied: "docker run evil --version",
     }

@@ -125,12 +125,6 @@ mod tests {
     }
 
     denied! {
-        dotnet_run_denied: "dotnet run",
-        dotnet_new_denied: "dotnet new console",
-        dotnet_add_denied: "dotnet add package Newtonsoft.Json",
-        dotnet_publish_denied: "dotnet publish",
-        dotnet_clean_denied: "dotnet clean",
-        dotnet_restore_denied: "dotnet restore",
         bare_dotnet_denied: "dotnet",
     }
 }

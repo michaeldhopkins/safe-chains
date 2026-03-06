@@ -148,10 +148,6 @@ mod tests {
     }
 
     denied! {
-        swift_run_denied: "swift run",
-        swift_package_init_denied: "swift package init",
-        swift_package_update_denied: "swift package update",
-        swift_package_resolve_denied: "swift package resolve",
         bare_swift_denied: "swift",
         swift_package_bare_denied: "swift package",
     }

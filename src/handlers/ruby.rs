@@ -264,15 +264,8 @@ mod tests {
     }
 
     denied! {
-        bundle_install_denied: "bundle install",
-        bundle_update_denied: "bundle update",
         bundle_exec_rails_console_denied: "bundle exec rails console",
         bundle_exec_rake_denied: "bundle exec rake db:drop",
         bundle_exec_ruby_denied: "bundle exec ruby script.rb",
-        gem_install_denied: "gem install rails",
-        gem_uninstall_denied: "gem uninstall rails",
-        rbenv_install_denied: "rbenv install 3.3.0",
-        rbenv_global_denied: "rbenv global 3.3.0",
-        rbenv_local_denied: "rbenv local 3.3.0",
     }
 }

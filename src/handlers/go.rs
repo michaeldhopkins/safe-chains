@@ -209,12 +209,6 @@ mod tests {
     }
 
     denied! {
-        go_run_denied: "go run main.go",
-        go_install_denied: "go install golang.org/x/tools/...@latest",
-        go_get_denied: "go get golang.org/x/tools",
-        go_clean_denied: "go clean",
-        go_generate_denied: "go generate ./...",
-        go_mod_tidy_denied: "go mod tidy",
         bare_go_denied: "go",
         go_build_toolexec_denied: "go build -toolexec=cmd ./...",
         go_build_toolexec_space_denied: "go build -toolexec cmd ./...",

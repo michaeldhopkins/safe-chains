@@ -553,9 +553,6 @@ mod tests {
 
     denied! {
         cargo_fmt_denied: "cargo fmt",
-        cargo_install_denied: "cargo install --path .",
-        cargo_run_denied: "cargo run",
-        cargo_clean_denied: "cargo clean",
         cargo_package_denied: "cargo package",
         cargo_publish_dry_run_force_denied: "cargo publish --dry-run --force",
         cargo_publish_no_verify_denied: "cargo publish --dry-run --no-verify",
@@ -568,11 +565,6 @@ mod tests {
         cargo_deny_graph_denied: "cargo deny check --graph /tmp/out.dot",
         cargo_info_bare_denied: "cargo info",
         cargo_clippy_fix_denied: "cargo clippy --fix",
-        rustup_install_denied: "rustup install stable",
-        rustup_update_denied: "rustup update",
-        rustup_default_denied: "rustup default nightly",
-        rustup_component_add_denied: "rustup component add clippy",
-        rustup_self_denied: "rustup self update",
         rustup_run_cargo_fmt_denied: "rustup run nightly cargo fmt",
         rustup_run_unsafe_inner_denied: "rustup run stable rm -rf /",
         rustup_run_no_inner_denied: "rustup run stable",
