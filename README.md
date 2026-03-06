@@ -104,7 +104,7 @@ safe-chains "rm -rf /"            # exit 1 = unsafe
 
 safe-chains knows 130+ read-only commands (`grep`, `cat`, `ls`, `jq`, ...) that are always safe with any arguments. For 50+ additional tools (`git`, `cargo`, `npm`, `docker`, ...), it validates specific subcommands and flags—allowing `git log` but not `git push`, allowing `sed 's/foo/bar/'` but not `sed -i`.
 
-Commands containing shell operators (`&&`, `|`, `;`) are split into segments, and each segment is validated independently. Segments containing output redirection (`>`), input redirection (`<`), backticks, or command substitution (`$(...)`) are always rejected.
+Commands containing shell operators (`&&`, `|`, `;`) are split into segments. Shell compound commands (`for`/`while`/`until` loops and `if`/`elif`/`else` conditionals) are parsed into an AST and each leaf command is validated recursively, supporting arbitrary nesting depth. Simple segments are validated independently. Segments containing output redirection (`>`), input redirection (`<`), backticks, or command substitution (`$(...)`) are always rejected.
 
 Found a safe command safe-chains should support? [Submit an issue.](https://github.com/michaeldhopkins/safe-chains/issues/new?template=command-request.yml)
 
@@ -137,6 +137,16 @@ Missing, unreadable, or malformed settings files are silently skipped—fewer pa
 Broad patterns like `Bash(bash *)` will approve nested commands without recursive validation. If you have `Bash(bash *)` in your settings and a segment is `bash -c "safe-cmd && evil-cmd"`, the settings match takes precedence over the built-in shell handler's recursive check. This matches Claude Code's own behavior for approved patterns.
 
 When matching allowed commands from settings, `safe-chains` splits first, then matches each segment in isolation, so `*`/`:*` doesn't leak.
+
+### Tip: prefer CLI tools over Python
+
+With compound command support, most commands that trigger approval prompts will be `python3` invocations. Consider instructing Claude to prefer safe CLI tools (`jq`, `grep`, `awk`, `sed`, `sort`, `curl`, etc.) over `python3` for data processing. Add something like this to your project's `CLAUDE.md`:
+
+```
+Prefer CLI tools (jq, grep, awk, sed, sort, curl) over python3 for data processing.
+```
+
+This reduces approval prompts without weakening security—when `python3` does come up for approval, it's more likely to be something worth paying attention to.
 
 ## Developing
 
