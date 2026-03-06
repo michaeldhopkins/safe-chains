@@ -15,7 +15,7 @@ static MDFIND_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "mdfind", policy: &MDFIND_POLICY, help_eligible: false },
+    FlatDef { name: "mdfind", policy: &MDFIND_POLICY, help_eligible: false, url: "https://ss64.com/mac/mdfind.html" },
 ];
 
 #[cfg(test)]

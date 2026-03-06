@@ -33,6 +33,7 @@ pub(crate) static DEFAULTS: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://ss64.com/mac/defaults.html",
 };
 
 #[cfg(test)]

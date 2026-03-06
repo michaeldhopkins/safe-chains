@@ -16,7 +16,7 @@ static SYSTEM_PROFILER_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "system_profiler", policy: &SYSTEM_PROFILER_POLICY, help_eligible: false },
+    FlatDef { name: "system_profiler", policy: &SYSTEM_PROFILER_POLICY, help_eligible: false, url: "https://ss64.com/mac/system_profiler.html" },
 ];
 
 #[cfg(test)]

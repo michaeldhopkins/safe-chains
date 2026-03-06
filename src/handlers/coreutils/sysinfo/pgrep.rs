@@ -24,7 +24,7 @@ static PGREP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "pgrep", policy: &PGREP_POLICY, help_eligible: false },
+    FlatDef { name: "pgrep", policy: &PGREP_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/pgrep.1.html" },
 ];
 
 #[cfg(test)]

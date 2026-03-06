@@ -21,7 +21,7 @@ static UNIQ_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "uniq", policy: &UNIQ_POLICY, help_eligible: false },
+    FlatDef { name: "uniq", policy: &UNIQ_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#uniq-invocation" },
 ];
 
 #[cfg(test)]

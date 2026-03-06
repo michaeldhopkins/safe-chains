@@ -24,6 +24,7 @@ pub(crate) static RBENV: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://github.com/rbenv/rbenv#readme",
 };
 
 #[cfg(test)]

@@ -19,7 +19,7 @@ static PASTE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "paste", policy: &PASTE_POLICY, help_eligible: false },
+    FlatDef { name: "paste", policy: &PASTE_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#paste-invocation" },
 ];
 
 #[cfg(test)]

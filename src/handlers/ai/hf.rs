@@ -121,6 +121,7 @@ pub(crate) static HF: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://huggingface.co/docs/huggingface_hub/guides/cli",
 };
 
 #[cfg(test)]

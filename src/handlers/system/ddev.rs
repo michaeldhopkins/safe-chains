@@ -79,6 +79,7 @@ pub(crate) static DDEV: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://ddev.readthedocs.io/en/stable/users/usage/commands/",
 };
 
 #[cfg(test)]

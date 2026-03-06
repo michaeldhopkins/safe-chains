@@ -30,6 +30,7 @@ pub(crate) static LAUNCHCTL: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://ss64.com/mac/launchctl.html",
 };
 
 #[cfg(test)]

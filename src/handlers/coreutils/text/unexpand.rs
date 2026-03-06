@@ -19,7 +19,7 @@ static UNEXPAND_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "unexpand", policy: &UNEXPAND_POLICY, help_eligible: false },
+    FlatDef { name: "unexpand", policy: &UNEXPAND_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#unexpand-invocation" },
 ];
 
 #[cfg(test)]

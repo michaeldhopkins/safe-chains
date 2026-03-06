@@ -26,7 +26,7 @@ static DU_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "du", policy: &DU_POLICY, help_eligible: false },
+    FlatDef { name: "du", policy: &DU_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation" },
 ];
 
 #[cfg(test)]

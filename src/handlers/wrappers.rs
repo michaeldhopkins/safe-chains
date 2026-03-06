@@ -134,14 +134,19 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("env",
+            "https://www.gnu.org/software/coreutils/manual/coreutils.html#env-invocation",
             "Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed."),
         CommandDoc::handler("timeout",
+            "https://www.gnu.org/software/coreutils/manual/coreutils.html#timeout-invocation",
             "Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recursively validates the inner command."),
         CommandDoc::handler("time",
+            "https://man7.org/linux/man-pages/man1/time.1.html",
             "Skips -p flag, then recursively validates the inner command."),
         CommandDoc::handler("hyperfine",
+            "https://github.com/sharkdp/hyperfine#readme",
             "Recursively validates each benchmarked command."),
         CommandDoc::handler("nice / ionice",
+            "https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation",
             "Skips priority flags (-n/--adjustment), then recursively validates the inner command."),
     ]
 }

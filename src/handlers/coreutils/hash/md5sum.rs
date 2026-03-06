@@ -18,10 +18,10 @@ static GNU_HASH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "md5sum", policy: &GNU_HASH_POLICY, help_eligible: false },
-    FlatDef { name: "sha1sum", policy: &GNU_HASH_POLICY, help_eligible: false },
-    FlatDef { name: "sha256sum", policy: &GNU_HASH_POLICY, help_eligible: false },
-    FlatDef { name: "sha512sum", policy: &GNU_HASH_POLICY, help_eligible: false },
+    FlatDef { name: "md5sum", policy: &GNU_HASH_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#md5sum-invocation" },
+    FlatDef { name: "sha1sum", policy: &GNU_HASH_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha1sum-invocation" },
+    FlatDef { name: "sha256sum", policy: &GNU_HASH_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities" },
+    FlatDef { name: "sha512sum", policy: &GNU_HASH_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities" },
 ];
 
 #[cfg(test)]

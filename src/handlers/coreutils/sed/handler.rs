@@ -99,7 +99,7 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_
 
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
-        crate::docs::CommandDoc::handler("sed", format!("{}\n- Inline expressions validated for safety", SED_POLICY.describe())),
+        crate::docs::CommandDoc::handler("sed", "https://www.gnu.org/software/sed/manual/sed.html", format!("{}\n- Inline expressions validated for safety", SED_POLICY.describe())),
     ]
 }
 

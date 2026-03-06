@@ -30,7 +30,7 @@ static XMLLINT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "xmllint", policy: &XMLLINT_POLICY, help_eligible: true },
+    FlatDef { name: "xmllint", policy: &XMLLINT_POLICY, help_eligible: true, url: "https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html" },
 ];
 
 #[cfg(test)]

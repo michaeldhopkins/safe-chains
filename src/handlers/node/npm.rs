@@ -96,6 +96,7 @@ pub(crate) static NPM: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://docs.npmjs.com/cli",
 };
 
 #[cfg(test)]

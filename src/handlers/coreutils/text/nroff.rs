@@ -17,7 +17,7 @@ static NROFF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "nroff", policy: &NROFF_POLICY, help_eligible: false },
+    FlatDef { name: "nroff", policy: &NROFF_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/nroff.1.html" },
 ];
 
 #[cfg(test)]

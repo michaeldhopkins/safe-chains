@@ -70,6 +70,7 @@ pub(crate) static PIP: CommandDef = CommandDef {
     subs: PIP_SUBS,
     bare_flags: &[],
     help_eligible: true,
+    url: "https://pip.pypa.io/en/stable/cli/",
 };
 
 pub(crate) static PIP3: CommandDef = CommandDef {
@@ -77,6 +78,7 @@ pub(crate) static PIP3: CommandDef = CommandDef {
     subs: PIP_SUBS,
     bare_flags: &[],
     help_eligible: true,
+    url: "https://pip.pypa.io/en/stable/cli/",
 };
 
 pub(in crate::handlers::python) fn command_docs() -> Vec<crate::docs::CommandDoc> {

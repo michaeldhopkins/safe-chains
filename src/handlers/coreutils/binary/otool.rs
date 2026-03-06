@@ -16,7 +16,7 @@ static OTOOL_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "otool", policy: &OTOOL_POLICY, help_eligible: false },
+    FlatDef { name: "otool", policy: &OTOOL_POLICY, help_eligible: false, url: "https://ss64.com/mac/otool.html" },
 ];
 
 #[cfg(test)]

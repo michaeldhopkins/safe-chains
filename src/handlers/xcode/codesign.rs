@@ -37,6 +37,7 @@ pub(in crate::handlers::xcode) fn command_docs() -> Vec<crate::docs::CommandDoc>
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("codesign",
+            "https://ss64.com/mac/codesign.html",
             "Requires --display/-d or --verify/-v."),
     ]
 }

@@ -18,7 +18,7 @@ static IOREG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ioreg", policy: &IOREG_POLICY, help_eligible: false },
+    FlatDef { name: "ioreg", policy: &IOREG_POLICY, help_eligible: false, url: "https://ss64.com/mac/ioreg.html" },
 ];
 
 #[cfg(test)]

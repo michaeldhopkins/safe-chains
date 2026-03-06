@@ -13,7 +13,7 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_
 
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
-        crate::docs::CommandDoc::handler("arch", "Bare invocation allowed."),
+        crate::docs::CommandDoc::handler("arch", "https://www.gnu.org/software/coreutils/manual/coreutils.html#arch-invocation", "Bare invocation allowed."),
     ]
 }
 

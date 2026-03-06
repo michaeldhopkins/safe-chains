@@ -13,7 +13,7 @@ static WHEREIS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "whereis", policy: &WHEREIS_POLICY, help_eligible: false },
+    FlatDef { name: "whereis", policy: &WHEREIS_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/whereis.1.html" },
 ];
 
 #[cfg(test)]

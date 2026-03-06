@@ -21,6 +21,7 @@ pub(crate) static CSRUTIL: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://ss64.com/mac/csrutil.html",
 };
 
 #[cfg(test)]

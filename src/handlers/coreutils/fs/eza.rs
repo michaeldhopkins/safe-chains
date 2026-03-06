@@ -35,8 +35,8 @@ static EZA_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "exa", policy: &EZA_POLICY, help_eligible: false },
-    FlatDef { name: "eza", policy: &EZA_POLICY, help_eligible: false },
+    FlatDef { name: "exa", policy: &EZA_POLICY, help_eligible: false, url: "https://eza.rocks/" },
+    FlatDef { name: "eza", policy: &EZA_POLICY, help_eligible: false, url: "https://eza.rocks/" },
 ];
 
 #[cfg(test)]

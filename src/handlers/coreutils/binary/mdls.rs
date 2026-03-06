@@ -13,7 +13,7 @@ static MDLS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "mdls", policy: &MDLS_POLICY, help_eligible: false },
+    FlatDef { name: "mdls", policy: &MDLS_POLICY, help_eligible: false, url: "https://ss64.com/mac/mdls.html" },
 ];
 
 #[cfg(test)]

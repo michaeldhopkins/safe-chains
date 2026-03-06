@@ -8,21 +8,21 @@ Any command with only `--version` or `--help` as its sole argument is always all
 
 These commands are allowed with specific subcommands or flags.
 
-### `R`
+### `R` (https://cran.r-project.org/manuals.html)
 
 - CMD check <package> (with --as-cran, --no-tests, --no-examples, --no-vignettes, --no-build-vignettes, --no-manual, --output)
 - CMD config <var>
 
-### `Rscript`
+### `Rscript` (https://cran.r-project.org/manuals.html)
 
 - --version
 - --help
 
-### `arch`
+### `arch` (https://www.gnu.org/software/coreutils/manual/coreutils.html#arch-invocation)
 
 - Bare invocation allowed.
 
-### `asdf`
+### `asdf` (https://asdf-vm.com/manage/commands.html)
 
 - **current**
 - **help**
@@ -34,50 +34,50 @@ These commands are allowed with specific subcommands or flags.
 - **version**
 - **which**
 
-### `awk / gawk / mawk / nawk`
+### `awk / gawk / mawk / nawk` (https://www.gnu.org/software/gawk/manual/gawk.html)
 
 - Program validated: system, getline, |, > constructs checked
 - Allowed standalone flags: --characters-as-bytes, --copyright, --gen-pot, --lint, --no-optimize, --optimize, --posix, --re-interval, --sandbox, --traditional, --use-lc-numeric, --version, -C, -N, -O, -P, -S, -V, -b, -c, -g, -r, -s, -t
 - Allowed valued flags: --assign, --field-separator, -F, -v
 
-### `b2sum`
+### `b2sum` (https://www.gnu.org/software/coreutils/manual/coreutils.html#b2sum-invocation)
 
 - Allowed standalone flags: --binary, --check, --ignore-missing, --quiet, --status, --strict, --tag, --text, --warn, --zero, -b, -c, -t, -w, -z
 - Allowed valued flags: --length, -l
 - Bare invocation allowed
 
-### `base64`
+### `base64` (https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation)
 
 - Allowed standalone flags: --decode, --ignore-garbage, -D, -d, -i
 - Allowed valued flags: --wrap, -b, -w
 - Bare invocation allowed
 
-### `basename`
+### `basename` (https://www.gnu.org/software/coreutils/manual/coreutils.html#basename-invocation)
 
 - Allowed standalone flags: --multiple, --zero, -a, -z
 - Allowed valued flags: --suffix, -s
 
-### `bash / sh`
+### `bash / sh` (https://www.gnu.org/software/bash/manual/bash.html)
 
 - Allowed: --version, --help, `bash -c` / `sh -c` with a safe inner command.
 
-### `bat`
+### `bat` (https://github.com/sharkdp/bat#readme)
 
 - Allowed standalone flags: --diff, --list-languages, --list-themes, --no-config, --number, --plain, --show-all, -A, -P, -d, -n, -p, -u
 - Allowed valued flags: --color, --decorations, --diff-context, --file-name, --highlight-line, --italic-text, --language, --line-range, --map-syntax, --paging, --style, --tabs, --terminal-width, --theme, --wrap, -H, -l, -m, -r
 - Bare invocation allowed
 
-### `bc`
+### `bc` (https://www.gnu.org/software/bc/manual/html_mono/bc.html)
 
 - Allowed standalone flags: --digit-clamp, --global-stacks, --interactive, --mathlib, --no-digit-clamp, --no-line-length, --no-prompt, --no-read-prompt, --quiet, --standard, --warn, -C, -P, -R, -c, -g, -i, -l, -q, -s, -w
 - Allowed valued flags: --expression, --file, --ibase, --obase, --redefine, --scale, --seed, -E, -I, -O, -S, -e, -f, -r
 - Bare invocation allowed
 
-### `branchdiff`
+### `branchdiff` (https://github.com/nickolasburr/branchdiff#readme)
 
 - Bare invocation allowed
 
-### `brew`
+### `brew` (https://docs.brew.sh/Manpage)
 
 - **--prefix**
 - **abv**: Flags: --analytics, --cask, --formula, --installed, --json. Valued: --days
@@ -100,7 +100,7 @@ These commands are allowed with specific subcommands or flags.
 - **tap**
 - **uses**: Flags: --cask, --formula, --include-build, --include-optional, --include-test, --installed, --missing, --recursive, --skip-recommended
 
-### `bun`
+### `bun` (https://bun.sh/docs/cli)
 
 - **outdated**
 - **pm bin**
@@ -110,7 +110,7 @@ These commands are allowed with specific subcommands or flags.
 - **test**: Flags: --bail, --only, --rerun-each, --todo. Valued: --preload, --timeout
 - **x**: x delegates to bunx logic.
 
-### `bundle`
+### `bundle` (https://bundler.io/man/bundle.1.html)
 
 - **check**: Flags: --dry-run. Valued: --gemfile, --path
 - **exec**: exec allowed for: brakeman, cucumber, erb_lint, herb, rspec, standardrb.
@@ -118,19 +118,19 @@ These commands are allowed with specific subcommands or flags.
 - **list**: Flags: --name-only, --paths
 - **show**: Flags: --paths
 
-### `bunx`
+### `bunx` (https://bun.sh/docs/cli/bunx)
 
 - Allowed packages: @herb-tools/linter, eslint, karma.
 - tsc allowed with --noEmit.
 - Skips flags: --bun/--no-install/--package/-p.
 
-### `cal`
+### `cal` (https://man7.org/linux/man-pages/man1/cal.1.html)
 
 - Allowed standalone flags: --monday, --sunday, --three, --year, -1, -3, -h, -j, -m, -s, -w, -y
 - Allowed valued flags: -A, -B, -d, -n
 - Bare invocation allowed
 
-### `cargo`
+### `cargo` (https://doc.rust-lang.org/cargo/commands/)
 
 - **audit**: Flags: --deny, --json, --no-fetch, --stale. Valued: --color, --db, --file, --ignore, --target-arch, --target-os
 - **bench**: Flags: --all-features, --all-targets, --frozen, --future-incompat-report, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --timings, --unit-graph. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test
@@ -155,62 +155,62 @@ These commands are allowed with specific subcommands or flags.
 
 +toolchain selectors (e.g. +nightly) are skipped.
 
-### `cat`
+### `cat` (https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation)
 
 - Allowed standalone flags: --number, --number-nonblank, --show-all, --show-ends, --show-nonprinting, --show-tabs, --squeeze-blank, -A, -E, -T, -b, -e, -l, -n, -s, -t, -u, -v
 - Bare invocation allowed
 
-### `cd`
+### `cd` (https://man7.org/linux/man-pages/man1/cd.1p.html)
 
 - Allowed standalone flags: -L, -P, -e
 - Bare invocation allowed
 
-### `cksum`
+### `cksum` (https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation)
 
 - Allowed standalone flags: --base64, --check, --raw, --strict, --tag, --untagged, --warn, --zero, -c, -w, -z
 - Allowed valued flags: --algorithm, --length, -a, -l
 - Bare invocation allowed
 
-### `cloc`
+### `cloc` (https://github.com/AlDanial/cloc#readme)
 
 - Allowed standalone flags: --3, --autoconf, --by-file, --by-file-by-lang, --by-percent, --categorized, --counted, --diff, --diff-list-file, --docstring-as-code, --follow-links, --force-lang-def, --found-langs, --git, --hide-rate, --ignored, --include-content, --json, --md, --no-autogen, --no3, --opt-match-d, --opt-match-f, --opt-not-match-d, --opt-not-match-f, --original-dir, --progress-rate, --quiet, --sdir, --show-ext, --show-lang, --show-os, --show-stored-lang, --skip-uniqueness, --sql-append, --strip-comments, --sum-one, --sum-reports, --unicode, --use-sloccount, --v, --vcs, --xml, --yaml
 - Allowed valued flags: --config, --csv-delimiter, --diff-alignment, --diff-timeout, --exclude-content, --exclude-dir, --exclude-ext, --exclude-lang, --exclude-list-file, --force-lang, --fullpath, --include-ext, --include-lang, --lang-no-ext, --list-file, --match-d, --match-f, --not-match-d, --not-match-f, --out, --read-binary-files, --read-lang-def, --report-file, --script-lang, --skip-archive, --sql, --sql-project, --sql-style, --timeout, --write-lang-def
 
-### `cmake`
+### `cmake` (https://cmake.org/cmake/help/latest/manual/cmake.1.html)
 
 - Info flags: --system-information, --version
 
-### `codesign`
+### `codesign` (https://ss64.com/mac/codesign.html)
 
 - Requires --display/-d or --verify/-v.
 
-### `col`
+### `col` (https://man7.org/linux/man-pages/man1/col.1.html)
 
 - Allowed standalone flags: -b, -f, -h, -p, -x
 - Allowed valued flags: -l
 - Bare invocation allowed
 
-### `colordiff`
+### `colordiff` (https://www.colordiff.org/)
 
 - Allowed standalone flags: --brief, --ed, --expand-tabs, --initial-tab, --left-column, --minimal, --normal, --paginate, --rcs, --report-identical-files, --side-by-side, --speed-large-files, --strip-trailing-cr, --suppress-blank-empty, --suppress-common-lines, --text, -B, -E, -N, -P, -T, -Z, -a, -b, -c, -d, -e, -i, -l, -n, -p, -q, -r, -s, -t, -u, -v, -w, -y
 - Allowed valued flags: --changed-group-format, --color, --context, --from-file, --horizon-lines, --ifdef, --ignore-matching-lines, --label, --line-format, --new-group-format, --new-line-format, --old-group-format, --old-line-format, --show-function-line, --starting-file, --tabsize, --to-file, --unchanged-group-format, --unchanged-line-format, --unified, --width, -C, -D, -F, -I, -L, -S, -U, -W
 
-### `column`
+### `column` (https://man7.org/linux/man-pages/man1/column.1.html)
 
 - Allowed standalone flags: --fillrows, --json, --keep-empty-lines, --table, --table-noextreme, --table-noheadings, --table-right-all, -J, -L, -R, -e, -n, -t, -x
 - Allowed valued flags: --output-separator, --separator, --table-columns, --table-empty-lines, --table-hide, --table-name, --table-order, --table-right, --table-truncate, --table-wrap, -E, -H, -O, -W, -c, -d, -o, -r, -s
 - Bare invocation allowed
 
-### `comm`
+### `comm` (https://www.gnu.org/software/coreutils/manual/coreutils.html#comm-invocation)
 
 - Allowed standalone flags: --check-order, --nocheck-order, --total, --zero-terminated, -1, -2, -3, -i, -z
 - Allowed valued flags: --output-delimiter
 
-### `command`
+### `command` (https://man7.org/linux/man-pages/man1/command.1p.html)
 
 - Allowed: -v, -V (check if command exists).
 
-### `composer`
+### `composer` (https://getcomposer.org/doc/03-cli.md)
 
 - **about**
 - **audit**: Flags: --abandoned, --locked, --no-dev. Valued: --format
@@ -224,13 +224,13 @@ These commands are allowed with specific subcommands or flags.
 - **show**: Flags: --all, --available, --direct, --installed, --latest, --locked, --minor-only, --name-only, --no-dev, --outdated, --path, --platform, --self, --strict, --tree, --versions. Valued: --format, --ignore
 - **suggests**
 
-### `conda`
+### `conda` (https://docs.conda.io/projects/conda/en/stable/commands/index.html)
 
 - **config**: config (--show/--show-sources only).
 - **info**: Flags: --all, --envs, --json, --verbose
 - **list**: Flags: --explicit, --export, --full-name, --json, --no-pip, --revisions. Valued: --name, --prefix
 
-### `craft`
+### `craft` (https://craftcms.com/docs/5.x/reference/cli.html)
 
 - **env/show**
 - **graphql/list-schemas**
@@ -247,36 +247,36 @@ These commands are allowed with specific subcommands or flags.
 - **update/info**
 - **users/list-admins**
 
-### `csrutil`
+### `csrutil` (https://ss64.com/mac/csrutil.html)
 
 - **authenticated-root**
 - **report**
 - **status**
 
-### `cucumber`
+### `cucumber` (https://cucumber.io/docs/cucumber/api/#running-cucumber)
 
 - Allowed standalone flags: --backtrace, --color, --dry-run, --expand, --guess, --i18n-keywords, --i18n-languages, --init, --no-color, --no-diff, --no-multiline, --no-snippets, --no-source, --no-strict, --publish, --publish-quiet, --quiet, --retry, --snippets, --strict, --verbose, --wip, -b, -d, -e, -q
 - Allowed valued flags: --ci-environment, --format, --format-options, --language, --lines, --name, --order, --out, --profile, --require, --require-module, --retry, --tags, -f, -i, -l, -n, -o, -p, -r, -t
 - Bare invocation allowed
 
-### `curl`
+### `curl` (https://curl.se/docs/manpage.html)
 
 - Allowed standalone flags: --compressed, --fail, --globoff, --head, --insecure, --ipv4, --ipv6, --location, --no-buffer, --no-progress-meter, --show-error, --silent, --verbose, -4, -6, -I, -L, -N, -S, -f, -g, -k, -s, -v.
 - Allowed valued flags: --connect-timeout, --max-time, --write-out, -m, -w.
 - Allowed methods (-X/--request): GET, HEAD, OPTIONS.
 
-### `cut`
+### `cut` (https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation)
 
 - Allowed standalone flags: --complement, --only-delimited, --zero-terminated, -n, -s, -w, -z
 - Allowed valued flags: --bytes, --characters, --delimiter, --fields, --output-delimiter, -b, -c, -d, -f
 
-### `date`
+### `date` (https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation)
 
 - Allowed standalone flags: --rfc-2822, --rfc-email, --universal, --utc, -R, -j, -n, -u
 - Allowed valued flags: --date, --iso-8601, --reference, --rfc-3339, -I, -d, -f, -r, -v, -z
 - Bare invocation allowed
 
-### `ddev`
+### `ddev` (https://ddev.readthedocs.io/en/stable/users/usage/commands/)
 
 - **aliases**
 - **debug configyaml**
@@ -290,7 +290,7 @@ These commands are allowed with specific subcommands or flags.
 - **status**: Flags: --json-output
 - **version**
 
-### `defaults`
+### `defaults` (https://ss64.com/mac/defaults.html)
 
 - **domains**
 - **export**: Flags: -g, -globalDomain. Valued: -app
@@ -298,13 +298,13 @@ These commands are allowed with specific subcommands or flags.
 - **read**: Flags: -g, -globalDomain. Valued: -app
 - **read-type**: Flags: -g, -globalDomain. Valued: -app
 
-### `delta`
+### `delta` (https://dandavison.github.io/delta/)
 
 - Allowed standalone flags: --blame-code-style, --blame-palette, --color-only, --dark, --diff-highlight, --diff-so-fancy, --hyperlinks, --keep-plus-minus-markers, --light, --line-numbers, --list-languages, --list-syntax-themes, --navigate, --no-gitconfig, --raw, --relative-paths, --show-config, --show-syntax-themes, --side-by-side, -n, -s
 - Allowed valued flags: --commit-decoration-style, --commit-style, --config, --diff-stat-align-width, --features, --file-added-label, --file-decoration-style, --file-modified-label, --file-removed-label, --file-renamed-label, --file-style, --file-transformation, --hunk-header-decoration-style, --hunk-header-file-style, --hunk-header-line-number-style, --hunk-header-style, --hunk-label, --inline-hint-style, --inspect-raw-lines, --line-buffer-size, --line-fill-method, --line-numbers-left-format, --line-numbers-left-style, --line-numbers-minus-style, --line-numbers-plus-style, --line-numbers-right-format, --line-numbers-right-style, --line-numbers-zero-style, --map-styles, --max-line-distance, --max-line-length, --merge-conflict-begin-symbol, --merge-conflict-end-symbol, --merge-conflict-ours-diff-header-decoration-style, --merge-conflict-ours-diff-header-style, --merge-conflict-theirs-diff-header-decoration-style, --merge-conflict-theirs-diff-header-style, --minus-emph-style, --minus-empty-line-marker-style, --minus-non-emph-style, --minus-style, --paging, --plus-emph-style, --plus-empty-line-marker-style, --plus-non-emph-style, --plus-style, --syntax-theme, --tabs, --true-color, --whitespace-error-style, --width, -w
 - Bare invocation allowed
 
-### `deno`
+### `deno` (https://docs.deno.com/runtime/reference/cli/)
 
 - **check**: Flags: --json, --no-lock, --quiet, --unstable. Valued: --config, --import-map
 - **doc**: Flags: --json, --no-lock, --quiet, --unstable. Valued: --config, --import-map
@@ -313,28 +313,28 @@ These commands are allowed with specific subcommands or flags.
 - **lint**: Flags: --json, --no-lock, --quiet, --unstable. Valued: --config, --import-map
 - **test**: Flags: --json, --no-lock, --quiet, --unstable. Valued: --config, --import-map
 
-### `df`
+### `df` (https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation)
 
 - Allowed standalone flags: --all, --human-readable, --inodes, --local, --no-sync, --portability, --print-type, --si, --sync, --total, -H, -P, -T, -a, -h, -i, -k, -l
 - Allowed valued flags: --block-size, --exclude-type, --output, --type, -B, -t, -x
 - Bare invocation allowed
 
-### `diff`
+### `diff` (https://www.gnu.org/software/diffutils/manual/diffutils.html)
 
 - Allowed standalone flags: --brief, --ed, --expand-tabs, --ignore-all-space, --ignore-blank-lines, --ignore-case, --ignore-space-change, --ignore-tab-expansion, --left-column, --minimal, --new-file, --no-dereference, --no-ignore-file-name-case, --normal, --paginate, --rcs, --recursive, --report-identical-files, --show-c-function, --side-by-side, --speed-large-files, --strip-trailing-cr, --suppress-blank-empty, --suppress-common-lines, --text, --unidirectional-new-file, -B, -E, -N, -P, -T, -a, -b, -c, -d, -e, -f, -i, -l, -n, -p, -q, -r, -s, -t, -u, -w, -y
 - Allowed valued flags: --changed-group-format, --color, --context, --exclude, --exclude-from, --from-file, --ifdef, --ignore-matching-lines, --label, --line-format, --new-group-format, --new-line-format, --old-group-format, --old-line-format, --show-function-line, --starting-file, --tabsize, --to-file, --unchanged-group-format, --unchanged-line-format, --unified, --width, -C, -D, -F, -I, -L, -S, -U, -W, -X, -x
 
-### `dig`
+### `dig` (https://man7.org/linux/man-pages/man1/dig.1.html)
 
 - Allowed standalone flags: -4, -6, -m, -r, -u, -v
 - Allowed valued flags: -b, -c, -f, -k, -p, -q, -t, -x, -y
 - Bare invocation allowed
 
-### `dirname`
+### `dirname` (https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation)
 
 - Allowed standalone flags: --zero, -z
 
-### `diskutil`
+### `diskutil` (https://ss64.com/mac/diskutil.html)
 
 - **activity**
 - **apfs list**
@@ -345,7 +345,7 @@ These commands are allowed with specific subcommands or flags.
 - **list**: Flags: -plist
 - **listFilesystems**: Flags: -plist
 
-### `docker / podman`
+### `docker / podman` (https://docs.docker.com/reference/cli/docker/)
 
 - **buildx --version**
 - **buildx inspect**
@@ -392,109 +392,109 @@ These commands are allowed with specific subcommands or flags.
 - **volume inspect**: Flags: --no-trunc, --quiet. Valued: --filter, --format
 - **volume ls**: Flags: --no-trunc, --quiet. Valued: --filter, --format
 
-### `dotnet`
+### `dotnet` (https://learn.microsoft.com/en-us/dotnet/core/tools/)
 
 - Info flags: --info, --list-runtimes, --list-sdks
 - **build**: Flags: --force, --no-dependencies, --no-incremental, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime. Valued: --arch, --artifacts-path, --configuration, --framework, --os, --output, --property, --runtime, --source, --verbosity, --version-suffix
 - **list**: Flags: --deprecated, --highest-minor, --highest-patch, --include-prerelease, --include-transitive, --outdated, --vulnerable. Valued: --config, --format, --framework, --source, --verbosity
 - **test**: Flags: --blame, --blame-crash, --blame-hang, --force, --list-tests, --no-build, --no-dependencies, --no-restore, --nologo. Valued: --arch, --artifacts-path, --blame-crash-collect-always, --blame-crash-dump-type, --blame-hang-dump-type, --blame-hang-timeout, --collect, --configuration, --diag, --environment, --filter, --framework, --logger, --os, --output, --property, --results-directory, --runtime, --settings, --test-adapter-path, --verbosity
 
-### `du`
+### `du` (https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation)
 
 - Allowed standalone flags: --all, --apparent-size, --bytes, --count-links, --dereference, --dereference-args, --human-readable, --inodes, --no-dereference, --null, --one-file-system, --separate-dirs, --si, --summarize, --total, -0, -D, -H, -L, -P, -S, -a, -b, -c, -h, -k, -l, -m, -s, -x
 - Allowed valued flags: --block-size, --exclude, --files0-from, --max-depth, --threshold, --time, --time-style, -B, -d, -t
 - Bare invocation allowed
 
-### `dust`
+### `dust` (https://github.com/bootandy/dust#readme)
 
 - Allowed standalone flags: --bars-on-right, --files0-from, --ignore-all-in-file, --invert-filter, --no-colors, --no-percent-bars, --only-dir, --only-file, --skip-total, -D, -F, -H, -P, -R, -S, -b, -c, -f, -i, -p, -r, -s
 - Allowed valued flags: --depth, --exclude, --filter, --terminal_width, -M, -X, -d, -e, -n, -t, -v, -w, -z
 - Bare invocation allowed
 
-### `echo`
+### `echo` (https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation)
 
 - Allowed standalone flags: -E, -e, -n
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
-### `egrep`
+### `egrep` (https://www.gnu.org/software/grep/manual/grep.html)
 
 - Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z
 - Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m
 
-### `env`
+### `env` (https://www.gnu.org/software/coreutils/manual/coreutils.html#env-invocation)
 
 - Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed.
 
-### `exa`
+### `exa` (https://eza.rocks/)
 
 - Allowed standalone flags: --accessed, --all, --binary, --blocks, --blocksize, --bytes, --changed, --classify, --color-scale, --color-scale-mode, --context, --created, --dereference, --extended, --flags, --follow-symlinks, --git, --git-ignore, --git-repos, --git-repos-no-status, --group, --group-directories-first, --header, --hyperlink, --icons, --inode, --links, --list-dirs, --long, --modified, --mounts, --no-filesize, --no-git, --no-icons, --no-permissions, --no-quotes, --no-time, --no-user, --numeric, --octal-permissions, --oneline, --only-dirs, --only-files, --recurse, --reverse, --tree, -1, -@, -A, -B, -D, -F, -G, -H, -I, -M, -R, -S, -T, -U, -Z, -a, -b, -d, -f, -g, -h, -i, -l, -m, -r, -s, -u, -x
 - Allowed valued flags: --color, --colour, --git-ignore-glob, --grid-columns, --group-directories-first-dirs, --ignore-glob, --level, --smart-group, --sort, --time, --time-style, --total-size, --width, -L, -X, -t, -w
 - Bare invocation allowed
 
-### `expand`
+### `expand` (https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation)
 
 - Allowed standalone flags: --initial, -i
 - Allowed valued flags: --tabs, -t
 - Bare invocation allowed
 
-### `expr`
+### `expr` (https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation)
 
 - Hyphen-prefixed positional arguments accepted
 
-### `eza`
+### `eza` (https://eza.rocks/)
 
 - Allowed standalone flags: --accessed, --all, --binary, --blocks, --blocksize, --bytes, --changed, --classify, --color-scale, --color-scale-mode, --context, --created, --dereference, --extended, --flags, --follow-symlinks, --git, --git-ignore, --git-repos, --git-repos-no-status, --group, --group-directories-first, --header, --hyperlink, --icons, --inode, --links, --list-dirs, --long, --modified, --mounts, --no-filesize, --no-git, --no-icons, --no-permissions, --no-quotes, --no-time, --no-user, --numeric, --octal-permissions, --oneline, --only-dirs, --only-files, --recurse, --reverse, --tree, -1, -@, -A, -B, -D, -F, -G, -H, -I, -M, -R, -S, -T, -U, -Z, -a, -b, -d, -f, -g, -h, -i, -l, -m, -r, -s, -u, -x
 - Allowed valued flags: --color, --colour, --git-ignore-glob, --grid-columns, --group-directories-first-dirs, --ignore-glob, --level, --smart-group, --sort, --time, --time-style, --total-size, --width, -L, -X, -t, -w
 - Bare invocation allowed
 
-### `factor`
+### `factor` (https://www.gnu.org/software/coreutils/manual/coreutils.html#factor-invocation)
 
 - Allowed standalone flags: --exponents, -h
 - Bare invocation allowed
 
-### `false`
+### `false` (https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation)
 
 - Bare invocation allowed
 
-### `fd`
+### `fd` (https://github.com/sharkdp/fd#readme)
 
 - Safe unless --exec/-x or --exec-batch/-X flags (execute arbitrary commands).
 
-### `fgrep`
+### `fgrep` (https://www.gnu.org/software/grep/manual/grep.html)
 
 - Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z
 - Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m
 
-### `file`
+### `file` (https://man7.org/linux/man-pages/man1/file.1.html)
 
 - Allowed standalone flags: --brief, --debug, --dereference, --extension, --keep-going, --list, --mime, --mime-encoding, --mime-type, --no-buffer, --no-dereference, --no-pad, --no-sandbox, --preserve-date, --print0, --raw, --special-files, --uncompress, --uncompress-noreport, -0, -D, -I, -L, -N, -S, -Z, -b, -d, -h, -i, -k, -l, -n, -p, -r, -s, -z
 - Allowed valued flags: --exclude, --exclude-quiet, --files-from, --magic-file, --parameter, --separator, -F, -P, -e, -f, -m
 
-### `find`
+### `find` (https://www.gnu.org/software/findutils/manual/html_mono/find.html)
 
 - Positional predicates allowed. -exec/-execdir allowed when the executed command is itself safe.
 
-### `fmt`
+### `fmt` (https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation)
 
 - Allowed standalone flags: --crown-margin, --split-only, --tagged-paragraph, --uniform-spacing, -c, -m, -n, -s, -u
 - Allowed valued flags: --goal, --prefix, --width, -d, -g, -l, -p, -t, -w
 - Bare invocation allowed
 
-### `fnm`
+### `fnm` (https://github.com/Schniz/fnm#readme)
 
 - **current**
 - **default**
 - **list**
 - **ls-remote**
 
-### `fold`
+### `fold` (https://www.gnu.org/software/coreutils/manual/coreutils.html#fold-invocation)
 
 - Allowed standalone flags: --bytes, --spaces, -b, -s
 - Allowed valued flags: --width, -w
 - Bare invocation allowed
 
-### `gem`
+### `gem` (https://guides.rubygems.org/command-reference/)
 
 - **contents**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
 - **dependency**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
@@ -510,19 +510,19 @@ These commands are allowed with specific subcommands or flags.
 - **stale**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
 - **which**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
 
-### `getconf`
+### `getconf` (https://man7.org/linux/man-pages/man1/getconf.1.html)
 
 - Allowed standalone flags: -a
 - Allowed valued flags: -v
 - Bare invocation allowed
 
-### `gh`
+### `gh` (https://cli.github.com/manual/)
 
 - Subcommands attestation, cache, codespace, extension, gpg-key, issue, label, pr, release, repo, run, ssh-key, variable, workflow are allowed with actions: checks, diff, list, status, verify, view, watch.
 - Always safe: --version, search, status.
 - auth status, browse (requires --no-browser), api (GET only).
 
-### `git`
+### `git` (https://git-scm.com/docs)
 
 - **blame**: Flags: --color-by-age, --color-lines, --incremental, --line-porcelain, --minimal, --porcelain, --progress, --root, --show-email, --show-name, --show-number, --show-stats, -b, -c, -e, -f, -l, -n, -p, -s, -t, -w. Valued: --abbrev, --contents, --ignore-rev, --ignore-revs-file, -C, -L, -M, -S
 - **branch**: branch (read-only flags).
@@ -559,13 +559,13 @@ These commands are allowed with specific subcommands or flags.
 
 Supports `-C <dir>` prefix.
 
-### `glab`
+### `glab` (https://glab.readthedocs.io/en/latest/)
 
 - Subcommands ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable are allowed with actions: diff, issues, list, status, view.
 - Always safe: --version, -v, check-update, version.
 - auth status, api (GET only).
 
-### `go`
+### `go` (https://pkg.go.dev/cmd/go)
 
 - **build**: Flags: -a, -asan, -cover, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -o, -overlay, -p, -pgo, -pkgdir, -tags
 - **doc**: Flags: -all, -c, -cmd, -short, -src, -u
@@ -576,7 +576,7 @@ Supports `-C <dir>` prefix.
 - **version**: Flags: -m, -v
 - **vet**: Flags: -a, -asan, -cover, -json, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -c, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -tags
 
-### `gradle / gradlew`
+### `gradle / gradlew` (https://docs.gradle.org/current/userguide/command_line_interface.html)
 
 - **build**: Flags: --build-cache, --configure-on-demand, --console, --continue, --dry-run, --info, --no-build-cache, --no-daemon, --no-parallel, --no-rebuild, --parallel, --profile, --quiet, --rerun-tasks, --scan, --stacktrace, --warning-mode. Valued: --exclude-task, --max-workers
 - **check**: Flags: --build-cache, --configure-on-demand, --console, --continue, --dry-run, --info, --no-build-cache, --no-daemon, --no-parallel, --no-rebuild, --parallel, --profile, --quiet, --rerun-tasks, --scan, --stacktrace, --warning-mode. Valued: --exclude-task, --max-workers
@@ -585,28 +585,28 @@ Supports `-C <dir>` prefix.
 - **tasks**: Flags: --all, --console, --info, --no-rebuild, --quiet, --stacktrace, --warning-mode. Valued: --group
 - **test**: Flags: --build-cache, --configure-on-demand, --console, --continue, --dry-run, --info, --no-build-cache, --no-daemon, --no-parallel, --no-rebuild, --parallel, --profile, --quiet, --rerun-tasks, --scan, --stacktrace, --warning-mode. Valued: --exclude-task, --max-workers
 
-### `grep`
+### `grep` (https://www.gnu.org/software/grep/manual/grep.html)
 
 - Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z
 - Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m
 
-### `groups`
+### `groups` (https://www.gnu.org/software/coreutils/manual/coreutils.html#groups-invocation)
 
 - Bare invocation allowed
 
-### `head`
+### `head` (https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation)
 
 - Allowed standalone flags: --quiet, --silent, --verbose, --zero-terminated, -q, -v, -z
 - Allowed valued flags: --bytes, --lines, -c, -n
 - Bare invocation allowed
 
-### `hexdump`
+### `hexdump` (https://man7.org/linux/man-pages/man1/hexdump.1.html)
 
 - Allowed standalone flags: -C, -b, -c, -d, -o, -v, -x
 - Allowed valued flags: -L, -e, -f, -n, -s
 - Bare invocation allowed
 
-### `hf`
+### `hf` (https://huggingface.co/docs/huggingface_hub/guides/cli)
 
 - **cache ls**
 - **cache verify**
@@ -627,81 +627,81 @@ Supports `-C <dir>` prefix.
 - **spaces ls**: Valued: --author, --filter, --limit, --search, --sort
 - **version**
 
-### `host`
+### `host` (https://man7.org/linux/man-pages/man1/host.1.html)
 
 - Allowed standalone flags: -4, -6, -C, -a, -c, -d, -l, -r, -s, -v
 - Allowed valued flags: -D, -N, -R, -T, -W, -i, -m, -t
 
-### `hostname`
+### `hostname` (https://man7.org/linux/man-pages/man1/hostname.1.html)
 
 - Flags: -A, -I, -d, -f, -i, -s
 
-### `htop`
+### `htop` (https://htop.dev/)
 
 - Allowed standalone flags: --no-color, --no-mouse, --no-unicode, --tree, -C, -H, -M, -t
 - Allowed valued flags: --delay, --filter, --highlight-changes, --pid, --sort-key, --user, -F, -d, -p, -s, -u
 - Bare invocation allowed
 
-### `hyperfine`
+### `hyperfine` (https://github.com/sharkdp/hyperfine#readme)
 
 - Recursively validates each benchmarked command.
 
-### `iconv`
+### `iconv` (https://man7.org/linux/man-pages/man1/iconv.1.html)
 
 - Allowed standalone flags: --list, --silent, -c, -l, -s
 - Allowed valued flags: --from-code, --to-code, -f, -t
 
-### `id`
+### `id` (https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation)
 
 - Allowed standalone flags: --context, --group, --groups, --name, --real, --user, --zero, -G, -Z, -g, -n, -p, -r, -u, -z
 - Bare invocation allowed
 
-### `identify`
+### `identify` (https://imagemagick.org/script/identify.php)
 
 - Allowed standalone flags: --verbose, -ping, -quiet, -regard-warnings, -verbose
 - Allowed valued flags: -channel, -define, -density, -depth, -features, -format, -fuzz, -interlace, -limit, -list, -log, -moments, -monitor, -precision, -seed, -set, -size, -strip, -unique, -virtual-pixel
 
-### `ifconfig`
+### `ifconfig` (https://man7.org/linux/man-pages/man8/ifconfig.8.html)
 
 - Allowed standalone flags: -L, -a, -l, -s, -v
 - Bare invocation allowed
 
-### `ioreg`
+### `ioreg` (https://ss64.com/mac/ioreg.html)
 
 - Allowed standalone flags: -S, -a, -b, -f, -i, -l, -r, -t, -x
 - Allowed valued flags: -c, -d, -k, -n, -p, -w
 - Bare invocation allowed
 
-### `iotop`
+### `iotop` (https://man7.org/linux/man-pages/man8/iotop.8.html)
 
 - Allowed standalone flags: --accumulated, --batch, --kilobytes, --only, --processes, --quiet, -P, -a, -b, -k, -o, -q, -t
 - Allowed valued flags: --delay, --iter, --pid, --user, -d, -n, -p, -u
 - Bare invocation allowed
 
-### `jj`
+### `jj` (https://jj-vcs.github.io/jj/latest/cli-reference/)
 
 - Subcommands: bookmark list, config get, config list, diff, file list, file show, git fetch, git remote list, help, log, op log, root, show, st, status, version, workspace list
 - Flags: --version
 - Skips global flags: standalone (--debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose), valued (--at-op, --at-operation, --color, --repository, -R).
 
-### `jq`
+### `jq` (https://jqlang.github.io/jq/manual/)
 
 - Allowed standalone flags: --ascii-output, --color-output, --compact-output, --exit-status, --join-output, --monochrome-output, --null-input, --raw-input, --raw-output, --raw-output0, --seq, --slurp, --sort-keys, --tab, -C, -M, -R, -S, -c, -e, -j, -n, -r, -s
 - Allowed valued flags: --arg, --argjson, --args, --from-file, --indent, --jsonargs, --rawfile, --slurpfile, -f
 - Bare invocation allowed
 
-### `last`
+### `last` (https://man7.org/linux/man-pages/man1/last.1.html)
 
 - Allowed standalone flags: --dns, --fullnames, --fulltimes, --hostlast, --ip, --nohostname, --system, --time-format, -F, -R, -a, -d, -i, -w, -x
 - Allowed valued flags: --limit, --present, --since, --time-format, --until, -f, -n, -p, -s, -t
 - Bare invocation allowed
 
-### `lastlog`
+### `lastlog` (https://man7.org/linux/man-pages/man8/lastlog.8.html)
 
 - Allowed valued flags: --before, --time, --user, -b, -t, -u
 - Bare invocation allowed
 
-### `launchctl`
+### `launchctl` (https://ss64.com/mac/launchctl.html)
 
 - **blame**
 - **dumpstate**
@@ -716,11 +716,11 @@ Supports `-C <dir>` prefix.
 - **resolveport**
 - **version**
 
-### `lipo`
+### `lipo` (https://ss64.com/mac/lipo.html)
 
 - Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch).
 
-### `llm`
+### `llm` (https://llm.datasette.io/en/stable/)
 
 - **aliases**: Flags: --json
 - **collections**: Flags: --json
@@ -729,61 +729,61 @@ Supports `-C <dir>` prefix.
 - **plugins**: Flags: --all, --json
 - **templates**: Flags: --json
 
-### `locale`
+### `locale` (https://man7.org/linux/man-pages/man1/locale.1.html)
 
 - Allowed standalone flags: --all-locales, --category-name, --charmaps, --keyword-name, --verbose, -a, -c, -k, -m, -v
 - Bare invocation allowed
 
-### `log`
+### `log` (https://ss64.com/mac/log.html)
 
 - **help**
 - **show**: Flags: --backtrace, --debug, --info, --loss, --mach-continuous-time, --no-pager, --signpost. Valued: --color, --end, --last, --predicate, --process, --source, --start, --style, --type
 - **stats**
 - **stream**: Flags: --backtrace, --debug, --info, --loss, --mach-continuous-time, --signpost. Valued: --color, --level, --predicate, --process, --source, --style, --timeout, --type
 
-### `ls`
+### `ls` (https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation)
 
 - Allowed standalone flags: --all, --almost-all, --author, --classify, --context, --dereference, --dereference-command-line, --dereference-command-line-symlink-to-dir, --directory, --escape, --file-type, --full-time, --group-directories-first, --hide-control-chars, --human-readable, --indicator-style, --inode, --kibibytes, --literal, --no-group, --numeric-uid-gid, --quote-name, --recursive, --reverse, --show-control-chars, --si, --size, -1, -A, -B, -C, -F, -G, -H, -L, -N, -Q, -R, -S, -U, -X, -Z, -a, -c, -d, -f, -g, -h, -i, -k, -l, -m, -n, -o, -p, -q, -r, -s, -t, -u, -v, -x
 - Allowed valued flags: --block-size, --color, --format, --hide, --hyperlink, --ignore, --quoting-style, --sort, --tabsize, --time, --time-style, --width, -I, -T, -w
 - Bare invocation allowed
 
-### `lsof`
+### `lsof` (https://man7.org/linux/man-pages/man8/lsof.8.html)
 
 - Allowed standalone flags: -C, -G, -M, -N, -O, -P, -R, -U, -V, -X, -b, -h, -l, -n, -t, -w, -x
 - Allowed valued flags: -F, -S, -T, -a, -c, -d, -g, -i, -k, -o, -p, -r, -s, -u
 - Bare invocation allowed
 
-### `magick`
+### `magick` (https://imagemagick.org/script/command-line-tools.php)
 
 - **identify**: Flags: -matte, -moments, -ping, -quiet, -regard-warnings, -unique, -verbose. Valued: -alpha, -colorspace, -define, -density, -depth, -endian, -format, -interlace, -limit, -precision, -sampling-factor, -size, -units, -virtual-pixel
 
-### `man`
+### `man` (https://man7.org/linux/man-pages/man1/man.1.html)
 
 - Allowed standalone flags: --all, --apropos, --default, --local-file, --regex, --update, --whatis, --where, --where-cat, --wildcard, -a, -f, -k, -l, -u, -w
 - Allowed valued flags: --config-file, --encoding, --extension, --locale, --manpath, --sections, --systems, -C, -E, -L, -M, -S, -e, -m
 
-### `md5`
+### `md5` (https://man7.org/linux/man-pages/man1/md5sum.1.html)
 
 - Allowed standalone flags: -n, -p, -q, -r, -t
 - Allowed valued flags: -s
 - Bare invocation allowed
 
-### `md5sum`
+### `md5sum` (https://www.gnu.org/software/coreutils/manual/coreutils.html#md5sum-invocation)
 
 - Allowed standalone flags: --binary, --check, --ignore-missing, --quiet, --status, --strict, --tag, --text, --warn, --zero, -b, -c, -t, -w, -z
 - Bare invocation allowed
 
-### `mdfind`
+### `mdfind` (https://ss64.com/mac/mdfind.html)
 
 - Allowed standalone flags: -0, -count, -interpret, -literal, -live
 - Allowed valued flags: -attr, -name, -onlyin, -s
 
-### `mdls`
+### `mdls` (https://ss64.com/mac/mdls.html)
 
 - Allowed standalone flags: --raw, -r
 - Allowed valued flags: --name, --nullMarker, -n
 
-### `mise`
+### `mise` (https://mise.jdx.dev/cli/)
 
 - **config list**
 - **config ls**
@@ -797,36 +797,36 @@ Supports `-C <dir>` prefix.
 - **settings get**
 - **which**
 
-### `mvn / mvnw`
+### `mvn / mvnw` (https://maven.apache.org/ref/current/maven-embedder/cli.html)
 
 - Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify.
 
-### `netstat`
+### `netstat` (https://man7.org/linux/man-pages/man8/netstat.8.html)
 
 - Allowed standalone flags: --all, --continuous, --extend, --groups, --interfaces, --listening, --masquerade, --numeric, --numeric-hosts, --numeric-ports, --numeric-users, --program, --route, --statistics, --symbolic, --tcp, --timers, --udp, --unix, --verbose, --wide, -A, -C, -L, -M, -N, -R, -S, -W, -Z, -a, -b, -c, -d, -e, -f, -g, -i, -l, -m, -n, -o, -p, -q, -r, -s, -t, -u, -v, -w, -x
 - Allowed valued flags: -I
 - Bare invocation allowed
 
-### `networksetup`
+### `networksetup` (https://ss64.com/mac/networksetup.html)
 
 - Allowed: subcommands starting with -list, -get, -show, -print, plus -version and -help.
 
-### `nice / ionice`
+### `nice / ionice` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation)
 
 - Skips priority flags (-n/--adjustment), then recursively validates the inner command.
 
-### `nl`
+### `nl` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nl-invocation)
 
 - Allowed standalone flags: --no-renumber, -p
 - Allowed valued flags: --body-numbering, --footer-numbering, --header-numbering, --join-blank-lines, --line-increment, --number-format, --number-separator, --number-width, --section-delimiter, --starting-line-number, -b, -d, -f, -h, -i, -l, -n, -s, -v, -w
 - Bare invocation allowed
 
-### `nm`
+### `nm` (https://man7.org/linux/man-pages/man1/nm.1.html)
 
 - Allowed standalone flags: --debug-syms, --defined-only, --demangle, --dynamic, --extern-only, --line-numbers, --no-demangle, --no-llvm-bc, --no-sort, --numeric-sort, --portability, --print-armap, --print-file-name, --print-size, --reverse-sort, --special-syms, --undefined-only, -A, -B, -C, -D, -P, -S, -a, -g, -j, -l, -m, -n, -o, -p, -r, -s, -u, -v, -x
 - Allowed valued flags: --format, --radix, --size-sort, --target, -f, -t
 
-### `npm`
+### `npm` (https://docs.npmjs.com/cli)
 
 - **audit**: Flags: --json, --omit, --production. Valued: --audit-level
 - **config get**: Flags: --json, --long
@@ -845,28 +845,28 @@ Supports `-C <dir>` prefix.
 - **view**: Flags: --json
 - **why**: Flags: --json
 
-### `nproc`
+### `nproc` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nproc-invocation)
 
 - Allowed standalone flags: --all
 - Allowed valued flags: --ignore
 - Bare invocation allowed
 
-### `npx`
+### `npx` (https://docs.npmjs.com/cli/commands/npx)
 
 - Allowed packages: @herb-tools/linter, eslint, karma.
 - tsc allowed with --noEmit.
 - Skips flags: --yes/-y/--no/--package/-p.
 
-### `nroff`
+### `nroff` (https://man7.org/linux/man-pages/man1/nroff.1.html)
 
 - Allowed standalone flags: -S, -c, -h, -i, -k, -p, -q, -t
 - Allowed valued flags: -M, -P, -T, -d, -m, -n, -o, -r, -w
 
-### `nslookup`
+### `nslookup` (https://man7.org/linux/man-pages/man1/nslookup.1.html)
 
 - Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -query=, -port=, -timeout=, -retry=, -class=, -domain=, -querytype=).
 
-### `nvm`
+### `nvm` (https://github.com/nvm-sh/nvm#readme)
 
 - **current**: Flags: --lts, --no-colors
 - **list**: Flags: --lts, --no-colors
@@ -875,39 +875,39 @@ Supports `-C <dir>` prefix.
 - **version**: Flags: --lts, --no-colors
 - **which**: Flags: --lts, --no-colors
 
-### `od`
+### `od` (https://www.gnu.org/software/coreutils/manual/coreutils.html#od-invocation)
 
 - Allowed standalone flags: --output-duplicates, --traditional, -b, -c, -d, -f, -i, -l, -o, -s, -v, -x
 - Allowed valued flags: --address-radix, --endian, --format, --read-bytes, --skip-bytes, --strings, --width, -A, -N, -S, -j, -t, -w
 - Bare invocation allowed
 
-### `ollama`
+### `ollama` (https://github.com/ollama/ollama/blob/main/docs/api.md)
 
 - **list**: Flags: --json
 - **ps**: Flags: --json
 - **show**: Flags: --json, --license, --modelfile, --parameters, --system, --template, --verbose
 
-### `otool`
+### `otool` (https://ss64.com/mac/otool.html)
 
 - Allowed standalone flags: -D, -I, -L, -V, -X, -a, -c, -d, -f, -h, -l, -o, -r, -t, -v, -x
 - Allowed valued flags: -p, -s
 
-### `paste`
+### `paste` (https://www.gnu.org/software/coreutils/manual/coreutils.html#paste-invocation)
 
 - Allowed standalone flags: --serial, --zero-terminated, -s, -z
 - Allowed valued flags: --delimiters, -d
 - Bare invocation allowed
 
-### `perl`
+### `perl` (https://perldoc.perl.org/perl)
 
 - Allowed: -e/-E inline one-liners with safe built-in functions, --version, --help, -v, -V. Requires -e/-E flag. Code is validated against a safe identifier allowlist.
 
-### `pgrep`
+### `pgrep` (https://man7.org/linux/man-pages/man1/pgrep.1.html)
 
 - Allowed standalone flags: --count, --delimiter, --full, --inverse, --lightweight, --list-full, --list-name, --newest, --oldest, -L, -a, -c, -f, -i, -l, -n, -o, -v, -w, -x
 - Allowed valued flags: --euid, --group, --parent, --pgroup, --pidfile, --session, --terminal, --uid, -F, -G, -P, -U, -d, -g, -s, -t, -u
 
-### `pip / pip3`
+### `pip / pip3` (https://pip.pypa.io/en/stable/cli/)
 
 - **check**
 - **config get**
@@ -920,22 +920,22 @@ Supports `-C <dir>` prefix.
 - **list**: Flags: --editable, --exclude-editable, --include-editable, --local, --not-required, --outdated, --pre, --uptodate, --user. Valued: --exclude, --format, --index-url, --path
 - **show**: Flags: --files, --verbose
 
-### `pkgutil`
+### `pkgutil` (https://ss64.com/mac/pkgutil.html)
 
 - Requires a read-only flag (--pkgs, --files, --pkg-info, etc.).
 
-### `plutil`
+### `plutil` (https://ss64.com/mac/plutil.html)
 
 - Info flags: -help
 - **-lint**: Flags: -s
 - **-p**
 - **-type**
 
-### `pmset`
+### `pmset` (https://ss64.com/mac/pmset.html)
 
 - Allowed: -g (get/display settings only).
 
-### `pnpm`
+### `pnpm` (https://pnpm.io/pnpm-cli)
 
 - **audit**: Flags: --json, --recursive. Valued: --filter
 - **list**: Flags: --dev, --json, --long, --no-optional, --parseable, --production, --recursive. Valued: --depth, --filter
@@ -943,40 +943,40 @@ Supports `-C <dir>` prefix.
 - **outdated**: Flags: --json, --recursive. Valued: --filter
 - **why**: Flags: --json, --recursive. Valued: --filter
 
-### `poetry`
+### `poetry` (https://python-poetry.org/docs/cli/)
 
 - **check**: Flags: --lock
 - **env info**: Flags: --full-path
 - **env list**: Flags: --full-path
 - **show**: Flags: --all, --latest, --no-dev, --outdated, --top-level, --tree. Valued: --why
 
-### `printenv`
+### `printenv` (https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation)
 
 - Allowed standalone flags: --null, -0
 - Bare invocation allowed
 
-### `printf`
+### `printf` (https://www.gnu.org/software/coreutils/manual/coreutils.html#printf-invocation)
 
 - Positional arguments only
 
-### `procs`
+### `procs` (https://github.com/dalance/procs#readme)
 
 - Allowed standalone flags: --no-header, --or, --tree, --watch-interval, -l, -t
 - Allowed valued flags: --color, --completion, --config, --gen-completion, --insert, --only, --pager, --sorta, --sortd, --theme, -i, -w
 - Bare invocation allowed
 
-### `ps`
+### `ps` (https://man7.org/linux/man-pages/man1/ps.1.html)
 
 - Allowed standalone flags: --cumulative, --deselect, --forest, --headers, --info, --no-headers, -A, -C, -H, -L, -M, -N, -S, -T, -Z, -a, -c, -d, -e, -f, -j, -l, -m, -r, -v, -w, -x
 - Allowed valued flags: --cols, --columns, --format, --group, --pid, --ppid, --rows, --sid, --sort, --tty, --user, --width, -G, -O, -U, -g, -n, -o, -p, -s, -t, -u
 - Bare invocation allowed
 
-### `pwd`
+### `pwd` (https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation)
 
 - Allowed standalone flags: -L, -P
 - Bare invocation allowed
 
-### `pyenv`
+### `pyenv` (https://github.com/pyenv/pyenv#readme)
 
 - **help**: Flags: --bare
 - **root**: Flags: --bare
@@ -985,7 +985,7 @@ Supports `-C <dir>` prefix.
 - **versions**: Flags: --bare
 - **which**: Flags: --bare
 
-### `rbenv`
+### `rbenv` (https://github.com/rbenv/rbenv#readme)
 
 - **help**
 - **root**
@@ -994,31 +994,31 @@ Supports `-C <dir>` prefix.
 - **versions**
 - **which**
 
-### `readlink`
+### `readlink` (https://www.gnu.org/software/coreutils/manual/coreutils.html#readlink-invocation)
 
 - Allowed standalone flags: --canonicalize, --canonicalize-existing, --canonicalize-missing, --no-newline, --verbose, --zero, -e, -f, -m, -n, -v, -z
 
-### `realpath`
+### `realpath` (https://www.gnu.org/software/coreutils/manual/coreutils.html#realpath-invocation)
 
 - Allowed standalone flags: --canonicalize-existing, --canonicalize-missing, --logical, --no-symlinks, --physical, --quiet, --strip, --zero, -L, -P, -e, -m, -q, -s, -z
 - Allowed valued flags: --relative-base, --relative-to
 
-### `rev`
+### `rev` (https://man7.org/linux/man-pages/man1/rev.1.html)
 
 - Bare invocation allowed
 
-### `rg`
+### `rg` (https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md)
 
 - Allowed standalone flags: --binary, --block-buffered, --byte-offset, --case-sensitive, --column, --count, --count-matches, --crlf, --debug, --files, --files-with-matches, --files-without-match, --fixed-strings, --follow, --glob-case-insensitive, --heading, --hidden, --ignore-case, --ignore-file-case-insensitive, --include-zero, --invert-match, --json, --line-buffered, --line-number, --line-regexp, --max-columns-preview, --mmap, --multiline, --multiline-dotall, --no-config, --no-filename, --no-heading, --no-ignore, --no-ignore-dot, --no-ignore-exclude, --no-ignore-files, --no-ignore-global, --no-ignore-messages, --no-ignore-parent, --no-ignore-vcs, --no-line-number, --no-messages, --no-mmap, --no-pcre2-unicode, --no-require-git, --no-unicode, --null, --null-data, --one-file-system, --only-matching, --passthru, --pcre2, --pcre2-version, --pretty, --quiet, --search-zip, --smart-case, --sort-files, --stats, --text, --trim, --type-list, --unicode, --unrestricted, --vimgrep, --with-filename, --word-regexp, -F, -H, -I, -L, -N, -P, -S, -U, -V, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -s, -u, -v, -w, -x, -z
 - Allowed valued flags: --after-context, --before-context, --color, --colors, --context, --context-separator, --dfa-size-limit, --encoding, --engine, --field-context-separator, --field-match-separator, --file, --glob, --iglob, --ignore-file, --max-columns, --max-count, --max-depth, --max-filesize, --path-separator, --regex-size-limit, --regexp, --replace, --sort, --sortr, --threads, --type, --type-add, --type-clear, --type-not, -A, -B, -C, -E, -M, -T, -e, -f, -g, -j, -m, -r, -t
 
-### `route`
+### `route` (https://man7.org/linux/man-pages/man8/route.8.html)
 
 - Allowed subcommands: get, monitor, print, show
 - Allowed flags: -4, -6, -n, -v
 - Bare invocation allowed
 
-### `rustup`
+### `rustup` (https://rust-lang.github.io/rustup/)
 
 - **component list**: Flags: --installed. Valued: --toolchain
 - **doc**: Flags: --alloc, --book, --cargo, --core, --edition-guide, --embedded-book, --nomicon, --path, --proc_macro, --reference, --rust-by-example, --rustc, --rustdoc, --std, --test, --unstable-book. Valued: --toolchain
@@ -1028,11 +1028,11 @@ Supports `-C <dir>` prefix.
 - **toolchain list**: Flags: --installed. Valued: --toolchain
 - **which**: Valued: --toolchain
 
-### `safe-chains`
+### `safe-chains` (https://github.com/michaeldhopkins/safe-chains#readme)
 
 - Any arguments allowed (safe-chains is this tool).
 
-### `security`
+### `security` (https://ss64.com/mac/security.html)
 
 - **cms**
 - **dump-keychain**
@@ -1046,89 +1046,89 @@ Supports `-C <dir>` prefix.
 - **smartcard**
 - **verify-cert**: Flags: -L, -l, -q. Valued: -c, -k, -n, -p, -r
 
-### `sed`
+### `sed` (https://www.gnu.org/software/sed/manual/sed.html)
 
 - Allowed standalone flags: --debug, --posix, --quiet, --sandbox, --silent, --unbuffered, -E, -n, -r, -u, -z
 - Allowed valued flags: --expression, --file, --line-length, -e, -f, -l
 - Inline expressions validated for safety
 
-### `seq`
+### `seq` (https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation)
 
 - Allowed standalone flags: --equal-width, -w
 - Allowed valued flags: --format, --separator, -f, -s, -t
 
-### `sha1sum`
+### `sha1sum` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sha1sum-invocation)
 
 - Allowed standalone flags: --binary, --check, --ignore-missing, --quiet, --status, --strict, --tag, --text, --warn, --zero, -b, -c, -t, -w, -z
 - Bare invocation allowed
 
-### `sha256sum`
+### `sha256sum` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities)
 
 - Allowed standalone flags: --binary, --check, --ignore-missing, --quiet, --status, --strict, --tag, --text, --warn, --zero, -b, -c, -t, -w, -z
 - Bare invocation allowed
 
-### `sha512sum`
+### `sha512sum` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities)
 
 - Allowed standalone flags: --binary, --check, --ignore-missing, --quiet, --status, --strict, --tag, --text, --warn, --zero, -b, -c, -t, -w, -z
 - Bare invocation allowed
 
-### `shasum`
+### `shasum` (https://perldoc.perl.org/shasum)
 
 - Allowed standalone flags: --binary, --check, --portable, --status, --strict, --tag, --text, --warn, -0, -b, -c, -p, -s, -t
 - Allowed valued flags: --algorithm, -a
 - Bare invocation allowed
 
-### `shellcheck`
+### `shellcheck` (https://www.shellcheck.net/wiki/)
 
 - Allowed standalone flags: --color, --external-sources, --list-optional, --norc, --severity, --wiki-link-count, -C, -a, -x
 - Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s
 
-### `size`
+### `size` (https://man7.org/linux/man-pages/man1/size.1.html)
 
 - Allowed standalone flags: --common, --totals, -A, -B, -G, -d, -o, -t, -x
 - Allowed valued flags: --format, --radix, --target
 
-### `sleep`
+### `sleep` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation)
 
 - Positional arguments only
 
-### `sort`
+### `sort` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation)
 
 - Allowed standalone flags: --check, --debug, --dictionary-order, --general-numeric-sort, --human-numeric-sort, --ignore-case, --ignore-leading-blanks, --ignore-nonprinting, --merge, --month-sort, --numeric-sort, --random-sort, --reverse, --stable, --unique, --version-sort, --zero-terminated, -C, -M, -R, -V, -b, -c, -d, -f, -g, -h, -i, -m, -n, -r, -s, -u, -z
 - Allowed valued flags: --batch-size, --buffer-size, --field-separator, --files0-from, --key, --parallel, --random-source, --sort, --temporary-directory, -S, -T, -k, -t
 - Bare invocation allowed
 
-### `spctl`
+### `spctl` (https://ss64.com/mac/spctl.html)
 
 - Requires --assess/-a.
 
-### `ss`
+### `ss` (https://man7.org/linux/man-pages/man8/ss.8.html)
 
 - Allowed standalone flags: --all, --dccp, --extended, --family, --help, --info, --ipv4, --ipv6, --listening, --memory, --no-header, --numeric, --oneline, --options, --packet, --processes, --raw, --resolve, --sctp, --summary, --tcp, --tipc, --udp, --unix, --version, --vsock, -0, -4, -6, -E, -H, -O, -V, -a, -e, -i, -l, -m, -n, -o, -p, -r, -s, -t, -u, -w, -x
 - Allowed valued flags: --filter, --query, -A, -F, -f
 - Bare invocation allowed
 
-### `stat`
+### `stat` (https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation)
 
 - Allowed standalone flags: --dereference, --file-system, --terse, -F, -L, -l, -n, -q, -r, -s, -x
 - Allowed valued flags: --format, --printf, -c, -f, -t
 
-### `strings`
+### `strings` (https://man7.org/linux/man-pages/man1/strings.1.html)
 
 - Allowed standalone flags: --all, --include-all-whitespace, --print-file-name, -a, -f, -w
 - Allowed valued flags: --bytes, --encoding, --output-separator, --radix, --target, -T, -e, -n, -o, -s, -t
 
-### `sum`
+### `sum` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sum-invocation)
 
 - Allowed standalone flags: --sysv, -r, -s
 - Bare invocation allowed
 
-### `sw_vers`
+### `sw_vers` (https://ss64.com/mac/sw_vers.html)
 
 - Allowed standalone flags: --buildVersion, --productName, --productVersion, --productVersionExtra
 - Bare invocation allowed
 
-### `swift`
+### `swift` (https://www.swift.org/documentation/swift-compiler/)
 
 - **build**: Flags: --enable-code-coverage, --show-bin-path, --skip-update, --static-swift-stdlib, --verbose. Valued: --arch, --build-path, --configuration, --jobs, --package-path, --product, --sanitize, --swift-sdk, --target, --triple
 - **package describe**: Valued: --package-path, --type
@@ -1136,116 +1136,116 @@ Supports `-C <dir>` prefix.
 - **package show-dependencies**: Valued: --format, --package-path
 - **test**: Flags: --enable-code-coverage, --list-tests, --parallel, --show-codecov-path, --skip-build, --skip-update, --verbose. Valued: --arch, --build-path, --configuration, --filter, --jobs, --num-workers, --package-path, --sanitize, --skip-tests, --swift-sdk, --target, --triple, --xunit-output
 
-### `sysctl`
+### `sysctl` (https://man7.org/linux/man-pages/man8/sysctl.8.html)
 
 - Read-only usage.
 
-### `system_profiler`
+### `system_profiler` (https://ss64.com/mac/system_profiler.html)
 
 - Allowed standalone flags: --json, --xml, -json, -listDataTypes, -nospinner, -xml
 - Allowed valued flags: -detailLevel, -timeout
 - Bare invocation allowed
 
-### `tac`
+### `tac` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation)
 
 - Allowed standalone flags: --before, --regex, -b, -r
 - Allowed valued flags: --separator, -s
 - Bare invocation allowed
 
-### `tail`
+### `tail` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tail-invocation)
 
 - Allowed standalone flags: --follow, --quiet, --retry, --silent, --verbose, --zero-terminated, -F, -f, -q, -r, -v, -z
 - Allowed valued flags: --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval, -b, -c, -n
 - Bare invocation allowed
 
-### `tea`
+### `tea` (https://gitea.com/gitea/tea)
 
 - Subcommands b, branch, branches, i, issue, issues, label, labels, milestone, milestones, ms, n, notification, notifications, org, organization, organizations, pr, pull, pulls, r, release, releases, repo, repos, t, time, times are allowed with actions: list, view or bare invocation.
 - Always safe: --version, -v, whoami.
 - logins/login (list only).
 
-### `test`
+### `test` (https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation)
 
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
-### `time`
+### `time` (https://man7.org/linux/man-pages/man1/time.1.html)
 
 - Skips -p flag, then recursively validates the inner command.
 
-### `timeout`
+### `timeout` (https://www.gnu.org/software/coreutils/manual/coreutils.html#timeout-invocation)
 
 - Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recursively validates the inner command.
 
-### `tokei`
+### `tokei` (https://github.com/XAMPPRocky/tokei#readme)
 
 - Allowed standalone flags: --compact, --files, --hidden, --no-ignore, --no-ignore-dot, --no-ignore-parent, --no-ignore-vcs, --verbose, -C, -V, -f
 - Allowed valued flags: --columns, --exclude, --input, --languages, --num-format, --output, --sort, --type, -c, -e, -i, -l, -o, -s, -t
 - Bare invocation allowed
 
-### `top`
+### `top` (https://man7.org/linux/man-pages/man1/top.1.html)
 
 - Allowed standalone flags: -1, -B, -E, -H, -S, -b, -c, -e, -i
 - Allowed valued flags: -F, -O, -U, -d, -f, -l, -n, -o, -p, -s, -u, -w
 - Bare invocation allowed
 
-### `tr`
+### `tr` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation)
 
 - Allowed standalone flags: --complement, --delete, --squeeze-repeats, --truncate-set1, -C, -c, -d, -s
 
-### `tree`
+### `tree` (https://man7.org/linux/man-pages/man1/tree.1.html)
 
 - Allowed standalone flags: --dirsfirst, --du, --fromfile, --gitignore, --help, --inodes, --matchdirs, --noreport, --prune, --si, --version, -A, -C, -D, -F, -J, -N, -Q, -S, -X, -a, -d, -f, -g, -h, -i, -l, -n, -p, -q, -r, -s, -t, -u, -v, -x
 - Allowed valued flags: --charset, --filelimit, --filesfrom, --sort, --timefmt, -H, -I, -L, -P, -T
 - Bare invocation allowed
 
-### `true`
+### `true` (https://www.gnu.org/software/coreutils/manual/coreutils.html#true-invocation)
 
 - Bare invocation allowed
 
-### `tty`
+### `tty` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tty-invocation)
 
 - Allowed standalone flags: --quiet, --silent, -s
 - Bare invocation allowed
 
-### `type`
+### `type` (https://man7.org/linux/man-pages/man1/type.1p.html)
 
 - Allowed standalone flags: -P, -a, -f, -p, -t
 
-### `uname`
+### `uname` (https://www.gnu.org/software/coreutils/manual/coreutils.html#uname-invocation)
 
 - Allowed standalone flags: --all, --kernel-name, --kernel-release, --kernel-version, --machine, --nodename, --operating-system, --processor, -a, -m, -n, -o, -p, -r, -s, -v
 - Bare invocation allowed
 
-### `unexpand`
+### `unexpand` (https://www.gnu.org/software/coreutils/manual/coreutils.html#unexpand-invocation)
 
 - Allowed standalone flags: --all, --first-only, -a
 - Allowed valued flags: --tabs, -t
 - Bare invocation allowed
 
-### `uniq`
+### `uniq` (https://www.gnu.org/software/coreutils/manual/coreutils.html#uniq-invocation)
 
 - Allowed standalone flags: --count, --ignore-case, --repeated, --unique, --zero-terminated, -D, -c, -d, -i, -u, -z
 - Allowed valued flags: --all-repeated, --check-chars, --group, --skip-chars, --skip-fields, -f, -s, -w
 - Bare invocation allowed
 
-### `unset`
+### `unset` (https://man7.org/linux/man-pages/man1/unset.1p.html)
 
 - Allowed standalone flags: -f, -n, -v
 - Bare invocation allowed
 
-### `uptime`
+### `uptime` (https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation)
 
 - Allowed standalone flags: --pretty, --since, -p, -s
 - Bare invocation allowed
 
-### `uuidgen`
+### `uuidgen` (https://man7.org/linux/man-pages/man1/uuidgen.1.html)
 
 - Allowed standalone flags: --random, --time, -r, -t
 - Allowed valued flags: --md5, --name, --namespace, --sha1, -N, -m, -n, -s
 - Bare invocation allowed
 
-### `uv`
+### `uv` (https://docs.astral.sh/uv/reference/cli/)
 
 - **pip check**: Flags: --verbose. Valued: --python
 - **pip freeze**: Flags: --verbose. Valued: --python
@@ -1254,59 +1254,59 @@ Supports `-C <dir>` prefix.
 - **python list**: Flags: --verbose. Valued: --python
 - **tool list**: Flags: --verbose. Valued: --python
 
-### `vm_stat`
+### `vm_stat` (https://ss64.com/mac/vm_stat.html)
 
 - Allowed valued flags: -c
 - Bare invocation allowed
 
-### `volta`
+### `volta` (https://docs.volta.sh/reference)
 
 - **list**: Flags: --current, --default. Valued: --format
 - **which**: Flags: --current, --default. Valued: --format
 
-### `w`
+### `w` (https://man7.org/linux/man-pages/man1/w.1.html)
 
 - Allowed standalone flags: --from, --ip-addr, --no-current, --no-header, --old-style, --short, -f, -h, -i, -o, -s, -u
 - Bare invocation allowed
 
-### `wc`
+### `wc` (https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation)
 
 - Allowed standalone flags: --bytes, --chars, --lines, --max-line-length, --words, --zero-terminated, -L, -c, -l, -m, -w
 - Allowed valued flags: --files0-from
 - Bare invocation allowed
 
-### `whereis`
+### `whereis` (https://man7.org/linux/man-pages/man1/whereis.1.html)
 
 - Allowed standalone flags: -b, -l, -m, -s, -u
 - Allowed valued flags: -B, -M, -S, -f
 
-### `which`
+### `which` (https://man7.org/linux/man-pages/man1/which.1.html)
 
 - Allowed standalone flags: --all, -a, -s
 
-### `who`
+### `who` (https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation)
 
 - Allowed standalone flags: --all, --boot, --count, --dead, --heading, --login, --lookup, --mesg, --message, --process, --runlevel, --short, --time, --users, --writable, -H, -T, -a, -b, -d, -l, -m, -p, -q, -r, -s, -t, -u, -w
 - Bare invocation allowed
 
-### `whoami`
+### `whoami` (https://www.gnu.org/software/coreutils/manual/coreutils.html#whoami-invocation)
 
 - Bare invocation allowed
 
-### `whois`
+### `whois` (https://man7.org/linux/man-pages/man1/whois.1.html)
 
 - Allowed standalone flags: -A, -B, -G, -H, -I, -K, -L, -M, -Q, -R, -S, -a, -b, -c, -d, -f, -g, -l, -m, -r, -x
 - Allowed valued flags: -T, -V, -h, -i, -p, -s, -t
 
-### `xargs`
+### `xargs` (https://www.gnu.org/software/findutils/manual/html_mono/find.html#Invoking-xargs)
 
 - Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n, -P, -s, -E, -d, -0, -r, -t, -p, -x).
 
-### `xcode-select`
+### `xcode-select` (https://ss64.com/mac/xcode-select.html)
 
 - Info flags: -p, --print-path, -v, --version
 
-### `xcodebuild`
+### `xcodebuild` (https://developer.apple.com/documentation/xcode/xcodebuild)
 
 - **-list**: Flags: -json. Valued: -project, -workspace
 - **-showBuildSettings**: Flags: -json. Valued: -configuration, -destination, -project, -scheme, -sdk, -target, -workspace
@@ -1314,26 +1314,26 @@ Supports `-C <dir>` prefix.
 - **-showsdks**: Flags: -json. Valued: -configuration, -destination, -project, -scheme, -sdk, -target, -workspace
 - **-version**
 
-### `xcrun`
+### `xcrun` (https://ss64.com/mac/xcrun.html)
 
 - Allowed: --find, --show-sdk-*, --show-toolchain-path. Multi-level: notarytool history/info/log, simctl list, stapler validate. Prefix flags --sdk/--toolchain (with arg), -v/-l/-n are skipped.
 
-### `xmllint`
+### `xmllint` (https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html)
 
 - Allowed standalone flags: --auto, --catalogs, --compress, --copy, --debug, --debugent, --dropdtd, --format, --html, --htmlout, --huge, --load-trace, --loaddtd, --memory, --noblanks, --nocatalogs, --nocdata, --nocompact, --nodefdtd, --noenc, --noent, --nonet, --noout, --nowarning, --nowrap, --nsclean, --oldxml10, --postvalid, --push, --pushsmall, --quiet, --recover, --repeat, --sax, --sax1, --stream, --testIO, --timing, --valid, --version, --walker, --xinclude, --xmlout
 - Allowed valued flags: --dtdvalid, --dtdvalidfpi, --encode, --maxmem, --path, --pattern, --pretty, --relaxng, --schema, --schematron, --xpath
 
-### `xxd`
+### `xxd` (https://man7.org/linux/man-pages/man1/xxd.1.html)
 
 - Allowed standalone flags: --autoskip, --bits, --capitalize, --decimal, --ebcdic, --include, --little-endian, --plain, --postscript, --revert, --uppercase, -C, -E, -a, -b, -d, -e, -i, -p, -r, -u
 - Allowed valued flags: --color, --cols, --groupsize, --len, --name, --offset, --seek, -R, -c, -g, -l, -n, -o, -s
 - Bare invocation allowed
 
-### `yarn`
+### `yarn` (https://yarnpkg.com/cli)
 
 - Subcommands: info, list, ls, test, test:*, why.
 
-### `yq`
+### `yq` (https://mikefarah.gitbook.io/yq)
 
 - Allowed standalone flags: --colors, --exit-status, --help, --no-colors, --no-doc, --null-input, --prettyPrint, --version, -C, -M, -N, -P, -e, -r
 - Allowed valued flags: --arg, --argjson, --expression, --front-matter, --indent, --input-format, --output-format, -I, -p

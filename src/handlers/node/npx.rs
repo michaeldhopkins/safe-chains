@@ -25,6 +25,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocBuilder, wordset_items};
     vec![
         CommandDoc::handler("npx",
+            "https://docs.npmjs.com/cli/commands/npx",
             DocBuilder::new()
                 .section(format!("Allowed packages: {}.", wordset_items(&super::NPX_SAFE)))
                 .section("tsc allowed with --noEmit.")

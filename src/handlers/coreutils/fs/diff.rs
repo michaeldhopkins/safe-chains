@@ -34,7 +34,7 @@ static DIFF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "diff", policy: &DIFF_POLICY, help_eligible: false },
+    FlatDef { name: "diff", policy: &DIFF_POLICY, help_eligible: false, url: "https://www.gnu.org/software/diffutils/manual/diffutils.html" },
 ];
 
 #[cfg(test)]

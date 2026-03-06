@@ -19,7 +19,7 @@ static FOLD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "fold", policy: &FOLD_POLICY, help_eligible: false },
+    FlatDef { name: "fold", policy: &FOLD_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#fold-invocation" },
 ];
 
 #[cfg(test)]

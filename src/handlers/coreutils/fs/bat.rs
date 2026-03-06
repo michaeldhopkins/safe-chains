@@ -23,7 +23,7 @@ static BAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "bat", policy: &BAT_POLICY, help_eligible: false },
+    FlatDef { name: "bat", policy: &BAT_POLICY, help_eligible: false, url: "https://github.com/sharkdp/bat#readme" },
 ];
 
 #[cfg(test)]

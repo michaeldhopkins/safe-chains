@@ -30,6 +30,7 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         crate::docs::CommandDoc::handler("fd",
+            "https://github.com/sharkdp/fd#readme",
             "Safe unless --exec/-x or --exec-batch/-X flags (execute arbitrary commands)."),
     ]
 }

@@ -23,7 +23,7 @@ static JQ_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "jq", policy: &JQ_POLICY, help_eligible: false },
+    FlatDef { name: "jq", policy: &JQ_POLICY, help_eligible: false, url: "https://jqlang.github.io/jq/manual/" },
 ];
 
 #[cfg(test)]

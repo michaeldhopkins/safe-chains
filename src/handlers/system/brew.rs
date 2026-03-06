@@ -144,6 +144,7 @@ pub(crate) static BREW: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://docs.brew.sh/Manpage",
 };
 
 #[cfg(test)]

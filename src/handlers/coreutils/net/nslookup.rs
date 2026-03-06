@@ -34,7 +34,7 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_
 
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
-        crate::docs::CommandDoc::handler("nslookup",
+        crate::docs::CommandDoc::handler("nslookup", "https://man7.org/linux/man-pages/man1/nslookup.1.html",
             "Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -query=, -port=, -timeout=, -retry=, -class=, -domain=, -querytype=)."),
     ]
 }

@@ -24,7 +24,7 @@ static BC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "bc", policy: &BC_POLICY, help_eligible: false },
+    FlatDef { name: "bc", policy: &BC_POLICY, help_eligible: false, url: "https://www.gnu.org/software/bc/manual/html_mono/bc.html" },
 ];
 
 #[cfg(test)]

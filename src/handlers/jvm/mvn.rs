@@ -71,6 +71,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("mvn / mvnw",
+            "https://maven.apache.org/ref/current/maven-embedder/cli.html",
             "Phases: compile, dependency:list, dependency:tree, help:describe, \
              test, test-compile, validate, verify."),
     ]

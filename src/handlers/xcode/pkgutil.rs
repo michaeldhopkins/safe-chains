@@ -50,6 +50,7 @@ pub(in crate::handlers::xcode) fn command_docs() -> Vec<crate::docs::CommandDoc>
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("pkgutil",
+            "https://ss64.com/mac/pkgutil.html",
             "Requires a read-only flag (--pkgs, --files, --pkg-info, etc.)."),
     ]
 }

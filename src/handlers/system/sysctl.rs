@@ -34,6 +34,7 @@ pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token], _is_saf
 pub(in crate::handlers::system) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         crate::docs::CommandDoc::handler("sysctl",
+            "https://man7.org/linux/man-pages/man8/sysctl.8.html",
             "Read-only usage."),
     ]
 }

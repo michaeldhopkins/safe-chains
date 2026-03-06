@@ -105,6 +105,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocBuilder, wordset_items};
     vec![
         CommandDoc::handler("curl",
+            "https://curl.se/docs/manpage.html",
             DocBuilder::new()
                 .section(format!(
                     "Allowed standalone flags: {}.",

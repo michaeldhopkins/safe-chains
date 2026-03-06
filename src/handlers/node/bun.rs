@@ -52,6 +52,7 @@ pub(crate) static BUN: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://bun.sh/docs/cli",
 };
 
 #[cfg(test)]

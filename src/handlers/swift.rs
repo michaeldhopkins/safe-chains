@@ -81,6 +81,7 @@ pub(crate) static SWIFT: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://www.swift.org/documentation/swift-compiler/",
 };
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
