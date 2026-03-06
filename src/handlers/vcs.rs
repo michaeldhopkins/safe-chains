@@ -788,7 +788,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, doc_multi, wordset_items};
     let mut git_doc = GIT.to_doc();
-    git_doc.description.push_str(" Supports `-C <dir>` prefix.");
+    git_doc.description.push_str("\n\nSupports `-C <dir>` prefix.");
     vec![
         git_doc,
         CommandDoc::handler("jj",

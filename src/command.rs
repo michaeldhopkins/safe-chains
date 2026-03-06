@@ -112,71 +112,92 @@ impl CommandDef {
     }
 
     pub fn to_doc(&self) -> crate::docs::CommandDoc {
-        let mut parts = Vec::new();
-
-        let mut policy_names: Vec<&str> = Vec::new();
-        let mut nested_names: Vec<String> = Vec::new();
-        let mut guarded_descs: Vec<String> = Vec::new();
-        let mut extra_docs: Vec<&str> = Vec::new();
-
-        for sub in self.subs {
-            match sub {
-                SubDef::Policy { name, .. } => {
-                    policy_names.push(name);
-                }
-                SubDef::Nested { name, subs } => {
-                    let visible: Vec<_> = subs.iter()
-                        .filter(|s| !s.name().starts_with('-'))
-                        .collect();
-                    if visible.len() <= 5 {
-                        for s in &visible {
-                            nested_names.push(format!("{name} {}", s.name()));
-                        }
-                    } else {
-                        nested_names.push((*name).to_string());
-                    }
-                }
-                SubDef::Guarded { name, guard_long, .. } => {
-                    guarded_descs.push(format!("{name} (requires {guard_long})"));
-                }
-                SubDef::Custom { name, doc, .. } => {
-                    if doc.is_empty() {
-                        policy_names.push(name);
-                    } else if !doc.trim().is_empty() {
-                        extra_docs.push(doc);
-                    }
-                }
-                SubDef::Delegation { doc, .. } => {
-                    if !doc.is_empty() {
-                        extra_docs.push(doc);
-                    }
-                }
-            }
-        }
-
-        if !policy_names.is_empty() {
-            policy_names.sort();
-            parts.push(format!("Subcommands: {}.", policy_names.join(", ")));
-        }
-
-        if !nested_names.is_empty() {
-            nested_names.sort();
-            parts.push(format!("Multi-level: {}.", nested_names.join(", ")));
-        }
+        let mut lines = Vec::new();
 
         if !self.bare_flags.is_empty() {
-            parts.push(format!("Info flags: {}.", self.bare_flags.join(", ")));
+            lines.push(format!("Info flags: {}.", self.bare_flags.join(", ")));
         }
 
-        if !guarded_descs.is_empty() {
-            parts.push(format!("{}.", guarded_descs.join(", ")));
+        let mut sub_lines: Vec<String> = Vec::new();
+        for sub in self.subs {
+            sub_doc_line(sub, "", &mut sub_lines);
         }
+        sub_lines.sort();
+        lines.extend(sub_lines);
 
-        for doc in extra_docs {
-            parts.push(doc.to_string());
+        crate::docs::CommandDoc::handler(self.name, lines.join("\n"))
+    }
+}
+
+fn sub_doc_line(sub: &SubDef, prefix: &str, out: &mut Vec<String>) {
+    match sub {
+        SubDef::Policy { name, policy } => {
+            let summary = policy.flag_summary();
+            let label = if prefix.is_empty() {
+                (*name).to_string()
+            } else {
+                format!("{prefix} {name}")
+            };
+            if summary.is_empty() {
+                out.push(format!("- **{label}**"));
+            } else {
+                out.push(format!("- **{label}**: {summary}"));
+            }
         }
-
-        crate::docs::CommandDoc::handler(self.name, parts.join(" "))
+        SubDef::Nested { name, subs } => {
+            let path = if prefix.is_empty() {
+                (*name).to_string()
+            } else {
+                format!("{prefix} {name}")
+            };
+            for s in *subs {
+                sub_doc_line(s, &path, out);
+            }
+        }
+        SubDef::Guarded {
+            name,
+            guard_long,
+            policy,
+            ..
+        } => {
+            let summary = policy.flag_summary();
+            let label = if prefix.is_empty() {
+                (*name).to_string()
+            } else {
+                format!("{prefix} {name}")
+            };
+            if summary.is_empty() {
+                out.push(format!("- **{label}** (requires {guard_long})"));
+            } else {
+                out.push(format!("- **{label}** (requires {guard_long}): {summary}"));
+            }
+        }
+        SubDef::Custom { name, doc, .. } => {
+            if !doc.is_empty() && doc.trim().is_empty() {
+                return;
+            }
+            let label = if prefix.is_empty() {
+                (*name).to_string()
+            } else {
+                format!("{prefix} {name}")
+            };
+            if doc.is_empty() {
+                out.push(format!("- **{label}**"));
+            } else {
+                out.push(format!("- **{label}**: {doc}"));
+            }
+        }
+        SubDef::Delegation { name, doc, .. } => {
+            if doc.is_empty() {
+                return;
+            }
+            let label = if prefix.is_empty() {
+                (*name).to_string()
+            } else {
+                format!("{prefix} {name}")
+            };
+            out.push(format!("- **{label}**: {doc}"));
+        }
     }
 }
 
@@ -488,30 +509,39 @@ mod tests {
     fn doc_simple() {
         let doc = SIMPLE_CMD.to_doc();
         assert_eq!(doc.name, "mycmd");
-        assert_eq!(doc.description, "Subcommands: build. Info flags: --info.");
+        assert_eq!(
+            doc.description,
+            "Info flags: --info.\n- **build**: Flags: --verbose. Valued: --output"
+        );
     }
 
     #[test]
     fn doc_nested() {
         let doc = NESTED_CMD.to_doc();
-        assert_eq!(doc.description, "Multi-level: package describe.");
+        assert_eq!(
+            doc.description,
+            "- **package describe**: Flags: --verbose. Valued: --output"
+        );
     }
 
     #[test]
     fn doc_guarded() {
         let doc = GUARDED_CMD.to_doc();
-        assert_eq!(doc.description, "fmt (requires --check).");
+        assert_eq!(
+            doc.description,
+            "- **fmt** (requires --check): Flags: --all, --check"
+        );
     }
 
     #[test]
     fn doc_delegation() {
         let doc = DELEGATION_CMD.to_doc();
-        assert_eq!(doc.description, "run delegates to inner command.");
+        assert_eq!(doc.description, "- **run**: run delegates to inner command.");
     }
 
     #[test]
     fn doc_custom() {
         let doc = CUSTOM_CMD.to_doc();
-        assert_eq!(doc.description, "special (safe only).");
+        assert_eq!(doc.description, "- **special**: special (safe only).");
     }
 }

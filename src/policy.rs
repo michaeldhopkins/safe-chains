@@ -36,6 +36,23 @@ impl FlagPolicy {
         }
         builder.build()
     }
+
+    pub fn flag_summary(&self) -> String {
+        use crate::docs::wordset_items;
+        let mut parts = Vec::new();
+        let standalone = wordset_items(&self.standalone);
+        if !standalone.is_empty() {
+            parts.push(format!("Flags: {standalone}"));
+        }
+        let valued = wordset_items(&self.valued);
+        if !valued.is_empty() {
+            parts.push(format!("Valued: {valued}"));
+        }
+        if self.flag_style == FlagStyle::Positional {
+            parts.push("Positional args accepted".to_string());
+        }
+        parts.join(". ")
+    }
 }
 
 pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {

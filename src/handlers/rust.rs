@@ -417,7 +417,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     let mut cargo_doc = CARGO.to_doc();
-    cargo_doc.description.push_str(" +toolchain selectors (e.g. +nightly) are skipped.");
+    cargo_doc.description.push_str("\n\n+toolchain selectors (e.g. +nightly) are skipped.");
     vec![cargo_doc, RUSTUP.to_doc()]
 }
 

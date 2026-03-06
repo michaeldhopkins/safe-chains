@@ -14,7 +14,15 @@ Bare invocation allowed.
 
 ### `asdf`
 
-Subcommands: current, help, info, list, plugin-list, plugin-list-all, version, which. Multi-level: plugin list.
+- **current**
+- **help**
+- **info**
+- **list**
+- **plugin list**
+- **plugin-list**
+- **plugin-list-all**
+- **version**
+- **which**
 
 ### `awk / gawk / mawk / nawk`
 
@@ -66,15 +74,44 @@ Bare invocation allowed.
 
 ### `brew`
 
-Subcommands: --prefix, abv, casks, cat, config, deps, desc, doctor, formulae, home, info, leaves, list, log, ls, outdated, search, shellenv, tap, uses.
+- **--prefix**
+- **abv**: Flags: --analytics, --cask, --formula, --installed, --json. Valued: --days
+- **casks**
+- **cat**
+- **config**
+- **deps**: Flags: --1, --annotate, --cask, --direct, --for-each, --formula, --full-name, --graph, --include-build, --include-optional, --include-test, --installed, --missing, --skip-recommended, --tree, --union
+- **desc**: Flags: --cask, --description, --eval-all, --formula, --name, --search
+- **doctor**
+- **formulae**
+- **home**
+- **info**: Flags: --analytics, --cask, --formula, --installed, --json. Valued: --days
+- **leaves**
+- **list**: Flags: --cask, --formula, --full-name, --multiple, --pinned, --versions
+- **log**: Flags: --cask, --formula, --oneline. Valued: --max-count
+- **ls**: Flags: --cask, --formula, --full-name, --multiple, --pinned, --versions
+- **outdated**: Flags: --cask, --fetch-HEAD, --formula, --greedy, --greedy-auto-updates, --greedy-latest, --json
+- **search**: Flags: --cask, --closed, --debian, --desc, --fedora, --fink, --formula, --macports, --open, --opensuse, --pull-request, --repology, --ubuntu
+- **shellenv**
+- **tap**
+- **uses**: Flags: --cask, --formula, --include-build, --include-optional, --include-test, --installed, --missing, --recursive, --skip-recommended
 
 ### `bun`
 
-Subcommands: outdated, test. Multi-level: pm bin, pm cache, pm hash, pm ls. x delegates to bunx logic.
+- **outdated**
+- **pm bin**
+- **pm cache**
+- **pm hash**
+- **pm ls**
+- **test**: Flags: --bail, --only, --rerun-each, --todo. Valued: --preload, --timeout
+- **x**: x delegates to bunx logic.
 
 ### `bundle`
 
-Subcommands: check, info, list, show. exec allowed for: brakeman, cucumber, erb_lint, herb, rspec, standardrb.
+- **check**: Flags: --dry-run. Valued: --gemfile, --path
+- **exec**: exec allowed for: brakeman, cucumber, erb_lint, herb, rspec, standardrb.
+- **info**: Flags: --path
+- **list**: Flags: --name-only, --paths
+- **show**: Flags: --paths
 
 ### `bunx`
 
@@ -94,7 +131,28 @@ Bare invocation allowed.
 
 ### `cargo`
 
-Subcommands: audit, bench, build, check, clippy, deny, doc, info, license, locate-project, metadata, pkgid, read-manifest, search, test, tree, verify-project. fmt (requires --check), package (requires --list), publish (requires --dry-run). +toolchain selectors (e.g. +nightly) are skipped.
+- **audit**: Flags: --deny, --json, --no-fetch, --stale. Valued: --color, --db, --file, --ignore, --target-arch, --target-os
+- **bench**: Flags: --all-features, --all-targets, --frozen, --future-incompat-report, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --timings, --unit-graph. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test
+- **build**: Flags: --all-features, --all-targets, --build-plan, --frozen, --future-incompat-report, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --timings, --unit-graph. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test
+- **check**: Flags: --all-features, --all-targets, --frozen, --future-incompat-report, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --timings, --unit-graph. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test
+- **clippy**: Flags: --all-features, --all-targets, --frozen, --future-incompat-report, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-deps, --offline, --release, --timings, --unit-graph. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test
+- **deny**: Flags: --all-features, --no-default-features. Valued: --color, --config, --exclude, --features, --format, --manifest-path, --target, --workspace
+- **doc**: Flags: --all-features, --document-private-items, --frozen, --future-incompat-report, --ignore-rust-version, --keep-going, --locked, --no-default-features, --no-deps, --offline, --open, --release, --timings, --unit-graph. Valued: --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir
+- **fmt** (requires --check): Flags: --all, --check. Valued: --manifest-path, --message-format, --package
+- **info**: Flags: --frozen, --locked, --offline. Valued: --color, --config, --index, --registry
+- **license**: Flags: --frozen, --locked, --offline. Valued: --color, --config, --manifest-path
+- **locate-project**: Flags: --frozen, --locked, --offline. Valued: --color, --config, --manifest-path
+- **metadata**: Flags: --all-features, --frozen, --locked, --no-default-features, --no-deps, --offline. Valued: --color, --config, --features, --filter-platform, --format-version, --manifest-path
+- **package** (requires --list): Flags: --all-features, --frozen, --keep-going, --list, --locked, --no-default-features, --no-metadata, --offline, --workspace. Valued: --color, --config, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --target, --target-dir
+- **pkgid**: Flags: --frozen, --locked, --offline. Valued: --color, --config, --manifest-path
+- **publish** (requires --dry-run): Flags: --all-features, --dry-run, --frozen, --keep-going, --locked, --no-default-features, --offline, --workspace. Valued: --color, --config, --exclude, --features, --index, --jobs, --manifest-path, --package, --registry, --target, --target-dir
+- **read-manifest**: Flags: --frozen, --locked, --offline. Valued: --color, --config, --manifest-path
+- **search**: Flags: --frozen, --locked, --offline. Valued: --color, --config, --index, --limit, --registry
+- **test**: Flags: --all-features, --all-targets, --doc, --frozen, --future-incompat-report, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --timings, --unit-graph. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test
+- **tree**: Flags: --all-features, --duplicates, --frozen, --ignore-rust-version, --locked, --no-dedupe, --no-default-features, --offline. Valued: --charset, --color, --config, --depth, --edges, --features, --format, --invert, --manifest-path, --package, --prefix, --prune, --target
+- **verify-project**: Flags: --frozen, --locked, --offline. Valued: --color, --config, --manifest-path
+
++toolchain selectors (e.g. +nightly) are skipped.
 
 ### `cat`
 
@@ -154,15 +212,29 @@ Allowed: -v, -V (check if command exists).
 
 ### `composer`
 
-Subcommands: about, audit, check-platform-reqs, diagnose, fund, help, info, licenses, outdated, show, suggests.
+- **about**
+- **audit**: Flags: --abandoned, --locked, --no-dev. Valued: --format
+- **check-platform-reqs**
+- **diagnose**
+- **fund**
+- **help**
+- **info**: Flags: --all, --available, --direct, --installed, --latest, --locked, --minor-only, --name-only, --no-dev, --outdated, --path, --platform, --self, --strict, --tree, --versions. Valued: --format, --ignore
+- **licenses**
+- **outdated**: Flags: --all, --direct, --locked, --minor-only, --no-dev, --strict. Valued: --format, --ignore
+- **show**: Flags: --all, --available, --direct, --installed, --latest, --locked, --minor-only, --name-only, --no-dev, --outdated, --path, --platform, --self, --strict, --tree, --versions. Valued: --format, --ignore
+- **suggests**
 
 ### `conda`
 
-Subcommands: info, list. config (--show/--show-sources only).
+- **config**: config (--show/--show-sources only).
+- **info**: Flags: --all, --envs, --json, --verbose
+- **list**: Flags: --explicit, --export, --full-name, --json, --no-pip, --revisions. Valued: --name, --prefix
 
 ### `csrutil`
 
-Subcommands: authenticated-root, report, status.
+- **authenticated-root**
+- **report**
+- **status**
 
 ### `cucumber`
 
@@ -194,7 +266,11 @@ Bare invocation allowed.
 
 ### `defaults`
 
-Subcommands: domains, export, find, read, read-type.
+- **domains**
+- **export**: Flags: -g, -globalDomain. Valued: -app
+- **find**: Flags: -g, -globalDomain. Valued: -app
+- **read**: Flags: -g, -globalDomain. Valued: -app
+- **read-type**: Flags: -g, -globalDomain. Valued: -app
 
 ### `delta`
 
@@ -206,7 +282,12 @@ Bare invocation allowed.
 
 ### `deno`
 
-Subcommands: check, doc, info, lint, test. fmt (requires --check).
+- **check**: Flags: --json, --no-lock, --quiet, --unstable. Valued: --config, --import-map
+- **doc**: Flags: --json, --no-lock, --quiet, --unstable. Valued: --config, --import-map
+- **fmt** (requires --check): Flags: --check, --no-semicolons, --single-quote, --unstable. Valued: --config, --ext, --ignore, --indent-width, --line-width, --log-level, --prose-wrap
+- **info**: Flags: --json, --no-lock, --quiet, --unstable. Valued: --config, --import-map
+- **lint**: Flags: --json, --no-lock, --quiet, --unstable. Valued: --config, --import-map
+- **test**: Flags: --json, --no-lock, --quiet, --unstable. Valued: --config, --import-map
 
 ### `df`
 
@@ -234,15 +315,68 @@ Allowed standalone flags: --zero, -z.
 
 ### `diskutil`
 
-Subcommands: activity, info, list, listFilesystems. Multi-level: apfs list, apfs listCryptoUsers, apfs listSnapshots, apfs listVolumeGroups.
+- **activity**
+- **apfs list**
+- **apfs listCryptoUsers**
+- **apfs listSnapshots**
+- **apfs listVolumeGroups**
+- **info**: Flags: -all, -plist
+- **list**: Flags: -plist
+- **listFilesystems**: Flags: -plist
 
 ### `docker / podman`
 
-Subcommands: diff, history, images, info, inspect, logs, port, ps, stats, top, version. Multi-level: buildx inspect, buildx ls, buildx version, compose, container, context inspect, context ls, context show, image history, image inspect, image list, image ls, manifest inspect, network inspect, network ls, system df, system info, volume inspect, volume ls.
+- **buildx --version**
+- **buildx inspect**
+- **buildx ls**
+- **buildx version**
+- **compose --version**
+- **compose config**: Flags: --dry-run, --hash, --images, --no-consistency, --no-interpolate, --no-normalize, --no-path-resolution, --profiles, --quiet, --resolve-image-digests, --services, --volumes. Valued: --format, --output
+- **compose images**
+- **compose ls**
+- **compose ps**: Flags: --all, --no-trunc, --orphans, --quiet, --services. Valued: --filter, --format, --status
+- **compose top**
+- **compose version**
+- **container diff**
+- **container inspect**: Flags: --size. Valued: --format, --type
+- **container list**: Flags: --all, --last, --latest, --no-trunc, --quiet, --size. Valued: --filter, --format
+- **container logs**: Flags: --details, --follow, --timestamps. Valued: --since, --tail, --until
+- **container ls**: Flags: --all, --last, --latest, --no-trunc, --quiet, --size. Valued: --filter, --format
+- **container port**
+- **container stats**: Flags: --all, --no-stream, --no-trunc. Valued: --format
+- **container top**
+- **context inspect**: Flags: --no-trunc, --quiet. Valued: --filter, --format
+- **context ls**: Flags: --no-trunc, --quiet. Valued: --filter, --format
+- **context show**: Flags: --no-trunc, --quiet. Valued: --filter, --format
+- **diff**
+- **history**: Flags: --human, --no-trunc, --quiet. Valued: --format
+- **image history**: Flags: --human, --no-trunc, --quiet. Valued: --format
+- **image inspect**: Flags: --size. Valued: --format, --type
+- **image list**: Flags: --all, --digests, --no-trunc, --quiet. Valued: --filter, --format
+- **image ls**: Flags: --all, --digests, --no-trunc, --quiet. Valued: --filter, --format
+- **images**: Flags: --all, --digests, --no-trunc, --quiet. Valued: --filter, --format
+- **info**: Valued: --format
+- **inspect**: Flags: --size. Valued: --format, --type
+- **logs**: Flags: --details, --follow, --timestamps. Valued: --since, --tail, --until
+- **manifest inspect**: Flags: --size. Valued: --format, --type
+- **network inspect**: Flags: --no-trunc, --quiet. Valued: --filter, --format
+- **network ls**: Flags: --no-trunc, --quiet. Valued: --filter, --format
+- **port**
+- **ps**: Flags: --all, --last, --latest, --no-trunc, --quiet, --size. Valued: --filter, --format
+- **stats**: Flags: --all, --no-stream, --no-trunc. Valued: --format
+- **system df**: Valued: --format
+- **system info**: Valued: --format
+- **top**
+- **version**: Valued: --format
+- **volume inspect**: Flags: --no-trunc, --quiet. Valued: --filter, --format
+- **volume ls**: Flags: --no-trunc, --quiet. Valued: --filter, --format
 
 ### `dotnet`
 
-Subcommands: build, list, test. Info flags: --info, --list-runtimes, --list-sdks.
+Info flags: --info, --list-runtimes, --list-sdks.
+- **build**: Flags: --force, --no-dependencies, --no-incremental, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime. Valued: --arch, --artifacts-path, --configuration, --framework, --os, --output, --property, --runtime, --source, --verbosity, --version-suffix
+- **list**: Flags: --deprecated, --highest-minor, --highest-patch, --include-prerelease, --include-transitive, --outdated, --vulnerable. Valued: --config, --format, --framework, --source, --verbosity
+- **test**: Flags: --blame, --blame-crash, --blame-hang, --force, --list-tests, --no-build, --no-dependencies, --no-restore, --nologo. Valued: --arch, --artifacts-path, --blame-crash-collect-always, --blame-crash-dump-type, --blame-hang-dump-type, --blame-hang-timeout, --collect, --configuration, --diag, --environment, --filter, --framework, --logger, --os, --output, --property, --results-directory, --runtime, --settings, --test-adapter-path, --verbosity
 
 ### `du`
 
@@ -318,7 +452,10 @@ Bare invocation allowed.
 
 ### `fnm`
 
-Subcommands: current, default, list, ls-remote.
+- **current**
+- **default**
+- **list**
+- **ls-remote**
 
 ### `fold`
 
@@ -330,7 +467,19 @@ Bare invocation allowed.
 
 ### `gem`
 
-Subcommands: contents, dependency, environment, help, info, list, outdated, pristine, search, sources, specification, stale, which.
+- **contents**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
+- **dependency**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
+- **environment**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
+- **help**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
+- **info**: Flags: --installed, --prerelease. Valued: --version
+- **list**: Flags: --all, --installed, --local, --no-details, --no-versions, --prerelease, --remote, --versions
+- **outdated**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
+- **pristine**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
+- **search**: Flags: --all, --details, --exact, --local, --prerelease, --remote, --versions
+- **sources**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
+- **specification**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
+- **stale**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
+- **which**: Flags: --all, --local, --prerelease, --remote, --versions. Valued: --version
 
 ### `getconf`
 
@@ -350,7 +499,40 @@ auth status, browse (requires --no-browser), api (GET only).
 
 ### `git`
 
-Subcommands: blame, cat-file, check-ignore, count-objects, describe, diff, diff-tree, fetch, for-each-ref, grep, help, log, ls-files, ls-remote, ls-tree, merge-base, merge-tree, name-rev, reflog, rev-parse, shortlog, show, status, verify-commit, verify-tag. branch (read-only flags). config (--get, --get-all, --get-regexp, --list, -l only). notes (list, show only). remote (read-only actions). stash (list, show only). tag (list only). worktree (list only). Supports `-C <dir>` prefix.
+- **blame**: Flags: --color-by-age, --color-lines, --incremental, --line-porcelain, --minimal, --porcelain, --progress, --root, --show-email, --show-name, --show-number, --show-stats, -b, -c, -e, -f, -l, -n, -p, -s, -t, -w. Valued: --abbrev, --contents, --ignore-rev, --ignore-revs-file, -C, -L, -M, -S
+- **branch**: branch (read-only flags).
+- **cat-file**: Flags: --batch-all-objects, --buffer, --filters, --follow-symlinks, --mailmap, --textconv, --unordered, --use-mailmap, -Z, -e, -p, -s, -t. Valued: --batch, --batch-check, --batch-command, --filter, --path
+- **check-ignore**: Flags: --no-index, --non-matching, --quiet, --stdin, --verbose, -n, -q, -v, -z
+- **config**: config (--get, --get-all, --get-regexp, --list, -l only).
+- **count-objects**: Flags: --human-readable, --verbose, -H, -v
+- **describe**: Flags: --all, --always, --contains, --debug, --exact-match, --first-parent, --long, --tags. Valued: --abbrev, --broken, --candidates, --dirty, --exclude, --match
+- **diff**: Flags: --cached, --check, --compact-summary, --cumulative, --dirstat-by-file, --exit-code, --find-copies-harder, --full-index, --ignore-all-space, --ignore-blank-lines, --ignore-cr-at-eol, --ignore-space-at-eol, --ignore-space-change, --merge-base, --minimal, --name-only, --name-status, --no-color, --no-ext-diff, --no-index, --no-patch, --no-prefix, --no-renames, --numstat, --patch, --patch-with-raw, --patch-with-stat, --patience, --pickaxe-all, --raw, --shortstat, --staged, --stat, --summary, --text, -B, -C, -M, -R, -a, -b, -p, -u, -w, -z. Valued: --abbrev, --color, --diff-algorithm, --diff-filter, --dirstat, --dst-prefix, --inter-hunk-context, --line-prefix, --output-indicator-new, --output-indicator-old, --relative, --src-prefix, --stat-width, --unified, --word-diff, --word-diff-regex, -G, -O, -S, -U
+- **diff-tree**: Flags: --cc, --combined-all-paths, --find-copies-harder, --full-index, --ignore-all-space, --ignore-space-at-eol, --ignore-space-change, --merge-base, --minimal, --name-only, --name-status, --no-commit-id, --no-ext-diff, --no-patch, --no-renames, --numstat, --patch, --patch-with-raw, --patch-with-stat, --pickaxe-all, --raw, --root, --shortstat, --stat, --stdin, --summary, --text, -B, -C, -M, -R, -a, -c, -m, -p, -r, -s, -t, -u, -v, -z. Valued: --abbrev, --diff-algorithm, --diff-filter, --pretty, -O, -S
+- **fetch**: Flags: --all, --append, --atomic, --dry-run, --force, --ipv4, --ipv6, --keep, --multiple, --negotiate-only, --no-auto-gc, --no-auto-maintenance, --no-show-forced-updates, --no-tags, --no-write-fetch-head, --porcelain, --prefetch, --progress, --prune, --prune-tags, --quiet, --refetch, --set-upstream, --show-forced-updates, --stdin, --tags, --unshallow, --update-head-ok, --update-shallow, --verbose, --write-commit-graph, --write-fetch-head, -4, -6, -P, -a, -f, -k, -m, -n, -p, -q, -t, -u, -v. Valued: --deepen, --depth, --filter, --jobs, --negotiation-tip, --recurse-submodules, --refmap, --server-option, --shallow-exclude, --shallow-since, -j, -o
+- **for-each-ref**: Flags: --ignore-case, --include-root-refs, --omit-empty, --perl, --python, --shell, --stdin, --tcl, -p, -s. Valued: --color, --contains, --count, --exclude, --format, --merged, --no-contains, --no-merged, --points-at, --sort
+- **grep**: Flags: --all-match, --and, --basic-regexp, --break, --cached, --column, --count, --exclude-standard, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --full-name, --function-context, --heading, --ignore-case, --index, --invert-match, --line-number, --name-only, --no-color, --no-index, --null, --only-matching, --perl-regexp, --quiet, --recurse-submodules, --recursive, --show-function, --text, --textconv, --untracked, --word-regexp, -E, -F, -G, -H, -I, -L, -P, -W, -a, -c, -h, -i, -l, -n, -o, -p, -q, -r, -v, -w, -z. Valued: --after-context, --before-context, --color, --context, --max-count, --max-depth, --open-files-in-pager, --threads, -A, -B, -C, -O, -e, -f, -m
+- **help**
+- **log**: Flags: --abbrev-commit, --all, --ancestry-path, --author-date-order, --bisect, --boundary, --branches, --cherry, --cherry-mark, --cherry-pick, --children, --clear-decorations, --compact-summary, --cumulative, --date-order, --dense, --do-walk, --early-output, --first-parent, --follow, --full-diff, --full-history, --graph, --ignore-missing, --left-only, --left-right, --log-size, --mailmap, --merges, --minimal, --name-only, --name-status, --no-abbrev-commit, --no-color, --no-decorate, --no-expand-tabs, --no-ext-diff, --no-merges, --no-notes, --no-patch, --no-prefix, --no-renames, --no-walk, --numstat, --oneline, --parents, --patch, --patch-with-raw, --patch-with-stat, --patience, --raw, --reflog, --relative-date, --remotes, --reverse, --shortstat, --show-linear-break, --show-notes, --show-pulls, --show-signature, --simplify-by-decoration, --simplify-merges, --source, --sparse, --stat, --stdin, --summary, --tags, --text, --topo-order, --use-mailmap, -p, -q, -u. Valued: --abbrev, --after, --author, --before, --color, --committer, --date, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --encoding, --exclude, --format, --glob, --grep, --max-count, --max-parents, --min-parents, --pretty, --since, --skip, --until, -L, -n
+- **ls-files**: Flags: --cached, --debug, --deduplicate, --deleted, --directory, --empty-directory, --eol, --error-unmatch, --exclude-standard, --full-name, --ignored, --killed, --modified, --no-empty-directory, --others, --recurse-submodules, --resolve-undo, --sparse, --stage, --unmerged, -c, -d, -f, -i, -k, -m, -o, -s, -t, -u, -v, -z. Valued: --abbrev, --exclude, --exclude-from, --exclude-per-directory, --format, --with-tree, -X, -x
+- **ls-remote**: Flags: --branches, --exit-code, --get-url, --quiet, --refs, --symref, --tags, -b, -q, -t. Valued: --server-option, --sort, -o
+- **ls-tree**: Flags: --full-name, --full-tree, --long, --name-only, --name-status, --object-only, -d, -l, -r, -t, -z. Valued: --abbrev, --format
+- **merge-base**: Flags: --all, --fork-point, --independent, --is-ancestor, --octopus, -a
+- **merge-tree**: Flags: --allow-unrelated-histories, --messages, --name-only, --quiet, --stdin, --trivial-merge, --write-tree, -z. Valued: --merge-base, -X
+- **name-rev**: Flags: --all, --always, --annotate-stdin, --name-only, --tags, --undefined. Valued: --exclude, --refs
+- **notes**: notes (list, show only).
+- **reflog**: Flags: --abbrev-commit, --all, --ancestry-path, --author-date-order, --bisect, --boundary, --branches, --cherry, --cherry-mark, --cherry-pick, --children, --clear-decorations, --compact-summary, --cumulative, --date-order, --dense, --do-walk, --early-output, --first-parent, --follow, --full-diff, --full-history, --graph, --ignore-missing, --left-only, --left-right, --log-size, --mailmap, --merges, --minimal, --name-only, --name-status, --no-abbrev-commit, --no-color, --no-decorate, --no-expand-tabs, --no-ext-diff, --no-merges, --no-notes, --no-patch, --no-prefix, --no-renames, --no-walk, --numstat, --oneline, --parents, --patch, --patch-with-raw, --patch-with-stat, --patience, --raw, --reflog, --relative-date, --remotes, --reverse, --shortstat, --show-linear-break, --show-notes, --show-pulls, --show-signature, --simplify-by-decoration, --simplify-merges, --source, --sparse, --stat, --stdin, --summary, --tags, --text, --topo-order, --use-mailmap, -p, -q, -u. Valued: --abbrev, --after, --author, --before, --color, --committer, --date, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --encoding, --exclude, --format, --glob, --grep, --max-count, --max-parents, --min-parents, --pretty, --since, --skip, --until, -L, -n
+- **remote**: remote (read-only actions).
+- **rev-parse**: Flags: --absolute-git-dir, --all, --branches, --git-common-dir, --git-dir, --git-path, --is-bare-repository, --is-inside-git-dir, --is-inside-work-tree, --is-shallow-repository, --local-env-vars, --quiet, --remotes, --shared-index-path, --show-cdup, --show-prefix, --show-superproject-working-tree, --show-toplevel, --symbolic, --symbolic-full-name, --tags, --verify, -q. Valued: --abbrev-ref, --after, --before, --default, --exclude, --glob, --prefix, --resolve-git-dir, --short, --since, --until. Positional args accepted
+- **shortlog**: Flags: --committer, --email, --numbered, --summary, -c, -e, -n, -s. Valued: --format, --group
+- **show**: Flags: --abbrev-commit, --compact-summary, --cumulative, --expand-tabs, --full-index, --ignore-all-space, --ignore-blank-lines, --ignore-space-at-eol, --ignore-space-change, --mailmap, --minimal, --name-only, --name-status, --no-color, --no-ext-diff, --no-notes, --no-patch, --no-prefix, --no-renames, --numstat, --patch, --patch-with-raw, --patch-with-stat, --patience, --raw, --shortstat, --show-notes, --show-signature, --source, --stat, --summary, --text, --use-mailmap, -p, -q, -u, -w. Valued: --abbrev, --color, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --encoding, --format, --notes, --pretty, -O
+- **stash**: stash (list, show only).
+- **status**: Flags: --ahead-behind, --branch, --ignore-submodules, --long, --no-ahead-behind, --no-renames, --null, --renames, --short, --show-stash, --verbose, -b, -s, -v, -z. Valued: --column, --find-renames, --ignored, --porcelain, --untracked-files, -M, -u
+- **tag**: tag (list only).
+- **verify-commit**: Flags: --raw, --verbose, -v
+- **verify-tag**: Flags: --raw, --verbose, -v. Valued: --format
+- **worktree**: worktree (list only).
+
+Supports `-C <dir>` prefix.
 
 ### `glab`
 
@@ -362,11 +544,23 @@ auth status, api (GET only).
 
 ### `go`
 
-Subcommands: build, doc, env, help, list, test, version, vet.
+- **build**: Flags: -a, -asan, -cover, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -o, -overlay, -p, -pgo, -pkgdir, -tags
+- **doc**: Flags: -all, -c, -cmd, -short, -src, -u
+- **env**: Flags: -json
+- **help**
+- **list**: Flags: -a, -asan, -compiled, -cover, -deps, -e, -export, -find, -linkshared, -m, -modcacherw, -msan, -n, -race, -retract, -test, -trimpath, -u, -v, -versions, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -f, -gccgoflags, -gcflags, -installsuffix, -json, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -reuse, -tags
+- **test**: Flags: -a, -asan, -benchmem, -cover, -failfast, -json, -linkshared, -modcacherw, -msan, -n, -race, -short, -trimpath, -v, -work, -x. Valued: -asmflags, -bench, -benchtime, -blockprofile, -blockprofilerate, -buildmode, -buildvcs, -compiler, -count, -covermode, -coverpkg, -coverprofile, -cpu, -cpuprofile, -fuzz, -fuzzminimizetime, -fuzztime, -gccgoflags, -gcflags, -installsuffix, -ldflags, -list, -memprofile, -memprofilerate, -mod, -modfile, -mutexprofile, -mutexprofilefraction, -o, -outputdir, -overlay, -p, -parallel, -pgo, -pkgdir, -run, -shuffle, -skip, -tags, -timeout, -trace
+- **version**: Flags: -m, -v
+- **vet**: Flags: -a, -asan, -cover, -json, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -c, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -tags
 
 ### `gradle / gradlew`
 
-Subcommands: build, check, dependencies, properties, tasks, test.
+- **build**: Flags: --build-cache, --configure-on-demand, --console, --continue, --dry-run, --info, --no-build-cache, --no-daemon, --no-parallel, --no-rebuild, --parallel, --profile, --quiet, --rerun-tasks, --scan, --stacktrace, --warning-mode. Valued: --exclude-task, --max-workers
+- **check**: Flags: --build-cache, --configure-on-demand, --console, --continue, --dry-run, --info, --no-build-cache, --no-daemon, --no-parallel, --no-rebuild, --parallel, --profile, --quiet, --rerun-tasks, --scan, --stacktrace, --warning-mode. Valued: --exclude-task, --max-workers
+- **dependencies**: Flags: --console, --info, --no-rebuild, --quiet, --stacktrace, --warning-mode. Valued: --configuration
+- **properties**: Flags: --console, --info, --no-rebuild, --quiet, --stacktrace, --warning-mode
+- **tasks**: Flags: --all, --console, --info, --no-rebuild, --quiet, --stacktrace, --warning-mode. Valued: --group
+- **test**: Flags: --build-cache, --configure-on-demand, --console, --continue, --dry-run, --info, --no-build-cache, --no-daemon, --no-parallel, --no-rebuild, --parallel, --profile, --quiet, --rerun-tasks, --scan, --stacktrace, --warning-mode. Valued: --exclude-task, --max-workers
 
 ### `grep`
 
@@ -474,7 +668,18 @@ Allowed valued flags: --before, --time, --user, -b, -t, -u. Bare invocation allo
 
 ### `launchctl`
 
-Subcommands: blame, dumpstate, error, examine, help, hostinfo, list, print, print-cache, print-disabled, resolveport, version.
+- **blame**
+- **dumpstate**
+- **error**
+- **examine**
+- **help**
+- **hostinfo**
+- **list**
+- **print**
+- **print-cache**
+- **print-disabled**
+- **resolveport**
+- **version**
 
 ### `lipo`
 
@@ -482,7 +687,12 @@ Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch).
 
 ### `llm`
 
-Subcommands: aliases, collections, logs, models, plugins, templates.
+- **aliases**: Flags: --json
+- **collections**: Flags: --json
+- **logs**: Flags: --conversation, --json, --no-truncate, --response, --truncate. Valued: --cid, --count, --id, --model, --search
+- **models**: Flags: --json, --options
+- **plugins**: Flags: --all, --json
+- **templates**: Flags: --json
 
 ### `locale`
 
@@ -490,7 +700,10 @@ Allowed standalone flags: --all-locales, --category-name, --charmaps, --keyword-
 
 ### `log`
 
-Subcommands: help, show, stats, stream.
+- **help**
+- **show**: Flags: --backtrace, --debug, --info, --loss, --mach-continuous-time, --no-pager, --signpost. Valued: --color, --end, --last, --predicate, --process, --source, --start, --style, --type
+- **stats**
+- **stream**: Flags: --backtrace, --debug, --info, --loss, --mach-continuous-time, --signpost. Valued: --color, --level, --predicate, --process, --source, --style, --timeout, --type
 
 ### `ls`
 
@@ -510,7 +723,7 @@ Bare invocation allowed.
 
 ### `magick`
 
-Subcommands: identify.
+- **identify**: Flags: -matte, -moments, -ping, -quiet, -regard-warnings, -unique, -verbose. Valued: -alpha, -colorspace, -define, -density, -depth, -endian, -format, -interlace, -limit, -precision, -sampling-factor, -size, -units, -virtual-pixel
 
 ### `man`
 
@@ -538,7 +751,17 @@ Allowed standalone flags: --raw, -r. Allowed valued flags: --name, --nullMarker,
 
 ### `mise`
 
-Subcommands: current, doctor, env, list, ls, reshim, which. Multi-level: config list, config ls, settings get. exec delegates after --.
+- **config list**
+- **config ls**
+- **current**
+- **doctor**
+- **env**: Flags: --json. Valued: --shell
+- **exec**: exec delegates after --.
+- **list**: Flags: --current, --installed, --json, --missing, --no-header, --prefix
+- **ls**: Flags: --current, --installed, --json, --missing, --no-header, --prefix
+- **reshim**: Flags: --force
+- **settings get**
+- **which**
 
 ### `mvn / mvnw`
 
@@ -574,7 +797,22 @@ Allowed standalone flags: --debug-syms, --defined-only, --demangle, --dynamic, -
 
 ### `npm`
 
-Subcommands: audit, doctor, explain, fund, info, list, ls, outdated, prefix, root, test, view, why. Multi-level: config get, config list. run/run-script (test only).
+- **audit**: Flags: --json, --omit, --production. Valued: --audit-level
+- **config get**: Flags: --json, --long
+- **config list**: Flags: --json, --long
+- **doctor**: Flags: --json
+- **explain**: Flags: --json
+- **fund**: Flags: --json
+- **info**: Flags: --json
+- **list**: Flags: --all, --json, --link, --long, --omit, --parseable, --production, --unicode. Valued: --depth, --prefix
+- **ls**: Flags: --all, --json, --link, --long, --omit, --parseable, --production, --unicode. Valued: --depth, --prefix
+- **outdated**: Flags: --json
+- **prefix**: Flags: --json
+- **root**: Flags: --json
+- **run**: run/run-script (test only).
+- **test**
+- **view**: Flags: --json
+- **why**: Flags: --json
 
 ### `nproc`
 
@@ -602,7 +840,12 @@ Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -qu
 
 ### `nvm`
 
-Subcommands: current, list, ls, ls-remote, version, which.
+- **current**: Flags: --lts, --no-colors
+- **list**: Flags: --lts, --no-colors
+- **ls**: Flags: --lts, --no-colors
+- **ls-remote**: Flags: --lts, --no-colors
+- **version**: Flags: --lts, --no-colors
+- **which**: Flags: --lts, --no-colors
 
 ### `od`
 
@@ -614,7 +857,9 @@ Bare invocation allowed.
 
 ### `ollama`
 
-Subcommands: list, ps, show.
+- **list**: Flags: --json
+- **ps**: Flags: --json
+- **show**: Flags: --json, --license, --modelfile, --parameters, --system, --template, --verbose
 
 ### `otool`
 
@@ -638,7 +883,16 @@ Allowed standalone flags: --count, --delimiter, --full, --inverse, --lightweight
 
 ### `pip / pip3`
 
-Subcommands: check, debug, freeze, help, index, inspect, list, show. Multi-level: config get, config list.
+- **check**
+- **config get**
+- **config list**
+- **debug**
+- **freeze**: Flags: --all, --exclude-editable, --local, --user. Valued: --exclude, --path
+- **help**
+- **index**
+- **inspect**
+- **list**: Flags: --editable, --exclude-editable, --include-editable, --local, --not-required, --outdated, --pre, --uptodate, --user. Valued: --exclude, --format, --index-url, --path
+- **show**: Flags: --files, --verbose
 
 ### `pkgutil`
 
@@ -646,7 +900,10 @@ Requires a read-only flag (--pkgs, --files, --pkg-info, etc.).
 
 ### `plutil`
 
-Subcommands: -lint, -p, -type. Info flags: -help.
+Info flags: -help.
+- **-lint**: Flags: -s
+- **-p**
+- **-type**
 
 ### `pmset`
 
@@ -654,11 +911,18 @@ Allowed: -g (get/display settings only).
 
 ### `pnpm`
 
-Subcommands: audit, list, ls, outdated, why.
+- **audit**: Flags: --json, --recursive. Valued: --filter
+- **list**: Flags: --dev, --json, --long, --no-optional, --parseable, --production, --recursive. Valued: --depth, --filter
+- **ls**: Flags: --dev, --json, --long, --no-optional, --parseable, --production, --recursive. Valued: --depth, --filter
+- **outdated**: Flags: --json, --recursive. Valued: --filter
+- **why**: Flags: --json, --recursive. Valued: --filter
 
 ### `poetry`
 
-Subcommands: check, show. Multi-level: env info, env list.
+- **check**: Flags: --lock
+- **env info**: Flags: --full-path
+- **env list**: Flags: --full-path
+- **show**: Flags: --all, --latest, --no-dev, --outdated, --top-level, --tree. Valued: --why
 
 ### `printenv`
 
@@ -690,11 +954,21 @@ Allowed standalone flags: -L, -P. Bare invocation allowed.
 
 ### `pyenv`
 
-Subcommands: help, root, shims, version, versions, which.
+- **help**: Flags: --bare
+- **root**: Flags: --bare
+- **shims**: Flags: --bare
+- **version**: Flags: --bare
+- **versions**: Flags: --bare
+- **which**: Flags: --bare
 
 ### `rbenv`
 
-Subcommands: help, root, shims, version, versions, which.
+- **help**
+- **root**
+- **shims**
+- **version**
+- **versions**
+- **which**
 
 ### `readlink`
 
@@ -718,7 +992,13 @@ Allowed subcommands: get, monitor, print, show. Allowed flags: -4, -6, -n, -v. B
 
 ### `rustup`
 
-Subcommands: doc, show, which. Multi-level: component list, target list, toolchain list. run <toolchain> delegates to inner command.
+- **component list**: Flags: --installed. Valued: --toolchain
+- **doc**: Flags: --alloc, --book, --cargo, --core, --edition-guide, --embedded-book, --nomicon, --path, --proc_macro, --reference, --rust-by-example, --rustc, --rustdoc, --std, --test, --unstable-book. Valued: --toolchain
+- **run**: run <toolchain> delegates to inner command.
+- **show**: Flags: --installed
+- **target list**: Flags: --installed. Valued: --toolchain
+- **toolchain list**: Flags: --installed. Valued: --toolchain
+- **which**: Valued: --toolchain
 
 ### `safe-chains`
 
@@ -726,7 +1006,17 @@ Any arguments allowed (safe-chains is this tool).
 
 ### `security`
 
-Subcommands: cms, dump-keychain, dump-trust-settings, find-certificate, find-generic-password, find-identity, find-internet-password, list-keychains, show-keychain-info, smartcard, verify-cert.
+- **cms**
+- **dump-keychain**
+- **dump-trust-settings**
+- **find-certificate**: Flags: -Z, -a, -p. Valued: -c, -e
+- **find-generic-password**: Valued: -D, -a, -c, -d, -j, -l, -r, -s, -t
+- **find-identity**: Flags: -v. Valued: -p, -s
+- **find-internet-password**: Valued: -D, -a, -c, -d, -j, -l, -r, -s, -t
+- **list-keychains**: Flags: -d
+- **show-keychain-info**
+- **smartcard**
+- **verify-cert**: Flags: -L, -l, -q. Valued: -c, -k, -n, -p, -r
 
 ### `sed`
 
@@ -794,7 +1084,11 @@ Allowed standalone flags: --buildVersion, --productName, --productVersion, --pro
 
 ### `swift`
 
-Subcommands: build, test. Multi-level: package describe, package dump-package, package show-dependencies.
+- **build**: Flags: --enable-code-coverage, --show-bin-path, --skip-update, --static-swift-stdlib, --verbose. Valued: --arch, --build-path, --configuration, --jobs, --package-path, --product, --sanitize, --swift-sdk, --target, --triple
+- **package describe**: Valued: --package-path, --type
+- **package dump-package**: Valued: --package-path
+- **package show-dependencies**: Valued: --format, --package-path
+- **test**: Flags: --enable-code-coverage, --list-tests, --parallel, --show-codecov-path, --skip-build, --skip-update, --verbose. Valued: --arch, --build-path, --configuration, --filter, --jobs, --num-workers, --package-path, --sanitize, --skip-tests, --swift-sdk, --target, --triple, --xunit-output
 
 ### `sysctl`
 
@@ -922,7 +1216,12 @@ Bare invocation allowed.
 
 ### `uv`
 
-Multi-level: pip check, pip freeze, pip list, pip show, python list, tool list.
+- **pip check**: Flags: --verbose. Valued: --python
+- **pip freeze**: Flags: --verbose. Valued: --python
+- **pip list**: Flags: --editable, --exclude-editable, --outdated, --strict. Valued: --exclude, --format, --python
+- **pip show**: Flags: --files, --verbose. Valued: --python
+- **python list**: Flags: --verbose. Valued: --python
+- **tool list**: Flags: --verbose. Valued: --python
 
 ### `vm_stat`
 
@@ -930,7 +1229,8 @@ Allowed valued flags: -c. Bare invocation allowed.
 
 ### `volta`
 
-Subcommands: list, which.
+- **list**: Flags: --current, --default. Valued: --format
+- **which**: Flags: --current, --default. Valued: --format
 
 ### `w`
 
@@ -974,7 +1274,11 @@ Allowed: -p/--print-path, -v/--version (single argument only).
 
 ### `xcodebuild`
 
-Subcommands: -list, -showBuildSettings, -showdestinations, -showsdks, -version.
+- **-list**: Flags: -json. Valued: -project, -workspace
+- **-showBuildSettings**: Flags: -json. Valued: -configuration, -destination, -project, -scheme, -sdk, -target, -workspace
+- **-showdestinations**: Flags: -json. Valued: -configuration, -destination, -project, -scheme, -sdk, -target, -workspace
+- **-showsdks**: Flags: -json. Valued: -configuration, -destination, -project, -scheme, -sdk, -target, -workspace
+- **-version**
 
 ### `xcrun`
 
