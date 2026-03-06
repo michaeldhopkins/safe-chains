@@ -222,7 +222,7 @@ fn full_registry() -> Vec<&'static CommandEntry> {
     entries.extend(system::REGISTRY);
     entries.extend(xcode::REGISTRY);
     entries.extend(perl::REGISTRY);
-    entries.extend(coreutils::REGISTRY);
+    entries.extend(coreutils::full_registry());
     entries
 }
 
@@ -326,7 +326,7 @@ mod tests {
 
     #[test]
     fn flat_defs_reject_unknown() {
-        for def in coreutils::FLAT_DEFS {
+        for def in coreutils::all_flat_defs() {
             def.auto_test_reject_unknown();
         }
     }
@@ -347,7 +347,7 @@ mod tests {
         for def in COMMAND_DEFS {
             all_cmds.insert(def.name);
         }
-        for def in coreutils::FLAT_DEFS {
+        for def in coreutils::all_flat_defs() {
             all_cmds.insert(def.name);
         }
         let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();

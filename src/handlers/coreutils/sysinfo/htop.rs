@@ -1,0 +1,34 @@
+use crate::command::FlatDef;
+use crate::parse::WordSet;
+use crate::policy::{FlagPolicy, FlagStyle};
+
+static HTOP_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[
+        "--no-color", "--no-mouse", "--no-unicode", "--tree",
+        "-C", "-H", "-M", "-t",
+    ]),
+    standalone_short: b"CHMt",
+    valued: WordSet::new(&[
+        "--delay", "--filter", "--highlight-changes",
+        "--pid", "--sort-key", "--user",
+        "-F", "-d", "-p", "-s", "-u",
+    ]),
+    valued_short: b"Fdpsu",
+    bare: true,
+    max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
+};
+
+pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
+    FlatDef { name: "htop", policy: &HTOP_POLICY, help_eligible: false },
+];
+
+#[cfg(test)]
+mod tests {
+    use crate::is_safe_command;
+    fn check(cmd: &str) -> bool { is_safe_command(cmd) }
+
+    safe! {
+        htop_bare: "htop",
+    }
+}
