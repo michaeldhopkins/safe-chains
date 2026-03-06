@@ -684,13 +684,17 @@ pub fn is_safe_git(tokens: &[Token]) -> bool {
         return args[1..].iter().all(|a| !GIT_TAG_MUTATING.contains(a));
     }
     if subcmd == "config" {
-        return args.get(1).is_some_and(|a| GIT_CONFIG_SAFE.contains(a));
+        return args.get(1).is_some_and(|a| GIT_CONFIG_SAFE.contains(a))
+            && args[2..].iter().all(|a| !a.starts_with('-'));
     }
     if subcmd == "worktree" {
-        return args.get(1).is_some_and(|a| a == "list");
+        return args.get(1).is_some_and(|a| a == "list")
+            && args[2..].iter().all(|a| !a.starts_with('-')
+                || *a == "--porcelain" || *a == "--verbose" || *a == "-v" || *a == "-z");
     }
     if subcmd == "notes" {
-        return args.get(1).is_some_and(|a| GIT_NOTES_SAFE.contains(a));
+        return args.get(1).is_some_and(|a| GIT_NOTES_SAFE.contains(a))
+            && args[2..].iter().all(|a| !a.starts_with('-'));
     }
     false
 }
@@ -811,15 +815,15 @@ pub(super) const REGISTRY: &[super::CommandEntry] = &[
         super::SubEntry::Positional { name: "remote" },
         super::SubEntry::Positional { name: "branch" },
         super::SubEntry::Positional { name: "tag" },
-        super::SubEntry::Positional { name: "config" },
+        super::SubEntry::Custom { name: "config", valid_suffix: Some("--list") },
         super::SubEntry::Nested { name: "stash", subs: &[
             super::SubEntry::Positional { name: "list" },
             super::SubEntry::Positional { name: "show" },
         ]},
-        super::SubEntry::Positional { name: "worktree" },
+        super::SubEntry::Custom { name: "worktree", valid_suffix: Some("list") },
         super::SubEntry::Nested { name: "notes", subs: &[
-            super::SubEntry::Positional { name: "list" },
-            super::SubEntry::Positional { name: "show" },
+            super::SubEntry::Custom { name: "list", valid_suffix: None },
+            super::SubEntry::Custom { name: "show", valid_suffix: None },
         ]},
     ]},
     super::CommandEntry::Positional { cmd: "jj" },
@@ -904,6 +908,8 @@ mod tests {
         git_config_get_regexp: "git config --get-regexp 'remote.*'",
         git_config_l: "git config -l",
         git_worktree_list: "git worktree list",
+        git_worktree_list_porcelain: "git worktree list --porcelain",
+        git_worktree_list_verbose: "git worktree list -v",
         git_notes_show: "git notes show HEAD",
         git_notes_list: "git notes list",
         jj_log: "jj log",
@@ -958,8 +964,12 @@ mod tests {
         git_tag_force_denied: "git tag -f v1.0",
         git_config_set_denied: "git config user.name foo",
         git_config_unset_denied: "git config --unset user.name",
+        git_config_list_trailing_flag_denied: "git config --list --evil",
+        git_config_get_trailing_flag_denied: "git config --get user.name --evil",
         git_worktree_add_denied: "git worktree add ../new-branch",
+        git_worktree_list_trailing_denied: "git worktree list --evil",
         git_notes_add_denied: "git notes add -m 'note'",
+        git_notes_list_trailing_flag_denied: "git notes list --evil",
         git_push_denied: "git push origin main",
         git_reset_denied: "git reset --hard HEAD~1",
         git_add_denied: "git add .",
