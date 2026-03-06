@@ -2,9 +2,12 @@ mod asdf;
 mod brew;
 mod cmake;
 mod csrutil;
+mod dcli;
 mod ddev;
 mod defaults;
 mod diskutil;
+mod flyctl;
+mod heroku;
 mod launchctl;
 mod log_cmd;
 mod mise;
@@ -12,6 +15,8 @@ mod networksetup;
 mod pmset;
 mod security;
 mod sysctl;
+mod terraform;
+mod vercel;
 
 use crate::parse::{Segment, Token};
 
@@ -19,13 +24,19 @@ pub(crate) use asdf::ASDF;
 pub(crate) use brew::BREW;
 pub(crate) use cmake::CMAKE;
 pub(crate) use csrutil::CSRUTIL;
+pub(crate) use dcli::DCLI;
 pub(crate) use ddev::DDEV;
 pub(crate) use defaults::DEFAULTS;
 pub(crate) use diskutil::DISKUTIL;
+pub(crate) use flyctl::FLY;
+pub(crate) use flyctl::FLYCTL;
+pub(crate) use heroku::HEROKU;
 pub(crate) use launchctl::LAUNCHCTL;
 pub(crate) use log_cmd::LOG;
 pub(crate) use mise::MISE;
 pub(crate) use security::SECURITY;
+pub(crate) use terraform::TERRAFORM;
+pub(crate) use vercel::VERCEL;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
     BREW.dispatch(cmd, tokens, is_safe)
@@ -39,6 +50,12 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
         .or_else(|| LAUNCHCTL.dispatch(cmd, tokens, is_safe))
         .or_else(|| LOG.dispatch(cmd, tokens, is_safe))
         .or_else(|| CMAKE.dispatch(cmd, tokens, is_safe))
+        .or_else(|| DCLI.dispatch(cmd, tokens, is_safe))
+        .or_else(|| TERRAFORM.dispatch(cmd, tokens, is_safe))
+        .or_else(|| HEROKU.dispatch(cmd, tokens, is_safe))
+        .or_else(|| VERCEL.dispatch(cmd, tokens, is_safe))
+        .or_else(|| FLYCTL.dispatch(cmd, tokens, is_safe))
+        .or_else(|| FLY.dispatch(cmd, tokens, is_safe))
         .or_else(|| pmset::dispatch(cmd, tokens, is_safe))
         .or_else(|| sysctl::dispatch(cmd, tokens, is_safe))
         .or_else(|| networksetup::dispatch(cmd, tokens, is_safe))
@@ -55,12 +72,22 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(pmset::command_docs());
     docs.extend(sysctl::command_docs());
     docs.push(CMAKE.to_doc());
+    docs.push(DCLI.to_doc());
     docs.push(SECURITY.to_doc());
     docs.push(CSRUTIL.to_doc());
     docs.push(DISKUTIL.to_doc());
     docs.push(LAUNCHCTL.to_doc());
     docs.extend(networksetup::command_docs());
     docs.push(LOG.to_doc());
+    docs.push(TERRAFORM.to_doc());
+    docs.push(HEROKU.to_doc());
+    docs.push(VERCEL.to_doc());
+    docs.push(FLYCTL.to_doc());
+    {
+        let mut fly_doc = FLY.to_doc();
+        fly_doc.name = "fly";
+        docs.push(fly_doc);
+    }
     docs
 }
 
