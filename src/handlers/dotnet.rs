@@ -123,7 +123,4 @@ mod tests {
         dotnet_list_deprecated: "dotnet list package --deprecated",
         dotnet_list_transitive: "dotnet list package --include-transitive",
     }
-
-    denied! {
-    }
 }
