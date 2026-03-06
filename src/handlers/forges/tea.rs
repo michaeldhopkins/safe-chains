@@ -96,6 +96,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocBuilder, wordset_items};
     vec![
         CommandDoc::handler("tea",
+            "https://gitea.com/gitea/tea",
             DocBuilder::new()
                 .section(format!("Subcommands {} are allowed with actions: {} or bare invocation.",
                     wordset_items(&TEA_READ_ONLY_SUBCOMMANDS),

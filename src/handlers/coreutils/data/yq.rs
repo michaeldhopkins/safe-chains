@@ -23,7 +23,7 @@ static YQ_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "yq", policy: &YQ_POLICY, help_eligible: true },
+    FlatDef { name: "yq", policy: &YQ_POLICY, help_eligible: true, url: "https://mikefarah.gitbook.io/yq" },
 ];
 
 #[cfg(test)]

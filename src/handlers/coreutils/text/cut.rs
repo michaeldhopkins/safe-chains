@@ -20,7 +20,7 @@ static CUT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cut", policy: &CUT_POLICY, help_eligible: false },
+    FlatDef { name: "cut", policy: &CUT_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation" },
 ];
 
 #[cfg(test)]

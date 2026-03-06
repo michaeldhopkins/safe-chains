@@ -27,7 +27,7 @@ static FILE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "file", policy: &FILE_POLICY, help_eligible: false },
+    FlatDef { name: "file", policy: &FILE_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/file.1.html" },
 ];
 
 #[cfg(test)]

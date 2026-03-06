@@ -23,7 +23,7 @@ static TOKEI_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "tokei", policy: &TOKEI_POLICY, help_eligible: false },
+    FlatDef { name: "tokei", policy: &TOKEI_POLICY, help_eligible: false, url: "https://github.com/XAMPPRocky/tokei#readme" },
 ];
 
 #[cfg(test)]

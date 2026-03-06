@@ -27,6 +27,7 @@ pub(crate) static MAGICK: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://imagemagick.org/script/command-line-tools.php",
 };
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {

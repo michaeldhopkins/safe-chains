@@ -18,7 +18,7 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_
 
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
-        crate::docs::CommandDoc::wordset("hostname", &HOSTNAME_DISPLAY),
+        crate::docs::CommandDoc::wordset("hostname", "https://man7.org/linux/man-pages/man1/hostname.1.html", &HOSTNAME_DISPLAY),
     ]
 }
 

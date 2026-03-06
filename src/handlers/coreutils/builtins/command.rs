@@ -14,7 +14,7 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_
 
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
-        crate::docs::CommandDoc::handler("command",
+        crate::docs::CommandDoc::handler("command", "https://man7.org/linux/man-pages/man1/command.1p.html",
             "Allowed: -v, -V (check if command exists)."),
     ]
 }

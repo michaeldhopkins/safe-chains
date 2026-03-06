@@ -44,6 +44,7 @@ pub(crate) static OLLAMA: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://github.com/ollama/ollama/blob/main/docs/api.md",
 };
 
 #[cfg(test)]

@@ -22,6 +22,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocBuilder, wordset_items};
     vec![
         CommandDoc::handler("bunx",
+            "https://bun.sh/docs/cli/bunx",
             DocBuilder::new()
                 .section(format!("Allowed packages: {}.", wordset_items(&super::NPX_SAFE)))
                 .section("tsc allowed with --noEmit.")

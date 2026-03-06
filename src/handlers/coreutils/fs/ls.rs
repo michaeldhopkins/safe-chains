@@ -34,7 +34,7 @@ static LS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ls", policy: &LS_POLICY, help_eligible: false },
+    FlatDef { name: "ls", policy: &LS_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation" },
 ];
 
 #[cfg(test)]

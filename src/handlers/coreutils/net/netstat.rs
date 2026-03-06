@@ -25,7 +25,7 @@ static NETSTAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "netstat", policy: &NETSTAT_POLICY, help_eligible: false },
+    FlatDef { name: "netstat", policy: &NETSTAT_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/netstat.8.html" },
 ];
 
 #[cfg(test)]

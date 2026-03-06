@@ -26,7 +26,7 @@ static PS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ps", policy: &PS_POLICY, help_eligible: false },
+    FlatDef { name: "ps", policy: &PS_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/ps.1.html" },
 ];
 
 #[cfg(test)]

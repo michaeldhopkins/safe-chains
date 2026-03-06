@@ -26,7 +26,7 @@ static SS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ss", policy: &SS_POLICY, help_eligible: false },
+    FlatDef { name: "ss", policy: &SS_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/ss.8.html" },
 ];
 
 #[cfg(test)]

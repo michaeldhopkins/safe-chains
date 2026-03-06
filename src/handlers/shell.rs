@@ -53,8 +53,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("bash / sh",
+            "https://www.gnu.org/software/bash/manual/bash.html",
             "Allowed: --version, --help, `bash -c` / `sh -c` with a safe inner command."),
         CommandDoc::handler("xargs",
+            "https://www.gnu.org/software/findutils/manual/html_mono/find.html#Invoking-xargs",
             "Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n, -P, -s, -E, -d, -0, -r, -t, -p, -x)."),
     ]
 }

@@ -21,7 +21,7 @@ static DF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "df", policy: &DF_POLICY, help_eligible: false },
+    FlatDef { name: "df", policy: &DF_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation" },
 ];
 
 #[cfg(test)]

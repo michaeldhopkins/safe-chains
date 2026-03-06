@@ -23,7 +23,7 @@ static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "identify", policy: &IDENTIFY_POLICY, help_eligible: false },
+    FlatDef { name: "identify", policy: &IDENTIFY_POLICY, help_eligible: false, url: "https://imagemagick.org/script/identify.php" },
 ];
 
 #[cfg(test)]

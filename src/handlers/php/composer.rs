@@ -68,6 +68,7 @@ pub(crate) static COMPOSER: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://getcomposer.org/doc/03-cli.md",
 };
 
 #[cfg(test)]

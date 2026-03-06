@@ -38,6 +38,7 @@ pub struct CommandDef {
     pub subs: &'static [SubDef],
     pub bare_flags: &'static [&'static str],
     pub help_eligible: bool,
+    pub url: &'static str,
 }
 
 impl SubDef {
@@ -125,7 +126,7 @@ impl CommandDef {
         sub_lines.sort();
         lines.extend(sub_lines);
 
-        crate::docs::CommandDoc::handler(self.name, lines.join("\n"))
+        crate::docs::CommandDoc::handler(self.name, self.url, lines.join("\n"))
     }
 }
 
@@ -133,6 +134,7 @@ pub struct FlatDef {
     pub name: &'static str,
     pub policy: &'static FlagPolicy,
     pub help_eligible: bool,
+    pub url: &'static str,
 }
 
 impl FlatDef {
@@ -145,7 +147,7 @@ impl FlatDef {
     }
 
     pub fn to_doc(&self) -> crate::docs::CommandDoc {
-        crate::docs::CommandDoc::handler(self.name, self.policy.describe())
+        crate::docs::CommandDoc::handler(self.name, self.url, self.policy.describe())
     }
 }
 
@@ -346,6 +348,7 @@ mod tests {
         }],
         bare_flags: &["--info"],
         help_eligible: true,
+        url: "",
     };
 
     #[test]
@@ -410,6 +413,7 @@ mod tests {
         }],
         bare_flags: &[],
         help_eligible: false,
+        url: "",
     };
 
     #[test]
@@ -455,6 +459,7 @@ mod tests {
         }],
         bare_flags: &[],
         help_eligible: false,
+        url: "",
     };
 
     #[test]
@@ -488,6 +493,7 @@ mod tests {
         }],
         bare_flags: &[],
         help_eligible: false,
+        url: "",
     };
 
     #[test]
@@ -528,6 +534,7 @@ mod tests {
         }],
         bare_flags: &[],
         help_eligible: false,
+        url: "",
     };
 
     #[test]

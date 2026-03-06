@@ -4,6 +4,7 @@ use crate::parse::WordSet;
 pub struct CommandDoc {
     pub name: &'static str,
     pub kind: DocKind,
+    pub url: &'static str,
     pub description: String,
 }
 
@@ -12,7 +13,7 @@ pub enum DocKind {
 }
 
 impl CommandDoc {
-    pub fn handler(name: &'static str, description: impl Into<String>) -> Self {
+    pub fn handler(name: &'static str, url: &'static str, description: impl Into<String>) -> Self {
         let raw = description.into();
         let description = raw
             .lines()
@@ -25,15 +26,15 @@ impl CommandDoc {
             })
             .collect::<Vec<_>>()
             .join("\n");
-        Self { name, kind: DocKind::Handler, description }
+        Self { name, kind: DocKind::Handler, url, description }
     }
 
-    pub fn wordset(name: &'static str, words: &WordSet) -> Self {
-        Self::handler(name, doc(words).build())
+    pub fn wordset(name: &'static str, url: &'static str, words: &WordSet) -> Self {
+        Self::handler(name, url, doc(words).build())
     }
 
-    pub fn wordset_multi(name: &'static str, words: &WordSet, multi: &[(&str, WordSet)]) -> Self {
-        Self::handler(name, doc_multi(words, multi).build())
+    pub fn wordset_multi(name: &'static str, url: &'static str, words: &WordSet, multi: &[(&str, WordSet)]) -> Self {
+        Self::handler(name, url, doc_multi(words, multi).build())
     }
 
 
@@ -147,7 +148,7 @@ pub fn render_markdown(docs: &[CommandDoc]) -> String {
     );
 
     for doc in docs {
-        out.push_str(&format!("### `{}`\n\n{}\n\n", doc.name, doc.description));
+        out.push_str(&format!("### `{}` ({})\n\n{}\n\n", doc.name, doc.url, doc.description));
     }
 
     out
@@ -156,6 +157,19 @@ pub fn render_markdown(docs: &[CommandDoc]) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn all_commands_have_url() {
+        for doc in all_command_docs() {
+            assert!(!doc.url.is_empty(), "{} has no documentation URL", doc.name);
+            assert!(
+                doc.url.starts_with("https://"),
+                "{} URL must use https: {}",
+                doc.name,
+                doc.url
+            );
+        }
+    }
 
     #[test]
     fn builder_two_sections() {

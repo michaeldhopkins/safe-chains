@@ -9,7 +9,7 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, _tokens: &[Token], _is
 
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
-        crate::docs::CommandDoc::handler("safe-chains",
+        crate::docs::CommandDoc::handler("safe-chains", "https://github.com/michaeldhopkins/safe-chains#readme",
             "Any arguments allowed (safe-chains is this tool)."),
     ]
 }

@@ -54,6 +54,7 @@ pub(crate) static LOG: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://ss64.com/mac/log.html",
 };
 
 #[cfg(test)]

@@ -46,6 +46,7 @@ pub(crate) static XCODEBUILD: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://developer.apple.com/documentation/xcode/xcodebuild",
 };
 
 #[cfg(test)]

@@ -82,6 +82,7 @@ pub(in crate::handlers::vcs) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, doc_multi, wordset_items};
     vec![
         CommandDoc::handler("jj",
+            "https://jj-vcs.github.io/jj/latest/cli-reference/",
             doc_multi(&JJ_READ_ONLY, JJ_MULTI)
                 .triple_word(JJ_TRIPLE)
                 .section(format!(

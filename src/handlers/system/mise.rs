@@ -79,6 +79,7 @@ pub(crate) static MISE: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://mise.jdx.dev/cli/",
 };
 
 #[cfg(test)]

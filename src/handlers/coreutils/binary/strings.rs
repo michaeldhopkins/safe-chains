@@ -20,7 +20,7 @@ static STRINGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "strings", policy: &STRINGS_POLICY, help_eligible: false },
+    FlatDef { name: "strings", policy: &STRINGS_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/strings.1.html" },
 ];
 
 #[cfg(test)]

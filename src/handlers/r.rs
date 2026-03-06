@@ -54,8 +54,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("R",
+            "https://cran.r-project.org/manuals.html",
             "- CMD check <package> (with --as-cran, --no-tests, --no-examples, --no-vignettes, --no-build-vignettes, --no-manual, --output)\n- CMD config <var>"),
         CommandDoc::handler("Rscript",
+            "https://cran.r-project.org/manuals.html",
             "- --version\n- --help"),
     ]
 }

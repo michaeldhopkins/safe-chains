@@ -43,6 +43,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         crate::docs::CommandDoc::handler("yarn",
+            "https://yarnpkg.com/cli",
             "Subcommands: info, list, ls, test, test:*, why."),
     ]
 }

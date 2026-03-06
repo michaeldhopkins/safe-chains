@@ -69,6 +69,7 @@ pub(crate) static GEM: CommandDef = CommandDef {
     ],
     bare_flags: &[],
     help_eligible: true,
+    url: "https://guides.rubygems.org/command-reference/",
 };
 
 #[cfg(test)]

@@ -37,6 +37,7 @@ pub(in crate::handlers::xcode) fn command_docs() -> Vec<crate::docs::CommandDoc>
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("lipo",
+            "https://ss64.com/mac/lipo.html",
             "Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch)."),
     ]
 }

@@ -55,6 +55,7 @@ pub(in crate::handlers::xcode) fn command_docs() -> Vec<crate::docs::CommandDoc>
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("xcrun",
+            "https://ss64.com/mac/xcrun.html",
             "Allowed: --find, --show-sdk-*, --show-toolchain-path. \
              Multi-level: notarytool history/info/log, simctl list, stapler validate. \
              Prefix flags --sdk/--toolchain (with arg), -v/-l/-n are skipped."),

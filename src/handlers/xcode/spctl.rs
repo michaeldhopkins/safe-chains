@@ -39,6 +39,7 @@ pub(in crate::handlers::xcode) fn command_docs() -> Vec<crate::docs::CommandDoc>
     use crate::docs::CommandDoc;
     vec![
         CommandDoc::handler("spctl",
+            "https://ss64.com/mac/spctl.html",
             "Requires --assess/-a."),
     ]
 }

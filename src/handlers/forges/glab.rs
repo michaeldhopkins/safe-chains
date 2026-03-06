@@ -128,6 +128,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, DocBuilder, wordset_items};
     vec![
         CommandDoc::handler("glab",
+            "https://glab.readthedocs.io/en/latest/",
             DocBuilder::new()
                 .section(format!("Subcommands {} are allowed with actions: {}.",
                     wordset_items(&GLAB_READ_ONLY_SUBCOMMANDS),
