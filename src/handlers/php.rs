@@ -128,7 +128,4 @@ mod tests {
         composer_about: "composer about",
         composer_help: "composer help",
     }
-
-    denied! {
-    }
 }
