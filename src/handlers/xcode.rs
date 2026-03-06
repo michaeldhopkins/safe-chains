@@ -357,7 +357,6 @@ mod tests {
     }
 
     denied! {
-        plutil_no_args_denied: "plutil",
         xcode_select_switch_denied: "xcode-select -s /Applications/Xcode.app",
         xcode_select_install_denied: "xcode-select --install",
         xcode_select_reset_denied: "xcode-select --reset",

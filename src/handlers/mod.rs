@@ -235,6 +235,9 @@ mod tests {
                 }
             }
             CommandEntry::Subcommand { cmd, subs } => {
+                if crate::is_safe_command(cmd) {
+                    failures.push(format!("{cmd}: accepted bare invocation"));
+                }
                 let test = format!("{cmd} {UNKNOWN_SUB}");
                 if crate::is_safe_command(&test) {
                     failures.push(format!("{cmd}: accepted unknown subcommand: {test}"));

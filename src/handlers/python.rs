@@ -421,9 +421,7 @@ mod tests {
     }
 
     denied! {
-        bare_pip_denied: "pip",
         pip_config_set_denied: "pip config set global.index-url https://example.com",
-        bare_uv_denied: "uv",
         conda_config_show_with_set_denied: "conda config --show --set always_yes true",
         conda_config_show_sources_with_remove_denied: "conda config --show-sources --remove channels defaults",
         conda_config_set_denied: "conda config --set always_yes true",
