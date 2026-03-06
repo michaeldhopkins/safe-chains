@@ -16,7 +16,8 @@ pub fn is_safe_shell(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bo
     let Some(script) = tokens.get(idx + 1) else {
         return false;
     };
-    script.as_command_line().segments().iter().all(is_safe)
+    let _ = is_safe;
+    crate::is_safe_command(script.as_str())
 }
 
 pub fn is_safe_xargs(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
@@ -70,6 +71,10 @@ mod tests {
         bash_c_safe: "bash -c \"grep foo file\"",
         bash_c_pipe: "bash -c \"cat file | head -5\"",
         sh_c_safe: "sh -c \"ls -la\"",
+        bash_c_for: "bash -c 'for x in 1 2 3; do echo $x; done'",
+        bash_c_for_keyword_values: "bash -c 'for x in do done; do echo $x; done'",
+        bash_c_while: "bash -c 'while test -f /tmp/foo; do sleep 1; done'",
+        bash_c_if: "bash -c 'if test -f foo; then echo yes; fi'",
         bash_version: "bash --version",
         sh_version: "sh --version",
         bash_help: "bash --help",

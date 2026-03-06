@@ -349,6 +349,8 @@ mod tests {
         if_elif: "if test -f a; then echo a; elif test -f b; then echo b; else echo c; fi",
         nested_if_in_for: "for x in 1 2; do if test $x = 1; then echo one; fi; done",
         nested_for_in_if: "if true; then for x in 1 2; do echo $x; done; fi",
+        bare_negation: "! echo hello",
+        bare_negation_test: "! test -f foo",
         keyword_as_data: "echo for; echo done; echo if; echo fi",
     }
 
