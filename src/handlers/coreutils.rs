@@ -1,3 +1,4 @@
+use crate::command::FlatDef;
 use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
@@ -154,10 +155,6 @@ static SORT_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_sort(tokens: &[Token]) -> bool {
-    policy::check(tokens, &SORT_POLICY)
-}
-
 static YQ_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--colors", "--exit-status", "--help",
@@ -177,10 +174,6 @@ static YQ_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_yq(tokens: &[Token]) -> bool {
-    policy::check(tokens, &YQ_POLICY)
-}
 
 static XMLLINT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -208,10 +201,6 @@ static XMLLINT_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_xmllint(tokens: &[Token]) -> bool {
-    policy::check(tokens, &XMLLINT_POLICY)
-}
 
 fn awk_has_dangerous_construct(token: &Token) -> bool {
     let code = token.content_outside_double_quotes();
@@ -293,10 +282,6 @@ static GREP_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_grep(tokens: &[Token]) -> bool {
-    policy::check(tokens, &GREP_POLICY)
-}
-
 static RG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--binary", "--block-buffered", "--byte-offset", "--case-sensitive",
@@ -338,10 +323,6 @@ static RG_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_rg(tokens: &[Token]) -> bool {
-    policy::check(tokens, &RG_POLICY)
-}
-
 static CAT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--number", "--number-nonblank", "--show-all", "--show-ends",
@@ -356,10 +337,6 @@ static CAT_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_cat(tokens: &[Token]) -> bool {
-    policy::check(tokens, &CAT_POLICY)
-}
 
 static HEAD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -376,10 +353,6 @@ static HEAD_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_head(tokens: &[Token]) -> bool {
-    policy::check(tokens, &HEAD_POLICY)
-}
 
 static TAIL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -399,10 +372,6 @@ static TAIL_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_tail(tokens: &[Token]) -> bool {
-    policy::check(tokens, &TAIL_POLICY)
-}
-
 static WC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--bytes", "--chars", "--lines", "--max-line-length", "--words",
@@ -416,10 +385,6 @@ static WC_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_wc(tokens: &[Token]) -> bool {
-    policy::check(tokens, &WC_POLICY)
-}
 
 static CUT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -438,10 +403,6 @@ static CUT_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_cut(tokens: &[Token]) -> bool {
-    policy::check(tokens, &CUT_POLICY)
-}
-
 static TR_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--complement", "--delete", "--squeeze-repeats", "--truncate-set1",
@@ -454,10 +415,6 @@ static TR_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_tr(tokens: &[Token]) -> bool {
-    policy::check(tokens, &TR_POLICY)
-}
 
 static UNIQ_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -476,10 +433,6 @@ static UNIQ_POLICY: FlagPolicy = FlagPolicy {
     max_positional: Some(1),
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_uniq(tokens: &[Token]) -> bool {
-    policy::check(tokens, &UNIQ_POLICY)
-}
 
 static DIFF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -512,10 +465,6 @@ static DIFF_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_diff(tokens: &[Token]) -> bool {
-    policy::check(tokens, &DIFF_POLICY)
-}
-
 static COMM_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--check-order", "--nocheck-order", "--total", "--zero-terminated",
@@ -528,10 +477,6 @@ static COMM_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_comm(tokens: &[Token]) -> bool {
-    policy::check(tokens, &COMM_POLICY)
-}
 
 static PASTE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -549,10 +494,6 @@ static PASTE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_paste(tokens: &[Token]) -> bool {
-    policy::check(tokens, &PASTE_POLICY)
-}
-
 static TAC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--before", "--regex",
@@ -569,10 +510,6 @@ static TAC_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_tac(tokens: &[Token]) -> bool {
-    policy::check(tokens, &TAC_POLICY)
-}
-
 static REV_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
     standalone_short: b"",
@@ -582,10 +519,6 @@ static REV_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_rev(tokens: &[Token]) -> bool {
-    policy::check(tokens, &REV_POLICY)
-}
 
 static NL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -606,10 +539,6 @@ static NL_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_nl(tokens: &[Token]) -> bool {
-    policy::check(tokens, &NL_POLICY)
-}
-
 static EXPAND_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--initial",
@@ -625,10 +554,6 @@ static EXPAND_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_expand(tokens: &[Token]) -> bool {
-    policy::check(tokens, &EXPAND_POLICY)
-}
 
 static UNEXPAND_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -646,10 +571,6 @@ static UNEXPAND_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_unexpand(tokens: &[Token]) -> bool {
-    policy::check(tokens, &UNEXPAND_POLICY)
-}
-
 static FOLD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--bytes", "--spaces",
@@ -665,10 +586,6 @@ static FOLD_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_fold(tokens: &[Token]) -> bool {
-    policy::check(tokens, &FOLD_POLICY)
-}
 
 static FMT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -686,10 +603,6 @@ static FMT_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_fmt(tokens: &[Token]) -> bool {
-    policy::check(tokens, &FMT_POLICY)
-}
 
 static COLUMN_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -710,10 +623,6 @@ static COLUMN_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_column(tokens: &[Token]) -> bool {
-    policy::check(tokens, &COLUMN_POLICY)
-}
-
 static COL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "-b", "-f", "-h", "-p", "-x",
@@ -725,10 +634,6 @@ static COL_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_col(tokens: &[Token]) -> bool {
-    policy::check(tokens, &COL_POLICY)
-}
 
 static ICONV_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -746,10 +651,6 @@ static ICONV_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_iconv(tokens: &[Token]) -> bool {
-    policy::check(tokens, &ICONV_POLICY)
-}
-
 static NROFF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "-S", "-c", "-h", "-i", "-k", "-p", "-q", "-t",
@@ -764,10 +665,6 @@ static NROFF_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_nroff(tokens: &[Token]) -> bool {
-    policy::check(tokens, &NROFF_POLICY)
-}
-
 static ECHO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["-E", "-e", "-n"]),
     standalone_short: b"Een",
@@ -778,10 +675,6 @@ static ECHO_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Positional,
 };
 
-pub fn is_safe_echo(tokens: &[Token]) -> bool {
-    policy::check(tokens, &ECHO_POLICY)
-}
-
 static PRINTF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
     standalone_short: b"",
@@ -791,10 +684,6 @@ static PRINTF_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_printf(tokens: &[Token]) -> bool {
-    policy::check(tokens, &PRINTF_POLICY)
-}
 
 static SEQ_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -812,10 +701,6 @@ static SEQ_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_seq(tokens: &[Token]) -> bool {
-    policy::check(tokens, &SEQ_POLICY)
-}
-
 static TEST_CMD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
     standalone_short: b"",
@@ -826,10 +711,6 @@ static TEST_CMD_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Positional,
 };
 
-pub fn is_safe_test(tokens: &[Token]) -> bool {
-    policy::check(tokens, &TEST_CMD_POLICY)
-}
-
 static EXPR_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
     standalone_short: b"",
@@ -839,10 +720,6 @@ static EXPR_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Positional,
 };
-
-pub fn is_safe_expr(tokens: &[Token]) -> bool {
-    policy::check(tokens, &EXPR_POLICY)
-}
 
 static BC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -865,10 +742,6 @@ static BC_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_bc(tokens: &[Token]) -> bool {
-    policy::check(tokens, &BC_POLICY)
-}
-
 static FACTOR_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--exponents",
@@ -881,10 +754,6 @@ static FACTOR_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_factor(tokens: &[Token]) -> bool {
-    policy::check(tokens, &FACTOR_POLICY)
-}
 
 static BAT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -905,10 +774,6 @@ static BAT_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_bat(tokens: &[Token]) -> bool {
-    policy::check(tokens, &BAT_POLICY)
-}
 
 static FD_EXEC_LONG: WordSet = WordSet::new(&["--exec", "--exec-batch"]);
 
@@ -952,10 +817,6 @@ static TREE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_tree(tokens: &[Token]) -> bool {
-    policy::check(tokens, &TREE_POLICY)
-}
-
 static FILE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--brief", "--debug", "--dereference", "--extension",
@@ -980,10 +841,6 @@ static FILE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_file_cmd(tokens: &[Token]) -> bool {
-    policy::check(tokens, &FILE_POLICY)
-}
-
 static DATE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--rfc-2822", "--rfc-email", "--universal", "--utc",
@@ -999,10 +856,6 @@ static DATE_POLICY: FlagPolicy = FlagPolicy {
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_date(tokens: &[Token]) -> bool {
-    policy::check(tokens, &DATE_POLICY)
-}
 
 static ROUTE_SAFE_FLAGS: WordSet = WordSet::new(&["-4", "-6", "-n", "-v"]);
 
@@ -1033,10 +886,6 @@ static IFCONFIG_POLICY: FlagPolicy = FlagPolicy {
     max_positional: Some(1),
     flag_style: FlagStyle::Strict,
 };
-
-pub fn is_safe_ifconfig(tokens: &[Token]) -> bool {
-    policy::check(tokens, &IFCONFIG_POLICY)
-}
 
 static BARE_ONLY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
@@ -2141,10 +1990,6 @@ static SS_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_ss(tokens: &[Token]) -> bool {
-    policy::check(tokens, &SS_POLICY)
-}
-
 static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--verbose", "-ping", "-quiet", "-regard-warnings",
@@ -2262,435 +2107,193 @@ static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn dispatch_policy(cmd: &str, tokens: &[Token]) -> Option<bool> {
-    match cmd {
-        "ls" => Some(policy::check(tokens, &LS_POLICY)),
-        "eza" | "exa" => Some(policy::check(tokens, &EZA_POLICY)),
-        "delta" => Some(policy::check(tokens, &DELTA_POLICY)),
-        "colordiff" => Some(policy::check(tokens, &COLORDIFF_POLICY)),
-        "dirname" => Some(policy::check(tokens, &DIRNAME_POLICY)),
-        "basename" => Some(policy::check(tokens, &BASENAME_POLICY)),
-        "realpath" => Some(policy::check(tokens, &REALPATH_POLICY)),
-        "readlink" => Some(policy::check(tokens, &READLINK_POLICY)),
-        "stat" => Some(policy::check(tokens, &STAT_POLICY)),
-        "du" => Some(policy::check(tokens, &DU_POLICY)),
-        "df" => Some(policy::check(tokens, &DF_POLICY)),
-        "true" | "false" | "whoami" | "branchdiff" => {
-            Some(policy::check(tokens, &BARE_ONLY))
-        }
-        "printenv" => Some(policy::check(tokens, &PRINTENV_POLICY)),
-        "type" => Some(policy::check(tokens, &TYPE_POLICY)),
-        "whereis" => Some(policy::check(tokens, &WHEREIS_POLICY)),
-        "which" => Some(policy::check(tokens, &WHICH_POLICY)),
-        "pwd" => Some(policy::check(tokens, &PWD_POLICY)),
-        "cd" => Some(policy::check(tokens, &CD_POLICY)),
-        "unset" => Some(policy::check(tokens, &UNSET_POLICY)),
-        "uname" => Some(policy::check(tokens, &UNAME_POLICY)),
-        "nproc" => Some(policy::check(tokens, &NPROC_POLICY)),
-        "uptime" => Some(policy::check(tokens, &UPTIME_POLICY)),
-        "id" => Some(policy::check(tokens, &ID_POLICY)),
-        "groups" => Some(policy::check(tokens, &GROUPS_POLICY)),
-        "tty" => Some(policy::check(tokens, &TTY_POLICY)),
-        "locale" => Some(policy::check(tokens, &LOCALE_POLICY)),
-        "cal" => Some(policy::check(tokens, &CAL_POLICY)),
-        "sleep" => Some(policy::check(tokens, &SLEEP_POLICY)),
-        "who" => Some(policy::check(tokens, &WHO_POLICY)),
-        "w" => Some(policy::check(tokens, &W_POLICY)),
-        "last" => Some(policy::check(tokens, &LAST_POLICY)),
-        "lastlog" => Some(policy::check(tokens, &LASTLOG_POLICY)),
-        "ps" => Some(policy::check(tokens, &PS_POLICY)),
-        "top" => Some(policy::check(tokens, &TOP_POLICY)),
-        "htop" => Some(policy::check(tokens, &HTOP_POLICY)),
-        "iotop" => Some(policy::check(tokens, &IOTOP_POLICY)),
-        "procs" => Some(policy::check(tokens, &PROCS_POLICY)),
-        "dust" => Some(policy::check(tokens, &DUST_POLICY)),
-        "lsof" => Some(policy::check(tokens, &LSOF_POLICY)),
-        "pgrep" => Some(policy::check(tokens, &PGREP_POLICY)),
-        "jq" => Some(policy::check(tokens, &JQ_POLICY)),
-        "base64" => Some(policy::check(tokens, &BASE64_POLICY)),
-        "xxd" => Some(policy::check(tokens, &XXD_POLICY)),
-        "getconf" => Some(policy::check(tokens, &GETCONF_POLICY)),
-        "uuidgen" => Some(policy::check(tokens, &UUIDGEN_POLICY)),
-        "md5sum" | "sha256sum" | "sha1sum" | "sha512sum" => {
-            Some(policy::check(tokens, &GNU_HASH_POLICY))
-        }
-        "md5" => Some(policy::check(tokens, &MD5_POLICY)),
-        "shasum" => Some(policy::check(tokens, &SHASUM_POLICY)),
-        "cksum" => Some(policy::check(tokens, &CKSUM_POLICY)),
-        "b2sum" => Some(policy::check(tokens, &B2SUM_POLICY)),
-        "sum" => Some(policy::check(tokens, &SUM_POLICY)),
-        "strings" => Some(policy::check(tokens, &STRINGS_POLICY)),
-        "hexdump" => Some(policy::check(tokens, &HEXDUMP_POLICY)),
-        "od" => Some(policy::check(tokens, &OD_POLICY)),
-        "size" => Some(policy::check(tokens, &SIZE_POLICY)),
-        "sw_vers" => Some(policy::check(tokens, &SW_VERS_POLICY)),
-        "mdls" => Some(policy::check(tokens, &MDLS_POLICY)),
-        "otool" => Some(policy::check(tokens, &OTOOL_POLICY)),
-        "nm" => Some(policy::check(tokens, &NM_POLICY)),
-        "system_profiler" => Some(policy::check(tokens, &SYSTEM_PROFILER_POLICY)),
-        "ioreg" => Some(policy::check(tokens, &IOREG_POLICY)),
-        "vm_stat" => Some(policy::check(tokens, &VM_STAT_POLICY)),
-        "man" => Some(policy::check(tokens, &MAN_POLICY)),
-        "mdfind" => Some(policy::check(tokens, &MDFIND_POLICY)),
-        "dig" => Some(policy::check(tokens, &DIG_POLICY)),
-        "host" => Some(policy::check(tokens, &HOST_POLICY)),
-        "whois" => Some(policy::check(tokens, &WHOIS_POLICY)),
-        "netstat" => Some(policy::check(tokens, &NETSTAT_POLICY)),
-        "identify" => Some(policy::check(tokens, &IDENTIFY_POLICY)),
-        "shellcheck" => Some(policy::check(tokens, &SHELLCHECK_POLICY)),
-        "cloc" => Some(policy::check(tokens, &CLOC_POLICY)),
-        "tokei" => Some(policy::check(tokens, &TOKEI_POLICY)),
-        "cucumber" => Some(policy::check(tokens, &CUCUMBER_POLICY)),
-        _ => None,
-    }
-}
+pub(crate) static FLAT_DEFS: &[FlatDef] = &[
+    FlatDef { name: "b2sum", policy: &B2SUM_POLICY, help_eligible: false },
+    FlatDef { name: "base64", policy: &BASE64_POLICY, help_eligible: false },
+    FlatDef { name: "basename", policy: &BASENAME_POLICY, help_eligible: false },
+    FlatDef { name: "bat", policy: &BAT_POLICY, help_eligible: false },
+    FlatDef { name: "bc", policy: &BC_POLICY, help_eligible: false },
+    FlatDef { name: "branchdiff", policy: &BARE_ONLY, help_eligible: false },
+    FlatDef { name: "cal", policy: &CAL_POLICY, help_eligible: false },
+    FlatDef { name: "cat", policy: &CAT_POLICY, help_eligible: false },
+    FlatDef { name: "cd", policy: &CD_POLICY, help_eligible: false },
+    FlatDef { name: "cksum", policy: &CKSUM_POLICY, help_eligible: false },
+    FlatDef { name: "cloc", policy: &CLOC_POLICY, help_eligible: false },
+    FlatDef { name: "col", policy: &COL_POLICY, help_eligible: false },
+    FlatDef { name: "colordiff", policy: &COLORDIFF_POLICY, help_eligible: false },
+    FlatDef { name: "column", policy: &COLUMN_POLICY, help_eligible: false },
+    FlatDef { name: "comm", policy: &COMM_POLICY, help_eligible: false },
+    FlatDef { name: "cucumber", policy: &CUCUMBER_POLICY, help_eligible: false },
+    FlatDef { name: "cut", policy: &CUT_POLICY, help_eligible: false },
+    FlatDef { name: "date", policy: &DATE_POLICY, help_eligible: false },
+    FlatDef { name: "delta", policy: &DELTA_POLICY, help_eligible: false },
+    FlatDef { name: "df", policy: &DF_POLICY, help_eligible: false },
+    FlatDef { name: "diff", policy: &DIFF_POLICY, help_eligible: false },
+    FlatDef { name: "dig", policy: &DIG_POLICY, help_eligible: false },
+    FlatDef { name: "dirname", policy: &DIRNAME_POLICY, help_eligible: false },
+    FlatDef { name: "du", policy: &DU_POLICY, help_eligible: false },
+    FlatDef { name: "dust", policy: &DUST_POLICY, help_eligible: false },
+    FlatDef { name: "echo", policy: &ECHO_POLICY, help_eligible: false },
+    FlatDef { name: "egrep", policy: &GREP_POLICY, help_eligible: false },
+    FlatDef { name: "exa", policy: &EZA_POLICY, help_eligible: false },
+    FlatDef { name: "expand", policy: &EXPAND_POLICY, help_eligible: false },
+    FlatDef { name: "expr", policy: &EXPR_POLICY, help_eligible: false },
+    FlatDef { name: "eza", policy: &EZA_POLICY, help_eligible: false },
+    FlatDef { name: "factor", policy: &FACTOR_POLICY, help_eligible: false },
+    FlatDef { name: "false", policy: &BARE_ONLY, help_eligible: false },
+    FlatDef { name: "fgrep", policy: &GREP_POLICY, help_eligible: false },
+    FlatDef { name: "file", policy: &FILE_POLICY, help_eligible: false },
+    FlatDef { name: "fmt", policy: &FMT_POLICY, help_eligible: false },
+    FlatDef { name: "fold", policy: &FOLD_POLICY, help_eligible: false },
+    FlatDef { name: "getconf", policy: &GETCONF_POLICY, help_eligible: false },
+    FlatDef { name: "grep", policy: &GREP_POLICY, help_eligible: false },
+    FlatDef { name: "groups", policy: &GROUPS_POLICY, help_eligible: false },
+    FlatDef { name: "head", policy: &HEAD_POLICY, help_eligible: false },
+    FlatDef { name: "hexdump", policy: &HEXDUMP_POLICY, help_eligible: false },
+    FlatDef { name: "host", policy: &HOST_POLICY, help_eligible: false },
+    FlatDef { name: "htop", policy: &HTOP_POLICY, help_eligible: false },
+    FlatDef { name: "iconv", policy: &ICONV_POLICY, help_eligible: false },
+    FlatDef { name: "id", policy: &ID_POLICY, help_eligible: false },
+    FlatDef { name: "identify", policy: &IDENTIFY_POLICY, help_eligible: false },
+    FlatDef { name: "ifconfig", policy: &IFCONFIG_POLICY, help_eligible: false },
+    FlatDef { name: "ioreg", policy: &IOREG_POLICY, help_eligible: false },
+    FlatDef { name: "iotop", policy: &IOTOP_POLICY, help_eligible: false },
+    FlatDef { name: "jq", policy: &JQ_POLICY, help_eligible: false },
+    FlatDef { name: "last", policy: &LAST_POLICY, help_eligible: false },
+    FlatDef { name: "lastlog", policy: &LASTLOG_POLICY, help_eligible: false },
+    FlatDef { name: "locale", policy: &LOCALE_POLICY, help_eligible: false },
+    FlatDef { name: "ls", policy: &LS_POLICY, help_eligible: false },
+    FlatDef { name: "lsof", policy: &LSOF_POLICY, help_eligible: false },
+    FlatDef { name: "man", policy: &MAN_POLICY, help_eligible: true },
+    FlatDef { name: "md5", policy: &MD5_POLICY, help_eligible: false },
+    FlatDef { name: "md5sum", policy: &GNU_HASH_POLICY, help_eligible: false },
+    FlatDef { name: "mdfind", policy: &MDFIND_POLICY, help_eligible: false },
+    FlatDef { name: "mdls", policy: &MDLS_POLICY, help_eligible: false },
+    FlatDef { name: "netstat", policy: &NETSTAT_POLICY, help_eligible: false },
+    FlatDef { name: "nl", policy: &NL_POLICY, help_eligible: false },
+    FlatDef { name: "nm", policy: &NM_POLICY, help_eligible: false },
+    FlatDef { name: "nproc", policy: &NPROC_POLICY, help_eligible: false },
+    FlatDef { name: "nroff", policy: &NROFF_POLICY, help_eligible: false },
+    FlatDef { name: "od", policy: &OD_POLICY, help_eligible: false },
+    FlatDef { name: "otool", policy: &OTOOL_POLICY, help_eligible: false },
+    FlatDef { name: "paste", policy: &PASTE_POLICY, help_eligible: false },
+    FlatDef { name: "pgrep", policy: &PGREP_POLICY, help_eligible: false },
+    FlatDef { name: "printenv", policy: &PRINTENV_POLICY, help_eligible: false },
+    FlatDef { name: "printf", policy: &PRINTF_POLICY, help_eligible: false },
+    FlatDef { name: "procs", policy: &PROCS_POLICY, help_eligible: false },
+    FlatDef { name: "ps", policy: &PS_POLICY, help_eligible: false },
+    FlatDef { name: "pwd", policy: &PWD_POLICY, help_eligible: false },
+    FlatDef { name: "readlink", policy: &READLINK_POLICY, help_eligible: false },
+    FlatDef { name: "realpath", policy: &REALPATH_POLICY, help_eligible: false },
+    FlatDef { name: "rev", policy: &REV_POLICY, help_eligible: false },
+    FlatDef { name: "rg", policy: &RG_POLICY, help_eligible: false },
+    FlatDef { name: "seq", policy: &SEQ_POLICY, help_eligible: false },
+    FlatDef { name: "sha1sum", policy: &GNU_HASH_POLICY, help_eligible: false },
+    FlatDef { name: "sha256sum", policy: &GNU_HASH_POLICY, help_eligible: false },
+    FlatDef { name: "sha512sum", policy: &GNU_HASH_POLICY, help_eligible: false },
+    FlatDef { name: "shasum", policy: &SHASUM_POLICY, help_eligible: false },
+    FlatDef { name: "shellcheck", policy: &SHELLCHECK_POLICY, help_eligible: false },
+    FlatDef { name: "size", policy: &SIZE_POLICY, help_eligible: false },
+    FlatDef { name: "sleep", policy: &SLEEP_POLICY, help_eligible: false },
+    FlatDef { name: "sort", policy: &SORT_POLICY, help_eligible: false },
+    FlatDef { name: "ss", policy: &SS_POLICY, help_eligible: false },
+    FlatDef { name: "stat", policy: &STAT_POLICY, help_eligible: false },
+    FlatDef { name: "strings", policy: &STRINGS_POLICY, help_eligible: false },
+    FlatDef { name: "sum", policy: &SUM_POLICY, help_eligible: false },
+    FlatDef { name: "sw_vers", policy: &SW_VERS_POLICY, help_eligible: false },
+    FlatDef { name: "system_profiler", policy: &SYSTEM_PROFILER_POLICY, help_eligible: false },
+    FlatDef { name: "tac", policy: &TAC_POLICY, help_eligible: false },
+    FlatDef { name: "tail", policy: &TAIL_POLICY, help_eligible: false },
+    FlatDef { name: "test", policy: &TEST_CMD_POLICY, help_eligible: false },
+    FlatDef { name: "tokei", policy: &TOKEI_POLICY, help_eligible: false },
+    FlatDef { name: "top", policy: &TOP_POLICY, help_eligible: false },
+    FlatDef { name: "tr", policy: &TR_POLICY, help_eligible: false },
+    FlatDef { name: "tree", policy: &TREE_POLICY, help_eligible: false },
+    FlatDef { name: "true", policy: &BARE_ONLY, help_eligible: false },
+    FlatDef { name: "tty", policy: &TTY_POLICY, help_eligible: false },
+    FlatDef { name: "type", policy: &TYPE_POLICY, help_eligible: false },
+    FlatDef { name: "uname", policy: &UNAME_POLICY, help_eligible: false },
+    FlatDef { name: "unexpand", policy: &UNEXPAND_POLICY, help_eligible: false },
+    FlatDef { name: "uniq", policy: &UNIQ_POLICY, help_eligible: false },
+    FlatDef { name: "unset", policy: &UNSET_POLICY, help_eligible: false },
+    FlatDef { name: "uptime", policy: &UPTIME_POLICY, help_eligible: false },
+    FlatDef { name: "uuidgen", policy: &UUIDGEN_POLICY, help_eligible: false },
+    FlatDef { name: "vm_stat", policy: &VM_STAT_POLICY, help_eligible: false },
+    FlatDef { name: "w", policy: &W_POLICY, help_eligible: false },
+    FlatDef { name: "wc", policy: &WC_POLICY, help_eligible: false },
+    FlatDef { name: "whereis", policy: &WHEREIS_POLICY, help_eligible: false },
+    FlatDef { name: "which", policy: &WHICH_POLICY, help_eligible: false },
+    FlatDef { name: "who", policy: &WHO_POLICY, help_eligible: false },
+    FlatDef { name: "whoami", policy: &BARE_ONLY, help_eligible: false },
+    FlatDef { name: "whois", policy: &WHOIS_POLICY, help_eligible: false },
+    FlatDef { name: "xmllint", policy: &XMLLINT_POLICY, help_eligible: true },
+    FlatDef { name: "xxd", policy: &XXD_POLICY, help_eligible: false },
+    FlatDef { name: "yq", policy: &YQ_POLICY, help_eligible: true },
+];
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    if let result @ Some(_) = dispatch_policy(cmd, tokens) {
-        return result;
+    for flat in FLAT_DEFS {
+        if let result @ Some(_) = flat.dispatch(cmd, tokens) {
+            return result;
+        }
     }
     match cmd {
+        "arch" => Some(is_safe_arch(tokens)),
+        "awk" | "gawk" | "mawk" | "nawk" => Some(is_safe_awk(tokens)),
+        "command" => Some(is_safe_command_builtin(tokens)),
         "fd" => Some(is_safe_fd(tokens)),
-        "tree" => Some(is_safe_tree(tokens)),
-        "file" => Some(is_safe_file_cmd(tokens)),
-        "date" => Some(is_safe_date(tokens)),
+        "find" => Some(is_safe_find(tokens, is_safe)),
+        "hostname" => Some(is_safe_hostname(tokens)),
         "nslookup" => Some(is_safe_nslookup(tokens)),
-        "ss" => Some(is_safe_ss(tokens)),
-        "ifconfig" => Some(is_safe_ifconfig(tokens)),
         "route" => Some(is_safe_route(tokens)),
         "safe-chains" => Some(true),
-        "grep" | "egrep" | "fgrep" => Some(is_safe_grep(tokens)),
-        "rg" => Some(is_safe_rg(tokens)),
-        "cat" => Some(is_safe_cat(tokens)),
-        "head" => Some(is_safe_head(tokens)),
-        "tail" => Some(is_safe_tail(tokens)),
-        "wc" => Some(is_safe_wc(tokens)),
-        "cut" => Some(is_safe_cut(tokens)),
-        "tr" => Some(is_safe_tr(tokens)),
-        "uniq" => Some(is_safe_uniq(tokens)),
-        "diff" => Some(is_safe_diff(tokens)),
-        "comm" => Some(is_safe_comm(tokens)),
-        "paste" => Some(is_safe_paste(tokens)),
-        "tac" => Some(is_safe_tac(tokens)),
-        "rev" => Some(is_safe_rev(tokens)),
-        "nl" => Some(is_safe_nl(tokens)),
-        "expand" => Some(is_safe_expand(tokens)),
-        "unexpand" => Some(is_safe_unexpand(tokens)),
-        "fold" => Some(is_safe_fold(tokens)),
-        "fmt" => Some(is_safe_fmt(tokens)),
-        "col" => Some(is_safe_col(tokens)),
-        "column" => Some(is_safe_column(tokens)),
-        "iconv" => Some(is_safe_iconv(tokens)),
-        "nroff" => Some(is_safe_nroff(tokens)),
-        "echo" => Some(is_safe_echo(tokens)),
-        "printf" => Some(is_safe_printf(tokens)),
-        "seq" => Some(is_safe_seq(tokens)),
-        "test" => Some(is_safe_test(tokens)),
-        "expr" => Some(is_safe_expr(tokens)),
-        "bc" => Some(is_safe_bc(tokens)),
-        "factor" => Some(is_safe_factor(tokens)),
-        "bat" => Some(is_safe_bat(tokens)),
-        "arch" => Some(is_safe_arch(tokens)),
-        "command" => Some(is_safe_command_builtin(tokens)),
-        "hostname" => Some(is_safe_hostname(tokens)),
-        "find" => Some(is_safe_find(tokens, is_safe)),
         "sed" => Some(is_safe_sed(tokens)),
-        "sort" => Some(is_safe_sort(tokens)),
-        "yq" => Some(is_safe_yq(tokens)),
-        "xmllint" => Some(is_safe_xmllint(tokens)),
-        "awk" | "gawk" | "mawk" | "nawk" => Some(is_safe_awk(tokens)),
         _ => None,
     }
-}
-
-fn policy_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::CommandDoc;
-    vec![
-        CommandDoc::handler("ls", LS_POLICY.describe()),
-        CommandDoc::handler("eza / exa", EZA_POLICY.describe()),
-        CommandDoc::handler("delta", DELTA_POLICY.describe()),
-        CommandDoc::handler("colordiff", COLORDIFF_POLICY.describe()),
-        CommandDoc::handler("dirname", DIRNAME_POLICY.describe()),
-        CommandDoc::handler("basename", BASENAME_POLICY.describe()),
-        CommandDoc::handler("realpath", REALPATH_POLICY.describe()),
-        CommandDoc::handler("readlink", READLINK_POLICY.describe()),
-        CommandDoc::handler("stat", STAT_POLICY.describe()),
-        CommandDoc::handler("du", DU_POLICY.describe()),
-        CommandDoc::handler("df", DF_POLICY.describe()),
-        CommandDoc::handler("true / false",
-            "Bare invocation allowed."),
-        CommandDoc::handler("printenv", PRINTENV_POLICY.describe()),
-        CommandDoc::handler("type", TYPE_POLICY.describe()),
-        CommandDoc::handler("whereis", WHEREIS_POLICY.describe()),
-        CommandDoc::handler("which", WHICH_POLICY.describe()),
-        CommandDoc::handler("whoami",
-            "Bare invocation allowed."),
-        CommandDoc::handler("pwd", PWD_POLICY.describe()),
-        CommandDoc::handler("cd", CD_POLICY.describe()),
-        CommandDoc::handler("unset", UNSET_POLICY.describe()),
-        CommandDoc::handler("uname", UNAME_POLICY.describe()),
-        CommandDoc::handler("nproc", NPROC_POLICY.describe()),
-        CommandDoc::handler("uptime", UPTIME_POLICY.describe()),
-        CommandDoc::handler("id", ID_POLICY.describe()),
-        CommandDoc::handler("groups",
-            "Positional arguments (usernames) only."),
-        CommandDoc::handler("tty", TTY_POLICY.describe()),
-        CommandDoc::handler("locale", LOCALE_POLICY.describe()),
-        CommandDoc::handler("cal", CAL_POLICY.describe()),
-        CommandDoc::handler("sleep",
-            "Positional duration arguments only."),
-        CommandDoc::handler("who", WHO_POLICY.describe()),
-        CommandDoc::handler("w", W_POLICY.describe()),
-        CommandDoc::handler("last", LAST_POLICY.describe()),
-        CommandDoc::handler("lastlog", LASTLOG_POLICY.describe()),
-        CommandDoc::handler("ps", PS_POLICY.describe()),
-        CommandDoc::handler("top", TOP_POLICY.describe()),
-        CommandDoc::handler("htop", HTOP_POLICY.describe()),
-        CommandDoc::handler("iotop", IOTOP_POLICY.describe()),
-        CommandDoc::handler("procs", PROCS_POLICY.describe()),
-        CommandDoc::handler("dust", DUST_POLICY.describe()),
-        CommandDoc::handler("lsof", LSOF_POLICY.describe()),
-        CommandDoc::handler("pgrep", PGREP_POLICY.describe()),
-        CommandDoc::handler("jq", JQ_POLICY.describe()),
-        CommandDoc::handler("base64", BASE64_POLICY.describe()),
-        CommandDoc::handler("xxd", XXD_POLICY.describe()),
-        CommandDoc::handler("getconf", GETCONF_POLICY.describe()),
-        CommandDoc::handler("uuidgen", UUIDGEN_POLICY.describe()),
-        CommandDoc::handler("md5sum / sha256sum / sha1sum / sha512sum", GNU_HASH_POLICY.describe()),
-        CommandDoc::handler("md5", MD5_POLICY.describe()),
-        CommandDoc::handler("shasum", SHASUM_POLICY.describe()),
-        CommandDoc::handler("cksum", CKSUM_POLICY.describe()),
-        CommandDoc::handler("b2sum", B2SUM_POLICY.describe()),
-        CommandDoc::handler("sum", SUM_POLICY.describe()),
-        CommandDoc::handler("strings", STRINGS_POLICY.describe()),
-        CommandDoc::handler("hexdump", HEXDUMP_POLICY.describe()),
-        CommandDoc::handler("od", OD_POLICY.describe()),
-        CommandDoc::handler("size", SIZE_POLICY.describe()),
-        CommandDoc::handler("sw_vers", SW_VERS_POLICY.describe()),
-        CommandDoc::handler("mdls", MDLS_POLICY.describe()),
-        CommandDoc::handler("otool", OTOOL_POLICY.describe()),
-        CommandDoc::handler("nm", NM_POLICY.describe()),
-        CommandDoc::handler("system_profiler", SYSTEM_PROFILER_POLICY.describe()),
-        CommandDoc::handler("ioreg", IOREG_POLICY.describe()),
-        CommandDoc::handler("vm_stat", VM_STAT_POLICY.describe()),
-        CommandDoc::handler("mdfind", MDFIND_POLICY.describe()),
-        CommandDoc::handler("dig", DIG_POLICY.describe()),
-        CommandDoc::handler("nslookup",
-            "Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -query=, -port=, -timeout=, -retry=, -class=, -domain=, -querytype=)."),
-        CommandDoc::handler("host", HOST_POLICY.describe()),
-        CommandDoc::handler("whois", WHOIS_POLICY.describe()),
-        CommandDoc::handler("netstat", NETSTAT_POLICY.describe()),
-        CommandDoc::handler("ss", SS_POLICY.describe()),
-        CommandDoc::handler("identify", IDENTIFY_POLICY.describe()),
-        CommandDoc::handler("shellcheck", SHELLCHECK_POLICY.describe()),
-        CommandDoc::handler("cloc", CLOC_POLICY.describe()),
-        CommandDoc::handler("tokei", TOKEI_POLICY.describe()),
-        CommandDoc::handler("cucumber", CUCUMBER_POLICY.describe()),
-        CommandDoc::handler("branchdiff",
-            "Bare invocation allowed."),
-        CommandDoc::handler("safe-chains",
-            "Any arguments allowed (safe-chains is this tool)."),
-    ]
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::CommandDoc;
-    let mut docs = vec![
+    let mut docs: Vec<_> = FLAT_DEFS.iter().map(|d| d.to_doc()).collect();
+    docs.extend([
         CommandDoc::handler("arch",
             "Bare invocation allowed."),
-        CommandDoc::handler("cat", CAT_POLICY.describe()),
-        CommandDoc::handler("comm", COMM_POLICY.describe()),
+        CommandDoc::handler("awk / gawk / mawk / nawk",
+            format!("Program validated: system, getline, |, > constructs checked. {}", AWK_POLICY.describe())),
         CommandDoc::handler("command",
             "Allowed: -v, -V (check if command exists)."),
-        CommandDoc::handler("cut", CUT_POLICY.describe()),
-        CommandDoc::handler("diff", DIFF_POLICY.describe()),
+        CommandDoc::handler("fd",
+            "Safe unless --exec/-x or --exec-batch/-X flags (execute arbitrary commands)."),
         CommandDoc::handler("find",
             "Positional predicates allowed. \
              -exec/-execdir allowed when the executed command is itself safe."),
-        CommandDoc::handler("grep", GREP_POLICY.describe()),
-        CommandDoc::handler("head", HEAD_POLICY.describe()),
-        CommandDoc::handler("man", MAN_POLICY.describe()),
         CommandDoc::wordset("hostname", &HOSTNAME_DISPLAY),
-        CommandDoc::handler("nl", NL_POLICY.describe()),
-        CommandDoc::handler("paste", PASTE_POLICY.describe()),
-        CommandDoc::handler("rev", REV_POLICY.describe()),
-        CommandDoc::handler("rg", RG_POLICY.describe()),
-        CommandDoc::handler("sed", format!("{} Inline expressions validated for safety.", SED_POLICY.describe())),
-        CommandDoc::handler("sort", SORT_POLICY.describe()),
-        CommandDoc::handler("tac", TAC_POLICY.describe()),
-        CommandDoc::handler("tail", TAIL_POLICY.describe()),
-        CommandDoc::handler("tr", TR_POLICY.describe()),
-        CommandDoc::handler("uniq", format!("{} Max 1 positional arg (second would be output file).", UNIQ_POLICY.describe())),
-        CommandDoc::handler("wc", WC_POLICY.describe()),
-        CommandDoc::handler("yq", YQ_POLICY.describe()),
-        CommandDoc::handler("awk / gawk / mawk / nawk",
-            format!("Program validated: system, getline, |, > constructs checked. {}", AWK_POLICY.describe())),
-        CommandDoc::handler("xmllint", XMLLINT_POLICY.describe()),
-        CommandDoc::handler("expand", EXPAND_POLICY.describe()),
-        CommandDoc::handler("unexpand", UNEXPAND_POLICY.describe()),
-        CommandDoc::handler("fold", FOLD_POLICY.describe()),
-        CommandDoc::handler("fmt", FMT_POLICY.describe()),
-        CommandDoc::handler("col", COL_POLICY.describe()),
-        CommandDoc::handler("column", COLUMN_POLICY.describe()),
-        CommandDoc::handler("iconv", ICONV_POLICY.describe()),
-        CommandDoc::handler("nroff", NROFF_POLICY.describe()),
-        CommandDoc::handler("echo", ECHO_POLICY.describe()),
-        CommandDoc::handler("printf", PRINTF_POLICY.describe()),
-        CommandDoc::handler("seq", SEQ_POLICY.describe()),
-        CommandDoc::handler("test", TEST_CMD_POLICY.describe()),
-        CommandDoc::handler("expr", EXPR_POLICY.describe()),
-        CommandDoc::handler("bc", BC_POLICY.describe()),
-        CommandDoc::handler("factor", FACTOR_POLICY.describe()),
-        CommandDoc::handler("bat", BAT_POLICY.describe()),
-        CommandDoc::handler("fd",
-            "Safe unless --exec/-x or --exec-batch/-X flags (execute arbitrary commands)."),
-        CommandDoc::handler("tree", TREE_POLICY.describe()),
-        CommandDoc::handler("file", FILE_POLICY.describe()),
-        CommandDoc::handler("date", DATE_POLICY.describe()),
+        CommandDoc::handler("nslookup",
+            "Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -query=, -port=, -timeout=, -retry=, -class=, -domain=, -querytype=)."),
         CommandDoc::handler("route",
             "Allowed subcommands: get, monitor, print, show. Allowed flags: -4, -6, -n, -v. Bare invocation allowed."),
-        CommandDoc::handler("ifconfig", IFCONFIG_POLICY.describe()),
-    ];
-    docs.extend(policy_docs());
+        CommandDoc::handler("safe-chains",
+            "Any arguments allowed (safe-chains is this tool)."),
+        CommandDoc::handler("sed", format!("{} Inline expressions validated for safety.", SED_POLICY.describe())),
+    ]);
     docs
 }
 
 #[cfg(test)]
 pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Policy { cmd: "ls" },
-    super::CommandEntry::Policy { cmd: "eza" },
-    super::CommandEntry::Policy { cmd: "exa" },
-    super::CommandEntry::Policy { cmd: "delta" },
-    super::CommandEntry::Policy { cmd: "colordiff" },
-    super::CommandEntry::Policy { cmd: "dirname" },
-    super::CommandEntry::Policy { cmd: "basename" },
-    super::CommandEntry::Policy { cmd: "realpath" },
-    super::CommandEntry::Policy { cmd: "readlink" },
-    super::CommandEntry::Policy { cmd: "stat" },
-    super::CommandEntry::Policy { cmd: "du" },
-    super::CommandEntry::Policy { cmd: "df" },
-    super::CommandEntry::Policy { cmd: "true" },
-    super::CommandEntry::Policy { cmd: "false" },
-    super::CommandEntry::Policy { cmd: "whoami" },
-    super::CommandEntry::Policy { cmd: "branchdiff" },
-    super::CommandEntry::Policy { cmd: "printenv" },
-    super::CommandEntry::Policy { cmd: "type" },
-    super::CommandEntry::Policy { cmd: "whereis" },
-    super::CommandEntry::Policy { cmd: "which" },
-    super::CommandEntry::Policy { cmd: "pwd" },
-    super::CommandEntry::Policy { cmd: "cd" },
-    super::CommandEntry::Policy { cmd: "unset" },
-    super::CommandEntry::Policy { cmd: "uname" },
-    super::CommandEntry::Policy { cmd: "nproc" },
-    super::CommandEntry::Policy { cmd: "uptime" },
-    super::CommandEntry::Policy { cmd: "id" },
-    super::CommandEntry::Policy { cmd: "groups" },
-    super::CommandEntry::Policy { cmd: "tty" },
-    super::CommandEntry::Policy { cmd: "locale" },
-    super::CommandEntry::Policy { cmd: "cal" },
-    super::CommandEntry::Policy { cmd: "sleep" },
-    super::CommandEntry::Policy { cmd: "who" },
-    super::CommandEntry::Policy { cmd: "w" },
-    super::CommandEntry::Policy { cmd: "last" },
-    super::CommandEntry::Policy { cmd: "lastlog" },
-    super::CommandEntry::Policy { cmd: "ps" },
-    super::CommandEntry::Policy { cmd: "top" },
-    super::CommandEntry::Policy { cmd: "htop" },
-    super::CommandEntry::Policy { cmd: "iotop" },
-    super::CommandEntry::Policy { cmd: "procs" },
-    super::CommandEntry::Policy { cmd: "dust" },
-    super::CommandEntry::Policy { cmd: "lsof" },
-    super::CommandEntry::Policy { cmd: "pgrep" },
-    super::CommandEntry::Policy { cmd: "jq" },
-    super::CommandEntry::Policy { cmd: "base64" },
-    super::CommandEntry::Policy { cmd: "xxd" },
-    super::CommandEntry::Policy { cmd: "getconf" },
-    super::CommandEntry::Policy { cmd: "uuidgen" },
-    super::CommandEntry::Policy { cmd: "md5sum" },
-    super::CommandEntry::Policy { cmd: "sha256sum" },
-    super::CommandEntry::Policy { cmd: "sha1sum" },
-    super::CommandEntry::Policy { cmd: "sha512sum" },
-    super::CommandEntry::Policy { cmd: "md5" },
-    super::CommandEntry::Policy { cmd: "shasum" },
-    super::CommandEntry::Policy { cmd: "cksum" },
-    super::CommandEntry::Policy { cmd: "b2sum" },
-    super::CommandEntry::Policy { cmd: "sum" },
-    super::CommandEntry::Policy { cmd: "strings" },
-    super::CommandEntry::Policy { cmd: "hexdump" },
-    super::CommandEntry::Policy { cmd: "od" },
-    super::CommandEntry::Policy { cmd: "size" },
-    super::CommandEntry::Policy { cmd: "sw_vers" },
-    super::CommandEntry::Policy { cmd: "mdls" },
-    super::CommandEntry::Policy { cmd: "otool" },
-    super::CommandEntry::Policy { cmd: "nm" },
-    super::CommandEntry::Policy { cmd: "system_profiler" },
-    super::CommandEntry::Policy { cmd: "ioreg" },
-    super::CommandEntry::Policy { cmd: "vm_stat" },
-    super::CommandEntry::Policy { cmd: "man" },
-    super::CommandEntry::Policy { cmd: "mdfind" },
-    super::CommandEntry::Policy { cmd: "dig" },
-    super::CommandEntry::Policy { cmd: "host" },
-    super::CommandEntry::Policy { cmd: "whois" },
-    super::CommandEntry::Policy { cmd: "netstat" },
-    super::CommandEntry::Policy { cmd: "identify" },
-    super::CommandEntry::Policy { cmd: "shellcheck" },
-    super::CommandEntry::Policy { cmd: "cloc" },
-    super::CommandEntry::Policy { cmd: "tokei" },
-    super::CommandEntry::Policy { cmd: "cucumber" },
-    super::CommandEntry::Positional { cmd: "fd" },
-    super::CommandEntry::Policy { cmd: "tree" },
-    super::CommandEntry::Policy { cmd: "file" },
-    super::CommandEntry::Policy { cmd: "date" },
-    super::CommandEntry::Custom { cmd: "nslookup", valid_prefix: Some("nslookup example.com") },
-    super::CommandEntry::Policy { cmd: "ss" },
-    super::CommandEntry::Policy { cmd: "ifconfig" },
-    super::CommandEntry::Positional { cmd: "route" },
-    super::CommandEntry::Positional { cmd: "safe-chains" },
-    super::CommandEntry::Policy { cmd: "grep" },
-    super::CommandEntry::Policy { cmd: "egrep" },
-    super::CommandEntry::Policy { cmd: "fgrep" },
-    super::CommandEntry::Policy { cmd: "rg" },
-    super::CommandEntry::Policy { cmd: "cat" },
-    super::CommandEntry::Policy { cmd: "head" },
-    super::CommandEntry::Policy { cmd: "tail" },
-    super::CommandEntry::Policy { cmd: "wc" },
-    super::CommandEntry::Policy { cmd: "cut" },
-    super::CommandEntry::Policy { cmd: "tr" },
-    super::CommandEntry::Policy { cmd: "uniq" },
-    super::CommandEntry::Policy { cmd: "diff" },
-    super::CommandEntry::Policy { cmd: "comm" },
-    super::CommandEntry::Policy { cmd: "paste" },
-    super::CommandEntry::Policy { cmd: "tac" },
-    super::CommandEntry::Policy { cmd: "rev" },
-    super::CommandEntry::Policy { cmd: "nl" },
-    super::CommandEntry::Policy { cmd: "expand" },
-    super::CommandEntry::Policy { cmd: "unexpand" },
-    super::CommandEntry::Policy { cmd: "fold" },
-    super::CommandEntry::Policy { cmd: "fmt" },
-    super::CommandEntry::Policy { cmd: "col" },
-    super::CommandEntry::Policy { cmd: "column" },
-    super::CommandEntry::Policy { cmd: "iconv" },
-    super::CommandEntry::Policy { cmd: "nroff" },
-    super::CommandEntry::Positional { cmd: "echo" },
-    super::CommandEntry::Policy { cmd: "printf" },
-    super::CommandEntry::Policy { cmd: "seq" },
-    super::CommandEntry::Positional { cmd: "test" },
-    super::CommandEntry::Positional { cmd: "expr" },
-    super::CommandEntry::Policy { cmd: "bc" },
-    super::CommandEntry::Policy { cmd: "factor" },
-    super::CommandEntry::Policy { cmd: "bat" },
     super::CommandEntry::Custom { cmd: "arch", valid_prefix: None },
-    super::CommandEntry::Positional { cmd: "command" },
-    super::CommandEntry::Custom { cmd: "hostname", valid_prefix: None },
-    super::CommandEntry::Delegation { cmd: "find" },
-    super::CommandEntry::Custom { cmd: "sed", valid_prefix: Some("sed 's/a/b/'") },
-    super::CommandEntry::Policy { cmd: "sort" },
-    super::CommandEntry::Policy { cmd: "yq" },
-    super::CommandEntry::Policy { cmd: "xmllint" },
     super::CommandEntry::Custom { cmd: "awk", valid_prefix: Some("awk '{print}'") },
+    super::CommandEntry::Positional { cmd: "command" },
+    super::CommandEntry::Positional { cmd: "fd" },
+    super::CommandEntry::Delegation { cmd: "find" },
     super::CommandEntry::Custom { cmd: "gawk", valid_prefix: Some("gawk '{print}'") },
+    super::CommandEntry::Custom { cmd: "hostname", valid_prefix: None },
     super::CommandEntry::Custom { cmd: "mawk", valid_prefix: Some("mawk '{print}'") },
     super::CommandEntry::Custom { cmd: "nawk", valid_prefix: Some("nawk '{print}'") },
+    super::CommandEntry::Custom { cmd: "nslookup", valid_prefix: Some("nslookup example.com") },
+    super::CommandEntry::Positional { cmd: "route" },
+    super::CommandEntry::Positional { cmd: "safe-chains" },
+    super::CommandEntry::Custom { cmd: "sed", valid_prefix: Some("sed 's/a/b/'") },
 ];
 
 #[cfg(test)]

@@ -129,6 +129,41 @@ impl CommandDef {
     }
 }
 
+pub struct FlatDef {
+    pub name: &'static str,
+    pub policy: &'static FlagPolicy,
+    pub help_eligible: bool,
+}
+
+impl FlatDef {
+    pub fn dispatch(&self, cmd: &str, tokens: &[Token]) -> Option<bool> {
+        if cmd == self.name {
+            Some(policy::check(tokens, self.policy))
+        } else {
+            None
+        }
+    }
+
+    pub fn to_doc(&self) -> crate::docs::CommandDoc {
+        crate::docs::CommandDoc::handler(self.name, self.policy.describe())
+    }
+}
+
+#[cfg(test)]
+impl FlatDef {
+    pub fn auto_test_reject_unknown(&self) {
+        if self.policy.flag_style == FlagStyle::Positional {
+            return;
+        }
+        let test = format!("{} --xyzzy-unknown-42", self.name);
+        assert!(
+            !crate::is_safe_command(&test),
+            "{}: accepted unknown flag: {test}",
+            self.name,
+        );
+    }
+}
+
 fn sub_doc_line(sub: &SubDef, prefix: &str, out: &mut Vec<String>) {
     match sub {
         SubDef::Policy { name, policy } => {

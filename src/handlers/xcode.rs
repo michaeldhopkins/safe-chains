@@ -79,10 +79,12 @@ pub(crate) static PLUTIL: CommandDef = CommandDef {
     help_eligible: true,
 };
 
-pub fn is_safe_xcode_select(tokens: &[Token]) -> bool {
-    tokens.len() == 2
-        && tokens[1].is_one_of(&["-p", "--print-path", "-v", "--version"])
-}
+pub(crate) static XCODE_SELECT: CommandDef = CommandDef {
+    name: "xcode-select",
+    subs: &[],
+    bare_flags: &["-p", "--print-path", "-v", "--version"],
+    help_eligible: true,
+};
 
 static XCRUN_SHOW_FLAGS: WordSet = WordSet::new(&[
     "--find", "--show-sdk-build-version", "--show-sdk-path",
@@ -241,8 +243,8 @@ pub fn is_safe_spctl(tokens: &[Token]) -> bool {
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
     XCODEBUILD.dispatch(cmd, tokens, is_safe)
         .or_else(|| PLUTIL.dispatch(cmd, tokens, is_safe))
+        .or_else(|| XCODE_SELECT.dispatch(cmd, tokens, is_safe))
         .or_else(|| match cmd {
-            "xcode-select" => Some(is_safe_xcode_select(tokens)),
             "xcrun" => Some(is_safe_xcrun(tokens)),
             "pkgutil" => Some(is_safe_pkgutil(tokens)),
             "lipo" => Some(is_safe_lipo(tokens)),
@@ -257,8 +259,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         XCODEBUILD.to_doc(),
         PLUTIL.to_doc(),
-        CommandDoc::handler("xcode-select",
-            "Allowed: -p/--print-path, -v/--version (single argument only)."),
+        XCODE_SELECT.to_doc(),
         CommandDoc::handler("xcrun",
             "Allowed: --find, --show-sdk-*, --show-toolchain-path. \
              Multi-level: notarytool history/info/log, simctl list, stapler validate. \
@@ -276,7 +277,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Custom { cmd: "xcode-select", valid_prefix: None },
     super::CommandEntry::Positional { cmd: "xcrun" },
     super::CommandEntry::Custom { cmd: "pkgutil", valid_prefix: Some("pkgutil --pkgs") },
     super::CommandEntry::Custom { cmd: "lipo", valid_prefix: Some("lipo -info /usr/bin/ls") },

@@ -34,7 +34,11 @@ impl FlagPolicy {
         if self.flag_style == FlagStyle::Positional {
             builder = builder.section("Hyphen-prefixed positional arguments accepted.".to_string());
         }
-        builder.build()
+        let result = builder.build();
+        if result.is_empty() && !self.bare {
+            return "Positional arguments only.".to_string();
+        }
+        result
     }
 
     pub fn flag_summary(&self) -> String {

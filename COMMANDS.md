@@ -176,7 +176,7 @@ Allowed standalone flags: --3, --autoconf, --by-file, --by-file-by-lang, --by-pe
 
 ### `cmake`
 
-Allowed: --version, --system-information (single argument only).
+Info flags: --system-information, --version.
 
 ### `codesign`
 
@@ -402,9 +402,21 @@ Bare invocation allowed.
 
 Hyphen-prefixed positional arguments accepted.
 
+### `egrep`
+
+Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z. Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m.
+
 ### `env`
 
 Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed.
+
+### `exa`
+
+Allowed standalone flags: --accessed, --all, --binary, --blocks, --blocksize, --bytes, --changed, --classify, --color-scale, --color-scale-mode, --context, --created, --dereference, --extended, --flags, --follow-symlinks, --git, --git-ignore, --git-repos, --git-repos-no-status, --group, --group-directories-first, --header, --hyperlink, --icons, --inode, --links, --list-dirs, --long, --modified, --mounts, --no-filesize, --no-git, --no-icons, --no-permissions, --no-quotes, --no-time, --no-user, --numeric, --octal-permissions, --oneline, --only-dirs, --only-files, --recurse, --reverse, --tree, -1, -@, -A, -B, -D, -F, -G, -H, -I, -M, -R, -S, -T, -U, -Z, -a, -b, -d, -f, -g, -h, -i, -l, -m, -r, -s, -u, -x.
+
+Allowed valued flags: --color, --colour, --git-ignore-glob, --grid-columns, --group-directories-first-dirs, --ignore-glob, --level, --smart-group, --sort, --time, --time-style, --total-size, --width, -L, -X, -t, -w.
+
+Bare invocation allowed.
 
 ### `expand`
 
@@ -418,7 +430,7 @@ Bare invocation allowed.
 
 Hyphen-prefixed positional arguments accepted.
 
-### `eza / exa`
+### `eza`
 
 Allowed standalone flags: --accessed, --all, --binary, --blocks, --blocksize, --bytes, --changed, --classify, --color-scale, --color-scale-mode, --context, --created, --dereference, --extended, --flags, --follow-symlinks, --git, --git-ignore, --git-repos, --git-repos-no-status, --group, --group-directories-first, --header, --hyperlink, --icons, --inode, --links, --list-dirs, --long, --modified, --mounts, --no-filesize, --no-git, --no-icons, --no-permissions, --no-quotes, --no-time, --no-user, --numeric, --octal-permissions, --oneline, --only-dirs, --only-files, --recurse, --reverse, --tree, -1, -@, -A, -B, -D, -F, -G, -H, -I, -M, -R, -S, -T, -U, -Z, -a, -b, -d, -f, -g, -h, -i, -l, -m, -r, -s, -u, -x.
 
@@ -430,9 +442,17 @@ Bare invocation allowed.
 
 Allowed standalone flags: --exponents, -h. Bare invocation allowed.
 
+### `false`
+
+Bare invocation allowed.
+
 ### `fd`
 
 Safe unless --exec/-x or --exec-batch/-X flags (execute arbitrary commands).
+
+### `fgrep`
+
+Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z. Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m.
 
 ### `file`
 
@@ -568,7 +588,7 @@ Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --co
 
 ### `groups`
 
-Positional arguments (usernames) only.
+Bare invocation allowed.
 
 ### `head`
 
@@ -737,7 +757,7 @@ Allowed valued flags: -s.
 
 Bare invocation allowed.
 
-### `md5sum / sha256sum / sha1sum / sha512sum`
+### `md5sum`
 
 Allowed standalone flags: --binary, --check, --ignore-missing, --quiet, --status, --strict, --tag, --text, --warn, --zero, -b, -c, -t, -w, -z. Bare invocation allowed.
 
@@ -930,7 +950,7 @@ Allowed standalone flags: --null, -0. Bare invocation allowed.
 
 ### `printf`
 
-
+Positional arguments only.
 
 ### `procs`
 
@@ -1026,6 +1046,18 @@ Allowed standalone flags: --debug, --posix, --quiet, --sandbox, --silent, --unbu
 
 Allowed standalone flags: --equal-width, -w. Allowed valued flags: --format, --separator, -f, -s, -t.
 
+### `sha1sum`
+
+Allowed standalone flags: --binary, --check, --ignore-missing, --quiet, --status, --strict, --tag, --text, --warn, --zero, -b, -c, -t, -w, -z. Bare invocation allowed.
+
+### `sha256sum`
+
+Allowed standalone flags: --binary, --check, --ignore-missing, --quiet, --status, --strict, --tag, --text, --warn, --zero, -b, -c, -t, -w, -z. Bare invocation allowed.
+
+### `sha512sum`
+
+Allowed standalone flags: --binary, --check, --ignore-missing, --quiet, --status, --strict, --tag, --text, --warn, --zero, -b, -c, -t, -w, -z. Bare invocation allowed.
+
 ### `shasum`
 
 Allowed standalone flags: --binary, --check, --portable, --status, --strict, --tag, --text, --warn, -0, -b, -c, -p, -s, -t.
@@ -1044,7 +1076,7 @@ Allowed standalone flags: --common, --totals, -A, -B, -G, -d, -o, -t, -x. Allowe
 
 ### `sleep`
 
-Positional duration arguments only.
+Positional arguments only.
 
 ### `sort`
 
@@ -1166,7 +1198,7 @@ Allowed valued flags: --charset, --filelimit, --filesfrom, --sort, --timefmt, -H
 
 Bare invocation allowed.
 
-### `true / false`
+### `true`
 
 Bare invocation allowed.
 
@@ -1196,7 +1228,7 @@ Allowed standalone flags: --count, --ignore-case, --repeated, --unique, --zero-t
 
 Allowed valued flags: --all-repeated, --check-chars, --group, --skip-chars, --skip-fields, -f, -s, -w.
 
-Bare invocation allowed. Max 1 positional arg (second would be output file).
+Bare invocation allowed.
 
 ### `unset`
 
@@ -1270,7 +1302,7 @@ Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n,
 
 ### `xcode-select`
 
-Allowed: -p/--print-path, -v/--version (single argument only).
+Info flags: -p, --print-path, -v, --version.
 
 ### `xcodebuild`
 

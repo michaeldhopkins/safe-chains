@@ -203,10 +203,10 @@ const COMMAND_DEFS: &[&CommandDef] = &[
     &rust::CARGO, &rust::RUSTUP,
     &vcs::GIT,
     &swift::SWIFT,
-    &system::BREW, &system::MISE, &system::ASDF, &system::DEFAULTS,
+    &system::BREW, &system::MISE, &system::ASDF, &system::CMAKE, &system::DEFAULTS,
     &system::SECURITY, &system::CSRUTIL, &system::DISKUTIL,
     &system::LAUNCHCTL, &system::LOG,
-    &xcode::XCODEBUILD, &xcode::PLUTIL,
+    &xcode::XCODEBUILD, &xcode::PLUTIL, &xcode::XCODE_SELECT,
 ];
 
 #[cfg(test)]
@@ -325,6 +325,13 @@ mod tests {
     }
 
     #[test]
+    fn flat_defs_reject_unknown() {
+        for def in coreutils::FLAT_DEFS {
+            def.auto_test_reject_unknown();
+        }
+    }
+
+    #[test]
     fn registry_covers_handled_commands() {
         let registry = full_registry();
         let mut all_cmds: HashSet<&str> = registry
@@ -338,6 +345,9 @@ mod tests {
             })
             .collect();
         for def in COMMAND_DEFS {
+            all_cmds.insert(def.name);
+        }
+        for def in coreutils::FLAT_DEFS {
             all_cmds.insert(def.name);
         }
         let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();

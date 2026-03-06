@@ -330,9 +330,12 @@ pub fn is_safe_sysctl(tokens: &[Token]) -> bool {
     policy::check(tokens, &SYSCTL_POLICY)
 }
 
-pub fn is_safe_cmake(tokens: &[Token]) -> bool {
-    tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--system-information")
-}
+pub(crate) static CMAKE: CommandDef = CommandDef {
+    name: "cmake",
+    subs: &[],
+    bare_flags: &["--system-information", "--version"],
+    help_eligible: true,
+};
 
 static SECURITY_FIND_CERT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["-Z", "-a", "-p"]),
@@ -606,10 +609,10 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
         .or_else(|| DISKUTIL.dispatch(cmd, tokens, is_safe))
         .or_else(|| LAUNCHCTL.dispatch(cmd, tokens, is_safe))
         .or_else(|| LOG.dispatch(cmd, tokens, is_safe))
+        .or_else(|| CMAKE.dispatch(cmd, tokens, is_safe))
         .or_else(|| match cmd {
             "pmset" => Some(is_safe_pmset(tokens)),
             "sysctl" => Some(is_safe_sysctl(tokens)),
-            "cmake" => Some(is_safe_cmake(tokens)),
             "networksetup" => Some(is_safe_networksetup(tokens)),
             _ => None,
         })
@@ -626,8 +629,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             "Allowed: -g (get/display settings only)."),
         CommandDoc::handler("sysctl",
             "Read-only usage."),
-        CommandDoc::handler("cmake",
-            "Allowed: --version, --system-information (single argument only)."),
+        CMAKE.to_doc(),
         SECURITY.to_doc(),
         CSRUTIL.to_doc(),
         DISKUTIL.to_doc(),
@@ -643,7 +645,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 pub(super) const REGISTRY: &[super::CommandEntry] = &[
     super::CommandEntry::Positional { cmd: "pmset" },
     super::CommandEntry::Custom { cmd: "sysctl", valid_prefix: Some("sysctl kern.maxproc") },
-    super::CommandEntry::Custom { cmd: "cmake", valid_prefix: None },
     super::CommandEntry::Positional { cmd: "networksetup" },
 ];
 
