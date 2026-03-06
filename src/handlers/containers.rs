@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static DOCKER_PS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -11,6 +11,7 @@ static DOCKER_PS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"fn",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_IMAGES_POLICY: FlagPolicy = FlagPolicy {
@@ -22,6 +23,7 @@ static DOCKER_IMAGES_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"f",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_LOGS_POLICY: FlagPolicy = FlagPolicy {
@@ -33,6 +35,7 @@ static DOCKER_LOGS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"n",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_INSPECT_POLICY: FlagPolicy = FlagPolicy {
@@ -42,6 +45,7 @@ static DOCKER_INSPECT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"f",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_INFO_POLICY: FlagPolicy = FlagPolicy {
@@ -51,6 +55,7 @@ static DOCKER_INFO_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"f",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_VERSION_POLICY: FlagPolicy = FlagPolicy {
@@ -60,6 +65,7 @@ static DOCKER_VERSION_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"f",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_STATS_POLICY: FlagPolicy = FlagPolicy {
@@ -69,6 +75,7 @@ static DOCKER_STATS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_HISTORY_POLICY: FlagPolicy = FlagPolicy {
@@ -78,6 +85,7 @@ static DOCKER_HISTORY_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
@@ -87,6 +95,7 @@ static DOCKER_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_LS_POLICY: FlagPolicy = FlagPolicy {
@@ -96,6 +105,7 @@ static DOCKER_LS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"f",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_COMPOSE_PS_POLICY: FlagPolicy = FlagPolicy {
@@ -108,6 +118,7 @@ static DOCKER_COMPOSE_PS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_COMPOSE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
@@ -122,6 +133,7 @@ static DOCKER_COMPOSE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"o",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 fn check_docker_subcmd(tokens: &[Token], subcmd_pos: usize) -> bool {

@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet, has_flag};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static NPM_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -11,6 +11,7 @@ static NPM_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static NPM_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -20,6 +21,7 @@ static NPM_VIEW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static NPM_AUDIT_POLICY: FlagPolicy = FlagPolicy {
@@ -31,6 +33,7 @@ static NPM_AUDIT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static NPM_BARE_POLICY: FlagPolicy = FlagPolicy {
@@ -40,6 +43,7 @@ static NPM_BARE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static NPM_TEST_POLICY: FlagPolicy = FlagPolicy {
@@ -49,6 +53,7 @@ static NPM_TEST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_npm(tokens: &[Token]) -> bool {
@@ -77,6 +82,7 @@ static YARN_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static YARN_BARE_POLICY: FlagPolicy = FlagPolicy {
@@ -86,6 +92,7 @@ static YARN_BARE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_yarn(tokens: &[Token]) -> bool {
@@ -110,6 +117,7 @@ static PNPM_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static PNPM_BARE_POLICY: FlagPolicy = FlagPolicy {
@@ -119,6 +127,7 @@ static PNPM_BARE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_pnpm(tokens: &[Token]) -> bool {
@@ -139,6 +148,7 @@ static BUN_TEST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"t",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static BUN_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
@@ -148,6 +158,7 @@ static BUN_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static BUN_PM_POLICY: FlagPolicy = FlagPolicy {
@@ -157,6 +168,7 @@ static BUN_PM_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static NPX_SAFE: WordSet =
@@ -186,6 +198,7 @@ static TSC_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"p",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 fn find_runner_package_index(
@@ -284,6 +297,7 @@ static DENO_SAFE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"c",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DENO_FMT_POLICY: FlagPolicy = FlagPolicy {
@@ -299,6 +313,7 @@ static DENO_FMT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"c",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_deno(tokens: &[Token]) -> bool {
@@ -322,6 +337,7 @@ static NVM_BARE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_nvm(tokens: &[Token]) -> bool {
@@ -343,6 +359,7 @@ static FNM_BARE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_fnm(tokens: &[Token]) -> bool {
@@ -364,6 +381,7 @@ static VOLTA_BARE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_volta(tokens: &[Token]) -> bool {

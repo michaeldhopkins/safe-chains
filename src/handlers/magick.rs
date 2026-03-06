@@ -1,5 +1,5 @@
 use crate::parse::{Token, WordSet};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -16,6 +16,7 @@ static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_magick(tokens: &[Token]) -> bool {

@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static DOTNET_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -16,6 +16,7 @@ static DOTNET_BUILD_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"acfoprsv",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOTNET_TEST_POLICY: FlagPolicy = FlagPolicy {
@@ -37,6 +38,7 @@ static DOTNET_TEST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"acdeflorsv",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DOTNET_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -52,6 +54,7 @@ static DOTNET_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"v",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_dotnet(tokens: &[Token]) -> bool {

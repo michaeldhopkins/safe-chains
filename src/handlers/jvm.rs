@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static GRADLE_TASKS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -11,6 +11,7 @@ static GRADLE_TASKS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GRADLE_DEPS_POLICY: FlagPolicy = FlagPolicy {
@@ -23,6 +24,7 @@ static GRADLE_DEPS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GRADLE_PROPS_POLICY: FlagPolicy = FlagPolicy {
@@ -35,6 +37,7 @@ static GRADLE_PROPS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GRADLE_BUILD_POLICY: FlagPolicy = FlagPolicy {
@@ -52,6 +55,7 @@ static GRADLE_BUILD_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"x",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_gradle(tokens: &[Token]) -> bool {

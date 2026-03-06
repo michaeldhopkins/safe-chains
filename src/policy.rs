@@ -1,5 +1,11 @@
 use crate::parse::{Token, WordSet};
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum FlagStyle {
+    Strict,
+    Positional,
+}
+
 pub struct FlagPolicy {
     pub standalone: WordSet,
     pub standalone_short: &'static [u8],
@@ -7,6 +13,7 @@ pub struct FlagPolicy {
     pub valued_short: &'static [u8],
     pub bare: bool,
     pub max_positional: Option<usize>,
+    pub flag_style: FlagStyle,
 }
 
 impl FlagPolicy {
@@ -23,6 +30,9 @@ impl FlagPolicy {
         }
         if self.bare {
             builder = builder.section("Bare invocation allowed.".to_string());
+        }
+        if self.flag_style == FlagStyle::Positional {
+            builder = builder.section("Hyphen-prefixed positional arguments accepted.".to_string());
         }
         builder.build()
     }
@@ -64,10 +74,20 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
                 i += 1;
                 continue;
             }
+            if policy.flag_style == FlagStyle::Positional {
+                positionals += 1;
+                i += 1;
+                continue;
+            }
             return false;
         }
 
         if t.starts_with("--") {
+            if policy.flag_style == FlagStyle::Positional {
+                positionals += 1;
+                i += 1;
+                continue;
+            }
             return false;
         }
 
@@ -84,6 +104,10 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
                 if is_last {
                     i += 1;
                 }
+                break;
+            }
+            if policy.flag_style == FlagStyle::Positional {
+                positionals += 1;
                 break;
             }
             return false;
@@ -110,6 +134,7 @@ mod tests {
         valued_short: b"ABm",
         bare: false,
         max_positional: None,
+        flag_style: FlagStyle::Strict,
     };
 
     fn toks(words: &[&str]) -> Vec<Token> {
@@ -130,6 +155,7 @@ mod tests {
             valued_short: b"",
             bare: true,
             max_positional: None,
+            flag_style: FlagStyle::Strict,
         };
         assert!(check(&toks(&["uname"]), &policy));
     }
@@ -239,6 +265,7 @@ mod tests {
         valued_short: b"fs",
         bare: true,
         max_positional: Some(1),
+        flag_style: FlagStyle::Strict,
     };
 
     #[test]
@@ -269,5 +296,65 @@ mod tests {
     #[test]
     fn max_positional_bare_allowed() {
         assert!(check(&toks(&["uniq"]), &LIMITED_POLICY));
+    }
+
+    static POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
+        standalone: WordSet::new(&["-E", "-e", "-n"]),
+        standalone_short: b"Een",
+        valued: WordSet::new(&[]),
+        valued_short: b"",
+        bare: true,
+        max_positional: None,
+        flag_style: FlagStyle::Positional,
+    };
+
+    #[test]
+    fn positional_style_unknown_long() {
+        assert!(check(&toks(&["echo", "--unknown", "hello"]), &POSITIONAL_POLICY));
+    }
+
+    #[test]
+    fn positional_style_unknown_short() {
+        assert!(check(&toks(&["echo", "-x", "hello"]), &POSITIONAL_POLICY));
+    }
+
+    #[test]
+    fn positional_style_dashes() {
+        assert!(check(&toks(&["echo", "---"]), &POSITIONAL_POLICY));
+    }
+
+    #[test]
+    fn positional_style_known_flags_still_work() {
+        assert!(check(&toks(&["echo", "-n", "hello"]), &POSITIONAL_POLICY));
+    }
+
+    #[test]
+    fn positional_style_combo_known() {
+        assert!(check(&toks(&["echo", "-ne", "hello"]), &POSITIONAL_POLICY));
+    }
+
+    #[test]
+    fn positional_style_combo_unknown_byte() {
+        assert!(check(&toks(&["echo", "-nx", "hello"]), &POSITIONAL_POLICY));
+    }
+
+    #[test]
+    fn positional_style_unknown_eq() {
+        assert!(check(&toks(&["echo", "--foo=bar"]), &POSITIONAL_POLICY));
+    }
+
+    #[test]
+    fn positional_style_with_max_positional() {
+        let policy = FlagPolicy {
+            standalone: WordSet::new(&["-n"]),
+            standalone_short: b"n",
+            valued: WordSet::new(&[]),
+            valued_short: b"",
+            bare: true,
+            max_positional: Some(2),
+            flag_style: FlagStyle::Positional,
+        };
+        assert!(check(&toks(&["echo", "--unknown", "hello"]), &policy));
+        assert!(!check(&toks(&["echo", "--a", "--b", "--c"]), &policy));
     }
 }

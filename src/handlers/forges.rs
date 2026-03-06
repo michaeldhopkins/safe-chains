@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet, has_flag};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -14,6 +14,7 @@ static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"BHLRS",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -27,6 +28,7 @@ static GH_VIEW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"R",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_DIFF_POLICY: FlagPolicy = FlagPolicy {
@@ -40,6 +42,7 @@ static GH_DIFF_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"R",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_CHECKS_POLICY: FlagPolicy = FlagPolicy {
@@ -53,6 +56,7 @@ static GH_CHECKS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"iR",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_STATUS_POLICY: FlagPolicy = FlagPolicy {
@@ -66,6 +70,7 @@ static GH_STATUS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"R",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_RUN_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -79,6 +84,7 @@ static GH_RUN_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"bLRuw",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_RUN_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -92,6 +98,7 @@ static GH_RUN_VIEW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"jR",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_RUN_WATCH_POLICY: FlagPolicy = FlagPolicy {
@@ -105,6 +112,7 @@ static GH_RUN_WATCH_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"iR",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_RELEASE_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -118,6 +126,7 @@ static GH_RELEASE_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"LR",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_RELEASE_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -131,6 +140,7 @@ static GH_RELEASE_VIEW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"R",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_SEARCH_POLICY: FlagPolicy = FlagPolicy {
@@ -154,6 +164,7 @@ static GH_SEARCH_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"LR",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -165,6 +176,7 @@ static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"LR",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GH_SIMPLE_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -176,6 +188,7 @@ static GH_SIMPLE_VIEW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"R",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
@@ -200,6 +213,7 @@ static GH_BROWSE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"bR",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static API_BODY_FLAGS: &[&str] = &["-f", "-F", "--field", "--raw-field", "--input"];
@@ -348,6 +362,7 @@ static GLAB_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"aFglmoPpRrSst",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -362,6 +377,7 @@ static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"FPpR",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
@@ -375,6 +391,7 @@ static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"R",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GLAB_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
@@ -386,6 +403,7 @@ static GLAB_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"FPpR",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 fn glab_action_policy(action: &str) -> &'static FlagPolicy {
@@ -462,6 +480,7 @@ static TEA_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"flLoopRs",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static TEA_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -475,6 +494,7 @@ static TEA_VIEW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"loR",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_tea(tokens: &[Token]) -> bool {

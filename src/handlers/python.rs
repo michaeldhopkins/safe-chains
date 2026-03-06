@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet, has_flag};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -14,6 +14,7 @@ static PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
@@ -23,6 +24,7 @@ static PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static PIP_FREEZE_POLICY: FlagPolicy = FlagPolicy {
@@ -34,6 +36,7 @@ static PIP_FREEZE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static PIP_BARE_POLICY: FlagPolicy = FlagPolicy {
@@ -43,6 +46,7 @@ static PIP_BARE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_pip(tokens: &[Token]) -> bool {
@@ -73,6 +77,7 @@ static UV_PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static UV_PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
@@ -82,6 +87,7 @@ static UV_PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static UV_PIP_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
@@ -91,6 +97,7 @@ static UV_PIP_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static UV_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
@@ -100,6 +107,7 @@ static UV_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_uv(tokens: &[Token]) -> bool {
@@ -139,6 +147,7 @@ static POETRY_SHOW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static POETRY_CHECK_POLICY: FlagPolicy = FlagPolicy {
@@ -148,6 +157,7 @@ static POETRY_CHECK_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static POETRY_ENV_POLICY: FlagPolicy = FlagPolicy {
@@ -157,6 +167,7 @@ static POETRY_ENV_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_poetry(tokens: &[Token]) -> bool {
@@ -183,6 +194,7 @@ static PYENV_BARE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_pyenv(tokens: &[Token]) -> bool {
@@ -208,6 +220,7 @@ static CONDA_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"np",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CONDA_INFO_POLICY: FlagPolicy = FlagPolicy {
@@ -219,6 +232,7 @@ static CONDA_INFO_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CONDA_CONFIG_POLICY: FlagPolicy = FlagPolicy {
@@ -230,6 +244,7 @@ static CONDA_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"fnp",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_conda(tokens: &[Token]) -> bool {

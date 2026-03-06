@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static GO_VERSION_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["-m", "-v"]),
@@ -8,6 +8,7 @@ static GO_VERSION_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GO_ENV_POLICY: FlagPolicy = FlagPolicy {
@@ -17,6 +18,7 @@ static GO_ENV_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GO_DOC_POLICY: FlagPolicy = FlagPolicy {
@@ -26,6 +28,7 @@ static GO_DOC_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GO_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -45,6 +48,7 @@ static GO_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GO_VET_POLICY: FlagPolicy = FlagPolicy {
@@ -62,6 +66,7 @@ static GO_VET_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GO_BUILD_POLICY: FlagPolicy = FlagPolicy {
@@ -79,6 +84,7 @@ static GO_BUILD_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GO_TEST_POLICY: FlagPolicy = FlagPolicy {
@@ -103,6 +109,7 @@ static GO_TEST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_go(tokens: &[Token]) -> bool {

@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet, has_flag};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static FIND_DANGEROUS_FLAGS: WordSet = WordSet::new(&[
     "-delete",
@@ -187,6 +187,7 @@ static GREP_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"ABCDdefm",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_grep(tokens: &[Token]) -> bool {
@@ -231,6 +232,7 @@ static RG_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"ABCEMTefgjmrt",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_rg(tokens: &[Token]) -> bool {
@@ -249,6 +251,7 @@ static CAT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_cat(tokens: &[Token]) -> bool {
@@ -268,6 +271,7 @@ static HEAD_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"cn",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_head(tokens: &[Token]) -> bool {
@@ -289,6 +293,7 @@ static TAIL_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"bcn",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_tail(tokens: &[Token]) -> bool {
@@ -306,6 +311,7 @@ static WC_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_wc(tokens: &[Token]) -> bool {
@@ -326,6 +332,7 @@ static CUT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"bcdf",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_cut(tokens: &[Token]) -> bool {
@@ -342,6 +349,7 @@ static TR_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_tr(tokens: &[Token]) -> bool {
@@ -363,6 +371,7 @@ static UNIQ_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"fsw",
     bare: true,
     max_positional: Some(1),
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_uniq(tokens: &[Token]) -> bool {
@@ -397,6 +406,7 @@ static DIFF_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"CDFILSUWXx",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_diff(tokens: &[Token]) -> bool {
@@ -413,6 +423,7 @@ static COMM_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_comm(tokens: &[Token]) -> bool {
@@ -432,6 +443,7 @@ static PASTE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"d",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_paste(tokens: &[Token]) -> bool {
@@ -451,6 +463,7 @@ static TAC_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"s",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_tac(tokens: &[Token]) -> bool {
@@ -464,6 +477,7 @@ static REV_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_rev(tokens: &[Token]) -> bool {
@@ -486,6 +500,7 @@ static NL_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"bdfhilnsvw",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_nl(tokens: &[Token]) -> bool {
@@ -505,6 +520,7 @@ static EXPAND_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"t",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_expand(tokens: &[Token]) -> bool {
@@ -524,6 +540,7 @@ static UNEXPAND_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"t",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_unexpand(tokens: &[Token]) -> bool {
@@ -543,6 +560,7 @@ static FOLD_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"w",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_fold(tokens: &[Token]) -> bool {
@@ -563,6 +581,7 @@ static FMT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"dglptw",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_fmt(tokens: &[Token]) -> bool {
@@ -585,6 +604,7 @@ static COLUMN_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"EHOWcdors",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_column(tokens: &[Token]) -> bool {
@@ -604,6 +624,7 @@ static ICONV_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"ft",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_iconv(tokens: &[Token]) -> bool {
@@ -621,6 +642,7 @@ static NROFF_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"MPTdmnorw",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_nroff(tokens: &[Token]) -> bool {
@@ -638,6 +660,7 @@ static PRINTF_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_printf(tokens: &[Token]) -> bool {
@@ -657,6 +680,7 @@ static SEQ_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"fst",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_seq(tokens: &[Token]) -> bool {
@@ -689,6 +713,7 @@ static BC_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"EIOSefr",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_bc(tokens: &[Token]) -> bool {
@@ -705,6 +730,7 @@ static FACTOR_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_factor(tokens: &[Token]) -> bool {
@@ -728,6 +754,7 @@ static BAT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"Hlmr",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_bat(tokens: &[Token]) -> bool {
@@ -793,6 +820,7 @@ static IFCONFIG_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(1),
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_ifconfig(tokens: &[Token]) -> bool {
@@ -806,6 +834,7 @@ static BARE_ONLY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static LS_POLICY: FlagPolicy = FlagPolicy {
@@ -836,6 +865,7 @@ static LS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"ITw",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static EZA_POLICY: FlagPolicy = FlagPolicy {
@@ -867,6 +897,7 @@ static EZA_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"LXtw",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DELTA_POLICY: FlagPolicy = FlagPolicy {
@@ -912,6 +943,7 @@ static DELTA_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"w",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static COLORDIFF_POLICY: FlagPolicy = FlagPolicy {
@@ -941,6 +973,7 @@ static COLORDIFF_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"CDFILSUW",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DIRNAME_POLICY: FlagPolicy = FlagPolicy {
@@ -950,6 +983,7 @@ static DIRNAME_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static BASENAME_POLICY: FlagPolicy = FlagPolicy {
@@ -959,6 +993,7 @@ static BASENAME_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"s",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static REALPATH_POLICY: FlagPolicy = FlagPolicy {
@@ -973,6 +1008,7 @@ static REALPATH_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static READLINK_POLICY: FlagPolicy = FlagPolicy {
@@ -986,6 +1022,7 @@ static READLINK_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static STAT_POLICY: FlagPolicy = FlagPolicy {
@@ -1001,6 +1038,7 @@ static STAT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"cft",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DU_POLICY: FlagPolicy = FlagPolicy {
@@ -1023,6 +1061,7 @@ static DU_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"Bdt",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DF_POLICY: FlagPolicy = FlagPolicy {
@@ -1040,6 +1079,7 @@ static DF_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"Btx",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static PWD_POLICY: FlagPolicy = FlagPolicy {
@@ -1049,6 +1089,7 @@ static PWD_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static CD_POLICY: FlagPolicy = FlagPolicy {
@@ -1058,6 +1099,7 @@ static CD_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(1),
+    flag_style: FlagStyle::Strict,
 };
 
 static UNSET_POLICY: FlagPolicy = FlagPolicy {
@@ -1067,6 +1109,7 @@ static UNSET_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static PRINTENV_POLICY: FlagPolicy = FlagPolicy {
@@ -1076,6 +1119,7 @@ static PRINTENV_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static TYPE_POLICY: FlagPolicy = FlagPolicy {
@@ -1085,6 +1129,7 @@ static TYPE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static WHEREIS_POLICY: FlagPolicy = FlagPolicy {
@@ -1094,6 +1139,7 @@ static WHEREIS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"BMSf",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static WHICH_POLICY: FlagPolicy = FlagPolicy {
@@ -1103,6 +1149,7 @@ static WHICH_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static UNAME_POLICY: FlagPolicy = FlagPolicy {
@@ -1117,6 +1164,7 @@ static UNAME_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static NPROC_POLICY: FlagPolicy = FlagPolicy {
@@ -1126,6 +1174,7 @@ static NPROC_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static UPTIME_POLICY: FlagPolicy = FlagPolicy {
@@ -1135,6 +1184,7 @@ static UPTIME_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static ID_POLICY: FlagPolicy = FlagPolicy {
@@ -1148,6 +1198,7 @@ static ID_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(1),
+    flag_style: FlagStyle::Strict,
 };
 
 static GROUPS_POLICY: FlagPolicy = FlagPolicy {
@@ -1157,6 +1208,7 @@ static GROUPS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static TTY_POLICY: FlagPolicy = FlagPolicy {
@@ -1166,6 +1218,7 @@ static TTY_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static LOCALE_POLICY: FlagPolicy = FlagPolicy {
@@ -1179,6 +1232,7 @@ static LOCALE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CAL_POLICY: FlagPolicy = FlagPolicy {
@@ -1193,6 +1247,7 @@ static CAL_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"ABdn",
     bare: true,
     max_positional: Some(2),
+    flag_style: FlagStyle::Strict,
 };
 
 static SLEEP_POLICY: FlagPolicy = FlagPolicy {
@@ -1202,6 +1257,7 @@ static SLEEP_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static WHO_POLICY: FlagPolicy = FlagPolicy {
@@ -1218,6 +1274,7 @@ static WHO_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(2),
+    flag_style: FlagStyle::Strict,
 };
 
 static W_POLICY: FlagPolicy = FlagPolicy {
@@ -1231,6 +1288,7 @@ static W_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(1),
+    flag_style: FlagStyle::Strict,
 };
 
 static LAST_POLICY: FlagPolicy = FlagPolicy {
@@ -1247,6 +1305,7 @@ static LAST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"fnpst",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static LASTLOG_POLICY: FlagPolicy = FlagPolicy {
@@ -1256,6 +1315,7 @@ static LASTLOG_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"btu",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static PS_POLICY: FlagPolicy = FlagPolicy {
@@ -1278,6 +1338,7 @@ static PS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"GOUnopstug",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static TOP_POLICY: FlagPolicy = FlagPolicy {
@@ -1293,6 +1354,7 @@ static TOP_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"FOUdflnopsuw",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static HTOP_POLICY: FlagPolicy = FlagPolicy {
@@ -1309,6 +1371,7 @@ static HTOP_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"Fdpsu",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static IOTOP_POLICY: FlagPolicy = FlagPolicy {
@@ -1325,6 +1388,7 @@ static IOTOP_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"dnpu",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static PROCS_POLICY: FlagPolicy = FlagPolicy {
@@ -1342,6 +1406,7 @@ static PROCS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"iw",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DUST_POLICY: FlagPolicy = FlagPolicy {
@@ -1360,6 +1425,7 @@ static DUST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"MXdentvwz",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static LSOF_POLICY: FlagPolicy = FlagPolicy {
@@ -1376,6 +1442,7 @@ static LSOF_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"FSTacdgikoprsug",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static PGREP_POLICY: FlagPolicy = FlagPolicy {
@@ -1396,6 +1463,7 @@ static PGREP_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"FGPdgstUu",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static JQ_POLICY: FlagPolicy = FlagPolicy {
@@ -1415,6 +1483,7 @@ static JQ_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"f",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static BASE64_POLICY: FlagPolicy = FlagPolicy {
@@ -1427,6 +1496,7 @@ static BASE64_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"bw",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static XXD_POLICY: FlagPolicy = FlagPolicy {
@@ -1446,6 +1516,7 @@ static XXD_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"Rcglnos",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GETCONF_POLICY: FlagPolicy = FlagPolicy {
@@ -1455,6 +1526,7 @@ static GETCONF_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"v",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static UUIDGEN_POLICY: FlagPolicy = FlagPolicy {
@@ -1467,6 +1539,7 @@ static UUIDGEN_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"mnNs",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static GNU_HASH_POLICY: FlagPolicy = FlagPolicy {
@@ -1481,6 +1554,7 @@ static GNU_HASH_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static MD5_POLICY: FlagPolicy = FlagPolicy {
@@ -1490,6 +1564,7 @@ static MD5_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"s",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static SHASUM_POLICY: FlagPolicy = FlagPolicy {
@@ -1503,6 +1578,7 @@ static SHASUM_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"a",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CKSUM_POLICY: FlagPolicy = FlagPolicy {
@@ -1516,6 +1592,7 @@ static CKSUM_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"al",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static B2SUM_POLICY: FlagPolicy = FlagPolicy {
@@ -1530,6 +1607,7 @@ static B2SUM_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"l",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static SUM_POLICY: FlagPolicy = FlagPolicy {
@@ -1539,6 +1617,7 @@ static SUM_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static STRINGS_POLICY: FlagPolicy = FlagPolicy {
@@ -1555,6 +1634,7 @@ static STRINGS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"Tenost",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static HEXDUMP_POLICY: FlagPolicy = FlagPolicy {
@@ -1568,6 +1648,7 @@ static HEXDUMP_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"Lefns",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static OD_POLICY: FlagPolicy = FlagPolicy {
@@ -1586,6 +1667,7 @@ static OD_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"ANSjtw",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static SIZE_POLICY: FlagPolicy = FlagPolicy {
@@ -1600,6 +1682,7 @@ static SIZE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static SW_VERS_POLICY: FlagPolicy = FlagPolicy {
@@ -1612,6 +1695,7 @@ static SW_VERS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static MDLS_POLICY: FlagPolicy = FlagPolicy {
@@ -1621,6 +1705,7 @@ static MDLS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"n",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static OTOOL_POLICY: FlagPolicy = FlagPolicy {
@@ -1633,6 +1718,7 @@ static OTOOL_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"ps",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static NM_POLICY: FlagPolicy = FlagPolicy {
@@ -1655,6 +1741,7 @@ static NM_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"ft",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static SYSTEM_PROFILER_POLICY: FlagPolicy = FlagPolicy {
@@ -1667,6 +1754,7 @@ static SYSTEM_PROFILER_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static IOREG_POLICY: FlagPolicy = FlagPolicy {
@@ -1681,6 +1769,7 @@ static IOREG_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"cdknpw",
     bare: true,
     max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
 };
 
 static VM_STAT_POLICY: FlagPolicy = FlagPolicy {
@@ -1690,6 +1779,7 @@ static VM_STAT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"c",
     bare: true,
     max_positional: Some(1),
+    flag_style: FlagStyle::Strict,
 };
 
 static MDFIND_POLICY: FlagPolicy = FlagPolicy {
@@ -1701,6 +1791,7 @@ static MDFIND_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"s",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static MAN_POLICY: FlagPolicy = FlagPolicy {
@@ -1719,6 +1810,7 @@ static MAN_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"CELMS",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static DIG_POLICY: FlagPolicy = FlagPolicy {
@@ -1732,6 +1824,7 @@ static DIG_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"bcfkpqtxy",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_nslookup(tokens: &[Token]) -> bool {
@@ -1771,6 +1864,7 @@ static HOST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"DNRTWimt",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static WHOIS_POLICY: FlagPolicy = FlagPolicy {
@@ -1786,6 +1880,7 @@ static WHOIS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"TVhipst",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static NETSTAT_POLICY: FlagPolicy = FlagPolicy {
@@ -1809,6 +1904,7 @@ static NETSTAT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"I",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static SS_POLICY: FlagPolicy = FlagPolicy {
@@ -1831,6 +1927,7 @@ static SS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"AFf",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_ss(tokens: &[Token]) -> bool {
@@ -1857,6 +1954,7 @@ static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static SHELLCHECK_POLICY: FlagPolicy = FlagPolicy {
@@ -1875,6 +1973,7 @@ static SHELLCHECK_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"PSWefios",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CLOC_POLICY: FlagPolicy = FlagPolicy {
@@ -1907,6 +2006,7 @@ static CLOC_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static TOKEI_POLICY: FlagPolicy = FlagPolicy {
@@ -1926,6 +2026,7 @@ static TOKEI_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"ceilost",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
@@ -1950,6 +2051,7 @@ static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"filnoprt",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 fn dispatch_policy(cmd: &str, tokens: &[Token]) -> Option<bool> {

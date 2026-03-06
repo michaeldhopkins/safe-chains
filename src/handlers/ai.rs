@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static OLLAMA_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--json"]),
@@ -8,6 +8,7 @@ static OLLAMA_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static OLLAMA_PS_POLICY: FlagPolicy = FlagPolicy {
@@ -17,6 +18,7 @@ static OLLAMA_PS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static OLLAMA_SHOW_POLICY: FlagPolicy = FlagPolicy {
@@ -29,6 +31,7 @@ static OLLAMA_SHOW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static LLM_MODELS_POLICY: FlagPolicy = FlagPolicy {
@@ -38,6 +41,7 @@ static LLM_MODELS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static LLM_PLUGINS_POLICY: FlagPolicy = FlagPolicy {
@@ -47,6 +51,7 @@ static LLM_PLUGINS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static LLM_LOGS_POLICY: FlagPolicy = FlagPolicy {
@@ -60,6 +65,7 @@ static LLM_LOGS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"cnm",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static LLM_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -69,6 +75,7 @@ static LLM_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_ollama(tokens: &[Token]) -> bool {

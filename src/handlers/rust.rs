@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet, has_flag};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static CARGO_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -17,6 +17,7 @@ static CARGO_BUILD_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"jZp",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_TEST_POLICY: FlagPolicy = FlagPolicy {
@@ -35,6 +36,7 @@ static CARGO_TEST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"jZp",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_CHECK_POLICY: FlagPolicy = FlagPolicy {
@@ -53,6 +55,7 @@ static CARGO_CHECK_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"jZp",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_CLIPPY_POLICY: FlagPolicy = FlagPolicy {
@@ -71,6 +74,7 @@ static CARGO_CLIPPY_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"jZp",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_BENCH_POLICY: FlagPolicy = FlagPolicy {
@@ -89,6 +93,7 @@ static CARGO_BENCH_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"jZp",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_DOC_POLICY: FlagPolicy = FlagPolicy {
@@ -107,6 +112,7 @@ static CARGO_DOC_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"jZp",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_TREE_POLICY: FlagPolicy = FlagPolicy {
@@ -125,6 +131,7 @@ static CARGO_TREE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"p",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_METADATA_POLICY: FlagPolicy = FlagPolicy {
@@ -141,6 +148,7 @@ static CARGO_METADATA_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_SEARCH_POLICY: FlagPolicy = FlagPolicy {
@@ -155,6 +163,7 @@ static CARGO_SEARCH_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_INFO_POLICY: FlagPolicy = FlagPolicy {
@@ -168,6 +177,7 @@ static CARGO_INFO_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_AUDIT_POLICY: FlagPolicy = FlagPolicy {
@@ -182,6 +192,7 @@ static CARGO_AUDIT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"f",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_DENY_POLICY: FlagPolicy = FlagPolicy {
@@ -197,6 +208,7 @@ static CARGO_DENY_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
@@ -210,6 +222,7 @@ static CARGO_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_FMT_POLICY: FlagPolicy = FlagPolicy {
@@ -221,6 +234,7 @@ static CARGO_FMT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"p",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_PACKAGE_POLICY: FlagPolicy = FlagPolicy {
@@ -238,6 +252,7 @@ static CARGO_PACKAGE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"jFZp",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static CARGO_PUBLISH_POLICY: FlagPolicy = FlagPolicy {
@@ -256,6 +271,7 @@ static CARGO_PUBLISH_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"jFZp",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_cargo(tokens: &[Token]) -> bool {
@@ -298,6 +314,7 @@ static RUSTUP_SHOW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static RUSTUP_WHICH_POLICY: FlagPolicy = FlagPolicy {
@@ -307,6 +324,7 @@ static RUSTUP_WHICH_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static RUSTUP_DOC_POLICY: FlagPolicy = FlagPolicy {
@@ -321,6 +339,7 @@ static RUSTUP_DOC_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static RUSTUP_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -330,6 +349,7 @@ static RUSTUP_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_rustup(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {

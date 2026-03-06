@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static BUNDLE_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--name-only", "--paths"]),
@@ -8,6 +8,7 @@ static BUNDLE_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static BUNDLE_INFO_POLICY: FlagPolicy = FlagPolicy {
@@ -17,6 +18,7 @@ static BUNDLE_INFO_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static BUNDLE_SHOW_POLICY: FlagPolicy = FlagPolicy {
@@ -26,6 +28,7 @@ static BUNDLE_SHOW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static BUNDLE_CHECK_POLICY: FlagPolicy = FlagPolicy {
@@ -35,6 +38,7 @@ static BUNDLE_CHECK_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static BUNDLE_EXEC_SAFE: WordSet = WordSet::new(&[
@@ -67,6 +71,7 @@ static GEM_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GEM_INFO_POLICY: FlagPolicy = FlagPolicy {
@@ -76,6 +81,7 @@ static GEM_INFO_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"v",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GEM_SEARCH_POLICY: FlagPolicy = FlagPolicy {
@@ -88,6 +94,7 @@ static GEM_SEARCH_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static GEM_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
@@ -99,6 +106,7 @@ static GEM_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"v",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_gem(tokens: &[Token]) -> bool {
@@ -123,6 +131,7 @@ static RBENV_BARE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_rbenv(tokens: &[Token]) -> bool {

@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static SWIFT_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -15,6 +15,7 @@ static SWIFT_BUILD_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"cj",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static SWIFT_TEST_POLICY: FlagPolicy = FlagPolicy {
@@ -33,6 +34,7 @@ static SWIFT_TEST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"cj",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static SWIFT_PACKAGE_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
@@ -42,6 +44,7 @@ static SWIFT_PACKAGE_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static SWIFT_PACKAGE_DUMP_POLICY: FlagPolicy = FlagPolicy {
@@ -51,6 +54,7 @@ static SWIFT_PACKAGE_DUMP_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static SWIFT_PACKAGE_SHOW_DEPS_POLICY: FlagPolicy = FlagPolicy {
@@ -60,6 +64,7 @@ static SWIFT_PACKAGE_SHOW_DEPS_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_swift(tokens: &[Token]) -> bool {

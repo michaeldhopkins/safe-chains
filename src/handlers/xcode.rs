@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static XCODEBUILD_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["-json"]),
@@ -8,6 +8,7 @@ static XCODEBUILD_LIST_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static XCODEBUILD_SHOW_POLICY: FlagPolicy = FlagPolicy {
@@ -20,6 +21,7 @@ static XCODEBUILD_SHOW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static XCODEBUILD_VERSION_POLICY: FlagPolicy = FlagPolicy {
@@ -29,6 +31,7 @@ static XCODEBUILD_VERSION_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_xcodebuild(tokens: &[Token]) -> bool {
@@ -51,6 +54,7 @@ static PLUTIL_LINT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static PLUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
@@ -60,6 +64,7 @@ static PLUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_plutil(tokens: &[Token]) -> bool {
@@ -147,6 +152,7 @@ static PKGUTIL_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_pkgutil(tokens: &[Token]) -> bool {
@@ -168,6 +174,7 @@ static LIPO_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_lipo(tokens: &[Token]) -> bool {
@@ -192,6 +199,7 @@ static CODESIGN_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_codesign(tokens: &[Token]) -> bool {
@@ -217,6 +225,7 @@ static SPCTL_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"t",
     bare: false,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_spctl(tokens: &[Token]) -> bool {

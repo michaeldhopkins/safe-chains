@@ -1,5 +1,5 @@
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static COMPOSER_SHOW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -12,6 +12,7 @@ static COMPOSER_SHOW_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"f",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static COMPOSER_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
@@ -24,6 +25,7 @@ static COMPOSER_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"f",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static COMPOSER_AUDIT_POLICY: FlagPolicy = FlagPolicy {
@@ -35,6 +37,7 @@ static COMPOSER_AUDIT_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"f",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 static COMPOSER_BARE_POLICY: FlagPolicy = FlagPolicy {
@@ -44,6 +47,7 @@ static COMPOSER_BARE_POLICY: FlagPolicy = FlagPolicy {
     valued_short: b"",
     bare: true,
     max_positional: None,
+    flag_style: FlagStyle::Strict,
 };
 
 pub fn is_safe_composer(tokens: &[Token]) -> bool {
