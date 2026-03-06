@@ -25,6 +25,9 @@ pub fn is_safe_yarn(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "--version") {
+        return true;
+    }
     match tokens[1].as_str() {
         "list" | "ls" => policy::check(&tokens[1..], &YARN_LIST_POLICY),
         "info" | "why" => policy::check(&tokens[1..], &YARN_BARE_POLICY),

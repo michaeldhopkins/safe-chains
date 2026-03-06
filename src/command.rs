@@ -54,12 +54,20 @@ impl SubDef {
 
     pub fn check(&self, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         match self {
-            Self::Policy { policy, .. } => policy::check(tokens, policy),
+            Self::Policy { policy, .. } => {
+                if tokens.len() == 2 && tokens[1] == "--help" {
+                    return true;
+                }
+                policy::check(tokens, policy)
+            }
             Self::Nested { subs, .. } => {
                 if tokens.len() < 2 {
                     return false;
                 }
                 let sub = tokens[1].as_str();
+                if tokens.len() == 2 && sub == "--help" {
+                    return true;
+                }
                 subs.iter()
                     .any(|s| s.name() == sub && s.check(&tokens[1..], is_safe))
             }
@@ -69,10 +77,18 @@ impl SubDef {
                 policy,
                 ..
             } => {
+                if tokens.len() == 2 && tokens[1] == "--help" {
+                    return true;
+                }
                 has_flag(tokens, *guard_short, Some(guard_long))
                     && policy::check(tokens, policy)
             }
-            Self::Custom { check: f, .. } => f(tokens, is_safe),
+            Self::Custom { check: f, .. } => {
+                if tokens.len() == 2 && tokens[1] == "--help" {
+                    return true;
+                }
+                f(tokens, is_safe)
+            }
             Self::Delegation { skip, .. } => {
                 if tokens.len() <= *skip {
                     return false;
@@ -90,6 +106,9 @@ impl CommandDef {
             return false;
         }
         let arg = tokens[1].as_str();
+        if self.help_eligible && tokens.len() == 2 && (arg == "--help" || arg == "--version") {
+            return true;
+        }
         if tokens.len() == 2 && self.bare_flags.contains(&arg) {
             return true;
         }
@@ -140,6 +159,12 @@ pub struct FlatDef {
 impl FlatDef {
     pub fn dispatch(&self, cmd: &str, tokens: &[Token]) -> Option<bool> {
         if cmd == self.name {
+            if self.help_eligible
+                && tokens.len() == 2
+                && (tokens[1] == "--help" || tokens[1] == "--version")
+            {
+                return Some(true);
+            }
             Some(policy::check(tokens, self.policy))
         } else {
             None

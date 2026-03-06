@@ -1,6 +1,9 @@
 use crate::parse::{Segment, Token};
 
 fn is_safe_command_builtin(tokens: &[Token]) -> bool {
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "--version") {
+        return true;
+    }
     tokens.len() >= 3
         && (tokens[1] == "-v" || tokens[1] == "-V")
 }

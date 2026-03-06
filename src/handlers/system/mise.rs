@@ -108,11 +108,11 @@ mod tests {
         mise_reshim: "mise reshim",
         mise_reshim_force: "mise reshim --force",
         mise_exec_git_status: "mise exec -- git status",
-        mise_exec_node_version: "mise exec node@20 -- node --version",
         mise_exec_bundle_rspec: "mise exec -- bundle exec rspec spec/foo_spec.rb --no-color",
     }
 
     denied! {
+        mise_exec_node_version_denied: "mise exec node@20 -- node --version",
         mise_exec_rm_denied: "mise exec -- rm -rf /",
         mise_exec_no_inner_denied: "mise exec --",
         mise_exec_no_separator_denied: "mise exec ruby foo.rb",

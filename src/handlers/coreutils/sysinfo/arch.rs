@@ -1,6 +1,9 @@
 use crate::parse::{Segment, Token};
 
 fn is_safe_arch(tokens: &[Token]) -> bool {
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "--version") {
+        return true;
+    }
     tokens.len() == 1
 }
 

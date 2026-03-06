@@ -251,6 +251,9 @@ pub fn is_safe_gh(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "--version") {
+        return true;
+    }
     let subcmd = &tokens[1];
 
     if subcmd == "search" {

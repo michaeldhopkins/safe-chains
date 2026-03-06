@@ -289,6 +289,16 @@ fn check_cargo_sub(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool
         .is_some_and(|s| s.check(rest, is_safe))
 }
 
+static CARGO_HELP_ONLY_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: false,
+    max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
+};
+
 static CARGO_SUBS: &[SubDef] = &[
     SubDef::Policy { name: "audit", policy: &CARGO_AUDIT_POLICY },
     SubDef::Policy { name: "bench", policy: &CARGO_BENCH_POLICY },
@@ -304,6 +314,7 @@ static CARGO_SUBS: &[SubDef] = &[
         policy: &CARGO_FMT_POLICY,
     },
     SubDef::Policy { name: "info", policy: &CARGO_INFO_POLICY },
+    SubDef::Policy { name: "install", policy: &CARGO_HELP_ONLY_POLICY },
     SubDef::Policy { name: "license", policy: &CARGO_SIMPLE_POLICY },
     SubDef::Policy { name: "locate-project", policy: &CARGO_SIMPLE_POLICY },
     SubDef::Policy { name: "metadata", policy: &CARGO_METADATA_POLICY },
@@ -321,6 +332,7 @@ static CARGO_SUBS: &[SubDef] = &[
         policy: &CARGO_PUBLISH_POLICY,
     },
     SubDef::Policy { name: "read-manifest", policy: &CARGO_SIMPLE_POLICY },
+    SubDef::Policy { name: "run", policy: &CARGO_HELP_ONLY_POLICY },
     SubDef::Policy { name: "search", policy: &CARGO_SEARCH_POLICY },
     SubDef::Policy { name: "test", policy: &CARGO_TEST_POLICY },
     SubDef::Policy { name: "tree", policy: &CARGO_TREE_POLICY },
@@ -344,6 +356,10 @@ pub(in crate::handlers::rust) fn dispatch(cmd: &str, tokens: &[Token], is_safe: 
             let sub = if tokens[1].starts_with('+') { 2 } else { 1 };
             if tokens.len() < sub + 1 {
                 return Some(false);
+            }
+            let arg = tokens[sub].as_str();
+            if tokens.len() == sub + 1 && (arg == "--help" || arg == "--version") {
+                return Some(true);
             }
             Some(check_cargo_sub(&tokens[sub..], is_safe))
         }

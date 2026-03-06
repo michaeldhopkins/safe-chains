@@ -65,7 +65,7 @@ pub(crate) static RUSTUP: CommandDef = CommandDef {
         SubDef::Policy { name: "which", policy: &RUSTUP_WHICH_POLICY },
     ],
     bare_flags: &[],
-    help_eligible: false,
+    help_eligible: true,
     url: "https://rust-lang.github.io/rustup/",
 };
 
@@ -93,7 +93,6 @@ mod tests {
         rustup_target_list_installed: "rustup target list --installed",
         rustup_toolchain_list: "rustup toolchain list",
         rustup_toolchain_list_verbose: "rustup toolchain list -v",
-        rustup_run_rustc_version: "rustup run stable rustc --version",
         rustup_run_cargo_test: "rustup run nightly cargo test",
         rustup_run_cargo_clippy: "rustup run stable cargo clippy -- -D warnings",
         rustup_run_cargo_fmt_check: "rustup run nightly cargo fmt --check",
@@ -101,6 +100,7 @@ mod tests {
     }
 
     denied! {
+        rustup_run_rustc_version_denied: "rustup run stable rustc --version",
         rustup_run_cargo_fmt_denied: "rustup run nightly cargo fmt",
         rustup_run_unsafe_inner_denied: "rustup run stable rm -rf /",
         rustup_run_no_inner_denied: "rustup run stable",

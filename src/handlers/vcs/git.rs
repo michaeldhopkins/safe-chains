@@ -804,13 +804,12 @@ mod tests {
         git_notes_show: "git notes show HEAD",
         git_notes_list: "git notes list",
         git_worktree_help: "git worktree --help",
-        git_subcommand_help: "git rebase --help",
-        git_push_help: "git push --help",
         git_worktree_help_h: "git worktree -h",
-        git_push_help_h: "git push -h",
     }
 
     denied! {
+        git_rebase_help_denied: "git rebase --help",
+        git_push_help_denied: "git push --help",
         git_fetch_upload_pack_denied: "git fetch --upload-pack=malicious origin",
         git_ls_remote_upload_pack_denied: "git ls-remote --upload-pack malicious origin",
         git_tag_delete_denied: "git tag -d v1.0",

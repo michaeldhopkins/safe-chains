@@ -210,7 +210,7 @@ pub(crate) static DOCKER: CommandDef = CommandDef {
     name: "docker",
     subs: DOCKER_SUBS,
     bare_flags: &[],
-    help_eligible: false,
+    help_eligible: true,
     url: "https://docs.docker.com/reference/cli/docker/",
 };
 
@@ -218,7 +218,7 @@ pub(crate) static PODMAN: CommandDef = CommandDef {
     name: "podman",
     subs: DOCKER_SUBS,
     bare_flags: &[],
-    help_eligible: false,
+    help_eligible: true,
     url: "https://docs.podman.io/en/latest/Commands.html",
 };
 

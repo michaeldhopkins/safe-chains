@@ -22,6 +22,9 @@ fn is_safe_method(method: &str) -> bool {
 }
 
 pub fn is_safe_curl(tokens: &[Token]) -> bool {
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "--version") {
+        return true;
+    }
     let mut i = 1;
     while i < tokens.len() {
         let t = &tokens[i];

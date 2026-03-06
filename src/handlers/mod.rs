@@ -21,54 +21,10 @@ pub mod vcs;
 pub mod wrappers;
 pub mod xcode;
 
-use std::collections::HashSet;
-use std::sync::LazyLock;
-
 use crate::parse::{Segment, Token};
 
-fn is_bare_info_request(tokens: &[Token]) -> bool {
-    tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--help")
-}
-
-static HELP_ELIGIBLE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
-    [
-        "asdf",
-        "brew", "bun", "bundle",
-        "cargo", "cmake", "codesign", "command", "composer", "conda", "craft", "csrutil", "curl",
-        "dcli", "ddev", "defaults", "deno", "diskutil", "dotnet",
-        "fly", "flyctl", "fnm",
-        "gem", "gh", "git", "glab", "go", "gradle", "gradlew", "heroku", "hf", "hostname",
-        "jj",
-        "kubectl",
-        "launchctl", "lipo", "llm", "log",
-        "magick", "man", "mise", "mvn", "mvnw",
-        "networksetup", "npm", "nvm",
-        "ollama",
-        "periphery", "pip", "pip3", "pkgutil", "plutil", "pmset", "pnpm", "pod", "poetry", "pyenv",
-        "rbenv",
-        "security", "spctl", "swift", "swiftlint", "sysctl",
-        "tea", "terraform", "tuist",
-        "uv",
-        "vercel", "volta",
-        "xcode-select", "xcodebuild", "xcodegen", "xcrun", "xmllint",
-        "yarn", "yq",
-    ].into_iter().collect()
-});
-
-fn is_trailing_info_request(tokens: &[Token]) -> bool {
-    tokens.len() >= 2
-        && tokens.last().is_some_and(|t| *t == "--help" || *t == "--version")
-        && !tokens.iter().any(|t| *t == "--")
-}
-
 pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    if is_bare_info_request(tokens) {
-        return true;
-    }
     let cmd = tokens[0].command_name();
-    if is_trailing_info_request(tokens) && HELP_ELIGIBLE.contains(cmd) {
-        return true;
-    }
     None
         .or_else(|| shell::dispatch(cmd, tokens, is_safe))
         .or_else(|| wrappers::dispatch(cmd, tokens, is_safe))
@@ -378,60 +334,4 @@ mod tests {
         assert!(extra.is_empty(), "not in HANDLED_CMDS: {extra:?}");
     }
 
-    const HELP_EXCLUDED: &[&str] = &[
-        "arch",
-        "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine",
-        "rustup", "find",
-        "npx", "bunx",
-        "docker", "podman",
-        "grep", "egrep", "fgrep", "rg",
-        "cat", "head", "tail", "wc", "cut", "tr", "uniq",
-        "diff", "comm", "paste", "tac", "rev", "nl",
-        "awk", "gawk", "mawk", "nawk", "sed", "sort", "perl", "R", "Rscript",
-        "expand", "unexpand", "fold", "fmt", "col", "column", "iconv", "nroff",
-        "echo", "printf", "seq", "test", "expr", "bc", "factor", "bat",
-        "fd", "eza", "exa", "ls", "delta", "colordiff",
-        "dirname", "basename", "realpath", "readlink",
-        "file", "stat", "du", "df", "tree",
-        "true", "false",
-        "printenv", "type", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
-        "uname", "nproc", "uptime", "id", "groups", "tty", "locale", "cal", "sleep",
-        "who", "w", "last", "lastlog",
-        "ps", "top", "htop", "iotop", "procs", "dust", "lsof", "pgrep",
-        "jq", "base64", "xxd", "getconf", "uuidgen",
-        "md5sum", "md5", "sha256sum", "shasum", "sha1sum", "sha512sum",
-        "cksum", "b2sum", "sum", "strings", "hexdump", "od", "size",
-        "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat", "mdfind",
-        "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route",
-        "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "safe-chains",
-        "swiftformat", "xcbeautify", "agvtool", "simctl",
-    ];
-
-    #[test]
-    fn help_eligible_plus_excluded_equals_handled() {
-        let eligible: HashSet<&str> = HELP_ELIGIBLE.iter().copied().collect();
-        let excluded: HashSet<&str> = HELP_EXCLUDED.iter().copied().collect();
-        let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
-
-        let combined: HashSet<&str> = eligible.union(&excluded).copied().collect();
-
-        let missing: Vec<&&str> = handled.difference(&combined).collect();
-        assert!(
-            missing.is_empty(),
-            "handled commands not in HELP_ELIGIBLE or HELP_EXCLUDED: {missing:?} — \
-             add each to one of the two sets"
-        );
-
-        let extra: Vec<&&str> = combined.difference(&handled).collect();
-        assert!(
-            extra.is_empty(),
-            "commands in HELP_ELIGIBLE/HELP_EXCLUDED but not in HANDLED_CMDS: {extra:?}"
-        );
-
-        let overlap: Vec<&&str> = eligible.intersection(&excluded).collect();
-        assert!(
-            overlap.is_empty(),
-            "commands in both HELP_ELIGIBLE and HELP_EXCLUDED: {overlap:?}"
-        );
-    }
 }
