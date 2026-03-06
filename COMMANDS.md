@@ -8,6 +8,16 @@ Any command with only `--version` or `--help` as its sole argument is always all
 
 These commands are allowed with specific subcommands or flags.
 
+### `R`
+
+- CMD check <package> (with --as-cran, --no-tests, --no-examples, --no-vignettes, --no-build-vignettes, --no-manual, --output)
+- CMD config <var>
+
+### `Rscript`
+
+- --version
+- --help
+
 ### `arch`
 
 - Bare invocation allowed.
@@ -220,6 +230,23 @@ These commands are allowed with specific subcommands or flags.
 - **info**: Flags: --all, --envs, --json, --verbose
 - **list**: Flags: --explicit, --export, --full-name, --json, --no-pip, --revisions. Valued: --name, --prefix
 
+### `craft`
+
+- **env/show**
+- **graphql/list-schemas**
+- **graphql/print-schema**
+- **help**
+- **install/check**
+- **migrate/history**
+- **migrate/new**
+- **pc/diff**
+- **pc/export**
+- **pc/get**
+- **plugin/list**
+- **queue/info**
+- **update/info**
+- **users/list-admins**
+
 ### `csrutil`
 
 - **authenticated-root**
@@ -248,6 +275,20 @@ These commands are allowed with specific subcommands or flags.
 - Allowed standalone flags: --rfc-2822, --rfc-email, --universal, --utc, -R, -j, -n, -u
 - Allowed valued flags: --date, --iso-8601, --reference, --rfc-3339, -I, -d, -f, -r, -v, -z
 - Bare invocation allowed
+
+### `ddev`
+
+- **aliases**
+- **debug configyaml**
+- **debug diagnose**
+- **debug mutagen**
+- **debug test**
+- **describe**: Flags: --json-output
+- **list**: Flags: --json-output
+- **logs**: Flags: --follow, --time, --timestamps. Valued: --service, --tail
+- **snapshot** (requires --list): Flags: --all, --list
+- **status**: Flags: --json-output
+- **version**
 
 ### `defaults`
 
@@ -564,6 +605,27 @@ Supports `-C <dir>` prefix.
 - Allowed standalone flags: -C, -b, -c, -d, -o, -v, -x
 - Allowed valued flags: -L, -e, -f, -n, -s
 - Bare invocation allowed
+
+### `hf`
+
+- **cache ls**
+- **cache verify**
+- **collections info**
+- **collections ls**: Valued: --limit, --owner
+- **datasets info**
+- **datasets ls**: Valued: --author, --filter, --limit, --search, --sort
+- **datasets parquet**
+- **discussions diff**
+- **discussions info**
+- **discussions list**
+- **env**
+- **jobs logs**: Valued: --tail
+- **jobs ps**
+- **models info**
+- **models ls**: Valued: --author, --filter, --limit, --search, --sort
+- **spaces info**
+- **spaces ls**: Valued: --author, --filter, --limit, --search, --sort
+- **version**
 
 ### `host`
 

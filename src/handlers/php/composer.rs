@@ -1,5 +1,5 @@
 use crate::command::{CommandDef, SubDef};
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static COMPOSER_SHOW_POLICY: FlagPolicy = FlagPolicy {
@@ -69,14 +69,6 @@ pub(crate) static COMPOSER: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
 };
-
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    COMPOSER.dispatch(cmd, tokens, is_safe)
-}
-
-pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    vec![COMPOSER.to_doc()]
-}
 
 #[cfg(test)]
 mod tests {

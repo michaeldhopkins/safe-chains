@@ -1,39 +1,6 @@
 use crate::command::{CommandDef, SubDef};
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
-
-static OLLAMA_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
-    standalone_short: b"",
-    valued: WordSet::new(&[]),
-    valued_short: b"",
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
-
-static OLLAMA_PS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
-    standalone_short: b"",
-    valued: WordSet::new(&[]),
-    valued_short: b"",
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
-
-static OLLAMA_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
-        "--json", "--license", "--modelfile", "--parameters",
-        "--system", "--template", "--verbose",
-    ]),
-    standalone_short: b"",
-    valued: WordSet::new(&[]),
-    valued_short: b"",
-    bare: false,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
 
 static LLM_MODELS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&["--json", "--options"]),
@@ -79,17 +46,6 @@ static LLM_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub(crate) static OLLAMA: CommandDef = CommandDef {
-    name: "ollama",
-    subs: &[
-        SubDef::Policy { name: "list", policy: &OLLAMA_LIST_POLICY },
-        SubDef::Policy { name: "ps", policy: &OLLAMA_PS_POLICY },
-        SubDef::Policy { name: "show", policy: &OLLAMA_SHOW_POLICY },
-    ],
-    bare_flags: &[],
-    help_eligible: true,
-};
-
 pub(crate) static LLM: CommandDef = CommandDef {
     name: "llm",
     subs: &[
@@ -104,15 +60,6 @@ pub(crate) static LLM: CommandDef = CommandDef {
     help_eligible: true,
 };
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    OLLAMA.dispatch(cmd, tokens, is_safe)
-        .or_else(|| LLM.dispatch(cmd, tokens, is_safe))
-}
-
-pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    vec![OLLAMA.to_doc(), LLM.to_doc()]
-}
-
 #[cfg(test)]
 mod tests {
     use crate::is_safe_command;
@@ -122,18 +69,6 @@ mod tests {
     }
 
     safe! {
-        ollama_list: "ollama list",
-        ollama_list_json: "ollama list --json",
-        ollama_show: "ollama show llama3",
-        ollama_show_license: "ollama show llama3 --license",
-        ollama_show_modelfile: "ollama show llama3 --modelfile",
-        ollama_show_parameters: "ollama show llama3 --parameters",
-        ollama_show_template: "ollama show llama3 --template",
-        ollama_show_system: "ollama show llama3 --system",
-        ollama_show_json: "ollama show llama3 --json",
-        ollama_ps: "ollama ps",
-        ollama_ps_json: "ollama ps --json",
-        ollama_version: "ollama --version",
         llm_models: "llm models",
         llm_models_json: "llm models --json",
         llm_models_options: "llm models --options",
@@ -152,9 +87,5 @@ mod tests {
         llm_collections: "llm collections",
         llm_collections_json: "llm collections --json",
         llm_version: "llm --version",
-    }
-
-    denied! {
-        ollama_show_bare_denied: "ollama show",
     }
 }

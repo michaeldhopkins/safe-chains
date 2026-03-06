@@ -2,6 +2,7 @@ mod asdf;
 mod brew;
 mod cmake;
 mod csrutil;
+mod ddev;
 mod defaults;
 mod diskutil;
 mod launchctl;
@@ -18,6 +19,7 @@ pub(crate) use asdf::ASDF;
 pub(crate) use brew::BREW;
 pub(crate) use cmake::CMAKE;
 pub(crate) use csrutil::CSRUTIL;
+pub(crate) use ddev::DDEV;
 pub(crate) use defaults::DEFAULTS;
 pub(crate) use diskutil::DISKUTIL;
 pub(crate) use launchctl::LAUNCHCTL;
@@ -29,6 +31,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
     BREW.dispatch(cmd, tokens, is_safe)
         .or_else(|| MISE.dispatch(cmd, tokens, is_safe))
         .or_else(|| ASDF.dispatch(cmd, tokens, is_safe))
+        .or_else(|| DDEV.dispatch(cmd, tokens, is_safe))
         .or_else(|| DEFAULTS.dispatch(cmd, tokens, is_safe))
         .or_else(|| SECURITY.dispatch(cmd, tokens, is_safe))
         .or_else(|| CSRUTIL.dispatch(cmd, tokens, is_safe))
@@ -48,6 +51,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         ASDF.to_doc(),
         DEFAULTS.to_doc(),
     ];
+    docs.push(DDEV.to_doc());
     docs.extend(pmset::command_docs());
     docs.extend(sysctl::command_docs());
     docs.push(CMAKE.to_doc());

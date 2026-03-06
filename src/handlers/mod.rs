@@ -11,6 +11,7 @@ pub mod node;
 pub mod perl;
 pub mod php;
 pub mod python;
+pub mod r;
 pub mod ruby;
 pub mod rust;
 pub mod shell;
@@ -33,10 +34,10 @@ static HELP_ELIGIBLE: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     [
         "asdf",
         "brew", "bun", "bundle",
-        "cargo", "cmake", "codesign", "command", "composer", "conda", "csrutil", "curl",
-        "defaults", "deno", "diskutil", "dotnet",
+        "cargo", "cmake", "codesign", "command", "composer", "conda", "craft", "csrutil", "curl",
+        "ddev", "defaults", "deno", "diskutil", "dotnet",
         "fnm",
-        "gem", "gh", "git", "glab", "go", "gradle", "gradlew", "hostname",
+        "gem", "gh", "git", "glab", "go", "gradle", "gradlew", "hf", "hostname",
         "jj",
         "launchctl", "lipo", "llm", "log",
         "magick", "man", "mise", "mvn", "mvnw",
@@ -87,6 +88,7 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         .or_else(|| system::dispatch(cmd, tokens, is_safe))
         .or_else(|| xcode::dispatch(cmd, tokens, is_safe))
         .or_else(|| perl::dispatch(cmd, tokens, is_safe))
+        .or_else(|| r::dispatch(cmd, tokens, is_safe))
         .or_else(|| coreutils::dispatch(cmd, tokens, is_safe))
         .or_else(|| magick::dispatch(cmd, tokens))
         .unwrap_or(false)
@@ -102,16 +104,18 @@ const HANDLED_CMDS: &[&str] = &[
     "cargo", "rustup",
     "go",
     "gradle", "gradlew", "mvn", "mvnw",
-    "composer",
+    "composer", "craft",
     "swift",
     "dotnet",
     "curl",
     "docker", "podman",
-    "ollama", "llm",
+    "ollama", "llm", "hf",
+    "ddev",
     "brew", "mise", "asdf", "defaults", "pmset", "sysctl", "cmake",
     "networksetup", "launchctl", "diskutil", "security", "csrutil", "log",
     "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign", "spctl",
     "perl",
+    "R", "Rscript",
     "grep", "egrep", "fgrep", "rg",
     "cat", "head", "tail", "wc", "cut", "tr", "uniq",
     "diff", "comm", "paste", "tac", "rev", "nl",
@@ -155,6 +159,7 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(system::command_docs());
     docs.extend(xcode::command_docs());
     docs.extend(perl::command_docs());
+    docs.extend(r::command_docs());
     docs.extend(coreutils::command_docs());
     docs.extend(shell::command_docs());
     docs.extend(wrappers::command_docs());
@@ -188,7 +193,7 @@ use crate::command::CommandDef;
 
 #[cfg(test)]
 const COMMAND_DEFS: &[&CommandDef] = &[
-    &ai::OLLAMA, &ai::LLM,
+    &ai::OLLAMA, &ai::LLM, &ai::HF,
     &containers::DOCKER, &containers::PODMAN,
     &dotnet::DOTNET,
     &go::GO,
@@ -196,14 +201,14 @@ const COMMAND_DEFS: &[&CommandDef] = &[
     &magick::MAGICK,
     &node::NPM, &node::PNPM, &node::BUN, &node::DENO,
     &node::NVM, &node::FNM, &node::VOLTA,
-    &php::COMPOSER,
+    &php::COMPOSER, &php::CRAFT,
     &python::PIP, &python::PIP3, &python::UV, &python::POETRY,
     &python::PYENV, &python::CONDA,
     &ruby::BUNDLE, &ruby::GEM, &ruby::RBENV,
     &rust::CARGO, &rust::RUSTUP,
     &vcs::GIT,
     &swift::SWIFT,
-    &system::BREW, &system::MISE, &system::ASDF, &system::CMAKE, &system::DEFAULTS,
+    &system::BREW, &system::MISE, &system::ASDF, &system::DDEV, &system::CMAKE, &system::DEFAULTS,
     &system::SECURITY, &system::CSRUTIL, &system::DISKUTIL,
     &system::LAUNCHCTL, &system::LOG,
     &xcode::XCODEBUILD, &xcode::PLUTIL, &xcode::XCODE_SELECT,
@@ -222,6 +227,7 @@ fn full_registry() -> Vec<&'static CommandEntry> {
     entries.extend(system::full_registry());
     entries.extend(xcode::full_registry());
     entries.extend(perl::REGISTRY);
+    entries.extend(r::REGISTRY);
     entries.extend(coreutils::full_registry());
     entries
 }
@@ -368,7 +374,7 @@ mod tests {
         "grep", "egrep", "fgrep", "rg",
         "cat", "head", "tail", "wc", "cut", "tr", "uniq",
         "diff", "comm", "paste", "tac", "rev", "nl",
-        "awk", "gawk", "mawk", "nawk", "sed", "sort", "perl",
+        "awk", "gawk", "mawk", "nawk", "sed", "sort", "perl", "R", "Rscript",
         "expand", "unexpand", "fold", "fmt", "col", "column", "iconv", "nroff",
         "echo", "printf", "seq", "test", "expr", "bc", "factor", "bat",
         "fd", "eza", "exa", "ls", "delta", "colordiff",
