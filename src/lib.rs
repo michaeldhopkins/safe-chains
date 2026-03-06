@@ -332,6 +332,24 @@ mod tests {
         help_curl_data: "curl -d data --help",
         version_pip_install: "pip install evil --version",
         version_cargo_build: "cargo build --version",
+
+        for_echo: "for x in 1 2 3; do echo $x; done",
+        for_pipe: "for f in *.txt; do cat $f | grep pattern; done",
+        for_empty_body: "for x in 1 2 3; do; done",
+        for_multiple: "for x in 1 2; do echo $x; done; for y in a b; do echo $y; done",
+        for_nested: "for x in 1 2; do for y in a b; do echo $x $y; done; done",
+        for_then_cmd: "for x in 1 2; do echo $x; done && echo finished",
+        for_safe_subst: "for x in $(seq 1 5); do echo $x; done",
+        while_test: "while test -f /tmp/foo; do sleep 1; done",
+        while_negation: "while ! test -f /tmp/done; do sleep 1; done",
+        while_ls: "while ! ls /tmp/foo 2>/dev/null; do sleep 10; done",
+        until_test: "until test -f /tmp/ready; do sleep 1; done",
+        if_then_fi: "if test -f foo; then echo exists; fi",
+        if_then_else_fi: "if test -f foo; then echo yes; else echo no; fi",
+        if_elif: "if test -f a; then echo a; elif test -f b; then echo b; else echo c; fi",
+        nested_if_in_for: "for x in 1 2; do if test $x = 1; then echo one; fi; done",
+        nested_for_in_if: "if true; then for x in 1 2; do echo $x; done; fi",
+        keyword_as_data: "echo for; echo done; echo if; echo fi",
     }
 
     denied! {
@@ -410,5 +428,17 @@ mod tests {
 
         pipeline_find_delete: "find . -name '*.py' -delete | wc -l",
         pipeline_sed_inplace: "sed -i 's/foo/bar/' file | head",
+
+        for_rm: "for x in 1 2 3; do rm $x; done",
+        for_unsafe_subst: "for x in $(rm -rf /); do echo $x; done",
+        while_unsafe_body: "while true; do rm -rf /; done",
+        while_unsafe_condition: "while python3 evil.py; do sleep 1; done",
+        if_unsafe_condition: "if ruby evil.rb; then echo done; fi",
+        if_unsafe_body: "if true; then rm -rf /; fi",
+        unclosed_for: "for x in 1 2 3; do echo $x",
+        unclosed_if: "if true; then echo hello",
+        for_missing_do: "for x in 1 2 3; echo $x; done",
+        stray_done: "echo hello; done",
+        stray_fi: "fi",
     }
 }
