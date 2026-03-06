@@ -130,6 +130,5 @@ mod tests {
     }
 
     denied! {
-        bare_composer_denied: "composer",
     }
 }

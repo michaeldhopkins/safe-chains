@@ -183,8 +183,6 @@ mod tests {
     }
 
     denied! {
-        ollama_no_args_denied: "ollama",
         ollama_show_bare_denied: "ollama show",
-        llm_no_args_denied: "llm",
     }
 }

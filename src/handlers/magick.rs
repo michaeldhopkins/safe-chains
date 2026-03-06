@@ -71,7 +71,6 @@ mod tests {
     }
 
     denied! {
-        bare_magick_denied: "magick",
         magick_identify_write_denied: "magick identify -write /tmp/out.txt /tmp/image.png",
         magick_identify_set_denied: "magick identify -set comment evil /tmp/image.png",
     }

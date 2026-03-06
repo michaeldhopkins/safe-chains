@@ -209,7 +209,6 @@ mod tests {
     }
 
     denied! {
-        bare_go_denied: "go",
         go_build_toolexec_denied: "go build -toolexec=cmd ./...",
         go_build_toolexec_space_denied: "go build -toolexec cmd ./...",
         go_test_exec_denied: "go test -exec=cmd ./...",

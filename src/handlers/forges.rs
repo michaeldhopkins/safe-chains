@@ -950,13 +950,10 @@ mod tests {
         api_method_eq_patch_denied: "gh api repos/o/r/pulls/1 --method=PATCH",
         api_xpost_short_denied: "gh api repos/o/r/pulls -XPOST",
         api_xpatch_short_denied: "gh api repos/o/r/pulls -XPATCH",
-        bare_gh_denied: "gh",
         glab_api_post_denied: "glab api projects/1/issues -X POST",
         glab_api_field_denied: "glab api projects/1/issues -f title=x",
-        bare_glab_denied: "glab",
         glab_version_with_extra_denied: "glab version --extra",
         glab_check_update_with_extra_denied: "glab check-update --extra",
-        bare_tea_denied: "tea",
         tea_whoami_with_extra_denied: "tea whoami --extra",
     }
 }

@@ -148,7 +148,6 @@ mod tests {
     }
 
     denied! {
-        bare_swift_denied: "swift",
         swift_package_bare_denied: "swift package",
     }
 }

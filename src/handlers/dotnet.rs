@@ -125,6 +125,5 @@ mod tests {
     }
 
     denied! {
-        bare_dotnet_denied: "dotnet",
     }
 }

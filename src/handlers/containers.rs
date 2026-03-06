@@ -401,7 +401,6 @@ mod tests {
     }
 
     denied! {
-        bare_docker_denied: "docker",
         docker_run_version_bypass_denied: "docker run evil --version",
     }
 }

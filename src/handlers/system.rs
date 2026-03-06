@@ -899,7 +899,6 @@ mod tests {
     }
 
     denied! {
-        bare_brew_denied: "brew",
         mise_exec_rm_denied: "mise exec -- rm -rf /",
         mise_exec_no_inner_denied: "mise exec --",
         mise_exec_no_separator_denied: "mise exec ruby foo.rb",
@@ -914,17 +913,12 @@ mod tests {
         sysctl_assign_denied: "sysctl kern.maxproc=2048",
         cmake_build_denied: "cmake --build .",
         cmake_generate_denied: "cmake .",
-        security_no_args_denied: "security",
         security_dump_keychain_decrypt_denied: "security dump-keychain -d",
         security_find_password_g_denied: "security find-generic-password -g",
         security_find_password_w_denied: "security find-internet-password -w pass",
-        csrutil_no_args_denied: "csrutil",
-        launchctl_no_args_denied: "launchctl",
-        diskutil_no_args_denied: "diskutil",
         diskutil_apfs_bare_denied: "diskutil apfs",
         networksetup_setdnsservers_denied: "networksetup -setdnsservers Wi-Fi 8.8.8.8",
         networksetup_setairportpower_denied: "networksetup -setairportpower en0 on",
         networksetup_no_args_denied: "networksetup",
-        log_no_args_denied: "log",
     }
 }

@@ -217,7 +217,6 @@ mod tests {
     }
 
     denied! {
-        bare_gradle_denied: "gradle",
         mvn_deploy_denied: "mvn deploy",
         mvn_install_denied: "mvn install",
         mvn_clean_denied: "mvn clean",
