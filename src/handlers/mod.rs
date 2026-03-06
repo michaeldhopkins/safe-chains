@@ -201,6 +201,7 @@ const COMMAND_DEFS: &[&CommandDef] = &[
     &python::PYENV, &python::CONDA,
     &ruby::BUNDLE, &ruby::GEM, &ruby::RBENV,
     &rust::CARGO, &rust::RUSTUP,
+    &vcs::GIT,
     &swift::SWIFT,
     &system::BREW, &system::MISE, &system::ASDF, &system::DEFAULTS,
     &system::SECURITY, &system::CSRUTIL, &system::DISKUTIL,

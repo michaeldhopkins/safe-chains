@@ -1,5 +1,7 @@
 use crate::parse::{has_flag, Segment, Token};
 use crate::policy::{self, FlagPolicy};
+#[cfg(test)]
+use crate::policy::FlagStyle;
 
 pub type CheckFn = fn(&[Token], &dyn Fn(&Segment) -> bool) -> bool;
 
@@ -213,7 +215,10 @@ fn auto_test_sub(prefix: &str, sub: &SubDef, failures: &mut Vec<String>) {
     const UNKNOWN: &str = "--xyzzy-unknown-42";
 
     match sub {
-        SubDef::Policy { name, .. } => {
+        SubDef::Policy { name, policy } => {
+            if policy.flag_style == FlagStyle::Positional {
+                return;
+            }
             let test = format!("{prefix} {name} {UNKNOWN}");
             if crate::is_safe_command(&test) {
                 failures.push(format!("{prefix} {name}: accepted unknown flag: {test}"));

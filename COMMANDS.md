@@ -350,7 +350,7 @@ auth status, browse (requires --no-browser), api (GET only).
 
 ### `git`
 
-Subcommands with flag allowlists: blame, cat-file, check-ignore, count-objects, describe, diff, diff-tree, fetch, for-each-ref, grep, help, log, ls-files, ls-remote, ls-tree, merge-base, merge-tree, name-rev, reflog, rev-parse, shortlog, show, status, verify-commit, verify-tag. Restricted subcommands: remote (read-only actions), branch (read-only flags), stash (list, show only), tag (list only), config (--get, --get-all, --get-regexp, --list, -l only), worktree (list only), notes (list, show only). Supports `-C <dir>` prefix.
+Subcommands: blame, cat-file, check-ignore, count-objects, describe, diff, diff-tree, fetch, for-each-ref, grep, help, log, ls-files, ls-remote, ls-tree, merge-base, merge-tree, name-rev, reflog, rev-parse, shortlog, show, status, verify-commit, verify-tag. branch (read-only flags). config (--get, --get-all, --get-regexp, --list, -l only). notes (list, show only). remote (read-only actions). stash (list, show only). tag (list only). worktree (list only). Supports `-C <dir>` prefix.
 
 ### `glab`
 

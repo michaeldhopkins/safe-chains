@@ -1,5 +1,6 @@
+use crate::command::{CheckFn, CommandDef, SubDef};
 use crate::parse::{Segment, Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{FlagPolicy, FlagStyle};
 
 static GIT_LOG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -613,91 +614,103 @@ static JJ_MULTI: &[(&str, WordSet)] = &[
 static JJ_TRIPLE: &[(&str, &str, WordSet)] =
     &[("git", "remote", WordSet::new(&["list"]))];
 
-fn git_subcommand_policy(subcmd: &str) -> Option<&'static FlagPolicy> {
-    match subcmd {
-        "blame" => Some(&GIT_BLAME_POLICY),
-        "cat-file" => Some(&GIT_CAT_FILE_POLICY),
-        "check-ignore" => Some(&GIT_CHECK_IGNORE_POLICY),
-        "count-objects" => Some(&GIT_COUNT_OBJECTS_POLICY),
-        "describe" => Some(&GIT_DESCRIBE_POLICY),
-        "diff" => Some(&GIT_DIFF_POLICY),
-        "diff-tree" => Some(&GIT_DIFF_TREE_POLICY),
-        "fetch" => Some(&GIT_FETCH_POLICY),
-        "for-each-ref" => Some(&GIT_FOR_EACH_REF_POLICY),
-        "grep" => Some(&GIT_GREP_POLICY),
-        "log" => Some(&GIT_LOG_POLICY),
-        "ls-files" => Some(&GIT_LS_FILES_POLICY),
-        "ls-remote" => Some(&GIT_LS_REMOTE_POLICY),
-        "ls-tree" => Some(&GIT_LS_TREE_POLICY),
-        "merge-base" => Some(&GIT_MERGE_BASE_POLICY),
-        "merge-tree" => Some(&GIT_MERGE_TREE_POLICY),
-        "name-rev" => Some(&GIT_NAME_REV_POLICY),
-        "reflog" => Some(&GIT_LOG_POLICY),
-        "rev-parse" => Some(&GIT_REV_PARSE_POLICY),
-        "shortlog" => Some(&GIT_SHORTLOG_POLICY),
-        "show" => Some(&GIT_SHOW_POLICY),
-        "status" => Some(&GIT_STATUS_POLICY),
-        "verify-commit" => Some(&GIT_VERIFY_COMMIT_POLICY),
-        "verify-tag" => Some(&GIT_VERIFY_TAG_POLICY),
-        _ => None,
-    }
+fn check_git_help(_tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    true
 }
 
-pub fn is_safe_git(tokens: &[Token]) -> bool {
-    if tokens.last().is_some_and(|t| *t == "-h")
-        && !tokens.iter().any(|t| *t == "--")
-    {
-        return true;
-    }
-    let mut args = &tokens[1..];
-    while args.len() >= 2 && args[0] == "-C" {
-        args = &args[2..];
-    }
-    if args.is_empty() {
-        return false;
-    }
-    if args[0] == "--version" || args[0] == "help" {
-        return true;
-    }
-    let subcmd = args[0].command_name();
-    if let Some(p) = git_subcommand_policy(subcmd) {
-        return policy::check(args, p);
-    }
-    if subcmd == "remote" {
-        return args.get(1).is_none_or(|a| !GIT_REMOTE_MUTATING.contains(a));
-    }
-    if subcmd == "branch" {
-        return args[1..].iter().all(|a| {
-            !GIT_BRANCH_MUTATING.contains(a)
-                && !GIT_BRANCH_MUTATING
-                    .iter()
-                    .any(|f| f.starts_with("--") && a.starts_with(&format!("{f}=")))
-        });
-    }
-    if subcmd == "stash" {
-        return args.get(1).is_some_and(|a| GIT_STASH_SAFE.contains(a));
-    }
-    if subcmd == "tag" {
-        if args.len() == 1 {
-            return true;
-        }
-        return args[1..].iter().all(|a| !GIT_TAG_MUTATING.contains(a));
-    }
-    if subcmd == "config" {
-        return args.get(1).is_some_and(|a| GIT_CONFIG_SAFE.contains(a))
-            && args[2..].iter().all(|a| !a.starts_with('-'));
-    }
-    if subcmd == "worktree" {
-        return args.get(1).is_some_and(|a| a == "list")
-            && args[2..].iter().all(|a| !a.starts_with('-')
-                || *a == "--porcelain" || *a == "--verbose" || *a == "-v" || *a == "-z");
-    }
-    if subcmd == "notes" {
-        return args.get(1).is_some_and(|a| GIT_NOTES_SAFE.contains(a))
-            && args[2..].iter().all(|a| !a.starts_with('-'));
-    }
-    false
+fn check_git_remote(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    tokens.get(1).is_none_or(|a| !GIT_REMOTE_MUTATING.contains(a))
 }
+
+fn check_git_branch(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    tokens[1..].iter().all(|a| {
+        !GIT_BRANCH_MUTATING.contains(a)
+            && !GIT_BRANCH_MUTATING
+                .iter()
+                .any(|f| f.starts_with("--") && a.starts_with(&format!("{f}=")))
+    })
+}
+
+fn check_git_stash(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    tokens.get(1).is_some_and(|a| GIT_STASH_SAFE.contains(a))
+}
+
+fn check_git_tag(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    if tokens.len() == 1 {
+        return true;
+    }
+    tokens[1..].iter().all(|a| !GIT_TAG_MUTATING.contains(a))
+}
+
+fn check_git_config(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    tokens.get(1).is_some_and(|a| GIT_CONFIG_SAFE.contains(a))
+        && tokens[2..].iter().all(|a| !a.starts_with('-'))
+}
+
+fn check_git_worktree(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    tokens.get(1).is_some_and(|a| a == "list")
+        && tokens[2..].iter().all(|a| {
+            !a.starts_with('-')
+                || *a == "--porcelain"
+                || *a == "--verbose"
+                || *a == "-v"
+                || *a == "-z"
+        })
+}
+
+fn check_git_notes(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    tokens.get(1).is_some_and(|a| GIT_NOTES_SAFE.contains(a))
+        && tokens[2..].iter().all(|a| !a.starts_with('-'))
+}
+
+fn check_git_sub(args: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    GIT_SUBS
+        .iter()
+        .find(|s| s.name() == args[0].as_str())
+        .is_some_and(|s| s.check(args, is_safe))
+}
+
+static GIT_SUBS: &[SubDef] = &[
+    SubDef::Policy { name: "blame", policy: &GIT_BLAME_POLICY },
+    SubDef::Custom { name: "branch", check: check_git_branch as CheckFn, doc: "branch (read-only flags).", test_suffix: None },
+    SubDef::Policy { name: "cat-file", policy: &GIT_CAT_FILE_POLICY },
+    SubDef::Policy { name: "check-ignore", policy: &GIT_CHECK_IGNORE_POLICY },
+    SubDef::Custom { name: "config", check: check_git_config as CheckFn, doc: "config (--get, --get-all, --get-regexp, --list, -l only).", test_suffix: Some("--list") },
+    SubDef::Policy { name: "count-objects", policy: &GIT_COUNT_OBJECTS_POLICY },
+    SubDef::Policy { name: "describe", policy: &GIT_DESCRIBE_POLICY },
+    SubDef::Policy { name: "diff", policy: &GIT_DIFF_POLICY },
+    SubDef::Policy { name: "diff-tree", policy: &GIT_DIFF_TREE_POLICY },
+    SubDef::Policy { name: "fetch", policy: &GIT_FETCH_POLICY },
+    SubDef::Policy { name: "for-each-ref", policy: &GIT_FOR_EACH_REF_POLICY },
+    SubDef::Policy { name: "grep", policy: &GIT_GREP_POLICY },
+    SubDef::Custom { name: "help", check: check_git_help as CheckFn, doc: "", test_suffix: None },
+    SubDef::Policy { name: "log", policy: &GIT_LOG_POLICY },
+    SubDef::Policy { name: "ls-files", policy: &GIT_LS_FILES_POLICY },
+    SubDef::Policy { name: "ls-remote", policy: &GIT_LS_REMOTE_POLICY },
+    SubDef::Policy { name: "ls-tree", policy: &GIT_LS_TREE_POLICY },
+    SubDef::Policy { name: "merge-base", policy: &GIT_MERGE_BASE_POLICY },
+    SubDef::Policy { name: "merge-tree", policy: &GIT_MERGE_TREE_POLICY },
+    SubDef::Policy { name: "name-rev", policy: &GIT_NAME_REV_POLICY },
+    SubDef::Custom { name: "notes", check: check_git_notes as CheckFn, doc: "notes (list, show only).", test_suffix: Some("list") },
+    SubDef::Policy { name: "reflog", policy: &GIT_LOG_POLICY },
+    SubDef::Custom { name: "remote", check: check_git_remote as CheckFn, doc: "remote (read-only actions).", test_suffix: None },
+    SubDef::Policy { name: "rev-parse", policy: &GIT_REV_PARSE_POLICY },
+    SubDef::Policy { name: "shortlog", policy: &GIT_SHORTLOG_POLICY },
+    SubDef::Policy { name: "show", policy: &GIT_SHOW_POLICY },
+    SubDef::Custom { name: "stash", check: check_git_stash as CheckFn, doc: "stash (list, show only).", test_suffix: None },
+    SubDef::Policy { name: "status", policy: &GIT_STATUS_POLICY },
+    SubDef::Custom { name: "tag", check: check_git_tag as CheckFn, doc: "tag (list only).", test_suffix: None },
+    SubDef::Policy { name: "verify-commit", policy: &GIT_VERIFY_COMMIT_POLICY },
+    SubDef::Policy { name: "verify-tag", policy: &GIT_VERIFY_TAG_POLICY },
+    SubDef::Custom { name: "worktree", check: check_git_worktree as CheckFn, doc: "worktree (list only).", test_suffix: Some("list") },
+];
+
+pub(crate) static GIT: CommandDef = CommandDef {
+    name: "git",
+    subs: GIT_SUBS,
+    bare_flags: &[],
+    help_eligible: true,
+};
 
 pub fn is_safe_jj(tokens: &[Token]) -> bool {
     if tokens.last().is_some_and(|t| *t == "-h")
@@ -747,9 +760,26 @@ pub fn is_safe_jj(tokens: &[Token]) -> bool {
     false
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
     match cmd {
-        "git" => Some(is_safe_git(tokens)),
+        "git" => {
+            if tokens.last().is_some_and(|t| *t == "-h")
+                && !tokens.iter().any(|t| *t == "--")
+            {
+                return Some(true);
+            }
+            let mut args = &tokens[1..];
+            while args.len() >= 2 && args[0] == "-C" {
+                args = &args[2..];
+            }
+            if args.is_empty() {
+                return Some(false);
+            }
+            if args[0] == "--version" {
+                return Some(true);
+            }
+            Some(check_git_sub(args, is_safe))
+        }
         "jj" => Some(is_safe_jj(tokens)),
         _ => None,
     }
@@ -757,21 +787,10 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) 
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{CommandDoc, doc_multi, wordset_items};
+    let mut git_doc = GIT.to_doc();
+    git_doc.description.push_str(" Supports `-C <dir>` prefix.");
     vec![
-        CommandDoc::handler("git",
-            format!(
-                "Subcommands with flag allowlists: blame, cat-file, check-ignore, count-objects, \
-                 describe, diff, diff-tree, fetch, for-each-ref, grep, help, log, ls-files, \
-                 ls-remote, ls-tree, merge-base, merge-tree, name-rev, reflog, rev-parse, \
-                 shortlog, show, status, verify-commit, verify-tag. \
-                 Restricted subcommands: remote (read-only actions), \
-                 branch (read-only flags), stash ({} only), \
-                 tag (list only), config ({} only), worktree (list only), \
-                 notes ({} only). Supports `-C <dir>` prefix.",
-                wordset_items(&GIT_STASH_SAFE),
-                wordset_items(&GIT_CONFIG_SAFE),
-                wordset_items(&GIT_NOTES_SAFE),
-            )),
+        git_doc,
         CommandDoc::handler("jj",
             doc_multi(&JJ_READ_ONLY, JJ_MULTI)
                 .triple_word(JJ_TRIPLE)
@@ -786,46 +805,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Subcommand { cmd: "git", subs: &[
-        super::SubEntry::Policy { name: "log" },
-        super::SubEntry::Policy { name: "diff" },
-        super::SubEntry::Policy { name: "show" },
-        super::SubEntry::Policy { name: "status" },
-        super::SubEntry::Policy { name: "blame" },
-        super::SubEntry::Policy { name: "grep" },
-        super::SubEntry::Policy { name: "fetch" },
-        super::SubEntry::Policy { name: "shortlog" },
-        super::SubEntry::Policy { name: "ls-files" },
-        super::SubEntry::Policy { name: "ls-remote" },
-        super::SubEntry::Policy { name: "ls-tree" },
-        super::SubEntry::Policy { name: "cat-file" },
-        super::SubEntry::Policy { name: "describe" },
-        super::SubEntry::Policy { name: "merge-base" },
-        super::SubEntry::Policy { name: "for-each-ref" },
-        super::SubEntry::Policy { name: "diff-tree" },
-        super::SubEntry::Policy { name: "name-rev" },
-        super::SubEntry::Policy { name: "count-objects" },
-        super::SubEntry::Policy { name: "check-ignore" },
-        super::SubEntry::Policy { name: "merge-tree" },
-        super::SubEntry::Policy { name: "verify-commit" },
-        super::SubEntry::Policy { name: "verify-tag" },
-        super::SubEntry::Policy { name: "reflog" },
-        super::SubEntry::Positional { name: "rev-parse" },
-        super::SubEntry::Positional { name: "help" },
-        super::SubEntry::Positional { name: "remote" },
-        super::SubEntry::Positional { name: "branch" },
-        super::SubEntry::Positional { name: "tag" },
-        super::SubEntry::Custom { name: "config", valid_suffix: Some("--list") },
-        super::SubEntry::Nested { name: "stash", subs: &[
-            super::SubEntry::Positional { name: "list" },
-            super::SubEntry::Positional { name: "show" },
-        ]},
-        super::SubEntry::Custom { name: "worktree", valid_suffix: Some("list") },
-        super::SubEntry::Nested { name: "notes", subs: &[
-            super::SubEntry::Custom { name: "list", valid_suffix: None },
-            super::SubEntry::Custom { name: "show", valid_suffix: None },
-        ]},
-    ]},
     super::CommandEntry::Positional { cmd: "jj" },
 ];
 
