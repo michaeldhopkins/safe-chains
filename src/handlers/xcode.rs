@@ -280,6 +280,28 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "xcodebuild", subs: &[
+        super::SubEntry::Policy { name: "-list" },
+        super::SubEntry::Policy { name: "-showBuildSettings" },
+        super::SubEntry::Policy { name: "-showdestinations" },
+        super::SubEntry::Policy { name: "-showsdks" },
+        super::SubEntry::Policy { name: "-version" },
+    ]},
+    super::CommandEntry::Subcommand { cmd: "plutil", subs: &[
+        super::SubEntry::Policy { name: "-lint" },
+        super::SubEntry::Policy { name: "-p" },
+        super::SubEntry::Policy { name: "-type" },
+    ]},
+    super::CommandEntry::Custom { cmd: "xcode-select", valid_prefix: None },
+    super::CommandEntry::Positional { cmd: "xcrun" },
+    super::CommandEntry::Custom { cmd: "pkgutil", valid_prefix: Some("pkgutil --pkgs") },
+    super::CommandEntry::Custom { cmd: "lipo", valid_prefix: Some("lipo -info /usr/bin/ls") },
+    super::CommandEntry::Custom { cmd: "codesign", valid_prefix: Some("codesign -d /usr/bin/ls") },
+    super::CommandEntry::Custom { cmd: "spctl", valid_prefix: Some("spctl --assess /tmp/binary") },
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -337,14 +359,11 @@ mod tests {
     denied! {
         xcodebuild_build_denied: "xcodebuild build",
         xcodebuild_clean_denied: "xcodebuild clean",
-        xcodebuild_list_unknown_denied: "xcodebuild -list --unknown",
-        xcodebuild_showsdks_unknown_denied: "xcodebuild -showsdks --unknown",
         plutil_convert_denied: "plutil -convert xml1 file.plist",
         plutil_insert_denied: "plutil -insert key -string value file.plist",
         plutil_replace_denied: "plutil -replace key -string value file.plist",
         plutil_remove_denied: "plutil -remove key file.plist",
         plutil_no_args_denied: "plutil",
-        plutil_lint_unknown_denied: "plutil -lint --unknown file.plist",
         xcode_select_switch_denied: "xcode-select -s /Applications/Xcode.app",
         xcode_select_install_denied: "xcode-select --install",
         xcode_select_reset_denied: "xcode-select --reset",
@@ -361,15 +380,12 @@ mod tests {
         spctl_enable_denied: "spctl --enable",
         spctl_master_disable_denied: "spctl --master-disable",
         spctl_no_args_denied: "spctl",
-        spctl_assess_unknown_denied: "spctl --assess --unknown",
         pkgutil_forget_denied: "pkgutil --forget com.example.pkg",
         pkgutil_expand_denied: "pkgutil --expand pkg.pkg /tmp/expanded",
         pkgutil_no_args_denied: "pkgutil",
-        pkgutil_unknown_denied: "pkgutil --unknown",
         lipo_create_denied: "lipo -create a.o b.o -output universal.o",
         lipo_thin_denied: "lipo -thin arm64 -output thin binary",
         lipo_no_args_denied: "lipo",
-        lipo_unknown_denied: "lipo --unknown binary",
         codesign_sign_denied: "codesign -s - binary",
         codesign_remove_signature_denied: "codesign --remove-signature binary",
         codesign_force_denied: "codesign -f -s - binary",

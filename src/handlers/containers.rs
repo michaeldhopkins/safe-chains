@@ -252,6 +252,85 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "docker", subs: &[
+        super::SubEntry::Policy { name: "ps" },
+        super::SubEntry::Policy { name: "images" },
+        super::SubEntry::Policy { name: "logs" },
+        super::SubEntry::Policy { name: "inspect" },
+        super::SubEntry::Policy { name: "info" },
+        super::SubEntry::Policy { name: "version" },
+        super::SubEntry::Policy { name: "top" },
+        super::SubEntry::Policy { name: "port" },
+        super::SubEntry::Policy { name: "diff" },
+        super::SubEntry::Policy { name: "stats" },
+        super::SubEntry::Policy { name: "history" },
+        super::SubEntry::Nested { name: "compose", subs: &[
+            super::SubEntry::Policy { name: "ps" },
+            super::SubEntry::Policy { name: "config" },
+            super::SubEntry::Policy { name: "images" },
+            super::SubEntry::Policy { name: "ls" },
+            super::SubEntry::Policy { name: "top" },
+            super::SubEntry::Policy { name: "version" },
+        ]},
+        super::SubEntry::Nested { name: "container", subs: &[
+            super::SubEntry::Policy { name: "diff" },
+            super::SubEntry::Policy { name: "inspect" },
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "logs" },
+            super::SubEntry::Policy { name: "ls" },
+            super::SubEntry::Policy { name: "port" },
+            super::SubEntry::Policy { name: "stats" },
+            super::SubEntry::Policy { name: "top" },
+        ]},
+        super::SubEntry::Nested { name: "image", subs: &[
+            super::SubEntry::Policy { name: "history" },
+            super::SubEntry::Policy { name: "inspect" },
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "ls" },
+        ]},
+        super::SubEntry::Nested { name: "context", subs: &[
+            super::SubEntry::Policy { name: "inspect" },
+            super::SubEntry::Policy { name: "ls" },
+            super::SubEntry::Policy { name: "show" },
+        ]},
+        super::SubEntry::Nested { name: "network", subs: &[
+            super::SubEntry::Policy { name: "inspect" },
+            super::SubEntry::Policy { name: "ls" },
+        ]},
+        super::SubEntry::Nested { name: "volume", subs: &[
+            super::SubEntry::Policy { name: "inspect" },
+            super::SubEntry::Policy { name: "ls" },
+        ]},
+        super::SubEntry::Nested { name: "system", subs: &[
+            super::SubEntry::Policy { name: "df" },
+            super::SubEntry::Policy { name: "info" },
+        ]},
+        super::SubEntry::Nested { name: "buildx", subs: &[
+            super::SubEntry::Policy { name: "inspect" },
+            super::SubEntry::Policy { name: "ls" },
+            super::SubEntry::Policy { name: "version" },
+        ]},
+        super::SubEntry::Nested { name: "manifest", subs: &[
+            super::SubEntry::Policy { name: "inspect" },
+        ]},
+    ]},
+    super::CommandEntry::Subcommand { cmd: "podman", subs: &[
+        super::SubEntry::Policy { name: "ps" },
+        super::SubEntry::Policy { name: "images" },
+        super::SubEntry::Policy { name: "logs" },
+        super::SubEntry::Policy { name: "inspect" },
+        super::SubEntry::Policy { name: "info" },
+        super::SubEntry::Policy { name: "version" },
+        super::SubEntry::Policy { name: "top" },
+        super::SubEntry::Policy { name: "port" },
+        super::SubEntry::Policy { name: "diff" },
+        super::SubEntry::Policy { name: "stats" },
+        super::SubEntry::Policy { name: "history" },
+    ]},
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -337,10 +416,5 @@ mod tests {
         docker_volume_create_denied: "docker volume create my_vol",
         bare_docker_denied: "docker",
         docker_run_version_bypass_denied: "docker run evil --version",
-        docker_ps_unknown_denied: "docker ps --unknown-flag",
-        docker_logs_unknown_denied: "docker logs --unknown container",
-        docker_images_unknown_denied: "docker images --unknown",
-        docker_network_ls_unknown_denied: "docker network ls --unknown",
-        docker_compose_ps_unknown_denied: "docker compose ps --unknown",
     }
 }

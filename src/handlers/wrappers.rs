@@ -147,6 +147,16 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Delegation { cmd: "timeout" },
+    super::CommandEntry::Delegation { cmd: "time" },
+    super::CommandEntry::Delegation { cmd: "env" },
+    super::CommandEntry::Delegation { cmd: "nice" },
+    super::CommandEntry::Delegation { cmd: "ionice" },
+    super::CommandEntry::Delegation { cmd: "hyperfine" },
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 

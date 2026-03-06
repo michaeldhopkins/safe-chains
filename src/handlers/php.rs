@@ -80,6 +80,23 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "composer", subs: &[
+        super::SubEntry::Policy { name: "show" },
+        super::SubEntry::Policy { name: "info" },
+        super::SubEntry::Policy { name: "outdated" },
+        super::SubEntry::Policy { name: "audit" },
+        super::SubEntry::Policy { name: "about" },
+        super::SubEntry::Policy { name: "check-platform-reqs" },
+        super::SubEntry::Policy { name: "diagnose" },
+        super::SubEntry::Policy { name: "fund" },
+        super::SubEntry::Policy { name: "help" },
+        super::SubEntry::Policy { name: "licenses" },
+        super::SubEntry::Policy { name: "suggests" },
+    ]},
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -119,7 +136,5 @@ mod tests {
         composer_remove_denied: "composer remove laravel/framework",
         composer_run_script_denied: "composer run-script test",
         bare_composer_denied: "composer",
-        composer_show_unknown_denied: "composer show --unknown-flag",
-        composer_outdated_unknown_denied: "composer outdated --unknown",
     }
 }

@@ -579,6 +579,253 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "gh", subs: &[
+        super::SubEntry::Nested { name: "issue", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "pr", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+            super::SubEntry::Policy { name: "diff" },
+            super::SubEntry::Policy { name: "checks" },
+            super::SubEntry::Policy { name: "status" },
+        ]},
+        super::SubEntry::Nested { name: "run", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+            super::SubEntry::Policy { name: "watch" },
+        ]},
+        super::SubEntry::Nested { name: "release", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "label", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "cache", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "codespace", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "variable", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "extension", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "attestation", subs: &[
+            super::SubEntry::Policy { name: "verify" },
+        ]},
+        super::SubEntry::Nested { name: "gpg-key", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "ssh-key", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "workflow", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "repo", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Custom { name: "search", valid_suffix: Some("issues foo") },
+        super::SubEntry::Policy { name: "status" },
+        super::SubEntry::Nested { name: "auth", subs: &[
+            super::SubEntry::Policy { name: "status" },
+        ]},
+        super::SubEntry::Custom { name: "browse", valid_suffix: Some("--no-browser") },
+        super::SubEntry::Positional { name: "api" },
+    ]},
+    super::CommandEntry::Subcommand { cmd: "glab", subs: &[
+        super::SubEntry::Nested { name: "mr", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+            super::SubEntry::Policy { name: "diff" },
+        ]},
+        super::SubEntry::Nested { name: "issue", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "ci", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "status" },
+        ]},
+        super::SubEntry::Nested { name: "release", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "label", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "milestone", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "snippet", subs: &[
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "variable", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "repo", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "cluster", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "deploy-key", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "gpg-key", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "incident", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "iteration", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "schedule", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "ssh-key", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "stack", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "auth", subs: &[
+            super::SubEntry::Policy { name: "status" },
+        ]},
+        super::SubEntry::Positional { name: "api" },
+    ]},
+    super::CommandEntry::Subcommand { cmd: "tea", subs: &[
+        super::SubEntry::Nested { name: "issue", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "issues", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "i", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "pr", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "pull", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "pulls", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "release", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "releases", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "r", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "repo", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "repos", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "branch", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "branches", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "b", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "label", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "labels", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "milestone", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "milestones", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "ms", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "org", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "organization", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "organizations", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "notification", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "notifications", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "n", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "time", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "times", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "t", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "view" },
+        ]},
+        super::SubEntry::Nested { name: "login", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "logins", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+    ]},
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -708,14 +955,6 @@ mod tests {
         auth_login_denied: "gh auth login",
         auth_token_denied: "gh auth token",
         bare_gh_denied: "gh",
-        gh_pr_list_unknown_denied: "gh pr list --unknown",
-        gh_pr_view_unknown_denied: "gh pr view 123 --unknown",
-        gh_pr_diff_unknown_denied: "gh pr diff 123 --unknown",
-        gh_issue_list_unknown_denied: "gh issue list --unknown",
-        gh_run_view_unknown_denied: "gh run view 789 --unknown",
-        gh_search_unknown_denied: "gh search issues foo --unknown",
-        gh_status_unknown_denied: "gh status --unknown",
-        gh_auth_status_unknown_denied: "gh auth status --unknown",
         glab_mr_create_denied: "glab mr create --title test",
         glab_mr_merge_denied: "glab mr merge 123",
         glab_issue_create_denied: "glab issue create --title test",
@@ -723,9 +962,6 @@ mod tests {
         glab_api_post_denied: "glab api projects/1/issues -X POST",
         glab_api_field_denied: "glab api projects/1/issues -f title=x",
         bare_glab_denied: "glab",
-        glab_mr_list_unknown_denied: "glab mr list --unknown",
-        glab_mr_view_unknown_denied: "glab mr view 123 --unknown",
-        glab_issue_list_unknown_denied: "glab issue list --unknown",
         glab_version_with_extra_denied: "glab version --extra",
         glab_check_update_with_extra_denied: "glab check-update --extra",
         tea_issue_create_denied: "tea issue create --title test",
@@ -733,9 +969,6 @@ mod tests {
         tea_login_add_denied: "tea login add",
         tea_logout_denied: "tea logout",
         bare_tea_denied: "tea",
-        tea_issue_list_unknown_denied: "tea issue list --unknown",
-        tea_issue_view_unknown_denied: "tea issue view 1 --unknown",
-        tea_login_list_unknown_denied: "tea login list --unknown",
         tea_whoami_with_extra_denied: "tea whoami --extra",
     }
 }

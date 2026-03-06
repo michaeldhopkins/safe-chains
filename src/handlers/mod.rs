@@ -163,9 +163,162 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+#[derive(Debug)]
+pub(crate) enum CommandEntry {
+    Policy { cmd: &'static str },
+    Positional { cmd: &'static str },
+    Custom { cmd: &'static str, valid_prefix: Option<&'static str> },
+    Subcommand { cmd: &'static str, subs: &'static [SubEntry] },
+    Delegation { cmd: &'static str },
+}
+
+#[cfg(test)]
+#[derive(Debug)]
+pub(crate) enum SubEntry {
+    Policy { name: &'static str },
+    Nested { name: &'static str, subs: &'static [SubEntry] },
+    Custom { name: &'static str, valid_suffix: Option<&'static str> },
+    Positional { name: &'static str },
+    Delegation { name: &'static str },
+    Guarded { name: &'static str, valid_suffix: &'static str },
+}
+
+#[cfg(test)]
+fn full_registry() -> Vec<&'static CommandEntry> {
+    let mut entries = Vec::new();
+    entries.extend(shell::REGISTRY);
+    entries.extend(wrappers::REGISTRY);
+    entries.extend(vcs::REGISTRY);
+    entries.extend(forges::REGISTRY);
+    entries.extend(node::REGISTRY);
+    entries.extend(ruby::REGISTRY);
+    entries.extend(python::REGISTRY);
+    entries.extend(rust::REGISTRY);
+    entries.extend(go::REGISTRY);
+    entries.extend(jvm::REGISTRY);
+    entries.extend(php::REGISTRY);
+    entries.extend(swift::REGISTRY);
+    entries.extend(dotnet::REGISTRY);
+    entries.extend(containers::REGISTRY);
+    entries.extend(network::REGISTRY);
+    entries.extend(ai::REGISTRY);
+    entries.extend(system::REGISTRY);
+    entries.extend(xcode::REGISTRY);
+    entries.extend(perl::REGISTRY);
+    entries.extend(coreutils::REGISTRY);
+    entries.extend(magick::REGISTRY);
+    entries
+}
+
+#[cfg(test)]
 mod tests {
     use super::*;
     use std::collections::HashSet;
+
+    const UNKNOWN_FLAG: &str = "--xyzzy-unknown-42";
+    const UNKNOWN_SUB: &str = "xyzzy-unknown-42";
+
+    fn check_entry(entry: &CommandEntry, failures: &mut Vec<String>) {
+        match entry {
+            CommandEntry::Policy { cmd } => {
+                let test = format!("{cmd} {UNKNOWN_FLAG}");
+                if crate::is_safe_command(&test) {
+                    failures.push(format!("{cmd}: accepted unknown flag: {test}"));
+                }
+            }
+            CommandEntry::Positional { .. } | CommandEntry::Delegation { .. } => {}
+            CommandEntry::Custom { cmd, valid_prefix } => {
+                let base = valid_prefix.unwrap_or(cmd);
+                let test = format!("{base} {UNKNOWN_FLAG}");
+                if crate::is_safe_command(&test) {
+                    failures.push(format!("{cmd}: accepted unknown flag: {test}"));
+                }
+            }
+            CommandEntry::Subcommand { cmd, subs } => {
+                let test = format!("{cmd} {UNKNOWN_SUB}");
+                if crate::is_safe_command(&test) {
+                    failures.push(format!("{cmd}: accepted unknown subcommand: {test}"));
+                }
+                for sub in *subs {
+                    check_sub(cmd, sub, failures);
+                }
+            }
+        }
+    }
+
+    fn check_sub(prefix: &str, entry: &SubEntry, failures: &mut Vec<String>) {
+        match entry {
+            SubEntry::Policy { name } => {
+                let test = format!("{prefix} {name} {UNKNOWN_FLAG}");
+                if crate::is_safe_command(&test) {
+                    failures.push(format!("{prefix} {name}: accepted unknown flag: {test}"));
+                }
+            }
+            SubEntry::Nested { name, subs } => {
+                let path = format!("{prefix} {name}");
+                let test = format!("{path} {UNKNOWN_SUB}");
+                if crate::is_safe_command(&test) {
+                    failures.push(format!("{path}: accepted unknown subcommand: {test}"));
+                }
+                for sub in *subs {
+                    check_sub(&path, sub, failures);
+                }
+            }
+            SubEntry::Custom { name, valid_suffix } => {
+                let base = match valid_suffix {
+                    Some(s) => format!("{prefix} {name} {s}"),
+                    None => format!("{prefix} {name}"),
+                };
+                let test = format!("{base} {UNKNOWN_FLAG}");
+                if crate::is_safe_command(&test) {
+                    failures.push(format!("{prefix} {name}: accepted unknown flag: {test}"));
+                }
+            }
+            SubEntry::Positional { .. } | SubEntry::Delegation { .. } => {}
+            SubEntry::Guarded { name, valid_suffix } => {
+                let test = format!("{prefix} {name} {valid_suffix} {UNKNOWN_FLAG}");
+                if crate::is_safe_command(&test) {
+                    failures.push(format!("{prefix} {name}: accepted unknown flag: {test}"));
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn all_commands_reject_unknown() {
+        let registry = full_registry();
+        let mut failures = Vec::new();
+        for entry in &registry {
+            check_entry(entry, &mut failures);
+        }
+        assert!(
+            failures.is_empty(),
+            "unknown flags/subcommands accepted:\n{}",
+            failures.join("\n")
+        );
+    }
+
+    #[test]
+    fn registry_covers_handled_commands() {
+        let registry = full_registry();
+        let registry_cmds: HashSet<&str> = registry
+            .iter()
+            .map(|e| match e {
+                CommandEntry::Policy { cmd }
+                | CommandEntry::Positional { cmd }
+                | CommandEntry::Custom { cmd, .. }
+                | CommandEntry::Subcommand { cmd, .. }
+                | CommandEntry::Delegation { cmd } => *cmd,
+            })
+            .collect();
+        let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
+
+        let missing: Vec<_> = handled.difference(&registry_cmds).collect();
+        assert!(missing.is_empty(), "not in registry: {missing:?}");
+
+        let extra: Vec<_> = registry_cmds.difference(&handled).collect();
+        assert!(extra.is_empty(), "not in HANDLED_CMDS: {extra:?}");
+    }
 
     const HELP_EXCLUDED: &[&str] = &[
         "arch",

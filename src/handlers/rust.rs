@@ -410,6 +410,47 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "cargo", subs: &[
+        super::SubEntry::Policy { name: "build" },
+        super::SubEntry::Policy { name: "test" },
+        super::SubEntry::Policy { name: "check" },
+        super::SubEntry::Policy { name: "clippy" },
+        super::SubEntry::Policy { name: "bench" },
+        super::SubEntry::Policy { name: "doc" },
+        super::SubEntry::Policy { name: "tree" },
+        super::SubEntry::Policy { name: "metadata" },
+        super::SubEntry::Policy { name: "search" },
+        super::SubEntry::Policy { name: "info" },
+        super::SubEntry::Policy { name: "audit" },
+        super::SubEntry::Policy { name: "deny" },
+        super::SubEntry::Policy { name: "license" },
+        super::SubEntry::Policy { name: "locate-project" },
+        super::SubEntry::Policy { name: "pkgid" },
+        super::SubEntry::Policy { name: "read-manifest" },
+        super::SubEntry::Policy { name: "verify-project" },
+        super::SubEntry::Guarded { name: "fmt", valid_suffix: "--check" },
+        super::SubEntry::Guarded { name: "package", valid_suffix: "--list" },
+        super::SubEntry::Guarded { name: "publish", valid_suffix: "--dry-run" },
+    ]},
+    super::CommandEntry::Subcommand { cmd: "rustup", subs: &[
+        super::SubEntry::Policy { name: "show" },
+        super::SubEntry::Policy { name: "which" },
+        super::SubEntry::Policy { name: "doc" },
+        super::SubEntry::Nested { name: "component", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "target", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "toolchain", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Delegation { name: "run" },
+    ]},
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -524,17 +565,8 @@ mod tests {
         cargo_nightly_publish_denied: "cargo +nightly publish",
         cargo_nightly_run_denied: "cargo +nightly run",
         cargo_bare_toolchain_denied: "cargo +nightly",
-        cargo_test_unknown_denied: "cargo test --unknown-flag",
-        cargo_build_unknown_denied: "cargo build --exec evil",
-        cargo_check_unknown_denied: "cargo check --unknown",
-        cargo_tree_unknown_denied: "cargo tree --unknown",
-        cargo_metadata_unknown_denied: "cargo metadata --unknown",
-        cargo_search_unknown_denied: "cargo search serde --unknown",
-        cargo_audit_unknown_denied: "cargo audit --unknown",
         cargo_deny_graph_denied: "cargo deny check --graph /tmp/out.dot",
-        cargo_deny_unknown_denied: "cargo deny check --unknown",
         cargo_info_bare_denied: "cargo info",
-        cargo_info_unknown_denied: "cargo info serde --unknown",
         cargo_clippy_fix_denied: "cargo clippy --fix",
         rustup_install_denied: "rustup install stable",
         rustup_update_denied: "rustup update",
@@ -549,11 +581,5 @@ mod tests {
         rustup_run_bash_c_denied: "rustup run stable bash -c 'rm -rf /'",
         rustup_run_env_unsafe_denied: "rustup run stable env rm foo",
         rustup_run_nested_denied: "rustup run nightly rustup run stable rm -rf /",
-        rustup_show_unknown_denied: "rustup show --unknown",
-        rustup_which_unknown_denied: "rustup which --unknown rustc",
-        rustup_doc_unknown_denied: "rustup doc --unknown",
-        rustup_component_list_unknown_denied: "rustup component list --unknown",
-        rustup_target_list_unknown_denied: "rustup target list --unknown",
-        rustup_toolchain_list_unknown_denied: "rustup toolchain list --unknown",
     }
 }

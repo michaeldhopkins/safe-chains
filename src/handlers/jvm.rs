@@ -153,6 +153,28 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "gradle", subs: &[
+        super::SubEntry::Policy { name: "tasks" },
+        super::SubEntry::Policy { name: "dependencies" },
+        super::SubEntry::Policy { name: "properties" },
+        super::SubEntry::Policy { name: "build" },
+        super::SubEntry::Policy { name: "check" },
+        super::SubEntry::Policy { name: "test" },
+    ]},
+    super::CommandEntry::Subcommand { cmd: "gradlew", subs: &[
+        super::SubEntry::Policy { name: "tasks" },
+        super::SubEntry::Policy { name: "dependencies" },
+        super::SubEntry::Policy { name: "properties" },
+        super::SubEntry::Policy { name: "build" },
+        super::SubEntry::Policy { name: "check" },
+        super::SubEntry::Policy { name: "test" },
+    ]},
+    super::CommandEntry::Custom { cmd: "mvn", valid_prefix: Some("mvn test") },
+    super::CommandEntry::Custom { cmd: "mvnw", valid_prefix: Some("mvnw test") },
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -199,13 +221,9 @@ mod tests {
         gradle_publish_denied: "gradle publish",
         gradle_run_denied: "gradle run",
         bare_gradle_denied: "gradle",
-        gradle_build_unknown_denied: "gradle build --unknown",
-        gradle_tasks_unknown_denied: "gradle tasks --unknown",
         mvn_deploy_denied: "mvn deploy",
         mvn_install_denied: "mvn install",
         mvn_clean_denied: "mvn clean",
         bare_mvn_denied: "mvn",
-        mvn_test_unknown_denied: "mvn test --unknown-flag",
-        mvn_compile_unknown_denied: "mvn compile --unknown",
     }
 }

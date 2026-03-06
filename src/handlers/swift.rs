@@ -107,6 +107,19 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "swift", subs: &[
+        super::SubEntry::Policy { name: "build" },
+        super::SubEntry::Policy { name: "test" },
+        super::SubEntry::Nested { name: "package", subs: &[
+            super::SubEntry::Policy { name: "describe" },
+            super::SubEntry::Policy { name: "dump-package" },
+            super::SubEntry::Policy { name: "show-dependencies" },
+        ]},
+    ]},
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -141,8 +154,5 @@ mod tests {
         swift_package_resolve_denied: "swift package resolve",
         bare_swift_denied: "swift",
         swift_package_bare_denied: "swift package",
-        swift_build_unknown_denied: "swift build --unknown",
-        swift_test_unknown_denied: "swift test --unknown-flag",
-        swift_package_describe_unknown_denied: "swift package describe --unknown",
     }
 }

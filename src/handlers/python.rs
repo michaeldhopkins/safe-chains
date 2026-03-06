@@ -293,6 +293,67 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "pip", subs: &[
+        super::SubEntry::Policy { name: "list" },
+        super::SubEntry::Policy { name: "show" },
+        super::SubEntry::Policy { name: "freeze" },
+        super::SubEntry::Policy { name: "check" },
+        super::SubEntry::Policy { name: "debug" },
+        super::SubEntry::Policy { name: "help" },
+        super::SubEntry::Policy { name: "index" },
+        super::SubEntry::Policy { name: "inspect" },
+        super::SubEntry::Positional { name: "config" },
+    ]},
+    super::CommandEntry::Subcommand { cmd: "pip3", subs: &[
+        super::SubEntry::Policy { name: "list" },
+        super::SubEntry::Policy { name: "show" },
+        super::SubEntry::Policy { name: "freeze" },
+        super::SubEntry::Policy { name: "check" },
+        super::SubEntry::Policy { name: "debug" },
+        super::SubEntry::Policy { name: "help" },
+        super::SubEntry::Policy { name: "index" },
+        super::SubEntry::Policy { name: "inspect" },
+        super::SubEntry::Positional { name: "config" },
+    ]},
+    super::CommandEntry::Subcommand { cmd: "uv", subs: &[
+        super::SubEntry::Nested { name: "pip", subs: &[
+            super::SubEntry::Policy { name: "list" },
+            super::SubEntry::Policy { name: "show" },
+            super::SubEntry::Policy { name: "check" },
+            super::SubEntry::Policy { name: "freeze" },
+        ]},
+        super::SubEntry::Nested { name: "python", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+        super::SubEntry::Nested { name: "tool", subs: &[
+            super::SubEntry::Policy { name: "list" },
+        ]},
+    ]},
+    super::CommandEntry::Subcommand { cmd: "poetry", subs: &[
+        super::SubEntry::Policy { name: "show" },
+        super::SubEntry::Policy { name: "check" },
+        super::SubEntry::Nested { name: "env", subs: &[
+            super::SubEntry::Policy { name: "info" },
+            super::SubEntry::Policy { name: "list" },
+        ]},
+    ]},
+    super::CommandEntry::Subcommand { cmd: "pyenv", subs: &[
+        super::SubEntry::Policy { name: "help" },
+        super::SubEntry::Policy { name: "root" },
+        super::SubEntry::Policy { name: "shims" },
+        super::SubEntry::Policy { name: "version" },
+        super::SubEntry::Policy { name: "versions" },
+        super::SubEntry::Policy { name: "which" },
+    ]},
+    super::CommandEntry::Subcommand { cmd: "conda", subs: &[
+        super::SubEntry::Policy { name: "list" },
+        super::SubEntry::Policy { name: "info" },
+        super::SubEntry::Guarded { name: "config", valid_suffix: "--show" },
+    ]},
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -365,22 +426,17 @@ mod tests {
         pip3_install_denied: "pip3 install django",
         bare_pip_denied: "pip",
         pip_config_set_denied: "pip config set global.index-url https://example.com",
-        pip_list_unknown_denied: "pip list --unknown",
-        pip_show_unknown_denied: "pip show requests --unknown",
         uv_pip_install_denied: "uv pip install requests",
         uv_run_denied: "uv run script.py",
         uv_venv_denied: "uv venv",
         uv_add_denied: "uv add requests",
         bare_uv_denied: "uv",
-        uv_pip_list_unknown_denied: "uv pip list --unknown",
         poetry_install_denied: "poetry install",
         poetry_add_denied: "poetry add requests",
         poetry_build_denied: "poetry build",
-        poetry_show_unknown_denied: "poetry show --unknown",
         pyenv_install_denied: "pyenv install 3.12",
         pyenv_global_denied: "pyenv global 3.12",
         pyenv_local_denied: "pyenv local 3.12",
-        pyenv_versions_unknown_denied: "pyenv versions --unknown",
         conda_install_denied: "conda install numpy",
         conda_create_denied: "conda create -n myenv",
         conda_remove_denied: "conda remove numpy",
@@ -388,7 +444,5 @@ mod tests {
         conda_config_show_sources_with_remove_denied: "conda config --show-sources --remove channels defaults",
         conda_config_set_denied: "conda config --set always_yes true",
         conda_config_add_denied: "conda config --add channels conda-forge",
-        conda_list_unknown_denied: "conda list --unknown",
-        conda_info_unknown_denied: "conda info --unknown",
     }
 }

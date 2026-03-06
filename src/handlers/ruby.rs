@@ -175,6 +175,40 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "bundle", subs: &[
+        super::SubEntry::Policy { name: "list" },
+        super::SubEntry::Policy { name: "info" },
+        super::SubEntry::Policy { name: "show" },
+        super::SubEntry::Policy { name: "check" },
+        super::SubEntry::Delegation { name: "exec" },
+    ]},
+    super::CommandEntry::Subcommand { cmd: "gem", subs: &[
+        super::SubEntry::Policy { name: "list" },
+        super::SubEntry::Policy { name: "info" },
+        super::SubEntry::Policy { name: "search" },
+        super::SubEntry::Policy { name: "contents" },
+        super::SubEntry::Policy { name: "dependency" },
+        super::SubEntry::Policy { name: "environment" },
+        super::SubEntry::Policy { name: "help" },
+        super::SubEntry::Policy { name: "outdated" },
+        super::SubEntry::Policy { name: "pristine" },
+        super::SubEntry::Policy { name: "sources" },
+        super::SubEntry::Policy { name: "specification" },
+        super::SubEntry::Policy { name: "stale" },
+        super::SubEntry::Policy { name: "which" },
+    ]},
+    super::CommandEntry::Subcommand { cmd: "rbenv", subs: &[
+        super::SubEntry::Policy { name: "help" },
+        super::SubEntry::Policy { name: "root" },
+        super::SubEntry::Policy { name: "shims" },
+        super::SubEntry::Policy { name: "version" },
+        super::SubEntry::Policy { name: "versions" },
+        super::SubEntry::Policy { name: "which" },
+    ]},
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -235,15 +269,10 @@ mod tests {
         bundle_exec_rails_console_denied: "bundle exec rails console",
         bundle_exec_rake_denied: "bundle exec rake db:drop",
         bundle_exec_ruby_denied: "bundle exec ruby script.rb",
-        bundle_list_unknown_denied: "bundle list --unknown",
-        bundle_check_unknown_denied: "bundle check --unknown",
         gem_install_denied: "gem install rails",
         gem_uninstall_denied: "gem uninstall rails",
-        gem_list_unknown_denied: "gem list --unknown-flag",
-        gem_search_unknown_denied: "gem search rails --unknown",
         rbenv_install_denied: "rbenv install 3.3.0",
         rbenv_global_denied: "rbenv global 3.3.0",
         rbenv_local_denied: "rbenv local 3.3.0",
-        rbenv_versions_flag_denied: "rbenv versions --unknown",
     }
 }

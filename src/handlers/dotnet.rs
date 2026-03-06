@@ -85,6 +85,15 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "dotnet", subs: &[
+        super::SubEntry::Policy { name: "build" },
+        super::SubEntry::Policy { name: "test" },
+        super::SubEntry::Policy { name: "list" },
+    ]},
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -123,8 +132,5 @@ mod tests {
         dotnet_clean_denied: "dotnet clean",
         dotnet_restore_denied: "dotnet restore",
         bare_dotnet_denied: "dotnet",
-        dotnet_build_unknown_denied: "dotnet build --unknown",
-        dotnet_test_unknown_denied: "dotnet test --unknown-flag",
-        dotnet_list_unknown_denied: "dotnet list package --unknown",
     }
 }

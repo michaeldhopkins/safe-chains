@@ -144,6 +144,20 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "go", subs: &[
+        super::SubEntry::Policy { name: "build" },
+        super::SubEntry::Policy { name: "doc" },
+        super::SubEntry::Policy { name: "env" },
+        super::SubEntry::Positional { name: "help" },
+        super::SubEntry::Policy { name: "list" },
+        super::SubEntry::Policy { name: "test" },
+        super::SubEntry::Policy { name: "version" },
+        super::SubEntry::Policy { name: "vet" },
+    ]},
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -210,8 +224,6 @@ mod tests {
         go_env_w_denied: "go env -w GOPATH=/tmp",
         go_env_u_denied: "go env -u GOPATH",
         go_vet_vettool_denied: "go vet -vettool=mytool ./...",
-        go_build_unknown_denied: "go build --unknown ./...",
-        go_test_unknown_denied: "go test -unknown ./...",
         go_list_toolexec_denied: "go list -toolexec=cmd ./...",
     }
 }

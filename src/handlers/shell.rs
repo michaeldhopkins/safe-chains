@@ -60,6 +60,13 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Delegation { cmd: "sh" },
+    super::CommandEntry::Delegation { cmd: "bash" },
+    super::CommandEntry::Delegation { cmd: "xargs" },
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 

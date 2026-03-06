@@ -44,6 +44,13 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "magick", subs: &[
+        super::SubEntry::Policy { name: "identify" },
+    ]},
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -69,7 +76,6 @@ mod tests {
         magick_composite_denied: "magick composite overlay.png base.png result.png",
         magick_conjure_denied: "magick conjure script.msl",
         bare_magick_denied: "magick",
-        magick_identify_unknown_denied: "magick identify --unknown /tmp/image.png",
         magick_identify_write_denied: "magick identify -write /tmp/out.txt /tmp/image.png",
         magick_identify_set_denied: "magick identify -set comment evil /tmp/image.png",
     }

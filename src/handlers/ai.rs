@@ -125,6 +125,23 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "ollama", subs: &[
+        super::SubEntry::Policy { name: "list" },
+        super::SubEntry::Policy { name: "ps" },
+        super::SubEntry::Policy { name: "show" },
+    ]},
+    super::CommandEntry::Subcommand { cmd: "llm", subs: &[
+        super::SubEntry::Policy { name: "aliases" },
+        super::SubEntry::Policy { name: "collections" },
+        super::SubEntry::Policy { name: "logs" },
+        super::SubEntry::Policy { name: "models" },
+        super::SubEntry::Policy { name: "plugins" },
+        super::SubEntry::Policy { name: "templates" },
+    ]},
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -174,15 +191,11 @@ mod tests {
         ollama_push_denied: "ollama push mymodel",
         ollama_no_args_denied: "ollama",
         ollama_show_bare_denied: "ollama show",
-        ollama_list_unknown_denied: "ollama list --unknown",
-        ollama_show_unknown_denied: "ollama show llama3 --unknown",
         llm_prompt_denied: "llm prompt hello",
         llm_chat_denied: "llm chat",
         llm_keys_denied: "llm keys set openai",
         llm_install_denied: "llm install llm-claude-3",
         llm_embed_denied: "llm embed -m 3-small -c hello",
         llm_no_args_denied: "llm",
-        llm_logs_unknown_denied: "llm logs --unknown-flag",
-        llm_models_unknown_denied: "llm models --unknown",
     }
 }

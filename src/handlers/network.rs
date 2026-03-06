@@ -123,6 +123,11 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Custom { cmd: "curl", valid_prefix: Some("curl https://example.com") },
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -176,7 +181,6 @@ mod tests {
         curl_cookie_jar: "curl -c cookies.txt https://example.com",
         curl_config: "curl -K config.txt",
         curl_upload: "curl -T file.txt https://example.com",
-        curl_unknown_flag: "curl --some-unknown-flag https://example.com",
         curl_bare: "curl",
         curl_netrc: "curl -n https://example.com",
         curl_data_long: "curl --data 'key=val' https://example.com",

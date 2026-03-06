@@ -781,6 +781,51 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Subcommand { cmd: "git", subs: &[
+        super::SubEntry::Policy { name: "log" },
+        super::SubEntry::Policy { name: "diff" },
+        super::SubEntry::Policy { name: "show" },
+        super::SubEntry::Policy { name: "status" },
+        super::SubEntry::Policy { name: "blame" },
+        super::SubEntry::Policy { name: "grep" },
+        super::SubEntry::Policy { name: "fetch" },
+        super::SubEntry::Policy { name: "shortlog" },
+        super::SubEntry::Policy { name: "ls-files" },
+        super::SubEntry::Policy { name: "ls-remote" },
+        super::SubEntry::Policy { name: "ls-tree" },
+        super::SubEntry::Policy { name: "cat-file" },
+        super::SubEntry::Policy { name: "describe" },
+        super::SubEntry::Policy { name: "merge-base" },
+        super::SubEntry::Policy { name: "for-each-ref" },
+        super::SubEntry::Policy { name: "diff-tree" },
+        super::SubEntry::Policy { name: "name-rev" },
+        super::SubEntry::Policy { name: "count-objects" },
+        super::SubEntry::Policy { name: "check-ignore" },
+        super::SubEntry::Policy { name: "merge-tree" },
+        super::SubEntry::Policy { name: "verify-commit" },
+        super::SubEntry::Policy { name: "verify-tag" },
+        super::SubEntry::Policy { name: "reflog" },
+        super::SubEntry::Positional { name: "rev-parse" },
+        super::SubEntry::Positional { name: "help" },
+        super::SubEntry::Positional { name: "remote" },
+        super::SubEntry::Positional { name: "branch" },
+        super::SubEntry::Positional { name: "tag" },
+        super::SubEntry::Positional { name: "config" },
+        super::SubEntry::Nested { name: "stash", subs: &[
+            super::SubEntry::Positional { name: "list" },
+            super::SubEntry::Positional { name: "show" },
+        ]},
+        super::SubEntry::Positional { name: "worktree" },
+        super::SubEntry::Nested { name: "notes", subs: &[
+            super::SubEntry::Positional { name: "list" },
+            super::SubEntry::Positional { name: "show" },
+        ]},
+    ]},
+    super::CommandEntry::Positional { cmd: "jj" },
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
@@ -901,28 +946,6 @@ mod tests {
     }
 
     denied! {
-        git_log_unknown: "git log --xyzzy-unknown",
-        git_diff_unknown: "git diff --xyzzy-unknown",
-        git_show_unknown: "git show --xyzzy-unknown HEAD",
-        git_status_unknown: "git status --xyzzy-unknown",
-        git_fetch_unknown: "git fetch --xyzzy-unknown",
-        git_grep_unknown: "git grep --xyzzy-unknown pattern",
-        git_blame_unknown: "git blame --xyzzy-unknown file.rb",
-        git_ls_files_unknown: "git ls-files --xyzzy-unknown",
-        git_ls_remote_unknown: "git ls-remote --xyzzy-unknown origin",
-        git_ls_tree_unknown: "git ls-tree --xyzzy-unknown HEAD",
-        git_cat_file_unknown: "git cat-file --xyzzy-unknown HEAD",
-        git_describe_unknown: "git describe --xyzzy-unknown",
-        git_merge_base_unknown: "git merge-base --xyzzy-unknown HEAD",
-        git_for_each_ref_unknown: "git for-each-ref --xyzzy-unknown",
-        git_diff_tree_unknown: "git diff-tree --xyzzy-unknown HEAD",
-        git_name_rev_unknown: "git name-rev --xyzzy-unknown HEAD",
-        git_count_objects_unknown: "git count-objects --xyzzy-unknown",
-        git_check_ignore_unknown: "git check-ignore --xyzzy-unknown foo",
-        git_merge_tree_unknown: "git merge-tree --xyzzy-unknown HEAD HEAD",
-        git_verify_commit_unknown: "git verify-commit --xyzzy-unknown HEAD",
-        git_verify_tag_unknown: "git verify-tag --xyzzy-unknown v1.0",
-        git_shortlog_unknown: "git shortlog --xyzzy-unknown",
         git_fetch_upload_pack_denied: "git fetch --upload-pack=malicious origin",
         git_ls_remote_upload_pack_denied: "git ls-remote --upload-pack malicious origin",
         git_stash_bare_denied: "git stash",

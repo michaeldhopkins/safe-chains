@@ -329,6 +329,11 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
+pub(super) const REGISTRY: &[super::CommandEntry] = &[
+    super::CommandEntry::Positional { cmd: "perl" },
+];
+
+#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 
