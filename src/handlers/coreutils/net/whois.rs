@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static WHOIS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-A", "-B", "-G", "-H", "-I", "-K", "-L",
         "-M", "-Q", "-R", "-S", "-a", "-b", "-c",
         "-d", "-f", "-g", "-l", "-m", "-r", "-x",
     ]),
     standalone_short: b"ABGHIKLMQRSabcdfglmrx",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "-T", "-V", "-h", "-i", "-p", "-s", "-t",
     ]),
     valued_short: b"TVhipst",

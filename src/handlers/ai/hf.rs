@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static HF_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static HF_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HF_POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -23,9 +23,9 @@ static HF_POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HF_LS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--author", "--filter", "--limit", "--search", "--sort"]),
+    valued: WordSet::flags(&["--author", "--filter", "--limit", "--search", "--sort"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -33,9 +33,9 @@ static HF_LS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HF_COLLECTIONS_LS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--limit", "--owner"]),
+    valued: WordSet::flags(&["--limit", "--owner"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -43,9 +43,9 @@ static HF_COLLECTIONS_LS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HF_DISCUSSIONS_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -53,9 +53,9 @@ static HF_DISCUSSIONS_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HF_JOBS_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--tail"]),
+    valued: WordSet::flags(&["--tail"]),
     valued_short: b"",
     bare: false,
     max_positional: None,

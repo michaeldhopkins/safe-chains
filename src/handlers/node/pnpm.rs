@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PNPM_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--dev", "--json", "--long", "--no-optional",
         "--parseable", "--production", "--recursive",
     ]),
     standalone_short: b"Pr",
-    valued: WordSet::new(&["--depth", "--filter"]),
+    valued: WordSet::flags(&["--depth", "--filter"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -16,9 +16,9 @@ static PNPM_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static PNPM_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--recursive"]),
+    standalone: WordSet::flags(&["--json", "--recursive"]),
     standalone_short: b"r",
-    valued: WordSet::new(&["--filter"]),
+    valued: WordSet::flags(&["--filter"]),
     valued_short: b"",
     bare: true,
     max_positional: None,

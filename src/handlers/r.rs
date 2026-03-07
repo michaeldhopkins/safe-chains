@@ -2,12 +2,12 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static R_CMD_CHECK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--as-cran", "--no-build-vignettes", "--no-examples",
         "--no-manual", "--no-tests", "--no-vignettes",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&["--output"]),
+    valued: WordSet::flags(&["--output"]),
     valued_short: b"o",
     bare: false,
     max_positional: None,
@@ -15,9 +15,9 @@ static R_CMD_CHECK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static R_CMD_CONFIG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: Some(1),

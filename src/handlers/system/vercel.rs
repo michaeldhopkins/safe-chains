@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static VERCEL_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"j",
-    valued: WordSet::new(&["--meta", "--next", "--scope"]),
+    valued: WordSet::flags(&["--meta", "--next", "--scope"]),
     valued_short: b"mS",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static VERCEL_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static VERCEL_INSPECT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"j",
-    valued: WordSet::new(&["--scope", "--timeout"]),
+    valued: WordSet::flags(&["--scope", "--timeout"]),
     valued_short: b"ST",
     bare: false,
     max_positional: None,
@@ -23,9 +23,9 @@ static VERCEL_INSPECT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static VERCEL_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -33,9 +33,9 @@ static VERCEL_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static VERCEL_PROJECT_LS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"j",
-    valued: WordSet::new(&["--scope"]),
+    valued: WordSet::flags(&["--scope"]),
     valued_short: b"S",
     bare: true,
     max_positional: None,

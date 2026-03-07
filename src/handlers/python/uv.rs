@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static UV_PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--editable", "--exclude-editable", "--outdated",
         "--strict",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&["--exclude", "--format", "--python"]),
+    valued: WordSet::flags(&["--exclude", "--format", "--python"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -16,9 +16,9 @@ static UV_PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static UV_PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--files", "--verbose"]),
+    standalone: WordSet::flags(&["--files", "--verbose"]),
     standalone_short: b"v",
-    valued: WordSet::new(&["--python"]),
+    valued: WordSet::flags(&["--python"]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -26,9 +26,9 @@ static UV_PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static UV_PIP_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--verbose"]),
+    standalone: WordSet::flags(&["--verbose"]),
     standalone_short: b"v",
-    valued: WordSet::new(&["--python"]),
+    valued: WordSet::flags(&["--python"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -36,9 +36,9 @@ static UV_PIP_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static UV_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--verbose"]),
+    standalone: WordSet::flags(&["--verbose"]),
     standalone_short: b"v",
-    valued: WordSet::new(&["--python"]),
+    valued: WordSet::flags(&["--python"]),
     valued_short: b"",
     bare: true,
     max_positional: None,

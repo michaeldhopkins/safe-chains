@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SHASUM_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--binary", "--check", "--portable", "--status",
         "--strict", "--tag", "--text", "--warn",
         "-0", "-b", "-c", "-p", "-s", "-t",
     ]),
     standalone_short: b"0bcpst",
-    valued: WordSet::new(&["--algorithm", "-a"]),
+    valued: WordSet::flags(&["--algorithm", "-a"]),
     valued_short: b"a",
     bare: true,
     max_positional: None,

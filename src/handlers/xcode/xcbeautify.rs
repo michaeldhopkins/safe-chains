@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static XCBEAUTIFY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--is-ci", "--quiet", "--quieter"]),
+    standalone: WordSet::flags(&["--is-ci", "--quiet", "--quieter"]),
     standalone_short: b"q",
-    valued: WordSet::new(&["--renderer"]),
+    valued: WordSet::flags(&["--renderer"]),
     valued_short: b"",
     bare: true,
     max_positional: None,

@@ -2,12 +2,12 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static SYSCTL_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-A", "-N", "-X", "-a", "-b", "-d", "-e", "-h",
         "-l", "-n", "-o", "-q", "-x",
     ]),
     standalone_short: b"ANXabdehlnoqx",
-    valued: WordSet::new(&["-B", "-r"]),
+    valued: WordSet::flags(&["-B", "-r"]),
     valued_short: b"Br",
     bare: false,
     max_positional: None,

@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static IOREG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-S", "-a", "-b", "-f", "-i", "-l", "-r",
         "-t", "-x",
     ]),
     standalone_short: b"Sabfilrtx",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "-c", "-d", "-k", "-n", "-p", "-w",
     ]),
     valued_short: b"cdknpw",

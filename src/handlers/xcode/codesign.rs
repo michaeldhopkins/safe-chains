@@ -2,12 +2,12 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static CODESIGN_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--deep", "--display", "--verify",
         "-R", "-d", "-v",
     ]),
     standalone_short: b"Rdv",
-    valued: WordSet::new(&["--verbose"]),
+    valued: WordSet::flags(&["--verbose"]),
     valued_short: b"",
     bare: false,
     max_positional: None,

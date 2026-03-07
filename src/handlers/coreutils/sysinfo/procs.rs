@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PROCS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--no-header", "--or", "--tree", "--watch-interval",
         "-l", "-t",
     ]),
     standalone_short: b"lt",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--color", "--completion", "--config", "--gen-completion",
         "--insert", "--only", "--pager", "--sorta", "--sortd",
         "--theme",

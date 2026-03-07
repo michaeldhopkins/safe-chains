@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static TYPE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-P", "-a", "-f", "-p", "-t"]),
+    standalone: WordSet::flags(&["-P", "-a", "-f", "-p", "-t"]),
     standalone_short: b"Pafpt",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,

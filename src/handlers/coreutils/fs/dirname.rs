@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DIRNAME_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--zero", "-z"]),
+    standalone: WordSet::flags(&["--zero", "-z"]),
     standalone_short: b"z",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,

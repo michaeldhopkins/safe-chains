@@ -3,14 +3,14 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static REALPATH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--canonicalize-existing", "--canonicalize-missing",
         "--logical", "--no-symlinks", "--physical", "--quiet",
         "--strip", "--zero",
         "-L", "-P", "-e", "-m", "-q", "-s", "-z",
     ]),
     standalone_short: b"LPemqsz",
-    valued: WordSet::new(&["--relative-base", "--relative-to"]),
+    valued: WordSet::flags(&["--relative-base", "--relative-to"]),
     valued_short: b"",
     bare: false,
     max_positional: None,

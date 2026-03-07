@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static CRAFT_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static CRAFT_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static CRAFT_POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,

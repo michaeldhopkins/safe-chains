@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SHELLCHECK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--color", "--external-sources", "--list-optional",
         "--norc", "--severity", "--wiki-link-count",
         "-C", "-a", "-x",
     ]),
     standalone_short: b"Cax",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--enable", "--exclude", "--format", "--include",
         "--rcfile", "--severity", "--shell", "--source-path",
         "--wiki-link-count",

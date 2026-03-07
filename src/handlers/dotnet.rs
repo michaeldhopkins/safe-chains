@@ -3,13 +3,13 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DOTNET_BUILD_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--force", "--no-dependencies", "--no-incremental",
         "--no-restore", "--nologo", "--self-contained",
         "--tl", "--use-current-runtime",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--arch", "--artifacts-path", "--configuration", "--framework",
         "--os", "--output", "--property", "--runtime", "--source",
         "--verbosity", "--version-suffix",
@@ -21,13 +21,13 @@ static DOTNET_BUILD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DOTNET_TEST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--blame", "--blame-crash", "--blame-hang", "--force",
         "--list-tests", "--no-build", "--no-dependencies",
         "--no-restore", "--nologo",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--arch", "--artifacts-path", "--blame-crash-collect-always",
         "--blame-crash-dump-type", "--blame-hang-dump-type",
         "--blame-hang-timeout", "--collect", "--configuration",
@@ -43,13 +43,13 @@ static DOTNET_TEST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DOTNET_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--deprecated", "--highest-minor", "--highest-patch",
         "--include-prerelease", "--include-transitive", "--outdated",
         "--vulnerable",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--config", "--format", "--framework", "--source", "--verbosity",
     ]),
     valued_short: b"v",

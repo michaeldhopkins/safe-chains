@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static CAL_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--monday", "--sunday", "--three", "--year",
         "-1", "-3", "-h", "-j", "-m", "-s", "-w", "-y",
     ]),
     standalone_short: b"13hjmswy",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "-A", "-B", "-d", "-n",
     ]),
     valued_short: b"ABdn",

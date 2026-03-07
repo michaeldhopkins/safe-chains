@@ -2,11 +2,11 @@ use crate::parse::{Segment, Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--comments", "--draft", "--web",
     ]),
     standalone_short: b"qw",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--app", "--assignee", "--author", "--base", "--head",
         "--jq", "--json", "--label", "--limit", "--milestone",
         "--repo", "--search", "--state", "--template",
@@ -18,11 +18,11 @@ static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--comments", "--web",
     ]),
     standalone_short: b"cqw",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--jq", "--json", "--repo", "--template",
     ]),
     valued_short: b"R",
@@ -32,11 +32,11 @@ static GH_VIEW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_DIFF_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--name-only", "--patch", "--web",
     ]),
     standalone_short: b"w",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--color", "--repo",
     ]),
     valued_short: b"R",
@@ -46,11 +46,11 @@ static GH_DIFF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_CHECKS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--fail-fast", "--required", "--watch", "--web",
     ]),
     standalone_short: b"w",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--interval", "--jq", "--json", "--repo", "--template",
     ]),
     valued_short: b"iR",
@@ -60,11 +60,11 @@ static GH_CHECKS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_STATUS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--exit-status", "--log", "--log-failed", "--web",
     ]),
     standalone_short: b"w",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--jq", "--json", "--repo", "--template",
     ]),
     valued_short: b"R",
@@ -74,9 +74,9 @@ static GH_STATUS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_RUN_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"q",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--branch", "--commit", "--created", "--event",
         "--jq", "--json", "--limit", "--repo",
         "--status", "--template", "--user", "--workflow",
@@ -88,11 +88,11 @@ static GH_RUN_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_RUN_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--exit-status", "--log", "--log-failed", "--verbose", "--web",
     ]),
     standalone_short: b"vw",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--attempt", "--job", "--jq", "--json", "--repo", "--template",
     ]),
     valued_short: b"jR",
@@ -102,11 +102,11 @@ static GH_RUN_VIEW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_RUN_WATCH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--exit-status",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--interval", "--repo",
     ]),
     valued_short: b"iR",
@@ -116,11 +116,11 @@ static GH_RUN_WATCH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_RELEASE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--exclude-drafts", "--exclude-pre-releases",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--jq", "--json", "--limit", "--order", "--repo", "--template",
     ]),
     valued_short: b"LR",
@@ -130,11 +130,11 @@ static GH_RELEASE_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_RELEASE_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--web",
     ]),
     standalone_short: b"w",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--jq", "--json", "--repo", "--template",
     ]),
     valued_short: b"R",
@@ -144,11 +144,11 @@ static GH_RELEASE_VIEW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_SEARCH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--archived", "--include-forks", "--web",
     ]),
     standalone_short: b"w",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--assignee", "--author", "--closed", "--committer",
         "--created", "--filename", "--followers", "--forks",
         "--good-first-issues", "--hash", "--help-wanted-issues",
@@ -168,9 +168,9 @@ static GH_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"q",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--jq", "--json", "--limit", "--repo", "--template",
     ]),
     valued_short: b"LR",
@@ -180,9 +180,9 @@ static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_SIMPLE_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--web"]),
+    standalone: WordSet::flags(&["--web"]),
     standalone_short: b"w",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--jq", "--json", "--repo", "--template",
     ]),
     valued_short: b"R",
@@ -204,12 +204,12 @@ static ALWAYS_SAFE_SUBCOMMANDS: WordSet =
     WordSet::new(&["--version", "search", "status"]);
 
 static GH_BROWSE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--actions", "--no-browser", "--projects",
         "--releases", "--settings", "--wiki",
     ]),
     standalone_short: b"acnprsw",
-    valued: WordSet::new(&["--branch", "--commit", "--repo"]),
+    valued: WordSet::flags(&["--branch", "--commit", "--repo"]),
     valued_short: b"bR",
     bare: false,
     max_positional: None,

@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--editable", "--exclude-editable", "--include-editable",
         "--local", "--not-required", "--outdated", "--pre",
         "--uptodate", "--user",
     ]),
     standalone_short: b"eilo",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--exclude", "--format", "--index-url", "--path",
     ]),
     valued_short: b"",
@@ -19,9 +19,9 @@ static PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--files", "--verbose"]),
+    standalone: WordSet::flags(&["--files", "--verbose"]),
     standalone_short: b"fv",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -29,11 +29,11 @@ static PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static PIP_FREEZE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--exclude-editable", "--local", "--user",
     ]),
     standalone_short: b"l",
-    valued: WordSet::new(&["--exclude", "--path"]),
+    valued: WordSet::flags(&["--exclude", "--path"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -41,9 +41,9 @@ static PIP_FREEZE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static PIP_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

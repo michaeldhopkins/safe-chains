@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static NL_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--no-renumber",
         "-p",
     ]),
     standalone_short: b"p",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--body-numbering", "--footer-numbering", "--header-numbering",
         "--join-blank-lines", "--line-increment", "--number-format",
         "--number-separator", "--number-width", "--section-delimiter",

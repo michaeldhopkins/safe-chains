@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static EZA_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--accessed", "--all", "--binary", "--blocks", "--blocksize",
         "--bytes", "--changed", "--classify", "--color-scale", "--color-scale-mode",
         "--context", "--created", "--dereference", "--extended", "--flags",
@@ -21,7 +21,7 @@ static EZA_POLICY: FlagPolicy = FlagPolicy {
         "-r", "-s", "-u", "-x",
     ]),
     standalone_short: b"1@ABDFGHIMRSTUZabdfghilmrsux",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--color", "--colour", "--git-ignore-glob", "--grid-columns",
         "--group-directories-first-dirs", "--ignore-glob", "--level",
         "--smart-group", "--sort", "--time", "--time-style",

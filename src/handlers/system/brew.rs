@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BREW_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--cask", "--formula", "--full-name", "--multiple",
         "--pinned", "--versions",
     ]),
     standalone_short: b"1lrt",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -16,11 +16,11 @@ static BREW_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BREW_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--analytics", "--cask", "--formula", "--installed", "--json",
     ]),
     standalone_short: b"v",
-    valued: WordSet::new(&["--days"]),
+    valued: WordSet::flags(&["--days"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -28,13 +28,13 @@ static BREW_INFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BREW_SEARCH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--cask", "--closed", "--debian", "--desc", "--fedora",
         "--fink", "--formula", "--macports", "--open",
         "--opensuse", "--pull-request", "--repology", "--ubuntu",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -42,14 +42,14 @@ static BREW_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BREW_DEPS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--1", "--annotate", "--cask", "--direct", "--for-each",
         "--formula", "--full-name", "--graph", "--include-build",
         "--include-optional", "--include-test", "--installed", "--missing",
         "--skip-recommended", "--tree", "--union",
     ]),
     standalone_short: b"n",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -57,13 +57,13 @@ static BREW_DEPS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BREW_USES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--cask", "--formula", "--include-build", "--include-optional",
         "--include-test", "--installed", "--missing",
         "--recursive", "--skip-recommended",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -71,12 +71,12 @@ static BREW_USES_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BREW_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--cask", "--fetch-HEAD", "--formula", "--greedy",
         "--greedy-auto-updates", "--greedy-latest", "--json",
     ]),
     standalone_short: b"dqv",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -84,12 +84,12 @@ static BREW_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BREW_DESC_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--cask", "--description", "--eval-all", "--formula",
         "--name", "--search",
     ]),
     standalone_short: b"dns",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -97,11 +97,11 @@ static BREW_DESC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BREW_LOG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--cask", "--formula", "--oneline",
     ]),
     standalone_short: b"1",
-    valued: WordSet::new(&["--max-count"]),
+    valued: WordSet::flags(&["--max-count"]),
     valued_short: b"n",
     bare: false,
     max_positional: None,
@@ -109,9 +109,9 @@ static BREW_LOG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BREW_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"qv",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static HTOP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--no-color", "--no-mouse", "--no-unicode", "--tree",
         "-C", "-H", "-M", "-t",
     ]),
     standalone_short: b"CHMt",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--delay", "--filter", "--highlight-changes",
         "--pid", "--sort-key", "--user",
         "-F", "-d", "-p", "-s", "-u",

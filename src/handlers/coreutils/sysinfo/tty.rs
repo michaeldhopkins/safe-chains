@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static TTY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--quiet", "--silent", "-s"]),
+    standalone: WordSet::flags(&["--quiet", "--silent", "-s"]),
     standalone_short: b"s",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: Some(0),

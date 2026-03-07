@@ -3,9 +3,9 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BUN_TEST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--bail", "--only", "--rerun-each", "--todo"]),
+    standalone: WordSet::flags(&["--bail", "--only", "--rerun-each", "--todo"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--preload", "--timeout"]),
+    valued: WordSet::flags(&["--preload", "--timeout"]),
     valued_short: b"t",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static BUN_TEST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUN_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -23,9 +23,9 @@ static BUN_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUN_PM_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

@@ -2,9 +2,9 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static PMSET_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

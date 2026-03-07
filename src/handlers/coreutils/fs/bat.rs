@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BAT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--diff", "--list-languages", "--list-themes", "--no-config",
         "--number", "--plain", "--show-all",
         "-A", "-P", "-d", "-n", "-p", "-u",
     ]),
     standalone_short: b"APdnpu",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--color", "--decorations", "--diff-context", "--file-name",
         "--highlight-line", "--italic-text", "--language", "--line-range",
         "--map-syntax", "--paging", "--style", "--tabs",

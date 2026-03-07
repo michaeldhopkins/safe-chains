@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static COMPOSER_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--available", "--direct", "--installed", "--latest",
         "--locked", "--minor-only", "--name-only", "--no-dev", "--outdated",
         "--path", "--platform", "--self", "--strict", "--tree", "--versions",
     ]),
     standalone_short: b"aDHilNosPt",
-    valued: WordSet::new(&["--format", "--ignore"]),
+    valued: WordSet::flags(&["--format", "--ignore"]),
     valued_short: b"f",
     bare: true,
     max_positional: None,
@@ -17,12 +17,12 @@ static COMPOSER_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static COMPOSER_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--direct", "--locked", "--minor-only",
         "--no-dev", "--strict",
     ]),
     standalone_short: b"aDm",
-    valued: WordSet::new(&["--format", "--ignore"]),
+    valued: WordSet::flags(&["--format", "--ignore"]),
     valued_short: b"f",
     bare: true,
     max_positional: None,
@@ -30,11 +30,11 @@ static COMPOSER_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static COMPOSER_AUDIT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--abandoned", "--locked", "--no-dev",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&["--format"]),
+    valued: WordSet::flags(&["--format"]),
     valued_short: b"f",
     bare: true,
     max_positional: None,
@@ -42,9 +42,9 @@ static COMPOSER_AUDIT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static COMPOSER_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PWD_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-L", "-P"]),
+    standalone: WordSet::flags(&["-L", "-P"]),
     standalone_short: b"LP",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: Some(0),

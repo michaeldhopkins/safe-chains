@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PASTE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--serial", "--zero-terminated",
         "-s", "-z",
     ]),
     standalone_short: b"sz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--delimiters",
         "-d",
     ]),

@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PLUTIL_LINT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-s"]),
+    standalone: WordSet::flags(&["-s"]),
     standalone_short: b"s",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -13,9 +13,9 @@ static PLUTIL_LINT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static PLUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,

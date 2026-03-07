@@ -2,11 +2,11 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static SWIFTFORMAT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--dryrun", "--lenient", "--lint", "--quiet", "--strict", "--verbose",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&["--config", "--disable", "--enable", "--rules"]),
+    valued: WordSet::flags(&["--config", "--disable", "--enable", "--rules"]),
     valued_short: b"",
     bare: false,
     max_positional: None,

@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static LS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--almost-all", "--author", "--classify",
         "--context", "--dereference", "--dereference-command-line",
         "--dereference-command-line-symlink-to-dir", "--directory",
@@ -20,7 +20,7 @@ static LS_POLICY: FlagPolicy = FlagPolicy {
         "-t", "-u", "-v", "-x",
     ]),
     standalone_short: b"1ABCFGHLNQRSUXZacdfghiklmnopqrstuvx",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--block-size", "--color", "--format", "--hide",
         "--hyperlink", "--ignore",
         "--quoting-style", "--sort", "--tabsize", "--time",

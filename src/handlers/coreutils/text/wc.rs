@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static WC_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--bytes", "--chars", "--lines", "--max-line-length", "--words",
         "--zero-terminated",
         "-L", "-c", "-l", "-m", "-w",
     ]),
     standalone_short: b"Lclmw",
-    valued: WordSet::new(&["--files0-from"]),
+    valued: WordSet::flags(&["--files0-from"]),
     valued_short: b"",
     bare: true,
     max_positional: None,

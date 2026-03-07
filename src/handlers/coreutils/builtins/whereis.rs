@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static WHEREIS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-b", "-l", "-m", "-s", "-u"]),
+    standalone: WordSet::flags(&["-b", "-l", "-m", "-s", "-u"]),
     standalone_short: b"blmsu",
-    valued: WordSet::new(&["-B", "-M", "-S", "-f"]),
+    valued: WordSet::flags(&["-B", "-M", "-S", "-f"]),
     valued_short: b"BMSf",
     bare: false,
     max_positional: None,

@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static XMLLINT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--auto", "--catalogs", "--compress", "--copy",
         "--debug", "--debugent", "--dropdtd", "--format",
         "--html", "--htmlout", "--huge", "--load-trace",
@@ -17,7 +17,7 @@ static XMLLINT_POLICY: FlagPolicy = FlagPolicy {
         "--walker", "--xinclude", "--xmlout",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--dtdvalid", "--dtdvalidfpi", "--encode",
         "--maxmem", "--path", "--pattern",
         "--pretty", "--relaxng", "--schema",

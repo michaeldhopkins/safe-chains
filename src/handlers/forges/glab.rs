@@ -17,11 +17,11 @@ static GLAB_AUTH_SAFE: WordSet =
     WordSet::new(&["status"]);
 
 static GLAB_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--closed", "--draft", "--merged",
     ]),
     standalone_short: b"AacdgMq",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--assignee", "--author", "--group", "--label",
         "--milestone", "--not-label", "--order", "--output",
         "--page", "--per-page", "--repo", "--reviewer",
@@ -35,12 +35,12 @@ static GLAB_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--comments", "--resolved", "--system-logs",
         "--unresolved", "--web",
     ]),
     standalone_short: b"cpsw",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--output", "--page", "--per-page", "--repo",
     ]),
     valued_short: b"FPpR",
@@ -50,11 +50,11 @@ static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--raw",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--color", "--repo",
     ]),
     valued_short: b"R",
@@ -64,9 +64,9 @@ static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GLAB_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"q",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--output", "--page", "--per-page", "--repo",
     ]),
     valued_short: b"FPpR",

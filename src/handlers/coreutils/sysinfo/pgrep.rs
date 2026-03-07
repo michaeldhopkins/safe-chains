@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PGREP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--count", "--delimiter", "--full", "--inverse",
         "--lightweight", "--list-full", "--list-name",
         "--newest", "--oldest",
@@ -11,7 +11,7 @@ static PGREP_POLICY: FlagPolicy = FlagPolicy {
         "-o", "-v", "-w", "-x",
     ]),
     standalone_short: b"Lacfilnovwx",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--euid", "--group", "--parent", "--pgroup", "--pidfile",
         "--session", "--terminal", "--uid", "-F", "-G",
         "-P", "-U", "-d", "-g", "-s",

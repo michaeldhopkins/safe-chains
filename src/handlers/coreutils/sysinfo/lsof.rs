@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static LSOF_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-C", "-G", "-M", "-N", "-O", "-P", "-R",
         "-U", "-V", "-X", "-b", "-h",
         "-l", "-n", "-t", "-w", "-x",
     ]),
     standalone_short: b"CGMNOPRUVXbhlntwx",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "-F", "-S", "-T", "-a", "-c", "-d", "-g",
         "-i", "-k", "-o", "-p", "-r", "-s", "-u",
     ]),

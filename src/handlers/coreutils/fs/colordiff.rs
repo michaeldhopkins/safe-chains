@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static COLORDIFF_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--brief", "--ed", "--expand-tabs", "--initial-tab",
         "--left-column", "--minimal", "--normal",
         "--paginate", "--rcs", "--report-identical-files",
@@ -15,7 +15,7 @@ static COLORDIFF_POLICY: FlagPolicy = FlagPolicy {
         "-p", "-q", "-r", "-s", "-t", "-u", "-v", "-w", "-y",
     ]),
     standalone_short: b"BENPTZabcdefilnpqrstuvwy",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--changed-group-format", "--color", "--context",
         "--from-file", "--horizon-lines", "--ifdef",
         "--ignore-matching-lines", "--label", "--line-format",

@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static VM_STAT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["-c"]),
+    valued: WordSet::flags(&["-c"]),
     valued_short: b"c",
     bare: true,
     max_positional: Some(1),

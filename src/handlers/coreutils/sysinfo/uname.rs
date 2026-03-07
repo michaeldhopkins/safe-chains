@@ -3,14 +3,14 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static UNAME_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--kernel-name", "--kernel-release",
         "--kernel-version", "--machine", "--nodename",
         "--operating-system", "--processor",
         "-a", "-m", "-n", "-o", "-p", "-r", "-s", "-v",
     ]),
     standalone_short: b"amnoprsv",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: Some(0),

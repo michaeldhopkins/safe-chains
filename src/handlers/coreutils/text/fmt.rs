@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static FMT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--crown-margin", "--split-only", "--tagged-paragraph",
         "--uniform-spacing",
         "-c", "-m", "-n", "-s", "-u",
     ]),
     standalone_short: b"cmnsu",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--goal", "--prefix", "--width",
         "-d", "-g", "-l", "-p", "-t", "-w",
     ]),

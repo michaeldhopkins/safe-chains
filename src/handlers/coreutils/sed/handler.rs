@@ -70,13 +70,13 @@ fn sed_has_exec_modifier(tokens: &[Token]) -> bool {
 }
 
 static SED_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--debug", "--posix", "--quiet", "--sandbox",
         "--silent", "--unbuffered",
         "-E", "-n", "-r", "-u", "-z",
     ]),
     standalone_short: b"Enruz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--expression", "--file", "--line-length",
         "-e", "-f", "-l",
     ]),

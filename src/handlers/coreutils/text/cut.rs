@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static CUT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--complement", "--only-delimited", "--zero-terminated",
         "-n", "-s", "-w", "-z",
     ]),
     standalone_short: b"nswz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--bytes", "--characters", "--delimiter", "--fields",
         "--output-delimiter",
         "-b", "-c", "-d", "-f",

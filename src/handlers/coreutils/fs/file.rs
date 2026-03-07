@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static FILE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--brief", "--debug", "--dereference", "--extension",
         "--keep-going", "--list", "--mime", "--mime-encoding",
         "--mime-type", "--no-buffer", "--no-dereference",
@@ -15,7 +15,7 @@ static FILE_POLICY: FlagPolicy = FlagPolicy {
         "-n", "-p", "-r", "-s", "-z",
     ]),
     standalone_short: b"0DILNSZbdhiklnprsz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--exclude", "--exclude-quiet", "--files-from",
         "--magic-file", "--parameter", "--separator",
         "-F", "-P", "-e", "-f", "-m",

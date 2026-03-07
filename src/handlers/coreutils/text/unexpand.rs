@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static UNEXPAND_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--first-only",
         "-a",
     ]),
     standalone_short: b"a",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--tabs",
         "-t",
     ]),

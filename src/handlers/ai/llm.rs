@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static LLM_MODELS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--options"]),
+    standalone: WordSet::flags(&["--json", "--options"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static LLM_MODELS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static LLM_PLUGINS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--all", "--json"]),
+    standalone: WordSet::flags(&["--all", "--json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -23,11 +23,11 @@ static LLM_PLUGINS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static LLM_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--conversation", "--json", "--no-truncate", "--response", "--truncate",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--cid", "--count", "--id", "--model", "--search",
     ]),
     valued_short: b"cnm",
@@ -37,9 +37,9 @@ static LLM_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static LLM_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

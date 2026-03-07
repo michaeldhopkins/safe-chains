@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SYSTEM_PROFILER_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--json", "--xml", "-json", "-listDataTypes",
         "-nospinner", "-xml",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&["-detailLevel", "-timeout"]),
+    valued: WordSet::flags(&["-detailLevel", "-timeout"]),
     valued_short: b"",
     bare: true,
     max_positional: None,

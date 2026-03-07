@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SUM_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--sysv", "-r", "-s"]),
+    standalone: WordSet::flags(&["--sysv", "-r", "-s"]),
     standalone_short: b"rs",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

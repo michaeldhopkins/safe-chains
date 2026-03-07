@@ -3,14 +3,14 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static YQ_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--colors", "--exit-status",
         "--no-colors", "--no-doc", "--null-input",
         "--prettyPrint",
         "-C", "-M", "-N", "-P", "-e", "-r",
     ]),
     standalone_short: b"CMNPer",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--arg", "--argjson", "--expression",
         "--front-matter", "--indent", "--input-format",
         "--output-format",

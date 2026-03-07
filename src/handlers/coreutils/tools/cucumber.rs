@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--backtrace", "--color", "--dry-run", "--expand",
         "--guess", "--i18n-keywords", "--i18n-languages",
         "--init", "--no-color", "--no-diff", "--no-multiline",
@@ -14,7 +14,7 @@ static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
         "-b", "-d", "-e", "-q",
     ]),
     standalone_short: b"bdeq",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--ci-environment", "--format", "--format-options",
         "--language", "--lines", "--name", "--order",
         "--out", "--profile", "--require",

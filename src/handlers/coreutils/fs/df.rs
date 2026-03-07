@@ -3,14 +3,14 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DF_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--human-readable", "--inodes", "--local",
         "--no-sync", "--portability", "--print-type",
         "--si", "--sync", "--total",
         "-H", "-P", "-T", "-a", "-h", "-i", "-k", "-l",
     ]),
     standalone_short: b"HPTahikl",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--block-size", "--exclude-type", "--output", "--type",
         "-B", "-t", "-x",
     ]),

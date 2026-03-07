@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DELTA_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--blame-code-style", "--blame-palette",
         "--color-only", "--dark", "--diff-highlight",
         "--diff-so-fancy", "--hyperlinks", "--keep-plus-minus-markers",
@@ -14,7 +14,7 @@ static DELTA_POLICY: FlagPolicy = FlagPolicy {
         "-n", "-s",
     ]),
     standalone_short: b"ns",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--commit-decoration-style", "--commit-style", "--config",
         "--diff-stat-align-width", "--features", "--file-added-label",
         "--file-decoration-style", "--file-modified-label",

@@ -3,9 +3,9 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BUNDLE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--name-only", "--paths"]),
+    standalone: WordSet::flags(&["--name-only", "--paths"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static BUNDLE_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUNDLE_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--path"]),
+    standalone: WordSet::flags(&["--path"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -23,9 +23,9 @@ static BUNDLE_INFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUNDLE_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--paths"]),
+    standalone: WordSet::flags(&["--paths"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -33,9 +33,9 @@ static BUNDLE_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUNDLE_CHECK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--dry-run"]),
+    standalone: WordSet::flags(&["--dry-run"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--gemfile", "--path"]),
+    valued: WordSet::flags(&["--gemfile", "--path"]),
     valued_short: b"",
     bare: true,
     max_positional: None,

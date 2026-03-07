@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static STRINGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--include-all-whitespace", "--print-file-name",
         "-a", "-f", "-w",
     ]),
     standalone_short: b"afw",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--bytes", "--encoding", "--output-separator",
         "--radix", "--target",
         "-T", "-e", "-n", "-o", "-s", "-t",

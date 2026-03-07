@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static CKSUM_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--base64", "--check", "--raw", "--strict",
         "--tag", "--untagged", "--warn", "--zero",
         "-c", "-w", "-z",
     ]),
     standalone_short: b"cwz",
-    valued: WordSet::new(&["--algorithm", "--length", "-a", "-l"]),
+    valued: WordSet::flags(&["--algorithm", "--length", "-a", "-l"]),
     valued_short: b"al",
     bare: true,
     max_positional: None,

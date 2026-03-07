@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DUST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--bars-on-right", "--files0-from", "--ignore-all-in-file", "--invert-filter", "--no-colors",
         "--no-percent-bars", "--only-dir", "--only-file", "--skip-total", "-D",
         "-F", "-H", "-P", "-R", "-S",
@@ -11,7 +11,7 @@ static DUST_POLICY: FlagPolicy = FlagPolicy {
         "-r", "-s",
     ]),
     standalone_short: b"DFHPbcfiprRsS",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--depth", "--exclude", "--filter", "--terminal_width",
         "-M", "-X", "-d", "-e", "-n", "-t", "-v", "-w", "-z",
     ]),

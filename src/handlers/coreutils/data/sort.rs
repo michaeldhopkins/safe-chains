@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SORT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--check", "--debug", "--dictionary-order",
         "--general-numeric-sort", "--human-numeric-sort",
         "--ignore-case", "--ignore-leading-blanks",
@@ -16,7 +16,7 @@ static SORT_POLICY: FlagPolicy = FlagPolicy {
         "-s", "-u", "-z",
     ]),
     standalone_short: b"CMRVbcdfghimnrsuz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--batch-size", "--buffer-size", "--field-separator",
         "--files0-from", "--key", "--parallel",
         "--random-source", "--sort", "--temporary-directory",

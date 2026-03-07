@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static UNIQ_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--count", "--ignore-case", "--repeated", "--unique",
         "--zero-terminated",
         "-D", "-c", "-d", "-i", "-u", "-z",
     ]),
     standalone_short: b"Dcdiuz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--all-repeated", "--check-chars", "--group", "--skip-chars",
         "--skip-fields",
         "-f", "-s", "-w",

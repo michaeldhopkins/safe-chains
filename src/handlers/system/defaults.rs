@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DEFAULTS_READ_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-g", "-globalDomain"]),
+    standalone: WordSet::flags(&["-g", "-globalDomain"]),
     standalone_short: b"",
-    valued: WordSet::new(&["-app"]),
+    valued: WordSet::flags(&["-app"]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -13,9 +13,9 @@ static DEFAULTS_READ_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DEFAULTS_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

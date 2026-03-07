@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static ECHO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-E", "-e", "-n"]),
+    standalone: WordSet::flags(&["-E", "-e", "-n"]),
     standalone_short: b"Een",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

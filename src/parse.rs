@@ -32,6 +32,20 @@ impl WordSet {
         Self(words)
     }
 
+    pub const fn flags(words: &'static [&'static str]) -> Self {
+        let mut i = 0;
+        while i < words.len() {
+            let b = words[i].as_bytes();
+            assert!(b.len() >= 2, "WordSet::flags: flag too short (need at least 2 chars)");
+            assert!(b[0] == b'-', "WordSet::flags: flag must start with '-'");
+            if b[1] == b'-' {
+                assert!(b.len() >= 3, "WordSet::flags: long flag needs at least 3 chars (e.g. --x)");
+            }
+            i += 1;
+        }
+        Self::new(words)
+    }
+
     pub fn contains(&self, s: &str) -> bool {
         self.0.binary_search(&s).is_ok()
     }

@@ -3,9 +3,9 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static MISE_RESHIM_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--force"]),
+    standalone: WordSet::flags(&["--force"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static MISE_RESHIM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"qv",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -23,12 +23,12 @@ static MISE_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--current", "--installed", "--json", "--missing",
         "--no-header", "--prefix",
     ]),
     standalone_short: b"ciJm",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -36,9 +36,9 @@ static MISE_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_ENV_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"J",
-    valued: WordSet::new(&["--shell"]),
+    valued: WordSet::flags(&["--shell"]),
     valued_short: b"s",
     bare: true,
     max_positional: None,

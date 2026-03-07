@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static XCODEBUILD_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-json"]),
+    standalone: WordSet::flags(&["-json"]),
     standalone_short: b"",
-    valued: WordSet::new(&["-project", "-workspace"]),
+    valued: WordSet::flags(&["-project", "-workspace"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static XCODEBUILD_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static XCODEBUILD_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-json"]),
+    standalone: WordSet::flags(&["-json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "-configuration", "-destination", "-project",
         "-scheme", "-sdk", "-target", "-workspace",
     ]),
@@ -26,9 +26,9 @@ static XCODEBUILD_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static XCODEBUILD_VERSION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

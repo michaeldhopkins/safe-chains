@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BASENAME_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--multiple", "--zero", "-a", "-z"]),
+    standalone: WordSet::flags(&["--multiple", "--zero", "-a", "-z"]),
     standalone_short: b"az",
-    valued: WordSet::new(&["--suffix", "-s"]),
+    valued: WordSet::flags(&["--suffix", "-s"]),
     valued_short: b"s",
     bare: false,
     max_positional: None,

@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static JQ_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--ascii-output", "--color-output", "--compact-output", "--exit-status", "--join-output",
         "--monochrome-output", "--null-input", "--raw-input", "--raw-output", "--raw-output0",
         "--seq", "--slurp", "--sort-keys", "--tab", "-C",
@@ -11,7 +11,7 @@ static JQ_POLICY: FlagPolicy = FlagPolicy {
         "-j", "-n", "-r", "-s",
     ]),
     standalone_short: b"CMRScegjnrs",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--arg", "--argjson", "--args", "--from-file",
         "--indent", "--jsonargs", "--rawfile",
         "--slurpfile", "-f",

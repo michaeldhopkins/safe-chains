@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static NPROC_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--all"]),
+    standalone: WordSet::flags(&["--all"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--ignore"]),
+    valued: WordSet::flags(&["--ignore"]),
     valued_short: b"",
     bare: true,
     max_positional: Some(0),

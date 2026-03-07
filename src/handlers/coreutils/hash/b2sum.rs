@@ -3,14 +3,14 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static B2SUM_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--binary", "--check", "--ignore-missing", "--quiet",
         "--status", "--strict", "--tag", "--text", "--warn",
         "--zero",
         "-b", "-c", "-t", "-w", "-z",
     ]),
     standalone_short: b"bctwz",
-    valued: WordSet::new(&["--length", "-l"]),
+    valued: WordSet::flags(&["--length", "-l"]),
     valued_short: b"l",
     bare: true,
     max_positional: None,

@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static TERRAFORM_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--no-color"]),
+    standalone: WordSet::flags(&["--json", "--no-color"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static TERRAFORM_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_STATE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--id", "--state"]),
+    valued: WordSet::flags(&["--id", "--state"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -23,9 +23,9 @@ static TERRAFORM_STATE_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_STATE_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--state"]),
+    valued: WordSet::flags(&["--state"]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -33,9 +33,9 @@ static TERRAFORM_STATE_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_OUTPUT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--no-color", "--raw"]),
+    standalone: WordSet::flags(&["--json", "--no-color", "--raw"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--state"]),
+    valued: WordSet::flags(&["--state"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -43,9 +43,9 @@ static TERRAFORM_OUTPUT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_VALIDATE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--no-color"]),
+    standalone: WordSet::flags(&["--json", "--no-color"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -53,9 +53,9 @@ static TERRAFORM_VALIDATE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_GRAPH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--draw-cycles"]),
+    standalone: WordSet::flags(&["--draw-cycles"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--plan", "--type"]),
+    valued: WordSet::flags(&["--plan", "--type"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -63,9 +63,9 @@ static TERRAFORM_GRAPH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -73,9 +73,9 @@ static TERRAFORM_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_VERSION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -83,9 +83,9 @@ static TERRAFORM_VERSION_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_FMT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--check", "--diff", "--no-color", "--recursive"]),
+    standalone: WordSet::flags(&["--check", "--diff", "--no-color", "--recursive"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

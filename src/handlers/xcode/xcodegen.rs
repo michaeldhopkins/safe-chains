@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static XCODEGEN_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static XCODEGEN_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static XCODEGEN_DUMP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--no-env", "--quiet"]),
+    standalone: WordSet::flags(&["--no-env", "--quiet"]),
     standalone_short: b"nq",
-    valued: WordSet::new(&["--project-root", "--spec", "--type"]),
+    valued: WordSet::flags(&["--project-root", "--spec", "--type"]),
     valued_short: b"rst",
     bare: true,
     max_positional: None,

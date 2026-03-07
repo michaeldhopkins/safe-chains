@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DCLI_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static DCLI_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_DEVICES_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -23,9 +23,9 @@ static DCLI_DEVICES_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_TEAM_MEMBERS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--csv", "--human-readable"]),
+    standalone: WordSet::flags(&["--csv", "--human-readable"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -33,9 +33,9 @@ static DCLI_TEAM_MEMBERS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_TEAM_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--csv", "--human-readable"]),
+    standalone: WordSet::flags(&["--csv", "--human-readable"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--end", "--start"]),
+    valued: WordSet::flags(&["--end", "--start"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -43,9 +43,9 @@ static DCLI_TEAM_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_TEAM_REPORT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -53,9 +53,9 @@ static DCLI_TEAM_REPORT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_TEAM_DWI_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--count", "--offset", "--order-by"]),
+    valued: WordSet::flags(&["--count", "--offset", "--order-by"]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -63,9 +63,9 @@ static DCLI_TEAM_DWI_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_JSON_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

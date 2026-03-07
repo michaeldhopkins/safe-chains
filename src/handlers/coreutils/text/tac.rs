@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static TAC_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--before", "--regex",
         "-b", "-r",
     ]),
     standalone_short: b"br",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--separator",
         "-s",
     ]),

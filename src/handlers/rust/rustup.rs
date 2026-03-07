@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static RUSTUP_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--installed"]),
+    standalone: WordSet::flags(&["--installed"]),
     standalone_short: b"v",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static RUSTUP_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static RUSTUP_WHICH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--toolchain"]),
+    valued: WordSet::flags(&["--toolchain"]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -23,14 +23,14 @@ static RUSTUP_WHICH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static RUSTUP_DOC_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--alloc", "--book", "--cargo", "--core", "--edition-guide",
         "--embedded-book", "--nomicon", "--path", "--proc_macro",
         "--reference", "--rust-by-example", "--rustc", "--rustdoc",
         "--std", "--test", "--unstable-book",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&["--toolchain"]),
+    valued: WordSet::flags(&["--toolchain"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -38,9 +38,9 @@ static RUSTUP_DOC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static RUSTUP_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--installed"]),
+    standalone: WordSet::flags(&["--installed"]),
     standalone_short: b"v",
-    valued: WordSet::new(&["--toolchain"]),
+    valued: WordSet::flags(&["--toolchain"]),
     valued_short: b"",
     bare: true,
     max_positional: None,

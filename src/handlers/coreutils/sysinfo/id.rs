@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static ID_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--context", "--group", "--groups", "--name",
         "--real", "--user", "--zero",
         "-G", "-Z", "-g", "-n", "-p", "-r", "-u", "-z",
     ]),
     standalone_short: b"GZgnpruz",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: Some(1),

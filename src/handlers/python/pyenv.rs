@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PYENV_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--bare"]),
+    standalone: WordSet::flags(&["--bare"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

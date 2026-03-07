@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static COLUMN_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--fillrows", "--json", "--keep-empty-lines", "--table",
         "--table-noextreme", "--table-noheadings", "--table-right-all",
         "-J", "-L", "-R", "-e", "-n", "-t", "-x",
     ]),
     standalone_short: b"JLRentx",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--output-separator", "--separator", "--table-columns",
         "--table-empty-lines", "--table-hide", "--table-name",
         "--table-order", "--table-right", "--table-truncate", "--table-wrap",

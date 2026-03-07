@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static READLINK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--canonicalize", "--canonicalize-existing",
         "--canonicalize-missing", "--no-newline", "--verbose", "--zero",
         "-e", "-f", "-m", "-n", "-v", "-z",
     ]),
     standalone_short: b"efmnvz",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,

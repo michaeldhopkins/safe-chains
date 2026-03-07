@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static CLOC_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--3", "--autoconf", "--by-file", "--by-file-by-lang", "--by-percent",
         "--categorized", "--counted", "--diff", "--diff-list-file", "--docstring-as-code",
         "--follow-links", "--force-lang-def", "--found-langs", "--git", "--hide-rate",
@@ -15,7 +15,7 @@ static CLOC_POLICY: FlagPolicy = FlagPolicy {
         "--v", "--vcs", "--xml", "--yaml",
     ]),
     standalone_short: b"v",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--config", "--csv-delimiter", "--diff-alignment",
         "--diff-timeout", "--exclude-content",
         "--exclude-dir", "--exclude-ext",

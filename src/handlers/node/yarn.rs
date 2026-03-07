@@ -2,9 +2,9 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static YARN_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--long", "--production"]),
+    standalone: WordSet::flags(&["--json", "--long", "--production"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--depth", "--pattern"]),
+    valued: WordSet::flags(&["--depth", "--pattern"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -12,9 +12,9 @@ static YARN_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static YARN_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

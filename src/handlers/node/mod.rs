@@ -27,7 +27,7 @@ pub(super) static BUNX_FLAGS_NO_ARG: WordSet =
     WordSet::new(&["--bun", "--no-install", "--silent", "--verbose"]);
 
 pub(super) static TSC_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--allowJs", "--checkJs", "--esModuleInterop",
         "--forceConsistentCasingInFileNames", "--incremental",
         "--isolatedModules", "--noEmit", "--noFallthroughCasesInSwitch",
@@ -36,7 +36,7 @@ pub(super) static TSC_POLICY: FlagPolicy = FlagPolicy {
         "--skipLibCheck", "--strict", "--strictNullChecks",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--baseUrl", "--jsx", "--lib", "--module",
         "--moduleResolution", "--project",
         "--rootDir", "--target",

@@ -3,14 +3,14 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static MAN_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--apropos", "--default", "--local-file",
         "--regex", "--update", "--whatis", "--where", "--where-cat",
         "--wildcard",
         "-a", "-f", "-k", "-l", "-u", "-w",
     ]),
     standalone_short: b"afkluw",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--config-file", "--encoding", "--extension", "--locale",
         "--manpath", "--sections", "--systems",
         "-C", "-E", "-L", "-M", "-S", "-e", "-m",

@@ -2,12 +2,12 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static SPCTL_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--assess", "--verbose",
         "-a", "-v",
     ]),
     standalone_short: b"av",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--context", "--type",
     ]),
     valued_short: b"t",

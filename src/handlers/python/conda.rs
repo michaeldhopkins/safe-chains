@@ -3,12 +3,12 @@ use crate::parse::{Segment, Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static CONDA_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--explicit", "--export", "--full-name", "--json",
         "--no-pip", "--revisions",
     ]),
     standalone_short: b"ef",
-    valued: WordSet::new(&["--name", "--prefix"]),
+    valued: WordSet::flags(&["--name", "--prefix"]),
     valued_short: b"np",
     bare: true,
     max_positional: None,
@@ -16,11 +16,11 @@ static CONDA_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static CONDA_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--envs", "--json", "--verbose",
     ]),
     standalone_short: b"aev",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -28,11 +28,11 @@ static CONDA_INFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static CONDA_CONFIG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--json", "--quiet", "--show", "--show-sources", "--verbose",
     ]),
     standalone_short: b"qv",
-    valued: WordSet::new(&["--env", "--file", "--name", "--prefix"]),
+    valued: WordSet::flags(&["--env", "--file", "--name", "--prefix"]),
     valued_short: b"fnp",
     bare: false,
     max_positional: None,

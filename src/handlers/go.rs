@@ -3,9 +3,9 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static GO_VERSION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-m", "-v"]),
+    standalone: WordSet::flags(&["-m", "-v"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static GO_VERSION_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GO_ENV_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-json"]),
+    standalone: WordSet::flags(&["-json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -23,9 +23,9 @@ static GO_ENV_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GO_DOC_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-all", "-c", "-cmd", "-short", "-src", "-u"]),
+    standalone: WordSet::flags(&["-all", "-c", "-cmd", "-short", "-src", "-u"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -33,14 +33,14 @@ static GO_DOC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GO_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-a", "-asan", "-compiled", "-cover", "-deps", "-e", "-export",
         "-find", "-linkshared", "-m", "-modcacherw", "-msan", "-n",
         "-race", "-retract", "-test", "-trimpath", "-u", "-v",
         "-versions", "-work", "-x",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "-asmflags", "-buildmode", "-buildvcs", "-compiler", "-covermode",
         "-coverpkg", "-f", "-gccgoflags", "-gcflags", "-installsuffix",
         "-json", "-ldflags", "-mod", "-modfile", "-overlay", "-p",
@@ -53,12 +53,12 @@ static GO_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GO_VET_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-a", "-asan", "-cover", "-json", "-linkshared", "-modcacherw",
         "-msan", "-n", "-race", "-trimpath", "-v", "-work", "-x",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "-asmflags", "-buildmode", "-buildvcs", "-c", "-compiler",
         "-covermode", "-coverpkg", "-gccgoflags", "-gcflags",
         "-installsuffix", "-ldflags", "-mod", "-modfile", "-overlay",
@@ -71,12 +71,12 @@ static GO_VET_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GO_BUILD_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-a", "-asan", "-cover", "-linkshared", "-modcacherw",
         "-msan", "-n", "-race", "-trimpath", "-v", "-work", "-x",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "-asmflags", "-buildmode", "-buildvcs", "-compiler", "-covermode",
         "-coverpkg", "-gccgoflags", "-gcflags", "-installsuffix",
         "-ldflags", "-mod", "-modfile", "-o", "-overlay", "-p",
@@ -89,13 +89,13 @@ static GO_BUILD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GO_TEST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-a", "-asan", "-benchmem", "-cover", "-failfast", "-json",
         "-linkshared", "-modcacherw", "-msan", "-n", "-race",
         "-short", "-trimpath", "-v", "-work", "-x",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "-asmflags", "-bench", "-benchtime", "-blockprofile",
         "-blockprofilerate", "-buildmode", "-buildvcs", "-compiler",
         "-count", "-covermode", "-coverpkg", "-coverprofile",

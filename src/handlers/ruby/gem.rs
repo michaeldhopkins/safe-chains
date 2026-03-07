@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static GEM_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--installed", "--local", "--no-details",
         "--no-versions", "--prerelease", "--remote", "--versions",
     ]),
     standalone_short: b"adilr",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -16,9 +16,9 @@ static GEM_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GEM_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--installed", "--prerelease"]),
+    standalone: WordSet::flags(&["--installed", "--prerelease"]),
     standalone_short: b"i",
-    valued: WordSet::new(&["--version"]),
+    valued: WordSet::flags(&["--version"]),
     valued_short: b"v",
     bare: true,
     max_positional: None,
@@ -26,12 +26,12 @@ static GEM_INFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GEM_SEARCH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--details", "--exact", "--local",
         "--prerelease", "--remote", "--versions",
     ]),
     standalone_short: b"adeilr",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -39,11 +39,11 @@ static GEM_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GEM_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--local", "--prerelease", "--remote", "--versions",
     ]),
     standalone_short: b"ailr",
-    valued: WordSet::new(&["--version"]),
+    valued: WordSet::flags(&["--version"]),
     valued_short: b"v",
     bare: true,
     max_positional: None,

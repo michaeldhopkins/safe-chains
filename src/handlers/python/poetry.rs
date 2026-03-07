@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static POETRY_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--latest", "--no-dev", "--outdated",
         "--top-level", "--tree",
     ]),
     standalone_short: b"loT",
-    valued: WordSet::new(&["--why"]),
+    valued: WordSet::flags(&["--why"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -16,9 +16,9 @@ static POETRY_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POETRY_CHECK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--lock"]),
+    standalone: WordSet::flags(&["--lock"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -26,9 +26,9 @@ static POETRY_CHECK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POETRY_ENV_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--full-path"]),
+    standalone: WordSet::flags(&["--full-path"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

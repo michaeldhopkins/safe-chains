@@ -3,12 +3,12 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SWIFT_BUILD_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--enable-code-coverage", "--show-bin-path",
         "--skip-update", "--static-swift-stdlib", "--verbose",
     ]),
     standalone_short: b"v",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--arch", "--build-path", "--configuration", "--jobs",
         "--package-path", "--product", "--sanitize", "--swift-sdk",
         "--target", "--triple",
@@ -20,13 +20,13 @@ static SWIFT_BUILD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SWIFT_TEST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--enable-code-coverage", "--list-tests", "--parallel",
         "--show-codecov-path", "--skip-build", "--skip-update",
         "--verbose",
     ]),
     standalone_short: b"lv",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--arch", "--build-path", "--configuration", "--filter",
         "--jobs", "--num-workers", "--package-path", "--sanitize",
         "--skip-tests", "--swift-sdk", "--target", "--triple",
@@ -39,9 +39,9 @@ static SWIFT_TEST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SWIFT_PACKAGE_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--package-path", "--type"]),
+    valued: WordSet::flags(&["--package-path", "--type"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -49,9 +49,9 @@ static SWIFT_PACKAGE_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SWIFT_PACKAGE_DUMP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--package-path"]),
+    valued: WordSet::flags(&["--package-path"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -59,9 +59,9 @@ static SWIFT_PACKAGE_DUMP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SWIFT_PACKAGE_SHOW_DEPS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--format", "--package-path"]),
+    valued: WordSet::flags(&["--format", "--package-path"]),
     valued_short: b"",
     bare: true,
     max_positional: None,

@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static XXD_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--autoskip", "--bits", "--capitalize", "--decimal",
         "--ebcdic", "--include", "--little-endian", "--plain",
         "--postscript", "--revert", "--uppercase",
@@ -11,7 +11,7 @@ static XXD_POLICY: FlagPolicy = FlagPolicy {
         "-r", "-u",
     ]),
     standalone_short: b"CEabdeipru",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--color", "--cols", "--groupsize", "--len",
         "--name", "--offset", "--seek",
         "-R", "-c", "-g", "-l", "-n", "-o", "-s",

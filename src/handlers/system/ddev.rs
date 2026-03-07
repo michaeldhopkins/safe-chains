@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DDEV_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json-output"]),
+    standalone: WordSet::flags(&["--json-output"]),
     standalone_short: b"j",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static DDEV_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DDEV_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json-output"]),
+    standalone: WordSet::flags(&["--json-output"]),
     standalone_short: b"j",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -23,9 +23,9 @@ static DDEV_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DDEV_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--follow", "--time", "--timestamps"]),
+    standalone: WordSet::flags(&["--follow", "--time", "--timestamps"]),
     standalone_short: b"f",
-    valued: WordSet::new(&["--service", "--tail"]),
+    valued: WordSet::flags(&["--service", "--tail"]),
     valued_short: b"st",
     bare: true,
     max_positional: None,
@@ -33,9 +33,9 @@ static DDEV_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DDEV_SNAPSHOT_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--all", "--list"]),
+    standalone: WordSet::flags(&["--all", "--list"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -43,9 +43,9 @@ static DDEV_SNAPSHOT_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DDEV_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

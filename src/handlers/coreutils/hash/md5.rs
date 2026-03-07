@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static MD5_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["-n", "-p", "-q", "-r", "-t"]),
+    standalone: WordSet::flags(&["-n", "-p", "-q", "-r", "-t"]),
     standalone_short: b"npqrt",
-    valued: WordSet::new(&["-s"]),
+    valued: WordSet::flags(&["-s"]),
     valued_short: b"s",
     bare: true,
     max_positional: None,

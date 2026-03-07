@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static GRADLE_TASKS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--console", "--info", "--no-rebuild",
         "--quiet", "--stacktrace", "--warning-mode",
     ]),
     standalone_short: b"q",
-    valued: WordSet::new(&["--group"]),
+    valued: WordSet::flags(&["--group"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -16,12 +16,12 @@ static GRADLE_TASKS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GRADLE_DEPS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--console", "--info", "--no-rebuild",
         "--quiet", "--stacktrace", "--warning-mode",
     ]),
     standalone_short: b"q",
-    valued: WordSet::new(&["--configuration"]),
+    valued: WordSet::flags(&["--configuration"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -29,12 +29,12 @@ static GRADLE_DEPS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GRADLE_PROPS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--console", "--info", "--no-rebuild",
         "--quiet", "--stacktrace", "--warning-mode",
     ]),
     standalone_short: b"q",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -42,7 +42,7 @@ static GRADLE_PROPS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GRADLE_BUILD_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--build-cache", "--configure-on-demand", "--console",
         "--continue", "--dry-run", "--info", "--no-build-cache",
         "--no-daemon", "--no-parallel", "--no-rebuild",
@@ -50,7 +50,7 @@ static GRADLE_BUILD_POLICY: FlagPolicy = FlagPolicy {
         "--scan", "--stacktrace", "--warning-mode",
     ]),
     standalone_short: b"q",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--exclude-task", "--max-workers",
     ]),
     valued_short: b"x",

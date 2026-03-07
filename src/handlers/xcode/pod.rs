@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static POD_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static POD_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POD_SEARCH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--simple", "--stats", "--web"]),
+    standalone: WordSet::flags(&["--simple", "--stats", "--web"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -23,9 +23,9 @@ static POD_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POD_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -33,9 +33,9 @@ static POD_INFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POD_SPEC_CAT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--version"]),
+    valued: WordSet::flags(&["--version"]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -43,9 +43,9 @@ static POD_SPEC_CAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POD_SPEC_WHICH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--version"]),
+    valued: WordSet::flags(&["--version"]),
     valued_short: b"",
     bare: false,
     max_positional: None,

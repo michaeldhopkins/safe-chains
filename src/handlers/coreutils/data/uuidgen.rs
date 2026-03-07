@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static UUIDGEN_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--random", "--time", "-r", "-t"]),
+    standalone: WordSet::flags(&["--random", "--time", "-r", "-t"]),
     standalone_short: b"rt",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--md5", "--name", "--namespace", "--sha1", "-N",
         "-m", "-n", "-s",
     ]),

@@ -11,7 +11,7 @@ static PKGUTIL_SAFE: WordSet = WordSet::new(&[
 ]);
 
 static PKGUTIL_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--check-signature", "--export-plist",
         "--file-info", "--file-info-plist",
         "--files", "--group-pkgs", "--groups", "--groups-plist",
@@ -21,7 +21,7 @@ static PKGUTIL_POLICY: FlagPolicy = FlagPolicy {
         "--regexp",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&["--volume"]),
+    valued: WordSet::flags(&["--volume"]),
     valued_short: b"",
     bare: false,
     max_positional: None,

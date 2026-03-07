@@ -3,12 +3,12 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static NPM_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--json", "--link", "--long", "--omit",
         "--parseable", "--production", "--unicode",
     ]),
     standalone_short: b"al",
-    valued: WordSet::new(&["--depth", "--prefix"]),
+    valued: WordSet::flags(&["--depth", "--prefix"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -16,9 +16,9 @@ static NPM_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static NPM_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -26,11 +26,11 @@ static NPM_VIEW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static NPM_AUDIT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--json", "--omit", "--production",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&["--audit-level"]),
+    valued: WordSet::flags(&["--audit-level"]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -38,9 +38,9 @@ static NPM_AUDIT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static NPM_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -48,9 +48,9 @@ static NPM_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static NPM_TEST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -58,9 +58,9 @@ static NPM_TEST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static NPM_CONFIG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--long"]),
+    standalone: WordSet::flags(&["--json", "--long"]),
     standalone_short: b"l",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

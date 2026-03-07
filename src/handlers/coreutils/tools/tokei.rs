@@ -3,14 +3,14 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static TOKEI_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--compact", "--files", "--hidden", "--no-ignore",
         "--no-ignore-dot", "--no-ignore-parent",
         "--no-ignore-vcs", "--verbose",
         "-C", "-V", "-f",
     ]),
     standalone_short: b"CVf",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--columns", "--exclude", "--input",
         "--languages", "--num-format", "--output",
         "--sort", "--type",

@@ -3,12 +3,12 @@ use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-matte", "-moments", "-ping", "-quiet",
         "-regard-warnings", "-unique", "-verbose",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "-alpha", "-colorspace", "-define", "-density",
         "-depth", "-endian", "-format", "-interlace",
         "-limit", "-precision", "-sampling-factor",

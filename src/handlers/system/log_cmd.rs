@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static LOG_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--backtrace", "--debug", "--info", "--loss", "--mach-continuous-time",
         "--no-pager", "--signpost",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--color", "--end", "--last", "--predicate",
         "--process", "--source", "--start", "--style", "--type",
     ]),
@@ -19,12 +19,12 @@ static LOG_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static LOG_STREAM_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--backtrace", "--debug", "--info", "--loss",
         "--mach-continuous-time", "--signpost",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--color", "--level", "--predicate", "--process",
         "--source", "--style", "--timeout", "--type",
     ]),
@@ -35,9 +35,9 @@ static LOG_STREAM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static LOG_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,

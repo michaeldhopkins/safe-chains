@@ -3,11 +3,11 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static MDFIND_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-0", "-count", "-interpret", "-literal", "-live",
     ]),
     standalone_short: b"0",
-    valued: WordSet::new(&["-attr", "-name", "-onlyin", "-s"]),
+    valued: WordSet::flags(&["-attr", "-name", "-onlyin", "-s"]),
     valued_short: b"s",
     bare: false,
     max_positional: None,

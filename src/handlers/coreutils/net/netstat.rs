@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static NETSTAT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--continuous", "--extend", "--groups",
         "--interfaces", "--listening", "--masquerade",
         "--numeric", "--numeric-hosts", "--numeric-ports",
@@ -17,7 +17,7 @@ static NETSTAT_POLICY: FlagPolicy = FlagPolicy {
         "-s", "-t", "-u", "-v", "-w", "-x",
     ]),
     standalone_short: b"ACLMNRSWZabcdefgilmnopqrstuvwx",
-    valued: WordSet::new(&["-I"]),
+    valued: WordSet::flags(&["-I"]),
     valued_short: b"I",
     bare: true,
     max_positional: None,

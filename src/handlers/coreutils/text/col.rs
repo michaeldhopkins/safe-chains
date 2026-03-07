@@ -3,11 +3,11 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static COL_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-b", "-f", "-h", "-p", "-x",
     ]),
     standalone_short: b"bfhpx",
-    valued: WordSet::new(&["-l"]),
+    valued: WordSet::flags(&["-l"]),
     valued_short: b"l",
     bare: true,
     max_positional: None,

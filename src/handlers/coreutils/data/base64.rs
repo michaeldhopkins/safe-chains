@@ -3,12 +3,12 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BASE64_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--decode", "--ignore-garbage",
         "-D", "-d", "-i",
     ]),
     standalone_short: b"Ddi",
-    valued: WordSet::new(&["--wrap", "-b", "-w"]),
+    valued: WordSet::flags(&["--wrap", "-b", "-w"]),
     valued_short: b"bw",
     bare: true,
     max_positional: None,

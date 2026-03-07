@@ -7,7 +7,7 @@ fn awk_has_dangerous_construct(token: &Token) -> bool {
 }
 
 static AWK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--characters-as-bytes", "--copyright", "--gen-pot",
         "--lint", "--no-optimize", "--optimize",
         "--posix", "--re-interval", "--sandbox",
@@ -16,7 +16,7 @@ static AWK_POLICY: FlagPolicy = FlagPolicy {
         "-b", "-c", "-g", "-r", "-s", "-t",
     ]),
     standalone_short: b"CNOPSVbcgrst",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--assign", "--field-separator",
         "-F", "-v",
     ]),

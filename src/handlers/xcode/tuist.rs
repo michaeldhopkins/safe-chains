@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static TUIST_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static TUIST_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_DUMP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--verbose"]),
+    standalone: WordSet::flags(&["--json", "--verbose"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--path"]),
+    valued: WordSet::flags(&["--path"]),
     valued_short: b"p",
     bare: true,
     max_positional: None,
@@ -23,9 +23,9 @@ static TUIST_DUMP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_GRAPH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--verbose"]),
+    standalone: WordSet::flags(&["--json", "--verbose"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--format", "--path"]),
+    valued: WordSet::flags(&["--format", "--path"]),
     valued_short: b"fp",
     bare: true,
     max_positional: None,
@@ -33,9 +33,9 @@ static TUIST_GRAPH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_INSPECT_SUB_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--verbose"]),
+    standalone: WordSet::flags(&["--json", "--verbose"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--path"]),
+    valued: WordSet::flags(&["--path"]),
     valued_short: b"p",
     bare: true,
     max_positional: None,
@@ -43,9 +43,9 @@ static TUIST_INSPECT_SUB_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_HASH_SUB_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--verbose"]),
+    standalone: WordSet::flags(&["--json", "--verbose"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--path"]),
+    valued: WordSet::flags(&["--path"]),
     valued_short: b"p",
     bare: true,
     max_positional: None,
@@ -53,9 +53,9 @@ static TUIST_HASH_SUB_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_SCAFFOLD_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"",
-    valued: WordSet::new(&["--path"]),
+    valued: WordSet::flags(&["--path"]),
     valued_short: b"p",
     bare: true,
     max_positional: None,
@@ -63,9 +63,9 @@ static TUIST_SCAFFOLD_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_MIGRATION_SUB_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--path"]),
+    valued: WordSet::flags(&["--path"]),
     valued_short: b"p",
     bare: true,
     max_positional: None,

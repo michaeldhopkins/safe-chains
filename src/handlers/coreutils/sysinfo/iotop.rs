@@ -3,13 +3,13 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static IOTOP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--accumulated", "--batch", "--kilobytes", "--only",
         "--processes", "--quiet",
         "-P", "-a", "-b", "-k", "-o", "-q", "-t",
     ]),
     standalone_short: b"Pabkoqt",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--delay", "--iter", "--pid", "--user",
         "-d", "-n", "-p", "-u",
     ]),

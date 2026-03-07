@@ -3,9 +3,9 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static HEROKU_APPS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--all", "--json"]),
+    standalone: WordSet::flags(&["--all", "--json"]),
     standalone_short: b"a",
-    valued: WordSet::new(&["--space", "--team"]),
+    valued: WordSet::flags(&["--space", "--team"]),
     valued_short: b"st",
     bare: true,
     max_positional: None,
@@ -13,9 +13,9 @@ static HEROKU_APPS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_APPS_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--shell"]),
+    standalone: WordSet::flags(&["--json", "--shell"]),
     standalone_short: b"s",
-    valued: WordSet::new(&["--app"]),
+    valued: WordSet::flags(&["--app"]),
     valued_short: b"a",
     bare: true,
     max_positional: None,
@@ -23,9 +23,9 @@ static HEROKU_APPS_INFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_CONFIG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json", "--shell"]),
+    standalone: WordSet::flags(&["--json", "--shell"]),
     standalone_short: b"js",
-    valued: WordSet::new(&["--app"]),
+    valued: WordSet::flags(&["--app"]),
     valued_short: b"a",
     bare: true,
     max_positional: None,
@@ -33,9 +33,9 @@ static HEROKU_CONFIG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--force-colors", "--tail"]),
+    standalone: WordSet::flags(&["--force-colors", "--tail"]),
     standalone_short: b"t",
-    valued: WordSet::new(&["--app", "--dyno", "--num", "--source"]),
+    valued: WordSet::flags(&["--app", "--dyno", "--num", "--source"]),
     valued_short: b"adns",
     bare: true,
     max_positional: None,
@@ -43,9 +43,9 @@ static HEROKU_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_PS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"j",
-    valued: WordSet::new(&["--app"]),
+    valued: WordSet::flags(&["--app"]),
     valued_short: b"a",
     bare: true,
     max_positional: None,
@@ -53,9 +53,9 @@ static HEROKU_PS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_RELEASES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"j",
-    valued: WordSet::new(&["--app", "--num"]),
+    valued: WordSet::flags(&["--app", "--num"]),
     valued_short: b"an",
     bare: true,
     max_positional: None,
@@ -63,9 +63,9 @@ static HEROKU_RELEASES_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_REGIONS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -73,9 +73,9 @@ static HEROKU_REGIONS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_STATUS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--json"]),
+    standalone: WordSet::flags(&["--json"]),
     standalone_short: b"",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -83,9 +83,9 @@ static HEROKU_STATUS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_BUILDPACKS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[]),
+    standalone: WordSet::flags(&[]),
     standalone_short: b"",
-    valued: WordSet::new(&["--app"]),
+    valued: WordSet::flags(&["--app"]),
     valued_short: b"a",
     bare: true,
     max_positional: None,
@@ -93,9 +93,9 @@ static HEROKU_BUILDPACKS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_ADDONS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&["--all", "--json"]),
+    standalone: WordSet::flags(&["--all", "--json"]),
     standalone_short: b"A",
-    valued: WordSet::new(&["--app"]),
+    valued: WordSet::flags(&["--app"]),
     valued_short: b"a",
     bare: true,
     max_positional: None,

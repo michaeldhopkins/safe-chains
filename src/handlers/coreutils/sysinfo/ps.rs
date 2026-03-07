@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--cumulative", "--deselect", "--forest", "--headers", "--info",
         "--no-headers", "-A", "-C", "-H", "-L",
         "-M", "-N", "-S", "-T", "-Z",
@@ -12,7 +12,7 @@ static PS_POLICY: FlagPolicy = FlagPolicy {
         "-w", "-x",
     ]),
     standalone_short: b"ACHLMNSTZacdefjlmrvwx",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--cols", "--columns", "--format", "--group", "--pid",
         "--ppid", "--rows", "--sid", "--sort", "--tty", "--user",
         "--width",

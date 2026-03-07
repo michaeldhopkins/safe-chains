@@ -142,12 +142,12 @@ mod tests {
     use super::*;
 
     static TEST_POLICY: FlagPolicy = FlagPolicy {
-        standalone: WordSet::new(&[
+        standalone: WordSet::flags(&[
             "--color", "--count", "--help", "--recursive", "--version",
             "-c", "-r",
         ]),
         standalone_short: b"cHilnorsvw",
-        valued: WordSet::new(&[
+        valued: WordSet::flags(&[
             "--after-context", "--before-context", "--max-count",
             "-A", "-B", "-m",
         ]),
@@ -169,9 +169,9 @@ mod tests {
     #[test]
     fn bare_allowed_when_bare_true() {
         let policy = FlagPolicy {
-            standalone: WordSet::new(&[]),
+            standalone: WordSet::flags(&[]),
             standalone_short: b"",
-            valued: WordSet::new(&[]),
+            valued: WordSet::flags(&[]),
             valued_short: b"",
             bare: true,
             max_positional: None,
@@ -279,9 +279,9 @@ mod tests {
     }
 
     static LIMITED_POLICY: FlagPolicy = FlagPolicy {
-        standalone: WordSet::new(&["--count", "-c", "-d", "-i", "-u"]),
+        standalone: WordSet::flags(&["--count", "-c", "-d", "-i", "-u"]),
         standalone_short: b"cdiu",
-        valued: WordSet::new(&["--skip-fields", "-f", "-s"]),
+        valued: WordSet::flags(&["--skip-fields", "-f", "-s"]),
         valued_short: b"fs",
         bare: true,
         max_positional: Some(1),
@@ -319,9 +319,9 @@ mod tests {
     }
 
     static POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
-        standalone: WordSet::new(&["-E", "-e", "-n"]),
+        standalone: WordSet::flags(&["-E", "-e", "-n"]),
         standalone_short: b"Een",
-        valued: WordSet::new(&[]),
+        valued: WordSet::flags(&[]),
         valued_short: b"",
         bare: true,
         max_positional: None,
@@ -366,9 +366,9 @@ mod tests {
     #[test]
     fn positional_style_with_max_positional() {
         let policy = FlagPolicy {
-            standalone: WordSet::new(&["-n"]),
+            standalone: WordSet::flags(&["-n"]),
             standalone_short: b"n",
-            valued: WordSet::new(&[]),
+            valued: WordSet::flags(&[]),
             valued_short: b"",
             bare: true,
             max_positional: Some(2),

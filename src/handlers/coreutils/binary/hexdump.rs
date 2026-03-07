@@ -3,11 +3,11 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static HEXDUMP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "-C", "-b", "-c", "-d", "-o", "-v", "-x",
     ]),
     standalone_short: b"Cbcdovx",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "-L", "-e", "-f", "-n", "-s",
     ]),
     valued_short: b"Lefns",

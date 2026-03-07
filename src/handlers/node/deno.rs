@@ -3,11 +3,11 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DENO_SAFE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--json", "--no-lock", "--quiet", "--unstable",
     ]),
     standalone_short: b"q",
-    valued: WordSet::new(&["--config", "--import-map"]),
+    valued: WordSet::flags(&["--config", "--import-map"]),
     valued_short: b"c",
     bare: true,
     max_positional: None,
@@ -15,12 +15,12 @@ static DENO_SAFE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DENO_FMT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--check", "--no-semicolons", "--single-quote",
         "--unstable",
     ]),
     standalone_short: b"q",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--config", "--ext", "--ignore", "--indent-width",
         "--line-width", "--log-level", "--prose-wrap",
     ]),

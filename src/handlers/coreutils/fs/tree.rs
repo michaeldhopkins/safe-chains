@@ -3,7 +3,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static TREE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--dirsfirst", "--du", "--fromfile", "--gitignore",
         "--inodes", "--matchdirs", "--noreport",
         "--prune", "--si",
@@ -13,7 +13,7 @@ static TREE_POLICY: FlagPolicy = FlagPolicy {
         "-x",
     ]),
     standalone_short: b"ACDFJNQSXadfghilnpqrstuvx",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--charset", "--filelimit", "--filesfrom",
         "--sort", "--timefmt",
         "-H", "-I", "-L", "-P", "-T",

@@ -3,7 +3,7 @@ use crate::parse::{Segment, Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static GIT_LOG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--abbrev-commit", "--all", "--ancestry-path",
         "--author-date-order", "--bisect", "--boundary",
         "--branches", "--cherry", "--cherry-mark", "--cherry-pick",
@@ -39,7 +39,7 @@ static GIT_LOG_POLICY: FlagPolicy = FlagPolicy {
         "-p", "-q", "-u",
     ]),
     standalone_short: b"0123456789pqu",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--abbrev", "--after", "--author", "--before",
         "--color", "--committer", "--date",
         "--decorate", "--decorate-refs", "--decorate-refs-exclude",
@@ -58,7 +58,7 @@ static GIT_LOG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_DIFF_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--cached", "--check", "--compact-summary", "--cumulative",
         "--dirstat-by-file",
         "--exit-code",
@@ -80,7 +80,7 @@ static GIT_DIFF_POLICY: FlagPolicy = FlagPolicy {
         "-a", "-b", "-p", "-u", "-w", "-z",
     ]),
     standalone_short: b"BCMRabpuwz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--abbrev", "--color", "--diff-algorithm", "--diff-filter",
         "--dirstat", "--dst-prefix",
         "--inter-hunk-context",
@@ -98,7 +98,7 @@ static GIT_DIFF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--abbrev-commit", "--compact-summary", "--cumulative",
         "--expand-tabs", "--full-index",
         "--ignore-all-space", "--ignore-blank-lines",
@@ -116,7 +116,7 @@ static GIT_SHOW_POLICY: FlagPolicy = FlagPolicy {
         "-p", "-q", "-u", "-w",
     ]),
     standalone_short: b"pquw",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--abbrev", "--color",
         "--decorate", "--decorate-refs", "--decorate-refs-exclude",
         "--diff-algorithm", "--diff-filter",
@@ -131,7 +131,7 @@ static GIT_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_STATUS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--ahead-behind", "--branch",
         "--ignore-submodules",
         "--long", "--no-ahead-behind",
@@ -142,7 +142,7 @@ static GIT_STATUS_POLICY: FlagPolicy = FlagPolicy {
         "-b", "-s", "-v", "-z",
     ]),
     standalone_short: b"bsvz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--column", "--find-renames",
         "--ignored",
         "--porcelain",
@@ -156,7 +156,7 @@ static GIT_STATUS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_BLAME_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--color-by-age", "--color-lines",
         "--incremental",
         "--line-porcelain",
@@ -168,7 +168,7 @@ static GIT_BLAME_POLICY: FlagPolicy = FlagPolicy {
         "-b", "-c", "-e", "-f", "-l", "-n", "-p", "-s", "-t", "-w",
     ]),
     standalone_short: b"bcefklnpstw",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--abbrev",
         "--contents",
         "--ignore-rev", "--ignore-revs-file",
@@ -181,7 +181,7 @@ static GIT_BLAME_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_GREP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all-match", "--and",
         "--basic-regexp", "--break",
         "--cached", "--column", "--count",
@@ -205,7 +205,7 @@ static GIT_GREP_POLICY: FlagPolicy = FlagPolicy {
         "-p", "-q", "-r", "-v", "-w", "-z",
     ]),
     standalone_short: b"EFGHILPWachilnopqrvwz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--after-context", "--before-context",
         "--color", "--context",
         "--max-count", "--max-depth",
@@ -220,7 +220,7 @@ static GIT_GREP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_FETCH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--append", "--atomic",
         "--dry-run",
         "--force",
@@ -241,7 +241,7 @@ static GIT_FETCH_POLICY: FlagPolicy = FlagPolicy {
         "-P", "-a", "-f", "-k", "-m", "-n", "-p", "-q", "-t", "-u", "-v",
     ]),
     standalone_short: b"46Pafkmnpqtuv",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--deepen", "--depth",
         "--filter",
         "--jobs", "--negotiation-tip",
@@ -257,12 +257,12 @@ static GIT_FETCH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_SHORTLOG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--committer", "--email", "--numbered", "--summary",
         "-c", "-e", "-n", "-s",
     ]),
     standalone_short: b"cens",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--format", "--group",
     ]),
     valued_short: b"",
@@ -272,7 +272,7 @@ static GIT_SHORTLOG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_LS_FILES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--cached", "--debug", "--deduplicate", "--deleted",
         "--directory", "--empty-directory", "--eol",
         "--error-unmatch", "--exclude-standard",
@@ -288,7 +288,7 @@ static GIT_LS_FILES_POLICY: FlagPolicy = FlagPolicy {
         "-c", "-d", "-f", "-i", "-k", "-m", "-o", "-s", "-t", "-u", "-v", "-z",
     ]),
     standalone_short: b"cdfikmorstuvz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--abbrev",
         "--exclude", "--exclude-from", "--exclude-per-directory",
         "--format",
@@ -302,7 +302,7 @@ static GIT_LS_FILES_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_LS_REMOTE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--branches",
         "--exit-code",
         "--get-url",
@@ -313,7 +313,7 @@ static GIT_LS_REMOTE_POLICY: FlagPolicy = FlagPolicy {
         "-b", "-q", "-t",
     ]),
     standalone_short: b"bqt",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--server-option", "--sort",
         "-o",
     ]),
@@ -324,7 +324,7 @@ static GIT_LS_REMOTE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_LS_TREE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--full-name", "--full-tree",
         "--long",
         "--name-only", "--name-status",
@@ -332,7 +332,7 @@ static GIT_LS_TREE_POLICY: FlagPolicy = FlagPolicy {
         "-d", "-l", "-r", "-t", "-z",
     ]),
     standalone_short: b"dlrtz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--abbrev", "--format",
     ]),
     valued_short: b"",
@@ -342,7 +342,7 @@ static GIT_LS_TREE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_CAT_FILE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--batch-all-objects", "--buffer",
         "--filters", "--follow-symlinks",
         "--mailmap",
@@ -350,7 +350,7 @@ static GIT_CAT_FILE_POLICY: FlagPolicy = FlagPolicy {
         "-Z", "-e", "-p", "-s", "-t",
     ]),
     standalone_short: b"Zepst",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--batch", "--batch-check", "--batch-command",
         "--filter", "--path",
     ]),
@@ -361,7 +361,7 @@ static GIT_CAT_FILE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--always", "--contains",
         "--debug",
         "--exact-match", "--first-parent",
@@ -369,7 +369,7 @@ static GIT_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
         "--tags",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--abbrev", "--broken",
         "--candidates", "--dirty",
         "--exclude", "--match",
@@ -381,14 +381,14 @@ static GIT_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_MERGE_BASE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--fork-point",
         "--independent", "--is-ancestor",
         "--octopus",
         "-a",
     ]),
     standalone_short: b"a",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -396,7 +396,7 @@ static GIT_MERGE_BASE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_FOR_EACH_REF_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--ignore-case", "--include-root-refs",
         "--omit-empty",
         "--perl", "--python",
@@ -405,7 +405,7 @@ static GIT_FOR_EACH_REF_POLICY: FlagPolicy = FlagPolicy {
         "-p", "-s",
     ]),
     standalone_short: b"ps",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--color", "--contains", "--count",
         "--exclude", "--format",
         "--merged", "--no-contains", "--no-merged",
@@ -418,7 +418,7 @@ static GIT_FOR_EACH_REF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_DIFF_TREE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--cc", "--combined-all-paths",
         "--find-copies-harder", "--full-index",
         "--ignore-all-space", "--ignore-space-at-eol",
@@ -436,7 +436,7 @@ static GIT_DIFF_TREE_POLICY: FlagPolicy = FlagPolicy {
         "-a", "-c", "-m", "-p", "-r", "-s", "-t", "-u", "-v", "-z",
     ]),
     standalone_short: b"BCMRacmprstuvz",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--abbrev", "--diff-algorithm", "--diff-filter",
         "--pretty",
         "-O", "-S",
@@ -448,12 +448,12 @@ static GIT_DIFF_TREE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_NAME_REV_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--all", "--always", "--annotate-stdin",
         "--name-only", "--tags", "--undefined",
     ]),
     standalone_short: b"",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--exclude", "--refs",
     ]),
     valued_short: b"",
@@ -463,12 +463,12 @@ static GIT_NAME_REV_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_COUNT_OBJECTS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--human-readable", "--verbose",
         "-H", "-v",
     ]),
     standalone_short: b"Hv",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: true,
     max_positional: None,
@@ -476,13 +476,13 @@ static GIT_COUNT_OBJECTS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_CHECK_IGNORE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--no-index", "--non-matching",
         "--quiet", "--stdin", "--verbose",
         "-n", "-q", "-v", "-z",
     ]),
     standalone_short: b"nqvz",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -490,7 +490,7 @@ static GIT_CHECK_IGNORE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_MERGE_TREE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--allow-unrelated-histories",
         "--messages", "--name-only",
         "--quiet",
@@ -498,7 +498,7 @@ static GIT_MERGE_TREE_POLICY: FlagPolicy = FlagPolicy {
         "-z",
     ]),
     standalone_short: b"z",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--merge-base",
         "-X",
     ]),
@@ -509,12 +509,12 @@ static GIT_MERGE_TREE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_VERIFY_COMMIT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--raw", "--verbose",
         "-v",
     ]),
     standalone_short: b"v",
-    valued: WordSet::new(&[]),
+    valued: WordSet::flags(&[]),
     valued_short: b"",
     bare: false,
     max_positional: None,
@@ -522,12 +522,12 @@ static GIT_VERIFY_COMMIT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_VERIFY_TAG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--raw", "--verbose",
         "-v",
     ]),
     standalone_short: b"v",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--format",
     ]),
     valued_short: b"",
@@ -537,7 +537,7 @@ static GIT_VERIFY_TAG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GIT_REV_PARSE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
+    standalone: WordSet::flags(&[
         "--absolute-git-dir",
         "--all",
         "--branches",
@@ -554,7 +554,7 @@ static GIT_REV_PARSE_POLICY: FlagPolicy = FlagPolicy {
         "-q",
     ]),
     standalone_short: b"q",
-    valued: WordSet::new(&[
+    valued: WordSet::flags(&[
         "--abbrev-ref", "--after", "--before",
         "--default", "--exclude",
         "--glob", "--prefix",
