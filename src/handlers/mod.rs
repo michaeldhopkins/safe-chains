@@ -87,7 +87,7 @@ const HANDLED_CMDS: &[&str] = &[
     "dirname", "basename", "realpath", "readlink",
     "file", "stat", "du", "df", "tree",
     "true", "false",
-    "printenv", "type", "wait", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
+    "printenv", "read", "type", "wait", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
     "uname", "nproc", "uptime", "id", "groups", "tty", "locale", "cal", "sleep",
     "who", "w", "last", "lastlog",
     "ps", "top", "htop", "iotop", "procs", "dust", "lsof", "pgrep",

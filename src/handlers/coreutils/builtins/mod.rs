@@ -2,6 +2,7 @@ mod command;
 mod false_cmd;
 mod hostname;
 mod printenv;
+mod read;
 mod true_cmd;
 mod type_cmd;
 mod unset;
@@ -35,6 +36,7 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     let mut v = Vec::new();
     v.extend(false_cmd::FLAT_DEFS);
     v.extend(printenv::FLAT_DEFS);
+    v.extend(read::FLAT_DEFS);
     v.extend(true_cmd::FLAT_DEFS);
     v.extend(type_cmd::FLAT_DEFS);
     v.extend(unset::FLAT_DEFS);
