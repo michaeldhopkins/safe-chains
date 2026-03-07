@@ -45,7 +45,7 @@ pub fn is_safe_curl(tokens: &[Token]) -> bool {
         }
 
         if let Some(val) = t.split_value("=") {
-            let flag = t.as_str().split_once('=').unwrap().0;
+            let flag = t.as_str().split_once('=').map_or(t.as_str(), |(k, _)| k);
             if CURL_SAFE_VALUED.contains(flag) {
                 i += 1;
                 continue;

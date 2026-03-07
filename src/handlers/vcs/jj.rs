@@ -42,7 +42,7 @@ pub fn is_safe_jj(tokens: &[Token]) -> bool {
             }
             args = &args[2..];
         } else if let Some(prefix) = args[0].split_value("=") {
-            let flag = args[0].as_str().split_once('=').unwrap().0;
+            let flag = args[0].as_str().split_once('=').map_or(args[0].as_str(), |(k, _)| k);
             if JJ_GLOBAL_VALUED.contains(flag) && !prefix.is_empty() {
                 args = &args[1..];
             } else {

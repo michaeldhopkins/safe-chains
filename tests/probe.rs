@@ -1,3 +1,5 @@
+#![allow(clippy::unwrap_used)]
+
 use safe_chains::is_safe_command;
 use safe_chains::parse::{CommandLine, Segment};
 
