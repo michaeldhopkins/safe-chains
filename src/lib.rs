@@ -292,7 +292,9 @@ mod tests {
         chain_git_log_status: "git log && git status",
 
         bg_ls_echo: "ls & echo done",
+        bg_gh_wait: "gh pr view 123 --repo o/r --json title 2>&1 & gh pr view 456 --repo o/r --json title 2>&1 & wait",
         chain_ls_echo_and: "ls && echo done",
+        here_string_grep: "grep -c , <<< 'hello,world,test'",
 
         newline_echo_echo: "echo foo\necho bar",
         newline_ls_cat: "ls\ncat file.txt",

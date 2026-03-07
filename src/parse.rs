@@ -332,8 +332,12 @@ fn check_unsafe_shell_syntax(segment: &str) -> bool {
     let mut in_double = false;
     let mut escaped = false;
     let chars: Vec<char> = segment.chars().collect();
+    let mut skip_until = 0;
 
     for (i, &c) in chars.iter().enumerate() {
+        if i < skip_until {
+            continue;
+        }
         if escaped {
             escaped = false;
             continue;
@@ -352,6 +356,10 @@ fn check_unsafe_shell_syntax(segment: &str) -> bool {
         }
         if !in_single && !in_double {
             if c == '>' || c == '<' {
+                if c == '<' && chars.get(i + 1) == Some(&'<') && chars.get(i + 2) == Some(&'<') {
+                    skip_until = i + 3;
+                    continue;
+                }
                 let next = chars.get(i + 1);
                 if next == Some(&'&')
                     && chars
@@ -381,8 +389,12 @@ fn check_unsafe_redirects(segment: &str) -> bool {
     let mut in_double = false;
     let mut escaped = false;
     let chars: Vec<char> = segment.chars().collect();
+    let mut skip_until = 0;
 
     for (i, &c) in chars.iter().enumerate() {
+        if i < skip_until {
+            continue;
+        }
         if escaped {
             escaped = false;
             continue;
@@ -400,6 +412,10 @@ fn check_unsafe_redirects(segment: &str) -> bool {
             continue;
         }
         if !in_single && !in_double && (c == '>' || c == '<') {
+            if c == '<' && chars.get(i + 1) == Some(&'<') && chars.get(i + 2) == Some(&'<') {
+                skip_until = i + 3;
+                continue;
+            }
             let next = chars.get(i + 1);
             if next == Some(&'&')
                 && chars
@@ -778,6 +794,26 @@ mod tests {
     }
 
     #[test]
+    fn safe_here_string() {
+        assert!(!seg("grep -c , <<< 'hello world'").has_unsafe_shell_syntax());
+    }
+
+    #[test]
+    fn safe_here_string_double_quoted() {
+        assert!(!seg("cat <<< \"some text\"").has_unsafe_shell_syntax());
+    }
+
+    #[test]
+    fn unsafe_heredoc_still_blocked() {
+        assert!(seg("cat << EOF").has_unsafe_shell_syntax());
+    }
+
+    #[test]
+    fn unsafe_input_redirect_still_blocked() {
+        assert!(seg("cmd < file.txt").has_unsafe_shell_syntax());
+    }
+
+    #[test]
     fn has_flag_short() {
         let tokens = toks(&["sed", "-i", "s/foo/bar/"]);
         assert!(has_flag(&tokens, Some("-i"), Some("--in-place")));
@@ -1138,5 +1174,15 @@ mod tests {
     #[test]
     fn unsafe_redirects_no_dollar_paren_check() {
         assert!(!seg("echo $(ls)").has_unsafe_redirects());
+    }
+
+    #[test]
+    fn unsafe_redirects_here_string_ok() {
+        assert!(!seg("grep -c , <<< 'hello'").has_unsafe_redirects());
+    }
+
+    #[test]
+    fn unsafe_redirects_heredoc_still_blocked() {
+        assert!(seg("cat << EOF").has_unsafe_redirects());
     }
 }
