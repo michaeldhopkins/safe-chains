@@ -397,6 +397,22 @@ mod tests {
     }
 
     #[test]
+    fn guarded_subs_accept_guard_short() {
+        let mut failures = Vec::new();
+        for def in COMMAND_DEFS {
+            visit_subs(def.name, def.subs, &mut |prefix, sub| {
+                if let crate::command::SubDef::Guarded { name, guard_short: Some(short), .. } = sub {
+                    let with_short = format!("{prefix} {name} {short}");
+                    if !crate::is_safe_command(&with_short) {
+                        failures.push(format!("{with_short}: rejected with guard_short"));
+                    }
+                }
+            });
+        }
+        assert!(failures.is_empty(), "guard_short issues:\n{}", failures.join("\n"));
+    }
+
+    #[test]
     fn nested_subs_reject_bare() {
         let mut failures = Vec::new();
         for def in COMMAND_DEFS {
