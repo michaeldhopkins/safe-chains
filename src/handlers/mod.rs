@@ -502,6 +502,45 @@ mod tests {
     }
 
     #[test]
+    fn max_positional_enforced() {
+        let mut failures = Vec::new();
+
+        for def in coreutils::all_flat_defs()
+            .into_iter()
+            .chain(xcode::xcbeautify_flat_defs())
+        {
+            if let Some(max) = def.policy.max_positional {
+                let args: Vec<&str> = (0..=max).map(|_| "testarg").collect();
+                let cmd = format!("{} {}", def.name, args.join(" "));
+                if crate::is_safe_command(&cmd) {
+                    failures.push(format!(
+                        "{}: max_positional={max} but accepted {} positional args",
+                        def.name,
+                        max + 1,
+                    ));
+                }
+            }
+        }
+
+        for def in COMMAND_DEFS {
+            visit_policies(def.name, def.subs, &mut |prefix, policy| {
+                if let Some(max) = policy.max_positional {
+                    let args: Vec<&str> = (0..=max).map(|_| "testarg").collect();
+                    let cmd = format!("{prefix} {}", args.join(" "));
+                    if crate::is_safe_command(&cmd) {
+                        failures.push(format!(
+                            "{prefix}: max_positional={max} but accepted {} positional args",
+                            max + 1,
+                        ));
+                    }
+                }
+            });
+        }
+
+        assert!(failures.is_empty(), "max_positional issues:\n{}", failures.join("\n"));
+    }
+
+    #[test]
     fn doc_generation_non_empty() {
         let mut failures = Vec::new();
 
