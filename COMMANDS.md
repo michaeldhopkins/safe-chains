@@ -1196,7 +1196,7 @@ Supports `-C <dir>` prefix.
 
 ### `ss` (https://man7.org/linux/man-pages/man8/ss.8.html)
 
-- Allowed standalone flags: --all, --dccp, --extended, --family, --help, --info, --ipv4, --ipv6, --listening, --memory, --no-header, --numeric, --oneline, --options, --packet, --processes, --raw, --resolve, --sctp, --summary, --tcp, --tipc, --udp, --unix, --version, --vsock, -0, -4, -6, -E, -H, -O, -V, -a, -e, -i, -l, -m, -n, -o, -p, -r, -s, -t, -u, -w, -x
+- Allowed standalone flags: --all, --dccp, --extended, --family, --info, --ipv4, --ipv6, --listening, --memory, --no-header, --numeric, --oneline, --options, --packet, --processes, --raw, --resolve, --sctp, --summary, --tcp, --tipc, --udp, --unix, --vsock, -0, -4, -6, -E, -H, -O, -a, -e, -i, -l, -m, -n, -o, -p, -r, -s, -t, -u, -w, -x
 - Allowed valued flags: --filter, --query, -A, -F, -f
 - Bare invocation allowed
 
@@ -1311,7 +1311,7 @@ Supports `-C <dir>` prefix.
 
 ### `tree` (https://man7.org/linux/man-pages/man1/tree.1.html)
 
-- Allowed standalone flags: --dirsfirst, --du, --fromfile, --gitignore, --help, --inodes, --matchdirs, --noreport, --prune, --si, --version, -A, -C, -D, -F, -J, -N, -Q, -S, -X, -a, -d, -f, -g, -h, -i, -l, -n, -p, -q, -r, -s, -t, -u, -v, -x
+- Allowed standalone flags: --dirsfirst, --du, --fromfile, --gitignore, --inodes, --matchdirs, --noreport, --prune, --si, -A, -C, -D, -F, -J, -N, -Q, -S, -X, -a, -d, -f, -g, -h, -i, -l, -n, -p, -q, -r, -s, -t, -u, -v, -x
 - Allowed valued flags: --charset, --filelimit, --filesfrom, --sort, --timefmt, -H, -I, -L, -P, -T
 - Bare invocation allowed
 
@@ -1490,6 +1490,6 @@ Supports `-C <dir>` prefix.
 
 ### `yq` (https://mikefarah.gitbook.io/yq)
 
-- Allowed standalone flags: --colors, --exit-status, --help, --no-colors, --no-doc, --null-input, --prettyPrint, --version, -C, -M, -N, -P, -e, -r
+- Allowed standalone flags: --colors, --exit-status, --no-colors, --no-doc, --null-input, --prettyPrint, -C, -M, -N, -P, -e, -r
 - Allowed valued flags: --arg, --argjson, --expression, --front-matter, --indent, --input-format, --output-format, -I, -p
 

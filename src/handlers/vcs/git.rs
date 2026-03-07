@@ -705,7 +705,7 @@ pub(in crate::handlers::vcs) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &
             if args.is_empty() {
                 return Some(false);
             }
-            if args[0] == "--version" {
+            if args[0] == "--version" || args[0] == "--help" {
                 return Some(true);
             }
             Some(check_git_sub(args, is_safe))

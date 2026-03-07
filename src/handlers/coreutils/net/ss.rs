@@ -4,17 +4,17 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static SS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
-        "--all", "--dccp", "--extended", "--family", "--help",
+        "--all", "--dccp", "--extended", "--family",
         "--info", "--ipv4", "--ipv6", "--listening", "--memory",
         "--no-header", "--numeric", "--oneline", "--options",
         "--packet", "--processes", "--raw", "--resolve",
         "--sctp", "--summary", "--tcp", "--tipc", "--udp",
-        "--unix", "--version", "--vsock",
-        "-0", "-4", "-6", "-E", "-H", "-O", "-V",
+        "--unix", "--vsock",
+        "-0", "-4", "-6", "-E", "-H", "-O",
         "-a", "-e", "-i", "-l", "-m", "-n", "-o",
         "-p", "-r", "-s", "-t", "-u", "-w", "-x",
     ]),
-    standalone_short: b"046EHOVaeilmnoprstuwx",
+    standalone_short: b"046EHOaeilmnoprstuwx",
     valued: WordSet::new(&[
         "--filter", "--query",
         "-A", "-F", "-f",
@@ -26,7 +26,7 @@ static SS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ss", policy: &SS_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/ss.8.html" },
+    FlatDef { name: "ss", policy: &SS_POLICY, help_eligible: true, url: "https://man7.org/linux/man-pages/man8/ss.8.html" },
 ];
 
 #[cfg(test)]

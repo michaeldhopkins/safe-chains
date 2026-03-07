@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static TREE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
         "--dirsfirst", "--du", "--fromfile", "--gitignore",
-        "--help", "--inodes", "--matchdirs", "--noreport",
-        "--prune", "--si", "--version",
+        "--inodes", "--matchdirs", "--noreport",
+        "--prune", "--si",
         "-A", "-C", "-D", "-F", "-J", "-N", "-Q", "-S",
         "-X", "-a", "-d", "-f", "-g", "-h", "-i", "-l",
         "-n", "-p", "-q", "-r", "-s", "-t", "-u", "-v",
@@ -25,7 +25,7 @@ static TREE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "tree", policy: &TREE_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/tree.1.html" },
+    FlatDef { name: "tree", policy: &TREE_POLICY, help_eligible: true, url: "https://man7.org/linux/man-pages/man1/tree.1.html" },
 ];
 
 #[cfg(test)]

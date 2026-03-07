@@ -4,9 +4,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static YQ_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
-        "--colors", "--exit-status", "--help",
+        "--colors", "--exit-status",
         "--no-colors", "--no-doc", "--null-input",
-        "--prettyPrint", "--version",
+        "--prettyPrint",
         "-C", "-M", "-N", "-P", "-e", "-r",
     ]),
     standalone_short: b"CMNPer",

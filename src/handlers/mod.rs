@@ -304,6 +304,149 @@ mod tests {
     }
 
     #[test]
+    fn help_eligible_command_defs() {
+        for def in COMMAND_DEFS {
+            let help = format!("{} --help", def.name);
+            let version = format!("{} --version", def.name);
+            if def.help_eligible {
+                assert!(
+                    crate::is_safe_command(&help),
+                    "{}: help_eligible=true but rejected --help",
+                    def.name,
+                );
+                assert!(
+                    crate::is_safe_command(&version),
+                    "{}: help_eligible=true but rejected --version",
+                    def.name,
+                );
+            } else {
+                assert!(
+                    !crate::is_safe_command(&help),
+                    "{}: help_eligible=false but accepted --help",
+                    def.name,
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn help_eligible_flat_defs() {
+        use crate::policy::FlagStyle;
+        for def in coreutils::all_flat_defs()
+            .into_iter()
+            .chain(xcode::xcbeautify_flat_defs())
+        {
+            let help = format!("{} --help", def.name);
+            let version = format!("{} --version", def.name);
+            if def.help_eligible {
+                assert!(
+                    crate::is_safe_command(&help),
+                    "{}: help_eligible=true but rejected --help",
+                    def.name,
+                );
+                assert!(
+                    crate::is_safe_command(&version),
+                    "{}: help_eligible=true but rejected --version",
+                    def.name,
+                );
+            } else if def.policy.flag_style != FlagStyle::Positional {
+                assert!(
+                    !crate::is_safe_command(&help),
+                    "{}: help_eligible=false but accepted --help",
+                    def.name,
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn bare_false_rejects_bare_invocation() {
+        for def in coreutils::all_flat_defs()
+            .into_iter()
+            .chain(xcode::xcbeautify_flat_defs())
+        {
+            if !def.policy.bare {
+                assert!(
+                    !crate::is_safe_command(def.name),
+                    "{}: bare=false but bare invocation accepted",
+                    def.name,
+                );
+            }
+        }
+    }
+
+    fn visit_subs(prefix: &str, subs: &[crate::command::SubDef], visitor: &mut dyn FnMut(&str, &crate::command::SubDef)) {
+        for sub in subs {
+            visitor(prefix, sub);
+            if let crate::command::SubDef::Nested { name, subs: inner } = sub {
+                visit_subs(&format!("{prefix} {name}"), inner, visitor);
+            }
+        }
+    }
+
+    #[test]
+    fn guarded_subs_require_guard() {
+        let mut failures = Vec::new();
+        for def in COMMAND_DEFS {
+            visit_subs(def.name, def.subs, &mut |prefix, sub| {
+                if let crate::command::SubDef::Guarded { name, guard_long, .. } = sub {
+                    let without = format!("{prefix} {name}");
+                    if crate::is_safe_command(&without) {
+                        failures.push(format!("{without}: accepted without guard {guard_long}"));
+                    }
+                    let with = format!("{prefix} {name} {guard_long}");
+                    if !crate::is_safe_command(&with) {
+                        failures.push(format!("{with}: rejected with guard {guard_long}"));
+                    }
+                }
+            });
+        }
+        assert!(failures.is_empty(), "guarded sub issues:\n{}", failures.join("\n"));
+    }
+
+    #[test]
+    fn nested_subs_reject_bare() {
+        let mut failures = Vec::new();
+        for def in COMMAND_DEFS {
+            visit_subs(def.name, def.subs, &mut |prefix, sub| {
+                if let crate::command::SubDef::Nested { name, .. } = sub {
+                    let bare = format!("{prefix} {name}");
+                    if crate::is_safe_command(&bare) {
+                        failures.push(format!("{bare}: nested sub accepted bare invocation"));
+                    }
+                }
+            });
+        }
+        assert!(failures.is_empty(), "nested bare issues:\n{}", failures.join("\n"));
+    }
+
+    #[test]
+    fn process_substitution_blocked() {
+        let cmds = ["echo <(cat /etc/passwd)", "echo >(rm -rf /)", "grep pattern <(ls)"];
+        for cmd in &cmds {
+            assert!(
+                !crate::is_safe_command(cmd),
+                "process substitution not blocked: {cmd}",
+            );
+        }
+    }
+
+    #[test]
+    fn positional_style_accepts_unknown_args() {
+        use crate::policy::FlagStyle;
+        for def in coreutils::all_flat_defs() {
+            if def.policy.flag_style == FlagStyle::Positional {
+                let test = format!("{} --unknown-xyz", def.name);
+                assert!(
+                    crate::is_safe_command(&test),
+                    "{}: FlagStyle::Positional but rejected unknown arg",
+                    def.name,
+                );
+            }
+        }
+    }
+
+    #[test]
     fn registry_covers_handled_commands() {
         let registry = full_registry();
         let mut all_cmds: HashSet<&str> = registry
