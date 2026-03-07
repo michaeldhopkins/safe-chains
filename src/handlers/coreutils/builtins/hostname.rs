@@ -6,7 +6,7 @@ fn is_safe_hostname(tokens: &[Token]) -> bool {
     if tokens.len() == 1 {
         return true;
     }
-    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "--version") {
+    if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
         return true;
     }
     tokens[1..].iter().all(|t| HOSTNAME_DISPLAY.contains(t))

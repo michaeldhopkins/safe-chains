@@ -306,22 +306,18 @@ mod tests {
     #[test]
     fn help_eligible_command_defs() {
         for def in COMMAND_DEFS {
-            let help = format!("{} --help", def.name);
-            let version = format!("{} --version", def.name);
             if def.help_eligible {
-                assert!(
-                    crate::is_safe_command(&help),
-                    "{}: help_eligible=true but rejected --help",
-                    def.name,
-                );
-                assert!(
-                    crate::is_safe_command(&version),
-                    "{}: help_eligible=true but rejected --version",
-                    def.name,
-                );
+                for flag in &["--help", "-h", "--version", "-V"] {
+                    let cmd = format!("{} {flag}", def.name);
+                    assert!(
+                        crate::is_safe_command(&cmd),
+                        "{}: help_eligible=true but rejected {flag}",
+                        def.name,
+                    );
+                }
             } else {
                 assert!(
-                    !crate::is_safe_command(&help),
+                    !crate::is_safe_command(&format!("{} --help", def.name)),
                     "{}: help_eligible=false but accepted --help",
                     def.name,
                 );
@@ -336,22 +332,18 @@ mod tests {
             .into_iter()
             .chain(xcode::xcbeautify_flat_defs())
         {
-            let help = format!("{} --help", def.name);
-            let version = format!("{} --version", def.name);
             if def.help_eligible {
-                assert!(
-                    crate::is_safe_command(&help),
-                    "{}: help_eligible=true but rejected --help",
-                    def.name,
-                );
-                assert!(
-                    crate::is_safe_command(&version),
-                    "{}: help_eligible=true but rejected --version",
-                    def.name,
-                );
+                for flag in &["--help", "-h", "--version", "-V"] {
+                    let cmd = format!("{} {flag}", def.name);
+                    assert!(
+                        crate::is_safe_command(&cmd),
+                        "{}: help_eligible=true but rejected {flag}",
+                        def.name,
+                    );
+                }
             } else if def.policy.flag_style != FlagStyle::Positional {
                 assert!(
-                    !crate::is_safe_command(&help),
+                    !crate::is_safe_command(&format!("{} --help", def.name)),
                     "{}: help_eligible=false but accepted --help",
                     def.name,
                 );

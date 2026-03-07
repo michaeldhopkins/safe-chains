@@ -320,7 +320,7 @@ pub(in crate::handlers::rust) fn dispatch(cmd: &str, tokens: &[Token], is_safe: 
                 return Some(false);
             }
             let arg = tokens[sub].as_str();
-            if tokens.len() == sub + 1 && (arg == "--help" || arg == "--version") {
+            if tokens.len() == sub + 1 && matches!(arg, "--help" | "-h" | "--version" | "-V") {
                 return Some(true);
             }
             Some(check_cargo_sub(&tokens[sub..], is_safe))

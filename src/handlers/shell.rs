@@ -7,7 +7,7 @@ static XARGS_FLAGS_NO_ARG: WordSet =
     WordSet::new(&["-0", "-p", "-r", "-t", "-x"]);
 
 pub fn is_safe_shell(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    if tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--help") {
+    if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
         return true;
     }
     let Some(idx) = tokens.iter().position(|t| *t == "-c") else {

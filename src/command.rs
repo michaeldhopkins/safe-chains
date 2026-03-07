@@ -55,7 +55,7 @@ impl SubDef {
     pub fn check(&self, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         match self {
             Self::Policy { policy, .. } => {
-                if tokens.len() == 2 && tokens[1] == "--help" {
+                if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
                     return true;
                 }
                 policy::check(tokens, policy)
@@ -65,7 +65,7 @@ impl SubDef {
                     return false;
                 }
                 let sub = tokens[1].as_str();
-                if tokens.len() == 2 && sub == "--help" {
+                if tokens.len() == 2 && (sub == "--help" || sub == "-h") {
                     return true;
                 }
                 subs.iter()
@@ -77,14 +77,14 @@ impl SubDef {
                 policy,
                 ..
             } => {
-                if tokens.len() == 2 && tokens[1] == "--help" {
+                if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
                     return true;
                 }
                 has_flag(tokens, *guard_short, Some(guard_long))
                     && policy::check(tokens, policy)
             }
             Self::Custom { check: f, .. } => {
-                if tokens.len() == 2 && tokens[1] == "--help" {
+                if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
                     return true;
                 }
                 f(tokens, is_safe)
@@ -106,7 +106,7 @@ impl CommandDef {
             return false;
         }
         let arg = tokens[1].as_str();
-        if self.help_eligible && tokens.len() == 2 && (arg == "--help" || arg == "--version") {
+        if self.help_eligible && tokens.len() == 2 && matches!(arg, "--help" | "-h" | "--version" | "-V") {
             return true;
         }
         if tokens.len() == 2 && self.bare_flags.contains(&arg) {
@@ -161,7 +161,7 @@ impl FlatDef {
         if cmd == self.name {
             if self.help_eligible
                 && tokens.len() == 2
-                && (tokens[1] == "--help" || tokens[1] == "--version")
+                && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V")
             {
                 return Some(true);
             }

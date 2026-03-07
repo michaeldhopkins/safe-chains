@@ -39,7 +39,7 @@ fn is_safe_r(tokens: &[Token]) -> bool {
 }
 
 fn is_safe_rscript(tokens: &[Token]) -> bool {
-    tokens.len() == 2 && (tokens[1] == "--version" || tokens[1] == "--help")
+    tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V")
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
