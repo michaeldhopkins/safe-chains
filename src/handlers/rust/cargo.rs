@@ -23,39 +23,39 @@ macro_rules! cargo_compile_policy {
 }
 
 static CARGO_BUILD_POLICY: FlagPolicy = cargo_compile_policy!([
-    "--all-features", "--all-targets", "--build-plan", "--frozen",
-    "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-    "--lib", "--locked", "--no-default-features", "--offline", "--release",
-    "--timings", "--unit-graph",
+    "--all-features", "--all-targets", "--benches", "--bins", "--build-plan",
+    "--examples", "--frozen", "--future-incompat-report", "--ignore-rust-version",
+    "--keep-going", "--lib", "--locked", "--no-default-features", "--offline",
+    "--release", "--tests", "--timings", "--unit-graph",
 ]);
 
 static CARGO_TEST_POLICY: FlagPolicy = cargo_compile_policy!([
-    "--all-features", "--all-targets", "--doc", "--frozen",
-    "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-    "--lib", "--locked", "--no-default-features", "--no-fail-fast", "--no-run",
-    "--offline", "--release", "--timings", "--unit-graph",
+    "--all-features", "--all-targets", "--benches", "--bins", "--doc",
+    "--examples", "--frozen", "--future-incompat-report", "--ignore-rust-version",
+    "--keep-going", "--lib", "--locked", "--no-default-features", "--no-fail-fast",
+    "--no-run", "--offline", "--release", "--tests", "--timings", "--unit-graph",
 ]);
 
 static CARGO_CHECK_POLICY: FlagPolicy = cargo_compile_policy!([
-    "--all-features", "--all-targets", "--frozen",
-    "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-    "--lib", "--locked", "--no-default-features", "--offline", "--release",
-    "--timings", "--unit-graph",
+    "--all-features", "--all-targets", "--benches", "--bins", "--examples",
+    "--frozen", "--future-incompat-report", "--ignore-rust-version",
+    "--keep-going", "--lib", "--locked", "--no-default-features", "--offline",
+    "--release", "--tests", "--timings", "--unit-graph",
 ]);
 
 static CARGO_CLIPPY_POLICY: FlagPolicy = cargo_compile_policy!([
-    "--all-features", "--all-targets", "--frozen",
-    "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-    "--lib", "--locked", "--no-default-features", "--no-deps", "--offline",
-    "--release", "--timings", "--unit-graph",
+    "--all-features", "--all-targets", "--benches", "--bins", "--examples",
+    "--frozen", "--future-incompat-report", "--ignore-rust-version",
+    "--keep-going", "--lib", "--locked", "--no-default-features", "--no-deps",
+    "--offline", "--release", "--tests", "--timings", "--unit-graph",
 ]);
 
 static CARGO_DOC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
-        "--all-features", "--document-private-items", "--frozen",
-        "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-        "--locked", "--no-default-features", "--no-deps", "--offline",
-        "--open", "--release", "--timings", "--unit-graph",
+        "--all-features", "--bins", "--document-private-items", "--examples",
+        "--frozen", "--future-incompat-report", "--ignore-rust-version",
+        "--keep-going", "--locked", "--no-default-features", "--no-deps",
+        "--offline", "--open", "--release", "--timings", "--unit-graph",
     ]),
     standalone_short: b"qv",
     valued: WordSet::new(&[
@@ -240,6 +240,16 @@ fn check_cargo_sub(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool
         .is_some_and(|s| s.check(rest, is_safe))
 }
 
+static CARGO_HELP_SUB_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::new(&[]),
+    standalone_short: b"",
+    valued: WordSet::new(&[]),
+    valued_short: b"",
+    bare: true,
+    max_positional: Some(1),
+    flag_style: FlagStyle::Positional,
+};
+
 static CARGO_HELP_ONLY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[]),
     standalone_short: b"",
@@ -258,6 +268,7 @@ static CARGO_SUBS: &[SubDef] = &[
     SubDef::Policy { name: "clippy", policy: &CARGO_CLIPPY_POLICY },
     SubDef::Policy { name: "deny", policy: &CARGO_DENY_POLICY },
     SubDef::Policy { name: "doc", policy: &CARGO_DOC_POLICY },
+    SubDef::Policy { name: "help", policy: &CARGO_HELP_SUB_POLICY },
     SubDef::Guarded {
         name: "fmt",
         guard_short: None,
@@ -381,6 +392,9 @@ mod tests {
         cargo_license: "cargo license",
         cargo_fmt_check: "cargo fmt --check",
         cargo_help: "cargo --help",
+        cargo_help_sub: "cargo help clippy",
+        cargo_help_sub_build: "cargo help build",
+        cargo_help_bare: "cargo help",
         cargo_install_help: "cargo install --help",
         cargo_package_list: "cargo package --list",
         cargo_package_list_redirect: "cargo package --list 2>&1",
@@ -397,10 +411,19 @@ mod tests {
         cargo_nightly_package_list: "cargo +nightly package --list",
         cargo_clippy_no_deps: "cargo clippy --no-deps",
         cargo_clippy_lib: "cargo clippy --lib",
+        cargo_clippy_tests: "cargo clippy --tests",
+        cargo_clippy_tests_warnings: "cargo clippy --tests -- -D warnings",
         cargo_test_lib: "cargo test --lib",
+        cargo_test_tests: "cargo test --tests",
+        cargo_test_bins: "cargo test --bins",
         cargo_check_lib: "cargo check --lib",
+        cargo_check_benches: "cargo check --benches",
         cargo_build_lib: "cargo build --lib",
+        cargo_build_examples: "cargo build --examples",
         cargo_bench_lib: "cargo bench --lib",
+        cargo_bench_bins: "cargo bench --bins",
+        cargo_doc_bins: "cargo doc --bins",
+        cargo_doc_examples: "cargo doc --examples",
         cargo_info: "cargo info serde",
         cargo_info_registry: "cargo info serde --registry crates-io",
     }
