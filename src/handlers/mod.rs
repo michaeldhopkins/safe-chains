@@ -502,6 +502,36 @@ mod tests {
     }
 
     #[test]
+    fn doc_generation_non_empty() {
+        let mut failures = Vec::new();
+
+        for def in COMMAND_DEFS {
+            let doc = def.to_doc();
+            if doc.description.trim().is_empty() {
+                failures.push(format!("{}: CommandDef produced empty doc", def.name));
+            }
+            if doc.url.is_empty() {
+                failures.push(format!("{}: CommandDef has empty URL", def.name));
+            }
+        }
+
+        for def in coreutils::all_flat_defs()
+            .into_iter()
+            .chain(xcode::xcbeautify_flat_defs())
+        {
+            let doc = def.to_doc();
+            if doc.description.trim().is_empty() && !def.policy.bare {
+                failures.push(format!("{}: FlatDef produced empty doc", def.name));
+            }
+            if doc.url.is_empty() {
+                failures.push(format!("{}: FlatDef has empty URL", def.name));
+            }
+        }
+
+        assert!(failures.is_empty(), "doc generation issues:\n{}", failures.join("\n"));
+    }
+
+    #[test]
     fn registry_covers_handled_commands() {
         let registry = full_registry();
         let mut all_cmds: HashSet<&str> = registry
