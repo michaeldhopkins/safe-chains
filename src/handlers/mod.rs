@@ -438,6 +438,53 @@ mod tests {
         }
     }
 
+    fn visit_policies(prefix: &str, subs: &[crate::command::SubDef], visitor: &mut dyn FnMut(&str, &crate::policy::FlagPolicy)) {
+        for sub in subs {
+            match sub {
+                crate::command::SubDef::Policy { name, policy } => {
+                    visitor(&format!("{prefix} {name}"), policy);
+                }
+                crate::command::SubDef::Guarded { name, guard_long, policy, .. } => {
+                    visitor(&format!("{prefix} {name} {guard_long}"), policy);
+                }
+                crate::command::SubDef::Nested { name, subs: inner } => {
+                    visit_policies(&format!("{prefix} {name}"), inner, visitor);
+                }
+                _ => {}
+            }
+        }
+    }
+
+    #[test]
+    fn valued_flags_accept_eq_syntax() {
+        let mut failures = Vec::new();
+
+        for def in coreutils::all_flat_defs()
+            .into_iter()
+            .chain(xcode::xcbeautify_flat_defs())
+        {
+            for flag in def.policy.valued.iter() {
+                let cmd = format!("{} {flag}=test_value", def.name);
+                if !crate::is_safe_command(&cmd) {
+                    failures.push(format!("{cmd}: valued flag rejected with = syntax"));
+                }
+            }
+        }
+
+        for def in COMMAND_DEFS {
+            visit_policies(def.name, def.subs, &mut |prefix, policy| {
+                for flag in policy.valued.iter() {
+                    let cmd = format!("{prefix} {flag}=test_value");
+                    if !crate::is_safe_command(&cmd) {
+                        failures.push(format!("{cmd}: valued flag rejected with = syntax"));
+                    }
+                }
+            });
+        }
+
+        assert!(failures.is_empty(), "valued = syntax issues:\n{}", failures.join("\n"));
+    }
+
     #[test]
     fn registry_covers_handled_commands() {
         let registry = full_registry();
