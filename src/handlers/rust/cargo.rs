@@ -4,100 +4,51 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 use crate::parse::WordSet;
 
-static CARGO_BUILD_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
-        "--all-features", "--all-targets", "--build-plan", "--frozen",
-        "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-        "--lib", "--locked", "--no-default-features", "--offline", "--release",
-        "--timings", "--unit-graph",
-    ]),
-    standalone_short: b"qv",
-    valued: WordSet::new(&[
-        "--bench", "--bin", "--color", "--config", "--example",
-        "--features", "--jobs", "--manifest-path", "--message-format",
-        "--package", "--profile", "--target", "--target-dir", "--test",
-    ]),
-    valued_short: b"jZp",
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
+macro_rules! cargo_compile_policy {
+    ([$($standalone:literal),* $(,)?]) => {
+        FlagPolicy {
+            standalone: WordSet::new(&[$($standalone),*]),
+            standalone_short: b"qv",
+            valued: WordSet::new(&[
+                "--bench", "--bin", "--color", "--config", "--example",
+                "--features", "--jobs", "--manifest-path", "--message-format",
+                "--package", "--profile", "--target", "--target-dir", "--test",
+            ]),
+            valued_short: b"jZp",
+            bare: true,
+            max_positional: None,
+            flag_style: FlagStyle::Strict,
+        }
+    };
+}
 
-static CARGO_TEST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
-        "--all-features", "--all-targets", "--doc", "--frozen",
-        "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-        "--lib", "--locked", "--no-default-features", "--no-fail-fast", "--no-run",
-        "--offline", "--release", "--timings", "--unit-graph",
-    ]),
-    standalone_short: b"qv",
-    valued: WordSet::new(&[
-        "--bench", "--bin", "--color", "--config", "--example",
-        "--features", "--jobs", "--manifest-path", "--message-format",
-        "--package", "--profile", "--target", "--target-dir", "--test",
-    ]),
-    valued_short: b"jZp",
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
+static CARGO_BUILD_POLICY: FlagPolicy = cargo_compile_policy!([
+    "--all-features", "--all-targets", "--build-plan", "--frozen",
+    "--future-incompat-report", "--ignore-rust-version", "--keep-going",
+    "--lib", "--locked", "--no-default-features", "--offline", "--release",
+    "--timings", "--unit-graph",
+]);
 
-static CARGO_CHECK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
-        "--all-features", "--all-targets", "--frozen",
-        "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-        "--lib", "--locked", "--no-default-features", "--offline", "--release",
-        "--timings", "--unit-graph",
-    ]),
-    standalone_short: b"qv",
-    valued: WordSet::new(&[
-        "--bench", "--bin", "--color", "--config", "--example",
-        "--features", "--jobs", "--manifest-path", "--message-format",
-        "--package", "--profile", "--target", "--target-dir", "--test",
-    ]),
-    valued_short: b"jZp",
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
+static CARGO_TEST_POLICY: FlagPolicy = cargo_compile_policy!([
+    "--all-features", "--all-targets", "--doc", "--frozen",
+    "--future-incompat-report", "--ignore-rust-version", "--keep-going",
+    "--lib", "--locked", "--no-default-features", "--no-fail-fast", "--no-run",
+    "--offline", "--release", "--timings", "--unit-graph",
+]);
 
-static CARGO_CLIPPY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
-        "--all-features", "--all-targets", "--frozen",
-        "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-        "--lib", "--locked", "--no-default-features", "--no-deps", "--offline",
-        "--release", "--timings", "--unit-graph",
-    ]),
-    standalone_short: b"qv",
-    valued: WordSet::new(&[
-        "--bench", "--bin", "--color", "--config", "--example",
-        "--features", "--jobs", "--manifest-path", "--message-format",
-        "--package", "--profile", "--target", "--target-dir", "--test",
-    ]),
-    valued_short: b"jZp",
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
+static CARGO_CHECK_POLICY: FlagPolicy = cargo_compile_policy!([
+    "--all-features", "--all-targets", "--frozen",
+    "--future-incompat-report", "--ignore-rust-version", "--keep-going",
+    "--lib", "--locked", "--no-default-features", "--offline", "--release",
+    "--timings", "--unit-graph",
+]);
 
-static CARGO_BENCH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::new(&[
-        "--all-features", "--all-targets", "--frozen",
-        "--future-incompat-report", "--ignore-rust-version", "--keep-going",
-        "--lib", "--locked", "--no-default-features", "--no-fail-fast", "--no-run",
-        "--offline", "--release", "--timings", "--unit-graph",
-    ]),
-    standalone_short: b"qv",
-    valued: WordSet::new(&[
-        "--bench", "--bin", "--color", "--config", "--example",
-        "--features", "--jobs", "--manifest-path", "--message-format",
-        "--package", "--profile", "--target", "--target-dir", "--test",
-    ]),
-    valued_short: b"jZp",
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
+static CARGO_CLIPPY_POLICY: FlagPolicy = cargo_compile_policy!([
+    "--all-features", "--all-targets", "--frozen",
+    "--future-incompat-report", "--ignore-rust-version", "--keep-going",
+    "--lib", "--locked", "--no-default-features", "--no-deps", "--offline",
+    "--release", "--timings", "--unit-graph",
+]);
 
 static CARGO_DOC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::new(&[
@@ -301,7 +252,7 @@ static CARGO_HELP_ONLY_POLICY: FlagPolicy = FlagPolicy {
 
 static CARGO_SUBS: &[SubDef] = &[
     SubDef::Policy { name: "audit", policy: &CARGO_AUDIT_POLICY },
-    SubDef::Policy { name: "bench", policy: &CARGO_BENCH_POLICY },
+    SubDef::Policy { name: "bench", policy: &CARGO_TEST_POLICY },
     SubDef::Policy { name: "build", policy: &CARGO_BUILD_POLICY },
     SubDef::Policy { name: "check", policy: &CARGO_CHECK_POLICY },
     SubDef::Policy { name: "clippy", policy: &CARGO_CLIPPY_POLICY },
