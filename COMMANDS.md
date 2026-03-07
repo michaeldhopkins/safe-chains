@@ -1409,6 +1409,10 @@ Supports `-C <dir>` prefix.
 - Allowed standalone flags: --from, --ip-addr, --no-current, --no-header, --old-style, --short, -f, -h, -i, -o, -s, -u
 - Bare invocation allowed
 
+### `wait` (https://pubs.opengroup.org/onlinepubs/9799919799/utilities/wait.html)
+
+- Bare invocation allowed
+
 ### `wc` (https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation)
 
 - Allowed standalone flags: --bytes, --chars, --lines, --max-line-length, --words, --zero-terminated, -L, -c, -l, -m, -w

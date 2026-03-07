@@ -5,6 +5,7 @@ mod printenv;
 mod true_cmd;
 mod type_cmd;
 mod unset;
+mod wait;
 mod whereis;
 mod which;
 mod whoami;
@@ -37,6 +38,7 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     v.extend(true_cmd::FLAT_DEFS);
     v.extend(type_cmd::FLAT_DEFS);
     v.extend(unset::FLAT_DEFS);
+    v.extend(wait::FLAT_DEFS);
     v.extend(whereis::FLAT_DEFS);
     v.extend(which::FLAT_DEFS);
     v.extend(whoami::FLAT_DEFS);
