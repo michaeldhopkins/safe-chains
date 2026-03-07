@@ -75,12 +75,10 @@ static SED_POLICY: FlagPolicy = FlagPolicy {
         "--silent", "--unbuffered",
         "-E", "-n", "-r", "-u", "-z",
     ]),
-    standalone_short: b"Enruz",
     valued: WordSet::flags(&[
         "--expression", "--file", "--line-length",
         "-e", "-f", "-l",
     ]),
-    valued_short: b"efl",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

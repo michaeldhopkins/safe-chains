@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static PWD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-L", "-P"]),
-    standalone_short: b"LP",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: Some(0),
     flag_style: FlagStyle::Strict,

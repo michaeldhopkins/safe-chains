@@ -7,11 +7,9 @@ static HOST_POLICY: FlagPolicy = FlagPolicy {
         "-4", "-6", "-C", "-a", "-c", "-d", "-l",
         "-r", "-s", "-v",
     ]),
-    standalone_short: b"46Cacdlrsv",
     valued: WordSet::flags(&[
         "-D", "-N", "-R", "-T", "-W", "-i", "-m", "-t",
     ]),
-    valued_short: b"DNRTWimt",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

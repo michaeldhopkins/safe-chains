@@ -6,10 +6,9 @@ static DOCKER_PS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--last", "--latest", "--no-trunc",
         "--quiet", "--size",
+        "-a", "-l", "-n", "-q", "-s",
     ]),
-    standalone_short: b"alnoqs",
-    valued: WordSet::flags(&["--filter", "--format"]),
-    valued_short: b"fn",
+    valued: WordSet::flags(&["--filter", "--format", "-f"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -18,10 +17,9 @@ static DOCKER_PS_POLICY: FlagPolicy = FlagPolicy {
 static DOCKER_IMAGES_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--digests", "--no-trunc", "--quiet",
+        "-a", "-q",
     ]),
-    standalone_short: b"aq",
-    valued: WordSet::flags(&["--filter", "--format"]),
-    valued_short: b"f",
+    valued: WordSet::flags(&["--filter", "--format", "-f"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -30,20 +28,17 @@ static DOCKER_IMAGES_POLICY: FlagPolicy = FlagPolicy {
 static DOCKER_LOGS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--details", "--follow", "--timestamps",
+        "-f", "-t",
     ]),
-    standalone_short: b"ft",
-    valued: WordSet::flags(&["--since", "--tail", "--until"]),
-    valued_short: b"n",
+    valued: WordSet::flags(&["--since", "--tail", "--until", "-n"]),
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_INSPECT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--size"]),
-    standalone_short: b"s",
-    valued: WordSet::flags(&["--format", "--type"]),
-    valued_short: b"f",
+    standalone: WordSet::flags(&["--size", "-s"]),
+    valued: WordSet::flags(&["--format", "--type", "-f"]),
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -51,9 +46,7 @@ static DOCKER_INSPECT_POLICY: FlagPolicy = FlagPolicy {
 
 static DOCKER_INFO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
-    valued: WordSet::flags(&["--format"]),
-    valued_short: b"f",
+    valued: WordSet::flags(&["--format", "-f"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -61,29 +54,23 @@ static DOCKER_INFO_POLICY: FlagPolicy = FlagPolicy {
 
 static DOCKER_VERSION_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
-    valued: WordSet::flags(&["--format"]),
-    valued_short: b"f",
+    valued: WordSet::flags(&["--format", "-f"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_STATS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "--no-stream", "--no-trunc"]),
-    standalone_short: b"a",
+    standalone: WordSet::flags(&["--all", "--no-stream", "--no-trunc", "-a"]),
     valued: WordSet::flags(&["--format"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_HISTORY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--human", "--no-trunc", "--quiet"]),
-    standalone_short: b"Hq",
+    standalone: WordSet::flags(&["--human", "--no-trunc", "--quiet", "-H", "-q"]),
     valued: WordSet::flags(&["--format"]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -91,19 +78,15 @@ static DOCKER_HISTORY_POLICY: FlagPolicy = FlagPolicy {
 
 static DOCKER_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static DOCKER_LS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--no-trunc", "--quiet"]),
-    standalone_short: b"q",
-    valued: WordSet::flags(&["--filter", "--format"]),
-    valued_short: b"f",
+    standalone: WordSet::flags(&["--no-trunc", "--quiet", "-q"]),
+    valued: WordSet::flags(&["--filter", "--format", "-f"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -113,10 +96,9 @@ static DOCKER_COMPOSE_PS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--no-trunc", "--orphans", "--quiet",
         "--services",
+        "-a", "-q",
     ]),
-    standalone_short: b"aq",
     valued: WordSet::flags(&["--filter", "--format", "--status"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -128,10 +110,9 @@ static DOCKER_COMPOSE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
         "--no-interpolate", "--no-normalize", "--no-path-resolution",
         "--profiles", "--quiet", "--resolve-image-digests",
         "--services", "--volumes",
+        "-q",
     ]),
-    standalone_short: b"q",
-    valued: WordSet::flags(&["--format", "--output"]),
-    valued_short: b"o",
+    valued: WordSet::flags(&["--format", "--output", "-o"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

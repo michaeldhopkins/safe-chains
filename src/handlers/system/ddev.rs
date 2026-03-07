@@ -3,30 +3,24 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DDEV_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json-output"]),
-    standalone_short: b"j",
+    standalone: WordSet::flags(&["--json-output", "-j"]),
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static DDEV_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json-output"]),
-    standalone_short: b"j",
+    standalone: WordSet::flags(&["--json-output", "-j"]),
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static DDEV_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--follow", "--time", "--timestamps"]),
-    standalone_short: b"f",
-    valued: WordSet::flags(&["--service", "--tail"]),
-    valued_short: b"st",
+    standalone: WordSet::flags(&["--follow", "--time", "--timestamps", "-f"]),
+    valued: WordSet::flags(&["--service", "--tail", "-s", "-t"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -34,9 +28,7 @@ static DDEV_LOGS_POLICY: FlagPolicy = FlagPolicy {
 
 static DDEV_SNAPSHOT_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--all", "--list"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -44,9 +36,7 @@ static DDEV_SNAPSHOT_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static DDEV_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

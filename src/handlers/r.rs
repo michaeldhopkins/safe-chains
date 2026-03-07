@@ -6,9 +6,7 @@ static R_CMD_CHECK_POLICY: FlagPolicy = FlagPolicy {
         "--as-cran", "--no-build-vignettes", "--no-examples",
         "--no-manual", "--no-tests", "--no-vignettes",
     ]),
-    standalone_short: b"",
-    valued: WordSet::flags(&["--output"]),
-    valued_short: b"o",
+    valued: WordSet::flags(&["--output", "-o"]),
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -16,9 +14,7 @@ static R_CMD_CHECK_POLICY: FlagPolicy = FlagPolicy {
 
 static R_CMD_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: false,
     max_positional: Some(1),
     flag_style: FlagStyle::Strict,

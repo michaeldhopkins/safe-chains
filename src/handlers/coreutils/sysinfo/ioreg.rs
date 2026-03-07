@@ -7,11 +7,9 @@ static IOREG_POLICY: FlagPolicy = FlagPolicy {
         "-S", "-a", "-b", "-f", "-i", "-l", "-r",
         "-t", "-x",
     ]),
-    standalone_short: b"Sabfilrtx",
     valued: WordSet::flags(&[
         "-c", "-d", "-k", "-n", "-p", "-w",
     ]),
-    valued_short: b"cdknpw",
     bare: true,
     max_positional: Some(0),
     flag_style: FlagStyle::Strict,

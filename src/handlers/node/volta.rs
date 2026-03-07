@@ -3,10 +3,8 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static VOLTA_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--current", "--default"]),
-    standalone_short: b"cd",
+    standalone: WordSet::flags(&["--current", "--default", "-c", "-d"]),
     valued: WordSet::flags(&["--format"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

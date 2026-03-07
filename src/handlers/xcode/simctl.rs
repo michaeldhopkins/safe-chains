@@ -3,10 +3,8 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SIMCTL_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--verbose"]),
-    standalone_short: b"jv",
+    standalone: WordSet::flags(&["--json", "--verbose", "-j", "-v"]),
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

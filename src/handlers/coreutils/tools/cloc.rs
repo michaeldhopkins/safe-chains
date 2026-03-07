@@ -13,8 +13,8 @@ static CLOC_POLICY: FlagPolicy = FlagPolicy {
         "--show-lang", "--show-os", "--show-stored-lang", "--skip-uniqueness", "--sql-append",
         "--strip-comments", "--sum-one", "--sum-reports", "--unicode", "--use-sloccount",
         "--v", "--vcs", "--xml", "--yaml",
+        "-v",
     ]),
-    standalone_short: b"v",
     valued: WordSet::flags(&[
         "--config", "--csv-delimiter", "--diff-alignment",
         "--diff-timeout", "--exclude-content",
@@ -29,7 +29,6 @@ static CLOC_POLICY: FlagPolicy = FlagPolicy {
         "--sql", "--sql-project", "--sql-style",
         "--timeout", "--write-lang-def",
     ]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

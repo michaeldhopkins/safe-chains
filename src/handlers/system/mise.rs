@@ -4,19 +4,15 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static MISE_RESHIM_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--force"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static MISE_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
-    standalone_short: b"qv",
+    standalone: WordSet::flags(&["-q", "-v"]),
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -26,20 +22,17 @@ static MISE_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--current", "--installed", "--json", "--missing",
         "--no-header", "--prefix",
+        "-J", "-c", "-i", "-m",
     ]),
-    standalone_short: b"ciJm",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static MISE_ENV_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"J",
-    valued: WordSet::flags(&["--shell"]),
-    valued_short: b"s",
+    standalone: WordSet::flags(&["--json", "-J"]),
+    valued: WordSet::flags(&["--shell", "-s"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

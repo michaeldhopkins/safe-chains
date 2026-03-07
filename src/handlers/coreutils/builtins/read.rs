@@ -4,9 +4,7 @@ use crate::parse::WordSet;
 
 static READ_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-r", "-s"]),
-    standalone_short: b"rs",
     valued: WordSet::flags(&["-a", "-d", "-n", "-p", "-t", "-u"]),
-    valued_short: b"adnptu",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Positional,

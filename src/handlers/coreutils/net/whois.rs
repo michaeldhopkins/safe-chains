@@ -8,11 +8,9 @@ static WHOIS_POLICY: FlagPolicy = FlagPolicy {
         "-M", "-Q", "-R", "-S", "-a", "-b", "-c",
         "-d", "-f", "-g", "-l", "-m", "-r", "-x",
     ]),
-    standalone_short: b"ABGHIKLMQRSabcdfglmrx",
     valued: WordSet::flags(&[
         "-T", "-V", "-h", "-i", "-p", "-s", "-t",
     ]),
-    valued_short: b"TVhipst",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

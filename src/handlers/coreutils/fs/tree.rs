@@ -12,13 +12,11 @@ static TREE_POLICY: FlagPolicy = FlagPolicy {
         "-n", "-p", "-q", "-r", "-s", "-t", "-u", "-v",
         "-x",
     ]),
-    standalone_short: b"ACDFJNQSXadfghilnpqrstuvx",
     valued: WordSet::flags(&[
         "--charset", "--filelimit", "--filesfrom",
         "--sort", "--timefmt",
         "-H", "-I", "-L", "-P", "-T",
     ]),
-    valued_short: b"HILPT",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

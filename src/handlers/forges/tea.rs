@@ -25,12 +25,11 @@ static TEA_LOGIN_SAFE: WordSet =
 
 static TEA_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[
         "--fields", "--limit", "--login", "--output",
         "--page", "--repo", "--state",
+        "-L", "-R", "-f", "-l", "-o", "-p", "-s",
     ]),
-    valued_short: b"flLoopRs",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -39,12 +38,12 @@ static TEA_LIST_POLICY: FlagPolicy = FlagPolicy {
 static TEA_VIEW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--comments",
+        "-c",
     ]),
-    standalone_short: b"c",
     valued: WordSet::flags(&[
         "--login", "--output", "--repo",
+        "-R", "-l", "-o",
     ]),
-    valued_short: b"loR",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

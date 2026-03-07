@@ -19,7 +19,6 @@ static LS_POLICY: FlagPolicy = FlagPolicy {
         "-l", "-m", "-n", "-o", "-p", "-q", "-r", "-s",
         "-t", "-u", "-v", "-x",
     ]),
-    standalone_short: b"1ABCFGHLNQRSUXZacdfghiklmnopqrstuvx",
     valued: WordSet::flags(&[
         "--block-size", "--color", "--format", "--hide",
         "--hyperlink", "--ignore",
@@ -27,7 +26,6 @@ static LS_POLICY: FlagPolicy = FlagPolicy {
         "--time-style", "--width",
         "-I", "-T", "-w",
     ]),
-    valued_short: b"ITw",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

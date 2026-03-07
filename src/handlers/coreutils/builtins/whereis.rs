@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static WHEREIS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-b", "-l", "-m", "-s", "-u"]),
-    standalone_short: b"blmsu",
     valued: WordSet::flags(&["-B", "-M", "-S", "-f"]),
-    valued_short: b"BMSf",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

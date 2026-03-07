@@ -7,7 +7,6 @@ static NL_POLICY: FlagPolicy = FlagPolicy {
         "--no-renumber",
         "-p",
     ]),
-    standalone_short: b"p",
     valued: WordSet::flags(&[
         "--body-numbering", "--footer-numbering", "--header-numbering",
         "--join-blank-lines", "--line-increment", "--number-format",
@@ -15,7 +14,6 @@ static NL_POLICY: FlagPolicy = FlagPolicy {
         "--starting-line-number",
         "-b", "-d", "-f", "-h", "-i", "-l", "-n", "-s", "-v", "-w",
     ]),
-    valued_short: b"bdfhilnsvw",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

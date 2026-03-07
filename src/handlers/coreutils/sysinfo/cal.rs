@@ -7,11 +7,9 @@ static CAL_POLICY: FlagPolicy = FlagPolicy {
         "--monday", "--sunday", "--three", "--year",
         "-1", "-3", "-h", "-j", "-m", "-s", "-w", "-y",
     ]),
-    standalone_short: b"13hjmswy",
     valued: WordSet::flags(&[
         "-A", "-B", "-d", "-n",
     ]),
-    valued_short: b"ABdn",
     bare: true,
     max_positional: Some(2),
     flag_style: FlagStyle::Strict,

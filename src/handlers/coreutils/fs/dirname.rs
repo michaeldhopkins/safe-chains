@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DIRNAME_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--zero", "-z"]),
-    standalone_short: b"z",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

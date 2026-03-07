@@ -7,12 +7,10 @@ static PASTE_POLICY: FlagPolicy = FlagPolicy {
         "--serial", "--zero-terminated",
         "-s", "-z",
     ]),
-    standalone_short: b"sz",
     valued: WordSet::flags(&[
         "--delimiters",
         "-d",
     ]),
-    valued_short: b"d",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

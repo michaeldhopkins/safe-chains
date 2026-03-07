@@ -8,9 +8,7 @@ pub enum FlagStyle {
 
 pub struct FlagPolicy {
     pub standalone: WordSet,
-    pub standalone_short: &'static [u8],
     pub valued: WordSet,
-    pub valued_short: &'static [u8],
     pub bare: bool,
     pub max_positional: Option<usize>,
     pub flag_style: FlagStyle,
@@ -116,11 +114,11 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
         while j < bytes.len() {
             let b = bytes[j];
             let is_last = j == bytes.len() - 1;
-            if policy.standalone_short.contains(&b) {
+            if policy.standalone.contains_short(b) {
                 j += 1;
                 continue;
             }
-            if policy.valued_short.contains(&b) {
+            if policy.valued.contains_short(b) {
                 if is_last {
                     i += 1;
                 }
@@ -144,14 +142,12 @@ mod tests {
     static TEST_POLICY: FlagPolicy = FlagPolicy {
         standalone: WordSet::flags(&[
             "--color", "--count", "--help", "--recursive", "--version",
-            "-c", "-r",
+            "-H", "-c", "-i", "-l", "-n", "-o", "-r", "-s", "-v", "-w",
         ]),
-        standalone_short: b"cHilnorsvw",
         valued: WordSet::flags(&[
             "--after-context", "--before-context", "--max-count",
             "-A", "-B", "-m",
         ]),
-        valued_short: b"ABm",
         bare: false,
         max_positional: None,
         flag_style: FlagStyle::Strict,
@@ -170,9 +166,7 @@ mod tests {
     fn bare_allowed_when_bare_true() {
         let policy = FlagPolicy {
             standalone: WordSet::flags(&[]),
-            standalone_short: b"",
             valued: WordSet::flags(&[]),
-            valued_short: b"",
             bare: true,
             max_positional: None,
             flag_style: FlagStyle::Strict,
@@ -280,9 +274,7 @@ mod tests {
 
     static LIMITED_POLICY: FlagPolicy = FlagPolicy {
         standalone: WordSet::flags(&["--count", "-c", "-d", "-i", "-u"]),
-        standalone_short: b"cdiu",
         valued: WordSet::flags(&["--skip-fields", "-f", "-s"]),
-        valued_short: b"fs",
         bare: true,
         max_positional: Some(1),
         flag_style: FlagStyle::Strict,
@@ -320,9 +312,7 @@ mod tests {
 
     static POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
         standalone: WordSet::flags(&["-E", "-e", "-n"]),
-        standalone_short: b"Een",
         valued: WordSet::flags(&[]),
-        valued_short: b"",
         bare: true,
         max_positional: None,
         flag_style: FlagStyle::Positional,
@@ -367,9 +357,7 @@ mod tests {
     fn positional_style_with_max_positional() {
         let policy = FlagPolicy {
             standalone: WordSet::flags(&["-n"]),
-            standalone_short: b"n",
             valued: WordSet::flags(&[]),
-            valued_short: b"",
             bare: true,
             max_positional: Some(2),
             flag_style: FlagStyle::Positional,

@@ -13,7 +13,6 @@ static DELTA_POLICY: FlagPolicy = FlagPolicy {
         "--show-syntax-themes", "--side-by-side",
         "-n", "-s",
     ]),
-    standalone_short: b"ns",
     valued: WordSet::flags(&[
         "--commit-decoration-style", "--commit-style", "--config",
         "--diff-stat-align-width", "--features", "--file-added-label",
@@ -42,7 +41,6 @@ static DELTA_POLICY: FlagPolicy = FlagPolicy {
         "--true-color", "--whitespace-error-style", "--width",
         "-w",
     ]),
-    valued_short: b"w",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

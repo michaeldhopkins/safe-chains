@@ -356,10 +356,8 @@ mod tests {
     }
 
     static TEST_POLICY: FlagPolicy = FlagPolicy {
-        standalone: WordSet::new(&["--verbose"]),
-        standalone_short: b"v",
-        valued: WordSet::new(&["--output"]),
-        valued_short: b"o",
+        standalone: WordSet::new(&["--verbose", "-v"]),
+        valued: WordSet::new(&["--output", "-o"]),
         bare: true,
         max_positional: None,
         flag_style: FlagStyle::Strict,
@@ -466,9 +464,7 @@ mod tests {
 
     static GUARDED_POLICY: FlagPolicy = FlagPolicy {
         standalone: WordSet::new(&["--all", "--check"]),
-        standalone_short: b"",
         valued: WordSet::new(&[]),
-        valued_short: b"",
         bare: false,
         max_positional: None,
         flag_style: FlagStyle::Strict,
@@ -578,7 +574,7 @@ mod tests {
         assert_eq!(doc.name, "mycmd");
         assert_eq!(
             doc.description,
-            "- Info flags: --info\n- **build**: Flags: --verbose. Valued: --output"
+            "- Info flags: --info\n- **build**: Flags: --verbose, -v. Valued: --output, -o"
         );
     }
 
@@ -587,7 +583,7 @@ mod tests {
         let doc = NESTED_CMD.to_doc();
         assert_eq!(
             doc.description,
-            "- **package describe**: Flags: --verbose. Valued: --output"
+            "- **package describe**: Flags: --verbose, -v. Valued: --output, -o"
         );
     }
 

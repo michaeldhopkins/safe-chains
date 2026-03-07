@@ -10,13 +10,11 @@ static XXD_POLICY: FlagPolicy = FlagPolicy {
         "-C", "-E", "-a", "-b", "-d", "-e", "-i", "-p",
         "-r", "-u",
     ]),
-    standalone_short: b"CEabdeipru",
     valued: WordSet::flags(&[
         "--color", "--cols", "--groupsize", "--len",
         "--name", "--offset", "--seek",
         "-R", "-c", "-g", "-l", "-n", "-o", "-s",
     ]),
-    valued_short: b"Rcglnos",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

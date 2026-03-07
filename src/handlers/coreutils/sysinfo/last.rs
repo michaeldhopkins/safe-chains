@@ -6,14 +6,13 @@ static LAST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--dns", "--fullnames", "--fulltimes", "--hostlast",
         "--ip", "--nohostname", "--system", "--time-format",
+        "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
         "-F", "-R", "-a", "-d", "-i", "-w", "-x",
     ]),
-    standalone_short: b"0123456789FRadiwx",
     valued: WordSet::flags(&[
         "--limit", "--present", "--since", "--time-format", "--until",
         "-f", "-n", "-p", "-s", "-t",
     ]),
-    valued_short: b"fnpst",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

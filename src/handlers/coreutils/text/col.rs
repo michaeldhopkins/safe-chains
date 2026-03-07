@@ -6,9 +6,7 @@ static COL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "-b", "-f", "-h", "-p", "-x",
     ]),
-    standalone_short: b"bfhpx",
     valued: WordSet::flags(&["-l"]),
-    valued_short: b"l",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

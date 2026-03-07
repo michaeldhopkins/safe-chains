@@ -7,12 +7,10 @@ static TOP_POLICY: FlagPolicy = FlagPolicy {
         "-1", "-B", "-E", "-H", "-S", "-b", "-c", "-e",
         "-i",
     ]),
-    standalone_short: b"1BEHSbcei",
     valued: WordSet::flags(&[
         "-F", "-O", "-U", "-d", "-f",
         "-l", "-n", "-o", "-p", "-s", "-u", "-w",
     ]),
-    valued_short: b"FOUdflnopsuw",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

@@ -14,12 +14,10 @@ static NM_POLICY: FlagPolicy = FlagPolicy {
         "-a", "-g", "-j", "-l", "-m", "-n", "-o",
         "-p", "-r", "-s", "-u", "-v", "-x",
     ]),
-    standalone_short: b"ABCDPSagjlmnoprsuvx",
     valued: WordSet::flags(&[
         "--format", "--radix", "--size-sort", "--target",
         "-f", "-t",
     ]),
-    valued_short: b"ft",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

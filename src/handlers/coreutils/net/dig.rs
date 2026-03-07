@@ -6,11 +6,9 @@ static DIG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "-4", "-6", "-m", "-r", "-u", "-v",
     ]),
-    standalone_short: b"46mruv",
     valued: WordSet::flags(&[
         "-b", "-c", "-f", "-k", "-p", "-q", "-t", "-x", "-y",
     ]),
-    valued_short: b"bcfkpqtxy",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

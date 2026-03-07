@@ -20,7 +20,6 @@ static EZA_POLICY: FlagPolicy = FlagPolicy {
         "-g", "-h", "-i", "-l", "-m",
         "-r", "-s", "-u", "-x",
     ]),
-    standalone_short: b"1@ABDFGHIMRSTUZabdfghilmrsux",
     valued: WordSet::flags(&[
         "--color", "--colour", "--git-ignore-glob", "--grid-columns",
         "--group-directories-first-dirs", "--ignore-glob", "--level",
@@ -28,7 +27,6 @@ static EZA_POLICY: FlagPolicy = FlagPolicy {
         "--total-size", "--width",
         "-L", "-X", "-t", "-w",
     ]),
-    valued_short: b"LXtw",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

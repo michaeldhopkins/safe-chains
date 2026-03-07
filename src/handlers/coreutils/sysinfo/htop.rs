@@ -7,13 +7,11 @@ static HTOP_POLICY: FlagPolicy = FlagPolicy {
         "--no-color", "--no-mouse", "--no-unicode", "--tree",
         "-C", "-H", "-M", "-t",
     ]),
-    standalone_short: b"CHMt",
     valued: WordSet::flags(&[
         "--delay", "--filter", "--highlight-changes",
         "--pid", "--sort-key", "--user",
         "-F", "-d", "-p", "-s", "-u",
     ]),
-    valued_short: b"Fdpsu",
     bare: true,
     max_positional: Some(0),
     flag_style: FlagStyle::Strict,

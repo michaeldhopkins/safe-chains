@@ -25,7 +25,6 @@ static RG_POLICY: FlagPolicy = FlagPolicy {
         "-a", "-b", "-c", "-h", "-i", "-l", "-n", "-o", "-p", "-q",
         "-s", "-u", "-v", "-w", "-x", "-z",
     ]),
-    standalone_short: b"FHILNPSUVabchilnopqsuvwxz",
     valued: WordSet::flags(&[
         "--after-context", "--before-context", "--color", "--colors",
         "--context", "--context-separator", "--dfa-size-limit", "--encoding",
@@ -37,7 +36,6 @@ static RG_POLICY: FlagPolicy = FlagPolicy {
         "-A", "-B", "-C", "-E", "-M", "-T",
         "-e", "-f", "-g", "-j", "-m", "-r", "-t",
     ]),
-    valued_short: b"ABCEMTefgjmrt",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

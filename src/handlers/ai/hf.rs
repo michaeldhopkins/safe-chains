@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static HF_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -14,9 +12,7 @@ static HF_BARE_POLICY: FlagPolicy = FlagPolicy {
 
 static HF_POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -24,9 +20,7 @@ static HF_POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
 
 static HF_LS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--author", "--filter", "--limit", "--search", "--sort"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -34,9 +28,7 @@ static HF_LS_POLICY: FlagPolicy = FlagPolicy {
 
 static HF_COLLECTIONS_LS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--limit", "--owner"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -44,9 +36,7 @@ static HF_COLLECTIONS_LS_POLICY: FlagPolicy = FlagPolicy {
 
 static HF_DISCUSSIONS_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -54,9 +44,7 @@ static HF_DISCUSSIONS_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static HF_JOBS_LOGS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--tail"]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

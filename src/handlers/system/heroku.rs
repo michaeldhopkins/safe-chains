@@ -3,60 +3,48 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static HEROKU_APPS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "--json"]),
-    standalone_short: b"a",
-    valued: WordSet::flags(&["--space", "--team"]),
-    valued_short: b"st",
+    standalone: WordSet::flags(&["--all", "--json", "-a"]),
+    valued: WordSet::flags(&["--space", "--team", "-s", "-t"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static HEROKU_APPS_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--shell"]),
-    standalone_short: b"s",
-    valued: WordSet::flags(&["--app"]),
-    valued_short: b"a",
+    standalone: WordSet::flags(&["--json", "--shell", "-s"]),
+    valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static HEROKU_CONFIG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--shell"]),
-    standalone_short: b"js",
-    valued: WordSet::flags(&["--app"]),
-    valued_short: b"a",
+    standalone: WordSet::flags(&["--json", "--shell", "-j", "-s"]),
+    valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static HEROKU_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--force-colors", "--tail"]),
-    standalone_short: b"t",
-    valued: WordSet::flags(&["--app", "--dyno", "--num", "--source"]),
-    valued_short: b"adns",
+    standalone: WordSet::flags(&["--force-colors", "--tail", "-t"]),
+    valued: WordSet::flags(&["--app", "--dyno", "--num", "--source", "-a", "-d", "-n", "-s"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static HEROKU_PS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"j",
-    valued: WordSet::flags(&["--app"]),
-    valued_short: b"a",
+    standalone: WordSet::flags(&["--json", "-j"]),
+    valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static HEROKU_RELEASES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"j",
-    valued: WordSet::flags(&["--app", "--num"]),
-    valued_short: b"an",
+    standalone: WordSet::flags(&["--json", "-j"]),
+    valued: WordSet::flags(&["--app", "--num", "-a", "-n"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -64,9 +52,7 @@ static HEROKU_RELEASES_POLICY: FlagPolicy = FlagPolicy {
 
 static HEROKU_REGIONS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -74,9 +60,7 @@ static HEROKU_REGIONS_POLICY: FlagPolicy = FlagPolicy {
 
 static HEROKU_STATUS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -84,19 +68,15 @@ static HEROKU_STATUS_POLICY: FlagPolicy = FlagPolicy {
 
 static HEROKU_BUILDPACKS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
-    valued: WordSet::flags(&["--app"]),
-    valued_short: b"a",
+    valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static HEROKU_ADDONS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "--json"]),
-    standalone_short: b"A",
-    valued: WordSet::flags(&["--app"]),
-    valued_short: b"a",
+    standalone: WordSet::flags(&["--all", "--json", "-A"]),
+    valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

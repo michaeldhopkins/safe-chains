@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static XCODEBUILD_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-json"]),
-    standalone_short: b"",
     valued: WordSet::flags(&["-project", "-workspace"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -14,12 +12,10 @@ static XCODEBUILD_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static XCODEBUILD_SHOW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-json"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[
         "-configuration", "-destination", "-project",
         "-scheme", "-sdk", "-target", "-workspace",
     ]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -27,9 +23,7 @@ static XCODEBUILD_SHOW_POLICY: FlagPolicy = FlagPolicy {
 
 static XCODEBUILD_VERSION_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

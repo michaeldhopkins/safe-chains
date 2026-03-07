@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static NVM_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--lts", "--no-colors"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

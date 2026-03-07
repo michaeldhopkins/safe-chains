@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static UPTIME_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--pretty", "--since", "-p", "-s"]),
-    standalone_short: b"ps",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: Some(0),
     flag_style: FlagStyle::Strict,

@@ -4,19 +4,15 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static XCODEGEN_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static XCODEGEN_DUMP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--no-env", "--quiet"]),
-    standalone_short: b"nq",
-    valued: WordSet::flags(&["--project-root", "--spec", "--type"]),
-    valued_short: b"rst",
+    standalone: WordSet::flags(&["--no-env", "--quiet", "-n", "-q"]),
+    valued: WordSet::flags(&["--project-root", "--spec", "--type", "-r", "-s", "-t"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

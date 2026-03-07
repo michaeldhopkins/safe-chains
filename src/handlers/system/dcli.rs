@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DCLI_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -14,9 +12,7 @@ static DCLI_BARE_POLICY: FlagPolicy = FlagPolicy {
 
 static DCLI_DEVICES_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -24,9 +20,7 @@ static DCLI_DEVICES_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static DCLI_TEAM_MEMBERS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--csv", "--human-readable"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -34,9 +28,7 @@ static DCLI_TEAM_MEMBERS_POLICY: FlagPolicy = FlagPolicy {
 
 static DCLI_TEAM_LOGS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--csv", "--human-readable"]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--end", "--start"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -44,9 +36,7 @@ static DCLI_TEAM_LOGS_POLICY: FlagPolicy = FlagPolicy {
 
 static DCLI_TEAM_REPORT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -54,9 +44,7 @@ static DCLI_TEAM_REPORT_POLICY: FlagPolicy = FlagPolicy {
 
 static DCLI_TEAM_DWI_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--count", "--offset", "--order-by"]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -64,9 +52,7 @@ static DCLI_TEAM_DWI_POLICY: FlagPolicy = FlagPolicy {
 
 static DCLI_JSON_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

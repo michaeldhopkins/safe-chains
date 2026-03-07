@@ -13,7 +13,6 @@ static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
         "--wip",
         "-b", "-d", "-e", "-q",
     ]),
-    standalone_short: b"bdeq",
     valued: WordSet::flags(&[
         "--ci-environment", "--format", "--format-options",
         "--language", "--lines", "--name", "--order",
@@ -21,7 +20,6 @@ static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
         "--require-module", "--retry", "--tags",
         "-f", "-i", "-l", "-n", "-o", "-p", "-r", "-t",
     ]),
-    valued_short: b"filnoprt",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

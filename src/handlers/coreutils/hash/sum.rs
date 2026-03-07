@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static SUM_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--sysv", "-r", "-s"]),
-    standalone_short: b"rs",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

@@ -9,12 +9,10 @@ static DF_POLICY: FlagPolicy = FlagPolicy {
         "--si", "--sync", "--total",
         "-H", "-P", "-T", "-a", "-h", "-i", "-k", "-l",
     ]),
-    standalone_short: b"HPTahikl",
     valued: WordSet::flags(&[
         "--block-size", "--exclude-type", "--output", "--type",
         "-B", "-t", "-x",
     ]),
-    valued_short: b"Btx",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

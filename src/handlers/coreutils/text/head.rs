@@ -5,14 +5,13 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static HEAD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--quiet", "--silent", "--verbose", "--zero-terminated",
+        "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
         "-q", "-v", "-z",
     ]),
-    standalone_short: b"0123456789qvz",
     valued: WordSet::flags(&[
         "--bytes", "--lines",
         "-c", "-n",
     ]),
-    valued_short: b"cn",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

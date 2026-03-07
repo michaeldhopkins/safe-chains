@@ -6,15 +6,14 @@ static TAIL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--follow", "--quiet", "--retry", "--silent", "--verbose",
         "--zero-terminated",
+        "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
         "-F", "-f", "-q", "-r", "-v", "-z",
     ]),
-    standalone_short: b"0123456789Ffqrvz",
     valued: WordSet::flags(&[
         "--bytes", "--lines", "--max-unchanged-stats", "--pid",
         "--sleep-interval",
         "-b", "-c", "-n",
     ]),
-    valued_short: b"bcn",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

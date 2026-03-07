@@ -6,10 +6,9 @@ static CONDA_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--explicit", "--export", "--full-name", "--json",
         "--no-pip", "--revisions",
+        "-e", "-f",
     ]),
-    standalone_short: b"ef",
-    valued: WordSet::flags(&["--name", "--prefix"]),
-    valued_short: b"np",
+    valued: WordSet::flags(&["--name", "--prefix", "-n", "-p"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -18,10 +17,9 @@ static CONDA_LIST_POLICY: FlagPolicy = FlagPolicy {
 static CONDA_INFO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--envs", "--json", "--verbose",
+        "-a", "-e", "-v",
     ]),
-    standalone_short: b"aev",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -30,10 +28,9 @@ static CONDA_INFO_POLICY: FlagPolicy = FlagPolicy {
 static CONDA_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--json", "--quiet", "--show", "--show-sources", "--verbose",
+        "-q", "-v",
     ]),
-    standalone_short: b"qv",
-    valued: WordSet::flags(&["--env", "--file", "--name", "--prefix"]),
-    valued_short: b"fnp",
+    valued: WordSet::flags(&["--env", "--file", "--name", "--prefix", "-f", "-n", "-p"]),
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

@@ -6,20 +6,17 @@ static GEM_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--installed", "--local", "--no-details",
         "--no-versions", "--prerelease", "--remote", "--versions",
+        "-a", "-d", "-i", "-l", "-r",
     ]),
-    standalone_short: b"adilr",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static GEM_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--installed", "--prerelease"]),
-    standalone_short: b"i",
-    valued: WordSet::flags(&["--version"]),
-    valued_short: b"v",
+    standalone: WordSet::flags(&["--installed", "--prerelease", "-i"]),
+    valued: WordSet::flags(&["--version", "-v"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -29,10 +26,9 @@ static GEM_SEARCH_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--details", "--exact", "--local",
         "--prerelease", "--remote", "--versions",
+        "-a", "-d", "-e", "-i", "-l", "-r",
     ]),
-    standalone_short: b"adeilr",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -41,10 +37,9 @@ static GEM_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 static GEM_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--local", "--prerelease", "--remote", "--versions",
+        "-a", "-i", "-l", "-r",
     ]),
-    standalone_short: b"ailr",
-    valued: WordSet::flags(&["--version"]),
-    valued_short: b"v",
+    valued: WordSet::flags(&["--version", "-v"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

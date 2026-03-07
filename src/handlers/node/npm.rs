@@ -6,10 +6,9 @@ static NPM_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--json", "--link", "--long", "--omit",
         "--parseable", "--production", "--unicode",
+        "-a", "-l",
     ]),
-    standalone_short: b"al",
     valued: WordSet::flags(&["--depth", "--prefix"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -17,9 +16,7 @@ static NPM_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static NPM_VIEW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -29,9 +26,7 @@ static NPM_AUDIT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--json", "--omit", "--production",
     ]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--audit-level"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -39,9 +34,7 @@ static NPM_AUDIT_POLICY: FlagPolicy = FlagPolicy {
 
 static NPM_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -49,19 +42,15 @@ static NPM_BARE_POLICY: FlagPolicy = FlagPolicy {
 
 static NPM_TEST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static NPM_CONFIG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--long"]),
-    standalone_short: b"l",
+    standalone: WordSet::flags(&["--json", "--long", "-l"]),
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

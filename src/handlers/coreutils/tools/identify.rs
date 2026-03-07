@@ -7,7 +7,6 @@ static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
         "--verbose", "-ping", "-quiet", "-regard-warnings",
         "-verbose",
     ]),
-    standalone_short: b"",
     valued: WordSet::flags(&[
         "-channel", "-define", "-density", "-depth",
         "-features", "-format", "-fuzz", "-interlace",
@@ -16,7 +15,6 @@ static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
         "-size", "-strip", "-unique",
         "-virtual-pixel",
     ]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

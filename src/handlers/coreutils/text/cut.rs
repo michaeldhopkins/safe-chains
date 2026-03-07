@@ -7,13 +7,11 @@ static CUT_POLICY: FlagPolicy = FlagPolicy {
         "--complement", "--only-delimited", "--zero-terminated",
         "-n", "-s", "-w", "-z",
     ]),
-    standalone_short: b"nswz",
     valued: WordSet::flags(&[
         "--bytes", "--characters", "--delimiter", "--fields",
         "--output-delimiter",
         "-b", "-c", "-d", "-f",
     ]),
-    valued_short: b"bcdf",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

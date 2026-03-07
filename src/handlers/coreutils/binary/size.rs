@@ -7,11 +7,9 @@ static SIZE_POLICY: FlagPolicy = FlagPolicy {
         "--common", "--totals",
         "-A", "-B", "-G", "-d", "-o", "-t", "-x",
     ]),
-    standalone_short: b"ABGdotx",
     valued: WordSet::flags(&[
         "--format", "--radix", "--target",
     ]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

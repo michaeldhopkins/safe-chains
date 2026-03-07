@@ -7,39 +7,31 @@ static UV_PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
         "--editable", "--exclude-editable", "--outdated",
         "--strict",
     ]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--exclude", "--format", "--python"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static UV_PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--files", "--verbose"]),
-    standalone_short: b"v",
+    standalone: WordSet::flags(&["--files", "--verbose", "-v"]),
     valued: WordSet::flags(&["--python"]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static UV_PIP_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--verbose"]),
-    standalone_short: b"v",
+    standalone: WordSet::flags(&["--verbose", "-v"]),
     valued: WordSet::flags(&["--python"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static UV_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--verbose"]),
-    standalone_short: b"v",
+    standalone: WordSet::flags(&["--verbose", "-v"]),
     valued: WordSet::flags(&["--python"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

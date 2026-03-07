@@ -7,12 +7,10 @@ static TAC_POLICY: FlagPolicy = FlagPolicy {
         "--before", "--regex",
         "-b", "-r",
     ]),
-    standalone_short: b"br",
     valued: WordSet::flags(&[
         "--separator",
         "-s",
     ]),
-    valued_short: b"s",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

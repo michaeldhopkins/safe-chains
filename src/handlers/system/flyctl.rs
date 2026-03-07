@@ -3,10 +3,8 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static FLYCTL_STATUS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"j",
-    valued: WordSet::flags(&["--app"]),
-    valued_short: b"a",
+    standalone: WordSet::flags(&["--json", "-j"]),
+    valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -14,9 +12,7 @@ static FLYCTL_STATUS_POLICY: FlagPolicy = FlagPolicy {
 
 static FLYCTL_LOGS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
-    valued: WordSet::flags(&["--app", "--instance", "--region"]),
-    valued_short: b"air",
+    valued: WordSet::flags(&["--app", "--instance", "--region", "-a", "-i", "-r"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -24,29 +20,23 @@ static FLYCTL_LOGS_POLICY: FlagPolicy = FlagPolicy {
 
 static FLYCTL_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static FLYCTL_RELEASES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"j",
-    valued: WordSet::flags(&["--app"]),
-    valued_short: b"a",
+    standalone: WordSet::flags(&["--json", "-j"]),
+    valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static FLYCTL_APP_JSON_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"j",
-    valued: WordSet::flags(&["--app"]),
-    valued_short: b"a",
+    standalone: WordSet::flags(&["--json", "-j"]),
+    valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

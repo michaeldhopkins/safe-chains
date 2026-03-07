@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DEFAULTS_READ_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-g", "-globalDomain"]),
-    standalone_short: b"",
     valued: WordSet::flags(&["-app"]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -14,9 +12,7 @@ static DEFAULTS_READ_POLICY: FlagPolicy = FlagPolicy {
 
 static DEFAULTS_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

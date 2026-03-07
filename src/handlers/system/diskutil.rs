@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DISKUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -14,9 +12,7 @@ static DISKUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 
 static DISKUTIL_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-plist"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -24,9 +20,7 @@ static DISKUTIL_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static DISKUTIL_INFO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-all", "-plist"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

@@ -7,12 +7,10 @@ static EXPAND_POLICY: FlagPolicy = FlagPolicy {
         "--initial",
         "-i",
     ]),
-    standalone_short: b"i",
     valued: WordSet::flags(&[
         "--tabs",
         "-t",
     ]),
-    valued_short: b"t",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

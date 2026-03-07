@@ -7,12 +7,10 @@ static LOG_SHOW_POLICY: FlagPolicy = FlagPolicy {
         "--backtrace", "--debug", "--info", "--loss", "--mach-continuous-time",
         "--no-pager", "--signpost",
     ]),
-    standalone_short: b"",
     valued: WordSet::flags(&[
         "--color", "--end", "--last", "--predicate",
         "--process", "--source", "--start", "--style", "--type",
     ]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -23,12 +21,10 @@ static LOG_STREAM_POLICY: FlagPolicy = FlagPolicy {
         "--backtrace", "--debug", "--info", "--loss",
         "--mach-continuous-time", "--signpost",
     ]),
-    standalone_short: b"",
     valued: WordSet::flags(&[
         "--color", "--level", "--predicate", "--process",
         "--source", "--style", "--timeout", "--type",
     ]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -36,9 +32,7 @@ static LOG_STREAM_POLICY: FlagPolicy = FlagPolicy {
 
 static LOG_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

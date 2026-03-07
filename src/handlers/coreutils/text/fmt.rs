@@ -8,12 +8,10 @@ static FMT_POLICY: FlagPolicy = FlagPolicy {
         "--uniform-spacing",
         "-c", "-m", "-n", "-s", "-u",
     ]),
-    standalone_short: b"cmnsu",
     valued: WordSet::flags(&[
         "--goal", "--prefix", "--width",
         "-d", "-g", "-l", "-p", "-t", "-w",
     ]),
-    valued_short: b"dglptw",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

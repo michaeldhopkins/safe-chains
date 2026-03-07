@@ -8,13 +8,11 @@ static UNIQ_POLICY: FlagPolicy = FlagPolicy {
         "--zero-terminated",
         "-D", "-c", "-d", "-i", "-u", "-z",
     ]),
-    standalone_short: b"Dcdiuz",
     valued: WordSet::flags(&[
         "--all-repeated", "--check-chars", "--group", "--skip-chars",
         "--skip-fields",
         "-f", "-s", "-w",
     ]),
-    valued_short: b"fsw",
     bare: true,
     max_positional: Some(1),
     flag_style: FlagStyle::Strict,

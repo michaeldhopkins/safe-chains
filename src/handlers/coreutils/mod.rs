@@ -16,9 +16,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 pub(super) static BARE_ONLY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: Some(0),
     flag_style: FlagStyle::Strict,

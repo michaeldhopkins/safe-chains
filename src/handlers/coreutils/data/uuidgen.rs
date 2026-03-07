@@ -4,12 +4,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static UUIDGEN_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--random", "--time", "-r", "-t"]),
-    standalone_short: b"rt",
     valued: WordSet::flags(&[
         "--md5", "--name", "--namespace", "--sha1", "-N",
         "-m", "-n", "-s",
     ]),
-    valued_short: b"mnNs",
     bare: true,
     max_positional: Some(0),
     flag_style: FlagStyle::Strict,

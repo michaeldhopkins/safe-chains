@@ -8,12 +8,10 @@ static LSOF_POLICY: FlagPolicy = FlagPolicy {
         "-U", "-V", "-X", "-b", "-h",
         "-l", "-n", "-t", "-w", "-x",
     ]),
-    standalone_short: b"CGMNOPRUVXbhlntwx",
     valued: WordSet::flags(&[
         "-F", "-S", "-T", "-a", "-c", "-d", "-g",
         "-i", "-k", "-o", "-p", "-r", "-s", "-u",
     ]),
-    valued_short: b"FSTacdgikoprsug",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

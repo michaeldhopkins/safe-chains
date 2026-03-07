@@ -6,11 +6,10 @@ static SPCTL_POLICY: FlagPolicy = FlagPolicy {
         "--assess", "--verbose",
         "-a", "-v",
     ]),
-    standalone_short: b"av",
     valued: WordSet::flags(&[
         "--context", "--type",
+        "-t",
     ]),
-    valued_short: b"t",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

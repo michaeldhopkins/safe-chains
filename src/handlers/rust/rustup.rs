@@ -3,10 +3,8 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static RUSTUP_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--installed"]),
-    standalone_short: b"v",
+    standalone: WordSet::flags(&["--installed", "-v"]),
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -14,9 +12,7 @@ static RUSTUP_SHOW_POLICY: FlagPolicy = FlagPolicy {
 
 static RUSTUP_WHICH_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--toolchain"]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -29,19 +25,15 @@ static RUSTUP_DOC_POLICY: FlagPolicy = FlagPolicy {
         "--reference", "--rust-by-example", "--rustc", "--rustdoc",
         "--std", "--test", "--unstable-book",
     ]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--toolchain"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static RUSTUP_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--installed"]),
-    standalone_short: b"v",
+    standalone: WordSet::flags(&["--installed", "-v"]),
     valued: WordSet::flags(&["--toolchain"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

@@ -7,13 +7,11 @@ static STRINGS_POLICY: FlagPolicy = FlagPolicy {
         "--all", "--include-all-whitespace", "--print-file-name",
         "-a", "-f", "-w",
     ]),
-    standalone_short: b"afw",
     valued: WordSet::flags(&[
         "--bytes", "--encoding", "--output-separator",
         "--radix", "--target",
         "-T", "-e", "-n", "-o", "-s", "-t",
     ]),
-    valued_short: b"Tenost",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

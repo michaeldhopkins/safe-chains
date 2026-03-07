@@ -7,12 +7,10 @@ static DATE_POLICY: FlagPolicy = FlagPolicy {
         "--rfc-2822", "--rfc-email", "--universal", "--utc",
         "-R", "-j", "-n", "-u",
     ]),
-    standalone_short: b"Rjnu",
     valued: WordSet::flags(&[
         "--date", "--iso-8601", "--reference", "--rfc-3339",
         "-I", "-d", "-f", "-r", "-v", "-z",
     ]),
-    valued_short: b"Idfrvz",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

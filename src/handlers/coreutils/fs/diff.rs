@@ -17,7 +17,6 @@ static DIFF_POLICY: FlagPolicy = FlagPolicy {
         "-a", "-b", "-c", "-d", "-e", "-f", "-i", "-l", "-n", "-p",
         "-q", "-r", "-s", "-t", "-u", "-w", "-y",
     ]),
-    standalone_short: b"BENPTabcdefilnpqrstuwy",
     valued: WordSet::flags(&[
         "--changed-group-format", "--color", "--context", "--exclude",
         "--exclude-from", "--from-file", "--ifdef", "--ignore-matching-lines",
@@ -27,7 +26,6 @@ static DIFF_POLICY: FlagPolicy = FlagPolicy {
         "--unchanged-line-format", "--unified", "--width",
         "-C", "-D", "-F", "-I", "-L", "-S", "-U", "-W", "-X", "-x",
     ]),
-    valued_short: b"CDFILSUWXx",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

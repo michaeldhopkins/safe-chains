@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static BUN_TEST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--bail", "--only", "--rerun-each", "--todo"]),
-    standalone_short: b"",
-    valued: WordSet::flags(&["--preload", "--timeout"]),
-    valued_short: b"t",
+    valued: WordSet::flags(&["--preload", "--timeout", "-t"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -14,9 +12,7 @@ static BUN_TEST_POLICY: FlagPolicy = FlagPolicy {
 
 static BUN_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -24,9 +20,7 @@ static BUN_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
 
 static BUN_PM_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

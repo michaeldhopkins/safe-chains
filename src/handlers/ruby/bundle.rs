@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static BUNDLE_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--name-only", "--paths"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -14,9 +12,7 @@ static BUNDLE_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static BUNDLE_INFO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--path"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -24,9 +20,7 @@ static BUNDLE_INFO_POLICY: FlagPolicy = FlagPolicy {
 
 static BUNDLE_SHOW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--paths"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -34,9 +28,7 @@ static BUNDLE_SHOW_POLICY: FlagPolicy = FlagPolicy {
 
 static BUNDLE_CHECK_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--dry-run"]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--gemfile", "--path"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

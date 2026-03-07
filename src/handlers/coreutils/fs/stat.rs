@@ -7,12 +7,10 @@ static STAT_POLICY: FlagPolicy = FlagPolicy {
         "--dereference", "--file-system", "--terse",
         "-F", "-L", "-l", "-n", "-q", "-r", "-s", "-x",
     ]),
-    standalone_short: b"FLlnqrsx",
     valued: WordSet::flags(&[
         "--format", "--printf",
         "-c", "-f", "-t",
     ]),
-    valued_short: b"cft",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

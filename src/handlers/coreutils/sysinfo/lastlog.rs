@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static LASTLOG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--before", "--time", "--user", "-b", "-t", "-u"]),
-    valued_short: b"btu",
     bare: true,
     max_positional: Some(0),
     flag_style: FlagStyle::Strict,

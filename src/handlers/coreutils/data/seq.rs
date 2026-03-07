@@ -7,12 +7,10 @@ static SEQ_POLICY: FlagPolicy = FlagPolicy {
         "--equal-width",
         "-w",
     ]),
-    standalone_short: b"w",
     valued: WordSet::flags(&[
         "--format", "--separator",
         "-f", "-s", "-t",
     ]),
-    valued_short: b"fst",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

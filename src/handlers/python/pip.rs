@@ -7,22 +7,19 @@ static PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
         "--editable", "--exclude-editable", "--include-editable",
         "--local", "--not-required", "--outdated", "--pre",
         "--uptodate", "--user",
+        "-e", "-i", "-l", "-o",
     ]),
-    standalone_short: b"eilo",
     valued: WordSet::flags(&[
         "--exclude", "--format", "--index-url", "--path",
     ]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--files", "--verbose"]),
-    standalone_short: b"fv",
+    standalone: WordSet::flags(&["--files", "--verbose", "-f", "-v"]),
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -31,10 +28,9 @@ static PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
 static PIP_FREEZE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--exclude-editable", "--local", "--user",
+        "-l",
     ]),
-    standalone_short: b"l",
     valued: WordSet::flags(&["--exclude", "--path"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -42,9 +38,7 @@ static PIP_FREEZE_POLICY: FlagPolicy = FlagPolicy {
 
 static PIP_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static SECURITY_FIND_CERT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-Z", "-a", "-p"]),
-    standalone_short: b"Zap",
     valued: WordSet::flags(&["-c", "-e"]),
-    valued_short: b"ce",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -14,9 +12,7 @@ static SECURITY_FIND_CERT_POLICY: FlagPolicy = FlagPolicy {
 
 static SECURITY_FIND_IDENTITY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-v"]),
-    standalone_short: b"v",
     valued: WordSet::flags(&["-p", "-s"]),
-    valued_short: b"ps",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -24,12 +20,10 @@ static SECURITY_FIND_IDENTITY_POLICY: FlagPolicy = FlagPolicy {
 
 static SECURITY_FIND_PASSWORD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[
         "-D", "-a", "-c", "-d", "-j", "-l", "-r", "-s",
         "-t",
     ]),
-    valued_short: b"Dacdjlrst",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -37,9 +31,7 @@ static SECURITY_FIND_PASSWORD_POLICY: FlagPolicy = FlagPolicy {
 
 static SECURITY_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-d"]),
-    standalone_short: b"d",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -47,9 +39,7 @@ static SECURITY_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static SECURITY_DUMP_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -57,9 +47,7 @@ static SECURITY_DUMP_POLICY: FlagPolicy = FlagPolicy {
 
 static SECURITY_VERIFY_CERT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-L", "-l", "-q"]),
-    standalone_short: b"Llq",
     valued: WordSet::flags(&["-c", "-k", "-n", "-p", "-r"]),
-    valued_short: b"cknpr",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -67,9 +55,7 @@ static SECURITY_VERIFY_CERT_POLICY: FlagPolicy = FlagPolicy {
 
 static SECURITY_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

@@ -8,13 +8,12 @@ macro_rules! cargo_compile_policy {
     ([$($standalone:literal),* $(,)?]) => {
         FlagPolicy {
             standalone: WordSet::flags(&[$($standalone),*]),
-            standalone_short: b"qv",
             valued: WordSet::flags(&[
                 "--bench", "--bin", "--color", "--config", "--example",
                 "--features", "--jobs", "--manifest-path", "--message-format",
                 "--package", "--profile", "--target", "--target-dir", "--test",
+                "-Z", "-j", "-p",
             ]),
-            valued_short: b"jZp",
             bare: true,
             max_positional: None,
             flag_style: FlagStyle::Strict,
@@ -27,6 +26,7 @@ static CARGO_BUILD_POLICY: FlagPolicy = cargo_compile_policy!([
     "--examples", "--frozen", "--future-incompat-report", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--offline",
     "--release", "--tests", "--timings", "--unit-graph",
+    "-q", "-v",
 ]);
 
 static CARGO_TEST_POLICY: FlagPolicy = cargo_compile_policy!([
@@ -34,6 +34,7 @@ static CARGO_TEST_POLICY: FlagPolicy = cargo_compile_policy!([
     "--examples", "--frozen", "--future-incompat-report", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--no-fail-fast",
     "--no-run", "--offline", "--release", "--tests", "--timings", "--unit-graph",
+    "-q", "-v",
 ]);
 
 static CARGO_CHECK_POLICY: FlagPolicy = cargo_compile_policy!([
@@ -41,6 +42,7 @@ static CARGO_CHECK_POLICY: FlagPolicy = cargo_compile_policy!([
     "--frozen", "--future-incompat-report", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--offline",
     "--release", "--tests", "--timings", "--unit-graph",
+    "-q", "-v",
 ]);
 
 static CARGO_CLIPPY_POLICY: FlagPolicy = cargo_compile_policy!([
@@ -48,6 +50,7 @@ static CARGO_CLIPPY_POLICY: FlagPolicy = cargo_compile_policy!([
     "--frozen", "--future-incompat-report", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--no-deps",
     "--offline", "--release", "--tests", "--timings", "--unit-graph",
+    "-q", "-v",
 ]);
 
 static CARGO_DOC_POLICY: FlagPolicy = FlagPolicy {
@@ -56,14 +59,14 @@ static CARGO_DOC_POLICY: FlagPolicy = FlagPolicy {
         "--frozen", "--future-incompat-report", "--ignore-rust-version",
         "--keep-going", "--locked", "--no-default-features", "--no-deps",
         "--offline", "--open", "--release", "--timings", "--unit-graph",
+        "-q", "-v",
     ]),
-    standalone_short: b"qv",
     valued: WordSet::flags(&[
         "--bin", "--color", "--config", "--example",
         "--features", "--jobs", "--manifest-path", "--message-format",
         "--package", "--profile", "--target", "--target-dir",
+        "-Z", "-j", "-p",
     ]),
-    valued_short: b"jZp",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -74,15 +77,15 @@ static CARGO_TREE_POLICY: FlagPolicy = FlagPolicy {
         "--all-features", "--duplicates", "--frozen",
         "--ignore-rust-version", "--locked", "--no-dedupe",
         "--no-default-features", "--offline",
+        "-d", "-e", "-i", "-q", "-v",
     ]),
-    standalone_short: b"deiqv",
     valued: WordSet::flags(&[
         "--charset", "--color", "--config", "--depth",
         "--edges", "--features", "--format", "--invert",
         "--manifest-path", "--package", "--prefix", "--prune",
         "--target",
+        "-p",
     ]),
-    valued_short: b"p",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -92,14 +95,13 @@ static CARGO_METADATA_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all-features", "--frozen", "--locked",
         "--no-default-features", "--no-deps", "--offline",
+        "-q", "-v",
     ]),
-    standalone_short: b"qv",
     valued: WordSet::flags(&[
         "--color", "--config", "--features",
         "--filter-platform", "--format-version",
         "--manifest-path",
     ]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -108,13 +110,12 @@ static CARGO_METADATA_POLICY: FlagPolicy = FlagPolicy {
 static CARGO_SEARCH_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--frozen", "--locked", "--offline",
+        "-q", "-v",
     ]),
-    standalone_short: b"qv",
     valued: WordSet::flags(&[
         "--color", "--config", "--index", "--limit",
         "--registry",
     ]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -123,12 +124,11 @@ static CARGO_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 static CARGO_INFO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--frozen", "--locked", "--offline",
+        "-q", "-v",
     ]),
-    standalone_short: b"qv",
     valued: WordSet::flags(&[
         "--color", "--config", "--index", "--registry",
     ]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -137,13 +137,13 @@ static CARGO_INFO_POLICY: FlagPolicy = FlagPolicy {
 static CARGO_AUDIT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--deny", "--json", "--no-fetch", "--stale",
+        "-n", "-q", "-v",
     ]),
-    standalone_short: b"nqv",
     valued: WordSet::flags(&[
         "--color", "--db", "--file", "--ignore",
         "--target-arch", "--target-os",
+        "-f",
     ]),
-    valued_short: b"f",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -152,14 +152,13 @@ static CARGO_AUDIT_POLICY: FlagPolicy = FlagPolicy {
 static CARGO_DENY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all-features", "--no-default-features",
+        "-q", "-v",
     ]),
-    standalone_short: b"qv",
     valued: WordSet::flags(&[
         "--color", "--config", "--exclude", "--features",
         "--format", "--manifest-path", "--target",
         "--workspace",
     ]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -168,24 +167,22 @@ static CARGO_DENY_POLICY: FlagPolicy = FlagPolicy {
 static CARGO_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--frozen", "--locked", "--offline",
+        "-q", "-v",
     ]),
-    standalone_short: b"qv",
     valued: WordSet::flags(&[
         "--color", "--config", "--manifest-path",
     ]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static CARGO_FMT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "--check"]),
-    standalone_short: b"qv",
+    standalone: WordSet::flags(&["--all", "--check", "-q", "-v"]),
     valued: WordSet::flags(&[
         "--manifest-path", "--message-format", "--package",
+        "-p",
     ]),
-    valued_short: b"p",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -196,14 +193,14 @@ static CARGO_PACKAGE_POLICY: FlagPolicy = FlagPolicy {
         "--all-features", "--frozen", "--keep-going",
         "--list", "--locked", "--no-default-features",
         "--no-metadata", "--offline", "--workspace",
+        "-l", "-q", "-v",
     ]),
-    standalone_short: b"lqv",
     valued: WordSet::flags(&[
         "--color", "--config", "--exclude", "--features",
         "--jobs", "--manifest-path", "--message-format",
         "--package", "--target", "--target-dir",
+        "-F", "-Z", "-j", "-p",
     ]),
-    valued_short: b"jFZp",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -214,15 +211,15 @@ static CARGO_PUBLISH_POLICY: FlagPolicy = FlagPolicy {
         "--all-features", "--dry-run", "--frozen",
         "--keep-going", "--locked", "--no-default-features",
         "--offline", "--workspace",
+        "-n", "-q", "-v",
     ]),
-    standalone_short: b"nqv",
     valued: WordSet::flags(&[
         "--color", "--config", "--exclude", "--features",
         "--index", "--jobs", "--manifest-path",
         "--package", "--registry", "--target",
         "--target-dir",
+        "-F", "-Z", "-j", "-p",
     ]),
-    valued_short: b"jFZp",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -242,9 +239,7 @@ fn check_cargo_sub(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool
 
 static CARGO_HELP_SUB_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: Some(1),
     flag_style: FlagStyle::Positional,
@@ -252,9 +247,7 @@ static CARGO_HELP_SUB_POLICY: FlagPolicy = FlagPolicy {
 
 static CARGO_HELP_ONLY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: false,
     max_positional: Some(0),
     flag_style: FlagStyle::Strict,

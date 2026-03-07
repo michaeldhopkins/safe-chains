@@ -6,11 +6,9 @@ static HEXDUMP_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "-C", "-b", "-c", "-d", "-o", "-v", "-x",
     ]),
-    standalone_short: b"Cbcdovx",
     valued: WordSet::flags(&[
         "-L", "-e", "-f", "-n", "-s",
     ]),
-    valued_short: b"Lefns",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

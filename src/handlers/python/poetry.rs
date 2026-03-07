@@ -6,10 +6,9 @@ static POETRY_SHOW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--latest", "--no-dev", "--outdated",
         "--top-level", "--tree",
+        "-T", "-l", "-o",
     ]),
-    standalone_short: b"loT",
     valued: WordSet::flags(&["--why"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -17,9 +16,7 @@ static POETRY_SHOW_POLICY: FlagPolicy = FlagPolicy {
 
 static POETRY_CHECK_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--lock"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -27,9 +24,7 @@ static POETRY_CHECK_POLICY: FlagPolicy = FlagPolicy {
 
 static POETRY_ENV_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--full-path"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

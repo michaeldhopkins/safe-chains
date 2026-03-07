@@ -16,7 +16,6 @@ static GREP_POLICY: FlagPolicy = FlagPolicy {
         "-a", "-b", "-c", "-h", "-i", "-l", "-n", "-o", "-p", "-q",
         "-r", "-s", "-v", "-w", "-x", "-z",
     ]),
-    standalone_short: b"EFGHIJLPRSTUVZabchilnopqrsvwxz",
     valued: WordSet::flags(&[
         "--after-context", "--before-context", "--binary-files", "--color",
         "--colour", "--context", "--devices", "--directories", "--exclude",
@@ -24,7 +23,6 @@ static GREP_POLICY: FlagPolicy = FlagPolicy {
         "--include", "--label", "--max-count", "--regexp",
         "-A", "-B", "-C", "-D", "-d", "-e", "-f", "-m",
     ]),
-    valued_short: b"ABCDdefm",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

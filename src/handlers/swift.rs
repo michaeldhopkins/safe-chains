@@ -6,14 +6,14 @@ static SWIFT_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--enable-code-coverage", "--show-bin-path",
         "--skip-update", "--static-swift-stdlib", "--verbose",
+        "-v",
     ]),
-    standalone_short: b"v",
     valued: WordSet::flags(&[
         "--arch", "--build-path", "--configuration", "--jobs",
         "--package-path", "--product", "--sanitize", "--swift-sdk",
         "--target", "--triple",
+        "-c", "-j",
     ]),
-    valued_short: b"cj",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -24,15 +24,15 @@ static SWIFT_TEST_POLICY: FlagPolicy = FlagPolicy {
         "--enable-code-coverage", "--list-tests", "--parallel",
         "--show-codecov-path", "--skip-build", "--skip-update",
         "--verbose",
+        "-l", "-v",
     ]),
-    standalone_short: b"lv",
     valued: WordSet::flags(&[
         "--arch", "--build-path", "--configuration", "--filter",
         "--jobs", "--num-workers", "--package-path", "--sanitize",
         "--skip-tests", "--swift-sdk", "--target", "--triple",
         "--xunit-output",
+        "-c", "-j",
     ]),
-    valued_short: b"cj",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -40,9 +40,7 @@ static SWIFT_TEST_POLICY: FlagPolicy = FlagPolicy {
 
 static SWIFT_PACKAGE_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--package-path", "--type"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -50,9 +48,7 @@ static SWIFT_PACKAGE_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
 
 static SWIFT_PACKAGE_DUMP_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--package-path"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -60,9 +56,7 @@ static SWIFT_PACKAGE_DUMP_POLICY: FlagPolicy = FlagPolicy {
 
 static SWIFT_PACKAGE_SHOW_DEPS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--format", "--package-path"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

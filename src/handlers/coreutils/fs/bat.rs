@@ -8,7 +8,6 @@ static BAT_POLICY: FlagPolicy = FlagPolicy {
         "--number", "--plain", "--show-all",
         "-A", "-P", "-d", "-n", "-p", "-u",
     ]),
-    standalone_short: b"APdnpu",
     valued: WordSet::flags(&[
         "--color", "--decorations", "--diff-context", "--file-name",
         "--highlight-line", "--italic-text", "--language", "--line-range",
@@ -16,7 +15,6 @@ static BAT_POLICY: FlagPolicy = FlagPolicy {
         "--terminal-width", "--theme", "--wrap",
         "-H", "-l", "-m", "-r",
     ]),
-    valued_short: b"Hlmr",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

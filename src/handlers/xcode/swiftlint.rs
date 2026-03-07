@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static SWIFTLINT_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -14,9 +12,7 @@ static SWIFTLINT_BARE_POLICY: FlagPolicy = FlagPolicy {
 
 static SWIFTLINT_LINT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--no-cache", "--quiet", "--strict"]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--config", "--path", "--reporter"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -24,9 +20,7 @@ static SWIFTLINT_LINT_POLICY: FlagPolicy = FlagPolicy {
 
 static SWIFTLINT_ANALYZE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--quiet", "--strict"]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--compiler-log-path", "--config", "--path", "--reporter"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -34,9 +28,7 @@ static SWIFTLINT_ANALYZE_POLICY: FlagPolicy = FlagPolicy {
 
 static SWIFTLINT_RULES_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--disabled", "--enabled"]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--config", "--reporter"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

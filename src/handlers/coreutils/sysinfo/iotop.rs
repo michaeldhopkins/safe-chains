@@ -8,12 +8,10 @@ static IOTOP_POLICY: FlagPolicy = FlagPolicy {
         "--processes", "--quiet",
         "-P", "-a", "-b", "-k", "-o", "-q", "-t",
     ]),
-    standalone_short: b"Pabkoqt",
     valued: WordSet::flags(&[
         "--delay", "--iter", "--pid", "--user",
         "-d", "-n", "-p", "-u",
     ]),
-    valued_short: b"dnpu",
     bare: true,
     max_positional: Some(0),
     flag_style: FlagStyle::Strict,

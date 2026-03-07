@@ -3,9 +3,7 @@ use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static PMSET_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

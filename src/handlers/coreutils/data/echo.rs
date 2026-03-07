@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static ECHO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["-E", "-e", "-n"]),
-    standalone_short: b"Een",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Positional,

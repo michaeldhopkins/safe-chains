@@ -6,9 +6,7 @@ static MDFIND_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "-0", "-count", "-interpret", "-literal", "-live",
     ]),
-    standalone_short: b"0",
     valued: WordSet::flags(&["-attr", "-name", "-onlyin", "-s"]),
-    valued_short: b"s",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

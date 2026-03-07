@@ -5,9 +5,7 @@ static SWIFTFORMAT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--dryrun", "--lenient", "--lint", "--quiet", "--strict", "--verbose",
     ]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--config", "--disable", "--enable", "--rules"]),
-    valued_short: b"",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

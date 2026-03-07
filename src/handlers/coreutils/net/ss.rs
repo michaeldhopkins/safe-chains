@@ -14,12 +14,10 @@ static SS_POLICY: FlagPolicy = FlagPolicy {
         "-a", "-e", "-i", "-l", "-m", "-n", "-o",
         "-p", "-r", "-s", "-t", "-u", "-w", "-x",
     ]),
-    standalone_short: b"046EHOaeilmnoprstuwx",
     valued: WordSet::flags(&[
         "--filter", "--query",
         "-A", "-F", "-f",
     ]),
-    valued_short: b"AFf",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

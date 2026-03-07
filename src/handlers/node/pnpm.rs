@@ -6,20 +6,17 @@ static PNPM_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--dev", "--json", "--long", "--no-optional",
         "--parseable", "--production", "--recursive",
+        "-P", "-r",
     ]),
-    standalone_short: b"Pr",
     valued: WordSet::flags(&["--depth", "--filter"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static PNPM_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--recursive"]),
-    standalone_short: b"r",
+    standalone: WordSet::flags(&["--json", "--recursive", "-r"]),
     valued: WordSet::flags(&["--filter"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

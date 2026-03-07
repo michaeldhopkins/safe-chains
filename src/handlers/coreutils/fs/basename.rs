@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static BASENAME_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--multiple", "--zero", "-a", "-z"]),
-    standalone_short: b"az",
     valued: WordSet::flags(&["--suffix", "-s"]),
-    valued_short: b"s",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

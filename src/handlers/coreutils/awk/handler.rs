@@ -15,12 +15,10 @@ static AWK_POLICY: FlagPolicy = FlagPolicy {
         "-C", "-N", "-O", "-P", "-S", "-V",
         "-b", "-c", "-g", "-r", "-s", "-t",
     ]),
-    standalone_short: b"CNOPSVbcgrst",
     valued: WordSet::flags(&[
         "--assign", "--field-separator",
         "-F", "-v",
     ]),
-    valued_short: b"Fv",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

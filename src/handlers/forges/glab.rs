@@ -19,16 +19,16 @@ static GLAB_AUTH_SAFE: WordSet =
 static GLAB_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--closed", "--draft", "--merged",
+        "-A", "-M", "-a", "-c", "-d", "-g", "-q",
     ]),
-    standalone_short: b"AacdgMq",
     valued: WordSet::flags(&[
         "--assignee", "--author", "--group", "--label",
         "--milestone", "--not-label", "--order", "--output",
         "--page", "--per-page", "--repo", "--reviewer",
         "--search", "--sort", "--source-branch", "--state",
         "--target-branch",
+        "-F", "-P", "-R", "-S", "-a", "-g", "-l", "-m", "-o", "-p", "-r", "-s", "-t",
     ]),
-    valued_short: b"aFglmoPpRrSst",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -38,12 +38,12 @@ static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--comments", "--resolved", "--system-logs",
         "--unresolved", "--web",
+        "-c", "-p", "-s", "-w",
     ]),
-    standalone_short: b"cpsw",
     valued: WordSet::flags(&[
         "--output", "--page", "--per-page", "--repo",
+        "-F", "-P", "-R", "-p",
     ]),
-    valued_short: b"FPpR",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -53,23 +53,23 @@ static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--raw",
     ]),
-    standalone_short: b"",
     valued: WordSet::flags(&[
         "--color", "--repo",
+        "-R",
     ]),
-    valued_short: b"R",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static GLAB_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
-    standalone_short: b"q",
+    standalone: WordSet::flags(&[
+        "-q",
+    ]),
     valued: WordSet::flags(&[
         "--output", "--page", "--per-page", "--repo",
+        "-F", "-P", "-R", "-p",
     ]),
-    valued_short: b"FPpR",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

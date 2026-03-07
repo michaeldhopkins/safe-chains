@@ -7,12 +7,10 @@ static FOLD_POLICY: FlagPolicy = FlagPolicy {
         "--bytes", "--spaces",
         "-b", "-s",
     ]),
-    standalone_short: b"bs",
     valued: WordSet::flags(&[
         "--width",
         "-w",
     ]),
-    valued_short: b"w",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

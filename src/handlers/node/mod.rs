@@ -35,13 +35,11 @@ pub(super) static TSC_POLICY: FlagPolicy = FlagPolicy {
         "--noUnusedParameters", "--pretty", "--resolveJsonModule",
         "--skipLibCheck", "--strict", "--strictNullChecks",
     ]),
-    standalone_short: b"",
     valued: WordSet::flags(&[
         "--baseUrl", "--jsx", "--lib", "--module",
         "--moduleResolution", "--project",
         "--rootDir", "--target",
     ]),
-    valued_short: b"p",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static PERIPHERY_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -16,12 +14,10 @@ static PERIPHERY_SCAN_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--quiet", "--skip-build", "--strict", "--verbose",
     ]),
-    standalone_short: b"",
     valued: WordSet::flags(&[
         "--config", "--format", "--index-store-path",
         "--project", "--schemes", "--targets",
     ]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

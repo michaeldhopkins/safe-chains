@@ -4,9 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static VM_STAT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&["-c"]),
-    valued_short: b"c",
     bare: true,
     max_positional: Some(1),
     flag_style: FlagStyle::Strict,

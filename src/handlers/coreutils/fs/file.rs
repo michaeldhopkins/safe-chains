@@ -14,13 +14,11 @@ static FILE_POLICY: FlagPolicy = FlagPolicy {
         "-b", "-d", "-h", "-i", "-k", "-l",
         "-n", "-p", "-r", "-s", "-z",
     ]),
-    standalone_short: b"0DILNSZbdhiklnprsz",
     valued: WordSet::flags(&[
         "--exclude", "--exclude-quiet", "--files-from",
         "--magic-file", "--parameter", "--separator",
         "-F", "-P", "-e", "-f", "-m",
     ]),
-    valued_short: b"FPefm",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

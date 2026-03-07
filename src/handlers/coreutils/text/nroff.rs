@@ -6,11 +6,9 @@ static NROFF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "-S", "-c", "-h", "-i", "-k", "-p", "-q", "-t",
     ]),
-    standalone_short: b"Schikpqt",
     valued: WordSet::flags(&[
         "-M", "-P", "-T", "-d", "-m", "-n", "-o", "-r", "-w",
     ]),
-    valued_short: b"MPTdmnorw",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

@@ -9,13 +9,11 @@ static MAN_POLICY: FlagPolicy = FlagPolicy {
         "--wildcard",
         "-a", "-f", "-k", "-l", "-u", "-w",
     ]),
-    standalone_short: b"afkluw",
     valued: WordSet::flags(&[
         "--config-file", "--encoding", "--extension", "--locale",
         "--manpath", "--sections", "--systems",
         "-C", "-E", "-L", "-M", "-S", "-e", "-m",
     ]),
-    valued_short: b"CELMS",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

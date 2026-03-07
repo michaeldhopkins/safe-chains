@@ -7,12 +7,10 @@ static UNEXPAND_POLICY: FlagPolicy = FlagPolicy {
         "--all", "--first-only",
         "-a",
     ]),
-    standalone_short: b"a",
     valued: WordSet::flags(&[
         "--tabs",
         "-t",
     ]),
-    valued_short: b"t",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

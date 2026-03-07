@@ -50,6 +50,11 @@ impl WordSet {
         self.0.binary_search(&s).is_ok()
     }
 
+    pub fn contains_short(&self, b: u8) -> bool {
+        let target = [b'-', b];
+        std::str::from_utf8(&target).is_ok_and(|s| self.0.binary_search(&s).is_ok())
+    }
+
     pub fn iter(&self) -> impl Iterator<Item = &'static str> + '_ {
         self.0.iter().copied()
     }

@@ -3,9 +3,7 @@ use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static YARN_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--json", "--long", "--production"]),
-    standalone_short: b"",
     valued: WordSet::flags(&["--depth", "--pattern"]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -13,9 +11,7 @@ static YARN_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static YARN_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

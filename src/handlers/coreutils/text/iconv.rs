@@ -7,12 +7,10 @@ static ICONV_POLICY: FlagPolicy = FlagPolicy {
         "--list", "--silent",
         "-c", "-l", "-s",
     ]),
-    standalone_short: b"cls",
     valued: WordSet::flags(&[
         "--from-code", "--to-code",
         "-f", "-t",
     ]),
-    valued_short: b"ft",
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,

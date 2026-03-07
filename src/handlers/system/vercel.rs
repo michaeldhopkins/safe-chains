@@ -3,20 +3,16 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static VERCEL_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"j",
-    valued: WordSet::flags(&["--meta", "--next", "--scope"]),
-    valued_short: b"mS",
+    standalone: WordSet::flags(&["--json", "-j"]),
+    valued: WordSet::flags(&["--meta", "--next", "--scope", "-S", "-m"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static VERCEL_INSPECT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"j",
-    valued: WordSet::flags(&["--scope", "--timeout"]),
-    valued_short: b"ST",
+    standalone: WordSet::flags(&["--json", "-j"]),
+    valued: WordSet::flags(&["--scope", "--timeout", "-S", "-T"]),
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -24,19 +20,15 @@ static VERCEL_INSPECT_POLICY: FlagPolicy = FlagPolicy {
 
 static VERCEL_BARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
-    standalone_short: b"",
     valued: WordSet::flags(&[]),
-    valued_short: b"",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static VERCEL_PROJECT_LS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
-    standalone_short: b"j",
-    valued: WordSet::flags(&["--scope"]),
-    valued_short: b"S",
+    standalone: WordSet::flags(&["--json", "-j"]),
+    valued: WordSet::flags(&["--scope", "-S"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,

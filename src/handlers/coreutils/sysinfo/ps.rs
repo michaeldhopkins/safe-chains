@@ -11,7 +11,6 @@ static PS_POLICY: FlagPolicy = FlagPolicy {
         "-j", "-l", "-m", "-r", "-v",
         "-w", "-x",
     ]),
-    standalone_short: b"ACHLMNSTZacdefjlmrvwx",
     valued: WordSet::flags(&[
         "--cols", "--columns", "--format", "--group", "--pid",
         "--ppid", "--rows", "--sid", "--sort", "--tty", "--user",
@@ -19,7 +18,6 @@ static PS_POLICY: FlagPolicy = FlagPolicy {
         "-G", "-O", "-U", "-g", "-n", "-o", "-p", "-s",
         "-t", "-u",
     ]),
-    valued_short: b"GOUnopstug",
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
