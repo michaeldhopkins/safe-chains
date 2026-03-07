@@ -6,7 +6,7 @@ When an agentic tool wants to run a bash command, safe-chains checks if every se
 
 For chained commands, safe-chains also reads your Claude Code settings to approve segments you've already permanently approved but that Claude Code can't match because the command contains shell operators. See [Settings-aware chain approval](#settings-aware-chain-approval).
 
-See [COMMANDS.md](COMMANDS.md) for the full list of supported commands.
+See [COMMANDS.md](COMMANDS.md) for the full list of supported commands. See [SECURITY.md](SECURITY.md) for security properties and threat model.
 
 ## Install
 
