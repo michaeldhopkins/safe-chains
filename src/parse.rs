@@ -132,6 +132,10 @@ impl Segment {
         Segment(strip_env_prefix_str(self.as_str()).trim().to_string())
     }
 
+    pub fn is_bare_assignment(&self) -> bool {
+        is_bare_assignment(&self.0)
+    }
+
     pub fn from_tokens_replacing(tokens: &[Token], find: &str, replace: &str) -> Self {
         let words: Vec<&str> = tokens
             .iter()
@@ -296,6 +300,8 @@ fn split_outside_quotes(cmd: &str) -> Vec<String> {
     let mut in_single = false;
     let mut in_double = false;
     let mut escaped = false;
+    let mut paren_depth: u32 = 0;
+    let mut in_backtick = false;
     let mut chars = cmd.chars().peekable();
 
     while let Some(c) = chars.next() {
@@ -309,31 +315,56 @@ fn split_outside_quotes(cmd: &str) -> Vec<String> {
             current.push(c);
             continue;
         }
-        if c == '\'' && !in_double {
+        if c == '\'' && !in_double && paren_depth == 0 && !in_backtick {
             in_single = !in_single;
             current.push(c);
             continue;
         }
-        if c == '"' && !in_single {
+        if c == '"' && !in_single && paren_depth == 0 && !in_backtick {
             in_double = !in_double;
             current.push(c);
             continue;
         }
         if !in_single && !in_double {
-            if c == '|' {
-                segments.push(std::mem::take(&mut current));
+            if c == '`' {
+                in_backtick = !in_backtick;
+                current.push(c);
                 continue;
             }
-            if c == '&' && !current.ends_with('>') {
-                segments.push(std::mem::take(&mut current));
-                if chars.peek() == Some(&'&') {
-                    chars.next();
+            if c == '$' && chars.peek() == Some(&'(') {
+                paren_depth += 1;
+                current.push(c);
+                if let Some(open) = chars.next() {
+                    current.push(open);
                 }
                 continue;
             }
-            if c == ';' || c == '\n' {
-                segments.push(std::mem::take(&mut current));
+            if c == '(' && paren_depth > 0 {
+                paren_depth += 1;
+                current.push(c);
                 continue;
+            }
+            if c == ')' && paren_depth > 0 {
+                paren_depth -= 1;
+                current.push(c);
+                continue;
+            }
+            if paren_depth == 0 && !in_backtick {
+                if c == '|' {
+                    segments.push(std::mem::take(&mut current));
+                    continue;
+                }
+                if c == '&' && !current.ends_with('>') {
+                    segments.push(std::mem::take(&mut current));
+                    if chars.peek() == Some(&'&') {
+                        chars.next();
+                    }
+                    continue;
+                }
+                if c == ';' || c == '\n' {
+                    segments.push(std::mem::take(&mut current));
+                    continue;
+                }
             }
         }
         current.push(c);
@@ -634,6 +665,45 @@ fn find_unquoted_space(s: &str) -> Option<usize> {
         }
     }
     None
+}
+
+fn is_shell_var_name(s: &str) -> bool {
+    let bytes = s.as_bytes();
+    !bytes.is_empty()
+        && (bytes[0].is_ascii_alphabetic() || bytes[0] == b'_')
+        && bytes[1..]
+            .iter()
+            .all(|b| b.is_ascii_alphanumeric() || *b == b'_')
+}
+
+fn is_bare_assignment(segment: &str) -> bool {
+    let trimmed = segment.trim();
+    if trimmed.is_empty() {
+        return false;
+    }
+    let mut rest = trimmed;
+    let mut found = false;
+    loop {
+        let trimmed = rest.trim_start();
+        if trimmed.is_empty() {
+            return found;
+        }
+        let Some(eq_pos) = trimmed.find('=') else {
+            return false;
+        };
+        let key = &trimmed[..eq_pos];
+        if !is_shell_var_name(key) {
+            return false;
+        }
+        let after_eq = &trimmed[eq_pos..];
+        match find_unquoted_space(after_eq) {
+            Some(space_pos) => {
+                rest = &after_eq[space_pos..];
+                found = true;
+            }
+            None => return true,
+        }
+    }
 }
 
 fn strip_env_prefix_str(segment: &str) -> &str {
@@ -944,6 +1014,56 @@ mod tests {
             seg("FOO='x y' BAR=\"a b\" cmd").strip_env_prefix(),
             seg("cmd")
         );
+    }
+
+    #[test]
+    fn bare_assignment_single() {
+        assert!(seg("out=_").is_bare_assignment());
+    }
+
+    #[test]
+    fn bare_assignment_multiple() {
+        assert!(seg("a=_ b=_").is_bare_assignment());
+    }
+
+    #[test]
+    fn bare_assignment_lowercase() {
+        assert!(seg("result=hello").is_bare_assignment());
+    }
+
+    #[test]
+    fn bare_assignment_uppercase() {
+        assert!(seg("FOO=bar").is_bare_assignment());
+    }
+
+    #[test]
+    fn bare_assignment_underscore_prefix() {
+        assert!(seg("_foo=bar").is_bare_assignment());
+    }
+
+    #[test]
+    fn bare_assignment_quoted_value() {
+        assert!(seg("out='hello world'").is_bare_assignment());
+    }
+
+    #[test]
+    fn not_bare_assignment_with_command() {
+        assert!(!seg("FOO=bar ls").is_bare_assignment());
+    }
+
+    #[test]
+    fn not_bare_assignment_no_equals() {
+        assert!(!seg("foobar").is_bare_assignment());
+    }
+
+    #[test]
+    fn not_bare_assignment_empty() {
+        assert!(!seg("").is_bare_assignment());
+    }
+
+    #[test]
+    fn not_bare_assignment_starts_with_digit() {
+        assert!(!seg("1foo=bar").is_bare_assignment());
     }
 
     #[test]

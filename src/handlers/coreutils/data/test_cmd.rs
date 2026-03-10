@@ -11,6 +11,7 @@ static TEST_CMD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
+    FlatDef { name: "[", policy: &TEST_CMD_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation" },
     FlatDef { name: "test", policy: &TEST_CMD_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation" },
 ];
 
@@ -24,5 +25,8 @@ mod tests {
         test_dir: "test -d /tmp",
         test_eq: "test 1 -eq 1",
         test_bare: "test",
+        bracket_file: "[ -f file.txt ]",
+        bracket_n: "[ -n \"$out\" ]",
+        bracket_gt: "[ \"$x\" -gt 0 ]",
     }
 }

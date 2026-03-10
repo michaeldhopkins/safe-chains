@@ -79,7 +79,7 @@ const HANDLED_CMDS: &[&str] = &[
     "cat", "head", "tail", "wc", "cut", "tr", "uniq",
     "diff", "comm", "paste", "tac", "rev", "nl",
     "expand", "unexpand", "fold", "fmt", "col", "column", "iconv", "nroff",
-    "echo", "printf", "seq", "test", "expr", "bc", "factor", "bat",
+    "echo", "printf", "seq", "[", "test", "expr", "bc", "factor", "bat",
     "arch", "command", "hostname",
     "find", "sed", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
     "magick",
