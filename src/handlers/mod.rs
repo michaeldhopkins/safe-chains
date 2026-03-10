@@ -54,7 +54,7 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
 #[cfg(test)]
 const HANDLED_CMDS: &[&str] = &[
     "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine",
-    "git", "jj", "gh", "glab", "tea",
+    "git", "jj", "gh", "glab", "jjpr", "tea",
     "npm", "yarn", "pnpm", "bun", "deno", "npx", "bunx", "nvm", "fnm", "volta",
     "bundle", "gem", "rbenv",
     "pip", "pip3", "uv", "poetry", "pyenv", "conda",
@@ -132,7 +132,7 @@ pub(crate) enum CommandEntry {
     Policy { cmd: &'static str },
     Positional { cmd: &'static str },
     Custom { cmd: &'static str, valid_prefix: Option<&'static str> },
-    Subcommand { cmd: &'static str, subs: &'static [SubEntry] },
+    Subcommand { cmd: &'static str, subs: &'static [SubEntry], bare_ok: bool },
     Delegation { cmd: &'static str },
 }
 
@@ -219,8 +219,8 @@ mod tests {
                     failures.push(format!("{cmd}: accepted unknown flag: {test}"));
                 }
             }
-            CommandEntry::Subcommand { cmd, subs } => {
-                if crate::is_safe_command(cmd) {
+            CommandEntry::Subcommand { cmd, subs, bare_ok } => {
+                if !bare_ok && crate::is_safe_command(cmd) {
                     failures.push(format!("{cmd}: accepted bare invocation"));
                 }
                 let test = format!("{cmd} {UNKNOWN_SUB}");

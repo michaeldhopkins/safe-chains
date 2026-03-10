@@ -110,7 +110,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
-    crate::handlers::CommandEntry::Subcommand { cmd: "tea", subs: &[
+    crate::handlers::CommandEntry::Subcommand { cmd: "tea", bare_ok: false, subs: &[
         crate::handlers::SubEntry::Nested { name: "issue", subs: &[
             crate::handlers::SubEntry::Policy { name: "list" },
             crate::handlers::SubEntry::Policy { name: "view" },

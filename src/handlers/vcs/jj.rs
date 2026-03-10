@@ -17,6 +17,7 @@ static JJ_MULTI: &[(&str, WordSet)] = &[
     ("file", WordSet::new(&["list", "show"])),
     ("git", WordSet::new(&["fetch"])),
     ("op", WordSet::new(&["log"])),
+    ("tag", WordSet::new(&["list"])),
     ("workspace", WordSet::new(&["list"])),
 ];
 
@@ -137,6 +138,8 @@ mod tests {
         jj_file_list_with_flags: "jj --no-pager file list",
         jj_workspace_list: "jj workspace list",
         jj_workspace_list_with_flags: "jj --no-pager workspace list",
+        jj_tag_list: "jj tag list",
+        jj_tag_list_with_flags: "jj --no-pager tag list",
         jj_workspace_help: "jj workspace --help",
         jj_new_help: "jj new --help",
         jj_workspace_help_h: "jj workspace -h",
@@ -158,6 +161,7 @@ mod tests {
         jj_workspace_add_denied: "jj workspace add ../new",
         jj_workspace_forget_denied: "jj workspace forget default",
         jj_file_annotate_denied: "jj file annotate",
+        jj_tag_create_denied: "jj tag create v1.0",
         jj_help_bypass_denied: "jj new -- --help",
         bare_jj_denied: "jj",
     }

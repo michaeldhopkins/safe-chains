@@ -736,9 +736,15 @@ Supports `-C <dir>` prefix.
 
 ### `jj` (https://jj-vcs.github.io/jj/latest/cli-reference/)
 
-- Subcommands: bookmark list, config get, config list, diff, file list, file show, git fetch, git remote list, help, log, op log, root, show, st, status, version, workspace list
+- Subcommands: bookmark list, config get, config list, diff, file list, file show, git fetch, git remote list, help, log, op log, root, show, st, status, tag list, version, workspace list
 - Flags: --version
 - Skips global flags: standalone (--debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose), valued (--at-op, --at-operation, --color, --repository, -R).
+
+### `jjpr` (https://github.com/michaeldhopkins/jjpr)
+
+- Bare invocation allowed (displays stack status).
+- auth (test, setup).
+- submit (requires --dry-run), merge (requires --dry-run).
 
 ### `jq` (https://jqlang.github.io/jq/manual/)
 
