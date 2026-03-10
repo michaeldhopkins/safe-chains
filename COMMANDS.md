@@ -736,7 +736,7 @@ Supports `-C <dir>` prefix.
 
 ### `jj` (https://jj-vcs.github.io/jj/latest/cli-reference/)
 
-- Subcommands: bookmark list, config get, config list, diff, file list, file show, git fetch, git remote list, help, log, op log, root, show, st, status, tag list, version, workspace list
+- Subcommands: bookmark list, config get, config list, diff, file list, file show, git fetch, git remote list, help, log, op log, resolve --list, root, show, st, status, tag list, version, workspace list
 - Flags: --version
 - Skips global flags: standalone (--debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose), valued (--at-op, --at-operation, --color, --repository, -R).
 
