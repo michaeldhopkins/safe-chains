@@ -2,10 +2,11 @@ use crate::handlers;
 use crate::parse::WordSet;
 
 pub struct CommandDoc {
-    pub name: &'static str,
+    pub name: String,
     pub kind: DocKind,
     pub url: &'static str,
     pub description: String,
+    pub aliases: Vec<String>,
 }
 
 pub enum DocKind {
@@ -26,7 +27,7 @@ impl CommandDoc {
             })
             .collect::<Vec<_>>()
             .join("\n");
-        Self { name, kind: DocKind::Handler, url, description }
+        Self { name: name.to_string(), kind: DocKind::Handler, url, description, aliases: Vec::new() }
     }
 
     pub fn wordset(name: &'static str, url: &'static str, words: &WordSet) -> Self {
@@ -131,7 +132,6 @@ pub fn wordset_items(words: &WordSet) -> String {
 
 pub fn all_command_docs() -> Vec<CommandDoc> {
     let mut docs = handlers::handler_docs();
-    docs.retain(|d| d.name != "[");
     docs.sort_by(|a, b| a.name.to_ascii_lowercase().cmp(&b.name.to_ascii_lowercase()));
     docs
 }
@@ -144,7 +144,16 @@ pub fn render_markdown(docs: &[CommandDoc]) -> String {
     );
 
     for doc in docs {
-        out.push_str(&format!("### `{}` ({})\n\n{}\n\n", doc.name, doc.url, doc.description));
+        if doc.aliases.is_empty() {
+            out.push_str(&format!("### `{}` ({})\n\n", doc.name, doc.url));
+        } else {
+            let alias_str: Vec<String> = doc.aliases.iter().map(|a| format!("`{a}`")).collect();
+            out.push_str(&format!(
+                "### `{}` ({})\n\nAliases: {}\n\n",
+                doc.name, doc.url, alias_str.join(", ")
+            ));
+        }
+        out.push_str(&format!("{}\n\n", doc.description));
     }
 
     out

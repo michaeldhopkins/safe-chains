@@ -11,7 +11,7 @@ static TYPE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "type", policy: &TYPE_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/type.1p.html" },
+    FlatDef { name: "type", policy: &TYPE_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/type.1p.html", aliases: &[] },
 ];
 
 #[cfg(test)]

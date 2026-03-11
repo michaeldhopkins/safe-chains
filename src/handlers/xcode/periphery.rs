@@ -32,6 +32,7 @@ pub(crate) static PERIPHERY: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://github.com/peripheryapp/periphery",
+    aliases: &[],
 };
 
 #[cfg(test)]

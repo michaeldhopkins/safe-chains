@@ -20,7 +20,7 @@ static SHELLCHECK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "shellcheck", policy: &SHELLCHECK_POLICY, help_eligible: false, url: "https://www.shellcheck.net/wiki/" },
+    FlatDef { name: "shellcheck", policy: &SHELLCHECK_POLICY, help_eligible: false, url: "https://www.shellcheck.net/wiki/", aliases: &[] },
 ];
 
 #[cfg(test)]

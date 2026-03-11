@@ -16,6 +16,7 @@ pub static DEFS: &[FlatDef] = &[
         policy: &LINT_POLICY,
         help_eligible: true,
         url: "https://developer.android.com/studio/write/lint",
+        aliases: &[],
     },
 ];
 

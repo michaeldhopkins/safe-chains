@@ -19,6 +19,7 @@ pub(crate) static VOLTA: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://docs.volta.sh/reference",
+    aliases: &[],
 };
 
 #[cfg(test)]

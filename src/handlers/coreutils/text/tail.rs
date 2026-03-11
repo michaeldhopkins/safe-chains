@@ -20,7 +20,7 @@ static TAIL_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "tail", policy: &TAIL_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#tail-invocation" },
+    FlatDef { name: "tail", policy: &TAIL_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#tail-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

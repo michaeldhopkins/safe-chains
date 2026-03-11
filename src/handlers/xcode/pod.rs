@@ -60,6 +60,7 @@ pub(crate) static POD: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://guides.cocoapods.org/terminal/commands.html",
+    aliases: &[],
 };
 
 #[cfg(test)]

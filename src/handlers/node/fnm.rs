@@ -21,6 +21,7 @@ pub(crate) static FNM: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://github.com/Schniz/fnm#readme",
+    aliases: &[],
 };
 
 #[cfg(test)]

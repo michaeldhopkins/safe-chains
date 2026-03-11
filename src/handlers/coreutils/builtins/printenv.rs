@@ -11,7 +11,7 @@ static PRINTENV_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "printenv", policy: &PRINTENV_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation" },
+    FlatDef { name: "printenv", policy: &PRINTENV_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

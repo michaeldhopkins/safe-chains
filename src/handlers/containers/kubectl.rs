@@ -151,6 +151,7 @@ pub(crate) static KUBECTL: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://kubernetes.io/docs/reference/kubectl/",
+    aliases: &[],
 };
 
 #[cfg(test)]

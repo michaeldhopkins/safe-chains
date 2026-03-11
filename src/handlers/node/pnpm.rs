@@ -34,6 +34,7 @@ pub(crate) static PNPM: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://pnpm.io/pnpm-cli",
+    aliases: &[],
 };
 
 #[cfg(test)]

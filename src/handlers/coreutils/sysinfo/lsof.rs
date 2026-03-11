@@ -18,7 +18,7 @@ static LSOF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "lsof", policy: &LSOF_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/lsof.8.html" },
+    FlatDef { name: "lsof", policy: &LSOF_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/lsof.8.html", aliases: &[] },
 ];
 
 #[cfg(test)]

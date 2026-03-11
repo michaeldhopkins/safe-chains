@@ -29,6 +29,7 @@ pub(crate) static FASTLANE: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://docs.fastlane.tools/",
+    aliases: &[],
 };
 
 #[cfg(test)]

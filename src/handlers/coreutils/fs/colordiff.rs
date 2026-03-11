@@ -31,7 +31,7 @@ static COLORDIFF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "colordiff", policy: &COLORDIFF_POLICY, help_eligible: false, url: "https://www.colordiff.org/" },
+    FlatDef { name: "colordiff", policy: &COLORDIFF_POLICY, help_eligible: false, url: "https://www.colordiff.org/", aliases: &[] },
 ];
 
 #[cfg(test)]

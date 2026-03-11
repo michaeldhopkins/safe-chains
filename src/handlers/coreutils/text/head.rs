@@ -18,7 +18,7 @@ static HEAD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "head", policy: &HEAD_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation" },
+    FlatDef { name: "head", policy: &HEAD_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

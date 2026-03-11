@@ -27,6 +27,7 @@ pub(crate) static XCODEGEN: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://github.com/yonaskolb/XcodeGen",
+    aliases: &[],
 };
 
 #[cfg(test)]

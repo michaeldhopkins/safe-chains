@@ -643,6 +643,7 @@ pub(crate) static GIT: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://git-scm.com/docs",
+    aliases: &[],
 };
 
 pub(in crate::handlers::vcs) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {

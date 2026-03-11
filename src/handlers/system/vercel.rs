@@ -47,6 +47,7 @@ pub(crate) static VERCEL: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://vercel.com/docs/cli",
+    aliases: &[],
 };
 
 #[cfg(test)]

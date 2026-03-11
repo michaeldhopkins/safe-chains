@@ -59,10 +59,10 @@ const HANDLED_CMDS: &[&str] = &[
     "git", "jj", "gh", "glab", "jjpr", "tea",
     "npm", "yarn", "pnpm", "bun", "deno", "npx", "bunx", "nvm", "fnm", "volta",
     "bundle", "gem", "rbenv",
-    "pip", "pip3", "uv", "poetry", "pyenv", "conda",
+    "pip", "uv", "poetry", "pyenv", "conda",
     "cargo", "rustup",
     "go",
-    "gradle", "gradlew", "mvn", "mvnw", "ktlint", "detekt",
+    "gradle", "mvn", "mvnw", "ktlint", "detekt",
     "javap", "jar", "keytool", "jarsigner",
     "adb", "apkanalyzer", "apksigner", "bundletool", "aapt2",
     "emulator", "avdmanager", "sdkmanager", "zipalign", "lint",
@@ -75,21 +75,21 @@ const HANDLED_CMDS: &[&str] = &[
     "ollama", "llm", "hf",
     "ddev", "dcli",
     "brew", "mise", "asdf", "defaults", "pmset", "sysctl", "cmake",
-    "terraform", "heroku", "vercel", "flyctl", "fly",
+    "terraform", "heroku", "vercel", "flyctl",
     "networksetup", "launchctl", "diskutil", "security", "csrutil", "log",
     "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign", "spctl",
     "xcodegen", "tuist", "pod", "swiftlint", "swiftformat", "periphery", "xcbeautify", "agvtool", "simctl",
     "perl",
     "R", "Rscript",
-    "grep", "egrep", "fgrep", "rg",
+    "grep", "rg",
     "cat", "head", "tail", "wc", "cut", "tr", "uniq",
     "diff", "comm", "paste", "tac", "rev", "nl",
     "expand", "unexpand", "fold", "fmt", "col", "column", "iconv", "nroff",
-    "echo", "printf", "seq", "[", "test", "expr", "bc", "factor", "bat",
+    "echo", "printf", "seq", "test", "expr", "bc", "factor", "bat",
     "arch", "command", "hostname",
     "find", "sed", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
     "magick",
-    "fd", "eza", "exa", "ls", "delta", "colordiff",
+    "fd", "eza", "ls", "delta", "colordiff",
     "dirname", "basename", "realpath", "readlink",
     "file", "stat", "du", "df", "tree",
     "true", "false",
@@ -165,12 +165,12 @@ const COMMAND_DEFS: &[&CommandDef] = &[
     &go::GO,
     &android::APKANALYZER, &android::APKSIGNER, &android::BUNDLETOOL, &android::AAPT2,
     &android::AVDMANAGER,
-    &jvm::GRADLE, &jvm::GRADLEW, &jvm::KEYTOOL,
+    &jvm::GRADLE, &jvm::KEYTOOL,
     &magick::MAGICK,
     &node::NPM, &node::PNPM, &node::BUN, &node::DENO,
     &node::NVM, &node::FNM, &node::VOLTA,
     &php::COMPOSER, &php::CRAFT,
-    &python::PIP, &python::PIP3, &python::UV, &python::POETRY,
+    &python::PIP, &python::UV, &python::POETRY,
     &python::PYENV, &python::CONDA,
     &ruby::BUNDLE, &ruby::GEM, &ruby::RBENV,
     &rust::CARGO, &rust::RUSTUP,
@@ -178,7 +178,7 @@ const COMMAND_DEFS: &[&CommandDef] = &[
     &swift::SWIFT,
     &system::BREW, &system::MISE, &system::ASDF, &system::DDEV, &system::DCLI, &system::CMAKE,
     &system::DEFAULTS, &system::TERRAFORM, &system::HEROKU, &system::VERCEL,
-    &system::FLYCTL, &system::FLY, &system::FASTLANE, &system::FIREBASE,
+    &system::FLYCTL, &system::FASTLANE, &system::FIREBASE,
     &system::SECURITY, &system::CSRUTIL, &system::DISKUTIL,
     &system::LAUNCHCTL, &system::LOG,
     &xcode::XCODEBUILD, &xcode::PLUTIL, &xcode::XCODE_SELECT,
@@ -319,21 +319,22 @@ mod tests {
     #[test]
     fn help_eligible_command_defs() {
         for def in COMMAND_DEFS {
-            if def.help_eligible {
-                for flag in &["--help", "-h", "--version", "-V"] {
-                    let cmd = format!("{} {flag}", def.name);
+            let names: Vec<&str> = std::iter::once(def.name).chain(def.aliases.iter().copied()).collect();
+            for name in &names {
+                if def.help_eligible {
+                    for flag in &["--help", "-h", "--version", "-V"] {
+                        let cmd = format!("{name} {flag}");
+                        assert!(
+                            crate::is_safe_command(&cmd),
+                            "{name}: help_eligible=true but rejected {flag}",
+                        );
+                    }
+                } else {
                     assert!(
-                        crate::is_safe_command(&cmd),
-                        "{}: help_eligible=true but rejected {flag}",
-                        def.name,
+                        !crate::is_safe_command(&format!("{name} --help")),
+                        "{name}: help_eligible=false but accepted --help",
                     );
                 }
-            } else {
-                assert!(
-                    !crate::is_safe_command(&format!("{} --help", def.name)),
-                    "{}: help_eligible=false but accepted --help",
-                    def.name,
-                );
             }
         }
     }

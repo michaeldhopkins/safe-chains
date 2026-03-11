@@ -118,6 +118,7 @@ pub(crate) static GO: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://pkg.go.dev/cmd/go",
+    aliases: &[],
 };
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {

@@ -17,7 +17,7 @@ static STAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "stat", policy: &STAT_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation" },
+    FlatDef { name: "stat", policy: &STAT_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -14,7 +14,7 @@ static UUIDGEN_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "uuidgen", policy: &UUIDGEN_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/uuidgen.1.html" },
+    FlatDef { name: "uuidgen", policy: &UUIDGEN_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/uuidgen.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

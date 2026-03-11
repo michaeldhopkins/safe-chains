@@ -16,6 +16,7 @@ pub static DEFS: &[FlatDef] = &[
         policy: &XCBEAUTIFY_POLICY,
         help_eligible: false,
         url: "https://github.com/cpisciotta/xcbeautify",
+        aliases: &[],
     },
 ];
 

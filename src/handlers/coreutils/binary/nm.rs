@@ -24,7 +24,7 @@ static NM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "nm", policy: &NM_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/nm.1.html" },
+    FlatDef { name: "nm", policy: &NM_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/nm.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

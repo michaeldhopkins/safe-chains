@@ -29,9 +29,7 @@ static GREP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "egrep", policy: &GREP_POLICY, help_eligible: false, url: "https://www.gnu.org/software/grep/manual/grep.html" },
-    FlatDef { name: "fgrep", policy: &GREP_POLICY, help_eligible: false, url: "https://www.gnu.org/software/grep/manual/grep.html" },
-    FlatDef { name: "grep", policy: &GREP_POLICY, help_eligible: false, url: "https://www.gnu.org/software/grep/manual/grep.html" },
+    FlatDef { name: "grep", policy: &GREP_POLICY, help_eligible: false, url: "https://www.gnu.org/software/grep/manual/grep.html", aliases: &["egrep", "fgrep"] },
 ];
 
 #[cfg(test)]

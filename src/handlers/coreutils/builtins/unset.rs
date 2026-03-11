@@ -11,7 +11,7 @@ static UNSET_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "unset", policy: &UNSET_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/unset.1p.html" },
+    FlatDef { name: "unset", policy: &UNSET_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/unset.1p.html", aliases: &[] },
 ];
 
 #[cfg(test)]

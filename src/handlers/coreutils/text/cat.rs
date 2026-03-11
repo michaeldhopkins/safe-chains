@@ -16,7 +16,7 @@ static CAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cat", policy: &CAT_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation" },
+    FlatDef { name: "cat", policy: &CAT_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

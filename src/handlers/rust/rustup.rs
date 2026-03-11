@@ -59,6 +59,7 @@ pub(crate) static RUSTUP: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://rust-lang.github.io/rustup/",
+    aliases: &[],
 };
 
 #[cfg(test)]

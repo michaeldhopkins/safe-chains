@@ -16,7 +16,7 @@ static B2SUM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "b2sum", policy: &B2SUM_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#b2sum-invocation" },
+    FlatDef { name: "b2sum", policy: &B2SUM_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#b2sum-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

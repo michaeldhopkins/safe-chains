@@ -22,6 +22,7 @@ pub static DEFS: &[FlatDef] = &[
         policy: &DETEKT_POLICY,
         help_eligible: true,
         url: "https://detekt.dev/docs/gettingstarted/cli/",
+        aliases: &[],
     },
 ];
 

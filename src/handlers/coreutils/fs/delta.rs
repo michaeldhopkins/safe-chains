@@ -47,7 +47,7 @@ static DELTA_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "delta", policy: &DELTA_POLICY, help_eligible: false, url: "https://dandavison.github.io/delta/" },
+    FlatDef { name: "delta", policy: &DELTA_POLICY, help_eligible: false, url: "https://dandavison.github.io/delta/", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -14,7 +14,7 @@ static FACTOR_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "factor", policy: &FACTOR_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#factor-invocation" },
+    FlatDef { name: "factor", policy: &FACTOR_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#factor-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -11,7 +11,7 @@ static MD5_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "md5", policy: &MD5_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/md5sum.1.html" },
+    FlatDef { name: "md5", policy: &MD5_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/md5sum.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

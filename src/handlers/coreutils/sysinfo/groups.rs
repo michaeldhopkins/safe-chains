@@ -11,7 +11,7 @@ static GROUPS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "groups", policy: &GROUPS_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#groups-invocation" },
+    FlatDef { name: "groups", policy: &GROUPS_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#groups-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

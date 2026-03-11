@@ -29,6 +29,7 @@ pub(crate) static FIREBASE: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://firebase.google.com/docs/cli",
+    aliases: &[],
 };
 
 #[cfg(test)]

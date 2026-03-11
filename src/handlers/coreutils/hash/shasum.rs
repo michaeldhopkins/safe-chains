@@ -15,7 +15,7 @@ static SHASUM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "shasum", policy: &SHASUM_POLICY, help_eligible: false, url: "https://perldoc.perl.org/shasum" },
+    FlatDef { name: "shasum", policy: &SHASUM_POLICY, help_eligible: false, url: "https://perldoc.perl.org/shasum", aliases: &[] },
 ];
 
 #[cfg(test)]

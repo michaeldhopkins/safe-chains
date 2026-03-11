@@ -16,6 +16,7 @@ pub static DEFS: &[FlatDef] = &[
         policy: &SDKMANAGER_POLICY,
         help_eligible: true,
         url: "https://developer.android.com/tools/sdkmanager",
+        aliases: &[],
     },
 ];
 

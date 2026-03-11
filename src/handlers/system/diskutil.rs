@@ -43,6 +43,7 @@ pub(crate) static DISKUTIL: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://ss64.com/mac/diskutil.html",
+    aliases: &[],
 };
 
 #[cfg(test)]

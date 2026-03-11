@@ -18,7 +18,7 @@ static WHO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "who", policy: &WHO_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation" },
+    FlatDef { name: "who", policy: &WHO_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -42,6 +42,7 @@ pub(crate) static DENO: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://docs.deno.com/runtime/reference/cli/",
+    aliases: &[],
 };
 
 #[cfg(test)]
