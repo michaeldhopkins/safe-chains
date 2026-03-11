@@ -87,7 +87,7 @@ const HANDLED_CMDS: &[&str] = &[
     "expand", "unexpand", "fold", "fmt", "col", "column", "iconv", "nroff",
     "echo", "printf", "seq", "test", "expr", "bc", "factor", "bat",
     "arch", "command", "hostname",
-    "find", "sed", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
+    "find", "sed", "shuf", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
     "magick",
     "fd", "eza", "ls", "delta", "colordiff",
     "dirname", "basename", "realpath", "readlink",
