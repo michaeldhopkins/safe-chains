@@ -7,6 +7,7 @@ mod getconf;
 mod jq;
 mod printf;
 mod seq;
+mod shuf;
 mod sort;
 mod test_cmd;
 mod uuidgen;
@@ -41,6 +42,7 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     v.extend(jq::FLAT_DEFS);
     v.extend(printf::FLAT_DEFS);
     v.extend(seq::FLAT_DEFS);
+    v.extend(shuf::FLAT_DEFS);
     v.extend(sort::FLAT_DEFS);
     v.extend(test_cmd::FLAT_DEFS);
     v.extend(uuidgen::FLAT_DEFS);

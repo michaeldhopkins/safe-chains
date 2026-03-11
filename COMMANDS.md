@@ -1389,6 +1389,12 @@ Aliases: `pip3`
 - Allowed standalone flags: --color, --external-sources, --list-optional, --norc, --severity, --wiki-link-count, -C, -a, -x
 - Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s
 
+### `shuf` (https://www.gnu.org/software/coreutils/manual/coreutils.html#shuf-invocation)
+
+- Allowed standalone flags: --echo, --repeat, --zero-terminated, -e, -r, -z
+- Allowed valued flags: --head-count, --input-range, --random-source, -i, -n
+- Bare invocation allowed
+
 ### `simctl` (https://developer.apple.com/documentation/xcode/simctl)
 
 - **list**: Flags: --json, --verbose, -j, -v
