@@ -17,7 +17,7 @@ static EXPAND_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "expand", policy: &EXPAND_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation" },
+    FlatDef { name: "expand", policy: &EXPAND_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

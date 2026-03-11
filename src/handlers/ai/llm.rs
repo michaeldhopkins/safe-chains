@@ -52,6 +52,7 @@ pub(crate) static LLM: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://llm.datasette.io/en/stable/",
+    aliases: &[],
 };
 
 #[cfg(test)]

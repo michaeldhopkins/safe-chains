@@ -11,7 +11,7 @@ static TTY_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "tty", policy: &TTY_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#tty-invocation" },
+    FlatDef { name: "tty", policy: &TTY_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#tty-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

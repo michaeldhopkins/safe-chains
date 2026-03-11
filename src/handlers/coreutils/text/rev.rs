@@ -11,7 +11,7 @@ static REV_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "rev", policy: &REV_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/rev.1.html" },
+    FlatDef { name: "rev", policy: &REV_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/rev.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

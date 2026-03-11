@@ -21,6 +21,7 @@ pub(crate) static AGVTOOL: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: false,
     url: "https://developer.apple.com/library/archive/qa/qa1827/_index.html",
+    aliases: &[],
 };
 
 #[cfg(test)]

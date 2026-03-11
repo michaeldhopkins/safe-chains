@@ -15,7 +15,7 @@ static LOCALE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "locale", policy: &LOCALE_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/locale.1.html" },
+    FlatDef { name: "locale", policy: &LOCALE_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/locale.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

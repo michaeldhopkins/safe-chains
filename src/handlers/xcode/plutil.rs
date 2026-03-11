@@ -28,6 +28,7 @@ pub(crate) static PLUTIL: CommandDef = CommandDef {
     bare_flags: &["-help"],
     help_eligible: true,
     url: "https://ss64.com/mac/plutil.html",
+    aliases: &[],
 };
 
 #[cfg(test)]

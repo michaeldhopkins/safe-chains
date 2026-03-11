@@ -11,7 +11,7 @@ static WHICH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "which", policy: &WHICH_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/which.1.html" },
+    FlatDef { name: "which", policy: &WHICH_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/which.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

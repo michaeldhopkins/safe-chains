@@ -97,6 +97,7 @@ pub(crate) static TERRAFORM: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://developer.hashicorp.com/terraform/cli/commands",
+    aliases: &[],
 };
 
 #[cfg(test)]

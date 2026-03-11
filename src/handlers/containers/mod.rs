@@ -14,9 +14,5 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    let mut doc = DOCKER.to_doc();
-    doc.name = "docker / podman";
-    let mut docs = vec![doc];
-    docs.push(KUBECTL.to_doc());
-    docs
+    vec![DOCKER.to_doc(), PODMAN.to_doc(), KUBECTL.to_doc()]
 }

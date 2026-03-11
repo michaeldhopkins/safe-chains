@@ -51,6 +51,7 @@ pub(crate) static BUNDLETOOL: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://developer.android.com/tools/bundletool",
+    aliases: &[],
 };
 
 #[cfg(test)]

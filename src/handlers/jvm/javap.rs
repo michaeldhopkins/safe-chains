@@ -21,6 +21,7 @@ pub static DEFS: &[FlatDef] = &[
         policy: &JAVAP_POLICY,
         help_eligible: true,
         url: "https://docs.oracle.com/en/java/javase/21/docs/specs/man/javap.html",
+        aliases: &[],
     },
 ];
 

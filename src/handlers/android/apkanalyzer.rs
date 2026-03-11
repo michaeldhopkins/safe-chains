@@ -74,6 +74,7 @@ pub(crate) static APKANALYZER: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://developer.android.com/tools/apkanalyzer",
+    aliases: &[],
 };
 
 #[cfg(test)]

@@ -73,14 +73,7 @@ pub(crate) static FLYCTL: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://fly.io/docs/flyctl/",
-};
-
-pub(crate) static FLY: CommandDef = CommandDef {
-    name: "fly",
-    subs: FLYCTL_SUBS,
-    bare_flags: &[],
-    help_eligible: true,
-    url: "https://fly.io/docs/flyctl/",
+    aliases: &["fly"],
 };
 
 #[cfg(test)]

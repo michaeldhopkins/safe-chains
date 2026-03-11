@@ -46,6 +46,7 @@ pub(crate) static SWIFTLINT: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://github.com/realm/SwiftLint",
+    aliases: &[],
 };
 
 #[cfg(test)]

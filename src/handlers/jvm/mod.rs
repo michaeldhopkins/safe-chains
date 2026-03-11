@@ -10,12 +10,10 @@ mod mvn;
 use crate::parse::{Segment, Token};
 
 pub(crate) use gradle::GRADLE;
-pub(crate) use gradle::GRADLEW;
 pub(crate) use keytool::KEYTOOL;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
     GRADLE.dispatch(cmd, tokens, is_safe)
-        .or_else(|| GRADLEW.dispatch(cmd, tokens, is_safe))
         .or_else(|| KEYTOOL.dispatch(cmd, tokens, is_safe))
         .or_else(|| mvn::dispatch(cmd, tokens, is_safe))
         .or_else(|| jar::dispatch(cmd, tokens, is_safe))
@@ -26,9 +24,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    let mut doc = GRADLE.to_doc();
-    doc.name = "gradle / gradlew";
-    let mut docs = vec![doc];
+    let mut docs = vec![GRADLE.to_doc()];
     docs.extend(mvn::command_docs());
     docs.push(KEYTOOL.to_doc());
     docs.extend(jar::command_docs());

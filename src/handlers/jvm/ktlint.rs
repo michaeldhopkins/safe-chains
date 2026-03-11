@@ -16,6 +16,7 @@ pub static DEFS: &[FlatDef] = &[
         policy: &KTLINT_POLICY,
         help_eligible: true,
         url: "https://pinterest.github.io/ktlint/latest/",
+        aliases: &[],
     },
 ];
 

@@ -11,7 +11,7 @@ static WAIT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "wait", policy: &WAIT_POLICY, help_eligible: false, url: "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/wait.html" },
+    FlatDef { name: "wait", policy: &WAIT_POLICY, help_eligible: false, url: "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/wait.html", aliases: &[] },
 ];
 
 #[cfg(test)]

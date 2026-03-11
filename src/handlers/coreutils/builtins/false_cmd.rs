@@ -1,7 +1,7 @@
 use crate::command::FlatDef;
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "false", policy: &super::super::BARE_ONLY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation" },
+    FlatDef { name: "false", policy: &super::super::BARE_ONLY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

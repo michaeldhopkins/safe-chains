@@ -99,6 +99,7 @@ pub(crate) static TUIST: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://docs.tuist.dev/en/cli/",
+    aliases: &[],
 };
 
 #[cfg(test)]

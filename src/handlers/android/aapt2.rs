@@ -36,6 +36,7 @@ pub(crate) static AAPT2: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://developer.android.com/tools/aapt2",
+    aliases: &[],
 };
 
 #[cfg(test)]

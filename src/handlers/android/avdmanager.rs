@@ -22,6 +22,7 @@ pub(crate) static AVDMANAGER: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://developer.android.com/tools/avdmanager",
+    aliases: &[],
 };
 
 #[cfg(test)]

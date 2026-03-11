@@ -18,6 +18,7 @@ pub(crate) static SIMCTL: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: false,
     url: "https://developer.apple.com/documentation/xcode/simctl",
+    aliases: &[],
 };
 
 #[cfg(test)]

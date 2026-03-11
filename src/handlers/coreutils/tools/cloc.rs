@@ -35,7 +35,7 @@ static CLOC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cloc", policy: &CLOC_POLICY, help_eligible: false, url: "https://github.com/AlDanial/cloc#readme" },
+    FlatDef { name: "cloc", policy: &CLOC_POLICY, help_eligible: false, url: "https://github.com/AlDanial/cloc#readme", aliases: &[] },
 ];
 
 #[cfg(test)]

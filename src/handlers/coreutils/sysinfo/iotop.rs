@@ -18,7 +18,7 @@ static IOTOP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "iotop", policy: &IOTOP_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/iotop.8.html" },
+    FlatDef { name: "iotop", policy: &IOTOP_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/iotop.8.html", aliases: &[] },
 ];
 
 #[cfg(test)]

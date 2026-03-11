@@ -16,7 +16,7 @@ static HOST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "host", policy: &HOST_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/host.1.html" },
+    FlatDef { name: "host", policy: &HOST_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/host.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

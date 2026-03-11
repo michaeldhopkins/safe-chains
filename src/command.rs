@@ -39,6 +39,7 @@ pub struct CommandDef {
     pub bare_flags: &'static [&'static str],
     pub help_eligible: bool,
     pub url: &'static str,
+    pub aliases: &'static [&'static str],
 }
 
 impl SubDef {
@@ -124,7 +125,7 @@ impl CommandDef {
         tokens: &[Token],
         is_safe: &dyn Fn(&Segment) -> bool,
     ) -> Option<bool> {
-        if cmd == self.name {
+        if cmd == self.name || self.aliases.contains(&cmd) {
             Some(self.check(tokens, is_safe))
         } else {
             None
@@ -145,7 +146,9 @@ impl CommandDef {
         sub_lines.sort();
         lines.extend(sub_lines);
 
-        crate::docs::CommandDoc::handler(self.name, self.url, lines.join("\n"))
+        let mut doc = crate::docs::CommandDoc::handler(self.name, self.url, lines.join("\n"));
+        doc.aliases = self.aliases.iter().map(|a| a.to_string()).collect();
+        doc
     }
 }
 
@@ -154,11 +157,12 @@ pub struct FlatDef {
     pub policy: &'static FlagPolicy,
     pub help_eligible: bool,
     pub url: &'static str,
+    pub aliases: &'static [&'static str],
 }
 
 impl FlatDef {
     pub fn dispatch(&self, cmd: &str, tokens: &[Token]) -> Option<bool> {
-        if cmd == self.name {
+        if cmd == self.name || self.aliases.contains(&cmd) {
             if self.help_eligible
                 && tokens.len() == 2
                 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V")
@@ -172,7 +176,9 @@ impl FlatDef {
     }
 
     pub fn to_doc(&self) -> crate::docs::CommandDoc {
-        crate::docs::CommandDoc::handler(self.name, self.url, self.policy.describe())
+        let mut doc = crate::docs::CommandDoc::handler(self.name, self.url, self.policy.describe());
+        doc.aliases = self.aliases.iter().map(|a| a.to_string()).collect();
+        doc
     }
 }
 
@@ -188,6 +194,13 @@ impl FlatDef {
             "{}: accepted unknown flag: {test}",
             self.name,
         );
+        for alias in self.aliases {
+            let test = format!("{alias} --xyzzy-unknown-42");
+            assert!(
+                !crate::is_safe_command(&test),
+                "{alias}: alias accepted unknown flag: {test}",
+            );
+        }
     }
 }
 
@@ -372,6 +385,7 @@ mod tests {
         bare_flags: &["--info"],
         help_eligible: true,
         url: "",
+        aliases: &[],
     };
 
     #[test]
@@ -437,6 +451,7 @@ mod tests {
         bare_flags: &[],
         help_eligible: false,
         url: "",
+        aliases: &[],
     };
 
     #[test]
@@ -481,6 +496,7 @@ mod tests {
         bare_flags: &[],
         help_eligible: false,
         url: "",
+        aliases: &[],
     };
 
     #[test]
@@ -515,6 +531,7 @@ mod tests {
         bare_flags: &[],
         help_eligible: false,
         url: "",
+        aliases: &[],
     };
 
     #[test]
@@ -556,6 +573,7 @@ mod tests {
         bare_flags: &[],
         help_eligible: false,
         url: "",
+        aliases: &[],
     };
 
     #[test]

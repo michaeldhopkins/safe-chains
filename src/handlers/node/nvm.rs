@@ -23,6 +23,7 @@ pub(crate) static NVM: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://github.com/nvm-sh/nvm#readme",
+    aliases: &[],
 };
 
 #[cfg(test)]

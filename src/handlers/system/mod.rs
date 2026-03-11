@@ -30,7 +30,6 @@ pub(crate) use dcli::DCLI;
 pub(crate) use ddev::DDEV;
 pub(crate) use defaults::DEFAULTS;
 pub(crate) use diskutil::DISKUTIL;
-pub(crate) use flyctl::FLY;
 pub(crate) use flyctl::FLYCTL;
 pub(crate) use heroku::HEROKU;
 pub(crate) use launchctl::LAUNCHCTL;
@@ -59,7 +58,6 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
         .or_else(|| HEROKU.dispatch(cmd, tokens, is_safe))
         .or_else(|| VERCEL.dispatch(cmd, tokens, is_safe))
         .or_else(|| FLYCTL.dispatch(cmd, tokens, is_safe))
-        .or_else(|| FLY.dispatch(cmd, tokens, is_safe))
         .or_else(|| FASTLANE.dispatch(cmd, tokens, is_safe))
         .or_else(|| FIREBASE.dispatch(cmd, tokens, is_safe))
         .or_else(|| pmset::dispatch(cmd, tokens, is_safe))
@@ -91,11 +89,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs.push(HEROKU.to_doc());
     docs.push(VERCEL.to_doc());
     docs.push(FLYCTL.to_doc());
-    {
-        let mut fly_doc = FLY.to_doc();
-        fly_doc.name = "fly";
-        docs.push(fly_doc);
-    }
     docs
 }
 

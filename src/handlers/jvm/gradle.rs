@@ -71,14 +71,7 @@ pub(crate) static GRADLE: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://docs.gradle.org/current/userguide/command_line_interface.html",
-};
-
-pub(crate) static GRADLEW: CommandDef = CommandDef {
-    name: "gradlew",
-    subs: GRADLE_SUBS,
-    bare_flags: &[],
-    help_eligible: true,
-    url: "https://docs.gradle.org/current/userguide/command_line_interface.html",
+    aliases: &["gradlew"],
 };
 
 #[cfg(test)]

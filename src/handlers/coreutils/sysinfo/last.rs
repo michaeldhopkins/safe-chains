@@ -19,7 +19,7 @@ static LAST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "last", policy: &LAST_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/last.1.html" },
+    FlatDef { name: "last", policy: &LAST_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/last.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

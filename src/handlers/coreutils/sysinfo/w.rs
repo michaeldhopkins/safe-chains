@@ -15,7 +15,7 @@ static W_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "w", policy: &W_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/w.1.html" },
+    FlatDef { name: "w", policy: &W_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/w.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

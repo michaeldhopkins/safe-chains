@@ -19,7 +19,7 @@ static PROCS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "procs", policy: &PROCS_POLICY, help_eligible: false, url: "https://github.com/dalance/procs#readme" },
+    FlatDef { name: "procs", policy: &PROCS_POLICY, help_eligible: false, url: "https://github.com/dalance/procs#readme", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -11,7 +11,7 @@ static VM_STAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "vm_stat", policy: &VM_STAT_POLICY, help_eligible: false, url: "https://ss64.com/mac/vm_stat.html" },
+    FlatDef { name: "vm_stat", policy: &VM_STAT_POLICY, help_eligible: false, url: "https://ss64.com/mac/vm_stat.html", aliases: &[] },
 ];
 
 #[cfg(test)]

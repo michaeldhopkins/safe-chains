@@ -11,8 +11,7 @@ static TEST_CMD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "[", policy: &TEST_CMD_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation" },
-    FlatDef { name: "test", policy: &TEST_CMD_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation" },
+    FlatDef { name: "test", policy: &TEST_CMD_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation", aliases: &["["] },
 ];
 
 #[cfg(test)]

@@ -56,6 +56,7 @@ pub(crate) static UV: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://docs.astral.sh/uv/reference/cli/",
+    aliases: &[],
 };
 
 #[cfg(test)]

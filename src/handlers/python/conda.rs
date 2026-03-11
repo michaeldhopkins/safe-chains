@@ -52,6 +52,7 @@ pub(crate) static CONDA: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://docs.conda.io/projects/conda/en/stable/commands/index.html",
+    aliases: &[],
 };
 
 #[cfg(test)]

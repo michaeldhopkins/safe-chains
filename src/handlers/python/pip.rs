@@ -65,20 +65,11 @@ pub(crate) static PIP: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://pip.pypa.io/en/stable/cli/",
-};
-
-pub(crate) static PIP3: CommandDef = CommandDef {
-    name: "pip3",
-    subs: PIP_SUBS,
-    bare_flags: &[],
-    help_eligible: true,
-    url: "https://pip.pypa.io/en/stable/cli/",
+    aliases: &["pip3"],
 };
 
 pub(in crate::handlers::python) fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    let mut pip_doc = PIP.to_doc();
-    pip_doc.name = "pip / pip3";
-    vec![pip_doc]
+    vec![PIP.to_doc()]
 }
 
 #[cfg(test)]

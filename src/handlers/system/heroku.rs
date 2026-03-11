@@ -99,6 +99,7 @@ pub(crate) static HEROKU: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://devcenter.heroku.com/articles/heroku-cli-commands",
+    aliases: &[],
 };
 
 #[cfg(test)]

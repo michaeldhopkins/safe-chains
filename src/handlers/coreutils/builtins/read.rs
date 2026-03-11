@@ -11,7 +11,7 @@ static READ_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "read", policy: &READ_POLICY, help_eligible: false, url: "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html" },
+    FlatDef { name: "read", policy: &READ_POLICY, help_eligible: false, url: "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html", aliases: &[] },
 ];
 
 #[cfg(test)]

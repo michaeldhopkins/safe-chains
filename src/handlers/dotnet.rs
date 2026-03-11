@@ -65,6 +65,7 @@ pub(crate) static DOTNET: CommandDef = CommandDef {
     bare_flags: &["--info", "--list-runtimes", "--list-sdks"],
     help_eligible: true,
     url: "https://learn.microsoft.com/en-us/dotnet/core/tools/",
+    aliases: &[],
 };
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {

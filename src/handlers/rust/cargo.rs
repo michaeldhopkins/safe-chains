@@ -300,6 +300,7 @@ pub(crate) static CARGO: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://doc.rust-lang.org/cargo/commands/",
+    aliases: &[],
 };
 
 pub(in crate::handlers::rust) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {

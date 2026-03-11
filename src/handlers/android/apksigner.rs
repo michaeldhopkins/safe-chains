@@ -28,6 +28,7 @@ pub(crate) static APKSIGNER: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://developer.android.com/tools/apksigner",
+    aliases: &[],
 };
 
 #[cfg(test)]

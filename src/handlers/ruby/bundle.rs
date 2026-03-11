@@ -59,6 +59,7 @@ pub(crate) static BUNDLE: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://bundler.io/man/bundle.1.html",
+    aliases: &[],
 };
 
 #[cfg(test)]

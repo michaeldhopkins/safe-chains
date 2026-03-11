@@ -27,6 +27,7 @@ pub(crate) static KEYTOOL: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html",
+    aliases: &[],
 };
 
 #[cfg(test)]

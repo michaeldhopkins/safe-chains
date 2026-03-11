@@ -23,6 +23,7 @@ pub(crate) static PYENV: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://github.com/pyenv/pyenv#readme",
+    aliases: &[],
 };
 
 #[cfg(test)]

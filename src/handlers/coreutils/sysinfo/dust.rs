@@ -20,7 +20,7 @@ static DUST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "dust", policy: &DUST_POLICY, help_eligible: false, url: "https://github.com/bootandy/dust#readme" },
+    FlatDef { name: "dust", policy: &DUST_POLICY, help_eligible: false, url: "https://github.com/bootandy/dust#readme", aliases: &[] },
 ];
 
 #[cfg(test)]

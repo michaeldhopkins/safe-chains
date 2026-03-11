@@ -14,7 +14,7 @@ static COMM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "comm", policy: &COMM_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#comm-invocation" },
+    FlatDef { name: "comm", policy: &COMM_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#comm-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

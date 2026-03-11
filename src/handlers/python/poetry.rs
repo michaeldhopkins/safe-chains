@@ -43,6 +43,7 @@ pub(crate) static POETRY: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://python-poetry.org/docs/cli/",
+    aliases: &[],
 };
 
 #[cfg(test)]

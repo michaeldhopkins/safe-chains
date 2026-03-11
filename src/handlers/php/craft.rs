@@ -39,6 +39,7 @@ pub(crate) static CRAFT: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://craftcms.com/docs/5.x/reference/cli.html",
+    aliases: &[],
 };
 
 #[cfg(test)]

@@ -16,6 +16,7 @@ pub static DEFS: &[FlatDef] = &[
         policy: &EMULATOR_POLICY,
         help_eligible: false,
         url: "https://developer.android.com/studio/run/emulator-commandline",
+        aliases: &[],
     },
 ];
 

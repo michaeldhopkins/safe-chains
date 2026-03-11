@@ -6,6 +6,7 @@ pub(crate) static CMAKE: CommandDef = CommandDef {
     bare_flags: &["--system-information", "--version"],
     help_eligible: true,
     url: "https://cmake.org/cmake/help/latest/manual/cmake.1.html",
+    aliases: &[],
 };
 
 #[cfg(test)]

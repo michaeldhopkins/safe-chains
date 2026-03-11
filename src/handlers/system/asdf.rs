@@ -28,6 +28,7 @@ pub(crate) static ASDF: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://asdf-vm.com/manage/commands.html",
+    aliases: &[],
 };
 
 #[cfg(test)]

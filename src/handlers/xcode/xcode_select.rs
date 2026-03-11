@@ -6,6 +6,7 @@ pub(crate) static XCODE_SELECT: CommandDef = CommandDef {
     bare_flags: &["-p", "--print-path", "-v", "--version"],
     help_eligible: true,
     url: "https://ss64.com/mac/xcode-select.html",
+    aliases: &[],
 };
 
 #[cfg(test)]

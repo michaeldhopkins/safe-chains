@@ -100,6 +100,7 @@ pub(crate) static DCLI: CommandDef = CommandDef {
     bare_flags: &[],
     help_eligible: true,
     url: "https://cli.dashlane.com/",
+    aliases: &[],
 };
 
 #[cfg(test)]

@@ -42,7 +42,7 @@ static RG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "rg", policy: &RG_POLICY, help_eligible: false, url: "https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md" },
+    FlatDef { name: "rg", policy: &RG_POLICY, help_eligible: false, url: "https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md", aliases: &[] },
 ];
 
 #[cfg(test)]
