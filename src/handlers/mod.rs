@@ -55,7 +55,7 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
 
 #[cfg(test)]
 const HANDLED_CMDS: &[&str] = &[
-    "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine",
+    "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine", "dotenv",
     "git", "jj", "gh", "glab", "jjpr", "tea",
     "npm", "yarn", "pnpm", "bun", "deno", "npx", "bunx", "nvm", "fnm", "volta",
     "bundle", "gem", "rbenv",
@@ -93,7 +93,7 @@ const HANDLED_CMDS: &[&str] = &[
     "dirname", "basename", "realpath", "readlink",
     "file", "stat", "du", "df", "tree",
     "true", "false",
-    "printenv", "read", "type", "wait", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
+    "export", "printenv", "read", "type", "wait", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
     "uname", "nproc", "uptime", "id", "groups", "tty", "locale", "cal", "sleep",
     "who", "w", "last", "lastlog",
     "ps", "top", "htop", "iotop", "procs", "dust", "lsof", "pgrep",

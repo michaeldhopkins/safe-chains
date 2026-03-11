@@ -129,6 +129,8 @@ pub(crate) static BREW: CommandDef = CommandDef {
         SubDef::Policy { name: "shellenv", policy: &BREW_SIMPLE_POLICY },
         SubDef::Policy { name: "tap", policy: &BREW_SIMPLE_POLICY },
         SubDef::Policy { name: "--prefix", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Policy { name: "--repository", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Policy { name: "tap-info", policy: &BREW_SIMPLE_POLICY },
     ],
     bare_flags: &[],
     help_eligible: true,
@@ -181,5 +183,9 @@ mod tests {
         brew_casks: "brew casks",
         brew_log: "brew log node",
         brew_log_oneline: "brew log --oneline node",
+        brew_tap_info: "brew tap-info homebrew/core",
+        brew_tap_info_quiet: "brew tap-info -q homebrew/core",
+        brew_repository: "brew --repository",
+        brew_repository_tap: "brew --repository homebrew/core",
     }
 }

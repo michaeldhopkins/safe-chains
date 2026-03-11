@@ -1,4 +1,5 @@
 mod command;
+mod export;
 mod false_cmd;
 mod hostname;
 mod printenv;
@@ -34,6 +35,7 @@ pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     let mut v = Vec::new();
+    v.extend(export::FLAT_DEFS);
     v.extend(false_cmd::FLAT_DEFS);
     v.extend(printenv::FLAT_DEFS);
     v.extend(read::FLAT_DEFS);
