@@ -1,4 +1,5 @@
 pub mod ai;
+pub mod android;
 pub mod containers;
 pub mod coreutils;
 pub mod dotnet;
@@ -36,6 +37,7 @@ pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
         .or_else(|| rust::dispatch(cmd, tokens, is_safe))
         .or_else(|| go::dispatch(cmd, tokens, is_safe))
         .or_else(|| jvm::dispatch(cmd, tokens, is_safe))
+        .or_else(|| android::dispatch(cmd, tokens, is_safe))
         .or_else(|| php::dispatch(cmd, tokens, is_safe))
         .or_else(|| swift::dispatch(cmd, tokens, is_safe))
         .or_else(|| dotnet::dispatch(cmd, tokens, is_safe))
@@ -60,7 +62,11 @@ const HANDLED_CMDS: &[&str] = &[
     "pip", "pip3", "uv", "poetry", "pyenv", "conda",
     "cargo", "rustup",
     "go",
-    "gradle", "gradlew", "mvn", "mvnw",
+    "gradle", "gradlew", "mvn", "mvnw", "ktlint", "detekt",
+    "javap", "jar", "keytool", "jarsigner",
+    "adb", "apkanalyzer", "apksigner", "bundletool", "aapt2",
+    "emulator", "avdmanager", "sdkmanager", "zipalign", "lint",
+    "fastlane", "firebase",
     "composer", "craft",
     "swift",
     "dotnet",
@@ -109,6 +115,7 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(rust::command_docs());
     docs.extend(go::command_docs());
     docs.extend(jvm::command_docs());
+    docs.extend(android::command_docs());
     docs.extend(php::command_docs());
     docs.extend(swift::command_docs());
     docs.extend(dotnet::command_docs());
@@ -156,7 +163,9 @@ const COMMAND_DEFS: &[&CommandDef] = &[
     &containers::DOCKER, &containers::PODMAN, &containers::KUBECTL,
     &dotnet::DOTNET,
     &go::GO,
-    &jvm::GRADLE, &jvm::GRADLEW,
+    &android::APKANALYZER, &android::APKSIGNER, &android::BUNDLETOOL, &android::AAPT2,
+    &android::AVDMANAGER,
+    &jvm::GRADLE, &jvm::GRADLEW, &jvm::KEYTOOL,
     &magick::MAGICK,
     &node::NPM, &node::PNPM, &node::BUN, &node::DENO,
     &node::NVM, &node::FNM, &node::VOLTA,
@@ -169,7 +178,7 @@ const COMMAND_DEFS: &[&CommandDef] = &[
     &swift::SWIFT,
     &system::BREW, &system::MISE, &system::ASDF, &system::DDEV, &system::DCLI, &system::CMAKE,
     &system::DEFAULTS, &system::TERRAFORM, &system::HEROKU, &system::VERCEL,
-    &system::FLYCTL, &system::FLY,
+    &system::FLYCTL, &system::FLY, &system::FASTLANE, &system::FIREBASE,
     &system::SECURITY, &system::CSRUTIL, &system::DISKUTIL,
     &system::LAUNCHCTL, &system::LOG,
     &xcode::XCODEBUILD, &xcode::PLUTIL, &xcode::XCODE_SELECT,
@@ -186,6 +195,7 @@ fn full_registry() -> Vec<&'static CommandEntry> {
     entries.extend(forges::full_registry());
     entries.extend(node::full_registry());
     entries.extend(jvm::full_registry());
+    entries.extend(android::full_registry());
     entries.extend(network::REGISTRY);
     entries.extend(system::full_registry());
     entries.extend(xcode::full_registry());
@@ -301,6 +311,9 @@ mod tests {
         for def in xcode::xcbeautify_flat_defs() {
             def.auto_test_reject_unknown();
         }
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()) {
+            def.auto_test_reject_unknown();
+        }
     }
 
     #[test]
@@ -328,10 +341,7 @@ mod tests {
     #[test]
     fn help_eligible_flat_defs() {
         use crate::policy::FlagStyle;
-        for def in coreutils::all_flat_defs()
-            .into_iter()
-            .chain(xcode::xcbeautify_flat_defs())
-        {
+        let check_def = |def: &crate::command::FlatDef| {
             if def.help_eligible {
                 for flag in &["--help", "-h", "--version", "-V"] {
                     let cmd = format!("{} {flag}", def.name);
@@ -348,15 +358,21 @@ mod tests {
                     def.name,
                 );
             }
+        };
+        for def in coreutils::all_flat_defs()
+            .into_iter()
+            .chain(xcode::xcbeautify_flat_defs())
+        {
+            check_def(def);
+        }
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()) {
+            check_def(def);
         }
     }
 
     #[test]
     fn bare_false_rejects_bare_invocation() {
-        for def in coreutils::all_flat_defs()
-            .into_iter()
-            .chain(xcode::xcbeautify_flat_defs())
-        {
+        let check_def = |def: &crate::command::FlatDef| {
             if !def.policy.bare {
                 assert!(
                     !crate::is_safe_command(def.name),
@@ -364,6 +380,15 @@ mod tests {
                     def.name,
                 );
             }
+        };
+        for def in coreutils::all_flat_defs()
+            .into_iter()
+            .chain(xcode::xcbeautify_flat_defs())
+        {
+            check_def(def);
+        }
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()) {
+            check_def(def);
         }
     }
 
@@ -475,16 +500,22 @@ mod tests {
     fn valued_flags_accept_eq_syntax() {
         let mut failures = Vec::new();
 
-        for def in coreutils::all_flat_defs()
-            .into_iter()
-            .chain(xcode::xcbeautify_flat_defs())
-        {
+        let check_flat = |def: &crate::command::FlatDef, failures: &mut Vec<String>| {
             for flag in def.policy.valued.iter() {
                 let cmd = format!("{} {flag}=test_value", def.name);
                 if !crate::is_safe_command(&cmd) {
                     failures.push(format!("{cmd}: valued flag rejected with = syntax"));
                 }
             }
+        };
+        for def in coreutils::all_flat_defs()
+            .into_iter()
+            .chain(xcode::xcbeautify_flat_defs())
+        {
+            check_flat(def, &mut failures);
+        }
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()) {
+            check_flat(def, &mut failures);
         }
 
         for def in COMMAND_DEFS {
@@ -505,10 +536,7 @@ mod tests {
     fn max_positional_enforced() {
         let mut failures = Vec::new();
 
-        for def in coreutils::all_flat_defs()
-            .into_iter()
-            .chain(xcode::xcbeautify_flat_defs())
-        {
+        let check_flat = |def: &crate::command::FlatDef, failures: &mut Vec<String>| {
             if let Some(max) = def.policy.max_positional {
                 let args: Vec<&str> = (0..=max).map(|_| "testarg").collect();
                 let cmd = format!("{} {}", def.name, args.join(" "));
@@ -520,6 +548,15 @@ mod tests {
                     ));
                 }
             }
+        };
+        for def in coreutils::all_flat_defs()
+            .into_iter()
+            .chain(xcode::xcbeautify_flat_defs())
+        {
+            check_flat(def, &mut failures);
+        }
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()) {
+            check_flat(def, &mut failures);
         }
 
         for def in COMMAND_DEFS {
@@ -554,10 +591,7 @@ mod tests {
             }
         }
 
-        for def in coreutils::all_flat_defs()
-            .into_iter()
-            .chain(xcode::xcbeautify_flat_defs())
-        {
+        let check_flat = |def: &crate::command::FlatDef, failures: &mut Vec<String>| {
             let doc = def.to_doc();
             if doc.description.trim().is_empty() && !def.policy.bare {
                 failures.push(format!("{}: FlatDef produced empty doc", def.name));
@@ -565,6 +599,15 @@ mod tests {
             if doc.url.is_empty() {
                 failures.push(format!("{}: FlatDef has empty URL", def.name));
             }
+        };
+        for def in coreutils::all_flat_defs()
+            .into_iter()
+            .chain(xcode::xcbeautify_flat_defs())
+        {
+            check_flat(def, &mut failures);
+        }
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()) {
+            check_flat(def, &mut failures);
         }
 
         assert!(failures.is_empty(), "doc generation issues:\n{}", failures.join("\n"));
@@ -590,6 +633,9 @@ mod tests {
             all_cmds.insert(def.name);
         }
         for def in xcode::xcbeautify_flat_defs() {
+            all_cmds.insert(def.name);
+        }
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()) {
             all_cmds.insert(def.name);
         }
         let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();

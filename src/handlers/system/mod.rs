@@ -6,6 +6,8 @@ mod dcli;
 mod ddev;
 mod defaults;
 mod diskutil;
+mod fastlane;
+mod firebase;
 mod flyctl;
 mod heroku;
 mod launchctl;
@@ -36,6 +38,8 @@ pub(crate) use log_cmd::LOG;
 pub(crate) use mise::MISE;
 pub(crate) use security::SECURITY;
 pub(crate) use terraform::TERRAFORM;
+pub(crate) use fastlane::FASTLANE;
+pub(crate) use firebase::FIREBASE;
 pub(crate) use vercel::VERCEL;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
@@ -56,6 +60,8 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
         .or_else(|| VERCEL.dispatch(cmd, tokens, is_safe))
         .or_else(|| FLYCTL.dispatch(cmd, tokens, is_safe))
         .or_else(|| FLY.dispatch(cmd, tokens, is_safe))
+        .or_else(|| FASTLANE.dispatch(cmd, tokens, is_safe))
+        .or_else(|| FIREBASE.dispatch(cmd, tokens, is_safe))
         .or_else(|| pmset::dispatch(cmd, tokens, is_safe))
         .or_else(|| sysctl::dispatch(cmd, tokens, is_safe))
         .or_else(|| networksetup::dispatch(cmd, tokens, is_safe))
@@ -79,6 +85,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs.push(LAUNCHCTL.to_doc());
     docs.extend(networksetup::command_docs());
     docs.push(LOG.to_doc());
+    docs.push(FASTLANE.to_doc());
+    docs.push(FIREBASE.to_doc());
     docs.push(TERRAFORM.to_doc());
     docs.push(HEROKU.to_doc());
     docs.push(VERCEL.to_doc());
