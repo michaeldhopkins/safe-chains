@@ -968,16 +968,54 @@ Aliases: `egrep`, `fgrep`
 
 ### `mise` (https://mise.jdx.dev/cli/)
 
-- **config list**: Flags: -q, -v
-- **config ls**: Flags: -q, -v
+- **activate**
+- **backends**: Bare invocation allowed. Subcommands: list, ls.
+- **bin-paths**: Flags: -q, -v
+- **cache**: Bare invocation allowed. Subcommands: path.
+- **completion**: Flags: -q, -v
+- **config**: Bare invocation allowed. Subcommands: get, list, ls.
 - **current**: Flags: -q, -v
+- **deactivate**
 - **doctor**: Flags: -q, -v
+- **edit**
+- **en**
 - **env**: Flags: --json, -J. Valued: --shell, -s
 - **exec**: exec delegates after --.
+- **fmt**: Flags: --check
+- **generate**
+- **implode**
+- **install**
+- **latest**: Flags: -q, -v
+- **link**
 - **list**: Flags: --current, --installed, --json, --missing, --no-header, --prefix, -J, -c, -i, -m
+- **lock**
 - **ls**: Flags: --current, --installed, --json, --missing, --no-header, --prefix, -J, -c, -i, -m
+- **ls-remote**: Flags: --all
+- **outdated**: Flags: --json, --no-header, -J
+- **plugins**: Bare invocation allowed. Subcommands: list, ls, ls-remote.
+- **prepare**
+- **prune**
+- **registry**: Valued: --backend, -b
 - **reshim**: Flags: --force
-- **settings get**: Flags: -q, -v
+- **run**
+- **search**
+- **self-update**
+- **set**: Flags: --json, -J
+- **settings**: Bare invocation allowed. Subcommands: get, list, ls.
+- **shell**
+- **shell-alias**: Bare invocation allowed. Subcommands: get, list, ls.
+- **sync**
+- **tasks**: Bare invocation allowed. Subcommands: deps, info, list, ls.
+- **tool**: Flags: -q, -v
+- **tool-alias**: Bare invocation allowed. Subcommands: get, list, ls.
+- **trust**: Flags: --show
+- **uninstall**
+- **unset**
+- **unuse**
+- **upgrade**
+- **use**
+- **watch**
+- **where**: Flags: -q, -v
 - **which**: Flags: -q, -v
 
 ### `mvn / mvnw` (https://maven.apache.org/ref/current/maven-embedder/cli.html)
