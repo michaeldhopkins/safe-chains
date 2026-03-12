@@ -21,12 +21,22 @@ static JJPR_SUBMIT_DRY_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
+static JJPR_STATUS_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&[
+        "--dry-run", "--no-fetch",
+    ]),
+    valued: WordSet::flags(&[]),
+    bare: true,
+    max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
+};
+
 static JJPR_MERGE_DRY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--dry-run", "--no-ci-check", "--no-fetch",
+        "--dry-run", "--no-ci-check", "--no-fetch", "--watch",
     ]),
     valued: WordSet::flags(&[
-        "--base", "--merge-method", "--required-approvals",
+        "--base", "--merge-method", "--remote", "--required-approvals",
     ]),
     bare: true,
     max_positional: None,
@@ -46,20 +56,40 @@ fn is_safe_jjpr(tokens: &[Token]) -> bool {
     }
 
     if subcmd == "auth" {
+        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
+            return true;
+        }
         if tokens.len() < 3 || !AUTH_ACTIONS.contains(&tokens[2]) {
             return false;
         }
         return policy::check(&tokens[2..], &JJPR_AUTH_POLICY);
     }
 
+    if subcmd == "status" {
+        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
+            return true;
+        }
+        return policy::check(&tokens[1..], &JJPR_STATUS_POLICY);
+    }
+
     if subcmd == "submit" {
+        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
+            return true;
+        }
         return has_flag(&tokens[1..], None, Some("--dry-run"))
             && policy::check(&tokens[1..], &JJPR_SUBMIT_DRY_POLICY);
     }
 
     if subcmd == "merge" {
+        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
+            return true;
+        }
         return has_flag(&tokens[1..], None, Some("--dry-run"))
             && policy::check(&tokens[1..], &JJPR_MERGE_DRY_POLICY);
+    }
+
+    if subcmd == "config" {
+        return tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h");
     }
 
     false
@@ -79,8 +109,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             "https://github.com/michaeldhopkins/jjpr",
             DocBuilder::new()
                 .section("Bare invocation allowed (displays stack status).")
+                .section("status allowed.")
                 .section("auth (test, setup).")
                 .section("submit (requires --dry-run), merge (requires --dry-run).")
+                .section("--help allowed on all subcommands.")
                 .section("")
                 .build()),
     ]
@@ -93,8 +125,10 @@ pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
             crate::handlers::SubEntry::Policy { name: "test" },
             crate::handlers::SubEntry::Policy { name: "setup" },
         ]},
-        crate::handlers::SubEntry::Guarded { name: "submit", valid_suffix: "--dry-run" },
+        crate::handlers::SubEntry::Policy { name: "config" },
         crate::handlers::SubEntry::Guarded { name: "merge", valid_suffix: "--dry-run" },
+        crate::handlers::SubEntry::Policy { name: "status" },
+        crate::handlers::SubEntry::Guarded { name: "submit", valid_suffix: "--dry-run" },
     ]},
 ];
 
@@ -114,13 +148,27 @@ mod tests {
         version_short: "jjpr -V",
         auth_test: "jjpr auth test",
         auth_setup: "jjpr auth setup",
+        auth_help: "jjpr auth --help",
+        auth_help_short: "jjpr auth -h",
+        status_bare: "jjpr status",
+        status_help: "jjpr status --help",
+        status_help_short: "jjpr status -h",
+        status_no_fetch: "jjpr status --no-fetch",
         submit_dry: "jjpr submit --dry-run",
         submit_dry_bookmark: "jjpr submit my-stack --dry-run",
         submit_dry_draft: "jjpr submit --dry-run --draft",
         submit_dry_reviewer: "jjpr submit --dry-run --reviewer user",
+        submit_help: "jjpr submit --help",
+        submit_help_short: "jjpr submit -h",
         merge_dry: "jjpr merge --dry-run",
         merge_dry_bookmark: "jjpr merge my-stack --dry-run",
         merge_dry_method: "jjpr merge --dry-run --merge-method squash",
+        merge_dry_watch: "jjpr merge --dry-run --watch",
+        merge_dry_remote: "jjpr merge --dry-run --remote origin",
+        merge_help: "jjpr merge --help",
+        merge_help_short: "jjpr merge -h",
+        config_help: "jjpr config --help",
+        config_help_short: "jjpr config -h",
     }
 
     denied! {
@@ -133,5 +181,6 @@ mod tests {
         unknown_flag_denied: "jjpr --unknown",
         auth_bare_denied: "jjpr auth",
         auth_unknown_denied: "jjpr auth login",
+        status_positional_denied: "jjpr status foo",
     }
 }
