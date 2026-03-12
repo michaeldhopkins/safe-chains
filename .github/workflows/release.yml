@@ -18,7 +18,7 @@ jobs:
       should_release: ${{ steps.check.outputs.should_release }}
       version: ${{ steps.check.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           fetch-tags: true
@@ -42,7 +42,7 @@ jobs:
     if: needs.check-version.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -76,7 +76,7 @@ jobs:
         run: cargo run --locked --example generate_assets
 
       - name: Upload distribution assets
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: dist-assets
           path: target/assets/
@@ -107,7 +107,7 @@ jobs:
             runner: windows-latest
             archive: safe-chains-x86_64-pc-windows-msvc.zip
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -178,7 +178,7 @@ jobs:
           rm "$RUNNER_TEMP/safe-chains.zip"
 
       - name: Download distribution assets
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: dist-assets
           path: dist-assets
@@ -201,7 +201,7 @@ jobs:
           Compress-Archive -Path "target/${{ matrix.target }}/release/safe-chains.exe" -DestinationPath "${{ matrix.archive }}"
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.archive }}
           path: ${{ matrix.archive }}
@@ -216,7 +216,7 @@ jobs:
     needs: [check-version, build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -228,7 +228,7 @@ jobs:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           path: artifacts
           merge-multiple: true
@@ -264,7 +264,7 @@ jobs:
         if: env.TAP_TOKEN != ''
         env:
           TAP_TOKEN: ${{ secrets.TAP_GITHUB_TOKEN }}
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@v4
         with:
           token: ${{ secrets.TAP_GITHUB_TOKEN }}
           repository: michaeldhopkins/homebrew-tap
