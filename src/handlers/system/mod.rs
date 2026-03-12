@@ -15,11 +15,13 @@ mod log_cmd;
 mod mise;
 mod networksetup;
 mod pmset;
+mod postgres;
 mod security;
 mod sysctl;
 mod terraform;
 mod vercel;
 
+use crate::command::FlatDef;
 use crate::parse::{Segment, Token};
 
 pub(crate) use asdf::ASDF;
@@ -42,6 +44,11 @@ pub(crate) use firebase::FIREBASE;
 pub(crate) use vercel::VERCEL;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+    for flat in system_flat_defs() {
+        if let r @ Some(_) = flat.dispatch(cmd, tokens) {
+            return r;
+        }
+    }
     BREW.dispatch(cmd, tokens, is_safe)
         .or_else(|| MISE.dispatch(cmd, tokens, is_safe))
         .or_else(|| ASDF.dispatch(cmd, tokens, is_safe))
@@ -65,13 +72,20 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -
         .or_else(|| networksetup::dispatch(cmd, tokens, is_safe))
 }
 
+pub(crate) fn system_flat_defs() -> Vec<&'static FlatDef> {
+    let mut v = Vec::new();
+    v.extend(postgres::FLAT_DEFS);
+    v
+}
+
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    let mut docs = vec![
+    let mut docs: Vec<_> = system_flat_defs().iter().map(|d| d.to_doc()).collect();
+    docs.extend([
         BREW.to_doc(),
         MISE.to_doc(),
         ASDF.to_doc(),
         DEFAULTS.to_doc(),
-    ];
+    ]);
     docs.push(DDEV.to_doc());
     docs.extend(pmset::command_docs());
     docs.extend(sysctl::command_docs());
