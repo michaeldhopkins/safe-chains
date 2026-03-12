@@ -54,7 +54,7 @@ pub(crate) const REGISTRY: &[crate::handlers::CommandEntry] = &[
         crate::handlers::SubEntry::Policy { name: "ls" },
         crate::handlers::SubEntry::Policy { name: "info" },
         crate::handlers::SubEntry::Policy { name: "why" },
-        crate::handlers::SubEntry::Positional { name: "test" },
+        crate::handlers::SubEntry::Positional,
     ]},
 ];
 

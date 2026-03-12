@@ -203,7 +203,7 @@ pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
         crate::handlers::SubEntry::Nested { name: "auth", subs: &[
             crate::handlers::SubEntry::Policy { name: "status" },
         ]},
-        crate::handlers::SubEntry::Positional { name: "api" },
+        crate::handlers::SubEntry::Positional,
     ]},
 ];
 

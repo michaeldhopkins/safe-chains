@@ -136,7 +136,6 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
 #[cfg(test)]
 #[derive(Debug)]
 pub(crate) enum CommandEntry {
-    Policy { cmd: &'static str },
     Positional { cmd: &'static str },
     Custom { cmd: &'static str, valid_prefix: Option<&'static str> },
     Subcommand { cmd: &'static str, subs: &'static [SubEntry], bare_ok: bool },
@@ -149,8 +148,7 @@ pub(crate) enum SubEntry {
     Policy { name: &'static str },
     Nested { name: &'static str, subs: &'static [SubEntry] },
     Custom { name: &'static str, valid_suffix: Option<&'static str> },
-    Positional { name: &'static str },
-    Delegation { name: &'static str },
+    Positional,
     Guarded { name: &'static str, valid_suffix: &'static str },
 }
 
@@ -215,12 +213,6 @@ mod tests {
 
     fn check_entry(entry: &CommandEntry, failures: &mut Vec<String>) {
         match entry {
-            CommandEntry::Policy { cmd } => {
-                let test = format!("{cmd} {UNKNOWN_FLAG}");
-                if crate::is_safe_command(&test) {
-                    failures.push(format!("{cmd}: accepted unknown flag: {test}"));
-                }
-            }
             CommandEntry::Positional { .. } | CommandEntry::Delegation { .. } => {}
             CommandEntry::Custom { cmd, valid_prefix } => {
                 let base = valid_prefix.unwrap_or(cmd);
@@ -272,7 +264,7 @@ mod tests {
                     failures.push(format!("{prefix} {name}: accepted unknown flag: {test}"));
                 }
             }
-            SubEntry::Positional { .. } | SubEntry::Delegation { .. } => {}
+            SubEntry::Positional => {}
             SubEntry::Guarded { name, valid_suffix } => {
                 let test = format!("{prefix} {name} {valid_suffix} {UNKNOWN_FLAG}");
                 if crate::is_safe_command(&test) {
@@ -620,8 +612,7 @@ mod tests {
         let mut all_cmds: HashSet<&str> = registry
             .iter()
             .map(|e| match e {
-                CommandEntry::Policy { cmd }
-                | CommandEntry::Positional { cmd }
+                CommandEntry::Positional { cmd }
                 | CommandEntry::Custom { cmd, .. }
                 | CommandEntry::Subcommand { cmd, .. }
                 | CommandEntry::Delegation { cmd } => *cmd,

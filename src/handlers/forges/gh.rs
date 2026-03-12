@@ -419,7 +419,7 @@ pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
             crate::handlers::SubEntry::Policy { name: "status" },
         ]},
         crate::handlers::SubEntry::Custom { name: "browse", valid_suffix: Some("--no-browser") },
-        crate::handlers::SubEntry::Positional { name: "api" },
+        crate::handlers::SubEntry::Positional,
     ]},
 ];
 
