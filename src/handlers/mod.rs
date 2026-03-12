@@ -58,7 +58,7 @@ const HANDLED_CMDS: &[&str] = &[
     "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine", "dotenv",
     "git", "jj", "gh", "glab", "jjpr", "tea",
     "npm", "yarn", "pnpm", "bun", "deno", "npx", "bunx", "nvm", "fnm", "volta",
-    "bundle", "gem", "rbenv",
+    "ruby", "ri", "bundle", "gem", "rbenv",
     "pip", "uv", "poetry", "pyenv", "conda",
     "cargo", "rustup",
     "go",
@@ -311,7 +311,7 @@ mod tests {
         for def in xcode::xcbeautify_flat_defs() {
             def.auto_test_reject_unknown();
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()) {
             def.auto_test_reject_unknown();
         }
     }
@@ -366,7 +366,7 @@ mod tests {
         {
             check_def(def);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()) {
             check_def(def);
         }
     }
@@ -388,7 +388,7 @@ mod tests {
         {
             check_def(def);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()) {
             check_def(def);
         }
     }
@@ -515,7 +515,7 @@ mod tests {
         {
             check_flat(def, &mut failures);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()) {
             check_flat(def, &mut failures);
         }
 
@@ -556,7 +556,7 @@ mod tests {
         {
             check_flat(def, &mut failures);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()) {
             check_flat(def, &mut failures);
         }
 
@@ -607,7 +607,7 @@ mod tests {
         {
             check_flat(def, &mut failures);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()) {
             check_flat(def, &mut failures);
         }
 
@@ -636,7 +636,7 @@ mod tests {
         for def in xcode::xcbeautify_flat_defs() {
             all_cmds.insert(def.name);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()) {
             all_cmds.insert(def.name);
         }
         let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
