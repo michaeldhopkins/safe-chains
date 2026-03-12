@@ -835,8 +835,10 @@ Aliases: `egrep`, `fgrep`
 ### `jjpr` (https://github.com/michaeldhopkins/jjpr)
 
 - Bare invocation allowed (displays stack status).
+- status allowed.
 - auth (test, setup).
 - submit (requires --dry-run), merge (requires --dry-run).
+- --help allowed on all subcommands.
 
 ### `jq` (https://jqlang.github.io/jq/manual/)
 
