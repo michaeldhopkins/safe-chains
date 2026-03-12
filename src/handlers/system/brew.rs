@@ -106,6 +106,22 @@ static BREW_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
+static BREW_SERVICES_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&["--json"]),
+    valued: WordSet::flags(&[]),
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static BREW_SERVICES_INFO_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&["--all", "--json"]),
+    valued: WordSet::flags(&[]),
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
 pub(crate) static BREW: CommandDef = CommandDef {
     name: "brew",
     subs: &[
@@ -131,6 +147,10 @@ pub(crate) static BREW: CommandDef = CommandDef {
         SubDef::Policy { name: "--prefix", policy: &BREW_SIMPLE_POLICY },
         SubDef::Policy { name: "--repository", policy: &BREW_SIMPLE_POLICY },
         SubDef::Policy { name: "tap-info", policy: &BREW_SIMPLE_POLICY },
+        SubDef::Nested { name: "services", subs: &[
+            SubDef::Policy { name: "list", policy: &BREW_SERVICES_LIST_POLICY },
+            SubDef::Policy { name: "info", policy: &BREW_SERVICES_INFO_POLICY },
+        ]},
     ],
     bare_flags: &[],
     help_eligible: true,
@@ -187,5 +207,10 @@ mod tests {
         brew_tap_info_quiet: "brew tap-info -q homebrew/core",
         brew_repository: "brew --repository",
         brew_repository_tap: "brew --repository homebrew/core",
+        brew_services_list: "brew services list",
+        brew_services_list_json: "brew services list --json",
+        brew_services_info: "brew services info postgres",
+        brew_services_info_all: "brew services info --all",
+        brew_services_help: "brew services --help",
     }
 }
