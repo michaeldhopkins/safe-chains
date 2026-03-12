@@ -4,13 +4,13 @@ use crate::policy::{self, FlagPolicy, FlagStyle};
 static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--comments", "--draft", "--web",
-        "-q", "-w",
+        "-w",
     ]),
     valued: WordSet::flags(&[
         "--app", "--assignee", "--author", "--base", "--head",
         "--jq", "--json", "--label", "--limit", "--milestone",
         "--repo", "--search", "--state", "--template",
-        "-B", "-H", "-L", "-R", "-S",
+        "-B", "-H", "-L", "-R", "-S", "-q",
     ]),
     bare: true,
     max_positional: None,
@@ -20,11 +20,11 @@ static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
 static GH_VIEW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--comments", "--web",
-        "-c", "-q", "-w",
+        "-c", "-w",
     ]),
     valued: WordSet::flags(&[
         "--jq", "--json", "--repo", "--template",
-        "-R",
+        "-R", "-q",
     ]),
     bare: false,
     max_positional: None,
@@ -52,7 +52,7 @@ static GH_CHECKS_POLICY: FlagPolicy = FlagPolicy {
     ]),
     valued: WordSet::flags(&[
         "--interval", "--jq", "--json", "--repo", "--template",
-        "-R", "-i",
+        "-R", "-i", "-q",
     ]),
     bare: false,
     max_positional: None,
@@ -66,7 +66,7 @@ static GH_STATUS_POLICY: FlagPolicy = FlagPolicy {
     ]),
     valued: WordSet::flags(&[
         "--jq", "--json", "--repo", "--template",
-        "-R",
+        "-R", "-q",
     ]),
     bare: false,
     max_positional: None,
@@ -74,12 +74,12 @@ static GH_STATUS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_RUN_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-q"]),
+    standalone: WordSet::flags(&[]),
     valued: WordSet::flags(&[
         "--branch", "--commit", "--created", "--event",
         "--jq", "--json", "--limit", "--repo",
         "--status", "--template", "--user", "--workflow",
-        "-L", "-R", "-b", "-u", "-w",
+        "-L", "-R", "-b", "-q", "-u", "-w",
     ]),
     bare: true,
     max_positional: None,
@@ -93,7 +93,7 @@ static GH_RUN_VIEW_POLICY: FlagPolicy = FlagPolicy {
     ]),
     valued: WordSet::flags(&[
         "--attempt", "--job", "--jq", "--json", "--repo", "--template",
-        "-R", "-j",
+        "-R", "-j", "-q",
     ]),
     bare: false,
     max_positional: None,
@@ -119,7 +119,7 @@ static GH_RELEASE_LIST_POLICY: FlagPolicy = FlagPolicy {
     ]),
     valued: WordSet::flags(&[
         "--jq", "--json", "--limit", "--order", "--repo", "--template",
-        "-L", "-R",
+        "-L", "-R", "-q",
     ]),
     bare: true,
     max_positional: None,
@@ -133,7 +133,7 @@ static GH_RELEASE_VIEW_POLICY: FlagPolicy = FlagPolicy {
     ]),
     valued: WordSet::flags(&[
         "--jq", "--json", "--repo", "--template",
-        "-R",
+        "-R", "-q",
     ]),
     bare: false,
     max_positional: None,
@@ -157,7 +157,7 @@ static GH_SEARCH_POLICY: FlagPolicy = FlagPolicy {
         "--reviewed-by", "--size", "--sort", "--stars",
         "--state", "--team-review-requested", "--template",
         "--topic", "--updated", "--visibility",
-        "-L", "-R",
+        "-L", "-R", "-q",
     ]),
     bare: false,
     max_positional: None,
@@ -165,10 +165,10 @@ static GH_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-q"]),
+    standalone: WordSet::flags(&[]),
     valued: WordSet::flags(&[
         "--jq", "--json", "--limit", "--repo", "--template",
-        "-L", "-R",
+        "-L", "-R", "-q",
     ]),
     bare: true,
     max_positional: None,
@@ -179,7 +179,7 @@ static GH_SIMPLE_VIEW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--web", "-w"]),
     valued: WordSet::flags(&[
         "--jq", "--json", "--repo", "--template",
-        "-R",
+        "-R", "-q",
     ]),
     bare: false,
     max_positional: None,
@@ -249,6 +249,10 @@ pub fn is_safe_gh(tokens: &[Token]) -> bool {
         return true;
     }
     let subcmd = &tokens[1];
+
+    if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
+        return true;
+    }
 
     if subcmd == "search" {
         return tokens.len() >= 3 && policy::check(&tokens[2..], &GH_SEARCH_POLICY);
@@ -459,6 +463,18 @@ mod tests {
         run_view_log_failed: "gh run view 789 --log-failed",
         run_view_exit_status: "gh run view 789 --exit-status",
         run_view_json: "gh run view 789 --json conclusion",
+        run_view_json_jq: "gh run view 789 --json status,conclusion -q '.status'",
+        run_view_json_jq_repo: "gh run view 789 --repo owner/repo --json status,conclusion -q '.status'",
+        pr_list_jq_short: "gh pr list --json number -q '.[].number'",
+        issue_list_jq_short: "gh issue list -q '.[] | .title' --json title",
+        pr_help: "gh pr --help",
+        issue_help: "gh issue --help",
+        run_help: "gh run --help",
+        search_help: "gh search --help",
+        auth_help: "gh auth --help",
+        browse_help: "gh browse --help",
+        api_help: "gh api --help",
+        release_help: "gh release --help",
         run_watch: "gh run watch 123",
         run_watch_repo: "gh run watch 123 --repo owner/repo",
         run_watch_exit: "gh run watch 123 --exit-status",
