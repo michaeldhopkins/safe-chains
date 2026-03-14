@@ -1,5 +1,5 @@
 use crate::command::{CheckFn, CommandDef, SubDef};
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static NPM_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -56,7 +56,7 @@ static NPM_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_npm_run(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_npm_run(tokens: &[Token]) -> bool {
     tokens.get(1).is_some_and(|a| a == "test" || a.starts_with("test:"))
 }
 

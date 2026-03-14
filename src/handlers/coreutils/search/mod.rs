@@ -4,17 +4,17 @@ mod grep;
 mod rg;
 
 use crate::command::FlatDef;
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
-pub(super) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     for flat in all_flat_defs() {
         if let r @ Some(_) = flat.dispatch(cmd, tokens) {
             return r;
         }
     }
     None
-        .or_else(|| find::dispatch(cmd, tokens, is_safe))
-        .or_else(|| fd::dispatch(cmd, tokens, is_safe))
+        .or_else(|| find::dispatch(cmd, tokens))
+        .or_else(|| fd::dispatch(cmd, tokens))
 }
 
 pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {

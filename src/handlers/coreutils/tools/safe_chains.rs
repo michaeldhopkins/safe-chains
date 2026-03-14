@@ -1,6 +1,6 @@
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, _tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, _tokens: &[Token]) -> Option<bool> {
     match cmd {
         "safe-chains" => Some(true),
         _ => None,

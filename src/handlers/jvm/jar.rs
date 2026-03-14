@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 fn is_list_mode(arg: &str) -> bool {
     if arg == "--list" {
@@ -27,7 +27,7 @@ pub fn is_safe_jar(tokens: &[Token]) -> bool {
     }
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     if cmd == "jar" {
         Some(is_safe_jar(tokens))
     } else {

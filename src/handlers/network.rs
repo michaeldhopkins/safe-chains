@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 
 static CURL_SAFE_STANDALONE: WordSet = WordSet::new(&[
     "--compressed", "--fail", "--globoff", "--head", "--insecure",
@@ -97,7 +97,7 @@ pub fn is_safe_curl(tokens: &[Token]) -> bool {
     i > 1
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "curl" => Some(is_safe_curl(tokens)),
         _ => None,

@@ -6,9 +6,9 @@ mod shasum;
 mod sum;
 
 use crate::command::FlatDef;
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
-pub(super) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     for flat in all_flat_defs() {
         if let r @ Some(_) = flat.dispatch(cmd, tokens) {
             return r;

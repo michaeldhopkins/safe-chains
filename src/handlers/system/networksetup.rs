@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 fn is_safe_networksetup(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
@@ -17,7 +17,7 @@ fn is_safe_networksetup(tokens: &[Token]) -> bool {
     true
 }
 
-pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "networksetup" => Some(is_safe_networksetup(tokens)),
         _ => None,

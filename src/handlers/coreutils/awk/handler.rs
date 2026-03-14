@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 fn awk_has_dangerous_construct(token: &Token) -> bool {
@@ -33,7 +33,7 @@ fn is_safe_awk(tokens: &[Token]) -> bool {
     policy::check(tokens, &AWK_POLICY)
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "awk" | "gawk" | "mawk" | "nawk" => Some(is_safe_awk(tokens)),
         _ => None,

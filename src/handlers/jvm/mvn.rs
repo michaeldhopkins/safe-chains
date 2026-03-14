@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 
 static MVN_STANDALONE: WordSet = WordSet::new(&[
     "--also-make", "--also-make-dependents", "--batch-mode",
@@ -60,7 +60,7 @@ pub fn is_safe_mvn(tokens: &[Token]) -> bool {
     true
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "mvn" | "mvnw" => Some(is_safe_mvn(tokens)),
         _ => None,

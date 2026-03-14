@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static PKGUTIL_SAFE: WordSet = WordSet::new(&[
@@ -36,7 +36,7 @@ pub fn is_safe_pkgutil(tokens: &[Token]) -> bool {
     policy::check(tokens, &PKGUTIL_POLICY)
 }
 
-pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     if cmd == "pkgutil" {
         Some(is_safe_pkgutil(tokens))
     } else {

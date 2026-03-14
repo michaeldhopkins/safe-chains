@@ -1,5 +1,5 @@
 use crate::command::{CheckFn, CommandDef, SubDef};
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static GIT_LOG_POLICY: FlagPolicy = FlagPolicy {
@@ -546,15 +546,15 @@ static GIT_CONFIG_SAFE: WordSet =
 static GIT_NOTES_SAFE: WordSet =
     WordSet::new(&["list", "show"]);
 
-fn check_git_help(_tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_git_help(_tokens: &[Token]) -> bool {
     true
 }
 
-fn check_git_remote(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_git_remote(tokens: &[Token]) -> bool {
     tokens.get(1).is_none_or(|a| !GIT_REMOTE_MUTATING.contains(a))
 }
 
-fn check_git_branch(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_git_branch(tokens: &[Token]) -> bool {
     tokens[1..].iter().all(|a| {
         !GIT_BRANCH_MUTATING.contains(a)
             && !GIT_BRANCH_MUTATING
@@ -563,23 +563,23 @@ fn check_git_branch(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bo
     })
 }
 
-fn check_git_stash(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_git_stash(tokens: &[Token]) -> bool {
     tokens.get(1).is_some_and(|a| GIT_STASH_SAFE.contains(a))
 }
 
-fn check_git_tag(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_git_tag(tokens: &[Token]) -> bool {
     if tokens.len() == 1 {
         return true;
     }
     tokens[1..].iter().all(|a| !GIT_TAG_MUTATING.contains(a))
 }
 
-fn check_git_config(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_git_config(tokens: &[Token]) -> bool {
     tokens.get(1).is_some_and(|a| GIT_CONFIG_SAFE.contains(a))
         && tokens[2..].iter().all(|a| !a.starts_with('-'))
 }
 
-fn check_git_worktree(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_git_worktree(tokens: &[Token]) -> bool {
     tokens.get(1).is_some_and(|a| a == "list")
         && tokens[2..].iter().all(|a| {
             !a.starts_with('-')
@@ -590,16 +590,16 @@ fn check_git_worktree(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> 
         })
 }
 
-fn check_git_notes(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_git_notes(tokens: &[Token]) -> bool {
     tokens.get(1).is_some_and(|a| GIT_NOTES_SAFE.contains(a))
         && tokens[2..].iter().all(|a| !a.starts_with('-'))
 }
 
-fn check_git_sub(args: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_git_sub(args: &[Token]) -> bool {
     GIT_SUBS
         .iter()
         .find(|s| s.name() == args[0].as_str())
-        .is_some_and(|s| s.check(args, is_safe))
+        .is_some_and(|s| s.check(args))
 }
 
 static GIT_SUBS: &[SubDef] = &[
@@ -646,7 +646,7 @@ pub(crate) static GIT: CommandDef = CommandDef {
     aliases: &[],
 };
 
-pub(in crate::handlers::vcs) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::vcs) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "git" => {
             if tokens.last().is_some_and(|t| *t == "-h")
@@ -664,7 +664,7 @@ pub(in crate::handlers::vcs) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &
             if matches!(args[0].as_str(), "--version" | "-V" | "--help" | "-h") {
                 return Some(true);
             }
-            Some(check_git_sub(args, is_safe))
+            Some(check_git_sub(args))
         }
         _ => None,
     }

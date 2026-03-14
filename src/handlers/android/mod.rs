@@ -9,7 +9,7 @@ mod lint;
 mod sdkmanager;
 mod zipalign;
 
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 pub(crate) use aapt2::AAPT2;
 pub(crate) use apkanalyzer::APKANALYZER;
@@ -17,14 +17,14 @@ pub(crate) use apksigner::APKSIGNER;
 pub(crate) use avdmanager::AVDMANAGER;
 pub(crate) use bundletool::BUNDLETOOL;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    adb::dispatch(cmd, tokens, is_safe)
-        .or_else(|| APKANALYZER.dispatch(cmd, tokens, is_safe))
-        .or_else(|| APKSIGNER.dispatch(cmd, tokens, is_safe))
-        .or_else(|| BUNDLETOOL.dispatch(cmd, tokens, is_safe))
-        .or_else(|| AAPT2.dispatch(cmd, tokens, is_safe))
-        .or_else(|| AVDMANAGER.dispatch(cmd, tokens, is_safe))
-        .or_else(|| zipalign::dispatch(cmd, tokens, is_safe))
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+    adb::dispatch(cmd, tokens)
+        .or_else(|| APKANALYZER.dispatch(cmd, tokens))
+        .or_else(|| APKSIGNER.dispatch(cmd, tokens))
+        .or_else(|| BUNDLETOOL.dispatch(cmd, tokens))
+        .or_else(|| AAPT2.dispatch(cmd, tokens))
+        .or_else(|| AVDMANAGER.dispatch(cmd, tokens))
+        .or_else(|| zipalign::dispatch(cmd, tokens))
         .or_else(|| emulator::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
         .or_else(|| sdkmanager::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
         .or_else(|| lint::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))

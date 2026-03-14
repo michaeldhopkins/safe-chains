@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 
 static ROUTE_SAFE_FLAGS: WordSet = WordSet::new(&["-4", "-6", "-n", "-v"]);
 static ROUTE_SAFE_SUBCMDS: WordSet = WordSet::new(&["get", "monitor", "print", "show"]);
@@ -19,7 +19,7 @@ fn is_safe_route(tokens: &[Token]) -> bool {
     true
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "route" => Some(is_safe_route(tokens)),
         _ => None,

@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 
 static NPX_FLAGS_NO_ARG: WordSet =
     WordSet::new(&["--ignore-existing", "--no", "--quiet", "--yes", "-q", "-y"]);
@@ -14,7 +14,7 @@ pub fn is_safe_npx(tokens: &[Token]) -> bool {
         .is_some_and(|idx| super::is_safe_runner_package(tokens, idx))
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "npx" => Some(is_safe_npx(tokens)),
         _ => None,

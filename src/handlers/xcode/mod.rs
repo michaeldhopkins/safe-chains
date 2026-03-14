@@ -16,7 +16,7 @@ mod xcodebuild;
 mod xcodegen;
 mod xcrun;
 
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 pub(crate) use agvtool::AGVTOOL;
 pub(crate) use periphery::PERIPHERY;
@@ -29,23 +29,23 @@ pub(crate) use xcode_select::XCODE_SELECT;
 pub(crate) use xcodebuild::XCODEBUILD;
 pub(crate) use xcodegen::XCODEGEN;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    XCODEBUILD.dispatch(cmd, tokens, is_safe)
-        .or_else(|| PLUTIL.dispatch(cmd, tokens, is_safe))
-        .or_else(|| XCODE_SELECT.dispatch(cmd, tokens, is_safe))
-        .or_else(|| XCODEGEN.dispatch(cmd, tokens, is_safe))
-        .or_else(|| TUIST.dispatch(cmd, tokens, is_safe))
-        .or_else(|| POD.dispatch(cmd, tokens, is_safe))
-        .or_else(|| SWIFTLINT.dispatch(cmd, tokens, is_safe))
-        .or_else(|| PERIPHERY.dispatch(cmd, tokens, is_safe))
-        .or_else(|| AGVTOOL.dispatch(cmd, tokens, is_safe))
-        .or_else(|| SIMCTL.dispatch(cmd, tokens, is_safe))
-        .or_else(|| xcrun::dispatch(cmd, tokens, is_safe))
-        .or_else(|| pkgutil::dispatch(cmd, tokens, is_safe))
-        .or_else(|| lipo::dispatch(cmd, tokens, is_safe))
-        .or_else(|| codesign::dispatch(cmd, tokens, is_safe))
-        .or_else(|| spctl::dispatch(cmd, tokens, is_safe))
-        .or_else(|| swiftformat::dispatch(cmd, tokens, is_safe))
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+    XCODEBUILD.dispatch(cmd, tokens)
+        .or_else(|| PLUTIL.dispatch(cmd, tokens))
+        .or_else(|| XCODE_SELECT.dispatch(cmd, tokens))
+        .or_else(|| XCODEGEN.dispatch(cmd, tokens))
+        .or_else(|| TUIST.dispatch(cmd, tokens))
+        .or_else(|| POD.dispatch(cmd, tokens))
+        .or_else(|| SWIFTLINT.dispatch(cmd, tokens))
+        .or_else(|| PERIPHERY.dispatch(cmd, tokens))
+        .or_else(|| AGVTOOL.dispatch(cmd, tokens))
+        .or_else(|| SIMCTL.dispatch(cmd, tokens))
+        .or_else(|| xcrun::dispatch(cmd, tokens))
+        .or_else(|| pkgutil::dispatch(cmd, tokens))
+        .or_else(|| lipo::dispatch(cmd, tokens))
+        .or_else(|| codesign::dispatch(cmd, tokens))
+        .or_else(|| spctl::dispatch(cmd, tokens))
+        .or_else(|| swiftformat::dispatch(cmd, tokens))
         .or_else(|| xcbeautify::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
 }
 

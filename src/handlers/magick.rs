@@ -31,7 +31,7 @@ pub(crate) static MAGICK: CommandDef = CommandDef {
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     if cmd == MAGICK.name {
-        Some(MAGICK.check(tokens, &|_| false))
+        Some(MAGICK.check(tokens))
     } else {
         None
     }

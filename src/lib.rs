@@ -14,134 +14,15 @@ macro_rules! denied {
 
 pub mod cli;
 pub mod command;
-pub mod compound;
+pub mod cst;
 pub mod docs;
 mod handlers;
 pub mod parse;
 pub mod policy;
 pub mod allowlist;
 
-use compound::ShellUnit;
-use parse::{CommandLine, Segment, Token};
-
-fn filter_safe_redirects(tokens: Vec<Token>) -> Vec<Token> {
-    let mut result = Vec::new();
-    let mut iter = tokens.into_iter().peekable();
-    while let Some(token) = iter.next() {
-        if token.is_fd_redirect() || token.is_dev_null_redirect() {
-            continue;
-        }
-        if token.is_redirect_operator()
-            && iter.peek().is_some_and(|next| *next == "/dev/null")
-        {
-            iter.next();
-            continue;
-        }
-        result.push(token);
-    }
-    result
-}
-
-pub fn is_safe(segment: &Segment) -> bool {
-    if segment.has_unsafe_redirects() {
-        return false;
-    }
-
-    let Ok((subs, cleaned)) = segment.extract_substitutions() else {
-        return false;
-    };
-
-    for sub in &subs {
-        if !is_safe_command(sub) {
-            return false;
-        }
-    }
-
-    let segment = Segment::from_raw(cleaned);
-
-    if !subs.is_empty() && segment.is_bare_assignment() {
-        return true;
-    }
-
-    if let Some(inner) = segment.unwrap_subshell() {
-        return is_safe_command(inner);
-    }
-
-    let stripped = segment.strip_env_prefix();
-    if stripped.is_empty() {
-        return true;
-    }
-
-    let Some(tokens) = stripped.tokenize() else {
-        return false;
-    };
-    if tokens.is_empty() {
-        return true;
-    }
-
-    let tokens = filter_safe_redirects(tokens);
-    if tokens.is_empty() {
-        return true;
-    }
-
-    handlers::dispatch(&tokens, &is_safe)
-}
-
-fn strip_negation(s: &str) -> &str {
-    let mut s = s.trim();
-    loop {
-        if let Some(rest) = s.strip_prefix("! ") {
-            s = rest.trim_start();
-        } else if s == "!" {
-            return "";
-        } else {
-            return s;
-        }
-    }
-}
-
-fn header_subs_safe(header: &str) -> bool {
-    let seg = Segment::from_raw(header.to_string());
-    let Ok((subs, _)) = seg.extract_substitutions() else {
-        return false;
-    };
-    subs.iter().all(|s| is_safe_command(s))
-}
-
-fn validate_units(units: &[ShellUnit], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    units.iter().all(|unit| match unit {
-        ShellUnit::Simple(s) => {
-            let s = strip_negation(s);
-            if s.is_empty() {
-                return true;
-            }
-            is_safe(&Segment::from_raw(s.to_string()))
-        }
-        ShellUnit::For { header, body } => {
-            header_subs_safe(header) && validate_units(body, is_safe)
-        }
-        ShellUnit::Loop {
-            condition, body, ..
-        } => validate_units(condition, is_safe) && validate_units(body, is_safe),
-        ShellUnit::If {
-            branches,
-            else_body,
-        } => {
-            branches
-                .iter()
-                .all(|b| validate_units(&b.condition, is_safe) && validate_units(&b.body, is_safe))
-                && validate_units(else_body, is_safe)
-        }
-    })
-}
-
 pub fn is_safe_command(command: &str) -> bool {
-    let segments = CommandLine::new(command).segments();
-    let strs: Vec<&str> = segments.iter().map(|s| s.as_str()).collect();
-    match compound::parse(&strs) {
-        Some(units) => validate_units(&units, &is_safe),
-        None => false,
-    }
+    cst::is_safe_command(command)
 }
 
 #[cfg(test)]

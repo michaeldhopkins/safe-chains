@@ -1,14 +1,14 @@
 mod git;
 mod jj;
 
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 #[cfg(test)]
 pub(crate) use git::GIT;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    git::dispatch(cmd, tokens, is_safe)
-        .or_else(|| jj::dispatch(cmd, tokens, is_safe))
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+    git::dispatch(cmd, tokens)
+        .or_else(|| jj::dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

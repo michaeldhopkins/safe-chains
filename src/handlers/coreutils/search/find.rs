@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 
 static FIND_DANGEROUS_FLAGS: WordSet = WordSet::new(&[
     "-delete",
@@ -10,7 +10,7 @@ static FIND_DANGEROUS_FLAGS: WordSet = WordSet::new(&[
     "-okdir",
 ]);
 
-pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> bool {
     let mut i = 1;
     while i < tokens.len() {
         if FIND_DANGEROUS_FLAGS.contains(&tokens[i]) {
@@ -26,8 +26,12 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token], is_safe: &d
             if cmd_start >= cmd_end {
                 return false;
             }
-            let exec_cmd = Segment::from_tokens_replacing(&tokens[cmd_start..cmd_end], "{}", "file");
-            if !is_safe(&exec_cmd) {
+            let exec_words: Vec<&str> = tokens[cmd_start..cmd_end]
+                .iter()
+                .map(|t| if t.as_str() == "{}" { "file" } else { t.as_str() })
+                .collect();
+            let exec_cmd = shell_words::join(exec_words);
+            if !crate::is_safe_command(&exec_cmd) {
                 return false;
             }
             i = cmd_end + 1;
@@ -38,9 +42,9 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token], is_safe: &d
     true
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
-        "find" => Some(is_safe_find(tokens, is_safe)),
+        "find" => Some(is_safe_find(tokens)),
         _ => None,
     }
 }

@@ -4,21 +4,21 @@ mod llm;
 mod ollama;
 
 use crate::command::FlatDef;
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 pub(crate) use hf::HF;
 pub(crate) use llm::LLM;
 pub(crate) use ollama::OLLAMA;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     for flat in ai_flat_defs() {
         if let r @ Some(_) = flat.dispatch(cmd, tokens) {
             return r;
         }
     }
-    OLLAMA.dispatch(cmd, tokens, is_safe)
-        .or_else(|| LLM.dispatch(cmd, tokens, is_safe))
-        .or_else(|| HF.dispatch(cmd, tokens, is_safe))
+    OLLAMA.dispatch(cmd, tokens)
+        .or_else(|| LLM.dispatch(cmd, tokens))
+        .or_else(|| HF.dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

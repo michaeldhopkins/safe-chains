@@ -1,15 +1,15 @@
 mod cargo;
 mod rustup;
 
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 #[cfg(test)]
 pub(crate) use cargo::CARGO;
 pub(crate) use rustup::RUSTUP;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    cargo::dispatch(cmd, tokens, is_safe)
-        .or_else(|| RUSTUP.dispatch(cmd, tokens, is_safe))
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+    cargo::dispatch(cmd, tokens)
+        .or_else(|| RUSTUP.dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 
 static HOSTNAME_DISPLAY: WordSet = WordSet::new(&["-A", "-I", "-d", "-f", "-i", "-s"]);
 
@@ -12,7 +12,7 @@ fn is_safe_hostname(tokens: &[Token]) -> bool {
     tokens[1..].iter().all(|t| HOSTNAME_DISPLAY.contains(t))
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "hostname" => Some(is_safe_hostname(tokens)),
         _ => None,

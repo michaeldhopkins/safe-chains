@@ -4,21 +4,21 @@ mod rbenv;
 mod ruby_cmd;
 
 use crate::command::FlatDef;
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 pub(crate) use bundle::BUNDLE;
 pub(crate) use gem::GEM;
 pub(crate) use rbenv::RBENV;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     for flat in ruby_flat_defs() {
         if let r @ Some(_) = flat.dispatch(cmd, tokens) {
             return r;
         }
     }
-    BUNDLE.dispatch(cmd, tokens, is_safe)
-        .or_else(|| GEM.dispatch(cmd, tokens, is_safe))
-        .or_else(|| RBENV.dispatch(cmd, tokens, is_safe))
+    BUNDLE.dispatch(cmd, tokens)
+        .or_else(|| GEM.dispatch(cmd, tokens))
+        .or_else(|| RBENV.dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

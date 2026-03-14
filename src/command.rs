@@ -1,9 +1,9 @@
-use crate::parse::{has_flag, Segment, Token};
+use crate::parse::{has_flag, Token};
 use crate::policy::{self, FlagPolicy};
 #[cfg(test)]
 use crate::policy::FlagStyle;
 
-pub type CheckFn = fn(&[Token], &dyn Fn(&Segment) -> bool) -> bool;
+pub type CheckFn = fn(&[Token]) -> bool;
 
 pub enum SubDef {
     Policy {
@@ -53,7 +53,7 @@ impl SubDef {
         }
     }
 
-    pub fn check(&self, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    pub fn check(&self, tokens: &[Token]) -> bool {
         match self {
             Self::Policy { policy, .. } => {
                 if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
@@ -70,7 +70,7 @@ impl SubDef {
                     return true;
                 }
                 subs.iter()
-                    .any(|s| s.name() == sub && s.check(&tokens[1..], is_safe))
+                    .any(|s| s.name() == sub && s.check(&tokens[1..]))
             }
             Self::Guarded {
                 guard_short,
@@ -88,21 +88,21 @@ impl SubDef {
                 if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
                     return true;
                 }
-                f(tokens, is_safe)
+                f(tokens)
             }
             Self::Delegation { skip, .. } => {
                 if tokens.len() <= *skip {
                     return false;
                 }
-                let inner = Token::join(&tokens[*skip..]);
-                is_safe(&inner)
+                let inner = shell_words::join(tokens[*skip..].iter().map(|t| t.as_str()));
+                crate::is_safe_command(&inner)
             }
         }
     }
 }
 
 impl CommandDef {
-    pub fn check(&self, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    pub fn check(&self, tokens: &[Token]) -> bool {
         if tokens.len() < 2 {
             return false;
         }
@@ -116,17 +116,16 @@ impl CommandDef {
         self.subs
             .iter()
             .find(|s| s.name() == arg)
-            .is_some_and(|s| s.check(&tokens[1..], is_safe))
+            .is_some_and(|s| s.check(&tokens[1..]))
     }
 
     pub fn dispatch(
         &self,
         cmd: &str,
         tokens: &[Token],
-        is_safe: &dyn Fn(&Segment) -> bool,
     ) -> Option<bool> {
         if cmd == self.name || self.aliases.contains(&cmd) {
-            Some(self.check(tokens, is_safe))
+            Some(self.check(tokens))
         } else {
             None
         }
@@ -364,9 +363,6 @@ mod tests {
         words.iter().map(|s| Token::from_test(s)).collect()
     }
 
-    fn no_safe(_: &Segment) -> bool {
-        false
-    }
 
     static TEST_POLICY: FlagPolicy = FlagPolicy {
         standalone: WordSet::new(&["--verbose", "-v"]),
@@ -390,43 +386,43 @@ mod tests {
 
     #[test]
     fn bare_rejected() {
-        assert!(!SIMPLE_CMD.check(&toks(&["mycmd"]), &no_safe));
+        assert!(!SIMPLE_CMD.check(&toks(&["mycmd"])));
     }
 
     #[test]
     fn bare_flag_accepted() {
-        assert!(SIMPLE_CMD.check(&toks(&["mycmd", "--info"]), &no_safe));
+        assert!(SIMPLE_CMD.check(&toks(&["mycmd", "--info"])));
     }
 
     #[test]
     fn bare_flag_with_extra_rejected() {
-        assert!(!SIMPLE_CMD.check(&toks(&["mycmd", "--info", "extra"]), &no_safe));
+        assert!(!SIMPLE_CMD.check(&toks(&["mycmd", "--info", "extra"])));
     }
 
     #[test]
     fn policy_sub_bare() {
-        assert!(SIMPLE_CMD.check(&toks(&["mycmd", "build"]), &no_safe));
+        assert!(SIMPLE_CMD.check(&toks(&["mycmd", "build"])));
     }
 
     #[test]
     fn policy_sub_with_flag() {
-        assert!(SIMPLE_CMD.check(&toks(&["mycmd", "build", "--verbose"]), &no_safe));
+        assert!(SIMPLE_CMD.check(&toks(&["mycmd", "build", "--verbose"])));
     }
 
     #[test]
     fn policy_sub_unknown_flag() {
-        assert!(!SIMPLE_CMD.check(&toks(&["mycmd", "build", "--bad"]), &no_safe));
+        assert!(!SIMPLE_CMD.check(&toks(&["mycmd", "build", "--bad"])));
     }
 
     #[test]
     fn unknown_sub_rejected() {
-        assert!(!SIMPLE_CMD.check(&toks(&["mycmd", "deploy"]), &no_safe));
+        assert!(!SIMPLE_CMD.check(&toks(&["mycmd", "deploy"])));
     }
 
     #[test]
     fn dispatch_matches() {
         assert_eq!(
-            SIMPLE_CMD.dispatch("mycmd", &toks(&["mycmd", "build"]), &no_safe),
+            SIMPLE_CMD.dispatch("mycmd", &toks(&["mycmd", "build"])),
             Some(true)
         );
     }
@@ -434,7 +430,7 @@ mod tests {
     #[test]
     fn dispatch_no_match() {
         assert_eq!(
-            SIMPLE_CMD.dispatch("other", &toks(&["other", "build"]), &no_safe),
+            SIMPLE_CMD.dispatch("other", &toks(&["other", "build"])),
             None
         );
     }
@@ -456,25 +452,24 @@ mod tests {
 
     #[test]
     fn nested_sub() {
-        assert!(NESTED_CMD.check(&toks(&["nested", "package", "describe"]), &no_safe));
+        assert!(NESTED_CMD.check(&toks(&["nested", "package", "describe"])));
     }
 
     #[test]
     fn nested_sub_with_flag() {
         assert!(NESTED_CMD.check(
             &toks(&["nested", "package", "describe", "--verbose"]),
-            &no_safe,
         ));
     }
 
     #[test]
     fn nested_bare_rejected() {
-        assert!(!NESTED_CMD.check(&toks(&["nested", "package"]), &no_safe));
+        assert!(!NESTED_CMD.check(&toks(&["nested", "package"])));
     }
 
     #[test]
     fn nested_unknown_sub_rejected() {
-        assert!(!NESTED_CMD.check(&toks(&["nested", "package", "deploy"]), &no_safe));
+        assert!(!NESTED_CMD.check(&toks(&["nested", "package", "deploy"])));
     }
 
     static GUARDED_POLICY: FlagPolicy = FlagPolicy {
@@ -501,24 +496,19 @@ mod tests {
 
     #[test]
     fn guarded_with_guard() {
-        assert!(GUARDED_CMD.check(&toks(&["guarded", "fmt", "--check"]), &no_safe));
+        assert!(GUARDED_CMD.check(&toks(&["guarded", "fmt", "--check"])));
     }
 
     #[test]
     fn guarded_without_guard() {
-        assert!(!GUARDED_CMD.check(&toks(&["guarded", "fmt"]), &no_safe));
+        assert!(!GUARDED_CMD.check(&toks(&["guarded", "fmt"])));
     }
 
     #[test]
     fn guarded_with_guard_and_flag() {
         assert!(GUARDED_CMD.check(
             &toks(&["guarded", "fmt", "--check", "--all"]),
-            &no_safe,
         ));
-    }
-
-    fn safe_echo(seg: &Segment) -> bool {
-        seg.as_str() == "echo hello"
     }
 
     static DELEGATION_CMD: CommandDef = CommandDef {
@@ -538,7 +528,6 @@ mod tests {
     fn delegation_safe_inner() {
         assert!(DELEGATION_CMD.check(
             &toks(&["runner", "run", "stable", "echo", "hello"]),
-            &safe_echo,
         ));
     }
 
@@ -546,7 +535,6 @@ mod tests {
     fn delegation_unsafe_inner() {
         assert!(!DELEGATION_CMD.check(
             &toks(&["runner", "run", "stable", "rm", "-rf"]),
-            &no_safe,
         ));
     }
 
@@ -554,11 +542,10 @@ mod tests {
     fn delegation_no_inner() {
         assert!(!DELEGATION_CMD.check(
             &toks(&["runner", "run", "stable"]),
-            &no_safe,
         ));
     }
 
-    fn custom_check(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+    fn custom_check(tokens: &[Token]) -> bool {
         tokens.len() >= 2 && tokens[1] == "safe"
     }
 
@@ -578,12 +565,12 @@ mod tests {
 
     #[test]
     fn custom_passes() {
-        assert!(CUSTOM_CMD.check(&toks(&["custom", "special", "safe"]), &no_safe));
+        assert!(CUSTOM_CMD.check(&toks(&["custom", "special", "safe"])));
     }
 
     #[test]
     fn custom_fails() {
-        assert!(!CUSTOM_CMD.check(&toks(&["custom", "special", "bad"]), &no_safe));
+        assert!(!CUSTOM_CMD.check(&toks(&["custom", "special", "bad"])));
     }
 
     #[test]

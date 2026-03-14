@@ -6,7 +6,7 @@ use serde::Deserialize;
 use serde_json::json;
 
 use safe_chains::cli::Cli;
-use safe_chains::{is_safe, is_safe_command};
+use safe_chains::is_safe_command;
 
 #[derive(Deserialize)]
 struct ToolInput {
@@ -54,10 +54,17 @@ fn run_claude_hook() {
         process::exit(0);
     }
 
-    let cmd_line = safe_chains::parse::CommandLine::new(&input.tool_input.command);
-    let segments = cmd_line.segments();
-    let all_covered = segments.iter().all(|s| {
-        is_safe(s) || (!s.has_unsafe_shell_syntax() && patterns.matches(s))
+    let Some(script) = safe_chains::cst::parse(&input.tool_input.command) else {
+        process::exit(0);
+    };
+
+    let all_covered = script.0.iter().all(|stmt| {
+        safe_chains::cst::is_safe_pipeline(&stmt.pipeline)
+            || stmt
+                .pipeline
+                .commands
+                .iter()
+                .all(|cmd| safe_chains::allowlist::is_cmd_covered(cmd, &patterns))
     });
 
     if all_covered {

@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 
 static FD_EXEC_LONG: WordSet = WordSet::new(&["--exec", "--exec-batch"]);
 
@@ -20,7 +20,7 @@ pub(in crate::handlers::coreutils) fn is_safe_fd(tokens: &[Token]) -> bool {
     true
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "fd" => Some(is_safe_fd(tokens)),
         _ => None,

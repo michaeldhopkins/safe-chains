@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static SYSCTL_POLICY: FlagPolicy = FlagPolicy {
@@ -22,7 +22,7 @@ fn is_safe_sysctl(tokens: &[Token]) -> bool {
     policy::check(tokens, &SYSCTL_POLICY)
 }
 
-pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "sysctl" => Some(is_safe_sysctl(tokens)),
         _ => None,

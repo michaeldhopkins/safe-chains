@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static R_CMD_CHECK_POLICY: FlagPolicy = FlagPolicy {
@@ -38,7 +38,7 @@ fn is_safe_rscript(tokens: &[Token]) -> bool {
     tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V")
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "R" => Some(is_safe_r(tokens)),
         "Rscript" => Some(is_safe_rscript(tokens)),

@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 fn is_safe_nslookup(tokens: &[Token]) -> bool {
     for t in &tokens[1..] {
@@ -25,7 +25,7 @@ fn is_safe_nslookup(tokens: &[Token]) -> bool {
     true
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "nslookup" => Some(is_safe_nslookup(tokens)),
         _ => None,

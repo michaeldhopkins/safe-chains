@@ -1,5 +1,5 @@
 use crate::command::{CommandDef, SubDef};
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static GO_VERSION_POLICY: FlagPolicy = FlagPolicy {
@@ -99,7 +99,7 @@ static GO_TEST_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_go_help(_tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_go_help(_tokens: &[Token]) -> bool {
     true
 }
 
@@ -121,8 +121,8 @@ pub(crate) static GO: CommandDef = CommandDef {
     aliases: &[],
 };
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    GO.dispatch(cmd, tokens, is_safe)
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+    GO.dispatch(cmd, tokens)
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

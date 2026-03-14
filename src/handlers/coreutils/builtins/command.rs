@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 fn is_safe_command_builtin(tokens: &[Token]) -> bool {
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
@@ -8,7 +8,7 @@ fn is_safe_command_builtin(tokens: &[Token]) -> bool {
         && (tokens[1] == "-v" || tokens[1] == "-V")
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "command" => Some(is_safe_command_builtin(tokens)),
         _ => None,
