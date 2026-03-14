@@ -6,6 +6,7 @@ mod man;
 mod safe_chains;
 mod shellcheck;
 mod tokei;
+mod workon;
 
 use crate::command::FlatDef;
 use crate::parse::{Segment, Token};
@@ -34,6 +35,7 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     v.extend(man::FLAT_DEFS);
     v.extend(shellcheck::FLAT_DEFS);
     v.extend(tokei::FLAT_DEFS);
+    v.extend(workon::FLAT_DEFS);
     v
 }
 

@@ -102,7 +102,7 @@ const HANDLED_CMDS: &[&str] = &[
     "cksum", "b2sum", "sum", "strings", "hexdump", "od", "size",
     "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat", "mdfind", "man",
     "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route",
-    "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "safe-chains",
+    "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "workon", "safe-chains",
 ];
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
