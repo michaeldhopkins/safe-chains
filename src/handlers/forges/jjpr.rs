@@ -36,7 +36,7 @@ static JJPR_MERGE_DRY_POLICY: FlagPolicy = FlagPolicy {
         "--dry-run", "--no-ci-check", "--no-fetch", "--watch",
     ]),
     valued: WordSet::flags(&[
-        "--base", "--merge-method", "--remote", "--required-approvals",
+        "--base", "--merge-method", "--reconcile-strategy", "--remote", "--required-approvals",
     ]),
     bare: true,
     max_positional: None,
@@ -55,8 +55,12 @@ fn is_safe_jjpr(tokens: &[Token]) -> bool {
         return tokens.len() == 2;
     }
 
+    if subcmd == "help" {
+        return tokens.len() <= 3;
+    }
+
     if subcmd == "auth" {
-        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
+        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h" | "help") {
             return true;
         }
         if tokens.len() < 3 || !AUTH_ACTIONS.contains(&tokens[2]) {
@@ -66,14 +70,14 @@ fn is_safe_jjpr(tokens: &[Token]) -> bool {
     }
 
     if subcmd == "status" {
-        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
+        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h" | "help") {
             return true;
         }
         return policy::check(&tokens[1..], &JJPR_STATUS_POLICY);
     }
 
     if subcmd == "submit" {
-        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
+        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h" | "help") {
             return true;
         }
         return has_flag(&tokens[1..], None, Some("--dry-run"))
@@ -81,7 +85,7 @@ fn is_safe_jjpr(tokens: &[Token]) -> bool {
     }
 
     if subcmd == "merge" {
-        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
+        if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h" | "help") {
             return true;
         }
         return has_flag(&tokens[1..], None, Some("--dry-run"))
@@ -89,7 +93,7 @@ fn is_safe_jjpr(tokens: &[Token]) -> bool {
     }
 
     if subcmd == "config" {
-        return tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h");
+        return tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h" | "help");
     }
 
     false
@@ -150,9 +154,11 @@ mod tests {
         auth_setup: "jjpr auth setup",
         auth_help: "jjpr auth --help",
         auth_help_short: "jjpr auth -h",
+        auth_help_sub: "jjpr auth help",
         status_bare: "jjpr status",
         status_help: "jjpr status --help",
         status_help_short: "jjpr status -h",
+        status_help_sub: "jjpr status help",
         status_no_fetch: "jjpr status --no-fetch",
         submit_dry: "jjpr submit --dry-run",
         submit_dry_bookmark: "jjpr submit my-stack --dry-run",
@@ -160,15 +166,25 @@ mod tests {
         submit_dry_reviewer: "jjpr submit --dry-run --reviewer user",
         submit_help: "jjpr submit --help",
         submit_help_short: "jjpr submit -h",
+        submit_help_sub: "jjpr submit help",
         merge_dry: "jjpr merge --dry-run",
         merge_dry_bookmark: "jjpr merge my-stack --dry-run",
         merge_dry_method: "jjpr merge --dry-run --merge-method squash",
         merge_dry_watch: "jjpr merge --dry-run --watch",
         merge_dry_remote: "jjpr merge --dry-run --remote origin",
+        merge_dry_reconcile: "jjpr merge --dry-run --reconcile-strategy rebase",
         merge_help: "jjpr merge --help",
         merge_help_short: "jjpr merge -h",
+        merge_help_sub: "jjpr merge help",
+        help_sub: "jjpr help",
+        help_sub_submit: "jjpr help submit",
+        help_sub_merge: "jjpr help merge",
+        help_sub_auth: "jjpr help auth",
+        help_sub_config: "jjpr help config",
+        help_sub_status: "jjpr help status",
         config_help: "jjpr config --help",
         config_help_short: "jjpr config -h",
+        config_help_sub: "jjpr config help",
     }
 
     denied! {
