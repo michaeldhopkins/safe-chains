@@ -165,6 +165,54 @@ fn arb_safe_redir() -> BoxedStrategy<Redir> {
     .boxed()
 }
 
+fn unsafe_rm() -> Cmd {
+    Cmd::Simple(SimpleCmd {
+        env: vec![],
+        words: vec![
+            Word(vec![WordPart::Lit("rm".into())]),
+            Word(vec![WordPart::Lit("-rf".into())]),
+            Word(vec![WordPart::Lit("/".into())]),
+        ],
+        redirs: vec![],
+    })
+}
+
+fn unsafe_script() -> Script {
+    Script(vec![Stmt {
+        pipeline: Pipeline {
+            bang: false,
+            commands: vec![unsafe_rm()],
+        },
+        op: None,
+    }])
+}
+
+fn inject_unsafe_into_pipeline(pipeline: &Pipeline, pos: usize) -> Pipeline {
+    let mut commands = pipeline.commands.clone();
+    let idx = pos % (commands.len() + 1);
+    commands.insert(idx, unsafe_rm());
+    Pipeline {
+        bang: pipeline.bang,
+        commands,
+    }
+}
+
+fn inject_unsafe_into_script(script: &Script, pos: usize) -> Script {
+    if script.0.is_empty() {
+        return Script(vec![Stmt {
+            pipeline: Pipeline {
+                bang: false,
+                commands: vec![unsafe_rm()],
+            },
+            op: None,
+        }]);
+    }
+    let stmt_idx = pos % script.0.len();
+    let mut stmts = script.0.clone();
+    stmts[stmt_idx].pipeline = inject_unsafe_into_pipeline(&stmts[stmt_idx].pipeline, pos / 2);
+    Script(stmts)
+}
+
 proptest! {
     #[test]
     fn roundtrip(script in arb_script(2)) {
@@ -204,51 +252,19 @@ proptest! {
 
     #[test]
     fn unsafe_sub_detected_in_word(safe_word in arb_shell_word()) {
-        let unsafe_script = Script(vec![Stmt {
-            pipeline: Pipeline {
-                bang: false,
-                commands: vec![Cmd::Simple(SimpleCmd {
-                    env: vec![],
-                    words: vec![
-                        Word(vec![WordPart::Lit("rm".to_string())]),
-                        Word(vec![WordPart::Lit("-rf".to_string())]),
-                        Word(vec![WordPart::Lit("/".to_string())]),
-                    ],
-                    redirs: vec![],
-                })],
-            },
-            op: None,
-        }]);
-
         let word_with_sub = Word(vec![
             WordPart::Lit(safe_word),
-            WordPart::CmdSub(unsafe_script),
+            WordPart::CmdSub(unsafe_script()),
         ]);
         prop_assert!(!check::word_subs_safe(&word_with_sub));
     }
 
     #[test]
     fn unsafe_sub_in_dquote_detected(safe_word in arb_shell_word()) {
-        let unsafe_script = Script(vec![Stmt {
-            pipeline: Pipeline {
-                bang: false,
-                commands: vec![Cmd::Simple(SimpleCmd {
-                    env: vec![],
-                    words: vec![
-                        Word(vec![WordPart::Lit("rm".to_string())]),
-                        Word(vec![WordPart::Lit("-rf".to_string())]),
-                        Word(vec![WordPart::Lit("/".to_string())]),
-                    ],
-                    redirs: vec![],
-                })],
-            },
-            op: None,
-        }]);
-
         let word_nested = Word(vec![
             WordPart::DQuote(Word(vec![
                 WordPart::Lit(safe_word),
-                WordPart::CmdSub(unsafe_script),
+                WordPart::CmdSub(unsafe_script()),
             ])),
         ]);
         prop_assert!(!check::word_subs_safe(&word_nested));
@@ -265,5 +281,136 @@ proptest! {
     )) {
         let word = Word(parts);
         prop_assert!(check::word_subs_safe(&word));
+    }
+
+    #[test]
+    fn unsafe_injected_into_pipeline(
+        script in arb_script(1),
+        pos in 0..20usize,
+    ) {
+        let injected = inject_unsafe_into_script(&script, pos);
+        prop_assert!(
+            !check::is_safe_script(&injected),
+            "unsafe command not detected after injection into: {}",
+            injected.to_string()
+        );
+    }
+
+    #[test]
+    fn unsafe_in_subshell_detected(script in arb_script(0)) {
+        let with_unsafe = Script(vec![
+            Stmt {
+                pipeline: Pipeline {
+                    bang: false,
+                    commands: vec![Cmd::Subshell(inject_unsafe_into_script(&script, 0))],
+                },
+                op: None,
+            },
+        ]);
+        prop_assert!(!check::is_safe_script(&with_unsafe));
+    }
+
+    #[test]
+    fn unsafe_in_for_body_detected(
+        var in arb_env_name(),
+        items in prop::collection::vec(arb_word(0), 1..3),
+    ) {
+        let cmd = Cmd::For {
+            var,
+            items,
+            body: unsafe_script(),
+        };
+        prop_assert!(!check::is_safe_cmd(&cmd));
+    }
+
+    #[test]
+    fn unsafe_in_while_body_detected(safe_cond in arb_script(0)) {
+        let cmd = Cmd::While {
+            cond: safe_cond,
+            body: unsafe_script(),
+        };
+        prop_assert!(!check::is_safe_cmd(&cmd));
+    }
+
+    #[test]
+    fn unsafe_in_while_cond_detected(safe_body in arb_script(0)) {
+        let cmd = Cmd::While {
+            cond: unsafe_script(),
+            body: safe_body,
+        };
+        prop_assert!(!check::is_safe_cmd(&cmd));
+    }
+
+    #[test]
+    fn unsafe_in_if_body_detected(safe_cond in arb_script(0)) {
+        let cmd = Cmd::If {
+            branches: vec![Branch {
+                cond: safe_cond,
+                body: unsafe_script(),
+            }],
+            else_body: None,
+        };
+        prop_assert!(!check::is_safe_cmd(&cmd));
+    }
+
+    #[test]
+    fn unsafe_in_if_cond_detected(safe_body in arb_script(0)) {
+        let cmd = Cmd::If {
+            branches: vec![Branch {
+                cond: unsafe_script(),
+                body: safe_body,
+            }],
+            else_body: None,
+        };
+        prop_assert!(!check::is_safe_cmd(&cmd));
+    }
+
+    #[test]
+    fn unsafe_in_else_detected(safe_cond in arb_script(0), safe_body in arb_script(0)) {
+        let cmd = Cmd::If {
+            branches: vec![Branch {
+                cond: safe_cond,
+                body: safe_body,
+            }],
+            else_body: Some(unsafe_script()),
+        };
+        prop_assert!(!check::is_safe_cmd(&cmd));
+    }
+
+    #[test]
+    fn unsafe_in_for_items_sub_detected(
+        var in arb_env_name(),
+        safe_body in arb_script(0),
+    ) {
+        let cmd = Cmd::For {
+            var,
+            items: vec![Word(vec![WordPart::CmdSub(unsafe_script())])],
+            body: safe_body,
+        };
+        prop_assert!(!check::is_safe_cmd(&cmd));
+    }
+
+    #[test]
+    fn file_redirect_always_denied(
+        cmd_word in arb_shell_word(),
+        target in arb_shell_word().prop_filter("not /dev/null", |s| s != "/dev/null"),
+        fd in 0..3u32,
+        append in any::<bool>(),
+    ) {
+        let cmd = SimpleCmd {
+            env: vec![],
+            words: vec![Word(vec![WordPart::Lit(cmd_word)])],
+            redirs: vec![Redir::Write {
+                fd,
+                target: Word(vec![WordPart::Lit(target)]),
+                append,
+            }],
+        };
+        prop_assert!(!check::check_redirects(&cmd.redirs));
+    }
+
+    #[test]
+    fn parse_never_panics(input in "[ -~]{0,200}") {
+        let _ = parse(&input);
     }
 }
