@@ -1,5 +1,5 @@
 use crate::command::{CheckFn, CommandDef, SubDef};
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BUN_TEST_POLICY: FlagPolicy = FlagPolicy {
@@ -26,7 +26,7 @@ static BUN_PM_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_bun_x(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_bun_x(tokens: &[Token]) -> bool {
     super::find_runner_package_index(tokens, 1, &super::BUNX_FLAGS_NO_ARG)
         .is_some_and(|idx| super::is_safe_runner_package(tokens, idx))
 }

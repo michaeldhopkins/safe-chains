@@ -3,13 +3,13 @@ mod glab;
 mod jjpr;
 mod tea;
 
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    gh::dispatch(cmd, tokens, is_safe)
-        .or_else(|| glab::dispatch(cmd, tokens, is_safe))
-        .or_else(|| jjpr::dispatch(cmd, tokens, is_safe))
-        .or_else(|| tea::dispatch(cmd, tokens, is_safe))
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+    gh::dispatch(cmd, tokens)
+        .or_else(|| glab::dispatch(cmd, tokens))
+        .or_else(|| jjpr::dispatch(cmd, tokens))
+        .or_else(|| tea::dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet, has_flag};
+use crate::parse::{Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -333,7 +333,7 @@ pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> bool {
     true
 }
 
-pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "gh" => Some(is_safe_gh(tokens)),
         _ => None,

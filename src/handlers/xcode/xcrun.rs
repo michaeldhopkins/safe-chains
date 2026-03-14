@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 
 static XCRUN_SHOW_FLAGS: WordSet = WordSet::new(&[
     "--find", "--show-sdk-build-version", "--show-sdk-path",
@@ -43,7 +43,7 @@ pub fn is_safe_xcrun(tokens: &[Token]) -> bool {
     false
 }
 
-pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     if cmd == "xcrun" {
         Some(is_safe_xcrun(tokens))
     } else {

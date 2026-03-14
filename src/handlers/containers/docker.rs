@@ -1,5 +1,5 @@
 use crate::command::{CommandDef, SubDef};
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DOCKER_PS_POLICY: FlagPolicy = FlagPolicy {
@@ -118,7 +118,7 @@ static DOCKER_COMPOSE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_docker_version_flag(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_docker_version_flag(tokens: &[Token]) -> bool {
     tokens.len() == 1
 }
 

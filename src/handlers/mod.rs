@@ -22,33 +22,33 @@ pub mod vcs;
 pub mod wrappers;
 pub mod xcode;
 
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
-pub fn dispatch(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+pub fn dispatch(tokens: &[Token]) -> bool {
     let cmd = tokens[0].command_name();
     None
-        .or_else(|| shell::dispatch(cmd, tokens, is_safe))
-        .or_else(|| wrappers::dispatch(cmd, tokens, is_safe))
-        .or_else(|| vcs::dispatch(cmd, tokens, is_safe))
-        .or_else(|| forges::dispatch(cmd, tokens, is_safe))
-        .or_else(|| node::dispatch(cmd, tokens, is_safe))
-        .or_else(|| ruby::dispatch(cmd, tokens, is_safe))
-        .or_else(|| python::dispatch(cmd, tokens, is_safe))
-        .or_else(|| rust::dispatch(cmd, tokens, is_safe))
-        .or_else(|| go::dispatch(cmd, tokens, is_safe))
-        .or_else(|| jvm::dispatch(cmd, tokens, is_safe))
-        .or_else(|| android::dispatch(cmd, tokens, is_safe))
-        .or_else(|| php::dispatch(cmd, tokens, is_safe))
-        .or_else(|| swift::dispatch(cmd, tokens, is_safe))
-        .or_else(|| dotnet::dispatch(cmd, tokens, is_safe))
-        .or_else(|| containers::dispatch(cmd, tokens, is_safe))
-        .or_else(|| network::dispatch(cmd, tokens, is_safe))
-        .or_else(|| ai::dispatch(cmd, tokens, is_safe))
-        .or_else(|| system::dispatch(cmd, tokens, is_safe))
-        .or_else(|| xcode::dispatch(cmd, tokens, is_safe))
-        .or_else(|| perl::dispatch(cmd, tokens, is_safe))
-        .or_else(|| r::dispatch(cmd, tokens, is_safe))
-        .or_else(|| coreutils::dispatch(cmd, tokens, is_safe))
+        .or_else(|| shell::dispatch(cmd, tokens))
+        .or_else(|| wrappers::dispatch(cmd, tokens))
+        .or_else(|| vcs::dispatch(cmd, tokens))
+        .or_else(|| forges::dispatch(cmd, tokens))
+        .or_else(|| node::dispatch(cmd, tokens))
+        .or_else(|| ruby::dispatch(cmd, tokens))
+        .or_else(|| python::dispatch(cmd, tokens))
+        .or_else(|| rust::dispatch(cmd, tokens))
+        .or_else(|| go::dispatch(cmd, tokens))
+        .or_else(|| jvm::dispatch(cmd, tokens))
+        .or_else(|| android::dispatch(cmd, tokens))
+        .or_else(|| php::dispatch(cmd, tokens))
+        .or_else(|| swift::dispatch(cmd, tokens))
+        .or_else(|| dotnet::dispatch(cmd, tokens))
+        .or_else(|| containers::dispatch(cmd, tokens))
+        .or_else(|| network::dispatch(cmd, tokens))
+        .or_else(|| ai::dispatch(cmd, tokens))
+        .or_else(|| system::dispatch(cmd, tokens))
+        .or_else(|| xcode::dispatch(cmd, tokens))
+        .or_else(|| perl::dispatch(cmd, tokens))
+        .or_else(|| r::dispatch(cmd, tokens))
+        .or_else(|| coreutils::dispatch(cmd, tokens))
         .or_else(|| magick::dispatch(cmd, tokens))
         .unwrap_or(false)
 }

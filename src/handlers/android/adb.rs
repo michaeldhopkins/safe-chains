@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 
 static SAFE_BARE_SUBS: WordSet = WordSet::new(&[
     "devices", "get-serialno", "get-state", "help", "start-server", "version",
@@ -103,7 +103,7 @@ pub fn is_safe_adb(tokens: &[Token]) -> bool {
     }
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     if cmd == "adb" {
         Some(is_safe_adb(tokens))
     } else {

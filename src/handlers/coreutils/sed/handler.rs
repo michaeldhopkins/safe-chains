@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 fn expr_has_exec(token: &Token) -> bool {
@@ -88,7 +88,7 @@ fn is_safe_sed(tokens: &[Token]) -> bool {
     !sed_has_exec_modifier(tokens) && policy::check(tokens, &SED_POLICY)
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "sed" => Some(is_safe_sed(tokens)),
         _ => None,

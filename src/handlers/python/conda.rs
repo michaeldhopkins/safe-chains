@@ -1,5 +1,5 @@
 use crate::command::{CheckFn, CommandDef, SubDef};
-use crate::parse::{Segment, Token, WordSet, has_flag};
+use crate::parse::{Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static CONDA_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -36,7 +36,7 @@ static CONDA_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_conda_config(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_conda_config(tokens: &[Token]) -> bool {
     (has_flag(tokens, None, Some("--show"))
         || has_flag(tokens, None, Some("--show-sources")))
         && policy::check(tokens, &CONDA_CONFIG_POLICY)

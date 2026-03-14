@@ -1,5 +1,5 @@
 use crate::command::{CheckFn, CommandDef, SubDef};
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static HELP_ONLY: FlagPolicy = FlagPolicy {
@@ -166,7 +166,7 @@ static SHELL_ALIAS_SUBS: &[SubDef] = &[
     SubDef::Policy { name: "unset", policy: &HELP_ONLY },
 ];
 
-fn check_nested_bare(tokens: &[Token], subs: &[SubDef], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_nested_bare(tokens: &[Token], subs: &[SubDef]) -> bool {
     if tokens.len() == 1 {
         return true;
     }
@@ -174,50 +174,50 @@ fn check_nested_bare(tokens: &[Token], subs: &[SubDef], is_safe: &dyn Fn(&Segmen
     if tokens.len() == 2 && (sub == "--help" || sub == "-h") {
         return true;
     }
-    subs.iter().any(|s| s.name() == sub && s.check(&tokens[1..], is_safe))
+    subs.iter().any(|s| s.name() == sub && s.check(&tokens[1..]))
 }
 
-fn check_mise_settings(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    check_nested_bare(tokens, SETTINGS_SUBS, is_safe)
+fn check_mise_settings(tokens: &[Token]) -> bool {
+    check_nested_bare(tokens, SETTINGS_SUBS)
 }
 
-fn check_mise_config(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    check_nested_bare(tokens, CONFIG_SUBS, is_safe)
+fn check_mise_config(tokens: &[Token]) -> bool {
+    check_nested_bare(tokens, CONFIG_SUBS)
 }
 
-fn check_mise_plugins(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    check_nested_bare(tokens, PLUGINS_SUBS, is_safe)
+fn check_mise_plugins(tokens: &[Token]) -> bool {
+    check_nested_bare(tokens, PLUGINS_SUBS)
 }
 
-fn check_mise_backends(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    check_nested_bare(tokens, BACKENDS_SUBS, is_safe)
+fn check_mise_backends(tokens: &[Token]) -> bool {
+    check_nested_bare(tokens, BACKENDS_SUBS)
 }
 
-fn check_mise_tasks(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    check_nested_bare(tokens, TASKS_SUBS, is_safe)
+fn check_mise_tasks(tokens: &[Token]) -> bool {
+    check_nested_bare(tokens, TASKS_SUBS)
 }
 
-fn check_mise_cache(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    check_nested_bare(tokens, CACHE_SUBS, is_safe)
+fn check_mise_cache(tokens: &[Token]) -> bool {
+    check_nested_bare(tokens, CACHE_SUBS)
 }
 
-fn check_mise_tool_alias(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    check_nested_bare(tokens, TOOL_ALIAS_SUBS, is_safe)
+fn check_mise_tool_alias(tokens: &[Token]) -> bool {
+    check_nested_bare(tokens, TOOL_ALIAS_SUBS)
 }
 
-fn check_mise_shell_alias(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
-    check_nested_bare(tokens, SHELL_ALIAS_SUBS, is_safe)
+fn check_mise_shell_alias(tokens: &[Token]) -> bool {
+    check_nested_bare(tokens, SHELL_ALIAS_SUBS)
 }
 
-fn check_mise_exec(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_mise_exec(tokens: &[Token]) -> bool {
     let sep = tokens[1..].iter().position(|t| *t == "--");
     if let Some(pos) = sep {
         let inner_start = 1 + pos + 1;
         if inner_start >= tokens.len() {
             return false;
         }
-        let inner = Token::join(&tokens[inner_start..]);
-        return is_safe(&inner);
+        let inner = shell_words::join(tokens[inner_start..].iter().map(|t| t.as_str()));
+        return crate::is_safe_command(&inner);
     }
     false
 }

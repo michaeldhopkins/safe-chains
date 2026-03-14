@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 
 static SAFE_PERL_WORDS: WordSet = WordSet::new(&[
     "ARGV", "BEGIN", "END", "STDERR", "STDIN", "STDOUT",
@@ -312,7 +312,7 @@ pub fn is_safe_perl(tokens: &[Token]) -> bool {
     has_code
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "perl" => Some(is_safe_perl(tokens)),
         _ => None,

@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static SPCTL_POLICY: FlagPolicy = FlagPolicy {
@@ -26,7 +26,7 @@ pub fn is_safe_spctl(tokens: &[Token]) -> bool {
     policy::check(tokens, &SPCTL_POLICY)
 }
 
-pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     if cmd == "spctl" {
         Some(is_safe_spctl(tokens))
     } else {

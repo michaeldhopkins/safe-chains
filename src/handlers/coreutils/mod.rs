@@ -11,7 +11,7 @@ mod sysinfo;
 mod text;
 mod tools;
 
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 pub(super) static BARE_ONLY: FlagPolicy = FlagPolicy {
@@ -22,20 +22,20 @@ pub(super) static BARE_ONLY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     None
-        .or_else(|| text::dispatch(cmd, tokens, is_safe))
-        .or_else(|| search::dispatch(cmd, tokens, is_safe))
-        .or_else(|| sed::dispatch(cmd, tokens, is_safe))
-        .or_else(|| awk::dispatch(cmd, tokens, is_safe))
-        .or_else(|| data::dispatch(cmd, tokens, is_safe))
-        .or_else(|| hash::dispatch(cmd, tokens, is_safe))
-        .or_else(|| fs::dispatch(cmd, tokens, is_safe))
-        .or_else(|| sysinfo::dispatch(cmd, tokens, is_safe))
-        .or_else(|| net::dispatch(cmd, tokens, is_safe))
-        .or_else(|| builtins::dispatch(cmd, tokens, is_safe))
-        .or_else(|| binary::dispatch(cmd, tokens, is_safe))
-        .or_else(|| tools::dispatch(cmd, tokens, is_safe))
+        .or_else(|| text::dispatch(cmd, tokens))
+        .or_else(|| search::dispatch(cmd, tokens))
+        .or_else(|| sed::dispatch(cmd, tokens))
+        .or_else(|| awk::dispatch(cmd, tokens))
+        .or_else(|| data::dispatch(cmd, tokens))
+        .or_else(|| hash::dispatch(cmd, tokens))
+        .or_else(|| fs::dispatch(cmd, tokens))
+        .or_else(|| sysinfo::dispatch(cmd, tokens))
+        .or_else(|| net::dispatch(cmd, tokens))
+        .or_else(|| builtins::dispatch(cmd, tokens))
+        .or_else(|| binary::dispatch(cmd, tokens))
+        .or_else(|| tools::dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

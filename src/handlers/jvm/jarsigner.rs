@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 
 static VERIFY_STANDALONE: WordSet = WordSet::new(&[
     "-certs", "-strict", "-verbose",
@@ -30,7 +30,7 @@ pub fn is_safe_jarsigner(tokens: &[Token]) -> bool {
     has_verify
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     if cmd == "jarsigner" {
         Some(is_safe_jarsigner(tokens))
     } else {

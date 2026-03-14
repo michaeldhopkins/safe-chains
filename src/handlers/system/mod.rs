@@ -22,7 +22,7 @@ mod terraform;
 mod vercel;
 
 use crate::command::FlatDef;
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 pub(crate) use asdf::ASDF;
 pub(crate) use brew::BREW;
@@ -43,33 +43,33 @@ pub(crate) use fastlane::FASTLANE;
 pub(crate) use firebase::FIREBASE;
 pub(crate) use vercel::VERCEL;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     for flat in system_flat_defs() {
         if let r @ Some(_) = flat.dispatch(cmd, tokens) {
             return r;
         }
     }
-    BREW.dispatch(cmd, tokens, is_safe)
-        .or_else(|| MISE.dispatch(cmd, tokens, is_safe))
-        .or_else(|| ASDF.dispatch(cmd, tokens, is_safe))
-        .or_else(|| DDEV.dispatch(cmd, tokens, is_safe))
-        .or_else(|| DEFAULTS.dispatch(cmd, tokens, is_safe))
-        .or_else(|| SECURITY.dispatch(cmd, tokens, is_safe))
-        .or_else(|| CSRUTIL.dispatch(cmd, tokens, is_safe))
-        .or_else(|| DISKUTIL.dispatch(cmd, tokens, is_safe))
-        .or_else(|| LAUNCHCTL.dispatch(cmd, tokens, is_safe))
-        .or_else(|| LOG.dispatch(cmd, tokens, is_safe))
-        .or_else(|| CMAKE.dispatch(cmd, tokens, is_safe))
-        .or_else(|| DCLI.dispatch(cmd, tokens, is_safe))
-        .or_else(|| TERRAFORM.dispatch(cmd, tokens, is_safe))
-        .or_else(|| HEROKU.dispatch(cmd, tokens, is_safe))
-        .or_else(|| VERCEL.dispatch(cmd, tokens, is_safe))
-        .or_else(|| FLYCTL.dispatch(cmd, tokens, is_safe))
-        .or_else(|| FASTLANE.dispatch(cmd, tokens, is_safe))
-        .or_else(|| FIREBASE.dispatch(cmd, tokens, is_safe))
-        .or_else(|| pmset::dispatch(cmd, tokens, is_safe))
-        .or_else(|| sysctl::dispatch(cmd, tokens, is_safe))
-        .or_else(|| networksetup::dispatch(cmd, tokens, is_safe))
+    BREW.dispatch(cmd, tokens)
+        .or_else(|| MISE.dispatch(cmd, tokens))
+        .or_else(|| ASDF.dispatch(cmd, tokens))
+        .or_else(|| DDEV.dispatch(cmd, tokens))
+        .or_else(|| DEFAULTS.dispatch(cmd, tokens))
+        .or_else(|| SECURITY.dispatch(cmd, tokens))
+        .or_else(|| CSRUTIL.dispatch(cmd, tokens))
+        .or_else(|| DISKUTIL.dispatch(cmd, tokens))
+        .or_else(|| LAUNCHCTL.dispatch(cmd, tokens))
+        .or_else(|| LOG.dispatch(cmd, tokens))
+        .or_else(|| CMAKE.dispatch(cmd, tokens))
+        .or_else(|| DCLI.dispatch(cmd, tokens))
+        .or_else(|| TERRAFORM.dispatch(cmd, tokens))
+        .or_else(|| HEROKU.dispatch(cmd, tokens))
+        .or_else(|| VERCEL.dispatch(cmd, tokens))
+        .or_else(|| FLYCTL.dispatch(cmd, tokens))
+        .or_else(|| FASTLANE.dispatch(cmd, tokens))
+        .or_else(|| FIREBASE.dispatch(cmd, tokens))
+        .or_else(|| pmset::dispatch(cmd, tokens))
+        .or_else(|| sysctl::dispatch(cmd, tokens))
+        .or_else(|| networksetup::dispatch(cmd, tokens))
 }
 
 pub(crate) fn system_flat_defs() -> Vec<&'static FlatDef> {

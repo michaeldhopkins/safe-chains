@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 pub fn is_safe_bunx(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
@@ -11,7 +11,7 @@ pub fn is_safe_bunx(tokens: &[Token]) -> bool {
         .is_some_and(|idx| super::is_safe_runner_package(tokens, idx))
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "bunx" => Some(is_safe_bunx(tokens)),
         _ => None,

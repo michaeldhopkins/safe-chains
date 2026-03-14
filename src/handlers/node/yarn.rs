@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static YARN_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -32,7 +32,7 @@ pub fn is_safe_yarn(tokens: &[Token]) -> bool {
     }
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "yarn" => Some(is_safe_yarn(tokens)),
         _ => None,

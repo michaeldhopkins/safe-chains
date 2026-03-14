@@ -1,5 +1,5 @@
 use crate::command::{CommandDef, SubDef};
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 use crate::parse::WordSet;
@@ -225,7 +225,7 @@ static CARGO_PUBLISH_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_cargo_sub(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_cargo_sub(tokens: &[Token]) -> bool {
     let sub = usize::from(!tokens.is_empty() && tokens[0].starts_with('+'));
     if tokens.len() < sub + 1 {
         return false;
@@ -234,7 +234,7 @@ fn check_cargo_sub(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool
     CARGO_SUBS
         .iter()
         .find(|s| s.name() == rest[0].as_str())
-        .is_some_and(|s| s.check(rest, is_safe))
+        .is_some_and(|s| s.check(rest))
 }
 
 static CARGO_HELP_SUB_POLICY: FlagPolicy = FlagPolicy {
@@ -303,7 +303,7 @@ pub(crate) static CARGO: CommandDef = CommandDef {
     aliases: &[],
 };
 
-pub(in crate::handlers::rust) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::rust) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "cargo" => {
             if tokens.len() < 2 {
@@ -317,7 +317,7 @@ pub(in crate::handlers::rust) fn dispatch(cmd: &str, tokens: &[Token], is_safe: 
             if tokens.len() == sub + 1 && matches!(arg, "--help" | "-h" | "--version" | "-V") {
                 return Some(true);
             }
-            Some(check_cargo_sub(&tokens[sub..], is_safe))
+            Some(check_cargo_sub(&tokens[sub..]))
         }
         _ => None,
     }

@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet, has_flag};
+use crate::parse::{Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static JJPR_AUTH_POLICY: FlagPolicy = FlagPolicy {
@@ -99,7 +99,7 @@ fn is_safe_jjpr(tokens: &[Token]) -> bool {
     false
 }
 
-pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     match cmd {
         "jjpr" => Some(is_safe_jjpr(tokens)),
         _ => None,

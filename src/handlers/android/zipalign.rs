@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 pub fn is_safe_zipalign(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
@@ -18,7 +18,7 @@ pub fn is_safe_zipalign(tokens: &[Token]) -> bool {
     has_c
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     if cmd == "zipalign" {
         Some(is_safe_zipalign(tokens))
     } else {

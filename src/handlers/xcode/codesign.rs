@@ -1,4 +1,4 @@
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static CODESIGN_POLICY: FlagPolicy = FlagPolicy {
@@ -23,7 +23,7 @@ pub fn is_safe_codesign(tokens: &[Token]) -> bool {
     policy::check(tokens, &CODESIGN_POLICY)
 }
 
-pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
+pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
     if cmd == "codesign" {
         Some(is_safe_codesign(tokens))
     } else {

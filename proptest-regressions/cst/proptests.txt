@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 1e065186773a73d2f1c1791bdc1be79d00e62fc6724368e26b2dba58d9a7ae60 # shrinks to script = Script([Stmt { pipeline: Pipeline { bang: false, commands: [Simple(SimpleCmd { env: [], words: [Word([Lit("_"), Lit("0")])], redirs: [] })] }, op: None }])

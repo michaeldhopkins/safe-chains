@@ -7,17 +7,17 @@ mod keytool;
 mod ktlint;
 mod mvn;
 
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 pub(crate) use gradle::GRADLE;
 pub(crate) use keytool::KEYTOOL;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    GRADLE.dispatch(cmd, tokens, is_safe)
-        .or_else(|| KEYTOOL.dispatch(cmd, tokens, is_safe))
-        .or_else(|| mvn::dispatch(cmd, tokens, is_safe))
-        .or_else(|| jar::dispatch(cmd, tokens, is_safe))
-        .or_else(|| jarsigner::dispatch(cmd, tokens, is_safe))
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+    GRADLE.dispatch(cmd, tokens)
+        .or_else(|| KEYTOOL.dispatch(cmd, tokens))
+        .or_else(|| mvn::dispatch(cmd, tokens))
+        .or_else(|| jar::dispatch(cmd, tokens))
+        .or_else(|| jarsigner::dispatch(cmd, tokens))
         .or_else(|| detekt::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
         .or_else(|| ktlint::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
         .or_else(|| javap::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))

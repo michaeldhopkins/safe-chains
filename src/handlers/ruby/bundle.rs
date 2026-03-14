@@ -1,5 +1,5 @@
 use crate::command::{CommandDef, SubDef};
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BUNDLE_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -122,7 +122,7 @@ static HELP_ONLY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_bundle_config(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_bundle_config(tokens: &[Token]) -> bool {
     if tokens.len() == 1 {
         return true;
     }
@@ -130,13 +130,13 @@ fn check_bundle_config(tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> 
     if tokens.len() == 2 && (sub == "--help" || sub == "-h") {
         return true;
     }
-    if CONFIG_SUBS.iter().any(|s| s.name() == sub && s.check(&tokens[1..], is_safe)) {
+    if CONFIG_SUBS.iter().any(|s| s.name() == sub && s.check(&tokens[1..])) {
         return true;
     }
     policy::check(tokens, &BUNDLE_CONFIG_POLICY)
 }
 
-fn check_bundle_exec(tokens: &[Token], _is_safe: &dyn Fn(&Segment) -> bool) -> bool {
+fn check_bundle_exec(tokens: &[Token]) -> bool {
     let Some(cmd) = tokens.get(1) else {
         return false;
     };

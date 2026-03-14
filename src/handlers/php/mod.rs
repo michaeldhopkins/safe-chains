@@ -1,14 +1,14 @@
 mod composer;
 mod craft;
 
-use crate::parse::{Segment, Token};
+use crate::parse::Token;
 
 pub(crate) use composer::COMPOSER;
 pub(crate) use craft::CRAFT;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    COMPOSER.dispatch(cmd, tokens, is_safe)
-        .or_else(|| CRAFT.dispatch(cmd, tokens, is_safe))
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+    COMPOSER.dispatch(cmd, tokens)
+        .or_else(|| CRAFT.dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

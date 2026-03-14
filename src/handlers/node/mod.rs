@@ -9,7 +9,7 @@ mod pnpm;
 mod volta;
 mod yarn;
 
-use crate::parse::{Segment, Token, WordSet, has_flag};
+use crate::parse::{Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 pub(crate) use bun::BUN;
@@ -85,17 +85,17 @@ pub(super) fn is_safe_runner_package(tokens: &[Token], pkg_idx: usize) -> bool {
     false
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    NPM.dispatch(cmd, tokens, is_safe)
-        .or_else(|| yarn::dispatch(cmd, tokens, is_safe))
-        .or_else(|| PNPM.dispatch(cmd, tokens, is_safe))
-        .or_else(|| BUN.dispatch(cmd, tokens, is_safe))
-        .or_else(|| DENO.dispatch(cmd, tokens, is_safe))
-        .or_else(|| npx::dispatch(cmd, tokens, is_safe))
-        .or_else(|| bunx::dispatch(cmd, tokens, is_safe))
-        .or_else(|| NVM.dispatch(cmd, tokens, is_safe))
-        .or_else(|| FNM.dispatch(cmd, tokens, is_safe))
-        .or_else(|| VOLTA.dispatch(cmd, tokens, is_safe))
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+    NPM.dispatch(cmd, tokens)
+        .or_else(|| yarn::dispatch(cmd, tokens))
+        .or_else(|| PNPM.dispatch(cmd, tokens))
+        .or_else(|| BUN.dispatch(cmd, tokens))
+        .or_else(|| DENO.dispatch(cmd, tokens))
+        .or_else(|| npx::dispatch(cmd, tokens))
+        .or_else(|| bunx::dispatch(cmd, tokens))
+        .or_else(|| NVM.dispatch(cmd, tokens))
+        .or_else(|| FNM.dispatch(cmd, tokens))
+        .or_else(|| VOLTA.dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {

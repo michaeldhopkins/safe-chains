@@ -1,5 +1,5 @@
 use crate::command::{CommandDef, SubDef};
-use crate::parse::{Segment, Token, WordSet};
+use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DOTNET_BUILD_POLICY: FlagPolicy = FlagPolicy {
@@ -68,8 +68,8 @@ pub(crate) static DOTNET: CommandDef = CommandDef {
     aliases: &[],
 };
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token], is_safe: &dyn Fn(&Segment) -> bool) -> Option<bool> {
-    DOTNET.dispatch(cmd, tokens, is_safe)
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+    DOTNET.dispatch(cmd, tokens)
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
