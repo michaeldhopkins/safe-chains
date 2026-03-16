@@ -185,7 +185,6 @@ impl fmt::Display for Redir {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use crate::cst::parse;
 
     #[test]
