@@ -1,6 +1,7 @@
 mod arch;
 mod cal;
 mod dust;
+mod free;
 mod groups;
 mod htop;
 mod id;
@@ -9,6 +10,7 @@ mod iotop;
 mod last;
 mod lastlog;
 mod locale;
+mod lsblk;
 mod lsof;
 mod nproc;
 mod pgrep;
@@ -47,6 +49,7 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     let mut v = Vec::new();
     v.extend(cal::FLAT_DEFS);
     v.extend(dust::FLAT_DEFS);
+    v.extend(free::FLAT_DEFS);
     v.extend(groups::FLAT_DEFS);
     v.extend(htop::FLAT_DEFS);
     v.extend(id::FLAT_DEFS);
@@ -55,6 +58,7 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     v.extend(last::FLAT_DEFS);
     v.extend(lastlog::FLAT_DEFS);
     v.extend(locale::FLAT_DEFS);
+    v.extend(lsblk::FLAT_DEFS);
     v.extend(lsof::FLAT_DEFS);
     v.extend(nproc::FLAT_DEFS);
     v.extend(pgrep::FLAT_DEFS);

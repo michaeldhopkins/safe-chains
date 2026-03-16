@@ -1,7 +1,11 @@
+mod ack;
+mod ag;
 mod fd;
 mod find;
 mod grep;
+mod locate;
 mod rg;
+mod zgrep;
 
 use crate::command::FlatDef;
 use crate::parse::Token;
@@ -26,8 +30,12 @@ pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     let mut v = Vec::new();
+    v.extend(ack::FLAT_DEFS);
+    v.extend(ag::FLAT_DEFS);
     v.extend(grep::FLAT_DEFS);
+    v.extend(locate::FLAT_DEFS);
     v.extend(rg::FLAT_DEFS);
+    v.extend(zgrep::FLAT_DEFS);
     v
 }
 
