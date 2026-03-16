@@ -6,7 +6,7 @@ export const SafeChains = async () => ({
       try {
         execFileSync("safe-chains", [output.args.command]);
       } catch {
-        throw new Error("Command not in safe-chains allowlist");
+        throw new Error("Command blocked by safe-chains: not in the read-only allowlist. See https://github.com/michaeldhopkins/safe-chains for supported commands.");
       }
     }
   }

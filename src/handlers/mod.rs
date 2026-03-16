@@ -152,10 +152,8 @@ pub(crate) enum SubEntry {
     Guarded { name: &'static str, valid_suffix: &'static str },
 }
 
-#[cfg(test)]
 use crate::command::CommandDef;
 
-#[cfg(test)]
 const COMMAND_DEFS: &[&CommandDef] = &[
     &ai::CODEX, &ai::OLLAMA, &ai::OPENCODE, &ai::LLM, &ai::HF,
     &containers::DOCKER, &containers::PODMAN, &containers::KUBECTL,
@@ -183,6 +181,37 @@ const COMMAND_DEFS: &[&CommandDef] = &[
     &xcode::XCODEGEN, &xcode::TUIST, &xcode::POD, &xcode::SWIFTLINT,
     &xcode::PERIPHERY, &xcode::AGVTOOL, &xcode::SIMCTL,
 ];
+
+pub fn all_opencode_patterns() -> Vec<String> {
+    let mut patterns = Vec::new();
+    for def in COMMAND_DEFS {
+        patterns.extend(def.opencode_patterns());
+    }
+    for def in coreutils::all_flat_defs() {
+        patterns.extend(def.opencode_patterns());
+    }
+    for def in jvm::jvm_flat_defs() {
+        patterns.extend(def.opencode_patterns());
+    }
+    for def in android::android_flat_defs() {
+        patterns.extend(def.opencode_patterns());
+    }
+    for def in ai::ai_flat_defs() {
+        patterns.extend(def.opencode_patterns());
+    }
+    for def in ruby::ruby_flat_defs() {
+        patterns.extend(def.opencode_patterns());
+    }
+    for def in system::system_flat_defs() {
+        patterns.extend(def.opencode_patterns());
+    }
+    for def in xcode::xcbeautify_flat_defs() {
+        patterns.extend(def.opencode_patterns());
+    }
+    patterns.sort();
+    patterns.dedup();
+    patterns
+}
 
 #[cfg(test)]
 fn full_registry() -> Vec<&'static CommandEntry> {

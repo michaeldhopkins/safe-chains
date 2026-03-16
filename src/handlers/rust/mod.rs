@@ -3,7 +3,6 @@ mod rustup;
 
 use crate::parse::Token;
 
-#[cfg(test)]
 pub(crate) use cargo::CARGO;
 pub(crate) use rustup::RUSTUP;
 

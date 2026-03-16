@@ -1,6 +1,6 @@
 # `safe-chains`
 
-A command safety checker that auto-allows safe, read-only bash commands without prompting. Works as a Claude Code pre-hook, a CLI tool, or an OpenCode plugin.
+A command safety checker that auto-allows safe, read-only bash commands without prompting. Works as a Claude Code pre-hook, a CLI tool, or an OpenCode plugin (experimental).
 
 When an agentic tool wants to run a bash command, safe-chains checks if every segment of the command is safe. If so, the command runs without asking for permission. If any segment is unsafe, the normal permission flow takes over. Commands in piped chains, `&&`, and `;` sequences are each validated independently.
 
@@ -68,18 +68,30 @@ If you installed via Homebrew, the hook is already configured. Otherwise, add th
 
 Restart your Claude Code sessions to activate the hook. Once configured, updating the `safe-chains` binary takes effect immediately.
 
-### OpenCode
+### OpenCode (experimental)
 
-If you installed via Homebrew, the plugin is available at `$(brew --prefix)/share/safe-chains/opencode-plugin.js`. Copy it to your project:
+OpenCode's plugin API does not yet support auto-allowing commands. The [`permission.ask` hook](https://github.com/anomalyco/opencode/issues/7006) that would enable this is defined in the SDK but never triggered. OpenCode runs permission checks *before* plugin hooks, so `tool.execute.before` cannot bypass the permission prompt for safe commands.
+
+**Recommended setup:** Generate OpenCode `permission.bash` rules from safe-chains' command list:
+
+```bash
+safe-chains --opencode-config
+```
+
+This reads your existing `opencode.json` (if present), merges safe-chains permission rules into it, and prints the result. Review the output, then apply:
+
+```bash
+safe-chains --opencode-config > opencode.json
+```
+
+The generated rules are coarser than safe-chains' flag-level validation — they allow any flags for a safe subcommand (e.g., `"git status *": "allow"`), while safe-chains validates specific flags. Shell wrappers (`bash`, `env`, `xargs`, etc.) are excluded since their safety depends on the inner command.
+
+**Plugin (optional):** The included `opencode-plugin.js` blocks commands safe-chains considers unsafe. With `"*": "allow"` in your permission config, the plugin acts as a safety net — all commands are auto-allowed, and the plugin blocks unsafe ones with an error. Without `"*": "allow"`, the plugin adds a second layer of restriction on top of OpenCode's permission prompts.
 
 ```bash
 mkdir -p .opencode/plugins
 cp $(brew --prefix)/share/safe-chains/opencode-plugin.js .opencode/plugins/
 ```
-
-If you installed via cargo or from source, copy `opencode-plugin.js` from the repository to `.opencode/plugins/` in your project.
-
-The plugin intercepts bash commands before OpenCode executes them. Safe commands run without prompting; unsafe commands are blocked and OpenCode's normal permission flow takes over.
 
 Requires `safe-chains` in PATH.
 

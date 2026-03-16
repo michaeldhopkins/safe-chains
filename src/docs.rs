@@ -159,6 +159,44 @@ pub fn render_markdown(docs: &[CommandDoc]) -> String {
     out
 }
 
+pub fn render_opencode_json(patterns: &[String]) -> String {
+    use serde_json::{Map, Value};
+    use std::fs;
+
+    let mut root: Map<String, Value> = fs::read_to_string("opencode.json")
+        .ok()
+        .and_then(|s| serde_json::from_str(&s).ok())
+        .and_then(|v: Value| v.as_object().cloned())
+        .unwrap_or_else(|| {
+            let mut m = Map::new();
+            m.insert(
+                "$schema".to_string(),
+                Value::String("https://opencode.ai/config.json".to_string()),
+            );
+            m
+        });
+
+    let mut bash = Map::new();
+    bash.insert("*".to_string(), Value::String("ask".to_string()));
+    for pat in patterns {
+        bash.insert(pat.clone(), Value::String("allow".to_string()));
+    }
+
+    let permission = root
+        .entry("permission")
+        .or_insert_with(|| Value::Object(Map::new()));
+    if !permission.is_object() {
+        *permission = Value::Object(Map::new());
+    }
+    if let Value::Object(perm_map) = permission {
+        perm_map.insert("bash".to_string(), Value::Object(bash));
+    }
+
+    let mut out = serde_json::to_string_pretty(&Value::Object(root)).unwrap_or_default();
+    out.push('\n');
+    out
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -263,6 +301,58 @@ mod tests {
         assert_eq!(
             doc(&ws).subcommand("plugin-list").build(),
             "- Subcommands: list, plugin-list\n- Flags: --version"
+        );
+    }
+
+    #[test]
+    fn render_opencode_json_valid() {
+        let patterns = vec!["grep".to_string(), "grep *".to_string(), "ls".to_string()];
+        let json = render_opencode_json(&patterns);
+        let parsed: serde_json::Value = serde_json::from_str(&json).expect("valid JSON");
+        let bash = &parsed["permission"]["bash"];
+        assert_eq!(bash["*"], "ask");
+        assert_eq!(bash["grep"], "allow");
+        assert_eq!(bash["grep *"], "allow");
+        assert_eq!(bash["ls"], "allow");
+        assert!(bash["rm"].is_null());
+    }
+
+    #[test]
+    fn render_opencode_json_has_schema() {
+        let json = render_opencode_json(&[]);
+        let parsed: serde_json::Value = serde_json::from_str(&json).expect("valid JSON");
+        assert_eq!(parsed["$schema"], "https://opencode.ai/config.json");
+    }
+
+    #[test]
+    fn render_opencode_json_trailing_newline() {
+        let json = render_opencode_json(&[]);
+        assert!(json.ends_with('\n'));
+    }
+
+    #[test]
+    fn render_opencode_json_merges_existing() {
+        use std::fs;
+        let dir = tempfile::tempdir().expect("tmpdir");
+        let config_path = dir.path().join("opencode.json");
+        fs::write(
+            &config_path,
+            r#"{"$schema":"https://opencode.ai/config.json","model":"claude-sonnet-4-6","permission":{"bash":{"rm *":"deny"}}}"#,
+        )
+        .expect("write");
+
+        let prev = std::env::current_dir().expect("cwd");
+        std::env::set_current_dir(dir.path()).expect("cd");
+        let json = render_opencode_json(&["ls".to_string()]);
+        std::env::set_current_dir(prev).expect("cd back");
+
+        let parsed: serde_json::Value = serde_json::from_str(&json).expect("valid JSON");
+        assert_eq!(parsed["model"], "claude-sonnet-4-6", "existing keys preserved");
+        assert_eq!(parsed["permission"]["bash"]["*"], "ask");
+        assert_eq!(parsed["permission"]["bash"]["ls"], "allow");
+        assert!(
+            parsed["permission"]["bash"]["rm *"].is_null(),
+            "old bash rules replaced, not merged"
         );
     }
 

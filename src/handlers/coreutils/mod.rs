@@ -55,7 +55,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs
 }
 
-#[cfg(test)]
 pub(crate) fn all_flat_defs() -> Vec<&'static crate::command::FlatDef> {
     let mut v = Vec::new();
     v.extend(text::all_flat_defs());

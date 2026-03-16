@@ -17,6 +17,7 @@ pub mod command;
 pub mod cst;
 pub mod docs;
 mod handlers;
+pub use handlers::all_opencode_patterns;
 pub mod parse;
 pub mod policy;
 pub mod allowlist;

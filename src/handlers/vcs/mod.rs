@@ -3,7 +3,6 @@ mod jj;
 
 use crate::parse::Token;
 
-#[cfg(test)]
 pub(crate) use git::GIT;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {

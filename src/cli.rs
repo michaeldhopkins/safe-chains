@@ -11,4 +11,8 @@ pub struct Cli {
     /// List all supported commands in Markdown format
     #[arg(long)]
     pub list_commands: bool,
+
+    /// Generate OpenCode permission config (merges with existing opencode.json)
+    #[arg(long)]
+    pub opencode_config: bool,
 }
