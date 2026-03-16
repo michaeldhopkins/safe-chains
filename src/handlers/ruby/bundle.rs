@@ -146,6 +146,9 @@ fn check_bundle_exec(tokens: &[Token]) -> bool {
     if cmd == "rails" {
         return check_rails_sub(&tokens[1..]);
     }
+    if cmd == "gem" {
+        return super::GEM.check(&tokens[1..]);
+    }
     false
 }
 
@@ -178,7 +181,7 @@ pub(crate) static BUNDLE: CommandDef = CommandDef {
         SubDef::Custom {
             name: "exec",
             check: check_bundle_exec,
-            doc: "exec allowed for: brakeman, cucumber, erb_lint, herb, rails (about, assets:reveal, assets:reveal:full, db:migrate:status, db:version, initializers, middleware, notes, routes, secret, stats, test, test:system, time:zones:all, time:zones:local, version), rspec, standardrb.",
+            doc: "exec allowed for: brakeman, cucumber, erb_lint, gem (read-only subcommands), herb, rails (about, assets:reveal, assets:reveal:full, db:migrate:status, db:version, initializers, middleware, notes, routes, secret, stats, test, test:system, time:zones:all, time:zones:local, version), rspec, standardrb.",
             test_suffix: None,
         },
         SubDef::Policy { name: "info", policy: &BUNDLE_INFO_POLICY },
@@ -250,6 +253,17 @@ mod tests {
         bundle_config_help: "bundle config --help",
         bundle_config_set_help: "bundle config set --help",
         bundle_version: "bundle --version",
+        bundle_exec_gem_list: "bundle exec gem list",
+        bundle_exec_gem_list_local: "bundle exec gem list --local",
+        bundle_exec_gem_dependency: "bundle exec gem dependency rails",
+        bundle_exec_gem_info: "bundle exec gem info rails",
+        bundle_exec_gem_which: "bundle exec gem which bundler",
+        bundle_exec_gem_environment: "bundle exec gem environment",
+        bundle_exec_gem_contents: "bundle exec gem contents rails",
+        bundle_exec_gem_search: "bundle exec gem search rails",
+        bundle_exec_gem_outdated: "bundle exec gem outdated",
+        bundle_exec_gem_help: "bundle exec gem --help",
+        bundle_exec_gem_version: "bundle exec gem --version",
     }
 
     denied! {
@@ -274,5 +288,9 @@ mod tests {
         bundle_config_set_denied: "bundle config set path vendor/bundle",
         bundle_config_unset_denied: "bundle config unset path",
         bundle_config_old_set_denied: "bundle config path vendor/bundle",
+        bundle_exec_gem_install_denied: "bundle exec gem install rails",
+        bundle_exec_gem_uninstall_denied: "bundle exec gem uninstall rails",
+        bundle_exec_gem_update_denied: "bundle exec gem update",
+        bundle_exec_gem_bare_denied: "bundle exec gem",
     }
 }
