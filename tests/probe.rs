@@ -84,3 +84,231 @@ fn has_flag_unicode_no_panic() {
 fn heredoc_blocked() {
     assert!(!check("cat << EOF"));
 }
+
+// ── gh api: safe patterns ────────────────────────────────────────────
+
+#[test]
+fn gh_api_bare_endpoint() {
+    assert!(check("gh api repos/owner/repo/pulls"));
+    assert!(check("gh api repos/owner/repo/issues"));
+    assert!(check("gh api repos/owner/repo/commits"));
+    assert!(check("gh api repos/owner/repo/releases"));
+    assert!(check("gh api repos/owner/repo/branches"));
+    assert!(check("gh api repos/owner/repo/tags"));
+    assert!(check("gh api repos/owner/repo/contributors"));
+    assert!(check("gh api repos/owner/repo/languages"));
+    assert!(check("gh api repos/owner/repo/topics"));
+    assert!(check("gh api repos/owner/repo/readme"));
+    assert!(check("gh api repos/owner/repo/license"));
+    assert!(check("gh api repos/owner/repo/contents/src/main.rs"));
+    assert!(check("gh api repos/owner/repo/git/refs"));
+    assert!(check("gh api repos/owner/repo/git/trees/main"));
+    assert!(check("gh api repos/owner/repo/actions/runs"));
+    assert!(check("gh api repos/owner/repo/actions/workflows"));
+    assert!(check("gh api repos/owner/repo/check-runs/123"));
+    assert!(check("gh api repos/owner/repo/check-suites/456"));
+    assert!(check("gh api repos/owner/repo/deployments"));
+    assert!(check("gh api repos/owner/repo/milestones"));
+    assert!(check("gh api repos/owner/repo/labels"));
+    assert!(check("gh api repos/owner/repo/stargazers"));
+    assert!(check("gh api repos/owner/repo/forks"));
+    assert!(check("gh api repos/owner/repo/collaborators"));
+    assert!(check("gh api user"));
+    assert!(check("gh api user/repos"));
+    assert!(check("gh api users/octocat"));
+    assert!(check("gh api users/octocat/repos"));
+    assert!(check("gh api orgs/github"));
+    assert!(check("gh api orgs/github/repos"));
+    assert!(check("gh api orgs/github/members"));
+    assert!(check("gh api search/repositories?q=rust"));
+    assert!(check("gh api rate_limit"));
+    assert!(check("gh api notifications"));
+    assert!(check("gh api gists"));
+}
+
+#[test]
+fn gh_api_pr_review_patterns() {
+    assert!(check("gh api repos/o/r/pulls/1"));
+    assert!(check("gh api repos/o/r/pulls/1/reviews"));
+    assert!(check("gh api repos/o/r/pulls/1/comments"));
+    assert!(check("gh api repos/o/r/pulls/1/commits"));
+    assert!(check("gh api repos/o/r/pulls/1/files"));
+    assert!(check("gh api repos/o/r/pulls/1/requested_reviewers"));
+    assert!(check("gh api repos/o/r/pulls/1/merge"));
+}
+
+#[test]
+fn gh_api_issue_patterns() {
+    assert!(check("gh api repos/o/r/issues/123"));
+    assert!(check("gh api repos/o/r/issues/123/comments"));
+    assert!(check("gh api repos/o/r/issues/123/labels"));
+    assert!(check("gh api repos/o/r/issues/123/events"));
+    assert!(check("gh api repos/o/r/issues/123/timeline"));
+}
+
+#[test]
+fn gh_api_jq_variations() {
+    assert!(check("gh api repos/o/r/pulls --jq '.[].title'"));
+    assert!(check("gh api repos/o/r/pulls --jq '.[].number'"));
+    assert!(check("gh api repos/o/r/pulls --jq '.[] | {number, title}'"));
+    assert!(check("gh api repos/o/r/pulls --jq 'length'"));
+    assert!(check("gh api repos/o/r/pulls -q '.[0]'"));
+    assert!(check("gh api repos/o/r/pulls -q '.[] | select(.draft)'"));
+}
+
+#[test]
+fn gh_api_template_variations() {
+    assert!(check("gh api repos/o/r/pulls --template '{{.title}}'"));
+    assert!(check("gh api repos/o/r/pulls -t '{{range .}}{{.title}}{{end}}'"));
+    assert!(check("gh api repos/o/r/releases -t '{{.tag_name}}'"));
+}
+
+#[test]
+fn gh_api_pagination() {
+    assert!(check("gh api repos/o/r/pulls --paginate"));
+    assert!(check("gh api repos/o/r/issues --paginate --jq '.[].title'"));
+    assert!(check("gh api repos/o/r/pulls --paginate --slurp"));
+    assert!(check("gh api repos/o/r/pulls --paginate --slurp --jq 'flatten | length'"));
+    assert!(check("gh api repos/o/r/stargazers --paginate --silent"));
+    assert!(check("gh api graphql --paginate -q '.data.viewer.repositories.nodes[].nameWithOwner'"));
+}
+
+#[test]
+fn gh_api_cache() {
+    assert!(check("gh api repos/o/r/pulls --cache 3600s"));
+    assert!(check("gh api repos/o/r/pulls --cache 60m"));
+    assert!(check("gh api repos/o/r/pulls --cache 1h"));
+    assert!(check("gh api rate_limit --cache 30s"));
+}
+
+#[test]
+fn gh_api_hostname() {
+    assert!(check("gh api repos/o/r/pulls --hostname github.example.com"));
+    assert!(check("gh api repos/o/r/pulls --hostname enterprise.corp.com --jq '.[].title'"));
+}
+
+#[test]
+fn gh_api_preview() {
+    assert!(check("gh api repos/o/r/pulls -p corsair"));
+    assert!(check("gh api repos/o/r/pulls --preview corsair"));
+    assert!(check("gh api repos/o/r/pulls -p corsair -p nebula"));
+    assert!(check("gh api repos/o/r/pulls --preview corsair --preview nebula"));
+}
+
+#[test]
+fn gh_api_include() {
+    assert!(check("gh api repos/o/r/pulls -i"));
+    assert!(check("gh api repos/o/r/pulls --include"));
+    assert!(check("gh api repos/o/r/pulls -i --jq '.[].title'"));
+}
+
+#[test]
+fn gh_api_verbose_silent() {
+    assert!(check("gh api repos/o/r/pulls --verbose"));
+    assert!(check("gh api repos/o/r/pulls --silent"));
+}
+
+#[test]
+fn gh_api_explicit_get() {
+    assert!(check("gh api repos/o/r/pulls -X GET"));
+    assert!(check("gh api repos/o/r/pulls -XGET"));
+    assert!(check("gh api repos/o/r/pulls --method GET"));
+    assert!(check("gh api repos/o/r/pulls --method=GET"));
+    assert!(check("gh api repos/o/r/pulls -X GET --jq '.[].title'"));
+    assert!(check("gh api repos/o/r/pulls -X GET --paginate"));
+    assert!(check("gh api search/issues -X GET --jq '.items[].title'"));
+}
+
+#[test]
+fn gh_api_combined_flags() {
+    assert!(check("gh api repos/o/r/pulls --paginate --slurp --jq '.[].title' --cache 60s"));
+    assert!(check("gh api repos/o/r/pulls --paginate --jq '.[] | {number, title}' -i"));
+    assert!(check("gh api repos/o/r/issues --hostname enterprise.corp.com --paginate --jq '.[].title'"));
+    assert!(check("gh api repos/o/r/pulls -p corsair --cache 1h --jq 'length'"));
+    assert!(check("gh api repos/o/r/pulls --verbose --paginate --slurp"));
+    assert!(check("gh api repos/o/r/commits -t '{{range .}}{{.sha}}{{end}}' --cache 300s"));
+    assert!(check("gh api repos/o/r/releases --paginate --slurp --template '{{range .}}{{.tag_name}}{{end}}'"));
+}
+
+#[test]
+fn gh_api_in_pipelines() {
+    assert!(check("gh api repos/o/r/pulls --jq '.[].title' | head -5"));
+    assert!(check("gh api repos/o/r/contents/f --jq '.content' | base64 -d"));
+    assert!(check("gh api repos/o/r/pulls --paginate --slurp | jq 'flatten | length'"));
+    assert!(check("gh api repos/o/r/pulls --jq '.[].number' | sort -n | tail -1"));
+    assert!(check("gh api repos/o/r/pulls --paginate --jq '.[].title' | grep -c pattern"));
+    assert!(check("gh api repos/o/r/readme --jq '.content' | base64 -d | head -50"));
+}
+
+#[test]
+fn gh_api_with_redirects() {
+    assert!(check("gh api repos/o/r/pulls 2>&1"));
+    assert!(check("gh api repos/o/r/pulls --jq '.[].title' 2>/dev/null"));
+    assert!(check("gh api repos/o/r/pulls --silent 2>/dev/null"));
+}
+
+#[test]
+fn gh_api_graphql_safe_readonly() {
+    assert!(check("gh api graphql --jq '.data.viewer.login'"));
+    assert!(check("gh api graphql --paginate --jq '.data.viewer.repositories.nodes[].name'"));
+    assert!(check("gh api graphql --paginate --slurp --jq '.[].data'"));
+    assert!(check("gh api graphql -q '.data'"));
+}
+
+// ── gh api: denied patterns ──────────────────────────────────────────
+
+#[test]
+fn gh_api_mutation_methods() {
+    assert!(!check("gh api repos/o/r/pulls -X POST"));
+    assert!(!check("gh api repos/o/r/pulls -XPOST"));
+    assert!(!check("gh api repos/o/r/pulls -X PATCH"));
+    assert!(!check("gh api repos/o/r/pulls -XPATCH"));
+    assert!(!check("gh api repos/o/r/pulls -X PUT"));
+    assert!(!check("gh api repos/o/r/pulls -XPUT"));
+    assert!(!check("gh api repos/o/r/pulls -X DELETE"));
+    assert!(!check("gh api repos/o/r/pulls -XDELETE"));
+    assert!(!check("gh api repos/o/r/pulls --method POST"));
+    assert!(!check("gh api repos/o/r/pulls --method PATCH"));
+    assert!(!check("gh api repos/o/r/pulls --method=POST"));
+    assert!(!check("gh api repos/o/r/pulls --method=PATCH"));
+    assert!(!check("gh api repos/o/r/pulls --method=PUT"));
+    assert!(!check("gh api repos/o/r/pulls --method=DELETE"));
+}
+
+#[test]
+fn gh_api_body_flags() {
+    assert!(!check("gh api repos/o/r/issues -f title=bug"));
+    assert!(!check("gh api repos/o/r/issues -f body='description'"));
+    assert!(!check("gh api repos/o/r/issues -F title=bug"));
+    assert!(!check("gh api repos/o/r/issues -F 'labels[]=bug'"));
+    assert!(!check("gh api repos/o/r/issues --field title=bug"));
+    assert!(!check("gh api repos/o/r/issues --raw-field body=text"));
+    assert!(!check("gh api repos/o/r/rulesets --input file.json"));
+    assert!(!check("gh api repos/o/r/rulesets --input -"));
+    assert!(!check("gh api graphql -f query='{viewer{login}}'"));
+    assert!(!check("gh api graphql -F owner=octocat -f query='query{}'"));
+}
+
+#[test]
+fn gh_api_header_flag() {
+    assert!(!check("gh api repos/o/r/pulls -H 'Accept: application/json'"));
+    assert!(!check("gh api repos/o/r/pulls --header 'Accept: application/json'"));
+    assert!(!check("gh api repos/o/r/pulls -H 'Content-Type: application/json'"));
+    assert!(!check("gh api repos/o/r/pulls --header 'X-Custom: value'"));
+}
+
+#[test]
+fn gh_api_unknown_flags() {
+    assert!(!check("gh api repos/o/r/pulls --unknown-flag"));
+    assert!(!check("gh api repos/o/r/pulls -Z"));
+    assert!(!check("gh api repos/o/r/pulls --foo=bar"));
+}
+
+#[test]
+fn gh_api_mixed_safe_and_unsafe() {
+    assert!(!check("gh api repos/o/r/issues --jq '.[].title' -f title=bug"));
+    assert!(!check("gh api repos/o/r/pulls --paginate -X POST"));
+    assert!(!check("gh api repos/o/r/pulls --cache 60s -H 'Accept: json'"));
+    assert!(!check("gh api repos/o/r/pulls --jq '.[]' --input data.json"));
+    assert!(!check("gh api repos/o/r/pulls --paginate --field key=val"));
+}
