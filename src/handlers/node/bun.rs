@@ -18,6 +18,28 @@ static BUN_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
+static BUN_BUILD_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&[
+        "--bytecode", "--compile", "--css-chunking",
+        "--emit-dce-annotations", "--minify", "--minify-identifiers",
+        "--minify-syntax", "--minify-whitespace", "--no-bundle",
+        "--no-clear-screen", "--production", "--react-fast-refresh",
+        "--splitting", "--watch",
+        "--windows-hide-console",
+    ]),
+    valued: WordSet::flags(&[
+        "--asset-naming", "--banner", "--chunk-naming", "--conditions",
+        "--entry-naming", "--env", "--external", "--footer",
+        "--format", "--outdir", "--outfile", "--packages",
+        "--public-path", "--root", "--sourcemap", "--target",
+        "--windows-icon",
+        "-e",
+    ]),
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
 static BUN_PM_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
     valued: WordSet::flags(&[]),
@@ -34,6 +56,7 @@ fn check_bun_x(tokens: &[Token]) -> bool {
 pub(crate) static BUN: CommandDef = CommandDef {
     name: "bun",
     subs: &[
+        SubDef::Policy { name: "build", policy: &BUN_BUILD_POLICY },
         SubDef::Policy { name: "test", policy: &BUN_TEST_POLICY },
         SubDef::Policy { name: "outdated", policy: &BUN_OUTDATED_POLICY },
         SubDef::Nested { name: "pm", subs: &[
@@ -60,6 +83,20 @@ mod tests {
 
     safe! {
         bun_version: "bun --version",
+        bun_help: "bun --help",
+        bun_build_entrypoint: "bun build ./src/index.ts",
+        bun_build_outfile: "bun build --outfile=bundle.js ./src/index.ts",
+        bun_build_outdir: "bun build --outdir=dist ./src/index.ts",
+        bun_build_minify: "bun build --minify --splitting --outdir=out ./index.jsx",
+        bun_build_production: "bun build --production --outdir=dist ./src/index.ts",
+        bun_build_compile: "bun build --compile --outfile=my-app ./cli.ts",
+        bun_build_sourcemap: "bun build --sourcemap=linked --outdir=dist ./src/index.ts",
+        bun_build_target: "bun build --target=bun --outfile=server.js ./server.ts",
+        bun_build_format: "bun build --format=cjs --outdir=dist ./src/index.ts",
+        bun_build_external: "bun build --external react --outdir=dist ./src/index.ts",
+        bun_build_no_bundle: "bun build --no-bundle ./src/index.ts",
+        bun_build_watch: "bun build --watch --outdir=dist ./src/index.ts",
+        bun_build_help: "bun build --help",
         bun_test: "bun test",
         bun_test_bail: "bun test --bail",
         bun_test_timeout: "bun test --timeout 5000",
@@ -73,6 +110,8 @@ mod tests {
     }
 
     denied! {
+        bun_build_bare: "bun build",
+        bun_build_unknown_flag: "bun build --some-unknown ./src/index.ts",
         bun_x_tsc_denied: "bun x tsc",
         bun_x_cowsay_denied: "bun x cowsay hello",
     }
