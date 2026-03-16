@@ -4,6 +4,7 @@ mod ifconfig;
 mod mdfind;
 mod netstat;
 mod nslookup;
+mod ping;
 mod route;
 mod ss;
 mod whois;
@@ -18,14 +19,16 @@ pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
         }
     }
     None
-        .or_else(|| route::dispatch(cmd, tokens))
         .or_else(|| nslookup::dispatch(cmd, tokens))
+        .or_else(|| ping::dispatch(cmd, tokens))
+        .or_else(|| route::dispatch(cmd, tokens))
 }
 
 pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs: Vec<_> = all_flat_defs().iter().map(|d| d.to_doc()).collect();
-    docs.extend(route::command_docs());
     docs.extend(nslookup::command_docs());
+    docs.extend(ping::command_docs());
+    docs.extend(route::command_docs());
     docs
 }
 
@@ -44,7 +47,8 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
 #[cfg(test)]
 pub(super) fn registry() -> Vec<&'static crate::handlers::CommandEntry> {
     let mut v = Vec::new();
-    v.extend(route::REGISTRY);
     v.extend(nslookup::REGISTRY);
+    v.extend(ping::REGISTRY);
+    v.extend(route::REGISTRY);
     v
 }

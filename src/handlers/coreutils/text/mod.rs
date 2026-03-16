@@ -8,6 +8,8 @@ mod fmt;
 mod fold;
 mod head;
 mod iconv;
+mod less;
+mod more;
 mod nl;
 mod nroff;
 mod paste;
@@ -18,6 +20,7 @@ mod tr;
 mod unexpand;
 mod uniq;
 mod wc;
+mod zcat;
 
 use crate::command::FlatDef;
 use crate::parse::Token;
@@ -47,6 +50,8 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     v.extend(fold::FLAT_DEFS);
     v.extend(head::FLAT_DEFS);
     v.extend(iconv::FLAT_DEFS);
+    v.extend(less::FLAT_DEFS);
+    v.extend(more::FLAT_DEFS);
     v.extend(nl::FLAT_DEFS);
     v.extend(nroff::FLAT_DEFS);
     v.extend(paste::FLAT_DEFS);
@@ -57,5 +62,6 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     v.extend(unexpand::FLAT_DEFS);
     v.extend(uniq::FLAT_DEFS);
     v.extend(wc::FLAT_DEFS);
+    v.extend(zcat::FLAT_DEFS);
     v
 }
