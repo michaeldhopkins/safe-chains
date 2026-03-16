@@ -672,7 +672,7 @@ Aliases: `fly`
 
 - Subcommands attestation, cache, codespace, extension, gpg-key, issue, label, pr, release, repo, run, ssh-key, variable, workflow are allowed with actions: checks, diff, list, status, verify, view, watch.
 - Always safe: --version, search, status.
-- auth status, browse (requires --no-browser), api (GET only).
+- auth status, browse (requires --no-browser), api (read-only: implicit GET or explicit -X GET, with --paginate, --slurp, --jq, --template, --cache, --preview, --include, --silent, --verbose, --hostname).
 
 ### `git` (https://git-scm.com/docs)
 
