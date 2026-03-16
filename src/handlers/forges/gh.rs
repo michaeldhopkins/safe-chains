@@ -210,7 +210,15 @@ static GH_BROWSE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub(in crate::handlers::forges) static API_BODY_FLAGS: &[&str] = &["-f", "-F", "--field", "--raw-field", "--input"];
+static API_STANDALONE: WordSet = WordSet::new(&[
+    "--include", "--paginate", "--silent", "--slurp", "--verbose",
+    "-i",
+]);
+
+static API_VALUED: WordSet = WordSet::new(&[
+    "--cache", "--hostname", "--jq", "--preview", "--template",
+    "-p", "-q", "-t",
+]);
 
 fn gh_action_policy(action: &str) -> &'static FlagPolicy {
     match action {
@@ -300,12 +308,13 @@ pub fn is_safe_gh(tokens: &[Token]) -> bool {
 }
 
 pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> bool {
-    for (i, token) in tokens[2..].iter().enumerate() {
-        let abs_i = i + 2;
+    let mut i = 2;
+    while i < tokens.len() {
+        let token = &tokens[i];
 
         if token == "-X" || token == "--method" {
             return tokens
-                .get(abs_i + 1)
+                .get(i + 1)
                 .is_some_and(|m| m.eq_ignore_ascii_case("GET"));
         }
         if token.starts_with("-X") && token.len() > 2 && !token.starts_with("-X=") {
@@ -318,17 +327,26 @@ pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> bool {
             return val.eq_ignore_ascii_case("GET");
         }
 
-        for flag in API_BODY_FLAGS {
-            if token == *flag {
-                return false;
+        if token.starts_with('-') {
+            if API_STANDALONE.contains(token) {
+                i += 1;
+                continue;
             }
-            if flag.len() == 2 && token.len() > 2 && token.starts_with(flag) {
-                return false;
+            if API_VALUED.contains(token) {
+                i += 2;
+                continue;
             }
-            if flag.starts_with("--") && token.starts_with(&format!("{flag}=")) {
-                return false;
+            if let Some((_flag, _val)) = token.split_once('=') {
+                let flag_part = Token::from_raw(_flag.to_string());
+                if API_VALUED.contains(&flag_part) {
+                    i += 1;
+                    continue;
+                }
             }
+            return false;
         }
+
+        i += 1;
     }
     true
 }
@@ -352,7 +370,9 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                 .section(format!("Always safe: {}.",
                     wordset_items(&ALWAYS_SAFE_SUBCOMMANDS)))
                 .section("auth status, browse (requires --no-browser), \
-                          api (GET only).")
+                          api (read-only: implicit GET or explicit -X GET, \
+                          with --paginate, --slurp, --jq, --template, \
+                          --cache, --preview, --include, --silent, --verbose, --hostname).")
                 .section("")
                 .build()),
     ]
@@ -501,7 +521,18 @@ mod tests {
         api_jq: "gh api repos/o/r/contents/f --jq '.content'",
         api_explicit_get: "gh api repos/o/r/pulls -X GET",
         api_paginate: "gh api repos/o/r/pulls --paginate",
+        api_paginate_slurp: "gh api repos/o/r/pulls --paginate --slurp",
+        api_paginate_jq: "gh api repos/o/r/pulls --paginate --jq '.[].title'",
         api_xget_short: "gh api repos/o/r/pulls -XGET",
+        api_include: "gh api repos/o/r/pulls -i",
+        api_silent: "gh api repos/o/r/pulls --silent",
+        api_verbose: "gh api repos/o/r/pulls --verbose",
+        api_cache: "gh api repos/o/r/pulls --cache 3600s",
+        api_hostname: "gh api repos/o/r/pulls --hostname github.example.com",
+        api_template: "gh api repos/o/r/pulls -t '{{.title}}'",
+        api_preview: "gh api repos/o/r/pulls -p corsair",
+        api_method_eq_get: "gh api repos/o/r/pulls --method=GET",
+        api_combined: "gh api repos/o/r/pulls --paginate --slurp --jq '.[].title' --cache 60s",
         gh_version: "gh --version",
     }
 
@@ -510,8 +541,14 @@ mod tests {
         api_patch_denied: "gh api repos/o/r/pulls/1 -X PATCH -f body=x",
         api_post_denied: "gh api repos/o/r/pulls/1 -X POST",
         api_field_denied: "gh api repos/o/r/issues -f title=x",
+        api_raw_field_denied: "gh api repos/o/r/issues --raw-field body=x",
+        api_big_field_denied: "gh api repos/o/r/issues -F title=x",
+        api_input_denied: "gh api repos/o/r/rulesets --input file.json",
+        api_header_denied: "gh api repos/o/r/pulls -H 'Accept: application/json'",
+        api_header_long_denied: "gh api repos/o/r/pulls --header 'Accept: application/json'",
         api_method_eq_patch_denied: "gh api repos/o/r/pulls/1 --method=PATCH",
         api_xpost_short_denied: "gh api repos/o/r/pulls -XPOST",
         api_xpatch_short_denied: "gh api repos/o/r/pulls -XPATCH",
+        api_unknown_flag_denied: "gh api repos/o/r/pulls --some-unknown-flag",
     }
 }
