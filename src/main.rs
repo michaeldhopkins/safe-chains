@@ -23,6 +23,11 @@ fn print_docs() {
     print!("{}", safe_chains::docs::render_markdown(&docs));
 }
 
+fn print_opencode_config() {
+    let patterns = safe_chains::all_opencode_patterns();
+    print!("{}", safe_chains::docs::render_opencode_json(&patterns));
+}
+
 fn run_cli(command: &str) {
     process::exit(i32::from(!is_safe_command(command)));
 }
@@ -81,6 +86,8 @@ fn main() {
         Ok(cli) => {
             if cli.list_commands {
                 print_docs();
+            } else if cli.opencode_config {
+                print_opencode_config();
             } else if let Some(command) = cli.command {
                 run_cli(&command);
             } else {

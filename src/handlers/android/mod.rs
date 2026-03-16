@@ -44,7 +44,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs
 }
 
-#[cfg(test)]
 pub(crate) fn android_flat_defs() -> Vec<&'static crate::command::FlatDef> {
     emulator::DEFS.iter()
         .chain(sdkmanager::DEFS.iter())

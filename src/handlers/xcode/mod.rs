@@ -72,7 +72,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs
 }
 
-#[cfg(test)]
 pub(crate) fn xcbeautify_flat_defs() -> &'static [crate::command::FlatDef] {
     xcbeautify::DEFS
 }

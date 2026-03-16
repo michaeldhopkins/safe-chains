@@ -35,7 +35,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs
 }
 
-#[cfg(test)]
 pub(crate) fn jvm_flat_defs() -> Vec<&'static crate::command::FlatDef> {
     detekt::DEFS.iter().chain(ktlint::DEFS.iter()).chain(javap::DEFS.iter()).collect()
 }

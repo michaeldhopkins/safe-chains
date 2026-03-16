@@ -102,6 +102,19 @@ impl SubDef {
 }
 
 impl CommandDef {
+    pub fn opencode_patterns(&self) -> Vec<String> {
+        let mut patterns = Vec::new();
+        let names: Vec<&str> = std::iter::once(self.name)
+            .chain(self.aliases.iter().copied())
+            .collect();
+        for name in &names {
+            for sub in self.subs {
+                sub_opencode_patterns(name, sub, &mut patterns);
+            }
+        }
+        patterns
+    }
+
     pub fn check(&self, tokens: &[Token]) -> bool {
         if tokens.len() < 2 {
             return false;
@@ -160,6 +173,18 @@ pub struct FlatDef {
 }
 
 impl FlatDef {
+    pub fn opencode_patterns(&self) -> Vec<String> {
+        let mut patterns = Vec::new();
+        let names: Vec<&str> = std::iter::once(self.name)
+            .chain(self.aliases.iter().copied())
+            .collect();
+        for name in names {
+            patterns.push(name.to_string());
+            patterns.push(format!("{name} *"));
+        }
+        patterns
+    }
+
     pub fn dispatch(&self, cmd: &str, tokens: &[Token]) -> Option<bool> {
         if cmd == self.name || self.aliases.contains(&cmd) {
             if self.help_eligible
@@ -200,6 +225,32 @@ impl FlatDef {
                 "{alias}: alias accepted unknown flag: {test}",
             );
         }
+    }
+}
+
+fn sub_opencode_patterns(prefix: &str, sub: &SubDef, out: &mut Vec<String>) {
+    match sub {
+        SubDef::Policy { name, .. } => {
+            out.push(format!("{prefix} {name}"));
+            out.push(format!("{prefix} {name} *"));
+        }
+        SubDef::Nested { name, subs } => {
+            let path = format!("{prefix} {name}");
+            for s in *subs {
+                sub_opencode_patterns(&path, s, out);
+            }
+        }
+        SubDef::Guarded {
+            name, guard_long, ..
+        } => {
+            out.push(format!("{prefix} {name} {guard_long}"));
+            out.push(format!("{prefix} {name} {guard_long} *"));
+        }
+        SubDef::Custom { name, .. } => {
+            out.push(format!("{prefix} {name}"));
+            out.push(format!("{prefix} {name} *"));
+        }
+        SubDef::Delegation { .. } => {}
     }
 }
 
@@ -611,5 +662,73 @@ mod tests {
     fn doc_custom() {
         let doc = CUSTOM_CMD.to_doc();
         assert_eq!(doc.description, "- **special**: special (safe only).");
+    }
+
+    #[test]
+    fn opencode_patterns_simple() {
+        let patterns = SIMPLE_CMD.opencode_patterns();
+        assert!(patterns.contains(&"mycmd build".to_string()));
+        assert!(patterns.contains(&"mycmd build *".to_string()));
+    }
+
+    #[test]
+    fn opencode_patterns_nested() {
+        let patterns = NESTED_CMD.opencode_patterns();
+        assert!(patterns.contains(&"nested package describe".to_string()));
+        assert!(patterns.contains(&"nested package describe *".to_string()));
+        assert!(!patterns.iter().any(|p| p == "nested package"));
+    }
+
+    #[test]
+    fn opencode_patterns_guarded() {
+        let patterns = GUARDED_CMD.opencode_patterns();
+        assert!(patterns.contains(&"guarded fmt --check".to_string()));
+        assert!(patterns.contains(&"guarded fmt --check *".to_string()));
+        assert!(!patterns.iter().any(|p| p == "guarded fmt"));
+    }
+
+    #[test]
+    fn opencode_patterns_delegation_skipped() {
+        let patterns = DELEGATION_CMD.opencode_patterns();
+        assert!(patterns.is_empty());
+    }
+
+    #[test]
+    fn opencode_patterns_custom() {
+        let patterns = CUSTOM_CMD.opencode_patterns();
+        assert!(patterns.contains(&"custom special".to_string()));
+        assert!(patterns.contains(&"custom special *".to_string()));
+    }
+
+    #[test]
+    fn opencode_patterns_aliases() {
+        static ALIASED: CommandDef = CommandDef {
+            name: "primary",
+            subs: &[SubDef::Policy {
+                name: "list",
+                policy: &TEST_POLICY,
+            }],
+            bare_flags: &[],
+            help_eligible: false,
+            url: "",
+            aliases: &["alt"],
+        };
+        let patterns = ALIASED.opencode_patterns();
+        assert!(patterns.contains(&"primary list".to_string()));
+        assert!(patterns.contains(&"alt list".to_string()));
+        assert!(patterns.contains(&"alt list *".to_string()));
+    }
+
+    #[test]
+    fn flat_def_opencode_patterns() {
+        static FLAT: FlatDef = FlatDef {
+            name: "grep",
+            policy: &TEST_POLICY,
+            help_eligible: true,
+            url: "",
+            aliases: &["rg"],
+        };
+        let patterns = FLAT.opencode_patterns();
+        assert_eq!(patterns, vec!["grep", "grep *", "rg", "rg *"]);
     }
 }
