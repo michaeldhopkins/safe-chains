@@ -9,7 +9,7 @@ static JJ_GLOBAL_VALUED: WordSet =
     WordSet::new(&["--at-op", "--at-operation", "--color", "--repository", "-R"]);
 
 static JJ_READ_ONLY: WordSet =
-    WordSet::new(&["--version", "diff", "help", "log", "root", "show", "st", "status", "version"]);
+    WordSet::new(&["--version", "cat", "diff", "help", "log", "root", "show", "st", "status", "version"]);
 
 static JJ_MULTI: &[(&str, WordSet)] = &[
     ("bookmark", WordSet::new(&["list"])),
@@ -143,6 +143,9 @@ mod tests {
         jj_resolve_list_file: "jj resolve --list somefile",
         jj_tag_list: "jj tag list",
         jj_tag_list_with_flags: "jj --no-pager tag list",
+        jj_cat: "jj cat some/file.rb",
+        jj_cat_revision: "jj cat -r master some/file.rb",
+        jj_cat_pipe_standardrb: "jj cat -r master spec/foo_spec.rb | bundle exec standardrb --stdin spec/foo_spec.rb 2>&1",
         jj_workspace_help: "jj workspace --help",
         jj_new_help: "jj new --help",
         jj_workspace_help_h: "jj workspace -h",
