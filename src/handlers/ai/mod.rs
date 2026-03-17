@@ -5,6 +5,7 @@ mod hf;
 mod llm;
 mod ollama;
 mod opencode;
+mod vibe;
 
 use crate::command::FlatDef;
 use crate::parse::Token;
@@ -38,5 +39,6 @@ pub(crate) fn ai_flat_defs() -> Vec<&'static FlatDef> {
     let mut v = Vec::new();
     v.extend(aider::FLAT_DEFS);
     v.extend(claude::FLAT_DEFS);
+    v.extend(vibe::FLAT_DEFS);
     v
 }
