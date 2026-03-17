@@ -72,7 +72,7 @@ const HANDLED_CMDS: &[&str] = &[
     "dotnet",
     "curl",
     "docker", "podman", "kubectl",
-    "ollama", "llm", "hf", "claude", "aider", "codex", "opencode",
+    "ollama", "llm", "hf", "claude", "aider", "codex", "opencode", "vibe",
     "ddev", "dcli",
     "brew", "mise", "asdf", "defaults", "pmset", "sysctl", "cmake", "psql", "pg_isready",
     "terraform", "heroku", "vercel", "flyctl",

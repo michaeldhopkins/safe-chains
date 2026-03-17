@@ -1739,6 +1739,10 @@ Aliases: `[`
 - **project ls**: Flags: --json, -j. Valued: --scope, -S
 - **whoami**
 
+### `vibe` (https://docs.mistral.ai/mistral-vibe/)
+
+- Positional arguments only
+
 ### `vm_stat` (https://ss64.com/mac/vm_stat.html)
 
 - Allowed valued flags: -c
