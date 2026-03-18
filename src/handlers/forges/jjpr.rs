@@ -27,7 +27,7 @@ static JJPR_STATUS_POLICY: FlagPolicy = FlagPolicy {
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
-    max_positional: Some(0),
+    max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
@@ -160,6 +160,8 @@ mod tests {
         status_help_short: "jjpr status -h",
         status_help_sub: "jjpr status help",
         status_no_fetch: "jjpr status --no-fetch",
+        status_branch: "jjpr status cycle/renewal-request-sent-layout",
+        status_branch_no_fetch: "jjpr status my-stack --no-fetch",
         submit_dry: "jjpr submit --dry-run",
         submit_dry_bookmark: "jjpr submit my-stack --dry-run",
         submit_dry_draft: "jjpr submit --dry-run --draft",
@@ -197,6 +199,6 @@ mod tests {
         unknown_flag_denied: "jjpr --unknown",
         auth_bare_denied: "jjpr auth",
         auth_unknown_denied: "jjpr auth login",
-        status_positional_denied: "jjpr status foo",
+        status_unknown_flag_denied: "jjpr status --verbose",
     }
 }
