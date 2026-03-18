@@ -1,9 +1,25 @@
 use super::*;
 use proptest::prelude::*;
 
+const SHELL_KEYWORDS: &[&str] = &[
+    "do", "done", "for", "while", "until", "if", "then", "elif", "else", "fi", "in", "case",
+    "esac", "select",
+];
+
+fn starts_with_keyword(s: &str) -> bool {
+    SHELL_KEYWORDS.iter().any(|kw| {
+        s.starts_with(kw)
+            && !s
+                .as_bytes()
+                .get(kw.len())
+                .is_some_and(|&b| b.is_ascii_alphanumeric() || b == b'_')
+    })
+}
+
 fn arb_shell_word() -> impl Strategy<Value = String> {
     prop::string::string_regex("[a-zA-Z0-9_./-]+")
         .expect("valid regex")
+        .prop_filter("must not look like a shell keyword", |s| !starts_with_keyword(s))
 }
 
 fn arb_env_name() -> impl Strategy<Value = String> {
