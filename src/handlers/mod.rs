@@ -74,7 +74,7 @@ const HANDLED_CMDS: &[&str] = &[
     "docker", "podman", "kubectl",
     "ollama", "llm", "hf", "claude", "aider", "codex", "opencode", "vibe",
     "ddev", "dcli",
-    "brew", "mise", "asdf", "defaults", "pmset", "sysctl", "cmake", "psql", "pg_isready",
+    "brew", "mise", "asdf", "crontab", "defaults", "pmset", "sysctl", "cmake", "psql", "pg_isready",
     "terraform", "heroku", "vercel", "flyctl",
     "networksetup", "launchctl", "diskutil", "security", "csrutil", "log",
     "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign", "spctl",
