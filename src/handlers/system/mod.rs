@@ -1,6 +1,7 @@
 mod asdf;
 mod brew;
 mod cmake;
+mod crontab;
 mod csrutil;
 mod dcli;
 mod ddev;
@@ -67,6 +68,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
         .or_else(|| FLYCTL.dispatch(cmd, tokens))
         .or_else(|| FASTLANE.dispatch(cmd, tokens))
         .or_else(|| FIREBASE.dispatch(cmd, tokens))
+        .or_else(|| crontab::dispatch(cmd, tokens))
         .or_else(|| pmset::dispatch(cmd, tokens))
         .or_else(|| sysctl::dispatch(cmd, tokens))
         .or_else(|| networksetup::dispatch(cmd, tokens))
@@ -87,6 +89,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         DEFAULTS.to_doc(),
     ]);
     docs.push(DDEV.to_doc());
+    docs.extend(crontab::command_docs());
     docs.extend(pmset::command_docs());
     docs.extend(sysctl::command_docs());
     docs.push(CMAKE.to_doc());
@@ -109,6 +112,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 #[cfg(test)]
 pub(super) fn full_registry() -> Vec<&'static super::CommandEntry> {
     let mut v = Vec::new();
+    v.extend(crontab::REGISTRY);
     v.extend(pmset::REGISTRY);
     v.extend(sysctl::REGISTRY);
     v.extend(networksetup::REGISTRY);
