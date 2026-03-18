@@ -220,6 +220,15 @@ static API_VALUED: WordSet = WordSet::new(&[
     "-p", "-q", "-t",
 ]);
 
+fn is_safe_api_header(value: &str) -> bool {
+    let Some((name, _)) = value.split_once(':') else {
+        return false;
+    };
+    let trimmed = name.trim();
+    trimmed.eq_ignore_ascii_case("Accept")
+        || trimmed.eq_ignore_ascii_case("X-GitHub-Api-Version")
+}
+
 fn gh_action_policy(action: &str) -> &'static FlagPolicy {
     match action {
         "list" => &GH_LIST_POLICY,
@@ -327,6 +336,23 @@ pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> bool {
             return val.eq_ignore_ascii_case("GET");
         }
 
+        if token == "-H" || token == "--header" {
+            match tokens.get(i + 1) {
+                Some(val) if is_safe_api_header(val.as_str()) => {
+                    i += 2;
+                    continue;
+                }
+                _ => return false,
+            }
+        }
+        if let Some(rest) = token.as_str().strip_prefix("-H=").or_else(|| token.as_str().strip_prefix("--header=")) {
+            if is_safe_api_header(rest) {
+                i += 1;
+                continue;
+            }
+            return false;
+        }
+
         if token.starts_with('-') {
             if API_STANDALONE.contains(token) {
                 i += 1;
@@ -372,7 +398,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                 .section("auth status, browse (requires --no-browser), \
                           api (read-only: implicit GET or explicit -X GET, \
                           with --paginate, --slurp, --jq, --template, \
-                          --cache, --preview, --include, --silent, --verbose, --hostname).")
+                          --cache, --preview, --include, --silent, --verbose, --hostname, \
+                          -H for Accept and X-GitHub-Api-Version headers).")
                 .section("")
                 .build()),
     ]
@@ -533,6 +560,12 @@ mod tests {
         api_preview: "gh api repos/o/r/pulls -p corsair",
         api_method_eq_get: "gh api repos/o/r/pulls --method=GET",
         api_combined: "gh api repos/o/r/pulls --paginate --slurp --jq '.[].title' --cache 60s",
+        api_header_accept_raw: "gh api repos/o/r/contents/f?ref=branch -H 'Accept: application/vnd.github.raw'",
+        api_header_accept_json: "gh api repos/o/r/contents/f -H 'Accept: application/vnd.github.v3+json'",
+        api_header_api_version: "gh api repos/o/r/pulls -H 'X-GitHub-Api-Version: 2022-11-28'",
+        api_header_long_form: "gh api repos/o/r/contents/f --header 'Accept: application/vnd.github.raw'",
+        api_header_multiple: "gh api repos/o/r/contents/f -H 'Accept: application/vnd.github.raw' -H 'X-GitHub-Api-Version: 2022-11-28'",
+        api_header_with_jq: "gh api repos/o/r/contents/f -H 'Accept: application/vnd.github.raw' --jq '.content'",
         gh_version: "gh --version",
     }
 
@@ -544,8 +577,12 @@ mod tests {
         api_raw_field_denied: "gh api repos/o/r/issues --raw-field body=x",
         api_big_field_denied: "gh api repos/o/r/issues -F title=x",
         api_input_denied: "gh api repos/o/r/rulesets --input file.json",
-        api_header_denied: "gh api repos/o/r/pulls -H 'Accept: application/json'",
-        api_header_long_denied: "gh api repos/o/r/pulls --header 'Accept: application/json'",
+        api_header_authorization_denied: "gh api repos/o/r/pulls -H 'Authorization: token ghp_xxx'",
+        api_header_content_type_denied: "gh api repos/o/r/pulls -H 'Content-Type: application/json'",
+        api_header_long_auth_denied: "gh api repos/o/r/pulls --header 'Authorization: Bearer xxx'",
+        api_header_missing_value_denied: "gh api repos/o/r/pulls -H",
+        api_header_no_colon_denied: "gh api repos/o/r/pulls -H 'Accept'",
+        api_header_compact_denied: "gh api repos/o/r/pulls -HAuthorization:token",
         api_method_eq_patch_denied: "gh api repos/o/r/pulls/1 --method=PATCH",
         api_xpost_short_denied: "gh api repos/o/r/pulls -XPOST",
         api_xpatch_short_denied: "gh api repos/o/r/pulls -XPATCH",

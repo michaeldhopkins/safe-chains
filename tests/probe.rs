@@ -291,10 +291,12 @@ fn gh_api_body_flags() {
 
 #[test]
 fn gh_api_header_flag() {
-    assert!(!check("gh api repos/o/r/pulls -H 'Accept: application/json'"));
-    assert!(!check("gh api repos/o/r/pulls --header 'Accept: application/json'"));
+    assert!(check("gh api repos/o/r/pulls -H 'Accept: application/json'"));
+    assert!(check("gh api repos/o/r/pulls --header 'Accept: application/json'"));
+    assert!(check("gh api repos/o/r/pulls -H 'X-GitHub-Api-Version: 2022-11-28'"));
     assert!(!check("gh api repos/o/r/pulls -H 'Content-Type: application/json'"));
     assert!(!check("gh api repos/o/r/pulls --header 'X-Custom: value'"));
+    assert!(!check("gh api repos/o/r/pulls -H 'Authorization: token ghp_xxx'"));
 }
 
 #[test]
@@ -308,7 +310,7 @@ fn gh_api_unknown_flags() {
 fn gh_api_mixed_safe_and_unsafe() {
     assert!(!check("gh api repos/o/r/issues --jq '.[].title' -f title=bug"));
     assert!(!check("gh api repos/o/r/pulls --paginate -X POST"));
-    assert!(!check("gh api repos/o/r/pulls --cache 60s -H 'Accept: json'"));
+    assert!(!check("gh api repos/o/r/pulls --cache 60s -H 'Authorization: Bearer x'"));
     assert!(!check("gh api repos/o/r/pulls --jq '.[]' --input data.json"));
     assert!(!check("gh api repos/o/r/pulls --paginate --field key=val"));
 }
