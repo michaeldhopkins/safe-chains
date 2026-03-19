@@ -164,6 +164,17 @@ static GH_SEARCH_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
+static GH_RELEASE_DOWNLOAD_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&["--clobber", "--skip-existing"]),
+    valued: WordSet::flags(&[
+        "--archive", "--dir", "--output", "--pattern", "--repo",
+        "-A", "-D", "-O", "-R", "-p",
+    ]),
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
 static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[]),
     valued: WordSet::flags(&[
@@ -252,6 +263,7 @@ fn gh_run_action_policy(action: &str) -> &'static FlagPolicy {
 
 fn gh_release_action_policy(action: &str) -> &'static FlagPolicy {
     match action {
+        "download" => &GH_RELEASE_DOWNLOAD_POLICY,
         "list" => &GH_RELEASE_LIST_POLICY,
         "view" => &GH_RELEASE_VIEW_POLICY,
         _ => &GH_SIMPLE_LIST_POLICY,
@@ -277,6 +289,11 @@ pub fn is_safe_gh(tokens: &[Token]) -> bool {
 
     if subcmd == "status" {
         return policy::check(&tokens[1..], &GH_SIMPLE_LIST_POLICY);
+    }
+
+    if subcmd == "release" && tokens.len() >= 3 && tokens[2] == "download" {
+        return has_flag(&tokens[2..], Some("-O"), Some("--output"))
+            && policy::check(&tokens[2..], &GH_RELEASE_DOWNLOAD_POLICY);
     }
 
     if READ_ONLY_SUBCOMMANDS.contains(subcmd) {
@@ -396,6 +413,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                 .section(format!("Always safe: {}.",
                     wordset_items(&ALWAYS_SAFE_SUBCOMMANDS)))
                 .section("auth status, browse (requires --no-browser), \
+                          release download (requires --output), \
                           api (read-only: implicit GET or explicit -X GET, \
                           with --paginate, --slurp, --jq, --template, \
                           --cache, --preview, --include, --silent, --verbose, --hostname, \
@@ -425,6 +443,7 @@ pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
             crate::handlers::SubEntry::Policy { name: "watch" },
         ]},
         crate::handlers::SubEntry::Nested { name: "release", subs: &[
+            crate::handlers::SubEntry::Guarded { name: "download", valid_suffix: "--output -" },
             crate::handlers::SubEntry::Policy { name: "list" },
             crate::handlers::SubEntry::Policy { name: "view" },
         ]},
@@ -533,6 +552,11 @@ mod tests {
         release_list_limit: "gh release list --limit 10",
         release_view: "gh release view v1.0",
         release_view_web: "gh release view v1.0 --web",
+        release_download_stdout: "gh release download v1.0 --output -",
+        release_download_pattern: "gh release download v1.0 --repo o/r --pattern 'SHA256SUMS.txt' --output -",
+        release_download_short: "gh release download v1.0 -O - -p '*.tar.gz'",
+        release_download_archive: "gh release download v1.0 --archive tar.gz --output out.tar.gz",
+        release_download_dir: "gh release download v1.0 --output /tmp/out --dir /tmp",
         label_list: "gh label list",
         codespace_list: "gh codespace list",
         variable_list: "gh variable list",
@@ -571,6 +595,9 @@ mod tests {
 
     denied! {
         browse_without_flag_denied: "gh browse",
+        issue_download_denied: "gh issue download",
+        release_download_no_output_denied: "gh release download v1.0",
+        release_download_pattern_no_output_denied: "gh release download v1.0 --pattern '*.tar.gz'",
         api_patch_denied: "gh api repos/o/r/pulls/1 -X PATCH -f body=x",
         api_post_denied: "gh api repos/o/r/pulls/1 -X POST",
         api_field_denied: "gh api repos/o/r/issues -f title=x",
