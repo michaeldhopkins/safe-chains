@@ -71,7 +71,7 @@ const HANDLED_CMDS: &[&str] = &[
     "swift",
     "dotnet",
     "curl",
-    "docker", "podman", "kubectl",
+    "docker", "podman", "kubectl", "orbctl",
     "ollama", "llm", "hf", "claude", "aider", "codex", "opencode", "vibe",
     "ddev", "dcli",
     "brew", "mise", "asdf", "crontab", "defaults", "pmset", "sysctl", "cmake", "psql", "pg_isready",
@@ -156,7 +156,7 @@ use crate::command::CommandDef;
 
 const COMMAND_DEFS: &[&CommandDef] = &[
     &ai::CODEX, &ai::OLLAMA, &ai::OPENCODE, &ai::LLM, &ai::HF,
-    &containers::DOCKER, &containers::PODMAN, &containers::KUBECTL,
+    &containers::DOCKER, &containers::PODMAN, &containers::KUBECTL, &containers::ORBCTL,
     &dotnet::DOTNET,
     &go::GO,
     &android::APKANALYZER, &android::APKSIGNER, &android::BUNDLETOOL, &android::AAPT2,
