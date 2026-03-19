@@ -1601,8 +1601,8 @@ Aliases: `pip3`
 
 ### `tar` (https://man7.org/linux/man-pages/man1/tar.1.html)
 
-- Listing mode only (requires -t or --list).
-- Flags: -f, -j, -J, -v, -z, --bzip2, --file, --gzip, --xz, --zstd.
+- Listing mode only (requires -t or --list). Old-style flags accepted (e.g. tar tf, tar tzf).
+- Flags: -f, -j, -J, -v, -z, -O, --bzip2, --file, --gzip, --xz, --zstd.
 
 ### `tea` (https://gitea.com/gitea/tea)
 

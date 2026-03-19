@@ -13,8 +13,12 @@ static TAR_SAFE_LONG: WordSet = WordSet::new(&[
     "--bzip2", "--file", "--gzip", "--list", "--verbose", "--xz", "--zstd",
 ]);
 
+fn is_old_style_flags(s: &str) -> bool {
+    !s.starts_with('-') && !s.is_empty() && s.bytes().all(|b| b.is_ascii_alphabetic())
+}
+
 fn has_list_mode(tokens: &[Token]) -> bool {
-    for t in &tokens[1..] {
+    for (idx, t) in tokens[1..].iter().enumerate() {
         if *t == "--list" {
             return true;
         }
@@ -22,6 +26,9 @@ fn has_list_mode(tokens: &[Token]) -> bool {
         if s.starts_with('-') && !s.starts_with("--")
             && s.bytes().skip(1).any(|b| b == b't')
         {
+            return true;
+        }
+        if idx == 0 && is_old_style_flags(s) && s.contains('t') {
             return true;
         }
     }
@@ -34,6 +41,19 @@ fn has_dangerous_char(s: &str) -> bool {
 
 fn all_chars_safe(s: &str) -> bool {
     s.bytes().skip(1).all(|b| TAR_SAFE_SHORT.contains(&b) || b == b't')
+}
+
+fn check_short_bundle(s: &str) -> Option<usize> {
+    if has_dangerous_char(s) {
+        return None;
+    }
+    if !all_chars_safe(s) {
+        if s.contains('f') {
+            return Some(2);
+        }
+        return None;
+    }
+    if s.contains('f') { Some(2) } else { Some(1) }
 }
 
 fn is_safe_tar(tokens: &[Token]) -> bool {
@@ -56,22 +76,17 @@ fn is_safe_tar(tokens: &[Token]) -> bool {
             continue;
         }
         if s.starts_with('-') && !s.starts_with("--") && s.len() > 1 {
-            if has_dangerous_char(s) {
-                return false;
+            match check_short_bundle(s) {
+                Some(advance) => { i += advance; continue; }
+                None => return false,
             }
-            if !all_chars_safe(s) {
-                if s.contains('f') {
-                    i += 2;
-                    continue;
-                }
-                return false;
+        }
+        if i == 1 && is_old_style_flags(s) {
+            let dashed = format!("-{s}");
+            match check_short_bundle(&dashed) {
+                Some(advance) => { i += advance; continue; }
+                None => return false,
             }
-            if s.contains('f') {
-                i += 2;
-            } else {
-                i += 1;
-            }
-            continue;
         }
         if s.starts_with("--") {
             return false;
@@ -92,8 +107,8 @@ pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::Command
     vec![
         crate::docs::CommandDoc::handler("tar",
             "https://man7.org/linux/man-pages/man1/tar.1.html",
-            "Listing mode only (requires -t or --list).\n\
-             Flags: -f, -j, -J, -v, -z, --bzip2, --file, --gzip, --xz, --zstd."),
+            "Listing mode only (requires -t or --list). Old-style flags accepted (e.g. tar tf, tar tzf).\n\
+             Flags: -f, -j, -J, -v, -z, -O, --bzip2, --file, --gzip, --xz, --zstd."),
     ]
 }
 
@@ -116,6 +131,11 @@ mod tests {
         tar_list_xz: "tar -tJf archive.tar.xz",
         tar_list_separate: "tar -t -f archive.tar",
         tar_list_v_separate: "tar -t -v -f archive.tar",
+        tar_old_style_tz: "tar tz",
+        tar_old_style_tf: "tar tf archive.tar",
+        tar_old_style_tvf: "tar tvf archive.tar",
+        tar_old_style_tzf: "tar tzf archive.tar.gz",
+        tar_old_style_tjf: "tar tjf archive.tar.bz2",
     }
 
     denied! {
@@ -127,5 +147,7 @@ mod tests {
         tar_no_list: "tar -f archive.tar",
         tar_bundled_extract: "tar -txf archive.tar",
         tar_bundled_create: "tar -tcf archive.tar",
+        tar_old_style_xf: "tar xf archive.tar",
+        tar_old_style_cf: "tar cf archive.tar files/",
     }
 }
