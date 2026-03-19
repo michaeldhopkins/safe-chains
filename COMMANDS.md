@@ -1195,6 +1195,21 @@ Aliases: `mlocate`, `plocate`
 - **session list**
 - **stats**
 
+### `orbctl` (https://docs.orbstack.dev/cli)
+
+Aliases: `orb`
+
+- **config get**
+- **config show**
+- **default**: bare invocation only (reads current default)
+- **doctor**: read-only check (rejects --fix)
+- **info**: Valued: --format, -f
+- **list**: Flags: --quiet, --running, -q, -r. Valued: --format, -f
+- **logs**: Flags: --all, -a
+- **status**
+- **update** (requires --check): Flags: --check
+- **version**
+
 ### `otool` (https://ss64.com/mac/otool.html)
 
 - Allowed standalone flags: -D, -I, -L, -V, -X, -a, -c, -d, -f, -h, -l, -o, -r, -t, -v, -x
