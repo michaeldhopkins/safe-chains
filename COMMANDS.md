@@ -1387,6 +1387,15 @@ Aliases: `pip3`
 - **versions**: Flags: --bare
 - **which**: Flags: --bare
 
+### `qemu-img` (https://www.qemu.org/docs/master/tools/qemu-img.html)
+
+- **check**: Flags: --force-share, --image-opts, --quiet, -U, -q. Valued: --cache, --format, --object, --output, -T, -f
+- **compare**: Flags: --force-share, --image-opts, --progress, --quiet, --strict, -U, -p, -q, -s. Valued: --a-format, --b-format, --cache, --object, -F, -T, -f
+- **info**: Flags: --backing-chain, --force-share, --image-opts, --limits, -U. Valued: --cache, --format, --object, --output, -f, -t
+- **map**: Flags: --force-share, --image-opts, -U. Valued: --format, --max-length, --object, --output, --start-offset, -f, -l, -s
+- **measure**: Flags: --force-share, --image-opts, -U. Valued: --format, --object, --output, --size, --snapshot, --target-format, -O, -f, -l, -o, -s
+- **snapshot**: list-only (rejects -a, -c, -d)
+
 ### `R` (https://cran.r-project.org/manuals.html)
 
 - CMD check <package> (with --as-cran, --no-tests, --no-examples, --no-vignettes, --no-build-vignettes, --no-manual, --output)
