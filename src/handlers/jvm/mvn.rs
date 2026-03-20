@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static MVN_STANDALONE: WordSet = WordSet::new(&[
     "--also-make", "--also-make-dependents", "--batch-mode",
@@ -20,15 +21,15 @@ static MVN_SAFE_PHASES: WordSet = WordSet::new(&[
     "help:describe", "test", "test-compile", "validate", "verify",
 ]);
 
-pub fn is_safe_mvn(tokens: &[Token]) -> bool {
+pub fn is_safe_mvn(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     if !MVN_SAFE_PHASES.contains(&tokens[1]) {
-        return false;
+        return Verdict::Denied;
     }
     if tokens[1] == "--version" || tokens[1] == "-v" {
-        return tokens.len() == 2;
+        return if tokens.len() == 2 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
     let mut i = 2;
     while i < tokens.len() {
@@ -55,12 +56,13 @@ pub fn is_safe_mvn(tokens: &[Token]) -> bool {
             i += 1;
             continue;
         }
-        return false;
+        return Verdict::Denied;
     }
-    true
+    Verdict::Allowed(SafetyLevel::Inert)
+
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "mvn" | "mvnw" => Some(is_safe_mvn(tokens)),
         _ => None,

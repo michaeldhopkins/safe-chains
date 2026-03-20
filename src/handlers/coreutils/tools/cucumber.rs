@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -26,5 +27,5 @@ static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cucumber", policy: &CUCUMBER_POLICY, help_eligible: false, url: "https://cucumber.io/docs/cucumber/api/#running-cucumber", aliases: &[] },
+    FlatDef { name: "cucumber", policy: &CUCUMBER_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://cucumber.io/docs/cucumber/api/#running-cucumber", aliases: &[] },
 ];

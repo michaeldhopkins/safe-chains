@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static FIND_DANGEROUS_FLAGS: WordSet = WordSet::new(&[
     "-delete",
@@ -10,11 +11,12 @@ static FIND_DANGEROUS_FLAGS: WordSet = WordSet::new(&[
     "-okdir",
 ]);
 
-pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> bool {
+pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict {
+    let mut level = SafetyLevel::Inert;
     let mut i = 1;
     while i < tokens.len() {
         if FIND_DANGEROUS_FLAGS.contains(&tokens[i]) {
-            return false;
+            return Verdict::Denied;
         }
         if tokens[i] == "-exec" || tokens[i] == "-execdir" {
             let cmd_start = i + 1;
@@ -24,25 +26,26 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> bool {
                 .map(|p| cmd_start + p)
                 .unwrap_or(tokens.len());
             if cmd_start >= cmd_end {
-                return false;
+                return Verdict::Denied;
             }
             let exec_words: Vec<&str> = tokens[cmd_start..cmd_end]
                 .iter()
                 .map(|t| if t.as_str() == "{}" { "file" } else { t.as_str() })
                 .collect();
             let exec_cmd = shell_words::join(exec_words);
-            if !crate::is_safe_command(&exec_cmd) {
-                return false;
+            match crate::command_verdict(&exec_cmd) {
+                Verdict::Denied => return Verdict::Denied,
+                Verdict::Allowed(l) => level = level.max(l),
             }
             i = cmd_end + 1;
             continue;
         }
         i += 1;
     }
-    true
+    Verdict::Allowed(level)
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "find" => Some(is_safe_find(tokens)),
         _ => None,

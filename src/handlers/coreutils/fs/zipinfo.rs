@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -13,7 +14,7 @@ static ZIPINFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "zipinfo", policy: &ZIPINFO_POLICY, help_eligible: false, url: "https://linux.die.net/man/1/zipinfo", aliases: &[] },
+    FlatDef { name: "zipinfo", policy: &ZIPINFO_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://linux.die.net/man/1/zipinfo", aliases: &[] },
 ];
 
 #[cfg(test)]

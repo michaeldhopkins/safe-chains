@@ -2,10 +2,11 @@ mod git;
 mod jj;
 
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
 pub(crate) use git::GIT;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     git::dispatch(cmd, tokens)
         .or_else(|| jj::dispatch(cmd, tokens))
 }

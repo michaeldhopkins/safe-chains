@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -81,18 +82,17 @@ pub(crate) static TERRAFORM: CommandDef = CommandDef {
             name: "fmt",
             guard_short: None,
             guard_long: "--check",
-            policy: &TERRAFORM_FMT_POLICY,
-        },
-        SubDef::Policy { name: "graph", policy: &TERRAFORM_GRAPH_POLICY },
-        SubDef::Policy { name: "output", policy: &TERRAFORM_OUTPUT_POLICY },
-        SubDef::Policy { name: "providers", policy: &TERRAFORM_BARE_POLICY },
-        SubDef::Policy { name: "show", policy: &TERRAFORM_SHOW_POLICY },
+            policy: &TERRAFORM_FMT_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "graph", policy: &TERRAFORM_GRAPH_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "output", policy: &TERRAFORM_OUTPUT_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "providers", policy: &TERRAFORM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "show", policy: &TERRAFORM_SHOW_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "state", subs: &[
-            SubDef::Policy { name: "list", policy: &TERRAFORM_STATE_LIST_POLICY },
-            SubDef::Policy { name: "show", policy: &TERRAFORM_STATE_SHOW_POLICY },
+            SubDef::Policy { name: "list", policy: &TERRAFORM_STATE_LIST_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "show", policy: &TERRAFORM_STATE_SHOW_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "validate", policy: &TERRAFORM_VALIDATE_POLICY },
-        SubDef::Policy { name: "version", policy: &TERRAFORM_VERSION_POLICY },
+        SubDef::Policy { name: "validate", policy: &TERRAFORM_VALIDATE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &TERRAFORM_VERSION_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

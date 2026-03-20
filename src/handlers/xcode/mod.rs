@@ -17,6 +17,7 @@ mod xcodegen;
 mod xcrun;
 
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
 pub(crate) use agvtool::AGVTOOL;
 pub(crate) use periphery::PERIPHERY;
@@ -29,7 +30,7 @@ pub(crate) use xcode_select::XCODE_SELECT;
 pub(crate) use xcodebuild::XCODEBUILD;
 pub(crate) use xcodegen::XCODEGEN;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     XCODEBUILD.dispatch(cmd, tokens)
         .or_else(|| PLUTIL.dispatch(cmd, tokens))
         .or_else(|| XCODE_SELECT.dispatch(cmd, tokens))

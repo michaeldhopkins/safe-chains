@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -32,11 +33,11 @@ static XCODEBUILD_VERSION_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static XCODEBUILD: CommandDef = CommandDef {
     name: "xcodebuild",
     subs: &[
-        SubDef::Policy { name: "-list", policy: &XCODEBUILD_LIST_POLICY },
-        SubDef::Policy { name: "-showBuildSettings", policy: &XCODEBUILD_SHOW_POLICY },
-        SubDef::Policy { name: "-showdestinations", policy: &XCODEBUILD_SHOW_POLICY },
-        SubDef::Policy { name: "-showsdks", policy: &XCODEBUILD_SHOW_POLICY },
-        SubDef::Policy { name: "-version", policy: &XCODEBUILD_VERSION_POLICY },
+        SubDef::Policy { name: "-list", policy: &XCODEBUILD_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "-showBuildSettings", policy: &XCODEBUILD_SHOW_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "-showdestinations", policy: &XCODEBUILD_SHOW_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "-showsdks", policy: &XCODEBUILD_SHOW_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "-version", policy: &XCODEBUILD_VERSION_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

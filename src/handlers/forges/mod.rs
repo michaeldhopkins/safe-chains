@@ -4,8 +4,9 @@ mod jjpr;
 mod tea;
 
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     gh::dispatch(cmd, tokens)
         .or_else(|| glab::dispatch(cmd, tokens))
         .or_else(|| jjpr::dispatch(cmd, tokens))

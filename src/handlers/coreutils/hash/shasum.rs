@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -15,7 +16,7 @@ static SHASUM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "shasum", policy: &SHASUM_POLICY, help_eligible: false, url: "https://perldoc.perl.org/shasum", aliases: &[] },
+    FlatDef { name: "shasum", policy: &SHASUM_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://perldoc.perl.org/shasum", aliases: &[] },
 ];
 
 #[cfg(test)]

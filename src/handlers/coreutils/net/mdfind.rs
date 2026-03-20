@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -13,7 +14,7 @@ static MDFIND_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "mdfind", policy: &MDFIND_POLICY, help_eligible: false, url: "https://ss64.com/mac/mdfind.html", aliases: &[] },
+    FlatDef { name: "mdfind", policy: &MDFIND_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://ss64.com/mac/mdfind.html", aliases: &[] },
 ];
 
 #[cfg(test)]

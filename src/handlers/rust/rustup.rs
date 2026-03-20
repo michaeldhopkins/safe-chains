@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -43,18 +44,18 @@ pub(crate) static RUSTUP: CommandDef = CommandDef {
     name: "rustup",
     subs: &[
         SubDef::Nested { name: "component", subs: &[
-            SubDef::Policy { name: "list", policy: &RUSTUP_LIST_POLICY },
+            SubDef::Policy { name: "list", policy: &RUSTUP_LIST_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "doc", policy: &RUSTUP_DOC_POLICY },
+        SubDef::Policy { name: "doc", policy: &RUSTUP_DOC_POLICY, level: SafetyLevel::Inert },
         SubDef::Delegation { name: "run", skip: 2, doc: "run <toolchain> delegates to inner command." },
-        SubDef::Policy { name: "show", policy: &RUSTUP_SHOW_POLICY },
+        SubDef::Policy { name: "show", policy: &RUSTUP_SHOW_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "target", subs: &[
-            SubDef::Policy { name: "list", policy: &RUSTUP_LIST_POLICY },
+            SubDef::Policy { name: "list", policy: &RUSTUP_LIST_POLICY, level: SafetyLevel::Inert },
         ]},
         SubDef::Nested { name: "toolchain", subs: &[
-            SubDef::Policy { name: "list", policy: &RUSTUP_LIST_POLICY },
+            SubDef::Policy { name: "list", policy: &RUSTUP_LIST_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "which", policy: &RUSTUP_WHICH_POLICY },
+        SubDef::Policy { name: "which", policy: &RUSTUP_WHICH_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

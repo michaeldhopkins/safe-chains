@@ -1,4 +1,5 @@
 use clap::Parser;
+use crate::verdict::SafetyLevel;
 
 #[derive(Parser)]
 #[command(name = "safe-chains")]
@@ -7,6 +8,10 @@ use clap::Parser;
 pub struct Cli {
     /// Command string to check (omit for Claude hook mode via stdin)
     pub command: Option<String>,
+
+    /// Safety level threshold (inert, safe-read, safe-write). Only commands at or below this level pass.
+    #[arg(long, value_enum)]
+    pub level: Option<SafetyLevel>,
 
     /// List all supported commands in Markdown format
     #[arg(long)]

@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 
 static NPX_FLAGS_NO_ARG: WordSet =
@@ -14,9 +15,9 @@ pub fn is_safe_npx(tokens: &[Token]) -> bool {
         .is_some_and(|idx| super::is_safe_runner_package(tokens, idx))
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "npx" => Some(is_safe_npx(tokens)),
+        "npx" => Some(if is_safe_npx(tokens) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }),
         _ => None,
     }
 }

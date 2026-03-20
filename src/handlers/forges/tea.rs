@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static TEA_READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
@@ -49,42 +50,43 @@ static TEA_VIEW_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_tea(tokens: &[Token]) -> bool {
+pub fn is_safe_tea(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     let subcmd = &tokens[1];
 
     if TEA_READ_ONLY_SUBCOMMANDS.contains(subcmd) {
         if tokens.len() == 2 {
-            return true;
+            return Verdict::Allowed(SafetyLevel::Inert);
         }
         if !TEA_READ_ONLY_ACTIONS.contains(&tokens[2]) {
-            return false;
+            return Verdict::Denied;
         }
         let policy = if tokens[2] == "view" {
             &TEA_VIEW_POLICY
         } else {
             &TEA_LIST_POLICY
         };
-        return policy::check(&tokens[2..], policy);
+        return if policy::check(&tokens[2..], policy) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if TEA_ALWAYS_SAFE.contains(subcmd) {
-        return tokens.len() == 2;
+        return if tokens.len() == 2 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if subcmd == "logins" || subcmd == "login" {
         if tokens.len() < 3 || !TEA_LOGIN_SAFE.contains(&tokens[2]) {
-            return false;
+            return Verdict::Denied;
         }
-        return policy::check(&tokens[2..], &TEA_LIST_POLICY);
+        return if policy::check(&tokens[2..], &TEA_LIST_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
-    false
+    Verdict::Denied
+
 }
 
-pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "tea" => Some(is_safe_tea(tokens)),
         _ => None,

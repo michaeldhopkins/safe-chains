@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -32,9 +33,9 @@ static OLLAMA_SHOW_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static OLLAMA: CommandDef = CommandDef {
     name: "ollama",
     subs: &[
-        SubDef::Policy { name: "list", policy: &OLLAMA_LIST_POLICY },
-        SubDef::Policy { name: "ps", policy: &OLLAMA_PS_POLICY },
-        SubDef::Policy { name: "show", policy: &OLLAMA_SHOW_POLICY },
+        SubDef::Policy { name: "list", policy: &OLLAMA_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ps", policy: &OLLAMA_PS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "show", policy: &OLLAMA_SHOW_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

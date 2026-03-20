@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -21,9 +22,9 @@ static BARE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static APKSIGNER: CommandDef = CommandDef {
     name: "apksigner",
     subs: &[
-        SubDef::Policy { name: "help", policy: &BARE_POLICY },
-        SubDef::Policy { name: "verify", policy: &VERIFY_POLICY },
-        SubDef::Policy { name: "version", policy: &BARE_POLICY },
+        SubDef::Policy { name: "help", policy: &BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "verify", policy: &VERIFY_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

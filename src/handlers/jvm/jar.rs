@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::Token;
 
 fn is_list_mode(arg: &str) -> bool {
@@ -27,9 +28,9 @@ pub fn is_safe_jar(tokens: &[Token]) -> bool {
     }
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     if cmd == "jar" {
-        Some(is_safe_jar(tokens))
+        Some(if is_safe_jar(tokens) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied })
     } else {
         None
     }

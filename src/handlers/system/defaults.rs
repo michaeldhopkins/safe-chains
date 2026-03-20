@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -21,11 +22,11 @@ static DEFAULTS_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static DEFAULTS: CommandDef = CommandDef {
     name: "defaults",
     subs: &[
-        SubDef::Policy { name: "read", policy: &DEFAULTS_READ_POLICY },
-        SubDef::Policy { name: "read-type", policy: &DEFAULTS_READ_POLICY },
-        SubDef::Policy { name: "export", policy: &DEFAULTS_READ_POLICY },
-        SubDef::Policy { name: "find", policy: &DEFAULTS_READ_POLICY },
-        SubDef::Policy { name: "domains", policy: &DEFAULTS_SIMPLE_POLICY },
+        SubDef::Policy { name: "read", policy: &DEFAULTS_READ_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "read-type", policy: &DEFAULTS_READ_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "export", policy: &DEFAULTS_READ_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "find", policy: &DEFAULTS_READ_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "domains", policy: &DEFAULTS_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

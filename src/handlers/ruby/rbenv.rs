@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -13,12 +14,12 @@ static RBENV_BARE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static RBENV: CommandDef = CommandDef {
     name: "rbenv",
     subs: &[
-        SubDef::Policy { name: "help", policy: &RBENV_BARE_POLICY },
-        SubDef::Policy { name: "root", policy: &RBENV_BARE_POLICY },
-        SubDef::Policy { name: "shims", policy: &RBENV_BARE_POLICY },
-        SubDef::Policy { name: "version", policy: &RBENV_BARE_POLICY },
-        SubDef::Policy { name: "versions", policy: &RBENV_BARE_POLICY },
-        SubDef::Policy { name: "which", policy: &RBENV_BARE_POLICY },
+        SubDef::Policy { name: "help", policy: &RBENV_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "root", policy: &RBENV_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "shims", policy: &RBENV_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &RBENV_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "versions", policy: &RBENV_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "which", policy: &RBENV_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

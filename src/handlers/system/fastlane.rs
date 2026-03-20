@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -21,10 +22,10 @@ static ACTION_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static FASTLANE: CommandDef = CommandDef {
     name: "fastlane",
     subs: &[
-        SubDef::Policy { name: "action", policy: &ACTION_POLICY },
-        SubDef::Policy { name: "actions", policy: &BARE_POLICY },
-        SubDef::Policy { name: "env", policy: &BARE_POLICY },
-        SubDef::Policy { name: "lanes", policy: &BARE_POLICY },
+        SubDef::Policy { name: "action", policy: &ACTION_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "actions", policy: &BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "env", policy: &BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "lanes", policy: &BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

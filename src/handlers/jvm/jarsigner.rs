@@ -1,12 +1,13 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static VERIFY_STANDALONE: WordSet = WordSet::new(&[
     "-certs", "-strict", "-verbose",
 ]);
 
-pub fn is_safe_jarsigner(tokens: &[Token]) -> bool {
+pub fn is_safe_jarsigner(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     let mut has_verify = false;
     let mut i = 1;
@@ -25,12 +26,13 @@ pub fn is_safe_jarsigner(tokens: &[Token]) -> bool {
             i += 1;
             continue;
         }
-        return false;
+        return Verdict::Denied;
     }
-    has_verify
+        if has_verify { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     if cmd == "jarsigner" {
         Some(is_safe_jarsigner(tokens))
     } else {

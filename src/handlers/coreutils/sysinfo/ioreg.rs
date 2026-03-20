@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -16,7 +17,7 @@ static IOREG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ioreg", policy: &IOREG_POLICY, help_eligible: false, url: "https://ss64.com/mac/ioreg.html", aliases: &[] },
+    FlatDef { name: "ioreg", policy: &IOREG_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://ss64.com/mac/ioreg.html", aliases: &[] },
 ];
 
 #[cfg(test)]

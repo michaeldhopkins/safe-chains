@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::command::{CommandDef, SubDef};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
@@ -86,25 +87,25 @@ static QEMU_IMG_SNAPSHOT_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_snapshot(tokens: &[Token]) -> bool {
+fn check_snapshot(tokens: &[Token]) -> Verdict {
     for t in tokens {
         let s = t.as_str();
         if s == "-a" || s == "--apply"
             || s == "-c" || s == "--create"
             || s == "-d" || s == "--delete"
         {
-            return false;
+            return Verdict::Denied;
         }
     }
-    crate::policy::check(tokens, &QEMU_IMG_SNAPSHOT_POLICY)
+    if crate::policy::check(tokens, &QEMU_IMG_SNAPSHOT_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
 static QEMU_IMG_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "check", policy: &QEMU_IMG_CHECK_POLICY },
-    SubDef::Policy { name: "compare", policy: &QEMU_IMG_COMPARE_POLICY },
-    SubDef::Policy { name: "info", policy: &QEMU_IMG_INFO_POLICY },
-    SubDef::Policy { name: "map", policy: &QEMU_IMG_MAP_POLICY },
-    SubDef::Policy { name: "measure", policy: &QEMU_IMG_MEASURE_POLICY },
+    SubDef::Policy { name: "check", policy: &QEMU_IMG_CHECK_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "compare", policy: &QEMU_IMG_COMPARE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "info", policy: &QEMU_IMG_INFO_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "map", policy: &QEMU_IMG_MAP_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "measure", policy: &QEMU_IMG_MEASURE_POLICY, level: SafetyLevel::Inert },
     SubDef::Custom { name: "snapshot", check: check_snapshot, doc: "list-only (rejects -a, -c, -d)", test_suffix: Some("-l") },
 ];
 

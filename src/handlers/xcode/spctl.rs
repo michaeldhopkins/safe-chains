@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static SPCTL_POLICY: FlagPolicy = FlagPolicy {
@@ -15,18 +16,19 @@ static SPCTL_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_spctl(tokens: &[Token]) -> bool {
+pub fn is_safe_spctl(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     static SPCTL_SAFE: WordSet = WordSet::new(&["--assess", "-a"]);
     if !tokens[1..].iter().any(|t| SPCTL_SAFE.contains(t)) {
-        return false;
+        return Verdict::Denied;
     }
-    policy::check(tokens, &SPCTL_POLICY)
+        if policy::check(tokens, &SPCTL_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     if cmd == "spctl" {
         Some(is_safe_spctl(tokens))
     } else {

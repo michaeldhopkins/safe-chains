@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static R_CMD_CHECK_POLICY: FlagPolicy = FlagPolicy {
@@ -20,25 +21,27 @@ static R_CMD_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn is_safe_r(tokens: &[Token]) -> bool {
+fn is_safe_r(tokens: &[Token]) -> Verdict {
     if tokens.len() < 3 {
-        return false;
+        return Verdict::Denied;
     }
     if tokens[1] != "CMD" {
-        return false;
+        return Verdict::Denied;
     }
-    match tokens[2].as_str() {
+    let ok = match tokens[2].as_str() {
         "check" => policy::check(&tokens[2..], &R_CMD_CHECK_POLICY),
         "config" => policy::check(&tokens[2..], &R_CMD_CONFIG_POLICY),
         _ => false,
-    }
+    };
+    if ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
-fn is_safe_rscript(tokens: &[Token]) -> bool {
-    tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V")
+fn is_safe_rscript(tokens: &[Token]) -> Verdict {
+    if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "R" => Some(is_safe_r(tokens)),
         "Rscript" => Some(is_safe_rscript(tokens)),

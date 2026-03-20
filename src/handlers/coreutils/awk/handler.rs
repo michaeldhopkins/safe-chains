@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
@@ -33,9 +34,9 @@ fn is_safe_awk(tokens: &[Token]) -> bool {
     policy::check(tokens, &AWK_POLICY)
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "awk" | "gawk" | "mawk" | "nawk" => Some(is_safe_awk(tokens)),
+        "awk" | "gawk" | "mawk" | "nawk" => Some(if is_safe_awk(tokens) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }),
         _ => None,
     }
 }

@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -58,9 +59,9 @@ static DOTNET_LIST_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static DOTNET: CommandDef = CommandDef {
     name: "dotnet",
     subs: &[
-        SubDef::Policy { name: "build", policy: &DOTNET_BUILD_POLICY },
-        SubDef::Policy { name: "list", policy: &DOTNET_LIST_POLICY },
-        SubDef::Policy { name: "test", policy: &DOTNET_TEST_POLICY },
+        SubDef::Policy { name: "build", policy: &DOTNET_BUILD_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &DOTNET_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "test", policy: &DOTNET_TEST_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &["--info", "--list-runtimes", "--list-sdks"],
     help_eligible: true,
@@ -68,7 +69,7 @@ pub(crate) static DOTNET: CommandDef = CommandDef {
     aliases: &[],
 };
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     DOTNET.dispatch(cmd, tokens)
 }
 

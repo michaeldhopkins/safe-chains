@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -125,28 +126,28 @@ static KUBECTL_EVENTS_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static KUBECTL: CommandDef = CommandDef {
     name: "kubectl",
     subs: &[
-        SubDef::Policy { name: "api-resources", policy: &KUBECTL_API_RESOURCES_POLICY },
-        SubDef::Policy { name: "api-versions", policy: &KUBECTL_BARE_POLICY },
+        SubDef::Policy { name: "api-resources", policy: &KUBECTL_API_RESOURCES_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "api-versions", policy: &KUBECTL_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "auth", subs: &[
-            SubDef::Policy { name: "can-i", policy: &KUBECTL_AUTH_CAN_I_POLICY },
-            SubDef::Policy { name: "whoami", policy: &KUBECTL_BARE_POLICY },
+            SubDef::Policy { name: "can-i", policy: &KUBECTL_AUTH_CAN_I_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "whoami", policy: &KUBECTL_BARE_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "cluster-info", policy: &KUBECTL_BARE_POLICY },
+        SubDef::Policy { name: "cluster-info", policy: &KUBECTL_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "config", subs: &[
-            SubDef::Policy { name: "current-context", policy: &KUBECTL_BARE_POLICY },
-            SubDef::Policy { name: "get-contexts", policy: &KUBECTL_CONFIG_GET_CONTEXTS_POLICY },
-            SubDef::Policy { name: "view", policy: &KUBECTL_CONFIG_VIEW_POLICY },
+            SubDef::Policy { name: "current-context", policy: &KUBECTL_BARE_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "get-contexts", policy: &KUBECTL_CONFIG_GET_CONTEXTS_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "view", policy: &KUBECTL_CONFIG_VIEW_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "describe", policy: &KUBECTL_DESCRIBE_POLICY },
-        SubDef::Policy { name: "events", policy: &KUBECTL_EVENTS_POLICY },
-        SubDef::Policy { name: "explain", policy: &KUBECTL_EXPLAIN_POLICY },
-        SubDef::Policy { name: "get", policy: &KUBECTL_GET_POLICY },
-        SubDef::Policy { name: "logs", policy: &KUBECTL_LOGS_POLICY },
+        SubDef::Policy { name: "describe", policy: &KUBECTL_DESCRIBE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "events", policy: &KUBECTL_EVENTS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "explain", policy: &KUBECTL_EXPLAIN_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "get", policy: &KUBECTL_GET_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "logs", policy: &KUBECTL_LOGS_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "top", subs: &[
-            SubDef::Policy { name: "node", policy: &KUBECTL_TOP_NODE_POLICY },
-            SubDef::Policy { name: "pod", policy: &KUBECTL_TOP_POD_POLICY },
+            SubDef::Policy { name: "node", policy: &KUBECTL_TOP_NODE_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "pod", policy: &KUBECTL_TOP_POD_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "version", policy: &KUBECTL_VERSION_POLICY },
+        SubDef::Policy { name: "version", policy: &KUBECTL_VERSION_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

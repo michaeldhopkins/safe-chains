@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -15,7 +16,7 @@ static CKSUM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cksum", policy: &CKSUM_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation", aliases: &[] },
+    FlatDef { name: "cksum", policy: &CKSUM_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

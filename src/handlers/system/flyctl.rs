@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -44,27 +45,27 @@ static FLYCTL_APP_JSON_POLICY: FlagPolicy = FlagPolicy {
 
 static FLYCTL_SUBS: &[SubDef] = &[
     SubDef::Nested { name: "apps", subs: &[
-        SubDef::Policy { name: "list", policy: &FLYCTL_BARE_POLICY },
+        SubDef::Policy { name: "list", policy: &FLYCTL_BARE_POLICY, level: SafetyLevel::Inert },
     ]},
     SubDef::Nested { name: "config", subs: &[
-        SubDef::Policy { name: "show", policy: &FLYCTL_APP_JSON_POLICY },
+        SubDef::Policy { name: "show", policy: &FLYCTL_APP_JSON_POLICY, level: SafetyLevel::Inert },
     ]},
     SubDef::Nested { name: "ips", subs: &[
-        SubDef::Policy { name: "list", policy: &FLYCTL_APP_JSON_POLICY },
+        SubDef::Policy { name: "list", policy: &FLYCTL_APP_JSON_POLICY, level: SafetyLevel::Inert },
     ]},
-    SubDef::Policy { name: "logs", policy: &FLYCTL_LOGS_POLICY },
+    SubDef::Policy { name: "logs", policy: &FLYCTL_LOGS_POLICY, level: SafetyLevel::Inert },
     SubDef::Nested { name: "platform", subs: &[
-        SubDef::Policy { name: "regions", policy: &FLYCTL_BARE_POLICY },
+        SubDef::Policy { name: "regions", policy: &FLYCTL_BARE_POLICY, level: SafetyLevel::Inert },
     ]},
     SubDef::Nested { name: "regions", subs: &[
-        SubDef::Policy { name: "list", policy: &FLYCTL_APP_JSON_POLICY },
+        SubDef::Policy { name: "list", policy: &FLYCTL_APP_JSON_POLICY, level: SafetyLevel::Inert },
     ]},
-    SubDef::Policy { name: "releases", policy: &FLYCTL_RELEASES_POLICY },
+    SubDef::Policy { name: "releases", policy: &FLYCTL_RELEASES_POLICY, level: SafetyLevel::Inert },
     SubDef::Nested { name: "services", subs: &[
-        SubDef::Policy { name: "list", policy: &FLYCTL_APP_JSON_POLICY },
+        SubDef::Policy { name: "list", policy: &FLYCTL_APP_JSON_POLICY, level: SafetyLevel::Inert },
     ]},
-    SubDef::Policy { name: "status", policy: &FLYCTL_STATUS_POLICY },
-    SubDef::Policy { name: "version", policy: &FLYCTL_BARE_POLICY },
+    SubDef::Policy { name: "status", policy: &FLYCTL_STATUS_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "version", policy: &FLYCTL_BARE_POLICY, level: SafetyLevel::Inert },
 ];
 
 pub(crate) static FLYCTL: CommandDef = CommandDef {

@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static SWIFTFORMAT_POLICY: FlagPolicy = FlagPolicy {
@@ -11,18 +12,19 @@ static SWIFTFORMAT_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_swiftformat(tokens: &[Token]) -> bool {
+pub fn is_safe_swiftformat(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     static REQUIRED: WordSet = WordSet::new(&["--dryrun", "--lint"]);
     if !tokens[1..].iter().any(|t| REQUIRED.contains(t)) {
-        return false;
+        return Verdict::Denied;
     }
-    policy::check(tokens, &SWIFTFORMAT_POLICY)
+        if policy::check(tokens, &SWIFTFORMAT_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     if cmd == "swiftformat" {
         Some(is_safe_swiftformat(tokens))
     } else {

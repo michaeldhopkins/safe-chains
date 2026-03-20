@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 
 static XARGS_FLAGS_WITH_ARG: WordSet =
@@ -6,20 +7,20 @@ static XARGS_FLAGS_WITH_ARG: WordSet =
 static XARGS_FLAGS_NO_ARG: WordSet =
     WordSet::new(&["-0", "-p", "-r", "-t", "-x"]);
 
-pub fn is_safe_shell(tokens: &[Token]) -> bool {
+pub fn is_safe_shell(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     let Some(idx) = tokens.iter().position(|t| *t == "-c") else {
-        return false;
+        return Verdict::Denied;
     };
     let Some(script) = tokens.get(idx + 1) else {
-        return false;
+        return Verdict::Denied;
     };
-    crate::is_safe_command(script.as_str())
+    crate::command_verdict(script.as_str())
 }
 
-pub fn is_safe_xargs(tokens: &[Token]) -> bool {
+pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
     let mut i = 1;
     while i < tokens.len() {
         if XARGS_FLAGS_WITH_ARG.contains(&tokens[i]) {
@@ -35,12 +36,13 @@ pub fn is_safe_xargs(tokens: &[Token]) -> bool {
             continue;
         }
         let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
-        return crate::is_safe_command(&inner);
+        return crate::command_verdict(&inner);
     }
-    true
+    Verdict::Allowed(SafetyLevel::Inert)
+
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "sh" | "bash" => Some(is_safe_shell(tokens)),
         "xargs" => Some(is_safe_xargs(tokens)),

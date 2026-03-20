@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -64,36 +65,36 @@ pub(crate) static DCLI: CommandDef = CommandDef {
         SubDef::Nested {
             name: "accounts",
             subs: &[
-                SubDef::Policy { name: "whoami", policy: &DCLI_BARE_POLICY },
+                SubDef::Policy { name: "whoami", policy: &DCLI_BARE_POLICY, level: SafetyLevel::Inert },
             ],
         },
         SubDef::Nested {
             name: "devices",
             subs: &[
-                SubDef::Policy { name: "list", policy: &DCLI_DEVICES_LIST_POLICY },
+                SubDef::Policy { name: "list", policy: &DCLI_DEVICES_LIST_POLICY, level: SafetyLevel::Inert },
             ],
         },
-        SubDef::Policy { name: "lock", policy: &DCLI_BARE_POLICY },
-        SubDef::Policy { name: "sync", policy: &DCLI_BARE_POLICY },
+        SubDef::Policy { name: "lock", policy: &DCLI_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "sync", policy: &DCLI_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested {
             name: "team",
             subs: &[
                 SubDef::Nested {
                     name: "credentials",
                     subs: &[
-                        SubDef::Policy { name: "list", policy: &DCLI_JSON_LIST_POLICY },
+                        SubDef::Policy { name: "list", policy: &DCLI_JSON_LIST_POLICY, level: SafetyLevel::Inert },
                     ],
                 },
-                SubDef::Policy { name: "dark-web-insights", policy: &DCLI_TEAM_DWI_POLICY },
-                SubDef::Policy { name: "logs", policy: &DCLI_TEAM_LOGS_POLICY },
-                SubDef::Policy { name: "members", policy: &DCLI_TEAM_MEMBERS_POLICY },
+                SubDef::Policy { name: "dark-web-insights", policy: &DCLI_TEAM_DWI_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "logs", policy: &DCLI_TEAM_LOGS_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "members", policy: &DCLI_TEAM_MEMBERS_POLICY, level: SafetyLevel::Inert },
                 SubDef::Nested {
                     name: "public-api",
                     subs: &[
-                        SubDef::Policy { name: "list-keys", policy: &DCLI_JSON_LIST_POLICY },
+                        SubDef::Policy { name: "list-keys", policy: &DCLI_JSON_LIST_POLICY, level: SafetyLevel::Inert },
                     ],
                 },
-                SubDef::Policy { name: "report", policy: &DCLI_TEAM_REPORT_POLICY },
+                SubDef::Policy { name: "report", policy: &DCLI_TEAM_REPORT_POLICY, level: SafetyLevel::Inert },
             ],
         },
     ],

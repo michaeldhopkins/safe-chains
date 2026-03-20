@@ -1,7 +1,8 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "workon", policy: &super::super::BARE_ONLY, help_eligible: true, url: "https://github.com/michaeldhopkins/workon", aliases: &[] },
+    FlatDef { name: "workon", policy: &super::super::BARE_ONLY, level: SafetyLevel::Inert, help_eligible: true, url: "https://github.com/michaeldhopkins/workon", aliases: &[] },
 ];
 
 #[cfg(test)]

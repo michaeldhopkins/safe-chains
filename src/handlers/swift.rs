@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -65,13 +66,13 @@ static SWIFT_PACKAGE_SHOW_DEPS_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static SWIFT: CommandDef = CommandDef {
     name: "swift",
     subs: &[
-        SubDef::Policy { name: "build", policy: &SWIFT_BUILD_POLICY },
+        SubDef::Policy { name: "build", policy: &SWIFT_BUILD_POLICY, level: SafetyLevel::SafeWrite },
         SubDef::Nested { name: "package", subs: &[
-            SubDef::Policy { name: "describe", policy: &SWIFT_PACKAGE_DESCRIBE_POLICY },
-            SubDef::Policy { name: "dump-package", policy: &SWIFT_PACKAGE_DUMP_POLICY },
-            SubDef::Policy { name: "show-dependencies", policy: &SWIFT_PACKAGE_SHOW_DEPS_POLICY },
+            SubDef::Policy { name: "describe", policy: &SWIFT_PACKAGE_DESCRIBE_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "dump-package", policy: &SWIFT_PACKAGE_DUMP_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "show-dependencies", policy: &SWIFT_PACKAGE_SHOW_DEPS_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "test", policy: &SWIFT_TEST_POLICY },
+        SubDef::Policy { name: "test", policy: &SWIFT_TEST_POLICY, level: SafetyLevel::SafeRead },
     ],
     bare_flags: &[],
     help_eligible: true,
@@ -79,7 +80,7 @@ pub(crate) static SWIFT: CommandDef = CommandDef {
     aliases: &[],
 };
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     SWIFT.dispatch(cmd, tokens)
 }
 

@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -21,10 +22,10 @@ static LOG_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static FIREBASE: CommandDef = CommandDef {
     name: "firebase",
     subs: &[
-        SubDef::Policy { name: "apps:list", policy: &BARE_POLICY },
-        SubDef::Policy { name: "functions:log", policy: &LOG_POLICY },
-        SubDef::Policy { name: "login:list", policy: &BARE_POLICY },
-        SubDef::Policy { name: "projects:list", policy: &BARE_POLICY },
+        SubDef::Policy { name: "apps:list", policy: &BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "functions:log", policy: &LOG_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "login:list", policy: &BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "projects:list", policy: &BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::command::{CheckFn, CommandDef, SubDef};
 use crate::parse::{Token, WordSet, has_flag};
 use crate::policy::{self, FlagPolicy, FlagStyle};
@@ -36,17 +37,18 @@ static CONDA_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_conda_config(tokens: &[Token]) -> bool {
-    (has_flag(tokens, None, Some("--show"))
+fn check_conda_config(tokens: &[Token]) -> Verdict {
+    if (has_flag(tokens, None, Some("--show"))
         || has_flag(tokens, None, Some("--show-sources")))
         && policy::check(tokens, &CONDA_CONFIG_POLICY)
+    { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
 pub(crate) static CONDA: CommandDef = CommandDef {
     name: "conda",
     subs: &[
-        SubDef::Policy { name: "list", policy: &CONDA_LIST_POLICY },
-        SubDef::Policy { name: "info", policy: &CONDA_INFO_POLICY },
+        SubDef::Policy { name: "list", policy: &CONDA_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "info", policy: &CONDA_INFO_POLICY, level: SafetyLevel::Inert },
         SubDef::Custom { name: "config", check: check_conda_config as CheckFn, doc: "config (--show/--show-sources only).", test_suffix: Some("--show") },
     ],
     bare_flags: &[],

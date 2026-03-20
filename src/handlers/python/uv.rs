@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -41,16 +42,16 @@ pub(crate) static UV: CommandDef = CommandDef {
     name: "uv",
     subs: &[
         SubDef::Nested { name: "pip", subs: &[
-            SubDef::Policy { name: "list", policy: &UV_PIP_LIST_POLICY },
-            SubDef::Policy { name: "show", policy: &UV_PIP_SHOW_POLICY },
-            SubDef::Policy { name: "check", policy: &UV_PIP_SIMPLE_POLICY },
-            SubDef::Policy { name: "freeze", policy: &UV_PIP_SIMPLE_POLICY },
+            SubDef::Policy { name: "list", policy: &UV_PIP_LIST_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "show", policy: &UV_PIP_SHOW_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "check", policy: &UV_PIP_SIMPLE_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "freeze", policy: &UV_PIP_SIMPLE_POLICY, level: SafetyLevel::Inert },
         ]},
         SubDef::Nested { name: "python", subs: &[
-            SubDef::Policy { name: "list", policy: &UV_SIMPLE_POLICY },
+            SubDef::Policy { name: "list", policy: &UV_SIMPLE_POLICY, level: SafetyLevel::Inert },
         ]},
         SubDef::Nested { name: "tool", subs: &[
-            SubDef::Policy { name: "list", policy: &UV_SIMPLE_POLICY },
+            SubDef::Policy { name: "list", policy: &UV_SIMPLE_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
     bare_flags: &[],

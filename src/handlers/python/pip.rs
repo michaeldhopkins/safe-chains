@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -45,18 +46,18 @@ static PIP_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static PIP_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "list", policy: &PIP_LIST_POLICY },
-    SubDef::Policy { name: "show", policy: &PIP_SHOW_POLICY },
-    SubDef::Policy { name: "freeze", policy: &PIP_FREEZE_POLICY },
-    SubDef::Policy { name: "check", policy: &PIP_BARE_POLICY },
+    SubDef::Policy { name: "list", policy: &PIP_LIST_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "show", policy: &PIP_SHOW_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "freeze", policy: &PIP_FREEZE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "check", policy: &PIP_BARE_POLICY, level: SafetyLevel::Inert },
     SubDef::Nested { name: "config", subs: &[
-        SubDef::Policy { name: "get", policy: &PIP_BARE_POLICY },
-        SubDef::Policy { name: "list", policy: &PIP_BARE_POLICY },
+        SubDef::Policy { name: "get", policy: &PIP_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &PIP_BARE_POLICY, level: SafetyLevel::Inert },
     ]},
-    SubDef::Policy { name: "debug", policy: &PIP_BARE_POLICY },
-    SubDef::Policy { name: "help", policy: &PIP_BARE_POLICY },
-    SubDef::Policy { name: "index", policy: &PIP_BARE_POLICY },
-    SubDef::Policy { name: "inspect", policy: &PIP_BARE_POLICY },
+    SubDef::Policy { name: "debug", policy: &PIP_BARE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "help", policy: &PIP_BARE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "index", policy: &PIP_BARE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "inspect", policy: &PIP_BARE_POLICY, level: SafetyLevel::Inert },
 ];
 
 pub(crate) static PIP: CommandDef = CommandDef {

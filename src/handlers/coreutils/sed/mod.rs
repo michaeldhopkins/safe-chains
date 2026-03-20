@@ -1,8 +1,9 @@
 mod handler;
 
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
-pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     handler::dispatch(cmd, tokens)
 }
 

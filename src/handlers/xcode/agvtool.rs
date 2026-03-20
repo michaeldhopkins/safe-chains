@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -13,10 +14,10 @@ static AGVTOOL_BARE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static AGVTOOL: CommandDef = CommandDef {
     name: "agvtool",
     subs: &[
-        SubDef::Policy { name: "mvers", policy: &AGVTOOL_BARE_POLICY },
-        SubDef::Policy { name: "vers", policy: &AGVTOOL_BARE_POLICY },
-        SubDef::Policy { name: "what-marketing-version", policy: &AGVTOOL_BARE_POLICY },
-        SubDef::Policy { name: "what-version", policy: &AGVTOOL_BARE_POLICY },
+        SubDef::Policy { name: "mvers", policy: &AGVTOOL_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "vers", policy: &AGVTOOL_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "what-marketing-version", policy: &AGVTOOL_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "what-version", policy: &AGVTOOL_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: false,

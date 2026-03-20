@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -45,15 +46,15 @@ static POD_SPEC_WHICH_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static POD: CommandDef = CommandDef {
     name: "pod",
     subs: &[
-        SubDef::Policy { name: "env", policy: &POD_BARE_POLICY },
-        SubDef::Policy { name: "info", policy: &POD_INFO_POLICY },
-        SubDef::Policy { name: "list", policy: &POD_BARE_POLICY },
-        SubDef::Policy { name: "search", policy: &POD_SEARCH_POLICY },
+        SubDef::Policy { name: "env", policy: &POD_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "info", policy: &POD_INFO_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &POD_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "search", policy: &POD_SEARCH_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested {
             name: "spec",
             subs: &[
-                SubDef::Policy { name: "cat", policy: &POD_SPEC_CAT_POLICY },
-                SubDef::Policy { name: "which", policy: &POD_SPEC_WHICH_POLICY },
+                SubDef::Policy { name: "cat", policy: &POD_SPEC_CAT_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "which", policy: &POD_SPEC_WHICH_POLICY, level: SafetyLevel::Inert },
             ],
         },
     ],

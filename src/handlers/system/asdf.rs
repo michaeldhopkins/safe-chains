@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -13,17 +14,17 @@ static ASDF_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static ASDF: CommandDef = CommandDef {
     name: "asdf",
     subs: &[
-        SubDef::Policy { name: "current", policy: &ASDF_SIMPLE_POLICY },
-        SubDef::Policy { name: "help", policy: &ASDF_SIMPLE_POLICY },
-        SubDef::Policy { name: "info", policy: &ASDF_SIMPLE_POLICY },
-        SubDef::Policy { name: "list", policy: &ASDF_SIMPLE_POLICY },
-        SubDef::Policy { name: "version", policy: &ASDF_SIMPLE_POLICY },
-        SubDef::Policy { name: "which", policy: &ASDF_SIMPLE_POLICY },
+        SubDef::Policy { name: "current", policy: &ASDF_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "help", policy: &ASDF_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "info", policy: &ASDF_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &ASDF_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &ASDF_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "which", policy: &ASDF_SIMPLE_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "plugin", subs: &[
-            SubDef::Policy { name: "list", policy: &ASDF_SIMPLE_POLICY },
+            SubDef::Policy { name: "list", policy: &ASDF_SIMPLE_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "plugin-list", policy: &ASDF_SIMPLE_POLICY },
-        SubDef::Policy { name: "plugin-list-all", policy: &ASDF_SIMPLE_POLICY },
+        SubDef::Policy { name: "plugin-list", policy: &ASDF_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "plugin-list-all", policy: &ASDF_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

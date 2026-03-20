@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -14,6 +15,7 @@ pub static DEFS: &[FlatDef] = &[
     FlatDef {
         name: "emulator",
         policy: &EMULATOR_POLICY,
+        level: SafetyLevel::Inert,
         help_eligible: false,
         url: "https://developer.android.com/studio/run/emulator-commandline",
         aliases: &[],

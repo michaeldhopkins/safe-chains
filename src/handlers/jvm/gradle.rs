@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -57,12 +58,12 @@ static GRADLE_BUILD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GRADLE_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "build", policy: &GRADLE_BUILD_POLICY },
-    SubDef::Policy { name: "check", policy: &GRADLE_BUILD_POLICY },
-    SubDef::Policy { name: "dependencies", policy: &GRADLE_DEPS_POLICY },
-    SubDef::Policy { name: "properties", policy: &GRADLE_PROPS_POLICY },
-    SubDef::Policy { name: "tasks", policy: &GRADLE_TASKS_POLICY },
-    SubDef::Policy { name: "test", policy: &GRADLE_BUILD_POLICY },
+    SubDef::Policy { name: "build", policy: &GRADLE_BUILD_POLICY, level: SafetyLevel::SafeWrite },
+    SubDef::Policy { name: "check", policy: &GRADLE_BUILD_POLICY, level: SafetyLevel::SafeRead },
+    SubDef::Policy { name: "dependencies", policy: &GRADLE_DEPS_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "properties", policy: &GRADLE_PROPS_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "tasks", policy: &GRADLE_TASKS_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "test", policy: &GRADLE_BUILD_POLICY, level: SafetyLevel::SafeRead },
 ];
 
 pub(crate) static GRADLE: CommandDef = CommandDef {

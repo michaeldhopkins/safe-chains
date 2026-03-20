@@ -2,11 +2,12 @@ mod cargo;
 mod rustup;
 
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
 pub(crate) use cargo::CARGO;
 pub(crate) use rustup::RUSTUP;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     cargo::dispatch(cmd, tokens)
         .or_else(|| RUSTUP.dispatch(cmd, tokens))
 }

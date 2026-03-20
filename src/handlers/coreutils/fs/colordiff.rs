@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -31,7 +32,7 @@ static COLORDIFF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "colordiff", policy: &COLORDIFF_POLICY, help_eligible: false, url: "https://www.colordiff.org/", aliases: &[] },
+    FlatDef { name: "colordiff", policy: &COLORDIFF_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.colordiff.org/", aliases: &[] },
 ];
 
 #[cfg(test)]

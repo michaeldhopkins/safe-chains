@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -13,9 +14,9 @@ static CSRUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static CSRUTIL: CommandDef = CommandDef {
     name: "csrutil",
     subs: &[
-        SubDef::Policy { name: "authenticated-root", policy: &CSRUTIL_SIMPLE_POLICY },
-        SubDef::Policy { name: "report", policy: &CSRUTIL_SIMPLE_POLICY },
-        SubDef::Policy { name: "status", policy: &CSRUTIL_SIMPLE_POLICY },
+        SubDef::Policy { name: "authenticated-root", policy: &CSRUTIL_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "report", policy: &CSRUTIL_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "status", policy: &CSRUTIL_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

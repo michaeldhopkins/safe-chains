@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::command::{CommandDef, SubDef};
 use crate::parse::Token;
 use crate::policy::{FlagPolicy, FlagStyle};
@@ -225,16 +226,16 @@ static CARGO_PUBLISH_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_cargo_sub(tokens: &[Token]) -> bool {
+fn check_cargo_sub(tokens: &[Token]) -> Verdict {
     let sub = usize::from(!tokens.is_empty() && tokens[0].starts_with('+'));
     if tokens.len() < sub + 1 {
-        return false;
+        return Verdict::Denied;
     }
     let rest = &tokens[sub..];
     CARGO_SUBS
         .iter()
         .find(|s| s.name() == rest[0].as_str())
-        .is_some_and(|s| s.check(rest))
+        .map(|s| s.check(rest)).unwrap_or(Verdict::Denied)
 }
 
 static CARGO_HELP_SUB_POLICY: FlagPolicy = FlagPolicy {
@@ -254,44 +255,41 @@ static CARGO_HELP_ONLY_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static CARGO_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "audit", policy: &CARGO_AUDIT_POLICY },
-    SubDef::Policy { name: "bench", policy: &CARGO_TEST_POLICY },
-    SubDef::Policy { name: "build", policy: &CARGO_BUILD_POLICY },
-    SubDef::Policy { name: "check", policy: &CARGO_CHECK_POLICY },
-    SubDef::Policy { name: "clippy", policy: &CARGO_CLIPPY_POLICY },
-    SubDef::Policy { name: "deny", policy: &CARGO_DENY_POLICY },
-    SubDef::Policy { name: "doc", policy: &CARGO_DOC_POLICY },
-    SubDef::Policy { name: "help", policy: &CARGO_HELP_SUB_POLICY },
+    SubDef::Policy { name: "audit", policy: &CARGO_AUDIT_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "bench", policy: &CARGO_TEST_POLICY, level: SafetyLevel::SafeRead },
+    SubDef::Policy { name: "build", policy: &CARGO_BUILD_POLICY, level: SafetyLevel::SafeWrite },
+    SubDef::Policy { name: "check", policy: &CARGO_CHECK_POLICY, level: SafetyLevel::SafeRead },
+    SubDef::Policy { name: "clippy", policy: &CARGO_CLIPPY_POLICY, level: SafetyLevel::SafeRead },
+    SubDef::Policy { name: "deny", policy: &CARGO_DENY_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "doc", policy: &CARGO_DOC_POLICY, level: SafetyLevel::SafeWrite },
+    SubDef::Policy { name: "help", policy: &CARGO_HELP_SUB_POLICY, level: SafetyLevel::Inert },
     SubDef::Guarded {
         name: "fmt",
         guard_short: None,
         guard_long: "--check",
-        policy: &CARGO_FMT_POLICY,
-    },
-    SubDef::Policy { name: "info", policy: &CARGO_INFO_POLICY },
-    SubDef::Policy { name: "install", policy: &CARGO_HELP_ONLY_POLICY },
-    SubDef::Policy { name: "license", policy: &CARGO_SIMPLE_POLICY },
-    SubDef::Policy { name: "locate-project", policy: &CARGO_SIMPLE_POLICY },
-    SubDef::Policy { name: "metadata", policy: &CARGO_METADATA_POLICY },
+        policy: &CARGO_FMT_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "info", policy: &CARGO_INFO_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "install", policy: &CARGO_HELP_ONLY_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "license", policy: &CARGO_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "locate-project", policy: &CARGO_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "metadata", policy: &CARGO_METADATA_POLICY, level: SafetyLevel::Inert },
     SubDef::Guarded {
         name: "package",
         guard_short: Some("-l"),
         guard_long: "--list",
-        policy: &CARGO_PACKAGE_POLICY,
-    },
-    SubDef::Policy { name: "pkgid", policy: &CARGO_SIMPLE_POLICY },
+        policy: &CARGO_PACKAGE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "pkgid", policy: &CARGO_SIMPLE_POLICY, level: SafetyLevel::Inert },
     SubDef::Guarded {
         name: "publish",
         guard_short: Some("-n"),
         guard_long: "--dry-run",
-        policy: &CARGO_PUBLISH_POLICY,
-    },
-    SubDef::Policy { name: "read-manifest", policy: &CARGO_SIMPLE_POLICY },
-    SubDef::Policy { name: "run", policy: &CARGO_HELP_ONLY_POLICY },
-    SubDef::Policy { name: "search", policy: &CARGO_SEARCH_POLICY },
-    SubDef::Policy { name: "test", policy: &CARGO_TEST_POLICY },
-    SubDef::Policy { name: "tree", policy: &CARGO_TREE_POLICY },
-    SubDef::Policy { name: "verify-project", policy: &CARGO_SIMPLE_POLICY },
+        policy: &CARGO_PUBLISH_POLICY, level: SafetyLevel::SafeRead },
+    SubDef::Policy { name: "read-manifest", policy: &CARGO_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "run", policy: &CARGO_HELP_ONLY_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "search", policy: &CARGO_SEARCH_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "test", policy: &CARGO_TEST_POLICY, level: SafetyLevel::SafeRead },
+    SubDef::Policy { name: "tree", policy: &CARGO_TREE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "verify-project", policy: &CARGO_SIMPLE_POLICY, level: SafetyLevel::Inert },
 ];
 
 pub(crate) static CARGO: CommandDef = CommandDef {
@@ -303,19 +301,19 @@ pub(crate) static CARGO: CommandDef = CommandDef {
     aliases: &[],
 };
 
-pub(in crate::handlers::rust) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::rust) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "cargo" => {
             if tokens.len() < 2 {
-                return Some(false);
+                return Some(Verdict::Denied);
             }
             let sub = if tokens[1].starts_with('+') { 2 } else { 1 };
             if tokens.len() < sub + 1 {
-                return Some(false);
+                return Some(Verdict::Denied);
             }
             let arg = tokens[sub].as_str();
             if tokens.len() == sub + 1 && matches!(arg, "--help" | "-h" | "--version" | "-V") {
-                return Some(true);
+                return Some(Verdict::Allowed(SafetyLevel::Inert));
             }
             Some(check_cargo_sub(&tokens[sub..]))
         }

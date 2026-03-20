@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -38,37 +39,37 @@ pub(crate) static APKANALYZER: CommandDef = CommandDef {
     name: "apkanalyzer",
     subs: &[
         SubDef::Nested { name: "apk", subs: &[
-            SubDef::Policy { name: "compare", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "download-size", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "features", policy: &FEATURES_POLICY },
-            SubDef::Policy { name: "file-size", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "summary", policy: &POSITIONAL_POLICY },
+            SubDef::Policy { name: "compare", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "download-size", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "features", policy: &FEATURES_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "file-size", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "summary", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
         ]},
         SubDef::Nested { name: "dex", subs: &[
-            SubDef::Policy { name: "code", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "list", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "packages", policy: &DEX_PACKAGES_POLICY },
-            SubDef::Policy { name: "references", policy: &POSITIONAL_POLICY },
+            SubDef::Policy { name: "code", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "list", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "packages", policy: &DEX_PACKAGES_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "references", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
         ]},
         SubDef::Nested { name: "files", subs: &[
-            SubDef::Policy { name: "cat", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "list", policy: &POSITIONAL_POLICY },
+            SubDef::Policy { name: "cat", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "list", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
         ]},
         SubDef::Nested { name: "manifest", subs: &[
-            SubDef::Policy { name: "application-id", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "debuggable", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "min-sdk", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "permissions", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "print", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "target-sdk", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "version-code", policy: &POSITIONAL_POLICY },
-            SubDef::Policy { name: "version-name", policy: &POSITIONAL_POLICY },
+            SubDef::Policy { name: "application-id", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "debuggable", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "min-sdk", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "permissions", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "print", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "target-sdk", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "version-code", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "version-name", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
         ]},
         SubDef::Nested { name: "resources", subs: &[
-            SubDef::Policy { name: "configs", policy: &RESOURCES_POLICY },
-            SubDef::Policy { name: "names", policy: &RESOURCES_POLICY },
-            SubDef::Policy { name: "value", policy: &RESOURCES_POLICY },
-            SubDef::Policy { name: "xml", policy: &POSITIONAL_POLICY },
+            SubDef::Policy { name: "configs", policy: &RESOURCES_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "names", policy: &RESOURCES_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "value", policy: &RESOURCES_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "xml", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
     bare_flags: &[],

@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static LIPO_POLICY: FlagPolicy = FlagPolicy {
@@ -11,19 +12,20 @@ static LIPO_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_lipo(tokens: &[Token]) -> bool {
+pub fn is_safe_lipo(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     static LIPO_SAFE: WordSet =
         WordSet::new(&["-archs", "-detailed_info", "-info", "-verify_arch"]);
     if !tokens[1..].iter().any(|t| LIPO_SAFE.contains(t)) {
-        return false;
+        return Verdict::Denied;
     }
-    policy::check(tokens, &LIPO_POLICY)
+        if policy::check(tokens, &LIPO_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     if cmd == "lipo" {
         Some(is_safe_lipo(tokens))
     } else {

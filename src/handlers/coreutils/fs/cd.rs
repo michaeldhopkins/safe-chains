@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -11,7 +12,7 @@ static CD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cd", policy: &CD_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/cd.1p.html", aliases: &[] },
+    FlatDef { name: "cd", policy: &CD_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/cd.1p.html", aliases: &[] },
 ];
 
 #[cfg(test)]

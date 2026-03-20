@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -108,10 +109,10 @@ use crate::command::CheckFn;
 use crate::policy;
 
 static CONFIG_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "get", policy: &BUNDLE_CONFIG_GET_POLICY },
-    SubDef::Policy { name: "list", policy: &BUNDLE_CONFIG_GET_POLICY },
-    SubDef::Policy { name: "set", policy: &HELP_ONLY },
-    SubDef::Policy { name: "unset", policy: &HELP_ONLY },
+    SubDef::Policy { name: "get", policy: &BUNDLE_CONFIG_GET_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "list", policy: &BUNDLE_CONFIG_GET_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "set", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "unset", policy: &HELP_ONLY, level: SafetyLevel::Inert },
 ];
 
 static HELP_ONLY: FlagPolicy = FlagPolicy {
@@ -122,26 +123,29 @@ static HELP_ONLY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_bundle_config(tokens: &[Token]) -> bool {
+fn check_bundle_config(tokens: &[Token]) -> Verdict {
     if tokens.len() == 1 {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     let sub = tokens[1].as_str();
     if tokens.len() == 2 && (sub == "--help" || sub == "-h") {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
-    if CONFIG_SUBS.iter().any(|s| s.name() == sub && s.check(&tokens[1..])) {
-        return true;
+    if let Some(s) = CONFIG_SUBS.iter().find(|s| s.name() == sub) {
+        let v = s.check(&tokens[1..]);
+        if v.is_allowed() {
+            return v;
+        }
     }
-    policy::check(tokens, &BUNDLE_CONFIG_POLICY)
+    if policy::check(tokens, &BUNDLE_CONFIG_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
-fn check_bundle_exec(tokens: &[Token]) -> bool {
+fn check_bundle_exec(tokens: &[Token]) -> Verdict {
     let Some(cmd) = tokens.get(1) else {
-        return false;
+        return Verdict::Denied;
     };
     if BUNDLE_EXEC_SAFE.contains(cmd) {
-        return true;
+        return Verdict::Allowed(SafetyLevel::SafeRead);
     }
     if cmd == "rails" {
         return check_rails_sub(&tokens[1..]);
@@ -149,29 +153,29 @@ fn check_bundle_exec(tokens: &[Token]) -> bool {
     if cmd == "gem" {
         return super::GEM.check(&tokens[1..]);
     }
-    false
+    Verdict::Denied
 }
 
-fn check_rails_sub(tokens: &[Token]) -> bool {
+fn check_rails_sub(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     let sub = &tokens[1];
     if tokens.len() == 2 && matches!(sub.as_str(), "--help" | "-h") {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     match sub.as_str() {
-        "routes" => policy::check(&tokens[1..], &RAILS_ROUTES_POLICY),
-        "test" | "test:system" => policy::check(&tokens[1..], &RAILS_TEST_POLICY),
-        "notes" => policy::check(&tokens[1..], &RAILS_NOTES_POLICY),
-        _ => RAILS_BARE_SUBS.contains(sub) && tokens.len() == 2,
+        "routes" => if policy::check(&tokens[1..], &RAILS_ROUTES_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied },
+        "test" | "test:system" => if policy::check(&tokens[1..], &RAILS_TEST_POLICY) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied },
+        "notes" => if policy::check(&tokens[1..], &RAILS_NOTES_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied },
+        _ => if RAILS_BARE_SUBS.contains(sub) && tokens.len() == 2 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied },
     }
 }
 
 pub(crate) static BUNDLE: CommandDef = CommandDef {
     name: "bundle",
     subs: &[
-        SubDef::Policy { name: "check", policy: &BUNDLE_CHECK_POLICY },
+        SubDef::Policy { name: "check", policy: &BUNDLE_CHECK_POLICY, level: SafetyLevel::Inert },
         SubDef::Custom {
             name: "config",
             check: check_bundle_config as CheckFn,
@@ -184,9 +188,9 @@ pub(crate) static BUNDLE: CommandDef = CommandDef {
             doc: "exec allowed for: brakeman, cucumber, erb_lint, gem (read-only subcommands), herb, rails (about, assets:reveal, assets:reveal:full, db:migrate:status, db:version, initializers, middleware, notes, routes, secret, stats, test, test:system, time:zones:all, time:zones:local, version), rspec, standardrb.",
             test_suffix: None,
         },
-        SubDef::Policy { name: "info", policy: &BUNDLE_INFO_POLICY },
-        SubDef::Policy { name: "list", policy: &BUNDLE_LIST_POLICY },
-        SubDef::Policy { name: "show", policy: &BUNDLE_SHOW_POLICY },
+        SubDef::Policy { name: "info", policy: &BUNDLE_INFO_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &BUNDLE_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "show", policy: &BUNDLE_SHOW_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

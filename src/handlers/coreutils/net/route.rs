@@ -1,9 +1,10 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static ROUTE_SAFE_FLAGS: WordSet = WordSet::new(&["-4", "-6", "-n", "-v"]);
 static ROUTE_SAFE_SUBCMDS: WordSet = WordSet::new(&["get", "monitor", "print", "show"]);
 
-fn is_safe_route(tokens: &[Token]) -> bool {
+fn is_safe_route(tokens: &[Token]) -> Verdict {
     let mut i = 1;
     while i < tokens.len() {
         let t = &tokens[i];
@@ -12,14 +13,15 @@ fn is_safe_route(tokens: &[Token]) -> bool {
             continue;
         }
         if ROUTE_SAFE_SUBCMDS.contains(t) {
-            return true;
+            return Verdict::Allowed(SafetyLevel::Inert);
         }
-        return false;
+        return Verdict::Denied;
     }
-    true
+    Verdict::Allowed(SafetyLevel::Inert)
+
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "route" => Some(is_safe_route(tokens)),
         _ => None,

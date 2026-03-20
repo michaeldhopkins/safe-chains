@@ -12,6 +12,7 @@ mod text;
 mod tools;
 
 use crate::parse::{Token, WordSet};
+use crate::verdict::Verdict;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 pub(super) static BARE_ONLY: FlagPolicy = FlagPolicy {
@@ -22,7 +23,7 @@ pub(super) static BARE_ONLY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     None
         .or_else(|| text::dispatch(cmd, tokens))
         .or_else(|| search::dispatch(cmd, tokens))

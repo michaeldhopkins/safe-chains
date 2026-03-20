@@ -28,9 +28,10 @@ mod w;
 mod who;
 
 use crate::command::FlatDef;
+use crate::verdict::Verdict;
 use crate::parse::Token;
 
-pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     for flat in all_flat_defs() {
         if let r @ Some(_) = flat.dispatch(cmd, tokens) {
             return r;

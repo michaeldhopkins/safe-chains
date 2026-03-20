@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -48,19 +49,19 @@ static GEM_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static GEM: CommandDef = CommandDef {
     name: "gem",
     subs: &[
-        SubDef::Policy { name: "contents", policy: &GEM_SIMPLE_POLICY },
-        SubDef::Policy { name: "dependency", policy: &GEM_SIMPLE_POLICY },
-        SubDef::Policy { name: "environment", policy: &GEM_SIMPLE_POLICY },
-        SubDef::Policy { name: "help", policy: &GEM_SIMPLE_POLICY },
-        SubDef::Policy { name: "info", policy: &GEM_INFO_POLICY },
-        SubDef::Policy { name: "list", policy: &GEM_LIST_POLICY },
-        SubDef::Policy { name: "outdated", policy: &GEM_SIMPLE_POLICY },
-        SubDef::Policy { name: "pristine", policy: &GEM_SIMPLE_POLICY },
-        SubDef::Policy { name: "search", policy: &GEM_SEARCH_POLICY },
-        SubDef::Policy { name: "sources", policy: &GEM_SIMPLE_POLICY },
-        SubDef::Policy { name: "specification", policy: &GEM_SIMPLE_POLICY },
-        SubDef::Policy { name: "stale", policy: &GEM_SIMPLE_POLICY },
-        SubDef::Policy { name: "which", policy: &GEM_SIMPLE_POLICY },
+        SubDef::Policy { name: "contents", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "dependency", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "environment", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "help", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "info", policy: &GEM_INFO_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &GEM_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "outdated", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "pristine", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "search", policy: &GEM_SEARCH_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "sources", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "specification", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "stale", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "which", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

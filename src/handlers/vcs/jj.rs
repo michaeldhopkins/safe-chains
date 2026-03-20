@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static JJ_GLOBAL_STANDALONE: WordSet = WordSet::new(&[
     "--debug", "--ignore-immutable", "--ignore-working-copy",
@@ -25,22 +26,22 @@ static JJ_MULTI: &[(&str, WordSet)] = &[
 static JJ_TRIPLE: &[(&str, &str, WordSet)] =
     &[("git", "remote", WordSet::new(&["list"]))];
 
-pub fn is_safe_jj(tokens: &[Token]) -> bool {
+pub fn is_safe_jj(tokens: &[Token]) -> Verdict {
     if tokens.last().is_some_and(|t| *t == "-h" || *t == "--help")
         && !tokens.iter().any(|t| *t == "--")
     {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     let mut args = &tokens[1..];
     loop {
         if args.is_empty() {
-            return false;
+            return Verdict::Denied;
         }
         if JJ_GLOBAL_STANDALONE.contains(&args[0]) {
             args = &args[1..];
         } else if JJ_GLOBAL_VALUED.contains(&args[0]) {
             if args.len() < 2 {
-                return false;
+                return Verdict::Denied;
             }
             args = &args[2..];
         } else if let Some(prefix) = args[0].split_value("=") {
@@ -55,25 +56,26 @@ pub fn is_safe_jj(tokens: &[Token]) -> bool {
         }
     }
     if args.is_empty() {
-        return false;
+        return Verdict::Denied;
     }
     if JJ_READ_ONLY.contains(&args[0]) {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     for (prefix, actions) in JJ_MULTI.iter() {
         if args[0] == *prefix && args.get(1).is_some_and(|a| actions.contains(a)) {
-            return true;
+            return Verdict::Allowed(SafetyLevel::Inert);
         }
     }
     for (first, second, actions) in JJ_TRIPLE.iter() {
         if args[0] == *first && args.get(1).is_some_and(|t| t == *second) {
-            return args.get(2).is_some_and(|a| actions.contains(a));
+            return if args.get(2).is_some_and(|a| actions.contains(a)) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
         }
     }
-    false
+    Verdict::Denied
+
 }
 
-pub(in crate::handlers::vcs) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::vcs) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "jj" => Some(is_safe_jj(tokens)),
         _ => None,

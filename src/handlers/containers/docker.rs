@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -118,72 +119,73 @@ static DOCKER_COMPOSE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_docker_version_flag(tokens: &[Token]) -> bool {
-    tokens.len() == 1
+fn check_docker_version_flag(tokens: &[Token]) -> Verdict {
+    if tokens.len() == 1 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
 static DOCKER_SUBS: &[SubDef] = &[
     SubDef::Nested { name: "buildx", subs: &[
         SubDef::Custom { name: "--version", check: check_docker_version_flag, doc: "", test_suffix: None },
-        SubDef::Policy { name: "inspect", policy: &DOCKER_SIMPLE_POLICY },
-        SubDef::Policy { name: "ls", policy: &DOCKER_SIMPLE_POLICY },
-        SubDef::Policy { name: "version", policy: &DOCKER_SIMPLE_POLICY },
+        SubDef::Policy { name: "inspect", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ]},
     SubDef::Nested { name: "compose", subs: &[
         SubDef::Custom { name: "--version", check: check_docker_version_flag, doc: "", test_suffix: None },
-        SubDef::Policy { name: "config", policy: &DOCKER_COMPOSE_CONFIG_POLICY },
-        SubDef::Policy { name: "images", policy: &DOCKER_SIMPLE_POLICY },
-        SubDef::Policy { name: "ls", policy: &DOCKER_SIMPLE_POLICY },
-        SubDef::Policy { name: "ps", policy: &DOCKER_COMPOSE_PS_POLICY },
-        SubDef::Policy { name: "top", policy: &DOCKER_SIMPLE_POLICY },
-        SubDef::Policy { name: "version", policy: &DOCKER_SIMPLE_POLICY },
+        SubDef::Policy { name: "config", policy: &DOCKER_COMPOSE_CONFIG_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "images", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ps", policy: &DOCKER_COMPOSE_PS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "top", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ]},
     SubDef::Nested { name: "container", subs: &[
-        SubDef::Policy { name: "diff", policy: &DOCKER_SIMPLE_POLICY },
-        SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY },
-        SubDef::Policy { name: "list", policy: &DOCKER_PS_POLICY },
-        SubDef::Policy { name: "logs", policy: &DOCKER_LOGS_POLICY },
-        SubDef::Policy { name: "ls", policy: &DOCKER_PS_POLICY },
-        SubDef::Policy { name: "port", policy: &DOCKER_SIMPLE_POLICY },
-        SubDef::Policy { name: "stats", policy: &DOCKER_STATS_POLICY },
-        SubDef::Policy { name: "top", policy: &DOCKER_SIMPLE_POLICY },
+        SubDef::Policy { name: "diff", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &DOCKER_PS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "logs", policy: &DOCKER_LOGS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls", policy: &DOCKER_PS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "port", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "stats", policy: &DOCKER_STATS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "top", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ]},
     SubDef::Nested { name: "context", subs: &[
-        SubDef::Policy { name: "inspect", policy: &DOCKER_LS_POLICY },
-        SubDef::Policy { name: "ls", policy: &DOCKER_LS_POLICY },
-        SubDef::Policy { name: "show", policy: &DOCKER_LS_POLICY },
+        SubDef::Policy { name: "inspect", policy: &DOCKER_LS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls", policy: &DOCKER_LS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "show", policy: &DOCKER_LS_POLICY, level: SafetyLevel::Inert },
     ]},
-    SubDef::Policy { name: "diff", policy: &DOCKER_SIMPLE_POLICY },
-    SubDef::Policy { name: "history", policy: &DOCKER_HISTORY_POLICY },
+    SubDef::Policy { name: "diff", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "history", policy: &DOCKER_HISTORY_POLICY, level: SafetyLevel::Inert },
     SubDef::Nested { name: "image", subs: &[
-        SubDef::Policy { name: "history", policy: &DOCKER_HISTORY_POLICY },
-        SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY },
-        SubDef::Policy { name: "list", policy: &DOCKER_IMAGES_POLICY },
-        SubDef::Policy { name: "ls", policy: &DOCKER_IMAGES_POLICY },
+        SubDef::Policy { name: "history", policy: &DOCKER_HISTORY_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &DOCKER_IMAGES_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls", policy: &DOCKER_IMAGES_POLICY, level: SafetyLevel::Inert },
     ]},
-    SubDef::Policy { name: "images", policy: &DOCKER_IMAGES_POLICY },
-    SubDef::Policy { name: "info", policy: &DOCKER_INFO_POLICY },
-    SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY },
-    SubDef::Policy { name: "logs", policy: &DOCKER_LOGS_POLICY },
+    SubDef::Policy { name: "images", policy: &DOCKER_IMAGES_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "info", policy: &DOCKER_INFO_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "logs", policy: &DOCKER_LOGS_POLICY, level: SafetyLevel::Inert },
     SubDef::Nested { name: "manifest", subs: &[
-        SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY },
+        SubDef::Policy { name: "inspect", policy: &DOCKER_INSPECT_POLICY, level: SafetyLevel::Inert },
     ]},
     SubDef::Nested { name: "network", subs: &[
-        SubDef::Policy { name: "inspect", policy: &DOCKER_LS_POLICY },
-        SubDef::Policy { name: "ls", policy: &DOCKER_LS_POLICY },
+        SubDef::Policy { name: "inspect", policy: &DOCKER_LS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls", policy: &DOCKER_LS_POLICY, level: SafetyLevel::Inert },
     ]},
-    SubDef::Policy { name: "port", policy: &DOCKER_SIMPLE_POLICY },
-    SubDef::Policy { name: "ps", policy: &DOCKER_PS_POLICY },
-    SubDef::Policy { name: "stats", policy: &DOCKER_STATS_POLICY },
+    SubDef::Policy { name: "port", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "ps", policy: &DOCKER_PS_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "stats", policy: &DOCKER_STATS_POLICY, level: SafetyLevel::Inert },
     SubDef::Nested { name: "system", subs: &[
-        SubDef::Policy { name: "df", policy: &DOCKER_INFO_POLICY },
-        SubDef::Policy { name: "info", policy: &DOCKER_INFO_POLICY },
+        SubDef::Policy { name: "df", policy: &DOCKER_INFO_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "info", policy: &DOCKER_INFO_POLICY, level: SafetyLevel::Inert },
     ]},
-    SubDef::Policy { name: "top", policy: &DOCKER_SIMPLE_POLICY },
-    SubDef::Policy { name: "version", policy: &DOCKER_VERSION_POLICY },
+    SubDef::Policy { name: "top", policy: &DOCKER_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "version", policy: &DOCKER_VERSION_POLICY, level: SafetyLevel::Inert },
     SubDef::Nested { name: "volume", subs: &[
-        SubDef::Policy { name: "inspect", policy: &DOCKER_LS_POLICY },
-        SubDef::Policy { name: "ls", policy: &DOCKER_LS_POLICY },
+        SubDef::Policy { name: "inspect", policy: &DOCKER_LS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls", policy: &DOCKER_LS_POLICY, level: SafetyLevel::Inert },
     ]},
 ];
 

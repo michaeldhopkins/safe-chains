@@ -1,6 +1,7 @@
 use crate::parse::Token;
+use crate::verdict::{SafetyLevel, Verdict};
 
-fn is_safe_nslookup(tokens: &[Token]) -> bool {
+fn is_safe_nslookup(tokens: &[Token]) -> Verdict {
     for t in &tokens[1..] {
         let s = t.as_str();
         if !s.starts_with('-') {
@@ -20,12 +21,13 @@ fn is_safe_nslookup(tokens: &[Token]) -> bool {
         {
             continue;
         }
-        return false;
+        return Verdict::Denied;
     }
-    true
+    Verdict::Allowed(SafetyLevel::Inert)
+
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "nslookup" => Some(is_safe_nslookup(tokens)),
         _ => None,

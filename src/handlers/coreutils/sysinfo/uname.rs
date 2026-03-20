@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -16,7 +17,7 @@ static UNAME_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "uname", policy: &UNAME_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#uname-invocation", aliases: &[] },
+    FlatDef { name: "uname", policy: &UNAME_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#uname-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

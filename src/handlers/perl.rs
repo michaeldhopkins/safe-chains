@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 
 static SAFE_PERL_WORDS: WordSet = WordSet::new(&[
@@ -312,9 +313,9 @@ pub fn is_safe_perl(tokens: &[Token]) -> bool {
     has_code
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "perl" => Some(is_safe_perl(tokens)),
+        "perl" => Some(if is_safe_perl(tokens) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }),
         _ => None,
     }
 }

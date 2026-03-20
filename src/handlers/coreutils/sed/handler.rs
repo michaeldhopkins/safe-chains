@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
@@ -88,9 +89,9 @@ fn is_safe_sed(tokens: &[Token]) -> bool {
     !sed_has_exec_modifier(tokens) && policy::check(tokens, &SED_POLICY)
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "sed" => Some(is_safe_sed(tokens)),
+        "sed" => Some(if is_safe_sed(tokens) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }),
         _ => None,
     }
 }

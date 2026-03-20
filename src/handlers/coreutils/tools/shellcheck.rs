@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -20,7 +21,7 @@ static SHELLCHECK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "shellcheck", policy: &SHELLCHECK_POLICY, help_eligible: false, url: "https://www.shellcheck.net/wiki/", aliases: &[] },
+    FlatDef { name: "shellcheck", policy: &SHELLCHECK_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.shellcheck.net/wiki/", aliases: &[] },
 ];
 
 #[cfg(test)]

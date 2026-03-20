@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -33,11 +34,11 @@ static POETRY_ENV_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static POETRY: CommandDef = CommandDef {
     name: "poetry",
     subs: &[
-        SubDef::Policy { name: "show", policy: &POETRY_SHOW_POLICY },
-        SubDef::Policy { name: "check", policy: &POETRY_CHECK_POLICY },
+        SubDef::Policy { name: "show", policy: &POETRY_SHOW_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "check", policy: &POETRY_CHECK_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "env", subs: &[
-            SubDef::Policy { name: "info", policy: &POETRY_ENV_POLICY },
-            SubDef::Policy { name: "list", policy: &POETRY_ENV_POLICY },
+            SubDef::Policy { name: "info", policy: &POETRY_ENV_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "list", policy: &POETRY_ENV_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
     bare_flags: &[],

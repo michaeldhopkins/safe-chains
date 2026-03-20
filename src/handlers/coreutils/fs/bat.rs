@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -21,7 +22,7 @@ static BAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "bat", policy: &BAT_POLICY, help_eligible: false, url: "https://github.com/sharkdp/bat#readme", aliases: &[] },
+    FlatDef { name: "bat", policy: &BAT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://github.com/sharkdp/bat#readme", aliases: &[] },
 ];
 
 #[cfg(test)]

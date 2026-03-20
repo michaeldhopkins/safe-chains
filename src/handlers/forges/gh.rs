@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet, has_flag};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -270,35 +271,35 @@ fn gh_release_action_policy(action: &str) -> &'static FlagPolicy {
     }
 }
 
-pub fn is_safe_gh(tokens: &[Token]) -> bool {
+pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     let subcmd = &tokens[1];
 
     if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
 
     if subcmd == "search" {
-        return tokens.len() >= 3 && policy::check(&tokens[2..], &GH_SEARCH_POLICY);
+        return if tokens.len() >= 3 && policy::check(&tokens[2..], &GH_SEARCH_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if subcmd == "status" {
-        return policy::check(&tokens[1..], &GH_SIMPLE_LIST_POLICY);
+        return if policy::check(&tokens[1..], &GH_SIMPLE_LIST_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if subcmd == "release" && tokens.len() >= 3 && tokens[2] == "download" {
-        return has_flag(&tokens[2..], Some("-O"), Some("--output"))
-            && policy::check(&tokens[2..], &GH_RELEASE_DOWNLOAD_POLICY);
+        return if has_flag(&tokens[2..], Some("-O"), Some("--output"))
+            && policy::check(&tokens[2..], &GH_RELEASE_DOWNLOAD_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if READ_ONLY_SUBCOMMANDS.contains(subcmd) {
         if tokens.len() < 3 || !READ_ONLY_ACTIONS.contains(&tokens[2]) {
-            return false;
+            return Verdict::Denied;
         }
         let action = tokens[2].as_str();
         let policy = if subcmd == "run" {
@@ -308,49 +309,52 @@ pub fn is_safe_gh(tokens: &[Token]) -> bool {
         } else {
             gh_action_policy(action)
         };
-        return policy::check(&tokens[2..], policy);
+        return if policy::check(&tokens[2..], policy) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if subcmd == "auth" {
         if tokens.len() < 3 {
-            return false;
+            return Verdict::Denied;
         }
         if tokens[2] == "status" {
-            return policy::check(&tokens[2..], &GH_SIMPLE_LIST_POLICY);
+            return if policy::check(&tokens[2..], &GH_SIMPLE_LIST_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
         }
-        return false;
+        return Verdict::Denied;
     }
 
     if subcmd == "browse" {
-        return has_flag(&tokens[1..], Some("-n"), Some("--no-browser"))
-            && policy::check(&tokens[1..], &GH_BROWSE_POLICY);
+        return if has_flag(&tokens[1..], Some("-n"), Some("--no-browser"))
+            && policy::check(&tokens[1..], &GH_BROWSE_POLICY)
+        { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if subcmd == "api" {
         return is_safe_gh_api(tokens);
     }
 
-    false
+    Verdict::Denied
+
 }
 
-pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> bool {
+pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> Verdict {
     let mut i = 2;
     while i < tokens.len() {
         let token = &tokens[i];
 
         if token == "-X" || token == "--method" {
-            return tokens
+            return if tokens
                 .get(i + 1)
-                .is_some_and(|m| m.eq_ignore_ascii_case("GET"));
+                .is_some_and(|m| m.eq_ignore_ascii_case("GET")) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
         }
         if token.starts_with("-X") && token.len() > 2 && !token.starts_with("-X=") {
-            return token
+            return if token
                 .get(2..)
-                .is_some_and(|s| s.eq_ignore_ascii_case("GET"));
+                .is_some_and(|s| s.eq_ignore_ascii_case("GET"))
+            { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
         }
         if token.starts_with("-X=") || token.starts_with("--method=") {
             let val = token.split_value("=").unwrap_or("");
-            return val.eq_ignore_ascii_case("GET");
+            return if val.eq_ignore_ascii_case("GET") { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
         }
 
         if token == "-H" || token == "--header" {
@@ -359,7 +363,7 @@ pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> bool {
                     i += 2;
                     continue;
                 }
-                _ => return false,
+                _ => return Verdict::Denied,
             }
         }
         if let Some(rest) = token.as_str().strip_prefix("-H=").or_else(|| token.as_str().strip_prefix("--header=")) {
@@ -367,7 +371,7 @@ pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> bool {
                 i += 1;
                 continue;
             }
-            return false;
+            return Verdict::Denied;
         }
 
         if token.starts_with('-') {
@@ -386,15 +390,15 @@ pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> bool {
                     continue;
                 }
             }
-            return false;
+            return Verdict::Denied;
         }
 
         i += 1;
     }
-    true
+    Verdict::Allowed(SafetyLevel::Inert)
 }
 
-pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "gh" => Some(is_safe_gh(tokens)),
         _ => None,

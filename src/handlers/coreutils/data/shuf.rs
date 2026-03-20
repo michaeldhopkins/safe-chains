@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -17,7 +18,7 @@ static SHUF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "shuf", policy: &SHUF_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#shuf-invocation", aliases: &[] },
+    FlatDef { name: "shuf", policy: &SHUF_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#shuf-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

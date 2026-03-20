@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::command::{CheckFn, CommandDef, SubDef};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
@@ -48,22 +49,23 @@ static BUN_PM_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_bun_x(tokens: &[Token]) -> bool {
-    super::find_runner_package_index(tokens, 1, &super::BUNX_FLAGS_NO_ARG)
+fn check_bun_x(tokens: &[Token]) -> Verdict {
+    if super::find_runner_package_index(tokens, 1, &super::BUNX_FLAGS_NO_ARG)
         .is_some_and(|idx| super::is_safe_runner_package(tokens, idx))
+    { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }
 }
 
 pub(crate) static BUN: CommandDef = CommandDef {
     name: "bun",
     subs: &[
-        SubDef::Policy { name: "build", policy: &BUN_BUILD_POLICY },
-        SubDef::Policy { name: "test", policy: &BUN_TEST_POLICY },
-        SubDef::Policy { name: "outdated", policy: &BUN_OUTDATED_POLICY },
+        SubDef::Policy { name: "build", policy: &BUN_BUILD_POLICY, level: SafetyLevel::SafeWrite },
+        SubDef::Policy { name: "test", policy: &BUN_TEST_POLICY, level: SafetyLevel::SafeRead },
+        SubDef::Policy { name: "outdated", policy: &BUN_OUTDATED_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "pm", subs: &[
-            SubDef::Policy { name: "bin", policy: &BUN_PM_POLICY },
-            SubDef::Policy { name: "cache", policy: &BUN_PM_POLICY },
-            SubDef::Policy { name: "hash", policy: &BUN_PM_POLICY },
-            SubDef::Policy { name: "ls", policy: &BUN_PM_POLICY },
+            SubDef::Policy { name: "bin", policy: &BUN_PM_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "cache", policy: &BUN_PM_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "hash", policy: &BUN_PM_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "ls", policy: &BUN_PM_POLICY, level: SafetyLevel::Inert },
         ]},
         SubDef::Custom { name: "x", check: check_bun_x as CheckFn, doc: "x delegates to bunx logic.", test_suffix: None },
     ],

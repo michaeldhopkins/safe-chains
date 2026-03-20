@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -32,12 +33,12 @@ static DENO_FMT_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static DENO: CommandDef = CommandDef {
     name: "deno",
     subs: &[
-        SubDef::Policy { name: "check", policy: &DENO_SAFE_POLICY },
-        SubDef::Policy { name: "doc", policy: &DENO_SAFE_POLICY },
-        SubDef::Policy { name: "info", policy: &DENO_SAFE_POLICY },
-        SubDef::Policy { name: "lint", policy: &DENO_SAFE_POLICY },
-        SubDef::Policy { name: "test", policy: &DENO_SAFE_POLICY },
-        SubDef::Guarded { name: "fmt", guard_short: None, guard_long: "--check", policy: &DENO_FMT_POLICY },
+        SubDef::Policy { name: "check", policy: &DENO_SAFE_POLICY, level: SafetyLevel::SafeRead },
+        SubDef::Policy { name: "doc", policy: &DENO_SAFE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "info", policy: &DENO_SAFE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "lint", policy: &DENO_SAFE_POLICY, level: SafetyLevel::SafeRead },
+        SubDef::Policy { name: "test", policy: &DENO_SAFE_POLICY, level: SafetyLevel::SafeRead },
+        SubDef::Guarded { name: "fmt", guard_short: None, guard_long: "--check", policy: &DENO_FMT_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

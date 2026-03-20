@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -21,7 +22,7 @@ static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static MAGICK: CommandDef = CommandDef {
     name: "magick",
     subs: &[
-        SubDef::Policy { name: "identify", policy: &IDENTIFY_POLICY },
+        SubDef::Policy { name: "identify", policy: &IDENTIFY_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,
@@ -29,7 +30,7 @@ pub(crate) static MAGICK: CommandDef = CommandDef {
     aliases: &[],
 };
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     if cmd == MAGICK.name {
         Some(MAGICK.check(tokens))
     } else {

@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -14,7 +15,7 @@ static AIDER_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::ai) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "aider", policy: &AIDER_POLICY, help_eligible: true, url: "https://aider.chat/docs/", aliases: &[] },
+    FlatDef { name: "aider", policy: &AIDER_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://aider.chat/docs/", aliases: &[] },
 ];
 
 #[cfg(test)]

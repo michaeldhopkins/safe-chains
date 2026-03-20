@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -14,9 +15,9 @@ pub(crate) static AVDMANAGER: CommandDef = CommandDef {
     name: "avdmanager",
     subs: &[
         SubDef::Nested { name: "list", subs: &[
-            SubDef::Policy { name: "avd", policy: &LIST_POLICY },
-            SubDef::Policy { name: "device", policy: &LIST_POLICY },
-            SubDef::Policy { name: "target", policy: &LIST_POLICY },
+            SubDef::Policy { name: "avd", policy: &LIST_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "device", policy: &LIST_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "target", policy: &LIST_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
     bare_flags: &[],

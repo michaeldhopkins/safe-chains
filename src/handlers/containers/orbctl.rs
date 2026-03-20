@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -45,27 +46,29 @@ static ORBCTL_UPDATE_CHECK_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_doctor(tokens: &[Token]) -> bool {
-    tokens.iter().all(|t| t != "--fix" && t != "-f")
+fn check_doctor(tokens: &[Token]) -> Verdict {
+    if tokens.iter().all(|t| t != "--fix" && t != "-f") { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-fn check_default_bare(tokens: &[Token]) -> bool {
-    tokens.len() == 1
+fn check_default_bare(tokens: &[Token]) -> Verdict {
+    if tokens.len() == 1 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
 static ORBCTL_SUBS: &[SubDef] = &[
     SubDef::Nested { name: "config", subs: &[
-        SubDef::Policy { name: "get", policy: &ORBCTL_SIMPLE_POLICY },
-        SubDef::Policy { name: "show", policy: &ORBCTL_SIMPLE_POLICY },
+        SubDef::Policy { name: "get", policy: &ORBCTL_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "show", policy: &ORBCTL_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ]},
     SubDef::Custom { name: "default", check: check_default_bare, doc: "bare invocation only (reads current default)", test_suffix: None },
     SubDef::Custom { name: "doctor", check: check_doctor, doc: "read-only check (rejects --fix)", test_suffix: None },
-    SubDef::Policy { name: "info", policy: &ORBCTL_INFO_POLICY },
-    SubDef::Policy { name: "list", policy: &ORBCTL_LIST_POLICY },
-    SubDef::Policy { name: "logs", policy: &ORBCTL_LOGS_POLICY },
-    SubDef::Policy { name: "status", policy: &ORBCTL_SIMPLE_POLICY },
-    SubDef::Guarded { name: "update", guard_short: None, guard_long: "--check", policy: &ORBCTL_UPDATE_CHECK_POLICY },
-    SubDef::Policy { name: "version", policy: &ORBCTL_SIMPLE_POLICY },
+    SubDef::Policy { name: "info", policy: &ORBCTL_INFO_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "list", policy: &ORBCTL_LIST_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "logs", policy: &ORBCTL_LOGS_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "status", policy: &ORBCTL_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Guarded { name: "update", guard_short: None, guard_long: "--check", policy: &ORBCTL_UPDATE_CHECK_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "version", policy: &ORBCTL_SIMPLE_POLICY, level: SafetyLevel::Inert },
 ];
 
 pub(crate) static ORBCTL: CommandDef = CommandDef {

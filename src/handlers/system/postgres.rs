@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -25,8 +26,8 @@ static PG_ISREADY_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::system) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "psql", policy: &PSQL_POLICY, help_eligible: true, url: "https://www.postgresql.org/docs/current/app-psql.html", aliases: &[] },
-    FlatDef { name: "pg_isready", policy: &PG_ISREADY_POLICY, help_eligible: false, url: "https://www.postgresql.org/docs/current/app-pg-isready.html", aliases: &[] },
+    FlatDef { name: "psql", policy: &PSQL_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://www.postgresql.org/docs/current/app-psql.html", aliases: &[] },
+    FlatDef { name: "pg_isready", policy: &PG_ISREADY_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.postgresql.org/docs/current/app-pg-isready.html", aliases: &[] },
 ];
 
 #[cfg(test)]

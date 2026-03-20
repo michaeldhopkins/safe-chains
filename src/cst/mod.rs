@@ -95,7 +95,7 @@ pub enum Redir {
     },
 }
 
-pub use check::{is_safe_command, is_safe_pipeline};
+pub use check::{command_verdict, is_safe_command, is_safe_pipeline};
 pub use parse::parse;
 
 impl Word {

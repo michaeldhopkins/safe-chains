@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -25,8 +26,8 @@ static RI_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::ruby) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ruby", policy: &RUBY_POLICY, help_eligible: true, url: "https://www.ruby-lang.org/en/documentation/", aliases: &[] },
-    FlatDef { name: "ri", policy: &RI_POLICY, help_eligible: false, url: "https://ruby.github.io/rdoc/RI_md.html", aliases: &[] },
+    FlatDef { name: "ruby", policy: &RUBY_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://www.ruby-lang.org/en/documentation/", aliases: &[] },
+    FlatDef { name: "ri", policy: &RI_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://ruby.github.io/rdoc/RI_md.html", aliases: &[] },
 ];
 
 #[cfg(test)]

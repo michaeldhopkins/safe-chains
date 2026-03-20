@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -21,8 +22,8 @@ static KEYTOOL_PRINTCERT_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static KEYTOOL: CommandDef = CommandDef {
     name: "keytool",
     subs: &[
-        SubDef::Policy { name: "-list", policy: &KEYTOOL_LIST_POLICY },
-        SubDef::Policy { name: "-printcert", policy: &KEYTOOL_PRINTCERT_POLICY },
+        SubDef::Policy { name: "-list", policy: &KEYTOOL_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "-printcert", policy: &KEYTOOL_PRINTCERT_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

@@ -2,11 +2,12 @@ mod composer;
 mod craft;
 
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
 pub(crate) use composer::COMPOSER;
 pub(crate) use craft::CRAFT;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     COMPOSER.dispatch(cmd, tokens)
         .or_else(|| CRAFT.dispatch(cmd, tokens))
 }

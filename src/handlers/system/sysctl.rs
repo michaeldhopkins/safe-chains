@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static SYSCTL_POLICY: FlagPolicy = FlagPolicy {
@@ -12,17 +13,18 @@ static SYSCTL_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn is_safe_sysctl(tokens: &[Token]) -> bool {
+fn is_safe_sysctl(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     if tokens[1..].iter().any(|t| t.contains("=")) {
-        return false;
+        return Verdict::Denied;
     }
-    policy::check(tokens, &SYSCTL_POLICY)
+        if policy::check(tokens, &SYSCTL_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "sysctl" => Some(is_safe_sysctl(tokens)),
         _ => None,

@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -48,17 +49,17 @@ static COMPOSER_BARE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static COMPOSER: CommandDef = CommandDef {
     name: "composer",
     subs: &[
-        SubDef::Policy { name: "about", policy: &COMPOSER_BARE_POLICY },
-        SubDef::Policy { name: "audit", policy: &COMPOSER_AUDIT_POLICY },
-        SubDef::Policy { name: "check-platform-reqs", policy: &COMPOSER_BARE_POLICY },
-        SubDef::Policy { name: "diagnose", policy: &COMPOSER_BARE_POLICY },
-        SubDef::Policy { name: "fund", policy: &COMPOSER_BARE_POLICY },
-        SubDef::Policy { name: "help", policy: &COMPOSER_BARE_POLICY },
-        SubDef::Policy { name: "info", policy: &COMPOSER_SHOW_POLICY },
-        SubDef::Policy { name: "licenses", policy: &COMPOSER_BARE_POLICY },
-        SubDef::Policy { name: "outdated", policy: &COMPOSER_OUTDATED_POLICY },
-        SubDef::Policy { name: "show", policy: &COMPOSER_SHOW_POLICY },
-        SubDef::Policy { name: "suggests", policy: &COMPOSER_BARE_POLICY },
+        SubDef::Policy { name: "about", policy: &COMPOSER_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "audit", policy: &COMPOSER_AUDIT_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "check-platform-reqs", policy: &COMPOSER_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "diagnose", policy: &COMPOSER_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "fund", policy: &COMPOSER_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "help", policy: &COMPOSER_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "info", policy: &COMPOSER_SHOW_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "licenses", policy: &COMPOSER_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "outdated", policy: &COMPOSER_OUTDATED_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "show", policy: &COMPOSER_SHOW_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "suggests", policy: &COMPOSER_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

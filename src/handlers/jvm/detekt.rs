@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -20,6 +21,7 @@ pub static DEFS: &[FlatDef] = &[
     FlatDef {
         name: "detekt",
         policy: &DETEKT_POLICY,
+        level: SafetyLevel::Inert,
         help_eligible: true,
         url: "https://detekt.dev/docs/gettingstarted/cli/",
         aliases: &[],

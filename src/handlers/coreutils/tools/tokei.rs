@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -21,7 +22,7 @@ static TOKEI_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "tokei", policy: &TOKEI_POLICY, help_eligible: false, url: "https://github.com/XAMPPRocky/tokei#readme", aliases: &[] },
+    FlatDef { name: "tokei", policy: &TOKEI_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://github.com/XAMPPRocky/tokei#readme", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::policy::{FlagPolicy, FlagStyle};
 use crate::parse::WordSet;
 
@@ -11,7 +12,7 @@ static WAIT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "wait", policy: &WAIT_POLICY, help_eligible: false, url: "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/wait.html", aliases: &[] },
+    FlatDef { name: "wait", policy: &WAIT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/wait.html", aliases: &[] },
 ];
 
 #[cfg(test)]

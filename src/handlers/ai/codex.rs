@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -21,9 +22,9 @@ static CODEX_FEATURES_LIST_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static CODEX: CommandDef = CommandDef {
     name: "codex",
     subs: &[
-        SubDef::Policy { name: "completion", policy: &CODEX_COMPLETION_POLICY },
+        SubDef::Policy { name: "completion", policy: &CODEX_COMPLETION_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "features", subs: &[
-            SubDef::Policy { name: "list", policy: &CODEX_FEATURES_LIST_POLICY },
+            SubDef::Policy { name: "list", policy: &CODEX_FEATURES_LIST_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
     bare_flags: &[],

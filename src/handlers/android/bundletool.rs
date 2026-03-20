@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -38,15 +39,15 @@ pub(crate) static BUNDLETOOL: CommandDef = CommandDef {
     name: "bundletool",
     subs: &[
         SubDef::Nested { name: "dump", subs: &[
-            SubDef::Policy { name: "config", policy: &DUMP_POLICY },
-            SubDef::Policy { name: "manifest", policy: &DUMP_POLICY },
-            SubDef::Policy { name: "resources", policy: &DUMP_POLICY },
+            SubDef::Policy { name: "config", policy: &DUMP_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "manifest", policy: &DUMP_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "resources", policy: &DUMP_POLICY, level: SafetyLevel::Inert },
         ]},
         SubDef::Nested { name: "get-size", subs: &[
-            SubDef::Policy { name: "total", policy: &GET_SIZE_POLICY },
+            SubDef::Policy { name: "total", policy: &GET_SIZE_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "validate", policy: &VALIDATE_POLICY },
-        SubDef::Policy { name: "version", policy: &VERSION_POLICY },
+        SubDef::Policy { name: "validate", policy: &VALIDATE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &VERSION_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

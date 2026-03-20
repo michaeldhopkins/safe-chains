@@ -1,20 +1,38 @@
 use super::*;
 use crate::handlers;
 use crate::parse::Token;
+use crate::verdict::{SafetyLevel, Verdict};
 
-pub fn is_safe_command(input: &str) -> bool {
+pub fn command_verdict(input: &str) -> Verdict {
     let Some(script) = parse(input) else {
-        return false;
+        return Verdict::Denied;
     };
-    is_safe_script(&script)
+    script_verdict(&script)
 }
 
+pub fn is_safe_command(input: &str) -> bool {
+    command_verdict(input).is_allowed()
+}
+
+fn script_verdict(script: &Script) -> Verdict {
+    script.0.iter()
+        .map(|stmt| pipeline_verdict(&stmt.pipeline))
+        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
+}
+
+#[cfg(test)]
 pub(crate) fn is_safe_script(script: &Script) -> bool {
-    script.0.iter().all(|stmt| is_safe_pipeline(&stmt.pipeline))
+    script_verdict(script).is_allowed()
+}
+
+fn pipeline_verdict(pipeline: &Pipeline) -> Verdict {
+    pipeline.commands.iter()
+        .map(cmd_verdict)
+        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
 }
 
 pub fn is_safe_pipeline(pipeline: &Pipeline) -> bool {
-    pipeline.commands.iter().all(is_safe_cmd)
+    pipeline_verdict(pipeline).is_allowed()
 }
 
 pub(crate) fn has_unsafe_syntax(cmd: &Cmd) -> bool {
@@ -33,67 +51,96 @@ pub(crate) fn normalize_for_matching(cmd: &SimpleCmd) -> String {
     cmd.words.iter().map(|w| w.eval()).collect::<Vec<_>>().join(" ")
 }
 
-pub(crate) fn is_safe_cmd(cmd: &Cmd) -> bool {
+fn cmd_verdict(cmd: &Cmd) -> Verdict {
     match cmd {
-        Cmd::Simple(s) => is_safe_simple(s),
-        Cmd::Subshell(inner) => is_safe_script(inner),
+        Cmd::Simple(s) => simple_verdict(s),
+        Cmd::Subshell(inner) => script_verdict(inner),
         Cmd::For { items, body, .. } => {
-            word_subs_safe_all(items) && is_safe_script(body)
+            let items_v = words_sub_verdict(items);
+            let body_v = script_verdict(body);
+            items_v.combine(body_v)
         }
         Cmd::While { cond, body } | Cmd::Until { cond, body } => {
-            is_safe_script(cond) && is_safe_script(body)
+            script_verdict(cond).combine(script_verdict(body))
         }
         Cmd::If {
             branches,
             else_body,
         } => {
-            branches
-                .iter()
-                .all(|b| is_safe_script(&b.cond) && is_safe_script(&b.body))
-                && else_body.as_ref().is_none_or(is_safe_script)
+            let mut v = Verdict::Allowed(SafetyLevel::Inert);
+            for b in branches {
+                v = v.combine(script_verdict(&b.cond)).combine(script_verdict(&b.body));
+            }
+            if let Some(eb) = else_body {
+                v = v.combine(script_verdict(eb));
+            }
+            v
         }
     }
 }
 
-fn part_subs_safe(part: &WordPart) -> bool {
+pub(crate) fn is_safe_cmd(cmd: &Cmd) -> bool {
+    cmd_verdict(cmd).is_allowed()
+}
+
+fn part_sub_verdict(part: &WordPart) -> Verdict {
     match part {
-        WordPart::CmdSub(inner) => is_safe_script(inner),
-        WordPart::Backtick(raw) => is_safe_command(raw),
-        WordPart::DQuote(inner) => inner.0.iter().all(part_subs_safe),
-        _ => true,
+        WordPart::CmdSub(inner) => script_verdict(inner),
+        WordPart::Backtick(raw) => command_verdict(raw),
+        WordPart::DQuote(inner) => word_sub_verdict(inner),
+        _ => Verdict::Allowed(SafetyLevel::Inert),
     }
 }
 
+fn word_sub_verdict(word: &Word) -> Verdict {
+    word.0.iter()
+        .map(part_sub_verdict)
+        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
+}
+
+fn words_sub_verdict(words: &[Word]) -> Verdict {
+    words.iter()
+        .map(word_sub_verdict)
+        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
+}
+
+#[cfg(test)]
 pub(crate) fn word_subs_safe(word: &Word) -> bool {
-    word.0.iter().all(part_subs_safe)
+    word_sub_verdict(word).is_allowed()
 }
 
-fn word_subs_safe_all(words: &[Word]) -> bool {
-    words.iter().all(word_subs_safe)
-}
-
-fn is_safe_simple(cmd: &SimpleCmd) -> bool {
+fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
     if !check_redirects(&cmd.redirs) {
-        return false;
+        return Verdict::Denied;
     }
 
-    if !cmd.env.iter().all(|(_, v)| word_subs_safe(v)) || !word_subs_safe_all(&cmd.words) {
-        return false;
+    let env_sub_v = cmd.env.iter()
+        .map(|(_, v)| word_sub_verdict(v))
+        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine);
+    let word_sub_v = words_sub_verdict(&cmd.words);
+    let sub_v = env_sub_v.combine(word_sub_v);
+
+    if let Verdict::Denied = sub_v {
+        return Verdict::Denied;
     }
 
     if cmd.words.is_empty() {
         if cmd.env.is_empty() {
-            return true;
+            return Verdict::Allowed(SafetyLevel::Inert);
         }
-        return cmd.env.iter().any(|(_, v)| has_substitution(v));
+        if cmd.env.iter().any(|(_, v)| has_substitution(v)) {
+            return sub_v;
+        }
+        return Verdict::Denied;
     }
 
     let tokens: Vec<Token> = cmd.words.iter().map(|w| Token::from_raw(w.eval())).collect();
     if tokens.is_empty() {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
 
-    handlers::dispatch(&tokens)
+    let cmd_v = handlers::dispatch(&tokens);
+    sub_v.combine(cmd_v)
 }
 
 pub(crate) fn check_redirects(redirs: &[Redir]) -> bool {

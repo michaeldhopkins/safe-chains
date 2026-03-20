@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -14,7 +15,7 @@ static BASE64_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "base64", policy: &BASE64_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation", aliases: &[] },
+    FlatDef { name: "base64", policy: &BASE64_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

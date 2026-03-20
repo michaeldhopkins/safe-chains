@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static CURL_SAFE_STANDALONE: WordSet = WordSet::new(&[
     "--compressed", "--fail", "--globoff", "--head", "--insecure",
@@ -21,9 +22,9 @@ fn is_safe_method(method: &str) -> bool {
     CURL_SAFE_METHODS.contains(&method.to_ascii_uppercase())
 }
 
-pub fn is_safe_curl(tokens: &[Token]) -> bool {
+pub fn is_safe_curl(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     let mut i = 1;
     while i < tokens.len() {
@@ -52,24 +53,24 @@ pub fn is_safe_curl(tokens: &[Token]) -> bool {
             }
             if flag == "--request" {
                 if !is_safe_method(val) {
-                    return false;
+                    return Verdict::Denied;
                 }
                 i += 1;
                 continue;
             }
-            return false;
+            return Verdict::Denied;
         }
 
         if t == "-X" || t == "--request" {
             if !tokens.get(i + 1).is_some_and(|m| is_safe_method(m)) {
-                return false;
+                return Verdict::Denied;
             }
             i += 2;
             continue;
         }
         if t.starts_with("-X") && t.len() > 2 {
             if !t.get(2..).is_some_and(is_safe_method) {
-                return false;
+                return Verdict::Denied;
             }
             i += 1;
             continue;
@@ -86,18 +87,19 @@ pub fn is_safe_curl(tokens: &[Token]) -> bool {
                     i += 1;
                     break;
                 }
-                return false;
+                return Verdict::Denied;
             }
             i += 1;
             continue;
         }
 
-        return false;
+        return Verdict::Denied;
     }
-    i > 1
+        if i > 1 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "curl" => Some(is_safe_curl(tokens)),
         _ => None,

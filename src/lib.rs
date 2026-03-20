@@ -12,6 +12,45 @@ macro_rules! denied {
     };
 }
 
+#[cfg(test)]
+macro_rules! inert {
+    ($($name:ident: $cmd:expr),* $(,)?) => {
+        $(#[test] fn $name() {
+            assert_eq!(
+                crate::command_verdict($cmd),
+                crate::verdict::Verdict::Allowed(crate::verdict::SafetyLevel::Inert),
+                "expected Inert: {}", $cmd,
+            );
+        })*
+    };
+}
+
+#[cfg(test)]
+macro_rules! safe_read {
+    ($($name:ident: $cmd:expr),* $(,)?) => {
+        $(#[test] fn $name() {
+            assert_eq!(
+                crate::command_verdict($cmd),
+                crate::verdict::Verdict::Allowed(crate::verdict::SafetyLevel::SafeRead),
+                "expected SafeRead: {}", $cmd,
+            );
+        })*
+    };
+}
+
+#[cfg(test)]
+macro_rules! safe_write {
+    ($($name:ident: $cmd:expr),* $(,)?) => {
+        $(#[test] fn $name() {
+            assert_eq!(
+                crate::command_verdict($cmd),
+                crate::verdict::Verdict::Allowed(crate::verdict::SafetyLevel::SafeWrite),
+                "expected SafeWrite: {}", $cmd,
+            );
+        })*
+    };
+}
+
 pub mod cli;
 pub mod command;
 pub mod cst;
@@ -21,9 +60,16 @@ pub use handlers::all_opencode_patterns;
 pub mod parse;
 pub mod policy;
 pub mod allowlist;
+pub mod verdict;
+
+pub use verdict::{SafetyLevel, Verdict};
 
 pub fn is_safe_command(command: &str) -> bool {
-    cst::is_safe_command(command)
+    command_verdict(command).is_allowed()
+}
+
+pub fn command_verdict(command: &str) -> Verdict {
+    cst::command_verdict(command)
 }
 
 #[cfg(test)]
@@ -363,5 +409,49 @@ mod tests {
         for_missing_do: "for x in 1 2 3; echo $x; done",
         stray_done: "echo hello; done",
         stray_fi: "fi",
+    }
+
+    inert! {
+        level_cat: "cat file.txt",
+        level_grep: "grep foo file.txt",
+        level_echo: "echo hello",
+        level_ls: "ls -la",
+        level_git_log: "git log --oneline",
+        level_git_diff: "git diff",
+        level_cargo_help: "cargo --help",
+        level_cargo_build_help: "cargo build --help",
+        level_cargo_tree: "cargo tree",
+        level_find_grep: "find . -name '*.py' -exec grep pattern {} +",
+        level_pipe_inert: "grep foo file | head -5",
+        level_env_bare: "env",
+        level_timeout_ls: "timeout 5 ls -la",
+        level_bash_version: "bash --version",
+    }
+
+    safe_read! {
+        level_cargo_test: "cargo test",
+        level_cargo_clippy: "cargo clippy",
+        level_cargo_check: "cargo check",
+        level_cargo_bench: "cargo bench",
+        level_bundle_exec_rspec: "bundle exec rspec",
+        level_npm_test: "npm test",
+        level_go_test: "go test ./...",
+        level_deno_test: "deno test",
+        level_bun_test: "bun test",
+        level_swift_test: "swift test",
+        level_gradle_test: "gradle test",
+        level_npx_eslint: "npx eslint src/",
+        level_timeout_cargo_test: "timeout 120 cargo test",
+        level_env_cargo_test: "env RUST_BACKTRACE=1 cargo test",
+        level_pipe_cargo_test: "cargo test | grep PASS",
+    }
+
+    safe_write! {
+        level_cargo_build: "cargo build",
+        level_cargo_doc: "cargo doc",
+        level_go_build: "go build ./...",
+        level_swift_build: "swift build",
+        level_gradle_build: "gradle build",
+        level_bun_build: "bun build src/index.ts",
     }
 }

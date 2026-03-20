@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::Token;
 
 pub fn is_safe_bunx(tokens: &[Token]) -> bool {
@@ -11,9 +12,9 @@ pub fn is_safe_bunx(tokens: &[Token]) -> bool {
         .is_some_and(|idx| super::is_safe_runner_package(tokens, idx))
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "bunx" => Some(is_safe_bunx(tokens)),
+        "bunx" => Some(if is_safe_bunx(tokens) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }),
         _ => None,
     }
 }
