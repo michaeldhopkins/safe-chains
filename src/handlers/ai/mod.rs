@@ -8,6 +8,7 @@ mod opencode;
 mod vibe;
 
 use crate::command::FlatDef;
+use crate::verdict::Verdict;
 use crate::parse::Token;
 
 pub(crate) use codex::CODEX;
@@ -16,7 +17,7 @@ pub(crate) use llm::LLM;
 pub(crate) use ollama::OLLAMA;
 pub(crate) use opencode::OPENCODE;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     for flat in ai_flat_defs() {
         if let r @ Some(_) = flat.dispatch(cmd, tokens) {
             return r;

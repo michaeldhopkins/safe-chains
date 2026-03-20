@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static YARN_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -17,22 +18,23 @@ static YARN_BARE_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_yarn(tokens: &[Token]) -> bool {
+pub fn is_safe_yarn(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
-    match tokens[1].as_str() {
+    let ok = match tokens[1].as_str() {
         "list" | "ls" => policy::check(&tokens[1..], &YARN_LIST_POLICY),
         "info" | "why" => policy::check(&tokens[1..], &YARN_BARE_POLICY),
         "test" => true,
         _ => tokens[1].starts_with("test:"),
-    }
+    };
+    if ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "yarn" => Some(is_safe_yarn(tokens)),
         _ => None,

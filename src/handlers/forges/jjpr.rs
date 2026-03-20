@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet, has_flag};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static JJPR_AUTH_POLICY: FlagPolicy = FlagPolicy {
@@ -45,61 +46,65 @@ static JJPR_MERGE_DRY_POLICY: FlagPolicy = FlagPolicy {
 
 static AUTH_ACTIONS: WordSet = WordSet::new(&["setup", "test"]);
 
-fn is_safe_jjpr(tokens: &[Token]) -> bool {
+fn is_safe_jjpr(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     let subcmd = &tokens[1];
 
     if matches!(subcmd.as_str(), "--help" | "-h" | "--version" | "-V") {
-        return tokens.len() == 2;
+        return if tokens.len() == 2 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if subcmd == "help" {
-        return tokens.len() <= 3;
+        return if tokens.len() <= 3 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if subcmd == "auth" {
         if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h" | "help") {
-            return true;
+            return Verdict::Allowed(SafetyLevel::Inert);
         }
         if tokens.len() < 3 || !AUTH_ACTIONS.contains(&tokens[2]) {
-            return false;
+            return Verdict::Denied;
         }
-        return policy::check(&tokens[2..], &JJPR_AUTH_POLICY);
+        return if policy::check(&tokens[2..], &JJPR_AUTH_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if subcmd == "status" {
         if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h" | "help") {
-            return true;
+            return Verdict::Allowed(SafetyLevel::Inert);
         }
-        return policy::check(&tokens[1..], &JJPR_STATUS_POLICY);
+        return if policy::check(&tokens[1..], &JJPR_STATUS_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if subcmd == "submit" {
         if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h" | "help") {
-            return true;
+            return Verdict::Allowed(SafetyLevel::Inert);
         }
-        return has_flag(&tokens[1..], None, Some("--dry-run"))
-            && policy::check(&tokens[1..], &JJPR_SUBMIT_DRY_POLICY);
+        return if has_flag(&tokens[1..], None, Some("--dry-run"))
+            && policy::check(&tokens[1..], &JJPR_SUBMIT_DRY_POLICY)
+        { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if subcmd == "merge" {
         if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h" | "help") {
-            return true;
+            return Verdict::Allowed(SafetyLevel::Inert);
         }
-        return has_flag(&tokens[1..], None, Some("--dry-run"))
-            && policy::check(&tokens[1..], &JJPR_MERGE_DRY_POLICY);
+        return if has_flag(&tokens[1..], None, Some("--dry-run"))
+            && policy::check(&tokens[1..], &JJPR_MERGE_DRY_POLICY)
+        { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
     if subcmd == "config" {
-        return tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h" | "help");
+        return if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h" | "help")
+        { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
 
-    false
+    Verdict::Denied
+
 }
 
-pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "jjpr" => Some(is_safe_jjpr(tokens)),
         _ => None,

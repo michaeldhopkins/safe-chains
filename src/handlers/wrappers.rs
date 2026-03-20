@@ -1,12 +1,12 @@
-use crate::is_safe_command;
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static TIMEOUT_FLAGS_WITH_ARG: WordSet =
     WordSet::new(&["--kill-after", "--signal", "-k", "-s"]);
 
-pub fn is_safe_env(tokens: &[Token]) -> bool {
+pub fn is_safe_env(tokens: &[Token]) -> Verdict {
     if tokens.len() == 1 {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     let mut i = 1;
     while i < tokens.len() && tokens[i].starts_with("-") {
@@ -22,14 +22,13 @@ pub fn is_safe_env(tokens: &[Token]) -> bool {
         i += 1;
     }
     if i >= tokens.len() {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
-    is_safe_command(&inner)
+    crate::command_verdict(&inner)
 }
 
-
-pub fn is_safe_timeout(tokens: &[Token]) -> bool {
+pub fn is_safe_timeout(tokens: &[Token]) -> Verdict {
     let mut i = 1;
     while i < tokens.len() && tokens[i].starts_with("-") {
         if TIMEOUT_FLAGS_WITH_ARG.contains(&tokens[i]) {
@@ -40,25 +39,25 @@ pub fn is_safe_timeout(tokens: &[Token]) -> bool {
     }
     i += 1;
     if i >= tokens.len() {
-        return false;
+        return Verdict::Denied;
     }
     let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
-    is_safe_command(&inner)
+    crate::command_verdict(&inner)
 }
 
-pub fn is_safe_time(tokens: &[Token]) -> bool {
+pub fn is_safe_time(tokens: &[Token]) -> Verdict {
     let mut i = 1;
     if i < tokens.len() && tokens[i] == "-p" {
         i += 1;
     }
     if i >= tokens.len() {
-        return false;
+        return Verdict::Denied;
     }
     let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
-    is_safe_command(&inner)
+    crate::command_verdict(&inner)
 }
 
-pub fn is_safe_nice(tokens: &[Token]) -> bool {
+pub fn is_safe_nice(tokens: &[Token]) -> Verdict {
     let mut i = 1;
     while i < tokens.len() && tokens[i].starts_with("-") {
         if tokens[i] == "-n" || tokens[i] == "--adjustment" {
@@ -68,10 +67,10 @@ pub fn is_safe_nice(tokens: &[Token]) -> bool {
         }
     }
     if i >= tokens.len() {
-        return false;
+        return Verdict::Denied;
     }
     let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
-    is_safe_command(&inner)
+    crate::command_verdict(&inner)
 }
 
 static HYPERFINE_FLAGS_WITH_ARG: WordSet = WordSet::new(&[
@@ -83,7 +82,8 @@ static HYPERFINE_FLAGS_WITH_ARG: WordSet = WordSet::new(&[
     "-M", "-S", "-c", "-m", "-n", "-p", "-r", "-s", "-w",
 ]);
 
-pub fn is_safe_hyperfine(tokens: &[Token]) -> bool {
+pub fn is_safe_hyperfine(tokens: &[Token]) -> Verdict {
+    let mut combined = Verdict::Allowed(SafetyLevel::Inert);
     let mut i = 1;
     while i < tokens.len() {
         let t = &tokens[i];
@@ -98,7 +98,7 @@ pub fn is_safe_hyperfine(tokens: &[Token]) -> bool {
             }
             if HYPERFINE_FLAGS_WITH_ARG.contains(t) {
                 if t.is_one_of(&["-p", "--prepare", "-c", "--cleanup", "-s", "--setup"]) {
-                    return false;
+                    return Verdict::Denied;
                 }
                 i += 2;
             } else {
@@ -106,24 +106,28 @@ pub fn is_safe_hyperfine(tokens: &[Token]) -> bool {
             }
             continue;
         }
-        if !is_safe_command(t.as_str()) {
-            return false;
+        let v = crate::command_verdict(t.as_str());
+        if !v.is_allowed() {
+            return Verdict::Denied;
         }
+        combined = combined.combine(v);
         i += 1;
     }
     while i < tokens.len() {
-        if !is_safe_command(tokens[i].as_str()) {
-            return false;
+        let v = crate::command_verdict(tokens[i].as_str());
+        if !v.is_allowed() {
+            return Verdict::Denied;
         }
+        combined = combined.combine(v);
         i += 1;
     }
-    true
+    combined
 }
 
 static DOTENV_FLAGS_WITH_ARG: WordSet =
     WordSet::new(&["-c", "-e", "-f", "-v"]);
 
-pub fn is_safe_dotenv(tokens: &[Token]) -> bool {
+pub fn is_safe_dotenv(tokens: &[Token]) -> Verdict {
     let mut i = 1;
     while i < tokens.len() {
         let t = &tokens[i];
@@ -142,13 +146,13 @@ pub fn is_safe_dotenv(tokens: &[Token]) -> bool {
         break;
     }
     if i >= tokens.len() {
-        return false;
+        return Verdict::Denied;
     }
     let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
-    is_safe_command(&inner)
+    crate::command_verdict(&inner)
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "timeout" => Some(is_safe_timeout(tokens)),
         "time" => Some(is_safe_time(tokens)),

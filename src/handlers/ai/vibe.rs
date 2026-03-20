@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -11,7 +12,7 @@ static VIBE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::ai) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "vibe", policy: &VIBE_POLICY, help_eligible: true, url: "https://docs.mistral.ai/mistral-vibe/", aliases: &[] },
+    FlatDef { name: "vibe", policy: &VIBE_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://docs.mistral.ai/mistral-vibe/", aliases: &[] },
 ];
 
 #[cfg(test)]

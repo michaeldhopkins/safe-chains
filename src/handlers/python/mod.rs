@@ -5,6 +5,7 @@ mod pyenv;
 mod uv;
 
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
 pub(crate) use conda::CONDA;
 pub(crate) use pip::PIP;
@@ -12,7 +13,7 @@ pub(crate) use poetry::POETRY;
 pub(crate) use pyenv::PYENV;
 pub(crate) use uv::UV;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     PIP.dispatch(cmd, tokens)
         .or_else(|| UV.dispatch(cmd, tokens))
         .or_else(|| POETRY.dispatch(cmd, tokens))

@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -42,12 +43,12 @@ static LLM_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static LLM: CommandDef = CommandDef {
     name: "llm",
     subs: &[
-        SubDef::Policy { name: "aliases", policy: &LLM_SIMPLE_LIST_POLICY },
-        SubDef::Policy { name: "collections", policy: &LLM_SIMPLE_LIST_POLICY },
-        SubDef::Policy { name: "logs", policy: &LLM_LOGS_POLICY },
-        SubDef::Policy { name: "models", policy: &LLM_MODELS_POLICY },
-        SubDef::Policy { name: "plugins", policy: &LLM_PLUGINS_POLICY },
-        SubDef::Policy { name: "templates", policy: &LLM_SIMPLE_LIST_POLICY },
+        SubDef::Policy { name: "aliases", policy: &LLM_SIMPLE_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "collections", policy: &LLM_SIMPLE_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "logs", policy: &LLM_LOGS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "models", policy: &LLM_MODELS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "plugins", policy: &LLM_PLUGINS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "templates", policy: &LLM_SIMPLE_LIST_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

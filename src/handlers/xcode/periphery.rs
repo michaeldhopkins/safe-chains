@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -26,8 +27,8 @@ static PERIPHERY_SCAN_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static PERIPHERY: CommandDef = CommandDef {
     name: "periphery",
     subs: &[
-        SubDef::Policy { name: "scan", policy: &PERIPHERY_SCAN_POLICY },
-        SubDef::Policy { name: "version", policy: &PERIPHERY_BARE_POLICY },
+        SubDef::Policy { name: "scan", policy: &PERIPHERY_SCAN_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &PERIPHERY_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

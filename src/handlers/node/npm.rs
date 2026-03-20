@@ -1,4 +1,5 @@
 use crate::command::{CheckFn, CommandDef, SubDef};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -56,29 +57,29 @@ static NPM_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_npm_run(tokens: &[Token]) -> bool {
-    tokens.get(1).is_some_and(|a| a == "test" || a.starts_with("test:"))
+fn check_npm_run(tokens: &[Token]) -> Verdict {
+    if tokens.get(1).is_some_and(|a| a == "test" || a.starts_with("test:")) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }
 }
 
 pub(crate) static NPM: CommandDef = CommandDef {
     name: "npm",
     subs: &[
-        SubDef::Policy { name: "list", policy: &NPM_LIST_POLICY },
-        SubDef::Policy { name: "ls", policy: &NPM_LIST_POLICY },
-        SubDef::Policy { name: "view", policy: &NPM_VIEW_POLICY },
-        SubDef::Policy { name: "info", policy: &NPM_VIEW_POLICY },
-        SubDef::Policy { name: "audit", policy: &NPM_AUDIT_POLICY },
-        SubDef::Policy { name: "test", policy: &NPM_TEST_POLICY },
-        SubDef::Policy { name: "doctor", policy: &NPM_BARE_POLICY },
-        SubDef::Policy { name: "explain", policy: &NPM_BARE_POLICY },
-        SubDef::Policy { name: "fund", policy: &NPM_BARE_POLICY },
-        SubDef::Policy { name: "outdated", policy: &NPM_BARE_POLICY },
-        SubDef::Policy { name: "prefix", policy: &NPM_BARE_POLICY },
-        SubDef::Policy { name: "root", policy: &NPM_BARE_POLICY },
-        SubDef::Policy { name: "why", policy: &NPM_BARE_POLICY },
+        SubDef::Policy { name: "list", policy: &NPM_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls", policy: &NPM_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "view", policy: &NPM_VIEW_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "info", policy: &NPM_VIEW_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "audit", policy: &NPM_AUDIT_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "test", policy: &NPM_TEST_POLICY, level: SafetyLevel::SafeRead },
+        SubDef::Policy { name: "doctor", policy: &NPM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "explain", policy: &NPM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "fund", policy: &NPM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "outdated", policy: &NPM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "prefix", policy: &NPM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "root", policy: &NPM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "why", policy: &NPM_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "config", subs: &[
-            SubDef::Policy { name: "get", policy: &NPM_CONFIG_POLICY },
-            SubDef::Policy { name: "list", policy: &NPM_CONFIG_POLICY },
+            SubDef::Policy { name: "get", policy: &NPM_CONFIG_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "list", policy: &NPM_CONFIG_POLICY, level: SafetyLevel::Inert },
         ]},
         SubDef::Custom { name: "run", check: check_npm_run as CheckFn, doc: "run/run-script (test only).", test_suffix: None },
         SubDef::Custom { name: "run-script", check: check_npm_run as CheckFn, doc: " ", test_suffix: None },

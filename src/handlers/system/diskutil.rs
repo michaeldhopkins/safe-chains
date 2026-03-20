@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -29,15 +30,15 @@ static DISKUTIL_INFO_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static DISKUTIL: CommandDef = CommandDef {
     name: "diskutil",
     subs: &[
-        SubDef::Policy { name: "list", policy: &DISKUTIL_LIST_POLICY },
-        SubDef::Policy { name: "listFilesystems", policy: &DISKUTIL_LIST_POLICY },
-        SubDef::Policy { name: "info", policy: &DISKUTIL_INFO_POLICY },
-        SubDef::Policy { name: "activity", policy: &DISKUTIL_SIMPLE_POLICY },
+        SubDef::Policy { name: "list", policy: &DISKUTIL_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "listFilesystems", policy: &DISKUTIL_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "info", policy: &DISKUTIL_INFO_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "activity", policy: &DISKUTIL_SIMPLE_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "apfs", subs: &[
-            SubDef::Policy { name: "list", policy: &DISKUTIL_SIMPLE_POLICY },
-            SubDef::Policy { name: "listCryptoUsers", policy: &DISKUTIL_SIMPLE_POLICY },
-            SubDef::Policy { name: "listSnapshots", policy: &DISKUTIL_SIMPLE_POLICY },
-            SubDef::Policy { name: "listVolumeGroups", policy: &DISKUTIL_SIMPLE_POLICY },
+            SubDef::Policy { name: "list", policy: &DISKUTIL_SIMPLE_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "listCryptoUsers", policy: &DISKUTIL_SIMPLE_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "listSnapshots", policy: &DISKUTIL_SIMPLE_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "listVolumeGroups", policy: &DISKUTIL_SIMPLE_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
     bare_flags: &[],

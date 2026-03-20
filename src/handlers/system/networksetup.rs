@@ -1,8 +1,9 @@
 use crate::parse::Token;
+use crate::verdict::{SafetyLevel, Verdict};
 
-fn is_safe_networksetup(tokens: &[Token]) -> bool {
+fn is_safe_networksetup(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     let sub = tokens[1].as_str();
     if !(sub.starts_with("-list")
@@ -12,12 +13,13 @@ fn is_safe_networksetup(tokens: &[Token]) -> bool {
         || sub == "-version"
         || sub == "-help")
     {
-        return false;
+        return Verdict::Denied;
     }
-    true
+    Verdict::Allowed(SafetyLevel::Inert)
+
 }
 
-pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "networksetup" => Some(is_safe_networksetup(tokens)),
         _ => None,

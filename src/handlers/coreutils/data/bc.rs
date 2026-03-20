@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -22,7 +23,7 @@ static BC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "bc", policy: &BC_POLICY, help_eligible: false, url: "https://www.gnu.org/software/bc/manual/html_mono/bc.html", aliases: &[] },
+    FlatDef { name: "bc", policy: &BC_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/bc/manual/html_mono/bc.html", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -14,7 +15,7 @@ static BRANCHDIFF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "branchdiff", policy: &BRANCHDIFF_POLICY, help_eligible: true, url: "https://github.com/michaeldhopkins/branchdiff", aliases: &[] },
+    FlatDef { name: "branchdiff", policy: &BRANCHDIFF_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://github.com/michaeldhopkins/branchdiff", aliases: &[] },
 ];
 
 #[cfg(test)]

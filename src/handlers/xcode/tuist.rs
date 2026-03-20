@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -61,40 +62,40 @@ static TUIST_MIGRATION_SUB_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static TUIST: CommandDef = CommandDef {
     name: "tuist",
     subs: &[
-        SubDef::Policy { name: "dump", policy: &TUIST_DUMP_POLICY },
-        SubDef::Policy { name: "graph", policy: &TUIST_GRAPH_POLICY },
+        SubDef::Policy { name: "dump", policy: &TUIST_DUMP_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "graph", policy: &TUIST_GRAPH_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested {
             name: "hash",
             subs: &[
-                SubDef::Policy { name: "cache", policy: &TUIST_HASH_SUB_POLICY },
-                SubDef::Policy { name: "selective-testing", policy: &TUIST_HASH_SUB_POLICY },
+                SubDef::Policy { name: "cache", policy: &TUIST_HASH_SUB_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "selective-testing", policy: &TUIST_HASH_SUB_POLICY, level: SafetyLevel::Inert },
             ],
         },
         SubDef::Nested {
             name: "inspect",
             subs: &[
-                SubDef::Policy { name: "build", policy: &TUIST_INSPECT_SUB_POLICY },
-                SubDef::Policy { name: "bundle", policy: &TUIST_INSPECT_SUB_POLICY },
-                SubDef::Policy { name: "dependencies", policy: &TUIST_INSPECT_SUB_POLICY },
-                SubDef::Policy { name: "implicit-imports", policy: &TUIST_INSPECT_SUB_POLICY },
-                SubDef::Policy { name: "redundant-imports", policy: &TUIST_INSPECT_SUB_POLICY },
-                SubDef::Policy { name: "test", policy: &TUIST_INSPECT_SUB_POLICY },
+                SubDef::Policy { name: "build", policy: &TUIST_INSPECT_SUB_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "bundle", policy: &TUIST_INSPECT_SUB_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "dependencies", policy: &TUIST_INSPECT_SUB_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "implicit-imports", policy: &TUIST_INSPECT_SUB_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "redundant-imports", policy: &TUIST_INSPECT_SUB_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "test", policy: &TUIST_INSPECT_SUB_POLICY, level: SafetyLevel::Inert },
             ],
         },
         SubDef::Nested {
             name: "migration",
             subs: &[
-                SubDef::Policy { name: "check-empty-settings", policy: &TUIST_MIGRATION_SUB_POLICY },
-                SubDef::Policy { name: "list-targets", policy: &TUIST_MIGRATION_SUB_POLICY },
+                SubDef::Policy { name: "check-empty-settings", policy: &TUIST_MIGRATION_SUB_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "list-targets", policy: &TUIST_MIGRATION_SUB_POLICY, level: SafetyLevel::Inert },
             ],
         },
         SubDef::Nested {
             name: "scaffold",
             subs: &[
-                SubDef::Policy { name: "list", policy: &TUIST_SCAFFOLD_LIST_POLICY },
+                SubDef::Policy { name: "list", policy: &TUIST_SCAFFOLD_LIST_POLICY, level: SafetyLevel::Inert },
             ],
         },
-        SubDef::Policy { name: "version", policy: &TUIST_BARE_POLICY },
+        SubDef::Policy { name: "version", policy: &TUIST_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static CODESIGN_POLICY: FlagPolicy = FlagPolicy {
@@ -12,18 +13,19 @@ static CODESIGN_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-pub fn is_safe_codesign(tokens: &[Token]) -> bool {
+pub fn is_safe_codesign(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     static CODESIGN_SAFE: WordSet = WordSet::new(&["--display", "--verify", "-d", "-v"]);
     if !tokens[1..].iter().any(|t| CODESIGN_SAFE.contains(t)) {
-        return false;
+        return Verdict::Denied;
     }
-    policy::check(tokens, &CODESIGN_POLICY)
+        if policy::check(tokens, &CODESIGN_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     if cmd == "codesign" {
         Some(is_safe_codesign(tokens))
     } else {

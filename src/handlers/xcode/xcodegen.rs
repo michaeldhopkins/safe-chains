@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -21,8 +22,8 @@ static XCODEGEN_DUMP_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static XCODEGEN: CommandDef = CommandDef {
     name: "xcodegen",
     subs: &[
-        SubDef::Policy { name: "dump", policy: &XCODEGEN_DUMP_POLICY },
-        SubDef::Policy { name: "version", policy: &XCODEGEN_BARE_POLICY },
+        SubDef::Policy { name: "dump", policy: &XCODEGEN_DUMP_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &XCODEGEN_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

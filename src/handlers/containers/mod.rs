@@ -4,6 +4,7 @@ mod orbctl;
 mod qemu_img;
 
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
 pub(crate) use docker::DOCKER;
 pub(crate) use docker::PODMAN;
@@ -11,7 +12,7 @@ pub(crate) use kubectl::KUBECTL;
 pub(crate) use orbctl::ORBCTL;
 pub(crate) use qemu_img::QEMU_IMG;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     DOCKER.dispatch(cmd, tokens)
         .or_else(|| PODMAN.dispatch(cmd, tokens))
         .or_else(|| KUBECTL.dispatch(cmd, tokens))

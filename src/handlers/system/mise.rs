@@ -1,4 +1,5 @@
 use crate::command::{CheckFn, CommandDef, SubDef};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -103,147 +104,151 @@ static MISE_SET_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SETTINGS_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "get", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "add", policy: &HELP_ONLY },
-    SubDef::Policy { name: "set", policy: &HELP_ONLY },
-    SubDef::Policy { name: "unset", policy: &HELP_ONLY },
+    SubDef::Policy { name: "get", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "add", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "set", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "unset", policy: &HELP_ONLY, level: SafetyLevel::Inert },
 ];
 
 static CONFIG_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "get", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "generate", policy: &HELP_ONLY },
-    SubDef::Policy { name: "set", policy: &HELP_ONLY },
+    SubDef::Policy { name: "get", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "generate", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "set", policy: &HELP_ONLY, level: SafetyLevel::Inert },
 ];
 
 static PLUGINS_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "ls-remote", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "install", policy: &HELP_ONLY },
-    SubDef::Policy { name: "link", policy: &HELP_ONLY },
-    SubDef::Policy { name: "uninstall", policy: &HELP_ONLY },
-    SubDef::Policy { name: "update", policy: &HELP_ONLY },
+    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "ls-remote", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "install", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "link", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "uninstall", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "update", policy: &HELP_ONLY, level: SafetyLevel::Inert },
 ];
 
 static BACKENDS_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY },
+    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
 ];
 
 static TASKS_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "deps", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "info", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "add", policy: &HELP_ONLY },
-    SubDef::Policy { name: "edit", policy: &HELP_ONLY },
-    SubDef::Policy { name: "run", policy: &HELP_ONLY },
+    SubDef::Policy { name: "deps", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "info", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "add", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "edit", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "run", policy: &HELP_ONLY, level: SafetyLevel::Inert },
 ];
 
 static CACHE_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "path", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "clear", policy: &HELP_ONLY },
-    SubDef::Policy { name: "prune", policy: &HELP_ONLY },
+    SubDef::Policy { name: "path", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "clear", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "prune", policy: &HELP_ONLY, level: SafetyLevel::Inert },
 ];
 
 static TOOL_ALIAS_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "get", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "set", policy: &HELP_ONLY },
-    SubDef::Policy { name: "unset", policy: &HELP_ONLY },
+    SubDef::Policy { name: "get", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "set", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "unset", policy: &HELP_ONLY, level: SafetyLevel::Inert },
 ];
 
 static SHELL_ALIAS_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "get", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY },
-    SubDef::Policy { name: "set", policy: &HELP_ONLY },
-    SubDef::Policy { name: "unset", policy: &HELP_ONLY },
+    SubDef::Policy { name: "get", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "list", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "ls", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "set", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+    SubDef::Policy { name: "unset", policy: &HELP_ONLY, level: SafetyLevel::Inert },
 ];
 
-fn check_nested_bare(tokens: &[Token], subs: &[SubDef]) -> bool {
+fn check_nested_bare(tokens: &[Token], subs: &[SubDef]) -> Verdict {
     if tokens.len() == 1 {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     let sub = tokens[1].as_str();
     if tokens.len() == 2 && (sub == "--help" || sub == "-h") {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
-    subs.iter().any(|s| s.name() == sub && s.check(&tokens[1..]))
+    subs.iter()
+        .find(|s| s.name() == sub)
+        .map(|s| s.check(&tokens[1..]))
+        .unwrap_or(Verdict::Denied)
 }
 
-fn check_mise_settings(tokens: &[Token]) -> bool {
+fn check_mise_settings(tokens: &[Token]) -> Verdict {
     check_nested_bare(tokens, SETTINGS_SUBS)
 }
 
-fn check_mise_config(tokens: &[Token]) -> bool {
+fn check_mise_config(tokens: &[Token]) -> Verdict {
     check_nested_bare(tokens, CONFIG_SUBS)
 }
 
-fn check_mise_plugins(tokens: &[Token]) -> bool {
+fn check_mise_plugins(tokens: &[Token]) -> Verdict {
     check_nested_bare(tokens, PLUGINS_SUBS)
 }
 
-fn check_mise_backends(tokens: &[Token]) -> bool {
+fn check_mise_backends(tokens: &[Token]) -> Verdict {
     check_nested_bare(tokens, BACKENDS_SUBS)
 }
 
-fn check_mise_tasks(tokens: &[Token]) -> bool {
+fn check_mise_tasks(tokens: &[Token]) -> Verdict {
     check_nested_bare(tokens, TASKS_SUBS)
 }
 
-fn check_mise_cache(tokens: &[Token]) -> bool {
+fn check_mise_cache(tokens: &[Token]) -> Verdict {
     check_nested_bare(tokens, CACHE_SUBS)
 }
 
-fn check_mise_tool_alias(tokens: &[Token]) -> bool {
+fn check_mise_tool_alias(tokens: &[Token]) -> Verdict {
     check_nested_bare(tokens, TOOL_ALIAS_SUBS)
 }
 
-fn check_mise_shell_alias(tokens: &[Token]) -> bool {
+fn check_mise_shell_alias(tokens: &[Token]) -> Verdict {
     check_nested_bare(tokens, SHELL_ALIAS_SUBS)
 }
 
-fn check_mise_exec(tokens: &[Token]) -> bool {
+fn check_mise_exec(tokens: &[Token]) -> Verdict {
     let sep = tokens[1..].iter().position(|t| *t == "--");
     if let Some(pos) = sep {
         let inner_start = 1 + pos + 1;
         if inner_start >= tokens.len() {
-            return false;
+            return Verdict::Denied;
         }
         let inner = shell_words::join(tokens[inner_start..].iter().map(|t| t.as_str()));
-        return crate::is_safe_command(&inner);
+        return crate::command_verdict(&inner);
     }
-    false
+    Verdict::Denied
+
 }
 
 pub(crate) static MISE: CommandDef = CommandDef {
     name: "mise",
     subs: &[
-        SubDef::Policy { name: "list", policy: &MISE_LIST_POLICY },
-        SubDef::Policy { name: "ls", policy: &MISE_LIST_POLICY },
-        SubDef::Policy { name: "current", policy: &MISE_SIMPLE_POLICY },
-        SubDef::Policy { name: "which", policy: &MISE_SIMPLE_POLICY },
-        SubDef::Policy { name: "where", policy: &MISE_SIMPLE_POLICY },
-        SubDef::Policy { name: "doctor", policy: &MISE_SIMPLE_POLICY },
-        SubDef::Policy { name: "reshim", policy: &MISE_RESHIM_POLICY },
-        SubDef::Policy { name: "env", policy: &MISE_ENV_POLICY },
-        SubDef::Policy { name: "outdated", policy: &MISE_OUTDATED_POLICY },
-        SubDef::Policy { name: "search", policy: &MISE_SEARCH_POLICY },
-        SubDef::Policy { name: "registry", policy: &MISE_REGISTRY_POLICY },
-        SubDef::Policy { name: "latest", policy: &MISE_SIMPLE_POLICY },
-        SubDef::Policy { name: "ls-remote", policy: &MISE_LS_REMOTE_POLICY },
-        SubDef::Policy { name: "bin-paths", policy: &MISE_SIMPLE_POLICY },
-        SubDef::Policy { name: "tool", policy: &MISE_SIMPLE_POLICY },
-        SubDef::Policy { name: "completion", policy: &MISE_SIMPLE_POLICY },
-        SubDef::Policy { name: "trust", policy: &MISE_TRUST_SHOW_POLICY },
-        SubDef::Policy { name: "fmt", policy: &MISE_FMT_CHECK_POLICY },
-        SubDef::Policy { name: "set", policy: &MISE_SET_POLICY },
+        SubDef::Policy { name: "list", policy: &MISE_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls", policy: &MISE_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "current", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "which", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "where", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "doctor", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "reshim", policy: &MISE_RESHIM_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "env", policy: &MISE_ENV_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "outdated", policy: &MISE_OUTDATED_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "search", policy: &MISE_SEARCH_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "registry", policy: &MISE_REGISTRY_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "latest", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls-remote", policy: &MISE_LS_REMOTE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "bin-paths", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "tool", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "completion", policy: &MISE_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "trust", policy: &MISE_TRUST_SHOW_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "fmt", policy: &MISE_FMT_CHECK_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "set", policy: &MISE_SET_POLICY, level: SafetyLevel::Inert },
         SubDef::Custom { name: "config", check: check_mise_config as CheckFn, doc: "Bare invocation allowed. Subcommands: get, list, ls.", test_suffix: None },
         SubDef::Custom { name: "settings", check: check_mise_settings as CheckFn, doc: "Bare invocation allowed. Subcommands: get, list, ls.", test_suffix: None },
         SubDef::Custom { name: "plugins", check: check_mise_plugins as CheckFn, doc: "Bare invocation allowed. Subcommands: list, ls, ls-remote.", test_suffix: None },
@@ -253,27 +258,27 @@ pub(crate) static MISE: CommandDef = CommandDef {
         SubDef::Custom { name: "tool-alias", check: check_mise_tool_alias as CheckFn, doc: "Bare invocation allowed. Subcommands: get, list, ls.", test_suffix: None },
         SubDef::Custom { name: "shell-alias", check: check_mise_shell_alias as CheckFn, doc: "Bare invocation allowed. Subcommands: get, list, ls.", test_suffix: None },
         SubDef::Custom { name: "exec", check: check_mise_exec as CheckFn, doc: "exec delegates after --.", test_suffix: None },
-        SubDef::Policy { name: "activate", policy: &HELP_ONLY },
-        SubDef::Policy { name: "deactivate", policy: &HELP_ONLY },
-        SubDef::Policy { name: "edit", policy: &HELP_ONLY },
-        SubDef::Policy { name: "en", policy: &HELP_ONLY },
-        SubDef::Policy { name: "generate", policy: &HELP_ONLY },
-        SubDef::Policy { name: "implode", policy: &HELP_ONLY },
-        SubDef::Policy { name: "install", policy: &HELP_ONLY },
-        SubDef::Policy { name: "link", policy: &HELP_ONLY },
-        SubDef::Policy { name: "lock", policy: &HELP_ONLY },
-        SubDef::Policy { name: "prepare", policy: &HELP_ONLY },
-        SubDef::Policy { name: "prune", policy: &HELP_ONLY },
-        SubDef::Policy { name: "run", policy: &HELP_ONLY },
-        SubDef::Policy { name: "self-update", policy: &HELP_ONLY },
-        SubDef::Policy { name: "shell", policy: &HELP_ONLY },
-        SubDef::Policy { name: "sync", policy: &HELP_ONLY },
-        SubDef::Policy { name: "uninstall", policy: &HELP_ONLY },
-        SubDef::Policy { name: "unset", policy: &HELP_ONLY },
-        SubDef::Policy { name: "unuse", policy: &HELP_ONLY },
-        SubDef::Policy { name: "upgrade", policy: &HELP_ONLY },
-        SubDef::Policy { name: "use", policy: &HELP_ONLY },
-        SubDef::Policy { name: "watch", policy: &HELP_ONLY },
+        SubDef::Policy { name: "activate", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "deactivate", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "edit", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "en", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "generate", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "implode", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "install", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "link", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "lock", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "prepare", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "prune", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "run", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "self-update", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "shell", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "sync", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "uninstall", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "unset", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "unuse", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "upgrade", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "use", policy: &HELP_ONLY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "watch", policy: &HELP_ONLY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

@@ -1,8 +1,9 @@
 use crate::parse::Token;
+use crate::verdict::{SafetyLevel, Verdict};
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, _tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, _tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "safe-chains" => Some(true),
+        "safe-chains" => Some(Verdict::Allowed(SafetyLevel::Inert)),
         _ => None,
     }
 }

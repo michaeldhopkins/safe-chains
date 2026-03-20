@@ -1,3 +1,4 @@
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::Token;
 
 pub fn is_safe_zipalign(tokens: &[Token]) -> bool {
@@ -18,9 +19,9 @@ pub fn is_safe_zipalign(tokens: &[Token]) -> bool {
     has_c
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     if cmd == "zipalign" {
-        Some(is_safe_zipalign(tokens))
+        Some(if is_safe_zipalign(tokens) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied })
     } else {
         None
     }

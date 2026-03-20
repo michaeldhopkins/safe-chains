@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -29,7 +30,7 @@ static ACK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ack", policy: &ACK_POLICY, help_eligible: false, url: "https://beyondgrep.com/documentation/", aliases: &[] },
+    FlatDef { name: "ack", policy: &ACK_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://beyondgrep.com/documentation/", aliases: &[] },
 ];
 
 #[cfg(test)]

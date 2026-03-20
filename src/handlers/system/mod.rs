@@ -23,6 +23,7 @@ mod terraform;
 mod vercel;
 
 use crate::command::FlatDef;
+use crate::verdict::Verdict;
 use crate::parse::Token;
 
 pub(crate) use asdf::ASDF;
@@ -44,7 +45,7 @@ pub(crate) use fastlane::FASTLANE;
 pub(crate) use firebase::FIREBASE;
 pub(crate) use vercel::VERCEL;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     for flat in system_flat_defs() {
         if let r @ Some(_) = flat.dispatch(cmd, tokens) {
             return r;

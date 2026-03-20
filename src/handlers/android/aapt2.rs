@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -22,16 +23,16 @@ pub(crate) static AAPT2: CommandDef = CommandDef {
     name: "aapt2",
     subs: &[
         SubDef::Nested { name: "dump", subs: &[
-            SubDef::Policy { name: "badging", policy: &DUMP_POLICY },
-            SubDef::Policy { name: "configurations", policy: &DUMP_POLICY },
-            SubDef::Policy { name: "permissions", policy: &DUMP_POLICY },
-            SubDef::Policy { name: "resources", policy: &DUMP_POLICY },
-            SubDef::Policy { name: "strings", policy: &DUMP_POLICY },
-            SubDef::Policy { name: "styleparents", policy: &DUMP_POLICY },
-            SubDef::Policy { name: "xmlstrings", policy: &DUMP_POLICY },
-            SubDef::Policy { name: "xmltree", policy: &DUMP_POLICY },
+            SubDef::Policy { name: "badging", policy: &DUMP_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "configurations", policy: &DUMP_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "permissions", policy: &DUMP_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "resources", policy: &DUMP_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "strings", policy: &DUMP_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "styleparents", policy: &DUMP_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "xmlstrings", policy: &DUMP_POLICY, level: SafetyLevel::Inert },
+            SubDef::Policy { name: "xmltree", policy: &DUMP_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "version", policy: &VERSION_POLICY },
+        SubDef::Policy { name: "version", policy: &VERSION_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

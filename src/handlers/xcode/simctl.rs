@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -13,7 +14,7 @@ static SIMCTL_LIST_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static SIMCTL: CommandDef = CommandDef {
     name: "simctl",
     subs: &[
-        SubDef::Policy { name: "list", policy: &SIMCTL_LIST_POLICY },
+        SubDef::Policy { name: "list", policy: &SIMCTL_LIST_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: false,

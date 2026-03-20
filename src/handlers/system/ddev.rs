@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -45,27 +46,26 @@ static DDEV_BARE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static DDEV: CommandDef = CommandDef {
     name: "ddev",
     subs: &[
-        SubDef::Policy { name: "aliases", policy: &DDEV_BARE_POLICY },
+        SubDef::Policy { name: "aliases", policy: &DDEV_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested {
             name: "debug",
             subs: &[
-                SubDef::Policy { name: "configyaml", policy: &DDEV_BARE_POLICY },
-                SubDef::Policy { name: "diagnose", policy: &DDEV_BARE_POLICY },
-                SubDef::Policy { name: "mutagen", policy: &DDEV_BARE_POLICY },
-                SubDef::Policy { name: "test", policy: &DDEV_BARE_POLICY },
+                SubDef::Policy { name: "configyaml", policy: &DDEV_BARE_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "diagnose", policy: &DDEV_BARE_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "mutagen", policy: &DDEV_BARE_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "test", policy: &DDEV_BARE_POLICY, level: SafetyLevel::Inert },
             ],
         },
-        SubDef::Policy { name: "describe", policy: &DDEV_DESCRIBE_POLICY },
-        SubDef::Policy { name: "list", policy: &DDEV_LIST_POLICY },
-        SubDef::Policy { name: "logs", policy: &DDEV_LOGS_POLICY },
+        SubDef::Policy { name: "describe", policy: &DDEV_DESCRIBE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &DDEV_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "logs", policy: &DDEV_LOGS_POLICY, level: SafetyLevel::Inert },
         SubDef::Guarded {
             name: "snapshot",
             guard_short: None,
             guard_long: "--list",
-            policy: &DDEV_SNAPSHOT_LIST_POLICY,
-        },
-        SubDef::Policy { name: "status", policy: &DDEV_DESCRIBE_POLICY },
-        SubDef::Policy { name: "version", policy: &DDEV_BARE_POLICY },
+            policy: &DDEV_SNAPSHOT_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "status", policy: &DDEV_DESCRIBE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &DDEV_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -99,21 +100,22 @@ static GO_TEST_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn check_go_help(_tokens: &[Token]) -> bool {
-    true
+fn check_go_help(_tokens: &[Token]) -> Verdict {
+    Verdict::Allowed(SafetyLevel::Inert)
+
 }
 
 pub(crate) static GO: CommandDef = CommandDef {
     name: "go",
     subs: &[
-        SubDef::Policy { name: "build", policy: &GO_BUILD_POLICY },
-        SubDef::Policy { name: "doc", policy: &GO_DOC_POLICY },
-        SubDef::Policy { name: "env", policy: &GO_ENV_POLICY },
+        SubDef::Policy { name: "build", policy: &GO_BUILD_POLICY, level: SafetyLevel::SafeWrite },
+        SubDef::Policy { name: "doc", policy: &GO_DOC_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "env", policy: &GO_ENV_POLICY, level: SafetyLevel::Inert },
         SubDef::Custom { name: "help", check: check_go_help, doc: "", test_suffix: None },
-        SubDef::Policy { name: "list", policy: &GO_LIST_POLICY },
-        SubDef::Policy { name: "test", policy: &GO_TEST_POLICY },
-        SubDef::Policy { name: "version", policy: &GO_VERSION_POLICY },
-        SubDef::Policy { name: "vet", policy: &GO_VET_POLICY },
+        SubDef::Policy { name: "list", policy: &GO_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "test", policy: &GO_TEST_POLICY, level: SafetyLevel::SafeRead },
+        SubDef::Policy { name: "version", policy: &GO_VERSION_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "vet", policy: &GO_VET_POLICY, level: SafetyLevel::SafeRead },
     ],
     bare_flags: &[],
     help_eligible: true,
@@ -121,7 +123,7 @@ pub(crate) static GO: CommandDef = CommandDef {
     aliases: &[],
 };
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     GO.dispatch(cmd, tokens)
 }
 

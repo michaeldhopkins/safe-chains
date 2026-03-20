@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -35,7 +36,7 @@ static CLOC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cloc", policy: &CLOC_POLICY, help_eligible: false, url: "https://github.com/AlDanial/cloc#readme", aliases: &[] },
+    FlatDef { name: "cloc", policy: &CLOC_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://github.com/AlDanial/cloc#readme", aliases: &[] },
 ];
 
 #[cfg(test)]

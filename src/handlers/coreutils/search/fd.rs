@@ -1,26 +1,27 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static FD_EXEC_LONG: WordSet = WordSet::new(&["--exec", "--exec-batch"]);
 
-pub(in crate::handlers::coreutils) fn is_safe_fd(tokens: &[Token]) -> bool {
+pub(in crate::handlers::coreutils) fn is_safe_fd(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     for t in &tokens[1..] {
         if FD_EXEC_LONG.contains(t) {
-            return false;
+            return Verdict::Denied;
         }
         if t.starts_with('-')
             && !t.starts_with("--")
             && t.as_bytes()[1..].iter().any(|&b| b == b'x' || b == b'X')
         {
-            return false;
+            return Verdict::Denied;
         }
     }
-    true
+    Verdict::Allowed(SafetyLevel::Inert)
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "fd" => Some(is_safe_fd(tokens)),
         _ => None,

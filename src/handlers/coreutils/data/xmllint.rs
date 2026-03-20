@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -28,7 +29,7 @@ static XMLLINT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "xmllint", policy: &XMLLINT_POLICY, help_eligible: true, url: "https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html", aliases: &[] },
+    FlatDef { name: "xmllint", policy: &XMLLINT_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html", aliases: &[] },
 ];
 
 #[cfg(test)]

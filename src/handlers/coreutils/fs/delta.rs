@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -47,7 +48,7 @@ static DELTA_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "delta", policy: &DELTA_POLICY, help_eligible: false, url: "https://dandavison.github.io/delta/", aliases: &[] },
+    FlatDef { name: "delta", policy: &DELTA_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://dandavison.github.io/delta/", aliases: &[] },
 ];
 
 #[cfg(test)]

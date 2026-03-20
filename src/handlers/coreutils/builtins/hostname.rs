@@ -1,18 +1,20 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static HOSTNAME_DISPLAY: WordSet = WordSet::new(&["-A", "-I", "-d", "-f", "-i", "-s"]);
 
-fn is_safe_hostname(tokens: &[Token]) -> bool {
+fn is_safe_hostname(tokens: &[Token]) -> Verdict {
     if tokens.len() == 1 {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
-    tokens[1..].iter().all(|t| HOSTNAME_DISPLAY.contains(t))
+        if tokens[1..].iter().all(|t| HOSTNAME_DISPLAY.contains(t)) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "hostname" => Some(is_safe_hostname(tokens)),
         _ => None,

@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -37,12 +38,12 @@ static VERCEL_PROJECT_LS_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static VERCEL: CommandDef = CommandDef {
     name: "vercel",
     subs: &[
-        SubDef::Policy { name: "inspect", policy: &VERCEL_INSPECT_POLICY },
-        SubDef::Policy { name: "list", policy: &VERCEL_LIST_POLICY },
+        SubDef::Policy { name: "inspect", policy: &VERCEL_INSPECT_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &VERCEL_LIST_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "project", subs: &[
-            SubDef::Policy { name: "ls", policy: &VERCEL_PROJECT_LS_POLICY },
+            SubDef::Policy { name: "ls", policy: &VERCEL_PROJECT_LS_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "whoami", policy: &VERCEL_BARE_POLICY },
+        SubDef::Policy { name: "whoami", policy: &VERCEL_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

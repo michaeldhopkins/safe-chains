@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -19,7 +20,7 @@ static LOCATE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "locate", policy: &LOCATE_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/locate.1.html", aliases: &["mlocate", "plocate"] },
+    FlatDef { name: "locate", policy: &LOCATE_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/locate.1.html", aliases: &["mlocate", "plocate"] },
 ];
 
 #[cfg(test)]

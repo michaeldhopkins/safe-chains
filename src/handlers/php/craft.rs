@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -21,20 +22,20 @@ static CRAFT_POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static CRAFT: CommandDef = CommandDef {
     name: "craft",
     subs: &[
-        SubDef::Policy { name: "env/show", policy: &CRAFT_POSITIONAL_POLICY },
-        SubDef::Policy { name: "graphql/list-schemas", policy: &CRAFT_BARE_POLICY },
-        SubDef::Policy { name: "graphql/print-schema", policy: &CRAFT_POSITIONAL_POLICY },
-        SubDef::Policy { name: "help", policy: &CRAFT_BARE_POLICY },
-        SubDef::Policy { name: "install/check", policy: &CRAFT_BARE_POLICY },
-        SubDef::Policy { name: "migrate/history", policy: &CRAFT_BARE_POLICY },
-        SubDef::Policy { name: "migrate/new", policy: &CRAFT_BARE_POLICY },
-        SubDef::Policy { name: "pc/diff", policy: &CRAFT_BARE_POLICY },
-        SubDef::Policy { name: "pc/export", policy: &CRAFT_BARE_POLICY },
-        SubDef::Policy { name: "pc/get", policy: &CRAFT_POSITIONAL_POLICY },
-        SubDef::Policy { name: "plugin/list", policy: &CRAFT_BARE_POLICY },
-        SubDef::Policy { name: "queue/info", policy: &CRAFT_BARE_POLICY },
-        SubDef::Policy { name: "update/info", policy: &CRAFT_BARE_POLICY },
-        SubDef::Policy { name: "users/list-admins", policy: &CRAFT_BARE_POLICY },
+        SubDef::Policy { name: "env/show", policy: &CRAFT_POSITIONAL_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "graphql/list-schemas", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "graphql/print-schema", policy: &CRAFT_POSITIONAL_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "help", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "install/check", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "migrate/history", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "migrate/new", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "pc/diff", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "pc/export", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "pc/get", policy: &CRAFT_POSITIONAL_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "plugin/list", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "queue/info", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "update/info", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "users/list-admins", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

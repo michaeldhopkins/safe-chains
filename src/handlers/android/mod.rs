@@ -10,6 +10,7 @@ mod sdkmanager;
 mod zipalign;
 
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
 pub(crate) use aapt2::AAPT2;
 pub(crate) use apkanalyzer::APKANALYZER;
@@ -17,7 +18,7 @@ pub(crate) use apksigner::APKSIGNER;
 pub(crate) use avdmanager::AVDMANAGER;
 pub(crate) use bundletool::BUNDLETOOL;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     adb::dispatch(cmd, tokens)
         .or_else(|| APKANALYZER.dispatch(cmd, tokens))
         .or_else(|| APKSIGNER.dispatch(cmd, tokens))

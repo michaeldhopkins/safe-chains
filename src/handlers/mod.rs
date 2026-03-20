@@ -23,8 +23,9 @@ pub mod wrappers;
 pub mod xcode;
 
 use crate::parse::Token;
+use crate::verdict::Verdict;
 
-pub fn dispatch(tokens: &[Token]) -> bool {
+pub fn dispatch(tokens: &[Token]) -> Verdict {
     let cmd = tokens[0].command_name();
     None
         .or_else(|| shell::dispatch(cmd, tokens))
@@ -50,7 +51,7 @@ pub fn dispatch(tokens: &[Token]) -> bool {
         .or_else(|| r::dispatch(cmd, tokens))
         .or_else(|| coreutils::dispatch(cmd, tokens))
         .or_else(|| magick::dispatch(cmd, tokens))
-        .unwrap_or(false)
+        .unwrap_or(Verdict::Denied)
 }
 
 #[cfg(test)]
@@ -504,7 +505,7 @@ mod tests {
     fn visit_policies(prefix: &str, subs: &[crate::command::SubDef], visitor: &mut dyn FnMut(&str, &crate::policy::FlagPolicy)) {
         for sub in subs {
             match sub {
-                crate::command::SubDef::Policy { name, policy } => {
+                crate::command::SubDef::Policy { name, policy, .. } => {
                     visitor(&format!("{prefix} {name}"), policy);
                 }
                 crate::command::SubDef::Guarded { name, guard_long, policy, .. } => {

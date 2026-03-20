@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -19,7 +20,7 @@ static DF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "df", policy: &DF_POLICY, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation", aliases: &[] },
+    FlatDef { name: "df", policy: &DF_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

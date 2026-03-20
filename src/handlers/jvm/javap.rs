@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -19,6 +20,7 @@ pub static DEFS: &[FlatDef] = &[
     FlatDef {
         name: "javap",
         policy: &JAVAP_POLICY,
+        level: SafetyLevel::Inert,
         help_eligible: true,
         url: "https://docs.oracle.com/en/java/javase/21/docs/specs/man/javap.html",
         aliases: &[],

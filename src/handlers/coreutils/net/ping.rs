@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static PING_SAFE_STANDALONE: WordSet = WordSet::new(&[
     "-4", "-6", "-D", "-O", "-R", "-a", "-d", "-n", "-q", "-v",
@@ -23,9 +24,9 @@ fn has_count(tokens: &[Token]) -> bool {
     false
 }
 
-fn is_safe_ping(tokens: &[Token]) -> bool {
+fn is_safe_ping(tokens: &[Token]) -> Verdict {
     if !has_count(tokens) {
-        return false;
+        return Verdict::Denied;
     }
     let mut i = 1;
     while i < tokens.len() {
@@ -50,12 +51,13 @@ fn is_safe_ping(tokens: &[Token]) -> bool {
             i += 1;
             continue;
         }
-        return false;
+        return Verdict::Denied;
     }
-    true
+    Verdict::Allowed(SafetyLevel::Inert)
+
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "ping" => Some(is_safe_ping(tokens)),
         _ => None,

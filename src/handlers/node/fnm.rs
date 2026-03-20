@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -13,10 +14,10 @@ static FNM_BARE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static FNM: CommandDef = CommandDef {
     name: "fnm",
     subs: &[
-        SubDef::Policy { name: "current", policy: &FNM_BARE_POLICY },
-        SubDef::Policy { name: "default", policy: &FNM_BARE_POLICY },
-        SubDef::Policy { name: "list", policy: &FNM_BARE_POLICY },
-        SubDef::Policy { name: "ls-remote", policy: &FNM_BARE_POLICY },
+        SubDef::Policy { name: "current", policy: &FNM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "default", policy: &FNM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &FNM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls-remote", policy: &FNM_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

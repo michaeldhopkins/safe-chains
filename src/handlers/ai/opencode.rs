@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -29,11 +30,11 @@ static OPENCODE_STATS_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static OPENCODE: CommandDef = CommandDef {
     name: "opencode",
     subs: &[
-        SubDef::Policy { name: "models", policy: &OPENCODE_MODELS_POLICY },
+        SubDef::Policy { name: "models", policy: &OPENCODE_MODELS_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested { name: "session", subs: &[
-            SubDef::Policy { name: "list", policy: &OPENCODE_SESSION_LIST_POLICY },
+            SubDef::Policy { name: "list", policy: &OPENCODE_SESSION_LIST_POLICY, level: SafetyLevel::Inert },
         ]},
-        SubDef::Policy { name: "stats", policy: &OPENCODE_STATS_POLICY },
+        SubDef::Policy { name: "stats", policy: &OPENCODE_STATS_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

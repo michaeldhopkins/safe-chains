@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -23,7 +24,7 @@ static NETSTAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "netstat", policy: &NETSTAT_POLICY, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/netstat.8.html", aliases: &[] },
+    FlatDef { name: "netstat", policy: &NETSTAT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/netstat.8.html", aliases: &[] },
 ];
 
 #[cfg(test)]

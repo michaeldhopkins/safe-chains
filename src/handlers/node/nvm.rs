@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -13,12 +14,12 @@ static NVM_BARE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static NVM: CommandDef = CommandDef {
     name: "nvm",
     subs: &[
-        SubDef::Policy { name: "current", policy: &NVM_BARE_POLICY },
-        SubDef::Policy { name: "list", policy: &NVM_BARE_POLICY },
-        SubDef::Policy { name: "ls", policy: &NVM_BARE_POLICY },
-        SubDef::Policy { name: "ls-remote", policy: &NVM_BARE_POLICY },
-        SubDef::Policy { name: "version", policy: &NVM_BARE_POLICY },
-        SubDef::Policy { name: "which", policy: &NVM_BARE_POLICY },
+        SubDef::Policy { name: "current", policy: &NVM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &NVM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls", policy: &NVM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ls-remote", policy: &NVM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &NVM_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "which", policy: &NVM_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

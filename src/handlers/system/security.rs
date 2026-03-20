@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -64,17 +65,17 @@ static SECURITY_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static SECURITY: CommandDef = CommandDef {
     name: "security",
     subs: &[
-        SubDef::Policy { name: "find-certificate", policy: &SECURITY_FIND_CERT_POLICY },
-        SubDef::Policy { name: "find-identity", policy: &SECURITY_FIND_IDENTITY_POLICY },
-        SubDef::Policy { name: "find-generic-password", policy: &SECURITY_FIND_PASSWORD_POLICY },
-        SubDef::Policy { name: "find-internet-password", policy: &SECURITY_FIND_PASSWORD_POLICY },
-        SubDef::Policy { name: "list-keychains", policy: &SECURITY_LIST_POLICY },
-        SubDef::Policy { name: "dump-keychain", policy: &SECURITY_DUMP_POLICY },
-        SubDef::Policy { name: "dump-trust-settings", policy: &SECURITY_DUMP_POLICY },
-        SubDef::Policy { name: "verify-cert", policy: &SECURITY_VERIFY_CERT_POLICY },
-        SubDef::Policy { name: "cms", policy: &SECURITY_SIMPLE_POLICY },
-        SubDef::Policy { name: "show-keychain-info", policy: &SECURITY_SIMPLE_POLICY },
-        SubDef::Policy { name: "smartcard", policy: &SECURITY_SIMPLE_POLICY },
+        SubDef::Policy { name: "find-certificate", policy: &SECURITY_FIND_CERT_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "find-identity", policy: &SECURITY_FIND_IDENTITY_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "find-generic-password", policy: &SECURITY_FIND_PASSWORD_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "find-internet-password", policy: &SECURITY_FIND_PASSWORD_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list-keychains", policy: &SECURITY_LIST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "dump-keychain", policy: &SECURITY_DUMP_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "dump-trust-settings", policy: &SECURITY_DUMP_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "verify-cert", policy: &SECURITY_VERIFY_CERT_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "cms", policy: &SECURITY_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "show-keychain-info", policy: &SECURITY_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "smartcard", policy: &SECURITY_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

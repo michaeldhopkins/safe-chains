@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static GZIP_SAFE_MODES: WordSet = WordSet::new(&["--list", "--test", "-l", "-t"]);
 
@@ -7,7 +8,7 @@ static GZIP_SAFE_FLAGS: WordSet = WordSet::new(&[
     "-l", "-t", "-v",
 ]);
 
-fn is_safe_gzip(tokens: &[Token]) -> bool {
+fn is_safe_gzip(tokens: &[Token]) -> Verdict {
     let mut has_mode = false;
     for t in &tokens[1..] {
         if GZIP_SAFE_MODES.contains(t) {
@@ -15,7 +16,7 @@ fn is_safe_gzip(tokens: &[Token]) -> bool {
         }
     }
     if !has_mode {
-        return false;
+        return Verdict::Denied;
     }
     let mut i = 1;
     while i < tokens.len() {
@@ -28,12 +29,13 @@ fn is_safe_gzip(tokens: &[Token]) -> bool {
             i += 1;
             continue;
         }
-        return false;
+        return Verdict::Denied;
     }
-    true
+    Verdict::Allowed(SafetyLevel::Inert)
+
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "gzip" => Some(is_safe_gzip(tokens)),
         _ => None,

@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -14,6 +15,7 @@ pub static DEFS: &[FlatDef] = &[
     FlatDef {
         name: "ktlint",
         policy: &KTLINT_POLICY,
+        level: SafetyLevel::Inert,
         help_eligible: true,
         url: "https://pinterest.github.io/ktlint/latest/",
         aliases: &[],

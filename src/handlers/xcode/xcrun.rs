@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static XCRUN_SHOW_FLAGS: WordSet = WordSet::new(&[
     "--find", "--show-sdk-build-version", "--show-sdk-path",
@@ -8,9 +9,9 @@ static XCRUN_SHOW_FLAGS: WordSet = WordSet::new(&[
 
 static NOTARYTOOL_SAFE: WordSet = WordSet::new(&["history", "info", "log"]);
 
-pub fn is_safe_xcrun(tokens: &[Token]) -> bool {
+pub fn is_safe_xcrun(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     let mut i = 1;
     while i < tokens.len() {
@@ -26,24 +27,25 @@ pub fn is_safe_xcrun(tokens: &[Token]) -> bool {
         break;
     }
     if i >= tokens.len() {
-        return false;
+        return Verdict::Denied;
     }
     if XCRUN_SHOW_FLAGS.contains(&tokens[i]) {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     if tokens[i] == "simctl" {
-        return tokens.get(i + 1).is_some_and(|a| a == "list");
+        return if tokens.get(i + 1).is_some_and(|a| a == "list") { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
     if tokens[i] == "stapler" {
-        return tokens.get(i + 1).is_some_and(|a| a == "validate");
+        return if tokens.get(i + 1).is_some_and(|a| a == "validate") { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
     if tokens[i] == "notarytool" {
-        return tokens.get(i + 1).is_some_and(|a| NOTARYTOOL_SAFE.contains(a));
+        return if tokens.get(i + 1).is_some_and(|a| NOTARYTOOL_SAFE.contains(a)) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
-    false
+    Verdict::Denied
+
 }
 
-pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::xcode) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     if cmd == "xcrun" {
         Some(is_safe_xcrun(tokens))
     } else {

@@ -6,7 +6,7 @@ use serde::Deserialize;
 use serde_json::json;
 
 use safe_chains::cli::Cli;
-use safe_chains::is_safe_command;
+use safe_chains::verdict::{SafetyLevel, Verdict};
 
 #[derive(Deserialize)]
 struct ToolInput {
@@ -28,8 +28,13 @@ fn print_opencode_config() {
     print!("{}", safe_chains::docs::render_opencode_json(&patterns));
 }
 
-fn run_cli(command: &str) {
-    process::exit(i32::from(!is_safe_command(command)));
+fn run_cli(command: &str, threshold: SafetyLevel) {
+    let verdict = safe_chains::command_verdict(command);
+    let ok = match verdict {
+        Verdict::Allowed(level) => level <= threshold,
+        Verdict::Denied => false,
+    };
+    process::exit(i32::from(!ok));
 }
 
 fn emit_allow(reason: &str) {
@@ -49,7 +54,7 @@ fn run_claude_hook() {
         Err(_) => process::exit(0),
     };
 
-    if is_safe_command(&input.tool_input.command) {
+    if safe_chains::is_safe_command(&input.tool_input.command) {
         emit_allow("All commands in chain are safe read-only utilities");
         return;
     }
@@ -89,7 +94,8 @@ fn main() {
             } else if cli.opencode_config {
                 print_opencode_config();
             } else if let Some(command) = cli.command {
-                run_cli(&command);
+                let threshold = cli.level.unwrap_or(SafetyLevel::SafeWrite);
+                run_cli(&command, threshold);
             } else {
                 run_claude_hook();
             }

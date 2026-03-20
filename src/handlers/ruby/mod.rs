@@ -4,13 +4,14 @@ mod rbenv;
 mod ruby_cmd;
 
 use crate::command::FlatDef;
+use crate::verdict::Verdict;
 use crate::parse::Token;
 
 pub(crate) use bundle::BUNDLE;
 pub(crate) use gem::GEM;
 pub(crate) use rbenv::RBENV;
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     for flat in ruby_flat_defs() {
         if let r @ Some(_) = flat.dispatch(cmd, tokens) {
             return r;

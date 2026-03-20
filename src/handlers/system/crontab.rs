@@ -1,11 +1,13 @@
 use crate::parse::Token;
+use crate::verdict::{SafetyLevel, Verdict};
 
-fn is_safe_crontab(tokens: &[Token]) -> bool {
+fn is_safe_crontab(tokens: &[Token]) -> Verdict {
     let args: Vec<&str> = tokens[1..].iter().map(|t| t.as_str()).collect();
-    matches!(args.as_slice(), ["-l"] | ["-l", "-u", _] | ["-u", _, "-l"])
+    if matches!(args.as_slice(), ["-l"] | ["-l", "-u", _] | ["-u", _, "-l"]) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "crontab" => Some(is_safe_crontab(tokens)),
         _ => None,

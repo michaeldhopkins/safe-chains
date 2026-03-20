@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static PMSET_POLICY: FlagPolicy = FlagPolicy {
@@ -9,17 +10,18 @@ static PMSET_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
-fn is_safe_pmset(tokens: &[Token]) -> bool {
+fn is_safe_pmset(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     if tokens[1] != "-g" {
-        return false;
+        return Verdict::Denied;
     }
-    policy::check(&tokens[2..], &PMSET_POLICY)
+        if policy::check(&tokens[2..], &PMSET_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::system) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "pmset" => Some(is_safe_pmset(tokens)),
         _ => None,

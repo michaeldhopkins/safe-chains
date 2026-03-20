@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -41,10 +42,10 @@ static LOG_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static LOG: CommandDef = CommandDef {
     name: "log",
     subs: &[
-        SubDef::Policy { name: "show", policy: &LOG_SHOW_POLICY },
-        SubDef::Policy { name: "stream", policy: &LOG_STREAM_POLICY },
-        SubDef::Policy { name: "help", policy: &LOG_SIMPLE_POLICY },
-        SubDef::Policy { name: "stats", policy: &LOG_SIMPLE_POLICY },
+        SubDef::Policy { name: "show", policy: &LOG_SHOW_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "stream", policy: &LOG_STREAM_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "help", policy: &LOG_SIMPLE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "stats", policy: &LOG_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

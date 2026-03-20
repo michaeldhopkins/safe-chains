@@ -1,14 +1,16 @@
 use crate::parse::{has_flag, Token};
 use crate::policy::{self, FlagPolicy};
+use crate::verdict::{SafetyLevel, Verdict};
 #[cfg(test)]
 use crate::policy::FlagStyle;
 
-pub type CheckFn = fn(&[Token]) -> bool;
+pub type CheckFn = fn(&[Token]) -> Verdict;
 
 pub enum SubDef {
     Policy {
         name: &'static str,
         policy: &'static FlagPolicy,
+        level: SafetyLevel,
     },
     Nested {
         name: &'static str,
@@ -19,6 +21,7 @@ pub enum SubDef {
         guard_short: Option<&'static str>,
         guard_long: &'static str,
         policy: &'static FlagPolicy,
+        level: SafetyLevel,
     },
     Custom {
         name: &'static str,
@@ -53,49 +56,61 @@ impl SubDef {
         }
     }
 
-    pub fn check(&self, tokens: &[Token]) -> bool {
+    pub fn check(&self, tokens: &[Token]) -> Verdict {
         match self {
-            Self::Policy { policy, .. } => {
+            Self::Policy { policy, level, .. } => {
                 if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
-                    return true;
+                    return Verdict::Allowed(SafetyLevel::Inert);
                 }
-                policy::check(tokens, policy)
+                if policy::check(tokens, policy) {
+                    Verdict::Allowed(*level)
+                } else {
+                    Verdict::Denied
+                }
             }
             Self::Nested { subs, .. } => {
                 if tokens.len() < 2 {
-                    return false;
+                    return Verdict::Denied;
                 }
                 let sub = tokens[1].as_str();
                 if tokens.len() == 2 && (sub == "--help" || sub == "-h") {
-                    return true;
+                    return Verdict::Allowed(SafetyLevel::Inert);
                 }
                 subs.iter()
-                    .any(|s| s.name() == sub && s.check(&tokens[1..]))
+                    .find(|s| s.name() == sub)
+                    .map(|s| s.check(&tokens[1..]))
+                    .unwrap_or(Verdict::Denied)
             }
             Self::Guarded {
                 guard_short,
                 guard_long,
                 policy,
+                level,
                 ..
             } => {
                 if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
-                    return true;
+                    return Verdict::Allowed(SafetyLevel::Inert);
                 }
-                has_flag(tokens, *guard_short, Some(guard_long))
+                if has_flag(tokens, *guard_short, Some(guard_long))
                     && policy::check(tokens, policy)
+                {
+                    Verdict::Allowed(*level)
+                } else {
+                    Verdict::Denied
+                }
             }
             Self::Custom { check: f, .. } => {
                 if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
-                    return true;
+                    return Verdict::Allowed(SafetyLevel::Inert);
                 }
                 f(tokens)
             }
             Self::Delegation { skip, .. } => {
                 if tokens.len() <= *skip {
-                    return false;
+                    return Verdict::Denied;
                 }
                 let inner = shell_words::join(tokens[*skip..].iter().map(|t| t.as_str()));
-                crate::is_safe_command(&inner)
+                crate::command_verdict(&inner)
             }
         }
     }
@@ -115,28 +130,29 @@ impl CommandDef {
         patterns
     }
 
-    pub fn check(&self, tokens: &[Token]) -> bool {
+    pub fn check(&self, tokens: &[Token]) -> Verdict {
         if tokens.len() < 2 {
-            return false;
+            return Verdict::Denied;
         }
         let arg = tokens[1].as_str();
         if self.help_eligible && tokens.len() == 2 && matches!(arg, "--help" | "-h" | "--version" | "-V") {
-            return true;
+            return Verdict::Allowed(SafetyLevel::Inert);
         }
         if tokens.len() == 2 && self.bare_flags.contains(&arg) {
-            return true;
+            return Verdict::Allowed(SafetyLevel::Inert);
         }
         self.subs
             .iter()
             .find(|s| s.name() == arg)
-            .is_some_and(|s| s.check(&tokens[1..]))
+            .map(|s| s.check(&tokens[1..]))
+            .unwrap_or(Verdict::Denied)
     }
 
     pub fn dispatch(
         &self,
         cmd: &str,
         tokens: &[Token],
-    ) -> Option<bool> {
+    ) -> Option<Verdict> {
         if cmd == self.name || self.aliases.contains(&cmd) {
             Some(self.check(tokens))
         } else {
@@ -167,6 +183,7 @@ impl CommandDef {
 pub struct FlatDef {
     pub name: &'static str,
     pub policy: &'static FlagPolicy,
+    pub level: SafetyLevel,
     pub help_eligible: bool,
     pub url: &'static str,
     pub aliases: &'static [&'static str],
@@ -185,15 +202,19 @@ impl FlatDef {
         patterns
     }
 
-    pub fn dispatch(&self, cmd: &str, tokens: &[Token]) -> Option<bool> {
+    pub fn dispatch(&self, cmd: &str, tokens: &[Token]) -> Option<Verdict> {
         if cmd == self.name || self.aliases.contains(&cmd) {
             if self.help_eligible
                 && tokens.len() == 2
                 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V")
             {
-                return Some(true);
+                return Some(Verdict::Allowed(SafetyLevel::Inert));
             }
-            Some(policy::check(tokens, self.policy))
+            if policy::check(tokens, self.policy) {
+                Some(Verdict::Allowed(self.level))
+            } else {
+                Some(Verdict::Denied)
+            }
         } else {
             None
         }
@@ -256,7 +277,7 @@ fn sub_opencode_patterns(prefix: &str, sub: &SubDef, out: &mut Vec<String>) {
 
 fn sub_doc_line(sub: &SubDef, prefix: &str, out: &mut Vec<String>) {
     match sub {
-        SubDef::Policy { name, policy } => {
+        SubDef::Policy { name, policy, .. } => {
             let summary = policy.flag_summary();
             let label = if prefix.is_empty() {
                 (*name).to_string()
@@ -361,7 +382,7 @@ fn auto_test_sub(prefix: &str, sub: &SubDef, failures: &mut Vec<String>) {
     const UNKNOWN: &str = "--xyzzy-unknown-42";
 
     match sub {
-        SubDef::Policy { name, policy } => {
+        SubDef::Policy { name, policy, .. } => {
             if policy.flag_style == FlagStyle::Positional {
                 return;
             }
@@ -428,6 +449,7 @@ mod tests {
         subs: &[SubDef::Policy {
             name: "build",
             policy: &TEST_POLICY,
+            level: SafetyLevel::SafeWrite,
         }],
         bare_flags: &["--info"],
         help_eligible: true,
@@ -437,44 +459,62 @@ mod tests {
 
     #[test]
     fn bare_rejected() {
-        assert!(!SIMPLE_CMD.check(&toks(&["mycmd"])));
+        assert_eq!(SIMPLE_CMD.check(&toks(&["mycmd"])), Verdict::Denied);
     }
 
     #[test]
     fn bare_flag_accepted() {
-        assert!(SIMPLE_CMD.check(&toks(&["mycmd", "--info"])));
+        assert_eq!(
+            SIMPLE_CMD.check(&toks(&["mycmd", "--info"])),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
     }
 
     #[test]
     fn bare_flag_with_extra_rejected() {
-        assert!(!SIMPLE_CMD.check(&toks(&["mycmd", "--info", "extra"])));
+        assert_eq!(
+            SIMPLE_CMD.check(&toks(&["mycmd", "--info", "extra"])),
+            Verdict::Denied,
+        );
     }
 
     #[test]
     fn policy_sub_bare() {
-        assert!(SIMPLE_CMD.check(&toks(&["mycmd", "build"])));
+        assert_eq!(
+            SIMPLE_CMD.check(&toks(&["mycmd", "build"])),
+            Verdict::Allowed(SafetyLevel::SafeWrite),
+        );
     }
 
     #[test]
     fn policy_sub_with_flag() {
-        assert!(SIMPLE_CMD.check(&toks(&["mycmd", "build", "--verbose"])));
+        assert_eq!(
+            SIMPLE_CMD.check(&toks(&["mycmd", "build", "--verbose"])),
+            Verdict::Allowed(SafetyLevel::SafeWrite),
+        );
     }
 
     #[test]
     fn policy_sub_unknown_flag() {
-        assert!(!SIMPLE_CMD.check(&toks(&["mycmd", "build", "--bad"])));
+        assert_eq!(
+            SIMPLE_CMD.check(&toks(&["mycmd", "build", "--bad"])),
+            Verdict::Denied,
+        );
     }
 
     #[test]
     fn unknown_sub_rejected() {
-        assert!(!SIMPLE_CMD.check(&toks(&["mycmd", "deploy"])));
+        assert_eq!(
+            SIMPLE_CMD.check(&toks(&["mycmd", "deploy"])),
+            Verdict::Denied,
+        );
     }
 
     #[test]
     fn dispatch_matches() {
         assert_eq!(
             SIMPLE_CMD.dispatch("mycmd", &toks(&["mycmd", "build"])),
-            Some(true)
+            Some(Verdict::Allowed(SafetyLevel::SafeWrite)),
         );
     }
 
@@ -493,6 +533,7 @@ mod tests {
             subs: &[SubDef::Policy {
                 name: "describe",
                 policy: &TEST_POLICY,
+                level: SafetyLevel::Inert,
             }],
         }],
         bare_flags: &[],
@@ -503,24 +544,30 @@ mod tests {
 
     #[test]
     fn nested_sub() {
-        assert!(NESTED_CMD.check(&toks(&["nested", "package", "describe"])));
+        assert!(NESTED_CMD.check(&toks(&["nested", "package", "describe"])).is_allowed());
     }
 
     #[test]
     fn nested_sub_with_flag() {
         assert!(NESTED_CMD.check(
             &toks(&["nested", "package", "describe", "--verbose"]),
-        ));
+        ).is_allowed());
     }
 
     #[test]
     fn nested_bare_rejected() {
-        assert!(!NESTED_CMD.check(&toks(&["nested", "package"])));
+        assert_eq!(
+            NESTED_CMD.check(&toks(&["nested", "package"])),
+            Verdict::Denied,
+        );
     }
 
     #[test]
     fn nested_unknown_sub_rejected() {
-        assert!(!NESTED_CMD.check(&toks(&["nested", "package", "deploy"])));
+        assert_eq!(
+            NESTED_CMD.check(&toks(&["nested", "package", "deploy"])),
+            Verdict::Denied,
+        );
     }
 
     static GUARDED_POLICY: FlagPolicy = FlagPolicy {
@@ -538,6 +585,7 @@ mod tests {
             guard_short: None,
             guard_long: "--check",
             policy: &GUARDED_POLICY,
+            level: SafetyLevel::Inert,
         }],
         bare_flags: &[],
         help_eligible: false,
@@ -547,19 +595,22 @@ mod tests {
 
     #[test]
     fn guarded_with_guard() {
-        assert!(GUARDED_CMD.check(&toks(&["guarded", "fmt", "--check"])));
+        assert!(GUARDED_CMD.check(&toks(&["guarded", "fmt", "--check"])).is_allowed());
     }
 
     #[test]
     fn guarded_without_guard() {
-        assert!(!GUARDED_CMD.check(&toks(&["guarded", "fmt"])));
+        assert_eq!(
+            GUARDED_CMD.check(&toks(&["guarded", "fmt"])),
+            Verdict::Denied,
+        );
     }
 
     #[test]
     fn guarded_with_guard_and_flag() {
         assert!(GUARDED_CMD.check(
             &toks(&["guarded", "fmt", "--check", "--all"]),
-        ));
+        ).is_allowed());
     }
 
     static DELEGATION_CMD: CommandDef = CommandDef {
@@ -579,25 +630,31 @@ mod tests {
     fn delegation_safe_inner() {
         assert!(DELEGATION_CMD.check(
             &toks(&["runner", "run", "stable", "echo", "hello"]),
-        ));
+        ).is_allowed());
     }
 
     #[test]
     fn delegation_unsafe_inner() {
-        assert!(!DELEGATION_CMD.check(
-            &toks(&["runner", "run", "stable", "rm", "-rf"]),
-        ));
+        assert_eq!(
+            DELEGATION_CMD.check(&toks(&["runner", "run", "stable", "rm", "-rf"])),
+            Verdict::Denied,
+        );
     }
 
     #[test]
     fn delegation_no_inner() {
-        assert!(!DELEGATION_CMD.check(
-            &toks(&["runner", "run", "stable"]),
-        ));
+        assert_eq!(
+            DELEGATION_CMD.check(&toks(&["runner", "run", "stable"])),
+            Verdict::Denied,
+        );
     }
 
-    fn custom_check(tokens: &[Token]) -> bool {
-        tokens.len() >= 2 && tokens[1] == "safe"
+    fn custom_check(tokens: &[Token]) -> Verdict {
+        if tokens.len() >= 2 && tokens[1] == "safe" {
+            Verdict::Allowed(SafetyLevel::Inert)
+        } else {
+            Verdict::Denied
+        }
     }
 
     static CUSTOM_CMD: CommandDef = CommandDef {
@@ -616,12 +673,31 @@ mod tests {
 
     #[test]
     fn custom_passes() {
-        assert!(CUSTOM_CMD.check(&toks(&["custom", "special", "safe"])));
+        assert!(CUSTOM_CMD.check(&toks(&["custom", "special", "safe"])).is_allowed());
     }
 
     #[test]
     fn custom_fails() {
-        assert!(!CUSTOM_CMD.check(&toks(&["custom", "special", "bad"])));
+        assert_eq!(
+            CUSTOM_CMD.check(&toks(&["custom", "special", "bad"])),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn help_on_sub_is_inert() {
+        assert_eq!(
+            SIMPLE_CMD.check(&toks(&["mycmd", "build", "--help"])),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn help_on_command_is_inert() {
+        assert_eq!(
+            SIMPLE_CMD.check(&toks(&["mycmd", "--help"])),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
     }
 
     #[test]
@@ -707,6 +783,7 @@ mod tests {
             subs: &[SubDef::Policy {
                 name: "list",
                 policy: &TEST_POLICY,
+                level: SafetyLevel::Inert,
             }],
             bare_flags: &[],
             help_eligible: false,
@@ -724,6 +801,7 @@ mod tests {
         static FLAT: FlatDef = FlatDef {
             name: "grep",
             policy: &TEST_POLICY,
+            level: SafetyLevel::Inert,
             help_eligible: true,
             url: "",
             aliases: &["rg"],

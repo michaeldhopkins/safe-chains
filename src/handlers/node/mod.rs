@@ -10,6 +10,7 @@ mod volta;
 mod yarn;
 
 use crate::parse::{Token, WordSet, has_flag};
+use crate::verdict::Verdict;
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 pub(crate) use bun::BUN;
@@ -85,7 +86,7 @@ pub(super) fn is_safe_runner_package(tokens: &[Token], pkg_idx: usize) -> bool {
     false
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     NPM.dispatch(cmd, tokens)
         .or_else(|| yarn::dispatch(cmd, tokens))
         .or_else(|| PNPM.dispatch(cmd, tokens))

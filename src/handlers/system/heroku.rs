@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -85,16 +86,16 @@ static HEROKU_ADDONS_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static HEROKU: CommandDef = CommandDef {
     name: "heroku",
     subs: &[
-        SubDef::Policy { name: "addons", policy: &HEROKU_ADDONS_POLICY },
-        SubDef::Policy { name: "apps", policy: &HEROKU_APPS_POLICY },
-        SubDef::Policy { name: "apps:info", policy: &HEROKU_APPS_INFO_POLICY },
-        SubDef::Policy { name: "buildpacks", policy: &HEROKU_BUILDPACKS_POLICY },
-        SubDef::Policy { name: "config", policy: &HEROKU_CONFIG_POLICY },
-        SubDef::Policy { name: "logs", policy: &HEROKU_LOGS_POLICY },
-        SubDef::Policy { name: "ps", policy: &HEROKU_PS_POLICY },
-        SubDef::Policy { name: "regions", policy: &HEROKU_REGIONS_POLICY },
-        SubDef::Policy { name: "releases", policy: &HEROKU_RELEASES_POLICY },
-        SubDef::Policy { name: "status", policy: &HEROKU_STATUS_POLICY },
+        SubDef::Policy { name: "addons", policy: &HEROKU_ADDONS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "apps", policy: &HEROKU_APPS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "apps:info", policy: &HEROKU_APPS_INFO_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "buildpacks", policy: &HEROKU_BUILDPACKS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "config", policy: &HEROKU_CONFIG_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "logs", policy: &HEROKU_LOGS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "ps", policy: &HEROKU_PS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "regions", policy: &HEROKU_REGIONS_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "releases", policy: &HEROKU_RELEASES_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "status", policy: &HEROKU_STATUS_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
     help_eligible: true,

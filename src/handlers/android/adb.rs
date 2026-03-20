@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static SAFE_BARE_SUBS: WordSet = WordSet::new(&[
     "devices", "get-serialno", "get-state", "help", "start-server", "version",
@@ -20,17 +21,17 @@ static LOGCAT_VALUED: WordSet = WordSet::new(&[
     "--pid", "-b", "-e", "-t", "-v",
 ]);
 
-fn check_shell(tokens: &[Token], offset: usize) -> bool {
+fn check_shell(tokens: &[Token], offset: usize) -> Verdict {
     let Some(cmd) = tokens.get(offset) else {
-        return false;
+        return Verdict::Denied;
     };
     if SHELL_BARE_CMDS.contains(cmd) {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
     if !SHELL_PREFIX_CMDS.contains(cmd) {
-        return false;
+        return Verdict::Denied;
     }
-    match cmd.as_str() {
+    let ok = match cmd.as_str() {
         "cat" | "ls" | "dumpsys" => true,
         "pm" => {
             let sub = tokens.get(offset + 1);
@@ -42,10 +43,11 @@ fn check_shell(tokens: &[Token], offset: usize) -> bool {
                 && tokens.get(offset + 2).is_none()
         }
         _ => false,
-    }
+    };
+    if ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
-fn check_logcat(tokens: &[Token], start: usize) -> bool {
+fn check_logcat(tokens: &[Token], start: usize) -> Verdict {
     let mut has_d = false;
     let mut i = start;
     while i < tokens.len() {
@@ -65,7 +67,7 @@ fn check_logcat(tokens: &[Token], start: usize) -> bool {
         }
         if LOGCAT_VALUED.contains(t) {
             if i + 1 >= tokens.len() {
-                return false;
+                return Verdict::Denied;
             }
             i += 2;
             continue;
@@ -76,34 +78,38 @@ fn check_logcat(tokens: &[Token], start: usize) -> bool {
             i += 1;
             continue;
         }
-        return false;
+        return Verdict::Denied;
     }
-    has_d
+    if has_d { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
-pub fn is_safe_adb(tokens: &[Token]) -> bool {
+pub fn is_safe_adb(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     let mut i = 1;
     if tokens.get(i).is_some_and(|t| t == "-s") {
         i += 2;
     }
     let Some(sub) = tokens.get(i) else {
-        return false;
+        return Verdict::Denied;
     };
     match sub.as_str() {
-        s if SAFE_BARE_SUBS.contains(s) => true,
+        s if SAFE_BARE_SUBS.contains(s) => Verdict::Allowed(SafetyLevel::Inert),
         "forward" | "reverse" => {
-            tokens.get(i + 1).is_some_and(|t| t == "--list") && tokens.len() == i + 2
+            if tokens.get(i + 1).is_some_and(|t| t == "--list") && tokens.len() == i + 2 {
+                Verdict::Allowed(SafetyLevel::Inert)
+            } else {
+                Verdict::Denied
+            }
         }
         "logcat" => check_logcat(tokens, i + 1),
         "shell" => check_shell(tokens, i + 1),
-        _ => false,
+        _ => Verdict::Denied,
     }
 }
 
-pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     if cmd == "adb" {
         Some(is_safe_adb(tokens))
     } else {

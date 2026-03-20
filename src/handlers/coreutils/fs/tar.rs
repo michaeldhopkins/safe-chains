@@ -1,4 +1,5 @@
 use crate::parse::{Token, WordSet};
+use crate::verdict::{SafetyLevel, Verdict};
 
 static TAR_DANGEROUS_LONG: WordSet = WordSet::new(&[
     "--append", "--concatenate", "--create", "--delete",
@@ -56,16 +57,16 @@ fn check_short_bundle(s: &str) -> Option<usize> {
     if s.contains('f') { Some(2) } else { Some(1) }
 }
 
-fn is_safe_tar(tokens: &[Token]) -> bool {
+fn is_safe_tar(tokens: &[Token]) -> Verdict {
     if !has_list_mode(tokens) {
-        return false;
+        return Verdict::Denied;
     }
     let mut i = 1;
     while i < tokens.len() {
         let t = &tokens[i];
         let s = t.as_str();
         if TAR_DANGEROUS_LONG.contains(t) {
-            return false;
+            return Verdict::Denied;
         }
         if TAR_SAFE_LONG.contains(t) {
             i += 1;
@@ -78,25 +79,26 @@ fn is_safe_tar(tokens: &[Token]) -> bool {
         if s.starts_with('-') && !s.starts_with("--") && s.len() > 1 {
             match check_short_bundle(s) {
                 Some(advance) => { i += advance; continue; }
-                None => return false,
+                None => return Verdict::Denied,
             }
         }
         if i == 1 && is_old_style_flags(s) {
             let dashed = format!("-{s}");
             match check_short_bundle(&dashed) {
                 Some(advance) => { i += advance; continue; }
-                None => return false,
+                None => return Verdict::Denied,
             }
         }
         if s.starts_with("--") {
-            return false;
+            return Verdict::Denied;
         }
         i += 1;
     }
-    true
+    Verdict::Allowed(SafetyLevel::Inert)
+
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "tar" => Some(is_safe_tar(tokens)),
         _ => None,

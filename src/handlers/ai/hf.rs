@@ -1,4 +1,5 @@
 use crate::command::{CommandDef, SubDef};
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -53,57 +54,57 @@ static HF_JOBS_LOGS_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static HF: CommandDef = CommandDef {
     name: "hf",
     subs: &[
-        SubDef::Policy { name: "env", policy: &HF_BARE_POLICY },
-        SubDef::Policy { name: "version", policy: &HF_BARE_POLICY },
+        SubDef::Policy { name: "env", policy: &HF_BARE_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "version", policy: &HF_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Nested {
             name: "cache",
             subs: &[
-                SubDef::Policy { name: "ls", policy: &HF_BARE_POLICY },
-                SubDef::Policy { name: "verify", policy: &HF_POSITIONAL_POLICY },
+                SubDef::Policy { name: "ls", policy: &HF_BARE_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "verify", policy: &HF_POSITIONAL_POLICY, level: SafetyLevel::Inert },
             ],
         },
         SubDef::Nested {
             name: "collections",
             subs: &[
-                SubDef::Policy { name: "info", policy: &HF_POSITIONAL_POLICY },
-                SubDef::Policy { name: "ls", policy: &HF_COLLECTIONS_LS_POLICY },
+                SubDef::Policy { name: "info", policy: &HF_POSITIONAL_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "ls", policy: &HF_COLLECTIONS_LS_POLICY, level: SafetyLevel::Inert },
             ],
         },
         SubDef::Nested {
             name: "datasets",
             subs: &[
-                SubDef::Policy { name: "info", policy: &HF_POSITIONAL_POLICY },
-                SubDef::Policy { name: "ls", policy: &HF_LS_POLICY },
-                SubDef::Policy { name: "parquet", policy: &HF_POSITIONAL_POLICY },
+                SubDef::Policy { name: "info", policy: &HF_POSITIONAL_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "ls", policy: &HF_LS_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "parquet", policy: &HF_POSITIONAL_POLICY, level: SafetyLevel::Inert },
             ],
         },
         SubDef::Nested {
             name: "discussions",
             subs: &[
-                SubDef::Policy { name: "diff", policy: &HF_DISCUSSIONS_LIST_POLICY },
-                SubDef::Policy { name: "info", policy: &HF_DISCUSSIONS_LIST_POLICY },
-                SubDef::Policy { name: "list", policy: &HF_DISCUSSIONS_LIST_POLICY },
+                SubDef::Policy { name: "diff", policy: &HF_DISCUSSIONS_LIST_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "info", policy: &HF_DISCUSSIONS_LIST_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "list", policy: &HF_DISCUSSIONS_LIST_POLICY, level: SafetyLevel::Inert },
             ],
         },
         SubDef::Nested {
             name: "jobs",
             subs: &[
-                SubDef::Policy { name: "logs", policy: &HF_JOBS_LOGS_POLICY },
-                SubDef::Policy { name: "ps", policy: &HF_BARE_POLICY },
+                SubDef::Policy { name: "logs", policy: &HF_JOBS_LOGS_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "ps", policy: &HF_BARE_POLICY, level: SafetyLevel::Inert },
             ],
         },
         SubDef::Nested {
             name: "models",
             subs: &[
-                SubDef::Policy { name: "info", policy: &HF_POSITIONAL_POLICY },
-                SubDef::Policy { name: "ls", policy: &HF_LS_POLICY },
+                SubDef::Policy { name: "info", policy: &HF_POSITIONAL_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "ls", policy: &HF_LS_POLICY, level: SafetyLevel::Inert },
             ],
         },
         SubDef::Nested {
             name: "spaces",
             subs: &[
-                SubDef::Policy { name: "info", policy: &HF_POSITIONAL_POLICY },
-                SubDef::Policy { name: "ls", policy: &HF_LS_POLICY },
+                SubDef::Policy { name: "info", policy: &HF_POSITIONAL_POLICY, level: SafetyLevel::Inert },
+                SubDef::Policy { name: "ls", policy: &HF_LS_POLICY, level: SafetyLevel::Inert },
             ],
         },
     ],

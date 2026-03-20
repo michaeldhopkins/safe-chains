@@ -1,4 +1,5 @@
 use crate::command::FlatDef;
+use crate::verdict::SafetyLevel;
 use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
@@ -33,7 +34,7 @@ static EZA_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "eza", policy: &EZA_POLICY, help_eligible: false, url: "https://eza.rocks/", aliases: &["exa"] },
+    FlatDef { name: "eza", policy: &EZA_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://eza.rocks/", aliases: &["exa"] },
 ];
 
 #[cfg(test)]

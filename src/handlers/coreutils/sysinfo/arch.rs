@@ -1,13 +1,15 @@
 use crate::parse::Token;
+use crate::verdict::{SafetyLevel, Verdict};
 
-fn is_safe_arch(tokens: &[Token]) -> bool {
+fn is_safe_arch(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
-    tokens.len() == 1
+        if tokens.len() == 1 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+
 }
 
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<bool> {
+pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "arch" => Some(is_safe_arch(tokens)),
         _ => None,
