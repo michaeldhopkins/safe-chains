@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static RUSTUP_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--installed", "-v"]),
+    standalone: WordSet::flags(&["--help", "--installed", "-h", "-v"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static RUSTUP_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static RUSTUP_WHICH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--toolchain"]),
     bare: false,
     max_positional: None,
@@ -22,9 +22,10 @@ static RUSTUP_WHICH_POLICY: FlagPolicy = FlagPolicy {
 static RUSTUP_DOC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--alloc", "--book", "--cargo", "--core", "--edition-guide",
-        "--embedded-book", "--nomicon", "--path", "--proc_macro",
+        "--embedded-book", "--help", "--nomicon", "--path", "--proc_macro",
         "--reference", "--rust-by-example", "--rustc", "--rustdoc",
         "--std", "--test", "--unstable-book",
+        "-h",
     ]),
     valued: WordSet::flags(&["--toolchain"]),
     bare: true,
@@ -33,7 +34,7 @@ static RUSTUP_DOC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static RUSTUP_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--installed", "-v"]),
+    standalone: WordSet::flags(&["--help", "--installed", "-h", "-v"]),
     valued: WordSet::flags(&["--toolchain"]),
     bare: true,
     max_positional: None,
@@ -57,8 +58,7 @@ pub(crate) static RUSTUP: CommandDef = CommandDef {
         ]},
         SubDef::Policy { name: "which", policy: &RUSTUP_WHICH_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://rust-lang.github.io/rustup/",
     aliases: &[],
 };

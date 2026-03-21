@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static NVM_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--lts", "--no-colors"]),
+    standalone: WordSet::flags(&["--help", "--lts", "--no-colors", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -21,8 +21,7 @@ pub(crate) static NVM: CommandDef = CommandDef {
         SubDef::Policy { name: "version", policy: &NVM_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "which", policy: &NVM_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://github.com/nvm-sh/nvm#readme",
     aliases: &[],
 };

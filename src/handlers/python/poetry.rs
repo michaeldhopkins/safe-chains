@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static POETRY_SHOW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--latest", "--no-dev", "--outdated",
+        "--all", "--help", "--latest", "--no-dev", "--outdated",
         "--top-level", "--tree",
-        "-T", "-l", "-o",
+        "-T", "-h", "-l", "-o",
     ]),
     valued: WordSet::flags(&["--why"]),
     bare: true,
@@ -16,7 +16,7 @@ static POETRY_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POETRY_CHECK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--lock"]),
+    standalone: WordSet::flags(&["--help", "--lock", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -24,7 +24,7 @@ static POETRY_CHECK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POETRY_ENV_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--full-path"]),
+    standalone: WordSet::flags(&["--full-path", "--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -41,8 +41,7 @@ pub(crate) static POETRY: CommandDef = CommandDef {
             SubDef::Policy { name: "list", policy: &POETRY_ENV_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://python-poetry.org/docs/cli/",
     aliases: &[],
 };

@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static TAC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--before", "--regex",
-        "-b", "-r",
+        "--before", "--help", "--regex", "--version",
+        "-V", "-b", "-h", "-r",
     ]),
     valued: WordSet::flags(&[
         "--separator",
@@ -18,7 +18,7 @@ static TAC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "tac", policy: &TAC_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation", aliases: &[] },
+    FlatDef { name: "tac", policy: &TAC_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static PROCS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--no-header", "--or", "--tree", "--watch-interval",
-        "-l", "-t",
+        "--help", "--no-header", "--or", "--tree", "--version", "--watch-interval",
+        "-V", "-h", "-l", "-t",
     ]),
     valued: WordSet::flags(&[
         "--color", "--completion", "--config", "--gen-completion",
@@ -20,7 +20,7 @@ static PROCS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "procs", policy: &PROCS_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://github.com/dalance/procs#readme", aliases: &[] },
+    FlatDef { name: "procs", policy: &PROCS_POLICY, level: SafetyLevel::Inert, url: "https://github.com/dalance/procs#readme", aliases: &[] },
 ];
 
 #[cfg(test)]

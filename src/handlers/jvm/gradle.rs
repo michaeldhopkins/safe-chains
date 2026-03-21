@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static GRADLE_TASKS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--console", "--info", "--no-rebuild",
+        "--all", "--console", "--help", "--info", "--no-rebuild",
         "--quiet", "--stacktrace", "--warning-mode",
-        "-q",
+        "-h", "-q",
     ]),
     valued: WordSet::flags(&["--group"]),
     bare: true,
@@ -17,9 +17,9 @@ static GRADLE_TASKS_POLICY: FlagPolicy = FlagPolicy {
 
 static GRADLE_DEPS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--console", "--info", "--no-rebuild",
+        "--console", "--help", "--info", "--no-rebuild",
         "--quiet", "--stacktrace", "--warning-mode",
-        "-q",
+        "-h", "-q",
     ]),
     valued: WordSet::flags(&["--configuration"]),
     bare: true,
@@ -29,9 +29,9 @@ static GRADLE_DEPS_POLICY: FlagPolicy = FlagPolicy {
 
 static GRADLE_PROPS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--console", "--info", "--no-rebuild",
+        "--console", "--help", "--info", "--no-rebuild",
         "--quiet", "--stacktrace", "--warning-mode",
-        "-q",
+        "-h", "-q",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -42,11 +42,11 @@ static GRADLE_PROPS_POLICY: FlagPolicy = FlagPolicy {
 static GRADLE_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--build-cache", "--configure-on-demand", "--console",
-        "--continue", "--dry-run", "--info", "--no-build-cache",
+        "--continue", "--dry-run", "--help", "--info", "--no-build-cache",
         "--no-daemon", "--no-parallel", "--no-rebuild",
         "--parallel", "--profile", "--quiet", "--rerun-tasks",
         "--scan", "--stacktrace", "--warning-mode",
-        "-q",
+        "-h", "-q",
     ]),
     valued: WordSet::flags(&[
         "--exclude-task", "--max-workers",
@@ -69,8 +69,7 @@ static GRADLE_SUBS: &[SubDef] = &[
 pub(crate) static GRADLE: CommandDef = CommandDef {
     name: "gradle",
     subs: GRADLE_SUBS,
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.gradle.org/current/userguide/command_line_interface.html",
     aliases: &["gradlew"],
 };

@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static SHASUM_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--binary", "--check", "--portable", "--status",
-        "--strict", "--tag", "--text", "--warn",
-        "-0", "-b", "-c", "-p", "-s", "-t",
+        "--binary", "--check", "--help", "--portable", "--status",
+        "--strict", "--tag", "--text", "--version", "--warn",
+        "-0", "-V", "-b", "-c", "-h", "-p", "-s", "-t",
     ]),
     valued: WordSet::flags(&["--algorithm", "-a"]),
     bare: true,
@@ -16,7 +16,7 @@ static SHASUM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "shasum", policy: &SHASUM_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://perldoc.perl.org/shasum", aliases: &[] },
+    FlatDef { name: "shasum", policy: &SHASUM_POLICY, level: SafetyLevel::Inert, url: "https://perldoc.perl.org/shasum", aliases: &[] },
 ];
 
 #[cfg(test)]

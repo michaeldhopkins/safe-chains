@@ -3,7 +3,7 @@ use crate::verdict::{SafetyLevel, Verdict};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static PMSET_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,

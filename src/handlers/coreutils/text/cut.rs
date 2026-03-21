@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static CUT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--complement", "--only-delimited", "--zero-terminated",
-        "-n", "-s", "-w", "-z",
+        "--complement", "--help", "--only-delimited", "--version", "--zero-terminated",
+        "-V", "-h", "-n", "-s", "-w", "-z",
     ]),
     valued: WordSet::flags(&[
         "--bytes", "--characters", "--delimiter", "--fields",
@@ -19,7 +19,7 @@ static CUT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cut", policy: &CUT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation", aliases: &[] },
+    FlatDef { name: "cut", policy: &CUT_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

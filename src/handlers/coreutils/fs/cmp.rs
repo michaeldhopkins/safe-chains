@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static CMP_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--print-bytes", "--quiet", "--silent", "--verbose",
-        "-b", "-l", "-s",
+        "--help", "--print-bytes", "--quiet", "--silent", "--verbose", "--version",
+        "-V", "-b", "-h", "-l", "-s",
     ]),
     valued: WordSet::flags(&[
         "--bytes", "--ignore-initial",
@@ -18,7 +18,7 @@ static CMP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cmp", policy: &CMP_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/cmp.1.html", aliases: &[] },
+    FlatDef { name: "cmp", policy: &CMP_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/cmp.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

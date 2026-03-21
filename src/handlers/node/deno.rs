@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DENO_SAFE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--json", "--no-lock", "--quiet", "--unstable",
-        "-q",
+        "--help", "--json", "--no-lock", "--quiet", "--unstable",
+        "-h", "-q",
     ]),
     valued: WordSet::flags(&["--config", "--import-map", "-c"]),
     bare: true,
@@ -16,9 +16,9 @@ static DENO_SAFE_POLICY: FlagPolicy = FlagPolicy {
 
 static DENO_FMT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--check", "--no-semicolons", "--single-quote",
+        "--check", "--help", "--no-semicolons", "--single-quote",
         "--unstable",
-        "-q",
+        "-h", "-q",
     ]),
     valued: WordSet::flags(&[
         "--config", "--ext", "--ignore", "--indent-width",
@@ -40,8 +40,7 @@ pub(crate) static DENO: CommandDef = CommandDef {
         SubDef::Policy { name: "test", policy: &DENO_SAFE_POLICY, level: SafetyLevel::SafeRead },
         SubDef::Guarded { name: "fmt", guard_short: None, guard_long: "--check", policy: &DENO_FMT_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.deno.com/runtime/reference/cli/",
     aliases: &[],
 };

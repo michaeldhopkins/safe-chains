@@ -19,8 +19,8 @@ static GLAB_AUTH_SAFE: WordSet =
 
 static GLAB_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--closed", "--draft", "--merged",
-        "-A", "-M", "-a", "-c", "-d", "-g", "-q",
+        "--all", "--closed", "--draft", "--help", "--merged",
+        "-A", "-M", "-a", "-c", "-d", "-g", "-h", "-q",
     ]),
     valued: WordSet::flags(&[
         "--assignee", "--author", "--group", "--label",
@@ -37,9 +37,9 @@ static GLAB_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--comments", "--resolved", "--system-logs",
+        "--comments", "--help", "--resolved", "--system-logs",
         "--unresolved", "--web",
-        "-c", "-p", "-s", "-w",
+        "-c", "-h", "-p", "-s", "-w",
     ]),
     valued: WordSet::flags(&[
         "--output", "--page", "--per-page", "--repo",
@@ -52,7 +52,8 @@ static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
 
 static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--raw",
+        "--help", "--raw",
+        "-h",
     ]),
     valued: WordSet::flags(&[
         "--color", "--repo",
@@ -65,7 +66,8 @@ static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
 
 static GLAB_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "-q",
+        "--help",
+        "-h", "-q",
     ]),
     valued: WordSet::flags(&[
         "--output", "--page", "--per-page", "--repo",

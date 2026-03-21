@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static STRINGS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--include-all-whitespace", "--print-file-name",
-        "-a", "-f", "-w",
+        "--all", "--help", "--include-all-whitespace", "--print-file-name", "--version",
+        "-V", "-a", "-f", "-h", "-w",
     ]),
     valued: WordSet::flags(&[
         "--bytes", "--encoding", "--output-separator",
@@ -19,7 +19,7 @@ static STRINGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "strings", policy: &STRINGS_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/strings.1.html", aliases: &[] },
+    FlatDef { name: "strings", policy: &STRINGS_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/strings.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

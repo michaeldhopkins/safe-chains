@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static QEMU_IMG_INFO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--backing-chain", "--force-share", "--image-opts", "--limits",
-        "-U",
+        "--backing-chain", "--force-share", "--help", "--image-opts", "--limits",
+        "-U", "-h",
     ]),
     valued: WordSet::flags(&[
         "--cache", "--format", "--object", "--output",
@@ -19,8 +19,8 @@ static QEMU_IMG_INFO_POLICY: FlagPolicy = FlagPolicy {
 
 static QEMU_IMG_CHECK_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--force-share", "--image-opts", "--quiet",
-        "-U", "-q",
+        "--force-share", "--help", "--image-opts", "--quiet",
+        "-U", "-h", "-q",
     ]),
     valued: WordSet::flags(&[
         "--cache", "--format", "--object", "--output",
@@ -33,8 +33,8 @@ static QEMU_IMG_CHECK_POLICY: FlagPolicy = FlagPolicy {
 
 static QEMU_IMG_COMPARE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--force-share", "--image-opts", "--progress", "--quiet", "--strict",
-        "-U", "-p", "-q", "-s",
+        "--force-share", "--help", "--image-opts", "--progress", "--quiet", "--strict",
+        "-U", "-h", "-p", "-q", "-s",
     ]),
     valued: WordSet::flags(&[
         "--a-format", "--b-format", "--cache", "--object",
@@ -47,8 +47,8 @@ static QEMU_IMG_COMPARE_POLICY: FlagPolicy = FlagPolicy {
 
 static QEMU_IMG_MAP_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--force-share", "--image-opts",
-        "-U",
+        "--force-share", "--help", "--image-opts",
+        "-U", "-h",
     ]),
     valued: WordSet::flags(&[
         "--format", "--max-length", "--object", "--output", "--start-offset",
@@ -61,8 +61,8 @@ static QEMU_IMG_MAP_POLICY: FlagPolicy = FlagPolicy {
 
 static QEMU_IMG_MEASURE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--force-share", "--image-opts",
-        "-U",
+        "--force-share", "--help", "--image-opts",
+        "-U", "-h",
     ]),
     valued: WordSet::flags(&[
         "--format", "--object", "--output", "--size", "--snapshot", "--target-format",
@@ -75,8 +75,8 @@ static QEMU_IMG_MEASURE_POLICY: FlagPolicy = FlagPolicy {
 
 static QEMU_IMG_SNAPSHOT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--force-share", "--image-opts", "--list", "--quiet",
-        "-U", "-l", "-q",
+        "--force-share", "--help", "--image-opts", "--list", "--quiet",
+        "-U", "-h", "-l", "-q",
     ]),
     valued: WordSet::flags(&[
         "--format", "--object",
@@ -112,8 +112,7 @@ static QEMU_IMG_SUBS: &[SubDef] = &[
 pub(crate) static QEMU_IMG: CommandDef = CommandDef {
     name: "qemu-img",
     subs: QEMU_IMG_SUBS,
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://www.qemu.org/docs/master/tools/qemu-img.html",
     aliases: &[],
 };

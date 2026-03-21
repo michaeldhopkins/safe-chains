@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SIMCTL_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--verbose", "-j", "-v"]),
+    standalone: WordSet::flags(&["--help", "--json", "--verbose", "-h", "-j", "-v"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -17,7 +17,6 @@ pub(crate) static SIMCTL: CommandDef = CommandDef {
         SubDef::Policy { name: "list", policy: &SIMCTL_LIST_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
-    help_eligible: false,
     url: "https://developer.apple.com/documentation/xcode/simctl",
     aliases: &[],
 };

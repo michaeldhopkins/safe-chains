@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static XCBEAUTIFY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--is-ci", "--quiet", "--quieter", "-q"]),
+    standalone: WordSet::flags(&["--help", "--is-ci", "--quiet", "--quieter", "--version", "-V", "-h", "-q"]),
     valued: WordSet::flags(&["--renderer"]),
     bare: true,
     max_positional: None,
@@ -16,7 +16,6 @@ pub static DEFS: &[FlatDef] = &[
         name: "xcbeautify",
         policy: &XCBEAUTIFY_POLICY,
         level: SafetyLevel::Inert,
-        help_eligible: false,
         url: "https://github.com/cpisciotta/xcbeautify",
         aliases: &[],
     },

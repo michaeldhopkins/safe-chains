@@ -40,7 +40,6 @@ pub struct CommandDef {
     pub name: &'static str,
     pub subs: &'static [SubDef],
     pub bare_flags: &'static [&'static str],
-    pub help_eligible: bool,
     pub url: &'static str,
     pub aliases: &'static [&'static str],
 }
@@ -59,9 +58,6 @@ impl SubDef {
     pub fn check(&self, tokens: &[Token]) -> Verdict {
         match self {
             Self::Policy { policy, level, .. } => {
-                if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
-                    return Verdict::Allowed(SafetyLevel::Inert);
-                }
                 if policy::check(tokens, policy) {
                     Verdict::Allowed(*level)
                 } else {
@@ -73,9 +69,6 @@ impl SubDef {
                     return Verdict::Denied;
                 }
                 let sub = tokens[1].as_str();
-                if tokens.len() == 2 && (sub == "--help" || sub == "-h") {
-                    return Verdict::Allowed(SafetyLevel::Inert);
-                }
                 subs.iter()
                     .find(|s| s.name() == sub)
                     .map(|s| s.check(&tokens[1..]))
@@ -88,9 +81,6 @@ impl SubDef {
                 level,
                 ..
             } => {
-                if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
-                    return Verdict::Allowed(SafetyLevel::Inert);
-                }
                 if has_flag(tokens, *guard_short, Some(guard_long))
                     && policy::check(tokens, policy)
                 {
@@ -99,12 +89,7 @@ impl SubDef {
                     Verdict::Denied
                 }
             }
-            Self::Custom { check: f, .. } => {
-                if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
-                    return Verdict::Allowed(SafetyLevel::Inert);
-                }
-                f(tokens)
-            }
+            Self::Custom { check: f, .. } => f(tokens),
             Self::Delegation { skip, .. } => {
                 if tokens.len() <= *skip {
                     return Verdict::Denied;
@@ -135,9 +120,6 @@ impl CommandDef {
             return Verdict::Denied;
         }
         let arg = tokens[1].as_str();
-        if self.help_eligible && tokens.len() == 2 && matches!(arg, "--help" | "-h" | "--version" | "-V") {
-            return Verdict::Allowed(SafetyLevel::Inert);
-        }
         if tokens.len() == 2 && self.bare_flags.contains(&arg) {
             return Verdict::Allowed(SafetyLevel::Inert);
         }
@@ -184,7 +166,6 @@ pub struct FlatDef {
     pub name: &'static str,
     pub policy: &'static FlagPolicy,
     pub level: SafetyLevel,
-    pub help_eligible: bool,
     pub url: &'static str,
     pub aliases: &'static [&'static str],
 }
@@ -204,12 +185,6 @@ impl FlatDef {
 
     pub fn dispatch(&self, cmd: &str, tokens: &[Token]) -> Option<Verdict> {
         if cmd == self.name || self.aliases.contains(&cmd) {
-            if self.help_eligible
-                && tokens.len() == 2
-                && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V")
-            {
-                return Some(Verdict::Allowed(SafetyLevel::Inert));
-            }
             if policy::check(tokens, self.policy) {
                 Some(Verdict::Allowed(self.level))
             } else {
@@ -437,7 +412,7 @@ mod tests {
 
 
     static TEST_POLICY: FlagPolicy = FlagPolicy {
-        standalone: WordSet::new(&["--verbose", "-v"]),
+        standalone: WordSet::new(&["--help", "--verbose", "-h", "-v"]),
         valued: WordSet::new(&["--output", "-o"]),
         bare: true,
         max_positional: None,
@@ -451,8 +426,7 @@ mod tests {
             policy: &TEST_POLICY,
             level: SafetyLevel::SafeWrite,
         }],
-        bare_flags: &["--info"],
-        help_eligible: true,
+        bare_flags: &["--help", "--info", "--version", "-V", "-h"],
         url: "",
         aliases: &[],
     };
@@ -537,7 +511,6 @@ mod tests {
             }],
         }],
         bare_flags: &[],
-        help_eligible: false,
         url: "",
         aliases: &[],
     };
@@ -571,7 +544,7 @@ mod tests {
     }
 
     static GUARDED_POLICY: FlagPolicy = FlagPolicy {
-        standalone: WordSet::new(&["--all", "--check"]),
+        standalone: WordSet::new(&["--all", "--check", "--help", "-h"]),
         valued: WordSet::new(&[]),
         bare: false,
         max_positional: None,
@@ -588,7 +561,6 @@ mod tests {
             level: SafetyLevel::Inert,
         }],
         bare_flags: &[],
-        help_eligible: false,
         url: "",
         aliases: &[],
     };
@@ -621,7 +593,6 @@ mod tests {
             doc: "run delegates to inner command.",
         }],
         bare_flags: &[],
-        help_eligible: false,
         url: "",
         aliases: &[],
     };
@@ -666,7 +637,6 @@ mod tests {
             test_suffix: Some("safe"),
         }],
         bare_flags: &[],
-        help_eligible: false,
         url: "",
         aliases: &[],
     };
@@ -685,15 +655,15 @@ mod tests {
     }
 
     #[test]
-    fn help_on_sub_is_inert() {
+    fn help_on_sub_uses_sub_level() {
         assert_eq!(
             SIMPLE_CMD.check(&toks(&["mycmd", "build", "--help"])),
-            Verdict::Allowed(SafetyLevel::Inert),
+            Verdict::Allowed(SafetyLevel::SafeWrite),
         );
     }
 
     #[test]
-    fn help_on_command_is_inert() {
+    fn help_on_command_uses_bare_flags() {
         assert_eq!(
             SIMPLE_CMD.check(&toks(&["mycmd", "--help"])),
             Verdict::Allowed(SafetyLevel::Inert),
@@ -706,7 +676,7 @@ mod tests {
         assert_eq!(doc.name, "mycmd");
         assert_eq!(
             doc.description,
-            "- Allowed standalone flags: --info\n- **build**: Flags: --verbose, -v. Valued: --output, -o"
+            "- Allowed standalone flags: --help, --info, --version, -V, -h\n- **build**: Flags: --help, --verbose, -h, -v. Valued: --output, -o"
         );
     }
 
@@ -715,7 +685,7 @@ mod tests {
         let doc = NESTED_CMD.to_doc();
         assert_eq!(
             doc.description,
-            "- **package describe**: Flags: --verbose, -v. Valued: --output, -o"
+            "- **package describe**: Flags: --help, --verbose, -h, -v. Valued: --output, -o"
         );
     }
 
@@ -724,7 +694,7 @@ mod tests {
         let doc = GUARDED_CMD.to_doc();
         assert_eq!(
             doc.description,
-            "- **fmt** (requires --check): Flags: --all, --check"
+            "- **fmt** (requires --check): Flags: --all, --check, --help, -h"
         );
     }
 
@@ -786,7 +756,6 @@ mod tests {
                 level: SafetyLevel::Inert,
             }],
             bare_flags: &[],
-            help_eligible: false,
             url: "",
             aliases: &["alt"],
         };
@@ -802,7 +771,6 @@ mod tests {
             name: "grep",
             policy: &TEST_POLICY,
             level: SafetyLevel::Inert,
-            help_eligible: true,
             url: "",
             aliases: &["rg"],
         };

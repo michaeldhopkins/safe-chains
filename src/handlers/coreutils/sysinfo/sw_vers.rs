@@ -5,8 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static SW_VERS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--buildVersion", "--productName",
-        "--productVersion", "--productVersionExtra",
+        "--buildVersion", "--help", "--productName",
+        "--productVersion", "--productVersionExtra", "--version",
+        "-V", "-h",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -15,7 +16,7 @@ static SW_VERS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "sw_vers", policy: &SW_VERS_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://ss64.com/mac/sw_vers.html", aliases: &[] },
+    FlatDef { name: "sw_vers", policy: &SW_VERS_POLICY, level: SafetyLevel::Inert, url: "https://ss64.com/mac/sw_vers.html", aliases: &[] },
 ];
 
 #[cfg(test)]

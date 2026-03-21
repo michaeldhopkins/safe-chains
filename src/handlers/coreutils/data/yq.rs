@@ -6,9 +6,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static YQ_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--colors", "--exit-status",
-        "--no-colors", "--no-doc", "--null-input",
-        "--prettyPrint",
-        "-C", "-M", "-N", "-P", "-e", "-r",
+        "--help", "--no-colors", "--no-doc", "--null-input",
+        "--prettyPrint", "--version",
+        "-C", "-M", "-N", "-P", "-V", "-e", "-h", "-r",
     ]),
     valued: WordSet::flags(&[
         "--arg", "--argjson", "--expression",
@@ -22,7 +22,7 @@ static YQ_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "yq", policy: &YQ_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://mikefarah.gitbook.io/yq", aliases: &[] },
+    FlatDef { name: "yq", policy: &YQ_POLICY, level: SafetyLevel::Inert, url: "https://mikefarah.gitbook.io/yq", aliases: &[] },
 ];
 
 #[cfg(test)]

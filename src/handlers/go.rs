@@ -4,7 +4,7 @@ use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static GO_VERSION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-m", "-v"]),
+    standalone: WordSet::flags(&["--help", "-h", "-m", "-v"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static GO_VERSION_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GO_ENV_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-json"]),
+    standalone: WordSet::flags(&["--help", "-h", "-json"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static GO_ENV_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GO_DOC_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-all", "-c", "-cmd", "-short", "-src", "-u"]),
+    standalone: WordSet::flags(&["--help", "-all", "-c", "-cmd", "-h", "-short", "-src", "-u"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -29,8 +29,9 @@ static GO_DOC_POLICY: FlagPolicy = FlagPolicy {
 
 static GO_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
+        "--help",
         "-a", "-asan", "-compiled", "-cover", "-deps", "-e", "-export",
-        "-find", "-linkshared", "-m", "-modcacherw", "-msan", "-n",
+        "-find", "-h", "-linkshared", "-m", "-modcacherw", "-msan", "-n",
         "-race", "-retract", "-test", "-trimpath", "-u", "-v",
         "-versions", "-work", "-x",
     ]),
@@ -47,7 +48,8 @@ static GO_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static GO_VET_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "-a", "-asan", "-cover", "-json", "-linkshared", "-modcacherw",
+        "--help",
+        "-a", "-asan", "-cover", "-h", "-json", "-linkshared", "-modcacherw",
         "-msan", "-n", "-race", "-trimpath", "-v", "-work", "-x",
     ]),
     valued: WordSet::flags(&[
@@ -63,7 +65,8 @@ static GO_VET_POLICY: FlagPolicy = FlagPolicy {
 
 static GO_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "-a", "-asan", "-cover", "-linkshared", "-modcacherw",
+        "--help",
+        "-a", "-asan", "-cover", "-h", "-linkshared", "-modcacherw",
         "-msan", "-n", "-race", "-trimpath", "-v", "-work", "-x",
     ]),
     valued: WordSet::flags(&[
@@ -79,7 +82,8 @@ static GO_BUILD_POLICY: FlagPolicy = FlagPolicy {
 
 static GO_TEST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "-a", "-asan", "-benchmem", "-cover", "-failfast", "-json",
+        "--help",
+        "-a", "-asan", "-benchmem", "-cover", "-failfast", "-h", "-json",
         "-linkshared", "-modcacherw", "-msan", "-n", "-race",
         "-short", "-trimpath", "-v", "-work", "-x",
     ]),
@@ -117,8 +121,7 @@ pub(crate) static GO: CommandDef = CommandDef {
         SubDef::Policy { name: "version", policy: &GO_VERSION_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "vet", policy: &GO_VET_POLICY, level: SafetyLevel::SafeRead },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://pkg.go.dev/cmd/go",
     aliases: &[],
 };

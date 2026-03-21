@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static RUBY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-v"]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-h", "-v"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: Some(0),
@@ -26,8 +26,8 @@ static RI_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::ruby) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ruby", policy: &RUBY_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://www.ruby-lang.org/en/documentation/", aliases: &[] },
-    FlatDef { name: "ri", policy: &RI_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://ruby.github.io/rdoc/RI_md.html", aliases: &[] },
+    FlatDef { name: "ruby", policy: &RUBY_POLICY, level: SafetyLevel::Inert, url: "https://www.ruby-lang.org/en/documentation/", aliases: &[] },
+    FlatDef { name: "ri", policy: &RI_POLICY, level: SafetyLevel::Inert, url: "https://ruby.github.io/rdoc/RI_md.html", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -9,13 +9,13 @@ static LS_POLICY: FlagPolicy = FlagPolicy {
         "--context", "--dereference", "--dereference-command-line",
         "--dereference-command-line-symlink-to-dir", "--directory",
         "--escape", "--file-type", "--full-time",
-        "--group-directories-first", "--hide-control-chars",
+        "--group-directories-first", "--help", "--hide-control-chars",
         "--human-readable", "--indicator-style",
         "--inode", "--kibibytes", "--literal", "--no-group",
         "--numeric-uid-gid", "--quote-name", "--recursive",
-        "--reverse", "--show-control-chars", "--si", "--size",
+        "--reverse", "--show-control-chars", "--si", "--size", "--version",
         "-1", "-A", "-B", "-C", "-F", "-G", "-H", "-L",
-        "-N", "-Q", "-R", "-S", "-U", "-X", "-Z",
+        "-N", "-Q", "-R", "-S", "-U", "-V", "-X", "-Z",
         "-a", "-c", "-d", "-f", "-g", "-h", "-i", "-k",
         "-l", "-m", "-n", "-o", "-p", "-q", "-r", "-s",
         "-t", "-u", "-v", "-x",
@@ -33,7 +33,7 @@ static LS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ls", policy: &LS_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation", aliases: &[] },
+    FlatDef { name: "ls", policy: &LS_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

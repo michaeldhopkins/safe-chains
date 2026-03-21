@@ -5,7 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DETEKT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--build-upon-default-config", "--debug", "--parallel",
+        "--build-upon-default-config", "--debug", "--help", "--parallel", "--version",
+        "-V", "-h",
     ]),
     valued: WordSet::flags(&[
         "--baseline", "--classpath", "--config", "--config-resource",
@@ -22,7 +23,6 @@ pub static DEFS: &[FlatDef] = &[
         name: "detekt",
         policy: &DETEKT_POLICY,
         level: SafetyLevel::Inert,
-        help_eligible: true,
         url: "https://detekt.dev/docs/gettingstarted/cli/",
         aliases: &[],
     },

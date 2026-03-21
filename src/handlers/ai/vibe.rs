@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static VIBE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: Some(0),
@@ -12,7 +12,7 @@ static VIBE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::ai) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "vibe", policy: &VIBE_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://docs.mistral.ai/mistral-vibe/", aliases: &[] },
+    FlatDef { name: "vibe", policy: &VIBE_POLICY, level: SafetyLevel::Inert, url: "https://docs.mistral.ai/mistral-vibe/", aliases: &[] },
 ];
 
 #[cfg(test)]

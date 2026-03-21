@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static VOLTA_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--current", "--default", "-c", "-d"]),
+    standalone: WordSet::flags(&["--current", "--default", "--help", "-c", "-d", "-h"]),
     valued: WordSet::flags(&["--format"]),
     bare: true,
     max_positional: None,
@@ -17,8 +17,7 @@ pub(crate) static VOLTA: CommandDef = CommandDef {
         SubDef::Policy { name: "list", policy: &VOLTA_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "which", policy: &VOLTA_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.volta.sh/reference",
     aliases: &[],
 };

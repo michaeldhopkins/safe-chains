@@ -419,7 +419,6 @@ mod tests {
         level_git_log: "git log --oneline",
         level_git_diff: "git diff",
         level_cargo_help: "cargo --help",
-        level_cargo_build_help: "cargo build --help",
         level_cargo_tree: "cargo tree",
         level_find_grep: "find . -name '*.py' -exec grep pattern {} +",
         level_pipe_inert: "grep foo file | head -5",
@@ -448,6 +447,7 @@ mod tests {
 
     safe_write! {
         level_cargo_build: "cargo build",
+        level_cargo_build_help: "cargo build --help",
         level_cargo_doc: "cargo doc",
         level_go_build: "go build ./...",
         level_swift_build: "swift build",

@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--human-readable", "--inodes", "--local",
+        "--all", "--help", "--human-readable", "--inodes", "--local",
         "--no-sync", "--portability", "--print-type",
-        "--si", "--sync", "--total",
-        "-H", "-P", "-T", "-a", "-h", "-i", "-k", "-l",
+        "--si", "--sync", "--total", "--version",
+        "-H", "-P", "-T", "-V", "-a", "-h", "-i", "-k", "-l",
     ]),
     valued: WordSet::flags(&[
         "--block-size", "--exclude-type", "--output", "--type",
@@ -20,7 +20,7 @@ static DF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "df", policy: &DF_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation", aliases: &[] },
+    FlatDef { name: "df", policy: &DF_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static HF_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static HF_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HF_POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -20,7 +20,7 @@ static HF_POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HF_LS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--author", "--filter", "--limit", "--search", "--sort"]),
     bare: true,
     max_positional: None,
@@ -28,7 +28,7 @@ static HF_LS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HF_COLLECTIONS_LS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--limit", "--owner"]),
     bare: true,
     max_positional: None,
@@ -36,7 +36,7 @@ static HF_COLLECTIONS_LS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HF_DISCUSSIONS_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -44,7 +44,7 @@ static HF_DISCUSSIONS_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HF_JOBS_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--tail"]),
     bare: false,
     max_positional: None,
@@ -108,8 +108,7 @@ pub(crate) static HF: CommandDef = CommandDef {
             ],
         },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://huggingface.co/docs/huggingface_hub/guides/cli",
     aliases: &[],
 };

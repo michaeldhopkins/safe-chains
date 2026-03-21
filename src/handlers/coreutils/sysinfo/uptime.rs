@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static UPTIME_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--pretty", "--since", "-p", "-s"]),
+    standalone: WordSet::flags(&["--help", "--pretty", "--since", "--version", "-V", "-h", "-p", "-s"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),
@@ -12,7 +12,7 @@ static UPTIME_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "uptime", policy: &UPTIME_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation", aliases: &[] },
+    FlatDef { name: "uptime", policy: &UPTIME_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -280,7 +280,7 @@ pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
     }
     let subcmd = &tokens[1];
 
-    if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
+    if tokens.len() == 3 && (tokens[2] == "--help" || tokens[2] == "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
 

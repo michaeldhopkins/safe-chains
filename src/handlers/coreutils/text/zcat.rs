@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static ZCAT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--force", "--quiet", "--verbose",
-        "-f", "-q", "-v",
+        "--force", "--help", "--quiet", "--verbose", "--version",
+        "-V", "-f", "-h", "-q", "-v",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -15,7 +15,7 @@ static ZCAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "zcat", policy: &ZCAT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/zcat.1.html", aliases: &["gzcat"] },
+    FlatDef { name: "zcat", policy: &ZCAT_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/zcat.1.html", aliases: &["gzcat"] },
 ];
 
 #[cfg(test)]

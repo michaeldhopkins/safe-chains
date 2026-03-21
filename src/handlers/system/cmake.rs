@@ -3,8 +3,7 @@ use crate::command::CommandDef;
 pub(crate) static CMAKE: CommandDef = CommandDef {
     name: "cmake",
     subs: &[],
-    bare_flags: &["--system-information", "--version"],
-    help_eligible: true,
+    bare_flags: &["--help", "--system-information", "--version", "-V", "-h"],
     url: "https://cmake.org/cmake/help/latest/manual/cmake.1.html",
     aliases: &[],
 };

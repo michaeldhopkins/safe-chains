@@ -338,60 +338,6 @@ mod tests {
         }
     }
 
-    #[test]
-    fn help_eligible_command_defs() {
-        for def in COMMAND_DEFS {
-            let names: Vec<&str> = std::iter::once(def.name).chain(def.aliases.iter().copied()).collect();
-            for name in &names {
-                if def.help_eligible {
-                    for flag in &["--help", "-h", "--version", "-V"] {
-                        let cmd = format!("{name} {flag}");
-                        assert!(
-                            crate::is_safe_command(&cmd),
-                            "{name}: help_eligible=true but rejected {flag}",
-                        );
-                    }
-                } else {
-                    assert!(
-                        !crate::is_safe_command(&format!("{name} --help")),
-                        "{name}: help_eligible=false but accepted --help",
-                    );
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn help_eligible_flat_defs() {
-        use crate::policy::FlagStyle;
-        let check_def = |def: &crate::command::FlatDef| {
-            if def.help_eligible {
-                for flag in &["--help", "-h", "--version", "-V"] {
-                    let cmd = format!("{} {flag}", def.name);
-                    assert!(
-                        crate::is_safe_command(&cmd),
-                        "{}: help_eligible=true but rejected {flag}",
-                        def.name,
-                    );
-                }
-            } else if def.policy.flag_style != FlagStyle::Positional {
-                assert!(
-                    !crate::is_safe_command(&format!("{} --help", def.name)),
-                    "{}: help_eligible=false but accepted --help",
-                    def.name,
-                );
-            }
-        };
-        for def in coreutils::all_flat_defs()
-            .into_iter()
-            .chain(xcode::xcbeautify_flat_defs())
-        {
-            check_def(def);
-        }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()) {
-            check_def(def);
-        }
-    }
 
     #[test]
     fn bare_false_rejects_bare_invocation() {

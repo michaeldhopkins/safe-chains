@@ -6,9 +6,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static REALPATH_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--canonicalize-existing", "--canonicalize-missing",
-        "--logical", "--no-symlinks", "--physical", "--quiet",
-        "--strip", "--zero",
-        "-L", "-P", "-e", "-m", "-q", "-s", "-z",
+        "--help", "--logical", "--no-symlinks", "--physical", "--quiet",
+        "--strip", "--version", "--zero",
+        "-L", "-P", "-V", "-e", "-h", "-m", "-q", "-s", "-z",
     ]),
     valued: WordSet::flags(&["--relative-base", "--relative-to"]),
     bare: false,
@@ -17,7 +17,7 @@ static REALPATH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "realpath", policy: &REALPATH_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#realpath-invocation", aliases: &[] },
+    FlatDef { name: "realpath", policy: &REALPATH_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#realpath-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

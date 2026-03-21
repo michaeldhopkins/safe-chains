@@ -6,9 +6,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static LOCATE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--basename", "--count", "--existing",
-        "--follow", "--ignore-case", "--null", "--quiet",
-        "--statistics", "--wholename",
-        "-0", "-A", "-S", "-b", "-c", "-e", "-i", "-q", "-w",
+        "--follow", "--help", "--ignore-case", "--null", "--quiet",
+        "--statistics", "--version", "--wholename",
+        "-0", "-A", "-S", "-V", "-b", "-c", "-e", "-h", "-i", "-q", "-w",
     ]),
     valued: WordSet::flags(&[
         "--database", "--limit",
@@ -20,7 +20,7 @@ static LOCATE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "locate", policy: &LOCATE_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/locate.1.html", aliases: &["mlocate", "plocate"] },
+    FlatDef { name: "locate", policy: &LOCATE_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/locate.1.html", aliases: &["mlocate", "plocate"] },
 ];
 
 #[cfg(test)]

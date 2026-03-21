@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static UNIQ_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--count", "--ignore-case", "--repeated", "--unique",
-        "--zero-terminated",
-        "-D", "-c", "-d", "-i", "-u", "-z",
+        "--count", "--help", "--ignore-case", "--repeated", "--unique",
+        "--version", "--zero-terminated",
+        "-D", "-V", "-c", "-d", "-h", "-i", "-u", "-z",
     ]),
     valued: WordSet::flags(&[
         "--all-repeated", "--check-chars", "--group", "--skip-chars",
@@ -20,7 +20,7 @@ static UNIQ_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "uniq", policy: &UNIQ_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#uniq-invocation", aliases: &[] },
+    FlatDef { name: "uniq", policy: &UNIQ_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#uniq-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

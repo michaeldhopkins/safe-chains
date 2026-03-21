@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static RBENV_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -21,8 +21,7 @@ pub(crate) static RBENV: CommandDef = CommandDef {
         SubDef::Policy { name: "versions", policy: &RBENV_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "which", policy: &RBENV_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://github.com/rbenv/rbenv#readme",
     aliases: &[],
 };

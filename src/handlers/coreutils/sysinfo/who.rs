@@ -6,10 +6,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static WHO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--boot", "--count", "--dead", "--heading",
-        "--login", "--lookup", "--mesg", "--message", "--process",
-        "--runlevel", "--short", "--time", "--users", "--writable",
-        "-H", "-S", "-T", "-a", "-b", "-d",
-        "-l", "-m", "-p", "-q", "-r",
+        "--help", "--login", "--lookup", "--mesg", "--message", "--process",
+        "--runlevel", "--short", "--time", "--users", "--version", "--writable",
+        "-H", "-S", "-T", "-V", "-a", "-b", "-d",
+        "-h", "-l", "-m", "-p", "-q", "-r",
         "-s", "-t", "-u", "-w",
     ]),
     valued: WordSet::flags(&[]),
@@ -19,7 +19,7 @@ static WHO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "who", policy: &WHO_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation", aliases: &[] },
+    FlatDef { name: "who", policy: &WHO_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

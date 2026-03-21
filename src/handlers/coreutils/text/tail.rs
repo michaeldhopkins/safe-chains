@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static TAIL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--follow", "--quiet", "--retry", "--silent", "--verbose",
-        "--zero-terminated",
+        "--follow", "--help", "--quiet", "--retry", "--silent", "--verbose",
+        "--version", "--zero-terminated",
         "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
-        "-F", "-f", "-q", "-r", "-v", "-z",
+        "-F", "-V", "-f", "-h", "-q", "-r", "-v", "-z",
     ]),
     valued: WordSet::flags(&[
         "--bytes", "--lines", "--max-unchanged-stats", "--pid",
@@ -21,7 +21,7 @@ static TAIL_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "tail", policy: &TAIL_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#tail-invocation", aliases: &[] },
+    FlatDef { name: "tail", policy: &TAIL_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#tail-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

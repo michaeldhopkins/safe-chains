@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static GNU_HASH_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--binary", "--check", "--ignore-missing", "--quiet",
-        "--status", "--strict", "--tag", "--text", "--warn",
+        "--binary", "--check", "--help", "--ignore-missing", "--quiet",
+        "--status", "--strict", "--tag", "--text", "--version", "--warn",
         "--zero",
-        "-b", "-c", "-t", "-w", "-z",
+        "-V", "-b", "-c", "-h", "-t", "-w", "-z",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -17,10 +17,10 @@ static GNU_HASH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "md5sum", policy: &GNU_HASH_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#md5sum-invocation", aliases: &[] },
-    FlatDef { name: "sha1sum", policy: &GNU_HASH_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha1sum-invocation", aliases: &[] },
-    FlatDef { name: "sha256sum", policy: &GNU_HASH_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities", aliases: &[] },
-    FlatDef { name: "sha512sum", policy: &GNU_HASH_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities", aliases: &[] },
+    FlatDef { name: "md5sum", policy: &GNU_HASH_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#md5sum-invocation", aliases: &[] },
+    FlatDef { name: "sha1sum", policy: &GNU_HASH_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha1sum-invocation", aliases: &[] },
+    FlatDef { name: "sha256sum", policy: &GNU_HASH_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities", aliases: &[] },
+    FlatDef { name: "sha512sum", policy: &GNU_HASH_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities", aliases: &[] },
 ];
 
 #[cfg(test)]

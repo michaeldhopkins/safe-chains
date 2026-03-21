@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -12,7 +12,7 @@ static POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static FEATURES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--not-required"]),
+    standalone: WordSet::flags(&["--help", "--not-required", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -20,7 +20,7 @@ static FEATURES_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DEX_PACKAGES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--defined-only"]),
+    standalone: WordSet::flags(&["--defined-only", "--help", "-h"]),
     valued: WordSet::flags(&["--files", "--proguard-folder", "--proguard-mappings", "--proguard-seeds", "--proguard-usages"]),
     bare: false,
     max_positional: None,
@@ -28,7 +28,7 @@ static DEX_PACKAGES_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static RESOURCES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--config", "--name", "--type"]),
     bare: false,
     max_positional: None,
@@ -72,8 +72,7 @@ pub(crate) static APKANALYZER: CommandDef = CommandDef {
             SubDef::Policy { name: "xml", policy: &POSITIONAL_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://developer.android.com/tools/apkanalyzer",
     aliases: &[],
 };

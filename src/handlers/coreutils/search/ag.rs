@@ -8,7 +8,7 @@ static AG_POLICY: FlagPolicy = FlagPolicy {
         "--ackmate", "--all-text", "--all-types", "--case-sensitive",
         "--color", "--column", "--count", "--filename",
         "--files-with-matches", "--files-without-matches", "--fixed-strings",
-        "--follow", "--group", "--heading", "--hidden", "--ignore-case",
+        "--follow", "--group", "--heading", "--help", "--hidden", "--ignore-case",
         "--invert-match", "--line-numbers", "--literal",
         "--no-break", "--no-color", "--no-filename", "--no-follow",
         "--no-group", "--no-heading", "--no-numbers", "--nobreak",
@@ -17,9 +17,9 @@ static AG_POLICY: FlagPolicy = FlagPolicy {
         "--one-device", "--only-matching", "--print-all-files",
         "--print-long-lines", "--search-binary", "--search-files",
         "--search-zip", "--silent", "--smart-case", "--stats",
-        "--unrestricted", "--vimgrep", "--word-regexp",
-        "-0", "-H", "-L", "-Q", "-S", "-U",
-        "-a", "-c", "-f", "-i", "-l", "-n", "-s", "-u", "-v", "-w",
+        "--unrestricted", "--version", "--vimgrep", "--word-regexp",
+        "-0", "-H", "-L", "-Q", "-S", "-U", "-V",
+        "-a", "-c", "-f", "-h", "-i", "-l", "-n", "-s", "-u", "-v", "-w",
     ]),
     valued: WordSet::flags(&[
         "--after", "--before", "--context", "--depth",
@@ -33,7 +33,7 @@ static AG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ag", policy: &AG_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://github.com/ggreer/the_silver_searcher", aliases: &[] },
+    FlatDef { name: "ag", policy: &AG_POLICY, level: SafetyLevel::Inert, url: "https://github.com/ggreer/the_silver_searcher", aliases: &[] },
 ];
 
 #[cfg(test)]

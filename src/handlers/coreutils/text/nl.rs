@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static NL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--no-renumber",
-        "-p",
+        "--help", "--no-renumber", "--version",
+        "-V", "-p",
     ]),
     valued: WordSet::flags(&[
         "--body-numbering", "--footer-numbering", "--header-numbering",
@@ -21,7 +21,7 @@ static NL_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "nl", policy: &NL_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#nl-invocation", aliases: &[] },
+    FlatDef { name: "nl", policy: &NL_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#nl-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -6,13 +6,13 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--backtrace", "--color", "--dry-run", "--expand",
-        "--guess", "--i18n-keywords", "--i18n-languages",
+        "--guess", "--help", "--i18n-keywords", "--i18n-languages",
         "--init", "--no-color", "--no-diff", "--no-multiline",
         "--no-snippets", "--no-source", "--no-strict",
         "--publish", "--publish-quiet", "--quiet",
-        "--retry", "--snippets", "--strict", "--verbose",
+        "--retry", "--snippets", "--strict", "--verbose", "--version",
         "--wip",
-        "-b", "-d", "-e", "-q",
+        "-V", "-b", "-d", "-e", "-h", "-q",
     ]),
     valued: WordSet::flags(&[
         "--ci-environment", "--format", "--format-options",
@@ -27,5 +27,5 @@ static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cucumber", policy: &CUCUMBER_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://cucumber.io/docs/cucumber/api/#running-cucumber", aliases: &[] },
+    FlatDef { name: "cucumber", policy: &CUCUMBER_POLICY, level: SafetyLevel::Inert, url: "https://cucumber.io/docs/cucumber/api/#running-cucumber", aliases: &[] },
 ];

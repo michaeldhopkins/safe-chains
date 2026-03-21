@@ -3,8 +3,7 @@ use crate::command::CommandDef;
 pub(crate) static XCODE_SELECT: CommandDef = CommandDef {
     name: "xcode-select",
     subs: &[],
-    bare_flags: &["-p", "--print-path", "-v", "--version"],
-    help_eligible: true,
+    bare_flags: &["--help", "--print-path", "--version", "-V", "-h", "-p", "-v"],
     url: "https://ss64.com/mac/xcode-select.html",
     aliases: &[],
 };

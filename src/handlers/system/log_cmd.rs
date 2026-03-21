@@ -5,8 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static LOG_SHOW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--backtrace", "--debug", "--info", "--loss", "--mach-continuous-time",
+        "--backtrace", "--debug", "--help", "--info", "--loss", "--mach-continuous-time",
         "--no-pager", "--signpost",
+        "-h",
     ]),
     valued: WordSet::flags(&[
         "--color", "--end", "--last", "--predicate",
@@ -19,8 +20,9 @@ static LOG_SHOW_POLICY: FlagPolicy = FlagPolicy {
 
 static LOG_STREAM_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--backtrace", "--debug", "--info", "--loss",
+        "--backtrace", "--debug", "--help", "--info", "--loss",
         "--mach-continuous-time", "--signpost",
+        "-h",
     ]),
     valued: WordSet::flags(&[
         "--color", "--level", "--predicate", "--process",
@@ -32,7 +34,7 @@ static LOG_STREAM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static LOG_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -47,8 +49,7 @@ pub(crate) static LOG: CommandDef = CommandDef {
         SubDef::Policy { name: "help", policy: &LOG_SIMPLE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "stats", policy: &LOG_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://ss64.com/mac/log.html",
     aliases: &[],
 };

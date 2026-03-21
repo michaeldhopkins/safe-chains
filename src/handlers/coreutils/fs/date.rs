@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DATE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--rfc-2822", "--rfc-email", "--universal", "--utc",
-        "-R", "-j", "-n", "-u",
+        "--help", "--rfc-2822", "--rfc-email", "--universal", "--utc", "--version",
+        "-R", "-V", "-h", "-j", "-n", "-u",
     ]),
     valued: WordSet::flags(&[
         "--date", "--iso-8601", "--reference", "--rfc-3339",
@@ -18,7 +18,7 @@ static DATE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "date", policy: &DATE_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation", aliases: &[] },
+    FlatDef { name: "date", policy: &DATE_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

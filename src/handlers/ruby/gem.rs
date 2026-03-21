@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static GEM_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--installed", "--local", "--no-details",
+        "--all", "--help", "--installed", "--local", "--no-details",
         "--no-versions", "--prerelease", "--remote", "--versions",
-        "-a", "-d", "-i", "-l", "-r",
+        "-a", "-d", "-h", "-i", "-l", "-r",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -16,7 +16,7 @@ static GEM_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GEM_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--installed", "--prerelease", "-i"]),
+    standalone: WordSet::flags(&["--help", "--installed", "--prerelease", "-h", "-i"]),
     valued: WordSet::flags(&["--version", "-v"]),
     bare: true,
     max_positional: None,
@@ -25,9 +25,9 @@ static GEM_INFO_POLICY: FlagPolicy = FlagPolicy {
 
 static GEM_SEARCH_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--details", "--exact", "--local",
+        "--all", "--details", "--exact", "--help", "--local",
         "--prerelease", "--remote", "--versions",
-        "-a", "-d", "-e", "-i", "-l", "-r",
+        "-a", "-d", "-e", "-h", "-i", "-l", "-r",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -37,8 +37,8 @@ static GEM_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 
 static GEM_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--local", "--prerelease", "--remote", "--versions",
-        "-a", "-i", "-l", "-r",
+        "--all", "--help", "--local", "--prerelease", "--remote", "--versions",
+        "-a", "-h", "-i", "-l", "-r",
     ]),
     valued: WordSet::flags(&["--version", "-v"]),
     bare: true,
@@ -63,8 +63,7 @@ pub(crate) static GEM: CommandDef = CommandDef {
         SubDef::Policy { name: "stale", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "which", policy: &GEM_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://guides.rubygems.org/command-reference/",
     aliases: &[],
 };

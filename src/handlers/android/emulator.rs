@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static EMULATOR_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-help", "-list-avds", "-version"]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-h", "-help", "-list-avds", "-version"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: Some(0),
@@ -16,7 +16,6 @@ pub static DEFS: &[FlatDef] = &[
         name: "emulator",
         policy: &EMULATOR_POLICY,
         level: SafetyLevel::Inert,
-        help_eligible: false,
         url: "https://developer.android.com/studio/run/emulator-commandline",
         aliases: &[],
     },

@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static CAT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--number", "--number-nonblank", "--show-all", "--show-ends",
-        "--show-nonprinting", "--show-tabs", "--squeeze-blank",
-        "-A", "-E", "-T",
-        "-b", "-e", "-l", "-n", "-s", "-t", "-u", "-v",
+        "--help", "--number", "--number-nonblank", "--show-all", "--show-ends",
+        "--show-nonprinting", "--show-tabs", "--squeeze-blank", "--version",
+        "-A", "-E", "-T", "-V",
+        "-b", "-e", "-h", "-l", "-n", "-s", "-t", "-u", "-v",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -17,7 +17,7 @@ static CAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cat", policy: &CAT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation", aliases: &[] },
+    FlatDef { name: "cat", policy: &CAT_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

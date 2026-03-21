@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static POD_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static POD_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POD_SEARCH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--simple", "--stats", "--web"]),
+    standalone: WordSet::flags(&["--help", "--simple", "--stats", "--web", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -20,7 +20,7 @@ static POD_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POD_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -28,7 +28,7 @@ static POD_INFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POD_SPEC_CAT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--version"]),
     bare: false,
     max_positional: None,
@@ -36,7 +36,7 @@ static POD_SPEC_CAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static POD_SPEC_WHICH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--version"]),
     bare: false,
     max_positional: None,
@@ -58,8 +58,7 @@ pub(crate) static POD: CommandDef = CommandDef {
             ],
         },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://guides.cocoapods.org/terminal/commands.html",
     aliases: &[],
 };

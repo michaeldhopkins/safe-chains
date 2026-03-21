@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SECURITY_FIND_CERT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-Z", "-a", "-p"]),
+    standalone: WordSet::flags(&["--help", "-Z", "-a", "-h", "-p"]),
     valued: WordSet::flags(&["-c", "-e"]),
     bare: false,
     max_positional: None,
@@ -12,7 +12,7 @@ static SECURITY_FIND_CERT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SECURITY_FIND_IDENTITY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-v"]),
+    standalone: WordSet::flags(&["--help", "-h", "-v"]),
     valued: WordSet::flags(&["-p", "-s"]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static SECURITY_FIND_IDENTITY_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SECURITY_FIND_PASSWORD_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[
         "-D", "-a", "-c", "-d", "-j", "-l", "-r", "-s",
         "-t",
@@ -31,7 +31,7 @@ static SECURITY_FIND_PASSWORD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SECURITY_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-d"]),
+    standalone: WordSet::flags(&["--help", "-d", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -39,7 +39,7 @@ static SECURITY_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SECURITY_DUMP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -47,7 +47,7 @@ static SECURITY_DUMP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SECURITY_VERIFY_CERT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-L", "-l", "-q"]),
+    standalone: WordSet::flags(&["--help", "-L", "-h", "-l", "-q"]),
     valued: WordSet::flags(&["-c", "-k", "-n", "-p", "-r"]),
     bare: false,
     max_positional: None,
@@ -55,7 +55,7 @@ static SECURITY_VERIFY_CERT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SECURITY_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -77,8 +77,7 @@ pub(crate) static SECURITY: CommandDef = CommandDef {
         SubDef::Policy { name: "show-keychain-info", policy: &SECURITY_SIMPLE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "smartcard", policy: &SECURITY_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://ss64.com/mac/security.html",
     aliases: &[],
 };

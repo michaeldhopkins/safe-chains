@@ -7,7 +7,7 @@ static XMLLINT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--auto", "--catalogs", "--compress", "--copy",
         "--debug", "--debugent", "--dropdtd", "--format",
-        "--html", "--htmlout", "--huge", "--load-trace",
+        "--help", "--html", "--htmlout", "--huge", "--load-trace",
         "--loaddtd", "--memory", "--noblanks", "--nocatalogs",
         "--nocdata", "--nocompact", "--nodefdtd", "--noenc",
         "--noent", "--nonet", "--noout", "--nowarning",
@@ -16,6 +16,7 @@ static XMLLINT_POLICY: FlagPolicy = FlagPolicy {
         "--repeat", "--sax", "--sax1", "--stream",
         "--testIO", "--timing", "--valid", "--version",
         "--walker", "--xinclude", "--xmlout",
+        "-V", "-h",
     ]),
     valued: WordSet::flags(&[
         "--dtdvalid", "--dtdvalidfpi", "--encode",
@@ -29,7 +30,7 @@ static XMLLINT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "xmllint", policy: &XMLLINT_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html", aliases: &[] },
+    FlatDef { name: "xmllint", policy: &XMLLINT_POLICY, level: SafetyLevel::Inert, url: "https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html", aliases: &[] },
 ];
 
 #[cfg(test)]

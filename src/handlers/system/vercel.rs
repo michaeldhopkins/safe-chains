@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static VERCEL_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "-j"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h", "-j"]),
     valued: WordSet::flags(&["--meta", "--next", "--scope", "-S", "-m"]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static VERCEL_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static VERCEL_INSPECT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "-j"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h", "-j"]),
     valued: WordSet::flags(&["--scope", "--timeout", "-S", "-T"]),
     bare: false,
     max_positional: None,
@@ -20,7 +20,7 @@ static VERCEL_INSPECT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static VERCEL_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -28,7 +28,7 @@ static VERCEL_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static VERCEL_PROJECT_LS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "-j"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h", "-j"]),
     valued: WordSet::flags(&["--scope", "-S"]),
     bare: true,
     max_positional: None,
@@ -45,8 +45,7 @@ pub(crate) static VERCEL: CommandDef = CommandDef {
         ]},
         SubDef::Policy { name: "whoami", policy: &VERCEL_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://vercel.com/docs/cli",
     aliases: &[],
 };

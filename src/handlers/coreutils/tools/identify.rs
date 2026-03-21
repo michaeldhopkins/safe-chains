@@ -5,7 +5,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--verbose", "-ping", "-quiet", "-regard-warnings",
+        "--help", "--verbose", "--version", "-V", "-h", "-ping", "-quiet", "-regard-warnings",
         "-verbose",
     ]),
     valued: WordSet::flags(&[
@@ -22,7 +22,7 @@ static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "identify", policy: &IDENTIFY_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://imagemagick.org/script/identify.php", aliases: &[] },
+    FlatDef { name: "identify", policy: &IDENTIFY_POLICY, level: SafetyLevel::Inert, url: "https://imagemagick.org/script/identify.php", aliases: &[] },
 ];
 
 #[cfg(test)]

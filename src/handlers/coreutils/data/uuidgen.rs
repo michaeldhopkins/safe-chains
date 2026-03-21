@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static UUIDGEN_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--random", "--time", "-r", "-t"]),
+    standalone: WordSet::flags(&["--help", "--random", "--time", "--version", "-V", "-h", "-r", "-t"]),
     valued: WordSet::flags(&[
         "--md5", "--name", "--namespace", "--sha1", "-N",
         "-m", "-n", "-s",
@@ -15,7 +15,7 @@ static UUIDGEN_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "uuidgen", policy: &UUIDGEN_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/uuidgen.1.html", aliases: &[] },
+    FlatDef { name: "uuidgen", policy: &UUIDGEN_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/uuidgen.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

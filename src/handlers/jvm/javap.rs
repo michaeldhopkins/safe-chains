@@ -5,7 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static JAVAP_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "-c", "-constants", "-l", "-p", "-private", "-protected",
+        "--help", "--version",
+        "-V", "-c", "-constants", "-h", "-l", "-p", "-private", "-protected",
         "-public", "-s", "-sysinfo", "-v", "-verbose",
     ]),
     valued: WordSet::flags(&[
@@ -21,7 +22,6 @@ pub static DEFS: &[FlatDef] = &[
         name: "javap",
         policy: &JAVAP_POLICY,
         level: SafetyLevel::Inert,
-        help_eligible: true,
         url: "https://docs.oracle.com/en/java/javase/21/docs/specs/man/javap.html",
         aliases: &[],
     },

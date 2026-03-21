@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static CODEX_COMPLETION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--shell", "-s"]),
     bare: true,
     max_positional: Some(0),
@@ -12,7 +12,7 @@ static CODEX_COMPLETION_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static CODEX_FEATURES_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),
@@ -27,8 +27,7 @@ pub(crate) static CODEX: CommandDef = CommandDef {
             SubDef::Policy { name: "list", policy: &CODEX_FEATURES_LIST_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://github.com/openai/codex",
     aliases: &[],
 };

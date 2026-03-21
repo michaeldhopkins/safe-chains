@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static COMPOSER_SHOW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--available", "--direct", "--installed", "--latest",
+        "--all", "--available", "--direct", "--help", "--installed", "--latest",
         "--locked", "--minor-only", "--name-only", "--no-dev", "--outdated",
         "--path", "--platform", "--self", "--strict", "--tree", "--versions",
-        "-D", "-H", "-N", "-P", "-a", "-i", "-l", "-o", "-s", "-t",
+        "-D", "-H", "-N", "-P", "-a", "-h", "-i", "-l", "-o", "-s", "-t",
     ]),
     valued: WordSet::flags(&["--format", "--ignore", "-f"]),
     bare: true,
@@ -18,9 +18,9 @@ static COMPOSER_SHOW_POLICY: FlagPolicy = FlagPolicy {
 
 static COMPOSER_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--direct", "--locked", "--minor-only",
+        "--all", "--direct", "--help", "--locked", "--minor-only",
         "--no-dev", "--strict",
-        "-D", "-a", "-m",
+        "-D", "-a", "-h", "-m",
     ]),
     valued: WordSet::flags(&["--format", "--ignore", "-f"]),
     bare: true,
@@ -30,7 +30,8 @@ static COMPOSER_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
 
 static COMPOSER_AUDIT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--abandoned", "--locked", "--no-dev",
+        "--abandoned", "--help", "--locked", "--no-dev",
+        "-h",
     ]),
     valued: WordSet::flags(&["--format", "-f"]),
     bare: true,
@@ -39,7 +40,7 @@ static COMPOSER_AUDIT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static COMPOSER_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -61,8 +62,7 @@ pub(crate) static COMPOSER: CommandDef = CommandDef {
         SubDef::Policy { name: "show", policy: &COMPOSER_SHOW_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "suggests", policy: &COMPOSER_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://getcomposer.org/doc/03-cli.md",
     aliases: &[],
 };

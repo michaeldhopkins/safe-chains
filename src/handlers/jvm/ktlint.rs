@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static KTLINT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--color", "--color-name", "--relative", "--verbose"]),
+    standalone: WordSet::flags(&["--color", "--color-name", "--help", "--relative", "--verbose", "--version", "-V", "-h"]),
     valued: WordSet::flags(&["--editorconfig", "--reporter"]),
     bare: true,
     max_positional: None,
@@ -16,7 +16,6 @@ pub static DEFS: &[FlatDef] = &[
         name: "ktlint",
         policy: &KTLINT_POLICY,
         level: SafetyLevel::Inert,
-        help_eligible: true,
         url: "https://pinterest.github.io/ktlint/latest/",
         aliases: &[],
     },

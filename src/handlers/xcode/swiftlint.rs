@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SWIFTLINT_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static SWIFTLINT_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SWIFTLINT_LINT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--no-cache", "--quiet", "--strict"]),
+    standalone: WordSet::flags(&["--help", "--no-cache", "--quiet", "--strict", "-h"]),
     valued: WordSet::flags(&["--config", "--path", "--reporter"]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static SWIFTLINT_LINT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SWIFTLINT_ANALYZE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--quiet", "--strict"]),
+    standalone: WordSet::flags(&["--help", "--quiet", "--strict", "-h"]),
     valued: WordSet::flags(&["--compiler-log-path", "--config", "--path", "--reporter"]),
     bare: true,
     max_positional: None,
@@ -28,7 +28,7 @@ static SWIFTLINT_ANALYZE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SWIFTLINT_RULES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--disabled", "--enabled"]),
+    standalone: WordSet::flags(&["--disabled", "--enabled", "--help", "-h"]),
     valued: WordSet::flags(&["--config", "--reporter"]),
     bare: true,
     max_positional: None,
@@ -44,8 +44,7 @@ pub(crate) static SWIFTLINT: CommandDef = CommandDef {
         SubDef::Policy { name: "rules", policy: &SWIFTLINT_RULES_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "version", policy: &SWIFTLINT_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://github.com/realm/SwiftLint",
     aliases: &[],
 };

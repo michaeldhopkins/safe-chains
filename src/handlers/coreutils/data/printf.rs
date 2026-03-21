@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PRINTF_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -12,7 +12,7 @@ static PRINTF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "printf", policy: &PRINTF_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#printf-invocation", aliases: &[] },
+    FlatDef { name: "printf", policy: &PRINTF_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#printf-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

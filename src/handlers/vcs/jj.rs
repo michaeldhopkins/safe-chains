@@ -10,7 +10,7 @@ static JJ_GLOBAL_VALUED: WordSet =
     WordSet::new(&["--at-op", "--at-operation", "--color", "--repository", "-R"]);
 
 static JJ_READ_ONLY: WordSet =
-    WordSet::new(&["--version", "cat", "diff", "help", "log", "root", "show", "st", "status", "version"]);
+    WordSet::new(&["--help", "--version", "-h", "cat", "diff", "help", "log", "root", "show", "st", "status", "version"]);
 
 static JJ_MULTI: &[(&str, WordSet)] = &[
     ("bookmark", WordSet::new(&["list"])),
@@ -27,11 +27,6 @@ static JJ_TRIPLE: &[(&str, &str, WordSet)] =
     &[("git", "remote", WordSet::new(&["list"]))];
 
 pub fn is_safe_jj(tokens: &[Token]) -> Verdict {
-    if tokens.last().is_some_and(|t| *t == "-h" || *t == "--help")
-        && !tokens.iter().any(|t| *t == "--")
-    {
-        return Verdict::Allowed(SafetyLevel::Inert);
-    }
     let mut args = &tokens[1..];
     loop {
         if args.is_empty() {
@@ -62,7 +57,7 @@ pub fn is_safe_jj(tokens: &[Token]) -> Verdict {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     for (prefix, actions) in JJ_MULTI.iter() {
-        if args[0] == *prefix && args.get(1).is_some_and(|a| actions.contains(a)) {
+        if args[0] == *prefix && args.get(1).is_some_and(|a| actions.contains(a) || a == "--help" || a == "-h") {
             return Verdict::Allowed(SafetyLevel::Inert);
         }
     }
@@ -149,7 +144,6 @@ mod tests {
         jj_cat_revision: "jj cat -r master some/file.rb",
         jj_cat_pipe_standardrb: "jj cat -r master spec/foo_spec.rb | bundle exec standardrb --stdin spec/foo_spec.rb 2>&1",
         jj_workspace_help: "jj workspace --help",
-        jj_new_help: "jj new --help",
         jj_workspace_help_h: "jj workspace -h",
     }
 

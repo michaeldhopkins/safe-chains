@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static BASE64_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--decode", "--ignore-garbage",
-        "-D", "-d", "-i",
+        "--decode", "--help", "--ignore-garbage", "--version",
+        "-D", "-V", "-d", "-h", "-i",
     ]),
     valued: WordSet::flags(&["--wrap", "-b", "-w"]),
     bare: true,
@@ -15,7 +15,7 @@ static BASE64_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "base64", policy: &BASE64_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation", aliases: &[] },
+    FlatDef { name: "base64", policy: &BASE64_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -5,9 +5,9 @@ use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static CONDA_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--explicit", "--export", "--full-name", "--json",
+        "--explicit", "--export", "--full-name", "--help", "--json",
         "--no-pip", "--revisions",
-        "-e", "-f",
+        "-e", "-f", "-h",
     ]),
     valued: WordSet::flags(&["--name", "--prefix", "-n", "-p"]),
     bare: true,
@@ -17,8 +17,8 @@ static CONDA_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static CONDA_INFO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--envs", "--json", "--verbose",
-        "-a", "-e", "-v",
+        "--all", "--envs", "--help", "--json", "--verbose",
+        "-a", "-e", "-h", "-v",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -28,8 +28,8 @@ static CONDA_INFO_POLICY: FlagPolicy = FlagPolicy {
 
 static CONDA_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--json", "--quiet", "--show", "--show-sources", "--verbose",
-        "-q", "-v",
+        "--help", "--json", "--quiet", "--show", "--show-sources", "--verbose",
+        "-h", "-q", "-v",
     ]),
     valued: WordSet::flags(&["--env", "--file", "--name", "--prefix", "-f", "-n", "-p"]),
     bare: false,
@@ -51,8 +51,7 @@ pub(crate) static CONDA: CommandDef = CommandDef {
         SubDef::Policy { name: "info", policy: &CONDA_INFO_POLICY, level: SafetyLevel::Inert },
         SubDef::Custom { name: "config", check: check_conda_config as CheckFn, doc: "config (--show/--show-sources only).", test_suffix: Some("--show") },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.conda.io/projects/conda/en/stable/commands/index.html",
     aliases: &[],
 };

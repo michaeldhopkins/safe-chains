@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static ICONV_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--list", "--silent",
-        "-c", "-l", "-s",
+        "--help", "--list", "--silent", "--version",
+        "-V", "-c", "-h", "-l", "-s",
     ]),
     valued: WordSet::flags(&[
         "--from-code", "--to-code",
@@ -18,7 +18,7 @@ static ICONV_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "iconv", policy: &ICONV_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/iconv.1.html", aliases: &[] },
+    FlatDef { name: "iconv", policy: &ICONV_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/iconv.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static SHUF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--echo", "--repeat", "--zero-terminated",
-        "-e", "-r", "-z",
+        "--echo", "--help", "--repeat", "--version", "--zero-terminated",
+        "-V", "-e", "-h", "-r", "-z",
     ]),
     valued: WordSet::flags(&[
         "--head-count", "--input-range", "--random-source",
@@ -18,7 +18,7 @@ static SHUF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "shuf", policy: &SHUF_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#shuf-invocation", aliases: &[] },
+    FlatDef { name: "shuf", policy: &SHUF_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#shuf-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

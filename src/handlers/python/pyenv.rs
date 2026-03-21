@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PYENV_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--bare"]),
+    standalone: WordSet::flags(&["--bare", "--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -21,8 +21,7 @@ pub(crate) static PYENV: CommandDef = CommandDef {
         SubDef::Policy { name: "versions", policy: &PYENV_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "which", policy: &PYENV_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://github.com/pyenv/pyenv#readme",
     aliases: &[],
 };

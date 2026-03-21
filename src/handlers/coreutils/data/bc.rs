@@ -5,11 +5,11 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static BC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--digit-clamp", "--global-stacks", "--interactive", "--mathlib",
+        "--digit-clamp", "--global-stacks", "--help", "--interactive", "--mathlib",
         "--no-digit-clamp", "--no-line-length", "--no-prompt",
-        "--no-read-prompt", "--quiet", "--standard", "--warn",
-        "-C", "-P", "-R",
-        "-c", "-g", "-i", "-l", "-q", "-s", "-w",
+        "--no-read-prompt", "--quiet", "--standard", "--version", "--warn",
+        "-C", "-P", "-R", "-V",
+        "-c", "-g", "-h", "-i", "-l", "-q", "-s", "-w",
     ]),
     valued: WordSet::flags(&[
         "--expression", "--file", "--ibase", "--obase", "--redefine",
@@ -23,7 +23,7 @@ static BC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "bc", policy: &BC_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/bc/manual/html_mono/bc.html", aliases: &[] },
+    FlatDef { name: "bc", policy: &BC_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/bc/manual/html_mono/bc.html", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static LLM_MODELS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--options"]),
+    standalone: WordSet::flags(&["--help", "--json", "--options", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static LLM_MODELS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static LLM_PLUGINS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "--json"]),
+    standalone: WordSet::flags(&["--all", "--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -21,7 +21,8 @@ static LLM_PLUGINS_POLICY: FlagPolicy = FlagPolicy {
 
 static LLM_LOGS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--conversation", "--json", "--no-truncate", "--response", "--truncate",
+        "--conversation", "--help", "--json", "--no-truncate", "--response", "--truncate",
+        "-h",
     ]),
     valued: WordSet::flags(&[
         "--cid", "--count", "--id", "--model", "--search",
@@ -33,7 +34,7 @@ static LLM_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static LLM_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -50,8 +51,7 @@ pub(crate) static LLM: CommandDef = CommandDef {
         SubDef::Policy { name: "plugins", policy: &LLM_PLUGINS_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "templates", policy: &LLM_SIMPLE_LIST_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://llm.datasette.io/en/stable/",
     aliases: &[],
 };

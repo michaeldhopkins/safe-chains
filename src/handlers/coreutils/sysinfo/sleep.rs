@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SLEEP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -12,7 +12,7 @@ static SLEEP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "sleep", policy: &SLEEP_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation", aliases: &[] },
+    FlatDef { name: "sleep", policy: &SLEEP_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

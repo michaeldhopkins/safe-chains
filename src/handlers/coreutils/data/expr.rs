@@ -12,7 +12,7 @@ static EXPR_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "expr", policy: &EXPR_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation", aliases: &[] },
+    FlatDef { name: "expr", policy: &EXPR_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static PGREP_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--count", "--delimiter", "--full", "--inverse",
+        "--count", "--delimiter", "--full", "--help", "--inverse",
         "--lightweight", "--list-full", "--list-name",
-        "--newest", "--oldest",
-        "-L", "-a", "-c", "-f", "-i", "-l", "-n",
+        "--newest", "--oldest", "--version",
+        "-L", "-V", "-a", "-c", "-f", "-h", "-i", "-l", "-n",
         "-o", "-v", "-w", "-x",
     ]),
     valued: WordSet::flags(&[
@@ -23,7 +23,7 @@ static PGREP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "pgrep", policy: &PGREP_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/pgrep.1.html", aliases: &[] },
+    FlatDef { name: "pgrep", policy: &PGREP_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/pgrep.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

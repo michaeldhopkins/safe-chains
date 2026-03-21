@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static GETCONF_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-a"]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-a", "-h"]),
     valued: WordSet::flags(&["-v"]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static GETCONF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "getconf", policy: &GETCONF_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/getconf.1.html", aliases: &[] },
+    FlatDef { name: "getconf", policy: &GETCONF_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/getconf.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PWD_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-L", "-P"]),
+    standalone: WordSet::flags(&["--help", "--version", "-L", "-P", "-V", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),
@@ -12,7 +12,7 @@ static PWD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "pwd", policy: &PWD_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation", aliases: &[] },
+    FlatDef { name: "pwd", policy: &PWD_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -25,7 +25,7 @@ static TEA_LOGIN_SAFE: WordSet =
     WordSet::new(&["list"]);
 
 static TEA_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[
         "--fields", "--limit", "--login", "--output",
         "--page", "--repo", "--state",
@@ -38,8 +38,8 @@ static TEA_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static TEA_VIEW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--comments",
-        "-c",
+        "--comments", "--help",
+        "-c", "-h",
     ]),
     valued: WordSet::flags(&[
         "--login", "--output", "--repo",

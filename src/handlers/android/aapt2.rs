@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DUMP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--no-values", "-v"]),
+    standalone: WordSet::flags(&["--help", "--no-values", "-h", "-v"]),
     valued: WordSet::flags(&["--config", "--file"]),
     bare: false,
     max_positional: None,
@@ -12,7 +12,7 @@ static DUMP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static VERSION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),
@@ -34,8 +34,7 @@ pub(crate) static AAPT2: CommandDef = CommandDef {
         ]},
         SubDef::Policy { name: "version", policy: &VERSION_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://developer.android.com/tools/aapt2",
     aliases: &[],
 };

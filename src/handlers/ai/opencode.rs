@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static OPENCODE_MODELS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(1),
@@ -12,7 +12,7 @@ static OPENCODE_MODELS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static OPENCODE_SESSION_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),
@@ -20,7 +20,7 @@ static OPENCODE_SESSION_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static OPENCODE_STATS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),
@@ -36,8 +36,7 @@ pub(crate) static OPENCODE: CommandDef = CommandDef {
         ]},
         SubDef::Policy { name: "stats", policy: &OPENCODE_STATS_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://opencode.ai/docs/",
     aliases: &[],
 };

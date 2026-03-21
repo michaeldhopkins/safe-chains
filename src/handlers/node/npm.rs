@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static NPM_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--json", "--link", "--long", "--omit",
+        "--all", "--help", "--json", "--link", "--long", "--omit",
         "--parseable", "--production", "--unicode",
-        "-a", "-l",
+        "-a", "-h", "-l",
     ]),
     valued: WordSet::flags(&["--depth", "--prefix"]),
     bare: true,
@@ -16,7 +16,7 @@ static NPM_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static NPM_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -25,7 +25,8 @@ static NPM_VIEW_POLICY: FlagPolicy = FlagPolicy {
 
 static NPM_AUDIT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--json", "--omit", "--production",
+        "--help", "--json", "--omit", "--production",
+        "-h",
     ]),
     valued: WordSet::flags(&["--audit-level"]),
     bare: true,
@@ -34,7 +35,7 @@ static NPM_AUDIT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static NPM_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -42,7 +43,7 @@ static NPM_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static NPM_TEST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -50,7 +51,7 @@ static NPM_TEST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static NPM_CONFIG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--long", "-l"]),
+    standalone: WordSet::flags(&["--help", "--json", "--long", "-h", "-l"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -84,8 +85,7 @@ pub(crate) static NPM: CommandDef = CommandDef {
         SubDef::Custom { name: "run", check: check_npm_run as CheckFn, doc: "run/run-script (test only).", test_suffix: None },
         SubDef::Custom { name: "run-script", check: check_npm_run as CheckFn, doc: " ", test_suffix: None },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.npmjs.com/cli",
     aliases: &[],
 };

@@ -6,14 +6,14 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static NETSTAT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--continuous", "--extend", "--groups",
-        "--interfaces", "--listening", "--masquerade",
+        "--help", "--interfaces", "--listening", "--masquerade",
         "--numeric", "--numeric-hosts", "--numeric-ports",
         "--numeric-users", "--program", "--route",
         "--statistics", "--symbolic", "--tcp", "--timers",
-        "--udp", "--unix", "--verbose", "--wide",
-        "-A", "-C", "-L", "-M", "-N", "-R", "-S", "-W",
+        "--udp", "--unix", "--verbose", "--version", "--wide",
+        "-A", "-C", "-L", "-M", "-N", "-R", "-S", "-V", "-W",
         "-Z",
-        "-a", "-b", "-c", "-d", "-e", "-f", "-g", "-i",
+        "-a", "-b", "-c", "-d", "-e", "-f", "-g", "-h", "-i",
         "-l", "-m", "-n", "-o", "-p", "-q", "-r",
         "-s", "-t", "-u", "-v", "-w", "-x",
     ]),
@@ -24,7 +24,7 @@ static NETSTAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "netstat", policy: &NETSTAT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/netstat.8.html", aliases: &[] },
+    FlatDef { name: "netstat", policy: &NETSTAT_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man8/netstat.8.html", aliases: &[] },
 ];
 
 #[cfg(test)]

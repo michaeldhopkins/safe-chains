@@ -4,7 +4,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 use crate::parse::WordSet;
 
 static WAIT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static WAIT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "wait", policy: &WAIT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/wait.html", aliases: &[] },
+    FlatDef { name: "wait", policy: &WAIT_POLICY, level: SafetyLevel::Inert, url: "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/wait.html", aliases: &[] },
 ];
 
 #[cfg(test)]

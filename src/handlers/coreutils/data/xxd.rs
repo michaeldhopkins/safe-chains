@@ -6,9 +6,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static XXD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--autoskip", "--bits", "--capitalize", "--decimal",
-        "--ebcdic", "--include", "--little-endian", "--plain",
-        "--postscript", "--revert", "--uppercase",
-        "-C", "-E", "-a", "-b", "-d", "-e", "-i", "-p",
+        "--ebcdic", "--help", "--include", "--little-endian", "--plain",
+        "--postscript", "--revert", "--uppercase", "--version",
+        "-C", "-E", "-V", "-a", "-b", "-d", "-e", "-h", "-i", "-p",
         "-r", "-u",
     ]),
     valued: WordSet::flags(&[
@@ -22,7 +22,7 @@ static XXD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "xxd", policy: &XXD_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/xxd.1.html", aliases: &[] },
+    FlatDef { name: "xxd", policy: &XXD_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/xxd.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

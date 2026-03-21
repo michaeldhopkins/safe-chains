@@ -5,7 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static IOREG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "-S", "-a", "-b", "-f", "-i", "-l", "-r",
+        "--help", "--version",
+        "-S", "-V", "-a", "-b", "-f", "-h", "-i", "-l", "-r",
         "-t", "-x",
     ]),
     valued: WordSet::flags(&[
@@ -17,7 +18,7 @@ static IOREG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ioreg", policy: &IOREG_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://ss64.com/mac/ioreg.html", aliases: &[] },
+    FlatDef { name: "ioreg", policy: &IOREG_POLICY, level: SafetyLevel::Inert, url: "https://ss64.com/mac/ioreg.html", aliases: &[] },
 ];
 
 #[cfg(test)]

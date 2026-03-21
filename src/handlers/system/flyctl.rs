@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static FLYCTL_STATUS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "-j"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h", "-j"]),
     valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static FLYCTL_STATUS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static FLYCTL_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--app", "--instance", "--region", "-a", "-i", "-r"]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static FLYCTL_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static FLYCTL_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -28,7 +28,7 @@ static FLYCTL_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static FLYCTL_RELEASES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "-j"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h", "-j"]),
     valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
@@ -36,7 +36,7 @@ static FLYCTL_RELEASES_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static FLYCTL_APP_JSON_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "-j"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h", "-j"]),
     valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
@@ -71,8 +71,7 @@ static FLYCTL_SUBS: &[SubDef] = &[
 pub(crate) static FLYCTL: CommandDef = CommandDef {
     name: "flyctl",
     subs: FLYCTL_SUBS,
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://fly.io/docs/flyctl/",
     aliases: &["fly"],
 };

@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DCLI_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static DCLI_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_DEVICES_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static DCLI_DEVICES_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_TEAM_MEMBERS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--csv", "--human-readable"]),
+    standalone: WordSet::flags(&["--csv", "--help", "--human-readable", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -28,7 +28,7 @@ static DCLI_TEAM_MEMBERS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_TEAM_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--csv", "--human-readable"]),
+    standalone: WordSet::flags(&["--csv", "--help", "--human-readable", "-h"]),
     valued: WordSet::flags(&["--end", "--start"]),
     bare: true,
     max_positional: None,
@@ -36,7 +36,7 @@ static DCLI_TEAM_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_TEAM_REPORT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -44,7 +44,7 @@ static DCLI_TEAM_REPORT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_TEAM_DWI_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--count", "--offset", "--order-by"]),
     bare: false,
     max_positional: None,
@@ -52,7 +52,7 @@ static DCLI_TEAM_DWI_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DCLI_JSON_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -98,8 +98,7 @@ pub(crate) static DCLI: CommandDef = CommandDef {
             ],
         },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://cli.dashlane.com/",
     aliases: &[],
 };

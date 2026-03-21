@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DOCKER_PS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--last", "--latest", "--no-trunc",
+        "--all", "--help", "--last", "--latest", "--no-trunc",
         "--quiet", "--size",
-        "-a", "-l", "-n", "-q", "-s",
+        "-a", "-h", "-l", "-n", "-q", "-s",
     ]),
     valued: WordSet::flags(&["--filter", "--format", "-f"]),
     bare: true,
@@ -17,8 +17,8 @@ static DOCKER_PS_POLICY: FlagPolicy = FlagPolicy {
 
 static DOCKER_IMAGES_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--digests", "--no-trunc", "--quiet",
-        "-a", "-q",
+        "--all", "--digests", "--help", "--no-trunc", "--quiet",
+        "-a", "-h", "-q",
     ]),
     valued: WordSet::flags(&["--filter", "--format", "-f"]),
     bare: true,
@@ -28,8 +28,8 @@ static DOCKER_IMAGES_POLICY: FlagPolicy = FlagPolicy {
 
 static DOCKER_LOGS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--details", "--follow", "--timestamps",
-        "-f", "-t",
+        "--details", "--follow", "--help", "--timestamps",
+        "-f", "-h", "-t",
     ]),
     valued: WordSet::flags(&["--since", "--tail", "--until", "-n"]),
     bare: false,
@@ -38,7 +38,7 @@ static DOCKER_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DOCKER_INSPECT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--size", "-s"]),
+    standalone: WordSet::flags(&["--help", "--size", "-h", "-s"]),
     valued: WordSet::flags(&["--format", "--type", "-f"]),
     bare: false,
     max_positional: None,
@@ -46,7 +46,7 @@ static DOCKER_INSPECT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DOCKER_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--format", "-f"]),
     bare: true,
     max_positional: None,
@@ -54,7 +54,7 @@ static DOCKER_INFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DOCKER_VERSION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--format", "-f"]),
     bare: true,
     max_positional: None,
@@ -62,7 +62,7 @@ static DOCKER_VERSION_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DOCKER_STATS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "--no-stream", "--no-trunc", "-a"]),
+    standalone: WordSet::flags(&["--all", "--help", "--no-stream", "--no-trunc", "-a", "-h"]),
     valued: WordSet::flags(&["--format"]),
     bare: true,
     max_positional: None,
@@ -70,7 +70,7 @@ static DOCKER_STATS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DOCKER_HISTORY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--human", "--no-trunc", "--quiet", "-H", "-q"]),
+    standalone: WordSet::flags(&["--help", "--human", "--no-trunc", "--quiet", "-H", "-h", "-q"]),
     valued: WordSet::flags(&["--format"]),
     bare: false,
     max_positional: None,
@@ -78,7 +78,7 @@ static DOCKER_HISTORY_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DOCKER_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -86,7 +86,7 @@ static DOCKER_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DOCKER_LS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--no-trunc", "--quiet", "-q"]),
+    standalone: WordSet::flags(&["--help", "--no-trunc", "--quiet", "-h", "-q"]),
     valued: WordSet::flags(&["--filter", "--format", "-f"]),
     bare: true,
     max_positional: None,
@@ -95,9 +95,9 @@ static DOCKER_LS_POLICY: FlagPolicy = FlagPolicy {
 
 static DOCKER_COMPOSE_PS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--no-trunc", "--orphans", "--quiet",
+        "--all", "--help", "--no-trunc", "--orphans", "--quiet",
         "--services",
-        "-a", "-q",
+        "-a", "-h", "-q",
     ]),
     valued: WordSet::flags(&["--filter", "--format", "--status"]),
     bare: true,
@@ -107,11 +107,11 @@ static DOCKER_COMPOSE_PS_POLICY: FlagPolicy = FlagPolicy {
 
 static DOCKER_COMPOSE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--dry-run", "--hash", "--images", "--no-consistency",
+        "--dry-run", "--hash", "--help", "--images", "--no-consistency",
         "--no-interpolate", "--no-normalize", "--no-path-resolution",
         "--profiles", "--quiet", "--resolve-image-digests",
         "--services", "--volumes",
-        "-q",
+        "-h", "-q",
     ]),
     valued: WordSet::flags(&["--format", "--output", "-o"]),
     bare: true,
@@ -192,8 +192,7 @@ static DOCKER_SUBS: &[SubDef] = &[
 pub(crate) static DOCKER: CommandDef = CommandDef {
     name: "docker",
     subs: DOCKER_SUBS,
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.docker.com/reference/cli/docker/",
     aliases: &[],
 };
@@ -201,8 +200,7 @@ pub(crate) static DOCKER: CommandDef = CommandDef {
 pub(crate) static PODMAN: CommandDef = CommandDef {
     name: "podman",
     subs: DOCKER_SUBS,
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.podman.io/en/latest/Commands.html",
     aliases: &[],
 };

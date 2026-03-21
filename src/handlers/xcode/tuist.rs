@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static TUIST_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static TUIST_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_DUMP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--verbose"]),
+    standalone: WordSet::flags(&["--help", "--json", "--verbose", "-h"]),
     valued: WordSet::flags(&["--path", "-p"]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static TUIST_DUMP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_GRAPH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--verbose"]),
+    standalone: WordSet::flags(&["--help", "--json", "--verbose", "-h"]),
     valued: WordSet::flags(&["--format", "--path", "-f", "-p"]),
     bare: true,
     max_positional: None,
@@ -28,7 +28,7 @@ static TUIST_GRAPH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_INSPECT_SUB_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--verbose"]),
+    standalone: WordSet::flags(&["--help", "--json", "--verbose", "-h"]),
     valued: WordSet::flags(&["--path", "-p"]),
     bare: true,
     max_positional: None,
@@ -36,7 +36,7 @@ static TUIST_INSPECT_SUB_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_HASH_SUB_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--verbose"]),
+    standalone: WordSet::flags(&["--help", "--json", "--verbose", "-h"]),
     valued: WordSet::flags(&["--path", "-p"]),
     bare: true,
     max_positional: None,
@@ -44,7 +44,7 @@ static TUIST_HASH_SUB_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_SCAFFOLD_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&["--path", "-p"]),
     bare: true,
     max_positional: None,
@@ -52,7 +52,7 @@ static TUIST_SCAFFOLD_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TUIST_MIGRATION_SUB_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--path", "-p"]),
     bare: true,
     max_positional: None,
@@ -97,8 +97,7 @@ pub(crate) static TUIST: CommandDef = CommandDef {
         },
         SubDef::Policy { name: "version", policy: &TUIST_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.tuist.dev/en/cli/",
     aliases: &[],
 };

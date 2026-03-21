@@ -6,8 +6,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static READLINK_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--canonicalize", "--canonicalize-existing",
-        "--canonicalize-missing", "--no-newline", "--verbose", "--zero",
-        "-e", "-f", "-m", "-n", "-v", "-z",
+        "--canonicalize-missing", "--help", "--no-newline", "--verbose", "--version", "--zero",
+        "-V", "-e", "-f", "-h", "-m", "-n", "-v", "-z",
     ]),
     valued: WordSet::flags(&[]),
     bare: false,
@@ -16,7 +16,7 @@ static READLINK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "readlink", policy: &READLINK_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#readlink-invocation", aliases: &[] },
+    FlatDef { name: "readlink", policy: &READLINK_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#readlink-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

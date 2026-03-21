@@ -9,15 +9,15 @@ static EZA_POLICY: FlagPolicy = FlagPolicy {
         "--bytes", "--changed", "--classify", "--color-scale", "--color-scale-mode",
         "--context", "--created", "--dereference", "--extended", "--flags",
         "--follow-symlinks", "--git", "--git-ignore", "--git-repos", "--git-repos-no-status",
-        "--group", "--group-directories-first", "--header", "--hyperlink", "--icons",
+        "--group", "--group-directories-first", "--header", "--help", "--hyperlink", "--icons",
         "--inode", "--links", "--list-dirs", "--long", "--modified",
         "--mounts", "--no-filesize", "--no-git", "--no-icons", "--no-permissions",
         "--no-quotes", "--no-time", "--no-user", "--numeric", "--octal-permissions",
         "--oneline", "--only-dirs", "--only-files", "--recurse", "--reverse",
-        "--tree", "-1", "-@", "-A", "-B",
+        "--tree", "--version", "-1", "-@", "-A", "-B",
         "-D", "-F", "-G", "-H", "-I",
         "-M", "-R", "-S", "-T", "-U",
-        "-Z", "-a", "-b", "-d", "-f",
+        "-V", "-Z", "-a", "-b", "-d", "-f",
         "-g", "-h", "-i", "-l", "-m",
         "-r", "-s", "-u", "-x",
     ]),
@@ -34,7 +34,7 @@ static EZA_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "eza", policy: &EZA_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://eza.rocks/", aliases: &["exa"] },
+    FlatDef { name: "eza", policy: &EZA_POLICY, level: SafetyLevel::Inert, url: "https://eza.rocks/", aliases: &["exa"] },
 ];
 
 #[cfg(test)]

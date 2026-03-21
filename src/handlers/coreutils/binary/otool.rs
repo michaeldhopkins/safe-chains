@@ -5,6 +5,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static OTOOL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
+        "--help", "--version",
         "-D", "-I", "-L", "-V", "-X", "-a", "-c", "-d",
         "-f", "-h", "-l", "-o", "-r", "-t", "-v", "-x",
     ]),
@@ -15,7 +16,7 @@ static OTOOL_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "otool", policy: &OTOOL_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://ss64.com/mac/otool.html", aliases: &[] },
+    FlatDef { name: "otool", policy: &OTOOL_POLICY, level: SafetyLevel::Inert, url: "https://ss64.com/mac/otool.html", aliases: &[] },
 ];
 
 #[cfg(test)]

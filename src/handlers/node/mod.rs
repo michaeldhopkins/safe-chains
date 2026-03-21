@@ -30,11 +30,12 @@ pub(super) static BUNX_FLAGS_NO_ARG: WordSet =
 pub(super) static TSC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--allowJs", "--checkJs", "--esModuleInterop",
-        "--forceConsistentCasingInFileNames", "--incremental",
+        "--forceConsistentCasingInFileNames", "--help", "--incremental",
         "--isolatedModules", "--noEmit", "--noFallthroughCasesInSwitch",
         "--noImplicitAny", "--noImplicitReturns", "--noUnusedLocals",
         "--noUnusedParameters", "--pretty", "--resolveJsonModule",
         "--skipLibCheck", "--strict", "--strictNullChecks",
+        "-h",
     ]),
     valued: WordSet::flags(&[
         "--baseUrl", "--jsx", "--lib", "--module",

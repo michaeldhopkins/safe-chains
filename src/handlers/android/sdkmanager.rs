@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static SDKMANAGER_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--list", "--version"]),
+    standalone: WordSet::flags(&["--help", "--list", "--version", "-V", "-h"]),
     valued: WordSet::flags(&["--channel", "--sdk_root"]),
     bare: false,
     max_positional: Some(0),
@@ -16,7 +16,6 @@ pub static DEFS: &[FlatDef] = &[
         name: "sdkmanager",
         policy: &SDKMANAGER_POLICY,
         level: SafetyLevel::Inert,
-        help_eligible: true,
         url: "https://developer.android.com/tools/sdkmanager",
         aliases: &[],
     },

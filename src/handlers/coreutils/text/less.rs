@@ -6,11 +6,11 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static LESS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--QUIT-AT-EOF", "--RAW-CONTROL-CHARS", "--chop-long-lines",
-        "--ignore-case", "--no-init", "--quiet", "--quit-at-eof",
+        "--help", "--ignore-case", "--no-init", "--quiet", "--quit-at-eof",
         "--quit-if-one-screen", "--raw-control-chars", "--silent",
-        "--squeeze-blank-lines",
+        "--squeeze-blank-lines", "--version",
         "-E", "-F", "-G", "-I", "-J", "-K", "-L", "-M", "-N",
-        "-Q", "-R", "-S", "-W", "-X",
+        "-Q", "-R", "-S", "-V", "-W", "-X",
         "-a", "-c", "-e", "-f", "-g", "-i", "-m", "-n", "-q", "-r", "-s", "-w",
     ]),
     valued: WordSet::flags(&[
@@ -24,7 +24,7 @@ static LESS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "less", policy: &LESS_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/less.1.html", aliases: &[] },
+    FlatDef { name: "less", policy: &LESS_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/less.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static LAUNCHCTL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -27,8 +27,7 @@ pub(crate) static LAUNCHCTL: CommandDef = CommandDef {
         SubDef::Policy { name: "resolveport", policy: &LAUNCHCTL_SIMPLE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "version", policy: &LAUNCHCTL_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://ss64.com/mac/launchctl.html",
     aliases: &[],
 };

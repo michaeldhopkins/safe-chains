@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static HTOP_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--no-color", "--no-mouse", "--no-unicode", "--tree",
-        "-C", "-H", "-M", "-t",
+        "--help", "--no-color", "--no-mouse", "--no-unicode", "--tree", "--version",
+        "-C", "-H", "-M", "-V", "-h", "-t",
     ]),
     valued: WordSet::flags(&[
         "--delay", "--filter", "--highlight-changes",
@@ -19,7 +19,7 @@ static HTOP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "htop", policy: &HTOP_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://htop.dev/", aliases: &[] },
+    FlatDef { name: "htop", policy: &HTOP_POLICY, level: SafetyLevel::Inert, url: "https://htop.dev/", aliases: &[] },
 ];
 
 #[cfg(test)]

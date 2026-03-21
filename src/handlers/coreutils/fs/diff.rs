@@ -5,7 +5,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DIFF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--brief", "--ed", "--expand-tabs", "--ignore-all-space",
+        "--brief", "--ed", "--expand-tabs", "--help", "--ignore-all-space",
         "--ignore-blank-lines", "--ignore-case", "--ignore-space-change",
         "--ignore-tab-expansion", "--left-column", "--minimal",
         "--new-file", "--no-dereference", "--no-ignore-file-name-case",
@@ -13,9 +13,9 @@ static DIFF_POLICY: FlagPolicy = FlagPolicy {
         "--report-identical-files", "--show-c-function", "--side-by-side",
         "--speed-large-files", "--strip-trailing-cr",
         "--suppress-blank-empty", "--suppress-common-lines", "--text",
-        "--unidirectional-new-file",
-        "-B", "-E", "-N", "-P", "-T",
-        "-a", "-b", "-c", "-d", "-e", "-f", "-i", "-l", "-n", "-p",
+        "--unidirectional-new-file", "--version",
+        "-B", "-E", "-N", "-P", "-T", "-V",
+        "-a", "-b", "-c", "-d", "-e", "-f", "-h", "-i", "-l", "-n", "-p",
         "-q", "-r", "-s", "-t", "-u", "-w", "-y",
     ]),
     valued: WordSet::flags(&[
@@ -33,7 +33,7 @@ static DIFF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "diff", policy: &DIFF_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/diffutils/manual/diffutils.html", aliases: &[] },
+    FlatDef { name: "diff", policy: &DIFF_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/diffutils/manual/diffutils.html", aliases: &[] },
 ];
 
 #[cfg(test)]

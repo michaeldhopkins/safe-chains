@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static B2SUM_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--binary", "--check", "--ignore-missing", "--quiet",
-        "--status", "--strict", "--tag", "--text", "--warn",
+        "--binary", "--check", "--help", "--ignore-missing", "--quiet",
+        "--status", "--strict", "--tag", "--text", "--version", "--warn",
         "--zero",
-        "-b", "-c", "-t", "-w", "-z",
+        "-V", "-b", "-c", "-h", "-t", "-w", "-z",
     ]),
     valued: WordSet::flags(&["--length", "-l"]),
     bare: true,
@@ -17,7 +17,7 @@ static B2SUM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "b2sum", policy: &B2SUM_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#b2sum-invocation", aliases: &[] },
+    FlatDef { name: "b2sum", policy: &B2SUM_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#b2sum-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

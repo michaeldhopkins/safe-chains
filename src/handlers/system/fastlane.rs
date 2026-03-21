@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),
@@ -12,7 +12,7 @@ static BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static ACTION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: Some(1),
@@ -27,8 +27,7 @@ pub(crate) static FASTLANE: CommandDef = CommandDef {
         SubDef::Policy { name: "env", policy: &BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "lanes", policy: &BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.fastlane.tools/",
     aliases: &[],
 };

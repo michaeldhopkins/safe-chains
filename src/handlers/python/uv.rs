@@ -5,8 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static UV_PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--editable", "--exclude-editable", "--outdated",
+        "--editable", "--exclude-editable", "--help", "--outdated",
         "--strict",
+        "-h",
     ]),
     valued: WordSet::flags(&["--exclude", "--format", "--python"]),
     bare: true,
@@ -15,7 +16,7 @@ static UV_PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static UV_PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--files", "--verbose", "-v"]),
+    standalone: WordSet::flags(&["--files", "--help", "--verbose", "-h", "-v"]),
     valued: WordSet::flags(&["--python"]),
     bare: false,
     max_positional: None,
@@ -23,7 +24,7 @@ static UV_PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static UV_PIP_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--verbose", "-v"]),
+    standalone: WordSet::flags(&["--help", "--verbose", "-h", "-v"]),
     valued: WordSet::flags(&["--python"]),
     bare: true,
     max_positional: None,
@@ -31,7 +32,7 @@ static UV_PIP_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static UV_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--verbose", "-v"]),
+    standalone: WordSet::flags(&["--help", "--verbose", "-h", "-v"]),
     valued: WordSet::flags(&["--python"]),
     bare: true,
     max_positional: None,
@@ -54,8 +55,7 @@ pub(crate) static UV: CommandDef = CommandDef {
             SubDef::Policy { name: "list", policy: &UV_SIMPLE_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.astral.sh/uv/reference/cli/",
     aliases: &[],
 };

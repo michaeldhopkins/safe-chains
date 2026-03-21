@@ -12,7 +12,7 @@ static EXPORT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "export", policy: &EXPORT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/export.1p.html", aliases: &[] },
+    FlatDef { name: "export", policy: &EXPORT_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/export.1p.html", aliases: &[] },
 ];
 
 #[cfg(test)]

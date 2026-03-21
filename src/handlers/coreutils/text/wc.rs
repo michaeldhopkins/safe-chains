@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static WC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--bytes", "--chars", "--lines", "--max-line-length", "--words",
+        "--bytes", "--chars", "--help", "--lines", "--max-line-length", "--version", "--words",
         "--zero-terminated",
-        "-L", "-c", "-l", "-m", "-w",
+        "-L", "-V", "-c", "-h", "-l", "-m", "-w",
     ]),
     valued: WordSet::flags(&["--files0-from"]),
     bare: true,
@@ -16,7 +16,7 @@ static WC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "wc", policy: &WC_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation", aliases: &[] },
+    FlatDef { name: "wc", policy: &WC_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

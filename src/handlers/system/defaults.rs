@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DEFAULTS_READ_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-g", "-globalDomain"]),
+    standalone: WordSet::flags(&["--help", "-g", "-globalDomain", "-h"]),
     valued: WordSet::flags(&["-app"]),
     bare: false,
     max_positional: None,
@@ -12,7 +12,7 @@ static DEFAULTS_READ_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DEFAULTS_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -28,8 +28,7 @@ pub(crate) static DEFAULTS: CommandDef = CommandDef {
         SubDef::Policy { name: "find", policy: &DEFAULTS_READ_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "domains", policy: &DEFAULTS_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://ss64.com/mac/defaults.html",
     aliases: &[],
 };

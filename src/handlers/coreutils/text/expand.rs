@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static EXPAND_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--initial",
-        "-i",
+        "--help", "--initial", "--version",
+        "-V", "-h", "-i",
     ]),
     valued: WordSet::flags(&[
         "--tabs",
@@ -18,7 +18,7 @@ static EXPAND_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "expand", policy: &EXPAND_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation", aliases: &[] },
+    FlatDef { name: "expand", policy: &EXPAND_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

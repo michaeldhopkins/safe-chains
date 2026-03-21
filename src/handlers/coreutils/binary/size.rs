@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static SIZE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--common", "--totals",
-        "-A", "-B", "-G", "-d", "-o", "-t", "-x",
+        "--common", "--help", "--totals", "--version",
+        "-A", "-B", "-G", "-V", "-d", "-h", "-o", "-t", "-x",
     ]),
     valued: WordSet::flags(&[
         "--format", "--radix", "--target",
@@ -17,7 +17,7 @@ static SIZE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "size", policy: &SIZE_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/size.1.html", aliases: &[] },
+    FlatDef { name: "size", policy: &SIZE_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/size.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

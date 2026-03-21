@@ -5,7 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static MORE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "-c", "-d", "-f", "-l", "-p", "-s", "-u",
+        "--help", "--version",
+        "-V", "-c", "-d", "-f", "-h", "-l", "-p", "-s", "-u",
     ]),
     valued: WordSet::flags(&[
         "--lines", "-n",
@@ -16,7 +17,7 @@ static MORE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "more", policy: &MORE_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/more.1.html", aliases: &[] },
+    FlatDef { name: "more", policy: &MORE_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/more.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

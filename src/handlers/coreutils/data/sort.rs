@@ -6,11 +6,11 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static SORT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--check", "--debug", "--dictionary-order",
-        "--general-numeric-sort", "--human-numeric-sort",
+        "--general-numeric-sort", "--help", "--human-numeric-sort",
         "--ignore-case", "--ignore-leading-blanks",
         "--ignore-nonprinting", "--merge", "--month-sort",
         "--numeric-sort", "--random-sort", "--reverse",
-        "--stable", "--unique", "--version-sort",
+        "--stable", "--unique", "--version", "--version-sort",
         "--zero-terminated",
         "-C", "-M", "-R", "-V", "-b", "-c", "-d",
         "-f", "-g", "-h", "-i", "-m", "-n", "-r",
@@ -28,7 +28,7 @@ static SORT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "sort", policy: &SORT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation", aliases: &[] },
+    FlatDef { name: "sort", policy: &SORT_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -5,6 +5,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static LSOF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
+        "--help", "--version",
         "-C", "-G", "-M", "-N", "-O", "-P", "-R",
         "-U", "-V", "-X", "-b", "-h",
         "-l", "-n", "-t", "-w", "-x",
@@ -19,7 +20,7 @@ static LSOF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "lsof", policy: &LSOF_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/lsof.8.html", aliases: &[] },
+    FlatDef { name: "lsof", policy: &LSOF_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man8/lsof.8.html", aliases: &[] },
 ];
 
 #[cfg(test)]

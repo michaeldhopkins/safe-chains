@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DISKUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static DISKUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DISKUTIL_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-plist"]),
+    standalone: WordSet::flags(&["--help", "-h", "-plist"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static DISKUTIL_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DISKUTIL_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-all", "-plist"]),
+    standalone: WordSet::flags(&["--help", "-all", "-h", "-plist"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -41,8 +41,7 @@ pub(crate) static DISKUTIL: CommandDef = CommandDef {
             SubDef::Policy { name: "listVolumeGroups", policy: &DISKUTIL_SIMPLE_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://ss64.com/mac/diskutil.html",
     aliases: &[],
 };

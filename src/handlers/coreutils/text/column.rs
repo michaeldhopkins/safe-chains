@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static COLUMN_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--fillrows", "--json", "--keep-empty-lines", "--table",
-        "--table-noextreme", "--table-noheadings", "--table-right-all",
-        "-J", "-L", "-R", "-e", "-n", "-t", "-x",
+        "--fillrows", "--help", "--json", "--keep-empty-lines", "--table",
+        "--table-noextreme", "--table-noheadings", "--table-right-all", "--version",
+        "-J", "-L", "-R", "-V", "-e", "-h", "-n", "-t", "-x",
     ]),
     valued: WordSet::flags(&[
         "--output-separator", "--separator", "--table-columns",
@@ -21,7 +21,7 @@ static COLUMN_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "column", policy: &COLUMN_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/column.1.html", aliases: &[] },
+    FlatDef { name: "column", policy: &COLUMN_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/column.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

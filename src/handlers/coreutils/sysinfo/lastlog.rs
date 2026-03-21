@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static LASTLOG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-h"]),
     valued: WordSet::flags(&["--before", "--time", "--user", "-b", "-t", "-u"]),
     bare: true,
     max_positional: Some(0),
@@ -12,7 +12,7 @@ static LASTLOG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "lastlog", policy: &LASTLOG_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/lastlog.8.html", aliases: &[] },
+    FlatDef { name: "lastlog", policy: &LASTLOG_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man8/lastlog.8.html", aliases: &[] },
 ];
 
 #[cfg(test)]

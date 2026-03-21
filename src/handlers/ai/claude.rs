@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static CLAUDE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: Some(0),
@@ -12,7 +12,7 @@ static CLAUDE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::ai) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "claude", policy: &CLAUDE_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://docs.anthropic.com/en/docs/claude-code", aliases: &[] },
+    FlatDef { name: "claude", policy: &CLAUDE_POLICY, level: SafetyLevel::Inert, url: "https://docs.anthropic.com/en/docs/claude-code", aliases: &[] },
 ];
 
 #[cfg(test)]

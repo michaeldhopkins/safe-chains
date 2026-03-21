@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static XCODEBUILD_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-json"]),
+    standalone: WordSet::flags(&["--help", "-h", "-json"]),
     valued: WordSet::flags(&["-project", "-workspace"]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static XCODEBUILD_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static XCODEBUILD_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-json"]),
+    standalone: WordSet::flags(&["--help", "-h", "-json"]),
     valued: WordSet::flags(&[
         "-configuration", "-destination", "-project",
         "-scheme", "-sdk", "-target", "-workspace",
@@ -23,7 +23,7 @@ static XCODEBUILD_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static XCODEBUILD_VERSION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -39,8 +39,7 @@ pub(crate) static XCODEBUILD: CommandDef = CommandDef {
         SubDef::Policy { name: "-showsdks", policy: &XCODEBUILD_SHOW_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "-version", policy: &XCODEBUILD_VERSION_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://developer.apple.com/documentation/xcode/xcodebuild",
     aliases: &[],
 };

@@ -7,14 +7,14 @@ static CLOC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--3", "--autoconf", "--by-file", "--by-file-by-lang", "--by-percent",
         "--categorized", "--counted", "--diff", "--diff-list-file", "--docstring-as-code",
-        "--follow-links", "--force-lang-def", "--found-langs", "--git", "--hide-rate",
+        "--follow-links", "--force-lang-def", "--found-langs", "--git", "--help", "--hide-rate",
         "--ignored", "--include-content", "--json", "--md", "--no-autogen",
         "--no3", "--opt-match-d", "--opt-match-f", "--opt-not-match-d", "--opt-not-match-f",
         "--original-dir", "--progress-rate", "--quiet", "--sdir", "--show-ext",
         "--show-lang", "--show-os", "--show-stored-lang", "--skip-uniqueness", "--sql-append",
         "--strip-comments", "--sum-one", "--sum-reports", "--unicode", "--use-sloccount",
-        "--v", "--vcs", "--xml", "--yaml",
-        "-v",
+        "--v", "--vcs", "--version", "--xml", "--yaml",
+        "-V", "-h", "-v",
     ]),
     valued: WordSet::flags(&[
         "--config", "--csv-delimiter", "--diff-alignment",
@@ -36,7 +36,7 @@ static CLOC_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cloc", policy: &CLOC_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://github.com/AlDanial/cloc#readme", aliases: &[] },
+    FlatDef { name: "cloc", policy: &CLOC_POLICY, level: SafetyLevel::Inert, url: "https://github.com/AlDanial/cloc#readme", aliases: &[] },
 ];
 
 #[cfg(test)]

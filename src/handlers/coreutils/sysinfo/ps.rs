@@ -5,11 +5,11 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static PS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--cumulative", "--deselect", "--forest", "--headers", "--info",
-        "--no-headers", "-A", "-C", "-H", "-L",
-        "-M", "-N", "-S", "-T", "-Z",
+        "--cumulative", "--deselect", "--forest", "--headers", "--help", "--info",
+        "--no-headers", "--version", "-A", "-C", "-H", "-L",
+        "-M", "-N", "-S", "-T", "-V", "-Z",
         "-a", "-c", "-d", "-e", "-f",
-        "-j", "-l", "-m", "-r", "-v",
+        "-h", "-j", "-l", "-m", "-r", "-v",
         "-w", "-x",
     ]),
     valued: WordSet::flags(&[
@@ -25,7 +25,7 @@ static PS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ps", policy: &PS_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/ps.1.html", aliases: &[] },
+    FlatDef { name: "ps", policy: &PS_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/ps.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

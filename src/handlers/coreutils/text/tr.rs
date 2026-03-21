@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static TR_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--complement", "--delete", "--squeeze-repeats", "--truncate-set1",
-        "-C", "-c", "-d", "-s",
+        "--complement", "--delete", "--help", "--squeeze-repeats", "--truncate-set1", "--version",
+        "-C", "-V", "-c", "-d", "-h", "-s",
     ]),
     valued: WordSet::flags(&[]),
     bare: false,
@@ -15,7 +15,7 @@ static TR_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "tr", policy: &TR_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation", aliases: &[] },
+    FlatDef { name: "tr", policy: &TR_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

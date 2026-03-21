@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static LINT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--list", "--quiet", "--show"]),
+    standalone: WordSet::flags(&["--help", "--list", "--quiet", "--show", "--version", "-V", "-h"]),
     valued: WordSet::flags(&["--check", "--config", "--disable", "--enable"]),
     bare: true,
     max_positional: None,
@@ -16,7 +16,6 @@ pub static DEFS: &[FlatDef] = &[
         name: "lint",
         policy: &LINT_POLICY,
         level: SafetyLevel::Inert,
-        help_eligible: true,
         url: "https://developer.android.com/studio/write/lint",
         aliases: &[],
     },

@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static MAN_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--apropos", "--default", "--local-file",
-        "--regex", "--update", "--whatis", "--where", "--where-cat",
+        "--all", "--apropos", "--default", "--help", "--local-file",
+        "--regex", "--update", "--version", "--whatis", "--where", "--where-cat",
         "--wildcard",
-        "-a", "-f", "-k", "-l", "-u", "-w",
+        "-V", "-a", "-f", "-h", "-k", "-l", "-u", "-w",
     ]),
     valued: WordSet::flags(&[
         "--config-file", "--encoding", "--extension", "--locale",
@@ -21,7 +21,7 @@ static MAN_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "man", policy: &MAN_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://man7.org/linux/man-pages/man1/man.1.html", aliases: &[] },
+    FlatDef { name: "man", policy: &MAN_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/man.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

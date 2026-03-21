@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--editable", "--exclude-editable", "--include-editable",
+        "--editable", "--exclude-editable", "--help", "--include-editable",
         "--local", "--not-required", "--outdated", "--pre",
         "--uptodate", "--user",
-        "-e", "-i", "-l", "-o",
+        "-e", "-h", "-i", "-l", "-o",
     ]),
     valued: WordSet::flags(&[
         "--exclude", "--format", "--index-url", "--path",
@@ -19,7 +19,7 @@ static PIP_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--files", "--verbose", "-f", "-v"]),
+    standalone: WordSet::flags(&["--files", "--help", "--verbose", "-f", "-h", "-v"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -28,8 +28,8 @@ static PIP_SHOW_POLICY: FlagPolicy = FlagPolicy {
 
 static PIP_FREEZE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--exclude-editable", "--local", "--user",
-        "-l",
+        "--all", "--exclude-editable", "--help", "--local", "--user",
+        "-h", "-l",
     ]),
     valued: WordSet::flags(&["--exclude", "--path"]),
     bare: true,
@@ -38,7 +38,7 @@ static PIP_FREEZE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static PIP_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -63,8 +63,7 @@ static PIP_SUBS: &[SubDef] = &[
 pub(crate) static PIP: CommandDef = CommandDef {
     name: "pip",
     subs: PIP_SUBS,
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://pip.pypa.io/en/stable/cli/",
     aliases: &["pip3"],
 };

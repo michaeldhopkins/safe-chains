@@ -6,9 +6,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static ZGREP_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--count", "--extended-regexp", "--files-with-matches",
-        "--files-without-match", "--fixed-strings", "--ignore-case",
+        "--files-without-match", "--fixed-strings", "--help", "--ignore-case",
         "--invert-match", "--line-number", "--no-filename",
-        "--only-matching", "--quiet", "--silent", "--with-filename",
+        "--only-matching", "--quiet", "--silent", "--version", "--with-filename",
         "--word-regexp",
         "-E", "-F", "-G", "-H", "-L", "-V", "-Z",
         "-c", "-h", "-i", "-l", "-n", "-o", "-q", "-s", "-v", "-w", "-x",
@@ -24,7 +24,7 @@ static ZGREP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "zgrep", policy: &ZGREP_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/zgrep.1.html", aliases: &["zegrep", "zfgrep"] },
+    FlatDef { name: "zgrep", policy: &ZGREP_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/zgrep.1.html", aliases: &["zegrep", "zfgrep"] },
 ];
 
 #[cfg(test)]

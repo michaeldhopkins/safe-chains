@@ -6,8 +6,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static LOCALE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all-locales", "--category-name", "--charmaps",
-        "--keyword-name", "--verbose",
-        "-a", "-c", "-k", "-m", "-v",
+        "--help", "--keyword-name", "--verbose", "--version",
+        "-V", "-a", "-c", "-h", "-k", "-m", "-v",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -16,7 +16,7 @@ static LOCALE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "locale", policy: &LOCALE_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/locale.1.html", aliases: &[] },
+    FlatDef { name: "locale", policy: &LOCALE_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/locale.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

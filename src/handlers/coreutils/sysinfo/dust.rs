@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DUST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--bars-on-right", "--files0-from", "--ignore-all-in-file", "--invert-filter", "--no-colors",
-        "--no-percent-bars", "--only-dir", "--only-file", "--skip-total", "-D",
-        "-F", "-H", "-P", "-R", "-S",
-        "-b", "-c", "-f", "-i", "-p",
+        "--bars-on-right", "--files0-from", "--help", "--ignore-all-in-file", "--invert-filter", "--no-colors",
+        "--no-percent-bars", "--only-dir", "--only-file", "--skip-total", "--version", "-D",
+        "-F", "-H", "-P", "-R", "-S", "-V",
+        "-b", "-c", "-f", "-h", "-i", "-p",
         "-r", "-s",
     ]),
     valued: WordSet::flags(&[
@@ -21,7 +21,7 @@ static DUST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "dust", policy: &DUST_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://github.com/bootandy/dust#readme", aliases: &[] },
+    FlatDef { name: "dust", policy: &DUST_POLICY, level: SafetyLevel::Inert, url: "https://github.com/bootandy/dust#readme", aliases: &[] },
 ];
 
 #[cfg(test)]

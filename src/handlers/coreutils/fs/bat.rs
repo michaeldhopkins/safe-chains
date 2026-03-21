@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static BAT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--diff", "--list-languages", "--list-themes", "--no-config",
-        "--number", "--plain", "--show-all",
-        "-A", "-P", "-d", "-n", "-p", "-u",
+        "--diff", "--help", "--list-languages", "--list-themes", "--no-config",
+        "--number", "--plain", "--show-all", "--version",
+        "-A", "-P", "-V", "-d", "-h", "-n", "-p", "-u",
     ]),
     valued: WordSet::flags(&[
         "--color", "--decorations", "--diff-context", "--file-name",
@@ -22,7 +22,7 @@ static BAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "bat", policy: &BAT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://github.com/sharkdp/bat#readme", aliases: &[] },
+    FlatDef { name: "bat", policy: &BAT_POLICY, level: SafetyLevel::Inert, url: "https://github.com/sharkdp/bat#readme", aliases: &[] },
 ];
 
 #[cfg(test)]

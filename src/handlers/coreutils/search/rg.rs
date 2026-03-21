@@ -9,7 +9,7 @@ static RG_POLICY: FlagPolicy = FlagPolicy {
         "--column", "--count", "--count-matches", "--crlf", "--debug",
         "--files", "--files-with-matches", "--files-without-match",
         "--fixed-strings", "--follow", "--glob-case-insensitive", "--heading",
-        "--hidden", "--ignore-case", "--ignore-file-case-insensitive",
+        "--help", "--hidden", "--ignore-case", "--ignore-file-case-insensitive",
         "--include-zero", "--invert-match", "--json", "--line-buffered",
         "--line-number", "--line-regexp", "--max-columns-preview", "--mmap",
         "--multiline", "--multiline-dotall", "--no-config", "--no-filename",
@@ -21,7 +21,7 @@ static RG_POLICY: FlagPolicy = FlagPolicy {
         "--only-matching", "--passthru", "--pcre2", "--pcre2-version",
         "--pretty", "--quiet", "--search-zip", "--smart-case", "--sort-files",
         "--stats", "--text", "--trim", "--type-list", "--unicode",
-        "--unrestricted", "--vimgrep", "--with-filename", "--word-regexp",
+        "--unrestricted", "--version", "--vimgrep", "--with-filename", "--word-regexp",
         "-F", "-H", "-I", "-L", "-N", "-P", "-S", "-U", "-V",
         "-a", "-b", "-c", "-h", "-i", "-l", "-n", "-o", "-p", "-q",
         "-s", "-u", "-v", "-w", "-x", "-z",
@@ -43,7 +43,7 @@ static RG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "rg", policy: &RG_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md", aliases: &[] },
+    FlatDef { name: "rg", policy: &RG_POLICY, level: SafetyLevel::Inert, url: "https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md", aliases: &[] },
 ];
 
 #[cfg(test)]

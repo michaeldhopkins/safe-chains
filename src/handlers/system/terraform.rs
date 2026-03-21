@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static TERRAFORM_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--no-color"]),
+    standalone: WordSet::flags(&["--help", "--json", "--no-color", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static TERRAFORM_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_STATE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--id", "--state"]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static TERRAFORM_STATE_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_STATE_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--state"]),
     bare: false,
     max_positional: None,
@@ -28,7 +28,7 @@ static TERRAFORM_STATE_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_OUTPUT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--no-color", "--raw"]),
+    standalone: WordSet::flags(&["--help", "--json", "--no-color", "--raw", "-h"]),
     valued: WordSet::flags(&["--state"]),
     bare: true,
     max_positional: None,
@@ -36,7 +36,7 @@ static TERRAFORM_OUTPUT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_VALIDATE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--no-color"]),
+    standalone: WordSet::flags(&["--help", "--json", "--no-color", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -44,7 +44,7 @@ static TERRAFORM_VALIDATE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_GRAPH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--draw-cycles"]),
+    standalone: WordSet::flags(&["--draw-cycles", "--help", "-h"]),
     valued: WordSet::flags(&["--plan", "--type"]),
     bare: true,
     max_positional: None,
@@ -52,7 +52,7 @@ static TERRAFORM_GRAPH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -60,7 +60,7 @@ static TERRAFORM_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_VERSION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -68,7 +68,7 @@ static TERRAFORM_VERSION_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static TERRAFORM_FMT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--check", "--diff", "--no-color", "--recursive"]),
+    standalone: WordSet::flags(&["--check", "--diff", "--help", "--no-color", "--recursive", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -94,8 +94,7 @@ pub(crate) static TERRAFORM: CommandDef = CommandDef {
         SubDef::Policy { name: "validate", policy: &TERRAFORM_VALIDATE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "version", policy: &TERRAFORM_VERSION_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://developer.hashicorp.com/terraform/cli/commands",
     aliases: &[],
 };

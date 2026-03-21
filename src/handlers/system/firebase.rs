@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),
@@ -12,7 +12,7 @@ static BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static LOG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--only"]),
     bare: true,
     max_positional: None,
@@ -27,8 +27,7 @@ pub(crate) static FIREBASE: CommandDef = CommandDef {
         SubDef::Policy { name: "login:list", policy: &BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "projects:list", policy: &BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://firebase.google.com/docs/cli",
     aliases: &[],
 };

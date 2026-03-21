@@ -7,12 +7,12 @@ static DELTA_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--blame-code-style", "--blame-palette",
         "--color-only", "--dark", "--diff-highlight",
-        "--diff-so-fancy", "--hyperlinks", "--keep-plus-minus-markers",
+        "--diff-so-fancy", "--help", "--hyperlinks", "--keep-plus-minus-markers",
         "--light", "--line-numbers", "--list-languages",
         "--list-syntax-themes", "--navigate", "--no-gitconfig",
         "--raw", "--relative-paths", "--show-config",
-        "--show-syntax-themes", "--side-by-side",
-        "-n", "-s",
+        "--show-syntax-themes", "--side-by-side", "--version",
+        "-V", "-h", "-n", "-s",
     ]),
     valued: WordSet::flags(&[
         "--commit-decoration-style", "--commit-style", "--config",
@@ -48,7 +48,7 @@ static DELTA_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "delta", policy: &DELTA_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://dandavison.github.io/delta/", aliases: &[] },
+    FlatDef { name: "delta", policy: &DELTA_POLICY, level: SafetyLevel::Inert, url: "https://dandavison.github.io/delta/", aliases: &[] },
 ];
 
 #[cfg(test)]

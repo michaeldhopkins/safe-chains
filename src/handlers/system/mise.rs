@@ -4,7 +4,7 @@ use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static HELP_ONLY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: Some(0),
@@ -12,7 +12,7 @@ static HELP_ONLY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_RESHIM_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--force"]),
+    standalone: WordSet::flags(&["--force", "--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static MISE_RESHIM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-q", "-v"]),
+    standalone: WordSet::flags(&["--help", "-h", "-q", "-v"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -29,9 +29,9 @@ static MISE_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 
 static MISE_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--current", "--installed", "--json", "--missing",
+        "--current", "--help", "--installed", "--json", "--missing",
         "--no-header", "--prefix",
-        "-J", "-c", "-i", "-m",
+        "-J", "-c", "-h", "-i", "-m",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -40,7 +40,7 @@ static MISE_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_ENV_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "-J"]),
+    standalone: WordSet::flags(&["--help", "--json", "-J", "-h"]),
     valued: WordSet::flags(&["--shell", "-s"]),
     bare: true,
     max_positional: None,
@@ -48,7 +48,7 @@ static MISE_ENV_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--no-header", "-J"]),
+    standalone: WordSet::flags(&["--help", "--json", "--no-header", "-J", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -56,7 +56,7 @@ static MISE_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_SEARCH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -64,7 +64,7 @@ static MISE_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_REGISTRY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--backend", "-b"]),
     bare: true,
     max_positional: None,
@@ -72,7 +72,7 @@ static MISE_REGISTRY_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_LS_REMOTE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all"]),
+    standalone: WordSet::flags(&["--all", "--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -80,7 +80,7 @@ static MISE_LS_REMOTE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_TRUST_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--show"]),
+    standalone: WordSet::flags(&["--help", "--show", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: Some(0),
@@ -88,7 +88,7 @@ static MISE_TRUST_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_FMT_CHECK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--check"]),
+    standalone: WordSet::flags(&["--check", "--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: Some(0),
@@ -96,7 +96,7 @@ static MISE_FMT_CHECK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static MISE_SET_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "-J"]),
+    standalone: WordSet::flags(&["--help", "--json", "-J", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),
@@ -280,8 +280,7 @@ pub(crate) static MISE: CommandDef = CommandDef {
         SubDef::Policy { name: "use", policy: &HELP_ONLY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "watch", policy: &HELP_ONLY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://mise.jdx.dev/cli/",
     aliases: &[],
 };

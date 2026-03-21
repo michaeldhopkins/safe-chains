@@ -6,11 +6,11 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static DU_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--apparent-size", "--bytes", "--count-links",
-        "--dereference", "--dereference-args", "--human-readable",
+        "--dereference", "--dereference-args", "--help", "--human-readable",
         "--inodes", "--no-dereference", "--null",
         "--one-file-system", "--separate-dirs", "--si",
-        "--summarize", "--total",
-        "-0", "-D", "-H", "-L", "-P", "-S", "-a", "-b",
+        "--summarize", "--total", "--version",
+        "-0", "-D", "-H", "-L", "-P", "-S", "-V", "-a", "-b",
         "-c", "-h", "-k", "-l", "-m", "-s", "-x",
     ]),
     valued: WordSet::flags(&[
@@ -25,7 +25,7 @@ static DU_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "du", policy: &DU_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation", aliases: &[] },
+    FlatDef { name: "du", policy: &DU_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

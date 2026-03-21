@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static HEROKU_APPS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "--json", "-a"]),
+    standalone: WordSet::flags(&["--all", "--help", "--json", "-a", "-h"]),
     valued: WordSet::flags(&["--space", "--team", "-s", "-t"]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static HEROKU_APPS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_APPS_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--shell", "-s"]),
+    standalone: WordSet::flags(&["--help", "--json", "--shell", "-h", "-s"]),
     valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static HEROKU_APPS_INFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_CONFIG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--shell", "-j", "-s"]),
+    standalone: WordSet::flags(&["--help", "--json", "--shell", "-h", "-j", "-s"]),
     valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
@@ -28,7 +28,7 @@ static HEROKU_CONFIG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--force-colors", "--tail", "-t"]),
+    standalone: WordSet::flags(&["--force-colors", "--help", "--tail", "-h", "-t"]),
     valued: WordSet::flags(&["--app", "--dyno", "--num", "--source", "-a", "-d", "-n", "-s"]),
     bare: true,
     max_positional: None,
@@ -36,7 +36,7 @@ static HEROKU_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_PS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "-j"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h", "-j"]),
     valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
@@ -44,7 +44,7 @@ static HEROKU_PS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_RELEASES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "-j"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h", "-j"]),
     valued: WordSet::flags(&["--app", "--num", "-a", "-n"]),
     bare: true,
     max_positional: None,
@@ -52,7 +52,7 @@ static HEROKU_RELEASES_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_REGIONS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -60,7 +60,7 @@ static HEROKU_REGIONS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_STATUS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -68,7 +68,7 @@ static HEROKU_STATUS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_BUILDPACKS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
@@ -76,7 +76,7 @@ static HEROKU_BUILDPACKS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static HEROKU_ADDONS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "--json", "-A"]),
+    standalone: WordSet::flags(&["--all", "--help", "--json", "-A", "-h"]),
     valued: WordSet::flags(&["--app", "-a"]),
     bare: true,
     max_positional: None,
@@ -97,8 +97,7 @@ pub(crate) static HEROKU: CommandDef = CommandDef {
         SubDef::Policy { name: "releases", policy: &HEROKU_RELEASES_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "status", policy: &HEROKU_STATUS_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://devcenter.heroku.com/articles/heroku-cli-commands",
     aliases: &[],
 };

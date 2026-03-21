@@ -5,7 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static ZIPINFO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "-1", "-2", "-C", "-M", "-T", "-Z", "-h", "-l", "-m", "-s", "-t", "-v", "-z",
+        "--help", "--version",
+        "-1", "-2", "-C", "-M", "-T", "-V", "-Z", "-h", "-l", "-m", "-s", "-t", "-v", "-z",
     ]),
     valued: WordSet::flags(&[]),
     bare: false,
@@ -14,7 +15,7 @@ static ZIPINFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "zipinfo", policy: &ZIPINFO_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://linux.die.net/man/1/zipinfo", aliases: &[] },
+    FlatDef { name: "zipinfo", policy: &ZIPINFO_POLICY, level: SafetyLevel::Inert, url: "https://linux.die.net/man/1/zipinfo", aliases: &[] },
 ];
 
 #[cfg(test)]

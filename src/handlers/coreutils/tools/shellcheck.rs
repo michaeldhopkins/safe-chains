@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static SHELLCHECK_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--color", "--external-sources", "--list-optional",
-        "--norc", "--severity", "--wiki-link-count",
-        "-C", "-a", "-x",
+        "--color", "--external-sources", "--help", "--list-optional",
+        "--norc", "--severity", "--version", "--wiki-link-count",
+        "-C", "-V", "-a", "-h", "-x",
     ]),
     valued: WordSet::flags(&[
         "--enable", "--exclude", "--format", "--include",
@@ -21,7 +21,7 @@ static SHELLCHECK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "shellcheck", policy: &SHELLCHECK_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.shellcheck.net/wiki/", aliases: &[] },
+    FlatDef { name: "shellcheck", policy: &SHELLCHECK_POLICY, level: SafetyLevel::Inert, url: "https://www.shellcheck.net/wiki/", aliases: &[] },
 ];
 
 #[cfg(test)]

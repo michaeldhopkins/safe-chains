@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static ORBCTL_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--quiet", "--running",
-        "-q", "-r",
+        "--help", "--quiet", "--running",
+        "-h", "-q", "-r",
     ]),
     valued: WordSet::flags(&["--format", "-f"]),
     bare: true,
@@ -15,7 +15,7 @@ static ORBCTL_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static ORBCTL_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--format", "-f"]),
     bare: false,
     max_positional: None,
@@ -23,7 +23,7 @@ static ORBCTL_INFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static ORBCTL_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "-a"]),
+    standalone: WordSet::flags(&["--all", "--help", "-a", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -31,7 +31,7 @@ static ORBCTL_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static ORBCTL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -39,7 +39,7 @@ static ORBCTL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static ORBCTL_UPDATE_CHECK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--check"]),
+    standalone: WordSet::flags(&["--check", "--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -74,8 +74,7 @@ static ORBCTL_SUBS: &[SubDef] = &[
 pub(crate) static ORBCTL: CommandDef = CommandDef {
     name: "orbctl",
     subs: ORBCTL_SUBS,
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.orbstack.dev/cli",
     aliases: &["orb"],
 };
@@ -105,13 +104,9 @@ mod tests {
         logs_all: "orbctl logs myvm -a",
         config_get: "orbctl config get some.key",
         config_show: "orbctl config show",
-        config_help: "orbctl config --help",
         update_check: "orbctl update --check",
-        update_help: "orbctl update --help",
         doctor: "orbctl doctor",
-        doctor_help: "orbctl doctor --help",
         default_bare: "orbctl default",
-        default_help: "orbctl default --help",
         orb_alias_status: "orb status",
         orb_alias_list: "orb list",
         orb_alias_version: "orb version",

@@ -5,8 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static AIDER_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--check-update", "--just-check-update", "--list-models", "--models",
+        "--check-update", "--help", "--just-check-update", "--list-models", "--models",
         "--show-prompts", "--show-release-notes", "--show-repo-map", "--version",
+        "-V", "-h",
     ]),
     valued: WordSet::flags(&[]),
     bare: false,
@@ -15,7 +16,7 @@ static AIDER_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::ai) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "aider", policy: &AIDER_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://aider.chat/docs/", aliases: &[] },
+    FlatDef { name: "aider", policy: &AIDER_POLICY, level: SafetyLevel::Inert, url: "https://aider.chat/docs/", aliases: &[] },
 ];
 
 #[cfg(test)]

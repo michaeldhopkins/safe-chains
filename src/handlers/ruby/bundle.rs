@@ -4,7 +4,7 @@ use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BUNDLE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--name-only", "--paths"]),
+    standalone: WordSet::flags(&["--help", "--name-only", "--paths", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static BUNDLE_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUNDLE_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--path"]),
+    standalone: WordSet::flags(&["--help", "--path", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static BUNDLE_INFO_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUNDLE_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--paths"]),
+    standalone: WordSet::flags(&["--help", "--paths", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -28,7 +28,7 @@ static BUNDLE_SHOW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUNDLE_CHECK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--dry-run"]),
+    standalone: WordSet::flags(&["--dry-run", "--help", "-h"]),
     valued: WordSet::flags(&["--gemfile", "--path"]),
     bare: true,
     max_positional: None,
@@ -36,7 +36,7 @@ static BUNDLE_CHECK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUNDLE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(1),
@@ -44,7 +44,7 @@ static BUNDLE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUNDLE_CONFIG_GET_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -56,7 +56,7 @@ static BUNDLE_EXEC_SAFE: WordSet = WordSet::new(&[
 ]);
 
 static RAILS_ROUTES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--expanded"]),
+    standalone: WordSet::flags(&["--expanded", "--help", "-h"]),
     valued: WordSet::flags(&[
         "--controller", "--grep", "-g",
     ]),
@@ -68,8 +68,8 @@ static RAILS_ROUTES_POLICY: FlagPolicy = FlagPolicy {
 static RAILS_TEST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--backtrace", "--color", "--defer-output", "--fail-fast",
-        "--no-color", "--verbose",
-        "-b", "-c", "-d", "-f", "-v",
+        "--help", "--no-color", "--verbose",
+        "-b", "-c", "-d", "-f", "-h", "-v",
     ]),
     valued: WordSet::flags(&[
         "--environment", "--name", "--seed",
@@ -81,7 +81,7 @@ static RAILS_TEST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static RAILS_NOTES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[
         "--annotations", "-a",
     ]),
@@ -116,7 +116,7 @@ static CONFIG_SUBS: &[SubDef] = &[
 ];
 
 static HELP_ONLY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: Some(0),
@@ -161,7 +161,7 @@ fn check_rails_sub(tokens: &[Token]) -> Verdict {
         return Verdict::Denied;
     }
     let sub = &tokens[1];
-    if tokens.len() == 2 && matches!(sub.as_str(), "--help" | "-h") {
+    if tokens.len() == 2 && (sub == "--help" || sub == "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     match sub.as_str() {
@@ -192,8 +192,7 @@ pub(crate) static BUNDLE: CommandDef = CommandDef {
         SubDef::Policy { name: "list", policy: &BUNDLE_LIST_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "show", policy: &BUNDLE_SHOW_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://bundler.io/man/bundle.1.html",
     aliases: &[],
 };

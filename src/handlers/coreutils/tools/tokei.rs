@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static TOKEI_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--compact", "--files", "--hidden", "--no-ignore",
+        "--compact", "--files", "--help", "--hidden", "--no-ignore",
         "--no-ignore-dot", "--no-ignore-parent",
-        "--no-ignore-vcs", "--verbose",
-        "-C", "-V", "-f",
+        "--no-ignore-vcs", "--verbose", "--version",
+        "-C", "-V", "-f", "-h",
     ]),
     valued: WordSet::flags(&[
         "--columns", "--exclude", "--input",
@@ -22,7 +22,7 @@ static TOKEI_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "tokei", policy: &TOKEI_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://github.com/XAMPPRocky/tokei#readme", aliases: &[] },
+    FlatDef { name: "tokei", policy: &TOKEI_POLICY, level: SafetyLevel::Inert, url: "https://github.com/XAMPPRocky/tokei#readme", aliases: &[] },
 ];
 
 #[cfg(test)]

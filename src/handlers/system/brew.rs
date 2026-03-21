@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static BREW_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--cask", "--formula", "--full-name", "--multiple",
+        "--cask", "--formula", "--full-name", "--help", "--multiple",
         "--pinned", "--versions",
-        "-1", "-l", "-r", "-t",
+        "-1", "-h", "-l", "-r", "-t",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -17,8 +17,8 @@ static BREW_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static BREW_INFO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--analytics", "--cask", "--formula", "--installed", "--json",
-        "-v",
+        "--analytics", "--cask", "--formula", "--help", "--installed", "--json",
+        "-h", "-v",
     ]),
     valued: WordSet::flags(&["--days"]),
     bare: true,
@@ -29,8 +29,9 @@ static BREW_INFO_POLICY: FlagPolicy = FlagPolicy {
 static BREW_SEARCH_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--cask", "--closed", "--debian", "--desc", "--fedora",
-        "--fink", "--formula", "--macports", "--open",
+        "--fink", "--formula", "--help", "--macports", "--open",
         "--opensuse", "--pull-request", "--repology", "--ubuntu",
+        "-h",
     ]),
     valued: WordSet::flags(&[]),
     bare: false,
@@ -41,10 +42,10 @@ static BREW_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 static BREW_DEPS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--1", "--annotate", "--cask", "--direct", "--for-each",
-        "--formula", "--full-name", "--graph", "--include-build",
+        "--formula", "--full-name", "--graph", "--help", "--include-build",
         "--include-optional", "--include-test", "--installed", "--missing",
         "--skip-recommended", "--tree", "--union",
-        "-n",
+        "-h", "-n",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -54,9 +55,10 @@ static BREW_DEPS_POLICY: FlagPolicy = FlagPolicy {
 
 static BREW_USES_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--cask", "--formula", "--include-build", "--include-optional",
+        "--cask", "--formula", "--help", "--include-build", "--include-optional",
         "--include-test", "--installed", "--missing",
         "--recursive", "--skip-recommended",
+        "-h",
     ]),
     valued: WordSet::flags(&[]),
     bare: false,
@@ -67,8 +69,8 @@ static BREW_USES_POLICY: FlagPolicy = FlagPolicy {
 static BREW_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--cask", "--fetch-HEAD", "--formula", "--greedy",
-        "--greedy-auto-updates", "--greedy-latest", "--json",
-        "-d", "-q", "-v",
+        "--greedy-auto-updates", "--greedy-latest", "--help", "--json",
+        "-d", "-h", "-q", "-v",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -79,8 +81,8 @@ static BREW_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
 static BREW_DESC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--cask", "--description", "--eval-all", "--formula",
-        "--name", "--search",
-        "-d", "-n", "-s",
+        "--help", "--name", "--search",
+        "-d", "-h", "-n", "-s",
     ]),
     valued: WordSet::flags(&[]),
     bare: false,
@@ -90,8 +92,8 @@ static BREW_DESC_POLICY: FlagPolicy = FlagPolicy {
 
 static BREW_LOG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--cask", "--formula", "--oneline",
-        "-1",
+        "--cask", "--formula", "--help", "--oneline",
+        "-1", "-h",
     ]),
     valued: WordSet::flags(&["--max-count", "-n"]),
     bare: false,
@@ -100,7 +102,7 @@ static BREW_LOG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BREW_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-q", "-v"]),
+    standalone: WordSet::flags(&["--help", "-h", "-q", "-v"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -108,7 +110,7 @@ static BREW_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BREW_SERVICES_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -116,7 +118,7 @@ static BREW_SERVICES_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BREW_SERVICES_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "--json"]),
+    standalone: WordSet::flags(&["--all", "--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -153,8 +155,7 @@ pub(crate) static BREW: CommandDef = CommandDef {
             SubDef::Policy { name: "info", policy: &BREW_SERVICES_INFO_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.brew.sh/Manpage",
     aliases: &[],
 };
@@ -212,6 +213,5 @@ mod tests {
         brew_services_list_json: "brew services list --json",
         brew_services_info: "brew services info postgres",
         brew_services_info_all: "brew services info --all",
-        brew_services_help: "brew services --help",
     }
 }

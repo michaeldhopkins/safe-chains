@@ -6,12 +6,12 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static LSBLK_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all", "--ascii", "--bytes", "--dedup", "--discard",
-        "--fs", "--inverse", "--json", "--list", "--merge",
+        "--fs", "--help", "--inverse", "--json", "--list", "--merge",
         "--nodeps", "--noheadings", "--output-all", "--pairs",
         "--paths", "--perms", "--raw", "--scsi", "--topology",
-        "--tree", "--zoned",
-        "-A", "-J", "-O", "-P", "-S", "-T",
-        "-a", "-b", "-d", "-f", "-i", "-l", "-m", "-n", "-p", "-r", "-s", "-t", "-z",
+        "--tree", "--version", "--zoned",
+        "-A", "-J", "-O", "-P", "-S", "-T", "-V",
+        "-a", "-b", "-d", "-f", "-h", "-i", "-l", "-m", "-n", "-p", "-r", "-s", "-t", "-z",
     ]),
     valued: WordSet::flags(&[
         "--exclude", "--include", "--output", "--sort", "--width",
@@ -23,7 +23,7 @@ static LSBLK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "lsblk", policy: &LSBLK_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/lsblk.8.html", aliases: &[] },
+    FlatDef { name: "lsblk", policy: &LSBLK_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man8/lsblk.8.html", aliases: &[] },
 ];
 
 #[cfg(test)]

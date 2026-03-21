@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static VALIDATE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--bundle"]),
     bare: false,
     max_positional: None,
@@ -12,7 +12,7 @@ static VALIDATE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DUMP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--bundle", "--module", "--xpath"]),
     bare: false,
     max_positional: None,
@@ -20,7 +20,7 @@ static DUMP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GET_SIZE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--apks", "--device-spec", "--dimensions", "--modules"]),
     bare: false,
     max_positional: None,
@@ -28,7 +28,7 @@ static GET_SIZE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static VERSION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),
@@ -49,8 +49,7 @@ pub(crate) static BUNDLETOOL: CommandDef = CommandDef {
         SubDef::Policy { name: "validate", policy: &VALIDATE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "version", policy: &VERSION_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://developer.android.com/tools/bundletool",
     aliases: &[],
 };

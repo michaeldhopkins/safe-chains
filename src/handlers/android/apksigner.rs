@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static VERIFY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--print-certs", "--verbose", "-v"]),
+    standalone: WordSet::flags(&["--help", "--print-certs", "--verbose", "-h", "-v"]),
     valued: WordSet::flags(&["--in", "--max-sdk-version", "--min-sdk-version"]),
     bare: false,
     max_positional: None,
@@ -12,7 +12,7 @@ static VERIFY_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),
@@ -26,8 +26,7 @@ pub(crate) static APKSIGNER: CommandDef = CommandDef {
         SubDef::Policy { name: "verify", policy: &VERIFY_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "version", policy: &BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://developer.android.com/tools/apksigner",
     aliases: &[],
 };

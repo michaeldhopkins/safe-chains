@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static FMT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--crown-margin", "--split-only", "--tagged-paragraph",
-        "--uniform-spacing",
-        "-c", "-m", "-n", "-s", "-u",
+        "--crown-margin", "--help", "--split-only", "--tagged-paragraph",
+        "--uniform-spacing", "--version",
+        "-V", "-c", "-h", "-m", "-n", "-s", "-u",
     ]),
     valued: WordSet::flags(&[
         "--goal", "--prefix", "--width",
@@ -19,7 +19,7 @@ static FMT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "fmt", policy: &FMT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation", aliases: &[] },
+    FlatDef { name: "fmt", policy: &FMT_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PERIPHERY_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -13,7 +13,8 @@ static PERIPHERY_BARE_POLICY: FlagPolicy = FlagPolicy {
 
 static PERIPHERY_SCAN_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--quiet", "--skip-build", "--strict", "--verbose",
+        "--help", "--quiet", "--skip-build", "--strict", "--verbose",
+        "-h",
     ]),
     valued: WordSet::flags(&[
         "--config", "--format", "--index-store-path",
@@ -30,8 +31,7 @@ pub(crate) static PERIPHERY: CommandDef = CommandDef {
         SubDef::Policy { name: "scan", policy: &PERIPHERY_SCAN_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "version", policy: &PERIPHERY_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://github.com/peripheryapp/periphery",
     aliases: &[],
 };

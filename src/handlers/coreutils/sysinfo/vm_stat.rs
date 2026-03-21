@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static VM_STAT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-h"]),
     valued: WordSet::flags(&["-c"]),
     bare: true,
     max_positional: Some(1),
@@ -12,7 +12,7 @@ static VM_STAT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "vm_stat", policy: &VM_STAT_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://ss64.com/mac/vm_stat.html", aliases: &[] },
+    FlatDef { name: "vm_stat", policy: &VM_STAT_POLICY, level: SafetyLevel::Inert, url: "https://ss64.com/mac/vm_stat.html", aliases: &[] },
 ];
 
 #[cfg(test)]

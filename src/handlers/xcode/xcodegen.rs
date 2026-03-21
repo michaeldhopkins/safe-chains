@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static XCODEGEN_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static XCODEGEN_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static XCODEGEN_DUMP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--no-env", "--quiet", "-n", "-q"]),
+    standalone: WordSet::flags(&["--help", "--no-env", "--quiet", "-h", "-n", "-q"]),
     valued: WordSet::flags(&["--project-root", "--spec", "--type", "-r", "-s", "-t"]),
     bare: true,
     max_positional: None,
@@ -25,8 +25,7 @@ pub(crate) static XCODEGEN: CommandDef = CommandDef {
         SubDef::Policy { name: "dump", policy: &XCODEGEN_DUMP_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "version", policy: &XCODEGEN_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://github.com/yonaskolb/XcodeGen",
     aliases: &[],
 };

@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static CKSUM_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--base64", "--check", "--raw", "--strict",
-        "--tag", "--untagged", "--warn", "--zero",
-        "-c", "-w", "-z",
+        "--base64", "--check", "--help", "--raw", "--strict",
+        "--tag", "--untagged", "--version", "--warn", "--zero",
+        "-V", "-c", "-h", "-w", "-z",
     ]),
     valued: WordSet::flags(&["--algorithm", "--length", "-a", "-l"]),
     bare: true,
@@ -16,7 +16,7 @@ static CKSUM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cksum", policy: &CKSUM_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation", aliases: &[] },
+    FlatDef { name: "cksum", policy: &CKSUM_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

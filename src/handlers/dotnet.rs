@@ -5,9 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static DOTNET_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--force", "--no-dependencies", "--no-incremental",
+        "--force", "--help", "--no-dependencies", "--no-incremental",
         "--no-restore", "--nologo", "--self-contained",
         "--tl", "--use-current-runtime",
+        "-h",
     ]),
     valued: WordSet::flags(&[
         "--arch", "--artifacts-path", "--configuration", "--framework",
@@ -23,8 +24,9 @@ static DOTNET_BUILD_POLICY: FlagPolicy = FlagPolicy {
 static DOTNET_TEST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--blame", "--blame-crash", "--blame-hang", "--force",
-        "--list-tests", "--no-build", "--no-dependencies",
+        "--help", "--list-tests", "--no-build", "--no-dependencies",
         "--no-restore", "--nologo",
+        "-h",
     ]),
     valued: WordSet::flags(&[
         "--arch", "--artifacts-path", "--blame-crash-collect-always",
@@ -43,9 +45,10 @@ static DOTNET_TEST_POLICY: FlagPolicy = FlagPolicy {
 
 static DOTNET_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--deprecated", "--highest-minor", "--highest-patch",
+        "--deprecated", "--help", "--highest-minor", "--highest-patch",
         "--include-prerelease", "--include-transitive", "--outdated",
         "--vulnerable",
+        "-h",
     ]),
     valued: WordSet::flags(&[
         "--config", "--format", "--framework", "--source", "--verbosity",
@@ -63,8 +66,7 @@ pub(crate) static DOTNET: CommandDef = CommandDef {
         SubDef::Policy { name: "list", policy: &DOTNET_LIST_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "test", policy: &DOTNET_TEST_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &["--info", "--list-runtimes", "--list-sdks"],
-    help_eligible: true,
+    bare_flags: &["--help", "--info", "--list-runtimes", "--list-sdks", "--version", "-V", "-h"],
     url: "https://learn.microsoft.com/en-us/dotnet/core/tools/",
     aliases: &[],
 };

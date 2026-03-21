@@ -16,7 +16,7 @@ use crate::verdict::Verdict;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 pub(super) static BARE_ONLY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(0),

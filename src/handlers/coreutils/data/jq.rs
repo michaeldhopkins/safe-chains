@@ -5,11 +5,12 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static JQ_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--ascii-output", "--color-output", "--compact-output", "--exit-status", "--join-output",
+        "--ascii-output", "--color-output", "--compact-output", "--exit-status", "--help",
+        "--join-output",
         "--monochrome-output", "--null-input", "--raw-input", "--raw-output", "--raw-output0",
-        "--seq", "--slurp", "--sort-keys", "--tab", "-C",
-        "-M", "-R", "-S", "-c", "-e",
-        "-g", "-j", "-n", "-r", "-s",
+        "--seq", "--slurp", "--sort-keys", "--tab", "--version", "-C",
+        "-M", "-R", "-S", "-V", "-c", "-e",
+        "-g", "-h", "-j", "-n", "-r", "-s",
     ]),
     valued: WordSet::flags(&[
         "--arg", "--argjson", "--args", "--from-file",
@@ -22,7 +23,7 @@ static JQ_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "jq", policy: &JQ_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://jqlang.github.io/jq/manual/", aliases: &[] },
+    FlatDef { name: "jq", policy: &JQ_POLICY, level: SafetyLevel::Inert, url: "https://jqlang.github.io/jq/manual/", aliases: &[] },
 ];
 
 #[cfg(test)]

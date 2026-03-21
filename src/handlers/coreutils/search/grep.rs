@@ -8,10 +8,10 @@ static GREP_POLICY: FlagPolicy = FlagPolicy {
         "--basic-regexp", "--binary", "--byte-offset", "--color", "--colour",
         "--count", "--dereference-recursive", "--extended-regexp",
         "--files-with-matches", "--files-without-match", "--fixed-strings",
-        "--ignore-case", "--initial-tab", "--invert-match", "--line-buffered",
+        "--help", "--ignore-case", "--initial-tab", "--invert-match", "--line-buffered",
         "--line-number", "--line-regexp", "--no-filename", "--no-messages",
         "--null", "--null-data", "--only-matching", "--perl-regexp", "--quiet",
-        "--recursive", "--silent", "--text", "--with-filename", "--word-regexp",
+        "--recursive", "--silent", "--text", "--version", "--with-filename", "--word-regexp",
         "-E", "-F", "-G", "-H", "-I", "-J", "-L", "-P", "-R", "-S",
         "-T", "-U", "-V", "-Z",
         "-a", "-b", "-c", "-h", "-i", "-l", "-n", "-o", "-p", "-q",
@@ -30,7 +30,7 @@ static GREP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "grep", policy: &GREP_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/grep/manual/grep.html", aliases: &["egrep", "fgrep"] },
+    FlatDef { name: "grep", policy: &GREP_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/grep/manual/grep.html", aliases: &["egrep", "fgrep"] },
 ];
 
 #[cfg(test)]

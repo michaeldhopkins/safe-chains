@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static WHEREIS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-b", "-l", "-m", "-s", "-u"]),
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-b", "-h", "-l", "-m", "-s", "-u"]),
     valued: WordSet::flags(&["-B", "-M", "-S", "-f"]),
     bare: false,
     max_positional: None,
@@ -12,7 +12,7 @@ static WHEREIS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "whereis", policy: &WHEREIS_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/whereis.1.html", aliases: &[] },
+    FlatDef { name: "whereis", policy: &WHEREIS_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/whereis.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

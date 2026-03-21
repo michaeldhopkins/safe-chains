@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static SWIFT_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--enable-code-coverage", "--show-bin-path",
+        "--enable-code-coverage", "--help", "--show-bin-path",
         "--skip-update", "--static-swift-stdlib", "--verbose",
-        "-v",
+        "-h", "-v",
     ]),
     valued: WordSet::flags(&[
         "--arch", "--build-path", "--configuration", "--jobs",
@@ -22,10 +22,10 @@ static SWIFT_BUILD_POLICY: FlagPolicy = FlagPolicy {
 
 static SWIFT_TEST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--enable-code-coverage", "--list-tests", "--parallel",
+        "--enable-code-coverage", "--help", "--list-tests", "--parallel",
         "--show-codecov-path", "--skip-build", "--skip-update",
         "--verbose",
-        "-l", "-v",
+        "-h", "-l", "-v",
     ]),
     valued: WordSet::flags(&[
         "--arch", "--build-path", "--configuration", "--filter",
@@ -40,7 +40,7 @@ static SWIFT_TEST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SWIFT_PACKAGE_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--package-path", "--type"]),
     bare: true,
     max_positional: None,
@@ -48,7 +48,7 @@ static SWIFT_PACKAGE_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SWIFT_PACKAGE_DUMP_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--package-path"]),
     bare: true,
     max_positional: None,
@@ -56,7 +56,7 @@ static SWIFT_PACKAGE_DUMP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static SWIFT_PACKAGE_SHOW_DEPS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&["--format", "--package-path"]),
     bare: true,
     max_positional: None,
@@ -74,8 +74,7 @@ pub(crate) static SWIFT: CommandDef = CommandDef {
         ]},
         SubDef::Policy { name: "test", policy: &SWIFT_TEST_POLICY, level: SafetyLevel::SafeRead },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://www.swift.org/documentation/swift-compiler/",
     aliases: &[],
 };

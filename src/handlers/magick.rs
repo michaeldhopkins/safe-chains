@@ -5,7 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static IDENTIFY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "-matte", "-moments", "-ping", "-quiet",
+        "--help",
+        "-h", "-matte", "-moments", "-ping", "-quiet",
         "-regard-warnings", "-unique", "-verbose",
     ]),
     valued: WordSet::flags(&[
@@ -24,8 +25,7 @@ pub(crate) static MAGICK: CommandDef = CommandDef {
     subs: &[
         SubDef::Policy { name: "identify", policy: &IDENTIFY_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://imagemagick.org/script/command-line-tools.php",
     aliases: &[],
 };

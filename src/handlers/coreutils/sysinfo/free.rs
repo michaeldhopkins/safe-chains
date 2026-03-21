@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static FREE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--bytes", "--gibi", "--giga", "--human", "--kibi", "--kilo",
+        "--bytes", "--gibi", "--giga", "--help", "--human", "--kibi", "--kilo",
         "--lohi", "--mebi", "--mega", "--si", "--tebi", "--tera",
-        "--total", "--wide",
-        "-b", "-g", "-h", "-k", "-l", "-m", "-t", "-v", "-w",
+        "--total", "--version", "--wide",
+        "-V", "-b", "-g", "-h", "-k", "-l", "-m", "-t", "-v", "-w",
     ]),
     valued: WordSet::flags(&[
         "--count", "--seconds",
@@ -20,7 +20,7 @@ static FREE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "free", policy: &FREE_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/free.1.html", aliases: &[] },
+    FlatDef { name: "free", policy: &FREE_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/free.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

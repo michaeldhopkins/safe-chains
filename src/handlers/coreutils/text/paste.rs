@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static PASTE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--serial", "--zero-terminated",
-        "-s", "-z",
+        "--help", "--serial", "--version", "--zero-terminated",
+        "-V", "-h", "-s", "-z",
     ]),
     valued: WordSet::flags(&[
         "--delimiters",
@@ -18,7 +18,7 @@ static PASTE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "paste", policy: &PASTE_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#paste-invocation", aliases: &[] },
+    FlatDef { name: "paste", policy: &PASTE_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#paste-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

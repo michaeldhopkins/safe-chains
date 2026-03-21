@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static PLUTIL_LINT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-s"]),
+    standalone: WordSet::flags(&["--help", "-h", "-s"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -12,7 +12,7 @@ static PLUTIL_LINT_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static PLUTIL_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -26,8 +26,7 @@ pub(crate) static PLUTIL: CommandDef = CommandDef {
         SubDef::Policy { name: "-p", policy: &PLUTIL_SIMPLE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "-type", policy: &PLUTIL_SIMPLE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &["-help"],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h", "-help"],
     url: "https://ss64.com/mac/plutil.html",
     aliases: &[],
 };

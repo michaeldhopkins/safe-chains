@@ -2,13 +2,14 @@ use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
 
 fn is_safe_command_builtin(tokens: &[Token]) -> Verdict {
-    if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
+    if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "--version" | "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
-        }
-            if tokens.len() >= 3
-            && (tokens[1] == "-v" || tokens[1] == "-V")
-        { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
-
+    }
+    if tokens.len() >= 3 && (tokens[1] == "-v" || tokens[1] == "-V") {
+        Verdict::Allowed(SafetyLevel::Inert)
+    } else {
+        Verdict::Denied
+    }
 }
 
 pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
@@ -21,7 +22,7 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> O
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         crate::docs::CommandDoc::handler("command", "https://man7.org/linux/man-pages/man1/command.1p.html",
-            "Allowed: -v, -V (check if command exists)."),
+            "Allowed: --help, --version, -h, -v, -V (check if command exists)."),
     ]
 }
 

@@ -5,7 +5,7 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static SYSTEM_PROFILER_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--json", "--xml", "-json", "-listDataTypes",
+        "--help", "--json", "--version", "--xml", "-V", "-h", "-json", "-listDataTypes",
         "-nospinner", "-xml",
     ]),
     valued: WordSet::flags(&["-detailLevel", "-timeout"]),
@@ -15,7 +15,7 @@ static SYSTEM_PROFILER_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "system_profiler", policy: &SYSTEM_PROFILER_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://ss64.com/mac/system_profiler.html", aliases: &[] },
+    FlatDef { name: "system_profiler", policy: &SYSTEM_PROFILER_POLICY, level: SafetyLevel::Inert, url: "https://ss64.com/mac/system_profiler.html", aliases: &[] },
 ];
 
 #[cfg(test)]

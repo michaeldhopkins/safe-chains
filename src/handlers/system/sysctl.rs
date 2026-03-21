@@ -4,6 +4,7 @@ use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static SYSCTL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
+        "--help",
         "-A", "-N", "-X", "-a", "-b", "-d", "-e", "-h",
         "-l", "-n", "-o", "-q", "-x",
     ]),

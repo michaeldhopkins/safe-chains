@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static KUBECTL_GET_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all-namespaces", "--no-headers", "--show-labels", "--watch",
-        "-A", "-w",
+        "--all-namespaces", "--help", "--no-headers", "--show-labels", "--watch",
+        "-A", "-h", "-w",
     ]),
     valued: WordSet::flags(&[
         "--field-selector", "--label-selector", "--namespace",
@@ -20,8 +20,8 @@ static KUBECTL_GET_POLICY: FlagPolicy = FlagPolicy {
 
 static KUBECTL_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all-namespaces", "--show-events",
-        "-A",
+        "--all-namespaces", "--help", "--show-events",
+        "-A", "-h",
     ]),
     valued: WordSet::flags(&["--namespace", "--selector", "-l", "-n"]),
     bare: false,
@@ -31,8 +31,8 @@ static KUBECTL_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
 
 static KUBECTL_LOGS_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all-containers", "--follow", "--previous", "--timestamps",
-        "-f", "-p",
+        "--all-containers", "--follow", "--help", "--previous", "--timestamps",
+        "-f", "-h", "-p",
     ]),
     valued: WordSet::flags(&["--container", "--namespace", "--since", "--tail", "-c", "-n"]),
     bare: false,
@@ -41,7 +41,7 @@ static KUBECTL_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static KUBECTL_TOP_NODE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--no-headers"]),
+    standalone: WordSet::flags(&["--help", "--no-headers", "-h"]),
     valued: WordSet::flags(&["--selector", "--sort-by", "-l"]),
     bare: true,
     max_positional: None,
@@ -50,8 +50,8 @@ static KUBECTL_TOP_NODE_POLICY: FlagPolicy = FlagPolicy {
 
 static KUBECTL_TOP_POD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all-namespaces", "--containers", "--no-headers",
-        "-A",
+        "--all-namespaces", "--containers", "--help", "--no-headers",
+        "-A", "-h",
     ]),
     valued: WordSet::flags(&["--namespace", "--selector", "--sort-by", "-l", "-n"]),
     bare: true,
@@ -60,7 +60,7 @@ static KUBECTL_TOP_POD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static KUBECTL_EXPLAIN_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--recursive"]),
+    standalone: WordSet::flags(&["--help", "--recursive", "-h"]),
     valued: WordSet::flags(&["--api-version"]),
     bare: false,
     max_positional: None,
@@ -68,7 +68,7 @@ static KUBECTL_EXPLAIN_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static KUBECTL_API_RESOURCES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--namespaced", "--no-headers"]),
+    standalone: WordSet::flags(&["--help", "--namespaced", "--no-headers", "-h"]),
     valued: WordSet::flags(&["--api-group", "--output", "--sort-by", "--verbs", "-o"]),
     bare: true,
     max_positional: None,
@@ -76,7 +76,7 @@ static KUBECTL_API_RESOURCES_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static KUBECTL_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -84,7 +84,7 @@ static KUBECTL_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static KUBECTL_VERSION_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--client", "--short"]),
+    standalone: WordSet::flags(&["--client", "--help", "--short", "-h"]),
     valued: WordSet::flags(&["--output", "-o"]),
     bare: true,
     max_positional: None,
@@ -92,7 +92,7 @@ static KUBECTL_VERSION_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static KUBECTL_CONFIG_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--flatten", "--minify", "--raw"]),
+    standalone: WordSet::flags(&["--flatten", "--help", "--minify", "--raw", "-h"]),
     valued: WordSet::flags(&["--output", "-o"]),
     bare: true,
     max_positional: None,
@@ -100,7 +100,7 @@ static KUBECTL_CONFIG_VIEW_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static KUBECTL_CONFIG_GET_CONTEXTS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--no-headers"]),
+    standalone: WordSet::flags(&["--help", "--no-headers", "-h"]),
     valued: WordSet::flags(&["--output", "-o"]),
     bare: true,
     max_positional: None,
@@ -108,7 +108,7 @@ static KUBECTL_CONFIG_GET_CONTEXTS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static KUBECTL_AUTH_CAN_I_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -116,7 +116,7 @@ static KUBECTL_AUTH_CAN_I_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static KUBECTL_EVENTS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all-namespaces", "--watch", "-A", "-w"]),
+    standalone: WordSet::flags(&["--all-namespaces", "--help", "--watch", "-A", "-h", "-w"]),
     valued: WordSet::flags(&["--for", "--namespace", "--output", "--types", "-n", "-o"]),
     bare: true,
     max_positional: None,
@@ -149,8 +149,7 @@ pub(crate) static KUBECTL: CommandDef = CommandDef {
         ]},
         SubDef::Policy { name: "version", policy: &KUBECTL_VERSION_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://kubernetes.io/docs/reference/kubectl/",
     aliases: &[],
 };

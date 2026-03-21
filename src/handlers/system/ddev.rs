@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static DDEV_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json-output", "-j"]),
+    standalone: WordSet::flags(&["--help", "--json-output", "-h", "-j"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static DDEV_DESCRIBE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DDEV_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json-output", "-j"]),
+    standalone: WordSet::flags(&["--help", "--json-output", "-h", "-j"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,7 @@ static DDEV_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DDEV_LOGS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--follow", "--time", "--timestamps", "-f"]),
+    standalone: WordSet::flags(&["--follow", "--help", "--time", "--timestamps", "-f", "-h"]),
     valued: WordSet::flags(&["--service", "--tail", "-s", "-t"]),
     bare: true,
     max_positional: None,
@@ -28,7 +28,7 @@ static DDEV_LOGS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DDEV_SNAPSHOT_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "--list"]),
+    standalone: WordSet::flags(&["--all", "--help", "--list", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -36,7 +36,7 @@ static DDEV_SNAPSHOT_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static DDEV_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -67,8 +67,7 @@ pub(crate) static DDEV: CommandDef = CommandDef {
         SubDef::Policy { name: "status", policy: &DDEV_DESCRIBE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "version", policy: &DDEV_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://ddev.readthedocs.io/en/stable/users/usage/commands/",
     aliases: &[],
 };

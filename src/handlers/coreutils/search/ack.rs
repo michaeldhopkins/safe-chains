@@ -7,14 +7,14 @@ static ACK_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--color", "--column", "--count", "--files-with-matches",
         "--files-without-matches", "--flush", "--follow", "--group",
-        "--heading", "--ignore-case", "--invert-match", "--line",
+        "--heading", "--help", "--ignore-case", "--invert-match", "--line",
         "--literal", "--match", "--no-color", "--no-filename",
         "--no-follow", "--no-group", "--no-heading", "--nocolor",
         "--noenv", "--nofilter", "--nofollow", "--nogroup",
         "--noheading", "--nopager", "--nosmart-case", "--passthru",
         "--print0", "--show-types", "--smart-case", "--sort-files",
-        "--with-filename", "--word-regexp",
-        "-1", "-H", "-L", "-c", "-f", "-h", "-i", "-l",
+        "--version", "--with-filename", "--word-regexp",
+        "-1", "-H", "-L", "-V", "-c", "-f", "-h", "-i", "-l",
         "-n", "-s", "-v", "-w", "-x",
     ]),
     valued: WordSet::flags(&[
@@ -30,7 +30,7 @@ static ACK_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "ack", policy: &ACK_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://beyondgrep.com/documentation/", aliases: &[] },
+    FlatDef { name: "ack", policy: &ACK_POLICY, level: SafetyLevel::Inert, url: "https://beyondgrep.com/documentation/", aliases: &[] },
 ];
 
 #[cfg(test)]

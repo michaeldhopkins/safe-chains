@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static PNPM_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--dev", "--json", "--long", "--no-optional",
+        "--dev", "--help", "--json", "--long", "--no-optional",
         "--parseable", "--production", "--recursive",
-        "-P", "-r",
+        "-P", "-h", "-r",
     ]),
     valued: WordSet::flags(&["--depth", "--filter"]),
     bare: true,
@@ -16,7 +16,7 @@ static PNPM_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static PNPM_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json", "--recursive", "-r"]),
+    standalone: WordSet::flags(&["--help", "--json", "--recursive", "-h", "-r"]),
     valued: WordSet::flags(&["--filter"]),
     bare: true,
     max_positional: None,
@@ -32,8 +32,7 @@ pub(crate) static PNPM: CommandDef = CommandDef {
         SubDef::Policy { name: "outdated", policy: &PNPM_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "why", policy: &PNPM_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://pnpm.io/pnpm-cli",
     aliases: &[],
 };

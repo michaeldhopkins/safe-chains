@@ -5,7 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static MDFIND_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "-0", "-count", "-interpret", "-literal", "-live",
+        "--help", "--version",
+        "-0", "-V", "-count", "-h", "-interpret", "-literal", "-live",
     ]),
     valued: WordSet::flags(&["-attr", "-name", "-onlyin", "-s"]),
     bare: false,
@@ -14,7 +15,7 @@ static MDFIND_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "mdfind", policy: &MDFIND_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://ss64.com/mac/mdfind.html", aliases: &[] },
+    FlatDef { name: "mdfind", policy: &MDFIND_POLICY, level: SafetyLevel::Inert, url: "https://ss64.com/mac/mdfind.html", aliases: &[] },
 ];
 
 #[cfg(test)]

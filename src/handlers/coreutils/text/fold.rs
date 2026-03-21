@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static FOLD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--bytes", "--spaces",
-        "-b", "-s",
+        "--bytes", "--help", "--spaces", "--version",
+        "-V", "-b", "-h", "-s",
     ]),
     valued: WordSet::flags(&[
         "--width",
@@ -18,7 +18,7 @@ static FOLD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "fold", policy: &FOLD_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#fold-invocation", aliases: &[] },
+    FlatDef { name: "fold", policy: &FOLD_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#fold-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

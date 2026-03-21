@@ -6,12 +6,12 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static FILE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--brief", "--debug", "--dereference", "--extension",
-        "--keep-going", "--list", "--mime", "--mime-encoding",
+        "--help", "--keep-going", "--list", "--mime", "--mime-encoding",
         "--mime-type", "--no-buffer", "--no-dereference",
         "--no-pad", "--no-sandbox", "--preserve-date",
         "--print0", "--raw", "--special-files",
-        "--uncompress", "--uncompress-noreport",
-        "-0", "-D", "-I", "-L", "-N", "-S", "-Z",
+        "--uncompress", "--uncompress-noreport", "--version",
+        "-0", "-D", "-I", "-L", "-N", "-S", "-V", "-Z",
         "-b", "-d", "-h", "-i", "-k", "-l",
         "-n", "-p", "-r", "-s", "-z",
     ]),
@@ -26,7 +26,7 @@ static FILE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "file", policy: &FILE_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/file.1.html", aliases: &[] },
+    FlatDef { name: "file", policy: &FILE_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/file.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

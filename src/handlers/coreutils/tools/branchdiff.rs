@@ -5,8 +5,8 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static BRANCHDIFF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--diff", "--no-auto-fetch", "--print",
-        "-d", "-p",
+        "--diff", "--help", "--no-auto-fetch", "--print", "--version",
+        "-V", "-d", "-h", "-p",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -15,7 +15,7 @@ static BRANCHDIFF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "branchdiff", policy: &BRANCHDIFF_POLICY, level: SafetyLevel::Inert, help_eligible: true, url: "https://github.com/michaeldhopkins/branchdiff", aliases: &[] },
+    FlatDef { name: "branchdiff", policy: &BRANCHDIFF_POLICY, level: SafetyLevel::Inert, url: "https://github.com/michaeldhopkins/branchdiff", aliases: &[] },
 ];
 
 #[cfg(test)]

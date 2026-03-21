@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static LAST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--dns", "--fullnames", "--fulltimes", "--hostlast",
-        "--ip", "--nohostname", "--system", "--time-format",
+        "--dns", "--fullnames", "--fulltimes", "--help", "--hostlast",
+        "--ip", "--nohostname", "--system", "--time-format", "--version",
         "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
-        "-F", "-R", "-a", "-d", "-i", "-w", "-x",
+        "-F", "-R", "-V", "-a", "-d", "-h", "-i", "-w", "-x",
     ]),
     valued: WordSet::flags(&[
         "--limit", "--present", "--since", "--time-format", "--until",
@@ -20,7 +20,7 @@ static LAST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "last", policy: &LAST_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/last.1.html", aliases: &[] },
+    FlatDef { name: "last", policy: &LAST_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/last.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

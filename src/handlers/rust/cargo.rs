@@ -24,43 +24,43 @@ macro_rules! cargo_compile_policy {
 
 static CARGO_BUILD_POLICY: FlagPolicy = cargo_compile_policy!([
     "--all-features", "--all-targets", "--benches", "--bins", "--build-plan",
-    "--examples", "--frozen", "--future-incompat-report", "--ignore-rust-version",
+    "--examples", "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--offline",
     "--release", "--tests", "--timings", "--unit-graph",
-    "-q", "-v",
+    "-h", "-q", "-v",
 ]);
 
 static CARGO_TEST_POLICY: FlagPolicy = cargo_compile_policy!([
     "--all-features", "--all-targets", "--benches", "--bins", "--doc",
-    "--examples", "--frozen", "--future-incompat-report", "--ignore-rust-version",
+    "--examples", "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--no-fail-fast",
     "--no-run", "--offline", "--release", "--tests", "--timings", "--unit-graph",
-    "-q", "-v",
+    "-h", "-q", "-v",
 ]);
 
 static CARGO_CHECK_POLICY: FlagPolicy = cargo_compile_policy!([
     "--all-features", "--all-targets", "--benches", "--bins", "--examples",
-    "--frozen", "--future-incompat-report", "--ignore-rust-version",
+    "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--offline",
     "--release", "--tests", "--timings", "--unit-graph",
-    "-q", "-v",
+    "-h", "-q", "-v",
 ]);
 
 static CARGO_CLIPPY_POLICY: FlagPolicy = cargo_compile_policy!([
     "--all-features", "--all-targets", "--benches", "--bins", "--examples",
-    "--frozen", "--future-incompat-report", "--ignore-rust-version",
+    "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--no-deps",
     "--offline", "--release", "--tests", "--timings", "--unit-graph",
-    "-q", "-v",
+    "-h", "-q", "-v",
 ]);
 
 static CARGO_DOC_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all-features", "--bins", "--document-private-items", "--examples",
-        "--frozen", "--future-incompat-report", "--ignore-rust-version",
+        "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
         "--keep-going", "--locked", "--no-default-features", "--no-deps",
         "--offline", "--open", "--release", "--timings", "--unit-graph",
-        "-q", "-v",
+        "-h", "-q", "-v",
     ]),
     valued: WordSet::flags(&[
         "--bin", "--color", "--config", "--example",
@@ -76,9 +76,9 @@ static CARGO_DOC_POLICY: FlagPolicy = FlagPolicy {
 static CARGO_TREE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all-features", "--duplicates", "--frozen",
-        "--ignore-rust-version", "--locked", "--no-dedupe",
+        "--help", "--ignore-rust-version", "--locked", "--no-dedupe",
         "--no-default-features", "--offline",
-        "-d", "-e", "-i", "-q", "-v",
+        "-d", "-e", "-h", "-i", "-q", "-v",
     ]),
     valued: WordSet::flags(&[
         "--charset", "--color", "--config", "--depth",
@@ -94,9 +94,9 @@ static CARGO_TREE_POLICY: FlagPolicy = FlagPolicy {
 
 static CARGO_METADATA_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all-features", "--frozen", "--locked",
+        "--all-features", "--frozen", "--help", "--locked",
         "--no-default-features", "--no-deps", "--offline",
-        "-q", "-v",
+        "-h", "-q", "-v",
     ]),
     valued: WordSet::flags(&[
         "--color", "--config", "--features",
@@ -110,8 +110,8 @@ static CARGO_METADATA_POLICY: FlagPolicy = FlagPolicy {
 
 static CARGO_SEARCH_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--frozen", "--locked", "--offline",
-        "-q", "-v",
+        "--frozen", "--help", "--locked", "--offline",
+        "-h", "-q", "-v",
     ]),
     valued: WordSet::flags(&[
         "--color", "--config", "--index", "--limit",
@@ -124,8 +124,8 @@ static CARGO_SEARCH_POLICY: FlagPolicy = FlagPolicy {
 
 static CARGO_INFO_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--frozen", "--locked", "--offline",
-        "-q", "-v",
+        "--frozen", "--help", "--locked", "--offline",
+        "-h", "-q", "-v",
     ]),
     valued: WordSet::flags(&[
         "--color", "--config", "--index", "--registry",
@@ -137,8 +137,8 @@ static CARGO_INFO_POLICY: FlagPolicy = FlagPolicy {
 
 static CARGO_AUDIT_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--deny", "--json", "--no-fetch", "--stale",
-        "-n", "-q", "-v",
+        "--deny", "--help", "--json", "--no-fetch", "--stale",
+        "-h", "-n", "-q", "-v",
     ]),
     valued: WordSet::flags(&[
         "--color", "--db", "--file", "--ignore",
@@ -152,8 +152,8 @@ static CARGO_AUDIT_POLICY: FlagPolicy = FlagPolicy {
 
 static CARGO_DENY_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all-features", "--no-default-features",
-        "-q", "-v",
+        "--all-features", "--help", "--no-default-features",
+        "-h", "-q", "-v",
     ]),
     valued: WordSet::flags(&[
         "--color", "--config", "--exclude", "--features",
@@ -167,8 +167,8 @@ static CARGO_DENY_POLICY: FlagPolicy = FlagPolicy {
 
 static CARGO_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--frozen", "--locked", "--offline",
-        "-q", "-v",
+        "--frozen", "--help", "--locked", "--offline",
+        "-h", "-q", "-v",
     ]),
     valued: WordSet::flags(&[
         "--color", "--config", "--manifest-path",
@@ -179,7 +179,7 @@ static CARGO_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static CARGO_FMT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--all", "--check", "-q", "-v"]),
+    standalone: WordSet::flags(&["--all", "--check", "--help", "-h", "-q", "-v"]),
     valued: WordSet::flags(&[
         "--manifest-path", "--message-format", "--package",
         "-p",
@@ -191,10 +191,10 @@ static CARGO_FMT_POLICY: FlagPolicy = FlagPolicy {
 
 static CARGO_PACKAGE_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all-features", "--frozen", "--keep-going",
+        "--all-features", "--frozen", "--help", "--keep-going",
         "--list", "--locked", "--no-default-features",
         "--no-metadata", "--offline", "--workspace",
-        "-l", "-q", "-v",
+        "-h", "-l", "-q", "-v",
     ]),
     valued: WordSet::flags(&[
         "--color", "--config", "--exclude", "--features",
@@ -210,9 +210,9 @@ static CARGO_PACKAGE_POLICY: FlagPolicy = FlagPolicy {
 static CARGO_PUBLISH_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--all-features", "--dry-run", "--frozen",
-        "--keep-going", "--locked", "--no-default-features",
+        "--help", "--keep-going", "--locked", "--no-default-features",
         "--offline", "--workspace",
-        "-n", "-q", "-v",
+        "-h", "-n", "-q", "-v",
     ]),
     valued: WordSet::flags(&[
         "--color", "--config", "--exclude", "--features",
@@ -227,15 +227,17 @@ static CARGO_PUBLISH_POLICY: FlagPolicy = FlagPolicy {
 };
 
 fn check_cargo_sub(tokens: &[Token]) -> Verdict {
-    let sub = usize::from(!tokens.is_empty() && tokens[0].starts_with('+'));
-    if tokens.len() < sub + 1 {
+    if tokens.is_empty() {
         return Verdict::Denied;
     }
-    let rest = &tokens[sub..];
+    let arg = tokens[0].as_str();
+    if tokens.len() == 1 && CARGO.bare_flags.contains(&arg) {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
     CARGO_SUBS
         .iter()
-        .find(|s| s.name() == rest[0].as_str())
-        .map(|s| s.check(rest)).unwrap_or(Verdict::Denied)
+        .find(|s| s.name() == arg)
+        .map(|s| s.check(tokens)).unwrap_or(Verdict::Denied)
 }
 
 static CARGO_HELP_SUB_POLICY: FlagPolicy = FlagPolicy {
@@ -247,7 +249,7 @@ static CARGO_HELP_SUB_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static CARGO_HELP_ONLY_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: Some(0),
@@ -295,8 +297,7 @@ static CARGO_SUBS: &[SubDef] = &[
 pub(crate) static CARGO: CommandDef = CommandDef {
     name: "cargo",
     subs: CARGO_SUBS,
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://doc.rust-lang.org/cargo/commands/",
     aliases: &[],
 };
@@ -304,18 +305,11 @@ pub(crate) static CARGO: CommandDef = CommandDef {
 pub(in crate::handlers::rust) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "cargo" => {
-            if tokens.len() < 2 {
-                return Some(Verdict::Denied);
+            if tokens.len() >= 2 && tokens[1].starts_with('+') {
+                Some(check_cargo_sub(&tokens[2..]))
+            } else {
+                Some(CARGO.check(tokens))
             }
-            let sub = if tokens[1].starts_with('+') { 2 } else { 1 };
-            if tokens.len() < sub + 1 {
-                return Some(Verdict::Denied);
-            }
-            let arg = tokens[sub].as_str();
-            if tokens.len() == sub + 1 && matches!(arg, "--help" | "-h" | "--version" | "-V") {
-                return Some(Verdict::Allowed(SafetyLevel::Inert));
-            }
-            Some(check_cargo_sub(&tokens[sub..]))
         }
         _ => None,
     }

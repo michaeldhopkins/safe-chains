@@ -2,7 +2,7 @@ use crate::command::FlatDef;
 use crate::verdict::SafetyLevel;
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "whoami", policy: &super::super::BARE_ONLY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#whoami-invocation", aliases: &[] },
+    FlatDef { name: "whoami", policy: &super::super::BARE_ONLY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#whoami-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

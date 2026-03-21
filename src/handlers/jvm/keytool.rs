@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static KEYTOOL_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-rfc", "-v"]),
+    standalone: WordSet::flags(&["--help", "-h", "-rfc", "-v"]),
     valued: WordSet::flags(&["-alias", "-keystore", "-storepass", "-storetype"]),
     bare: true,
     max_positional: Some(0),
@@ -12,7 +12,7 @@ static KEYTOOL_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static KEYTOOL_PRINTCERT_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["-rfc", "-v"]),
+    standalone: WordSet::flags(&["--help", "-h", "-rfc", "-v"]),
     valued: WordSet::flags(&["-file", "-jarfile"]),
     bare: true,
     max_positional: Some(0),
@@ -25,8 +25,7 @@ pub(crate) static KEYTOOL: CommandDef = CommandDef {
         SubDef::Policy { name: "-list", policy: &KEYTOOL_LIST_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "-printcert", policy: &KEYTOOL_PRINTCERT_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html",
     aliases: &[],
 };

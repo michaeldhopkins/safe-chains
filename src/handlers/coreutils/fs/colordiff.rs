@@ -5,14 +5,14 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static COLORDIFF_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--brief", "--ed", "--expand-tabs", "--initial-tab",
+        "--brief", "--ed", "--expand-tabs", "--help", "--initial-tab",
         "--left-column", "--minimal", "--normal",
         "--paginate", "--rcs", "--report-identical-files",
         "--side-by-side", "--speed-large-files",
         "--strip-trailing-cr", "--suppress-blank-empty",
-        "--suppress-common-lines", "--text",
-        "-B", "-E", "-N", "-P", "-T", "-Z",
-        "-a", "-b", "-c", "-d", "-e", "-f", "-i", "-l", "-n",
+        "--suppress-common-lines", "--text", "--version",
+        "-B", "-E", "-N", "-P", "-T", "-V", "-Z",
+        "-a", "-b", "-c", "-d", "-e", "-f", "-h", "-i", "-l", "-n",
         "-p", "-q", "-r", "-s", "-t", "-u", "-v", "-w", "-y",
     ]),
     valued: WordSet::flags(&[
@@ -32,7 +32,7 @@ static COLORDIFF_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "colordiff", policy: &COLORDIFF_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.colordiff.org/", aliases: &[] },
+    FlatDef { name: "colordiff", policy: &COLORDIFF_POLICY, level: SafetyLevel::Inert, url: "https://www.colordiff.org/", aliases: &[] },
 ];
 
 #[cfg(test)]

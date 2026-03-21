@@ -4,7 +4,7 @@ use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static BUN_TEST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--bail", "--only", "--rerun-each", "--todo"]),
+    standalone: WordSet::flags(&["--bail", "--help", "--only", "--rerun-each", "--todo", "-h"]),
     valued: WordSet::flags(&["--preload", "--timeout", "-t"]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static BUN_TEST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUN_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -22,11 +22,12 @@ static BUN_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
 static BUN_BUILD_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--bytecode", "--compile", "--css-chunking",
-        "--emit-dce-annotations", "--minify", "--minify-identifiers",
+        "--emit-dce-annotations", "--help", "--minify", "--minify-identifiers",
         "--minify-syntax", "--minify-whitespace", "--no-bundle",
         "--no-clear-screen", "--production", "--react-fast-refresh",
         "--splitting", "--watch",
         "--windows-hide-console",
+        "-h",
     ]),
     valued: WordSet::flags(&[
         "--asset-naming", "--banner", "--chunk-naming", "--conditions",
@@ -42,7 +43,7 @@ static BUN_BUILD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static BUN_PM_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -69,8 +70,7 @@ pub(crate) static BUN: CommandDef = CommandDef {
         ]},
         SubDef::Custom { name: "x", check: check_bun_x as CheckFn, doc: "x delegates to bunx logic.", test_suffix: None },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://bun.sh/docs/cli",
     aliases: &[],
 };

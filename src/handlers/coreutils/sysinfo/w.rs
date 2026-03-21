@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static W_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--from", "--ip-addr", "--no-current", "--no-header",
-        "--old-style", "--short",
-        "-f", "-h", "-i", "-o", "-s", "-u",
+        "--from", "--help", "--ip-addr", "--no-current", "--no-header",
+        "--old-style", "--short", "--version",
+        "-V", "-f", "-h", "-i", "-o", "-s", "-u",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -16,7 +16,7 @@ static W_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "w", policy: &W_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/w.1.html", aliases: &[] },
+    FlatDef { name: "w", policy: &W_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/w.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

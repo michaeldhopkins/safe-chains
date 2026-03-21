@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static OLLAMA_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static OLLAMA_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static OLLAMA_PS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--json"]),
+    standalone: WordSet::flags(&["--help", "--json", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -21,8 +21,9 @@ static OLLAMA_PS_POLICY: FlagPolicy = FlagPolicy {
 
 static OLLAMA_SHOW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--json", "--license", "--modelfile", "--parameters",
+        "--help", "--json", "--license", "--modelfile", "--parameters",
         "--system", "--template", "--verbose",
+        "-h",
     ]),
     valued: WordSet::flags(&[]),
     bare: false,
@@ -37,8 +38,7 @@ pub(crate) static OLLAMA: CommandDef = CommandDef {
         SubDef::Policy { name: "ps", policy: &OLLAMA_PS_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "show", policy: &OLLAMA_SHOW_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://github.com/ollama/ollama/blob/main/docs/api.md",
     aliases: &[],
 };

@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static CRAFT_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -12,7 +12,7 @@ static CRAFT_BARE_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static CRAFT_POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
@@ -37,8 +37,7 @@ pub(crate) static CRAFT: CommandDef = CommandDef {
         SubDef::Policy { name: "update/info", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "users/list-admins", policy: &CRAFT_BARE_POLICY, level: SafetyLevel::Inert },
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://craftcms.com/docs/5.x/reference/cli.html",
     aliases: &[],
 };

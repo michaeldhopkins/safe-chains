@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--compact", "-c"]),
+    standalone: WordSet::flags(&["--compact", "--help", "-c", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -20,8 +20,7 @@ pub(crate) static AVDMANAGER: CommandDef = CommandDef {
             SubDef::Policy { name: "target", policy: &LIST_POLICY, level: SafetyLevel::Inert },
         ]},
     ],
-    bare_flags: &[],
-    help_eligible: true,
+    bare_flags: &["--help", "--version", "-V", "-h"],
     url: "https://developer.android.com/tools/avdmanager",
     aliases: &[],
 };

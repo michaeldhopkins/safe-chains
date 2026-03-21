@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static AGVTOOL_BARE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: None,
@@ -20,7 +20,6 @@ pub(crate) static AGVTOOL: CommandDef = CommandDef {
         SubDef::Policy { name: "what-version", policy: &AGVTOOL_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &[],
-    help_eligible: false,
     url: "https://developer.apple.com/library/archive/qa/qa1827/_index.html",
     aliases: &[],
 };

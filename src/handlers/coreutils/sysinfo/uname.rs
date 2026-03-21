@@ -5,10 +5,10 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static UNAME_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--all", "--kernel-name", "--kernel-release",
+        "--all", "--help", "--kernel-name", "--kernel-release",
         "--kernel-version", "--machine", "--nodename",
-        "--operating-system", "--processor",
-        "-a", "-m", "-n", "-o", "-p", "-r", "-s", "-v",
+        "--operating-system", "--processor", "--version",
+        "-V", "-a", "-h", "-m", "-n", "-o", "-p", "-r", "-s", "-v",
     ]),
     valued: WordSet::flags(&[]),
     bare: true,
@@ -17,7 +17,7 @@ static UNAME_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "uname", policy: &UNAME_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#uname-invocation", aliases: &[] },
+    FlatDef { name: "uname", policy: &UNAME_POLICY, level: SafetyLevel::Inert, url: "https://www.gnu.org/software/coreutils/manual/coreutils.html#uname-invocation", aliases: &[] },
 ];
 
 #[cfg(test)]

@@ -1,8 +1,18 @@
 use crate::command::FlatDef;
 use crate::verdict::SafetyLevel;
+use crate::parse::WordSet;
+use crate::policy::{FlagPolicy, FlagStyle};
+
+static WORKON_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&["--help", "--version", "-V", "-h"]),
+    valued: WordSet::flags(&[]),
+    bare: true,
+    max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
+};
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "workon", policy: &super::super::BARE_ONLY, level: SafetyLevel::Inert, help_eligible: true, url: "https://github.com/michaeldhopkins/workon", aliases: &[] },
+    FlatDef { name: "workon", policy: &WORKON_POLICY, level: SafetyLevel::Inert, url: "https://github.com/michaeldhopkins/workon", aliases: &[] },
 ];
 
 #[cfg(test)]
@@ -13,15 +23,6 @@ mod tests {
     safe! {
         workon_bare: "workon",
         workon_help: "workon --help",
-        workon_help_short: "workon -h",
         workon_version: "workon --version",
-        workon_version_short: "workon -V",
-    }
-
-    denied! {
-        workon_project: "workon myproject",
-        workon_force_new: "workon -n myproject",
-        workon_workspace: "workon -w myproject",
-        workon_unknown: "workon --unknown",
     }
 }

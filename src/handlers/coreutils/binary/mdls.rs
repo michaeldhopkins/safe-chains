@@ -4,7 +4,7 @@ use crate::parse::WordSet;
 use crate::policy::{FlagPolicy, FlagStyle};
 
 static MDLS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--raw", "-r"]),
+    standalone: WordSet::flags(&["--help", "--raw", "--version", "-V", "-h", "-r"]),
     valued: WordSet::flags(&["--name", "--nullMarker", "-n"]),
     bare: false,
     max_positional: None,
@@ -12,7 +12,7 @@ static MDLS_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "mdls", policy: &MDLS_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://ss64.com/mac/mdls.html", aliases: &[] },
+    FlatDef { name: "mdls", policy: &MDLS_POLICY, level: SafetyLevel::Inert, url: "https://ss64.com/mac/mdls.html", aliases: &[] },
 ];
 
 #[cfg(test)]

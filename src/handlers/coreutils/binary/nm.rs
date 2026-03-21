@@ -6,13 +6,13 @@ use crate::policy::{FlagPolicy, FlagStyle};
 static NM_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--debug-syms", "--defined-only", "--demangle",
-        "--dynamic", "--extern-only", "--line-numbers",
+        "--dynamic", "--extern-only", "--help", "--line-numbers",
         "--no-demangle", "--no-llvm-bc", "--no-sort",
         "--numeric-sort", "--portability", "--print-armap",
         "--print-file-name", "--print-size", "--reverse-sort",
-        "--special-syms", "--undefined-only",
-        "-A", "-B", "-C", "-D", "-P", "-S",
-        "-a", "-g", "-j", "-l", "-m", "-n", "-o",
+        "--special-syms", "--undefined-only", "--version",
+        "-A", "-B", "-C", "-D", "-P", "-S", "-V",
+        "-a", "-g", "-h", "-j", "-l", "-m", "-n", "-o",
         "-p", "-r", "-s", "-u", "-v", "-x",
     ]),
     valued: WordSet::flags(&[
@@ -25,7 +25,7 @@ static NM_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "nm", policy: &NM_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man1/nm.1.html", aliases: &[] },
+    FlatDef { name: "nm", policy: &NM_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man1/nm.1.html", aliases: &[] },
 ];
 
 #[cfg(test)]

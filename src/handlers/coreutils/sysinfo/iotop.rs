@@ -5,9 +5,9 @@ use crate::policy::{FlagPolicy, FlagStyle};
 
 static IOTOP_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--accumulated", "--batch", "--kilobytes", "--only",
-        "--processes", "--quiet",
-        "-P", "-a", "-b", "-k", "-o", "-q", "-t",
+        "--accumulated", "--batch", "--help", "--kilobytes", "--only",
+        "--processes", "--quiet", "--version",
+        "-P", "-V", "-a", "-b", "-h", "-k", "-o", "-q", "-t",
     ]),
     valued: WordSet::flags(&[
         "--delay", "--iter", "--pid", "--user",
@@ -19,7 +19,7 @@ static IOTOP_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "iotop", policy: &IOTOP_POLICY, level: SafetyLevel::Inert, help_eligible: false, url: "https://man7.org/linux/man-pages/man8/iotop.8.html", aliases: &[] },
+    FlatDef { name: "iotop", policy: &IOTOP_POLICY, level: SafetyLevel::Inert, url: "https://man7.org/linux/man-pages/man8/iotop.8.html", aliases: &[] },
 ];
 
 #[cfg(test)]
