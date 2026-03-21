@@ -152,7 +152,6 @@ pub fn render_markdown(docs: &[CommandDoc]) -> String {
          | **Valued** | Same as valued flags, in shorter format within subcommand entries. |\n\
          | **Bare invocation allowed** | The command can be run with no arguments at all. |\n\
          | **Subcommands** | Named subcommands that are allowed (e.g. `git log`, `cargo test`). |\n\
-         | **Info flags** | Top-level informational flags on a command (e.g. `--info`). |\n\
          | **Positional arguments only** | No specific flags are allowed; only positional arguments. `--help`/`--version` may still work if the command is help-eligible. |\n\
          | **(requires --flag)** | A guarded subcommand that is only allowed when a specific flag is present (e.g. `cargo fmt` requires `--check`). |\n\
          \n\
