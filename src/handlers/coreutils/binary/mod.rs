@@ -3,6 +3,7 @@ mod mdls;
 mod nm;
 mod od;
 mod otool;
+mod sips;
 mod size;
 mod strings;
 
@@ -30,6 +31,7 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     v.extend(nm::FLAT_DEFS);
     v.extend(od::FLAT_DEFS);
     v.extend(otool::FLAT_DEFS);
+    v.extend(sips::FLAT_DEFS);
     v.extend(size::FLAT_DEFS);
     v.extend(strings::FLAT_DEFS);
     v

@@ -100,7 +100,7 @@ const HANDLED_CMDS: &[&str] = &[
     "ps", "top", "htop", "iotop", "procs", "dust", "lsof", "pgrep", "lsblk", "free",
     "jq", "base64", "xxd", "getconf", "uuidgen",
     "md5sum", "md5", "sha256sum", "shasum", "sha1sum", "sha512sum",
-    "cksum", "b2sum", "sum", "strings", "hexdump", "od", "size",
+    "cksum", "b2sum", "sum", "strings", "hexdump", "od", "size", "sips",
     "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat", "mdfind", "man",
     "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route", "ping",
     "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "workon", "safe-chains",
