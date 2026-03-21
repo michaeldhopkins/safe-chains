@@ -25,6 +25,9 @@ fn has_count(tokens: &[Token]) -> bool {
 }
 
 fn is_safe_ping(tokens: &[Token]) -> Verdict {
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h" || tokens[1] == "--version" || tokens[1] == "-V") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
     if !has_count(tokens) {
         return Verdict::Denied;
     }

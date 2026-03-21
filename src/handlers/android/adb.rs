@@ -94,6 +94,9 @@ pub fn is_safe_adb(tokens: &[Token]) -> Verdict {
     let Some(sub) = tokens.get(i) else {
         return Verdict::Denied;
     };
+    if tokens.len() == i + 1 && (sub == "--help" || sub == "-h" || sub == "--version" || sub == "-V") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
     match sub.as_str() {
         s if SAFE_BARE_SUBS.contains(s) => Verdict::Allowed(SafetyLevel::Inert),
         "forward" | "reverse" => {

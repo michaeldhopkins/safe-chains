@@ -9,6 +9,9 @@ static GZIP_SAFE_FLAGS: WordSet = WordSet::new(&[
 ]);
 
 fn is_safe_gzip(tokens: &[Token]) -> Verdict {
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h" || tokens[1] == "--version" || tokens[1] == "-V") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
     let mut has_mode = false;
     for t in &tokens[1..] {
         if GZIP_SAFE_MODES.contains(t) {

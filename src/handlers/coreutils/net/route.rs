@@ -1,7 +1,7 @@
 use crate::parse::{Token, WordSet};
 use crate::verdict::{SafetyLevel, Verdict};
 
-static ROUTE_SAFE_FLAGS: WordSet = WordSet::new(&["-4", "-6", "-n", "-v"]);
+static ROUTE_SAFE_FLAGS: WordSet = WordSet::new(&["--help", "--version", "-4", "-6", "-V", "-h", "-n", "-v"]);
 static ROUTE_SAFE_SUBCMDS: WordSet = WordSet::new(&["get", "monitor", "print", "show"]);
 
 fn is_safe_route(tokens: &[Token]) -> Verdict {

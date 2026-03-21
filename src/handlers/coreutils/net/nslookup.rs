@@ -2,6 +2,9 @@ use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
 
 fn is_safe_nslookup(tokens: &[Token]) -> Verdict {
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h" || tokens[1] == "--version" || tokens[1] == "-V") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
     for t in &tokens[1..] {
         let s = t.as_str();
         if !s.starts_with('-') {

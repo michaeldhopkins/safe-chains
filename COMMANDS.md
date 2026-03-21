@@ -1564,7 +1564,7 @@ Aliases: `pip3`
 
 ### `sed` (https://www.gnu.org/software/sed/manual/sed.html)
 
-- Allowed standalone flags: --debug, --posix, --quiet, --sandbox, --silent, --unbuffered, -E, -n, -r, -u, -z
+- Allowed standalone flags: --debug, --help, --posix, --quiet, --sandbox, --silent, --unbuffered, --version, -E, -V, -h, -n, -r, -u, -z
 - Allowed valued flags: --expression, --file, --line-length, -e, -f, -l
 - Inline expressions validated for safety
 

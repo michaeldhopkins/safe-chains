@@ -536,7 +536,7 @@ static GIT_BRANCH_MUTATING: WordSet = WordSet::new(&[
 ]);
 
 static GIT_STASH_SAFE: WordSet =
-    WordSet::new(&["list", "show"]);
+    WordSet::new(&["--help", "-h", "list", "show"]);
 
 static GIT_TAG_MUTATING: WordSet = WordSet::new(&[
     "--annotate", "--delete", "--force", "--sign",
@@ -544,10 +544,10 @@ static GIT_TAG_MUTATING: WordSet = WordSet::new(&[
 ]);
 
 static GIT_CONFIG_SAFE: WordSet =
-    WordSet::new(&["--get", "--get-all", "--get-regexp", "--list", "-l"]);
+    WordSet::new(&["--get", "--get-all", "--get-regexp", "--help", "--list", "-h", "-l"]);
 
 static GIT_NOTES_SAFE: WordSet =
-    WordSet::new(&["list", "show"]);
+    WordSet::new(&["--help", "-h", "list", "show"]);
 
 fn check_git_help(_tokens: &[Token]) -> Verdict {
     if true { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }

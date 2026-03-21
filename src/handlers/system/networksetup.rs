@@ -10,8 +10,8 @@ fn is_safe_networksetup(tokens: &[Token]) -> Verdict {
         || sub.starts_with("-get")
         || sub.starts_with("-show")
         || sub.starts_with("-print")
-        || sub == "-version"
-        || sub == "-help")
+        || sub == "-version" || sub == "--version" || sub == "-V"
+        || sub == "-help" || sub == "--help" || sub == "-h")
     {
         return Verdict::Denied;
     }
