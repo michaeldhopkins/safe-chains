@@ -38,6 +38,9 @@ static CONDA_CONFIG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 fn check_conda_config(tokens: &[Token]) -> Verdict {
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
     if (has_flag(tokens, None, Some("--show"))
         || has_flag(tokens, None, Some("--show-sources")))
         && policy::check(tokens, &CONDA_CONFIG_POLICY)

@@ -144,6 +144,9 @@ fn check_bundle_exec(tokens: &[Token]) -> Verdict {
     let Some(cmd) = tokens.get(1) else {
         return Verdict::Denied;
     };
+    if tokens.len() == 2 && (cmd == "--help" || cmd == "-h") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
     if BUNDLE_EXEC_SAFE.contains(cmd) {
         return Verdict::Allowed(SafetyLevel::SafeRead);
     }

@@ -5,6 +5,9 @@ pub fn is_safe_zipalign(tokens: &[Token]) -> bool {
     if tokens.len() < 2 {
         return false;
     }
+    if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
+        return true;
+    }
     let mut has_c = false;
     let mut i = 1;
     while i < tokens.len() {

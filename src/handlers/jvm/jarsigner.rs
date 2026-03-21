@@ -9,6 +9,9 @@ pub fn is_safe_jarsigner(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
         return Verdict::Denied;
     }
+    if tokens.len() == 2 && (tokens[1] == "-help" || tokens[1] == "-h") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
     let mut has_verify = false;
     let mut i = 1;
     while i < tokens.len() {

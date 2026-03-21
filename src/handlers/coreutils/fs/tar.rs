@@ -58,6 +58,9 @@ fn check_short_bundle(s: &str) -> Option<usize> {
 }
 
 fn is_safe_tar(tokens: &[Token]) -> Verdict {
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h" || tokens[1] == "--version") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
     if !has_list_mode(tokens) {
         return Verdict::Denied;
     }

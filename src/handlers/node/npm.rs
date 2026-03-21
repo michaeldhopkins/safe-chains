@@ -59,6 +59,9 @@ static NPM_CONFIG_POLICY: FlagPolicy = FlagPolicy {
 };
 
 fn check_npm_run(tokens: &[Token]) -> Verdict {
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
     if tokens.get(1).is_some_and(|a| a == "test" || a.starts_with("test:")) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }
 }
 
