@@ -20,7 +20,7 @@ pub fn is_safe_swiftformat(tokens: &[Token]) -> Verdict {
     if !tokens[1..].iter().any(|t| REQUIRED.contains(t)) {
         return Verdict::Denied;
     }
-        if policy::check(tokens, &SWIFTFORMAT_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+        if policy::check(tokens, &SWIFTFORMAT_POLICY) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }
 
 }
 

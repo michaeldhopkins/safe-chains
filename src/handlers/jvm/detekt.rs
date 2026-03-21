@@ -22,7 +22,7 @@ pub static DEFS: &[FlatDef] = &[
     FlatDef {
         name: "detekt",
         policy: &DETEKT_POLICY,
-        level: SafetyLevel::Inert,
+        level: SafetyLevel::SafeRead,
         url: "https://detekt.dev/docs/gettingstarted/cli/",
         aliases: &[],
     },

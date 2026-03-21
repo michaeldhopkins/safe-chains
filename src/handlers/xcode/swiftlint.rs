@@ -38,8 +38,8 @@ static SWIFTLINT_RULES_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static SWIFTLINT: CommandDef = CommandDef {
     name: "swiftlint",
     subs: &[
-        SubDef::Policy { name: "analyze", policy: &SWIFTLINT_ANALYZE_POLICY, level: SafetyLevel::Inert },
-        SubDef::Policy { name: "lint", policy: &SWIFTLINT_LINT_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "analyze", policy: &SWIFTLINT_ANALYZE_POLICY, level: SafetyLevel::SafeRead },
+        SubDef::Policy { name: "lint", policy: &SWIFTLINT_LINT_POLICY, level: SafetyLevel::SafeRead },
         SubDef::Policy { name: "reporters", policy: &SWIFTLINT_BARE_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "rules", policy: &SWIFTLINT_RULES_POLICY, level: SafetyLevel::Inert },
         SubDef::Policy { name: "version", policy: &SWIFTLINT_BARE_POLICY, level: SafetyLevel::Inert },

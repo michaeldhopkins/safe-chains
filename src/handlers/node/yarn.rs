@@ -25,13 +25,13 @@ pub fn is_safe_yarn(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-    let ok = match tokens[1].as_str() {
-        "list" | "ls" => policy::check(&tokens[1..], &YARN_LIST_POLICY),
-        "info" | "why" => policy::check(&tokens[1..], &YARN_BARE_POLICY),
-        "test" => true,
-        _ => tokens[1].starts_with("test:"),
-    };
-    if ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
+    match tokens[1].as_str() {
+        "list" | "ls" => if policy::check(&tokens[1..], &YARN_LIST_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied },
+        "info" | "why" => if policy::check(&tokens[1..], &YARN_BARE_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied },
+        "test" => Verdict::Allowed(SafetyLevel::SafeRead),
+        _ if tokens[1].starts_with("test:") => Verdict::Allowed(SafetyLevel::SafeRead),
+        _ => Verdict::Denied,
+    }
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {

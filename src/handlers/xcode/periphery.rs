@@ -28,7 +28,7 @@ static PERIPHERY_SCAN_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static PERIPHERY: CommandDef = CommandDef {
     name: "periphery",
     subs: &[
-        SubDef::Policy { name: "scan", policy: &PERIPHERY_SCAN_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "scan", policy: &PERIPHERY_SCAN_POLICY, level: SafetyLevel::SafeRead },
         SubDef::Policy { name: "version", policy: &PERIPHERY_BARE_POLICY, level: SafetyLevel::Inert },
     ],
     bare_flags: &["--help", "--version", "-V", "-h"],

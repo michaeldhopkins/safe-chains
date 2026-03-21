@@ -294,7 +294,7 @@ pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
 
     if subcmd == "release" && tokens.len() >= 3 && tokens[2] == "download" {
         return if has_flag(&tokens[2..], Some("-O"), Some("--output"))
-            && policy::check(&tokens[2..], &GH_RELEASE_DOWNLOAD_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
+            && policy::check(&tokens[2..], &GH_RELEASE_DOWNLOAD_POLICY) { Verdict::Allowed(SafetyLevel::SafeWrite) } else { Verdict::Denied };
     }
 
     if READ_ONLY_SUBCOMMANDS.contains(subcmd) {

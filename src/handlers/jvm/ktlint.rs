@@ -15,7 +15,7 @@ pub static DEFS: &[FlatDef] = &[
     FlatDef {
         name: "ktlint",
         policy: &KTLINT_POLICY,
-        level: SafetyLevel::Inert,
+        level: SafetyLevel::SafeRead,
         url: "https://pinterest.github.io/ktlint/latest/",
         aliases: &[],
     },

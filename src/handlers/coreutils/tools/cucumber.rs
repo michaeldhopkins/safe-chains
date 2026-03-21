@@ -27,5 +27,5 @@ static CUCUMBER_POLICY: FlagPolicy = FlagPolicy {
 };
 
 pub(in crate::handlers::coreutils) static FLAT_DEFS: &[FlatDef] = &[
-    FlatDef { name: "cucumber", policy: &CUCUMBER_POLICY, level: SafetyLevel::Inert, url: "https://cucumber.io/docs/cucumber/api/#running-cucumber", aliases: &[] },
+    FlatDef { name: "cucumber", policy: &CUCUMBER_POLICY, level: SafetyLevel::SafeRead, url: "https://cucumber.io/docs/cucumber/api/#running-cucumber", aliases: &[] },
 ];

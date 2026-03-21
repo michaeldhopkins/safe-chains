@@ -62,9 +62,9 @@ static DOTNET_LIST_POLICY: FlagPolicy = FlagPolicy {
 pub(crate) static DOTNET: CommandDef = CommandDef {
     name: "dotnet",
     subs: &[
-        SubDef::Policy { name: "build", policy: &DOTNET_BUILD_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "build", policy: &DOTNET_BUILD_POLICY, level: SafetyLevel::SafeWrite },
         SubDef::Policy { name: "list", policy: &DOTNET_LIST_POLICY, level: SafetyLevel::Inert },
-        SubDef::Policy { name: "test", policy: &DOTNET_TEST_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "test", policy: &DOTNET_TEST_POLICY, level: SafetyLevel::SafeRead },
     ],
     bare_flags: &["--help", "--info", "--list-runtimes", "--list-sdks", "--version", "-V", "-h"],
     url: "https://learn.microsoft.com/en-us/dotnet/core/tools/",

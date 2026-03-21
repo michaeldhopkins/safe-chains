@@ -58,8 +58,12 @@ pub fn is_safe_mvn(tokens: &[Token]) -> Verdict {
         }
         return Verdict::Denied;
     }
-    Verdict::Allowed(SafetyLevel::Inert)
-
+    let level = match tokens[1].as_str() {
+        "compile" | "test-compile" => SafetyLevel::SafeWrite,
+        "test" | "validate" | "verify" => SafetyLevel::SafeRead,
+        _ => SafetyLevel::Inert,
+    };
+    Verdict::Allowed(level)
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
