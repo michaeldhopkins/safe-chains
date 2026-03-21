@@ -396,6 +396,8 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed standalone flags: --compressed, --fail, --globoff, --head, --insecure, --ipv4, --ipv6, --location, --no-buffer, --no-progress-meter, --show-error, --silent, --verbose, -4, -6, -I, -L, -N, -S, -f, -g, -k, -s, -v.
 - Allowed valued flags: --connect-timeout, --max-time, --write-out, -m, -w.
 - Allowed methods (-X/--request): GET, HEAD, OPTIONS.
+- -H/--header allowed with safe headers (Accept, User-Agent, Authorization, Cookie, Cache-Control, Range, etc.).
+- -o/--output and -O/--remote-name allowed (writes files).
 
 ### `cut` (https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation)
 
@@ -1608,6 +1610,11 @@ Aliases: `pip3`
 ### `simctl` (https://developer.apple.com/documentation/xcode/simctl)
 
 - **list**: Flags: --help, --json, --verbose, -h, -j, -v
+
+### `sips` (https://ss64.com/mac/sips.html)
+
+- Allowed standalone flags: --help, --version, -V, -h
+- Allowed valued flags: --getProperty, -g
 
 ### `size` (https://man7.org/linux/man-pages/man1/size.1.html)
 
