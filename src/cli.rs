@@ -5,6 +5,7 @@ use crate::verdict::SafetyLevel;
 #[command(name = "safe-chains")]
 #[command(about = "Auto-allow safe, read-only bash commands in agentic coding tools")]
 #[command(version)]
+#[allow(clippy::struct_excessive_bools)]
 pub struct Cli {
     /// Command string to check (omit for Claude hook mode via stdin)
     pub command: Option<String>,
@@ -20,4 +21,8 @@ pub struct Cli {
     /// Generate OpenCode permission config (merges with existing opencode.json)
     #[arg(long)]
     pub opencode_config: bool,
+
+    /// Configure the Claude Code hook in ~/.claude/settings.json
+    #[arg(long)]
+    pub setup: bool,
 }

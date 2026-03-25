@@ -89,7 +89,9 @@ fn main() {
 
     match cli {
         Ok(cli) => {
-            if cli.list_commands {
+            if cli.setup {
+                safe_chains::setup::run_setup();
+            } else if cli.list_commands {
                 print_docs();
             } else if cli.opencode_config {
                 print_opencode_config();

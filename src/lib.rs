@@ -60,6 +60,7 @@ pub use handlers::all_opencode_patterns;
 pub mod parse;
 pub mod policy;
 pub mod allowlist;
+pub mod setup;
 pub mod verdict;
 
 pub use verdict::{SafetyLevel, Verdict};
