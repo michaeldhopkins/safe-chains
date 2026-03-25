@@ -16,7 +16,7 @@ See [COMMANDS.md](COMMANDS.md) for the full list of supported commands. See [SEC
 brew install michaeldhopkins/tap/safe-chains
 ```
 
-This installs the binary, man page, shell completions, and the OpenCode plugin. After installing, run `safe-chains setup` to configure the Claude Code hook (see below).
+This installs the binary, man page, shell completions, and the OpenCode plugin. After installing, run `safe-chains --setup` to configure the Claude Code hook (see below).
 
 ### Pre-built binary
 
@@ -48,7 +48,7 @@ cargo install --path .
 
 ### Claude Code
 
-Run `safe-chains setup` to automatically configure the hook in `~/.claude/settings.json`. Or manually add this to `~/.claude/settings.json`:
+Run `safe-chains --setup` to automatically configure the hook in `~/.claude/settings.json`. Or manually add this to `~/.claude/settings.json`:
 
 ```json
 "hooks": {
