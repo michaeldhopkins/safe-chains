@@ -208,7 +208,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed standalone flags: --help, --version, -V, -h
 - **check**: Flags: --dry-run, --help, -h. Valued: --gemfile, --path
 - **config**: Bare and single-key lookup allowed. Subcommands: get, list.
-- **exec**: exec allowed for: brakeman, cucumber, erb_lint, gem (read-only subcommands), herb, rails (about, assets:reveal, assets:reveal:full, db:migrate:status, db:version, initializers, middleware, notes, routes, secret, stats, test, test:system, time:zones:all, time:zones:local, version), rspec, standardrb.
+- **exec**: exec allowed for: appraisal (list, or delegates inner command), brakeman, cucumber, erb_lint, gem (read-only subcommands), herb, rails (about, assets:reveal, assets:reveal:full, db:migrate:status, db:version, initializers, middleware, notes, routes, secret, stats, test, test:system, time:zones:all, time:zones:local, version), rspec, standardrb.
 - **info**: Flags: --help, --path, -h
 - **list**: Flags: --help, --name-only, --paths, -h
 - **show**: Flags: --help, --paths, -h
@@ -720,7 +720,7 @@ Aliases: `fly`
 
 - Subcommands attestation, cache, codespace, extension, gpg-key, issue, label, pr, release, repo, run, ssh-key, variable, workflow are allowed with actions: checks, diff, list, status, verify, view, watch.
 - Always safe: --version, search, status.
-- auth status, browse (requires --no-browser), release download (requires --output), api (read-only: implicit GET or explicit -X GET, with --paginate, --slurp, --jq, --template, --cache, --preview, --include, --silent, --verbose, --hostname, -H for Accept and X-GitHub-Api-Version headers).
+- auth status, browse (requires --no-browser), run rerun (SafeWrite), release download (requires --output), api (read-only: implicit GET or explicit -X GET, with --paginate, --slurp, --jq, --template, --cache, --preview, --include, --silent, --verbose, --hostname, -H for Accept and X-GitHub-Api-Version headers).
 
 ### `git` (https://git-scm.com/docs)
 
@@ -893,6 +893,14 @@ Aliases: `egrep`, `fgrep`
 
 - Allowed standalone flags: --help, --version, -L, -V, -a, -h, -l, -s, -v
 - Bare invocation allowed
+
+### `importmap` (https://github.com/rails/importmap-rails)
+
+- Allowed standalone flags: --help, -h
+- **audit**: Flags: --help, -h
+- **json**: Flags: --help, -h
+- **outdated**: Flags: --help, -h
+- **packages**: Flags: --help, -h
 
 ### `ionice` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation)
 

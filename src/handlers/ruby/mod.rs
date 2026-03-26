@@ -1,5 +1,6 @@
 mod bundle;
 mod gem;
+mod importmap;
 mod rbenv;
 mod ruby_cmd;
 
@@ -9,6 +10,7 @@ use crate::parse::Token;
 
 pub(crate) use bundle::BUNDLE;
 pub(crate) use gem::GEM;
+pub(crate) use importmap::IMPORTMAP;
 pub(crate) use rbenv::RBENV;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
@@ -19,12 +21,13 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     }
     BUNDLE.dispatch(cmd, tokens)
         .or_else(|| GEM.dispatch(cmd, tokens))
+        .or_else(|| IMPORTMAP.dispatch(cmd, tokens))
         .or_else(|| RBENV.dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs: Vec<_> = ruby_flat_defs().iter().map(|d| d.to_doc()).collect();
-    docs.extend([BUNDLE.to_doc(), GEM.to_doc(), RBENV.to_doc()]);
+    docs.extend([BUNDLE.to_doc(), GEM.to_doc(), IMPORTMAP.to_doc(), RBENV.to_doc()]);
     docs
 }
 

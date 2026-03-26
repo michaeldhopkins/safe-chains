@@ -156,7 +156,27 @@ fn check_bundle_exec(tokens: &[Token]) -> Verdict {
     if cmd == "gem" {
         return super::GEM.check(&tokens[1..]);
     }
+    if cmd == "appraisal" {
+        return check_appraisal(&tokens[1..]);
+    }
     Verdict::Denied
+}
+
+fn check_appraisal(tokens: &[Token]) -> Verdict {
+    if tokens.len() < 2 {
+        return Verdict::Denied;
+    }
+    let sub = &tokens[1];
+    if tokens.len() == 2 && (sub == "--help" || sub == "-h") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
+    if sub == "list" {
+        return if tokens.len() == 2 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
+    }
+    if tokens.len() < 3 {
+        return Verdict::Denied;
+    }
+    check_bundle_exec(&tokens[1..])
 }
 
 fn check_rails_sub(tokens: &[Token]) -> Verdict {
@@ -188,7 +208,7 @@ pub(crate) static BUNDLE: CommandDef = CommandDef {
         SubDef::Custom {
             name: "exec",
             check: check_bundle_exec,
-            doc: "exec allowed for: brakeman, cucumber, erb_lint, gem (read-only subcommands), herb, rails (about, assets:reveal, assets:reveal:full, db:migrate:status, db:version, initializers, middleware, notes, routes, secret, stats, test, test:system, time:zones:all, time:zones:local, version), rspec, standardrb.",
+            doc: "exec allowed for: appraisal (list, or delegates inner command), brakeman, cucumber, erb_lint, gem (read-only subcommands), herb, rails (about, assets:reveal, assets:reveal:full, db:migrate:status, db:version, initializers, middleware, notes, routes, secret, stats, test, test:system, time:zones:all, time:zones:local, version), rspec, standardrb.",
             test_suffix: None,
         },
         SubDef::Policy { name: "info", policy: &BUNDLE_INFO_POLICY, level: SafetyLevel::Inert },
@@ -270,6 +290,11 @@ mod tests {
         bundle_exec_gem_outdated: "bundle exec gem outdated",
         bundle_exec_gem_help: "bundle exec gem --help",
         bundle_exec_gem_version: "bundle exec gem --version",
+        bundle_exec_appraisal_list: "bundle exec appraisal list",
+        bundle_exec_appraisal_help: "bundle exec appraisal --help",
+        bundle_exec_appraisal_rspec: "bundle exec appraisal rails-7-1 rspec spec/models/foo_spec.rb",
+        bundle_exec_appraisal_rspec_tag: "bundle exec appraisal rails-7-1 rspec --tag focus spec/",
+        bundle_exec_appraisal_cucumber: "bundle exec appraisal rails-7-1 cucumber",
     }
 
     denied! {
@@ -298,5 +323,10 @@ mod tests {
         bundle_exec_gem_uninstall_denied: "bundle exec gem uninstall rails",
         bundle_exec_gem_update_denied: "bundle exec gem update",
         bundle_exec_gem_bare_denied: "bundle exec gem",
+        bundle_exec_appraisal_bare_denied: "bundle exec appraisal",
+        bundle_exec_appraisal_gemfile_only_denied: "bundle exec appraisal rails-7-1",
+        bundle_exec_appraisal_rm_denied: "bundle exec appraisal rails-7-1 rm -rf /",
+        bundle_exec_appraisal_list_extra_denied: "bundle exec appraisal list foo",
+        bundle_exec_appraisal_list_flag_denied: "bundle exec appraisal list --unknown",
     }
 }

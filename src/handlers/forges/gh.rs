@@ -198,6 +198,14 @@ static GH_SIMPLE_VIEW_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
+static GH_RUN_RERUN_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&["--debug", "--failed"]),
+    valued: WordSet::flags(&["--job", "--repo", "-R", "-j"]),
+    bare: false,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
 static READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
     "attestation", "cache", "codespace", "extension", "gpg-key",
     "issue", "label", "pr", "release", "repo", "run",
@@ -290,6 +298,12 @@ pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
 
     if subcmd == "status" {
         return if policy::check(&tokens[1..], &GH_SIMPLE_LIST_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
+    }
+
+    if subcmd == "run" && tokens.len() >= 3 && tokens[2] == "rerun" {
+        return if policy::check(&tokens[2..], &GH_RUN_RERUN_POLICY)
+        { Verdict::Allowed(SafetyLevel::SafeWrite) }
+        else { Verdict::Denied };
     }
 
     if subcmd == "release" && tokens.len() >= 3 && tokens[2] == "download" {
@@ -417,6 +431,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                 .section(format!("Always safe: {}.",
                     wordset_items(&ALWAYS_SAFE_SUBCOMMANDS)))
                 .section("auth status, browse (requires --no-browser), \
+                          run rerun (SafeWrite), \
                           release download (requires --output), \
                           api (read-only: implicit GET or explicit -X GET, \
                           with --paginate, --slurp, --jq, --template, \
@@ -443,6 +458,7 @@ pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
         ]},
         crate::handlers::SubEntry::Nested { name: "run", subs: &[
             crate::handlers::SubEntry::Policy { name: "list" },
+            crate::handlers::SubEntry::Policy { name: "rerun" },
             crate::handlers::SubEntry::Policy { name: "view" },
             crate::handlers::SubEntry::Policy { name: "watch" },
         ]},
@@ -548,6 +564,11 @@ mod tests {
         run_watch: "gh run watch 123",
         run_watch_repo: "gh run watch 123 --repo owner/repo",
         run_watch_exit: "gh run watch 123 --exit-status",
+        run_rerun: "gh run rerun 12345",
+        run_rerun_failed: "gh run rerun 12345 --failed",
+        run_rerun_debug: "gh run rerun 12345 --debug",
+        run_rerun_job: "gh run rerun 12345 --job job-id",
+        run_rerun_repo: "gh run rerun 12345 --repo owner/repo",
         run_list: "gh run list",
         run_list_workflow: "gh run list --workflow ci.yml",
         run_list_branch: "gh run list --branch main",
@@ -598,6 +619,8 @@ mod tests {
     }
 
     denied! {
+        run_rerun_bare_denied: "gh run rerun",
+        run_rerun_unknown_flag_denied: "gh run rerun 12345 --unknown",
         browse_without_flag_denied: "gh browse",
         issue_download_denied: "gh issue download",
         release_download_no_output_denied: "gh release download v1.0",
