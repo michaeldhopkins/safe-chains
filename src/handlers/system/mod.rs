@@ -15,12 +15,16 @@ mod launchctl;
 mod log_cmd;
 mod mise;
 mod networksetup;
+mod overmind;
 mod pmset;
 mod postgres;
 mod security;
 mod sysctl;
+mod tailscale;
 mod terraform;
+mod tmux;
 mod vercel;
+mod wg;
 
 use crate::command::FlatDef;
 use crate::verdict::Verdict;
@@ -43,7 +47,10 @@ pub(crate) use security::SECURITY;
 pub(crate) use terraform::TERRAFORM;
 pub(crate) use fastlane::FASTLANE;
 pub(crate) use firebase::FIREBASE;
+pub(crate) use overmind::OVERMIND;
+pub(crate) use tailscale::TAILSCALE;
 pub(crate) use vercel::VERCEL;
+pub(crate) use wg::WG;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     for flat in system_flat_defs() {
@@ -72,6 +79,10 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
         .or_else(|| crontab::dispatch(cmd, tokens))
         .or_else(|| pmset::dispatch(cmd, tokens))
         .or_else(|| sysctl::dispatch(cmd, tokens))
+        .or_else(|| OVERMIND.dispatch(cmd, tokens))
+        .or_else(|| TAILSCALE.dispatch(cmd, tokens))
+        .or_else(|| WG.dispatch(cmd, tokens))
+        .or_else(|| tmux::dispatch(cmd, tokens))
         .or_else(|| networksetup::dispatch(cmd, tokens))
 }
 
@@ -107,6 +118,10 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs.push(HEROKU.to_doc());
     docs.push(VERCEL.to_doc());
     docs.push(FLYCTL.to_doc());
+    docs.push(OVERMIND.to_doc());
+    docs.push(TAILSCALE.to_doc());
+    docs.push(WG.to_doc());
+    docs.extend(tmux::command_docs());
     docs
 }
 
@@ -117,5 +132,6 @@ pub(super) fn full_registry() -> Vec<&'static super::CommandEntry> {
     v.extend(pmset::REGISTRY);
     v.extend(sysctl::REGISTRY);
     v.extend(networksetup::REGISTRY);
+    v.extend(tmux::REGISTRY);
     v
 }

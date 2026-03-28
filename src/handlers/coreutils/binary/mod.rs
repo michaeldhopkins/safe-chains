@@ -6,6 +6,7 @@ mod otool;
 mod sips;
 mod size;
 mod strings;
+mod xv;
 
 use crate::command::FlatDef;
 use crate::verdict::Verdict;
@@ -34,5 +35,6 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
     v.extend(sips::FLAT_DEFS);
     v.extend(size::FLAT_DEFS);
     v.extend(strings::FLAT_DEFS);
+    v.extend(xv::FLAT_DEFS);
     v
 }

@@ -74,6 +74,7 @@ pub(crate) fn all_flat_defs() -> Vec<&'static crate::command::FlatDef> {
 #[cfg(test)]
 pub(super) fn full_registry() -> Vec<&'static super::CommandEntry> {
     let mut v = Vec::new();
+    v.extend(data::registry());
     v.extend(fs::registry());
     v.extend(search::registry());
     v.extend(sed::registry());
