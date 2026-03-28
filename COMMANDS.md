@@ -404,6 +404,10 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed standalone flags: --complement, --help, --only-delimited, --version, --zero-terminated, -V, -h, -n, -s, -w, -z
 - Allowed valued flags: --bytes, --characters, --delimiter, --fields, --output-delimiter, -b, -c, -d, -f
 
+### `dasel` (https://github.com/TomWright/dasel)
+
+- Read-only queries allowed. select subcommand allowed.
+
 ### `date` (https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation)
 
 - Allowed standalone flags: --help, --rfc-2822, --rfc-email, --universal, --utc, --version, -R, -V, -h, -j, -n, -u
@@ -693,6 +697,12 @@ Aliases: `fly`
 - Allowed valued flags: --count, --seconds, -c, -s
 - Bare invocation allowed
 
+### `fx` (https://github.com/antonmedv/fx)
+
+- Allowed standalone flags: --help, --raw, --slurp, --themes, --version, -h, -r, -s
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `gem` (https://guides.rubygems.org/command-reference/)
 
 - Allowed standalone flags: --help, --version, -V, -h
@@ -777,6 +787,12 @@ Supports `-C <dir>` prefix.
 - **test**: Flags: --help, -a, -asan, -benchmem, -cover, -failfast, -h, -json, -linkshared, -modcacherw, -msan, -n, -race, -short, -trimpath, -v, -work, -x. Valued: -asmflags, -bench, -benchtime, -blockprofile, -blockprofilerate, -buildmode, -buildvcs, -compiler, -count, -covermode, -coverpkg, -coverprofile, -cpu, -cpuprofile, -fuzz, -fuzzminimizetime, -fuzztime, -gccgoflags, -gcflags, -installsuffix, -ldflags, -list, -memprofile, -memprofilerate, -mod, -modfile, -mutexprofile, -mutexprofilefraction, -o, -outputdir, -overlay, -p, -parallel, -pgo, -pkgdir, -run, -shuffle, -skip, -tags, -timeout, -trace
 - **version**: Flags: --help, -h, -m, -v
 - **vet**: Flags: --help, -a, -asan, -cover, -h, -json, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -c, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -tags
+
+### `gojq` (https://github.com/itchyny/gojq)
+
+- Allowed standalone flags: --color-output, --compact-output, --exit-status, --help, --join-output, --monochrome-output, --null-input, --raw-input, --raw-output, --raw-output0, --slurp, --sort-keys, --tab, --version, --yaml-input, --yaml-output, -C, -M, -R, -S, -V, -c, -e, -h, -j, -n, -r, -s
+- Allowed valued flags: --arg, --argjson, --args, --from-file, --indent, --jsonargs, --rawfile, --slurpfile, -f
+- Bare invocation allowed
 
 ### `gradle` (https://docs.gradle.org/current/userguide/command_line_interface.html)
 
@@ -864,6 +880,11 @@ Aliases: `egrep`, `fgrep`
 
 - Flags: --help, --version, -A, -I, -V, -d, -f, -h, -i, -s
 
+### `htmlq` (https://github.com/mgdm/htmlq)
+
+- Allowed standalone flags: --detect-base, --help, --ignore-whitespace, --pretty, --remove-nodes, --text, --version, -B, -V, -h, -p, -t, -w
+- Allowed valued flags: --attribute, --base, --filename, --output, -a, -b, -f, -o
+
 ### `htop` (https://htop.dev/)
 
 - Allowed standalone flags: --help, --no-color, --no-mouse, --no-unicode, --tree, --version, -C, -H, -M, -V, -h, -t
@@ -918,6 +939,12 @@ Aliases: `egrep`, `fgrep`
 - Allowed valued flags: --delay, --iter, --pid, --user, -d, -n, -p, -u
 - Bare invocation allowed
 
+### `jaq` (https://github.com/01mf02/jaq)
+
+- Allowed standalone flags: --compact-output, --exit-status, --help, --join-output, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --version, -C, -M, -R, -S, -V, -c, -e, -h, -j, -n, -r, -s
+- Allowed valued flags: --arg, --argjson, --from-file, --indent, --rawfile, --slurpfile, -f
+- Bare invocation allowed
+
 ### `jar` (https://docs.oracle.com/en/java/javase/21/docs/specs/man/jar.html)
 
 - List mode only: tf, tvf, --list, -t. Also --version, --help.
@@ -944,6 +971,11 @@ Aliases: `egrep`, `fgrep`
 - auth (test, setup).
 - submit (requires --dry-run), merge (requires --dry-run).
 - --help allowed on all subcommands.
+
+### `jless` (https://github.com/PaulJuliusMartinez/jless)
+
+- Allowed standalone flags: --help, --json, --version, --yaml, -N, -V, -h, -n
+- Allowed valued flags: --mode, --scrolloff
 
 ### `jq` (https://jqlang.github.io/jq/manual/)
 
@@ -1159,6 +1191,10 @@ Aliases: `mlocate`, `plocate`
 - **where**: Flags: --help, -h, -q, -v
 - **which**: Flags: --help, -h, -q, -v
 
+### `mlr` (https://miller.readthedocs.io/)
+
+- Data processing allowed. Verbs and file arguments accepted.
+
 ### `more` (https://man7.org/linux/man-pages/man1/more.1.html)
 
 - Allowed standalone flags: --help, --version, -V, -c, -d, -f, -h, -l, -p, -s, -u
@@ -1285,6 +1321,18 @@ Aliases: `orb`
 
 - Allowed standalone flags: --help, --version, -D, -I, -L, -V, -X, -a, -c, -d, -f, -h, -l, -o, -r, -t, -v, -x
 - Allowed valued flags: -p, -s
+
+### `overmind` (https://github.com/DarthSim/overmind)
+
+- Allowed standalone flags: --help, --version, -h, -v
+- **connect**: Flags: --help, -h
+- **echo**: Flags: --help, -h
+- **kill**: Flags: --help, -h
+- **quit**: Flags: --help, -h
+- **restart**: Flags: --help, -h
+- **start**: Flags: --daemonize, --help, --no-port, -D, -N, -h. Valued: --colors, --formation, --port, --port-step, --procfile, --root, --socket, --title, -T, -c, -f, -l, -p, -r, -s
+- **status**: Flags: --help, -h
+- **stop**: Flags: --help, -h
 
 ### `paste` (https://www.gnu.org/software/coreutils/manual/coreutils.html#paste-invocation)
 
@@ -1713,6 +1761,27 @@ Aliases: `pip3`
 - Allowed valued flags: --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval, -b, -c, -n
 - Bare invocation allowed
 
+### `tailscale` (https://tailscale.com/kb/1080/cli)
+
+- Allowed standalone flags: --help, --version, -h
+- **bugreport**: Flags: --help, -h
+- **dns query**: Flags: --help, -h. Positional args accepted
+- **dns status**: Flags: --help, -h
+- **down**: Flags: --help, -h
+- **exit-node list**: Flags: --help, --json, -h. Valued: --filter
+- **exit-node suggest**: Flags: --help, -h
+- **ip**: Flags: --1, --4, --6, --help, -h
+- **licenses**: Flags: --help, -h
+- **login**: Flags: --accept-dns, --accept-routes, --help, --shields-up, -h. Valued: --advertise-exit-node, --advertise-routes, --advertise-tags, --authkey, --exit-node, --hostname, --login-server, --operator, --timeout
+- **logout**: Flags: --help, -h
+- **netcheck**: Flags: --help, -h
+- **ping**: Flags: --c2c, --help, --icmp, --peerapi, --tsmp, --until-direct, --verbose, -h. Valued: --size, --timeout
+- **status**: Flags: --active, --browser, --help, --json, --peers, --self, --web, -h
+- **switch**: Flags: --help, --list, -h
+- **up**: Flags: --accept-dns, --accept-routes, --help, --reset, --shields-up, -h. Valued: --advertise-exit-node, --advertise-routes, --advertise-tags, --authkey, --exit-node, --exit-node-allow-lan-access, --hostname, --login-server, --operator, --timeout
+- **version**: Flags: --help, -h. Positional args accepted
+- **whois**: Flags: --help, --json, -h
+
 ### `tar` (https://man7.org/linux/man-pages/man1/tar.1.html)
 
 - Listing mode only (requires -t or --list). Old-style flags accepted (e.g. tar tf, tar tzf).
@@ -1752,11 +1821,20 @@ Aliases: `[`
 
 - Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recursively validates the inner command.
 
+### `tmux` (https://man7.org/linux/man-pages/man1/tmux.1.html)
+
+- Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, list-keys, list-commands, show-options, show-environment, display-message, info, has-session, start-server. Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, kill-server, attach-session, detach-client, switch-client, new-window, split-window, select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, set-option, set-environment, send-keys. Delegation: run-shell, if-shell, pipe-pane, confirm-before (recursively validates inner commands).
+
 ### `tokei` (https://github.com/XAMPPRocky/tokei#readme)
 
 - Allowed standalone flags: --compact, --files, --help, --hidden, --no-ignore, --no-ignore-dot, --no-ignore-parent, --no-ignore-vcs, --verbose, --version, -C, -V, -f, -h
 - Allowed valued flags: --columns, --exclude, --input, --languages, --num-format, --output, --sort, --type, -c, -e, -i, -l, -o, -s, -t
 - Bare invocation allowed
+
+### `tomlq` (https://github.com/kislyuk/yq)
+
+- Allowed standalone flags: --compact-output, --exit-status, --help, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --toml-output, --version, -C, -M, -R, -S, -V, -c, -e, -h, -n, -r, -s, -t
+- Allowed valued flags: --arg, --argjson, --indent, -f
 
 ### `top` (https://man7.org/linux/man-pages/man1/top.1.html)
 
@@ -1894,6 +1972,16 @@ Aliases: `[`
 - Allowed valued flags: --files0-from
 - Bare invocation allowed
 
+### `wg` (https://www.wireguard.com/quickstart/)
+
+- Allowed standalone flags: --help, --version, -h
+- **genkey**: Flags: --help, -h
+- **genpsk**: Flags: --help, -h
+- **help**: Flags: --help, -h
+- **pubkey**: Flags: --help, -h
+- **show**: Flags: --help, -h. Positional args accepted
+- **showconf**: Flags: --help, -h
+
 ### `whereis` (https://man7.org/linux/man-pages/man1/whereis.1.html)
 
 - Allowed standalone flags: --help, --version, -V, -b, -h, -l, -m, -s, -u
@@ -1960,6 +2048,16 @@ Aliases: `[`
 
 - Allowed standalone flags: --auto, --catalogs, --compress, --copy, --debug, --debugent, --dropdtd, --format, --help, --html, --htmlout, --huge, --load-trace, --loaddtd, --memory, --noblanks, --nocatalogs, --nocdata, --nocompact, --nodefdtd, --noenc, --noent, --nonet, --noout, --nowarning, --nowrap, --nsclean, --oldxml10, --postvalid, --push, --pushsmall, --quiet, --recover, --repeat, --sax, --sax1, --stream, --testIO, --timing, --valid, --version, --walker, --xinclude, --xmlout, -V, -h
 - Allowed valued flags: --dtdvalid, --dtdvalidfpi, --encode, --maxmem, --path, --pattern, --pretty, --relaxng, --schema, --schematron, --xpath
+
+### `xq` (https://github.com/kislyuk/yq)
+
+- Allowed standalone flags: --compact-output, --exit-status, --help, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --version, --xml-output, -C, -M, -R, -S, -V, -c, -e, -h, -n, -r, -s, -x
+- Allowed valued flags: --arg, --argjson, --indent, --xml-dtd, --xml-item-depth, --xml-root, -f
+
+### `xv` (https://github.com/gyscos/xv)
+
+- Allowed standalone flags: --help, --version, -V, -h
+- Hyphen-prefixed positional arguments accepted
 
 ### `xxd` (https://man7.org/linux/man-pages/man1/xxd.1.html)
 
