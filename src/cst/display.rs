@@ -175,6 +175,9 @@ impl fmt::Display for Redir {
                 write!(f, "< {target}")
             }
             Redir::HereStr(w) => write!(f, "<<< {w}"),
+            Redir::HereDoc { delimiter, strip_tabs } => {
+                if *strip_tabs { write!(f, "<<-{delimiter}") } else { write!(f, "<<{delimiter}") }
+            }
             Redir::DupFd { src, dst } => {
                 if *src != 1 { write!(f, "{src}")?; }
                 write!(f, ">&{dst}")

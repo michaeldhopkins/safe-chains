@@ -21,7 +21,7 @@ safe-chains is also a response to inadequate deny-based hooks in agentic tools. 
 
 **Per-segment validation.** Commands with shell operators (`&&`, `|`, `;`, `&`) are split into segments. Each segment must independently pass validation. One safe segment cannot cause another to be approved.
 
-**No file output.** Output redirection (`>`, `>>`) to any file is always rejected. The sole exception is `/dev/null`. Here-strings (`<<<`) are allowed since they provide input, not output.
+**No file output.** Output redirection (`>`, `>>`) to any file is always rejected. The sole exception is `/dev/null`. Input redirection (`<`) is only allowed from `/dev/null`. Here-strings (`<<<`) and here-documents (`<<`, `<<-`) are allowed since they provide input, not output.
 
 **Substitution validation.** Command substitutions (`$(...)`) are extracted and their contents are recursively validated. `echo $(git log)` is approved because `git log` is safe. `echo $(rm -rf /)` is rejected because `rm` is not.
 

@@ -76,6 +76,10 @@ fn arb_dq_part(depth: u32) -> BoxedStrategy<WordPart> {
     .boxed()
 }
 
+fn arb_heredoc_delimiter() -> impl Strategy<Value = String> {
+    prop::string::string_regex("[A-Z_][A-Z0-9_]{0,5}").expect("valid regex")
+}
+
 fn arb_redir() -> BoxedStrategy<Redir> {
     prop_oneof![
         (0..3u32, arb_word(0), any::<bool>()).prop_map(|(fd, target, append)| {
@@ -83,6 +87,9 @@ fn arb_redir() -> BoxedStrategy<Redir> {
         }),
         (0..3u32, arb_word(0)).prop_map(|(fd, target)| Redir::Read { fd, target }),
         arb_word(0).prop_map(Redir::HereStr),
+        (arb_heredoc_delimiter(), any::<bool>()).prop_map(|(delimiter, strip_tabs)| {
+            Redir::HereDoc { delimiter, strip_tabs }
+        }),
         (0..3u32, prop_oneof!["0", "1", "2", "-"].prop_map(String::from))
             .prop_map(|(src, dst)| Redir::DupFd { src, dst }),
     ]
@@ -175,6 +182,9 @@ fn arb_safe_redir() -> BoxedStrategy<Redir> {
         }),
         (0..3u32, arb_dev_null_word()).prop_map(|(fd, target)| Redir::Read { fd, target }),
         arb_word(0).prop_map(Redir::HereStr),
+        (arb_heredoc_delimiter(), any::<bool>()).prop_map(|(delimiter, strip_tabs)| {
+            Redir::HereDoc { delimiter, strip_tabs }
+        }),
         (0..3u32, prop_oneof!["0", "1", "2"].prop_map(String::from))
             .prop_map(|(src, dst)| Redir::DupFd { src, dst }),
     ]
@@ -428,5 +438,25 @@ proptest! {
     #[test]
     fn parse_never_panics(input in "[ -~]{0,200}") {
         let _ = parse(&input);
+    }
+
+    #[test]
+    fn heredoc_always_safe(
+        cmd_word in arb_shell_word(),
+        delimiter in arb_heredoc_delimiter(),
+        strip_tabs in any::<bool>(),
+    ) {
+        let redir = Redir::HereDoc { delimiter, strip_tabs };
+        prop_assert!(check::check_redirects(&[redir]));
+
+        let cmd = SimpleCmd {
+            env: vec![],
+            words: vec![Word(vec![WordPart::Lit(cmd_word)])],
+            redirs: vec![Redir::HereDoc {
+                delimiter: "EOF".to_string(),
+                strip_tabs: false,
+            }],
+        };
+        prop_assert!(check::check_redirects(&cmd.redirs));
     }
 }

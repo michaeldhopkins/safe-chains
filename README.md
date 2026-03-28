@@ -137,7 +137,7 @@ Without `--level`, the default threshold is `safe-write` (all allowed commands p
 
 safe-chains knows 130+ read-only commands (`grep`, `cat`, `ls`, `jq`, ...) that are always safe with any arguments. For 50+ additional tools (`git`, `cargo`, `npm`, `docker`, ...), it validates specific subcommands and flags—allowing `git log` but not `git push`, allowing `sed 's/foo/bar/'` but not `sed -i`.
 
-Commands containing shell operators (`&&`, `|`, `;`) are split into segments. Shell compound commands (`for`/`while`/`until` loops and `if`/`elif`/`else` conditionals) are parsed into an AST and each leaf command is validated recursively, supporting arbitrary nesting depth. Simple segments are validated independently. Segments containing output redirection (`>`), input redirection (`<`), backticks, or command substitution (`$(...)`) are always rejected.
+Commands containing shell operators (`&&`, `|`, `;`) are split into segments. Shell compound commands (`for`/`while`/`until` loops and `if`/`elif`/`else` conditionals) are parsed into an AST and each leaf command is validated recursively, supporting arbitrary nesting depth. Simple segments are validated independently. Output redirection (`>`, `>>`) is only allowed to `/dev/null`. Input redirection (`<`) is only allowed from `/dev/null`. Here-strings (`<<<`) and here-documents (`<<`, `<<-`) are allowed. Backticks and command substitution (`$(...)`) are recursively validated.
 
 Found a safe command safe-chains should support? [Submit an issue.](https://github.com/michaeldhopkins/safe-chains/issues/new?template=command-request.yml)
 
