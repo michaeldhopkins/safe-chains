@@ -81,8 +81,11 @@ fn has_flag_unicode_no_panic() {
 }
 
 #[test]
-fn heredoc_blocked() {
-    assert!(!check("cat << EOF"));
+fn heredoc_safe() {
+    assert!(check("cat << EOF"));
+    assert!(check("cat <<EOF\nhello world\nEOF"));
+    assert!(check("cat <<'EOF'\nhello world\nEOF"));
+    assert!(check("cat <<-EOF\n\thello\nEOF"));
 }
 
 // ── gh api: safe patterns ────────────────────────────────────────────

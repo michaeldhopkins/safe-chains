@@ -89,6 +89,10 @@ pub enum Redir {
         target: Word,
     },
     HereStr(Word),
+    HereDoc {
+        delimiter: String,
+        strip_tabs: bool,
+    },
     DupFd {
         src: u32,
         dst: String,
@@ -219,7 +223,7 @@ impl SimpleCmd {
                         target: target.normalize(),
                     },
                     Redir::HereStr(w) => Redir::HereStr(w.normalize()),
-                    other => other.clone(),
+                    Redir::HereDoc { .. } | Redir::DupFd { .. } => r.clone(),
                 })
                 .collect(),
         }

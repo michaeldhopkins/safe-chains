@@ -182,6 +182,7 @@ fn redirect(input: &mut &str) -> ModalResult<Redir> {
     let fd = opt(fd_prefix).parse_next(input)?;
     alt((
         preceded("<<<", (ws, word)).map(|(_, target)| Redir::HereStr(target)),
+        heredoc,
         preceded(">>", (ws, word)).map(move |(_, target)| Redir::Write {
             fd: fd.unwrap_or(1),
             target,
@@ -200,6 +201,28 @@ fn redirect(input: &mut &str) -> ModalResult<Redir> {
             fd: fd.unwrap_or(0),
             target,
         }),
+    ))
+    .parse_next(input)
+}
+
+fn heredoc(input: &mut &str) -> ModalResult<Redir> {
+    "<<".parse_next(input)?;
+    let strip_tabs = opt('-').parse_next(input)?.is_some();
+    ws.parse_next(input)?;
+    let delimiter = heredoc_delimiter.parse_next(input)?;
+    let needle = format!("\n{delimiter}");
+    if let Some(pos) = input.find(&needle) {
+        let after = pos + needle.len();
+        *input = input[after..].trim_start_matches([' ', '\t', '\n']);
+    }
+    Ok(Redir::HereDoc { delimiter, strip_tabs })
+}
+
+fn heredoc_delimiter(input: &mut &str) -> ModalResult<String> {
+    alt((
+        delimited('\'', take_while(0.., |c| c != '\''), '\'').map(|s: &str| s.to_string()),
+        delimited('"', take_while(0.., |c| c != '"'), '"').map(|s: &str| s.to_string()),
+        take_while(1.., |c: char| c.is_ascii_alphanumeric() || c == '_').map(|s: &str| s.to_string()),
     ))
     .parse_next(input)
 }
@@ -465,6 +488,33 @@ mod tests {
     fn here_string() {
         assert!(matches!(&simple(&p("grep -c , <<< 'hello,world,test'")).redirs[0], Redir::HereStr(_)));
     }
+    #[test]
+    fn heredoc_bare() {
+        assert!(matches!(&simple(&p("cat <<EOF")).redirs[0], Redir::HereDoc { delimiter, strip_tabs: false } if delimiter == "EOF"));
+    }
+    #[test]
+    fn heredoc_with_content() {
+        let s = p("cat <<EOF\nhello world\nEOF");
+        assert!(matches!(&simple(&s).redirs[0], Redir::HereDoc { delimiter, .. } if delimiter == "EOF"));
+    }
+    #[test]
+    fn heredoc_quoted_delimiter() {
+        assert!(matches!(&simple(&p("cat <<'EOF'")).redirs[0], Redir::HereDoc { delimiter, .. } if delimiter == "EOF"));
+    }
+    #[test]
+    fn heredoc_strip_tabs() {
+        assert!(matches!(&simple(&p("cat <<-EOF")).redirs[0], Redir::HereDoc { strip_tabs: true, .. }));
+    }
+    #[test]
+    fn heredoc_then_pipe() {
+        let s = p("cat <<EOF\nhello\nEOF | grep hello");
+        assert_eq!(s.0[0].pipeline.commands.len(), 2);
+    }
+    #[test]
+    fn heredoc_then_pipe_next_line() {
+        let s = p("cat <<EOF\nhello\nEOF\n| grep hello");
+        assert_eq!(s.0[0].pipeline.commands.len(), 2);
+    }
 
     #[test]
     fn env_prefix() {
@@ -558,6 +608,9 @@ mod tests {
             "grep foo file.txt | head -5", "cat file | sort | uniq",
             "ls && echo done", "ls; echo done", "ls & echo done",
             "grep -c , <<< 'hello,world,test'",
+            "cat <<EOF\nhello world\nEOF",
+            "cat <<'MARKER'\nsome text\nMARKER",
+            "cat <<-EOF\n\thello\nEOF",
             "echo foo\necho bar", "ls\ncat file.txt",
             "git log --oneline -20 | head -5",
             "echo hello > /dev/null", "echo hello 2> /dev/null",

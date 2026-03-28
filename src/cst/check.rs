@@ -148,7 +148,7 @@ pub(crate) fn check_redirects(redirs: &[Redir]) -> bool {
         Redir::Write { target, .. } | Redir::Read { target, .. } => {
             target.eval() == "/dev/null"
         }
-        Redir::HereStr(_) | Redir::DupFd { .. } => true,
+        Redir::HereStr(_) | Redir::HereDoc { .. } | Redir::DupFd { .. } => true,
     })
 }
 
@@ -220,6 +220,11 @@ mod tests {
         newline_echo_echo: "echo foo\necho bar",
 
         here_string_grep: "grep -c , <<< 'hello,world,test'",
+        heredoc_cat: "cat <<EOF\nhello world\nEOF",
+        heredoc_quoted: "cat <<'EOF'\nhello\nEOF",
+        heredoc_strip_tabs: "cat <<-EOF\n\thello\nEOF",
+        heredoc_no_content: "cat <<EOF",
+        heredoc_pipe: "cat <<EOF\nhello\nEOF | grep hello",
 
         for_echo: "for x in 1 2 3; do echo $x; done",
         for_empty_body: "for x in 1 2 3; do; done",
