@@ -703,6 +703,16 @@ Aliases: `fly`
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+### `fzf` (https://github.com/junegunn/fzf)
+
+- Fuzzy finder. --bind allowed with UI-only actions (no command execution). Display, filtering, and layout flags allowed.
+
+### `fzy` (https://github.com/jhawthorn/fzy)
+
+- Allowed standalone flags: --help, --show-info, --show-scores, --version, -h, -i, -v
+- Allowed valued flags: --lines, --prompt, --query, --show-matches, --tty, -e, -l, -p, -q, -t
+- Bare invocation allowed
+
 ### `gem` (https://guides.rubygems.org/command-reference/)
 
 - Allowed standalone flags: --help, --version, -V, -h
@@ -1340,6 +1350,12 @@ Aliases: `orb`
 - Allowed valued flags: --delimiters, -d
 - Bare invocation allowed
 
+### `peco` (https://github.com/peco/peco)
+
+- Allowed standalone flags: --help, --null, --print-query, --select-1, --version, -h, -v
+- Allowed valued flags: --buffer-size, --initial-filter, --initial-index, --layout, --on-cancel, --prompt, --query, --selection-prefix, -b
+- Bare invocation allowed
+
 ### `periphery` (https://github.com/peripheryapp/periphery)
 
 - Allowed standalone flags: --help, --version, -V, -h
@@ -1360,6 +1376,12 @@ Aliases: `orb`
 
 - Allowed standalone flags: --count, --delimiter, --full, --help, --inverse, --lightweight, --list-full, --list-name, --newest, --oldest, --version, -L, -V, -a, -c, -f, -h, -i, -l, -n, -o, -v, -w, -x
 - Allowed valued flags: --euid, --group, --parent, --pgroup, --pidfile, --session, --terminal, --uid, -F, -G, -P, -U, -d, -g, -s, -t, -u
+
+### `pick` (https://github.com/mptre/pick)
+
+- Allowed standalone flags: --help, --version, -K, -S, -X, -d, -h, -o, -v, -x
+- Allowed valued flags: -q
+- Bare invocation allowed
 
 ### `ping` (https://man7.org/linux/man-pages/man8/ping.8.html)
 
@@ -1626,6 +1648,12 @@ Aliases: `pip3`
 - Allowed valued flags: --expression, --file, --line-length, -e, -f, -l
 - Inline expressions validated for safety
 
+### `selecta` (https://github.com/garybernhardt/selecta)
+
+- Allowed standalone flags: --help, --version, -h, -v
+- Allowed valued flags: --search, -s
+- Bare invocation allowed
+
 ### `seq` (https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation)
 
 - Allowed standalone flags: --equal-width, --help, --version, -V, -h, -w
@@ -1676,6 +1704,10 @@ Aliases: `pip3`
 
 - Allowed standalone flags: --common, --help, --totals, --version, -A, -B, -G, -V, -d, -h, -o, -t, -x
 - Allowed valued flags: --format, --radix, --target
+
+### `sk` (https://github.com/lotabout/skim)
+
+- Fuzzy finder. Display, filtering, and layout flags allowed. --history allowed (SafeWrite).
 
 ### `sleep` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation)
 
@@ -2079,6 +2111,12 @@ Aliases: `[`
 Aliases: `gzcat`
 
 - Allowed standalone flags: --force, --help, --quiet, --verbose, --version, -V, -f, -h, -q, -v
+- Bare invocation allowed
+
+### `zf` (https://github.com/natecraddock/zf)
+
+- Allowed standalone flags: --help, --keep-order, --plain, --version, -0, -h, -k, -p, -v
+- Allowed valued flags: --delimiter, --filter, --height, --lines, --preview-width, -d, -f, -l
 - Bare invocation allowed
 
 ### `zgrep` (https://man7.org/linux/man-pages/man1/zgrep.1.html)

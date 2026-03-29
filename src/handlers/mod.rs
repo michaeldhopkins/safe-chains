@@ -4,6 +4,7 @@ pub mod containers;
 pub mod coreutils;
 pub mod dotnet;
 pub mod forges;
+pub mod fuzzy;
 pub mod go;
 pub mod jvm;
 pub mod magick;
@@ -50,6 +51,7 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
         .or_else(|| perl::dispatch(cmd, tokens))
         .or_else(|| r::dispatch(cmd, tokens))
         .or_else(|| coreutils::dispatch(cmd, tokens))
+        .or_else(|| fuzzy::dispatch(cmd, tokens))
         .or_else(|| magick::dispatch(cmd, tokens))
         .unwrap_or(Verdict::Denied)
 }
@@ -106,6 +108,7 @@ const HANDLED_CMDS: &[&str] = &[
     "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat", "mdfind", "man",
     "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route", "ping",
     "xv",
+    "fzf", "fzy", "peco", "pick", "selecta", "sk", "zf",
     "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "workon", "safe-chains",
 ];
 
@@ -131,6 +134,7 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(perl::command_docs());
     docs.extend(r::command_docs());
     docs.extend(coreutils::command_docs());
+    docs.extend(fuzzy::command_docs());
     docs.extend(shell::command_docs());
     docs.extend(wrappers::command_docs());
     docs.extend(magick::command_docs());
@@ -213,6 +217,9 @@ pub fn all_opencode_patterns() -> Vec<String> {
     for def in xcode::xcbeautify_flat_defs() {
         patterns.extend(def.opencode_patterns());
     }
+    for def in fuzzy::fuzzy_flat_defs() {
+        patterns.extend(def.opencode_patterns());
+    }
     patterns.sort();
     patterns.dedup();
     patterns
@@ -234,6 +241,7 @@ fn full_registry() -> Vec<&'static CommandEntry> {
     entries.extend(perl::REGISTRY);
     entries.extend(r::REGISTRY);
     entries.extend(coreutils::full_registry());
+    entries.extend(fuzzy::full_registry());
     entries
 }
 
@@ -337,7 +345,7 @@ mod tests {
         for def in xcode::xcbeautify_flat_defs() {
             def.auto_test_reject_unknown();
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             def.auto_test_reject_unknown();
         }
     }
@@ -360,7 +368,7 @@ mod tests {
         {
             check_def(def);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             check_def(def);
         }
     }
@@ -487,7 +495,7 @@ mod tests {
         {
             check_flat(def, &mut failures);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             check_flat(def, &mut failures);
         }
 
@@ -528,7 +536,7 @@ mod tests {
         {
             check_flat(def, &mut failures);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             check_flat(def, &mut failures);
         }
 
@@ -579,7 +587,7 @@ mod tests {
         {
             check_flat(def, &mut failures);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             check_flat(def, &mut failures);
         }
 
@@ -607,7 +615,7 @@ mod tests {
         for def in xcode::xcbeautify_flat_defs() {
             all_cmds.insert(def.name);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             all_cmds.insert(def.name);
         }
         let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
