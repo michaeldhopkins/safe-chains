@@ -608,13 +608,13 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `eza` (https://eza.rocks/)
 
-Aliases: `exa`
-
 - Allowed standalone flags: --accessed, --all, --binary, --blocks, --blocksize, --bytes, --changed, --classify, --color-scale, --color-scale-mode, --context, --created, --dereference, --extended, --flags, --follow-symlinks, --git, --git-ignore, --git-repos, --git-repos-no-status, --group, --group-directories-first, --header, --help, --hyperlink, --icons, --inode, --links, --list-dirs, --long, --modified, --mounts, --no-filesize, --no-git, --no-icons, --no-permissions, --no-quotes, --no-time, --no-user, --numeric, --octal-permissions, --oneline, --only-dirs, --only-files, --recurse, --reverse, --tree, --version, -1, -@, -A, -B, -D, -F, -G, -H, -I, -M, -R, -S, -T, -U, -V, -Z, -a, -b, -d, -f, -g, -h, -i, -l, -m, -r, -s, -u, -x
 - Allowed valued flags: --color, --colour, --git-ignore-glob, --grid-columns, --group-directories-first-dirs, --ignore-glob, --level, --smart-group, --sort, --time, --time-style, --total-size, --width, -L, -X, -t, -w
 - Bare invocation allowed
 
 ### `eza` (https://eza.rocks/)
+
+Aliases: `exa`
 
 - Allowed standalone flags: --accessed, --all, --binary, --blocks, --blocksize, --bytes, --changed, --classify, --color-scale, --color-scale-mode, --context, --created, --dereference, --extended, --flags, --follow-symlinks, --git, --git-ignore, --git-repos, --git-repos-no-status, --group, --group-directories-first, --header, --help, --hyperlink, --icons, --inode, --links, --list-dirs, --long, --modified, --mounts, --no-filesize, --no-git, --no-icons, --no-permissions, --no-quotes, --no-time, --no-user, --numeric, --octal-permissions, --oneline, --only-dirs, --only-files, --recurse, --reverse, --tree, --version, -1, -@, -A, -B, -D, -F, -G, -H, -I, -M, -R, -S, -T, -U, -V, -Z, -a, -b, -d, -f, -g, -h, -i, -l, -m, -r, -s, -u, -x
 - Allowed valued flags: --color, --colour, --git-ignore-glob, --grid-columns, --group-directories-first-dirs, --ignore-glob, --level, --smart-group, --sort, --time, --time-style, --total-size, --width, -L, -X, -t, -w
@@ -827,12 +827,12 @@ Aliases: `gradlew`
 
 ### `grep` (https://www.gnu.org/software/grep/manual/grep.html)
 
+Aliases: `egrep`, `fgrep`
+
 - Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z
 - Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m
 
 ### `grep` (https://www.gnu.org/software/grep/manual/grep.html)
-
-Aliases: `egrep`, `fgrep`
 
 - Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z
 - Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m
@@ -1100,12 +1100,12 @@ Aliases: `egrep`, `fgrep`
 
 ### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
 
+Aliases: `mlocate`, `plocate`
+
 - Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
 - Allowed valued flags: --database, --limit, -d, -l, -n
 
 ### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
-
-Aliases: `mlocate`, `plocate`
 
 - Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
 - Allowed valued flags: --database, --limit, -d, -l, -n
@@ -1297,7 +1297,6 @@ Aliases: `mlocate`, `plocate`
 
 ### `npm` (https://docs.npmjs.com/cli)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **audit**: Flags: --help, --json, --omit, --production, -h. Valued: --audit-level
 - **config get**: Flags: --help, --json, --long, -h, -l
 - **config list**: Flags: --help, --json, --long, -h, -l
@@ -1310,10 +1309,12 @@ Aliases: `mlocate`, `plocate`
 - **outdated**: Flags: --help, --json, -h
 - **prefix**: Flags: --help, --json, -h
 - **root**: Flags: --help, --json, -h
-- **run**: run/run-script (test only).
+- **run**: Allowed arguments: test, test:*
+- **run-script**: Allowed arguments: test, test:*
 - **test**: Flags: --help, -h
 - **view**: Flags: --help, --json, -h
 - **why**: Flags: --help, --json, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `nproc` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nproc-invocation)
 
@@ -1906,12 +1907,12 @@ Aliases: `pip3`
 
 ### `test` (https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation)
 
+Aliases: `[`
+
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
 ### `test` (https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation)
-
-Aliases: `[`
 
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
@@ -2179,12 +2180,12 @@ Aliases: `[`
 
 ### `zcat` (https://man7.org/linux/man-pages/man1/zcat.1.html)
 
-Aliases: `gzcat`
-
 - Allowed standalone flags: -V, -f, -h, -q, -v, --force, --help, --quiet, --verbose, --version
 - Bare invocation allowed
 
 ### `zcat` (https://man7.org/linux/man-pages/man1/zcat.1.html)
+
+Aliases: `gzcat`
 
 - Allowed standalone flags: -V, -f, -h, -q, -v, --force, --help, --quiet, --verbose, --version
 - Bare invocation allowed
