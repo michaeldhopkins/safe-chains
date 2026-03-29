@@ -1,5 +1,4 @@
 mod crontab;
-mod mise;
 mod networksetup;
 mod pmset;
 mod sysctl;
@@ -9,11 +8,8 @@ use crate::command::FlatDef;
 use crate::verdict::Verdict;
 use crate::parse::Token;
 
-pub(crate) use mise::MISE;
-
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    MISE.dispatch(cmd, tokens)
-        .or_else(|| crontab::dispatch(cmd, tokens))
+    crontab::dispatch(cmd, tokens)
         .or_else(|| pmset::dispatch(cmd, tokens))
         .or_else(|| sysctl::dispatch(cmd, tokens))
         .or_else(|| tmux::dispatch(cmd, tokens))
@@ -25,7 +21,7 @@ pub(crate) fn system_flat_defs() -> Vec<&'static FlatDef> {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    let mut docs = vec![MISE.to_doc()];
+    let mut docs = Vec::new();
     docs.extend(crontab::command_docs());
     docs.extend(pmset::command_docs());
     docs.extend(sysctl::command_docs());

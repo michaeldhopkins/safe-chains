@@ -149,10 +149,8 @@ use crate::command::CommandDef;
 
 const COMMAND_DEFS: &[&CommandDef] = &[
     &node::NPM, &node::BUN,
-    &python::CONDA,
     &ruby::BUNDLE,
     &vcs::GIT,
-    &system::MISE,
 ];
 
 pub fn all_opencode_patterns() -> Vec<String> {

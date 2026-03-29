@@ -349,10 +349,10 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `conda` (https://docs.conda.io/projects/conda/en/stable/commands/index.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
-- **config**: config (--show/--show-sources only).
+- **config** (requires --show, --show-sources): Flags: --help, --json, --quiet, --show, --show-sources, --verbose, -h, -q, -v. Valued: --env, --file, --name, --prefix, -f, -n, -p
 - **info**: Flags: --all, --envs, --help, --json, --verbose, -a, -e, -h, -v
 - **list**: Flags: --explicit, --export, --full-name, --help, --json, --no-pip, --revisions, -e, -f, -h. Valued: --name, --prefix, -n, -p
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `craft` (https://craftcms.com/docs/5.x/reference/cli.html)
 
@@ -1105,12 +1105,12 @@ Aliases: `egrep`, `fgrep`
 
 ### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
 
+Aliases: `mlocate`, `plocate`
+
 - Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
 - Allowed valued flags: --database, --limit, -d, -l, -n
 
 ### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
-
-Aliases: `mlocate`, `plocate`
 
 - Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
 - Allowed valued flags: --database, --limit, -d, -l, -n
@@ -1174,20 +1174,25 @@ Aliases: `mlocate`, `plocate`
 
 ### `mise` (https://mise.jdx.dev/cli/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **activate**: Flags: --help, -h
-- **backends**: Bare invocation allowed. Subcommands: list, ls.
+- **backends list**: Flags: --help, -h, -q, -v
+- **backends ls**: Flags: --help, -h, -q, -v
 - **bin-paths**: Flags: --help, -h, -q, -v
-- **cache**: Bare invocation allowed. Subcommands: path.
+- **cache clear**: Flags: --help, -h
+- **cache path**: Flags: --help, -h, -q, -v
+- **cache prune**: Flags: --help, -h
 - **completion**: Flags: --help, -h, -q, -v
-- **config**: Bare invocation allowed. Subcommands: get, list, ls.
+- **config generate**: Flags: --help, -h
+- **config get**: Flags: --help, -h, -q, -v
+- **config list**: Flags: --help, -h, -q, -v
+- **config ls**: Flags: --help, -h, -q, -v
+- **config set**: Flags: --help, -h
 - **current**: Flags: --help, -h, -q, -v
 - **deactivate**: Flags: --help, -h
 - **doctor**: Flags: --help, -h, -q, -v
 - **edit**: Flags: --help, -h
 - **en**: Flags: --help, -h
 - **env**: Flags: --help, --json, -J, -h. Valued: --shell, -s
-- **exec**: exec delegates after --.
 - **fmt**: Flags: --check, --help, -h
 - **generate**: Flags: --help, -h
 - **implode**: Flags: --help, -h
@@ -1199,7 +1204,13 @@ Aliases: `mlocate`, `plocate`
 - **ls**: Flags: --current, --help, --installed, --json, --missing, --no-header, --prefix, -J, -c, -h, -i, -m
 - **ls-remote**: Flags: --all, --help, -h
 - **outdated**: Flags: --help, --json, --no-header, -J, -h
-- **plugins**: Bare invocation allowed. Subcommands: list, ls, ls-remote.
+- **plugins install**: Flags: --help, -h
+- **plugins link**: Flags: --help, -h
+- **plugins list**: Flags: --help, -h, -q, -v
+- **plugins ls**: Flags: --help, -h, -q, -v
+- **plugins ls-remote**: Flags: --help, -h, -q, -v
+- **plugins uninstall**: Flags: --help, -h
+- **plugins update**: Flags: --help, -h
 - **prepare**: Flags: --help, -h
 - **prune**: Flags: --help, -h
 - **registry**: Flags: --help, -h. Valued: --backend, -b
@@ -1208,13 +1219,32 @@ Aliases: `mlocate`, `plocate`
 - **search**: Flags: --help, -h
 - **self-update**: Flags: --help, -h
 - **set**: Flags: --help, --json, -J, -h
-- **settings**: Bare invocation allowed. Subcommands: get, list, ls.
+- **settings add**: Flags: --help, -h
+- **settings get**: Flags: --help, -h, -q, -v
+- **settings list**: Flags: --help, -h, -q, -v
+- **settings ls**: Flags: --help, -h, -q, -v
+- **settings set**: Flags: --help, -h
+- **settings unset**: Flags: --help, -h
 - **shell**: Flags: --help, -h
-- **shell-alias**: Bare invocation allowed. Subcommands: get, list, ls.
+- **shell-alias get**: Flags: --help, -h, -q, -v
+- **shell-alias list**: Flags: --help, -h, -q, -v
+- **shell-alias ls**: Flags: --help, -h, -q, -v
+- **shell-alias set**: Flags: --help, -h
+- **shell-alias unset**: Flags: --help, -h
 - **sync**: Flags: --help, -h
-- **tasks**: Bare invocation allowed. Subcommands: deps, info, list, ls.
+- **tasks add**: Flags: --help, -h
+- **tasks deps**: Flags: --help, -h, -q, -v
+- **tasks edit**: Flags: --help, -h
+- **tasks info**: Flags: --help, -h, -q, -v
+- **tasks list**: Flags: --help, -h, -q, -v
+- **tasks ls**: Flags: --help, -h, -q, -v
+- **tasks run**: Flags: --help, -h
 - **tool**: Flags: --help, -h, -q, -v
-- **tool-alias**: Bare invocation allowed. Subcommands: get, list, ls.
+- **tool-alias get**: Flags: --help, -h, -q, -v
+- **tool-alias list**: Flags: --help, -h, -q, -v
+- **tool-alias ls**: Flags: --help, -h, -q, -v
+- **tool-alias set**: Flags: --help, -h
+- **tool-alias unset**: Flags: --help, -h
 - **trust**: Flags: --help, --show, -h
 - **uninstall**: Flags: --help, -h
 - **unset**: Flags: --help, -h
@@ -1224,6 +1254,7 @@ Aliases: `mlocate`, `plocate`
 - **watch**: Flags: --help, -h
 - **where**: Flags: --help, -h, -q, -v
 - **which**: Flags: --help, -h, -q, -v
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `mlr` (https://miller.readthedocs.io/)
 
@@ -2166,12 +2197,12 @@ Aliases: `gzcat`
 
 ### `zgrep` (https://man7.org/linux/man-pages/man1/zgrep.1.html)
 
-Aliases: `zegrep`, `zfgrep`
-
 - Allowed standalone flags: --count, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --invert-match, --line-number, --no-filename, --only-matching, --quiet, --silent, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -L, -V, -Z, -c, -h, -i, -l, -n, -o, -q, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --file, --max-count, --regexp, -A, -B, -C, -e, -f, -m
 
 ### `zgrep` (https://man7.org/linux/man-pages/man1/zgrep.1.html)
+
+Aliases: `zegrep`, `zfgrep`
 
 - Allowed standalone flags: --count, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --invert-match, --line-number, --no-filename, --only-matching, --quiet, --silent, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -L, -V, -Z, -c, -h, -i, -l, -n, -o, -q, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --file, --max-count, --regexp, -A, -B, -C, -e, -f, -m
