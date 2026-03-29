@@ -593,7 +593,12 @@ fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
             let inner = shell_words::join(tokens[*skip..].iter().map(|t| t.as_str()));
             crate::command_verdict(&inner)
         }
-        SubKind::Custom { .. } => Verdict::Denied,
+        SubKind::Custom { handler_name } => {
+            SUB_HANDLERS
+                .get(handler_name.as_str())
+                .map(|f| f(tokens))
+                .unwrap_or(Verdict::Denied)
+        }
     }
 }
 
@@ -619,11 +624,24 @@ pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
                 .map(|s| dispatch_sub(&tokens[1..], s))
                 .unwrap_or(Verdict::Denied)
         }
-        CommandKind::Custom { .. } => Verdict::Denied,
+        CommandKind::Custom { handler_name } => {
+            CMD_HANDLERS
+                .get(handler_name.as_str())
+                .map(|f| f(tokens))
+                .unwrap_or(Verdict::Denied)
+        }
     }
 }
 
 use std::sync::LazyLock;
+
+type HandlerFn = fn(&[Token]) -> Verdict;
+
+static CMD_HANDLERS: LazyLock<HashMap<&'static str, HandlerFn>> =
+    LazyLock::new(crate::handlers::custom_cmd_handlers);
+
+static SUB_HANDLERS: LazyLock<HashMap<&'static str, HandlerFn>> =
+    LazyLock::new(crate::handlers::custom_sub_handlers);
 
 static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| {
     let mut all = Vec::new();

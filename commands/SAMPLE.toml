@@ -223,19 +223,30 @@
 #
 # Use as a last resort when the command needs logic that can't be
 # expressed with the fields above. The handler name references a Rust
-# function registered in src/registry.rs or dispatched from a handler
-# module. The TOML entry provides metadata (name, url) but the Rust
-# function performs all validation.
+# function registered in custom_cmd_handlers() or custom_sub_handlers()
+# in src/handlers/mod.rs. The function receives the token slice and
+# returns a Verdict.
+#
+# Works at both levels:
+#   - Command level: the entire command uses a Rust handler
+#   - Sub level: one subcommand uses a Rust handler while siblings
+#     use declarative TOML fields
 #
 # Before reaching for this: can you express the rule as a guard, a
 # nested sub, a delegation, or simply by listing the right flags?
 # Most commands that seem to need custom code can be modeled with the
 # declarative fields above.
 
+# Command-level handler (entire command validated by Rust):
 # [[command]]
 # name = "curl"
 # handler = "curl"                       # references Rust handler by name
 # url = "https://curl.se/docs/manpage.html"
+
+# Sub-level handler (one sub uses Rust, siblings use TOML):
+# [[command.sub]]
+# name = "exec"
+# handler = "bundle_exec"                # references Rust handler by name
 
 # ─────────────────────────────────────────────────────────────────────
 # SAFETY LEVELS

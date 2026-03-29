@@ -18,8 +18,20 @@ pub mod vcs;
 pub mod wrappers;
 pub mod xcode;
 
+use std::collections::HashMap;
+
 use crate::parse::Token;
 use crate::verdict::Verdict;
+
+type HandlerFn = fn(&[Token]) -> Verdict;
+
+pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
+    HashMap::new()
+}
+
+pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
+    HashMap::new()
+}
 
 pub fn dispatch(tokens: &[Token]) -> Verdict {
     let cmd = tokens[0].command_name();
