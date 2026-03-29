@@ -1,6 +1,4 @@
-pub mod ai;
 pub mod android;
-pub mod containers;
 pub mod coreutils;
 pub mod forges;
 pub mod fuzzy;
@@ -8,10 +6,8 @@ pub mod jvm;
 pub mod network;
 pub mod node;
 pub mod perl;
-pub mod python;
 pub mod r;
 pub mod ruby;
-pub mod rust;
 pub mod shell;
 pub mod system;
 pub mod vcs;
@@ -42,11 +38,8 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
         .or_else(|| forges::dispatch(cmd, tokens))
         .or_else(|| node::dispatch(cmd, tokens))
         .or_else(|| ruby::dispatch(cmd, tokens))
-        .or_else(|| python::dispatch(cmd, tokens))
-        .or_else(|| rust::dispatch(cmd, tokens))
         .or_else(|| jvm::dispatch(cmd, tokens))
         .or_else(|| android::dispatch(cmd, tokens))
-        .or_else(|| containers::dispatch(cmd, tokens))
         .or_else(|| network::dispatch(cmd, tokens))
         .or_else(|| system::dispatch(cmd, tokens))
         .or_else(|| xcode::dispatch(cmd, tokens))
@@ -120,11 +113,8 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(forges::command_docs());
     docs.extend(node::command_docs());
     docs.extend(ruby::command_docs());
-    docs.extend(python::command_docs());
-    docs.extend(rust::command_docs());
     docs.extend(jvm::command_docs());
     docs.extend(android::command_docs());
-    docs.extend(containers::command_docs());
     docs.extend(network::command_docs());
     docs.extend(system::command_docs());
     docs.extend(xcode::command_docs());
@@ -177,15 +167,6 @@ pub fn all_opencode_patterns() -> Vec<String> {
         patterns.extend(def.opencode_patterns());
     }
     for def in android::android_flat_defs() {
-        patterns.extend(def.opencode_patterns());
-    }
-    for def in ai::ai_flat_defs() {
-        patterns.extend(def.opencode_patterns());
-    }
-    for def in ruby::ruby_flat_defs() {
-        patterns.extend(def.opencode_patterns());
-    }
-    for def in system::system_flat_defs() {
         patterns.extend(def.opencode_patterns());
     }
     for def in xcode::xcbeautify_flat_defs() {
@@ -319,7 +300,7 @@ mod tests {
         for def in xcode::xcbeautify_flat_defs() {
             def.auto_test_reject_unknown();
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             def.auto_test_reject_unknown();
         }
     }
@@ -342,7 +323,7 @@ mod tests {
         {
             check_def(def);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             check_def(def);
         }
     }
@@ -469,7 +450,7 @@ mod tests {
         {
             check_flat(def, &mut failures);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             check_flat(def, &mut failures);
         }
 
@@ -510,7 +491,7 @@ mod tests {
         {
             check_flat(def, &mut failures);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             check_flat(def, &mut failures);
         }
 
@@ -561,7 +542,7 @@ mod tests {
         {
             check_flat(def, &mut failures);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             check_flat(def, &mut failures);
         }
 
@@ -589,7 +570,7 @@ mod tests {
         for def in xcode::xcbeautify_flat_defs() {
             all_cmds.insert(def.name);
         }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
+        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             all_cmds.insert(def.name);
         }
         for name in crate::registry::toml_command_names() {
