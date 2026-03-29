@@ -2302,4 +2302,28 @@ mod tests {
         assert!(!crate::is_safe_command("sha256sum --evil"));
         assert!(!crate::is_safe_command("b2sum --evil"));
     }
+
+    #[test]
+    fn toml_fd_allowed() {
+        assert!(crate::is_safe_command("fd pattern"));
+        assert!(crate::is_safe_command("fd -H pattern"));
+        assert!(crate::is_safe_command("fd -t f pattern"));
+        assert!(crate::is_safe_command("fd -e rs pattern"));
+        assert!(crate::is_safe_command("fd -g '*.rs'"));
+        assert!(crate::is_safe_command("fd -L pattern"));
+        assert!(crate::is_safe_command("fd -a pattern"));
+        assert!(crate::is_safe_command("fd --color auto pattern"));
+        assert!(crate::is_safe_command("fd --max-depth 3 pattern"));
+    }
+
+    #[test]
+    fn toml_fd_denied() {
+        assert!(!crate::is_safe_command("fd pattern --exec rm"));
+        assert!(!crate::is_safe_command("fd pattern -x rm"));
+        assert!(!crate::is_safe_command("fd -t f pattern --exec-batch rm"));
+        assert!(!crate::is_safe_command("fd pattern -X rm"));
+        assert!(!crate::is_safe_command("fd -xH pattern"));
+        assert!(!crate::is_safe_command("fd -HX pattern"));
+        assert!(!crate::is_safe_command("fd"));
+    }
 }

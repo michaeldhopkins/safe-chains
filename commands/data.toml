@@ -1,4 +1,4 @@
-# Skipped custom handlers: dasel, mlr
+# Skipped custom handlers: dasel (denies put/delete positionals), mlr (denies -I/--in-place with positional_style)
 
 [[command]]
 name = "base64"
