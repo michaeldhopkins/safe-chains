@@ -38,9 +38,25 @@ struct TomlCommand {
     handler: Option<String>,
     #[serde(default)]
     require_any: Vec<String>,
+    #[serde(default)]
+    wrapper: Option<TomlWrapper>,
     #[allow(dead_code)]
     #[serde(default)]
     doc: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct TomlWrapper {
+    #[serde(default)]
+    standalone: Vec<String>,
+    #[serde(default)]
+    valued: Vec<String>,
+    #[serde(default)]
+    positional_skip: Option<usize>,
+    #[serde(default)]
+    separator: Option<String>,
+    #[serde(default)]
+    bare_ok: Option<bool>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -124,6 +140,13 @@ enum CommandKind {
     Structured {
         bare_flags: Vec<String>,
         subs: Vec<SubSpec>,
+    },
+    Wrapper {
+        standalone: Vec<String>,
+        valued: Vec<String>,
+        positional_skip: usize,
+        separator: Option<String>,
+        bare_ok: bool,
     },
     Custom {
         #[allow(dead_code)]
@@ -405,6 +428,21 @@ fn build_command(toml: TomlCommand) -> CommandSpec {
         };
     }
 
+    if let Some(w) = toml.wrapper {
+        return CommandSpec {
+            name: toml.name,
+            aliases: toml.aliases,
+            url: toml.url,
+            kind: CommandKind::Wrapper {
+                standalone: w.standalone,
+                valued: w.valued,
+                positional_skip: w.positional_skip.unwrap_or(0),
+                separator: w.separator,
+                bare_ok: w.bare_ok.unwrap_or(false),
+            },
+        };
+    }
+
     if !toml.sub.is_empty() || !toml.bare_flags.is_empty() {
         return CommandSpec {
             name: toml.name,
@@ -662,6 +700,55 @@ pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
                 .map(|s| dispatch_sub(&tokens[1..], s))
                 .unwrap_or(Verdict::Denied)
         }
+        CommandKind::Wrapper {
+            standalone,
+            valued,
+            positional_skip,
+            separator,
+            bare_ok,
+        } => {
+            let mut i = 1;
+            while i < tokens.len() {
+                let t = &tokens[i];
+                if let Some(sep) = separator
+                    && t == sep.as_str()
+                {
+                    i += 1;
+                    break;
+                }
+                if !t.starts_with('-') {
+                    break;
+                }
+                if valued.iter().any(|f| t == f.as_str()) {
+                    i += 2;
+                    continue;
+                }
+                if standalone.iter().any(|f| t == f.as_str()) {
+                    i += 1;
+                    continue;
+                }
+                i += 1;
+            }
+            for _ in 0..*positional_skip {
+                if i >= tokens.len() {
+                    return if *bare_ok {
+                        Verdict::Allowed(SafetyLevel::Inert)
+                    } else {
+                        Verdict::Denied
+                    };
+                }
+                i += 1;
+            }
+            if i >= tokens.len() {
+                return if *bare_ok {
+                    Verdict::Allowed(SafetyLevel::Inert)
+                } else {
+                    Verdict::Denied
+                };
+            }
+            let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
+            crate::command_verdict(&inner)
+        }
         CommandKind::Custom { handler_name } => {
             CMD_HANDLERS
                 .get(handler_name.as_str())
@@ -754,6 +841,9 @@ impl CommandSpec {
                 }
                 lines.sort();
                 lines.join("\n")
+            }
+            CommandKind::Wrapper { .. } => {
+                "- Recursively validates the inner command.".to_string()
             }
             CommandKind::Custom { .. } => String::new(),
         };
@@ -1931,6 +2021,151 @@ mod tests {
     }
 
     // ---------------------------------------------------------------
+    // ---------------------------------------------------------------
+    // Wrapper (delegate inner command)
+    // ---------------------------------------------------------------
+
+    #[test]
+    fn wrapper_delegates_safe_inner() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "timeout"
+            [command.wrapper]
+            valued = ["--signal", "--kill-after", "-s", "-k"]
+            standalone = ["--preserve-status"]
+            positional_skip = 1
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["timeout", "30", "echo", "hello"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn wrapper_rejects_unsafe_inner() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "timeout"
+            [command.wrapper]
+            positional_skip = 1
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["timeout", "30", "rm", "-rf", "/"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn wrapper_skips_flags_then_delegates() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "timeout"
+            [command.wrapper]
+            valued = ["--signal", "-s", "--kill-after", "-k"]
+            standalone = ["--preserve-status"]
+            positional_skip = 1
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["timeout", "-s", "KILL", "60", "echo", "hello"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["timeout", "--preserve-status", "120", "git", "status"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn wrapper_no_inner_denied() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "timeout"
+            [command.wrapper]
+            positional_skip = 1
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["timeout", "30"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn wrapper_bare_ok() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "env"
+            [command.wrapper]
+            valued = ["--unset", "-u"]
+            standalone = ["--ignore-environment", "-i"]
+            bare_ok = true
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["env"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn wrapper_bare_not_ok() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "time"
+            [command.wrapper]
+            standalone = ["-p"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["time"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn wrapper_with_separator() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "dotenv"
+            [command.wrapper]
+            valued = ["-c", "-e", "-f", "-v"]
+            separator = "--"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["dotenv", "-f", ".env", "--", "git", "status"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn wrapper_simple_no_flags() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "time"
+            [command.wrapper]
+            standalone = ["-p"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["time", "git", "log"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["time", "-p", "git", "log"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn wrapper_nested_delegation() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "nice"
+            [command.wrapper]
+            valued = ["-n", "--adjustment"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["nice", "-n", "10", "cargo", "test"]), &spec),
+            Verdict::Allowed(SafetyLevel::SafeRead),
+        );
+    }
+
     // Multiple commands in one file
     // ---------------------------------------------------------------
 

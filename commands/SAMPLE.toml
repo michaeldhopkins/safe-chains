@@ -43,6 +43,9 @@
 #   Does a flag promote the safety level (sk --history → SafeWrite)?
 #     → Use "write_flags"
 #
+#   Does the command wrap and delegate to an inner command (timeout, nice)?
+#     → Use "wrapper" with skip flags and positional_skip
+#
 #   Does the command need Rust code for validation (curl, perl, fzf)?
 #     → Use "handler" to reference a named Rust function
 #
@@ -216,6 +219,39 @@
 # [[command.sub]]
 # name = "exec"
 # delegate_after = "--"                  # validate everything after "--"
+
+# ─────────────────────────────────────────────────────────────────────
+# WRAPPER — command that wraps an inner command
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use for: timeout, time, nice, ionice, dotenv, and similar commands
+# that accept their own flags, optionally skip positional args (like a
+# duration or priority), then delegate everything remaining as a
+# complete inner command to be validated recursively.
+#
+# Fields:
+#   standalone  — wrapper's own flags that take no value
+#   valued      — wrapper's own flags that consume the next token
+#   positional_skip — number of positional args to skip before the
+#                     inner command (e.g., 1 for timeout's duration)
+#   separator   — stop scanning flags at this token (e.g., "--")
+#   bare_ok     — if true, running the wrapper with no inner command
+#                 is allowed (e.g., "env" alone lists variables)
+
+# [[command]]
+# name = "timeout"
+# url = "https://www.gnu.org/software/coreutils/..."
+# [command.wrapper]
+# standalone = ["--preserve-status"]
+# valued = ["--signal", "--kill-after", "-s", "-k"]
+# positional_skip = 1               # skip the duration argument
+#
+# [[command]]
+# name = "dotenv"
+# url = "https://github.com/bkeepers/dotenv"
+# [command.wrapper]
+# valued = ["-c", "-e", "-f", "-v"]
+# separator = "--"                   # stop flag scanning at "--"
 
 # ─────────────────────────────────────────────────────────────────────
 # CUSTOM HANDLER — requires Rust code for validation
