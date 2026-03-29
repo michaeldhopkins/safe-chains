@@ -1,0 +1,157 @@
+# Skipped CommandDef with Custom: npm (check_npm_run), bun (check_bun_x)
+# Skipped custom handler: yarn
+
+[[command]]
+name = "pnpm"
+url = "https://pnpm.io/pnpm-cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--dev", "--help", "--json", "--long", "--no-optional", "--parseable", "--production", "--recursive", "-P", "-h", "-r"]
+valued = ["--depth", "--filter"]
+
+[[command.sub]]
+name = "ls"
+level = "Inert"
+standalone = ["--dev", "--help", "--json", "--long", "--no-optional", "--parseable", "--production", "--recursive", "-P", "-h", "-r"]
+valued = ["--depth", "--filter"]
+
+[[command.sub]]
+name = "audit"
+level = "Inert"
+standalone = ["--help", "--json", "--recursive", "-h", "-r"]
+valued = ["--filter"]
+
+[[command.sub]]
+name = "outdated"
+level = "Inert"
+standalone = ["--help", "--json", "--recursive", "-h", "-r"]
+valued = ["--filter"]
+
+[[command.sub]]
+name = "why"
+level = "Inert"
+standalone = ["--help", "--json", "--recursive", "-h", "-r"]
+valued = ["--filter"]
+
+[[command]]
+name = "deno"
+url = "https://docs.deno.com/runtime/reference/cli/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+standalone = ["--help", "--json", "--no-lock", "--quiet", "--unstable", "-h", "-q"]
+valued = ["--config", "--import-map", "-c"]
+
+[[command.sub]]
+name = "doc"
+level = "Inert"
+standalone = ["--help", "--json", "--no-lock", "--quiet", "--unstable", "-h", "-q"]
+valued = ["--config", "--import-map", "-c"]
+
+[[command.sub]]
+name = "fmt"
+guard = "--check"
+level = "Inert"
+bare = false
+standalone = ["--check", "--help", "--no-semicolons", "--single-quote", "--unstable", "-h", "-q"]
+valued = ["--config", "--ext", "--ignore", "--indent-width", "--line-width", "--log-level", "--prose-wrap", "-c"]
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+standalone = ["--help", "--json", "--no-lock", "--quiet", "--unstable", "-h", "-q"]
+valued = ["--config", "--import-map", "-c"]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+standalone = ["--help", "--json", "--no-lock", "--quiet", "--unstable", "-h", "-q"]
+valued = ["--config", "--import-map", "-c"]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+standalone = ["--help", "--json", "--no-lock", "--quiet", "--unstable", "-h", "-q"]
+valued = ["--config", "--import-map", "-c"]
+
+[[command]]
+name = "nvm"
+url = "https://github.com/nvm-sh/nvm#readme"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "current"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]
+
+[[command.sub]]
+name = "ls"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]
+
+[[command.sub]]
+name = "ls-remote"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]
+
+[[command.sub]]
+name = "version"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]
+
+[[command.sub]]
+name = "which"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]
+
+[[command]]
+name = "fnm"
+url = "https://github.com/Schniz/fnm#readme"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "current"
+level = "Inert"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "default"
+level = "Inert"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ls-remote"
+level = "Inert"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "volta"
+url = "https://docs.volta.sh/reference"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--current", "--default", "--help", "-c", "-d", "-h"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "which"
+level = "Inert"
+standalone = ["--current", "--default", "--help", "-c", "-d", "-h"]
+valued = ["--format"]

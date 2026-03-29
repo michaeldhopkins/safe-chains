@@ -1,12 +1,7 @@
 mod bun;
 mod bunx;
-mod deno;
-mod fnm;
 mod npm;
 mod npx;
-mod nvm;
-mod pnpm;
-mod volta;
 mod yarn;
 
 use crate::parse::{Token, WordSet, has_flag};
@@ -14,12 +9,7 @@ use crate::verdict::Verdict;
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
 pub(crate) use bun::BUN;
-pub(crate) use deno::DENO;
-pub(crate) use fnm::FNM;
 pub(crate) use npm::NPM;
-pub(crate) use nvm::NVM;
-pub(crate) use pnpm::PNPM;
-pub(crate) use volta::VOLTA;
 
 pub(super) static NPX_SAFE: WordSet =
     WordSet::new(&["@herb-tools/linter", "eslint", "karma"]);
@@ -90,28 +80,18 @@ pub(super) fn is_safe_runner_package(tokens: &[Token], pkg_idx: usize) -> bool {
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     NPM.dispatch(cmd, tokens)
         .or_else(|| yarn::dispatch(cmd, tokens))
-        .or_else(|| PNPM.dispatch(cmd, tokens))
         .or_else(|| BUN.dispatch(cmd, tokens))
-        .or_else(|| DENO.dispatch(cmd, tokens))
         .or_else(|| npx::dispatch(cmd, tokens))
         .or_else(|| bunx::dispatch(cmd, tokens))
-        .or_else(|| NVM.dispatch(cmd, tokens))
-        .or_else(|| FNM.dispatch(cmd, tokens))
-        .or_else(|| VOLTA.dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs = Vec::new();
     docs.push(NPM.to_doc());
     docs.extend(yarn::command_docs());
-    docs.push(PNPM.to_doc());
     docs.push(BUN.to_doc());
     docs.extend(bunx::command_docs());
-    docs.push(DENO.to_doc());
     docs.extend(npx::command_docs());
-    docs.push(NVM.to_doc());
-    docs.push(FNM.to_doc());
-    docs.push(VOLTA.to_doc());
     docs
 }
 

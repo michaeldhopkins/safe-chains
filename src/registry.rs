@@ -545,7 +545,9 @@ static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| 
     all.extend(load_toml(include_str!("../commands/hash.toml")));
     all.extend(load_toml(include_str!("../commands/jvm.toml")));
     all.extend(load_toml(include_str!("../commands/net.toml")));
+    all.extend(load_toml(include_str!("../commands/node.toml")));
     all.extend(load_toml(include_str!("../commands/ruby.toml")));
+    all.extend(load_toml(include_str!("../commands/rust.toml")));
     all.extend(load_toml(include_str!("../commands/search.toml")));
     all.extend(load_toml(include_str!("../commands/sysinfo.toml")));
     all.extend(load_toml(include_str!("../commands/system.toml")));

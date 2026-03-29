@@ -237,7 +237,6 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `cargo` (https://doc.rust-lang.org/cargo/commands/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **audit**: Flags: --deny, --help, --json, --no-fetch, --stale, -h, -n, -q, -v. Valued: --color, --db, --file, --ignore, --target-arch, --target-os, -f
 - **bench**: Flags: --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, -h, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **build**: Flags: --all-features, --all-targets, --benches, --bins, --build-plan, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, -h, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
@@ -261,8 +260,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **test**: Flags: --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, -h, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **tree**: Flags: --all-features, --duplicates, --frozen, --help, --ignore-rust-version, --locked, --no-dedupe, --no-default-features, --offline, -d, -e, -h, -i, -q, -v. Valued: --charset, --color, --config, --depth, --edges, --features, --format, --invert, --manifest-path, --package, --prefix, --prune, --target, -p
 - **verify-project**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --manifest-path
-
-+toolchain selectors (e.g. +nightly) are skipped.
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `cat` (https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation)
 
@@ -460,13 +458,13 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `deno` (https://docs.deno.com/runtime/reference/cli/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **check**: Flags: --help, --json, --no-lock, --quiet, --unstable, -h, -q. Valued: --config, --import-map, -c
 - **doc**: Flags: --help, --json, --no-lock, --quiet, --unstable, -h, -q. Valued: --config, --import-map, -c
 - **fmt** (requires --check): Flags: --check, --help, --no-semicolons, --single-quote, --unstable, -h, -q. Valued: --config, --ext, --ignore, --indent-width, --line-width, --log-level, --prose-wrap, -c
 - **info**: Flags: --help, --json, --no-lock, --quiet, --unstable, -h, -q. Valued: --config, --import-map, -c
 - **lint**: Flags: --help, --json, --no-lock, --quiet, --unstable, -h, -q. Valued: --config, --import-map, -c
 - **test**: Flags: --help, --json, --no-lock, --quiet, --unstable, -h, -q. Valued: --config, --import-map, -c
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `detekt` (https://detekt.dev/docs/gettingstarted/cli/)
 
@@ -685,11 +683,11 @@ Aliases: `fly`
 
 ### `fnm` (https://github.com/Schniz/fnm#readme)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **current**: Flags: --help, -h
 - **default**: Flags: --help, -h
 - **list**: Flags: --help, -h
 - **ls-remote**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `fold` (https://www.gnu.org/software/coreutils/manual/coreutils.html#fold-invocation)
 
@@ -829,12 +827,12 @@ Aliases: `gradlew`
 
 ### `grep` (https://www.gnu.org/software/grep/manual/grep.html)
 
-Aliases: `egrep`, `fgrep`
-
 - Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z
 - Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m
 
 ### `grep` (https://www.gnu.org/software/grep/manual/grep.html)
+
+Aliases: `egrep`, `fgrep`
 
 - Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z
 - Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m
@@ -1107,12 +1105,12 @@ Aliases: `egrep`, `fgrep`
 
 ### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
 
-Aliases: `mlocate`, `plocate`
-
 - Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
 - Allowed valued flags: --database, --limit, -d, -l, -n
 
 ### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
+
+Aliases: `mlocate`, `plocate`
 
 - Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
 - Allowed valued flags: --database, --limit, -d, -l, -n
@@ -1309,13 +1307,13 @@ Aliases: `mlocate`, `plocate`
 
 ### `nvm` (https://github.com/nvm-sh/nvm#readme)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **current**: Flags: --help, --lts, --no-colors, -h
 - **list**: Flags: --help, --lts, --no-colors, -h
 - **ls**: Flags: --help, --lts, --no-colors, -h
 - **ls-remote**: Flags: --help, --lts, --no-colors, -h
 - **version**: Flags: --help, --lts, --no-colors, -h
 - **which**: Flags: --help, --lts, --no-colors, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `od` (https://www.gnu.org/software/coreutils/manual/coreutils.html#od-invocation)
 
@@ -1448,12 +1446,12 @@ Aliases: `pip3`
 
 ### `pnpm` (https://pnpm.io/pnpm-cli)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **audit**: Flags: --help, --json, --recursive, -h, -r. Valued: --filter
 - **list**: Flags: --dev, --help, --json, --long, --no-optional, --parseable, --production, --recursive, -P, -h, -r. Valued: --depth, --filter
 - **ls**: Flags: --dev, --help, --json, --long, --no-optional, --parseable, --production, --recursive, -P, -h, -r. Valued: --depth, --filter
 - **outdated**: Flags: --help, --json, --recursive, -h, -r. Valued: --filter
 - **why**: Flags: --help, --json, --recursive, -h, -r. Valued: --filter
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `pod` (https://guides.cocoapods.org/terminal/commands.html)
 
@@ -1635,14 +1633,13 @@ Aliases: `pip3`
 
 ### `rustup` (https://rust-lang.github.io/rustup/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **component list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
 - **doc**: Flags: --alloc, --book, --cargo, --core, --edition-guide, --embedded-book, --help, --nomicon, --path, --proc_macro, --reference, --rust-by-example, --rustc, --rustdoc, --std, --test, --unstable-book, -h. Valued: --toolchain
-- **run**: run <toolchain> delegates to inner command.
 - **show**: Flags: --help, --installed, -h, -v
 - **target list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
 - **toolchain list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
 - **which**: Flags: --help, -h. Valued: --toolchain
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `safe-chains` (https://github.com/michaeldhopkins/safe-chains#readme)
 
@@ -2015,9 +2012,9 @@ Aliases: `[`
 
 ### `volta` (https://docs.volta.sh/reference)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **list**: Flags: --current, --default, --help, -c, -d, -h. Valued: --format
 - **which**: Flags: --current, --default, --help, -c, -d, -h. Valued: --format
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `w` (https://man7.org/linux/man-pages/man1/w.1.html)
 
@@ -2139,12 +2136,12 @@ Aliases: `[`
 
 ### `zcat` (https://man7.org/linux/man-pages/man1/zcat.1.html)
 
-Aliases: `gzcat`
-
 - Allowed standalone flags: -V, -f, -h, -q, -v, --force, --help, --quiet, --verbose, --version
 - Bare invocation allowed
 
 ### `zcat` (https://man7.org/linux/man-pages/man1/zcat.1.html)
+
+Aliases: `gzcat`
 
 - Allowed standalone flags: -V, -f, -h, -q, -v, --force, --help, --quiet, --verbose, --version
 - Bare invocation allowed
