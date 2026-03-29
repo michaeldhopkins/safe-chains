@@ -1,5 +1,257 @@
-# Skipped CommandDef: aapt2, apkanalyzer, apksigner, avdmanager, bundletool
 # Skipped custom handlers: adb, zipalign
+
+[[command]]
+name = "aapt2"
+url = "https://developer.android.com/tools/aapt2"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "dump"
+[[command.sub.sub]]
+name = "badging"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "configurations"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "permissions"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "resources"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "strings"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "styleparents"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "xmlstrings"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "xmltree"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+
+[[command.sub]]
+name = "version"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "apkanalyzer"
+url = "https://developer.android.com/tools/apkanalyzer"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "apk"
+[[command.sub.sub]]
+name = "compare"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "download-size"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "features"
+bare = false
+standalone = ["--help", "--not-required", "-h"]
+[[command.sub.sub]]
+name = "file-size"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "summary"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dex"
+[[command.sub.sub]]
+name = "code"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "list"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "packages"
+bare = false
+standalone = ["--defined-only", "--help", "-h"]
+valued = ["--files", "--proguard-folder", "--proguard-mappings", "--proguard-seeds", "--proguard-usages"]
+[[command.sub.sub]]
+name = "references"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "files"
+[[command.sub.sub]]
+name = "cat"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "list"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "manifest"
+[[command.sub.sub]]
+name = "application-id"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "debuggable"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "min-sdk"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "permissions"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "print"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "target-sdk"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "version-code"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "version-name"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "resources"
+[[command.sub.sub]]
+name = "configs"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--config", "--name", "--type"]
+[[command.sub.sub]]
+name = "names"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--config", "--name", "--type"]
+[[command.sub.sub]]
+name = "value"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--config", "--name", "--type"]
+[[command.sub.sub]]
+name = "xml"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "apksigner"
+url = "https://developer.android.com/tools/apksigner"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "help"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "verify"
+bare = false
+standalone = ["--help", "--print-certs", "--verbose", "-h", "-v"]
+valued = ["--in", "--max-sdk-version", "--min-sdk-version"]
+
+[[command.sub]]
+name = "version"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "avdmanager"
+url = "https://developer.android.com/tools/avdmanager"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+[[command.sub.sub]]
+name = "avd"
+standalone = ["--compact", "--help", "-c", "-h"]
+[[command.sub.sub]]
+name = "device"
+standalone = ["--compact", "--help", "-c", "-h"]
+[[command.sub.sub]]
+name = "target"
+standalone = ["--compact", "--help", "-c", "-h"]
+
+[[command]]
+name = "bundletool"
+url = "https://developer.android.com/tools/bundletool"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "dump"
+[[command.sub.sub]]
+name = "config"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--bundle", "--module", "--xpath"]
+[[command.sub.sub]]
+name = "manifest"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--bundle", "--module", "--xpath"]
+[[command.sub.sub]]
+name = "resources"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--bundle", "--module", "--xpath"]
+
+[[command.sub]]
+name = "get-size"
+[[command.sub.sub]]
+name = "total"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--apks", "--device-spec", "--dimensions", "--modules"]
+
+[[command.sub]]
+name = "validate"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--bundle"]
+
+[[command.sub]]
+name = "version"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]
 
 [[command]]
 name = "emulator"

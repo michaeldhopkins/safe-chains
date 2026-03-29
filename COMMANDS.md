@@ -19,7 +19,6 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `aapt2` (https://developer.android.com/tools/aapt2)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **dump badging**: Flags: --help, --no-values, -h, -v. Valued: --config, --file
 - **dump configurations**: Flags: --help, --no-values, -h, -v. Valued: --config, --file
 - **dump permissions**: Flags: --help, --no-values, -h, -v. Valued: --config, --file
@@ -29,6 +28,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **dump xmlstrings**: Flags: --help, --no-values, -h, -v. Valued: --config, --file
 - **dump xmltree**: Flags: --help, --no-values, -h, -v. Valued: --config, --file
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `ack` (https://beyondgrep.com/documentation/)
 
@@ -63,7 +63,6 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `apkanalyzer` (https://developer.android.com/tools/apkanalyzer)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **apk compare**: Flags: --help, -h
 - **apk download-size**: Flags: --help, -h
 - **apk features**: Flags: --help, --not-required, -h
@@ -87,13 +86,14 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **resources names**: Flags: --help, -h. Valued: --config, --name, --type
 - **resources value**: Flags: --help, -h. Valued: --config, --name, --type
 - **resources xml**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `apksigner` (https://developer.android.com/tools/apksigner)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **help**: Flags: --help, -h
 - **verify**: Flags: --help, --print-certs, --verbose, -h, -v. Valued: --in, --max-sdk-version, --min-sdk-version
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `arch` (https://www.gnu.org/software/coreutils/manual/coreutils.html#arch-invocation)
 
@@ -114,10 +114,10 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `avdmanager` (https://developer.android.com/tools/avdmanager)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **list avd**: Flags: --compact, --help, -c, -h
 - **list device**: Flags: --compact, --help, -c, -h
 - **list target**: Flags: --compact, --help, -c, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `awk / gawk / mawk / nawk` (https://www.gnu.org/software/gawk/manual/gawk.html)
 
@@ -215,13 +215,13 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `bundletool` (https://developer.android.com/tools/bundletool)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **dump config**: Flags: --help, -h. Valued: --bundle, --module, --xpath
 - **dump manifest**: Flags: --help, -h. Valued: --bundle, --module, --xpath
 - **dump resources**: Flags: --help, -h. Valued: --bundle, --module, --xpath
 - **get-size total**: Flags: --help, -h. Valued: --apks, --device-spec, --dimensions, --modules
 - **validate**: Flags: --help, -h. Valued: --bundle
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `bunx` (https://bun.sh/docs/cli/bunx)
 
@@ -507,7 +507,6 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `docker` (https://docs.docker.com/reference/cli/docker/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **buildx --version**
 - **buildx inspect**: Flags: --help, -h
 - **buildx ls**: Flags: --help, -h
@@ -552,6 +551,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **version**: Flags: --help, -h. Valued: --format, -f
 - **volume inspect**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **volume ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `dotenv` (https://github.com/bkeepers/dotenv)
 
@@ -1100,17 +1100,17 @@ Aliases: `egrep`, `fgrep`
 
 ### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
 
-- Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
-- Allowed valued flags: --database, --limit, -d, -l, -n
-
-### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
-
-- Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
-- Allowed valued flags: --database, --limit, -d, -l, -n
-
-### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
-
 Aliases: `mlocate`, `plocate`
+
+- Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
+- Allowed valued flags: --database, --limit, -d, -l, -n
+
+### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
+
+- Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
+- Allowed valued flags: --database, --limit, -d, -l, -n
+
+### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
 
 - Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
 - Allowed valued flags: --database, --limit, -d, -l, -n
@@ -1335,21 +1335,33 @@ Aliases: `mlocate`, `plocate`
 - **stats**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
-### `orbctl` (https://docs.orbstack.dev/cli)
+### `orb` (https://docs.orbstack.dev/cli)
 
-Aliases: `orb`
-
-- Allowed standalone flags: --help, --version, -V, -h
 - **config get**: Flags: --help, -h
 - **config show**: Flags: --help, -h
-- **default**: bare invocation only (reads current default)
-- **doctor**: read-only check (rejects --fix)
+- **default**: Flags: --help, -h
+- **doctor**: Flags: --help, -h
 - **info**: Flags: --help, -h. Valued: --format, -f
 - **list**: Flags: --help, --quiet, --running, -h, -q, -r. Valued: --format, -f
 - **logs**: Flags: --all, --help, -a, -h
 - **status**: Flags: --help, -h
 - **update** (requires --check): Flags: --check, --help, -h
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
+### `orbctl` (https://docs.orbstack.dev/cli)
+
+- **config get**: Flags: --help, -h
+- **config show**: Flags: --help, -h
+- **default**: Flags: --help, -h
+- **doctor**: Flags: --help, -h
+- **info**: Flags: --help, -h. Valued: --format, -f
+- **list**: Flags: --help, --quiet, --running, -h, -q, -r. Valued: --format, -f
+- **logs**: Flags: --all, --help, -a, -h
+- **status**: Flags: --help, -h
+- **update** (requires --check): Flags: --check, --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `otool` (https://ss64.com/mac/otool.html)
 
@@ -1465,7 +1477,6 @@ Aliases: `pip3`
 
 ### `podman` (https://docs.podman.io/en/latest/Commands.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **buildx --version**
 - **buildx inspect**: Flags: --help, -h
 - **buildx ls**: Flags: --help, -h
@@ -1510,6 +1521,7 @@ Aliases: `pip3`
 - **version**: Flags: --help, -h. Valued: --format, -f
 - **volume inspect**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **volume ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `poetry` (https://python-poetry.org/docs/cli/)
 
@@ -1561,13 +1573,13 @@ Aliases: `pip3`
 
 ### `qemu-img` (https://www.qemu.org/docs/master/tools/qemu-img.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **check**: Flags: --force-share, --help, --image-opts, --quiet, -U, -h, -q. Valued: --cache, --format, --object, --output, -T, -f
 - **compare**: Flags: --force-share, --help, --image-opts, --progress, --quiet, --strict, -U, -h, -p, -q, -s. Valued: --a-format, --b-format, --cache, --object, -F, -T, -f
 - **info**: Flags: --backing-chain, --force-share, --help, --image-opts, --limits, -U, -h. Valued: --cache, --format, --object, --output, -f, -t
 - **map**: Flags: --force-share, --help, --image-opts, -U, -h. Valued: --format, --max-length, --object, --output, --start-offset, -f, -l, -s
 - **measure**: Flags: --force-share, --help, --image-opts, -U, -h. Valued: --format, --object, --output, --size, --snapshot, --target-format, -O, -f, -l, -o, -s
-- **snapshot**: list-only (rejects -a, -c, -d)
+- **snapshot**: Flags: --force-share, --help, --image-opts, --list, --quiet, -U, -h, -l, -q. Valued: --format, --object, -f
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `R` (https://cran.r-project.org/manuals.html)
 
@@ -1863,12 +1875,12 @@ Aliases: `pip3`
 
 ### `test` (https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation)
 
-Aliases: `[`
-
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
 ### `test` (https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation)
+
+Aliases: `[`
 
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
@@ -2154,12 +2166,12 @@ Aliases: `gzcat`
 
 ### `zgrep` (https://man7.org/linux/man-pages/man1/zgrep.1.html)
 
+Aliases: `zegrep`, `zfgrep`
+
 - Allowed standalone flags: --count, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --invert-match, --line-number, --no-filename, --only-matching, --quiet, --silent, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -L, -V, -Z, -c, -h, -i, -l, -n, -o, -q, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --file, --max-count, --regexp, -A, -B, -C, -e, -f, -m
 
 ### `zgrep` (https://man7.org/linux/man-pages/man1/zgrep.1.html)
-
-Aliases: `zegrep`, `zfgrep`
 
 - Allowed standalone flags: --count, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --invert-match, --line-number, --no-filename, --only-matching, --quiet, --silent, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -L, -V, -Z, -c, -h, -i, -l, -n, -o, -q, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --file, --max-count, --regexp, -A, -B, -C, -e, -f, -m

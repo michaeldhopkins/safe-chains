@@ -64,7 +64,7 @@ const HANDLED_CMDS: &[&str] = &[
     "swift",
     "dotnet",
     "curl",
-    "docker", "podman", "kubectl", "orbctl", "qemu-img",
+    "docker", "podman", "kubectl", "orbctl", "orb", "qemu-img",
     "ollama", "llm", "hf", "claude", "aider", "codex", "opencode", "vibe",
     "ddev", "dcli",
     "brew", "mise", "asdf", "crontab", "defaults", "pmset", "sysctl", "cmake", "psql", "pg_isready",
@@ -148,9 +148,6 @@ pub(crate) enum SubEntry {
 use crate::command::CommandDef;
 
 const COMMAND_DEFS: &[&CommandDef] = &[
-    &containers::DOCKER, &containers::PODMAN, &containers::ORBCTL, &containers::QEMU_IMG,
-    &android::APKANALYZER, &android::APKSIGNER, &android::BUNDLETOOL, &android::AAPT2,
-    &android::AVDMANAGER,
     &node::NPM, &node::BUN,
     &python::CONDA,
     &ruby::BUNDLE,
