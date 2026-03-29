@@ -524,6 +524,13 @@ pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
                         },
                         level: *level,
                     },
+                    CommandKind::Wrapper { standalone, valued, positional_skip, separator, bare_ok } => CommandKind::Wrapper {
+                        standalone: standalone.clone(),
+                        valued: valued.clone(),
+                        positional_skip: *positional_skip,
+                        separator: separator.clone(),
+                        bare_ok: *bare_ok,
+                    },
                     _ => continue,
                 },
             });
@@ -795,6 +802,7 @@ static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| 
     all.extend(load_toml(include_str!("../commands/system.toml")));
     all.extend(load_toml(include_str!("../commands/text.toml")));
     all.extend(load_toml(include_str!("../commands/tools.toml")));
+    all.extend(load_toml(include_str!("../commands/wrappers.toml")));
     all.extend(load_toml(include_str!("../commands/xcode.toml")));
     build_registry(all)
 });
