@@ -67,6 +67,8 @@ struct TomlSub {
     #[serde(default)]
     nested_bare: Option<bool>,
     #[serde(default)]
+    require_any: Vec<String>,
+    #[serde(default)]
     write_flags: Vec<String>,
     #[serde(default)]
     delegate_after: Option<String>,
@@ -149,6 +151,11 @@ enum SubKind {
         policy: OwnedPolicy,
         base_level: SafetyLevel,
         write_flags: Vec<String>,
+    },
+    RequireAny {
+        require_any: Vec<String>,
+        policy: OwnedPolicy,
+        level: SafetyLevel,
     },
     DelegateAfterSeparator {
         separator: String,
@@ -348,6 +355,17 @@ fn build_sub(toml: TomlSub) -> SubSpec {
         };
     }
 
+    if !toml.require_any.is_empty() {
+        return SubSpec {
+            name: toml.name,
+            kind: SubKind::RequireAny {
+                require_any: toml.require_any,
+                policy,
+                level,
+            },
+        };
+    }
+
     SubSpec {
         name: toml.name,
         kind: SubKind::Policy { policy, level },
@@ -491,6 +509,27 @@ fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
                 Verdict::Allowed(SafetyLevel::SafeWrite)
             } else {
                 Verdict::Allowed(*base_level)
+            }
+        }
+        SubKind::RequireAny {
+            require_any,
+            policy,
+            level,
+        } => {
+            if tokens.len() == 2
+                && (tokens[1] == "--help" || tokens[1] == "-h")
+            {
+                return Verdict::Allowed(SafetyLevel::Inert);
+            }
+            let has_required = tokens[1..].iter().any(|t| {
+                require_any.iter().any(|r| {
+                    t == r.as_str() || t.as_str().starts_with(&format!("{r}="))
+                })
+            });
+            if has_required && check_owned(tokens, policy) {
+                Verdict::Allowed(*level)
+            } else {
+                Verdict::Denied
             }
         }
         SubKind::DelegateAfterSeparator { separator } => {
@@ -695,6 +734,15 @@ impl SubSpec {
                     out.push(format!("- **{label}**"));
                 } else {
                     out.push(format!("- **{label}**: {summary}"));
+                }
+            }
+            SubKind::RequireAny { require_any, policy, .. } => {
+                let req = require_any.join(", ");
+                let summary = policy.flag_summary();
+                if summary.is_empty() {
+                    out.push(format!("- **{label}** (requires {req})"));
+                } else {
+                    out.push(format!("- **{label}** (requires {req}): {summary}"));
                 }
             }
             SubKind::DelegateAfterSeparator { .. } | SubKind::DelegateSkip { .. } => {}
@@ -1315,6 +1363,137 @@ mod tests {
         assert_eq!(
             dispatch_spec(&toks(&["git", "help", "commit", "--verbose"]), &spec),
             Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    // ---------------------------------------------------------------
+    // RequireAny
+    // ---------------------------------------------------------------
+
+    #[test]
+    fn require_any_with_required_flag() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "conda"
+            bare_flags = ["--help", "--version", "-V", "-h"]
+
+            [[command.sub]]
+            name = "config"
+            bare = false
+            require_any = ["--show", "--show-sources"]
+            standalone = ["--help", "--json", "--quiet", "--show", "--show-sources", "--verbose", "-h", "-q", "-v"]
+            valued = ["--env", "--file", "--name", "--prefix", "-f", "-n", "-p"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["conda", "config", "--show"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["conda", "config", "--show-sources"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["conda", "config", "--show", "--json"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn require_any_without_required_flag() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "conda"
+
+            [[command.sub]]
+            name = "config"
+            bare = false
+            require_any = ["--show", "--show-sources"]
+            standalone = ["--help", "--json", "--show", "--show-sources", "-h"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["conda", "config", "--json"]), &spec),
+            Verdict::Denied,
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["conda", "config"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn require_any_allows_help() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "conda"
+
+            [[command.sub]]
+            name = "config"
+            bare = false
+            require_any = ["--show"]
+            standalone = ["--help", "--show", "-h"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["conda", "config", "--help"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["conda", "config", "-h"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn require_any_rejects_unknown_flags() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "conda"
+
+            [[command.sub]]
+            name = "config"
+            bare = false
+            require_any = ["--show"]
+            standalone = ["--help", "--show", "-h"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["conda", "config", "--show", "--evil"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn require_any_with_eq_syntax() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "tool"
+
+            [[command.sub]]
+            name = "sub"
+            bare = false
+            require_any = ["--mode"]
+            standalone = ["--help"]
+            valued = ["--mode"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "sub", "--mode=check"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn require_any_rejects_unlisted_extra_flags() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "conda"
+
+            [[command.sub]]
+            name = "config"
+            bare = false
+            require_any = ["--show", "--show-sources"]
+            standalone = ["--help", "--show", "--show-sources", "-h"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["conda", "config", "--show", "--set"]), &spec),
+            Verdict::Denied,
         );
     }
 
