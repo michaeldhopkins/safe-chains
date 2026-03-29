@@ -4,7 +4,6 @@ mod pmset;
 mod sysctl;
 mod tmux;
 
-use crate::command::FlatDef;
 use crate::verdict::Verdict;
 use crate::parse::Token;
 
@@ -14,10 +13,6 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
         .or_else(|| sysctl::dispatch(cmd, tokens))
         .or_else(|| tmux::dispatch(cmd, tokens))
         .or_else(|| networksetup::dispatch(cmd, tokens))
-}
-
-pub(crate) fn system_flat_defs() -> Vec<&'static FlatDef> {
-    Vec::new()
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
