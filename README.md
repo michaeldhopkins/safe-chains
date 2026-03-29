@@ -190,12 +190,16 @@ cargo clippy -- -D warnings
 
 Adding a new command:
 
-1. Add constants and handler function in the appropriate `src/handlers/` module
-2. Register it in the dispatch match in `src/handlers/mod.rs`
-3. Add `#[cfg(test)]` tests in the handler module covering both allow and deny cases
+Most commands are defined as TOML in the `commands/` directory. See [`commands/SAMPLE.toml`](commands/SAMPLE.toml) for a documented reference of every supported field and when to use each one.
+
+1. Add the command to the appropriate `commands/*.toml` file (or create a new one)
+2. If you created a new file, register it in `src/registry.rs` via `include_str!`
+3. Add the command name to `HANDLED_CMDS` in `src/handlers/mod.rs`
 4. Run `cargo test` and `cargo clippy -- -D warnings`
 5. Run `./generate-docs.sh` to regenerate COMMANDS.md
 6. Run `cargo install --path .` to update the installed binary
+
+For commands that need custom validation logic (rare — see SAMPLE.toml for guidance), add a Rust handler in `src/handlers/` and reference it with `handler = "name"` in the TOML.
 
 ---
 

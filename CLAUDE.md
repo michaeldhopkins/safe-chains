@@ -28,7 +28,10 @@ Regenerates COMMANDS.md and updates the installed binary.
 
 ## Development
 
-- When adding a new command handler: add the handler in the appropriate `src/handlers/` module, register in `src/handlers/mod.rs` dispatch, add `command_docs()` entries, add `#[cfg(test)]` tests covering both allow and deny, run the test suite, clippy, and `./generate-docs.sh`
+- Most commands are defined as TOML in `commands/*.toml`. See `commands/SAMPLE.toml` for the complete field reference — it documents every field type, when to use each one, and how they compose. Always check SAMPLE.toml before adding a new field type to ensure you aren't duplicating what existing fields already cover.
+- When adding a new command: add it to the appropriate `commands/*.toml` file, add the name to `HANDLED_CMDS` in `src/handlers/mod.rs`, run the test suite, clippy, and `./generate-docs.sh`. If you create a new TOML file, register it in `src/registry.rs` via `include_str!`.
+- When adding a new TOML field type: design and thoroughly test the generic handler in `src/registry.rs` before using it in any data file. Add comprehensive tests covering every edge case. Update `commands/SAMPLE.toml` with documentation for the new field.
+- Commands that need custom Rust validation (curl headers, perl AST, fzf --bind parsing) use `handler = "name"` in TOML and a Rust function in `src/handlers/`. This is a last resort — most commands can be expressed declaratively.
 - Do not add comments to code
 - All files must end with a newline
 - Bump the version in `Cargo.toml` with each commit using semver: patch for bug fixes, minor for new commands/features, major for breaking changes

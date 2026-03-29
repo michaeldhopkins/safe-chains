@@ -1,0 +1,209 @@
+# SAMPLE.toml — Reference for all supported TOML command definition fields.
+#
+# This file is not loaded by safe-chains. It documents every field the
+# registry understands, when to use each one, and how they compose.
+# Copy the pattern that matches your command and fill in the data.
+#
+# CORE PRINCIPLE: This is an allowlist. Only what you list is allowed.
+# Omitted flags, subcommands, and arguments are implicitly not allowed.
+# Never describe what is blocked — just list what is permitted.
+#
+# FIELD DEFAULTS (omit when the default is what you want):
+#   level       = "Inert"    (alternatives: "SafeRead", "SafeWrite")
+#   bare        = true       (command can run with no arguments)
+#   positional_style = false (unknown flags are rejected; if true, they're
+#                             treated as positional arguments)
+#
+# CHOOSING THE RIGHT PATTERN:
+#
+#   Is the command a simple tool with flags and positional args?
+#     → Use "Flat command" (grep, cat, jq, bat, etc.)
+#
+#   Does the command have subcommands (git log, cargo build, etc.)?
+#     → Use "Structured command with subcommands"
+#
+#   Does a subcommand require a specific flag to be safe (cargo fmt --check)?
+#     → Use "guard" on the sub
+#
+#   Does a subcommand have its own sub-subcommands (npm config get)?
+#     → Use nested [[command.sub.sub]]
+#
+#   Does a subcommand delegate to an inner command (rustup run stable echo)?
+#     → Use "delegate_skip" or "delegate_after"
+#
+#   Does a subcommand accept anything (git help)?
+#     → Use "allow_all = true"
+#
+#   Does a flag promote the safety level (sk --history → SafeWrite)?
+#     → Use "write_flags"
+#
+#   Does the command need Rust code for validation (curl, perl, fzf)?
+#     → Use "handler" to reference a named Rust function
+#
+# ─────────────────────────────────────────────────────────────────────
+# FLAT COMMAND — simple tool with flags and positional args
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use for: grep, cat, jq, ls, bat, wc, and most CLI tools.
+# A flat command has no subcommands — just flags and file arguments.
+
+# [[command]]
+# name = "grep"
+# aliases = ["egrep", "fgrep"]          # optional; registers additional names
+# url = "https://www.gnu.org/software/grep/manual/grep.html"
+# level = "Inert"                        # Inert | SafeRead | SafeWrite
+# bare = false                           # false = requires at least one argument
+# # max_positional = 2                   # optional; limits positional arg count
+# # positional_style = true              # optional; treats unknown -flags as args
+# standalone = [                         # flags that take no value
+#     "--count", "--help", "--recursive", "--version",
+#     "-c", "-h", "-i", "-r", "-V",
+# ]
+# valued = [                             # flags that consume the next token as value
+#     "--after-context", "--max-count",   # also accepts --max-count=5 syntax
+#     "-A", "-m",
+# ]
+
+# ─────────────────────────────────────────────────────────────────────
+# STRUCTURED COMMAND — has subcommands
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use for: cargo, git, docker, npm, brew, etc.
+# bare_flags are accepted when the command is invoked alone (e.g. cargo --help).
+# Each [[command.sub]] defines one allowed subcommand.
+
+# [[command]]
+# name = "cargo"
+# url = "https://doc.rust-lang.org/cargo/commands/"
+# bare_flags = ["--help", "--version", "-V", "-h"]   # allowed with just the flag
+#
+# [[command.sub]]
+# name = "test"
+# level = "SafeRead"
+# standalone = ["--release", "--no-fail-fast", "-h"]
+# valued = ["--jobs", "--package", "-j", "-p"]
+#
+# [[command.sub]]
+# name = "build"
+# level = "SafeWrite"
+# standalone = ["--release", "-h"]
+# valued = ["--jobs", "--target", "-j"]
+
+# ─────────────────────────────────────────────────────────────────────
+# GUARDED SUBCOMMAND — requires a specific flag to be present
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use when a subcommand is only safe with a particular flag.
+# Example: "cargo fmt" is a write operation, but "cargo fmt --check" is read-only.
+# Without the guard flag, the subcommand is not allowed.
+
+# [[command.sub]]
+# name = "fmt"
+# guard = "--check"                      # long flag that must be present
+# # guard_short = "-c"                   # optional short form of the guard
+# level = "Inert"
+# bare = false                           # must have at least the guard flag
+# standalone = ["--all", "--check", "-h"]
+# valued = ["--package", "-p"]
+
+# ─────────────────────────────────────────────────────────────────────
+# NESTED SUBCOMMANDS — subcommand has its own subcommands
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use for: npm config get, docker compose ps, mise config ls, etc.
+# The parent sub has no flags of its own — it just groups child subs.
+# Bare invocation of the parent (e.g. "npm config") is rejected.
+
+# [[command.sub]]
+# name = "config"
+#
+# [[command.sub.sub]]
+# name = "get"
+# standalone = ["--help", "--json", "-h"]
+#
+# [[command.sub.sub]]
+# name = "list"
+# standalone = ["--help", "--json", "-h"]
+
+# ─────────────────────────────────────────────────────────────────────
+# ALLOW ALL — subcommand that accepts anything
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use for: help subcommands that accept any topic as an argument.
+# No flag or argument checking is performed.
+
+# [[command.sub]]
+# name = "help"
+# allow_all = true
+# level = "Inert"
+
+# ─────────────────────────────────────────────────────────────────────
+# WRITE-FLAGGED — specific flags promote the safety level
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use when a command is normally Inert but certain flags cause writes.
+# Example: sk (skim) is Inert, but --history writes to a file → SafeWrite.
+# The base level applies when none of the write_flags are present.
+
+# [[command.sub]]
+# name = "run"
+# write_flags = ["--history"]            # if any of these appear → SafeWrite
+# # level = "Inert"                      # base level when write_flags absent
+# standalone = ["--help", "-h"]
+# valued = ["--history", "--query", "-q"]
+
+# ─────────────────────────────────────────────────────────────────────
+# DELEGATION — subcommand wraps an inner command
+# ─────────────────────────────────────────────────────────────────────
+#
+# delegate_skip: Skip N tokens after the subcommand name, then validate
+#   the rest as a complete command. Used for "rustup run stable echo hello"
+#   where skip=2 skips the toolchain name.
+#
+# delegate_after: Find a separator token (usually "--"), then validate
+#   everything after it as a complete command. Used for
+#   "mise exec -- git status" where the separator is "--".
+
+# [[command.sub]]
+# name = "run"
+# delegate_skip = 2                      # skip 2 tokens, validate the rest
+#
+# [[command.sub]]
+# name = "exec"
+# delegate_after = "--"                  # validate everything after "--"
+
+# ─────────────────────────────────────────────────────────────────────
+# CUSTOM HANDLER — requires Rust code for validation
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use as a last resort when the command needs logic that can't be
+# expressed with the fields above. The handler name references a Rust
+# function registered in src/registry.rs or dispatched from a handler
+# module. The TOML entry provides metadata (name, url) but the Rust
+# function performs all validation.
+#
+# Before reaching for this: can you express the rule as a guard, a
+# nested sub, a delegation, or simply by listing the right flags?
+# Most commands that seem to need custom code can be modeled with the
+# declarative fields above.
+
+# [[command]]
+# name = "curl"
+# handler = "curl"                       # references Rust handler by name
+# url = "https://curl.se/docs/manpage.html"
+
+# ─────────────────────────────────────────────────────────────────────
+# SAFETY LEVELS
+# ─────────────────────────────────────────────────────────────────────
+#
+# "Inert"     — No side effects. Read-only or purely informational.
+#               Examples: ls, cat, grep, git log, cargo tree
+#
+# "SafeRead"  — Runs code but doesn't produce build artifacts.
+#               Examples: cargo test, npm test, go vet, linters
+#
+# "SafeWrite" — Produces artifacts or modifies the working tree.
+#               Examples: cargo build, go build, cargo doc
+#
+# When commands are piped or chained, the highest level wins.
+# Unlisted commands are always denied regardless of level.

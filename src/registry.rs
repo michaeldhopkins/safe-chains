@@ -72,6 +72,7 @@ struct TomlSub {
     delegate_skip: Option<usize>,
     #[serde(default)]
     handler: Option<String>,
+    #[allow(dead_code)]
     #[serde(default)]
     doc: Option<String>,
 }
