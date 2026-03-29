@@ -53,8 +53,9 @@ pub fn toml_command_names() -> Vec<&'static str> {
 
 pub fn toml_command_docs() -> Vec<crate::docs::CommandDoc> {
     TOML_REGISTRY
-        .values()
-        .map(|spec| spec.to_command_doc())
+        .iter()
+        .filter(|(key, spec)| *key == &spec.name)
+        .map(|(_, spec)| spec.to_command_doc())
         .collect()
 }
 
