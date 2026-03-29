@@ -65,6 +65,8 @@ struct TomlSub {
     #[serde(default)]
     sub: Vec<TomlSub>,
     #[serde(default)]
+    nested_bare: Option<bool>,
+    #[serde(default)]
     write_flags: Vec<String>,
     #[serde(default)]
     delegate_after: Option<String>,
@@ -138,6 +140,7 @@ enum SubKind {
     },
     Nested {
         subs: Vec<SubSpec>,
+        allow_bare: bool,
     },
     AllowAll {
         level: SafetyLevel,
@@ -308,6 +311,7 @@ fn build_sub(toml: TomlSub) -> SubSpec {
             name: toml.name,
             kind: SubKind::Nested {
                 subs: toml.sub.into_iter().map(build_sub).collect(),
+                allow_bare: toml.nested_bare.unwrap_or(false),
             },
         };
     }
@@ -455,13 +459,19 @@ fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
                 Verdict::Denied
             }
         }
-        SubKind::Nested { subs } => {
+        SubKind::Nested { subs, allow_bare } => {
             if tokens.len() < 2 {
+                if *allow_bare {
+                    return Verdict::Allowed(SafetyLevel::Inert);
+                }
                 return Verdict::Denied;
             }
-            let name = tokens[1].as_str();
+            let arg = tokens[1].as_str();
+            if *allow_bare && (arg == "--help" || arg == "-h") {
+                return Verdict::Allowed(SafetyLevel::Inert);
+            }
             subs.iter()
-                .find(|s| s.name == name)
+                .find(|s| s.name == arg)
                 .map(|s| dispatch_sub(&tokens[1..], s))
                 .unwrap_or(Verdict::Denied)
         }
@@ -671,7 +681,7 @@ impl SubSpec {
                     out.push(format!("- **{label}** (requires {guard_long}): {summary}"));
                 }
             }
-            SubKind::Nested { subs } => {
+            SubKind::Nested { subs, .. } => {
                 for sub in subs {
                     sub.doc_line(&label, out);
                 }
@@ -1133,6 +1143,153 @@ mod tests {
         "#);
         assert_eq!(
             dispatch_spec(&toks(&["mise", "config"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    // ---------------------------------------------------------------
+    // Nested with nested_bare = true
+    // ---------------------------------------------------------------
+
+    #[test]
+    fn nested_bare_allowed_when_flag_set() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "mise"
+
+            [[command.sub]]
+            name = "settings"
+            nested_bare = true
+
+            [[command.sub.sub]]
+            name = "get"
+            standalone = ["--help", "-h", "-q", "-v"]
+
+            [[command.sub.sub]]
+            name = "list"
+            standalone = ["--help", "-h", "-q", "-v"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["mise", "settings"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn nested_bare_help_allowed() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "mise"
+
+            [[command.sub]]
+            name = "settings"
+            nested_bare = true
+
+            [[command.sub.sub]]
+            name = "get"
+            standalone = ["--help", "-h"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["mise", "settings", "--help"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["mise", "settings", "-h"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn nested_bare_still_dispatches_to_subs() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "mise"
+
+            [[command.sub]]
+            name = "settings"
+            nested_bare = true
+
+            [[command.sub.sub]]
+            name = "get"
+            standalone = ["--help", "-h", "-q", "-v"]
+
+            [[command.sub.sub]]
+            name = "list"
+            standalone = ["--help", "-h", "-q", "-v"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["mise", "settings", "get"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["mise", "settings", "list"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["mise", "settings", "get", "-q"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn nested_bare_rejects_unknown_sub() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "mise"
+
+            [[command.sub]]
+            name = "settings"
+            nested_bare = true
+
+            [[command.sub.sub]]
+            name = "get"
+            standalone = ["--help", "-h"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["mise", "settings", "set"]), &spec),
+            Verdict::Denied,
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["mise", "settings", "delete"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn nested_bare_rejects_unknown_flags() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "mise"
+
+            [[command.sub]]
+            name = "settings"
+            nested_bare = true
+
+            [[command.sub.sub]]
+            name = "get"
+            standalone = ["--help", "-h"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["mise", "settings", "--evil"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn nested_bare_false_is_default() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "npm"
+
+            [[command.sub]]
+            name = "config"
+
+            [[command.sub.sub]]
+            name = "get"
+            standalone = ["--help", "-h"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["npm", "config"]), &spec),
             Verdict::Denied,
         );
     }
