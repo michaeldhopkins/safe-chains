@@ -87,7 +87,7 @@ const HANDLED_CMDS: &[&str] = &[
     "perl",
     "R", "Rscript",
     "grep", "rg", "ag", "ack", "zgrep", "locate",
-    "cat", "head", "tail", "wc", "cut", "tr", "uniq", "less", "more", "zcat",
+    "cat", "gzcat", "head", "tail", "wc", "cut", "tr", "uniq", "less", "more", "zcat",
     "diff", "comm", "paste", "tac", "rev", "nl",
     "expand", "unexpand", "fold", "fmt", "col", "column", "iconv", "nroff",
     "echo", "printf", "seq", "test", "expr", "bc", "factor", "bat",
