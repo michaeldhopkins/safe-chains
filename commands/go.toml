@@ -1,0 +1,90 @@
+[[command]]
+name = "go"
+url = "https://pkg.go.dev/cmd/go"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help",
+    "-a", "-asan", "-cover", "-h", "-linkshared", "-modcacherw",
+    "-msan", "-n", "-race", "-trimpath", "-v", "-work", "-x",
+]
+valued = [
+    "-asmflags", "-buildmode", "-buildvcs", "-compiler", "-covermode",
+    "-coverpkg", "-gccgoflags", "-gcflags", "-installsuffix",
+    "-ldflags", "-mod", "-modfile", "-o", "-overlay", "-p",
+    "-pgo", "-pkgdir", "-tags",
+]
+
+[[command.sub]]
+name = "doc"
+standalone = ["--help", "-all", "-c", "-cmd", "-h", "-short", "-src", "-u"]
+
+[[command.sub]]
+name = "env"
+standalone = ["--help", "-h", "-json"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "list"
+standalone = [
+    "--help",
+    "-a", "-asan", "-compiled", "-cover", "-deps", "-e", "-export",
+    "-find", "-h", "-linkshared", "-m", "-modcacherw", "-msan", "-n",
+    "-race", "-retract", "-test", "-trimpath", "-u", "-v",
+    "-versions", "-work", "-x",
+]
+valued = [
+    "-asmflags", "-buildmode", "-buildvcs", "-compiler", "-covermode",
+    "-coverpkg", "-f", "-gccgoflags", "-gcflags", "-installsuffix",
+    "-json", "-ldflags", "-mod", "-modfile", "-overlay", "-p",
+    "-pgo", "-pkgdir", "-reuse", "-tags",
+]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help",
+    "-a", "-asan", "-benchmem", "-cover", "-failfast", "-h", "-json",
+    "-linkshared", "-modcacherw", "-msan", "-n", "-race",
+    "-short", "-trimpath", "-v", "-work", "-x",
+]
+valued = [
+    "-asmflags", "-bench", "-benchtime", "-blockprofile",
+    "-blockprofilerate", "-buildmode", "-buildvcs", "-compiler",
+    "-count", "-covermode", "-coverpkg", "-coverprofile",
+    "-cpu", "-cpuprofile", "-fuzz", "-fuzzminimizetime", "-fuzztime",
+    "-gccgoflags", "-gcflags", "-installsuffix",
+    "-ldflags", "-list", "-memprofile", "-memprofilerate",
+    "-mod", "-modfile", "-mutexprofile", "-mutexprofilefraction",
+    "-o", "-outputdir", "-overlay", "-p", "-parallel",
+    "-pgo", "-pkgdir", "-run", "-shuffle", "-skip",
+    "-tags", "-timeout", "-trace",
+]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h", "-m", "-v"]
+
+[[command.sub]]
+name = "vet"
+level = "SafeRead"
+standalone = [
+    "--help",
+    "-a", "-asan", "-cover", "-h", "-json", "-linkshared", "-modcacherw",
+    "-msan", "-n", "-race", "-trimpath", "-v", "-work", "-x",
+]
+valued = [
+    "-asmflags", "-buildmode", "-buildvcs", "-c", "-compiler",
+    "-covermode", "-coverpkg", "-gccgoflags", "-gcflags",
+    "-installsuffix", "-ldflags", "-mod", "-modfile", "-overlay",
+    "-p", "-pgo", "-pkgdir", "-tags",
+]

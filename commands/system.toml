@@ -1,7 +1,3 @@
-# Skipped CommandDef: brew, mise, asdf, ddev, defaults, security, csrutil,
-#   diskutil, launchctl, log, cmake, dcli, terraform, heroku, vercel,
-#   flyctl, fastlane, firebase, overmind, tailscale, wg
-# Skipped custom handlers: crontab, pmset, sysctl, tmux, networksetup
 
 [[command]]
 name = "pg_isready"
@@ -19,3 +15,994 @@ level = "Inert"
 bare = false
 max_positional = 0
 standalone = ["--help", "--version", "-V", "-h"]
+
+[[command]]
+name = "asdf"
+url = "https://asdf-vm.com/manage/commands.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "current"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "which"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugin"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugin-list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugin-list-all"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "brew"
+url = "https://docs.brew.sh/Manpage"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = [
+    "--cask", "--formula", "--full-name", "--help", "--multiple",
+    "--pinned", "--versions",
+    "-1", "-h", "-l", "-r", "-t",
+]
+
+[[command.sub]]
+name = "ls"
+standalone = [
+    "--cask", "--formula", "--full-name", "--help", "--multiple",
+    "--pinned", "--versions",
+    "-1", "-h", "-l", "-r", "-t",
+]
+
+[[command.sub]]
+name = "info"
+standalone = [
+    "--analytics", "--cask", "--formula", "--help", "--installed", "--json",
+    "-h", "-v",
+]
+valued = ["--days"]
+
+[[command.sub]]
+name = "abv"
+standalone = [
+    "--analytics", "--cask", "--formula", "--help", "--installed", "--json",
+    "-h", "-v",
+]
+valued = ["--days"]
+
+[[command.sub]]
+name = "search"
+bare = false
+standalone = [
+    "--cask", "--closed", "--debian", "--desc", "--fedora",
+    "--fink", "--formula", "--help", "--macports", "--open",
+    "--opensuse", "--pull-request", "--repology", "--ubuntu",
+    "-h",
+]
+
+[[command.sub]]
+name = "deps"
+standalone = [
+    "--1", "--annotate", "--cask", "--direct", "--for-each",
+    "--formula", "--full-name", "--graph", "--help", "--include-build",
+    "--include-optional", "--include-test", "--installed", "--missing",
+    "--skip-recommended", "--tree", "--union",
+    "-h", "-n",
+]
+
+[[command.sub]]
+name = "uses"
+bare = false
+standalone = [
+    "--cask", "--formula", "--help", "--include-build", "--include-optional",
+    "--include-test", "--installed", "--missing",
+    "--recursive", "--skip-recommended",
+    "-h",
+]
+
+[[command.sub]]
+name = "outdated"
+standalone = [
+    "--cask", "--fetch-HEAD", "--formula", "--greedy",
+    "--greedy-auto-updates", "--greedy-latest", "--help", "--json",
+    "-d", "-h", "-q", "-v",
+]
+
+[[command.sub]]
+name = "desc"
+bare = false
+standalone = [
+    "--cask", "--description", "--eval-all", "--formula",
+    "--help", "--name", "--search",
+    "-d", "-h", "-n", "-s",
+]
+
+[[command.sub]]
+name = "log"
+bare = false
+standalone = ["--cask", "--formula", "--help", "--oneline", "-1", "-h"]
+valued = ["--max-count", "-n"]
+
+[[command.sub]]
+name = "cat"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "casks"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "config"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "doctor"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "formulae"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "home"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "leaves"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "shellenv"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "tap"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "--prefix"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "--repository"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "tap-info"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "services"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+[[command.sub.sub]]
+name = "info"
+bare = false
+standalone = ["--all", "--help", "--json", "-h"]
+
+[[command]]
+name = "cmake"
+url = "https://cmake.org/cmake/help/latest/manual/cmake.1.html"
+bare_flags = ["--help", "--system-information", "--version", "-V", "-h"]
+
+[[command]]
+name = "csrutil"
+url = "https://ss64.com/mac/csrutil.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "authenticated-root"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "report"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "dcli"
+url = "https://cli.dashlane.com/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "accounts"
+[[command.sub.sub]]
+name = "whoami"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "devices"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "lock"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "sync"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "team"
+[[command.sub.sub]]
+name = "credentials"
+[[command.sub.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+[[command.sub.sub]]
+name = "dark-web-insights"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--count", "--offset", "--order-by"]
+[[command.sub.sub]]
+name = "logs"
+standalone = ["--csv", "--help", "--human-readable", "-h"]
+valued = ["--end", "--start"]
+[[command.sub.sub]]
+name = "members"
+standalone = ["--csv", "--help", "--human-readable", "-h"]
+[[command.sub.sub]]
+name = "public-api"
+[[command.sub.sub.sub]]
+name = "list-keys"
+standalone = ["--help", "--json", "-h"]
+[[command.sub.sub]]
+name = "report"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "ddev"
+url = "https://ddev.readthedocs.io/en/stable/users/usage/commands/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "aliases"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "debug"
+[[command.sub.sub]]
+name = "configyaml"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "diagnose"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "mutagen"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "test"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "describe"
+standalone = ["--help", "--json-output", "-h", "-j"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--json-output", "-h", "-j"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--follow", "--help", "--time", "--timestamps", "-f", "-h"]
+valued = ["--service", "--tail", "-s", "-t"]
+
+[[command.sub]]
+name = "snapshot"
+guard = "--list"
+standalone = ["--all", "--help", "--list", "-h"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--json-output", "-h", "-j"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "defaults"
+url = "https://ss64.com/mac/defaults.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "read"
+bare = false
+standalone = ["--help", "-g", "-globalDomain", "-h"]
+valued = ["-app"]
+
+[[command.sub]]
+name = "read-type"
+bare = false
+standalone = ["--help", "-g", "-globalDomain", "-h"]
+valued = ["-app"]
+
+[[command.sub]]
+name = "export"
+bare = false
+standalone = ["--help", "-g", "-globalDomain", "-h"]
+valued = ["-app"]
+
+[[command.sub]]
+name = "find"
+bare = false
+standalone = ["--help", "-g", "-globalDomain", "-h"]
+valued = ["-app"]
+
+[[command.sub]]
+name = "domains"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "diskutil"
+url = "https://ss64.com/mac/diskutil.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h", "-plist"]
+
+[[command.sub]]
+name = "listFilesystems"
+standalone = ["--help", "-h", "-plist"]
+
+[[command.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-all", "-h", "-plist"]
+
+[[command.sub]]
+name = "activity"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "apfs"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "listCryptoUsers"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "listSnapshots"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "listVolumeGroups"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "fastlane"
+url = "https://docs.fastlane.tools/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "action"
+bare = false
+standalone = ["--help", "-h"]
+max_positional = 1
+
+[[command.sub]]
+name = "actions"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "env"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "lanes"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command]]
+name = "firebase"
+url = "https://firebase.google.com/docs/cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "apps:list"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "functions:log"
+standalone = ["--help", "-h"]
+valued = ["--only"]
+
+[[command.sub]]
+name = "login:list"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "projects:list"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command]]
+name = "flyctl"
+aliases = ["fly"]
+url = "https://fly.io/docs/flyctl/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "apps"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "ips"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--help", "-h"]
+valued = ["--app", "--instance", "--region", "-a", "-i", "-r"]
+
+[[command.sub]]
+name = "platform"
+[[command.sub.sub]]
+name = "regions"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "regions"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "releases"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "services"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "heroku"
+url = "https://devcenter.heroku.com/articles/heroku-cli-commands"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "addons"
+standalone = ["--all", "--help", "--json", "-A", "-h"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "apps"
+standalone = ["--all", "--help", "--json", "-a", "-h"]
+valued = ["--space", "--team", "-s", "-t"]
+
+[[command.sub]]
+name = "apps:info"
+standalone = ["--help", "--json", "--shell", "-h", "-s"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "buildpacks"
+standalone = ["--help", "-h"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "config"
+standalone = ["--help", "--json", "--shell", "-h", "-j", "-s"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--force-colors", "--help", "--tail", "-h", "-t"]
+valued = ["--app", "--dyno", "--num", "--source", "-a", "-d", "-n", "-s"]
+
+[[command.sub]]
+name = "ps"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "regions"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "releases"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "--num", "-a", "-n"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--json", "-h"]
+
+[[command]]
+name = "launchctl"
+url = "https://ss64.com/mac/launchctl.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "blame"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dumpstate"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "error"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "examine"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "hostinfo"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "print"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "print-cache"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "print-disabled"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "resolveport"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "log"
+url = "https://ss64.com/mac/log.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "show"
+standalone = [
+    "--backtrace", "--debug", "--help", "--info", "--loss", "--mach-continuous-time",
+    "--no-pager", "--signpost", "-h",
+]
+valued = [
+    "--color", "--end", "--last", "--predicate",
+    "--process", "--source", "--start", "--style", "--type",
+]
+
+[[command.sub]]
+name = "stream"
+standalone = [
+    "--backtrace", "--debug", "--help", "--info", "--loss",
+    "--mach-continuous-time", "--signpost", "-h",
+]
+valued = [
+    "--color", "--level", "--predicate", "--process",
+    "--source", "--style", "--timeout", "--type",
+]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "stats"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "overmind"
+url = "https://github.com/DarthSim/overmind"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "connect"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "echo"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "kill"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "quit"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "restart"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "start"
+level = "SafeWrite"
+standalone = [
+    "--daemonize", "--help", "--no-port",
+    "-D", "-N", "-h",
+]
+valued = [
+    "--colors", "--formation", "--port", "--port-step",
+    "--procfile", "--root", "--socket", "--title",
+    "-T", "-c", "-f", "-l", "-p", "-r", "-s",
+]
+max_positional = 0
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "stop"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "security"
+url = "https://ss64.com/mac/security.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "find-certificate"
+bare = false
+standalone = ["--help", "-Z", "-a", "-h", "-p"]
+valued = ["-c", "-e"]
+
+[[command.sub]]
+name = "find-identity"
+standalone = ["--help", "-h", "-v"]
+valued = ["-p", "-s"]
+
+[[command.sub]]
+name = "find-generic-password"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["-D", "-a", "-c", "-d", "-j", "-l", "-r", "-s", "-t"]
+
+[[command.sub]]
+name = "find-internet-password"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["-D", "-a", "-c", "-d", "-j", "-l", "-r", "-s", "-t"]
+
+[[command.sub]]
+name = "list-keychains"
+standalone = ["--help", "-d", "-h"]
+
+[[command.sub]]
+name = "dump-keychain"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dump-trust-settings"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "verify-cert"
+bare = false
+standalone = ["--help", "-L", "-h", "-l", "-q"]
+valued = ["-c", "-k", "-n", "-p", "-r"]
+
+[[command.sub]]
+name = "cms"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "show-keychain-info"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "smartcard"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "tailscale"
+url = "https://tailscale.com/kb/1080/cli"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "bugreport"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "dns"
+[[command.sub.sub]]
+name = "query"
+positional_style = true
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "down"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "exit-node"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+valued = ["--filter"]
+max_positional = 0
+[[command.sub.sub]]
+name = "suggest"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "ip"
+standalone = ["--1", "--4", "--6", "--help", "-h"]
+
+[[command.sub]]
+name = "licenses"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "login"
+level = "SafeWrite"
+standalone = [
+    "--accept-dns", "--accept-routes", "--help", "--shields-up",
+    "-h",
+]
+valued = [
+    "--advertise-exit-node", "--advertise-routes",
+    "--advertise-tags", "--authkey", "--exit-node",
+    "--hostname", "--login-server", "--operator", "--timeout",
+]
+max_positional = 0
+
+[[command.sub]]
+name = "logout"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "netcheck"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "ping"
+bare = false
+standalone = [
+    "--c2c", "--help", "--icmp", "--peerapi", "--tsmp", "--until-direct", "--verbose",
+    "-h",
+]
+valued = ["--size", "--timeout"]
+
+[[command.sub]]
+name = "status"
+standalone = [
+    "--active", "--browser", "--help", "--json",
+    "--peers", "--self", "--web",
+    "-h",
+]
+max_positional = 0
+
+[[command.sub]]
+name = "switch"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--list", "-h"]
+
+[[command.sub]]
+name = "up"
+level = "SafeWrite"
+standalone = [
+    "--accept-dns", "--accept-routes", "--help", "--reset", "--shields-up",
+    "-h",
+]
+valued = [
+    "--advertise-exit-node", "--advertise-routes",
+    "--advertise-tags", "--authkey", "--exit-node",
+    "--exit-node-allow-lan-access", "--hostname",
+    "--login-server", "--operator", "--timeout",
+]
+max_positional = 0
+
+[[command.sub]]
+name = "version"
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "whois"
+bare = false
+standalone = ["--help", "--json", "-h"]
+
+[[command]]
+name = "terraform"
+url = "https://developer.hashicorp.com/terraform/cli/commands"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "fmt"
+guard = "--check"
+standalone = ["--check", "--diff", "--help", "--no-color", "--recursive", "-h"]
+
+[[command.sub]]
+name = "graph"
+standalone = ["--draw-cycles", "--help", "-h"]
+valued = ["--plan", "--type"]
+
+[[command.sub]]
+name = "output"
+standalone = ["--help", "--json", "--no-color", "--raw", "-h"]
+valued = ["--state"]
+
+[[command.sub]]
+name = "providers"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "show"
+standalone = ["--help", "--json", "--no-color", "-h"]
+
+[[command.sub]]
+name = "state"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--id", "--state"]
+[[command.sub.sub]]
+name = "show"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--state"]
+
+[[command.sub]]
+name = "validate"
+standalone = ["--help", "--json", "--no-color", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--json", "-h"]
+
+[[command]]
+name = "vercel"
+url = "https://vercel.com/docs/cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "inspect"
+bare = false
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--scope", "--timeout", "-S", "-T"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--meta", "--next", "--scope", "-S", "-m"]
+
+[[command.sub]]
+name = "project"
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--scope", "-S"]
+
+[[command.sub]]
+name = "whoami"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "wg"
+url = "https://www.wireguard.com/quickstart/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "genkey"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "genpsk"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "pubkey"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "show"
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "showconf"
+bare = false
+standalone = ["--help", "-h"]
+max_positional = 1

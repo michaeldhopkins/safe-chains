@@ -1,0 +1,53 @@
+[[command]]
+name = "dotnet"
+url = "https://learn.microsoft.com/en-us/dotnet/core/tools/"
+bare_flags = ["--help", "--info", "--list-runtimes", "--list-sdks", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+standalone = [
+    "--force", "--help", "--no-dependencies", "--no-incremental",
+    "--no-restore", "--nologo", "--self-contained",
+    "--tl", "--use-current-runtime",
+    "-h",
+]
+valued = [
+    "--arch", "--artifacts-path", "--configuration", "--framework",
+    "--os", "--output", "--property", "--runtime", "--source",
+    "--verbosity", "--version-suffix",
+    "-a", "-c", "-f", "-o", "-p", "-r", "-s", "-v",
+]
+
+[[command.sub]]
+name = "list"
+standalone = [
+    "--deprecated", "--help", "--highest-minor", "--highest-patch",
+    "--include-prerelease", "--include-transitive", "--outdated",
+    "--vulnerable",
+    "-h",
+]
+valued = [
+    "--config", "--format", "--framework", "--source", "--verbosity",
+    "-v",
+]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+standalone = [
+    "--blame", "--blame-crash", "--blame-hang", "--force",
+    "--help", "--list-tests", "--no-build", "--no-dependencies",
+    "--no-restore", "--nologo",
+    "-h",
+]
+valued = [
+    "--arch", "--artifacts-path", "--blame-crash-collect-always",
+    "--blame-crash-dump-type", "--blame-hang-dump-type",
+    "--blame-hang-timeout", "--collect", "--configuration",
+    "--diag", "--environment", "--filter", "--framework",
+    "--logger", "--os", "--output", "--property",
+    "--results-directory", "--runtime", "--settings",
+    "--test-adapter-path", "--verbosity",
+    "-a", "-c", "-d", "-e", "-f", "-l", "-o", "-r", "-s", "-v",
+]

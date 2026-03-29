@@ -1,6 +1,3 @@
-# Skipped CommandDef: xcodebuild, plutil, xcode-select, xcodegen, tuist,
-#   pod, swiftlint, periphery, agvtool, simctl
-# Skipped custom handlers: xcrun, pkgutil, lipo, codesign, spctl, swiftformat
 
 [[command]]
 name = "xcbeautify"
@@ -9,3 +6,270 @@ level = "Inert"
 bare = true
 standalone = ["--help", "--is-ci", "--quiet", "--quieter", "--version", "-V", "-h", "-q"]
 valued = ["--renderer"]
+
+[[command]]
+name = "agvtool"
+url = "https://developer.apple.com/library/archive/qa/qa1827/_index.html"
+
+[[command.sub]]
+name = "mvers"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "vers"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "what-marketing-version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "what-version"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "periphery"
+url = "https://github.com/peripheryapp/periphery"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "scan"
+level = "SafeRead"
+standalone = [
+    "--help", "--quiet", "--skip-build", "--strict", "--verbose",
+    "-h",
+]
+valued = [
+    "--config", "--format", "--index-store-path",
+    "--project", "--schemes", "--targets",
+]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "plutil"
+url = "https://ss64.com/mac/plutil.html"
+bare_flags = ["--help", "--version", "-V", "-h", "-help"]
+
+[[command.sub]]
+name = "-lint"
+bare = false
+standalone = ["--help", "-h", "-s"]
+
+[[command.sub]]
+name = "-p"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "-type"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "pod"
+url = "https://guides.cocoapods.org/terminal/commands.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "env"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "search"
+bare = false
+standalone = ["--help", "--simple", "--stats", "--web", "-h"]
+
+[[command.sub]]
+name = "spec"
+[[command.sub.sub]]
+name = "cat"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--version"]
+[[command.sub.sub]]
+name = "which"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--version"]
+
+[[command]]
+name = "simctl"
+url = "https://developer.apple.com/documentation/xcode/simctl"
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--json", "--verbose", "-h", "-j", "-v"]
+
+[[command]]
+name = "swiftlint"
+url = "https://github.com/realm/SwiftLint"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "analyze"
+level = "SafeRead"
+standalone = ["--help", "--quiet", "--strict", "-h"]
+valued = ["--compiler-log-path", "--config", "--path", "--reporter"]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+standalone = ["--help", "--no-cache", "--quiet", "--strict", "-h"]
+valued = ["--config", "--path", "--reporter"]
+
+[[command.sub]]
+name = "reporters"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "rules"
+standalone = ["--disabled", "--enabled", "--help", "-h"]
+valued = ["--config", "--reporter"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "tuist"
+url = "https://docs.tuist.dev/en/cli/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "dump"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "graph"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--format", "--path", "-f", "-p"]
+
+[[command.sub]]
+name = "hash"
+[[command.sub.sub]]
+name = "cache"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "selective-testing"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "inspect"
+[[command.sub.sub]]
+name = "build"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "bundle"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "dependencies"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "implicit-imports"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "redundant-imports"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "test"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "migration"
+[[command.sub.sub]]
+name = "check-empty-settings"
+standalone = ["--help", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "list-targets"
+standalone = ["--help", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "scaffold"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "xcode-select"
+url = "https://ss64.com/mac/xcode-select.html"
+bare_flags = ["--help", "--print-path", "--version", "-V", "-h", "-p", "-v"]
+
+[[command]]
+name = "xcodebuild"
+url = "https://developer.apple.com/documentation/xcode/xcodebuild"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "-list"
+standalone = ["--help", "-h", "-json"]
+valued = ["-project", "-workspace"]
+
+[[command.sub]]
+name = "-showBuildSettings"
+standalone = ["--help", "-h", "-json"]
+valued = [
+    "-configuration", "-destination", "-project",
+    "-scheme", "-sdk", "-target", "-workspace",
+]
+
+[[command.sub]]
+name = "-showdestinations"
+standalone = ["--help", "-h", "-json"]
+valued = [
+    "-configuration", "-destination", "-project",
+    "-scheme", "-sdk", "-target", "-workspace",
+]
+
+[[command.sub]]
+name = "-showsdks"
+standalone = ["--help", "-h", "-json"]
+valued = [
+    "-configuration", "-destination", "-project",
+    "-scheme", "-sdk", "-target", "-workspace",
+]
+
+[[command.sub]]
+name = "-version"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "xcodegen"
+url = "https://github.com/yonaskolb/XcodeGen"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "dump"
+standalone = ["--help", "--no-env", "--quiet", "-h", "-n", "-q"]
+valued = ["--project-root", "--spec", "--type", "-r", "-s", "-t"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

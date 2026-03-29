@@ -2,22 +2,17 @@ pub mod ai;
 pub mod android;
 pub mod containers;
 pub mod coreutils;
-pub mod dotnet;
 pub mod forges;
 pub mod fuzzy;
-pub mod go;
 pub mod jvm;
-pub mod magick;
 pub mod network;
 pub mod node;
 pub mod perl;
-pub mod php;
 pub mod python;
 pub mod r;
 pub mod ruby;
 pub mod rust;
 pub mod shell;
-pub mod swift;
 pub mod system;
 pub mod vcs;
 pub mod wrappers;
@@ -37,22 +32,16 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
         .or_else(|| ruby::dispatch(cmd, tokens))
         .or_else(|| python::dispatch(cmd, tokens))
         .or_else(|| rust::dispatch(cmd, tokens))
-        .or_else(|| go::dispatch(cmd, tokens))
         .or_else(|| jvm::dispatch(cmd, tokens))
         .or_else(|| android::dispatch(cmd, tokens))
-        .or_else(|| php::dispatch(cmd, tokens))
-        .or_else(|| swift::dispatch(cmd, tokens))
-        .or_else(|| dotnet::dispatch(cmd, tokens))
         .or_else(|| containers::dispatch(cmd, tokens))
         .or_else(|| network::dispatch(cmd, tokens))
-        .or_else(|| ai::dispatch(cmd, tokens))
         .or_else(|| system::dispatch(cmd, tokens))
         .or_else(|| xcode::dispatch(cmd, tokens))
         .or_else(|| perl::dispatch(cmd, tokens))
         .or_else(|| r::dispatch(cmd, tokens))
         .or_else(|| coreutils::dispatch(cmd, tokens))
         .or_else(|| fuzzy::dispatch(cmd, tokens))
-        .or_else(|| magick::dispatch(cmd, tokens))
         .or_else(|| crate::registry::toml_dispatch(tokens))
         .unwrap_or(Verdict::Denied)
 }
@@ -121,14 +110,9 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(ruby::command_docs());
     docs.extend(python::command_docs());
     docs.extend(rust::command_docs());
-    docs.extend(go::command_docs());
     docs.extend(jvm::command_docs());
     docs.extend(android::command_docs());
-    docs.extend(php::command_docs());
-    docs.extend(swift::command_docs());
-    docs.extend(dotnet::command_docs());
     docs.extend(containers::command_docs());
-    docs.extend(ai::command_docs());
     docs.extend(network::command_docs());
     docs.extend(system::command_docs());
     docs.extend(xcode::command_docs());
@@ -138,7 +122,6 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(fuzzy::command_docs());
     docs.extend(shell::command_docs());
     docs.extend(wrappers::command_docs());
-    docs.extend(magick::command_docs());
     docs.extend(crate::registry::toml_command_docs());
     docs
 }
@@ -165,30 +148,14 @@ pub(crate) enum SubEntry {
 use crate::command::CommandDef;
 
 const COMMAND_DEFS: &[&CommandDef] = &[
-    &ai::CODEX, &ai::OLLAMA, &ai::OPENCODE, &ai::LLM, &ai::HF,
-    &containers::DOCKER, &containers::PODMAN, &containers::KUBECTL, &containers::ORBCTL, &containers::QEMU_IMG,
-    &dotnet::DOTNET,
-    &go::GO,
+    &containers::DOCKER, &containers::PODMAN, &containers::ORBCTL, &containers::QEMU_IMG,
     &android::APKANALYZER, &android::APKSIGNER, &android::BUNDLETOOL, &android::AAPT2,
     &android::AVDMANAGER,
-    &jvm::GRADLE, &jvm::KEYTOOL,
-    &magick::MAGICK,
     &node::NPM, &node::BUN,
-    &php::COMPOSER, &php::CRAFT,
-    &python::PIP, &python::UV, &python::POETRY,
-    &python::PYENV, &python::CONDA,
-    &ruby::BUNDLE, &ruby::GEM, &ruby::IMPORTMAP, &ruby::RBENV,
+    &python::CONDA,
+    &ruby::BUNDLE,
     &vcs::GIT,
-    &swift::SWIFT,
-    &system::BREW, &system::MISE, &system::ASDF, &system::DDEV, &system::DCLI, &system::CMAKE,
-    &system::DEFAULTS, &system::TERRAFORM, &system::HEROKU, &system::VERCEL,
-    &system::FLYCTL, &system::FASTLANE, &system::FIREBASE,
-    &system::OVERMIND, &system::TAILSCALE, &system::WG,
-    &system::SECURITY, &system::CSRUTIL, &system::DISKUTIL,
-    &system::LAUNCHCTL, &system::LOG,
-    &xcode::XCODEBUILD, &xcode::PLUTIL, &xcode::XCODE_SELECT,
-    &xcode::XCODEGEN, &xcode::TUIST, &xcode::POD, &xcode::SWIFTLINT,
-    &xcode::PERIPHERY, &xcode::AGVTOOL, &xcode::SIMCTL,
+    &system::MISE,
 ];
 
 pub fn all_opencode_patterns() -> Vec<String> {

@@ -101,7 +101,6 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `asdf` (https://asdf-vm.com/manage/commands.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **current**: Flags: --help, -h
 - **help**: Flags: --help, -h
 - **info**: Flags: --help, -h
@@ -111,6 +110,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **plugin-list-all**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - **which**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `avdmanager` (https://developer.android.com/tools/avdmanager)
 
@@ -165,7 +165,6 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `brew` (https://docs.brew.sh/Manpage)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **--prefix**: Flags: --help, -h, -q, -v
 - **--repository**: Flags: --help, -h, -q, -v
 - **abv**: Flags: --analytics, --cask, --formula, --help, --installed, --json, -h, -v. Valued: --days
@@ -190,6 +189,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **tap**: Flags: --help, -h, -q, -v
 - **tap-info**: Flags: --help, -h, -q, -v
 - **uses**: Flags: --cask, --formula, --help, --include-build, --include-optional, --include-test, --installed, --missing, --recursive, --skip-recommended, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `bun` (https://bun.sh/docs/cli)
 
@@ -302,9 +302,9 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `codex` (https://github.com/openai/codex)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **completion**: Flags: --help, -h. Valued: --shell, -s
 - **features list**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `col` (https://man7.org/linux/man-pages/man1/col.1.html)
 
@@ -334,7 +334,6 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `composer` (https://getcomposer.org/doc/03-cli.md)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **about**: Flags: --help, -h
 - **audit**: Flags: --abandoned, --help, --locked, --no-dev, -h. Valued: --format, -f
 - **check-platform-reqs**: Flags: --help, -h
@@ -346,6 +345,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **outdated**: Flags: --all, --direct, --help, --locked, --minor-only, --no-dev, --strict, -D, -a, -h, -m. Valued: --format, --ignore, -f
 - **show**: Flags: --all, --available, --direct, --help, --installed, --latest, --locked, --minor-only, --name-only, --no-dev, --outdated, --path, --platform, --self, --strict, --tree, --versions, -D, -H, -N, -P, -a, -h, -i, -l, -o, -s, -t. Valued: --format, --ignore, -f
 - **suggests**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `conda` (https://docs.conda.io/projects/conda/en/stable/commands/index.html)
 
@@ -356,7 +356,6 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `craft` (https://craftcms.com/docs/5.x/reference/cli.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **env/show**: Flags: --help, -h
 - **graphql/list-schemas**: Flags: --help, -h
 - **graphql/print-schema**: Flags: --help, -h
@@ -371,6 +370,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **queue/info**: Flags: --help, -h
 - **update/info**: Flags: --help, -h
 - **users/list-admins**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `crontab` (https://ss64.com/mac/crontab.html)
 
@@ -378,10 +378,10 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `csrutil` (https://ss64.com/mac/csrutil.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **authenticated-root**: Flags: --help, -h
 - **report**: Flags: --help, -h
 - **status**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `cucumber` (https://cucumber.io/docs/cucumber/api/#running-cucumber)
 
@@ -414,7 +414,6 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `dcli` (https://cli.dashlane.com/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **accounts whoami**: Flags: --help, -h
 - **devices list**: Flags: --help, --json, -h
 - **lock**: Flags: --help, -h
@@ -425,10 +424,10 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **team members**: Flags: --csv, --help, --human-readable, -h
 - **team public-api list-keys**: Flags: --help, --json, -h
 - **team report**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `ddev` (https://ddev.readthedocs.io/en/stable/users/usage/commands/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **aliases**: Flags: --help, -h
 - **debug configyaml**: Flags: --help, -h
 - **debug diagnose**: Flags: --help, -h
@@ -440,15 +439,16 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **snapshot** (requires --list): Flags: --all, --help, --list, -h
 - **status**: Flags: --help, --json-output, -h, -j
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `defaults` (https://ss64.com/mac/defaults.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **domains**: Flags: --help, -h
 - **export**: Flags: --help, -g, -globalDomain, -h. Valued: -app
 - **find**: Flags: --help, -g, -globalDomain, -h. Valued: -app
 - **read**: Flags: --help, -g, -globalDomain, -h. Valued: -app
 - **read-type**: Flags: --help, -g, -globalDomain, -h. Valued: -app
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `delta` (https://dandavison.github.io/delta/)
 
@@ -495,7 +495,6 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `diskutil` (https://ss64.com/mac/diskutil.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **activity**: Flags: --help, -h
 - **apfs list**: Flags: --help, -h
 - **apfs listCryptoUsers**: Flags: --help, -h
@@ -504,6 +503,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **info**: Flags: --help, -all, -h, -plist
 - **list**: Flags: --help, -h, -plist
 - **listFilesystems**: Flags: --help, -h, -plist
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `docker` (https://docs.docker.com/reference/cli/docker/)
 
@@ -559,10 +559,10 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `dotnet` (https://learn.microsoft.com/en-us/dotnet/core/tools/)
 
-- Allowed standalone flags: --help, --info, --list-runtimes, --list-sdks, --version, -V, -h
 - **build**: Flags: --force, --help, --no-dependencies, --no-incremental, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --os, --output, --property, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -p, -r, -s, -v
 - **list**: Flags: --deprecated, --help, --highest-minor, --highest-patch, --include-prerelease, --include-transitive, --outdated, --vulnerable, -h. Valued: --config, --format, --framework, --source, --verbosity, -v
 - **test**: Flags: --blame, --blame-crash, --blame-hang, --force, --help, --list-tests, --no-build, --no-dependencies, --no-restore, --nologo, -h. Valued: --arch, --artifacts-path, --blame-crash-collect-always, --blame-crash-dump-type, --blame-hang-dump-type, --blame-hang-timeout, --collect, --configuration, --diag, --environment, --filter, --framework, --logger, --os, --output, --property, --results-directory, --runtime, --settings, --test-adapter-path, --verbosity, -a, -c, -d, -e, -f, -l, -o, -r, -s, -v
+- Allowed standalone flags: --help, --info, --list-runtimes, --list-sdks, --version, -V, -h
 
 ### `du` (https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation)
 
@@ -632,11 +632,11 @@ Aliases: `exa`
 
 ### `fastlane` (https://docs.fastlane.tools/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **action**: Flags: --help, -h
 - **actions**: Flags: --help, -h
 - **env**: Flags: --help, -h
 - **lanes**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `fd` (https://github.com/sharkdp/fd#readme)
 
@@ -653,17 +653,16 @@ Aliases: `exa`
 
 ### `firebase` (https://firebase.google.com/docs/cli)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **apps:list**: Flags: --help, -h
 - **functions:log**: Flags: --help, -h. Valued: --only
 - **login:list**: Flags: --help, -h
 - **projects:list**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `flyctl` (https://fly.io/docs/flyctl/)
 
 Aliases: `fly`
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **apps list**: Flags: --help, -h
 - **config show**: Flags: --help, --json, -h, -j. Valued: --app, -a
 - **ips list**: Flags: --help, --json, -h, -j. Valued: --app, -a
@@ -674,6 +673,7 @@ Aliases: `fly`
 - **services list**: Flags: --help, --json, -h, -j. Valued: --app, -a
 - **status**: Flags: --help, --json, -h, -j. Valued: --app, -a
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `fmt` (https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation)
 
@@ -719,7 +719,6 @@ Aliases: `fly`
 
 ### `gem` (https://guides.rubygems.org/command-reference/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **contents**: Flags: --all, --help, --local, --prerelease, --remote, --versions, -a, -h, -i, -l, -r. Valued: --version, -v
 - **dependency**: Flags: --all, --help, --local, --prerelease, --remote, --versions, -a, -h, -i, -l, -r. Valued: --version, -v
 - **environment**: Flags: --all, --help, --local, --prerelease, --remote, --versions, -a, -h, -i, -l, -r. Valued: --version, -v
@@ -733,6 +732,7 @@ Aliases: `fly`
 - **specification**: Flags: --all, --help, --local, --prerelease, --remote, --versions, -a, -h, -i, -l, -r. Valued: --version, -v
 - **stale**: Flags: --all, --help, --local, --prerelease, --remote, --versions, -a, -h, -i, -l, -r. Valued: --version, -v
 - **which**: Flags: --all, --help, --local, --prerelease, --remote, --versions, -a, -h, -i, -l, -r. Valued: --version, -v
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `getconf` (https://man7.org/linux/man-pages/man1/getconf.1.html)
 
@@ -792,7 +792,6 @@ Supports `-C <dir>` prefix.
 
 ### `go` (https://pkg.go.dev/cmd/go)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **build**: Flags: --help, -a, -asan, -cover, -h, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -o, -overlay, -p, -pgo, -pkgdir, -tags
 - **doc**: Flags: --help, -all, -c, -cmd, -h, -short, -src, -u
 - **env**: Flags: --help, -h, -json
@@ -801,6 +800,7 @@ Supports `-C <dir>` prefix.
 - **test**: Flags: --help, -a, -asan, -benchmem, -cover, -failfast, -h, -json, -linkshared, -modcacherw, -msan, -n, -race, -short, -trimpath, -v, -work, -x. Valued: -asmflags, -bench, -benchtime, -blockprofile, -blockprofilerate, -buildmode, -buildvcs, -compiler, -count, -covermode, -coverpkg, -coverprofile, -cpu, -cpuprofile, -fuzz, -fuzzminimizetime, -fuzztime, -gccgoflags, -gcflags, -installsuffix, -ldflags, -list, -memprofile, -memprofilerate, -mod, -modfile, -mutexprofile, -mutexprofilefraction, -o, -outputdir, -overlay, -p, -parallel, -pgo, -pkgdir, -run, -shuffle, -skip, -tags, -timeout, -trace
 - **version**: Flags: --help, -h, -m, -v
 - **vet**: Flags: --help, -a, -asan, -cover, -h, -json, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -c, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -tags
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `gojq` (https://github.com/itchyny/gojq)
 
@@ -812,13 +812,13 @@ Supports `-C <dir>` prefix.
 
 Aliases: `gradlew`
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **build**: Flags: --build-cache, --configure-on-demand, --console, --continue, --dry-run, --help, --info, --no-build-cache, --no-daemon, --no-parallel, --no-rebuild, --parallel, --profile, --quiet, --rerun-tasks, --scan, --stacktrace, --warning-mode, -h, -q. Valued: --exclude-task, --max-workers, -x
 - **check**: Flags: --build-cache, --configure-on-demand, --console, --continue, --dry-run, --help, --info, --no-build-cache, --no-daemon, --no-parallel, --no-rebuild, --parallel, --profile, --quiet, --rerun-tasks, --scan, --stacktrace, --warning-mode, -h, -q. Valued: --exclude-task, --max-workers, -x
 - **dependencies**: Flags: --console, --help, --info, --no-rebuild, --quiet, --stacktrace, --warning-mode, -h, -q. Valued: --configuration
 - **properties**: Flags: --console, --help, --info, --no-rebuild, --quiet, --stacktrace, --warning-mode, -h, -q
 - **tasks**: Flags: --all, --console, --help, --info, --no-rebuild, --quiet, --stacktrace, --warning-mode, -h, -q. Valued: --group
 - **test**: Flags: --build-cache, --configure-on-demand, --console, --continue, --dry-run, --help, --info, --no-build-cache, --no-daemon, --no-parallel, --no-rebuild, --parallel, --profile, --quiet, --rerun-tasks, --scan, --stacktrace, --warning-mode, -h, -q. Valued: --exclude-task, --max-workers, -x
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `grep` (https://www.gnu.org/software/grep/manual/grep.html)
 
@@ -855,7 +855,6 @@ Aliases: `egrep`, `fgrep`
 
 ### `heroku` (https://devcenter.heroku.com/articles/heroku-cli-commands)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **addons**: Flags: --all, --help, --json, -A, -h. Valued: --app, -a
 - **apps**: Flags: --all, --help, --json, -a, -h. Valued: --space, --team, -s, -t
 - **apps:info**: Flags: --help, --json, --shell, -h, -s. Valued: --app, -a
@@ -866,6 +865,7 @@ Aliases: `egrep`, `fgrep`
 - **regions**: Flags: --help, --json, -h
 - **releases**: Flags: --help, --json, -h, -j. Valued: --app, --num, -a, -n
 - **status**: Flags: --help, --json, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `hexdump` (https://man7.org/linux/man-pages/man1/hexdump.1.html)
 
@@ -875,7 +875,6 @@ Aliases: `egrep`, `fgrep`
 
 ### `hf` (https://huggingface.co/docs/huggingface_hub/guides/cli)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **cache ls**: Flags: --help, -h
 - **cache verify**: Flags: --help, -h
 - **collections info**: Flags: --help, -h
@@ -894,6 +893,7 @@ Aliases: `egrep`, `fgrep`
 - **spaces info**: Flags: --help, -h
 - **spaces ls**: Flags: --help, -h. Valued: --author, --filter, --limit, --search, --sort
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `host` (https://man7.org/linux/man-pages/man1/host.1.html)
 
@@ -941,11 +941,11 @@ Aliases: `egrep`, `fgrep`
 
 ### `importmap` (https://github.com/rails/importmap-rails)
 
-- Allowed standalone flags: --help, -h
 - **audit**: Flags: --help, -h
 - **json**: Flags: --help, -h
 - **outdated**: Flags: --help, -h
 - **packages**: Flags: --help, -h
+- Allowed standalone flags: --help, -h
 
 ### `ionice` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation)
 
@@ -1009,9 +1009,9 @@ Aliases: `egrep`, `fgrep`
 
 ### `keytool` (https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **-list**: Flags: --help, -h, -rfc, -v. Valued: -alias, -keystore, -storepass, -storetype
 - **-printcert**: Flags: --help, -h, -rfc, -v. Valued: -file, -jarfile
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `ktlint` (https://pinterest.github.io/ktlint/latest/)
 
@@ -1021,7 +1021,6 @@ Aliases: `egrep`, `fgrep`
 
 ### `kubectl` (https://kubernetes.io/docs/reference/kubectl/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **api-resources**: Flags: --help, --namespaced, --no-headers, -h. Valued: --api-group, --output, --sort-by, --verbs, -o
 - **api-versions**: Flags: --help, -h
 - **auth can-i**: Flags: --help, -h
@@ -1038,6 +1037,7 @@ Aliases: `egrep`, `fgrep`
 - **top node**: Flags: --help, --no-headers, -h. Valued: --selector, --sort-by, -l
 - **top pod**: Flags: --all-namespaces, --containers, --help, --no-headers, -A, -h. Valued: --namespace, --selector, --sort-by, -l, -n
 - **version**: Flags: --client, --help, --short, -h. Valued: --output, -o
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `last` (https://man7.org/linux/man-pages/man1/last.1.html)
 
@@ -1053,7 +1053,6 @@ Aliases: `egrep`, `fgrep`
 
 ### `launchctl` (https://ss64.com/mac/launchctl.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **blame**: Flags: --help, -h
 - **dumpstate**: Flags: --help, -h
 - **error**: Flags: --help, -h
@@ -1066,6 +1065,7 @@ Aliases: `egrep`, `fgrep`
 - **print-disabled**: Flags: --help, -h
 - **resolveport**: Flags: --help, -h
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `less` (https://man7.org/linux/man-pages/man1/less.1.html)
 
@@ -1085,13 +1085,13 @@ Aliases: `egrep`, `fgrep`
 
 ### `llm` (https://llm.datasette.io/en/stable/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **aliases**: Flags: --help, --json, -h
 - **collections**: Flags: --help, --json, -h
 - **logs**: Flags: --conversation, --help, --json, --no-truncate, --response, --truncate, -h. Valued: --cid, --count, --id, --model, --search, -c, -m, -n
 - **models**: Flags: --help, --json, --options, -h
 - **plugins**: Flags: --all, --help, --json, -h
 - **templates**: Flags: --help, --json, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `locale` (https://man7.org/linux/man-pages/man1/locale.1.html)
 
@@ -1117,11 +1117,11 @@ Aliases: `mlocate`, `plocate`
 
 ### `log` (https://ss64.com/mac/log.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **help**: Flags: --help, -h
 - **show**: Flags: --backtrace, --debug, --help, --info, --loss, --mach-continuous-time, --no-pager, --signpost, -h. Valued: --color, --end, --last, --predicate, --process, --source, --start, --style, --type
 - **stats**: Flags: --help, -h
 - **stream**: Flags: --backtrace, --debug, --help, --info, --loss, --mach-continuous-time, --signpost, -h. Valued: --color, --level, --predicate, --process, --source, --style, --timeout, --type
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `ls` (https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation)
 
@@ -1143,8 +1143,8 @@ Aliases: `mlocate`, `plocate`
 
 ### `magick` (https://imagemagick.org/script/command-line-tools.php)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **identify**: Flags: --help, -h, -matte, -moments, -ping, -quiet, -regard-warnings, -unique, -verbose. Valued: -alpha, -colorspace, -define, -density, -depth, -endian, -format, -interlace, -limit, -precision, -sampling-factor, -size, -units, -virtual-pixel
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `man` (https://man7.org/linux/man-pages/man1/man.1.html)
 
@@ -1323,17 +1323,17 @@ Aliases: `mlocate`, `plocate`
 
 ### `ollama` (https://github.com/ollama/ollama/blob/main/docs/api.md)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **list**: Flags: --help, --json, -h
 - **ps**: Flags: --help, --json, -h
 - **show**: Flags: --help, --json, --license, --modelfile, --parameters, --system, --template, --verbose, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `opencode` (https://opencode.ai/docs/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **models**: Flags: --help, -h
 - **session list**: Flags: --help, -h
 - **stats**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `orbctl` (https://docs.orbstack.dev/cli)
 
@@ -1358,7 +1358,6 @@ Aliases: `orb`
 
 ### `overmind` (https://github.com/DarthSim/overmind)
 
-- Allowed standalone flags: --help, --version, -h, -v
 - **connect**: Flags: --help, -h
 - **echo**: Flags: --help, -h
 - **kill**: Flags: --help, -h
@@ -1367,6 +1366,7 @@ Aliases: `orb`
 - **start**: Flags: --daemonize, --help, --no-port, -D, -N, -h. Valued: --colors, --formation, --port, --port-step, --procfile, --root, --socket, --title, -T, -c, -f, -l, -p, -r, -s
 - **status**: Flags: --help, -h
 - **stop**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `paste` (https://www.gnu.org/software/coreutils/manual/coreutils.html#paste-invocation)
 
@@ -1382,9 +1382,9 @@ Aliases: `orb`
 
 ### `periphery` (https://github.com/peripheryapp/periphery)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **scan**: Flags: --help, --quiet, --skip-build, --strict, --verbose, -h. Valued: --config, --format, --index-store-path, --project, --schemes, --targets
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `perl` (https://perldoc.perl.org/perl)
 
@@ -1417,7 +1417,6 @@ Aliases: `orb`
 
 Aliases: `pip3`
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **check**: Flags: --help, -h
 - **config get**: Flags: --help, -h
 - **config list**: Flags: --help, -h
@@ -1428,6 +1427,7 @@ Aliases: `pip3`
 - **inspect**: Flags: --help, -h
 - **list**: Flags: --editable, --exclude-editable, --help, --include-editable, --local, --not-required, --outdated, --pre, --uptodate, --user, -e, -h, -i, -l, -o. Valued: --exclude, --format, --index-url, --path
 - **show**: Flags: --files, --help, --verbose, -f, -h, -v
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `pkgutil` (https://ss64.com/mac/pkgutil.html)
 
@@ -1435,10 +1435,10 @@ Aliases: `pip3`
 
 ### `plutil` (https://ss64.com/mac/plutil.html)
 
-- Allowed standalone flags: --help, --version, -V, -h, -help
 - **-lint**: Flags: --help, -h, -s
 - **-p**: Flags: --help, -h
 - **-type**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h, -help
 
 ### `pmset` (https://ss64.com/mac/pmset.html)
 
@@ -1455,13 +1455,13 @@ Aliases: `pip3`
 
 ### `pod` (https://guides.cocoapods.org/terminal/commands.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **env**: Flags: --help, -h
 - **info**: Flags: --help, -h
 - **list**: Flags: --help, -h
 - **search**: Flags: --help, --simple, --stats, --web, -h
 - **spec cat**: Flags: --help, -h. Valued: --version
 - **spec which**: Flags: --help, -h. Valued: --version
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `podman` (https://docs.podman.io/en/latest/Commands.html)
 
@@ -1513,11 +1513,11 @@ Aliases: `pip3`
 
 ### `poetry` (https://python-poetry.org/docs/cli/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **check**: Flags: --help, --lock, -h
 - **env info**: Flags: --full-path, --help, -h
 - **env list**: Flags: --full-path, --help, -h
 - **show**: Flags: --all, --help, --latest, --no-dev, --outdated, --top-level, --tree, -T, -h, -l, -o. Valued: --why
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `printenv` (https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation)
 
@@ -1551,13 +1551,13 @@ Aliases: `pip3`
 
 ### `pyenv` (https://github.com/pyenv/pyenv#readme)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **help**: Flags: --bare, --help, -h
 - **root**: Flags: --bare, --help, -h
 - **shims**: Flags: --bare, --help, -h
 - **version**: Flags: --bare, --help, -h
 - **versions**: Flags: --bare, --help, -h
 - **which**: Flags: --bare, --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `qemu-img` (https://www.qemu.org/docs/master/tools/qemu-img.html)
 
@@ -1576,13 +1576,13 @@ Aliases: `pip3`
 
 ### `rbenv` (https://github.com/rbenv/rbenv#readme)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **help**: Flags: --help, -h
 - **root**: Flags: --help, -h
 - **shims**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - **versions**: Flags: --help, -h
 - **which**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `read` (https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html)
 
@@ -1652,7 +1652,6 @@ Aliases: `pip3`
 
 ### `security` (https://ss64.com/mac/security.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **cms**: Flags: --help, -h
 - **dump-keychain**: Flags: --help, -h
 - **dump-trust-settings**: Flags: --help, -h
@@ -1664,6 +1663,7 @@ Aliases: `pip3`
 - **show-keychain-info**: Flags: --help, -h
 - **smartcard**: Flags: --help, -h
 - **verify-cert**: Flags: --help, -L, -h, -l, -q. Valued: -c, -k, -n, -p, -r
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `sed` (https://www.gnu.org/software/sed/manual/sed.html)
 
@@ -1774,12 +1774,12 @@ Aliases: `pip3`
 
 ### `swift` (https://www.swift.org/documentation/swift-compiler/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **build**: Flags: --enable-code-coverage, --help, --show-bin-path, --skip-update, --static-swift-stdlib, --verbose, -h, -v. Valued: --arch, --build-path, --configuration, --jobs, --package-path, --product, --sanitize, --swift-sdk, --target, --triple, -c, -j
 - **package describe**: Flags: --help, -h. Valued: --package-path, --type
 - **package dump-package**: Flags: --help, -h. Valued: --package-path
 - **package show-dependencies**: Flags: --help, -h. Valued: --format, --package-path
 - **test**: Flags: --enable-code-coverage, --help, --list-tests, --parallel, --show-codecov-path, --skip-build, --skip-update, --verbose, -h, -l, -v. Valued: --arch, --build-path, --configuration, --filter, --jobs, --num-workers, --package-path, --sanitize, --skip-tests, --swift-sdk, --target, --triple, --xunit-output, -c, -j
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `swiftformat` (https://github.com/nicklockwood/SwiftFormat)
 
@@ -1787,12 +1787,12 @@ Aliases: `pip3`
 
 ### `swiftlint` (https://github.com/realm/SwiftLint)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **analyze**: Flags: --help, --quiet, --strict, -h. Valued: --compiler-log-path, --config, --path, --reporter
 - **lint**: Flags: --help, --no-cache, --quiet, --strict, -h. Valued: --config, --path, --reporter
 - **reporters**: Flags: --help, -h
 - **rules**: Flags: --disabled, --enabled, --help, -h. Valued: --config, --reporter
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `sysctl` (https://man7.org/linux/man-pages/man8/sysctl.8.html)
 
@@ -1818,7 +1818,6 @@ Aliases: `pip3`
 
 ### `tailscale` (https://tailscale.com/kb/1080/cli)
 
-- Allowed standalone flags: --help, --version, -h
 - **bugreport**: Flags: --help, -h
 - **dns query**: Flags: --help, -h. Positional args accepted
 - **dns status**: Flags: --help, -h
@@ -1836,6 +1835,7 @@ Aliases: `pip3`
 - **up**: Flags: --accept-dns, --accept-routes, --help, --reset, --shields-up, -h. Valued: --advertise-exit-node, --advertise-routes, --advertise-tags, --authkey, --exit-node, --exit-node-allow-lan-access, --hostname, --login-server, --operator, --timeout
 - **version**: Flags: --help, -h. Positional args accepted
 - **whois**: Flags: --help, --json, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `tar` (https://man7.org/linux/man-pages/man1/tar.1.html)
 
@@ -1850,7 +1850,6 @@ Aliases: `pip3`
 
 ### `terraform` (https://developer.hashicorp.com/terraform/cli/commands)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **fmt** (requires --check): Flags: --check, --diff, --help, --no-color, --recursive, -h
 - **graph**: Flags: --draw-cycles, --help, -h. Valued: --plan, --type
 - **output**: Flags: --help, --json, --no-color, --raw, -h. Valued: --state
@@ -1860,6 +1859,7 @@ Aliases: `pip3`
 - **state show**: Flags: --help, -h. Valued: --state
 - **validate**: Flags: --help, --json, --no-color, -h
 - **version**: Flags: --help, --json, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `test` (https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation)
 
@@ -1924,7 +1924,6 @@ Aliases: `[`
 
 ### `tuist` (https://docs.tuist.dev/en/cli/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **dump**: Flags: --help, --json, --verbose, -h. Valued: --path, -p
 - **graph**: Flags: --help, --json, --verbose, -h. Valued: --format, --path, -f, -p
 - **hash cache**: Flags: --help, --json, --verbose, -h. Valued: --path, -p
@@ -1939,6 +1938,7 @@ Aliases: `[`
 - **migration list-targets**: Flags: --help, -h. Valued: --path, -p
 - **scaffold list**: Flags: --help, --json, -h. Valued: --path, -p
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `type` (https://man7.org/linux/man-pages/man1/type.1p.html)
 
@@ -1984,21 +1984,21 @@ Aliases: `[`
 
 ### `uv` (https://docs.astral.sh/uv/reference/cli/)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **pip check**: Flags: --help, --verbose, -h, -v. Valued: --python
 - **pip freeze**: Flags: --help, --verbose, -h, -v. Valued: --python
 - **pip list**: Flags: --editable, --exclude-editable, --help, --outdated, --strict, -h. Valued: --exclude, --format, --python
 - **pip show**: Flags: --files, --help, --verbose, -h, -v. Valued: --python
 - **python list**: Flags: --help, --verbose, -h, -v. Valued: --python
 - **tool list**: Flags: --help, --verbose, -h, -v. Valued: --python
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `vercel` (https://vercel.com/docs/cli)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **inspect**: Flags: --help, --json, -h, -j. Valued: --scope, --timeout, -S, -T
 - **list**: Flags: --help, --json, -h, -j. Valued: --meta, --next, --scope, -S, -m
 - **project ls**: Flags: --help, --json, -h, -j. Valued: --scope, -S
 - **whoami**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `vibe` (https://docs.mistral.ai/mistral-vibe/)
 
@@ -2034,13 +2034,13 @@ Aliases: `[`
 
 ### `wg` (https://www.wireguard.com/quickstart/)
 
-- Allowed standalone flags: --help, --version, -h
 - **genkey**: Flags: --help, -h
 - **genpsk**: Flags: --help, -h
 - **help**: Flags: --help, -h
 - **pubkey**: Flags: --help, -h
 - **show**: Flags: --help, -h. Positional args accepted
 - **showconf**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `whereis` (https://man7.org/linux/man-pages/man1/whereis.1.html)
 
@@ -2087,18 +2087,18 @@ Aliases: `[`
 
 ### `xcodebuild` (https://developer.apple.com/documentation/xcode/xcodebuild)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **-list**: Flags: --help, -h, -json. Valued: -project, -workspace
 - **-showBuildSettings**: Flags: --help, -h, -json. Valued: -configuration, -destination, -project, -scheme, -sdk, -target, -workspace
 - **-showdestinations**: Flags: --help, -h, -json. Valued: -configuration, -destination, -project, -scheme, -sdk, -target, -workspace
 - **-showsdks**: Flags: --help, -h, -json. Valued: -configuration, -destination, -project, -scheme, -sdk, -target, -workspace
 - **-version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `xcodegen` (https://github.com/yonaskolb/XcodeGen)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **dump**: Flags: --help, --no-env, --quiet, -h, -n, -q. Valued: --project-root, --spec, --type, -r, -s, -t
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `xcrun` (https://ss64.com/mac/xcrun.html)
 
@@ -2136,12 +2136,12 @@ Aliases: `[`
 
 ### `zcat` (https://man7.org/linux/man-pages/man1/zcat.1.html)
 
+Aliases: `gzcat`
+
 - Allowed standalone flags: -V, -f, -h, -q, -v, --force, --help, --quiet, --verbose, --version
 - Bare invocation allowed
 
 ### `zcat` (https://man7.org/linux/man-pages/man1/zcat.1.html)
-
-Aliases: `gzcat`
 
 - Allowed standalone flags: -V, -f, -h, -q, -v, --force, --help, --quiet, --verbose, --version
 - Bare invocation allowed
@@ -2159,12 +2159,12 @@ Aliases: `gzcat`
 
 ### `zgrep` (https://man7.org/linux/man-pages/man1/zgrep.1.html)
 
+Aliases: `zegrep`, `zfgrep`
+
 - Allowed standalone flags: --count, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --invert-match, --line-number, --no-filename, --only-matching, --quiet, --silent, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -L, -V, -Z, -c, -h, -i, -l, -n, -o, -q, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --file, --max-count, --regexp, -A, -B, -C, -e, -f, -m
 
 ### `zgrep` (https://man7.org/linux/man-pages/man1/zgrep.1.html)
-
-Aliases: `zegrep`, `zfgrep`
 
 - Allowed standalone flags: --count, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --invert-match, --line-number, --no-filename, --only-matching, --quiet, --silent, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -L, -V, -Z, -c, -h, -i, -l, -n, -o, -q, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --file, --max-count, --regexp, -A, -B, -C, -e, -f, -m

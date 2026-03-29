@@ -154,7 +154,8 @@ fn check_bundle_exec(tokens: &[Token]) -> Verdict {
         return check_rails_sub(&tokens[1..]);
     }
     if cmd == "gem" {
-        return super::GEM.check(&tokens[1..]);
+        let inner = shell_words::join(tokens[1..].iter().map(|t| t.as_str()));
+        return crate::command_verdict(&inner);
     }
     if cmd == "appraisal" {
         return check_appraisal(&tokens[1..]);

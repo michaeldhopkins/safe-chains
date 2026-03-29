@@ -1,0 +1,54 @@
+[[command]]
+name = "swift"
+url = "https://www.swift.org/documentation/swift-compiler/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+standalone = [
+    "--enable-code-coverage", "--help", "--show-bin-path",
+    "--skip-update", "--static-swift-stdlib", "--verbose",
+    "-h", "-v",
+]
+valued = [
+    "--arch", "--build-path", "--configuration", "--jobs",
+    "--package-path", "--product", "--sanitize", "--swift-sdk",
+    "--target", "--triple",
+    "-c", "-j",
+]
+
+[[command.sub]]
+name = "package"
+[[command.sub.sub]]
+name = "describe"
+standalone = ["--help", "-h"]
+valued = ["--package-path", "--type"]
+max_positional = 0
+[[command.sub.sub]]
+name = "dump-package"
+standalone = ["--help", "-h"]
+valued = ["--package-path"]
+max_positional = 0
+[[command.sub.sub]]
+name = "show-dependencies"
+standalone = ["--help", "-h"]
+valued = ["--format", "--package-path"]
+max_positional = 0
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+standalone = [
+    "--enable-code-coverage", "--help", "--list-tests", "--parallel",
+    "--show-codecov-path", "--skip-build", "--skip-update",
+    "--verbose",
+    "-h", "-l", "-v",
+]
+valued = [
+    "--arch", "--build-path", "--configuration", "--filter",
+    "--jobs", "--num-workers", "--package-path", "--sanitize",
+    "--skip-tests", "--swift-sdk", "--target", "--triple",
+    "--xunit-output",
+    "-c", "-j",
+]

@@ -1,0 +1,19 @@
+[[command]]
+name = "magick"
+url = "https://imagemagick.org/script/command-line-tools.php"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "identify"
+bare = false
+standalone = [
+    "--help",
+    "-h", "-matte", "-moments", "-ping", "-quiet",
+    "-regard-warnings", "-unique", "-verbose",
+]
+valued = [
+    "-alpha", "-colorspace", "-define", "-density",
+    "-depth", "-endian", "-format", "-interlace",
+    "-limit", "-precision", "-sampling-factor",
+    "-size", "-units", "-virtual-pixel",
+]

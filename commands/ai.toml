@@ -1,4 +1,3 @@
-# Skipped CommandDef: codex, hf, llm, ollama, opencode
 
 [[command]]
 name = "aider"
@@ -27,3 +26,194 @@ level = "Inert"
 bare = false
 max_positional = 0
 standalone = ["--help", "--version", "-V", "-h"]
+
+[[command]]
+name = "codex"
+url = "https://github.com/openai/codex"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "completion"
+standalone = ["--help", "-h"]
+valued = ["--shell", "-s"]
+max_positional = 0
+
+[[command.sub]]
+name = "features"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command]]
+name = "hf"
+url = "https://huggingface.co/docs/huggingface_hub/guides/cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "env"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "cache"
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "verify"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "collections"
+[[command.sub.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+valued = ["--limit", "--owner"]
+
+[[command.sub]]
+name = "datasets"
+[[command.sub.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+valued = ["--author", "--filter", "--limit", "--search", "--sort"]
+[[command.sub.sub]]
+name = "parquet"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "discussions"
+[[command.sub.sub]]
+name = "diff"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "list"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "jobs"
+[[command.sub.sub]]
+name = "logs"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--tail"]
+[[command.sub.sub]]
+name = "ps"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "models"
+[[command.sub.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+valued = ["--author", "--filter", "--limit", "--search", "--sort"]
+
+[[command.sub]]
+name = "spaces"
+[[command.sub.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+valued = ["--author", "--filter", "--limit", "--search", "--sort"]
+
+[[command]]
+name = "llm"
+url = "https://llm.datasette.io/en/stable/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "aliases"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "collections"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "logs"
+standalone = [
+    "--conversation", "--help", "--json", "--no-truncate", "--response", "--truncate",
+    "-h",
+]
+valued = ["--cid", "--count", "--id", "--model", "--search", "-c", "-m", "-n"]
+
+[[command.sub]]
+name = "models"
+standalone = ["--help", "--json", "--options", "-h"]
+
+[[command.sub]]
+name = "plugins"
+standalone = ["--all", "--help", "--json", "-h"]
+
+[[command.sub]]
+name = "templates"
+standalone = ["--help", "--json", "-h"]
+
+[[command]]
+name = "ollama"
+url = "https://github.com/ollama/ollama/blob/main/docs/api.md"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "ps"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "show"
+bare = false
+standalone = [
+    "--help", "--json", "--license", "--modelfile", "--parameters",
+    "--system", "--template", "--verbose", "-h",
+]
+
+[[command]]
+name = "opencode"
+url = "https://opencode.ai/docs/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "models"
+standalone = ["--help", "-h"]
+max_positional = 1
+
+[[command.sub]]
+name = "session"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "stats"
+standalone = ["--help", "-h"]
+max_positional = 0
