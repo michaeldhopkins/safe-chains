@@ -3,6 +3,82 @@ use crate::command::{CheckFn, CommandDef, SubDef};
 use crate::parse::{Token, WordSet};
 use crate::policy::{FlagPolicy, FlagStyle};
 
+static GIT_HELP_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&[]),
+    valued: WordSet::flags(&[]),
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Positional,
+};
+
+static GIT_BRANCH_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&[
+        "--all", "--help", "--ignore-case", "--list",
+        "--no-abbrev", "--no-color", "--no-column",
+        "--omit-empty", "--remotes", "--show-current",
+        "--verbose",
+        "-a", "-h", "-i", "-l", "-r", "-v", "-vv",
+    ]),
+    valued: WordSet::flags(&[
+        "--abbrev", "--color", "--column", "--contains",
+        "--format", "--merged", "--no-contains", "--no-merged",
+        "--points-at", "--sort",
+    ]),
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_TAG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&[
+        "--help", "--list", "--no-color", "--no-column",
+        "--verify",
+        "-h", "-l", "-v",
+    ]),
+    valued: WordSet::flags(&[
+        "--color", "--column", "--contains",
+        "--format", "--merged", "--no-contains", "--no-merged",
+        "--points-at", "--sort", "-n",
+    ]),
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_STASH_SUB_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&[]),
+    valued: WordSet::flags(&[]),
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Positional,
+};
+
+static GIT_WORKTREE_LIST_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&[
+        "--porcelain", "--verbose", "-v", "-z",
+    ]),
+    valued: WordSet::flags(&[]),
+    bare: true,
+    max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_CONFIG_ARG_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&[]),
+    valued: WordSet::flags(&[]),
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
+static GIT_NOTES_SUB_POLICY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&[]),
+    valued: WordSet::flags(&[]),
+    bare: true,
+    max_positional: None,
+    flag_style: FlagStyle::Strict,
+};
+
 static GIT_LOG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
         "--abbrev-commit", "--all", "--ancestry-path",
@@ -529,84 +605,8 @@ static GIT_REMOTE_MUTATING: WordSet = WordSet::new(&[
     "add", "prune", "remove", "rename", "set-branches", "set-url",
 ]);
 
-static GIT_BRANCH_MUTATING: WordSet = WordSet::new(&[
-    "--copy", "--delete", "--edit-description", "--move",
-    "--set-upstream-to", "--unset-upstream",
-    "-C", "-D", "-M", "-c", "-d", "-m", "-u",
-]);
-
-static GIT_STASH_SAFE: WordSet =
-    WordSet::new(&["--help", "-h", "list", "show"]);
-
-static GIT_TAG_MUTATING: WordSet = WordSet::new(&[
-    "--annotate", "--delete", "--force", "--sign",
-    "-a", "-d", "-f", "-s",
-]);
-
-static GIT_CONFIG_SAFE: WordSet =
-    WordSet::new(&["--get", "--get-all", "--get-regexp", "--help", "--list", "-h", "-l"]);
-
-static GIT_NOTES_SAFE: WordSet =
-    WordSet::new(&["--help", "-h", "list", "show"]);
-
-fn check_git_help(_tokens: &[Token]) -> Verdict {
-    if true { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
-
-}
-
 fn check_git_remote(tokens: &[Token]) -> Verdict {
     if tokens.get(1).is_none_or(|a| !GIT_REMOTE_MUTATING.contains(a)) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
-
-}
-
-fn check_git_branch(tokens: &[Token]) -> Verdict {
-    if tokens[1..].iter().all(|a| {
-        !GIT_BRANCH_MUTATING.contains(a)
-            && !GIT_BRANCH_MUTATING
-                .iter()
-                .any(|f| f.starts_with("--") && a.starts_with(&format!("{f}=")))
-    })
-    { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
-}
-
-fn check_git_stash(tokens: &[Token]) -> Verdict {
-    if tokens.get(1).is_some_and(|a| GIT_STASH_SAFE.contains(a)) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
-
-}
-
-fn check_git_tag(tokens: &[Token]) -> Verdict {
-    if tokens.len() == 1 {
-        return Verdict::Allowed(SafetyLevel::Inert);
-    }
-    if tokens[1..].iter().all(|a| !GIT_TAG_MUTATING.contains(a)) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
-
-}
-
-fn check_git_config(tokens: &[Token]) -> Verdict {
-    if tokens.get(1).is_some_and(|a| GIT_CONFIG_SAFE.contains(a))
-        && tokens[2..].iter().all(|a| !a.starts_with('-'))
-    { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
-}
-
-fn check_git_worktree(tokens: &[Token]) -> Verdict {
-    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
-        return Verdict::Allowed(SafetyLevel::Inert);
-    }
-    if tokens.get(1).is_some_and(|a| a == "list")
-        && tokens[2..].iter().all(|a| {
-            !a.starts_with('-')
-                || *a == "--porcelain"
-                || *a == "--verbose"
-                || *a == "-v"
-                || *a == "-z"
-        })
-    { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
-}
-
-fn check_git_notes(tokens: &[Token]) -> Verdict {
-    if tokens.get(1).is_some_and(|a| GIT_NOTES_SAFE.contains(a))
-        && tokens[2..].iter().all(|a| !a.starts_with('-'))
-    { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
 fn check_git_sub(args: &[Token]) -> Verdict {
@@ -619,10 +619,18 @@ fn check_git_sub(args: &[Token]) -> Verdict {
 
 static GIT_SUBS: &[SubDef] = &[
     SubDef::Policy { name: "blame", policy: &GIT_BLAME_POLICY, level: SafetyLevel::Inert },
-    SubDef::Custom { name: "branch", check: check_git_branch as CheckFn, doc: "branch (read-only flags).", test_suffix: None },
+    SubDef::Policy { name: "branch", policy: &GIT_BRANCH_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "cat-file", policy: &GIT_CAT_FILE_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "check-ignore", policy: &GIT_CHECK_IGNORE_POLICY, level: SafetyLevel::Inert },
-    SubDef::Custom { name: "config", check: check_git_config as CheckFn, doc: "config (--get, --get-all, --get-regexp, --list, -l only).", test_suffix: Some("--list") },
+    SubDef::Nested { name: "config", subs: &[
+        SubDef::Policy { name: "--get", policy: &GIT_CONFIG_ARG_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "--get-all", policy: &GIT_CONFIG_ARG_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "--get-regexp", policy: &GIT_CONFIG_ARG_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "--help", policy: &GIT_CONFIG_ARG_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "--list", policy: &GIT_CONFIG_ARG_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "-h", policy: &GIT_CONFIG_ARG_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "-l", policy: &GIT_CONFIG_ARG_POLICY, level: SafetyLevel::Inert },
+    ]},
     SubDef::Policy { name: "count-objects", policy: &GIT_COUNT_OBJECTS_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "describe", policy: &GIT_DESCRIBE_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "diff", policy: &GIT_DIFF_POLICY, level: SafetyLevel::Inert },
@@ -630,7 +638,7 @@ static GIT_SUBS: &[SubDef] = &[
     SubDef::Policy { name: "fetch", policy: &GIT_FETCH_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "for-each-ref", policy: &GIT_FOR_EACH_REF_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "grep", policy: &GIT_GREP_POLICY, level: SafetyLevel::Inert },
-    SubDef::Custom { name: "help", check: check_git_help as CheckFn, doc: "", test_suffix: None },
+    SubDef::Policy { name: "help", policy: &GIT_HELP_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "log", policy: &GIT_LOG_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "ls-files", policy: &GIT_LS_FILES_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "ls-remote", policy: &GIT_LS_REMOTE_POLICY, level: SafetyLevel::Inert },
@@ -638,18 +646,32 @@ static GIT_SUBS: &[SubDef] = &[
     SubDef::Policy { name: "merge-base", policy: &GIT_MERGE_BASE_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "merge-tree", policy: &GIT_MERGE_TREE_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "name-rev", policy: &GIT_NAME_REV_POLICY, level: SafetyLevel::Inert },
-    SubDef::Custom { name: "notes", check: check_git_notes as CheckFn, doc: "notes (list, show only).", test_suffix: Some("list") },
+    SubDef::Nested { name: "notes", subs: &[
+        SubDef::Policy { name: "--help", policy: &GIT_NOTES_SUB_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "-h", policy: &GIT_NOTES_SUB_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &GIT_NOTES_SUB_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "show", policy: &GIT_NOTES_SUB_POLICY, level: SafetyLevel::Inert },
+    ]},
     SubDef::Policy { name: "reflog", policy: &GIT_LOG_POLICY, level: SafetyLevel::Inert },
     SubDef::Custom { name: "remote", check: check_git_remote as CheckFn, doc: "remote (read-only actions).", test_suffix: None },
     SubDef::Policy { name: "rev-parse", policy: &GIT_REV_PARSE_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "shortlog", policy: &GIT_SHORTLOG_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "show", policy: &GIT_SHOW_POLICY, level: SafetyLevel::Inert },
-    SubDef::Custom { name: "stash", check: check_git_stash as CheckFn, doc: "stash (list, show only).", test_suffix: None },
+    SubDef::Nested { name: "stash", subs: &[
+        SubDef::Policy { name: "--help", policy: &GIT_STASH_SUB_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "-h", policy: &GIT_STASH_SUB_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &GIT_STASH_SUB_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "show", policy: &GIT_STASH_SUB_POLICY, level: SafetyLevel::Inert },
+    ]},
     SubDef::Policy { name: "status", policy: &GIT_STATUS_POLICY, level: SafetyLevel::Inert },
-    SubDef::Custom { name: "tag", check: check_git_tag as CheckFn, doc: "tag (list only).", test_suffix: None },
+    SubDef::Policy { name: "tag", policy: &GIT_TAG_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "verify-commit", policy: &GIT_VERIFY_COMMIT_POLICY, level: SafetyLevel::Inert },
     SubDef::Policy { name: "verify-tag", policy: &GIT_VERIFY_TAG_POLICY, level: SafetyLevel::Inert },
-    SubDef::Custom { name: "worktree", check: check_git_worktree as CheckFn, doc: "worktree (list only).", test_suffix: Some("list") },
+    SubDef::Nested { name: "worktree", subs: &[
+        SubDef::Policy { name: "--help", policy: &GIT_CONFIG_ARG_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "-h", policy: &GIT_CONFIG_ARG_POLICY, level: SafetyLevel::Inert },
+        SubDef::Policy { name: "list", policy: &GIT_WORKTREE_LIST_POLICY, level: SafetyLevel::Inert },
+    ]},
 ];
 
 pub(crate) static GIT: CommandDef = CommandDef {
