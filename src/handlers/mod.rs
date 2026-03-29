@@ -148,7 +148,7 @@ pub(crate) enum SubEntry {
 use crate::command::CommandDef;
 
 const COMMAND_DEFS: &[&CommandDef] = &[
-    &node::NPM, &node::BUN,
+    &node::BUN,
     &ruby::BUNDLE,
     &vcs::GIT,
 ];
