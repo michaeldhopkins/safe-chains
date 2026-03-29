@@ -112,10 +112,16 @@
 #
 # Use for: npm config get, docker compose ps, mise config ls, etc.
 # The parent sub has no flags of its own — it just groups child subs.
-# Bare invocation of the parent (e.g. "npm config") is rejected.
+# Bare invocation of the parent (e.g. "npm config") is rejected by default.
+#
+# Set nested_bare = true if bare invocation and --help/-h should be
+# accepted. Use this for commands like "mise settings" that show output
+# when invoked without a subcommand. This also allows --help/-h on the
+# parent without routing to a child sub.
 
 # [[command.sub]]
 # name = "config"
+# # nested_bare = true                  # set if "tool config" alone is safe
 #
 # [[command.sub.sub]]
 # name = "get"
