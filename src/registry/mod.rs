@@ -22,36 +22,21 @@ static CMD_HANDLERS: LazyLock<HashMap<&'static str, HandlerFn>> =
 static SUB_HANDLERS: LazyLock<HashMap<&'static str, HandlerFn>> =
     LazyLock::new(crate::handlers::custom_sub_handlers);
 
+macro_rules! load_commands {
+    ($($file:literal),* $(,)?) => {{
+        let mut all = Vec::new();
+        $(all.extend(load_toml(include_str!(concat!("../../commands/", $file, ".toml"))));)*
+        build_registry(all)
+    }};
+}
+
 static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| {
-    let mut all = Vec::new();
-    all.extend(load_toml(include_str!("../../commands/ai.toml")));
-    all.extend(load_toml(include_str!("../../commands/android.toml")));
-    all.extend(load_toml(include_str!("../../commands/binary.toml")));
-    all.extend(load_toml(include_str!("../../commands/builtins.toml")));
-    all.extend(load_toml(include_str!("../../commands/containers.toml")));
-    all.extend(load_toml(include_str!("../../commands/data.toml")));
-    all.extend(load_toml(include_str!("../../commands/dotnet.toml")));
-    all.extend(load_toml(include_str!("../../commands/fs.toml")));
-    all.extend(load_toml(include_str!("../../commands/fuzzy.toml")));
-    all.extend(load_toml(include_str!("../../commands/go.toml")));
-    all.extend(load_toml(include_str!("../../commands/hash.toml")));
-    all.extend(load_toml(include_str!("../../commands/jvm.toml")));
-    all.extend(load_toml(include_str!("../../commands/magick.toml")));
-    all.extend(load_toml(include_str!("../../commands/net.toml")));
-    all.extend(load_toml(include_str!("../../commands/node.toml")));
-    all.extend(load_toml(include_str!("../../commands/php.toml")));
-    all.extend(load_toml(include_str!("../../commands/python.toml")));
-    all.extend(load_toml(include_str!("../../commands/ruby.toml")));
-    all.extend(load_toml(include_str!("../../commands/rust.toml")));
-    all.extend(load_toml(include_str!("../../commands/search.toml")));
-    all.extend(load_toml(include_str!("../../commands/swift.toml")));
-    all.extend(load_toml(include_str!("../../commands/sysinfo.toml")));
-    all.extend(load_toml(include_str!("../../commands/system.toml")));
-    all.extend(load_toml(include_str!("../../commands/text.toml")));
-    all.extend(load_toml(include_str!("../../commands/tools.toml")));
-    all.extend(load_toml(include_str!("../../commands/wrappers.toml")));
-    all.extend(load_toml(include_str!("../../commands/xcode.toml")));
-    build_registry(all)
+    load_commands![
+        "ai", "android", "binary", "builtins", "containers", "data",
+        "dotnet", "fs", "fuzzy", "go", "hash", "jvm", "magick", "net",
+        "node", "php", "python", "ruby", "rust", "search", "swift",
+        "sysinfo", "system", "text", "tools", "wrappers", "xcode",
+    ]
 });
 
 pub fn toml_dispatch(tokens: &[Token]) -> Option<Verdict> {
