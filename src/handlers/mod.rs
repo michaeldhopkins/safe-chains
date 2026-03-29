@@ -53,6 +53,7 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
         .or_else(|| coreutils::dispatch(cmd, tokens))
         .or_else(|| fuzzy::dispatch(cmd, tokens))
         .or_else(|| magick::dispatch(cmd, tokens))
+        .or_else(|| crate::registry::toml_dispatch(tokens))
         .unwrap_or(Verdict::Denied)
 }
 
@@ -138,6 +139,7 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(shell::command_docs());
     docs.extend(wrappers::command_docs());
     docs.extend(magick::command_docs());
+    docs.extend(crate::registry::toml_command_docs());
     docs
 }
 
@@ -617,6 +619,9 @@ mod tests {
         }
         for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(ai::ai_flat_defs()).chain(ruby::ruby_flat_defs()).chain(system::system_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
             all_cmds.insert(def.name);
+        }
+        for name in crate::registry::toml_command_names() {
+            all_cmds.insert(name);
         }
         let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
 
