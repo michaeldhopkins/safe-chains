@@ -36,6 +36,8 @@ struct TomlCommand {
     sub: Vec<TomlSub>,
     #[serde(default)]
     handler: Option<String>,
+    #[serde(default)]
+    require_any: Vec<String>,
     #[allow(dead_code)]
     #[serde(default)]
     doc: Option<String>,
@@ -111,6 +113,11 @@ pub struct CommandSpec {
 #[derive(Debug)]
 enum CommandKind {
     Flat {
+        policy: OwnedPolicy,
+        level: SafetyLevel,
+    },
+    FlatRequireAny {
+        require_any: Vec<String>,
         policy: OwnedPolicy,
         level: SafetyLevel,
     },
@@ -418,13 +425,28 @@ fn build_command(toml: TomlCommand) -> CommandSpec {
         toml.positional_style,
     );
 
+    let level = toml.level.unwrap_or(TomlLevel::Inert).into();
+
+    if !toml.require_any.is_empty() {
+        return CommandSpec {
+            name: toml.name,
+            aliases: toml.aliases,
+            url: toml.url,
+            kind: CommandKind::FlatRequireAny {
+                require_any: toml.require_any,
+                policy,
+                level,
+            },
+        };
+    }
+
     CommandSpec {
         name: toml.name,
         aliases: toml.aliases,
         url: toml.url,
         kind: CommandKind::Flat {
             policy,
-            level: toml.level.unwrap_or(TomlLevel::Inert).into(),
+            level,
         },
     }
 }
@@ -444,6 +466,17 @@ pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
                 url: spec.url.clone(),
                 kind: match &spec.kind {
                     CommandKind::Flat { policy, level } => CommandKind::Flat {
+                        policy: OwnedPolicy {
+                            standalone: policy.standalone.clone(),
+                            valued: policy.valued.clone(),
+                            bare: policy.bare,
+                            max_positional: policy.max_positional,
+                            flag_style: policy.flag_style,
+                        },
+                        level: *level,
+                    },
+                    CommandKind::FlatRequireAny { require_any, policy, level } => CommandKind::FlatRequireAny {
+                        require_any: require_any.clone(),
                         policy: OwnedPolicy {
                             standalone: policy.standalone.clone(),
                             valued: policy.valued.clone(),
@@ -611,6 +644,11 @@ pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
                 Verdict::Denied
             }
         }
+        CommandKind::FlatRequireAny {
+            require_any,
+            policy,
+            level,
+        } => dispatch_require_any(tokens, require_any, policy, *level),
         CommandKind::Structured { bare_flags, subs } => {
             if tokens.len() < 2 {
                 return Verdict::Denied;
@@ -697,6 +735,15 @@ impl CommandSpec {
     fn to_command_doc(&self) -> crate::docs::CommandDoc {
         let description = match &self.kind {
             CommandKind::Flat { policy, .. } => policy.describe(),
+            CommandKind::FlatRequireAny { require_any, policy, .. } => {
+                let req = require_any.join(", ");
+                let summary = policy.describe();
+                if summary.is_empty() {
+                    format!("Requires {req}.")
+                } else {
+                    format!("Requires {req}. {summary}")
+                }
+            }
             CommandKind::Structured { bare_flags, subs } => {
                 let mut lines = Vec::new();
                 if !bare_flags.is_empty() {
@@ -1978,10 +2025,13 @@ mod tests {
     fn toml_registry_rejects_unknown_flags() {
         let mut failures = Vec::new();
         for (name, spec) in TOML_REGISTRY.iter() {
-            if let CommandKind::Flat { policy, .. } = &spec.kind {
-                if policy.flag_style == FlagStyle::Positional {
-                    continue;
+            match &spec.kind {
+                CommandKind::Flat { policy, .. } | CommandKind::FlatRequireAny { policy, .. } => {
+                    if policy.flag_style == FlagStyle::Positional {
+                        continue;
+                    }
                 }
+                _ => {}
             }
             let test = format!("{name} --xyzzy-unknown-42");
             if crate::is_safe_command(&test) {

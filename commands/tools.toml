@@ -1,4 +1,9 @@
-# Skipped custom handler: safe_chains
+[[command]]
+name = "safe-chains"
+url = "https://github.com/michaeldhopkins/safe-chains#readme"
+level = "Inert"
+bare = true
+positional_style = true
 
 [[command]]
 name = "branchdiff"

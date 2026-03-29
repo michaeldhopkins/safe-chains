@@ -1,17 +1,13 @@
-mod arch;
-
 use crate::command::FlatDef;
 use crate::verdict::Verdict;
 use crate::parse::Token;
 
-pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    arch::dispatch(cmd, tokens)
+pub(super) fn dispatch(_cmd: &str, _tokens: &[Token]) -> Option<Verdict> {
+    None
 }
 
 pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    let mut docs = Vec::new();
-    docs.extend(arch::command_docs());
-    docs
+    Vec::new()
 }
 
 pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
@@ -20,7 +16,5 @@ pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
 
 #[cfg(test)]
 pub(super) fn registry() -> Vec<&'static crate::handlers::CommandEntry> {
-    let mut v = Vec::new();
-    v.extend(arch::REGISTRY);
-    v
+    Vec::new()
 }

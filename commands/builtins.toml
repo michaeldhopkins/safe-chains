@@ -1,4 +1,12 @@
-# Skipped custom handlers: command, hostname
+# Skipped custom handler: command
+
+[[command]]
+name = "hostname"
+url = "https://man7.org/linux/man-pages/man1/hostname.1.html"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version", "-A", "-I", "-V", "-d", "-f", "-h", "-i", "-s"]
 
 [[command]]
 name = "alias"

@@ -1,3 +1,10 @@
+[[command]]
+name = "jarsigner"
+url = "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jarsigner.html"
+level = "Inert"
+bare = false
+require_any = ["-verify"]
+standalone = ["-certs", "-strict", "-verbose", "-verify", "-help", "-h"]
 
 [[command]]
 name = "detekt"

@@ -97,7 +97,8 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `arch` (https://www.gnu.org/software/coreutils/manual/coreutils.html#arch-invocation)
 
-- Bare invocation allowed.
+- Allowed standalone flags: --help, --version, -V, -h
+- Bare invocation allowed
 
 ### `asdf` (https://asdf-vm.com/manage/commands.html)
 
@@ -298,7 +299,8 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `codesign` (https://ss64.com/mac/codesign.html)
 
-- Requires --display/-d or --verify/-v.
+- Requires --display, --verify, -d, -v. - Allowed standalone flags: --deep, --display, --verify, -R, -d, -v, --help, -h
+- Allowed valued flags: --verbose
 
 ### `codex` (https://github.com/openai/codex)
 
@@ -374,7 +376,8 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `crontab` (https://ss64.com/mac/crontab.html)
 
-- Allowed: -l (list), -l -u <user>.
+- Requires -l. - Allowed standalone flags: -l, --help, -h
+- Allowed valued flags: -u
 
 ### `csrutil` (https://ss64.com/mac/csrutil.html)
 
@@ -858,8 +861,7 @@ Aliases: `egrep`, `fgrep`
 
 ### `gzip` (https://man7.org/linux/man-pages/man1/gzip.1.html)
 
-- Info/test modes only (requires -l/--list or -t/--test).
-- Flags: -v/--verbose.
+- Requires -l, --list, -t, --test. - Allowed standalone flags: -l, --list, -t, --test, -v, --verbose, --help, -h, --version, -V
 
 ### `head` (https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation)
 
@@ -916,7 +918,8 @@ Aliases: `egrep`, `fgrep`
 
 ### `hostname` (https://man7.org/linux/man-pages/man1/hostname.1.html)
 
-- Flags: --help, --version, -A, -I, -V, -d, -f, -h, -i, -s
+- Allowed standalone flags: --help, --version, -A, -I, -V, -d, -f, -h, -i, -s
+- Bare invocation allowed
 
 ### `htmlq` (https://github.com/mgdm/htmlq)
 
@@ -989,7 +992,7 @@ Aliases: `egrep`, `fgrep`
 
 ### `jarsigner` (https://docs.oracle.com/en/java/javase/21/docs/specs/man/jarsigner.html)
 
-- Verify mode only (requires -verify). Flags: -certs, -strict, -verbose.
+- Requires -verify. - Allowed standalone flags: -certs, -strict, -verbose, -verify, -help, -h
 
 ### `javap` (https://docs.oracle.com/en/java/javase/21/docs/specs/man/javap.html)
 
@@ -1095,7 +1098,7 @@ Aliases: `egrep`, `fgrep`
 
 ### `lipo` (https://ss64.com/mac/lipo.html)
 
-- Requires a read-only flag (-info, -archs, -detailed_info, -verify_arch).
+- Requires -archs, -detailed_info, -info, -verify_arch. - Allowed standalone flags: -archs, -detailed_info, -info, -verify_arch, --help, -h
 
 ### `llm` (https://llm.datasette.io/en/stable/)
 
@@ -1119,12 +1122,12 @@ Aliases: `egrep`, `fgrep`
 
 ### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
 
+Aliases: `mlocate`, `plocate`
+
 - Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
 - Allowed valued flags: --database, --limit, -d, -l, -n
 
 ### `locate` (https://man7.org/linux/man-pages/man1/locate.1.html)
-
-Aliases: `mlocate`, `plocate`
 
 - Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
 - Allowed valued flags: --database, --limit, -d, -l, -n
@@ -1467,9 +1470,8 @@ Aliases: `mlocate`, `plocate`
 
 ### `ping` (https://man7.org/linux/man-pages/man8/ping.8.html)
 
-- Requires -c/--count to prevent infinite ping.
-- Flags: -4, -6, -D, -O, -R, -a, -d, -n, -q, -v.
-- Valued: -I, -Q, -S, -W, -c, -i, -l, -s, -t, -w, --deadline, --interface, --interval, --ttl.
+- Requires -c, --count. - Allowed standalone flags: -4, -6, -D, -O, -R, -a, -d, -n, -q, -v, --help, -h, --version, -V
+- Allowed valued flags: --count, --deadline, --interface, --interval, --ttl, -I, -Q, -S, -W, -c, -i, -l, -s, -t, -w
 
 ### `pip` (https://pip.pypa.io/en/stable/cli/)
 
@@ -1489,7 +1491,8 @@ Aliases: `pip3`
 
 ### `pkgutil` (https://ss64.com/mac/pkgutil.html)
 
-- Requires a read-only flag (--pkgs, --files, --pkg-info, etc.).
+- Requires --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist. - Allowed standalone flags: --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist, --regexp, --help, -h
+- Allowed valued flags: --volume
 
 ### `plutil` (https://ss64.com/mac/plutil.html)
 
@@ -1500,7 +1503,7 @@ Aliases: `pip3`
 
 ### `pmset` (https://ss64.com/mac/pmset.html)
 
-- Allowed: -g (get/display settings only).
+- Requires -g. - Allowed standalone flags: -g, --help, -h
 
 ### `pnpm` (https://pnpm.io/pnpm-cli)
 
@@ -1701,7 +1704,8 @@ Aliases: `pip3`
 
 ### `safe-chains` (https://github.com/michaeldhopkins/safe-chains#readme)
 
-- Any arguments allowed (safe-chains is this tool).
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
 
 ### `sdkmanager` (https://developer.android.com/tools/sdkmanager)
 
@@ -1802,7 +1806,8 @@ Aliases: `pip3`
 
 ### `spctl` (https://ss64.com/mac/spctl.html)
 
-- Requires --assess/-a.
+- Requires --assess, -a. - Allowed standalone flags: --assess, --verbose, -a, -v, --help, -h
+- Allowed valued flags: --context, --type, -t
 
 ### `ss` (https://man7.org/linux/man-pages/man8/ss.8.html)
 
@@ -1841,7 +1846,8 @@ Aliases: `pip3`
 
 ### `swiftformat` (https://github.com/nicklockwood/SwiftFormat)
 
-- Requires --lint or --dryrun.
+- Requires --dryrun, --lint. - Allowed standalone flags: --dryrun, --lenient, --lint, --quiet, --strict, --verbose, --help, -h
+- Allowed valued flags: --config, --disable, --enable, --rules
 
 ### `swiftlint` (https://github.com/realm/SwiftLint)
 
@@ -2026,8 +2032,7 @@ Aliases: `[`
 
 ### `unzip` (https://linux.die.net/man/1/unzip)
 
-- List/test modes only (requires -l, -t, or -Z).
-- Flags: -1, -2, -C, -M, -T, -h, -m, -q, -s, -v, -z.
+- Requires -l, -t, -Z. - Allowed standalone flags: -1, -2, -C, -M, -T, -Z, -h, -l, -m, -q, -s, -t, -v, -z, --help, --version, -V
 
 ### `uptime` (https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation)
 
@@ -2212,12 +2217,12 @@ Aliases: `gzcat`
 
 ### `zgrep` (https://man7.org/linux/man-pages/man1/zgrep.1.html)
 
+Aliases: `zegrep`, `zfgrep`
+
 - Allowed standalone flags: --count, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --invert-match, --line-number, --no-filename, --only-matching, --quiet, --silent, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -L, -V, -Z, -c, -h, -i, -l, -n, -o, -q, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --file, --max-count, --regexp, -A, -B, -C, -e, -f, -m
 
 ### `zgrep` (https://man7.org/linux/man-pages/man1/zgrep.1.html)
-
-Aliases: `zegrep`, `zfgrep`
 
 - Allowed standalone flags: --count, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --invert-match, --line-number, --no-filename, --only-matching, --quiet, --silent, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -L, -V, -Z, -c, -h, -i, -l, -n, -o, -q, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --file, --max-count, --regexp, -A, -B, -C, -e, -f, -m
@@ -2229,7 +2234,7 @@ Aliases: `zegrep`, `zfgrep`
 
 ### `zipalign` (https://developer.android.com/tools/zipalign)
 
-- Check mode only (requires -c). Flags: -p, -v.
+- Requires -c. - Allowed standalone flags: -c, -p, -v, --help, -h, --version, -V
 
 ### `zipinfo` (https://linux.die.net/man/1/zipinfo)
 
