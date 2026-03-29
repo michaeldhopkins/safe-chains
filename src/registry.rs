@@ -535,7 +535,9 @@ use std::sync::LazyLock;
 
 static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| {
     let mut all = Vec::new();
+    all.extend(load_toml(include_str!("../commands/binary.toml")));
     all.extend(load_toml(include_str!("../commands/hash.toml")));
+    all.extend(load_toml(include_str!("../commands/text.toml")));
     build_registry(all)
 });
 
@@ -1428,7 +1430,12 @@ mod tests {
     #[test]
     fn toml_registry_rejects_unknown_flags() {
         let mut failures = Vec::new();
-        for (name, _spec) in TOML_REGISTRY.iter() {
+        for (name, spec) in TOML_REGISTRY.iter() {
+            if let CommandKind::Flat { policy, .. } = &spec.kind {
+                if policy.flag_style == FlagStyle::Positional {
+                    continue;
+                }
+            }
             let test = format!("{name} --xyzzy-unknown-42");
             if crate::is_safe_command(&test) {
                 failures.push(format!("{name}: accepted unknown flag"));

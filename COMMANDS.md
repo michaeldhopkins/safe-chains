@@ -266,7 +266,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `cat` (https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation)
 
-- Allowed standalone flags: --help, --number, --number-nonblank, --show-all, --show-ends, --show-nonprinting, --show-tabs, --squeeze-blank, --version, -A, -E, -T, -V, -b, -e, -h, -l, -n, -s, -t, -u, -v
+- Allowed standalone flags: -A, -E, -T, -V, -b, -e, -h, -l, -n, -s, -t, -u, -v, --help, --number, --number-nonblank, --show-all, --show-ends, --show-nonprinting, --show-tabs, --squeeze-blank, --version
 - Bare invocation allowed
 
 ### `cd` (https://man7.org/linux/man-pages/man1/cd.1p.html)
@@ -310,7 +310,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `col` (https://man7.org/linux/man-pages/man1/col.1.html)
 
-- Allowed standalone flags: --help, --version, -V, -b, -f, -h, -p, -x
+- Allowed standalone flags: -V, -b, -f, -h, -p, -x, --help, --version
 - Allowed valued flags: -l
 - Bare invocation allowed
 
@@ -321,13 +321,13 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `column` (https://man7.org/linux/man-pages/man1/column.1.html)
 
-- Allowed standalone flags: --fillrows, --help, --json, --keep-empty-lines, --table, --table-noextreme, --table-noheadings, --table-right-all, --version, -J, -L, -R, -V, -e, -h, -n, -t, -x
-- Allowed valued flags: --output-separator, --separator, --table-columns, --table-empty-lines, --table-hide, --table-name, --table-order, --table-right, --table-truncate, --table-wrap, -E, -H, -O, -W, -c, -d, -o, -r, -s
+- Allowed standalone flags: -J, -L, -R, -V, -e, -h, -n, -t, -x, --fillrows, --help, --json, --keep-empty-lines, --table, --table-noextreme, --table-noheadings, --table-right-all, --version
+- Allowed valued flags: -E, -H, -O, -W, -c, -d, -o, -r, -s, --output-separator, --separator, --table-columns, --table-empty-lines, --table-hide, --table-name, --table-order, --table-right, --table-truncate, --table-wrap
 - Bare invocation allowed
 
 ### `comm` (https://www.gnu.org/software/coreutils/manual/coreutils.html#comm-invocation)
 
-- Allowed standalone flags: --check-order, --help, --nocheck-order, --total, --version, --zero-terminated, -1, -2, -3, -V, -h, -i, -z
+- Allowed standalone flags: -1, -2, -3, -V, -h, -i, -z, --check-order, --help, --nocheck-order, --total, --version, --zero-terminated
 - Allowed valued flags: --output-delimiter
 
 ### `command` (https://man7.org/linux/man-pages/man1/command.1p.html)
@@ -401,8 +401,8 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `cut` (https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation)
 
-- Allowed standalone flags: --complement, --help, --only-delimited, --version, --zero-terminated, -V, -h, -n, -s, -w, -z
-- Allowed valued flags: --bytes, --characters, --delimiter, --fields, --output-delimiter, -b, -c, -d, -f
+- Allowed standalone flags: -V, -h, -n, -s, -w, -z, --complement, --help, --only-delimited, --version, --zero-terminated
+- Allowed valued flags: -b, -c, -d, -f, --bytes, --characters, --delimiter, --fields, --output-delimiter
 
 ### `dasel` (https://github.com/TomWright/dasel)
 
@@ -594,8 +594,8 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `expand` (https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation)
 
-- Allowed standalone flags: --help, --initial, --version, -V, -h, -i
-- Allowed valued flags: --tabs, -t
+- Allowed standalone flags: -V, -h, -i, --help, --initial, --version
+- Allowed valued flags: -t, --tabs
 - Bare invocation allowed
 
 ### `export` (https://man7.org/linux/man-pages/man1/export.1p.html)
@@ -673,8 +673,8 @@ Aliases: `fly`
 
 ### `fmt` (https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation)
 
-- Allowed standalone flags: --crown-margin, --help, --split-only, --tagged-paragraph, --uniform-spacing, --version, -V, -c, -h, -m, -n, -s, -u
-- Allowed valued flags: --goal, --prefix, --width, -d, -g, -l, -p, -t, -w
+- Allowed standalone flags: -V, -c, -h, -m, -n, -s, -u, --crown-margin, --help, --split-only, --tagged-paragraph, --uniform-spacing, --version
+- Allowed valued flags: -d, -g, -l, -p, -t, -w, --goal, --prefix, --width
 - Bare invocation allowed
 
 ### `fnm` (https://github.com/Schniz/fnm#readme)
@@ -687,8 +687,8 @@ Aliases: `fly`
 
 ### `fold` (https://www.gnu.org/software/coreutils/manual/coreutils.html#fold-invocation)
 
-- Allowed standalone flags: --bytes, --help, --spaces, --version, -V, -b, -h, -s
-- Allowed valued flags: --width, -w
+- Allowed standalone flags: -V, -b, -h, -s, --bytes, --help, --spaces, --version
+- Allowed valued flags: -w, --width
 - Bare invocation allowed
 
 ### `free` (https://man7.org/linux/man-pages/man1/free.1.html)
@@ -835,8 +835,8 @@ Aliases: `egrep`, `fgrep`
 
 ### `head` (https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation)
 
-- Allowed standalone flags: --help, --quiet, --silent, --verbose, --version, --zero-terminated, -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -V, -h, -q, -v, -z
-- Allowed valued flags: --bytes, --lines, -c, -n
+- Allowed standalone flags: -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -V, -h, -q, -v, -z, --help, --quiet, --silent, --verbose, --version, --zero-terminated
+- Allowed valued flags: -c, -n, --bytes, --lines
 - Bare invocation allowed
 
 ### `heroku` (https://devcenter.heroku.com/articles/heroku-cli-commands)
@@ -855,7 +855,7 @@ Aliases: `egrep`, `fgrep`
 
 ### `hexdump` (https://man7.org/linux/man-pages/man1/hexdump.1.html)
 
-- Allowed standalone flags: --help, --version, -C, -V, -b, -c, -d, -h, -o, -v, -x
+- Allowed standalone flags: -C, -V, -b, -c, -d, -h, -o, -v, -x, --help, --version
 - Allowed valued flags: -L, -e, -f, -n, -s
 - Bare invocation allowed
 
@@ -907,8 +907,8 @@ Aliases: `egrep`, `fgrep`
 
 ### `iconv` (https://man7.org/linux/man-pages/man1/iconv.1.html)
 
-- Allowed standalone flags: --help, --list, --silent, --version, -V, -c, -h, -l, -s
-- Allowed valued flags: --from-code, --to-code, -f, -t
+- Allowed standalone flags: -V, -c, -h, -l, -s, --help, --list, --silent, --version
+- Allowed valued flags: -f, -t, --from-code, --to-code
 
 ### `id` (https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation)
 
@@ -1055,8 +1055,8 @@ Aliases: `egrep`, `fgrep`
 
 ### `less` (https://man7.org/linux/man-pages/man1/less.1.html)
 
-- Allowed standalone flags: --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version, -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w
-- Allowed valued flags: --LINE-NUMBERS, --LONG-PROMPT, --pattern, --prompt, --shift, --tabs, --tag, --window, -P, -b, -h, -j, -p, -t, -x, -y, -z
+- Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
+- Allowed valued flags: -P, -b, -h, -j, -p, -t, -x, -y, -z, --LINE-NUMBERS, --LONG-PROMPT, --pattern, --prompt, --shift, --tabs, --tag, --window
 - Bare invocation allowed
 
 ### `lint` (https://developer.android.com/studio/write/lint)
@@ -1145,8 +1145,8 @@ Aliases: `mlocate`, `plocate`
 
 ### `mdls` (https://ss64.com/mac/mdls.html)
 
-- Allowed standalone flags: --help, --raw, --version, -V, -h, -r
-- Allowed valued flags: --name, --nullMarker, -n
+- Allowed standalone flags: -V, -h, -r, --help, --raw, --version
+- Allowed valued flags: -n, --name, --nullMarker
 
 ### `mise` (https://mise.jdx.dev/cli/)
 
@@ -1207,8 +1207,8 @@ Aliases: `mlocate`, `plocate`
 
 ### `more` (https://man7.org/linux/man-pages/man1/more.1.html)
 
-- Allowed standalone flags: --help, --version, -V, -c, -d, -f, -h, -l, -p, -s, -u
-- Allowed valued flags: --lines, -n
+- Allowed standalone flags: -V, -c, -d, -f, -h, -l, -p, -s, -u, --help, --version
+- Allowed valued flags: -n, --lines
 - Bare invocation allowed
 
 ### `mvn / mvnw` (https://maven.apache.org/ref/current/maven-embedder/cli.html)
@@ -1231,14 +1231,14 @@ Aliases: `mlocate`, `plocate`
 
 ### `nl` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nl-invocation)
 
-- Allowed standalone flags: --help, --no-renumber, --version, -V, -p
-- Allowed valued flags: --body-numbering, --footer-numbering, --header-numbering, --join-blank-lines, --line-increment, --number-format, --number-separator, --number-width, --section-delimiter, --starting-line-number, -b, -d, -f, -h, -i, -l, -n, -s, -v, -w
+- Allowed standalone flags: -V, -p, --help, --no-renumber, --version
+- Allowed valued flags: -b, -d, -f, -h, -i, -l, -n, -s, -v, -w, --body-numbering, --footer-numbering, --header-numbering, --join-blank-lines, --line-increment, --number-format, --number-separator, --number-width, --section-delimiter, --starting-line-number
 - Bare invocation allowed
 
 ### `nm` (https://man7.org/linux/man-pages/man1/nm.1.html)
 
-- Allowed standalone flags: --debug-syms, --defined-only, --demangle, --dynamic, --extern-only, --help, --line-numbers, --no-demangle, --no-llvm-bc, --no-sort, --numeric-sort, --portability, --print-armap, --print-file-name, --print-size, --reverse-sort, --special-syms, --undefined-only, --version, -A, -B, -C, -D, -P, -S, -V, -a, -g, -h, -j, -l, -m, -n, -o, -p, -r, -s, -u, -v, -x
-- Allowed valued flags: --format, --radix, --size-sort, --target, -f, -t
+- Allowed standalone flags: -A, -B, -C, -D, -P, -S, -V, -a, -g, -h, -j, -l, -m, -n, -o, -p, -r, -s, -u, -v, -x, --debug-syms, --defined-only, --demangle, --dynamic, --extern-only, --help, --line-numbers, --no-demangle, --no-llvm-bc, --no-sort, --numeric-sort, --portability, --print-armap, --print-file-name, --print-size, --reverse-sort, --special-syms, --undefined-only, --version
+- Allowed valued flags: -f, -t, --format, --radix, --size-sort, --target
 
 ### `npm` (https://docs.npmjs.com/cli)
 
@@ -1274,7 +1274,7 @@ Aliases: `mlocate`, `plocate`
 
 ### `nroff` (https://man7.org/linux/man-pages/man1/nroff.1.html)
 
-- Allowed standalone flags: --help, --version, -S, -V, -c, -h, -i, -k, -p, -q, -t
+- Allowed standalone flags: -S, -V, -c, -h, -i, -k, -p, -q, -t, --help, --version
 - Allowed valued flags: -M, -P, -T, -d, -m, -n, -o, -r, -w
 
 ### `nslookup` (https://man7.org/linux/man-pages/man1/nslookup.1.html)
@@ -1293,8 +1293,8 @@ Aliases: `mlocate`, `plocate`
 
 ### `od` (https://www.gnu.org/software/coreutils/manual/coreutils.html#od-invocation)
 
-- Allowed standalone flags: --help, --output-duplicates, --traditional, --version, -V, -b, -c, -d, -f, -h, -i, -l, -o, -s, -v, -x
-- Allowed valued flags: --address-radix, --endian, --format, --read-bytes, --skip-bytes, --strings, --width, -A, -N, -S, -j, -t, -w
+- Allowed standalone flags: -V, -b, -c, -d, -f, -h, -i, -l, -o, -s, -v, -x, --help, --output-duplicates, --traditional, --version
+- Allowed valued flags: -A, -N, -S, -j, -t, -w, --address-radix, --endian, --format, --read-bytes, --skip-bytes, --strings, --width
 - Bare invocation allowed
 
 ### `ollama` (https://github.com/ollama/ollama/blob/main/docs/api.md)
@@ -1329,7 +1329,7 @@ Aliases: `orb`
 
 ### `otool` (https://ss64.com/mac/otool.html)
 
-- Allowed standalone flags: --help, --version, -D, -I, -L, -V, -X, -a, -c, -d, -f, -h, -l, -o, -r, -t, -v, -x
+- Allowed standalone flags: -D, -I, -L, -V, -X, -a, -c, -d, -f, -h, -l, -o, -r, -t, -v, -x, --help, --version
 - Allowed valued flags: -p, -s
 
 ### `overmind` (https://github.com/DarthSim/overmind)
@@ -1346,8 +1346,8 @@ Aliases: `orb`
 
 ### `paste` (https://www.gnu.org/software/coreutils/manual/coreutils.html#paste-invocation)
 
-- Allowed standalone flags: --help, --serial, --version, --zero-terminated, -V, -h, -s, -z
-- Allowed valued flags: --delimiters, -d
+- Allowed standalone flags: -V, -h, -s, -z, --help, --serial, --version, --zero-terminated
+- Allowed valued flags: -d, --delimiters
 - Bare invocation allowed
 
 ### `peco` (https://github.com/peco/peco)
@@ -1578,7 +1578,7 @@ Aliases: `pip3`
 
 ### `rev` (https://man7.org/linux/man-pages/man1/rev.1.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
+- Allowed standalone flags: -V, -h, --help, --version
 - Bare invocation allowed
 
 ### `rg` (https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md)
@@ -1697,12 +1697,12 @@ Aliases: `pip3`
 
 ### `sips` (https://ss64.com/mac/sips.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
-- Allowed valued flags: --getProperty, -g
+- Allowed standalone flags: -V, -h, --help, --version
+- Allowed valued flags: -g, --getProperty
 
 ### `size` (https://man7.org/linux/man-pages/man1/size.1.html)
 
-- Allowed standalone flags: --common, --help, --totals, --version, -A, -B, -G, -V, -d, -h, -o, -t, -x
+- Allowed standalone flags: -A, -B, -G, -V, -d, -h, -o, -t, -x, --common, --help, --totals, --version
 - Allowed valued flags: --format, --radix, --target
 
 ### `sk` (https://github.com/lotabout/skim)
@@ -1736,8 +1736,8 @@ Aliases: `pip3`
 
 ### `strings` (https://man7.org/linux/man-pages/man1/strings.1.html)
 
-- Allowed standalone flags: --all, --help, --include-all-whitespace, --print-file-name, --version, -V, -a, -f, -h, -w
-- Allowed valued flags: --bytes, --encoding, --output-separator, --radix, --target, -T, -e, -n, -o, -s, -t
+- Allowed standalone flags: -V, -a, -f, -h, -w, --all, --help, --include-all-whitespace, --print-file-name, --version
+- Allowed valued flags: -T, -e, -n, -o, -s, -t, --bytes, --encoding, --output-separator, --radix, --target
 
 ### `sum` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sum-invocation)
 
@@ -1783,14 +1783,14 @@ Aliases: `pip3`
 
 ### `tac` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation)
 
-- Allowed standalone flags: --before, --help, --regex, --version, -V, -b, -h, -r
-- Allowed valued flags: --separator, -s
+- Allowed standalone flags: -V, -b, -h, -r, --before, --help, --regex, --version
+- Allowed valued flags: -s, --separator
 - Bare invocation allowed
 
 ### `tail` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tail-invocation)
 
-- Allowed standalone flags: --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated, -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -F, -V, -f, -h, -q, -r, -v, -z
-- Allowed valued flags: --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval, -b, -c, -n
+- Allowed standalone flags: -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -F, -V, -f, -h, -q, -r, -v, -z, --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated
+- Allowed valued flags: -b, -c, -n, --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval
 - Bare invocation allowed
 
 ### `tailscale` (https://tailscale.com/kb/1080/cli)
@@ -1876,7 +1876,7 @@ Aliases: `[`
 
 ### `tr` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation)
 
-- Allowed standalone flags: --complement, --delete, --help, --squeeze-repeats, --truncate-set1, --version, -C, -V, -c, -d, -h, -s
+- Allowed standalone flags: -C, -V, -c, -d, -h, -s, --complement, --delete, --help, --squeeze-repeats, --truncate-set1, --version
 
 ### `tree` (https://man7.org/linux/man-pages/man1/tree.1.html)
 
@@ -1923,14 +1923,14 @@ Aliases: `[`
 
 ### `unexpand` (https://www.gnu.org/software/coreutils/manual/coreutils.html#unexpand-invocation)
 
-- Allowed standalone flags: --all, --first-only, --help, --version, -V, -a, -h
-- Allowed valued flags: --tabs, -t
+- Allowed standalone flags: -V, -a, -h, --all, --first-only, --help, --version
+- Allowed valued flags: -t, --tabs
 - Bare invocation allowed
 
 ### `uniq` (https://www.gnu.org/software/coreutils/manual/coreutils.html#uniq-invocation)
 
-- Allowed standalone flags: --count, --help, --ignore-case, --repeated, --unique, --version, --zero-terminated, -D, -V, -c, -d, -h, -i, -u, -z
-- Allowed valued flags: --all-repeated, --check-chars, --group, --skip-chars, --skip-fields, -f, -s, -w
+- Allowed standalone flags: -D, -V, -c, -d, -h, -i, -u, -z, --count, --help, --ignore-case, --repeated, --unique, --version, --zero-terminated
+- Allowed valued flags: -f, -s, -w, --all-repeated, --check-chars, --group, --skip-chars, --skip-fields
 - Bare invocation allowed
 
 ### `unset` (https://man7.org/linux/man-pages/man1/unset.1p.html)
@@ -2000,7 +2000,7 @@ Aliases: `[`
 
 ### `wc` (https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation)
 
-- Allowed standalone flags: --bytes, --chars, --help, --lines, --max-line-length, --version, --words, --zero-terminated, -L, -V, -c, -h, -l, -m, -w
+- Allowed standalone flags: -L, -V, -c, -h, -l, -m, -w, --bytes, --chars, --help, --lines, --max-line-length, --version, --words, --zero-terminated
 - Allowed valued flags: --files0-from
 - Bare invocation allowed
 
@@ -2088,7 +2088,7 @@ Aliases: `[`
 
 ### `xv` (https://github.com/gyscos/xv)
 
-- Allowed standalone flags: --help, --version, -V, -h
+- Allowed standalone flags: -V, -h, --help, --version
 - Hyphen-prefixed positional arguments accepted
 
 ### `xxd` (https://man7.org/linux/man-pages/man1/xxd.1.html)
@@ -2108,9 +2108,14 @@ Aliases: `[`
 
 ### `zcat` (https://man7.org/linux/man-pages/man1/zcat.1.html)
 
+- Allowed standalone flags: -V, -f, -h, -q, -v, --force, --help, --quiet, --verbose, --version
+- Bare invocation allowed
+
+### `zcat` (https://man7.org/linux/man-pages/man1/zcat.1.html)
+
 Aliases: `gzcat`
 
-- Allowed standalone flags: --force, --help, --quiet, --verbose, --version, -V, -f, -h, -q, -v
+- Allowed standalone flags: -V, -f, -h, -q, -v, --force, --help, --quiet, --verbose, --version
 - Bare invocation allowed
 
 ### `zf` (https://github.com/natecraddock/zf)
