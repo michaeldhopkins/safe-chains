@@ -34,6 +34,12 @@
 #   Does a subcommand accept anything (git help)?
 #     → Use "allow_all = true"
 #
+#   Does a subcommand only allow specific argument values (npm run test)?
+#     → Use "first_arg" with patterns
+#
+#   Does a subcommand require one of several flags (conda config --show)?
+#     → Use "require_any"
+#
 #   Does a flag promote the safety level (sk --history → SafeWrite)?
 #     → Use "write_flags"
 #
@@ -130,6 +136,22 @@
 # [[command.sub.sub]]
 # name = "list"
 # standalone = ["--help", "--json", "-h"]
+
+# ─────────────────────────────────────────────────────────────────────
+# FIRST ARG FILTER — restrict which argument values are accepted
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use when a subcommand accepts an argument but only specific values are
+# safe. The first positional argument after the subcommand name must
+# match one of the patterns. Supports trailing * for prefix matching.
+# Example: "npm run test" and "npm run test:unit" are safe, but
+# "npm run build" is not.
+# --help/-h is always allowed without matching.
+
+# [[command.sub]]
+# name = "run"
+# first_arg = ["test", "test:*"]         # "test" exact or "test:..." prefix
+# level = "SafeRead"
 
 # ─────────────────────────────────────────────────────────────────────
 # REQUIRE ANY — subcommand needs at least one of several flags

@@ -69,6 +69,8 @@ struct TomlSub {
     #[serde(default)]
     require_any: Vec<String>,
     #[serde(default)]
+    first_arg: Vec<String>,
+    #[serde(default)]
     write_flags: Vec<String>,
     #[serde(default)]
     delegate_after: Option<String>,
@@ -151,6 +153,10 @@ enum SubKind {
         policy: OwnedPolicy,
         base_level: SafetyLevel,
         write_flags: Vec<String>,
+    },
+    FirstArgFilter {
+        patterns: Vec<String>,
+        level: SafetyLevel,
     },
     RequireAny {
         require_any: Vec<String>,
@@ -355,6 +361,16 @@ fn build_sub(toml: TomlSub) -> SubSpec {
         };
     }
 
+    if !toml.first_arg.is_empty() {
+        return SubSpec {
+            name: toml.name,
+            kind: SubKind::FirstArgFilter {
+                patterns: toml.first_arg,
+                level,
+            },
+        };
+    }
+
     if !toml.require_any.is_empty() {
         return SubSpec {
             name: toml.name,
@@ -454,6 +470,45 @@ fn has_flag_owned(tokens: &[Token], short: Option<&str>, long: &str) -> bool {
     })
 }
 
+fn dispatch_first_arg(tokens: &[Token], patterns: &[String], level: SafetyLevel) -> Verdict {
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
+    let Some(arg) = tokens.get(1) else {
+        return Verdict::Denied;
+    };
+    let arg_str = arg.as_str();
+    let matches = patterns.iter().any(|p| {
+        if let Some(prefix) = p.strip_suffix('*') {
+            arg_str.starts_with(prefix)
+        } else {
+            arg_str == p
+        }
+    });
+    if matches { Verdict::Allowed(level) } else { Verdict::Denied }
+}
+
+fn dispatch_require_any(
+    tokens: &[Token],
+    require_any: &[String],
+    policy: &OwnedPolicy,
+    level: SafetyLevel,
+) -> Verdict {
+    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
+    let has_required = tokens[1..].iter().any(|t| {
+        require_any.iter().any(|r| {
+            t == r.as_str() || t.as_str().starts_with(&format!("{r}="))
+        })
+    });
+    if has_required && check_owned(tokens, policy) {
+        Verdict::Allowed(level)
+    } else {
+        Verdict::Denied
+    }
+}
+
 fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
     match &sub.kind {
         SubKind::Policy { policy, level } => {
@@ -511,27 +566,14 @@ fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
                 Verdict::Allowed(*base_level)
             }
         }
+        SubKind::FirstArgFilter { patterns, level } => {
+            dispatch_first_arg(tokens, patterns, *level)
+        }
         SubKind::RequireAny {
             require_any,
             policy,
             level,
-        } => {
-            if tokens.len() == 2
-                && (tokens[1] == "--help" || tokens[1] == "-h")
-            {
-                return Verdict::Allowed(SafetyLevel::Inert);
-            }
-            let has_required = tokens[1..].iter().any(|t| {
-                require_any.iter().any(|r| {
-                    t == r.as_str() || t.as_str().starts_with(&format!("{r}="))
-                })
-            });
-            if has_required && check_owned(tokens, policy) {
-                Verdict::Allowed(*level)
-            } else {
-                Verdict::Denied
-            }
-        }
+        } => dispatch_require_any(tokens, require_any, policy, *level),
         SubKind::DelegateAfterSeparator { separator } => {
             let sep_pos = tokens[1..].iter().position(|t| t == separator.as_str());
             let Some(pos) = sep_pos else {
@@ -735,6 +777,10 @@ impl SubSpec {
                 } else {
                     out.push(format!("- **{label}**: {summary}"));
                 }
+            }
+            SubKind::FirstArgFilter { patterns, .. } => {
+                let args = patterns.join(", ");
+                out.push(format!("- **{label}**: Allowed arguments: {args}"));
             }
             SubKind::RequireAny { require_any, policy, .. } => {
                 let req = require_any.join(", ");
@@ -1363,6 +1409,129 @@ mod tests {
         assert_eq!(
             dispatch_spec(&toks(&["git", "help", "commit", "--verbose"]), &spec),
             Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    // ---------------------------------------------------------------
+    // FirstArgFilter (first_arg field)
+    // ---------------------------------------------------------------
+
+    #[test]
+    fn first_arg_exact_match() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "npm"
+            bare_flags = ["--help", "--version", "-V", "-h"]
+
+            [[command.sub]]
+            name = "run"
+            first_arg = ["test"]
+            level = "SafeRead"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["npm", "run", "test"]), &spec),
+            Verdict::Allowed(SafetyLevel::SafeRead),
+        );
+    }
+
+    #[test]
+    fn first_arg_glob_match() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "npm"
+
+            [[command.sub]]
+            name = "run"
+            first_arg = ["test", "test:*"]
+            level = "SafeRead"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["npm", "run", "test:unit"]), &spec),
+            Verdict::Allowed(SafetyLevel::SafeRead),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["npm", "run", "test:integration"]), &spec),
+            Verdict::Allowed(SafetyLevel::SafeRead),
+        );
+    }
+
+    #[test]
+    fn first_arg_rejects_non_matching() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "npm"
+
+            [[command.sub]]
+            name = "run"
+            first_arg = ["test", "test:*"]
+            level = "SafeRead"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["npm", "run", "build"]), &spec),
+            Verdict::Denied,
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["npm", "run", "start"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn first_arg_rejects_bare() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "npm"
+
+            [[command.sub]]
+            name = "run"
+            first_arg = ["test"]
+            level = "SafeRead"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["npm", "run"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn first_arg_allows_help() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "npm"
+
+            [[command.sub]]
+            name = "run"
+            first_arg = ["test"]
+            level = "SafeRead"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["npm", "run", "--help"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["npm", "run", "-h"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn first_arg_glob_does_not_match_partial() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "npm"
+
+            [[command.sub]]
+            name = "run"
+            first_arg = ["test:*"]
+            level = "SafeRead"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["npm", "run", "test"]), &spec),
+            Verdict::Denied,
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["npm", "run", "testing"]), &spec),
+            Verdict::Denied,
         );
     }
 
