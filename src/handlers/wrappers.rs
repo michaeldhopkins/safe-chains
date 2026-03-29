@@ -1,9 +1,6 @@
 use crate::parse::{Token, WordSet};
 use crate::verdict::{SafetyLevel, Verdict};
 
-static TIMEOUT_FLAGS_WITH_ARG: WordSet =
-    WordSet::new(&["--kill-after", "--signal", "-k", "-s"]);
-
 pub fn is_safe_env(tokens: &[Token]) -> Verdict {
     if tokens.len() == 1 {
         return Verdict::Allowed(SafetyLevel::Inert);
@@ -23,51 +20,6 @@ pub fn is_safe_env(tokens: &[Token]) -> Verdict {
     }
     if i >= tokens.len() {
         return Verdict::Allowed(SafetyLevel::Inert);
-    }
-    let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
-    crate::command_verdict(&inner)
-}
-
-pub fn is_safe_timeout(tokens: &[Token]) -> Verdict {
-    let mut i = 1;
-    while i < tokens.len() && tokens[i].starts_with("-") {
-        if TIMEOUT_FLAGS_WITH_ARG.contains(&tokens[i]) {
-            i += 2;
-        } else {
-            i += 1;
-        }
-    }
-    i += 1;
-    if i >= tokens.len() {
-        return Verdict::Denied;
-    }
-    let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
-    crate::command_verdict(&inner)
-}
-
-pub fn is_safe_time(tokens: &[Token]) -> Verdict {
-    let mut i = 1;
-    if i < tokens.len() && tokens[i] == "-p" {
-        i += 1;
-    }
-    if i >= tokens.len() {
-        return Verdict::Denied;
-    }
-    let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
-    crate::command_verdict(&inner)
-}
-
-pub fn is_safe_nice(tokens: &[Token]) -> Verdict {
-    let mut i = 1;
-    while i < tokens.len() && tokens[i].starts_with("-") {
-        if tokens[i] == "-n" || tokens[i] == "--adjustment" {
-            i += 2;
-        } else {
-            i += 1;
-        }
-    }
-    if i >= tokens.len() {
-        return Verdict::Denied;
     }
     let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
     crate::command_verdict(&inner)
@@ -124,42 +76,10 @@ pub fn is_safe_hyperfine(tokens: &[Token]) -> Verdict {
     combined
 }
 
-static DOTENV_FLAGS_WITH_ARG: WordSet =
-    WordSet::new(&["-c", "-e", "-f", "-v"]);
-
-pub fn is_safe_dotenv(tokens: &[Token]) -> Verdict {
-    let mut i = 1;
-    while i < tokens.len() {
-        let t = &tokens[i];
-        if *t == "--" {
-            i += 1;
-            break;
-        }
-        if t.starts_with("-") {
-            if DOTENV_FLAGS_WITH_ARG.contains(t) {
-                i += 2;
-            } else {
-                i += 1;
-            }
-            continue;
-        }
-        break;
-    }
-    if i >= tokens.len() {
-        return Verdict::Denied;
-    }
-    let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
-    crate::command_verdict(&inner)
-}
-
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "timeout" => Some(is_safe_timeout(tokens)),
-        "time" => Some(is_safe_time(tokens)),
         "env" => Some(is_safe_env(tokens)),
-        "nice" | "ionice" => Some(is_safe_nice(tokens)),
         "hyperfine" => Some(is_safe_hyperfine(tokens)),
-        "dotenv" => Some(is_safe_dotenv(tokens)),
         _ => None,
     }
 }
@@ -170,36 +90,16 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("env",
             "https://www.gnu.org/software/coreutils/manual/coreutils.html#env-invocation",
             "Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed."),
-        CommandDoc::handler("timeout",
-            "https://www.gnu.org/software/coreutils/manual/coreutils.html#timeout-invocation",
-            "Skips timeout flags (-s/--signal, -k/--kill-after, --preserve-status), then recursively validates the inner command."),
-        CommandDoc::handler("time",
-            "https://man7.org/linux/man-pages/man1/time.1.html",
-            "Skips -p flag, then recursively validates the inner command."),
         CommandDoc::handler("hyperfine",
             "https://github.com/sharkdp/hyperfine#readme",
             "Recursively validates each benchmarked command."),
-        CommandDoc::handler("nice",
-            "https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation",
-            "Skips priority flags (-n/--adjustment), then recursively validates the inner command."),
-        CommandDoc::handler("ionice",
-            "https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation",
-            "Skips priority flags (-n/--adjustment), then recursively validates the inner command."),
-        CommandDoc::handler("dotenv",
-            "https://github.com/bkeepers/dotenv",
-            "Skips flags (-e, -f, -c, -v), then recursively validates the inner command."),
     ]
 }
 
 #[cfg(test)]
 pub(super) const REGISTRY: &[super::CommandEntry] = &[
-    super::CommandEntry::Delegation { cmd: "timeout" },
-    super::CommandEntry::Delegation { cmd: "time" },
     super::CommandEntry::Delegation { cmd: "env" },
-    super::CommandEntry::Delegation { cmd: "nice" },
-    super::CommandEntry::Delegation { cmd: "ionice" },
     super::CommandEntry::Delegation { cmd: "hyperfine" },
-    super::CommandEntry::Delegation { cmd: "dotenv" },
 ];
 
 #[cfg(test)]
