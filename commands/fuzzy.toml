@@ -1,0 +1,45 @@
+# Skipped custom handlers: fzf, sk
+
+[[command]]
+name = "fzy"
+url = "https://github.com/jhawthorn/fzy"
+level = "Inert"
+bare = true
+standalone = ["--help", "--show-info", "--show-scores", "--version", "-h", "-i", "-v"]
+valued = ["--lines", "--prompt", "--query", "--show-matches", "--tty", "-e", "-l", "-p", "-q", "-t"]
+
+[[command]]
+name = "peco"
+url = "https://github.com/peco/peco"
+level = "Inert"
+bare = true
+standalone = ["--help", "--null", "--print-query", "--select-1", "--version", "-h", "-v"]
+valued = [
+    "--buffer-size", "--initial-filter", "--initial-index",
+    "--layout", "--on-cancel", "--prompt", "--query", "--selection-prefix",
+    "-b",
+]
+
+[[command]]
+name = "pick"
+url = "https://github.com/mptre/pick"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-K", "-S", "-X", "-d", "-h", "-o", "-v", "-x"]
+valued = ["-q"]
+
+[[command]]
+name = "selecta"
+url = "https://github.com/garybernhardt/selecta"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-h", "-v"]
+valued = ["--search", "-s"]
+
+[[command]]
+name = "zf"
+url = "https://github.com/natecraddock/zf"
+level = "Inert"
+bare = true
+standalone = ["--help", "--keep-order", "--plain", "--version", "-0", "-h", "-k", "-p", "-v"]
+valued = ["--delimiter", "--filter", "--height", "--lines", "--preview-width", "-d", "-f", "-l"]

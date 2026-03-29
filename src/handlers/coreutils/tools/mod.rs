@@ -1,43 +1,21 @@
-mod branchdiff;
-mod cloc;
-mod cucumber;
-mod identify;
-mod man;
 mod safe_chains;
-mod shellcheck;
-mod tokei;
-mod workon;
 
 use crate::command::FlatDef;
 use crate::verdict::Verdict;
 use crate::parse::Token;
 
 pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    for flat in all_flat_defs() {
-        if let r @ Some(_) = flat.dispatch(cmd, tokens) {
-            return r;
-        }
-    }
     safe_chains::dispatch(cmd, tokens)
 }
 
 pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    let mut docs: Vec<_> = all_flat_defs().iter().map(|d| d.to_doc()).collect();
+    let mut docs = Vec::new();
     docs.extend(safe_chains::command_docs());
     docs
 }
 
 pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
-    let mut v = Vec::new();
-    v.extend(branchdiff::FLAT_DEFS);
-    v.extend(cloc::FLAT_DEFS);
-    v.extend(cucumber::FLAT_DEFS);
-    v.extend(identify::FLAT_DEFS);
-    v.extend(man::FLAT_DEFS);
-    v.extend(shellcheck::FLAT_DEFS);
-    v.extend(tokei::FLAT_DEFS);
-    v.extend(workon::FLAT_DEFS);
-    v
+    Vec::new()
 }
 
 #[cfg(test)]

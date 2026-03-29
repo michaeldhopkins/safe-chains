@@ -1,0 +1,27 @@
+# Skipped CommandDef: aapt2, apkanalyzer, apksigner, avdmanager, bundletool
+# Skipped custom handlers: adb, zipalign
+
+[[command]]
+name = "emulator"
+url = "https://developer.android.com/studio/run/emulator-commandline"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h", "-help", "-list-avds", "-version"]
+
+[[command]]
+name = "lint"
+url = "https://developer.android.com/studio/write/lint"
+level = "Inert"
+bare = true
+standalone = ["--help", "--list", "--quiet", "--show", "--version", "-V", "-h"]
+valued = ["--check", "--config", "--disable", "--enable"]
+
+[[command]]
+name = "sdkmanager"
+url = "https://developer.android.com/tools/sdkmanager"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--list", "--version", "-V", "-h"]
+valued = ["--channel", "--sdk_root"]

@@ -1,0 +1,358 @@
+# Skipped custom handlers: gzip, tar, unzip
+
+[[command]]
+name = "basename"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#basename-invocation"
+level = "Inert"
+bare = false
+standalone = ["--help", "--multiple", "--version", "--zero", "-V", "-a", "-h", "-z"]
+valued = ["--suffix", "-s"]
+
+[[command]]
+name = "bat"
+url = "https://github.com/sharkdp/bat#readme"
+level = "Inert"
+bare = true
+standalone = [
+    "--diff", "--help", "--list-languages", "--list-themes", "--no-config",
+    "--number", "--plain", "--show-all", "--version",
+    "-A", "-P", "-V", "-d", "-h", "-n", "-p", "-u",
+]
+valued = [
+    "--color", "--decorations", "--diff-context", "--file-name",
+    "--highlight-line", "--italic-text", "--language", "--line-range",
+    "--map-syntax", "--paging", "--style", "--tabs",
+    "--terminal-width", "--theme", "--wrap",
+    "-H", "-l", "-m", "-r",
+]
+
+[[command]]
+name = "cd"
+url = "https://man7.org/linux/man-pages/man1/cd.1p.html"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = ["--help", "--version", "-L", "-P", "-V", "-e", "-h"]
+
+[[command]]
+name = "cmp"
+url = "https://man7.org/linux/man-pages/man1/cmp.1.html"
+level = "Inert"
+bare = false
+max_positional = 2
+standalone = [
+    "--help", "--print-bytes", "--quiet", "--silent", "--verbose", "--version",
+    "-V", "-b", "-h", "-l", "-s",
+]
+valued = ["--bytes", "--ignore-initial", "-i", "-n"]
+
+[[command]]
+name = "colordiff"
+url = "https://www.colordiff.org/"
+level = "Inert"
+bare = false
+standalone = [
+    "--brief", "--ed", "--expand-tabs", "--help", "--initial-tab",
+    "--left-column", "--minimal", "--normal",
+    "--paginate", "--rcs", "--report-identical-files",
+    "--side-by-side", "--speed-large-files",
+    "--strip-trailing-cr", "--suppress-blank-empty",
+    "--suppress-common-lines", "--text", "--version",
+    "-B", "-E", "-N", "-P", "-T", "-V", "-Z",
+    "-a", "-b", "-c", "-d", "-e", "-f", "-h", "-i", "-l", "-n",
+    "-p", "-q", "-r", "-s", "-t", "-u", "-v", "-w", "-y",
+]
+valued = [
+    "--changed-group-format", "--color", "--context",
+    "--from-file", "--horizon-lines", "--ifdef",
+    "--ignore-matching-lines", "--label", "--line-format",
+    "--new-group-format", "--new-line-format",
+    "--old-group-format", "--old-line-format",
+    "--show-function-line", "--starting-file",
+    "--tabsize", "--to-file", "--unchanged-group-format",
+    "--unchanged-line-format", "--unified", "--width",
+    "-C", "-D", "-F", "-I", "-L", "-S", "-U", "-W",
+]
+
+[[command]]
+name = "date"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--rfc-2822", "--rfc-email", "--universal", "--utc", "--version",
+    "-R", "-V", "-h", "-j", "-n", "-u",
+]
+valued = [
+    "--date", "--iso-8601", "--reference", "--rfc-3339",
+    "-I", "-d", "-f", "-r", "-v", "-z",
+]
+
+[[command]]
+name = "delta"
+url = "https://dandavison.github.io/delta/"
+level = "Inert"
+bare = true
+standalone = [
+    "--blame-code-style", "--blame-palette",
+    "--color-only", "--dark", "--diff-highlight",
+    "--diff-so-fancy", "--help", "--hyperlinks", "--keep-plus-minus-markers",
+    "--light", "--line-numbers", "--list-languages",
+    "--list-syntax-themes", "--navigate", "--no-gitconfig",
+    "--raw", "--relative-paths", "--show-config",
+    "--show-syntax-themes", "--side-by-side", "--version",
+    "-V", "-h", "-n", "-s",
+]
+valued = [
+    "--commit-decoration-style", "--commit-style", "--config",
+    "--diff-stat-align-width", "--features", "--file-added-label",
+    "--file-decoration-style", "--file-modified-label",
+    "--file-removed-label", "--file-renamed-label",
+    "--file-style", "--file-transformation",
+    "--hunk-header-decoration-style", "--hunk-header-file-style",
+    "--hunk-header-line-number-style", "--hunk-header-style",
+    "--hunk-label", "--inline-hint-style",
+    "--inspect-raw-lines", "--line-buffer-size",
+    "--line-fill-method", "--line-numbers-left-format",
+    "--line-numbers-left-style", "--line-numbers-minus-style",
+    "--line-numbers-plus-style", "--line-numbers-right-format",
+    "--line-numbers-right-style", "--line-numbers-zero-style",
+    "--map-styles", "--max-line-distance", "--max-line-length",
+    "--merge-conflict-begin-symbol", "--merge-conflict-end-symbol",
+    "--merge-conflict-ours-diff-header-decoration-style",
+    "--merge-conflict-ours-diff-header-style",
+    "--merge-conflict-theirs-diff-header-decoration-style",
+    "--merge-conflict-theirs-diff-header-style",
+    "--minus-emph-style", "--minus-empty-line-marker-style",
+    "--minus-non-emph-style", "--minus-style",
+    "--paging", "--plus-emph-style",
+    "--plus-empty-line-marker-style", "--plus-non-emph-style",
+    "--plus-style", "--syntax-theme", "--tabs",
+    "--true-color", "--whitespace-error-style", "--width",
+    "-w",
+]
+
+[[command]]
+name = "df"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--help", "--human-readable", "--inodes", "--local",
+    "--no-sync", "--portability", "--print-type",
+    "--si", "--sync", "--total", "--version",
+    "-H", "-P", "-T", "-V", "-a", "-h", "-i", "-k", "-l",
+]
+valued = [
+    "--block-size", "--exclude-type", "--output", "--type",
+    "-B", "-t", "-x",
+]
+
+[[command]]
+name = "diff"
+url = "https://www.gnu.org/software/diffutils/manual/diffutils.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--brief", "--ed", "--expand-tabs", "--help", "--ignore-all-space",
+    "--ignore-blank-lines", "--ignore-case", "--ignore-space-change",
+    "--ignore-tab-expansion", "--left-column", "--minimal",
+    "--new-file", "--no-dereference", "--no-ignore-file-name-case",
+    "--normal", "--paginate", "--rcs", "--recursive",
+    "--report-identical-files", "--show-c-function", "--side-by-side",
+    "--speed-large-files", "--strip-trailing-cr",
+    "--suppress-blank-empty", "--suppress-common-lines", "--text",
+    "--unidirectional-new-file", "--version",
+    "-B", "-E", "-N", "-P", "-T", "-V",
+    "-a", "-b", "-c", "-d", "-e", "-f", "-h", "-i", "-l", "-n", "-p",
+    "-q", "-r", "-s", "-t", "-u", "-w", "-y",
+]
+valued = [
+    "--changed-group-format", "--color", "--context", "--exclude",
+    "--exclude-from", "--from-file", "--ifdef", "--ignore-matching-lines",
+    "--label", "--line-format", "--new-group-format", "--new-line-format",
+    "--old-group-format", "--old-line-format", "--show-function-line",
+    "--starting-file", "--tabsize", "--to-file", "--unchanged-group-format",
+    "--unchanged-line-format", "--unified", "--width",
+    "-C", "-D", "-F", "-I", "-L", "-S", "-U", "-W", "-X", "-x",
+]
+
+[[command]]
+name = "dirname"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation"
+level = "Inert"
+bare = false
+standalone = ["--help", "--version", "--zero", "-V", "-h", "-z"]
+
+[[command]]
+name = "du"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--apparent-size", "--bytes", "--count-links",
+    "--dereference", "--dereference-args", "--help", "--human-readable",
+    "--inodes", "--no-dereference", "--null",
+    "--one-file-system", "--separate-dirs", "--si",
+    "--summarize", "--total", "--version",
+    "-0", "-D", "-H", "-L", "-P", "-S", "-V", "-a", "-b",
+    "-c", "-h", "-k", "-l", "-m", "-s", "-x",
+]
+valued = [
+    "--block-size", "--exclude", "--files0-from",
+    "--max-depth", "--threshold", "--time", "--time-style",
+    "-B", "-d", "-t",
+]
+
+[[command]]
+name = "eza"
+url = "https://eza.rocks/"
+level = "Inert"
+bare = true
+aliases = ["exa"]
+standalone = [
+    "--accessed", "--all", "--binary", "--blocks", "--blocksize",
+    "--bytes", "--changed", "--classify", "--color-scale", "--color-scale-mode",
+    "--context", "--created", "--dereference", "--extended", "--flags",
+    "--follow-symlinks", "--git", "--git-ignore", "--git-repos", "--git-repos-no-status",
+    "--group", "--group-directories-first", "--header", "--help", "--hyperlink", "--icons",
+    "--inode", "--links", "--list-dirs", "--long", "--modified",
+    "--mounts", "--no-filesize", "--no-git", "--no-icons", "--no-permissions",
+    "--no-quotes", "--no-time", "--no-user", "--numeric", "--octal-permissions",
+    "--oneline", "--only-dirs", "--only-files", "--recurse", "--reverse",
+    "--tree", "--version", "-1", "-@", "-A", "-B",
+    "-D", "-F", "-G", "-H", "-I",
+    "-M", "-R", "-S", "-T", "-U",
+    "-V", "-Z", "-a", "-b", "-d", "-f",
+    "-g", "-h", "-i", "-l", "-m",
+    "-r", "-s", "-u", "-x",
+]
+valued = [
+    "--color", "--colour", "--git-ignore-glob", "--grid-columns",
+    "--group-directories-first-dirs", "--ignore-glob", "--level",
+    "--smart-group", "--sort", "--time", "--time-style",
+    "--total-size", "--width",
+    "-L", "-X", "-t", "-w",
+]
+
+[[command]]
+name = "file"
+url = "https://man7.org/linux/man-pages/man1/file.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--brief", "--debug", "--dereference", "--extension",
+    "--help", "--keep-going", "--list", "--mime", "--mime-encoding",
+    "--mime-type", "--no-buffer", "--no-dereference",
+    "--no-pad", "--no-sandbox", "--preserve-date",
+    "--print0", "--raw", "--special-files",
+    "--uncompress", "--uncompress-noreport", "--version",
+    "-0", "-D", "-I", "-L", "-N", "-S", "-V", "-Z",
+    "-b", "-d", "-h", "-i", "-k", "-l",
+    "-n", "-p", "-r", "-s", "-z",
+]
+valued = [
+    "--exclude", "--exclude-quiet", "--files-from",
+    "--magic-file", "--parameter", "--separator",
+    "-F", "-P", "-e", "-f", "-m",
+]
+
+[[command]]
+name = "ls"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--almost-all", "--author", "--classify",
+    "--context", "--dereference", "--dereference-command-line",
+    "--dereference-command-line-symlink-to-dir", "--directory",
+    "--escape", "--file-type", "--full-time",
+    "--group-directories-first", "--help", "--hide-control-chars",
+    "--human-readable", "--indicator-style",
+    "--inode", "--kibibytes", "--literal", "--no-group",
+    "--numeric-uid-gid", "--quote-name", "--recursive",
+    "--reverse", "--show-control-chars", "--si", "--size", "--version",
+    "-1", "-A", "-B", "-C", "-F", "-G", "-H", "-L",
+    "-N", "-Q", "-R", "-S", "-U", "-V", "-X", "-Z",
+    "-a", "-c", "-d", "-f", "-g", "-h", "-i", "-k",
+    "-l", "-m", "-n", "-o", "-p", "-q", "-r", "-s",
+    "-t", "-u", "-v", "-x",
+]
+valued = [
+    "--block-size", "--color", "--format", "--hide",
+    "--hyperlink", "--ignore",
+    "--quoting-style", "--sort", "--tabsize", "--time",
+    "--time-style", "--width",
+    "-I", "-T", "-w",
+]
+
+[[command]]
+name = "pwd"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version", "-L", "-P", "-V", "-h"]
+
+[[command]]
+name = "readlink"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#readlink-invocation"
+level = "Inert"
+bare = false
+standalone = [
+    "--canonicalize", "--canonicalize-existing",
+    "--canonicalize-missing", "--help", "--no-newline", "--verbose", "--version", "--zero",
+    "-V", "-e", "-f", "-h", "-m", "-n", "-v", "-z",
+]
+
+[[command]]
+name = "realpath"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#realpath-invocation"
+level = "Inert"
+bare = false
+standalone = [
+    "--canonicalize-existing", "--canonicalize-missing",
+    "--help", "--logical", "--no-symlinks", "--physical", "--quiet",
+    "--strip", "--version", "--zero",
+    "-L", "-P", "-V", "-e", "-h", "-m", "-q", "-s", "-z",
+]
+valued = ["--relative-base", "--relative-to"]
+
+[[command]]
+name = "stat"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation"
+level = "Inert"
+bare = false
+standalone = [
+    "--dereference", "--file-system", "--help", "--terse", "--version",
+    "-F", "-L", "-V", "-h", "-l", "-n", "-q", "-r", "-s", "-x",
+]
+valued = ["--format", "--printf", "-c", "-f", "-t"]
+
+[[command]]
+name = "tree"
+url = "https://man7.org/linux/man-pages/man1/tree.1.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--dirsfirst", "--du", "--fromfile", "--gitignore",
+    "--help", "--inodes", "--matchdirs", "--noreport",
+    "--prune", "--si", "--version",
+    "-A", "-C", "-D", "-F", "-J", "-N", "-Q", "-S",
+    "-V", "-X", "-a", "-d", "-f", "-g", "-h", "-i", "-l",
+    "-n", "-p", "-q", "-r", "-s", "-t", "-u", "-v", "-x",
+]
+valued = [
+    "--charset", "--filelimit", "--filesfrom", "--sort", "--timefmt",
+    "-H", "-I", "-L", "-P", "-T",
+]
+
+[[command]]
+name = "zipinfo"
+url = "https://linux.die.net/man/1/zipinfo"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--version",
+    "-1", "-2", "-C", "-M", "-T", "-V", "-Z", "-h", "-l", "-m", "-s", "-t", "-v", "-z",
+]

@@ -1,0 +1,135 @@
+# Skipped custom handler: safe_chains
+
+[[command]]
+name = "branchdiff"
+url = "https://github.com/michaeldhopkins/branchdiff"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = ["--diff", "--help", "--no-auto-fetch", "--print", "--version", "-V", "-d", "-h", "-p"]
+
+[[command]]
+name = "cloc"
+url = "https://github.com/AlDanial/cloc#readme"
+level = "Inert"
+bare = false
+standalone = [
+    "--3", "--autoconf", "--by-file", "--by-file-by-lang", "--by-percent",
+    "--categorized", "--counted", "--diff", "--diff-list-file", "--docstring-as-code",
+    "--follow-links", "--force-lang-def", "--found-langs", "--git", "--help", "--hide-rate",
+    "--ignored", "--include-content", "--json", "--md", "--no-autogen",
+    "--no3", "--opt-match-d", "--opt-match-f", "--opt-not-match-d", "--opt-not-match-f",
+    "--original-dir", "--progress-rate", "--quiet", "--sdir", "--show-ext",
+    "--show-lang", "--show-os", "--show-stored-lang", "--skip-uniqueness", "--sql-append",
+    "--strip-comments", "--sum-one", "--sum-reports", "--unicode", "--use-sloccount",
+    "--v", "--vcs", "--version", "--xml", "--yaml",
+    "-V", "-h", "-v",
+]
+valued = [
+    "--config", "--csv-delimiter", "--diff-alignment", "--diff-timeout",
+    "--exclude-content", "--exclude-dir", "--exclude-ext",
+    "--exclude-lang", "--exclude-list-file",
+    "--force-lang", "--fullpath",
+    "--include-ext", "--include-lang",
+    "--lang-no-ext", "--list-file", "--match-d",
+    "--match-f", "--not-match-d", "--not-match-f",
+    "--out", "--read-binary-files", "--read-lang-def",
+    "--report-file", "--script-lang", "--skip-archive",
+    "--sql", "--sql-project", "--sql-style",
+    "--timeout", "--write-lang-def",
+]
+
+[[command]]
+name = "cucumber"
+url = "https://cucumber.io/docs/cucumber/api/#running-cucumber"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--backtrace", "--color", "--dry-run", "--expand",
+    "--guess", "--help", "--i18n-keywords", "--i18n-languages",
+    "--init", "--no-color", "--no-diff", "--no-multiline",
+    "--no-snippets", "--no-source", "--no-strict",
+    "--publish", "--publish-quiet", "--quiet",
+    "--retry", "--snippets", "--strict", "--verbose", "--version", "--wip",
+    "-V", "-b", "-d", "-e", "-h", "-q",
+]
+valued = [
+    "--ci-environment", "--format", "--format-options",
+    "--language", "--lines", "--name", "--order",
+    "--out", "--profile", "--require",
+    "--require-module", "--retry", "--tags",
+    "-f", "-i", "-l", "-n", "-o", "-p", "-r", "-t",
+]
+
+[[command]]
+name = "identify"
+url = "https://imagemagick.org/script/identify.php"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--verbose", "--version", "-V", "-h", "-ping", "-quiet", "-regard-warnings", "-verbose",
+]
+valued = [
+    "-channel", "-define", "-density", "-depth",
+    "-features", "-format", "-fuzz", "-interlace",
+    "-limit", "-list", "-log", "-moments",
+    "-monitor", "-precision", "-seed", "-set",
+    "-size", "-strip", "-unique", "-virtual-pixel",
+]
+
+[[command]]
+name = "man"
+url = "https://man7.org/linux/man-pages/man1/man.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--all", "--apropos", "--default", "--help", "--local-file",
+    "--regex", "--update", "--version", "--whatis", "--where", "--where-cat", "--wildcard",
+    "-V", "-a", "-f", "-h", "-k", "-l", "-u", "-w",
+]
+valued = [
+    "--config-file", "--encoding", "--extension", "--locale",
+    "--manpath", "--sections", "--systems",
+    "-C", "-E", "-L", "-M", "-S", "-e", "-m",
+]
+
+[[command]]
+name = "shellcheck"
+url = "https://www.shellcheck.net/wiki/"
+level = "Inert"
+bare = false
+standalone = [
+    "--color", "--external-sources", "--help", "--list-optional",
+    "--norc", "--severity", "--version", "--wiki-link-count",
+    "-C", "-V", "-a", "-h", "-x",
+]
+valued = [
+    "--enable", "--exclude", "--format", "--include",
+    "--rcfile", "--severity", "--shell", "--source-path", "--wiki-link-count",
+    "-P", "-S", "-W", "-e", "-f", "-i", "-o", "-s",
+]
+
+[[command]]
+name = "tokei"
+url = "https://github.com/XAMPPRocky/tokei#readme"
+level = "Inert"
+bare = true
+standalone = [
+    "--compact", "--files", "--help", "--hidden", "--no-ignore",
+    "--no-ignore-dot", "--no-ignore-parent",
+    "--no-ignore-vcs", "--verbose", "--version",
+    "-C", "-V", "-f", "-h",
+]
+valued = [
+    "--columns", "--exclude", "--input",
+    "--languages", "--num-format", "--output", "--sort", "--type",
+    "-c", "-e", "-i", "-l", "-o", "-s", "-t",
+]
+
+[[command]]
+name = "workon"
+url = "https://github.com/michaeldhopkins/workon"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

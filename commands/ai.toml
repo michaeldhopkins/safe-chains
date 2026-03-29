@@ -1,0 +1,29 @@
+# Skipped CommandDef: codex, hf, llm, ollama, opencode
+
+[[command]]
+name = "aider"
+url = "https://aider.chat/docs/"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = [
+    "--check-update", "--help", "--just-check-update", "--list-models",
+    "--models", "--show-prompts", "--show-release-notes", "--show-repo-map",
+    "--version", "-V", "-h",
+]
+
+[[command]]
+name = "claude"
+url = "https://docs.anthropic.com/en/docs/claude-code"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]
+
+[[command]]
+name = "vibe"
+url = "https://docs.mistral.ai/mistral-vibe/"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

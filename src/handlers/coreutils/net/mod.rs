@@ -1,24 +1,12 @@
-mod dig;
-mod host;
-mod ifconfig;
-mod mdfind;
-mod netstat;
 mod nslookup;
 mod ping;
 mod route;
-mod ss;
-mod whois;
 
 use crate::command::FlatDef;
 use crate::verdict::Verdict;
 use crate::parse::Token;
 
 pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    for flat in all_flat_defs() {
-        if let r @ Some(_) = flat.dispatch(cmd, tokens) {
-            return r;
-        }
-    }
     None
         .or_else(|| nslookup::dispatch(cmd, tokens))
         .or_else(|| ping::dispatch(cmd, tokens))
@@ -26,7 +14,7 @@ pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
 }
 
 pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    let mut docs: Vec<_> = all_flat_defs().iter().map(|d| d.to_doc()).collect();
+    let mut docs = Vec::new();
     docs.extend(nslookup::command_docs());
     docs.extend(ping::command_docs());
     docs.extend(route::command_docs());
@@ -34,15 +22,7 @@ pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
-    let mut v = Vec::new();
-    v.extend(dig::FLAT_DEFS);
-    v.extend(host::FLAT_DEFS);
-    v.extend(ifconfig::FLAT_DEFS);
-    v.extend(mdfind::FLAT_DEFS);
-    v.extend(netstat::FLAT_DEFS);
-    v.extend(ss::FLAT_DEFS);
-    v.extend(whois::FLAT_DEFS);
-    v
+    Vec::new()
 }
 
 #[cfg(test)]

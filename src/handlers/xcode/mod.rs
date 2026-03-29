@@ -10,7 +10,6 @@ mod spctl;
 mod swiftformat;
 mod swiftlint;
 mod tuist;
-mod xcbeautify;
 mod xcode_select;
 mod xcodebuild;
 mod xcodegen;
@@ -47,7 +46,6 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
         .or_else(|| codesign::dispatch(cmd, tokens))
         .or_else(|| spctl::dispatch(cmd, tokens))
         .or_else(|| swiftformat::dispatch(cmd, tokens))
-        .or_else(|| xcbeautify::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -69,12 +67,11 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(codesign::command_docs());
     docs.extend(spctl::command_docs());
     docs.extend(swiftformat::command_docs());
-    docs.extend(xcbeautify::DEFS.iter().map(|d| d.to_doc()));
     docs
 }
 
 pub(crate) fn xcbeautify_flat_defs() -> &'static [crate::command::FlatDef] {
-    xcbeautify::DEFS
+    &[]
 }
 
 #[cfg(test)]

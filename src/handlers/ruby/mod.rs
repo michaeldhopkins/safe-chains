@@ -2,7 +2,6 @@ mod bundle;
 mod gem;
 mod importmap;
 mod rbenv;
-mod ruby_cmd;
 
 use crate::command::FlatDef;
 use crate::verdict::Verdict;
@@ -14,11 +13,6 @@ pub(crate) use importmap::IMPORTMAP;
 pub(crate) use rbenv::RBENV;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    for flat in ruby_flat_defs() {
-        if let r @ Some(_) = flat.dispatch(cmd, tokens) {
-            return r;
-        }
-    }
     BUNDLE.dispatch(cmd, tokens)
         .or_else(|| GEM.dispatch(cmd, tokens))
         .or_else(|| IMPORTMAP.dispatch(cmd, tokens))
@@ -26,13 +20,9 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    let mut docs: Vec<_> = ruby_flat_defs().iter().map(|d| d.to_doc()).collect();
-    docs.extend([BUNDLE.to_doc(), GEM.to_doc(), IMPORTMAP.to_doc(), RBENV.to_doc()]);
-    docs
+    vec![BUNDLE.to_doc(), GEM.to_doc(), IMPORTMAP.to_doc(), RBENV.to_doc()]
 }
 
 pub(crate) fn ruby_flat_defs() -> Vec<&'static FlatDef> {
-    let mut v = Vec::new();
-    v.extend(ruby_cmd::FLAT_DEFS);
-    v
+    Vec::new()
 }

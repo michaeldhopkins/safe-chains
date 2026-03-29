@@ -1,0 +1,93 @@
+# Skipped custom handlers: command, hostname
+
+[[command]]
+name = "alias"
+url = "https://man7.org/linux/man-pages/man1/alias.1p.html"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["-p"]
+
+[[command]]
+name = "export"
+url = "https://man7.org/linux/man-pages/man1/export.1p.html"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["-f", "-n", "-p"]
+
+[[command]]
+name = "false"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]
+
+[[command]]
+name = "printenv"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation"
+level = "Inert"
+bare = true
+standalone = ["--help", "--null", "--version", "-0", "-V", "-h"]
+
+[[command]]
+name = "read"
+url = "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["-r", "-s"]
+valued = ["-a", "-d", "-n", "-p", "-t", "-u"]
+
+[[command]]
+name = "true"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#true-invocation"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]
+
+[[command]]
+name = "type"
+url = "https://man7.org/linux/man-pages/man1/type.1p.html"
+level = "Inert"
+bare = false
+standalone = ["--help", "--version", "-P", "-V", "-a", "-f", "-h", "-p", "-t"]
+
+[[command]]
+name = "unset"
+url = "https://man7.org/linux/man-pages/man1/unset.1p.html"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-V", "-f", "-h", "-n", "-v"]
+
+[[command]]
+name = "wait"
+url = "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/wait.html"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-V", "-h"]
+
+[[command]]
+name = "whereis"
+url = "https://man7.org/linux/man-pages/man1/whereis.1.html"
+level = "Inert"
+bare = false
+standalone = ["--help", "--version", "-V", "-b", "-h", "-l", "-m", "-s", "-u"]
+valued = ["-B", "-M", "-S", "-f"]
+
+[[command]]
+name = "which"
+url = "https://man7.org/linux/man-pages/man1/which.1.html"
+level = "Inert"
+bare = false
+standalone = ["--all", "--help", "--version", "-V", "-a", "-h", "-s"]
+
+[[command]]
+name = "whoami"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#whoami-invocation"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

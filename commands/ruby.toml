@@ -1,0 +1,17 @@
+# Skipped CommandDef: bundle, gem, importmap, rbenv
+
+[[command]]
+name = "ruby"
+url = "https://www.ruby-lang.org/en/documentation/"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h", "-v"]
+
+[[command]]
+name = "ri"
+url = "https://ruby.github.io/rdoc/RI_md.html"
+level = "Inert"
+bare = true
+standalone = ["--all", "--interactive", "--list", "--no-pager", "-a", "-i", "-l"]
+valued = ["--format", "--width", "-f", "-w"]

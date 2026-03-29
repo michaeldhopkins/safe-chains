@@ -11,17 +11,8 @@ mod sysinfo;
 mod text;
 mod tools;
 
-use crate::parse::{Token, WordSet};
+use crate::parse::Token;
 use crate::verdict::Verdict;
-use crate::policy::{FlagPolicy, FlagStyle};
-
-pub(super) static BARE_ONLY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--help", "--version", "-V", "-h"]),
-    valued: WordSet::flags(&[]),
-    bare: true,
-    max_positional: Some(0),
-    flag_style: FlagStyle::Strict,
-};
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     None

@@ -535,9 +535,23 @@ use std::sync::LazyLock;
 
 static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| {
     let mut all = Vec::new();
+    all.extend(load_toml(include_str!("../commands/ai.toml")));
+    all.extend(load_toml(include_str!("../commands/android.toml")));
     all.extend(load_toml(include_str!("../commands/binary.toml")));
+    all.extend(load_toml(include_str!("../commands/builtins.toml")));
+    all.extend(load_toml(include_str!("../commands/data.toml")));
+    all.extend(load_toml(include_str!("../commands/fs.toml")));
+    all.extend(load_toml(include_str!("../commands/fuzzy.toml")));
     all.extend(load_toml(include_str!("../commands/hash.toml")));
+    all.extend(load_toml(include_str!("../commands/jvm.toml")));
+    all.extend(load_toml(include_str!("../commands/net.toml")));
+    all.extend(load_toml(include_str!("../commands/ruby.toml")));
+    all.extend(load_toml(include_str!("../commands/search.toml")));
+    all.extend(load_toml(include_str!("../commands/sysinfo.toml")));
+    all.extend(load_toml(include_str!("../commands/system.toml")));
     all.extend(load_toml(include_str!("../commands/text.toml")));
+    all.extend(load_toml(include_str!("../commands/tools.toml")));
+    all.extend(load_toml(include_str!("../commands/xcode.toml")));
     build_registry(all)
 });
 

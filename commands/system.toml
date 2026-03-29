@@ -1,0 +1,21 @@
+# Skipped CommandDef: brew, mise, asdf, ddev, defaults, security, csrutil,
+#   diskutil, launchctl, log, cmake, dcli, terraform, heroku, vercel,
+#   flyctl, fastlane, firebase, overmind, tailscale, wg
+# Skipped custom handlers: crontab, pmset, sysctl, tmux, networksetup
+
+[[command]]
+name = "pg_isready"
+url = "https://www.postgresql.org/docs/current/app-pg-isready.html"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--quiet", "--version", "-V", "-q"]
+valued = ["--dbname", "--host", "--port", "--timeout", "--username", "-U", "-d", "-h", "-p", "-t"]
+
+[[command]]
+name = "psql"
+url = "https://www.postgresql.org/docs/current/app-psql.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

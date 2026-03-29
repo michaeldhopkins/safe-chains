@@ -1,0 +1,280 @@
+# Skipped custom handlers: dasel, mlr
+
+[[command]]
+name = "base64"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation"
+level = "Inert"
+bare = true
+standalone = ["--decode", "--help", "--ignore-garbage", "--version", "-D", "-V", "-d", "-h", "-i"]
+valued = ["--wrap", "-b", "-w"]
+
+[[command]]
+name = "bc"
+url = "https://www.gnu.org/software/bc/manual/html_mono/bc.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--digit-clamp", "--global-stacks", "--help", "--interactive", "--mathlib",
+    "--no-digit-clamp", "--no-line-length", "--no-prompt",
+    "--no-read-prompt", "--quiet", "--standard", "--version", "--warn",
+    "-C", "-P", "-R", "-V", "-c", "-g", "-h", "-i", "-l", "-q", "-s", "-w",
+]
+valued = [
+    "--expression", "--file", "--ibase", "--obase", "--redefine", "--scale", "--seed",
+    "-E", "-I", "-O", "-S", "-e", "-f", "-r",
+]
+
+[[command]]
+name = "echo"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["-E", "-e", "-n"]
+
+[[command]]
+name = "expr"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation"
+level = "Inert"
+bare = false
+positional_style = true
+
+[[command]]
+name = "factor"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#factor-invocation"
+level = "Inert"
+bare = true
+standalone = ["--exponents", "--help", "--version", "-V", "-h"]
+
+[[command]]
+name = "fx"
+url = "https://github.com/antonmedv/fx"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--help", "--raw", "--slurp", "--themes", "--version", "-h", "-r", "-s"]
+
+[[command]]
+name = "getconf"
+url = "https://man7.org/linux/man-pages/man1/getconf.1.html"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-V", "-a", "-h"]
+valued = ["-v"]
+
+[[command]]
+name = "gojq"
+url = "https://github.com/itchyny/gojq"
+level = "Inert"
+bare = true
+standalone = [
+    "--color-output", "--compact-output", "--exit-status", "--help",
+    "--join-output", "--monochrome-output", "--null-input",
+    "--raw-input", "--raw-output", "--raw-output0",
+    "--slurp", "--sort-keys", "--tab", "--version",
+    "--yaml-input", "--yaml-output",
+    "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-j", "-n", "-r", "-s",
+]
+valued = [
+    "--arg", "--argjson", "--args", "--from-file",
+    "--indent", "--jsonargs", "--rawfile", "--slurpfile",
+    "-f",
+]
+
+[[command]]
+name = "htmlq"
+url = "https://github.com/mgdm/htmlq"
+level = "Inert"
+bare = false
+standalone = [
+    "--detect-base", "--help", "--ignore-whitespace",
+    "--pretty", "--remove-nodes", "--text", "--version",
+    "-B", "-V", "-h", "-p", "-t", "-w",
+]
+valued = ["--attribute", "--base", "--filename", "--output", "-a", "-b", "-f", "-o"]
+
+[[command]]
+name = "jaq"
+url = "https://github.com/01mf02/jaq"
+level = "Inert"
+bare = true
+standalone = [
+    "--compact-output", "--exit-status", "--help",
+    "--join-output", "--null-input", "--raw-input",
+    "--raw-output", "--slurp", "--sort-keys", "--tab", "--version",
+    "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-j", "-n", "-r", "-s",
+]
+valued = ["--arg", "--argjson", "--from-file", "--indent", "--rawfile", "--slurpfile", "-f"]
+
+[[command]]
+name = "jless"
+url = "https://github.com/PaulJuliusMartinez/jless"
+level = "Inert"
+bare = false
+standalone = ["--help", "--json", "--version", "--yaml", "-N", "-V", "-h", "-n"]
+valued = ["--mode", "--scrolloff"]
+
+[[command]]
+name = "jq"
+url = "https://jqlang.github.io/jq/manual/"
+level = "Inert"
+bare = true
+standalone = [
+    "--ascii-output", "--color-output", "--compact-output", "--exit-status", "--help",
+    "--join-output", "--monochrome-output", "--null-input", "--raw-input",
+    "--raw-output", "--raw-output0", "--seq", "--slurp", "--sort-keys", "--tab", "--version",
+    "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-g", "-h", "-j", "-n", "-r", "-s",
+]
+valued = [
+    "--arg", "--argjson", "--args", "--from-file",
+    "--indent", "--jsonargs", "--rawfile", "--slurpfile",
+    "-f",
+]
+
+[[command]]
+name = "printf"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#printf-invocation"
+level = "Inert"
+bare = false
+standalone = ["--help", "--version", "-V", "-h"]
+
+[[command]]
+name = "seq"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation"
+level = "Inert"
+bare = false
+standalone = ["--equal-width", "--help", "--version", "-V", "-h", "-w"]
+valued = ["--format", "--separator", "-f", "-s", "-t"]
+
+[[command]]
+name = "shuf"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#shuf-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--echo", "--help", "--repeat", "--version", "--zero-terminated",
+    "-V", "-e", "-h", "-r", "-z",
+]
+valued = ["--head-count", "--input-range", "--random-source", "-i", "-n"]
+
+[[command]]
+name = "sort"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--check", "--debug", "--dictionary-order",
+    "--general-numeric-sort", "--help", "--human-numeric-sort",
+    "--ignore-case", "--ignore-leading-blanks",
+    "--ignore-nonprinting", "--merge", "--month-sort",
+    "--numeric-sort", "--random-sort", "--reverse",
+    "--stable", "--unique", "--version", "--version-sort", "--zero-terminated",
+    "-C", "-M", "-R", "-V", "-b", "-c", "-d",
+    "-f", "-g", "-h", "-i", "-m", "-n", "-r", "-s", "-u", "-z",
+]
+valued = [
+    "--batch-size", "--buffer-size", "--field-separator",
+    "--files0-from", "--key", "--parallel",
+    "--random-source", "--sort", "--temporary-directory",
+    "-S", "-T", "-k", "-t",
+]
+
+[[command]]
+name = "test"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation"
+level = "Inert"
+bare = true
+positional_style = true
+aliases = ["["]
+
+[[command]]
+name = "tomlq"
+url = "https://github.com/kislyuk/yq"
+level = "Inert"
+bare = false
+standalone = [
+    "--compact-output", "--exit-status", "--help",
+    "--null-input", "--raw-input", "--raw-output",
+    "--slurp", "--sort-keys", "--tab", "--toml-output", "--version",
+    "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-n", "-r", "-s", "-t",
+]
+valued = ["--arg", "--argjson", "--indent", "-f"]
+
+[[command]]
+name = "uuidgen"
+url = "https://man7.org/linux/man-pages/man1/uuidgen.1.html"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--random", "--time", "--version", "-V", "-h", "-r", "-t"]
+valued = ["--md5", "--name", "--namespace", "--sha1", "-N", "-m", "-n", "-s"]
+
+[[command]]
+name = "xmllint"
+url = "https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--auto", "--catalogs", "--compress", "--copy",
+    "--debug", "--debugent", "--dropdtd", "--format",
+    "--help", "--html", "--htmlout", "--huge", "--load-trace",
+    "--loaddtd", "--memory", "--noblanks", "--nocatalogs",
+    "--nocdata", "--nocompact", "--nodefdtd", "--noenc",
+    "--noent", "--nonet", "--noout", "--nowarning",
+    "--nowrap", "--nsclean", "--oldxml10", "--postvalid",
+    "--push", "--pushsmall", "--quiet", "--recover",
+    "--repeat", "--sax", "--sax1", "--stream",
+    "--testIO", "--timing", "--valid", "--version",
+    "--walker", "--xinclude", "--xmlout",
+    "-V", "-h",
+]
+valued = [
+    "--dtdvalid", "--dtdvalidfpi", "--encode",
+    "--maxmem", "--path", "--pattern",
+    "--pretty", "--relaxng", "--schema", "--schematron", "--xpath",
+]
+
+[[command]]
+name = "xq"
+url = "https://github.com/kislyuk/yq"
+level = "Inert"
+bare = false
+standalone = [
+    "--compact-output", "--exit-status", "--help",
+    "--null-input", "--raw-input", "--raw-output",
+    "--slurp", "--sort-keys", "--tab", "--version", "--xml-output",
+    "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-n", "-r", "-s", "-x",
+]
+valued = ["--arg", "--argjson", "--indent", "--xml-dtd", "--xml-item-depth", "--xml-root", "-f"]
+
+[[command]]
+name = "xxd"
+url = "https://man7.org/linux/man-pages/man1/xxd.1.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--autoskip", "--bits", "--capitalize", "--decimal",
+    "--ebcdic", "--help", "--include", "--little-endian", "--plain",
+    "--postscript", "--revert", "--uppercase", "--version",
+    "-C", "-E", "-V", "-a", "-b", "-d", "-e", "-h", "-i", "-p", "-r", "-u",
+]
+valued = [
+    "--color", "--cols", "--groupsize", "--len", "--name", "--offset", "--seek",
+    "-R", "-c", "-g", "-l", "-n", "-o", "-s",
+]
+
+[[command]]
+name = "yq"
+url = "https://mikefarah.gitbook.io/yq"
+level = "Inert"
+bare = false
+standalone = [
+    "--colors", "--exit-status", "--help", "--no-colors", "--no-doc", "--null-input",
+    "--prettyPrint", "--version",
+    "-C", "-M", "-N", "-P", "-V", "-e", "-h", "-r",
+]
+valued = [
+    "--arg", "--argjson", "--expression", "--front-matter",
+    "--indent", "--input-format", "--output-format",
+    "-I", "-p",
+]

@@ -1,10 +1,7 @@
-mod detekt;
 mod gradle;
 mod jar;
 mod jarsigner;
-mod javap;
 mod keytool;
-mod ktlint;
 mod mvn;
 
 use crate::parse::Token;
@@ -19,9 +16,6 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
         .or_else(|| mvn::dispatch(cmd, tokens))
         .or_else(|| jar::dispatch(cmd, tokens))
         .or_else(|| jarsigner::dispatch(cmd, tokens))
-        .or_else(|| detekt::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
-        .or_else(|| ktlint::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
-        .or_else(|| javap::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -30,14 +24,11 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs.push(KEYTOOL.to_doc());
     docs.extend(jar::command_docs());
     docs.extend(jarsigner::command_docs());
-    docs.extend(detekt::DEFS.iter().map(|d| d.to_doc()));
-    docs.extend(ktlint::DEFS.iter().map(|d| d.to_doc()));
-    docs.extend(javap::DEFS.iter().map(|d| d.to_doc()));
     docs
 }
 
 pub(crate) fn jvm_flat_defs() -> Vec<&'static crate::command::FlatDef> {
-    detekt::DEFS.iter().chain(ktlint::DEFS.iter()).chain(javap::DEFS.iter()).collect()
+    Vec::new()
 }
 
 #[cfg(test)]

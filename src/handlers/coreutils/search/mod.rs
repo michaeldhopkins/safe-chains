@@ -1,43 +1,25 @@
-mod ack;
-mod ag;
 mod fd;
 mod find;
-mod grep;
-mod locate;
-mod rg;
-mod zgrep;
 
 use crate::command::FlatDef;
 use crate::verdict::Verdict;
 use crate::parse::Token;
 
 pub(super) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    for flat in all_flat_defs() {
-        if let r @ Some(_) = flat.dispatch(cmd, tokens) {
-            return r;
-        }
-    }
     None
         .or_else(|| find::dispatch(cmd, tokens))
         .or_else(|| fd::dispatch(cmd, tokens))
 }
 
 pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    let mut docs: Vec<_> = all_flat_defs().iter().map(|d| d.to_doc()).collect();
+    let mut docs = Vec::new();
     docs.extend(find::command_docs());
     docs.extend(fd::command_docs());
     docs
 }
 
 pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
-    let mut v = Vec::new();
-    v.extend(ack::FLAT_DEFS);
-    v.extend(ag::FLAT_DEFS);
-    v.extend(grep::FLAT_DEFS);
-    v.extend(locate::FLAT_DEFS);
-    v.extend(rg::FLAT_DEFS);
-    v.extend(zgrep::FLAT_DEFS);
-    v
+    Vec::new()
 }
 
 #[cfg(test)]

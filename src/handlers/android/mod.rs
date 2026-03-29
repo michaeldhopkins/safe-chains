@@ -4,9 +4,6 @@ mod apkanalyzer;
 mod apksigner;
 mod avdmanager;
 mod bundletool;
-mod emulator;
-mod lint;
-mod sdkmanager;
 mod zipalign;
 
 use crate::parse::Token;
@@ -26,9 +23,6 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
         .or_else(|| AAPT2.dispatch(cmd, tokens))
         .or_else(|| AVDMANAGER.dispatch(cmd, tokens))
         .or_else(|| zipalign::dispatch(cmd, tokens))
-        .or_else(|| emulator::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
-        .or_else(|| sdkmanager::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
-        .or_else(|| lint::DEFS.iter().find_map(|d| d.dispatch(cmd, tokens)))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -39,17 +33,11 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs.push(AAPT2.to_doc());
     docs.push(AVDMANAGER.to_doc());
     docs.extend(zipalign::command_docs());
-    docs.extend(emulator::DEFS.iter().map(|d| d.to_doc()));
-    docs.extend(sdkmanager::DEFS.iter().map(|d| d.to_doc()));
-    docs.extend(lint::DEFS.iter().map(|d| d.to_doc()));
     docs
 }
 
 pub(crate) fn android_flat_defs() -> Vec<&'static crate::command::FlatDef> {
-    emulator::DEFS.iter()
-        .chain(sdkmanager::DEFS.iter())
-        .chain(lint::DEFS.iter())
-        .collect()
+    Vec::new()
 }
 
 #[cfg(test)]
