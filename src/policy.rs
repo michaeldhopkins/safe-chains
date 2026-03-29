@@ -1,6 +1,6 @@
 use crate::parse::{Token, WordSet};
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum FlagStyle {
     Strict,
     Positional,

@@ -59,6 +59,7 @@ mod handlers;
 pub use handlers::all_opencode_patterns;
 pub mod parse;
 pub mod policy;
+pub mod registry;
 pub mod allowlist;
 pub mod setup;
 pub mod verdict;
