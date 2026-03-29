@@ -132,6 +132,23 @@
 # standalone = ["--help", "--json", "-h"]
 
 # ─────────────────────────────────────────────────────────────────────
+# REQUIRE ANY — subcommand needs at least one of several flags
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use when a subcommand is only safe if at least one of several specific
+# flags is present. Similar to "guard" but accepts multiple alternatives.
+# Example: "conda config" is only safe with --show or --show-sources.
+# Without one of those, it could be used for --set or --add operations.
+# --help/-h is always allowed without the required flag.
+
+# [[command.sub]]
+# name = "config"
+# bare = false
+# require_any = ["--show", "--show-sources"]
+# standalone = ["--help", "--json", "--show", "--show-sources", "-h"]
+# valued = ["--file", "--name", "-f", "-n"]
+
+# ─────────────────────────────────────────────────────────────────────
 # ALLOW ALL — subcommand that accepts anything
 # ─────────────────────────────────────────────────────────────────────
 #
