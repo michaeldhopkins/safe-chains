@@ -332,7 +332,8 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `command` (https://man7.org/linux/man-pages/man1/command.1p.html)
 
-- Allowed: --help, --version, -h, -v, -V (check if command exists).
+- Requires -v, -V, --version. - Allowed standalone flags: --help, --version, -h
+- Allowed valued flags: -v, -V
 
 ### `composer` (https://getcomposer.org/doc/03-cli.md)
 
@@ -1266,7 +1267,7 @@ Aliases: `mlocate`, `plocate`
 
 ### `networksetup` (https://ss64.com/mac/networksetup.html)
 
-- Allowed: subcommands starting with -list, -get, -show, -print, plus -version and -help.
+- Allowed first arguments: -list*, -get*, -show*, -print*, -version, --version, -V, -help, --help, -h
 
 ### `nice` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation)
 
@@ -1833,7 +1834,7 @@ Aliases: `pip3`
 
 ### `sysctl` (https://man7.org/linux/man-pages/man8/sysctl.8.html)
 
-- Read-only usage.
+
 
 ### `system_profiler` (https://ss64.com/mac/system_profiler.html)
 

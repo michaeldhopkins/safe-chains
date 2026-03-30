@@ -175,6 +175,18 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
 
     let level = toml.level.unwrap_or(TomlLevel::Inert).into();
 
+    if !toml.first_arg.is_empty() {
+        return CommandSpec {
+            name: toml.name,
+            aliases: toml.aliases,
+            url: toml.url,
+            kind: CommandKind::FlatFirstArg {
+                patterns: toml.first_arg,
+                level,
+            },
+        };
+    }
+
     if !toml.require_any.is_empty() {
         return CommandSpec {
             name: toml.name,
@@ -221,6 +233,10 @@ pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
                             max_positional: policy.max_positional,
                             flag_style: policy.flag_style,
                         },
+                        level: *level,
+                    },
+                    CommandKind::FlatFirstArg { patterns, level } => CommandKind::FlatFirstArg {
+                        patterns: patterns.clone(),
                         level: *level,
                     },
                     CommandKind::FlatRequireAny { require_any, policy, level } => CommandKind::FlatRequireAny {

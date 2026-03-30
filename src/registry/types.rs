@@ -36,6 +36,8 @@ pub(super) struct TomlCommand {
     #[serde(default)]
     pub require_any: Vec<String>,
     #[serde(default)]
+    pub first_arg: Vec<String>,
+    #[serde(default)]
     pub wrapper: Option<TomlWrapper>,
     #[allow(dead_code)]
     #[serde(default)]
@@ -132,6 +134,10 @@ pub(super) enum CommandKind {
     FlatRequireAny {
         require_any: Vec<String>,
         policy: OwnedPolicy,
+        level: SafetyLevel,
+    },
+    FlatFirstArg {
+        patterns: Vec<String>,
         level: SafetyLevel,
     },
     Structured {
