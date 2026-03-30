@@ -11,7 +11,7 @@ pub mod shell;
 pub mod system;
 pub mod vcs;
 pub mod wrappers;
-pub mod xcode;
+
 
 use std::collections::HashMap;
 
@@ -40,15 +40,12 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
     None
         .or_else(|| shell::dispatch(cmd, tokens))
         .or_else(|| wrappers::dispatch(cmd, tokens))
-        .or_else(|| vcs::dispatch(cmd, tokens))
         .or_else(|| forges::dispatch(cmd, tokens))
         .or_else(|| node::dispatch(cmd, tokens))
-        .or_else(|| ruby::dispatch(cmd, tokens))
         .or_else(|| jvm::dispatch(cmd, tokens))
         .or_else(|| android::dispatch(cmd, tokens))
         .or_else(|| network::dispatch(cmd, tokens))
         .or_else(|| system::dispatch(cmd, tokens))
-        .or_else(|| xcode::dispatch(cmd, tokens))
         .or_else(|| perl::dispatch(cmd, tokens))
         .or_else(|| coreutils::dispatch(cmd, tokens))
         .or_else(|| fuzzy::dispatch(cmd, tokens))
@@ -114,15 +111,12 @@ const HANDLED_CMDS: &[&str] = &[
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs = Vec::new();
-    docs.extend(vcs::command_docs());
     docs.extend(forges::command_docs());
     docs.extend(node::command_docs());
-    docs.extend(ruby::command_docs());
     docs.extend(jvm::command_docs());
     docs.extend(android::command_docs());
     docs.extend(network::command_docs());
     docs.extend(system::command_docs());
-    docs.extend(xcode::command_docs());
     docs.extend(perl::command_docs());
     docs.extend(coreutils::command_docs());
     docs.extend(fuzzy::command_docs());
@@ -163,14 +157,12 @@ fn full_registry() -> Vec<&'static CommandEntry> {
     let mut entries = Vec::new();
     entries.extend(shell::REGISTRY);
     entries.extend(wrappers::REGISTRY);
-    entries.extend(vcs::full_registry());
     entries.extend(forges::full_registry());
     entries.extend(node::full_registry());
     entries.extend(jvm::full_registry());
     entries.extend(android::full_registry());
     entries.extend(network::REGISTRY);
     entries.extend(system::full_registry());
-    entries.extend(xcode::full_registry());
     entries.extend(perl::REGISTRY);
     entries.extend(coreutils::full_registry());
     entries.extend(fuzzy::full_registry());

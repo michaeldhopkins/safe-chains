@@ -1,49 +1,31 @@
 mod awk;
-mod binary;
-mod builtins;
 mod data;
 mod fs;
-mod hash;
 mod net;
 mod search;
 mod sed;
-mod sysinfo;
-mod text;
-mod tools;
 
 use crate::parse::Token;
 use crate::verdict::Verdict;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     None
-        .or_else(|| text::dispatch(cmd, tokens))
         .or_else(|| search::dispatch(cmd, tokens))
         .or_else(|| sed::dispatch(cmd, tokens))
         .or_else(|| awk::dispatch(cmd, tokens))
         .or_else(|| data::dispatch(cmd, tokens))
-        .or_else(|| hash::dispatch(cmd, tokens))
         .or_else(|| fs::dispatch(cmd, tokens))
-        .or_else(|| sysinfo::dispatch(cmd, tokens))
         .or_else(|| net::dispatch(cmd, tokens))
-        .or_else(|| builtins::dispatch(cmd, tokens))
-        .or_else(|| binary::dispatch(cmd, tokens))
-        .or_else(|| tools::dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs = Vec::new();
-    docs.extend(text::command_docs());
     docs.extend(search::command_docs());
     docs.extend(sed::command_docs());
     docs.extend(awk::command_docs());
     docs.extend(data::command_docs());
-    docs.extend(hash::command_docs());
     docs.extend(fs::command_docs());
-    docs.extend(sysinfo::command_docs());
     docs.extend(net::command_docs());
-    docs.extend(builtins::command_docs());
-    docs.extend(binary::command_docs());
-    docs.extend(tools::command_docs());
     docs
 }
 
@@ -55,9 +37,6 @@ pub(super) fn full_registry() -> Vec<&'static super::CommandEntry> {
     v.extend(search::registry());
     v.extend(sed::registry());
     v.extend(awk::registry());
-    v.extend(sysinfo::registry());
     v.extend(net::registry());
-    v.extend(builtins::registry());
-    v.extend(tools::registry());
     v
 }
