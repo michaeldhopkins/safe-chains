@@ -1,39 +1,6 @@
-use crate::command::{CommandDef, SubDef};
 use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
-use crate::policy::{FlagPolicy, FlagStyle};
-
-static BUNDLE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--help", "--name-only", "--paths", "-h"]),
-    valued: WordSet::flags(&[]),
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
-
-static BUNDLE_INFO_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--help", "--path", "-h"]),
-    valued: WordSet::flags(&[]),
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
-
-static BUNDLE_SHOW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--help", "--paths", "-h"]),
-    valued: WordSet::flags(&[]),
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
-
-static BUNDLE_CHECK_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--dry-run", "--help", "-h"]),
-    valued: WordSet::flags(&["--gemfile", "--path"]),
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
+use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static BUNDLE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--help", "-h"]),
@@ -51,15 +18,21 @@ static BUNDLE_CONFIG_GET_POLICY: FlagPolicy = FlagPolicy {
     flag_style: FlagStyle::Strict,
 };
 
+static HELP_ONLY: FlagPolicy = FlagPolicy {
+    standalone: WordSet::flags(&["--help", "-h"]),
+    valued: WordSet::flags(&[]),
+    bare: false,
+    max_positional: Some(0),
+    flag_style: FlagStyle::Strict,
+};
+
 static BUNDLE_EXEC_SAFE: WordSet = WordSet::new(&[
     "brakeman", "cucumber", "erb_lint", "herb", "rspec", "standardrb",
 ]);
 
 static RAILS_ROUTES_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--expanded", "--help", "-h"]),
-    valued: WordSet::flags(&[
-        "--controller", "--grep", "-g",
-    ]),
+    valued: WordSet::flags(&["--controller", "--grep", "-g"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -71,10 +44,7 @@ static RAILS_TEST_POLICY: FlagPolicy = FlagPolicy {
         "--help", "--no-color", "--verbose",
         "-b", "-c", "-d", "-f", "-h", "-v",
     ]),
-    valued: WordSet::flags(&[
-        "--environment", "--name", "--seed",
-        "-e", "-n", "-s",
-    ]),
+    valued: WordSet::flags(&["--environment", "--name", "--seed", "-e", "-n", "-s"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
@@ -82,48 +52,20 @@ static RAILS_TEST_POLICY: FlagPolicy = FlagPolicy {
 
 static RAILS_NOTES_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--help", "-h"]),
-    valued: WordSet::flags(&[
-        "--annotations", "-a",
-    ]),
+    valued: WordSet::flags(&["--annotations", "-a"]),
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
 };
 
 static RAILS_BARE_SUBS: WordSet = WordSet::new(&[
-    "about",
-    "assets:reveal",
-    "assets:reveal:full",
-    "db:migrate:status",
-    "db:version",
-    "initializers",
-    "middleware",
-    "secret",
-    "stats",
-    "time:zones:all",
-    "time:zones:local",
-    "version",
+    "about", "assets:reveal", "assets:reveal:full",
+    "db:migrate:status", "db:version",
+    "initializers", "middleware", "secret", "stats",
+    "time:zones:all", "time:zones:local", "version",
 ]);
 
-use crate::command::CheckFn;
-use crate::policy;
-
-static CONFIG_SUBS: &[SubDef] = &[
-    SubDef::Policy { name: "get", policy: &BUNDLE_CONFIG_GET_POLICY, level: SafetyLevel::Inert },
-    SubDef::Policy { name: "list", policy: &BUNDLE_CONFIG_GET_POLICY, level: SafetyLevel::Inert },
-    SubDef::Policy { name: "set", policy: &HELP_ONLY, level: SafetyLevel::Inert },
-    SubDef::Policy { name: "unset", policy: &HELP_ONLY, level: SafetyLevel::Inert },
-];
-
-static HELP_ONLY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--help", "-h"]),
-    valued: WordSet::flags(&[]),
-    bare: false,
-    max_positional: Some(0),
-    flag_style: FlagStyle::Strict,
-};
-
-fn check_bundle_config(tokens: &[Token]) -> Verdict {
+pub fn check_bundle_config(tokens: &[Token]) -> Verdict {
     if tokens.len() == 1 {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
@@ -131,16 +73,24 @@ fn check_bundle_config(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && (sub == "--help" || sub == "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-    if let Some(s) = CONFIG_SUBS.iter().find(|s| s.name() == sub) {
-        let v = s.check(&tokens[1..]);
-        if v.is_allowed() {
-            return v;
+    match sub {
+        "get" | "list" => {
+            if policy::check(&tokens[1..], &BUNDLE_CONFIG_GET_POLICY) {
+                return Verdict::Allowed(SafetyLevel::Inert);
+            }
         }
+        "set" | "unset" => {
+            if policy::check(&tokens[1..], &HELP_ONLY) {
+                return Verdict::Allowed(SafetyLevel::Inert);
+            }
+            return Verdict::Denied;
+        }
+        _ => {}
     }
     if policy::check(tokens, &BUNDLE_CONFIG_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
-fn check_bundle_exec(tokens: &[Token]) -> Verdict {
+pub fn check_bundle_exec(tokens: &[Token]) -> Verdict {
     let Some(cmd) = tokens.get(1) else {
         return Verdict::Denied;
     };
@@ -195,31 +145,6 @@ fn check_rails_sub(tokens: &[Token]) -> Verdict {
         _ => if RAILS_BARE_SUBS.contains(sub) && tokens.len() == 2 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied },
     }
 }
-
-pub(crate) static BUNDLE: CommandDef = CommandDef {
-    name: "bundle",
-    subs: &[
-        SubDef::Policy { name: "check", policy: &BUNDLE_CHECK_POLICY, level: SafetyLevel::Inert },
-        SubDef::Custom {
-            name: "config",
-            check: check_bundle_config as CheckFn,
-            doc: "Bare and single-key lookup allowed. Subcommands: get, list.",
-            test_suffix: None,
-        },
-        SubDef::Custom {
-            name: "exec",
-            check: check_bundle_exec,
-            doc: "exec allowed for: appraisal (list, or delegates inner command), brakeman, cucumber, erb_lint, gem (read-only subcommands), herb, rails (about, assets:reveal, assets:reveal:full, db:migrate:status, db:version, initializers, middleware, notes, routes, secret, stats, test, test:system, time:zones:all, time:zones:local, version), rspec, standardrb.",
-            test_suffix: None,
-        },
-        SubDef::Policy { name: "info", policy: &BUNDLE_INFO_POLICY, level: SafetyLevel::Inert },
-        SubDef::Policy { name: "list", policy: &BUNDLE_LIST_POLICY, level: SafetyLevel::Inert },
-        SubDef::Policy { name: "show", policy: &BUNDLE_SHOW_POLICY, level: SafetyLevel::Inert },
-    ],
-    bare_flags: &["--help", "--version", "-V", "-h"],
-    url: "https://bundler.io/man/bundle.1.html",
-    aliases: &[],
-};
 
 #[cfg(test)]
 mod tests {
