@@ -35,7 +35,7 @@ static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| 
         "ai", "android", "binary", "builtins", "containers", "data",
         "dotnet", "fs", "fuzzy", "go", "hash", "jvm", "magick", "net",
         "node", "php", "python", "ruby", "rust", "search", "swift",
-        "sysinfo", "system", "text", "tools", "wrappers", "xcode",
+        "sysinfo", "system", "text", "tools", "vcs", "wrappers", "xcode",
     ]
 });
 

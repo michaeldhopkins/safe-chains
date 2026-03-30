@@ -335,3 +335,64 @@ valued = ["--project-root", "--spec", "--type", "-r", "-s", "-t"]
 [[command.sub]]
 name = "version"
 standalone = ["--help", "-h"]
+
+[[command]]
+name = "xcrun"
+url = "https://ss64.com/mac/xcrun.html"
+bare_flags = []
+[command.wrapper]
+standalone = ["-l", "-n", "-v", "--log", "--no-cache", "--verbose"]
+valued = ["--sdk", "--toolchain"]
+
+[[command.sub]]
+name = "--find"
+bare = false
+positional_style = true
+
+[[command.sub]]
+name = "--show-sdk-build-version"
+positional_style = true
+
+[[command.sub]]
+name = "--show-sdk-path"
+positional_style = true
+
+[[command.sub]]
+name = "--show-sdk-platform-path"
+positional_style = true
+
+[[command.sub]]
+name = "--show-sdk-platform-version"
+positional_style = true
+
+[[command.sub]]
+name = "--show-sdk-version"
+positional_style = true
+
+[[command.sub]]
+name = "--show-toolchain-path"
+positional_style = true
+
+[[command.sub]]
+name = "simctl"
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "stapler"
+[[command.sub.sub]]
+name = "validate"
+positional_style = true
+
+[[command.sub]]
+name = "notarytool"
+[[command.sub.sub]]
+name = "history"
+positional_style = true
+[[command.sub.sub]]
+name = "info"
+positional_style = true
+[[command.sub.sub]]
+name = "log"
+positional_style = true

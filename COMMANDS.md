@@ -983,9 +983,27 @@ Aliases: `egrep`, `fgrep`
 
 ### `jj` (https://jj-vcs.github.io/jj/latest/cli-reference/)
 
-- Subcommands: bookmark list, cat, config get, config list, diff, file list, file show, git fetch, git remote list, help, log, op log, resolve --list, root, show, st, status, tag list, version, workspace list
-- Flags: --help, --version, -h
-- Skips global flags: standalone (--debug, --ignore-immutable, --ignore-working-copy, --no-pager, --quiet, --verbose), valued (--at-op, --at-operation, --color, --repository, -R).
+- **bookmark list**: Positional args accepted
+- **cat**: Positional args accepted
+- **config get**: Positional args accepted
+- **config list**: Positional args accepted
+- **diff**: Positional args accepted
+- **file list**: Positional args accepted
+- **file show**: Positional args accepted
+- **git fetch**: Positional args accepted
+- **git remote list**: Positional args accepted
+- **help**: Positional args accepted
+- **log**: Positional args accepted
+- **op log**: Positional args accepted
+- **resolve**: Allowed arguments: --list
+- **root**: Positional args accepted
+- **show**: Positional args accepted
+- **st**: Positional args accepted
+- **status**: Positional args accepted
+- **tag list**: Positional args accepted
+- **version**: Positional args accepted
+- **workspace list**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
 
 ### `jjpr` (https://github.com/michaeldhopkins/jjpr)
 
@@ -2134,7 +2152,18 @@ Aliases: `[`
 
 ### `xcrun` (https://ss64.com/mac/xcrun.html)
 
-- Allowed: --find, --show-sdk-*, --show-toolchain-path. Multi-level: notarytool history/info/log, simctl list, stapler validate. Prefix flags --sdk/--toolchain (with arg), -v/-l/-n are skipped.
+- **--find**: Positional args accepted
+- **--show-sdk-build-version**: Positional args accepted
+- **--show-sdk-path**: Positional args accepted
+- **--show-sdk-platform-path**: Positional args accepted
+- **--show-sdk-platform-version**: Positional args accepted
+- **--show-sdk-version**: Positional args accepted
+- **--show-toolchain-path**: Positional args accepted
+- **notarytool history**: Positional args accepted
+- **notarytool info**: Positional args accepted
+- **notarytool log**: Positional args accepted
+- **simctl list**: Positional args accepted
+- **stapler validate**: Positional args accepted
 
 ### `xmllint` (https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html)
 

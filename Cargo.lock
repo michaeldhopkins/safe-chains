@@ -462,7 +462,7 @@ dependencies = [
 
 [[package]]
 name = "safe-chains"
-version = "0.110.0"
+version = "0.110.1"
 dependencies = [
  "clap",
  "clap_complete",
