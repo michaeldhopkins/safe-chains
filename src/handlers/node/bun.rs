@@ -1,56 +1,7 @@
 use crate::verdict::{SafetyLevel, Verdict};
-use crate::command::{CheckFn, CommandDef, SubDef};
-use crate::parse::{Token, WordSet};
-use crate::policy::{FlagPolicy, FlagStyle};
+use crate::parse::Token;
 
-static BUN_TEST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--bail", "--help", "--only", "--rerun-each", "--todo", "-h"]),
-    valued: WordSet::flags(&["--preload", "--timeout", "-t"]),
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
-
-static BUN_OUTDATED_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--help", "-h"]),
-    valued: WordSet::flags(&[]),
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
-
-static BUN_BUILD_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--bytecode", "--compile", "--css-chunking",
-        "--emit-dce-annotations", "--help", "--minify", "--minify-identifiers",
-        "--minify-syntax", "--minify-whitespace", "--no-bundle",
-        "--no-clear-screen", "--production", "--react-fast-refresh",
-        "--splitting", "--watch",
-        "--windows-hide-console",
-        "-h",
-    ]),
-    valued: WordSet::flags(&[
-        "--asset-naming", "--banner", "--chunk-naming", "--conditions",
-        "--entry-naming", "--env", "--external", "--footer",
-        "--format", "--outdir", "--outfile", "--packages",
-        "--public-path", "--root", "--sourcemap", "--target",
-        "--windows-icon",
-        "-e",
-    ]),
-    bare: false,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
-
-static BUN_PM_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--help", "-h"]),
-    valued: WordSet::flags(&[]),
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
-
-fn check_bun_x(tokens: &[Token]) -> Verdict {
+pub fn check_bun_x(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
@@ -58,25 +9,6 @@ fn check_bun_x(tokens: &[Token]) -> Verdict {
         .is_some_and(|idx| super::is_safe_runner_package(tokens, idx))
     { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }
 }
-
-pub(crate) static BUN: CommandDef = CommandDef {
-    name: "bun",
-    subs: &[
-        SubDef::Policy { name: "build", policy: &BUN_BUILD_POLICY, level: SafetyLevel::SafeWrite },
-        SubDef::Policy { name: "test", policy: &BUN_TEST_POLICY, level: SafetyLevel::SafeRead },
-        SubDef::Policy { name: "outdated", policy: &BUN_OUTDATED_POLICY, level: SafetyLevel::Inert },
-        SubDef::Nested { name: "pm", subs: &[
-            SubDef::Policy { name: "bin", policy: &BUN_PM_POLICY, level: SafetyLevel::Inert },
-            SubDef::Policy { name: "cache", policy: &BUN_PM_POLICY, level: SafetyLevel::Inert },
-            SubDef::Policy { name: "hash", policy: &BUN_PM_POLICY, level: SafetyLevel::Inert },
-            SubDef::Policy { name: "ls", policy: &BUN_PM_POLICY, level: SafetyLevel::Inert },
-        ]},
-        SubDef::Custom { name: "x", check: check_bun_x as CheckFn, doc: "x delegates to bunx logic.", test_suffix: None },
-    ],
-    bare_flags: &["--help", "--version", "-V", "-h"],
-    url: "https://bun.sh/docs/cli",
-    aliases: &[],
-};
 
 #[cfg(test)]
 mod tests {

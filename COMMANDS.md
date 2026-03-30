@@ -194,7 +194,6 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `bun` (https://bun.sh/docs/cli)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **build**: Flags: --bytecode, --compile, --css-chunking, --emit-dce-annotations, --help, --minify, --minify-identifiers, --minify-syntax, --minify-whitespace, --no-bundle, --no-clear-screen, --production, --react-fast-refresh, --splitting, --watch, --windows-hide-console, -h. Valued: --asset-naming, --banner, --chunk-naming, --conditions, --entry-naming, --env, --external, --footer, --format, --outdir, --outfile, --packages, --public-path, --root, --sourcemap, --target, --windows-icon, -e
 - **outdated**: Flags: --help, -h
 - **pm bin**: Flags: --help, -h
@@ -202,7 +201,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **pm hash**: Flags: --help, -h
 - **pm ls**: Flags: --help, -h
 - **test**: Flags: --bail, --help, --only, --rerun-each, --todo, -h. Valued: --preload, --timeout, -t
-- **x**: x delegates to bunx logic.
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `bundle` (https://bundler.io/man/bundle.1.html)
 
