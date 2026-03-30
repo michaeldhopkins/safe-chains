@@ -6,6 +6,38 @@ pub enum FlagStyle {
     Positional,
 }
 
+pub trait FlagSet {
+    fn contains_flag(&self, token: &str) -> bool;
+    fn contains_short(&self, byte: u8) -> bool;
+}
+
+impl FlagSet for WordSet {
+    fn contains_flag(&self, token: &str) -> bool {
+        self.contains(token)
+    }
+    fn contains_short(&self, byte: u8) -> bool {
+        self.contains_short(byte)
+    }
+}
+
+impl FlagSet for [String] {
+    fn contains_flag(&self, token: &str) -> bool {
+        self.iter().any(|f| f.as_str() == token)
+    }
+    fn contains_short(&self, byte: u8) -> bool {
+        self.iter().any(|f| f.len() == 2 && f.as_bytes()[1] == byte)
+    }
+}
+
+impl FlagSet for Vec<String> {
+    fn contains_flag(&self, token: &str) -> bool {
+        self.as_slice().contains_flag(token)
+    }
+    fn contains_short(&self, byte: u8) -> bool {
+        self.as_slice().contains_short(byte)
+    }
+}
+
 pub struct FlagPolicy {
     pub standalone: WordSet,
     pub valued: WordSet,
@@ -57,8 +89,26 @@ impl FlagPolicy {
 }
 
 pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
+    check_flags(
+        tokens,
+        &policy.standalone,
+        &policy.valued,
+        policy.bare,
+        policy.max_positional,
+        policy.flag_style,
+    )
+}
+
+pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
+    tokens: &[Token],
+    standalone: &S,
+    valued: &V,
+    bare: bool,
+    max_positional: Option<usize>,
+    flag_style: FlagStyle,
+) -> bool {
     if tokens.len() == 1 {
-        return policy.bare;
+        return bare;
     }
 
     let mut i = 1;
@@ -77,22 +127,22 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
             continue;
         }
 
-        if policy.standalone.contains(t) {
+        if standalone.contains_flag(t) {
             i += 1;
             continue;
         }
 
-        if policy.valued.contains(t) {
+        if valued.contains_flag(t) {
             i += 2;
             continue;
         }
 
         if let Some(flag) = t.as_str().split_once('=').map(|(f, _)| f) {
-            if policy.valued.contains(flag) {
+            if valued.contains_flag(flag) {
                 i += 1;
                 continue;
             }
-            if policy.flag_style == FlagStyle::Positional {
+            if flag_style == FlagStyle::Positional {
                 positionals += 1;
                 i += 1;
                 continue;
@@ -101,7 +151,7 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
         }
 
         if t.starts_with("--") {
-            if policy.flag_style == FlagStyle::Positional {
+            if flag_style == FlagStyle::Positional {
                 positionals += 1;
                 i += 1;
                 continue;
@@ -114,17 +164,17 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
         while j < bytes.len() {
             let b = bytes[j];
             let is_last = j == bytes.len() - 1;
-            if policy.standalone.contains_short(b) {
+            if standalone.contains_short(b) {
                 j += 1;
                 continue;
             }
-            if policy.valued.contains_short(b) {
+            if valued.contains_short(b) {
                 if is_last {
                     i += 1;
                 }
                 break;
             }
-            if policy.flag_style == FlagStyle::Positional {
+            if flag_style == FlagStyle::Positional {
                 positionals += 1;
                 break;
             }
@@ -132,7 +182,7 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
         }
         i += 1;
     }
-    policy.max_positional.is_none_or(|max| positionals <= max)
+    max_positional.is_none_or(|max| positionals <= max)
 }
 
 #[cfg(test)]
