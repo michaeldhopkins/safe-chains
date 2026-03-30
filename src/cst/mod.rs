@@ -1,4 +1,5 @@
 pub(crate) mod check;
+#[cfg(test)]
 mod display;
 mod eval;
 mod parse;
