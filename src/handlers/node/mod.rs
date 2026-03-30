@@ -1,7 +1,6 @@
 mod bun;
 mod bunx;
 mod npx;
-mod yarn;
 
 use crate::parse::{Token, WordSet, has_flag};
 use crate::verdict::Verdict;
@@ -76,15 +75,13 @@ pub(super) fn is_safe_runner_package(tokens: &[Token], pkg_idx: usize) -> bool {
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    yarn::dispatch(cmd, tokens)
-        .or_else(|| BUN.dispatch(cmd, tokens))
+    BUN.dispatch(cmd, tokens)
         .or_else(|| npx::dispatch(cmd, tokens))
         .or_else(|| bunx::dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs = Vec::new();
-    docs.extend(yarn::command_docs());
     docs.push(BUN.to_doc());
     docs.extend(bunx::command_docs());
     docs.extend(npx::command_docs());
@@ -94,7 +91,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 #[cfg(test)]
 pub(super) fn full_registry() -> Vec<&'static super::CommandEntry> {
     let mut v = Vec::new();
-    v.extend(yarn::REGISTRY);
     v.extend(npx::REGISTRY);
     v.extend(bunx::REGISTRY);
     v

@@ -15,13 +15,19 @@ impl CommandSpec {
                     format!("Requires {req}. {summary}")
                 }
             }
-            CommandKind::Structured { bare_flags, subs, .. } => {
+            CommandKind::Structured { bare_flags, subs, bare_ok, first_arg, .. } => {
                 let mut lines = Vec::new();
+                if *bare_ok {
+                    lines.push("- Bare invocation allowed".to_string());
+                }
                 if !bare_flags.is_empty() {
                     lines.push(format!("- Allowed standalone flags: {}", bare_flags.join(", ")));
                 }
                 for sub in subs {
                     sub.doc_line("", &mut lines);
+                }
+                if !first_arg.is_empty() {
+                    lines.push(format!("- Allowed arguments: {}", first_arg.join(", ")));
                 }
                 lines.sort();
                 lines.join("\n")

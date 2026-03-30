@@ -6,7 +6,6 @@ pub mod jvm;
 pub mod network;
 pub mod node;
 pub mod perl;
-pub mod r;
 pub mod ruby;
 pub mod shell;
 pub mod system;
@@ -46,7 +45,6 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
         .or_else(|| system::dispatch(cmd, tokens))
         .or_else(|| xcode::dispatch(cmd, tokens))
         .or_else(|| perl::dispatch(cmd, tokens))
-        .or_else(|| r::dispatch(cmd, tokens))
         .or_else(|| coreutils::dispatch(cmd, tokens))
         .or_else(|| fuzzy::dispatch(cmd, tokens))
         .or_else(|| crate::registry::toml_dispatch(tokens))
@@ -121,7 +119,6 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(system::command_docs());
     docs.extend(xcode::command_docs());
     docs.extend(perl::command_docs());
-    docs.extend(r::command_docs());
     docs.extend(coreutils::command_docs());
     docs.extend(fuzzy::command_docs());
     docs.extend(shell::command_docs());
@@ -196,7 +193,6 @@ fn full_registry() -> Vec<&'static CommandEntry> {
     entries.extend(system::full_registry());
     entries.extend(xcode::full_registry());
     entries.extend(perl::REGISTRY);
-    entries.extend(r::REGISTRY);
     entries.extend(coreutils::full_registry());
     entries.extend(fuzzy::full_registry());
     entries

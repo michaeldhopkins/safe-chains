@@ -1,0 +1,27 @@
+[[command]]
+name = "R"
+url = "https://cran.r-project.org/manuals.html"
+
+[[command.sub]]
+name = "CMD"
+
+[[command.sub.sub]]
+name = "check"
+bare = false
+standalone = [
+    "--as-cran", "--no-build-vignettes", "--no-examples",
+    "--no-manual", "--no-tests", "--no-vignettes",
+]
+valued = ["--output", "-o"]
+
+[[command.sub.sub]]
+name = "config"
+bare = false
+max_positional = 1
+
+[[command]]
+name = "Rscript"
+url = "https://cran.r-project.org/manuals.html"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

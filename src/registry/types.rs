@@ -145,6 +145,9 @@ pub(super) enum CommandKind {
         subs: Vec<SubSpec>,
         pre_standalone: Vec<String>,
         pre_valued: Vec<String>,
+        bare_ok: bool,
+        first_arg: Vec<String>,
+        first_arg_level: SafetyLevel,
     },
     Wrapper {
         standalone: Vec<String>,

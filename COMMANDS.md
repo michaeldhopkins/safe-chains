@@ -1007,11 +1007,16 @@ Aliases: `egrep`, `fgrep`
 
 ### `jjpr` (https://github.com/michaeldhopkins/jjpr)
 
-- Bare invocation allowed (displays stack status).
-- status allowed.
-- auth (test, setup).
-- submit (requires --dry-run), merge (requires --dry-run).
-- --help allowed on all subcommands.
+- **auth help**
+- **auth setup**: Flags: --help, -h
+- **auth test**: Flags: --help, -h
+- **config help**
+- **help**
+- **merge** (requires --dry-run): Flags: --dry-run, --help, --no-ci-check, --no-fetch, --watch, -h. Valued: --base, --merge-method, --reconcile-strategy, --remote, --required-approvals
+- **status**: Flags: --dry-run, --help, --no-fetch, -h
+- **submit** (requires --dry-run): Flags: --draft, --dry-run, --help, --no-fetch, --ready, -h. Valued: --base, --remote, --reviewer
+- Allowed standalone flags: --help, --version, -V, -h
+- Bare invocation allowed
 
 ### `jless` (https://github.com/PaulJuliusMartinez/jless)
 
@@ -1624,8 +1629,8 @@ Aliases: `pip3`
 
 ### `R` (https://cran.r-project.org/manuals.html)
 
-- CMD check <package> (with --as-cran, --no-tests, --no-examples, --no-vignettes, --no-build-vignettes, --no-manual, --output)
-- CMD config <var>
+- **CMD check**: Flags: --as-cran, --no-build-vignettes, --no-examples, --no-manual, --no-tests, --no-vignettes. Valued: --output, -o
+- **CMD config**
 
 ### `rbenv` (https://github.com/rbenv/rbenv#readme)
 
@@ -1677,8 +1682,7 @@ Aliases: `pip3`
 
 ### `Rscript` (https://cran.r-project.org/manuals.html)
 
-- --version
-- --help
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `ruby` (https://www.ruby-lang.org/en/documentation/)
 
@@ -1900,9 +1904,66 @@ Aliases: `pip3`
 
 ### `tea` (https://gitea.com/gitea/tea)
 
-- Subcommands b, branch, branches, i, issue, issues, label, labels, milestone, milestones, ms, n, notification, notifications, org, organization, organizations, pr, pull, pulls, r, release, releases, repo, repos, t, time, times are allowed with actions: list, view or bare invocation.
-- Always safe: --version, -v, whoami.
-- logins/login (list only).
+- **b list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **b view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **branch list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **branch view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **branches list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **branches view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **i list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **i view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **issue list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **issue view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **issues list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **issues view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **label list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **label view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **labels list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **labels view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **login list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **logins list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **milestone list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **milestone view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **milestones list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **milestones view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **ms list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **ms view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **n list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **n view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **notification list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **notification view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **notifications list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **notifications view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **org list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **org view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **organization list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **organization view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **organizations list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **organizations view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **pr list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **pr view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **pull list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **pull view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **pulls list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **pulls view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **r list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **r view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **release list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **release view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **releases list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **releases view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **repo list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **repo view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **repos list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **repos view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **t list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **t view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **time list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **time view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **times list**: Flags: --help, -h. Valued: --fields, --limit, --login, --output, --page, --repo, --state, -L, -R, -f, -l, -o, -p, -s
+- **times view**: Flags: --comments, --help, -c, -h. Valued: --login, --output, --repo, -R, -l, -o
+- **whoami**
+- Allowed standalone flags: --version, -v
 
 ### `terraform` (https://developer.hashicorp.com/terraform/cli/commands)
 
@@ -2188,7 +2249,12 @@ Aliases: `[`
 
 ### `yarn` (https://yarnpkg.com/cli)
 
-- Subcommands: info, list, ls, test, test:*, why.
+- **info**: Flags: --help, --json, -h
+- **list**: Flags: --help, --json, --long, --production, -h. Valued: --depth, --pattern
+- **ls**: Flags: --help, --json, --long, --production, -h. Valued: --depth, --pattern
+- **why**: Flags: --help, --json, -h
+- Allowed arguments: test, test:*
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `yq` (https://mikefarah.gitbook.io/yq)
 

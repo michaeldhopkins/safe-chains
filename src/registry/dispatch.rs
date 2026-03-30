@@ -67,6 +67,9 @@ fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
             policy,
             level,
         } => {
+            if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "help") {
+                return Verdict::Allowed(SafetyLevel::Inert);
+            }
             if has_flag_owned(tokens, guard_short.as_deref(), guard_long)
                 && check_owned(tokens, policy)
             {
@@ -83,8 +86,11 @@ fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
                 return Verdict::Denied;
             }
             let arg = tokens[1].as_str();
-            if *allow_bare && (arg == "--help" || arg == "-h") {
-                return Verdict::Allowed(SafetyLevel::Inert);
+            if matches!(arg, "--help" | "-h") {
+                if tokens.len() == 2 {
+                    return Verdict::Allowed(SafetyLevel::Inert);
+                }
+                return Verdict::Denied;
             }
             subs.iter()
                 .find(|s| s.name == arg)
@@ -151,6 +157,9 @@ fn dispatch_structured(
     subs: &[SubSpec],
     pre_standalone: &[String],
     pre_valued: &[String],
+    bare_ok: bool,
+    first_arg: &[String],
+    first_arg_level: SafetyLevel,
 ) -> Verdict {
     let mut start = 1;
     while start < tokens.len() {
@@ -173,16 +182,28 @@ fn dispatch_structured(
         break;
     }
     if start >= tokens.len() {
-        return Verdict::Denied;
+        return if bare_ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
     let arg = tokens[start].as_str();
     if start + 1 == tokens.len() && bare_flags.iter().any(|f| f == arg) {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-    subs.iter()
-        .find(|s| s.name == arg)
-        .map(|s| dispatch_sub(&tokens[start..], s))
-        .unwrap_or(Verdict::Denied)
+    if let Some(sub) = subs.iter().find(|s| s.name == arg) {
+        return dispatch_sub(&tokens[start..], sub);
+    }
+    if !first_arg.is_empty() {
+        let matches = first_arg.iter().any(|p| {
+            if let Some(prefix) = p.strip_suffix('*') {
+                arg.starts_with(prefix)
+            } else {
+                arg == p
+            }
+        });
+        if matches {
+            return Verdict::Allowed(first_arg_level);
+        }
+    }
+    Verdict::Denied
 }
 
 pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
@@ -202,8 +223,8 @@ pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
             policy,
             level,
         } => dispatch_require_any(tokens, require_any, policy, *level),
-        CommandKind::Structured { bare_flags, subs, pre_standalone, pre_valued } => {
-            dispatch_structured(tokens, bare_flags, subs, pre_standalone, pre_valued)
+        CommandKind::Structured { bare_flags, subs, pre_standalone, pre_valued, bare_ok, first_arg, first_arg_level } => {
+            dispatch_structured(tokens, bare_flags, subs, pre_standalone, pre_valued, *bare_ok, first_arg, *first_arg_level)
         }
         CommandKind::Wrapper {
             standalone,

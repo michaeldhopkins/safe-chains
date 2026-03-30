@@ -1,0 +1,624 @@
+[[command]]
+name = "jjpr"
+url = "https://github.com/michaeldhopkins/jjpr"
+bare = true
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "status"
+standalone = [
+    "--dry-run", "--help", "--no-fetch",
+    "-h",
+]
+
+[[command.sub]]
+name = "auth"
+
+[[command.sub.sub]]
+name = "test"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "setup"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "submit"
+guard = "--dry-run"
+standalone = [
+    "--draft", "--dry-run", "--help", "--no-fetch", "--ready",
+    "-h",
+]
+valued = ["--base", "--remote", "--reviewer"]
+
+[[command.sub]]
+name = "merge"
+guard = "--dry-run"
+standalone = [
+    "--dry-run", "--help", "--no-ci-check", "--no-fetch", "--watch",
+    "-h",
+]
+valued = [
+    "--base", "--merge-method", "--reconcile-strategy", "--remote",
+    "--required-approvals",
+]
+
+[[command.sub]]
+name = "config"
+
+[[command.sub.sub]]
+name = "help"
+allow_all = true
+
+[[command]]
+name = "tea"
+url = "https://gitea.com/gitea/tea"
+bare_flags = ["--version", "-v"]
+
+[[command.sub]]
+name = "whoami"
+max_positional = 0
+
+[[command.sub]]
+name = "b"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "branch"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "branches"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "i"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "issue"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "issues"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "label"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "labels"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "milestone"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "milestones"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "ms"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "n"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "notification"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "notifications"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "org"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "organization"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "organizations"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "pr"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "pull"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "pulls"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "r"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "release"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "releases"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "repo"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "repos"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "t"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "time"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "times"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--comments", "--help", "-c", "-h"]
+valued = ["--login", "--output", "--repo", "-R", "-l", "-o"]
+
+[[command.sub]]
+name = "login"
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]
+
+[[command.sub]]
+name = "logins"
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = [
+    "--fields", "--limit", "--login", "--output",
+    "--page", "--repo", "--state",
+    "-L", "-R", "-f", "-l", "-o", "-p", "-s",
+]

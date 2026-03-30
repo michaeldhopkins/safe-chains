@@ -1,5 +1,29 @@
 # Skipped CommandDef with Custom: bun (check_bun_x)
-# Skipped custom handler: yarn
+
+[[command]]
+name = "yarn"
+url = "https://yarnpkg.com/cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+first_arg = ["test", "test:*"]
+level = "SafeRead"
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--json", "--long", "--production", "-h"]
+valued = ["--depth", "--pattern"]
+
+[[command.sub]]
+name = "ls"
+standalone = ["--help", "--json", "--long", "--production", "-h"]
+valued = ["--depth", "--pattern"]
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "why"
+standalone = ["--help", "--json", "-h"]
 
 [[command]]
 name = "npm"
