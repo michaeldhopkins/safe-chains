@@ -205,13 +205,11 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `bundle` (https://bundler.io/man/bundle.1.html)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **check**: Flags: --dry-run, --help, -h. Valued: --gemfile, --path
-- **config**: Bare and single-key lookup allowed. Subcommands: get, list.
-- **exec**: exec allowed for: appraisal (list, or delegates inner command), brakeman, cucumber, erb_lint, gem (read-only subcommands), herb, rails (about, assets:reveal, assets:reveal:full, db:migrate:status, db:version, initializers, middleware, notes, routes, secret, stats, test, test:system, time:zones:all, time:zones:local, version), rspec, standardrb.
 - **info**: Flags: --help, --path, -h
 - **list**: Flags: --help, --name-only, --paths, -h
 - **show**: Flags: --help, --paths, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `bundletool` (https://developer.android.com/tools/bundletool)
 
@@ -746,7 +744,6 @@ Aliases: `fly`
 
 ### `git` (https://git-scm.com/docs)
 
-- Allowed standalone flags: --help, --version, -V, -h
 - **blame**: Flags: --color-by-age, --color-lines, --help, --incremental, --line-porcelain, --minimal, --porcelain, --progress, --root, --show-email, --show-name, --show-number, --show-stats, -b, -c, -e, -f, -h, -k, -l, -n, -p, -s, -t, -w. Valued: --abbrev, --contents, --ignore-rev, --ignore-revs-file, -C, -L, -M, -S
 - **branch**: Flags: --all, --help, --ignore-case, --list, --no-abbrev, --no-color, --no-column, --omit-empty, --remotes, --show-current, --verbose, -a, -h, -i, -l, -r, -v, -vv. Valued: --abbrev, --color, --column, --contains, --format, --merged, --no-contains, --no-merged, --points-at, --sort
 - **cat-file**: Flags: --batch-all-objects, --buffer, --filters, --follow-symlinks, --help, --mailmap, --textconv, --unordered, --use-mailmap, -Z, -e, -h, -p, -s, -t. Valued: --batch, --batch-check, --batch-command, --filter, --path
@@ -778,7 +775,6 @@ Aliases: `fly`
 - **notes list**
 - **notes show**
 - **reflog**: Flags: --abbrev-commit, --all, --ancestry-path, --author-date-order, --bisect, --boundary, --branches, --cherry, --cherry-mark, --cherry-pick, --children, --clear-decorations, --compact-summary, --cumulative, --date-order, --dense, --do-walk, --early-output, --first-parent, --follow, --full-diff, --full-history, --graph, --help, --ignore-missing, --invert-grep, --left-only, --left-right, --log-size, --mailmap, --merges, --minimal, --name-only, --name-status, --no-abbrev-commit, --no-color, --no-decorate, --no-expand-tabs, --no-ext-diff, --no-merges, --no-notes, --no-patch, --no-prefix, --no-renames, --no-walk, --numstat, --oneline, --parents, --patch, --patch-with-raw, --patch-with-stat, --patience, --raw, --reflog, --regexp-ignore-case, --relative-date, --remotes, --reverse, --shortstat, --show-linear-break, --show-notes, --show-pulls, --show-signature, --simplify-by-decoration, --simplify-merges, --source, --sparse, --stat, --stdin, --summary, --tags, --text, --topo-order, --use-mailmap, -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -h, -i, -p, -q, -u. Valued: --abbrev, --after, --author, --before, --color, --committer, --date, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --encoding, --exclude, --format, --glob, --grep, --max-count, --max-parents, --min-parents, --pretty, --since, --skip, --until, -L, -n
-- **remote**: remote (read-only actions).
 - **rev-parse**: Flags: --absolute-git-dir, --all, --branches, --git-common-dir, --git-dir, --git-path, --help, --is-bare-repository, --is-inside-git-dir, --is-inside-work-tree, --is-shallow-repository, --local-env-vars, --quiet, --remotes, --shared-index-path, --show-cdup, --show-prefix, --show-superproject-working-tree, --show-toplevel, --symbolic, --symbolic-full-name, --tags, --verify, -h, -q. Valued: --abbrev-ref, --after, --before, --default, --exclude, --glob, --prefix, --resolve-git-dir, --short, --since, --until. Positional args accepted
 - **shortlog**: Flags: --committer, --email, --help, --numbered, --summary, -c, -e, -h, -n, -s. Valued: --format, --group
 - **show**: Flags: --abbrev-commit, --compact-summary, --cumulative, --expand-tabs, --full-index, --help, --ignore-all-space, --ignore-blank-lines, --ignore-space-at-eol, --ignore-space-change, --mailmap, --minimal, --name-only, --name-status, --no-color, --no-ext-diff, --no-notes, --no-patch, --no-prefix, --no-renames, --numstat, --patch, --patch-with-raw, --patch-with-stat, --patience, --raw, --shortstat, --show-notes, --show-signature, --source, --stat, --summary, --text, --use-mailmap, -h, -p, -q, -u, -w. Valued: --abbrev, --color, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --encoding, --format, --notes, --pretty, -O
@@ -793,8 +789,7 @@ Aliases: `fly`
 - **worktree --help**
 - **worktree -h**
 - **worktree list**: Flags: --porcelain, --verbose, -v, -z
-
-Supports `-C <dir>` prefix.
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `glab` (https://glab.readthedocs.io/en/latest/)
 

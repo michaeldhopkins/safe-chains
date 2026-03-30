@@ -29,6 +29,9 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
 pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
     HashMap::from([
         ("bun_x", node::bun::check_bun_x as HandlerFn),
+        ("bundle_config", ruby::bundle::check_bundle_config as HandlerFn),
+        ("bundle_exec", ruby::bundle::check_bundle_exec as HandlerFn),
+        ("git_remote", vcs::git::check_git_remote as HandlerFn),
     ])
 }
 
@@ -151,8 +154,6 @@ pub(crate) enum SubEntry {
 use crate::command::CommandDef;
 
 const COMMAND_DEFS: &[&CommandDef] = &[
-    &ruby::BUNDLE,
-    &vcs::GIT,
 ];
 
 pub fn all_opencode_patterns() -> Vec<String> {
