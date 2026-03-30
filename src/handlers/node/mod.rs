@@ -1,12 +1,10 @@
-mod bun;
+pub mod bun;
 mod bunx;
 mod npx;
 
 use crate::parse::{Token, WordSet, has_flag};
 use crate::verdict::Verdict;
 use crate::policy::{self, FlagPolicy, FlagStyle};
-
-pub(crate) use bun::BUN;
 
 pub(super) static NPX_SAFE: WordSet =
     WordSet::new(&["@herb-tools/linter", "eslint", "karma"]);
@@ -75,14 +73,12 @@ pub(super) fn is_safe_runner_package(tokens: &[Token], pkg_idx: usize) -> bool {
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    BUN.dispatch(cmd, tokens)
-        .or_else(|| npx::dispatch(cmd, tokens))
+    npx::dispatch(cmd, tokens)
         .or_else(|| bunx::dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs = Vec::new();
-    docs.push(BUN.to_doc());
     docs.extend(bunx::command_docs());
     docs.extend(npx::command_docs());
     docs

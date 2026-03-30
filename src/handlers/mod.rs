@@ -27,7 +27,9 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
 }
 
 pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
-    HashMap::new()
+    HashMap::from([
+        ("bun_x", node::bun::check_bun_x as HandlerFn),
+    ])
 }
 
 pub fn dispatch(tokens: &[Token]) -> Verdict {
@@ -149,7 +151,6 @@ pub(crate) enum SubEntry {
 use crate::command::CommandDef;
 
 const COMMAND_DEFS: &[&CommandDef] = &[
-    &node::BUN,
     &ruby::BUNDLE,
     &vcs::GIT,
 ];
