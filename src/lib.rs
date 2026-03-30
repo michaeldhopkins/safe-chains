@@ -52,7 +52,6 @@ macro_rules! safe_write {
 }
 
 pub mod cli;
-pub mod command;
 pub mod cst;
 pub mod docs;
 mod handlers;

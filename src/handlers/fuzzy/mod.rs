@@ -1,7 +1,6 @@
 mod fzf;
 mod sk;
 
-use crate::command::FlatDef;
 use crate::parse::Token;
 use crate::verdict::Verdict;
 
@@ -14,10 +13,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs = fzf::command_docs();
     docs.extend(sk::command_docs());
     docs
-}
-
-pub(crate) fn fuzzy_flat_defs() -> Vec<&'static FlatDef> {
-    Vec::new()
 }
 
 #[cfg(test)]
