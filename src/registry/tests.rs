@@ -1069,6 +1069,143 @@ use super::*;
 
     // ---------------------------------------------------------------
     // ---------------------------------------------------------------
+    // Structured with wrapper (global flag stripping)
+    // ---------------------------------------------------------------
+
+    #[test]
+    fn structured_wrapper_strips_flags() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "jj"
+            bare_flags = ["--help", "--version", "-h"]
+            [command.wrapper]
+            standalone = ["--no-pager", "--quiet"]
+            valued = ["--color", "-R"]
+
+            [[command.sub]]
+            name = "log"
+            standalone = ["--help", "-h"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["jj", "--no-pager", "log"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["jj", "--color", "auto", "log"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["jj", "-R", "/repo", "--quiet", "log"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn structured_wrapper_still_dispatches_subs() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "jj"
+            bare_flags = ["--help", "-h"]
+            [command.wrapper]
+            standalone = ["--no-pager"]
+
+            [[command.sub]]
+            name = "log"
+
+            [[command.sub]]
+            name = "diff"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["jj", "log"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["jj", "diff"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["jj", "push"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn structured_wrapper_bare_flags_still_work() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "jj"
+            bare_flags = ["--help", "--version", "-h"]
+            [command.wrapper]
+            standalone = ["--no-pager"]
+
+            [[command.sub]]
+            name = "log"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["jj", "--help"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["jj", "--version"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn structured_wrapper_rejects_unknown_sub() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "jj"
+            [command.wrapper]
+            standalone = ["--no-pager"]
+
+            [[command.sub]]
+            name = "log"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["jj", "--no-pager", "push"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn structured_wrapper_eq_syntax() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "jj"
+            [command.wrapper]
+            valued = ["--color"]
+
+            [[command.sub]]
+            name = "log"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["jj", "--color=auto", "log"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn structured_no_wrapper_unchanged() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "cargo"
+            bare_flags = ["--help"]
+
+            [[command.sub]]
+            name = "test"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["cargo", "test"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["cargo", "--help"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    // ---------------------------------------------------------------
     // Wrapper (delegate inner command)
     // ---------------------------------------------------------------
 

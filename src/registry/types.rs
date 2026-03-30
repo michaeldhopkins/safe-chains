@@ -143,6 +143,8 @@ pub(super) enum CommandKind {
     Structured {
         bare_flags: Vec<String>,
         subs: Vec<SubSpec>,
+        pre_standalone: Vec<String>,
+        pre_valued: Vec<String>,
     },
     Wrapper {
         standalone: Vec<String>,

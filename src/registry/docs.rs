@@ -15,7 +15,7 @@ impl CommandSpec {
                     format!("Requires {req}. {summary}")
                 }
             }
-            CommandKind::Structured { bare_flags, subs } => {
+            CommandKind::Structured { bare_flags, subs, .. } => {
                 let mut lines = Vec::new();
                 if !bare_flags.is_empty() {
                     lines.push(format!("- Allowed standalone flags: {}", bare_flags.join(", ")));

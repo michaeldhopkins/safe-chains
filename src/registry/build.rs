@@ -139,6 +139,19 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
     }
 
     if let Some(w) = toml.wrapper {
+        if !toml.sub.is_empty() || !toml.bare_flags.is_empty() {
+            return CommandSpec {
+                name: toml.name,
+                aliases: toml.aliases,
+                url: toml.url,
+                kind: CommandKind::Structured {
+                    bare_flags: toml.bare_flags,
+                    subs: toml.sub.into_iter().map(build_sub).collect(),
+                    pre_standalone: w.standalone,
+                    pre_valued: w.valued,
+                },
+            };
+        }
         return CommandSpec {
             name: toml.name,
             aliases: toml.aliases,
@@ -161,6 +174,8 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
             kind: CommandKind::Structured {
                 bare_flags: toml.bare_flags,
                 subs: toml.sub.into_iter().map(build_sub).collect(),
+                pre_standalone: Vec::new(),
+                pre_valued: Vec::new(),
             },
         };
     }

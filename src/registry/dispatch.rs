@@ -145,6 +145,46 @@ fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
     }
 }
 
+fn dispatch_structured(
+    tokens: &[Token],
+    bare_flags: &[String],
+    subs: &[SubSpec],
+    pre_standalone: &[String],
+    pre_valued: &[String],
+) -> Verdict {
+    let mut start = 1;
+    while start < tokens.len() {
+        let t = &tokens[start];
+        if !t.starts_with('-') {
+            break;
+        }
+        if pre_valued.iter().any(|f| t == f.as_str()) {
+            start += 2;
+            continue;
+        }
+        if pre_valued.iter().any(|f| t.as_str().starts_with(&format!("{f}="))) {
+            start += 1;
+            continue;
+        }
+        if pre_standalone.iter().any(|f| t == f.as_str()) {
+            start += 1;
+            continue;
+        }
+        break;
+    }
+    if start >= tokens.len() {
+        return Verdict::Denied;
+    }
+    let arg = tokens[start].as_str();
+    if start + 1 == tokens.len() && bare_flags.iter().any(|f| f == arg) {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
+    subs.iter()
+        .find(|s| s.name == arg)
+        .map(|s| dispatch_sub(&tokens[start..], s))
+        .unwrap_or(Verdict::Denied)
+}
+
 pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
     match &spec.kind {
         CommandKind::Flat { policy, level } => {
@@ -162,18 +202,8 @@ pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
             policy,
             level,
         } => dispatch_require_any(tokens, require_any, policy, *level),
-        CommandKind::Structured { bare_flags, subs } => {
-            if tokens.len() < 2 {
-                return Verdict::Denied;
-            }
-            let arg = tokens[1].as_str();
-            if tokens.len() == 2 && bare_flags.iter().any(|f| f == arg) {
-                return Verdict::Allowed(SafetyLevel::Inert);
-            }
-            subs.iter()
-                .find(|s| s.name == arg)
-                .map(|s| dispatch_sub(&tokens[1..], s))
-                .unwrap_or(Verdict::Denied)
+        CommandKind::Structured { bare_flags, subs, pre_standalone, pre_valued } => {
+            dispatch_structured(tokens, bare_flags, subs, pre_standalone, pre_valued)
         }
         CommandKind::Wrapper {
             standalone,

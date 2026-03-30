@@ -43,6 +43,9 @@
 #   Does a flag promote the safety level (sk --history → SafeWrite)?
 #     → Use "write_flags"
 #
+#   Does the command have global flags before subcommands (jj --no-pager log)?
+#     → Use "wrapper" on a structured command to strip them first
+#
 #   Does the command wrap and delegate to an inner command (timeout, nice)?
 #     → Use "wrapper" with skip flags and positional_skip
 #
@@ -219,6 +222,31 @@
 # [[command.sub]]
 # name = "exec"
 # delegate_after = "--"                  # validate everything after "--"
+
+# ─────────────────────────────────────────────────────────────────────
+# STRUCTURED + WRAPPER — global flags stripped before sub dispatch
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use for: commands with global flags that appear before the subcommand.
+# Example: "jj --no-pager log" or "xcrun --sdk macosx --find clang".
+# The wrapper flags are stripped from the front, then the remaining
+# tokens are dispatched to subcommands as normal.
+# This reuses the wrapper concept on a structured command.
+
+# [[command]]
+# name = "jj"
+# bare_flags = ["--help", "--version", "-h"]
+# [command.wrapper]
+# standalone = ["--no-pager", "--quiet", "--verbose"]
+# valued = ["--color", "--repository", "-R"]
+#
+# [[command.sub]]
+# name = "log"
+# standalone = ["--help", "-h"]
+#
+# [[command.sub]]
+# name = "diff"
+# standalone = ["--help", "-h"]
 
 # ─────────────────────────────────────────────────────────────────────
 # WRAPPER — command that wraps an inner command
