@@ -1,3 +1,13 @@
+[[command]]
+name = "networksetup"
+url = "https://ss64.com/mac/networksetup.html"
+level = "Inert"
+first_arg = ["-list*", "-get*", "-show*", "-print*", "-version", "--version", "-V", "-help", "--help", "-h"]
+
+[[command]]
+name = "sysctl"
+handler = "sysctl"
+url = "https://man7.org/linux/man-pages/man8/sysctl.8.html"
 
 [[command]]
 name = "crontab"

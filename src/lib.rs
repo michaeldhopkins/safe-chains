@@ -291,6 +291,28 @@ mod tests {
         bare_negation: "! echo hello",
         bare_negation_test: "! test -f foo",
         keyword_as_data: "echo for; echo done; echo if; echo fi",
+
+        command_help: "command --help",
+        command_version: "command --version",
+        command_v: "command -v git",
+        command_v_upper: "command -V git",
+        command_v_path: "command -v /usr/bin/git",
+
+        networksetup_listallhardwareports: "networksetup -listallhardwareports",
+        networksetup_listallnetworkservices: "networksetup -listallnetworkservices",
+        networksetup_getinfo: "networksetup -getinfo Wi-Fi",
+        networksetup_getdnsservers: "networksetup -getdnsservers Wi-Fi",
+        networksetup_version: "networksetup -version",
+        networksetup_help: "networksetup -help",
+
+        mlr_csv_head: "mlr --csv head -n 10 data.csv",
+        mlr_json_filter: "mlr --json filter '$age > 30' data.json",
+        mlr_tsv_cut: "mlr --tsv cut -f name,age data.tsv",
+
+        sysctl_read: "sysctl kern.maxproc",
+        sysctl_all: "sysctl -a",
+        sysctl_names: "sysctl -N -a",
+        sysctl_read_ostype: "sysctl kern.ostype",
     }
 
     denied! {
@@ -411,6 +433,20 @@ mod tests {
         for_missing_do: "for x in 1 2 3; echo $x; done",
         stray_done: "echo hello; done",
         stray_fi: "fi",
+
+        command_bare_denied: "command",
+        command_exec_denied: "command git status",
+        command_exec_rm_denied: "command rm -rf /",
+
+        networksetup_setdnsservers_denied: "networksetup -setdnsservers Wi-Fi 8.8.8.8",
+        networksetup_setairportpower_denied: "networksetup -setairportpower en0 on",
+        networksetup_no_args_denied: "networksetup",
+
+        mlr_bare_denied: "mlr",
+
+        sysctl_write_denied: "sysctl -w kern.maxproc=2048",
+        sysctl_assign_denied: "sysctl kern.maxproc=2048",
+        sysctl_assign_ostype_denied: "sysctl kern.ostype=evil",
     }
 
     inert! {

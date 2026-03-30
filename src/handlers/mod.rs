@@ -22,7 +22,9 @@ use crate::verdict::Verdict;
 type HandlerFn = fn(&[Token]) -> Verdict;
 
 pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
-    HashMap::new()
+    HashMap::from([
+        ("sysctl", system::sysctl::is_safe_sysctl as HandlerFn),
+    ])
 }
 
 pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {

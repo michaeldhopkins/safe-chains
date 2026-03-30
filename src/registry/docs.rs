@@ -29,6 +29,10 @@ impl CommandSpec {
             CommandKind::Wrapper { .. } => {
                 "- Recursively validates the inner command.".to_string()
             }
+            CommandKind::FlatFirstArg { patterns, .. } => {
+                let args = patterns.join(", ");
+                format!("Allowed first arguments: {args}")
+            }
             CommandKind::Custom { .. } => String::new(),
         };
         let mut doc = crate::docs::CommandDoc::handler(

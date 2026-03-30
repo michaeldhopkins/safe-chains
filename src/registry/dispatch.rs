@@ -154,6 +154,9 @@ pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
                 Verdict::Denied
             }
         }
+        CommandKind::FlatFirstArg { patterns, level } => {
+            dispatch_first_arg(tokens, patterns, *level)
+        }
         CommandKind::FlatRequireAny {
             require_any,
             policy,
