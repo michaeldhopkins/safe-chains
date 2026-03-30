@@ -47,21 +47,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs
 }
 
-pub(crate) fn all_flat_defs() -> Vec<&'static crate::command::FlatDef> {
-    let mut v = Vec::new();
-    v.extend(text::all_flat_defs());
-    v.extend(search::all_flat_defs());
-    v.extend(data::all_flat_defs());
-    v.extend(hash::all_flat_defs());
-    v.extend(fs::all_flat_defs());
-    v.extend(sysinfo::all_flat_defs());
-    v.extend(net::all_flat_defs());
-    v.extend(builtins::all_flat_defs());
-    v.extend(binary::all_flat_defs());
-    v.extend(tools::all_flat_defs());
-    v
-}
-
 #[cfg(test)]
 pub(super) fn full_registry() -> Vec<&'static super::CommandEntry> {
     let mut v = Vec::new();

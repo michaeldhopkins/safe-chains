@@ -1,7 +1,6 @@
 mod dasel;
 mod mlr;
 
-use crate::command::FlatDef;
 use crate::verdict::Verdict;
 use crate::parse::Token;
 
@@ -15,10 +14,6 @@ pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(dasel::command_docs());
     docs.extend(mlr::command_docs());
     docs
-}
-
-pub(super) fn all_flat_defs() -> Vec<&'static FlatDef> {
-    Vec::new()
 }
 
 #[cfg(test)]

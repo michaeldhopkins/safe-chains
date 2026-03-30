@@ -151,31 +151,8 @@ pub(crate) enum SubEntry {
     Guarded { name: &'static str, valid_suffix: &'static str },
 }
 
-use crate::command::CommandDef;
-
-const COMMAND_DEFS: &[&CommandDef] = &[
-];
-
 pub fn all_opencode_patterns() -> Vec<String> {
     let mut patterns = Vec::new();
-    for def in COMMAND_DEFS {
-        patterns.extend(def.opencode_patterns());
-    }
-    for def in coreutils::all_flat_defs() {
-        patterns.extend(def.opencode_patterns());
-    }
-    for def in jvm::jvm_flat_defs() {
-        patterns.extend(def.opencode_patterns());
-    }
-    for def in android::android_flat_defs() {
-        patterns.extend(def.opencode_patterns());
-    }
-    for def in xcode::xcbeautify_flat_defs() {
-        patterns.extend(def.opencode_patterns());
-    }
-    for def in fuzzy::fuzzy_flat_defs() {
-        patterns.extend(def.opencode_patterns());
-    }
     patterns.sort();
     patterns.dedup();
     patterns
@@ -286,110 +263,6 @@ mod tests {
     }
 
     #[test]
-    fn command_defs_reject_unknown() {
-        for def in COMMAND_DEFS {
-            def.auto_test_reject_unknown();
-        }
-    }
-
-    #[test]
-    fn flat_defs_reject_unknown() {
-        for def in coreutils::all_flat_defs() {
-            def.auto_test_reject_unknown();
-        }
-        for def in xcode::xcbeautify_flat_defs() {
-            def.auto_test_reject_unknown();
-        }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
-            def.auto_test_reject_unknown();
-        }
-    }
-
-
-    #[test]
-    fn bare_false_rejects_bare_invocation() {
-        let check_def = |def: &crate::command::FlatDef| {
-            if !def.policy.bare {
-                assert!(
-                    !crate::is_safe_command(def.name),
-                    "{}: bare=false but bare invocation accepted",
-                    def.name,
-                );
-            }
-        };
-        for def in coreutils::all_flat_defs()
-            .into_iter()
-            .chain(xcode::xcbeautify_flat_defs())
-        {
-            check_def(def);
-        }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
-            check_def(def);
-        }
-    }
-
-    fn visit_subs(prefix: &str, subs: &[crate::command::SubDef], visitor: &mut dyn FnMut(&str, &crate::command::SubDef)) {
-        for sub in subs {
-            visitor(prefix, sub);
-            if let crate::command::SubDef::Nested { name, subs: inner } = sub {
-                visit_subs(&format!("{prefix} {name}"), inner, visitor);
-            }
-        }
-    }
-
-    #[test]
-    fn guarded_subs_require_guard() {
-        let mut failures = Vec::new();
-        for def in COMMAND_DEFS {
-            visit_subs(def.name, def.subs, &mut |prefix, sub| {
-                if let crate::command::SubDef::Guarded { name, guard_long, .. } = sub {
-                    let without = format!("{prefix} {name}");
-                    if crate::is_safe_command(&without) {
-                        failures.push(format!("{without}: accepted without guard {guard_long}"));
-                    }
-                    let with = format!("{prefix} {name} {guard_long}");
-                    if !crate::is_safe_command(&with) {
-                        failures.push(format!("{with}: rejected with guard {guard_long}"));
-                    }
-                }
-            });
-        }
-        assert!(failures.is_empty(), "guarded sub issues:\n{}", failures.join("\n"));
-    }
-
-    #[test]
-    fn guarded_subs_accept_guard_short() {
-        let mut failures = Vec::new();
-        for def in COMMAND_DEFS {
-            visit_subs(def.name, def.subs, &mut |prefix, sub| {
-                if let crate::command::SubDef::Guarded { name, guard_short: Some(short), .. } = sub {
-                    let with_short = format!("{prefix} {name} {short}");
-                    if !crate::is_safe_command(&with_short) {
-                        failures.push(format!("{with_short}: rejected with guard_short"));
-                    }
-                }
-            });
-        }
-        assert!(failures.is_empty(), "guard_short issues:\n{}", failures.join("\n"));
-    }
-
-    #[test]
-    fn nested_subs_reject_bare() {
-        let mut failures = Vec::new();
-        for def in COMMAND_DEFS {
-            visit_subs(def.name, def.subs, &mut |prefix, sub| {
-                if let crate::command::SubDef::Nested { name, .. } = sub {
-                    let bare = format!("{prefix} {name}");
-                    if crate::is_safe_command(&bare) {
-                        failures.push(format!("{bare}: nested sub accepted bare invocation"));
-                    }
-                }
-            });
-        }
-        assert!(failures.is_empty(), "nested bare issues:\n{}", failures.join("\n"));
-    }
-
-    #[test]
     fn process_substitution_blocked() {
         let cmds = ["echo <(cat /etc/passwd)", "echo >(rm -rf /)", "grep pattern <(ls)"];
         for cmd in &cmds {
@@ -398,155 +271,6 @@ mod tests {
                 "process substitution not blocked: {cmd}",
             );
         }
-    }
-
-    #[test]
-    fn positional_style_accepts_unknown_args() {
-        use crate::policy::FlagStyle;
-        for def in coreutils::all_flat_defs() {
-            if def.policy.flag_style == FlagStyle::Positional {
-                let test = format!("{} --unknown-xyz", def.name);
-                assert!(
-                    crate::is_safe_command(&test),
-                    "{}: FlagStyle::Positional but rejected unknown arg",
-                    def.name,
-                );
-            }
-        }
-    }
-
-    fn visit_policies(prefix: &str, subs: &[crate::command::SubDef], visitor: &mut dyn FnMut(&str, &crate::policy::FlagPolicy)) {
-        for sub in subs {
-            match sub {
-                crate::command::SubDef::Policy { name, policy, .. } => {
-                    visitor(&format!("{prefix} {name}"), policy);
-                }
-                crate::command::SubDef::Guarded { name, guard_long, policy, .. } => {
-                    visitor(&format!("{prefix} {name} {guard_long}"), policy);
-                }
-                crate::command::SubDef::Nested { name, subs: inner } => {
-                    visit_policies(&format!("{prefix} {name}"), inner, visitor);
-                }
-                _ => {}
-            }
-        }
-    }
-
-    #[test]
-    fn valued_flags_accept_eq_syntax() {
-        let mut failures = Vec::new();
-
-        let check_flat = |def: &crate::command::FlatDef, failures: &mut Vec<String>| {
-            for flag in def.policy.valued.iter() {
-                let cmd = format!("{} {flag}=test_value", def.name);
-                if !crate::is_safe_command(&cmd) {
-                    failures.push(format!("{cmd}: valued flag rejected with = syntax"));
-                }
-            }
-        };
-        for def in coreutils::all_flat_defs()
-            .into_iter()
-            .chain(xcode::xcbeautify_flat_defs())
-        {
-            check_flat(def, &mut failures);
-        }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
-            check_flat(def, &mut failures);
-        }
-
-        for def in COMMAND_DEFS {
-            visit_policies(def.name, def.subs, &mut |prefix, policy| {
-                for flag in policy.valued.iter() {
-                    let cmd = format!("{prefix} {flag}=test_value");
-                    if !crate::is_safe_command(&cmd) {
-                        failures.push(format!("{cmd}: valued flag rejected with = syntax"));
-                    }
-                }
-            });
-        }
-
-        assert!(failures.is_empty(), "valued = syntax issues:\n{}", failures.join("\n"));
-    }
-
-    #[test]
-    fn max_positional_enforced() {
-        let mut failures = Vec::new();
-
-        let check_flat = |def: &crate::command::FlatDef, failures: &mut Vec<String>| {
-            if let Some(max) = def.policy.max_positional {
-                let args: Vec<&str> = (0..=max).map(|_| "testarg").collect();
-                let cmd = format!("{} {}", def.name, args.join(" "));
-                if crate::is_safe_command(&cmd) {
-                    failures.push(format!(
-                        "{}: max_positional={max} but accepted {} positional args",
-                        def.name,
-                        max + 1,
-                    ));
-                }
-            }
-        };
-        for def in coreutils::all_flat_defs()
-            .into_iter()
-            .chain(xcode::xcbeautify_flat_defs())
-        {
-            check_flat(def, &mut failures);
-        }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
-            check_flat(def, &mut failures);
-        }
-
-        for def in COMMAND_DEFS {
-            visit_policies(def.name, def.subs, &mut |prefix, policy| {
-                if let Some(max) = policy.max_positional {
-                    let args: Vec<&str> = (0..=max).map(|_| "testarg").collect();
-                    let cmd = format!("{prefix} {}", args.join(" "));
-                    if crate::is_safe_command(&cmd) {
-                        failures.push(format!(
-                            "{prefix}: max_positional={max} but accepted {} positional args",
-                            max + 1,
-                        ));
-                    }
-                }
-            });
-        }
-
-        assert!(failures.is_empty(), "max_positional issues:\n{}", failures.join("\n"));
-    }
-
-    #[test]
-    fn doc_generation_non_empty() {
-        let mut failures = Vec::new();
-
-        for def in COMMAND_DEFS {
-            let doc = def.to_doc();
-            if doc.description.trim().is_empty() {
-                failures.push(format!("{}: CommandDef produced empty doc", def.name));
-            }
-            if doc.url.is_empty() {
-                failures.push(format!("{}: CommandDef has empty URL", def.name));
-            }
-        }
-
-        let check_flat = |def: &crate::command::FlatDef, failures: &mut Vec<String>| {
-            let doc = def.to_doc();
-            if doc.description.trim().is_empty() && !def.policy.bare {
-                failures.push(format!("{}: FlatDef produced empty doc", def.name));
-            }
-            if doc.url.is_empty() {
-                failures.push(format!("{}: FlatDef has empty URL", def.name));
-            }
-        };
-        for def in coreutils::all_flat_defs()
-            .into_iter()
-            .chain(xcode::xcbeautify_flat_defs())
-        {
-            check_flat(def, &mut failures);
-        }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
-            check_flat(def, &mut failures);
-        }
-
-        assert!(failures.is_empty(), "doc generation issues:\n{}", failures.join("\n"));
     }
 
     #[test]
@@ -561,25 +285,13 @@ mod tests {
                 | CommandEntry::Delegation { cmd } => *cmd,
             })
             .collect();
-        for def in COMMAND_DEFS {
-            all_cmds.insert(def.name);
-        }
-        for def in coreutils::all_flat_defs() {
-            all_cmds.insert(def.name);
-        }
-        for def in xcode::xcbeautify_flat_defs() {
-            all_cmds.insert(def.name);
-        }
-        for def in jvm::jvm_flat_defs().into_iter().chain(android::android_flat_defs()).chain(fuzzy::fuzzy_flat_defs()) {
-            all_cmds.insert(def.name);
-        }
         for name in crate::registry::toml_command_names() {
             all_cmds.insert(name);
         }
         let handled: HashSet<&str> = HANDLED_CMDS.iter().copied().collect();
 
         let missing: Vec<_> = handled.difference(&all_cmds).collect();
-        assert!(missing.is_empty(), "not in registry or COMMAND_DEFS: {missing:?}");
+        assert!(missing.is_empty(), "not in registry: {missing:?}");
 
         let extra: Vec<_> = all_cmds.difference(&handled).collect();
         assert!(extra.is_empty(), "not in HANDLED_CMDS: {extra:?}");
