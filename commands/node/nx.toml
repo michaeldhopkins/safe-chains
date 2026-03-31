@@ -1,0 +1,35 @@
+[[command]]
+name = "nx"
+url = "https://nx.dev/reference/commands"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "graph"
+standalone = ["--affected", "--help", "--open", "--watch", "-h"]
+valued = ["--file", "--focus", "--groupByFolder", "--host", "--port", "--targets", "--view"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--plugin"]
+
+[[command.sub]]
+name = "show"
+bare = false
+standalone = ["--help", "--json", "-h"]
+valued = ["--projects", "--type", "--web"]
+
+[[command.sub]]
+name = "report"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "format"
+guard = "--check"
+standalone = ["--all", "--base", "--check", "--head", "--help", "--uncommitted", "--untracked", "-h"]
+valued = ["--exclude", "--files", "--projects"]
+
+[[command.sub]]
+name = "print-affected"
+standalone = ["--all", "--base", "--head", "--help", "--select", "--uncommitted", "--untracked", "-h"]
+valued = ["--exclude", "--files", "--type"]

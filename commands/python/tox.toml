@@ -1,0 +1,18 @@
+[[command]]
+name = "tox"
+url = "https://tox.wiki/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--no-desc", "-d", "-h"]
+
+[[command.sub]]
+name = "config"
+standalone = ["--core", "--help", "-h"]
+
+[[command.sub]]
+name = "run"
+level = "SafeRead"
+standalone = ["--help", "--no-recreate-pkg", "--skip-missing-interpreters", "-h"]
+valued = ["-e", "-f", "--override", "--result-json"]

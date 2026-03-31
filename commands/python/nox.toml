@@ -1,0 +1,17 @@
+[[command]]
+name = "nox"
+url = "https://nox.thea.codes/"
+level = "SafeRead"
+standalone = [
+    "--error-on-external-run", "--error-on-missing-interpreters", "--help",
+    "--list", "--no-color", "--no-error-on-external-run",
+    "--no-error-on-missing-interpreters", "--no-install", "--no-venv",
+    "--reuse-existing-virtualenvs", "--stop-on-first-error", "--version",
+    "-R", "-h", "-l", "-r", "-x",
+]
+valued = [
+    "--default-venv-backend", "--envdir", "--extra-pythons",
+    "--force-pythons", "--noxfile", "--pythons",
+    "--sessions", "--tags",
+    "-e", "-f", "-p", "-s", "-t",
+]

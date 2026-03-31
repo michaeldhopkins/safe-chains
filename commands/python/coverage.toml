@@ -1,0 +1,34 @@
+[[command]]
+name = "coverage"
+url = "https://coverage.readthedocs.io/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "report"
+standalone = ["--help", "--ignore-errors", "--include", "--no-skip-covered", "--omit", "--show-missing", "--skip-covered", "--skip-empty", "-h", "-m"]
+valued = ["--data-file", "--fail-under", "--precision", "--sort"]
+
+[[command.sub]]
+name = "json"
+level = "SafeWrite"
+standalone = ["--help", "--ignore-errors", "--include", "--omit", "--pretty-print", "-h"]
+valued = ["--data-file", "--fail-under", "-o"]
+
+[[command.sub]]
+name = "html"
+level = "SafeWrite"
+standalone = ["--help", "--ignore-errors", "--include", "--omit", "--show-contexts", "--skip-covered", "--skip-empty", "-h"]
+valued = ["--data-file", "--directory", "--fail-under", "--precision", "--title", "-d"]
+
+[[command.sub]]
+name = "run"
+level = "SafeRead"
+positional_style = true
+standalone = ["--append", "--branch", "--concurrency", "--help", "--parallel", "--source", "--timid", "-a", "-h", "-p"]
+valued = ["--context", "--data-file", "--include", "--omit", "--rcfile", "--source"]
+
+[[command.sub]]
+name = "combine"
+level = "SafeWrite"
+standalone = ["--append", "--help", "--keep", "-a", "-h"]
+valued = ["--data-file"]

@@ -1,0 +1,19 @@
+[[command]]
+name = "act"
+url = "https://nektosact.com/"
+level = "Inert"
+bare = false
+require_any = ["--dryrun", "--graph", "--list", "-l", "-n"]
+standalone = [
+    "--dryrun", "--graph", "--help", "--list", "--version",
+    "-h", "-l", "-n",
+]
+valued = [
+    "--action-offline-mode", "--artifact-server-path",
+    "--container-architecture", "--env", "--env-file",
+    "--eventpath", "--input", "--job", "--matrix",
+    "--platform", "--pull", "--remote-name",
+    "--secret", "--secret-file", "--var", "--var-file",
+    "--workflows",
+    "-E", "-P", "-W", "-e", "-j", "-s",
+]

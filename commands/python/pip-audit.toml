@@ -1,0 +1,15 @@
+[[command]]
+name = "pip-audit"
+url = "https://github.com/pypa/pip-audit"
+level = "Inert"
+standalone = [
+    "--desc", "--dry-run", "--help", "--json", "--local",
+    "--no-deps", "--skip-editable", "--strict",
+    "--verbose", "--version",
+    "-S", "-h", "-l", "-s", "-v",
+]
+valued = [
+    "--cache-dir", "--exclude", "--format", "--ignore-vuln",
+    "--index-url", "--output", "--path", "--requirement",
+    "-e", "-f", "-i", "-o", "-r",
+]

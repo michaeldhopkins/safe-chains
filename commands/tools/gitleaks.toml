@@ -1,0 +1,20 @@
+[[command]]
+name = "gitleaks"
+url = "https://github.com/gitleaks/gitleaks"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "detect"
+level = "SafeRead"
+standalone = ["--help", "--no-banner", "--no-color", "--redact", "--verbose", "-h", "-v"]
+valued = ["--baseline-path", "--config", "--exit-code", "--gitleaks-ignore-path", "--log-level", "--log-opts", "--max-target-megabytes", "--report-format", "--report-path", "--source", "-c", "-l", "-r", "-s"]
+
+[[command.sub]]
+name = "protect"
+level = "SafeRead"
+standalone = ["--help", "--no-banner", "--no-color", "--redact", "--staged", "--verbose", "-h", "-v"]
+valued = ["--config", "--exit-code", "--gitleaks-ignore-path", "--log-level", "--max-target-megabytes", "--report-format", "--report-path", "--source", "-c", "-l", "-r", "-s"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

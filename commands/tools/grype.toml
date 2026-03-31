@@ -1,0 +1,13 @@
+[[command]]
+name = "grype"
+url = "https://github.com/anchore/grype"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--add-cpes-if-none", "--by-cve", "--help",
+    "--only-fixed", "--only-notfixed", "--quiet",
+    "--verbose", "--version",
+    "-h", "-q", "-v",
+]
+valued = ["--config", "--distro", "--exclude", "--fail-on", "--file", "--key", "--name", "--output", "--platform", "--scope", "-c", "-o"]

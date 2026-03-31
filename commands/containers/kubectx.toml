@@ -1,0 +1,7 @@
+[[command]]
+name = "kubectx"
+url = "https://github.com/ahmetb/kubectx"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--current", "--help", "-c", "-h"]

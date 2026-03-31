@@ -1,0 +1,8 @@
+[[command]]
+name = "syft"
+url = "https://github.com/anchore/syft"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "--verbose", "--version", "-h", "-q", "-v"]
+valued = ["--config", "--exclude", "--file", "--from", "--name", "--output", "--platform", "--scope", "--source-name", "--source-version", "-c", "-o"]

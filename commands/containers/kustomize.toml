@@ -1,0 +1,13 @@
+[[command]]
+name = "kustomize"
+url = "https://kubectl.docs.kubernetes.io/references/kustomize/"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "build"
+standalone = ["--enable-alpha-plugins", "--enable-exec", "--enable-helm", "--help", "--load-restrictor", "-h"]
+valued = ["--env", "--helm-command", "--mount", "--output", "-o"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--short", "-h"]
