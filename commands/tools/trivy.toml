@@ -1,0 +1,40 @@
+[[command]]
+name = "trivy"
+url = "https://aquasecurity.github.io/trivy/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "fs"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--ignore-unfixed", "--json", "--quiet", "--severity", "-h", "-q"]
+valued = ["--cache-dir", "--config", "--exit-code", "--format", "--ignorefile", "--output", "--scanners", "--severity", "--skip-dirs", "--skip-files", "--template", "--timeout", "-f", "-o", "-s"]
+
+[[command.sub]]
+name = "image"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--ignore-unfixed", "--json", "--quiet", "-h", "-q"]
+valued = ["--cache-dir", "--config", "--exit-code", "--format", "--ignorefile", "--output", "--scanners", "--severity", "--skip-dirs", "--skip-files", "--template", "--timeout", "-f", "-o", "-s"]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--json", "--quiet", "-h", "-q"]
+valued = ["--exit-code", "--format", "--ignorefile", "--output", "--severity", "--skip-dirs", "--skip-files", "--template", "-f", "-o", "-s"]
+
+[[command.sub]]
+name = "sbom"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--json", "--quiet", "-h", "-q"]
+valued = ["--artifact-type", "--cache-dir", "--format", "--output", "-f", "-o"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

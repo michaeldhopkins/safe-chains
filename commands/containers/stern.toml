@@ -1,0 +1,21 @@
+[[command]]
+name = "stern"
+url = "https://github.com/stern/stern"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = [
+    "--all-namespaces", "--color", "--diff-container",
+    "--ephemeral-containers", "--help", "--include-hidden",
+    "--init-containers", "--no-follow", "--only-log-lines",
+    "--timestamps", "--version",
+    "-A", "-h",
+]
+valued = [
+    "--container", "--container-state", "--context", "--exclude",
+    "--exclude-container", "--exclude-pod", "--highlight",
+    "--include", "--kubeconfig", "--max-log-requests",
+    "--namespace", "--node", "--output", "--selector",
+    "--since", "--tail", "--template", "--timezone",
+    "-c", "-e", "-l", "-n", "-o", "-s", "-t",
+]

@@ -1,0 +1,45 @@
+[[command]]
+name = "turbo"
+url = "https://turbo.build/repo/docs/reference/command-line-reference"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "run"
+level = "SafeRead"
+positional_style = true
+standalone = [
+    "--affected", "--cache-dir", "--continue", "--dry-run",
+    "--env-mode", "--force", "--framework-inference",
+    "--graph", "--help", "--no-cache", "--no-daemon",
+    "--output-logs", "--parallel", "--summarize", "--verbose",
+    "-h",
+]
+valued = [
+    "--cache-workers", "--color", "--concurrency",
+    "--env-mode", "--filter", "--global-deps",
+    "--graph", "--log-order", "--log-prefix",
+    "--output-logs", "--profile", "--remote-only",
+    "--scope", "--team", "--token",
+    "-F",
+]
+
+[[command.sub]]
+name = "ls"
+standalone = ["--affected", "--help", "-h"]
+valued = ["--filter", "-F"]
+
+[[command.sub]]
+name = "prune"
+bare = false
+standalone = ["--docker", "--help", "-h"]
+valued = ["--out-dir", "--scope"]
+
+[[command.sub]]
+name = "query"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "daemon"
+[[command.sub.sub]]
+name = "status"
+standalone = ["--help", "-h"]

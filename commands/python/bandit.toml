@@ -1,0 +1,16 @@
+[[command]]
+name = "bandit"
+url = "https://bandit.readthedocs.io/"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--ignore-nosec", "--number", "--one-line",
+    "--quiet", "--recursive", "--verbose", "--version",
+    "-h", "-i", "-n", "-q", "-r", "-v",
+]
+valued = [
+    "--aggregate", "--baseline", "--config", "--configfile",
+    "--exclude", "--format", "--output", "--profile",
+    "--severity-level", "--skip", "--tests",
+    "-b", "-c", "-f", "-l", "-o", "-p", "-s", "-t",
+]

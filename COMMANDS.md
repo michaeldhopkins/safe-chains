@@ -35,6 +35,11 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed standalone flags: --color, --column, --count, --files-with-matches, --files-without-matches, --flush, --follow, --group, --heading, --help, --ignore-case, --invert-match, --line, --literal, --match, --no-color, --no-filename, --no-follow, --no-group, --no-heading, --nocolor, --noenv, --nofilter, --nofollow, --nogroup, --noheading, --nopager, --nosmart-case, --passthru, --print0, --show-types, --smart-case, --sort-files, --version, --with-filename, --word-regexp, -1, -H, -L, -V, -c, -f, -h, -i, -l, -n, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --ignore-dir, --max-count, --noignore-dir, --output, --pager, --type, --type-add, --type-del, --type-set, -A, -B, -C, -m
 
+### `act` (https://nektosact.com/)
+
+- Requires --dryrun, --graph, --list, -l, -n. - Allowed standalone flags: --dryrun, --graph, --help, --list, --version, -h, -l, -n
+- Allowed valued flags: --action-offline-mode, --artifact-server-path, --container-architecture, --env, --env-file, --eventpath, --input, --job, --matrix, --platform, --pull, --remote-name, --secret, --secret-file, --var, --var-file, --workflows, -E, -P, -W, -e, -j, -s
+
 ### `adb` (https://developer.android.com/tools/adb)
 
 - Bare subcommands: devices, get-serialno, get-state, help, start-server, version. forward --list, reverse --list. logcat (requires -d). shell: cat, df, dumpsys, getprop, id, ls, pm list/path, ps, settings get, uname, whoami, wm size/density. Prefix flag -s SERIAL is skipped.
@@ -224,6 +229,11 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
 - Allowed valued flags: --length, -l
 - Bare invocation allowed
+
+### `bandit` (https://bandit.readthedocs.io/)
+
+- Allowed standalone flags: --help, --ignore-nosec, --number, --one-line, --quiet, --recursive, --verbose, --version, -h, -i, -n, -q, -r, -v
+- Allowed valued flags: --aggregate, --baseline, --config, --configfile, --exclude, --format, --output, --profile, --severity-level, --skip, --tests, -b, -c, -f, -l, -o, -p, -s, -t
 
 ### `base64` (https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation)
 
@@ -519,6 +529,15 @@ Aliases: `clang++`
 - **verify**: Flags: --check-claims, --help, --local-image, --offline, -h. Valued: --attachment, --certificate, --certificate-chain, --certificate-identity, --certificate-identity-regexp, --certificate-oidc-issuer, --certificate-oidc-issuer-regexp, --k8s-keychain, --key, --output, --payload, --rekor-url, --signature, --slot, -o
 - **verify-attestation**: Flags: --check-claims, --help, --local-image, --offline, -h. Valued: --certificate, --certificate-identity, --certificate-oidc-issuer, --key, --output, --policy, --rekor-url, --type, -o
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
+### `coverage` (https://coverage.readthedocs.io/)
+
+- **combine**: Flags: --append, --help, --keep, -a, -h. Valued: --data-file
+- **html**: Flags: --help, --ignore-errors, --include, --omit, --show-contexts, --skip-covered, --skip-empty, -h. Valued: --data-file, --directory, --fail-under, --precision, --title, -d
+- **json**: Flags: --help, --ignore-errors, --include, --omit, --pretty-print, -h. Valued: --data-file, --fail-under, -o
+- **report**: Flags: --help, --ignore-errors, --include, --no-skip-covered, --omit, --show-missing, --skip-covered, --skip-empty, -h, -m. Valued: --data-file, --fail-under, --precision, --sort
+- **run**: Flags: --append, --branch, --concurrency, --help, --parallel, --source, --timid, -a, -h, -p. Valued: --context, --data-file, --include, --omit, --rcfile, --source. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
 ### `craft` (https://craftcms.com/docs/5.x/reference/cli.html)
@@ -1107,6 +1126,13 @@ Aliases: `g++`, `cc`, `c++`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
 
+### `gitleaks` (https://github.com/gitleaks/gitleaks)
+
+- **detect**: Flags: --help, --no-banner, --no-color, --redact, --verbose, -h, -v. Valued: --baseline-path, --config, --exit-code, --gitleaks-ignore-path, --log-level, --log-opts, --max-target-megabytes, --report-format, --report-path, --source, -c, -l, -r, -s
+- **protect**: Flags: --help, --no-banner, --no-color, --redact, --staged, --verbose, -h, -v. Valued: --config, --exit-code, --gitleaks-ignore-path, --log-level, --max-target-megabytes, --report-format, --report-path, --source, -c, -l, -r, -s
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `glab` (https://glab.readthedocs.io/en/latest/)
 
 - Subcommands ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable are allowed with actions: diff, issues, list, status, view.
@@ -1172,6 +1198,12 @@ Aliases: `egrep`, `fgrep`
 
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
+
+### `grype` (https://github.com/anchore/grype)
+
+- Allowed standalone flags: --add-cpes-if-none, --by-cve, --help, --only-fixed, --only-notfixed, --quiet, --verbose, --version, -h, -q, -v
+- Allowed valued flags: --config, --distro, --exclude, --fail-on, --file, --key, --name, --output, --platform, --scope, -c, -o
+- Hyphen-prefixed positional arguments accepted
 
 ### `gzip` (https://man7.org/linux/man-pages/man1/gzip.1.html)
 
@@ -1479,6 +1511,22 @@ Aliases: `egrep`, `fgrep`
 - **top pod**: Flags: --all-namespaces, --containers, --help, --no-headers, -A, -h. Valued: --namespace, --selector, --sort-by, -l, -n
 - **version**: Flags: --client, --help, --short, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `kubectx` (https://github.com/ahmetb/kubectx)
+
+- Allowed standalone flags: --current, --help, -c, -h
+- Bare invocation allowed
+
+### `kubens` (https://github.com/ahmetb/kubectx)
+
+- Allowed standalone flags: --current, --help, -c, -h
+- Bare invocation allowed
+
+### `kustomize` (https://kubectl.docs.kubernetes.io/references/kustomize/)
+
+- **build**: Flags: --enable-alpha-plugins, --enable-exec, --enable-helm, --help, --load-restrictor, -h. Valued: --env, --helm-command, --mount, --output, -o
+- **version**: Flags: --help, --short, -h
+- Allowed standalone flags: --help, -h
 
 ### `last` (https://man7.org/linux/man-pages/man1/last.1.html)
 
@@ -1824,6 +1872,12 @@ Aliases: `ionice`
 
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `nox` (https://nox.thea.codes/)
+
+- Allowed standalone flags: --error-on-external-run, --error-on-missing-interpreters, --help, --list, --no-color, --no-error-on-external-run, --no-error-on-missing-interpreters, --no-install, --no-venv, --reuse-existing-virtualenvs, --stop-on-first-error, --version, -R, -h, -l, -r, -x
+- Allowed valued flags: --default-venv-backend, --envdir, --extra-pythons, --force-pythons, --noxfile, --pythons, --sessions, --tags, -e, -f, -p, -s, -t
+- Bare invocation allowed
+
 ### `npm` (https://docs.npmjs.com/cli)
 
 - **audit**: Flags: --help, --json, --omit, --production, -h. Valued: --audit-level
@@ -1875,6 +1929,16 @@ Aliases: `ionice`
 - **version**: Flags: --help, --lts, --no-colors, -h
 - **which**: Flags: --help, --lts, --no-colors, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `nx` (https://nx.dev/reference/commands)
+
+- **format** (requires --check): Flags: --all, --base, --check, --head, --help, --uncommitted, --untracked, -h. Valued: --exclude, --files, --projects
+- **graph**: Flags: --affected, --help, --open, --watch, -h. Valued: --file, --focus, --groupByFolder, --host, --port, --targets, --view
+- **list**: Flags: --help, -h. Valued: --plugin
+- **print-affected**: Flags: --all, --base, --head, --help, --select, --uncommitted, --untracked, -h. Valued: --exclude, --files, --type
+- **report**: Flags: --help, -h
+- **show**: Flags: --help, --json, -h. Valued: --projects, --type, --web
+- Allowed standalone flags: --help, --version, -h
 
 ### `objdump` (https://man7.org/linux/man-pages/man1/objdump.1.html)
 
@@ -2021,6 +2085,12 @@ Aliases: `pip3`
 - **list**: Flags: --editable, --exclude-editable, --help, --include-editable, --local, --not-required, --outdated, --pre, --uptodate, --user, -e, -h, -i, -l, -o. Valued: --exclude, --format, --index-url, --path
 - **show**: Flags: --files, --help, --verbose, -f, -h, -v
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `pip-audit` (https://github.com/pypa/pip-audit)
+
+- Allowed standalone flags: --desc, --dry-run, --help, --json, --local, --no-deps, --skip-editable, --strict, --verbose, --version, -S, -h, -l, -s, -v
+- Allowed valued flags: --cache-dir, --exclude, --format, --ignore-vuln, --index-url, --output, --path, --requirement, -e, -f, -i, -o, -r
+- Bare invocation allowed
 
 ### `pkgutil` (https://ss64.com/mac/pkgutil.html)
 
@@ -2477,6 +2547,12 @@ Aliases: `python`
 - Allowed standalone flags: --debug.version, --help, --json, --matrix, --merge, --show-ignored, --tests, -f
 - Allowed valued flags: -checks, -explain, -fail, -go, -tags
 
+### `stern` (https://github.com/stern/stern)
+
+- Allowed standalone flags: --all-namespaces, --color, --diff-container, --ephemeral-containers, --help, --include-hidden, --init-containers, --no-follow, --only-log-lines, --timestamps, --version, -A, -h
+- Allowed valued flags: --container, --container-state, --context, --exclude, --exclude-container, --exclude-pod, --highlight, --include, --kubeconfig, --max-log-requests, --namespace, --node, --output, --selector, --since, --tail, --template, --timezone, -c, -e, -l, -n, -o, -s, -t
+- Hyphen-prefixed positional arguments accepted
+
 ### `strings` (https://man7.org/linux/man-pages/man1/strings.1.html)
 
 - Allowed standalone flags: -V, -a, -f, -h, -w, --all, --help, --include-all-whitespace, --print-file-name, --version
@@ -2519,6 +2595,12 @@ Aliases: `python`
 - **rules**: Flags: --disabled, --enabled, --help, -h. Valued: --config, --reporter
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `syft` (https://github.com/anchore/syft)
+
+- Allowed standalone flags: --help, --quiet, --verbose, --version, -h, -q, -v
+- Allowed valued flags: --config, --exclude, --file, --from, --name, --output, --platform, --scope, --source-name, --source-version, -c, -o
+- Hyphen-prefixed positional arguments accepted
 
 ### `sysctl` (https://man7.org/linux/man-pages/man8/sysctl.8.html)
 
@@ -2666,6 +2748,13 @@ Aliases: `[`
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+### `tig` (https://jonas.github.io/tig/)
+
+- Allowed standalone flags: --all, --date-order, --help, --reverse, --version, -C, -h, -v
+- Allowed valued flags: -n
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `time` (https://man7.org/linux/man-pages/man1/time.1.html)
 
 - Recursively validates the inner command.
@@ -2701,6 +2790,13 @@ Aliases: `[`
 - Allowed valued flags: -F, -O, -U, -d, -f, -l, -n, -o, -p, -s, -u, -w
 - Bare invocation allowed
 
+### `tox` (https://tox.wiki/)
+
+- **config**: Flags: --core, --help, -h
+- **list**: Flags: --help, --no-desc, -d, -h
+- **run**: Flags: --help, --no-recreate-pkg, --skip-missing-interpreters, -h. Valued: -e, -f, --override, --result-json
+- Allowed standalone flags: --help, --version, -h
+
 ### `tr` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation)
 
 - Allowed standalone flags: -C, -V, -c, -d, -h, -s, --complement, --delete, --help, --squeeze-repeats, --truncate-set1, --version
@@ -2717,6 +2813,15 @@ Aliases: `traceroute6`
 - Allowed standalone flags: --dirsfirst, --du, --fromfile, --gitignore, --help, --inodes, --matchdirs, --noreport, --prune, --si, --version, -A, -C, -D, -F, -J, -N, -Q, -S, -V, -X, -a, -d, -f, -g, -h, -i, -l, -n, -p, -q, -r, -s, -t, -u, -v, -x
 - Allowed valued flags: --charset, --filelimit, --filesfrom, --sort, --timefmt, -H, -I, -L, -P, -T
 - Bare invocation allowed
+
+### `trivy` (https://aquasecurity.github.io/trivy/)
+
+- **config**: Flags: --help, --json, --quiet, -h, -q. Valued: --exit-code, --format, --ignorefile, --output, --severity, --skip-dirs, --skip-files, --template, -f, -o, -s. Positional args accepted
+- **fs**: Flags: --help, --ignore-unfixed, --json, --quiet, --severity, -h, -q. Valued: --cache-dir, --config, --exit-code, --format, --ignorefile, --output, --scanners, --severity, --skip-dirs, --skip-files, --template, --timeout, -f, -o, -s. Positional args accepted
+- **image**: Flags: --help, --ignore-unfixed, --json, --quiet, -h, -q. Valued: --cache-dir, --config, --exit-code, --format, --ignorefile, --output, --scanners, --severity, --skip-dirs, --skip-files, --template, --timeout, -f, -o, -s. Positional args accepted
+- **sbom**: Flags: --help, --json, --quiet, -h, -q. Valued: --artifact-type, --cache-dir, --format, --output, -f, -o. Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `true` (https://www.gnu.org/software/coreutils/manual/coreutils.html#true-invocation)
 
@@ -2749,6 +2854,15 @@ Aliases: `traceroute6`
 - **scaffold list**: Flags: --help, --json, -h. Valued: --path, -p
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `turbo` (https://turbo.build/repo/docs/reference/command-line-reference)
+
+- **daemon status**: Flags: --help, -h
+- **ls**: Flags: --affected, --help, -h. Valued: --filter, -F
+- **prune**: Flags: --docker, --help, -h. Valued: --out-dir, --scope
+- **query**: Flags: --help, -h
+- **run**: Flags: --affected, --cache-dir, --continue, --dry-run, --env-mode, --force, --framework-inference, --graph, --help, --no-cache, --no-daemon, --output-logs, --parallel, --summarize, --verbose, -h. Valued: --cache-workers, --color, --concurrency, --env-mode, --filter, --global-deps, --graph, --log-order, --log-prefix, --output-logs, --profile, --remote-only, --scope, --team, --token, -F. Positional args accepted
+- Allowed standalone flags: --help, --version, -h
 
 ### `type` (https://man7.org/linux/man-pages/man1/type.1p.html)
 
@@ -2876,6 +2990,10 @@ Aliases: `traceroute6`
 
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
+
+### `watchexec` (https://watchexec.github.io/)
+
+- Recursively validates the inner command.
 
 ### `wc` (https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation)
 

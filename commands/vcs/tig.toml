@@ -1,0 +1,7 @@
+[[command]]
+name = "tig"
+url = "https://jonas.github.io/tig/"
+level = "Inert"
+positional_style = true
+standalone = ["--all", "--date-order", "--help", "--reverse", "--version", "-C", "-h", "-v"]
+valued = ["-n"]

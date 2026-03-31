@@ -1,0 +1,20 @@
+[[command]]
+name = "watchexec"
+url = "https://watchexec.github.io/"
+[command.wrapper]
+standalone = [
+    "--clear", "--help", "--no-default-ignore", "--no-discover-ignore",
+    "--no-environment", "--no-meta", "--no-process-group",
+    "--no-vcs-ignore", "--notify", "--postpone", "--restart",
+    "--verbose", "--version",
+    "-c", "-h", "-n", "-p", "-r", "-v", "-w",
+]
+valued = [
+    "--color", "--debounce", "--delay-run", "--emit-events-to",
+    "--exts", "--filter", "--filter-file", "--ignore",
+    "--log-file", "--on-busy-update", "--project-origin",
+    "--signal", "--stop-signal", "--stop-timeout",
+    "--watch", "--workdir",
+    "-E", "-W", "-d", "-e", "-f", "-i", "-j",
+]
+separator = "--"
