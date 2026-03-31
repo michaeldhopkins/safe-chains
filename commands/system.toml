@@ -1450,3 +1450,113 @@ name = "watch"
 bare = false
 max_positional = 0
 standalone = ["--help", "-h"]
+
+[[command]]
+name = "direnv"
+url = "https://direnv.net/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "export"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "fetchurl"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "make"
+url = "https://www.gnu.org/software/make/manual/make.html"
+level = "Inert"
+bare = false
+require_any = ["-n", "--dry-run", "--just-print", "--recon", "-p", "--print-data-base"]
+standalone = [
+    "--dry-run", "--help", "--just-print", "--print-data-base",
+    "--question", "--recon", "--version",
+    "-V", "-h", "-n", "-p", "-q",
+]
+valued = [
+    "--directory", "--file", "--jobs", "--makefile",
+    "-C", "-f", "-j",
+]
+
+[[command]]
+name = "packer"
+url = "https://developer.hashicorp.com/packer/docs/commands"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "validate"
+standalone = [
+    "--help", "--no-warn-undeclared-var", "--syntax-only",
+    "-h",
+]
+valued = [
+    "--except", "--only", "--var", "--var-file",
+    "-e", "-o",
+]
+
+[[command.sub]]
+name = "inspect"
+standalone = ["--help", "--machine-readable", "-h"]
+
+[[command.sub]]
+name = "fmt"
+guard = "--check"
+standalone = ["--check", "--diff", "--help", "--recursive", "-h"]
+valued = ["--write"]
+
+[[command]]
+name = "vagrant"
+url = "https://developer.hashicorp.com/vagrant/docs/cli"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--machine-readable", "-h"]
+
+[[command.sub]]
+name = "global-status"
+standalone = ["--help", "--machine-readable", "--prune", "-h"]
+
+[[command.sub]]
+name = "ssh-config"
+standalone = ["--help", "-h"]
+valued = ["--host"]
+
+[[command.sub]]
+name = "port"
+standalone = ["--guest", "--help", "-h"]
+
+[[command.sub]]
+name = "validate"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "box"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--box-info", "--help", "-h", "-i"]
+[[command.sub.sub]]
+name = "outdated"
+standalone = ["--global", "--help", "-h"]
+
+[[command.sub]]
+name = "plugin"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]

@@ -107,6 +107,8 @@ const HANDLED_CMDS: &[&str] = &[
     "xv",
     "fzf", "fzy", "peco", "pick", "selecta", "sk", "zf",
     "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "workon", "safe-chains",
+    "tldr", "ldd", "objdump", "readelf", "just",
+    "direnv", "make", "packer", "vagrant",
 ];
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {

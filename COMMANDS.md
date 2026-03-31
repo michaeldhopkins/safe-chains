@@ -490,6 +490,14 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed valued flags: -b, -c, -f, -k, -p, -q, -t, -x, -y
 - Bare invocation allowed
 
+### `direnv` (https://direnv.net/)
+
+- **export**: Flags: --help, -h
+- **fetchurl**: Flags: --help, -h
+- **status**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `dirname` (https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation)
 
 - Allowed standalone flags: --help, --version, --zero, -V, -h, -z
@@ -1023,6 +1031,11 @@ Aliases: `egrep`, `fgrep`
 - Allowed valued flags: --arg, --argjson, --args, --from-file, --indent, --jsonargs, --rawfile, --slurpfile, -f
 - Bare invocation allowed
 
+### `just` (https://just.systems/man/en/)
+
+- Requires --dump, --evaluate, --list, --summary, --variables, -l. - Allowed standalone flags: --dump, --evaluate, --help, --list, --summary, --unsorted, --variables, --version, -l, -u
+- Allowed valued flags: --color, --dump-format, --justfile, --list-heading, --list-prefix, --list-submodules, -f
+
 ### `keytool` (https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html)
 
 - **-list**: Flags: --help, -h, -rfc, -v. Valued: -alias, -keystore, -storepass, -storetype
@@ -1082,6 +1095,10 @@ Aliases: `egrep`, `fgrep`
 - **resolveport**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `ldd` (https://man7.org/linux/man-pages/man1/ldd.1.html)
+
+- Allowed standalone flags: --help, --version, -d, -r, -u, -v
 
 ### `less` (https://man7.org/linux/man-pages/man1/less.1.html)
 
@@ -1151,6 +1168,11 @@ Aliases: `mlocate`, `plocate`
 
 - **identify**: Flags: --help, -h, -matte, -moments, -ping, -quiet, -regard-warnings, -unique, -verbose. Valued: -alpha, -colorspace, -define, -density, -depth, -endian, -format, -interlace, -limit, -precision, -sampling-factor, -size, -units, -virtual-pixel
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `make` (https://www.gnu.org/software/make/manual/make.html)
+
+- Requires -n, --dry-run, --just-print, --recon, -p, --print-data-base. - Allowed standalone flags: --dry-run, --help, --just-print, --print-data-base, --question, --recon, --version, -V, -h, -n, -p, -q
+- Allowed valued flags: --directory, --file, --jobs, --makefile, -C, -f, -j
 
 ### `man` (https://man7.org/linux/man-pages/man1/man.1.html)
 
@@ -1355,6 +1377,11 @@ Aliases: `ionice`
 - **which**: Flags: --help, --lts, --no-colors, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `objdump` (https://man7.org/linux/man-pages/man1/objdump.1.html)
+
+- Allowed standalone flags: --all-headers, --archive-headers, --debugging, --disassemble, --disassemble-all, --dynamic-reloc, --dynamic-syms, --file-headers, --full-contents, --headers, --help, --info, --line-numbers, --no-addresses, --no-show-raw-insn, --private-headers, --reloc, --section-headers, --source, --stabs, --syms, --version, --wide, -C, -D, -G, -R, -S, -T, -V, -W, -a, -d, -f, -g, -h, -l, -p, -r, -s, -t, -w, -x
+- Allowed valued flags: --demangle, --disassemble-symbols, --dwarf, --section, --start-address, --stop-address, --target, -M, -b, -j, -m
+
 ### `od` (https://www.gnu.org/software/coreutils/manual/coreutils.html#od-invocation)
 
 - Allowed standalone flags: -V, -b, -c, -d, -f, -h, -i, -l, -o, -s, -v, -x, --help, --output-duplicates, --traditional, --version
@@ -1419,6 +1446,13 @@ Aliases: `ionice`
 - **status**: Flags: --help, -h
 - **stop**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `packer` (https://developer.hashicorp.com/packer/docs/commands)
+
+- **fmt** (requires --check): Flags: --check, --diff, --help, --recursive, -h. Valued: --write
+- **inspect**: Flags: --help, --machine-readable, -h
+- **validate**: Flags: --help, --no-warn-undeclared-var, --syntax-only, -h. Valued: --except, --only, --var, --var-file, -e, -o
+- Allowed standalone flags: --help, --version, -h
 
 ### `paste` (https://www.gnu.org/software/coreutils/manual/coreutils.html#paste-invocation)
 
@@ -1642,6 +1676,11 @@ Aliases: `pip3`
 - Allowed valued flags: -a, -d, -n, -p, -t, -u
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+### `readelf` (https://man7.org/linux/man-pages/man1/readelf.1.html)
+
+- Allowed standalone flags: --all, --arch-specific, --archive-index, --debug-dump, --dynamic, --file-header, --headers, --help, --histogram, --notes, --program-headers, --relocs, --section-headers, --segments, --symbols, --syms, --unwind, --version, --version-info, --wide, -A, -I, -S, -V, -W, -a, -d, -e, -g, -h, -l, -n, -p, -r, -s, -u
+- Allowed valued flags: --decompress, --dwarf-depth, --dwarf-start, --hex-dump, --relocated-dump, --section-details, --string-dump, -D, -R, -w, -x, -z
 
 ### `readlink` (https://www.gnu.org/software/coreutils/manual/coreutils.html#readlink-invocation)
 
@@ -1987,6 +2026,12 @@ Aliases: `[`
 
 - Recursively validates the inner command.
 
+### `tldr` (https://tldr.sh/)
+
+- Allowed standalone flags: --help, --list, --version, -h, -l, -v
+- Allowed valued flags: --language, --platform, -L, -p
+- Hyphen-prefixed positional arguments accepted
+
 ### `tmux` (https://man7.org/linux/man-pages/man1/tmux.1.html)
 
 - Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, list-keys, list-commands, show-options, show-environment, display-message, info, has-session, start-server. Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, kill-server, attach-session, detach-client, switch-client, new-window, split-window, select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, set-option, set-environment, send-keys. Delegation: run-shell, if-shell, pipe-pane, confirm-before (recursively validates inner commands).
@@ -2096,6 +2141,19 @@ Aliases: `[`
 - **python list**: Flags: --help, --verbose, -h, -v. Valued: --python
 - **tool list**: Flags: --help, --verbose, -h, -v. Valued: --python
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `vagrant` (https://developer.hashicorp.com/vagrant/docs/cli)
+
+- **box list**: Flags: --box-info, --help, -h, -i
+- **box outdated**: Flags: --global, --help, -h
+- **global-status**: Flags: --help, --machine-readable, --prune, -h
+- **plugin list**: Flags: --help, -h
+- **port**: Flags: --guest, --help, -h
+- **ssh-config**: Flags: --help, -h. Valued: --host
+- **status**: Flags: --help, --machine-readable, -h
+- **validate**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `vercel` (https://vercel.com/docs/cli)
 

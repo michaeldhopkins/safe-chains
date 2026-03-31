@@ -132,6 +132,83 @@ valued = [
 ]
 
 [[command]]
+name = "tldr"
+url = "https://tldr.sh/"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "--list", "--version", "-h", "-l", "-v"]
+valued = ["--language", "--platform", "-L", "-p"]
+
+[[command]]
+name = "ldd"
+url = "https://man7.org/linux/man-pages/man1/ldd.1.html"
+level = "Inert"
+bare = false
+standalone = ["--help", "--version", "-d", "-r", "-u", "-v"]
+
+[[command]]
+name = "objdump"
+url = "https://man7.org/linux/man-pages/man1/objdump.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--all-headers", "--archive-headers", "--debugging",
+    "--disassemble", "--disassemble-all", "--dynamic-reloc",
+    "--dynamic-syms", "--file-headers", "--full-contents",
+    "--headers", "--help", "--info", "--line-numbers",
+    "--no-addresses", "--no-show-raw-insn", "--private-headers",
+    "--reloc", "--section-headers", "--source", "--stabs",
+    "--syms", "--version", "--wide",
+    "-C", "-D", "-G", "-R", "-S", "-T", "-V", "-W",
+    "-a", "-d", "-f", "-g", "-h", "-l", "-p", "-r", "-s", "-t", "-w", "-x",
+]
+valued = [
+    "--demangle", "--disassemble-symbols", "--dwarf",
+    "--section", "--start-address", "--stop-address", "--target",
+    "-M", "-b", "-j", "-m",
+]
+
+[[command]]
+name = "readelf"
+url = "https://man7.org/linux/man-pages/man1/readelf.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--all", "--arch-specific", "--archive-index",
+    "--debug-dump", "--dynamic", "--file-header",
+    "--headers", "--help", "--histogram",
+    "--notes", "--program-headers", "--relocs",
+    "--section-headers", "--segments", "--symbols",
+    "--syms", "--unwind", "--version", "--version-info", "--wide",
+    "-A", "-I", "-S", "-V", "-W", "-a", "-d", "-e",
+    "-g", "-h", "-l", "-n", "-p", "-r", "-s", "-u",
+]
+valued = [
+    "--decompress", "--dwarf-depth", "--dwarf-start",
+    "--hex-dump", "--relocated-dump", "--section-details",
+    "--string-dump",
+    "-D", "-R", "-w", "-x", "-z",
+]
+
+[[command]]
+name = "just"
+url = "https://just.systems/man/en/"
+level = "Inert"
+bare = false
+require_any = ["--dump", "--evaluate", "--list", "--summary", "--variables", "-l"]
+standalone = [
+    "--dump", "--evaluate", "--help", "--list", "--summary",
+    "--unsorted", "--variables", "--version",
+    "-l", "-u",
+]
+valued = [
+    "--color", "--dump-format", "--justfile", "--list-heading",
+    "--list-prefix", "--list-submodules",
+    "-f",
+]
+
+[[command]]
 name = "workon"
 url = "https://github.com/michaeldhopkins/workon"
 level = "Inert"
