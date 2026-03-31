@@ -1,0 +1,27 @@
+[[command]]
+name = "pdm"
+url = "https://pdm-project.org/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--csv", "--freeze", "--graph", "--help", "--json", "--markdown", "--reverse", "--tree", "-h"]
+valued = ["--exclude", "--fields", "--include", "--resolve", "--sort"]
+
+[[command.sub]]
+name = "show"
+bare = false
+standalone = ["--help", "--json", "--keywords", "--name", "--platform", "--summary", "--version", "-h"]
+
+[[command.sub]]
+name = "info"
+standalone = ["--env", "--help", "--json", "--packages", "--python", "--where", "-h"]
+
+[[command.sub]]
+name = "search"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+standalone = ["--delete", "--global", "--help", "--local", "--project", "-d", "-g", "-h", "-l"]

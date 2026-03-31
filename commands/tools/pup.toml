@@ -1,0 +1,7 @@
+[[command]]
+name = "pup"
+url = "https://github.com/ericchiang/pup"
+level = "Inert"
+positional_style = true
+standalone = ["--charset", "--color", "--help", "--number", "--plain", "--version", "-c", "-h", "-n", "-p"]
+valued = ["--file", "-f"]

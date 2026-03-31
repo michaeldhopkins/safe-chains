@@ -1,0 +1,19 @@
+[[command]]
+name = "mocha"
+url = "https://mochajs.org/"
+level = "SafeRead"
+standalone = [
+    "--bail", "--check-leaks", "--color", "--diff", "--dry-run",
+    "--exit", "--forbid-only", "--forbid-pending", "--full-trace",
+    "--help", "--inline-diffs", "--invert", "--list-files",
+    "--list-reporters", "--no-color", "--no-diff", "--no-timeouts",
+    "--parallel", "--quiet", "--recursive", "--sort", "--version",
+    "-A", "-R", "-V", "-b", "-c", "-h",
+]
+valued = [
+    "--config", "--delay", "--extension", "--fgrep", "--file",
+    "--grep", "--ignore", "--jobs", "--node-option", "--package",
+    "--reporter", "--reporter-option", "--require", "--retries",
+    "--slow", "--spec", "--timeout", "--ui",
+    "-f", "-g", "-j", "-n", "-r", "-s", "-t", "-u",
+]

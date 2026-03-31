@@ -1,0 +1,22 @@
+[[command]]
+name = "mdbook"
+url = "https://rust-lang.github.io/mdBook/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+standalone = ["--help", "--open", "-h", "-o"]
+valued = ["--dest-dir", "-d"]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+valued = ["--dest-dir", "--library-path", "-L", "-d"]
+
+[[command.sub]]
+name = "clean"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+valued = ["--dest-dir", "-d"]

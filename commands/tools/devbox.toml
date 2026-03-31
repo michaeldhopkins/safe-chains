@@ -1,0 +1,22 @@
+[[command]]
+name = "devbox"
+url = "https://www.jetify.com/devbox/docs/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "--json", "--markdown", "-h"]
+
+[[command.sub]]
+name = "search"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

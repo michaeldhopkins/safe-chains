@@ -346,3 +346,52 @@ valued = [
     "--package", "--release-type", "--target",
     "-j", "-p",
 ]
+
+[[command.sub]]
+name = "expand"
+level = "SafeWrite"
+standalone = [
+    "--all-features", "--help", "--lib", "--no-default-features",
+    "--release", "--tests", "--ugly",
+    "-h",
+]
+valued = [
+    "--bin", "--color", "--example", "--features",
+    "--manifest-path", "--package", "--target", "--theme",
+    "-p",
+]
+
+[[command.sub]]
+name = "llvm-cov"
+level = "SafeRead"
+standalone = [
+    "--all-features", "--all-targets", "--help", "--html", "--json",
+    "--lcov", "--lib", "--locked", "--no-cfg-coverage",
+    "--no-default-features", "--no-fail-fast", "--no-run",
+    "--open", "--release", "--text",
+    "-h",
+]
+valued = [
+    "--bin", "--branch", "--codecov", "--cobertura",
+    "--color", "--config", "--example", "--exclude",
+    "--features", "--ignore-filename-regex", "--ignore-run-fail",
+    "--jobs", "--manifest-path", "--output-dir", "--output-path",
+    "--package", "--profile", "--target", "--target-dir", "--test",
+    "-j", "-p",
+]
+
+[[command.sub]]
+name = "bloat"
+level = "SafeWrite"
+standalone = [
+    "--crates", "--filter", "--help", "--lib",
+    "--no-default-features", "--release", "--time",
+    "--wide",
+    "-h",
+]
+valued = [
+    "--bin", "--example", "--features", "--jobs",
+    "--manifest-path", "--message-format", "--package",
+    "--target",
+    "-j", "-n", "-p",
+]

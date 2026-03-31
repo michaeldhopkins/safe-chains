@@ -362,16 +362,19 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 - **audit**: Flags: --deny, --help, --json, --no-fetch, --stale, -h, -n, -q, -v. Valued: --color, --db, --file, --ignore, --target-arch, --target-os, -f
 - **bench**: Flags: --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, -h, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
+- **bloat**: Flags: --crates, --filter, --help, --lib, --no-default-features, --release, --time, --wide, -h. Valued: --bin, --example, --features, --jobs, --manifest-path, --message-format, --package, --target, -j, -n, -p
 - **build**: Flags: --all-features, --all-targets, --benches, --bins, --build-plan, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, -h, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **check**: Flags: --all-features, --all-targets, --benches, --bins, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, -h, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **clippy**: Flags: --all-features, --all-targets, --benches, --bins, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-deps, --offline, --release, --tests, --timings, --unit-graph, -h, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **deny**: Flags: --all-features, --help, --no-default-features, -h, -q, -v. Valued: --color, --config, --exclude, --features, --format, --manifest-path, --target, --workspace
 - **doc**: Flags: --all-features, --bins, --document-private-items, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --locked, --no-default-features, --no-deps, --offline, --open, --release, --timings, --unit-graph, -h, -q, -v. Valued: --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, -Z, -j, -p
+- **expand**: Flags: --all-features, --help, --lib, --no-default-features, --release, --tests, --ugly, -h. Valued: --bin, --color, --example, --features, --manifest-path, --package, --target, --theme, -p
 - **fmt** (requires --check): Flags: --all, --check, --help, -h, -q, -v. Valued: --manifest-path, --message-format, --package, -p
 - **help**: Positional args accepted
 - **info**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --index, --registry
 - **install**: Flags: --help, -h
 - **license**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --manifest-path
+- **llvm-cov**: Flags: --all-features, --all-targets, --help, --html, --json, --lcov, --lib, --locked, --no-cfg-coverage, --no-default-features, --no-fail-fast, --no-run, --open, --release, --text, -h. Valued: --bin, --branch, --codecov, --cobertura, --color, --config, --example, --exclude, --features, --ignore-filename-regex, --ignore-run-fail, --jobs, --manifest-path, --output-dir, --output-path, --package, --profile, --target, --target-dir, --test, -j, -p
 - **locate-project**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --manifest-path
 - **machete**: Flags: --help, --skip-target-dir, --with-metadata, -V, -h
 - **metadata**: Flags: --all-features, --frozen, --help, --locked, --no-default-features, --no-deps, --offline, -h, -q, -v. Valued: --color, --config, --features, --filter-platform, --format-version, --manifest-path
@@ -670,6 +673,14 @@ Aliases: `clang++`
 - Allowed standalone flags: --build-upon-default-config, --debug, --help, --parallel, --version, -V, -h
 - Allowed valued flags: --baseline, --classpath, --config, --config-resource, --excludes, --includes, --input, --jvm-target, --language-version, --plugins, --report
 - Bare invocation allowed
+
+### `devbox` (https://www.jetify.com/devbox/docs/)
+
+- **info**: Flags: --help, --json, --markdown, -h
+- **list**: Flags: --help, -h
+- **search**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `df` (https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation)
 
@@ -1486,6 +1497,14 @@ Aliases: `egrep`, `fgrep`
 - **-printcert**: Flags: --help, -h, -rfc, -v. Valued: -file, -jarfile
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `kind` (https://kind.sigs.k8s.io/)
+
+- **get clusters**: Flags: --help, -h
+- **get kubeconfig**: Flags: --help, --internal, -h. Valued: --name
+- **get nodes**: Flags: --help, -h. Valued: --name
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `ktlint` (https://pinterest.github.io/ktlint/latest/)
 
 - Allowed standalone flags: --color, --color-name, --help, --relative, --verbose, --version, -V, -h
@@ -1677,6 +1696,13 @@ Aliases: `mlocate`, `plocate`
 - Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
 - Bare invocation allowed
 
+### `mdbook` (https://rust-lang.github.io/mdBook/)
+
+- **build**: Flags: --help, --open, -h, -o. Valued: --dest-dir, -d
+- **clean**: Flags: --help, -h. Valued: --dest-dir, -d
+- **test**: Flags: --help, -h. Valued: --dest-dir, --library-path, -L, -d
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `mdfind` (https://ss64.com/mac/mdfind.html)
 
 - Allowed standalone flags: --help, --version, -0, -V, -count, -h, -interpret, -literal, -live
@@ -1693,6 +1719,16 @@ Aliases: `mlocate`, `plocate`
 - **info**: Flags: --help, -h
 - **introspect**: Flags: --all, --benchmarks, --buildoptions, --buildsystem-files, --dependencies, --help, --installed, --projectinfo, --targets, --tests, -a, -h. Valued: --backend, --indent
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `minikube` (https://minikube.sigs.k8s.io/docs/)
+
+- **addons list**: Flags: --help, --output, -h, -o. Valued: --profile, -p
+- **ip**: Flags: --help, -h. Valued: --node, --profile, -n, -p
+- **profile list**: Flags: --help, --light, --output, -h, -l, -o
+- **service list**: Flags: --help, --namespace, -h. Valued: --profile, -p
+- **status**: Flags: --format, --help, --output, -h, -o. Valued: --node, --profile, -n, -p
+- **version**: Flags: --components, --help, --output, --short, -h, -o
+- Allowed standalone flags: --help, --version, -h
 
 ### `mise` (https://mise.jdx.dev/cli/)
 
@@ -1785,6 +1821,12 @@ Aliases: `mlocate`, `plocate`
 ### `mlr` (https://miller.readthedocs.io/)
 
 - Data processing allowed. Verbs and file arguments accepted.
+
+### `mocha` (https://mochajs.org/)
+
+- Allowed standalone flags: --bail, --check-leaks, --color, --diff, --dry-run, --exit, --forbid-only, --forbid-pending, --full-trace, --help, --inline-diffs, --invert, --list-files, --list-reporters, --no-color, --no-diff, --no-timeouts, --parallel, --quiet, --recursive, --sort, --version, -A, -R, -V, -b, -c, -h
+- Allowed valued flags: --config, --delay, --extension, --fgrep, --file, --grep, --ignore, --jobs, --node-option, --package, --reporter, --reporter-option, --require, --retries, --slow, --spec, --timeout, --ui, -f, -g, -j, -n, -r, -s, -t, -u
+- Bare invocation allowed
 
 ### `more` (https://man7.org/linux/man-pages/man1/more.1.html)
 
@@ -2023,6 +2065,15 @@ Aliases: `ionice`
 - Allowed valued flags: -d, --delimiters
 - Bare invocation allowed
 
+### `pdm` (https://pdm-project.org/)
+
+- **config**: Flags: --delete, --global, --help, --local, --project, -d, -g, -h, -l
+- **info**: Flags: --env, --help, --json, --packages, --python, --where, -h
+- **list**: Flags: --csv, --freeze, --graph, --help, --json, --markdown, --reverse, --tree, -h. Valued: --exclude, --fields, --include, --resolve, --sort
+- **search**: Flags: --help, -h
+- **show**: Flags: --help, --json, --keywords, --name, --platform, --summary, --version, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `peco` (https://github.com/peco/peco)
 
 - Allowed standalone flags: --help, --null, --print-query, --select-1, --version, -h, -v
@@ -2230,6 +2281,13 @@ Aliases: `pip3`
 - **version**
 - **whoami**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, -h
+
+### `pup` (https://github.com/ericchiang/pup)
+
+- Allowed standalone flags: --charset, --color, --help, --number, --plain, --version, -c, -h, -n, -p
+- Allowed valued flags: --file, -f
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
 
 ### `pwd` (https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation)
 
@@ -2519,6 +2577,15 @@ Aliases: `python`
 ### `sleep` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation)
 
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `snyk` (https://docs.snyk.io/snyk-cli)
+
+- **code test**: Flags: --help, --json, --sarif, --severity-threshold, -h. Valued: --org. Positional args accepted
+- **container test**: Flags: --help, --json, --severity-threshold, -h. Valued: --exclude-base-image-vulns, --file, --org, --platform. Positional args accepted
+- **iac test**: Flags: --help, --json, --sarif, --scan, --severity-threshold, -h. Valued: --detection-depth, --org, --rules, --target-name. Positional args accepted
+- **test**: Flags: --all-projects, --all-sub-projects, --detection-depth, --dev, --fail-on, --help, --json, --print-deps, --prune-repeated-subdependencies, --sarif, --scan-all-unmanaged, --severity-threshold, --strict-out-of-sync, -h. Valued: --command, --configuration-attributes, --configuration-matching, --exclude, --file, --org, --package-manager, --packages-folder, --project-name, --reachable, --reachable-timeout, --severity-threshold, --sub-project, --target-reference. Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `sort` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation)
 

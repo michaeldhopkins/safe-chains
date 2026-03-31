@@ -1,0 +1,38 @@
+[[command]]
+name = "minikube"
+url = "https://minikube.sigs.k8s.io/docs/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--format", "--help", "--output", "-h", "-o"]
+valued = ["--node", "--profile", "-n", "-p"]
+
+[[command.sub]]
+name = "profile"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--light", "--output", "-h", "-l", "-o"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--components", "--help", "--output", "--short", "-h", "-o"]
+
+[[command.sub]]
+name = "ip"
+standalone = ["--help", "-h"]
+valued = ["--node", "--profile", "-n", "-p"]
+
+[[command.sub]]
+name = "service"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--namespace", "-h"]
+valued = ["--profile", "-p"]
+
+[[command.sub]]
+name = "addons"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--output", "-h", "-o"]
+valued = ["--profile", "-p"]

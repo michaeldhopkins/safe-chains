@@ -1,0 +1,56 @@
+[[command]]
+name = "snyk"
+url = "https://docs.snyk.io/snyk-cli"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+positional_style = true
+standalone = [
+    "--all-projects", "--all-sub-projects", "--detection-depth",
+    "--dev", "--fail-on", "--help", "--json", "--print-deps",
+    "--prune-repeated-subdependencies", "--sarif",
+    "--scan-all-unmanaged", "--severity-threshold",
+    "--strict-out-of-sync",
+    "-h",
+]
+valued = [
+    "--command", "--configuration-attributes", "--configuration-matching",
+    "--exclude", "--file", "--org", "--package-manager",
+    "--packages-folder", "--project-name", "--reachable",
+    "--reachable-timeout", "--severity-threshold",
+    "--sub-project", "--target-reference",
+]
+
+[[command.sub]]
+name = "code"
+[[command.sub.sub]]
+name = "test"
+level = "SafeRead"
+positional_style = true
+standalone = ["--help", "--json", "--sarif", "--severity-threshold", "-h"]
+valued = ["--org"]
+
+[[command.sub]]
+name = "iac"
+[[command.sub.sub]]
+name = "test"
+level = "SafeRead"
+positional_style = true
+standalone = ["--help", "--json", "--sarif", "--scan", "--severity-threshold", "-h"]
+valued = ["--detection-depth", "--org", "--rules", "--target-name"]
+
+[[command.sub]]
+name = "container"
+[[command.sub.sub]]
+name = "test"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--json", "--severity-threshold", "-h"]
+valued = ["--exclude-base-image-vulns", "--file", "--org", "--platform"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

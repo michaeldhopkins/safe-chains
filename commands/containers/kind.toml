@@ -1,0 +1,24 @@
+[[command]]
+name = "kind"
+url = "https://kind.sigs.k8s.io/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "get"
+[[command.sub.sub]]
+name = "clusters"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "nodes"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--name"]
+[[command.sub.sub]]
+name = "kubeconfig"
+bare = false
+standalone = ["--help", "--internal", "-h"]
+valued = ["--name"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
