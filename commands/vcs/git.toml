@@ -546,6 +546,7 @@ positional_style = true
 [[command.sub.sub]]
 name = "show"
 positional_style = true
+standalone = ["--help", "--patch", "--stat", "-h", "-p", "-u"]
 
 [[command.sub]]
 name = "status"

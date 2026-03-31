@@ -145,3 +145,1118 @@ positional_style = true
 name = "acm"
 first_arg = ["describe-*", "get-*", "list-*"]
 positional_style = true
+
+[[command.sub]]
+name = "apigateway"
+first_arg = ["get-*"]
+positional_style = true
+
+[[command.sub]]
+name = "apigatewayv2"
+first_arg = ["get-*"]
+positional_style = true
+
+[[command.sub]]
+name = "codebuild"
+first_arg = ["batch-get-*", "describe-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "codepipeline"
+first_arg = ["get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cognito-idp"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "elasticbeanstalk"
+first_arg = ["describe-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ses"
+first_arg = ["get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "sesv2"
+first_arg = ["get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "sagemaker"
+first_arg = ["describe-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "kinesis"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "athena"
+first_arg = ["get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "glue"
+first_arg = ["get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "stepfunctions"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "events"
+first_arg = ["describe-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "wafv2"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "accessanalyzer"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "account"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "acm-pca"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "amp"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "amplify"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "amplifybackend"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "amplifyuibuilder"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "appconfig"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "appflow"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "application-autoscaling"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "application-insights"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "appmesh"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "apprunner"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "appstream"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "appsync"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "artifact"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "auditmanager"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "autoscaling-plans"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "b2bi"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "backup"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "batch"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "bedrock"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "bedrock-agent"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "billingconductor"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "braket"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "budgets"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ce"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "chatbot"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "chime"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "chime-sdk-identity"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "chime-sdk-meetings"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "chime-sdk-messaging"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "chime-sdk-voice"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cleanrooms"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cloud9"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cloudcontrol"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cloudfront"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cloudhsmv2"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cloudsearch"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cloudtrail"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "codeartifact"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "codecatalyst"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "codecommit"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "codeguru-reviewer"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "codeguruprofiler"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "codestar-connections"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "codestar-notifications"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cognito-identity"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "comprehend"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "compute-optimizer"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "configservice"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "connect"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "controltower"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cur"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "databrew"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "dataexchange"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "datasync"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "datazone"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "dax"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "deadline"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "detective"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "devicefarm"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "devops-guru"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "directconnect"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "discovery"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "dlm"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "dms"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "docdb"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "docdb-elastic"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ds"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "dynamodbstreams"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ebs"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ecr-public"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "efs"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "elastictranscoder"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "emr"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "emr-containers"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "emr-serverless"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "entityresolution"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "es"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "finspace"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "firehose"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "fis"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "fms"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "forecast"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "frauddetector"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "fsx"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "gamelift"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "glacier"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "globalaccelerator"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "grafana"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "greengrass"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "greengrassv2"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "groundstation"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "guardduty"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "health"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "healthlake"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "identitystore"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "imagebuilder"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "inspector2"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "internetmonitor"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "iot"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "iotevents"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "iotsitewise"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "iottwinmaker"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ivs"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "kafka"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "kafkaconnect"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "kendra"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "keyspaces"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "kinesisanalytics"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "kinesisanalyticsv2"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "kinesisvideo"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "lakeformation"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "lex-models"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "lexv2-models"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "license-manager"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "lightsail"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "location"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "m2"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "macie2"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "managedblockchain"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "mediaconnect"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "mediaconvert"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "medialive"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "mediapackage"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "mediastore"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "mediatailor"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "medical-imaging"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "memorydb"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "mgn"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "mq"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "mturk"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "mwaa"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "neptune"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "neptune-graph"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "network-firewall"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "networkmanager"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "notifications"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "oam"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "omics"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "opensearch"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "opensearchserverless"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "organizations"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "outposts"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "personalize"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "pi"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "pinpoint"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "pipes"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "polly"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "pricing"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "proton"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "quicksight"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ram"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "rbin"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "rds-data"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "redshift"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "redshift-data"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "redshift-serverless"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "rekognition"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "resiliencehub"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "resource-explorer-2"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "resource-groups"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "resourcegroupstaggingapi"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "rolesanywhere"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "route53-recovery-control-config"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "route53-recovery-readiness"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "route53domains"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "route53profiles"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "route53resolver"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "rum"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "s3control"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "savingsplans"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "scheduler"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "schemas"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "securityhub"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "securitylake"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "serverlessrepo"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "service-quotas"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "servicecatalog"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "servicediscovery"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "shield"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "signer"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ssm-contacts"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ssm-incidents"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "sso"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "sso-admin"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "storagegateway"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "sts"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "support"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "swf"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "synthetics"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "textract"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "timestream-query"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "transcribe"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "transfer"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "translate"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "trustedadvisor"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "verifiedpermissions"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "vpc-lattice"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "waf"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "waf-regional"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "wellarchitected"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "workdocs"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "workmail"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "workspaces"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "workspaces-web"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "xray"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true

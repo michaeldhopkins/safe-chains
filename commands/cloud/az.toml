@@ -134,3 +134,213 @@ positional_style = true
 name = "cosmosdb"
 first_arg = ["list", "show"]
 positional_style = true
+
+[[command.sub]]
+name = "appservice"
+first_arg = ["list-locations", "plan"]
+positional_style = true
+
+[[command.sub]]
+name = "batch"
+first_arg = ["account", "application", "certificate", "job", "node", "pool", "task"]
+positional_style = true
+
+[[command.sub]]
+name = "cdn"
+first_arg = ["custom-domain", "edge-node", "endpoint", "name-exists", "origin", "profile", "waf-policy"]
+positional_style = true
+
+[[command.sub]]
+name = "cognitiveservices"
+first_arg = ["account", "list", "usage"]
+positional_style = true
+
+[[command.sub]]
+name = "container"
+first_arg = ["list", "logs", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "containerapp"
+first_arg = ["list", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "disk"
+first_arg = ["list", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "dns"
+first_arg = ["record-set", "zone"]
+positional_style = true
+
+[[command.sub]]
+name = "eventhubs"
+first_arg = ["eventhub", "namespace"]
+positional_style = true
+
+[[command.sub]]
+name = "hdinsight"
+first_arg = ["list", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "identity"
+first_arg = ["list", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "iot"
+first_arg = ["central", "dps", "hub"]
+positional_style = true
+
+[[command.sub]]
+name = "logicapp"
+first_arg = ["list", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "managed-cassandra"
+first_arg = ["cluster", "datacenter"]
+positional_style = true
+
+[[command.sub]]
+name = "maps"
+first_arg = ["account"]
+positional_style = true
+
+[[command.sub]]
+name = "mariadb"
+first_arg = ["db", "server"]
+positional_style = true
+
+[[command.sub]]
+name = "mysql"
+first_arg = ["db", "flexible-server", "server"]
+positional_style = true
+
+[[command.sub]]
+name = "netappfiles"
+first_arg = ["account", "pool", "snapshot", "volume"]
+positional_style = true
+
+[[command.sub]]
+name = "notification-hub"
+first_arg = ["authorization-rule", "credential", "list", "namespace"]
+positional_style = true
+
+[[command.sub]]
+name = "postgres"
+first_arg = ["db", "flexible-server", "server"]
+positional_style = true
+
+[[command.sub]]
+name = "redis"
+first_arg = ["list", "list-keys", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "relay"
+first_arg = ["hyco", "namespace", "wcfrelay"]
+positional_style = true
+
+[[command.sub]]
+name = "search"
+first_arg = ["admin-key", "query-key", "service"]
+positional_style = true
+
+[[command.sub]]
+name = "servicebus"
+first_arg = ["namespace", "queue", "topic"]
+positional_style = true
+
+[[command.sub]]
+name = "sf"
+first_arg = ["application", "cluster", "managed-application-type", "managed-cluster", "service"]
+positional_style = true
+
+[[command.sub]]
+name = "sig"
+first_arg = ["image-definition", "image-version", "list", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "signalr"
+first_arg = ["list", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "spring"
+first_arg = ["app", "certificate", "config-server", "eureka-server", "service-registry"]
+positional_style = true
+
+[[command.sub]]
+name = "staticwebapp"
+first_arg = ["list", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "synapse"
+first_arg = ["spark", "sql", "workspace"]
+positional_style = true
+
+[[command.sub]]
+name = "tag"
+first_arg = ["list"]
+positional_style = true
+
+[[command.sub]]
+name = "ts"
+first_arg = ["list", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "vmss"
+first_arg = ["list", "list-instances", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "security"
+first_arg = ["alert", "assessment", "contact", "pricing", "secure-score", "setting", "task"]
+positional_style = true
+
+[[command.sub]]
+name = "policy"
+first_arg = ["assignment", "definition", "set-definition", "state"]
+positional_style = true
+
+[[command.sub]]
+name = "role"
+first_arg = ["assignment", "definition"]
+positional_style = true
+
+[[command.sub]]
+name = "lock"
+first_arg = ["list", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "feature"
+first_arg = ["list", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "provider"
+first_arg = ["list", "operation", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "deployment"
+first_arg = ["list", "operation", "show"]
+positional_style = true
+
+[[command.sub]]
+name = "advisor"
+first_arg = ["configuration", "recommendation"]
+positional_style = true
+
+[[command.sub]]
+name = "consumption"
+first_arg = ["budget", "marketplace", "pricesheet", "reservation", "usage"]
+positional_style = true

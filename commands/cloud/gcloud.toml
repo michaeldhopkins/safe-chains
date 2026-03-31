@@ -196,3 +196,243 @@ name = "artifacts"
 name = "repositories"
 first_arg = ["describe", "list"]
 positional_style = true
+
+[[command.sub]]
+name = "storage"
+first_arg = ["buckets", "cp", "ls", "cat", "objects"]
+positional_style = true
+
+[[command.sub]]
+name = "pubsub"
+first_arg = ["subscriptions", "topics", "snapshots", "schemas"]
+positional_style = true
+
+[[command.sub]]
+name = "spanner"
+first_arg = ["databases", "instances", "operations"]
+positional_style = true
+
+[[command.sub]]
+name = "redis"
+first_arg = ["instances", "operations", "regions"]
+positional_style = true
+
+[[command.sub]]
+name = "memcache"
+first_arg = ["instances", "operations", "regions"]
+positional_style = true
+
+[[command.sub]]
+name = "bigtable"
+first_arg = ["clusters", "instances", "operations"]
+positional_style = true
+
+[[command.sub]]
+name = "firestore"
+first_arg = ["databases", "indexes", "operations"]
+positional_style = true
+
+[[command.sub]]
+name = "dataflow"
+first_arg = ["jobs", "logs", "metrics", "snapshots"]
+positional_style = true
+
+[[command.sub]]
+name = "dataproc"
+first_arg = ["clusters", "jobs", "operations", "workflow-templates"]
+positional_style = true
+
+[[command.sub]]
+name = "composer"
+first_arg = ["environments", "operations"]
+positional_style = true
+
+[[command.sub]]
+name = "builds"
+first_arg = ["describe", "list", "log"]
+positional_style = true
+
+[[command.sub]]
+name = "secrets"
+first_arg = ["describe", "list", "versions"]
+positional_style = true
+
+[[command.sub]]
+name = "endpoints"
+first_arg = ["describe", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "kms"
+first_arg = ["keys", "keyrings", "locations"]
+positional_style = true
+
+[[command.sub]]
+name = "resource-manager"
+first_arg = ["folders", "liens", "operations", "org-policies"]
+positional_style = true
+
+[[command.sub]]
+name = "organizations"
+first_arg = ["describe", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "billing"
+first_arg = ["accounts", "budgets", "projects"]
+positional_style = true
+
+[[command.sub]]
+name = "monitoring"
+first_arg = ["channels", "dashboards", "policies", "snoozes"]
+positional_style = true
+
+[[command.sub]]
+name = "deploy"
+first_arg = ["delivery-pipelines", "releases", "rollouts", "targets"]
+positional_style = true
+
+[[command.sub]]
+name = "network-management"
+first_arg = ["connectivity-tests", "operations"]
+positional_style = true
+
+[[command.sub]]
+name = "network-services"
+first_arg = ["endpoints", "gateways", "grpc-routes", "http-routes", "meshes"]
+positional_style = true
+
+[[command.sub]]
+name = "certificate-manager"
+first_arg = ["certificates", "dns-authorizations", "maps", "operations"]
+positional_style = true
+
+[[command.sub]]
+name = "access-context-manager"
+first_arg = ["levels", "perimeters", "policies"]
+positional_style = true
+
+[[command.sub]]
+name = "recaptcha"
+first_arg = ["keys"]
+positional_style = true
+
+[[command.sub]]
+name = "alloydb"
+first_arg = ["clusters", "instances", "operations"]
+positional_style = true
+
+[[command.sub]]
+name = "vmware"
+first_arg = ["clusters", "dns-bind-permission", "external-addresses", "hcx-activation-keys", "locations", "networks", "node-types", "operations", "private-clouds", "subnets"]
+positional_style = true
+
+[[command.sub]]
+name = "notebooks"
+first_arg = ["environments", "instances", "locations"]
+positional_style = true
+
+[[command.sub]]
+name = "ai"
+first_arg = ["custom-jobs", "endpoints", "hp-tuning-jobs", "index-endpoints", "indexes", "models", "operations", "tensorboards"]
+positional_style = true
+
+[[command.sub]]
+name = "ai-platform"
+first_arg = ["jobs", "local", "models", "operations", "versions"]
+positional_style = true
+
+[[command.sub]]
+name = "healthcare"
+first_arg = ["datasets", "dicom-stores", "fhir-stores", "hl7v2-stores", "operations"]
+positional_style = true
+
+[[command.sub]]
+name = "filestore"
+first_arg = ["backups", "instances", "locations", "operations"]
+positional_style = true
+
+[[command.sub]]
+name = "transfer"
+first_arg = ["agents", "jobs", "operations"]
+positional_style = true
+
+[[command.sub]]
+name = "eventarc"
+first_arg = ["channels", "providers", "triggers"]
+positional_style = true
+
+[[command.sub]]
+name = "workflows"
+first_arg = ["describe", "executions", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "scheduler"
+first_arg = ["jobs"]
+positional_style = true
+
+[[command.sub]]
+name = "tasks"
+first_arg = ["describe", "list", "locations", "queues"]
+positional_style = true
+
+[[command.sub]]
+name = "apigee"
+first_arg = ["apis", "applications", "archives", "deployments", "developers", "environments", "operations", "organizations", "products"]
+positional_style = true
+
+[[command.sub]]
+name = "api-gateway"
+first_arg = ["apis", "api-configs", "gateways", "operations"]
+positional_style = true
+
+[[command.sub]]
+name = "assured"
+first_arg = ["operations", "workloads"]
+positional_style = true
+
+[[command.sub]]
+name = "batch"
+first_arg = ["jobs", "tasks"]
+positional_style = true
+
+[[command.sub]]
+name = "artifacts"
+first_arg = ["docker", "files", "packages", "repositories", "tags", "versions"]
+positional_style = true
+
+[[command.sub]]
+name = "source"
+first_arg = ["repos"]
+positional_style = true
+
+[[command.sub]]
+name = "service-directory"
+first_arg = ["endpoints", "namespaces", "services"]
+positional_style = true
+
+[[command.sub]]
+name = "identity"
+first_arg = ["groups"]
+positional_style = true
+
+[[command.sub]]
+name = "essential-contacts"
+first_arg = ["compute", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "policy-intelligence"
+first_arg = ["lint-condition", "query-activity", "troubleshoot-policy"]
+positional_style = true
+
+[[command.sub]]
+name = "scc"
+first_arg = ["assets", "findings", "notifications", "operations", "sources"]
+positional_style = true
+
+[[command.sub]]
+name = "recommender"
+first_arg = ["insights", "recommendations"]
+positional_style = true

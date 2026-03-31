@@ -97,3 +97,10 @@ valued = ["--namespace", "--selector", "--sort-by", "-l", "-n"]
 name = "version"
 standalone = ["--client", "--help", "--short", "-h"]
 valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "diff"
+bare = false
+positional_style = true
+standalone = ["--field-manager", "--force-conflicts", "--help", "--prune", "--server-side", "-h"]
+valued = ["-f", "--filename", "-k", "--kustomize", "-l", "--selector", "--prune-allowlist"]

@@ -55,3 +55,35 @@ standalone = ["--help", "-h"]
 [[command.sub]]
 name = "inspect"
 standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "install"
+guard = "--dry-run"
+level = "Inert"
+bare = false
+standalone = [
+    "--dry-run", "--help", "--no-deps", "--pre", "--quiet",
+    "--require-hashes", "--user", "--verbose",
+    "-U", "-h", "-q", "-v",
+]
+valued = [
+    "--constraint", "--extra-index-url", "--find-links",
+    "--index-url", "--no-binary", "--only-binary",
+    "--platform", "--python-version", "--requirement",
+    "--target", "--upgrade-strategy",
+    "-c", "-f", "-i", "-r", "-t",
+]
+
+[[command.sub]]
+name = "download"
+standalone = [
+    "--help", "--no-deps", "--pre", "--quiet",
+    "--require-hashes", "--verbose",
+    "-h", "-q", "-v",
+]
+valued = [
+    "--constraint", "--dest", "--extra-index-url", "--find-links",
+    "--index-url", "--no-binary", "--only-binary",
+    "--platform", "--python-version", "--requirement",
+    "-c", "-d", "-f", "-i", "-r",
+]

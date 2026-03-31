@@ -1,0 +1,18 @@
+[[command]]
+name = "go"
+url = "https://pkg.go.dev/cmd/go"
+bare_flags = ["--help", "-h", "help", "version"]
+
+[[command.sub]]
+name = "mod"
+[[command.sub.sub]]
+name = "graph"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "verify"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "why"
+bare = false
+positional_style = true
+standalone = ["--help", "--m", "--vendor", "-h"]

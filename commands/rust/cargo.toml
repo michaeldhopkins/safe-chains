@@ -381,6 +381,36 @@ valued = [
 ]
 
 [[command.sub]]
+name = "update"
+guard = "--dry-run"
+level = "Inert"
+bare = false
+standalone = [
+    "--aggressive", "--dry-run", "--frozen", "--help",
+    "--locked", "--offline", "--recursive", "--workspace",
+    "-h", "-q", "-v",
+]
+valued = [
+    "--color", "--config", "--manifest-path", "--package",
+    "--precise",
+    "-p",
+]
+
+[[command.sub]]
+name = "generate-lockfile"
+level = "SafeWrite"
+standalone = [
+    "--frozen", "--help", "--locked", "--offline",
+    "-h", "-q", "-v",
+]
+valued = ["--color", "--config", "--manifest-path"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+positional_style = true
+
+[[command.sub]]
 name = "bloat"
 level = "SafeWrite"
 standalone = [

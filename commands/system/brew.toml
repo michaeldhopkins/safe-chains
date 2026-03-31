@@ -145,3 +145,35 @@ standalone = ["--help", "--json", "-h"]
 name = "info"
 bare = false
 standalone = ["--all", "--help", "--json", "-h"]
+
+[[command.sub]]
+name = "upgrade"
+guard = "--dry-run"
+level = "Inert"
+standalone = [
+    "--cask", "--debug", "--dry-run", "--fetch-HEAD",
+    "--formula", "--greedy", "--greedy-auto-updates",
+    "--greedy-latest", "--help", "--quiet", "--verbose",
+    "-d", "-h", "-n", "-q", "-v",
+]
+
+[[command.sub]]
+name = "cleanup"
+guard = "--dry-run"
+level = "Inert"
+standalone = [
+    "--dry-run", "--help", "--prune", "--quiet", "--verbose",
+    "-d", "-h", "-n", "-q", "-s", "-v",
+]
+valued = ["--prune-prefix"]
+
+[[command.sub]]
+name = "bundle"
+[[command.sub.sub]]
+name = "check"
+standalone = ["--all", "--help", "--no-upgrade", "--verbose", "-h", "-v"]
+valued = ["--file", "--global"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--all", "--brews", "--casks", "--formula", "--help", "--taps", "--verbose", "--vscode", "-h", "-v"]
+valued = ["--file", "--global"]

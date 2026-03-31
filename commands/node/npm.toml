@@ -99,3 +99,13 @@ level = "SafeRead"
 name = "run-script"
 first_arg = ["test", "test:*"]
 level = "SafeRead"
+
+[[command.sub]]
+name = "ci"
+level = "SafeWrite"
+standalone = [
+    "--help", "--ignore-scripts", "--legacy-bundling",
+    "--no-audit", "--no-fund", "--no-optional",
+    "--production",
+    "-h",
+]

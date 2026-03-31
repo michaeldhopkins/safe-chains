@@ -55,6 +55,10 @@ standalone = ["--help", "-h"]
 [[command.sub.sub]]
 name = "version"
 standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "port"
+bare = false
+standalone = ["--help", "--index", "--protocol", "-h"]
 
 [[command.sub]]
 name = "container"
