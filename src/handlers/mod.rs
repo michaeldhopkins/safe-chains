@@ -75,6 +75,7 @@ const HANDLED_CMDS: &[&str] = &[
     "ollama", "llm", "hf", "claude", "aider", "codex", "opencode", "vibe",
     "ddev", "dcli",
     "brew", "mise", "asdf", "crontab", "defaults", "pmset", "sysctl", "cmake", "psql", "pg_isready",
+    "pg_dump", "bazel", "meson", "ninja",
     "terraform", "heroku", "vercel", "flyctl", "pulumi", "netlify", "railway", "wrangler", "cf", "newrelic",
     "aws", "gcloud", "az",
     "doctl", "hcloud", "vultr-cli", "exo", "scw", "linode-cli",
@@ -107,10 +108,13 @@ const HANDLED_CMDS: &[&str] = &[
     "cksum", "b2sum", "sum", "strings", "hexdump", "od", "size", "sips",
     "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat", "mdfind", "man",
     "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route", "ping",
+    "traceroute", "traceroute6", "mtr",
     "xv",
     "fzf", "fzy", "peco", "pick", "selecta", "sk", "zf",
     "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "workon", "safe-chains",
     "tldr", "ldd", "objdump", "readelf", "just",
+    "prettier", "black", "ruff", "mypy", "pyright", "pylint", "flake8", "isort",
+    "rubocop", "eslint", "biome", "stylelint", "zoxide",
     "direnv", "make", "packer", "vagrant",
 ];
 
