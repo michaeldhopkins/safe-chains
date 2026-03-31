@@ -354,6 +354,15 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **list**: Flags: --explicit, --export, --full-name, --help, --json, --no-pip, --revisions, -e, -f, -h. Valued: --name, --prefix, -n, -p
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `cosign` (https://github.com/sigstore/cosign)
+
+- **tree**: Flags: --help, -h
+- **triangulate**: Flags: --help, -h. Valued: --type
+- **verify**: Flags: --check-claims, --help, --local-image, --offline, -h. Valued: --attachment, --certificate, --certificate-chain, --certificate-identity, --certificate-identity-regexp, --certificate-oidc-issuer, --certificate-oidc-issuer-regexp, --k8s-keychain, --key, --output, --payload, --rekor-url, --signature, --slot, -o
+- **verify-attestation**: Flags: --check-claims, --help, --local-image, --offline, -h. Valued: --certificate, --certificate-identity, --certificate-oidc-issuer, --key, --output, --policy, --rekor-url, --type, -o
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `craft` (https://craftcms.com/docs/5.x/reference/cli.html)
 
 - **env/show**: Flags: --help, -h
@@ -371,6 +380,18 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **update/info**: Flags: --help, -h
 - **users/list-admins**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `crane` (https://github.com/google/go-containerregistry)
+
+- **blob**: Flags: --help, -h
+- **catalog**: Flags: --full-ref, --help, -h
+- **config**: Flags: --help, -h
+- **digest**: Flags: --full-ref, --help, --tarball, -h
+- **ls**: Flags: --full-ref, --help, --omit-digest-tags, -h
+- **manifest**: Flags: --help, -h
+- **validate**: Flags: --fast, --help, --remote, --tarball, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, -h
 
 ### `crontab` (https://ss64.com/mac/crontab.html)
 
@@ -857,6 +878,31 @@ Aliases: `egrep`, `fgrep`
 - Allowed valued flags: -c, -n, --bytes, --lines
 - Bare invocation allowed
 
+### `helm` (https://helm.sh/docs/helm/)
+
+- **env**: Flags: --help, -h
+- **get all**: Flags: --help, -h. Valued: --output, --revision, --template, -o
+- **get hooks**: Flags: --help, -h. Valued: --output, --revision, -o
+- **get manifest**: Flags: --help, -h. Valued: --output, --revision, -o
+- **get metadata**: Flags: --help, -h. Valued: --output, --revision, -o
+- **get notes**: Flags: --help, -h. Valued: --output, --revision, -o
+- **get values**: Flags: --help, -h. Valued: --output, --revision, -o
+- **history**: Flags: --help, -h. Valued: --max, --output, -o
+- **lint**: Flags: --help, --quiet, --strict, --with-subcharts, -h. Valued: --set, --set-file, --set-json, --set-string, --values, -f
+- **list**: Flags: --all, --all-namespaces, --deployed, --failed, --help, --pending, --reverse, --short, --superseded, --uninstalled, --uninstalling, -A, -a, -h, -q. Valued: --filter, --max, --offset, --output, --time-format, -o
+- **search hub**: Flags: --help, --list-repo-url, -h. Valued: --max-col-width, --output, -o
+- **search repo**: Flags: --devel, --help, --regexp, --versions, -h, -l, -r. Valued: --max-col-width, --output, --version, -o
+- **show all**: Flags: --devel, --help, -h. Valued: --ca-file, --cert-file, --key-file, --keyring, --repo, --username, --version
+- **show chart**: Flags: --devel, --help, -h. Valued: --repo, --version
+- **show crds**: Flags: --devel, --help, -h. Valued: --repo, --version
+- **show readme**: Flags: --devel, --help, -h. Valued: --repo, --version
+- **show values**: Flags: --devel, --help, -h. Valued: --jsonpath, --repo, --version
+- **status**: Flags: --help, --show-desc, --show-resources, -h. Valued: --output, --revision, -o
+- **template**: Flags: --api-versions, --create-namespace, --dependency-update, --devel, --dry-run, --generate-name, --help, --include-crds, --is-upgrade, --no-hooks, --release-name, --replace, --skip-crds, --skip-tests, --validate, -g, -h. Valued: --kube-version, --name-template, --namespace, --output-dir, --post-renderer, --repo, --set, --set-file, --set-json, --set-string, --show-only, --timeout, --values, --version, -f, -n, -s
+- **verify**: Flags: --help, -h. Valued: --keyring
+- **version**: Flags: --help, --short, --template, -h
+- Allowed standalone flags: --help, -h
+
 ### `heroku` (https://devcenter.heroku.com/articles/heroku-cli-commands)
 
 - **addons**: Flags: --all, --help, --json, -A, -h. Valued: --app, -a
@@ -1024,6 +1070,12 @@ Aliases: `egrep`, `fgrep`
 
 - Allowed standalone flags: --help, --json, --version, --yaml, -N, -V, -h, -n
 - Allowed valued flags: --mode, --scrolloff
+
+### `journalctl` (https://man7.org/linux/man-pages/man1/journalctl.1.html)
+
+- Allowed standalone flags: --all, --catalog, --disk-usage, --dmesg, --full, --header, --help, --json, --list-boots, --list-catalog, --list-fields, --merge, --no-full, --no-hostname, --no-pager, --no-tail, --quiet, --reverse, --system, --this-boot, --user, --utc, --verify, --version, -a, -b, -f, -h, -k, -l, -m, -q, -r, -x
+- Allowed valued flags: --after-cursor, --boot, --cursor, --directory, --facility, --field, --file, --identifier, --lines, --machine, --output, --priority, --since, --unit, --until, --user-unit, -D, -F, -M, -S, -U, -g, -n, -o, -p, -t, -u
+- Bare invocation allowed
 
 ### `jq` (https://jqlang.github.io/jq/manual/)
 
@@ -1823,6 +1875,13 @@ Aliases: `pip3`
 
 - Fuzzy finder. Display, filtering, and layout flags allowed. --history allowed (SafeWrite).
 
+### `skopeo` (https://github.com/containers/skopeo)
+
+- **inspect**: Flags: --config, --help, --no-creds, --raw, -h. Valued: --authfile, --cert-dir, --creds, --format, --tls-verify
+- **list-tags**: Flags: --help, --no-creds, -h. Valued: --authfile, --cert-dir, --creds, --tls-verify
+- **manifest-digest**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `sleep` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation)
 
 - Allowed standalone flags: --help, --version, -V, -h
@@ -1896,6 +1955,21 @@ Aliases: `pip3`
 - Allowed standalone flags: --help, --json, --version, --xml, -V, -h, -json, -listDataTypes, -nospinner, -xml
 - Allowed valued flags: -detailLevel, -timeout
 - Bare invocation allowed
+
+### `systemctl` (https://man7.org/linux/man-pages/man1/systemctl.1.html)
+
+- **cat**: Flags: --help, --no-pager, -h. Positional args accepted
+- **is-active**: Flags: --help, --quiet, -h, -q. Positional args accepted
+- **is-enabled**: Flags: --help, --quiet, -h, -q. Positional args accepted
+- **is-failed**: Flags: --help, --quiet, -h, -q. Positional args accepted
+- **list-dependencies**: Flags: --all, --help, --no-pager, --plain, --reverse, -a, -h
+- **list-sockets**: Flags: --all, --full, --help, --no-legend, --no-pager, --show-types, -a, -h, -l
+- **list-timers**: Flags: --all, --full, --help, --no-legend, --no-pager, -a, -h, -l
+- **list-unit-files**: Flags: --all, --full, --help, --no-legend, --no-pager, -a, -h, -l. Valued: --state, --type, -t
+- **list-units**: Flags: --all, --failed, --full, --help, --no-legend, --no-pager, --plain, --recursive, -a, -h, -l, -r. Valued: --state, --type, -t
+- **show**: Flags: --all, --help, --no-pager, -a, -h. Valued: --property, -p. Positional args accepted
+- **status**: Flags: --all, --full, --help, --lines, --no-pager, -a, -h, -l. Valued: -n, --output, -o. Positional args accepted
+- Allowed standalone flags: --help, --version, -h
 
 ### `tac` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation)
 
