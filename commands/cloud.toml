@@ -1,0 +1,649 @@
+[[command]]
+name = "doctl"
+url = "https://docs.digitalocean.com/reference/doctl/"
+bare_flags = ["--help", "--version", "-h", "-v"]
+[command.wrapper]
+valued = ["--access-token", "--context", "--output", "-o", "-t"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "account"
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "balance"
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "compute"
+[[command.sub.sub]]
+name = "droplet"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+valued = ["--format", "--no-header"]
+[[command.sub.sub]]
+name = "region"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "size"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "image"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "volume"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "firewall"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "databases"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "kubernetes"
+[[command.sub.sub]]
+name = "cluster"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "apps"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "projects"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "hcloud"
+url = "https://github.com/hetznercloud/cli"
+bare_flags = ["--help", "--version", "-h", "-v"]
+[command.wrapper]
+valued = ["--poll-interval"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "context"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "active"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "datacenter"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "location"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "server-type"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "server"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "image"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "--type", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "volume"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "network"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "firewall"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "load-balancer"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "floating-ip"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "primary-ip"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "ssh-key"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "certificate"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "placement-group"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command]]
+name = "vultr-cli"
+url = "https://github.com/vultr/vultr-cli"
+bare_flags = ["--help", "--version", "-h", "-v"]
+[command.wrapper]
+valued = ["--config"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "account"
+
+[[command.sub]]
+name = "plans"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "regions"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "os"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "instance"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "bare-metal"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "block-storage"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dns"
+[[command.sub.sub]]
+name = "domain"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "record"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "firewall"
+[[command.sub.sub]]
+name = "group"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "rule"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "kubernetes"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "database"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "exo"
+url = "https://community.exoscale.com/documentation/tools/exoscale-cli/"
+bare_flags = ["--help", "-h"]
+[command.wrapper]
+standalone = ["--quiet", "-q"]
+valued = ["--account", "--output-format", "--output-template", "-O"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "status"
+
+[[command.sub]]
+name = "limits"
+
+[[command.sub]]
+name = "zone"
+
+[[command.sub]]
+name = "config"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "compute"
+[[command.sub.sub]]
+name = "instance"
+first_arg = ["list", "show"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "instance-type"
+first_arg = ["list", "show"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "security-group"
+first_arg = ["list", "show"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "elastic-ip"
+first_arg = ["list", "show"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ssh-key"
+first_arg = ["list", "show"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dbaas"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "show"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "type"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dns"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "show"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "scw"
+url = "https://github.com/scaleway/scaleway-cli"
+bare_flags = ["--help", "-h"]
+[command.wrapper]
+standalone = ["--debug", "-D"]
+valued = ["--output", "--profile", "-o", "-p"]
+
+[[command.sub]]
+name = "instance"
+[[command.sub.sub]]
+name = "server"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "image"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "volume"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "security-group"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ip"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "snapshot"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "k8s"
+[[command.sub.sub]]
+name = "cluster"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "pool"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "rdb"
+[[command.sub.sub]]
+name = "instance"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "registry"
+[[command.sub.sub]]
+name = "namespace"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "image"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "lb"
+[[command.sub.sub]]
+name = "lb"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "vpc"
+[[command.sub.sub]]
+name = "private-network"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dns"
+[[command.sub.sub]]
+name = "zone"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "record"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "account"
+[[command.sub.sub]]
+name = "project"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "linode-cli"
+url = "https://www.linode.com/docs/products/tools/cli/get-started/"
+bare_flags = ["--help", "--version"]
+[command.wrapper]
+standalone = ["--json", "--markdown", "--no-headers", "--pretty", "--suppress-warnings", "--text"]
+valued = ["--delimiter"]
+
+[[command.sub]]
+name = "linodes"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "regions"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "images"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "volumes"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "domains"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "nodebalancers"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "firewalls"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "lke"
+[[command.sub.sub]]
+name = "clusters-list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "cluster-view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "account"
+[[command.sub.sub]]
+name = "view"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "events-list"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "profile"
+[[command.sub.sub]]
+name = "view"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "databases"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]

@@ -32,7 +32,7 @@ macro_rules! load_commands {
 
 static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| {
     load_commands![
-        "ai", "android", "binary", "builtins", "containers", "data",
+        "ai", "android", "ansible", "binary", "builtins", "cloud", "containers", "data",
         "dotnet", "forges", "fs", "fuzzy", "go", "hash", "jvm", "magick", "net",
         "node", "php", "python", "r", "ruby", "rust", "search", "swift",
         "sysinfo", "system", "text", "tools", "vcs", "wrappers", "xcode",

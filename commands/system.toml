@@ -1653,3 +1653,400 @@ valued = [
     "--since", "--unit", "--until", "--user-unit",
     "-D", "-F", "-M", "-S", "-U", "-g", "-n", "-o", "-p", "-t", "-u",
 ]
+
+[[command]]
+name = "pulumi"
+url = "https://www.pulumi.com/docs/cli/"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "whoami"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "about"
+standalone = ["--help", "--json", "--transitive", "-h"]
+
+[[command.sub]]
+name = "preview"
+level = "SafeRead"
+standalone = [
+    "--diff", "--help", "--json", "--non-interactive",
+    "--refresh", "--show-config", "--show-reads",
+    "--show-replacement-steps", "--show-sames",
+    "--suppress-outputs", "--suppress-permalink",
+    "-h", "-j",
+]
+valued = [
+    "--config", "--config-file", "--parallel", "--stack",
+    "--target", "-c", "-p", "-s", "-t",
+]
+
+[[command.sub]]
+name = "stack"
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--all", "--help", "--json", "-a", "-h"]
+valued = ["--organization", "--project", "--tag", "-o"]
+[[command.sub.sub]]
+name = "output"
+standalone = ["--help", "--json", "--show-secrets", "-h", "-j"]
+valued = ["--stack", "-s"]
+[[command.sub.sub]]
+name = "history"
+standalone = ["--help", "--json", "--show-secrets", "-h"]
+valued = ["--page", "--page-size", "--stack", "-s"]
+[[command.sub.sub]]
+name = "tag"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "graph"
+standalone = ["--help", "-h"]
+valued = ["--dependency-edge-color", "--parent-edge-color", "--stack", "-s"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--follow", "--help", "--json", "-f", "-h"]
+valued = ["--resource", "--since", "--stack", "-r", "-s"]
+
+[[command.sub]]
+name = "config"
+nested_bare = true
+
+[[command.sub]]
+name = "gen-completion"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "console"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "schema"
+[[command.sub.sub]]
+name = "check"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "netlify"
+url = "https://cli.netlify.com/"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--verbose", "-h"]
+
+[[command.sub]]
+name = "sites:list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "env:list"
+standalone = ["--help", "--json", "--plain", "-h"]
+valued = ["--context", "--scope"]
+
+[[command.sub]]
+name = "functions:list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--help", "-h"]
+valued = ["--level", "--type"]
+
+[[command.sub]]
+name = "teams:list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "completion"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "railway"
+url = "https://docs.railway.app/guides/cli"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "whoami"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--help", "-h"]
+valued = ["--deployment"]
+
+[[command.sub]]
+name = "variables"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "volume"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "wrangler"
+url = "https://developers.cloudflare.com/workers/wrangler/"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "whoami"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "docs"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "secret"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--env", "-e"]
+
+[[command.sub]]
+name = "tail"
+standalone = ["--help", "-h"]
+valued = ["--env", "--format", "--ip", "--method", "--sampling-rate", "--search", "--status", "-e"]
+
+[[command.sub]]
+name = "deployments"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--name"]
+[[command.sub.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+valued = ["--name"]
+
+[[command.sub]]
+name = "versions"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--name"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--name"]
+
+[[command.sub]]
+name = "telemetry"
+[[command.sub.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "complete"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "cf"
+url = "https://cli.cloudfoundry.org/en-US/v8/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "apps"
+standalone = ["--help", "-h"]
+valued = ["--labels"]
+
+[[command.sub]]
+name = "app"
+bare = false
+standalone = ["--guid", "--help", "-h"]
+
+[[command.sub]]
+name = "events"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "tasks"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "services"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "service"
+bare = false
+standalone = ["--guid", "--help", "--params", "-h"]
+
+[[command.sub]]
+name = "marketplace"
+standalone = ["--help", "-h"]
+valued = ["--no-plans", "-e"]
+
+[[command.sub]]
+name = "orgs"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "org"
+bare = false
+standalone = ["--guid", "--help", "-h"]
+
+[[command.sub]]
+name = "spaces"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "space"
+bare = false
+standalone = ["--guid", "--help", "-h"]
+
+[[command.sub]]
+name = "routes"
+standalone = ["--help", "--orglevel", "-h"]
+
+[[command.sub]]
+name = "domains"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "stacks"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "stack"
+bare = false
+standalone = ["--guid", "--help", "-h"]
+
+[[command.sub]]
+name = "buildpacks"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "quotas"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "quota"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugins"
+standalone = ["--checksum", "--help", "--outdated", "-h"]
+
+[[command.sub]]
+name = "feature-flags"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "feature-flag"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "security-groups"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "security-group"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "logs"
+bare = false
+guard = "--recent"
+standalone = ["--help", "--recent", "-h"]
+
+[[command]]
+name = "newrelic"
+url = "https://github.com/newrelic/newrelic-cli"
+bare_flags = ["--help", "--version", "-h"]
+[command.wrapper]
+standalone = ["--debug", "--trace"]
+valued = ["--format", "--plain"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "entity"
+[[command.sub.sub]]
+name = "search"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--fields-filter", "--type"]
+[[command.sub.sub]]
+name = "tags"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "nrql"
+[[command.sub.sub]]
+name = "query"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--accountId", "--query", "-a", "-q"]
+
+[[command.sub]]
+name = "apm"
+[[command.sub.sub]]
+name = "application"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--accountId", "--guid", "--name", "-a"]
+
+[[command.sub]]
+name = "workload"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--accountId", "-a"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--accountId", "--guid", "-a"]
+
+[[command.sub]]
+name = "profile"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]

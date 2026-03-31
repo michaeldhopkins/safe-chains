@@ -61,6 +61,38 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+### `ansible-config` (https://docs.ansible.com/ansible/latest/cli/ansible-config.html)
+
+- **dump**: Flags: --help, --only-changed, -h
+- **list**: Flags: --help, -h
+- **view**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
+### `ansible-doc` (https://docs.ansible.com/ansible/latest/cli/ansible-doc.html)
+
+- Allowed standalone flags: --help, --json, --list, --metadata-dump, --version, -F, -h, -j, -l
+- Allowed valued flags: --module-path, --type, -M, -t
+- Bare invocation allowed
+
+### `ansible-galaxy` (https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html)
+
+- **info**: Flags: --help, -h
+- **list**: Flags: --help, -h
+- **search**: Flags: --help, -h. Valued: --author, --galaxy-tags, --platforms
+- Allowed standalone flags: --help, --version, -h
+
+### `ansible-inventory` (https://docs.ansible.com/ansible/latest/cli/ansible-inventory.html)
+
+- **--graph**: Flags: --help, --vars, -h. Valued: --inventory, --limit, -i, -l
+- **--host**: Flags: --help, -h. Valued: --inventory, -i
+- **--list**: Flags: --help, --yaml, --toml, --export, -h, -y. Valued: --inventory, --limit, -i, -l
+- Allowed standalone flags: --help, --version, -h
+
+### `ansible-playbook` (https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html)
+
+- Requires --list-hosts, --list-tasks, --list-tags, --syntax-check. - Allowed standalone flags: --help, --list-hosts, --list-tags, --list-tasks, --syntax-check, --version, -h
+- Allowed valued flags: --connection, --extra-vars, --inventory, --limit, --tags, --skip-tags, -C, -c, -e, -i, -l, -t
+
 ### `apkanalyzer` (https://developer.android.com/tools/apkanalyzer)
 
 - **apk compare**: Flags: --help, -h
@@ -269,6 +301,36 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 - Allowed standalone flags: --help, --version, -L, -P, -V, -e, -h
 - Bare invocation allowed
+
+### `cf` (https://cli.cloudfoundry.org/en-US/v8/)
+
+- **app**: Flags: --guid, --help, -h
+- **apps**: Flags: --help, -h. Valued: --labels
+- **buildpacks**: Flags: --help, -h
+- **domains**: Flags: --help, -h
+- **env**: Flags: --help, -h
+- **events**: Flags: --help, -h
+- **feature-flag**: Flags: --help, -h
+- **feature-flags**: Flags: --help, -h
+- **logs** (requires --recent): Flags: --help, --recent, -h
+- **marketplace**: Flags: --help, -h. Valued: --no-plans, -e
+- **org**: Flags: --guid, --help, -h
+- **orgs**: Flags: --help, -h
+- **plugins**: Flags: --checksum, --help, --outdated, -h
+- **quota**: Flags: --help, -h
+- **quotas**: Flags: --help, -h
+- **routes**: Flags: --help, --orglevel, -h
+- **security-group**: Flags: --help, -h
+- **security-groups**: Flags: --help, -h
+- **service**: Flags: --guid, --help, --params, -h
+- **services**: Flags: --help, -h
+- **space**: Flags: --guid, --help, -h
+- **spaces**: Flags: --help, -h
+- **stack**: Flags: --guid, --help, -h
+- **stacks**: Flags: --help, -h
+- **tasks**: Flags: --help, -h
+- **version**
+- Allowed standalone flags: --help, --version, -h
 
 ### `cksum` (https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation)
 
@@ -583,6 +645,25 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **volume ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `doctl` (https://docs.digitalocean.com/reference/doctl/)
+
+- **account get**: Flags: --help, -h
+- **apps get**: Flags: --help, -h
+- **apps list**: Flags: --help, -h
+- **balance get**: Flags: --help, -h
+- **compute droplet**: Allowed arguments: list, get
+- **compute firewall**: Allowed arguments: list, get
+- **compute image**: Allowed arguments: list, get
+- **compute region**: Allowed arguments: list
+- **compute size**: Allowed arguments: list
+- **compute volume**: Allowed arguments: list, get
+- **databases get**: Flags: --help, -h
+- **databases list**: Flags: --help, -h
+- **kubernetes cluster**: Allowed arguments: list, get
+- **projects list**: Flags: --help, -h
+- **version**
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `dotenv` (https://github.com/bkeepers/dotenv)
 
 - Recursively validates the inner command.
@@ -619,6 +700,26 @@ Unlisted flags, subcommands, and commands are not allowed.
 ### `env` (https://www.gnu.org/software/coreutils/manual/coreutils.html#env-invocation)
 
 - Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed.
+
+### `exo` (https://community.exoscale.com/documentation/tools/exoscale-cli/)
+
+- **compute elastic-ip**: Allowed arguments: list, show
+- **compute instance**: Allowed arguments: list, show
+- **compute instance-type**: Allowed arguments: list, show
+- **compute security-group**: Allowed arguments: list, show
+- **compute ssh-key**: Allowed arguments: list, show
+- **config list**: Flags: --help, -h
+- **config show**: Flags: --help, -h
+- **dbaas list**: Flags: --help, -h
+- **dbaas show**: Flags: --help, -h
+- **dbaas type**: Allowed arguments: list
+- **dns list**: Flags: --help, -h
+- **dns show**: Flags: --help, -h
+- **limits**
+- **status**
+- **version**
+- **zone**
+- Allowed standalone flags: --help, -h
 
 ### `expand` (https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation)
 
@@ -871,6 +972,41 @@ Aliases: `egrep`, `fgrep`
 ### `gzip` (https://man7.org/linux/man-pages/man1/gzip.1.html)
 
 - Requires -l, --list, -t, --test. - Allowed standalone flags: -l, --list, -t, --test, -v, --verbose, --help, -h, --version, -V
+
+### `hcloud` (https://github.com/hetznercloud/cli)
+
+- **certificate describe**: Flags: --help, -h. Valued: --output, -o
+- **certificate list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **context active**: Flags: --help, -h
+- **context list**: Flags: --help, -h
+- **datacenter describe**: Flags: --help, -h. Valued: --output, -o
+- **datacenter list**: Flags: --help, -h. Valued: --output, -o
+- **firewall describe**: Flags: --help, -h. Valued: --output, -o
+- **firewall list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **floating-ip describe**: Flags: --help, -h. Valued: --output, -o
+- **floating-ip list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **image describe**: Flags: --help, -h. Valued: --output, -o
+- **image list**: Flags: --help, -h. Valued: --output, --selector, --type, -l, -o
+- **load-balancer describe**: Flags: --help, -h. Valued: --output, -o
+- **load-balancer list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **location describe**: Flags: --help, -h. Valued: --output, -o
+- **location list**: Flags: --help, -h. Valued: --output, -o
+- **network describe**: Flags: --help, -h. Valued: --output, -o
+- **network list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **placement-group describe**: Flags: --help, -h. Valued: --output, -o
+- **placement-group list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **primary-ip describe**: Flags: --help, -h. Valued: --output, -o
+- **primary-ip list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **server describe**: Flags: --help, -h. Valued: --output, -o
+- **server list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **server-type describe**: Flags: --help, -h. Valued: --output, -o
+- **server-type list**: Flags: --help, -h. Valued: --output, -o
+- **ssh-key describe**: Flags: --help, -h. Valued: --output, -o
+- **ssh-key list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **version**
+- **volume describe**: Flags: --help, -h. Valued: --output, -o
+- **volume list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `head` (https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation)
 
@@ -1158,6 +1294,29 @@ Aliases: `egrep`, `fgrep`
 - Allowed valued flags: -P, -b, -h, -j, -p, -t, -x, -y, -z, --LINE-NUMBERS, --LONG-PROMPT, --pattern, --prompt, --shift, --tabs, --tag, --window
 - Bare invocation allowed
 
+### `linode-cli` (https://www.linode.com/docs/products/tools/cli/get-started/)
+
+- **account events-list**: Flags: --help
+- **account view**: Flags: --help
+- **databases list**: Flags: --help
+- **domains list**: Flags: --help
+- **domains view**: Flags: --help
+- **firewalls list**: Flags: --help
+- **firewalls view**: Flags: --help
+- **images list**: Flags: --help
+- **images view**: Flags: --help
+- **linodes list**: Flags: --help
+- **linodes view**: Flags: --help
+- **lke cluster-view**: Flags: --help
+- **lke clusters-list**: Flags: --help
+- **nodebalancers list**: Flags: --help
+- **nodebalancers view**: Flags: --help
+- **profile view**: Flags: --help
+- **regions list**: Flags: --help
+- **volumes list**: Flags: --help
+- **volumes view**: Flags: --help
+- Allowed standalone flags: --help, --version
+
 ### `lint` (https://developer.android.com/studio/write/lint)
 
 - Allowed standalone flags: --help, --list, --quiet, --show, --version, -V, -h
@@ -1350,6 +1509,17 @@ Aliases: `mlocate`, `plocate`
 
 - Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify.
 
+### `netlify` (https://cli.netlify.com/)
+
+- **completion**: Flags: --help, -h
+- **env:list**: Flags: --help, --json, --plain, -h. Valued: --context, --scope
+- **functions:list**: Flags: --help, --json, -h
+- **logs**: Flags: --help, -h. Valued: --level, --type
+- **sites:list**: Flags: --help, --json, -h
+- **status**: Flags: --help, --verbose, -h
+- **teams:list**: Flags: --help, --json, -h
+- Allowed standalone flags: --help, -h
+
 ### `netstat` (https://man7.org/linux/man-pages/man8/netstat.8.html)
 
 - Allowed standalone flags: --all, --continuous, --extend, --groups, --help, --interfaces, --listening, --masquerade, --numeric, --numeric-hosts, --numeric-ports, --numeric-users, --program, --route, --statistics, --symbolic, --tcp, --timers, --udp, --unix, --verbose, --version, --wide, -A, -C, -L, -M, -N, -R, -S, -V, -W, -Z, -a, -b, -c, -d, -e, -f, -g, -h, -i, -l, -m, -n, -o, -p, -q, -r, -s, -t, -u, -v, -w, -x
@@ -1359,6 +1529,18 @@ Aliases: `mlocate`, `plocate`
 ### `networksetup` (https://ss64.com/mac/networksetup.html)
 
 - Allowed first arguments: -list*, -get*, -show*, -print*, -version, --version, -V, -help, --help, -h
+
+### `newrelic` (https://github.com/newrelic/newrelic-cli)
+
+- **apm application**: Flags: --help, -h. Valued: --accountId, --guid, --name, -a
+- **entity search**: Flags: --help, -h. Valued: --fields-filter, --type. Positional args accepted
+- **entity tags**: Flags: --help, -h
+- **nrql query**: Flags: --help, -h. Valued: --accountId, --query, -a, -q
+- **profile list**: Flags: --help, -h
+- **version**
+- **workload get**: Flags: --help, -h. Valued: --accountId, --guid, -a
+- **workload list**: Flags: --help, -h. Valued: --accountId, -a
+- Allowed standalone flags: --help, --version, -h
 
 ### `nice` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation)
 
@@ -1682,6 +1864,24 @@ Aliases: `pip3`
 
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `pulumi` (https://www.pulumi.com/docs/cli/)
+
+- **about**: Flags: --help, --json, --transitive, -h
+- **config**
+- **console**: Flags: --help, -h
+- **gen-completion**: Flags: --help, -h
+- **logs**: Flags: --follow, --help, --json, -f, -h. Valued: --resource, --since, --stack, -r, -s
+- **preview**: Flags: --diff, --help, --json, --non-interactive, --refresh, --show-config, --show-reads, --show-replacement-steps, --show-sames, --suppress-outputs, --suppress-permalink, -h, -j. Valued: --config, --config-file, --parallel, --stack, --target, -c, -p, -s, -t
+- **schema check**: Flags: --help, -h
+- **stack graph**: Flags: --help, -h. Valued: --dependency-edge-color, --parent-edge-color, --stack, -s
+- **stack history**: Flags: --help, --json, --show-secrets, -h. Valued: --page, --page-size, --stack, -s
+- **stack ls**: Flags: --all, --help, --json, -a, -h. Valued: --organization, --project, --tag, -o
+- **stack output**: Flags: --help, --json, --show-secrets, -h, -j. Valued: --stack, -s
+- **stack tag**: Flags: --help, -h
+- **version**
+- **whoami**: Flags: --help, --json, -h
+- Allowed standalone flags: --help, -h
+
 ### `pwd` (https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation)
 
 - Allowed standalone flags: --help, --version, -L, -P, -V, -h
@@ -1711,6 +1911,18 @@ Aliases: `pip3`
 
 - **CMD check**: Flags: --as-cran, --no-build-vignettes, --no-examples, --no-manual, --no-tests, --no-vignettes. Valued: --output, -o
 - **CMD config**
+
+### `railway` (https://docs.railway.app/guides/cli)
+
+- **completion**: Flags: --help, -h
+- **list**: Flags: --help, -h
+- **logs**: Flags: --help, -h. Valued: --deployment
+- **status**: Flags: --help, --json, -h
+- **variables list**: Flags: --help, -h
+- **version**
+- **volume list**: Flags: --help, -h
+- **whoami**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `rbenv` (https://github.com/rbenv/rbenv#readme)
 
@@ -1787,6 +1999,26 @@ Aliases: `pip3`
 
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+### `scw` (https://github.com/scaleway/scaleway-cli)
+
+- **account project**: Allowed arguments: list
+- **dns record**: Allowed arguments: list
+- **dns zone**: Allowed arguments: list
+- **instance image**: Allowed arguments: list, get
+- **instance ip**: Allowed arguments: list, get
+- **instance security-group**: Allowed arguments: list, get
+- **instance server**: Allowed arguments: list, get
+- **instance snapshot**: Allowed arguments: list, get
+- **instance volume**: Allowed arguments: list, get
+- **k8s cluster**: Allowed arguments: list, get
+- **k8s pool**: Allowed arguments: list, get
+- **lb lb**: Allowed arguments: list, get
+- **rdb instance**: Allowed arguments: list, get
+- **registry image**: Allowed arguments: list
+- **registry namespace**: Allowed arguments: list
+- **vpc private-network**: Allowed arguments: list
+- Allowed standalone flags: --help, -h
 
 ### `sdkmanager` (https://developer.android.com/tools/sdkmanager)
 
@@ -2253,6 +2485,29 @@ Aliases: `[`
 - **which**: Flags: --current, --default, --help, -c, -d, -h. Valued: --format
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `vultr-cli` (https://github.com/vultr/vultr-cli)
+
+- **account**
+- **bare-metal get**: Flags: --help, -h
+- **bare-metal list**: Flags: --help, -h
+- **block-storage get**: Flags: --help, -h
+- **block-storage list**: Flags: --help, -h
+- **database get**: Flags: --help, -h
+- **database list**: Flags: --help, -h
+- **dns domain**: Allowed arguments: list
+- **dns record**: Allowed arguments: list
+- **firewall group**: Allowed arguments: list
+- **firewall rule**: Allowed arguments: list
+- **instance get**: Flags: --help, -h
+- **instance list**: Flags: --help, -h
+- **kubernetes get**: Flags: --help, -h
+- **kubernetes list**: Flags: --help, -h
+- **os list**: Flags: --help, -h
+- **plans list**: Flags: --help, -h
+- **regions list**: Flags: --help, -h
+- **version**
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `w` (https://man7.org/linux/man-pages/man1/w.1.html)
 
 - Allowed standalone flags: --from, --help, --ip-addr, --no-current, --no-header, --old-style, --short, --version, -V, -f, -h, -i, -o, -s, -u
@@ -2307,6 +2562,21 @@ Aliases: `[`
 
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
+
+### `wrangler` (https://developers.cloudflare.com/workers/wrangler/)
+
+- **complete**: Flags: --help, -h
+- **deployments list**: Flags: --help, -h. Valued: --name
+- **deployments status**: Flags: --help, -h. Valued: --name
+- **docs**: Flags: --help, -h
+- **secret list**: Flags: --help, -h. Valued: --env, -e
+- **tail**: Flags: --help, -h. Valued: --env, --format, --ip, --method, --sampling-rate, --search, --status, -e
+- **telemetry status**: Flags: --help, -h
+- **version**
+- **versions list**: Flags: --help, -h. Valued: --name
+- **versions view**: Flags: --help, -h. Valued: --name
+- **whoami**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `xargs` (https://www.gnu.org/software/findutils/manual/html_mono/find.html#Invoking-xargs)
 
