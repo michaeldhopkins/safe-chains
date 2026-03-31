@@ -1,0 +1,23 @@
+[[command]]
+name = "next"
+url = "https://nextjs.org/docs/api-reference/cli"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+standalone = ["--dir", "--help", "--quiet", "--strict", "-d", "-h"]
+valued = [
+    "--cache-location", "--ext", "--max-warnings",
+    "--output-file", "--resolve-plugins-relative-to",
+    "-c",
+]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+standalone = ["--debug", "--help", "--lint", "--no-lint", "--profile", "-d", "-h"]

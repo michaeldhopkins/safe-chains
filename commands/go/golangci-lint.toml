@@ -1,0 +1,34 @@
+[[command]]
+name = "golangci-lint"
+url = "https://golangci-lint.run/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "run"
+level = "SafeRead"
+standalone = [
+    "--allow-parallel-runners", "--help", "--json", "--new",
+    "--no-config", "--print-issued-lines", "--print-linter-name",
+    "--show-stats", "--verbose",
+    "-h", "-v",
+]
+valued = [
+    "--build-tags", "--color", "--concurrency", "--config",
+    "--disable", "--enable", "--exclude", "--go",
+    "--max-issues-per-linter", "--max-same-issues",
+    "--out-format", "--path-prefix", "--skip-dirs",
+    "--skip-files", "--sort-results", "--timeout",
+    "-D", "-E", "-c", "-e", "-p",
+]
+
+[[command.sub]]
+name = "linters"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--format", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true

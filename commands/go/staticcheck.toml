@@ -1,0 +1,11 @@
+[[command]]
+name = "staticcheck"
+url = "https://staticcheck.dev/"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--debug.version", "--help", "--json", "--matrix",
+    "--merge", "--show-ignored", "--tests",
+    "-f",
+]
+valued = ["-checks", "-explain", "-fail", "-go", "-tags"]

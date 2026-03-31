@@ -1,0 +1,7 @@
+[[command]]
+name = "govulncheck"
+url = "https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "--json", "--version", "-h"]
+valued = ["-C", "-db", "-mode", "-show", "-tags", "-test"]

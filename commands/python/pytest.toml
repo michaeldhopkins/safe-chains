@@ -1,0 +1,19 @@
+[[command]]
+name = "pytest"
+url = "https://docs.pytest.org/"
+level = "SafeRead"
+standalone = [
+    "--cache-clear", "--cache-show", "--co", "--collect-only",
+    "--doctest-modules", "--help", "--last-failed", "--lf",
+    "--markers", "--new-first", "--nf", "--no-header",
+    "--quiet", "--showlocals", "--stepwise", "--strict-markers",
+    "--verbose", "--version",
+    "-h", "-l", "-q", "-v", "-x",
+]
+valued = [
+    "--basetemp", "--color", "--confcutdir", "--deselect",
+    "--durations", "--ignore", "--import-mode", "--junitxml",
+    "--log-cli-level", "--maxfail", "--override-ini",
+    "--rootdir", "--timeout",
+    "-c", "-k", "-m", "-o", "-p", "-r", "-W",
+]

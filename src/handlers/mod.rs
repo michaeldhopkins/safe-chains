@@ -115,6 +115,7 @@ const HANDLED_CMDS: &[&str] = &[
     "tldr", "ldd", "objdump", "readelf", "just",
     "prettier", "black", "ruff", "mypy", "pyright", "pylint", "flake8", "isort",
     "rubocop", "eslint", "biome", "stylelint", "zoxide",
+    "pytest", "jest", "vitest", "golangci-lint", "staticcheck", "govulncheck", "semgrep", "next",
     "direnv", "make", "packer", "vagrant",
     "node", "python3", "python", "rustc", "java", "php",
     "gcc", "g++", "cc", "c++", "clang", "clang++",

@@ -266,3 +266,83 @@ name = "verify-project"
 level = "Inert"
 standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "-q", "-v"]
 valued = ["--color", "--config", "--manifest-path"]
+
+[[command.sub]]
+name = "nextest"
+[[command.sub.sub]]
+name = "run"
+level = "SafeRead"
+standalone = [
+    "--all-features", "--all-targets", "--help", "--lib",
+    "--locked", "--no-capture", "--no-default-features",
+    "--no-fail-fast", "--release", "--status-level",
+    "-h",
+]
+valued = [
+    "--bin", "--cargo-profile", "--color", "--config",
+    "--exclude", "--features", "--jobs", "--manifest-path",
+    "--package", "--partition", "--profile", "--retries",
+    "--target", "--target-dir", "--test", "--test-threads",
+    "--threads",
+    "-E", "-j", "-p",
+]
+[[command.sub.sub]]
+name = "list"
+standalone = [
+    "--all-features", "--help", "--lib", "--locked",
+    "--no-default-features", "--release",
+    "-T", "-h",
+]
+valued = [
+    "--bin", "--color", "--config", "--exclude",
+    "--features", "--manifest-path", "--message-format",
+    "--package", "--partition", "--profile",
+    "--target", "--target-dir", "--test",
+    "-E", "-p",
+]
+[[command.sub.sub]]
+name = "show-config"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "archive"
+level = "SafeWrite"
+standalone = ["--all-features", "--help", "--locked", "--no-default-features", "--release", "-h"]
+valued = ["--archive-file", "--archive-format", "--cargo-profile", "--features", "--manifest-path", "--package", "--target", "--target-dir", "-p"]
+
+[[command.sub]]
+name = "outdated"
+standalone = [
+    "--aggressive", "--color", "--depth", "--exit-code",
+    "--features", "--help", "--manifest-path", "--packages",
+    "--root-deps-only", "--verbose", "--workspace",
+    "-R", "-V", "-d", "-h", "-n", "-q", "-r", "-v", "-w",
+]
+valued = [
+    "--color", "--depth", "--exclude", "--features",
+    "--ignore", "--manifest-path", "--packages",
+    "-d", "-e", "-i", "-p",
+]
+
+[[command.sub]]
+name = "machete"
+standalone = [
+    "--help", "--skip-target-dir", "--with-metadata",
+    "-V", "-h",
+]
+
+[[command.sub]]
+name = "semver-checks"
+[[command.sub.sub]]
+name = "check-release"
+standalone = [
+    "--all-features", "--default-features", "--help",
+    "--verbose",
+    "-h", "-v",
+]
+valued = [
+    "--baseline-rev", "--baseline-root", "--baseline-version",
+    "--color", "--config-path", "--current-rustdoc",
+    "--exclude", "--features", "--manifest-path",
+    "--package", "--release-type", "--target",
+    "-j", "-p",
+]

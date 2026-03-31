@@ -1,0 +1,23 @@
+[[command]]
+name = "jest"
+url = "https://jestjs.io/docs/cli"
+level = "SafeRead"
+standalone = [
+    "--all", "--bail", "--changedFilesWithAncestor", "--ci",
+    "--clearCache", "--clearMocks", "--collectCoverage", "--colors",
+    "--coverage", "--debug", "--detectOpenHandles", "--errorOnDeprecated",
+    "--expand", "--forceExit", "--help", "--json", "--lastCommit",
+    "--listTests", "--logHeapUsage", "--noCache", "--noStackTrace",
+    "--onlyChanged", "--passWithNoTests", "--runInBand",
+    "--showConfig", "--silent", "--verbose", "--version",
+    "-b", "-e", "-h", "-i", "-o", "-u", "-w",
+]
+valued = [
+    "--changedSince", "--collectCoverageFrom", "--config",
+    "--coverageDirectory", "--coverageProvider", "--filter",
+    "--maxConcurrency", "--maxWorkers", "--outputFile",
+    "--projects", "--reporters", "--roots", "--shard",
+    "--testMatch", "--testNamePattern", "--testPathPattern",
+    "--testRunner", "--testTimeout",
+    "-c", "-t",
+]

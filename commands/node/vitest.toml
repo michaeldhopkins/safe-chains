@@ -1,0 +1,17 @@
+[[command]]
+name = "vitest"
+url = "https://vitest.dev/guide/cli.html"
+level = "SafeRead"
+standalone = [
+    "--bail", "--changed", "--coverage", "--dom", "--globals",
+    "--help", "--hideSkippedTests", "--no-color", "--no-isolate",
+    "--passWithNoTests", "--reporter", "--run", "--silent",
+    "--ui", "--update", "--version", "--watch",
+    "-h", "-v",
+]
+valued = [
+    "--color", "--config", "--dir", "--environment", "--exclude",
+    "--include", "--maxConcurrency", "--mode", "--project",
+    "--root", "--testTimeout",
+    "-c", "-r", "-t",
+]

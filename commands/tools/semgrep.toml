@@ -1,0 +1,31 @@
+[[command]]
+name = "semgrep"
+url = "https://semgrep.dev/docs/cli-reference/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "scan"
+level = "SafeRead"
+standalone = [
+    "--debug", "--dryrun", "--emacs", "--error", "--help",
+    "--json", "--junit-xml", "--no-autofix", "--no-git-ignore",
+    "--no-rewrite-rule-ids", "--quiet", "--sarif",
+    "--strict", "--text", "--time", "--verbose", "--vim",
+    "-e", "-h", "-q", "-v",
+]
+valued = [
+    "--config", "--exclude", "--include", "--lang",
+    "--max-target-bytes", "--metrics", "--output",
+    "--pattern", "--timeout",
+    "-c", "-f", "-l", "-o",
+]
+
+[[command.sub]]
+name = "ci"
+level = "SafeRead"
+standalone = [
+    "--debug", "--dryrun", "--help", "--json",
+    "--quiet", "--sarif", "--text", "--verbose",
+    "-h", "-q",
+]
+valued = ["--config", "--exclude", "--include", "--metrics", "--output", "-c", "-o"]

@@ -363,13 +363,20 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **install**: Flags: --help, -h
 - **license**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --manifest-path
 - **locate-project**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --manifest-path
+- **machete**: Flags: --help, --skip-target-dir, --with-metadata, -V, -h
 - **metadata**: Flags: --all-features, --frozen, --help, --locked, --no-default-features, --no-deps, --offline, -h, -q, -v. Valued: --color, --config, --features, --filter-platform, --format-version, --manifest-path
+- **nextest archive**: Flags: --all-features, --help, --locked, --no-default-features, --release, -h. Valued: --archive-file, --archive-format, --cargo-profile, --features, --manifest-path, --package, --target, --target-dir, -p
+- **nextest list**: Flags: --all-features, --help, --lib, --locked, --no-default-features, --release, -T, -h. Valued: --bin, --color, --config, --exclude, --features, --manifest-path, --message-format, --package, --partition, --profile, --target, --target-dir, --test, -E, -p
+- **nextest run**: Flags: --all-features, --all-targets, --help, --lib, --locked, --no-capture, --no-default-features, --no-fail-fast, --release, --status-level, -h. Valued: --bin, --cargo-profile, --color, --config, --exclude, --features, --jobs, --manifest-path, --package, --partition, --profile, --retries, --target, --target-dir, --test, --test-threads, --threads, -E, -j, -p
+- **nextest show-config**: Flags: --help, -h
+- **outdated**: Flags: --aggressive, --color, --depth, --exit-code, --features, --help, --manifest-path, --packages, --root-deps-only, --verbose, --workspace, -R, -V, -d, -h, -n, -q, -r, -v, -w. Valued: --color, --depth, --exclude, --features, --ignore, --manifest-path, --packages, -d, -e, -i, -p
 - **package** (requires --list): Flags: --all-features, --frozen, --help, --keep-going, --list, --locked, --no-default-features, --no-metadata, --offline, --workspace, -h, -l, -q, -v. Valued: --color, --config, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --target, --target-dir, -F, -Z, -j, -p
 - **pkgid**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --manifest-path
 - **publish** (requires --dry-run): Flags: --all-features, --dry-run, --frozen, --help, --keep-going, --locked, --no-default-features, --offline, --workspace, -h, -n, -q, -v. Valued: --color, --config, --exclude, --features, --index, --jobs, --manifest-path, --package, --registry, --target, --target-dir, -F, -Z, -j, -p
 - **read-manifest**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --manifest-path
 - **run**: Flags: --help, -h
 - **search**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --index, --limit, --registry
+- **semver-checks check-release**: Flags: --all-features, --default-features, --help, --verbose, -h, -v. Valued: --baseline-rev, --baseline-root, --baseline-version, --color, --config-path, --current-rustdoc, --exclude, --features, --manifest-path, --package, --release-type, --target, -j, -p
 - **test**: Flags: --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, -h, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **tree**: Flags: --all-features, --duplicates, --frozen, --help, --ignore-rust-version, --locked, --no-dedupe, --no-default-features, --offline, -d, -e, -h, -i, -q, -v. Valued: --charset, --color, --config, --depth, --edges, --features, --format, --invert, --manifest-path, --package, --prefix, --prune, --target, -p
 - **verify-project**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --manifest-path
@@ -1124,6 +1131,19 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed valued flags: --arg, --argjson, --args, --from-file, --indent, --jsonargs, --rawfile, --slurpfile, -f
 - Bare invocation allowed
 
+### `golangci-lint` (https://golangci-lint.run/)
+
+- **help**
+- **linters**: Flags: --help, -h
+- **run**: Flags: --allow-parallel-runners, --help, --json, --new, --no-config, --print-issued-lines, --print-linter-name, --show-stats, --verbose, -h, -v. Valued: --build-tags, --color, --concurrency, --config, --disable, --enable, --exclude, --go, --max-issues-per-linter, --max-same-issues, --out-format, --path-prefix, --skip-dirs, --skip-files, --sort-results, --timeout, -D, -E, -c, -e, -p
+- **version**: Flags: --help, --format, -h
+- Allowed standalone flags: --help, --version, -h
+
+### `govulncheck` (https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck)
+
+- Allowed standalone flags: --help, --json, --version, -h
+- Allowed valued flags: -C, -db, -mode, -show, -tags, -test
+
 ### `gradle` (https://docs.gradle.org/current/userguide/command_line_interface.html)
 
 Aliases: `gradlew`
@@ -1362,6 +1382,12 @@ Aliases: `egrep`, `fgrep`
 
 - Allowed standalone flags: --about, --bash-comp, --force-color, --help, --meta-out, --monochrome, --pretty, --quiet, --raw, --unbuffer, --version, --yaml-out, --zsh-comp, -C, -M, -a, -h, -m, -p, -q, -r, -u, -y
 - Hyphen-prefixed positional arguments accepted
+
+### `jest` (https://jestjs.io/docs/cli)
+
+- Allowed standalone flags: --all, --bail, --changedFilesWithAncestor, --ci, --clearCache, --clearMocks, --collectCoverage, --colors, --coverage, --debug, --detectOpenHandles, --errorOnDeprecated, --expand, --forceExit, --help, --json, --lastCommit, --listTests, --logHeapUsage, --noCache, --noStackTrace, --onlyChanged, --passWithNoTests, --runInBand, --showConfig, --silent, --verbose, --version, -b, -e, -h, -i, -o, -u, -w
+- Allowed valued flags: --changedSince, --collectCoverageFrom, --config, --coverageDirectory, --coverageProvider, --filter, --maxConcurrency, --maxWorkers, --outputFile, --projects, --reporters, --roots, --shard, --testMatch, --testNamePattern, --testPathPattern, --testRunner, --testTimeout, -c, -t
+- Bare invocation allowed
 
 ### `jj` (https://jj-vcs.github.io/jj/latest/cli-reference/)
 
@@ -1765,6 +1791,13 @@ Aliases: `mlocate`, `plocate`
 - **workload list**: Flags: --help, -h. Valued: --accountId, -a
 - Allowed standalone flags: --help, --version, -h
 
+### `next` (https://nextjs.org/docs/api-reference/cli)
+
+- **build**: Flags: --debug, --help, --lint, --no-lint, --profile, -d, -h
+- **info**: Flags: --help, -h
+- **lint**: Flags: --dir, --help, --quiet, --strict, -d, -h. Valued: --cache-location, --ext, --max-warnings, --output-file, --resolve-plugins-relative-to, -c
+- Allowed standalone flags: --help, --version, -h
+
 ### `nice` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation)
 
 Aliases: `ionice`
@@ -2154,6 +2187,12 @@ Aliases: `pip3`
 - Allowed valued flags: --exclude, --ignore, --level, --project, --pythonpath, --pythonplatform, --pythonversion, --threads, --typeshedpath, --verifytypes, -p
 - Bare invocation allowed
 
+### `pytest` (https://docs.pytest.org/)
+
+- Allowed standalone flags: --cache-clear, --cache-show, --co, --collect-only, --doctest-modules, --help, --last-failed, --lf, --markers, --new-first, --nf, --no-header, --quiet, --showlocals, --stepwise, --strict-markers, --verbose, --version, -h, -l, -q, -v, -x
+- Allowed valued flags: --basetemp, --color, --confcutdir, --deselect, --durations, --ignore, --import-mode, --junitxml, --log-cli-level, --maxfail, --override-ini, --rootdir, --timeout, -c, -k, -m, -o, -p, -r, -W
+- Bare invocation allowed
+
 ### `python3` (https://docs.python.org/3/using/cmdline.html)
 
 Aliases: `python`
@@ -2339,6 +2378,12 @@ Aliases: `python`
 - Allowed valued flags: --search, -s
 - Bare invocation allowed
 
+### `semgrep` (https://semgrep.dev/docs/cli-reference/)
+
+- **ci**: Flags: --debug, --dryrun, --help, --json, --quiet, --sarif, --text, --verbose, -h, -q. Valued: --config, --exclude, --include, --metrics, --output, -c, -o
+- **scan**: Flags: --debug, --dryrun, --emacs, --error, --help, --json, --junit-xml, --no-autofix, --no-git-ignore, --no-rewrite-rule-ids, --quiet, --sarif, --strict, --text, --time, --verbose, --vim, -e, -h, -q, -v. Valued: --config, --exclude, --include, --lang, --max-target-bytes, --metrics, --output, --pattern, --timeout, -c, -f, -l, -o
+- Allowed standalone flags: --help, --version, -h
+
 ### `seq` (https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation)
 
 - Allowed standalone flags: --equal-width, --help, --version, -V, -h, -w
@@ -2426,6 +2471,11 @@ Aliases: `python`
 
 - Allowed standalone flags: --dereference, --file-system, --help, --terse, --version, -F, -L, -V, -h, -l, -n, -q, -r, -s, -x
 - Allowed valued flags: --format, --printf, -c, -f, -t
+
+### `staticcheck` (https://staticcheck.dev/)
+
+- Allowed standalone flags: --debug.version, --help, --json, --matrix, --merge, --show-ignored, --tests, -f
+- Allowed valued flags: -checks, -explain, -fail, -go, -tags
 
 ### `strings` (https://man7.org/linux/man-pages/man1/strings.1.html)
 
@@ -2775,6 +2825,12 @@ Aliases: `traceroute6`
 ### `vibe` (https://docs.mistral.ai/mistral-vibe/)
 
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `vitest` (https://vitest.dev/guide/cli.html)
+
+- Allowed standalone flags: --bail, --changed, --coverage, --dom, --globals, --help, --hideSkippedTests, --no-color, --no-isolate, --passWithNoTests, --reporter, --run, --silent, --ui, --update, --version, --watch, -h, -v
+- Allowed valued flags: --color, --config, --dir, --environment, --exclude, --include, --maxConcurrency, --mode, --project, --root, --testTimeout, -c, -r, -t
+- Bare invocation allowed
 
 ### `vm_stat` (https://ss64.com/mac/vm_stat.html)
 
