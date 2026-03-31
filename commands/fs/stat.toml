@@ -1,0 +1,10 @@
+[[command]]
+name = "stat"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation"
+level = "Inert"
+bare = false
+standalone = [
+    "--dereference", "--file-system", "--help", "--terse", "--version",
+    "-F", "-L", "-V", "-h", "-l", "-n", "-q", "-r", "-s", "-x",
+]
+valued = ["--format", "--printf", "-c", "-f", "-t"]

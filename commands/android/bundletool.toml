@@ -1,0 +1,42 @@
+[[command]]
+name = "bundletool"
+url = "https://developer.android.com/tools/bundletool"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "dump"
+[[command.sub.sub]]
+name = "config"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--bundle", "--module", "--xpath"]
+[[command.sub.sub]]
+name = "manifest"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--bundle", "--module", "--xpath"]
+[[command.sub.sub]]
+name = "resources"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--bundle", "--module", "--xpath"]
+
+[[command.sub]]
+name = "get-size"
+[[command.sub.sub]]
+name = "total"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--apks", "--device-spec", "--dimensions", "--modules"]
+
+[[command.sub]]
+name = "validate"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--bundle"]
+
+[[command.sub]]
+name = "version"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]

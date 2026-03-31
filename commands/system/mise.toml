@@ -1,0 +1,415 @@
+[[command]]
+name = "mise"
+url = "https://mise.jdx.dev/cli/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = [
+    "--current", "--help", "--installed", "--json", "--missing",
+    "--no-header", "--prefix",
+    "-J", "-c", "-h", "-i", "-m",
+]
+
+[[command.sub]]
+name = "ls"
+standalone = [
+    "--current", "--help", "--installed", "--json", "--missing",
+    "--no-header", "--prefix",
+    "-J", "-c", "-h", "-i", "-m",
+]
+
+[[command.sub]]
+name = "current"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "which"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "where"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "doctor"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "reshim"
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "env"
+standalone = ["--help", "--json", "-J", "-h"]
+valued = ["--shell", "-s"]
+
+[[command.sub]]
+name = "outdated"
+standalone = ["--help", "--json", "--no-header", "-J", "-h"]
+
+[[command.sub]]
+name = "search"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "registry"
+standalone = ["--help", "-h"]
+valued = ["--backend", "-b"]
+
+[[command.sub]]
+name = "latest"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "ls-remote"
+bare = false
+standalone = ["--all", "--help", "-h"]
+
+[[command.sub]]
+name = "bin-paths"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "tool"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "completion"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "trust"
+bare = false
+max_positional = 0
+standalone = ["--help", "--show", "-h"]
+
+[[command.sub]]
+name = "fmt"
+bare = false
+max_positional = 0
+standalone = ["--check", "--help", "-h"]
+
+[[command.sub]]
+name = "set"
+max_positional = 0
+standalone = ["--help", "--json", "-J", "-h"]
+
+[[command.sub]]
+name = "config"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "generate"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "set"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "settings"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "add"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "set"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "unset"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugins"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "ls-remote"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "install"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "link"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "uninstall"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "update"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "backends"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "tasks"
+nested_bare = true
+[[command.sub.sub]]
+name = "deps"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "add"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "edit"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "run"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "cache"
+nested_bare = true
+[[command.sub.sub]]
+name = "path"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "clear"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "prune"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "tool-alias"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "set"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "unset"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "shell-alias"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h", "-q", "-v"]
+[[command.sub.sub]]
+name = "set"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "unset"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "exec"
+delegate_after = "--"
+
+[[command.sub]]
+name = "activate"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "deactivate"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "edit"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "en"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "generate"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "implode"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "install"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "link"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "lock"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "prepare"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "prune"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "run"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "self-update"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "shell"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "sync"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "uninstall"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "unset"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "unuse"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "upgrade"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "use"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "watch"
+bare = false
+max_positional = 0
+standalone = ["--help", "-h"]

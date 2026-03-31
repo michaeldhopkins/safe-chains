@@ -1,0 +1,52 @@
+[[command]]
+name = "dcli"
+url = "https://cli.dashlane.com/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "accounts"
+[[command.sub.sub]]
+name = "whoami"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "devices"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "lock"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "sync"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "team"
+[[command.sub.sub]]
+name = "credentials"
+[[command.sub.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+[[command.sub.sub]]
+name = "dark-web-insights"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--count", "--offset", "--order-by"]
+[[command.sub.sub]]
+name = "logs"
+standalone = ["--csv", "--help", "--human-readable", "-h"]
+valued = ["--end", "--start"]
+[[command.sub.sub]]
+name = "members"
+standalone = ["--csv", "--help", "--human-readable", "-h"]
+[[command.sub.sub]]
+name = "public-api"
+[[command.sub.sub.sub]]
+name = "list-keys"
+standalone = ["--help", "--json", "-h"]
+[[command.sub.sub]]
+name = "report"
+standalone = ["--help", "-h"]

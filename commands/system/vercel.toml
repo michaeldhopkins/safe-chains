@@ -1,0 +1,26 @@
+[[command]]
+name = "vercel"
+url = "https://vercel.com/docs/cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "inspect"
+bare = false
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--scope", "--timeout", "-S", "-T"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--meta", "--next", "--scope", "-S", "-m"]
+
+[[command.sub]]
+name = "project"
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--scope", "-S"]
+
+[[command.sub]]
+name = "whoami"
+standalone = ["--help", "-h"]

@@ -1,0 +1,53 @@
+[[command]]
+name = "aapt2"
+url = "https://developer.android.com/tools/aapt2"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "dump"
+[[command.sub.sub]]
+name = "badging"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "configurations"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "permissions"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "resources"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "strings"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "styleparents"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "xmlstrings"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+[[command.sub.sub]]
+name = "xmltree"
+bare = false
+standalone = ["--help", "--no-values", "-h", "-v"]
+valued = ["--config", "--file"]
+
+[[command.sub]]
+name = "version"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]

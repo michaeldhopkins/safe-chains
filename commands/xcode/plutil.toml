@@ -1,0 +1,19 @@
+[[command]]
+name = "plutil"
+url = "https://ss64.com/mac/plutil.html"
+bare_flags = ["--help", "--version", "-V", "-h", "-help"]
+
+[[command.sub]]
+name = "-lint"
+bare = false
+standalone = ["--help", "-h", "-s"]
+
+[[command.sub]]
+name = "-p"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "-type"
+bare = false
+standalone = ["--help", "-h"]

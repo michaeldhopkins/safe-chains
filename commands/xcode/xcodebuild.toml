@@ -1,0 +1,37 @@
+[[command]]
+name = "xcodebuild"
+url = "https://developer.apple.com/documentation/xcode/xcodebuild"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "-list"
+standalone = ["--help", "-h", "-json"]
+valued = ["-project", "-workspace"]
+
+[[command.sub]]
+name = "-showBuildSettings"
+standalone = ["--help", "-h", "-json"]
+valued = [
+    "-configuration", "-destination", "-project",
+    "-scheme", "-sdk", "-target", "-workspace",
+]
+
+[[command.sub]]
+name = "-showdestinations"
+standalone = ["--help", "-h", "-json"]
+valued = [
+    "-configuration", "-destination", "-project",
+    "-scheme", "-sdk", "-target", "-workspace",
+]
+
+[[command.sub]]
+name = "-showsdks"
+standalone = ["--help", "-h", "-json"]
+valued = [
+    "-configuration", "-destination", "-project",
+    "-scheme", "-sdk", "-target", "-workspace",
+]
+
+[[command.sub]]
+name = "-version"
+standalone = ["--help", "-h"]

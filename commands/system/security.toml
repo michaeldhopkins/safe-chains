@@ -1,0 +1,57 @@
+[[command]]
+name = "security"
+url = "https://ss64.com/mac/security.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "find-certificate"
+bare = false
+standalone = ["--help", "-Z", "-a", "-h", "-p"]
+valued = ["-c", "-e"]
+
+[[command.sub]]
+name = "find-identity"
+standalone = ["--help", "-h", "-v"]
+valued = ["-p", "-s"]
+
+[[command.sub]]
+name = "find-generic-password"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["-D", "-a", "-c", "-d", "-j", "-l", "-r", "-s", "-t"]
+
+[[command.sub]]
+name = "find-internet-password"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["-D", "-a", "-c", "-d", "-j", "-l", "-r", "-s", "-t"]
+
+[[command.sub]]
+name = "list-keychains"
+standalone = ["--help", "-d", "-h"]
+
+[[command.sub]]
+name = "dump-keychain"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dump-trust-settings"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "verify-cert"
+bare = false
+standalone = ["--help", "-L", "-h", "-l", "-q"]
+valued = ["-c", "-k", "-n", "-p", "-r"]
+
+[[command.sub]]
+name = "cms"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "show-keychain-info"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "smartcard"
+standalone = ["--help", "-h"]

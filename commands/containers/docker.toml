@@ -1,0 +1,246 @@
+[[command]]
+name = "docker"
+url = "https://docs.docker.com/reference/cli/docker/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "buildx"
+[[command.sub.sub]]
+name = "--version"
+bare = true
+max_positional = 0
+[[command.sub.sub]]
+name = "inspect"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "compose"
+[[command.sub.sub]]
+name = "--version"
+bare = true
+max_positional = 0
+[[command.sub.sub]]
+name = "config"
+standalone = [
+    "--dry-run", "--hash", "--help", "--images", "--no-consistency",
+    "--no-interpolate", "--no-normalize", "--no-path-resolution",
+    "--profiles", "--quiet", "--resolve-image-digests",
+    "--services", "--volumes",
+    "-h", "-q",
+]
+valued = ["--format", "--output", "-o"]
+[[command.sub.sub]]
+name = "images"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ps"
+standalone = [
+    "--all", "--help", "--no-trunc", "--orphans", "--quiet",
+    "--services",
+    "-a", "-h", "-q",
+]
+valued = ["--filter", "--format", "--status"]
+[[command.sub.sub]]
+name = "top"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "container"
+[[command.sub.sub]]
+name = "diff"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "inspect"
+standalone = ["--help", "--size", "-h", "-s"]
+valued = ["--format", "--type", "-f"]
+[[command.sub.sub]]
+name = "list"
+standalone = [
+    "--all", "--help", "--last", "--latest", "--no-trunc",
+    "--quiet", "--size",
+    "-a", "-h", "-l", "-n", "-q", "-s",
+]
+valued = ["--filter", "--format", "-f"]
+[[command.sub.sub]]
+name = "logs"
+bare = false
+standalone = [
+    "--details", "--follow", "--help", "--timestamps",
+    "-f", "-h", "-t",
+]
+valued = ["--since", "--tail", "--until", "-n"]
+[[command.sub.sub]]
+name = "ls"
+standalone = [
+    "--all", "--help", "--last", "--latest", "--no-trunc",
+    "--quiet", "--size",
+    "-a", "-h", "-l", "-n", "-q", "-s",
+]
+valued = ["--filter", "--format", "-f"]
+[[command.sub.sub]]
+name = "port"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "stats"
+standalone = ["--all", "--help", "--no-stream", "--no-trunc", "-a", "-h"]
+valued = ["--format"]
+[[command.sub.sub]]
+name = "top"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "context"
+[[command.sub.sub]]
+name = "inspect"
+standalone = ["--help", "--no-trunc", "--quiet", "-h", "-q"]
+valued = ["--filter", "--format", "-f"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "--no-trunc", "--quiet", "-h", "-q"]
+valued = ["--filter", "--format", "-f"]
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "--no-trunc", "--quiet", "-h", "-q"]
+valued = ["--filter", "--format", "-f"]
+
+[[command.sub]]
+name = "diff"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "history"
+standalone = ["--help", "--human", "--no-trunc", "--quiet", "-H", "-h", "-q"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "image"
+[[command.sub.sub]]
+name = "history"
+standalone = ["--help", "--human", "--no-trunc", "--quiet", "-H", "-h", "-q"]
+valued = ["--format"]
+[[command.sub.sub]]
+name = "inspect"
+standalone = ["--help", "--size", "-h", "-s"]
+valued = ["--format", "--type", "-f"]
+[[command.sub.sub]]
+name = "list"
+standalone = [
+    "--all", "--digests", "--help", "--no-trunc", "--quiet",
+    "-a", "-h", "-q",
+]
+valued = ["--filter", "--format", "-f"]
+[[command.sub.sub]]
+name = "ls"
+standalone = [
+    "--all", "--digests", "--help", "--no-trunc", "--quiet",
+    "-a", "-h", "-q",
+]
+valued = ["--filter", "--format", "-f"]
+
+[[command.sub]]
+name = "images"
+standalone = [
+    "--all", "--digests", "--help", "--no-trunc", "--quiet",
+    "-a", "-h", "-q",
+]
+valued = ["--filter", "--format", "-f"]
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+valued = ["--format", "-f"]
+
+[[command.sub]]
+name = "inspect"
+bare = false
+standalone = ["--help", "--size", "-h", "-s"]
+valued = ["--format", "--type", "-f"]
+
+[[command.sub]]
+name = "logs"
+bare = false
+standalone = [
+    "--details", "--follow", "--help", "--timestamps",
+    "-f", "-h", "-t",
+]
+valued = ["--since", "--tail", "--until", "-n"]
+
+[[command.sub]]
+name = "manifest"
+[[command.sub.sub]]
+name = "inspect"
+bare = false
+standalone = ["--help", "--size", "-h", "-s"]
+valued = ["--format", "--type", "-f"]
+
+[[command.sub]]
+name = "network"
+[[command.sub.sub]]
+name = "inspect"
+standalone = ["--help", "--no-trunc", "--quiet", "-h", "-q"]
+valued = ["--filter", "--format", "-f"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "--no-trunc", "--quiet", "-h", "-q"]
+valued = ["--filter", "--format", "-f"]
+
+[[command.sub]]
+name = "port"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ps"
+standalone = [
+    "--all", "--help", "--last", "--latest", "--no-trunc",
+    "--quiet", "--size",
+    "-a", "-h", "-l", "-n", "-q", "-s",
+]
+valued = ["--filter", "--format", "-f"]
+
+[[command.sub]]
+name = "stats"
+standalone = ["--all", "--help", "--no-stream", "--no-trunc", "-a", "-h"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "system"
+[[command.sub.sub]]
+name = "df"
+standalone = ["--help", "-h"]
+valued = ["--format", "-f"]
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+valued = ["--format", "-f"]
+
+[[command.sub]]
+name = "top"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+valued = ["--format", "-f"]
+
+[[command.sub]]
+name = "volume"
+[[command.sub.sub]]
+name = "inspect"
+standalone = ["--help", "--no-trunc", "--quiet", "-h", "-q"]
+valued = ["--filter", "--format", "-f"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "--no-trunc", "--quiet", "-h", "-q"]
+valued = ["--filter", "--format", "-f"]

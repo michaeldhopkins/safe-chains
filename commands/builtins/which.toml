@@ -1,0 +1,6 @@
+[[command]]
+name = "which"
+url = "https://man7.org/linux/man-pages/man1/which.1.html"
+level = "Inert"
+bare = false
+standalone = ["--all", "--help", "--version", "-V", "-a", "-h", "-s"]

@@ -1,0 +1,6 @@
+[[command]]
+name = "factor"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#factor-invocation"
+level = "Inert"
+bare = true
+standalone = ["--exponents", "--help", "--version", "-V", "-h"]

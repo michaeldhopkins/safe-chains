@@ -1,0 +1,24 @@
+[[command]]
+name = "pkgutil"
+url = "https://ss64.com/mac/pkgutil.html"
+level = "Inert"
+bare = false
+require_any = [
+    "--check-signature", "--export-plist",
+    "--file-info", "--file-info-plist",
+    "--files", "--group-pkgs", "--groups", "--groups-plist",
+    "--packages", "--payload-files",
+    "--pkg-groups", "--pkg-info", "--pkg-info-plist",
+    "--pkgs", "--pkgs-plist",
+]
+standalone = [
+    "--check-signature", "--export-plist",
+    "--file-info", "--file-info-plist",
+    "--files", "--group-pkgs", "--groups", "--groups-plist",
+    "--packages", "--payload-files",
+    "--pkg-groups", "--pkg-info", "--pkg-info-plist",
+    "--pkgs", "--pkgs-plist",
+    "--regexp",
+    "--help", "-h",
+]
+valued = ["--volume"]

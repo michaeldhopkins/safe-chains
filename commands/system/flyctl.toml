@@ -1,0 +1,64 @@
+[[command]]
+name = "flyctl"
+aliases = ["fly"]
+url = "https://fly.io/docs/flyctl/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "apps"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "ips"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--help", "-h"]
+valued = ["--app", "--instance", "--region", "-a", "-i", "-r"]
+
+[[command.sub]]
+name = "platform"
+[[command.sub.sub]]
+name = "regions"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "regions"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "releases"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "services"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

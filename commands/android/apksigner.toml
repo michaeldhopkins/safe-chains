@@ -1,0 +1,22 @@
+[[command]]
+name = "apksigner"
+url = "https://developer.android.com/tools/apksigner"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "help"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "verify"
+bare = false
+standalone = ["--help", "--print-certs", "--verbose", "-h", "-v"]
+valued = ["--in", "--max-sdk-version", "--min-sdk-version"]
+
+[[command.sub]]
+name = "version"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]

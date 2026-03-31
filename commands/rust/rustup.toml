@@ -1,0 +1,58 @@
+[[command]]
+name = "rustup"
+url = "https://rust-lang.github.io/rustup/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "component"
+
+[[command.sub.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--help", "--installed", "-h", "-v"]
+valued = ["--toolchain"]
+
+[[command.sub]]
+name = "doc"
+level = "Inert"
+standalone = [
+    "--alloc", "--book", "--cargo", "--core", "--edition-guide",
+    "--embedded-book", "--help", "--nomicon", "--path", "--proc_macro",
+    "--reference", "--rust-by-example", "--rustc", "--rustdoc",
+    "--std", "--test", "--unstable-book", "-h",
+]
+valued = ["--toolchain"]
+
+[[command.sub]]
+name = "run"
+delegate_skip = 2
+
+[[command.sub]]
+name = "show"
+level = "Inert"
+standalone = ["--help", "--installed", "-h", "-v"]
+
+[[command.sub]]
+name = "target"
+
+[[command.sub.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--help", "--installed", "-h", "-v"]
+valued = ["--toolchain"]
+
+[[command.sub]]
+name = "toolchain"
+
+[[command.sub.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--help", "--installed", "-h", "-v"]
+valued = ["--toolchain"]
+
+[[command.sub]]
+name = "which"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--toolchain"]

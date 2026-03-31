@@ -1,0 +1,20 @@
+[[command]]
+name = "stylelint"
+url = "https://stylelint.io/user-guide/cli/"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--allow-empty-input", "--cache", "--color",
+    "--disable-default-ignores", "--help", "--no-color",
+    "--quiet", "--version",
+    "-h", "-q",
+]
+valued = [
+    "--config", "--config-basedir", "--custom-formatter",
+    "--custom-syntax", "--formatter", "--ignore-path",
+    "--ignore-pattern", "--max-warnings", "--output-file",
+    "--report-descriptionless-disables",
+    "--report-invalid-scope-disables",
+    "--report-needless-disables",
+    "-f", "-o",
+]

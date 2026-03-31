@@ -1,0 +1,17 @@
+[[command]]
+name = "flake8"
+url = "https://flake8.pycqa.org/en/latest/user/invocation.html"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--benchmark", "--count", "--help", "--quiet",
+    "--show-pep8", "--show-source", "--statistics",
+    "--verbose", "--version",
+    "-V", "-h", "-q", "-v",
+]
+valued = [
+    "--config", "--exclude", "--extend-exclude",
+    "--extend-ignore", "--filename", "--format",
+    "--ignore", "--max-complexity", "--max-line-length",
+    "--output-file", "--per-file-ignores", "--select",
+]

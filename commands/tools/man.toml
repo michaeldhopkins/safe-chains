@@ -1,0 +1,15 @@
+[[command]]
+name = "man"
+url = "https://man7.org/linux/man-pages/man1/man.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--all", "--apropos", "--default", "--help", "--local-file",
+    "--regex", "--update", "--version", "--whatis", "--where", "--where-cat", "--wildcard",
+    "-V", "-a", "-f", "-h", "-k", "-l", "-u", "-w",
+]
+valued = [
+    "--config-file", "--encoding", "--extension", "--locale",
+    "--manpath", "--sections", "--systems",
+    "-C", "-E", "-L", "-M", "-S", "-e", "-m",
+]

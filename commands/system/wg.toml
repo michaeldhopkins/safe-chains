@@ -1,0 +1,35 @@
+[[command]]
+name = "wg"
+url = "https://www.wireguard.com/quickstart/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "genkey"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "genpsk"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "pubkey"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "show"
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "showconf"
+bare = false
+standalone = ["--help", "-h"]
+max_positional = 1

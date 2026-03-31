@@ -1,0 +1,104 @@
+[[command]]
+name = "linode-cli"
+url = "https://www.linode.com/docs/products/tools/cli/get-started/"
+bare_flags = ["--help", "--version"]
+[command.wrapper]
+standalone = ["--json", "--markdown", "--no-headers", "--pretty", "--suppress-warnings", "--text"]
+valued = ["--delimiter"]
+
+[[command.sub]]
+name = "linodes"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "regions"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "images"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "volumes"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "domains"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "nodebalancers"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "firewalls"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "lke"
+[[command.sub.sub]]
+name = "clusters-list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "cluster-view"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "account"
+[[command.sub.sub]]
+name = "view"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "events-list"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "profile"
+[[command.sub.sub]]
+name = "view"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "databases"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]

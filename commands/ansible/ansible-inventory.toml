@@ -1,0 +1,20 @@
+[[command]]
+name = "ansible-inventory"
+url = "https://docs.ansible.com/ansible/latest/cli/ansible-inventory.html"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "--list"
+standalone = ["--help", "--yaml", "--toml", "--export", "-h", "-y"]
+valued = ["--inventory", "--limit", "-i", "-l"]
+
+[[command.sub]]
+name = "--graph"
+standalone = ["--help", "--vars", "-h"]
+valued = ["--inventory", "--limit", "-i", "-l"]
+
+[[command.sub]]
+name = "--host"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--inventory", "-i"]

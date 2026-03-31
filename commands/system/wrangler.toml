@@ -1,0 +1,60 @@
+[[command]]
+name = "wrangler"
+url = "https://developers.cloudflare.com/workers/wrangler/"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "whoami"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "docs"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "secret"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--env", "-e"]
+
+[[command.sub]]
+name = "tail"
+standalone = ["--help", "-h"]
+valued = ["--env", "--format", "--ip", "--method", "--sampling-rate", "--search", "--status", "-e"]
+
+[[command.sub]]
+name = "deployments"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--name"]
+[[command.sub.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+valued = ["--name"]
+
+[[command.sub]]
+name = "versions"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--name"]
+[[command.sub.sub]]
+name = "view"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--name"]
+
+[[command.sub]]
+name = "telemetry"
+[[command.sub.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "complete"
+standalone = ["--help", "-h"]

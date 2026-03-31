@@ -1,0 +1,8 @@
+[[command]]
+name = "read"
+url = "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["-r", "-s"]
+valued = ["-a", "-d", "-n", "-p", "-t", "-u"]

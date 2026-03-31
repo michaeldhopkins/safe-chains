@@ -1,0 +1,21 @@
+[[command]]
+name = "cucumber"
+url = "https://cucumber.io/docs/cucumber/api/#running-cucumber"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--backtrace", "--color", "--dry-run", "--expand",
+    "--guess", "--help", "--i18n-keywords", "--i18n-languages",
+    "--init", "--no-color", "--no-diff", "--no-multiline",
+    "--no-snippets", "--no-source", "--no-strict",
+    "--publish", "--publish-quiet", "--quiet",
+    "--retry", "--snippets", "--strict", "--verbose", "--version", "--wip",
+    "-V", "-b", "-d", "-e", "-h", "-q",
+]
+valued = [
+    "--ci-environment", "--format", "--format-options",
+    "--language", "--lines", "--name", "--order",
+    "--out", "--profile", "--require",
+    "--require-module", "--retry", "--tags",
+    "-f", "-i", "-l", "-n", "-o", "-p", "-r", "-t",
+]

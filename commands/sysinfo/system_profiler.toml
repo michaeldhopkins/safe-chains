@@ -1,0 +1,10 @@
+[[command]]
+name = "system_profiler"
+url = "https://ss64.com/mac/system_profiler.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--json", "--version", "--xml",
+    "-V", "-h", "-json", "-listDataTypes", "-nospinner", "-xml",
+]
+valued = ["-detailLevel", "-timeout"]

@@ -1,0 +1,14 @@
+[[command]]
+name = "ping"
+url = "https://man7.org/linux/man-pages/man8/ping.8.html"
+level = "Inert"
+bare = false
+require_any = ["-c", "--count"]
+standalone = [
+    "-4", "-6", "-D", "-O", "-R", "-a", "-d", "-n", "-q", "-v",
+    "--help", "-h", "--version", "-V",
+]
+valued = [
+    "--count", "--deadline", "--interface", "--interval", "--ttl",
+    "-I", "-Q", "-S", "-W", "-c", "-i", "-l", "-s", "-t", "-w",
+]

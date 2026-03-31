@@ -1,0 +1,56 @@
+[[command]]
+name = "overmind"
+url = "https://github.com/DarthSim/overmind"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "connect"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "echo"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "kill"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "quit"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "restart"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "start"
+level = "SafeWrite"
+standalone = [
+    "--daemonize", "--help", "--no-port",
+    "-D", "-N", "-h",
+]
+valued = [
+    "--colors", "--formation", "--port", "--port-step",
+    "--procfile", "--root", "--socket", "--title",
+    "-T", "-c", "-f", "-l", "-p", "-r", "-s",
+]
+max_positional = 0
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "stop"
+level = "SafeWrite"
+standalone = ["--help", "-h"]

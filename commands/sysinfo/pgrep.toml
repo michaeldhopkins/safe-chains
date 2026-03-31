@@ -1,0 +1,16 @@
+[[command]]
+name = "pgrep"
+url = "https://man7.org/linux/man-pages/man1/pgrep.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--count", "--delimiter", "--full", "--help", "--inverse",
+    "--lightweight", "--list-full", "--list-name",
+    "--newest", "--oldest", "--version",
+    "-L", "-V", "-a", "-c", "-f", "-h", "-i", "-l", "-n", "-o", "-v", "-w", "-x",
+]
+valued = [
+    "--euid", "--group", "--parent", "--pgroup", "--pidfile",
+    "--session", "--terminal", "--uid",
+    "-F", "-G", "-P", "-U", "-d", "-g", "-s", "-t", "-u",
+]

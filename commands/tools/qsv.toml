@@ -1,0 +1,7 @@
+[[command]]
+name = "qsv"
+url = "https://github.com/jqnatividad/qsv"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--envlist", "--help", "--list", "--update", "--version", "-h"]

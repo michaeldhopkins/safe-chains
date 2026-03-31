@@ -1,0 +1,8 @@
+[[command]]
+name = "vm_stat"
+url = "https://ss64.com/mac/vm_stat.html"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = ["--help", "--version", "-V", "-h"]
+valued = ["-c"]

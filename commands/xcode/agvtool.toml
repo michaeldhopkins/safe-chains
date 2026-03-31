@@ -1,0 +1,19 @@
+[[command]]
+name = "agvtool"
+url = "https://developer.apple.com/library/archive/qa/qa1827/_index.html"
+
+[[command.sub]]
+name = "mvers"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "vers"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "what-marketing-version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "what-version"
+standalone = ["--help", "-h"]

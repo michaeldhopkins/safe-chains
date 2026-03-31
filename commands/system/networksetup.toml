@@ -1,0 +1,5 @@
+[[command]]
+name = "networksetup"
+url = "https://ss64.com/mac/networksetup.html"
+level = "Inert"
+first_arg = ["-list*", "-get*", "-show*", "-print*", "-version", "--version", "-V", "-help", "--help", "-h"]

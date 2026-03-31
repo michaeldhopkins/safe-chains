@@ -1,0 +1,7 @@
+[[command]]
+name = "seq"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation"
+level = "Inert"
+bare = false
+standalone = ["--equal-width", "--help", "--version", "-V", "-h", "-w"]
+valued = ["--format", "--separator", "-f", "-s", "-t"]

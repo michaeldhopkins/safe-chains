@@ -1,0 +1,14 @@
+[[command]]
+name = "detekt"
+url = "https://detekt.dev/docs/gettingstarted/cli/"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--build-upon-default-config", "--debug", "--help", "--parallel", "--version",
+    "-V", "-h",
+]
+valued = [
+    "--baseline", "--classpath", "--config", "--config-resource",
+    "--excludes", "--includes", "--input", "--jvm-target",
+    "--language-version", "--plugins", "--report",
+]

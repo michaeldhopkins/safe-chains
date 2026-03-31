@@ -1,0 +1,21 @@
+[[command]]
+name = "journalctl"
+url = "https://man7.org/linux/man-pages/man1/journalctl.1.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--catalog", "--disk-usage", "--dmesg",
+    "--full", "--header", "--help", "--json", "--list-boots",
+    "--list-catalog", "--list-fields", "--merge", "--no-full",
+    "--no-hostname", "--no-pager", "--no-tail", "--quiet",
+    "--reverse", "--system", "--this-boot", "--user",
+    "--utc", "--verify", "--version",
+    "-a", "-b", "-f", "-h", "-k", "-l", "-m", "-q", "-r", "-x",
+]
+valued = [
+    "--after-cursor", "--boot", "--cursor", "--directory",
+    "--facility", "--field", "--file", "--identifier",
+    "--lines", "--machine", "--output", "--priority",
+    "--since", "--unit", "--until", "--user-unit",
+    "-D", "-F", "-M", "-S", "-U", "-g", "-n", "-o", "-p", "-t", "-u",
+]

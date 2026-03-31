@@ -1,0 +1,16 @@
+[[command]]
+name = "tokei"
+url = "https://github.com/XAMPPRocky/tokei#readme"
+level = "Inert"
+bare = true
+standalone = [
+    "--compact", "--files", "--help", "--hidden", "--no-ignore",
+    "--no-ignore-dot", "--no-ignore-parent",
+    "--no-ignore-vcs", "--verbose", "--version",
+    "-C", "-V", "-f", "-h",
+]
+valued = [
+    "--columns", "--exclude", "--input",
+    "--languages", "--num-format", "--output", "--sort", "--type",
+    "-c", "-e", "-i", "-l", "-o", "-s", "-t",
+]

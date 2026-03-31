@@ -1,0 +1,10 @@
+[[command]]
+name = "shuf"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#shuf-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--echo", "--help", "--repeat", "--version", "--zero-terminated",
+    "-V", "-e", "-h", "-r", "-z",
+]
+valued = ["--head-count", "--input-range", "--random-source", "-i", "-n"]

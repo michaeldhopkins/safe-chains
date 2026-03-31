@@ -1,0 +1,16 @@
+[[command]]
+name = "volta"
+url = "https://docs.volta.sh/reference"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--current", "--default", "--help", "-c", "-d", "-h"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "which"
+level = "Inert"
+standalone = ["--current", "--default", "--help", "-c", "-d", "-h"]
+valued = ["--format"]

@@ -1,0 +1,47 @@
+[[command]]
+name = "terraform"
+url = "https://developer.hashicorp.com/terraform/cli/commands"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "fmt"
+guard = "--check"
+standalone = ["--check", "--diff", "--help", "--no-color", "--recursive", "-h"]
+
+[[command.sub]]
+name = "graph"
+standalone = ["--draw-cycles", "--help", "-h"]
+valued = ["--plan", "--type"]
+
+[[command.sub]]
+name = "output"
+standalone = ["--help", "--json", "--no-color", "--raw", "-h"]
+valued = ["--state"]
+
+[[command.sub]]
+name = "providers"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "show"
+standalone = ["--help", "--json", "--no-color", "-h"]
+
+[[command.sub]]
+name = "state"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--id", "--state"]
+[[command.sub.sub]]
+name = "show"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--state"]
+
+[[command.sub]]
+name = "validate"
+standalone = ["--help", "--json", "--no-color", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--json", "-h"]

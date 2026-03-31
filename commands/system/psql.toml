@@ -1,0 +1,7 @@
+[[command]]
+name = "psql"
+url = "https://www.postgresql.org/docs/current/app-psql.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

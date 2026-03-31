@@ -22,22 +22,9 @@ static CMD_HANDLERS: LazyLock<HashMap<&'static str, HandlerFn>> =
 static SUB_HANDLERS: LazyLock<HashMap<&'static str, HandlerFn>> =
     LazyLock::new(crate::handlers::custom_sub_handlers);
 
-macro_rules! load_commands {
-    ($($file:literal),* $(,)?) => {{
-        let mut all = Vec::new();
-        $(all.extend(load_toml(include_str!(concat!("../../commands/", $file, ".toml"))));)*
-        build_registry(all)
-    }};
-}
-
-static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| {
-    load_commands![
-        "ai", "android", "ansible", "binary", "builtins", "cloud", "containers", "data",
-        "dotnet", "forges", "fs", "fuzzy", "go", "hash", "jvm", "magick", "net",
-        "node", "php", "python", "r", "ruby", "rust", "search", "swift",
-        "sysinfo", "system", "text", "tools", "vcs", "wrappers", "xcode",
-    ]
-});
+static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(||
+    include!(concat!(env!("OUT_DIR"), "/toml_includes.rs"))
+);
 
 pub fn toml_dispatch(tokens: &[Token]) -> Option<Verdict> {
     let cmd = tokens[0].command_name();

@@ -1,0 +1,18 @@
+[[command]]
+name = "gojq"
+url = "https://github.com/itchyny/gojq"
+level = "Inert"
+bare = true
+standalone = [
+    "--color-output", "--compact-output", "--exit-status", "--help",
+    "--join-output", "--monochrome-output", "--null-input",
+    "--raw-input", "--raw-output", "--raw-output0",
+    "--slurp", "--sort-keys", "--tab", "--version",
+    "--yaml-input", "--yaml-output",
+    "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-j", "-n", "-r", "-s",
+]
+valued = [
+    "--arg", "--argjson", "--args", "--from-file",
+    "--indent", "--jsonargs", "--rawfile", "--slurpfile",
+    "-f",
+]

@@ -1,0 +1,12 @@
+[[command]]
+name = "xq"
+url = "https://github.com/kislyuk/yq"
+level = "Inert"
+bare = false
+standalone = [
+    "--compact-output", "--exit-status", "--help",
+    "--null-input", "--raw-input", "--raw-output",
+    "--slurp", "--sort-keys", "--tab", "--version", "--xml-output",
+    "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-n", "-r", "-s", "-x",
+]
+valued = ["--arg", "--argjson", "--indent", "--xml-dtd", "--xml-item-depth", "--xml-root", "-f"]

@@ -1,0 +1,8 @@
+[[command]]
+name = "pg_isready"
+url = "https://www.postgresql.org/docs/current/app-pg-isready.html"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--quiet", "--version", "-V", "-q"]
+valued = ["--dbname", "--host", "--port", "--timeout", "--username", "-U", "-d", "-h", "-p", "-t"]

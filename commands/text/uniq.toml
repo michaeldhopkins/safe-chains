@@ -1,0 +1,16 @@
+[[command]]
+name = "uniq"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#uniq-invocation"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = [
+    "-D", "-V", "-c", "-d", "-h", "-i", "-u", "-z",
+    "--count", "--help", "--ignore-case", "--repeated",
+    "--unique", "--version", "--zero-terminated",
+]
+valued = [
+    "-f", "-s", "-w",
+    "--all-repeated", "--check-chars", "--group",
+    "--skip-chars", "--skip-fields",
+]

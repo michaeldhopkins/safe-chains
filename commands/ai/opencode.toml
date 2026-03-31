@@ -1,0 +1,21 @@
+[[command]]
+name = "opencode"
+url = "https://opencode.ai/docs/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "models"
+standalone = ["--help", "-h"]
+max_positional = 1
+
+[[command.sub]]
+name = "session"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "stats"
+standalone = ["--help", "-h"]
+max_positional = 0

@@ -1,0 +1,17 @@
+[[command]]
+name = "netstat"
+url = "https://man7.org/linux/man-pages/man8/netstat.8.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--continuous", "--extend", "--groups",
+    "--help", "--interfaces", "--listening", "--masquerade",
+    "--numeric", "--numeric-hosts", "--numeric-ports",
+    "--numeric-users", "--program", "--route",
+    "--statistics", "--symbolic", "--tcp", "--timers",
+    "--udp", "--unix", "--verbose", "--version", "--wide",
+    "-A", "-C", "-L", "-M", "-N", "-R", "-S", "-V", "-W", "-Z",
+    "-a", "-b", "-c", "-d", "-e", "-f", "-g", "-h", "-i",
+    "-l", "-m", "-n", "-o", "-p", "-q", "-r", "-s", "-t", "-u", "-v", "-w", "-x",
+]
+valued = ["-I"]

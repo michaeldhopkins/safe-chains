@@ -1,0 +1,186 @@
+[[command]]
+name = "hcloud"
+url = "https://github.com/hetznercloud/cli"
+bare_flags = ["--help", "--version", "-h", "-v"]
+[command.wrapper]
+valued = ["--poll-interval"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "context"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "active"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "datacenter"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "location"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "server-type"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "server"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "image"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "--type", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "volume"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "network"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "firewall"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "load-balancer"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "floating-ip"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "primary-ip"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "ssh-key"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "certificate"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "placement-group"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]

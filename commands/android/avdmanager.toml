@@ -1,0 +1,16 @@
+[[command]]
+name = "avdmanager"
+url = "https://developer.android.com/tools/avdmanager"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+[[command.sub.sub]]
+name = "avd"
+standalone = ["--compact", "--help", "-c", "-h"]
+[[command.sub.sub]]
+name = "device"
+standalone = ["--compact", "--help", "-c", "-h"]
+[[command.sub.sub]]
+name = "target"
+standalone = ["--compact", "--help", "-c", "-h"]

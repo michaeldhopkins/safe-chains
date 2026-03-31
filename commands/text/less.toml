@@ -1,0 +1,19 @@
+[[command]]
+name = "less"
+url = "https://man7.org/linux/man-pages/man1/less.1.html"
+level = "Inert"
+bare = true
+standalone = [
+    "-E", "-F", "-G", "-I", "-J", "-K", "-L", "-M", "-N", "-Q", "-R", "-S",
+    "-V", "-W", "-X", "-a", "-c", "-e", "-f", "-g", "-i", "-m", "-n", "-q",
+    "-r", "-s", "-w",
+    "--QUIT-AT-EOF", "--RAW-CONTROL-CHARS", "--chop-long-lines", "--help",
+    "--ignore-case", "--no-init", "--quiet", "--quit-at-eof",
+    "--quit-if-one-screen", "--raw-control-chars", "--silent",
+    "--squeeze-blank-lines", "--version",
+]
+valued = [
+    "-P", "-b", "-h", "-j", "-p", "-t", "-x", "-y", "-z",
+    "--LINE-NUMBERS", "--LONG-PROMPT", "--pattern", "--prompt",
+    "--shift", "--tabs", "--tag", "--window",
+]

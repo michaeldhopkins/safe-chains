@@ -1,0 +1,13 @@
+[[command]]
+name = "ninja"
+url = "https://ninja-build.org/manual.html"
+level = "Inert"
+bare = false
+require_any = ["-t", "-n"]
+standalone = [
+    "--help", "--version", "-n", "-v", "-V",
+    "-h",
+]
+valued = [
+    "-C", "-f", "-j", "-k", "-l", "-t",
+]

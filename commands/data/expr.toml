@@ -1,0 +1,6 @@
+[[command]]
+name = "expr"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation"
+level = "Inert"
+bare = false
+positional_style = true

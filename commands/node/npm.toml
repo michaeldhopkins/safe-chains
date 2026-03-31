@@ -1,0 +1,101 @@
+[[command]]
+name = "npm"
+url = "https://docs.npmjs.com/cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = [
+    "--all", "--help", "--json", "--link", "--long", "--omit",
+    "--parseable", "--production", "--unicode",
+    "-a", "-h", "-l",
+]
+valued = ["--depth", "--prefix"]
+
+[[command.sub]]
+name = "ls"
+level = "Inert"
+standalone = [
+    "--all", "--help", "--json", "--link", "--long", "--omit",
+    "--parseable", "--production", "--unicode",
+    "-a", "-h", "-l",
+]
+valued = ["--depth", "--prefix"]
+
+[[command.sub]]
+name = "view"
+level = "Inert"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "audit"
+level = "Inert"
+standalone = ["--help", "--json", "--omit", "--production", "-h"]
+valued = ["--audit-level"]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+level = "Inert"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "explain"
+level = "Inert"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "fund"
+level = "Inert"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "outdated"
+level = "Inert"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "prefix"
+level = "Inert"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "root"
+level = "Inert"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "why"
+level = "Inert"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "config"
+[[command.sub.sub]]
+name = "get"
+level = "Inert"
+standalone = ["--help", "--json", "--long", "-h", "-l"]
+[[command.sub.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--help", "--json", "--long", "-h", "-l"]
+
+[[command.sub]]
+name = "run"
+first_arg = ["test", "test:*"]
+level = "SafeRead"
+
+[[command.sub]]
+name = "run-script"
+first_arg = ["test", "test:*"]
+level = "SafeRead"

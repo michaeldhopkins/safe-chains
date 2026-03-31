@@ -1,0 +1,52 @@
+[[command]]
+name = "launchctl"
+url = "https://ss64.com/mac/launchctl.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "blame"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dumpstate"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "error"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "examine"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "hostinfo"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "print"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "print-cache"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "print-disabled"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "resolveport"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

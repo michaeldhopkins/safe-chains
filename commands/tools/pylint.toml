@@ -1,0 +1,19 @@
+[[command]]
+name = "pylint"
+url = "https://pylint.readthedocs.io/en/latest/user_guide/usage/run.html"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--errors-only", "--help", "--list-msgs", "--list-msgs-enabled",
+    "--long-help", "--persistent", "--py-version",
+    "--recursive", "--verbose", "--version",
+    "-E", "-V", "-h", "-v",
+]
+valued = [
+    "--disable", "--enable", "--extension-pkg-allow-list",
+    "--fail-under", "--generated-members", "--ignore",
+    "--ignore-paths", "--ignore-patterns", "--jobs",
+    "--load-plugins", "--max-line-length", "--msg-template",
+    "--output-format", "--rcfile", "--reports",
+    "-d", "-e", "-f", "-j",
+]

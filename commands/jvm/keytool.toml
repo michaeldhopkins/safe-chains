@@ -1,0 +1,16 @@
+[[command]]
+name = "keytool"
+url = "https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "-list"
+standalone = ["--help", "-h", "-rfc", "-v"]
+valued = ["-alias", "-keystore", "-storepass", "-storetype"]
+max_positional = 0
+
+[[command.sub]]
+name = "-printcert"
+standalone = ["--help", "-h", "-rfc", "-v"]
+valued = ["-file", "-jarfile"]
+max_positional = 0

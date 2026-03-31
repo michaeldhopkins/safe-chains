@@ -1,0 +1,6 @@
+[[command]]
+name = "wait"
+url = "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/wait.html"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-V", "-h"]

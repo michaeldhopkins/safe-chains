@@ -1,0 +1,7 @@
+[[command]]
+name = "selecta"
+url = "https://github.com/garybernhardt/selecta"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-h", "-v"]
+valued = ["--search", "-s"]

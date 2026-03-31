@@ -1,0 +1,13 @@
+[[command]]
+name = "date"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--rfc-2822", "--rfc-email", "--universal", "--utc", "--version",
+    "-R", "-V", "-h", "-j", "-n", "-u",
+]
+valued = [
+    "--date", "--iso-8601", "--reference", "--rfc-3339",
+    "-I", "-d", "-f", "-r", "-v", "-z",
+]

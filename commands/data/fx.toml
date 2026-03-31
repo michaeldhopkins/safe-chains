@@ -1,0 +1,7 @@
+[[command]]
+name = "fx"
+url = "https://github.com/antonmedv/fx"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--help", "--raw", "--slurp", "--themes", "--version", "-h", "-r", "-s"]

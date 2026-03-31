@@ -1,0 +1,6 @@
+[[command]]
+name = "dotenv"
+url = "https://github.com/bkeepers/dotenv"
+[command.wrapper]
+valued = ["-c", "-e", "-f", "-v"]
+separator = "--"

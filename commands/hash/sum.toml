@@ -1,0 +1,6 @@
+[[command]]
+name = "sum"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sum-invocation"
+level = "Inert"
+bare = true
+standalone = ["--help", "--sysv", "--version", "-V", "-h", "-r", "-s"]

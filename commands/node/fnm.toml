@@ -1,0 +1,24 @@
+[[command]]
+name = "fnm"
+url = "https://github.com/Schniz/fnm#readme"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "current"
+level = "Inert"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "default"
+level = "Inert"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ls-remote"
+level = "Inert"
+standalone = ["--help", "-h"]

@@ -1,0 +1,9 @@
+[[command]]
+name = "tsc"
+url = "https://www.typescriptlang.org/docs/handbook/compiler-options.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]
+
+# Modern CLI tools

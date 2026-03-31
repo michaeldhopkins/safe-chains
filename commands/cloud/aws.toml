@@ -1,0 +1,147 @@
+[[command]]
+name = "aws"
+url = "https://docs.aws.amazon.com/cli/latest/"
+bare_flags = ["--help", "--version"]
+[command.wrapper]
+standalone = ["--debug", "--no-paginate", "--no-sign-request", "--no-verify-ssl"]
+valued = [
+    "--ca-bundle", "--cli-connect-timeout", "--cli-read-timeout",
+    "--color", "--endpoint-url", "--output",
+    "--profile", "--query", "--region",
+]
+
+[[command.sub]]
+name = "configure"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help"]
+
+[[command.sub]]
+name = "sts"
+[[command.sub.sub]]
+name = "get-caller-identity"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "s3"
+first_arg = ["ls"]
+positional_style = true
+
+[[command.sub]]
+name = "s3api"
+first_arg = ["get-*", "head-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ec2"
+first_arg = ["describe-*"]
+positional_style = true
+
+[[command.sub]]
+name = "iam"
+first_arg = ["get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "lambda"
+first_arg = ["get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "logs"
+first_arg = ["describe-*", "filter-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ecs"
+first_arg = ["describe-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "rds"
+first_arg = ["describe-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cloudformation"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "route53"
+first_arg = ["get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "dynamodb"
+first_arg = ["describe-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "sqs"
+first_arg = ["get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "sns"
+first_arg = ["get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "cloudwatch"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ssm"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "secretsmanager"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "ecr"
+first_arg = ["batch-get-*", "describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "eks"
+first_arg = ["describe-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "elasticache"
+first_arg = ["describe-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "elb"
+first_arg = ["describe-*"]
+positional_style = true
+
+[[command.sub]]
+name = "elbv2"
+first_arg = ["describe-*"]
+positional_style = true
+
+[[command.sub]]
+name = "autoscaling"
+first_arg = ["describe-*"]
+positional_style = true
+
+[[command.sub]]
+name = "kms"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true
+
+[[command.sub]]
+name = "acm"
+first_arg = ["describe-*", "get-*", "list-*"]
+positional_style = true

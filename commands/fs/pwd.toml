@@ -1,0 +1,7 @@
+[[command]]
+name = "pwd"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version", "-L", "-P", "-V", "-h"]

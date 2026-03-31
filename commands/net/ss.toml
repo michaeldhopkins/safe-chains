@@ -1,0 +1,16 @@
+[[command]]
+name = "ss"
+url = "https://man7.org/linux/man-pages/man8/ss.8.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--dccp", "--extended", "--family",
+    "--help", "--info", "--ipv4", "--ipv6", "--listening", "--memory",
+    "--no-header", "--numeric", "--oneline", "--options",
+    "--packet", "--processes", "--raw", "--resolve",
+    "--sctp", "--summary", "--tcp", "--tipc", "--udp",
+    "--unix", "--version", "--vsock",
+    "-0", "-4", "-6", "-E", "-H", "-O", "-V",
+    "-a", "-e", "-h", "-i", "-l", "-m", "-n", "-o", "-p", "-r", "-s", "-t", "-u", "-w", "-x",
+]
+valued = ["--filter", "--query", "-A", "-F", "-f"]

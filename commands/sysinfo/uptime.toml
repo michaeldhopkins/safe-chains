@@ -1,0 +1,7 @@
+[[command]]
+name = "uptime"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--pretty", "--since", "--version", "-V", "-h", "-p", "-s"]

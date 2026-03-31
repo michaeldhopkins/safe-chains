@@ -1,0 +1,11 @@
+[[command]]
+name = "cmp"
+url = "https://man7.org/linux/man-pages/man1/cmp.1.html"
+level = "Inert"
+bare = false
+max_positional = 2
+standalone = [
+    "--help", "--print-bytes", "--quiet", "--silent", "--verbose", "--version",
+    "-V", "-b", "-h", "-l", "-s",
+]
+valued = ["--bytes", "--ignore-initial", "-i", "-n"]

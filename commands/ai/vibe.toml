@@ -1,0 +1,7 @@
+[[command]]
+name = "vibe"
+url = "https://docs.mistral.ai/mistral-vibe/"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

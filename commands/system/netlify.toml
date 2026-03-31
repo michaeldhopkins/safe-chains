@@ -1,0 +1,34 @@
+[[command]]
+name = "netlify"
+url = "https://cli.netlify.com/"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--verbose", "-h"]
+
+[[command.sub]]
+name = "sites:list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "env:list"
+standalone = ["--help", "--json", "--plain", "-h"]
+valued = ["--context", "--scope"]
+
+[[command.sub]]
+name = "functions:list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--help", "-h"]
+valued = ["--level", "--type"]
+
+[[command.sub]]
+name = "teams:list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "completion"
+standalone = ["--help", "-h"]

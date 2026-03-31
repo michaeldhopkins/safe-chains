@@ -1,0 +1,12 @@
+[[command]]
+name = "jaq"
+url = "https://github.com/01mf02/jaq"
+level = "Inert"
+bare = true
+standalone = [
+    "--compact-output", "--exit-status", "--help",
+    "--join-output", "--null-input", "--raw-input",
+    "--raw-output", "--slurp", "--sort-keys", "--tab", "--version",
+    "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-j", "-n", "-r", "-s",
+]
+valued = ["--arg", "--argjson", "--from-file", "--indent", "--rawfile", "--slurpfile", "-f"]

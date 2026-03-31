@@ -1,0 +1,41 @@
+[[command]]
+name = "railway"
+url = "https://docs.railway.app/guides/cli"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "whoami"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--help", "-h"]
+valued = ["--deployment"]
+
+[[command.sub]]
+name = "variables"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "volume"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+bare = false
+standalone = ["--help", "-h"]

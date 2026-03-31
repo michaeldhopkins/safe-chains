@@ -1,0 +1,11 @@
+[[command]]
+name = "swiftformat"
+url = "https://github.com/nicklockwood/SwiftFormat"
+level = "SafeRead"
+bare = false
+require_any = ["--dryrun", "--lint"]
+standalone = [
+    "--dryrun", "--lenient", "--lint", "--quiet", "--strict", "--verbose",
+    "--help", "-h",
+]
+valued = ["--config", "--disable", "--enable", "--rules"]

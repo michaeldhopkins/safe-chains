@@ -1,0 +1,7 @@
+[[command]]
+name = "paste"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#paste-invocation"
+level = "Inert"
+bare = true
+standalone = ["-V", "-h", "-s", "-z", "--help", "--serial", "--version", "--zero-terminated"]
+valued = ["-d", "--delimiters"]

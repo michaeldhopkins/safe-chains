@@ -1,0 +1,7 @@
+[[command]]
+name = "unexpand"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#unexpand-invocation"
+level = "Inert"
+bare = true
+standalone = ["-V", "-a", "-h", "--all", "--first-only", "--help", "--version"]
+valued = ["-t", "--tabs"]

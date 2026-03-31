@@ -1,0 +1,7 @@
+[[command]]
+name = "zipalign"
+url = "https://developer.android.com/tools/zipalign"
+level = "Inert"
+bare = false
+require_any = ["-c"]
+standalone = ["-c", "-p", "-v", "--help", "-h", "--version", "-V"]

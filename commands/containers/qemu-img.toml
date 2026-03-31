@@ -1,0 +1,61 @@
+[[command]]
+name = "qemu-img"
+url = "https://www.qemu.org/docs/master/tools/qemu-img.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "check"
+bare = false
+standalone = [
+    "--force-share", "--help", "--image-opts", "--quiet",
+    "-U", "-h", "-q",
+]
+valued = ["--cache", "--format", "--object", "--output", "-T", "-f"]
+
+[[command.sub]]
+name = "compare"
+bare = false
+standalone = [
+    "--force-share", "--help", "--image-opts", "--progress", "--quiet", "--strict",
+    "-U", "-h", "-p", "-q", "-s",
+]
+valued = ["--a-format", "--b-format", "--cache", "--object", "-F", "-T", "-f"]
+
+[[command.sub]]
+name = "info"
+bare = false
+standalone = [
+    "--backing-chain", "--force-share", "--help", "--image-opts", "--limits",
+    "-U", "-h",
+]
+valued = ["--cache", "--format", "--object", "--output", "-f", "-t"]
+
+[[command.sub]]
+name = "map"
+bare = false
+standalone = [
+    "--force-share", "--help", "--image-opts",
+    "-U", "-h",
+]
+valued = ["--format", "--max-length", "--object", "--output", "--start-offset", "-f", "-l", "-s"]
+
+[[command.sub]]
+name = "measure"
+bare = false
+standalone = [
+    "--force-share", "--help", "--image-opts",
+    "-U", "-h",
+]
+valued = [
+    "--format", "--object", "--output", "--size", "--snapshot", "--target-format",
+    "-O", "-f", "-l", "-o", "-s",
+]
+
+[[command.sub]]
+name = "snapshot"
+bare = false
+standalone = [
+    "--force-share", "--help", "--image-opts", "--list", "--quiet",
+    "-U", "-h", "-l", "-q",
+]
+valued = ["--format", "--object", "-f"]

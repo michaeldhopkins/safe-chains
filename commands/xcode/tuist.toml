@@ -1,0 +1,74 @@
+[[command]]
+name = "tuist"
+url = "https://docs.tuist.dev/en/cli/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "dump"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "graph"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--format", "--path", "-f", "-p"]
+
+[[command.sub]]
+name = "hash"
+[[command.sub.sub]]
+name = "cache"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "selective-testing"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "inspect"
+[[command.sub.sub]]
+name = "build"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "bundle"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "dependencies"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "implicit-imports"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "redundant-imports"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "test"
+standalone = ["--help", "--json", "--verbose", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "migration"
+[[command.sub.sub]]
+name = "check-empty-settings"
+standalone = ["--help", "-h"]
+valued = ["--path", "-p"]
+[[command.sub.sub]]
+name = "list-targets"
+standalone = ["--help", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "scaffold"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

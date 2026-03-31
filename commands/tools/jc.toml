@@ -1,0 +1,12 @@
+[[command]]
+name = "jc"
+url = "https://kellyjonbrazil.github.io/jc/"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = [
+    "--about", "--bash-comp", "--force-color", "--help", "--meta-out",
+    "--monochrome", "--pretty", "--quiet", "--raw", "--unbuffer",
+    "--version", "--yaml-out", "--zsh-comp",
+    "-C", "-M", "-a", "-h", "-m", "-p", "-q", "-r", "-u", "-y",
+]

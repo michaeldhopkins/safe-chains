@@ -1,0 +1,14 @@
+[[command]]
+name = "procs"
+url = "https://github.com/dalance/procs#readme"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--no-header", "--or", "--tree", "--version", "--watch-interval",
+    "-V", "-h", "-l", "-t",
+]
+valued = [
+    "--color", "--completion", "--config", "--gen-completion",
+    "--insert", "--only", "--pager", "--sorta", "--sortd", "--theme",
+    "-i", "-w",
+]

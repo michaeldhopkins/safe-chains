@@ -1,0 +1,7 @@
+[[command]]
+name = "base64"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation"
+level = "Inert"
+bare = true
+standalone = ["--decode", "--help", "--ignore-garbage", "--version", "-D", "-V", "-d", "-h", "-i"]
+valued = ["--wrap", "-b", "-w"]

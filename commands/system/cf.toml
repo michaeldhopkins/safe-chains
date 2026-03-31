@@ -1,0 +1,122 @@
+[[command]]
+name = "cf"
+url = "https://cli.cloudfoundry.org/en-US/v8/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "apps"
+standalone = ["--help", "-h"]
+valued = ["--labels"]
+
+[[command.sub]]
+name = "app"
+bare = false
+standalone = ["--guid", "--help", "-h"]
+
+[[command.sub]]
+name = "events"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "tasks"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "services"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "service"
+bare = false
+standalone = ["--guid", "--help", "--params", "-h"]
+
+[[command.sub]]
+name = "marketplace"
+standalone = ["--help", "-h"]
+valued = ["--no-plans", "-e"]
+
+[[command.sub]]
+name = "orgs"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "org"
+bare = false
+standalone = ["--guid", "--help", "-h"]
+
+[[command.sub]]
+name = "spaces"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "space"
+bare = false
+standalone = ["--guid", "--help", "-h"]
+
+[[command.sub]]
+name = "routes"
+standalone = ["--help", "--orglevel", "-h"]
+
+[[command.sub]]
+name = "domains"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "stacks"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "stack"
+bare = false
+standalone = ["--guid", "--help", "-h"]
+
+[[command.sub]]
+name = "buildpacks"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "quotas"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "quota"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugins"
+standalone = ["--checksum", "--help", "--outdated", "-h"]
+
+[[command.sub]]
+name = "feature-flags"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "feature-flag"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "security-groups"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "security-group"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "logs"
+bare = false
+guard = "--recent"
+standalone = ["--help", "--recent", "-h"]

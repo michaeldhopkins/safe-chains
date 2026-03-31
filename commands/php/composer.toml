@@ -1,0 +1,66 @@
+[[command]]
+name = "composer"
+url = "https://getcomposer.org/doc/03-cli.md"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "about"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "audit"
+standalone = ["--abandoned", "--help", "--locked", "--no-dev", "-h"]
+valued = ["--format", "-f"]
+
+[[command.sub]]
+name = "check-platform-reqs"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "diagnose"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "fund"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+standalone = [
+    "--all", "--available", "--direct", "--help", "--installed", "--latest",
+    "--locked", "--minor-only", "--name-only", "--no-dev", "--outdated",
+    "--path", "--platform", "--self", "--strict", "--tree", "--versions",
+    "-D", "-H", "-N", "-P", "-a", "-h", "-i", "-l", "-o", "-s", "-t",
+]
+valued = ["--format", "--ignore", "-f"]
+
+[[command.sub]]
+name = "licenses"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "outdated"
+standalone = [
+    "--all", "--direct", "--help", "--locked", "--minor-only",
+    "--no-dev", "--strict",
+    "-D", "-a", "-h", "-m",
+]
+valued = ["--format", "--ignore", "-f"]
+
+[[command.sub]]
+name = "show"
+standalone = [
+    "--all", "--available", "--direct", "--help", "--installed", "--latest",
+    "--locked", "--minor-only", "--name-only", "--no-dev", "--outdated",
+    "--path", "--platform", "--self", "--strict", "--tree", "--versions",
+    "-D", "-H", "-N", "-P", "-a", "-h", "-i", "-l", "-o", "-s", "-t",
+]
+valued = ["--format", "--ignore", "-f"]
+
+[[command.sub]]
+name = "suggests"
+standalone = ["--help", "-h"]

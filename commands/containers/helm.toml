@@ -1,0 +1,148 @@
+[[command]]
+name = "helm"
+url = "https://helm.sh/docs/helm/"
+bare_flags = ["--help", "-h"]
+[command.wrapper]
+standalone = ["--debug"]
+valued = [
+    "--burst-limit", "--kube-apiserver", "--kube-as-group", "--kube-as-user",
+    "--kube-ca-file", "--kube-context", "--kube-insecure-skip-tls-verify",
+    "--kube-tls-server-name", "--kube-token", "--kubeconfig",
+    "--namespace", "--registry-config", "--repository-cache",
+    "--repository-config", "-n",
+]
+
+[[command.sub]]
+name = "env"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "get"
+[[command.sub.sub]]
+name = "all"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "--revision", "--template", "-o"]
+[[command.sub.sub]]
+name = "hooks"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "--revision", "-o"]
+[[command.sub.sub]]
+name = "manifest"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "--revision", "-o"]
+[[command.sub.sub]]
+name = "metadata"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "--revision", "-o"]
+[[command.sub.sub]]
+name = "notes"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "--revision", "-o"]
+[[command.sub.sub]]
+name = "values"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "--revision", "-o"]
+
+[[command.sub]]
+name = "history"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--max", "--output", "-o"]
+
+[[command.sub]]
+name = "lint"
+bare = false
+standalone = ["--help", "--quiet", "--strict", "--with-subcharts", "-h"]
+valued = ["--set", "--set-file", "--set-json", "--set-string", "--values", "-f"]
+
+[[command.sub]]
+name = "list"
+standalone = [
+    "--all", "--all-namespaces", "--deployed", "--failed", "--help",
+    "--pending", "--reverse", "--short", "--superseded",
+    "--uninstalled", "--uninstalling",
+    "-A", "-a", "-h", "-q",
+]
+valued = ["--filter", "--max", "--offset", "--output", "--time-format", "-o"]
+
+[[command.sub]]
+name = "search"
+[[command.sub.sub]]
+name = "hub"
+bare = false
+standalone = ["--help", "--list-repo-url", "-h"]
+valued = ["--max-col-width", "--output", "-o"]
+[[command.sub.sub]]
+name = "repo"
+bare = false
+standalone = ["--devel", "--help", "--regexp", "--versions", "-h", "-l", "-r"]
+valued = ["--max-col-width", "--output", "--version", "-o"]
+
+[[command.sub]]
+name = "show"
+[[command.sub.sub]]
+name = "all"
+bare = false
+standalone = ["--devel", "--help", "-h"]
+valued = ["--ca-file", "--cert-file", "--key-file", "--keyring", "--repo", "--username", "--version"]
+[[command.sub.sub]]
+name = "chart"
+bare = false
+standalone = ["--devel", "--help", "-h"]
+valued = ["--repo", "--version"]
+[[command.sub.sub]]
+name = "crds"
+bare = false
+standalone = ["--devel", "--help", "-h"]
+valued = ["--repo", "--version"]
+[[command.sub.sub]]
+name = "readme"
+bare = false
+standalone = ["--devel", "--help", "-h"]
+valued = ["--repo", "--version"]
+[[command.sub.sub]]
+name = "values"
+bare = false
+standalone = ["--devel", "--help", "-h"]
+valued = ["--jsonpath", "--repo", "--version"]
+
+[[command.sub]]
+name = "status"
+bare = false
+standalone = ["--help", "--show-desc", "--show-resources", "-h"]
+valued = ["--output", "--revision", "-o"]
+
+[[command.sub]]
+name = "template"
+bare = false
+standalone = [
+    "--api-versions", "--create-namespace", "--dependency-update",
+    "--devel", "--dry-run", "--generate-name", "--help",
+    "--include-crds", "--is-upgrade", "--no-hooks",
+    "--release-name", "--replace", "--skip-crds",
+    "--skip-tests", "--validate",
+    "-g", "-h",
+]
+valued = [
+    "--kube-version", "--name-template", "--namespace",
+    "--output-dir", "--post-renderer", "--repo",
+    "--set", "--set-file", "--set-json", "--set-string",
+    "--show-only", "--timeout", "--values", "--version",
+    "-f", "-n", "-s",
+]
+
+[[command.sub]]
+name = "verify"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--keyring"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--short", "--template", "-h"]

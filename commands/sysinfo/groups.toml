@@ -1,0 +1,6 @@
+[[command]]
+name = "groups"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#groups-invocation"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-V", "-h"]

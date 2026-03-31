@@ -1,0 +1,12 @@
+[[command]]
+name = "tail"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#tail-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
+    "-F", "-V", "-f", "-h", "-q", "-r", "-v", "-z",
+    "--follow", "--help", "--quiet", "--retry", "--silent",
+    "--verbose", "--version", "--zero-terminated",
+]
+valued = ["-b", "-c", "-n", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]

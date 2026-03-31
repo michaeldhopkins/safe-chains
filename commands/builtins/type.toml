@@ -1,0 +1,6 @@
+[[command]]
+name = "type"
+url = "https://man7.org/linux/man-pages/man1/type.1p.html"
+level = "Inert"
+bare = false
+standalone = ["--help", "--version", "-P", "-V", "-a", "-f", "-h", "-p", "-t"]

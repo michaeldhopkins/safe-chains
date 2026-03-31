@@ -1,0 +1,13 @@
+[[command]]
+name = "xcodegen"
+url = "https://github.com/yonaskolb/XcodeGen"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "dump"
+standalone = ["--help", "--no-env", "--quiet", "-h", "-n", "-q"]
+valued = ["--project-root", "--spec", "--type", "-r", "-s", "-t"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

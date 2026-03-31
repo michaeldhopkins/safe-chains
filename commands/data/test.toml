@@ -1,0 +1,7 @@
+[[command]]
+name = "test"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation"
+level = "Inert"
+bare = true
+positional_style = true
+aliases = ["["]

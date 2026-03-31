@@ -1,0 +1,15 @@
+[[command]]
+name = "traceroute"
+aliases = ["traceroute6"]
+url = "https://man7.org/linux/man-pages/man8/traceroute.8.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--version",
+    "-4", "-6", "-F", "-I", "-T", "-U", "-V",
+    "-d", "-e", "-h", "-n", "-r", "-v",
+]
+valued = [
+    "--port", "--queries", "--sendwait", "--wait",
+    "-f", "-i", "-m", "-N", "-p", "-q", "-s", "-t", "-w", "-z",
+]

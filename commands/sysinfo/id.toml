@@ -1,0 +1,11 @@
+[[command]]
+name = "id"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = [
+    "--context", "--group", "--groups", "--help", "--name",
+    "--real", "--user", "--version", "--zero",
+    "-G", "-V", "-Z", "-g", "-h", "-n", "-p", "-r", "-u", "-z",
+]

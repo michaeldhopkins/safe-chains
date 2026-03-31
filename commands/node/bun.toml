@@ -1,0 +1,54 @@
+[[command]]
+name = "bun"
+url = "https://bun.sh/docs/cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--bytecode", "--compile", "--css-chunking",
+    "--emit-dce-annotations", "--help", "--minify", "--minify-identifiers",
+    "--minify-syntax", "--minify-whitespace", "--no-bundle",
+    "--no-clear-screen", "--production", "--react-fast-refresh",
+    "--splitting", "--watch", "--windows-hide-console",
+    "-h",
+]
+valued = [
+    "--asset-naming", "--banner", "--chunk-naming", "--conditions",
+    "--entry-naming", "--env", "--external", "--footer",
+    "--format", "--outdir", "--outfile", "--packages",
+    "--public-path", "--root", "--sourcemap", "--target",
+    "--windows-icon",
+    "-e",
+]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+standalone = ["--bail", "--help", "--only", "--rerun-each", "--todo", "-h"]
+valued = ["--preload", "--timeout", "-t"]
+
+[[command.sub]]
+name = "outdated"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "pm"
+[[command.sub.sub]]
+name = "bin"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "cache"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "hash"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "x"
+handler = "bun_x"

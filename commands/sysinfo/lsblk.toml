@@ -1,0 +1,15 @@
+[[command]]
+name = "lsblk"
+url = "https://man7.org/linux/man-pages/man8/lsblk.8.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--ascii", "--bytes", "--dedup", "--discard",
+    "--fs", "--help", "--inverse", "--json", "--list", "--merge",
+    "--nodeps", "--noheadings", "--output-all", "--pairs",
+    "--paths", "--perms", "--raw", "--scsi", "--topology",
+    "--tree", "--version", "--zoned",
+    "-A", "-J", "-O", "-P", "-S", "-T", "-V",
+    "-a", "-b", "-d", "-f", "-h", "-i", "-l", "-m", "-n", "-p", "-r", "-s", "-t", "-z",
+]
+valued = ["--exclude", "--include", "--output", "--sort", "--width", "-E", "-I", "-e", "-o", "-w", "-x"]

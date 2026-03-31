@@ -1,0 +1,10 @@
+[[command]]
+name = "duf"
+url = "https://github.com/muesli/duf"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--help", "--hide-fs", "--hide-mp", "--inodes",
+    "--json", "--version", "--warnings",
+]
+valued = ["--only", "--output", "--sort", "--style", "--theme", "--width"]

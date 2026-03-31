@@ -1,0 +1,7 @@
+[[command]]
+name = "xv"
+url = "https://github.com/gyscos/xv"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["-V", "-h", "--help", "--version"]

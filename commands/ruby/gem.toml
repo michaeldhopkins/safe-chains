@@ -1,0 +1,105 @@
+[[command]]
+name = "gem"
+url = "https://guides.rubygems.org/command-reference/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "contents"
+standalone = [
+    "--all", "--help", "--local", "--prerelease", "--remote", "--versions",
+    "-a", "-h", "-i", "-l", "-r",
+]
+valued = ["--version", "-v"]
+
+[[command.sub]]
+name = "dependency"
+standalone = [
+    "--all", "--help", "--local", "--prerelease", "--remote", "--versions",
+    "-a", "-h", "-i", "-l", "-r",
+]
+valued = ["--version", "-v"]
+
+[[command.sub]]
+name = "environment"
+standalone = [
+    "--all", "--help", "--local", "--prerelease", "--remote", "--versions",
+    "-a", "-h", "-i", "-l", "-r",
+]
+valued = ["--version", "-v"]
+
+[[command.sub]]
+name = "help"
+standalone = [
+    "--all", "--help", "--local", "--prerelease", "--remote", "--versions",
+    "-a", "-h", "-i", "-l", "-r",
+]
+valued = ["--version", "-v"]
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "--installed", "--prerelease", "-h", "-i"]
+valued = ["--version", "-v"]
+
+[[command.sub]]
+name = "list"
+standalone = [
+    "--all", "--help", "--installed", "--local", "--no-details",
+    "--no-versions", "--prerelease", "--remote", "--versions",
+    "-a", "-d", "-h", "-i", "-l", "-r",
+]
+
+[[command.sub]]
+name = "outdated"
+standalone = [
+    "--all", "--help", "--local", "--prerelease", "--remote", "--versions",
+    "-a", "-h", "-i", "-l", "-r",
+]
+valued = ["--version", "-v"]
+
+[[command.sub]]
+name = "pristine"
+standalone = [
+    "--all", "--help", "--local", "--prerelease", "--remote", "--versions",
+    "-a", "-h", "-i", "-l", "-r",
+]
+valued = ["--version", "-v"]
+
+[[command.sub]]
+name = "search"
+standalone = [
+    "--all", "--details", "--exact", "--help", "--local",
+    "--prerelease", "--remote", "--versions",
+    "-a", "-d", "-e", "-h", "-i", "-l", "-r",
+]
+
+[[command.sub]]
+name = "sources"
+standalone = [
+    "--all", "--help", "--local", "--prerelease", "--remote", "--versions",
+    "-a", "-h", "-i", "-l", "-r",
+]
+valued = ["--version", "-v"]
+
+[[command.sub]]
+name = "specification"
+standalone = [
+    "--all", "--help", "--local", "--prerelease", "--remote", "--versions",
+    "-a", "-h", "-i", "-l", "-r",
+]
+valued = ["--version", "-v"]
+
+[[command.sub]]
+name = "stale"
+standalone = [
+    "--all", "--help", "--local", "--prerelease", "--remote", "--versions",
+    "-a", "-h", "-i", "-l", "-r",
+]
+valued = ["--version", "-v"]
+
+[[command.sub]]
+name = "which"
+standalone = [
+    "--all", "--help", "--local", "--prerelease", "--remote", "--versions",
+    "-a", "-h", "-i", "-l", "-r",
+]
+valued = ["--version", "-v"]

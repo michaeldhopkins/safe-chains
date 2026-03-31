@@ -1,0 +1,4 @@
+[[command]]
+name = "cmake"
+url = "https://cmake.org/cmake/help/latest/manual/cmake.1.html"
+bare_flags = ["--help", "--system-information", "--version", "-V", "-h"]

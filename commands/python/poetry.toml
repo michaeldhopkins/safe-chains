@@ -1,0 +1,26 @@
+[[command]]
+name = "poetry"
+url = "https://python-poetry.org/docs/cli/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "show"
+standalone = [
+    "--all", "--help", "--latest", "--no-dev", "--outdated",
+    "--top-level", "--tree",
+    "-T", "-h", "-l", "-o",
+]
+valued = ["--why"]
+
+[[command.sub]]
+name = "check"
+standalone = ["--help", "--lock", "-h"]
+
+[[command.sub]]
+name = "env"
+[[command.sub.sub]]
+name = "info"
+standalone = ["--full-path", "--help", "-h"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--full-path", "--help", "-h"]

@@ -1,0 +1,7 @@
+[[command]]
+name = "iconv"
+url = "https://man7.org/linux/man-pages/man1/iconv.1.html"
+level = "Inert"
+bare = false
+standalone = ["-V", "-c", "-h", "-l", "-s", "--help", "--list", "--silent", "--version"]
+valued = ["-f", "-t", "--from-code", "--to-code"]

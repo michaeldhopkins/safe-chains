@@ -1,0 +1,7 @@
+[[command]]
+name = "basename"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#basename-invocation"
+level = "Inert"
+bare = false
+standalone = ["--help", "--multiple", "--version", "--zero", "-V", "-a", "-h", "-z"]
+valued = ["--suffix", "-s"]

@@ -1,0 +1,13 @@
+[[command]]
+name = "strings"
+url = "https://man7.org/linux/man-pages/man1/strings.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "-V", "-a", "-f", "-h", "-w",
+    "--all", "--help", "--include-all-whitespace", "--print-file-name", "--version",
+]
+valued = [
+    "-T", "-e", "-n", "-o", "-s", "-t",
+    "--bytes", "--encoding", "--output-separator", "--radix", "--target",
+]

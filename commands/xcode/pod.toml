@@ -1,0 +1,35 @@
+[[command]]
+name = "pod"
+url = "https://guides.cocoapods.org/terminal/commands.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "env"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "search"
+bare = false
+standalone = ["--help", "--simple", "--stats", "--web", "-h"]
+
+[[command.sub]]
+name = "spec"
+[[command.sub.sub]]
+name = "cat"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--version"]
+[[command.sub.sub]]
+name = "which"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--version"]

@@ -1,0 +1,10 @@
+[[command]]
+name = "tr"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation"
+level = "Inert"
+bare = false
+standalone = [
+    "-C", "-V", "-c", "-d", "-h", "-s",
+    "--complement", "--delete", "--help", "--squeeze-repeats",
+    "--truncate-set1", "--version",
+]

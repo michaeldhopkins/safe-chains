@@ -1,0 +1,7 @@
+[[command]]
+name = "more"
+url = "https://man7.org/linux/man-pages/man1/more.1.html"
+level = "Inert"
+bare = true
+standalone = ["-V", "-c", "-d", "-f", "-h", "-l", "-p", "-s", "-u", "--help", "--version"]
+valued = ["-n", "--lines"]

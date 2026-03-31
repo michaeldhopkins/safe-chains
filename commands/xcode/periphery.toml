@@ -1,0 +1,20 @@
+[[command]]
+name = "periphery"
+url = "https://github.com/peripheryapp/periphery"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "scan"
+level = "SafeRead"
+standalone = [
+    "--help", "--quiet", "--skip-build", "--strict", "--verbose",
+    "-h",
+]
+valued = [
+    "--config", "--format", "--index-store-path",
+    "--project", "--schemes", "--targets",
+]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

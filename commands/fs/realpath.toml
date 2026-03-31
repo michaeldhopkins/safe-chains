@@ -1,0 +1,12 @@
+[[command]]
+name = "realpath"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#realpath-invocation"
+level = "Inert"
+bare = false
+standalone = [
+    "--canonicalize-existing", "--canonicalize-missing",
+    "--help", "--logical", "--no-symlinks", "--physical", "--quiet",
+    "--strip", "--version", "--zero",
+    "-L", "-P", "-V", "-e", "-h", "-m", "-q", "-s", "-z",
+]
+valued = ["--relative-base", "--relative-to"]

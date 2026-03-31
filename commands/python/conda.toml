@@ -1,0 +1,30 @@
+[[command]]
+name = "conda"
+url = "https://docs.conda.io/projects/conda/en/stable/commands/index.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = [
+    "--explicit", "--export", "--full-name", "--help", "--json",
+    "--no-pip", "--revisions",
+    "-e", "-f", "-h",
+]
+valued = ["--name", "--prefix", "-n", "-p"]
+
+[[command.sub]]
+name = "info"
+standalone = [
+    "--all", "--envs", "--help", "--json", "--verbose",
+    "-a", "-e", "-h", "-v",
+]
+
+[[command.sub]]
+name = "config"
+bare = false
+require_any = ["--show", "--show-sources"]
+standalone = [
+    "--help", "--json", "--quiet", "--show", "--show-sources", "--verbose",
+    "-h", "-q", "-v",
+]
+valued = ["--env", "--file", "--name", "--prefix", "-f", "-n", "-p"]

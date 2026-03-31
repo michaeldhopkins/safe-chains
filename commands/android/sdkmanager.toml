@@ -1,0 +1,8 @@
+[[command]]
+name = "sdkmanager"
+url = "https://developer.android.com/tools/sdkmanager"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--list", "--version", "-V", "-h"]
+valued = ["--channel", "--sdk_root"]

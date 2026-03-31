@@ -1,0 +1,27 @@
+[[command]]
+name = "colordiff"
+url = "https://www.colordiff.org/"
+level = "Inert"
+bare = false
+standalone = [
+    "--brief", "--ed", "--expand-tabs", "--help", "--initial-tab",
+    "--left-column", "--minimal", "--normal",
+    "--paginate", "--rcs", "--report-identical-files",
+    "--side-by-side", "--speed-large-files",
+    "--strip-trailing-cr", "--suppress-blank-empty",
+    "--suppress-common-lines", "--text", "--version",
+    "-B", "-E", "-N", "-P", "-T", "-V", "-Z",
+    "-a", "-b", "-c", "-d", "-e", "-f", "-h", "-i", "-l", "-n",
+    "-p", "-q", "-r", "-s", "-t", "-u", "-v", "-w", "-y",
+]
+valued = [
+    "--changed-group-format", "--color", "--context",
+    "--from-file", "--horizon-lines", "--ifdef",
+    "--ignore-matching-lines", "--label", "--line-format",
+    "--new-group-format", "--new-line-format",
+    "--old-group-format", "--old-line-format",
+    "--show-function-line", "--starting-file",
+    "--tabsize", "--to-file", "--unchanged-group-format",
+    "--unchanged-line-format", "--unified", "--width",
+    "-C", "-D", "-F", "-I", "-L", "-S", "-U", "-W",
+]

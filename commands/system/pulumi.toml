@@ -1,0 +1,77 @@
+[[command]]
+name = "pulumi"
+url = "https://www.pulumi.com/docs/cli/"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "whoami"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "about"
+standalone = ["--help", "--json", "--transitive", "-h"]
+
+[[command.sub]]
+name = "preview"
+level = "SafeRead"
+standalone = [
+    "--diff", "--help", "--json", "--non-interactive",
+    "--refresh", "--show-config", "--show-reads",
+    "--show-replacement-steps", "--show-sames",
+    "--suppress-outputs", "--suppress-permalink",
+    "-h", "-j",
+]
+valued = [
+    "--config", "--config-file", "--parallel", "--stack",
+    "--target", "-c", "-p", "-s", "-t",
+]
+
+[[command.sub]]
+name = "stack"
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--all", "--help", "--json", "-a", "-h"]
+valued = ["--organization", "--project", "--tag", "-o"]
+[[command.sub.sub]]
+name = "output"
+standalone = ["--help", "--json", "--show-secrets", "-h", "-j"]
+valued = ["--stack", "-s"]
+[[command.sub.sub]]
+name = "history"
+standalone = ["--help", "--json", "--show-secrets", "-h"]
+valued = ["--page", "--page-size", "--stack", "-s"]
+[[command.sub.sub]]
+name = "tag"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "graph"
+standalone = ["--help", "-h"]
+valued = ["--dependency-edge-color", "--parent-edge-color", "--stack", "-s"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--follow", "--help", "--json", "-f", "-h"]
+valued = ["--resource", "--since", "--stack", "-r", "-s"]
+
+[[command.sub]]
+name = "config"
+nested_bare = true
+
+[[command.sub]]
+name = "gen-completion"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "console"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "schema"
+[[command.sub.sub]]
+name = "check"
+standalone = ["--help", "-h"]

@@ -1,0 +1,11 @@
+[[command]]
+name = "wc"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "-L", "-V", "-c", "-h", "-l", "-m", "-w",
+    "--bytes", "--chars", "--help", "--lines",
+    "--max-line-length", "--version", "--words", "--zero-terminated",
+]
+valued = ["--files0-from"]

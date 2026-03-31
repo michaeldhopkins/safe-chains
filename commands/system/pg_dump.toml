@@ -1,0 +1,18 @@
+[[command]]
+name = "pg_dump"
+url = "https://www.postgresql.org/docs/current/app-pgdump.html"
+level = "Inert"
+bare = false
+require_any = ["--schema-only", "-s"]
+standalone = [
+    "--help", "--no-comments", "--no-owner",
+    "--no-privileges", "--no-tablespaces", "--schema-only",
+    "--verbose", "--version",
+    "-V", "-h", "-s", "-v",
+]
+valued = [
+    "--dbname", "--encoding", "--file", "--format",
+    "--host", "--port", "--schema", "--table",
+    "--username",
+    "-E", "-F", "-U", "-d", "-f", "-n", "-p", "-t",
+]

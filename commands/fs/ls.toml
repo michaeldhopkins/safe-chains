@@ -1,0 +1,28 @@
+[[command]]
+name = "ls"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--almost-all", "--author", "--classify",
+    "--context", "--dereference", "--dereference-command-line",
+    "--dereference-command-line-symlink-to-dir", "--directory",
+    "--escape", "--file-type", "--full-time",
+    "--group-directories-first", "--help", "--hide-control-chars",
+    "--human-readable", "--indicator-style",
+    "--inode", "--kibibytes", "--literal", "--no-group",
+    "--numeric-uid-gid", "--quote-name", "--recursive",
+    "--reverse", "--show-control-chars", "--si", "--size", "--version",
+    "-1", "-A", "-B", "-C", "-F", "-G", "-H", "-L",
+    "-N", "-Q", "-R", "-S", "-U", "-V", "-X", "-Z",
+    "-a", "-c", "-d", "-f", "-g", "-h", "-i", "-k",
+    "-l", "-m", "-n", "-o", "-p", "-q", "-r", "-s",
+    "-t", "-u", "-v", "-x",
+]
+valued = [
+    "--block-size", "--color", "--format", "--hide",
+    "--hyperlink", "--ignore",
+    "--quoting-style", "--sort", "--tabsize", "--time",
+    "--time-style", "--width",
+    "-I", "-T", "-w",
+]

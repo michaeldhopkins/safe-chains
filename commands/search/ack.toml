@@ -1,0 +1,25 @@
+[[command]]
+name = "ack"
+url = "https://beyondgrep.com/documentation/"
+level = "Inert"
+bare = false
+standalone = [
+    "--color", "--column", "--count", "--files-with-matches",
+    "--files-without-matches", "--flush", "--follow", "--group",
+    "--heading", "--help", "--ignore-case", "--invert-match", "--line",
+    "--literal", "--match", "--no-color", "--no-filename",
+    "--no-follow", "--no-group", "--no-heading", "--nocolor",
+    "--noenv", "--nofilter", "--nofollow", "--nogroup",
+    "--noheading", "--nopager", "--nosmart-case", "--passthru",
+    "--print0", "--show-types", "--smart-case", "--sort-files",
+    "--version", "--with-filename", "--word-regexp",
+    "-1", "-H", "-L", "-V", "-c", "-f", "-h", "-i", "-l",
+    "-n", "-s", "-v", "-w", "-x",
+]
+valued = [
+    "--after-context", "--before-context", "--context",
+    "--ignore-dir", "--max-count", "--noignore-dir",
+    "--output", "--pager", "--type", "--type-add",
+    "--type-del", "--type-set",
+    "-A", "-B", "-C", "-m",
+]

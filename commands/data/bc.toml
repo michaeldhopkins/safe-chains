@@ -1,0 +1,15 @@
+[[command]]
+name = "bc"
+url = "https://www.gnu.org/software/bc/manual/html_mono/bc.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--digit-clamp", "--global-stacks", "--help", "--interactive", "--mathlib",
+    "--no-digit-clamp", "--no-line-length", "--no-prompt",
+    "--no-read-prompt", "--quiet", "--standard", "--version", "--warn",
+    "-C", "-P", "-R", "-V", "-c", "-g", "-h", "-i", "-l", "-q", "-s", "-w",
+]
+valued = [
+    "--expression", "--file", "--ibase", "--obase", "--redefine", "--scale", "--seed",
+    "-E", "-I", "-O", "-S", "-e", "-f", "-r",
+]

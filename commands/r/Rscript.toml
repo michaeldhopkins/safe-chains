@@ -1,0 +1,6 @@
+[[command]]
+name = "Rscript"
+url = "https://cran.r-project.org/manuals.html"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

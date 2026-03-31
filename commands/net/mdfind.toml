@@ -1,0 +1,10 @@
+[[command]]
+name = "mdfind"
+url = "https://ss64.com/mac/mdfind.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--version",
+    "-0", "-V", "-count", "-h", "-interpret", "-literal", "-live",
+]
+valued = ["-attr", "-name", "-onlyin", "-s"]

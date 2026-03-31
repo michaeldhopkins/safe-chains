@@ -1,0 +1,12 @@
+[[command]]
+name = "iotop"
+url = "https://man7.org/linux/man-pages/man8/iotop.8.html"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = [
+    "--accumulated", "--batch", "--help", "--kilobytes", "--only",
+    "--processes", "--quiet", "--version",
+    "-P", "-V", "-a", "-b", "-h", "-k", "-o", "-q", "-t",
+]
+valued = ["--delay", "--iter", "--pid", "--user", "-d", "-n", "-p", "-u"]

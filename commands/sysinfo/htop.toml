@@ -1,0 +1,14 @@
+[[command]]
+name = "htop"
+url = "https://htop.dev/"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = [
+    "--help", "--no-color", "--no-mouse", "--no-unicode", "--tree", "--version",
+    "-C", "-H", "-M", "-V", "-h", "-t",
+]
+valued = [
+    "--delay", "--filter", "--highlight-changes", "--pid", "--sort-key", "--user",
+    "-F", "-d", "-p", "-s", "-u",
+]

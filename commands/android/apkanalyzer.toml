@@ -1,0 +1,115 @@
+[[command]]
+name = "apkanalyzer"
+url = "https://developer.android.com/tools/apkanalyzer"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "apk"
+[[command.sub.sub]]
+name = "compare"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "download-size"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "features"
+bare = false
+standalone = ["--help", "--not-required", "-h"]
+[[command.sub.sub]]
+name = "file-size"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "summary"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dex"
+[[command.sub.sub]]
+name = "code"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "list"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "packages"
+bare = false
+standalone = ["--defined-only", "--help", "-h"]
+valued = ["--files", "--proguard-folder", "--proguard-mappings", "--proguard-seeds", "--proguard-usages"]
+[[command.sub.sub]]
+name = "references"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "files"
+[[command.sub.sub]]
+name = "cat"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "list"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "manifest"
+[[command.sub.sub]]
+name = "application-id"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "debuggable"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "min-sdk"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "permissions"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "print"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "target-sdk"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "version-code"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "version-name"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "resources"
+[[command.sub.sub]]
+name = "configs"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--config", "--name", "--type"]
+[[command.sub.sub]]
+name = "names"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--config", "--name", "--type"]
+[[command.sub.sub]]
+name = "value"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--config", "--name", "--type"]
+[[command.sub.sub]]
+name = "xml"
+bare = false
+standalone = ["--help", "-h"]

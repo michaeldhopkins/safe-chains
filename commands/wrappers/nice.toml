@@ -1,0 +1,6 @@
+[[command]]
+name = "nice"
+aliases = ["ionice"]
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation"
+[command.wrapper]
+valued = ["-n", "--adjustment"]

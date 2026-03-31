@@ -1,0 +1,55 @@
+[[command]]
+name = "biome"
+url = "https://biomejs.dev/reference/cli/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+standalone = [
+    "--apply", "--colors", "--help", "--json-formatter",
+    "--no-errors-on-unmatched", "--quiet", "--verbose",
+    "-h",
+]
+valued = [
+    "--config-path", "--max-diagnostics", "--stdin-file-path",
+    "--vcs-root",
+]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+standalone = [
+    "--colors", "--help", "--json-formatter",
+    "--no-errors-on-unmatched", "--quiet", "--verbose",
+    "-h",
+]
+valued = [
+    "--config-path", "--max-diagnostics", "--stdin-file-path",
+    "--vcs-root",
+]
+
+[[command.sub]]
+name = "ci"
+level = "SafeRead"
+standalone = [
+    "--colors", "--help", "--json-formatter",
+    "--no-errors-on-unmatched", "--quiet", "--verbose",
+    "-h",
+]
+valued = [
+    "--config-path", "--max-diagnostics",
+]
+
+[[command.sub]]
+name = "format"
+level = "Inert"
+standalone = [
+    "--colors", "--help", "--json-formatter",
+    "--no-errors-on-unmatched", "--quiet", "--verbose",
+    "-h",
+]
+valued = [
+    "--config-path", "--indent-style", "--indent-width",
+    "--line-width", "--stdin-file-path",
+]

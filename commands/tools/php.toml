@@ -1,0 +1,7 @@
+[[command]]
+name = "php"
+url = "https://www.php.net/manual/en/features.commandline.options.php"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

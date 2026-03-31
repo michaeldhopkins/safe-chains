@@ -1,0 +1,12 @@
+[[command]]
+name = "whois"
+url = "https://man7.org/linux/man-pages/man1/whois.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--version",
+    "-A", "-B", "-G", "-H", "-I", "-K", "-L",
+    "-M", "-Q", "-R", "-S", "-a", "-b", "-c",
+    "-d", "-f", "-g", "-l", "-m", "-r", "-x",
+]
+valued = ["-T", "-V", "-h", "-i", "-p", "-s", "-t"]

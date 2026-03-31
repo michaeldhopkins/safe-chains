@@ -1,0 +1,11 @@
+[[command]]
+name = "unzip"
+url = "https://linux.die.net/man/1/unzip"
+level = "Inert"
+bare = false
+require_any = ["-l", "-t", "-Z"]
+standalone = [
+    "-1", "-2", "-C", "-M", "-T", "-Z",
+    "-h", "-l", "-m", "-q", "-s", "-t", "-v", "-z",
+    "--help", "--version", "-V",
+]

@@ -1,0 +1,10 @@
+[[command]]
+name = "gron"
+url = "https://github.com/tomnomnom/gron"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--json", "--monochrome", "--no-sort",
+    "--stream", "--ungron", "--values", "--version",
+    "-c", "-j", "-k", "-m", "-s", "-u", "-v",
+]

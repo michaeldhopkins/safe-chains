@@ -1,0 +1,17 @@
+[[command]]
+name = "bat"
+url = "https://github.com/sharkdp/bat#readme"
+level = "Inert"
+bare = true
+standalone = [
+    "--diff", "--help", "--list-languages", "--list-themes", "--no-config",
+    "--number", "--plain", "--show-all", "--version",
+    "-A", "-P", "-V", "-d", "-h", "-n", "-p", "-u",
+]
+valued = [
+    "--color", "--decorations", "--diff-context", "--file-name",
+    "--highlight-line", "--italic-text", "--language", "--line-range",
+    "--map-syntax", "--paging", "--style", "--tabs",
+    "--terminal-width", "--theme", "--wrap",
+    "-H", "-l", "-m", "-r",
+]

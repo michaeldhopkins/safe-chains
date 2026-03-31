@@ -1,0 +1,7 @@
+[[command]]
+name = "ruby"
+url = "https://www.ruby-lang.org/en/documentation/"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h", "-v"]

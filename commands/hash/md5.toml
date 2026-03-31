@@ -1,0 +1,7 @@
+[[command]]
+name = "md5"
+url = "https://man7.org/linux/man-pages/man1/md5sum.1.html"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-V", "-h", "-n", "-p", "-q", "-r", "-t"]
+valued = ["-s"]

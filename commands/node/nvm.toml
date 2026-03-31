@@ -1,0 +1,34 @@
+[[command]]
+name = "nvm"
+url = "https://github.com/nvm-sh/nvm#readme"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "current"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]
+
+[[command.sub]]
+name = "ls"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]
+
+[[command.sub]]
+name = "ls-remote"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]
+
+[[command.sub]]
+name = "version"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]
+
+[[command.sub]]
+name = "which"
+level = "Inert"
+standalone = ["--help", "--lts", "--no-colors", "-h"]

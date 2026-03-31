@@ -1,0 +1,10 @@
+[[command]]
+name = "host"
+url = "https://man7.org/linux/man-pages/man1/host.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--version",
+    "-4", "-6", "-C", "-V", "-a", "-c", "-d", "-h", "-l", "-r", "-s", "-v",
+]
+valued = ["-D", "-N", "-R", "-T", "-W", "-i", "-m", "-t"]

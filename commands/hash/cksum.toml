@@ -1,0 +1,11 @@
+[[command]]
+name = "cksum"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--base64", "--check", "--help", "--raw", "--strict",
+    "--tag", "--untagged", "--version", "--warn", "--zero",
+    "-V", "-c", "-h", "-w", "-z",
+]
+valued = ["--algorithm", "--length", "-a", "-l"]

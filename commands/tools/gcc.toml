@@ -1,0 +1,8 @@
+[[command]]
+name = "gcc"
+url = "https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-v"]
+aliases = ["g++", "cc", "c++"]

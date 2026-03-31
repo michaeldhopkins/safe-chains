@@ -1,0 +1,18 @@
+[[command]]
+name = "pyright"
+url = "https://github.com/microsoft/pyright"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--dependencies", "--help", "--lib",
+    "--outputjson", "--skipunannotated", "--stats",
+    "--verbose", "--version", "--warnings",
+    "-h",
+]
+valued = [
+    "--exclude", "--ignore", "--level",
+    "--project", "--pythonpath", "--pythonplatform",
+    "--pythonversion", "--threads", "--typeshedpath",
+    "--verifytypes",
+    "-p",
+]

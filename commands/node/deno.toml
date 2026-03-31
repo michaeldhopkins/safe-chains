@@ -1,0 +1,42 @@
+[[command]]
+name = "deno"
+url = "https://docs.deno.com/runtime/reference/cli/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+standalone = ["--help", "--json", "--no-lock", "--quiet", "--unstable", "-h", "-q"]
+valued = ["--config", "--import-map", "-c"]
+
+[[command.sub]]
+name = "doc"
+level = "Inert"
+standalone = ["--help", "--json", "--no-lock", "--quiet", "--unstable", "-h", "-q"]
+valued = ["--config", "--import-map", "-c"]
+
+[[command.sub]]
+name = "fmt"
+guard = "--check"
+level = "Inert"
+bare = false
+standalone = ["--check", "--help", "--no-semicolons", "--single-quote", "--unstable", "-h", "-q"]
+valued = ["--config", "--ext", "--ignore", "--indent-width", "--line-width", "--log-level", "--prose-wrap", "-c"]
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+standalone = ["--help", "--json", "--no-lock", "--quiet", "--unstable", "-h", "-q"]
+valued = ["--config", "--import-map", "-c"]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+standalone = ["--help", "--json", "--no-lock", "--quiet", "--unstable", "-h", "-q"]
+valued = ["--config", "--import-map", "-c"]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+standalone = ["--help", "--json", "--no-lock", "--quiet", "--unstable", "-h", "-q"]
+valued = ["--config", "--import-map", "-c"]

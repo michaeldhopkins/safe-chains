@@ -1,0 +1,7 @@
+[[command]]
+name = "rustc"
+url = "https://doc.rust-lang.org/rustc/"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

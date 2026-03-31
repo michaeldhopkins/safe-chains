@@ -1,0 +1,7 @@
+[[command]]
+name = "lint"
+url = "https://developer.android.com/studio/write/lint"
+level = "Inert"
+bare = true
+standalone = ["--help", "--list", "--quiet", "--show", "--version", "-V", "-h"]
+valued = ["--check", "--config", "--disable", "--enable"]

@@ -1,0 +1,7 @@
+[[command]]
+name = "jless"
+url = "https://github.com/PaulJuliusMartinez/jless"
+level = "Inert"
+bare = false
+standalone = ["--help", "--json", "--version", "--yaml", "-N", "-V", "-h", "-n"]
+valued = ["--mode", "--scrolloff"]

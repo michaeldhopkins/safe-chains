@@ -1,0 +1,102 @@
+[[command]]
+name = "vultr-cli"
+url = "https://github.com/vultr/vultr-cli"
+bare_flags = ["--help", "--version", "-h", "-v"]
+[command.wrapper]
+valued = ["--config"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "account"
+
+[[command.sub]]
+name = "plans"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "regions"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "os"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "instance"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "bare-metal"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "block-storage"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dns"
+[[command.sub.sub]]
+name = "domain"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "record"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "firewall"
+[[command.sub.sub]]
+name = "group"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "rule"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "kubernetes"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "database"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]

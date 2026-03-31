@@ -1,0 +1,7 @@
+[[command]]
+name = "dig"
+url = "https://man7.org/linux/man-pages/man1/dig.1.html"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-4", "-6", "-V", "-h", "-m", "-r", "-u", "-v"]
+valued = ["-b", "-c", "-f", "-k", "-p", "-q", "-t", "-x", "-y"]

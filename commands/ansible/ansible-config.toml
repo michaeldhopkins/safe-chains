@@ -1,0 +1,16 @@
+[[command]]
+name = "ansible-config"
+url = "https://docs.ansible.com/ansible/latest/cli/ansible-config.html"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dump"
+standalone = ["--help", "--only-changed", "-h"]
+
+[[command.sub]]
+name = "view"
+standalone = ["--help", "-h"]

@@ -1,0 +1,21 @@
+[[command]]
+name = "readelf"
+url = "https://man7.org/linux/man-pages/man1/readelf.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--all", "--arch-specific", "--archive-index",
+    "--debug-dump", "--dynamic", "--file-header",
+    "--headers", "--help", "--histogram",
+    "--notes", "--program-headers", "--relocs",
+    "--section-headers", "--segments", "--symbols",
+    "--syms", "--unwind", "--version", "--version-info", "--wide",
+    "-A", "-I", "-S", "-V", "-W", "-a", "-d", "-e",
+    "-g", "-h", "-l", "-n", "-p", "-r", "-s", "-u",
+]
+valued = [
+    "--decompress", "--dwarf-depth", "--dwarf-start",
+    "--hex-dump", "--relocated-dump", "--section-details",
+    "--string-dump",
+    "-D", "-R", "-w", "-x", "-z",
+]

@@ -1,0 +1,22 @@
+[[command]]
+name = "meson"
+url = "https://mesonbuild.com/Commands.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "introspect"
+standalone = [
+    "--all", "--benchmarks", "--buildoptions", "--buildsystem-files",
+    "--dependencies", "--help", "--installed",
+    "--projectinfo", "--targets", "--tests",
+    "-a", "-h",
+]
+valued = ["--backend", "--indent"]
+
+[[command.sub]]
+name = "configure"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "-h"]

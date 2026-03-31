@@ -1,0 +1,46 @@
+[[command]]
+name = "crane"
+url = "https://github.com/google/go-containerregistry"
+bare_flags = ["--help", "-h"]
+[command.wrapper]
+standalone = ["--insecure", "--verbose", "-v"]
+valued = ["--platform"]
+
+[[command.sub]]
+name = "blob"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "catalog"
+bare = false
+standalone = ["--full-ref", "--help", "-h"]
+
+[[command.sub]]
+name = "config"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "digest"
+bare = false
+standalone = ["--full-ref", "--help", "--tarball", "-h"]
+
+[[command.sub]]
+name = "ls"
+bare = false
+standalone = ["--full-ref", "--help", "--omit-digest-tags", "-h"]
+
+[[command.sub]]
+name = "manifest"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "validate"
+bare = false
+standalone = ["--fast", "--help", "--remote", "--tarball", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

@@ -1,0 +1,7 @@
+[[command]]
+name = "elixir"
+url = "https://hexdocs.pm/elixir/main/elixir-cmd.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

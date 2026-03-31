@@ -1,0 +1,36 @@
+[[command]]
+name = "diskutil"
+url = "https://ss64.com/mac/diskutil.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h", "-plist"]
+
+[[command.sub]]
+name = "listFilesystems"
+standalone = ["--help", "-h", "-plist"]
+
+[[command.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-all", "-h", "-plist"]
+
+[[command.sub]]
+name = "activity"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "apfs"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "listCryptoUsers"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "listSnapshots"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "listVolumeGroups"
+standalone = ["--help", "-h"]

@@ -1,0 +1,11 @@
+[[command]]
+name = "shasum"
+url = "https://perldoc.perl.org/shasum"
+level = "Inert"
+bare = true
+standalone = [
+    "--binary", "--check", "--help", "--portable", "--status",
+    "--strict", "--tag", "--text", "--version", "--warn",
+    "-0", "-V", "-b", "-c", "-h", "-p", "-s", "-t",
+]
+valued = ["--algorithm", "-a"]

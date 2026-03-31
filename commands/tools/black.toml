@@ -1,0 +1,16 @@
+[[command]]
+name = "black"
+url = "https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html"
+level = "Inert"
+bare = false
+require_any = ["--check", "--diff"]
+standalone = [
+    "--check", "--diff", "--color", "--no-color",
+    "--fast", "--quiet", "--verbose",
+    "--help", "--version",
+]
+valued = [
+    "--config", "--exclude", "--extend-exclude",
+    "--include", "--line-length", "--target-version",
+    "-l", "-t",
+]

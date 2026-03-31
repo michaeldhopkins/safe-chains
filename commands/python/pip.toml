@@ -1,0 +1,57 @@
+[[command]]
+name = "pip"
+aliases = ["pip3"]
+url = "https://pip.pypa.io/en/stable/cli/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = [
+    "--editable", "--exclude-editable", "--help", "--include-editable",
+    "--local", "--not-required", "--outdated", "--pre",
+    "--uptodate", "--user",
+    "-e", "-h", "-i", "-l", "-o",
+]
+valued = ["--exclude", "--format", "--index-url", "--path"]
+
+[[command.sub]]
+name = "show"
+bare = false
+standalone = ["--files", "--help", "--verbose", "-f", "-h", "-v"]
+
+[[command.sub]]
+name = "freeze"
+standalone = [
+    "--all", "--exclude-editable", "--help", "--local", "--user",
+    "-h", "-l",
+]
+valued = ["--exclude", "--path"]
+
+[[command.sub]]
+name = "check"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "debug"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "index"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "inspect"
+standalone = ["--help", "-h"]

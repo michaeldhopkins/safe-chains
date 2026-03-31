@@ -1,0 +1,58 @@
+[[command]]
+name = "orbctl"
+url = "https://docs.orbstack.dev/cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "config"
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "default"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--format", "-f"]
+
+[[command.sub]]
+name = "list"
+standalone = [
+    "--help", "--quiet", "--running",
+    "-h", "-q", "-r",
+]
+valued = ["--format", "-f"]
+
+[[command.sub]]
+name = "logs"
+bare = false
+standalone = ["--all", "--help", "-a", "-h"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "update"
+bare = false
+guard = "--check"
+standalone = ["--check", "--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

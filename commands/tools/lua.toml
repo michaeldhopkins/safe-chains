@@ -1,0 +1,7 @@
+[[command]]
+name = "lua"
+url = "https://www.lua.org/manual/5.4/readme.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-v"]

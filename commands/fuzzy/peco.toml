@@ -1,0 +1,11 @@
+[[command]]
+name = "peco"
+url = "https://github.com/peco/peco"
+level = "Inert"
+bare = true
+standalone = ["--help", "--null", "--print-query", "--select-1", "--version", "-h", "-v"]
+valued = [
+    "--buffer-size", "--initial-filter", "--initial-index",
+    "--layout", "--on-cancel", "--prompt", "--query", "--selection-prefix",
+    "-b",
+]

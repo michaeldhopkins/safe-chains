@@ -1,0 +1,9 @@
+[[command]]
+name = "zipinfo"
+url = "https://linux.die.net/man/1/zipinfo"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--version",
+    "-1", "-2", "-C", "-M", "-T", "-V", "-Z", "-h", "-l", "-m", "-s", "-t", "-v", "-z",
+]

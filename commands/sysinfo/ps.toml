@@ -1,0 +1,16 @@
+[[command]]
+name = "ps"
+url = "https://man7.org/linux/man-pages/man1/ps.1.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--cumulative", "--deselect", "--forest", "--headers", "--help", "--info",
+    "--no-headers", "--version",
+    "-A", "-C", "-H", "-L", "-M", "-N", "-S", "-T", "-V", "-Z",
+    "-a", "-c", "-d", "-e", "-f", "-h", "-j", "-l", "-m", "-r", "-v", "-w", "-x",
+]
+valued = [
+    "--cols", "--columns", "--format", "--group", "--pid",
+    "--ppid", "--rows", "--sid", "--sort", "--tty", "--user", "--width",
+    "-G", "-O", "-U", "-g", "-n", "-o", "-p", "-s", "-t", "-u",
+]

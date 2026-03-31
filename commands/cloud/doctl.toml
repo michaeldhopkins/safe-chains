@@ -1,0 +1,82 @@
+[[command]]
+name = "doctl"
+url = "https://docs.digitalocean.com/reference/doctl/"
+bare_flags = ["--help", "--version", "-h", "-v"]
+[command.wrapper]
+valued = ["--access-token", "--context", "--output", "-o", "-t"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "account"
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "balance"
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "compute"
+[[command.sub.sub]]
+name = "droplet"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+valued = ["--format", "--no-header"]
+[[command.sub.sub]]
+name = "region"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "size"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "image"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "volume"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "firewall"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "databases"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "kubernetes"
+[[command.sub.sub]]
+name = "cluster"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "apps"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "projects"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]

@@ -1,0 +1,11 @@
+[[command]]
+name = "head"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
+    "-V", "-h", "-q", "-v", "-z",
+    "--help", "--quiet", "--silent", "--verbose", "--version", "--zero-terminated",
+]
+valued = ["-c", "-n", "--bytes", "--lines"]

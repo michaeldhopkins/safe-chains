@@ -1,0 +1,14 @@
+[[command]]
+name = "zoxide"
+url = "https://github.com/ajeetdsouza/zoxide"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "query"
+standalone = [
+    "--all", "--exclude", "--help", "--interactive",
+    "--list", "--score",
+    "-a", "-h", "-i", "-l", "-s",
+]
+
+# Language runtime version/help queries

@@ -1,0 +1,32 @@
+[[command]]
+name = "defaults"
+url = "https://ss64.com/mac/defaults.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "read"
+bare = false
+standalone = ["--help", "-g", "-globalDomain", "-h"]
+valued = ["-app"]
+
+[[command.sub]]
+name = "read-type"
+bare = false
+standalone = ["--help", "-g", "-globalDomain", "-h"]
+valued = ["-app"]
+
+[[command.sub]]
+name = "export"
+bare = false
+standalone = ["--help", "-g", "-globalDomain", "-h"]
+valued = ["-app"]
+
+[[command.sub]]
+name = "find"
+bare = false
+standalone = ["--help", "-g", "-globalDomain", "-h"]
+valued = ["-app"]
+
+[[command.sub]]
+name = "domains"
+standalone = ["--help", "-h"]

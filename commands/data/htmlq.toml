@@ -1,0 +1,11 @@
+[[command]]
+name = "htmlq"
+url = "https://github.com/mgdm/htmlq"
+level = "Inert"
+bare = false
+standalone = [
+    "--detect-base", "--help", "--ignore-whitespace",
+    "--pretty", "--remove-nodes", "--text", "--version",
+    "-B", "-V", "-h", "-p", "-t", "-w",
+]
+valued = ["--attribute", "--base", "--filename", "--output", "-a", "-b", "-f", "-o"]

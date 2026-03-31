@@ -1,0 +1,15 @@
+[[command]]
+name = "make"
+url = "https://www.gnu.org/software/make/manual/make.html"
+level = "Inert"
+bare = false
+require_any = ["-n", "--dry-run", "--just-print", "--recon", "-p", "--print-data-base"]
+standalone = [
+    "--dry-run", "--help", "--just-print", "--print-data-base",
+    "--question", "--recon", "--version",
+    "-V", "-h", "-n", "-p", "-q",
+]
+valued = [
+    "--directory", "--file", "--jobs", "--makefile",
+    "-C", "-f", "-j",
+]

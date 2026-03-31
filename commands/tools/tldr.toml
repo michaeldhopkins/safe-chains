@@ -1,0 +1,8 @@
+[[command]]
+name = "tldr"
+url = "https://tldr.sh/"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "--list", "--version", "-h", "-l", "-v"]
+valued = ["--language", "--platform", "-L", "-p"]

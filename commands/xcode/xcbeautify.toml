@@ -1,0 +1,7 @@
+[[command]]
+name = "xcbeautify"
+url = "https://github.com/cpisciotta/xcbeautify"
+level = "Inert"
+bare = true
+standalone = ["--help", "--is-ci", "--quiet", "--quieter", "--version", "-V", "-h", "-q"]
+valued = ["--renderer"]

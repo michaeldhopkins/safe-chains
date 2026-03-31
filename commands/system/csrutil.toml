@@ -1,0 +1,16 @@
+[[command]]
+name = "csrutil"
+url = "https://ss64.com/mac/csrutil.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "authenticated-root"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "report"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "-h"]

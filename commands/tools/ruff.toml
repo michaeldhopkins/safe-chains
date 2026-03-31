@@ -1,0 +1,42 @@
+[[command]]
+name = "ruff"
+url = "https://docs.astral.sh/ruff/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+standalone = [
+    "--help", "--no-fix", "--quiet", "--show-files",
+    "--show-settings", "--statistics", "--verbose",
+    "--watch",
+    "-e", "-h", "-q", "-v",
+]
+valued = [
+    "--config", "--exclude", "--extend-exclude",
+    "--extend-select", "--ignore", "--line-length",
+    "--output-format", "--select", "--target-version",
+]
+
+[[command.sub]]
+name = "format"
+guard = "--check"
+level = "Inert"
+bare = false
+standalone = ["--check", "--diff", "--help", "--quiet", "--verbose", "-h", "-q", "-v"]
+valued = [
+    "--config", "--exclude", "--extend-exclude",
+    "--line-length", "--target-version",
+]
+
+[[command.sub]]
+name = "rule"
+standalone = ["--all", "--help", "--output-format", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--output-format", "-h"]
+
+[[command.sub]]
+name = "config"
+standalone = ["--help", "-h"]

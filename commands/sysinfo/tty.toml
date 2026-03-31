@@ -1,0 +1,7 @@
+[[command]]
+name = "tty"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#tty-invocation"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--quiet", "--silent", "--version", "-V", "-h", "-s"]

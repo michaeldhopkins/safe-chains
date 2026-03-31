@@ -1,0 +1,8 @@
+[[command]]
+name = "spctl"
+url = "https://ss64.com/mac/spctl.html"
+level = "Inert"
+bare = false
+require_any = ["--assess", "-a"]
+standalone = ["--assess", "--verbose", "-a", "-v", "--help", "-h"]
+valued = ["--context", "--type", "-t"]

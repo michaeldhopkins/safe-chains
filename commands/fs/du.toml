@@ -1,0 +1,19 @@
+[[command]]
+name = "du"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--apparent-size", "--bytes", "--count-links",
+    "--dereference", "--dereference-args", "--help", "--human-readable",
+    "--inodes", "--no-dereference", "--null",
+    "--one-file-system", "--separate-dirs", "--si",
+    "--summarize", "--total", "--version",
+    "-0", "-D", "-H", "-L", "-P", "-S", "-V", "-a", "-b",
+    "-c", "-h", "-k", "-l", "-m", "-s", "-x",
+]
+valued = [
+    "--block-size", "--exclude", "--files0-from",
+    "--max-depth", "--threshold", "--time", "--time-style",
+    "-B", "-d", "-t",
+]

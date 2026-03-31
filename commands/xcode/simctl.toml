@@ -1,0 +1,7 @@
+[[command]]
+name = "simctl"
+url = "https://developer.apple.com/documentation/xcode/simctl"
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--json", "--verbose", "-h", "-j", "-v"]

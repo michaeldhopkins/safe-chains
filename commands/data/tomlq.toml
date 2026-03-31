@@ -1,0 +1,12 @@
+[[command]]
+name = "tomlq"
+url = "https://github.com/kislyuk/yq"
+level = "Inert"
+bare = false
+standalone = [
+    "--compact-output", "--exit-status", "--help",
+    "--null-input", "--raw-input", "--raw-output",
+    "--slurp", "--sort-keys", "--tab", "--toml-output", "--version",
+    "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-h", "-n", "-r", "-s", "-t",
+]
+valued = ["--arg", "--argjson", "--indent", "-f"]

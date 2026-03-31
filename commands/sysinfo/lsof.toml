@@ -1,0 +1,11 @@
+[[command]]
+name = "lsof"
+url = "https://man7.org/linux/man-pages/man8/lsof.8.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--version",
+    "-C", "-G", "-M", "-N", "-O", "-P", "-R", "-U", "-V", "-X",
+    "-b", "-h", "-l", "-n", "-t", "-w", "-x",
+]
+valued = ["-F", "-S", "-T", "-a", "-c", "-d", "-g", "-i", "-k", "-o", "-p", "-r", "-s", "-u"]

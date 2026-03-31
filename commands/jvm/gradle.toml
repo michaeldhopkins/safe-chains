@@ -1,0 +1,70 @@
+[[command]]
+name = "gradle"
+aliases = ["gradlew"]
+url = "https://docs.gradle.org/current/userguide/command_line_interface.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+standalone = [
+    "--build-cache", "--configure-on-demand", "--console",
+    "--continue", "--dry-run", "--help", "--info", "--no-build-cache",
+    "--no-daemon", "--no-parallel", "--no-rebuild",
+    "--parallel", "--profile", "--quiet", "--rerun-tasks",
+    "--scan", "--stacktrace", "--warning-mode",
+    "-h", "-q",
+]
+valued = ["--exclude-task", "--max-workers", "-x"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+standalone = [
+    "--build-cache", "--configure-on-demand", "--console",
+    "--continue", "--dry-run", "--help", "--info", "--no-build-cache",
+    "--no-daemon", "--no-parallel", "--no-rebuild",
+    "--parallel", "--profile", "--quiet", "--rerun-tasks",
+    "--scan", "--stacktrace", "--warning-mode",
+    "-h", "-q",
+]
+valued = ["--exclude-task", "--max-workers", "-x"]
+
+[[command.sub]]
+name = "dependencies"
+standalone = [
+    "--console", "--help", "--info", "--no-rebuild",
+    "--quiet", "--stacktrace", "--warning-mode",
+    "-h", "-q",
+]
+valued = ["--configuration"]
+
+[[command.sub]]
+name = "properties"
+standalone = [
+    "--console", "--help", "--info", "--no-rebuild",
+    "--quiet", "--stacktrace", "--warning-mode",
+    "-h", "-q",
+]
+
+[[command.sub]]
+name = "tasks"
+standalone = [
+    "--all", "--console", "--help", "--info", "--no-rebuild",
+    "--quiet", "--stacktrace", "--warning-mode",
+    "-h", "-q",
+]
+valued = ["--group"]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+standalone = [
+    "--build-cache", "--configure-on-demand", "--console",
+    "--continue", "--dry-run", "--help", "--info", "--no-build-cache",
+    "--no-daemon", "--no-parallel", "--no-rebuild",
+    "--parallel", "--profile", "--quiet", "--rerun-tasks",
+    "--scan", "--stacktrace", "--warning-mode",
+    "-h", "-q",
+]
+valued = ["--exclude-task", "--max-workers", "-x"]

@@ -1,0 +1,24 @@
+[[command]]
+name = "importmap"
+url = "https://github.com/rails/importmap-rails"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "audit"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "json"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "outdated"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "packages"
+standalone = ["--help", "-h"]
+max_positional = 0

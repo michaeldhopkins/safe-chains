@@ -1,0 +1,20 @@
+[[command]]
+name = "ollama"
+url = "https://github.com/ollama/ollama/blob/main/docs/api.md"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "ps"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "show"
+bare = false
+standalone = [
+    "--help", "--json", "--license", "--modelfile", "--parameters",
+    "--system", "--template", "--verbose", "-h",
+]

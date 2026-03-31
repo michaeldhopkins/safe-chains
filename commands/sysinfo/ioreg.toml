@@ -1,0 +1,11 @@
+[[command]]
+name = "ioreg"
+url = "https://ss64.com/mac/ioreg.html"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = [
+    "--help", "--version",
+    "-S", "-V", "-a", "-b", "-f", "-h", "-i", "-l", "-r", "-t", "-x",
+]
+valued = ["-c", "-d", "-k", "-n", "-p", "-w"]

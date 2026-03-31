@@ -1,0 +1,7 @@
+[[command]]
+name = "xsv"
+url = "https://github.com/BurntSushi/xsv"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-h"]

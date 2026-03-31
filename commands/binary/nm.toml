@@ -1,0 +1,15 @@
+[[command]]
+name = "nm"
+url = "https://man7.org/linux/man-pages/man1/nm.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "-A", "-B", "-C", "-D", "-P", "-S", "-V", "-a", "-g", "-h", "-j",
+    "-l", "-m", "-n", "-o", "-p", "-r", "-s", "-u", "-v", "-x",
+    "--debug-syms", "--defined-only", "--demangle", "--dynamic",
+    "--extern-only", "--help", "--line-numbers", "--no-demangle",
+    "--no-llvm-bc", "--no-sort", "--numeric-sort", "--portability",
+    "--print-armap", "--print-file-name", "--print-size", "--reverse-sort",
+    "--special-syms", "--undefined-only", "--version",
+]
+valued = ["-f", "-t", "--format", "--radix", "--size-sort", "--target"]

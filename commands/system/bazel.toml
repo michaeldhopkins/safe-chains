@@ -1,0 +1,30 @@
+[[command]]
+name = "bazel"
+url = "https://bazel.build/reference/command-line-reference"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "query"
+bare = false
+standalone = ["--help", "--keep_going", "--nohost_deps", "--noimplicit_deps", "--order_output", "-h", "-k"]
+valued = ["--output", "--universe_scope"]
+
+[[command.sub]]
+name = "cquery"
+bare = false
+standalone = ["--help", "--keep_going", "-h", "-k"]
+valued = ["--output", "--universe_scope"]
+
+[[command.sub]]
+name = "aquery"
+bare = false
+standalone = ["--help", "--keep_going", "-h", "-k"]
+valued = ["--output", "--universe_scope"]
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

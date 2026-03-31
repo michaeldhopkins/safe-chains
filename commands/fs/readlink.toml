@@ -1,0 +1,10 @@
+[[command]]
+name = "readlink"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#readlink-invocation"
+level = "Inert"
+bare = false
+standalone = [
+    "--canonicalize", "--canonicalize-existing",
+    "--canonicalize-missing", "--help", "--no-newline", "--verbose", "--version", "--zero",
+    "-V", "-e", "-f", "-h", "-m", "-n", "-v", "-z",
+]

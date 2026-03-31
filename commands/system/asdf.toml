@@ -1,0 +1,42 @@
+[[command]]
+name = "asdf"
+url = "https://asdf-vm.com/manage/commands.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "current"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "which"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugin"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugin-list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugin-list-all"
+standalone = ["--help", "-h"]

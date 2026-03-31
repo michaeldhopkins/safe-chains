@@ -1,0 +1,10 @@
+[[command]]
+name = "cat"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "-A", "-E", "-T", "-V", "-b", "-e", "-h", "-l", "-n", "-s", "-t", "-u", "-v",
+    "--help", "--number", "--number-nonblank", "--show-all", "--show-ends",
+    "--show-nonprinting", "--show-tabs", "--squeeze-blank", "--version",
+]

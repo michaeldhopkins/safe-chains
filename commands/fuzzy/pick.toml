@@ -1,0 +1,7 @@
+[[command]]
+name = "pick"
+url = "https://github.com/mptre/pick"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-K", "-S", "-X", "-d", "-h", "-o", "-v", "-x"]
+valued = ["-q"]

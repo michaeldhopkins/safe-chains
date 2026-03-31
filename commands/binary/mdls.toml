@@ -1,0 +1,7 @@
+[[command]]
+name = "mdls"
+url = "https://ss64.com/mac/mdls.html"
+level = "Inert"
+bare = false
+standalone = ["-V", "-h", "-r", "--help", "--raw", "--version"]
+valued = ["-n", "--name", "--nullMarker"]

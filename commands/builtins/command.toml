@@ -1,0 +1,8 @@
+[[command]]
+name = "command"
+url = "https://man7.org/linux/man-pages/man1/command.1p.html"
+level = "Inert"
+bare = false
+require_any = ["-v", "-V", "--version"]
+standalone = ["--help", "--version", "-h"]
+valued = ["-v", "-V"]

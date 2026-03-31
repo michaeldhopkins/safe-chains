@@ -1,0 +1,6 @@
+[[command]]
+name = "printenv"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation"
+level = "Inert"
+bare = true
+standalone = ["--help", "--null", "--version", "-0", "-V", "-h"]

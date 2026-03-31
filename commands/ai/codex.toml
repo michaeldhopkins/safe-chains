@@ -1,0 +1,17 @@
+[[command]]
+name = "codex"
+url = "https://github.com/openai/codex"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "completion"
+standalone = ["--help", "-h"]
+valued = ["--shell", "-s"]
+max_positional = 0
+
+[[command.sub]]
+name = "features"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+max_positional = 0

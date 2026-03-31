@@ -1,0 +1,29 @@
+[[command]]
+name = "swiftlint"
+url = "https://github.com/realm/SwiftLint"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "analyze"
+level = "SafeRead"
+standalone = ["--help", "--quiet", "--strict", "-h"]
+valued = ["--compiler-log-path", "--config", "--path", "--reporter"]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+standalone = ["--help", "--no-cache", "--quiet", "--strict", "-h"]
+valued = ["--config", "--path", "--reporter"]
+
+[[command.sub]]
+name = "reporters"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "rules"
+standalone = ["--disabled", "--enabled", "--help", "-h"]
+valued = ["--config", "--reporter"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

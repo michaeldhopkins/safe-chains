@@ -1,0 +1,12 @@
+[[command]]
+name = "b2sum"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#b2sum-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--binary", "--check", "--help", "--ignore-missing", "--quiet",
+    "--status", "--strict", "--tag", "--text", "--version", "--warn",
+    "--zero",
+    "-V", "-b", "-c", "-h", "-t", "-w", "-z",
+]
+valued = ["--length", "-l"]

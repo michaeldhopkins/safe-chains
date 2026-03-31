@@ -1,0 +1,7 @@
+[[command]]
+name = "timeout"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#timeout-invocation"
+[command.wrapper]
+standalone = ["--preserve-status"]
+valued = ["--signal", "--kill-after", "-s", "-k"]
+positional_skip = 1

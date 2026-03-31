@@ -1,0 +1,21 @@
+[[command]]
+name = "eslint"
+url = "https://eslint.org/docs/latest/use/command-line-interface"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--cache", "--color", "--debug", "--env-info",
+    "--help", "--init", "--no-color", "--no-eslintrc",
+    "--no-inline-config", "--print-config", "--quiet",
+    "--version",
+    "-h", "-v",
+]
+valued = [
+    "--cache-location", "--config", "--env", "--ext",
+    "--format", "--global", "--ignore-path",
+    "--ignore-pattern", "--max-warnings",
+    "--no-error-on-unmatched-pattern", "--output-file",
+    "--parser", "--parser-options", "--plugin",
+    "--resolve-plugins-relative-to", "--rule", "--rulesdir",
+    "-c", "-f", "-o",
+]

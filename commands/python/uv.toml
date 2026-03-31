@@ -1,0 +1,41 @@
+[[command]]
+name = "uv"
+url = "https://docs.astral.sh/uv/reference/cli/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "pip"
+[[command.sub.sub]]
+name = "list"
+standalone = [
+    "--editable", "--exclude-editable", "--help", "--outdated",
+    "--strict", "-h",
+]
+valued = ["--exclude", "--format", "--python"]
+[[command.sub.sub]]
+name = "show"
+bare = false
+standalone = ["--files", "--help", "--verbose", "-h", "-v"]
+valued = ["--python"]
+[[command.sub.sub]]
+name = "check"
+standalone = ["--help", "--verbose", "-h", "-v"]
+valued = ["--python"]
+[[command.sub.sub]]
+name = "freeze"
+standalone = ["--help", "--verbose", "-h", "-v"]
+valued = ["--python"]
+
+[[command.sub]]
+name = "python"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--verbose", "-h", "-v"]
+valued = ["--python"]
+
+[[command.sub]]
+name = "tool"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--verbose", "-h", "-v"]
+valued = ["--python"]

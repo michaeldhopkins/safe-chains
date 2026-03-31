@@ -1,0 +1,57 @@
+[[command]]
+name = "newrelic"
+url = "https://github.com/newrelic/newrelic-cli"
+bare_flags = ["--help", "--version", "-h"]
+[command.wrapper]
+standalone = ["--debug", "--trace"]
+valued = ["--format", "--plain"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "entity"
+[[command.sub.sub]]
+name = "search"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--fields-filter", "--type"]
+[[command.sub.sub]]
+name = "tags"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "nrql"
+[[command.sub.sub]]
+name = "query"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--accountId", "--query", "-a", "-q"]
+
+[[command.sub]]
+name = "apm"
+[[command.sub.sub]]
+name = "application"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--accountId", "--guid", "--name", "-a"]
+
+[[command.sub]]
+name = "workload"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--accountId", "-a"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--accountId", "--guid", "-a"]
+
+[[command.sub]]
+name = "profile"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]

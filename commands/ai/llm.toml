@@ -1,0 +1,32 @@
+[[command]]
+name = "llm"
+url = "https://llm.datasette.io/en/stable/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "aliases"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "collections"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "logs"
+standalone = [
+    "--conversation", "--help", "--json", "--no-truncate", "--response", "--truncate",
+    "-h",
+]
+valued = ["--cid", "--count", "--id", "--model", "--search", "-c", "-m", "-n"]
+
+[[command.sub]]
+name = "models"
+standalone = ["--help", "--json", "--options", "-h"]
+
+[[command.sub]]
+name = "plugins"
+standalone = ["--all", "--help", "--json", "-h"]
+
+[[command.sub]]
+name = "templates"
+standalone = ["--help", "--json", "-h"]

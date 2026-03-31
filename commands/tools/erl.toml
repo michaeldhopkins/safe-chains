@@ -1,0 +1,7 @@
+[[command]]
+name = "erl"
+url = "https://www.erlang.org/docs/26/man/erl"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]

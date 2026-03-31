@@ -1,0 +1,611 @@
+[[command]]
+name = "git"
+url = "https://git-scm.com/docs"
+bare_flags = ["--help", "--version", "-V", "-h"]
+[command.wrapper]
+valued = ["-C"]
+
+[[command.sub]]
+name = "blame"
+bare = false
+standalone = [
+    "--color-by-age", "--color-lines",
+    "--help", "--incremental",
+    "--line-porcelain",
+    "--minimal",
+    "--porcelain", "--progress",
+    "--root",
+    "--show-email", "--show-name", "--show-number",
+    "--show-stats",
+    "-b", "-c", "-e", "-f", "-h", "-k", "-l", "-n", "-p", "-s", "-t", "-w",
+]
+valued = [
+    "--abbrev",
+    "--contents",
+    "--ignore-rev", "--ignore-revs-file",
+    "-C", "-L", "-M", "-S",
+]
+
+[[command.sub]]
+name = "branch"
+standalone = [
+    "--all", "--help", "--ignore-case", "--list",
+    "--no-abbrev", "--no-color", "--no-column",
+    "--omit-empty", "--remotes", "--show-current",
+    "--verbose",
+    "-a", "-h", "-i", "-l", "-r", "-v", "-vv",
+]
+valued = [
+    "--abbrev", "--color", "--column", "--contains",
+    "--format", "--merged", "--no-contains", "--no-merged",
+    "--points-at", "--sort",
+]
+
+[[command.sub]]
+name = "cat-file"
+bare = false
+standalone = [
+    "--batch-all-objects", "--buffer",
+    "--filters", "--follow-symlinks",
+    "--help", "--mailmap",
+    "--textconv", "--unordered", "--use-mailmap",
+    "-Z", "-e", "-h", "-p", "-s", "-t",
+]
+valued = [
+    "--batch", "--batch-check", "--batch-command",
+    "--filter", "--path",
+]
+
+[[command.sub]]
+name = "check-ignore"
+bare = false
+standalone = [
+    "--help", "--no-index", "--non-matching",
+    "--quiet", "--stdin", "--verbose",
+    "-h", "-n", "-q", "-v", "-z",
+]
+
+[[command.sub]]
+name = "config"
+[[command.sub.sub]]
+name = "--get"
+[[command.sub.sub]]
+name = "--get-all"
+[[command.sub.sub]]
+name = "--get-regexp"
+[[command.sub.sub]]
+name = "--help"
+[[command.sub.sub]]
+name = "--list"
+[[command.sub.sub]]
+name = "-h"
+[[command.sub.sub]]
+name = "-l"
+
+[[command.sub]]
+name = "count-objects"
+standalone = [
+    "--help", "--human-readable", "--verbose",
+    "-H", "-h", "-v",
+]
+
+[[command.sub]]
+name = "describe"
+standalone = [
+    "--all", "--always", "--contains",
+    "--debug",
+    "--exact-match", "--first-parent",
+    "--help", "--long",
+    "--tags",
+    "-h",
+]
+valued = [
+    "--abbrev", "--broken",
+    "--candidates", "--dirty",
+    "--exclude", "--match",
+]
+
+[[command.sub]]
+name = "diff"
+standalone = [
+    "--cached", "--check", "--compact-summary", "--cumulative",
+    "--dirstat-by-file",
+    "--exit-code",
+    "--find-copies-harder", "--full-index",
+    "--help", "--ignore-all-space", "--ignore-blank-lines",
+    "--ignore-cr-at-eol", "--ignore-space-at-eol",
+    "--ignore-space-change",
+    "--merge-base", "--minimal",
+    "--name-only", "--name-status", "--no-color",
+    "--no-ext-diff", "--no-index", "--no-patch",
+    "--no-prefix", "--no-renames",
+    "--numstat",
+    "--patch", "--patch-with-raw", "--patch-with-stat",
+    "--patience", "--pickaxe-all",
+    "--raw",
+    "--shortstat", "--staged", "--stat", "--summary",
+    "--text",
+    "-B", "-C", "-M", "-R",
+    "-a", "-b", "-h", "-p", "-u", "-w", "-z",
+]
+valued = [
+    "--abbrev", "--color", "--diff-algorithm", "--diff-filter",
+    "--dirstat", "--dst-prefix",
+    "--inter-hunk-context",
+    "--line-prefix",
+    "--output-indicator-new", "--output-indicator-old",
+    "--relative", "--src-prefix",
+    "--stat-width",
+    "--unified", "--word-diff", "--word-diff-regex",
+    "-G", "-O", "-S", "-U",
+]
+
+[[command.sub]]
+name = "diff-tree"
+bare = false
+standalone = [
+    "--cc", "--combined-all-paths",
+    "--find-copies-harder", "--full-index",
+    "--help", "--ignore-all-space", "--ignore-space-at-eol",
+    "--ignore-space-change",
+    "--merge-base", "--minimal",
+    "--name-only", "--name-status", "--no-commit-id",
+    "--no-ext-diff", "--no-patch", "--no-renames",
+    "--numstat",
+    "--patch", "--patch-with-raw", "--patch-with-stat",
+    "--pickaxe-all",
+    "--raw", "--root",
+    "--shortstat", "--stat", "--stdin", "--summary",
+    "--text",
+    "-B", "-C", "-M", "-R",
+    "-a", "-c", "-h", "-m", "-p", "-r", "-s", "-t", "-u", "-v", "-z",
+]
+valued = [
+    "--abbrev", "--diff-algorithm", "--diff-filter",
+    "--pretty",
+    "-O", "-S",
+]
+
+[[command.sub]]
+name = "fetch"
+standalone = [
+    "--all", "--append", "--atomic",
+    "--dry-run",
+    "--force",
+    "--help", "--ipv4", "--ipv6",
+    "--keep",
+    "--multiple",
+    "--negotiate-only", "--no-auto-gc", "--no-auto-maintenance",
+    "--no-show-forced-updates", "--no-tags", "--no-write-fetch-head",
+    "--porcelain", "--prefetch", "--progress",
+    "--prune", "--prune-tags",
+    "--quiet",
+    "--refetch",
+    "--set-upstream", "--show-forced-updates", "--stdin",
+    "--tags",
+    "--unshallow", "--update-head-ok", "--update-shallow",
+    "--verbose", "--write-commit-graph", "--write-fetch-head",
+    "-4", "-6",
+    "-P", "-a", "-f", "-h", "-k", "-m", "-n", "-p", "-q", "-t", "-u", "-v",
+]
+valued = [
+    "--deepen", "--depth",
+    "--filter",
+    "--jobs", "--negotiation-tip",
+    "--recurse-submodules", "--refmap",
+    "--server-option",
+    "--shallow-exclude", "--shallow-since",
+    "-j", "-o",
+]
+
+[[command.sub]]
+name = "for-each-ref"
+standalone = [
+    "--help", "--ignore-case", "--include-root-refs",
+    "--omit-empty",
+    "--perl", "--python",
+    "--shell", "--stdin",
+    "--tcl",
+    "-h", "-p", "-s",
+]
+valued = [
+    "--color", "--contains", "--count",
+    "--exclude", "--format",
+    "--merged", "--no-contains", "--no-merged",
+    "--points-at", "--sort",
+]
+
+[[command.sub]]
+name = "grep"
+bare = false
+standalone = [
+    "--all-match", "--and",
+    "--basic-regexp", "--break",
+    "--cached", "--column", "--count",
+    "--exclude-standard", "--extended-regexp",
+    "--files-with-matches", "--files-without-match",
+    "--fixed-strings", "--full-name", "--function-context",
+    "--heading", "--help",
+    "--ignore-case", "--index", "--invert-match",
+    "--line-number",
+    "--name-only", "--no-color", "--no-index", "--null",
+    "--only-matching",
+    "--perl-regexp",
+    "--quiet",
+    "--recurse-submodules", "--recursive",
+    "--show-function",
+    "--text", "--textconv",
+    "--untracked",
+    "--word-regexp",
+    "-E", "-F", "-G", "-H", "-I", "-L", "-P", "-W",
+    "-a", "-c", "-h", "-i", "-l", "-n", "-o",
+    "-p", "-q", "-r", "-v", "-w", "-z",
+]
+valued = [
+    "--after-context", "--before-context",
+    "--color", "--context",
+    "--max-count", "--max-depth",
+    "--open-files-in-pager", "--threads",
+    "-A", "-B", "-C", "-O",
+    "-e", "-f", "-m",
+]
+
+[[command.sub]]
+name = "help"
+positional_style = true
+
+[[command.sub]]
+name = "log"
+standalone = [
+    "--abbrev-commit", "--all", "--ancestry-path",
+    "--author-date-order", "--bisect", "--boundary",
+    "--branches", "--cherry", "--cherry-mark", "--cherry-pick",
+    "--children", "--clear-decorations",
+    "--compact-summary", "--cumulative",
+    "--date-order",
+    "--dense", "--do-walk",
+    "--early-output",
+    "--first-parent", "--follow", "--full-diff", "--full-history",
+    "--graph",
+    "--help", "--ignore-missing", "--invert-grep",
+    "--left-only", "--left-right", "--log-size",
+    "--mailmap",
+    "--merges", "--minimal",
+    "--name-only", "--name-status",
+    "--no-abbrev-commit",
+    "--no-color", "--no-decorate",
+    "--no-expand-tabs", "--no-ext-diff", "--no-merges",
+    "--no-notes", "--no-patch", "--no-prefix",
+    "--no-renames", "--no-walk",
+    "--numstat",
+    "--oneline",
+    "--parents", "--patch", "--patch-with-raw",
+    "--patch-with-stat", "--patience",
+    "--raw", "--reflog", "--regexp-ignore-case", "--relative-date", "--remotes",
+    "--reverse",
+    "--shortstat", "--show-linear-break", "--show-notes",
+    "--show-pulls", "--show-signature", "--simplify-by-decoration",
+    "--simplify-merges", "--source", "--sparse", "--stat",
+    "--stdin", "--summary",
+    "--tags", "--text", "--topo-order",
+    "--use-mailmap",
+    "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
+    "-h", "-i", "-p", "-q", "-u",
+]
+valued = [
+    "--abbrev", "--after", "--author", "--before",
+    "--color", "--committer", "--date",
+    "--decorate", "--decorate-refs", "--decorate-refs-exclude",
+    "--diff-algorithm", "--diff-filter",
+    "--encoding", "--exclude",
+    "--format", "--glob", "--grep",
+    "--max-count", "--max-parents", "--min-parents",
+    "--pretty",
+    "--since", "--skip", "--until",
+    "-L", "-n",
+]
+
+[[command.sub]]
+name = "ls-files"
+standalone = [
+    "--cached", "--debug", "--deduplicate", "--deleted",
+    "--directory", "--empty-directory", "--eol",
+    "--error-unmatch", "--exclude-standard",
+    "--full-name",
+    "--help", "--ignored",
+    "--killed",
+    "--modified",
+    "--no-empty-directory",
+    "--others",
+    "--recurse-submodules", "--resolve-undo",
+    "--sparse", "--stage",
+    "--unmerged",
+    "-c", "-d", "-f", "-h", "-i", "-k", "-m", "-o", "-r", "-s", "-t", "-u", "-v", "-z",
+]
+valued = [
+    "--abbrev",
+    "--exclude", "--exclude-from", "--exclude-per-directory",
+    "--format",
+    "--with-tree",
+    "-X", "-x",
+]
+
+[[command.sub]]
+name = "ls-remote"
+standalone = [
+    "--branches",
+    "--exit-code",
+    "--get-url", "--help",
+    "--quiet",
+    "--refs",
+    "--symref",
+    "--tags",
+    "-b", "-h", "-q", "-t",
+]
+valued = [
+    "--server-option", "--sort",
+    "-o",
+]
+
+[[command.sub]]
+name = "ls-tree"
+bare = false
+standalone = [
+    "--full-name", "--full-tree",
+    "--help", "--long",
+    "--name-only", "--name-status",
+    "--object-only",
+    "-d", "-h", "-l", "-r", "-t", "-z",
+]
+valued = [
+    "--abbrev", "--format",
+]
+
+[[command.sub]]
+name = "merge-base"
+bare = false
+standalone = [
+    "--all", "--fork-point",
+    "--help", "--independent", "--is-ancestor",
+    "--octopus",
+    "-a", "-h",
+]
+
+[[command.sub]]
+name = "merge-tree"
+bare = false
+standalone = [
+    "--allow-unrelated-histories",
+    "--help", "--messages", "--name-only",
+    "--quiet",
+    "--stdin", "--trivial-merge", "--write-tree",
+    "-h", "-z",
+]
+valued = [
+    "--merge-base",
+    "-X",
+]
+
+[[command.sub]]
+name = "name-rev"
+bare = false
+standalone = [
+    "--all", "--always", "--annotate-stdin",
+    "--help", "--name-only", "--tags", "--undefined",
+    "-h",
+]
+valued = [
+    "--exclude", "--refs",
+]
+
+[[command.sub]]
+name = "notes"
+[[command.sub.sub]]
+name = "--help"
+[[command.sub.sub]]
+name = "-h"
+[[command.sub.sub]]
+name = "list"
+[[command.sub.sub]]
+name = "show"
+
+[[command.sub]]
+name = "reflog"
+standalone = [
+    "--abbrev-commit", "--all", "--ancestry-path",
+    "--author-date-order", "--bisect", "--boundary",
+    "--branches", "--cherry", "--cherry-mark", "--cherry-pick",
+    "--children", "--clear-decorations",
+    "--compact-summary", "--cumulative",
+    "--date-order",
+    "--dense", "--do-walk",
+    "--early-output",
+    "--first-parent", "--follow", "--full-diff", "--full-history",
+    "--graph",
+    "--help", "--ignore-missing", "--invert-grep",
+    "--left-only", "--left-right", "--log-size",
+    "--mailmap",
+    "--merges", "--minimal",
+    "--name-only", "--name-status",
+    "--no-abbrev-commit",
+    "--no-color", "--no-decorate",
+    "--no-expand-tabs", "--no-ext-diff", "--no-merges",
+    "--no-notes", "--no-patch", "--no-prefix",
+    "--no-renames", "--no-walk",
+    "--numstat",
+    "--oneline",
+    "--parents", "--patch", "--patch-with-raw",
+    "--patch-with-stat", "--patience",
+    "--raw", "--reflog", "--regexp-ignore-case", "--relative-date", "--remotes",
+    "--reverse",
+    "--shortstat", "--show-linear-break", "--show-notes",
+    "--show-pulls", "--show-signature", "--simplify-by-decoration",
+    "--simplify-merges", "--source", "--sparse", "--stat",
+    "--stdin", "--summary",
+    "--tags", "--text", "--topo-order",
+    "--use-mailmap",
+    "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
+    "-h", "-i", "-p", "-q", "-u",
+]
+valued = [
+    "--abbrev", "--after", "--author", "--before",
+    "--color", "--committer", "--date",
+    "--decorate", "--decorate-refs", "--decorate-refs-exclude",
+    "--diff-algorithm", "--diff-filter",
+    "--encoding", "--exclude",
+    "--format", "--glob", "--grep",
+    "--max-count", "--max-parents", "--min-parents",
+    "--pretty",
+    "--since", "--skip", "--until",
+    "-L", "-n",
+]
+
+[[command.sub]]
+name = "remote"
+handler = "git_remote"
+doc = "remote (read-only actions)."
+
+[[command.sub]]
+name = "rev-parse"
+bare = false
+positional_style = true
+standalone = [
+    "--absolute-git-dir",
+    "--all",
+    "--branches",
+    "--git-common-dir", "--git-dir", "--git-path",
+    "--help", "--is-bare-repository", "--is-inside-git-dir",
+    "--is-inside-work-tree", "--is-shallow-repository",
+    "--local-env-vars",
+    "--quiet",
+    "--remotes",
+    "--shared-index-path", "--show-cdup", "--show-prefix",
+    "--show-superproject-working-tree", "--show-toplevel",
+    "--symbolic", "--symbolic-full-name",
+    "--tags", "--verify",
+    "-h", "-q",
+]
+valued = [
+    "--abbrev-ref", "--after", "--before",
+    "--default", "--exclude",
+    "--glob", "--prefix",
+    "--resolve-git-dir", "--short",
+    "--since", "--until",
+]
+
+[[command.sub]]
+name = "shortlog"
+standalone = [
+    "--committer", "--email", "--help", "--numbered", "--summary",
+    "-c", "-e", "-h", "-n", "-s",
+]
+valued = [
+    "--format", "--group",
+]
+
+[[command.sub]]
+name = "show"
+bare = false
+standalone = [
+    "--abbrev-commit", "--compact-summary", "--cumulative",
+    "--expand-tabs", "--full-index",
+    "--help", "--ignore-all-space", "--ignore-blank-lines",
+    "--ignore-space-at-eol", "--ignore-space-change",
+    "--mailmap", "--minimal",
+    "--name-only", "--name-status", "--no-color",
+    "--no-ext-diff", "--no-notes", "--no-patch",
+    "--no-prefix", "--no-renames",
+    "--numstat",
+    "--patch", "--patch-with-raw", "--patch-with-stat",
+    "--patience", "--raw",
+    "--shortstat", "--show-notes", "--show-signature",
+    "--source", "--stat", "--summary",
+    "--text", "--use-mailmap",
+    "-h", "-p", "-q", "-u", "-w",
+]
+valued = [
+    "--abbrev", "--color",
+    "--decorate", "--decorate-refs", "--decorate-refs-exclude",
+    "--diff-algorithm", "--diff-filter",
+    "--encoding", "--format",
+    "--notes", "--pretty",
+    "-O",
+]
+
+[[command.sub]]
+name = "stash"
+[[command.sub.sub]]
+name = "--help"
+positional_style = true
+[[command.sub.sub]]
+name = "-h"
+positional_style = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "show"
+positional_style = true
+
+[[command.sub]]
+name = "status"
+standalone = [
+    "--ahead-behind", "--branch",
+    "--help", "--ignore-submodules",
+    "--long", "--no-ahead-behind",
+    "--no-renames", "--null",
+    "--renames",
+    "--short", "--show-stash",
+    "--verbose",
+    "-b", "-h", "-s", "-v", "-z",
+]
+valued = [
+    "--column", "--find-renames",
+    "--ignored",
+    "--porcelain",
+    "--untracked-files",
+    "-M", "-u",
+]
+
+[[command.sub]]
+name = "tag"
+standalone = [
+    "--help", "--list", "--no-color", "--no-column",
+    "--verify",
+    "-h", "-l", "-v",
+]
+valued = [
+    "--color", "--column", "--contains",
+    "--format", "--merged", "--no-contains", "--no-merged",
+    "--points-at", "--sort", "-n",
+]
+
+[[command.sub]]
+name = "verify-commit"
+bare = false
+standalone = [
+    "--help", "--raw", "--verbose",
+    "-h", "-v",
+]
+
+[[command.sub]]
+name = "verify-tag"
+bare = false
+standalone = [
+    "--help", "--raw", "--verbose",
+    "-h", "-v",
+]
+valued = [
+    "--format",
+]
+
+[[command.sub]]
+name = "worktree"
+[[command.sub.sub]]
+name = "--help"
+[[command.sub.sub]]
+name = "-h"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--porcelain", "--verbose", "-v", "-z"]
+max_positional = 0

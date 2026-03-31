@@ -1,0 +1,198 @@
+[[command]]
+name = "gcloud"
+url = "https://cloud.google.com/sdk/gcloud/reference"
+bare_flags = ["--help", "-h", "--version"]
+[command.wrapper]
+standalone = ["--quiet", "-q"]
+valued = [
+    "--configuration", "--flatten", "--format", "--filter",
+    "--limit", "--log-http", "--project", "--sort-by", "--verbosity",
+]
+
+[[command.sub]]
+name = "version"
+positional_style = true
+
+[[command.sub]]
+name = "info"
+standalone = ["--anonymize", "--help", "--run-diagnostics", "-h"]
+
+[[command.sub]]
+name = "auth"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--filter-account", "--help", "-h"]
+[[command.sub.sub]]
+name = "print-access-token"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "print-identity-token"
+standalone = ["--help", "-h"]
+valued = ["--audiences", "--include-email"]
+
+[[command.sub]]
+name = "config"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--all", "--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get-value"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "projects"
+first_arg = ["describe", "get-iam-policy", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "compute"
+[[command.sub.sub]]
+name = "instances"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "zones"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "regions"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "machine-types"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "networks"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "firewall-rules"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "addresses"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "disks"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "images"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "snapshots"
+first_arg = ["describe", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "container"
+[[command.sub.sub]]
+name = "clusters"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "node-pools"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "images"
+first_arg = ["describe", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "iam"
+[[command.sub.sub]]
+name = "service-accounts"
+first_arg = ["describe", "get-iam-policy", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "roles"
+first_arg = ["describe", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "sql"
+[[command.sub.sub]]
+name = "instances"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "databases"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "app"
+[[command.sub.sub]]
+name = "instances"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "services"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "versions"
+first_arg = ["describe", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "logging"
+[[command.sub.sub]]
+name = "logs"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "read"
+positional_style = true
+
+[[command.sub]]
+name = "services"
+first_arg = ["list"]
+positional_style = true
+
+[[command.sub]]
+name = "functions"
+first_arg = ["describe", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "run"
+[[command.sub.sub]]
+name = "services"
+first_arg = ["describe", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "dns"
+[[command.sub.sub]]
+name = "managed-zones"
+first_arg = ["describe", "list"]
+positional_style = true
+[[command.sub.sub]]
+name = "record-sets"
+first_arg = ["describe", "list"]
+positional_style = true
+
+[[command.sub]]
+name = "artifacts"
+[[command.sub.sub]]
+name = "repositories"
+first_arg = ["describe", "list"]
+positional_style = true

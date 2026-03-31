@@ -1,0 +1,24 @@
+[[command]]
+name = "xmllint"
+url = "https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--auto", "--catalogs", "--compress", "--copy",
+    "--debug", "--debugent", "--dropdtd", "--format",
+    "--help", "--html", "--htmlout", "--huge", "--load-trace",
+    "--loaddtd", "--memory", "--noblanks", "--nocatalogs",
+    "--nocdata", "--nocompact", "--nodefdtd", "--noenc",
+    "--noent", "--nonet", "--noout", "--nowarning",
+    "--nowrap", "--nsclean", "--oldxml10", "--postvalid",
+    "--push", "--pushsmall", "--quiet", "--recover",
+    "--repeat", "--sax", "--sax1", "--stream",
+    "--testIO", "--timing", "--valid", "--version",
+    "--walker", "--xinclude", "--xmlout",
+    "-V", "-h",
+]
+valued = [
+    "--dtdvalid", "--dtdvalidfpi", "--encode",
+    "--maxmem", "--path", "--pattern",
+    "--pretty", "--relaxng", "--schema", "--schematron", "--xpath",
+]

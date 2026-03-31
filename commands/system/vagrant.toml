@@ -1,0 +1,44 @@
+[[command]]
+name = "vagrant"
+url = "https://developer.hashicorp.com/vagrant/docs/cli"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--machine-readable", "-h"]
+
+[[command.sub]]
+name = "global-status"
+standalone = ["--help", "--machine-readable", "--prune", "-h"]
+
+[[command.sub]]
+name = "ssh-config"
+standalone = ["--help", "-h"]
+valued = ["--host"]
+
+[[command.sub]]
+name = "port"
+standalone = ["--guest", "--help", "-h"]
+
+[[command.sub]]
+name = "validate"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "box"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--box-info", "--help", "-h", "-i"]
+[[command.sub.sub]]
+name = "outdated"
+standalone = ["--global", "--help", "-h"]
+
+[[command.sub]]
+name = "plugin"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]

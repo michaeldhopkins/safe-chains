@@ -1,0 +1,17 @@
+[[command]]
+name = "tree"
+url = "https://man7.org/linux/man-pages/man1/tree.1.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--dirsfirst", "--du", "--fromfile", "--gitignore",
+    "--help", "--inodes", "--matchdirs", "--noreport",
+    "--prune", "--si", "--version",
+    "-A", "-C", "-D", "-F", "-J", "-N", "-Q", "-S",
+    "-V", "-X", "-a", "-d", "-f", "-g", "-h", "-i", "-l",
+    "-n", "-p", "-q", "-r", "-s", "-t", "-u", "-v", "-x",
+]
+valued = [
+    "--charset", "--filelimit", "--filesfrom", "--sort", "--timefmt",
+    "-H", "-I", "-L", "-P", "-T",
+]

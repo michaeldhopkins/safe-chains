@@ -1,0 +1,7 @@
+[[command]]
+name = "branchdiff"
+url = "https://github.com/michaeldhopkins/branchdiff"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = ["--diff", "--help", "--no-auto-fetch", "--print", "--version", "-V", "-d", "-h", "-p"]

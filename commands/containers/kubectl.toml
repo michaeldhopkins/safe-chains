@@ -1,0 +1,99 @@
+[[command]]
+name = "kubectl"
+url = "https://kubernetes.io/docs/reference/kubectl/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "api-resources"
+standalone = ["--help", "--namespaced", "--no-headers", "-h"]
+valued = ["--api-group", "--output", "--sort-by", "--verbs", "-o"]
+
+[[command.sub]]
+name = "api-versions"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "auth"
+[[command.sub.sub]]
+name = "can-i"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "whoami"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "cluster-info"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+[[command.sub.sub]]
+name = "current-context"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get-contexts"
+standalone = ["--help", "--no-headers", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "view"
+standalone = ["--flatten", "--help", "--minify", "--raw", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "describe"
+bare = false
+standalone = ["--all-namespaces", "--help", "--show-events", "-A", "-h"]
+valued = ["--namespace", "--selector", "-l", "-n"]
+
+[[command.sub]]
+name = "events"
+standalone = ["--all-namespaces", "--help", "--watch", "-A", "-h", "-w"]
+valued = ["--for", "--namespace", "--output", "--types", "-n", "-o"]
+
+[[command.sub]]
+name = "explain"
+bare = false
+standalone = ["--help", "--recursive", "-h"]
+valued = ["--api-version"]
+
+[[command.sub]]
+name = "get"
+bare = false
+standalone = [
+    "--all-namespaces", "--help", "--no-headers", "--show-labels", "--watch",
+    "-A", "-h", "-w",
+]
+valued = [
+    "--field-selector", "--label-selector", "--namespace",
+    "--output", "--selector", "--sort-by",
+    "-l", "-n", "-o",
+]
+
+[[command.sub]]
+name = "logs"
+bare = false
+standalone = [
+    "--all-containers", "--follow", "--help", "--previous", "--timestamps",
+    "-f", "-h", "-p",
+]
+valued = ["--container", "--namespace", "--since", "--tail", "-c", "-n"]
+
+[[command.sub]]
+name = "top"
+[[command.sub.sub]]
+name = "node"
+standalone = ["--help", "--no-headers", "-h"]
+valued = ["--selector", "--sort-by", "-l"]
+[[command.sub.sub]]
+name = "pod"
+standalone = [
+    "--all-namespaces", "--containers", "--help", "--no-headers",
+    "-A", "-h",
+]
+valued = ["--namespace", "--selector", "--sort-by", "-l", "-n"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--client", "--help", "--short", "-h"]
+valued = ["--output", "-o"]

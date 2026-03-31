@@ -1,0 +1,7 @@
+[[command]]
+name = "node"
+url = "https://nodejs.org/api/cli.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

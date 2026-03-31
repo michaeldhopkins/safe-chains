@@ -1,0 +1,6 @@
+[[command]]
+name = "dirname"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation"
+level = "Inert"
+bare = false
+standalone = ["--help", "--version", "--zero", "-V", "-h", "-z"]

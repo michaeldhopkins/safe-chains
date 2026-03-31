@@ -1,0 +1,7 @@
+[[command]]
+name = "ifconfig"
+url = "https://man7.org/linux/man-pages/man8/ifconfig.8.html"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = ["--help", "--version", "-L", "-V", "-a", "-h", "-l", "-s", "-v"]

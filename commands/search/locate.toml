@@ -1,0 +1,13 @@
+[[command]]
+name = "locate"
+url = "https://man7.org/linux/man-pages/man1/locate.1.html"
+level = "Inert"
+bare = false
+aliases = ["mlocate", "plocate"]
+standalone = [
+    "--all", "--basename", "--count", "--existing",
+    "--follow", "--help", "--ignore-case", "--null", "--quiet",
+    "--statistics", "--version", "--wholename",
+    "-0", "-A", "-S", "-V", "-b", "-c", "-e", "-h", "-i", "-q", "-w",
+]
+valued = ["--database", "--limit", "-d", "-l", "-n"]

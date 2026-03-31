@@ -1,0 +1,8 @@
+[[command]]
+name = "nproc"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#nproc-invocation"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--all", "--help", "--version", "-V", "-h"]
+valued = ["--ignore"]

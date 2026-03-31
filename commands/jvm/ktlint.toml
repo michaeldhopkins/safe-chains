@@ -1,0 +1,10 @@
+[[command]]
+name = "ktlint"
+url = "https://pinterest.github.io/ktlint/latest/"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--color", "--color-name", "--help", "--relative", "--verbose", "--version",
+    "-V", "-h",
+]
+valued = ["--editorconfig", "--reporter"]

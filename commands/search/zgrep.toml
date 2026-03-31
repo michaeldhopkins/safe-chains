@@ -1,0 +1,20 @@
+[[command]]
+name = "zgrep"
+url = "https://man7.org/linux/man-pages/man1/zgrep.1.html"
+level = "Inert"
+bare = false
+aliases = ["zegrep", "zfgrep"]
+standalone = [
+    "--count", "--extended-regexp", "--files-with-matches",
+    "--files-without-match", "--fixed-strings", "--help", "--ignore-case",
+    "--invert-match", "--line-number", "--no-filename",
+    "--only-matching", "--quiet", "--silent", "--version", "--with-filename",
+    "--word-regexp",
+    "-E", "-F", "-G", "-H", "-L", "-V", "-Z",
+    "-c", "-h", "-i", "-l", "-n", "-o", "-q", "-s", "-v", "-w", "-x",
+]
+valued = [
+    "--after-context", "--before-context", "--context",
+    "--file", "--max-count", "--regexp",
+    "-A", "-B", "-C", "-e", "-f", "-m",
+]

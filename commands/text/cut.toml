@@ -1,0 +1,13 @@
+[[command]]
+name = "cut"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation"
+level = "Inert"
+bare = false
+standalone = [
+    "-V", "-h", "-n", "-s", "-w", "-z",
+    "--complement", "--help", "--only-delimited", "--version", "--zero-terminated",
+]
+valued = [
+    "-b", "-c", "-d", "-f",
+    "--bytes", "--characters", "--delimiter", "--fields", "--output-delimiter",
+]

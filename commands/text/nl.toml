@@ -1,0 +1,13 @@
+[[command]]
+name = "nl"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#nl-invocation"
+level = "Inert"
+bare = true
+standalone = ["-V", "-p", "--help", "--no-renumber", "--version"]
+valued = [
+    "-b", "-d", "-f", "-h", "-i", "-l", "-n", "-s", "-v", "-w",
+    "--body-numbering", "--footer-numbering", "--header-numbering",
+    "--join-blank-lines", "--line-increment", "--number-format",
+    "--number-separator", "--number-width", "--section-delimiter",
+    "--starting-line-number",
+]

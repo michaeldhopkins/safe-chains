@@ -1,0 +1,121 @@
+[[command]]
+name = "tailscale"
+url = "https://tailscale.com/kb/1080/cli"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "bugreport"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "dns"
+[[command.sub.sub]]
+name = "query"
+positional_style = true
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "down"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "exit-node"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+valued = ["--filter"]
+max_positional = 0
+[[command.sub.sub]]
+name = "suggest"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "ip"
+standalone = ["--1", "--4", "--6", "--help", "-h"]
+
+[[command.sub]]
+name = "licenses"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "login"
+level = "SafeWrite"
+standalone = [
+    "--accept-dns", "--accept-routes", "--help", "--shields-up",
+    "-h",
+]
+valued = [
+    "--advertise-exit-node", "--advertise-routes",
+    "--advertise-tags", "--authkey", "--exit-node",
+    "--hostname", "--login-server", "--operator", "--timeout",
+]
+max_positional = 0
+
+[[command.sub]]
+name = "logout"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "netcheck"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "ping"
+bare = false
+standalone = [
+    "--c2c", "--help", "--icmp", "--peerapi", "--tsmp", "--until-direct", "--verbose",
+    "-h",
+]
+valued = ["--size", "--timeout"]
+
+[[command.sub]]
+name = "status"
+standalone = [
+    "--active", "--browser", "--help", "--json",
+    "--peers", "--self", "--web",
+    "-h",
+]
+max_positional = 0
+
+[[command.sub]]
+name = "switch"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--list", "-h"]
+
+[[command.sub]]
+name = "up"
+level = "SafeWrite"
+standalone = [
+    "--accept-dns", "--accept-routes", "--help", "--reset", "--shields-up",
+    "-h",
+]
+valued = [
+    "--advertise-exit-node", "--advertise-routes",
+    "--advertise-tags", "--authkey", "--exit-node",
+    "--exit-node-allow-lan-access", "--hostname",
+    "--login-server", "--operator", "--timeout",
+]
+max_positional = 0
+
+[[command.sub]]
+name = "version"
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "whois"
+bare = false
+standalone = ["--help", "--json", "-h"]

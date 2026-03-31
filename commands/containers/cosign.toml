@@ -1,0 +1,42 @@
+[[command]]
+name = "cosign"
+url = "https://github.com/sigstore/cosign"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "verify"
+bare = false
+standalone = ["--check-claims", "--help", "--local-image", "--offline", "-h"]
+valued = [
+    "--attachment", "--certificate", "--certificate-chain",
+    "--certificate-identity", "--certificate-identity-regexp",
+    "--certificate-oidc-issuer", "--certificate-oidc-issuer-regexp",
+    "--k8s-keychain", "--key", "--output", "--payload",
+    "--rekor-url", "--signature", "--slot",
+    "-o",
+]
+
+[[command.sub]]
+name = "verify-attestation"
+bare = false
+standalone = ["--check-claims", "--help", "--local-image", "--offline", "-h"]
+valued = [
+    "--certificate", "--certificate-identity", "--certificate-oidc-issuer",
+    "--key", "--output", "--policy", "--rekor-url", "--type",
+    "-o",
+]
+
+[[command.sub]]
+name = "tree"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "triangulate"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--type"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

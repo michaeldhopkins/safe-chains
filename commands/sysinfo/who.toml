@@ -1,0 +1,13 @@
+[[command]]
+name = "who"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation"
+level = "Inert"
+bare = true
+max_positional = 2
+standalone = [
+    "--all", "--boot", "--count", "--dead", "--heading",
+    "--help", "--login", "--lookup", "--mesg", "--message", "--process",
+    "--runlevel", "--short", "--time", "--users", "--version", "--writable",
+    "-H", "-S", "-T", "-V", "-a", "-b", "-d",
+    "-h", "-l", "-m", "-p", "-q", "-r", "-s", "-t", "-u", "-w",
+]

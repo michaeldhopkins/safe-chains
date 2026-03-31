@@ -1,0 +1,10 @@
+[[command]]
+name = "otool"
+url = "https://ss64.com/mac/otool.html"
+level = "Inert"
+bare = false
+standalone = [
+    "-D", "-I", "-L", "-V", "-X", "-a", "-c", "-d", "-f", "-h",
+    "-l", "-o", "-r", "-t", "-v", "-x", "--help", "--version",
+]
+valued = ["-p", "-s"]

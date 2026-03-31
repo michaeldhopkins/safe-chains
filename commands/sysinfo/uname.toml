@@ -1,0 +1,12 @@
+[[command]]
+name = "uname"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#uname-invocation"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = [
+    "--all", "--help", "--kernel-name", "--kernel-release",
+    "--kernel-version", "--machine", "--nodename",
+    "--operating-system", "--processor", "--version",
+    "-V", "-a", "-h", "-m", "-n", "-o", "-p", "-r", "-s", "-v",
+]

@@ -1,0 +1,7 @@
+[[command]]
+name = "echo"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["-E", "-e", "-n"]

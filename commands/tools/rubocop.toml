@@ -1,0 +1,21 @@
+[[command]]
+name = "rubocop"
+url = "https://docs.rubocop.org/rubocop/usage/basic_usage.html"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--color", "--debug", "--display-cop-names",
+    "--display-only-correctable", "--display-only-safe-correctable",
+    "--display-style-guide", "--extra-details",
+    "--help", "--lint", "--list-target-files",
+    "--no-color", "--parallel", "--show-cops",
+    "--show-docs-url", "--version",
+    "-L", "-V", "-d", "-h", "-l",
+]
+valued = [
+    "--cache-root", "--config", "--disable-pending-cops",
+    "--enable-pending-cops", "--except", "--exclude-limit",
+    "--fail-level", "--format", "--only", "--out",
+    "--require", "--stdin",
+    "-P", "-c", "-f", "-o", "-r",
+]

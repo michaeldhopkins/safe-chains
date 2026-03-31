@@ -1,0 +1,70 @@
+[[command]]
+name = "systemctl"
+url = "https://man7.org/linux/man-pages/man1/systemctl.1.html"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "status"
+positional_style = true
+standalone = ["--all", "--full", "--help", "--lines", "--no-pager", "-a", "-h", "-l"]
+valued = ["-n", "--output", "-o"]
+
+[[command.sub]]
+name = "show"
+positional_style = true
+standalone = ["--all", "--help", "--no-pager", "-a", "-h"]
+valued = ["--property", "-p"]
+
+[[command.sub]]
+name = "is-active"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+
+[[command.sub]]
+name = "is-enabled"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+
+[[command.sub]]
+name = "is-failed"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+
+[[command.sub]]
+name = "list-units"
+standalone = [
+    "--all", "--failed", "--full", "--help", "--no-legend",
+    "--no-pager", "--plain", "--recursive",
+    "-a", "-h", "-l", "-r",
+]
+valued = ["--state", "--type", "-t"]
+
+[[command.sub]]
+name = "list-unit-files"
+standalone = [
+    "--all", "--full", "--help", "--no-legend", "--no-pager",
+    "-a", "-h", "-l",
+]
+valued = ["--state", "--type", "-t"]
+
+[[command.sub]]
+name = "list-sockets"
+standalone = ["--all", "--full", "--help", "--no-legend", "--no-pager", "--show-types", "-a", "-h", "-l"]
+
+[[command.sub]]
+name = "list-timers"
+standalone = ["--all", "--full", "--help", "--no-legend", "--no-pager", "-a", "-h", "-l"]
+
+[[command.sub]]
+name = "list-dependencies"
+bare = false
+standalone = ["--all", "--help", "--no-pager", "--plain", "--reverse", "-a", "-h"]
+
+[[command.sub]]
+name = "cat"
+bare = false
+positional_style = true
+standalone = ["--help", "--no-pager", "-h"]

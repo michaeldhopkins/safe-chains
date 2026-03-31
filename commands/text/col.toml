@@ -1,0 +1,7 @@
+[[command]]
+name = "col"
+url = "https://man7.org/linux/man-pages/man1/col.1.html"
+level = "Inert"
+bare = true
+standalone = ["-V", "-b", "-f", "-h", "-p", "-x", "--help", "--version"]
+valued = ["-l"]

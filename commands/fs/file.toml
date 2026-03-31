@@ -1,0 +1,21 @@
+[[command]]
+name = "file"
+url = "https://man7.org/linux/man-pages/man1/file.1.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--brief", "--debug", "--dereference", "--extension",
+    "--help", "--keep-going", "--list", "--mime", "--mime-encoding",
+    "--mime-type", "--no-buffer", "--no-dereference",
+    "--no-pad", "--no-sandbox", "--preserve-date",
+    "--print0", "--raw", "--special-files",
+    "--uncompress", "--uncompress-noreport", "--version",
+    "-0", "-D", "-I", "-L", "-N", "-S", "-V", "-Z",
+    "-b", "-d", "-h", "-i", "-k", "-l",
+    "-n", "-p", "-r", "-s", "-z",
+]
+valued = [
+    "--exclude", "--exclude-quiet", "--files-from",
+    "--magic-file", "--parameter", "--separator",
+    "-F", "-P", "-e", "-f", "-m",
+]

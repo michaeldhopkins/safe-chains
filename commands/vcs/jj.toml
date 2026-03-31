@@ -1,0 +1,109 @@
+[[command]]
+name = "jj"
+url = "https://jj-vcs.github.io/jj/latest/cli-reference/"
+bare_flags = ["--help", "--version", "-h"]
+[command.wrapper]
+standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
+valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
+
+[[command.sub]]
+name = "cat"
+positional_style = true
+bare = false
+
+[[command.sub]]
+name = "diff"
+positional_style = true
+
+[[command.sub]]
+name = "help"
+positional_style = true
+
+[[command.sub]]
+name = "log"
+positional_style = true
+
+[[command.sub]]
+name = "root"
+positional_style = true
+
+[[command.sub]]
+name = "show"
+positional_style = true
+
+[[command.sub]]
+name = "st"
+positional_style = true
+
+[[command.sub]]
+name = "status"
+positional_style = true
+
+[[command.sub]]
+name = "version"
+positional_style = true
+
+[[command.sub]]
+name = "bookmark"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "config"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+positional_style = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "file"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "show"
+positional_style = true
+
+[[command.sub]]
+name = "git"
+nested_bare = true
+[[command.sub.sub]]
+name = "fetch"
+positional_style = true
+[[command.sub.sub]]
+name = "remote"
+nested_bare = true
+[[command.sub.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "op"
+nested_bare = true
+[[command.sub.sub]]
+name = "log"
+positional_style = true
+
+[[command.sub]]
+name = "resolve"
+first_arg = ["--list"]
+
+[[command.sub]]
+name = "tag"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "workspace"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true

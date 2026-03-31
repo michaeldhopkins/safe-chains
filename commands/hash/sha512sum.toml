@@ -1,0 +1,11 @@
+[[command]]
+name = "sha512sum"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities"
+level = "Inert"
+bare = true
+standalone = [
+    "--binary", "--check", "--help", "--ignore-missing", "--quiet",
+    "--status", "--strict", "--tag", "--text", "--version", "--warn",
+    "--zero",
+    "-V", "-b", "-c", "-h", "-t", "-w", "-z",
+]

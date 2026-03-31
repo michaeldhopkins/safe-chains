@@ -1,0 +1,6 @@
+[[command]]
+name = "rev"
+url = "https://man7.org/linux/man-pages/man1/rev.1.html"
+level = "Inert"
+bare = true
+standalone = ["-V", "-h", "--help", "--version"]

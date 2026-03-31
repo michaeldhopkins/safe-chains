@@ -1,0 +1,7 @@
+[[command]]
+name = "gzip"
+url = "https://man7.org/linux/man-pages/man1/gzip.1.html"
+level = "Inert"
+bare = false
+require_any = ["-l", "--list", "-t", "--test"]
+standalone = ["-l", "--list", "-t", "--test", "-v", "--verbose", "--help", "-h", "--version", "-V"]

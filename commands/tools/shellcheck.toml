@@ -1,0 +1,15 @@
+[[command]]
+name = "shellcheck"
+url = "https://www.shellcheck.net/wiki/"
+level = "Inert"
+bare = false
+standalone = [
+    "--color", "--external-sources", "--help", "--list-optional",
+    "--norc", "--severity", "--version", "--wiki-link-count",
+    "-C", "-V", "-a", "-h", "-x",
+]
+valued = [
+    "--enable", "--exclude", "--format", "--include",
+    "--rcfile", "--severity", "--shell", "--source-path", "--wiki-link-count",
+    "-P", "-S", "-W", "-e", "-f", "-i", "-o", "-s",
+]

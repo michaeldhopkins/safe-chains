@@ -1,0 +1,28 @@
+[[command]]
+name = "pyenv"
+url = "https://github.com/pyenv/pyenv#readme"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "help"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "root"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "shims"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "versions"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "which"
+standalone = ["--bare", "--help", "-h"]

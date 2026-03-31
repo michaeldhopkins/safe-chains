@@ -1,0 +1,9 @@
+[[command]]
+name = "crontab"
+url = "https://ss64.com/mac/crontab.html"
+level = "Inert"
+bare = false
+max_positional = 0
+require_any = ["-l"]
+standalone = ["-l", "--help", "-h"]
+valued = ["-u"]

@@ -1,0 +1,7 @@
+[[command]]
+name = "tac"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation"
+level = "Inert"
+bare = true
+standalone = ["-V", "-b", "-h", "-r", "--before", "--help", "--regex", "--version"]
+valued = ["-s", "--separator"]

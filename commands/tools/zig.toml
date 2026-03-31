@@ -1,0 +1,7 @@
+[[command]]
+name = "zig"
+url = "https://ziglang.org/documentation/"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version"]

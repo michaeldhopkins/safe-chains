@@ -1,0 +1,14 @@
+[[command]]
+name = "od"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#od-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "-V", "-b", "-c", "-d", "-f", "-h", "-i", "-l", "-o", "-s", "-v", "-x",
+    "--help", "--output-duplicates", "--traditional", "--version",
+]
+valued = [
+    "-A", "-N", "-S", "-j", "-t", "-w",
+    "--address-radix", "--endian", "--format", "--read-bytes",
+    "--skip-bytes", "--strings", "--width",
+]

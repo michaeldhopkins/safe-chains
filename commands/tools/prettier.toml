@@ -1,0 +1,18 @@
+[[command]]
+name = "prettier"
+url = "https://prettier.io/docs/en/cli.html"
+level = "Inert"
+bare = false
+require_any = ["--check", "--list-different", "-c", "-l"]
+standalone = [
+    "--check", "--list-different",
+    "--no-config", "--no-editorconfig", "--no-semi", "--single-quote",
+    "--jsx-single-quote", "--bracket-same-line",
+    "--help", "--version",
+    "-c", "-l",
+]
+valued = [
+    "--config", "--ignore-path", "--parser", "--plugin",
+    "--print-width", "--tab-width", "--trailing-comma",
+    "--end-of-line", "--prose-wrap",
+]

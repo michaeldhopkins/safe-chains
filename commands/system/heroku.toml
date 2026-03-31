@@ -1,0 +1,52 @@
+[[command]]
+name = "heroku"
+url = "https://devcenter.heroku.com/articles/heroku-cli-commands"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "addons"
+standalone = ["--all", "--help", "--json", "-A", "-h"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "apps"
+standalone = ["--all", "--help", "--json", "-a", "-h"]
+valued = ["--space", "--team", "-s", "-t"]
+
+[[command.sub]]
+name = "apps:info"
+standalone = ["--help", "--json", "--shell", "-h", "-s"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "buildpacks"
+standalone = ["--help", "-h"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "config"
+standalone = ["--help", "--json", "--shell", "-h", "-j", "-s"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--force-colors", "--help", "--tail", "-h", "-t"]
+valued = ["--app", "--dyno", "--num", "--source", "-a", "-d", "-n", "-s"]
+
+[[command.sub]]
+name = "ps"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "-a"]
+
+[[command.sub]]
+name = "regions"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "releases"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--app", "--num", "-a", "-n"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--json", "-h"]

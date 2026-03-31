@@ -1,0 +1,7 @@
+[[command]]
+name = "fzy"
+url = "https://github.com/jhawthorn/fzy"
+level = "Inert"
+bare = true
+standalone = ["--help", "--show-info", "--show-scores", "--version", "-h", "-i", "-v"]
+valued = ["--lines", "--prompt", "--query", "--show-matches", "--tty", "-e", "-l", "-p", "-q", "-t"]

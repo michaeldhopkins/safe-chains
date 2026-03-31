@@ -1,0 +1,4 @@
+[[command]]
+name = "xcode-select"
+url = "https://ss64.com/mac/xcode-select.html"
+bare_flags = ["--help", "--print-path", "--version", "-V", "-h", "-p", "-v"]

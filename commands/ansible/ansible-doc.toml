@@ -1,0 +1,10 @@
+[[command]]
+name = "ansible-doc"
+url = "https://docs.ansible.com/ansible/latest/cli/ansible-doc.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--json", "--list", "--metadata-dump", "--version",
+    "-F", "-h", "-j", "-l",
+]
+valued = ["--module-path", "--type", "-M", "-t"]

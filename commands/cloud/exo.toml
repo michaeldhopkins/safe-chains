@@ -1,0 +1,75 @@
+[[command]]
+name = "exo"
+url = "https://community.exoscale.com/documentation/tools/exoscale-cli/"
+bare_flags = ["--help", "-h"]
+[command.wrapper]
+standalone = ["--quiet", "-q"]
+valued = ["--account", "--output-format", "--output-template", "-O"]
+
+[[command.sub]]
+name = "version"
+
+[[command.sub]]
+name = "status"
+
+[[command.sub]]
+name = "limits"
+
+[[command.sub]]
+name = "zone"
+
+[[command.sub]]
+name = "config"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "compute"
+[[command.sub.sub]]
+name = "instance"
+first_arg = ["list", "show"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "instance-type"
+first_arg = ["list", "show"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "security-group"
+first_arg = ["list", "show"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "elastic-ip"
+first_arg = ["list", "show"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ssh-key"
+first_arg = ["list", "show"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dbaas"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "show"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "type"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dns"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "show"
+bare = false
+standalone = ["--help", "-h"]

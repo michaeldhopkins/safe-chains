@@ -1,0 +1,95 @@
+[[command]]
+name = "scw"
+url = "https://github.com/scaleway/scaleway-cli"
+bare_flags = ["--help", "-h"]
+[command.wrapper]
+standalone = ["--debug", "-D"]
+valued = ["--output", "--profile", "-o", "-p"]
+
+[[command.sub]]
+name = "instance"
+[[command.sub.sub]]
+name = "server"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "image"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "volume"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "security-group"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ip"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "snapshot"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "k8s"
+[[command.sub.sub]]
+name = "cluster"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "pool"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "rdb"
+[[command.sub.sub]]
+name = "instance"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "registry"
+[[command.sub.sub]]
+name = "namespace"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "image"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "lb"
+[[command.sub.sub]]
+name = "lb"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "vpc"
+[[command.sub.sub]]
+name = "private-network"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dns"
+[[command.sub.sub]]
+name = "zone"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "record"
+first_arg = ["list"]
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "account"
+[[command.sub.sub]]
+name = "project"
+first_arg = ["list"]
+standalone = ["--help", "-h"]

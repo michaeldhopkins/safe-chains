@@ -1,0 +1,15 @@
+[[command]]
+name = "identify"
+url = "https://imagemagick.org/script/identify.php"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--verbose", "--version", "-V", "-h", "-ping", "-quiet", "-regard-warnings", "-verbose",
+]
+valued = [
+    "-channel", "-define", "-density", "-depth",
+    "-features", "-format", "-fuzz", "-interlace",
+    "-limit", "-list", "-log", "-moments",
+    "-monitor", "-precision", "-seed", "-set",
+    "-size", "-strip", "-unique", "-virtual-pixel",
+]

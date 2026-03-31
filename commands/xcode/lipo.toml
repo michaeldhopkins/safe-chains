@@ -1,0 +1,7 @@
+[[command]]
+name = "lipo"
+url = "https://ss64.com/mac/lipo.html"
+level = "Inert"
+bare = false
+require_any = ["-archs", "-detailed_info", "-info", "-verify_arch"]
+standalone = ["-archs", "-detailed_info", "-info", "-verify_arch", "--help", "-h"]

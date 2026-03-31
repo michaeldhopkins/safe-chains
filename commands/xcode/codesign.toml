@@ -1,0 +1,8 @@
+[[command]]
+name = "codesign"
+url = "https://ss64.com/mac/codesign.html"
+level = "Inert"
+bare = false
+require_any = ["--display", "--verify", "-d", "-v"]
+standalone = ["--deep", "--display", "--verify", "-R", "-d", "-v", "--help", "-h"]
+valued = ["--verbose"]

@@ -1,0 +1,7 @@
+[[command]]
+name = "hexdump"
+url = "https://man7.org/linux/man-pages/man1/hexdump.1.html"
+level = "Inert"
+bare = true
+standalone = ["-C", "-V", "-b", "-c", "-d", "-h", "-o", "-v", "-x", "--help", "--version"]
+valued = ["-L", "-e", "-f", "-n", "-s"]

@@ -1,0 +1,7 @@
+[[command]]
+name = "fold"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#fold-invocation"
+level = "Inert"
+bare = true
+standalone = ["-V", "-b", "-h", "-s", "--bytes", "--help", "--spaces", "--version"]
+valued = ["-w", "--width"]

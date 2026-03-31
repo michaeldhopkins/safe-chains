@@ -1,0 +1,18 @@
+[[command]]
+name = "ansible-galaxy"
+url = "https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "search"
+standalone = ["--help", "-h"]
+valued = ["--author", "--galaxy-tags", "--platforms"]

@@ -1,0 +1,16 @@
+[[command]]
+name = "column"
+url = "https://man7.org/linux/man-pages/man1/column.1.html"
+level = "Inert"
+bare = true
+standalone = [
+    "-J", "-L", "-R", "-V", "-e", "-h", "-n", "-t", "-x",
+    "--fillrows", "--help", "--json", "--keep-empty-lines", "--table",
+    "--table-noextreme", "--table-noheadings", "--table-right-all", "--version",
+]
+valued = [
+    "-E", "-H", "-O", "-W", "-c", "-d", "-o", "-r", "-s",
+    "--output-separator", "--separator", "--table-columns", "--table-empty-lines",
+    "--table-hide", "--table-name", "--table-order", "--table-right",
+    "--table-truncate", "--table-wrap",
+]

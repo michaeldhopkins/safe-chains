@@ -1,0 +1,24 @@
+[[command]]
+name = "skopeo"
+url = "https://github.com/containers/skopeo"
+bare_flags = ["--help", "--version", "-h"]
+[command.wrapper]
+standalone = ["--debug", "--insecure-policy"]
+valued = ["--command-timeout", "--override-arch", "--override-os", "--override-variant", "--policy", "--registries.d", "--tmpdir"]
+
+[[command.sub]]
+name = "inspect"
+bare = false
+standalone = ["--config", "--help", "--no-creds", "--raw", "-h"]
+valued = ["--authfile", "--cert-dir", "--creds", "--format", "--tls-verify"]
+
+[[command.sub]]
+name = "list-tags"
+bare = false
+standalone = ["--help", "--no-creds", "-h"]
+valued = ["--authfile", "--cert-dir", "--creds", "--tls-verify"]
+
+[[command.sub]]
+name = "manifest-digest"
+bare = false
+standalone = ["--help", "-h"]

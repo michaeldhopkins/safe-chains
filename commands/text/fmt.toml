@@ -1,0 +1,11 @@
+[[command]]
+name = "fmt"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "-V", "-c", "-h", "-m", "-n", "-s", "-u",
+    "--crown-margin", "--help", "--split-only", "--tagged-paragraph",
+    "--uniform-spacing", "--version",
+]
+valued = ["-d", "-g", "-l", "-p", "-t", "-w", "--goal", "--prefix", "--width"]

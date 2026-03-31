@@ -1,0 +1,21 @@
+[[command]]
+name = "sort"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--check", "--debug", "--dictionary-order",
+    "--general-numeric-sort", "--help", "--human-numeric-sort",
+    "--ignore-case", "--ignore-leading-blanks",
+    "--ignore-nonprinting", "--merge", "--month-sort",
+    "--numeric-sort", "--random-sort", "--reverse",
+    "--stable", "--unique", "--version", "--version-sort", "--zero-terminated",
+    "-C", "-M", "-R", "-V", "-b", "-c", "-d",
+    "-f", "-g", "-h", "-i", "-m", "-n", "-r", "-s", "-u", "-z",
+]
+valued = [
+    "--batch-size", "--buffer-size", "--field-separator",
+    "--files0-from", "--key", "--parallel",
+    "--random-source", "--sort", "--temporary-directory",
+    "-S", "-T", "-k", "-t",
+]

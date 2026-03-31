@@ -1,0 +1,147 @@
+[[command]]
+name = "brew"
+url = "https://docs.brew.sh/Manpage"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = [
+    "--cask", "--formula", "--full-name", "--help", "--multiple",
+    "--pinned", "--versions",
+    "-1", "-h", "-l", "-r", "-t",
+]
+
+[[command.sub]]
+name = "ls"
+standalone = [
+    "--cask", "--formula", "--full-name", "--help", "--multiple",
+    "--pinned", "--versions",
+    "-1", "-h", "-l", "-r", "-t",
+]
+
+[[command.sub]]
+name = "info"
+standalone = [
+    "--analytics", "--cask", "--formula", "--help", "--installed", "--json",
+    "-h", "-v",
+]
+valued = ["--days"]
+
+[[command.sub]]
+name = "abv"
+standalone = [
+    "--analytics", "--cask", "--formula", "--help", "--installed", "--json",
+    "-h", "-v",
+]
+valued = ["--days"]
+
+[[command.sub]]
+name = "search"
+bare = false
+standalone = [
+    "--cask", "--closed", "--debian", "--desc", "--fedora",
+    "--fink", "--formula", "--help", "--macports", "--open",
+    "--opensuse", "--pull-request", "--repology", "--ubuntu",
+    "-h",
+]
+
+[[command.sub]]
+name = "deps"
+standalone = [
+    "--1", "--annotate", "--cask", "--direct", "--for-each",
+    "--formula", "--full-name", "--graph", "--help", "--include-build",
+    "--include-optional", "--include-test", "--installed", "--missing",
+    "--skip-recommended", "--tree", "--union",
+    "-h", "-n",
+]
+
+[[command.sub]]
+name = "uses"
+bare = false
+standalone = [
+    "--cask", "--formula", "--help", "--include-build", "--include-optional",
+    "--include-test", "--installed", "--missing",
+    "--recursive", "--skip-recommended",
+    "-h",
+]
+
+[[command.sub]]
+name = "outdated"
+standalone = [
+    "--cask", "--fetch-HEAD", "--formula", "--greedy",
+    "--greedy-auto-updates", "--greedy-latest", "--help", "--json",
+    "-d", "-h", "-q", "-v",
+]
+
+[[command.sub]]
+name = "desc"
+bare = false
+standalone = [
+    "--cask", "--description", "--eval-all", "--formula",
+    "--help", "--name", "--search",
+    "-d", "-h", "-n", "-s",
+]
+
+[[command.sub]]
+name = "log"
+bare = false
+standalone = ["--cask", "--formula", "--help", "--oneline", "-1", "-h"]
+valued = ["--max-count", "-n"]
+
+[[command.sub]]
+name = "cat"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "casks"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "config"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "doctor"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "formulae"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "home"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "leaves"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "shellenv"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "tap"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "--prefix"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "--repository"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "tap-info"
+standalone = ["--help", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "services"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+[[command.sub.sub]]
+name = "info"
+bare = false
+standalone = ["--all", "--help", "--json", "-h"]

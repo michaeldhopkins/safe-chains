@@ -1,0 +1,34 @@
+[[command]]
+name = "log"
+url = "https://ss64.com/mac/log.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "show"
+standalone = [
+    "--backtrace", "--debug", "--help", "--info", "--loss", "--mach-continuous-time",
+    "--no-pager", "--signpost", "-h",
+]
+valued = [
+    "--color", "--end", "--last", "--predicate",
+    "--process", "--source", "--start", "--style", "--type",
+]
+
+[[command.sub]]
+name = "stream"
+standalone = [
+    "--backtrace", "--debug", "--help", "--info", "--loss",
+    "--mach-continuous-time", "--signpost", "-h",
+]
+valued = [
+    "--color", "--level", "--predicate", "--process",
+    "--source", "--style", "--timeout", "--type",
+]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "stats"
+standalone = ["--help", "-h"]

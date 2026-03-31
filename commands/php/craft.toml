@@ -1,0 +1,63 @@
+[[command]]
+name = "craft"
+url = "https://craftcms.com/docs/5.x/reference/cli.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "env/show"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "graphql/list-schemas"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "graphql/print-schema"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "install/check"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "migrate/history"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "migrate/new"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "pc/diff"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "pc/export"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "pc/get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugin/list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "queue/info"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "update/info"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "users/list-admins"
+standalone = ["--help", "-h"]

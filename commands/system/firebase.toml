@@ -1,0 +1,24 @@
+[[command]]
+name = "firebase"
+url = "https://firebase.google.com/docs/cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "apps:list"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "functions:log"
+standalone = ["--help", "-h"]
+valued = ["--only"]
+
+[[command.sub]]
+name = "login:list"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "projects:list"
+standalone = ["--help", "-h"]
+max_positional = 0

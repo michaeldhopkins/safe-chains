@@ -1,0 +1,7 @@
+[[command]]
+name = "mix"
+url = "https://hexdocs.pm/mix/Mix.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

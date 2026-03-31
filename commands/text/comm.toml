@@ -1,0 +1,11 @@
+[[command]]
+name = "comm"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#comm-invocation"
+level = "Inert"
+bare = false
+standalone = [
+    "-1", "-2", "-3", "-V", "-h", "-i", "-z",
+    "--check-order", "--help", "--nocheck-order", "--total",
+    "--version", "--zero-terminated",
+]
+valued = ["--output-delimiter"]

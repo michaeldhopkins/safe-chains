@@ -1,0 +1,15 @@
+[[command]]
+name = "df"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--help", "--human-readable", "--inodes", "--local",
+    "--no-sync", "--portability", "--print-type",
+    "--si", "--sync", "--total", "--version",
+    "-H", "-P", "-T", "-V", "-a", "-h", "-i", "-k", "-l",
+]
+valued = [
+    "--block-size", "--exclude-type", "--output", "--type",
+    "-B", "-t", "-x",
+]

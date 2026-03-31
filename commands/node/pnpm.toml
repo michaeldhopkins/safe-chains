@@ -1,0 +1,34 @@
+[[command]]
+name = "pnpm"
+url = "https://pnpm.io/pnpm-cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--dev", "--help", "--json", "--long", "--no-optional", "--parseable", "--production", "--recursive", "-P", "-h", "-r"]
+valued = ["--depth", "--filter"]
+
+[[command.sub]]
+name = "ls"
+level = "Inert"
+standalone = ["--dev", "--help", "--json", "--long", "--no-optional", "--parseable", "--production", "--recursive", "-P", "-h", "-r"]
+valued = ["--depth", "--filter"]
+
+[[command.sub]]
+name = "audit"
+level = "Inert"
+standalone = ["--help", "--json", "--recursive", "-h", "-r"]
+valued = ["--filter"]
+
+[[command.sub]]
+name = "outdated"
+level = "Inert"
+standalone = ["--help", "--json", "--recursive", "-h", "-r"]
+valued = ["--filter"]
+
+[[command.sub]]
+name = "why"
+level = "Inert"
+standalone = ["--help", "--json", "--recursive", "-h", "-r"]
+valued = ["--filter"]

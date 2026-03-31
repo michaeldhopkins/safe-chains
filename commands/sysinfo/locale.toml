@@ -1,0 +1,10 @@
+[[command]]
+name = "locale"
+url = "https://man7.org/linux/man-pages/man1/locale.1.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--all-locales", "--category-name", "--charmaps",
+    "--help", "--keyword-name", "--verbose", "--version",
+    "-V", "-a", "-c", "-h", "-k", "-m", "-v",
+]

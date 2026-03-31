@@ -1,0 +1,59 @@
+[[command]]
+name = "jjpr"
+url = "https://github.com/michaeldhopkins/jjpr"
+bare = true
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "status"
+standalone = [
+    "--dry-run", "--help", "--no-fetch",
+    "-h",
+]
+
+[[command.sub]]
+name = "auth"
+
+[[command.sub.sub]]
+name = "test"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "setup"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "submit"
+guard = "--dry-run"
+standalone = [
+    "--draft", "--dry-run", "--help", "--no-fetch", "--ready",
+    "-h",
+]
+valued = ["--base", "--remote", "--reviewer"]
+
+[[command.sub]]
+name = "merge"
+guard = "--dry-run"
+standalone = [
+    "--dry-run", "--help", "--no-ci-check", "--no-fetch", "--watch",
+    "-h",
+]
+valued = [
+    "--base", "--merge-method", "--reconcile-strategy", "--remote",
+    "--required-approvals",
+]
+
+[[command.sub]]
+name = "config"
+
+[[command.sub.sub]]
+name = "help"
+allow_all = true

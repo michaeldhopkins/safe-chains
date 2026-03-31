@@ -1,0 +1,7 @@
+[[command]]
+name = "workon"
+url = "https://github.com/michaeldhopkins/workon"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

@@ -1,0 +1,19 @@
+[[command]]
+name = "mypy"
+url = "https://mypy.readthedocs.io/en/stable/command_line.html"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--no-error-summary", "--no-incremental",
+    "--pretty", "--show-column-numbers", "--show-error-codes",
+    "--show-error-context", "--strict", "--verbose", "--version",
+    "--warn-redundant-casts", "--warn-return-any",
+    "--warn-unreachable", "--warn-unused-ignores",
+    "-V", "-h", "-v",
+]
+valued = [
+    "--cache-dir", "--config-file", "--exclude", "--follow-imports",
+    "--ignore-missing-imports", "--module", "--namespace-packages",
+    "--package", "--python-executable", "--python-version",
+    "-m", "-p",
+]

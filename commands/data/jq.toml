@@ -1,0 +1,16 @@
+[[command]]
+name = "jq"
+url = "https://jqlang.github.io/jq/manual/"
+level = "Inert"
+bare = true
+standalone = [
+    "--ascii-output", "--color-output", "--compact-output", "--exit-status", "--help",
+    "--join-output", "--monochrome-output", "--null-input", "--raw-input",
+    "--raw-output", "--raw-output0", "--seq", "--slurp", "--sort-keys", "--tab", "--version",
+    "-C", "-M", "-R", "-S", "-V", "-c", "-e", "-g", "-h", "-j", "-n", "-r", "-s",
+]
+valued = [
+    "--arg", "--argjson", "--args", "--from-file",
+    "--indent", "--jsonargs", "--rawfile", "--slurpfile",
+    "-f",
+]

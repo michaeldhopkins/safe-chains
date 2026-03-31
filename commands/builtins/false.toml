@@ -1,0 +1,7 @@
+[[command]]
+name = "false"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

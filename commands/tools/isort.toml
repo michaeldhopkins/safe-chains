@@ -1,0 +1,17 @@
+[[command]]
+name = "isort"
+url = "https://pycqa.github.io/isort/docs/configuration/options.html"
+level = "Inert"
+bare = false
+require_any = ["--check-only", "--diff", "-c"]
+standalone = [
+    "--check-only", "--diff", "--help", "--quiet",
+    "--show-config", "--verbose", "--version",
+    "-c", "-V", "-h", "-q", "-v",
+]
+valued = [
+    "--filter-files", "--line-length", "--multi-line",
+    "--profile", "--project", "--settings-file",
+    "--skip", "--skip-glob", "--src",
+    "-l", "-m",
+]

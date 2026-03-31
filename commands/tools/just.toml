@@ -1,0 +1,16 @@
+[[command]]
+name = "just"
+url = "https://just.systems/man/en/"
+level = "Inert"
+bare = false
+require_any = ["--dump", "--evaluate", "--list", "--summary", "--variables", "-l"]
+standalone = [
+    "--dump", "--evaluate", "--help", "--list", "--summary",
+    "--unsorted", "--variables", "--version",
+    "-l", "-u",
+]
+valued = [
+    "--color", "--dump-format", "--justfile", "--list-heading",
+    "--list-prefix", "--list-submodules",
+    "-f",
+]

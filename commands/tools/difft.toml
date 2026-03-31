@@ -1,0 +1,16 @@
+[[command]]
+name = "difft"
+url = "https://difftastic.wilfred.me.uk/"
+level = "Inert"
+bare = false
+aliases = ["difftastic"]
+standalone = [
+    "--check-only", "--help", "--list-languages", "--missing-as-empty",
+    "--skip-unchanged", "--strip-cr", "--version",
+]
+valued = [
+    "--background", "--byte-limit", "--color", "--context",
+    "--display", "--graph-limit", "--language", "--override",
+    "--parse-error-limit", "--sort-paths", "--syntax-highlight",
+    "--tab-width", "--width",
+]

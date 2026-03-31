@@ -1,0 +1,7 @@
+[[command]]
+name = "expand"
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation"
+level = "Inert"
+bare = true
+standalone = ["-V", "-h", "-i", "--help", "--initial", "--version"]
+valued = ["-t", "--tabs"]

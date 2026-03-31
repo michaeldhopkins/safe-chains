@@ -1,0 +1,11 @@
+[[command]]
+name = "sw_vers"
+url = "https://ss64.com/mac/sw_vers.html"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = [
+    "--buildVersion", "--help", "--productName",
+    "--productVersion", "--productVersionExtra", "--version",
+    "-V", "-h",
+]

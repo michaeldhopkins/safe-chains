@@ -1,0 +1,7 @@
+[[command]]
+name = "zf"
+url = "https://github.com/natecraddock/zf"
+level = "Inert"
+bare = true
+standalone = ["--help", "--keep-order", "--plain", "--version", "-0", "-h", "-k", "-p", "-v"]
+valued = ["--delimiter", "--filter", "--height", "--lines", "--preview-width", "-d", "-f", "-l"]

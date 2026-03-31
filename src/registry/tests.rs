@@ -1,5 +1,5 @@
 use super::*;
-    use super::types::{CommandKind, OwnedPolicy};
+    use super::types::CommandKind;
     use crate::parse::Token;
     use crate::policy::FlagStyle;
     use crate::verdict::{SafetyLevel, Verdict};

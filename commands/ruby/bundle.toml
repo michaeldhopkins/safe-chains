@@ -1,0 +1,29 @@
+[[command]]
+name = "bundle"
+url = "https://bundler.io/man/bundle.1.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "check"
+standalone = ["--dry-run", "--help", "-h"]
+valued = ["--gemfile", "--path"]
+
+[[command.sub]]
+name = "config"
+handler = "bundle_config"
+
+[[command.sub]]
+name = "exec"
+handler = "bundle_exec"
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "--path", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--name-only", "--paths", "-h"]
+
+[[command.sub]]
+name = "show"
+standalone = ["--help", "--paths", "-h"]

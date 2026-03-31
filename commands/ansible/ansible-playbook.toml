@@ -1,0 +1,16 @@
+[[command]]
+name = "ansible-playbook"
+url = "https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html"
+level = "Inert"
+bare = false
+require_any = ["--list-hosts", "--list-tasks", "--list-tags", "--syntax-check"]
+standalone = [
+    "--help", "--list-hosts", "--list-tags", "--list-tasks",
+    "--syntax-check", "--version",
+    "-h",
+]
+valued = [
+    "--connection", "--extra-vars", "--inventory", "--limit",
+    "--tags", "--skip-tags",
+    "-C", "-c", "-e", "-i", "-l", "-t",
+]

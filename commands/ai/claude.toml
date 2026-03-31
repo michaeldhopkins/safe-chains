@@ -1,0 +1,7 @@
+[[command]]
+name = "claude"
+url = "https://docs.anthropic.com/en/docs/claude-code"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

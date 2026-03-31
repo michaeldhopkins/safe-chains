@@ -1,0 +1,7 @@
+[[command]]
+name = "sips"
+url = "https://ss64.com/mac/sips.html"
+level = "Inert"
+bare = false
+standalone = ["-V", "-h", "--help", "--version"]
+valued = ["-g", "--getProperty"]
