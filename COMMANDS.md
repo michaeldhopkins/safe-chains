@@ -158,6 +158,67 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed standalone flags: --characters-as-bytes, --copyright, --gen-pot, --lint, --no-optimize, --optimize, --posix, --re-interval, --sandbox, --traditional, --use-lc-numeric, --version, -C, -N, -O, -P, -S, -V, -b, -c, -g, -r, -s, -t
 - Allowed valued flags: --assign, --field-separator, -F, -v
 
+### `aws` (https://docs.aws.amazon.com/cli/latest/)
+
+- **acm**: Allowed arguments: describe-*, get-*, list-*
+- **autoscaling**: Allowed arguments: describe-*
+- **cloudformation**: Allowed arguments: describe-*, get-*, list-*
+- **cloudwatch**: Allowed arguments: describe-*, get-*, list-*
+- **configure get**: Flags: --help
+- **configure list**: Flags: --help
+- **dynamodb**: Allowed arguments: describe-*, list-*
+- **ec2**: Allowed arguments: describe-*
+- **ecr**: Allowed arguments: batch-get-*, describe-*, get-*, list-*
+- **ecs**: Allowed arguments: describe-*, list-*
+- **eks**: Allowed arguments: describe-*, list-*
+- **elasticache**: Allowed arguments: describe-*, list-*
+- **elb**: Allowed arguments: describe-*
+- **elbv2**: Allowed arguments: describe-*
+- **iam**: Allowed arguments: get-*, list-*
+- **kms**: Allowed arguments: describe-*, get-*, list-*
+- **lambda**: Allowed arguments: get-*, list-*
+- **logs**: Allowed arguments: describe-*, filter-*, get-*, list-*
+- **rds**: Allowed arguments: describe-*, list-*
+- **route53**: Allowed arguments: get-*, list-*
+- **s3**: Allowed arguments: ls
+- **s3api**: Allowed arguments: get-*, head-*, list-*
+- **secretsmanager**: Allowed arguments: describe-*, get-*, list-*
+- **sns**: Allowed arguments: get-*, list-*
+- **sqs**: Allowed arguments: get-*, list-*
+- **ssm**: Allowed arguments: describe-*, get-*, list-*
+- **sts get-caller-identity**: Flags: --help
+- Allowed standalone flags: --help, --version
+
+### `az` (https://learn.microsoft.com/en-us/cli/azure/)
+
+- **account**: Allowed arguments: list, show, list-locations
+- **acr list**: Positional args accepted
+- **acr repository**: Allowed arguments: list, show
+- **acr show**: Positional args accepted
+- **ad app**: Allowed arguments: list, show
+- **ad group**: Allowed arguments: list, show
+- **ad sp**: Allowed arguments: list, show
+- **ad user**: Allowed arguments: list, show
+- **aks**: Allowed arguments: list, show, get-credentials
+- **cosmosdb**: Allowed arguments: list, show
+- **functionapp**: Allowed arguments: list, show
+- **group**: Allowed arguments: list, show
+- **keyvault**: Allowed arguments: list, show
+- **monitor log-analytics**: Allowed arguments: query
+- **monitor metrics**: Allowed arguments: list
+- **network nic**: Allowed arguments: list, show
+- **network nsg**: Allowed arguments: list, show
+- **network public-ip**: Allowed arguments: list, show
+- **network vnet**: Allowed arguments: list, show
+- **resource**: Allowed arguments: list, show
+- **sql db**: Allowed arguments: list, show
+- **sql server**: Allowed arguments: list, show
+- **storage account**: Allowed arguments: list, show
+- **version**: Positional args accepted
+- **vm**: Allowed arguments: list, show, list-sizes, list-ip-addresses
+- **webapp**: Allowed arguments: list, show
+- Allowed standalone flags: --help, -h, --version
+
 ### `b2sum` (https://www.gnu.org/software/coreutils/manual/coreutils.html#b2sum-invocation)
 
 - Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
@@ -842,6 +903,49 @@ Aliases: `fly`
 - Allowed standalone flags: --help, --show-info, --show-scores, --version, -h, -i, -v
 - Allowed valued flags: --lines, --prompt, --query, --show-matches, --tty, -e, -l, -p, -q, -t
 - Bare invocation allowed
+
+### `gcloud` (https://cloud.google.com/sdk/gcloud/reference)
+
+- **app instances**: Allowed arguments: describe, list
+- **app services**: Allowed arguments: describe, list
+- **app versions**: Allowed arguments: describe, list
+- **artifacts repositories**: Allowed arguments: describe, list
+- **auth list**: Flags: --filter-account, --help, -h
+- **auth print-access-token**: Flags: --help, -h
+- **auth print-identity-token**: Flags: --help, -h. Valued: --audiences, --include-email
+- **compute addresses**: Allowed arguments: describe, list
+- **compute disks**: Allowed arguments: describe, list
+- **compute firewall-rules**: Allowed arguments: describe, list
+- **compute images**: Allowed arguments: describe, list
+- **compute instances**: Allowed arguments: describe, list
+- **compute machine-types**: Allowed arguments: describe, list
+- **compute networks**: Allowed arguments: describe, list
+- **compute regions**: Allowed arguments: describe, list
+- **compute snapshots**: Allowed arguments: describe, list
+- **compute zones**: Allowed arguments: describe, list
+- **config get**: Flags: --help, -h
+- **config get-value**: Flags: --help, -h
+- **config list**: Flags: --all, --help, -h
+- **container clusters**: Allowed arguments: describe, list
+- **container images**: Allowed arguments: describe, list
+- **container node-pools**: Allowed arguments: describe, list
+- **container operations**: Allowed arguments: describe, list
+- **dns managed-zones**: Allowed arguments: describe, list
+- **dns record-sets**: Allowed arguments: describe, list
+- **functions**: Allowed arguments: describe, list
+- **iam roles**: Allowed arguments: describe, list
+- **iam service-accounts**: Allowed arguments: describe, get-iam-policy, list
+- **info**: Flags: --anonymize, --help, --run-diagnostics, -h
+- **logging logs**: Allowed arguments: describe, list
+- **logging read**: Positional args accepted
+- **projects**: Allowed arguments: describe, get-iam-policy, list
+- **run services**: Allowed arguments: describe, list
+- **services**: Allowed arguments: list
+- **sql databases**: Allowed arguments: describe, list
+- **sql instances**: Allowed arguments: describe, list
+- **sql operations**: Allowed arguments: describe, list
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, -h, --version
 
 ### `gem` (https://guides.rubygems.org/command-reference/)
 

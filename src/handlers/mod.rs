@@ -76,6 +76,7 @@ const HANDLED_CMDS: &[&str] = &[
     "ddev", "dcli",
     "brew", "mise", "asdf", "crontab", "defaults", "pmset", "sysctl", "cmake", "psql", "pg_isready",
     "terraform", "heroku", "vercel", "flyctl", "pulumi", "netlify", "railway", "wrangler", "cf", "newrelic",
+    "aws", "gcloud", "az",
     "doctl", "hcloud", "vultr-cli", "exo", "scw", "linode-cli",
     "ansible-playbook", "ansible-inventory", "ansible-doc", "ansible-config", "ansible-galaxy",
     "overmind", "tailscale", "tmux", "wg", "systemctl", "journalctl",
