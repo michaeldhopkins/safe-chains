@@ -719,3 +719,34 @@ name = "-h"
 name = "list"
 standalone = ["--porcelain", "--verbose", "-v", "-z"]
 max_positional = 0
+
+[[command]]
+name = "git-lfs"
+url = "https://git-lfs.com/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "env"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ls-files"
+standalone = [
+    "--all", "--deleted", "--help", "--long",
+    "--name-only", "--size",
+    "-a", "-d", "-h", "-l", "-n", "-s",
+]
+valued = ["--include", "--exclude", "-I", "-X"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "--json", "--porcelain", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "locks"
+standalone = ["--help", "--json", "--local", "--verify", "-h", "-l", "-v"]
+valued = ["--id", "--limit", "--path"]

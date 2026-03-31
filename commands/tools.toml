@@ -523,3 +523,180 @@ standalone = [
     "--list", "--score",
     "-a", "-h", "-i", "-l", "-s",
 ]
+
+# Language runtime version/help queries
+[[command]]
+name = "node"
+url = "https://nodejs.org/api/cli.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]
+
+[[command]]
+name = "python3"
+url = "https://docs.python.org/3/using/cmdline.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]
+aliases = ["python"]
+
+[[command]]
+name = "rustc"
+url = "https://doc.rust-lang.org/rustc/"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]
+
+[[command]]
+name = "java"
+url = "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-version"]
+
+[[command]]
+name = "php"
+url = "https://www.php.net/manual/en/features.commandline.options.php"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]
+
+[[command]]
+name = "gcc"
+url = "https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-v"]
+aliases = ["g++", "cc", "c++"]
+
+[[command]]
+name = "clang"
+url = "https://clang.llvm.org/docs/CommandGuide/clang.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-v"]
+aliases = ["clang++"]
+
+[[command]]
+name = "elixir"
+url = "https://hexdocs.pm/elixir/main/elixir-cmd.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]
+
+[[command]]
+name = "erl"
+url = "https://www.erlang.org/docs/26/man/erl"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]
+
+[[command]]
+name = "mix"
+url = "https://hexdocs.pm/mix/Mix.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]
+
+[[command]]
+name = "zig"
+url = "https://ziglang.org/documentation/"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version"]
+
+[[command]]
+name = "lua"
+url = "https://www.lua.org/manual/5.4/readme.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-v"]
+
+[[command]]
+name = "tsc"
+url = "https://www.typescriptlang.org/docs/handbook/compiler-options.html"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]
+
+# Modern CLI tools
+[[command]]
+name = "jc"
+url = "https://kellyjonbrazil.github.io/jc/"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = [
+    "--about", "--bash-comp", "--force-color", "--help", "--meta-out",
+    "--monochrome", "--pretty", "--quiet", "--raw", "--unbuffer",
+    "--version", "--yaml-out", "--zsh-comp",
+    "-C", "-M", "-a", "-h", "-m", "-p", "-q", "-r", "-u", "-y",
+]
+
+[[command]]
+name = "gron"
+url = "https://github.com/tomnomnom/gron"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--json", "--monochrome", "--no-sort",
+    "--stream", "--ungron", "--values", "--version",
+    "-c", "-j", "-k", "-m", "-s", "-u", "-v",
+]
+
+[[command]]
+name = "difft"
+url = "https://difftastic.wilfred.me.uk/"
+level = "Inert"
+bare = false
+aliases = ["difftastic"]
+standalone = [
+    "--check-only", "--help", "--list-languages", "--missing-as-empty",
+    "--skip-unchanged", "--strip-cr", "--version",
+]
+valued = [
+    "--background", "--byte-limit", "--color", "--context",
+    "--display", "--graph-limit", "--language", "--override",
+    "--parse-error-limit", "--sort-paths", "--syntax-highlight",
+    "--tab-width", "--width",
+]
+
+[[command]]
+name = "duf"
+url = "https://github.com/muesli/duf"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--help", "--hide-fs", "--hide-mp", "--inodes",
+    "--json", "--version", "--warnings",
+]
+valued = ["--only", "--output", "--sort", "--style", "--theme", "--width"]
+
+[[command]]
+name = "xsv"
+url = "https://github.com/BurntSushi/xsv"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-h"]
+
+[[command]]
+name = "qsv"
+url = "https://github.com/jqnatividad/qsv"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--envlist", "--help", "--list", "--update", "--version", "-h"]

@@ -116,6 +116,11 @@ const HANDLED_CMDS: &[&str] = &[
     "prettier", "black", "ruff", "mypy", "pyright", "pylint", "flake8", "isort",
     "rubocop", "eslint", "biome", "stylelint", "zoxide",
     "direnv", "make", "packer", "vagrant",
+    "node", "python3", "python", "rustc", "java", "php",
+    "gcc", "g++", "cc", "c++", "clang", "clang++",
+    "elixir", "erl", "mix", "zig", "lua", "tsc",
+    "jc", "gron", "difft", "difftastic", "duf", "xsv", "qsv",
+    "git-lfs",
 ];
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {

@@ -421,6 +421,12 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed valued flags: --algorithm, --length, -a, -l
 - Bare invocation allowed
 
+### `clang` (https://clang.llvm.org/docs/CommandGuide/clang.html)
+
+Aliases: `clang++`
+
+- Allowed standalone flags: --help, --version, -v
+
 ### `claude` (https://docs.anthropic.com/en/docs/claude-code)
 
 - Allowed standalone flags: --help, --version, -V, -h
@@ -650,6 +656,13 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed standalone flags: --brief, --ed, --expand-tabs, --help, --ignore-all-space, --ignore-blank-lines, --ignore-case, --ignore-space-change, --ignore-tab-expansion, --left-column, --minimal, --new-file, --no-dereference, --no-ignore-file-name-case, --normal, --paginate, --rcs, --recursive, --report-identical-files, --show-c-function, --side-by-side, --speed-large-files, --strip-trailing-cr, --suppress-blank-empty, --suppress-common-lines, --text, --unidirectional-new-file, --version, -B, -E, -N, -P, -T, -V, -a, -b, -c, -d, -e, -f, -h, -i, -l, -n, -p, -q, -r, -s, -t, -u, -w, -y
 - Allowed valued flags: --changed-group-format, --color, --context, --exclude, --exclude-from, --from-file, --ifdef, --ignore-matching-lines, --label, --line-format, --new-group-format, --new-line-format, --old-group-format, --old-line-format, --show-function-line, --starting-file, --tabsize, --to-file, --unchanged-group-format, --unchanged-line-format, --unified, --width, -C, -D, -F, -I, -L, -S, -U, -W, -X, -x
 
+### `difft` (https://difftastic.wilfred.me.uk/)
+
+Aliases: `difftastic`
+
+- Allowed standalone flags: --check-only, --help, --list-languages, --missing-as-empty, --skip-unchanged, --strip-cr, --version
+- Allowed valued flags: --background, --byte-limit, --color, --context, --display, --graph-limit, --language, --override, --parse-error-limit, --sort-paths, --syntax-highlight, --tab-width, --width
+
 ### `dig` (https://man7.org/linux/man-pages/man1/dig.1.html)
 
 - Allowed standalone flags: --help, --version, -4, -6, -V, -h, -m, -r, -u, -v
@@ -764,6 +777,12 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed valued flags: --block-size, --exclude, --files0-from, --max-depth, --threshold, --time, --time-style, -B, -d, -t
 - Bare invocation allowed
 
+### `duf` (https://github.com/muesli/duf)
+
+- Allowed standalone flags: --all, --help, --hide-fs, --hide-mp, --inodes, --json, --version, --warnings
+- Allowed valued flags: --only, --output, --sort, --style, --theme, --width
+- Bare invocation allowed
+
 ### `dust` (https://github.com/bootandy/dust#readme)
 
 - Allowed standalone flags: --bars-on-right, --files0-from, --help, --ignore-all-in-file, --invert-filter, --no-colors, --no-percent-bars, --only-dir, --only-file, --skip-total, --version, -D, -F, -H, -P, -R, -S, -V, -b, -c, -f, -h, -i, -p, -r, -s
@@ -776,6 +795,10 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+### `elixir` (https://hexdocs.pm/elixir/main/elixir-cmd.html)
+
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `emulator` (https://developer.android.com/studio/run/emulator-commandline)
 
 - Allowed standalone flags: --help, --version, -V, -h, -help, -list-avds, -version
@@ -783,6 +806,10 @@ Unlisted flags, subcommands, and commands are not allowed.
 ### `env` (https://www.gnu.org/software/coreutils/manual/coreutils.html#env-invocation)
 
 - Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed.
+
+### `erl` (https://www.erlang.org/docs/26/man/erl)
+
+- Allowed standalone flags: --help, --version, -h
 
 ### `eslint` (https://eslint.org/docs/latest/use/command-line-interface)
 
@@ -937,6 +964,12 @@ Aliases: `fly`
 - Allowed valued flags: --lines, --prompt, --query, --show-matches, --tty, -e, -l, -p, -q, -t
 - Bare invocation allowed
 
+### `gcc` (https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html)
+
+Aliases: `g++`, `cc`, `c++`
+
+- Allowed standalone flags: --help, --version, -v
+
 ### `gcloud` (https://cloud.google.com/sdk/gcloud/reference)
 
 - **app instances**: Allowed arguments: describe, list
@@ -1058,6 +1091,15 @@ Aliases: `fly`
 - **worktree list**: Flags: --porcelain, --verbose, -v, -z
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `git-lfs` (https://git-lfs.com/)
+
+- **env**: Flags: --help, -h
+- **locks**: Flags: --help, --json, --local, --verify, -h, -l, -v. Valued: --id, --limit, --path
+- **ls-files**: Flags: --all, --deleted, --help, --long, --name-only, --size, -a, -d, -h, -l, -n, -s. Valued: --include, --exclude, -I, -X
+- **status**: Flags: --help, --json, --porcelain, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `glab` (https://glab.readthedocs.io/en/latest/)
 
 - Subcommands ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable are allowed with actions: diff, issues, list, status, view.
@@ -1100,6 +1142,11 @@ Aliases: `egrep`, `fgrep`
 
 - Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z
 - Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m
+
+### `gron` (https://github.com/tomnomnom/gron)
+
+- Allowed standalone flags: --help, --json, --monochrome, --no-sort, --stream, --ungron, --values, --version, -c, -j, -k, -m, -s, -u, -v
+- Bare invocation allowed
 
 ### `groups` (https://www.gnu.org/software/coreutils/manual/coreutils.html#groups-invocation)
 
@@ -1302,10 +1349,19 @@ Aliases: `egrep`, `fgrep`
 
 - Requires -verify. - Allowed standalone flags: -certs, -strict, -verbose, -verify, -help, -h
 
+### `java` (https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html)
+
+- Allowed standalone flags: --help, --version, -h, -version
+
 ### `javap` (https://docs.oracle.com/en/java/javase/21/docs/specs/man/javap.html)
 
 - Allowed standalone flags: --help, --version, -V, -c, -constants, -h, -l, -p, -private, -protected, -public, -s, -sysinfo, -v, -verbose
 - Allowed valued flags: --module, -bootclasspath, -classpath, -cp, -m
+
+### `jc` (https://kellyjonbrazil.github.io/jc/)
+
+- Allowed standalone flags: --about, --bash-comp, --force-color, --help, --meta-out, --monochrome, --pretty, --quiet, --raw, --unbuffer, --version, --yaml-out, --zsh-comp, -C, -M, -a, -h, -m, -p, -q, -r, -u, -y
+- Hyphen-prefixed positional arguments accepted
 
 ### `jj` (https://jj-vcs.github.io/jj/latest/cli-reference/)
 
@@ -1517,6 +1573,10 @@ Aliases: `mlocate`, `plocate`
 - Allowed valued flags: -F, -S, -T, -a, -c, -d, -g, -i, -k, -o, -p, -r, -s, -u
 - Bare invocation allowed
 
+### `lua` (https://www.lua.org/manual/5.4/readme.html)
+
+- Allowed standalone flags: --help, --version, -v
+
 ### `magick` (https://imagemagick.org/script/command-line-tools.php)
 
 - **identify**: Flags: --help, -h, -matte, -moments, -ping, -quiet, -regard-warnings, -unique, -verbose. Valued: -alpha, -colorspace, -define, -density, -depth, -endian, -format, -interlace, -limit, -precision, -sampling-factor, -size, -units, -virtual-pixel
@@ -1644,6 +1704,10 @@ Aliases: `mlocate`, `plocate`
 - **which**: Flags: --help, -h, -q, -v
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `mix` (https://hexdocs.pm/mix/Mix.html)
+
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `mlr` (https://miller.readthedocs.io/)
 
 - Data processing allowed. Verbs and file arguments accepted.
@@ -1722,6 +1786,10 @@ Aliases: `ionice`
 
 - Allowed standalone flags: -A, -B, -C, -D, -P, -S, -V, -a, -g, -h, -j, -l, -m, -n, -o, -p, -r, -s, -u, -v, -x, --debug-syms, --defined-only, --demangle, --dynamic, --extern-only, --help, --line-numbers, --no-demangle, --no-llvm-bc, --no-sort, --numeric-sort, --portability, --print-armap, --print-file-name, --print-size, --reverse-sort, --special-syms, --undefined-only, --version
 - Allowed valued flags: -f, -t, --format, --radix, --size-sort, --target
+
+### `node` (https://nodejs.org/api/cli.html)
+
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `npm` (https://docs.npmjs.com/cli)
 
@@ -1889,6 +1957,10 @@ Aliases: `ionice`
 
 - Allowed standalone flags: --count, --delimiter, --full, --help, --inverse, --lightweight, --list-full, --list-name, --newest, --oldest, --version, -L, -V, -a, -c, -f, -h, -i, -l, -n, -o, -v, -w, -x
 - Allowed valued flags: --euid, --group, --parent, --pgroup, --pidfile, --session, --terminal, --uid, -F, -G, -P, -U, -d, -g, -s, -t, -u
+
+### `php` (https://www.php.net/manual/en/features.commandline.options.php)
+
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `pick` (https://github.com/mptre/pick)
 
@@ -2082,6 +2154,12 @@ Aliases: `pip3`
 - Allowed valued flags: --exclude, --ignore, --level, --project, --pythonpath, --pythonplatform, --pythonversion, --threads, --typeshedpath, --verifytypes, -p
 - Bare invocation allowed
 
+### `python3` (https://docs.python.org/3/using/cmdline.html)
+
+Aliases: `python`
+
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `qemu-img` (https://www.qemu.org/docs/master/tools/qemu-img.html)
 
 - **check**: Flags: --force-share, --help, --image-opts, --quiet, -U, -h, -q. Valued: --cache, --format, --object, --output, -T, -f
@@ -2091,6 +2169,11 @@ Aliases: `pip3`
 - **measure**: Flags: --force-share, --help, --image-opts, -U, -h. Valued: --format, --object, --output, --size, --snapshot, --target-format, -O, -f, -l, -o, -s
 - **snapshot**: Flags: --force-share, --help, --image-opts, --list, --quiet, -U, -h, -l, -q. Valued: --format, --object, -f
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `qsv` (https://github.com/jqnatividad/qsv)
+
+- Allowed standalone flags: --envlist, --help, --list, --update, --version, -h
+- Hyphen-prefixed positional arguments accepted
 
 ### `R` (https://cran.r-project.org/manuals.html)
 
@@ -2183,6 +2266,10 @@ Aliases: `pip3`
 - **format** (requires --check): Flags: --check, --diff, --help, --quiet, --verbose, -h, -q, -v. Valued: --config, --exclude, --extend-exclude, --line-length, --target-version
 - **rule**: Flags: --all, --help, --output-format, -h
 - **version**: Flags: --help, --output-format, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
+### `rustc` (https://doc.rust-lang.org/rustc/)
+
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `rustup` (https://rust-lang.github.io/rustup/)
@@ -2586,6 +2673,10 @@ Aliases: `traceroute6`
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
 
+### `tsc` (https://www.typescriptlang.org/docs/handbook/compiler-options.html)
+
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `tty` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tty-invocation)
 
 - Allowed standalone flags: --help, --quiet, --silent, --version, -V, -h, -s
@@ -2844,6 +2935,11 @@ Aliases: `traceroute6`
 - Allowed standalone flags: --compact-output, --exit-status, --help, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --version, --xml-output, -C, -M, -R, -S, -V, -c, -e, -h, -n, -r, -s, -x
 - Allowed valued flags: --arg, --argjson, --indent, --xml-dtd, --xml-item-depth, --xml-root, -f
 
+### `xsv` (https://github.com/BurntSushi/xsv)
+
+- Allowed standalone flags: --help, --version, -h
+- Hyphen-prefixed positional arguments accepted
+
 ### `xv` (https://github.com/gyscos/xv)
 
 - Allowed standalone flags: -V, -h, --help, --version
@@ -2888,6 +2984,10 @@ Aliases: `zegrep`, `zfgrep`
 
 - Allowed standalone flags: --count, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --invert-match, --line-number, --no-filename, --only-matching, --quiet, --silent, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -L, -V, -Z, -c, -h, -i, -l, -n, -o, -q, -s, -v, -w, -x
 - Allowed valued flags: --after-context, --before-context, --context, --file, --max-count, --regexp, -A, -B, -C, -e, -f, -m
+
+### `zig` (https://ziglang.org/documentation/)
+
+- Allowed standalone flags: --help, --version
 
 ### `zipalign` (https://developer.android.com/tools/zipalign)
 
