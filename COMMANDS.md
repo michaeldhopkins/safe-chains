@@ -246,11 +246,33 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed valued flags: --color, --decorations, --diff-context, --file-name, --highlight-line, --italic-text, --language, --line-range, --map-syntax, --paging, --style, --tabs, --terminal-width, --theme, --wrap, -H, -l, -m, -r
 - Bare invocation allowed
 
+### `bazel` (https://bazel.build/reference/command-line-reference)
+
+- **aquery**: Flags: --help, --keep_going, -h, -k. Valued: --output, --universe_scope
+- **cquery**: Flags: --help, --keep_going, -h, -k. Valued: --output, --universe_scope
+- **info**: Flags: --help, -h
+- **query**: Flags: --help, --keep_going, --nohost_deps, --noimplicit_deps, --order_output, -h, -k. Valued: --output, --universe_scope
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `bc` (https://www.gnu.org/software/bc/manual/html_mono/bc.html)
 
 - Allowed standalone flags: --digit-clamp, --global-stacks, --help, --interactive, --mathlib, --no-digit-clamp, --no-line-length, --no-prompt, --no-read-prompt, --quiet, --standard, --version, --warn, -C, -P, -R, -V, -c, -g, -h, -i, -l, -q, -s, -w
 - Allowed valued flags: --expression, --file, --ibase, --obase, --redefine, --scale, --seed, -E, -I, -O, -S, -e, -f, -r
 - Bare invocation allowed
+
+### `biome` (https://biomejs.dev/reference/cli/)
+
+- **check**: Flags: --apply, --colors, --help, --json-formatter, --no-errors-on-unmatched, --quiet, --verbose, -h. Valued: --config-path, --max-diagnostics, --stdin-file-path, --vcs-root
+- **ci**: Flags: --colors, --help, --json-formatter, --no-errors-on-unmatched, --quiet, --verbose, -h. Valued: --config-path, --max-diagnostics
+- **format**: Flags: --colors, --help, --json-formatter, --no-errors-on-unmatched, --quiet, --verbose, -h. Valued: --config-path, --indent-style, --indent-width, --line-width, --stdin-file-path
+- **lint**: Flags: --colors, --help, --json-formatter, --no-errors-on-unmatched, --quiet, --verbose, -h. Valued: --config-path, --max-diagnostics, --stdin-file-path, --vcs-root
+- Allowed standalone flags: --help, --version, -V, -h
+
+### `black` (https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html)
+
+- Requires --check, --diff. - Allowed standalone flags: --check, --diff, --color, --no-color, --fast, --quiet, --verbose, --help, --version
+- Allowed valued flags: --config, --exclude, --extend-exclude, --include, --line-length, --target-version, -l, -t
 
 ### `branchdiff` (https://github.com/michaeldhopkins/branchdiff)
 
@@ -762,6 +784,11 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 - Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed.
 
+### `eslint` (https://eslint.org/docs/latest/use/command-line-interface)
+
+- Allowed standalone flags: --cache, --color, --debug, --env-info, --help, --init, --no-color, --no-eslintrc, --no-inline-config, --print-config, --quiet, --version, -h, -v
+- Allowed valued flags: --cache-location, --config, --env, --ext, --format, --global, --ignore-path, --ignore-pattern, --max-warnings, --no-error-on-unmatched-pattern, --output-file, --parser, --parser-options, --plugin, --resolve-plugins-relative-to, --rule, --rulesdir, -c, -f, -o
+
 ### `exo` (https://community.exoscale.com/documentation/tools/exoscale-cli/)
 
 - **compute elastic-ip**: Allowed arguments: list, show
@@ -845,6 +872,12 @@ Aliases: `exa`
 - **login:list**: Flags: --help, -h
 - **projects:list**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `flake8` (https://flake8.pycqa.org/en/latest/user/invocation.html)
+
+- Allowed standalone flags: --benchmark, --count, --help, --quiet, --show-pep8, --show-source, --statistics, --verbose, --version, -V, -h, -q, -v
+- Allowed valued flags: --config, --exclude, --extend-exclude, --extend-ignore, --filename, --format, --ignore, --max-complexity, --max-line-length, --output-file, --per-file-ignores, --select
+- Bare invocation allowed
 
 ### `flyctl` (https://fly.io/docs/flyctl/)
 
@@ -1250,6 +1283,11 @@ Aliases: `egrep`, `fgrep`
 - Allowed valued flags: --delay, --iter, --pid, --user, -d, -n, -p, -u
 - Bare invocation allowed
 
+### `isort` (https://pycqa.github.io/isort/docs/configuration/options.html)
+
+- Requires --check-only, --diff, -c. - Allowed standalone flags: --check-only, --diff, --help, --quiet, --show-config, --verbose, --version, -c, -V, -h, -q, -v
+- Allowed valued flags: --filter-files, --line-length, --multi-line, --profile, --project, --settings-file, --skip, --skip-glob, --src, -l, -m
+
 ### `jaq` (https://github.com/01mf02/jaq)
 
 - Allowed standalone flags: --compact-output, --exit-status, --help, --join-output, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --version, -C, -M, -R, -S, -V, -c, -e, -h, -j, -n, -r, -s
@@ -1515,6 +1553,13 @@ Aliases: `mlocate`, `plocate`
 - Allowed standalone flags: -V, -h, -r, --help, --raw, --version
 - Allowed valued flags: -n, --name, --nullMarker
 
+### `meson` (https://mesonbuild.com/Commands.html)
+
+- **configure**: Flags: --help, -h
+- **info**: Flags: --help, -h
+- **introspect**: Flags: --all, --benchmarks, --buildoptions, --buildsystem-files, --dependencies, --help, --installed, --projectinfo, --targets, --tests, -a, -h. Valued: --backend, --indent
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `mise` (https://mise.jdx.dev/cli/)
 
 - **activate**: Flags: --help, -h
@@ -1609,9 +1654,19 @@ Aliases: `mlocate`, `plocate`
 - Allowed valued flags: -n, --lines
 - Bare invocation allowed
 
+### `mtr` (https://man7.org/linux/man-pages/man8/mtr.8.html)
+
+- Allowed standalone flags: --help, --no-dns, --report, --report-wide, --show-ips, --version, -4, -6, -V, -b, -h, -n, -r, -w
+- Allowed valued flags: --address, --count, --interval, --max-ttl, --psize, --report-cycles, --type, -I, -a, -c, -i, -m, -s
+
 ### `mvn / mvnw` (https://maven.apache.org/ref/current/maven-embedder/cli.html)
 
 - Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify.
+
+### `mypy` (https://mypy.readthedocs.io/en/stable/command_line.html)
+
+- Allowed standalone flags: --help, --no-error-summary, --no-incremental, --pretty, --show-column-numbers, --show-error-codes, --show-error-context, --strict, --verbose, --version, --warn-redundant-casts, --warn-return-any, --warn-unreachable, --warn-unused-ignores, -V, -h, -v
+- Allowed valued flags: --cache-dir, --config-file, --exclude, --follow-imports, --ignore-missing-imports, --module, --namespace-packages, --package, --python-executable, --python-version, -m, -p
 
 ### `netlify` (https://cli.netlify.com/)
 
@@ -1651,6 +1706,11 @@ Aliases: `mlocate`, `plocate`
 Aliases: `ionice`
 
 - Recursively validates the inner command.
+
+### `ninja` (https://ninja-build.org/manual.html)
+
+- Requires -t, -n. - Allowed standalone flags: --help, --version, -n, -v, -V, -h
+- Allowed valued flags: -C, -f, -j, -k, -l, -t
 
 ### `nl` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nl-invocation)
 
@@ -1814,6 +1874,11 @@ Aliases: `ionice`
 
 - Allowed: -e/-E inline one-liners with safe built-in functions, --version, --help, -v, -V. Requires -e/-E flag. Code is validated against a safe identifier allowlist.
 
+### `pg_dump` (https://www.postgresql.org/docs/current/app-pgdump.html)
+
+- Requires --schema-only, -s. - Allowed standalone flags: --help, --no-comments, --no-owner, --no-privileges, --no-tablespaces, --schema-only, --verbose, --version, -V, -h, -s, -v
+- Allowed valued flags: --dbname, --encoding, --file, --format, --host, --port, --schema, --table, --username, -E, -F, -U, -d, -f, -n, -p, -t
+
 ### `pg_isready` (https://www.postgresql.org/docs/current/app-pg-isready.html)
 
 - Allowed standalone flags: --help, --quiet, --version, -V, -q
@@ -1943,6 +2008,11 @@ Aliases: `pip3`
 - **show**: Flags: --all, --help, --latest, --no-dev, --outdated, --top-level, --tree, -T, -h, -l, -o. Valued: --why
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `prettier` (https://prettier.io/docs/en/cli.html)
+
+- Requires --check, --list-different, -c, -l. - Allowed standalone flags: --check, --list-different, --no-config, --no-editorconfig, --no-semi, --single-quote, --jsx-single-quote, --bracket-same-line, --help, --version, -c, -l
+- Allowed valued flags: --config, --ignore-path, --parser, --plugin, --print-width, --tab-width, --trailing-comma, --end-of-line, --prose-wrap
+
 ### `printenv` (https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation)
 
 - Allowed standalone flags: --help, --null, --version, -0, -V, -h
@@ -2000,6 +2070,17 @@ Aliases: `pip3`
 - **versions**: Flags: --bare, --help, -h
 - **which**: Flags: --bare, --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `pylint` (https://pylint.readthedocs.io/en/latest/user_guide/usage/run.html)
+
+- Allowed standalone flags: --errors-only, --help, --list-msgs, --list-msgs-enabled, --long-help, --persistent, --py-version, --recursive, --verbose, --version, -E, -V, -h, -v
+- Allowed valued flags: --disable, --enable, --extension-pkg-allow-list, --fail-under, --generated-members, --ignore, --ignore-paths, --ignore-patterns, --jobs, --load-plugins, --max-line-length, --msg-template, --output-format, --rcfile, --reports, -d, -e, -f, -j
+
+### `pyright` (https://github.com/microsoft/pyright)
+
+- Allowed standalone flags: --dependencies, --help, --lib, --outputjson, --skipunannotated, --stats, --verbose, --version, --warnings, -h
+- Allowed valued flags: --exclude, --ignore, --level, --project, --pythonpath, --pythonplatform, --pythonversion, --threads, --typeshedpath, --verifytypes, -p
+- Bare invocation allowed
 
 ### `qemu-img` (https://www.qemu.org/docs/master/tools/qemu-img.html)
 
@@ -2085,9 +2166,24 @@ Aliases: `pip3`
 
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `rubocop` (https://docs.rubocop.org/rubocop/usage/basic_usage.html)
+
+- Allowed standalone flags: --color, --debug, --display-cop-names, --display-only-correctable, --display-only-safe-correctable, --display-style-guide, --extra-details, --help, --lint, --list-target-files, --no-color, --parallel, --show-cops, --show-docs-url, --version, -L, -V, -d, -h, -l
+- Allowed valued flags: --cache-root, --config, --disable-pending-cops, --enable-pending-cops, --except, --exclude-limit, --fail-level, --format, --only, --out, --require, --stdin, -P, -c, -f, -o, -r
+- Bare invocation allowed
+
 ### `ruby` (https://www.ruby-lang.org/en/documentation/)
 
 - Allowed standalone flags: --help, --version, -V, -h, -v
+
+### `ruff` (https://docs.astral.sh/ruff/)
+
+- **check**: Flags: --help, --no-fix, --quiet, --show-files, --show-settings, --statistics, --verbose, --watch, -e, -h, -q, -v. Valued: --config, --exclude, --extend-exclude, --extend-select, --ignore, --line-length, --output-format, --select, --target-version
+- **config**: Flags: --help, -h
+- **format** (requires --check): Flags: --check, --diff, --help, --quiet, --verbose, -h, -q, -v. Valued: --config, --exclude, --extend-exclude, --line-length, --target-version
+- **rule**: Flags: --all, --help, --output-format, -h
+- **version**: Flags: --help, --output-format, -h
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `rustup` (https://rust-lang.github.io/rustup/)
 
@@ -2248,6 +2344,11 @@ Aliases: `pip3`
 
 - Allowed standalone flags: -V, -a, -f, -h, -w, --all, --help, --include-all-whitespace, --print-file-name, --version
 - Allowed valued flags: -T, -e, -n, -o, -s, -t, --bytes, --encoding, --output-separator, --radix, --target
+
+### `stylelint` (https://stylelint.io/user-guide/cli/)
+
+- Allowed standalone flags: --allow-empty-input, --cache, --color, --disable-default-ignores, --help, --no-color, --quiet, --version, -h, -q
+- Allowed valued flags: --config, --config-basedir, --custom-formatter, --custom-syntax, --formatter, --ignore-path, --ignore-pattern, --max-warnings, --output-file, --report-descriptionless-disables, --report-invalid-scope-disables, --report-needless-disables, -f, -o
 
 ### `sum` (https://www.gnu.org/software/coreutils/manual/coreutils.html#sum-invocation)
 
@@ -2466,6 +2567,13 @@ Aliases: `[`
 ### `tr` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation)
 
 - Allowed standalone flags: -C, -V, -c, -d, -h, -s, --complement, --delete, --help, --squeeze-repeats, --truncate-set1, --version
+
+### `traceroute` (https://man7.org/linux/man-pages/man8/traceroute.8.html)
+
+Aliases: `traceroute6`
+
+- Allowed standalone flags: --help, --version, -4, -6, -F, -I, -T, -U, -V, -d, -e, -h, -n, -r, -v
+- Allowed valued flags: --port, --queries, --sendwait, --wait, -f, -i, -m, -N, -p, -q, -s, -t, -w, -z
 
 ### `tree` (https://man7.org/linux/man-pages/man1/tree.1.html)
 
@@ -2788,4 +2896,9 @@ Aliases: `zegrep`, `zfgrep`
 ### `zipinfo` (https://linux.die.net/man/1/zipinfo)
 
 - Allowed standalone flags: --help, --version, -1, -2, -C, -M, -T, -V, -Z, -h, -l, -m, -s, -t, -v, -z
+
+### `zoxide` (https://github.com/ajeetdsouza/zoxide)
+
+- **query**: Flags: --all, --exclude, --help, --interactive, --list, --score, -a, -h, -i, -l, -s
+- Allowed standalone flags: --help, --version, -V, -h
 

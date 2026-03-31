@@ -215,3 +215,311 @@ level = "Inert"
 bare = true
 max_positional = 0
 standalone = ["--help", "--version", "-V", "-h"]
+
+[[command]]
+name = "prettier"
+url = "https://prettier.io/docs/en/cli.html"
+level = "Inert"
+bare = false
+require_any = ["--check", "--list-different", "-c", "-l"]
+standalone = [
+    "--check", "--list-different",
+    "--no-config", "--no-editorconfig", "--no-semi", "--single-quote",
+    "--jsx-single-quote", "--bracket-same-line",
+    "--help", "--version",
+    "-c", "-l",
+]
+valued = [
+    "--config", "--ignore-path", "--parser", "--plugin",
+    "--print-width", "--tab-width", "--trailing-comma",
+    "--end-of-line", "--prose-wrap",
+]
+
+[[command]]
+name = "black"
+url = "https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html"
+level = "Inert"
+bare = false
+require_any = ["--check", "--diff"]
+standalone = [
+    "--check", "--diff", "--color", "--no-color",
+    "--fast", "--quiet", "--verbose",
+    "--help", "--version",
+]
+valued = [
+    "--config", "--exclude", "--extend-exclude",
+    "--include", "--line-length", "--target-version",
+    "-l", "-t",
+]
+
+[[command]]
+name = "ruff"
+url = "https://docs.astral.sh/ruff/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+standalone = [
+    "--help", "--no-fix", "--quiet", "--show-files",
+    "--show-settings", "--statistics", "--verbose",
+    "--watch",
+    "-e", "-h", "-q", "-v",
+]
+valued = [
+    "--config", "--exclude", "--extend-exclude",
+    "--extend-select", "--ignore", "--line-length",
+    "--output-format", "--select", "--target-version",
+]
+
+[[command.sub]]
+name = "format"
+guard = "--check"
+level = "Inert"
+bare = false
+standalone = ["--check", "--diff", "--help", "--quiet", "--verbose", "-h", "-q", "-v"]
+valued = [
+    "--config", "--exclude", "--extend-exclude",
+    "--line-length", "--target-version",
+]
+
+[[command.sub]]
+name = "rule"
+standalone = ["--all", "--help", "--output-format", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--output-format", "-h"]
+
+[[command.sub]]
+name = "config"
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "mypy"
+url = "https://mypy.readthedocs.io/en/stable/command_line.html"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--no-error-summary", "--no-incremental",
+    "--pretty", "--show-column-numbers", "--show-error-codes",
+    "--show-error-context", "--strict", "--verbose", "--version",
+    "--warn-redundant-casts", "--warn-return-any",
+    "--warn-unreachable", "--warn-unused-ignores",
+    "-V", "-h", "-v",
+]
+valued = [
+    "--cache-dir", "--config-file", "--exclude", "--follow-imports",
+    "--ignore-missing-imports", "--module", "--namespace-packages",
+    "--package", "--python-executable", "--python-version",
+    "-m", "-p",
+]
+
+[[command]]
+name = "pyright"
+url = "https://github.com/microsoft/pyright"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--dependencies", "--help", "--lib",
+    "--outputjson", "--skipunannotated", "--stats",
+    "--verbose", "--version", "--warnings",
+    "-h",
+]
+valued = [
+    "--exclude", "--ignore", "--level",
+    "--project", "--pythonpath", "--pythonplatform",
+    "--pythonversion", "--threads", "--typeshedpath",
+    "--verifytypes",
+    "-p",
+]
+
+[[command]]
+name = "pylint"
+url = "https://pylint.readthedocs.io/en/latest/user_guide/usage/run.html"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--errors-only", "--help", "--list-msgs", "--list-msgs-enabled",
+    "--long-help", "--persistent", "--py-version",
+    "--recursive", "--verbose", "--version",
+    "-E", "-V", "-h", "-v",
+]
+valued = [
+    "--disable", "--enable", "--extension-pkg-allow-list",
+    "--fail-under", "--generated-members", "--ignore",
+    "--ignore-paths", "--ignore-patterns", "--jobs",
+    "--load-plugins", "--max-line-length", "--msg-template",
+    "--output-format", "--rcfile", "--reports",
+    "-d", "-e", "-f", "-j",
+]
+
+[[command]]
+name = "flake8"
+url = "https://flake8.pycqa.org/en/latest/user/invocation.html"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--benchmark", "--count", "--help", "--quiet",
+    "--show-pep8", "--show-source", "--statistics",
+    "--verbose", "--version",
+    "-V", "-h", "-q", "-v",
+]
+valued = [
+    "--config", "--exclude", "--extend-exclude",
+    "--extend-ignore", "--filename", "--format",
+    "--ignore", "--max-complexity", "--max-line-length",
+    "--output-file", "--per-file-ignores", "--select",
+]
+
+[[command]]
+name = "isort"
+url = "https://pycqa.github.io/isort/docs/configuration/options.html"
+level = "Inert"
+bare = false
+require_any = ["--check-only", "--diff", "-c"]
+standalone = [
+    "--check-only", "--diff", "--help", "--quiet",
+    "--show-config", "--verbose", "--version",
+    "-c", "-V", "-h", "-q", "-v",
+]
+valued = [
+    "--filter-files", "--line-length", "--multi-line",
+    "--profile", "--project", "--settings-file",
+    "--skip", "--skip-glob", "--src",
+    "-l", "-m",
+]
+
+[[command]]
+name = "rubocop"
+url = "https://docs.rubocop.org/rubocop/usage/basic_usage.html"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--color", "--debug", "--display-cop-names",
+    "--display-only-correctable", "--display-only-safe-correctable",
+    "--display-style-guide", "--extra-details",
+    "--help", "--lint", "--list-target-files",
+    "--no-color", "--parallel", "--show-cops",
+    "--show-docs-url", "--version",
+    "-L", "-V", "-d", "-h", "-l",
+]
+valued = [
+    "--cache-root", "--config", "--disable-pending-cops",
+    "--enable-pending-cops", "--except", "--exclude-limit",
+    "--fail-level", "--format", "--only", "--out",
+    "--require", "--stdin",
+    "-P", "-c", "-f", "-o", "-r",
+]
+
+[[command]]
+name = "eslint"
+url = "https://eslint.org/docs/latest/use/command-line-interface"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--cache", "--color", "--debug", "--env-info",
+    "--help", "--init", "--no-color", "--no-eslintrc",
+    "--no-inline-config", "--print-config", "--quiet",
+    "--version",
+    "-h", "-v",
+]
+valued = [
+    "--cache-location", "--config", "--env", "--ext",
+    "--format", "--global", "--ignore-path",
+    "--ignore-pattern", "--max-warnings",
+    "--no-error-on-unmatched-pattern", "--output-file",
+    "--parser", "--parser-options", "--plugin",
+    "--resolve-plugins-relative-to", "--rule", "--rulesdir",
+    "-c", "-f", "-o",
+]
+
+[[command]]
+name = "biome"
+url = "https://biomejs.dev/reference/cli/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+standalone = [
+    "--apply", "--colors", "--help", "--json-formatter",
+    "--no-errors-on-unmatched", "--quiet", "--verbose",
+    "-h",
+]
+valued = [
+    "--config-path", "--max-diagnostics", "--stdin-file-path",
+    "--vcs-root",
+]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+standalone = [
+    "--colors", "--help", "--json-formatter",
+    "--no-errors-on-unmatched", "--quiet", "--verbose",
+    "-h",
+]
+valued = [
+    "--config-path", "--max-diagnostics", "--stdin-file-path",
+    "--vcs-root",
+]
+
+[[command.sub]]
+name = "ci"
+level = "SafeRead"
+standalone = [
+    "--colors", "--help", "--json-formatter",
+    "--no-errors-on-unmatched", "--quiet", "--verbose",
+    "-h",
+]
+valued = [
+    "--config-path", "--max-diagnostics",
+]
+
+[[command.sub]]
+name = "format"
+level = "Inert"
+standalone = [
+    "--colors", "--help", "--json-formatter",
+    "--no-errors-on-unmatched", "--quiet", "--verbose",
+    "-h",
+]
+valued = [
+    "--config-path", "--indent-style", "--indent-width",
+    "--line-width", "--stdin-file-path",
+]
+
+[[command]]
+name = "stylelint"
+url = "https://stylelint.io/user-guide/cli/"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--allow-empty-input", "--cache", "--color",
+    "--disable-default-ignores", "--help", "--no-color",
+    "--quiet", "--version",
+    "-h", "-q",
+]
+valued = [
+    "--config", "--config-basedir", "--custom-formatter",
+    "--custom-syntax", "--formatter", "--ignore-path",
+    "--ignore-pattern", "--max-warnings", "--output-file",
+    "--report-descriptionless-disables",
+    "--report-invalid-scope-disables",
+    "--report-needless-disables",
+    "-f", "-o",
+]
+
+[[command]]
+name = "zoxide"
+url = "https://github.com/ajeetdsouza/zoxide"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "query"
+standalone = [
+    "--all", "--exclude", "--help", "--interactive",
+    "--list", "--score",
+    "-a", "-h", "-i", "-l", "-s",
+]
