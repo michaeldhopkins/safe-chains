@@ -1,6 +1,6 @@
 # `safe-chains`
 
-A command safety checker that auto-allows safe, read-only bash commands without prompting. Works as a Claude Code pre-hook, a CLI tool, or an OpenCode plugin (experimental).
+A command safety checker that auto-allows safe bash commands without prompting. Works as a Claude Code pre-hook, a CLI tool, or an OpenCode plugin (experimental).
 
 When an agentic tool wants to run a bash command, safe-chains checks if every segment of the command is safe. If so, the command runs without asking for permission. If any segment is unsafe, the normal permission flow takes over. Commands in piped chains, `&&`, and `;` sequences are each validated independently.
 
@@ -135,7 +135,7 @@ Without `--level`, the default threshold is `safe-write` (all allowed commands p
 
 ### Built-in rules
 
-safe-chains knows 130+ read-only commands (`grep`, `cat`, `ls`, `jq`, ...) that are always safe with any arguments. For 50+ additional tools (`git`, `cargo`, `npm`, `docker`, ...), it validates specific subcommands and flags—allowing `git log` but not `git push`, allowing `sed 's/foo/bar/'` but not `sed -i`.
+safe-chains knows 420+ commands. Of these, 110+ (`grep`, `cat`, `ls`, `jq`, ...) are safe with any arguments. For 300+ additional tools (`git`, `cargo`, `npm`, `docker`, ...), it validates specific subcommands and flags—allowing `git log` but not `git push`, allowing `sed 's/foo/bar/'` but not `sed -i`.
 
 Commands containing shell operators (`&&`, `|`, `;`) are split into segments. Shell compound commands (`for`/`while`/`until` loops and `if`/`elif`/`else` conditionals) are parsed into an AST and each leaf command is validated recursively, supporting arbitrary nesting depth. Simple segments are validated independently. Output redirection (`>`, `>>`) is only allowed to `/dev/null`. Input redirection (`<`) is only allowed from `/dev/null`. Here-strings (`<<<`) and here-documents (`<<`, `<<-`) are allowed. Backticks and command substitution (`$(...)`) are recursively validated.
 
