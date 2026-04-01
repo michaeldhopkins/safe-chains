@@ -17,6 +17,11 @@ name = "exec"
 handler = "bundle_exec"
 
 [[command.sub]]
+name = "install"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
 name = "info"
 standalone = ["--help", "--path", "-h"]
 

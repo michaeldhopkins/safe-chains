@@ -601,6 +601,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 - **check**: Flags: --dry-run, --help, -h. Valued: --gemfile, --path
 - **info**: Flags: --help, --path, -h
+- **install**: Flags: --help, -h
 - **list**: Flags: --help, --name-only, --paths, -h
 - **show**: Flags: --help, --paths, -h
 - Allowed standalone flags: --help, --version, -V, -h
