@@ -111,7 +111,17 @@ impl SubSpec {
                     out.push(format!("- **{label}** (requires {guard_long}): {summary}"));
                 }
             }
-            SubKind::Nested { subs, .. } => {
+            SubKind::Nested { subs, pre_standalone, pre_valued, .. } => {
+                if !pre_standalone.is_empty() || !pre_valued.is_empty() {
+                    let mut parts = Vec::new();
+                    if !pre_standalone.is_empty() {
+                        parts.push(format!("Flags: {}", pre_standalone.join(", ")));
+                    }
+                    if !pre_valued.is_empty() {
+                        parts.push(format!("Valued: {}", pre_valued.join(", ")));
+                    }
+                    out.push(format!("- **{label}**: {}", parts.join(". ")));
+                }
                 for sub in subs {
                     sub.doc_line(&label, out);
                 }

@@ -1414,6 +1414,7 @@ Aliases: `g++`, `cc`, `c++`
 - **config --list**
 - **config -h**
 - **config -l**
+- **config**: Flags: --global, --local, --name-only, --show-origin, --show-scope, --system, --worktree, -z. Valued: --blob, --file, -f
 - **count-objects**: Flags: --help, --human-readable, --verbose, -H, -h, -v
 - **describe**: Flags: --all, --always, --contains, --debug, --exact-match, --first-parent, --help, --long, --tags, -h. Valued: --abbrev, --broken, --candidates, --dirty, --exclude, --match
 - **diff**: Flags: --cached, --check, --compact-summary, --cumulative, --dirstat-by-file, --exit-code, --find-copies-harder, --full-index, --help, --ignore-all-space, --ignore-blank-lines, --ignore-cr-at-eol, --ignore-space-at-eol, --ignore-space-change, --merge-base, --minimal, --name-only, --name-status, --no-color, --no-ext-diff, --no-index, --no-patch, --no-prefix, --no-renames, --numstat, --patch, --patch-with-raw, --patch-with-stat, --patience, --pickaxe-all, --raw, --shortstat, --staged, --stat, --summary, --text, -B, -C, -M, -R, -a, -b, -h, -p, -u, -w, -z. Valued: --abbrev, --color, --diff-algorithm, --diff-filter, --dirstat, --dst-prefix, --inter-hunk-context, --line-prefix, --output-indicator-new, --output-indicator-old, --relative, --src-prefix, --stat-width, --unified, --word-diff, --word-diff-regex, -G, -O, -S, -U

@@ -130,10 +130,16 @@
 # accepted. Use this for commands like "mise settings" that show output
 # when invoked without a subcommand. This also allows --help/-h on the
 # parent without routing to a child sub.
+#
+# If the parent sub accepts flags that can appear before the child sub
+# (e.g. "git config --local --list"), add standalone/valued on the parent.
+# These are skipped when locating the child sub name.
 
 # [[command.sub]]
 # name = "config"
 # # nested_bare = true                  # set if "tool config" alone is safe
+# # standalone = ["--local", "--global"] # flags allowed before the child sub
+# # valued = ["--file", "-f"]           # valued flags allowed before the child sub
 #
 # [[command.sub.sub]]
 # name = "get"
