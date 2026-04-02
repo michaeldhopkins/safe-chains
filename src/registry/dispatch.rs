@@ -52,6 +52,34 @@ fn dispatch_require_any(
     }
 }
 
+fn skip_pre_flags(
+    tokens: &[Token],
+    pre_standalone: &[String],
+    pre_valued: &[String],
+) -> usize {
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = &tokens[i];
+        if !t.starts_with('-') {
+            break;
+        }
+        if pre_valued.iter().any(|f| t == f.as_str()) {
+            i += 2;
+            continue;
+        }
+        if pre_valued.iter().any(|f| t.as_str().starts_with(&format!("{f}="))) {
+            i += 1;
+            continue;
+        }
+        if pre_standalone.iter().any(|f| t == f.as_str()) {
+            i += 1;
+            continue;
+        }
+        break;
+    }
+    i
+}
+
 fn dispatch_nested(
     tokens: &[Token],
     subs: &[SubSpec],
@@ -59,26 +87,7 @@ fn dispatch_nested(
     pre_standalone: &[String],
     pre_valued: &[String],
 ) -> Verdict {
-    let mut start = 1;
-    while start < tokens.len() {
-        let t = &tokens[start];
-        if !t.starts_with('-') {
-            break;
-        }
-        if pre_valued.iter().any(|f| t == f.as_str()) {
-            start += 2;
-            continue;
-        }
-        if pre_valued.iter().any(|f| t.as_str().starts_with(&format!("{f}="))) {
-            start += 1;
-            continue;
-        }
-        if pre_standalone.iter().any(|f| t == f.as_str()) {
-            start += 1;
-            continue;
-        }
-        break;
-    }
+    let start = skip_pre_flags(tokens, pre_standalone, pre_valued);
     if start >= tokens.len() {
         if allow_bare {
             return Verdict::Allowed(SafetyLevel::Inert);
@@ -191,26 +200,7 @@ fn dispatch_structured(
     first_arg: &[String],
     first_arg_level: SafetyLevel,
 ) -> Verdict {
-    let mut start = 1;
-    while start < tokens.len() {
-        let t = &tokens[start];
-        if !t.starts_with('-') {
-            break;
-        }
-        if pre_valued.iter().any(|f| t == f.as_str()) {
-            start += 2;
-            continue;
-        }
-        if pre_valued.iter().any(|f| t.as_str().starts_with(&format!("{f}="))) {
-            start += 1;
-            continue;
-        }
-        if pre_standalone.iter().any(|f| t == f.as_str()) {
-            start += 1;
-            continue;
-        }
-        break;
-    }
+    let start = skip_pre_flags(tokens, pre_standalone, pre_valued);
     if start >= tokens.len() {
         return if bare_ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
