@@ -122,79 +122,22 @@ pub struct CommandSpec {
     pub name: String,
     pub aliases: Vec<String>,
     pub url: String,
-    pub(super) kind: CommandKind,
-}
-
-#[derive(Debug)]
-pub(super) enum CommandKind {
-    Flat {
-        policy: OwnedPolicy,
-        level: SafetyLevel,
-    },
-    FlatRequireAny {
-        require_any: Vec<String>,
-        policy: OwnedPolicy,
-        level: SafetyLevel,
-    },
-    FlatFirstArg {
-        patterns: Vec<String>,
-        level: SafetyLevel,
-    },
-    Structured {
-        bare_flags: Vec<String>,
-        subs: Vec<SubSpec>,
-        pre_standalone: Vec<String>,
-        pre_valued: Vec<String>,
-        bare_ok: bool,
-        first_arg: Vec<String>,
-        first_arg_level: SafetyLevel,
-    },
-    Wrapper {
-        standalone: Vec<String>,
-        valued: Vec<String>,
-        positional_skip: usize,
-        separator: Option<String>,
-        bare_ok: bool,
-    },
-    Custom {
-        #[allow(dead_code)]
-        handler_name: String,
-    },
+    pub(super) kind: DispatchKind,
 }
 
 #[derive(Debug)]
 pub(super) struct SubSpec {
     pub name: String,
-    pub kind: SubKind,
+    pub kind: DispatchKind,
 }
 
 #[derive(Debug)]
-pub(super) enum SubKind {
+pub(super) enum DispatchKind {
     Policy {
         policy: OwnedPolicy,
         level: SafetyLevel,
     },
-    Guarded {
-        guard_long: String,
-        guard_short: Option<String>,
-        policy: OwnedPolicy,
-        level: SafetyLevel,
-    },
-    Nested {
-        subs: Vec<SubSpec>,
-        allow_bare: bool,
-        pre_standalone: Vec<String>,
-        pre_valued: Vec<String>,
-    },
-    AllowAll {
-        level: SafetyLevel,
-    },
-    WriteFlagged {
-        policy: OwnedPolicy,
-        base_level: SafetyLevel,
-        write_flags: Vec<String>,
-    },
-    FirstArgFilter {
+    FirstArg {
         patterns: Vec<String>,
         level: SafetyLevel,
     },
@@ -202,14 +145,34 @@ pub(super) enum SubKind {
         require_any: Vec<String>,
         policy: OwnedPolicy,
         level: SafetyLevel,
+        accept_bare_help: bool,
+    },
+    Branching {
+        subs: Vec<SubSpec>,
+        bare_flags: Vec<String>,
+        bare_ok: bool,
+        pre_standalone: Vec<String>,
+        pre_valued: Vec<String>,
+        first_arg: Vec<String>,
+        first_arg_level: SafetyLevel,
+    },
+    WriteFlagged {
+        policy: OwnedPolicy,
+        base_level: SafetyLevel,
+        write_flags: Vec<String>,
     },
     DelegateAfterSeparator {
         separator: String,
     },
     DelegateSkip {
         skip: usize,
-        #[allow(dead_code)]
-        doc: String,
+    },
+    Wrapper {
+        standalone: Vec<String>,
+        valued: Vec<String>,
+        positional_skip: usize,
+        separator: Option<String>,
+        bare_ok: bool,
     },
     Custom {
         #[allow(dead_code)]

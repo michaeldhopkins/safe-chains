@@ -108,6 +108,12 @@
 # Use when a subcommand is only safe with a particular flag.
 # Example: "cargo fmt" is a write operation, but "cargo fmt --check" is read-only.
 # Without the guard flag, the subcommand is not allowed.
+#
+# Internally, guard is a shorthand for require_any with a single flag.
+# The difference: guard also accepts bare "help" as a positional argument
+# (e.g. "cargo fmt help"), while require_any only accepts --help/-h.
+# Use guard when there is exactly one required flag; use require_any
+# when multiple flags are acceptable alternatives.
 
 # [[command.sub]]
 # name = "fmt"
@@ -170,7 +176,9 @@
 # ─────────────────────────────────────────────────────────────────────
 #
 # Use when a subcommand is only safe if at least one of several specific
-# flags is present. Similar to "guard" but accepts multiple alternatives.
+# flags is present. Internally the same dispatch as guard, but accepts
+# multiple alternatives. Use guard when there is exactly one required
+# flag; use require_any when several flags are acceptable.
 # Example: "conda config" is only safe with --show or --show-sources.
 # Without one of those, it could be used for --set or --add operations.
 # --help/-h is always allowed without the required flag.
@@ -187,7 +195,8 @@
 # ─────────────────────────────────────────────────────────────────────
 #
 # Use for: help subcommands that accept any topic as an argument.
-# No flag or argument checking is performed.
+# Internally equivalent to a policy with positional_style = true and
+# no flags listed, but allow_all is clearer about intent.
 
 # [[command.sub]]
 # name = "help"

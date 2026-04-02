@@ -25,18 +25,29 @@ pub(super) fn build_policy(
     }
 }
 
+fn allow_all_policy() -> OwnedPolicy {
+    OwnedPolicy {
+        standalone: Vec::new(),
+        valued: Vec::new(),
+        bare: true,
+        max_positional: None,
+        flag_style: FlagStyle::Positional,
+    }
+}
+
 pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
     if let Some(handler_name) = toml.handler {
         return SubSpec {
             name: toml.name,
-            kind: SubKind::Custom { handler_name },
+            kind: DispatchKind::Custom { handler_name },
         };
     }
 
     if toml.allow_all.unwrap_or(false) {
         return SubSpec {
             name: toml.name,
-            kind: SubKind::AllowAll {
+            kind: DispatchKind::Policy {
+                policy: allow_all_policy(),
                 level: toml.level.unwrap_or(TomlLevel::Inert).into(),
             },
         };
@@ -45,28 +56,28 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
     if let Some(sep) = toml.delegate_after {
         return SubSpec {
             name: toml.name,
-            kind: SubKind::DelegateAfterSeparator { separator: sep },
+            kind: DispatchKind::DelegateAfterSeparator { separator: sep },
         };
     }
 
     if let Some(skip) = toml.delegate_skip {
         return SubSpec {
             name: toml.name,
-            kind: SubKind::DelegateSkip {
-                skip,
-                doc: toml.doc.unwrap_or_default(),
-            },
+            kind: DispatchKind::DelegateSkip { skip },
         };
     }
 
     if !toml.sub.is_empty() {
         return SubSpec {
             name: toml.name,
-            kind: SubKind::Nested {
+            kind: DispatchKind::Branching {
                 subs: toml.sub.into_iter().map(build_sub).collect(),
-                allow_bare: toml.nested_bare.unwrap_or(false),
+                bare_flags: Vec::new(),
+                bare_ok: toml.nested_bare.unwrap_or(false),
                 pre_standalone: toml.standalone,
                 pre_valued: toml.valued,
+                first_arg: Vec::new(),
+                first_arg_level: SafetyLevel::Inert,
             },
         };
     }
@@ -83,7 +94,7 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
     if !toml.write_flags.is_empty() {
         return SubSpec {
             name: toml.name,
-            kind: SubKind::WriteFlagged {
+            kind: DispatchKind::WriteFlagged {
                 policy,
                 base_level: level,
                 write_flags: toml.write_flags,
@@ -92,13 +103,17 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
     }
 
     if let Some(guard) = toml.guard {
+        let mut require_any = vec![guard];
+        if let Some(short) = toml.guard_short {
+            require_any.push(short);
+        }
         return SubSpec {
             name: toml.name,
-            kind: SubKind::Guarded {
-                guard_long: guard,
-                guard_short: toml.guard_short,
+            kind: DispatchKind::RequireAny {
+                require_any,
                 policy,
                 level,
+                accept_bare_help: true,
             },
         };
     }
@@ -106,7 +121,7 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
     if !toml.first_arg.is_empty() {
         return SubSpec {
             name: toml.name,
-            kind: SubKind::FirstArgFilter {
+            kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
                 level,
             },
@@ -116,17 +131,18 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
     if !toml.require_any.is_empty() {
         return SubSpec {
             name: toml.name,
-            kind: SubKind::RequireAny {
+            kind: DispatchKind::RequireAny {
                 require_any: toml.require_any,
                 policy,
                 level,
+                accept_bare_help: false,
             },
         };
     }
 
     SubSpec {
         name: toml.name,
-        kind: SubKind::Policy { policy, level },
+        kind: DispatchKind::Policy { policy, level },
     }
 }
 
@@ -136,7 +152,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
             name: toml.name,
             aliases: toml.aliases,
             url: toml.url,
-            kind: CommandKind::Custom { handler_name },
+            kind: DispatchKind::Custom { handler_name },
         };
     }
 
@@ -147,7 +163,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
                 name: toml.name,
                 aliases: toml.aliases,
                 url: toml.url,
-                kind: CommandKind::Structured {
+                kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
                     subs: toml.sub.into_iter().map(build_sub).collect(),
                     pre_standalone: w.standalone,
@@ -162,7 +178,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
             name: toml.name,
             aliases: toml.aliases,
             url: toml.url,
-            kind: CommandKind::Wrapper {
+            kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
                 valued: w.valued,
                 positional_skip: w.positional_skip.unwrap_or(0),
@@ -178,7 +194,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
             name: toml.name,
             aliases: toml.aliases,
             url: toml.url,
-            kind: CommandKind::Structured {
+            kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
                 subs: toml.sub.into_iter().map(build_sub).collect(),
                 pre_standalone: Vec::new(),
@@ -205,7 +221,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
             name: toml.name,
             aliases: toml.aliases,
             url: toml.url,
-            kind: CommandKind::FlatFirstArg {
+            kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
                 level,
             },
@@ -217,10 +233,11 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
             name: toml.name,
             aliases: toml.aliases,
             url: toml.url,
-            kind: CommandKind::FlatRequireAny {
+            kind: DispatchKind::RequireAny {
                 require_any: toml.require_any,
                 policy,
                 level,
+                accept_bare_help: false,
             },
         };
     }
@@ -229,7 +246,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
         name: toml.name,
         aliases: toml.aliases,
         url: toml.url,
-        kind: CommandKind::Flat {
+        kind: DispatchKind::Policy {
             policy,
             level,
         },
@@ -250,7 +267,7 @@ pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
                 aliases: vec![],
                 url: spec.url.clone(),
                 kind: match &spec.kind {
-                    CommandKind::Flat { policy, level } => CommandKind::Flat {
+                    DispatchKind::Policy { policy, level } => DispatchKind::Policy {
                         policy: OwnedPolicy {
                             standalone: policy.standalone.clone(),
                             valued: policy.valued.clone(),
@@ -260,11 +277,11 @@ pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
                         },
                         level: *level,
                     },
-                    CommandKind::FlatFirstArg { patterns, level } => CommandKind::FlatFirstArg {
+                    DispatchKind::FirstArg { patterns, level } => DispatchKind::FirstArg {
                         patterns: patterns.clone(),
                         level: *level,
                     },
-                    CommandKind::FlatRequireAny { require_any, policy, level } => CommandKind::FlatRequireAny {
+                    DispatchKind::RequireAny { require_any, policy, level, accept_bare_help } => DispatchKind::RequireAny {
                         require_any: require_any.clone(),
                         policy: OwnedPolicy {
                             standalone: policy.standalone.clone(),
@@ -274,8 +291,9 @@ pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
                             flag_style: policy.flag_style,
                         },
                         level: *level,
+                        accept_bare_help: *accept_bare_help,
                     },
-                    CommandKind::Wrapper { standalone, valued, positional_skip, separator, bare_ok } => CommandKind::Wrapper {
+                    DispatchKind::Wrapper { standalone, valued, positional_skip, separator, bare_ok } => DispatchKind::Wrapper {
                         standalone: standalone.clone(),
                         valued: valued.clone(),
                         positional_skip: *positional_skip,

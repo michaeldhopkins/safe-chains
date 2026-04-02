@@ -1,5 +1,5 @@
 use super::*;
-    use super::types::CommandKind;
+    use super::types::DispatchKind;
     use crate::parse::Token;
     use crate::policy::FlagStyle;
     use crate::verdict::{SafetyLevel, Verdict};
@@ -273,6 +273,86 @@ use super::*;
     }
 
     #[test]
+    fn structured_help_denied_when_not_in_bare_flags() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "tea"
+            bare_flags = ["--version", "-v"]
+
+            [[command.sub]]
+            name = "whoami"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["tea", "--help"]), &spec),
+            Verdict::Denied,
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["tea", "-h"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn structured_help_allowed_when_in_bare_flags() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "cargo"
+            bare_flags = ["--help", "-h"]
+
+            [[command.sub]]
+            name = "build"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["cargo", "--help"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["cargo", "-h"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn nested_help_allowed_without_bare_flags() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "tool"
+
+            [[command.sub]]
+            name = "config"
+
+            [[command.sub.sub]]
+            name = "get"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "config", "--help"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "config", "-h"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn nested_help_with_trailing_denied() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "tool"
+
+            [[command.sub]]
+            name = "config"
+
+            [[command.sub.sub]]
+            name = "get"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "config", "--help", "extra"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
     fn structured_unknown_sub_rejected() {
         let spec = load_one(r#"
             [[command]]
@@ -390,6 +470,67 @@ use super::*;
         "#);
         assert_eq!(
             dispatch_spec(&toks(&["tool", "sub", "--mode=check"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn guarded_short_eq_does_not_satisfy_guard() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "cargo"
+
+            [[command.sub]]
+            name = "package"
+            guard = "--list"
+            guard_short = "-l"
+            standalone = ["--list", "-l"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["cargo", "package", "-l=foo"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn guarded_long_eq_satisfies_guard() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "cargo"
+
+            [[command.sub]]
+            name = "package"
+            guard = "--list"
+            guard_short = "-l"
+            valued = ["--list"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["cargo", "package", "--list=all"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn guarded_help_positional_allowed() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "cargo"
+
+            [[command.sub]]
+            name = "fmt"
+            guard = "--check"
+            standalone = ["--all", "--check"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["cargo", "fmt", "--help"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["cargo", "fmt", "-h"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["cargo", "fmt", "help"]), &spec),
             Verdict::Allowed(SafetyLevel::Inert),
         );
     }
@@ -864,6 +1005,68 @@ use super::*;
         "#);
         assert_eq!(
             dispatch_spec(&toks(&["conda", "config", "--show", "--set"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn require_any_short_eq_does_not_satisfy() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "tool"
+
+            [[command.sub]]
+            name = "sub"
+            bare = false
+            require_any = ["--show", "-s"]
+            standalone = ["--help", "--show", "-h", "-s"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "sub", "-s=foo"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn require_any_long_eq_satisfies() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "tool"
+
+            [[command.sub]]
+            name = "sub"
+            bare = false
+            require_any = ["--show", "-s"]
+            valued = ["--show"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "sub", "--show=all"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+    }
+
+    #[test]
+    fn require_any_does_not_accept_bare_help() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "tool"
+
+            [[command.sub]]
+            name = "sub"
+            bare = false
+            require_any = ["--show"]
+            standalone = ["--help", "--show", "-h"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "sub", "--help"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "sub", "-h"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "sub", "help"]), &spec),
             Verdict::Denied,
         );
     }
@@ -1445,7 +1648,7 @@ use super::*;
         let mut failures = Vec::new();
         for (name, spec) in TOML_REGISTRY.iter() {
             match &spec.kind {
-                CommandKind::Flat { policy, .. } | CommandKind::FlatRequireAny { policy, .. } => {
+                DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. } => {
                     if policy.flag_style == FlagStyle::Positional {
                         continue;
                     }

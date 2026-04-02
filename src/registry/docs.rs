@@ -5,8 +5,8 @@ use super::types::*;
 impl CommandSpec {
     pub(super) fn to_command_doc(&self) -> crate::docs::CommandDoc {
         let description = match &self.kind {
-            CommandKind::Flat { policy, .. } => policy.describe(),
-            CommandKind::FlatRequireAny { require_any, policy, .. } => {
+            DispatchKind::Policy { policy, .. } => policy.describe(),
+            DispatchKind::RequireAny { require_any, policy, .. } => {
                 let req = require_any.join(", ");
                 let summary = policy.describe();
                 if summary.is_empty() {
@@ -15,7 +15,7 @@ impl CommandSpec {
                     format!("Requires {req}. {summary}")
                 }
             }
-            CommandKind::Structured { bare_flags, subs, bare_ok, first_arg, .. } => {
+            DispatchKind::Branching { bare_flags, subs, bare_ok, first_arg, .. } => {
                 let mut lines = Vec::new();
                 if *bare_ok {
                     lines.push("- Bare invocation allowed".to_string());
@@ -32,14 +32,16 @@ impl CommandSpec {
                 lines.sort();
                 lines.join("\n")
             }
-            CommandKind::Wrapper { .. } => {
+            DispatchKind::Wrapper { .. } => {
                 "- Recursively validates the inner command.".to_string()
             }
-            CommandKind::FlatFirstArg { patterns, .. } => {
+            DispatchKind::FirstArg { patterns, .. } => {
                 let args = patterns.join(", ");
                 format!("Allowed first arguments: {args}")
             }
-            CommandKind::Custom { .. } => String::new(),
+            DispatchKind::Custom { .. } => String::new(),
+            DispatchKind::WriteFlagged { policy, .. } => policy.describe(),
+            DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => String::new(),
         };
         let mut doc = crate::docs::CommandDoc::handler(
             Box::leak(self.name.clone().into_boxed_str()),
@@ -95,7 +97,7 @@ impl SubSpec {
             format!("{prefix} {}", self.name)
         };
         match &self.kind {
-            SubKind::Policy { policy, .. } => {
+            DispatchKind::Policy { policy, .. } => {
                 let summary = policy.flag_summary();
                 if summary.is_empty() {
                     out.push(format!("- **{label}**"));
@@ -103,15 +105,16 @@ impl SubSpec {
                     out.push(format!("- **{label}**: {summary}"));
                 }
             }
-            SubKind::Guarded { guard_long, policy, .. } => {
+            DispatchKind::RequireAny { require_any, policy, .. } => {
+                let req = require_any.join(", ");
                 let summary = policy.flag_summary();
                 if summary.is_empty() {
-                    out.push(format!("- **{label}** (requires {guard_long})"));
+                    out.push(format!("- **{label}** (requires {req})"));
                 } else {
-                    out.push(format!("- **{label}** (requires {guard_long}): {summary}"));
+                    out.push(format!("- **{label}** (requires {req}): {summary}"));
                 }
             }
-            SubKind::Nested { subs, pre_standalone, pre_valued, .. } => {
+            DispatchKind::Branching { subs, pre_standalone, pre_valued, .. } => {
                 if !pre_standalone.is_empty() || !pre_valued.is_empty() {
                     let mut parts = Vec::new();
                     if !pre_standalone.is_empty() {
@@ -126,10 +129,11 @@ impl SubSpec {
                     sub.doc_line(&label, out);
                 }
             }
-            SubKind::AllowAll { .. } => {
-                out.push(format!("- **{label}**"));
+            DispatchKind::FirstArg { patterns, .. } => {
+                let args = patterns.join(", ");
+                out.push(format!("- **{label}**: Allowed arguments: {args}"));
             }
-            SubKind::WriteFlagged { policy, .. } => {
+            DispatchKind::WriteFlagged { policy, .. } => {
                 let summary = policy.flag_summary();
                 if summary.is_empty() {
                     out.push(format!("- **{label}**"));
@@ -137,21 +141,9 @@ impl SubSpec {
                     out.push(format!("- **{label}**: {summary}"));
                 }
             }
-            SubKind::FirstArgFilter { patterns, .. } => {
-                let args = patterns.join(", ");
-                out.push(format!("- **{label}**: Allowed arguments: {args}"));
-            }
-            SubKind::RequireAny { require_any, policy, .. } => {
-                let req = require_any.join(", ");
-                let summary = policy.flag_summary();
-                if summary.is_empty() {
-                    out.push(format!("- **{label}** (requires {req})"));
-                } else {
-                    out.push(format!("- **{label}** (requires {req}): {summary}"));
-                }
-            }
-            SubKind::DelegateAfterSeparator { .. } | SubKind::DelegateSkip { .. } => {}
-            SubKind::Custom { .. } => {}
+            DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => {}
+            DispatchKind::Custom { .. } => {}
+            DispatchKind::Wrapper { .. } => {}
         }
     }
 }

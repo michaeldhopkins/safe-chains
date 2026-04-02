@@ -654,9 +654,9 @@ Unlisted flags, subcommands, and commands are not allowed.
 - **nextest run**: Flags: --all-features, --all-targets, --help, --lib, --locked, --no-capture, --no-default-features, --no-fail-fast, --release, --status-level, -h. Valued: --bin, --cargo-profile, --color, --config, --exclude, --features, --jobs, --manifest-path, --package, --partition, --profile, --retries, --target, --target-dir, --test, --test-threads, --threads, -E, -j, -p
 - **nextest show-config**: Flags: --help, -h
 - **outdated**: Flags: --aggressive, --color, --depth, --exit-code, --features, --help, --manifest-path, --packages, --root-deps-only, --verbose, --workspace, -R, -V, -d, -h, -n, -q, -r, -v, -w. Valued: --color, --depth, --exclude, --features, --ignore, --manifest-path, --packages, -d, -e, -i, -p
-- **package** (requires --list): Flags: --all-features, --frozen, --help, --keep-going, --list, --locked, --no-default-features, --no-metadata, --offline, --workspace, -h, -l, -q, -v. Valued: --color, --config, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --target, --target-dir, -F, -Z, -j, -p
+- **package** (requires --list, -l): Flags: --all-features, --frozen, --help, --keep-going, --list, --locked, --no-default-features, --no-metadata, --offline, --workspace, -h, -l, -q, -v. Valued: --color, --config, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --target, --target-dir, -F, -Z, -j, -p
 - **pkgid**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --manifest-path
-- **publish** (requires --dry-run): Flags: --all-features, --dry-run, --frozen, --help, --keep-going, --locked, --no-default-features, --offline, --workspace, -h, -n, -q, -v. Valued: --color, --config, --exclude, --features, --index, --jobs, --manifest-path, --package, --registry, --target, --target-dir, -F, -Z, -j, -p
+- **publish** (requires --dry-run, -n): Flags: --all-features, --dry-run, --frozen, --help, --keep-going, --locked, --no-default-features, --offline, --workspace, -h, -n, -q, -v. Valued: --color, --config, --exclude, --features, --index, --jobs, --manifest-path, --package, --registry, --target, --target-dir, -F, -Z, -j, -p
 - **read-manifest**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --manifest-path
 - **run**: Flags: --help, -h
 - **search**: Flags: --frozen, --help, --locked, --offline, -h, -q, -v. Valued: --color, --config, --index, --limit, --registry
@@ -1478,7 +1478,7 @@ Aliases: `g++`, `cc`, `c++`
 - **build**: Flags: --help, -a, -asan, -cover, -h, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -o, -overlay, -p, -pgo, -pkgdir, -tags
 - **doc**: Flags: --help, -all, -c, -cmd, -h, -short, -src, -u
 - **env**: Flags: --help, -h, -json
-- **help**
+- **help**: Positional args accepted
 - **list**: Flags: --help, -a, -asan, -compiled, -cover, -deps, -e, -export, -find, -h, -linkshared, -m, -modcacherw, -msan, -n, -race, -retract, -test, -trimpath, -u, -v, -versions, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -f, -gccgoflags, -gcflags, -installsuffix, -json, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -reuse, -tags
 - **test**: Flags: --help, -a, -asan, -benchmem, -cover, -failfast, -h, -json, -linkshared, -modcacherw, -msan, -n, -race, -short, -trimpath, -v, -work, -x. Valued: -asmflags, -bench, -benchtime, -blockprofile, -blockprofilerate, -buildmode, -buildvcs, -compiler, -count, -covermode, -coverpkg, -coverprofile, -cpu, -cpuprofile, -fuzz, -fuzzminimizetime, -fuzztime, -gccgoflags, -gcflags, -installsuffix, -ldflags, -list, -memprofile, -memprofilerate, -mod, -modfile, -mutexprofile, -mutexprofilefraction, -o, -outputdir, -overlay, -p, -parallel, -pgo, -pkgdir, -run, -shuffle, -skip, -tags, -timeout, -trace
 - **version**: Flags: --help, -h, -m, -v
@@ -1493,7 +1493,7 @@ Aliases: `g++`, `cc`, `c++`
 
 ### `golangci-lint` (https://golangci-lint.run/)
 
-- **help**
+- **help**: Positional args accepted
 - **linters**: Flags: --help, -h
 - **run**: Flags: --allow-parallel-runners, --help, --json, --new, --no-config, --print-issued-lines, --print-linter-name, --show-stats, --verbose, -h, -v. Valued: --build-tags, --color, --concurrency, --config, --disable, --enable, --exclude, --go, --max-issues-per-linter, --max-same-issues, --out-format, --path-prefix, --skip-dirs, --skip-files, --sort-results, --timeout, -D, -E, -c, -e, -p
 - **version**: Flags: --help, --format, -h
@@ -1781,11 +1781,11 @@ Aliases: `egrep`, `fgrep`
 
 ### `jjpr` (https://github.com/michaeldhopkins/jjpr)
 
-- **auth help**
+- **auth help**: Positional args accepted
 - **auth setup**: Flags: --help, -h
 - **auth test**: Flags: --help, -h
-- **config help**
-- **help**
+- **config help**: Positional args accepted
+- **help**: Positional args accepted
 - **merge** (requires --dry-run): Flags: --dry-run, --help, --no-ci-check, --no-fetch, --watch, -h. Valued: --base, --merge-method, --reconcile-strategy, --remote, --required-approvals
 - **status**: Flags: --dry-run, --help, --no-fetch, -h
 - **submit** (requires --dry-run): Flags: --draft, --dry-run, --help, --no-fetch, --ready, -h. Valued: --base, --remote, --reviewer

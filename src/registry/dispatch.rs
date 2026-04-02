@@ -5,13 +5,7 @@ use super::policy::check_owned;
 use super::types::*;
 use super::{CMD_HANDLERS, SUB_HANDLERS};
 
-fn has_flag_owned(tokens: &[Token], short: Option<&str>, long: &str) -> bool {
-    tokens[1..].iter().any(|t| {
-        t == long
-            || short.is_some_and(|s| t == s)
-            || t.as_str().starts_with(&format!("{long}="))
-    })
-}
+type HandlerMap = std::collections::HashMap<&'static str, super::HandlerFn>;
 
 fn dispatch_first_arg(tokens: &[Token], patterns: &[String], level: SafetyLevel) -> Verdict {
     if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
@@ -36,13 +30,17 @@ fn dispatch_require_any(
     require_any: &[String],
     policy: &OwnedPolicy,
     level: SafetyLevel,
+    accept_bare_help: bool,
 ) -> Verdict {
-    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
-        return Verdict::Allowed(SafetyLevel::Inert);
+    if tokens.len() == 2 {
+        let t = tokens[1].as_str();
+        if t == "--help" || t == "-h" || (accept_bare_help && t == "help") {
+            return Verdict::Allowed(SafetyLevel::Inert);
+        }
     }
     let has_required = tokens[1..].iter().any(|t| {
         require_any.iter().any(|r| {
-            t == r.as_str() || t.as_str().starts_with(&format!("{r}="))
+            t == r.as_str() || (r.starts_with("--") && t.as_str().starts_with(&format!("{r}=")))
         })
     });
     if has_required && check_owned(tokens, policy) {
@@ -80,123 +78,13 @@ fn skip_pre_flags(
     i
 }
 
-fn dispatch_nested(
+fn dispatch_branching(
     tokens: &[Token],
     subs: &[SubSpec],
-    allow_bare: bool,
-    pre_standalone: &[String],
-    pre_valued: &[String],
-) -> Verdict {
-    let start = skip_pre_flags(tokens, pre_standalone, pre_valued);
-    if start >= tokens.len() {
-        if allow_bare {
-            return Verdict::Allowed(SafetyLevel::Inert);
-        }
-        return Verdict::Denied;
-    }
-    let arg = tokens[start].as_str();
-    if matches!(arg, "--help" | "-h") {
-        if tokens.len() == start + 1 {
-            return Verdict::Allowed(SafetyLevel::Inert);
-        }
-        return Verdict::Denied;
-    }
-    subs.iter()
-        .find(|s| s.name == arg)
-        .map(|s| dispatch_sub(&tokens[start..], s))
-        .unwrap_or(Verdict::Denied)
-}
-
-fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
-    match &sub.kind {
-        SubKind::Policy { policy, level } => {
-            if check_owned(tokens, policy) {
-                Verdict::Allowed(*level)
-            } else {
-                Verdict::Denied
-            }
-        }
-        SubKind::Guarded {
-            guard_long,
-            guard_short,
-            policy,
-            level,
-        } => {
-            if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "help") {
-                return Verdict::Allowed(SafetyLevel::Inert);
-            }
-            if has_flag_owned(tokens, guard_short.as_deref(), guard_long)
-                && check_owned(tokens, policy)
-            {
-                Verdict::Allowed(*level)
-            } else {
-                Verdict::Denied
-            }
-        }
-        SubKind::Nested { subs, allow_bare, pre_standalone, pre_valued } => {
-            dispatch_nested(tokens, subs, *allow_bare, pre_standalone, pre_valued)
-        }
-        SubKind::AllowAll { level } => Verdict::Allowed(*level),
-        SubKind::WriteFlagged {
-            policy,
-            base_level,
-            write_flags,
-        } => {
-            if !check_owned(tokens, policy) {
-                return Verdict::Denied;
-            }
-            let has_write = tokens[1..].iter().any(|t| {
-                write_flags.iter().any(|f| t == f.as_str() || t.as_str().starts_with(&format!("{f}=")))
-            });
-            if has_write {
-                Verdict::Allowed(SafetyLevel::SafeWrite)
-            } else {
-                Verdict::Allowed(*base_level)
-            }
-        }
-        SubKind::FirstArgFilter { patterns, level } => {
-            dispatch_first_arg(tokens, patterns, *level)
-        }
-        SubKind::RequireAny {
-            require_any,
-            policy,
-            level,
-        } => dispatch_require_any(tokens, require_any, policy, *level),
-        SubKind::DelegateAfterSeparator { separator } => {
-            let sep_pos = tokens[1..].iter().position(|t| t == separator.as_str());
-            let Some(pos) = sep_pos else {
-                return Verdict::Denied;
-            };
-            let inner_start = pos + 2;
-            if inner_start >= tokens.len() {
-                return Verdict::Denied;
-            }
-            let inner = shell_words::join(tokens[inner_start..].iter().map(|t| t.as_str()));
-            crate::command_verdict(&inner)
-        }
-        SubKind::DelegateSkip { skip, .. } => {
-            if tokens.len() <= *skip {
-                return Verdict::Denied;
-            }
-            let inner = shell_words::join(tokens[*skip..].iter().map(|t| t.as_str()));
-            crate::command_verdict(&inner)
-        }
-        SubKind::Custom { handler_name } => {
-            SUB_HANDLERS
-                .get(handler_name.as_str())
-                .map(|f| f(tokens))
-                .unwrap_or(Verdict::Denied)
-        }
-    }
-}
-
-fn dispatch_structured(
-    tokens: &[Token],
     bare_flags: &[String],
-    subs: &[SubSpec],
+    bare_ok: bool,
     pre_standalone: &[String],
     pre_valued: &[String],
-    bare_ok: bool,
     first_arg: &[String],
     first_arg_level: SafetyLevel,
 ) -> Verdict {
@@ -205,11 +93,17 @@ fn dispatch_structured(
         return if bare_ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
     let arg = tokens[start].as_str();
+    if bare_flags.is_empty() && matches!(arg, "--help" | "-h") {
+        if tokens.len() == start + 1 {
+            return Verdict::Allowed(SafetyLevel::Inert);
+        }
+        return Verdict::Denied;
+    }
     if start + 1 == tokens.len() && bare_flags.iter().any(|f| f == arg) {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     if let Some(sub) = subs.iter().find(|s| s.name == arg) {
-        return dispatch_sub(&tokens[start..], sub);
+        return dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS);
     }
     if !first_arg.is_empty() {
         let matches = first_arg.iter().any(|p| {
@@ -226,80 +120,126 @@ fn dispatch_structured(
     Verdict::Denied
 }
 
-pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
-    match &spec.kind {
-        CommandKind::Flat { policy, level } => {
+fn dispatch_wrapper(
+    tokens: &[Token],
+    standalone: &[String],
+    valued: &[String],
+    positional_skip: usize,
+    separator: Option<&str>,
+    bare_ok: bool,
+) -> Verdict {
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = &tokens[i];
+        if let Some(sep) = separator
+            && t == sep
+        {
+            i += 1;
+            break;
+        }
+        if !t.starts_with('-') {
+            break;
+        }
+        if valued.iter().any(|f| t == f.as_str()) {
+            i += 2;
+            continue;
+        }
+        if standalone.iter().any(|f| t == f.as_str()) {
+            i += 1;
+            continue;
+        }
+        i += 1;
+    }
+    for _ in 0..positional_skip {
+        if i >= tokens.len() {
+            return if bare_ok {
+                Verdict::Allowed(SafetyLevel::Inert)
+            } else {
+                Verdict::Denied
+            };
+        }
+        i += 1;
+    }
+    if i >= tokens.len() {
+        return if bare_ok {
+            Verdict::Allowed(SafetyLevel::Inert)
+        } else {
+            Verdict::Denied
+        };
+    }
+    let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
+    crate::command_verdict(&inner)
+}
+
+fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -> Verdict {
+    match kind {
+        DispatchKind::Policy { policy, level } => {
             if check_owned(tokens, policy) {
                 Verdict::Allowed(*level)
             } else {
                 Verdict::Denied
             }
         }
-        CommandKind::FlatFirstArg { patterns, level } => {
+        DispatchKind::FirstArg { patterns, level } => {
             dispatch_first_arg(tokens, patterns, *level)
         }
-        CommandKind::FlatRequireAny {
-            require_any,
-            policy,
-            level,
-        } => dispatch_require_any(tokens, require_any, policy, *level),
-        CommandKind::Structured { bare_flags, subs, pre_standalone, pre_valued, bare_ok, first_arg, first_arg_level } => {
-            dispatch_structured(tokens, bare_flags, subs, pre_standalone, pre_valued, *bare_ok, first_arg, *first_arg_level)
+        DispatchKind::RequireAny { require_any, policy, level, accept_bare_help } => {
+            dispatch_require_any(tokens, require_any, policy, *level, *accept_bare_help)
         }
-        CommandKind::Wrapper {
-            standalone,
-            valued,
-            positional_skip,
-            separator,
-            bare_ok,
+        DispatchKind::Branching {
+            subs, bare_flags, bare_ok, pre_standalone, pre_valued, first_arg, first_arg_level,
         } => {
-            let mut i = 1;
-            while i < tokens.len() {
-                let t = &tokens[i];
-                if let Some(sep) = separator
-                    && t == sep.as_str()
-                {
-                    i += 1;
-                    break;
-                }
-                if !t.starts_with('-') {
-                    break;
-                }
-                if valued.iter().any(|f| t == f.as_str()) {
-                    i += 2;
-                    continue;
-                }
-                if standalone.iter().any(|f| t == f.as_str()) {
-                    i += 1;
-                    continue;
-                }
-                i += 1;
+            dispatch_branching(
+                tokens, subs, bare_flags, *bare_ok, pre_standalone, pre_valued,
+                first_arg, *first_arg_level,
+            )
+        }
+        DispatchKind::WriteFlagged { policy, base_level, write_flags } => {
+            if !check_owned(tokens, policy) {
+                return Verdict::Denied;
             }
-            for _ in 0..*positional_skip {
-                if i >= tokens.len() {
-                    return if *bare_ok {
-                        Verdict::Allowed(SafetyLevel::Inert)
-                    } else {
-                        Verdict::Denied
-                    };
-                }
-                i += 1;
+            let has_write = tokens[1..].iter().any(|t| {
+                write_flags.iter().any(|f| t == f.as_str() || t.as_str().starts_with(&format!("{f}=")))
+            });
+            if has_write {
+                Verdict::Allowed(SafetyLevel::SafeWrite)
+            } else {
+                Verdict::Allowed(*base_level)
             }
-            if i >= tokens.len() {
-                return if *bare_ok {
-                    Verdict::Allowed(SafetyLevel::Inert)
-                } else {
-                    Verdict::Denied
-                };
+        }
+        DispatchKind::DelegateAfterSeparator { separator } => {
+            let sep_pos = tokens[1..].iter().position(|t| t == separator.as_str());
+            let Some(pos) = sep_pos else {
+                return Verdict::Denied;
+            };
+            let inner_start = pos + 2;
+            if inner_start >= tokens.len() {
+                return Verdict::Denied;
             }
-            let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
+            let inner = shell_words::join(tokens[inner_start..].iter().map(|t| t.as_str()));
             crate::command_verdict(&inner)
         }
-        CommandKind::Custom { handler_name } => {
-            CMD_HANDLERS
+        DispatchKind::DelegateSkip { skip } => {
+            if tokens.len() <= *skip {
+                return Verdict::Denied;
+            }
+            let inner = shell_words::join(tokens[*skip..].iter().map(|t| t.as_str()));
+            crate::command_verdict(&inner)
+        }
+        DispatchKind::Wrapper {
+            standalone, valued, positional_skip, separator, bare_ok,
+        } => {
+            dispatch_wrapper(tokens, standalone, valued, *positional_skip, separator.as_deref(), *bare_ok)
+        }
+        DispatchKind::Custom { handler_name } => {
+            handlers
                 .get(handler_name.as_str())
                 .map(|f| f(tokens))
                 .unwrap_or(Verdict::Denied)
         }
     }
+}
+
+pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
+    dispatch_kind(tokens, &spec.kind, &CMD_HANDLERS)
 }
