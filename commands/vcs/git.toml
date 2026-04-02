@@ -67,6 +67,12 @@ standalone = [
 
 [[command.sub]]
 name = "config"
+standalone = [
+    "--global", "--local", "--name-only", "--show-origin", "--show-scope",
+    "--system", "--worktree",
+    "-z",
+]
+valued = ["--blob", "--file", "-f"]
 [[command.sub.sub]]
 name = "--get"
 [[command.sub.sub]]

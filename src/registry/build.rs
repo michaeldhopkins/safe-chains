@@ -65,6 +65,8 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
             kind: SubKind::Nested {
                 subs: toml.sub.into_iter().map(build_sub).collect(),
                 allow_bare: toml.nested_bare.unwrap_or(false),
+                pre_standalone: toml.standalone,
+                pre_valued: toml.valued,
             },
         };
     }

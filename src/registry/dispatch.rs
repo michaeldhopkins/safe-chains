@@ -52,6 +52,52 @@ fn dispatch_require_any(
     }
 }
 
+fn dispatch_nested(
+    tokens: &[Token],
+    subs: &[SubSpec],
+    allow_bare: bool,
+    pre_standalone: &[String],
+    pre_valued: &[String],
+) -> Verdict {
+    let mut start = 1;
+    while start < tokens.len() {
+        let t = &tokens[start];
+        if !t.starts_with('-') {
+            break;
+        }
+        if pre_valued.iter().any(|f| t == f.as_str()) {
+            start += 2;
+            continue;
+        }
+        if pre_valued.iter().any(|f| t.as_str().starts_with(&format!("{f}="))) {
+            start += 1;
+            continue;
+        }
+        if pre_standalone.iter().any(|f| t == f.as_str()) {
+            start += 1;
+            continue;
+        }
+        break;
+    }
+    if start >= tokens.len() {
+        if allow_bare {
+            return Verdict::Allowed(SafetyLevel::Inert);
+        }
+        return Verdict::Denied;
+    }
+    let arg = tokens[start].as_str();
+    if matches!(arg, "--help" | "-h") {
+        if tokens.len() == start + 1 {
+            return Verdict::Allowed(SafetyLevel::Inert);
+        }
+        return Verdict::Denied;
+    }
+    subs.iter()
+        .find(|s| s.name == arg)
+        .map(|s| dispatch_sub(&tokens[start..], s))
+        .unwrap_or(Verdict::Denied)
+}
+
 fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
     match &sub.kind {
         SubKind::Policy { policy, level } => {
@@ -78,24 +124,8 @@ fn dispatch_sub(tokens: &[Token], sub: &SubSpec) -> Verdict {
                 Verdict::Denied
             }
         }
-        SubKind::Nested { subs, allow_bare } => {
-            if tokens.len() < 2 {
-                if *allow_bare {
-                    return Verdict::Allowed(SafetyLevel::Inert);
-                }
-                return Verdict::Denied;
-            }
-            let arg = tokens[1].as_str();
-            if matches!(arg, "--help" | "-h") {
-                if tokens.len() == 2 {
-                    return Verdict::Allowed(SafetyLevel::Inert);
-                }
-                return Verdict::Denied;
-            }
-            subs.iter()
-                .find(|s| s.name == arg)
-                .map(|s| dispatch_sub(&tokens[1..], s))
-                .unwrap_or(Verdict::Denied)
+        SubKind::Nested { subs, allow_bare, pre_standalone, pre_valued } => {
+            dispatch_nested(tokens, subs, *allow_bare, pre_standalone, pre_valued)
         }
         SubKind::AllowAll { level } => Verdict::Allowed(*level),
         SubKind::WriteFlagged {

@@ -183,6 +183,8 @@ pub(super) enum SubKind {
     Nested {
         subs: Vec<SubSpec>,
         allow_bare: bool,
+        pre_standalone: Vec<String>,
+        pre_valued: Vec<String>,
     },
     AllowAll {
         level: SafetyLevel,
