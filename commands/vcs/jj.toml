@@ -107,3 +107,9 @@ nested_bare = true
 [[command.sub.sub]]
 name = "list"
 positional_style = true
+[[command.sub.sub]]
+name = "root"
+positional_style = true
+[[command.sub.sub]]
+name = "update-stale"
+positional_style = true

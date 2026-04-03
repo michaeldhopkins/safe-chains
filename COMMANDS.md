@@ -1777,6 +1777,8 @@ Aliases: `egrep`, `fgrep`
 - **tag list**: Positional args accepted
 - **version**: Positional args accepted
 - **workspace list**: Positional args accepted
+- **workspace root**: Positional args accepted
+- **workspace update-stale**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
 ### `jjpr` (https://github.com/michaeldhopkins/jjpr)
