@@ -275,6 +275,10 @@ safe! {
     git_lfs_ls_files: "git-lfs ls-files --long",
     git_lfs_status: "git-lfs status",
     git_lfs_locks: "git-lfs locks --json",
+
+    jj_workspace_list: "jj workspace list",
+    jj_workspace_root: "jj workspace root",
+    jj_workspace_update_stale: "jj workspace update-stale",
 }
 
 denied! {
@@ -400,6 +404,10 @@ denied! {
     sysctl_write_denied: "sysctl -w kern.maxproc=2048",
     sysctl_assign_denied: "sysctl kern.maxproc=2048",
     sysctl_assign_ostype_denied: "sysctl kern.ostype=evil",
+
+    jj_workspace_forget: "jj workspace forget default",
+    jj_workspace_add: "jj workspace add foo",
+    jj_workspace_rename: "jj workspace rename new-name",
 }
 
 inert! {
