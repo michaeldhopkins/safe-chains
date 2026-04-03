@@ -15,9 +15,9 @@ fn main() {
     let mut code = String::from("{\n    let mut all = Vec::new();\n");
     for rel_path in &entries {
         let full = commands_dir.join(rel_path);
+        let path_str = full.to_str().expect("non-UTF-8 path").replace('\\', "/");
         code.push_str(&format!(
-            "    all.extend(load_toml(include_str!(\"{}\")));\n",
-            full.display()
+            "    all.extend(load_toml(include_str!(\"{path_str}\")));\n",
         ));
     }
     code.push_str("    build_registry(all)\n}");
