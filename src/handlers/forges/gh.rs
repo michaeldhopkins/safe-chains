@@ -248,7 +248,7 @@ static API_STANDALONE: WordSet = WordSet::new(&[
 ]);
 
 static API_VALUED: WordSet = WordSet::new(&[
-    "--cache", "--hostname", "--jq", "--preview", "--template",
+    "--cache", "--hostname", "--jq", "--json", "--preview", "--template",
     "-p", "-q", "-t",
 ]);
 

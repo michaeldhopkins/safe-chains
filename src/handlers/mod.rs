@@ -79,6 +79,7 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
 const HANDLED_CMDS: &[&str] = &[
     "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine", "dotenv",
     "git", "jj", "gh", "glab", "jjpr", "tea", "basecamp",
+    "jira", "linear", "notion", "td", "todoist", "trello",
     "npm", "yarn", "pnpm", "bun", "deno", "npx", "bunx", "nvm", "fnm", "volta", "mocha",
     "ruby", "ri", "bundle", "gem", "importmap", "rbenv",
     "pip", "pip3", "uv", "poetry", "pyenv", "conda", "coverage", "tox", "nox", "bandit", "pip-audit", "pdm",

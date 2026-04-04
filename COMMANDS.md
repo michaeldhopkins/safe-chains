@@ -1840,6 +1840,16 @@ Aliases: `egrep`, `fgrep`
 - Allowed valued flags: --changedSince, --collectCoverageFrom, --config, --coverageDirectory, --coverageProvider, --filter, --maxConcurrency, --maxWorkers, --outputFile, --projects, --reporters, --roots, --shard, --testMatch, --testNamePattern, --testPathPattern, --testRunner, --testTimeout, -c, -t
 - Bare invocation allowed
 
+### `jira` (https://github.com/ankitpokhrel/jira-cli)
+
+- **completion**: Positional args accepted
+- **init**: Positional args accepted
+- **issue list**: Positional args accepted
+- **issue view**: Positional args accepted
+- **me**: Positional args accepted
+- **sprint list**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `jj` (https://jj-vcs.github.io/jj/latest/cli-reference/)
 
 - **abandon**: Positional args accepted
@@ -2025,6 +2035,25 @@ Aliases: `egrep`, `fgrep`
 - Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
 - Allowed valued flags: -P, -b, -h, -j, -p, -t, -x, -y, -z, --LINE-NUMBERS, --LONG-PROMPT, --pattern, --prompt, --shift, --tabs, --tag, --window
 - Bare invocation allowed
+
+### `linear` (https://github.com/schpet/linear-cli)
+
+- **completions**: Positional args accepted
+- **issue comment list**: Positional args accepted
+- **issue id**: Positional args accepted
+- **issue list**: Positional args accepted
+- **issue query**: Positional args accepted
+- **issue title**: Positional args accepted
+- **issue url**: Positional args accepted
+- **issue view**: Positional args accepted
+- **milestone list**: Positional args accepted
+- **milestone view**: Positional args accepted
+- **project list**: Positional args accepted
+- **project view**: Positional args accepted
+- **team id**: Positional args accepted
+- **team list**: Positional args accepted
+- **team members**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
 
 ### `linode-cli` (https://www.linode.com/docs/products/tools/cli/get-started/)
 
@@ -2354,6 +2383,28 @@ Aliases: `ionice`
 ### `node` (https://nodejs.org/api/cli.html)
 
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `notion` (https://github.com/4ier/notion-cli)
+
+- **block get**: Positional args accepted
+- **block list**: Positional args accepted
+- **comment get**: Positional args accepted
+- **comment list**: Positional args accepted
+- **db list**: Positional args accepted
+- **db open**: Positional args accepted
+- **db query**: Positional args accepted
+- **db view**: Positional args accepted
+- **doctor**: Positional args accepted
+- **file list**: Positional args accepted
+- **page list**: Positional args accepted
+- **page open**: Positional args accepted
+- **page view**: Positional args accepted
+- **search**: Positional args accepted
+- **status**: Positional args accepted
+- **user get**: Positional args accepted
+- **user list**: Positional args accepted
+- **user me**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
 
 ### `nox` (https://nox.thea.codes/)
 
@@ -3283,6 +3334,19 @@ Aliases: `[`
 
 - Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, list-keys, list-commands, show-options, show-environment, display-message, info, has-session, start-server. Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, kill-server, attach-session, detach-client, switch-client, new-window, split-window, select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, set-option, set-environment, send-keys. Delegation: run-shell, if-shell, pipe-pane, confirm-before (recursively validates inner commands).
 
+### `todoist` (https://github.com/Doist/todoist-cli)
+
+Aliases: `td`
+
+- **auth status**: Positional args accepted
+- **inbox**: Positional args accepted
+- **project list**: Positional args accepted
+- **skill list**: Positional args accepted
+- **task list**: Positional args accepted
+- **task view**: Positional args accepted
+- **today**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
+
 ### `tokei` (https://github.com/XAMPPRocky/tokei#readme)
 
 - Allowed standalone flags: --compact, --files, --help, --hidden, --no-ignore, --no-ignore-dot, --no-ignore-parent, --no-ignore-vcs, --verbose, --version, -C, -V, -f, -h
@@ -3323,6 +3387,13 @@ Aliases: `traceroute6`
 - Allowed standalone flags: --dirsfirst, --du, --fromfile, --gitignore, --help, --inodes, --matchdirs, --noreport, --prune, --si, --version, -A, -C, -D, -F, -J, -N, -Q, -S, -V, -X, -a, -d, -f, -g, -h, -i, -l, -n, -p, -q, -r, -s, -t, -u, -v, -x
 - Allowed valued flags: --charset, --filelimit, --filesfrom, --sort, --timefmt, -H, -I, -L, -P, -T
 - Bare invocation allowed
+
+### `trello` (https://github.com/mheap/trello-cli)
+
+- **board list**: Positional args accepted
+- **card list**: Positional args accepted
+- **list list**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
 
 ### `trivy` (https://aquasecurity.github.io/trivy/)
 
