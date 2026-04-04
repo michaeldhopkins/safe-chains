@@ -1705,3 +1705,81 @@ use super::*;
         assert!(!crate::is_safe_command("fd -HX pattern"));
         assert!(!crate::is_safe_command("fd"));
     }
+
+    fn check_toml_unknown(prefix: &str, kind: &DispatchKind, failures: &mut Vec<String>) {
+        match kind {
+            DispatchKind::Branching { subs, .. } => {
+                for sub in subs {
+                    check_toml_unknown(&format!("{prefix} {}", sub.name), &sub.kind, failures);
+                }
+            }
+            DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. }
+                if policy.flag_style == FlagStyle::Strict =>
+            {
+                let test = format!("{prefix} --xyzzy-unknown-42");
+                if crate::is_safe_command(&test) {
+                    failures.push(format!("{prefix}: accepted unknown flag"));
+                }
+            }
+            DispatchKind::WriteFlagged { policy, .. } if policy.flag_style == FlagStyle::Strict => {
+                let test = format!("{prefix} --xyzzy-unknown-42");
+                if crate::is_safe_command(&test) {
+                    failures.push(format!("{prefix}: accepted unknown flag"));
+                }
+            }
+            _ => {}
+        }
+    }
+
+    #[test]
+    fn toml_specs_reject_unknown() {
+        let mut failures = Vec::new();
+        for (name, spec) in super::TOML_REGISTRY.iter() {
+            if name != &spec.name { continue; }
+            check_toml_unknown(&spec.name, &spec.kind, &mut failures);
+        }
+        assert!(failures.is_empty(), "TOML specs accepted unknown flags:\n{}", failures.join("\n"));
+    }
+
+    fn collect_strict_paths() -> Vec<String> {
+        let mut paths = Vec::new();
+        for (name, spec) in super::TOML_REGISTRY.iter() {
+            if name != &spec.name { continue; }
+            collect_strict_inner(&spec.name, &spec.kind, &mut paths);
+        }
+        paths
+    }
+
+    fn collect_strict_inner(prefix: &str, kind: &DispatchKind, paths: &mut Vec<String>) {
+        match kind {
+            DispatchKind::Branching { subs, .. } => {
+                for sub in subs {
+                    collect_strict_inner(&format!("{prefix} {}", sub.name), &sub.kind, paths);
+                }
+            }
+            DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. }
+                if policy.flag_style == FlagStyle::Strict =>
+            {
+                paths.push(prefix.to_string());
+            }
+            DispatchKind::WriteFlagged { policy, .. } if policy.flag_style == FlagStyle::Strict => {
+                paths.push(prefix.to_string());
+            }
+            _ => {}
+        }
+    }
+
+    proptest::proptest! {
+        #[test]
+        fn toml_strict_reject_random_flags(
+            seed in 0..1000usize,
+            suffix in "[a-z]{5,10}"
+        ) {
+            let paths = collect_strict_paths();
+            if paths.is_empty() { return Ok(()); }
+            let path = &paths[seed % paths.len()];
+            let test = format!("{path} --xyzzy-{suffix}");
+            proptest::prop_assert!(!crate::is_safe_command(&test),
+                "accepted random flag: {test}");
+        }
+    }
