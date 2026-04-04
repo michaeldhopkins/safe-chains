@@ -443,6 +443,19 @@ denied! {
     basecamp_done: "basecamp done 123",
     basecamp_chat_post: "basecamp chat post 'hello' --in 123",
     basecamp_comment: "basecamp comment 123 'looks good'",
+
+    unicode_homoglyph_git: "g\u{0456}t log",
+    unicode_zwsp_in_cmd: "g\u{200B}it log",
+    unicode_zwnj_in_cmd: "g\u{200C}it log",
+    unicode_combining_in_cmd: "g\u{0300}it log",
+    ansi_c_quote_rm: "$'\\x72\\x6d' -rf /",
+    ansi_c_quote_git: "$'git' log",
+    eval_rm: "eval 'rm -rf /'",
+    eval_git: "eval 'git log'",
+    cmd_sub_in_cmd_position: "$(echo rm) -rf /",
+    backtick_in_cmd_position: "`echo rm` -rf /",
+    var_expansion_cmd: "$cmd log",
+    dollar_brace_cmd: "${cmd} log",
 }
 
 inert! {

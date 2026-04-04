@@ -459,4 +459,24 @@ proptest! {
         };
         prop_assert!(check::check_redirects(&cmd.redirs));
     }
+
+    #[test]
+    fn unicode_prefix_never_matches_allowlist(
+        prefix in "[\\u{0080}-\\u{FFFF}]{1,3}",
+        cmd in "(git|cat|ls|grep)"
+    ) {
+        let mangled = format!("{prefix}{cmd} --version");
+        prop_assert!(!crate::is_safe_command(&mangled),
+            "Unicode-prefixed command was approved: {}", mangled);
+    }
+
+    #[test]
+    fn unicode_suffix_never_matches_allowlist(
+        cmd in "(git|cat|ls|grep)",
+        suffix in "[\\u{0080}-\\u{FFFF}]{1,3}"
+    ) {
+        let mangled = format!("{cmd}{suffix} --version");
+        prop_assert!(!crate::is_safe_command(&mangled),
+            "Unicode-suffixed command was approved: {}", mangled);
+    }
 }
