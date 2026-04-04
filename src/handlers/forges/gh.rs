@@ -444,68 +444,38 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 
 #[cfg(test)]
 pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
-    crate::handlers::CommandEntry::Subcommand { cmd: "gh", bare_ok: false, subs: &[
-        crate::handlers::SubEntry::Nested { name: "issue", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-            crate::handlers::SubEntry::Policy { name: "view" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "pr", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-            crate::handlers::SubEntry::Policy { name: "view" },
-            crate::handlers::SubEntry::Policy { name: "diff" },
-            crate::handlers::SubEntry::Policy { name: "checks" },
-            crate::handlers::SubEntry::Policy { name: "status" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "run", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-            crate::handlers::SubEntry::Policy { name: "rerun" },
-            crate::handlers::SubEntry::Policy { name: "view" },
-            crate::handlers::SubEntry::Policy { name: "watch" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "release", subs: &[
-            crate::handlers::SubEntry::Guarded { name: "download", valid_suffix: "--output -" },
-            crate::handlers::SubEntry::Policy { name: "list" },
-            crate::handlers::SubEntry::Policy { name: "view" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "label", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "cache", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "codespace", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "variable", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "extension", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "attestation", subs: &[
-            crate::handlers::SubEntry::Policy { name: "verify" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "gpg-key", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "ssh-key", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "workflow", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-            crate::handlers::SubEntry::Policy { name: "view" },
-        ]},
-        crate::handlers::SubEntry::Nested { name: "repo", subs: &[
-            crate::handlers::SubEntry::Policy { name: "list" },
-            crate::handlers::SubEntry::Policy { name: "view" },
-        ]},
-        crate::handlers::SubEntry::Custom { name: "search", valid_suffix: Some("issues foo") },
-        crate::handlers::SubEntry::Policy { name: "status" },
-        crate::handlers::SubEntry::Nested { name: "auth", subs: &[
-            crate::handlers::SubEntry::Policy { name: "status" },
-        ]},
-        crate::handlers::SubEntry::Custom { name: "browse", valid_suffix: Some("--no-browser") },
-        crate::handlers::SubEntry::Positional,
+    crate::handlers::CommandEntry::Paths { cmd: "gh", bare_ok: false, paths: &[
+        "gh issue list",
+        "gh issue view 456",
+        "gh pr list",
+        "gh pr view 123",
+        "gh pr diff 123",
+        "gh pr checks 123",
+        "gh pr status 123",
+        "gh run list",
+        "gh run view 789",
+        "gh run watch 123",
+        "gh run rerun 12345",
+        "gh release list",
+        "gh release view v1.0",
+        "gh release download v1.0 --output -",
+        "gh label list",
+        "gh cache list",
+        "gh codespace list",
+        "gh variable list",
+        "gh extension list",
+        "gh attestation verify artifact",
+        "gh gpg-key list",
+        "gh ssh-key list",
+        "gh workflow list",
+        "gh workflow view ci",
+        "gh repo list",
+        "gh repo view owner/repo",
+        "gh search issues foo",
+        "gh status",
+        "gh auth status",
+        "gh browse --no-browser",
+        "gh api repos/o/r",
     ]},
 ];
 

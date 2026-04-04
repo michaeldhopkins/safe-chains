@@ -1,3 +1,26 @@
+macro_rules! handler_module {
+    ($($sub:ident),+ $(,)?) => {
+        $(mod $sub;)+
+
+        pub(crate) fn dispatch(cmd: &str, tokens: &[crate::parse::Token]) -> Option<crate::verdict::Verdict> {
+            None$(.or_else(|| $sub::dispatch(cmd, tokens)))+
+        }
+
+        pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
+            let mut docs = Vec::new();
+            $(docs.extend($sub::command_docs());)+
+            docs
+        }
+
+        #[cfg(test)]
+        pub(super) fn full_registry() -> Vec<&'static super::CommandEntry> {
+            let mut v = Vec::new();
+            $(v.extend($sub::REGISTRY);)+
+            v
+        }
+    };
+}
+
 pub mod android;
 pub mod coreutils;
 pub mod forges;
@@ -11,7 +34,6 @@ pub mod shell;
 pub mod system;
 pub mod vcs;
 pub mod wrappers;
-
 
 use std::collections::HashMap;
 
@@ -147,18 +169,8 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
 pub(crate) enum CommandEntry {
     Positional { cmd: &'static str },
     Custom { cmd: &'static str, valid_prefix: Option<&'static str> },
-    Subcommand { cmd: &'static str, subs: &'static [SubEntry], bare_ok: bool },
+    Paths { cmd: &'static str, bare_ok: bool, paths: &'static [&'static str] },
     Delegation { cmd: &'static str },
-}
-
-#[cfg(test)]
-#[derive(Debug)]
-pub(crate) enum SubEntry {
-    Policy { name: &'static str },
-    Nested { name: &'static str, subs: &'static [SubEntry] },
-    Custom { name: &'static str, valid_suffix: Option<&'static str> },
-    Positional,
-    Guarded { name: &'static str, valid_suffix: &'static str },
 }
 
 pub fn all_opencode_patterns() -> Vec<String> {
@@ -203,7 +215,7 @@ mod tests {
                     failures.push(format!("{cmd}: accepted unknown flag: {test}"));
                 }
             }
-            CommandEntry::Subcommand { cmd, subs, bare_ok } => {
+            CommandEntry::Paths { cmd, bare_ok, paths } => {
                 if !bare_ok && crate::is_safe_command(cmd) {
                     failures.push(format!("{cmd}: accepted bare invocation"));
                 }
@@ -211,46 +223,11 @@ mod tests {
                 if crate::is_safe_command(&test) {
                     failures.push(format!("{cmd}: accepted unknown subcommand: {test}"));
                 }
-                for sub in *subs {
-                    check_sub(cmd, sub, failures);
-                }
-            }
-        }
-    }
-
-    fn check_sub(prefix: &str, entry: &SubEntry, failures: &mut Vec<String>) {
-        match entry {
-            SubEntry::Policy { name } => {
-                let test = format!("{prefix} {name} {UNKNOWN_FLAG}");
-                if crate::is_safe_command(&test) {
-                    failures.push(format!("{prefix} {name}: accepted unknown flag: {test}"));
-                }
-            }
-            SubEntry::Nested { name, subs } => {
-                let path = format!("{prefix} {name}");
-                let test = format!("{path} {UNKNOWN_SUB}");
-                if crate::is_safe_command(&test) {
-                    failures.push(format!("{path}: accepted unknown subcommand: {test}"));
-                }
-                for sub in *subs {
-                    check_sub(&path, sub, failures);
-                }
-            }
-            SubEntry::Custom { name, valid_suffix } => {
-                let base = match valid_suffix {
-                    Some(s) => format!("{prefix} {name} {s}"),
-                    None => format!("{prefix} {name}"),
-                };
-                let test = format!("{base} {UNKNOWN_FLAG}");
-                if crate::is_safe_command(&test) {
-                    failures.push(format!("{prefix} {name}: accepted unknown flag: {test}"));
-                }
-            }
-            SubEntry::Positional => {}
-            SubEntry::Guarded { name, valid_suffix } => {
-                let test = format!("{prefix} {name} {valid_suffix} {UNKNOWN_FLAG}");
-                if crate::is_safe_command(&test) {
-                    failures.push(format!("{prefix} {name}: accepted unknown flag: {test}"));
+                for path in *paths {
+                    let test = format!("{path} {UNKNOWN_FLAG}");
+                    if crate::is_safe_command(&test) {
+                        failures.push(format!("{path}: accepted unknown flag: {test}"));
+                    }
                 }
             }
         }
@@ -289,7 +266,7 @@ mod tests {
             .map(|e| match e {
                 CommandEntry::Positional { cmd }
                 | CommandEntry::Custom { cmd, .. }
-                | CommandEntry::Subcommand { cmd, .. }
+                | CommandEntry::Paths { cmd, .. }
                 | CommandEntry::Delegation { cmd } => *cmd,
             })
             .collect();
