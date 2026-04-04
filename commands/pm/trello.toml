@@ -1,0 +1,25 @@
+[[command]]
+name = "trello"
+url = "https://github.com/mheap/trello-cli"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "card"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "board"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "list"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true

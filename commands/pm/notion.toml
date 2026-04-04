@@ -1,0 +1,85 @@
+[[command]]
+name = "notion"
+url = "https://github.com/4ier/notion-cli"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "block"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+positional_style = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "comment"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+positional_style = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "db"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "open"
+positional_style = true
+[[command.sub.sub]]
+name = "query"
+positional_style = true
+[[command.sub.sub]]
+name = "view"
+positional_style = true
+
+[[command.sub]]
+name = "doctor"
+positional_style = true
+
+[[command.sub]]
+name = "file"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "page"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "open"
+positional_style = true
+[[command.sub.sub]]
+name = "view"
+positional_style = true
+
+[[command.sub]]
+name = "search"
+positional_style = true
+
+[[command.sub]]
+name = "status"
+positional_style = true
+
+[[command.sub]]
+name = "user"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+positional_style = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "me"
+positional_style = true

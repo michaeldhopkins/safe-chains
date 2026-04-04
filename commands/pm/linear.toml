@@ -1,0 +1,69 @@
+[[command]]
+name = "linear"
+url = "https://github.com/schpet/linear-cli"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "completions"
+positional_style = true
+
+[[command.sub]]
+name = "issue"
+nested_bare = true
+[[command.sub.sub]]
+name = "comment"
+nested_bare = true
+[[command.sub.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "id"
+positional_style = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "query"
+positional_style = true
+[[command.sub.sub]]
+name = "title"
+positional_style = true
+[[command.sub.sub]]
+name = "url"
+positional_style = true
+[[command.sub.sub]]
+name = "view"
+positional_style = true
+
+[[command.sub]]
+name = "milestone"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "view"
+positional_style = true
+
+[[command.sub]]
+name = "project"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "view"
+positional_style = true
+
+[[command.sub]]
+name = "team"
+nested_bare = true
+[[command.sub.sub]]
+name = "id"
+positional_style = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "members"
+positional_style = true
