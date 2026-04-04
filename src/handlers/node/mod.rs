@@ -58,6 +58,17 @@ pub(super) fn find_runner_package_index(
     None
 }
 
+pub(super) fn is_safe_runner(tokens: &[Token], flags: &WordSet) -> bool {
+    if tokens.len() < 2 {
+        return false;
+    }
+    if tokens.len() == 2 && tokens[1] == "--version" {
+        return true;
+    }
+    find_runner_package_index(tokens, 1, flags)
+        .is_some_and(|idx| is_safe_runner_package(tokens, idx))
+}
+
 pub(super) fn is_safe_runner_package(tokens: &[Token], pkg_idx: usize) -> bool {
     if pkg_idx >= tokens.len() {
         return false;

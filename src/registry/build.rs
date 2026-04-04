@@ -254,7 +254,13 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
 }
 
 pub fn load_toml(source: &str) -> Vec<CommandSpec> {
-    let file: TomlFile = toml::from_str(source).expect("invalid TOML command definition");
+    let file: TomlFile = match toml::from_str(source) {
+        Ok(f) => f,
+        Err(e) => {
+            let preview: String = source.chars().take(80).collect();
+            panic!("invalid TOML command definition: {e}\n  source begins: {preview}");
+        }
+    };
     file.command.into_iter().map(build_command).collect()
 }
 
@@ -266,42 +272,7 @@ pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
                 name: spec.name.clone(),
                 aliases: vec![],
                 url: spec.url.clone(),
-                kind: match &spec.kind {
-                    DispatchKind::Policy { policy, level } => DispatchKind::Policy {
-                        policy: OwnedPolicy {
-                            standalone: policy.standalone.clone(),
-                            valued: policy.valued.clone(),
-                            bare: policy.bare,
-                            max_positional: policy.max_positional,
-                            flag_style: policy.flag_style,
-                        },
-                        level: *level,
-                    },
-                    DispatchKind::FirstArg { patterns, level } => DispatchKind::FirstArg {
-                        patterns: patterns.clone(),
-                        level: *level,
-                    },
-                    DispatchKind::RequireAny { require_any, policy, level, accept_bare_help } => DispatchKind::RequireAny {
-                        require_any: require_any.clone(),
-                        policy: OwnedPolicy {
-                            standalone: policy.standalone.clone(),
-                            valued: policy.valued.clone(),
-                            bare: policy.bare,
-                            max_positional: policy.max_positional,
-                            flag_style: policy.flag_style,
-                        },
-                        level: *level,
-                        accept_bare_help: *accept_bare_help,
-                    },
-                    DispatchKind::Wrapper { standalone, valued, positional_skip, separator, bare_ok } => DispatchKind::Wrapper {
-                        standalone: standalone.clone(),
-                        valued: valued.clone(),
-                        positional_skip: *positional_skip,
-                        separator: separator.clone(),
-                        bare_ok: *bare_ok,
-                    },
-                    _ => continue,
-                },
+                kind: spec.kind.clone(),
             });
         }
         map.insert(spec.name.clone(), spec);

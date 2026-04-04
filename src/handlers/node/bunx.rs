@@ -1,20 +1,9 @@
 use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::Token;
 
-pub fn is_safe_bunx(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if tokens.len() == 2 && tokens[1] == "--version" {
-        return true;
-    }
-    super::find_runner_package_index(tokens, 1, &super::BUNX_FLAGS_NO_ARG)
-        .is_some_and(|idx| super::is_safe_runner_package(tokens, idx))
-}
-
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "bunx" => Some(if is_safe_bunx(tokens) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }),
+        "bunx" => Some(if super::is_safe_runner(tokens, &super::BUNX_FLAGS_NO_ARG) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }),
         _ => None,
     }
 }
