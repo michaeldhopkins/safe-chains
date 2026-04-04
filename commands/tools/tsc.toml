@@ -3,7 +3,19 @@ name = "tsc"
 url = "https://www.typescriptlang.org/docs/handbook/compiler-options.html"
 level = "Inert"
 bare = false
-max_positional = 0
-standalone = ["--help", "--version", "-h", "-v"]
-
-# Modern CLI tools
+require_any = ["--help", "--noEmit", "--version", "-h", "-v"]
+standalone = [
+    "--allowJs", "--checkJs", "--esModuleInterop",
+    "--forceConsistentCasingInFileNames", "--help", "--incremental",
+    "--isolatedModules", "--noEmit", "--noFallthroughCasesInSwitch",
+    "--noImplicitAny", "--noImplicitReturns", "--noUnusedLocals",
+    "--noUnusedParameters", "--pretty", "--resolveJsonModule",
+    "--skipLibCheck", "--strict", "--strictNullChecks",
+    "--version",
+    "-h", "-v",
+]
+valued = [
+    "--baseUrl", "--jsx", "--lib", "--module",
+    "--moduleResolution", "--project",
+    "--rootDir", "--target",
+]

