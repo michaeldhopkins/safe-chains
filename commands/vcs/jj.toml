@@ -7,12 +7,52 @@ standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pa
 valued = ["--at-op", "--at-operation", "--color", "--repository", "-R"]
 
 [[command.sub]]
+name = "abandon"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "absorb"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "backout"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
 name = "cat"
 positional_style = true
 bare = false
 
 [[command.sub]]
+name = "commit"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "describe"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
 name = "diff"
+positional_style = true
+
+[[command.sub]]
+name = "duplicate"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "edit"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "fix"
+level = "SafeWrite"
 positional_style = true
 
 [[command.sub]]
@@ -24,11 +64,51 @@ name = "log"
 positional_style = true
 
 [[command.sub]]
+name = "new"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "parallelize"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "rebase"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "resolve"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "restore"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
 name = "root"
 positional_style = true
 
 [[command.sub]]
 name = "show"
+positional_style = true
+
+[[command.sub]]
+name = "simplify-parents"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "split"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "squash"
+level = "SafeWrite"
 positional_style = true
 
 [[command.sub]]
@@ -40,6 +120,16 @@ name = "status"
 positional_style = true
 
 [[command.sub]]
+name = "undo"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "unsquash"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
 name = "version"
 positional_style = true
 
@@ -47,7 +137,39 @@ positional_style = true
 name = "bookmark"
 nested_bare = true
 [[command.sub.sub]]
+name = "create"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "delete"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "forget"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
 name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "move"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "rename"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "set"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "track"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "untrack"
+level = "SafeWrite"
 positional_style = true
 
 [[command.sub]]
@@ -77,6 +199,13 @@ nested_bare = true
 name = "fetch"
 positional_style = true
 [[command.sub.sub]]
+name = "import"
+positional_style = true
+[[command.sub.sub]]
+name = "init"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
 name = "remote"
 nested_bare = true
 [[command.sub.sub.sub]]
@@ -91,10 +220,6 @@ name = "log"
 positional_style = true
 
 [[command.sub]]
-name = "resolve"
-first_arg = ["--list"]
-
-[[command.sub]]
 name = "tag"
 nested_bare = true
 [[command.sub.sub]]
@@ -105,7 +230,19 @@ positional_style = true
 name = "workspace"
 nested_bare = true
 [[command.sub.sub]]
+name = "add"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "forget"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
 name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "rename"
+level = "SafeWrite"
 positional_style = true
 [[command.sub.sub]]
 name = "root"

@@ -1,0 +1,8 @@
+[[command]]
+name = "declare"
+aliases = ["typeset"]
+url = "https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["-A", "-F", "-a", "-f", "-g", "-i", "-l", "-n", "-p", "-r", "-t", "-u", "-x"]

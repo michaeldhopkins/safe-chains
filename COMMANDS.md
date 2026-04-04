@@ -506,6 +506,20 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed valued flags: --wrap, -b, -w
 - Bare invocation allowed
 
+### `basecamp` (https://github.com/basecamp/basecamp-cli)
+
+- **auth token**: Positional args accepted
+- **cards list**: Positional args accepted
+- **commands**: Positional args accepted
+- **doctor**: Positional args accepted
+- **files list**: Positional args accepted
+- **help**: Positional args accepted
+- **projects list**: Positional args accepted
+- **projects show**: Positional args accepted
+- **search**: Positional args accepted
+- **todos list**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
+
 ### `basename` (https://www.gnu.org/software/coreutils/manual/coreutils.html#basename-invocation)
 
 - Allowed standalone flags: --help, --multiple, --version, --zero, -V, -a, -h, -z
@@ -916,6 +930,14 @@ Aliases: `clang++`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `declare` (https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html)
+
+Aliases: `typeset`
+
+- Allowed standalone flags: -A, -F, -a, -f, -g, -i, -l, -n, -p, -r, -t, -u, -x
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `defaults` (https://ss64.com/mac/defaults.html)
 
 - **domains**: Flags: --help, -h
@@ -1126,6 +1148,11 @@ Aliases: `difftastic`
 
 - Allowed standalone flags: --cache, --color, --debug, --env-info, --help, --init, --no-color, --no-eslintrc, --no-inline-config, --print-config, --quiet, --version, -h, -v
 - Allowed valued flags: --cache-location, --config, --env, --ext, --format, --global, --ignore-path, --ignore-pattern, --max-warnings, --no-error-on-unmatched-pattern, --output-file, --parser, --parser-options, --plugin, --resolve-plugins-relative-to, --rule, --rulesdir, -c, -f, -o
+
+### `exit` (https://man7.org/linux/man-pages/man1/exit.1p.html)
+
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
 
 ### `exo` (https://community.exoscale.com/documentation/tools/exoscale-cli/)
 
@@ -1543,6 +1570,13 @@ Aliases: `egrep`, `fgrep`
 
 - Requires -l, --list, -t, --test. - Allowed standalone flags: -l, --list, -t, --test, -v, --verbose, --help, -h, --version, -V
 
+### `hash` (https://man7.org/linux/man-pages/man1/hash.1p.html)
+
+- Allowed standalone flags: -d, -l, -r, -t
+- Allowed valued flags: -p
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `hcloud` (https://github.com/hetznercloud/cli)
 
 - **certificate describe**: Flags: --help, -h. Valued: --output, -o
@@ -1757,26 +1791,56 @@ Aliases: `egrep`, `fgrep`
 
 ### `jj` (https://jj-vcs.github.io/jj/latest/cli-reference/)
 
+- **abandon**: Positional args accepted
+- **absorb**: Positional args accepted
+- **backout**: Positional args accepted
+- **bookmark create**: Positional args accepted
+- **bookmark delete**: Positional args accepted
+- **bookmark forget**: Positional args accepted
 - **bookmark list**: Positional args accepted
+- **bookmark move**: Positional args accepted
+- **bookmark rename**: Positional args accepted
+- **bookmark set**: Positional args accepted
+- **bookmark track**: Positional args accepted
+- **bookmark untrack**: Positional args accepted
 - **cat**: Positional args accepted
+- **commit**: Positional args accepted
 - **config get**: Positional args accepted
 - **config list**: Positional args accepted
+- **describe**: Positional args accepted
 - **diff**: Positional args accepted
+- **duplicate**: Positional args accepted
+- **edit**: Positional args accepted
 - **file list**: Positional args accepted
 - **file show**: Positional args accepted
+- **fix**: Positional args accepted
 - **git fetch**: Positional args accepted
+- **git import**: Positional args accepted
+- **git init**: Positional args accepted
 - **git remote list**: Positional args accepted
 - **help**: Positional args accepted
 - **log**: Positional args accepted
+- **new**: Positional args accepted
 - **op log**: Positional args accepted
-- **resolve**: Allowed arguments: --list
+- **parallelize**: Positional args accepted
+- **rebase**: Positional args accepted
+- **resolve**: Positional args accepted
+- **restore**: Positional args accepted
 - **root**: Positional args accepted
 - **show**: Positional args accepted
+- **simplify-parents**: Positional args accepted
+- **split**: Positional args accepted
+- **squash**: Positional args accepted
 - **st**: Positional args accepted
 - **status**: Positional args accepted
 - **tag list**: Positional args accepted
+- **undo**: Positional args accepted
+- **unsquash**: Positional args accepted
 - **version**: Positional args accepted
+- **workspace add**: Positional args accepted
+- **workspace forget**: Positional args accepted
 - **workspace list**: Positional args accepted
+- **workspace rename**: Positional args accepted
 - **workspace root**: Positional args accepted
 - **workspace update-stale**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h

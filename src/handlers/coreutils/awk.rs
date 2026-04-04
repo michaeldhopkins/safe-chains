@@ -2,9 +2,50 @@ use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
 use crate::policy::{self, FlagPolicy, FlagStyle};
 
+fn strip_regex_literals(s: &str) -> String {
+    let bytes = s.as_bytes();
+    let mut result = Vec::with_capacity(bytes.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'/' {
+            result.push(b' ');
+            i += 1;
+            while i < bytes.len() {
+                if bytes[i] == b'\\' && i + 1 < bytes.len() {
+                    i += 2;
+                    continue;
+                }
+                if bytes[i] == b'/' {
+                    i += 1;
+                    break;
+                }
+                i += 1;
+            }
+        } else {
+            result.push(bytes[i]);
+            i += 1;
+        }
+    }
+    String::from_utf8(result).unwrap_or_default()
+}
+
+fn has_redirect(code: &str) -> bool {
+    let bytes = code.as_bytes();
+    for (i, &b) in bytes.iter().enumerate() {
+        if b == b'>' && !(i + 1 < bytes.len() && bytes[i + 1] == b'=') {
+            return true;
+        }
+    }
+    false
+}
+
 fn awk_has_dangerous_construct(token: &Token) -> bool {
     let code = token.content_outside_double_quotes();
-    code.contains("system") || code.contains("getline") || code.contains('|') || code.contains('>')
+    if code.contains("system") || code.contains("getline") {
+        return true;
+    }
+    let stripped = strip_regex_literals(&code);
+    stripped.contains('|') || has_redirect(&stripped)
 }
 
 static AWK_POLICY: FlagPolicy = FlagPolicy {
@@ -71,10 +112,32 @@ mod tests {
         awk_begin_end_safe: "awk 'BEGIN{n=0} {n++} END{print n}' file.txt",
         gawk_safe: "gawk '{print $2}' file.txt",
         awk_netstat_pipeline: "awk '{print $6}'",
+        awk_comparison_gte: "awk 'NR>=10 {print}' file.txt",
+        awk_comparison_gte_complex: "awk '{if(length($0)>=80) print NR\": \"$0}' file.txt",
+        awk_multiple_comparisons: "awk 'NR>=5 && NR<=20' file.txt",
+        awk_division: "awk '{print $1/100}' file.txt",
+        awk_multiple_divisions: "awk '{avg=$1/10; pct=avg/total*100; print pct}' file.txt",
+        awk_modulo_and_division: "awk '{print $1%10, $1/10}' file.txt",
+
         awk_string_literal_system: "awk 'BEGIN{print \"system failed\"}'",
         awk_string_literal_redirect: "awk '{print \">\"}'",
         awk_string_literal_pipe: "awk '{print \"a | b\"}'",
         awk_string_literal_getline: "awk 'BEGIN{print \"getline is a keyword\"}'",
+
+        awk_regex_alternation: "awk '/foo|bar/ {print}' file.txt",
+        awk_regex_multi_alt: "awk '/^def |^class |^end/ {print}' file.rb",
+        awk_regex_redirect_char: "awk '/a>b/ {print}' file.txt",
+        awk_regex_complex: "awk '/^  def /{m=$0; l=NR} NR-l>=10 && /^  def |^class |^end/{print}' file.rb",
+        awk_regex_single_char: "awk '/^#/ {print}' file.txt",
+        awk_regex_escaped_slash: "awk '/path\\/to/ {print}' file.txt",
+        awk_regex_pipe_and_gte: "awk '/error|warning/ && NR>=10 {print}' log.txt",
+        awk_regex_empty: "awk '/^$/ {print NR}' file.txt",
+        awk_regex_pipe_in_match: "awk '$0 ~ /foo|bar/ {print}' file.txt",
+        awk_regex_multiple_patterns: "awk '/start/,/end/ {print}' file.txt",
+        awk_regex_redirect_in_char_class: "awk '/[><=]/ {print}' file.txt",
+        awk_regex_pipe_in_char_class: "awk '/[|&]/ {print}' file.txt",
+        awk_regex_mixed_with_math: "awk '/error|warn/ {c++} END{print c>=0 ? c : 0}' log.txt",
+        awk_no_program_just_flag: "awk --version",
     }
 
     denied! {
@@ -91,5 +154,15 @@ mod tests {
         awk_redirect_outside_string_denied: "awk '{print $0 > \"file\"}'",
         awk_system_trailing_help_denied: "awk 'BEGIN{system(\"rm\")}' --help",
         awk_system_trailing_version_denied: "awk 'BEGIN{system(\"rm\")}' --version",
+        awk_system_between_division_denied: "awk '{x=1/2;system(\"rm\");y=3/4}' file",
+        awk_getline_in_regex_context_denied: "awk '/foo/ {getline; print}' file",
+        awk_getline_from_cmd_denied: "awk 'BEGIN{cmd=\"date\"; cmd | getline d; print d}'",
+        awk_pipe_bare_denied: "awk '{cmd=\"sort\"; print $0 | cmd}' file",
+        awk_redirect_bare_var_denied: "awk '{f=\"out.txt\"; print $0 > f}' file",
+        awk_system_in_function_denied: "awk 'function run(){system(\"rm\")} BEGIN{run()}'",
+        awk_getline_from_pipe_denied: "awk 'BEGIN{\"date\" | getline d; print d}'",
+        awk_append_bare_denied: "awk '{print >> \"log.txt\"}' file",
+        awk_redirect_no_space_denied: "awk '{print >\"out\"}' file",
+        awk_pipe_no_space_denied: "awk '{print|\"cmd\"}' file",
     }
 }

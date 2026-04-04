@@ -1,0 +1,60 @@
+[[command]]
+name = "basecamp"
+url = "https://github.com/basecamp/basecamp-cli"
+bare_flags = ["--help", "--version", "-h"]
+[command.wrapper]
+standalone = ["--agent", "--json", "--quiet"]
+
+[[command.sub]]
+name = "auth"
+nested_bare = true
+[[command.sub.sub]]
+name = "token"
+positional_style = true
+
+[[command.sub]]
+name = "cards"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "commands"
+positional_style = true
+
+[[command.sub]]
+name = "doctor"
+positional_style = true
+
+[[command.sub]]
+name = "files"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+
+[[command.sub]]
+name = "help"
+positional_style = true
+
+[[command.sub]]
+name = "projects"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "show"
+positional_style = true
+
+[[command.sub]]
+name = "search"
+positional_style = true
+
+[[command.sub]]
+name = "todos"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true

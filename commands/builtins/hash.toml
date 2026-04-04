@@ -1,0 +1,8 @@
+[[command]]
+name = "hash"
+url = "https://man7.org/linux/man-pages/man1/hash.1p.html"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["-d", "-l", "-r", "-t"]
+valued = ["-p"]

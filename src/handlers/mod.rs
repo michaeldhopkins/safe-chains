@@ -56,7 +56,7 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
 #[cfg(test)]
 const HANDLED_CMDS: &[&str] = &[
     "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine", "dotenv",
-    "git", "jj", "gh", "glab", "jjpr", "tea",
+    "git", "jj", "gh", "glab", "jjpr", "tea", "basecamp",
     "npm", "yarn", "pnpm", "bun", "deno", "npx", "bunx", "nvm", "fnm", "volta", "mocha",
     "ruby", "ri", "bundle", "gem", "importmap", "rbenv",
     "pip", "uv", "poetry", "pyenv", "conda", "coverage", "tox", "nox", "bandit", "pip-audit", "pdm",
@@ -98,7 +98,7 @@ const HANDLED_CMDS: &[&str] = &[
     "dirname", "basename", "realpath", "readlink",
     "file", "stat", "du", "df", "tree", "cmp", "zipinfo", "tar", "unzip", "gzip",
     "true", "false",
-    "alias", "export", "printenv", "read", "type", "wait", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
+    "alias", "declare", "exit", "export", "hash", "printenv", "read", "type", "typeset", "wait", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
     "uname", "nproc", "uptime", "id", "groups", "tty", "locale", "cal", "sleep",
     "who", "w", "last", "lastlog",
     "ps", "top", "htop", "iotop", "procs", "dust", "lsof", "pgrep", "lsblk", "free",
