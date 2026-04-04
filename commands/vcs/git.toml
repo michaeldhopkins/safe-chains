@@ -469,7 +469,6 @@ valued = [
 [[command.sub]]
 name = "remote"
 handler = "git_remote"
-doc = "remote (read-only actions)."
 
 [[command.sub]]
 name = "rev-parse"

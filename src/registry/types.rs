@@ -39,9 +39,6 @@ pub(super) struct TomlCommand {
     pub first_arg: Vec<String>,
     #[serde(default)]
     pub wrapper: Option<TomlWrapper>,
-    #[allow(dead_code)]
-    #[serde(default)]
-    pub doc: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -95,9 +92,6 @@ pub(super) struct TomlSub {
     pub delegate_skip: Option<usize>,
     #[serde(default)]
     pub handler: Option<String>,
-    #[allow(dead_code)]
-    #[serde(default)]
-    pub doc: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]
@@ -125,13 +119,13 @@ pub struct CommandSpec {
     pub(super) kind: DispatchKind,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(super) struct SubSpec {
     pub name: String,
     pub kind: DispatchKind,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(super) enum DispatchKind {
     Policy {
         policy: OwnedPolicy,
@@ -180,7 +174,7 @@ pub(super) enum DispatchKind {
     },
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct OwnedPolicy {
     pub standalone: Vec<String>,
     pub valued: Vec<String>,

@@ -4,20 +4,9 @@ use crate::parse::{Token, WordSet};
 static NPX_FLAGS_NO_ARG: WordSet =
     WordSet::new(&["--ignore-existing", "--no", "--quiet", "--yes", "-q", "-y"]);
 
-pub fn is_safe_npx(tokens: &[Token]) -> bool {
-    if tokens.len() < 2 {
-        return false;
-    }
-    if tokens.len() == 2 && tokens[1] == "--version" {
-        return true;
-    }
-    super::find_runner_package_index(tokens, 1, &NPX_FLAGS_NO_ARG)
-        .is_some_and(|idx| super::is_safe_runner_package(tokens, idx))
-}
-
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "npx" => Some(if is_safe_npx(tokens) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }),
+        "npx" => Some(if super::is_safe_runner(tokens, &NPX_FLAGS_NO_ARG) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }),
         _ => None,
     }
 }
