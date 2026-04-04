@@ -794,8 +794,25 @@ Aliases: `clang++`
 
 ### `codex` (https://github.com/openai/codex)
 
+- **apply**: Positional args accepted
+- **cloud apply**: Positional args accepted
+- **cloud diff**: Positional args accepted
+- **cloud list**: Positional args accepted
+- **cloud status**: Positional args accepted
 - **completion**: Flags: --help, -h. Valued: --shell, -s
+- **debug app-server**: Positional args accepted
+- **exec**: Positional args accepted
+- **features disable**: Positional args accepted
+- **features enable**: Positional args accepted
 - **features list**: Flags: --help, -h
+- **fork**: Positional args accepted
+- **mcp add**: Positional args accepted
+- **mcp get**: Positional args accepted
+- **mcp list**: Positional args accepted
+- **mcp remove**: Positional args accepted
+- **resume**: Positional args accepted
+- **review**: Positional args accepted
+- **sandbox**: Positional args accepted
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `col` (https://man7.org/linux/man-pages/man1/col.1.html)
