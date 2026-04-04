@@ -5,9 +5,10 @@ pub fn check_bun_x(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-    if super::find_runner_package_index(tokens, 1, &super::BUNX_FLAGS_NO_ARG)
-        .is_some_and(|idx| super::is_safe_runner_package(tokens, idx))
-    { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }
+    match super::find_runner_package_index(tokens, 1, &super::BUNX_FLAGS_NO_ARG) {
+        Some(idx) => super::runner_verdict(tokens, idx),
+        None => Verdict::Denied,
+    }
 }
 
 #[cfg(test)]

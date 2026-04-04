@@ -632,8 +632,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 ### `bunx` (https://bun.sh/docs/cli/bunx)
 
-- Allowed packages: @herb-tools/linter, eslint, karma.
-- tsc allowed with --noEmit.
+- Delegates to the inner command's safety rules.
 - Skips flags: --bun/--no-install/--package/-p.
 
 ### `cal` (https://man7.org/linux/man-pages/man1/cal.1.html)
@@ -2392,8 +2391,7 @@ Aliases: `ionice`
 
 ### `npx` (https://docs.npmjs.com/cli/commands/npx)
 
-- Allowed packages: @herb-tools/linter, eslint, karma.
-- tsc allowed with --noEmit.
+- Delegates to the inner command's safety rules.
 - Skips flags: --yes/-y/--no/--package/-p.
 
 ### `nroff` (https://man7.org/linux/man-pages/man1/nroff.1.html)
@@ -3342,7 +3340,8 @@ Aliases: `traceroute6`
 
 ### `tsc` (https://www.typescriptlang.org/docs/handbook/compiler-options.html)
 
-- Allowed standalone flags: --help, --version, -h, -v
+- Requires --help, --noEmit, --version, -h, -v. - Allowed standalone flags: --allowJs, --checkJs, --esModuleInterop, --forceConsistentCasingInFileNames, --help, --incremental, --isolatedModules, --noEmit, --noFallthroughCasesInSwitch, --noImplicitAny, --noImplicitReturns, --noUnusedLocals, --noUnusedParameters, --pretty, --resolveJsonModule, --skipLibCheck, --strict, --strictNullChecks, --version, -h, -v
+- Allowed valued flags: --baseUrl, --jsx, --lib, --module, --moduleResolution, --project, --rootDir, --target
 
 ### `tty` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tty-invocation)
 

@@ -93,7 +93,7 @@ mod tests {
         xargs_cat: "xargs cat",
         xargs_with_flags: "xargs -I {} cat {}",
         xargs_zero_flag: "xargs -0 grep foo",
-        xargs_npx_safe: "xargs npx @herb-tools/linter",
+        xargs_npx_safe: "xargs npx eslint src/",
         xargs_find_safe: "xargs find . -name '*.py'",
         xargs_sed_safe: "xargs sed 's/foo/bar/'",
         xargs_nested_bash_safe: "xargs bash -c 'git status'",

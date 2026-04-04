@@ -1,21 +1,20 @@
-use crate::verdict::{SafetyLevel, Verdict};
+use crate::verdict::Verdict;
 use crate::parse::Token;
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "bunx" => Some(if super::is_safe_runner(tokens, &super::BUNX_FLAGS_NO_ARG) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied }),
+        "bunx" => Some(super::runner_dispatch(tokens, &super::BUNX_FLAGS_NO_ARG)),
         _ => None,
     }
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocBuilder, wordset_items};
+    use crate::docs::{CommandDoc, DocBuilder};
     vec![
         CommandDoc::handler("bunx",
             "https://bun.sh/docs/cli/bunx",
             DocBuilder::new()
-                .section(format!("Allowed packages: {}.", wordset_items(&super::NPX_SAFE)))
-                .section("tsc allowed with --noEmit.")
+                .section("Delegates to the inner command's safety rules.")
                 .section("Skips flags: --bun/--no-install/--package/-p.")
                 .build()),
     ]
@@ -43,6 +42,8 @@ mod tests {
         bunx_package_flag: "bunx --package eslint eslint src/",
         bunx_double_dash: "bunx -- eslint src/",
         bunx_version: "bunx --version",
+        bunx_prettier_check: "bunx prettier --check src/",
+        bunx_biome_check: "bunx biome check src/",
     }
 
     denied! {
