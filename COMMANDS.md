@@ -736,6 +736,41 @@ Aliases: `clang++`
 
 ### `claude` (https://docs.anthropic.com/en/docs/claude-code)
 
+- **agents**: Positional args accepted
+- **auth logout**: Positional args accepted
+- **auth status**: Positional args accepted
+- **auto-mode config**: Positional args accepted
+- **auto-mode defaults**: Positional args accepted
+- **doctor**: Positional args accepted
+- **mcp add**: Positional args accepted
+- **mcp add-from-claude-desktop**: Positional args accepted
+- **mcp add-json**: Positional args accepted
+- **mcp get**: Positional args accepted
+- **mcp list**: Positional args accepted
+- **mcp remove**: Positional args accepted
+- **mcp reset-project-choices**: Positional args accepted
+- **plugin disable**: Positional args accepted
+- **plugin enable**: Positional args accepted
+- **plugin install**: Positional args accepted
+- **plugin list**: Positional args accepted
+- **plugin marketplace add**: Positional args accepted
+- **plugin marketplace list**: Positional args accepted
+- **plugin marketplace remove**: Positional args accepted
+- **plugin marketplace update**: Positional args accepted
+- **plugin uninstall**: Positional args accepted
+- **plugin update**: Positional args accepted
+- **plugin validate**: Positional args accepted
+- **plugins disable**: Positional args accepted
+- **plugins enable**: Positional args accepted
+- **plugins install**: Positional args accepted
+- **plugins list**: Positional args accepted
+- **plugins marketplace add**: Positional args accepted
+- **plugins marketplace list**: Positional args accepted
+- **plugins marketplace remove**: Positional args accepted
+- **plugins marketplace update**: Positional args accepted
+- **plugins uninstall**: Positional args accepted
+- **plugins update**: Positional args accepted
+- **plugins validate**: Positional args accepted
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `cloc` (https://github.com/AlDanial/cloc#readme)
@@ -1424,7 +1459,7 @@ Aliases: `g++`, `cc`, `c++`
 
 ### `gh` (https://cli.github.com/manual/)
 
-- Subcommands attestation, cache, codespace, extension, gpg-key, issue, label, pr, release, repo, run, ssh-key, variable, workflow are allowed with actions: checks, diff, list, status, verify, view, watch.
+- Subcommands alias, attestation, cache, codespace, config, extension, gist, gpg-key, issue, label, org, pr, project, release, repo, ruleset, run, secret, ssh-key, variable, workflow are allowed with actions: checks, diff, list, status, verify, view, watch.
 - Always safe: --version, search, status.
 - auth status, browse (requires --no-browser), run rerun (SafeWrite), release download (requires --output), api (read-only: implicit GET or explicit -X GET, with --paginate, --slurp, --jq, --template, --cache, --preview, --include, --silent, --verbose, --hostname, -H for Accept and X-GitHub-Api-Version headers).
 

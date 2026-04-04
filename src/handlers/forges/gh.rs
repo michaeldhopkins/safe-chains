@@ -4,14 +4,19 @@ use crate::policy::{self, FlagPolicy, FlagStyle};
 
 static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--comments", "--draft", "--web",
-        "-w",
+        "--all", "--archived", "--comments", "--draft",
+        "--fork", "--no-archived", "--source", "--web",
+        "-a", "-w",
     ]),
     valued: WordSet::flags(&[
-        "--app", "--assignee", "--author", "--base", "--head",
-        "--jq", "--json", "--label", "--limit", "--milestone",
-        "--repo", "--search", "--state", "--template",
-        "-B", "-H", "-L", "-R", "-S", "-q",
+        "--app", "--assignee", "--author", "--base",
+        "--env", "--head", "--jq", "--json",
+        "--key", "--label", "--language", "--limit",
+        "--mention", "--milestone", "--order", "--org",
+        "--ref", "--repo", "--search", "--sort",
+        "--state", "--template", "--topic", "--user", "--visibility",
+        "-B", "-H", "-L", "-O", "-R", "-S",
+        "-e", "-k", "-l", "-o", "-q", "-r", "-u",
     ]),
     bare: true,
     max_positional: None,
@@ -20,12 +25,12 @@ static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
 
 static GH_VIEW_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
-        "--comments", "--web",
-        "-c", "-w",
+        "--comments", "--web", "--yaml",
+        "-c", "-w", "-y",
     ]),
     valued: WordSet::flags(&[
-        "--jq", "--json", "--repo", "--template",
-        "-R", "-q",
+        "--branch", "--jq", "--json", "--ref", "--repo", "--template",
+        "-R", "-b", "-q", "-r",
     ]),
     bare: false,
     max_positional: None,
@@ -177,10 +182,15 @@ static GH_RELEASE_DOWNLOAD_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
+    standalone: WordSet::flags(&[
+        "--all", "--archived", "--fork", "--no-archived", "--source", "--web",
+        "-a", "-w",
+    ]),
     valued: WordSet::flags(&[
-        "--jq", "--json", "--limit", "--repo", "--template",
-        "-L", "-R", "-q",
+        "--env", "--jq", "--json", "--key", "--language", "--limit",
+        "--order", "--org", "--ref", "--repo", "--search",
+        "--sort", "--template", "--topic", "--user", "--visibility",
+        "-L", "-O", "-R", "-S", "-e", "-k", "-l", "-o", "-q", "-r", "-u",
     ]),
     bare: true,
     max_positional: None,
@@ -188,10 +198,10 @@ static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static GH_SIMPLE_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--web", "-w"]),
+    standalone: WordSet::flags(&["--web", "--yaml", "-w", "-y"]),
     valued: WordSet::flags(&[
-        "--jq", "--json", "--repo", "--template",
-        "-R", "-q",
+        "--jq", "--json", "--ref", "--repo", "--template",
+        "-R", "-q", "-r",
     ]),
     bare: false,
     max_positional: None,
@@ -207,8 +217,10 @@ static GH_RUN_RERUN_POLICY: FlagPolicy = FlagPolicy {
 };
 
 static READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
-    "attestation", "cache", "codespace", "extension", "gpg-key",
-    "issue", "label", "pr", "release", "repo", "run",
+    "alias", "attestation", "cache", "codespace", "config",
+    "extension", "gist", "gpg-key",
+    "issue", "label", "org", "pr", "project", "release",
+    "repo", "ruleset", "run", "secret",
     "ssh-key", "variable", "workflow",
 ]);
 
@@ -445,36 +457,46 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 #[cfg(test)]
 pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
     crate::handlers::CommandEntry::Paths { cmd: "gh", bare_ok: false, paths: &[
+        "gh alias list",
+        "gh attestation verify artifact",
+        "gh auth status",
+        "gh browse --no-browser",
+        "gh cache list",
+        "gh codespace list",
+        "gh config list",
+        "gh extension list",
+        "gh gist list",
+        "gh gist view 123",
+        "gh gpg-key list",
         "gh issue list",
         "gh issue view 456",
+        "gh label list",
+        "gh org list",
         "gh pr list",
         "gh pr view 123",
         "gh pr diff 123",
         "gh pr checks 123",
         "gh pr status 123",
+        "gh project list",
+        "gh project view 1",
+        "gh release list",
+        "gh release view v1.0",
+        "gh release download v1.0 --output -",
+        "gh repo list",
+        "gh repo view owner/repo",
+        "gh ruleset list",
+        "gh ruleset view 1",
         "gh run list",
         "gh run view 789",
         "gh run watch 123",
         "gh run rerun 12345",
-        "gh release list",
-        "gh release view v1.0",
-        "gh release download v1.0 --output -",
-        "gh label list",
-        "gh cache list",
-        "gh codespace list",
-        "gh variable list",
-        "gh extension list",
-        "gh attestation verify artifact",
-        "gh gpg-key list",
+        "gh search issues foo",
+        "gh secret list",
         "gh ssh-key list",
+        "gh status",
+        "gh variable list",
         "gh workflow list",
         "gh workflow view ci",
-        "gh repo list",
-        "gh repo view owner/repo",
-        "gh search issues foo",
-        "gh status",
-        "gh auth status",
-        "gh browse --no-browser",
         "gh api repos/o/r",
     ]},
 ];
@@ -586,6 +608,29 @@ mod tests {
         api_header_multiple: "gh api repos/o/r/contents/f -H 'Accept: application/vnd.github.raw' -H 'X-GitHub-Api-Version: 2022-11-28'",
         api_header_with_jq: "gh api repos/o/r/contents/f -H 'Accept: application/vnd.github.raw' --jq '.content'",
         gh_version: "gh --version",
+        gist_list: "gh gist list",
+        gist_view: "gh gist view abc123",
+        org_list: "gh org list",
+        project_list: "gh project list",
+        project_view: "gh project view 1",
+        ruleset_list: "gh ruleset list",
+        ruleset_view: "gh ruleset view 1",
+        config_list: "gh config list",
+        alias_list: "gh alias list",
+        secret_list: "gh secret list",
+        issue_list_mention: "gh issue list --mention user",
+        label_list_search: "gh label list --search bug",
+        label_list_sort: "gh label list --sort name --order asc",
+        cache_list_key: "gh cache list --key prefix",
+        repo_list_language: "gh repo list --language rust",
+        repo_list_archived: "gh repo list --archived",
+        repo_view_branch: "gh repo view owner/repo --branch dev",
+        workflow_list_all: "gh workflow list --all",
+        workflow_view_yaml: "gh workflow view ci --yaml",
+        workflow_view_ref: "gh workflow view ci --ref main",
+        codespace_list_repo: "gh codespace list --repo owner/repo",
+        variable_list_env: "gh variable list --env production",
+        variable_list_org: "gh variable list --org myorg",
     }
 
     denied! {

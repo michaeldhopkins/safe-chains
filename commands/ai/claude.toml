@@ -1,7 +1,159 @@
 [[command]]
 name = "claude"
 url = "https://docs.anthropic.com/en/docs/claude-code"
-level = "Inert"
-bare = false
-max_positional = 0
-standalone = ["--help", "--version", "-V", "-h"]
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "agents"
+positional_style = true
+
+[[command.sub]]
+name = "auto-mode"
+nested_bare = true
+[[command.sub.sub]]
+name = "config"
+positional_style = true
+[[command.sub.sub]]
+name = "defaults"
+positional_style = true
+
+[[command.sub]]
+name = "doctor"
+positional_style = true
+
+[[command.sub]]
+name = "auth"
+nested_bare = true
+[[command.sub.sub]]
+name = "logout"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "status"
+positional_style = true
+
+[[command.sub]]
+name = "mcp"
+nested_bare = true
+[[command.sub.sub]]
+name = "add"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "add-json"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "add-from-claude-desktop"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "get"
+positional_style = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "remove"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "reset-project-choices"
+level = "SafeWrite"
+positional_style = true
+
+[[command.sub]]
+name = "plugin"
+nested_bare = true
+[[command.sub.sub]]
+name = "disable"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "enable"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "install"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "marketplace"
+nested_bare = true
+[[command.sub.sub.sub]]
+name = "add"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub.sub]]
+name = "remove"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub.sub]]
+name = "update"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "uninstall"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "update"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "validate"
+positional_style = true
+
+[[command.sub]]
+name = "plugins"
+nested_bare = true
+[[command.sub.sub]]
+name = "disable"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "enable"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "install"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub]]
+name = "marketplace"
+nested_bare = true
+[[command.sub.sub.sub]]
+name = "add"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub.sub]]
+name = "list"
+positional_style = true
+[[command.sub.sub.sub]]
+name = "remove"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub.sub]]
+name = "update"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "uninstall"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "update"
+level = "SafeWrite"
+positional_style = true
+[[command.sub.sub]]
+name = "validate"
+positional_style = true
