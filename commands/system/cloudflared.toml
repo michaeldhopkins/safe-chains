@@ -1,0 +1,12 @@
+[[command]]
+name = "cloudflared"
+url = "https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "tail"
+positional_style = true
+
+[[command.sub]]
+name = "version"
+positional_style = true

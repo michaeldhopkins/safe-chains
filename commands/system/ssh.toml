@@ -1,0 +1,7 @@
+[[command]]
+name = "ssh"
+url = "https://man.openbsd.org/ssh"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["-V"]

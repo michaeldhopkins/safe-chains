@@ -777,6 +777,12 @@ Aliases: `clang++`
 - Allowed standalone flags: --3, --autoconf, --by-file, --by-file-by-lang, --by-percent, --categorized, --counted, --diff, --diff-list-file, --docstring-as-code, --follow-links, --force-lang-def, --found-langs, --git, --help, --hide-rate, --ignored, --include-content, --json, --md, --no-autogen, --no3, --opt-match-d, --opt-match-f, --opt-not-match-d, --opt-not-match-f, --original-dir, --progress-rate, --quiet, --sdir, --show-ext, --show-lang, --show-os, --show-stored-lang, --skip-uniqueness, --sql-append, --strip-comments, --sum-one, --sum-reports, --unicode, --use-sloccount, --v, --vcs, --version, --xml, --yaml, -V, -h, -v
 - Allowed valued flags: --config, --csv-delimiter, --diff-alignment, --diff-timeout, --exclude-content, --exclude-dir, --exclude-ext, --exclude-lang, --exclude-list-file, --force-lang, --fullpath, --include-ext, --include-lang, --lang-no-ext, --list-file, --match-d, --match-f, --not-match-d, --not-match-f, --out, --read-binary-files, --read-lang-def, --report-file, --script-lang, --skip-archive, --sql, --sql-project, --sql-style, --timeout, --write-lang-def
 
+### `cloudflared` (https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/)
+
+- **tail**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `cmake` (https://cmake.org/cmake/help/latest/manual/cmake.1.html)
 
 - Allowed standalone flags: --help, --system-information, --version, -V, -h
@@ -2358,6 +2364,15 @@ Aliases: `mlocate`, `plocate`
 - **lint**: Flags: --dir, --help, --quiet, --strict, -d, -h. Valued: --cache-location, --ext, --max-warnings, --output-file, --resolve-plugins-relative-to, -c
 - Allowed standalone flags: --help, --version, -h
 
+### `ngrok` (https://ngrok.com/docs/agent/cli)
+
+- **completion**: Positional args accepted
+- **config check**: Positional args accepted
+- **credits**: Positional args accepted
+- **diagnose**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
+
 ### `nice` (https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation)
 
 Aliases: `ionice`
@@ -3097,6 +3112,10 @@ Aliases: `python`
 - Allowed standalone flags: --all, --dccp, --extended, --family, --help, --info, --ipv4, --ipv6, --listening, --memory, --no-header, --numeric, --oneline, --options, --packet, --processes, --raw, --resolve, --sctp, --summary, --tcp, --tipc, --udp, --unix, --version, --vsock, -0, -4, -6, -E, -H, -O, -V, -a, -e, -h, -i, -l, -m, -n, -o, -p, -r, -s, -t, -u, -w, -x
 - Allowed valued flags: --filter, --query, -A, -F, -f
 - Bare invocation allowed
+
+### `ssh` (https://man.openbsd.org/ssh)
+
+- Allowed standalone flags: -V
 
 ### `stat` (https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation)
 

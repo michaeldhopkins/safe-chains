@@ -1,0 +1,27 @@
+[[command]]
+name = "ngrok"
+url = "https://ngrok.com/docs/agent/cli"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "completion"
+positional_style = true
+
+[[command.sub]]
+name = "config"
+nested_bare = true
+[[command.sub.sub]]
+name = "check"
+positional_style = true
+
+[[command.sub]]
+name = "credits"
+positional_style = true
+
+[[command.sub]]
+name = "diagnose"
+positional_style = true
+
+[[command.sub]]
+name = "version"
+positional_style = true
