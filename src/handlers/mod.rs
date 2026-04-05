@@ -117,7 +117,7 @@ const HANDLED_CMDS: &[&str] = &[
     "echo", "printf", "seq", "test", "[", "expr", "bc", "factor", "bat",
     "arch", "command", "hostname",
     "find", "sed", "shuf", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
-    "magick",
+    "magick", "convert",
     "fd", "eza", "exa", "ls", "delta", "colordiff",
     "dirname", "basename", "realpath", "readlink",
     "file", "stat", "du", "df", "tree", "cmp", "zipinfo", "tar", "unzip", "gzip",

@@ -4,6 +4,24 @@ url = "https://imagemagick.org/script/command-line-tools.php"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
 [[command.sub]]
+name = "compare"
+level = "SafeWrite"
+positional_style = true
+bare = false
+
+[[command.sub]]
+name = "composite"
+level = "SafeWrite"
+positional_style = true
+bare = false
+
+[[command.sub]]
+name = "convert"
+level = "SafeWrite"
+positional_style = true
+bare = false
+
+[[command.sub]]
 name = "identify"
 bare = false
 standalone = [
@@ -17,3 +35,21 @@ valued = [
     "-limit", "-precision", "-sampling-factor",
     "-size", "-units", "-virtual-pixel",
 ]
+
+[[command.sub]]
+name = "mogrify"
+level = "SafeWrite"
+positional_style = true
+bare = false
+
+[[command.sub]]
+name = "montage"
+level = "SafeWrite"
+positional_style = true
+bare = false
+
+[[command.sub]]
+name = "stream"
+level = "SafeWrite"
+positional_style = true
+bare = false

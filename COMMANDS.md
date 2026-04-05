@@ -869,6 +869,10 @@ Aliases: `clang++`
 - **list**: Flags: --explicit, --export, --full-name, --help, --json, --no-pip, --revisions, -e, -f, -h. Valued: --name, --prefix, -n, -p
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `convert` (https://imagemagick.org/script/convert.php)
+
+- Hyphen-prefixed positional arguments accepted
+
 ### `cosign` (https://github.com/sigstore/cosign)
 
 - **tree**: Flags: --help, -h
@@ -2148,7 +2152,13 @@ Aliases: `mlocate`, `plocate`
 
 ### `magick` (https://imagemagick.org/script/command-line-tools.php)
 
+- **compare**: Positional args accepted
+- **composite**: Positional args accepted
+- **convert**: Positional args accepted
 - **identify**: Flags: --help, -h, -matte, -moments, -ping, -quiet, -regard-warnings, -unique, -verbose. Valued: -alpha, -colorspace, -define, -density, -depth, -endian, -format, -interlace, -limit, -precision, -sampling-factor, -size, -units, -virtual-pixel
+- **mogrify**: Positional args accepted
+- **montage**: Positional args accepted
+- **stream**: Positional args accepted
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `make` (https://www.gnu.org/software/make/manual/make.html)

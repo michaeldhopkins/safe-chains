@@ -1,0 +1,6 @@
+[[command]]
+name = "convert"
+url = "https://imagemagick.org/script/convert.php"
+level = "SafeWrite"
+bare = false
+positional_style = true
