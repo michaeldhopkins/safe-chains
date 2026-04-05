@@ -104,6 +104,7 @@ const HANDLED_CMDS: &[&str] = &[
     "doctl", "hcloud", "vultr-cli", "exo", "scw", "linode-cli",
     "ansible-playbook", "ansible-inventory", "ansible-doc", "ansible-config", "ansible-galaxy",
     "overmind", "tailscale", "tmux", "wg", "systemctl", "journalctl",
+    "cloudflared", "ngrok", "ssh",
     "networksetup", "launchctl", "diskutil", "security", "csrutil", "log",
     "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign", "spctl",
     "xcodegen", "tuist", "pod", "swiftlint", "swiftformat", "periphery", "xcbeautify", "agvtool", "simctl",
