@@ -1,0 +1,18 @@
+[[command]]
+name = "oxlint"
+url = "https://oxc.rs/docs/guide/usage/linter/cli"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--deny-warnings", "--disable-nested-config",
+    "--help", "--import-plugin",
+    "--quiet", "--report-unused-disable-directives",
+    "--rules", "--version",
+    "-V", "-h",
+]
+valued = [
+    "--allow", "--config", "--deny",
+    "--format", "--max-warnings",
+    "--tsconfig", "--warn",
+    "-A", "-D", "-W", "-f",
+]

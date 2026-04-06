@@ -1,0 +1,15 @@
+[[command]]
+name = "@shopify/theme-check"
+url = "https://shopify.dev/docs/storefronts/themes/tools/theme-check/commands"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help", "--list", "--no-color",
+    "--verbose", "--version",
+    "-h",
+]
+valued = [
+    "--config", "--fail-level",
+    "--output", "--path",
+    "-C", "-o",
+]

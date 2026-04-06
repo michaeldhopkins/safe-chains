@@ -1,0 +1,16 @@
+[[command]]
+name = "@commitlint/cli"
+url = "https://commitlint.js.org/reference/cli.html"
+level = "Inert"
+bare = true
+standalone = [
+    "--color", "--help", "--help-url",
+    "--no-color", "--print-config", "--quiet",
+    "--strict", "--verbose", "--version",
+    "-V", "-h", "-q", "-s",
+]
+valued = [
+    "--config", "--cwd", "--edit", "--env",
+    "--extends", "--from", "--options", "--to",
+    "-E", "-H", "-d", "-e", "-f", "-g", "-t", "-x",
+]

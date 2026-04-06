@@ -1,0 +1,17 @@
+[[command]]
+name = "@arethetypeswrong/cli"
+url = "https://github.com/arethetypeswrong/arethetypeswrong.github.io"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--entrypoints-legacy", "--help", "--no-emoji",
+    "--quiet", "--version",
+    "-h", "-q",
+]
+valued = [
+    "--config-path", "--entrypoints",
+    "--exclude-entrypoints", "--format",
+    "--from-npm", "--include-entrypoints",
+    "--pack",
+    "-f", "-p",
+]

@@ -1,0 +1,20 @@
+[[command]]
+name = "@stoplight/spectral-cli"
+url = "https://docs.stoplight.io/docs/spectral/9ffa04e052cc1-spectral-cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--display-only-failures", "--help",
+    "--quiet", "--verbose",
+    "-D", "-h", "-v",
+]
+valued = [
+    "--encoding", "--fail-severity",
+    "--format", "--resolver", "--ruleset",
+    "--stdin-filepath",
+    "-F", "-e", "-f", "-r",
+]

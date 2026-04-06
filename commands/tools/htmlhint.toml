@@ -1,0 +1,15 @@
+[[command]]
+name = "@htmlhint/htmlhint"
+url = "https://htmlhint.com/usage/cli/"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--list", "--nocolor",
+    "--version", "--warn",
+    "-V", "-h", "-l",
+]
+valued = [
+    "--config", "--format", "--ignore",
+    "--rules", "--rulesdir",
+    "-R", "-c", "-f", "-i", "-r",
+]

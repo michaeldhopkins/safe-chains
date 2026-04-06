@@ -1,0 +1,15 @@
+[[command]]
+name = "@ibm/openapi-validator"
+url = "https://github.com/IBM/openapi-validator"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--impact-score", "--json",
+    "--no-colors", "--summary-only", "--version",
+    "-V", "-h", "-j", "-n", "-q", "-s",
+]
+valued = [
+    "--config", "--log-level",
+    "--ruleset", "--warnings-limit",
+    "-c", "-l", "-r", "-w",
+]

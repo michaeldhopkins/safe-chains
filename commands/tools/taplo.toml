@@ -1,0 +1,27 @@
+[[command]]
+name = "@taplo/cli"
+url = "https://taplo.tamasfe.dev/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "Inert"
+standalone = [
+    "--help", "--no-auto-config",
+    "-h",
+]
+valued = [
+    "--config", "--config-table",
+]
+
+[[command.sub]]
+name = "lint"
+level = "Inert"
+standalone = [
+    "--help", "--no-auto-config",
+    "-h",
+]
+valued = [
+    "--config", "--config-table",
+    "--schema",
+]

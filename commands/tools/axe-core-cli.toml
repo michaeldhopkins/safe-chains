@@ -1,0 +1,16 @@
+[[command]]
+name = "@axe-core/cli"
+url = "https://github.com/dequelabs/axe-core-npm/tree/develop/packages/cli"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--no-color", "--verbose", "--version",
+    "-h", "-v",
+]
+valued = [
+    "--browser", "--browser-arg", "--chromedriver-path",
+    "--dir", "--disable", "--exclude", "--exit",
+    "--include",
+    "--load-delay", "--rules", "--tags",
+    "--timeout",
+]

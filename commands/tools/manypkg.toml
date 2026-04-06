@@ -1,0 +1,10 @@
+[[command]]
+name = "@manypkg/cli"
+url = "https://github.com/Thinkmill/manypkg"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]

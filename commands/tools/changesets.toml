@@ -1,0 +1,16 @@
+[[command]]
+name = "@changesets/cli"
+url = "https://github.com/changesets/changesets/blob/main/docs/command-line-options.md"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "status"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--verbose",
+    "-h",
+]
+valued = [
+    "--since",
+]

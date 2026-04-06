@@ -1,0 +1,16 @@
+[[command]]
+name = "depcheck"
+url = "https://github.com/depcheck/depcheck"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help", "--ignore-bin-package",
+    "--json", "--oneline",
+    "--skip-missing", "--version",
+]
+valued = [
+    "--config", "--detectors",
+    "--ignore-dirs", "--ignore-path",
+    "--ignore-patterns", "--ignores",
+    "--parsers", "--specials",
+]

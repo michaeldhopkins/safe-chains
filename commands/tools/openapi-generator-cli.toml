@@ -1,0 +1,17 @@
+[[command]]
+name = "@openapitools/openapi-generator-cli"
+url = "https://openapi-generator.tech/docs/usage/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--recommend",
+    "-h",
+]
+valued = [
+    "--auth", "--input-spec",
+    "-a", "-i",
+]

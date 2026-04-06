@@ -1,0 +1,34 @@
+[[command]]
+name = "@asyncapi/cli"
+url = "https://www.asyncapi.com/docs/tools/cli"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--log-diagnostics",
+    "--no-log-diagnostics", "--score",
+    "--suppressAllWarnings", "--suppressWarnings",
+    "-h",
+]
+valued = [
+    "--diagnostics-format", "--fail-severity",
+    "--proxyHost", "--proxyPort",
+]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--log-diagnostics",
+    "--no-log-diagnostics",
+    "-h",
+]
+valued = [
+    "--diagnostics-format", "--fail-severity",
+    "--format", "--type",
+    "-f", "-t",
+]

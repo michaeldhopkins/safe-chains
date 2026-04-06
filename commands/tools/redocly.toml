@@ -1,0 +1,28 @@
+[[command]]
+name = "@redocly/cli"
+url = "https://redocly.com/docs/cli/commands"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+standalone = [
+    "--help", "--version",
+    "-h",
+]
+valued = [
+    "--config", "--extends", "--format",
+    "--max-problems", "--skip-rule",
+]
+
+[[command.sub]]
+name = "stats"
+level = "Inert"
+standalone = ["--help", "-h"]
+valued = ["--config"]
+
+[[command.sub]]
+name = "check-config"
+level = "Inert"
+standalone = ["--help", "-h"]
+valued = ["--config"]

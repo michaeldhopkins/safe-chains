@@ -1,0 +1,20 @@
+[[command]]
+name = "madge"
+url = "https://github.com/pahen/madge"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--circular", "--debug", "--dot",
+    "--help", "--include-npm",
+    "--json", "--leaves", "--no-color", "--no-count",
+    "--no-spinner", "--orphans",
+    "--stdin", "--summary",
+    "--version", "--warning",
+]
+valued = [
+    "--basedir", "--exclude",
+    "--extensions",
+    "--layout", "--rankdir",
+    "--require-config", "--ts-config",
+    "--webpack-config",
+]
