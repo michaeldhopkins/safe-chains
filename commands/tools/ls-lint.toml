@@ -1,0 +1,11 @@
+[[command]]
+name = "@ls-lint/ls-lint"
+url = "https://ls-lint.org/"
+level = "Inert"
+bare = true
+standalone = [
+    "--debug", "--version", "--warn",
+]
+valued = [
+    "--config", "--error-output-format", "--workdir",
+]

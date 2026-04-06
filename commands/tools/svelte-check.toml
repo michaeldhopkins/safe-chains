@@ -1,0 +1,15 @@
+[[command]]
+name = "svelte-check"
+url = "https://svelte.dev/docs/cli/sv-check"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--fail-on-warnings", "--help", "--no-tsconfig",
+    "--preserveWatchOutput", "--version", "--watch",
+    "-h",
+]
+valued = [
+    "--compiler-warnings", "--diagnostic-sources",
+    "--ignore", "--output", "--threshold",
+    "--tsconfig", "--workspace",
+]

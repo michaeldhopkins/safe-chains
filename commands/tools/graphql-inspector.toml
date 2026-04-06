@@ -1,0 +1,62 @@
+[[command]]
+name = "@graphql-inspector/cli"
+url = "https://the-guild.dev/graphql/inspector/docs"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "diff"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+valued = [
+    "--header", "--left-header",
+    "--require", "--right-header",
+    "--rule", "--token",
+    "-r", "-t",
+]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--apollo", "--deprecated", "--help",
+    "--noStrictFragments",
+    "-h",
+]
+valued = [
+    "--header", "--require", "--token",
+    "-r", "-t",
+]
+
+[[command.sub]]
+name = "similar"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+valued = [
+    "--header", "--require",
+    "--threshold", "--token",
+    "-n", "-r", "-t",
+]
+
+[[command.sub]]
+name = "introspect"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+valued = [
+    "--header", "--require", "--token",
+    "-r", "-t",
+]
+
+[[command.sub]]
+name = "coverage"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+valued = [
+    "--header", "--require",
+    "--silent", "--token",
+    "-r", "-t",
+]

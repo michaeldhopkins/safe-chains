@@ -1,0 +1,13 @@
+[[command]]
+name = "size-limit"
+url = "https://github.com/ai/size-limit"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--debug", "--help", "--hide-passed",
+    "--highlight-less", "--json",
+    "--silent", "--version", "--watch", "--why",
+]
+valued = [
+    "--compare-with", "--config", "--limit",
+]

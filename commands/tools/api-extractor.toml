@@ -1,0 +1,18 @@
+[[command]]
+name = "@microsoft/api-extractor"
+url = "https://api-extractor.com/pages/commands/api-extractor_run/"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "run"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--diagnostics", "--help",
+    "--local", "--verbose",
+    "-h", "-l", "-v",
+]
+valued = [
+    "--config", "--typescript-compiler-folder",
+    "-c",
+]

@@ -1,0 +1,13 @@
+[[command]]
+name = "@apidevtools/swagger-cli"
+url = "https://github.com/APIDevTools/swagger-cli"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--no-schema", "--no-spec",
+    "-h",
+]

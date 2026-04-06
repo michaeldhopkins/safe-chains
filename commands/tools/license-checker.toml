@@ -1,0 +1,23 @@
+[[command]]
+name = "license-checker"
+url = "https://github.com/davglass/license-checker"
+level = "Inert"
+bare = true
+standalone = [
+    "--color", "--csv", "--customFormat",
+    "--development", "--direct",
+    "--help", "--json", "--long",
+    "--markdown", "--no-color",
+    "--production", "--relativeLicensePath",
+    "--start", "--summary", "--unknown",
+    "--version",
+]
+valued = [
+    "--clarificationsFile", "--customPath",
+    "--excludeLicenses", "--excludePackages",
+    "--excludePackagesStartingWith",
+    "--excludePrivatePackages",
+    "--failOn", "--files", "--from",
+    "--onlyAllow", "--onlyunknown",
+    "--out",
+]

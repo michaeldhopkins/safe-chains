@@ -1,0 +1,22 @@
+[[command]]
+name = "knip"
+url = "https://knip.dev/reference/cli"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--debug", "--dependencies", "--exports",
+    "--files", "--help", "--include-entry-exports",
+    "--include-libs", "--isolate-workspaces",
+    "--no-config-hints", "--no-exit-code",
+    "--no-gitignore", "--no-progress",
+    "--performance", "--production",
+    "--strict", "--version",
+    "-V", "-h",
+]
+valued = [
+    "--cache-location", "--config",
+    "--exclude", "--include",
+    "--max-issues", "--reporter",
+    "--tags", "--tsConfig", "--workspace",
+    "-W", "-c", "-t",
+]

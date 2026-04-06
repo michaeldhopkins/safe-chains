@@ -84,7 +84,11 @@ impl Token {
     }
 
     pub fn command_name(&self) -> &str {
-        self.as_str().rsplit('/').next().unwrap_or(self.as_str())
+        let s = self.as_str();
+        if s.starts_with('@') {
+            return s;
+        }
+        s.rsplit('/').next().unwrap_or(s)
     }
 
     pub fn is_one_of(&self, options: &[&str]) -> bool {
@@ -243,6 +247,11 @@ mod tests {
     #[test]
     fn command_name_relative_path() {
         assert_eq!(tok("./scripts/test.sh").command_name(), "test.sh");
+    }
+
+    #[test]
+    fn command_name_scoped_package() {
+        assert_eq!(tok("@herb-tools/linter").command_name(), "@herb-tools/linter");
     }
 
     #[test]

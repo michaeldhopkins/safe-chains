@@ -50,6 +50,8 @@ mod tests {
         npx_shellcheck: "npx shellcheck script.sh",
         npx_versioned: "npx eslint@8 src/",
         npx_eslint_max_warnings: "npx eslint src/ --max-warnings 0",
+        npx_scoped_herb_linter: "npx @herb-tools/linter --fail-level warning file.erb",
+        npx_scoped_herb_linter_versioned: "npx @herb-tools/linter@0.9.5 --fail-level warning file.erb",
     }
 
     denied! {
@@ -91,5 +93,7 @@ mod tests {
         ("npx cat /etc/passwd", "cat /etc/passwd"),
         ("npx grep pattern file", "grep pattern file"),
         ("npx unknown-package", "unknown-package"),
+        ("npx @herb-tools/linter file.erb", "@herb-tools/linter file.erb"),
+        ("npx @unknown-scope/unknown-pkg file", "@unknown-scope/unknown-pkg file"),
     ];
 }

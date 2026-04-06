@@ -1,0 +1,13 @@
+[[command]]
+name = "@astrojs/check"
+url = "https://docs.astro.build/en/reference/cli-reference/"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help", "--version", "--watch",
+    "-h",
+]
+valued = [
+    "--minimumFailingSeverity", "--minimumSeverity",
+    "--tsconfig",
+]

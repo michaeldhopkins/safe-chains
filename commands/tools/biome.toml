@@ -1,5 +1,6 @@
 [[command]]
 name = "biome"
+aliases = ["@biomejs/biome"]
 url = "https://biomejs.dev/reference/cli/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
@@ -7,7 +8,7 @@ bare_flags = ["--help", "--version", "-V", "-h"]
 name = "check"
 level = "SafeRead"
 standalone = [
-    "--apply", "--colors", "--help", "--json-formatter",
+    "--colors", "--help", "--json-formatter",
     "--no-errors-on-unmatched", "--quiet", "--verbose",
     "-h",
 ]

@@ -1,0 +1,20 @@
+[[command]]
+name = "@herb-tools/linter"
+url = "https://github.com/nicholaides/herb"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--disable-failing",
+    "--force", "--github",
+    "--help", "--ignore-disable-comments",
+    "--json", "--no-color", "--no-custom-rules",
+    "--no-github", "--no-timing", "--no-wrap-lines",
+    "--simple", "--truncate-lines",
+    "--version",
+    "-h", "-v",
+]
+valued = [
+    "--config-file", "--fail-level", "--format",
+    "--jobs", "--theme",
+    "-c", "-j",
+]
