@@ -95,6 +95,37 @@ cp $(brew --prefix)/share/safe-chains/opencode-plugin.js .opencode/plugins/
 
 Requires `safe-chains` in PATH.
 
+### OpenAI codex
+
+Manually add this to `~/.claude/config.toml`:
+
+```toml
+[features]
+codex_hooks = true
+```
+
+And add this to `~/.claude/hooks.json`:
+
+```json
+"hooks": {
+  "PreToolUse": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "safe-chains"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Restart your codex sessions to activate the hook. Once configured, updating the `safe-chains` binary takes effect immediately.
+
+Requires `safe-chains` in PATH.
+
 ## Usage
 
 ### Claude Code (hook mode)
