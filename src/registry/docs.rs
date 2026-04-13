@@ -68,6 +68,9 @@ impl OwnedPolicy {
         if self.flag_style == FlagStyle::Positional {
             lines.push("- Hyphen-prefixed positional arguments accepted".to_string());
         }
+        if self.numeric_dash {
+            lines.push("- Numeric shorthand accepted (e.g. -20 for -n 20)".to_string());
+        }
         if lines.is_empty() && !self.bare {
             return "- Positional arguments only".to_string();
         }
@@ -84,6 +87,9 @@ impl OwnedPolicy {
         }
         if self.flag_style == FlagStyle::Positional {
             parts.push("Positional args accepted".to_string());
+        }
+        if self.numeric_dash {
+            parts.push("Numeric -N accepted".to_string());
         }
         parts.join(". ")
     }

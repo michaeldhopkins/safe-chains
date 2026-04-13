@@ -33,7 +33,14 @@ fn has_redirect(code: &str) -> bool {
     let bytes = code.as_bytes();
     for (i, &b) in bytes.iter().enumerate() {
         if b == b'>' && !(i + 1 < bytes.len() && bytes[i + 1] == b'=') {
-            return true;
+            if b == b'>' && i > 0 && bytes[i - 1] == b'>' {
+                return true;
+            }
+            let stmt_start = bytes[..i].iter().rposition(|&c| c == b';' || c == b'{').map_or(0, |p| p + 1);
+            let before = &code[stmt_start..i];
+            if before.contains("printf") || before.contains("print") {
+                return true;
+            }
         }
     }
     false
@@ -64,6 +71,7 @@ static AWK_POLICY: FlagPolicy = FlagPolicy {
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 fn is_safe_awk(tokens: &[Token]) -> bool {
@@ -138,6 +146,12 @@ mod tests {
         awk_regex_pipe_in_char_class: "awk '/[|&]/ {print}' file.txt",
         awk_regex_mixed_with_math: "awk '/error|warn/ {c++} END{print c>=0 ? c : 0}' log.txt",
         awk_no_program_just_flag: "awk --version",
+        awk_comparison_gt: "awk 'length > 80' file.txt",
+        awk_comparison_gt_print: "awk 'length > 80 {print}' file.txt",
+        awk_comparison_nr_gt: "awk 'NR > 5' file.txt",
+        awk_comparison_field_gt: "awk '$1 > 100 {print $0}' file.txt",
+        awk_comparison_gt_conditional: "awk '{if(length($0) > 80) print NR}' file.txt",
+        awk_comparison_gt_multi: "awk 'NR > 5 && NR < 20' file.txt",
     }
 
     denied! {

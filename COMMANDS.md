@@ -1795,9 +1795,10 @@ Aliases: `egrep`, `fgrep`
 
 ### `head` (https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation)
 
-- Allowed standalone flags: -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -V, -h, -q, -v, -z, --help, --quiet, --silent, --verbose, --version, --zero-terminated
+- Allowed standalone flags: -V, -h, -q, -v, -z, --help, --quiet, --silent, --verbose, --version, --zero-terminated
 - Allowed valued flags: -c, -n, --bytes, --lines
 - Bare invocation allowed
+- Numeric shorthand accepted (e.g. -20 for -n 20)
 
 ### `helm` (https://helm.sh/docs/helm/)
 
@@ -3385,9 +3386,10 @@ Aliases: `python`
 
 ### `tail` (https://www.gnu.org/software/coreutils/manual/coreutils.html#tail-invocation)
 
-- Allowed standalone flags: -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -F, -V, -f, -h, -q, -r, -v, -z, --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated
+- Allowed standalone flags: -F, -V, -f, -h, -q, -r, -v, -z, --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated
 - Allowed valued flags: -b, -c, -n, --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval
 - Bare invocation allowed
+- Numeric shorthand accepted (e.g. -20 for -n 20)
 
 ### `tailscale` (https://tailscale.com/kb/1080/cli)
 

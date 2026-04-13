@@ -12,6 +12,7 @@ static SYSCTL_POLICY: FlagPolicy = FlagPolicy {
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 pub(crate) fn is_safe_sysctl(tokens: &[Token]) -> Verdict {

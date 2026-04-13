@@ -43,6 +43,7 @@ static FZF_POLICY: FlagPolicy = FlagPolicy {
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 fn bind_value_is_safe(val: &str) -> bool {

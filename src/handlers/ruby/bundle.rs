@@ -8,6 +8,7 @@ static BUNDLE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     bare: true,
     max_positional: Some(1),
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 static BUNDLE_CONFIG_GET_POLICY: FlagPolicy = FlagPolicy {
@@ -16,6 +17,7 @@ static BUNDLE_CONFIG_GET_POLICY: FlagPolicy = FlagPolicy {
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 static HELP_ONLY: FlagPolicy = FlagPolicy {
@@ -24,6 +26,7 @@ static HELP_ONLY: FlagPolicy = FlagPolicy {
     bare: false,
     max_positional: Some(0),
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 static BUNDLE_EXEC_SAFE: WordSet = WordSet::new(&[
@@ -36,6 +39,7 @@ static RAILS_ROUTES_POLICY: FlagPolicy = FlagPolicy {
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 static RAILS_TEST_POLICY: FlagPolicy = FlagPolicy {
@@ -48,6 +52,7 @@ static RAILS_TEST_POLICY: FlagPolicy = FlagPolicy {
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 static RAILS_NOTES_POLICY: FlagPolicy = FlagPolicy {
@@ -56,6 +61,7 @@ static RAILS_NOTES_POLICY: FlagPolicy = FlagPolicy {
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 static RAILS_BARE_SUBS: WordSet = WordSet::new(&[

@@ -176,6 +176,9 @@ safe! {
     newline_echo_echo: "echo foo\necho bar",
     newline_ls_cat: "ls\ncat file.txt",
 
+    head_numeric_dash: "head -20 file.txt",
+    tail_numeric_dash: "tail -100 log.txt",
+    head_numeric_with_flags: "head -q -50 file.txt",
     pipeline_git_log_head: "git log --oneline -20 | head -5",
     pipeline_git_show_grep: "git show HEAD:file.rb | grep pattern",
     pipeline_gh_api: "gh api repos/o/r/contents/f --jq .content | base64 -d | head -50",

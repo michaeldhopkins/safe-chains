@@ -83,6 +83,7 @@ static SED_POLICY: FlagPolicy = FlagPolicy {
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 fn is_safe_sed(tokens: &[Token]) -> bool {
