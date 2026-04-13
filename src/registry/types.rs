@@ -24,6 +24,8 @@ pub(super) struct TomlCommand {
     #[serde(default)]
     pub positional_style: Option<bool>,
     #[serde(default)]
+    pub numeric_dash: Option<bool>,
+    #[serde(default)]
     pub standalone: Vec<String>,
     #[serde(default)]
     pub valued: Vec<String>,
@@ -66,6 +68,8 @@ pub(super) struct TomlSub {
     pub max_positional: Option<usize>,
     #[serde(default)]
     pub positional_style: Option<bool>,
+    #[serde(default)]
+    pub numeric_dash: Option<bool>,
     #[serde(default)]
     pub standalone: Vec<String>,
     #[serde(default)]
@@ -181,4 +185,5 @@ pub struct OwnedPolicy {
     pub bare: bool,
     pub max_positional: Option<usize>,
     pub flag_style: FlagStyle,
+    pub numeric_dash: bool,
 }

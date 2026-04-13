@@ -44,6 +44,7 @@ pub struct FlagPolicy {
     pub bare: bool,
     pub max_positional: Option<usize>,
     pub flag_style: FlagStyle,
+    pub numeric_dash: bool,
 }
 
 impl FlagPolicy {
@@ -64,6 +65,9 @@ impl FlagPolicy {
         if self.flag_style == FlagStyle::Positional {
             lines.push("- Hyphen-prefixed positional arguments accepted".to_string());
         }
+        if self.numeric_dash {
+            lines.push("- Numeric shorthand accepted (e.g. -20 for -n 20)".to_string());
+        }
         if lines.is_empty() && !self.bare {
             return "- Positional arguments only".to_string();
         }
@@ -80,6 +84,7 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
         policy.bare,
         policy.max_positional,
         policy.flag_style,
+        policy.numeric_dash,
     )
 }
 
@@ -90,6 +95,7 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
     bare: bool,
     max_positional: Option<usize>,
     flag_style: FlagStyle,
+    numeric_dash: bool,
 ) -> bool {
     if tokens.len() == 1 {
         return bare;
@@ -107,6 +113,11 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
 
         if !t.starts_with('-') {
             positionals += 1;
+            i += 1;
+            continue;
+        }
+
+        if numeric_dash && t.len() > 1 && t[1..].bytes().all(|b| b.is_ascii_digit()) {
             i += 1;
             continue;
         }
@@ -185,6 +196,7 @@ mod tests {
         bare: false,
         max_positional: None,
         flag_style: FlagStyle::Strict,
+        numeric_dash: false,
     };
 
     fn toks(words: &[&str]) -> Vec<Token> {
@@ -204,6 +216,7 @@ mod tests {
             bare: true,
             max_positional: None,
             flag_style: FlagStyle::Strict,
+            numeric_dash: false,
         };
         assert!(check(&toks(&["uname"]), &policy));
     }
@@ -312,6 +325,7 @@ mod tests {
         bare: true,
         max_positional: Some(1),
         flag_style: FlagStyle::Strict,
+        numeric_dash: false,
     };
 
     #[test]
@@ -350,6 +364,7 @@ mod tests {
         bare: true,
         max_positional: None,
         flag_style: FlagStyle::Positional,
+        numeric_dash: false,
     };
 
     #[test]
@@ -395,8 +410,66 @@ mod tests {
             bare: true,
             max_positional: Some(2),
             flag_style: FlagStyle::Positional,
+            numeric_dash: false,
         };
         assert!(check(&toks(&["echo", "--unknown", "hello"]), &policy));
         assert!(!check(&toks(&["echo", "--a", "--b", "--c"]), &policy));
+    }
+
+    static NUMERIC_DASH_POLICY: FlagPolicy = FlagPolicy {
+        standalone: WordSet::flags(&[
+            "--help", "--quiet", "--verbose", "--version",
+            "-V", "-h", "-q", "-v", "-z",
+        ]),
+        valued: WordSet::flags(&["--bytes", "--lines", "-c", "-n"]),
+        bare: true,
+        max_positional: None,
+        flag_style: FlagStyle::Strict,
+        numeric_dash: true,
+    };
+
+    #[test]
+    fn numeric_dash_single_digit() {
+        assert!(check(&toks(&["head", "-5"]), &NUMERIC_DASH_POLICY));
+    }
+
+    #[test]
+    fn numeric_dash_multi_digit() {
+        assert!(check(&toks(&["head", "-20"]), &NUMERIC_DASH_POLICY));
+    }
+
+    #[test]
+    fn numeric_dash_large_number() {
+        assert!(check(&toks(&["head", "-1000"]), &NUMERIC_DASH_POLICY));
+    }
+
+    #[test]
+    fn numeric_dash_with_file_arg() {
+        assert!(check(&toks(&["head", "-20", "file.txt"]), &NUMERIC_DASH_POLICY));
+    }
+
+    #[test]
+    fn numeric_dash_with_other_flags() {
+        assert!(check(&toks(&["head", "-q", "-20", "file.txt"]), &NUMERIC_DASH_POLICY));
+    }
+
+    #[test]
+    fn numeric_dash_zero() {
+        assert!(check(&toks(&["head", "-0"]), &NUMERIC_DASH_POLICY));
+    }
+
+    #[test]
+    fn numeric_dash_still_rejects_unknown_flags() {
+        assert!(!check(&toks(&["head", "-x"]), &NUMERIC_DASH_POLICY));
+    }
+
+    #[test]
+    fn numeric_dash_rejects_mixed_alpha_num() {
+        assert!(!check(&toks(&["head", "-20x"]), &NUMERIC_DASH_POLICY));
+    }
+
+    #[test]
+    fn numeric_dash_disabled_rejects_multi_digit() {
+        assert!(!check(&toks(&["grep", "-20", "pattern"]), &TEST_POLICY));
     }
 }

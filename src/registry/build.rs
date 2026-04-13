@@ -11,6 +11,7 @@ pub(super) fn build_policy(
     bare: Option<bool>,
     max_positional: Option<usize>,
     positional_style: Option<bool>,
+    numeric_dash: Option<bool>,
 ) -> OwnedPolicy {
     OwnedPolicy {
         standalone,
@@ -22,6 +23,7 @@ pub(super) fn build_policy(
         } else {
             FlagStyle::Strict
         },
+        numeric_dash: numeric_dash.unwrap_or(false),
     }
 }
 
@@ -32,6 +34,7 @@ fn allow_all_policy() -> OwnedPolicy {
         bare: true,
         max_positional: None,
         flag_style: FlagStyle::Positional,
+        numeric_dash: false,
     }
 }
 
@@ -88,6 +91,7 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
         toml.bare,
         toml.max_positional,
         toml.positional_style,
+        toml.numeric_dash,
     );
     let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
 
@@ -212,6 +216,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
         toml.bare,
         toml.max_positional,
         toml.positional_style,
+        toml.numeric_dash,
     );
 
     let level = toml.level.unwrap_or(TomlLevel::Inert).into();

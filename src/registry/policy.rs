@@ -11,5 +11,6 @@ pub(super) fn check_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {
         policy.bare,
         policy.max_positional,
         policy.flag_style,
+        policy.numeric_dash,
     )
 }

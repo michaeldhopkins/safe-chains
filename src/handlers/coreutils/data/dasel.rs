@@ -16,6 +16,7 @@ static DASEL_POLICY: FlagPolicy = FlagPolicy {
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 static MUTATING_SUBS: WordSet = WordSet::new(&["delete", "put"]);

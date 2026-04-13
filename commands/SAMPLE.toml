@@ -67,6 +67,9 @@
 # bare = false                           # false = requires at least one argument
 # # max_positional = 2                   # optional; limits positional arg count
 # # positional_style = true              # optional; treats unknown -flags as args
+# # numeric_dash = true                  # optional; accepts -NUMBER shorthand
+#                                        #   (e.g. head -20 ≡ head -n 20).
+#                                        #   Only for commands with POSIX -number legacy syntax.
 # standalone = [                         # flags that take no value
 #     "--count", "--help", "--recursive", "--version",
 #     "-c", "-h", "-i", "-r", "-V",

@@ -25,6 +25,7 @@ static SK_POLICY: FlagPolicy = FlagPolicy {
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 static HISTORY_FLAGS: WordSet = WordSet::flags(&["--history"]);

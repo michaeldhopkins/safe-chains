@@ -33,6 +33,7 @@ static GLAB_LIST_POLICY: FlagPolicy = FlagPolicy {
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -48,6 +49,7 @@ static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
@@ -62,6 +64,7 @@ static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 static GLAB_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
@@ -76,6 +79,7 @@ static GLAB_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     bare: true,
     max_positional: None,
     flag_style: FlagStyle::Strict,
+    numeric_dash: false,
 };
 
 fn glab_action_policy(action: &str) -> &'static FlagPolicy {

@@ -20,6 +20,7 @@ static MLR_POLICY: FlagPolicy = FlagPolicy {
     bare: false,
     max_positional: None,
     flag_style: FlagStyle::Positional,
+    numeric_dash: false,
 };
 
 fn is_safe_mlr(tokens: &[Token]) -> Verdict {
