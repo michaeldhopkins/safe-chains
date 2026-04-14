@@ -92,42 +92,49 @@ fn heredoc_safe() {
 
 #[test]
 fn gh_api_bare_endpoint() {
-    assert!(check("gh api repos/owner/repo/pulls"));
-    assert!(check("gh api repos/owner/repo/issues"));
-    assert!(check("gh api repos/owner/repo/commits"));
-    assert!(check("gh api repos/owner/repo/releases"));
-    assert!(check("gh api repos/owner/repo/branches"));
-    assert!(check("gh api repos/owner/repo/tags"));
-    assert!(check("gh api repos/owner/repo/contributors"));
-    assert!(check("gh api repos/owner/repo/languages"));
-    assert!(check("gh api repos/owner/repo/topics"));
-    assert!(check("gh api repos/owner/repo/readme"));
-    assert!(check("gh api repos/owner/repo/license"));
-    assert!(check("gh api repos/owner/repo/contents/src/main.rs"));
-    assert!(check("gh api repos/owner/repo/git/refs"));
-    assert!(check("gh api repos/owner/repo/git/trees/main"));
-    assert!(check("gh api repos/owner/repo/actions/runs"));
-    assert!(check("gh api repos/owner/repo/actions/workflows"));
-    assert!(check("gh api repos/owner/repo/check-runs/123"));
-    assert!(check("gh api repos/owner/repo/check-suites/456"));
-    assert!(check("gh api repos/owner/repo/deployments"));
-    assert!(check("gh api repos/owner/repo/milestones"));
-    assert!(check("gh api repos/owner/repo/labels"));
-    assert!(check("gh api repos/owner/repo/stargazers"));
-    assert!(check("gh api repos/owner/repo/forks"));
-    assert!(check("gh api repos/owner/repo/collaborators"));
-    assert!(check("gh api user"));
-    assert!(check("gh api user/repos"));
-    assert!(check("gh api users/octocat"));
-    assert!(check("gh api users/octocat/repos"));
-    assert!(check("gh api orgs/github"));
-    assert!(check("gh api orgs/github/repos"));
-    assert!(check("gh api orgs/github/members"));
-    assert!(check("gh api search/repositories?q=rust"));
-    assert!(check("gh api rate_limit"));
-    assert!(check("gh api notifications"));
-    assert!(check("gh api gists"));
+    for endpoint in GH_API_BARE_ENDPOINTS {
+        let cmd = format!("gh api {endpoint}");
+        assert!(check(&cmd), "expected safe: {cmd}");
+    }
 }
+
+const GH_API_BARE_ENDPOINTS: &[&str] = &[
+    "repos/owner/repo/pulls",
+    "repos/owner/repo/issues",
+    "repos/owner/repo/commits",
+    "repos/owner/repo/releases",
+    "repos/owner/repo/branches",
+    "repos/owner/repo/tags",
+    "repos/owner/repo/contributors",
+    "repos/owner/repo/languages",
+    "repos/owner/repo/topics",
+    "repos/owner/repo/readme",
+    "repos/owner/repo/license",
+    "repos/owner/repo/contents/src/main.rs",
+    "repos/owner/repo/git/refs",
+    "repos/owner/repo/git/trees/main",
+    "repos/owner/repo/actions/runs",
+    "repos/owner/repo/actions/workflows",
+    "repos/owner/repo/check-runs/123",
+    "repos/owner/repo/check-suites/456",
+    "repos/owner/repo/deployments",
+    "repos/owner/repo/milestones",
+    "repos/owner/repo/labels",
+    "repos/owner/repo/stargazers",
+    "repos/owner/repo/forks",
+    "repos/owner/repo/collaborators",
+    "user",
+    "user/repos",
+    "users/octocat",
+    "users/octocat/repos",
+    "orgs/github",
+    "orgs/github/repos",
+    "orgs/github/members",
+    "search/repositories?q=rust",
+    "rate_limit",
+    "notifications",
+    "gists",
+];
 
 #[test]
 fn gh_api_pr_review_patterns() {

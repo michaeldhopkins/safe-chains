@@ -682,6 +682,10 @@ Aliases: `@biomejs/biome`
 - Allowed standalone flags: --diff, --help, --no-auto-fetch, --print, --version, -V, -d, -h, -p
 - Bare invocation allowed
 
+### `break / continue` (https://www.gnu.org/software/bash/manual/bash.html#index-break)
+
+- Bare invocation or a single non-negative integer level (e.g. `break`, `break 2`).
+
 ### `brew` (https://docs.brew.sh/Manpage)
 
 - **--prefix**: Flags: --help, -h, -q, -v
@@ -864,6 +868,7 @@ Aliases: `clang++`
 - **mcp reset-project-choices**: Positional args accepted
 - **plugin disable**: Positional args accepted
 - **plugin enable**: Positional args accepted
+- **plugin info**: Positional args accepted
 - **plugin install**: Positional args accepted
 - **plugin list**: Positional args accepted
 - **plugin marketplace add**: Positional args accepted
@@ -875,6 +880,7 @@ Aliases: `clang++`
 - **plugin validate**: Positional args accepted
 - **plugins disable**: Positional args accepted
 - **plugins enable**: Positional args accepted
+- **plugins info**: Positional args accepted
 - **plugins install**: Positional args accepted
 - **plugins list**: Positional args accepted
 - **plugins marketplace add**: Positional args accepted
@@ -1937,6 +1943,10 @@ Aliases: `egrep`, `fgrep`
 - Requires --check-only, --diff, -c. - Allowed standalone flags: --check-only, --diff, --help, --quiet, --show-config, --verbose, --version, -c, -V, -h, -q, -v
 - Allowed valued flags: --filter-files, --line-length, --multi-line, --profile, --project, --settings-file, --skip, --skip-glob, --src, -l, -m
 
+### `jai` (https://jai.scs.stanford.edu/)
+
+- Recursively validates the inner command.
+
 ### `jaq` (https://github.com/01mf02/jaq)
 
 - Allowed standalone flags: --compact-output, --exit-status, --help, --join-output, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --version, -C, -M, -R, -S, -V, -c, -e, -h, -j, -n, -r, -s
@@ -2071,6 +2081,23 @@ Aliases: `egrep`, `fgrep`
 
 - Requires --dump, --evaluate, --list, --summary, --variables, -l. - Allowed standalone flags: --dump, --evaluate, --help, --list, --summary, --unsorted, --variables, --version, -l, -u
 - Allowed valued flags: --color, --dump-format, --justfile, --list-heading, --list-prefix, --list-submodules, -f
+
+### `kafka-console-consumer` (https://kafka.apache.org/documentation/#basic_ops_consumer)
+
+- Allowed standalone flags: --help, -h, --version, --from-beginning, --skip-message-on-error, --enable-systest-events
+- Allowed valued flags: --bootstrap-server, --consumer-property, --consumer.config, --consumer-config, --formatter, --formatter-config, --property, --group, --isolation-level, --key-deserializer, --value-deserializer, --max-messages, --timeout-ms, --offset, --partition, --topic, --include, --whitelist
+
+### `kafka-consumer-groups` (https://kafka.apache.org/documentation/#basic_ops_consumer_group)
+
+- **--describe**: Flags: --help, -h, --all-groups, --members, --offsets, --state, --verbose. Valued: --bootstrap-server, --command-config, --group, --timeout
+- **--list**: Flags: --help, -h. Valued: --bootstrap-server, --command-config, --state
+- Allowed standalone flags: --help, -h, --version
+
+### `kafka-topics` (https://kafka.apache.org/documentation/#basic_ops_add_topic)
+
+- **--describe**: Flags: --help, -h, --unavailable-partitions, --under-replicated-partitions, --under-min-isr-partitions, --at-min-isr-partitions, --exclude-internal. Valued: --bootstrap-server, --command-config, --topic, --topic-id, --topic-id-type, --exclude-topic, --partition
+- **--list**: Flags: --help, -h, --exclude-internal. Valued: --bootstrap-server, --command-config, --topic, --topic-id, --topic-id-type, --exclude-topic
+- Allowed standalone flags: --help, -h, --version
 
 ### `keytool` (https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html)
 
@@ -2451,6 +2478,11 @@ Aliases: `mlocate`, `plocate`
 - Allowed standalone flags: --bail, --check-leaks, --color, --diff, --dry-run, --exit, --forbid-only, --forbid-pending, --full-trace, --help, --inline-diffs, --invert, --list-files, --list-reporters, --no-color, --no-diff, --no-timeouts, --parallel, --quiet, --recursive, --sort, --version, -A, -R, -V, -b, -c, -h
 - Allowed valued flags: --config, --delay, --extension, --fgrep, --file, --grep, --ignore, --jobs, --node-option, --package, --reporter, --reporter-option, --require, --retries, --slow, --spec, --timeout, --ui, -f, -g, -j, -n, -r, -s, -t, -u
 - Bare invocation allowed
+
+### `monolith` (https://github.com/Y2Z/monolith)
+
+- Allowed standalone flags: -a, -c, -e, -f, -F, -h, -i, -I, -j, -k, -m, -M, -n, -q, -v, -V, --help, --version, --no-audio, --no-css, --no-fonts, --no-frames, --no-images, --isolate, --no-js, --insecure, --unwrap-noscript, --silent, --no-video, --no-metadata
+- Allowed valued flags: -b, -B, -C, -d, -E, -t, -u, --base-url, --blacklist-domains, --cookies, --domain, --encoding, --timeout, --user-agent
 
 ### `more` (https://man7.org/linux/man-pages/man1/more.1.html)
 

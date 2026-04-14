@@ -144,11 +144,15 @@ fn dispatch_wrapper(
             i += 2;
             continue;
         }
+        if valued.iter().any(|f| t.as_str().starts_with(&format!("{f}="))) {
+            i += 1;
+            continue;
+        }
         if standalone.iter().any(|f| t == f.as_str()) {
             i += 1;
             continue;
         }
-        i += 1;
+        return Verdict::Denied;
     }
     for _ in 0..positional_skip {
         if i >= tokens.len() {

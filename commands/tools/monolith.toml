@@ -1,0 +1,19 @@
+[[command]]
+name = "monolith"
+url = "https://github.com/Y2Z/monolith"
+level = "Inert"
+bare = false
+max_positional = 1
+standalone = [
+    "-a", "-c", "-e", "-f", "-F", "-h", "-i", "-I", "-j",
+    "-k", "-m", "-M", "-n", "-q", "-v", "-V",
+    "--help", "--version", "--no-audio", "--no-css", "--no-fonts",
+    "--no-frames", "--no-images", "--isolate", "--no-js",
+    "--insecure", "--unwrap-noscript", "--silent",
+    "--no-video", "--no-metadata",
+]
+valued = [
+    "-b", "-B", "-C", "-d", "-E", "-t", "-u",
+    "--base-url", "--blacklist-domains", "--cookies",
+    "--domain", "--encoding", "--timeout", "--user-agent",
+]

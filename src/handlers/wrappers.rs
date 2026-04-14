@@ -12,7 +12,7 @@ pub fn is_safe_env(tokens: &[Token]) -> Verdict {
         } else if tokens[i] == "-u" || tokens[i] == "--unset" {
             i += 2;
         } else {
-            i += 1;
+            return Verdict::Denied;
         }
     }
     while i < tokens.len() && !tokens[i].starts_with("-") && tokens[i].contains("=") {
@@ -34,6 +34,11 @@ static HYPERFINE_FLAGS_WITH_ARG: WordSet = WordSet::new(&[
     "-M", "-S", "-c", "-m", "-n", "-p", "-r", "-s", "-w",
 ]);
 
+static HYPERFINE_FLAGS_NO_ARG: WordSet = WordSet::new(&[
+    "--help", "--ignore-failure", "--no-color", "--show-output", "--version",
+    "-N", "-V", "-h", "-i", "-u",
+]);
+
 pub fn is_safe_hyperfine(tokens: &[Token]) -> Verdict {
     let mut combined = Verdict::Allowed(SafetyLevel::Inert);
     let mut i = 1;
@@ -45,18 +50,27 @@ pub fn is_safe_hyperfine(tokens: &[Token]) -> Verdict {
         }
         if t.starts_with("-") {
             if t.contains("=") {
-                i += 1;
-                continue;
+                let name = t.as_str().split_once('=').map_or("", |(k, _)| k);
+                if HYPERFINE_FLAGS_WITH_ARG.iter().any(|f| f == name)
+                    || HYPERFINE_FLAGS_NO_ARG.iter().any(|f| f == name)
+                {
+                    i += 1;
+                    continue;
+                }
+                return Verdict::Denied;
             }
             if HYPERFINE_FLAGS_WITH_ARG.contains(t) {
                 if t.is_one_of(&["-p", "--prepare", "-c", "--cleanup", "-s", "--setup"]) {
                     return Verdict::Denied;
                 }
                 i += 2;
-            } else {
-                i += 1;
+                continue;
             }
-            continue;
+            if HYPERFINE_FLAGS_NO_ARG.contains(t) {
+                i += 1;
+                continue;
+            }
+            return Verdict::Denied;
         }
         let v = crate::command_verdict(t.as_str());
         if !v.is_allowed() {
@@ -168,5 +182,12 @@ mod tests {
         dotenv_rm_denied: "dotenv rm -rf /",
         dotenv_flag_rm_denied: "dotenv -f .env rm -rf /",
         dotenv_nested_bash_denied: "dotenv bash -c 'ls && rm -rf /'",
+        timeout_unknown_flag_denied: "timeout --xyzzy 60 cat /tmp/x",
+        nice_unknown_flag_denied: "nice --xyzzy cat /tmp/x",
+        dotenv_unknown_flag_denied: "dotenv --xyzzy ls",
+        env_unknown_flag_denied: "env --xyzzy FOO=bar cat",
+        env_unknown_short_flag_denied: "env -x FOO=bar ls",
+        hyperfine_unknown_flag_denied: "hyperfine --xyzzy 'ls'",
+        hyperfine_unknown_eq_flag_denied: "hyperfine --xyzzy=foo 'ls'",
     }
 }

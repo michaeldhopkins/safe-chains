@@ -54,6 +54,7 @@ pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
         ("bundle_config", ruby::bundle::check_bundle_config as HandlerFn),
         ("bundle_exec", ruby::bundle::check_bundle_exec as HandlerFn),
         ("git_remote", vcs::git::check_git_remote as HandlerFn),
+        ("plutil_convert", system::plutil::check_plutil_convert as HandlerFn),
     ])
 }
 
@@ -77,7 +78,7 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
 
 #[cfg(test)]
 const HANDLED_CMDS: &[&str] = &[
-    "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine", "dotenv",
+    "sh", "bash", "xargs", "timeout", "time", "env", "nice", "ionice", "hyperfine", "dotenv", "jai",
     "git", "jj", "gh", "glab", "jjpr", "tea", "basecamp",
     "jira", "linear", "notion", "td", "todoist", "trello",
     "npm", "yarn", "pnpm", "bun", "deno", "npx", "bunx", "nvm", "fnm", "volta", "mocha",
@@ -104,6 +105,8 @@ const HANDLED_CMDS: &[&str] = &[
     "doctl", "hcloud", "vultr-cli", "exo", "scw", "linode-cli",
     "ansible-playbook", "ansible-inventory", "ansible-doc", "ansible-config", "ansible-galaxy",
     "overmind", "tailscale", "tmux", "wg", "systemctl", "journalctl",
+    "kafka-topics", "kafka-console-consumer", "kafka-consumer-groups",
+    "monolith",
     "cloudflared", "ngrok", "ssh",
     "networksetup", "launchctl", "diskutil", "security", "csrutil", "log",
     "xcodebuild", "plutil", "xcode-select", "xcrun", "pkgutil", "lipo", "codesign", "spctl",
@@ -122,7 +125,7 @@ const HANDLED_CMDS: &[&str] = &[
     "dirname", "basename", "realpath", "readlink",
     "file", "stat", "du", "df", "tree", "cmp", "zipinfo", "tar", "unzip", "gzip",
     "true", "false",
-    "alias", "declare", "exit", "export", "hash", "printenv", "read", "type", "typeset", "wait", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
+    "alias", "break", "continue", "declare", "exit", "export", "hash", "printenv", "read", "type", "typeset", "wait", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
     "uname", "nproc", "uptime", "id", "groups", "tty", "locale", "cal", "sleep",
     "who", "w", "last", "lastlog",
     "ps", "top", "htop", "iotop", "procs", "dust", "lsof", "pgrep", "lsblk", "free",

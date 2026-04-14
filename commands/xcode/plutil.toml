@@ -17,3 +17,7 @@ standalone = ["--help", "-h"]
 name = "-type"
 bare = false
 standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "-convert"
+handler = "plutil_convert"

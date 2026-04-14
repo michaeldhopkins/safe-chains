@@ -32,20 +32,31 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
             continue;
         }
         if tokens[i].starts_with("-") {
-            i += 1;
-            continue;
+            return Verdict::Denied;
         }
         let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
         return crate::command_verdict(&inner);
     }
     Verdict::Allowed(SafetyLevel::Inert)
+}
 
+pub fn is_safe_loop_control(tokens: &[Token]) -> Verdict {
+    match tokens.len() {
+        1 => Verdict::Allowed(SafetyLevel::Inert),
+        2 if tokens[1].as_str().chars().all(|c| c.is_ascii_digit())
+            && !tokens[1].as_str().is_empty() =>
+        {
+            Verdict::Allowed(SafetyLevel::Inert)
+        }
+        _ => Verdict::Denied,
+    }
 }
 
 pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
         "sh" | "bash" => Some(is_safe_shell(tokens)),
         "xargs" => Some(is_safe_xargs(tokens)),
+        "break" | "continue" => Some(is_safe_loop_control(tokens)),
         _ => None,
     }
 }
@@ -59,6 +70,9 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
         CommandDoc::handler("xargs",
             "https://www.gnu.org/software/findutils/manual/html_mono/find.html#Invoking-xargs",
             "Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n, -P, -s, -E, -d, -0, -r, -t, -p, -x)."),
+        CommandDoc::handler("break / continue",
+            "https://www.gnu.org/software/bash/manual/bash.html#index-break",
+            "Bare invocation or a single non-negative integer level (e.g. `break`, `break 2`)."),
     ]
 }
 
@@ -67,6 +81,8 @@ pub(super) const REGISTRY: &[super::CommandEntry] = &[
     super::CommandEntry::Delegation { cmd: "sh" },
     super::CommandEntry::Delegation { cmd: "bash" },
     super::CommandEntry::Delegation { cmd: "xargs" },
+    super::CommandEntry::Positional { cmd: "break" },
+    super::CommandEntry::Positional { cmd: "continue" },
 ];
 
 #[cfg(test)]
@@ -97,6 +113,10 @@ mod tests {
         xargs_find_safe: "xargs find . -name '*.py'",
         xargs_sed_safe: "xargs sed 's/foo/bar/'",
         xargs_nested_bash_safe: "xargs bash -c 'git status'",
+        break_bare: "break",
+        break_numeric: "break 2",
+        continue_bare: "continue",
+        continue_numeric: "continue 1",
     }
 
     denied! {
@@ -110,5 +130,11 @@ mod tests {
         xargs_find_delete_denied: "xargs find . -delete",
         xargs_sort_output_denied: "xargs sort -o out.txt",
         xargs_nested_bash_chain_denied: "xargs bash -c 'ls && rm -rf /'",
+        xargs_unknown_flag_denied: "xargs --xyzzy cat",
+        break_non_numeric: "break evil",
+        break_too_many: "break 1 2",
+        break_flag: "break --help",
+        continue_non_numeric: "continue abc",
+        break_negative: "break -1",
     }
 }

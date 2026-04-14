@@ -66,6 +66,9 @@ positional_style = true
 name = "plugin"
 nested_bare = true
 [[command.sub.sub]]
+name = "info"
+positional_style = true
+[[command.sub.sub]]
 name = "disable"
 level = "SafeWrite"
 positional_style = true
@@ -113,6 +116,9 @@ positional_style = true
 [[command.sub]]
 name = "plugins"
 nested_bare = true
+[[command.sub.sub]]
+name = "info"
+positional_style = true
 [[command.sub.sub]]
 name = "disable"
 level = "SafeWrite"

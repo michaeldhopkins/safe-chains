@@ -1,0 +1,5 @@
+[[command]]
+name = "jai"
+url = "https://jai.scs.stanford.edu/"
+[command.wrapper]
+standalone = ["--casual", "--strict", "--bare"]

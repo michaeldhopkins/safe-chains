@@ -1,0 +1,38 @@
+[[command]]
+name = "kafka-topics"
+url = "https://kafka.apache.org/documentation/#basic_ops_add_topic"
+bare_flags = ["--help", "-h", "--version"]
+
+[command.wrapper]
+standalone = ["--exclude-internal"]
+valued = [
+    "--bootstrap-server", "--command-config",
+    "--topic", "--topic-id", "--topic-id-type",
+    "--exclude-topic",
+]
+
+[[command.sub]]
+name = "--list"
+bare = true
+standalone = ["--help", "-h", "--exclude-internal"]
+valued = [
+    "--bootstrap-server", "--command-config",
+    "--topic", "--topic-id", "--topic-id-type",
+    "--exclude-topic",
+]
+
+[[command.sub]]
+name = "--describe"
+bare = true
+standalone = [
+    "--help", "-h",
+    "--unavailable-partitions", "--under-replicated-partitions",
+    "--under-min-isr-partitions", "--at-min-isr-partitions",
+    "--exclude-internal",
+]
+valued = [
+    "--bootstrap-server", "--command-config",
+    "--topic", "--topic-id", "--topic-id-type",
+    "--exclude-topic",
+    "--partition",
+]

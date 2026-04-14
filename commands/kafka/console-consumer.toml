@@ -1,0 +1,22 @@
+[[command]]
+name = "kafka-console-consumer"
+url = "https://kafka.apache.org/documentation/#basic_ops_consumer"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "-h", "--version",
+    "--from-beginning",
+    "--skip-message-on-error",
+    "--enable-systest-events",
+]
+valued = [
+    "--bootstrap-server",
+    "--consumer-property", "--consumer.config", "--consumer-config",
+    "--formatter", "--formatter-config", "--property",
+    "--group",
+    "--isolation-level",
+    "--key-deserializer", "--value-deserializer",
+    "--max-messages", "--timeout-ms",
+    "--offset", "--partition",
+    "--topic", "--include", "--whitelist",
+]

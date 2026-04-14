@@ -1,3 +1,4 @@
+pub(crate) mod plutil;
 pub(crate) mod sysctl;
 mod tmux;
 

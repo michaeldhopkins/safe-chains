@@ -1,0 +1,31 @@
+[[command]]
+name = "kafka-consumer-groups"
+url = "https://kafka.apache.org/documentation/#basic_ops_consumer_group"
+bare_flags = ["--help", "-h", "--version"]
+
+[command.wrapper]
+standalone = ["--all-groups", "--members", "--offsets", "--state", "--verbose"]
+valued = [
+    "--bootstrap-server", "--command-config",
+    "--group", "--timeout",
+]
+
+[[command.sub]]
+name = "--list"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--bootstrap-server", "--command-config", "--state"]
+
+[[command.sub]]
+name = "--describe"
+bare = true
+standalone = [
+    "--help", "-h",
+    "--all-groups",
+    "--members", "--offsets", "--state",
+    "--verbose",
+]
+valued = [
+    "--bootstrap-server", "--command-config",
+    "--group", "--timeout",
+]

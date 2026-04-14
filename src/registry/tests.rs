@@ -1706,6 +1706,113 @@ use super::*;
         assert!(!crate::is_safe_command("fd"));
     }
 
+    #[test]
+    fn toml_kafka_topics_allowed() {
+        assert!(crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --list"));
+        assert!(crate::is_safe_command("kafka-topics --list --bootstrap-server localhost:9092"));
+        assert!(crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --describe --topic foo"));
+        assert!(crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --describe --under-replicated-partitions"));
+        assert!(crate::is_safe_command("kafka-topics --help"));
+    }
+
+    #[test]
+    fn toml_kafka_topics_denied() {
+        assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --delete --topic foo"));
+        assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --create --topic foo"));
+        assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --alter --topic foo"));
+        assert!(!crate::is_safe_command("kafka-topics --bootstrap-server localhost:9092 --list --create"));
+        assert!(!crate::is_safe_command("kafka-topics"));
+    }
+
+    #[test]
+    fn toml_kafka_consumer_groups_allowed() {
+        assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --list"));
+        assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --group acme --describe"));
+        assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group acme"));
+        assert!(crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --describe --all-groups"));
+    }
+
+    #[test]
+    fn toml_kafka_consumer_groups_denied() {
+        assert!(!crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --reset-offsets"));
+        assert!(!crate::is_safe_command("kafka-consumer-groups --bootstrap-server localhost:9092 --delete"));
+        assert!(!crate::is_safe_command("kafka-consumer-groups"));
+    }
+
+    #[test]
+    fn toml_kafka_console_consumer_allowed() {
+        assert!(crate::is_safe_command(
+            "kafka-console-consumer --bootstrap-server localhost:9092 --topic domain_events --from-beginning --max-messages 3 --timeout-ms 5000"
+        ));
+        assert!(crate::is_safe_command("kafka-console-consumer --bootstrap-server localhost:9092 --topic foo"));
+    }
+
+    #[test]
+    fn toml_kafka_console_consumer_denied() {
+        assert!(!crate::is_safe_command("kafka-console-consumer"));
+        assert!(!crate::is_safe_command("kafka-console-consumer --evil"));
+    }
+
+    #[test]
+    fn toml_monolith_allowed() {
+        assert!(crate::is_safe_command("monolith https://example.com"));
+        assert!(crate::is_safe_command("monolith -j -i https://example.com"));
+        assert!(crate::is_safe_command("monolith --no-audio --no-video https://example.com"));
+        assert!(crate::is_safe_command("monolith -C /tmp/cookies.txt https://example.com"));
+        assert!(crate::is_safe_command("monolith -u 'Mozilla/5.0' https://example.com"));
+        assert!(crate::is_safe_command("monolith --timeout 30 https://example.com"));
+        assert!(crate::is_safe_command("monolith https://example.com > /dev/null"));
+    }
+
+    #[test]
+    fn toml_monolith_denied() {
+        assert!(!crate::is_safe_command("monolith"));
+        assert!(!crate::is_safe_command("monolith https://example.com -o /tmp/out.html"));
+        assert!(!crate::is_safe_command("monolith -o - https://example.com"));
+        assert!(!crate::is_safe_command("monolith --unknown https://example.com"));
+    }
+
+    #[test]
+    fn toml_jai_allowed() {
+        assert!(crate::is_safe_command("jai cat /tmp/foo"));
+        assert!(crate::is_safe_command("jai grep pattern /tmp/foo"));
+        assert!(crate::is_safe_command("jai --casual rg pattern src/"));
+        assert!(crate::is_safe_command("jai --strict sleep 1"));
+        assert!(crate::is_safe_command("jai claude plugin info foo"));
+    }
+
+    #[test]
+    fn toml_jai_denied() {
+        assert!(!crate::is_safe_command("jai rm -rf /"));
+        assert!(!crate::is_safe_command("jai"));
+        assert!(!crate::is_safe_command("jai bash"));
+        assert!(!crate::is_safe_command("jai --unknown-flag cat /tmp/x"));
+        assert!(!crate::is_safe_command("jai --casual bash -c 'rm -rf /'"));
+        assert!(!crate::is_safe_command("jai -- rm -rf /"));
+    }
+
+    #[test]
+    fn toml_claude_plugin_info_allowed() {
+        assert!(crate::is_safe_command("claude plugin info acme@acme-plugins"));
+        assert!(crate::is_safe_command("claude plugins info acme@acme-plugins"));
+    }
+
+    #[test]
+    fn toml_plutil_convert_allowed() {
+        assert!(crate::is_safe_command("plutil -convert xml1 -o - /tmp/foo.plist"));
+        assert!(crate::is_safe_command("plutil -convert binary1 -o - /tmp/foo.plist"));
+        assert!(crate::is_safe_command("plutil -convert json -r -o - /tmp/foo.plist"));
+        assert!(crate::is_safe_command("plutil -convert xml1 -o -"));
+    }
+
+    #[test]
+    fn toml_plutil_convert_denied() {
+        assert!(!crate::is_safe_command("plutil -convert xml1 /tmp/foo.plist"));
+        assert!(!crate::is_safe_command("plutil -convert xml1 -o /tmp/out.plist /tmp/in.plist"));
+        assert!(!crate::is_safe_command("plutil -convert invalid -o - /tmp/in"));
+        assert!(!crate::is_safe_command("plutil -convert xml1 -e plist -o - /tmp/in"));
+    }
+
     fn check_toml_unknown(prefix: &str, kind: &DispatchKind, failures: &mut Vec<String>) {
         match kind {
             DispatchKind::Branching { subs, .. } => {

@@ -145,10 +145,11 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
 
 pub(crate) fn check_redirects(redirs: &[Redir]) -> bool {
     redirs.iter().all(|r| match r {
-        Redir::Write { target, .. } | Redir::Read { target, .. } => {
-            target.eval() == "/dev/null"
-        }
-        Redir::HereStr(_) | Redir::HereDoc { .. } | Redir::DupFd { .. } => true,
+        Redir::Write { target, .. } => target.eval() == "/dev/null",
+        Redir::Read { .. }
+        | Redir::HereStr(_)
+        | Redir::HereDoc { .. }
+        | Redir::DupFd { .. } => true,
     })
 }
 
@@ -219,6 +220,11 @@ mod tests {
         bg_ls_echo: "ls & echo done",
         newline_echo_echo: "echo foo\necho bar",
 
+        stdin_read_from_path: "wc -l < /tmp/foo.log",
+        stdin_read_from_etc: "grep foo < /etc/hosts",
+        stdin_read_in_subst: "while [ $(wc -l < /tmp/x) -lt 10 ]; do sleep 5; done",
+        stdin_read_in_for_body: "for i in 1 2; do cat < /tmp/x; done",
+
         here_string_grep: "grep -c , <<< 'hello,world,test'",
         heredoc_cat: "cat <<EOF\nhello world\nEOF",
         heredoc_quoted: "cat <<'EOF'\nhello\nEOF",
@@ -253,6 +259,7 @@ mod tests {
         redirect_to_file: "echo hello > file.txt",
         redirect_append: "cat file >> output.txt",
         redirect_stderr_file: "ls 2> errors.txt",
+        redirect_bidirectional_write_denied: "cat < /tmp/x > /tmp/y",
 
         subst_rm: "echo $(rm -rf /)",
         backtick_rm: "echo `rm -rf /`",

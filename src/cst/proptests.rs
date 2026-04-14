@@ -263,9 +263,7 @@ proptest! {
     fn redirect_safety(redirs in prop::collection::vec(arb_redir(), 1..4)) {
         let result = check::check_redirects(&redirs);
         let expected = redirs.iter().all(|r| match r {
-            Redir::Write { target, .. } | Redir::Read { target, .. } => {
-                target.eval() == "/dev/null"
-            }
+            Redir::Write { target, .. } => target.eval() == "/dev/null",
             _ => true,
         });
         prop_assert_eq!(result, expected);
