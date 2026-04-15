@@ -238,10 +238,10 @@ jobs:
           git tag "v${{ needs.check-version.outputs.version }}"
           git push origin "v${{ needs.check-version.outputs.version }}"
 
+      - uses: taiki-e/install-action@git-cliff
+
       - name: Generate release notes
-        run: |
-          cargo install git-cliff
-          git cliff --latest --strip all > RELEASE_NOTES.md
+        run: git cliff --latest --strip all > RELEASE_NOTES.md
 
       - name: Generate checksums
         run: |
