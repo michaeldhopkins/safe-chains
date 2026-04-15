@@ -173,15 +173,17 @@ guard_short = "-l"
 level = "Inert"
 bare = false
 standalone = [
-    "--all-features", "--frozen", "--help", "--keep-going",
+    "--all-features", "--allow-dirty", "--exclude-lockfile",
+    "--frozen", "--help", "--keep-going",
     "--list", "--locked", "--no-default-features",
-    "--no-metadata", "--offline", "--workspace",
+    "--no-metadata", "--no-verify", "--offline", "--workspace",
     "-h", "-l", "-q", "-v",
 ]
 valued = [
     "--color", "--config", "--exclude", "--features",
-    "--jobs", "--manifest-path", "--message-format",
-    "--package", "--target", "--target-dir",
+    "--index", "--jobs", "--lockfile-path",
+    "--manifest-path", "--message-format",
+    "--package", "--registry", "--target", "--target-dir",
     "-F", "-Z", "-j", "-p",
 ]
 
@@ -198,13 +200,15 @@ guard_short = "-n"
 level = "SafeRead"
 bare = false
 standalone = [
-    "--all-features", "--dry-run", "--frozen", "--help", "--keep-going",
-    "--locked", "--no-default-features", "--offline", "--workspace",
+    "--all-features", "--allow-dirty", "--dry-run",
+    "--frozen", "--help", "--keep-going",
+    "--locked", "--no-default-features", "--no-verify",
+    "--offline", "--workspace",
     "-h", "-n", "-q", "-v",
 ]
 valued = [
     "--color", "--config", "--exclude", "--features",
-    "--index", "--jobs", "--manifest-path",
+    "--index", "--jobs", "--lockfile-path", "--manifest-path",
     "--package", "--registry", "--target", "--target-dir",
     "-F", "-Z", "-j", "-p",
 ]
@@ -424,4 +428,297 @@ valued = [
     "--manifest-path", "--message-format", "--package",
     "--target",
     "-j", "-n", "-p",
+]
+
+[[command.sub]]
+name = "clean"
+level = "SafeWrite"
+standalone = [
+    "--doc", "--dry-run", "--frozen", "--help", "--locked",
+    "--offline", "--release", "--workspace",
+    "-h", "-n", "-q", "-r", "-v",
+]
+valued = [
+    "--color", "--config", "--lockfile-path", "--manifest-path",
+    "--package", "--profile", "--target", "--target-dir",
+    "-Z", "-p",
+]
+
+[[command.sub]]
+name = "fetch"
+level = "SafeWrite"
+standalone = [
+    "--frozen", "--help", "--locked", "--offline",
+    "-h", "-q", "-v",
+]
+valued = [
+    "--color", "--config", "--lockfile-path",
+    "--manifest-path", "--target",
+    "-Z",
+]
+
+[[command.sub]]
+name = "vendor"
+level = "SafeWrite"
+max_positional = 1
+standalone = [
+    "--frozen", "--help", "--locked", "--no-delete",
+    "--offline", "--respect-source-config", "--versioned-dirs",
+    "-h", "-q", "-v",
+]
+valued = [
+    "--color", "--config", "--lockfile-path",
+    "--manifest-path", "--sync",
+    "-Z", "-s",
+]
+
+[[command.sub]]
+name = "config"
+
+[[command.sub.sub]]
+name = "get"
+level = "Inert"
+max_positional = 1
+standalone = [
+    "--frozen", "--help", "--locked", "--offline",
+    "--show-origin",
+    "-h", "-q", "-v",
+]
+valued = [
+    "--color", "--config", "--format", "--merged",
+    "-Z",
+]
+
+[[command.sub]]
+name = "report"
+
+[[command.sub.sub]]
+name = "future-incompatibilities"
+level = "Inert"
+standalone = [
+    "--frozen", "--help", "--locked", "--offline",
+    "-h", "-q", "-v",
+]
+valued = [
+    "--color", "--config", "--id", "--package",
+    "-Z", "-p",
+]
+
+[[command.sub]]
+name = "udeps"
+level = "SafeRead"
+standalone = [
+    "--all", "--all-features", "--all-targets", "--benches",
+    "--bins", "--examples", "--frozen", "--help", "--keep-going",
+    "--lib", "--locked", "--no-default-features", "--offline",
+    "--release", "--tests", "--workspace", "--version",
+    "-V", "-h", "-q", "-v",
+]
+valued = [
+    "--backend", "--bench", "--bin", "--color", "--example",
+    "--exclude", "--features", "--jobs", "--manifest-path",
+    "--message-format", "--output", "--package", "--profile",
+    "--target", "--target-dir", "--test",
+    "-j", "-p",
+]
+
+[[command.sub]]
+name = "msrv"
+standalone = [
+    "--help", "--no-log", "--no-user-output", "--version",
+    "-V", "-h",
+]
+valued = [
+    "--log-level", "--log-target", "--manifest-path",
+    "--output-format", "--path",
+]
+
+[[command.sub.sub]]
+name = "find"
+level = "SafeRead"
+max_positional = 0
+standalone = [
+    "--all-features", "--bisect", "--help",
+    "--ignore-lockfile", "--include-all-patch-releases",
+    "--linear", "--no-check-feedback",
+    "--no-default-features", "--no-log", "--no-user-output",
+    "-h",
+]
+valued = [
+    "--component", "--features", "--log-level", "--log-target",
+    "--manifest-path", "--max", "--maximum", "--min", "--minimum",
+    "--output-format", "--path", "--release-source", "--target",
+]
+
+[[command.sub.sub]]
+name = "verify"
+level = "SafeRead"
+max_positional = 0
+standalone = [
+    "--all-features", "--help",
+    "--ignore-lockfile", "--include-all-patch-releases",
+    "--no-check-feedback", "--no-default-features",
+    "--no-log", "--no-user-output",
+    "-h",
+]
+valued = [
+    "--component", "--features", "--log-level", "--log-target",
+    "--manifest-path", "--max", "--maximum", "--min", "--minimum",
+    "--output-format", "--path", "--release-source",
+    "--rust-version", "--target",
+]
+
+[[command.sub.sub]]
+name = "list"
+level = "Inert"
+standalone = [
+    "--help", "--no-log", "--no-user-output",
+    "-h",
+]
+valued = [
+    "--log-level", "--log-target", "--manifest-path",
+    "--output-format", "--path", "--variant",
+]
+
+[[command.sub.sub]]
+name = "show"
+level = "Inert"
+standalone = [
+    "--help", "--no-log", "--no-user-output",
+    "-h",
+]
+valued = [
+    "--log-level", "--log-target", "--manifest-path",
+    "--output-format", "--path",
+]
+
+[[command.sub]]
+name = "public-api"
+level = "SafeRead"
+standalone = [
+    "--all-features", "--help", "--no-default-features",
+    "--simplified", "--version",
+    "-V", "-h", "-s",
+]
+valued = [
+    "--color", "--features", "--manifest-path", "--omit",
+    "--package", "--target",
+    "-F", "-p",
+]
+
+[[command.sub]]
+name = "about"
+standalone = [
+    "--help", "--version",
+    "-V", "-h",
+]
+valued = ["--color", "-L"]
+
+[[command.sub.sub]]
+name = "generate"
+level = "SafeRead"
+max_positional = 1
+standalone = [
+    "--all-features", "--fail", "--frozen", "--help",
+    "--locked", "--no-default-features", "--offline",
+    "--workspace",
+    "-V", "-h",
+]
+valued = [
+    "--color", "--config", "--features", "--format",
+    "--manifest-path", "--name", "--target", "--threshold",
+    "-L", "-c", "-m", "-n",
+]
+
+[[command.sub]]
+name = "vet"
+standalone = [
+    "--frozen", "--help", "--locked",
+    "--no-all-features", "--no-default-features",
+    "--no-minimize-exemptions", "--no-registry-suggestions",
+    "--version",
+    "-V", "-h",
+]
+valued = [
+    "--cache-dir", "--cargo-arg", "--features",
+    "--filter-graph", "--manifest-path",
+    "--output-format", "--store-path", "--verbose",
+]
+
+[[command.sub.sub]]
+name = "check"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "suggest"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "dump-graph"
+level = "Inert"
+standalone = ["--help", "-h"]
+valued = ["--depth"]
+
+[[command.sub.sub]]
+name = "explain-audit"
+level = "Inert"
+max_positional = 3
+standalone = ["--help", "-h"]
+valued = ["--criteria"]
+
+[[command.sub]]
+name = "geiger"
+level = "SafeRead"
+standalone = [
+    "--all", "--all-dependencies", "--all-features",
+    "--all-targets", "--build-dependencies",
+    "--dev-dependencies", "--forbid-only", "--frozen",
+    "--help", "--include-tests", "--invert", "--locked",
+    "--no-default-features", "--no-indent", "--offline",
+    "--prefix-depth", "--quiet", "--verbose", "--version",
+    "-V", "-a", "-f", "-h", "-i", "-q", "-v",
+]
+valued = [
+    "--color", "--features", "--format", "--manifest-path",
+    "--output-format", "--package", "--section-name", "--target",
+    "-Z", "-p",
+]
+
+[[command.sub]]
+name = "criterion"
+level = "SafeRead"
+standalone = [
+    "--all", "--all-features", "--all-targets", "--benches",
+    "--bins", "--debug", "--examples", "--frozen", "--help",
+    "--lib", "--locked", "--no-default-features",
+    "--no-fail-fast", "--no-run", "--offline", "--tests",
+    "--verbose", "--version", "--workspace",
+    "-V", "-h", "-v",
+]
+valued = [
+    "--bench", "--bin", "--color", "--criterion-manifest-path",
+    "--example", "--exclude", "--features", "--history-description",
+    "--history-id", "--jobs", "--manifest-path", "--message-format",
+    "--output-format", "--package", "--plotting-backend",
+    "--target", "--target-dir", "--test",
+    "-Z", "-j", "-p",
+]
+
+[[command.sub]]
+name = "cyclonedx"
+level = "SafeWrite"
+standalone = [
+    "--all", "--all-features", "--help",
+    "--license-strict", "--no-default-features", "--quiet",
+    "--target-in-filename", "--top-level", "--verbose",
+    "--version",
+    "-V", "-a", "-h", "-q", "-v",
+]
+valued = [
+    "--describe", "--features", "--format",
+    "--license-accept-named", "--manifest-path",
+    "--override-filename", "--spec-version", "--target",
+    "-F", "-f",
 ]
