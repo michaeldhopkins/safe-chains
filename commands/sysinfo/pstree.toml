@@ -1,0 +1,18 @@
+[[command]]
+name = "pstree"
+url = "https://man7.org/linux/man-pages/man1/pstree.1.html"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = [
+    "--help", "--version",
+    "--arguments", "--ascii", "--compact-not", "--vt100", "--highlight-all",
+    "--long", "--numeric-sort", "--show-pids", "--show-parents", "--hide-threads",
+    "--unicode", "--uid-changes", "--ns-changes", "--security-context", "--wide",
+    "-V", "-a", "-A", "-c", "-G", "-h", "-l", "-n", "-p", "-s", "-T",
+    "-U", "-u", "-w", "-Z", "-g",
+]
+valued = [
+    "--show-pgids", "--ns-sort", "--highlight-pid",
+    "-H", "-N",
+]

@@ -2613,6 +2613,11 @@ Aliases: `ionice`
 - Allowed standalone flags: -A, -B, -C, -D, -P, -S, -V, -a, -g, -h, -j, -l, -m, -n, -o, -p, -r, -s, -u, -v, -x, --debug-syms, --defined-only, --demangle, --dynamic, --extern-only, --help, --line-numbers, --no-demangle, --no-llvm-bc, --no-sort, --numeric-sort, --portability, --print-armap, --print-file-name, --print-size, --reverse-sort, --special-syms, --undefined-only, --version
 - Allowed valued flags: -f, -t, --format, --radix, --size-sort, --target
 
+### `nmap` (https://nmap.org/book/man.html)
+
+- Allowed standalone flags: --help, --version, -h, -V, -sT, -sn, -sP, -sL, -sV, -Pn, -PE, -PP, -PM, -F, --open, --reason, --traceroute, -n, -R, -4, -6, -v, -vv, -vvv, -d, -d1, -d2, -d3, -d4, -d5, -d6, -d7, -d8, -d9, --packet-trace, --no-stylesheet, -T0, -T1, -T2, -T3, -T4, -T5, --system-dns, --version-light, --version-all
+- Allowed valued flags: -p, --exclude-ports, --top-ports, --port-ratio, --max-retries, --host-timeout, --scan-delay, --max-scan-delay, --min-rate, --max-rate, --min-parallelism, --max-parallelism, --min-hostgroup, --max-hostgroup, --min-rtt-timeout, --max-rtt-timeout, --initial-rtt-timeout, --exclude, --dns-servers, -e, --source-port, -g, --ttl, --version-intensity
+
 ### `node` (https://nodejs.org/api/cli.html)
 
 - Allowed standalone flags: --help, --version, -h, -v
@@ -2996,6 +3001,13 @@ Aliases: `pip3`
 ### `psql` (https://www.postgresql.org/docs/current/app-psql.html)
 
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `pstree` (https://man7.org/linux/man-pages/man1/pstree.1.html)
+
+- Allowed standalone flags: --help, --version, --arguments, --ascii, --compact-not, --vt100, --highlight-all, --long, --numeric-sort, --show-pids, --show-parents, --hide-threads, --unicode, --uid-changes, --ns-changes, --security-context, --wide, -V, -a, -A, -c, -G, -h, -l, -n, -p, -s, -T, -U, -u, -w, -Z, -g
+- Allowed valued flags: --show-pgids, --ns-sort, --highlight-pid, -H, -N
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
 
 ### `pulumi` (https://www.pulumi.com/docs/cli/)
 
