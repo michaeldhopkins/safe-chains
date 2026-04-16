@@ -132,7 +132,7 @@ pub fn wordset_items(words: &WordSet) -> String {
 
 pub fn all_command_docs() -> Vec<CommandDoc> {
     let mut docs = handlers::handler_docs();
-    docs.sort_by(|a, b| a.name.to_ascii_lowercase().cmp(&b.name.to_ascii_lowercase()));
+    docs.sort_by_key(|a| a.name.to_ascii_lowercase());
     docs
 }
 

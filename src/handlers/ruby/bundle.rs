@@ -80,10 +80,8 @@ pub fn check_bundle_config(tokens: &[Token]) -> Verdict {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
     match sub {
-        "get" | "list" => {
-            if policy::check(&tokens[1..], &BUNDLE_CONFIG_GET_POLICY) {
-                return Verdict::Allowed(SafetyLevel::Inert);
-            }
+        "get" | "list" if policy::check(&tokens[1..], &BUNDLE_CONFIG_GET_POLICY) => {
+            return Verdict::Allowed(SafetyLevel::Inert);
         }
         "set" | "unset" => {
             if policy::check(&tokens[1..], &HELP_ONLY) {
