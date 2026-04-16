@@ -1,0 +1,25 @@
+[[command]]
+name = "nc"
+url = "https://man.openbsd.org/nc.1"
+level = "Inert"
+bare = false
+require_any = ["-z"]
+standalone = [
+    "--help", "-h",
+    "-z", "-v", "-n", "-u",
+    "-4", "-6",
+]
+valued = ["-w"]
+
+[[command]]
+name = "ncat"
+url = "https://nmap.org/ncat/"
+level = "Inert"
+bare = false
+require_any = ["-z"]
+standalone = [
+    "--help", "-h", "--version",
+    "-z", "-v", "-n", "-u",
+    "-4", "-6",
+]
+valued = ["-w", "--wait"]

@@ -7,6 +7,20 @@ use super::{CMD_HANDLERS, SUB_HANDLERS};
 
 type HandlerMap = std::collections::HashMap<&'static str, super::HandlerFn>;
 
+fn short_flag_char(s: &str) -> Option<char> {
+    let bytes = s.as_bytes();
+    if bytes.len() == 2 && bytes[0] == b'-' && bytes[1] != b'-' {
+        s.chars().nth(1)
+    } else {
+        None
+    }
+}
+
+fn is_combined_short(s: &str) -> bool {
+    let bytes = s.as_bytes();
+    bytes.len() > 2 && bytes[0] == b'-' && bytes[1] != b'-'
+}
+
 fn dispatch_first_arg(tokens: &[Token], patterns: &[String], level: SafetyLevel) -> Verdict {
     if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
@@ -40,7 +54,20 @@ fn dispatch_require_any(
     }
     let has_required = tokens[1..].iter().any(|t| {
         require_any.iter().any(|r| {
-            t == r.as_str() || (r.starts_with("--") && t.as_str().starts_with(&format!("{r}=")))
+            let t_str = t.as_str();
+            if t_str == r.as_str() {
+                return true;
+            }
+            if r.starts_with("--") && t_str.starts_with(&format!("{r}=")) {
+                return true;
+            }
+            if let Some(short_char) = short_flag_char(r)
+                && is_combined_short(t_str)
+                && t_str[1..].contains(short_char)
+            {
+                return true;
+            }
+            false
         })
     });
     if has_required && check_owned(tokens, policy) {

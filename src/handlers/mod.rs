@@ -135,7 +135,7 @@ const HANDLED_CMDS: &[&str] = &[
     "cksum", "b2sum", "sum", "strings", "hexdump", "od", "size", "sips",
     "sw_vers", "mdls", "otool", "nm", "system_profiler", "ioreg", "vm_stat", "mdfind", "man",
     "dig", "nslookup", "host", "whois", "netstat", "ss", "ifconfig", "route", "ping",
-    "traceroute", "traceroute6", "mtr",
+    "traceroute", "traceroute6", "mtr", "nc", "ncat",
     "xv",
     "fzf", "fzy", "peco", "pick", "selecta", "sk", "zf",
     "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "workon", "safe-chains", "snyk", "mdbook", "devbox", "pup",
