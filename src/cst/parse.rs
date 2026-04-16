@@ -258,7 +258,7 @@ fn word_part(input: &mut &str) -> ModalResult<WordPart> {
     if input.is_empty() || is_word_boundary(input.as_bytes()[0] as char) {
         return backtrack();
     }
-    alt((single_quoted, double_quoted, cmd_sub, backtick_part, escaped, dollar_lit(is_word_literal), lit(is_word_literal)))
+    alt((single_quoted, double_quoted, arith_sub, cmd_sub, backtick_part, escaped, dollar_lit(is_word_literal), lit(is_word_literal)))
         .parse_next(input)
 }
 
@@ -278,6 +278,38 @@ fn cmd_sub(input: &mut &str) -> ModalResult<WordPart> {
     delimited(("$(", ws), script, (ws, ')'))
         .map(WordPart::CmdSub)
         .parse_next(input)
+}
+
+fn arith_sub(input: &mut &str) -> ModalResult<WordPart> {
+    if !input.starts_with("$((") {
+        return backtrack();
+    }
+    let body_start = 3;
+    let bytes = input.as_bytes();
+    let mut depth: i32 = 1;
+    let mut i = body_start;
+    while i < bytes.len() {
+        match bytes[i] {
+            b'(' => depth += 1,
+            b')' => {
+                if depth == 1 && i + 1 < bytes.len() && bytes[i + 1] == b')' {
+                    let body = input[body_start..i].to_string();
+                    if body.contains("$(") || body.contains('`') {
+                        return backtrack();
+                    }
+                    *input = &input[i + 2..];
+                    return Ok(WordPart::Arith(body));
+                }
+                depth -= 1;
+                if depth < 0 {
+                    return backtrack();
+                }
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+    backtrack()
 }
 
 fn backtick_part(input: &mut &str) -> ModalResult<WordPart> {
@@ -312,7 +344,7 @@ fn dq_part(input: &mut &str) -> ModalResult<WordPart> {
     if input.is_empty() || input.starts_with('"') {
         return backtrack();
     }
-    alt((dq_escape, cmd_sub, backtick_part, dollar_lit(is_dq_literal), lit(is_dq_literal)))
+    alt((dq_escape, arith_sub, cmd_sub, backtick_part, dollar_lit(is_dq_literal), lit(is_dq_literal)))
         .parse_next(input)
 }
 

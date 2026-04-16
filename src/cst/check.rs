@@ -178,7 +178,7 @@ pub(crate) fn redirect_verdict(redirs: &[Redir]) -> Verdict {
 
 fn has_substitution(word: &Word) -> bool {
     word.0.iter().any(|p| match p {
-        WordPart::CmdSub(_) | WordPart::Backtick(_) => true,
+        WordPart::CmdSub(_) | WordPart::Backtick(_) | WordPart::Arith(_) => true,
         WordPart::DQuote(inner) => has_substitution(inner),
         _ => false,
     })
@@ -278,6 +278,12 @@ mod tests {
         redirect_bidirectional_write: "cat < /tmp/x > /tmp/y",
         env_rails_redirect: "RAILS_ENV=test echo foo > bar",
         jj_diff_redirect_chain: "jj diff -r 'master..@' --context 5 > /tmp/review_diff.txt && wc -l /tmp/review_diff.txt",
+
+        arith_basic: "echo $((1 + 2))",
+        arith_with_var: "prev=$((ln - 1))",
+        arith_nested_parens: "echo $(( (1 + 2) * 3 ))",
+        arith_in_dquote: "echo \"line $((ln - 1))\"",
+        arith_in_for_loop: "for i in 1 2; do echo $((i * 10)); done",
     }
 
     denied! {

@@ -6,3 +6,4 @@
 # everyone who runs the test benefits from these saved cases.
 cc 1e065186773a73d2f1c1791bdc1be79d00e62fc6724368e26b2dba58d9a7ae60 # shrinks to script = Script([Stmt { pipeline: Pipeline { bang: false, commands: [Simple(SimpleCmd { env: [], words: [Word([Lit("_"), Lit("0")])], redirs: [] })] }, op: None }])
 cc 90352108bcefdd43b54c450d0f28b6ead6cae51acae108656bf48898680de816 # shrinks to script with Lit("do-") in command substitution
+cc 3b001f5317d247c42e465827fac1f705b7efaa55e4085e3869e04e0ef5c10a34 # shrinks to script = Script([Stmt { pipeline: Pipeline { bang: false, commands: [Simple(SimpleCmd { env: [], words: [Word([CmdSub(Script([Stmt { pipeline: Pipeline { bang: false, commands: [Subshell(Script([Stmt { pipeline: Pipeline { bang: false, commands: [Simple(SimpleCmd { env: [], words: [Word([Lit("A")])], redirs: [] })] }, op: None }]))] }, op: None }]))])], redirs: [] })] }, op: None }])

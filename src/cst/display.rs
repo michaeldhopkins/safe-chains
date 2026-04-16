@@ -157,8 +157,16 @@ impl fmt::Display for WordPart {
             WordPart::Escape(c) => write!(f, "\\{c}"),
             WordPart::SQuote(s) => write!(f, "'{s}'"),
             WordPart::DQuote(w) => write!(f, "\"{w}\""),
-            WordPart::CmdSub(s) => write!(f, "$({s})"),
+            WordPart::CmdSub(s) => {
+                let rendered = s.to_string();
+                if rendered.starts_with('(') {
+                    write!(f, "$( {rendered})")
+                } else {
+                    write!(f, "$({rendered})")
+                }
+            }
             WordPart::Backtick(s) => write!(f, "`{s}`"),
+            WordPart::Arith(s) => write!(f, "$(({s}))"),
         }
     }
 }

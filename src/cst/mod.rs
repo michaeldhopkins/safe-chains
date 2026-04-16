@@ -76,6 +76,7 @@ pub enum WordPart {
     DQuote(Word),
     CmdSub(Script),
     Backtick(String),
+    Arith(String),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
