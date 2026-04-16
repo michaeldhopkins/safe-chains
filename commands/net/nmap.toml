@@ -1,0 +1,33 @@
+[[command]]
+name = "nmap"
+url = "https://nmap.org/book/man.html"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--version", "-h", "-V",
+    "-sT", "-sn", "-sP", "-sL", "-sV",
+    "-Pn", "-PE", "-PP", "-PM",
+    "-F", "--open", "--reason", "--traceroute",
+    "-n", "-R",
+    "-4", "-6",
+    "-v", "-vv", "-vvv", "-d", "-d1", "-d2", "-d3", "-d4", "-d5", "-d6", "-d7", "-d8", "-d9",
+    "--packet-trace", "--no-stylesheet",
+    "-T0", "-T1", "-T2", "-T3", "-T4", "-T5",
+    "--system-dns",
+    "--version-light", "--version-all",
+]
+valued = [
+    "-p", "--exclude-ports", "--top-ports", "--port-ratio",
+    "--max-retries", "--host-timeout",
+    "--scan-delay", "--max-scan-delay",
+    "--min-rate", "--max-rate",
+    "--min-parallelism", "--max-parallelism",
+    "--min-hostgroup", "--max-hostgroup",
+    "--min-rtt-timeout", "--max-rtt-timeout", "--initial-rtt-timeout",
+    "--exclude",
+    "--dns-servers",
+    "-e",
+    "--source-port", "-g",
+    "--ttl",
+    "--version-intensity",
+]

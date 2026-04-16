@@ -1816,6 +1816,52 @@ use super::*;
     }
 
     #[test]
+    fn toml_pstree_allowed() {
+        assert!(crate::is_safe_command("pstree"));
+        assert!(crate::is_safe_command("pstree 56849"));
+        assert!(crate::is_safe_command("pstree -p"));
+        assert!(crate::is_safe_command("pstree -pa 56849"));
+        assert!(crate::is_safe_command("pstree --show-pids 56849 | head -20"));
+        assert!(crate::is_safe_command("pstree -u root"));
+    }
+
+    #[test]
+    fn toml_nmap_safe_scans_allowed() {
+        assert!(crate::is_safe_command("nmap -sT localhost"));
+        assert!(crate::is_safe_command("nmap -sn 192.168.1.0/24"));
+        assert!(crate::is_safe_command("nmap -sL 10.0.0.1-100"));
+        assert!(crate::is_safe_command("nmap -sV -p 80,443 example.com"));
+        assert!(crate::is_safe_command("nmap -p 22 --open --reason host"));
+        assert!(crate::is_safe_command("nmap --top-ports 100 -T4 host"));
+        assert!(crate::is_safe_command("nmap -Pn -n -sT host"));
+        assert!(crate::is_safe_command("nmap --max-retries 2 --host-timeout 30s host"));
+        assert!(crate::is_safe_command("nmap -F localhost"));
+        assert!(crate::is_safe_command("nmap --version"));
+        assert!(crate::is_safe_command("nmap -V"));
+    }
+
+    #[test]
+    fn toml_nmap_dangerous_modes_denied() {
+        assert!(!crate::is_safe_command("nmap"));
+        assert!(!crate::is_safe_command("nmap --script vuln host"));
+        assert!(!crate::is_safe_command("nmap --script=http-shellshock host"));
+        assert!(!crate::is_safe_command("nmap --script-args user=admin host"));
+        assert!(!crate::is_safe_command("nmap -A host"));
+        assert!(!crate::is_safe_command("nmap -O host"));
+        assert!(!crate::is_safe_command("nmap -sU host"));
+        assert!(!crate::is_safe_command("nmap -sS host"));
+        assert!(!crate::is_safe_command("nmap -sF host"));
+        assert!(!crate::is_safe_command("nmap -iL targets.txt"));
+        assert!(!crate::is_safe_command("nmap -oN out.txt host"));
+        assert!(!crate::is_safe_command("nmap -oA scan host"));
+        assert!(!crate::is_safe_command("nmap --data-string EVIL host"));
+        assert!(!crate::is_safe_command("nmap --scanflags SYNFIN host"));
+        assert!(!crate::is_safe_command("nmap --privileged host"));
+        assert!(!crate::is_safe_command("nmap --resume scan.gnmap"));
+        assert!(!crate::is_safe_command("nmap --script-updatedb"));
+    }
+
+    #[test]
     fn toml_monolith_allowed() {
         assert!(crate::is_safe_command("monolith https://example.com"));
         assert!(crate::is_safe_command("monolith -j -i https://example.com"));
