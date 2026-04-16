@@ -370,12 +370,10 @@ mod tests {
     }
 
     #[test]
-    fn bare_star_blocked_by_unsafe_syntax_redirect() {
-        let mut p = empty();
-        p.add_pattern("Bash(*)");
+    fn file_redirect_promoted_to_safewrite() {
+        let p = empty();
         let c = cmd("echo > /etc/passwd");
-        assert!(p.matches_cmd(&c));
-        assert!(!is_covered(&c, &p));
+        assert!(is_covered(&c, &p));
     }
 
     #[test]
@@ -409,12 +407,10 @@ mod tests {
     }
 
     #[test]
-    fn nested_shell_redirect_still_blocked() {
-        let mut p = empty();
-        p.add_pattern("Bash(bash *)");
-        let c = cmd("bash -c 'echo hello' > /tmp/pwned");
-        assert!(check::has_unsafe_syntax(&c));
-        assert!(!is_covered(&c, &p));
+    fn nested_shell_redirect_promoted_to_safewrite() {
+        let p = empty();
+        let c = cmd("bash -c 'echo hello' > /tmp/out");
+        assert!(is_covered(&c, &p));
     }
 
     #[test]

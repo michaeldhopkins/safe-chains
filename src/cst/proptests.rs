@@ -415,7 +415,7 @@ proptest! {
     }
 
     #[test]
-    fn file_redirect_always_denied(
+    fn file_redirect_promotes_to_safewrite(
         cmd_word in arb_shell_word(),
         target in arb_shell_word().prop_filter("not /dev/null", |s| s != "/dev/null"),
         fd in 0..3u32,
@@ -431,6 +431,10 @@ proptest! {
             }],
         };
         prop_assert!(!check::check_redirects(&cmd.redirs));
+        prop_assert_eq!(
+            check::redirect_verdict(&cmd.redirs),
+            crate::verdict::Verdict::Allowed(crate::verdict::SafetyLevel::SafeWrite),
+        );
     }
 
     #[test]

@@ -1,0 +1,24 @@
+[[command]]
+name = "frames"
+url = "https://github.com/viticci/frames-cli"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--help", "--version", "-h", "-V",
+    "--json",
+    "--copy",
+    "--merge", "-m",
+    "--no-scale",
+    "-f",
+    "--no-subfolder",
+]
+valued = [
+    "--color", "-c",
+    "--spacing", "-s",
+    "--batch", "-b",
+    "--output", "-o",
+    "--device", "-d",
+    "--subfolder",
+    "--assets",
+]

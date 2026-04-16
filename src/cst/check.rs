@@ -110,7 +110,8 @@ pub(crate) fn word_subs_safe(word: &Word) -> bool {
 }
 
 fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
-    if !check_redirects(&cmd.redirs) {
+    let redir_v = redirect_verdict(&cmd.redirs);
+    if let Verdict::Denied = redir_v {
         return Verdict::Denied;
     }
 
@@ -140,7 +141,7 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
     }
 
     let cmd_v = handlers::dispatch(&tokens);
-    sub_v.combine(cmd_v)
+    sub_v.combine(cmd_v).combine(redir_v)
 }
 
 pub(crate) fn check_redirects(redirs: &[Redir]) -> bool {
@@ -151,6 +152,28 @@ pub(crate) fn check_redirects(redirs: &[Redir]) -> bool {
         | Redir::HereDoc { .. }
         | Redir::DupFd { .. } => true,
     })
+}
+
+pub(crate) fn redirect_verdict(redirs: &[Redir]) -> Verdict {
+    let mut level = Verdict::Allowed(SafetyLevel::Inert);
+    for r in redirs {
+        match r {
+            Redir::Write { target, .. } => {
+                level = level.combine(word_sub_verdict(target));
+                if target.eval() != "/dev/null" {
+                    level = level.combine(Verdict::Allowed(SafetyLevel::SafeWrite));
+                }
+            }
+            Redir::Read { target, .. } => {
+                level = level.combine(word_sub_verdict(target));
+            }
+            Redir::HereStr(word) => {
+                level = level.combine(word_sub_verdict(word));
+            }
+            Redir::HereDoc { .. } | Redir::DupFd { .. } => {}
+        }
+    }
+    level
 }
 
 fn has_substitution(word: &Word) -> bool {
@@ -248,6 +271,13 @@ mod tests {
 
         quoted_redirect: "echo 'greater > than' test",
         quoted_subst: "echo '$(safe)' arg",
+
+        redirect_to_file: "echo hello > file.txt",
+        redirect_append: "cat file >> output.txt",
+        redirect_stderr_file: "ls 2> errors.txt",
+        redirect_bidirectional_write: "cat < /tmp/x > /tmp/y",
+        env_rails_redirect: "RAILS_ENV=test echo foo > bar",
+        jj_diff_redirect_chain: "jj diff -r 'master..@' --context 5 > /tmp/review_diff.txt && wc -l /tmp/review_diff.txt",
     }
 
     denied! {
@@ -256,10 +286,10 @@ mod tests {
         node_app: "node app.js",
         tee_output: "tee output.txt",
 
-        redirect_to_file: "echo hello > file.txt",
-        redirect_append: "cat file >> output.txt",
-        redirect_stderr_file: "ls 2> errors.txt",
-        redirect_bidirectional_write_denied: "cat < /tmp/x > /tmp/y",
+
+        redirect_target_subst_rm: "echo hello > $(rm -rf /)",
+        redirect_target_backtick_rm: "echo hello > `rm -rf /`",
+        redirect_read_subst_rm: "cat < $(rm -rf /)",
 
         subst_rm: "echo $(rm -rf /)",
         backtick_rm: "echo `rm -rf /`",
@@ -274,7 +304,6 @@ mod tests {
         subshell_unsafe_pipe: "(ls | rm -rf /)",
 
         env_prefix_rm: "FOO='bar baz' rm -rf /",
-        env_rails_redirect: "RAILS_ENV=test echo foo > bar",
 
         pipe_rm: "cat file | rm -rf /",
         bg_rm: "cat file & rm -rf /",

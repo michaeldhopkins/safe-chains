@@ -1489,6 +1489,12 @@ Aliases: `fly`
 - Allowed valued flags: -w, --width
 - Bare invocation allowed
 
+### `frames` (https://github.com/viticci/frames-cli)
+
+- Allowed standalone flags: --help, --version, -h, -V, --json, --copy, --merge, -m, --no-scale, -f, --no-subfolder
+- Allowed valued flags: --color, -c, --spacing, -s, --batch, -b, --output, -o, --device, -d, --subfolder, --assets
+- Hyphen-prefixed positional arguments accepted
+
 ### `free` (https://man7.org/linux/man-pages/man1/free.1.html)
 
 - Allowed standalone flags: --bytes, --gibi, --giga, --help, --human, --kibi, --kilo, --lohi, --mebi, --mega, --si, --tebi, --tera, --total, --version, --wide, -V, -b, -g, -h, -k, -l, -m, -t, -v, -w

