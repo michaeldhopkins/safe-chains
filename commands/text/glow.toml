@@ -1,0 +1,17 @@
+[[command]]
+name = "glow"
+url = "https://github.com/charmbracelet/glow"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = [
+    "--help", "--version", "-h", "-v",
+    "--all", "-a",
+    "--local", "-l",
+    "--pager", "-p",
+]
+valued = [
+    "--style", "-s",
+    "--width", "-w",
+    "--config",
+]

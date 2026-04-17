@@ -117,7 +117,7 @@ const HANDLED_CMDS: &[&str] = &[
     "cat", "gzcat", "head", "tail", "wc", "cut", "tr", "uniq", "less", "more", "zcat",
     "diff", "comm", "paste", "tac", "rev", "nl",
     "expand", "unexpand", "fold", "fmt", "col", "column", "iconv", "nroff",
-    "echo", "printf", "seq", "test", "[", "expr", "bc", "factor", "bat",
+    "echo", "printf", "seq", "test", "[", "expr", "bc", "factor", "bat", "glow",
     "arch", "command", "hostname",
     "find", "sed", "shuf", "sort", "yq", "xmllint", "awk", "gawk", "mawk", "nawk",
     "magick", "convert", "frames",

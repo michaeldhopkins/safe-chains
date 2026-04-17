@@ -1715,6 +1715,13 @@ Aliases: `g++`, `cc`, `c++`
 - Always safe: --version, -v, check-update, version.
 - auth status, api (GET only).
 
+### `glow` (https://github.com/charmbracelet/glow)
+
+- Allowed standalone flags: --help, --version, -h, -v, --all, -a, --local, -l, --pager, -p
+- Allowed valued flags: --style, -s, --width, -w, --config
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `go` (https://pkg.go.dev/cmd/go)
 
 - **build**: Flags: --help, -a, -asan, -cover, -h, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -o, -overlay, -p, -pgo, -pkgdir, -tags
