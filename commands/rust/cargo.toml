@@ -8,7 +8,7 @@ name = "audit"
 level = "Inert"
 standalone = [
     "--deny", "--help", "--json", "--no-fetch", "--stale",
-    "-h", "-n", "-q", "-v",
+    "-h", "-n", "--quiet", "-q", "-v",
 ]
 valued = [
     "--color", "--db", "--file", "--ignore",
@@ -23,7 +23,7 @@ standalone = [
     "--examples", "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--no-fail-fast",
     "--no-run", "--offline", "--release", "--tests", "--timings", "--unit-graph",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--bench", "--bin", "--color", "--config", "--example",
@@ -40,7 +40,7 @@ standalone = [
     "--examples", "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--offline",
     "--release", "--tests", "--timings", "--unit-graph",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--bench", "--bin", "--color", "--config", "--example",
@@ -57,7 +57,7 @@ standalone = [
     "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--offline",
     "--release", "--tests", "--timings", "--unit-graph",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--bench", "--bin", "--color", "--config", "--example",
@@ -74,7 +74,7 @@ standalone = [
     "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--no-deps",
     "--offline", "--release", "--tests", "--timings", "--unit-graph",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--bench", "--bin", "--color", "--config", "--example",
@@ -89,7 +89,7 @@ level = "Inert"
 bare = false
 standalone = [
     "--all-features", "--help", "--no-default-features",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--color", "--config", "--exclude", "--features",
@@ -104,7 +104,7 @@ standalone = [
     "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--locked", "--no-default-features", "--no-deps",
     "--offline", "--open", "--release", "--timings", "--unit-graph",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--bin", "--color", "--config", "--example",
@@ -118,7 +118,7 @@ name = "fmt"
 guard = "--check"
 level = "Inert"
 bare = false
-standalone = ["--all", "--check", "--help", "-h", "-q", "-v"]
+standalone = ["--all", "--check", "--help", "-h", "--quiet", "-q", "-v"]
 valued = ["--manifest-path", "--message-format", "--package", "-p"]
 
 [[command.sub]]
@@ -131,7 +131,7 @@ positional_style = true
 name = "info"
 level = "Inert"
 bare = false
-standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "-q", "-v"]
+standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
 valued = ["--color", "--config", "--index", "--registry"]
 
 [[command.sub]]
@@ -144,13 +144,13 @@ standalone = ["--help", "-h"]
 [[command.sub]]
 name = "license"
 level = "Inert"
-standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "-q", "-v"]
+standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
 valued = ["--color", "--config", "--manifest-path"]
 
 [[command.sub]]
 name = "locate-project"
 level = "Inert"
-standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "-q", "-v"]
+standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
 valued = ["--color", "--config", "--manifest-path"]
 
 [[command.sub]]
@@ -159,7 +159,7 @@ level = "Inert"
 standalone = [
     "--all-features", "--frozen", "--help", "--locked",
     "--no-default-features", "--no-deps", "--offline",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--color", "--config", "--features", "--filter-platform",
@@ -177,7 +177,7 @@ standalone = [
     "--frozen", "--help", "--keep-going",
     "--list", "--locked", "--no-default-features",
     "--no-metadata", "--no-verify", "--offline", "--workspace",
-    "-h", "-l", "-q", "-v",
+    "-h", "-l", "--quiet", "-q", "-v",
 ]
 valued = [
     "--color", "--config", "--exclude", "--features",
@@ -190,7 +190,7 @@ valued = [
 [[command.sub]]
 name = "pkgid"
 level = "Inert"
-standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "-q", "-v"]
+standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
 valued = ["--color", "--config", "--manifest-path"]
 
 [[command.sub]]
@@ -204,7 +204,7 @@ standalone = [
     "--frozen", "--help", "--keep-going",
     "--locked", "--no-default-features", "--no-verify",
     "--offline", "--workspace",
-    "-h", "-n", "-q", "-v",
+    "-h", "-n", "--quiet", "-q", "-v",
 ]
 valued = [
     "--color", "--config", "--exclude", "--features",
@@ -216,7 +216,7 @@ valued = [
 [[command.sub]]
 name = "read-manifest"
 level = "Inert"
-standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "-q", "-v"]
+standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
 valued = ["--color", "--config", "--manifest-path"]
 
 [[command.sub]]
@@ -230,7 +230,7 @@ standalone = ["--help", "-h"]
 name = "search"
 level = "Inert"
 bare = false
-standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "-q", "-v"]
+standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
 valued = ["--color", "--config", "--index", "--limit", "--registry"]
 
 [[command.sub]]
@@ -241,7 +241,7 @@ standalone = [
     "--examples", "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--no-fail-fast",
     "--no-run", "--offline", "--release", "--tests", "--timings", "--unit-graph",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--bench", "--bin", "--color", "--config", "--example",
@@ -256,7 +256,7 @@ level = "Inert"
 standalone = [
     "--all-features", "--duplicates", "--frozen", "--help", "--ignore-rust-version",
     "--locked", "--no-dedupe", "--no-default-features", "--offline",
-    "-d", "-e", "-h", "-i", "-q", "-v",
+    "-d", "-e", "-h", "-i", "--quiet", "-q", "-v",
 ]
 valued = [
     "--charset", "--color", "--config", "--depth", "--edges",
@@ -268,7 +268,7 @@ valued = [
 [[command.sub]]
 name = "verify-project"
 level = "Inert"
-standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "-q", "-v"]
+standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
 valued = ["--color", "--config", "--manifest-path"]
 
 [[command.sub]]
@@ -319,7 +319,7 @@ standalone = [
     "--aggressive", "--color", "--depth", "--exit-code",
     "--features", "--help", "--manifest-path", "--packages",
     "--root-deps-only", "--verbose", "--workspace",
-    "-R", "-V", "-d", "-h", "-n", "-q", "-r", "-v", "-w",
+    "-R", "-V", "-d", "-h", "-n", "--quiet", "-q", "-r", "-v", "-w",
 ]
 valued = [
     "--color", "--depth", "--exclude", "--features",
@@ -392,7 +392,7 @@ bare = false
 standalone = [
     "--aggressive", "--dry-run", "--frozen", "--help",
     "--locked", "--offline", "--recursive", "--workspace",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--color", "--config", "--manifest-path", "--package",
@@ -405,7 +405,7 @@ name = "generate-lockfile"
 level = "SafeWrite"
 standalone = [
     "--frozen", "--help", "--locked", "--offline",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = ["--color", "--config", "--manifest-path"]
 
@@ -436,7 +436,7 @@ level = "SafeWrite"
 standalone = [
     "--doc", "--dry-run", "--frozen", "--help", "--locked",
     "--offline", "--release", "--workspace",
-    "-h", "-n", "-q", "-r", "-v",
+    "-h", "-n", "--quiet", "-q", "-r", "-v",
 ]
 valued = [
     "--color", "--config", "--lockfile-path", "--manifest-path",
@@ -449,7 +449,7 @@ name = "fetch"
 level = "SafeWrite"
 standalone = [
     "--frozen", "--help", "--locked", "--offline",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--color", "--config", "--lockfile-path",
@@ -464,7 +464,7 @@ max_positional = 1
 standalone = [
     "--frozen", "--help", "--locked", "--no-delete",
     "--offline", "--respect-source-config", "--versioned-dirs",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--color", "--config", "--lockfile-path",
@@ -482,7 +482,7 @@ max_positional = 1
 standalone = [
     "--frozen", "--help", "--locked", "--offline",
     "--show-origin",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--color", "--config", "--format", "--merged",
@@ -497,7 +497,7 @@ name = "future-incompatibilities"
 level = "Inert"
 standalone = [
     "--frozen", "--help", "--locked", "--offline",
-    "-h", "-q", "-v",
+    "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--color", "--config", "--id", "--package",
@@ -512,7 +512,7 @@ standalone = [
     "--bins", "--examples", "--frozen", "--help", "--keep-going",
     "--lib", "--locked", "--no-default-features", "--offline",
     "--release", "--tests", "--workspace", "--version",
-    "-V", "-h", "-q", "-v",
+    "-V", "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--backend", "--bench", "--bin", "--color", "--example",

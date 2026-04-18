@@ -255,7 +255,13 @@ fn word(input: &mut &str) -> ModalResult<Word> {
 }
 
 fn word_part(input: &mut &str) -> ModalResult<WordPart> {
-    if input.is_empty() || is_word_boundary(input.as_bytes()[0] as char) {
+    if input.is_empty() {
+        return backtrack();
+    }
+    if input.starts_with("<(") || input.starts_with(">(") {
+        return proc_sub(input);
+    }
+    if is_word_boundary(input.as_bytes()[0] as char) {
         return backtrack();
     }
     alt((single_quoted, double_quoted, arith_sub, cmd_sub, backtick_part, escaped, dollar_lit(is_word_literal), lit(is_word_literal)))
@@ -277,6 +283,16 @@ fn double_quoted(input: &mut &str) -> ModalResult<WordPart> {
 fn cmd_sub(input: &mut &str) -> ModalResult<WordPart> {
     delimited(("$(", ws), script, (ws, ')'))
         .map(WordPart::CmdSub)
+        .parse_next(input)
+}
+
+fn proc_sub(input: &mut &str) -> ModalResult<WordPart> {
+    if !(input.starts_with("<(") || input.starts_with(">(")) {
+        return backtrack();
+    }
+    *input = &input[1..];
+    delimited(('(', ws), script, (ws, ')'))
+        .map(WordPart::ProcSub)
         .parse_next(input)
 }
 
@@ -617,6 +633,21 @@ mod tests {
         } else { panic!("expected Subshell"); }
     }
     #[test]
+    fn proc_sub_input() {
+        let s = p("diff <(sort a.txt) <(sort b.txt)");
+        let cmd = simple(&s);
+        assert_eq!(cmd.words.len(), 3);
+        assert!(matches!(&cmd.words[1].0[0], WordPart::ProcSub(_)));
+        assert!(matches!(&cmd.words[2].0[0], WordPart::ProcSub(_)));
+    }
+    #[test]
+    fn proc_sub_output() {
+        let s = p("tee >(grep error > /dev/null)");
+        let cmd = simple(&s);
+        assert_eq!(cmd.words.len(), 2);
+        assert!(matches!(&cmd.words[1].0[0], WordPart::ProcSub(_)));
+    }
+    #[test]
     fn quoted_redirect_in_echo() {
         let s = p("echo 'greater > than' test");
         let cmd = simple(&s);
@@ -663,6 +694,9 @@ mod tests {
             "if test -f a; then echo a; elif test -f b; then echo b; else echo c; fi",
             "for x in 1 2; do if test $x = 1; then echo one; fi; done",
             "if true; then for x in 1 2; do echo $x; done; fi",
+            "diff <(sort a.txt) <(sort b.txt)",
+            "comm -23 file.txt <(sort other.txt)",
+            "cat <(echo hello)",
             "! echo hello", "! test -f foo",
             "echo for; echo done; echo if; echo fi",
         ];

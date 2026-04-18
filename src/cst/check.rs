@@ -85,7 +85,7 @@ pub(crate) fn is_safe_cmd(cmd: &Cmd) -> bool {
 
 fn part_sub_verdict(part: &WordPart) -> Verdict {
     match part {
-        WordPart::CmdSub(inner) => script_verdict(inner),
+        WordPart::CmdSub(inner) | WordPart::ProcSub(inner) => script_verdict(inner),
         WordPart::Backtick(raw) => command_verdict(raw),
         WordPart::DQuote(inner) => word_sub_verdict(inner),
         _ => Verdict::Allowed(SafetyLevel::Inert),
@@ -178,7 +178,7 @@ pub(crate) fn redirect_verdict(redirs: &[Redir]) -> Verdict {
 
 fn has_substitution(word: &Word) -> bool {
     word.0.iter().any(|p| match p {
-        WordPart::CmdSub(_) | WordPart::Backtick(_) | WordPart::Arith(_) => true,
+        WordPart::CmdSub(_) | WordPart::ProcSub(_) | WordPart::Backtick(_) | WordPart::Arith(_) => true,
         WordPart::DQuote(inner) => has_substitution(inner),
         _ => false,
     })

@@ -1,0 +1,11 @@
+[[command]]
+name = "specdiff"
+url = "https://github.com/michaeldhopkins/specdiff"
+standalone = [
+    "--changed-only", "--help", "--no-color", "--print", "--version",
+    "-V", "-h", "-p",
+]
+valued = [
+    "--base", "--base-dir", "--filter", "--format",
+    "--framework", "--head", "--head-dir",
+]

@@ -18,7 +18,7 @@ fn eval_part(part: &WordPart, out: &mut String) {
                 eval_part(p, out);
             }
         }
-        WordPart::CmdSub(_) => out.push_str("__SAFE_CHAINS_SUB__"),
+        WordPart::CmdSub(_) | WordPart::ProcSub(_) => out.push_str("__SAFE_CHAINS_SUB__"),
         WordPart::Backtick(_) => out.push_str("__SAFE_CHAINS_SUB__"),
         WordPart::Arith(_) => out.push_str("__SAFE_CHAINS_ARITH__"),
     }

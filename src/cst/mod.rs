@@ -75,6 +75,7 @@ pub enum WordPart {
     SQuote(String),
     DQuote(Word),
     CmdSub(Script),
+    ProcSub(Script),
     Backtick(String),
     Arith(String),
 }
@@ -119,6 +120,7 @@ impl Word {
             let part = match part {
                 WordPart::DQuote(inner) => WordPart::DQuote(inner.normalize()),
                 WordPart::CmdSub(s) => WordPart::CmdSub(s.normalize()),
+                WordPart::ProcSub(s) => WordPart::ProcSub(s.normalize()),
                 other => other.clone(),
             };
             if let WordPart::Lit(s) = &part
