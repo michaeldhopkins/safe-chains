@@ -130,7 +130,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
              logcat (requires -d). \
              shell: cat, df, dumpsys, getprop, id, ls, pm list/path, ps, settings get, \
              uname, whoami, wm size/density. \
-             Prefix flag -s SERIAL is skipped."),
+             Prefix flag -s SERIAL is skipped.",
+            "android"),
     ]
 }
 

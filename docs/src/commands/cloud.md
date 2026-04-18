@@ -1,0 +1,568 @@
+# Cloud Providers
+
+### `aws`
+<p class="cmd-url"><a href="https://docs.aws.amazon.com/cli/latest/">https://docs.aws.amazon.com/cli/latest/</a></p>
+
+- **accessanalyzer**: Allowed arguments: describe-*, get-*, list-*
+- **account**: Allowed arguments: describe-*, get-*, list-*
+- **acm**: Allowed arguments: describe-*, get-*, list-*
+- **acm-pca**: Allowed arguments: describe-*, get-*, list-*
+- **amp**: Allowed arguments: describe-*, get-*, list-*
+- **amplify**: Allowed arguments: describe-*, get-*, list-*
+- **amplifybackend**: Allowed arguments: describe-*, get-*, list-*
+- **amplifyuibuilder**: Allowed arguments: describe-*, get-*, list-*
+- **apigateway**: Allowed arguments: get-*
+- **apigatewayv2**: Allowed arguments: get-*
+- **appconfig**: Allowed arguments: describe-*, get-*, list-*
+- **appflow**: Allowed arguments: describe-*, get-*, list-*
+- **application-autoscaling**: Allowed arguments: describe-*, get-*, list-*
+- **application-insights**: Allowed arguments: describe-*, get-*, list-*
+- **appmesh**: Allowed arguments: describe-*, get-*, list-*
+- **apprunner**: Allowed arguments: describe-*, get-*, list-*
+- **appstream**: Allowed arguments: describe-*, get-*, list-*
+- **appsync**: Allowed arguments: describe-*, get-*, list-*
+- **artifact**: Allowed arguments: describe-*, get-*, list-*
+- **athena**: Allowed arguments: get-*, list-*
+- **auditmanager**: Allowed arguments: describe-*, get-*, list-*
+- **autoscaling**: Allowed arguments: describe-*
+- **autoscaling-plans**: Allowed arguments: describe-*, get-*, list-*
+- **b2bi**: Allowed arguments: describe-*, get-*, list-*
+- **backup**: Allowed arguments: describe-*, get-*, list-*
+- **batch**: Allowed arguments: describe-*, get-*, list-*
+- **bedrock**: Allowed arguments: describe-*, get-*, list-*
+- **bedrock-agent**: Allowed arguments: describe-*, get-*, list-*
+- **billingconductor**: Allowed arguments: describe-*, get-*, list-*
+- **braket**: Allowed arguments: describe-*, get-*, list-*
+- **budgets**: Allowed arguments: describe-*, get-*, list-*
+- **ce**: Allowed arguments: describe-*, get-*, list-*
+- **chatbot**: Allowed arguments: describe-*, get-*, list-*
+- **chime**: Allowed arguments: describe-*, get-*, list-*
+- **chime-sdk-identity**: Allowed arguments: describe-*, get-*, list-*
+- **chime-sdk-meetings**: Allowed arguments: describe-*, get-*, list-*
+- **chime-sdk-messaging**: Allowed arguments: describe-*, get-*, list-*
+- **chime-sdk-voice**: Allowed arguments: describe-*, get-*, list-*
+- **cleanrooms**: Allowed arguments: describe-*, get-*, list-*
+- **cloud9**: Allowed arguments: describe-*, get-*, list-*
+- **cloudcontrol**: Allowed arguments: describe-*, get-*, list-*
+- **cloudformation**: Allowed arguments: describe-*, get-*, list-*
+- **cloudfront**: Allowed arguments: describe-*, get-*, list-*
+- **cloudhsmv2**: Allowed arguments: describe-*, get-*, list-*
+- **cloudsearch**: Allowed arguments: describe-*, get-*, list-*
+- **cloudtrail**: Allowed arguments: describe-*, get-*, list-*
+- **cloudwatch**: Allowed arguments: describe-*, get-*, list-*
+- **codeartifact**: Allowed arguments: describe-*, get-*, list-*
+- **codebuild**: Allowed arguments: batch-get-*, describe-*, list-*
+- **codecatalyst**: Allowed arguments: describe-*, get-*, list-*
+- **codecommit**: Allowed arguments: describe-*, get-*, list-*
+- **codeguru-reviewer**: Allowed arguments: describe-*, get-*, list-*
+- **codeguruprofiler**: Allowed arguments: describe-*, get-*, list-*
+- **codepipeline**: Allowed arguments: get-*, list-*
+- **codestar-connections**: Allowed arguments: describe-*, get-*, list-*
+- **codestar-notifications**: Allowed arguments: describe-*, get-*, list-*
+- **cognito-identity**: Allowed arguments: describe-*, get-*, list-*
+- **cognito-idp**: Allowed arguments: describe-*, get-*, list-*
+- **comprehend**: Allowed arguments: describe-*, get-*, list-*
+- **compute-optimizer**: Allowed arguments: describe-*, get-*, list-*
+- **configservice**: Allowed arguments: describe-*, get-*, list-*
+- **configure get**: Flags: --help
+- **configure list**: Flags: --help
+- **connect**: Allowed arguments: describe-*, get-*, list-*
+- **controltower**: Allowed arguments: describe-*, get-*, list-*
+- **cur**: Allowed arguments: describe-*, get-*, list-*
+- **databrew**: Allowed arguments: describe-*, get-*, list-*
+- **dataexchange**: Allowed arguments: describe-*, get-*, list-*
+- **datasync**: Allowed arguments: describe-*, get-*, list-*
+- **datazone**: Allowed arguments: describe-*, get-*, list-*
+- **dax**: Allowed arguments: describe-*, get-*, list-*
+- **deadline**: Allowed arguments: describe-*, get-*, list-*
+- **detective**: Allowed arguments: describe-*, get-*, list-*
+- **devicefarm**: Allowed arguments: describe-*, get-*, list-*
+- **devops-guru**: Allowed arguments: describe-*, get-*, list-*
+- **directconnect**: Allowed arguments: describe-*, get-*, list-*
+- **discovery**: Allowed arguments: describe-*, get-*, list-*
+- **dlm**: Allowed arguments: describe-*, get-*, list-*
+- **dms**: Allowed arguments: describe-*, get-*, list-*
+- **docdb**: Allowed arguments: describe-*, get-*, list-*
+- **docdb-elastic**: Allowed arguments: describe-*, get-*, list-*
+- **ds**: Allowed arguments: describe-*, get-*, list-*
+- **dynamodb**: Allowed arguments: describe-*, list-*
+- **dynamodbstreams**: Allowed arguments: describe-*, get-*, list-*
+- **ebs**: Allowed arguments: describe-*, get-*, list-*
+- **ec2**: Allowed arguments: describe-*
+- **ecr**: Allowed arguments: batch-get-*, describe-*, get-*, list-*
+- **ecr-public**: Allowed arguments: describe-*, get-*, list-*
+- **ecs**: Allowed arguments: describe-*, list-*
+- **efs**: Allowed arguments: describe-*, get-*, list-*
+- **eks**: Allowed arguments: describe-*, list-*
+- **elasticache**: Allowed arguments: describe-*, list-*
+- **elasticbeanstalk**: Allowed arguments: describe-*, list-*
+- **elastictranscoder**: Allowed arguments: describe-*, get-*, list-*
+- **elb**: Allowed arguments: describe-*
+- **elbv2**: Allowed arguments: describe-*
+- **emr**: Allowed arguments: describe-*, get-*, list-*
+- **emr-containers**: Allowed arguments: describe-*, get-*, list-*
+- **emr-serverless**: Allowed arguments: describe-*, get-*, list-*
+- **entityresolution**: Allowed arguments: describe-*, get-*, list-*
+- **es**: Allowed arguments: describe-*, get-*, list-*
+- **events**: Allowed arguments: describe-*, list-*
+- **finspace**: Allowed arguments: describe-*, get-*, list-*
+- **firehose**: Allowed arguments: describe-*, get-*, list-*
+- **fis**: Allowed arguments: describe-*, get-*, list-*
+- **fms**: Allowed arguments: describe-*, get-*, list-*
+- **forecast**: Allowed arguments: describe-*, get-*, list-*
+- **frauddetector**: Allowed arguments: describe-*, get-*, list-*
+- **fsx**: Allowed arguments: describe-*, get-*, list-*
+- **gamelift**: Allowed arguments: describe-*, get-*, list-*
+- **glacier**: Allowed arguments: describe-*, get-*, list-*
+- **globalaccelerator**: Allowed arguments: describe-*, get-*, list-*
+- **glue**: Allowed arguments: get-*, list-*
+- **grafana**: Allowed arguments: describe-*, get-*, list-*
+- **greengrass**: Allowed arguments: describe-*, get-*, list-*
+- **greengrassv2**: Allowed arguments: describe-*, get-*, list-*
+- **groundstation**: Allowed arguments: describe-*, get-*, list-*
+- **guardduty**: Allowed arguments: describe-*, get-*, list-*
+- **health**: Allowed arguments: describe-*, get-*, list-*
+- **healthlake**: Allowed arguments: describe-*, get-*, list-*
+- **iam**: Allowed arguments: get-*, list-*
+- **identitystore**: Allowed arguments: describe-*, get-*, list-*
+- **imagebuilder**: Allowed arguments: describe-*, get-*, list-*
+- **inspector2**: Allowed arguments: describe-*, get-*, list-*
+- **internetmonitor**: Allowed arguments: describe-*, get-*, list-*
+- **iot**: Allowed arguments: describe-*, get-*, list-*
+- **iotevents**: Allowed arguments: describe-*, get-*, list-*
+- **iotsitewise**: Allowed arguments: describe-*, get-*, list-*
+- **iottwinmaker**: Allowed arguments: describe-*, get-*, list-*
+- **ivs**: Allowed arguments: describe-*, get-*, list-*
+- **kafka**: Allowed arguments: describe-*, get-*, list-*
+- **kafkaconnect**: Allowed arguments: describe-*, get-*, list-*
+- **kendra**: Allowed arguments: describe-*, get-*, list-*
+- **keyspaces**: Allowed arguments: describe-*, get-*, list-*
+- **kinesis**: Allowed arguments: describe-*, get-*, list-*
+- **kinesisanalytics**: Allowed arguments: describe-*, get-*, list-*
+- **kinesisanalyticsv2**: Allowed arguments: describe-*, get-*, list-*
+- **kinesisvideo**: Allowed arguments: describe-*, get-*, list-*
+- **kms**: Allowed arguments: describe-*, get-*, list-*
+- **lakeformation**: Allowed arguments: describe-*, get-*, list-*
+- **lambda**: Allowed arguments: get-*, list-*
+- **lex-models**: Allowed arguments: describe-*, get-*, list-*
+- **lexv2-models**: Allowed arguments: describe-*, get-*, list-*
+- **license-manager**: Allowed arguments: describe-*, get-*, list-*
+- **lightsail**: Allowed arguments: describe-*, get-*, list-*
+- **location**: Allowed arguments: describe-*, get-*, list-*
+- **logs**: Allowed arguments: describe-*, filter-*, get-*, list-*
+- **m2**: Allowed arguments: describe-*, get-*, list-*
+- **macie2**: Allowed arguments: describe-*, get-*, list-*
+- **managedblockchain**: Allowed arguments: describe-*, get-*, list-*
+- **mediaconnect**: Allowed arguments: describe-*, get-*, list-*
+- **mediaconvert**: Allowed arguments: describe-*, get-*, list-*
+- **medialive**: Allowed arguments: describe-*, get-*, list-*
+- **mediapackage**: Allowed arguments: describe-*, get-*, list-*
+- **mediastore**: Allowed arguments: describe-*, get-*, list-*
+- **mediatailor**: Allowed arguments: describe-*, get-*, list-*
+- **medical-imaging**: Allowed arguments: describe-*, get-*, list-*
+- **memorydb**: Allowed arguments: describe-*, get-*, list-*
+- **mgn**: Allowed arguments: describe-*, get-*, list-*
+- **mq**: Allowed arguments: describe-*, get-*, list-*
+- **mturk**: Allowed arguments: describe-*, get-*, list-*
+- **mwaa**: Allowed arguments: describe-*, get-*, list-*
+- **neptune**: Allowed arguments: describe-*, get-*, list-*
+- **neptune-graph**: Allowed arguments: describe-*, get-*, list-*
+- **network-firewall**: Allowed arguments: describe-*, get-*, list-*
+- **networkmanager**: Allowed arguments: describe-*, get-*, list-*
+- **notifications**: Allowed arguments: describe-*, get-*, list-*
+- **oam**: Allowed arguments: describe-*, get-*, list-*
+- **omics**: Allowed arguments: describe-*, get-*, list-*
+- **opensearch**: Allowed arguments: describe-*, get-*, list-*
+- **opensearchserverless**: Allowed arguments: describe-*, get-*, list-*
+- **organizations**: Allowed arguments: describe-*, get-*, list-*
+- **outposts**: Allowed arguments: describe-*, get-*, list-*
+- **personalize**: Allowed arguments: describe-*, get-*, list-*
+- **pi**: Allowed arguments: describe-*, get-*, list-*
+- **pinpoint**: Allowed arguments: describe-*, get-*, list-*
+- **pipes**: Allowed arguments: describe-*, get-*, list-*
+- **polly**: Allowed arguments: describe-*, get-*, list-*
+- **pricing**: Allowed arguments: describe-*, get-*, list-*
+- **proton**: Allowed arguments: describe-*, get-*, list-*
+- **quicksight**: Allowed arguments: describe-*, get-*, list-*
+- **ram**: Allowed arguments: describe-*, get-*, list-*
+- **rbin**: Allowed arguments: describe-*, get-*, list-*
+- **rds**: Allowed arguments: describe-*, list-*
+- **rds-data**: Allowed arguments: describe-*, get-*, list-*
+- **redshift**: Allowed arguments: describe-*, get-*, list-*
+- **redshift-data**: Allowed arguments: describe-*, get-*, list-*
+- **redshift-serverless**: Allowed arguments: describe-*, get-*, list-*
+- **rekognition**: Allowed arguments: describe-*, get-*, list-*
+- **resiliencehub**: Allowed arguments: describe-*, get-*, list-*
+- **resource-explorer-2**: Allowed arguments: describe-*, get-*, list-*
+- **resource-groups**: Allowed arguments: describe-*, get-*, list-*
+- **resourcegroupstaggingapi**: Allowed arguments: describe-*, get-*, list-*
+- **rolesanywhere**: Allowed arguments: describe-*, get-*, list-*
+- **route53**: Allowed arguments: get-*, list-*
+- **route53-recovery-control-config**: Allowed arguments: describe-*, get-*, list-*
+- **route53-recovery-readiness**: Allowed arguments: describe-*, get-*, list-*
+- **route53domains**: Allowed arguments: describe-*, get-*, list-*
+- **route53profiles**: Allowed arguments: describe-*, get-*, list-*
+- **route53resolver**: Allowed arguments: describe-*, get-*, list-*
+- **rum**: Allowed arguments: describe-*, get-*, list-*
+- **s3**: Allowed arguments: ls
+- **s3api**: Allowed arguments: get-*, head-*, list-*
+- **s3control**: Allowed arguments: describe-*, get-*, list-*
+- **sagemaker**: Allowed arguments: describe-*, list-*
+- **savingsplans**: Allowed arguments: describe-*, get-*, list-*
+- **scheduler**: Allowed arguments: describe-*, get-*, list-*
+- **schemas**: Allowed arguments: describe-*, get-*, list-*
+- **secretsmanager**: Allowed arguments: describe-*, get-*, list-*
+- **securityhub**: Allowed arguments: describe-*, get-*, list-*
+- **securitylake**: Allowed arguments: describe-*, get-*, list-*
+- **serverlessrepo**: Allowed arguments: describe-*, get-*, list-*
+- **service-quotas**: Allowed arguments: describe-*, get-*, list-*
+- **servicecatalog**: Allowed arguments: describe-*, get-*, list-*
+- **servicediscovery**: Allowed arguments: describe-*, get-*, list-*
+- **ses**: Allowed arguments: get-*, list-*
+- **sesv2**: Allowed arguments: get-*, list-*
+- **shield**: Allowed arguments: describe-*, get-*, list-*
+- **signer**: Allowed arguments: describe-*, get-*, list-*
+- **sns**: Allowed arguments: get-*, list-*
+- **sqs**: Allowed arguments: get-*, list-*
+- **ssm**: Allowed arguments: describe-*, get-*, list-*
+- **ssm-contacts**: Allowed arguments: describe-*, get-*, list-*
+- **ssm-incidents**: Allowed arguments: describe-*, get-*, list-*
+- **sso**: Allowed arguments: describe-*, get-*, list-*
+- **sso-admin**: Allowed arguments: describe-*, get-*, list-*
+- **stepfunctions**: Allowed arguments: describe-*, get-*, list-*
+- **storagegateway**: Allowed arguments: describe-*, get-*, list-*
+- **sts get-caller-identity**: Flags: --help
+- **sts**: Allowed arguments: describe-*, get-*, list-*
+- **support**: Allowed arguments: describe-*, get-*, list-*
+- **swf**: Allowed arguments: describe-*, get-*, list-*
+- **synthetics**: Allowed arguments: describe-*, get-*, list-*
+- **textract**: Allowed arguments: describe-*, get-*, list-*
+- **timestream-query**: Allowed arguments: describe-*, get-*, list-*
+- **transcribe**: Allowed arguments: describe-*, get-*, list-*
+- **transfer**: Allowed arguments: describe-*, get-*, list-*
+- **translate**: Allowed arguments: describe-*, get-*, list-*
+- **trustedadvisor**: Allowed arguments: describe-*, get-*, list-*
+- **verifiedpermissions**: Allowed arguments: describe-*, get-*, list-*
+- **vpc-lattice**: Allowed arguments: describe-*, get-*, list-*
+- **waf**: Allowed arguments: describe-*, get-*, list-*
+- **waf-regional**: Allowed arguments: describe-*, get-*, list-*
+- **wafv2**: Allowed arguments: describe-*, get-*, list-*
+- **wellarchitected**: Allowed arguments: describe-*, get-*, list-*
+- **workdocs**: Allowed arguments: describe-*, get-*, list-*
+- **workmail**: Allowed arguments: describe-*, get-*, list-*
+- **workspaces**: Allowed arguments: describe-*, get-*, list-*
+- **workspaces-web**: Allowed arguments: describe-*, get-*, list-*
+- **xray**: Allowed arguments: describe-*, get-*, list-*
+- Allowed standalone flags: --help, --version
+
+### `az`
+<p class="cmd-url"><a href="https://learn.microsoft.com/en-us/cli/azure/">https://learn.microsoft.com/en-us/cli/azure/</a></p>
+
+- **account**: Allowed arguments: list, show, list-locations
+- **acr list**: Positional args accepted
+- **acr repository**: Allowed arguments: list, show
+- **acr show**: Positional args accepted
+- **ad app**: Allowed arguments: list, show
+- **ad group**: Allowed arguments: list, show
+- **ad sp**: Allowed arguments: list, show
+- **ad user**: Allowed arguments: list, show
+- **advisor**: Allowed arguments: configuration, recommendation
+- **aks**: Allowed arguments: list, show, get-credentials
+- **appservice**: Allowed arguments: list-locations, plan
+- **batch**: Allowed arguments: account, application, certificate, job, node, pool, task
+- **cdn**: Allowed arguments: custom-domain, edge-node, endpoint, name-exists, origin, profile, waf-policy
+- **cognitiveservices**: Allowed arguments: account, list, usage
+- **consumption**: Allowed arguments: budget, marketplace, pricesheet, reservation, usage
+- **container**: Allowed arguments: list, logs, show
+- **containerapp**: Allowed arguments: list, show
+- **cosmosdb**: Allowed arguments: list, show
+- **deployment**: Allowed arguments: list, operation, show
+- **disk**: Allowed arguments: list, show
+- **dns**: Allowed arguments: record-set, zone
+- **eventhubs**: Allowed arguments: eventhub, namespace
+- **feature**: Allowed arguments: list, show
+- **functionapp**: Allowed arguments: list, show
+- **group**: Allowed arguments: list, show
+- **hdinsight**: Allowed arguments: list, show
+- **identity**: Allowed arguments: list, show
+- **iot**: Allowed arguments: central, dps, hub
+- **keyvault**: Allowed arguments: list, show
+- **lock**: Allowed arguments: list, show
+- **logicapp**: Allowed arguments: list, show
+- **managed-cassandra**: Allowed arguments: cluster, datacenter
+- **maps**: Allowed arguments: account
+- **mariadb**: Allowed arguments: db, server
+- **monitor log-analytics**: Allowed arguments: query
+- **monitor metrics**: Allowed arguments: list
+- **mysql**: Allowed arguments: db, flexible-server, server
+- **netappfiles**: Allowed arguments: account, pool, snapshot, volume
+- **network nic**: Allowed arguments: list, show
+- **network nsg**: Allowed arguments: list, show
+- **network public-ip**: Allowed arguments: list, show
+- **network vnet**: Allowed arguments: list, show
+- **notification-hub**: Allowed arguments: authorization-rule, credential, list, namespace
+- **policy**: Allowed arguments: assignment, definition, set-definition, state
+- **postgres**: Allowed arguments: db, flexible-server, server
+- **provider**: Allowed arguments: list, operation, show
+- **redis**: Allowed arguments: list, list-keys, show
+- **relay**: Allowed arguments: hyco, namespace, wcfrelay
+- **resource**: Allowed arguments: list, show
+- **role**: Allowed arguments: assignment, definition
+- **search**: Allowed arguments: admin-key, query-key, service
+- **security**: Allowed arguments: alert, assessment, contact, pricing, secure-score, setting, task
+- **servicebus**: Allowed arguments: namespace, queue, topic
+- **sf**: Allowed arguments: application, cluster, managed-application-type, managed-cluster, service
+- **sig**: Allowed arguments: image-definition, image-version, list, show
+- **signalr**: Allowed arguments: list, show
+- **spring**: Allowed arguments: app, certificate, config-server, eureka-server, service-registry
+- **sql db**: Allowed arguments: list, show
+- **sql server**: Allowed arguments: list, show
+- **staticwebapp**: Allowed arguments: list, show
+- **storage account**: Allowed arguments: list, show
+- **synapse**: Allowed arguments: spark, sql, workspace
+- **tag**: Allowed arguments: list
+- **ts**: Allowed arguments: list, show
+- **version**: Positional args accepted
+- **vm**: Allowed arguments: list, show, list-sizes, list-ip-addresses
+- **vmss**: Allowed arguments: list, list-instances, show
+- **webapp**: Allowed arguments: list, show
+- Allowed standalone flags: --help, -h, --version
+
+### `doctl`
+<p class="cmd-url"><a href="https://docs.digitalocean.com/reference/doctl/">https://docs.digitalocean.com/reference/doctl/</a></p>
+
+- **account get**: Flags: --help, -h
+- **apps get**: Flags: --help, -h
+- **apps list**: Flags: --help, -h
+- **balance get**: Flags: --help, -h
+- **compute droplet**: Allowed arguments: list, get
+- **compute firewall**: Allowed arguments: list, get
+- **compute image**: Allowed arguments: list, get
+- **compute region**: Allowed arguments: list
+- **compute size**: Allowed arguments: list
+- **compute volume**: Allowed arguments: list, get
+- **databases get**: Flags: --help, -h
+- **databases list**: Flags: --help, -h
+- **kubernetes cluster**: Allowed arguments: list, get
+- **projects list**: Flags: --help, -h
+- **version**
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `exo`
+<p class="cmd-url"><a href="https://community.exoscale.com/documentation/tools/exoscale-cli/">https://community.exoscale.com/documentation/tools/exoscale-cli/</a></p>
+
+- **compute elastic-ip**: Allowed arguments: list, show
+- **compute instance**: Allowed arguments: list, show
+- **compute instance-type**: Allowed arguments: list, show
+- **compute security-group**: Allowed arguments: list, show
+- **compute ssh-key**: Allowed arguments: list, show
+- **config list**: Flags: --help, -h
+- **config show**: Flags: --help, -h
+- **dbaas list**: Flags: --help, -h
+- **dbaas show**: Flags: --help, -h
+- **dbaas type**: Allowed arguments: list
+- **dns list**: Flags: --help, -h
+- **dns show**: Flags: --help, -h
+- **limits**
+- **status**
+- **version**
+- **zone**
+- Allowed standalone flags: --help, -h
+
+### `gcloud`
+<p class="cmd-url"><a href="https://cloud.google.com/sdk/gcloud/reference">https://cloud.google.com/sdk/gcloud/reference</a></p>
+
+- **access-context-manager**: Allowed arguments: levels, perimeters, policies
+- **ai**: Allowed arguments: custom-jobs, endpoints, hp-tuning-jobs, index-endpoints, indexes, models, operations, tensorboards
+- **ai-platform**: Allowed arguments: jobs, local, models, operations, versions
+- **alloydb**: Allowed arguments: clusters, instances, operations
+- **api-gateway**: Allowed arguments: apis, api-configs, gateways, operations
+- **apigee**: Allowed arguments: apis, applications, archives, deployments, developers, environments, operations, organizations, products
+- **app instances**: Allowed arguments: describe, list
+- **app services**: Allowed arguments: describe, list
+- **app versions**: Allowed arguments: describe, list
+- **artifacts repositories**: Allowed arguments: describe, list
+- **artifacts**: Allowed arguments: docker, files, packages, repositories, tags, versions
+- **assured**: Allowed arguments: operations, workloads
+- **auth list**: Flags: --filter-account, --help, -h
+- **auth print-access-token**: Flags: --help, -h
+- **auth print-identity-token**: Flags: --help, -h. Valued: --audiences, --include-email
+- **batch**: Allowed arguments: jobs, tasks
+- **bigtable**: Allowed arguments: clusters, instances, operations
+- **billing**: Allowed arguments: accounts, budgets, projects
+- **builds**: Allowed arguments: describe, list, log
+- **certificate-manager**: Allowed arguments: certificates, dns-authorizations, maps, operations
+- **composer**: Allowed arguments: environments, operations
+- **compute addresses**: Allowed arguments: describe, list
+- **compute disks**: Allowed arguments: describe, list
+- **compute firewall-rules**: Allowed arguments: describe, list
+- **compute images**: Allowed arguments: describe, list
+- **compute instances**: Allowed arguments: describe, list
+- **compute machine-types**: Allowed arguments: describe, list
+- **compute networks**: Allowed arguments: describe, list
+- **compute regions**: Allowed arguments: describe, list
+- **compute snapshots**: Allowed arguments: describe, list
+- **compute zones**: Allowed arguments: describe, list
+- **config get**: Flags: --help, -h
+- **config get-value**: Flags: --help, -h
+- **config list**: Flags: --all, --help, -h
+- **container clusters**: Allowed arguments: describe, list
+- **container images**: Allowed arguments: describe, list
+- **container node-pools**: Allowed arguments: describe, list
+- **container operations**: Allowed arguments: describe, list
+- **dataflow**: Allowed arguments: jobs, logs, metrics, snapshots
+- **dataproc**: Allowed arguments: clusters, jobs, operations, workflow-templates
+- **deploy**: Allowed arguments: delivery-pipelines, releases, rollouts, targets
+- **dns managed-zones**: Allowed arguments: describe, list
+- **dns record-sets**: Allowed arguments: describe, list
+- **endpoints**: Allowed arguments: describe, list
+- **essential-contacts**: Allowed arguments: compute, list
+- **eventarc**: Allowed arguments: channels, providers, triggers
+- **filestore**: Allowed arguments: backups, instances, locations, operations
+- **firestore**: Allowed arguments: databases, indexes, operations
+- **functions**: Allowed arguments: describe, list
+- **healthcare**: Allowed arguments: datasets, dicom-stores, fhir-stores, hl7v2-stores, operations
+- **iam roles**: Allowed arguments: describe, list
+- **iam service-accounts**: Allowed arguments: describe, get-iam-policy, list
+- **identity**: Allowed arguments: groups
+- **info**: Flags: --anonymize, --help, --run-diagnostics, -h
+- **kms**: Allowed arguments: keys, keyrings, locations
+- **logging logs**: Allowed arguments: describe, list
+- **logging read**: Positional args accepted
+- **memcache**: Allowed arguments: instances, operations, regions
+- **monitoring**: Allowed arguments: channels, dashboards, policies, snoozes
+- **network-management**: Allowed arguments: connectivity-tests, operations
+- **network-services**: Allowed arguments: endpoints, gateways, grpc-routes, http-routes, meshes
+- **notebooks**: Allowed arguments: environments, instances, locations
+- **organizations**: Allowed arguments: describe, list
+- **policy-intelligence**: Allowed arguments: lint-condition, query-activity, troubleshoot-policy
+- **projects**: Allowed arguments: describe, get-iam-policy, list
+- **pubsub**: Allowed arguments: subscriptions, topics, snapshots, schemas
+- **recaptcha**: Allowed arguments: keys
+- **recommender**: Allowed arguments: insights, recommendations
+- **redis**: Allowed arguments: instances, operations, regions
+- **resource-manager**: Allowed arguments: folders, liens, operations, org-policies
+- **run services**: Allowed arguments: describe, list
+- **scc**: Allowed arguments: assets, findings, notifications, operations, sources
+- **scheduler**: Allowed arguments: jobs
+- **secrets**: Allowed arguments: describe, list, versions
+- **service-directory**: Allowed arguments: endpoints, namespaces, services
+- **services**: Allowed arguments: list
+- **source**: Allowed arguments: repos
+- **spanner**: Allowed arguments: databases, instances, operations
+- **sql databases**: Allowed arguments: describe, list
+- **sql instances**: Allowed arguments: describe, list
+- **sql operations**: Allowed arguments: describe, list
+- **storage**: Allowed arguments: buckets, cp, ls, cat, objects
+- **tasks**: Allowed arguments: describe, list, locations, queues
+- **transfer**: Allowed arguments: agents, jobs, operations
+- **version**: Positional args accepted
+- **vmware**: Allowed arguments: clusters, dns-bind-permission, external-addresses, hcx-activation-keys, locations, networks, node-types, operations, private-clouds, subnets
+- **workflows**: Allowed arguments: describe, executions, list
+- Allowed standalone flags: --help, -h, --version
+
+### `hcloud`
+<p class="cmd-url"><a href="https://github.com/hetznercloud/cli">https://github.com/hetznercloud/cli</a></p>
+
+- **certificate describe**: Flags: --help, -h. Valued: --output, -o
+- **certificate list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **context active**: Flags: --help, -h
+- **context list**: Flags: --help, -h
+- **datacenter describe**: Flags: --help, -h. Valued: --output, -o
+- **datacenter list**: Flags: --help, -h. Valued: --output, -o
+- **firewall describe**: Flags: --help, -h. Valued: --output, -o
+- **firewall list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **floating-ip describe**: Flags: --help, -h. Valued: --output, -o
+- **floating-ip list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **image describe**: Flags: --help, -h. Valued: --output, -o
+- **image list**: Flags: --help, -h. Valued: --output, --selector, --type, -l, -o
+- **load-balancer describe**: Flags: --help, -h. Valued: --output, -o
+- **load-balancer list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **location describe**: Flags: --help, -h. Valued: --output, -o
+- **location list**: Flags: --help, -h. Valued: --output, -o
+- **network describe**: Flags: --help, -h. Valued: --output, -o
+- **network list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **placement-group describe**: Flags: --help, -h. Valued: --output, -o
+- **placement-group list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **primary-ip describe**: Flags: --help, -h. Valued: --output, -o
+- **primary-ip list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **server describe**: Flags: --help, -h. Valued: --output, -o
+- **server list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **server-type describe**: Flags: --help, -h. Valued: --output, -o
+- **server-type list**: Flags: --help, -h. Valued: --output, -o
+- **ssh-key describe**: Flags: --help, -h. Valued: --output, -o
+- **ssh-key list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **version**
+- **volume describe**: Flags: --help, -h. Valued: --output, -o
+- **volume list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `linode-cli`
+<p class="cmd-url"><a href="https://www.linode.com/docs/products/tools/cli/get-started/">https://www.linode.com/docs/products/tools/cli/get-started/</a></p>
+
+- **account events-list**: Flags: --help
+- **account view**: Flags: --help
+- **databases list**: Flags: --help
+- **domains list**: Flags: --help
+- **domains view**: Flags: --help
+- **firewalls list**: Flags: --help
+- **firewalls view**: Flags: --help
+- **images list**: Flags: --help
+- **images view**: Flags: --help
+- **linodes list**: Flags: --help
+- **linodes view**: Flags: --help
+- **lke cluster-view**: Flags: --help
+- **lke clusters-list**: Flags: --help
+- **nodebalancers list**: Flags: --help
+- **nodebalancers view**: Flags: --help
+- **profile view**: Flags: --help
+- **regions list**: Flags: --help
+- **volumes list**: Flags: --help
+- **volumes view**: Flags: --help
+- Allowed standalone flags: --help, --version
+
+### `scw`
+<p class="cmd-url"><a href="https://github.com/scaleway/scaleway-cli">https://github.com/scaleway/scaleway-cli</a></p>
+
+- **account project**: Allowed arguments: list
+- **dns record**: Allowed arguments: list
+- **dns zone**: Allowed arguments: list
+- **instance image**: Allowed arguments: list, get
+- **instance ip**: Allowed arguments: list, get
+- **instance security-group**: Allowed arguments: list, get
+- **instance server**: Allowed arguments: list, get
+- **instance snapshot**: Allowed arguments: list, get
+- **instance volume**: Allowed arguments: list, get
+- **k8s cluster**: Allowed arguments: list, get
+- **k8s pool**: Allowed arguments: list, get
+- **lb lb**: Allowed arguments: list, get
+- **rdb instance**: Allowed arguments: list, get
+- **registry image**: Allowed arguments: list
+- **registry namespace**: Allowed arguments: list
+- **vpc private-network**: Allowed arguments: list
+- Allowed standalone flags: --help, -h
+
+### `vultr-cli`
+<p class="cmd-url"><a href="https://github.com/vultr/vultr-cli">https://github.com/vultr/vultr-cli</a></p>
+
+- **account**
+- **bare-metal get**: Flags: --help, -h
+- **bare-metal list**: Flags: --help, -h
+- **block-storage get**: Flags: --help, -h
+- **block-storage list**: Flags: --help, -h
+- **database get**: Flags: --help, -h
+- **database list**: Flags: --help, -h
+- **dns domain**: Allowed arguments: list
+- **dns record**: Allowed arguments: list
+- **firewall group**: Allowed arguments: list
+- **firewall rule**: Allowed arguments: list
+- **instance get**: Flags: --help, -h
+- **instance list**: Flags: --help, -h
+- **kubernetes get**: Flags: --help, -h
+- **kubernetes list**: Flags: --help, -h
+- **os list**: Flags: --help, -h
+- **plans list**: Flags: --help, -h
+- **regions list**: Flags: --help, -h
+- **version**
+- Allowed standalone flags: --help, --version, -h, -v
+

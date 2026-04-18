@@ -47,6 +47,7 @@ impl CommandSpec {
             Box::leak(self.name.clone().into_boxed_str()),
             Box::leak(self.url.clone().into_boxed_str()),
             description,
+            &self.category,
         );
         doc.aliases = self.aliases.iter().map(|a| a.to_string()).collect();
         doc

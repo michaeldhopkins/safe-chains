@@ -94,7 +94,8 @@ pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::Command
     vec![
         crate::docs::CommandDoc::handler("awk / gawk / mawk / nawk",
             "https://www.gnu.org/software/gawk/manual/gawk.html",
-            format!("- Program validated: system, getline, |, > constructs checked\n{}", AWK_POLICY.describe())),
+            format!("- Program validated: system, getline, |, > constructs checked\n{}", AWK_POLICY.describe()),
+            "text"),
     ]
 }
 

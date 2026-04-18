@@ -176,7 +176,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                 ))
                 .section("-H/--header allowed with safe headers (Accept, User-Agent, Authorization, Cookie, Cache-Control, Range, etc.).")
                 .section("-o/--output and -O/--remote-name allowed (writes files).")
-                .build()),
+                .build(),
+            "net"),
     ]
 }
 

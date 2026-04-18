@@ -1,0 +1,14 @@
+[book]
+title = "safe-chains"
+description = "Auto-allow safe, read-only bash commands in agentic coding tools"
+authors = ["Michael Hopkins"]
+
+[build]
+build-dir = "book"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "ayu"
+site-url = "/docs/safe-chains/"
+git-repository-url = "https://github.com/michaeldhopkins/safe-chains"
+additional-css = ["src/custom.css"]

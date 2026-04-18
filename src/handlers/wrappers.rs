@@ -103,10 +103,12 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         CommandDoc::handler("env",
             "https://www.gnu.org/software/coreutils/manual/coreutils.html#env-invocation",
-            "Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed."),
+            "Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed.",
+            "wrappers"),
         CommandDoc::handler("hyperfine",
             "https://github.com/sharkdp/hyperfine#readme",
-            "Recursively validates each benchmarked command."),
+            "Recursively validates each benchmarked command.",
+            "wrappers"),
     ]
 }
 

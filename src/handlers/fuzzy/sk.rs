@@ -61,6 +61,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             "sk",
             "https://github.com/lotabout/skim",
             "Fuzzy finder. Display, filtering, and layout flags allowed. --history allowed (SafeWrite).",
+            "fuzzy",
         ),
     ]
 }

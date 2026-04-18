@@ -16,8 +16,18 @@ fn main() {
     for rel_path in &entries {
         let full = commands_dir.join(rel_path);
         let path_str = full.to_str().expect("non-UTF-8 path").replace('\\', "/");
+        let category = rel_path
+            .parent()
+            .and_then(|p| p.to_str())
+            .filter(|s| !s.is_empty())
+            .unwrap_or_else(|| {
+                rel_path
+                    .file_stem()
+                    .and_then(|s| s.to_str())
+                    .expect("non-UTF-8 stem")
+            });
         code.push_str(&format!(
-            "    all.extend(load_toml(include_str!(\"{path_str}\")));\n",
+            "    all.extend(load_toml(include_str!(\"{path_str}\"), \"{category}\"));\n",
         ));
     }
     code.push_str("    build_registry(all)\n}");

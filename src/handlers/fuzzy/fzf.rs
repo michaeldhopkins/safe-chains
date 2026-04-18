@@ -101,6 +101,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             "fzf",
             "https://github.com/junegunn/fzf",
             "Fuzzy finder. --bind allowed with UI-only actions (no command execution). Display, filtering, and layout flags allowed.",
+            "fuzzy",
         ),
     ]
 }

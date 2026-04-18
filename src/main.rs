@@ -98,6 +98,9 @@ fn main() {
                 safe_chains::setup::run_setup();
             } else if cli.list_commands {
                 print_docs();
+            } else if cli.generate_book {
+                let docs = safe_chains::docs::all_command_docs();
+                safe_chains::docs::render_book(&docs, std::path::Path::new("docs"));
             } else if cli.opencode_config {
                 print_opencode_config();
             } else if let Some(command) = cli.command {

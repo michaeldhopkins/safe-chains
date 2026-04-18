@@ -120,6 +120,7 @@ pub struct CommandSpec {
     pub name: String,
     pub aliases: Vec<String>,
     pub url: String,
+    pub category: String,
     pub(super) kind: DispatchKind,
 }
 

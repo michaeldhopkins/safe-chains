@@ -31,7 +31,8 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> O
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         crate::docs::CommandDoc::handler("route", "https://man7.org/linux/man-pages/man8/route.8.html",
-            "- Allowed subcommands: get, monitor, print, show\n- Allowed flags: -4, -6, -n, -v\n- Bare invocation allowed"),
+            "- Allowed subcommands: get, monitor, print, show\n- Allowed flags: -4, -6, -n, -v\n- Bare invocation allowed",
+            "net"),
     ]
 }
 

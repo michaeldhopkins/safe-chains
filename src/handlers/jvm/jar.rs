@@ -41,7 +41,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         CommandDoc::handler("jar",
             "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jar.html",
-            "List mode only: tf, tvf, --list, -t. Also --version, --help."),
+            "List mode only: tf, tvf, --list, -t. Also --version, --help.",
+            "jvm"),
     ]
 }
 
