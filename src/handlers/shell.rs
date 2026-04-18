@@ -66,13 +66,16 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         CommandDoc::handler("bash / sh",
             "https://www.gnu.org/software/bash/manual/bash.html",
-            "Allowed: --version, --help, `bash -c` / `sh -c` with a safe inner command."),
+            "Allowed: --version, --help, `bash -c` / `sh -c` with a safe inner command.",
+            "builtins"),
         CommandDoc::handler("xargs",
             "https://www.gnu.org/software/findutils/manual/html_mono/find.html#Invoking-xargs",
-            "Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n, -P, -s, -E, -d, -0, -r, -t, -p, -x)."),
+            "Recursively validates the inner command. Skips xargs-specific flags (-I, -L, -n, -P, -s, -E, -d, -0, -r, -t, -p, -x).",
+            "builtins"),
         CommandDoc::handler("break / continue",
             "https://www.gnu.org/software/bash/manual/bash.html#index-break",
-            "Bare invocation or a single non-negative integer level (e.g. `break`, `break 2`)."),
+            "Bare invocation or a single non-negative integer level (e.g. `break`, `break 2`).",
+            "builtins"),
     ]
 }
 

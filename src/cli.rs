@@ -22,6 +22,10 @@ pub struct Cli {
     #[arg(long)]
     pub opencode_config: bool,
 
+    /// Generate mdBook command reference pages in docs/src/commands/
+    #[arg(long)]
+    pub generate_book: bool,
+
     /// Configure the Claude Code hook in ~/.claude/settings.json
     #[arg(long)]
     pub setup: bool,

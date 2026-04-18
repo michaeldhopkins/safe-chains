@@ -150,12 +150,15 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
     }
 }
 
-pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
+#[allow(clippy::too_many_lines)]
+pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
+    let cat = category.to_string();
     if let Some(handler_name) = toml.handler {
         return CommandSpec {
             name: toml.name,
             aliases: toml.aliases,
             url: toml.url,
+            category: cat,
             kind: DispatchKind::Custom { handler_name },
         };
     }
@@ -167,6 +170,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
                 name: toml.name,
                 aliases: toml.aliases,
                 url: toml.url,
+                category: cat,
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
                     subs: toml.sub.into_iter().map(build_sub).collect(),
@@ -182,6 +186,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
             name: toml.name,
             aliases: toml.aliases,
             url: toml.url,
+            category: cat,
             kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
                 valued: w.valued,
@@ -198,6 +203,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
             name: toml.name,
             aliases: toml.aliases,
             url: toml.url,
+            category: cat,
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
                 subs: toml.sub.into_iter().map(build_sub).collect(),
@@ -226,6 +232,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
             name: toml.name,
             aliases: toml.aliases,
             url: toml.url,
+            category: cat,
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
                 level,
@@ -238,6 +245,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
             name: toml.name,
             aliases: toml.aliases,
             url: toml.url,
+            category: cat,
             kind: DispatchKind::RequireAny {
                 require_any: toml.require_any,
                 policy,
@@ -251,6 +259,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
         name: toml.name,
         aliases: toml.aliases,
         url: toml.url,
+        category: cat,
         kind: DispatchKind::Policy {
             policy,
             level,
@@ -258,7 +267,7 @@ pub(super) fn build_command(toml: TomlCommand) -> CommandSpec {
     }
 }
 
-pub fn load_toml(source: &str) -> Vec<CommandSpec> {
+pub fn load_toml(source: &str, category: &str) -> Vec<CommandSpec> {
     let file: TomlFile = match toml::from_str(source) {
         Ok(f) => f,
         Err(e) => {
@@ -266,7 +275,7 @@ pub fn load_toml(source: &str) -> Vec<CommandSpec> {
             panic!("invalid TOML command definition: {e}\n  source begins: {preview}");
         }
     };
-    file.command.into_iter().map(build_command).collect()
+    file.command.into_iter().map(|cmd| build_command(cmd, category)).collect()
 }
 
 pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
@@ -277,6 +286,7 @@ pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
                 name: spec.name.clone(),
                 aliases: vec![],
                 url: spec.url.clone(),
+                category: spec.category.clone(),
                 kind: spec.kind.clone(),
             });
         }

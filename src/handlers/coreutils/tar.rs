@@ -113,7 +113,8 @@ pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::Command
         crate::docs::CommandDoc::handler("tar",
             "https://man7.org/linux/man-pages/man1/tar.1.html",
             "Listing mode only (requires -t or --list). Old-style flags accepted (e.g. tar tf, tar tzf).\n\
-             Flags: -f, -j, -J, -v, -z, -O, --bzip2, --file, --gzip, --xz, --zstd."),
+             Flags: -f, -j, -J, -v, -z, -O, --bzip2, --file, --gzip, --xz, --zstd.",
+            "fs"),
     ]
 }
 

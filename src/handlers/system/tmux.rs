@@ -215,7 +215,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
              select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, \
              set-option, set-environment, send-keys. \
              Delegation: run-shell, if-shell, pipe-pane, confirm-before \
-             (recursively validates inner commands)."),
+             (recursively validates inner commands).",
+            "system"),
     ]
 }
 

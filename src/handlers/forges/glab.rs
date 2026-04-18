@@ -145,7 +145,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                     wordset_items(&GLAB_ALWAYS_SAFE)))
                 .section("auth status, api (GET only).")
                 .section("")
-                .build()),
+                .build(),
+            "forges"),
     ]
 }
 

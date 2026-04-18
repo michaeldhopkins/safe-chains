@@ -9,7 +9,7 @@ use super::*;
     }
 
     fn load_one(toml_str: &str) -> CommandSpec {
-        let mut specs = load_toml(toml_str);
+        let mut specs = load_toml(toml_str, "test");
         assert_eq!(specs.len(), 1);
         specs.remove(0)
     }
@@ -1267,7 +1267,7 @@ use super::*;
             aliases = ["egrep"]
             bare = false
             standalone = ["-r"]
-        "#);
+        "#, "test");
         let registry = build_registry(specs);
         let spec = registry.get("egrep").expect("alias registered");
         assert_eq!(
@@ -1591,7 +1591,7 @@ use super::*;
             name = "head"
             bare = false
             valued = ["-n"]
-        "#);
+        "#, "test");
         assert_eq!(specs.len(), 2);
         assert_eq!(specs[0].name, "cat");
         assert_eq!(specs[1].name, "head");

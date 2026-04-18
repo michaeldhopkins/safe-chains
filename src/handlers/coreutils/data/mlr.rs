@@ -43,7 +43,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         crate::docs::CommandDoc::handler("mlr",
             "https://miller.readthedocs.io/",
-            "Data processing allowed. Verbs and file arguments accepted."),
+            "Data processing allowed. Verbs and file arguments accepted.",
+            "data"),
     ]
 }
 

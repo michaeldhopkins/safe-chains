@@ -16,7 +16,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
             DocBuilder::new()
                 .section("Delegates to the inner command's safety rules.")
                 .section("Skips flags: --bun/--no-install/--package/-p.")
-                .build()),
+                .build(),
+            "node"),
     ]
 }
 

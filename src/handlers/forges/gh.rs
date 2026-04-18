@@ -466,7 +466,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
                           --cache, --preview, --include, --silent, --verbose, --hostname, \
                           -H for Accept and X-GitHub-Api-Version headers).")
                 .section("")
-                .build()),
+                .build(),
+            "forges"),
     ]
 }
 

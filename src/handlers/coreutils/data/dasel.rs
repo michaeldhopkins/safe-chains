@@ -47,7 +47,8 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     vec![
         crate::docs::CommandDoc::handler("dasel",
             "https://github.com/TomWright/dasel",
-            "Read-only queries allowed. select subcommand allowed."),
+            "Read-only queries allowed. select subcommand allowed.",
+            "data"),
     ]
 }
 

@@ -57,7 +57,8 @@ pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::Command
         crate::docs::CommandDoc::handler("find",
             "https://www.gnu.org/software/findutils/manual/html_mono/find.html",
             "Positional predicates allowed. \
-             -exec/-execdir allowed when the executed command is itself safe."),
+             -exec/-execdir allowed when the executed command is itself safe.",
+            "fs"),
     ]
 }
 
