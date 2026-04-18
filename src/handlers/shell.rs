@@ -31,7 +31,12 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
             i += 1;
             continue;
         }
-        if tokens[i].starts_with("-") {
+        let s = tokens[i].as_str();
+        if XARGS_FLAGS_WITH_ARG.iter().any(|f| s.starts_with(f)) {
+            i += 1;
+            continue;
+        }
+        if s.starts_with("-") {
             return Verdict::Denied;
         }
         let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
@@ -111,6 +116,7 @@ mod tests {
         xargs_grep: "xargs grep pattern",
         xargs_cat: "xargs cat",
         xargs_with_flags: "xargs -I {} cat {}",
+        xargs_with_joined_flag: "xargs -I{} basename {}",
         xargs_zero_flag: "xargs -0 grep foo",
         xargs_npx_safe: "xargs npx eslint src/",
         xargs_find_safe: "xargs find . -name '*.py'",

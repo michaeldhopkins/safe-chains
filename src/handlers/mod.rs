@@ -138,7 +138,7 @@ const HANDLED_CMDS: &[&str] = &[
     "traceroute", "traceroute6", "mtr", "nc", "ncat", "nmap",
     "xv",
     "fzf", "fzy", "peco", "pick", "selecta", "sk", "zf",
-    "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "workon", "safe-chains", "snyk", "mdbook", "devbox", "pup",
+    "identify", "shellcheck", "cloc", "tokei", "cucumber", "branchdiff", "specdiff", "workon", "safe-chains", "snyk", "mdbook", "devbox", "pup",
     "tldr", "ldd", "objdump", "readelf", "just",
     "prettier", "black", "ruff", "mypy", "pyright", "pylint", "flake8", "isort",
     "rubocop", "eslint", "biome", "stylelint", "zoxide",
@@ -262,13 +262,18 @@ mod tests {
     }
 
     #[test]
-    fn process_substitution_blocked() {
-        let cmds = ["echo <(cat /etc/passwd)", "echo >(rm -rf /)", "grep pattern <(ls)"];
-        for cmd in &cmds {
-            assert!(
-                !crate::is_safe_command(cmd),
-                "process substitution not blocked: {cmd}",
-            );
+    fn process_substitution_safe_inner() {
+        let safe = ["echo <(cat /etc/passwd)", "grep pattern <(ls)", "diff <(sort a.txt) <(sort b.txt)", "comm -23 file.txt <(sort other.txt)"];
+        for cmd in &safe {
+            assert!(crate::is_safe_command(cmd), "safe process substitution rejected: {cmd}");
+        }
+    }
+
+    #[test]
+    fn process_substitution_unsafe_inner() {
+        let unsafe_cmds = ["echo >(rm -rf /)", "diff <(sort a.txt) <(rm -rf /)"];
+        for cmd in &unsafe_cmds {
+            assert!(!crate::is_safe_command(cmd), "unsafe process substitution approved: {cmd}");
         }
     }
 

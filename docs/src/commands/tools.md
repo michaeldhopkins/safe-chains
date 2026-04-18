@@ -498,6 +498,13 @@ Aliases: `python`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
 
+### `specdiff`
+<p class="cmd-url"><a href="https://github.com/michaeldhopkins/specdiff">https://github.com/michaeldhopkins/specdiff</a></p>
+
+- Allowed standalone flags: --changed-only, --help, --no-color, --print, --version, -V, -h, -p
+- Allowed valued flags: --base, --base-dir, --filter, --format, --framework, --head, --head-dir
+- Bare invocation allowed
+
 ### `stylelint`
 <p class="cmd-url"><a href="https://stylelint.io/user-guide/cli/">https://stylelint.io/user-guide/cli/</a></p>
 
