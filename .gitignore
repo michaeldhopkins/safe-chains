@@ -1,4 +1,5 @@
 /target
 .claude
 docs/src/commands/
+docs/src/includes/command-count.md
 docs/book/
