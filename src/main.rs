@@ -58,8 +58,9 @@ fn run_claude_hook() {
     let verdict = safe_chains::command_verdict(&input.tool_input.command);
     if verdict.is_allowed() {
         let reason = match verdict {
-            Verdict::Allowed(SafetyLevel::SafeWrite) => "All commands in chain are safe utilities (includes file output)",
-            _ => "All commands in chain are safe read-only utilities",
+            Verdict::Allowed(SafetyLevel::SafeWrite) => "All commands in chain are safe utilities (includes file writes)",
+            Verdict::Allowed(SafetyLevel::SafeRead) => "All commands in chain are safe utilities (includes code execution)",
+            _ => "All commands in chain are safe utilities",
         };
         emit_allow(reason);
         return;

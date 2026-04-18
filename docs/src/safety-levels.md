@@ -19,6 +19,4 @@ safe-chains --level safe-read "cargo build"  # exit 1 (safe-write > safe-read)
 
 Without `--level`, the default threshold is `safe-write` (all allowed commands pass).
 
-`--help` and `--version` on any command are always `inert`.
-
 Levels propagate through pipelines, wrappers, and substitutions — a pipeline's level is the maximum of its components.
