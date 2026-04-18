@@ -4,7 +4,7 @@ A command safety checker that auto-allows safe bash commands without prompting. 
 
 safe-chains knows 450+ commands. For each one it validates specific subcommands and flags — allowing `git log` but not `git push`, allowing `sed 's/foo/bar/'` but not `sed -i`. Commands in piped chains, `&&`, and `;` sequences are each validated independently. Compound commands (`for`, `while`, `if`) are parsed recursively.
 
-[Documentation](https://www.michaeldhopkins.com/docs/safe-chains/) · [Command reference](COMMANDS.md)
+[Documentation and supported command reference](https://www.michaeldhopkins.com/docs/safe-chains/)
 
 ## Install
 
