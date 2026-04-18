@@ -12,6 +12,8 @@ pub(super) struct TomlFile {
 pub(super) struct TomlCommand {
     pub name: String,
     #[serde(default)]
+    pub candidate: Option<bool>,
+    #[serde(default)]
     pub aliases: Vec<String>,
     #[serde(default)]
     pub url: String,
@@ -60,6 +62,8 @@ pub(super) struct TomlWrapper {
 #[derive(Debug, Deserialize)]
 pub(super) struct TomlSub {
     pub name: String,
+    #[serde(default)]
+    pub candidate: Option<bool>,
     #[serde(default)]
     pub level: Option<TomlLevel>,
     #[serde(default)]
