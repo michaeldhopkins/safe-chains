@@ -233,6 +233,12 @@ pub fn render_book(docs: &[CommandDoc], output_dir: &std::path::Path) {
     }
 
     let total: usize = by_category.values().map(|v| v.len()).sum();
+
+    let includes_dir = output_dir.join("src").join("includes");
+    fs::create_dir_all(&includes_dir).expect("failed to create includes dir");
+    fs::write(includes_dir.join("command-count.md"), format!("{total}\n"))
+        .expect("failed to write command-count.md");
+
     let mut readme = format!(
         "# Command Reference\n\n\
          safe-chains knows {total} commands across {} categories.\n\n\
