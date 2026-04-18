@@ -1,5 +1,6 @@
 [[command]]
 name = "psql"
+description = "PostgreSQL's interactive terminal client for executing SQL queries, managing databases, and administering servers. An unrestricted psql invocation opens a full interactive SQL session capable of reading, modifying, and deleting any data the authenticated user has access to, executing DDL, and running system-level functions. It can also execute arbitrary shell commands via \\! and read files via \\copy. The coverage is restricted to --help and --version, which print usage information and the client version string locally without connecting to any database server. No network connections, authentication, or SQL execution occurs with these flags."
 url = "https://www.postgresql.org/docs/current/app-psql.html"
 level = "Inert"
 bare = false

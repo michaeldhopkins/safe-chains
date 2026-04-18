@@ -1,5 +1,6 @@
 [[command]]
 name = "networksetup"
+description = "macOS system utility for configuring network interfaces, Wi-Fi, proxies, DNS, VLANs, and locations from the command line. The full command requires admin/root privileges and can modify TCP/IP settings, configure proxies, change DNS servers, create/delete network locations, and join Wi-Fi networks -- all of which alter the machine's network connectivity and security posture. The coverage is restricted to read-only flag prefixes (-list*, -get*, -show*, -print*) that query current network configuration, interface status, and service properties without making any changes. The set/create/remove/add/select operations are all outside coverage. The interface ships with macOS and changes with OS releases."
 url = "https://ss64.com/mac/networksetup.html"
 level = "Inert"
 first_arg = ["-list*", "-get*", "-show*", "-print*", "-version", "--version", "-V", "-help", "--help", "-h"]

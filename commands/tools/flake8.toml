@@ -1,5 +1,6 @@
 [[command]]
 name = "flake8"
+description = "Python linter that wraps pycodestyle, Pyflakes, and mccabe under a single CLI, extensible via third-party plugins. Reads Python source files and reports style violations and errors to stdout without modifying code. Stable project with periodic releases."
 url = "https://flake8.pycqa.org/en/latest/user/invocation.html"
 level = "SafeRead"
 bare = true

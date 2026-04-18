@@ -1,5 +1,6 @@
 [[command]]
 name = "fzy"
+description = "Fast fuzzy text selector that reads lines from stdin, presents an interactive selection UI, and prints the chosen line to stdout. Strictly read-only: reads from stdin and writes a selection to stdout. Does not modify files or access the network. Written in C with minimal dependencies. The CLI surface is small and very stable."
 url = "https://github.com/jhawthorn/fzy"
 level = "Inert"
 bare = true

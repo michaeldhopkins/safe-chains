@@ -1,5 +1,6 @@
 [[command]]
 name = "pg_isready"
+description = "Lightweight PostgreSQL utility that checks whether a server is accepting connections by attempting a minimal connection handshake. The tool makes a network connection to the specified host and port but does not authenticate, open a session, or execute any queries -- it only tests the connection acceptance state and returns an exit code (0=accepting, 1=rejecting, 2=no response, 3=invalid params). Incorrect credentials will not cause authentication failures, but the server may log the connection attempt. This is the lowest-risk PostgreSQL client tool: no data is read or written, and no session is established."
 url = "https://www.postgresql.org/docs/current/app-pg-isready.html"
 level = "Inert"
 bare = true

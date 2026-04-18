@@ -1,5 +1,6 @@
 [[command]]
 name = "shuf"
+description = "Generates random permutations of input lines, a numeric range, or command-line arguments. Writes to stdout by default; the -o flag can direct output to a file. No network access and no ability to execute commands. Ships with GNU coreutils."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#shuf-invocation"
 level = "Inert"
 bare = true

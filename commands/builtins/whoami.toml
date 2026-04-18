@@ -1,5 +1,6 @@
 [[command]]
 name = "whoami"
+description = "Prints the effective username associated with the current user ID. Read-only with no side effects -- it queries the system user database and writes a single line to stdout. Part of GNU coreutils; trivially simple and unchanged for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#whoami-invocation"
 level = "Inert"
 bare = true

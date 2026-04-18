@@ -1,5 +1,6 @@
 [[command]]
 name = "javap"
+description = "Disassembles compiled Java class files to display bytecode, method signatures, field declarations, and constant pool entries. All operations are strictly read-only: javap reads .class files (or JARs via classpath) and writes human-readable output to stdout. It does not modify files, execute code, or access the network. Part of the JDK, which ships on a 6-month cadence; javap's flag surface is very stable, with only minor additions (e.g., --module for Java 9+) over many years."
 url = "https://docs.oracle.com/en/java/javase/21/docs/specs/man/javap.html"
 level = "Inert"
 bare = false

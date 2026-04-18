@@ -1,5 +1,6 @@
 [[command]]
 name = "factor"
+description = "Computes and prints the prime factorization of integer arguments or integers read from stdin. Pure computation with no filesystem writes, no network access, and no side effects beyond stdout. Ships with GNU coreutils."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#factor-invocation"
 level = "Inert"
 bare = true

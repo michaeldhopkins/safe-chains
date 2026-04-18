@@ -1,5 +1,6 @@
 [[command]]
 name = "staticcheck"
+description = "Advanced static analysis tool for Go that finds bugs, performance issues, and code simplifications. Reads and compiles Go source files to perform deep analysis, including type checking and control flow analysis, then reports findings to stdout without modifying source code. Does not access the network. The -explain flag provides documentation for specific checks. Releases roughly every few months, tracking new Go versions."
 url = "https://staticcheck.dev/"
 level = "SafeRead"
 bare = false

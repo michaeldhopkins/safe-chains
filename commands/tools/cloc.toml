@@ -1,5 +1,6 @@
 [[command]]
 name = "cloc"
+description = "Counts blank lines, comment lines, and source lines of code across many programming languages. Reads files and directories, producing statistical reports to stdout in text, JSON, XML, or YAML. Pure Perl with no external dependencies; stable project with releases roughly every six months."
 url = "https://github.com/AlDanial/cloc#readme"
 level = "Inert"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "@asyncapi/cli"
+description = "CLI for working with AsyncAPI specification documents. The validate and diff subcommands parse documents and report conformance errors or differences to stdout without modifying files. Actively maintained with frequent releases."
 url = "https://www.asyncapi.com/docs/tools/cli"
 bare_flags = ["--help", "--version", "-h"]
 

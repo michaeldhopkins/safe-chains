@@ -1,5 +1,6 @@
 [[command]]
 name = "nm"
+description = "Lists symbols from object files, archives, and shared libraries. Read-only: parses binary formats (ELF, Mach-O, COFF) and writes symbol information to stdout without modifying input files. Included in GNU binutils and Xcode; both implementations have been stable for decades with minimal project velocity."
 url = "https://man7.org/linux/man-pages/man1/nm.1.html"
 level = "Inert"
 bare = false

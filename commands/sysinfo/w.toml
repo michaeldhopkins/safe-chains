@@ -1,5 +1,6 @@
 [[command]]
 name = "w"
+description = "Shows who is logged in and what they are doing; supported with header and format flags."
 url = "https://man7.org/linux/man-pages/man1/w.1.html"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "hcloud"
+description = "Command-line interface for managing Hetzner Cloud resources (servers, volumes, networks, firewalls, load balancers). The full CLI can create, modify, and delete infrastructure. Authenticated via project-scoped API token. Open-source Go project with moderate release velocity."
 url = "https://github.com/hetznercloud/cli"
 bare_flags = ["--help", "--version", "-h", "-v"]
 [command.wrapper]

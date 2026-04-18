@@ -1,5 +1,6 @@
 [[command]]
 name = "ansible-config"
+description = "Displays Ansible configuration settings and their sources. All subcommands (list, dump, view) are read-only: they read ansible.cfg and environment variables, then print effective configuration to stdout. No subcommand modifies files or touches the network. The init subcommand (which generates a new config file) is the only mutating operation. Part of ansible-core, which releases two major versions per year with minor releases roughly every four weeks."
 url = "https://docs.ansible.com/ansible/latest/cli/ansible-config.html"
 bare_flags = ["--help", "--version", "-h"]
 

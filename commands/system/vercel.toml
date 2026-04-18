@@ -1,5 +1,6 @@
 [[command]]
 name = "vercel"
+description = "CLI for the Vercel cloud deployment platform, used to deploy, manage, and inspect web applications. Write subcommands (deploy, dev, env, link, remove, alias -- not listed here) push code to Vercel's infrastructure, modify environment variables, and delete deployments, all communicating with Vercel's remote API. Read-only subcommands (inspect, list, project ls, whoami) query deployment and account state via the API; these are network calls to Vercel's servers but do not mutate anything. Vercel CLI releases very frequently via continuous deployment to npm, sometimes multiple times per week, with new subcommands and flags added regularly."
 url = "https://vercel.com/docs/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

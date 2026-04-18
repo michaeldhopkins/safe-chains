@@ -1,5 +1,6 @@
 [[command]]
 name = "depcheck"
+description = "Scans a Node.js project's source files for require/import statements and cross-references them against package.json to find unused or missing dependencies. Read-only analysis that does not modify any files. Maintenance has slowed significantly; last release was over two years ago."
 url = "https://github.com/depcheck/depcheck"
 level = "SafeRead"
 bare = true

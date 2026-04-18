@@ -1,5 +1,6 @@
 [[command]]
 name = "@ibm/openapi-validator"
+description = "Validates and lints OpenAPI (Swagger) specification documents against configurable rulesets including IBM Cloud API guidelines. Purely read-only file analysis — it parses spec files and reports violations without modifying them or making network calls. Actively maintained at v1.37.x with regular minor/patch releases every few weeks."
 url = "https://github.com/IBM/openapi-validator"
 level = "SafeRead"
 bare = false

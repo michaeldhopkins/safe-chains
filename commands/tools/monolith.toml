@@ -1,5 +1,6 @@
 [[command]]
 name = "monolith"
+description = "Saves a complete web page as a single self-contained HTML file by fetching and embedding all linked CSS, images, fonts, and JavaScript assets. It makes network requests to the target URL and all referenced asset URLs, and writes the result to stdout or a file. The -k flag disables TLS certificate verification. The --cookies and --user-agent flags transmit caller-specified data. Development is sporadic (v2.8.x, with gaps of months between releases)."
 url = "https://github.com/Y2Z/monolith"
 level = "Inert"
 bare = false

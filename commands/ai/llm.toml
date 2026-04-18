@@ -1,5 +1,6 @@
 [[command]]
 name = "llm"
+description = "CLI and Python library for interacting with large language models from multiple providers. The full tool can send prompts to LLMs over the network, execute tool-calling functions locally, manage API keys, and install plugins that extend its capabilities with arbitrary code. Read-only subcommands (models, plugins, aliases, templates, logs) inspect local configuration and conversation history stored in a SQLite database without side effects. The project is under very active development with major new features (tool calling, multimodal input) added in recent releases."
 url = "https://llm.datasette.io/en/stable/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

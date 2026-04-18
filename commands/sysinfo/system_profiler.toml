@@ -1,5 +1,6 @@
 [[command]]
 name = "system_profiler"
+description = "Collects and reports detailed hardware and software inventory on macOS (the CLI equivalent of System Information.app). Entirely read-only -- it queries system frameworks and kernel interfaces to enumerate hardware, network interfaces, installed software, and more. Output can be text, JSON, or XML. Cannot modify any system state. No network access. Positional arguments specify data types to report (e.g. SPHardwareDataType); without arguments it reports all categories, which can be slow. Ships with macOS; the interface is stable and changes only with OS updates when new data types are added."
 url = "https://ss64.com/mac/system_profiler.html"
 level = "Inert"
 bare = true

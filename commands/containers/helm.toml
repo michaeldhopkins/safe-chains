@@ -1,5 +1,6 @@
 [[command]]
 name = "helm"
+description = "Kubernetes package manager for deploying and managing Helm charts. Read-only subcommands (list, get, show, status, search, history, verify, env, version) inspect release state, chart metadata, or repository indices. template renders charts locally without contacting the cluster. Write subcommands (install, upgrade, uninstall, rollback, repo add/remove, plugin install) modify cluster state or local configuration. install/upgrade can execute chart hooks that run arbitrary workloads in the cluster. The project recently shipped Helm v4.0.0 (November 2025), the first major version in six years, which redesigned the plugin system and SDK. Patch releases ship roughly monthly across v3 and v4 tracks."
 url = "https://helm.sh/docs/helm/"
 bare_flags = ["--help", "-h"]
 [command.wrapper]

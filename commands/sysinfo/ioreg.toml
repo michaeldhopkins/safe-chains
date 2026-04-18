@@ -1,5 +1,6 @@
 [[command]]
 name = "ioreg"
+description = "Displays the macOS I/O Kit registry, a kernel-maintained hierarchical database of hardware and driver objects. Entirely read-only -- it queries the in-memory device tree and prints properties; it cannot modify the registry or any system state. Flags control filtering (by class, key, name, or depth) and output formatting. No network access. Ships with macOS and changes only with OS updates; the interface has been stable for many years."
 url = "https://ss64.com/mac/ioreg.html"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "dig"
+description = "DNS lookup utility that queries DNS servers over the network. Sends DNS queries to configured or specified nameservers and displays the response. Read-only from a local filesystem perspective, but every invocation generates network traffic to DNS servers. The -x flag performs reverse lookups. The -f flag reads queries from a file. Part of ISC BIND, with a very stable CLI surface."
 url = "https://man7.org/linux/man-pages/man1/dig.1.html"
 level = "Inert"
 bare = true

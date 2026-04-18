@@ -1,5 +1,6 @@
 [[command]]
 name = "syft"
+description = "Software Bill of Materials (SBOM) generator from Anchore that catalogs packages in container images and filesystems. Scans the target and outputs an SBOM in CycloneDX, SPDX, or other formats to stdout or a file. Read-only analysis that does not modify the scanned target. Very actively maintained with frequent releases."
 url = "https://github.com/anchore/syft"
 level = "Inert"
 bare = false

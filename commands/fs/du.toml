@@ -1,5 +1,6 @@
 [[command]]
 name = "du"
+description = "Estimates disk space used by files and directories by traversing the filesystem. Strictly read-only: reads file metadata (inode sizes) and prints totals to stdout. Can be slow on large directory trees. Does not modify files or access the network. Part of GNU coreutils with a very stable CLI surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation"
 level = "Inert"
 bare = true

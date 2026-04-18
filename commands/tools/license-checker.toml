@@ -1,5 +1,6 @@
 [[command]]
 name = "license-checker"
+description = "Inspects the node_modules tree of an npm project and reports the license of each installed package. Read-only — it reads package.json and LICENSE files from disk and outputs a summary to stdout or a file. The --out flag writes a report file. The project is unmaintained (last release v25.0.1 was in 2017), so the flag surface is frozen."
 url = "https://github.com/davglass/license-checker"
 level = "Inert"
 bare = true

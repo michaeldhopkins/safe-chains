@@ -1,5 +1,6 @@
 [[command]]
 name = "fastlane"
+description = "Build automation framework for iOS and Android that handles code signing, screenshot generation, beta distribution, and App Store/Play Store releases. Running lanes (fastlane [lane_name]) executes arbitrary Ruby code from Fastfile definitions, which can compile code, sign binaries, upload to distribution services, and modify provisioning profiles. The covered subcommands (action, actions, env, lanes) are purely informational: they print documentation for available actions, list defined lanes, and display environment diagnostics without executing any lane logic or making network calls. The project is actively maintained with frequent releases."
 url = "https://docs.fastlane.tools/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

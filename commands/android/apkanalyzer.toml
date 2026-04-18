@@ -1,5 +1,6 @@
 [[command]]
 name = "apkanalyzer"
+description = "Android APK static analysis tool, part of the Android SDK command-line tools. All subcommands are strictly read-only: they parse an APK file to report size, features, dex references, manifest fields, resource configs, and file listings. No subcommand modifies the APK, writes output files, or touches the network. Released as part of the Android SDK command-line tools, which update a few times per year."
 url = "https://developer.android.com/tools/apkanalyzer"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

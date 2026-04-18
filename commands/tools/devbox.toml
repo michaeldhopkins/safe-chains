@@ -1,5 +1,6 @@
 [[command]]
 name = "devbox"
+description = "Creates isolated, reproducible development environments backed by Nix packages. The list/info/search/version subcommands query package metadata and environment state without modifying the system. Actively maintained by Jetify with regular releases."
 url = "https://www.jetify.com/devbox/docs/"
 bare_flags = ["--help", "--version", "-h"]
 

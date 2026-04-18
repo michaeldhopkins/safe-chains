@@ -1,5 +1,6 @@
 [[command]]
 name = "nox"
+description = "Python test automation tool that executes sessions defined in a noxfile.py. Each session can create virtualenvs, install packages, and run arbitrary shell commands, so nox inherits the full safety profile of whatever the noxfile defines. --list is a read-only dry-run that shows available sessions without executing them. The noxfile.py itself is executed as Python code during session discovery. Does not make network requests directly, but sessions typically do (e.g., pip install). Stable project with regular releases."
 url = "https://nox.thea.codes/"
 level = "SafeRead"
 standalone = [

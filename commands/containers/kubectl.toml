@@ -1,5 +1,6 @@
 [[command]]
 name = "kubectl"
+description = "Primary CLI for Kubernetes cluster management with a large and growing surface area. Read-only subcommands (get, describe, logs, events, top, explain, api-resources, api-versions, cluster-info, auth can-i/whoami, config view/get-contexts, diff, version) query cluster state. Write subcommands (apply, delete, create, edit, patch, scale, rollout, label, annotate, taint, cordon, drain) modify cluster resources. exec and port-forward open network connections into pods and can execute arbitrary code. cp copies files to/from containers. Kubernetes releases three times per year and kubectl gains new flags and subcommands in each release (e.g. --subresource was added across multiple subcommands in v1.35)."
 url = "https://kubernetes.io/docs/reference/kubectl/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

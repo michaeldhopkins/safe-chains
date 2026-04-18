@@ -1,5 +1,6 @@
 [[command]]
 name = "cut"
+description = "Extracts sections (bytes, characters, or delimited fields) from each line of input. Purely read-only: reads input and writes selected portions to stdout without modifying source files. Part of GNU coreutils, which releases roughly every 6-12 months; the interface has been stable for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation"
 level = "Inert"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "jc"
+description = "Converts the text output of common CLI tools (ps, ls, ifconfig, etc.) and file formats into structured JSON or YAML. A pure text transformer that reads stdin or the output of a piped command and writes structured data to stdout — it does not execute the commands itself, modify files, or make network calls. New parsers are added regularly, with releases roughly every few weeks."
 url = "https://kellyjonbrazil.github.io/jc/"
 level = "Inert"
 bare = false

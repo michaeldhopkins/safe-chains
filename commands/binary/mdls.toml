@@ -1,5 +1,6 @@
 [[command]]
 name = "mdls"
+description = "Queries Spotlight metadata attributes for files on macOS. Read-only: retrieves indexed metadata and prints to stdout, never modifying files or the Spotlight index. Ships as a system binary since macOS 10.4; no independent release cycle."
 url = "https://ss64.com/mac/mdls.html"
 level = "Inert"
 bare = false

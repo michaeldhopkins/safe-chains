@@ -1,5 +1,6 @@
 [[command]]
 name = "terraform"
+description = "Infrastructure-as-code CLI that provisions and manages cloud resources via declarative configuration files. The full CLI has a very large blast radius: plan, apply, and destroy create, modify, or delete real infrastructure and can trigger arbitrary provider-defined operations. init downloads provider plugins from the network. Read-only subcommands (validate, output, show, state list/show, graph, providers, version) inspect local state and configuration without modifying infrastructure. fmt reformats files in place unless --check is passed, in which case it only reports drift. Terraform releases roughly quarterly with occasional new subcommands (e.g. terraform stacks in v1.13)."
 url = "https://developer.hashicorp.com/terraform/cli/commands"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

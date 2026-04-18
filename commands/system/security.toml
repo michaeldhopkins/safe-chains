@@ -1,5 +1,6 @@
 [[command]]
 name = "security"
+description = "macOS command-line interface to the Security framework for administering keychains, certificates, keys, trust policies, and code-signing identities. The full command can create/delete keychains, add/delete passwords and certificates, unlock keychains, modify trust settings, and import/export cryptographic material -- all of which affect the system's credential store and PKI trust chain. The covered subcommands (find-certificate, find-identity, find-generic-password, find-internet-password, list-keychains, dump-keychain, dump-trust-settings, verify-cert, cms, show-keychain-info, smartcard) are read-only queries that search for and display certificate, identity, and password metadata. Note that find-generic-password and find-internet-password can display stored password values in their output. The interface ships with macOS and is stable."
 url = "https://ss64.com/mac/security.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "@graphql-inspector/cli"
+description = "Compares, validates, and analyzes GraphQL schemas to detect breaking changes, unused types, and coverage gaps. Most subcommands are pure schema analysis (diff, validate, similar, coverage), but introspect sends a network request to a GraphQL endpoint. The --token and --header flags transmit credentials. Releases appear periodically; the project is at v6.x with occasional minor/patch updates."
 url = "https://the-guild.dev/graphql/inspector/docs"
 bare_flags = ["--help", "--version", "-h"]
 

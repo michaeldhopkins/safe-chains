@@ -1,5 +1,6 @@
 [[command]]
 name = "apksigner"
+description = "Signs and verifies Android APK files using cryptographic signatures, part of the Android SDK build tools. The sign subcommand modifies the APK by embedding a digital signature (requires access to a private key). The rotate subcommand manages signing key lineage. The verify subcommand is read-only: it checks the integrity and authenticity of an existing signature without modifying the file. All operations are local with no network access. Released as part of the Android SDK build tools."
 url = "https://developer.android.com/tools/apksigner"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

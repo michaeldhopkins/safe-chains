@@ -1,5 +1,6 @@
 [[command]]
 name = "sum"
+description = "Computes legacy BSD or System V style checksums and block counts. Strictly read-only: reads file contents, computes checksums, and prints results to stdout. These are non-cryptographic checksums intended only for basic data integrity checks. Does not modify files or access the network. Part of GNU coreutils with an essentially frozen CLI surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sum-invocation"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "glow"
+description = "Renders Markdown files with syntax highlighting and styling for terminal display. Read-only: reads Markdown files and writes formatted output to stdout or an internal pager. Does not modify input files. Developed by Charmbracelet; actively maintained with releases roughly annually (currently v2.x). Newer and faster-moving than traditional text utilities."
 url = "https://github.com/charmbracelet/glow"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "madge"
+description = "Generates dependency graphs from JavaScript/TypeScript modules and detects circular dependencies. Read-only analysis — it parses import/require statements and reports the dependency structure without modifying source files. The --dot flag outputs Graphviz format, and --image (not listed here) would write a file. Development has slowed (v8.0.0 released August 2024, no subsequent releases), so the flag surface is stable."
 url = "https://github.com/pahen/madge"
 level = "SafeRead"
 bare = false

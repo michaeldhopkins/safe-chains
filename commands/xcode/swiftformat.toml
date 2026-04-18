@@ -1,5 +1,6 @@
 [[command]]
 name = "swiftformat"
+description = "Opinionated code formatter for Swift source files. In default mode, it rewrites files in place — a write operation. --lint mode reports formatting violations to stderr without modifying files (read-only). --dryrun previews what would change without writing (read-only). The tool parses Swift source into a token stream and applies configurable rules; it never contacts the network. SwiftFormat has nightly automated releases from the develop branch, with frequent rule additions and behavioral changes; ongoing review of new rules is warranted."
 url = "https://github.com/nicklockwood/SwiftFormat"
 level = "SafeRead"
 bare = false

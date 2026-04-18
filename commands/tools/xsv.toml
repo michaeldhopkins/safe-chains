@@ -1,5 +1,6 @@
 [[command]]
 name = "xsv"
+description = "Fast CSV command-line toolkit written in Rust by BurntSushi, providing subcommands for slicing, selecting, searching, joining, and analyzing CSV data. Reads from files/stdin and writes to stdout without modifying input files. The project is archived and unmaintained (last release v0.13.0 in May 2018); qsv is its actively maintained successor. The CLI surface is frozen."
 url = "https://github.com/BurntSushi/xsv"
 level = "Inert"
 bare = false

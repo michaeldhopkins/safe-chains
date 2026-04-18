@@ -1,5 +1,6 @@
 [[command]]
 name = "time"
+description = "Command wrapper that measures the wall-clock, user, and system CPU time of a child process. time itself is purely observational — it runs the inner command unmodified and prints timing statistics to stderr. The -p flag selects POSIX output format. The safety of the overall invocation depends entirely on the inner command. The built-in shell keyword and /usr/bin/time have slightly different flag sets, but both are read-only wrappers. Extremely stable; the interface has not changed in decades."
 url = "https://man7.org/linux/man-pages/man1/time.1.html"
 [command.wrapper]
 standalone = ["-p"]

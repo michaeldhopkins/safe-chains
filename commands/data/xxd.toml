@@ -1,5 +1,6 @@
 [[command]]
 name = "xxd"
+description = "Creates a hex dump of a file or stdin, or reverses a hex dump back to binary (--revert). Pure data transformation that writes to stdout. No filesystem side effects, no network access, and no ability to execute commands. Ships with vim/xxd on most Unix systems."
 url = "https://man7.org/linux/man-pages/man1/xxd.1.html"
 level = "Inert"
 bare = true

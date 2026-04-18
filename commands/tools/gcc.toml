@@ -1,5 +1,6 @@
 [[command]]
 name = "gcc"
+description = "GNU Compiler Collection front-end for C, C++, and other languages. Full invocation compiles source into object files or executables and can execute arbitrary code through compiled output. Mature project with annual major releases and regular patch updates."
 url = "https://gcc.gnu.org/onlinedocs/gcc/Overall-Options.html"
 level = "Inert"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "tokei"
+description = "Fast code statistics tool written in Rust that counts lines of code, comments, and blanks across 150+ languages. Reads source files and prints a summary to stdout without modifying anything. Purely read-only. Actively maintained with periodic releases; v13.x is current."
 url = "https://github.com/XAMPPRocky/tokei#readme"
 level = "Inert"
 bare = true

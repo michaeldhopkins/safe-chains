@@ -1,5 +1,6 @@
 [[command]]
 name = "R"
+description = "R statistical computing environment; supports CMD check and CMD config subcommands for package validation and configuration queries."
 url = "https://cran.r-project.org/manuals.html"
 
 [[command.sub]]

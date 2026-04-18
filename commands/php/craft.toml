@@ -1,5 +1,6 @@
 [[command]]
 name = "craft"
+description = "CLI for the Craft CMS content management system (built on Yii2/PHP). All exposed subcommands are read-only queries against the Craft application state and database. env/show, graphql/list-schemas, graphql/print-schema, migrate/history, migrate/new, plugin/list, queue/info, update/info, install/check, and users/list-admins inspect configuration, schema, and status without modifying data. pc/diff, pc/export, and pc/get read Project Config state. Stable project with releases tied to the Craft CMS major version cycle."
 url = "https://craftcms.com/docs/5.x/reference/cli.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

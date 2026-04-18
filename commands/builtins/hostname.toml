@@ -1,5 +1,6 @@
 [[command]]
 name = "hostname"
+description = "Displays the system's hostname, domain name, or IP addresses. When invoked with a positional argument it can set the hostname (requires root), but without arguments it is read-only, printing to stdout. Part of most Unix-like systems; feature set has been stable for decades."
 url = "https://man7.org/linux/man-pages/man1/hostname.1.html"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "lua"
+description = "Interprets and executes Lua programs, which can perform arbitrary file, network, and OS operations via the standard library (io, os, debug modules). It is a full general-purpose scripting runtime. The standard library includes os.execute for running shell commands and io.popen for subprocess I/O. Major Lua releases are years apart (5.4 shipped in 2020), so the CLI flags are very stable."
 url = "https://www.lua.org/manual/5.4/readme.html"
 level = "Inert"
 bare = false

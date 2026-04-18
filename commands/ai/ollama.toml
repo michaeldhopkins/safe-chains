@@ -1,5 +1,6 @@
 [[command]]
 name = "ollama"
+description = "Tool for running large language models locally on your machine. Ollama manages model downloads, serves a local REST API on port 11434, and runs interactive chat sessions. Pulling models downloads multi-gigabyte files; running models consumes significant CPU/GPU resources. The 'serve' subcommand starts a persistent HTTP server. Read-only subcommands (list, ps, show) inspect locally cached models and running instances without side effects or network access. The project is actively developed with new model support and CLI changes in frequent releases."
 url = "https://github.com/ollama/ollama/blob/main/docs/api.md"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

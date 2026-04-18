@@ -1,5 +1,6 @@
 [[command]]
 name = "java"
+description = "Launches the Java Virtual Machine and executes Java bytecode, which can perform arbitrary file, network, and system operations. It is a full general-purpose runtime — any class or JAR it loads runs with the permissions of the invoking user. New JDK releases ship every six months, routinely adding and deprecating CLI flags."
 url = "https://docs.oracle.com/en/java/javase/21/docs/specs/man/java.html"
 level = "Inert"
 bare = false

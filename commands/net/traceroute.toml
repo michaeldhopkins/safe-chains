@@ -1,5 +1,6 @@
 [[command]]
 name = "traceroute"
+description = "Traces the network path packets take to reach a destination host, displaying each intermediate hop. Sends UDP, ICMP, or TCP probe packets with incrementing TTL values over the network. Read-only from a filesystem perspective, but generates network traffic to the target and every router along the path. May require root privileges for ICMP (-I) or TCP (-T) modes. The CLI surface is very stable."
 aliases = ["traceroute6"]
 url = "https://man7.org/linux/man-pages/man8/traceroute.8.html"
 level = "Inert"

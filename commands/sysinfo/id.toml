@@ -1,5 +1,6 @@
 [[command]]
 name = "id"
+description = "Prints user and group identity information; supported with output-selection flags and one optional username."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation"
 level = "Inert"
 bare = true

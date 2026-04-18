@@ -1,5 +1,6 @@
 [[command]]
 name = "log"
+description = "macOS unified logging system CLI (/usr/bin/log) for querying Apple's binary log store, which aggregates messages from the kernel, system services, and applications across all Apple platforms. The show subcommand queries historical logs with predicate-based filtering; stream provides real-time log output; stats reports log store statistics. All three are read-only operations against the local log archive. The uncovered collect subcommand can write .logarchive files to disk, and config can adjust logging levels. Logs may contain sensitive system data but are read from existing stores, not generated. Privacy-sensitive fields are redacted by default (shown as <private>). The interface ships with macOS and evolves with OS releases."
 url = "https://ss64.com/mac/log.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

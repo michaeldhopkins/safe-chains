@@ -1,5 +1,6 @@
 [[command]]
 name = "minikube"
+description = "Provisions local Kubernetes clusters for development, using VM or container drivers (Docker, QEMU, HyperKit, etc.). Read-only subcommands (status, profile list, ip, service list, addons list, version) query cluster state. Write subcommands (start, stop, delete, pause, unpause, addons enable/disable, image load) create, destroy, or mutate the local cluster and its VMs/containers. start downloads binaries and container images from the network. The project releases roughly quarterly (v1.38.0 in January 2026) and its subcommand set grows slowly."
 url = "https://minikube.sigs.k8s.io/docs/"
 bare_flags = ["--help", "--version", "-h"]
 

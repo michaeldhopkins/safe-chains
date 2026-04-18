@@ -1,5 +1,6 @@
 [[command]]
 name = "lipo"
+description = "macOS tool for creating and inspecting universal (fat) binaries containing multiple CPU architectures. The inspection flags (-info, -detailed_info, -archs, -verify_arch) are read-only — they print which architectures a binary contains. The creation/modification flags (-create, -thin, -extract, -remove, -replace, -output) produce or alter binary files. Entirely local; no network access. Part of Xcode command-line tools; versioning follows macOS/Xcode releases."
 url = "https://ss64.com/mac/lipo.html"
 level = "Inert"
 bare = false

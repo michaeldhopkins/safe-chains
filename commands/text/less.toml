@@ -1,5 +1,6 @@
 [[command]]
 name = "less"
+description = "Interactive terminal pager for viewing file contents with forward and backward navigation. Strictly read-only: never modifies the files it displays. Loads files lazily, so it can handle very large inputs efficiently. Maintained as a standalone project by Mark Nudelman (greenwoodsoftware.com); releases are infrequent and the interface is very stable."
 url = "https://man7.org/linux/man-pages/man1/less.1.html"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "md5sum"
+description = "Computes or verifies MD5 message digests. Strictly read-only: reads file contents, computes hashes, and prints results to stdout. The --check flag reads a checksum file and verifies listed files against their recorded hashes. Does not modify files or access the network. Note: MD5 is cryptographically broken and should not be used for security purposes. Part of GNU coreutils with a very stable CLI surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#md5sum-invocation"
 level = "Inert"
 bare = true

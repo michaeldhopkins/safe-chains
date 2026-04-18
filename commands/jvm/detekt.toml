@@ -1,5 +1,6 @@
 [[command]]
 name = "detekt"
+description = "Static code analysis tool for Kotlin projects. All operations are read-only: detekt parses Kotlin source files, applies configurable rule sets, and produces reports without modifying code. It does read the filesystem (source files, config YAML, baseline XML) but does not write to it or touch the network. The --plugins flag can load arbitrary JVM code from JAR files, which is the main escalation vector. Detekt releases roughly every 2-3 months, with point releases tracking new Kotlin compiler versions; a major 2.0 rewrite (switching to a compiler plugin architecture) is in alpha as of early 2026, which may change the CLI surface significantly."
 url = "https://detekt.dev/docs/gettingstarted/cli/"
 level = "SafeRead"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "jq"
+description = "Lightweight JSON processor. Pure data transformation — reads JSON, applies filters, writes to stdout. No flag causes side effects. The filter language is Turing-complete but has no I/O primitives, so arbitrary jq programs are safe. Stable and slow-moving; flag coverage is essentially complete."
 url = "https://jqlang.github.io/jq/manual/"
 level = "Inert"
 bare = true

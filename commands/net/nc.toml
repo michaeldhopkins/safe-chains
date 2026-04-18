@@ -1,5 +1,6 @@
 [[command]]
 name = "nc"
+description = "General-purpose network utility for reading and writing data across TCP/UDP connections. In its full form, netcat can open listening sockets (server mode), connect to remote hosts, transfer files, and proxy traffic -- making it extremely versatile but powerful. The -z flag enables zero-I/O mode (port scanning), which probes whether ports are open without sending data. All modes involve network access. Does not modify the local filesystem. The CLI surface is stable but varies between BSD, GNU, and ncat implementations."
 url = "https://man.openbsd.org/nc.1"
 level = "Inert"
 bare = false
@@ -13,6 +14,7 @@ valued = ["-w"]
 
 [[command]]
 name = "ncat"
+description = "Nmap project's enhanced netcat replacement with SSL support, connection brokering, and proxy capabilities. Like nc, ncat can open listeners, connect to hosts, and transfer data over TCP/UDP. The -z flag enables zero-I/O mode (port scanning) without sending data. All modes involve network access. Does not modify the local filesystem. Released alongside nmap, roughly once a year."
 url = "https://nmap.org/ncat/"
 level = "Inert"
 bare = false

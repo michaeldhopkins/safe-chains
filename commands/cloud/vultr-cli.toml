@@ -1,5 +1,6 @@
 [[command]]
 name = "vultr-cli"
+description = "Official command-line interface for managing Vultr cloud resources (instances, bare metal, block storage, Kubernetes, DNS, firewalls). The full CLI can create, modify, and delete infrastructure. Authenticated via API key from environment variable or config file. Open-source Go project with moderate release velocity."
 url = "https://github.com/vultr/vultr-cli"
 bare_flags = ["--help", "--version", "-h", "-v"]
 [command.wrapper]

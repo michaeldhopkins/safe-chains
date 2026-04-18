@@ -1,5 +1,6 @@
 [[command]]
 name = "oxlint"
+description = "Rust-based JavaScript/TypeScript linter from the OXC project, 50-100x faster than ESLint. Runs static analysis on source files and reports diagnostics to stdout without modifying files (no autofix is enabled by default). Executes user project code only for parsing, not evaluation. Very actively developed with weekly releases; reached v1.0 stable in August 2025."
 url = "https://oxc.rs/docs/guide/usage/linter/cli"
 level = "SafeRead"
 bare = true

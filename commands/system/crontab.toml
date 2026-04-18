@@ -1,5 +1,6 @@
 [[command]]
 name = "crontab"
+description = "Interface for managing the cron daemon's scheduled task tables, which execute commands automatically at specified times under the owning user's identity. The full command can install (-i), edit (-e), and remove (-r) crontab entries, all of which modify persistent system state and can schedule arbitrary code execution -- a classic privilege escalation vector if cron jobs reference world-writable scripts. The covered flag (-l) only lists the current user's crontab entries, which is a read-only operation with no side effects. The -u flag is also supported for specifying which user's crontab to list. crontab is a POSIX standard utility and its interface is stable across platforms."
 url = "https://ss64.com/mac/crontab.html"
 level = "Inert"
 bare = false

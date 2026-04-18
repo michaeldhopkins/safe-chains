@@ -1,5 +1,6 @@
 [[command]]
 name = "dcli"
+description = "Dashlane's CLI for programmatic access to the password vault, primarily used in CI/CD pipelines and server environments to retrieve credentials and inject secrets. The full CLI can read passwords, OTP codes, and secure notes from the vault, inject secrets into environment variables and config files, and register new devices. The covered subcommands (accounts whoami, devices list, lock, sync, team credentials/logs/members/report) are read-only queries against account metadata, device registrations, and team audit data -- they do not expose vault secrets or modify any state. The lock and sync operations affect only local vault cache state. The CLI communicates with Dashlane's servers over HTTPS for all operations."
 url = "https://cli.dashlane.com/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

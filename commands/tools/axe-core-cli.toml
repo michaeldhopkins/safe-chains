@@ -1,5 +1,6 @@
 [[command]]
 name = "@axe-core/cli"
+description = "Runs automated accessibility audits against web pages by launching a browser and injecting the axe-core engine. Reads URLs, evaluates WCAG rules in-browser, and reports violations to stdout. Maintained by Deque Systems with releases tracking the axe-core library."
 url = "https://github.com/dequelabs/axe-core-npm/tree/develop/packages/cli"
 level = "SafeRead"
 bare = false

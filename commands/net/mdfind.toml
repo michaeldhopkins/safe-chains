@@ -1,5 +1,6 @@
 [[command]]
 name = "mdfind"
+description = "macOS command-line interface to the Spotlight search index. Queries the pre-built Spotlight metadata index to find files matching criteria. Strictly read-only: reads from the Spotlight database and prints matching file paths to stdout. Does not modify files or access the network. The -live flag enables continuous monitoring, printing new matches as the index updates. macOS-only; the CLI surface is very stable."
 url = "https://ss64.com/mac/mdfind.html"
 level = "Inert"
 bare = false

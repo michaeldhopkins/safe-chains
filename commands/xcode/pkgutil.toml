@@ -1,5 +1,6 @@
 [[command]]
 name = "pkgutil"
+description = "macOS package receipt inspection tool. The query flags (--pkgs, --files, --pkg-info, --check-signature, --export-plist, --payload-files, etc.) are read-only — they inspect the local package receipt database or examine .pkg files without installing anything. The write operations (--forget, --expand, --flatten) modify the receipt database or extract/repack package archives. Entirely local; no network access. Part of macOS; versioning follows macOS releases."
 url = "https://ss64.com/mac/pkgutil.html"
 level = "Inert"
 bare = false

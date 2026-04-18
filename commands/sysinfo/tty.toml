@@ -1,5 +1,6 @@
 [[command]]
 name = "tty"
+description = "Prints the terminal device name; supported as a bare read-only invocation with silent mode."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#tty-invocation"
 level = "Inert"
 bare = true

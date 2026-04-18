@@ -1,5 +1,6 @@
 [[command]]
 name = "ninja"
+description = "Minimal, speed-focused build system designed to be driven by higher-level build generators like CMake and Meson rather than hand-written. Normal invocation executes build commands (compiler invocations, link steps, custom commands) defined in build.ninja files. The covered modes are dry-run (-n), which prints commands that would be executed without running them, and tool mode (-t), which exposes built-in utilities for inspecting the dependency graph (e.g., -t targets, -t deps, -t graph, -t commands). Unlike GNU Make, Ninja's build files do not support variable expansion via shell execution, so dry-run mode does not evaluate arbitrary code during parsing. Ninja's interface is very stable with infrequent releases."
 url = "https://ninja-build.org/manual.html"
 level = "Inert"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "otool"
+description = "Displays headers, load commands, and disassembled sections of Mach-O object files on macOS. Read-only: inspects binaries without modifying them, writing all output to stdout. Ships as part of Xcode Command Line Tools with no independent release cycle."
 url = "https://ss64.com/mac/otool.html"
 level = "Inert"
 bare = false

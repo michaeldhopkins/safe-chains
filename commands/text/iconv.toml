@@ -1,5 +1,6 @@
 [[command]]
 name = "iconv"
+description = "Converts text from one character encoding to another (e.g. ISO-8859-1 to UTF-8). Read-only stdin-to-stdout filter; reads input in the source encoding and writes converted output without modifying source files. Part of glibc, which has a very slow and conservative release cadence; the iconv interface is standardized by POSIX."
 url = "https://man7.org/linux/man-pages/man1/iconv.1.html"
 level = "Inert"
 bare = false

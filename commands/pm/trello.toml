@@ -1,5 +1,6 @@
 [[command]]
 name = "trello"
+description = "CLI client for Trello (trello-cli by mheap). All exposed subcommands (card list, board list, list list) are read-only queries against the Trello REST API over HTTPS. Each command requires stored API key and token credentials and makes network requests. None of these subcommands create, modify, or delete Trello resources. The project has not seen a release since 2023 and appears to be in low-maintenance status."
 url = "https://github.com/mheap/trello-cli"
 bare_flags = ["--help", "--version", "-h"]
 

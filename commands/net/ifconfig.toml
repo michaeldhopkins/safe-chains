@@ -1,5 +1,6 @@
 [[command]]
 name = "ifconfig"
+description = "Displays and configures network interface parameters. When invoked without configuration arguments, ifconfig is read-only: it queries the kernel for interface addresses, flags, MTU, and statistics. With configuration arguments (e.g., setting an IP address, bringing interfaces up/down), it modifies network state and typically requires root privileges. Does not generate network traffic itself. The CLI surface is essentially frozen; superseded by 'ip' on Linux."
 url = "https://man7.org/linux/man-pages/man8/ifconfig.8.html"
 level = "Inert"
 bare = true

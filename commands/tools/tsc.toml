@@ -1,5 +1,6 @@
 [[command]]
 name = "tsc"
+description = "TypeScript compiler. With --noEmit, it type-checks the project and reports errors without producing any output files. Without --noEmit (not exposed here), it writes .js and .d.ts files to disk. Requiring --noEmit, --help, or --version ensures no file writes occur. TypeScript follows a roughly quarterly release cadence; TypeScript 7 (Go-based rewrite) is targeting mid-2026."
 url = "https://www.typescriptlang.org/docs/handbook/compiler-options.html"
 level = "Inert"
 bare = false

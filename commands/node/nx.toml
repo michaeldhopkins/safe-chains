@@ -1,5 +1,6 @@
 [[command]]
 name = "nx"
+description = "Monorepo build orchestrator and task runner for JavaScript/TypeScript projects. graph, list, show, report, and print-affected are read-only commands that analyze the project dependency graph without executing tasks. format with --check performs a dry-run style formatting check without modifying files. None of these subcommands execute project build/test tasks or modify source code. Actively developed with frequent releases; the subcommand surface area grows regularly."
 url = "https://nx.dev/reference/commands"
 bare_flags = ["--help", "--version", "-h"]
 

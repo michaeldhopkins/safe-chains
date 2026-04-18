@@ -1,5 +1,6 @@
 [[command]]
 name = "@commitlint/cli"
+description = "Lints git commit messages against configurable rules such as the Conventional Commits format. Reads commit messages from stdin, git history, or an edit file and reports violations to stdout without modifying anything. Actively maintained with regular releases."
 url = "https://commitlint.js.org/reference/cli.html"
 level = "Inert"
 bare = true

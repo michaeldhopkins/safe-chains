@@ -1,5 +1,6 @@
 [[command]]
 name = "linode-cli"
+description = "Command-line interface for managing Akamai/Linode cloud resources (compute instances, volumes, Kubernetes, databases, DNS). The full CLI can create, modify, and delete infrastructure. Authenticated via personal access token. Python-based; released roughly every 2-4 weeks with moderate project velocity."
 url = "https://www.linode.com/docs/products/tools/cli/get-started/"
 bare_flags = ["--help", "--version"]
 [command.wrapper]

@@ -1,5 +1,6 @@
 [[command]]
 name = "ansible-doc"
+description = "Displays documentation for Ansible modules, plugins, roles, and other plugin types from locally installed collections. All operations are strictly read-only: it parses Python docstrings and YAML metadata from installed plugin files and prints them to stdout. No network access, no file modification. Part of ansible-core, which releases two major versions per year."
 url = "https://docs.ansible.com/ansible/latest/cli/ansible-doc.html"
 level = "Inert"
 bare = true

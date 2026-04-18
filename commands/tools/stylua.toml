@@ -1,5 +1,6 @@
 [[command]]
 name = "@johnnymorganz/stylua-bin"
+description = "Opinionated Lua code formatter written in Rust. --check reports whether files are already formatted without modifying them; --verify re-parses after formatting to detect AST changes. Without --check or --verify (not exposed here), it rewrites files in place. Actively maintained with several releases per year; currently at v2.4.x."
 url = "https://github.com/JohnnyMorganz/StyLua"
 level = "Inert"
 bare = false

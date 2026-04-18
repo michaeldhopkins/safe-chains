@@ -1,5 +1,6 @@
 [[command]]
 name = "pip"
+description = "Python package installer and manager. list, show, freeze, check, debug, inspect, and help are read-only queries against locally installed packages. config get/list reads pip configuration. install with --dry-run resolves dependencies over the network but does not modify the environment; without --dry-run, install downloads and installs packages which can execute arbitrary setup.py code. download fetches packages from PyPI to a local directory without installing them. index queries the package index over the network. Mature, stable project maintained by the PyPA."
 aliases = ["pip3"]
 url = "https://pip.pypa.io/en/stable/cli/"
 bare_flags = ["--help", "--version", "-V", "-h"]

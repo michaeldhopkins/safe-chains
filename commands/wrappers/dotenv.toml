@@ -1,5 +1,6 @@
 [[command]]
 name = "dotenv"
+description = "Command wrapper that loads environment variables from .env files before executing a child command. The dotenv process itself is read-only — it reads .env files and injects variables into the child's environment. The safety of the overall invocation depends entirely on the inner command being delegated to. The -f flag controls which .env files are loaded; -o overwrites existing ENV variables, which could alter the behavior of the inner command in subtle ways."
 url = "https://github.com/bkeepers/dotenv"
 [command.wrapper]
 valued = ["-c", "-e", "-f", "-v"]

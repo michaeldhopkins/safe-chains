@@ -1,5 +1,6 @@
 [[command]]
 name = "peco"
+description = "Interactive filtering tool that reads lines from stdin, lets the user fuzzy-search and select items, and prints selections to stdout. Strictly read-only: reads from stdin and writes to stdout. Does not modify files or access the network. Written in Go. The CLI surface is small and stable."
 url = "https://github.com/peco/peco"
 level = "Inert"
 bare = true

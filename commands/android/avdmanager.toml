@@ -1,5 +1,6 @@
 [[command]]
 name = "avdmanager"
+description = "Manages Android Virtual Devices (emulator images) for the Android SDK. The create, delete, and move subcommands modify local AVD configurations on disk. The list subcommand is read-only, enumerating available AVDs, device definitions, and system image targets without side effects. All operations are local with no network access. Released as part of the Android SDK command-line tools."
 url = "https://developer.android.com/tools/avdmanager"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

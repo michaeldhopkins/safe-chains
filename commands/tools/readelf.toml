@@ -1,5 +1,6 @@
 [[command]]
 name = "readelf"
+description = "GNU binutils tool that displays information about ELF-format object files, including headers, sections, symbols, and debug info. Strictly read-only; it parses and prints ELF metadata without modifying anything. Part of GNU binutils, which follows a roughly annual release cycle with high stability across versions."
 url = "https://man7.org/linux/man-pages/man1/readelf.1.html"
 level = "Inert"
 bare = false

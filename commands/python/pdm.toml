@@ -1,5 +1,6 @@
 [[command]]
 name = "pdm"
+description = "Modern Python package and dependency manager supporting PEP standards. pdm list, pdm show, and pdm info are read-only queries that inspect locally installed packages and project metadata. pdm search queries the PyPI registry over the network. pdm config reads or writes local/global configuration settings depending on whether a value argument is provided. None of these subcommands install or remove packages. Actively maintained with releases every few weeks."
 url = "https://pdm-project.org/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "nroff"
+description = "Formats documents using roff typesetting markup, producing plain-text output suitable for terminal display. Primarily used to render man pages. Read-only: processes input roff source and writes formatted text to stdout without modifying source files. Part of GNU groff, which releases infrequently (1.23.0 in July 2023, 1.24.1 in March 2026); the interface is very stable."
 url = "https://man7.org/linux/man-pages/man1/nroff.1.html"
 level = "Inert"
 bare = false

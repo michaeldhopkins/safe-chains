@@ -1,5 +1,6 @@
 [[command]]
 name = "uname"
+description = "Prints system identification (kernel, hostname, architecture); supported with all output-selection flags."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#uname-invocation"
 level = "Inert"
 bare = true

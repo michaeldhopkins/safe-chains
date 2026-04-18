@@ -1,5 +1,6 @@
 [[command]]
 name = "uv"
+description = "Extremely fast Python package manager and resolver written in Rust (by Astral). All exposed subcommands are read-only. uv pip list, uv pip show, uv pip check, and uv pip freeze inspect locally installed packages without modification. uv python list queries locally available Python interpreters. uv tool list shows installed CLI tools. None of these subcommands install packages, make network requests, or execute arbitrary code. Actively developed with very frequent releases."
 url = "https://docs.astral.sh/uv/reference/cli/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

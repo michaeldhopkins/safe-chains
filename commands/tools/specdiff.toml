@@ -1,5 +1,6 @@
 [[command]]
 name = "specdiff"
+description = "CLI tool for diffing OpenAPI/Swagger specifications between versions, highlighting breaking changes and additions. Reads spec files and prints a diff report to stdout without modifying them. Single-maintainer project."
 url = "https://github.com/michaeldhopkins/specdiff"
 standalone = [
     "--changed-only", "--help", "--no-color", "--print", "--version",

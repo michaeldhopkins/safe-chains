@@ -1,5 +1,6 @@
 [[command]]
 name = "linear"
+description = "CLI client for the Linear issue tracker (linear-cli by schpet). All exposed subcommands (issue list/view/query/id/title/url, issue comment list, milestone list/view, project list/view, team list/id/members) are read-only queries against the Linear GraphQL API over HTTPS. completions generates shell completions locally. Every API-facing command makes network requests and requires a stored API key. Actively developed with frequent releases."
 url = "https://github.com/schpet/linear-cli"
 bare_flags = ["--help", "--version", "-h"]
 

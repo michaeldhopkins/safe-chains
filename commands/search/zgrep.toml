@@ -1,5 +1,6 @@
 [[command]]
 name = "zgrep"
+description = "Grep for compressed files (also aliased as zegrep/zfgrep); full flag support for searching within gzipped files."
 url = "https://man7.org/linux/man-pages/man1/zgrep.1.html"
 level = "Inert"
 bare = false

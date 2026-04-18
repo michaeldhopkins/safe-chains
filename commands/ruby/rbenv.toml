@@ -1,5 +1,6 @@
 [[command]]
 name = "rbenv"
+description = "Ruby version manager; supports read-only subcommands for listing versions, shims, and locating executables."
 url = "https://github.com/rbenv/rbenv#readme"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

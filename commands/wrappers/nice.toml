@@ -1,5 +1,6 @@
 [[command]]
 name = "nice"
+description = "Command wrapper that adjusts the scheduling priority (niceness) of a child process. nice itself is harmless — it only sets the priority level via -n before exec-ing the inner command. ionice does the same for I/O scheduling class. Neither modifies files, state, or the network. The safety of the overall invocation depends entirely on the inner command. Part of GNU coreutils, which is extremely stable with infrequent flag additions."
 aliases = ["ionice"]
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation"
 [command.wrapper]

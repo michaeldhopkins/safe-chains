@@ -1,5 +1,6 @@
 [[command]]
 name = "aws"
+description = "Unified command-line interface for managing all Amazon Web Services resources. The full CLI can create, modify, and delete cloud infrastructure, manage IAM policies, and exfiltrate data from S3/Secrets Manager. Authenticated via credentials in ~/.aws or environment variables. Releases multiple times per week; very high project velocity."
 url = "https://docs.aws.amazon.com/cli/latest/"
 bare_flags = ["--help", "--version"]
 [command.wrapper]

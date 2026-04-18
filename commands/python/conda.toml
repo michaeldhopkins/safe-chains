@@ -1,5 +1,6 @@
 [[command]]
 name = "conda"
+description = "Cross-platform package and environment manager for Python and data science. conda list and conda info are read-only queries that inspect locally installed packages and environment metadata. conda config with --show or --show-sources is a read-only view of the configuration; other config operations can modify settings. None of these subcommands install or remove packages. list may read the lockfile and environment directories. Mature, stable project maintained by Anaconda, Inc."
 url = "https://docs.conda.io/projects/conda/en/stable/commands/index.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

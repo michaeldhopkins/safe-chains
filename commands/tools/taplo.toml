@@ -1,5 +1,6 @@
 [[command]]
 name = "@taplo/cli"
+description = "TOML toolkit written in Rust that provides validation, linting, and formatting for TOML files. The check subcommand validates syntax, and lint validates against schemas -- both report errors without modifying files. The format subcommand (not exposed here) rewrites files in place. The npm package lags behind the native binary releases; npm is at v0.7.0 while the Rust crate is at v0.10.x."
 url = "https://taplo.tamasfe.dev/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

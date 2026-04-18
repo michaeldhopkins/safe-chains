@@ -1,5 +1,6 @@
 [[command]]
 name = "aider"
+description = "AI pair programming assistant that edits code in your local git repository using LLM providers. In interactive mode, aider reads and writes files, runs shell commands, and makes git commits on your behalf. It communicates with external LLM APIs (OpenAI, Anthropic, etc.) over the network, sending code context with each request. The CLI surface changes frequently with new flags added in minor releases."
 url = "https://aider.chat/docs/"
 level = "Inert"
 bare = false

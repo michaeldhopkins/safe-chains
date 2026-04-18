@@ -1,5 +1,6 @@
 [[command]]
 name = "ss"
+description = "Displays detailed socket and connection information from the Linux kernel, replacing netstat. Strictly read-only: queries kernel socket tables via netlink and prints results to stdout. Does not modify network state, files, or generate network traffic. Faster than netstat on systems with many connections. The -p flag shows process information (may require root). Linux-only; the CLI surface is stable."
 url = "https://man7.org/linux/man-pages/man8/ss.8.html"
 level = "Inert"
 bare = true

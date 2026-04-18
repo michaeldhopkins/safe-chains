@@ -1,5 +1,6 @@
 [[command]]
 name = "mix"
+description = "Build automation tool for the Elixir programming language — compiles code, manages dependencies, runs tests, and creates releases. Most subcommands execute arbitrary Elixir/Erlang code or fetch packages from Hex.pm, making them full-privilege operations. New mix tasks and flags arrive with each Elixir release (every ~6 months, now at v1.19/1.20)."
 url = "https://hexdocs.pm/mix/Mix.html"
 level = "Inert"
 bare = false

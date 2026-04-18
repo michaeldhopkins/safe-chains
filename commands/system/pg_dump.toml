@@ -1,5 +1,6 @@
 [[command]]
 name = "pg_dump"
+description = "PostgreSQL utility that extracts a database into a SQL script or archive file for backup and migration. Normal invocation dumps all data and schema, which reads potentially sensitive row data from the database over a network connection and writes large files to disk. The coverage requires --schema-only mode, which dumps only DDL (CREATE TABLE, CREATE INDEX, etc.) without extracting any row data -- significantly reducing exposure of sensitive information. The operation still makes a network connection to the PostgreSQL server and requires authentication. By default pg_dump sets row_security to off, so the connecting user must have sufficient privileges to bypass row-level security or an error is thrown. The interface is tied to PostgreSQL major releases."
 url = "https://www.postgresql.org/docs/current/app-pgdump.html"
 level = "Inert"
 bare = false

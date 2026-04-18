@@ -1,5 +1,6 @@
 [[command]]
 name = "@herb-tools/linter"
+description = "Lints ERB templates in Rails projects for HTML validity, accessibility, and Rails-specific best practices using a fault-tolerant HTML-aware parser. Strictly read-only — it analyzes template files and reports issues without modifying source. The project is under active development (v0.9+ with 50+ lint rules), and new rules and flags are added in most minor releases."
 url = "https://github.com/nicholaides/herb"
 level = "SafeRead"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "wait"
+description = "Blocks until specified background jobs or processes complete, then reports their exit status. Has no side effects beyond suspending the current shell until the target process exits. Cannot modify the filesystem or launch new processes. POSIX builtin; no independent release cycle."
 url = "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/wait.html"
 level = "Inert"
 bare = true

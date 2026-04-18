@@ -1,5 +1,6 @@
 [[command]]
 name = "od"
+description = "Dumps file contents in octal, hexadecimal, decimal, or character formats. Purely a reader -- opens files read-only and emits formatted output to stdout. Part of POSIX and GNU coreutils; feature set has been unchanged for decades with essentially zero project velocity."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#od-invocation"
 level = "Inert"
 bare = true

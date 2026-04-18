@@ -1,5 +1,6 @@
 [[command]]
 name = "orbctl"
+description = "Control CLI for OrbStack, functionally identical to the orb command -- both manage OrbStack's Linux VMs and containers on macOS. Read-only subcommands (list, info, status, logs, config get/show, default, doctor, version) query machine and container state. Write subcommands (create, start, stop, delete, run) modify or destroy VMs and containers, and run can execute arbitrary commands inside a VM. Same release cadence as orb -- updates ship roughly weekly with the OrbStack desktop app."
 url = "https://docs.orbstack.dev/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

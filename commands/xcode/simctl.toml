@@ -1,5 +1,6 @@
 [[command]]
 name = "simctl"
+description = "Xcode Simulator control tool for managing iOS/watchOS/tvOS/visionOS simulator devices and runtimes. The list subcommand is read-only — it enumerates available devices, runtimes, device types, and pairs. Write subcommands (create, delete, boot, shutdown, install, launch, openurl, etc.) modify simulator state, create/destroy devices, or launch apps. Some operations (runtime download) contact Apple's servers. Part of Xcode; versioning follows Xcode releases."
 url = "https://developer.apple.com/documentation/xcode/simctl"
 
 [[command.sub]]

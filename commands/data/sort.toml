@@ -1,5 +1,6 @@
 [[command]]
 name = "sort"
+description = "Sorts lines of text from stdin or files according to various orderings (lexicographic, numeric, month, version, random), writing to stdout. May create temporary files in the directory specified by -T during large sorts, but does not modify input files. No network access and no ability to execute commands. Ships with GNU coreutils and macOS."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation"
 level = "Inert"
 bare = true

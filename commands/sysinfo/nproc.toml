@@ -1,5 +1,6 @@
 [[command]]
 name = "nproc"
+description = "Prints the number of available processing units; supported with --all and --ignore flags."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#nproc-invocation"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "vagrant"
+description = "Virtual machine lifecycle management tool that wraps providers like VirtualBox, VMware, and libvirt. Write subcommands (up, halt, destroy, provision, reload, snapshot, ssh -- not listed here) create, start, stop, destroy, and execute code inside VMs. ssh and provision can run arbitrary commands on the guest. Read-only subcommands (status, global-status, ssh-config, port, validate, version, box list/outdated, plugin list) query local VM state, Vagrantfile validity, and installed plugins/boxes without side effects. global-status --prune is a subtle exception: it removes stale entries from Vagrant's index. Vagrant's development has slowed considerably under HashiCorp/IBM; releases are infrequent (a handful of 2.4.x patches per year)."
 url = "https://developer.hashicorp.com/vagrant/docs/cli"
 bare_flags = ["--help", "--version", "-h", "-v"]
 

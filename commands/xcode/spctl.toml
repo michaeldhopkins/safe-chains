@@ -1,5 +1,6 @@
 [[command]]
 name = "spctl"
+description = "macOS system policy (Gatekeeper) assessment tool. In assess mode (--assess / -a), it checks whether an application or installer package passes Gatekeeper policy — this is read-only and may contact Apple's notarization servers over the network to verify tickets. Write operations (--add, --remove, --enable, --disable) modify the security policy database and typically require root. --type selects between execute, install, and open contexts. Part of macOS; versioning follows macOS releases."
 url = "https://ss64.com/mac/spctl.html"
 level = "Inert"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "false"
+description = "Does nothing and returns exit status 1. Has no side effects whatsoever -- no filesystem access, no output, no state changes. Part of POSIX and GNU coreutils; the implementation is trivially simple and has been unchanged for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation"
 level = "Inert"
 bare = true

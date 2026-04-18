@@ -1,5 +1,6 @@
 [[command]]
 name = "jai"
+description = "Lightweight Linux sandbox from Stanford that wraps a child command in a namespace-based container. jai itself is security-positive — it restricts the inner command's filesystem access via copy-on-write overlays and user namespace isolation. Three modes (--casual, --strict, --bare) control the level of isolation. The safety of the overall invocation depends on the inner command, but jai strictly reduces its blast radius. Requires Linux kernel 6.13+. The project is new (v0.3 as of early 2026) and evolving."
 url = "https://jai.scs.stanford.edu/"
 [command.wrapper]
 standalone = ["--casual", "--strict", "--bare"]

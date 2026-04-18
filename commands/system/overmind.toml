@@ -1,5 +1,6 @@
 [[command]]
 name = "overmind"
+description = "Process manager for Procfile-based applications that runs each process in a separate tmux window, allowing interactive access and per-process restart. The start subcommand launches all processes defined in the Procfile, which can be arbitrary commands; connect attaches to a process's tmux session granting interactive shell access; restart and stop control individual process lifecycle; kill and quit terminate the entire overmind session. All of these except status and echo modify local process state. The status subcommand reports running process status, and echo shows captured process output -- both are read-only. The project is mature with infrequent releases and a stable interface."
 url = "https://github.com/DarthSim/overmind"
 bare_flags = ["--help", "--version", "-h", "-v"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "col"
+description = "Filters reverse line feeds from input, typically used to clean up output from nroff/tbl. Read-only stdin-to-stdout filter; never modifies files on disk. Part of util-linux, which has a slow release cadence (major versions every 2-3 years) and a stable interface."
 url = "https://man7.org/linux/man-pages/man1/col.1.html"
 level = "Inert"
 bare = true

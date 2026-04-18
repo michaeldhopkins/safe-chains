@@ -1,5 +1,6 @@
 [[command]]
 name = "qemu-img"
+description = "QEMU disk image manipulation utility. Read-only subcommands (info, check, compare, map, measure, snapshot -l) inspect disk image metadata, integrity, and layout without modifying the image file. Write subcommands (create, convert, resize, commit, rebase, amend, snapshot -c/-d/-a, dd, bitmap) create or modify disk image files on the local filesystem. All operations are local -- no network access unless the image path uses a network-backed block driver (e.g. nbd://, rbd://). QEMU releases roughly three times per year (v10.0 through v10.2 in 2025) and the qemu-img subcommand set changes very rarely."
 url = "https://www.qemu.org/docs/master/tools/qemu-img.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

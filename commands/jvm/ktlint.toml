@@ -1,5 +1,6 @@
 [[command]]
 name = "ktlint"
+description = "Anti-bikeshedding linter and formatter for Kotlin code. When run without a format subcommand, ktlint performs read-only analysis: it parses Kotlin source files against coding style rules (derived from .editorconfig) and reports violations to stdout. The 'format' subcommand rewrites files in place. No network access. Ktlint reads .editorconfig for configuration and can load custom rule sets via --reporter, but does not execute arbitrary code. Releases roughly every 2-4 months; the rule set surface changes more often than the CLI flags. A major 2.0 version is planned which will remove some deprecated rules."
 url = "https://pinterest.github.io/ktlint/latest/"
 level = "SafeRead"
 bare = true

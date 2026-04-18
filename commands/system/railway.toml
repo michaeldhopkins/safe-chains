@@ -1,5 +1,6 @@
 [[command]]
 name = "railway"
+description = "Railway's cloud platform CLI for deploying, managing, and debugging applications, databases, and infrastructure on Railway's hosting service. The full CLI can deploy code (railway up), create/delete services, manage environment variables, open shell sessions inside running containers, redeploy/rollback, and run an AI agent with access to internal platform tools. The covered subcommands (status, list, logs, variables list, volume list, whoami, version, completion) are read-only API queries over HTTPS that fetch project metadata, deployment status, log streams, environment variable listings, and volume information without modifying any remote state. The uncovered up, deploy, redeploy, down, add, and agent subcommands are the state-modifying operations. Railway actively develops the CLI with recent additions including AI agent capabilities."
 url = "https://docs.railway.app/guides/cli"
 bare_flags = ["--help", "--version", "-h"]
 

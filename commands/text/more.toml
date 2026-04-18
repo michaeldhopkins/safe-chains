@@ -1,5 +1,6 @@
 [[command]]
 name = "more"
+description = "Simple terminal pager for viewing file contents with forward-only navigation. Strictly read-only: never modifies the files it displays. Part of util-linux, which has a slow release cadence (major versions every 2-3 years); the more interface has been stable since the 1970s."
 url = "https://man7.org/linux/man-pages/man1/more.1.html"
 level = "Inert"
 bare = true

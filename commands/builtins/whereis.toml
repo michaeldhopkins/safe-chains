@@ -1,5 +1,6 @@
 [[command]]
 name = "whereis"
+description = "Locates the binary, source, and manual page files for a command by searching standard system paths. Read-only: only performs filesystem path lookups and prints results to stdout. Part of util-linux; feature set has been stable for decades with negligible project velocity."
 url = "https://man7.org/linux/man-pages/man1/whereis.1.html"
 level = "Inert"
 bare = false

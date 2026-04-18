@@ -1,5 +1,6 @@
 [[command]]
 name = "pylint"
+description = "Static analysis tool for Python that checks for errors, coding standard violations, and code smells. Imports and partially executes Python modules to build an AST, so it can trigger module-level side effects in the analyzed code. Does not modify source files. Actively maintained with multiple releases per year; v4.0 shipped October 2025."
 url = "https://pylint.readthedocs.io/en/latest/user_guide/usage/run.html"
 level = "SafeRead"
 bare = false

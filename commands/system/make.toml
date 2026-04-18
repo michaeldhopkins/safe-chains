@@ -1,5 +1,6 @@
 [[command]]
 name = "make"
+description = "GNU Make, the classic Unix build automation tool that executes shell commands defined in Makefiles to compile, link, and install software. Normal invocation runs arbitrary shell commands from Makefile recipes, which can do anything the current user can do. The covered modes are dry-run (-n/--dry-run) and print-database (-p), which print what would be executed or dump the internal rule database without actually running any recipes. Note that -n still parses the Makefile and evaluates $(shell ...) calls in variable assignments, so a malicious Makefile can still execute code during the parse phase even in dry-run mode. GNU Make's interface is extremely stable with infrequent releases."
 url = "https://www.gnu.org/software/make/manual/make.html"
 level = "Inert"
 bare = false

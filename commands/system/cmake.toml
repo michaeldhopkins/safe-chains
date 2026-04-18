@@ -1,4 +1,5 @@
 [[command]]
 name = "cmake"
+description = "Cross-platform build system generator that produces native build files (Makefiles, Ninja files, IDE projects) from CMakeLists.txt configuration. The full CLI can configure, build, install, and test projects, which involves executing arbitrary code defined in CMake scripts. The covered flags (--help, --version, --system-information) are purely informational and local -- they print version strings or dump compiler/platform detection data without reading any project files or executing build steps. CMake releases new minor versions roughly every two to three months with patch releases in between; the subcommand surface is stable but new flags appear with each minor release."
 url = "https://cmake.org/cmake/help/latest/manual/cmake.1.html"
 bare_flags = ["--help", "--system-information", "--version", "-V", "-h"]

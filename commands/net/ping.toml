@@ -1,5 +1,6 @@
 [[command]]
 name = "ping"
+description = "Sends ICMP echo request packets to a network host and reports response times. Generates network traffic with each invocation. Without -c (count limit), ping runs indefinitely. Read-only from a filesystem perspective. May require root or setuid for raw socket access on some systems. The -l flag can set preload count, enabling burst traffic. The CLI surface is very stable but varies slightly between Linux (iputils) and macOS/BSD implementations."
 url = "https://man7.org/linux/man-pages/man8/ping.8.html"
 level = "Inert"
 bare = false

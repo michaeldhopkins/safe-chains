@@ -1,5 +1,6 @@
 [[command]]
 name = "ruby"
+description = "Ruby interpreter; limited to help and version flags with no script execution."
 url = "https://www.ruby-lang.org/en/documentation/"
 level = "Inert"
 bare = false

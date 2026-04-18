@@ -1,5 +1,6 @@
 [[command]]
 name = "gzip"
+description = "Compresses and decompresses files using the gzip/deflate algorithm. In default mode, gzip replaces the original file with a compressed version (destructive write). With -d, it decompresses, again replacing the .gz file. The -l flag is read-only, listing compression statistics for archive files. The -t flag is read-only, testing archive integrity without extracting. Does not access the network. Part of GNU gzip with a very stable CLI surface."
 url = "https://man7.org/linux/man-pages/man1/gzip.1.html"
 level = "Inert"
 bare = false

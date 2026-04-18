@@ -1,5 +1,6 @@
 [[command]]
 name = "tuist"
+description = "Xcode project generation and management platform that reads a Swift-based manifest and produces .xcodeproj/.xcworkspace files. Read-only subcommands (dump, graph, inspect, hash, migration check/list, scaffold list, version) analyze the project manifest without modifying it. Write subcommands (generate, edit, build, test, clean, fetch) create or modify Xcode projects, download dependencies, or invoke xcodebuild. fetch contacts the network to resolve Swift package dependencies. Tuist follows 6-week development cycles with frequent releases; the CLI surface is actively evolving."
 url = "https://docs.tuist.dev/en/cli/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

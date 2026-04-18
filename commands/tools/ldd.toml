@@ -1,5 +1,6 @@
 [[command]]
 name = "ldd"
+description = "Prints the shared libraries required by an executable or shared object. On Linux, ldd is a shell script that works by setting LD_TRACE_LOADED_OBJECTS and invoking the dynamic linker, which means running ldd on an untrusted binary can cause arbitrary code execution if the binary specifies a custom ELF interpreter. The interface is very stable — the flag set has not changed in years."
 url = "https://man7.org/linux/man-pages/man1/ldd.1.html"
 level = "Inert"
 bare = false

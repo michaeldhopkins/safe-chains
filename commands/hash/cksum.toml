@@ -1,5 +1,6 @@
 [[command]]
 name = "cksum"
+description = "Computes CRC checksums and byte counts for files, with selectable algorithms (CRC32, BLAKE2, SHA variants via --algorithm). Strictly read-only: reads file contents, computes checksums, and prints results to stdout. The --check flag verifies files against recorded checksums. Does not modify files or access the network. Part of GNU coreutils with a stable CLI surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation"
 level = "Inert"
 bare = true

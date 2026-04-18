@@ -1,5 +1,6 @@
 [[command]]
 name = "jj"
+description = "Git-compatible version control system with an opinionated, simpler model — automatic working-copy commits, first-class conflicts, and operation log for undo. Read-only operations (log, diff, show, status, file show, bookmark list, config list) inspect repo state. Write operations (new, commit, describe, rebase, squash, split, abandon, restore) modify the local change graph but never contact the network. git fetch downloads from remotes; git push uploads — both are network operations. The CLI is evolving rapidly with releases roughly every 1-2 weeks (still pre-1.0); new subcommands and flag changes are frequent and require ongoing review."
 url = "https://jj-vcs.github.io/jj/latest/cli-reference/"
 bare_flags = ["--help", "--version", "-h"]
 [command.wrapper]

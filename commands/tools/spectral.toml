@@ -1,5 +1,6 @@
 [[command]]
 name = "@stoplight/spectral-cli"
+description = "JSON/YAML linter from Stoplight for enforcing style guides on OpenAPI, AsyncAPI, and Arazzo specs. The lint subcommand validates documents against configurable rulesets and reports violations without modifying files. Custom rulesets can load external functions via --ruleset, which executes JavaScript. Maintained with periodic releases; currently at v6.15.x."
 url = "https://docs.stoplight.io/docs/spectral/9ffa04e052cc1-spectral-cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

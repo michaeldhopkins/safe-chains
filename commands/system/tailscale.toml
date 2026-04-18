@@ -1,5 +1,6 @@
 [[command]]
 name = "tailscale"
+description = "CLI for the Tailscale mesh VPN, controlling a local daemon that manages WireGuard tunnels. Read-only subcommands (status, ip, ping, netcheck, whois, dns status/query, version, bugreport, exit-node list/suggest, licenses) inspect local node state or probe the network. Write subcommands (up, down, login, logout, switch) mutate VPN connection state: up/login authenticate and connect to the tailnet, down disconnects, logout deauthenticates, and switch changes between tailnet profiles. up and login accept flags that configure routing (--advertise-routes, --exit-node) and access policy (--shields-up), which affect network topology for the entire tailnet. ping and netcheck send network probes. Tailscale releases frequently with monthly product updates and new CLI subcommands added regularly."
 url = "https://tailscale.com/kb/1080/cli"
 bare_flags = ["--help", "--version", "-h"]
 

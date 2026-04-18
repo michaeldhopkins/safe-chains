@@ -1,5 +1,6 @@
 [[command]]
 name = "read"
+description = "Reads a line from standard input and assigns it to shell variables. Effects are process-local to the current shell session -- it stores data in shell variables but cannot modify the filesystem or execute commands on its own. The -u flag can read from arbitrary file descriptors. POSIX builtin; no independent release cycle."
 url = "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "erl"
+description = "Erlang runtime system emulator that starts a BEAM VM instance, providing an interactive shell or executing compiled modules. Full invocation can run arbitrary Erlang code and connect to distributed nodes. Actively maintained under Erlang/OTP with annual major releases."
 url = "https://www.erlang.org/docs/26/man/erl"
 level = "Inert"
 bare = false

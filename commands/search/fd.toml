@@ -1,5 +1,6 @@
 [[command]]
 name = "fd"
+description = "Fast file finder alternative to find; full flag support for searching by name, type, size, and modification time."
 url = "https://github.com/sharkdp/fd#readme"
 level = "Inert"
 bare = false

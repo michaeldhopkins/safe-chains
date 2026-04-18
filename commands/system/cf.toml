@@ -1,5 +1,6 @@
 [[command]]
 name = "cf"
+description = "The official CLI for the Cloud Foundry PaaS platform, used to deploy and manage applications, services, and infrastructure. The covered subcommands (apps, app, services, orgs, spaces, routes, logs, env, events, marketplace, etc.) are read-only API queries that fetch metadata, status, and log streams from a remote Cloud Foundry deployment over HTTPS -- they do not modify any remote state. The uncovered push, delete, bind-service, and scale subcommands create, destroy, or reconfigure remote applications and service bindings. All covered operations require prior authentication and make network calls to the CF API endpoint. The CLI follows semver and releases periodically."
 url = "https://cli.cloudfoundry.org/en-US/v8/"
 bare_flags = ["--help", "--version", "-h"]
 

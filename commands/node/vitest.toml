@@ -1,5 +1,6 @@
 [[command]]
 name = "vitest"
+description = "Vite-native unit testing framework that executes arbitrary user-authored test code. Tests can perform any operation the Node.js process has access to, including filesystem writes, network requests, and subprocess spawning. Coverage collection writes instrumentation data and reports to disk. The --config flag loads a configuration file that can include custom plugins and transforms. --run disables watch mode for single-pass execution. Actively developed with frequent releases."
 url = "https://vitest.dev/guide/cli.html"
 level = "SafeRead"
 standalone = [

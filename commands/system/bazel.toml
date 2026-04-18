@@ -1,5 +1,6 @@
 [[command]]
 name = "bazel"
+description = "Google's polyglot build and test system, designed for large-scale monorepos. The covered subcommands (query, cquery, aquery, info, version) are read-only introspection operations that examine the dependency graph and build configuration without executing any build actions or modifying files. The uncovered build, test, run, and clean subcommands compile code, execute arbitrary binaries, and delete build outputs respectively. Bazel's build actions are hermetically sandboxed, but queries still evaluate BUILD files, which can contain Starlark code. Bazel releases new major versions roughly annually with rolling releases every two weeks; new subcommands or query flags may appear at that cadence."
 url = "https://bazel.build/reference/command-line-reference"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

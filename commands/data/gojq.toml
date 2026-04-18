@@ -1,5 +1,6 @@
 [[command]]
 name = "gojq"
+description = "Pure Go reimplementation of jq that filters and transforms JSON (and optionally YAML) from stdin or files, writing results to stdout. Like jq, the expression language is sandboxed: no filesystem writes, no network access, no shell execution. Adds YAML input/output support beyond what jq offers."
 url = "https://github.com/itchyny/gojq"
 level = "Inert"
 bare = true

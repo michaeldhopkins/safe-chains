@@ -1,5 +1,6 @@
 [[command]]
 name = "difft"
+description = "Structural diff tool that compares files based on their syntax tree rather than line-by-line text. Reads two files or directories and prints syntax-aware differences to stdout without modifying anything. Actively maintained with several releases per year."
 url = "https://difftastic.wilfred.me.uk/"
 level = "Inert"
 bare = false

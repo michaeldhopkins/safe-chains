@@ -1,5 +1,6 @@
 [[command]]
 name = "stern"
+description = "Multi-pod and multi-container log tailing tool for Kubernetes. All operations are read-only -- stern connects to the Kubernetes API server to stream pod logs and does not modify any cluster state. It supports regex-based pod selection, so a single invocation can open many concurrent log streams. The project releases a few times per year (v1.31 through v1.33 across 2024-2025) and its flag surface has been stable, with occasional additions like --node filtering."
 url = "https://github.com/stern/stern"
 level = "Inert"
 bare = false

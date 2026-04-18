@@ -1,5 +1,6 @@
 [[command]]
 name = "xq"
+description = "Transcodes XML to JSON, pipes it through jq for filtering/transformation, and optionally converts back to XML. Reads from files or stdin and writes to stdout. Supports --in-place for file modification, but is otherwise side-effect-free. No network access and no shell execution. Part of the kislyuk/yq package."
 url = "https://github.com/kislyuk/yq"
 level = "Inert"
 bare = false

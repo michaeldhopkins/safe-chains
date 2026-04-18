@@ -1,5 +1,6 @@
 [[command]]
 name = "@shopify/theme-check"
+description = "Linter for Shopify Liquid themes that checks for best practices, performance issues, and Liquid syntax errors. Reads theme files and reports diagnostics without modifying them. Does not connect to the Shopify API in lint mode. The project has been consolidated into Shopify's theme-tools monorepo but the npm package remains actively published."
 url = "https://shopify.dev/docs/storefronts/themes/tools/theme-check/commands"
 level = "SafeRead"
 bare = true

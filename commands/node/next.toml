@@ -1,5 +1,6 @@
 [[command]]
 name = "next"
+description = "CLI for the Next.js React framework. next info is a read-only command that prints environment details for debugging. next lint runs ESLint static analysis on the codebase, which reads files but does not modify them. next build compiles the application into an optimized production build, writing output to the .next directory and executing build-time code (getStaticProps, generateStaticParams). Actively developed with frequent releases tied to the Next.js framework."
 url = "https://nextjs.org/docs/api-reference/cli"
 bare_flags = ["--help", "--version", "-h"]
 

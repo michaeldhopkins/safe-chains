@@ -1,5 +1,6 @@
 [[command]]
 name = "svelte-check"
+description = "Type checker and compiler diagnostic tool for Svelte and SvelteKit projects. Analyzes .svelte and .ts files for type errors, accessibility warnings, and compiler issues, reporting to stdout without modifying files. Runs the Svelte compiler internally for parsing but does not emit build output. Actively maintained as part of the Svelte ecosystem with frequent releases."
 url = "https://svelte.dev/docs/cli/sv-check"
 level = "SafeRead"
 bare = true

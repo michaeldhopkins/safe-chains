@@ -1,5 +1,6 @@
 [[command]]
 name = "pod"
+description = "CocoaPods dependency manager for Swift and Objective-C projects. Read-only subcommands (list, search, info, env, spec cat, spec which) query the spec repository or local state. Write subcommands (install, update, init, deintegrate) modify the Pods/ directory, Podfile.lock, and the Xcode workspace. install and update contact the network to download specs and pod source code. CocoaPods is in maintenance mode (trunk goes read-only Dec 2026), with releases limited to roughly twice per year for Xcode compatibility."
 url = "https://guides.cocoapods.org/terminal/commands.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

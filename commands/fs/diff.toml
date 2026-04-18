@@ -1,5 +1,6 @@
 [[command]]
 name = "diff"
+description = "Compares files and directories line by line, producing various diff formats (unified, context, ed script, side-by-side). Strictly read-only: reads input files and writes comparison results to stdout. The -r flag enables recursive directory comparison. Does not modify files or access the network. Part of GNU diffutils with a very stable CLI surface."
 url = "https://www.gnu.org/software/diffutils/manual/diffutils.html"
 level = "Inert"
 bare = false

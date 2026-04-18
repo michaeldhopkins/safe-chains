@@ -1,5 +1,6 @@
 [[command]]
 name = "basename"
+description = "Strips directory prefixes and optional suffixes from file path strings. Purely a string manipulation utility that does not access the filesystem, network, or modify any state. Part of GNU coreutils, which has an extremely stable CLI surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#basename-invocation"
 level = "Inert"
 bare = false

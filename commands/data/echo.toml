@@ -1,5 +1,6 @@
 [[command]]
 name = "echo"
+description = "Prints arguments to stdout. Completely inert — no flags cause side effects. The only consideration is output redirection, which is handled by the redirect system, not by echo itself."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation"
 level = "Inert"
 bare = true

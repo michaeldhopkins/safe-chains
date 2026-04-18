@@ -1,5 +1,6 @@
 [[command]]
 name = "isort"
+description = "Sorts and organizes Python import statements alphabetically and by section. By default it rewrites files in-place; --check-only and --diff restrict it to read-only reporting. The flag surface is large and has grown over time, though the release cadence has slowed since the v5.x series stabilized. Requires Python 3.10+ to run."
 url = "https://pycqa.github.io/isort/docs/configuration/options.html"
 level = "Inert"
 bare = false

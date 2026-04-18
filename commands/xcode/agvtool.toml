@@ -1,5 +1,6 @@
 [[command]]
 name = "agvtool"
+description = "Apple-generic versioning tool that reads and writes version numbers in Xcode project files. The query subcommands (what-version, what-marketing-version, vers, mvers) are read-only — they print the current version from the .xcodeproj. The write subcommands (new-version, new-marketing-version, bump) modify Info.plist and project.pbxproj files in place. Entirely local; no network access. Part of Xcode command-line tools; versioning follows Xcode releases."
 url = "https://developer.apple.com/library/archive/qa/qa1827/_index.html"
 
 [[command.sub]]

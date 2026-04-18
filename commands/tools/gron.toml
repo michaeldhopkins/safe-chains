@@ -1,5 +1,6 @@
 [[command]]
 name = "gron"
+description = "Transforms JSON into discrete assignment statements so it can be grep'd and manipulated with standard Unix text tools. A pure stdin/stdout text transformer with no network, filesystem write, or subprocess capabilities. The project is effectively dormant — the last release (v0.7.1) was April 2022, so the flag surface is stable."
 url = "https://github.com/tomnomnom/gron"
 level = "Inert"
 bare = true

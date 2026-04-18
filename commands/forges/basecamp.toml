@@ -1,5 +1,6 @@
 [[command]]
 name = "basecamp"
+description = "CLI for interacting with the Basecamp project management API. The full tool supports creating, updating, and deleting projects, todos, messages, comments, and file uploads, all of which hit the Basecamp API over the network. Read-only subcommands (projects list/show, cards list, files list, todos list, search) query the API without modifying state. The auth subcommand manages API tokens locally. The project is under active development."
 url = "https://github.com/basecamp/basecamp-cli"
 bare_flags = ["--help", "--version", "-h"]
 [command.wrapper]

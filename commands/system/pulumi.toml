@@ -1,5 +1,6 @@
 [[command]]
 name = "pulumi"
+description = "Infrastructure-as-code platform that lets developers define cloud infrastructure using general-purpose programming languages (TypeScript, Python, Go, C#, etc.). The full CLI can create, update, and destroy cloud resources via the up and destroy subcommands, which provision real infrastructure and can incur costs or delete production systems. The covered subcommands include preview (computes a diff of what would change without applying it -- note this still runs provider code and may make read-only API calls to cloud providers), stack inspection (ls, output, history, graph, tag), logs (streams application logs), config (views stack configuration), whoami, about, console, schema check, and version. Preview is the highest-risk covered operation as it executes program code and contacts cloud APIs, though it does not apply changes. Pulumi releases roughly weekly with an active development pace."
 url = "https://www.pulumi.com/docs/cli/"
 bare_flags = ["--help", "-h"]
 

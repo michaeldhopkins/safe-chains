@@ -1,5 +1,6 @@
 [[command]]
 name = "unzip"
+description = "Extracts files from ZIP archives to the filesystem. In default mode, unzip writes extracted files to disk, potentially overwriting existing files. The -l flag is read-only, listing archive contents without extracting. The -t flag is read-only, testing archive integrity. The -Z flag invokes zipinfo mode for detailed metadata display. Does not access the network. The CLI surface is very stable and essentially frozen."
 url = "https://linux.die.net/man/1/unzip"
 level = "Inert"
 bare = false

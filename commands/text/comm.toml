@@ -1,5 +1,6 @@
 [[command]]
 name = "comm"
+description = "Compares two sorted files line by line, producing three-column output showing lines unique to each file and lines in common. Purely read-only: reads both input files and writes comparison results to stdout. Part of GNU coreutils, which releases roughly every 6-12 months; the interface has been stable for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#comm-invocation"
 level = "Inert"
 bare = false

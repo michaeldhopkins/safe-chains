@@ -1,5 +1,6 @@
 [[command]]
 name = "@manypkg/cli"
+description = "Lints package.json files across a monorepo for consistency issues such as mismatched dependency versions, internal dependency mismatches, and incorrect root-level dependency placement. The 'check' subcommand is read-only analysis; a separate 'fix' subcommand (not listed here) would auto-correct issues. Releases are infrequent, so the CLI surface is small and stable."
 url = "https://github.com/Thinkmill/manypkg"
 bare_flags = ["--help", "--version", "-h"]
 

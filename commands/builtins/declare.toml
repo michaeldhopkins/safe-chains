@@ -1,5 +1,6 @@
 [[command]]
 name = "declare"
+description = "Declares shell variables and sets their attributes (integer, readonly, export, array, etc.). Effects are process-local to the current shell session. With -x it exports to child processes' environments; with -r it makes variables readonly. Cannot modify the filesystem or execute commands. Bash/zsh builtin; no independent release cycle."
 aliases = ["typeset"]
 url = "https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html"
 level = "Inert"

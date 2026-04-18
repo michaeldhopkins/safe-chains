@@ -1,5 +1,6 @@
 [[command]]
 name = "pmset"
+description = "macOS power management utility that controls sleep timers, hibernation, wake-on-LAN, display sleep, scheduled wake/sleep events, and battery/UPS behavior. Modifying settings requires root and can change when the machine sleeps, wakes, or shuts down -- including scheduling future power events. The coverage is restricted to -g (get), which displays the current power management settings, battery/UPS status, and power source information as read-only output with no side effects. All set operations, schedule commands, and the -a/-b/-c/-u power-source-specific modifiers are outside coverage. The interface ships with macOS and is stable."
 url = "https://ss64.com/mac/pmset.html"
 level = "Inert"
 bare = false

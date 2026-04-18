@@ -1,5 +1,6 @@
 [[command]]
 name = "duf"
+description = "Modern disk usage/free utility, a user-friendly alternative to df. Reads filesystem mount information from the OS kernel and displays space usage in a color-coded table or JSON. Purely read-only with no ability to modify filesystems. Stable project with infrequent releases."
 url = "https://github.com/muesli/duf"
 level = "Inert"
 bare = true

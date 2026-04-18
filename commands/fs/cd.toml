@@ -1,5 +1,6 @@
 [[command]]
 name = "cd"
+description = "Shell built-in that changes the current working directory for the calling process. Modifies process state (the working directory) but does not modify the filesystem or access the network. The -L and -P flags control symlink resolution behavior. The CLI surface is defined by POSIX and essentially frozen."
 url = "https://man7.org/linux/man-pages/man1/cd.1p.html"
 level = "Inert"
 bare = true

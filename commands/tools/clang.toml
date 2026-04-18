@@ -1,5 +1,6 @@
 [[command]]
 name = "clang"
+description = "C/C++/Objective-C compiler front-end in the LLVM project. Full invocation compiles source into object files or executables and can execute arbitrary code via compiled output. Part of the LLVM release cycle with major versions roughly every six months."
 url = "https://clang.llvm.org/docs/CommandGuide/clang.html"
 level = "Inert"
 bare = false

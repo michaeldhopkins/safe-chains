@@ -1,5 +1,6 @@
 [[command]]
 name = "grype"
+description = "Scans container images and filesystems for known vulnerabilities by comparing software components against NVD, GitHub Security Advisories, and distro-specific databases. It reads package manifests and image layers but does not modify them. On first run or periodically, it downloads a vulnerability database from Anchore's servers. Releases are frequent (roughly weekly), now at v0.111.x, with new flags appearing regularly."
 url = "https://github.com/anchore/grype"
 level = "SafeRead"
 bare = false

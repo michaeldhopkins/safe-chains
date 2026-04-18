@@ -1,5 +1,6 @@
 [[command]]
 name = "biome"
+description = "Unified linter, formatter, and code checker for JavaScript, TypeScript, JSON, CSS, and HTML, written in Rust. In check/lint/ci mode it reads source files and reports diagnostics; format mode rewrites files in place. Very actively maintained with a fast release cadence."
 aliases = ["@biomejs/biome"]
 url = "https://biomejs.dev/reference/cli/"
 bare_flags = ["--help", "--version", "-V", "-h"]

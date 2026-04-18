@@ -1,5 +1,6 @@
 [[command]]
 name = "fx"
+description = "Terminal-based JSON viewer and processor that reads JSON from stdin or files and displays it interactively or applies transformation expressions. Read-only with no filesystem writes and no network access. Expressions operate on in-memory JSON data and cannot execute shell commands."
 url = "https://github.com/antonmedv/fx"
 level = "Inert"
 bare = true

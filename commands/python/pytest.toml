@@ -1,5 +1,6 @@
 [[command]]
 name = "pytest"
+description = "Python testing framework that discovers and executes arbitrary user-authored test code. Tests can perform any operation the Python process has access to, including filesystem writes, network requests, and subprocess spawning. --collect-only and --co perform test discovery without execution. conftest.py and plugin code loaded via --override-ini or -p runs arbitrary Python. --junitxml writes a report file. --basetemp controls the location of temporary test directories. Mature, stable project with regular releases."
 url = "https://docs.pytest.org/"
 level = "SafeRead"
 standalone = [

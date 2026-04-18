@@ -1,5 +1,6 @@
 [[command]]
 name = "claude"
+description = "Anthropic's agentic coding CLI. All subcommands here are local config and diagnostics — auth status, MCP server management, plugin install/uninstall, doctor. Nothing starts a session or makes API calls. The main concern is that MCP and plugin operations modify local config files, so they're SafeWrite. The CLI adds new subcommands frequently; coverage should be reviewed after major releases."
 url = "https://docs.anthropic.com/en/docs/claude-code"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

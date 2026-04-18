@@ -1,5 +1,6 @@
 [[command]]
 name = "column"
+description = "Formats input into aligned columns or tables for display. Read-only stdin-to-stdout filter; reads input and writes formatted output without modifying source files. Part of util-linux, which has a slow release cadence (major versions every 2-3 years) and a stable interface."
 url = "https://man7.org/linux/man-pages/man1/column.1.html"
 level = "Inert"
 bare = true

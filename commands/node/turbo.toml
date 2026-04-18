@@ -1,5 +1,6 @@
 [[command]]
 name = "turbo"
+description = "Monorepo build system and task runner by Vercel. turbo run executes tasks defined in turbo.json (build, test, lint, etc.), which run arbitrary shell commands in each package; safety depends entirely on the task definitions. turbo ls and turbo query are read-only workspace introspection commands. turbo prune generates a subset of the monorepo for a given package, writing files to an output directory. daemon status is a read-only process status query. Actively developed with frequent releases."
 url = "https://turbo.build/repo/docs/reference/command-line-reference"
 bare_flags = ["--help", "--version", "-h"]
 

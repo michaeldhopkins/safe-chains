@@ -1,5 +1,6 @@
 [[command]]
 name = "black"
+description = "Opinionated Python code formatter. In default mode it rewrites files in place; --check exits non-zero on unformatted files and --diff prints a unified diff, both without modifying anything. Maintained under the Python Software Foundation with regular annual-style releases."
 url = "https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html"
 level = "Inert"
 bare = false

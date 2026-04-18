@@ -1,5 +1,6 @@
 [[command]]
 name = "asdf"
+description = "Extendable tool version manager that manages per-project runtime versions via a plugin system and .tool-versions files. The covered subcommands (current, list, which, info, plugin list) are purely read-only queries against locally installed versions and plugin metadata with no side effects. Mutating operations like install, plugin add, and reshim are outside coverage. The plugin system is a security-relevant surface: plugins are arbitrary shell scripts fetched from third-party Git repos, and asdf does not pin plugin versions by default, so a compromised plugin can execute arbitrary code during install. The project releases infrequently and has a stable subcommand surface."
 url = "https://asdf-vm.com/manage/commands.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

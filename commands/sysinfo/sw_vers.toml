@@ -1,5 +1,6 @@
 [[command]]
 name = "sw_vers"
+description = "Prints macOS version metadata (product name, version number, build identifier). Entirely read-only -- it reads a handful of system plist files and prints their values. Cannot modify any system state. No network access. Ships with macOS and has an extremely stable, minimal interface that rarely changes."
 url = "https://ss64.com/mac/sw_vers.html"
 level = "Inert"
 bare = true

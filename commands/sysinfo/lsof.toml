@@ -1,5 +1,6 @@
 [[command]]
 name = "lsof"
+description = "Lists open files and network connections; supported with process, user, and file-descriptor filters."
 url = "https://man7.org/linux/man-pages/man8/lsof.8.html"
 level = "Inert"
 bare = true

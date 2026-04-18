@@ -1,5 +1,6 @@
 [[command]]
 name = "sleep"
+description = "Pauses execution for a specified duration; supported with a required time argument."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation"
 level = "Inert"
 bare = false

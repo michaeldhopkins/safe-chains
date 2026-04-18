@@ -1,5 +1,6 @@
 [[command]]
 name = "tac"
+description = "Concatenates files in reverse, printing lines (or records) from last to first. Purely read-only: reads input and writes reversed output to stdout without modifying source files. Part of GNU coreutils, which releases roughly every 6-12 months; the interface has been stable for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "ansible-playbook"
+description = "Executes Ansible playbooks, which run arbitrary tasks (commands, file operations, package installs, service management) on local or remote hosts over SSH. A normal playbook run can modify any system it targets. The --list-hosts, --list-tasks, and --list-tags flags are read-only, showing what would run without executing anything. The --syntax-check flag validates YAML without execution. Even in check mode (--check/-C), some tasks may still execute if flagged always_run. Part of ansible-core, which releases two major versions per year."
 url = "https://docs.ansible.com/ansible/latest/cli/ansible-playbook.html"
 level = "Inert"
 bare = false

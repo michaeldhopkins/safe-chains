@@ -1,5 +1,6 @@
 [[command]]
 name = "kubectx"
+description = "Small utility for switching between Kubernetes contexts in kubeconfig. Bare invocation lists available contexts (read-only). Passing a context name as an argument switches the active context, which modifies the local kubeconfig file. The --current flag prints the active context without modifying anything. The project was dormant for over two years (v0.9.5 in 2023) before resuming development in March 2026 with v0.10+, adding features like --shell for isolated context shells. The subcommand surface is minimal and stable."
 url = "https://github.com/ahmetb/kubectx"
 level = "Inert"
 bare = true

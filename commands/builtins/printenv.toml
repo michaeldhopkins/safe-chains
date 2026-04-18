@@ -1,5 +1,6 @@
 [[command]]
 name = "printenv"
+description = "Prints the values of environment variables to stdout. Purely a reader with no side effects -- it cannot set, modify, or delete variables, nor can it write to the filesystem. Note that output may contain sensitive values (API keys, tokens) if present in the environment. Part of GNU coreutils; stable for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation"
 level = "Inert"
 bare = true

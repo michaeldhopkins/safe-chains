@@ -1,5 +1,6 @@
 [[command]]
 name = "codex"
+description = "OpenAI's local coding agent that reads, modifies, and executes code on your machine. Codex runs in Agent mode by default, giving it the ability to read files, write changes, and run shell commands within your project directory. It communicates with OpenAI's API over the network, sending code context with each request. Some subcommands (cloud status/list/diff, review) are read-only, while others (apply, exec, fork, resume) modify local state. The project is under active development with frequent CLI changes."
 url = "https://github.com/openai/codex"
 bare_flags = ["--help", "--version", "-V", "-h"]
 [command.wrapper]

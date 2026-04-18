@@ -1,5 +1,6 @@
 [[command]]
 name = "@htmlhint/htmlhint"
+description = "Static analysis tool that checks HTML files against a configurable set of rules covering syntax, accessibility, and best practices. Read-only — it parses and reports issues without modifying files. The project saw renewed development activity in 2025 with multiple releases (v1.3 through v1.9), adding new rules and output formats, so the CLI surface is actively expanding."
 url = "https://htmlhint.com/usage/cli/"
 level = "SafeRead"
 bare = false

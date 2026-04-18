@@ -1,5 +1,6 @@
 [[command]]
 name = "@astrojs/check"
+description = "Runs type-checking and diagnostics against Astro projects, powered by the Astro language server. Reads source files and reports errors to stdout; does not modify any files. Actively maintained alongside the Astro framework."
 url = "https://docs.astro.build/en/reference/cli-reference/"
 level = "SafeRead"
 bare = true

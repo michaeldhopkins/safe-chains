@@ -1,5 +1,6 @@
 [[command]]
 name = "pstree"
+description = "Displays processes as a tree; supported with PID highlighting, sort, and display flags."
 url = "https://man7.org/linux/man-pages/man1/pstree.1.html"
 level = "Inert"
 bare = true

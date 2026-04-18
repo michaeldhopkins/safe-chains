@@ -1,5 +1,6 @@
 [[command]]
 name = "cal"
+description = "Displays a calendar; supported with date selection, formatting, and range flags."
 url = "https://man7.org/linux/man-pages/man1/cal.1.html"
 level = "Inert"
 bare = true

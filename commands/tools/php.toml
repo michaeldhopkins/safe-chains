@@ -1,5 +1,6 @@
 [[command]]
 name = "php"
+description = "PHP language interpreter. With no script file or code arguments, only --help and --version are exposed here, making it purely informational. The interpreter can execute arbitrary code when given a file or -r flag, so restricting to version/help queries eliminates the execution surface. PHP follows a predictable annual release cycle."
 url = "https://www.php.net/manual/en/features.commandline.options.php"
 level = "Inert"
 bare = false

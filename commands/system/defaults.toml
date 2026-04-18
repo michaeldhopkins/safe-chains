@@ -1,5 +1,6 @@
 [[command]]
 name = "defaults"
+description = "macOS command-line utility for reading and writing the user defaults system (property list preferences) used by applications and the OS to persist settings. The full command can write, delete, and rename preference keys, which can alter application behavior, change hidden system settings, and modify security-relevant preferences. The covered subcommands (read, read-type, export, find, domains) are strictly read-only -- they query existing preference values, export plist data, and search for keys without making any changes. The uncovered write and delete subcommands are the state-modifying operations. The interface is part of macOS and changes only with OS releases."
 url = "https://ss64.com/mac/defaults.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

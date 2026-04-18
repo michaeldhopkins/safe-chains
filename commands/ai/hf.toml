@@ -1,5 +1,6 @@
 [[command]]
 name = "hf"
+description = "CLI for interacting with the Hugging Face Hub, a platform hosting ML models, datasets, and Spaces. The full CLI includes subcommands for downloading, uploading, repo creation, and job management, all of which hit the Hugging Face API over the network. Read-only subcommands (list, info, cache inspection) query the Hub or inspect local cache without side effects. Mutating subcommands (upload, repo create/delete, login) modify remote state. The project is actively developed with new subcommands appearing regularly."
 url = "https://huggingface.co/docs/huggingface_hub/guides/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

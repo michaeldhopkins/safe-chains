@@ -1,5 +1,6 @@
 [[command]]
 name = "stat"
+description = "Displays detailed metadata about files or filesystems, including permissions, ownership, timestamps, inode numbers, and block counts. Strictly read-only: reads file or filesystem attributes via stat(2) syscall and prints them to stdout. Does not modify files or access the network. Part of GNU coreutils with a stable CLI surface, though macOS and GNU versions have different format string syntaxes."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation"
 level = "Inert"
 bare = false

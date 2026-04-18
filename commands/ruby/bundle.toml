@@ -1,5 +1,6 @@
 [[command]]
 name = "bundle"
+description = "Ruby dependency manager (Bundler). Read-only inspection (list, show, info, check) is straightforward. bundle exec delegates to the inner command's safety rules via a custom handler — this is the most common invocation in practice. bundle install is SafeWrite since it modifies the local gem cache. config uses a custom handler to allow reads but not writes. Stable project; subcommand surface doesn't change often."
 url = "https://bundler.io/man/bundle.1.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

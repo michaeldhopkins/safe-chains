@@ -1,5 +1,6 @@
 [[command]]
 name = "golangci-lint"
+description = "Meta-linter for Go that runs dozens of static analysis tools in parallel. The 'run' subcommand reads and compiles Go source files to perform analysis, reporting findings to stdout without modifying source code. It does not access the network in normal operation. The 'linters' subcommand lists available analyzers. Subtlety: some bundled linters load Go plugins or execute 'go vet'-style analyzers, which involve compilation. The v2 rewrite in 2025 changed the CLI surface significantly; releases occur roughly monthly."
 url = "https://golangci-lint.run/"
 bare_flags = ["--help", "--version", "-h"]
 

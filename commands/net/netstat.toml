@@ -1,5 +1,6 @@
 [[command]]
 name = "netstat"
+description = "Displays network connections, routing tables, interface statistics, masquerade connections, and multicast memberships. Strictly read-only: queries kernel network data structures and prints results to stdout. Does not modify network state, files, or generate network traffic. The -c flag enables continuous mode, refreshing the display periodically. The CLI surface is essentially frozen; superseded by 'ss' on Linux."
 url = "https://man7.org/linux/man-pages/man8/netstat.8.html"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "git-lfs"
+description = "Git extension for versioning large binary files by replacing them with text pointers while storing contents on a remote server. Read-only subcommands (ls-files, status, env, version, locks) inspect local and remote LFS state without modifying anything. Write operations (track, push, pull, install) modify .gitattributes, transfer data over the network, or alter git hooks. The locks subcommand with --verify contacts the remote to check lock ownership. Major releases happen every 2-4 years; minor/patch releases ship as needed (latest: v3.7.1, Oct 2025)."
 url = "https://git-lfs.com/"
 bare_flags = ["--help", "--version", "-h"]
 

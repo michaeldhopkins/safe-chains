@@ -1,5 +1,6 @@
 [[command]]
 name = "whois"
+description = "Queries WHOIS databases to retrieve domain name, IP address, and AS number registration information. Connects to WHOIS servers over the network (port 43) for each query. Read-only from a filesystem perspective, but generates network traffic. Results include registrant contact information, registration dates, and nameserver details. The CLI surface is very stable and essentially frozen."
 url = "https://man7.org/linux/man-pages/man1/whois.1.html"
 level = "Inert"
 bare = false

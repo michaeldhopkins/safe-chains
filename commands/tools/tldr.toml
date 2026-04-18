@@ -1,5 +1,6 @@
 [[command]]
 name = "tldr"
+description = "Community-driven command-line cheat sheet client that displays simplified man page summaries. Fetches pages from the tldr-pages repository (via network on first use or cache miss) and prints them to stdout. Read-only; the only write is to a local cache directory. The page corpus is actively maintained; client implementations vary in release cadence."
 url = "https://tldr.sh/"
 level = "Inert"
 bare = false

@@ -157,9 +157,11 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
 #[allow(clippy::too_many_lines)]
 pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     let cat = category.to_string();
+    let desc = toml.description.unwrap_or_default();
     if let Some(handler_name) = toml.handler {
         return CommandSpec {
             name: toml.name,
+            description: desc,
             aliases: toml.aliases,
             url: toml.url,
             category: cat,
@@ -172,6 +174,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             let first_arg_level = toml.level.unwrap_or(TomlLevel::Inert).into();
             return CommandSpec {
                 name: toml.name,
+                description: desc,
                 aliases: toml.aliases,
                 url: toml.url,
                 category: cat,
@@ -188,6 +191,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         }
         return CommandSpec {
             name: toml.name,
+            description: desc,
             aliases: toml.aliases,
             url: toml.url,
             category: cat,
@@ -205,6 +209,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         let first_arg_level = toml.level.unwrap_or(TomlLevel::Inert).into();
         return CommandSpec {
             name: toml.name,
+            description: desc,
             aliases: toml.aliases,
             url: toml.url,
             category: cat,
@@ -234,6 +239,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     if !toml.first_arg.is_empty() {
         return CommandSpec {
             name: toml.name,
+            description: desc,
             aliases: toml.aliases,
             url: toml.url,
             category: cat,
@@ -247,6 +253,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     if !toml.require_any.is_empty() {
         return CommandSpec {
             name: toml.name,
+            description: desc,
             aliases: toml.aliases,
             url: toml.url,
             category: cat,
@@ -261,6 +268,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
 
     CommandSpec {
         name: toml.name,
+        description: desc,
         aliases: toml.aliases,
         url: toml.url,
         category: cat,
@@ -291,6 +299,7 @@ pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
         for alias in &spec.aliases {
             map.insert(alias.clone(), CommandSpec {
                 name: spec.name.clone(),
+                description: spec.description.clone(),
                 aliases: vec![],
                 url: spec.url.clone(),
                 category: spec.category.clone(),

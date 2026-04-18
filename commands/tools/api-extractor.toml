@@ -1,5 +1,6 @@
 [[command]]
 name = "@microsoft/api-extractor"
+description = "Analyzes TypeScript declarations to produce API reports, .d.ts rollups, and doc models. Reads .d.ts files and project configuration; writes only API report files and doc JSON. Part of Microsoft's Rush Stack monorepo with regular releases."
 url = "https://api-extractor.com/pages/commands/api-extractor_run/"
 bare_flags = ["--help", "--version", "-h"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "htmlq"
+description = "Extracts elements from HTML using CSS selectors, reading from stdin or files. The --output/-o flag can write results to a file on disk, making it not purely side-effect-free. No network access and no ability to execute code. Written in Rust."
 url = "https://github.com/mgdm/htmlq"
 level = "Inert"
 bare = false

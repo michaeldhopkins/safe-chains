@@ -1,5 +1,6 @@
 [[command]]
 name = "aapt2"
+description = "Android Asset Packaging Tool, part of the Android SDK build tools. aapt2 compiles and links Android resources into binary format for inclusion in APKs. The compile and link subcommands write output files. The dump subcommands are read-only, parsing compiled APK files to display badging, permissions, resources, strings, and XML trees without modification. Entirely local with no network access. Released as part of the Android SDK build tools, which update a few times per year."
 url = "https://developer.android.com/tools/aapt2"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

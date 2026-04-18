@@ -1,5 +1,6 @@
 [[command]]
 name = "test"
+description = "Evaluates conditional expressions (file tests, string comparisons, integer comparisons) and exits with 0 (true) or 1 (false). Also invoked as \"[\". Purely a predicate: it reads file metadata and compares values but never modifies files, writes output, accesses the network, or executes commands. Ships with GNU coreutils, POSIX sh, and macOS."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation"
 level = "Inert"
 bare = true
