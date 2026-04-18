@@ -1,5 +1,6 @@
 [[command]]
 name = "sips"
+description = "macOS Scriptable Image Processing System that can both query and destructively modify image files (resize, crop, convert, rotate). The full tool overwrites files in place without confirmation. Only the property-query mode (-g/--getProperty) is side-effect-free, reading image metadata to stdout. Ships with macOS since 10.3; no independent release cycle."
 url = "https://ss64.com/mac/sips.html"
 level = "Inert"
 bare = false

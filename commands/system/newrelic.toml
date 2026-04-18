@@ -1,5 +1,6 @@
 [[command]]
 name = "newrelic"
+description = "New Relic's observability platform CLI for managing entities, workloads, dashboards, alerts, and deployment markers across the New Relic ecosystem. The full CLI can create and modify alert policies, record deployment markers, manage tags, and configure workloads. The covered subcommands (entity search/tags, nrql query, apm application, workload list/get, profile list, version) are read-only queries that search monitored entities, execute NRQL analytics queries, inspect APM application data, list workloads, and show configured profiles -- all over HTTPS to New Relic's API. They do not create, modify, or delete any New Relic resources. The uncovered entity tags create/delete, workload create, and deployment marker subcommands are the state-modifying operations."
 url = "https://github.com/newrelic/newrelic-cli"
 bare_flags = ["--help", "--version", "-h"]
 [command.wrapper]

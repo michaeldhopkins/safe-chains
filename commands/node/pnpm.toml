@@ -1,5 +1,6 @@
 [[command]]
 name = "pnpm"
+description = "Fast, disk-space-efficient Node.js package manager. All exposed subcommands (list, ls, audit, outdated, why) are read-only inspection commands. audit and outdated make network requests to the npm registry to check for vulnerabilities and newer versions. list, ls, and why only inspect the local node_modules and lockfile. None of these subcommands install packages or execute scripts. Actively maintained with frequent releases."
 url = "https://pnpm.io/pnpm-cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

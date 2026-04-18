@@ -1,5 +1,6 @@
 [[command]]
 name = "netlify"
+description = "Netlify's CLI for deploying, developing, and managing sites and serverless functions on their hosting platform. The full CLI can deploy sites, create projects from prompts (including AI-driven code generation), run local dev servers, manage DNS, and configure build hooks. The covered subcommands (status, sites:list, env:list, functions:list, logs, teams:list, completion) are read-only API queries over HTTPS that fetch deployment status, site metadata, environment variables, function listings, and log streams without modifying any remote state. Note that env:list can expose sensitive environment variable values. The uncovered deploy, dev, build, and create subcommands are the state-modifying operations. The CLI is actively developed with frequent updates."
 url = "https://cli.netlify.com/"
 bare_flags = ["--help", "-h"]
 

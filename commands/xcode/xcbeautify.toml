@@ -1,5 +1,6 @@
 [[command]]
 name = "xcbeautify"
+description = "Stdin filter that reformats xcodebuild output into human-readable, colorized log lines. Entirely read-only — it reads from stdin and writes formatted output to stdout without modifying any files, build artifacts, or network state. --quiet and --quieter suppress less-important output. --is-ci adjusts formatting for CI environments. --renderer selects the output backend. Releases roughly monthly (102 releases over 7 years); the flag surface is small and stable."
 url = "https://github.com/cpisciotta/xcbeautify"
 level = "Inert"
 bare = true

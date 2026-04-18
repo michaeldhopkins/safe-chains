@@ -1,5 +1,6 @@
 [[command]]
 name = "seq"
+description = "Generates a sequence of numbers between a start and end value, printing them to stdout. Pure computation with no filesystem writes, no network access, and no side effects beyond stdout. Ships with GNU coreutils and macOS."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation"
 level = "Inert"
 bare = false

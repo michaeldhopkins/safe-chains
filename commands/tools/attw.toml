@@ -1,5 +1,6 @@
 [[command]]
 name = "@arethetypeswrong/cli"
+description = "Analyzes npm package contents for TypeScript type resolution problems across ESM/CJS module systems. Reads package tarballs or invokes npm pack via --pack, then reports issues to stdout. Moderately active project with periodic releases."
 url = "https://github.com/arethetypeswrong/arethetypeswrong.github.io"
 level = "SafeRead"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "pyright"
+description = "Microsoft's static type checker for Python, written in TypeScript. Analyzes type annotations and reports errors without importing or executing any Python code, making it side-effect-free. Does not modify source files. Very actively maintained with roughly monthly releases."
 url = "https://github.com/microsoft/pyright"
 level = "SafeRead"
 bare = true

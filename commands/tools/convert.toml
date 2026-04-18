@@ -1,5 +1,6 @@
 [[command]]
 name = "convert"
+description = "Legacy ImageMagick command that converts between image formats and applies transformations (resize, crop, filter, composite). Reads input image files and writes output to a different file path; does not overwrite the source unless explicitly told to. Very actively maintained with monthly patch releases. Deprecated in ImageMagick 7 in favor of the magick command."
 url = "https://imagemagick.org/script/convert.php"
 level = "SafeWrite"
 bare = false

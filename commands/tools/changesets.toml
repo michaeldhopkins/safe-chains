@@ -1,5 +1,6 @@
 [[command]]
 name = "@changesets/cli"
+description = "Manages versioning and changelogs for monorepo packages. The status subcommand reads changeset files and package.json to report pending version bumps without modifying anything. Widely adopted in the JS ecosystem with steady maintenance."
 url = "https://github.com/changesets/changesets/blob/main/docs/command-line-options.md"
 bare_flags = ["--help", "--version", "-h"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "firebase"
+description = "Google's Firebase platform CLI for managing hosting, Cloud Functions, Firestore, Authentication, and other Firebase services. The full CLI can deploy code and hosting assets, configure authentication providers, create databases, manage emulators, and run functions locally. The covered subcommands (apps:list, functions:log, login:list, projects:list) are read-only API queries over HTTPS that list registered apps, stream function execution logs, show authenticated accounts, and enumerate projects -- they do not modify any remote resources. The uncovered deploy, init, and emulators subcommands are the state-modifying and code-executing operations. Firebase generally introduces breaking CLI changes only twice per year (May/June and Oct/Nov)."
 url = "https://firebase.google.com/docs/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

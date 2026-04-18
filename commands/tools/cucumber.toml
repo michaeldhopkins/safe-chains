@@ -1,5 +1,6 @@
 [[command]]
 name = "cucumber"
+description = "BDD test runner that executes scenarios written in Gherkin plain-language feature files. Reads feature files and step definitions, runs tests, and reports results to stdout. Can execute arbitrary code through step definition glue. Actively maintained with frequent releases."
 url = "https://cucumber.io/docs/cucumber/api/#running-cucumber"
 level = "SafeRead"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "csrutil"
+description = "macOS utility for managing System Integrity Protection (SIP), Apple's kernel-level security mechanism that restricts root-level access to protected system files, kernel extensions, and NVRAM. The full command can enable, disable, or selectively weaken SIP protections, but only from Recovery OS -- these operations fundamentally change the system's security posture. The covered subcommands (status, report, authenticated-root) are purely read-only queries that report the current SIP configuration without modifying anything. They work in normal boot mode and require no special privileges. The interface is extremely stable as it ships with macOS and changes only with major OS releases."
 url = "https://ss64.com/mac/csrutil.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

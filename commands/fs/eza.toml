@@ -1,5 +1,6 @@
 [[command]]
 name = "eza"
+description = "Modern replacement for ls, written in Rust, with color output, git integration, and tree view. Strictly read-only: reads directory entries and file metadata, then prints formatted listings to stdout. The --git flag reads local git repository state but does not modify it. Does not modify files or access the network. Releases roughly every few months with new display flags."
 url = "https://eza.rocks/"
 level = "Inert"
 bare = true

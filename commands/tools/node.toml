@@ -1,5 +1,6 @@
 [[command]]
 name = "node"
+description = "JavaScript runtime that executes arbitrary JavaScript with full access to the filesystem, network, child processes, and native addons. It is a general-purpose runtime — any script it runs operates with the invoking user's permissions. Node.js ships new major versions yearly and adds CLI flags in minor releases (now at v25.x), so the flag surface is large and continuously growing."
 url = "https://nodejs.org/api/cli.html"
 level = "Inert"
 bare = false

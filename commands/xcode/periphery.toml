@@ -1,5 +1,6 @@
 [[command]]
 name = "periphery"
+description = "Static analysis tool that identifies unused code (dead declarations) in Swift projects. The scan subcommand indexes the project build to find unreferenced types, functions, and properties — it reads source files and the index store but does not modify any code. It may invoke xcodebuild or swift build internally to produce the index, which is a build operation that writes to derived data. The --skip-build flag avoids this if an index already exists. No network access. Releases are periodic, roughly every few months; available via Homebrew."
 url = "https://github.com/peripheryapp/periphery"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

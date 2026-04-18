@@ -1,5 +1,6 @@
 [[command]]
 name = "bat"
+description = "Syntax-highlighting file viewer, a cat/less alternative written in Rust. All operations are read-only: bat reads files from disk and prints their contents to stdout with syntax highlighting, line numbers, and git diff markers. It does not modify files or access the network. The --list-languages and --list-themes flags are purely informational. Releases roughly every few months with occasional new flags."
 url = "https://github.com/sharkdp/bat#readme"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "fmt"
+description = "Reformats text to a specified line width by filling and joining lines. Read-only stdin-to-stdout filter; never modifies files on disk. Part of GNU coreutils, which releases roughly every 6-12 months; the interface has been stable for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "act"
+description = "Runs GitHub Actions workflows locally using Docker containers. In dry-run/list/graph mode it only parses and prints workflow structure without launching containers or executing any steps. Actively maintained with frequent releases."
 url = "https://nektosact.com/"
 level = "Inert"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "tig"
+description = "Text-mode interface (ncurses) for browsing git repositories. Entirely read-only — it displays log, diff, blame, tree, and status views by reading from the git object store and index. It never modifies the repository, working tree, or network state. The project is mature and infrequently updated (latest release 2.5.8 in April 2024); the flag surface is small and stable."
 url = "https://jonas.github.io/tig/"
 level = "Inert"
 positional_style = true

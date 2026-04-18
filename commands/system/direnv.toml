@@ -1,5 +1,6 @@
 [[command]]
 name = "direnv"
+description = "Shell extension that automatically loads and unloads environment variables when you enter or leave a directory, based on .envrc files. The security model requires explicit 'direnv allow' before any .envrc is executed, hashing the file contents so that modifications require re-approval -- this prevents drive-by code execution from cloned repos. The covered subcommands (status, version, export, fetchurl) are diagnostic and informational: status prints internal state, version prints the binary version, export outputs the computed env diff for a given shell, and fetchurl downloads a URL to stdout. None of these execute .envrc files. The allow, deny, and edit subcommands are the state-modifying operations not covered here."
 url = "https://direnv.net/"
 bare_flags = ["--help", "--version", "-h"]
 

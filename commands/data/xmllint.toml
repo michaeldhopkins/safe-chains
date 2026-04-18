@@ -1,5 +1,6 @@
 [[command]]
 name = "xmllint"
+description = "Parses, validates, and reformats XML documents, with support for XPath queries, DTD/Schema/RelaxNG validation, and XInclude processing. Reads from files or stdin and writes to stdout by default; --output can redirect to a file. Validation flags like --dtdvalid may fetch remote DTDs unless --nonet is used. Part of libxml2."
 url = "https://gnome.pages.gitlab.gnome.org/libxml2/xmllint.html"
 level = "Inert"
 bare = false

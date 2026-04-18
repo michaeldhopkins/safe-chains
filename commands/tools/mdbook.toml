@@ -1,5 +1,6 @@
 [[command]]
 name = "mdbook"
+description = "Builds online books from Markdown source files into HTML, PDF, or other formats. The 'build' and 'clean' subcommands write to the filesystem (output directory). The 'test' subcommand compiles and runs code samples embedded in the book's Markdown, which can execute arbitrary code. Releases are periodic (v0.5.2 as of December 2025), with new options added occasionally."
 url = "https://rust-lang.github.io/mdBook/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "dotnet"
+description = "Unified CLI for the .NET platform covering project creation, building, testing, publishing, and package management. build and test compile and execute code, meaning they run arbitrary user-authored code (test especially, since test projects can do anything a normal program can). list is read-only, querying local package metadata. publish, run, and pack (not listed here) can produce artifacts or execute code. The CLI is network-aware: restore and publish reach out to NuGet feeds. Microsoft ships a major .NET release annually each November with monthly servicing patches; new CLI subcommands (e.g. dotnet tool exec in .NET 10) and flags are added with each major version."
 url = "https://learn.microsoft.com/en-us/dotnet/core/tools/"
 bare_flags = ["--help", "--info", "--list-runtimes", "--list-sdks", "--version", "-V", "-h"]
 

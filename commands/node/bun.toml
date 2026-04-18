@@ -1,5 +1,6 @@
 [[command]]
 name = "bun"
+description = "All-in-one JavaScript/TypeScript runtime, bundler, and package manager. bun build writes compiled output to disk. bun test executes test files, which run arbitrary user code. bun outdated and bun pm subcommands are read-only local queries. bun x downloads and executes arbitrary npm packages, so safety depends entirely on which package is invoked. Rapidly evolving project with releases every few weeks; new subcommands appear frequently."
 url = "https://bun.sh/docs/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "rustup"
+description = "Rust toolchain installer and manager; supports listing components, targets, toolchains, opening docs, and delegating via run."
 url = "https://rust-lang.github.io/rustup/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

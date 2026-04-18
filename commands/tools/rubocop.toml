@@ -1,5 +1,6 @@
 [[command]]
 name = "rubocop"
+description = "Ruby static code analyzer and formatter based on the community Ruby Style Guide. In its default mode (without -a/--auto-correct), it reports violations without modifying files. It loads and parses Ruby source files but does not execute application code. The --auto-correct and --fix flags (not exposed here) would write changes. Actively maintained with roughly monthly releases."
 url = "https://docs.rubocop.org/rubocop/usage/basic_usage.html"
 level = "SafeRead"
 bare = true

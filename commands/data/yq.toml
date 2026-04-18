@@ -1,5 +1,6 @@
 [[command]]
 name = "yq"
+description = "Evaluates jq-style expressions against YAML, JSON, XML, CSV, and TOML documents. Reads from files or stdin and writes to stdout by default; the -i flag can modify files in place. No network access and no shell execution. By mikefarah; actively maintained with frequent releases."
 url = "https://mikefarah.gitbook.io/yq"
 level = "Inert"
 bare = false

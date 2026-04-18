@@ -1,5 +1,6 @@
 [[command]]
 name = "@openapitools/openapi-generator-cli"
+description = "Node wrapper around OpenAPI Generator, which generates API client SDKs, server stubs, and documentation from OpenAPI specs. The validate subcommand is read-only, parsing a spec file and reporting errors without writing any output. The generate subcommand (not exposed here) writes files to disk. Actively maintained with frequent releases."
 url = "https://openapi-generator.tech/docs/usage/"
 bare_flags = ["--help", "--version", "-h"]
 

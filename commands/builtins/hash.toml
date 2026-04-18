@@ -1,5 +1,6 @@
 [[command]]
 name = "hash"
+description = "Manages the shell's internal hash table that caches the paths of previously found commands. Effects are process-local to the current shell session -- listing, querying, or resetting the cache does not touch the filesystem or affect other processes. POSIX builtin; no independent release cycle."
 url = "https://man7.org/linux/man-pages/man1/hash.1p.html"
 level = "Inert"
 bare = true

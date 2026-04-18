@@ -1,5 +1,6 @@
 [[command]]
 name = "git"
+description = "Distributed version control system. git has a huge surface area — hundreds of subcommands and flags, with new ones added regularly. Read-only operations (log, diff, status, blame, show, branch listing) are safe. Write operations (push, commit, merge, rebase, reset, checkout) modify the repo or communicate with remotes. fetch contacts the network but only downloads; it does not modify the working tree. diff and show have 50+ display flags that are all safe but easy to miss. git releases roughly every 2-3 months (e.g. 2.48 through 2.53 shipped between Jan 2025 and Feb 2026), with git 3.0 expected late 2026; flag coverage needs periodic review."
 url = "https://git-scm.com/docs"
 bare_flags = ["--help", "--version", "-V", "-h"]
 [command.wrapper]

@@ -1,5 +1,6 @@
 [[command]]
 name = "xcrun"
+description = "macOS developer tool dispatcher that locates and executes tools within the active Xcode toolchain. The query flags (--find, --show-sdk-path, --show-sdk-version, --show-sdk-build-version, --show-sdk-platform-path, --show-sdk-platform-version, --show-toolchain-path) are read-only — they print paths or version strings. When used as a wrapper (xcrun <tool> ...), it exec's the inner tool, so safety depends entirely on the delegated command. --sdk and --toolchain select which toolchain to search. Part of Xcode command-line tools; versioning follows Xcode releases."
 url = "https://ss64.com/mac/xcrun.html"
 bare_flags = []
 [command.wrapper]

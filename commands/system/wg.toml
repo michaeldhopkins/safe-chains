@@ -1,5 +1,6 @@
 [[command]]
 name = "wg"
+description = "Userspace configuration utility for WireGuard kernel-level VPN tunnels. show and showconf are read-only, displaying current interface configuration and peer state from the kernel. genkey, genpsk, and pubkey perform local cryptographic key generation/derivation with no side effects beyond stdout output. Write subcommands (set, setconf, addconf, syncconf -- not listed here) modify live tunnel configuration including peers, endpoints, and allowed IPs, which directly affects network routing. No subcommand contacts the network itself; WireGuard tunneling is handled by the kernel. wireguard-tools is an exceptionally stable project with infrequent releases (last GitHub-tagged release was September 2021, though distro packages track newer snapshots like 1.0.20260223)."
 url = "https://www.wireguard.com/quickstart/"
 bare_flags = ["--help", "--version", "-h"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "jest"
+description = "JavaScript testing framework that executes arbitrary user-authored test code. Test runs can read and write files, make network requests, and spawn subprocesses depending on what the tests themselves do. Coverage collection and reporting add filesystem writes for output files. The --config flag loads a configuration file that can include custom transforms and reporters, which also execute arbitrary code. Mature, stable project with infrequent major releases."
 url = "https://jestjs.io/docs/cli"
 level = "SafeRead"
 standalone = [

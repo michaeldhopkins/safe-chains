@@ -1,5 +1,6 @@
 [[command]]
 name = "emulator"
+description = "Launches and manages Android emulator instances that simulate physical Android devices. Running an emulator starts a long-lived process that consumes significant CPU, RAM, and disk I/O. The -list-avds flag is read-only, printing available virtual device names. The version flag is also read-only. All other usage starts an emulator instance. Released as part of the Android SDK emulator package."
 url = "https://developer.android.com/studio/run/emulator-commandline"
 level = "Inert"
 bare = false

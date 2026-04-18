@@ -1,5 +1,6 @@
 [[command]]
 name = "jira"
+description = "Third-party CLI client for Atlassian Jira (jira-cli by ankitpokhrel). issue list, issue view, sprint list, and me are read-only API queries that fetch data from the Jira REST API over HTTPS. init writes a local configuration file with authentication credentials. completion generates shell completions locally. All API-facing subcommands require prior authentication and make network requests to the configured Jira instance. Moderately active project with a few releases per year."
 url = "https://github.com/ankitpokhrel/jira-cli"
 bare_flags = ["--help", "--version", "-h", "-v"]
 

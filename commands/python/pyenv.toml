@@ -1,5 +1,6 @@
 [[command]]
 name = "pyenv"
+description = "Python version manager implemented as shell scripts. All exposed subcommands (versions, version, which, root, shims, help) are read-only queries that inspect locally installed Python versions and the pyenv directory structure. None of these subcommands install or remove Python versions, modify the filesystem, or make network requests. Mature, stable project with infrequent releases; the subcommand surface rarely changes."
 url = "https://github.com/pyenv/pyenv#readme"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "todoist"
+description = "Official CLI client for Todoist (by Doist). All exposed subcommands (task list/view, project list, skill list, inbox, today) are read-only queries against the Todoist Sync API over HTTPS. auth status checks local credential validity without modifying state. Every API-facing command requires stored authentication and makes network requests. Actively maintained by the Todoist team with regular releases."
 aliases = ["td"]
 url = "https://github.com/Doist/todoist-cli"
 bare_flags = ["--help", "--version", "-h"]

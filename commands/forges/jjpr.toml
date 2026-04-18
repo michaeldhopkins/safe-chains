@@ -1,5 +1,6 @@
 [[command]]
 name = "jjpr"
+description = "Manages stacked pull requests for Jujutsu repositories on GitHub, GitLab, and Forgejo. The submit subcommand pushes branches and creates/updates PRs via forge APIs over the network. The merge subcommand merges PRs from the bottom of a stack upward, modifying remote repository state. The status subcommand is read-only, querying PR status from the forge API. The --dry-run flag on submit and merge simulates the operation without making changes. The auth subcommand manages API tokens locally."
 url = "https://github.com/michaeldhopkins/jjpr"
 bare = true
 bare_flags = ["--help", "--version", "-V", "-h"]

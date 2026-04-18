@@ -1,5 +1,6 @@
 [[command]]
 name = "mocha"
+description = "JavaScript testing framework that executes arbitrary user-authored test code. Test runs can perform any operation the Node.js process has access to, including filesystem writes and network requests. The --require flag loads arbitrary modules before tests run, and custom reporters execute user code. --dry-run and --list-files are read-only. Mature project in maintenance mode with infrequent releases."
 url = "https://mochajs.org/"
 level = "SafeRead"
 standalone = [

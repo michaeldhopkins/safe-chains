@@ -1,5 +1,6 @@
 [[command]]
 name = "readlink"
+description = "Resolves symbolic links, printing the target path. The -f/-e/-m flags canonicalize paths to absolute form. Strictly read-only: reads symlink metadata from the filesystem and prints results to stdout. Does not modify files or access the network. Part of GNU coreutils with a very stable CLI surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#readlink-invocation"
 level = "Inert"
 bare = false

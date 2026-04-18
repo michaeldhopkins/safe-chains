@@ -1,5 +1,6 @@
 [[command]]
 name = "meson"
+description = "Modern build system generator (similar in role to CMake) that produces Ninja build files from meson.build definitions. The full CLI can configure, compile, test, and install projects, which involves evaluating Meson's DSL and executing build commands. The covered subcommands (introspect, configure with no -D options, info) are read-only queries: introspect dumps build targets, dependencies, options, and test definitions from an existing build directory as structured data; configure (bare) prints current build options; info shows Meson version and detected compilers. None of these execute build steps or modify build configuration. Meson releases new minor versions frequently with an active development pace."
 url = "https://mesonbuild.com/Commands.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

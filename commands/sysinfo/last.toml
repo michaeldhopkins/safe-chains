@@ -1,5 +1,6 @@
 [[command]]
 name = "last"
+description = "Shows recent user login history; supported with time-range, format, and limit flags."
 url = "https://man7.org/linux/man-pages/man1/last.1.html"
 level = "Inert"
 bare = true

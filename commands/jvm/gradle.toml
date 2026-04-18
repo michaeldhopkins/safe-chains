@@ -1,5 +1,6 @@
 [[command]]
 name = "gradle"
+description = "General-purpose build automation tool for JVM projects. Gradle executes arbitrary code: build scripts (build.gradle, build.gradle.kts) are full Groovy or Kotlin programs that run during configuration and execution phases. Even read-only-sounding tasks like 'dependencies' or 'tasks' trigger script evaluation, which can download artifacts, run plugins, or execute shell commands. The 'build' task compiles code, runs tests, and produces artifacts (local filesystem writes). The '--scan' flag uploads build data to Gradle's servers. Gradle releases roughly every 6 weeks with new features, flags, and deprecations; the CLI surface changes frequently and needs periodic review."
 aliases = ["gradlew"]
 url = "https://docs.gradle.org/current/userguide/command_line_interface.html"
 bare_flags = ["--help", "--version", "-V", "-h"]

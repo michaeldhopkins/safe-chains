@@ -1,5 +1,6 @@
 [[command]]
 name = "tree"
+description = "Displays directory contents in a recursive tree format with optional file attributes. Strictly read-only: traverses the filesystem and prints a hierarchical listing to stdout. Can be slow on very large directory trees. Does not modify files or access the network. The -H flag generates HTML output to stdout but does not write files. The CLI surface is stable and rarely changes."
 url = "https://man7.org/linux/man-pages/man1/tree.1.html"
 level = "Inert"
 bare = true

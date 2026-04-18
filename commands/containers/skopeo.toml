@@ -1,5 +1,6 @@
 [[command]]
 name = "skopeo"
+description = "CLI for performing operations on container images and registries without requiring a daemon. Read-only subcommands (inspect, list-tags, manifest-digest) query registry metadata over the network. Write subcommands (copy, delete, sync) transfer or remove images between registries or local storage. All operations except manifest-digest involve network access to container registries. The project releases frequently with multiple maintained branches (v1.9 through v1.22 all receiving patches), and new flags are added periodically."
 url = "https://github.com/containers/skopeo"
 bare_flags = ["--help", "--version", "-h"]
 [command.wrapper]

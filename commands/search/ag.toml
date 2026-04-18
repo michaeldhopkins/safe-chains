@@ -1,5 +1,6 @@
 [[command]]
 name = "ag"
+description = "The Silver Searcher, a fast code search tool similar to ack; full flag support for pattern matching and output formatting."
 url = "https://github.com/ggreer/the_silver_searcher"
 level = "Inert"
 bare = false

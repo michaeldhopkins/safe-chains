@@ -1,5 +1,6 @@
 [[command]]
 name = "magick"
+description = "ImageMagick image processing suite, supporting over 200 image formats. The 'identify' subcommand is read-only, inspecting image metadata without modification. The 'convert', 'composite', 'compare', 'mogrify', 'montage', and 'stream' subcommands read input images and write output files to disk. 'mogrify' is particularly notable: it modifies images in place by default (destructive). ImageMagick has a large and complex flag surface with format-dependent behavior. Processing crafted image files has historically been a source of CVEs (memory corruption, SSRF via SVG/MVG delegates). No intentional network access, but delegate programs configured in policy.xml can be invoked. ImageMagick releases frequently with security patches."
 url = "https://imagemagick.org/script/command-line-tools.php"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

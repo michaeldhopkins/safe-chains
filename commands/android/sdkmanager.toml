@@ -1,5 +1,6 @@
 [[command]]
 name = "sdkmanager"
+description = "Manages Android SDK packages: installing, updating, and uninstalling SDK components. Install and update operations download packages from Google's servers and write to the local SDK directory. The --list flag is read-only, querying available and installed packages (this does hit the network to fetch the package index). Uninstall removes local SDK components. Released as part of the Android SDK command-line tools."
 url = "https://developer.android.com/tools/sdkmanager"
 level = "Inert"
 bare = false

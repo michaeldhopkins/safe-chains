@@ -1,5 +1,6 @@
 [[command]]
 name = "ruff"
+description = "Extremely fast Python linter and formatter written in Rust, 10-100x faster than Flake8/Black. ruff check performs static analysis and reports violations without modifying files (--fix is opt-in and not exposed here). ruff format --check only reports unformatted files without rewriting them. Does not import or execute Python code. Very actively developed with weekly releases."
 url = "https://docs.astral.sh/ruff/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

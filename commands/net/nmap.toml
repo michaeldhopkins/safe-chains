@@ -1,5 +1,6 @@
 [[command]]
 name = "nmap"
+description = "Network exploration and security auditing tool. Nmap sends crafted packets to discover hosts, scan ports, detect services, and fingerprint operating systems on target networks. All scanning modes generate network traffic and probe remote systems, which may be detectable by intrusion detection systems and could be considered hostile in some environments. SYN scans (-sS) require root privileges. The -sV flag actively probes services for version detection. The NSE scripting engine (--script, not exposed here) can execute arbitrary Lua scripts. Does not modify local files. Nmap releases roughly once a year with new features and detection signatures."
 url = "https://nmap.org/book/man.html"
 level = "Inert"
 bare = false

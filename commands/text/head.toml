@@ -1,5 +1,6 @@
 [[command]]
 name = "head"
+description = "Outputs the first part (lines or bytes) of files. Purely read-only: reads input and writes a prefix to stdout without modifying source files. Part of GNU coreutils, which releases roughly every 6-12 months; the interface has been stable for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation"
 level = "Inert"
 bare = true

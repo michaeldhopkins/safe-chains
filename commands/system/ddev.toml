@@ -1,5 +1,6 @@
 [[command]]
 name = "ddev"
+description = "Docker-based local development environment manager for PHP, Node.js, and Python projects that provisions and orchestrates containers, databases, and reverse proxies. The full CLI can create, start, stop, destroy environments, execute arbitrary commands inside containers (ddev exec, ddev ssh), snapshot/restore databases, and share sites via ngrok tunnels. The covered subcommands (status, list, describe, logs, version, aliases, debug/configyaml/diagnose/mutagen/test, snapshot --list) are read-only queries against local container state and project configuration -- they do not start, stop, or modify any containers or databases. DDEV releases minor versions roughly monthly with active development."
 url = "https://ddev.readthedocs.io/en/stable/users/usage/commands/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

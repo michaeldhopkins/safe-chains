@@ -1,5 +1,6 @@
 [[command]]
 name = "@ls-lint/ls-lint"
+description = "Checks file and directory names against configurable naming conventions (camelCase, snake_case, etc.). Purely read-only — it walks the filesystem and reports violations without modifying or renaming anything. Releases are infrequent (v2.3.0 in March 2025), so the CLI surface is small and stable."
 url = "https://ls-lint.org/"
 level = "Inert"
 bare = true

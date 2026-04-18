@@ -1,5 +1,6 @@
 [[command]]
 name = "cmp"
+description = "Compares two files byte by byte, reporting the first differing position or confirming they are identical. Strictly read-only: reads input files and writes comparison results to stdout. Does not modify files or access the network. Part of GNU diffutils, which has a very stable CLI surface."
 url = "https://man7.org/linux/man-pages/man1/cmp.1.html"
 level = "Inert"
 bare = false

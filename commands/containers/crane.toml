@@ -1,5 +1,6 @@
 [[command]]
 name = "crane"
+description = "Lightweight CLI for interacting with container registries, part of google/go-containerregistry. Subcommands divide into read-only operations (manifest, config, digest, ls, catalog, blob, validate) that fetch metadata or content from registries, and write operations (push, append, copy, delete, tag, mutate, flatten) that modify registry state. All registry interactions are network operations. The project releases frequently -- multiple patch releases per month in active periods -- and occasionally adds new subcommands."
 url = "https://github.com/google/go-containerregistry"
 bare_flags = ["--help", "-h"]
 [command.wrapper]

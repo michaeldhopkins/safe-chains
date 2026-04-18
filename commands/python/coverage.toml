@@ -1,5 +1,6 @@
 [[command]]
 name = "coverage"
+description = "Code coverage measurement tool for Python. coverage run executes an arbitrary Python program while tracing which lines are hit, so it inherits all the safety characteristics of the program being measured. coverage report reads the .coverage data file and prints a text summary (read-only). coverage json and coverage html write report files to disk. coverage combine merges multiple .coverage data files into one, modifying the data file on disk. Does not make network requests. Mature, stable project with regular releases."
 url = "https://coverage.readthedocs.io/"
 bare_flags = ["--help", "--version", "-h"]
 

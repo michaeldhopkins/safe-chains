@@ -1,5 +1,6 @@
 [[command]]
 name = "journalctl"
+description = "systemd's journal query utility for reading structured binary logs from the kernel, services, and user applications. journalctl is fundamentally a read-only tool -- it queries the journal's indexed binary log files with filtering by time range, boot session, unit, priority, and structured fields. It does not modify system state. The --vacuum-size and --vacuum-time flags (not covered here) can delete old log entries. The --verify flag checks journal file integrity. The -f (follow) mode streams new log entries in real-time. All operations are local; no network calls are made unless --machine is used to query a remote systemd host over SSH. The interface is stable and tied to systemd releases."
 url = "https://man7.org/linux/man-pages/man1/journalctl.1.html"
 level = "Inert"
 bare = true

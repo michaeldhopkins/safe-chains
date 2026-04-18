@@ -1,5 +1,6 @@
 [[command]]
 name = "colordiff"
+description = "Wrapper around diff that adds ANSI color coding to the output for readability. Like diff, it reads two files or directories and compares them. Strictly read-only: no file modification or network access. Inherits diff's CLI surface, which is defined by GNU diffutils and very stable."
 url = "https://www.colordiff.org/"
 level = "Inert"
 bare = false

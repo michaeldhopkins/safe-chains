@@ -1,5 +1,6 @@
 [[command]]
 name = "lint"
+description = "Static analysis tool for Android projects that checks source files, XML resources, and compiled code for bugs, performance issues, and style problems. Running lint scans the project read-only and prints findings to stdout; it does not modify source files. The --list and --show flags are purely informational. Lint can optionally write report files (HTML/XML) via flags like --html and --xml. No network access in normal operation. Released as part of the Android SDK command-line tools."
 url = "https://developer.android.com/studio/write/lint"
 level = "Inert"
 bare = true

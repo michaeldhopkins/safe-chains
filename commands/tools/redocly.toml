@@ -1,5 +1,6 @@
 [[command]]
 name = "@redocly/cli"
+description = "CLI for linting, validating, and bundling OpenAPI and AsyncAPI definitions. The lint subcommand validates specs against configurable rulesets and reports violations. stats prints spec metrics. check-config validates the redocly.yaml configuration file. None of these subcommands modify the spec files. Very actively maintained with multiple releases per month; v2.0 shipped summer 2025."
 url = "https://redocly.com/docs/cli/commands"
 bare_flags = ["--help", "--version", "-h"]
 

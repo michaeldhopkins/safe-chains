@@ -1,5 +1,6 @@
 [[command]]
 name = "tr"
+description = "Translates, squeezes, or deletes characters from stdin, writing the result to stdout. Read-only stdin-to-stdout filter; never reads or modifies files on disk (operates exclusively on standard input). Part of GNU coreutils, which releases roughly every 6-12 months; the interface has been stable for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation"
 level = "Inert"
 bare = false

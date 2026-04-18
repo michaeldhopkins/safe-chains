@@ -1,4 +1,5 @@
 [[command]]
 name = "xcode-select"
+description = "macOS tool for querying and switching the active Xcode developer directory. --print-path / -p is read-only — it prints the current developer tools path. --version prints the tools version (read-only). --install triggers a download of command-line tools from Apple (network + write). --switch changes the active developer directory (write, requires root). --reset restores the default path (write, requires root). Part of macOS; versioning follows macOS/Xcode releases."
 url = "https://ss64.com/mac/xcode-select.html"
 bare_flags = ["--help", "--print-path", "--version", "-V", "-h", "-p", "-v"]

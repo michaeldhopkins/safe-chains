@@ -1,5 +1,6 @@
 [[command]]
 name = "zig"
+description = "Zig programming language compiler and toolchain. With no positional arguments, only --help and --version are exposed here, making it purely informational. Compiling source files (not exposed here) runs comptime code execution, which can perform I/O. Actively developed with releases every few months; v0.16.0 shipped April 2026, with v1.0 targeting 2026."
 url = "https://ziglang.org/documentation/"
 level = "Inert"
 bare = false

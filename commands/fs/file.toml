@@ -1,5 +1,6 @@
 [[command]]
 name = "file"
+description = "Identifies file types by examining file contents against a database of magic number patterns. Strictly read-only: reads file headers and prints detected type information to stdout. The -s flag allows reading special files (device nodes), which could block on certain devices. Does not modify files or access the network. Part of a long-standing Unix utility with a very stable CLI surface."
 url = "https://man7.org/linux/man-pages/man1/file.1.html"
 level = "Inert"
 bare = false

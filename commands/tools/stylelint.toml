@@ -1,5 +1,6 @@
 [[command]]
 name = "stylelint"
+description = "CSS linter that enforces conventions and catches errors in CSS, SCSS, Sass, and Less files. Reports violations to stdout without modifying source files (--fix is opt-in and not exposed here). Loads plugins and custom formatters specified by config, which execute JavaScript. Actively maintained with regular releases."
 url = "https://stylelint.io/user-guide/cli/"
 level = "SafeRead"
 bare = false

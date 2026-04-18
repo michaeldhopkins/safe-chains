@@ -1,5 +1,6 @@
 [[command]]
 name = "zf"
+description = "Terminal fuzzy finder optimized for filename matching, using an algorithm tuned for path separators. Reads lines from stdin, presents a selection UI, and prints the chosen line to stdout. Strictly read-only: reads from stdin and writes to stdout. Does not modify files or access the network. Written in Zig. The CLI surface is small and stable."
 url = "https://github.com/natecraddock/zf"
 level = "Inert"
 bare = true

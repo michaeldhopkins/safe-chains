@@ -1,5 +1,6 @@
 [[command]]
 name = "jarsigner"
+description = "Signs and verifies Java Archive (JAR) files using cryptographic signatures. In signing mode, jarsigner modifies the JAR by embedding a digital signature (requires access to a private key). In verify mode (-verify), it is read-only: it checks the integrity and authenticity of an existing signature without modifying the file. Verification does read the filesystem and may contact a network timestamping authority or OCSP responder if the signature includes such references. Part of the JDK, which ships on a predictable 6-month cadence (March and September); jarsigner's flag surface is stable and rarely changes between releases."
 url = "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jarsigner.html"
 level = "Inert"
 bare = false

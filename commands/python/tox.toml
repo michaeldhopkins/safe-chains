@@ -1,5 +1,6 @@
 [[command]]
 name = "tox"
+description = "Python test automation tool that creates isolated virtualenvs and runs commands defined in tox.ini. tox run executes arbitrary shell commands as specified in the tox configuration, including installing packages (network requests) and running test suites. tox list and tox config are read-only commands that inspect configured environments and settings without executing anything. The tox.ini file itself can define any shell command to run. Mature, stable project with regular releases."
 url = "https://tox.wiki/"
 bare_flags = ["--help", "--version", "-h"]
 

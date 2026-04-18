@@ -1,5 +1,6 @@
 [[command]]
 name = "brew"
+description = "The macOS (and Linux) package manager that installs, upgrades, and removes software formulae and casks. The covered subcommands (list, info, search, deps, outdated, config, doctor, leaves, uses, tap-info, services list/info, bundle check/list, and dry-run variants of upgrade/cleanup) are read-only queries against the local package database and upstream metadata, performing no installations or filesystem modifications. The uncovered install, upgrade (without --dry-run), uninstall, and tap subcommands download and execute code from formula/cask definitions and modify /usr/local or /opt/homebrew. Homebrew releases frequently with patch versions every few weeks and minor versions every few months; new subcommands and flags appear regularly."
 url = "https://docs.brew.sh/Manpage"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

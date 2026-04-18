@@ -1,5 +1,6 @@
 [[command]]
 name = "python3"
+description = "CPython interpreter. With no positional arguments or code flags, only --help and --version are exposed here, making it purely informational. The interpreter can execute arbitrary code when given a file, -c, or -m flag, so restricting to version/help eliminates the execution surface. Python follows an annual release cycle with predictable cadence."
 url = "https://docs.python.org/3/using/cmdline.html"
 level = "Inert"
 bare = false

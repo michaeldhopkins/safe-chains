@@ -1,5 +1,6 @@
 [[command]]
 name = "uptime"
+description = "Shows how long the system has been running and load averages; supported with pretty and since flags."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation"
 level = "Inert"
 bare = true

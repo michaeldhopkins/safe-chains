@@ -1,5 +1,6 @@
 [[command]]
 name = "date"
+description = "Displays or sets the system date and time. When invoked without the set operation, date is read-only: it reads the system clock and prints formatted output. Setting the system clock (via a date string argument on some systems) requires root privileges and modifies system state. No network access. Part of GNU coreutils with a very stable CLI surface, though macOS and GNU versions have slightly different flag sets."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation"
 level = "Inert"
 bare = true

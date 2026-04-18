@@ -1,5 +1,6 @@
 [[command]]
 name = "xcodegen"
+description = "Generates Xcode project files (.xcodeproj) from a YAML or JSON project specification. The dump subcommand is read-only — it parses the spec and prints the resolved project configuration to stdout without creating any files. The generate subcommand (default action) writes a .xcodeproj to disk, which is a local write operation. No network access. The project sees periodic releases (several per year) tracking Xcode and Swift evolution."
 url = "https://github.com/yonaskolb/XcodeGen"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

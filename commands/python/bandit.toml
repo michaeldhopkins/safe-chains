@@ -1,5 +1,6 @@
 [[command]]
 name = "bandit"
+description = "Static security analysis tool for Python source code. Bandit parses Python ASTs to detect common security issues (e.g., hardcoded passwords, use of eval, insecure imports) without executing the analyzed code. All operations are read-only filesystem scans. The --output flag writes a report file. Does not make network requests. Mature, stable project maintained under the PyCQA umbrella with infrequent releases."
 url = "https://bandit.readthedocs.io/"
 level = "SafeRead"
 bare = false

@@ -1998,3 +1998,22 @@ use super::*;
                 "accepted random flag: {test}");
         }
     }
+
+    #[test]
+    fn all_toml_commands_have_description() {
+        let mut missing = Vec::new();
+        for (key, spec) in TOML_REGISTRY.iter() {
+            if *key != spec.name {
+                continue;
+            }
+            if spec.description.is_empty() {
+                missing.push(spec.name.as_str());
+            }
+        }
+        assert!(
+            missing.is_empty(),
+            "{} TOML commands missing description:\n{}",
+            missing.len(),
+            missing.join(", "),
+        );
+    }

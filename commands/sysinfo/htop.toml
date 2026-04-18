@@ -1,5 +1,6 @@
 [[command]]
 name = "htop"
+description = "Interactive process viewer; supported with sort, filter, user, and display flags."
 url = "https://htop.dev/"
 level = "Inert"
 bare = true

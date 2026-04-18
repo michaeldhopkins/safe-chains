@@ -1,5 +1,6 @@
 [[command]]
 name = "grep"
+description = "Standard text pattern search tool (also aliased as egrep/fgrep); full flag support for regex matching and output control."
 url = "https://www.gnu.org/software/grep/manual/grep.html"
 level = "Inert"
 bare = false

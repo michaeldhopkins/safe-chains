@@ -1,5 +1,6 @@
 [[command]]
 name = "pup"
+description = "Command-line HTML parser (like jq for HTML). Reads HTML from stdin, applies CSS selectors, and prints matching elements to stdout. Purely read-only with no file-writing capability. The project is unmaintained (last release v0.4.0 in 2016), but the CLI surface is frozen and the tool remains widely used."
 url = "https://github.com/ericchiang/pup"
 level = "Inert"
 positional_style = true

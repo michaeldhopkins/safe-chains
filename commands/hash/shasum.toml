@@ -1,5 +1,6 @@
 [[command]]
 name = "shasum"
+description = "Perl-based SHA checksum utility with selectable algorithm (SHA-1, SHA-224, SHA-256, SHA-384, SHA-512 via --algorithm). Strictly read-only: reads file contents, computes hashes, and prints results to stdout. The --check flag verifies files against recorded checksums. Does not modify files or access the network. Commonly the default SHA tool on macOS. The CLI surface is very stable."
 url = "https://perldoc.perl.org/shasum"
 level = "Inert"
 bare = true

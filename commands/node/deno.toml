@@ -1,5 +1,6 @@
 [[command]]
 name = "deno"
+description = "Secure JavaScript/TypeScript runtime with a granular permissions model. deno check and deno lint perform static analysis without executing user code. deno doc and deno info are read-only introspection commands. deno fmt with --check only reports formatting issues without modifying files. deno test executes test code but Deno's permission sandbox limits filesystem, network, and subprocess access by default. Actively developed with minor releases every few weeks."
 url = "https://docs.deno.com/runtime/reference/cli/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

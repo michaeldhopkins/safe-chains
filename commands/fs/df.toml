@@ -1,5 +1,6 @@
 [[command]]
 name = "df"
+description = "Reports disk space usage for mounted filesystems. Strictly read-only: queries the kernel for filesystem statistics and prints them to stdout. Does not modify files or access the network. Part of GNU coreutils with a very stable CLI surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "pick"
+description = "Minimal fuzzy text selector that reads lines from stdin, presents a selection UI, and prints the chosen line to stdout. Strictly read-only: reads from stdin and writes to stdout. Does not modify files or access the network. Written in C with minimal dependencies. The CLI surface is very small and stable."
 url = "https://github.com/mptre/pick"
 level = "Inert"
 bare = true

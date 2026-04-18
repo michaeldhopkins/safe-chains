@@ -1,5 +1,6 @@
 [[command]]
 name = "identify"
+description = "Reports the format, dimensions, color depth, and other metadata of image files (part of ImageMagick). Strictly read-only — it inspects image headers and pixel data without modifying the original files. However, ImageMagick's parser has a history of memory-corruption CVEs triggered by malformed input images, so running it on untrusted files carries risk. ImageMagick releases happen several times per year, occasionally adding new -define and -list options."
 url = "https://imagemagick.org/script/identify.php"
 level = "Inert"
 bare = false

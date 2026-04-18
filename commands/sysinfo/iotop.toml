@@ -1,5 +1,6 @@
 [[command]]
 name = "iotop"
+description = "Displays per-process I/O usage; supported with batch mode, filtering, and interval flags."
 url = "https://man7.org/linux/man-pages/man8/iotop.8.html"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "watchexec"
+description = "File-watching tool that re-executes a command when files change. Acts as a wrapper: it monitors the filesystem for changes and then runs an arbitrary inner command. Safety depends entirely on the inner command being executed. The watcher itself only reads filesystem events. Development pace has slowed but the project remains maintained; v2.5.1 shipped March 2026."
 url = "https://watchexec.github.io/"
 [command.wrapper]
 standalone = [

@@ -1,5 +1,6 @@
 [[command]]
 name = "zipinfo"
+description = "Displays detailed metadata about ZIP archive contents, including file sizes, compression ratios, timestamps, and permissions. Strictly read-only: reads the ZIP central directory and prints information to stdout without extracting any files. Does not modify files or access the network. The CLI surface is very stable and essentially frozen."
 url = "https://linux.die.net/man/1/zipinfo"
 level = "Inert"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "packer"
+description = "HashiCorp's tool for creating identical machine images (AMIs, Docker images, VMware templates, etc.) across multiple platforms from a single source template. The build subcommand is the primary operation and provisions real infrastructure -- it can launch VMs/containers, run provisioners (shell scripts, Ansible, Chef), and produce machine images, potentially incurring cloud costs. The covered subcommands are lower-risk: validate checks template syntax and configuration validity without provisioning anything; inspect dumps template components (builders, provisioners, variables) as structured output; fmt --check verifies HCL formatting without writing changes. The validate subcommand does make network calls to verify plugin availability. HashiCorp supports N-2 versions with GA releases supported for up to two years."
 url = "https://developer.hashicorp.com/packer/docs/commands"
 bare_flags = ["--help", "--version", "-h"]
 

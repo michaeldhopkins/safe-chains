@@ -1,5 +1,6 @@
 [[command]]
 name = "ls"
+description = "Lists directory contents and file metadata. Strictly read-only: reads directory entries and file attributes (permissions, timestamps, sizes), then prints formatted output to stdout. Does not modify files or access the network. Part of GNU coreutils with a very stable CLI surface, though macOS and GNU versions have slightly different flag sets."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation"
 level = "Inert"
 bare = true

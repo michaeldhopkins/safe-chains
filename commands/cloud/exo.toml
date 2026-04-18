@@ -1,5 +1,6 @@
 [[command]]
 name = "exo"
+description = "Command-line interface for managing Exoscale cloud resources (compute, storage, DNS, DBaaS). The full CLI can create, modify, and destroy instances and other infrastructure. Authenticated via API key and secret stored in config. Open-source Go project with moderate release velocity."
 url = "https://community.exoscale.com/documentation/tools/exoscale-cli/"
 bare_flags = ["--help", "-h"]
 [command.wrapper]

@@ -1,5 +1,6 @@
 [[command]]
 name = "alias"
+description = "Defines or lists shell aliases in the current session. Effects are process-local and do not persist beyond the shell session. Aliases can shadow real commands, but only within the invoking shell -- they cannot modify the filesystem or affect other processes. POSIX builtin; no independent release cycle."
 url = "https://man7.org/linux/man-pages/man1/alias.1p.html"
 level = "Inert"
 bare = true

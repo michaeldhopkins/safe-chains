@@ -1,5 +1,6 @@
 [[command]]
 name = "rg"
+description = "Ripgrep, a fast recursive regex search tool; full flag support for pattern matching, file filtering, and output formatting."
 url = "https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md"
 level = "Inert"
 bare = false

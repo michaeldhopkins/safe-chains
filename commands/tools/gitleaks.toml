@@ -1,5 +1,6 @@
 [[command]]
 name = "gitleaks"
+description = "Scans git repositories and files for hardcoded secrets such as API keys, tokens, and credentials using pattern matching. Purely read-only analysis — it inspects history and staged content but never modifies the repository or transmits findings externally. The rule set grows steadily (150+ patterns as of v8.28), so new flags and options appear in minor releases roughly every few weeks."
 url = "https://github.com/gitleaks/gitleaks"
 bare_flags = ["--help", "--version", "-h"]
 

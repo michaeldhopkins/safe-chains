@@ -1,5 +1,6 @@
 [[command]]
 name = "zipalign"
+description = "Optimizes APK file alignment to ensure uncompressed data starts at particular byte boundaries, improving runtime performance on Android. In default mode, zipalign reads an input APK and writes an aligned copy to a new output file. With the -c flag, it operates in verification mode: checking alignment without modifying any files. All operations are local with no network access. Released as part of the Android SDK build tools."
 url = "https://developer.android.com/tools/zipalign"
 level = "Inert"
 bare = false

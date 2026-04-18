@@ -1,5 +1,6 @@
 [[command]]
 name = "az"
+description = "Unified command-line interface for managing Microsoft Azure resources. The full CLI can create, modify, and delete cloud infrastructure, manage RBAC/AD policies, and access Key Vault secrets. Authenticated via device login, service principal, or managed identity. Released monthly with high project velocity."
 url = "https://learn.microsoft.com/en-us/cli/azure/"
 bare_flags = ["--help", "-h", "--version"]
 [command.wrapper]

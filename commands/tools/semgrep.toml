@@ -1,5 +1,6 @@
 [[command]]
 name = "semgrep"
+description = "Static analysis tool that finds bugs and security vulnerabilities using pattern-matching rules across 30+ languages. scan and ci subcommands parse source files and report findings without modifying them (--autofix is opt-in and not exposed here). The ci subcommand may send results to the Semgrep platform if configured. Actively maintained with monthly releases."
 url = "https://semgrep.dev/docs/cli-reference/"
 bare_flags = ["--help", "--version", "-h"]
 

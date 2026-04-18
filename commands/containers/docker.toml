@@ -1,5 +1,6 @@
 [[command]]
 name = "docker"
+description = "Container runtime CLI with a very large surface area. Read-only subcommands (ps, logs, inspect, images, stats, info, diff, top, history, port, version) query container and image state locally. Write subcommands (run, exec, build, push, pull, rm, rmi, stop, kill, restart, create, commit, network create/rm, volume create/rm) create, destroy, or mutate containers, images, networks, and volumes. exec and run can execute arbitrary code. push/pull communicate with remote registries. Docker Desktop releases biweekly with new flags and subcommands added regularly -- e.g. v28 added docker bake, --use-api-socket, and --platform on image inspect. Compose and Buildx are bundled sub-CLIs with their own subcommand trees."
 url = "https://docs.docker.com/reference/cli/docker/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

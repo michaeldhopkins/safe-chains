@@ -1,5 +1,6 @@
 [[command]]
 name = "snyk"
+description = "Security platform CLI that scans dependencies, code, containers, and infrastructure-as-code for known vulnerabilities. The test subcommands analyze manifests/lockfiles and report findings without modifying the project. snyk test sends dependency graphs to Snyk's API for vulnerability matching, so it requires network access and transmits project metadata. Very actively maintained with weekly releases."
 url = "https://docs.snyk.io/snyk-cli"
 bare_flags = ["--help", "--version", "-h"]
 

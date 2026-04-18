@@ -1,5 +1,6 @@
 [[command]]
 name = "wrangler"
+description = "CLI for Cloudflare's developer platform (Workers, Pages, R2, KV, D1, Queues, AI, and more). Write subcommands (deploy, publish, delete, secret put, kv:key put, r2 object put, d1 execute -- not listed here) deploy code, modify secrets, and mutate storage on Cloudflare's infrastructure, all over the network. Read-only subcommands (whoami, secret list, deployments list/status, versions list/view, telemetry status, docs) query account and deployment state via Cloudflare's API. tail streams live request logs from a deployed Worker over a WebSocket connection. Wrangler is a very fast-moving project: Cloudflare releases multiple times per week via npm, frequently adding new command namespaces as new products launch (e.g. ai-search, browser commands in early 2026). A major v4 release shipped in early 2025."
 url = "https://developers.cloudflare.com/workers/wrangler/"
 bare_flags = ["--help", "--version", "-h", "-v"]
 

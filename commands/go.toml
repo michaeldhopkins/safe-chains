@@ -1,5 +1,6 @@
 [[command]]
 name = "go"
+description = "Go programming language toolchain. The go command has a large surface area covering compilation, testing, dependency management, and code generation. 'go build' compiles code and writes binaries to disk. 'go test' compiles and executes test code, which can have arbitrary side effects. 'go mod download' fetches modules from the network. Read-only subcommands like 'go doc', 'go env', 'go list', 'go version', and 'go vet' inspect code or configuration without filesystem writes (though vet does compile code). Go releases on a predictable 6-month cadence (February and August), with the CLI surface growing steadily."
 url = "https://pkg.go.dev/cmd/go"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

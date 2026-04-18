@@ -1,5 +1,6 @@
 [[command]]
 name = "composer"
+description = "PHP dependency manager (Composer). All exposed subcommands are read-only. show, info, licenses, and suggests inspect the local lockfile and installed packages. audit and outdated make network requests to Packagist to check for vulnerabilities and newer versions. diagnose runs connectivity and environment checks. about, fund, help, and check-platform-reqs are purely local informational commands. None of these subcommands install packages or execute scripts. Mature, stable project with infrequent releases."
 url = "https://getcomposer.org/doc/03-cli.md"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

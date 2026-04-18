@@ -1,5 +1,6 @@
 [[command]]
 name = "zoxide"
+description = "Smarter cd replacement that learns directory usage patterns and enables fast jumping via fuzzy matching. The query subcommand searches the internal database and prints matching paths to stdout without changing the working directory. zoxide add and remove (not exposed here) modify the database. Actively maintained with a few releases per year; v0.9.9 shipped January 2026."
 url = "https://github.com/ajeetdsouza/zoxide"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "ansible-galaxy"
+description = "Manages Ansible roles and collections from Ansible Galaxy and other sources. Install and init subcommands download content from the network and write to the local filesystem. Remove and delete subcommands modify local state. Read-only subcommands (list, info, search) query the Galaxy API or inspect locally installed content without side effects. The search subcommand hits the Galaxy API over the network. Part of ansible-core, which releases two major versions per year."
 url = "https://docs.ansible.com/ansible/latest/cli/ansible-galaxy.html"
 bare_flags = ["--help", "--version", "-h"]
 

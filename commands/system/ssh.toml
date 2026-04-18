@@ -1,5 +1,6 @@
 [[command]]
 name = "ssh"
+description = "OpenSSH client for encrypted remote login, command execution, and tunnel/port-forwarding over untrusted networks. An unrestricted ssh invocation establishes an authenticated connection to a remote host and can execute arbitrary commands, forward local/remote ports, create SOCKS proxies, and tunnel X11 connections -- it is one of the most powerful network tools available. The coverage is restricted to -V, which prints the OpenSSH version and build information locally and exits immediately without making any network connections or reading any configuration files. No remote host is contacted."
 url = "https://man.openbsd.org/ssh"
 level = "Inert"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "jaq"
+description = "Rust reimplementation of jq that filters and transforms JSON from stdin or files, writing results to stdout. The expression language is sandboxed with no filesystem writes, no network access, and no shell execution. Aims for jq compatibility with improved performance."
 url = "https://github.com/01mf02/jaq"
 level = "Inert"
 bare = true

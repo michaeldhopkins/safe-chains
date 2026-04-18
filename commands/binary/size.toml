@@ -1,5 +1,6 @@
 [[command]]
 name = "size"
+description = "Reports the sizes of text, data, and BSS sections in object files. Purely a reader -- parses binary headers and writes size summaries to stdout without modifying input files. Part of GNU binutils and Xcode; stable for decades with negligible project velocity."
 url = "https://man7.org/linux/man-pages/man1/size.1.html"
 level = "Inert"
 bare = false

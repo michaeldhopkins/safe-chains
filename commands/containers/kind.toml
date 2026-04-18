@@ -1,5 +1,6 @@
 [[command]]
 name = "kind"
+description = "Creates local Kubernetes clusters using Docker containers as nodes, primarily for testing. The CLI is small: get subcommands (clusters, nodes, kubeconfig) are read-only queries. create cluster and delete cluster are write operations that spin up or tear down Docker containers and modify kubeconfig. load and export interact with container images and filesystem. The project releases every few months, tracking upstream Kubernetes versions, and its subcommand surface has remained stable for years."
 url = "https://kind.sigs.k8s.io/"
 bare_flags = ["--help", "--version", "-h"]
 

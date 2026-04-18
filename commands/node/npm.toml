@@ -1,5 +1,6 @@
 [[command]]
 name = "npm"
+description = "Node.js package manager and registry client. Inspection subcommands (list, ls, view, info, audit, outdated, explain, fund, why, doctor, prefix, root) are read-only, though audit contacts the npm registry over the network. npm test and npm run-script execute arbitrary shell commands defined in package.json. npm ci performs a clean install, downloading packages from the registry, modifying node_modules and package-lock.json, and running lifecycle scripts (install, postinstall) that can execute arbitrary code. config get/list are read-only. Mature, stable project maintained by npm, Inc."
 url = "https://docs.npmjs.com/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

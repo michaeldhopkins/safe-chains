@@ -1,5 +1,6 @@
 [[command]]
 name = "size-limit"
+description = "Performance budget tool for JavaScript that calculates the real cost (download + execution time) of JS bundles. Runs webpack/esbuild internally to produce a bundle and measures its size, which involves executing bundler plugins and build tooling. Does not modify source files but does create temporary build artifacts. Actively maintained; currently at v12.x."
 url = "https://github.com/ai/size-limit"
 level = "SafeRead"
 bare = true

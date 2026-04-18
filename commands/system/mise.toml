@@ -1,5 +1,6 @@
 [[command]]
 name = "mise"
+description = "Polyglot dev tool and runtime version manager (successor to rtx, alternative to asdf) that also provides environment variable management and a task runner. The full CLI can install/uninstall tool versions, modify config files, run arbitrary tasks, and self-update. The covered subcommands span a wide range: read-only queries (list, current, which, where, doctor, outdated, search, registry, latest, ls-remote, bin-paths, env, tool, completion, backends ls, tasks list/deps/info), config/settings management (config get/list/set, settings get/list/set/add/unset), plugin operations (plugins list/ls-remote/install/uninstall/update), task execution (tasks run/add/edit), cache management (cache path/clear/prune), and exec delegation (exec with --). The exec subcommand delegates to arbitrary downstream commands. Mise releases very frequently, often multiple times per week, with a YYYY.M.P versioning scheme; new subcommands appear regularly and coverage should be reviewed often."
 url = "https://mise.jdx.dev/cli/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

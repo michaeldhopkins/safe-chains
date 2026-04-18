@@ -1,5 +1,6 @@
 [[command]]
 name = "diskutil"
+description = "macOS disk management utility (the CLI counterpart of Disk Utility.app) that can partition, format, erase, mount, unmount, verify, and repair physical disks and volumes. The destructive operations (eraseDisk, partitionDisk, mergePartitions) permanently destroy data, and mount/unmount operations change filesystem availability. The covered subcommands (list, listFilesystems, info, activity, apfs list/listCryptoUsers/listSnapshots/listVolumeGroups) are strictly read-only queries that report disk topology, volume metadata, APFS container structure, and I/O activity without modifying any disk state. The interface ships with macOS and changes only with OS releases."
 url = "https://ss64.com/mac/diskutil.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

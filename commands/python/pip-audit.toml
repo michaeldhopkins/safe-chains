@@ -1,5 +1,6 @@
 [[command]]
 name = "pip-audit"
+description = "Vulnerability scanner for Python dependencies, developed by Trail of Bits. Scans installed packages against the Python Packaging Advisory Database via the PyPI JSON API, so every invocation makes network requests. Does not modify installed packages or the environment. The --output flag writes a report file locally. --dry-run simulates the audit without contacting the API. Stable project with regular releases."
 url = "https://github.com/pypa/pip-audit"
 level = "Inert"
 standalone = [

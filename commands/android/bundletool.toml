@@ -1,5 +1,6 @@
 [[command]]
 name = "bundletool"
+description = "Processes Android App Bundles (.aab) for distribution via the Google Play Store. The build-apks and extract subcommands write APK files to disk. The install subcommands push APKs to a connected device via adb. The dump subcommands are read-only, extracting config, manifest, and resource information from bundles. The validate and get-size subcommands are also read-only. All operations are local except install, which communicates with a connected device. Released by Google alongside Android SDK tools."
 url = "https://developer.android.com/tools/bundletool"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

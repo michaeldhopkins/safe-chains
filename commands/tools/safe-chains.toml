@@ -1,5 +1,6 @@
 [[command]]
 name = "safe-chains"
+description = "Command safety checker that validates bash commands against an allowlist of safe, read-only operations. Parses shell syntax (pipes, chains, subshells) and returns a safety verdict without executing anything. Purely read-only with no side effects. Actively maintained."
 url = "https://github.com/michaeldhopkins/safe-chains#readme"
 level = "Inert"
 bare = true

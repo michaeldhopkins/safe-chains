@@ -1,5 +1,6 @@
 [[command]]
 name = "getconf"
+description = "Queries POSIX system configuration variables (e.g., PATH_MAX, PAGE_SIZE) and prints their values to stdout. Strictly read-only: it inspects kernel and libc compile-time constants with no filesystem writes, no network access, and no state changes. Ships with POSIX systems."
 url = "https://man7.org/linux/man-pages/man1/getconf.1.html"
 level = "Inert"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "codesign"
+description = "macOS code signing and verification tool. In display mode (--display / -d), it reads and prints the signing identity, entitlements, and certificate chain of a binary — purely read-only. In verify mode (--verify / -v), it checks whether a signature is valid — also read-only. The signing mode (default, with --sign / -s) modifies the binary by embedding a cryptographic signature and is a write operation. --deep recurses into nested bundles. Part of Xcode command-line tools; versioning follows macOS/Xcode releases."
 url = "https://ss64.com/mac/codesign.html"
 level = "Inert"
 bare = false

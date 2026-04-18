@@ -1,5 +1,6 @@
 [[command]]
 name = "base64"
+description = "Encodes or decodes data in Base64 representation, reading from stdin or files and writing to stdout. Pure data transformation with no filesystem writes, no network access, and no ability to execute the decoded output. Ships with GNU coreutils and macOS."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation"
 level = "Inert"
 bare = true

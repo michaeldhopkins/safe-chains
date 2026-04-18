@@ -1,5 +1,6 @@
 [[command]]
 name = "podman"
+description = "Daemonless container runtime CLI, largely Docker-compatible in surface area. Read-only subcommands (ps, logs, inspect, images, stats, info, diff, top, history, port, version) query container and image state. Write subcommands (run, exec, build, push, pull, rm, rmi, stop, kill, create, commit, network create/rm, volume create/rm, pod create/rm) create, destroy, or mutate containers, pods, images, networks, and volumes. exec and run execute arbitrary code. push/pull communicate with remote registries. The project ships monthly minor releases and adds new subcommands (e.g. quadlet install/list/print/rm was added recently). play kube can run arbitrary Kubernetes YAML, which has had path-traversal CVEs."
 url = "https://docs.podman.io/en/latest/Commands.html"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

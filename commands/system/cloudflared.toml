@@ -1,5 +1,6 @@
 [[command]]
 name = "cloudflared"
+description = "Cloudflare's tunnel client daemon that creates encrypted tunnels between origin servers and Cloudflare's edge network. The full CLI can create, delete, and run tunnels, route DNS records, and manage credentials -- all of which modify remote Cloudflare infrastructure and establish persistent network connections. The covered subcommands (tail and version) are narrowly scoped: version prints the binary version locally, and tail streams recent logs from an existing tunnel via the Cloudflare API (read-only network call, no state changes). The uncovered tunnel run, tunnel create, tunnel delete, and tunnel route subcommands are the high-risk operations. Cloudflare releases new versions roughly monthly using a YYYY.M.P versioning scheme."
 url = "https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

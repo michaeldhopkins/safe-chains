@@ -1,5 +1,6 @@
 [[command]]
 name = "frames"
+description = "Frames device screenshots with official Apple product bezels, auto-detecting the source device. Reads screenshot image files and writes framed output images to disk. Supports batch processing, merging, and clipboard copy. New project released in April 2026."
 url = "https://github.com/viticci/frames-cli"
 level = "SafeWrite"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "gcloud"
+description = "Unified command-line interface for managing Google Cloud Platform resources. The full CLI can create, modify, and delete cloud infrastructure, manage IAM bindings, and access Secret Manager. Authenticated via OAuth or service account keys. Released weekly as part of the Google Cloud SDK; very high project velocity."
 url = "https://cloud.google.com/sdk/gcloud/reference"
 bare_flags = ["--help", "-h", "--version"]
 [command.wrapper]

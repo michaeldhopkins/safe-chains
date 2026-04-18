@@ -1,5 +1,6 @@
 [[command]]
 name = "xv"
+description = "Interactive terminal-based hex viewer written in Rust. Read-only: opens files for display only and renders hex/ASCII output in the terminal without modifying them. Small single-maintainer project (github.com/chrisvest/xxv) with low release velocity."
 url = "https://github.com/gyscos/xv"
 level = "Inert"
 bare = false

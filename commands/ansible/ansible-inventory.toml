@@ -1,5 +1,6 @@
 [[command]]
 name = "ansible-inventory"
+description = "Parses and displays Ansible inventory data, showing hosts, groups, and variables. All subcommands (--list, --graph, --host) are read-only: they parse inventory files or dynamic inventory scripts and output structured data (JSON/YAML/TOML) to stdout. Subtlety: dynamic inventory scripts are executed as subprocesses, which could have side effects or network access depending on the script. Static inventory parsing is purely local. Part of ansible-core."
 url = "https://docs.ansible.com/ansible/latest/cli/ansible-inventory.html"
 bare_flags = ["--help", "--version", "-h"]
 

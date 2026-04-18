@@ -12,6 +12,8 @@ pub(super) struct TomlFile {
 pub(super) struct TomlCommand {
     pub name: String,
     #[serde(default)]
+    pub description: Option<String>,
+    #[serde(default)]
     pub candidate: Option<bool>,
     #[serde(default)]
     pub aliases: Vec<String>,
@@ -122,6 +124,7 @@ impl From<TomlLevel> for SafetyLevel {
 #[derive(Debug)]
 pub struct CommandSpec {
     pub name: String,
+    pub description: String,
     pub aliases: Vec<String>,
     pub url: String,
     pub category: String,

@@ -1,5 +1,6 @@
 [[command]]
 name = "trivy"
+description = "Comprehensive security scanner from Aqua Security that finds vulnerabilities, misconfigurations, and secrets in container images, filesystems, code repos, and IaC files. Scanning subcommands (fs, image, config, sbom) analyze targets and report findings without modifying them. Downloads and caches a vulnerability database on first run (network access). Very actively maintained with frequent releases. Note: Trivy experienced supply-chain security incidents in early 2026 affecting its GitHub Actions and binary releases."
 url = "https://aquasecurity.github.io/trivy/"
 bare_flags = ["--help", "--version", "-h"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "arch"
+description = "Prints the machine hardware architecture name (equivalent to uname -m). Entirely read-only with no flags that modify system state, touch the network, or execute other programs. Part of GNU coreutils, which releases roughly once or twice a year and changes very slowly; arch itself has been essentially frozen for decades."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#arch-invocation"
 level = "Inert"
 bare = true

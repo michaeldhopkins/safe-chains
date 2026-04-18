@@ -1,5 +1,6 @@
 [[command]]
 name = "poetry"
+description = "Python dependency manager and build tool. poetry show is a read-only query that inspects installed packages; with --outdated or --latest it contacts PyPI over the network. poetry check validates pyproject.toml without modifying anything. env info and env list are read-only queries about local virtual environments. None of these subcommands install packages or execute arbitrary code. Actively maintained with regular releases."
 url = "https://python-poetry.org/docs/cli/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

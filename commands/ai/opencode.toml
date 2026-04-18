@@ -1,5 +1,6 @@
 [[command]]
 name = "opencode"
+description = "Terminal-based AI coding agent that provides an interactive TUI for modifying code, running commands, and interacting with multiple LLM providers over the network. In interactive mode, it can read and write files, execute shell commands, and use LSP integration. Session data is stored locally in SQLite. Read-only subcommands (models, session list, stats) inspect local state without side effects or network access. The project is under active development with frequent releases."
 url = "https://opencode.ai/docs/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

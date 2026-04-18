@@ -1,5 +1,6 @@
 [[command]]
 name = "mypy"
+description = "Static type checker for Python that analyzes source code for type errors without executing it. Read-only — it parses Python files and reports type violations, writing only to its incremental cache directory. It does not execute the code it checks. Actively maintained by the Python core team with releases every 2-3 months (v1.20.x as of early 2026), occasionally adding new flags."
 url = "https://mypy.readthedocs.io/en/stable/command_line.html"
 level = "SafeRead"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "kafka-console-consumer"
+description = "Reads messages from Apache Kafka topics and prints them to stdout. Connects to Kafka brokers over the network via --bootstrap-server. Consuming messages is a read operation on the topic data, but it does modify server-side consumer group offsets (tracking which messages have been read). Without --group, it uses a random group ID. The --from-beginning flag replays all messages from the start of the topic. Can run indefinitely unless --max-messages or --timeout-ms is specified. Part of the Apache Kafka distribution, which releases roughly every four months."
 url = "https://kafka.apache.org/documentation/#basic_ops_consumer"
 level = "SafeRead"
 bare = false

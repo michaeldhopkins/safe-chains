@@ -1,5 +1,6 @@
 [[command]]
 name = "workon"
+description = "Lightweight CLI for managing working directories and project context. With only --help and --version exposed and no positional arguments, it is purely informational. Single-maintainer project."
 url = "https://github.com/michaeldhopkins/workon"
 level = "Inert"
 bare = true

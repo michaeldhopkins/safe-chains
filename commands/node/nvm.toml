@@ -1,5 +1,6 @@
 [[command]]
 name = "nvm"
+description = "Shell-based Node.js version manager. All exposed subcommands (current, list, ls, ls-remote, version, which) are read-only queries that inspect locally installed Node.js versions or fetch available versions from the remote registry. ls-remote makes an HTTP request to the Node.js release server. None of these subcommands modify the filesystem or execute arbitrary code. Mature, stable project with infrequent releases."
 url = "https://github.com/nvm-sh/nvm#readme"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

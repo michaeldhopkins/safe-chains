@@ -1,5 +1,6 @@
 [[command]]
 name = "delta"
+description = "Syntax-highlighting pager for git diffs, diff output, and grep output, written in Rust. Strictly read-only: reads diff data from stdin or files and renders it with syntax highlighting, line numbers, and side-by-side views. Does not modify files or access the network. Typically configured as git's core.pager. Releases every few months with occasional new display flags."
 url = "https://dandavison.github.io/delta/"
 level = "Inert"
 bare = true

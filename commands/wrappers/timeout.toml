@@ -1,5 +1,6 @@
 [[command]]
 name = "timeout"
+description = "Command wrapper that runs a child process with a time limit, sending a signal (default SIGTERM) if the duration expires. timeout itself only adds a deadline — it does not modify files, state, or the network. --kill-after / -k sends SIGKILL after a grace period; --signal / -s changes the initial signal; --preserve-status forwards the child's exit code. The safety of the overall invocation depends entirely on the inner command. Part of GNU coreutils; extremely stable interface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#timeout-invocation"
 [command.wrapper]
 standalone = ["--preserve-status"]

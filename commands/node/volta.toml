@@ -1,5 +1,6 @@
 [[command]]
 name = "volta"
+description = "JavaScript toolchain version manager written in Rust. volta list and volta which are read-only commands that inspect locally pinned and installed tool versions. Neither subcommand modifies the filesystem, makes network requests, or executes arbitrary code. The project is no longer actively maintained but the existing surface is stable."
 url = "https://docs.volta.sh/reference"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

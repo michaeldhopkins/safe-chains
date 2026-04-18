@@ -1,5 +1,6 @@
 [[command]]
 name = "yarn"
+description = "Node.js package manager. list, ls, info, and why are read-only inspection commands that query the local dependency tree or the npm registry (info makes network requests). yarn test and yarn test:* execute arbitrary shell commands defined in package.json's scripts field; safety depends entirely on what those scripts do. Mature project; Yarn Classic (v1) is in maintenance mode, while Yarn Berry (v2+) is actively developed."
 url = "https://yarnpkg.com/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 first_arg = ["test", "test:*"]

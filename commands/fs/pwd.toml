@@ -1,5 +1,6 @@
 [[command]]
 name = "pwd"
+description = "Prints the absolute path of the current working directory. Strictly read-only: queries the process's working directory and prints it to stdout. Does not modify any state or access the network. Part of GNU coreutils with an essentially frozen CLI surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation"
 level = "Inert"
 bare = true

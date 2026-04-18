@@ -1,5 +1,6 @@
 [[command]]
 name = "strings"
+description = "Extracts sequences of printable characters from binary files. Read-only: scans file contents and writes found strings to stdout without modifying input. Part of GNU binutils and POSIX systems; feature set has been stable for decades with minimal project velocity."
 url = "https://man7.org/linux/man-pages/man1/strings.1.html"
 level = "Inert"
 bare = false

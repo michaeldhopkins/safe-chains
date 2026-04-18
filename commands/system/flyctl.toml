@@ -1,5 +1,6 @@
 [[command]]
 name = "flyctl"
+description = "Fly.io's CLI for deploying and managing applications on their global edge infrastructure, including Machines, volumes, networking, secrets, and autoscaling. The full CLI can deploy code, create/destroy Machines, manage secrets, configure certificates, and SSH into running instances. The covered subcommands (apps list, config show, ips list, logs, platform regions, regions list, releases, services list, status, version) are read-only API queries over HTTPS that fetch app metadata, deployment history, network configuration, and log streams without modifying any remote state. The uncovered deploy, machine create/destroy, secrets set, and scale subcommands are the state-modifying operations. The CLI is actively developed with frequent updates."
 aliases = ["fly"]
 url = "https://fly.io/docs/flyctl/"
 bare_flags = ["--help", "--version", "-V", "-h"]

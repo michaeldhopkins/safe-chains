@@ -1,5 +1,6 @@
 [[command]]
 name = "branchdiff"
+description = "Terminal UI showing a unified diff of the current branch versus its base, with support for both Git and Jujutsu backends. Reads repository state and renders color-coded diffs; non-interactive modes (--print, --diff) write to stdout. Actively maintained with frequent releases."
 url = "https://github.com/michaeldhopkins/branchdiff"
 level = "Inert"
 bare = true

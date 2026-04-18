@@ -1,5 +1,6 @@
 [[command]]
 name = "just"
+description = "A command runner that reads recipes from a Justfile and executes them as shell commands. Running a recipe can execute arbitrary code with full user permissions. Inspection subcommands (--list, --dump, --evaluate, --summary, --variables) only parse and display the Justfile without executing anything. Releases are frequent (roughly every 1-2 weeks, now at v1.49.x), with new flags added regularly."
 url = "https://just.systems/man/en/"
 level = "Inert"
 bare = false

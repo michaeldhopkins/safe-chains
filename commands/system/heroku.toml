@@ -1,5 +1,6 @@
 [[command]]
 name = "heroku"
+description = "Salesforce's Heroku PaaS CLI for deploying, scaling, and managing cloud applications, add-ons, and databases. The full CLI can push code, scale dynos, manage config vars, provision add-ons, run one-off processes, and access databases. The covered subcommands (addons, apps, apps:info, buildpacks, config, logs, ps, regions, releases, status) are read-only API queries over HTTPS that fetch application metadata, deployment history, process status, and log streams without modifying any remote state. The uncovered create, destroy, scale, config:set, addons:create, and run subcommands are the state-modifying operations. The CLI was updated to v11 in March 2026 with a modernized codebase; it auto-updates in the background every 4 hours."
 url = "https://devcenter.heroku.com/articles/heroku-cli-commands"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

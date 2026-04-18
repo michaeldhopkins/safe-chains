@@ -1,5 +1,6 @@
 [[command]]
 name = "md5"
+description = "BSD-style MD5 hash utility (macOS/FreeBSD). Computes MD5 message digests for files or strings. Strictly read-only: reads file contents or string arguments, computes hashes, and prints results to stdout. Does not modify files or access the network. Note: MD5 is cryptographically broken and should not be used for security purposes. The CLI surface is essentially frozen."
 url = "https://man7.org/linux/man-pages/man1/md5sum.1.html"
 level = "Inert"
 bare = true

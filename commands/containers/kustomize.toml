@@ -1,5 +1,6 @@
 [[command]]
 name = "kustomize"
+description = "Template-free customization tool for Kubernetes YAML configurations. The build subcommand is the core operation: it reads a kustomization.yaml and emits rendered manifests to stdout -- purely local file processing with no cluster or network interaction, unless Helm inflation or remote bases are enabled via flags. edit subcommands modify the kustomization.yaml file. The project targets biweekly-to-monthly releases, with kustomize v5.8.1 shipping in February 2026. New transformer types and field options are added periodically."
 url = "https://kubectl.docs.kubernetes.io/references/kustomize/"
 bare_flags = ["--help", "-h"]
 

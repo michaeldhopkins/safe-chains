@@ -1,5 +1,6 @@
 [[command]]
 name = "elixir"
+description = "Elixir language runtime that compiles and executes Elixir source code on the BEAM VM. Full invocation can run arbitrary programs. Actively maintained with minor releases every six months and regular patches."
 url = "https://hexdocs.pm/elixir/main/elixir-cmd.html"
 level = "Inert"
 bare = false

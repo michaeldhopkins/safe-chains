@@ -1,5 +1,6 @@
 [[command]]
 name = "vm_stat"
+description = "Displays Mach virtual memory statistics (page faults, pageins, pageouts, free/active/inactive/wired page counts). Entirely read-only -- it calls host_statistics() to read kernel VM counters. With an interval argument it samples repeatedly; -c limits the number of samples. Cannot modify any system state. No network access. Ships with macOS and has an extremely stable interface that has barely changed in decades."
 url = "https://ss64.com/mac/vm_stat.html"
 level = "Inert"
 bare = true

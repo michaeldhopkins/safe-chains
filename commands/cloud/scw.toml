@@ -1,5 +1,6 @@
 [[command]]
 name = "scw"
+description = "Command-line interface for managing Scaleway cloud resources (instances, Kubernetes, databases, DNS, load balancers, object storage). The full CLI can create, modify, and delete infrastructure. Authenticated via API key stored in ~/.config/scw/config.yaml. Open-source Go project with moderate release velocity."
 url = "https://github.com/scaleway/scaleway-cli"
 bare_flags = ["--help", "-h"]
 [command.wrapper]

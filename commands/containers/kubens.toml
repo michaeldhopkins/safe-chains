@@ -1,5 +1,6 @@
 [[command]]
 name = "kubens"
+description = "Small utility for switching between Kubernetes namespaces in kubeconfig, shipped alongside kubectx. Bare invocation lists available namespaces (read-only, queries the cluster). Passing a namespace name switches the active namespace, modifying the local kubeconfig file. The --current flag prints the active namespace without changes. Same release cadence as kubectx -- dormant for years, then a burst of activity in early 2026. The subcommand surface is minimal and stable."
 url = "https://github.com/ahmetb/kubectx"
 level = "Inert"
 bare = true

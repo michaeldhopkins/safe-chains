@@ -1,5 +1,6 @@
 [[command]]
 name = "sha256sum"
+description = "Computes or verifies SHA-256 cryptographic checksums. Strictly read-only: reads file contents, computes hashes, and prints results to stdout. The --check flag reads a checksum file and verifies listed files against their recorded hashes. Does not modify files or access the network. Part of GNU coreutils with a very stable CLI surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities"
 level = "Inert"
 bare = true

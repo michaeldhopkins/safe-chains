@@ -1,5 +1,6 @@
 [[command]]
 name = "ack"
+description = "Perl-based source code search tool optimized for programmers; full flag support for pattern matching and output formatting."
 url = "https://beyondgrep.com/documentation/"
 level = "Inert"
 bare = false

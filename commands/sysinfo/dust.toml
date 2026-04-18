@@ -1,5 +1,6 @@
 [[command]]
 name = "dust"
+description = "Disk usage viewer with intuitive bar charts; supported with depth, filter, and display options."
 url = "https://github.com/bootandy/dust#readme"
 level = "Inert"
 bare = true

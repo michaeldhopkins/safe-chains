@@ -1,5 +1,6 @@
 [[command]]
 name = "doctl"
+description = "Official command-line interface for managing DigitalOcean cloud resources. The full CLI can create, destroy, and modify droplets, databases, Kubernetes clusters, and DNS records. Authenticated via personal access token stored in config or environment. Actively maintained open-source project with moderate release velocity."
 url = "https://docs.digitalocean.com/reference/doctl/"
 bare_flags = ["--help", "--version", "-h", "-v"]
 [command.wrapper]

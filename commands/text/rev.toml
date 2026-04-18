@@ -1,5 +1,6 @@
 [[command]]
 name = "rev"
+description = "Reverses the character order of each line of input. Read-only stdin-to-stdout filter; never modifies files on disk. Part of util-linux, which has a slow release cadence (major versions every 2-3 years); the interface has been stable for decades."
 url = "https://man7.org/linux/man-pages/man1/rev.1.html"
 level = "Inert"
 bare = true

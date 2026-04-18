@@ -1,5 +1,6 @@
 [[command]]
 name = "swiftlint"
+description = "Linter and style checker for Swift source code, enforcing configurable rules from the Swift style guide. The lint and analyze subcommands are read-only — they parse source files and report violations without modification. The autocorrect / fix subcommand rewrites files in place to fix violations (write operation). rules and reporters list available rules and output formats (read-only). No network access. Releases are periodic, roughly every 1-3 months, with new rules added regularly; rule flag coverage should be reviewed after upgrades."
 url = "https://github.com/realm/SwiftLint"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

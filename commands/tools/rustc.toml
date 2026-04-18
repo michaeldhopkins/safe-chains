@@ -1,5 +1,6 @@
 [[command]]
 name = "rustc"
+description = "The Rust compiler. With no positional arguments, only --help and --version are exposed here, making it purely informational. Compiling source files (not exposed here) executes build scripts and proc macros, which can run arbitrary code. Rust follows a six-week release train with high predictability."
 url = "https://doc.rust-lang.org/rustc/"
 level = "Inert"
 bare = false

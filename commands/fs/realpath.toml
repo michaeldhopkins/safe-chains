@@ -1,5 +1,6 @@
 [[command]]
 name = "realpath"
+description = "Resolves file paths to their absolute canonical form, eliminating symlinks, '.', and '..' components. Strictly read-only: reads filesystem metadata to resolve paths and prints results to stdout. Does not modify files or access the network. Part of GNU coreutils with a very stable CLI surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#realpath-invocation"
 level = "Inert"
 bare = false

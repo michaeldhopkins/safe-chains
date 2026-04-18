@@ -1,5 +1,6 @@
 [[command]]
 name = "selecta"
+description = "Fuzzy text selector for shell pipelines that reads lines from stdin and prints the selected line to stdout. Strictly read-only: reads from stdin and writes to stdout. Does not modify files or access the network. Written in Ruby. The CLI surface is very small and essentially frozen."
 url = "https://github.com/garybernhardt/selecta"
 level = "Inert"
 bare = true

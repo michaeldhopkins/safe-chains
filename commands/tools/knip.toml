@@ -1,5 +1,6 @@
 [[command]]
 name = "knip"
+description = "Finds unused files, dependencies, and exports in JavaScript/TypeScript projects by traversing the full import graph. Read-only analysis — it inspects source files and package.json but does not modify or delete anything. Ships with 100+ framework plugins (Next.js, Vitest, Storybook, etc.). Actively maintained at v6.x with frequent releases, adding new plugins and flags regularly."
 url = "https://knip.dev/reference/cli"
 level = "SafeRead"
 bare = true

@@ -1,5 +1,6 @@
 [[command]]
 name = "systemctl"
+description = "Primary management tool for systemd, Linux's init system and service manager. The full command can start, stop, restart, enable, disable, mask, and kill system services, and even reboot or power off the machine -- making it one of the most privileged system administration tools. The covered subcommands (status, show, is-active, is-enabled, is-failed, list-units, list-unit-files, list-sockets, list-timers, list-dependencies, cat) are strictly read-only inspection operations that report service states, unit configurations, dependency trees, and timer schedules without starting, stopping, or reconfiguring any services. The interface is tied to systemd releases and is very stable."
 url = "https://man7.org/linux/man-pages/man1/systemctl.1.html"
 bare_flags = ["--help", "--version", "-h"]
 

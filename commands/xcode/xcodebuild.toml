@@ -1,5 +1,6 @@
 [[command]]
 name = "xcodebuild"
+description = "Apple's build system CLI for compiling, testing, archiving, and exporting Xcode projects. The query subcommands (-list, -showBuildSettings, -showdestinations, -showsdks, -version) are read-only — they inspect project configuration without building. Build actions (build, test, archive, clean, install) write to derived data, produce artifacts, and can execute arbitrary build phase scripts embedded in the project. test can also run on physical devices or simulators. No direct network access, but build phases and test actions can do anything. Part of Xcode; versioning follows Xcode releases."
 url = "https://developer.apple.com/documentation/xcode/xcodebuild"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

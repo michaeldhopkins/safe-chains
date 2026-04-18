@@ -1,5 +1,6 @@
 [[command]]
 name = "procs"
+description = "Modern process viewer with tree and color support; supported with sort, filter, and display flags."
 url = "https://github.com/dalance/procs#readme"
 level = "Inert"
 bare = true

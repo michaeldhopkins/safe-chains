@@ -1,5 +1,6 @@
 [[command]]
 name = "objdump"
+description = "GNU binutils tool that displays information from object files, including disassembly, headers, symbols, and section contents. Strictly read-only; it parses and prints binary metadata without modifying anything. Part of GNU binutils, which follows a roughly annual release cycle with high stability across versions."
 url = "https://man7.org/linux/man-pages/man1/objdump.1.html"
 level = "Inert"
 bare = false

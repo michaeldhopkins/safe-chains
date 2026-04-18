@@ -1,5 +1,6 @@
 [[command]]
 name = "ngrok"
+description = "Tunneling agent that exposes local servers to the public internet by creating secure tunnels through ngrok's edge network. The primary risk is the tunnel subcommands (http, tcp, tls) which open publicly-accessible endpoints pointing to local services, effectively bypassing firewalls and NAT -- this is by design but makes local services reachable by anyone. The covered subcommands (config check, diagnose, credits, version, completion) are strictly local and offline: config check validates the ngrok configuration file syntax, diagnose runs network connectivity tests, and the rest print version/credit/shell-completion data. None of these create tunnels or establish network connections to ngrok's infrastructure."
 url = "https://ngrok.com/docs/agent/cli"
 bare_flags = ["--help", "--version", "-h"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "eslint"
+description = "Pluggable linter for JavaScript, TypeScript, CSS, and HTML. Reads source files, applies configurable rules, and reports problems to stdout. Plugins can execute arbitrary code during analysis. Very actively maintained with biweekly releases and high community adoption."
 url = "https://eslint.org/docs/latest/use/command-line-interface"
 level = "SafeRead"
 bare = false

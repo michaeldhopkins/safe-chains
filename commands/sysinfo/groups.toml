@@ -1,5 +1,6 @@
 [[command]]
 name = "groups"
+description = "Prints group memberships for a user; supported as a bare read-only invocation."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#groups-invocation"
 level = "Inert"
 bare = true

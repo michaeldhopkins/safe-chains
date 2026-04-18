@@ -1,5 +1,6 @@
 [[command]]
 name = "jless"
+description = "Read-only interactive terminal viewer for JSON and YAML files. Displays structured data for browsing with no ability to modify files, write to disk, access the network, or execute code. Written in Rust."
 url = "https://github.com/PaulJuliusMartinez/jless"
 level = "Inert"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "tea"
+description = "CLI for interacting with Gitea instances, covering issues, pull requests, branches, releases, labels, milestones, organizations, and repositories. The full tool supports creating, editing, and closing issues and PRs, which modify remote state via the Gitea API over the network. Read-only subcommands (list, view) query the API without modification. The login subcommand manages server credentials locally. The project follows Gitea's development cycle."
 url = "https://gitea.com/gitea/tea"
 bare_flags = ["--version", "-v"]
 

@@ -1,5 +1,6 @@
 [[command]]
 name = "notion"
+description = "CLI client for the Notion API (notion-cli by 4ier). All exposed subcommands (block get/list, comment get/list, db list/open/query/view, file list, page list/open/view, user get/list/me, search, status, doctor) are read-only queries against the Notion REST API over HTTPS. doctor checks local configuration and API connectivity. Every API-facing command requires a stored integration token and makes network requests. Relatively new project."
 url = "https://github.com/4ier/notion-cli"
 bare_flags = ["--help", "--version", "-h"]
 

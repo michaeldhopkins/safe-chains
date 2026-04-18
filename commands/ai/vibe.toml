@@ -1,5 +1,6 @@
 [[command]]
 name = "vibe"
+description = "Mistral's open-source CLI coding agent that reads, modifies, and executes code in your project directory using Devstral models. In interactive mode, it scans your project structure, sends code context to Mistral's API over the network, and can write files and run shell commands locally. The project was released in late 2025 and is under active development."
 url = "https://docs.mistral.ai/mistral-vibe/"
 level = "Inert"
 bare = false

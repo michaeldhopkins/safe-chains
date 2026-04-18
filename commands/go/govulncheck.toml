@@ -1,5 +1,6 @@
 [[command]]
 name = "govulncheck"
+description = "Scans Go modules and binaries for known vulnerabilities by checking dependencies against the Go vulnerability database. In source mode, it compiles the module to build a call graph and checks reachability. It fetches vulnerability data from vuln.go.dev over the network. All operations are read-only with respect to the filesystem: it reads source/binary files and prints findings to stdout. Part of the official Go tools ecosystem, released independently of the Go toolchain."
 url = "https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck"
 level = "SafeRead"
 bare = false

@@ -1,5 +1,6 @@
 [[command]]
 name = "man"
+description = "Displays manual pages for system commands, library functions, and configuration files. Read-only — it formats and renders pre-installed documentation via a pager. The underlying formatter (groff/nroff) processes troff macros, which historically have had minor parsing quirks but no practical exploitation vector in normal use. The CLI interface is very stable across distributions."
 url = "https://man7.org/linux/man-pages/man1/man.1.html"
 level = "Inert"
 bare = false

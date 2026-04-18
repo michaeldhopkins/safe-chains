@@ -1,5 +1,6 @@
 [[command]]
 name = "@apidevtools/swagger-cli"
+description = "CLI for validating and bundling Swagger 2.0 and OpenAPI 3.0 definitions. The validate subcommand parses a spec file and reports schema/spec errors without modifying it. The project is deprecated in favor of Redocly CLI, so no further releases are expected. Last release was v4.0.4."
 url = "https://github.com/APIDevTools/swagger-cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 

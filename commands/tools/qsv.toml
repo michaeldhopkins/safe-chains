@@ -1,5 +1,6 @@
 [[command]]
 name = "qsv"
+description = "Blazing-fast CSV data-wrangling toolkit written in Rust, a fork and successor of xsv. Provides subcommands for slicing, sorting, joining, filtering, and analyzing tabular data. Most subcommands read from files/stdin and write to stdout. The --update flag can self-update the binary. Very actively maintained with frequent releases; reached v13.0 in 2026."
 url = "https://github.com/jqnatividad/qsv"
 level = "Inert"
 bare = false

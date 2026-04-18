@@ -1,5 +1,6 @@
 [[command]]
 name = "kafka-topics"
+description = "Manages Apache Kafka topics. Connects to Kafka brokers over the network via --bootstrap-server. The --list and --describe operations are read-only, querying topic names, partition counts, replication factors, and configuration. The --create, --delete, and --alter operations modify cluster state: creating or removing topics or changing their configuration. Part of the Apache Kafka distribution, which releases roughly every four months."
 url = "https://kafka.apache.org/documentation/#basic_ops_add_topic"
 bare_flags = ["--help", "-h", "--version"]
 

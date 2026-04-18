@@ -1,5 +1,6 @@
 [[command]]
 name = "who"
+description = "Shows logged-in users; supported with boot time, process, runlevel, and format flags."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation"
 level = "Inert"
 bare = true

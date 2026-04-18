@@ -1,5 +1,6 @@
 [[command]]
 name = "cosign"
+description = "Sigstore's container image signing and verification tool. Core operations split into signing (which writes signatures to registries or transparency logs) and verification (which reads and validates them). Verification subcommands like verify and verify-attestation are read-only, fetching signatures and attestation data from registries and Rekor transparency logs. Signing, attesting, and uploading subcommands modify registry state and interact with OIDC providers for keyless signing. The triangulate subcommand is read-only (resolves the signature location for an image). The project ships roughly monthly releases and recently underwent a major version bump to v3, which changed default behaviors around bundle formats and attestation storage."
 url = "https://github.com/sigstore/cosign"
 bare_flags = ["--help", "--version", "-h"]
 
