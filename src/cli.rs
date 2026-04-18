@@ -3,7 +3,7 @@ use crate::verdict::SafetyLevel;
 
 #[derive(Parser)]
 #[command(name = "safe-chains")]
-#[command(about = "Auto-allow safe, read-only bash commands in agentic coding tools")]
+#[command(about = "Auto-allow safe bash commands in agentic coding tools")]
 #[command(version)]
 #[allow(clippy::struct_excessive_bools)]
 pub struct Cli {

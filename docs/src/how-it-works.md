@@ -12,7 +12,7 @@ Take this command from the introduction:
 find src -name "*.rs" -exec grep -l "TODO" {} \; | sort | while read f; do echo "=== $f ==="; grep -n "TODO" "$f"; done
 ```
 
-safe-chains parses this into an AST and validates every leaf:
+safe-chains parses this and validates every leaf:
 
 1. **Pipeline segment 1:** `find src -name "*.rs" -exec grep -l "TODO" {} \;`
    - `find` is allowed with positional predicates
@@ -28,7 +28,7 @@ Every leaf is safe, so the entire command is approved.
 
 ## Compound commands
 
-Shell compound commands (`for`/`while`/`until` loops and `if`/`elif`/`else` conditionals) are parsed into an AST and each leaf command is validated recursively, supporting arbitrary nesting depth.
+Shell compound commands (`for`/`while`/`until` loops and `if`/`elif`/`else` conditionals) are parsed and each leaf command is validated recursively, supporting arbitrary nesting depth.
 
 Output redirection (`>`, `>>`) to `/dev/null` is `inert`. Output redirection to other files is allowed at `safe-write` level. Input redirection (`<`), here-strings (`<<<`), and here-documents (`<<`, `<<-`) are allowed.
 
@@ -49,9 +49,3 @@ For example, given `cargo test && npm run build && ./generate-docs.sh`:
 - `cargo test` passes built-in rules
 - `npm run build` matches `Bash(npm run:*)` from settings
 - `./generate-docs.sh` matches `Bash(./generate-docs.sh:*)` from settings
-
-See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands) for how to review and slim down your existing patterns after installing safe-chains.
-
-## Guardrails
-
-Segments with `>`, `<`, `` ` ``, or `$(...)` outside of quotes are never approved via settings, even if a pattern matches. This prevents `Bash(./script *)` from approving `./script > /etc/passwd`.

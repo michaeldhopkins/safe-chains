@@ -1,6 +1,6 @@
 [book]
 title = "safe-chains"
-description = "Auto-allow safe, read-only bash commands in agentic coding tools"
+description = "Auto-allow safe bash commands in agentic coding tools"
 authors = ["Michael Hopkins"]
 
 [build]
