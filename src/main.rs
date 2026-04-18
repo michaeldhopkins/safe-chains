@@ -16,6 +16,7 @@ struct ToolInput {
 #[derive(Deserialize)]
 struct HookInput {
     tool_input: ToolInput,
+    cwd: Option<String>,
 }
 
 fn print_docs() {
@@ -64,7 +65,8 @@ fn run_claude_hook() {
         return;
     }
 
-    let patterns = safe_chains::allowlist::Matcher::load();
+    let project_dir = input.cwd.as_deref().map(std::path::Path::new);
+    let patterns = safe_chains::allowlist::Matcher::load_with_project_dir(project_dir);
     if patterns.is_empty() {
         process::exit(0);
     }

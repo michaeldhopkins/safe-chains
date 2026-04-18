@@ -10,6 +10,15 @@ pub struct Matcher {
 
 impl Matcher {
     pub fn load() -> Self {
+        Self::load_with_project_dir(
+            std::env::var_os("CLAUDE_PROJECT_DIR")
+                .or_else(|| std::env::var_os("CWD"))
+                .as_deref()
+                .map(Path::new),
+        )
+    }
+
+    pub fn load_with_project_dir(project_dir: Option<&Path>) -> Self {
         let mut patterns = Matcher {
             exact: HashSet::new(),
             globs: Vec::new(),
@@ -19,8 +28,8 @@ impl Matcher {
             patterns.load_file(&Path::new(&home).join(".claude/settings.json"));
         }
 
-        if let Some(project_dir) = std::env::var_os("CLAUDE_PROJECT_DIR") {
-            let base = Path::new(&project_dir).join(".claude");
+        if let Some(dir) = project_dir {
+            let base = dir.join(".claude");
             patterns.load_file(&base.join("settings.json"));
             patterns.load_file(&base.join("settings.local.json"));
         }
@@ -418,6 +427,63 @@ mod tests {
         let mut p = empty();
         p.add_pattern("Bash(./script *)");
         assert!(all_covered("./script 'arg && rm -rf /'", &p));
+    }
+
+    #[test]
+    fn load_with_project_dir_reads_local_settings() {
+        let dir = tempfile::tempdir().unwrap();
+        let claude_dir = dir.path().join(".claude");
+        fs::create_dir_all(&claude_dir).unwrap();
+        fs::write(
+            claude_dir.join("settings.local.json"),
+            r#"{"permissions":{"allow":["Bash(./generate-docs.sh:*)"]}}"#,
+        )
+        .unwrap();
+        let p = Matcher::load_with_project_dir(Some(dir.path()));
+        assert!(p.matches_cmd(&cmd("./generate-docs.sh")));
+        assert!(p.matches_cmd(&cmd("./generate-docs.sh --verbose")));
+        assert!(!p.matches_cmd(&cmd("./evil.sh")));
+    }
+
+    #[test]
+    fn load_with_project_dir_reads_both_settings_files() {
+        let dir = tempfile::tempdir().unwrap();
+        let claude_dir = dir.path().join(".claude");
+        fs::create_dir_all(&claude_dir).unwrap();
+        fs::write(
+            claude_dir.join("settings.json"),
+            r#"{"permissions":{"allow":["Bash(cargo install:*)"]}}"#,
+        )
+        .unwrap();
+        fs::write(
+            claude_dir.join("settings.local.json"),
+            r#"{"permissions":{"allow":["Bash(./generate-docs.sh:*)"]}}"#,
+        )
+        .unwrap();
+        let p = Matcher::load_with_project_dir(Some(dir.path()));
+        assert!(p.matches_cmd(&cmd("cargo install --path .")));
+        assert!(p.matches_cmd(&cmd("./generate-docs.sh")));
+    }
+
+    #[test]
+    fn load_with_no_project_dir_skips_project_settings() {
+        let p = Matcher::load_with_project_dir(None);
+        assert!(!p.matches_cmd(&cmd("./generate-docs.sh")));
+    }
+
+    #[test]
+    fn load_with_project_dir_chains_with_builtins() {
+        let dir = tempfile::tempdir().unwrap();
+        let claude_dir = dir.path().join(".claude");
+        fs::create_dir_all(&claude_dir).unwrap();
+        fs::write(
+            claude_dir.join("settings.local.json"),
+            r#"{"permissions":{"allow":["Bash(./generate-docs.sh:*)"]}}"#,
+        )
+        .unwrap();
+        let p = Matcher::load_with_project_dir(Some(dir.path()));
+        assert!(all_covered("cargo test && ./generate-docs.sh", &p));
+        assert!(!all_covered("cargo test && ./evil.sh", &p));
     }
 
     #[test]
