@@ -6,12 +6,6 @@ safe-chains is an allowlist-only command checker. It auto-approves bash commands
 
 Auto-approval of destructive, write, or state-changing commands. An agentic tool cannot use safe-chains to bypass permission prompts for `rm`, `git push`, `sed -i`, `curl -X POST`, or any command/flag combination not in the allowlist.
 
-## What it does not prevent
-
-- **Information disclosure.** Read-only commands can read sensitive files (`cat ~/.ssh/id_rsa`). Sensitive contents would be read by the model provider. We recommend pairing safe-chains with a hook to block reading `~/.ssh`, `../credentials` and similar directories.
-- **Unrecognized commands.** Commands safe-chains doesn't handle are passed through to the normal permission flow, not blocked.
-- **Broad user-approved patterns.** If you add patterns like `Bash(bash *)` to your Claude Code settings, safe-chains will match them per-segment without recursive validation, matching Claude Code's own behavior. See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands).
-
 ## Security properties
 
 **Allowlist-only.** Unrecognized commands are never approved.
@@ -25,6 +19,12 @@ Auto-approval of destructive, write, or state-changing commands. An agentic tool
 **No shell evaluation.** `eval`, `exec`, `source`, and `.` (dot-source) are never approved when they would execute arbitrary commands.
 
 **Settings guardrails.** When matching commands against your Claude Code settings patterns, segments containing `>`, `<`, backticks, or `$()` are never approved via settings, even if a pattern matches. This prevents `Bash(./script *)` from approving `./script > /etc/passwd`.
+
+## What it does not prevent
+
+- **Information disclosure.** Read-only commands can read sensitive files (`cat ~/.ssh/id_rsa`). Sensitive contents would be read by the model provider. We recommend pairing safe-chains with a hook to block reading `~/.ssh`, `../credentials` and similar directories.
+- **Unrecognized commands.** Commands safe-chains doesn't handle are passed through to the normal permission flow, not blocked.
+- **Broad user-approved patterns.** If you add patterns like `Bash(bash *)` to your Claude Code settings, safe-chains will match them per-segment without recursive validation, matching Claude Code's own behavior. See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands).
 
 ## What safe-chains is not
 
