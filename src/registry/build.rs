@@ -38,6 +38,10 @@ fn allow_all_policy() -> OwnedPolicy {
     }
 }
 
+fn filter_candidates(subs: Vec<TomlSub>) -> impl Iterator<Item = TomlSub> {
+    subs.into_iter().filter(|s| !s.candidate.unwrap_or(false))
+}
+
 pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
     if let Some(handler_name) = toml.handler {
         return SubSpec {
@@ -74,7 +78,7 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
         return SubSpec {
             name: toml.name,
             kind: DispatchKind::Branching {
-                subs: toml.sub.into_iter().map(build_sub).collect(),
+                subs: filter_candidates(toml.sub).map(build_sub).collect(),
                 bare_flags: Vec::new(),
                 bare_ok: toml.nested_bare.unwrap_or(false),
                 pre_standalone: toml.standalone,
@@ -173,7 +177,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 category: cat,
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
-                    subs: toml.sub.into_iter().map(build_sub).collect(),
+                    subs: filter_candidates(toml.sub).map(build_sub).collect(),
                     pre_standalone: w.standalone,
                     pre_valued: w.valued,
                     bare_ok: toml.bare.unwrap_or(false),
@@ -206,7 +210,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             category: cat,
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
-                subs: toml.sub.into_iter().map(build_sub).collect(),
+                subs: filter_candidates(toml.sub).map(build_sub).collect(),
                 pre_standalone: Vec::new(),
                 pre_valued: Vec::new(),
                 bare_ok: toml.bare.unwrap_or(false),
@@ -275,7 +279,10 @@ pub fn load_toml(source: &str, category: &str) -> Vec<CommandSpec> {
             panic!("invalid TOML command definition: {e}\n  source begins: {preview}");
         }
     };
-    file.command.into_iter().map(|cmd| build_command(cmd, category)).collect()
+    file.command.into_iter()
+        .filter(|cmd| !cmd.candidate.unwrap_or(false))
+        .map(|cmd| build_command(cmd, category))
+        .collect()
 }
 
 pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {

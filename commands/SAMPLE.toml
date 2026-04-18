@@ -52,6 +52,9 @@
 #   Does the command need Rust code for validation (curl, perl, fzf)?
 #     → Use "handler" to reference a named Rust function
 #
+#   Was a subcommand considered but deliberately not approved?
+#     → Use "candidate = true" to record the decision
+#
 # ─────────────────────────────────────────────────────────────────────
 # FLAT COMMAND — simple tool with flags and positional args
 # ─────────────────────────────────────────────────────────────────────
@@ -329,6 +332,31 @@
 # [[command.sub]]
 # name = "exec"
 # handler = "bundle_exec"                # references Rust handler by name
+
+# ─────────────────────────────────────────────────────────────────────
+# CANDIDATE — record that a command was considered but not approved
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use for: subcommands or commands that were reviewed and deliberately
+# left out of the allowlist. Candidates are parsed but skipped during
+# registry building — they won't be dispatched or appear in docs.
+# They serve as a record so future contributors don't re-evaluate
+# the same commands.
+#
+# [[command.sub.sub]]
+# name = "push"
+# candidate = true
+#
+# [[command.sub.sub]]
+# name = "pop"
+# candidate = true
+#
+# Works on [[command]] and [[command.sub]] too:
+#
+# [[command]]
+# name = "dangerous-tool"
+# candidate = true
+# url = "https://example.com"
 
 # ─────────────────────────────────────────────────────────────────────
 # SAFETY LEVELS

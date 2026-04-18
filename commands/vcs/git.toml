@@ -563,6 +563,21 @@ positional_style = true
 name = "show"
 positional_style = true
 standalone = ["--help", "--patch", "--stat", "-h", "-p", "-u"]
+[[command.sub.sub]]
+name = "push"
+candidate = true
+[[command.sub.sub]]
+name = "pop"
+candidate = true
+[[command.sub.sub]]
+name = "apply"
+candidate = true
+[[command.sub.sub]]
+name = "drop"
+candidate = true
+[[command.sub.sub]]
+name = "clear"
+candidate = true
 
 [[command.sub]]
 name = "status"
