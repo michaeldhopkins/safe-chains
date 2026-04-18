@@ -34,17 +34,23 @@ Output redirection (`>`, `>>`) to `/dev/null` is `inert`. Output redirection to 
 
 Backticks and command substitution (`$(...)`) are recursively validated.
 
-## Settings-aware chain approval
+## Interaction with approved commands
 
-When a chain doesn't fully pass built-in rules, safe-chains reads your Claude Code settings and checks each segment independently against your approved patterns.
+safe-chains runs as a pre-hook. If it approves, Claude Code skips the prompt. If it doesn't recognize the command, Claude Code's normal permission flow takes over (checking your `Bash(...)` patterns in settings, or prompting).
+
+Where this gets interesting is chained commands. Claude Code matches approved patterns against the full command string. If you approved `Bash(cargo test:*)` and Claude runs `cargo test && ./generate-docs.sh`, Claude Code won't match — the full string isn't just `cargo test`.
+
+safe-chains splits the chain and checks each segment independently. `cargo test` passes built-in rules. `./generate-docs.sh` matches `Bash(./generate-docs.sh:*)` from your settings. Both segments covered, chain auto-approved.
+
+Once safe-chains is handling your safe commands, most of your existing approved patterns are redundant. Strip them down to project-specific scripts and tools safe-chains doesn't know about. See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands).
 
 For example, given `cargo test && npm run build && ./generate-docs.sh`:
 
 - `cargo test` passes built-in rules
-- `npm run build` matches `Bash(npm run *)` from settings
-- `./generate-docs.sh` matches `Bash(./generate-docs.sh)` from settings
+- `npm run build` matches `Bash(npm run:*)` from settings
+- `./generate-docs.sh` matches `Bash(./generate-docs.sh:*)` from settings
 
-All segments covered, so the chain is auto-approved.
+See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands) for how to review and slim down your existing patterns after installing safe-chains.
 
 ## Guardrails
 
