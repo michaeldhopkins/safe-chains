@@ -682,6 +682,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 
 - Allowed standalone flags: --help, --multiple, --version, --zero, -V, -a, -h, -z
 - Allowed valued flags: --suffix, -s
+- Bare invocation allowed
 
 ### `bash / sh`
 <p class="cmd-url"><a href="https://www.gnu.org/software/bash/manual/bash.html">https://www.gnu.org/software/bash/manual/bash.html</a></p>
@@ -1328,6 +1329,7 @@ Aliases: `difftastic`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation</a></p>
 
 - Allowed standalone flags: --help, --version, --zero, -V, -h, -z
+- Bare invocation allowed
 
 ### `diskutil`
 <p class="cmd-url"><a href="https://ss64.com/mac/diskutil.html">https://ss64.com/mac/diskutil.html</a></p>
