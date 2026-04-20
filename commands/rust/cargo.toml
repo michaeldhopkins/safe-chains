@@ -1,6 +1,6 @@
 [[command]]
 name = "cargo"
-description = "Rust package manager and build system; supports build, test, check, clippy, doc, and many third-party subcommands with curated flag sets."
+description = "Rust package manager and build system with a very large subcommand surface. Build operations (build, test, check, clippy, doc, bench, run) execute build scripts (build.rs) from every crate in the dependency tree, which can run arbitrary code. install has two modes: `cargo install crate-name` downloads from crates.io (network), while `cargo install --path .` builds from local source only — we allow --path but block positional crate names, --git, --registry, and --index to prevent remote-source installs. fmt without --check rewrites files. publish without --dry-run uploads to a registry. Third-party subcommands (nextest, deny, clippy, etc.) are added via cargo plugins and each has its own flag surface. Cargo releases with each Rust edition (roughly every 6 weeks) and frequently adds new flags."
 url = "https://doc.rust-lang.org/cargo/commands/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
@@ -137,10 +137,24 @@ valued = ["--color", "--config", "--index", "--registry"]
 
 [[command.sub]]
 name = "install"
-level = "Inert"
+level = "SafeWrite"
 bare = false
 max_positional = 0
-standalone = ["--help", "-h"]
+standalone = [
+    "--all-features", "--bins", "--debug",
+    "--force", "--frozen", "--help",
+    "--ignore-rust-version", "--keep-going",
+    "--locked", "--no-default-features", "--no-track",
+    "--offline", "--quiet", "--timings", "--verbose",
+    "-f", "-h", "-q", "-v",
+]
+valued = [
+    "--bin", "--color", "--config", "--example",
+    "--features", "--jobs", "--message-format",
+    "--path", "--profile", "--root",
+    "--target", "--target-dir",
+    "-F", "-Z", "-j",
+]
 
 [[command.sub]]
 name = "license"
