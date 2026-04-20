@@ -24,7 +24,7 @@
 - **generate-lockfile**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
 - **help**: Positional args accepted
 - **info**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --index, --registry
-- **install**: Flags: --help, -h
+- **install**: Flags: --all-features, --bins, --debug, --force, --frozen, --help, --ignore-rust-version, --keep-going, --locked, --no-default-features, --no-track, --offline, --quiet, --timings, --verbose, -f, -h, -q, -v. Valued: --bin, --color, --config, --example, --features, --jobs, --message-format, --path, --profile, --root, --target, --target-dir, -F, -Z, -j
 - **license**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
 - **llvm-cov**: Flags: --all-features, --all-targets, --help, --html, --json, --lcov, --lib, --locked, --no-cfg-coverage, --no-default-features, --no-fail-fast, --no-run, --open, --release, --text, -h. Valued: --bin, --branch, --codecov, --cobertura, --color, --config, --example, --exclude, --features, --ignore-filename-regex, --ignore-run-fail, --jobs, --manifest-path, --output-dir, --output-path, --package, --profile, --target, --target-dir, --test, -j, -p
 - **locate-project**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
