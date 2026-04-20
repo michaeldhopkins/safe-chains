@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 454 commands across 34 categories.
+safe-chains knows 457 commands across 34 categories.
 
 ## Glossary
 
@@ -36,7 +36,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [ImageMagick](magick.md) (1 commands)
 - [Networking](net.md) (16 commands)
 - [Node.js](node.md) (16 commands)
-- [PHP](php.md) (2 commands)
+- [PHP](php.md) (5 commands)
 - [Package Managers](pm.md) (5 commands)
 - [Python](python.md) (12 commands)
 - [R](r.md) (2 commands)
