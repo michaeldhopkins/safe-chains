@@ -1,8 +1,15 @@
 [[command]]
 name = "composer"
-description = "PHP dependency manager (Composer). All exposed subcommands are read-only. show, info, licenses, and suggests inspect the local lockfile and installed packages. audit and outdated make network requests to Packagist to check for vulnerabilities and newer versions. diagnose runs connectivity and environment checks. about, fund, help, and check-platform-reqs are purely local informational commands. None of these subcommands install packages or execute scripts. Mature, stable project with infrequent releases."
+description = "PHP dependency manager. install and dump-autoload write to the vendor directory and can execute post-install scripts defined in composer.json (arbitrary PHP/shell). --no-scripts disables script execution. update rewrites composer.lock. require/remove modify composer.json. exec and run-script execute arbitrary vendored binaries or scripts. Read-only subcommands (show, audit, outdated, validate, depends, prohibits, search) inspect packages and metadata. config without --list modifies composer.json. browse/home opens a browser. Mature, stable project with releases a few times per year."
 url = "https://getcomposer.org/doc/03-cli.md"
 bare_flags = ["--help", "--version", "-V", "-h"]
+[command.wrapper]
+standalone = [
+    "--ansi", "--no-ansi", "--no-cache", "--no-interaction",
+    "--no-plugins", "--no-scripts", "--quiet", "--verbose",
+    "-n", "-q", "-v", "-vv", "-vvv",
+]
+valued = ["--working-dir", "-d"]
 
 [[command.sub]]
 name = "about"
@@ -18,8 +25,35 @@ name = "check-platform-reqs"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
+name = "config"
+guard = "--list"
+guard_short = "-l"
+standalone = ["--global", "--help", "--list", "--source", "-g", "-h", "-l"]
+
+[[command.sub]]
+name = "depends"
+bare = false
+standalone = ["--help", "--recursive", "--tree", "-h", "-r", "-t"]
+
+[[command.sub]]
+name = "why"
+bare = false
+standalone = ["--help", "--recursive", "--tree", "-h", "-r", "-t"]
+
+[[command.sub]]
 name = "diagnose"
 standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dump-autoload"
+level = "SafeWrite"
+standalone = [
+    "--apcu", "--classmap-authoritative", "--dev", "--dry-run",
+    "--help", "--ignore-platform-reqs", "--no-dev",
+    "--optimize", "--strict-ambiguous", "--strict-psr",
+    "-a", "-h", "-o",
+]
+valued = ["--apcu-prefix", "--ignore-platform-req"]
 
 [[command.sub]]
 name = "fund"
@@ -40,6 +74,25 @@ standalone = [
 valued = ["--format", "--ignore", "-f"]
 
 [[command.sub]]
+name = "install"
+level = "SafeWrite"
+standalone = [
+    "--ansi", "--apcu-autoloader", "--audit", "--classmap-authoritative",
+    "--dev", "--download-only", "--dry-run",
+    "--help", "--ignore-platform-reqs",
+    "--no-ansi", "--no-autoloader", "--no-cache", "--no-dev",
+    "--no-interaction", "--no-plugins", "--no-progress", "--no-scripts",
+    "--no-security-blocking", "--no-source-fallback",
+    "--optimize-autoloader", "--quiet", "--source-fallback",
+    "--strict-psr-autoloader", "--verbose",
+    "-a", "-h", "-n", "-o", "-q", "-v", "-vv", "-vvv",
+]
+valued = [
+    "--apcu-autoloader-prefix", "--audit-format",
+    "--ignore-platform-req", "--prefer-install",
+]
+
+[[command.sub]]
 name = "licenses"
 standalone = ["--help", "-h"]
 
@@ -51,6 +104,22 @@ standalone = [
     "-D", "-a", "-h", "-m",
 ]
 valued = ["--format", "--ignore", "-f"]
+
+[[command.sub]]
+name = "prohibits"
+bare = false
+standalone = ["--help", "--recursive", "--tree", "-h", "-r", "-t"]
+
+[[command.sub]]
+name = "why-not"
+bare = false
+standalone = ["--help", "--recursive", "--tree", "-h", "-r", "-t"]
+
+[[command.sub]]
+name = "search"
+bare = false
+standalone = ["--help", "--only-name", "--only-vendor", "-N", "-O", "-h"]
+valued = ["--format", "--type", "-f", "-t"]
 
 [[command.sub]]
 name = "show"
@@ -65,3 +134,40 @@ valued = ["--format", "--ignore", "-f"]
 [[command.sub]]
 name = "suggests"
 standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "validate"
+standalone = [
+    "--check-lock", "--help", "--no-check-all",
+    "--no-check-lock", "--no-check-publish", "--no-check-version",
+    "--strict", "--with-dependencies",
+    "-h",
+]
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "require"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "run-script"
+candidate = true
+
+[[command.sub]]
+name = "browse"
+candidate = true
+
+[[command.sub]]
+name = "home"
+candidate = true

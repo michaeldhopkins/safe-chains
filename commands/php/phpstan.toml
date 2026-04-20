@@ -1,0 +1,32 @@
+[[command]]
+name = "phpstan"
+description = "PHP static analysis tool. Reads PHP source files and reports type errors without executing them. Purely read-only by default — the result cache is written to a temp directory automatically. --generate-baseline writes a .neon baseline file. PHPStan Pro features (--fix, --watch, --pro) launch a web UI and are not safe for allowlisting. Quarterly minor releases; frequent patches."
+url = "https://phpstan.org/user-guide/command-line-usage"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "analyse"
+standalone = [
+    "--allow-empty-baseline", "--ansi", "--debug",
+    "--help", "--no-ansi", "--no-progress",
+    "--quiet", "--verbose", "--version", "--xdebug",
+    "-V", "-h", "-q", "-v", "-vv", "-vvv",
+]
+valued = [
+    "--autoload-file", "--configuration", "--error-format",
+    "--generate-baseline", "--level", "--memory-limit",
+    "--tmp-file", "--instead-of",
+    "--use-baseline",
+    "-a", "-b", "-c", "-l",
+]
+
+[[command.sub]]
+name = "clear-result-cache"
+level = "SafeWrite"
+standalone = ["--debug", "--help", "--quiet", "--version", "-V", "-h", "-q"]
+valued = ["--autoload-file", "--configuration", "--memory-limit", "-a", "-c"]
+
+[[command.sub]]
+name = "diagnose"
+standalone = ["--debug", "--help", "-h"]
+valued = ["--autoload-file", "--configuration", "--level", "--memory-limit", "-a", "-c", "-l"]
