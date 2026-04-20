@@ -3110,7 +3110,9 @@ Aliases: `ionice`
 ### `periphery`
 <p class="cmd-url"><a href="https://github.com/peripheryapp/periphery">https://github.com/peripheryapp/periphery</a></p>
 
-- **scan**: Flags: --help, --quiet, --skip-build, --strict, --verbose, -h. Valued: --config, --format, --index-store-path, --project, --schemes, --targets
+- **check-update**: Flags: --help, -h
+- **clear-cache**: Flags: --help, -h
+- **scan**: Flags: --bazel, --bazel-check-visibility, --clean-build, --disable-redundant-public-analysis, --disable-unused-import-analysis, --disable-update-check, --exclude-tests, --help, --no-color, --no-superfluous-ignore-comments, --quiet, --relative-results, --retain-assign-only-properties, --retain-codable-properties, --retain-encodable-properties, --retain-objc-accessible, --retain-objc-annotated, --retain-public, --retain-swift-ui-previews, --retain-unused-protocol-func-params, --skip-build, --skip-schemes-validation, --strict, --superfluous-ignore-comments, --verbose, -h. Valued: --baseline, --bazel-filter, --bazel-index-store, --color, --config, --exclude-targets, --external-codable-protocols, --external-encodable-protocols, --external-test-case-classes, --format, --generic-project-config, --index-exclude, --index-store-path, --json-package-manifest-path, --no-retain-spi, --project, --project-root, --report-exclude, --report-include, --retain-assign-only-property-types, --retain-files, --retain-unused-imported-modules, --schemes, --write-baseline, --write-results
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
