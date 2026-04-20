@@ -1,6 +1,6 @@
 [[command]]
 name = "periphery"
-description = "Static analysis tool that identifies unused code (dead declarations) in Swift projects. The scan subcommand indexes the project build to find unreferenced types, functions, and properties — it reads source files and the index store but does not modify any code. It may invoke xcodebuild or swift build internally to produce the index, which is a build operation that writes to derived data. The --skip-build flag avoids this if an index already exists. No network access. Releases are periodic, roughly every few months; available via Homebrew."
+description = "Static analysis tool that identifies unused code in Swift projects. The scan subcommand invokes xcodebuild or swift build to produce an index store, then analyzes it for unreferenced declarations — this means scan executes arbitrary build scripts, build phases, and package plugins unless --skip-build is used. Periphery never modifies source code and has no auto-removal feature. check-update makes a GitHub API call. clear-cache deletes Periphery's local cache directory. --write-baseline and --write-results write report files to user-specified paths. Actively maintained with roughly monthly releases."
 url = "https://github.com/peripheryapp/periphery"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
@@ -8,14 +8,52 @@ bare_flags = ["--help", "--version", "-V", "-h"]
 name = "scan"
 level = "SafeRead"
 standalone = [
-    "--help", "--quiet", "--skip-build", "--strict", "--verbose",
+    "--bazel", "--bazel-check-visibility",
+    "--clean-build",
+    "--disable-redundant-public-analysis", "--disable-unused-import-analysis",
+    "--disable-update-check",
+    "--exclude-tests",
+    "--help",
+    "--no-color", "--no-superfluous-ignore-comments",
+    "--quiet",
+    "--relative-results",
+    "--retain-assign-only-properties", "--retain-codable-properties",
+    "--retain-encodable-properties", "--retain-objc-accessible",
+    "--retain-objc-annotated", "--retain-public",
+    "--retain-swift-ui-previews",
+    "--retain-unused-protocol-func-params",
+    "--skip-build", "--skip-schemes-validation",
+    "--strict", "--superfluous-ignore-comments",
+    "--verbose",
     "-h",
 ]
 valued = [
-    "--config", "--format", "--index-store-path",
-    "--project", "--schemes", "--targets",
+    "--baseline", "--bazel-filter", "--bazel-index-store",
+    "--color", "--config",
+    "--exclude-targets", "--external-codable-protocols",
+    "--external-encodable-protocols", "--external-test-case-classes",
+    "--format",
+    "--generic-project-config",
+    "--index-exclude", "--index-store-path",
+    "--json-package-manifest-path",
+    "--no-retain-spi",
+    "--project", "--project-root",
+    "--report-exclude", "--report-include",
+    "--retain-assign-only-property-types", "--retain-files",
+    "--retain-unused-imported-modules",
+    "--schemes",
+    "--write-baseline", "--write-results",
 ]
 
 [[command.sub]]
+name = "check-update"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
 name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "clear-cache"
+level = "SafeWrite"
 standalone = ["--help", "-h"]

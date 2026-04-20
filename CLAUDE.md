@@ -29,7 +29,21 @@ Regenerates COMMANDS.md and updates the installed binary.
 ## Development
 
 - Most commands are defined as TOML in `commands/*.toml`. See `commands/SAMPLE.toml` for the complete field reference — it documents every field type, when to use each one, and how they compose. Always check SAMPLE.toml before adding a new field type to ensure you aren't duplicating what existing fields already cover.
-- When adding a new command: add it to the appropriate `commands/*.toml` file, add the name to `HANDLED_CMDS` in `src/handlers/mod.rs`, run the test suite, clippy, and `./generate-docs.sh`. If you create a new TOML file, register it in `src/registry.rs` via `include_str!`.
+- When adding a new command: research the command first, then add it to the appropriate `commands/*.toml` file with a `description` field, add the name to `HANDLED_CMDS` in `src/handlers/mod.rs`, run the test suite, clippy, and `./generate-docs.sh`. If you create a new TOML file, register it in `src/registry.rs` via `include_str!`.
+
+## Researching a new command
+
+Before adding a command, research it and write a `description` field that serves as a safety analysis. The description is NOT a summary of what we support — it's an independent assessment of the command's behavior and risk profile, as if written by a security researcher who doesn't know how we'll use the report.
+
+The description should cover:
+- What the command does (one sentence)
+- Which operations are read-only, which modify state, which touch the network, which execute arbitrary code
+- Subtleties: subcommands that delegate to inner commands, flags that change behavior from safe to unsafe, read vs write modes on the same subcommand
+- Project velocity: how often does it release? Is the flag surface stable or fast-moving? Look this up — don't guess.
+
+Do NOT reference safe-chains internals (SafeWrite, SafeRead, Inert, handlers, allowlists) in the description. Describe the command itself.
+
+Use `candidate = true` on subcommands that were considered but deliberately not approved. This records the decision so future contributors don't re-evaluate the same commands.
 - When adding a new TOML field type: design and thoroughly test the generic handler in `src/registry.rs` before using it in any data file. Add comprehensive tests covering every edge case. Update `commands/SAMPLE.toml` with documentation for the new field.
 - Commands that need custom Rust validation (curl headers, perl AST, fzf --bind parsing) use `handler = "name"` in TOML and a Rust function in `src/handlers/`. This is a last resort — most commands can be expressed declaratively.
 - Do not add comments to code
