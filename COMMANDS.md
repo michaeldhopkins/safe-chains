@@ -1799,6 +1799,7 @@ Aliases: `g++`, `cc`, `c++`
 - **branch**: Flags: --all, --help, --ignore-case, --list, --no-abbrev, --no-color, --no-column, --omit-empty, --remotes, --show-current, --verbose, -a, -h, -i, -l, -r, -v, -vv. Valued: --abbrev, --color, --column, --contains, --format, --merged, --no-contains, --no-merged, --points-at, --sort
 - **cat-file**: Flags: --batch-all-objects, --buffer, --filters, --follow-symlinks, --help, --mailmap, --textconv, --unordered, --use-mailmap, -Z, -e, -h, -p, -s, -t. Valued: --batch, --batch-check, --batch-command, --filter, --path
 - **check-ignore**: Flags: --help, --no-index, --non-matching, --quiet, --stdin, --verbose, -h, -n, -q, -v, -z
+- **cliff** (requires --no-exec): Flags: --bumped-version, --current, --help, --latest, --no-exec, --offline, --topo-order, --unreleased, --use-branch-tags, --verbose, --version, -V, -h, -l, -u, -v. Valued: --body, --bump, --config, --count-tags, --exclude-path, --from-context, --ignore-tags, --include-path, --repository, --skip-commit, --skip-tags, --sort, --strip, --tag, --tag-pattern, --with-commit, --with-tag-message, --workdir, -b, -c, -r, -s, -t, -w
 - **config --get**
 - **config --get-all**
 - **config --get-regexp**
@@ -1842,6 +1843,13 @@ Aliases: `g++`, `cc`, `c++`
 - **worktree -h**
 - **worktree list**: Flags: --porcelain, --verbose, -v, -z
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `git-cliff`
+<p class="cmd-url"><a href="https://git-cliff.org/">https://git-cliff.org/</a></p>
+
+- Requires --no-exec. - Allowed standalone flags: --bumped-version, --current, --help, --latest, --no-exec, --offline, --topo-order, --unreleased, --use-branch-tags, --verbose, --version, -V, -h, -l, -u, -v
+- Allowed valued flags: --body, --bump, --config, --count-tags, --exclude-path, --from-context, --ignore-tags, --include-path, --repository, --skip-commit, --skip-tags, --sort, --strip, --tag, --tag-pattern, --with-commit, --with-tag-message, --workdir, -b, -c, -r, -s, -t, -w
+- Bare invocation allowed
 
 ### `git-lfs`
 <p class="cmd-url"><a href="https://git-lfs.com/">https://git-lfs.com/</a></p>

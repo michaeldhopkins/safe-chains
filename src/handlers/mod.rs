@@ -157,7 +157,7 @@ const HANDLED_CMDS: &[&str] = &[
     "gcc", "g++", "cc", "c++", "clang", "clang++",
     "elixir", "erl", "mix", "zig", "lua", "tsc",
     "jc", "gron", "difft", "difftastic", "duf", "xsv", "qsv",
-    "git-lfs", "tig",
+    "git-cliff", "git-lfs", "tig",
     "trivy", "gitleaks", "grype", "syft", "watchexec", "act",
 ];
 

@@ -1,0 +1,28 @@
+[[command]]
+name = "git-cliff"
+description = "Changelog generator that reads git history and renders formatted changelogs via a template engine. The cliff.toml config file supports replace_command fields in commit_preprocessors and postprocessors, which execute arbitrary shell commands via sh -c. The --no-exec flag disables this. Without --no-exec, a malicious cliff.toml in a repository can run arbitrary code. --output and --prepend write/modify files. --init creates a config file. Remote flags (--github-token, --gitlab-token, etc.) make API calls to external services. Also invocable as `git cliff` (git subcommand). Actively maintained with releases roughly every 1-2 months."
+url = "https://git-cliff.org/"
+require_any = ["--no-exec"]
+standalone = [
+    "--bumped-version", "--current",
+    "--help", "--latest",
+    "--no-exec",
+    "--offline",
+    "--topo-order",
+    "--unreleased", "--use-branch-tags",
+    "--verbose", "--version",
+    "-V", "-h", "-l", "-u", "-v",
+]
+valued = [
+    "--body", "--bump",
+    "--config", "--count-tags",
+    "--exclude-path",
+    "--from-context",
+    "--ignore-tags", "--include-path",
+    "--repository",
+    "--skip-commit", "--skip-tags", "--sort", "--strip",
+    "--tag", "--tag-pattern",
+    "--with-commit", "--with-tag-message",
+    "--workdir",
+    "-b", "-c", "-r", "-s", "-t", "-w",
+]
