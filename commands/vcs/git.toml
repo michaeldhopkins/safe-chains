@@ -642,3 +642,30 @@ name = "-h"
 name = "list"
 standalone = ["--porcelain", "--verbose", "-v", "-z"]
 max_positional = 0
+
+[[command.sub]]
+name = "cliff"
+require_any = ["--no-exec"]
+standalone = [
+    "--bumped-version", "--current",
+    "--help", "--latest",
+    "--no-exec",
+    "--offline",
+    "--topo-order",
+    "--unreleased", "--use-branch-tags",
+    "--verbose", "--version",
+    "-V", "-h", "-l", "-u", "-v",
+]
+valued = [
+    "--body", "--bump",
+    "--config", "--count-tags",
+    "--exclude-path",
+    "--from-context",
+    "--ignore-tags", "--include-path",
+    "--repository",
+    "--skip-commit", "--skip-tags", "--sort", "--strip",
+    "--tag", "--tag-pattern",
+    "--with-commit", "--with-tag-message",
+    "--workdir",
+    "-b", "-c", "-r", "-s", "-t", "-w",
+]
