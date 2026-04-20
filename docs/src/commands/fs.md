@@ -5,6 +5,7 @@
 
 - Allowed standalone flags: --help, --multiple, --version, --zero, -V, -a, -h, -z
 - Allowed valued flags: --suffix, -s
+- Bare invocation allowed
 
 ### `bat`
 <p class="cmd-url"><a href="https://github.com/sharkdp/bat#readme">https://github.com/sharkdp/bat#readme</a></p>
@@ -62,6 +63,7 @@
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation</a></p>
 
 - Allowed standalone flags: --help, --version, --zero, -V, -h, -z
+- Bare invocation allowed
 
 ### `du`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation</a></p>

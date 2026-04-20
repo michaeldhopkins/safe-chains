@@ -3,5 +3,5 @@ name = "dirname"
 description = "Strips the last component from a file path string, outputting the directory portion. Purely a string manipulation utility that does not access the filesystem, network, or modify any state. Part of GNU coreutils with an essentially frozen CLI surface."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation"
 level = "Inert"
-bare = false
+bare = true
 standalone = ["--help", "--version", "--zero", "-V", "-h", "-z"]
