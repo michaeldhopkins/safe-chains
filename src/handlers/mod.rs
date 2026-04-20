@@ -91,7 +91,7 @@ const HANDLED_CMDS: &[&str] = &[
     "adb", "apkanalyzer", "apksigner", "bundletool", "aapt2",
     "emulator", "avdmanager", "sdkmanager", "zipalign", "lint",
     "fastlane", "firebase",
-    "composer", "craft", "pest", "phpstan", "phpunit",
+    "artisan", "composer", "craft", "pest", "phpstan", "phpunit",
     "swift",
     "dotnet",
     "curl",

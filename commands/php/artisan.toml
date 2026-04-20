@@ -1,0 +1,162 @@
+[[command]]
+name = "artisan"
+description = "Laravel's CLI. Every command bootstraps the full application (all service providers boot, which can trigger side effects in third-party packages). Read-only commands (about, route:list, config:show, model:show, event:list, schedule:list, migrate:status, db:show, db:table) display information but some require a live DB connection. tinker is a full PHP REPL with no sandbox. test delegates to pest/phpunit. make:* generates stub files. migrate modifies the database schema. cache:clear, config:cache, route:cache, view:cache, and optimize write to bootstrap/cache. serve starts a local HTTP server. invoke-serialized-closure executes arbitrary serialized PHP closures. One major release per year; new artisan commands appear in each."
+url = "https://laravel.com/docs/12.x/artisan"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "about"
+standalone = ["--help", "--json", "-h"]
+valued = ["--only"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--raw", "-h"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "help"
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "inspire"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config:show"
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "route:list"
+standalone = [
+    "--except-vendor", "--help", "--json",
+    "--only-vendor", "--reverse",
+    "-h", "-r", "-v",
+]
+valued = [
+    "--action", "--domain", "--except-path",
+    "--method", "--name", "--path", "--sort",
+]
+
+[[command.sub]]
+name = "model:show"
+bare = false
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "event:list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "schedule:list"
+standalone = ["--help", "--json", "--next", "-h"]
+valued = ["--timezone"]
+
+[[command.sub]]
+name = "channel:list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "migrate:status"
+standalone = ["--help", "--realpath", "-h"]
+valued = ["--database", "--path"]
+
+[[command.sub]]
+name = "db:show"
+standalone = ["--counts", "--help", "--json", "--views", "-h"]
+valued = ["--database"]
+
+[[command.sub]]
+name = "db:table"
+bare = false
+standalone = ["--help", "--json", "-h"]
+valued = ["--database"]
+
+[[command.sub]]
+name = "queue:failed"
+standalone = ["--help", "-h"]
+valued = ["--queue"]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+standalone = [
+    "--bail", "--compact",
+    "--coverage", "--debug", "--dirty",
+    "--help", "--no-coverage", "--no-progress",
+    "--parallel", "--profile", "--retry",
+    "--stop-on-failure",
+    "-h",
+]
+valued = [
+    "--exclude-filter", "--exclude-group", "--exclude-testsuite",
+    "--filter", "--group", "--min", "--processes",
+    "--testsuite",
+]
+
+[[command.sub]]
+name = "tinker"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "migrate:fresh"
+candidate = true
+
+[[command.sub]]
+name = "migrate:refresh"
+candidate = true
+
+[[command.sub]]
+name = "migrate:reset"
+candidate = true
+
+[[command.sub]]
+name = "migrate:rollback"
+candidate = true
+
+[[command.sub]]
+name = "db:seed"
+candidate = true
+
+[[command.sub]]
+name = "db:wipe"
+candidate = true
+
+[[command.sub]]
+name = "cache:clear"
+candidate = true
+
+[[command.sub]]
+name = "key:generate"
+candidate = true
+
+[[command.sub]]
+name = "down"
+candidate = true
+
+[[command.sub]]
+name = "up"
+candidate = true
+
+[[command.sub]]
+name = "invoke-serialized-closure"
+candidate = true

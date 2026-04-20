@@ -285,6 +285,28 @@ Unlisted flags, subcommands, and commands are not allowed.
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
 
+### `artisan`
+<p class="cmd-url"><a href="https://laravel.com/docs/12.x/artisan">https://laravel.com/docs/12.x/artisan</a></p>
+
+- **about**: Flags: --help, --json, -h. Valued: --only
+- **channel:list**: Flags: --help, -h
+- **completion**: Flags: --help, -h. Positional args accepted
+- **config:show**: Flags: --help, -h. Positional args accepted
+- **db:show**: Flags: --counts, --help, --json, --views, -h. Valued: --database
+- **db:table**: Flags: --help, --json, -h. Valued: --database
+- **env**: Flags: --help, -h
+- **event:list**: Flags: --help, -h
+- **help**: Flags: --help, -h. Positional args accepted
+- **inspire**: Flags: --help, -h
+- **list**: Flags: --help, --raw, -h. Valued: --format
+- **migrate:status**: Flags: --help, --realpath, -h. Valued: --database, --path
+- **model:show**: Flags: --help, --json, -h
+- **queue:failed**: Flags: --help, -h. Valued: --queue
+- **route:list**: Flags: --except-vendor, --help, --json, --only-vendor, --reverse, -h, -r, -v. Valued: --action, --domain, --except-path, --method, --name, --path, --sort
+- **schedule:list**: Flags: --help, --json, --next, -h. Valued: --timezone
+- **test**: Flags: --bail, --compact, --coverage, --debug, --dirty, --help, --no-coverage, --no-progress, --parallel, --profile, --retry, --stop-on-failure, -h. Valued: --exclude-filter, --exclude-group, --exclude-testsuite, --filter, --group, --min, --processes, --testsuite
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `asdf`
 <p class="cmd-url"><a href="https://asdf-vm.com/manage/commands.html">https://asdf-vm.com/manage/commands.html</a></p>
 
