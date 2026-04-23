@@ -340,6 +340,16 @@ safe! {
     declare_ix: "declare -ix FOO=42",
     typeset_bare: "typeset",
 
+    colon_bare: ":",
+    colon_with_args: ": foo bar",
+    colon_in_if_then: "if true; then :; fi",
+    colon_in_if_else: "if false; then echo yes; else :; fi",
+    colon_in_for_loop: "for x in 1 2; do :; done",
+    colon_in_while: "while false; do :; done",
+    colon_in_chain: "echo hello && :",
+    colon_in_chain_reverse: ": && echo hello",
+    colon_with_redirect: ": > /dev/null",
+
     basecamp_help: "basecamp --help",
     basecamp_projects_list: "basecamp projects list",
     basecamp_todos_list: "basecamp todos list --in 12345",

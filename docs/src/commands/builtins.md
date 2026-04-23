@@ -1,5 +1,11 @@
 # Shell Builtins
 
+### `:`
+<p class="cmd-url"><a href="https://www.gnu.org/software/bash/manual/bash.html#Bourne-Shell-Builtins">https://www.gnu.org/software/bash/manual/bash.html#Bourne-Shell-Builtins</a></p>
+
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `alias`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/alias.1p.html">https://man7.org/linux/man-pages/man1/alias.1p.html</a></p>
 

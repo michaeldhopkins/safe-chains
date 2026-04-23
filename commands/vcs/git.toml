@@ -294,7 +294,7 @@ standalone = [
     "--numstat",
     "--oneline",
     "--parents", "--patch", "--patch-with-raw",
-    "--patch-with-stat", "--patience",
+    "--patch-with-stat", "--patience", "--pickaxe-all", "--pickaxe-regex",
     "--raw", "--reflog", "--regexp-ignore-case", "--relative-date", "--remotes",
     "--reverse",
     "--shortstat", "--show-linear-break", "--show-notes",
@@ -304,19 +304,19 @@ standalone = [
     "--tags", "--text", "--topo-order",
     "--use-mailmap",
     "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
-    "-h", "-i", "-p", "-q", "-u",
+    "-h", "-i", "-p", "-q", "-s", "-u",
 ]
 valued = [
     "--abbrev", "--after", "--author", "--before",
     "--color", "--committer", "--date",
     "--decorate", "--decorate-refs", "--decorate-refs-exclude",
-    "--diff-algorithm", "--diff-filter",
+    "--diff-algorithm", "--diff-filter", "--diff-merges",
     "--encoding", "--exclude",
     "--format", "--glob", "--grep",
     "--max-count", "--max-parents", "--min-parents",
     "--pretty",
     "--since", "--skip", "--until",
-    "-L", "-n",
+    "-G", "-L", "-S", "-n",
 ]
 
 [[command.sub]]
@@ -449,7 +449,7 @@ standalone = [
     "--numstat",
     "--oneline",
     "--parents", "--patch", "--patch-with-raw",
-    "--patch-with-stat", "--patience",
+    "--patch-with-stat", "--patience", "--pickaxe-all", "--pickaxe-regex",
     "--raw", "--reflog", "--regexp-ignore-case", "--relative-date", "--remotes",
     "--reverse",
     "--shortstat", "--show-linear-break", "--show-notes",
@@ -459,19 +459,19 @@ standalone = [
     "--tags", "--text", "--topo-order",
     "--use-mailmap",
     "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
-    "-h", "-i", "-p", "-q", "-u",
+    "-h", "-i", "-p", "-q", "-s", "-u",
 ]
 valued = [
     "--abbrev", "--after", "--author", "--before",
     "--color", "--committer", "--date",
     "--decorate", "--decorate-refs", "--decorate-refs-exclude",
-    "--diff-algorithm", "--diff-filter",
+    "--diff-algorithm", "--diff-filter", "--diff-merges",
     "--encoding", "--exclude",
     "--format", "--glob", "--grep",
     "--max-count", "--max-parents", "--min-parents",
     "--pretty",
     "--since", "--skip", "--until",
-    "-L", "-n",
+    "-G", "-L", "-S", "-n",
 ]
 
 [[command.sub]]
@@ -531,12 +531,13 @@ standalone = [
     "--no-ext-diff", "--no-notes", "--no-patch",
     "--no-prefix", "--no-renames", "--no-textconv",
     "--numstat",
+    "--oneline",
     "--patch", "--patch-with-raw", "--patch-with-stat",
-    "--patience", "--raw",
+    "--patience", "--pickaxe-all", "--pickaxe-regex", "--raw",
     "--shortstat", "--show-notes", "--show-signature",
     "--source", "--stat", "--summary",
     "--text", "--textconv", "--use-mailmap",
-    "-h", "-p", "-q", "-u", "-w",
+    "-h", "-p", "-q", "-s", "-u", "-w",
 ]
 valued = [
     "--abbrev", "--color", "--color-moved",
@@ -546,7 +547,7 @@ valued = [
     "--notes", "--pretty",
     "--stat-count", "--stat-graph-width", "--stat-name-width",
     "--submodule", "--word-diff", "--word-diff-regex",
-    "-O",
+    "-G", "-O", "-S",
 ]
 
 [[command.sub]]

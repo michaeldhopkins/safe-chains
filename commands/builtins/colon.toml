@@ -1,0 +1,6 @@
+[[command]]
+name = ":"
+description = "Shell null command (no-op). Does nothing and returns exit code 0. Commonly used as a placeholder in if/then/else constructs (e.g., `if ...; then :; fi`). Takes no meaningful arguments. Part of the POSIX shell specification; present in every shell."
+url = "https://www.gnu.org/software/bash/manual/bash.html#Bourne-Shell-Builtins"
+level = "Inert"
+positional_style = true
