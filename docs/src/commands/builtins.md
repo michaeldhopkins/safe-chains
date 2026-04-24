@@ -85,6 +85,13 @@ Aliases: `typeset`
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+### `shopt`
+<p class="cmd-url"><a href="https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin">https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin</a></p>
+
+- Allowed standalone flags: --help, -h, -o, -p, -q, -s, -u
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `true`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#true-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#true-invocation</a></p>
 
