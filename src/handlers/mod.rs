@@ -124,7 +124,7 @@ const HANDLED_CMDS: &[&str] = &[
     "fd", "eza", "exa", "ls", "delta", "colordiff",
     "dirname", "basename", "realpath", "readlink",
     "file", "stat", "du", "df", "tree", "cmp", "zipinfo", "tar", "unzip", "gzip",
-    "true", "false", ":",
+    "true", "false", ":", "shopt",
     "alias", "break", "continue", "declare", "exit", "export", "hash", "printenv", "read", "type", "typeset", "wait", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
     "uname", "nproc", "uptime", "id", "groups", "tty", "locale", "cal", "sleep",
     "who", "w", "last", "lastlog",

@@ -1,0 +1,7 @@
+[[command]]
+name = "shopt"
+description = "Bash builtin for getting and setting shell options. Modifies shell behavior for the current session only (e.g., nullglob, extglob, dotglob). All operations are process-local with no filesystem, network, or persistent side effects. The shell options are reset when the session ends. Part of bash; interface has been stable for decades."
+url = "https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin"
+level = "Inert"
+positional_style = true
+standalone = ["--help", "-h", "-o", "-p", "-q", "-s", "-u"]
