@@ -22,6 +22,37 @@ safe-chains --setup
 
 This adds the Claude Code pre-hook to `~/.claude/settings.json`. Restart Claude Code to activate. See the [documentation](https://www.michaeldhopkins.com/docs/safe-chains/configuration.html) for manual setup and OpenCode configuration.
 
+### OpenAI codex
+
+Manually add this to `~/.claude/config.toml`:
+
+```toml
+[features]
+codex_hooks = true
+```
+
+And add this to `~/.claude/hooks.json`:
+
+```json
+"hooks": {
+  "PreToolUse": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "safe-chains"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Restart your codex sessions to activate the hook. Once configured, updating the `safe-chains` binary takes effect immediately.
+
+Requires `safe-chains` in PATH.
+
 ## Usage
 
 With the hook configured, safe-chains runs automatically. No interaction needed — safe commands are approved, everything else goes through the normal permission prompt.
