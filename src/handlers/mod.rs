@@ -104,7 +104,7 @@ const HANDLED_CMDS: &[&str] = &[
     "aws", "gcloud", "az",
     "doctl", "hcloud", "vultr-cli", "exo", "scw", "linode-cli",
     "ansible-playbook", "ansible-inventory", "ansible-doc", "ansible-config", "ansible-galaxy",
-    "overmind", "tailscale", "tmux", "wg", "systemctl", "journalctl",
+    "overmind", "tailscale", "tmux", "wg", "systemctl", "journalctl", "zellij",
     "kafka-topics", "kafka-console-consumer", "kafka-consumer-groups",
     "monolith",
     "cloudflared", "ngrok", "ssh",

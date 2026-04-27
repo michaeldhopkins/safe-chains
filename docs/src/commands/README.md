@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 460 commands across 34 categories.
+safe-chains knows 461 commands across 34 categories.
 
 ## Glossary
 
@@ -45,7 +45,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Search](search.md) (7 commands)
 - [Swift](swift.md) (1 commands)
 - [System Info](sysinfo.md) (29 commands)
-- [System](system.md) (47 commands)
+- [System](system.md) (48 commands)
 - [Text Processing](text.md) (27 commands)
 - [Developer Tools](tools.md) (89 commands)
 - [Version Control](vcs.md) (5 commands)
