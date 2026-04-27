@@ -12,3 +12,4 @@ preferred-dark-theme = "ayu"
 site-url = "/docs/safe-chains/"
 git-repository-url = "https://github.com/michaeldhopkins/safe-chains"
 additional-css = ["src/custom.css"]
+additional-js = ["src/version-footer.js"]
