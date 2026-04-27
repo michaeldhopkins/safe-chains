@@ -101,10 +101,15 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> O
 }
 
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
+    use crate::docs::{DocBuilder, wordset_items};
     vec![
         crate::docs::CommandDoc::handler("grep / egrep / fgrep",
             "https://www.gnu.org/software/grep/manual/grep.html",
-            "Pattern and file arguments accepted after flags. Patterns starting with - are allowed as positional arguments.",
+            DocBuilder::new()
+                .wordset(&GREP_STANDALONE)
+                .section(format!("Allowed valued flags: {}", wordset_items(&GREP_VALUED)))
+                .section("Pattern and file arguments accepted after flags")
+                .build(),
             "search"),
     ]
 }
