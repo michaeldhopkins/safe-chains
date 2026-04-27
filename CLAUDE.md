@@ -24,12 +24,32 @@ Must pass with no warnings before committing.
 cargo install --path .
 ```
 
-Regenerates COMMANDS.md and updates the installed binary.
+Regenerates COMMANDS.md, builds and deploys the documentation site, and updates the installed binary.
+
+## Commits
+
+One logical change per commit. Each commit gets its own semver bump. Do not batch unrelated changes into one commit — we publish detailed changelogs and each entry should describe a single thing.
+
+Examples of one commit:
+- Adding a new command (TOML + HANDLED_CMDS + tests)
+- Adding missing flags to an existing command
+- A bug fix to the parser
+- A refactor of a handler
+
+Examples of what should NOT be one commit:
+- Adding a new command AND fixing an unrelated bug
+- Refactoring a handler AND adding missing flags to a different command
+
+Bump the version in `Cargo.toml` with each commit using semver: patch for bug fixes, minor for new commands/features, major for breaking changes.
 
 ## Development
 
 - Most commands are defined as TOML in `commands/*.toml`. See `commands/SAMPLE.toml` for the complete field reference — it documents every field type, when to use each one, and how they compose. Always check SAMPLE.toml before adding a new field type to ensure you aren't duplicating what existing fields already cover.
 - When adding a new command: research the command first, then add it to the appropriate `commands/*.toml` file with a `description` field, add the name to `HANDLED_CMDS` in `src/handlers/mod.rs`, run the test suite, clippy, and `./generate-docs.sh`. If you create a new TOML file, register it in `src/registry.rs` via `include_str!`.
+- When adding a new TOML field type: design and thoroughly test the generic handler in `src/registry.rs` before using it in any data file. Add comprehensive tests covering every edge case. Update `commands/SAMPLE.toml` with documentation for the new field.
+- Commands that need custom Rust validation (curl headers, perl AST, fzf --bind parsing) use `handler = "name"` in TOML and a Rust function in `src/handlers/`. This is a last resort — most commands can be expressed declaratively.
+- Do not add comments to code
+- All files must end with a newline
 
 ## Researching a new command
 
@@ -44,11 +64,6 @@ The description should cover:
 Do NOT reference safe-chains internals (SafeWrite, SafeRead, Inert, handlers, allowlists) in the description. Describe the command itself.
 
 Use `candidate = true` on subcommands that were considered but deliberately not approved. This records the decision so future contributors don't re-evaluate the same commands.
-- When adding a new TOML field type: design and thoroughly test the generic handler in `src/registry.rs` before using it in any data file. Add comprehensive tests covering every edge case. Update `commands/SAMPLE.toml` with documentation for the new field.
-- Commands that need custom Rust validation (curl headers, perl AST, fzf --bind parsing) use `handler = "name"` in TOML and a Rust function in `src/handlers/`. This is a last resort — most commands can be expressed declaratively.
-- Do not add comments to code
-- All files must end with a newline
-- Bump the version in `Cargo.toml` with each commit using semver: patch for bug fixes, minor for new commands/features, major for breaking changes
 
 ## Documentation style
 
