@@ -424,6 +424,44 @@ name = "list"
 name = "show"
 
 [[command.sub]]
+name = "pull"
+level = "SafeWrite"
+standalone = [
+    "--all", "--allow-unrelated-histories", "--append", "--autostash",
+    "--commit", "--compact-summary", "--dry-run",
+    "--edit",
+    "--ff", "--ff-only", "--force",
+    "--help",
+    "--ipv4", "--ipv6",
+    "--keep",
+    "--no-autostash", "--no-commit", "--no-edit",
+    "--no-ff", "--no-gpg-sign", "--no-log",
+    "--no-rebase", "--no-recurse-submodules",
+    "--no-show-forced-updates", "--no-signoff",
+    "--no-squash", "--no-stat", "--no-tags",
+    "--no-verify", "--no-verify-signatures",
+    "--progress", "--prune",
+    "--quiet",
+    "--set-upstream", "--show-forced-updates",
+    "--signoff", "--squash", "--stat",
+    "--tags",
+    "--verbose", "--verify", "--verify-signatures",
+    "-4", "-6",
+    "-a", "-e", "-f", "-h", "-k", "-n", "-p", "-q", "-t", "-v",
+]
+valued = [
+    "--cleanup", "--depth", "--deepen",
+    "--filter",
+    "--gpg-sign", "--jobs",
+    "--log",
+    "--rebase", "--recurse-submodules", "--refmap",
+    "--server-option", "--shallow-exclude", "--shallow-since",
+    "--strategy", "--strategy-option",
+    "--upload-pack",
+    "-S", "-X", "-j", "-o", "-r", "-s",
+]
+
+[[command.sub]]
 name = "reflog"
 standalone = [
     "--abbrev-commit", "--all", "--ancestry-path",
