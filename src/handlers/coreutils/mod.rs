@@ -1,6 +1,7 @@
 mod awk;
 mod data;
 mod find;
+mod grep;
 mod net;
 mod sed;
 mod tar;
@@ -16,6 +17,7 @@ pub(crate) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
         .or_else(|| data::dispatch(cmd, tokens))
         .or_else(|| tar::dispatch(cmd, tokens))
         .or_else(|| net::dispatch(cmd, tokens))
+        .or_else(|| grep::dispatch(cmd, tokens))
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
@@ -26,6 +28,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(data::command_docs());
     docs.extend(tar::command_docs());
     docs.extend(net::command_docs());
+    docs.extend(grep::command_docs());
     docs
 }
 
@@ -38,5 +41,6 @@ pub(super) fn full_registry() -> Vec<&'static super::CommandEntry> {
     v.extend(sed::REGISTRY);
     v.extend(awk::REGISTRY);
     v.extend(net::registry());
+    v.extend(grep::REGISTRY);
     v
 }
