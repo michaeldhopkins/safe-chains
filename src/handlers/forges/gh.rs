@@ -276,6 +276,11 @@ static API_VALUED: WordSet = WordSet::new(&[
     "-p", "-q", "-t",
 ]);
 
+static API_FIELD_FLAGS: WordSet = WordSet::new(&[
+    "--field", "--raw-field",
+    "-F", "-f",
+]);
+
 fn is_safe_api_header(value: &str) -> bool {
     let Some((name, _)) = value.split_once(':') else {
         return false;
@@ -387,55 +392,90 @@ pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
 }
 
 pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> Verdict {
-    let mut i = 2;
+    let endpoint = tokens.get(2).map(|t| t.as_str()).unwrap_or("");
+    if endpoint == "graphql" {
+        return is_safe_gh_api_graphql(tokens);
+    }
+    is_safe_gh_api_rest(tokens)
+}
+
+fn is_graphql_mutation(query: &str) -> bool {
+    let mut s = query.trim_start();
+    while s.starts_with('#') {
+        s = match s.find('\n') {
+            Some(pos) => s[pos + 1..].trim_start(),
+            None => return false,
+        };
+    }
+    s.starts_with("mutation")
+        && s.as_bytes()
+            .get(8)
+            .is_none_or(|&b| b == b' ' || b == b'\t' || b == b'\n' || b == b'{' || b == b'(')
+}
+
+fn extract_field_value(tokens: &[Token], i: usize) -> Option<(&str, &str)> {
+    let token = &tokens[i];
+    let s = token.as_str();
+    if let Some(rest) = s.strip_prefix("--field=")
+        .or_else(|| s.strip_prefix("--raw-field="))
+    {
+        return rest.split_once('=');
+    }
+    if let Some(rest) = s.strip_prefix("-f").or_else(|| s.strip_prefix("-F"))
+        && let Some(pair) = rest.split_once('=')
+    {
+        return Some(pair);
+    }
+    if API_FIELD_FLAGS.contains(token)
+        && let Some(next) = tokens.get(i + 1)
+    {
+        return next.as_str().split_once('=');
+    }
+    None
+}
+
+fn is_safe_gh_api_graphql(tokens: &[Token]) -> Verdict {
+    let mut i = 3;
     while i < tokens.len() {
         let token = &tokens[i];
 
         if token == "-X" || token == "--method" {
-            return if tokens
-                .get(i + 1)
-                .is_some_and(|m| m.eq_ignore_ascii_case("GET")) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
+            i += 2;
+            continue;
         }
-        if token.starts_with("-X") && token.len() > 2 && !token.starts_with("-X=") {
-            return if token
-                .get(2..)
-                .is_some_and(|s| s.eq_ignore_ascii_case("GET"))
-            { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
-        }
-        if token.starts_with("-X=") || token.starts_with("--method=") {
-            let val = token.split_value("=").unwrap_or("");
-            return if val.eq_ignore_ascii_case("GET") { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
+        if token.starts_with("-X") || token.starts_with("--method=") {
+            i += 1;
+            continue;
         }
 
         if token == "-H" || token == "--header" {
             match tokens.get(i + 1) {
-                Some(val) if is_safe_api_header(val.as_str()) => {
-                    i += 2;
-                    continue;
-                }
+                Some(val) if is_safe_api_header(val.as_str()) => { i += 2; continue; }
                 _ => return Verdict::Denied,
             }
         }
         if let Some(rest) = token.as_str().strip_prefix("-H=").or_else(|| token.as_str().strip_prefix("--header=")) {
-            if is_safe_api_header(rest) {
-                i += 1;
-                continue;
-            }
+            if is_safe_api_header(rest) { i += 1; continue; }
             return Verdict::Denied;
         }
 
         if token.starts_with('-') {
-            if API_STANDALONE.contains(token) {
-                i += 1;
-                continue;
-            }
-            if API_VALUED.contains(token) {
+            if API_STANDALONE.contains(token) { i += 1; continue; }
+            if API_VALUED.contains(token) { i += 2; continue; }
+            if API_FIELD_FLAGS.contains(token) {
+                if matches!(extract_field_value(tokens, i), Some(("query", val)) if is_graphql_mutation(val)) {
+                    return Verdict::Denied;
+                }
                 i += 2;
                 continue;
             }
             if let Some((_flag, _val)) = token.split_once('=') {
                 let flag_part = Token::from_raw(_flag.to_string());
-                if API_VALUED.contains(&flag_part) {
+                if API_VALUED.contains(&flag_part) { i += 1; continue; }
+                if API_FIELD_FLAGS.contains(&flag_part) {
+                    if matches!(extract_field_value(tokens, i), Some(("query", val)) if is_graphql_mutation(val)) {
+                        return Verdict::Denied;
+                    }
                     i += 1;
                     continue;
                 }
@@ -444,6 +484,78 @@ pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> Verdict {
         }
 
         i += 1;
+    }
+    Verdict::Allowed(SafetyLevel::Inert)
+}
+
+fn is_safe_gh_api_rest(tokens: &[Token]) -> Verdict {
+    let mut i = 2;
+    let mut has_fields = false;
+    let mut has_explicit_get = false;
+    while i < tokens.len() {
+        let token = &tokens[i];
+
+        if token == "-X" || token == "--method" {
+            if tokens.get(i + 1).is_some_and(|m| m.eq_ignore_ascii_case("GET")) {
+                has_explicit_get = true;
+                i += 2;
+                continue;
+            }
+            return Verdict::Denied;
+        }
+        if token.starts_with("-X") && token.len() > 2 && !token.starts_with("-X=") {
+            if token.get(2..).is_some_and(|s| s.eq_ignore_ascii_case("GET")) {
+                has_explicit_get = true;
+                i += 1;
+                continue;
+            }
+            return Verdict::Denied;
+        }
+        if token.starts_with("-X=") || token.starts_with("--method=") {
+            let val = token.split_value("=").unwrap_or("");
+            if val.eq_ignore_ascii_case("GET") {
+                has_explicit_get = true;
+                i += 1;
+                continue;
+            }
+            return Verdict::Denied;
+        }
+
+        if token == "-H" || token == "--header" {
+            match tokens.get(i + 1) {
+                Some(val) if is_safe_api_header(val.as_str()) => { i += 2; continue; }
+                _ => return Verdict::Denied,
+            }
+        }
+        if let Some(rest) = token.as_str().strip_prefix("-H=").or_else(|| token.as_str().strip_prefix("--header=")) {
+            if is_safe_api_header(rest) { i += 1; continue; }
+            return Verdict::Denied;
+        }
+
+        if token.starts_with('-') {
+            if API_STANDALONE.contains(token) { i += 1; continue; }
+            if API_VALUED.contains(token) { i += 2; continue; }
+            if API_FIELD_FLAGS.contains(token) {
+                has_fields = true;
+                i += 2;
+                continue;
+            }
+            if let Some((_flag, _val)) = token.split_once('=') {
+                let flag_part = Token::from_raw(_flag.to_string());
+                if API_VALUED.contains(&flag_part) { i += 1; continue; }
+                if API_FIELD_FLAGS.contains(&flag_part) {
+                    has_fields = true;
+                    i += 1;
+                    continue;
+                }
+            }
+            return Verdict::Denied;
+        }
+
+        i += 1;
+    }
+    if has_fields && !has_explicit_get {
+        return Verdict::Denied;
     }
     Verdict::Allowed(SafetyLevel::Inert)
 }
@@ -656,6 +768,15 @@ mod tests {
         codespace_list_repo: "gh codespace list --repo owner/repo",
         variable_list_env: "gh variable list --env production",
         variable_list_org: "gh variable list --org myorg",
+        api_field_with_get: "gh api repos/o/r/contents/f -X GET -f ref=abc --jq '.content'",
+        api_field_with_get_eq: "gh api repos/o/r/contents/f --method=GET -f ref=abc",
+        api_raw_field_with_get: "gh api repos/o/r/contents/f -X GET -F ref=abc",
+        api_graphql_query: "gh api graphql -f query='{viewer{login}}' --jq '.data.viewer.login'",
+        api_graphql_field: "gh api graphql --field query='{repository(owner:\"o\",name:\"r\"){name}}'",
+        api_graphql_jq: "gh api graphql -f query='{viewer{login}}' -q '.data'",
+        api_graphql_named_query: "gh api graphql -f query='query GetViewer{viewer{login}}'",
+        api_graphql_with_vars: "gh api graphql -f query='{repository(owner:\"o\",name:\"r\"){name}}' -F owner=o",
+        api_graphql_paginate: "gh api graphql --paginate -f query='{viewer{repositories(first:100){nodes{name}}}}'",
     }
 
     denied! {
@@ -667,9 +788,15 @@ mod tests {
         release_download_pattern_no_output_denied: "gh release download v1.0 --pattern '*.tar.gz'",
         api_patch_denied: "gh api repos/o/r/pulls/1 -X PATCH -f body=x",
         api_post_denied: "gh api repos/o/r/pulls/1 -X POST",
-        api_field_denied: "gh api repos/o/r/issues -f title=x",
-        api_raw_field_denied: "gh api repos/o/r/issues --raw-field body=x",
-        api_big_field_denied: "gh api repos/o/r/issues -F title=x",
+        api_field_no_get_denied: "gh api repos/o/r/issues -f title=x",
+        api_raw_field_no_get_denied: "gh api repos/o/r/issues --raw-field body=x",
+        api_big_field_no_get_denied: "gh api repos/o/r/issues -F title=x",
+        api_field_with_post_denied: "gh api repos/o/r/issues -X POST -f title=x",
+        api_field_with_patch_denied: "gh api repos/o/r/issues -X PATCH -f title=x",
+        api_graphql_mutation_denied: "gh api graphql -f query=mutation",
+        api_graphql_mutation_brace_denied: "gh api graphql -f query='mutation{addStar}'",
+        api_graphql_mutation_named_denied: "gh api graphql -f query='mutation AddStar{addStar}'",
+        api_graphql_mutation_whitespace_denied: "gh api graphql -f query='  mutation{addStar}'",
         api_input_denied: "gh api repos/o/r/rulesets --input file.json",
         api_header_authorization_denied: "gh api repos/o/r/pulls -H 'Authorization: token ghp_xxx'",
         api_header_content_type_denied: "gh api repos/o/r/pulls -H 'Content-Type: application/json'",
