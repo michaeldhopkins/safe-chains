@@ -295,8 +295,12 @@ fn gh_api_body_flags() {
     assert!(!check("gh api repos/o/r/issues --raw-field body=text"));
     assert!(!check("gh api repos/o/r/rulesets --input file.json"));
     assert!(!check("gh api repos/o/r/rulesets --input -"));
-    assert!(!check("gh api graphql -f query='{viewer{login}}'"));
-    assert!(!check("gh api graphql -F owner=octocat -f query='query{}'"));
+    assert!(check("gh api graphql -f query='{viewer{login}}'"));
+    assert!(check("gh api graphql -F owner=octocat -f query='query{}'"));
+    assert!(!check("gh api graphql -f query='mutation{createIssue(input:{repositoryId:\"R\",title:\"x\"}){issue{id}}}'"));
+    assert!(!check("gh api graphql -f query='  mutation AddReaction{addReaction(input:{subjectId:\"x\"}){reaction{content}}}'"));
+    assert!(check("gh api repos/o/r/contents/f -X GET -f ref=abc"));
+    assert!(!check("gh api repos/o/r/contents/f -f ref=abc"));
 }
 
 #[test]
