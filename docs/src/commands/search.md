@@ -18,13 +18,12 @@
 - Allowed standalone flags: --absolute-path, --case-sensitive, --fixed-strings, --follow, --full-path, --glob, --has-results, --help, --hidden, --ignore, --ignore-case, --ignore-vcs, --list-details, --no-follow, --no-hidden, --no-ignore, --no-ignore-parent, --no-ignore-vcs, --no-require-git, --one-file-system, --print0, --prune, --quiet, --regex, --relative-path, --require-git, --show-errors, --unrestricted, --version, -0, -1, -F, -H, -I, -L, -V, -a, -g, -h, -i, -l, -p, -q, -s, -u
 - Allowed valued flags: --and, --base-directory, --batch-size, --change-newer-than, --change-older-than, --changed-after, --changed-before, --changed-within, --color, --exact-depth, --exclude, --extension, --format, --hyperlink, --ignore-file, --max-depth, --max-results, --min-depth, --newer, --older, --owner, --path-separator, --search-path, --size, --strip-cwd-prefix, --threads, --type, -E, -S, -c, -d, -e, -j, -o, -t
 
-### `grep`
+### `grep / egrep / fgrep`
 <p class="cmd-url"><a href="https://www.gnu.org/software/grep/manual/grep.html">https://www.gnu.org/software/grep/manual/grep.html</a></p>
 
-Aliases: `egrep`, `fgrep`
-
-- Allowed standalone flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z
+- Flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z
 - Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m
+- Pattern and file arguments accepted after flags
 
 ### `locate`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/locate.1.html">https://man7.org/linux/man-pages/man1/locate.1.html</a></p>
