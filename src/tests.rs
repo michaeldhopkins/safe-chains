@@ -340,6 +340,11 @@ safe! {
     declare_ix: "declare -ix FOO=42",
     typeset_bare: "typeset",
 
+    comment_only: "# just a comment",
+    comment_before_cmd: "# comment\necho hello",
+    comment_inline: "echo hello # inline",
+    comment_between_cmds: "pgrep -af 'pattern' || echo 'no match'\n# Sanity check\npgrep -af 'other' || echo 'no match'",
+
     colon_bare: ":",
     colon_with_args: ": foo bar",
     colon_in_if_then: "if true; then :; fi",
