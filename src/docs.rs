@@ -239,6 +239,23 @@ pub fn render_book(docs: &[CommandDoc], output_dir: &std::path::Path) {
     fs::write(includes_dir.join("command-count.md"), format!("{total}\n"))
         .expect("failed to write command-count.md");
 
+    let version = env!("CARGO_PKG_VERSION");
+    fs::write(
+        output_dir.join("src").join("version-footer.js"),
+        format!(
+            "document.addEventListener('DOMContentLoaded', function() {{\n\
+             \x20   var nav = document.querySelector('.nav-wide-wrapper') || document.querySelector('.nav-wrapper');\n\
+             \x20   if (nav) {{\n\
+             \x20       var footer = document.createElement('div');\n\
+             \x20       footer.className = 'version-footer';\n\
+             \x20       footer.textContent = 'safe-chains v{version} · {total} commands';\n\
+             \x20       nav.parentNode.insertBefore(footer, nav.nextSibling);\n\
+             \x20   }}\n\
+             }});\n"
+        ),
+    )
+    .expect("failed to write version-footer.js");
+
     let mut readme = format!(
         "# Command Reference\n\n\
          safe-chains knows {total} commands across {} categories.\n\n\
