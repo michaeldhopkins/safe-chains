@@ -13,14 +13,39 @@ fn backtrack<T>() -> ModalResult<T> {
     Err(ErrMode::Backtrack(ContextError::new()))
 }
 
+fn comment(input: &mut &str) -> ModalResult<()> {
+    if input.starts_with('#') {
+        if let Some(pos) = input.find('\n') {
+            *input = &input[pos + 1..];
+        } else {
+            *input = "";
+        }
+    }
+    Ok(())
+}
+
 fn ws(input: &mut &str) -> ModalResult<()> {
-    take_while(0.., [' ', '\t']).void().parse_next(input)
+    loop {
+        take_while(0.., [' ', '\t']).void().parse_next(input)?;
+        if input.starts_with('#') {
+            comment(input)?;
+        } else {
+            break;
+        }
+    }
+    Ok(())
 }
 
 fn sep(input: &mut &str) -> ModalResult<()> {
-    take_while(0.., [' ', '\t', ';', '\n'])
-        .void()
-        .parse_next(input)
+    loop {
+        take_while(0.., [' ', '\t', ';', '\n']).void().parse_next(input)?;
+        if input.starts_with('#') {
+            comment(input)?;
+        } else {
+            break;
+        }
+    }
+    Ok(())
 }
 
 fn eat_keyword(input: &mut &str, kw: &str) -> ModalResult<()> {
@@ -66,6 +91,7 @@ fn is_dq_literal(c: char) -> bool {
 // === Script ===
 
 fn script(input: &mut &str) -> ModalResult<Script> {
+    sep.parse_next(input)?;
     let mut stmts = Vec::new();
     while let Some(pl) = opt(pipeline).parse_next(input)? {
         ws.parse_next(input)?;
@@ -648,6 +674,35 @@ mod tests {
         assert!(matches!(&cmd.words[1].0[0], WordPart::ProcSub(_)));
     }
     #[test]
+    fn comment_only() {
+        let s = p("# just a comment");
+        assert!(s.0.is_empty());
+    }
+    #[test]
+    fn comment_before_command() {
+        let s = p("# comment\necho hello");
+        assert_eq!(words(&s), ["echo", "hello"]);
+    }
+    #[test]
+    fn inline_comment() {
+        let s = p("echo hello # this is a comment");
+        assert_eq!(words(&s), ["echo", "hello"]);
+    }
+    #[test]
+    fn comment_between_commands() {
+        let s = p("echo hello\n# middle comment\necho world");
+        assert_eq!(s.0.len(), 2);
+    }
+    #[test]
+    fn comment_after_semicolon() {
+        let s = p("echo hello; # comment\necho world");
+        assert_eq!(s.0.len(), 2);
+    }
+    #[test]
+    fn comment_in_for_loop() {
+        assert!(parse("for x in 1 2; do\n# loop body\necho $x\ndone").is_some());
+    }
+    #[test]
     fn quoted_redirect_in_echo() {
         let s = p("echo 'greater > than' test");
         let cmd = simple(&s);
@@ -697,6 +752,10 @@ mod tests {
             "diff <(sort a.txt) <(sort b.txt)",
             "comm -23 file.txt <(sort other.txt)",
             "cat <(echo hello)",
+            "# comment only",
+            "# comment\necho hello",
+            "echo hello # inline comment",
+            "echo one\n# between\necho two",
             "! echo hello", "! test -f foo",
             "echo for; echo done; echo if; echo fi",
         ];
