@@ -1,0 +1,116 @@
+[[command]]
+name = "zellij"
+description = "Terminal multiplexer written in Rust. list-sessions, list-aliases, watch, subscribe, setup, and convert-* are read-only. attach creates/connects to sessions. run and action new-pane execute arbitrary shell commands. edit launches $EDITOR. plugin loads WebAssembly plugins from URLs (including remote HTTP). action send-keys/write/write-chars/paste inject input into panes, which can trigger command execution. The web subcommand starts an HTTP server exposing sessions. kill-session/delete-session destroy sessions. Actively maintained with roughly quarterly releases."
+url = "https://zellij.dev/"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list-sessions"
+standalone = [
+    "--help", "--no-formatting", "--reverse", "--short",
+    "-h", "-n", "-r", "-s",
+]
+
+[[command.sub]]
+name = "ls"
+standalone = [
+    "--help", "--no-formatting", "--reverse", "--short",
+    "-h", "-n", "-r", "-s",
+]
+
+[[command.sub]]
+name = "list-aliases"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "la"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "setup"
+standalone = [
+    "--check", "--clean", "--help",
+    "-h",
+]
+valued = [
+    "--dump-config", "--dump-layout", "--dump-plugins",
+    "--dump-swap-layout",
+    "--generate-auto-start", "--generate-completion",
+]
+
+[[command.sub]]
+name = "convert-config"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "convert-layout"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "convert-theme"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "watch"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "w"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "subscribe"
+bare = false
+standalone = ["--ansi", "--help", "-h"]
+valued = ["--format", "--pane-id", "--scrollback", "-f", "-p", "-s"]
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "plugin"
+candidate = true
+
+[[command.sub]]
+name = "pipe"
+candidate = true
+
+[[command.sub]]
+name = "attach"
+candidate = true
+
+[[command.sub]]
+name = "kill-session"
+candidate = true
+
+[[command.sub]]
+name = "kill-all-sessions"
+candidate = true
+
+[[command.sub]]
+name = "delete-session"
+candidate = true
+
+[[command.sub]]
+name = "delete-all-sessions"
+candidate = true
+
+[[command.sub]]
+name = "options"
+candidate = true
+
+[[command.sub]]
+name = "web"
+candidate = true
+
+[[command.sub]]
+name = "action"
+candidate = true

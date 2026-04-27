@@ -4538,6 +4538,22 @@ Aliases: `gzcat`
 - Allowed standalone flags: -V, -f, -h, -q, -v, --force, --help, --quiet, --verbose, --version
 - Bare invocation allowed
 
+### `zellij`
+<p class="cmd-url"><a href="https://zellij.dev/">https://zellij.dev/</a></p>
+
+- **convert-config**: Flags: --help, -h
+- **convert-layout**: Flags: --help, -h
+- **convert-theme**: Flags: --help, -h
+- **la**: Flags: --help, -h
+- **list-aliases**: Flags: --help, -h
+- **list-sessions**: Flags: --help, --no-formatting, --reverse, --short, -h, -n, -r, -s
+- **ls**: Flags: --help, --no-formatting, --reverse, --short, -h, -n, -r, -s
+- **setup**: Flags: --check, --clean, --help, -h. Valued: --dump-config, --dump-layout, --dump-plugins, --dump-swap-layout, --generate-auto-start, --generate-completion
+- **subscribe**: Flags: --ansi, --help, -h. Valued: --format, --pane-id, --scrollback, -f, -p, -s
+- **w**: Flags: --help, -h
+- **watch**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `zf`
 <p class="cmd-url"><a href="https://github.com/natecraddock/zf">https://github.com/natecraddock/zf</a></p>
 
