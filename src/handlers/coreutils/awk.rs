@@ -46,9 +46,40 @@ fn has_redirect(code: &str) -> bool {
     false
 }
 
+fn has_dangerous_getline(code: &str) -> bool {
+    let mut search = code;
+    while let Some(pos) = search.find("getline") {
+        let after = &search[pos + 7..];
+        let after_trimmed = after.trim_start();
+        let skip_var = if !after_trimmed.is_empty()
+            && after_trimmed.as_bytes()[0].is_ascii_alphabetic()
+        {
+            let var_end = after_trimmed
+                .find(|c: char| !c.is_ascii_alphanumeric() && c != '_')
+                .unwrap_or(after_trimmed.len());
+            after_trimmed[var_end..].trim_start()
+        } else {
+            after_trimmed
+        };
+        if skip_var.starts_with('<') {
+            return true;
+        }
+        let before = &code[..search.as_ptr() as usize - code.as_ptr() as usize + pos];
+        let before_trimmed = before.trim_end();
+        if before_trimmed.ends_with('|') {
+            return true;
+        }
+        search = &search[pos + 7..];
+    }
+    false
+}
+
 fn awk_has_dangerous_construct(token: &Token) -> bool {
     let code = token.content_outside_double_quotes();
-    if code.contains("system") || code.contains("getline") {
+    if code.contains("system") {
+        return true;
+    }
+    if has_dangerous_getline(&code) {
         return true;
     }
     let stripped = strip_regex_literals(&code);
@@ -147,6 +178,10 @@ mod tests {
         awk_regex_pipe_in_char_class: "awk '/[|&]/ {print}' file.txt",
         awk_regex_mixed_with_math: "awk '/error|warn/ {c++} END{print c>=0 ? c : 0}' log.txt",
         awk_no_program_just_flag: "awk --version",
+        awk_getline_plain: "awk '/pattern/{getline; print}' file",
+        awk_getline_var: "awk '/pattern/{getline line; print line}' file",
+        awk_getline_next_record: "awk 'NR%2==1{first=$0; getline; print first, $0}' file",
+        awk_getline_print_nr: "awk '/pattern/{getline; print NR\": \"$0}' file",
         awk_comparison_gt: "awk 'length > 80' file.txt",
         awk_comparison_gt_print: "awk 'length > 80 {print}' file.txt",
         awk_comparison_nr_gt: "awk 'NR > 5' file.txt",
@@ -170,7 +205,7 @@ mod tests {
         awk_system_trailing_help_denied: "awk 'BEGIN{system(\"rm\")}' --help",
         awk_system_trailing_version_denied: "awk 'BEGIN{system(\"rm\")}' --version",
         awk_system_between_division_denied: "awk '{x=1/2;system(\"rm\");y=3/4}' file",
-        awk_getline_in_regex_context_denied: "awk '/foo/ {getline; print}' file",
+        awk_getline_from_file_denied: "awk '{getline line < \"input.txt\"; print line}' file",
         awk_getline_from_cmd_denied: "awk 'BEGIN{cmd=\"date\"; cmd | getline d; print d}'",
         awk_pipe_bare_denied: "awk '{cmd=\"sort\"; print $0 | cmd}' file",
         awk_redirect_bare_var_denied: "awk '{f=\"out.txt\"; print $0 > f}' file",
