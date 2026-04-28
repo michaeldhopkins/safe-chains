@@ -12,7 +12,7 @@ Download signed, notarized binaries from [GitHub Releases](https://github.com/mi
 
 ```bash
 curl -L https://github.com/michaeldhopkins/safe-chains/releases/latest/download/safe-chains-aarch64-apple-darwin.tar.gz | tar xz
-mv safe-chains ~/.cargo/bin/
+mv safe-chains /usr/local/bin/   # or anywhere in your PATH
 ```
 
 ## With Cargo
