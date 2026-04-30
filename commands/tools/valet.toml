@@ -1,0 +1,120 @@
+[[command]]
+name = "valet"
+description = "Laravel Valet — macOS-only dev environment that runs nginx, dnsmasq, and PHP via Homebrew services. Several subcommands are read-only inspection (status, links, paths, which, diagnose, log, on-latest-version, php-versions, isolated, parked). Daemon control (start, stop, restart) toggles host-wide brew services without touching config. Other subcommands modify config files in ~/.config/valet (park, link, unlink, forget, isolate, secure, unsecure, tld, loopback). use swaps the host PHP version. share runs ngrok and exposes local sites to the public internet. trust modifies the sudoers file. install bootstraps the entire stack. Releases roughly twice a year tracking Laravel."
+url = "https://laravel.com/docs/12.x/valet"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "list"
+positional_style = true
+standalone = ["--help", "--raw", "-h"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "links"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "paths"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "parked"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "isolated"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "which"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "diagnose"
+standalone = ["--help", "--ignore-output", "--plain", "-h"]
+
+[[command.sub]]
+name = "log"
+positional_style = true
+standalone = ["--help", "-f", "-h"]
+
+[[command.sub]]
+name = "on-latest-version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "php-versions"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "park"
+candidate = true
+
+[[command.sub]]
+name = "forget"
+candidate = true
+
+[[command.sub]]
+name = "link"
+candidate = true
+
+[[command.sub]]
+name = "unlink"
+candidate = true
+
+[[command.sub]]
+name = "isolate"
+candidate = true
+
+[[command.sub]]
+name = "unisolate"
+candidate = true
+
+[[command.sub]]
+name = "secure"
+candidate = true
+
+[[command.sub]]
+name = "unsecure"
+candidate = true
+
+[[command.sub]]
+name = "tld"
+candidate = true
+
+[[command.sub]]
+name = "loopback"
+candidate = true
+
+[[command.sub]]
+name = "renew"
+candidate = true
+
+[[command.sub]]
+name = "use"
+candidate = true
+
+[[command.sub]]
+name = "share"
+candidate = true
+
+[[command.sub]]
+name = "trust"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
