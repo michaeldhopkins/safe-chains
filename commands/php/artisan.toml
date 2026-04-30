@@ -89,6 +89,26 @@ standalone = ["--help", "-h"]
 valued = ["--queue"]
 
 [[command.sub]]
+name = "view:clear"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config:clear"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "route:clear"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "event:clear"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
 name = "test"
 level = "SafeRead"
 standalone = [
