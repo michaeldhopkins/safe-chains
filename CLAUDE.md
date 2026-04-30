@@ -50,7 +50,7 @@ The bump level reflects the highest-impact change in the batch:
 
 We are not ready for major bumps yet.
 
-Apply the bump in the final commit of the stack (or as a dedicated `chore: bump version to X.Y.Z` commit at the end). Run `cargo check` after bumping so `Cargo.lock` matches before pushing — CI uses `--locked`.
+Fold the bump into the final feat/fix/refactor commit of the stack — do not create a separate `chore: bump version` commit. Run `cargo check` after bumping so `Cargo.lock` matches before pushing — CI uses `--locked`.
 
 ## Development
 
