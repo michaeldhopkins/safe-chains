@@ -4289,6 +4289,23 @@ Aliases: `traceroute6`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `valet`
+<p class="cmd-url"><a href="https://laravel.com/docs/12.x/valet">https://laravel.com/docs/12.x/valet</a></p>
+
+- **diagnose**: Flags: --help, --ignore-output, --plain, -h
+- **help**: Positional args accepted
+- **isolated**: Flags: --help, -h
+- **links**: Flags: --help, -h
+- **list**: Flags: --help, --raw, -h. Valued: --format. Positional args accepted
+- **log**: Flags: --help, -f, -h. Positional args accepted
+- **on-latest-version**: Flags: --help, -h
+- **parked**: Flags: --help, -h
+- **paths**: Flags: --help, -h
+- **php-versions**: Flags: --help, -h
+- **status**: Flags: --help, -h
+- **which**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `vercel`
 <p class="cmd-url"><a href="https://vercel.com/docs/cli">https://vercel.com/docs/cli</a></p>
 

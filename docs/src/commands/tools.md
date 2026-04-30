@@ -555,6 +555,23 @@ Aliases: `python`
 - Requires --help, --noEmit, --version, -h, -v. - Allowed standalone flags: --allowJs, --checkJs, --esModuleInterop, --forceConsistentCasingInFileNames, --help, --incremental, --isolatedModules, --noEmit, --noFallthroughCasesInSwitch, --noImplicitAny, --noImplicitReturns, --noUnusedLocals, --noUnusedParameters, --pretty, --resolveJsonModule, --skipLibCheck, --strict, --strictNullChecks, --version, -h, -v
 - Allowed valued flags: --baseUrl, --jsx, --lib, --module, --moduleResolution, --project, --rootDir, --target
 
+### `valet`
+<p class="cmd-url"><a href="https://laravel.com/docs/12.x/valet">https://laravel.com/docs/12.x/valet</a></p>
+
+- **diagnose**: Flags: --help, --ignore-output, --plain, -h
+- **help**: Positional args accepted
+- **isolated**: Flags: --help, -h
+- **links**: Flags: --help, -h
+- **list**: Flags: --help, --raw, -h. Valued: --format. Positional args accepted
+- **log**: Flags: --help, -f, -h. Positional args accepted
+- **on-latest-version**: Flags: --help, -h
+- **parked**: Flags: --help, -h
+- **paths**: Flags: --help, -h
+- **php-versions**: Flags: --help, -h
+- **status**: Flags: --help, -h
+- **which**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `watchexec`
 <p class="cmd-url"><a href="https://watchexec.github.io/">https://watchexec.github.io/</a></p>
 
