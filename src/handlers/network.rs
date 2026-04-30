@@ -9,14 +9,14 @@ static CURL_SAFE_STANDALONE: WordSet = WordSet::new(&[
 ]);
 
 static CURL_SAFE_VALUED: WordSet = WordSet::new(&[
-    "--connect-timeout", "--max-time", "--write-out",
-    "-m", "-w",
+    "--connect-timeout", "--max-time", "--user-agent", "--write-out",
+    "-A", "-m", "-w",
 ]);
 
 static CURL_SAFE_METHODS: WordSet = WordSet::new(&["GET", "HEAD", "OPTIONS"]);
 
 const CURL_STANDALONE_SHORT: &[u8] = b"46ILNOSfgksv";
-const CURL_VALUED_SHORT: &[u8] = b"mow";
+const CURL_VALUED_SHORT: &[u8] = b"Amow";
 
 fn is_safe_method(method: &str) -> bool {
     CURL_SAFE_METHODS.contains(&method.to_ascii_uppercase())
@@ -240,6 +240,10 @@ mod tests {
         curl_header_github_api: "curl -s https://api.github.com -H 'X-GitHub-Api-Version: 2022-11-28'",
         curl_header_eq: "curl -s https://example.com --header='Accept: text/html'",
         curl_multiple_headers: "curl -s https://example.com -H 'Accept: text/html' -H 'User-Agent: Bot'",
+        curl_user_agent_short: "curl -A 'Mozilla/5.0' https://example.com",
+        curl_user_agent_long: "curl --user-agent 'Mozilla/5.0' https://example.com",
+        curl_user_agent_eq: "curl --user-agent='Mozilla/5.0' https://example.com",
+        curl_user_agent_combined: "curl -sLA 'Mozilla/5.0' --max-time 15 https://example.com",
     }
 
     denied! {
@@ -253,7 +257,6 @@ mod tests {
         curl_header_method_override: "curl -H 'X-HTTP-Method-Override: DELETE' https://example.com",
         curl_header_transfer_encoding: "curl -H 'Transfer-Encoding: chunked' https://example.com",
         curl_header_no_colon: "curl -H 'BadHeader' https://example.com",
-        curl_user_agent: "curl -A CustomBot https://example.com",
         curl_cookie_flag: "curl -b 'session=abc' https://example.com",
         curl_user: "curl -u admin:pass https://example.com",
         curl_referer_flag: "curl -e 'https://evil.com' https://example.com",
