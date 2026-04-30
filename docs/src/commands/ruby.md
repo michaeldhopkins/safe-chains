@@ -5,7 +5,7 @@
 
 - **check**: Flags: --dry-run, --help, -h. Valued: --gemfile, --path
 - **info**: Flags: --help, --path, -h
-- **install**: Flags: --help, -h
+- **install**: Flags: --clean, --deployment, --frozen, --full-index, --help, --local, --no-cache, --no-prune-sources, --prefer-local, --quiet, --redownload, --system, -h. Valued: --gemfile, --jobs, --path, --retry, --standalone, --trust-policy, --with, --without, -j
 - **list**: Flags: --help, --name-only, --paths, -h
 - **show**: Flags: --help, --paths, -h
 - Allowed standalone flags: --help, --version, -V, -h
