@@ -9,6 +9,67 @@ pub fn check_git_remote(tokens: &[Token]) -> Verdict {
     if tokens.get(1).is_none_or(|a| !GIT_REMOTE_MUTATING.contains(a)) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
 }
 
+static GIT_C_KV_EXACT: WordSet = WordSet::new(&[
+    "core.askPass=",
+    "core.askPass=false",
+    "core.askpass=",
+    "core.askpass=false",
+    "core.pager=cat",
+    "core.pager=less",
+    "credential.helper=",
+    "http.sslVerify=false",
+    "http.sslVerify=true",
+    "http.sslverify=false",
+    "http.sslverify=true",
+    "init.defaultBranch=main",
+    "init.defaultBranch=master",
+    "init.defaultBranch=trunk",
+]);
+
+fn is_safe_git_c_kv(kv: &str) -> bool {
+    if GIT_C_KV_EXACT.contains(kv) {
+        return true;
+    }
+    let Some((key, _)) = kv.split_once('=') else {
+        return false;
+    };
+    let key_lc = key.to_ascii_lowercase();
+    matches!(key_lc.as_str(), "safe.directory")
+        || key_lc.starts_with("advice.")
+        || key_lc.starts_with("color.")
+}
+
+pub fn is_safe_git(tokens: &[Token]) -> Verdict {
+    let mut filtered: Vec<Token> = Vec::with_capacity(tokens.len());
+    if let Some(t) = tokens.first() {
+        filtered.push(t.clone());
+    } else {
+        return Verdict::Denied;
+    }
+    let mut i = 1;
+    let mut saw_c = false;
+    while i < tokens.len() {
+        let t = &tokens[i];
+        if t == "-c" {
+            let Some(next) = tokens.get(i + 1) else {
+                return Verdict::Denied;
+            };
+            if !is_safe_git_c_kv(next.as_str()) {
+                return Verdict::Denied;
+            }
+            saw_c = true;
+            i += 2;
+            continue;
+        }
+        filtered.push(t.clone());
+        i += 1;
+    }
+    if !saw_c {
+        return crate::registry::toml_dispatch(tokens).unwrap_or(Verdict::Denied);
+    }
+    crate::registry::toml_dispatch(&filtered).unwrap_or(Verdict::Denied)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::is_safe_command;
@@ -70,6 +131,19 @@ mod tests {
         git_merge_base_all: "git merge-base --all HEAD main",
         git_c_flag: "git -C /some/repo diff --stat",
         git_c_nested: "git -C /some/repo -C nested log",
+        git_config_askpass_disable: "git -c core.askPass=false ls-remote https://github.com/foo/bar",
+        git_config_askpass_empty: "git -c core.askPass= ls-remote https://github.com/foo/bar",
+        git_config_askpass_lower: "git -c core.askpass=false fetch origin",
+        git_config_credential_helper_empty: "git -c credential.helper= ls-remote origin",
+        git_config_safe_directory: "git -c safe.directory=/repo status",
+        git_config_safe_directory_star: "git -c safe.directory=* log",
+        git_config_advice: "git -c advice.detachedHead=false log HEAD",
+        git_config_color_ui: "git -c color.ui=never status",
+        git_config_pager_cat: "git -c core.pager=cat log",
+        git_config_sslverify_false: "git -c http.sslVerify=false fetch origin",
+        git_config_init_default_branch: "git -c init.defaultBranch=main ls-remote origin",
+        git_config_multiple_c: "git -c core.askPass=false -c credential.helper= ls-remote origin",
+        git_config_c_with_C: "git -C /repo -c core.askPass=false log",
         git_remote_bare: "git remote",
         git_remote_v: "git remote -v",
         git_remote_get_url: "git remote get-url origin",
@@ -137,6 +211,12 @@ mod tests {
         git_remote_remove_denied: "git remote remove upstream",
         git_remote_rename_denied: "git remote rename origin upstream",
         git_config_flag_denied: "git -c user.name=foo log",
+        git_config_editor_denied: "git -c core.editor=vim commit",
+        git_config_ssh_command_denied: "git -c core.sshCommand=evil ls-remote origin",
+        git_config_alias_denied: "git -c alias.evil=push log",
+        git_config_hooks_path_denied: "git -c core.hooksPath=/tmp log",
+        git_config_pager_arbitrary_denied: "git -c core.pager=evil log",
+        git_config_no_value_denied: "git -c log",
         git_help_bypass_denied: "git push -- --help",
     }
 }

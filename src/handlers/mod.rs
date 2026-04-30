@@ -72,6 +72,7 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
         .or_else(|| perl::dispatch(cmd, tokens))
         .or_else(|| coreutils::dispatch(cmd, tokens))
         .or_else(|| fuzzy::dispatch(cmd, tokens))
+        .or_else(|| vcs::dispatch(cmd, tokens))
         .or_else(|| crate::registry::toml_dispatch(tokens))
         .unwrap_or(Verdict::Denied)
 }
@@ -174,6 +175,7 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     docs.extend(fuzzy::command_docs());
     docs.extend(shell::command_docs());
     docs.extend(wrappers::command_docs());
+    docs.extend(vcs::command_docs());
     docs.extend(crate::registry::toml_command_docs());
     docs
 }
