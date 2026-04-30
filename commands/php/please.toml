@@ -30,20 +30,216 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "stache:warm"
-candidate = true
+level = "SafeWrite"
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "stache:refresh"
-candidate = true
+level = "SafeWrite"
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "static:warm"
-candidate = true
+level = "SafeWrite"
+standalone = ["--help", "--insecure", "--queue", "--uncached", "-h"]
+valued = ["--exclude", "--include", "--max-depth", "--max-requests"]
 
 [[command.sub]]
-name = "assets:generate-presets"
-candidate = true
+name = "stache:doctor"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "static:recache-token"
+standalone = ["--help", "--raw", "-h"]
+
+[[command.sub]]
+name = "support:details"
+standalone = ["--help", "--json", "-h"]
+valued = ["--only"]
+
+[[command.sub]]
+name = "flat:camp"
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "assets:meta"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "assets:meta-clean"
+level = "SafeWrite"
+standalone = ["--dry-run", "--help", "-h"]
+
+[[command.sub]]
+name = "assets:clear-cache"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "assets:generate-presets"
+level = "SafeWrite"
+standalone = ["--help", "--queue", "-h"]
+valued = ["--excluded-containers"]
+
+[[command.sub]]
+name = "addons:discover"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "auth:migration"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+valued = ["--path"]
+
+[[command.sub]]
+name = "nocache:migration"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+valued = ["--path"]
+
+[[command.sub]]
+name = "setup-cp-vite"
+level = "SafeWrite"
+standalone = ["--help", "--only-necessary", "-h"]
+
+[[command.sub]]
+name = "support:zip-blueprint"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "starter-kit:init"
+level = "SafeWrite"
+standalone = ["--force", "--help", "--updatable", "-h"]
+valued = ["--description", "--name"]
+
+[[command.sub]]
+name = "starter-kit:export"
+level = "SafeWrite"
+bare = false
+standalone = ["--clear", "--help", "-h"]
+
+[[command.sub]]
+name = "make:action"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "make:addon"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "make:dictionary"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "make:fieldtype"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "make:filter"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "make:modifier"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "make:scope"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "make:tag"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "make:widget"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "migrate-dates-to-utc"
+candidate = true
+
+[[command.sub]]
+name = "multisite"
+candidate = true
+
+[[command.sub]]
+name = "eloquent:import-groups"
+candidate = true
+
+[[command.sub]]
+name = "eloquent:import-roles"
+candidate = true
+
+[[command.sub]]
+name = "eloquent:import-users"
+candidate = true
+
+[[command.sub]]
+name = "install:collaboration"
+candidate = true
+
+[[command.sub]]
+name = "install:eloquent-driver"
+candidate = true
+
+[[command.sub]]
+name = "install:ssg"
+candidate = true
+
+[[command.sub]]
+name = "license:set"
+candidate = true
+
+[[command.sub]]
+name = "make:user"
+candidate = true
+
+[[command.sub]]
+name = "pro:enable"
+candidate = true
+
+[[command.sub]]
+name = "search:insert"
+candidate = true
+
+[[command.sub]]
+name = "search:update"
+candidate = true
+
+[[command.sub]]
+name = "site:clear"
+candidate = true
+
+[[command.sub]]
+name = "starter-kit:install"
+candidate = true
+
+[[command.sub]]
+name = "updates:run"
 candidate = true

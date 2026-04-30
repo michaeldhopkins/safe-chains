@@ -95,10 +95,37 @@
 ### `please`
 <p class="cmd-url"><a href="https://statamic.dev/cli">https://statamic.dev/cli</a></p>
 
+- **addons:discover**: Flags: --help, -h
+- **assets:clear-cache**: Flags: --help, -h
+- **assets:generate-presets**: Flags: --help, --queue, -h. Valued: --excluded-containers
+- **assets:meta**: Flags: --help, -h
+- **assets:meta-clean**: Flags: --dry-run, --help, -h
+- **auth:migration**: Flags: --help, -h. Valued: --path
+- **flat:camp**: Flags: --help, -h
 - **glide:clear**: Flags: --help, -h
 - **help**: Positional args accepted
 - **list**: Flags: --help, --raw, -h. Valued: --format
+- **make:action**: Flags: --force, --help, -h
+- **make:addon**: Flags: --force, --help, -h
+- **make:dictionary**: Flags: --force, --help, -h
+- **make:fieldtype**: Flags: --force, --help, -h
+- **make:filter**: Flags: --force, --help, -h
+- **make:modifier**: Flags: --force, --help, -h
+- **make:scope**: Flags: --force, --help, -h
+- **make:tag**: Flags: --force, --help, -h
+- **make:widget**: Flags: --force, --help, -h
+- **nocache:migration**: Flags: --help, -h. Valued: --path
+- **setup-cp-vite**: Flags: --help, --only-necessary, -h
 - **stache:clear**: Flags: --help, -h
+- **stache:doctor**: Flags: --help, -h
+- **stache:refresh**: Flags: --help, -h
+- **stache:warm**: Flags: --help, -h
+- **starter-kit:export**: Flags: --clear, --help, -h
+- **starter-kit:init**: Flags: --force, --help, --updatable, -h. Valued: --description, --name
 - **static:clear**: Flags: --help, -h
+- **static:recache-token**: Flags: --help, --raw, -h
+- **static:warm**: Flags: --help, --insecure, --queue, --uncached, -h. Valued: --exclude, --include, --max-depth, --max-requests
+- **support:details**: Flags: --help, --json, -h. Valued: --only
+- **support:zip-blueprint**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
