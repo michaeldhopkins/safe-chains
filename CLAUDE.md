@@ -28,7 +28,7 @@ Regenerates COMMANDS.md, builds and deploys the documentation site, and updates 
 
 ## Commits
 
-One logical change per commit. Each commit gets its own semver bump. Do not batch unrelated changes into one commit — we publish detailed changelogs and each entry should describe a single thing.
+One logical change per commit. Do not batch unrelated changes into one commit — we publish detailed changelogs and each entry should describe a single thing.
 
 Examples of one commit:
 - Adding a new command (TOML + HANDLED_CMDS + tests)
@@ -40,7 +40,17 @@ Examples of what should NOT be one commit:
 - Adding a new command AND fixing an unrelated bug
 - Refactoring a handler AND adding missing flags to a different command
 
-Bump the version in `Cargo.toml` with each commit using semver: patch for bug fixes, minor for new commands/features, major for breaking changes.
+## Versioning
+
+One version bump per release (i.e. per push), not per commit. A "release" is the batch of commits being pushed together; intermediate commits in the stack must not bump `Cargo.toml`.
+
+The bump level reflects the highest-impact change in the batch:
+- **patch** if every commit in the batch is a bug fix
+- **minor** if any commit adds a new command, flag, or feature
+
+We are not ready for major bumps yet.
+
+Apply the bump in the final commit of the stack (or as a dedicated `chore: bump version to X.Y.Z` commit at the end). Run `cargo check` after bumping so `Cargo.lock` matches before pushing — CI uses `--locked`.
 
 ## Development
 
