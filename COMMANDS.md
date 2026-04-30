@@ -3263,6 +3263,16 @@ Aliases: `pip3`
 - Requires --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist. - Allowed standalone flags: --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist, --regexp, --help, -h
 - Allowed valued flags: --volume
 
+### `please`
+<p class="cmd-url"><a href="https://statamic.dev/cli">https://statamic.dev/cli</a></p>
+
+- **glide:clear**: Flags: --help, -h
+- **help**: Positional args accepted
+- **list**: Flags: --help, --raw, -h. Valued: --format
+- **stache:clear**: Flags: --help, -h
+- **static:clear**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `plutil`
 <p class="cmd-url"><a href="https://ss64.com/mac/plutil.html">https://ss64.com/mac/plutil.html</a></p>
 

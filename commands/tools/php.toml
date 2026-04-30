@@ -11,3 +11,7 @@ bare_flags = [
 [[command.sub]]
 name = "artisan"
 delegate_skip = 0
+
+[[command.sub]]
+name = "please"
+delegate_skip = 0

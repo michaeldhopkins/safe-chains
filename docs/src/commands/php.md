@@ -92,3 +92,13 @@
 - Allowed valued flags: --bootstrap, --cache-directory, --colors, --columns, --configuration, --coverage-clover, --coverage-cobertura, --coverage-crap4j, --coverage-filter, --coverage-html, --coverage-openclover, --coverage-php, --coverage-text, --coverage-xml, --covers, --default-time-limit, --diff-context, --exclude-filter, --exclude-group, --exclude-testsuite, --extension, --filter, --generate-baseline, --group, --include-path, --log-events-text, --log-events-verbose-text, --log-junit, --log-otr, --log-teamcity, --order-by, --random-order-seed, --requires-php-extension, --run-test-id, --test-suffix, --testdox-html, --testdox-text, --testsuite, --use-baseline, --uses, -c, -d
 - Bare invocation allowed
 
+### `please`
+<p class="cmd-url"><a href="https://statamic.dev/cli">https://statamic.dev/cli</a></p>
+
+- **glide:clear**: Flags: --help, -h
+- **help**: Positional args accepted
+- **list**: Flags: --help, --raw, -h. Valued: --format
+- **stache:clear**: Flags: --help, -h
+- **static:clear**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
