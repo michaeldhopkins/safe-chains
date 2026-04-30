@@ -20,7 +20,17 @@ handler = "bundle_exec"
 [[command.sub]]
 name = "install"
 level = "SafeWrite"
-standalone = ["--help", "-h"]
+standalone = [
+    "--clean", "--deployment", "--frozen", "--full-index",
+    "--help", "--local", "--no-cache", "--no-prune-sources",
+    "--prefer-local", "--quiet", "--redownload", "--system",
+    "-h",
+]
+valued = [
+    "--gemfile", "--jobs", "--path", "--retry",
+    "--standalone", "--trust-policy", "--with", "--without",
+    "-j",
+]
 
 [[command.sub]]
 name = "info"
