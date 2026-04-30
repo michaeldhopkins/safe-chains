@@ -386,7 +386,7 @@ Aliases: `g++`, `cc`, `c++`
 ### `php`
 <p class="cmd-url"><a href="https://www.php.net/manual/en/features.commandline.options.php">https://www.php.net/manual/en/features.commandline.options.php</a></p>
 
-- Allowed standalone flags: --help, --version, -h, -v
+- Allowed standalone flags: --help, --info, --ini, --modules, --version, -h, -i, -m, -v
 
 ### `prettier`
 <p class="cmd-url"><a href="https://prettier.io/docs/en/cli.html">https://prettier.io/docs/en/cli.html</a></p>

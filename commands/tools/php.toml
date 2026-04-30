@@ -1,9 +1,12 @@
 [[command]]
 name = "php"
-description = "PHP language interpreter. With no script file or code arguments, only --help and --version are exposed here, making it purely informational. The interpreter can execute arbitrary code when given a file or -r flag, so restricting to version/help queries eliminates the execution surface. PHP follows a predictable annual release cycle."
+description = "PHP language interpreter. With no script file or code arguments, only informational flags are exposed here (--help, --version, -m/--modules to list compiled extensions, -i/--info to print phpinfo, --ini to show .ini files in use), making the bare invocation purely diagnostic. The interpreter can execute arbitrary code when given a file or -r flag, so restricting to version/help/inspection queries eliminates the execution surface. PHP follows a predictable annual release cycle."
 url = "https://www.php.net/manual/en/features.commandline.options.php"
 bare = false
-bare_flags = ["--help", "--version", "-h", "-v"]
+bare_flags = [
+    "--help", "--info", "--ini", "--modules", "--version",
+    "-h", "-i", "-m", "-v",
+]
 
 [[command.sub]]
 name = "artisan"
