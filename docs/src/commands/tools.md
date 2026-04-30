@@ -568,7 +568,10 @@ Aliases: `python`
 - **parked**: Flags: --help, -h
 - **paths**: Flags: --help, -h
 - **php-versions**: Flags: --help, -h
+- **restart**: Flags: --help, -h. Positional args accepted
+- **start**: Flags: --help, -h. Positional args accepted
 - **status**: Flags: --help, -h
+- **stop**: Flags: --help, -h. Positional args accepted
 - **which**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 

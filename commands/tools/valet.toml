@@ -56,6 +56,24 @@ name = "php-versions"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
+name = "start"
+level = "SafeWrite"
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "stop"
+level = "SafeWrite"
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "restart"
+level = "SafeWrite"
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
 name = "park"
 candidate = true
 

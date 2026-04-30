@@ -401,6 +401,10 @@ safe! {
     valet_php_versions: "valet php-versions",
     valet_on_latest_version: "valet on-latest-version",
     valet_list: "valet list",
+    valet_start: "valet start",
+    valet_stop: "valet stop",
+    valet_restart: "valet restart",
+    valet_restart_service: "valet restart nginx",
     artisan_bare: "artisan about",
     artisan_route_list: "artisan route:list --json",
 
