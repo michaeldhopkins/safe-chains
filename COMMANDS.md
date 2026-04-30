@@ -3197,7 +3197,7 @@ Aliases: `ionice`
 ### `php`
 <p class="cmd-url"><a href="https://www.php.net/manual/en/features.commandline.options.php">https://www.php.net/manual/en/features.commandline.options.php</a></p>
 
-- Allowed standalone flags: --help, --version, -h, -v
+- Allowed standalone flags: --help, --info, --ini, --modules, --version, -h, -i, -m, -v
 
 ### `phpstan`
 <p class="cmd-url"><a href="https://phpstan.org/user-guide/command-line-usage">https://phpstan.org/user-guide/command-line-usage</a></p>

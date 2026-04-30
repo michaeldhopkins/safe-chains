@@ -366,6 +366,11 @@ safe! {
     basecamp_commands: "basecamp commands --json",
 
     php_version: "php -v",
+    php_modules: "php -m",
+    php_modules_long: "php --modules",
+    php_info: "php -i",
+    php_info_long: "php --info",
+    php_ini: "php --ini",
     php_artisan_about: "php artisan about",
     php_artisan_about_json: "php artisan about --json",
     php_artisan_route_list: "php artisan route:list",
