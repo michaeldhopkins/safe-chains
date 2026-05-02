@@ -1,6 +1,6 @@
 [[command]]
 name = "please"
-description = "Statamic's CLI, an extension of Laravel's Artisan console kernel. Every invocation bootstraps the full Statamic + Laravel application stack (all service providers boot). Read-only commands display information; the *:clear commands delete local files. The Stache (storage/statamic/stache) is Statamic's flat-file content index. Glide is the image transformation cache (storage/statamic/glide by default, but configurable to a cloud disk in config/statamic/assets.php). Static is the rendered-page HTML cache (storage/statamic/static by default, configurable). Statamic ships minor releases every few months and the CLI surface is stable across versions."
+description = "Statamic's CLI, an extension of Laravel's Artisan console kernel. Every invocation bootstraps the full Statamic + Laravel application stack (all service providers boot). Read-only commands display information; the *:clear commands delete local files. The Stache (storage/statamic/stache) is Statamic's flat-file content index. Glide is the image transformation cache (storage/statamic/glide by default, but configurable to a cloud disk in config/statamic/assets.php). Static is the rendered-page HTML cache (storage/statamic/static by default, configurable). Because please inherits Laravel's Artisan kernel, generic Laravel commands like cache:clear are available too — cache:clear flushes the cache store named by --store (or the default in config/cache.php); some stores are local (file, array, null, apc) and others are external services (database, redis, memcached, dynamodb), so the safety depends on which store is targeted. Statamic ships minor releases every few months and the CLI surface is stable across versions."
 url = "https://statamic.dev/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
@@ -12,6 +12,10 @@ valued = ["--format"]
 [[command.sub]]
 name = "help"
 allow_all = true
+
+[[command.sub]]
+name = "cache:clear"
+handler = "laravel_cache_clear"
 
 [[command.sub]]
 name = "stache:clear"
