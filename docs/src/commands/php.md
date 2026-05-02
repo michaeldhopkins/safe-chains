@@ -4,7 +4,7 @@
 <p class="cmd-url"><a href="https://laravel.com/docs/12.x/artisan">https://laravel.com/docs/12.x/artisan</a></p>
 
 - **about**: Flags: --help, --json, -h. Valued: --only
-- **cache:clear**: requires --store with one of file, array, null (matched as `--store=<value>` or `--store <value>`)
+- **cache:clear**: requires the store name to be one of file, array, null — passed as `--store=<store>`, `--store <store>`, or as a positional argument (`cache:clear <store>`)
 - **channel:list**: Flags: --help, -h
 - **completion**: Flags: --help, -h. Positional args accepted
 - **config:clear**: Flags: --help, -h
@@ -102,7 +102,7 @@
 - **assets:meta**: Flags: --help, -h
 - **assets:meta-clean**: Flags: --dry-run, --help, -h
 - **auth:migration**: Flags: --help, -h. Valued: --path
-- **cache:clear**: requires --store with one of file, array, null (matched as `--store=<value>` or `--store <value>`)
+- **cache:clear**: requires the store name to be one of file, array, null — passed as `--store=<store>`, `--store <store>`, or as a positional argument (`cache:clear <store>`)
 - **flat:camp**: Flags: --help, -h
 - **glide:clear**: Flags: --help, -h
 - **help**: Positional args accepted
