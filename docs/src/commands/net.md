@@ -3,7 +3,7 @@
 ### `curl`
 <p class="cmd-url"><a href="https://curl.se/docs/manpage.html">https://curl.se/docs/manpage.html</a></p>
 
-- Allowed standalone flags: --compressed, --fail, --globoff, --head, --insecure, --ipv4, --ipv6, --location, --no-buffer, --no-progress-meter, --show-error, --silent, --verbose, -4, -6, -I, -L, -N, -S, -f, -g, -k, -s, -v.
+- Allowed standalone flags: --compressed, --fail, --globoff, --head, --include, --insecure, --ipv4, --ipv6, --location, --no-buffer, --no-progress-meter, --show-error, --silent, --verbose, -4, -6, -I, -L, -N, -S, -f, -g, -i, -k, -s, -v.
 - Allowed valued flags: --connect-timeout, --max-time, --user-agent, --write-out, -A, -m, -w.
 - Allowed methods (-X/--request): GET, HEAD, OPTIONS.
 - -H/--header allowed with safe headers (Accept, User-Agent, Authorization, Cookie, Cache-Control, Range, etc.).
