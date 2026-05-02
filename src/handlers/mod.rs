@@ -29,6 +29,7 @@ pub mod jvm;
 pub mod network;
 pub mod node;
 pub mod perl;
+pub mod php;
 pub mod ruby;
 pub mod shell;
 pub mod system;
@@ -44,6 +45,7 @@ type HandlerFn = fn(&[Token]) -> Verdict;
 
 pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
     HashMap::from([
+        ("php", php::is_safe_php as HandlerFn),
         ("sysctl", system::sysctl::is_safe_sysctl as HandlerFn),
     ])
 }
@@ -54,6 +56,7 @@ pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
         ("bundle_config", ruby::bundle::check_bundle_config as HandlerFn),
         ("bundle_exec", ruby::bundle::check_bundle_exec as HandlerFn),
         ("git_remote", vcs::git::check_git_remote as HandlerFn),
+        ("laravel_cache_clear", php::check_laravel_cache_clear as HandlerFn),
         ("plutil_convert", system::plutil::check_plutil_convert as HandlerFn),
     ])
 }
