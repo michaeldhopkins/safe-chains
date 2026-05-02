@@ -295,6 +295,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 <p class="cmd-url"><a href="https://laravel.com/docs/12.x/artisan">https://laravel.com/docs/12.x/artisan</a></p>
 
 - **about**: Flags: --help, --json, -h. Valued: --only
+- **cache:clear**: requires --store with one of file, array, null (matched as `--store=<value>` or `--store <value>`)
 - **channel:list**: Flags: --help, -h
 - **completion**: Flags: --help, -h. Positional args accepted
 - **config:clear**: Flags: --help, -h
@@ -816,12 +817,15 @@ Aliases: `@biomejs/biome`
 - **pm hash**: Flags: --help, -h
 - **pm ls**: Flags: --help, -h
 - **test**: Flags: --bail, --help, --only, --rerun-each, --todo, -h. Valued: --preload, --timeout, -t
+- **x**
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `bundle`
 <p class="cmd-url"><a href="https://bundler.io/man/bundle.1.html">https://bundler.io/man/bundle.1.html</a></p>
 
 - **check**: Flags: --dry-run, --help, -h. Valued: --gemfile, --path
+- **config**
+- **exec**
 - **info**: Flags: --help, --path, -h
 - **install**: Flags: --clean, --deployment, --frozen, --full-index, --help, --local, --no-cache, --no-prune-sources, --prefer-local, --quiet, --redownload, --system, -h. Valued: --gemfile, --jobs, --path, --retry, --standalone, --trust-policy, --with, --without, -j
 - **list**: Flags: --help, --name-only, --paths, -h
@@ -1872,6 +1876,7 @@ Aliases: `g++`, `cc`, `c++`
 - **notes show**
 - **pull**: Flags: --all, --allow-unrelated-histories, --append, --autostash, --commit, --compact-summary, --dry-run, --edit, --ff, --ff-only, --force, --help, --ipv4, --ipv6, --keep, --no-autostash, --no-commit, --no-edit, --no-ff, --no-gpg-sign, --no-log, --no-rebase, --no-recurse-submodules, --no-show-forced-updates, --no-signoff, --no-squash, --no-stat, --no-tags, --no-verify, --no-verify-signatures, --progress, --prune, --quiet, --set-upstream, --show-forced-updates, --signoff, --squash, --stat, --tags, --verbose, --verify, --verify-signatures, -4, -6, -a, -e, -f, -h, -k, -n, -p, -q, -t, -v. Valued: --cleanup, --depth, --deepen, --filter, --gpg-sign, --jobs, --log, --rebase, --recurse-submodules, --refmap, --server-option, --shallow-exclude, --shallow-since, --strategy, --strategy-option, --upload-pack, -S, -X, -j, -o, -r, -s
 - **reflog**: Flags: --abbrev-commit, --all, --ancestry-path, --author-date-order, --bisect, --boundary, --branches, --cherry, --cherry-mark, --cherry-pick, --children, --clear-decorations, --compact-summary, --cumulative, --date-order, --dense, --do-walk, --early-output, --first-parent, --follow, --full-diff, --full-history, --graph, --help, --ignore-missing, --invert-grep, --left-only, --left-right, --log-size, --mailmap, --merges, --minimal, --name-only, --name-status, --no-abbrev-commit, --no-color, --no-decorate, --no-expand-tabs, --no-ext-diff, --no-merges, --no-notes, --no-patch, --no-prefix, --no-renames, --no-walk, --numstat, --oneline, --parents, --patch, --patch-with-raw, --patch-with-stat, --patience, --pickaxe-all, --pickaxe-regex, --raw, --reflog, --regexp-ignore-case, --relative-date, --remotes, --reverse, --shortstat, --show-linear-break, --show-notes, --show-pulls, --show-signature, --simplify-by-decoration, --simplify-merges, --source, --sparse, --stat, --stdin, --summary, --tags, --text, --topo-order, --use-mailmap, -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -h, -i, -p, -q, -s, -u. Valued: --abbrev, --after, --author, --before, --color, --committer, --date, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --diff-merges, --encoding, --exclude, --format, --glob, --grep, --max-count, --max-parents, --min-parents, --pretty, --since, --skip, --until, -G, -L, -S, -n
+- **remote**
 - **rev-parse**: Flags: --absolute-git-dir, --all, --branches, --git-common-dir, --git-dir, --git-path, --help, --is-bare-repository, --is-inside-git-dir, --is-inside-work-tree, --is-shallow-repository, --local-env-vars, --quiet, --remotes, --shared-index-path, --show-cdup, --show-prefix, --show-superproject-working-tree, --show-toplevel, --symbolic, --symbolic-full-name, --tags, --verify, -h, -q. Valued: --abbrev-ref, --after, --before, --default, --exclude, --glob, --prefix, --resolve-git-dir, --short, --since, --until. Positional args accepted
 - **shortlog**: Flags: --committer, --email, --help, --numbered, --summary, -c, -e, -h, -n, -s. Valued: --format, --group
 - **show**: Flags: --abbrev-commit, --cc, --color-words, --combined-all-paths, --compact-summary, --cumulative, --expand-tabs, --find-copies, --find-renames, --full-index, --help, --histogram, --ignore-all-space, --ignore-blank-lines, --ignore-space-at-eol, --ignore-space-change, --mailmap, --minimal, --name-only, --name-status, --no-color, --no-ext-diff, --no-notes, --no-patch, --no-prefix, --no-renames, --no-textconv, --numstat, --oneline, --patch, --patch-with-raw, --patch-with-stat, --patience, --pickaxe-all, --pickaxe-regex, --raw, --shortstat, --show-notes, --show-signature, --source, --stat, --summary, --text, --textconv, --use-mailmap, -h, -p, -q, -s, -u, -w. Valued: --abbrev, --color, --color-moved, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --diff-merges, --encoding, --format, --notes, --pretty, --stat-count, --stat-graph-width, --stat-name-width, --submodule, --word-diff, --word-diff-regex, -G, -O, -S
@@ -3201,7 +3206,9 @@ Aliases: `ionice`
 ### `php`
 <p class="cmd-url"><a href="https://www.php.net/manual/en/features.commandline.options.php">https://www.php.net/manual/en/features.commandline.options.php</a></p>
 
-
+- Allowed standalone flags: --help, --info, --ini, --modules, --version, -V, -h, -i, -m, -v
+- Allowed pre-flag: -d <directive>=<value> where <directive> is one of date.timezone, display_errors, error_reporting, max_execution_time, max_input_time, max_input_vars, memory_limit, opcache.enable, opcache.enable_cli, post_max_size, upload_max_filesize
+- Subcommands: artisan, please — matched by exact name or by the basename of an absolute or relative path (e.g. `php /Users/me/project/please stache:clear`)
 
 ### `phpstan`
 <p class="cmd-url"><a href="https://phpstan.org/user-guide/command-line-usage">https://phpstan.org/user-guide/command-line-usage</a></p>
@@ -3272,6 +3279,7 @@ Aliases: `pip3`
 - **assets:meta**: Flags: --help, -h
 - **assets:meta-clean**: Flags: --dry-run, --help, -h
 - **auth:migration**: Flags: --help, -h. Valued: --path
+- **cache:clear**: requires --store with one of file, array, null (matched as `--store=<value>` or `--store <value>`)
 - **flat:camp**: Flags: --help, -h
 - **glide:clear**: Flags: --help, -h
 - **help**: Positional args accepted
@@ -3303,6 +3311,7 @@ Aliases: `pip3`
 ### `plutil`
 <p class="cmd-url"><a href="https://ss64.com/mac/plutil.html">https://ss64.com/mac/plutil.html</a></p>
 
+- **-convert**
 - **-lint**: Flags: --help, -h, -s
 - **-p**: Flags: --help, -h
 - **-type**: Flags: --help, -h
@@ -3945,7 +3954,9 @@ Aliases: `python`
 ### `sysctl`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/sysctl.8.html">https://man7.org/linux/man-pages/man8/sysctl.8.html</a></p>
 
-
+- Allowed standalone flags: --help, -A, -N, -X, -a, -b, -d, -e, -h, -l, -n, -o, -q, -x
+- Allowed valued flags: -B, -r
+- Read-only queries of kernel parameters
 
 ### `system_profiler`
 <p class="cmd-url"><a href="https://ss64.com/mac/system_profiler.html">https://ss64.com/mac/system_profiler.html</a></p>

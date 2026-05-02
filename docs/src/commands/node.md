@@ -10,6 +10,7 @@
 - **pm hash**: Flags: --help, -h
 - **pm ls**: Flags: --help, -h
 - **test**: Flags: --bail, --help, --only, --rerun-each, --todo, -h. Valued: --preload, --timeout, -t
+- **x**
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `bunx`

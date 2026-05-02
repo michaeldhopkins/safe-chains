@@ -40,6 +40,8 @@ pub(super) struct TomlCommand {
     #[serde(default)]
     pub handler: Option<String>,
     #[serde(default)]
+    pub doc_body: Option<String>,
+    #[serde(default)]
     pub require_any: Vec<String>,
     #[serde(default)]
     pub first_arg: Vec<String>,
@@ -102,6 +104,8 @@ pub(super) struct TomlSub {
     pub delegate_skip: Option<usize>,
     #[serde(default)]
     pub handler: Option<String>,
+    #[serde(default)]
+    pub doc_body: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]
@@ -183,6 +187,7 @@ pub(super) enum DispatchKind {
     Custom {
         #[allow(dead_code)]
         handler_name: String,
+        doc_body: Option<String>,
     },
 }
 

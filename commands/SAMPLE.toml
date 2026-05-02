@@ -333,6 +333,26 @@
 # name = "exec"
 # handler = "bundle_exec"                # references Rust handler by name
 
+# When a command (or sub) uses a handler, the auto-generated docs
+# can't introspect the Rust logic, so add a doc_body field with the
+# allowed surface in prose. Markdown bullet lines (lines starting
+# with "- ") are kept as-is; other lines get a "- " prefix added.
+# Follow the documentation style rules: list what is allowed in
+# positive terms; do not say "denied", "blocked", "no flags", etc.
+#
+# [[command]]
+# name = "php"
+# handler = "php"
+# doc_body = """
+# - Allowed standalone flags: --help, --version
+# - Subcommands: artisan, please
+# """
+#
+# [[command.sub]]
+# name = "cache:clear"
+# handler = "laravel_cache_clear"
+# doc_body = "requires --store with one of file, array, null"
+
 # ─────────────────────────────────────────────────────────────────────
 # CANDIDATE — record that a command was considered but not approved
 # ─────────────────────────────────────────────────────────────────────
