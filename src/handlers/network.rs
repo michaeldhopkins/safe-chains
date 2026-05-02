@@ -2,10 +2,10 @@ use crate::parse::{Token, WordSet};
 use crate::verdict::{SafetyLevel, Verdict};
 
 static CURL_SAFE_STANDALONE: WordSet = WordSet::new(&[
-    "--compressed", "--fail", "--globoff", "--head", "--insecure",
+    "--compressed", "--fail", "--globoff", "--head", "--include", "--insecure",
     "--ipv4", "--ipv6", "--location", "--no-buffer", "--no-progress-meter",
     "--show-error", "--silent", "--verbose",
-    "-4", "-6", "-I", "-L", "-N", "-S", "-f", "-g", "-k", "-s", "-v",
+    "-4", "-6", "-I", "-L", "-N", "-S", "-f", "-g", "-i", "-k", "-s", "-v",
 ]);
 
 static CURL_SAFE_VALUED: WordSet = WordSet::new(&[
@@ -15,7 +15,7 @@ static CURL_SAFE_VALUED: WordSet = WordSet::new(&[
 
 static CURL_SAFE_METHODS: WordSet = WordSet::new(&["GET", "HEAD", "OPTIONS"]);
 
-const CURL_STANDALONE_SHORT: &[u8] = b"46ILNOSfgksv";
+const CURL_STANDALONE_SHORT: &[u8] = b"46ILNOSfgiksv";
 const CURL_VALUED_SHORT: &[u8] = b"Amow";
 
 fn is_safe_method(method: &str) -> bool {
@@ -244,6 +244,10 @@ mod tests {
         curl_user_agent_long: "curl --user-agent 'Mozilla/5.0' https://example.com",
         curl_user_agent_eq: "curl --user-agent='Mozilla/5.0' https://example.com",
         curl_user_agent_combined: "curl -sLA 'Mozilla/5.0' --max-time 15 https://example.com",
+        curl_include_short: "curl -i https://example.com",
+        curl_include_long: "curl --include https://example.com",
+        curl_include_combined: "curl -sSi https://example.com",
+        curl_include_localhost: "curl -sS -i http://127.0.0.1:8001/",
     }
 
     denied! {
