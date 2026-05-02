@@ -505,7 +505,9 @@ Aliases: `fly`
 ### `sysctl`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/sysctl.8.html">https://man7.org/linux/man-pages/man8/sysctl.8.html</a></p>
 
-
+- Allowed standalone flags: --help, -A, -N, -X, -a, -b, -d, -e, -h, -l, -n, -o, -q, -x
+- Allowed valued flags: -B, -r
+- Read-only queries of kernel parameters
 
 ### `systemctl`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/systemctl.1.html">https://man7.org/linux/man-pages/man1/systemctl.1.html</a></p>

@@ -37,6 +37,7 @@
 ### `plutil`
 <p class="cmd-url"><a href="https://ss64.com/mac/plutil.html">https://ss64.com/mac/plutil.html</a></p>
 
+- **-convert**
 - **-lint**: Flags: --help, -h, -s
 - **-p**: Flags: --help, -h
 - **-type**: Flags: --help, -h

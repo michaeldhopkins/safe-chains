@@ -16,6 +16,7 @@ allow_all = true
 [[command.sub]]
 name = "cache:clear"
 handler = "laravel_cache_clear"
+doc_body = "requires --store with one of file, array, null (matched as `--store=<value>` or `--store <value>`)"
 
 [[command.sub]]
 name = "stache:clear"

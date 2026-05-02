@@ -2017,3 +2017,87 @@ use super::*;
             missing.join(", "),
         );
     }
+
+    #[test]
+    fn handler_command_with_doc_body_renders_body() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            handler = "demo_handler"
+            doc_body = "- Allowed standalone flags: --foo\n- Allowed valued flags: --bar"
+        "#);
+        let doc = spec.to_command_doc();
+        assert!(doc.description.contains("--foo"), "body missing --foo: {}", doc.description);
+        assert!(doc.description.contains("--bar"), "body missing --bar: {}", doc.description);
+    }
+
+    #[test]
+    fn handler_command_without_doc_body_renders_empty() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            handler = "demo_handler"
+        "#);
+        let doc = spec.to_command_doc();
+        assert_eq!(doc.description, "");
+    }
+
+    #[test]
+    fn handler_sub_with_doc_body_renders_in_parent_body() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            bare = false
+            [[command.sub]]
+            name = "rare-mode"
+            handler = "demo_sub"
+            doc_body = "requires --opt with one of red, green, blue"
+        "#);
+        let doc = spec.to_command_doc();
+        assert!(
+            doc.description.contains("**rare-mode**"),
+            "body missing sub label: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("requires --opt"),
+            "body missing sub doc_body: {}",
+            doc.description,
+        );
+    }
+
+    #[test]
+    fn handler_sub_without_doc_body_renders_label_only() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            bare = false
+            [[command.sub]]
+            name = "rare-mode"
+            handler = "demo_sub"
+        "#);
+        let doc = spec.to_command_doc();
+        assert!(
+            doc.description.contains("**rare-mode**"),
+            "body missing sub label: {}",
+            doc.description,
+        );
+    }
+
+    #[test]
+    fn doc_body_does_not_affect_dispatch_for_handler_command() {
+        // Sanity-check: doc_body is purely a docs concern; the handler
+        // is still what gets dispatched. We use a known handler (php)
+        // because tests can't register new handlers at runtime.
+        let spec = load_one(r#"
+            [[command]]
+            name = "php"
+            handler = "php"
+            doc_body = "anything here"
+        "#);
+        // bare php still denied via the handler
+        assert_eq!(
+            super::dispatch_spec(&toks(&["php"]), &spec),
+            Verdict::Denied,
+        );
+    }

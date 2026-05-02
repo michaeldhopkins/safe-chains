@@ -46,7 +46,7 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
     if let Some(handler_name) = toml.handler {
         return SubSpec {
             name: toml.name,
-            kind: DispatchKind::Custom { handler_name },
+            kind: DispatchKind::Custom { handler_name, doc_body: toml.doc_body },
         };
     }
 
@@ -165,7 +165,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             aliases: toml.aliases,
             url: toml.url,
             category: cat,
-            kind: DispatchKind::Custom { handler_name },
+            kind: DispatchKind::Custom { handler_name, doc_body: toml.doc_body },
         };
     }
 

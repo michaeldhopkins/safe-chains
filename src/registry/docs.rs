@@ -39,7 +39,7 @@ impl CommandSpec {
                 let args = patterns.join(", ");
                 format!("Allowed first arguments: {args}")
             }
-            DispatchKind::Custom { .. } => String::new(),
+            DispatchKind::Custom { doc_body, .. } => doc_body.clone().unwrap_or_default(),
             DispatchKind::WriteFlagged { policy, .. } => policy.describe(),
             DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => String::new(),
         };
@@ -149,7 +149,13 @@ impl SubSpec {
                 }
             }
             DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => {}
-            DispatchKind::Custom { .. } => {}
+            DispatchKind::Custom { doc_body, .. } => {
+                if let Some(body) = doc_body {
+                    out.push(format!("- **{label}**: {body}"));
+                } else {
+                    out.push(format!("- **{label}**"));
+                }
+            }
             DispatchKind::Wrapper { .. } => {}
         }
     }

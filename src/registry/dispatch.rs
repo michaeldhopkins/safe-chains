@@ -262,7 +262,7 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
         } => {
             dispatch_wrapper(tokens, standalone, valued, *positional_skip, separator.as_deref(), *bare_ok)
         }
-        DispatchKind::Custom { handler_name } => {
+        DispatchKind::Custom { handler_name, .. } => {
             handlers
                 .get(handler_name.as_str())
                 .map(|f| f(tokens))

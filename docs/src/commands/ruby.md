@@ -4,6 +4,8 @@
 <p class="cmd-url"><a href="https://bundler.io/man/bundle.1.html">https://bundler.io/man/bundle.1.html</a></p>
 
 - **check**: Flags: --dry-run, --help, -h. Valued: --gemfile, --path
+- **config**
+- **exec**
 - **info**: Flags: --help, --path, -h
 - **install**: Flags: --clean, --deployment, --frozen, --full-index, --help, --local, --no-cache, --no-prune-sources, --prefer-local, --quiet, --redownload, --system, -h. Valued: --gemfile, --jobs, --path, --retry, --standalone, --trust-policy, --with, --without, -j
 - **list**: Flags: --help, --name-only, --paths, -h
