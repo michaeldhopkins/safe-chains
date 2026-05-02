@@ -88,6 +88,7 @@ pub fn check_laravel_cache_clear(tokens: &[Token]) -> Verdict {
     }
 
     let mut store: Option<&str> = None;
+    let mut saw_positional = false;
     let mut i = 1;
     while i < tokens.len() {
         let s = tokens[i].as_str();
@@ -105,6 +106,12 @@ pub fn check_laravel_cache_clear(tokens: &[Token]) -> Verdict {
         }
         if let Some(val) = s.strip_prefix("--store=") {
             store = Some(val);
+            i += 1;
+            continue;
+        }
+        if !s.starts_with('-') && !saw_positional {
+            store = Some(s);
+            saw_positional = true;
             i += 1;
             continue;
         }
@@ -158,6 +165,12 @@ mod tests {
         php_path_please_cache_clear: "php /path/please cache:clear --store=file",
         php_d_then_cache_clear: "php -d memory_limit=512M /path/please cache:clear --store=file",
         php_artisan_cache_clear_help: "php artisan cache:clear --help",
+        php_artisan_cache_clear_positional_file: "php artisan cache:clear file",
+        php_artisan_cache_clear_positional_array: "php artisan cache:clear array",
+        php_artisan_cache_clear_positional_null: "php artisan cache:clear null",
+        php_please_cache_clear_positional_file: "php please cache:clear file",
+        php_path_please_cache_clear_positional: "php /path/please cache:clear file",
+        php_d_then_cache_clear_positional: "php -d memory_limit=512M /path/please cache:clear file",
     }
 
     denied! {
@@ -184,6 +197,24 @@ mod tests {
         php_artisan_cache_clear_with_tags: "php artisan cache:clear --tags=foo --store=file",
         php_artisan_cache_clear_unknown_flag: "php artisan cache:clear --store=file --foo",
         php_path_basename_only: "php /tmp/please-bak stache:clear",
+        php_artisan_cache_clear_positional_redis: "php artisan cache:clear redis",
+        php_artisan_cache_clear_positional_glide: "php artisan cache:clear glide",
+        php_artisan_cache_clear_positional_database: "php artisan cache:clear database",
+        php_artisan_cache_clear_two_positionals: "php artisan cache:clear file array",
+        php_artisan_cache_clear_positional_then_unsafe_flag: "php artisan cache:clear file --tags=foo",
+    }
+
+    #[test]
+    fn cache_clear_positional_file_is_safewrite() {
+        assert_eq!(
+            verdict("php artisan cache:clear file"),
+            Verdict::Allowed(SafetyLevel::SafeWrite)
+        );
+    }
+
+    #[test]
+    fn cache_clear_positional_glide_denied() {
+        assert_eq!(verdict("php artisan cache:clear glide"), Verdict::Denied);
     }
 
     #[test]
