@@ -143,7 +143,7 @@ Aliases: `exa`
 ### `unzip`
 <p class="cmd-url"><a href="https://linux.die.net/man/1/unzip">https://linux.die.net/man/1/unzip</a></p>
 
-- Requires -l, -t, -Z. - Allowed standalone flags: -1, -2, -C, -M, -T, -Z, -h, -l, -m, -q, -s, -t, -v, -z, --help, --version, -V
+- Requires -c, -l, -p, -t, -Z. - Allowed standalone flags: -1, -2, -C, -M, -T, -Z, -c, -h, -l, -m, -p, -q, -s, -t, -v, -z, --help, --version, -V
 
 ### `zipinfo`
 <p class="cmd-url"><a href="https://linux.die.net/man/1/zipinfo">https://linux.die.net/man/1/zipinfo</a></p>

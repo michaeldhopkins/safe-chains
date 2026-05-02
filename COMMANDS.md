@@ -4290,7 +4290,7 @@ Aliases: `traceroute6`
 ### `unzip`
 <p class="cmd-url"><a href="https://linux.die.net/man/1/unzip">https://linux.die.net/man/1/unzip</a></p>
 
-- Requires -l, -t, -Z. - Allowed standalone flags: -1, -2, -C, -M, -T, -Z, -h, -l, -m, -q, -s, -t, -v, -z, --help, --version, -V
+- Requires -c, -l, -p, -t, -Z. - Allowed standalone flags: -1, -2, -C, -M, -T, -Z, -c, -h, -l, -m, -p, -q, -s, -t, -v, -z, --help, --version, -V
 
 ### `uptime`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation</a></p>

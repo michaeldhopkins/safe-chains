@@ -1,12 +1,12 @@
 [[command]]
 name = "unzip"
-description = "Extracts files from ZIP archives to the filesystem. In default mode, unzip writes extracted files to disk, potentially overwriting existing files. The -l flag is read-only, listing archive contents without extracting. The -t flag is read-only, testing archive integrity. The -Z flag invokes zipinfo mode for detailed metadata display. Does not access the network. The CLI surface is very stable and essentially frozen."
+description = "Extracts files from ZIP archives. In default mode, unzip writes extracted files to disk, potentially overwriting existing files. Several flags select read-only output modes that do not touch the filesystem: -l lists archive contents, -t tests archive integrity, -Z invokes zipinfo mode for detailed metadata display, and -p / -c stream selected member contents to stdout (-c prefixes each member with its filename header; -p emits raw bytes only). Does not access the network. The CLI surface is very stable and essentially frozen."
 url = "https://linux.die.net/man/1/unzip"
 level = "Inert"
 bare = false
-require_any = ["-l", "-t", "-Z"]
+require_any = ["-c", "-l", "-p", "-t", "-Z"]
 standalone = [
     "-1", "-2", "-C", "-M", "-T", "-Z",
-    "-h", "-l", "-m", "-q", "-s", "-t", "-v", "-z",
+    "-c", "-h", "-l", "-m", "-p", "-q", "-s", "-t", "-v", "-z",
     "--help", "--version", "-V",
 ]
