@@ -29,6 +29,11 @@ fn strip_regex_literals(s: &str) -> String {
     String::from_utf8(result).unwrap_or_default()
 }
 
+fn has_shell_pipe(code: &str) -> bool {
+    let collapsed = code.replace("||", "  ");
+    collapsed.contains('|')
+}
+
 fn has_redirect(code: &str) -> bool {
     let bytes = code.as_bytes();
     for (i, &b) in bytes.iter().enumerate() {
@@ -83,7 +88,7 @@ fn awk_has_dangerous_construct(token: &Token) -> bool {
         return true;
     }
     let stripped = strip_regex_literals(&code);
-    stripped.contains('|') || has_redirect(&stripped)
+    has_shell_pipe(&stripped) || has_redirect(&stripped)
 }
 
 static AWK_POLICY: FlagPolicy = FlagPolicy {
@@ -155,6 +160,11 @@ mod tests {
         awk_comparison_gte: "awk 'NR>=10 {print}' file.txt",
         awk_comparison_gte_complex: "awk '{if(length($0)>=80) print NR\": \"$0}' file.txt",
         awk_multiple_comparisons: "awk 'NR>=5 && NR<=20' file.txt",
+        awk_logical_or: "awk 'NF==1 || NR<5' file.txt",
+        awk_logical_or_no_spaces: "awk 'NF==1||NR<5' file.txt",
+        awk_logical_or_with_regex: "awk 'NF==1 || /^[A-Z]+ [0-9]+$/' file.txt",
+        awk_logical_or_assign: "awk 'BEGIN{ok = a || b; print ok}'",
+        awk_logical_or_three_terms: "awk 'NR==1 || NR==5 || NR==10' file.txt",
         awk_division: "awk '{print $1/100}' file.txt",
         awk_multiple_divisions: "awk '{avg=$1/10; pct=avg/total*100; print pct}' file.txt",
         awk_modulo_and_division: "awk '{print $1%10, $1/10}' file.txt",
