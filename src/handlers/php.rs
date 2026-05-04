@@ -22,8 +22,6 @@ static PHP_SAFE_INI_DIRECTIVES: WordSet = WordSet::new(&[
 
 static PHP_DELEGATE_SUBS: WordSet = WordSet::new(&["artisan", "please"]);
 
-static CACHE_CLEAR_SAFE_STORES: WordSet = WordSet::new(&["array", "file", "null"]);
-
 fn is_safe_ini_pair(value: &str) -> bool {
     let Some((key, _)) = value.split_once('=') else {
         return false;
@@ -82,12 +80,35 @@ pub fn is_safe_php(tokens: &[Token]) -> Verdict {
     crate::command_verdict(&inner)
 }
 
+// Laravel's cache:clear is treated as SafeWrite for any well-formed
+// invocation, including bare (which uses config('cache.default')) and
+// any explicit store value.
+//
+// SafeWrite is normally local-only, and cache:clear with a redis,
+// memcached, database, or dynamodb store does interact with a remote
+// system. We deviate here on a recoverability argument: cache stores
+// are by definition recreatable, so a flush — even on prod — is a
+// transient performance event, not data loss. Worst-case downstream
+// effects (sessions cleared if SESSION_DRIVER is cache-backed; rate-
+// limit counters reset; Cache::lock() mutex keys cleared; warmed
+// `Cache::remember()` entries gone) are all self-healing within
+// seconds to minutes of normal traffic.
+//
+// For local cache:clear to actually reach prod, the local Laravel
+// installation must be configured with prod's cache-backend
+// connection details (REDIS_HOST=prod-redis, etc.) — an established
+// anti-pattern in Laravel dev that the tool can't (and shouldn't)
+// detect from CLI tokens alone. We trust the user's environment
+// configuration, the same way every other Artisan command does.
+//
+// The handler still validates the *shape* of the invocation (only
+// known flags / one positional store / one positional --tags value)
+// to avoid passing through arbitrary token streams.
 pub fn check_laravel_cache_clear(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
 
-    let mut store: Option<&str> = None;
     let mut saw_positional = false;
     let mut i = 1;
     while i < tokens.len() {
@@ -96,21 +117,18 @@ pub fn check_laravel_cache_clear(tokens: &[Token]) -> Verdict {
             i += 1;
             continue;
         }
-        if s == "--store" {
-            let Some(next) = tokens.get(i + 1) else {
+        if s == "--store" || s == "--tags" {
+            if tokens.get(i + 1).is_none() {
                 return Verdict::Denied;
-            };
-            store = Some(next.as_str());
+            }
             i += 2;
             continue;
         }
-        if let Some(val) = s.strip_prefix("--store=") {
-            store = Some(val);
+        if s.starts_with("--store=") || s.starts_with("--tags=") {
             i += 1;
             continue;
         }
         if !s.starts_with('-') && !saw_positional {
-            store = Some(s);
             saw_positional = true;
             i += 1;
             continue;
@@ -118,12 +136,6 @@ pub fn check_laravel_cache_clear(tokens: &[Token]) -> Verdict {
         return Verdict::Denied;
     }
 
-    let Some(store) = store else {
-        return Verdict::Denied;
-    };
-    if !CACHE_CLEAR_SAFE_STORES.contains(store) {
-        return Verdict::Denied;
-    }
     Verdict::Allowed(SafetyLevel::SafeWrite)
 }
 
@@ -171,6 +183,18 @@ mod tests {
         php_please_cache_clear_positional_file: "php please cache:clear file",
         php_path_please_cache_clear_positional: "php /path/please cache:clear file",
         php_d_then_cache_clear_positional: "php -d memory_limit=512M /path/please cache:clear file",
+        php_artisan_cache_clear_bare: "php artisan cache:clear",
+        php_please_cache_clear_bare: "php please cache:clear",
+        php_artisan_cache_clear_redis: "php artisan cache:clear --store=redis",
+        php_artisan_cache_clear_database: "php artisan cache:clear --store=database",
+        php_artisan_cache_clear_memcached: "php artisan cache:clear --store=memcached",
+        php_artisan_cache_clear_dynamodb: "php artisan cache:clear --store=dynamodb",
+        php_artisan_cache_clear_positional_redis: "php artisan cache:clear redis",
+        php_artisan_cache_clear_positional_glide: "php artisan cache:clear glide",
+        php_artisan_cache_clear_positional_database: "php artisan cache:clear database",
+        php_artisan_cache_clear_with_tags: "php artisan cache:clear --tags=foo --store=file",
+        php_artisan_cache_clear_tags_only: "php artisan cache:clear --tags=foo",
+        php_artisan_cache_clear_tags_space: "php artisan cache:clear --tags foo",
     }
 
     denied! {
@@ -189,19 +213,11 @@ mod tests {
         php_built_in_server_with_t: "php -S localhost:8000 -t public",
         php_help_then_extra: "php --help artisan",
         php_unrecognized_flag: "php --unknown artisan view:clear",
-        php_artisan_cache_clear_redis: "php artisan cache:clear --store=redis",
-        php_artisan_cache_clear_database: "php artisan cache:clear --store=database",
-        php_artisan_cache_clear_memcached: "php artisan cache:clear --store=memcached",
-        php_artisan_cache_clear_dynamodb: "php artisan cache:clear --store=dynamodb",
-        php_artisan_cache_clear_no_store: "php artisan cache:clear",
-        php_artisan_cache_clear_with_tags: "php artisan cache:clear --tags=foo --store=file",
         php_artisan_cache_clear_unknown_flag: "php artisan cache:clear --store=file --foo",
+        php_artisan_cache_clear_store_no_value: "php artisan cache:clear --store",
+        php_artisan_cache_clear_tags_no_value: "php artisan cache:clear --tags",
         php_path_basename_only: "php /tmp/please-bak stache:clear",
-        php_artisan_cache_clear_positional_redis: "php artisan cache:clear redis",
-        php_artisan_cache_clear_positional_glide: "php artisan cache:clear glide",
-        php_artisan_cache_clear_positional_database: "php artisan cache:clear database",
         php_artisan_cache_clear_two_positionals: "php artisan cache:clear file array",
-        php_artisan_cache_clear_positional_then_unsafe_flag: "php artisan cache:clear file --tags=foo",
     }
 
     #[test]
@@ -213,8 +229,35 @@ mod tests {
     }
 
     #[test]
-    fn cache_clear_positional_glide_denied() {
-        assert_eq!(verdict("php artisan cache:clear glide"), Verdict::Denied);
+    fn cache_clear_bare_is_safewrite() {
+        assert_eq!(
+            verdict("php artisan cache:clear"),
+            Verdict::Allowed(SafetyLevel::SafeWrite)
+        );
+    }
+
+    #[test]
+    fn cache_clear_remote_store_is_safewrite() {
+        // Remote stores are accepted under the recoverability argument
+        // documented on check_laravel_cache_clear.
+        assert_eq!(
+            verdict("php artisan cache:clear --store=redis"),
+            Verdict::Allowed(SafetyLevel::SafeWrite)
+        );
+        assert_eq!(
+            verdict("php artisan cache:clear --store=database"),
+            Verdict::Allowed(SafetyLevel::SafeWrite)
+        );
+    }
+
+    #[test]
+    fn cache_clear_unknown_flag_still_denied() {
+        // Shape validation still rejects malformed invocations even
+        // though the value allowlist is gone.
+        assert_eq!(
+            verdict("php artisan cache:clear --store=file --foo"),
+            Verdict::Denied,
+        );
     }
 
     #[test]

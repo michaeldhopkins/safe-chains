@@ -1,6 +1,6 @@
 [[command]]
 name = "please"
-description = "Statamic's CLI, an extension of Laravel's Artisan console kernel. Every invocation bootstraps the full Statamic + Laravel application stack (all service providers boot). Read-only commands display information; the *:clear commands delete local files. The Stache (storage/statamic/stache) is Statamic's flat-file content index. Glide is the image transformation cache (storage/statamic/glide by default, but configurable to a cloud disk in config/statamic/assets.php). Static is the rendered-page HTML cache (storage/statamic/static by default, configurable). Because please inherits Laravel's Artisan kernel, generic Laravel commands like cache:clear are available too — cache:clear flushes the cache store named by --store (or the default in config/cache.php); some stores are local (file, array, null, apc) and others are external services (database, redis, memcached, dynamodb), so the safety depends on which store is targeted. Statamic ships minor releases every few months and the CLI surface is stable across versions."
+description = "Statamic's CLI, an extension of Laravel's Artisan console kernel. Every invocation bootstraps the full Statamic + Laravel application stack (all service providers boot). Read-only commands display information; the *:clear commands delete local files. The Stache (storage/statamic/stache) is Statamic's flat-file content index. Glide is the image transformation cache (storage/statamic/glide by default, but configurable to a cloud disk in config/statamic/assets.php). Static is the rendered-page HTML cache (storage/statamic/static by default, configurable). Because please inherits Laravel's Artisan kernel, generic Laravel commands like cache:clear are available too — cache:clear flushes the cache store named by --store (or the default in config/cache.php). Some stores are local (file, array, null, apc); others are external services (database, redis, memcached, dynamodb). Cache stores are by definition recreatable, so a flush — local or remote — is a transient performance event rather than data loss; downstream effects (session rotation if SESSION_DRIVER is cache-backed, RateLimiter reset, mutex/lock key loss, warmed-cache stampede) are all self-healing. For a local cache:clear to reach prod the local install must be configured with prod cache-backend coordinates, an anti-pattern in Laravel dev. Statamic ships minor releases every few months and the CLI surface is stable across versions."
 url = "https://statamic.dev/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
@@ -16,7 +16,7 @@ allow_all = true
 [[command.sub]]
 name = "cache:clear"
 handler = "laravel_cache_clear"
-doc_body = "requires the store name to be one of file, array, null — passed as `--store=<store>`, `--store <store>`, or as a positional argument (`cache:clear <store>`)"
+doc_body = "any well-formed invocation: bare (uses `config('cache.default')`), `--store=<name>`, `--store <name>`, positional (`cache:clear <name>`), and/or `--tags=<list>`"
 
 [[command.sub]]
 name = "stache:clear"

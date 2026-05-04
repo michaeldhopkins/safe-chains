@@ -500,7 +500,6 @@ denied! {
     php_artisan_down: "php artisan down",
     php_artisan_db_seed: "php artisan db:seed",
     php_artisan_db_wipe: "php artisan db:wipe",
-    php_artisan_cache_clear: "php artisan cache:clear",
     php_artisan_key_generate: "php artisan key:generate",
     php_somescript: "php somescript.php",
     php_r_code: "php -r 'echo 1;'",
