@@ -3294,6 +3294,8 @@ Aliases: `pip3`
 - **make:tag**: Flags: --force, --help, -h
 - **make:widget**: Flags: --force, --help, -h
 - **nocache:migration**: Flags: --help, -h. Valued: --path
+- **search:insert**: Flags: --help, -h
+- **search:update**: Flags: --all, --help, -h
 - **setup-cp-vite**: Flags: --help, --only-necessary, -h
 - **stache:clear**: Flags: --help, -h
 - **stache:doctor**: Flags: --help, -h
