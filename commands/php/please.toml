@@ -1,6 +1,6 @@
 [[command]]
 name = "please"
-description = "Statamic's CLI, an extension of Laravel's Artisan console kernel. Every invocation bootstraps the full Statamic + Laravel application stack (all service providers boot). Read-only commands display information; the *:clear commands delete local files. The Stache (storage/statamic/stache) is Statamic's flat-file content index. Glide is the image transformation cache (storage/statamic/glide by default, but configurable to a cloud disk in config/statamic/assets.php). Static is the rendered-page HTML cache (storage/statamic/static by default, configurable). Because please inherits Laravel's Artisan kernel, generic Laravel commands like cache:clear are available too — cache:clear flushes the cache store named by --store (or the default in config/cache.php). Some stores are local (file, array, null, apc); others are external services (database, redis, memcached, dynamodb). Cache stores are by definition recreatable, so a flush — local or remote — is a transient performance event rather than data loss; downstream effects (session rotation if SESSION_DRIVER is cache-backed, RateLimiter reset, mutex/lock key loss, warmed-cache stampede) are all self-healing. For a local cache:clear to reach prod the local install must be configured with prod cache-backend coordinates, an anti-pattern in Laravel dev. Statamic ships minor releases every few months and the CLI surface is stable across versions."
+description = "Statamic's CLI, an extension of Laravel's Artisan console kernel. Every invocation bootstraps the full Statamic + Laravel application stack (all service providers boot). Read-only commands display information; the *:clear commands delete local files. The Stache (storage/statamic/stache) is Statamic's flat-file content index. Glide is the image transformation cache (storage/statamic/glide by default, but configurable to a cloud disk in config/statamic/assets.php). Static is the rendered-page HTML cache (storage/statamic/static by default, configurable). search:insert and search:update populate the configured search driver from config/statamic/search.php — `local` and `comb` write to storage/statamic/search/, while `algolia` and `meilisearch` write to a remote SaaS or self-hosted service. Search indexes, like caches, are derived state recreatable from the source content; pushing to a remote driver from the wrong environment causes a stale-state window but no irrecoverable loss. Because please inherits Laravel's Artisan kernel, generic Laravel commands like cache:clear are available too — cache:clear flushes the cache store named by --store (or the default in config/cache.php). Some stores are local (file, array, null, apc); others are external services (database, redis, memcached, dynamodb). Cache stores are by definition recreatable, so a flush — local or remote — is a transient performance event rather than data loss; downstream effects (session rotation if SESSION_DRIVER is cache-backed, RateLimiter reset, mutex/lock key loss, warmed-cache stampede) are all self-healing. For a local cache:clear or search:update to reach prod the local install must be configured with prod backend coordinates, an anti-pattern in Laravel/Statamic dev. Statamic ships minor releases every few months and the CLI surface is stable across versions."
 url = "https://statamic.dev/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
@@ -231,11 +231,13 @@ candidate = true
 
 [[command.sub]]
 name = "search:insert"
-candidate = true
+level = "SafeWrite"
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "search:update"
-candidate = true
+level = "SafeWrite"
+standalone = ["--all", "--help", "-h"]
 
 [[command.sub]]
 name = "site:clear"
