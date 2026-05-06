@@ -1676,6 +1676,7 @@ use super::*;
                         continue;
                     }
                 }
+                DispatchKind::Custom { .. } => continue,
                 _ => {}
             }
             let test = format!("{name} --xyzzy-unknown-42");

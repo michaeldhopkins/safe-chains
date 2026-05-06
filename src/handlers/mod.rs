@@ -26,6 +26,7 @@ pub mod coreutils;
 pub mod forges;
 pub mod fuzzy;
 pub mod jvm;
+pub mod magick;
 pub mod network;
 pub mod node;
 pub mod perl;
@@ -45,6 +46,7 @@ type HandlerFn = fn(&[Token]) -> Verdict;
 
 pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
     HashMap::from([
+        ("magick", magick::is_safe_magick as HandlerFn),
         ("php", php::is_safe_php as HandlerFn),
         ("sysctl", system::sysctl::is_safe_sysctl as HandlerFn),
     ])
