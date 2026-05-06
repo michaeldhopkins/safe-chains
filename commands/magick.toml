@@ -1,56 +1,10 @@
 [[command]]
 name = "magick"
-description = "ImageMagick image processing suite, supporting over 200 image formats. The 'identify' subcommand is read-only, inspecting image metadata without modification. The 'convert', 'composite', 'compare', 'mogrify', 'montage', and 'stream' subcommands read input images and write output files to disk. 'mogrify' is particularly notable: it modifies images in place by default (destructive). ImageMagick has a large and complex flag surface with format-dependent behavior. Processing crafted image files has historically been a source of CVEs (memory corruption, SSRF via SVG/MVG delegates). No intentional network access, but delegate programs configured in policy.xml can be invoked. ImageMagick releases frequently with security patches."
+description = "ImageMagick 7's unified binary, supporting over 200 image formats. Three documented calling forms: (1) subcommand-explicit, e.g. `magick convert in.png out.png`, `magick identify in.png`, `magick mogrify ...`; (2) convert-implicit, e.g. `magick in.png -resize 1200x out.png`, which preserves the IM6 `convert` legacy syntax; (3) script-driven, `magick [...] -script script.msl [...]`, which executes an MSL (Magick Scripting Language) script — arbitrary code execution. The identify subcommand is read-only; convert, composite, compare, mogrify, montage, stream, and the legacy combine alias read inputs and write outputs (mogrify modifies in place by default). The conjure, display, animate, and import subcommands are out of scope for headless validation: conjure runs MSL scripts, display and animate launch long-running GUI viewers requiring an X server, and import captures screen content (privacy-relevant + GUI-bound). Processing crafted image files has historically been a CVE source — memory corruption in libpng/libavif, SSRF via SVG/MVG delegate programs, the ImageTragick MSL/EPHEMERAL pseudo-format issues from 2016. Modern releases ship a hardened policy.xml that restricts most pseudo-format codecs (MSL, MVG, EPHEMERAL, HTTPS, etc.) by default, which is the deeper defense layer; behavior depends on the specific build's policy.xml. ImageMagick releases frequently with security patches."
 url = "https://imagemagick.org/script/command-line-tools.php"
-bare_flags = ["--help", "--version", "-V", "-h"]
-
-[[command.sub]]
-name = "compare"
-level = "SafeWrite"
-positional_style = true
-bare = false
-
-[[command.sub]]
-name = "composite"
-level = "SafeWrite"
-positional_style = true
-bare = false
-
-[[command.sub]]
-name = "convert"
-level = "SafeWrite"
-positional_style = true
-bare = false
-
-[[command.sub]]
-name = "identify"
-bare = false
-standalone = [
-    "--help",
-    "-h", "-matte", "-moments", "-ping", "-quiet",
-    "-regard-warnings", "-unique", "-verbose",
-]
-valued = [
-    "-alpha", "-colorspace", "-define", "-density",
-    "-depth", "-endian", "-format", "-interlace",
-    "-limit", "-precision", "-sampling-factor",
-    "-size", "-units", "-virtual-pixel",
-]
-
-[[command.sub]]
-name = "mogrify"
-level = "SafeWrite"
-positional_style = true
-bare = false
-
-[[command.sub]]
-name = "montage"
-level = "SafeWrite"
-positional_style = true
-bare = false
-
-[[command.sub]]
-name = "stream"
-level = "SafeWrite"
-positional_style = true
-bare = false
+handler = "magick"
+doc_body = """
+- Bare flags: --help, --version, -V, -h
+- Subcommand-explicit form: `magick <sub> <args>` for sub in {compare, composite, convert, identify, mogrify, montage, stream, combine}
+- Convert-implicit form: `magick <input> [options] <output>` — equivalent to `magick convert <input> [options] <output>`, validated by the convert top-level command surface
+- `magick identify ...` is Inert (read-only); other forms are SafeWrite"""
