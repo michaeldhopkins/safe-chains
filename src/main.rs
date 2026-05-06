@@ -1,7 +1,7 @@
-use std::io;
+use std::io::{self, IsTerminal};
 use std::process;
 
-use clap::Parser;
+use clap::{CommandFactory, Parser};
 use serde::Deserialize;
 use serde_json::json;
 
@@ -109,6 +109,10 @@ fn main() {
             } else if let Some(command) = cli.command {
                 let threshold = cli.level.unwrap_or(SafetyLevel::SafeWrite);
                 run_cli(&command, threshold);
+            } else if io::stdin().is_terminal() {
+                Cli::command().print_help().ok();
+                println!();
+                process::exit(2);
             } else {
                 run_claude_hook();
             }
