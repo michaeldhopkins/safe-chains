@@ -67,6 +67,7 @@ const SCRIPT_STOPS: &[&str] = &["do", "done", "elif", "else", "fi", "then"];
 
 fn at_script_stop(input: &str) -> bool {
     input.starts_with(')')
+        || input.starts_with('}')
         || SCRIPT_STOPS.iter().any(|kw| {
             input.starts_with(kw)
                 && !input
@@ -142,6 +143,7 @@ fn command(input: &mut &str) -> ModalResult<Cmd> {
     }
     alt((
         subshell,
+        brace_group,
         for_cmd,
         while_cmd,
         until_cmd,
@@ -151,10 +153,53 @@ fn command(input: &mut &str) -> ModalResult<Cmd> {
     .parse_next(input)
 }
 
+fn trailing_redirs(input: &mut &str) -> ModalResult<Vec<Redir>> {
+    let mut redirs = Vec::new();
+    loop {
+        ws.parse_next(input)?;
+        if let Some(r) = opt(redirect).parse_next(input)? {
+            redirs.push(r);
+        } else {
+            break;
+        }
+    }
+    Ok(redirs)
+}
+
 fn subshell(input: &mut &str) -> ModalResult<Cmd> {
-    delimited(('(', ws), script, (ws, ')'))
-        .map(Cmd::Subshell)
-        .parse_next(input)
+    let body = delimited(('(', ws), script, (ws, ')')).parse_next(input)?;
+    let redirs = trailing_redirs(input)?;
+    Ok(Cmd::Subshell { body, redirs })
+}
+
+fn brace_group(input: &mut &str) -> ModalResult<Cmd> {
+    if !input.starts_with('{') {
+        return backtrack();
+    }
+    if !input
+        .as_bytes()
+        .get(1)
+        .is_some_and(|b| matches!(b, b' ' | b'\t' | b'\n'))
+    {
+        return backtrack();
+    }
+    *input = &input[1..];
+    sep.parse_next(input)?;
+    let body = script.parse_next(input)?;
+    if body.0.is_empty() {
+        return backtrack();
+    }
+    sep.parse_next(input)?;
+    if !input.starts_with('}') {
+        return backtrack();
+    }
+    let last_op = body.0.last().and_then(|s| s.op);
+    if last_op.is_none() {
+        return backtrack();
+    }
+    *input = &input[1..];
+    let redirs = trailing_redirs(input)?;
+    Ok(Cmd::BraceGroup { body, redirs })
 }
 
 // === Simple Command ===
@@ -557,6 +602,89 @@ mod tests {
     fn semi_then_blank() { assert_eq!(p("echo foo;\n\necho bar").0.len(), 2); }
     #[test]
     fn and_then_blank() { assert_eq!(p("echo foo &&\n\necho bar").0.len(), 2); }
+
+    #[test]
+    fn brace_group_simple() {
+        assert!(matches!(
+            &p("{ echo hello; }").0[0].pipeline.commands[0],
+            Cmd::BraceGroup { body, redirs } if body.0.len() == 1 && redirs.is_empty()
+        ));
+    }
+    #[test]
+    fn brace_group_multiple_stmts() {
+        if let Cmd::BraceGroup { body, .. } = &p("{ echo a; echo b; echo c; }").0[0].pipeline.commands[0] {
+            assert_eq!(body.0.len(), 3);
+        } else { panic!("expected BraceGroup"); }
+    }
+    #[test]
+    fn brace_group_with_redirect() {
+        if let Cmd::BraceGroup { redirs, .. } = &p("{ echo a; echo b; } > /tmp/out.txt").0[0].pipeline.commands[0] {
+            assert_eq!(redirs.len(), 1);
+            assert!(matches!(redirs[0], Redir::Write { .. }));
+        } else { panic!("expected BraceGroup"); }
+    }
+    #[test]
+    fn brace_group_with_append_redirect() {
+        if let Cmd::BraceGroup { redirs, .. } = &p("{ echo a; } >> log.txt").0[0].pipeline.commands[0] {
+            assert!(matches!(redirs[0], Redir::Write { append: true, .. }));
+        } else { panic!("expected BraceGroup"); }
+    }
+    #[test]
+    fn brace_group_with_stderr_redirect() {
+        if let Cmd::BraceGroup { redirs, .. } = &p("{ echo a; } 2>&1").0[0].pipeline.commands[0] {
+            assert!(matches!(redirs[0], Redir::DupFd { src: 2, .. }));
+        } else { panic!("expected BraceGroup"); }
+    }
+    #[test]
+    fn brace_group_newline_separated() {
+        if let Cmd::BraceGroup { body, .. } = &p("{\n  echo a\n  echo b\n}").0[0].pipeline.commands[0] {
+            assert_eq!(body.0.len(), 2);
+        } else { panic!("expected BraceGroup"); }
+    }
+    #[test]
+    fn brace_group_in_pipeline() {
+        let pl = &p("{ echo a; echo b; } | grep a").0[0].pipeline;
+        assert_eq!(pl.commands.len(), 2);
+        assert!(matches!(&pl.commands[0], Cmd::BraceGroup { .. }));
+    }
+    #[test]
+    fn brace_group_followed_by_other() {
+        let stmts = &p("{ echo a; }; echo b").0;
+        assert_eq!(stmts.len(), 2);
+        assert!(matches!(&stmts[0].pipeline.commands[0], Cmd::BraceGroup { .. }));
+    }
+    #[test]
+    fn brace_group_nested() {
+        if let Cmd::BraceGroup { body, .. } = &p("{ { echo inner; }; echo outer; }").0[0].pipeline.commands[0] {
+            assert_eq!(body.0.len(), 2);
+            assert!(matches!(&body.0[0].pipeline.commands[0], Cmd::BraceGroup { .. }));
+        } else { panic!("expected outer BraceGroup"); }
+    }
+    #[test]
+    fn brace_group_with_subshell_inside() {
+        if let Cmd::BraceGroup { body, .. } = &p("{ (echo sub); echo grp; }").0[0].pipeline.commands[0] {
+            assert_eq!(body.0.len(), 2);
+            assert!(matches!(&body.0[0].pipeline.commands[0], Cmd::Subshell { .. }));
+        } else { panic!("expected BraceGroup"); }
+    }
+    #[test]
+    fn brace_open_requires_whitespace() {
+        // {echo (no space) is NOT a brace group; it's a literal word
+        // that becomes part of a simple command. Parser should not
+        // treat it as a brace group.
+        let cmds = &p("{echo a}").0;
+        // Either parsed as a simple_cmd with a literal `{echo` token,
+        // or fails. Either way, it should NOT be a BraceGroup.
+        if !cmds.is_empty() {
+            assert!(!matches!(&cmds[0].pipeline.commands[0], Cmd::BraceGroup { .. }));
+        }
+    }
+    #[test]
+    fn subshell_with_redirect() {
+        if let Cmd::Subshell { redirs, .. } = &p("(echo hello) > /tmp/out.txt").0[0].pipeline.commands[0] {
+            assert_eq!(redirs.len(), 1);
+        } else { panic!("expected Subshell with redir"); }
+    }
     #[test]
     fn background() { assert_eq!(p("ls & echo done").0[0].op, Some(ListOp::Amp)); }
 
@@ -622,7 +750,7 @@ mod tests {
     }
 
     #[test]
-    fn subshell_test() { assert!(matches!(&p("(echo hello)").0[0].pipeline.commands[0], Cmd::Subshell(_))); }
+    fn subshell_test() { assert!(matches!(&p("(echo hello)").0[0].pipeline.commands[0], Cmd::Subshell { .. })); }
     #[test]
     fn negation() { assert!(p("! echo hello").0[0].pipeline.bang); }
 
@@ -667,8 +795,8 @@ mod tests {
 
     #[test]
     fn subshell_for() {
-        if let Cmd::Subshell(inner) = &p("(for x in 1 2; do echo $x; done)").0[0].pipeline.commands[0] {
-            assert!(matches!(&inner.0[0].pipeline.commands[0], Cmd::For { .. }));
+        if let Cmd::Subshell { body, .. } = &p("(for x in 1 2; do echo $x; done)").0[0].pipeline.commands[0] {
+            assert!(matches!(&body.0[0].pipeline.commands[0], Cmd::For { .. }));
         } else { panic!("expected Subshell"); }
     }
     #[test]

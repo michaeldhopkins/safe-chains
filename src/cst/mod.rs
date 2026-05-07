@@ -32,7 +32,14 @@ pub struct Pipeline {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Cmd {
     Simple(SimpleCmd),
-    Subshell(Script),
+    Subshell {
+        body: Script,
+        redirs: Vec<Redir>,
+    },
+    BraceGroup {
+        body: Script,
+        redirs: Vec<Redir>,
+    },
     For {
         var: String,
         items: Vec<Word>,
@@ -176,7 +183,14 @@ impl Cmd {
     fn normalize(&self) -> Self {
         match self {
             Cmd::Simple(s) => Cmd::Simple(s.normalize()),
-            Cmd::Subshell(s) => Cmd::Subshell(s.normalize()),
+            Cmd::Subshell { body, redirs } => Cmd::Subshell {
+                body: body.normalize(),
+                redirs: normalize_redirs(redirs),
+            },
+            Cmd::BraceGroup { body, redirs } => Cmd::BraceGroup {
+                body: body.normalize_as_body(),
+                redirs: normalize_redirs(redirs),
+            },
             Cmd::For { var, items, body } => Cmd::For {
                 var: var.clone(),
                 items: items.iter().map(|w| w.normalize()).collect(),
@@ -213,23 +227,26 @@ impl SimpleCmd {
                 .map(|(k, v)| (k.clone(), v.normalize()))
                 .collect(),
             words: self.words.iter().map(|w| w.normalize()).collect(),
-            redirs: self
-                .redirs
-                .iter()
-                .map(|r| match r {
-                    Redir::Write { fd, target, append } => Redir::Write {
-                        fd: *fd,
-                        target: target.normalize(),
-                        append: *append,
-                    },
-                    Redir::Read { fd, target } => Redir::Read {
-                        fd: *fd,
-                        target: target.normalize(),
-                    },
-                    Redir::HereStr(w) => Redir::HereStr(w.normalize()),
-                    Redir::HereDoc { .. } | Redir::DupFd { .. } => r.clone(),
-                })
-                .collect(),
+            redirs: normalize_redirs(&self.redirs),
         }
     }
+}
+
+fn normalize_redirs(redirs: &[Redir]) -> Vec<Redir> {
+    redirs
+        .iter()
+        .map(|r| match r {
+            Redir::Write { fd, target, append } => Redir::Write {
+                fd: *fd,
+                target: target.normalize(),
+                append: *append,
+            },
+            Redir::Read { fd, target } => Redir::Read {
+                fd: *fd,
+                target: target.normalize(),
+            },
+            Redir::HereStr(w) => Redir::HereStr(w.normalize()),
+            Redir::HereDoc { .. } | Redir::DupFd { .. } => r.clone(),
+        })
+        .collect()
 }
