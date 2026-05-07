@@ -69,7 +69,20 @@ impl fmt::Display for Cmd {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Cmd::Simple(s) => write!(f, "{s}"),
-            Cmd::Subshell(s) => write!(f, "({s})"),
+            Cmd::Subshell { body, redirs } => {
+                write!(f, "({body})")?;
+                for r in redirs {
+                    write!(f, " {r}")?;
+                }
+                Ok(())
+            }
+            Cmd::BraceGroup { body, redirs } => {
+                write!(f, "{{ {body}; }}")?;
+                for r in redirs {
+                    write!(f, " {r}")?;
+                }
+                Ok(())
+            }
             Cmd::For { var, items, body } => {
                 write!(f, "for {var}")?;
                 if !items.is_empty() {

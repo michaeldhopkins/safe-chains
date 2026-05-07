@@ -114,7 +114,7 @@ fn arb_cmd(depth: u32) -> BoxedStrategy<Cmd> {
 
     prop_oneof![
         4 => arb_simple_cmd(depth).prop_map(Cmd::Simple),
-        1 => arb_script(depth - 1).prop_map(Cmd::Subshell),
+        1 => arb_script(depth - 1).prop_map(|body| Cmd::Subshell { body, redirs: vec![] }),
         1 => (
             arb_env_name(),
             prop::collection::vec(arb_word(0), 1..3),
@@ -326,7 +326,7 @@ proptest! {
             Stmt {
                 pipeline: Pipeline {
                     bang: false,
-                    commands: vec![Cmd::Subshell(inject_unsafe_into_script(&script, 0))],
+                    commands: vec![Cmd::Subshell { body: inject_unsafe_into_script(&script, 0), redirs: vec![] }],
                 },
                 op: None,
             },

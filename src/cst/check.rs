@@ -54,7 +54,17 @@ pub(crate) fn normalize_for_matching(cmd: &SimpleCmd) -> String {
 fn cmd_verdict(cmd: &Cmd) -> Verdict {
     match cmd {
         Cmd::Simple(s) => simple_verdict(s),
-        Cmd::Subshell(inner) => script_verdict(inner),
+        Cmd::Subshell { body, redirs } | Cmd::BraceGroup { body, redirs } => {
+            let body_v = script_verdict(body);
+            if let Verdict::Denied = body_v {
+                return Verdict::Denied;
+            }
+            let redir_v = redirect_verdict(redirs);
+            if let Verdict::Denied = redir_v {
+                return Verdict::Denied;
+            }
+            body_v.combine(redir_v)
+        }
         Cmd::For { items, body, .. } => {
             let items_v = words_sub_verdict(items);
             let body_v = script_verdict(body);
