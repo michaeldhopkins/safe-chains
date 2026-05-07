@@ -33,44 +33,6 @@ static BUNDLE_EXEC_SAFE: WordSet = WordSet::new(&[
     "brakeman", "cucumber", "erb_lint", "herb", "rspec", "standardrb",
 ]);
 
-static RAILS_ROUTES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--expanded", "--help", "-h"]),
-    valued: WordSet::flags(&["--controller", "--grep", "-g"]),
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
-};
-
-static RAILS_TEST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--backtrace", "--color", "--defer-output", "--fail-fast",
-        "--help", "--no-color", "--verbose",
-        "-b", "-c", "-d", "-f", "-h", "-v",
-    ]),
-    valued: WordSet::flags(&["--environment", "--name", "--seed", "-e", "-n", "-s"]),
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
-};
-
-static RAILS_NOTES_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--help", "-h"]),
-    valued: WordSet::flags(&["--annotations", "-a"]),
-    bare: true,
-    max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
-};
-
-static RAILS_BARE_SUBS: WordSet = WordSet::new(&[
-    "about", "assets:reveal", "assets:reveal:full",
-    "db:migrate:status", "db:version",
-    "initializers", "middleware", "secret", "stats",
-    "time:zones:all", "time:zones:local", "version",
-]);
-
 pub fn check_bundle_config(tokens: &[Token]) -> Verdict {
     if tokens.len() == 1 {
         return Verdict::Allowed(SafetyLevel::Inert);
@@ -105,7 +67,8 @@ pub fn check_bundle_exec(tokens: &[Token]) -> Verdict {
         return Verdict::Allowed(SafetyLevel::SafeRead);
     }
     if cmd == "rails" {
-        return check_rails_sub(&tokens[1..]);
+        let inner = shell_words::join(tokens[1..].iter().map(|t| t.as_str()));
+        return crate::command_verdict(&inner);
     }
     if cmd == "gem" {
         let inner = shell_words::join(tokens[1..].iter().map(|t| t.as_str()));
@@ -132,22 +95,6 @@ fn check_appraisal(tokens: &[Token]) -> Verdict {
         return Verdict::Denied;
     }
     check_bundle_exec(&tokens[1..])
-}
-
-fn check_rails_sub(tokens: &[Token]) -> Verdict {
-    if tokens.len() < 2 {
-        return Verdict::Denied;
-    }
-    let sub = &tokens[1];
-    if tokens.len() == 2 && (sub == "--help" || sub == "-h") {
-        return Verdict::Allowed(SafetyLevel::Inert);
-    }
-    match sub.as_str() {
-        "routes" => if policy::check(&tokens[1..], &RAILS_ROUTES_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied },
-        "test" | "test:system" => if policy::check(&tokens[1..], &RAILS_TEST_POLICY) { Verdict::Allowed(SafetyLevel::SafeRead) } else { Verdict::Denied },
-        "notes" => if policy::check(&tokens[1..], &RAILS_NOTES_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied },
-        _ => if RAILS_BARE_SUBS.contains(sub) && tokens.len() == 2 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied },
-    }
 }
 
 #[cfg(test)]
@@ -239,21 +186,21 @@ mod tests {
         bundle_exec_appraisal_rspec: "bundle exec appraisal rails-7-1 rspec spec/models/foo_spec.rb",
         bundle_exec_appraisal_rspec_tag: "bundle exec appraisal rails-7-1 rspec --tag focus spec/",
         bundle_exec_appraisal_cucumber: "bundle exec appraisal rails-7-1 cucumber",
+        bundle_exec_rails_db_create: "bundle exec rails db:create",
+        bundle_exec_rails_db_migrate: "bundle exec rails db:migrate",
+        bundle_exec_rails_db_seed: "bundle exec rails db:seed",
+        bundle_exec_rails_db_setup: "bundle exec rails db:setup",
+        bundle_exec_rails_db_schema_load: "bundle exec rails db:schema:load",
+        bundle_exec_rails_generate: "bundle exec rails generate model User name:string",
     }
 
     denied! {
         bundle_exec_rails_console_denied: "bundle exec rails console",
         bundle_exec_rails_server_denied: "bundle exec rails server",
-        bundle_exec_rails_generate_denied: "bundle exec rails generate model User",
         bundle_exec_rails_destroy_denied: "bundle exec rails destroy model User",
-        bundle_exec_rails_db_migrate_denied: "bundle exec rails db:migrate",
         bundle_exec_rails_db_drop_denied: "bundle exec rails db:drop",
-        bundle_exec_rails_db_seed_denied: "bundle exec rails db:seed",
         bundle_exec_rails_db_reset_denied: "bundle exec rails db:reset",
-        bundle_exec_rails_db_setup_denied: "bundle exec rails db:setup",
         bundle_exec_rails_db_rollback_denied: "bundle exec rails db:rollback",
-        bundle_exec_rails_db_create_denied: "bundle exec rails db:create",
-        bundle_exec_rails_db_schema_load_denied: "bundle exec rails db:schema:load",
         bundle_exec_rails_runner_denied: "bundle exec rails runner script.rb",
         bundle_exec_rails_dbconsole_denied: "bundle exec rails dbconsole",
         bundle_exec_rails_credentials_edit_denied: "bundle exec rails credentials:edit",

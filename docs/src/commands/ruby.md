@@ -39,6 +39,51 @@
 - **packages**: Flags: --help, -h
 - Allowed standalone flags: --help, -h
 
+### `rails`
+<p class="cmd-url"><a href="https://guides.rubyonrails.org/command_line.html">https://guides.rubyonrails.org/command_line.html</a></p>
+
+- **about**: Flags: --help, -h
+- **assets:clean**: Flags: --help, -h
+- **assets:clobber**: Flags: --help, -h
+- **assets:precompile**: Flags: --help, -h
+- **assets:reveal**: Flags: --help, -h
+- **assets:reveal:full**: Flags: --help, -h
+- **cache:clear**: Flags: --help, -h
+- **db:create**: Flags: --help, -h
+- **db:fixtures:load**: Flags: --help, -h
+- **db:migrate**: Flags: --help, --trace, -h
+- **db:migrate:status**: Flags: --help, -h
+- **db:prepare**: Flags: --help, -h
+- **db:schema:dump**: Flags: --help, -h
+- **db:schema:load**: Flags: --help, -h
+- **db:seed**: Flags: --help, -h
+- **db:setup**: Flags: --help, -h
+- **db:structure:dump**: Flags: --help, -h
+- **db:structure:load**: Flags: --help, -h
+- **db:version**: Flags: --help, -h
+- **g**: Positional args accepted
+- **generate**: Positional args accepted
+- **initializers**: Flags: --help, -h
+- **log:clear**: Flags: --help, -h
+- **middleware**: Flags: --help, -h
+- **notes**: Flags: --help, -h. Valued: --annotations
+- **routes**: Flags: --expanded, --help, --unused, -E, -h, -u. Valued: --controller, --grep, -c, -g
+- **runner:help**: Flags: --help, -h
+- **secret**: Flags: --help, -h
+- **stats**: Flags: --help, -h
+- **test**: Positional args accepted
+- **test:functionals**: Flags: --help, -h
+- **test:integration**: Flags: --help, -h
+- **test:system**: Flags: --help, -h
+- **test:units**: Flags: --help, -h
+- **time:zones:all**: Flags: --help, -h
+- **time:zones:local**: Flags: --help, -h
+- **tmp:cache:clear**: Flags: --help, -h
+- **tmp:clear**: Flags: --help, -h
+- **tmp:create**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h, -v
+
 ### `rbenv`
 <p class="cmd-url"><a href="https://github.com/rbenv/rbenv#readme">https://github.com/rbenv/rbenv#readme</a></p>
 

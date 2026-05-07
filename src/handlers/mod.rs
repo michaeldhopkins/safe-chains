@@ -88,7 +88,7 @@ const HANDLED_CMDS: &[&str] = &[
     "git", "jj", "gh", "glab", "jjpr", "tea", "basecamp",
     "jira", "linear", "notion", "td", "todoist", "trello",
     "npm", "yarn", "pnpm", "bun", "deno", "npx", "bunx", "nvm", "fnm", "volta", "mocha",
-    "ruby", "ri", "bundle", "gem", "importmap", "rbenv",
+    "ruby", "ri", "bundle", "gem", "importmap", "rails", "rbenv",
     "pip", "pip3", "uv", "poetry", "pyenv", "conda", "coverage", "tox", "nox", "bandit", "pip-audit", "pdm",
     "cargo", "rustup",
     "go",

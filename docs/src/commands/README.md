@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 463 commands across 34 categories.
+safe-chains knows 464 commands across 34 categories.
 
 ## Glossary
 
@@ -40,7 +40,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Package Managers](pm.md) (5 commands)
 - [Python](python.md) (12 commands)
 - [R](r.md) (2 commands)
-- [Ruby](ruby.md) (6 commands)
+- [Ruby](ruby.md) (7 commands)
 - [Rust](rust.md) (2 commands)
 - [Search](search.md) (7 commands)
 - [Swift](swift.md) (1 commands)
