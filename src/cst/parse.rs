@@ -100,6 +100,7 @@ fn script(input: &mut &str) -> ModalResult<Script> {
         if op.is_none() {
             break;
         }
+        sep.parse_next(input)?;
     }
     Ok(Script(stmts))
 }
@@ -544,6 +545,18 @@ mod tests {
     fn sequence_semi() { assert_eq!(p("ls; echo done").0.len(), 2); }
     #[test]
     fn newline_separator() { assert_eq!(p("echo foo\necho bar").0.len(), 2); }
+    #[test]
+    fn blank_line_between_statements() { assert_eq!(p("echo foo\n\necho bar").0.len(), 2); }
+    #[test]
+    fn multiple_blank_lines() { assert_eq!(p("echo foo\n\n\n\necho bar").0.len(), 2); }
+    #[test]
+    fn blank_line_with_whitespace() { assert_eq!(p("echo foo\n   \necho bar").0.len(), 2); }
+    #[test]
+    fn comment_between_statements() { assert_eq!(p("echo foo\n# comment\necho bar").0.len(), 2); }
+    #[test]
+    fn semi_then_blank() { assert_eq!(p("echo foo;\n\necho bar").0.len(), 2); }
+    #[test]
+    fn and_then_blank() { assert_eq!(p("echo foo &&\n\necho bar").0.len(), 2); }
     #[test]
     fn background() { assert_eq!(p("ls & echo done").0[0].op, Some(ListOp::Amp)); }
 
