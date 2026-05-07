@@ -1,6 +1,6 @@
 [package]
 name = "safe-chains"
-version = "0.159.0"
+version = "0.160.0"
 edition = "2024"
 rust-version = "1.95"
 license = "MIT OR Apache-2.0"
@@ -22,6 +22,7 @@ winnow = "0.7.15"
 [dev-dependencies]
 clap_complete = "4"
 clap_mangen = "0.2"
+expectrl = "0.8"
 proptest = "1.10.0"
 tempfile = "3"
 
