@@ -1,0 +1,275 @@
+[[command]]
+name = "rails"
+description = "Ruby on Rails CLI. Loaded with the application's Rakefile + Bundler config; many subcommands boot the full Rails app, running initializers and any side effects defined there. Read-only commands (about, version, routes, notes, stats, db:version, db:migrate:status) display information without modifying state, though some require a live DB connection. Database schema/data commands (db:create, db:migrate, db:seed, db:prepare, db:setup, db:fixtures:load, db:schema:load, db:schema:dump) modify the connected database — typically a local development DB, but they connect to whatever config/database.yml or DATABASE_URL points at; for a local invocation to reach prod, the local app would have to be configured with prod's database coordinates, the same anti-pattern that gates Laravel's cache:clear. tmp:clear, log:clear, assets:precompile, and assets:clean write inside the project tree. cache:clear is a recreatable-derived-state operation and follows the same SafeWrite reasoning that applies to Laravel cache:clear. console/c is a REPL with the full app loaded, runner executes arbitrary Ruby code in app context, server/s starts a long-running HTTP server, new scaffolds an entire project (and fetches gems from rubygems.org), destroy/d removes generated code, credentials:edit and secrets:edit open $EDITOR, dbconsole/db opens an interactive DB shell, and db:drop/db:reset/db:rollback/db:purge destroy schema or data — each of these is out of coverage. Rails ships a major release roughly every 1-2 years with active maintenance and security backports; the CLI surface is highly stable across versions."
+url = "https://guides.rubyonrails.org/command_line.html"
+bare_flags = ["--help", "--version", "-V", "-h", "-v"]
+
+[[command.sub]]
+name = "about"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "notes"
+standalone = ["--help", "-h"]
+valued = ["--annotations"]
+
+[[command.sub]]
+name = "stats"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "routes"
+standalone = ["--expanded", "--help", "--unused", "-E", "-h", "-u"]
+valued = ["--controller", "--grep", "-c", "-g"]
+
+[[command.sub]]
+name = "middleware"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "initializers"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "secret"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "time:zones:all"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "time:zones:local"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "assets:reveal"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "assets:reveal:full"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "runner:help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:migrate:status"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:create"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:migrate"
+level = "SafeWrite"
+standalone = ["--help", "--trace", "-h"]
+
+[[command.sub]]
+name = "db:seed"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:prepare"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:setup"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:fixtures:load"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:schema:load"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:schema:dump"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:structure:dump"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:structure:load"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "tmp:clear"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "tmp:create"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "tmp:cache:clear"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "log:clear"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "assets:precompile"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "assets:clean"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "assets:clobber"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "cache:clear"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+positional_style = true
+bare = true
+
+[[command.sub]]
+name = "test:units"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "test:functionals"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "test:integration"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "test:system"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "generate"
+level = "SafeWrite"
+positional_style = true
+bare = false
+
+[[command.sub]]
+name = "g"
+level = "SafeWrite"
+positional_style = true
+bare = false
+
+[[command.sub]]
+name = "console"
+candidate = true
+
+[[command.sub]]
+name = "c"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "s"
+candidate = true
+
+[[command.sub]]
+name = "runner"
+candidate = true
+
+[[command.sub]]
+name = "r"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "destroy"
+candidate = true
+
+[[command.sub]]
+name = "d"
+candidate = true
+
+[[command.sub]]
+name = "dbconsole"
+candidate = true
+
+[[command.sub]]
+name = "db"
+candidate = true
+
+[[command.sub]]
+name = "credentials:edit"
+candidate = true
+
+[[command.sub]]
+name = "credentials:show"
+candidate = true
+
+[[command.sub]]
+name = "secrets:edit"
+candidate = true
+
+[[command.sub]]
+name = "db:drop"
+candidate = true
+
+[[command.sub]]
+name = "db:reset"
+candidate = true
+
+[[command.sub]]
+name = "db:rollback"
+candidate = true
+
+[[command.sub]]
+name = "db:purge"
+candidate = true
+
+[[command.sub]]
+name = "db:migrate:redo"
+candidate = true
+
+[[command.sub]]
+name = "db:migrate:reset"
+candidate = true
