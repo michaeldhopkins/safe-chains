@@ -60,7 +60,7 @@ pub mod parse;
 pub mod policy;
 pub mod registry;
 pub mod allowlist;
-pub mod setup;
+pub mod targets;
 pub mod verdict;
 
 pub use verdict::{SafetyLevel, Verdict};
