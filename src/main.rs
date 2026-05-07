@@ -1,23 +1,12 @@
-use std::io::{self, IsTerminal};
+use std::io::{self, IsTerminal, Read, Write};
+use std::path::Path;
 use std::process;
 
 use clap::{CommandFactory, Parser};
-use serde::Deserialize;
-use serde_json::json;
 
-use safe_chains::cli::Cli;
+use safe_chains::cli::{Cli, Subcommand};
+use safe_chains::targets::{self, HookFormat};
 use safe_chains::verdict::{SafetyLevel, Verdict};
-
-#[derive(Deserialize)]
-struct ToolInput {
-    command: String,
-}
-
-#[derive(Deserialize)]
-struct HookInput {
-    tool_input: ToolInput,
-    cwd: Option<String>,
-}
 
 fn print_docs() {
     let docs = safe_chains::docs::all_command_docs();
@@ -26,7 +15,11 @@ fn print_docs() {
 
 fn print_opencode_config() {
     let patterns = safe_chains::all_opencode_patterns();
-    print!("{}", safe_chains::docs::render_opencode_json(&patterns));
+    let cwd = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
+    print!(
+        "{}",
+        safe_chains::targets::opencode::render_opencode_json_in(&cwd, &patterns)
+    );
 }
 
 fn run_cli(command: &str, threshold: SafetyLevel) {
@@ -38,41 +31,97 @@ fn run_cli(command: &str, threshold: SafetyLevel) {
     process::exit(i32::from(!ok));
 }
 
-fn emit_allow(reason: &str) {
-    let output = json!({
-        "hookSpecificOutput": {
-            "hookEventName": "PreToolUse",
-            "permissionDecision": "allow",
-            "permissionDecisionReason": reason,
-        }
-    });
-    serde_json::to_writer(io::stdout(), &output).ok();
-}
-
-fn run_claude_hook() {
-    let input: HookInput = match serde_json::from_reader(io::stdin()) {
-        Ok(v) => v,
-        Err(_) => process::exit(0),
+fn run_setup(name: Option<String>, auto_detect: bool) -> ! {
+    let Some(home) = std::env::var_os("HOME") else {
+        eprintln!("Error: HOME environment variable not set");
+        process::exit(1);
     };
+    let home = std::path::PathBuf::from(home);
 
-    let verdict = safe_chains::command_verdict(&input.tool_input.command);
-    if verdict.is_allowed() {
-        let reason = match verdict {
-            Verdict::Allowed(SafetyLevel::SafeWrite) => "All commands in chain are safe utilities (includes file writes)",
-            Verdict::Allowed(SafetyLevel::SafeRead) => "All commands in chain are safe utilities (includes code execution)",
-            _ => "All commands in chain are safe utilities",
-        };
-        emit_allow(reason);
-        return;
+    if auto_detect {
+        let detected = targets::detect_installed(&home);
+        if detected.is_empty() {
+            eprintln!(
+                "No supported tools detected on this machine. Run with --list-tools to see candidates."
+            );
+            process::exit(1);
+        }
+        let mut any_failed = false;
+        for target in detected {
+            match target.install(&home) {
+                Ok(outcome) => println!("{}", outcome.message(target.display_name())),
+                Err(e) => {
+                    eprintln!("{}: {e}", target.display_name());
+                    any_failed = true;
+                }
+            }
+        }
+        process::exit(i32::from(any_failed));
     }
 
-    let project_dir = input.cwd.as_deref().map(std::path::Path::new);
+    let target_name = name.as_deref().unwrap_or("claude");
+    let Some(target) = targets::find(target_name) else {
+        eprintln!("Unknown tool: {target_name}. Run with --list-tools to see candidates.");
+        process::exit(1);
+    };
+    match target.install(&home) {
+        Ok(outcome) => {
+            println!("{}", outcome.message(target.display_name()));
+            process::exit(0);
+        }
+        Err(e) => {
+            eprintln!("{}: {e}", target.display_name());
+            process::exit(1);
+        }
+    }
+}
+
+fn run_list_tools() -> ! {
+    for target in targets::registry() {
+        println!("{}\t{}", target.name(), target.display_name());
+    }
+    process::exit(0);
+}
+
+fn run_hook_for(target_name: &str) -> ! {
+    let Some(target) = targets::find(target_name) else {
+        eprintln!("Unknown tool: {target_name}. Run with --list-tools to see candidates.");
+        process::exit(1);
+    };
+    let Some(format) = target.hook_format() else {
+        eprintln!(
+            "{}: this target does not use a runtime hook (config-only integration).",
+            target.display_name()
+        );
+        process::exit(1);
+    };
+    run_hook_format(format);
+}
+
+fn run_hook_format(format: &dyn HookFormat) -> ! {
+    let mut buf = String::new();
+    if io::stdin().read_to_string(&mut buf).is_err() {
+        process::exit(0);
+    }
+
+    let Ok(input) = format.parse_input(&buf) else {
+        process::exit(0);
+    };
+
+    let verdict = safe_chains::command_verdict(&input.command);
+    if verdict.is_allowed() {
+        let response = format.render_response(verdict);
+        let _ = io::stdout().write_all(response.stdout.as_bytes());
+        process::exit(response.exit_code);
+    }
+
+    let project_dir = input.cwd.as_deref().map(Path::new);
     let patterns = safe_chains::allowlist::Matcher::load_with_project_dir(project_dir);
     if patterns.is_empty() {
         process::exit(0);
     }
 
-    let Some(script) = safe_chains::cst::parse(&input.tool_input.command) else {
+    let Some(script) = safe_chains::cst::parse(&input.command) else {
         process::exit(0);
     };
 
@@ -86,10 +135,11 @@ fn run_claude_hook() {
     });
 
     if all_covered {
-        emit_allow("All commands covered by safe-chains rules or user-approved settings");
-    } else {
-        process::exit(0);
+        let response = format.render_response(Verdict::Allowed(SafetyLevel::Inert));
+        let _ = io::stdout().write_all(response.stdout.as_bytes());
+        process::exit(response.exit_code);
     }
+    process::exit(0);
 }
 
 fn main() {
@@ -97,9 +147,16 @@ fn main() {
 
     match cli {
         Ok(cli) => {
+            if let Some(Subcommand::Hook { tool }) = cli.subcommand {
+                run_hook_for(&tool);
+            }
+            if cli.list_tools {
+                run_list_tools();
+            }
             if cli.setup {
-                safe_chains::setup::run_setup();
-            } else if cli.list_commands {
+                run_setup(cli.tool, cli.auto_detect);
+            }
+            if cli.list_commands {
                 print_docs();
             } else if cli.generate_book {
                 let docs = safe_chains::docs::all_command_docs();
@@ -114,16 +171,25 @@ fn main() {
                 println!();
                 process::exit(2);
             } else {
-                run_claude_hook();
+                let claude = targets::find("claude").expect("claude target registered");
+                let format = claude
+                    .hook_format()
+                    .expect("claude target has a hook format");
+                run_hook_format(format);
             }
         }
-        Err(e) if e.kind() == clap::error::ErrorKind::DisplayHelp
-              || e.kind() == clap::error::ErrorKind::DisplayVersion =>
+        Err(e)
+            if e.kind() == clap::error::ErrorKind::DisplayHelp
+                || e.kind() == clap::error::ErrorKind::DisplayVersion =>
         {
             print!("{e}");
         }
         Err(_) => {
-            run_claude_hook();
+            let claude = targets::find("claude").expect("claude target registered");
+            let format = claude
+                .hook_format()
+                .expect("claude target has a hook format");
+            run_hook_format(format);
         }
     }
 }
