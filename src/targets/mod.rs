@@ -4,7 +4,12 @@ use crate::verdict::{SafetyLevel, Verdict};
 
 pub mod claude;
 pub mod codex;
+pub mod copilot;
+pub mod cursor;
+pub mod droid;
+pub mod gemini;
 pub mod opencode;
+pub mod qwen;
 
 pub trait Target: Send + Sync {
     fn name(&self) -> &'static str;
@@ -75,6 +80,11 @@ pub fn registry() -> Vec<Box<dyn Target>> {
     vec![
         Box::new(claude::ClaudeTarget),
         Box::new(codex::CodexTarget),
+        Box::new(cursor::CursorTarget),
+        Box::new(gemini::GeminiTarget),
+        Box::new(copilot::CopilotTarget),
+        Box::new(qwen::QwenTarget),
+        Box::new(droid::DroidTarget),
         Box::new(opencode::OpenCodeTarget),
     ]
 }
