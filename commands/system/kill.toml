@@ -2,6 +2,7 @@
 name = "kill"
 description = "POSIX shell builtin and standalone utility for sending signals to processes. The default behavior — `kill <pid>` or `kill -<signal> <pid>` — terminates or signals a running process and is destructive in a way that isn't recoverable: any in-memory state, unsaved buffers, network connections, and child processes inside the target are lost. Footguns include `kill 0` (signals the calling shell's process group, wiping the current terminal session), `kill -1` and `kill <-pid>` (signal a process group, potentially every process the user owns), and `kill -KILL <wrong-pid>` (no chance for the target to clean up). The covered surface here is strictly read-only diagnostic queries: `-l`/`-L` enumerate signal names and numbers, and `-0 <pid>` (or `--signal 0`) checks whether a PID exists and is signal-able without delivering any signal. Forms that actually deliver a signal — including `kill <pid>`, `kill -9`, `kill -HUP`, `kill -TERM`, `kill -USR1`, etc. — are deliberately out of coverage; the destructive-vs-diagnostic distinction is structural here, not user-trustable. Available everywhere as part of POSIX; flag surface is essentially frozen."
 url = "https://man7.org/linux/man-pages/man1/kill.1.html"
+researched_version = "POSIX kill(1) / shell builtin; surface frozen"
 level = "Inert"
 bare = false
 require_any = ["-0", "-L", "-l"]

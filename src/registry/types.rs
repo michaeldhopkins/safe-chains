@@ -47,6 +47,8 @@ pub(super) struct TomlCommand {
     pub first_arg: Vec<String>,
     #[serde(default)]
     pub wrapper: Option<TomlWrapper>,
+    #[serde(default)]
+    pub researched_version: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -132,6 +134,13 @@ pub struct CommandSpec {
     pub aliases: Vec<String>,
     pub url: String,
     pub category: String,
+    /// Upstream version of the underlying tool that was researched
+    /// when this spec was last updated. Free-form string — e.g.
+    /// `"1.9.0"`, `"v5.10.3"`, `"2026-05-08 master"`,
+    /// `"@northflank/cli 0.10.15"`. Internal-only: not rendered in
+    /// docs or used at runtime. Surfaces in tests and as a tripwire
+    /// when researching newer versions of the same tool.
+    pub researched_version: Option<String>,
     pub(super) kind: DispatchKind,
 }
 

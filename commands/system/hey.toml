@@ -2,6 +2,7 @@
 name = "hey"
 description = "37signals' official Go CLI for HEY email (hey.com), released March 2026 as part of their CLI toolkit alongside basecamp and fizzy. Authenticates via 37signals Launchpad OAuth (PKCE) with tokens stored in the system keyring (file fallback at ~/.config/hey-cli/credentials.json, mode 0600). Supports `--token TOKEN` and `--cookie COOKIE` for non-interactive auth and accepts `--json` and `--base-url` globally. Read-only verbs (boxes, box, threads, drafts, calendars, recordings, todo list, timetrack list/current, journal list/read, auth status) hit the API but do not mutate. Mutating verbs (compose, reply, todo add/complete/uncomplete/delete, habit complete/uncomplete, timetrack start/stop, journal write) modify remote state — compose and reply send email and are irreversible. Bare `hey` launches an interactive TUI. `hey auth login` performs a browser OAuth flow; `hey auth token` prints the bearer token to stdout. Name collision worth flagging: `rakyll/hey` is a popular HTTP load tester also installed as `hey` — that tool takes a URL positional rather than a verb, so the allowlist below correctly falls through to a prompt for it. The CLI is actively developed at github.com/basecamp/hey-cli with a CI surface-stability check; the public flag surface should be stable across patch releases."
 url = "https://github.com/basecamp/hey-cli"
+researched_version = "github.com/basecamp/hey-cli @ master, 2026-05-05"
 bare_flags = ["--help", "--version", "-h", "-v"]
 
 [[command.sub]]

@@ -2,6 +2,7 @@
 name = "render"
 description = "Render's hosting platform CLI. Manages services, datastores, deployments, and workspaces on the Render PaaS. Read-only subcommands (whoami, workspaces, workspace current, projects, environments, services, services instances, deploys list, jobs list, logs, blueprints validate) issue API queries over HTTPS or validate a local YAML file without modifying remote state. login performs an OAuth-style browser flow and stores credentials under ~/.render/. Mutating operations include services create/update, deploys create/cancel, jobs create/cancel, restart (reboot a running service), ssh (open a shell on a running container), psql/pgcli/kv-cli (open interactive client sessions against managed databases — read-write), workflows (run platform workflows), and skills install/update/remove (modify local agent integration state). workspace set is recorded as out-of-coverage because it changes the account context all subsequent commands hit. The CLI iterates moderately frequently with new flag groups added when platform features ship; the global --output (interactive|json|yaml|text) and --confirm flags apply to most subs."
 url = "https://render.com/docs/cli-reference"
+researched_version = "render.com/docs/cli-reference, current as of 2026-05-08"
 bare_flags = ["--help", "--version", "-h", "-v"]
 
 [[command.sub]]

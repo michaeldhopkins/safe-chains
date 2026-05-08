@@ -354,6 +354,35 @@
 # doc_body = "requires --store with one of file, array, null"
 
 # ─────────────────────────────────────────────────────────────────────
+# RESEARCHED_VERSION — record which upstream version was last vetted
+# ─────────────────────────────────────────────────────────────────────
+#
+# Optional free-form string on [[command]]. Records the upstream
+# version of the underlying tool that was last researched when this
+# TOML was written or revised. Internal use only — not rendered in
+# docs or used at runtime; surfaces as a tripwire when re-researching
+# a tool to see what's changed since.
+#
+# Common forms:
+#   researched_version = "1.9.0"                          # semver tag
+#   researched_version = "v5.10.3 (April 2026)"            # tag + release date
+#   researched_version = "@northflank/cli 0.10.15"         # package@version
+#   researched_version = "github.com/foo/bar @ master, 2026-05-08"  # snapshot
+#   researched_version = "POSIX kill(1); surface frozen"   # truly stable surface
+#
+# When ADDING or REVISING a TOML, set this field to whatever the
+# upstream's *latest* released version is — verified by checking
+# the project's GitHub releases / npm / crates.io / official docs,
+# NOT just `<tool> --version` on the local machine, which can be
+# stale. If the local install and the online docs disagree, follow
+# the online docs (the latest version) and treat any local-only
+# behavior as a follow-up to revisit.
+#
+# When backfill is impossible (older TOMLs that pre-date this field)
+# leave it absent rather than guess. Re-researching is the right
+# moment to fill it in, not before.
+
+# ─────────────────────────────────────────────────────────────────────
 # CANDIDATE — record that a command was considered but not approved
 # ─────────────────────────────────────────────────────────────────────
 #
