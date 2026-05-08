@@ -1,0 +1,180 @@
+[[command]]
+name = "cx"
+description = "Cloud 66's `cx` toolbelt (Go binary, replaces the archived Ruby `c66toolbelt`). Manages applications, servers, services, processes, containers, databases, env-vars, backups, gateways, and failover groups on the Cloud 66 PaaS. Read-only subcommands (stacks list, servers list, services list/info, processes list, containers list, backups list, env-vars list, jobs list, gateways list, failover-groups list, settings list, users list/show, tail, ssh_config, info) issue API queries over HTTPS without modifying remote state. The `config` subcommands (list, show, create, use, update, rename) operate only on the local profile file (typically ~/.cloud66/cx.json); `delete` is recorded as a candidate because removing a profile is irreversible from the CLI's perspective. Mutating operations include redeploy (deploy a stack), stacks restart/reboot/clear-caches, processes restart/pause/resume/scale, services restart/pause/resume/stop/scale, containers restart/stop, env-vars set, backups new/download, databases promote-replica/resync-replica, gateways add/remove/open/close, failover groups add/update/delete, jobs run, run (execute an arbitrary command on a remote server), servers reboot, settings set, stacks configuration apply/upload, tags add/delete, upload/download (file transfer to/from remote servers), ssh (interactive remote shell), and update (self-update the binary). The toolbelt updates itself silently on each invocation; release cadence from Cloud 66 is moderate. The `-s`/`--stack` flag is near-universal for targeting a stack."
+url = "https://help.cloud66.com/rails/toolbelt/using-cloud66-toolbelt/"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "open"
+standalone = ["--help", "-h"]
+valued = ["--stack", "-s"]
+
+[[command.sub]]
+name = "tail"
+standalone = ["--help", "-h"]
+valued = ["--server", "--service", "--stack", "-s"]
+
+[[command.sub]]
+name = "ssh_config"
+standalone = ["--help", "-h"]
+valued = ["--stack", "-s"]
+
+[[command.sub]]
+name = "stacks"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "configuration"
+[[command.sub.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--stack", "-s"]
+
+[[command.sub]]
+name = "servers"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--stack", "-s"]
+[[command.sub.sub]]
+name = "settings"
+[[command.sub.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--server", "--stack", "-s"]
+
+[[command.sub]]
+name = "services"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--stack", "-s"]
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+valued = ["--service", "--stack", "-s"]
+
+[[command.sub]]
+name = "processes"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--stack", "-s"]
+
+[[command.sub]]
+name = "containers"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--stack", "-s"]
+
+[[command.sub]]
+name = "backups"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--stack", "-s"]
+
+[[command.sub]]
+name = "env-vars"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--stack", "-s"]
+
+[[command.sub]]
+name = "jobs"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--stack", "-s"]
+
+[[command.sub]]
+name = "gateways"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "failover-groups"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "settings"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--stack", "-s"]
+
+[[command.sub]]
+name = "users"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "create"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "use"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "update"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "rename"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "redeploy"
+candidate = true
+[[command.sub]]
+name = "run"
+candidate = true
+[[command.sub]]
+name = "ssh"
+candidate = true
+[[command.sub]]
+name = "upload"
+candidate = true
+[[command.sub]]
+name = "download"
+candidate = true
+[[command.sub]]
+name = "update"
+candidate = true
+[[command.sub]]
+name = "tags"
+candidate = true
+[[command.sub]]
+name = "databases"
+candidate = true

@@ -1,0 +1,82 @@
+[[command]]
+name = "northflank"
+description = "Northflank's hosting platform CLI (npm package @northflank/cli, binary `northflank`). Manages services, jobs, addons, projects, volumes, domains, and workflows on the Northflank PaaS. Verb-noun structure: `northflank <verb> <resource>` where verbs include get/list/logs/metrics (read-only) and create/delete/patch/update/exec/execute-command (mutating remote state). Read-only subcommands (get, list, logs, metrics, command-overview, context ls) issue API queries over HTTPS or render local CLI metadata without touching remote state. login/logout/context use modify only the local auth context (~/.config/northflank/ or similar). Mutating operations include create/delete/patch/update for any resource type, plus exec (open an interactive shell inside a running container — pure remote shell access). The CLI ships frequent minor releases with new resource verbs and flags; flag surfaces below cover the documented usage patterns and may need follow-up tightening once verbatim --help output is captured from a real install. No `northflank run -- <localcmd>` env-loading wrapper exists."
+url = "https://northflank.com/docs/v1/api/use-the-cli"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "login"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+valued = ["--name", "--token", "-n", "-t"]
+
+[[command.sub]]
+name = "logout"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "context"
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "use"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "command-overview"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+valued = [
+    "--addon", "--domain", "--job", "--output", "--project",
+    "--service", "--volume", "--workflow",
+    "-o",
+]
+
+[[command.sub]]
+name = "list"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "--project", "-o"]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--follow", "--help", "-f", "-h"]
+valued = [
+    "--container", "--job", "--limit", "--output",
+    "--project", "--service", "--since", "--until",
+    "-o",
+]
+
+[[command.sub]]
+name = "metrics"
+standalone = ["--help", "-h"]
+valued = ["--job", "--output", "--project", "--service", "-o"]
+
+[[command.sub]]
+name = "create"
+candidate = true
+[[command.sub]]
+name = "delete"
+candidate = true
+[[command.sub]]
+name = "patch"
+candidate = true
+[[command.sub]]
+name = "update"
+candidate = true
+[[command.sub]]
+name = "exec"
+candidate = true
+[[command.sub]]
+name = "execute-command"
+candidate = true

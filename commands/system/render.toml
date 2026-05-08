@@ -1,0 +1,130 @@
+[[command]]
+name = "render"
+description = "Render's hosting platform CLI. Manages services, datastores, deployments, and workspaces on the Render PaaS. Read-only subcommands (whoami, workspaces, workspace current, projects, environments, services, services instances, deploys list, jobs list, logs, blueprints validate) issue API queries over HTTPS or validate a local YAML file without modifying remote state. login performs an OAuth-style browser flow and stores credentials under ~/.render/. Mutating operations include services create/update, deploys create/cancel, jobs create/cancel, restart (reboot a running service), ssh (open a shell on a running container), psql/pgcli/kv-cli (open interactive client sessions against managed databases — read-write), workflows (run platform workflows), and skills install/update/remove (modify local agent integration state). workspace set is recorded as out-of-coverage because it changes the account context all subsequent commands hit. The CLI iterates moderately frequently with new flag groups added when platform features ship; the global --output (interactive|json|yaml|text) and --confirm flags apply to most subs."
+url = "https://render.com/docs/cli-reference"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "login"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "whoami"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "workspaces"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "workspace"
+[[command.sub.sub]]
+name = "current"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "set"
+candidate = true
+
+[[command.sub]]
+name = "projects"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "environments"
+bare = false
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "services"
+nested_bare = true
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "instances"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "deploys"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "cancel"
+candidate = true
+
+[[command.sub]]
+name = "jobs"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "cancel"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+standalone = ["--confirm", "--help", "--tail", "--text", "-h"]
+valued = [
+    "--direction", "--end", "--host", "--instance", "--level",
+    "--limit", "--method", "--output", "--path", "--resources",
+    "--start", "--status-code", "--task-id", "--task-run-id",
+    "--type",
+    "-o", "-r",
+]
+
+[[command.sub]]
+name = "blueprints"
+[[command.sub.sub]]
+name = "validate"
+bare = false
+standalone = ["--confirm", "--help", "-h"]
+valued = ["--output", "--workspace", "-o", "-w"]
+
+[[command.sub]]
+name = "restart"
+candidate = true
+
+[[command.sub]]
+name = "ssh"
+candidate = true
+
+[[command.sub]]
+name = "psql"
+candidate = true
+
+[[command.sub]]
+name = "pgcli"
+candidate = true
+
+[[command.sub]]
+name = "kv-cli"
+candidate = true
+
+[[command.sub]]
+name = "skills"
+candidate = true
+
+[[command.sub]]
+name = "workflows"
+candidate = true

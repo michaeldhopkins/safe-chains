@@ -1,42 +1,250 @@
 [[command]]
 name = "railway"
-description = "Railway's cloud platform CLI for deploying, managing, and debugging applications, databases, and infrastructure on Railway's hosting service. The full CLI can deploy code (railway up), create/delete services, manage environment variables, open shell sessions inside running containers, redeploy/rollback, and run an AI agent with access to internal platform tools. The covered subcommands (status, list, logs, variables list, volume list, whoami, version, completion) are read-only API queries over HTTPS that fetch project metadata, deployment status, log streams, environment variable listings, and volume information without modifying any remote state. The uncovered up, deploy, redeploy, down, add, and agent subcommands are the state-modifying operations. Railway actively develops the CLI with recent additions including AI agent capabilities."
-url = "https://docs.railway.app/guides/cli"
-bare_flags = ["--help", "--version", "-h"]
+description = "Railway's hosting platform CLI. Authenticates against railway.app via OAuth, links the current directory to a remote project/environment/service via a local .railway/ config, and exposes both read-only API queries (status, list, logs, metrics, variable list, deployment list, environment list, environment config, service list, volume list, whoami) and mutating operations. Mutating operations include up/deploy (upload and deploy cwd), redeploy/restart/down (mutate running deployments), add/init/delete (create/destroy projects and services), scale (mutate replica counts), variable set/delete (rotate live env vars), domain (register DNS records on a live service), environment new/delete/edit/link (mutate environment config), volume add/delete/update/detach/attach (mutate persistent storage), connect (spawn psql/mongosh/redis-cli/mysql against the live database with secrets piped in), shell (open a local subshell with remote secrets injected), run (execute an arbitrary local command with remote secrets injected as env vars — even an inert inner command exfiltrates secrets to stdout), ssh (open a shell on a running container), agent (run an AI agent with platform tool access), and upgrade/autoupdate (replace the local CLI binary). Actively developed in Rust at github.com/railwayapp/cli with frequent flag-surface additions; the variable command in particular has been refactored from a flat `railway variables` form into a `railway variable {list,set,delete}` subcommand structure with legacy bare-form flags retained on the parent."
+url = "https://docs.railway.com/guides/cli"
+bare_flags = ["--help", "--version", "-h", "-V"]
 
 [[command.sub]]
-name = "version"
-
-[[command.sub]]
-name = "whoami"
+name = "completion"
+bare = false
 standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "docs"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "logs"
+max_positional = 1
+standalone = [
+    "--build", "--deployment", "--help", "--http",
+    "--json", "--latest", "-b", "-d", "-h",
+]
+valued = [
+    "--environment", "--filter", "--lines", "--method",
+    "--path", "--request-id", "--service", "--since",
+    "--status", "--tail", "--until",
+    "-S", "-U", "-e", "-f", "-n", "-s",
+]
+
+[[command.sub]]
+name = "metrics"
+standalone = [
+    "--all", "--cpu", "--help", "--http", "--json",
+    "--memory", "--network", "--raw", "--volume", "--watch",
+    "-a", "-h", "-w",
+]
+valued = [
+    "--environment", "--filter", "--method", "--path",
+    "--request-id", "--service", "--since", "--status", "--until",
+    "-S", "-U", "-e", "-s",
+]
 
 [[command.sub]]
 name = "status"
 standalone = ["--help", "--json", "-h"]
 
 [[command.sub]]
-name = "list"
-standalone = ["--help", "-h"]
+name = "whoami"
+standalone = ["--help", "--json", "-h"]
 
 [[command.sub]]
-name = "logs"
-standalone = ["--help", "-h"]
-valued = ["--deployment"]
+name = "deployment"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+valued = ["--environment", "--limit", "--service", "-e", "-s"]
+
+[[command.sub]]
+name = "environment"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--ephemeral", "--help", "--json", "--no-ephemeral", "-h"]
+[[command.sub.sub]]
+name = "config"
+standalone = ["--help", "--json", "-h"]
+valued = ["--environment", "-e"]
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "--json", "-h"]
+valued = ["--environment", "-e"]
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "--json", "-h"]
+valued = ["--environment", "-e"]
+[[command.sub.sub]]
+name = "new"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+[[command.sub.sub]]
+name = "edit"
+candidate = true
+[[command.sub.sub]]
+name = "link"
+candidate = true
+
+[[command.sub]]
+name = "service"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+valued = ["--environment", "-e"]
+
+[[command.sub]]
+name = "variable"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "--kv", "-h", "-k"]
+valued = ["--environment", "--service", "-e", "-s"]
+[[command.sub.sub]]
+name = "set"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
 
 [[command.sub]]
 name = "variables"
-[[command.sub.sub]]
-name = "list"
-standalone = ["--help", "-h"]
+max_positional = 0
+standalone = ["--help", "--json", "--kv", "-h", "-k"]
+valued = ["--environment", "--service", "-e", "-s"]
 
 [[command.sub]]
 name = "volume"
 [[command.sub.sub]]
 name = "list"
+standalone = ["--help", "--json", "-h"]
+valued = ["--environment", "--service", "-e", "-s"]
+[[command.sub.sub]]
+name = "add"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+[[command.sub.sub]]
+name = "update"
+candidate = true
+[[command.sub.sub]]
+name = "attach"
+candidate = true
+[[command.sub.sub]]
+name = "detach"
+candidate = true
+
+[[command.sub]]
+name = "login"
+level = "SafeWrite"
+standalone = ["--browserless", "--help", "-b", "-h"]
+
+[[command.sub]]
+name = "logout"
+level = "SafeWrite"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
-name = "completion"
-bare = false
-standalone = ["--help", "-h"]
+name = "link"
+level = "SafeWrite"
+standalone = ["--help", "--json", "-h"]
+valued = [
+    "--environment", "--project", "--service", "--team", "--workspace",
+    "-e", "-p", "-s", "-t", "-w",
+]
+
+[[command.sub]]
+name = "unlink"
+level = "SafeWrite"
+standalone = ["--help", "--json", "--yes", "-h", "-y"]
+valued = ["--service", "-s"]
+
+[[command.sub]]
+name = "open"
+level = "SafeWrite"
+standalone = ["--help", "--print", "-h", "-p"]
+
+[[command.sub]]
+name = "add"
+candidate = true
+[[command.sub]]
+name = "agent"
+candidate = true
+[[command.sub]]
+name = "autoupdate"
+candidate = true
+[[command.sub]]
+name = "bucket"
+candidate = true
+[[command.sub]]
+name = "connect"
+candidate = true
+[[command.sub]]
+name = "delete"
+candidate = true
+[[command.sub]]
+name = "deploy"
+candidate = true
+[[command.sub]]
+name = "dev"
+candidate = true
+[[command.sub]]
+name = "domain"
+candidate = true
+[[command.sub]]
+name = "down"
+candidate = true
+[[command.sub]]
+name = "functions"
+candidate = true
+[[command.sub]]
+name = "init"
+candidate = true
+[[command.sub]]
+name = "mcp"
+candidate = true
+[[command.sub]]
+name = "project"
+candidate = true
+[[command.sub]]
+name = "redeploy"
+candidate = true
+[[command.sub]]
+name = "restart"
+candidate = true
+[[command.sub]]
+name = "run"
+candidate = true
+[[command.sub]]
+name = "scale"
+candidate = true
+[[command.sub]]
+name = "setup"
+candidate = true
+[[command.sub]]
+name = "shell"
+candidate = true
+[[command.sub]]
+name = "skills"
+candidate = true
+[[command.sub]]
+name = "ssh"
+candidate = true
+[[command.sub]]
+name = "starship"
+candidate = true
+[[command.sub]]
+name = "telemetry"
+candidate = true
+[[command.sub]]
+name = "templates"
+candidate = true
+[[command.sub]]
+name = "up"
+candidate = true
+[[command.sub]]
+name = "upgrade"
+candidate = true

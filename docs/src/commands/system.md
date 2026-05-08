@@ -114,6 +114,38 @@
 - **status**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `cx`
+<p class="cmd-url"><a href="https://help.cloud66.com/rails/toolbelt/using-cloud66-toolbelt/">https://help.cloud66.com/rails/toolbelt/using-cloud66-toolbelt/</a></p>
+
+- **backups list**: Flags: --help, -h. Valued: --stack, -s
+- **config create**: Flags: --help, -h
+- **config list**: Flags: --help, -h
+- **config rename**: Flags: --help, -h
+- **config show**: Flags: --help, -h
+- **config update**: Flags: --help, -h
+- **config use**: Flags: --help, -h
+- **containers list**: Flags: --help, -h. Valued: --stack, -s
+- **env-vars list**: Flags: --help, -h. Valued: --stack, -s
+- **failover-groups list**: Flags: --help, -h
+- **gateways list**: Flags: --help, -h
+- **help**: Positional args accepted
+- **info**: Flags: --help, -h
+- **jobs list**: Flags: --help, -h. Valued: --stack, -s
+- **open**: Flags: --help, -h. Valued: --stack, -s
+- **processes list**: Flags: --help, -h. Valued: --stack, -s
+- **servers list**: Flags: --help, -h. Valued: --stack, -s
+- **servers settings list**: Flags: --help, -h. Valued: --server, --stack, -s
+- **services info**: Flags: --help, -h. Valued: --service, --stack, -s
+- **services list**: Flags: --help, -h. Valued: --stack, -s
+- **settings list**: Flags: --help, -h. Valued: --stack, -s
+- **ssh_config**: Flags: --help, -h. Valued: --stack, -s
+- **stacks configuration list**: Flags: --help, -h. Valued: --stack, -s
+- **stacks list**: Flags: --help, -h
+- **tail**: Flags: --help, -h. Valued: --server, --service, --stack, -s
+- **users list**: Flags: --help, -h
+- **users show**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `dcli`
 <p class="cmd-url"><a href="https://cli.dashlane.com/">https://cli.dashlane.com/</a></p>
 
@@ -226,6 +258,24 @@ Aliases: `fly`
 - **releases**: Flags: --help, --json, -h, -j. Valued: --app, --num, -a, -n
 - **status**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `hey`
+<p class="cmd-url"><a href="https://github.com/basecamp/hey-cli">https://github.com/basecamp/hey-cli</a></p>
+
+- **auth logout**: Flags: --help, -h
+- **auth status**: Flags: --help, --json, -h
+- **box**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --token
+- **boxes**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --token
+- **calendars**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --token
+- **drafts**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --token
+- **journal list**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --token
+- **journal read**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --token
+- **recordings**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --ends-on, --starts-on, --token
+- **threads**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --token
+- **timetrack current**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --token
+- **timetrack list**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --token
+- **todo list**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --token
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `journalctl`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/journalctl.1.html">https://man7.org/linux/man-pages/man1/journalctl.1.html</a></p>
@@ -405,6 +455,21 @@ Aliases: `fly`
 - Requires -t, -n. - Allowed standalone flags: --help, --version, -n, -v, -V, -h
 - Allowed valued flags: -C, -f, -j, -k, -l, -t
 
+### `northflank`
+<p class="cmd-url"><a href="https://northflank.com/docs/v1/api/use-the-cli">https://northflank.com/docs/v1/api/use-the-cli</a></p>
+
+- **command-overview**: Flags: --help, -h
+- **context list**: Flags: --help, -h
+- **context ls**: Flags: --help, -h
+- **context use**: Flags: --help, -h
+- **get**: Flags: --help, -h. Valued: --addon, --domain, --job, --output, --project, --service, --volume, --workflow, -o
+- **list**: Flags: --help, -h. Valued: --output, --project, -o
+- **login**: Flags: --help, -h. Valued: --name, --token, -n, -t
+- **logout**: Flags: --help, -h
+- **logs**: Flags: --follow, --help, -f, -h. Valued: --container, --job, --limit, --output, --project, --service, --since, --until, -o
+- **metrics**: Flags: --help, -h. Valued: --job, --output, --project, --service, -o
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `overmind`
 <p class="cmd-url"><a href="https://github.com/DarthSim/overmind">https://github.com/DarthSim/overmind</a></p>
 
@@ -469,17 +534,47 @@ Aliases: `fly`
 - Allowed standalone flags: --help, -h
 
 ### `railway`
-<p class="cmd-url"><a href="https://docs.railway.app/guides/cli">https://docs.railway.app/guides/cli</a></p>
+<p class="cmd-url"><a href="https://docs.railway.com/guides/cli">https://docs.railway.com/guides/cli</a></p>
 
 - **completion**: Flags: --help, -h
-- **list**: Flags: --help, -h
-- **logs**: Flags: --help, -h. Valued: --deployment
+- **deployment list**: Flags: --help, --json, -h. Valued: --environment, --limit, --service, -e, -s
+- **docs**: Flags: --help, -h
+- **environment config**: Flags: --help, --json, -h. Valued: --environment, -e
+- **environment info**: Flags: --help, --json, -h. Valued: --environment, -e
+- **environment list**: Flags: --ephemeral, --help, --json, --no-ephemeral, -h
+- **environment show**: Flags: --help, --json, -h. Valued: --environment, -e
+- **link**: Flags: --help, --json, -h. Valued: --environment, --project, --service, --team, --workspace, -e, -p, -s, -t, -w
+- **list**: Flags: --help, --json, -h
+- **login**: Flags: --browserless, --help, -b, -h
+- **logout**: Flags: --help, -h
+- **logs**: Flags: --build, --deployment, --help, --http, --json, --latest, -b, -d, -h. Valued: --environment, --filter, --lines, --method, --path, --request-id, --service, --since, --status, --tail, --until, -S, -U, -e, -f, -n, -s
+- **metrics**: Flags: --all, --cpu, --help, --http, --json, --memory, --network, --raw, --volume, --watch, -a, -h, -w. Valued: --environment, --filter, --method, --path, --request-id, --service, --since, --status, --until, -S, -U, -e, -s
+- **open**: Flags: --help, --print, -h, -p
+- **service list**: Flags: --help, --json, -h. Valued: --environment, -e
 - **status**: Flags: --help, --json, -h
-- **variables list**: Flags: --help, -h
-- **version**
-- **volume list**: Flags: --help, -h
-- **whoami**: Flags: --help, -h
-- Allowed standalone flags: --help, --version, -h
+- **unlink**: Flags: --help, --json, --yes, -h, -y. Valued: --service, -s
+- **variable list**: Flags: --help, --json, --kv, -h, -k. Valued: --environment, --service, -e, -s
+- **variables**: Flags: --help, --json, --kv, -h, -k. Valued: --environment, --service, -e, -s
+- **volume list**: Flags: --help, --json, -h. Valued: --environment, --service, -e, -s
+- **whoami**: Flags: --help, --json, -h
+- Allowed standalone flags: --help, --version, -h, -V
+
+### `render`
+<p class="cmd-url"><a href="https://render.com/docs/cli-reference">https://render.com/docs/cli-reference</a></p>
+
+- **blueprints validate**: Flags: --confirm, --help, -h. Valued: --output, --workspace, -o, -w
+- **deploys list**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **environments**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **jobs list**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **login**: Flags: --help, -h
+- **logs**: Flags: --confirm, --help, --tail, --text, -h. Valued: --direction, --end, --host, --instance, --level, --limit, --method, --output, --path, --resources, --start, --status-code, --task-id, --task-run-id, --type, -o, -r
+- **projects**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **services instances**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **services**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **whoami**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **workspace current**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **workspaces**: Flags: --confirm, --help, -h. Valued: --output, -o
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `security`
 <p class="cmd-url"><a href="https://ss64.com/mac/security.html">https://ss64.com/mac/security.html</a></p>
