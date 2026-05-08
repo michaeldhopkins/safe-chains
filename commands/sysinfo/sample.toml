@@ -2,6 +2,7 @@
 name = "sample"
 description = "macOS profiling utility that attaches to a process by PID (or partial-name match), samples its call stacks at the configured interval for the configured duration, and prints a stack-trace report to stdout. Read-only — does not modify the target process. Operates via Mach task port APIs (the same APIs Instruments uses); attaching to processes owned by other users typically requires elevated permissions and may be blocked by SIP/AMFI policy. Useful for diagnosing CPU spikes, hangs, and lock contention without launching Instruments. The -wait flag pauses until a matching process spawns. -mayDie keeps sampling even if the target exits mid-run. The -file and -html flags redirect the report to a file (write operation) and are out of coverage; to capture a profile to disk, redirect stdout instead (`sample <pid> 1 > profile.txt`). Ships with macOS; the surface is stable across releases."
 url = "https://ss64.com/mac/sample.html"
+researched_version = "macOS sample(1) — ships with macOS, surface frozen across releases"
 level = "Inert"
 bare = false
 max_positional = 3

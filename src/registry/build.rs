@@ -158,6 +158,7 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
 pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     let cat = category.to_string();
     let desc = toml.description.unwrap_or_default();
+    let researched_version = toml.researched_version;
     if let Some(handler_name) = toml.handler {
         return CommandSpec {
             name: toml.name,
@@ -165,6 +166,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             aliases: toml.aliases,
             url: toml.url,
             category: cat,
+            researched_version,
             kind: DispatchKind::Custom { handler_name, doc_body: toml.doc_body },
         };
     }
@@ -178,6 +180,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 aliases: toml.aliases,
                 url: toml.url,
                 category: cat,
+                researched_version,
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
                     subs: filter_candidates(toml.sub).map(build_sub).collect(),
@@ -195,6 +198,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             aliases: toml.aliases,
             url: toml.url,
             category: cat,
+            researched_version,
             kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
                 valued: w.valued,
@@ -213,6 +217,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             aliases: toml.aliases,
             url: toml.url,
             category: cat,
+            researched_version,
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
                 subs: filter_candidates(toml.sub).map(build_sub).collect(),
@@ -243,6 +248,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             aliases: toml.aliases,
             url: toml.url,
             category: cat,
+            researched_version,
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
                 level,
@@ -257,6 +263,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             aliases: toml.aliases,
             url: toml.url,
             category: cat,
+            researched_version,
             kind: DispatchKind::RequireAny {
                 require_any: toml.require_any,
                 policy,
@@ -272,6 +279,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         aliases: toml.aliases,
         url: toml.url,
         category: cat,
+        researched_version,
         kind: DispatchKind::Policy {
             policy,
             level,
@@ -303,6 +311,7 @@ pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
                 aliases: vec![],
                 url: spec.url.clone(),
                 category: spec.category.clone(),
+                researched_version: spec.researched_version.clone(),
                 kind: spec.kind.clone(),
             });
         }

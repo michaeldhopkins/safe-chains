@@ -2,6 +2,7 @@
 name = "northflank"
 description = "Northflank's hosting platform CLI (npm package @northflank/cli, binary `northflank`). Manages services, jobs, addons, projects, volumes, domains, and workflows on the Northflank PaaS. Verb-noun structure: `northflank <verb> <resource>` where verbs include get/list/logs/metrics (read-only) and create/delete/patch/update/exec/execute-command (mutating remote state). Read-only subcommands (get, list, logs, metrics, command-overview, context ls) issue API queries over HTTPS or render local CLI metadata without touching remote state. login/logout/context use modify only the local auth context (~/.config/northflank/ or similar). Mutating operations include create/delete/patch/update for any resource type, plus exec (open an interactive shell inside a running container — pure remote shell access). The CLI ships frequent minor releases with new resource verbs and flags; flag surfaces below cover the documented usage patterns and may need follow-up tightening once verbatim --help output is captured from a real install. No `northflank run -- <localcmd>` env-loading wrapper exists."
 url = "https://northflank.com/docs/v1/api/use-the-cli"
+researched_version = "@northflank/cli 0.10.15 (npm, 2026-05-02)"
 bare_flags = ["--help", "--version", "-h", "-v"]
 
 [[command.sub]]

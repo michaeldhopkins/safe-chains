@@ -75,6 +75,16 @@ Do NOT reference safe-chains internals (SafeWrite, SafeRead, Inert, handlers, al
 
 Use `candidate = true` on subcommands that were considered but deliberately not approved. This records the decision so future contributors don't re-evaluate the same commands.
 
+### Research the latest upstream version, not the local install
+
+Whenever you research or revise a command, target the **latest released** version of the upstream tool, not whatever happens to be installed on the current machine. Check the project's GitHub releases, npm registry, crates.io, or official docs to confirm the current version, and read the latest reference for that version. If the local install and the online docs disagree, follow the online docs — local installs drift behind quickly and the goal is for safe-chains to match what an up-to-date user actually runs.
+
+Record the version you researched in the `researched_version` field on `[[command]]` (free-form string — see SAMPLE.toml for forms). This field is internal-only (not rendered in docs) but it's the tripwire for the next person re-researching: they can see whether the current upstream is meaningfully ahead and what to diff against.
+
+Backfill is not feasible for older TOMLs that pre-date the field. The right time to fill it in is the next time the command is researched — leave it absent until then rather than guess.
+
+When safe-chains' classification differs from upstream behavior because the upstream changed, the upstream wins: treat the divergence as a follow-up to update our TOML, not a reason to keep our older shape.
+
 ## Documentation style
 
 Doc strings in `command_docs()` must only describe what is **allowed**. This is an allowlist-only program.

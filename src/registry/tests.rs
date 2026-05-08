@@ -2020,6 +2020,47 @@ use super::*;
     }
 
     #[test]
+    fn researched_version_round_trips() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "demo-cli 1.9.0 (2026-05-08)"
+        "#);
+        assert_eq!(
+            spec.researched_version.as_deref(),
+            Some("demo-cli 1.9.0 (2026-05-08)"),
+        );
+    }
+
+    #[test]
+    fn researched_version_optional_defaults_to_none() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+        "#);
+        assert!(spec.researched_version.is_none());
+    }
+
+    #[test]
+    fn researched_version_does_not_render_in_docs() {
+        // Internal-only field — not rendered as part of the command
+        // doc body. Future commits can add a separate documentation
+        // surface; today the field is purely a tripwire for the next
+        // re-research pass.
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "9.9.9"
+        "#);
+        let doc = spec.to_command_doc();
+        assert!(
+            !doc.description.contains("9.9.9"),
+            "researched_version leaked into doc body: {}",
+            doc.description,
+        );
+    }
+
+    #[test]
     fn handler_command_with_doc_body_renders_body() {
         let spec = load_one(r#"
             [[command]]
