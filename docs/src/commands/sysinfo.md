@@ -129,6 +129,13 @@
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+### `sample`
+<p class="cmd-url"><a href="https://ss64.com/mac/sample.html">https://ss64.com/mac/sample.html</a></p>
+
+- Allowed standalone flags: --help, -h, -DTRACE, -DTRACE_PROBE, -e, -fullPaths, -mayDie, -microsecondPrecision, -noBinarySpec, -noSymbolize, -noTaskName, -revSymbolicate, -stackInfo, -wait
+- Allowed valued flags: -allMaxThreadCount
+- Numeric shorthand accepted (e.g. -20 for -n 20)
+
 ### `sleep`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation</a></p>
 

@@ -134,7 +134,7 @@ const HANDLED_CMDS: &[&str] = &[
     "alias", "break", "continue", "declare", "exit", "export", "hash", "printenv", "read", "type", "typeset", "wait", "whereis", "which", "whoami", "date", "pwd", "cd", "unset",
     "uname", "nproc", "uptime", "id", "groups", "tty", "locale", "cal", "sleep",
     "who", "w", "last", "lastlog",
-    "ps", "top", "htop", "iotop", "procs", "dust", "lsof", "pgrep", "pstree", "lsblk", "free",
+    "ps", "top", "htop", "iotop", "procs", "dust", "lsof", "pgrep", "pstree", "lsblk", "free", "sample",
     "jq", "jaq", "gojq", "fx", "jless", "htmlq", "xq", "tomlq", "mlr", "dasel",
     "base64", "xxd", "getconf", "uuidgen",
     "md5sum", "md5", "sha256sum", "shasum", "sha1sum", "sha512sum",
