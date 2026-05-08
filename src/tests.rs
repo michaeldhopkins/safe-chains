@@ -537,6 +537,12 @@ safe! {
 }
 
 denied! {
+    heredoc_pipe_to_bash_unsafe: "cat <<'EOF' | bash\nrm -rf /\nEOF",
+    heredoc_pipe_to_bash_safe_inner: "cat <<EOF | bash\nls\nEOF",
+    heredoc_strip_tabs_pipe_to_bash: "cat <<-EOF | bash\n\trm -rf /\n\tEOF",
+    heredoc_to_sh: "cat <<EOF | sh\nls\nEOF",
+    heredoc_to_zsh: "cat <<EOF | zsh\nls\nEOF",
+
     help_npm_install_denied: "npm install --help",
     help_brew_install_denied: "brew install --help",
     help_cargo_login_redirect_denied: "cargo login --help 2>&1",
