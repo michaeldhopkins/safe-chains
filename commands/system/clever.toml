@@ -1,0 +1,501 @@
+[[command]]
+name = "clever"
+description = "Clever Cloud's PaaS CLI (Node.js, npm package clever-tools, github.com/CleverCloud/clever-tools) for managing applications, addons, domains, environment variables, networks, and managed services on the Clever Cloud platform. Globally accepts --color/--no-color, --update-notifier/--no-update-notifier, --verbose/-v, --help/-?, --version/-V at any position. Auth lives in a profile config file written by login (an OAuth-style browser flow); profile switch/list manage which profile is active. Local app linkage is held in a per-repo config file: link writes a new app alias entry, unlink removes one — both purely local writes. The read-only surface (accesslogs, activity, applications [linked apps] / applications list [org-wide], addon list / addon env, console [opens browser to console URL — does NOT open a remote shell, unlike Scalingo's console], database backups, diag, domain [list], domain overview, domain diag, domain favourite, drain / drain get, env [list], features list / features info, k8s list / k8s get / k8s activity / k8s quota / k8s version / k8s nodegroups list/get, ng search / ng get / ng get-config, notify-email [list], oauth-consumers [list] / oauth-consumers list/get, profile / profile list, status, ssh-keys [list], tcp-redirs [list] / tcp-redirs list-namespaces, tokens [list], version, webhooks [list], emails [list]) issues HTTPS API queries against api.clever-cloud.com without modifying remote state. The mutating surface (cancel-deploy, create, delete, deploy, domain add/rm/favourite set/unset, drain create/disable/enable/remove, emails add/primary/remove/remove-all, env set/rm/import/import-vars, features enable/disable, k8s create/delete/update/add-persistent-storage/get-kubeconfig/version update/nodegroups create/delete/update, keycloak/matomo/metabase/otoroshi rebuild/restart/disable-ng/enable-ng/version update, ng create/delete/link/unlink/create external/delete external, notify-email add/remove, oauth-consumers create/delete/update, open, profile switch, published-config import/rm/set, restart, scale, service link-app/unlink-app/link-addon/unlink-addon, ssh-keys add/remove/remove-all, ssh [opens an interactive remote SSH session], stop, tcp-redirs add/remove, tokens create/revoke, webhooks add/remove, addon create/delete/rename, addon providers show, config-provider import/set/rm, database backups download, make-default, config get/set/update, kv) talks to live infrastructure or opens an interactive remote shell (clever ssh spawns the system ssh against the Clever gateway with the appId as the routing key). The repo ships a clever curl subcommand that wraps the CLI's API authentication around an arbitrary HTTPS request — that is best treated as out-of-coverage. The CLI iterates frequently with frequent minor releases; flag surfaces below were captured from src/commands/*.command.js."
+url = "https://www.clever-cloud.com/developers/doc/cli/"
+bare_flags = ["--help", "--version", "-?", "-V"]
+
+[command.wrapper]
+standalone = ["--color", "--no-color", "--no-update-notifier", "--update-notifier", "--verbose", "-v"]
+
+[[command.sub]]
+name = "login"
+level = "SafeWrite"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "--secret", "--token", "-a", "-o"]
+
+[[command.sub]]
+name = "logout"
+level = "SafeWrite"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+
+[[command.sub]]
+name = "link"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+
+[[command.sub]]
+name = "unlink"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+
+[[command.sub]]
+name = "diag"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+
+[[command.sub]]
+name = "status"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--format", "--org", "-F", "-a", "-o"]
+
+[[command.sub]]
+name = "console"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+
+[[command.sub]]
+name = "applications"
+nested_bare = true
+standalone = ["--help", "--json", "--only-aliases", "-?", "-j"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--format", "--org", "--owner", "-F", "-a", "-o"]
+
+[[command.sub]]
+name = "activity"
+standalone = ["--follow", "--help", "--show-all", "-?", "-f"]
+valued = ["--alias", "--app", "--format", "--org", "-F", "-a", "-o"]
+
+[[command.sub]]
+name = "accesslogs"
+standalone = ["--help", "-?"]
+valued = [
+    "--addon", "--after", "--alias", "--app", "--before",
+    "--format", "--since", "--until",
+    "-F", "-a",
+]
+
+[[command.sub]]
+name = "logs"
+standalone = ["--help", "-?"]
+valued = [
+    "--addon", "--after", "--alias", "--app", "--before",
+    "--deployment-id", "--format", "--search", "--since",
+    "--until",
+    "-F", "-a",
+]
+
+[[command.sub]]
+name = "env"
+nested_bare = true
+standalone = ["--add-export", "--help", "-?"]
+valued = ["--alias", "--app", "--format", "--org", "-F", "-a", "-o"]
+[[command.sub.sub]]
+name = "import"
+candidate = true
+[[command.sub.sub]]
+name = "import-vars"
+candidate = true
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+[[command.sub.sub]]
+name = "set"
+candidate = true
+
+[[command.sub]]
+name = "profile"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--format", "--org", "-F", "-a", "-o"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--format", "--org", "-F", "-a", "-o"]
+[[command.sub.sub]]
+name = "open"
+candidate = true
+[[command.sub.sub]]
+name = "switch"
+candidate = true
+
+[[command.sub]]
+name = "addon"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--no-app", "-?"]
+valued = ["--alias", "--app", "--format", "--org", "--owner", "-F", "-a", "-o"]
+[[command.sub.sub]]
+name = "env"
+bare = false
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--format", "--org", "-F", "-a", "-o"]
+[[command.sub.sub]]
+name = "providers"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+[[command.sub.sub]]
+name = "rename"
+candidate = true
+
+[[command.sub]]
+name = "domain"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "overview"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--format", "--org", "--owner", "-F", "-a", "-o"]
+[[command.sub.sub]]
+name = "diag"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--format", "--org", "-F", "-a", "-o"]
+[[command.sub.sub]]
+name = "favourite"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "add"
+candidate = true
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "drain"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "disable"
+candidate = true
+[[command.sub.sub]]
+name = "enable"
+candidate = true
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "notify-email"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--format", "--list-all", "--org", "--owner", "-F", "-a", "-o"]
+[[command.sub.sub]]
+name = "add"
+candidate = true
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "webhooks"
+nested_bare = true
+standalone = ["--help", "--list-all", "-?"]
+valued = ["--alias", "--app", "--format", "--org", "--owner", "-F", "-a", "-o"]
+[[command.sub.sub]]
+name = "add"
+candidate = true
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "tokens"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "revoke"
+candidate = true
+
+[[command.sub]]
+name = "ssh-keys"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "add"
+candidate = true
+[[command.sub.sub]]
+name = "open"
+candidate = true
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+[[command.sub.sub]]
+name = "remove-all"
+candidate = true
+
+[[command.sub]]
+name = "emails"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "add"
+candidate = true
+[[command.sub.sub]]
+name = "open"
+candidate = true
+[[command.sub.sub]]
+name = "primary"
+candidate = true
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+[[command.sub.sub]]
+name = "remove-all"
+candidate = true
+
+[[command.sub]]
+name = "tcp-redirs"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "list-namespaces"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "add"
+candidate = true
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "oauth-consumers"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+[[command.sub.sub]]
+name = "open"
+candidate = true
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "features"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "info"
+bare = false
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "enable"
+candidate = true
+[[command.sub.sub]]
+name = "disable"
+candidate = true
+
+[[command.sub]]
+name = "database"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "backups"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+
+[[command.sub]]
+name = "ng"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "search"
+bare = false
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "get-config"
+bare = false
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+[[command.sub.sub]]
+name = "link"
+candidate = true
+[[command.sub.sub]]
+name = "unlink"
+candidate = true
+
+[[command.sub]]
+name = "k8s"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "activity"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "quota"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "version"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "nodegroups"
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "add-persistent-storage"
+candidate = true
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+[[command.sub.sub]]
+name = "get-kubeconfig"
+candidate = true
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "service"
+nested_bare = true
+standalone = ["--help", "-?"]
+valued = ["--alias", "--app", "--org", "-a", "-o"]
+[[command.sub.sub]]
+name = "link-addon"
+candidate = true
+[[command.sub.sub]]
+name = "link-app"
+candidate = true
+[[command.sub.sub]]
+name = "unlink-addon"
+candidate = true
+[[command.sub.sub]]
+name = "unlink-app"
+candidate = true
+
+[[command.sub]]
+name = "cancel-deploy"
+candidate = true
+[[command.sub]]
+name = "config"
+candidate = true
+[[command.sub]]
+name = "config-provider"
+candidate = true
+[[command.sub]]
+name = "create"
+candidate = true
+[[command.sub]]
+name = "curl"
+candidate = true
+[[command.sub]]
+name = "delete"
+candidate = true
+[[command.sub]]
+name = "deploy"
+candidate = true
+[[command.sub]]
+name = "keycloak"
+candidate = true
+[[command.sub]]
+name = "kv"
+candidate = true
+[[command.sub]]
+name = "make-default"
+candidate = true
+[[command.sub]]
+name = "matomo"
+candidate = true
+[[command.sub]]
+name = "metabase"
+candidate = true
+[[command.sub]]
+name = "open"
+candidate = true
+[[command.sub]]
+name = "otoroshi"
+candidate = true
+[[command.sub]]
+name = "published-config"
+candidate = true
+[[command.sub]]
+name = "restart"
+candidate = true
+[[command.sub]]
+name = "scale"
+candidate = true
+[[command.sub]]
+name = "ssh"
+candidate = true
+[[command.sub]]
+name = "stop"
+candidate = true

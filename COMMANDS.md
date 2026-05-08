@@ -1018,6 +1018,64 @@ Aliases: `clang++`
 - **plugins validate**: Positional args accepted
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `clever`
+<p class="cmd-url"><a href="https://www.clever-cloud.com/developers/doc/cli/">https://www.clever-cloud.com/developers/doc/cli/</a></p>
+
+- **accesslogs**: Flags: --help, -?. Valued: --addon, --after, --alias, --app, --before, --format, --since, --until, -F, -a
+- **activity**: Flags: --follow, --help, --show-all, -?, -f. Valued: --alias, --app, --format, --org, -F, -a, -o
+- **addon env**: Flags: --help, -?. Valued: --alias, --app, --format, --org, -F, -a, -o
+- **addon list**: Flags: --help, --no-app, -?. Valued: --alias, --app, --format, --org, --owner, -F, -a, -o
+- **addon providers**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **addon**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **applications list**: Flags: --help, -?. Valued: --alias, --app, --format, --org, --owner, -F, -a, -o
+- **applications**: Flags: --help, --json, --only-aliases, -?, -j. Valued: --alias, --app, --org, -a, -o
+- **console**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **database backups**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **database**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **diag**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **domain diag**: Flags: --help, -?. Valued: --alias, --app, --format, --org, -F, -a, -o
+- **domain favourite**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **domain overview**: Flags: --help, -?. Valued: --alias, --app, --format, --org, --owner, -F, -a, -o
+- **domain**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **drain get**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **drain**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **emails**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **env**: Flags: --add-export, --help, -?. Valued: --alias, --app, --format, --org, -F, -a, -o
+- **features info**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **features list**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **features**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **k8s activity**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **k8s get**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **k8s list**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **k8s nodegroups**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **k8s quota**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **k8s version**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **k8s**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **link**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **login**: Flags: --help, -?. Valued: --alias, --app, --org, --secret, --token, -a, -o
+- **logout**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **logs**: Flags: --help, -?. Valued: --addon, --after, --alias, --app, --before, --deployment-id, --format, --search, --since, --until, -F, -a
+- **ng get**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **ng get-config**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **ng search**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **ng**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **notify-email**: Flags: --help, -?. Valued: --alias, --app, --format, --list-all, --org, --owner, -F, -a, -o
+- **oauth-consumers get**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **oauth-consumers list**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **oauth-consumers**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **profile list**: Flags: --help, -?. Valued: --alias, --app, --format, --org, -F, -a, -o
+- **profile**: Flags: --help, -?. Valued: --alias, --app, --format, --org, -F, -a, -o
+- **service**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **ssh-keys**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **status**: Flags: --help, -?. Valued: --alias, --app, --format, --org, -F, -a, -o
+- **tcp-redirs list-namespaces**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **tcp-redirs**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **tokens**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **unlink**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **version**: Flags: --help, -?. Valued: --alias, --app, --org, -a, -o
+- **webhooks**: Flags: --help, --list-all, -?. Valued: --alias, --app, --format, --org, --owner, -F, -a, -o
+- Allowed standalone flags: --help, --version, -?, -V
+
 ### `cloc`
 <p class="cmd-url"><a href="https://github.com/AlDanial/cloc#readme">https://github.com/AlDanial/cloc#readme</a></p>
 
@@ -2449,6 +2507,11 @@ Aliases: `gradlew`
 - **-printcert**: Flags: --help, -h, -rfc, -v. Valued: -file, -jarfile
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `kill`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/kill.1.html">https://man7.org/linux/man-pages/man1/kill.1.html</a></p>
+
+- Requires -0, -L, -l. - Allowed standalone flags: --help, -0, -L, -h, -l
+
 ### `kind`
 <p class="cmd-url"><a href="https://kind.sigs.k8s.io/">https://kind.sigs.k8s.io/</a></p>
 
@@ -2464,6 +2527,40 @@ Aliases: `gradlew`
 - Allowed standalone flags: --debug, --dependencies, --exports, --files, --help, --include-entry-exports, --include-libs, --isolate-workspaces, --no-config-hints, --no-exit-code, --no-gitignore, --no-progress, --performance, --production, --strict, --version, -V, -h
 - Allowed valued flags: --cache-location, --config, --exclude, --include, --max-issues, --reporter, --tags, --tsConfig, --workspace, -W, -c, -t
 - Bare invocation allowed
+
+### `koyeb`
+<p class="cmd-url"><a href="https://www.koyeb.com/docs/build-and-deploy/cli">https://www.koyeb.com/docs/build-and-deploy/cli</a></p>
+
+- **apps describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **apps get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **apps list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **deployments describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **deployments get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **deployments list**: Flags: --help, -h. Valued: --app, --organization, --output, --service, --token, --url, -o
+- **deployments logs**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **domains describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **domains get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **domains list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **instances describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **instances get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **instances list**: Flags: --help, -h. Valued: --app, --organization, --output, --service, --token, --url, -o
+- **instances logs**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
+- **login**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **metrics get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **organizations list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **regions get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **regions list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **secrets describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **secrets get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **secrets list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **services describe**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **services get**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **services list**: Flags: --help, -h. Valued: --app, --name, --organization, --output, --token, --url, -a, -n, -o
+- **services logs**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
+- **services unapplied-changes**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **version**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **whoami**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `ktlint`
 <p class="cmd-url"><a href="https://pinterest.github.io/ktlint/latest/">https://pinterest.github.io/ktlint/latest/</a></p>
@@ -3331,6 +3428,122 @@ Aliases: `pip3`
 - Requires --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist. - Allowed standalone flags: --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist, --regexp, --help, -h
 - Allowed valued flags: --volume
 
+### `platform`
+<p class="cmd-url"><a href="https://docs.platform.sh/administration/cli.html">https://docs.platform.sh/administration/cli.html</a></p>
+
+Aliases: `upsun`
+
+- **act**: Flags: --all, --help, -h. Valued: --environment, --exclude-type, --format, --limit, --project, --result, --start, --state, --type, -e, -p, -t
+- **activities**: Flags: --all, --help, -h. Valued: --environment, --exclude-type, --format, --limit, --project, --result, --start, --state, --type, -e, -p, -t
+- **activity:get**: Flags: --help, -h. Valued: --environment, --format, --project, --property, -e, -p
+- **activity:list**: Flags: --all, --help, -h. Valued: --environment, --exclude-type, --format, --limit, --project, --result, --start, --state, --type, -e, -p, -t
+- **activity:log**: Flags: --help, --refresh, -h. Valued: --environment, --project, --timestamps, -e, -p, -t
+- **app:config-get**: Flags: --help, -h. Valued: --app, --environment, --format, --project, --property, -A, -e, -p, -P
+- **app:list**: Flags: --help, --refresh, -h. Valued: --environment, --format, --project, -e, -p
+- **apps**: Flags: --help, --refresh, -h. Valued: --environment, --format, --project, -e, -p
+- **auth:api-token-login**: Flags: --help, -h
+- **auth:browser-login**: Flags: --force, --help, -f, -h. Valued: --method
+- **auth:info**: Flags: --help, --no-auto-login, --refresh, -h. Valued: --format, --property
+- **auth:logout**: Flags: --all, --help, --other, -h
+- **autoscaling**: Flags: --help, -h. Valued: --app, --environment, --format, --project, --service, --worker, -A, -e, -p
+- **autoscaling:get**: Flags: --help, -h. Valued: --app, --environment, --format, --project, --service, --worker, -A, -e, -p
+- **backup:get**: Flags: --help, -h. Valued: --environment, --format, --project, --property, -e, -p, -P
+- **backup:list**: Flags: --help, --no-header, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
+- **backups**: Flags: --help, --no-header, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
+- **cc**: Flags: --help, -h
+- **certificate:get**: Flags: --help, -h. Valued: --format, --project, --property, -p, -P
+- **certificate:list**: Flags: --help, --no-header, -h. Valued: --columns, --domain, --format, --issuer, --only-auto, --only-manual, --project, -c, -p
+- **certificates**: Flags: --help, --no-header, -h. Valued: --columns, --domain, --format, --issuer, --only-auto, --only-manual, --project, -c, -p
+- **certs**: Flags: --help, --no-header, -h. Valued: --columns, --domain, --format, --issuer, --only-auto, --only-manual, --project, -c, -p
+- **clear-cache**: Flags: --help, -h
+- **commit:get**: Flags: --help, -h. Valued: --environment, --format, --project, --property, -e, -p, -P
+- **commit:list**: Flags: --help, -h. Valued: --environment, --format, --limit, --project, -e, -p
+- **console**: Flags: --help, -h. Valued: --project, -p
+- **decode**: Flags: --help, -h. Valued: --property
+- **dir**: Flags: --help, -h
+- **docs**: Positional args accepted
+- **domain:get**: Flags: --help, -h. Valued: --format, --project, --property, -p, -P
+- **domain:list**: Flags: --help, --no-header, -h. Valued: --columns, --format, --project, -c, -p
+- **domains**: Flags: --help, --no-header, -h. Valued: --columns, --format, --project, -c, -p
+- **environment:info**: Flags: --help, --refresh, -h. Valued: --environment, --format, --project, -e, -p
+- **environment:list**: Flags: --help, --no-header, --no-inactive, --refresh, -h, -I. Valued: --columns, --depth, --format, --no-status, --pipe, --project, --sort, --status, --type, -c, -p, -t
+- **environment:logs**: Flags: --help, --tail, -h. Valued: --app, --environment, --lines, --project, --worker, -A, -e, -p
+- **environment:relationships**: Flags: --help, --refresh, -h. Valued: --app, --environment, --format, --project, --property, -A, -e, -p, -P
+- **environment:set-remote**: Flags: --help, -h. Valued: --project, -p
+- **environment:url**: Flags: --browser, --help, --pipe, -h. Valued: --environment, --primary, --project, -1, -e, -p
+- **environments**: Flags: --help, --no-header, --no-inactive, --refresh, -h, -I. Valued: --columns, --depth, --format, --no-status, --pipe, --project, --sort, --status, --type, -c, -p, -t
+- **envs**: Flags: --help, --no-header, --no-inactive, --refresh, -h, -I. Valued: --columns, --depth, --format, --no-status, --pipe, --project, --sort, --status, --type, -c, -p, -t
+- **help**: Positional args accepted
+- **integration:activity:get**: Flags: --help, -h. Valued: --format, --project, --property, -p, -P
+- **integration:activity:list**: Flags: --all, --help, -h. Valued: --exclude-type, --format, --limit, --project, --result, --start, --state, --type, -p, -t
+- **integration:activity:log**: Flags: --help, -h. Valued: --project, --timestamps, -p, -t
+- **integration:get**: Flags: --help, -h. Valued: --format, --project, --property, -p, -P
+- **integration:list**: Flags: --help, --no-header, -h. Valued: --columns, --format, --project, -c, -p
+- **integrations**: Flags: --help, --no-header, -h. Valued: --columns, --format, --project, -c, -p
+- **list**: Flags: --all, --help, --raw, --short, -h. Valued: --format
+- **local:dir**: Flags: --help, -h
+- **login**: Flags: --force, --help, -f, -h. Valued: --method
+- **logout**: Flags: --all, --help, --other, -h
+- **metrics**: Flags: --help, -h. Valued: --app, --bytes, --environment, --format, --project, --range, --service, --worker, -A, -e, -p, -r
+- **metrics:all**: Flags: --help, -h. Valued: --app, --bytes, --environment, --format, --project, --range, --service, --worker, -A, -e, -p, -r
+- **metrics:cpu**: Flags: --help, -h. Valued: --app, --environment, --format, --project, --range, --service, --worker, -A, -e, -p, -r
+- **metrics:disk-usage**: Flags: --help, -h. Valued: --app, --bytes, --environment, --format, --project, --range, --service, --worker, -A, -e, -p, -r
+- **metrics:memory**: Flags: --help, -h. Valued: --app, --bytes, --environment, --format, --project, --range, --service, --worker, -A, -e, -p, -r
+- **mount:list**: Flags: --help, --paths, --refresh, -h. Valued: --app, --environment, --format, --project, --worker, -A, -e, -p
+- **mounts**: Flags: --help, --paths, --refresh, -h. Valued: --app, --environment, --format, --project, --worker, -A, -e, -p
+- **operation:list**: Flags: --help, -h. Valued: --app, --environment, --format, --project, --worker, -A, -e, -p
+- **ops**: Flags: --help, -h. Valued: --app, --environment, --format, --project, --worker, -A, -e, -p
+- **organization:billing:address**: Flags: --help, -h. Valued: --format, --org, --property, -o, -P
+- **organization:billing:profile**: Flags: --help, -h. Valued: --format, --org, --property, -o, -P
+- **organization:info**: Flags: --help, -h. Valued: --format, --org, --property, -o, -P
+- **organization:list**: Flags: --help, --my, -h. Valued: --columns, --filter, --format, --sort, -c
+- **organization:subscription:list**: Flags: --help, -h. Valued: --columns, --format, --org, -c, -o
+- **organization:user:get**: Flags: --help, -h. Valued: --email, --format, --org, --property, -o, -P
+- **organization:user:list**: Flags: --help, -h. Valued: --columns, --format, --org, -c, -o
+- **organization:user:projects**: Flags: --help, -h. Valued: --columns, --email, --format, --org, -c, -o
+- **organizations**: Flags: --help, --my, -h. Valued: --columns, --filter, --format, --sort, -c
+- **orgs**: Flags: --help, --my, -h. Valued: --columns, --filter, --format, --sort, -c
+- **pro**: Flags: --help, --my, --no-header, --pipe, --refresh, -h. Valued: --columns, --format, --host, --org, --region, --sort, --title, -c, -o
+- **project:info**: Flags: --help, --refresh, -h. Valued: --format, --project, --property, -p, -P
+- **project:list**: Flags: --help, --my, --no-header, --pipe, --refresh, -h. Valued: --columns, --format, --host, --org, --region, --sort, --title, -c, -o
+- **project:set-remote**: Flags: --help, -h
+- **project:variable:list**: Flags: --help, --no-header, -h. Valued: --columns, --format, --project, -c, -p
+- **projects**: Flags: --help, --my, --no-header, --pipe, --refresh, -h. Valued: --columns, --format, --host, --org, --region, --sort, --title, -c, -o
+- **relationships**: Flags: --help, --refresh, -h. Valued: --app, --environment, --format, --project, --property, -A, -e, -p, -P
+- **repo:cat**: Flags: --help, -h. Valued: --app, --commit, --environment, --project, -A, -c, -e, -p
+- **repo:ls**: Flags: --directories, --files, --git-style, --help, -d, -h. Valued: --app, --commit, --environment, --project, -A, -c, -e, -p
+- **repo:read**: Flags: --help, -h. Valued: --app, --commit, --environment, --project, -A, -c, -e, -p
+- **route:get**: Flags: --help, --primary, -1, -h. Valued: --app, --environment, --format, --id, --project, --property, -A, -e, -p, -P
+- **route:list**: Flags: --help, --no-header, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
+- **routes**: Flags: --help, --no-header, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
+- **service:list**: Flags: --help, --no-header, --refresh, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
+- **services**: Flags: --help, --no-header, --refresh, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
+- **set-remote**: Flags: --help, -h
+- **source-operation:list**: Flags: --help, -h. Valued: --environment, --format, --project, -e, -p
+- **ssh-cert:load**: Flags: --help, --new, --refresh, -h
+- **ssh-key:list**: Flags: --help, -h. Valued: --columns, --format, -c
+- **ssh-keys**: Flags: --help, -h. Valued: --columns, --format, -c
+- **subscription:info**: Flags: --help, -h. Valued: --format, --project, --property, -p, -P
+- **team:get**: Flags: --help, -h. Valued: --format, --org, --property, --team, -o, -P
+- **team:list**: Flags: --help, -h. Valued: --columns, --format, --org, --sort, -c, -o
+- **team:project:list**: Flags: --help, -h. Valued: --columns, --format, --org, --team, -c, -o
+- **team:user:list**: Flags: --help, -h. Valued: --columns, --format, --org, --team, -c, -o
+- **teams**: Flags: --help, -h. Valued: --columns, --format, --org, --sort, -c, -o
+- **tunnel:info**: Flags: --encode, --help, -c, -h. Valued: --app, --environment, --format, --project, --property, --relationship, -A, -e, -p, -P, -r
+- **tunnel:list**: Flags: --all, --help, -a, -h. Valued: --app, --environment, --format, --project, -A, -e, -p
+- **tunnels**: Flags: --all, --help, -a, -h. Valued: --app, --environment, --format, --project, -A, -e, -p
+- **url**: Flags: --browser, --help, --pipe, -h. Valued: --environment, --primary, --project, -1, -e, -p
+- **user:get**: Flags: --help, --level, -h. Valued: --email, --format, --project, --property, -l, -p, -P
+- **user:list**: Flags: --help, --no-header, -h. Valued: --columns, --format, --project, -c, -p
+- **users**: Flags: --help, --no-header, -h. Valued: --columns, --format, --project, -c, -p
+- **variable:list**: Flags: --help, --no-header, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
+- **variables**: Flags: --help, --no-header, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
+- **vars**: Flags: --help, --no-header, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
+- **web**: Flags: --help, -h. Valued: --project, -p
+- **worker:list**: Flags: --help, --no-header, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
+- **workers**: Flags: --help, --no-header, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
+- Allowed standalone flags: --help, --version, -V, -h
+
 ### `please`
 <p class="cmd-url"><a href="https://statamic.dev/cli">https://statamic.dev/cli</a></p>
 
@@ -3463,6 +3676,23 @@ Aliases: `pip3`
 - **env list**: Flags: --full-path, --help, -h
 - **show**: Flags: --all, --help, --latest, --no-dev, --outdated, --top-level, --tree, -T, -h, -l, -o. Valued: --why
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `porter`
+<p class="cmd-url"><a href="https://docs.porter.run/standard/cli">https://docs.porter.run/standard/cli</a></p>
+
+- **app list**: Flags: --help, -h. Valued: --cluster, --project
+- **app manifests**: Flags: --help, -h. Valued: --cluster, --project
+- **app yaml**: Flags: --helm-overrides, --help, -h. Valued: --cluster, --project
+- **auth login**: Flags: --help, -h. Valued: --cluster, --project, --token
+- **auth logout**: Flags: --help, -h. Valued: --cluster, --project
+- **cluster list**: Flags: --help, -h. Valued: --cluster, --project
+- **config set-cluster**: Flags: --help, -h. Valued: --cluster, --project
+- **config set-project**: Flags: --help, -h. Valued: --cluster, --project
+- **config**: Flags: --help, --show-token, -h. Valued: --cluster, --project
+- **env list**: Flags: --help, -h. Valued: --cluster, --project
+- **project list**: Flags: --help, -h. Valued: --cluster, --project
+- **target list**: Flags: --help, --preview, -h. Valued: --cluster, --project
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `prettier`
 <p class="cmd-url"><a href="https://prettier.io/docs/en/cli.html">https://prettier.io/docs/en/cli.html</a></p>
@@ -3807,6 +4037,53 @@ Aliases: `python`
 - Allowed standalone flags: --help, -h, -DTRACE, -DTRACE_PROBE, -e, -fullPaths, -mayDie, -microsecondPrecision, -noBinarySpec, -noSymbolize, -noTaskName, -revSymbolicate, -stackInfo, -wait
 - Allowed valued flags: -allMaxThreadCount
 - Numeric shorthand accepted (e.g. -20 for -n 20)
+
+### `scalingo`
+<p class="cmd-url"><a href="https://doc.scalingo.com/platform/cli/start">https://doc.scalingo.com/platform/cli/start</a></p>
+
+- **addons**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **addons-config**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **addons-info**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **addons-list**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **addons-plans**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **alerts**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **apps**: Flags: --help, -h. Valued: --addon, --app, --database, --project, --region, -a
+- **apps-info**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **autoscalers**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **backups**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **changelog**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **collaborators**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **config**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **cron-tasks**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **deployment-logs**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **deployments**: Flags: --help, -h. Valued: --addon, --app, --database, --page, --per-page, --region, -a
+- **domains**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **domains-ssl**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **env**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **env-get**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **git-show**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **integration-link**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **integrations**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **keys**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **log-drains**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **login**: Flags: --help, --password-only, --ssh, -h. Valued: --addon, --api-token, --app, --database, --region, --ssh-identity, -a
+- **logout**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **logs**: Flags: --follow, --help, -f, -h. Valued: --addon, --app, --database, --filter, --lines, --region, -F, -a, -n
+- **logs-archives**: Flags: --help, -h. Valued: --addon, --app, --database, --page, --region, -a, -p
+- **notification-platforms**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **notifiers**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **notifiers-details**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **projects**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **projects-details**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **ps**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **regions**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **review-apps**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **self**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **stacks**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **stats**: Flags: --help, --stream, -h. Valued: --addon, --app, --database, --region, -a
+- **timeline**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **user-timeline**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `scw`
 <p class="cmd-url"><a href="https://github.com/scaleway/scaleway-cli">https://github.com/scaleway/scaleway-cli</a></p>

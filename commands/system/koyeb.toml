@@ -1,0 +1,334 @@
+[[command]]
+name = "koyeb"
+description = "Koyeb's PaaS CLI (Go, github.com/koyeb/koyeb-cli) for managing apps, services, deployments, instances, secrets, regions, and domains on the Koyeb platform via its HTTPS API. Resource-oriented structure (`koyeb <RESOURCE> <ACTION>`) with persistent flags accepted at any level: --config/-c, --output/-o, --debug/-d, --debug-full, --force-ascii, --full, --url, --token, --organization. The list/get/describe actions across apps, services, deployments, instances, regions, secrets, and domains issue API queries that return JSON/YAML/table representations of remote state without touching it; deployments logs and services logs stream historical and tailed log lines. login runs an interactive browser-token exchange and writes the resulting API token to the YAML config file at $HOME/.koyeb.yaml (or $KOYEB_CONFIG, or whatever --config points at). The state-modifying surface (apps create/update/delete/pause/resume, services create/update/delete/redeploy/scale/pause/resume, secrets create/update/delete/reveal, domains create/delete/attach/detach/refresh, deployments cancel) talks to the production control plane and rolls user code; instances exec/cp and services exec open or stream against running customer containers. The CLI sees frequent commits (multiple a month on master) with new sandbox/compose/database/volume/snapshot resource verbs added throughout 2025-2026; the documented flag surface for read actions has been stable but expects a follow-up tightening once verbatim --help is captured from a pinned release."
+url = "https://www.koyeb.com/docs/build-and-deploy/cli"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[command.wrapper]
+standalone = ["--debug", "--debug-full", "--force-ascii", "--full", "-d"]
+valued = ["--config", "--organization", "--output", "--token", "--url", "-c", "-o"]
+
+[[command.sub]]
+name = "login"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+
+[[command.sub]]
+name = "whoami"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+
+[[command.sub]]
+name = "apps"
+aliases = ["app", "a"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "init"
+candidate = true
+[[command.sub.sub]]
+name = "update"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+[[command.sub.sub]]
+name = "pause"
+candidate = true
+[[command.sub.sub]]
+name = "resume"
+candidate = true
+
+[[command.sub]]
+name = "deployments"
+aliases = ["deployment", "depl", "dep", "d"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--app", "--organization", "--output", "--service", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "logs"
+aliases = ["log", "l"]
+bare = false
+standalone = ["--help", "--tail", "-h"]
+valued = [
+    "--end-time", "--order", "--regex-search", "--since",
+    "--start-time", "--text-search", "--type",
+    "-e", "-s", "-t",
+]
+[[command.sub.sub]]
+name = "cancel"
+candidate = true
+
+[[command.sub]]
+name = "domains"
+aliases = ["domain", "dom"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+[[command.sub.sub]]
+name = "attach"
+candidate = true
+[[command.sub.sub]]
+name = "detach"
+candidate = true
+[[command.sub.sub]]
+name = "refresh"
+candidate = true
+
+[[command.sub]]
+name = "instances"
+aliases = ["instance", "inst", "i"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--app", "--organization", "--output", "--service", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "logs"
+aliases = ["log", "l"]
+bare = false
+standalone = ["--help", "--tail", "-h"]
+valued = [
+    "--end-time", "--order", "--regex-search", "--since",
+    "--start-time", "--text-search",
+    "-e", "-s",
+]
+[[command.sub.sub]]
+name = "exec"
+candidate = true
+[[command.sub.sub]]
+name = "run"
+candidate = true
+[[command.sub.sub]]
+name = "attach"
+candidate = true
+[[command.sub.sub]]
+name = "cp"
+candidate = true
+[[command.sub.sub]]
+name = "copy"
+candidate = true
+
+[[command.sub]]
+name = "secrets"
+aliases = ["secret", "sec"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "update"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+[[command.sub.sub]]
+name = "reveal"
+candidate = true
+
+[[command.sub]]
+name = "services"
+aliases = ["service", "svc", "s"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--app", "--name", "--organization", "--output", "--token", "--url", "-a", "-n", "-o"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--app", "--organization", "--output", "--token", "--url", "-a", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--app", "--organization", "--output", "--token", "--url", "-a", "-o"]
+[[command.sub.sub]]
+name = "logs"
+aliases = ["log", "l"]
+bare = false
+standalone = ["--help", "--tail", "-h"]
+valued = [
+    "--app", "--end-time", "--instance", "--order",
+    "--regex-search", "--since", "--start-time",
+    "--text-search", "--type",
+    "-a", "-t",
+]
+[[command.sub.sub]]
+name = "unapplied-changes"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--app", "--organization", "--output", "--token", "--url", "-a", "-o"]
+[[command.sub.sub]]
+name = "create"
+candidate = true
+[[command.sub.sub]]
+name = "update"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+[[command.sub.sub]]
+name = "redeploy"
+candidate = true
+[[command.sub.sub]]
+name = "pause"
+candidate = true
+[[command.sub.sub]]
+name = "resume"
+candidate = true
+[[command.sub.sub]]
+name = "scale"
+candidate = true
+[[command.sub.sub]]
+name = "exec"
+candidate = true
+[[command.sub.sub]]
+name = "run"
+candidate = true
+[[command.sub.sub]]
+name = "attach"
+candidate = true
+
+[[command.sub]]
+name = "regions"
+aliases = ["region"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+
+[[command.sub]]
+name = "organizations"
+aliases = ["organization", "org"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+[[command.sub.sub]]
+name = "switch"
+candidate = true
+
+[[command.sub]]
+name = "metrics"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--organization", "--output", "--token", "--url", "-o"]
+
+[[command.sub]]
+name = "archive"
+candidate = true
+[[command.sub]]
+name = "archives"
+candidate = true
+[[command.sub]]
+name = "compose"
+candidate = true
+[[command.sub]]
+name = "completion"
+candidate = true
+[[command.sub]]
+name = "databases"
+candidate = true
+[[command.sub]]
+name = "deploy"
+candidate = true
+[[command.sub]]
+name = "regional-deployments"
+candidate = true
+[[command.sub]]
+name = "sandbox"
+candidate = true
+[[command.sub]]
+name = "snapshots"
+candidate = true
+[[command.sub]]
+name = "volumes"
+candidate = true

@@ -1,0 +1,948 @@
+[[command]]
+name = "platform"
+aliases = ["upsun"]
+description = "Platform.sh / Upsun PaaS CLI — the same Symfony-Console binary ships under two names (`platform` for the Platform.sh brand, `upsun` for the Upsun brand) from the unified codebase at github.com/upsun/cli, with subtle behavioral differences but the same subcommand surface. Authenticates against api.platform.sh / api.upsun.com via browser OAuth (`auth:browser-login`, alias `login`) or an API token (`auth:api-token-login`); credentials and SSH certificates are written under `~/.platformsh/` (or the equivalent vendor dir for upsun). Subcommands use a `:` namespace separator (e.g. `project:list`) and the CLI also accepts the space-separated form (`project list`) as an alias. The read-only surface is large: every `:list`/`:get`/`:info` command, plus `auth:info`, `repo:cat`/`ls`/`read`, `subscription:info`, `environment:url`, `environment:relationships`, `environment:logs`, `route:get`/`list`, `metrics:*`, `commit:get`/`list`, `activity:get`/`list`/`log`, `app:config-get`, `app:config-validate`, `local:dir`, `mount:list`, `tunnel:info`/`list`, `ssh-key:list`, `ssh-cert:load` (writes a short-lived SSH cert to disk locally), `decode`, `web` (opens a browser), `docs`, `help`, `list`, `version`. Mutating remote operations include `environment:branch`/`activate`/`deactivate`/`delete`/`merge`/`push`/`redeploy`/`pause`/`resume`/`synchronize`, `project:create`/`delete`/`init`/`clear-build-cache`, `domain:add`/`delete`/`update`, `variable:create`/`update`/`delete` and the `project:variable:*` / `organization:user:*` / `team:*` siblings, `backup:create`/`restore`/`delete`, `integration:add`/`update`/`delete`/`validate`, `certificate:add`/`delete`, `ssh-key:add`/`delete`, `user:add`/`delete`/`update`, `source-operation:run`, `operation:run`, `autoscaling:set`. Remote-shell semantics: `ssh` and `environment:ssh` open an interactive container session (or with `-- <cmd>` execute a one-off remote command), `environment:drush` / `environment:xdebug` exec inside the container, `service:redis-cli`/`service:valkey-cli`/`service:mongo:shell` and `db:sql` open interactive remote DB shells, `tunnel:open` / `tunnel:single` / `tunnel:close` open or tear down localhost-bound tunnels that proxy to live service backends, `db:dump` and `service:mongo:dump`/`export` stream prod DB contents to a local file, `mount:download` / `mount:upload` / `environment:scp` move files between the local FS and a remote container, `environment:http-access` rewrites HTTP auth on a live env. Local-only writes: `auth:browser-login` / `auth:api-token-login` / `auth:logout` / `auth:verify-phone-number` (modify `~/.platformsh/`), `project:set-remote` / `environment:set-remote` (rewrite `.platform/local/project.yaml`), `environment:checkout`/`init` (manipulate the local git checkout), `clear-cache` (CLI cache), `local:build` / `local:drush-aliases` (build artifacts under `_www`/`.platform/`), `self:install` / `self:update` / `self:stats` (mutate the installed CLI binary). The CLI is on a ~bi-weekly minor release cadence (v5.x as of mid-2026) with a stable subcommand surface but flag additions in most releases."
+url = "https://docs.platform.sh/administration/cli.html"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--all", "--help", "--raw", "--short", "-h"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "docs"
+allow_all = true
+
+[[command.sub]]
+name = "decode"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--property"]
+
+[[command.sub]]
+name = "web"
+standalone = ["--help", "-h"]
+valued = ["--project", "-p"]
+
+[[command.sub]]
+name = "console"
+standalone = ["--help", "-h"]
+valued = ["--project", "-p"]
+
+[[command.sub]]
+name = "activity:get"
+standalone = ["--help", "-h"]
+valued = [
+    "--environment", "--format", "--project", "--property",
+    "-e", "-p",
+]
+
+[[command.sub]]
+name = "activity:list"
+standalone = ["--all", "--help", "-h"]
+valued = [
+    "--environment", "--exclude-type", "--format", "--limit",
+    "--project", "--result", "--start", "--state", "--type",
+    "-e", "-p", "-t",
+]
+
+[[command.sub]]
+name = "activities"
+standalone = ["--all", "--help", "-h"]
+valued = [
+    "--environment", "--exclude-type", "--format", "--limit",
+    "--project", "--result", "--start", "--state", "--type",
+    "-e", "-p", "-t",
+]
+
+[[command.sub]]
+name = "act"
+standalone = ["--all", "--help", "-h"]
+valued = [
+    "--environment", "--exclude-type", "--format", "--limit",
+    "--project", "--result", "--start", "--state", "--type",
+    "-e", "-p", "-t",
+]
+
+[[command.sub]]
+name = "activity:log"
+standalone = ["--help", "--refresh", "-h"]
+valued = ["--environment", "--project", "--timestamps", "-e", "-p", "-t"]
+
+[[command.sub]]
+name = "app:config-get"
+standalone = ["--help", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "--property", "-A", "-e", "-p", "-P"]
+
+[[command.sub]]
+name = "app:list"
+standalone = ["--help", "--refresh", "-h"]
+valued = ["--environment", "--format", "--project", "-e", "-p"]
+
+[[command.sub]]
+name = "apps"
+standalone = ["--help", "--refresh", "-h"]
+valued = ["--environment", "--format", "--project", "-e", "-p"]
+
+[[command.sub]]
+name = "auth:info"
+standalone = ["--help", "--no-auto-login", "--refresh", "-h"]
+valued = ["--format", "--property"]
+
+[[command.sub]]
+name = "certificate:get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--format", "--project", "--property", "-p", "-P"]
+
+[[command.sub]]
+name = "certificate:list"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--domain", "--format", "--issuer", "--only-auto", "--only-manual", "--project", "-c", "-p"]
+
+[[command.sub]]
+name = "certificates"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--domain", "--format", "--issuer", "--only-auto", "--only-manual", "--project", "-c", "-p"]
+
+[[command.sub]]
+name = "certs"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--domain", "--format", "--issuer", "--only-auto", "--only-manual", "--project", "-c", "-p"]
+
+[[command.sub]]
+name = "commit:get"
+standalone = ["--help", "-h"]
+valued = ["--environment", "--format", "--project", "--property", "-e", "-p", "-P"]
+
+[[command.sub]]
+name = "commit:list"
+standalone = ["--help", "-h"]
+valued = ["--environment", "--format", "--limit", "--project", "-e", "-p"]
+
+[[command.sub]]
+name = "domain:get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--format", "--project", "--property", "-p", "-P"]
+
+[[command.sub]]
+name = "domain:list"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--format", "--project", "-c", "-p"]
+
+[[command.sub]]
+name = "domains"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--format", "--project", "-c", "-p"]
+
+[[command.sub]]
+name = "environment:info"
+standalone = ["--help", "--refresh", "-h"]
+valued = ["--environment", "--format", "--project", "-e", "-p"]
+
+[[command.sub]]
+name = "environment:list"
+standalone = ["--help", "--no-header", "--no-inactive", "--refresh", "-h", "-I"]
+valued = ["--columns", "--depth", "--format", "--no-status", "--pipe", "--project", "--sort", "--status", "--type", "-c", "-p", "-t"]
+
+[[command.sub]]
+name = "environments"
+standalone = ["--help", "--no-header", "--no-inactive", "--refresh", "-h", "-I"]
+valued = ["--columns", "--depth", "--format", "--no-status", "--pipe", "--project", "--sort", "--status", "--type", "-c", "-p", "-t"]
+
+[[command.sub]]
+name = "envs"
+standalone = ["--help", "--no-header", "--no-inactive", "--refresh", "-h", "-I"]
+valued = ["--columns", "--depth", "--format", "--no-status", "--pipe", "--project", "--sort", "--status", "--type", "-c", "-p", "-t"]
+
+[[command.sub]]
+name = "environment:logs"
+standalone = ["--help", "--tail", "-h"]
+valued = ["--app", "--environment", "--lines", "--project", "--worker", "-A", "-e", "-p"]
+
+[[command.sub]]
+name = "environment:relationships"
+standalone = ["--help", "--refresh", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "--property", "-A", "-e", "-p", "-P"]
+
+[[command.sub]]
+name = "relationships"
+standalone = ["--help", "--refresh", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "--property", "-A", "-e", "-p", "-P"]
+
+[[command.sub]]
+name = "environment:url"
+standalone = ["--browser", "--help", "--pipe", "-h"]
+valued = ["--environment", "--primary", "--project", "-1", "-e", "-p"]
+
+[[command.sub]]
+name = "url"
+standalone = ["--browser", "--help", "--pipe", "-h"]
+valued = ["--environment", "--primary", "--project", "-1", "-e", "-p"]
+
+[[command.sub]]
+name = "metrics:all"
+standalone = ["--help", "-h"]
+valued = ["--app", "--bytes", "--environment", "--format", "--project", "--range", "--service", "--worker", "-A", "-e", "-p", "-r"]
+
+[[command.sub]]
+name = "metrics"
+standalone = ["--help", "-h"]
+valued = ["--app", "--bytes", "--environment", "--format", "--project", "--range", "--service", "--worker", "-A", "-e", "-p", "-r"]
+
+[[command.sub]]
+name = "metrics:cpu"
+standalone = ["--help", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "--range", "--service", "--worker", "-A", "-e", "-p", "-r"]
+
+[[command.sub]]
+name = "metrics:disk-usage"
+standalone = ["--help", "-h"]
+valued = ["--app", "--bytes", "--environment", "--format", "--project", "--range", "--service", "--worker", "-A", "-e", "-p", "-r"]
+
+[[command.sub]]
+name = "metrics:memory"
+standalone = ["--help", "-h"]
+valued = ["--app", "--bytes", "--environment", "--format", "--project", "--range", "--service", "--worker", "-A", "-e", "-p", "-r"]
+
+[[command.sub]]
+name = "mount:list"
+standalone = ["--help", "--paths", "--refresh", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "--worker", "-A", "-e", "-p"]
+
+[[command.sub]]
+name = "mounts"
+standalone = ["--help", "--paths", "--refresh", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "--worker", "-A", "-e", "-p"]
+
+[[command.sub]]
+name = "operation:list"
+standalone = ["--help", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "--worker", "-A", "-e", "-p"]
+
+[[command.sub]]
+name = "ops"
+standalone = ["--help", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "--worker", "-A", "-e", "-p"]
+
+[[command.sub]]
+name = "organization:info"
+standalone = ["--help", "-h"]
+valued = ["--format", "--org", "--property", "-o", "-P"]
+
+[[command.sub]]
+name = "organization:list"
+standalone = ["--help", "--my", "-h"]
+valued = ["--columns", "--filter", "--format", "--sort", "-c"]
+
+[[command.sub]]
+name = "organizations"
+standalone = ["--help", "--my", "-h"]
+valued = ["--columns", "--filter", "--format", "--sort", "-c"]
+
+[[command.sub]]
+name = "orgs"
+standalone = ["--help", "--my", "-h"]
+valued = ["--columns", "--filter", "--format", "--sort", "-c"]
+
+[[command.sub]]
+name = "organization:billing:address"
+standalone = ["--help", "-h"]
+valued = ["--format", "--org", "--property", "-o", "-P"]
+
+[[command.sub]]
+name = "organization:billing:profile"
+standalone = ["--help", "-h"]
+valued = ["--format", "--org", "--property", "-o", "-P"]
+
+[[command.sub]]
+name = "organization:subscription:list"
+standalone = ["--help", "-h"]
+valued = ["--columns", "--format", "--org", "-c", "-o"]
+
+[[command.sub]]
+name = "organization:user:get"
+standalone = ["--help", "-h"]
+valued = ["--email", "--format", "--org", "--property", "-o", "-P"]
+
+[[command.sub]]
+name = "organization:user:list"
+standalone = ["--help", "-h"]
+valued = ["--columns", "--format", "--org", "-c", "-o"]
+
+[[command.sub]]
+name = "organization:user:projects"
+standalone = ["--help", "-h"]
+valued = ["--columns", "--email", "--format", "--org", "-c", "-o"]
+
+[[command.sub]]
+name = "project:get"
+candidate = true
+
+[[command.sub]]
+name = "project:info"
+standalone = ["--help", "--refresh", "-h"]
+valued = ["--format", "--project", "--property", "-p", "-P"]
+
+[[command.sub]]
+name = "project:list"
+standalone = ["--help", "--my", "--no-header", "--pipe", "--refresh", "-h"]
+valued = ["--columns", "--format", "--host", "--org", "--region", "--sort", "--title", "-c", "-o"]
+
+[[command.sub]]
+name = "projects"
+standalone = ["--help", "--my", "--no-header", "--pipe", "--refresh", "-h"]
+valued = ["--columns", "--format", "--host", "--org", "--region", "--sort", "--title", "-c", "-o"]
+
+[[command.sub]]
+name = "pro"
+standalone = ["--help", "--my", "--no-header", "--pipe", "--refresh", "-h"]
+valued = ["--columns", "--format", "--host", "--org", "--region", "--sort", "--title", "-c", "-o"]
+
+[[command.sub]]
+name = "project:variable:get"
+candidate = true
+
+[[command.sub]]
+name = "project:variable:list"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--format", "--project", "-c", "-p"]
+
+[[command.sub]]
+name = "repo:cat"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--app", "--commit", "--environment", "--project", "-A", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "repo:ls"
+standalone = ["--directories", "--files", "--git-style", "--help", "-d", "-h"]
+valued = ["--app", "--commit", "--environment", "--project", "-A", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "repo:read"
+standalone = ["--help", "-h"]
+valued = ["--app", "--commit", "--environment", "--project", "-A", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "route:get"
+standalone = ["--help", "--primary", "-1", "-h"]
+valued = ["--app", "--environment", "--format", "--id", "--project", "--property", "-A", "-e", "-p", "-P"]
+
+[[command.sub]]
+name = "route:list"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--environment", "--format", "--project", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "routes"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--environment", "--format", "--project", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "service:list"
+standalone = ["--help", "--no-header", "--refresh", "-h"]
+valued = ["--columns", "--environment", "--format", "--project", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "services"
+standalone = ["--help", "--no-header", "--refresh", "-h"]
+valued = ["--columns", "--environment", "--format", "--project", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "source-operation:list"
+standalone = ["--help", "-h"]
+valued = ["--environment", "--format", "--project", "-e", "-p"]
+
+[[command.sub]]
+name = "ssh-key:list"
+standalone = ["--help", "-h"]
+valued = ["--columns", "--format", "-c"]
+
+[[command.sub]]
+name = "ssh-keys"
+standalone = ["--help", "-h"]
+valued = ["--columns", "--format", "-c"]
+
+[[command.sub]]
+name = "subscription:info"
+standalone = ["--help", "-h"]
+valued = ["--format", "--project", "--property", "-p", "-P"]
+
+[[command.sub]]
+name = "team:get"
+standalone = ["--help", "-h"]
+valued = ["--format", "--org", "--property", "--team", "-o", "-P"]
+
+[[command.sub]]
+name = "team:list"
+standalone = ["--help", "-h"]
+valued = ["--columns", "--format", "--org", "--sort", "-c", "-o"]
+
+[[command.sub]]
+name = "teams"
+standalone = ["--help", "-h"]
+valued = ["--columns", "--format", "--org", "--sort", "-c", "-o"]
+
+[[command.sub]]
+name = "team:project:list"
+standalone = ["--help", "-h"]
+valued = ["--columns", "--format", "--org", "--team", "-c", "-o"]
+
+[[command.sub]]
+name = "team:user:list"
+standalone = ["--help", "-h"]
+valued = ["--columns", "--format", "--org", "--team", "-c", "-o"]
+
+[[command.sub]]
+name = "tunnel:info"
+standalone = ["--encode", "--help", "-c", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "--property", "--relationship", "-A", "-e", "-p", "-P", "-r"]
+
+[[command.sub]]
+name = "tunnel:list"
+standalone = ["--all", "--help", "-a", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "-A", "-e", "-p"]
+
+[[command.sub]]
+name = "tunnels"
+standalone = ["--all", "--help", "-a", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "-A", "-e", "-p"]
+
+[[command.sub]]
+name = "user:get"
+standalone = ["--help", "--level", "-h"]
+valued = ["--email", "--format", "--project", "--property", "-l", "-p", "-P"]
+
+[[command.sub]]
+name = "user:list"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--format", "--project", "-c", "-p"]
+
+[[command.sub]]
+name = "users"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--format", "--project", "-c", "-p"]
+
+[[command.sub]]
+name = "variable:get"
+candidate = true
+
+[[command.sub]]
+name = "variable:list"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--environment", "--format", "--project", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "vget"
+candidate = true
+
+[[command.sub]]
+name = "variables"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--environment", "--format", "--project", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "vars"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--environment", "--format", "--project", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "worker:list"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--environment", "--format", "--project", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "workers"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--environment", "--format", "--project", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "backup:list"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--environment", "--format", "--project", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "backups"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--environment", "--format", "--project", "-c", "-e", "-p"]
+
+[[command.sub]]
+name = "backup:get"
+standalone = ["--help", "-h"]
+valued = ["--environment", "--format", "--project", "--property", "-e", "-p", "-P"]
+
+[[command.sub]]
+name = "snapshot:list"
+candidate = true
+
+[[command.sub]]
+name = "snapshot:get"
+candidate = true
+
+[[command.sub]]
+name = "integration:get"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--format", "--project", "--property", "-p", "-P"]
+
+[[command.sub]]
+name = "integration:list"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--format", "--project", "-c", "-p"]
+
+[[command.sub]]
+name = "integrations"
+standalone = ["--help", "--no-header", "-h"]
+valued = ["--columns", "--format", "--project", "-c", "-p"]
+
+[[command.sub]]
+name = "integration:activity:get"
+standalone = ["--help", "-h"]
+valued = ["--format", "--project", "--property", "-p", "-P"]
+
+[[command.sub]]
+name = "integration:activity:list"
+standalone = ["--all", "--help", "-h"]
+valued = ["--exclude-type", "--format", "--limit", "--project", "--result", "--start", "--state", "--type", "-p", "-t"]
+
+[[command.sub]]
+name = "integration:activity:log"
+standalone = ["--help", "-h"]
+valued = ["--project", "--timestamps", "-p", "-t"]
+
+[[command.sub]]
+name = "autoscaling:get"
+standalone = ["--help", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "--service", "--worker", "-A", "-e", "-p"]
+
+[[command.sub]]
+name = "autoscaling"
+standalone = ["--help", "-h"]
+valued = ["--app", "--environment", "--format", "--project", "--service", "--worker", "-A", "-e", "-p"]
+
+[[command.sub]]
+name = "local:dir"
+standalone = ["--help", "-h"]
+max_positional = 1
+
+[[command.sub]]
+name = "dir"
+standalone = ["--help", "-h"]
+max_positional = 1
+
+[[command.sub]]
+name = "auth:browser-login"
+level = "SafeWrite"
+standalone = ["--force", "--help", "-f", "-h"]
+valued = ["--method"]
+
+[[command.sub]]
+name = "login"
+level = "SafeWrite"
+standalone = ["--force", "--help", "-f", "-h"]
+valued = ["--method"]
+
+[[command.sub]]
+name = "auth:api-token-login"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "auth:logout"
+level = "SafeWrite"
+standalone = ["--all", "--help", "--other", "-h"]
+
+[[command.sub]]
+name = "logout"
+level = "SafeWrite"
+standalone = ["--all", "--help", "--other", "-h"]
+
+[[command.sub]]
+name = "ssh-cert:load"
+level = "SafeWrite"
+standalone = ["--help", "--new", "--refresh", "-h"]
+
+[[command.sub]]
+name = "clear-cache"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "cc"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "project:set-remote"
+level = "SafeWrite"
+max_positional = 1
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "set-remote"
+level = "SafeWrite"
+max_positional = 1
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "environment:set-remote"
+level = "SafeWrite"
+max_positional = 2
+standalone = ["--help", "-h"]
+valued = ["--project", "-p"]
+
+[[command.sub]]
+name = "blue-green:concluded"
+candidate = true
+[[command.sub]]
+name = "blue-green:deploy"
+candidate = true
+[[command.sub]]
+name = "blue-green:enable"
+candidate = true
+[[command.sub]]
+name = "autoscaling:set"
+candidate = true
+[[command.sub]]
+name = "auth:verify-phone-number"
+candidate = true
+[[command.sub]]
+name = "backup:create"
+candidate = true
+[[command.sub]]
+name = "backup"
+candidate = true
+[[command.sub]]
+name = "backup:delete"
+candidate = true
+[[command.sub]]
+name = "backup:restore"
+candidate = true
+[[command.sub]]
+name = "certificate:add"
+candidate = true
+[[command.sub]]
+name = "certificate:delete"
+candidate = true
+[[command.sub]]
+name = "db:dump"
+candidate = true
+[[command.sub]]
+name = "db:size"
+candidate = true
+[[command.sub]]
+name = "db:sql"
+candidate = true
+[[command.sub]]
+name = "domain:add"
+candidate = true
+[[command.sub]]
+name = "domain:delete"
+candidate = true
+[[command.sub]]
+name = "domain:update"
+candidate = true
+[[command.sub]]
+name = "environment:activate"
+candidate = true
+[[command.sub]]
+name = "environment:branch"
+candidate = true
+[[command.sub]]
+name = "branch"
+candidate = true
+[[command.sub]]
+name = "environment:checkout"
+candidate = true
+[[command.sub]]
+name = "checkout"
+candidate = true
+[[command.sub]]
+name = "environment:curl"
+candidate = true
+[[command.sub]]
+name = "environment:delete"
+candidate = true
+[[command.sub]]
+name = "environment:deactivate"
+candidate = true
+[[command.sub]]
+name = "environment:deploy"
+candidate = true
+[[command.sub]]
+name = "environment:deploy:type"
+candidate = true
+[[command.sub]]
+name = "environment:drush"
+candidate = true
+[[command.sub]]
+name = "drush"
+candidate = true
+[[command.sub]]
+name = "environment:http-access"
+candidate = true
+[[command.sub]]
+name = "httpaccess"
+candidate = true
+[[command.sub]]
+name = "environment:init"
+candidate = true
+[[command.sub]]
+name = "environment:merge"
+candidate = true
+[[command.sub]]
+name = "merge"
+candidate = true
+[[command.sub]]
+name = "environment:pause"
+candidate = true
+[[command.sub]]
+name = "environment:push"
+candidate = true
+[[command.sub]]
+name = "push"
+candidate = true
+[[command.sub]]
+name = "environment:redeploy"
+candidate = true
+[[command.sub]]
+name = "redeploy"
+candidate = true
+[[command.sub]]
+name = "environment:restore"
+candidate = true
+[[command.sub]]
+name = "environment:resume"
+candidate = true
+[[command.sub]]
+name = "environment:scp"
+candidate = true
+[[command.sub]]
+name = "scp"
+candidate = true
+[[command.sub]]
+name = "environment:ssh"
+candidate = true
+[[command.sub]]
+name = "environment:synchronize"
+candidate = true
+[[command.sub]]
+name = "synchronize"
+candidate = true
+[[command.sub]]
+name = "environment:xdebug"
+candidate = true
+[[command.sub]]
+name = "xdebug"
+candidate = true
+[[command.sub]]
+name = "integration:add"
+candidate = true
+[[command.sub]]
+name = "integration:delete"
+candidate = true
+[[command.sub]]
+name = "integration:update"
+candidate = true
+[[command.sub]]
+name = "integration:validate"
+candidate = true
+[[command.sub]]
+name = "local:build"
+candidate = true
+[[command.sub]]
+name = "build"
+candidate = true
+[[command.sub]]
+name = "local:drush-aliases"
+candidate = true
+[[command.sub]]
+name = "drush-aliases"
+candidate = true
+[[command.sub]]
+name = "mount:download"
+candidate = true
+[[command.sub]]
+name = "mount:upload"
+candidate = true
+[[command.sub]]
+name = "multi"
+candidate = true
+[[command.sub]]
+name = "operation:run"
+candidate = true
+[[command.sub]]
+name = "organization:create"
+candidate = true
+[[command.sub]]
+name = "organization:curl"
+candidate = true
+[[command.sub]]
+name = "organization:delete"
+candidate = true
+[[command.sub]]
+name = "organization:user:add"
+candidate = true
+[[command.sub]]
+name = "organization:user:delete"
+candidate = true
+[[command.sub]]
+name = "organization:user:update"
+candidate = true
+[[command.sub]]
+name = "project:clear-build-cache"
+candidate = true
+[[command.sub]]
+name = "project:create"
+candidate = true
+[[command.sub]]
+name = "project:curl"
+candidate = true
+[[command.sub]]
+name = "project:delete"
+candidate = true
+[[command.sub]]
+name = "project:init"
+candidate = true
+[[command.sub]]
+name = "ify"
+candidate = true
+[[command.sub]]
+name = "project:variable:create"
+candidate = true
+[[command.sub]]
+name = "project:variable:delete"
+candidate = true
+[[command.sub]]
+name = "project:variable:update"
+candidate = true
+[[command.sub]]
+name = "redis"
+candidate = true
+[[command.sub]]
+name = "self:install"
+candidate = true
+[[command.sub]]
+name = "self:stats"
+candidate = true
+[[command.sub]]
+name = "self:update"
+candidate = true
+[[command.sub]]
+name = "server:run"
+candidate = true
+[[command.sub]]
+name = "server:start"
+candidate = true
+[[command.sub]]
+name = "server:stop"
+candidate = true
+[[command.sub]]
+name = "service:mongo:dump"
+candidate = true
+[[command.sub]]
+name = "service:mongo:export"
+candidate = true
+[[command.sub]]
+name = "service:mongo:restore"
+candidate = true
+[[command.sub]]
+name = "service:mongo:shell"
+candidate = true
+[[command.sub]]
+name = "mongo"
+candidate = true
+[[command.sub]]
+name = "service:redis-cli"
+candidate = true
+[[command.sub]]
+name = "redis-cli"
+candidate = true
+[[command.sub]]
+name = "service:valkey-cli"
+candidate = true
+[[command.sub]]
+name = "valkey-cli"
+candidate = true
+[[command.sub]]
+name = "snapshot:create"
+candidate = true
+[[command.sub]]
+name = "snapshot:restore"
+candidate = true
+[[command.sub]]
+name = "source-operation:run"
+candidate = true
+[[command.sub]]
+name = "ssh"
+candidate = true
+[[command.sub]]
+name = "ssh-key:add"
+candidate = true
+[[command.sub]]
+name = "ssh-key:delete"
+candidate = true
+[[command.sub]]
+name = "team:create"
+candidate = true
+[[command.sub]]
+name = "team:delete"
+candidate = true
+[[command.sub]]
+name = "team:update"
+candidate = true
+[[command.sub]]
+name = "team:project:add"
+candidate = true
+[[command.sub]]
+name = "team:project:delete"
+candidate = true
+[[command.sub]]
+name = "team:user:add"
+candidate = true
+[[command.sub]]
+name = "team:user:delete"
+candidate = true
+[[command.sub]]
+name = "team:user:update"
+candidate = true
+[[command.sub]]
+name = "tunnel:close"
+candidate = true
+[[command.sub]]
+name = "tunnel:open"
+candidate = true
+[[command.sub]]
+name = "tunnel:single"
+candidate = true
+[[command.sub]]
+name = "user:add"
+candidate = true
+[[command.sub]]
+name = "user:delete"
+candidate = true
+[[command.sub]]
+name = "user:update"
+candidate = true
+[[command.sub]]
+name = "variable:create"
+candidate = true
+[[command.sub]]
+name = "vset"
+candidate = true
+[[command.sub]]
+name = "variable:delete"
+candidate = true
+[[command.sub]]
+name = "variable:update"
+candidate = true
+[[command.sub]]
+name = "vupdate"
+candidate = true
