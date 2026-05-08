@@ -6,7 +6,10 @@ use winnow::prelude::*;
 use winnow::token::{any, take_while};
 
 pub fn parse(input: &str) -> Option<Script> {
-    script.parse(input).ok()
+    reset_heredoc_queue();
+    let result = script.parse(input).ok();
+    reset_heredoc_queue();
+    result
 }
 
 fn backtrack<T>() -> ModalResult<T> {
@@ -98,6 +101,11 @@ fn script(input: &mut &str) -> ModalResult<Script> {
         ws.parse_next(input)?;
         let op = opt(list_op).parse_next(input)?;
         stmts.push(Stmt { pipeline: pl, op });
+        // Drain any heredoc bodies pending from this statement before
+        // the next pipeline starts; otherwise the body would be parsed
+        // as the next statement (which would either misvalidate or
+        // misalign the line counter).
+        drain_pending_heredocs(input);
         if op.is_none() {
             break;
         }
@@ -282,12 +290,77 @@ fn heredoc(input: &mut &str) -> ModalResult<Redir> {
     let strip_tabs = opt('-').parse_next(input)?.is_some();
     ws.parse_next(input)?;
     let delimiter = heredoc_delimiter.parse_next(input)?;
-    let needle = format!("\n{delimiter}");
-    if let Some(pos) = input.find(&needle) {
-        let after = pos + needle.len();
-        *input = input[after..].trim_start_matches([' ', '\t', '\n']);
-    }
+    // Bash semantics: the heredoc body lives on lines AFTER the
+    // command line is finished, not immediately after `<<DELIM`. The
+    // command line can continue with more redirects, a pipe, etc.
+    // Push the delimiter onto a thread-local queue; the body is
+    // drained at the next `\n`/`;` separator by drain_pending_heredocs.
+    PENDING_HEREDOCS.with(|q| {
+        q.borrow_mut().push(PendingHeredoc {
+            delimiter: delimiter.clone(),
+            strip_tabs,
+        });
+    });
     Ok(Redir::HereDoc { delimiter, strip_tabs })
+}
+
+#[derive(Debug, Clone)]
+struct PendingHeredoc {
+    delimiter: String,
+    strip_tabs: bool,
+}
+
+thread_local! {
+    static PENDING_HEREDOCS: std::cell::RefCell<Vec<PendingHeredoc>> =
+        const { std::cell::RefCell::new(Vec::new()) };
+}
+
+fn drain_pending_heredocs(input: &mut &str) {
+    let pending: Vec<PendingHeredoc> =
+        PENDING_HEREDOCS.with(|q| std::mem::take(&mut *q.borrow_mut()));
+    for h in pending {
+        if !skip_heredoc_body(input, &h.delimiter, h.strip_tabs) {
+            // Couldn't find the matching delimiter line. Leave input
+            // as-is; the parser will likely fail on the leftover body
+            // text, which is the safe outcome (we deny on parse fail).
+            return;
+        }
+    }
+}
+
+fn skip_heredoc_body(input: &mut &str, delimiter: &str, strip_tabs: bool) -> bool {
+    let s = *input;
+    let bytes = s.as_bytes();
+    let mut line_start = 0;
+    while line_start <= bytes.len() {
+        let line_end = match s[line_start..].find('\n') {
+            Some(rel) => line_start + rel,
+            None => bytes.len(),
+        };
+        let line_bytes = &bytes[line_start..line_end];
+        let line = if strip_tabs {
+            std::str::from_utf8(line_bytes)
+                .unwrap_or("")
+                .trim_start_matches('\t')
+        } else {
+            std::str::from_utf8(line_bytes).unwrap_or("")
+        };
+        if line == delimiter {
+            // Advance past the delimiter line + its newline.
+            let advance = line_end + usize::from(line_end < bytes.len());
+            *input = &s[advance..];
+            return true;
+        }
+        if line_end >= bytes.len() {
+            return false;
+        }
+        line_start = line_end + 1;
+    }
+    false
+}
+
+fn reset_heredoc_queue() {
+    PENDING_HEREDOCS.with(|q| q.borrow_mut().clear());
 }
 
 fn heredoc_delimiter(input: &mut &str) -> ModalResult<String> {
@@ -721,14 +794,30 @@ mod tests {
         assert!(matches!(&simple(&p("cat <<-EOF")).redirs[0], Redir::HereDoc { strip_tabs: true, .. }));
     }
     #[test]
-    fn heredoc_then_pipe() {
-        let s = p("cat <<EOF\nhello\nEOF | grep hello");
+    fn heredoc_pipe_on_command_line() {
+        // Correct bash: pipe is on the command line BEFORE the body,
+        // body terminator is on its own line.
+        let s = p("cat <<EOF | grep hello\nhello\nEOF");
         assert_eq!(s.0[0].pipeline.commands.len(), 2);
     }
     #[test]
-    fn heredoc_then_pipe_next_line() {
-        let s = p("cat <<EOF\nhello\nEOF\n| grep hello");
-        assert_eq!(s.0[0].pipeline.commands.len(), 2);
+    fn heredoc_body_does_not_swallow_pipe() {
+        // Regression for the `cat <<EOF | bash\n...\nEOF` bypass: the
+        // heredoc parser must NOT consume the pipe + downstream
+        // commands as part of the body.
+        let s = p("cat <<EOF | bash\nrm\nEOF");
+        assert_eq!(
+            s.0[0].pipeline.commands.len(),
+            2,
+            "pipeline must keep `bash` as a second command"
+        );
+    }
+    #[test]
+    fn heredoc_followed_by_next_statement() {
+        // After the heredoc body terminator, the script can continue
+        // with another statement.
+        let s = p("cat <<EOF\nhello\nEOF\nls");
+        assert_eq!(s.0.len(), 2);
     }
 
     #[test]

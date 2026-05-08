@@ -263,7 +263,7 @@ mod tests {
         heredoc_quoted: "cat <<'EOF'\nhello\nEOF",
         heredoc_strip_tabs: "cat <<-EOF\n\thello\nEOF",
         heredoc_no_content: "cat <<EOF",
-        heredoc_pipe: "cat <<EOF\nhello\nEOF | grep hello",
+        heredoc_pipe: "cat <<EOF | grep hello\nhello\nEOF",
 
         for_echo: "for x in 1 2 3; do echo $x; done",
         for_empty_body: "for x in 1 2 3; do; done",
