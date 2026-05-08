@@ -1,0 +1,124 @@
+[[command]]
+name = "hey"
+description = "37signals' official Go CLI for HEY email (hey.com), released March 2026 as part of their CLI toolkit alongside basecamp and fizzy. Authenticates via 37signals Launchpad OAuth (PKCE) with tokens stored in the system keyring (file fallback at ~/.config/hey-cli/credentials.json, mode 0600). Supports `--token TOKEN` and `--cookie COOKIE` for non-interactive auth and accepts `--json` and `--base-url` globally. Read-only verbs (boxes, box, threads, drafts, calendars, recordings, todo list, timetrack list/current, journal list/read, auth status) hit the API but do not mutate. Mutating verbs (compose, reply, todo add/complete/uncomplete/delete, habit complete/uncomplete, timetrack start/stop, journal write) modify remote state — compose and reply send email and are irreversible. Bare `hey` launches an interactive TUI. `hey auth login` performs a browser OAuth flow; `hey auth token` prints the bearer token to stdout. Name collision worth flagging: `rakyll/hey` is a popular HTTP load tester also installed as `hey` — that tool takes a URL positional rather than a verb, so the allowlist below correctly falls through to a prompt for it. The CLI is actively developed at github.com/basecamp/hey-cli with a CI surface-stability check; the public flag surface should be stable across patch releases."
+url = "https://github.com/basecamp/hey-cli"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "boxes"
+standalone = ["--help", "--json", "-h"]
+valued = ["--base-url", "--cookie", "--token"]
+
+[[command.sub]]
+name = "box"
+bare = false
+standalone = ["--help", "--json", "-h"]
+valued = ["--base-url", "--cookie", "--token"]
+
+[[command.sub]]
+name = "threads"
+bare = false
+standalone = ["--help", "--json", "-h"]
+valued = ["--base-url", "--cookie", "--token"]
+
+[[command.sub]]
+name = "drafts"
+standalone = ["--help", "--json", "-h"]
+valued = ["--base-url", "--cookie", "--token"]
+
+[[command.sub]]
+name = "calendars"
+standalone = ["--help", "--json", "-h"]
+valued = ["--base-url", "--cookie", "--token"]
+
+[[command.sub]]
+name = "recordings"
+bare = false
+standalone = ["--help", "--json", "-h"]
+valued = [
+    "--base-url", "--cookie", "--ends-on",
+    "--starts-on", "--token",
+]
+
+[[command.sub]]
+name = "todo"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+valued = ["--base-url", "--cookie", "--token"]
+[[command.sub.sub]]
+name = "add"
+candidate = true
+[[command.sub.sub]]
+name = "complete"
+candidate = true
+[[command.sub.sub]]
+name = "uncomplete"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "timetrack"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+valued = ["--base-url", "--cookie", "--token"]
+[[command.sub.sub]]
+name = "current"
+standalone = ["--help", "--json", "-h"]
+valued = ["--base-url", "--cookie", "--token"]
+[[command.sub.sub]]
+name = "start"
+candidate = true
+[[command.sub.sub]]
+name = "stop"
+candidate = true
+
+[[command.sub]]
+name = "journal"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+valued = ["--base-url", "--cookie", "--token"]
+[[command.sub.sub]]
+name = "read"
+standalone = ["--help", "--json", "-h"]
+valued = ["--base-url", "--cookie", "--token"]
+max_positional = 1
+[[command.sub.sub]]
+name = "write"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+[[command.sub.sub]]
+name = "status"
+standalone = ["--help", "--json", "-h"]
+[[command.sub.sub]]
+name = "login"
+candidate = true
+[[command.sub.sub]]
+name = "logout"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "token"
+candidate = true
+[[command.sub.sub]]
+name = "refresh"
+candidate = true
+
+[[command.sub]]
+name = "compose"
+candidate = true
+[[command.sub]]
+name = "reply"
+candidate = true
+[[command.sub]]
+name = "habit"
+candidate = true
+[[command.sub]]
+name = "skill"
+candidate = true
