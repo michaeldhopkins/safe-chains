@@ -39,7 +39,7 @@ Every command handler is covered by multiple layers of automated testing:
 - **Unknown flag rejection.** Every command is automatically tested to verify it rejects unknown flags and subcommands.
 - **Property verification.** Systematic tests verify that `help_eligible` declarations match actual behavior, that `bare=false` policies reject bare invocations, that guarded subcommands require their guard flags, and that nested subcommands reject bare parent invocations.
 - **Per-handler tests.** Each handler includes explicit safe/denied test cases covering expected approvals and rejections.
-- **Registry completeness.** A test verifies that every command in the handled set has a corresponding entry in the test registry, and vice versa.
+- **Examples lock-in.** TOML commands can declare `examples_safe` and `examples_denied` invocations. A test runs each through the dispatcher and fails if any example produces the wrong verdict — catching regressions where an alias stops working or a security boundary loosens.
 
 ## Reporting vulnerabilities
 

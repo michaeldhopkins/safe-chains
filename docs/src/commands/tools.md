@@ -578,6 +578,14 @@ Aliases: `g++`, `cc`, `c++`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `hexo version`
+- `hexo list page`
+- `hexo config`
+- `hexo generate`
+- `hexo g`
+
 ### `http-server`
 <p class="cmd-url"><a href="https://github.com/http-party/http-server">https://github.com/http-party/http-server</a></p>
 

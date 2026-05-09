@@ -50,6 +50,7 @@ impl CommandSpec {
             &self.category,
         );
         doc.aliases = self.aliases.iter().map(|a| a.to_string()).collect();
+        doc.examples = self.examples_safe.clone();
         doc
     }
 }
