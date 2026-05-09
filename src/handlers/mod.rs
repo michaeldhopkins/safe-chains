@@ -66,6 +66,7 @@ pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
 pub fn dispatch(tokens: &[Token]) -> Verdict {
     let cmd = tokens[0].command_name();
     None
+        .or_else(|| crate::registry::custom_dispatch(tokens))
         .or_else(|| shell::dispatch(cmd, tokens))
         .or_else(|| wrappers::dispatch(cmd, tokens))
         .or_else(|| forges::dispatch(cmd, tokens))

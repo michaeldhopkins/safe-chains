@@ -1,4 +1,5 @@
 mod build;
+mod custom;
 mod dispatch;
 mod docs;
 mod policy;
@@ -26,9 +27,24 @@ static TOML_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(||
     include!(concat!(env!("OUT_DIR"), "/toml_includes.rs"))
 );
 
+static CUSTOM_REGISTRY: LazyLock<HashMap<String, CommandSpec>> = LazyLock::new(|| {
+    let mut map = HashMap::new();
+    custom::apply_custom(&mut map);
+    map
+});
+
 pub fn toml_dispatch(tokens: &[Token]) -> Option<Verdict> {
     let cmd = tokens[0].command_name();
     TOML_REGISTRY.get(cmd).map(|spec| dispatch_spec(tokens, spec))
+}
+
+/// Looks up the command in the runtime custom registry (project-local
+/// `.safe-chains.toml`, then user-level `~/.config/safe-chains.toml`).
+/// A match here wins over the built-in hardcoded handlers, which is how
+/// an override of `gh` takes effect.
+pub fn custom_dispatch(tokens: &[Token]) -> Option<Verdict> {
+    let cmd = tokens[0].command_name();
+    CUSTOM_REGISTRY.get(cmd).map(|spec| dispatch_spec(tokens, spec))
 }
 
 pub fn toml_command_names() -> Vec<&'static str> {

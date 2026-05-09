@@ -383,6 +383,20 @@
 # moment to fill it in, not before.
 
 # ─────────────────────────────────────────────────────────────────────
+# DENY — shortcut for "every invocation of this command is denied"
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use for: locking down a built-in command from a custom TOML
+# (.safe-chains.toml). One field replaces a whole spec.
+#
+# [[command]]
+# name = "gh"
+# deny = true
+#
+# Equivalent to writing a spec with bare = false, max_positional = 0,
+# and no flags or subs — just shorter.
+
+# ─────────────────────────────────────────────────────────────────────
 # CANDIDATE — record that a command was considered but not approved
 # ─────────────────────────────────────────────────────────────────────
 #
