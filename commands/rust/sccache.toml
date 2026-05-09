@@ -1,0 +1,15 @@
+[[command]]
+name = "sccache"
+description = "Compiler cache for Rust, C, and C++ that intercepts compiler invocations and caches outputs. Bare invocation starts the background server. `--show-stats`/`-s` prints cache statistics (read). `--zero-stats`/`-z` clears in-memory stats. `--start-server`/`--stop-server` manage the background daemon. `--dist-status` queries a distributed build cluster (network). The general usage `sccache <compiler> <args>` wraps a real compiler invocation and runs it. Carve-out: stats / version / help."
+url = "https://github.com/mozilla/sccache"
+researched_version = "sccache 0.x"
+level = "SafeRead"
+bare = false
+max_positional = 0
+standalone = [
+    "--dist-status", "--help", "--show-adv-stats",
+    "--show-stats", "--start-server", "--stop-server",
+    "--version", "--zero-stats",
+    "-V", "-h", "-s", "-z",
+]
+valued = ["--stats-format"]

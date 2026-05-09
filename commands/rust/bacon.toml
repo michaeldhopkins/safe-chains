@@ -1,0 +1,9 @@
+[[command]]
+name = "bacon"
+description = "Background Rust code checker — runs a configurable set of cargo jobs (check, clippy, test, run) in a watch loop and displays results in a TUI. Each invocation executes cargo and the configured user code (so cargo run/test inside bacon executes arbitrary project code, same as `cargo run`). The `--prefs`, `--config-file`, `--summary` options influence display. Carve-out: `--help`, `--version`, `--prefs` (read-only) — bare invocation starts the long-running TUI."
+url = "https://github.com/Canop/bacon"
+researched_version = "bacon 3.x"
+level = "SafeRead"
+bare = true
+max_positional = 0
+standalone = ["--help", "--prefs", "--version", "-h", "-v"]

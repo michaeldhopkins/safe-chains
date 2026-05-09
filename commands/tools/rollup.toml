@@ -1,0 +1,40 @@
+[[command]]
+name = "rollup"
+description = "JavaScript module bundler. Reads source modules and writes one or more bundled outputs (file path or directory governed by -o/--file or --dir). Configuration loads via -c/--config (which is itself JS that gets evaluated at startup, executing arbitrary project code). Plugins are arbitrary Node modules loaded at startup. Active project."
+url = "https://rollupjs.org/"
+researched_version = "rollup 4.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--bundleConfigAsCjs", "--compact", "--config",
+    "--context", "--esModule", "--exports",
+    "--extend", "--externalImportAttributes",
+    "--externalLiveBindings", "--failAfterWarnings",
+    "--filterLogs", "--forceExit", "--freeze",
+    "--generatedCode", "--help", "--inlineDynamicImports",
+    "--input", "--logLevel", "--noConflict",
+    "--no-treeshake",
+    "--outro", "--perf", "--preserveEntrySignatures",
+    "--preserveModules", "--preserveSymlinks",
+    "--silent", "--sourcemap",
+    "--sourcemapDebugIds", "--strict",
+    "--strictDeprecations", "--treeshake",
+    "--validate", "--version", "--waitForBundleInput",
+    "--watch",
+    "-c", "-h", "-v", "-w",
+]
+valued = [
+    "--amd.autoId", "--amd.basePath", "--amd.define", "--amd.id",
+    "--assetFileNames", "--banner", "--chunkFileNames",
+    "--dir", "--entryFileNames", "--exports",
+    "--external", "--file", "--footer", "--format",
+    "--globals", "--hashCharacters", "--input",
+    "--intro", "--name", "--outro",
+    "--plugin", "--sourcemap",
+    "--sourcemapBaseUrl", "--sourcemapExcludeSources",
+    "--sourcemapFile", "--watch.buildDelay",
+    "--watch.chokidar.useFsEvents", "--watch.exclude",
+    "--watch.include", "--watch.onEnd",
+    "--watch.skipWrite",
+    "-d", "-e", "-f", "-i", "-m", "-n", "-o", "-p",
+]

@@ -1,0 +1,10 @@
+[[command]]
+name = "npm-run-all"
+aliases = ["run-p", "run-s"]
+description = "Runs multiple npm scripts in parallel (run-p) or serial (run-s). Each script is arbitrary shell — running them is equivalent to running the scripts directly. Carve-out: --help / --version only."
+url = "https://github.com/mysticatea/npm-run-all"
+researched_version = "npm-run-all 4.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

@@ -1,0 +1,26 @@
+[[command]]
+name = "sphinx-quickstart"
+description = "Sphinx project scaffolder — generates a minimal Sphinx documentation tree (conf.py, index.rst, Makefile, make.bat) in a target directory. Interactive by default; --no-prompt with -p PROJECT, -a AUTHOR, -v VERSION accepts non-interactive defaults. Writes to the given path (project-local). Does not execute project Python — only writes template files."
+url = "https://www.sphinx-doc.org/en/master/man/sphinx-quickstart.html"
+researched_version = "Sphinx 7.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--ext-autodoc", "--ext-coverage",
+    "--ext-doctest", "--ext-githubpages",
+    "--ext-ifconfig", "--ext-imgmath",
+    "--ext-intersphinx", "--ext-mathjax",
+    "--ext-todo", "--ext-viewcode",
+    "--help", "--makefile", "--no-batchfile",
+    "--no-makefile", "--no-prompt", "--no-sep",
+    "--quiet", "--sep", "--use-make-mode",
+    "--version",
+    "-h", "-q",
+]
+valued = [
+    "--author", "--dot", "--ext",
+    "--extensions", "--language", "--master",
+    "--project", "--release", "--suffix",
+    "--templatedir", "--version",
+    "-a", "-d", "-l", "-p", "-r", "-t", "-v",
+]

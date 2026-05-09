@@ -1,0 +1,8 @@
+[[command]]
+name = "pyflakes"
+description = "Lightweight Python source checker. Parses Python files (does not execute) and reports likely bugs — unused imports, undefined names, syntax errors. Output goes to stdout. Tiny CLI surface; bundled with flake8 as one of its checkers. Stable."
+url = "https://github.com/PyCQA/pyflakes"
+researched_version = "pyflakes 3.x"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--version", "-h"]

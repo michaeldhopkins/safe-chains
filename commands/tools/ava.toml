@@ -1,0 +1,20 @@
+[[command]]
+name = "ava"
+description = "Concurrent test runner for Node.js. Bare invocation runs the configured test files (executes project test code — same risk profile as jest/vitest). `--watch` keeps a long-running process. The diagnostic flags --version, --help, and the read-only modes are part of the safe surface."
+url = "https://github.com/avajs/ava"
+researched_version = "ava 6.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--color", "--config", "--fail-fast",
+    "--help", "--match", "--no-color",
+    "--node-arguments", "--reset-cache",
+    "--serial", "--tap", "--update-snapshots",
+    "--verbose", "--version", "--watch",
+    "-c", "-h", "-m", "-s", "-t", "-u", "-v", "-w",
+]
+valued = [
+    "--concurrency", "--config", "--node-arguments",
+    "--timeout", "--watch", "--watcher-debug",
+    "-T",
+]

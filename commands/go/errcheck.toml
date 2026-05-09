@@ -1,0 +1,17 @@
+[[command]]
+name = "errcheck"
+description = "Static analyzer that reports unchecked errors in Go code. Reads source files, parses, and emits findings. Stable, single-purpose tool."
+url = "https://github.com/kisielk/errcheck"
+researched_version = "errcheck 1.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--abspath", "--asserts", "--blank",
+    "--exclude", "--help", "--ignoretests",
+    "--ignoregenerated", "--mod", "--tags",
+    "--verbose",
+    "-abspath", "-asserts", "-blank",
+    "-exclude", "-h", "-ignoregenerated",
+    "-ignoretests", "-mod", "-tags",
+    "-verbose",
+]

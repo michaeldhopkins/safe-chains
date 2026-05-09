@@ -1,0 +1,11 @@
+[[command]]
+name = "mage"
+description = "Make-style build tool that compiles user-written Go targets to a binary and runs them. Each invocation compiles and runs project Go code (arbitrary execution). The diagnostic flags --version / --help / --list (lists available targets) are part of the safe surface; -l prints targets without running."
+url = "https://magefile.org/"
+researched_version = "mage 1.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--list", "--version", "-V",
+    "-h", "-l",
+]

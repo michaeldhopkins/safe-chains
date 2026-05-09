@@ -1,0 +1,97 @@
+[[command]]
+name = "alembic"
+description = "SQLAlchemy database migration tool. `current`, `history`, `heads`, `branches`, `show`, `check` are read-only inspection of revision graph and DB version. `revision` writes a new migration file (project-local SafeWrite). `upgrade`, `downgrade`, `stamp`, `merge` apply or modify migrations against the configured database — those are external-system writes. `init` scaffolds a versions/ directory."
+url = "https://alembic.sqlalchemy.org/"
+researched_version = "alembic 1.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[command.wrapper]
+standalone = ["--quiet", "--raiseerr", "-q"]
+valued = ["--config", "--name", "-c", "-n"]
+
+[[command.sub]]
+name = "current"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--verbose", "-h", "-v"]
+
+[[command.sub]]
+name = "history"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--indicate-current", "--verbose", "-h", "-i", "-v"]
+valued = ["--rev-range", "-r"]
+
+[[command.sub]]
+name = "heads"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--resolve-dependencies", "--verbose", "-h", "-v"]
+
+[[command.sub]]
+name = "branches"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--verbose", "-h", "-v"]
+
+[[command.sub]]
+name = "show"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--package", "-h"]
+valued = ["--template", "-t"]
+
+[[command.sub]]
+name = "revision"
+level = "SafeWrite"
+bare = true
+standalone = ["--autogenerate", "--head", "--help", "--splice", "-h"]
+valued = ["--branch-label", "--depends-on", "--message", "--rev-id", "--sql", "--version-path", "-m"]
+
+[[command.sub]]
+name = "list_templates"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "downgrade"
+candidate = true
+
+[[command.sub]]
+name = "stamp"
+candidate = true
+
+[[command.sub]]
+name = "merge"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "ensure_version"
+candidate = true

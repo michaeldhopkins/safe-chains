@@ -1,0 +1,30 @@
+[[command]]
+name = "tsup"
+description = "TypeScript library bundler built on esbuild. Reads source plus tsconfig.json and writes bundled output to dist/ (or --out-dir). --watch keeps a long-running process. Active project."
+url = "https://tsup.egoist.dev/"
+researched_version = "tsup 8.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--bundle", "--clean", "--cjs",
+    "--dts", "--dts-only", "--dts-resolve",
+    "--esm", "--external", "--global-name",
+    "--help", "--keep-names",
+    "--legacy-output", "--metafile",
+    "--minify", "--no-clean",
+    "--no-config", "--shims", "--silent",
+    "--skip-node-modules-bundle",
+    "--source-map", "--splitting",
+    "--sourcemap", "--terser",
+    "--treeshake", "--version", "--watch",
+    "-d", "-h", "-w",
+]
+valued = [
+    "--cjs-interop", "--config", "--define",
+    "--entry", "--env", "--external",
+    "--format", "--inject",
+    "--name", "--no-external",
+    "--out-dir", "--platform",
+    "--public-dir", "--target",
+    "--tsconfig",
+]

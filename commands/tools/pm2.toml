@@ -1,0 +1,102 @@
+[[command]]
+name = "pm2"
+description = "Production process manager for Node.js. Subcommands `start`, `restart`, `reload`, `stop`, `delete`, `kill` execute or signal user-defined processes (arbitrary code). `monit`, `dashboard`, `logs --lines` are interactive or long-running. Read-only diagnostics: `list/ls/status`, `describe/show`, `prettylist`, `jlist`, `monit` (skip — interactive), `--version`. The carve-out covers list-style introspection and help/version."
+url = "https://pm2.keymetrics.io/"
+researched_version = "pm2 5.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ls"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "describe"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "show"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "prettylist"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "jlist"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "restart"
+candidate = true
+
+[[command.sub]]
+name = "reload"
+candidate = true
+
+[[command.sub]]
+name = "stop"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "kill"
+candidate = true
+
+[[command.sub]]
+name = "monit"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub]]
+name = "save"
+candidate = true
+
+[[command.sub]]
+name = "resurrect"
+candidate = true
+
+[[command.sub]]
+name = "startup"
+candidate = true

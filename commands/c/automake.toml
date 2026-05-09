@@ -1,0 +1,19 @@
+[[command]]
+name = "automake"
+description = "Automake — generates portable Makefile.in templates from Makefile.am. Reads sources and writes Makefile.in plus auxiliary files. Static — does not run the generated Makefiles. Stable GNU tool."
+url = "https://www.gnu.org/software/automake/"
+researched_version = "automake 1.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--add-missing", "--copy", "--cygnus",
+    "--force-missing", "--foreign", "--gnits",
+    "--gnu", "--help", "--include-deps",
+    "--no-force", "--verbose", "--version", "--warnings",
+    "-W", "-a", "-c", "-f", "-h", "-i",
+    "-o", "-v",
+]
+valued = [
+    "--libdir", "--output-dir",
+    "-W", "-o",
+]

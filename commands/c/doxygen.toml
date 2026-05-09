@@ -1,0 +1,14 @@
+[[command]]
+name = "doxygen"
+description = "Documentation generator for C/C++/Java/Python/etc. Reads source plus a Doxyfile and writes HTML/LaTeX/man/RTF/XML output to the configured directory. -g writes a default Doxyfile (project-local SafeWrite). -d enables debug output. Static — does not execute the analyzed source."
+url = "https://www.doxygen.nl/"
+researched_version = "Doxygen 1.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--help", "--version", "-?", "-h", "-v",
+]
+valued = [
+    "-d", "-e", "-f", "-g",
+    "-l", "-q", "-s", "-t", "-u", "-w", "-x",
+]

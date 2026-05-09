@@ -1,0 +1,21 @@
+[[command]]
+name = "pycodestyle"
+description = "PEP 8 style guide checker (formerly known as pep8). Parses Python source statically and reports style violations to stdout. -q / --quiet suppress output; --diff reads from stdin. Bundled with flake8 as one of its checkers. Stable."
+url = "https://github.com/PyCQA/pycodestyle"
+researched_version = "pycodestyle 2.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--benchmark", "--count",
+    "--diff", "--first", "--help", "--quiet",
+    "--show-pep8", "--show-source",
+    "--statistics", "--testsuite", "--verbose",
+    "--version",
+    "-h", "-q", "-v",
+]
+valued = [
+    "--config", "--exclude", "--filename",
+    "--format", "--ignore",
+    "--max-doc-length", "--max-line-length",
+    "--select",
+]

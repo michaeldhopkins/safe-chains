@@ -1,0 +1,20 @@
+[[command]]
+name = "fourmolu"
+description = "Configurable formatter for Haskell, fork of ormolu. Same surface as ormolu plus per-feature config flags. Without --inplace, prints to stdout; --inplace rewrites files. --mode check is read-only."
+url = "https://fourmolu.github.io/"
+researched_version = "fourmolu 0.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--check-idempotence", "--color",
+    "--help", "--inplace", "--no-cabal",
+    "-c", "-h", "-i",
+]
+valued = [
+    "--config", "--ghc-opt",
+    "--mode", "--package-name",
+    "--start-line", "--start-column",
+    "--end-line", "--end-column",
+    "-o",
+]
+write_flags = ["--inplace", "-i"]

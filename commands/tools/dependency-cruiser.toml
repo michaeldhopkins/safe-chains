@@ -1,0 +1,28 @@
+[[command]]
+name = "depcruise"
+aliases = ["dependency-cruise"]
+description = "Static analyser for JavaScript/TypeScript dependency graphs. Reads source files, builds the import graph, and reports rule violations or the graph itself in dot/text/json/csv/html formats. --output-to writes to a file (otherwise stdout). The companion `depcruise-fmt` and `depcruise-baseline` are separate binaries."
+url = "https://github.com/sverweij/dependency-cruiser"
+researched_version = "dependency-cruiser 16.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--cache", "--config", "--detect-jsc-paths",
+    "--help", "--ignore-known", "--init",
+    "--metrics", "--no-cache", "--no-config",
+    "--no-progress", "--preserve-symlinks",
+    "--validate", "--verbose", "--version",
+    "-V", "-h", "-v",
+]
+valued = [
+    "--baseline", "--exclude", "--focus",
+    "--focus-depth", "--ignore-known",
+    "--include-only", "--max-depth",
+    "--module-systems", "--output-to",
+    "--output-type", "--prefix",
+    "--reaches", "--ts-config",
+    "--ts-pre-compilation-deps",
+    "--validate", "--webpack-config",
+    "-T", "-X", "-d", "-f", "-x",
+]
+write_flags = ["--output-to", "-f", "--init"]

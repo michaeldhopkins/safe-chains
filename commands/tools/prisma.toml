@@ -1,0 +1,58 @@
+[[command]]
+name = "prisma"
+description = "Prisma ORM CLI. `generate` writes the Prisma client into node_modules (project-local SafeWrite + reads schema). `validate`/`format` are read-only / format-the-schema. `init` scaffolds a project. `migrate dev|deploy|reset|status` apply schema migrations against the configured database (external system writes — not part of safe surface). `db push|pull|seed|execute` similarly contact the live database. `studio` runs an interactive UI server (network listener)."
+url = "https://www.prisma.io/docs/orm/reference/prisma-cli-reference"
+researched_version = "prisma 5.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--schema"]
+
+[[command.sub]]
+name = "format"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--check", "-h"]
+valued = ["--schema"]
+
+[[command.sub]]
+name = "generate"
+level = "SafeWrite"
+bare = true
+standalone = ["--allow-no-models", "--data-proxy", "--help", "--no-engine", "--no-hints", "--watch", "-h"]
+valued = ["--generator", "--schema", "--sql"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h", "--with-model"]
+valued = ["--datasource-provider", "--output", "--url"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "db"
+candidate = true
+
+[[command.sub]]
+name = "studio"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true

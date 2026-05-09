@@ -1,0 +1,89 @@
+[[command]]
+name = "starship"
+description = "Cross-shell prompt. `init <shell>` prints shell init code to stdout (read-only). `module <name>` evaluates and prints a single prompt module (typically a read-only filesystem/git probe). `prompt`, `print-config` are read-only display. `bug-report`, `explain`, `timings`, `preset`, `toggle`, `completions`, `session` are diagnostic. `config` opens an editor (interactive). Active project."
+url = "https://starship.rs/"
+researched_version = "starship 1.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "init"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "--print-full-init", "-h"]
+
+[[command.sub]]
+name = "prompt"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--cmd-duration", "--continuation", "--jobs", "--keymap", "--logical-path", "--path", "--pipestatus", "--profile", "--right", "--status", "--target", "--terminal-width"]
+
+[[command.sub]]
+name = "module"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "--list", "-h", "-l"]
+
+[[command.sub]]
+name = "preset"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--help", "--list", "-h", "-l"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "print-config"
+level = "Inert"
+bare = true
+standalone = ["--default", "--help", "-d", "-h"]
+valued = ["--name"]
+
+[[command.sub]]
+name = "explain"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "timings"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "bug-report"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completions"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "session"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "toggle"
+candidate = true
+
+[[command.sub]]
+name = "time"
+candidate = true

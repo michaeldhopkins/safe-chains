@@ -1,0 +1,32 @@
+[[command]]
+name = "scalac"
+description = "Scala compiler. Reads .scala source files and writes .class output (or jars) to the path specified by -d (defaults to ./). Compilation does not run user code, but invocation of macros or compiler plugins can execute arbitrary Scala at compile time. Active project on the 3.x line."
+url = "https://docs.scala-lang.org/scala3/reference/cli/scalac.html"
+researched_version = "scalac 3.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--version",
+    "-Werror", "-Xfatal-warnings", "-color",
+    "-deprecation", "-encoding",
+    "-explain", "-explain-types", "-feature",
+    "-help", "-language", "-new-syntax",
+    "-no-indent", "-old-syntax", "-print",
+    "-print-tasty", "-rewrite", "-shasum",
+    "-source", "-uniqid", "-unchecked",
+    "-usejavacp", "-verbose", "-version",
+    "-Wunused", "-Xignore-scala2-macros",
+    "-explain", "-explain-types",
+    "-language", "-rewrite",
+    "-deprecation", "-feature",
+    "-Yshow-suppressed-errors",
+    "-Wnonunit-statement",
+    "-h",
+]
+valued = [
+    "--release", "-Xss", "-bootclasspath",
+    "-classpath", "-cp",
+    "-d", "-encoding", "-extdirs",
+    "-javabootclasspath", "-language", "-release",
+    "-source", "-sourcepath", "-target",
+]

@@ -1,0 +1,9 @@
+[[command]]
+name = "py-spy"
+description = "Sampling profiler for Python that attaches to a running process by PID or runs a target program. Both `record`, `top`, and `dump` modes attach to the user-specified PID — that's an external-process operation that affects state outside this CLI invocation. Only the diagnostic flags --help and --version have a fixed safe surface."
+url = "https://github.com/benfred/py-spy"
+researched_version = "py-spy 0.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

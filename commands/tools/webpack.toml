@@ -1,0 +1,26 @@
+[[command]]
+name = "webpack"
+description = "Module bundler — reads entry files plus webpack.config.{js,cjs,mjs,ts}, applies loaders/plugins, and writes bundled assets to the configured output directory. The config file is itself JavaScript executed at startup, and loaders/plugins are arbitrary Node modules. Active project."
+url = "https://webpack.js.org/api/cli/"
+researched_version = "webpack 5.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--analyze", "--bail", "--cache", "--color",
+    "--devtool", "--disable-interpret",
+    "--env", "--extends", "--fail-on-warnings",
+    "--help", "--hot", "--json",
+    "--mode", "--no-cache", "--no-color",
+    "--no-stats", "--no-watch", "--no-watch-options-stdin",
+    "--profile", "--progress",
+    "--target", "--version",
+    "--watch", "--watch-options-stdin",
+    "-c", "-d", "-h", "-j", "-o", "-t", "-v", "-w",
+]
+valued = [
+    "--config", "--config-name", "--entry",
+    "--merge", "--name", "--node-env",
+    "--output-clean", "--output-filename",
+    "--output-path", "--output-public-path",
+    "--source-map", "--stats",
+]

@@ -1,0 +1,31 @@
+[[command]]
+name = "gotestsum"
+description = "Runs `go test` with a configurable formatted output. Each invocation runs the project's tests (executes user code — same risk profile as `go test`). The `tool` subcommand provides post-processing utilities (slow-test analysis, JSON conversion)."
+url = "https://github.com/gotestyourself/gotestsum"
+researched_version = "gotestsum 1.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--debug", "--dry-run", "--force-cache",
+    "--format-hide-empty-pkg",
+    "--help", "--ignore-non-json-output-lines",
+    "--no-color", "--rerun-fails-only-root-cases",
+    "--watch", "--watch-chdir",
+    "-h",
+]
+valued = [
+    "--format", "--format-hivis",
+    "--format-icons", "--hide-summary",
+    "--junitfile", "--junitfile-hide-empty-pkg",
+    "--junitfile-project-name", "--junitfile-testcase-classname",
+    "--junitfile-testsuite-name",
+    "--max-fails", "--packages",
+    "--post-run-command", "--raw-command",
+    "--rerun-fails", "--rerun-fails-max-failures",
+    "--rerun-fails-report",
+    "--rerun-fails-run-root-test", "--watch-skip-tests",
+]
+write_flags = [
+    "--junitfile", "--junitfile-hide-empty-pkg",
+    "--rerun-fails-report",
+]

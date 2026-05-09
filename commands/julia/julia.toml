@@ -1,0 +1,9 @@
+[[command]]
+name = "julia"
+description = "Julia language launcher. Bare invocation drops into a REPL. -e CODE / -E CODE / -L FILE / script.jl all execute Julia code. Carve-out: --version / --help only."
+url = "https://docs.julialang.org/"
+researched_version = "Julia 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--help-hidden", "--version", "-h", "-v"]

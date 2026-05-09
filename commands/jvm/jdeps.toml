@@ -1,0 +1,29 @@
+[[command]]
+name = "jdeps"
+description = "Java dependency analyzer (bundled with the JDK). Reads .class files, jars, and modules and prints dependency information. Static analysis only — does not execute the analyzed bytecode. Stable JDK utility."
+url = "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jdeps.html"
+researched_version = "jdeps — bundled with JDK 21+"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--api-only", "--check", "--ignore-missing-deps",
+    "--inverse", "--jdk-internals",
+    "--list-deps", "--list-reduced-deps",
+    "--missing-deps",
+    "--print-module-deps", "--regex",
+    "-R", "-V", "-apionly", "-c", "-cp",
+    "-dotoutput", "-e", "-f", "-filter", "-h",
+    "-help", "-include", "-jdkinternals",
+    "-m", "-module", "-multi-release",
+    "-p", "-package", "-q", "-quiet",
+    "-recursive", "-regex", "-s", "-summary",
+    "-v", "-verbose", "-version",
+]
+valued = [
+    "--add-modules", "--class-path",
+    "--dot-output", "--filter", "--ignore-missing-deps",
+    "--include", "--module", "--module-path",
+    "--multi-release", "--print-module-deps",
+    "--regex", "--require", "--upgrade-module-path",
+    "-classpath", "-cp",
+]

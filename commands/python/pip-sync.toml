@@ -1,0 +1,20 @@
+[[command]]
+name = "pip-sync"
+description = "Companion to pip-tools — installs, upgrades, and uninstalls packages in the current environment so the installed set exactly matches the given requirements.txt files. Fetches packages from the configured index (network) and modifies site-packages. --dry-run prints planned changes without applying them. The --pip-args option forwards arbitrary flags to pip; combined with custom indexes, this can pull arbitrary code, so users still control source trust through their requirements files."
+url = "https://github.com/jazzband/pip-tools"
+researched_version = "pip-tools 7.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--ask", "--config", "--dry-run",
+    "--force", "--help", "--no-config",
+    "--no-pip-args", "--quiet", "--verbose",
+    "--version",
+    "-a", "-f", "-h", "-i", "-n", "-q", "-v",
+]
+valued = [
+    "--cache-dir", "--extra-index-url",
+    "--find-links", "--index-url",
+    "--pip-args", "--python-executable",
+    "--trusted-host", "--user-config",
+]

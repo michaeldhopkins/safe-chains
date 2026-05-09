@@ -1,0 +1,118 @@
+[[command]]
+name = "pipx"
+description = "Installs and manages Python applications in isolated virtual environments. install/upgrade/upgrade-all/inject/uninstall fetch from PyPI and modify ~/.local/pipx/venvs (network + system-state writes — recoverable cache scope). list/list --json/show/environment/runpip print state. run executes the named tool (which then runs arbitrary Python). reinstall/uninstall-all rebuild or remove the entire pipx env. ensurepath edits shell rc files. Active maintenance — releases roughly monthly."
+url = "https://pipx.pypa.io/"
+researched_version = "pipx 1.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+bare = true
+standalone = ["--help", "--include-injected", "--json", "--short", "--skip-maintenance", "-h"]
+valued = ["--global"]
+
+[[command.sub]]
+name = "environment"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--value", "-v"]
+
+[[command.sub]]
+name = "completions"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "install"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--editable", "--force", "--global", "--help",
+    "--include-deps", "--preinstall", "--quiet",
+    "--system-site-packages", "--verbose",
+    "-e", "-f", "-h", "-q", "-v",
+]
+valued = [
+    "--fetch-missing-python", "--index-url",
+    "--pip-args", "--python", "--suffix",
+]
+
+[[command.sub]]
+name = "install-all"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--global", "--help", "--quiet", "--verbose", "-f", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "upgrade"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--global", "--help", "--include-injected", "--install", "--quiet", "--verbose", "-f", "-h", "-q", "-v"]
+valued = ["--pip-args", "--python"]
+
+[[command.sub]]
+name = "upgrade-all"
+level = "SafeWrite"
+bare = true
+standalone = ["--force", "--global", "--help", "--include-injected", "--quiet", "--skip", "--verbose", "-f", "-h", "-q", "-v"]
+valued = ["--pip-args"]
+
+[[command.sub]]
+name = "uninstall"
+level = "SafeWrite"
+bare = false
+standalone = ["--global", "--help", "-h"]
+
+[[command.sub]]
+name = "uninstall-all"
+level = "SafeWrite"
+bare = true
+standalone = ["--global", "--help", "-h"]
+
+[[command.sub]]
+name = "reinstall"
+level = "SafeWrite"
+bare = false
+standalone = ["--global", "--help", "-h"]
+valued = ["--python"]
+
+[[command.sub]]
+name = "reinstall-all"
+level = "SafeWrite"
+bare = true
+standalone = ["--global", "--help", "-h"]
+valued = ["--python", "--skip"]
+
+[[command.sub]]
+name = "inject"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--global", "--help", "--include-apps", "--include-deps", "--quiet", "--verbose", "-f", "-h", "-q", "-v"]
+valued = ["--index-url", "--pip-args"]
+
+[[command.sub]]
+name = "uninject"
+level = "SafeWrite"
+bare = false
+standalone = ["--global", "--help", "--leave-deps", "-h"]
+
+[[command.sub]]
+name = "ensurepath"
+level = "SafeWrite"
+bare = true
+standalone = ["--force", "--global", "--help", "-f", "-h"]
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "runpip"
+candidate = true
+
+[[command.sub]]
+name = "interpreter"
+candidate = true

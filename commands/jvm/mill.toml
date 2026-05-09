@@ -1,0 +1,15 @@
+[[command]]
+name = "mill"
+description = "Scala/Java build tool with a Bazel-flavoured task graph. Each invocation runs the target task (compile, run, test, etc.) which executes user code (build.sc / build.mill is itself Scala). The --version, --help, --bell, --interactive, --jobs, --no-server flags are infrastructure controls; running any task is arbitrary code execution."
+url = "https://mill-build.com/"
+researched_version = "mill 0.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = [
+    "--bell", "--debug", "--disable-callgraph",
+    "--disable-prompt", "--enable-prompt",
+    "--help", "--interactive", "--no-server",
+    "--silent", "--ticker", "--version", "--watch",
+    "-V", "-b", "-d", "-h", "-i", "-s", "-w",
+]

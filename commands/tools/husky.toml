@@ -1,0 +1,9 @@
+[[command]]
+name = "husky"
+description = "Modern Git hooks manager for Node projects. The simple `husky init` command scaffolds .husky/ with a pre-commit hook (project-local SafeWrite). `husky install` (deprecated alias) and bare `husky` (in v9+) initialize hooks. Hook bodies are user-controlled shell scripts under .husky/; running them is the responsibility of git, not husky itself. Active project on the 9.x line."
+url = "https://typicode.github.io/husky/"
+researched_version = "husky 9.x"
+level = "SafeWrite"
+bare = true
+max_positional = 1
+standalone = ["--help", "--version", "-h"]

@@ -1,0 +1,9 @@
+[[command]]
+name = "serve"
+description = "Vercel's static-file dev server. Each invocation opens a network listener on the configured port. The static file server does not execute project code, but binding network ports is a side effect outside this CLI invocation. Carve-out: --help / --version only."
+url = "https://github.com/vercel/serve"
+researched_version = "serve 14.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

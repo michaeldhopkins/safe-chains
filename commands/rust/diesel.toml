@@ -1,0 +1,69 @@
+[[command]]
+name = "diesel"
+description = "Diesel ORM CLI for Rust. `migration generate` writes new migration files (SafeWrite). `migration list` and `migration pending` are read-only inspections (network — connect to DB). `migration run`, `migration revert`, `migration redo`, `setup`, `database setup`, `database reset`, `database drop` modify the configured database (external system writes). `print-schema` reads schema from the DB and emits Rust source. `completions` writes shell completion scripts."
+url = "https://diesel.rs/guides/getting-started"
+researched_version = "diesel-cli 2.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[command.wrapper]
+valued = [
+    "--config-file", "--database-url",
+    "--locked-schema",
+]
+
+[[command.sub]]
+name = "migration"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "generate"
+standalone = ["--help", "--no-down", "--no-up", "-h"]
+valued = ["--diff-schema", "--migrations-dir", "--sql", "--version"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--migrations-dir"]
+
+[[command.sub.sub]]
+name = "pending"
+standalone = ["--help", "-h"]
+valued = ["--migrations-dir"]
+
+[[command.sub.sub]]
+name = "run"
+candidate = true
+
+[[command.sub.sub]]
+name = "revert"
+candidate = true
+
+[[command.sub.sub]]
+name = "redo"
+candidate = true
+
+[[command.sub]]
+name = "completions"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "print-schema"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--with-docs", "--with-docs-config", "-h"]
+valued = ["--except-tables", "--filter", "--import-types", "--only-tables", "--patch-file", "--schema", "-s"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "setup"
+candidate = true
+
+[[command.sub]]
+name = "database"
+candidate = true

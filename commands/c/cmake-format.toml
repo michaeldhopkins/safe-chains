@@ -1,0 +1,26 @@
+[[command]]
+name = "cmake-format"
+description = "Formatter for CMakeLists.txt files. Without -i, prints formatted source to stdout. -i rewrites files in place (project-local SafeWrite via write_flags). --check exits non-zero on diff (read). Static — does not execute CMake."
+url = "https://cmake-format.readthedocs.io/"
+researched_version = "cmake-format 0.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--check", "--config-files",
+    "--dump", "--dump-config", "--first-comment-is-literal",
+    "--help", "--in-place", "--no-config-file",
+    "--quiet", "--require-valid-layout",
+    "-c", "-h", "-i",
+]
+valued = [
+    "--bullet-char", "--command-case",
+    "--enum-char", "--keyword-case",
+    "--line-ending", "--line-width",
+    "--max-pargs-hwrap", "--max-prefix-chars",
+    "--max-rows-cmdline", "--max-subgroups-hwrap",
+    "--min-prefix-chars", "--output-encoding",
+    "--separate-ctrl-name-with-space",
+    "--separate-fn-name-with-space",
+    "--tab-size",
+]
+write_flags = ["--in-place", "-i"]

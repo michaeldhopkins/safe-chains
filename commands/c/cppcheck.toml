@@ -1,0 +1,46 @@
+[[command]]
+name = "cppcheck"
+description = "Static analyzer for C/C++. Reads source files (or a compile_commands.json) and reports defects to stdout. Does not execute project code. --output-file writes the report to a file (project-local SafeWrite via write_flags). Stable, popular tool."
+url = "https://cppcheck.sourceforge.io/"
+researched_version = "cppcheck 2.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--addon", "--addon-python",
+    "--bug-hunting", "--check-config",
+    "--check-headers", "--check-level",
+    "--check-library", "--checkers-report",
+    "--config-exclude", "--debug", "--debug-warnings",
+    "--debug-symdb", "--disable",
+    "--dump", "--enable", "--errorlist",
+    "--exception-handling", "--executor",
+    "--exitcode-suppressions", "--file-filter",
+    "--file-list", "--force",
+    "--help", "--include", "--includes-file",
+    "--inconclusive", "--inline-suppr",
+    "--language", "--library", "--max-configs",
+    "--max-ctu-depth", "--no-cppcheck-build-dir",
+    "--platform", "--plist-output",
+    "--profile-translations",
+    "--project-configurations", "--quiet",
+    "--relative-paths", "--report-progress",
+    "--rule", "--rule-file",
+    "--showtime", "--std", "--suppress",
+    "--suppress-xml", "--suppressions-list",
+    "--template", "--template-location",
+    "--verbose", "--version", "--xml",
+    "-D", "-U", "-h", "-j", "-l", "-q", "-v",
+]
+valued = [
+    "--cppcheck-build-dir", "--config-exclude",
+    "--exitcode-suppressions", "--executor",
+    "--include", "--includes-file",
+    "--language", "--library", "--max-configs",
+    "--max-ctu-depth", "--output-file",
+    "--platform", "--rule", "--rule-file",
+    "--std", "--suppress", "--suppressions-list",
+    "--template", "--template-location",
+    "--xml-version",
+    "-D", "-I", "-U", "-i", "-j", "-l",
+]
+write_flags = ["--output-file"]

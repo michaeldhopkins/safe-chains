@@ -1,0 +1,21 @@
+[[command]]
+name = "yapf"
+description = "Google's formatter for Python source. Without -i, prints the formatted source to stdout (or a unified diff with --diff). The -i / --in-place flag rewrites files. Recursively descends directories with -r/--recursive. Style is configured by .style.yapf or pyproject.toml. Active project; flag surface stable."
+url = "https://github.com/google/yapf"
+researched_version = "yapf 0.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--diff", "--help",
+    "--in-place", "--no-local-style",
+    "--parallel", "--print-modified",
+    "--quiet", "--recursive",
+    "--verify", "--version",
+    "-d", "-h", "-i", "-m", "-p",
+    "-q", "-r", "-vv",
+]
+valued = [
+    "--exclude", "--lines", "--style",
+    "-e", "-l",
+]
+write_flags = ["--in-place", "-i"]

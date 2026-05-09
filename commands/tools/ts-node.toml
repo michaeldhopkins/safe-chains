@@ -1,0 +1,9 @@
+[[command]]
+name = "ts-node"
+description = "TypeScript execution engine for Node.js. Each invocation runs the given .ts file or starts a TypeScript REPL — both execute user code. Carve-out: --help / --version only."
+url = "https://github.com/TypeStrong/ts-node"
+researched_version = "ts-node 10.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

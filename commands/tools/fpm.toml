@@ -5,7 +5,6 @@ url = "https://fpm.readthedocs.io/"
 researched_version = "fpm 1.17.0 (October 2025)"
 level = "SafeWrite"
 bare = false
-positional_style = true
 standalone = [
     "--debug", "--debug-workspace", "--force",
     "--help", "--no-auto-depends", "--no-depends",

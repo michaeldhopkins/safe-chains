@@ -1,0 +1,13 @@
+[[command]]
+name = "nodemon"
+description = "File watcher that re-runs a Node.js script on changes. Each invocation runs the configured `--exec` command (or the given script), which is arbitrary code. Only --help / --version / --dump (config dump) have a fixed safe surface."
+url = "https://github.com/remy/nodemon"
+researched_version = "nodemon 3.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = [
+    "--dump", "--help", "--quiet",
+    "--version",
+    "-h", "-q", "-v",
+]

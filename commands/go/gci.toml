@@ -1,0 +1,42 @@
+[[command]]
+name = "gci"
+description = "Imports formatter for Go that orders import groups deterministically. `print` prints formatted source to stdout (read). `diff` prints a unified diff (read). `write` rewrites files in place (project-local SafeWrite). `list` lists files whose imports differ from the desired order. Static — does not execute project code."
+url = "https://github.com/daixiang0/gci"
+researched_version = "gci 0.x"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "print"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--debug", "--help", "--no-prefix-comments", "--skip-generated", "--skip-vendor", "-h"]
+valued = ["--custom-order", "--section", "-s"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--debug", "--help", "--no-prefix-comments", "--skip-generated", "--skip-vendor", "-h"]
+valued = ["--custom-order", "--section", "-s"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--debug", "--help", "--skip-generated", "--skip-vendor", "-h"]
+valued = ["--section", "-s"]
+
+[[command.sub]]
+name = "write"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--debug", "--help", "--no-prefix-comments", "--skip-generated", "--skip-vendor", "-h"]
+valued = ["--custom-order", "--section", "-s"]
+
+[[command.sub]]
+name = "help"
+allow_all = true

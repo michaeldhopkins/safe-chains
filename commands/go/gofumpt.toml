@@ -1,0 +1,16 @@
+[[command]]
+name = "gofumpt"
+description = "Stricter superset of gofmt. Same flag surface as gofmt — without -w prints to stdout, -l lists files, -d diffs, -w rewrites in place. Static formatter; does not execute Go source."
+url = "https://github.com/mvdan/gofumpt"
+researched_version = "gofumpt 0.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--cpuprofile", "--d", "--diff",
+    "--e", "--extra", "--help",
+    "--l", "--list", "--write",
+    "--w",
+    "-d", "-e", "-h", "-l", "-w",
+]
+valued = ["--lang", "--modpath"]
+write_flags = ["--w", "-w", "--write"]

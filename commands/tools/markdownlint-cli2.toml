@@ -1,0 +1,17 @@
+[[command]]
+name = "markdownlint-cli2"
+description = "Modern markdownlint CLI — lints Markdown files against a configurable rule set. By default reports violations to stdout. The --fix flag rewrites files in place to apply auto-fixable rules; promotes the level to SafeWrite via write_flags. Configuration is loaded from .markdownlint-cli2.{jsonc,yaml,cjs,mjs}. Static — does not execute Markdown content. Active project."
+url = "https://github.com/DavidAnson/markdownlint-cli2"
+researched_version = "markdownlint-cli2 0.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--fix", "--help",
+    "--no-globs", "--no-inline-config",
+    "--quiet",
+]
+valued = [
+    "--config", "--directories",
+    "--no-globs",
+]
+write_flags = ["--fix"]

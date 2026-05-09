@@ -1,0 +1,21 @@
+[[command]]
+name = "ormolu"
+description = "Strict, opinionated formatter for Haskell. Without --inplace, prints formatted source to stdout. --inplace / -i rewrites files (project-local SafeWrite via write_flags). --mode check exits non-zero on diff (read-only). Static — does not execute Haskell."
+url = "https://github.com/tweag/ormolu"
+researched_version = "ormolu 0.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--check-idempotence", "--color",
+    "--help", "--inplace", "--no-cabal",
+    "--unsafe",
+    "-c", "-h", "-i",
+]
+valued = [
+    "--cabal-default-extensions", "--cabal-extension",
+    "--ghc-opt", "--mode", "--package-name",
+    "--start-line", "--start-column",
+    "--end-line", "--end-column",
+    "-o",
+]
+write_flags = ["--inplace", "-i"]

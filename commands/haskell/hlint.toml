@@ -1,0 +1,27 @@
+[[command]]
+name = "hlint"
+description = "Linter for Haskell. Reads source files and reports refactoring suggestions to stdout. --refactor invokes the `refactor` external program to apply suggestions in place — that's a write operation. The static analysis itself does not execute Haskell. Active project."
+url = "https://github.com/ndmitchell/hlint"
+researched_version = "hlint 3.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--cc", "--check", "--cpp-simple",
+    "--cross", "--default", "--help",
+    "--no-exit-code", "--no-summary",
+    "--no-utf8", "--print-test",
+    "--quiet", "--report", "--serialise",
+    "--show", "--test", "--verbose",
+    "--version", "--with-group",
+    "-?", "-c", "-q", "-r", "-t", "-v",
+]
+valued = [
+    "--cpp-define", "--cpp-file", "--cpp-include",
+    "--data-dir", "--encoding", "--extension",
+    "--git", "--hint", "--ignore",
+    "--language", "--lints", "--match",
+    "--only", "--path", "--threads",
+    "--utf8", "--with-refact",
+    "-X", "-c", "-e", "-h", "-i", "-j",
+    "-l",
+]

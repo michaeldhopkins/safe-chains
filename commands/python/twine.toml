@@ -1,0 +1,25 @@
+[[command]]
+name = "twine"
+description = "Utility for publishing Python packages to PyPI / TestPyPI. `check` verifies the long_description rendering of one or more distribution files (read-only). `upload` and `register` send the artifacts to a remote index over HTTPS (authenticated network operations that affect external systems — not part of the safe surface). The diagnostic --version and --help are also benign."
+url = "https://twine.readthedocs.io/"
+researched_version = "twine 5.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--strict", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "upload"
+candidate = true
+
+[[command.sub]]
+name = "register"
+candidate = true

@@ -1,0 +1,9 @@
+[[command]]
+name = "groovy"
+description = "Groovy launcher — runs scripts or evaluates -e expressions. Every meaningful invocation executes Groovy code. Only --version and --help have a fixed safe surface."
+url = "https://groovy-lang.org/single-page-documentation.html"
+researched_version = "groovy 4.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

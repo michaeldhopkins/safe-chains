@@ -1,0 +1,129 @@
+[[command]]
+name = "crystal"
+description = "Crystal language launcher. Subcommands include `build` (compile to binary, SafeWrite), `run` (compile + execute — arbitrary code), `eval` (REPL-like, executes code), `play` (browser playground server), `spec` (run tests, executes code), `tool format` (format files, SafeWrite), `tool hierarchy/types/expand/dependencies` (static analysis), `init`, `version`, `env`, `docs`. Carve-out covers diagnostic/static-analysis forms; `run` / `eval` / `spec` / `play` are candidates."
+url = "https://crystal-lang.org/reference/"
+researched_version = "crystal 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--cross-compile", "--debug",
+    "--emit", "--error-trace",
+    "--help", "--ll",
+    "--no-codegen", "--no-color",
+    "--no-debug", "--no-warnings",
+    "--release", "--single-module",
+    "--stats", "--threads",
+    "--time", "--verbose",
+    "-D", "-h", "-s", "-t", "-v",
+]
+valued = [
+    "--define", "--exclude-warnings",
+    "--link-flags", "--mattr",
+    "--mcpu", "--mtriple",
+    "--n", "--name",
+    "--no-color", "--o",
+    "--p", "--prelude",
+    "--run", "--target",
+    "-D", "-o", "-p",
+]
+
+[[command.sub]]
+name = "tool"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "format"
+standalone = ["--check", "--help", "--include-spec", "-c", "-h", "-i"]
+valued = ["--exclude"]
+
+[[command.sub.sub]]
+name = "hierarchy"
+standalone = ["--help", "-h"]
+valued = ["--exclude", "--format"]
+
+[[command.sub.sub]]
+name = "types"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "expand"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "dependencies"
+standalone = ["--help", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "context"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "implementations"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "unreachable"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "flags"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "macro_code_coverage"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--force", "--quiet", "-f", "-h", "-q"]
+
+[[command.sub]]
+name = "docs"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--output"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "eval"
+candidate = true
+
+[[command.sub]]
+name = "spec"
+candidate = true
+
+[[command.sub]]
+name = "play"
+candidate = true
+
+[[command.sub]]
+name = "i"
+candidate = true

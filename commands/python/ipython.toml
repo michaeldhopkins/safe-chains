@@ -1,0 +1,9 @@
+[[command]]
+name = "ipython"
+description = "Enhanced interactive Python REPL. The whole purpose is to evaluate arbitrary Python at a prompt, so the only safe surface is the diagnostic flags --version and --help. -c CMD runs Python code; --pylab/--matplotlib auto-import; -i FILE drops into a REPL after running the given script."
+url = "https://ipython.org/"
+researched_version = "ipython 8.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]

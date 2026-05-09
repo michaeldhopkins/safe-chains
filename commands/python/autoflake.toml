@@ -1,0 +1,23 @@
+[[command]]
+name = "autoflake"
+description = "Removes unused imports and unused variables from Python source. Without -i, prints the modified source to stdout. -i / --in-place rewrites files. -r/--recursive descends directories. --check exits non-zero if changes would be made (read-only)."
+url = "https://github.com/PyCQA/autoflake"
+researched_version = "autoflake 2.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--check", "--check-diff", "--expand-star-imports",
+    "--help", "--ignore-pass-after-docstring",
+    "--ignore-pass-statements",
+    "--in-place", "--quiet", "--recursive",
+    "--remove-all-unused-imports",
+    "--remove-duplicate-keys", "--remove-rhs-for-unused-variables",
+    "--remove-unused-variables", "--verbose", "--version",
+    "-c", "-h", "-i", "-q", "-r", "-v",
+]
+valued = [
+    "--exclude", "--ignore-init-module-imports",
+    "--imports", "--jobs", "--stdin-display-name",
+    "-j",
+]
+write_flags = ["--in-place", "-i"]

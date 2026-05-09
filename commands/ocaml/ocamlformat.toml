@@ -1,0 +1,28 @@
+[[command]]
+name = "ocamlformat"
+description = "Auto-formatter for OCaml. Without --inplace, prints formatted source to stdout. --inplace rewrites files (project-local SafeWrite via write_flags). --check exits non-zero on diff (read). Static formatter."
+url = "https://github.com/ocaml-ppx/ocamlformat"
+researched_version = "ocamlformat 0.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--check", "--debug", "--disable",
+    "--disable-conf-files", "--disable-outside-detected-project",
+    "--enable", "--enable-outside-detected-project",
+    "--help", "--inplace",
+    "--no-version-check", "--numeric",
+    "--print-config", "--print-margin-check",
+    "--quiet",
+    "--root", "--version", "-c", "-h", "-i",
+]
+valued = [
+    "--config", "--doc-comments",
+    "--doc-comments-padding",
+    "--enable-outside-detected-project",
+    "--exclude", "--impl", "--include",
+    "--intf", "--margin", "--max-iters",
+    "--name", "--ocaml-version",
+    "--output", "--profile",
+    "--use-file",
+]
+write_flags = ["--inplace", "-i"]

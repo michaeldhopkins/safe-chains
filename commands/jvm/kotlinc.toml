@@ -1,0 +1,27 @@
+[[command]]
+name = "kotlinc"
+description = "Kotlin compiler — reads .kt source files and writes .class/.jar output. Compiler plugins are arbitrary Kotlin/JVM code loaded at compile time. Active project on the 2.x line."
+url = "https://kotlinlang.org/docs/command-line.html"
+researched_version = "kotlinc 2.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "-Xjava-source-roots",
+    "-Xjvm-default", "-Xnew-inference",
+    "-Xno-call-assertions", "-Xno-receiver-assertions",
+    "-help", "-include-runtime",
+    "-java-parameters", "-jvm-target",
+    "-language-version", "-no-jdk", "-no-reflect",
+    "-no-stdlib", "-nowarn", "-progressive",
+    "-script", "-verbose", "-version",
+    "-Werror", "-X", "-h",
+]
+valued = [
+    "--release", "-Xfriend-paths",
+    "-Xplugin", "-api-version",
+    "-classpath", "-cp",
+    "-d", "-expression", "-jdk-home",
+    "-kotlin-home", "-language-version",
+    "-module-name", "-opt-in",
+    "-script-templates",
+]

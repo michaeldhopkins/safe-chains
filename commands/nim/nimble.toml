@@ -1,0 +1,116 @@
+[[command]]
+name = "nimble"
+description = "Nim package manager. `install`, `develop`, `uninstall`, `refresh`, `lock`, `sync` modify state and contact the registry (network + system writes). `init`, `setup`, `path`, `dump`, `list`, `search`, `tasks`, `check`, `manifest`, `--version` are read-only or scaffolding. `run`, `test`, `c`/`cc`/`build` execute project code."
+url = "https://github.com/nim-lang/nimble"
+researched_version = "nimble 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--installed", "--ver", "-h", "-i"]
+
+[[command.sub]]
+name = "search"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--ver", "-h"]
+
+[[command.sub]]
+name = "tasks"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "path"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dump"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--ini", "--json", "-h"]
+
+[[command.sub]]
+name = "manifest"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "develop"
+candidate = true
+
+[[command.sub]]
+name = "refresh"
+candidate = true
+
+[[command.sub]]
+name = "lock"
+candidate = true
+
+[[command.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "setup"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "c"
+candidate = true
+
+[[command.sub]]
+name = "cc"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true

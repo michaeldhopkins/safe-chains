@@ -1,0 +1,17 @@
+[[command]]
+name = "gofmt"
+description = "Standard Go formatter (also reachable as `go fmt`). Without -w, prints the formatted source to stdout. -l/--list lists files whose formatting differs (read-only). -d shows a diff. -w writes the result back to the source file (project-local SafeWrite via write_flags). -s simplifies code where it can. -r applies a rewrite rule (still a formatter operation, no execution). Bundled with the Go toolchain — surface is highly stable."
+url = "https://pkg.go.dev/cmd/gofmt"
+researched_version = "gofmt — bundled with Go 1.x; surface stable"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--cpuprofile", "--d", "--e",
+    "--help", "--l", "--s", "--w",
+    "-d", "-e", "-h", "-l", "-s", "-w",
+]
+valued = [
+    "--r",
+    "-r",
+]
+write_flags = ["--w", "-w"]

@@ -1,0 +1,22 @@
+[[command]]
+name = "copier"
+description = "Project scaffolder and template updater (cookiecutter alternative). Templates can include hooks (Jinja2 + tasks that run shell commands), so `copy`, `update`, and `recopy` execute template-defined commands during generation. Carve-out covers diagnostic forms only."
+url = "https://copier.readthedocs.io/"
+researched_version = "copier 9.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "copy"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "recopy"
+candidate = true

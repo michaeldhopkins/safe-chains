@@ -1,0 +1,41 @@
+[[command]]
+name = "esbuild"
+description = "Extremely fast JavaScript/TypeScript bundler and minifier. Reads source files and writes bundled output to stdout, or to --outfile / --outdir. The --serve flag starts a long-running HTTP server. --watch keeps a long-running process alive. Active project."
+url = "https://esbuild.github.io/"
+researched_version = "esbuild 0.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--allow-overwrite", "--bundle",
+    "--color", "--help", "--keep-names",
+    "--metafile", "--minify",
+    "--minify-identifiers", "--minify-syntax",
+    "--minify-whitespace", "--no-color",
+    "--preserve-symlinks", "--public-path",
+    "--source-root", "--sourcefile",
+    "--sourcemap", "--sources-content",
+    "--splitting", "--tree-shaking", "--version",
+    "--write",
+    "-h",
+]
+valued = [
+    "--abi-target", "--alias", "--analyze",
+    "--asset-names", "--banner", "--chunk-names",
+    "--charset", "--conditions", "--define",
+    "--drop", "--drop-labels", "--entry-names",
+    "--external", "--footer", "--format",
+    "--global-name", "--ignore-annotations",
+    "--inject", "--jsx", "--jsx-dev",
+    "--jsx-factory", "--jsx-fragment",
+    "--jsx-import-source", "--jsx-side-effects",
+    "--legal-comments", "--line-limit",
+    "--loader", "--log-level", "--log-limit",
+    "--log-override", "--main-fields",
+    "--mangle-cache", "--mangle-props",
+    "--mangle-quoted", "--out-extension",
+    "--outbase", "--outdir", "--outfile",
+    "--packages", "--platform", "--pure",
+    "--reserve-props", "--resolve-extensions",
+    "--supported", "--target",
+    "--tsconfig", "--tsconfig-raw",
+]

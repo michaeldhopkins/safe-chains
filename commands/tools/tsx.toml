@@ -1,0 +1,9 @@
+[[command]]
+name = "tsx"
+description = "Fast TypeScript executor for Node.js. Each invocation runs the given .ts/.tsx file (or stdin), so every meaningful invocation executes user code. Carve-out: --help / --version only. (Not to be confused with @types/react JSX.)"
+url = "https://github.com/privatenumber/tsx"
+researched_version = "tsx 4.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

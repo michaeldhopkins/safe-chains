@@ -1,0 +1,35 @@
+[[command]]
+name = "ncu"
+description = "npm-check-updates — finds outdated dependencies in package.json (or package-lock equivalents) by comparing installed versions against the registry (network read). Without -u/--upgrade, prints the report to stdout. With -u, rewrites package.json with upgraded version specs (project-local SafeWrite via write_flags). --doctor mode upgrades and runs project tests in a loop (executes test scripts — candidate)."
+url = "https://github.com/raineorshine/npm-check-updates"
+researched_version = "npm-check-updates 17.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--cwd", "--deep", "--dep", "--deprecated",
+    "--enginesNode", "--errorLevel",
+    "--global", "--groupFunction", "--help",
+    "--install", "--interactive", "--jsonAll",
+    "--jsonDeps", "--jsonUpgraded",
+    "--loglevel", "--mergeConfig",
+    "--minimal", "--no-color",
+    "--packageManager", "--peer",
+    "--pre", "--prefix", "--root",
+    "--silent", "--stdin", "--target", "--timeout",
+    "--upgrade", "--verbose", "--version",
+    "-c", "-d", "-e", "-g", "-h", "-i",
+    "-j", "-l", "-m", "-p",
+    "-r", "-s", "-t", "-u", "-v", "-w",
+]
+valued = [
+    "--color", "--concurrency", "--configFileName",
+    "--configFilePath", "--cwd",
+    "--filter", "--filterResults",
+    "--filterVersion", "--format",
+    "--packageData", "--packageFile",
+    "--registry", "--reject",
+    "--registryType", "--rejectVersion",
+    "--workspace",
+    "-f", "-x",
+]
+write_flags = ["--upgrade", "-u", "--doctor"]

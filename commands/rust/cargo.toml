@@ -737,3 +737,69 @@ valued = [
     "--override-filename", "--spec-version", "--target",
     "-F", "-f",
 ]
+
+[[command.sub]]
+name = "watch"
+candidate = true
+
+[[command.sub]]
+name = "binstall"
+candidate = true
+
+[[command.sub]]
+name = "fuzz"
+candidate = true
+
+[[command.sub]]
+name = "tarpaulin"
+candidate = true
+
+[[command.sub]]
+name = "modules"
+level = "SafeRead"
+standalone = [
+    "--all-features", "--cfg-test", "--help",
+    "--no-default-features", "--no-externs",
+    "--no-fns", "--no-modules", "--no-sysroot",
+    "--no-traits", "--no-types", "--no-uses",
+    "--orphans", "--sort-by-name",
+    "--sort-by-visibility", "--types",
+    "--uses", "--verbose",
+    "-h",
+]
+valued = [
+    "--bin", "--example", "--features",
+    "--lib", "--manifest-path", "--package",
+    "--target",
+    "-p",
+]
+
+[[command.sub]]
+name = "asm"
+level = "SafeRead"
+standalone = [
+    "--all-features", "--bin", "--debug-info",
+    "--example", "--features", "--frozen",
+    "--full-name", "--help", "--lib",
+    "--locked", "--no-color", "--no-default-features",
+    "--offline", "--release", "--rust",
+    "--simplify", "--source", "--test",
+    "--verbose", "--version",
+    "-V", "-h",
+]
+valued = [
+    "--asm-style", "--bench", "--build-type",
+    "--config", "--manifest-path",
+    "--package", "--target",
+    "--target-cpu", "--target-dir",
+    "--unstable",
+    "-p",
+]
+
+[[command.sub]]
+name = "features"
+candidate = true
+
+[[command.sub]]
+name = "release"
+candidate = true

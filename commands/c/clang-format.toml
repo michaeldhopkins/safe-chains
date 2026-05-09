@@ -1,0 +1,22 @@
+[[command]]
+name = "clang-format"
+description = "LLVM source formatter for C, C++, Objective-C, JavaScript, Java, JSON, Verilog, and Protobuf. Without -i, prints formatted source to stdout. -i rewrites files in place (project-local SafeWrite via write_flags). --dry-run + --Werror reports differences without modifying files. Static — does not execute project code."
+url = "https://clang.llvm.org/docs/ClangFormat.html"
+researched_version = "clang-format — LLVM 18+"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--Werror", "--Wno-error", "--dry-run",
+    "--ferror-limit", "--fail-on-incomplete-format",
+    "--help", "--help-list", "--help-list-hidden",
+    "--no-sort-includes", "--print-options",
+    "--sort-includes", "--verbose",
+    "--version", "-h", "-i", "-n",
+]
+valued = [
+    "--assume-filename", "--cursor",
+    "--fallback-style", "--length",
+    "--lines", "--offset", "--output-replacements-xml",
+    "--style",
+]
+write_flags = ["--i", "-i"]

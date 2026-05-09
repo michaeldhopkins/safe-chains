@@ -410,7 +410,7 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 <p class="cmd-url"><a href="https://sorbet.org/docs/cli">https://sorbet.org/docs/cli</a></p>
 
 - **help**: Positional args accepted
-- **tc**: Flags: --autocorrect, --check-out-of-order-constant-references, --color, --did-you-mean, --enable-experimental-rbs-assertions, --enable-experimental-rbs-comments, --enable-experimental-rbs-signatures, --enable-experimental-requires-ancestor, --enable-experimental-rspec, --experimental-ruby3-keyword-args, --force-hashing, --help, --license, --no-config, --no-did-you-mean, --no-error-count, --no-error-sections, --no-stdlib, --progress, --quiet, --silence-dev-message, --simulate-crash, --stdout-hup-hack, --suggest-typed, --suggest-unsafe, --suppress-non-critical, --track-untyped, --typed-super, --uniquely-defined-behavior, --verbose, --version, -P, -a, -h, -q, -v. Valued: --allowed-extension, --censor-for-snapshot-tests, --dir, --error-url-base, --file, --forcibly-silence-lsp-multiple-dir-error, --ignore, --isolate-error-code, --max-cache-size-bytes, --max-threads, --metrics-prefix, --minimize-to-rbi, --parser, --print, --remove-path-prefix, --stop-after, --suppress-error-code, --suppress-payload-superclass-redefinition-for, --typed, --typed-override, -e, -p. Positional args accepted
+- **tc**: Flags: --autocorrect, --check-out-of-order-constant-references, --color, --did-you-mean, --enable-experimental-rbs-assertions, --enable-experimental-rbs-comments, --enable-experimental-rbs-signatures, --enable-experimental-requires-ancestor, --enable-experimental-rspec, --experimental-ruby3-keyword-args, --force-hashing, --help, --license, --no-config, --no-did-you-mean, --no-error-count, --no-error-sections, --no-stdlib, --progress, --quiet, --silence-dev-message, --simulate-crash, --stdout-hup-hack, --suggest-typed, --suggest-unsafe, --suppress-non-critical, --track-untyped, --typed-super, --uniquely-defined-behavior, --verbose, --version, -P, -a, -h, -q, -v. Valued: --allowed-extension, --censor-for-snapshot-tests, --dir, --error-url-base, --file, --forcibly-silence-lsp-multiple-dir-error, --ignore, --isolate-error-code, --max-cache-size-bytes, --max-threads, --metrics-prefix, --minimize-to-rbi, --parser, --print, --remove-path-prefix, --stop-after, --suppress-error-code, --suppress-payload-superclass-redefinition-for, --typed, --typed-override, -e, -p
 - Allowed standalone flags: --help, --version, -h
 
 ### `stackprof`
@@ -444,27 +444,27 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 ### `stree`
 <p class="cmd-url"><a href="https://github.com/ruby-syntax-tree/syntax_tree">https://github.com/ruby-syntax-tree/syntax_tree</a></p>
 
-- **a**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **ast**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **c**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **check**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **ctags**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **debug**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **doc**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **e**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **expr**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **f**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **format**: Flags: --help, -h. Valued: -e. Positional args accepted
+- **a**: Flags: --help, -h. Valued: -e
+- **ast**: Flags: --help, -h. Valued: -e
+- **c**: Flags: --help, -h. Valued: -e
+- **check**: Flags: --help, -h. Valued: -e
+- **ctags**: Flags: --help, -h. Valued: -e
+- **debug**: Flags: --help, -h. Valued: -e
+- **doc**: Flags: --help, -h. Valued: -e
+- **e**: Flags: --help, -h. Valued: -e
+- **expr**: Flags: --help, -h. Valued: -e
+- **f**: Flags: --help, -h. Valued: -e
+- **format**: Flags: --help, -h. Valued: -e
 - **help**: Positional args accepted
-- **j**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **json**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **m**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **match**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **s**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **search**: Flags: --help, -h. Valued: -e. Positional args accepted
+- **j**: Flags: --help, -h. Valued: -e
+- **json**: Flags: --help, -h. Valued: -e
+- **m**: Flags: --help, -h. Valued: -e
+- **match**: Flags: --help, -h. Valued: -e
+- **s**: Flags: --help, -h. Valued: -e
+- **search**: Flags: --help, -h. Valued: -e
 - **version**: Flags: --help, -h
-- **w**: Flags: --help, -h. Valued: -e. Positional args accepted
-- **write**: Flags: --help, -h. Valued: -e. Positional args accepted
+- **w**: Flags: --help, -h. Valued: -e
+- **write**: Flags: --help, -h. Valued: -e
 - Allowed standalone flags: --help, --version, -h
 
 ### `thor`

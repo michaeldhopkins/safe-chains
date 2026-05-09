@@ -1,0 +1,29 @@
+[[command]]
+name = "gomodifytags"
+description = "Adds, removes, and modifies struct tags in Go source. Without -w, prints the modified source to stdout. -w writes the result back to the source file (project-local SafeWrite via write_flags). Static AST transformer."
+url = "https://github.com/fatih/gomodifytags"
+researched_version = "gomodifytags 1.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--add-options", "--all", "--clear-tags",
+    "--clear-options", "--format", "--help",
+    "--quiet", "--remove-tags", "--remove-options",
+    "--skip-unexported",
+    "--sort", "--transform", "--w",
+    "-h", "-w",
+]
+valued = [
+    "--add-tags", "--field", "--file",
+    "--line", "--modified", "--offset",
+    "--override", "--remove-options",
+    "--remove-tags", "--struct",
+    "--template", "--transform",
+    "-add-tags", "-clear-tags",
+    "-field", "-file", "-line",
+    "-modified", "-offset", "-override",
+    "-remove-options", "-remove-tags",
+    "-struct", "-template",
+    "-transform",
+]
+write_flags = ["--w", "-w"]

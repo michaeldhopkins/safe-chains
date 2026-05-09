@@ -1,0 +1,15 @@
+[[command]]
+name = "clj"
+aliases = ["clojure"]
+description = "Clojure CLI — runs scripts, REPLs, deps, and tools. Every meaningful invocation evaluates Clojure code. Only --help, -h, --version, -- options that don't run code (e.g. -Spath/-Stree/-Sdescribe/-Sdeps prints) are read-only. Carve-out: --help / --version / -Sdescribe / -Spath / -Stree."
+url = "https://clojure.org/reference/deps_and_cli"
+researched_version = "Clojure CLI 1.x"
+level = "SafeRead"
+bare = false
+max_positional = 0
+standalone = [
+    "--help", "--version", "-Sdescribe",
+    "-Spath", "-Stree", "-Sverbose",
+    "-h", "-help",
+]
+valued = []

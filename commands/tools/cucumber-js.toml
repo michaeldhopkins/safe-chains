@@ -1,0 +1,27 @@
+[[command]]
+name = "cucumber-js"
+aliases = ["@cucumber/cucumber"]
+description = "Cucumber.js — Node port of Cucumber. Reads .feature files and executes step-definition glue code (arbitrary JS). Same SafeRead profile as Ruby cucumber. Active project."
+url = "https://github.com/cucumber/cucumber-js"
+researched_version = "cucumber.js 11.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--dry-run", "--exit", "--fail-fast",
+    "--force-exit", "--help",
+    "--profile", "--publish",
+    "--publish-quiet", "--strict",
+    "--no-strict",
+    "--version",
+    "-V", "-h", "-x",
+]
+valued = [
+    "--backtrace", "--config", "--format",
+    "--format-options", "--i18n-keywords",
+    "--language", "--name", "--order",
+    "--paths", "--require", "--require-module",
+    "--retry", "--retry-tag-filter",
+    "--tags", "--world-parameters",
+    "-b", "-c", "-f", "-i", "-n",
+    "-p", "-r", "-t", "-w",
+]

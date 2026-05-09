@@ -1,0 +1,31 @@
+[[command]]
+name = "pip-compile"
+description = "Companion to pip-tools — reads a requirements.in (or pyproject.toml/setup.py) and resolves transitive dependencies into a fully-pinned requirements.txt. Writes the lockfile to disk by default (target governed by --output-file). Fetches package metadata from the configured index (network) but does not install anything. --dry-run skips the file write. Active maintenance on the 7.x line."
+url = "https://github.com/jazzband/pip-tools"
+researched_version = "pip-tools 7.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--all-build-deps", "--all-extras", "--allow-unsafe",
+    "--annotate", "--annotation-style", "--build-isolation",
+    "--cache-dir", "--config", "--constraint",
+    "--dry-run", "--emit-find-links", "--emit-index-url",
+    "--emit-options", "--emit-trusted-host", "--extra",
+    "--extra-index-url", "--find-links", "--generate-hashes",
+    "--header", "--help", "--index-url",
+    "--newline", "--no-allow-unsafe", "--no-annotate",
+    "--no-build-isolation", "--no-config", "--no-emit-find-links",
+    "--no-emit-index-url", "--no-emit-options", "--no-emit-trusted-host",
+    "--no-find-links", "--no-generate-hashes", "--no-header",
+    "--no-index", "--no-strip-extras", "--only-build-deps",
+    "--pip-args", "--quiet", "--rebuild",
+    "--strip-extras", "--trusted-host", "--unsafe-package",
+    "--upgrade", "--verbose", "--version",
+    "-U", "-h", "-i", "-n", "-o", "-q", "-r", "-v",
+]
+valued = [
+    "--build-deps-for", "--no-build-deps-for",
+    "--output-file", "--resolver",
+    "--upgrade-package",
+    "-P",
+]

@@ -1,0 +1,77 @@
+[[command]]
+name = "dart"
+description = "Dart SDK CLI. `analyze` and `format` (without --fix) are static analysis. `format --fix` rewrites files. `compile`, `pub get/upgrade/add/remove/publish/run`, `test`, `run`, `fix --apply` execute or modify state — `pub` operations contact pub.dev (network). The diagnostic --version, --help, plus `analyze`, `format` (read), `info`, `pub deps` are part of the safe surface."
+url = "https://dart.dev/tools/dart-tool"
+researched_version = "Dart 3.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "analyze"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--cache", "--enable-experiment", "--fatal-infos", "--fatal-warnings", "--format", "--help", "--no-fatal-infos", "--no-fatal-warnings", "--packages", "--verbose", "-h", "-v"]
+valued = ["--directory"]
+
+[[command.sub]]
+name = "format"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--enable-experiment", "--fix", "--follow-links", "--help", "--machine", "--set-exit-if-changed", "--show", "--show-help-hidden", "--summary", "-h"]
+valued = ["--line-length", "--output", "--language-version", "--page-width", "--selection", "--style", "-l", "-o"]
+write_flags = ["--output", "-o"]
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "pub"
+candidate = true
+
+[[command.sub]]
+name = "compile"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "doc"
+candidate = true
+
+[[command.sub]]
+name = "fix"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "devtools"
+candidate = true
+
+[[command.sub]]
+name = "language-server"
+candidate = true
+
+[[command.sub]]
+name = "mcp-server"
+candidate = true

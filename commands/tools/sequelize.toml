@@ -1,0 +1,78 @@
+[[command]]
+name = "sequelize"
+description = "Sequelize CLI for Node ORM. `init`, `model:generate`, `migration:generate`, `seed:generate` write project files (SafeWrite). `db:create`, `db:drop`, `db:migrate`, `db:migrate:undo`, `db:seed`, `db:seed:all` connect to the configured database (external-system writes). The diagnostic --help and --version are benign."
+url = "https://github.com/sequelize/cli"
+researched_version = "sequelize-cli 6.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--force", "--help", "-h"]
+valued = ["--config-path", "--migrations-path", "--models-path", "--seeders-path"]
+
+[[command.sub]]
+name = "model:generate"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+valued = ["--attributes", "--name", "--underscored"]
+
+[[command.sub]]
+name = "migration:generate"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--name"]
+
+[[command.sub]]
+name = "seed:generate"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--name"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "db:create"
+candidate = true
+
+[[command.sub]]
+name = "db:drop"
+candidate = true
+
+[[command.sub]]
+name = "db:migrate"
+candidate = true
+
+[[command.sub]]
+name = "db:migrate:undo"
+candidate = true
+
+[[command.sub]]
+name = "db:migrate:undo:all"
+candidate = true
+
+[[command.sub]]
+name = "db:migrate:status"
+candidate = true
+
+[[command.sub]]
+name = "db:seed"
+candidate = true
+
+[[command.sub]]
+name = "db:seed:undo"
+candidate = true
+
+[[command.sub]]
+name = "db:seed:all"
+candidate = true
+
+[[command.sub]]
+name = "db:seed:undo:all"
+candidate = true

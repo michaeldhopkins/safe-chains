@@ -1,0 +1,9 @@
+[[command]]
+name = "dlv"
+description = "Delve — debugger for Go. Every meaningful invocation (debug/exec/test/attach/connect) runs or attaches to a target Go program with the debugger REPL active — that's arbitrary code execution. Only the diagnostic flags --version and --help are part of the safe surface."
+url = "https://github.com/go-delve/delve"
+researched_version = "dlv 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

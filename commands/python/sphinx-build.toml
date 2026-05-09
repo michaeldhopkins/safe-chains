@@ -1,0 +1,26 @@
+[[command]]
+name = "sphinx-build"
+description = "Sphinx documentation builder. Reads .rst/.md sources from a source directory and writes rendered output (html/latex/man/text/json/etc.) to the given output directory. -b selects the builder; -d redirects the doctree cache; -c overrides the conf.py path. -E rebuilds the environment from scratch; -a forces a full rebuild. -W treats warnings as errors. Sphinx loads conf.py and any extensions from the project — those are arbitrary Python and execute at build time (same risk profile as `python conf.py`). Active project; major releases yearly."
+url = "https://www.sphinx-doc.org/"
+researched_version = "Sphinx 7.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--builders", "--color", "--exception-on-warning",
+    "--fail-on-warning", "--fresh-env", "--full-traceback",
+    "--help", "--keep-going", "--no-color",
+    "--quiet", "--really-quiet", "--show-traceback",
+    "--silent", "--verbose", "--version",
+    "--write-all",
+    "-E", "-M", "-N", "-P", "-Q", "-T",
+    "-W", "-a", "-b", "-h", "-n", "-q", "-v",
+]
+valued = [
+    "--builder", "--conf-dir",
+    "--define", "--doctree-dir", "--filenames",
+    "--html-define", "--include", "--isolated",
+    "--jobs", "--language", "--name-suffix",
+    "--nitpicky", "--pdb", "--tag",
+    "--warning-file",
+    "-A", "-D", "-c", "-d", "-j", "-t", "-w",
+]
