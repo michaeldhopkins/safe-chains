@@ -1,0 +1,23 @@
+[[command]]
+name = "haml-lint"
+description = "Linter for HAML templates. Parses HAML files (no execution of the template) and runs a configurable set of linters; embedded Ruby inside the template is delegated to RuboCop for style checking. Bare invocation lints the project against .haml-lint.yml. The -a/--auto-correct flag rewrites template files in place using linters that support correction; -A/--auto-correct-all also applies corrections marked unsafe. Read-only flags include reporter, format, and parallel mode controls. Actively maintained — point releases every couple of months."
+url = "https://github.com/sds/haml-lint"
+researched_version = "haml-lint v0.72.0 (2026-03-03)"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--auto-correct", "--auto-correct-all", "--auto-gen-config",
+    "--color", "--debug", "--display-cop-names",
+    "--fail-fast", "--help", "--no-color",
+    "--no-summary", "--parallel", "--show-linters",
+    "--show-reporters", "--stdin",
+    "--trace", "--version",
+    "-A", "-a", "-d", "-h", "-p", "-v",
+]
+valued = [
+    "--config", "--exclude", "--exclude-linter",
+    "--fail-level", "--file", "--format",
+    "--include-linter", "--reporter",
+    "-c", "-e", "-f", "-i", "-r", "-x",
+]
+write_flags = ["--auto-correct", "--auto-correct-all", "-A", "-a"]

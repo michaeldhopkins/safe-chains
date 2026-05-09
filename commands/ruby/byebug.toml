@@ -1,0 +1,9 @@
+[[command]]
+name = "byebug"
+description = "Ruby debugger — attaches to and steps through Ruby programs, with an interactive REPL that evaluates arbitrary code in the running process. Only the diagnostic flags --help and --version have a fixed safe surface. v13.0.0 dates to January 2026."
+url = "https://github.com/deivid-rodriguez/byebug"
+researched_version = "byebug v13.0.0 (Jan 2026)"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

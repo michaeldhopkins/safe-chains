@@ -1,0 +1,16 @@
+[[command]]
+name = "ruby-audit"
+description = "Companion to bundler-audit — checks the running Ruby and RubyGems versions against the ruby-advisory-db for CVE coverage. Default invocation runs the `check` subcommand and prints findings to stdout. The -n / --no-update flag suppresses the advisory-DB refresh; without it, the underlying advisory-db clone is updated in the user's cache directory (no project files modified). Note the binary name is dashed (ruby-audit) even though the gem is underscored (ruby_audit). Tiny, stable surface; release cadence is slow."
+url = "https://github.com/civisanalytics/ruby_audit"
+researched_version = "ruby_audit v3.1.0 (Jan 2026)"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+standalone = ["--help", "--no-update", "-h", "-n"]
+valued = ["--ignore", "-i"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]

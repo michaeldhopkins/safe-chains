@@ -1,0 +1,53 @@
+[[command]]
+name = "bridgetown"
+description = "Modern Ruby static-site / fullstack generator (Jekyll's spiritual successor; integrates Roda for dynamic routes). The `build`, `start`, and `serve` commands compile templates that may include Liquid, ERB, or Serbea, and load arbitrary project Ruby from config/initializers and Roda routes — same risk profile as `rails runner`. The `doctor` and `version` subcommands run without booting Roda, so they are safe. `console` is a Ruby REPL inside the booted app. Active development on the 2.x line (74 releases)."
+url = "https://www.bridgetownrb.com/docs/commands"
+researched_version = "bridgetown v2.1.2 (March 2026)"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "doctor"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--trace", "-h", "-t"]
+valued = ["--config"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "console"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "configure"
+candidate = true

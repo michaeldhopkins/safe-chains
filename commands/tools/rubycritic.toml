@@ -1,0 +1,19 @@
+[[command]]
+name = "rubycritic"
+description = "Aggregate code-quality reporter for Ruby projects. Wraps Reek, Flay, Flog, and churn into a unified score and HTML/JSON/console report. Performs static analysis only — does not execute application code. Default invocation writes a report into tmp/rubycritic and tries to open it in the user's browser; --no-browser suppresses the browser launch and is required so this command stays non-interactive. -p/--path redirects the output directory; -f/--format selects html, json, console, or lint output. -s/--minimum-score and --suppress-ratings affect exit-code behaviour. Active enough — intermittent releases on the 4.x line."
+url = "https://github.com/whitesmith/rubycritic"
+researched_version = "rubycritic 4.x"
+level = "SafeWrite"
+bare = false
+require_any = ["--no-browser"]
+standalone = [
+    "--deduplicate-symlinks", "--help",
+    "--mode-ci", "--no-browser", "--suppress-ratings",
+    "--version",
+    "-h", "-v",
+]
+valued = [
+    "--branch", "--format", "--maximum-decrease",
+    "--minimum-score", "--path",
+    "-f", "-p", "-s",
+]

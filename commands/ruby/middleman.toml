@@ -1,0 +1,38 @@
+[[command]]
+name = "middleman"
+description = "Sinatra-flavoured static site generator. Like Jekyll/Bridgetown, the `build` and `server` commands load config.rb plus any Ruby helpers and extensions, executing arbitrary user-supplied code at build time. The `help` subcommand and `--version` flag run without loading config.rb and are safe. Maintenance mode — v4.x has been stable for years; releases are infrequent."
+url = "https://middlemanapp.com/basics/install/"
+researched_version = "middleman 4.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "console"
+candidate = true
+
+[[command.sub]]
+name = "extension"
+candidate = true

@@ -1,0 +1,33 @@
+[[command]]
+name = "foreman"
+description = "Procfile-based process manager for development and export. `foreman start` and `foreman run <cmd>` execute whichever shell commands the project's Procfile contains — there is no static surface to validate because the dangerous behaviour is itself user-defined. The `check` subcommand validates Procfile syntax without running anything (read-only), and `export <format>` generates init scripts for upstart/systemd/supervisord/runit/etc. — it writes config files but does not execute Procfile entries. v0.90.0 dates to July 2025; the project is alive."
+url = "https://github.com/ddollar/foreman"
+researched_version = "foreman v0.90.0 (July 2025)"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--procfile", "-f"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true

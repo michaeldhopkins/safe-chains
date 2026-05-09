@@ -1,0 +1,9 @@
+[[command]]
+name = "annotate"
+description = "Legacy ctran/annotate_models gem — inserts schema and route comments into Rails model and route files. Officially deprecated as of January 2025 (issue #1039); upstream redirects users to drwl/annotaterb. Incompatible with Rails 8. The --models and --routes actions rewrite project files in place after booting the Rails environment, which executes application initializers. The diagnostic surface (--help, --version) does not boot Rails."
+url = "https://github.com/ctran/annotate_models"
+researched_version = "annotate 3.2.0 (Feb 2022) — deprecated Jan 2025"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

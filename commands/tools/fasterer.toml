@@ -1,0 +1,9 @@
+[[command]]
+name = "fasterer"
+description = "Reports Ruby idioms that are demonstrably slower than equivalents from the fast-ruby cheat sheet (e.g. select.first → detect, map.flatten → flat_map). Parses source statically and emits a textual report; does not execute application code and has no auto-correct or rewriting mode. Configuration is loaded from .fasterer.yml in the project root. Bare invocation runs against the project from cwd. Tiny CLI — essentially help/version plus path arguments. Releases are infrequent (yearly-ish); the 0.x flag surface has been stable for years."
+url = "https://github.com/DamirSvrtan/fasterer"
+researched_version = "fasterer 0.x; surface stable"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--version", "-h", "-v"]

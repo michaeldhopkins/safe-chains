@@ -1,0 +1,20 @@
+[[command]]
+name = "slim-lint"
+description = "Linter for Slim templates. Parses Slim files (no execution of the template) and runs a configurable set of linters; embedded Ruby is delegated to RuboCop for style checking. Bare invocation lints the project against .slim-lint.yml. Slim-lint does not currently ship an auto-correct mode — every invocation is read-only. Reporter, format, parallel mode, and stdin filename are the main flags. Actively maintained — small steady releases."
+url = "https://github.com/sds/slim-lint"
+researched_version = "slim-lint v0.34.0 (2026-02-02)"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--color", "--help", "--no-color",
+    "--no-summary", "--parallel",
+    "--show-linters", "--show-reporters",
+    "--version",
+    "-h", "-p", "-v",
+]
+valued = [
+    "--config", "--exclude", "--exclude-linter",
+    "--include-linter", "--reporter",
+    "--stdin-file-path",
+    "-c", "-e", "-i", "-r", "-x",
+]

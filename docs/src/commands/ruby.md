@@ -1,5 +1,25 @@
 # Ruby
 
+### `annotate`
+<p class="cmd-url"><a href="https://github.com/ctran/annotate_models">https://github.com/ctran/annotate_models</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `annotaterb`
+<p class="cmd-url"><a href="https://github.com/drwl/annotaterb">https://github.com/drwl/annotaterb</a></p>
+
+- **help**: Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `bridgetown`
+<p class="cmd-url"><a href="https://www.bridgetownrb.com/docs/commands">https://www.bridgetownrb.com/docs/commands</a></p>
+
+- **doctor**: Flags: --help, --trace, -h, -t. Valued: --config
+- **help**: Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `bundle`
 <p class="cmd-url"><a href="https://bundler.io/man/bundle.1.html">https://bundler.io/man/bundle.1.html</a></p>
 
@@ -11,6 +31,19 @@
 - **list**: Flags: --help, --name-only, --paths, -h
 - **show**: Flags: --help, --paths, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `byebug`
+<p class="cmd-url"><a href="https://github.com/deivid-rodriguez/byebug">https://github.com/deivid-rodriguez/byebug</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `foreman`
+<p class="cmd-url"><a href="https://github.com/ddollar/foreman">https://github.com/ddollar/foreman</a></p>
+
+- **check**: Flags: --help, -h. Valued: --procfile, -f
+- **help**: Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `gem`
 <p class="cmd-url"><a href="https://guides.rubygems.org/command-reference/">https://guides.rubygems.org/command-reference/</a></p>
@@ -30,6 +63,15 @@
 - **which**: Flags: --all, --help, --local, --prerelease, --remote, --versions, -a, -h, -i, -l, -r. Valued: --version, -v
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `guard`
+<p class="cmd-url"><a href="https://github.com/guard/guard">https://github.com/guard/guard</a></p>
+
+- **help**: Positional args accepted
+- **list**: Flags: --help, -h
+- **show**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `importmap`
 <p class="cmd-url"><a href="https://github.com/rails/importmap-rails">https://github.com/rails/importmap-rails</a></p>
 
@@ -38,6 +80,43 @@
 - **outdated**: Flags: --help, -h
 - **packages**: Flags: --help, -h
 - Allowed standalone flags: --help, -h
+
+### `jekyll`
+<p class="cmd-url"><a href="https://jekyllrb.com/docs/usage/">https://jekyllrb.com/docs/usage/</a></p>
+
+- **doctor**: Flags: --help, --trace, -h, -t. Valued: --config, --source
+- **help**: Positional args accepted
+- **hyde**: Flags: --help, --trace, -h, -t. Valued: --config, --source
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `license_finder`
+<p class="cmd-url"><a href="https://github.com/pivotal/LicenseFinder">https://github.com/pivotal/LicenseFinder</a></p>
+
+- **help**: Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `m`
+<p class="cmd-url"><a href="https://github.com/qrush/m">https://github.com/qrush/m</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `middleman`
+<p class="cmd-url"><a href="https://middlemanapp.com/basics/install/">https://middlemanapp.com/basics/install/</a></p>
+
+- **help**: Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `overcommit`
+<p class="cmd-url"><a href="https://github.com/sds/overcommit">https://github.com/sds/overcommit</a></p>
+
+- Allowed standalone flags: --force, --help, --install, --list-hooks, --sign, --template-dir, --uninstall, --version, -f, -h, -i, -l, -t, -u, -v
+
+### `pry`
+<p class="cmd-url"><a href="https://github.com/pry/pry">https://github.com/pry/pry</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `rails`
 <p class="cmd-url"><a href="https://guides.rubyonrails.org/command_line.html">https://guides.rubyonrails.org/command_line.html</a></p>
@@ -83,6 +162,11 @@
 - **tmp:create**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h, -v
+
+### `rake`
+<p class="cmd-url"><a href="https://github.com/ruby/rake">https://github.com/ruby/rake</a></p>
+
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `rbenv`
 <p class="cmd-url"><a href="https://github.com/rbenv/rbenv#readme">https://github.com/rbenv/rbenv#readme</a></p>
@@ -159,4 +243,27 @@
 - **use**: Flags: --create, --default, --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `sdoc`
+<p class="cmd-url"><a href="https://github.com/zzak/sdoc">https://github.com/zzak/sdoc</a></p>
+
+- Allowed standalone flags: --help, --version, -V, -h
+
+### `spring`
+<p class="cmd-url"><a href="https://github.com/rails/spring">https://github.com/rails/spring</a></p>
+
+- **binstub**: Flags: --all, --help, --remove, -h. Positional args accepted
+- **help**: Positional args accepted
+- **status**: Flags: --help, -h
+- **stop**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `thor`
+<p class="cmd-url"><a href="https://github.com/rails/thor">https://github.com/rails/thor</a></p>
+
+- **help**: Positional args accepted
+- **installed**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 

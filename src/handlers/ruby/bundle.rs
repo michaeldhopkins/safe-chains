@@ -72,16 +72,45 @@ pub fn check_bundle_exec(tokens: &[Token]) -> Verdict {
     // apply, instead of the legacy hard-coded SafeRead shortcut.
     if matches!(
         cmd.as_str(),
-        "brakeman"
+        "annotate"
+        | "annotaterb"
+        | "brakeman"
+        | "bridgetown"
+        | "bundle-audit"
+        | "bundler-audit"
+        | "byebug"
         | "cucumber"
         | "erb_lint"
         | "erblint"
+        | "fasterer"
+        | "flay"
+        | "flog"
+        | "foreman"
         | "gem"
+        | "guard"
+        | "haml-lint"
         | "herb"
+        | "jekyll"
+        | "license_finder"
+        | "m"
+        | "middleman"
+        | "overcommit"
+        | "pry"
         | "rails"
+        | "rake"
+        | "rdoc"
+        | "reek"
         | "rspec"
         | "rubocop"
+        | "rubycritic"
+        | "ruby-audit"
+        | "sdoc"
+        | "slim-lint"
+        | "spring"
         | "standardrb"
+        | "thor"
+        | "yard"
+        | "yardoc"
     ) {
         let inner = shell_words::join(tokens[1..].iter().map(|t| t.as_str()));
         return crate::command_verdict(&inner);
@@ -149,6 +178,24 @@ mod tests {
         bundle_exec_standardrb_fix: "bundle exec standardrb --fix app/models/foo.rb",
         bundle_exec_cucumber: "bundle exec cucumber",
         bundle_exec_brakeman: "bundle exec brakeman",
+        bundle_exec_reek: "bundle exec reek lib/",
+        bundle_exec_flay: "bundle exec flay lib/",
+        bundle_exec_flog_score: "bundle exec flog -s lib/",
+        bundle_exec_fasterer: "bundle exec fasterer",
+        bundle_exec_haml_lint: "bundle exec haml-lint app/views/",
+        bundle_exec_haml_lint_autocorrect: "bundle exec haml-lint --auto-correct app/views/",
+        bundle_exec_slim_lint: "bundle exec slim-lint app/views/",
+        bundle_exec_bundler_audit_check: "bundle exec bundler-audit check",
+        bundle_exec_bundle_audit_check: "bundle exec bundle-audit check",
+        bundle_exec_ruby_audit_check: "bundle exec ruby-audit check",
+        bundle_exec_yard_list: "bundle exec yard list",
+        bundle_exec_yard_stats: "bundle exec yard stats",
+        bundle_exec_yardoc: "bundle exec yardoc",
+        bundle_exec_rdoc: "bundle exec rdoc lib",
+        bundle_exec_rubycritic_no_browser: "bundle exec rubycritic --no-browser",
+        bundle_exec_pry_version: "bundle exec pry --version",
+        bundle_exec_byebug_version: "bundle exec byebug --version",
+        bundle_exec_rake_help: "bundle exec rake --help",
         bundle_exec_erb_lint: "bundle exec erb_lint app/views/foo.html.erb",
         bundle_exec_herb_lint: "bundle exec herb lint app/views/foo.html.erb",
         bundle_exec_herb_format_check: "bundle exec herb format --check app/views/foo.html.erb",
@@ -222,6 +269,16 @@ mod tests {
         bundle_exec_rails_credentials_edit_denied: "bundle exec rails credentials:edit",
         bundle_exec_rails_bare_denied: "bundle exec rails",
         bundle_exec_rake_denied: "bundle exec rake db:drop",
+        bundle_exec_pry_script_denied: "bundle exec pry script.rb",
+        bundle_exec_byebug_script_denied: "bundle exec byebug script.rb",
+        bundle_exec_rubycritic_no_no_browser_denied: "bundle exec rubycritic",
+        bundle_exec_jekyll_build_denied: "bundle exec jekyll build",
+        bundle_exec_jekyll_serve_denied: "bundle exec jekyll serve",
+        bundle_exec_foreman_start_denied: "bundle exec foreman start",
+        bundle_exec_guard_start_denied: "bundle exec guard start",
+        bundle_exec_annotaterb_models_denied: "bundle exec annotaterb models",
+        bundle_exec_thor_list_denied: "bundle exec thor list",
+        bundle_exec_haml_lint_unknown_denied: "bundle exec haml-lint --xyzzy",
         bundle_exec_ruby_denied: "bundle exec ruby script.rb",
         bundle_config_set_denied: "bundle config set path vendor/bundle",
         bundle_config_unset_denied: "bundle config unset path",

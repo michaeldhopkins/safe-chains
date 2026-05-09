@@ -1,0 +1,20 @@
+[[command]]
+name = "flog"
+description = "Static analyzer that reports a complexity (\"pain\") score for Ruby methods, classes, and modules. Parses the source via ruby_parser; does not execute application code. Output goes to stdout as a ranked list. Has no auto-correct or rewriting mode. Reads file and directory paths plus the standard seattlerb path-expander conventions (@argfile, -path/to/skip skips). The verbose mode reverse-compiles AST nodes through ruby2ruby (still no execution). The 4.x line is essentially frozen and releases come on the same slow-but-steady seattlerb cadence as flay."
+url = "https://github.com/seattlerb/flog"
+researched_version = "flog 4.x; surface frozen"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--all", "--blame", "--continue",
+    "--details", "--group", "--help",
+    "--methods-only", "--quiet", "--score",
+    "--verbose", "--version",
+    "-a", "-b", "-c", "-d", "-g", "-h", "-m", "-q", "-s", "-v",
+    "--18", "--19",
+]
+valued = [
+    "--extra-options", "--include", "--require",
+    "-I", "-e", "-r",
+]

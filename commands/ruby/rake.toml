@@ -1,0 +1,9 @@
+[[command]]
+name = "rake"
+description = "Ruby's Make-style build/automation tool. Tasks are defined in a Rakefile (plus rakelib/*.rake), which is itself arbitrary Ruby loaded at startup — even the introspection flags (-T, -D, -W, -P, -A) load and execute top-level Rakefile code as a side effect, so the only fixed safe surface is the bare diagnostic flags --help and --version. Bare invocation runs the default task. v13.4.2 dates to April 2026; the flag set has been frozen for years."
+url = "https://github.com/ruby/rake"
+researched_version = "rake v13.4.2 (April 2026)"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

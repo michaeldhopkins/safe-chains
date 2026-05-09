@@ -1,0 +1,147 @@
+[[command]]
+name = "yard"
+description = "Documentation generator for Ruby. Parses Ruby source via its own parser plus YARD's tag system to extract structure and comments; does not execute application code at parse time. The CLI is dispatched by subcommand. `list` and `stats` print summaries to stdout (read-only). `server` runs an HTTP preview that re-parses sources on demand (read-only). `doc` (also reachable as the standalone `yardoc` binary) renders HTML or other formats into ./doc by default. `graph` renders a Graphviz dot file describing class hierarchy. `config` reads or writes the per-user ~/.yard/config file; the read forms are listed here (write modes are not promoted). Releases follow Ruby's cadence — v0.9.x has been the stable line for years."
+url = "https://yardoc.org/guides/index.html"
+researched_version = "yard v0.9.43 (April 2026)"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--all", "--api", "--attr", "--class", "--constant",
+    "--debug", "--exception", "--exclude", "--extra",
+    "--full", "--has-tag", "--help", "--inherit",
+    "--inherited", "--kind", "--macro", "--method",
+    "--module", "--module-function", "--no-color",
+    "--no-private", "--no-protected", "--no-public",
+    "--protected", "--query", "--quiet", "--single",
+    "--verbose", "--visibility",
+    "-a", "-c", "-h", "-q",
+]
+valued = [
+    "--db", "--exclude-tag", "--no-api",
+    "--tag",
+]
+
+[[command.sub]]
+name = "stats"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--all", "--compact", "--debug",
+    "--help", "--list-incomplete", "--list-undoc",
+    "--no-cache", "--quiet", "--use-cache", "--verbose",
+    "-a", "-c", "-h", "-q",
+]
+valued = [
+    "--db", "--exclude", "--query",
+]
+
+[[command.sub]]
+name = "doc"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--api", "--asset", "--charset", "--debug",
+    "--default-return", "--embed-mixins", "--exclude",
+    "--exclude-tag", "--fail-on-warning", "--files",
+    "--has-tag", "--help", "--hide-api",
+    "--hide-tag", "--hide-void-return",
+    "--list-undoc", "--main", "--markup-provider",
+    "--no-api", "--no-cache", "--no-output", "--no-private",
+    "--no-progress", "--no-public", "--no-save", "--no-stats",
+    "--one-file", "--plugin", "--private",
+    "--protected", "--quiet", "--query",
+    "--readme", "--single", "--use-cache", "--verbose",
+    "--visibility",
+    "-c", "-D", "-M", "-T", "-b", "-e", "-h", "-m",
+    "-n", "-o", "-p", "-q", "-r", "-t",
+]
+valued = [
+    "--db", "--default-tag", "--format",
+    "--load-plugin", "--locale", "--macro",
+    "--markup", "--no-protected", "--no-public",
+    "--output-dir", "--plugin", "--query-tag",
+    "--tag", "--template", "--template-path",
+    "--title", "--transitive-tag", "--type-tag",
+    "--with-name-tag", "--with-tag", "--with-title-tag",
+    "--with-types-tag",
+]
+
+[[command.sub]]
+name = "graph"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--all", "--debug", "--dependencies",
+    "--full", "--help", "--no-color",
+    "--no-public", "--no-private", "--no-protected",
+    "--private", "--protected", "--quiet", "--verbose",
+    "-d", "-f", "-h", "-q",
+]
+valued = [
+    "--db", "--file", "--format",
+    "-F",
+]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--debug", "--help", "--list", "--quiet",
+    "--verbose",
+    "-a", "-h", "-l", "-q",
+]
+valued = []
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--added", "--all", "--compact", "--debug",
+    "--help", "--modified", "--no-progress",
+    "--quiet", "--query", "--removed",
+    "--verbose", "--visibility",
+    "-a", "-h", "-q",
+]
+valued = []
+
+[[command.sub]]
+name = "server"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--debug", "--docroot", "--gems", "--help",
+    "--no-cache", "--no-public", "--no-protected",
+    "--protected", "--quiet", "--reload",
+    "--single-library", "--use-cache",
+    "-B", "-c", "-d", "-g", "-h", "-q", "-r",
+]
+valued = [
+    "--bind", "--lib-version", "--port",
+    "--server", "-p",
+]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "ri"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "gems"
+candidate = true
+
+[[command.sub]]
+name = "i18n"
+candidate = true

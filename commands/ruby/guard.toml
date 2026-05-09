@@ -1,0 +1,35 @@
+[[command]]
+name = "guard"
+description = "File watcher that runs configurable Ruby blocks from a Guardfile when files change. `guard start` (the default subcommand) loads the Guardfile, which is arbitrary Ruby, then runs the configured guards — same risk profile as a generic command runner. `guard list` and `guard show` print the configured plugins and groups in a read-only fashion. `guard init [PLUGIN]` writes or updates a Guardfile in the project root. v2.20.1 dates to February 2026; sporadic but ongoing maintenance."
+url = "https://github.com/guard/guard"
+researched_version = "guard v2.20.1 (Feb 2026)"
+bare = false
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "show"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "start"
+candidate = true

@@ -168,6 +168,17 @@ Aliases: `@biomejs/biome`
 - Allowed standalone flags: --diff, --help, --no-auto-fetch, --print, --version, -V, -d, -h, -p
 - Bare invocation allowed
 
+### `bundler-audit`
+<p class="cmd-url"><a href="https://github.com/rubysec/bundler-audit">https://github.com/rubysec/bundler-audit</a></p>
+
+Aliases: `bundle-audit`
+
+- **check**: Flags: --help, --no-update, --quiet, --update, --verbose, -h, -q, -v. Valued: --config, --format, --gemfile-lock, --ignore, --output
+- **stats**: Flags: --help, -h
+- **update**: Flags: --help, --quiet, -h, -q
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -V
+
 ### `clang`
 <p class="cmd-url"><a href="https://clang.llvm.org/docs/CommandGuide/clang.html">https://clang.llvm.org/docs/CommandGuide/clang.html</a></p>
 
@@ -249,12 +260,33 @@ Aliases: `erblint`
 - Allowed standalone flags: --cache, --color, --debug, --env-info, --help, --init, --no-color, --no-eslintrc, --no-inline-config, --print-config, --quiet, --version, -h, -v
 - Allowed valued flags: --cache-location, --config, --env, --ext, --format, --global, --ignore-path, --ignore-pattern, --max-warnings, --no-error-on-unmatched-pattern, --output-file, --parser, --parser-options, --plugin, --resolve-plugins-relative-to, --rule, --rulesdir, -c, -f, -o
 
+### `fasterer`
+<p class="cmd-url"><a href="https://github.com/DamirSvrtan/fasterer">https://github.com/DamirSvrtan/fasterer</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `flake8`
 <p class="cmd-url"><a href="https://flake8.pycqa.org/en/latest/user/invocation.html">https://flake8.pycqa.org/en/latest/user/invocation.html</a></p>
 
 - Allowed standalone flags: --benchmark, --count, --help, --quiet, --show-pep8, --show-source, --statistics, --verbose, --version, -V, -h, -q, -v
 - Allowed valued flags: --config, --exclude, --extend-exclude, --extend-ignore, --filename, --format, --ignore, --max-complexity, --max-line-length, --output-file, --per-file-ignores, --select
 - Bare invocation allowed
+
+### `flay`
+<p class="cmd-url"><a href="https://github.com/seattlerb/flay">https://github.com/seattlerb/flay</a></p>
+
+- Allowed standalone flags: --diff, --help, --liberal, --summary, --verbose, --version, -d, -h, -l, -s, -v
+- Allowed valued flags: --fuzzy, --mass, --timeout, -#, -f, -m, -t
+- Hyphen-prefixed positional arguments accepted
+
+### `flog`
+<p class="cmd-url"><a href="https://github.com/seattlerb/flog">https://github.com/seattlerb/flog</a></p>
+
+- Allowed standalone flags: --all, --blame, --continue, --details, --group, --help, --methods-only, --quiet, --score, --verbose, --version, -a, -b, -c, -d, -g, -h, -m, -q, -s, -v, --18, --19
+- Allowed valued flags: --extra-options, --include, --require, -I, -e, -r
+- Hyphen-prefixed positional arguments accepted
 
 ### `frames`
 <p class="cmd-url"><a href="https://github.com/viticci/frames-cli">https://github.com/viticci/frames-cli</a></p>
@@ -290,6 +322,13 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed standalone flags: --add-cpes-if-none, --by-cve, --help, --only-fixed, --only-notfixed, --quiet, --verbose, --version, -h, -q, -v
 - Allowed valued flags: --config, --distro, --exclude, --fail-on, --file, --key, --name, --output, --platform, --scope, -c, -o
 - Hyphen-prefixed positional arguments accepted
+
+### `haml-lint`
+<p class="cmd-url"><a href="https://github.com/sds/haml-lint">https://github.com/sds/haml-lint</a></p>
+
+- Allowed standalone flags: --auto-correct, --auto-correct-all, --auto-gen-config, --color, --debug, --display-cop-names, --fail-fast, --help, --no-color, --no-summary, --parallel, --show-linters, --show-reporters, --stdin, --trace, --version, -A, -a, -d, -h, -p, -v
+- Allowed valued flags: --config, --exclude, --exclude-linter, --fail-level, --file, --format, --include-linter, --reporter, -c, -e, -f, -i, -r, -x
+- Bare invocation allowed
 
 ### `herb`
 <p class="cmd-url"><a href="https://herb-tools.dev">https://herb-tools.dev</a></p>
@@ -455,11 +494,25 @@ Aliases: `python`
 - Allowed standalone flags: --envlist, --help, --list, --update, --version, -h
 - Hyphen-prefixed positional arguments accepted
 
+### `rdoc`
+<p class="cmd-url"><a href="https://docs.ruby-lang.org/en/master/RDoc/RDoc.html">https://docs.ruby-lang.org/en/master/RDoc/RDoc.html</a></p>
+
+- Allowed standalone flags: --all, --coverage-report, --dcov, --debug, --dry-run, --exclude, --extend, --force-output, --force-update, --help, --hyperlink-all, --ignore-invalid, --line-numbers, --no-debug, --no-dcov, --no-force-update, --no-line-numbers, --no-pipe, --pipe, --quiet, --root, --show-hash, --verbose, --version, -C, -D, -N, -O, -P, -Q, -U, -V, -X, -d, -f, -h, -q, -x
+- Allowed valued flags: --charset, --copy-files, --dcov-class-method-sig, --dcov-method-signature, --dcov-source, --encoding, --extension, --format, --include, --locale, --locale-data-dir, --main, --markup, --op, --page-dir, --ri, --ri-site, --ri-system, --server, --style, --tab-width, --template, --template-stylesheets, --title, --visibility, --write-options, -c, -e, -i, -m, -o, -p, -r, -t, -w
+- Bare invocation allowed
+
 ### `readelf`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/readelf.1.html">https://man7.org/linux/man-pages/man1/readelf.1.html</a></p>
 
 - Allowed standalone flags: --all, --arch-specific, --archive-index, --debug-dump, --dynamic, --file-header, --headers, --help, --histogram, --notes, --program-headers, --relocs, --section-headers, --segments, --symbols, --syms, --unwind, --version, --version-info, --wide, -A, -I, -S, -V, -W, -a, -d, -e, -g, -h, -l, -n, -p, -r, -s, -u
 - Allowed valued flags: --decompress, --dwarf-depth, --dwarf-start, --hex-dump, --relocated-dump, --section-details, --string-dump, -D, -R, -w, -x, -z
+
+### `reek`
+<p class="cmd-url"><a href="https://github.com/troessner/reek">https://github.com/troessner/reek</a></p>
+
+- Allowed standalone flags: --documentation, --force-exclusion, --help, --no-documentation, --no-progress, --no-wiki-links, --progress, --show-configuration-path, --single-line, --smell, --sort-by-issue-count, --stdin-filename, --success-message, --todo, --verbose, --version, --wiki-links, -V, -h, -n, -s, -v
+- Allowed valued flags: --config, --exclude-paths, --failure-exit-code, --format, --line-numbers-format, --report-format, --success-exit-code, --template, -c, -f
+- Bare invocation allowed
 
 ### `rspec`
 <p class="cmd-url"><a href="https://rspec.info/documentation/">https://rspec.info/documentation/</a></p>
@@ -474,6 +527,19 @@ Aliases: `python`
 - Allowed standalone flags: --auto-correct, --auto-correct-all, --autocorrect, --autocorrect-all, --color, --debug, --display-cop-names, --display-only-correctable, --display-only-safe-correctable, --display-style-guide, --extra-details, --fail-fast, --fix-layout, --help, --lint, --list-target-files, --no-color, --parallel, --safe-auto-correct, --safe-autocorrect, --show-cops, --show-docs-url, --version, -A, -L, -V, -a, -d, -h, -l, -x
 - Allowed valued flags: --cache-root, --config, --disable-pending-cops, --enable-pending-cops, --except, --exclude-limit, --fail-level, --format, --only, --out, --require, --stdin, -P, -c, -f, -o, -r
 - Bare invocation allowed
+
+### `ruby-audit`
+<p class="cmd-url"><a href="https://github.com/civisanalytics/ruby_audit">https://github.com/civisanalytics/ruby_audit</a></p>
+
+- **check**: Flags: --help, --no-update, -h, -n. Valued: --ignore, -i
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `rubycritic`
+<p class="cmd-url"><a href="https://github.com/whitesmith/rubycritic">https://github.com/whitesmith/rubycritic</a></p>
+
+- Requires --no-browser. - Allowed standalone flags: --deduplicate-symlinks, --help, --mode-ci, --no-browser, --suppress-ratings, --version, -h, -v
+- Allowed valued flags: --branch, --format, --maximum-decrease, --minimum-score, --path, -f, -p, -s
 
 ### `ruff`
 <p class="cmd-url"><a href="https://docs.astral.sh/ruff/">https://docs.astral.sh/ruff/</a></p>
@@ -520,6 +586,13 @@ Aliases: `python`
 
 - Allowed standalone flags: --debug, --help, --hide-passed, --highlight-less, --json, --silent, --version, --watch, --why
 - Allowed valued flags: --compare-with, --config, --limit
+- Bare invocation allowed
+
+### `slim-lint`
+<p class="cmd-url"><a href="https://github.com/sds/slim-lint">https://github.com/sds/slim-lint</a></p>
+
+- Allowed standalone flags: --color, --help, --no-color, --no-summary, --parallel, --show-linters, --show-reporters, --version, -h, -p, -v
+- Allowed valued flags: --config, --exclude, --exclude-linter, --include-linter, --reporter, --stdin-file-path, -c, -e, -i, -r, -x
 - Bare invocation allowed
 
 ### `snyk`
@@ -632,6 +705,27 @@ Aliases: `python`
 
 - Allowed standalone flags: --help, --version, -h
 - Hyphen-prefixed positional arguments accepted
+
+### `yard`
+<p class="cmd-url"><a href="https://yardoc.org/guides/index.html">https://yardoc.org/guides/index.html</a></p>
+
+- **config**: Flags: --debug, --help, --list, --quiet, --verbose, -a, -h, -l, -q
+- **diff**: Flags: --added, --all, --compact, --debug, --help, --modified, --no-progress, --quiet, --query, --removed, --verbose, --visibility, -a, -h, -q. Positional args accepted
+- **doc**: Flags: --api, --asset, --charset, --debug, --default-return, --embed-mixins, --exclude, --exclude-tag, --fail-on-warning, --files, --has-tag, --help, --hide-api, --hide-tag, --hide-void-return, --list-undoc, --main, --markup-provider, --no-api, --no-cache, --no-output, --no-private, --no-progress, --no-public, --no-save, --no-stats, --one-file, --plugin, --private, --protected, --quiet, --query, --readme, --single, --use-cache, --verbose, --visibility, -c, -D, -M, -T, -b, -e, -h, -m, -n, -o, -p, -q, -r, -t. Valued: --db, --default-tag, --format, --load-plugin, --locale, --macro, --markup, --no-protected, --no-public, --output-dir, --plugin, --query-tag, --tag, --template, --template-path, --title, --transitive-tag, --type-tag, --with-name-tag, --with-tag, --with-title-tag, --with-types-tag
+- **graph**: Flags: --all, --debug, --dependencies, --full, --help, --no-color, --no-public, --no-private, --no-protected, --private, --protected, --quiet, --verbose, -d, -f, -h, -q. Valued: --db, --file, --format, -F
+- **help**: Positional args accepted
+- **list**: Flags: --all, --api, --attr, --class, --constant, --debug, --exception, --exclude, --extra, --full, --has-tag, --help, --inherit, --inherited, --kind, --macro, --method, --module, --module-function, --no-color, --no-private, --no-protected, --no-public, --protected, --query, --quiet, --single, --verbose, --visibility, -a, -c, -h, -q. Valued: --db, --exclude-tag, --no-api, --tag
+- **ri**: Flags: --help, -h. Positional args accepted
+- **server**: Flags: --debug, --docroot, --gems, --help, --no-cache, --no-public, --no-protected, --protected, --quiet, --reload, --single-library, --use-cache, -B, -c, -d, -g, -h, -q, -r. Valued: --bind, --lib-version, --port, --server, -p
+- **stats**: Flags: --all, --compact, --debug, --help, --list-incomplete, --list-undoc, --no-cache, --quiet, --use-cache, --verbose, -a, -c, -h, -q. Valued: --db, --exclude, --query
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `yardoc`
+<p class="cmd-url"><a href="https://yardoc.org/guides/index.html">https://yardoc.org/guides/index.html</a></p>
+
+- Allowed standalone flags: --api, --asset, --charset, --debug, --default-return, --embed-mixins, --exclude, --exclude-tag, --fail-on-warning, --files, --has-tag, --help, --hide-api, --hide-tag, --hide-void-return, --list-undoc, --main, --markup-provider, --no-api, --no-cache, --no-output, --no-private, --no-progress, --no-public, --no-save, --no-stats, --one-file, --plugin, --private, --protected, --quiet, --query, --readme, --single, --use-cache, --verbose, --version, --visibility, -c, -D, -M, -T, -b, -e, -h, -m, -n, -o, -p, -q, -r, -t
+- Allowed valued flags: --db, --default-tag, --format, --load-plugin, --locale, --macro, --markup, --output-dir, --plugin, --query-tag, --tag, --template, --template-path, --title, --transitive-tag, --type-tag, --with-name-tag, --with-tag, --with-title-tag, --with-types-tag
+- Bare invocation allowed
 
 ### `zig`
 <p class="cmd-url"><a href="https://ziglang.org/documentation/">https://ziglang.org/documentation/</a></p>

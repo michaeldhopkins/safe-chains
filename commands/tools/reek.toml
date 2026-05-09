@@ -1,0 +1,22 @@
+[[command]]
+name = "reek"
+description = "Code-smell detector for Ruby. Reek parses Ruby source files (does not execute application code) and reports detected smells such as long methods, feature envy, data clumps, duplicate method calls, and uncommunicative names. Output goes to stdout in text, html, yaml, json, xml, or github format. Reek has no auto-correct or rewriting mode — it is purely diagnostic. Reads from file/directory paths or stdin. Configuration is loaded from .reek.yml at the project root or whatever -c specifies. The 6.x line is long-stable with a small flag set; release cadence is slow but the project is alive."
+url = "https://github.com/troessner/reek"
+researched_version = "reek ~6.x line; flag surface stable as of 2026-05"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--documentation", "--force-exclusion", "--help",
+    "--no-documentation", "--no-progress", "--no-wiki-links",
+    "--progress", "--show-configuration-path",
+    "--single-line", "--smell", "--sort-by-issue-count",
+    "--stdin-filename", "--success-message",
+    "--todo", "--verbose", "--version", "--wiki-links",
+    "-V", "-h", "-n", "-s", "-v",
+]
+valued = [
+    "--config", "--exclude-paths", "--failure-exit-code",
+    "--format", "--line-numbers-format",
+    "--report-format", "--success-exit-code",
+    "--template", "-c", "-f",
+]

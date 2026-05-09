@@ -1,0 +1,9 @@
+[[command]]
+name = "sdoc"
+description = "Rails-flavoured HTML template on top of RDoc. Generates documentation by parsing Ruby source (no application code execution) and writing HTML into ./doc by default, or wherever -o points. Surface mirrors rdoc with a few extra template-selection flags. Release cadence is sleepy — used mostly by the Rails docs site. Carve-out covers the diagnostic flags only until the safe write surface is researched in detail."
+url = "https://github.com/zzak/sdoc"
+researched_version = "sdoc — sleepy; documentation-only carve-out"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]

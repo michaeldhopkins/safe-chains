@@ -1,0 +1,45 @@
+[[command]]
+name = "spring"
+description = "Rails preloader daemon — keeps the Rails application booted between commands so each invocation is fast. `spring status` lists running spring processes in the project (read-only). `spring stop` signals running spring processes to exit (no project file changes). `spring binstub --all` and `spring binstub <cmd>` write per-command shim files into ./bin so subsequent invocations route through spring; --remove deletes them. `spring server` boots the daemon, which loads the entire Rails application — same risk profile as `rails server`. v4.5.0 dates to May 2026 with active maintenance."
+url = "https://github.com/rails/spring"
+researched_version = "spring v4.5.0 (May 2026)"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "stop"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "binstub"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--all", "--help", "--remove", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "rails"
+candidate = true
+
+[[command.sub]]
+name = "rake"
+candidate = true
