@@ -1,0 +1,113 @@
+[[command]]
+name = "pscale"
+description = "PlanetScale CLI — managed MySQL service. Most subcommands contact PlanetScale's API (network). Read-side: `audit-log`, `branch list/show/diff/schema`, `database list/show`, `deploy-request list/show/diff/show-schema`, `org list`, `org show`, `region list`, `version`, `password list`, `service-token list/show`. Write-side: `auth`, `branch create/delete/promote/refresh-schema/restore`, `database create/delete/dump/restore`, `connect` (port-forward), `deploy-request create/cancel/queue/apply/skip-ci`, `org switch`, `password create/delete/rotate`, `service-token create/delete`, `shell`, `region default`."
+url = "https://planetscale.com/docs/reference/planetscale-cli"
+researched_version = "pscale 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "audit-log"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "backup"
+candidate = true
+
+[[command.sub]]
+name = "branch"
+candidate = true
+
+[[command.sub]]
+name = "connect"
+candidate = true
+
+[[command.sub]]
+name = "data-import"
+candidate = true
+
+[[command.sub]]
+name = "database"
+candidate = true
+
+[[command.sub]]
+name = "db"
+candidate = true
+
+[[command.sub]]
+name = "deploy-request"
+candidate = true
+
+[[command.sub]]
+name = "diff"
+candidate = true
+
+[[command.sub]]
+name = "keyspace"
+candidate = true
+
+[[command.sub]]
+name = "mfa"
+candidate = true
+
+[[command.sub]]
+name = "org"
+candidate = true
+
+[[command.sub]]
+name = "password"
+candidate = true
+
+[[command.sub]]
+name = "ping"
+candidate = true
+
+[[command.sub]]
+name = "region"
+candidate = true
+
+[[command.sub]]
+name = "schema"
+candidate = true
+
+[[command.sub]]
+name = "service-token"
+candidate = true
+
+[[command.sub]]
+name = "shell"
+candidate = true
+
+[[command.sub]]
+name = "signup"
+candidate = true
+
+[[command.sub]]
+name = "size"
+candidate = true
+
+[[command.sub]]
+name = "ssh-key"
+candidate = true
+
+[[command.sub]]
+name = "vector"
+candidate = true

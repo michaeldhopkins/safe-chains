@@ -1,0 +1,9 @@
+[[command]]
+name = "entr"
+description = "Runs an arbitrary shell command when files change (events from stdin). The positional arguments after the entr flags are the command to run on each event — that's user-supplied execution. Only --help / --version have a fixed safe surface."
+url = "https://eradman.com/entrproject/"
+researched_version = "entr 5.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]

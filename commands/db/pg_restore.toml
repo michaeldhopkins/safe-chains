@@ -1,0 +1,33 @@
+[[command]]
+name = "pg_restore"
+description = "PostgreSQL archive restore. Reads a pg_dump archive and writes records to the configured database (network for remote hosts; external system writes). -l/--list lists the archive contents without restoring (read). The connection target is derived from -d / -h / -p / -U / PGCONNECTION environment vars."
+url = "https://www.postgresql.org/docs/current/app-pgrestore.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--clean", "--create", "--data-only",
+    "--disable-triggers", "--enable-row-security",
+    "--exit-on-error", "--help", "--if-exists",
+    "--list", "--no-acl", "--no-comments",
+    "--no-data-for-failed-tables", "--no-owner",
+    "--no-password", "--no-privileges",
+    "--no-publications", "--no-security-labels",
+    "--no-subscriptions", "--no-tablespaces",
+    "--password", "--single-transaction",
+    "--strict-names", "--use-set-session-authorization",
+    "--verbose", "--version",
+    "-1", "-?", "-C", "-O", "-V", "-W",
+    "-a", "-c", "-e", "-l", "-v", "-w", "-x",
+]
+valued = [
+    "--dbname", "--exclude-schema", "--filter",
+    "--format", "--function", "--host", "--index",
+    "--jobs", "--no-data-for-failed-tables",
+    "--port", "--role", "--schema", "--section",
+    "--superuser", "--table", "--tablespace",
+    "--trigger", "--username",
+    "-F", "-I", "-L", "-P", "-S", "-T",
+    "-U", "-d", "-f", "-h", "-j", "-n",
+    "-p", "-t",
+]

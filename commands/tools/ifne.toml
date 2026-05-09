@@ -1,0 +1,9 @@
+[[command]]
+name = "ifne"
+description = "moreutils ifne — runs an arbitrary command if (and only if) stdin is non-empty. The wrapped command is user-supplied execution. Carve-out: --help only."
+url = "https://joeyh.name/code/moreutils/"
+researched_version = "moreutils ifne; surface stable"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "-n"]

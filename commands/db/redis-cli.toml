@@ -1,0 +1,9 @@
+[[command]]
+name = "redis-cli"
+description = "Redis CLI — interactive REPL or one-shot command runner. Bare invocation drops into the REPL connected to localhost:6379. Commands like `SET`, `DEL`, `FLUSHDB` mutate server state; `GET`, `KEYS`, `INFO` read. Carve-out: --version / --help only."
+url = "https://redis.io/docs/latest/develop/tools/cli/"
+researched_version = "redis-cli 7.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version"]

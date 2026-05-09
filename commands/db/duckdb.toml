@@ -1,0 +1,9 @@
+[[command]]
+name = "duckdb"
+description = "DuckDB shell — interactive analytical SQL REPL. Bare invocation opens an in-memory DuckDB instance and drops into the REPL. -c/-cmd executes SQL non-interactively. -readonly opens databases read-only. Carve-out: --version / --help only."
+url = "https://duckdb.org/docs/api/cli/overview"
+researched_version = "DuckDB 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-version", "-help"]

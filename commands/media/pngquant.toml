@@ -1,0 +1,19 @@
+[[command]]
+name = "pngquant"
+description = "Lossy PNG quantizer (palette reduction). Bare invocation writes <name>-fs8.png next to the input by default. --output / -o writes to a specific path. --ext changes the output suffix. --skip-if-larger / --quality control conversion. --strip removes ancillary chunks."
+url = "https://pngquant.org/"
+researched_version = "pngquant 3.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--force", "--help", "--nofs", "--posterize",
+    "--quiet", "--skip-if-larger", "--speed",
+    "--strip", "--verbose", "--version",
+    "-f", "-h", "-Q", "-q", "-s", "-V", "-v",
+]
+valued = [
+    "--ext", "--output", "--quality",
+    "--posterize", "--skip-if-larger",
+    "--speed",
+    "-o",
+]

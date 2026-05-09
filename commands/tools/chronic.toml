@@ -1,0 +1,9 @@
+[[command]]
+name = "chronic"
+description = "moreutils chronic — runs an arbitrary command (the positional arguments) and suppresses stdout/stderr unless the command fails. Since the wrapped command is user-supplied execution, only --help / --version have a fixed safe surface."
+url = "https://joeyh.name/code/moreutils/"
+researched_version = "moreutils chronic; surface stable"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "-e", "-v"]

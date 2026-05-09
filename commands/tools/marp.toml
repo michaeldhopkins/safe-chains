@@ -1,0 +1,34 @@
+[[command]]
+name = "marp"
+description = "Marp CLI — Markdown presentation builder. Bare invocation reads .md files and writes to .html / .pdf / .pptx (project-local SafeWrite). --pdf, --pptx, --html, --image, --images change the output format. --server runs a long-running preview server. --watch keeps a long-running rebuild loop. --output controls the output path. Active project."
+url = "https://github.com/marp-team/marp-cli"
+researched_version = "marp 4.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--bespoke.osc", "--bespoke.progress",
+    "--bespoke.transition", "--browser-protocol",
+    "--config-file", "--description",
+    "--engine", "--help", "--html",
+    "--image", "--images", "--input-dir",
+    "--no-config-file", "--no-stdin",
+    "--ogImage", "--output", "--pdf",
+    "--pdf-notes", "--pdf-outlines",
+    "--pdf-outlines.headings", "--pdf-outlines.pages",
+    "--pptx", "--pptx-editable", "--preview",
+    "--quiet", "--server", "--stdin",
+    "--template", "--theme", "--themeSet",
+    "--title", "--toc", "--url",
+    "--version", "--watch",
+    "-c", "-h", "-o", "-p", "-q", "-s", "-t", "-v", "-w",
+]
+valued = [
+    "--allow-local-files", "--browser",
+    "--browser-path", "--browser-protocol",
+    "--browser-timeout", "--config-file",
+    "--description", "--engine", "--input-dir",
+    "--ogImage", "--output", "--parallel",
+    "--pdf-notes", "--theme",
+    "--themeSet", "--title", "--url",
+    "-c", "-I", "-o",
+]

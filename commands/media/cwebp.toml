@@ -1,0 +1,32 @@
+[[command]]
+name = "cwebp"
+description = "WebP encoder — converts JPEG/PNG/TIFF/PAM to WebP. -o writes the result. Active project bundled with libwebp."
+url = "https://developers.google.com/speed/webp/docs/cwebp"
+researched_version = "cwebp 1.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--longhelp", "-444", "-422",
+    "-444", "-af", "-alpha_cleanup", "-alpha_filter",
+    "-alpha_q", "-blend_alpha", "-d", "-exact",
+    "-f", "-frame_size", "-h", "-help",
+    "-hint", "-jpeg_like", "-lossless", "-low_memory",
+    "-m", "-map", "-mt", "-near_lossless",
+    "-no_alpha", "-noasm", "-noalpha",
+    "-noasm", "-print_psnr", "-print_ssim",
+    "-progress", "-q", "-quiet", "-resize",
+    "-segments", "-sharp_yuv", "-sharpness",
+    "-short", "-size", "-sns", "-strong", "-targetPSNR",
+    "-targetsize", "-thread_level", "-tracking",
+    "-v", "-version",
+]
+valued = [
+    "-blend_alpha", "-crop", "-d", "-f",
+    "-hint", "-m", "-map",
+    "-mask", "-metadata", "-near_lossless",
+    "-o", "-pass", "-preset", "-progress",
+    "-q", "-quiet", "-resize", "-segments",
+    "-size", "-sns", "-sharpness", "-tile_rows",
+    "-targetsize", "-thread_level",
+    "-z",
+]

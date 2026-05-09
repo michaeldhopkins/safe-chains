@@ -1,0 +1,46 @@
+[[command]]
+name = "exiftool"
+description = "Reads, writes, and edits EXIF / IPTC / XMP / makernotes / etc. metadata in image, video, and audio files. Bare invocation prints metadata to stdout (read). -all=, -tag=value, -overwrite_original, -overwrite_original_in_place rewrite the file (project-local SafeWrite via write_flags). Stable, mature."
+url = "https://exiftool.org/"
+researched_version = "exiftool 12.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "-G",
+    "-S", "-T", "-X", "-a", "-args",
+    "-b", "-binary",
+    "-c", "-coordFormat", "-csv",
+    "-d", "-dateFormat", "-deletegps",
+    "-deleteByName", "-duplicates",
+    "-e", "-extracted",
+    "-f", "-fast", "-fast2", "-fast4",
+    "-fileOrder", "-h", "-htmlDump",
+    "-i", "-ignore", "-ifd0",
+    "-j", "-json", "-l", "-lang",
+    "-list", "-listf", "-listr", "-listg",
+    "-m", "-n", "-overwrite_original",
+    "-overwrite_original_in_place",
+    "-php", "-progress", "-psum",
+    "-q", "-quiet", "-r",
+    "-recurse", "-S", "-sep",
+    "-short", "-srcfile", "-stay_open",
+    "-struct", "-tab", "-tagsFromFile",
+    "-textOut", "-u", "-unknown",
+    "-unknown2", "-v", "-V",
+    "-verbose", "-w", "-wext",
+    "-xmlFormat", "-xmp", "-z",
+    "-version",
+]
+valued = [
+    "-@", "-config",
+    "-csvDelim", "-csv+",
+    "-d", "-dateFormat", "-execute",
+    "-ext", "-fileOrder", "-geosync",
+    "-geotag", "-globalTimeShift", "-htmlDump",
+    "-i", "-if", "-lang",
+    "-listr", "-progress", "-progressOptions",
+    "-q", "-r", "-srcfile",
+    "-tab", "-textOut", "-w", "-wext",
+    "-x", "-XML", "-xmlFormat",
+]
+write_flags = ["-overwrite_original", "-overwrite_original_in_place"]

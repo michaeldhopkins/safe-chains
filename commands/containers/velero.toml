@@ -1,0 +1,98 @@
+[[command]]
+name = "velero"
+description = "Velero — Kubernetes backup / restore. Most subcommands contact the cluster's Velero server (network). Read-side: `version`, `get` (backups/restores/schedules/locations/etc.), `describe`, `logs`, `version`. Write-side: `backup create`, `restore create`, `schedule create/delete`, `install`, `uninstall`, `repo`, `snapshot-location create`, `bug`."
+url = "https://velero.io/docs/"
+researched_version = "velero 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--client-only", "--help", "--timeout", "-h"]
+valued = ["--namespace", "--timeout", "-n"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "get"
+candidate = true
+
+[[command.sub]]
+name = "describe"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub]]
+name = "backup"
+candidate = true
+
+[[command.sub]]
+name = "restore"
+candidate = true
+
+[[command.sub]]
+name = "schedule"
+candidate = true
+
+[[command.sub]]
+name = "snapshot-location"
+candidate = true
+
+[[command.sub]]
+name = "backup-location"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "repo"
+candidate = true
+
+[[command.sub]]
+name = "client"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "plugin"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true
+
+[[command.sub]]
+name = "bug"
+candidate = true
+
+[[command.sub]]
+name = "node-agent"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true

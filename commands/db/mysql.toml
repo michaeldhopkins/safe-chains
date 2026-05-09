@@ -1,0 +1,10 @@
+[[command]]
+name = "mysql"
+aliases = ["mariadb"]
+description = "MySQL / MariaDB command-line client. Bare invocation drops into an interactive SQL REPL. -e/--execute runs SQL non-interactively. Connecting to a remote host is a network operation. Most flags are connection settings (-h host, -u user, -p pass, --port). Carve-out covers --version / --help only — meaningful invocations execute SQL against the configured server."
+url = "https://dev.mysql.com/doc/refman/8.4/en/mysql.html"
+researched_version = "MySQL 8.x / MariaDB 11.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-?", "-V"]

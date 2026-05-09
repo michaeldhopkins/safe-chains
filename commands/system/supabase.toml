@@ -1,0 +1,141 @@
+[[command]]
+name = "supabase"
+description = "Supabase CLI — managed Postgres + Auth + Storage + Edge Functions. Most subcommands contact Supabase Cloud or run a local stack via Docker. Read-side: `version`, `status`, `projects list`, `orgs list`, `domains get`, `migration list/squash`, `branches list/get`, `services list/show`, `inspect db`, `inspect db query`, `network-bans list`, `secrets list`. Write-side: `init`, `start`, `stop`, `link`, `unlink`, `login`, `logout`, `db push`, `db pull`, `db reset`, `db dump`, `db diff`, `migration new`, `secrets set/unset`, `functions deploy/serve/new/delete`, `storage cp`."
+url = "https://supabase.com/docs/reference/cli/introduction"
+researched_version = "supabase 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "link"
+candidate = true
+
+[[command.sub]]
+name = "unlink"
+candidate = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "stop"
+candidate = true
+
+[[command.sub]]
+name = "status"
+candidate = true
+
+[[command.sub]]
+name = "db"
+candidate = true
+
+[[command.sub]]
+name = "migration"
+candidate = true
+
+[[command.sub]]
+name = "functions"
+candidate = true
+
+[[command.sub]]
+name = "orgs"
+candidate = true
+
+[[command.sub]]
+name = "projects"
+candidate = true
+
+[[command.sub]]
+name = "branches"
+candidate = true
+
+[[command.sub]]
+name = "domains"
+candidate = true
+
+[[command.sub]]
+name = "secrets"
+candidate = true
+
+[[command.sub]]
+name = "storage"
+candidate = true
+
+[[command.sub]]
+name = "services"
+candidate = true
+
+[[command.sub]]
+name = "inspect"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "gen"
+candidate = true
+
+[[command.sub]]
+name = "snippets"
+candidate = true
+
+[[command.sub]]
+name = "network-restrictions"
+candidate = true
+
+[[command.sub]]
+name = "network-bans"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "encryption"
+candidate = true
+
+[[command.sub]]
+name = "postgres-config"
+candidate = true
+
+[[command.sub]]
+name = "ssl-enforcement"
+candidate = true
+
+[[command.sub]]
+name = "vanity-subdomains"
+candidate = true
+
+[[command.sub]]
+name = "bootstrap"
+candidate = true

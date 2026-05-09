@@ -1,0 +1,9 @@
+[[command]]
+name = "mongosh"
+description = "MongoDB Shell — interactive JavaScript REPL connected to a MongoDB cluster. Bare invocation drops into the REPL. --eval runs a JS expression against the server. Every meaningful invocation executes user-supplied JS. Carve-out: --version / --help only."
+url = "https://www.mongodb.com/docs/mongodb-shell/"
+researched_version = "mongosh 2.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]

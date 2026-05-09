@@ -1,0 +1,55 @@
+[[command]]
+name = "gifsicle"
+description = "GIF optimizer / animator / editor. Bare invocation reads GIFs and writes to stdout (or to --output). --batch / -b rewrites input files in place. Many flags combine read and modify behavior; the output flag is required when the action is non-default."
+url = "https://www.lcdf.org/gifsicle/"
+researched_version = "gifsicle 1.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--app-extension", "--append", "--background",
+    "--batch", "--careful", "--change-color",
+    "--color-method", "--colors", "--comment",
+    "--conserve-memory", "--crop-transparency",
+    "--delete", "--disposal", "--dither",
+    "--explode", "--explode-by-name", "--export",
+    "--extension", "--extract", "--first-frame",
+    "--flip-horizontal", "--flip-vertical",
+    "--gamma", "--help", "--info", "--insert-before",
+    "--last-frame", "--logical-screen",
+    "--loopcount", "--multifile", "--name",
+    "--no-app-extensions", "--no-comments",
+    "--no-extensions", "--no-loopcount",
+    "--no-names", "--no-warnings",
+    "--optimize", "--rotate-90", "--rotate-180",
+    "--rotate-270", "--same-app-extensions",
+    "--same-background", "--same-comments",
+    "--same-delay", "--same-extensions",
+    "--same-loopcount", "--same-names",
+    "--same-screen", "--screen", "--size-info",
+    "--terminal", "--threads", "--transform-colormap",
+    "--transparent", "--unoptimize", "--use-colormap",
+    "--verbose", "--version", "--xinfo",
+    "-#", "-V", "-X", "-Z", "-b",
+    "-d", "-e", "-h", "-i", "-l", "-O",
+    "-S", "-U", "-v", "-w", "-x",
+]
+valued = [
+    "--app-extension", "--background",
+    "--change-color", "--color-method",
+    "--colors", "--comment",
+    "--crop", "--delay", "--disposal",
+    "--dither", "--explode-by-name",
+    "--extension", "--first-frame", "--gamma",
+    "--insert-before", "--last-frame",
+    "--logical-screen", "--loopcount",
+    "--name", "--output", "--position",
+    "--resize", "--resize-fit",
+    "--resize-fit-height", "--resize-fit-width",
+    "--resize-height", "--resize-method",
+    "--resize-width", "--rotate",
+    "--screen", "--size-info",
+    "--terminal", "--threads",
+    "--transform-colormap", "--transparent",
+    "--use-colormap",
+    "-S", "-T", "-d", "-o",
+]

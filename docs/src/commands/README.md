@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 708 commands across 51 categories.
+safe-chains knows 754 commands across 53 categories.
 
 ## Glossary
 
@@ -24,11 +24,12 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Shell Builtins](builtins.md) (22 commands)
 - [C / C++](c.md) (7 commands)
 - [Cloud Providers](cloud.md) (9 commands)
-- [Containers](containers.md) (16 commands)
+- [Containers](containers.md) (23 commands)
 - [Crystal](crystal.md) (3 commands)
 - [D](d.md) (1 commands)
 - [Dart / Flutter](dart.md) (2 commands)
 - [Data Processing](data.md) (25 commands)
+- [Database Clients](db.md) (7 commands)
 - [.NET](dotnet.md) (2 commands)
 - [Elixir / Erlang](elixir.md) (2 commands)
 - [Erlang](erlang.md) (1 commands)
@@ -45,6 +46,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Common Lisp](lisp.md) (2 commands)
 - [Lua](lua.md) (2 commands)
 - [ImageMagick](magick.md) (1 commands)
+- [Media](media.md) (10 commands)
 - [Networking](net.md) (16 commands)
 - [Nim](nim.md) (2 commands)
 - [Node.js](node.md) (16 commands)
@@ -61,10 +63,10 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Search](search.md) (7 commands)
 - [Swift](swift.md) (1 commands)
 - [System Info](sysinfo.md) (30 commands)
-- [System](system.md) (58 commands)
+- [System](system.md) (62 commands)
 - [TeX / LaTeX](tex.md) (3 commands)
 - [Text Processing](text.md) (27 commands)
-- [Developer Tools](tools.md) (168 commands)
+- [Developer Tools](tools.md) (186 commands)
 - [Version Control](vcs.md) (5 commands)
 - [Shell Wrappers](wrappers.md) (7 commands)
 - [Xcode](xcode.md) (17 commands)

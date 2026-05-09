@@ -1,0 +1,9 @@
+[[command]]
+name = "parallel"
+description = "GNU parallel — runs an arbitrary shell command for each input line / argument. The command template after :: or ::: (or after the flag arguments) is user-supplied shell execution. Only --version / --help have a fixed safe surface."
+url = "https://www.gnu.org/software/parallel/"
+researched_version = "GNU parallel 2025.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]

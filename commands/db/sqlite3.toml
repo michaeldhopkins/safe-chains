@@ -1,0 +1,9 @@
+[[command]]
+name = "sqlite3"
+description = "SQLite shell — interactive SQL REPL on a database file (or `:memory:`). Bare invocation drops into the REPL. Positional SQL or -cmd runs against the database. -init runs an arbitrary SQL script at startup. Carve-out: --version / --help only — meaningful invocations execute SQL."
+url = "https://www.sqlite.org/cli.html"
+researched_version = "SQLite 3.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-help", "-version"]

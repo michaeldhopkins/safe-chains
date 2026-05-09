@@ -1,0 +1,9 @@
+[[command]]
+name = "vidir"
+description = "moreutils vidir — edits a directory listing in $EDITOR; renaming/deleting lines renames/deletes files when the editor saves. Interactive. Carve-out: --help only."
+url = "https://joeyh.name/code/moreutils/"
+researched_version = "moreutils vidir; surface stable"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--verbose"]

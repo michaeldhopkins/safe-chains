@@ -1,0 +1,133 @@
+[[command]]
+name = "borg"
+description = "BorgBackup — deduplicating backup tool. Most subcommands contact the configured repository (local path or remote SSH — network for remote). Read-side: `info`, `list`, `extract --dry-run`, `check --verify-data`, `version`, `help`, `mount` (FUSE — interactive). Write-side: `init`, `create`, `delete`, `prune`, `recreate`, `compact`, `key`, `serve`, `umount`, `with-lock`, `import-tar`, `export-tar`."
+url = "https://borgbackup.readthedocs.io/en/stable/usage/general.html"
+researched_version = "borgbackup 1.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[command.wrapper]
+standalone = ["--bypass-lock", "--consider-checkpoints", "--debug", "--info", "--lock-wait", "--no-cache-sync", "--progress", "--show-rc", "--show-version", "--verbose", "--warning"]
+valued = ["--bypass-lock", "--debug-topic", "--lock-wait", "--remote-path", "--remote-ratelimit", "--rsh", "--umask"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--first", "--help", "--json", "--last", "--sort-by", "-h"]
+valued = ["--exclude", "--exclude-from", "--first", "--last", "--match-archives", "--patterns-from", "--sort-by", "-a", "-e"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--first", "--format", "--help", "--json", "--json-lines", "--last", "--short", "--sort-by", "-h"]
+valued = ["--exclude", "--exclude-from", "--first", "--format", "--last", "--match-archives", "--patterns-from", "--sort-by", "-a", "-e"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--json-lines", "--numeric-ids", "--sort", "-h"]
+valued = ["--exclude", "--exclude-from", "--patterns-from", "--exclude-caches", "--exclude-if-present"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--archives-only", "--first", "--help", "--last", "--repair", "--repository-only", "--save-space", "--sort-by", "--verify-data", "-h"]
+valued = ["--archives-only", "--first", "--last", "--match-archives", "--max-duration", "--prefix", "--sort-by", "-a"]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--cache", "--delete", "--help", "--list", "-c", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "extract"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "prune"
+candidate = true
+
+[[command.sub]]
+name = "recreate"
+candidate = true
+
+[[command.sub]]
+name = "compact"
+candidate = true
+
+[[command.sub]]
+name = "key"
+candidate = true
+
+[[command.sub]]
+name = "rename"
+candidate = true
+
+[[command.sub]]
+name = "mount"
+candidate = true
+
+[[command.sub]]
+name = "umount"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "with-lock"
+candidate = true
+
+[[command.sub]]
+name = "break-lock"
+candidate = true
+
+[[command.sub]]
+name = "import-tar"
+candidate = true
+
+[[command.sub]]
+name = "export-tar"
+candidate = true
+
+[[command.sub]]
+name = "benchmark"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true

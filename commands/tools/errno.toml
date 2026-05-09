@@ -1,0 +1,9 @@
+[[command]]
+name = "errno"
+description = "moreutils errno — looks up errno values by number / name and prints the description. Pure read."
+url = "https://joeyh.name/code/moreutils/"
+researched_version = "moreutils errno; surface stable"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--list", "--search", "-l", "-s"]

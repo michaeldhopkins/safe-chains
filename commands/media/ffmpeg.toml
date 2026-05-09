@@ -1,0 +1,57 @@
+[[command]]
+name = "ffmpeg"
+description = "Universal multimedia transcoder. Reads input streams (-i) and writes output to one or more output paths (last positional argument). The output can also be `-` (stdout) or a network URL when configured. Almost every flag affects encoding/output. Loading inputs from URLs (http://, rtmp://, etc.) makes a network read; writing outputs to URLs (file:, rtmp:, etc.) makes a network write. Active project on the 7.x line."
+url = "https://ffmpeg.org/ffmpeg.html"
+researched_version = "ffmpeg 7.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "-an", "-autorotate",
+    "-benchmark", "-benchmark_all", "-copyinkf",
+    "-copytb", "-copyts", "-debug",
+    "-dn", "-err_detect", "-fflags",
+    "-fix_sub_duration", "-h", "-hide_banner",
+    "-loglevel", "-n", "-noaccurate_seek",
+    "-noautorotate", "-nostats",
+    "-nostdin", "-pass", "-progress",
+    "-re", "-report", "-shortest",
+    "-sn", "-stats", "-strict",
+    "-vn", "-vstats", "-y",
+    "-version",
+]
+valued = [
+    "-acodec", "-aframes", "-af", "-an",
+    "-ar", "-aspect", "-atag",
+    "-async", "-b", "-b:a", "-b:v",
+    "-bf", "-bitexact", "-bsf", "-c",
+    "-c:a", "-c:v", "-channel_layout",
+    "-codec", "-crf", "-crop", "-deinterlace",
+    "-disposition", "-ec",
+    "-f", "-filter", "-filter_complex",
+    "-filter_threads", "-flags",
+    "-fpre", "-frames",
+    "-g", "-glx", "-i",
+    "-init_hw_device", "-itsoffset",
+    "-keyint_min", "-language",
+    "-loglevel", "-loop",
+    "-map", "-maxrate", "-metadata",
+    "-minrate", "-mode", "-movflags",
+    "-muxdelay", "-muxpreload",
+    "-newvideo", "-newaudio", "-newsubtitle",
+    "-output_ts_offset", "-passlogfile",
+    "-pre", "-preset", "-profile",
+    "-q:a", "-q:v", "-qp", "-r",
+    "-rc-lookahead", "-readrate",
+    "-s", "-sameq", "-seek_timestamp",
+    "-segment_format", "-segment_list",
+    "-segment_time", "-shortest_buf_duration",
+    "-sleeve", "-ss", "-stats_period",
+    "-stream_loop",
+    "-strftime",
+    "-sync", "-t", "-target",
+    "-threads", "-time_base",
+    "-timecode", "-timestamp", "-to",
+    "-tune", "-vbr", "-vcodec",
+    "-vf", "-vframes", "-vol",
+    "-x264-params", "-x264opts",
+]

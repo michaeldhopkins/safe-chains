@@ -154,8 +154,48 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
     }
 }
 
+/// Diagnostic for a configuration class that silently breaks flag dispatch:
+/// a structured command (with `[[command.sub]]` blocks) cannot also use the
+/// flat-style top-level fields. When subs are present, top-level standalone/
+/// valued/max_positional/positional_style/numeric_dash are dropped — the
+/// dispatch routes through the Branching path. The fix is to either remove
+/// the subs (if the command is meant to be flat) or move global flags into
+/// a `[command.wrapper]` block.
+fn assert_flat_or_structured(toml: &TomlCommand) {
+    if toml.sub.is_empty() {
+        return;
+    }
+    let mut conflicts = Vec::new();
+    if !toml.standalone.is_empty() {
+        conflicts.push("standalone");
+    }
+    if !toml.valued.is_empty() {
+        conflicts.push("valued");
+    }
+    if toml.max_positional.is_some() {
+        conflicts.push("max_positional");
+    }
+    if toml.positional_style.is_some() {
+        conflicts.push("positional_style");
+    }
+    if toml.numeric_dash.is_some() {
+        conflicts.push("numeric_dash");
+    }
+    if !conflicts.is_empty() {
+        panic!(
+            "command '{}' mixes flat-style top-level fields ({}) with [[command.sub]] blocks. \
+             When subs are present these fields are silently dropped. \
+             Either drop the subs (if the command is flat) or move global \
+             flags into a [command.wrapper] block.",
+            toml.name,
+            conflicts.join(", "),
+        );
+    }
+}
+
 #[allow(clippy::too_many_lines)]
 pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
+    assert_flat_or_structured(&toml);
     let cat = category.to_string();
     let desc = toml.description.unwrap_or_default();
     let researched_version = toml.researched_version;
