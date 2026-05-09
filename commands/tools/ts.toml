@@ -1,0 +1,9 @@
+[[command]]
+name = "ts"
+description = "moreutils ts — prepends a timestamp to each line of stdin and prints to stdout. Pure read-write filter. -i / -s / -m switch between absolute time, incremental, and monotonic time. Stable."
+url = "https://joeyh.name/code/moreutils/"
+researched_version = "moreutils ts; surface stable"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-i", "-m", "-r", "-s"]

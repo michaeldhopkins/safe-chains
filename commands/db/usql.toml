@@ -1,0 +1,9 @@
+[[command]]
+name = "usql"
+description = "Universal SQL shell — interactive REPL supporting many database backends (PostgreSQL, MySQL, SQLite, SQL Server, Oracle, etc.). Bare invocation drops into the REPL. -c executes a SQL command. Carve-out: --version / --help only."
+url = "https://github.com/xo/usql"
+researched_version = "usql 0.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V"]

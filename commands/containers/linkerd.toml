@@ -1,0 +1,109 @@
+[[command]]
+name = "linkerd"
+description = "Linkerd CLI — service-mesh control plane. Most subcommands contact the cluster (network). Read-side: `version`, `check`, `diagnostics`, `dashboard`, `viz top`, `viz stat`, `viz tap`, `viz routes`, `identity`, `metrics`, `endpoints`. Write-side: `install`, `uninstall`, `upgrade`, `inject`, `uninject`, `prune`, `viz install`, `multicluster install/link/unlink`, `jaeger install`. Carve-out covers diagnostic forms."
+url = "https://linkerd.io/2/reference/cli/"
+researched_version = "linkerd 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--client", "--help", "--proxy", "--short", "-h"]
+valued = ["--namespace"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--allow-mismatched-policy-controller", "--cli-version-override", "--config", "--cni-namespace", "--crds", "--deletion-pending", "--enable-pprof", "--expected-version", "--help", "--ipv6", "--linkerd-cni-enabled", "--multicluster", "--no-policy", "--no-tls-policy", "--output", "--pre", "--proxy", "--retry-deadline", "--short", "--wait", "-h", "-o"]
+valued = ["--cni-namespace", "--config", "--expected-version", "--namespace", "--output", "--retry-deadline", "--wait", "-n", "-o"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "inject"
+candidate = true
+
+[[command.sub]]
+name = "uninject"
+candidate = true
+
+[[command.sub]]
+name = "prune"
+candidate = true
+
+[[command.sub]]
+name = "viz"
+candidate = true
+
+[[command.sub]]
+name = "multicluster"
+candidate = true
+
+[[command.sub]]
+name = "jaeger"
+candidate = true
+
+[[command.sub]]
+name = "diagnostics"
+candidate = true
+
+[[command.sub]]
+name = "identity"
+candidate = true
+
+[[command.sub]]
+name = "metrics"
+candidate = true
+
+[[command.sub]]
+name = "endpoints"
+candidate = true
+
+[[command.sub]]
+name = "profile"
+candidate = true
+
+[[command.sub]]
+name = "alpha"
+candidate = true
+
+[[command.sub]]
+name = "buoyant"
+candidate = true
+
+[[command.sub]]
+name = "policy"
+candidate = true
+
+[[command.sub]]
+name = "install-cni"
+candidate = true
+
+[[command.sub]]
+name = "uninstall-cni"
+candidate = true
+
+[[command.sub]]
+name = "purge"
+candidate = true

@@ -1,0 +1,240 @@
+[[command]]
+name = "mc"
+description = "MinIO Client — S3-compatible CLI. Subcommands contact the configured S3 endpoint (network). Read-side: `ls`, `find`, `stat`, `du`, `cat`, `head`, `tree`, `version`, `alias list`, `config host list`. Write-side: `cp`, `mv`, `rm`, `mb`, `rb`, `mirror`, `sync`, `pipe`, `tag set/remove`, `replicate`, `share`, `event add/remove`, `policy set/unset`, `admin`, `ilm`, `legalhold`, `retention`, `lock`."
+url = "https://min.io/docs/minio/linux/reference/minio-mc.html"
+researched_version = "mc 2025.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[command.wrapper]
+standalone = ["--debug", "--insecure", "--json", "--no-color", "--quiet"]
+valued = ["--config-dir", "--retries", "--timeout"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ls"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--incomplete", "--metadata", "--no-color", "--recursive", "--rewind", "--summarize", "--versions", "-I", "-h", "-r", "-S"]
+
+[[command.sub]]
+name = "find"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--ignore", "--metadata", "--name", "--newer-than", "--older-than", "--path", "--print", "--recursive", "--regex", "--rewind", "--versions", "--watch", "-h", "-r"]
+valued = ["--exec", "--maxdepth", "--mindepth", "--name", "--newer-than", "--older-than", "--path", "--print", "--regex"]
+
+[[command.sub]]
+name = "stat"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--encrypt-key", "--help", "--no-list", "--recursive", "--rewind", "--versions", "-h", "-r"]
+valued = ["--encrypt-key", "--rewind", "--version-id"]
+
+[[command.sub]]
+name = "du"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--depth", "--help", "--recursive", "--rewind", "--versions", "-d", "-h", "-r"]
+valued = ["--depth", "--rewind"]
+
+[[command.sub]]
+name = "cat"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--encrypt-key", "--help", "--rewind", "-h"]
+valued = ["--encrypt-key", "--rewind", "--version-id"]
+
+[[command.sub]]
+name = "head"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--encrypt-key", "--help", "--rewind", "-h"]
+valued = ["--encrypt-key", "-n", "--lines", "--rewind", "--version-id"]
+
+[[command.sub]]
+name = "tree"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--depth", "--files", "--help", "--no-color", "-d", "-f", "-h"]
+valued = ["--depth"]
+
+[[command.sub]]
+name = "alias"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "set"
+candidate = true
+
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub.sub]]
+name = "import"
+candidate = true
+
+[[command.sub.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "cp"
+candidate = true
+
+[[command.sub]]
+name = "mv"
+candidate = true
+
+[[command.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "mb"
+candidate = true
+
+[[command.sub]]
+name = "rb"
+candidate = true
+
+[[command.sub]]
+name = "mirror"
+candidate = true
+
+[[command.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "pipe"
+candidate = true
+
+[[command.sub]]
+name = "tag"
+candidate = true
+
+[[command.sub]]
+name = "policy"
+candidate = true
+
+[[command.sub]]
+name = "share"
+candidate = true
+
+[[command.sub]]
+name = "event"
+candidate = true
+
+[[command.sub]]
+name = "watch"
+candidate = true
+
+[[command.sub]]
+name = "admin"
+candidate = true
+
+[[command.sub]]
+name = "anonymous"
+candidate = true
+
+[[command.sub]]
+name = "ilm"
+candidate = true
+
+[[command.sub]]
+name = "legalhold"
+candidate = true
+
+[[command.sub]]
+name = "retention"
+candidate = true
+
+[[command.sub]]
+name = "encrypt"
+candidate = true
+
+[[command.sub]]
+name = "replicate"
+candidate = true
+
+[[command.sub]]
+name = "support"
+candidate = true
+
+[[command.sub]]
+name = "license"
+candidate = true
+
+[[command.sub]]
+name = "ready"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "diff"
+candidate = true
+
+[[command.sub]]
+name = "od"
+candidate = true
+
+[[command.sub]]
+name = "ping"
+candidate = true
+
+[[command.sub]]
+name = "batch"
+candidate = true
+
+[[command.sub]]
+name = "license-update"
+candidate = true
+
+[[command.sub]]
+name = "lock"
+candidate = true
+
+[[command.sub]]
+name = "share"
+candidate = true
+
+[[command.sub]]
+name = "idp"
+candidate = true
+
+[[command.sub]]
+name = "quota"
+candidate = true

@@ -1,0 +1,21 @@
+[[command]]
+name = "mediainfo"
+description = "Reads media file metadata and reports format, codec, duration, bitrate, etc. Output goes to stdout in plain / HTML / JSON / XML format. Pure read."
+url = "https://mediaarea.net/en/MediaInfo"
+researched_version = "MediaInfo 24.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--Help", "--Help-Outputs", "--Info-Capacities",
+    "--Info-Parameters", "--Info-Parameters_CSV",
+    "--Info-OutputFormats", "--Info-Version",
+    "--LogFile", "--Output", "--Version",
+    "-f", "-h",
+]
+valued = [
+    "--BlockMethod", "--Inform",
+    "--LogFile", "--Output",
+    "--ParseSpeed", "--ReadByHuman",
+    "--Trace_Format", "--Trace_Level",
+    "-i",
+]

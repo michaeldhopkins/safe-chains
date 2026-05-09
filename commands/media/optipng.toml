@@ -1,0 +1,23 @@
+[[command]]
+name = "optipng"
+description = "Lossless PNG optimizer. Bare invocation rewrites input files in place (or writes to -out PATH). --simulate skips writes. Active project."
+url = "https://optipng.sourceforge.net/"
+researched_version = "optipng 0.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--version", "-clobber", "-debug",
+    "-fix", "-force", "-full", "-help",
+    "-keep", "-log", "-no-bit-depth-reduction",
+    "-no-color-type-reduction", "-no-create",
+    "-no-fix", "-no-palette-reduction",
+    "-no-reductions", "-paranoid", "-preserve",
+    "-quiet", "-simulate", "-snip",
+    "-strip", "-version", "-zw",
+    "-h", "-q",
+]
+valued = [
+    "-dir", "-i", "-log",
+    "-out", "-strip",
+    "-zc", "-zm", "-zs",
+]

@@ -1,5 +1,16 @@
 # Containers
 
+### `buildah`
+<p class="cmd-url"><a href="https://github.com/containers/buildah/tree/main/docs">https://github.com/containers/buildah/tree/main/docs</a></p>
+
+- **containers**: Flags: --all, --help, --json, --no-trunc, --noheading, --notruncate, --quiet, -a, -h, -q. Valued: --filter, --format, -f
+- **help**: Positional args accepted
+- **images**: Flags: --all, --digests, --help, --history, --json, --no-trunc, --noheading, --quiet, -a, -h, -n, -q. Valued: --filter, --format, -f. Positional args accepted
+- **info**: Flags: --debug, --help, -h. Valued: --format
+- **inspect**: Flags: --help, -h. Valued: --format, --type, -f, -t. Positional args accepted
+- **version**: Flags: --help, -h. Valued: --format, --json
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `cosign`
 <p class="cmd-url"><a href="https://github.com/sigstore/cosign">https://github.com/sigstore/cosign</a></p>
 
@@ -73,6 +84,15 @@
 - **volume ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `flux`
+<p class="cmd-url"><a href="https://fluxcd.io/flux/cmd/flux/">https://fluxcd.io/flux/cmd/flux/</a></p>
+
+- **check**: Flags: --help, --pre, -h. Valued: --components, --components-extra, --kustomization, --source
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **version**: Flags: --client, --help, -h. Valued: --output, -o
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `helm`
 <p class="cmd-url"><a href="https://helm.sh/docs/helm/">https://helm.sh/docs/helm/</a></p>
 
@@ -98,6 +118,33 @@
 - **verify**: Flags: --help, -h. Valued: --keyring
 - **version**: Flags: --help, --short, --template, -h
 - Allowed standalone flags: --help, -h
+
+### `istioctl`
+<p class="cmd-url"><a href="https://istio.io/latest/docs/reference/commands/istioctl/">https://istio.io/latest/docs/reference/commands/istioctl/</a></p>
+
+- **analyze**: Flags: --all-namespaces, --color, --failure-threshold, --help, --ignore-unknown, --list-analyzers, --meshConfigFile, --no-color, --output, --output-threshold, --recursive, --revision, --suppress, --timeout, --use-kube, --verbose, -A, -L, -R, -S, -h, -o. Valued: --failure-threshold, --meshConfigFile, --namespace, --output, --output-threshold, --remote-contexts, --revision, --suppress, --timeout, --use-kube, --verbose, -S, -n, -o
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **proxy-config all**: Flags: --help, -h
+- **proxy-config bootstrap**: Flags: --help, -h
+- **proxy-config cluster**: Flags: --help, -h
+- **proxy-config endpoint**: Flags: --help, -h
+- **proxy-config listener**: Flags: --help, -h
+- **proxy-config route**: Flags: --help, -h
+- **proxy-config secret**: Flags: --help, -h
+- **proxy-status**: Flags: --file, --help, --multi-xds, --xds-via-agents, -f, -h. Valued: --file, --multi-xds, --output, --revision, -f, -o. Positional args accepted
+- **validate**: Flags: --help, --no-validate, --output, --quiet, --referential, -f, -h, -o, -q. Valued: --filename, --output, -f, -o. Positional args accepted
+- **version**: Flags: --help, --remote, --revision, --short, -h, -s. Valued: --filename, --output, --revision, -f, -o
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `kapp`
+<p class="cmd-url"><a href="https://carvel.dev/kapp/">https://carvel.dev/kapp/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **list**: Flags: --all-namespaces, --help, --namespace, -A, -h, -n. Valued: --namespace, -n
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `kind`
 <p class="cmd-url"><a href="https://kind.sigs.k8s.io/">https://kind.sigs.k8s.io/</a></p>
@@ -148,6 +195,15 @@
 - **build**: Flags: --enable-alpha-plugins, --enable-exec, --enable-helm, --help, --load-restrictor, -h. Valued: --env, --helm-command, --mount, --output, -o
 - **version**: Flags: --help, --short, -h
 - Allowed standalone flags: --help, -h
+
+### `linkerd`
+<p class="cmd-url"><a href="https://linkerd.io/2/reference/cli/">https://linkerd.io/2/reference/cli/</a></p>
+
+- **check**: Flags: --allow-mismatched-policy-controller, --cli-version-override, --config, --cni-namespace, --crds, --deletion-pending, --enable-pprof, --expected-version, --help, --ipv6, --linkerd-cni-enabled, --multicluster, --no-policy, --no-tls-policy, --output, --pre, --proxy, --retry-deadline, --short, --wait, -h, -o. Valued: --cni-namespace, --config, --expected-version, --namespace, --output, --retry-deadline, --wait, -n, -o
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **version**: Flags: --client, --help, --proxy, --short, -h. Valued: --namespace
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `minikube`
 <p class="cmd-url"><a href="https://minikube.sigs.k8s.io/docs/">https://minikube.sigs.k8s.io/docs/</a></p>
@@ -264,4 +320,19 @@
 - Allowed standalone flags: --all-namespaces, --color, --diff-container, --ephemeral-containers, --help, --include-hidden, --init-containers, --no-follow, --only-log-lines, --timestamps, --version, -A, -h
 - Allowed valued flags: --container, --container-state, --context, --exclude, --exclude-container, --exclude-pod, --highlight, --include, --kubeconfig, --max-log-requests, --namespace, --node, --output, --selector, --since, --tail, --template, --timezone, -c, -e, -l, -n, -o, -s, -t
 - Hyphen-prefixed positional arguments accepted
+
+### `velero`
+<p class="cmd-url"><a href="https://velero.io/docs/">https://velero.io/docs/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **version**: Flags: --client-only, --help, --timeout, -h. Valued: --namespace, --timeout, -n
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `ytt`
+<p class="cmd-url"><a href="https://carvel.dev/ytt/">https://carvel.dev/ytt/</a></p>
+
+- Allowed standalone flags: --debug, --dangerous-allow-all-symlink-destinations, --data-values-inspect, --data-values-schema-inspect, --debug-skip-default-files, --help, --ignore-unknown-comments, --implied-template-files, --quiet, --strict, --symlink-allow, --symlink-allow-all, --type-strict, --version, -h, -q, -v
+- Allowed valued flags: --data-value, --data-value-file, --data-value-yaml, --data-values-env, --data-values-env-yaml, --data-values-file, --debug-output, --file-mark, --filter, --ignored-paths, --output, --output-files, --output-directory, --output-multi-files, --symlink-allow, -f, -o
+- Bare invocation allowed
 

@@ -1,0 +1,30 @@
+[[command]]
+name = "ytt"
+description = "Carvel ytt — YAML templating tool. Reads YAML overlays plus user-supplied schema and prints the rendered YAML to stdout (or to --output). Static templating (the script-language is Starlark — sandboxed). --output writes to a file or directory."
+url = "https://carvel.dev/ytt/"
+researched_version = "ytt 0.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--debug", "--dangerous-allow-all-symlink-destinations",
+    "--data-values-inspect", "--data-values-schema-inspect",
+    "--debug-skip-default-files", "--help",
+    "--ignore-unknown-comments",
+    "--implied-template-files", "--quiet",
+    "--strict", "--symlink-allow",
+    "--symlink-allow-all", "--type-strict",
+    "--version",
+    "-h", "-q", "-v",
+]
+valued = [
+    "--data-value", "--data-value-file",
+    "--data-value-yaml", "--data-values-env",
+    "--data-values-env-yaml", "--data-values-file",
+    "--debug-output", "--file-mark",
+    "--filter", "--ignored-paths",
+    "--output", "--output-files",
+    "--output-directory",
+    "--output-multi-files", "--symlink-allow",
+    "-f", "-o",
+]
+write_flags = ["--output", "-o", "--output-files", "--output-directory"]

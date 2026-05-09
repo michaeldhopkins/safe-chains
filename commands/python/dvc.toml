@@ -50,15 +50,46 @@ allow_all = true
 
 [[command.sub]]
 name = "add"
-candidate = true
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--external", "--file", "--force", "--glob", "--help", "--no-commit", "--quiet", "--recursive", "--remote", "--to-remote", "--verbose", "-R", "-f", "-h", "-q", "-v"]
+valued = ["--desc", "--file", "--meta", "--out", "--remote", "--type", "-o"]
 
 [[command.sub]]
 name = "commit"
-candidate = true
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--data-only", "--force", "--help", "--no-commit", "--quiet", "--recursive", "--relink", "--verbose", "-R", "-d", "-f", "-h", "-q", "-v"]
 
 [[command.sub]]
 name = "checkout"
-candidate = true
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--allow-missing", "--force", "--help", "--quiet", "--recursive", "--relink", "--summary", "-R", "-f", "-h", "-q"]
+
+[[command.sub]]
+name = "remove"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--outs", "--quiet", "--verbose", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "move"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "--verbose", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "unprotect"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-q"]
 
 [[command.sub]]
 name = "fetch"
@@ -78,14 +109,6 @@ candidate = true
 
 [[command.sub]]
 name = "import-url"
-candidate = true
-
-[[command.sub]]
-name = "remove"
-candidate = true
-
-[[command.sub]]
-name = "move"
 candidate = true
 
 [[command.sub]]

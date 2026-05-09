@@ -1,0 +1,9 @@
+[[command]]
+name = "vipe"
+description = "moreutils vipe — opens stdin in $EDITOR, then prints the edited content to stdout. Interactive — bare invocation opens an editor. Carve-out: --help only."
+url = "https://joeyh.name/code/moreutils/"
+researched_version = "moreutils vipe; surface stable"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--suffix"]

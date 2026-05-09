@@ -1,0 +1,34 @@
+[[command]]
+name = "sox"
+description = "Audio file processor and converter. Reads input file(s) and writes output (or `-` for stdout). Effects (reverb, normalize, compand, fade, etc.) are passed as positional words after the output. Network reads when input is a URL. Stable, mature."
+url = "https://sox.sourceforge.net/"
+researched_version = "SoX 14.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--clobber", "--combine", "--effects-file",
+    "--guard", "--help", "--help-effect",
+    "--help-effects", "--help-format",
+    "--help-formats", "--ignore-length",
+    "--input-buffer", "--magic", "--multi-threaded",
+    "--no-clobber", "--no-dither", "--no-glob",
+    "--no-show-progress", "--norm", "--play-rate-arg",
+    "--plot", "--replay-gain", "--show-progress",
+    "--single-threaded", "--temp", "--type",
+    "--version", "--volume", "-?",
+    "-D", "-G", "-M", "-N", "-q", "-r", "-S", "-T",
+    "-V", "-V0", "-V1", "-V2", "-V3", "-V4",
+    "-h", "-m", "-p", "-v",
+]
+valued = [
+    "--add-comment", "--bits", "--buffer",
+    "--channels", "--combine", "--comment-file",
+    "--effects-file", "--encoding",
+    "--endian", "--input-buffer", "--magic",
+    "--play-rate-arg", "--plot",
+    "--rate", "--replay-gain", "--temp",
+    "--type", "--volume",
+    "-1", "-2", "-3", "-4", "-8", "-b",
+    "-c", "-C", "-e", "-r", "-t",
+]

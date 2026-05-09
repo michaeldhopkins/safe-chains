@@ -1,0 +1,137 @@
+[[command]]
+name = "istioctl"
+description = "Istio CLI — service-mesh control plane. Most subcommands contact the cluster (network). Read-side: `version`, `analyze`, `proxy-status`, `proxy-config`, `experimental check-inject`, `validate`, `dashboard`, `bug-report`. Write-side: `install`, `uninstall`, `upgrade`, `kube-inject`, `experimental remove-from-mesh`, `experimental install`, `experimental wait`. Carve-out covers diagnostic forms."
+url = "https://istio.io/latest/docs/reference/commands/istioctl/"
+researched_version = "istioctl 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--remote", "--revision", "--short", "-h", "-s"]
+valued = ["--filename", "--output", "--revision", "-f", "-o"]
+
+[[command.sub]]
+name = "analyze"
+level = "SafeRead"
+bare = true
+standalone = ["--all-namespaces", "--color", "--failure-threshold", "--help", "--ignore-unknown", "--list-analyzers", "--meshConfigFile", "--no-color", "--output", "--output-threshold", "--recursive", "--revision", "--suppress", "--timeout", "--use-kube", "--verbose", "-A", "-L", "-R", "-S", "-h", "-o"]
+valued = ["--failure-threshold", "--meshConfigFile", "--namespace", "--output", "--output-threshold", "--remote-contexts", "--revision", "--suppress", "--timeout", "--use-kube", "--verbose", "-S", "-n", "-o"]
+
+[[command.sub]]
+name = "proxy-status"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--file", "--help", "--multi-xds", "--xds-via-agents", "-f", "-h"]
+valued = ["--file", "--multi-xds", "--output", "--revision", "-f", "-o"]
+
+[[command.sub]]
+name = "proxy-config"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "all"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "bootstrap"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "cluster"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "endpoint"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "listener"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "log"
+candidate = true
+
+[[command.sub.sub]]
+name = "route"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "secret"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--no-validate", "--output", "--quiet", "--referential", "-f", "-h", "-o", "-q"]
+valued = ["--filename", "--output", "-f", "-o"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "kube-inject"
+candidate = true
+
+[[command.sub]]
+name = "manifest"
+candidate = true
+
+[[command.sub]]
+name = "experimental"
+candidate = true
+
+[[command.sub]]
+name = "x"
+candidate = true
+
+[[command.sub]]
+name = "operator"
+candidate = true
+
+[[command.sub]]
+name = "ztunnel-config"
+candidate = true
+
+[[command.sub]]
+name = "wait"
+candidate = true
+
+[[command.sub]]
+name = "ambient"
+candidate = true
+
+[[command.sub]]
+name = "bug-report"
+candidate = true
+
+[[command.sub]]
+name = "create-remote-secret"
+candidate = true
+
+[[command.sub]]
+name = "checkinject"
+candidate = true

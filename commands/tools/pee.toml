@@ -1,0 +1,9 @@
+[[command]]
+name = "pee"
+description = "moreutils pee — pipes stdin to multiple arbitrary commands (the positional arguments). Each wrapped command is user-supplied execution. Carve-out: --help only."
+url = "https://joeyh.name/code/moreutils/"
+researched_version = "moreutils pee; surface stable"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--ignore-sigpipe", "--ignore-write-errors", "--no-ignore-sigpipe", "--no-ignore-write-errors"]

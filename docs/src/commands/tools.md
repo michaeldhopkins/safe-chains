@@ -204,6 +204,18 @@ Aliases: `@biomejs/biome`
 - Requires --check, --diff. - Allowed standalone flags: --check, --diff, --color, --no-color, --fast, --quiet, --verbose, --help, --version
 - Allowed valued flags: --config, --exclude, --extend-exclude, --include, --line-length, --target-version, -l, -t
 
+### `borg`
+<p class="cmd-url"><a href="https://borgbackup.readthedocs.io/en/stable/usage/general.html">https://borgbackup.readthedocs.io/en/stable/usage/general.html</a></p>
+
+- **check**: Flags: --archives-only, --first, --help, --last, --repair, --repository-only, --save-space, --sort-by, --verify-data, -h. Valued: --archives-only, --first, --last, --match-archives, --max-duration, --prefix, --sort-by, -a. Positional args accepted
+- **config**: Flags: --cache, --delete, --help, --list, -c, -h. Positional args accepted
+- **diff**: Flags: --help, --json-lines, --numeric-ids, --sort, -h. Valued: --exclude, --exclude-from, --patterns-from, --exclude-caches, --exclude-if-present. Positional args accepted
+- **help**: Positional args accepted
+- **info**: Flags: --first, --help, --json, --last, --sort-by, -h. Valued: --exclude, --exclude-from, --first, --last, --match-archives, --patterns-from, --sort-by, -a, -e. Positional args accepted
+- **list**: Flags: --first, --format, --help, --json, --json-lines, --last, --short, --sort-by, -h. Valued: --exclude, --exclude-from, --first, --format, --last, --match-archives, --patterns-from, --sort-by, -a, -e. Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -V
+
 ### `brakeman`
 <p class="cmd-url"><a href="https://brakemanscanner.org/docs/options/">https://brakemanscanner.org/docs/options/</a></p>
 
@@ -250,6 +262,11 @@ Aliases: `bundle-audit`
 - **help**: Positional args accepted
 - **report**: Flags: --all, --allowExternal, --clean, --help, -h. Valued: --reporter, --reports-dir, --temp-directory, -r
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `chronic`
+<p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
+
+- Allowed standalone flags: --help, -e, -v
 
 ### `clang`
 <p class="cmd-url"><a href="https://clang.llvm.org/docs/CommandGuide/clang.html">https://clang.llvm.org/docs/CommandGuide/clang.html</a></p>
@@ -374,6 +391,11 @@ Aliases: `@11ty/eleventy`
 
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `entr`
+<p class="cmd-url"><a href="https://eradman.com/entrproject/">https://eradman.com/entrproject/</a></p>
+
+- Allowed standalone flags: --help, --version, -h
+
 ### `erb_lint`
 <p class="cmd-url"><a href="https://github.com/Shopify/erb_lint">https://github.com/Shopify/erb_lint</a></p>
 
@@ -387,6 +409,12 @@ Aliases: `erblint`
 <p class="cmd-url"><a href="https://www.erlang.org/docs/26/man/erl">https://www.erlang.org/docs/26/man/erl</a></p>
 
 - Allowed standalone flags: --help, --version, -h
+
+### `errno`
+<p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
+
+- Allowed standalone flags: --help, --list, --search, -l, -s
+- Hyphen-prefixed positional arguments accepted
 
 ### `esbuild`
 <p class="cmd-url"><a href="https://esbuild.github.io/">https://esbuild.github.io/</a></p>
@@ -573,11 +601,22 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed standalone flags: --help, --verbose, --version, -V, -h, -ping, -quiet, -regard-warnings, -verbose
 - Allowed valued flags: -channel, -define, -density, -depth, -features, -format, -fuzz, -interlace, -limit, -list, -log, -moments, -monitor, -precision, -seed, -set, -size, -strip, -unique, -virtual-pixel
 
+### `ifne`
+<p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
+
+- Allowed standalone flags: --help, -n
+
 ### `isort`
 <p class="cmd-url"><a href="https://pycqa.github.io/isort/docs/configuration/options.html">https://pycqa.github.io/isort/docs/configuration/options.html</a></p>
 
 - Requires --check-only, --diff, -c. - Allowed standalone flags: --check-only, --diff, --help, --quiet, --show-config, --verbose, --version, -c, -V, -h, -q, -v
 - Allowed valued flags: --filter-files, --line-length, --multi-line, --profile, --project, --settings-file, --skip, --skip-glob, --src, -l, -m
+
+### `isutf8`
+<p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
+
+- Allowed standalone flags: --help, --invert, --list, --quiet, -h, -i, -l, -q
+- Hyphen-prefixed positional arguments accepted
 
 ### `jasmine`
 <p class="cmd-url"><a href="https://jasmine.github.io/">https://jasmine.github.io/</a></p>
@@ -677,6 +716,28 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed standalone flags: --fix, --help, --no-globs, --no-inline-config, --quiet
 - Allowed valued flags: --config, --directories, --no-globs
 - Bare invocation allowed
+
+### `marp`
+<p class="cmd-url"><a href="https://github.com/marp-team/marp-cli">https://github.com/marp-team/marp-cli</a></p>
+
+- Allowed standalone flags: --bespoke.osc, --bespoke.progress, --bespoke.transition, --browser-protocol, --config-file, --description, --engine, --help, --html, --image, --images, --input-dir, --no-config-file, --no-stdin, --ogImage, --output, --pdf, --pdf-notes, --pdf-outlines, --pdf-outlines.headings, --pdf-outlines.pages, --pptx, --pptx-editable, --preview, --quiet, --server, --stdin, --template, --theme, --themeSet, --title, --toc, --url, --version, --watch, -c, -h, -o, -p, -q, -s, -t, -v, -w
+- Allowed valued flags: --allow-local-files, --browser, --browser-path, --browser-protocol, --browser-timeout, --config-file, --description, --engine, --input-dir, --ogImage, --output, --parallel, --pdf-notes, --theme, --themeSet, --title, --url, -c, -I, -o
+
+### `mc`
+<p class="cmd-url"><a href="https://min.io/docs/minio/linux/reference/minio-mc.html">https://min.io/docs/minio/linux/reference/minio-mc.html</a></p>
+
+- **alias list**: Flags: --help, -h
+- **cat**: Flags: --encrypt-key, --help, --rewind, -h. Valued: --encrypt-key, --rewind, --version-id. Positional args accepted
+- **completion**: Flags: --help, -h. Positional args accepted
+- **du**: Flags: --depth, --help, --recursive, --rewind, --versions, -d, -h, -r. Valued: --depth, --rewind. Positional args accepted
+- **find**: Flags: --help, --ignore, --metadata, --name, --newer-than, --older-than, --path, --print, --recursive, --regex, --rewind, --versions, --watch, -h, -r. Valued: --exec, --maxdepth, --mindepth, --name, --newer-than, --older-than, --path, --print, --regex. Positional args accepted
+- **head**: Flags: --encrypt-key, --help, --rewind, -h. Valued: --encrypt-key, -n, --lines, --rewind, --version-id. Positional args accepted
+- **help**: Positional args accepted
+- **ls**: Flags: --help, --incomplete, --metadata, --no-color, --recursive, --rewind, --summarize, --versions, -I, -h, -r, -S. Positional args accepted
+- **stat**: Flags: --encrypt-key, --help, --no-list, --recursive, --rewind, --versions, -h, -r. Valued: --encrypt-key, --rewind, --version-id. Positional args accepted
+- **tree**: Flags: --depth, --files, --help, --no-color, -d, -f, -h. Valued: --depth. Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `mdbook`
 <p class="cmd-url"><a href="https://rust-lang.github.io/mdBook/">https://rust-lang.github.io/mdBook/</a></p>
@@ -788,6 +849,18 @@ Aliases: `run-p`, `run-s`
 - Allowed valued flags: --allow, --config, --deny, --format, --max-warnings, --tsconfig, --warn, -A, -D, -W, -f
 - Bare invocation allowed
 
+### `pandoc`
+<p class="cmd-url"><a href="https://pandoc.org/MANUAL.html">https://pandoc.org/MANUAL.html</a></p>
+
+- Allowed standalone flags: --ascii, --atx-headers, --bash-completion, --biblatex, --bibliography, --columns, --csl, --datadir, --dump-args, --eol, --embed-resources, --epub-chapter-level, --epub-cover-image, --epub-embed-font, --epub-metadata, --epub-stylesheet, --epub-subdirectory, --fail-if-warnings, --file-scope, --from, --gladtex, --help, --highlight-style, --html-q-tags, --ignore-args, --id-prefix, --include-after-body, --include-before-body, --include-in-header, --incremental, --indented-code-classes, --ipynb-output, --katex, --katex-stylesheet, --latex-engine, --list-extensions, --list-highlight-languages, --list-highlight-styles, --list-input-formats, --list-output-formats, --listings, --log, --mathjax, --mathml, --metadata, --mimex, --natbib, --no-check-certificate, --no-highlight, --number-offset, --number-sections, --output, --parse-raw, --pdf-engine, --preserve-tabs, --quiet, --read, --reference-doc, --reference-links, --reference-location, --resource-path, --sandbox, --section-divs, --self-contained, --shift-heading-level-by, --slide-level, --smart, --standalone, --strip-comments, --strip-empty-paragraphs, --syntax-definition, --tab-stop, --table-of-contents, --template, --to, --toc, --toc-depth, --top-level-division, --trace, --track-changes, --variable, --verbose, --version, --webtex, --wrap, --write, -C, -D, -F, -H, -N, -R, -S, -V, -h, -i, -o, -p, -r, -s, -t, -v, -w
+- Allowed valued flags: --abbreviations, --bibliography, --citation-abbreviations, --columns, --csl, --data-dir, --default-image-extension, --dpi, --email-obfuscation, --epub-chapter-level, --epub-cover-image, --epub-embed-font, --epub-metadata, --epub-stylesheet, --epub-subdirectory, --extract-media, --file-scope, --from, --gladtex, --id-prefix, --include-after-body, --include-before-body, --include-in-header, --ipynb-output, --katex, --katex-stylesheet, --latex-engine, --log, --lua-filter, --mathjax, --mathml, --metadata, --metadata-file, --natbib, --number-offset, --output, --pdf-engine, --pdf-engine-opt, --read, --reference-doc, --reference-location, --request-header, --resource-path, --shift-heading-level-by, --slide-level, --syntax-definition, --tab-stop, --template, --to, --toc-depth, --top-level-division, --track-changes, --variable, --webtex, --wrap, --write, -D, -H, -M, -N, -V, -f, -i, -o, -t, -w
+- Bare invocation allowed
+
+### `parallel`
+<p class="cmd-url"><a href="https://www.gnu.org/software/parallel/">https://www.gnu.org/software/parallel/</a></p>
+
+- Allowed standalone flags: --help, --version, -h
+
 ### `parcel`
 <p class="cmd-url"><a href="https://parceljs.org/">https://parceljs.org/</a></p>
 
@@ -808,6 +881,11 @@ Aliases: `run-p`, `run-s`
 - **show**: Flags: --clip, --help, --qrcode, -c, -h, -q. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+### `pee`
+<p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
+
+- Allowed standalone flags: --help, --ignore-sigpipe, --ignore-write-errors, --no-ignore-sigpipe, --no-ignore-write-errors
 
 ### `php`
 <p class="cmd-url"><a href="https://www.php.net/manual/en/features.commandline.options.php">https://www.php.net/manual/en/features.commandline.options.php</a></p>
@@ -881,6 +959,27 @@ Aliases: `python`
 - Allowed standalone flags: --envlist, --help, --list, --update, --version, -h
 - Hyphen-prefixed positional arguments accepted
 
+### `rclone`
+<p class="cmd-url"><a href="https://rclone.org/commands/">https://rclone.org/commands/</a></p>
+
+- **about**: Flags: --full, --help, --json, -h. Positional args accepted
+- **cat**: Flags: --head, --help, --tail, -h. Valued: --count, --head, --offset, --tail. Positional args accepted
+- **check**: Flags: --checkfile, --combined, --differ, --download, --error, --help, --match, --missing-on-dst, --missing-on-src, --one-way, -h. Valued: --checkfile, --combined, --differ, --error, --match, --missing-on-dst, --missing-on-src. Positional args accepted
+- **completion**: Flags: --help, -h. Positional args accepted
+- **hashsum**: Flags: --base64, --checkfile, --download, --help, -h. Valued: --checkfile, --output-file. Positional args accepted
+- **help**: Positional args accepted
+- **ls**: Flags: --help, -h. Positional args accepted
+- **lsd**: Flags: --help, -R, -h. Positional args accepted
+- **lsf**: Flags: --absolute, --csv, --dir-slash, --files-only, --dirs-only, --help, --recursive, -R, -h. Valued: --format, --separator, --time-format, -F. Positional args accepted
+- **lsjson**: Flags: --dirs-only, --encrypted, --files-only, --help, --no-mimetype, --no-modtime, --original, --recursive, --stat, -h, -M, -R. Positional args accepted
+- **lsl**: Flags: --help, -h. Positional args accepted
+- **md5sum**: Flags: --base64, --checkfile, --download, --help, -h. Valued: --checkfile, --output-file. Positional args accepted
+- **sha1sum**: Flags: --base64, --checkfile, --download, --help, -h. Valued: --checkfile, --output-file. Positional args accepted
+- **size**: Flags: --help, --json, -h. Positional args accepted
+- **tree**: Flags: --all, --dirs-only, --full-path, --help, --noindent, --protections, --quote, --size, --sort-ctime, --sort-modtime, --sort-reverse, --unsorted, -D, -Q, -a, -c, -d, -h, -r, -s, -t. Positional args accepted
+- **version**: Flags: --check, --deps, --help, -h
+- Allowed standalone flags: --help, --version, -h, -V
+
 ### `rdoc`
 <p class="cmd-url"><a href="https://docs.ruby-lang.org/en/master/RDoc/RDoc.html">https://docs.ruby-lang.org/en/master/RDoc/RDoc.html</a></p>
 
@@ -901,6 +1000,23 @@ Aliases: `python`
 - Allowed valued flags: --config, --exclude-paths, --failure-exit-code, --format, --line-numbers-format, --report-format, --success-exit-code, --template, -c, -f
 - Bare invocation allowed
 
+### `restic`
+<p class="cmd-url"><a href="https://restic.readthedocs.io/">https://restic.readthedocs.io/</a></p>
+
+- **cat**: Flags: --help, -h. Positional args accepted
+- **check**: Flags: --help, --read-data, --with-cache, -h. Valued: --read-data-subset
+- **completion**: Flags: --help, -h. Positional args accepted
+- **diff**: Flags: --help, --metadata, -h. Positional args accepted
+- **dump**: Flags: --archive, --help, -a, -h. Valued: --host, --path, --tag, -H. Positional args accepted
+- **find**: Flags: --blob, --help, --ignore-case, --long, --newest, --oldest, --pack, --show-pack-id, --tree, -h, -i, -l. Valued: --host, --path, --snapshot, --tag, -H, -N, -O, -s. Positional args accepted
+- **help**: Positional args accepted
+- **list**: Flags: --help, -h. Positional args accepted
+- **ls**: Flags: --help, --long, --recursive, -h, -l. Valued: --host, --path, --tag, -H. Positional args accepted
+- **snapshots**: Flags: --compact, --help, --latest, -c, -h. Valued: --group-by, --host, --path, --tag, -H. Positional args accepted
+- **stats**: Flags: --help, -h. Valued: --host, --mode, --path, --tag, -H. Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `rollup`
 <p class="cmd-url"><a href="https://rollupjs.org/">https://rollupjs.org/</a></p>
 
@@ -913,6 +1029,12 @@ Aliases: `python`
 - Allowed standalone flags: --bisect, --color, --deprecation-out, --dry-run, --errors-only, --fail-fast, --fail-if-no-examples, --force-color, --format, --help, --no-color, --no-fail-fast, --no-profile, --only-failures, --order, --profile, --require, --seed, --tty, --version, --warnings, -D, -I, -O, -P, -T, -b, -c, -f, -h, -p, -r, -v, -w
 - Allowed valued flags: --default-path, --example, --exclude-pattern, --filter-files, --init, --no-deprecation-out, --out, --pattern, --tag, -I, -O, -P, -e, -o, -t
 - Bare invocation allowed
+
+### `rsync`
+<p class="cmd-url"><a href="https://rsync.samba.org/">https://rsync.samba.org/</a></p>
+
+- Allowed standalone flags: --8-bit-output, --acls, --address, --append, --archive, --atimes, --backup, --blocking-io, --bwlimit, --checksum, --checksum-choice, --chmod, --chown, --compress, --compress-level, --contimeout, --copy-as, --copy-devices, --copy-dirlinks, --copy-links, --copy-unsafe-links, --cvs-exclude, --debug, --delete, --delete-after, --delete-before, --delete-during, --delete-excluded, --delete-missing-args, --devices, --dirs, --dry-run, --exclude, --exclude-from, --executability, --existing, --fake-super, --fileflags, --files-from, --filter, --force, --from0, --fsync, --full-help, --fuzzy, --group, --groupmap, --hard-links, --help, --human-readable, --ignore-errors, --ignore-existing, --ignore-missing-args, --ignore-times, --inc-recursive, --include, --include-from, --info, --inplace, --ipv4, --ipv6, --itemize-changes, --keep-dirlinks, --links, --list-only, --log-file, --log-file-format, --max-alloc, --max-delete, --max-size, --min-size, --mkpath, --modify-window, --msgs2stderr, --munge-links, --no-D, --no-OO, --no-W, --no-blocking-io, --no-detach, --no-implied-dirs, --no-iconv, --no-i-r, --no-incremental, --no-inc-recursive, --no-links, --no-motd, --no-o, --no-perms, --no-relative, --no-specials, --no-times, --no-times-h, --no-W, --no-whole-file, --no-xattrs, --numeric-ids, --old-args, --old-d, --omit-dir-times, --omit-link-times, --one-file-system, --owner, --partial, --partial-dir, --password-file, --perms, --port, --preallocate, --progress, --protect-args, --protocol, --prune-empty-dirs, --quiet, --random, --read-batch, --recursive, --relative, --remote-option, --remove-source-files, --rsh, --rsync-path, --safe-links, --secluded-args, --secret, --secret-file, --server, --size-only, --skip-compress, --sockopts, --sparse, --specials, --stats, --stop-after, --stop-at, --stop-fmt, --super, --suffix, --temp-dir, --timeout, --times, --trust-sender, --update, --usermap, --use-qsort, --verbose, --version, --whole-file, -0, -4, -6, -8, -A, -B, -C, -D, -E, -F, -H, -I, -J, -K, -L, -M, -N, -O, -P, -R, -S, -T, -U, -V, -W, -X, -Z, -a, -b, -c, -d, -e, -f, -g, -h, -i, -k, -l, -m, -n, -o, -p, -q, -r, -s, -t, -u, -v, -x, -y, -z
+- Allowed valued flags: --address, --bwlimit, --checksum-choice, --chmod, --chown, --compress-level, --contimeout, --copy-as, --debug, --exclude, --exclude-from, --files-from, --filter, --info, --log-file, --log-file-format, --max-alloc, --max-delete, --max-size, --min-size, --modify-window, --out-format, --partial-dir, --password-file, --port, --protocol, --read-batch, --remote-option, --rsh, --rsync-path, --secret-file, --skip-compress, --sockopts, --stop-after, --stop-at, --stop-fmt, --suffix, --temp-dir, --timeout, --write-batch, -T, -e, -f
 
 ### `rubocop`
 <p class="cmd-url"><a href="https://docs.rubocop.org/rubocop/usage/basic_usage.html">https://docs.rubocop.org/rubocop/usage/basic_usage.html</a></p>
@@ -1036,6 +1158,12 @@ Aliases: `python`
 - Allowed valued flags: --base, --base-dir, --filter, --format, --framework, --head, --head-dir
 - Bare invocation allowed
 
+### `sponge`
+<p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
+
+- Allowed standalone flags: --help, -a, -h
+- Hyphen-prefixed positional arguments accepted
+
 ### `standardrb`
 <p class="cmd-url"><a href="https://github.com/standardrb/standard">https://github.com/standardrb/standard</a></p>
 
@@ -1144,6 +1272,13 @@ Aliases: `python`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
 
+### `ts`
+<p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
+
+- Allowed standalone flags: --help, -i, -m, -r, -s
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `ts-node`
 <p class="cmd-url"><a href="https://github.com/TypeStrong/ts-node">https://github.com/TypeStrong/ts-node</a></p>
 
@@ -1205,6 +1340,16 @@ Aliases: `python`
 - **status**: Flags: --format, --help, -h. Valued: --address, --format
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `vidir`
+<p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
+
+- Allowed standalone flags: --help, --verbose
+
+### `vipe`
+<p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
+
+- Allowed standalone flags: --help, --suffix
 
 ### `vite`
 <p class="cmd-url"><a href="https://vite.dev/">https://vite.dev/</a></p>

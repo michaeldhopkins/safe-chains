@@ -1,0 +1,9 @@
+[[command]]
+name = "isutf8"
+description = "moreutils isutf8 — checks whether each input file is valid UTF-8. Reports invalid lines / bytes to stdout. Pure read."
+url = "https://joeyh.name/code/moreutils/"
+researched_version = "moreutils isutf8; surface stable"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--invert", "--list", "--quiet", "-h", "-i", "-l", "-q"]

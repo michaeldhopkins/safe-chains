@@ -1,0 +1,238 @@
+[[command]]
+name = "rclone"
+description = "Cloud storage sync / copy / mount tool. Subcommands include `copy`, `sync`, `move`, `delete`, `purge` (cluster-state writes), `mount` (FUSE), `serve` (long-running), `lsd`, `lsf`, `ls`, `lsl`, `ncdu`, `tree`, `version`, `about`, `config show`, `cat`, `md5sum`, `sha1sum`, `size`, `hashsum`, `check` (read). The carve-out covers read-only inspection."
+url = "https://rclone.org/commands/"
+researched_version = "rclone 1.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--check", "--deps", "--help", "-h"]
+
+[[command.sub]]
+name = "about"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--full", "--help", "--json", "-h"]
+
+[[command.sub]]
+name = "ls"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "lsd"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-R", "-h"]
+
+[[command.sub]]
+name = "lsl"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "lsf"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--absolute", "--csv", "--dir-slash", "--files-only", "--dirs-only", "--help", "--recursive", "-R", "-h"]
+valued = ["--format", "--separator", "--time-format", "-F"]
+
+[[command.sub]]
+name = "lsjson"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--dirs-only", "--encrypted", "--files-only", "--help", "--no-mimetype", "--no-modtime", "--original", "--recursive", "--stat", "-h", "-M", "-R"]
+
+[[command.sub]]
+name = "tree"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--all", "--dirs-only", "--full-path", "--help", "--noindent", "--protections", "--quote", "--size", "--sort-ctime", "--sort-modtime", "--sort-reverse", "--unsorted", "-D", "-Q", "-a", "-c", "-d", "-h", "-r", "-s", "-t"]
+
+[[command.sub]]
+name = "size"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "cat"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--head", "--help", "--tail", "-h"]
+valued = ["--count", "--head", "--offset", "--tail"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--checkfile", "--combined", "--differ", "--download", "--error", "--help", "--match", "--missing-on-dst", "--missing-on-src", "--one-way", "-h"]
+valued = ["--checkfile", "--combined", "--differ", "--error", "--match", "--missing-on-dst", "--missing-on-src"]
+
+[[command.sub]]
+name = "md5sum"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--base64", "--checkfile", "--download", "--help", "-h"]
+valued = ["--checkfile", "--output-file"]
+
+[[command.sub]]
+name = "sha1sum"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--base64", "--checkfile", "--download", "--help", "-h"]
+valued = ["--checkfile", "--output-file"]
+
+[[command.sub]]
+name = "hashsum"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--base64", "--checkfile", "--download", "--help", "-h"]
+valued = ["--checkfile", "--output-file"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "copy"
+candidate = true
+
+[[command.sub]]
+name = "copyto"
+candidate = true
+
+[[command.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "move"
+candidate = true
+
+[[command.sub]]
+name = "moveto"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "deletefile"
+candidate = true
+
+[[command.sub]]
+name = "purge"
+candidate = true
+
+[[command.sub]]
+name = "rmdir"
+candidate = true
+
+[[command.sub]]
+name = "rmdirs"
+candidate = true
+
+[[command.sub]]
+name = "mkdir"
+candidate = true
+
+[[command.sub]]
+name = "touch"
+candidate = true
+
+[[command.sub]]
+name = "mount"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "authorize"
+candidate = true
+
+[[command.sub]]
+name = "obscure"
+candidate = true
+
+[[command.sub]]
+name = "cleanup"
+candidate = true
+
+[[command.sub]]
+name = "rcat"
+candidate = true
+
+[[command.sub]]
+name = "ncdu"
+candidate = true
+
+[[command.sub]]
+name = "settier"
+candidate = true
+
+[[command.sub]]
+name = "settier-class"
+candidate = true
+
+[[command.sub]]
+name = "link"
+candidate = true
+
+[[command.sub]]
+name = "rc"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "selfupdate"
+candidate = true
+
+[[command.sub]]
+name = "version-check"
+candidate = true
+
+[[command.sub]]
+name = "dedupe"
+candidate = true
+
+[[command.sub]]
+name = "backend"
+candidate = true
+
+[[command.sub]]
+name = "gendocs"
+candidate = true

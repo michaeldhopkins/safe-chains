@@ -525,6 +525,16 @@ Aliases: `fly`
 - **which**: Flags: --help, -h, -q, -v
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `neon`
+<p class="cmd-url"><a href="https://neon.tech/docs/reference/neon-cli">https://neon.tech/docs/reference/neon-cli</a></p>
+
+Aliases: `neonctl`
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `netlify`
 <p class="cmd-url"><a href="https://cli.netlify.com/">https://cli.netlify.com/</a></p>
 
@@ -585,6 +595,11 @@ Aliases: `fly`
 - **logs**: Flags: --follow, --help, -f, -h. Valued: --container, --job, --limit, --output, --project, --service, --since, --until, -o
 - **metrics**: Flags: --help, -h. Valued: --job, --output, --project, --service, -o
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `nu`
+<p class="cmd-url"><a href="https://www.nushell.sh/">https://www.nushell.sh/</a></p>
+
+- Allowed standalone flags: --help, --version, -h
 
 ### `overmind`
 <p class="cmd-url"><a href="https://github.com/DarthSim/overmind">https://github.com/DarthSim/overmind</a></p>
@@ -758,6 +773,14 @@ Aliases: `upsun`
 - **target list**: Flags: --help, --preview, -h. Valued: --cluster, --project
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `pscale`
+<p class="cmd-url"><a href="https://planetscale.com/docs/reference/planetscale-cli">https://planetscale.com/docs/reference/planetscale-cli</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `psql`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-psql.html">https://www.postgresql.org/docs/current/app-psql.html</a></p>
 
@@ -892,6 +915,14 @@ Aliases: `upsun`
 <p class="cmd-url"><a href="https://man.openbsd.org/ssh">https://man.openbsd.org/ssh</a></p>
 
 - Allowed standalone flags: -V
+
+### `supabase`
+<p class="cmd-url"><a href="https://supabase.com/docs/reference/cli/introduction">https://supabase.com/docs/reference/cli/introduction</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `sysctl`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/sysctl.8.html">https://man7.org/linux/man-pages/man8/sysctl.8.html</a></p>

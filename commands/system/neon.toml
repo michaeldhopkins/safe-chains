@@ -1,0 +1,78 @@
+[[command]]
+name = "neon"
+aliases = ["neonctl"]
+description = "Neon CLI — managed Postgres. Most subcommands contact Neon's API (network). Read-side: `version`, `me`, `auth`, `projects list/get`, `branches list/get`, `databases list`, `roles list`, `connection-string`, `endpoints list`, `set-context`. Write-side: `auth`, `projects create/delete/update`, `branches create/delete/reset/restore`, `databases create/delete`, `roles create/delete`, `endpoints create/delete/restart`, `org create/delete`, `set-context`."
+url = "https://neon.tech/docs/reference/neon-cli"
+researched_version = "neonctl 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "me"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "projects"
+candidate = true
+
+[[command.sub]]
+name = "ip-allow"
+candidate = true
+
+[[command.sub]]
+name = "set-context"
+candidate = true
+
+[[command.sub]]
+name = "branches"
+candidate = true
+
+[[command.sub]]
+name = "databases"
+candidate = true
+
+[[command.sub]]
+name = "roles"
+candidate = true
+
+[[command.sub]]
+name = "operations"
+candidate = true
+
+[[command.sub]]
+name = "connection-string"
+candidate = true
+
+[[command.sub]]
+name = "cs"
+candidate = true
+
+[[command.sub]]
+name = "endpoints"
+candidate = true
+
+[[command.sub]]
+name = "org"
+candidate = true
+
+[[command.sub]]
+name = "create-app"
+candidate = true

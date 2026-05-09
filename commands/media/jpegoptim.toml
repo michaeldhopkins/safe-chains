@@ -1,0 +1,23 @@
+[[command]]
+name = "jpegoptim"
+description = "Lossless and lossy JPEG optimizer. Bare invocation rewrites the input files in place. -t/--test reports compression without modifying. -d / --dest writes optimized copies to a different directory. -n / --noaction is a dry-run."
+url = "https://github.com/tjko/jpegoptim"
+researched_version = "jpegoptim 1.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--all-normal", "--all-progressive",
+    "--csv", "--force", "--help", "--keep-original",
+    "--noaction", "--overwrite", "--preserve-perms",
+    "--preserve-time", "--quiet",
+    "--standard", "--strip-all", "--strip-com",
+    "--strip-exif", "--strip-icc", "--strip-iptc",
+    "--strip-none", "--strip-xmp", "--test",
+    "--threshold", "--totals", "--verbose", "--version",
+    "-f", "-h", "-n", "-q", "-t", "-v",
+]
+valued = [
+    "--dest", "--max", "--size",
+    "--stdin", "--stdout", "--threshold",
+    "-T", "-d", "-m", "-S",
+]

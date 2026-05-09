@@ -1,0 +1,161 @@
+[[command]]
+name = "flux"
+description = "Flux CD — GitOps for Kubernetes. Most subcommands contact the cluster's Flux controllers (network). Read-side: `get`, `version`, `check`, `diff`, `events`, `logs`, `tree`, `stats`, `trace`. Write-side: `bootstrap`, `install`, `uninstall`, `create`, `delete`, `reconcile`, `suspend`, `resume`, `patch`, `push`, `import`."
+url = "https://fluxcd.io/flux/cmd/flux/"
+researched_version = "flux 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[command.wrapper]
+standalone = ["--insecure-skip-tls-verify", "--server-side"]
+valued = ["--as", "--as-group", "--as-uid", "--cache-dir", "--certificate-authority", "--client-certificate", "--client-key", "--cluster", "--context", "--disable-compression", "--kube-api-burst", "--kube-api-qps", "--kubeconfig", "--namespace", "--password", "--request-timeout", "--server", "--timeout", "--tls-server-name", "--token", "--user", "--username", "-n"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--client", "--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--pre", "-h"]
+valued = ["--components", "--components-extra", "--kustomization", "--source"]
+
+[[command.sub]]
+name = "diff"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "kustomization"
+candidate = true
+
+[[command.sub.sub]]
+name = "artifact"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "get"
+candidate = true
+
+[[command.sub]]
+name = "events"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub]]
+name = "stats"
+candidate = true
+
+[[command.sub]]
+name = "trace"
+candidate = true
+
+[[command.sub]]
+name = "tree"
+candidate = true
+
+[[command.sub]]
+name = "bootstrap"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "reconcile"
+candidate = true
+
+[[command.sub]]
+name = "suspend"
+candidate = true
+
+[[command.sub]]
+name = "resume"
+candidate = true
+
+[[command.sub]]
+name = "patch"
+candidate = true
+
+[[command.sub]]
+name = "import"
+candidate = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "watch"
+candidate = true
+
+[[command.sub]]
+name = "approve"
+candidate = true
+
+[[command.sub]]
+name = "list"
+candidate = true
+
+[[command.sub]]
+name = "apply"
+candidate = true
+
+[[command.sub]]
+name = "envsubst"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "uninstall-cli"
+candidate = true
+
+[[command.sub]]
+name = "set-orgs"
+candidate = true
+
+[[command.sub]]
+name = "set-context"
+candidate = true
+
+[[command.sub]]
+name = "logs-controllers"
+candidate = true

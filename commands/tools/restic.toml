@@ -1,0 +1,157 @@
+[[command]]
+name = "restic"
+description = "Encrypted, deduplicated backup tool. Most subcommands contact the configured repository (local path, S3, B2, REST, SFTP, etc. — network for remote). Read-side: `cat`, `dump`, `find`, `ls`, `snapshots`, `stats`, `version`, `check`, `list`. Write-side: `backup`, `forget`, `prune`, `init`, `rebuild-index`, `repair`, `tag`, `unlock`, `migrate`, `mount`, `restore`. The carve-out covers read-only inspection."
+url = "https://restic.readthedocs.io/"
+researched_version = "restic 0.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[command.wrapper]
+standalone = ["--cleanup-cache", "--no-cache", "--no-lock", "--quiet", "--verbose"]
+valued = ["--cache-dir", "--cacert", "--insecure-tls", "--json", "--limit-download", "--limit-upload", "--option", "--password-command", "--password-file", "--repo", "--repo-file", "--retry-lock", "--tls-client-cert", "-o", "-p", "-r"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "snapshots"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--compact", "--help", "--latest", "-c", "-h"]
+valued = ["--group-by", "--host", "--path", "--tag", "-H"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ls"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--long", "--recursive", "-h", "-l"]
+valued = ["--host", "--path", "--tag", "-H"]
+
+[[command.sub]]
+name = "stats"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--host", "--mode", "--path", "--tag", "-H"]
+
+[[command.sub]]
+name = "find"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--blob", "--help", "--ignore-case", "--long", "--newest", "--oldest", "--pack", "--show-pack-id", "--tree", "-h", "-i", "-l"]
+valued = ["--host", "--path", "--snapshot", "--tag", "-H", "-N", "-O", "-s"]
+
+[[command.sub]]
+name = "cat"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dump"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--archive", "--help", "-a", "-h"]
+valued = ["--host", "--path", "--tag", "-H"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--read-data", "--with-cache", "-h"]
+valued = ["--read-data-subset"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--metadata", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "backup"
+candidate = true
+
+[[command.sub]]
+name = "restore"
+candidate = true
+
+[[command.sub]]
+name = "forget"
+candidate = true
+
+[[command.sub]]
+name = "prune"
+candidate = true
+
+[[command.sub]]
+name = "rebuild-index"
+candidate = true
+
+[[command.sub]]
+name = "repair"
+candidate = true
+
+[[command.sub]]
+name = "tag"
+candidate = true
+
+[[command.sub]]
+name = "unlock"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "mount"
+candidate = true
+
+[[command.sub]]
+name = "key"
+candidate = true
+
+[[command.sub]]
+name = "self-update"
+candidate = true
+
+[[command.sub]]
+name = "copy"
+candidate = true
+
+[[command.sub]]
+name = "generate"
+candidate = true
+
+[[command.sub]]
+name = "rewrite"
+candidate = true
