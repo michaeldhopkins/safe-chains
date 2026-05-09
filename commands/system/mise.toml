@@ -4,6 +4,22 @@ description = "Polyglot dev tool and runtime version manager (successor to rtx, 
 url = "https://mise.jdx.dev/cli/"
 researched_version = "v2026.5.3 (May 2026; YYYY.M.P scheme)"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "mise list",
+    "mise use ruby@4.0.3",
+    "mise u ruby@4.0.3",
+    "mise install ruby@4",
+    "mise i ruby@4",
+    "mise uninstall ruby@4",
+    "mise rm ruby@4",
+    "mise remove ruby@4",
+    "mise upgrade",
+    "mise up",
+]
+examples_denied = [
+    "mise exec",
+    "mise tasks run my-task",
+]
 
 [[command.sub]]
 name = "list"
@@ -44,7 +60,6 @@ standalone = ["--force", "--help", "-h"]
 
 [[command.sub]]
 name = "use"
-aliases = ["u"]
 level = "SafeWrite"
 bare = false
 standalone = [
@@ -56,7 +71,6 @@ valued = ["--cd"]
 
 [[command.sub]]
 name = "install"
-aliases = ["i"]
 level = "SafeWrite"
 standalone = [
     "--force", "--help", "--quiet", "--verbose",
@@ -66,14 +80,12 @@ valued = ["--jobs", "-j"]
 
 [[command.sub]]
 name = "uninstall"
-aliases = ["remove", "rm"]
 level = "SafeWrite"
 bare = false
 standalone = ["--all", "--dry-run", "--help", "-a", "-n", "-h"]
 
 [[command.sub]]
 name = "upgrade"
-aliases = ["up"]
 level = "SafeWrite"
 standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
 valued = ["--jobs", "-j"]

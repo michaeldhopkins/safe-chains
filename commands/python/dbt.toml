@@ -32,7 +32,6 @@ valued = ["--profile", "--profiles-dir", "--project-dir", "--target", "--target-
 
 [[command.sub]]
 name = "ls"
-aliases = ["list"]
 level = "SafeRead"
 bare = true
 standalone = ["--help", "--no-version-check", "--quiet", "--resource-type", "-h", "-q"]

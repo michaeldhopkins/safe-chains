@@ -357,33 +357,124 @@ Aliases: `fly`
 ### `koyeb`
 <p class="cmd-url"><a href="https://www.koyeb.com/docs/build-and-deploy/cli">https://www.koyeb.com/docs/build-and-deploy/cli</a></p>
 
+- **a describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **a get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **a list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **app describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **app get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **app list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **apps describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **apps get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **apps list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **d describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **d get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **d l**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **d list**: Flags: --help, -h. Valued: --app, --organization, --output, --service, --token, --url, -o
+- **d log**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **d logs**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **dep describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **dep get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **dep l**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **dep list**: Flags: --help, -h. Valued: --app, --organization, --output, --service, --token, --url, -o
+- **dep log**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **dep logs**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **depl describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **depl get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **depl l**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **depl list**: Flags: --help, -h. Valued: --app, --organization, --output, --service, --token, --url, -o
+- **depl log**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **depl logs**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **deployment describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **deployment get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **deployment l**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **deployment list**: Flags: --help, -h. Valued: --app, --organization, --output, --service, --token, --url, -o
+- **deployment log**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **deployment logs**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
 - **deployments describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **deployments get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **deployments l**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
 - **deployments list**: Flags: --help, -h. Valued: --app, --organization, --output, --service, --token, --url, -o
+- **deployments log**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
 - **deployments logs**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
+- **dom describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **dom get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **dom list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **domain describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **domain get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **domain list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **domains describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **domains get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **domains list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **i describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **i get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **i l**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
+- **i list**: Flags: --help, -h. Valued: --app, --organization, --output, --service, --token, --url, -o
+- **i log**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
+- **i logs**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
+- **inst describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **inst get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **inst l**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
+- **inst list**: Flags: --help, -h. Valued: --app, --organization, --output, --service, --token, --url, -o
+- **inst log**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
+- **inst logs**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
+- **instance describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **instance get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **instance l**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
+- **instance list**: Flags: --help, -h. Valued: --app, --organization, --output, --service, --token, --url, -o
+- **instance log**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
+- **instance logs**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
 - **instances describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **instances get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **instances l**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
 - **instances list**: Flags: --help, -h. Valued: --app, --organization, --output, --service, --token, --url, -o
+- **instances log**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
 - **instances logs**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, -e, -s
 - **login**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **metrics get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **org list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **organization list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **organizations list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **region get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **region list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **regions get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **regions list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **s describe**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **s get**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **s l**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
+- **s list**: Flags: --help, -h. Valued: --app, --name, --organization, --output, --token, --url, -a, -n, -o
+- **s log**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
+- **s logs**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
+- **s unapplied-changes**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **sec describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **sec get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **sec list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **secret describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **secret get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **secret list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **secrets describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **secrets get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **secrets list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **service describe**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **service get**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **service l**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
+- **service list**: Flags: --help, -h. Valued: --app, --name, --organization, --output, --token, --url, -a, -n, -o
+- **service log**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
+- **service logs**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
+- **service unapplied-changes**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
 - **services describe**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
 - **services get**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **services l**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
 - **services list**: Flags: --help, -h. Valued: --app, --name, --organization, --output, --token, --url, -a, -n, -o
+- **services log**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
 - **services logs**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
 - **services unapplied-changes**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **svc describe**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **svc get**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
+- **svc l**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
+- **svc list**: Flags: --help, -h. Valued: --app, --name, --organization, --output, --token, --url, -a, -n, -o
+- **svc log**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
+- **svc logs**: Flags: --help, --tail, -h. Valued: --app, --end-time, --instance, --order, --regex-search, --since, --start-time, --text-search, --type, -a, -t
+- **svc unapplied-changes**: Flags: --help, -h. Valued: --app, --organization, --output, --token, --url, -a, -o
 - **version**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **whoami**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - Allowed standalone flags: --help, --version, -h, -v
@@ -875,6 +966,7 @@ Aliases: `upsun`
 - **integration-link**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
 - **integrations**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
 - **keys**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **l**: Flags: --follow, --help, -f, -h. Valued: --addon, --app, --database, --filter, --lines, --region, -F, -a, -n
 - **log-drains**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
 - **login**: Flags: --help, --password-only, --ssh, -h. Valued: --addon, --api-token, --app, --database, --region, --ssh-identity, -a
 - **logout**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
@@ -893,6 +985,7 @@ Aliases: `upsun`
 - **stats**: Flags: --help, --stream, -h. Valued: --addon, --app, --database, --region, -a
 - **timeline**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
 - **user-timeline**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
+- **whoami**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `security`

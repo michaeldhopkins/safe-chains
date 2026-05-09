@@ -96,6 +96,9 @@
 <p class="cmd-url"><a href="https://www.mercurial-scm.org/doc/hg.1.html">https://www.mercurial-scm.org/doc/hg.1.html</a></p>
 
 - **annotate**: Flags: --changeset, --date, --file, --follow, --help, --ignore-all-space, --ignore-blank-lines, --ignore-space-change, --ignore-space-at-eol, --line-number, --no-binary, --no-follow, --number, --quiet, --text, --user, --verbose, -B, -Z, -a, -b, -c, -d, -f, -h, -l, -n, -q, -u, -v, -w. Valued: --exclude, --include, --rev, --skip, -I, -X, -r. Positional args accepted
+- **blame**: Flags: --changeset, --date, --file, --follow, --help, --ignore-all-space, --ignore-blank-lines, --ignore-space-change, --ignore-space-at-eol, --line-number, --no-binary, --no-follow, --number, --quiet, --text, --user, --verbose, -B, -Z, -a, -b, -c, -d, -f, -h, -l, -n, -q, -u, -v, -w. Valued: --exclude, --include, --rev, --skip, -I, -X, -r. Positional args accepted
+- **bm**: Flags: --active, --all, --delete, --force, --help, --inactive, --rename, -B, -d, -f, -h, -i, -l, -m. Valued: --rev, -r. Positional args accepted
+- **bookmark**: Flags: --active, --all, --delete, --force, --help, --inactive, --rename, -B, -d, -f, -h, -i, -l, -m. Valued: --rev, -r. Positional args accepted
 - **bookmarks**: Flags: --active, --all, --delete, --force, --help, --inactive, --rename, -B, -d, -f, -h, -i, -l, -m. Valued: --rev, -r. Positional args accepted
 - **branch**: Flags: --clean, --force, --help, -C, -f, -h. Positional args accepted
 - **branches**: Flags: --active, --closed, --help, -a, -c, -h. Valued: --rev, --style, --template, -T, -r
@@ -107,13 +110,17 @@
 - **heads**: Flags: --active, --closed, --help, -a, -c, -h. Valued: --rev, --style, --template, -T, -r. Positional args accepted
 - **help**: Positional args accepted
 - **id**: Flags: --branch, --bookmarks, --debug, --help, --id, --num, --tags, -B, -b, -h, -i, -n, -r, -t. Valued: --rev, -r. Positional args accepted
+- **identify**: Flags: --branch, --bookmarks, --debug, --help, --id, --num, --tags, -B, -b, -h, -i, -n, -r, -t. Valued: --rev, -r. Positional args accepted
 - **incoming**: Flags: --bookmarks, --branch, --bundle, --force, --graph, --help, --insecure, --newest-first, --patch, -B, -G, -S, -b, -f, -h, -l, -n, -p, -r. Valued: --branch, --bundle, --rev, --ssh, --remotecmd, -r. Positional args accepted
 - **log**: Flags: --branch, --copies, --debug, --follow, --follow-first, --git, --graph, --hidden, --help, --no-merges, --patch, --quiet, --removed, --reverse, --stat, --style, --template, --user, --verbose, -G, -M, -T, -b, -c, -d, -f, -g, -h, -k, -l, -p, -q, -r, -u, -v, -y. Valued: --branch, --date, --exclude, --include, --keyword, --limit, --prune, --rev, --style, --template, --user, -T, -X, -d, -f, -k, -l, -r, -u. Positional args accepted
 - **manifest**: Flags: --all, --debug, --help, -h. Valued: --rev, -r. Positional args accepted
 - **outgoing**: Flags: --bookmarks, --branch, --force, --graph, --help, --insecure, --newest-first, --patch, --ssh, --remotecmd, -B, -G, -S, -b, -f, -h, -l, -n, -p, -r. Valued: --branch, --rev, --ssh, --remotecmd, -r. Positional args accepted
 - **parents**: Flags: --help, -h. Valued: --rev, --style, --template, -T, -r. Positional args accepted
 - **paths**: Flags: --help, --quiet, --verbose, -q, -v. Positional args accepted
+- **showconfig**: Flags: --debug, --edit, --global, --help, --local, --non-shared, --quiet, --user, -e, -h, -q. Valued: --source, -T, --template. Positional args accepted
+- **st**: Flags: --all, --added, --clean, --copies, --deleted, --ignored, --modified, --no-status, --print0, --quiet, --removed, --rev, --terse, --unknown, -0, -A, -C, -T, -a, -c, -d, -h, -i, -m, -n, -q, -r, -u. Valued: --change, --exclude, --include, --rev, --terse, -I, -X, -r, -t. Positional args accepted
 - **status**: Flags: --all, --added, --clean, --copies, --deleted, --ignored, --modified, --no-status, --print0, --quiet, --removed, --rev, --terse, --unknown, -0, -A, -C, -T, -a, -c, -d, -h, -i, -m, -n, -q, -r, -u. Valued: --change, --exclude, --include, --rev, --terse, -I, -X, -r, -t. Positional args accepted
+- **sum**: Flags: --help, --remote, -h
 - **summary**: Flags: --help, --remote, -h
 - **tags**: Flags: --debug, --help, --quiet, --verbose, -h, -q, -v
 - **tip**: Flags: --help, --patch, --style, --template, -T, -h, -p
@@ -196,6 +203,8 @@
 ### `svn`
 <p class="cmd-url"><a href="https://subversion.apache.org/docs/release-notes/1.14.html">https://subversion.apache.org/docs/release-notes/1.14.html</a></p>
 
+- **ann**: Flags: --force, --help, --use-merge-history, --xml, -g, -h, -r, -v, -x. Valued: --config-dir, --diff-cmd, --extensions, --password, --revision, --username, -r, -x. Positional args accepted
+- **annotate**: Flags: --force, --help, --use-merge-history, --xml, -g, -h, -r, -v, -x. Valued: --config-dir, --diff-cmd, --extensions, --password, --revision, --username, -r, -x. Positional args accepted
 - **blame**: Flags: --force, --help, --use-merge-history, --xml, -g, -h, -r, -v, -x. Valued: --config-dir, --diff-cmd, --extensions, --password, --revision, --username, -r, -x. Positional args accepted
 - **cat**: Flags: --help, --ignore-keywords, -h, -r. Valued: --config-dir, --password, --revision, --username, -r. Positional args accepted
 - **diff**: Flags: --diff-cmd, --force, --git, --help, --no-diff-deleted, --no-diff-added, --no-diff-statistics, --notice-ancestry, --patch-compatible, --summarize, --xml, -c, -h, -r, -x. Valued: --changelist, --config-dir, --config-option, --depth, --diff-cmd, --extensions, --internal-diff, --new, --old, --password, --revision, --username, -c, -r, -x. Positional args accepted
@@ -203,9 +212,17 @@
 - **info**: Flags: --help, --include-externals, --incremental, --recursive, --targets, --xml, -R, -h, -r. Valued: --changelist, --config-dir, --depth, --password, --revision, --targets, --username, -r. Positional args accepted
 - **list**: Flags: --depth, --help, --incremental, --recursive, --verbose, --xml, -R, -h, -r, -v. Valued: --config-dir, --depth, --password, --revision, --username, -r. Positional args accepted
 - **log**: Flags: --all-revprops, --diff, --help, --incremental, --quiet, --revprop, --search, --stop-on-copy, --use-merge-history, --verbose, --with-all-revprops, --with-no-revprops, --xml, -c, -g, -h, -l, -q, -r, -v. Valued: --changelist, --config-dir, --config-option, --depth, --diff-cmd, --limit, --password, --revision, --search-and, --targets, --username, --with-revprop, --xml-file, -c, -g, -l, -r. Positional args accepted
+- **ls**: Flags: --depth, --help, --incremental, --recursive, --verbose, --xml, -R, -h, -r, -v. Valued: --config-dir, --depth, --password, --revision, --username, -r. Positional args accepted
 - **mergeinfo**: Flags: --from-source, --help, --show-revs, -h. Valued: --config-dir, --password, --revision, --username, -R, -r. Positional args accepted
+- **pg**: Flags: --depth, --help, --no-newline, --recursive, --revprop, --show-inherited-props, --strict, --verbose, --xml, -R, -h, -r, -v. Valued: --changelist, --config-dir, --depth, --password, --revision, --username, -r. Positional args accepted
+- **pget**: Flags: --depth, --help, --no-newline, --recursive, --revprop, --show-inherited-props, --strict, --verbose, --xml, -R, -h, -r, -v. Valued: --changelist, --config-dir, --depth, --password, --revision, --username, -r. Positional args accepted
+- **pl**: Flags: --depth, --help, --incremental, --quiet, --recursive, --revprop, --show-inherited-props, --verbose, --xml, -R, -h, -q, -r, -v. Valued: --changelist, --config-dir, --depth, --password, --revision, --username, -r. Positional args accepted
+- **plist**: Flags: --depth, --help, --incremental, --quiet, --recursive, --revprop, --show-inherited-props, --verbose, --xml, -R, -h, -q, -r, -v. Valued: --changelist, --config-dir, --depth, --password, --revision, --username, -r. Positional args accepted
+- **praise**: Flags: --force, --help, --use-merge-history, --xml, -g, -h, -r, -v, -x. Valued: --config-dir, --diff-cmd, --extensions, --password, --revision, --username, -r, -x. Positional args accepted
 - **propget**: Flags: --depth, --help, --no-newline, --recursive, --revprop, --show-inherited-props, --strict, --verbose, --xml, -R, -h, -r, -v. Valued: --changelist, --config-dir, --depth, --password, --revision, --username, -r. Positional args accepted
 - **proplist**: Flags: --depth, --help, --incremental, --quiet, --recursive, --revprop, --show-inherited-props, --verbose, --xml, -R, -h, -q, -r, -v. Valued: --changelist, --config-dir, --depth, --password, --revision, --username, -r. Positional args accepted
+- **st**: Flags: --changelist, --config-dir, --depth, --help, --ignore-externals, --incremental, --no-ignore, --quiet, --show-updates, --verbose, --xml, -N, -h, -q, -u, -v. Valued: --changelist, --config-dir, --config-option, --depth. Positional args accepted
+- **stat**: Flags: --changelist, --config-dir, --depth, --help, --ignore-externals, --incremental, --no-ignore, --quiet, --show-updates, --verbose, --xml, -N, -h, -q, -u, -v. Valued: --changelist, --config-dir, --config-option, --depth. Positional args accepted
 - **status**: Flags: --changelist, --config-dir, --depth, --help, --ignore-externals, --incremental, --no-ignore, --quiet, --show-updates, --verbose, --xml, -N, -h, -q, -u, -v. Valued: --changelist, --config-dir, --config-option, --depth. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 

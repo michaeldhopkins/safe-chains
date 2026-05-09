@@ -4,6 +4,19 @@ description = "Scalingo's PaaS CLI (Go, github.com/Scalingo/cli) for Heroku-styl
 url = "https://doc.scalingo.com/platform/cli/start"
 researched_version = "github.com/Scalingo/cli @ master, 2026-05-06 (Go)"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "scalingo apps",
+    "scalingo self",
+    "scalingo whoami",
+    "scalingo logs",
+    "scalingo l",
+    "scalingo --version",
+]
+examples_denied = [
+    "scalingo run -a myapp -- bash",
+    "scalingo deploy",
+    "scalingo env-set FOO=bar",
+]
 
 [command.wrapper]
 valued = ["--addon", "--app", "--database", "--region", "-a"]

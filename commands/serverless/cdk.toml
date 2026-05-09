@@ -4,6 +4,20 @@ description = "AWS Cloud Development Kit. `init` scaffolds a CDK project. `synth
 url = "https://docs.aws.amazon.com/cdk/v2/guide/cli.html"
 researched_version = "AWS CDK 2.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "cdk version",
+    "cdk synth",
+    "cdk synthesize",
+    "cdk list",
+    "cdk ls",
+    "cdk diff",
+    "cdk doctor",
+]
+examples_denied = [
+    "cdk deploy",
+    "cdk destroy",
+    "cdk bootstrap",
+]
 
 [[command.sub]]
 name = "version"
@@ -23,7 +37,6 @@ standalone = ["--help", "--unacknowledged", "-h", "-u"]
 
 [[command.sub]]
 name = "list"
-aliases = ["ls"]
 level = "SafeRead"
 bare = true
 positional_style = true

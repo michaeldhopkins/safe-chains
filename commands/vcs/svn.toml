@@ -4,6 +4,31 @@ description = "Subversion — centralized version control. Read-side: `log`, `di
 url = "https://subversion.apache.org/docs/release-notes/1.14.html"
 researched_version = "Subversion 1.14"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "svn log",
+    "svn status",
+    "svn stat",
+    "svn st",
+    "svn list",
+    "svn ls",
+    "svn info",
+    "svn diff",
+    "svn blame foo.c",
+    "svn praise foo.c",
+    "svn annotate foo.c",
+    "svn ann foo.c",
+    "svn proplist",
+    "svn plist",
+    "svn pl",
+    "svn propget svn:keywords foo.c",
+    "svn pget svn:keywords foo.c",
+]
+examples_denied = [
+    "svn commit",
+    "svn ci",
+    "svn checkout https://example.com/svn/repo",
+    "svn co https://example.com/svn/repo",
+]
 
 [[command.sub]]
 name = "log"

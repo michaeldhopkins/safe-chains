@@ -4,6 +4,40 @@ description = "Koyeb's PaaS CLI (Go, github.com/koyeb/koyeb-cli) for managing ap
 url = "https://www.koyeb.com/docs/build-and-deploy/cli"
 researched_version = "github.com/koyeb/koyeb-cli @ master, 2026-05-08 (Go)"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "koyeb apps list",
+    "koyeb app list",
+    "koyeb a list",
+    "koyeb deployments list",
+    "koyeb deployment list",
+    "koyeb dep list",
+    "koyeb d list",
+    "koyeb services list",
+    "koyeb service list",
+    "koyeb svc list",
+    "koyeb s list",
+    "koyeb instances list",
+    "koyeb instance list",
+    "koyeb inst list",
+    "koyeb i list",
+    "koyeb secrets list",
+    "koyeb secret list",
+    "koyeb sec list",
+    "koyeb domains list",
+    "koyeb domain list",
+    "koyeb dom list",
+    "koyeb regions list",
+    "koyeb region list",
+    "koyeb organizations list",
+    "koyeb organization list",
+    "koyeb org list",
+]
+examples_denied = [
+    "koyeb apps create my-app",
+    "koyeb services delete svc-1",
+    "koyeb secrets reveal API_KEY",
+    "koyeb instances exec inst-1 -- /bin/sh",
+]
 
 [command.wrapper]
 standalone = ["--debug", "--debug-full", "--force-ascii", "--full", "-d"]

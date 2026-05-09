@@ -4,6 +4,26 @@ description = "Mercurial — distributed version control. Read-side: `log`, `dif
 url = "https://www.mercurial-scm.org/doc/hg.1.html"
 researched_version = "Mercurial 6.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "hg log",
+    "hg status",
+    "hg st",
+    "hg summary",
+    "hg sum",
+    "hg id",
+    "hg identify",
+    "hg blame foo.py",
+    "hg annotate foo.py",
+    "hg bookmarks",
+    "hg bm",
+    "hg config",
+    "hg showconfig",
+]
+examples_denied = [
+    "hg push",
+    "hg commit",
+    "hg pull",
+]
 
 [[command.sub]]
 name = "version"

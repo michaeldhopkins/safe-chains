@@ -4,6 +4,17 @@ description = "Hexo — Node.js static blog framework. `init` scaffolds a projec
 url = "https://hexo.io/docs/commands"
 researched_version = "hexo 7.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "hexo version",
+    "hexo list page",
+    "hexo config",
+    "hexo generate",
+    "hexo g",
+]
+examples_denied = [
+    "hexo deploy",
+    "hexo server",
+]
 
 [[command.sub]]
 name = "version"

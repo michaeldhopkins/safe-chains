@@ -569,6 +569,7 @@ Aliases: `g++`, `cc`, `c++`
 - **clean**: Flags: --help, -h
 - **config**: Flags: --help, -h. Positional args accepted
 - **g**: Flags: --bail, --debug, --deploy, --draft, --drafts, --force, --help, --silent, --verbose, --watch, -d, -f, -h, -w. Valued: --concurrency, -c
+- **g**: Flags: --bail, --debug, --deploy, --draft, --drafts, --force, --help, --silent, --verbose, --watch, -d, -f, -h, -w. Valued: --concurrency, -c
 - **generate**: Flags: --bail, --debug, --deploy, --draft, --drafts, --force, --help, --silent, --verbose, --watch, -d, -f, -h, -w. Valued: --concurrency, -c
 - **help**: Positional args accepted
 - **init**: Flags: --clone, --debug, --draft, --drafts, --help, --no-clone, --silent, --verbose, -h. Positional args accepted
