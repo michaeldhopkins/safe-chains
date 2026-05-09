@@ -22,11 +22,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
-pub(crate) const REGISTRY: &[crate::handlers::CommandEntry] = &[
-    crate::handlers::CommandEntry::Positional { cmd: "bunx" },
-];
-
-#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
 

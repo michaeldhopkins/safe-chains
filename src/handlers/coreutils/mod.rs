@@ -37,10 +37,8 @@ pub(super) fn full_registry() -> Vec<&'static super::CommandEntry> {
     let mut v = Vec::new();
     v.extend(data::registry());
     v.extend(tar::REGISTRY);
-    v.extend(find::REGISTRY);
     v.extend(sed::REGISTRY);
     v.extend(awk::REGISTRY);
     v.extend(net::registry());
-    v.extend(grep::REGISTRY);
     v
 }

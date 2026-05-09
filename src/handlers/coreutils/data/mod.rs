@@ -20,6 +20,5 @@ pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {
 pub(super) fn registry() -> Vec<&'static crate::handlers::CommandEntry> {
     let mut v = Vec::new();
     v.extend(dasel::REGISTRY);
-    v.extend(mlr::REGISTRY);
     v
 }

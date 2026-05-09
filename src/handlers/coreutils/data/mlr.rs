@@ -49,11 +49,6 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
-pub(in crate::handlers::coreutils) const REGISTRY: &[crate::handlers::CommandEntry] = &[
-    crate::handlers::CommandEntry::Positional { cmd: "mlr" },
-];
-
-#[cfg(test)]
 mod tests {
     use crate::is_safe_command;
     fn check(cmd: &str) -> bool { is_safe_command(cmd) }

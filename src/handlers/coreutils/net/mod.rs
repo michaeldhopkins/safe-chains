@@ -21,6 +21,5 @@ pub(super) fn command_docs() -> Vec<crate::docs::CommandDoc> {
 pub(super) fn registry() -> Vec<&'static crate::handlers::CommandEntry> {
     let mut v = Vec::new();
     v.extend(nslookup::REGISTRY);
-    v.extend(route::REGISTRY);
     v
 }

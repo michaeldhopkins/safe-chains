@@ -136,9 +136,7 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
 }
 
 #[cfg(test)]
-pub(in crate::handlers::android) const REGISTRY: &[crate::handlers::CommandEntry] = &[
-    crate::handlers::CommandEntry::Positional { cmd: "adb" },
-];
+pub(in crate::handlers::android) const REGISTRY: &[crate::handlers::CommandEntry] = &[];
 
 #[cfg(test)]
 mod tests {
