@@ -1,0 +1,23 @@
+[[command]]
+name = "racc"
+description = "LALR(1) parser generator for Ruby. Reads a `.y` grammar file and writes a generated Ruby parser module to the file given by -o. Pure code generation — does not execute the grammar's actions at generation time. The -O flag emits a binary debug table file. -E embeds racc's runtime into the generated parser. -C/--check-only validates the grammar without writing output. -v/--verbose writes a `.output` log alongside the parser. Distributed with Ruby and as a separate gem; the surface is essentially frozen."
+url = "https://github.com/ruby/racc"
+researched_version = "racc 1.x; surface stable"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--check-only", "--debug", "--embedded",
+    "--frozen", "--help",
+    "--line-convert-all", "--no-extensions",
+    "--no-line-convert", "--no-omit-actions",
+    "--output-status-table", "--profile",
+    "--superclass", "--verbose", "--version",
+    "-C", "-E", "-F", "-N", "-O", "-S", "-V", "-a",
+    "-c", "-g", "-h", "-l", "-t", "-v",
+]
+valued = [
+    "--executable", "--log-file", "--output-file",
+    "--runtime", "--template",
+    "-e", "-o",
+]

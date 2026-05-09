@@ -1,0 +1,25 @@
+[[command]]
+name = "stackprof"
+description = "Sampling profiler for Ruby. The CLI's primary mode is analysing existing `.dump` profile files: `--text` (default), `--json`, `--files`, `--callgrind`, `--graphviz`, `--stackcollapse`, `--timeline-flamegraph`, `--alphabetical-flamegraph`, `--d3-flamegraph`, and `--dump` all read a saved profile and print a report to stdout. `--method`, `--file`, `--select-files`, `--reject-files`, `--select-names`, and `--reject-names` filter the report. `--walk` is an interactive curses-style navigator. `--out FILENAME` is meaningful when stackprof is used as a profiler driver around another Ruby program; in analysis mode it is unused. All flags are long-form only — the tool does not define short forms. Active maintenance."
+url = "https://github.com/tmm1/stackprof"
+researched_version = "stackprof 0.2.28 (February 2026)"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--alphabetical-flamegraph", "--callgrind",
+    "--d3-flamegraph", "--debug", "--dump",
+    "--files", "--flamegraph",
+    "--graphviz", "--ignore-gc",
+    "--help", "--json",
+    "--raw", "--sort-total",
+    "--stackcollapse", "--text",
+    "--timeline-flamegraph", "--version",
+]
+valued = [
+    "--file", "--flamegraph-viewer",
+    "--interval", "--limit", "--method", "--mode",
+    "--node-fraction", "--out",
+    "--reject-files", "--reject-names",
+    "--select-files", "--select-names",
+]

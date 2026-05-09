@@ -1,0 +1,9 @@
+[[command]]
+name = "whenever"
+description = "Cron management tool that compiles config/schedule.rb into crontab format. Loading schedule.rb evaluates arbitrary Ruby (DSL plus any helpers/initializers the user requires). The --update-crontab/-w and --clear-crontab flags also write to the user's crontab — a system-level resource that affects scheduled execution outside this project. Bare `whenever` prints the compiled crontab to stdout but still loads schedule.rb. Only --help/--version have a fixed safe surface."
+url = "https://github.com/javan/whenever"
+researched_version = "whenever 1.0.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

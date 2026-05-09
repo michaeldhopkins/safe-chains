@@ -74,41 +74,69 @@ pub fn check_bundle_exec(tokens: &[Token]) -> Verdict {
         cmd.as_str(),
         "annotate"
         | "annotaterb"
+        | "asciidoctor"
         | "brakeman"
         | "bridgetown"
         | "bundle-audit"
         | "bundler-audit"
         | "byebug"
         | "cucumber"
+        | "danger"
+        | "dawn"
+        | "debride"
         | "erb_lint"
         | "erblint"
+        | "erd"
         | "fasterer"
         | "flay"
         | "flog"
         | "foreman"
+        | "fpm"
         | "gem"
         | "guard"
+        | "haml"
         | "haml-lint"
         | "herb"
+        | "i18n-tasks"
         | "jekyll"
+        | "kamal"
+        | "kramdown"
         | "license_finder"
         | "m"
         | "middleman"
+        | "mutant"
         | "overcommit"
+        | "packwerk"
+        | "parallel_cucumber"
+        | "parallel_rspec"
+        | "parallel_spinach"
+        | "parallel_test"
         | "pry"
+        | "racc"
+        | "railroady"
         | "rails"
         | "rake"
+        | "rbs"
         | "rdoc"
         | "reek"
+        | "rex"
         | "rspec"
         | "rubocop"
         | "rubycritic"
         | "ruby-audit"
+        | "rufo"
         | "sdoc"
         | "slim-lint"
+        | "slimrb"
         | "spring"
+        | "srb"
+        | "stackprof"
         | "standardrb"
+        | "steep"
+        | "stree"
         | "thor"
+        | "typeprof"
+        | "whenever"
         | "yard"
         | "yardoc"
     ) {
@@ -196,6 +224,32 @@ mod tests {
         bundle_exec_pry_version: "bundle exec pry --version",
         bundle_exec_byebug_version: "bundle exec byebug --version",
         bundle_exec_rake_help: "bundle exec rake --help",
+        bundle_exec_steep_check: "bundle exec steep check",
+        bundle_exec_steep_stats: "bundle exec steep stats",
+        bundle_exec_srb_tc: "bundle exec srb tc",
+        bundle_exec_srb_tc_autocorrect: "bundle exec srb tc -a",
+        bundle_exec_rbs_validate: "bundle exec rbs validate",
+        bundle_exec_rbs_list: "bundle exec rbs list --class",
+        bundle_exec_rbs_collection_install: "bundle exec rbs collection install",
+        bundle_exec_typeprof: "bundle exec typeprof app.rb",
+        bundle_exec_typeprof_out: "bundle exec typeprof -o sig/app.rbs app.rb",
+        bundle_exec_stree_check: "bundle exec stree check lib/",
+        bundle_exec_stree_format: "bundle exec stree format lib/foo.rb",
+        bundle_exec_stree_write: "bundle exec stree write lib/foo.rb",
+        bundle_exec_rufo_check: "bundle exec rufo --check lib/",
+        bundle_exec_rufo: "bundle exec rufo lib/",
+        bundle_exec_packwerk_check: "bundle exec packwerk check",
+        bundle_exec_packwerk_update_todo: "bundle exec packwerk update-todo",
+        bundle_exec_debride: "bundle exec debride lib/",
+        bundle_exec_i18n_tasks_missing: "bundle exec i18n-tasks missing",
+        bundle_exec_i18n_tasks_health: "bundle exec i18n-tasks health",
+        bundle_exec_i18n_tasks_normalize: "bundle exec i18n-tasks normalize",
+        bundle_exec_i18n_tasks_remove_unused: "bundle exec i18n-tasks remove-unused",
+        bundle_exec_asciidoctor: "bundle exec asciidoctor README.adoc",
+        bundle_exec_kramdown: "bundle exec kramdown README.md",
+        bundle_exec_dawn_scan: "bundle exec dawn scan app/",
+        bundle_exec_stackprof: "bundle exec stackprof tmp/profile.dump",
+        bundle_exec_fpm: "bundle exec fpm -s dir -t deb -n mypkg lib/",
         bundle_exec_erb_lint: "bundle exec erb_lint app/views/foo.html.erb",
         bundle_exec_herb_lint: "bundle exec herb lint app/views/foo.html.erb",
         bundle_exec_herb_format_check: "bundle exec herb format --check app/views/foo.html.erb",
@@ -279,6 +333,16 @@ mod tests {
         bundle_exec_annotaterb_models_denied: "bundle exec annotaterb models",
         bundle_exec_thor_list_denied: "bundle exec thor list",
         bundle_exec_haml_lint_unknown_denied: "bundle exec haml-lint --xyzzy",
+        bundle_exec_srb_init_denied: "bundle exec srb init",
+        bundle_exec_srb_rbi_denied: "bundle exec srb rbi gems",
+        bundle_exec_steep_watch_denied: "bundle exec steep watch",
+        bundle_exec_steep_langserver_denied: "bundle exec steep langserver",
+        bundle_exec_rbs_test_denied: "bundle exec rbs test",
+        bundle_exec_stree_lsp_denied: "bundle exec stree lsp",
+        bundle_exec_i18n_tasks_irb_denied: "bundle exec i18n-tasks irb",
+        bundle_exec_kamal_deploy_denied: "bundle exec kamal deploy",
+        bundle_exec_danger_pr_denied: "bundle exec danger pr",
+        bundle_exec_mutant_run_denied: "bundle exec mutant run -- Foo",
         bundle_exec_ruby_denied: "bundle exec ruby script.rb",
         bundle_config_set_denied: "bundle config set path vendor/bundle",
         bundle_config_unset_denied: "bundle config unset path",

@@ -1,0 +1,98 @@
+[[command]]
+name = "kamal"
+description = "Rails-flavoured Docker deployment tool — provisions servers via SSH, builds and pushes images to a registry, and orchestrates blue/green deploys. Every action subcommand (`setup`, `deploy`, `redeploy`, `rollback`, `app exec`, `app logs`, `prune`, `lock`, `traefik`, `accessory`, `proxy`, `audit`, `secrets`, `server`) reaches out to remote hosts over SSH and/or executes Docker commands against a remote registry — these are external-system writes and not auto-approvable under safe-chains' local-only SafeWrite policy. The `version` subcommand and `--help` print without contacting any remote."
+url = "https://kamal-deploy.org/"
+researched_version = "kamal 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "setup"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "redeploy"
+candidate = true
+
+[[command.sub]]
+name = "rollback"
+candidate = true
+
+[[command.sub]]
+name = "app"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "registry"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "accessory"
+candidate = true
+
+[[command.sub]]
+name = "proxy"
+candidate = true
+
+[[command.sub]]
+name = "traefik"
+candidate = true
+
+[[command.sub]]
+name = "secrets"
+candidate = true
+
+[[command.sub]]
+name = "envify"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "lock"
+candidate = true
+
+[[command.sub]]
+name = "prune"
+candidate = true
+
+[[command.sub]]
+name = "audit"
+candidate = true
+
+[[command.sub]]
+name = "details"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true

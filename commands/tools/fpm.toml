@@ -1,0 +1,32 @@
+[[command]]
+name = "fpm"
+description = "Package builder — converts between source formats (dir, tar, gem, python, cpan, npm, deb, rpm, ...) and emits a target package (deb, rpm, apk, snap, tar, dir, ...). Always writes the resulting package file (-p PATH or a default `<name>_<version>.<arch>.<ext>` in the working directory). With source types like gem/python/cpan/npm, fpm fetches upstream artifacts from the corresponding registry — those input types perform network operations as part of building the package. The maintainer-script flags (--before-install, --after-install, --before-remove, --after-remove, --before-upgrade, --after-upgrade) take script paths whose contents are bundled into the resulting package; the scripts are executed by the package manager on the install target, not by fpm itself. The -e/--edit flag opens an interactive editor and is not part of the safe surface."
+url = "https://fpm.readthedocs.io/"
+researched_version = "fpm 1.17.0 (October 2025)"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--debug", "--debug-workspace", "--force",
+    "--help", "--no-auto-depends", "--no-depends",
+    "--source-date-epoch-from-changelog",
+    "--template-scripts", "--verbose", "--version",
+    "-f", "-h",
+]
+valued = [
+    "--after-install", "--after-remove", "--after-upgrade",
+    "--architecture", "--before-install", "--before-remove",
+    "--before-upgrade", "--category", "--chdir",
+    "--config-files", "--conflicts", "--depends",
+    "--description", "--directories", "--epoch",
+    "--exclude", "--exclude-file", "--fpm-options-file",
+    "--input-type", "--inputs", "--iteration",
+    "--license", "--log", "--maintainer",
+    "--name", "--output-type", "--package",
+    "--package-name-suffix", "--prefix", "--provides",
+    "--replaces", "--source-date-epoch-default",
+    "--template-value", "--url", "--vendor", "--version",
+    "--workdir",
+    "-C", "-S", "-a", "-d", "-m", "-n", "-p", "-s",
+    "-t", "-v", "-x",
+]

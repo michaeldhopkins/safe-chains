@@ -1,0 +1,9 @@
+[[command]]
+name = "haml"
+description = "Renders HAML templates to HTML (or other targets) by evaluating the template — embedded Ruby in `=` and `-` lines is executed at render time. Outputs to stdout by default, or to a file when a second positional argument is given. Only the diagnostic flags --help and --version have a fixed safe surface; rendering any template runs arbitrary Ruby."
+url = "https://haml.info/"
+researched_version = "haml 6.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

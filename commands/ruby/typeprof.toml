@@ -1,0 +1,21 @@
+[[command]]
+name = "typeprof"
+description = "Type analyzer for Ruby — performs abstract interpretation over Ruby source to infer type signatures and emits RBS to stdout (or to the file given by -o). Loads and resolves required files, so loading hostile project Ruby still triggers `require` resolution; default classification is SafeRead since it does not execute methods. -o writes inferred RBS to disk; --init scaffolds a typeprof.conf.jsonc. --lsp / --port / --stdio put the binary in long-running language-server mode. --stackprof writes a profile dump as a side-effect. Active project on the 0.x line."
+url = "https://github.com/ruby/typeprof"
+researched_version = "typeprof 0.31.1 (December 2025)"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--no-collection", "--no-show-errors",
+    "--no-show-parameter-names", "--no-show-source-locations",
+    "--no-show-stats", "--no-show-typeprof-version",
+    "--quiet", "--show-errors", "--show-parameter-names",
+    "--show-source-locations", "--show-stats",
+    "--show-typeprof-version", "--verbose", "--version",
+    "-h", "-q", "-v",
+]
+valued = [
+    "--collection", "--exclude",
+    "-o",
+]
+write_flags = ["-o"]

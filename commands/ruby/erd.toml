@@ -1,0 +1,9 @@
+[[command]]
+name = "erd"
+description = "Standalone binary from rails-erd that generates entity-relationship diagrams of ActiveRecord models. Like railroady, generating the diagram requires booting Rails to introspect ActiveRecord — arbitrary Ruby is executed at startup (same risk profile as `rails runner`). Only the diagnostic flags --help and --version have a fixed safe surface."
+url = "https://github.com/voormedia/rails-erd"
+researched_version = "rails-erd 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

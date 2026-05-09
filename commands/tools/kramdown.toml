@@ -1,0 +1,22 @@
+[[command]]
+name = "kramdown"
+description = "Kramdown / Markdown converter. Reads Markdown (or other input formats — kramdown, html) from stdin or file arguments and prints converted output to stdout in the requested format (html, kramdown, latex, man, remove_html_tags, etc.). Pure conversion — does not execute embedded code. Default output is to stdout; the tool does not write files implicitly. The -x/--extension flag and the dynamic --template option load arbitrary Ruby / template files and are not part of the safe surface. The dynamic option set derived from `Kramdown::Options.definitions` is large; common formatting flags are listed below."
+url = "https://kramdown.gettalong.org/"
+researched_version = "kramdown 2.5.2 (January 2026)"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--auto-id-prefix", "--auto-ids", "--enable-coderay",
+    "--gfm-quirks", "--hard-wrap", "--help",
+    "--no-auto-ids", "--no-config-file", "--no-hard-wrap",
+    "--smart-quotes", "--version",
+    "-h", "-v",
+]
+valued = [
+    "--config-file", "--coderay-line-numbers",
+    "--entity-output", "--footnote-nr",
+    "--header-offset", "--input", "--math-engine",
+    "--output", "--syntax-highlighter",
+    "--toc-levels",
+    "-i", "-o",
+]

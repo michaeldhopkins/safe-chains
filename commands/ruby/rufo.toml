@@ -1,0 +1,15 @@
+[[command]]
+name = "rufo"
+description = "Opinionated, mostly-non-configurable Ruby formatter. Without arguments, formats stdin to stdout (read). With path arguments, rewrites those files in place. The -c/--check flag switches to read-only mode (exits non-zero on diff). Surface is intentionally small. Classified as SafeWrite because the dominant invocation (`rufo file.rb` or `rufo lib/`) modifies the working tree; the read-only `--check` form is allowed within the same level cap. Active maintenance on the 0.x line."
+url = "https://github.com/ruby-formatter/rufo"
+researched_version = "rufo 0.18.2 (December 2025)"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = [
+    "--check", "--help", "--simple-exit", "--version",
+    "-c", "-h", "-x",
+]
+valued = [
+    "--filename", "--loglevel",
+]

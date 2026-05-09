@@ -1,0 +1,9 @@
+[[command]]
+name = "railroady"
+description = "Generates Graphviz/SVG ERD-style diagrams of Rails models and controllers. Rendering the model or controller graph requires booting the Rails environment to introspect the application's classes — that loads config/environment.rb and any initializers, which is arbitrary Ruby execution (same risk profile as `rails runner`). Only the diagnostic flags --help and --version have a fixed safe surface."
+url = "https://github.com/preston/railroady"
+researched_version = "railroady 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

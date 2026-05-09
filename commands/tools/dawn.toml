@@ -1,0 +1,52 @@
+[[command]]
+name = "dawn"
+description = "Older Ruby web-app security scanner (predecessor of Brakeman in some Sinatra/Rails contexts). Static analyzer that fingerprints the application against a built-in vulnerability knowledge base. The `scan TARGET` subcommand reports findings to stdout in text/html/json/csv format and can optionally write to a file via -O. As a side effect, scan also writes a timestamped results directory under $HOME/dawnscanner/results/<target>/ on every run. The `kb` subcommand exposes knowledge-base introspection (find, lint, status, list) and a write operation (kb unpack). The dawnscanner gem has been dormant since v2.2.0 (April 2023) — the security KB is likewise stale; this entry preserves the safe surface but the project is unlikely to grow."
+url = "https://github.com/thesp0nge/dawnscanner"
+researched_version = "dawnscanner 2.2.0 (April 2023; project dormant)"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "scan"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--count", "--debug", "--dependencies",
+    "--exit-on-warn", "--gemfile",
+    "--help", "--verbose",
+    "-C", "-G", "-d", "-h", "-z",
+]
+valued = [
+    "--config-file", "--output", "--report-format",
+    "--skip",
+    "-F", "-O", "-S", "-c",
+]
+write_flags = ["--output", "-O"]
+
+[[command.sub]]
+name = "kb"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "find"
+standalone = ["--debug", "--help", "--verbose", "-h"]
+
+[[command.sub.sub]]
+name = "lint"
+standalone = ["--debug", "--help", "--verbose", "-h"]
+
+[[command.sub.sub]]
+name = "status"
+standalone = ["--debug", "--help", "--verbose", "-h"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--debug", "--help", "--verbose", "-h"]
+
+[[command.sub.sub]]
+name = "unpack"
+candidate = true
+
+[[command.sub]]
+name = "help"
+allow_all = true

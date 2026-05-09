@@ -1,0 +1,162 @@
+[[command]]
+name = "steep"
+description = "Static type checker for Ruby using RBS signatures. The `check` subcommand runs the type checker against the project (read-only — parses Ruby source plus RBS files but does not execute application code). `list`, `ancestors`, `methods`, `method`, `validate`, `paths`, `parse`, `annotations`, `project`, `stats`, and `version` are read-only introspection commands. `init` scaffolds a Steepfile (project-local SafeWrite). `binstub` writes a `bin/steep` shim. `vendor` copies gem RBS into vendor/sigs. `watch` is the long-running re-check loop, `langserver` runs the LSP, `server` hosts the worker daemon — those are not part of the safe surface here. `worker` is an internal IPC binary. Active development on the 1.x line."
+url = "https://github.com/soutaro/steep"
+researched_version = "steep 1.10.0 (March 2025)"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = [
+    "--daemon", "--help", "--no-daemon",
+    "--no-type-check", "--type-check",
+    "-h",
+]
+valued = [
+    "--expression", "--format", "--group",
+    "--jobs", "--save-expectations",
+    "--severity-level", "--steep-command",
+    "--steepfile", "--validate",
+    "--with-expectations",
+    "-e", "-j",
+]
+write_flags = ["--save-expectations"]
+
+[[command.sub]]
+name = "checkfile"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--all-rbs", "--all-ruby", "--help", "--stdin", "-h"]
+valued = ["--jobs", "--steepfile", "-j"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--class", "--help", "--interface", "--module", "-h"]
+valued = ["--steepfile"]
+
+[[command.sub]]
+name = "ancestors"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--instance", "--singleton", "-h"]
+valued = ["--steepfile"]
+
+[[command.sub]]
+name = "methods"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--help", "--inherit", "--instance",
+    "--no-inherit", "--singleton", "-h",
+]
+valued = ["--steepfile"]
+
+[[command.sub]]
+name = "method"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--instance", "--singleton", "-h"]
+valued = ["--steepfile"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--severity-level", "--steepfile"]
+
+[[command.sub]]
+name = "annotations"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--steepfile"]
+
+[[command.sub]]
+name = "project"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help", "--no-print-files",
+    "--print-files", "-h",
+]
+valued = ["--steepfile"]
+
+[[command.sub]]
+name = "paths"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--steepfile"]
+
+[[command.sub]]
+name = "stats"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--format", "--jobs", "--steep-command", "--steepfile", "-j"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--force", "--help", "-h"]
+valued = ["--steepfile"]
+
+[[command.sub]]
+name = "binstub"
+level = "SafeWrite"
+bare = true
+standalone = ["--force", "--help", "--no-force", "-h"]
+valued = ["--output", "--root", "-o"]
+
+[[command.sub]]
+name = "vendor"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--clean", "--help", "--no-clean", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "watch"
+candidate = true
+
+[[command.sub]]
+name = "langserver"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "query"
+candidate = true
+
+[[command.sub]]
+name = "worker"
+candidate = true
+
+[[command.sub]]
+name = "prototype"
+candidate = true
