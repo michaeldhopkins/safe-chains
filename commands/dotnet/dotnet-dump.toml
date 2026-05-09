@@ -1,0 +1,32 @@
+[[command]]
+name = "dotnet-dump"
+description = "dotnet-dump — collect / analyse .NET process dumps. `ps` lists running .NET processes (read). `collect` attaches to the target process and writes a heap dump (external attach + project-local SafeWrite). `analyze` opens an interactive REPL on a saved dump file. Carve-out covers the listing form."
+url = "https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-dump"
+researched_version = "dotnet-dump 8.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "ps"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "collect"
+candidate = true
+
+[[command.sub]]
+name = "analyze"
+candidate = true
+
+[[command.sub]]
+name = "report"
+candidate = true

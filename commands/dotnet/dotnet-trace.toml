@@ -1,0 +1,46 @@
+[[command]]
+name = "dotnet-trace"
+description = "dotnet-trace — trace .NET process events via EventPipe. `ps` lists running .NET processes (read). `list-profiles` prints the available trace profiles (read). `convert` reads a saved .nettrace file and writes a Speedscope/Chromium/Etlx file (project-local SafeWrite). `collect` attaches to a target process and streams a trace (external attach + writes). `report` analyses a saved trace."
+url = "https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-trace"
+researched_version = "dotnet-trace 8.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "ps"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list-profiles"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "convert"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--format", "--output", "-o"]
+
+[[command.sub]]
+name = "report"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--max-depth"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "collect"
+candidate = true

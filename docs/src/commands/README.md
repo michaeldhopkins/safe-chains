@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 754 commands across 53 categories.
+safe-chains knows 773 commands across 53 categories.
 
 ## Glossary
 
@@ -30,7 +30,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Dart / Flutter](dart.md) (2 commands)
 - [Data Processing](data.md) (25 commands)
 - [Database Clients](db.md) (7 commands)
-- [.NET](dotnet.md) (2 commands)
+- [.NET](dotnet.md) (21 commands)
 - [Elixir / Erlang](elixir.md) (2 commands)
 - [Erlang](erlang.md) (1 commands)
 - [Code Forges](forges.md) (5 commands)

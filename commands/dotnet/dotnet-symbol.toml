@@ -1,0 +1,22 @@
+[[command]]
+name = "dotnet-symbol"
+description = "dotnet-symbol — downloads files needed to debug a core dump (modules, symbols, host program). Always contacts a symbol server (network) and writes downloaded files to a cache directory. The diagnostic --version / --help do not contact the network."
+url = "https://github.com/dotnet/symstore/blob/main/src/dotnet-symbol/README.md"
+researched_version = "dotnet-symbol 7.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--debugging", "--diagnostics",
+    "--help", "--host-only", "--ignore-errors",
+    "--internal-server", "--microsoft-symbol-server",
+    "--modules", "--no-symbols",
+    "--quiet", "--recurse-subdirectories",
+    "--symbols", "--version",
+    "-d", "-h", "-r",
+]
+valued = [
+    "--authenticated-server-path",
+    "--cache-directory",
+    "--output", "--server-path",
+    "--symstore", "--timeout", "-o",
+]

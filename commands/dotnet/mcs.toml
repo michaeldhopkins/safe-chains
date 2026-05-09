@@ -1,0 +1,29 @@
+[[command]]
+name = "mcs"
+description = "Mono C# compiler. Reads .cs sources and writes compiled .exe/.dll output. Custom analyzers/plugins are arbitrary C#. Compatible with the C# compiler tooling shipped with Mono."
+url = "https://www.mono-project.com/docs/about-mono/languages/csharp/"
+researched_version = "Mono mcs 6.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--version", "-help",
+    "/checked-", "/checked", "/codepage:auto",
+    "/debug", "/debug+", "/debug-",
+    "/help", "/nologo", "/noconfig",
+    "/nostdlib", "/nowarn",
+    "/optimize", "/optimize+", "/optimize-",
+    "/recurse", "/target:exe", "/target:library",
+    "/target:winexe", "/target:module",
+    "/unsafe", "/unsafe+", "/unsafe-",
+    "/v", "/warnaserror", "/warnaserror+", "/warnaserror-",
+    "-?", "-help", "-langversion",
+]
+valued = [
+    "/d", "/define", "/doc",
+    "/keycontainer", "/keyfile",
+    "/l", "/lib", "/main", "/out",
+    "/pkg", "/r", "/recurse",
+    "/reference", "/target",
+    "/warn", "/warnaserror",
+    "/win32icon", "/win32res",
+]

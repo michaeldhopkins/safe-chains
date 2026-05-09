@@ -1,0 +1,118 @@
+[[command]]
+name = "nuget"
+description = "NuGet CLI — separate binary from `dotnet nuget`. Manages packages, sources, signatures, and cache. Most subcommands contact NuGet feeds (network) or modify the local cache. Read-side: `list`, `locals -list`, `sources List`, `config -AsPath`, `verify`, `search`, `help`. Write-side: `push`, `delete`, `add`, `init`, `mirror`, `pack`, `restore`, `setapikey`, `sign`, `update`, `sources Add/Remove/Disable/Enable/Update`, `config -set`, `locals -clear`, `client-certs`, `trusted-signers`."
+url = "https://learn.microsoft.com/en-us/nuget/reference/nuget-exe-cli-reference"
+researched_version = "NuGet 6.x"
+bare_flags = ["--help", "-?", "-h", "-help"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-?", "-AllVersions", "-IncludeDelisted", "-NonInteractive", "-PreRelease", "-help"]
+valued = ["-ConfigFile", "-Source", "-Verbosity"]
+
+[[command.sub]]
+name = "search"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-?", "-PreRelease", "-help"]
+valued = ["-ConfigFile", "-Source", "-Take", "-Verbosity"]
+
+[[command.sub]]
+name = "spec"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "-?", "-Force", "-help"]
+valued = ["-AssemblyPath"]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-?", "-AsPath", "-help"]
+valued = ["-ConfigFile"]
+
+[[command.sub]]
+name = "locals"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-?", "-clear", "-help", "-list"]
+valued = ["-Verbosity"]
+
+[[command.sub]]
+name = "verify"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-?", "-All", "-Signatures", "-help"]
+valued = ["-CertificateFingerprint", "-ConfigFile", "-Verbosity"]
+
+[[command.sub]]
+name = "sources"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-?", "-Format", "-help"]
+valued = ["-ConfigFile", "-Format", "-Name", "-Password", "-Source", "-StorePasswordInClearText", "-Username", "-ProtocolVersion", "-Verbosity"]
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "mirror"
+candidate = true
+
+[[command.sub]]
+name = "pack"
+candidate = true
+
+[[command.sub]]
+name = "restore"
+candidate = true
+
+[[command.sub]]
+name = "setapikey"
+candidate = true
+
+[[command.sub]]
+name = "sign"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "client-certs"
+candidate = true
+
+[[command.sub]]
+name = "trusted-signers"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true

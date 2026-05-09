@@ -1,0 +1,10 @@
+[[command]]
+name = "fsi"
+aliases = ["dotnet-fsi"]
+description = "F# Interactive — REPL / script runner for F#. Bare invocation drops into the REPL. Passing a .fsx script executes it. Every meaningful invocation runs F# code. Carve-out: --version / --help only."
+url = "https://learn.microsoft.com/en-us/dotnet/fsharp/tools/fsharp-interactive/"
+researched_version = "F# Interactive bundled with .NET 8+"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-?", "-h"]

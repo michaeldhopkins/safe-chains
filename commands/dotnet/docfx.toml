@@ -1,0 +1,61 @@
+[[command]]
+name = "docfx"
+description = "DocFX — documentation generator for .NET projects. `metadata` extracts API metadata from compiled assemblies (read). `build` renders docs into the configured output directory (project-local SafeWrite). `serve` runs the long-running preview server. `pdf` produces a PDF (write). `init` scaffolds a docfx.json. Custom DocFX plugins are arbitrary .NET code loaded at build time."
+url = "https://dotnet.github.io/docfx/reference/docfx-cli-reference/docfx.html"
+researched_version = "docfx 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "metadata"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--disableDefaultFilter", "--disableGitFeatures", "--force", "--help", "--namespaceLayout", "--shouldSkipMarkup", "-?", "-h"]
+valued = ["--filter", "--globalNamespaceId", "--logLevel", "--logFile", "--memberLayout", "--namespaceLayout", "--outputFormat", "--output", "--property", "--repositoryRoot", "-l", "-o", "-p"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--changesFile", "--cleanupCacheHistory", "--debug", "--disableGitFeatures", "--dryRun", "--exportRawModel", "--exportViewModel", "--force", "--forcePostProcess", "--help", "--keepFileLink", "--lruSize", "--maxParallelism", "--noLangKeyword", "--postProcessors", "--rawModelOutputFolder", "--serve", "--templateFolder", "--viewModelOutputFolder", "-?", "-f", "-h"]
+valued = ["--changesFile", "--exportRawModel", "--exportViewModel", "--globalMetadata", "--globalMetadataFiles", "--fileMetadata", "--fileMetadataFiles", "--logLevel", "--logFile", "--lruSize", "--markdownEngineName", "--markdownEngineProperties", "--maxParallelism", "--output", "--postProcessors", "--templateFolder", "--theme", "-l", "-o", "-t"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--quiet", "--yes", "-h", "-q", "-y"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "template"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "pdf"
+candidate = true
+
+[[command.sub]]
+name = "merge"
+candidate = true
+
+[[command.sub]]
+name = "download"
+candidate = true
