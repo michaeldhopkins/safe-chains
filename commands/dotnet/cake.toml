@@ -1,0 +1,12 @@
+[[command]]
+name = "cake"
+description = "Cake — C# build runner. Reads a `build.cake` (or named) script which is arbitrary C# evaluated by Roslyn at runtime — every meaningful invocation executes user code. The diagnostic --version, --help, --info are read-only. Carve-out covers diagnostic forms."
+url = "https://cakebuild.net/docs/running-builds/runners/cake-tool"
+researched_version = "Cake 4.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = [
+    "--help", "--info", "--version",
+    "-h",
+]

@@ -1,0 +1,86 @@
+[[command]]
+name = "dotnet-ef"
+description = "Entity Framework Core CLI — installed via `dotnet tool install -g dotnet-ef`. `migrations add/list/script/has-pending-model-changes`, `dbcontext list/info/scaffold/optimize/script`, `database list` are read-side or scaffolding writes. `database update/drop`, `migrations bundle/remove`, `migrations script` apply or modify the configured database (external system writes — not part of safe surface)."
+url = "https://learn.microsoft.com/en-us/ef/core/cli/dotnet"
+researched_version = "EF Core 8.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "migrations"
+nested_bare = true
+standalone = ["--help", "-h", "--verbose"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--no-build", "--no-color", "--no-connect", "--prefix-output", "-h"]
+valued = ["--configuration", "--connection", "--context", "--framework", "--json", "--msbuildprojectextensionspath", "--project", "--runtime", "--startup-project", "-c", "-p", "-s"]
+
+[[command.sub.sub]]
+name = "has-pending-model-changes"
+standalone = ["--help", "--no-build", "-h"]
+valued = ["--configuration", "--context", "--framework", "--project", "--startup-project", "-c", "-p", "-s"]
+
+[[command.sub.sub]]
+name = "add"
+candidate = true
+
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub.sub]]
+name = "bundle"
+candidate = true
+
+[[command.sub.sub]]
+name = "script"
+candidate = true
+
+[[command.sub]]
+name = "dbcontext"
+nested_bare = true
+standalone = ["--help", "-h", "--verbose"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--no-build", "--prefix-output", "-h"]
+valued = ["--configuration", "--framework", "--json", "--project", "--startup-project", "-p", "-s"]
+
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "--no-build", "--prefix-output", "-h"]
+valued = ["--configuration", "--context", "--framework", "--json", "--project", "--runtime", "--startup-project", "-c", "-p", "-s"]
+
+[[command.sub.sub]]
+name = "scaffold"
+candidate = true
+
+[[command.sub.sub]]
+name = "optimize"
+candidate = true
+
+[[command.sub.sub]]
+name = "script"
+candidate = true
+
+[[command.sub]]
+name = "database"
+nested_bare = true
+standalone = ["--help", "-h", "--verbose"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--no-build", "--prefix-output", "-h"]
+valued = ["--configuration", "--framework", "--json", "--project", "--startup-project", "-p", "-s"]
+
+[[command.sub.sub]]
+name = "drop"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "help"
+allow_all = true

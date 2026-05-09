@@ -1,0 +1,28 @@
+[[command]]
+name = "dotnet-stack"
+description = "dotnet-stack — collect or print stack traces from running .NET processes. `ps` lists running .NET processes (read). `report` and `symbolicate` attach to a target process to produce stack traces (external attach). Carve-out covers the listing form."
+url = "https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-stack"
+researched_version = "dotnet-stack 8.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "ps"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "report"
+candidate = true
+
+[[command.sub]]
+name = "symbolicate"
+candidate = true

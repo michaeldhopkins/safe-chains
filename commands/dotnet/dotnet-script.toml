@@ -1,0 +1,9 @@
+[[command]]
+name = "dotnet-script"
+description = "C# script runner — installed via `dotnet tool install -g dotnet-script`. Bare invocation runs a .csx script (arbitrary code). The diagnostic --version / --help / --info are read-only."
+url = "https://github.com/dotnet-script/dotnet-script"
+researched_version = "dotnet-script 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--info", "--version", "-h"]

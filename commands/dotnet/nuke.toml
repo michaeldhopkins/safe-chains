@@ -1,0 +1,12 @@
+[[command]]
+name = "nuke"
+description = "NUKE — C# build automation framework. The wrapper reads `_build/Build.cs`, compiles the project, and runs the user-defined targets — every meaningful invocation executes arbitrary C#. Carve-out: --version / --help / :setup / :update / :complete diagnostic forms only; targets are arbitrary."
+url = "https://nuke.build/docs/getting-started/setup/"
+researched_version = "NUKE 9.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = [
+    "--help", "--version", "--?",
+    "-h", "-?",
+]

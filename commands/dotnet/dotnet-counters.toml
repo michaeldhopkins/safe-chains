@@ -1,0 +1,34 @@
+[[command]]
+name = "dotnet-counters"
+description = "dotnet-counters — performance-counter monitor. `list` prints the available counter set (read). `monitor` and `collect` attach to a target .NET process by PID/name and stream counters live (read but external-process attach). `ps` lists running .NET processes (read). The carve-out covers the listing forms — process attachment is an external-system operation."
+url = "https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters"
+researched_version = "dotnet-counters 8.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ps"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "monitor"
+candidate = true
+
+[[command.sub]]
+name = "collect"
+candidate = true

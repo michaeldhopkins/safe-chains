@@ -52,3 +52,294 @@ valued = [
     "--test-adapter-path", "--verbosity",
     "-a", "-c", "-d", "-e", "-f", "-l", "-o", "-r", "-s", "-v",
 ]
+
+[[command.sub]]
+name = "restore"
+level = "SafeWrite"
+standalone = [
+    "--disable-build-servers", "--disable-parallel",
+    "--force", "--force-evaluate",
+    "--help", "--ignore-failed-sources", "--interactive",
+    "--no-cache", "--no-dependencies",
+    "--no-http-cache", "--use-current-runtime",
+    "-h",
+]
+valued = [
+    "--arch", "--artifacts-path", "--configfile",
+    "--lock-file-path", "--locked-mode",
+    "--os", "--packages", "--runtime",
+    "--source", "--verbosity",
+    "-a", "-r", "-s", "-v",
+]
+
+[[command.sub]]
+name = "publish"
+level = "SafeWrite"
+standalone = [
+    "--disable-build-servers", "--force",
+    "--help", "--no-build", "--no-dependencies",
+    "--no-restore", "--nologo",
+    "--self-contained", "--tl",
+    "--use-current-runtime",
+    "-h",
+]
+valued = [
+    "--arch", "--artifacts-path", "--configuration",
+    "--framework", "--manifest", "--os",
+    "--output", "--property", "--runtime",
+    "--source", "--verbosity", "--version-suffix",
+    "-a", "-c", "-f", "-o", "-p", "-r", "-s", "-v",
+]
+
+[[command.sub]]
+name = "pack"
+level = "SafeWrite"
+standalone = [
+    "--force", "--help", "--include-source",
+    "--include-symbols", "--no-build",
+    "--no-dependencies", "--no-restore",
+    "--nologo", "--serviceable", "--tl",
+    "-h",
+]
+valued = [
+    "--artifacts-path", "--configuration",
+    "--output", "--property", "--runtime",
+    "--source", "--verbosity", "--version-suffix",
+    "-c", "-o", "-p", "-r", "-s", "-v",
+]
+
+[[command.sub]]
+name = "clean"
+level = "SafeWrite"
+standalone = ["--help", "--nologo", "--tl", "-h"]
+valued = ["--artifacts-path", "--configuration", "--framework", "--output", "--runtime", "--verbosity", "-c", "-f", "-o", "-r", "-v"]
+
+[[command.sub]]
+name = "new"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--diagnostics", "--dry-run", "--force",
+    "--help", "--list", "--update-apply",
+    "--update-check", "-d", "-h", "-l",
+]
+valued = [
+    "--author", "--columns", "--columns-all",
+    "--language", "--name", "--no-update-check",
+    "--output", "--project", "--type",
+    "--verbosity",
+    "-lang", "-n", "-o",
+]
+
+[[command.sub]]
+name = "format"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--exclude-generated", "--folder", "--help",
+    "--include-generated", "--no-restore",
+    "--verify-no-changes",
+    "-h",
+]
+valued = [
+    "--binarylog", "--diagnostics", "--exclude",
+    "--exclude-diagnostics", "--include",
+    "--report", "--severity",
+    "--verbosity",
+    "-v",
+]
+
+[[command.sub]]
+name = "sln"
+nested_bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--solution-folders", "-h"]
+
+[[command.sub.sub]]
+name = "add"
+standalone = ["--help", "--in-root", "-h"]
+valued = ["--solution-folder", "-s"]
+
+[[command.sub.sub]]
+name = "remove"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "msbuild"
+candidate = true
+
+[[command.sub]]
+name = "nuget"
+nested_bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "locals"
+candidate = true
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "push"
+candidate = true
+
+[[command.sub.sub]]
+name = "add"
+candidate = true
+
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub.sub]]
+name = "enable"
+candidate = true
+
+[[command.sub.sub]]
+name = "disable"
+candidate = true
+
+[[command.sub.sub]]
+name = "verify"
+candidate = true
+
+[[command.sub.sub]]
+name = "trust"
+candidate = true
+
+[[command.sub.sub]]
+name = "sign"
+candidate = true
+
+[[command.sub.sub]]
+name = "config"
+candidate = true
+
+[[command.sub.sub]]
+name = "why"
+candidate = true
+
+[[command.sub]]
+name = "tool"
+nested_bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--global", "--help", "--local", "-g", "-h"]
+valued = ["--tool-path"]
+
+[[command.sub.sub]]
+name = "search"
+candidate = true
+
+[[command.sub.sub]]
+name = "install"
+candidate = true
+
+[[command.sub.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub.sub]]
+name = "restore"
+candidate = true
+
+[[command.sub.sub]]
+name = "run"
+candidate = true
+
+[[command.sub.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "workload"
+nested_bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--verbosity", "-v"]
+
+[[command.sub.sub]]
+name = "search"
+candidate = true
+
+[[command.sub.sub]]
+name = "install"
+candidate = true
+
+[[command.sub.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub.sub]]
+name = "restore"
+candidate = true
+
+[[command.sub.sub]]
+name = "repair"
+candidate = true
+
+[[command.sub.sub]]
+name = "config"
+candidate = true
+
+[[command.sub.sub]]
+name = "elevate"
+candidate = true
+
+[[command.sub.sub]]
+name = "history"
+candidate = true
+
+[[command.sub]]
+name = "ef"
+candidate = true
+
+[[command.sub]]
+name = "dev-certs"
+candidate = true
+
+[[command.sub]]
+name = "watch"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "vstest"
+candidate = true
+
+[[command.sub]]
+name = "store"
+candidate = true
+
+[[command.sub]]
+name = "help"
+allow_all = true

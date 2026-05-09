@@ -1,0 +1,9 @@
+[[command]]
+name = "mono"
+description = "Mono runtime — runs .NET assemblies on Linux/macOS. Bare invocation runs the assembly given as a positional argument (arbitrary code execution). --version / --help are diagnostic. The wide flag set covers GC, JIT, and runtime tuning, but the dominant action is executing user code."
+url = "https://www.mono-project.com/docs/about-mono/"
+researched_version = "Mono 6.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h", "--info"]

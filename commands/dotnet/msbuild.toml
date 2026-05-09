@@ -1,0 +1,62 @@
+[[command]]
+name = "msbuild"
+description = "Microsoft Build Engine — builds .NET projects from .csproj / .vbproj / .fsproj / .sln files. Compiles and writes binaries (project-local SafeWrite). Loads MSBuild custom tasks (Roslyn analyzers, source generators), which can be arbitrary user-supplied code. Targets execute custom tasks at build time; -t targets the user-named task."
+url = "https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-command-line-reference"
+researched_version = "MSBuild 17.x"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = [
+    "/binaryLogger", "/check", "/clp", "/consoleLoggerParameters",
+    "/debug", "/detailedSummary", "/distributedFileLogger",
+    "/distributedlogger", "/dl", "/ds", "/fileLogger",
+    "/fl", "/getItem", "/getProperty", "/getTargetResult",
+    "/graphBuild", "/help", "/ignoreProjectExtensions",
+    "/inputResultsCaches", "/interactive", "/isolateProjects",
+    "/lowPriority", "/m", "/maxcpucount", "/multiProc",
+    "/nodeReuse", "/noAutoResponse", "/noConsoleLogger",
+    "/noLogo", "/nologo", "/nor", "/p:RestoreNoCache=true",
+    "/preprocess", "/profileEvaluation", "/q",
+    "/quiet", "/r", "/restore", "/restoreProperty",
+    "/t", "/target", "/terminalLogger", "/tl",
+    "/toolsVersion", "/tv", "/v", "/validate",
+    "/verbosity", "/version", "/warnAsError", "/warnAsMessage",
+    "/warnNotAsError", "/ver", "/?",
+    "-binaryLogger", "-check", "-clp", "-consoleLoggerParameters",
+    "-debug", "-detailedSummary", "-distributedFileLogger",
+    "-distributedlogger", "-dl", "-ds", "-fileLogger",
+    "-fl", "-getItem", "-getProperty", "-getTargetResult",
+    "-graphBuild", "-help", "-ignoreProjectExtensions",
+    "-interactive", "-isolateProjects", "-lowPriority",
+    "-m", "-maxcpucount", "-multiProc",
+    "-nodeReuse", "-noAutoResponse", "-noConsoleLogger",
+    "-noLogo", "-nologo", "-nor", "-preprocess",
+    "-profileEvaluation", "-q", "-quiet", "-r", "-restore",
+    "-restoreProperty", "-t", "-target", "-terminalLogger",
+    "-tl", "-toolsVersion", "-tv", "-v",
+    "-validate", "-verbosity", "-version", "-warnAsError",
+    "-warnAsMessage", "-warnNotAsError", "-ver",
+    "--help",
+]
+valued = [
+    "/binaryLogger", "/clp", "/consoleLoggerParameters",
+    "/distributedFileLogger", "/distributedlogger",
+    "/fileLogger", "/fileLoggerParameters",
+    "/flp", "/getProperty", "/getItem", "/getTargetResult",
+    "/inputResultsCaches", "/logger", "/maxcpucount",
+    "/nodeReuse", "/outputResultsCache",
+    "/p", "/preprocess", "/profileEvaluation",
+    "/property", "/restore", "/target", "/terminalLogger",
+    "/toolsVersion", "/tv", "/verbosity",
+    "/warnAsError", "/warnAsMessage", "/warnNotAsError",
+    "-binaryLogger", "-clp", "-consoleLoggerParameters",
+    "-distributedFileLogger", "-distributedlogger",
+    "-fileLogger", "-fileLoggerParameters", "-flp",
+    "-getProperty", "-getItem", "-getTargetResult",
+    "-inputResultsCaches", "-logger", "-maxcpucount",
+    "-nodeReuse", "-outputResultsCache", "-p",
+    "-preprocess", "-profileEvaluation", "-property",
+    "-restore", "-target", "-terminalLogger",
+    "-toolsVersion", "-tv", "-verbosity",
+    "-warnAsError", "-warnAsMessage", "-warnNotAsError",
+]

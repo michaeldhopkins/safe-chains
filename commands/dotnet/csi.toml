@@ -1,0 +1,9 @@
+[[command]]
+name = "csi"
+description = "C# script REPL (Roslyn-based scripting CLI). Bare invocation drops into the REPL; passing a .csx file executes it. Every meaningful invocation runs C# code. Carve-out: --version / --help only."
+url = "https://learn.microsoft.com/en-us/visualstudio/scripting/scripting-with-the-csi-utility"
+researched_version = "Roslyn csi 4.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-?", "-help"]

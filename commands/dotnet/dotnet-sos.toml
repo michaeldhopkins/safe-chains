@@ -1,0 +1,22 @@
+[[command]]
+name = "dotnet-sos"
+description = "dotnet-sos — installs SOS debugger extension into LLDB / Windows debuggers. `install` writes the extension into the user's debugger config (system-state SafeWrite). `uninstall` removes it. `version`, `--help` are diagnostic."
+url = "https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-sos"
+researched_version = "dotnet-sos 8.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true

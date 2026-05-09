@@ -1,0 +1,152 @@
+[[command]]
+name = "paket"
+description = "Paket — alternative .NET dependency manager. `install`, `update`, `restore`, `remove`, `add` modify state and contact NuGet feeds (network). `outdated`, `find-packages`, `find-package-versions`, `find-refs`, `show-installed-packages`, `show-groups`, `version`, `info` are read-only inspections. `pack`, `push`, `convert-from-nuget`, `simplify`, `init`, `config`, `clear-cache` mutate local files or push to remote feeds. The carve-out covers diagnostic forms only."
+url = "https://fsprojects.github.io/Paket/paket-commands.html"
+researched_version = "paket 8.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--paket-version", "-h"]
+
+[[command.sub]]
+name = "outdated"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--ignore-constraints", "--include-prereleases", "--strict", "-h"]
+valued = ["--group"]
+
+[[command.sub]]
+name = "show-installed-packages"
+level = "SafeRead"
+bare = true
+standalone = ["--all", "--help", "-h"]
+valued = ["--group", "--package", "--project"]
+
+[[command.sub]]
+name = "show-groups"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "find-packages"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--max", "--source"]
+
+[[command.sub]]
+name = "find-package-versions"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--max", "--source"]
+
+[[command.sub]]
+name = "find-refs"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--group"]
+
+[[command.sub]]
+name = "why"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--details", "--help", "-h"]
+valued = ["--group"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "restore"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "outdated"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "convert-from-nuget"
+candidate = true
+
+[[command.sub]]
+name = "simplify"
+candidate = true
+
+[[command.sub]]
+name = "clear-cache"
+candidate = true
+
+[[command.sub]]
+name = "pack"
+candidate = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "auto-restore"
+candidate = true
+
+[[command.sub]]
+name = "github"
+candidate = true
+
+[[command.sub]]
+name = "fix-nuspecs"
+candidate = true
+
+[[command.sub]]
+name = "fix-nuspec"
+candidate = true
+
+[[command.sub]]
+name = "generate-nuspec"
+candidate = true
+
+[[command.sub]]
+name = "generate-load-scripts"
+candidate = true
+
+[[command.sub]]
+name = "generate-include-scripts"
+candidate = true
