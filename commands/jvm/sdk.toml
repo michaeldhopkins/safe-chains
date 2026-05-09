@@ -1,0 +1,94 @@
+[[command]]
+name = "sdk"
+description = "SDKMAN! command-line interface for managing parallel installations of multiple SDKs on Unix-based systems, primarily used for the JVM ecosystem (Java distributions, Kotlin, Scala, Groovy, Maven, Gradle, sbt, Leiningen, Ant) but also supports tools like Spring Boot CLI, Visual VM, and others. The `sdk` entry point is a Bash function loaded from ~/.sdkman/bin/sdkman-init.sh that dispatches to candidate-specific install scripts. Subcommands split into read-only metadata queries (list, current, version, home, help) and operations that mutate the local ~/.sdkman directory by downloading and unpacking SDK archives over the network (install, uninstall, upgrade), switch the active or default candidate version (use, default, env), refresh local metadata caches (update, flush), and update SDKMAN itself (selfupdate). The `offline` subcommand toggles network behavior and is treated as a local mutation. There is no auth model — SDKMAN talks to api.sdkman.io anonymously. Release cadence is moderate: a few minor releases per year. The latest is 5.23.0 (May 4, 2024), which dropped an exploitable `eval` from checksum verification (GHSA-jh7h-4x3r-f89r); a separate Rust rewrite at sdkman/sdkman-cli-native is in active development and may eventually replace this surface."
+url = "https://sdkman.io/usage"
+researched_version = "5.23.0 (May 4, 2024)"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "current"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "home"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "uninstall"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "use"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "default"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "upgrade"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "update"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "flush"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "offline"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "init"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "install"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "clear"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "selfupdate"
+candidate = true

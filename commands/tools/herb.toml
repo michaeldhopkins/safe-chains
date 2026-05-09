@@ -1,0 +1,34 @@
+[[command]]
+name = "herb"
+description = "HTML+ERB language tooling from herb-tools (Marco Roth) — a parser, linter, and formatter for HTML+ERB templates with a tree-sitter-style CST. Subcommands include `parse` (read-only AST dump), `lint` (read-only diagnostics; --fix rewrites files), `format` (--check is read-only; --write rewrites files), and `analyze` (read-only project-wide reports). The tool loads and parses templates but does not execute the embedded Ruby. Actively developed at herb-tools/herb with frequent releases."
+url = "https://herb-tools.dev"
+researched_version = "herb-tools 2025-2026 line; subcommand surface stable across recent releases"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "parse"
+bare = false
+standalone = ["--help", "--json", "--no-color", "-h", "-j"]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+standalone = [
+    "--color", "--fail-fast", "--fix", "--help",
+    "--no-color", "--quiet", "--verbose",
+    "-h", "-q", "-v",
+]
+valued = ["--config", "--exclude", "--format", "--include"]
+write_flags = ["--fix"]
+
+[[command.sub]]
+name = "format"
+level = "SafeRead"
+standalone = ["--check", "--color", "--help", "--no-color", "--write", "-h", "-w"]
+valued = ["--config"]
+write_flags = ["--write", "-w"]
+
+[[command.sub]]
+name = "analyze"
+standalone = ["--help", "--json", "-h", "-j"]
+valued = ["--config", "--format"]

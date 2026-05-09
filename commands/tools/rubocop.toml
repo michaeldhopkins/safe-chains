@@ -1,17 +1,21 @@
 [[command]]
 name = "rubocop"
-description = "Ruby static code analyzer and formatter based on the community Ruby Style Guide. In its default mode (without -a/--auto-correct), it reports violations without modifying files. It loads and parses Ruby source files but does not execute application code. The --auto-correct and --fix flags (not exposed here) would write changes. Actively maintained with roughly monthly releases."
+description = "Ruby static code analyzer and formatter based on the community Ruby Style Guide. In its default mode it reports violations without modifying files. The -a/--autocorrect and -A/--autocorrect-all (and the legacy --auto-correct / --auto-correct-all spellings, plus --fix-layout / -x) flags rewrite source files in place; the -A form additionally applies cops marked unsafe-to-autocorrect, which can change program semantics. The --safe-auto-correct / --safe-autocorrect form restricts to the safe subset. rubocop loads and parses Ruby source files but does not execute application code at lint time. Actively maintained with roughly monthly releases."
 url = "https://docs.rubocop.org/rubocop/usage/basic_usage.html"
+researched_version = "RuboCop ~1.x line; flag surface stable across recent releases as of 2026-05"
 level = "SafeRead"
 bare = true
 standalone = [
+    "--auto-correct", "--auto-correct-all", "--autocorrect", "--autocorrect-all",
     "--color", "--debug", "--display-cop-names",
     "--display-only-correctable", "--display-only-safe-correctable",
     "--display-style-guide", "--extra-details",
+    "--fail-fast", "--fix-layout",
     "--help", "--lint", "--list-target-files",
-    "--no-color", "--parallel", "--show-cops",
-    "--show-docs-url", "--version",
-    "-L", "-V", "-d", "-h", "-l",
+    "--no-color", "--parallel",
+    "--safe-auto-correct", "--safe-autocorrect",
+    "--show-cops", "--show-docs-url", "--version",
+    "-A", "-L", "-V", "-a", "-d", "-h", "-l", "-x",
 ]
 valued = [
     "--cache-root", "--config", "--disable-pending-cops",
@@ -19,4 +23,9 @@ valued = [
     "--fail-level", "--format", "--only", "--out",
     "--require", "--stdin",
     "-P", "-c", "-f", "-o", "-r",
+]
+write_flags = [
+    "--auto-correct", "--auto-correct-all", "--autocorrect", "--autocorrect-all",
+    "--fix-layout", "--safe-auto-correct", "--safe-autocorrect",
+    "-A", "-a", "-x",
 ]

@@ -36,6 +36,38 @@ Aliases: `gradlew`
 - Allowed standalone flags: --help, --version, -V, -c, -constants, -h, -l, -p, -private, -protected, -public, -s, -sysinfo, -v, -verbose
 - Allowed valued flags: --module, -bootclasspath, -classpath, -cp, -m
 
+### `jenv`
+<p class="cmd-url"><a href="https://www.jenv.be/">https://www.jenv.be/</a></p>
+
+- **add**: Flags: --help, --skip-existing, -h
+- **commands**: Flags: --help, --sh, --no-sh, -h
+- **disable-plugin**: Flags: --help, -h
+- **doctor**: Flags: --help, -h
+- **enable-plugin**: Flags: --help, -h
+- **global**: Flags: --help, --unset, -h
+- **help**: Positional args accepted
+- **hooks**: Flags: --help, -h
+- **javahome**: Flags: --help, -h
+- **local**: Flags: --help, --unset, -h
+- **plugin list**: Flags: --help, -h
+- **plugin ls**: Flags: --help, -h
+- **plugins**: Flags: --help, -h
+- **prefix**: Flags: --help, -h
+- **rehash**: Flags: --help, -h
+- **remove**: Flags: --help, -h
+- **root**: Flags: --help, -h
+- **shell**: Flags: --help, --unset, -h
+- **shims**: Flags: --help, --short, -h
+- **version**: Flags: --help, -h
+- **version-file**: Flags: --help, -h
+- **version-file-read**: Flags: --help, -h
+- **version-name**: Flags: --help, -h
+- **version-origin**: Flags: --help, -h
+- **versions**: Flags: --bare, --help, -h
+- **whence**: Flags: --help, --path, -h
+- **which**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `keytool`
 <p class="cmd-url"><a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html">https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html</a></p>
 
@@ -54,4 +86,25 @@ Aliases: `gradlew`
 <p class="cmd-url"><a href="https://maven.apache.org/ref/current/maven-embedder/cli.html">https://maven.apache.org/ref/current/maven-embedder/cli.html</a></p>
 
 - Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify.
+
+### `sdk`
+<p class="cmd-url"><a href="https://sdkman.io/usage">https://sdkman.io/usage</a></p>
+
+- **current**: Flags: --help, -h
+- **default**: Flags: --help, -h
+- **env clear**: Flags: --help, -h
+- **env init**: Flags: --help, -h
+- **env install**: Flags: --help, -h
+- **flush**: Flags: --help, -h
+- **help**: Positional args accepted
+- **home**: Flags: --help, -h
+- **install**: Flags: --help, -h
+- **list**: Flags: --help, -h
+- **offline**: Flags: --help, -h
+- **uninstall**: Flags: --help, -h
+- **update**: Flags: --help, -h
+- **upgrade**: Flags: --help, -h
+- **use**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 

@@ -1,0 +1,27 @@
+[[command]]
+name = "standardrb"
+description = "Ruby Style Guide CLI — a wrapper around RuboCop with an opinionated, non-configurable cop set chosen by the Standard project. Inherits RuboCop's flag surface: bare invocation reports violations without modifying files, while -a/--autocorrect, -A/--autocorrect-all, --fix, --fix-layout, and --safe-auto-correct rewrite source files in place. The --no-fix counterpart of --fix is read-only. standardrb loads and parses Ruby source files but does not execute application code. Releases follow Standard's roughly quarterly cadence, tracking RuboCop versions."
+url = "https://github.com/standardrb/standard"
+researched_version = "standard gem ~1.x line; flag surface tracks RuboCop"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--auto-correct", "--auto-correct-all", "--autocorrect", "--autocorrect-all",
+    "--color", "--debug", "--display-cop-names",
+    "--fail-fast", "--fix", "--fix-layout",
+    "--help", "--lint", "--list-target-files",
+    "--no-color", "--no-fix", "--parallel",
+    "--safe-auto-correct", "--safe-autocorrect",
+    "--show-cops", "--version",
+    "-A", "-V", "-a", "-d", "-h", "-l",
+]
+valued = [
+    "--cache-root", "--config", "--except", "--fail-level",
+    "--format", "--only", "--out", "--require", "--stdin",
+    "-c", "-f", "-o", "-r",
+]
+write_flags = [
+    "--auto-correct", "--auto-correct-all", "--autocorrect", "--autocorrect-all",
+    "--fix", "--fix-layout", "--safe-auto-correct", "--safe-autocorrect",
+    "-A", "-a",
+]
