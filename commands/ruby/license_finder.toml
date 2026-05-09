@@ -1,0 +1,62 @@
+[[command]]
+name = "license_finder"
+description = "Reports project dependencies and their licenses against an approval policy stored in doc/dependency_decisions.yml. The default action (and the `action_items` subcommand) prints unapproved dependencies; `report`, `project_roots`, and `version` are also read-only. The `--prepare` flag shells out to package managers (e.g. `bundle install`, `npm install`) to build a manifest, which is a write operation in disguise. The many add/remove/decisions/approvals subcommands modify the YAML decisions file — those are project-local writes but the surface is large; carve-out below covers the diagnostic and read-only set first. Active but infrequent — minor releases roughly yearly on the 7.x line."
+url = "https://github.com/pivotal/LicenseFinder"
+researched_version = "license_finder 7.2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "action_items"
+candidate = true
+
+[[command.sub]]
+name = "report"
+candidate = true
+
+[[command.sub]]
+name = "project_roots"
+candidate = true
+
+[[command.sub]]
+name = "approvals"
+candidate = true
+
+[[command.sub]]
+name = "permitted_licenses"
+candidate = true
+
+[[command.sub]]
+name = "restricted_licenses"
+candidate = true
+
+[[command.sub]]
+name = "licenses"
+candidate = true
+
+[[command.sub]]
+name = "dependencies"
+candidate = true
+
+[[command.sub]]
+name = "ignored_groups"
+candidate = true
+
+[[command.sub]]
+name = "ignored_dependencies"
+candidate = true
+
+[[command.sub]]
+name = "inherited_decisions"
+candidate = true
+
+[[command.sub]]
+name = "project_name"
+candidate = true

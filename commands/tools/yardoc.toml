@@ -1,0 +1,33 @@
+[[command]]
+name = "yardoc"
+description = "Standalone binary equivalent to `yard doc`. Renders Ruby documentation into ./doc by default (or wherever -o/--output-dir points); honours all of YARD's templating, plugin, and parsing options. Distributed alongside the yard gem. Does not execute application code at parse time, but loaded plugins and template hooks are arbitrary Ruby."
+url = "https://yardoc.org/guides/index.html"
+researched_version = "yard v0.9.43 (April 2026)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--api", "--asset", "--charset", "--debug",
+    "--default-return", "--embed-mixins", "--exclude",
+    "--exclude-tag", "--fail-on-warning", "--files",
+    "--has-tag", "--help", "--hide-api",
+    "--hide-tag", "--hide-void-return",
+    "--list-undoc", "--main", "--markup-provider",
+    "--no-api", "--no-cache", "--no-output", "--no-private",
+    "--no-progress", "--no-public", "--no-save", "--no-stats",
+    "--one-file", "--plugin", "--private",
+    "--protected", "--quiet", "--query",
+    "--readme", "--single", "--use-cache", "--verbose",
+    "--version", "--visibility",
+    "-c", "-D", "-M", "-T", "-b", "-e", "-h", "-m",
+    "-n", "-o", "-p", "-q", "-r", "-t",
+]
+valued = [
+    "--db", "--default-tag", "--format",
+    "--load-plugin", "--locale", "--macro",
+    "--markup", "--output-dir", "--plugin",
+    "--query-tag", "--tag", "--template",
+    "--template-path", "--title",
+    "--transitive-tag", "--type-tag",
+    "--with-name-tag", "--with-tag",
+    "--with-title-tag", "--with-types-tag",
+]

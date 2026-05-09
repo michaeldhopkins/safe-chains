@@ -1,0 +1,36 @@
+[[command]]
+name = "thor"
+description = "Generic Ruby CLI framework. The `thor` binary loads a project's Thorfile or registered classes and dispatches user-defined tasks — invoking any task is equivalent to running arbitrary Ruby. The diagnostic surface (--help, version, the `installed` subcommand which lists ~/.thor metadata, the `uninstalled` mirror) does not load project Thor classes. The `list` subcommand requires loading the project's Thor classes to enumerate tasks, so it is not part of the safe surface. v1.5.0 dates to January 2026."
+url = "https://github.com/rails/thor"
+researched_version = "thor v1.5.0 (Jan 2026)"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "installed"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "list"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true

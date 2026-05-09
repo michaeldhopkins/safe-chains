@@ -1,0 +1,33 @@
+[[command]]
+name = "rdoc"
+description = "Ruby's standard documentation generator. Parses Ruby source files via the rdoc parser to extract comments and structure; does not execute application code. Bare invocation writes generated HTML into ./doc (or whatever -o/--op points to). The -C/--coverage-report flag prints a coverage summary to stdout instead of generating files. The --server flag runs an HTTP preview server (read-only). Output format is configurable via --format darkfish|aliki and presentation flags such as --main, --title, --visibility. RDoc ships with stdlib and tracks the Ruby release cycle; v7.x is current and the surface is highly stable."
+url = "https://docs.ruby-lang.org/en/master/RDoc/RDoc.html"
+researched_version = "rdoc v7.2.0 (Feb 2026)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--all", "--coverage-report",
+    "--dcov", "--debug", "--dry-run",
+    "--exclude", "--extend", "--force-output",
+    "--force-update", "--help", "--hyperlink-all",
+    "--ignore-invalid", "--line-numbers", "--no-debug",
+    "--no-dcov", "--no-force-update", "--no-line-numbers",
+    "--no-pipe", "--pipe", "--quiet",
+    "--root", "--show-hash", "--verbose",
+    "--version",
+    "-C", "-D", "-N", "-O", "-P", "-Q",
+    "-U", "-V", "-X", "-d", "-f", "-h",
+    "-q", "-x",
+]
+valued = [
+    "--charset", "--copy-files", "--dcov-class-method-sig",
+    "--dcov-method-signature", "--dcov-source",
+    "--encoding", "--extension", "--format",
+    "--include", "--locale", "--locale-data-dir",
+    "--main", "--markup", "--op",
+    "--page-dir", "--ri", "--ri-site", "--ri-system",
+    "--server", "--style", "--tab-width", "--template",
+    "--template-stylesheets", "--title",
+    "--visibility", "--write-options",
+    "-c", "-e", "-i", "-m", "-o", "-p", "-r", "-t", "-w",
+]

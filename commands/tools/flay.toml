@@ -1,0 +1,17 @@
+[[command]]
+name = "flay"
+description = "Detects structural code duplication across Ruby files by parsing each file to an S-expression and comparing trees with identifiers and whitespace normalised. Pure static analysis — does not execute the code under inspection. Output is a textual report on stdout describing matched groups and their locations. Has no auto-correct or rewriting mode. Reads file and directory paths from the command line; honours @argfile (path-list file), -path/to/skip path skips, and .flayignore. The 2.x line is essentially frozen — releases come from the seattlerb maintenance group on a sporadic-but-steady cadence."
+url = "https://github.com/seattlerb/flay"
+researched_version = "flay 2.x; surface frozen"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--diff", "--help", "--liberal",
+    "--summary", "--verbose", "--version",
+    "-d", "-h", "-l", "-s", "-v",
+]
+valued = [
+    "--fuzzy", "--mass", "--timeout",
+    "-#", "-f", "-m", "-t",
+]

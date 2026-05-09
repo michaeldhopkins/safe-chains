@@ -1,0 +1,69 @@
+[[command]]
+name = "jekyll"
+description = "Static site generator written in Ruby. Reads source content (Markdown, HTML, Liquid templates) and renders a static site into ./_site (or wherever --destination points). The build pipeline loads any Ruby code under _plugins/ and any gems referenced from the project Gemfile, so `build` and `serve` execute arbitrary user-supplied Ruby — same risk profile as `rails runner`. The `doctor` subcommand (alias `hyde`) prints config / deprecation warnings without rendering and does not load _plugins/, so it is safe. `help` is also benign. Active but slow — v4.4.1 dates to January 2025."
+url = "https://jekyllrb.com/docs/usage/"
+researched_version = "jekyll v4.4.1 (Jan 2025)"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "doctor"
+aliases = ["hyde"]
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--trace", "-h", "-t"]
+valued = ["--config", "--source"]
+
+[[command.sub]]
+name = "hyde"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--trace", "-h", "-t"]
+valued = ["--config", "--source"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "b"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "s"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "new-theme"
+candidate = true
+
+[[command.sub]]
+name = "compose"
+candidate = true
+
+[[command.sub]]
+name = "docs"
+candidate = true
+
+[[command.sub]]
+name = "import"
+candidate = true

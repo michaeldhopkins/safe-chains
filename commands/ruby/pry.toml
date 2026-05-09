@@ -1,0 +1,9 @@
+[[command]]
+name = "pry"
+description = "Interactive Ruby REPL with introspection (a richer alternative to irb). The whole purpose of pry is to evaluate arbitrary Ruby at a prompt, so the only safe surface is the diagnostic flags --help and --version. v0.16.0 dates to December 2025."
+url = "https://github.com/pry/pry"
+researched_version = "pry v0.16.0 (Dec 2025)"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

@@ -1,0 +1,35 @@
+[[command]]
+name = "bundler-audit"
+aliases = ["bundle-audit"]
+description = "Patch-level vulnerability scanner for Ruby projects. Reads Gemfile.lock and matches each gem version against the ruby-advisory-db CVE database; does not execute application code. The `check` subcommand (and the bare invocation that aliases to it) prints findings to stdout in text or JSON. The `update` subcommand clones / git-pulls the advisory database into a recoverable cache (default ~/.local/share/ruby-advisory-db); --no-update on `check` skips that. The gem ships two binary names — bundler-audit (canonical) and bundle-audit (legacy alias) — so both are accepted. Bundler also picks up bundler-audit as a plugin so `bundle audit` works through the bundle command. Releases are infrequent (years between minor versions) but the project is alive."
+url = "https://github.com/rubysec/bundler-audit"
+researched_version = "bundler-audit 0.9.3 (Nov 2025)"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+standalone = [
+    "--help", "--no-update", "--quiet",
+    "--update", "--verbose",
+    "-h", "-q", "-v",
+]
+valued = [
+    "--config", "--format", "--gemfile-lock",
+    "--ignore", "--output",
+]
+write_flags = ["--output"]
+
+[[command.sub]]
+name = "update"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = []
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "stats"
+standalone = ["--help", "-h"]

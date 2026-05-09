@@ -1,0 +1,20 @@
+[[command]]
+name = "overcommit"
+description = "Git hook manager for Ruby projects. The diagnostic flags `--list-hooks` (-l), `--template-dir` (-t), and bare `--help`/`--version` are read-only. `--install` (-i) writes hook scripts into .git/hooks/ for the current repository, with backups; `--uninstall` (-u) restores those backups. `--sign` rewrites the hook signature in .git/hooks/ when the project's .overcommit.yml changes. `--run` (-r) and `--diff <ref>` execute the configured hook chain — those run arbitrary user-defined linters and scripts, so they are not part of the safe surface. v0.69.0 dates to March 2026."
+url = "https://github.com/sds/overcommit"
+researched_version = "overcommit v0.69.0 (March 2026)"
+level = "SafeRead"
+bare = false
+require_any = [
+    "--help", "--install", "--list-hooks",
+    "--sign", "--template-dir", "--uninstall",
+    "--version",
+    "-h", "-i", "-l", "-t", "-u", "-v",
+]
+standalone = [
+    "--force", "--help", "--install",
+    "--list-hooks", "--sign", "--template-dir",
+    "--uninstall", "--version",
+    "-f", "-h", "-i", "-l", "-t", "-u", "-v",
+]
+write_flags = ["--install", "--sign", "--uninstall", "-i", "-u"]

@@ -1,0 +1,9 @@
+[[command]]
+name = "m"
+description = "Smart Minitest / Test::Unit runner — resolves test files and lines from short arguments and runs the matching tests. Test execution loads the application code under test, so every meaningful invocation runs arbitrary Ruby (same risk profile as `rspec` and `rails test`). Only the diagnostic flags --help and --version have a fixed safe surface. v1.6.0 dates to September 2021 — frozen since then."
+url = "https://github.com/qrush/m"
+researched_version = "m v1.6.0 (Sep 2021)"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]
