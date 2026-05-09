@@ -143,7 +143,7 @@ mod tests {
         git_config_sslverify_false: "git -c http.sslVerify=false fetch origin",
         git_config_init_default_branch: "git -c init.defaultBranch=main ls-remote origin",
         git_config_multiple_c: "git -c core.askPass=false -c credential.helper= ls-remote origin",
-        git_config_c_with_C: "git -C /repo -c core.askPass=false log",
+        git_config_lower_c_with_upper_c: "git -C /repo -c core.askPass=false log",
         git_remote_bare: "git remote",
         git_remote_v: "git remote -v",
         git_remote_get_url: "git remote get-url origin",

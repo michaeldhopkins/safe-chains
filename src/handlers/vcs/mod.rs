@@ -14,5 +14,3 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     Vec::new()
 }
 
-#[cfg(test)]
-pub(super) const REGISTRY: &[super::CommandEntry] = &[];
