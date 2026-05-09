@@ -64,6 +64,21 @@
 - **run**: Flags: --append, --branch, --concurrency, --help, --parallel, --source, --timid, -a, -h, -p. Valued: --context, --data-file, --include, --omit, --rcfile, --source. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
+### `dbt`
+<p class="cmd-url"><a href="https://docs.getdbt.com/reference/dbt-commands">https://docs.getdbt.com/reference/dbt-commands</a></p>
+
+- **clean**: Flags: --help, --no-clean-project-files-only, --profile, --quiet, -h, -q. Valued: --profile, --profiles-dir, --project-dir, --target
+- **compile**: Flags: --cache-selected-only, --debug, --exclude-resource-type, --full-refresh, --help, --inline, --no-cache-selected-only, --no-defer, --no-favor-state, --no-full-refresh, --no-introspect, --no-partial-parse, --no-populate-cache, --no-print, --no-static-parser, --no-version-check, --profile, --profiles-dir, --quiet, --show, --target, --target-path, --threads, --vars, --warn-error, -h, -q. Valued: --exclude, --inline, --profile, --profiles-dir, --project-dir, --resource-type, --select, --state, --target, --target-path, --threads, --vars, -d, -m, -s, -t
+- **debug**: Flags: --config-dir, --connection, --help, --no-version-check, --quiet, --version-check, -h, -q. Valued: --profile, --project-dir, --profiles-dir, --target, -t
+- **deps**: Flags: --add-package, --dry-run, --help, --lock, --no-lock, --quiet, --upgrade, -h, -q. Valued: --profile, --profiles-dir, --project-dir, --source, --target, --vars, -t
+- **help**: Positional args accepted
+- **init**: Flags: --help, --profiles-dir, --quiet, --skip-profile-setup, -h, -q, -s
+- **list**: Flags: --help, --no-version-check, --quiet, -h, -q. Valued: --exclude, --output, --output-keys, --profile, --profiles-dir, --project-dir, --resource-type, --select, --state, --target, -d, -m, -s, -t
+- **ls**: Flags: --help, --no-version-check, --quiet, --resource-type, -h, -q. Valued: --exclude, --exclude-resource-type, --output, --output-keys, --profile, --profiles-dir, --project-dir, --resource-type, --select, --state, --target, -d, -m, -s, -t
+- **parse**: Flags: --help, --no-partial-parse, --no-static-parser, --no-version-check, --quiet, --show-hash, --write-json, -h, -q. Valued: --profile, --profiles-dir, --project-dir, --target, --target-path, --threads, --vars, -t
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -V
+
 ### `deptry`
 <p class="cmd-url"><a href="https://deptry.com/">https://deptry.com/</a></p>
 
@@ -115,6 +130,28 @@ Aliases: `https`
 
 - Allowed standalone flags: --help, --version, -h
 
+### `jupyter`
+<p class="cmd-url"><a href="https://docs.jupyter.org/en/latest/projects/jupyter-command.html">https://docs.jupyter.org/en/latest/projects/jupyter-command.html</a></p>
+
+- **help**: Positional args accepted
+- **troubleshoot**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
+### `jupyter-nbconvert`
+<p class="cmd-url"><a href="https://nbconvert.readthedocs.io/">https://nbconvert.readthedocs.io/</a></p>
+
+Aliases: `nbconvert`
+
+- Allowed standalone flags: --allow-chromium-download, --allow-errors, --clear-output, --debug, --disable-chromium-sandbox, --embed-images, --exec, --execute, --from, --generate-config, --help, --inplace, --log-level, --no-input, --no-prompt, --no-stdin, --show-config, --show-config-json, --stdin, --stdout, --version, --writer, -h, -y
+- Allowed valued flags: --config, --ExecutePreprocessor.timeout, --ExecutePreprocessor.kernel-name, --ExecutePreprocessor.kernel_name, --from, --log-level, --nbformat, --output, --output-dir, --post, --reveal-prefix, --template, --template-file, --to, --use-frontmatter, --writer, -c, -y
+
+### `jupytext`
+<p class="cmd-url"><a href="https://jupytext.readthedocs.io/">https://jupytext.readthedocs.io/</a></p>
+
+- Allowed standalone flags: --check-paired, --diff, --help, --out, --quiet, --show-changes, --sync, --test, --test-strict, --update-metadata, --use-source-timestamp, --version, --warn-only, -h, -q
+- Allowed valued flags: --from, --input-format, --opt, --output, --output-format, --paired-paths, --pipe, --pipe-fmt, --pre-commit-mode, --set-formats, --set-kernel, --to, --warn-only, -K, -i, -k, -o
+- Bare invocation allowed
+
 ### `kernprof`
 <p class="cmd-url"><a href="https://github.com/pyutils/line_profiler">https://github.com/pyutils/line_profiler</a></p>
 
@@ -128,6 +165,15 @@ Aliases: `https`
 - **new**: Flags: --help, --quiet, --verbose, -h, -q, -v. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -V
 
+### `mlflow`
+<p class="cmd-url"><a href="https://mlflow.org/docs/latest/cli.html">https://mlflow.org/docs/latest/cli.html</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **doctor**: Flags: --help, -h. Valued: --mask-envs
+- **help**: Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `mprof`
 <p class="cmd-url"><a href="https://github.com/pythonprofilers/memory_profiler">https://github.com/pythonprofilers/memory_profiler</a></p>
 
@@ -137,12 +183,29 @@ Aliases: `https`
 - **rm**: Flags: --help, -h. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
+### `nbqa`
+<p class="cmd-url"><a href="https://nbqa.readthedocs.io/">https://nbqa.readthedocs.io/</a></p>
+
+- Allowed standalone flags: --help, --nbqa-help, --nbqa-version, --version, -h, -V
+
+### `nbstripout`
+<p class="cmd-url"><a href="https://github.com/kynan/nbstripout">https://github.com/kynan/nbstripout</a></p>
+
+- Allowed standalone flags: --attributes, --drop-empty-cells, --dry-run, --extra-keys, --force, --global, --help, --include-files-from-stdin, --install, --is-installed, --keep-count, --keep-id, --keep-metadata-keys, --keep-output, --max-size, --max-size-bytes, --no-empty-cells, --no-strip-init-cells, --strip-empty-cells, --strip-init-cells, --status, --system, --textconv, --uninstall, --verify, --version, -f, -h, -t
+- Allowed valued flags: --attributes, --extra-keys, --keep-metadata-keys, --max-size
+- Bare invocation allowed
+
 ### `nox`
 <p class="cmd-url"><a href="https://nox.thea.codes/">https://nox.thea.codes/</a></p>
 
 - Allowed standalone flags: --error-on-external-run, --error-on-missing-interpreters, --help, --list, --no-color, --no-error-on-external-run, --no-error-on-missing-interpreters, --no-install, --no-venv, --reuse-existing-virtualenvs, --stop-on-first-error, --version, -R, -h, -l, -r, -x
 - Allowed valued flags: --default-venv-backend, --envdir, --extra-pythons, --force-pythons, --noxfile, --pythons, --sessions, --tags, -e, -f, -p, -s, -t
 - Bare invocation allowed
+
+### `papermill`
+<p class="cmd-url"><a href="https://papermill.readthedocs.io/">https://papermill.readthedocs.io/</a></p>
+
+- Allowed standalone flags: --help, --version, -h
 
 ### `pdm`
 <p class="cmd-url"><a href="https://pdm-project.org/">https://pdm-project.org/</a></p>
@@ -361,6 +424,14 @@ Aliases: `pip3`
 
 - Allowed standalone flags: --help, --ignore-decorators, --ignore-names, --make-whitelist, --sort-by-size, --verbose, --version, -h, -v
 - Allowed valued flags: --config, --exclude, --min-confidence
+
+### `wandb`
+<p class="cmd-url"><a href="https://docs.wandb.ai/ref/cli/">https://docs.wandb.ai/ref/cli/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **status**: Flags: --help, --settings, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `yapf`
 <p class="cmd-url"><a href="https://github.com/google/yapf">https://github.com/google/yapf</a></p>

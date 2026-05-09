@@ -1,0 +1,22 @@
+[[command]]
+name = "eleventy"
+aliases = ["@11ty/eleventy"]
+description = "Eleventy — Node.js static site generator. Bare invocation builds the site (writes to _site/ or --output). --serve runs the long-running dev server with HMR. --watch rebuilds on changes. .eleventy.js / eleventy.config.js / eleventy.config.mjs is the project config and is loaded at startup — that's arbitrary Node.js executed every run. --dryrun skips file writes (read). Active project on the 3.x line."
+url = "https://www.11ty.dev/docs/usage/"
+researched_version = "@11ty/eleventy 3.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--dryrun", "--formats",
+    "--help", "--ignore-initial",
+    "--incremental", "--input",
+    "--output", "--quiet",
+    "--running-as-server",
+    "--to", "--version",
+    "-h", "-q",
+]
+valued = [
+    "--config", "--input",
+    "--output", "--port", "--pathprefix",
+    "--to", "--what",
+]

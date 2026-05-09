@@ -1,0 +1,9 @@
+[[command]]
+name = "papermill"
+description = "Parameterizes and executes Jupyter notebooks. Each invocation runs a notebook (executes Python — arbitrary code) and writes the result. Only --help and --version have a fixed safe surface."
+url = "https://papermill.readthedocs.io/"
+researched_version = "papermill 2.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]

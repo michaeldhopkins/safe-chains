@@ -1,0 +1,9 @@
+[[command]]
+name = "cpanm"
+description = "cpanminus — slimmer CPAN installer. Bare invocation installs the named module (network + executes build scripts = arbitrary code). --info, --look, --self-upgrade, --installdeps query state. Only --help / --version have a fixed safe surface."
+url = "https://metacpan.org/pod/App::cpanminus"
+researched_version = "App::cpanminus 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

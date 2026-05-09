@@ -1,0 +1,84 @@
+[[command]]
+name = "hexo"
+description = "Hexo — Node.js static blog framework. `init` scaffolds a project. `generate` (alias `g`) renders the site (SafeWrite). `clean` clears db.json and public/. `migrate` writes converted content from another generator. `new` scaffolds new posts. `version`, `config`, `list` are read-only. `server` runs the long-running dev server. `deploy` pushes to a remote (network)."
+url = "https://hexo.io/docs/commands"
+researched_version = "hexo 7.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--clone", "--debug", "--draft", "--drafts", "--help", "--no-clone", "--silent", "--verbose", "-h"]
+
+[[command.sub]]
+name = "generate"
+aliases = ["g"]
+level = "SafeWrite"
+bare = true
+standalone = ["--bail", "--debug", "--deploy", "--draft", "--drafts", "--force", "--help", "--silent", "--verbose", "--watch", "-d", "-f", "-h", "-w"]
+valued = ["--concurrency", "-c"]
+
+[[command.sub]]
+name = "g"
+level = "SafeWrite"
+bare = true
+standalone = ["--bail", "--debug", "--deploy", "--draft", "--drafts", "--force", "--help", "--silent", "--verbose", "--watch", "-d", "-f", "-h", "-w"]
+valued = ["--concurrency", "-c"]
+
+[[command.sub]]
+name = "clean"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "new"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--draft", "--drafts", "--help", "--replace", "--slug", "-h", "-r", "-s"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "render"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true

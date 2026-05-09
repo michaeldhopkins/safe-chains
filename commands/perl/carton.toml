@@ -1,0 +1,64 @@
+[[command]]
+name = "carton"
+description = "Perl module deployment helper — Bundler-style. `install` (network — fetches and builds modules), `update`, `bundle`, `fatpack`, `exec` execute Perl or modify ./local. `check`, `list`, `show`, `tree`, `version` are read-only inspections."
+url = "https://metacpan.org/pod/Carton"
+researched_version = "Carton 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "show"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "tree"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--without"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "bundle"
+candidate = true
+
+[[command.sub]]
+name = "fatpack"
+candidate = true

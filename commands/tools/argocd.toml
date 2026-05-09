@@ -1,0 +1,92 @@
+[[command]]
+name = "argocd"
+description = "Argo CD CLI — manages applications on an Argo CD server. Most subcommands contact the Argo CD API (network) to read or modify cluster state. Read-side: `app list/get/manifests/diff/history/resources/logs`, `proj list/get/role`, `cluster list/get`, `repo list/get`, `version`, `account list/get`, `cert list`. Write-side: `login`, `logout`, `app create/sync/rollback/delete`, `proj create/delete`, `cluster add/rm`, `repo add/rm/get`, `account update-password/can-i`, `cert add-tls/add-ssh/rm`. Carve-out covers diagnostic + read-only inspection."
+url = "https://argo-cd.readthedocs.io/en/stable/user-guide/commands/argocd/"
+researched_version = "argocd 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--client", "--grpc-web", "--help", "--insecure", "--loglevel", "--output", "--server", "--short", "-h"]
+valued = ["--auth-token", "--client-crt", "--client-crt-key", "--config", "--core", "--grpc-web-root-path", "--http-retry-max", "--kube-context", "--loglevel", "--output", "--plaintext", "--port-forward-namespace", "--server", "--server-crt"]
+
+[[command.sub]]
+name = "context"
+level = "SafeRead"
+bare = true
+standalone = ["--current", "--delete", "--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "app"
+candidate = true
+
+[[command.sub]]
+name = "appset"
+candidate = true
+
+[[command.sub]]
+name = "proj"
+candidate = true
+
+[[command.sub]]
+name = "cluster"
+candidate = true
+
+[[command.sub]]
+name = "repo"
+candidate = true
+
+[[command.sub]]
+name = "repocreds"
+candidate = true
+
+[[command.sub]]
+name = "cert"
+candidate = true
+
+[[command.sub]]
+name = "account"
+candidate = true
+
+[[command.sub]]
+name = "gpg"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "relogin"
+candidate = true
+
+[[command.sub]]
+name = "admin"
+candidate = true
+
+[[command.sub]]
+name = "configure"
+candidate = true
+
+[[command.sub]]
+name = "logout-all"
+candidate = true
+
+[[command.sub]]
+name = "load"
+candidate = true

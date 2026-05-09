@@ -1,0 +1,138 @@
+[[command]]
+name = "tilt"
+description = "Local Kubernetes / Docker dev environment with continuous build/deploy. `up` runs the long-running interactive dev loop (builds images, deploys to local cluster). `ci` runs in CI mode. `down` tears down resources. `args`, `disable`, `enable`, `trigger`, `wait` mutate cluster/run state. The carve-out covers diagnostic forms only."
+url = "https://docs.tilt.dev/cli/tilt"
+researched_version = "tilt 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "verify-install"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "up"
+candidate = true
+
+[[command.sub]]
+name = "down"
+candidate = true
+
+[[command.sub]]
+name = "ci"
+candidate = true
+
+[[command.sub]]
+name = "args"
+candidate = true
+
+[[command.sub]]
+name = "demo"
+candidate = true
+
+[[command.sub]]
+name = "trigger"
+candidate = true
+
+[[command.sub]]
+name = "wait"
+candidate = true
+
+[[command.sub]]
+name = "disable"
+candidate = true
+
+[[command.sub]]
+name = "enable"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "describe"
+candidate = true
+
+[[command.sub]]
+name = "patch"
+candidate = true
+
+[[command.sub]]
+name = "snapshot"
+candidate = true
+
+[[command.sub]]
+name = "alpha"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "get"
+candidate = true
+
+[[command.sub]]
+name = "apply"
+candidate = true
+
+[[command.sub]]
+name = "label"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "lsp"
+candidate = true
+
+[[command.sub]]
+name = "starlark"
+candidate = true
+
+[[command.sub]]
+name = "dump"
+candidate = true
+
+[[command.sub]]
+name = "kubectl"
+candidate = true
+
+[[command.sub]]
+name = "namespace"
+candidate = true

@@ -1,0 +1,191 @@
+[[command]]
+name = "vault"
+description = "HashiCorp Vault CLI — secrets management. Most subcommands contact a Vault server (network). Read-side: `read`, `list`, `kv get/list/metadata get`, `policy read/list`, `auth list`, `secrets list`, `token lookup`, `version`, `status`. Write-side: `write`, `kv put/patch/delete`, `policy write/delete`, `secrets enable/disable`, `auth enable/disable`, `login`, `logout`, `token create/revoke/renew`, `unwrap`, `delegate`, `seal`, `unseal`, `operator init/raft/migrate`."
+url = "https://developer.hashicorp.com/vault/docs/commands"
+researched_version = "Vault 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--format", "--help", "-h"]
+valued = ["--address", "--format"]
+
+[[command.sub]]
+name = "read"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--field", "--help", "--mount", "-h"]
+valued = ["--address", "--field", "--format", "--namespace"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--detailed", "--help", "--mount", "-h"]
+valued = ["--address", "--format", "--namespace"]
+
+[[command.sub]]
+name = "kv"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "get"
+standalone = ["--field", "--help", "--mount", "-h"]
+valued = ["--address", "--field", "--format", "--namespace", "--version"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--mount", "-h"]
+valued = ["--address", "--format", "--namespace"]
+
+[[command.sub.sub]]
+name = "metadata"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "patch"
+candidate = true
+
+[[command.sub.sub]]
+name = "put"
+candidate = true
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "destroy"
+candidate = true
+
+[[command.sub.sub]]
+name = "rollback"
+candidate = true
+
+[[command.sub.sub]]
+name = "undelete"
+candidate = true
+
+[[command.sub.sub]]
+name = "enable-versioning"
+candidate = true
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "write"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "secrets"
+candidate = true
+
+[[command.sub]]
+name = "policy"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "token"
+candidate = true
+
+[[command.sub]]
+name = "lease"
+candidate = true
+
+[[command.sub]]
+name = "operator"
+candidate = true
+
+[[command.sub]]
+name = "audit"
+candidate = true
+
+[[command.sub]]
+name = "namespace"
+candidate = true
+
+[[command.sub]]
+name = "ssh"
+candidate = true
+
+[[command.sub]]
+name = "transit"
+candidate = true
+
+[[command.sub]]
+name = "unwrap"
+candidate = true
+
+[[command.sub]]
+name = "wrap"
+candidate = true
+
+[[command.sub]]
+name = "agent"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "events"
+candidate = true
+
+[[command.sub]]
+name = "monitor"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true
+
+[[command.sub]]
+name = "patch"
+candidate = true
+
+[[command.sub]]
+name = "path-help"
+candidate = true
+
+[[command.sub]]
+name = "pki"
+candidate = true
+
+[[command.sub]]
+name = "plugin"
+candidate = true
+
+[[command.sub]]
+name = "print"
+candidate = true
+
+[[command.sub]]
+name = "proxy"
+candidate = true

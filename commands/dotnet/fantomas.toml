@@ -1,0 +1,18 @@
+[[command]]
+name = "fantomas"
+description = "F# source code formatter. Without --check, rewrites files in place. --check exits non-zero on diff (read). Static formatter — does not execute F#. Active project."
+url = "https://github.com/fsprojects/fantomas"
+researched_version = "fantomas 6.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--check", "--daemon", "--force", "--help",
+    "--out", "--profile", "--quiet",
+    "--recurse", "--standalone", "--strict",
+    "--verbose", "--version",
+    "-h", "-r",
+]
+valued = [
+    "--config", "--exclude", "--include",
+    "--out", "--parallel",
+]

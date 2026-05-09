@@ -1,0 +1,84 @@
+[[command]]
+name = "raco"
+description = "Racket command-line tool. `pkg install/update/remove/migrate/setup` modify the user's package state and may contact pkgs.racket-lang.org (network). `make`, `exe`, `distribute` produce artifacts (write). `test`, `setup` execute Racket code. `doc`, `docs`, `help`, `pkg show`, `pkg config`, `pkg dirs`, `link --list`, `--list`, `version` are read-only."
+url = "https://docs.racket-lang.org/raco/"
+researched_version = "Racket 8.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "doc"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--no-build", "-h"]
+
+[[command.sub]]
+name = "docs"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "make"
+candidate = true
+
+[[command.sub]]
+name = "exe"
+candidate = true
+
+[[command.sub]]
+name = "distribute"
+candidate = true
+
+[[command.sub]]
+name = "pkg"
+candidate = true
+
+[[command.sub]]
+name = "setup"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "demod"
+candidate = true
+
+[[command.sub]]
+name = "link"
+candidate = true
+
+[[command.sub]]
+name = "expand"
+candidate = true
+
+[[command.sub]]
+name = "decompile"
+candidate = true
+
+[[command.sub]]
+name = "macro-debugger"
+candidate = true
+
+[[command.sub]]
+name = "scribble"
+candidate = true
+
+[[command.sub]]
+name = "fmt"
+candidate = true
+
+[[command.sub]]
+name = "review"
+candidate = true

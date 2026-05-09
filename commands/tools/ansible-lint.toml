@@ -1,0 +1,27 @@
+[[command]]
+name = "ansible-lint"
+description = "Static linter for Ansible playbooks. Reads YAML files and reports issues. --fix applies auto-fixable rules in place (project-local SafeWrite via write_flags). Does not connect to any inventory or run plays. Active project."
+url = "https://ansible.readthedocs.io/projects/lint/"
+researched_version = "ansible-lint 25.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--fix", "--force-color", "--format",
+    "--generate-ignore", "--help", "--list-rules",
+    "--list-tags", "--nocolor",
+    "--offline", "--parseable",
+    "--parseable-severity", "--profile",
+    "--quiet", "--strict",
+    "--verbose", "--version",
+    "-L", "-T", "-h", "-q", "-v",
+]
+valued = [
+    "--config-file", "--exclude",
+    "--ignore-file", "--profile",
+    "--project-dir", "--rulesdir",
+    "--show-relpath", "--skip-list",
+    "--tags", "--warn-list",
+    "--write",
+    "-c", "-r", "-t", "-w", "-x",
+]
+write_flags = ["--fix", "--write", "-w"]

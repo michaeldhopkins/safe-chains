@@ -1,0 +1,17 @@
+[[command]]
+name = "age"
+description = "Modern, simple file encryption tool. Bare invocation reads input (file or stdin) and writes encrypted output (or vice versa with -d/--decrypt). -o/--output redirects from stdout to a file. -r/--recipient and -R/--recipients-file specify keys; -i/--identity sets the decryption key. -a/--armor produces ASCII output. -p/--passphrase prompts. No network. Active project."
+url = "https://age-encryption.org/"
+researched_version = "age 1.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--armor", "--decrypt", "--encrypt",
+    "--help", "--passphrase", "--version",
+    "-a", "-d", "-e", "-h", "-p",
+]
+valued = [
+    "--identity", "--output",
+    "--recipient", "--recipients-file",
+    "-R", "-i", "-o", "-r",
+]

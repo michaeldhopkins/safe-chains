@@ -1,0 +1,77 @@
+[[command]]
+name = "roc"
+description = "Roc — fast, friendly, functional language. `build` compiles a binary (SafeWrite). `run`, `test`, `repl`, `dev`, `app` execute Roc code. `format`, `check`, `docs` are read or write static analysis / docs generation. `--version`, `--help` are diagnostic. Active early project."
+url = "https://www.roc-lang.org/"
+researched_version = "roc 0.x; pre-1.0"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "format"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--check", "--help", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--emit-llvm-ir", "--help", "--main", "--no-color", "--no-link", "--time", "-h"]
+valued = ["--main", "--target"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--build-host", "--debug", "--dev", "--emit-llvm-ir", "--help", "--linker", "--main", "--no-color", "--no-link", "--optimize", "--prebuilt-platform", "--profiling", "--release", "--standalone", "--time", "-h", "-O"]
+valued = ["--linker", "--main", "--optimize", "--output", "--prebuilt-platform", "--target"]
+
+[[command.sub]]
+name = "docs"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--output"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "dev"
+candidate = true
+
+[[command.sub]]
+name = "app"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "repl"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "deps"
+candidate = true
+
+[[command.sub]]
+name = "preprocess-host"
+candidate = true

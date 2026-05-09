@@ -1,0 +1,169 @@
+[[command]]
+name = "nomad"
+description = "HashiCorp Nomad CLI — cluster scheduler. Most subcommands contact a Nomad server (network) to read or schedule jobs. Carve-out covers diagnostic + read-only inspection: `version`, `status`, `job status`, `job inspect`, `node status`, `alloc status`, `eval status`, `validate`, `fmt --check`, `monitor`, `agent-info`."
+url = "https://developer.hashicorp.com/nomad/docs/commands"
+researched_version = "Nomad 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-address", "-namespace", "-region", "-token", "-token-file"]
+
+[[command.sub]]
+name = "agent-info"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["-address"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-vault-namespace", "-vault-token"]
+
+[[command.sub]]
+name = "fmt"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--check", "--help", "--list", "--recursive", "--write", "-c", "-h", "-l", "-recursive", "-w"]
+write_flags = ["--write", "-w"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "agent"
+candidate = true
+
+[[command.sub]]
+name = "alloc"
+candidate = true
+
+[[command.sub]]
+name = "alloc-status"
+candidate = true
+
+[[command.sub]]
+name = "client-config"
+candidate = true
+
+[[command.sub]]
+name = "deployment"
+candidate = true
+
+[[command.sub]]
+name = "eval"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "job"
+candidate = true
+
+[[command.sub]]
+name = "license"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub]]
+name = "monitor"
+candidate = true
+
+[[command.sub]]
+name = "namespace"
+candidate = true
+
+[[command.sub]]
+name = "node"
+candidate = true
+
+[[command.sub]]
+name = "node-drain"
+candidate = true
+
+[[command.sub]]
+name = "node-status"
+candidate = true
+
+[[command.sub]]
+name = "operator"
+candidate = true
+
+[[command.sub]]
+name = "plan"
+candidate = true
+
+[[command.sub]]
+name = "quota"
+candidate = true
+
+[[command.sub]]
+name = "recommendation"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "scaling"
+candidate = true
+
+[[command.sub]]
+name = "sentinel"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "service"
+candidate = true
+
+[[command.sub]]
+name = "stop"
+candidate = true
+
+[[command.sub]]
+name = "system"
+candidate = true
+
+[[command.sub]]
+name = "tls"
+candidate = true
+
+[[command.sub]]
+name = "ui"
+candidate = true
+
+[[command.sub]]
+name = "var"
+candidate = true
+
+[[command.sub]]
+name = "volume"
+candidate = true

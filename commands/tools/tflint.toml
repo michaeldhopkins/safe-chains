@@ -1,0 +1,28 @@
+[[command]]
+name = "tflint"
+description = "Pluggable Terraform linter. Reads .tf files and reports issues. --recursive walks subdirectories. --fix applies safe auto-fixes (project-local SafeWrite via write_flags). --init downloads configured plugins (network)."
+url = "https://github.com/terraform-linters/tflint"
+researched_version = "tflint 0.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--call-module-type", "--chdir",
+    "--config", "--color", "--disable-rule",
+    "--disable-plugins", "--enable-rule",
+    "--enable-plugin", "--filter",
+    "--fix", "--force", "--format",
+    "--help", "--ignore-module", "--init",
+    "--minimum-failure-severity", "--module",
+    "--no-color", "--no-module",
+    "--only", "--quiet",
+    "--recursive", "--var-file", "--version",
+    "-c", "-f", "-h", "-q", "-v",
+]
+valued = [
+    "--act-as-bundled-plugin", "--config",
+    "--filter", "--format",
+    "--ignore-module", "--module",
+    "--var", "--var-file",
+    "-v",
+]
+write_flags = ["--fix"]

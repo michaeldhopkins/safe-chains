@@ -1,0 +1,35 @@
+[[command]]
+name = "tfsec"
+description = "Static security scanner for Terraform. Reads .tf files and reports policy violations. -O / --out writes a report file (project-local SafeWrite via write_flags). Pure static analysis. Note: tfsec is in maintenance — Aqua recommends migrating to trivy's terraform scanner."
+url = "https://github.com/aquasecurity/tfsec"
+researched_version = "tfsec 1.x; maintenance mode"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--allow-checks-to-panic", "--color",
+    "--concise-output", "--config-file",
+    "--custom-check-dir", "--custom-check-url",
+    "--debug", "--exclude-downloaded-modules",
+    "--exclude-paths", "--filter-results",
+    "--force-all-dirs", "--format",
+    "--gif", "--help", "--ignore-warnings",
+    "--include-ignored", "--include-passed",
+    "--minimum-severity", "--no-code", "--no-color",
+    "--no-colour", "--no-ignores",
+    "--no-module-downloads", "--out",
+    "--rego-policy-dir", "--run-statistics",
+    "--single-thread", "--soft-fail",
+    "--tfvars-file", "--update",
+    "--var-file", "--verbose",
+    "--version", "--workspace",
+    "-h",
+]
+valued = [
+    "--config-file", "--custom-check-dir",
+    "--custom-check-url",
+    "--exclude-paths", "--format",
+    "--minimum-severity", "--out",
+    "--rego-policy-dir", "--tfvars-file",
+    "--var-file", "--workspace",
+]
+write_flags = ["--out"]

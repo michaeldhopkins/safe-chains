@@ -1,0 +1,187 @@
+[[command]]
+name = "op"
+description = "1Password CLI — fetches and manages items in 1Password vaults. Every meaningful subcommand contacts the 1Password servers (or local biometric service) over the network. `account list/get`, `vault list/get`, `item list/get/template`, `document list/get`, `user list/get`, `group list/get`, `read`, `whoami`, `account list` are read-only network operations. `signin`, `signout`, `account add/forget` change local credential state. `inject`, `run`, `read --to-clipboard` resolve secrets in shell pipelines. `item create/edit/delete/share`, `vault create/edit/delete`, `document create/edit/delete`, `user provision/suspend/reactivate`, `group create/edit/delete`, `connect`, `events-api` mutate remote state. The diagnostic surface (--version / --help) is local-only."
+url = "https://developer.1password.com/docs/cli/reference/"
+researched_version = "op 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "account"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--format", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+valued = ["--account", "--format"]
+
+[[command.sub]]
+name = "vault"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--account", "--format", "--group", "--user"]
+
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+valued = ["--account", "--format"]
+
+[[command.sub.sub]]
+name = "list-users"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list-groups"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "item"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--include-archive", "-h"]
+valued = ["--account", "--categories", "--favorite", "--format", "--include-archive", "--long", "--tags", "--vault"]
+
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+valued = ["--account", "--fields", "--format", "--otp", "--reveal", "--vault"]
+
+[[command.sub.sub]]
+name = "template"
+standalone = ["--help", "-h"]
+valued = ["--account", "--format"]
+
+[[command.sub]]
+name = "document"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--include-archive", "-h"]
+valued = ["--account", "--format", "--vault"]
+
+[[command.sub.sub]]
+name = "get"
+standalone = ["--force", "--help", "-h"]
+valued = ["--account", "--include-archive", "--out-file", "--vault"]
+write_flags = ["--out-file"]
+
+[[command.sub]]
+name = "user"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--account", "--format", "--group", "--vault"]
+
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "--me", "-h"]
+valued = ["--account", "--format", "--fingerprint", "--public-key"]
+
+[[command.sub]]
+name = "group"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--account", "--format", "--user", "--vault"]
+
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+valued = ["--account", "--format"]
+
+[[command.sub.sub]]
+name = "list-users"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list-groups"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "read"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--force", "--help", "--no-newline", "-h", "-n"]
+valued = ["--account", "--out-file"]
+write_flags = ["--out-file"]
+
+[[command.sub]]
+name = "whoami"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--account", "--format"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "signin"
+candidate = true
+
+[[command.sub]]
+name = "signout"
+candidate = true
+
+[[command.sub]]
+name = "inject"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "events-api"
+candidate = true
+
+[[command.sub]]
+name = "connect"
+candidate = true
+
+[[command.sub]]
+name = "service-account"
+candidate = true
+
+[[command.sub]]
+name = "device"
+candidate = true
+
+[[command.sub]]
+name = "encode"
+candidate = true
+
+[[command.sub]]
+name = "plugin"
+candidate = true
+
+[[command.sub]]
+name = "ssh"
+candidate = true

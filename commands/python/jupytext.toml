@@ -1,0 +1,26 @@
+[[command]]
+name = "jupytext"
+description = "Round-trip converter between Jupyter notebooks (.ipynb) and plain-text formats (Markdown, py:percent, py:light, etc.). Without --to / --update, prints to stdout. With --update or --output, rewrites files (project-local SafeWrite via write_flags). --execute runs notebook cells, executing arbitrary Python — that's a write-class operation."
+url = "https://jupytext.readthedocs.io/"
+researched_version = "jupytext 1.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--check-paired", "--diff",
+    "--help", "--out", "--quiet",
+    "--show-changes", "--sync",
+    "--test", "--test-strict",
+    "--update-metadata", "--use-source-timestamp",
+    "--version", "--warn-only",
+    "-h", "-q",
+]
+valued = [
+    "--from", "--input-format",
+    "--opt", "--output", "--output-format",
+    "--paired-paths", "--pipe",
+    "--pipe-fmt", "--pre-commit-mode",
+    "--set-formats", "--set-kernel",
+    "--to", "--warn-only",
+    "-K", "-i", "-k", "-o",
+]
+write_flags = ["--output", "-o", "--update-metadata", "--sync", "--set-formats"]

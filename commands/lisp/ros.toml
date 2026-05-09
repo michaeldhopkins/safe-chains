@@ -1,0 +1,87 @@
+[[command]]
+name = "ros"
+description = "Roswell — Lisp implementation manager and script runner. `install`, `update`, `uninstall`, `setup` modify ~/.roswell/ (system-state writes + network fetches from upstream Lisp implementations). `run`, `script`, `exec`, `dump` execute Lisp code. `list`, `version`, `init`, `template`, `--help` are diagnostic. The carve-out covers diagnostic forms only."
+url = "https://github.com/roswell/roswell"
+researched_version = "Roswell 24.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "use"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "setup"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "script"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "dump"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "template"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "asdf"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true

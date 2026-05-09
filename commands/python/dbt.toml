@@ -1,0 +1,118 @@
+[[command]]
+name = "dbt"
+description = "Data build tool — manages SQL transformations. `compile`, `parse`, `ls/list`, `docs generate`, `debug`, `version`, `init` are read-only or scaffolding. `run`, `seed`, `snapshot`, `test`, `build`, `freshness`, `source`, `clean`, `deps`, `docs serve`, `clone` execute SQL against the configured database (external system writes). Carve-out covers diagnostic / read-only forms."
+url = "https://docs.getdbt.com/reference/dbt-commands"
+researched_version = "dbt-core 1.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "debug"
+level = "SafeRead"
+bare = true
+standalone = ["--config-dir", "--connection", "--help", "--no-version-check", "--quiet", "--version-check", "-h", "-q"]
+valued = ["--profile", "--project-dir", "--profiles-dir", "--target", "-t"]
+
+[[command.sub]]
+name = "compile"
+level = "SafeRead"
+bare = true
+standalone = ["--cache-selected-only", "--debug", "--exclude-resource-type", "--full-refresh", "--help", "--inline", "--no-cache-selected-only", "--no-defer", "--no-favor-state", "--no-full-refresh", "--no-introspect", "--no-partial-parse", "--no-populate-cache", "--no-print", "--no-static-parser", "--no-version-check", "--profile", "--profiles-dir", "--quiet", "--show", "--target", "--target-path", "--threads", "--vars", "--warn-error", "-h", "-q"]
+valued = ["--exclude", "--inline", "--profile", "--profiles-dir", "--project-dir", "--resource-type", "--select", "--state", "--target", "--target-path", "--threads", "--vars", "-d", "-m", "-s", "-t"]
+
+[[command.sub]]
+name = "parse"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--no-partial-parse", "--no-static-parser", "--no-version-check", "--quiet", "--show-hash", "--write-json", "-h", "-q"]
+valued = ["--profile", "--profiles-dir", "--project-dir", "--target", "--target-path", "--threads", "--vars", "-t"]
+
+[[command.sub]]
+name = "ls"
+aliases = ["list"]
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--no-version-check", "--quiet", "--resource-type", "-h", "-q"]
+valued = ["--exclude", "--exclude-resource-type", "--output", "--output-keys", "--profile", "--profiles-dir", "--project-dir", "--resource-type", "--select", "--state", "--target", "-d", "-m", "-s", "-t"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--no-version-check", "--quiet", "-h", "-q"]
+valued = ["--exclude", "--output", "--output-keys", "--profile", "--profiles-dir", "--project-dir", "--resource-type", "--select", "--state", "--target", "-d", "-m", "-s", "-t"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--profiles-dir", "--quiet", "--skip-profile-setup", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "deps"
+level = "SafeWrite"
+bare = true
+standalone = ["--add-package", "--dry-run", "--help", "--lock", "--no-lock", "--quiet", "--upgrade", "-h", "-q"]
+valued = ["--profile", "--profiles-dir", "--project-dir", "--source", "--target", "--vars", "-t"]
+
+[[command.sub]]
+name = "clean"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--no-clean-project-files-only", "--profile", "--quiet", "-h", "-q"]
+valued = ["--profile", "--profiles-dir", "--project-dir", "--target"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "seed"
+candidate = true
+
+[[command.sub]]
+name = "snapshot"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "freshness"
+candidate = true
+
+[[command.sub]]
+name = "source"
+candidate = true
+
+[[command.sub]]
+name = "docs"
+candidate = true
+
+[[command.sub]]
+name = "clone"
+candidate = true
+
+[[command.sub]]
+name = "run-operation"
+candidate = true
+
+[[command.sub]]
+name = "show"
+candidate = true
+
+[[command.sub]]
+name = "retry"
+candidate = true
