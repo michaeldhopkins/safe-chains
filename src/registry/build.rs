@@ -218,6 +218,29 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     let researched_version = toml.researched_version;
     let examples_safe = toml.examples_safe;
     let examples_denied = toml.examples_denied;
+    if toml.deny.unwrap_or(false) {
+        return CommandSpec {
+            name: toml.name,
+            description: desc,
+            aliases: toml.aliases,
+            url: toml.url,
+            category: cat,
+            researched_version,
+            examples_safe,
+            examples_denied,
+            kind: DispatchKind::Policy {
+                policy: OwnedPolicy {
+                    standalone: Vec::new(),
+                    valued: Vec::new(),
+                    bare: false,
+                    max_positional: Some(0),
+                    flag_style: crate::policy::FlagStyle::Strict,
+                    numeric_dash: false,
+                },
+                level: SafetyLevel::Inert,
+            },
+        };
+    }
     if let Some(handler_name) = toml.handler {
         return CommandSpec {
             name: toml.name,
@@ -395,20 +418,30 @@ pub fn load_toml(source: &str, category: &str) -> Vec<CommandSpec> {
 pub fn build_registry(specs: Vec<CommandSpec>) -> HashMap<String, CommandSpec> {
     let mut map = HashMap::new();
     for spec in specs {
-        for alias in &spec.aliases {
-            map.insert(alias.clone(), CommandSpec {
-                name: spec.name.clone(),
-                description: spec.description.clone(),
-                aliases: vec![],
-                url: spec.url.clone(),
-                category: spec.category.clone(),
-                researched_version: spec.researched_version.clone(),
-                examples_safe: vec![],
-                examples_denied: vec![],
-                kind: spec.kind.clone(),
-            });
-        }
-        map.insert(spec.name.clone(), spec);
+        insert_spec(&mut map, spec);
     }
     map
+}
+
+/// Insert a CommandSpec into the registry, registering both its canonical
+/// name and each alias. Existing entries for the same command name are
+/// removed first, so a custom-TOML override of `gh` replaces every
+/// built-in alias of `gh` rather than leaving stale aliases pointing at
+/// the old spec.
+pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
+    map.retain(|_, s| s.name != spec.name);
+    for alias in &spec.aliases {
+        map.insert(alias.clone(), CommandSpec {
+            name: spec.name.clone(),
+            description: spec.description.clone(),
+            aliases: vec![],
+            url: spec.url.clone(),
+            category: spec.category.clone(),
+            researched_version: spec.researched_version.clone(),
+            examples_safe: vec![],
+            examples_denied: vec![],
+            kind: spec.kind.clone(),
+        });
+    }
+    map.insert(spec.name.clone(), spec);
 }

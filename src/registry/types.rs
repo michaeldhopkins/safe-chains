@@ -59,6 +59,11 @@ pub(super) struct TomlCommand {
     pub examples_safe: Vec<String>,
     #[serde(default)]
     pub examples_denied: Vec<String>,
+    /// Shortcut: every invocation of this command is denied. Used in custom
+    /// TOMLs to lock down a built-in (e.g. `name = "gh", deny = true` in
+    /// `.safe-chains.toml` denies every gh form for that project).
+    #[serde(default)]
+    pub deny: Option<bool>,
 }
 
 #[derive(Debug, Deserialize)]

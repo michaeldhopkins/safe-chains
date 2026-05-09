@@ -1714,6 +1714,54 @@ use super::*;
     }
 
     #[test]
+    fn deny_field_denies_every_invocation() {
+        let source = r#"
+[[command]]
+name = "demo-deny"
+deny = true
+"#;
+        let specs = load_toml(source, "test");
+        let map = build_registry(specs);
+        let spec = map.get("demo-deny").expect("demo-deny in registry");
+        for case in ["demo-deny", "demo-deny --help", "demo-deny foo bar", "demo-deny -x"] {
+            let parsed = toks(&case.split_whitespace().collect::<Vec<_>>());
+            assert_eq!(
+                dispatch_spec(&parsed, spec),
+                Verdict::Denied,
+                "expected denied: {case}",
+            );
+        }
+    }
+
+    #[test]
+    fn insert_spec_replaces_aliases() {
+        let original = load_toml(r#"
+[[command]]
+name = "original-tool"
+aliases = ["o", "orig"]
+url = "x"
+description = "first"
+bare_flags = ["--help"]
+"#, "test");
+        let mut map = build_registry(original);
+        assert!(map.contains_key("o"));
+        assert!(map.contains_key("orig"));
+
+        let override_spec = load_toml(r#"
+[[command]]
+name = "original-tool"
+deny = true
+"#, "test").into_iter().next().unwrap();
+        super::build::insert_spec(&mut map, override_spec);
+
+        assert!(!map.contains_key("o"), "stale alias 'o' must be removed");
+        assert!(!map.contains_key("orig"), "stale alias 'orig' must be removed");
+        let spec = &map["original-tool"];
+        let parsed = toks(&["original-tool", "--help"]);
+        assert_eq!(dispatch_spec(&parsed, spec), Verdict::Denied);
+    }
+
+    #[test]
     fn toml_hash_commands_work() {
         assert!(crate::is_safe_command("md5sum file.txt"));
         assert!(crate::is_safe_command("sha256sum file.txt"));
