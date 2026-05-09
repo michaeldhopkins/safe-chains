@@ -79,11 +79,25 @@ Aliases: `pip3`
 ### `pyenv`
 <p class="cmd-url"><a href="https://github.com/pyenv/pyenv#readme">https://github.com/pyenv/pyenv#readme</a></p>
 
+- **commands**: Flags: --bare, --help, -h
+- **completions**: Flags: --bare, --help, -h
+- **global**: Flags: --help, -h
 - **help**: Flags: --bare, --help, -h
+- **hooks**: Flags: --bare, --help, -h
+- **install**: Flags: --debug, --force, --help, --keep, --list, --patch, --skip-existing, --verbose, --version, -f, -g, -h, -k, -l, -p, -s, -v
+- **local**: Flags: --force, --help, --unset, -f, -h
+- **prefix**: Flags: --bare, --help, -h
+- **rehash**: Flags: --help, -h
 - **root**: Flags: --bare, --help, -h
+- **shell**: Flags: --help, --unset, -h
 - **shims**: Flags: --bare, --help, -h
+- **uninstall**: Flags: --force, --help, -f, -h
 - **version**: Flags: --bare, --help, -h
-- **versions**: Flags: --bare, --help, -h
+- **version-file**: Flags: --bare, --help, -h
+- **version-name**: Flags: --bare, --help, -h
+- **version-origin**: Flags: --bare, --help, -h
+- **versions**: Flags: --bare, --help, --skip-aliases, -h
+- **whence**: Flags: --bare, --help, -h
 - **which**: Flags: --bare, --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 

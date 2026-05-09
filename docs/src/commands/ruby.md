@@ -87,11 +87,24 @@
 ### `rbenv`
 <p class="cmd-url"><a href="https://github.com/rbenv/rbenv#readme">https://github.com/rbenv/rbenv#readme</a></p>
 
+- **completions**: Flags: --help, -h
+- **global**: Flags: --help, -h
 - **help**: Flags: --help, -h
+- **hooks**: Flags: --help, -h
+- **install**: Flags: --force, --help, --keep, --list, --list-all, --patch, --skip-existing, --verbose, --version, -L, -f, -h, -k, -l, -p, -s, -v
+- **local**: Flags: --help, --unset, -h
+- **prefix**: Flags: --help, -h
+- **rehash**: Flags: --help, -h
 - **root**: Flags: --help, -h
+- **shell**: Flags: --help, --unset, -h
 - **shims**: Flags: --help, -h
+- **uninstall**: Flags: --force, --help, -f, -h
 - **version**: Flags: --help, -h
-- **versions**: Flags: --help, -h
+- **version-file**: Flags: --help, -h
+- **version-name**: Flags: --help, -h
+- **version-origin**: Flags: --help, -h
+- **versions**: Flags: --bare, --help, -h
+- **whence**: Flags: --help, -h
 - **which**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
@@ -106,4 +119,44 @@
 <p class="cmd-url"><a href="https://www.ruby-lang.org/en/documentation/">https://www.ruby-lang.org/en/documentation/</a></p>
 
 - Allowed standalone flags: --help, --version, -V, -h, -v
+
+### `rvm`
+<p class="cmd-url"><a href="https://rvm.io/rvm/cli">https://rvm.io/rvm/cli</a></p>
+
+- **alias create**: Flags: --help, -h
+- **alias delete**: Flags: --help, -h
+- **alias list**: Flags: --help, -h
+- **alias show**: Flags: --help, -h
+- **cleanup**: Flags: --help, -h
+- **current**: Flags: --help, -h
+- **disk-usage**: Flags: --help, -h
+- **doctor**: Flags: --help, -h
+- **env**: Flags: --help, -h
+- **gemdir**: Flags: --help, -h
+- **gemhome**: Flags: --help, -h
+- **gempath**: Flags: --help, -h
+- **gemset copy**: Flags: --help, -h
+- **gemset create**: Flags: --help, -h
+- **gemset delete**: Flags: --force, --help, -h
+- **gemset dir**: Flags: --help, -h
+- **gemset empty**: Flags: --force, --help, -h
+- **gemset list**: Flags: --help, -h
+- **gemset list_all**: Flags: --help, -h
+- **gemset name**: Flags: --help, -h
+- **gemset rename**: Flags: --help, -h
+- **gemset use**: Flags: --create, --default, --help, -h
+- **info**: Flags: --help, -h
+- **install**: Flags: --default, --force, --help, -h. Valued: --with-openssl-dir, --with-readline-dir
+- **list**: Flags: --default, --help, -h
+- **ls**: Flags: --default, --help, -h
+- **notes**: Flags: --help, -h
+- **reinstall**: Flags: --force, --help, -h
+- **remove**: Flags: --force, --help, -h
+- **repair**: Flags: --help, -h
+- **requirements**: Flags: --help, -h
+- **strings**: Flags: --help, -h
+- **uninstall**: Flags: --force, --help, -h
+- **use**: Flags: --create, --default, --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
 

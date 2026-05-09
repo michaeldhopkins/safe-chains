@@ -29,9 +29,12 @@ static HELP_ONLY: FlagPolicy = FlagPolicy {
     numeric_dash: false,
 };
 
-static BUNDLE_EXEC_SAFE: WordSet = WordSet::new(&[
-    "brakeman", "cucumber", "erb_lint", "herb", "rspec", "standardrb",
-]);
+/// Legacy fast path for tools that don't yet have a top-level command
+/// allowlist. New entries should land as a top-level TOML and be added
+/// to the bundle-exec delegation match above instead — that path
+/// recursively validates flags so write-mode flags promote the level
+/// correctly. This list will shrink to empty as those land.
+static BUNDLE_EXEC_SAFE: WordSet = WordSet::new(&[]);
 
 pub fn check_bundle_config(tokens: &[Token]) -> Verdict {
     if tokens.len() == 1 {
@@ -63,16 +66,28 @@ pub fn check_bundle_exec(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && (cmd == "--help" || cmd == "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
+    // Tools that are also covered as top-level commands: delegate
+    // through command_verdict so flag-driven level promotion (e.g.
+    // rubocop --autocorrect → SafeWrite) and full flag allowlists
+    // apply, instead of the legacy hard-coded SafeRead shortcut.
+    if matches!(
+        cmd.as_str(),
+        "brakeman"
+        | "cucumber"
+        | "erb_lint"
+        | "erblint"
+        | "gem"
+        | "herb"
+        | "rails"
+        | "rspec"
+        | "rubocop"
+        | "standardrb"
+    ) {
+        let inner = shell_words::join(tokens[1..].iter().map(|t| t.as_str()));
+        return crate::command_verdict(&inner);
+    }
     if BUNDLE_EXEC_SAFE.contains(cmd) {
         return Verdict::Allowed(SafetyLevel::SafeRead);
-    }
-    if cmd == "rails" {
-        let inner = shell_words::join(tokens[1..].iter().map(|t| t.as_str()));
-        return crate::command_verdict(&inner);
-    }
-    if cmd == "gem" {
-        let inner = shell_words::join(tokens[1..].iter().map(|t| t.as_str()));
-        return crate::command_verdict(&inner);
     }
     if cmd == "appraisal" {
         return check_appraisal(&tokens[1..]);
@@ -135,7 +150,8 @@ mod tests {
         bundle_exec_cucumber: "bundle exec cucumber",
         bundle_exec_brakeman: "bundle exec brakeman",
         bundle_exec_erb_lint: "bundle exec erb_lint app/views/foo.html.erb",
-        bundle_exec_herb: "bundle exec herb app/views/foo.html.erb",
+        bundle_exec_herb_lint: "bundle exec herb lint app/views/foo.html.erb",
+        bundle_exec_herb_format_check: "bundle exec herb format --check app/views/foo.html.erb",
         bundle_exec_rails_routes: "bundle exec rails routes",
         bundle_exec_rails_routes_grep: "bundle exec rails routes --grep dun_and_bradstreet",
         bundle_exec_rails_routes_controller: "bundle exec rails routes --controller users",

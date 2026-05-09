@@ -1,0 +1,23 @@
+[[command]]
+name = "erb_lint"
+description = "ERB linter from Shopify, written in Ruby. Reports style and correctness issues in ERB templates against a configurable rule set; in default mode it doesn't modify files. The -a/--autocorrect flag rewrites template files in place using the linters that support correction. erb_lint loads and parses ERB files but does not execute the templates' Ruby code at lint time. Releases are infrequent (every few months). Sometimes installed as the binary `erblint` instead of `erb_lint` depending on packaging."
+url = "https://github.com/Shopify/erb_lint"
+researched_version = "erb_lint ~0.x line; flag surface stable across recent releases as of 2026-05"
+aliases = ["erblint"]
+level = "SafeRead"
+bare = true
+standalone = [
+    "--allow-no-files", "--autocorrect", "--clear-cache",
+    "--color", "--enable-all-linters", "--fail-level",
+    "--help", "--no-color", "--quiet", "--stats",
+    "--verbose", "--version",
+    "-a", "-h", "-q",
+]
+valued = [
+    "--config", "--custom-rule-files",
+    "--disable-linters", "--enable-linters",
+    "--exclude", "--format", "--lint-all",
+    "--stdin",
+    "-c", "-f",
+]
+write_flags = ["--autocorrect", "-a"]

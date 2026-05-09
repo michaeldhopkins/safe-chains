@@ -1,0 +1,235 @@
+[[command]]
+name = "rvm"
+description = "Ruby Version Manager (RVM): a long-running tool for installing, switching between, and managing Ruby interpreters and per-project gemsets. RVM is implemented as a mix of a shell function (loaded from ~/.rvm/scripts/rvm) and on-disk shell scripts; some subcommands route through the shell function, others execute scripts directly. The subcommand surface is broad and mixes read-only inspection (list, info, current, version, env, gemdir, gempath, gemhome) with operations that download, compile, and install entire Ruby toolchains (install, reinstall, upgrade, fetch), modify the active shell or default Ruby (use, default, alias), uninstall or wipe state (uninstall, remove, cleanup, repair, implode, seppuku), update RVM itself (get, update), and execute arbitrary code under selected Rubies (do, exec, ruby). Several subcommands have their own nested subcommands (gemset, alias, config) that further mix reads and writes. There is no auth model — RVM operates entirely on local files under ~/.rvm and on remote downloads from rvm.io / ruby-lang.org during install. The project releases very infrequently: 1.29.12 in January 2021 was the last stable tag, and most current usage is against the master branch (rvm get head). Treat the surface as frozen but vet new commits if upstream resumes."
+url = "https://rvm.io/rvm/cli"
+researched_version = "1.29.12 (January 2021); active development on master branch"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--default", "--help", "-h"]
+
+[[command.sub]]
+name = "ls"
+standalone = ["--default", "--help", "-h"]
+
+[[command.sub]]
+name = "current"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "gemdir"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "gempath"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "gemhome"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "strings"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "requirements"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "notes"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "disk-usage"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "install"
+level = "SafeWrite"
+bare = false
+standalone = ["--default", "--force", "--help", "-h"]
+valued = ["--with-openssl-dir", "--with-readline-dir"]
+
+[[command.sub]]
+name = "reinstall"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "use"
+level = "SafeWrite"
+bare = false
+standalone = ["--create", "--default", "--help", "-h"]
+
+[[command.sub]]
+name = "uninstall"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "remove"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "cleanup"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "repair"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "fetch"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "implode"
+candidate = true
+
+[[command.sub]]
+name = "seppuku"
+candidate = true
+
+[[command.sub]]
+name = "get"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "do"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "ruby"
+candidate = true
+
+[[command.sub]]
+name = "gemset"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list_all"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "name"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "dir"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "create"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "use"
+level = "SafeWrite"
+bare = false
+standalone = ["--create", "--default", "--help", "-h"]
+
+[[command.sub.sub]]
+name = "delete"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub.sub]]
+name = "empty"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub.sub]]
+name = "copy"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "rename"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "export"
+candidate = true
+
+[[command.sub.sub]]
+name = "import"
+candidate = true
+
+[[command.sub.sub]]
+name = "pristine"
+candidate = true
+
+[[command.sub.sub]]
+name = "globalcache"
+candidate = true
+
+[[command.sub]]
+name = "alias"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "create"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "delete"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]

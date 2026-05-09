@@ -256,6 +256,22 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         };
     }
 
+    if !toml.write_flags.is_empty() {
+        return CommandSpec {
+            name: toml.name,
+            description: desc,
+            aliases: toml.aliases,
+            url: toml.url,
+            category: cat,
+            researched_version,
+            kind: DispatchKind::WriteFlagged {
+                policy,
+                base_level: level,
+                write_flags: toml.write_flags,
+            },
+        };
+    }
+
     if !toml.require_any.is_empty() {
         return CommandSpec {
             name: toml.name,

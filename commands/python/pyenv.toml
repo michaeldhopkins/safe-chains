@@ -1,7 +1,8 @@
 [[command]]
 name = "pyenv"
-description = "Python version manager implemented as shell scripts. All exposed subcommands (versions, version, which, root, shims, help) are read-only queries that inspect locally installed Python versions and the pyenv directory structure. None of these subcommands install or remove Python versions, modify the filesystem, or make network requests. Mature, stable project with infrequent releases; the subcommand surface rarely changes."
+description = "Python version manager that selects which Python installation under $PYENV_ROOT/versions is active per directory, shell, or globally via shim wrappers on PATH. The covered read-only subcommands (versions, version, version-name, version-file, version-origin, which, whence, prefix, root, shims, hooks, commands, completions) inspect local state without modifying anything. SafeWrite subcommands operate entirely on local files: install (downloads python source via the python-build plugin and compiles it under $PYENV_ROOT/versions; running build scripts under the user-trusted-environment model, same posture as pip install running setup.py), uninstall (removes a version directory), local (writes .python-version in cwd; can take multiple versions for multi-Python projects), global (writes $PYENV_ROOT/version), shell (sets the PYENV_VERSION env var — only meaningful when invoked through the pyenv() shell function), and rehash (regenerates shim files). The init and exec subcommands run shell init code or arbitrary commands and are left out of coverage. No remote service interaction beyond the source-tarball download performed by python-build during install."
 url = "https://github.com/pyenv/pyenv#readme"
+researched_version = "v2.6.30 (May 2026)"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
 [[command.sub]]
@@ -22,8 +23,88 @@ standalone = ["--bare", "--help", "-h"]
 
 [[command.sub]]
 name = "versions"
-standalone = ["--bare", "--help", "-h"]
+standalone = ["--bare", "--help", "--skip-aliases", "-h"]
 
 [[command.sub]]
 name = "which"
+bare = false
 standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "whence"
+bare = false
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "prefix"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "hooks"
+bare = false
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "version-name"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "version-file"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "version-origin"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "commands"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "completions"
+bare = false
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "install"
+level = "SafeWrite"
+standalone = [
+    "--debug", "--force", "--help", "--keep", "--list", "--patch",
+    "--skip-existing", "--verbose", "--version",
+    "-f", "-g", "-h", "-k", "-l", "-p", "-s", "-v",
+]
+
+[[command.sub]]
+name = "uninstall"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-f", "-h"]
+
+[[command.sub]]
+name = "local"
+level = "SafeWrite"
+standalone = ["--force", "--help", "--unset", "-f", "-h"]
+
+[[command.sub]]
+name = "global"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "shell"
+level = "SafeWrite"
+standalone = ["--help", "--unset", "-h"]
+
+[[command.sub]]
+name = "rehash"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true

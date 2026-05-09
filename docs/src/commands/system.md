@@ -4,13 +4,20 @@
 <p class="cmd-url"><a href="https://asdf-vm.com/manage/commands.html">https://asdf-vm.com/manage/commands.html</a></p>
 
 - **current**: Flags: --help, -h
+- **env**: Flags: --help, -h
 - **help**: Flags: --help, -h
 - **info**: Flags: --help, -h
+- **install**: Flags: --help, -h
+- **latest**: Flags: --all, --help, -h
 - **list**: Flags: --help, -h
-- **plugin list**: Flags: --help, -h
-- **plugin-list**: Flags: --help, -h
-- **plugin-list-all**: Flags: --help, -h
+- **plugin list**: Flags: --help, --refs, --urls, -h
+- **plugin remove**: Flags: --help, -h
+- **reshim**: Flags: --help, -h
+- **set**: Flags: --help, --home, --parent, -h, -p, -u
+- **shimversions**: Flags: --help, -h
+- **uninstall**: Flags: --help, -h
 - **version**: Flags: --help, -h
+- **where**: Flags: --help, -h
 - **which**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
@@ -445,7 +452,9 @@ Aliases: `fly`
 - **env**: Flags: --help, --json, -J, -h. Valued: --shell, -s
 - **fmt**: Flags: --check, --help, -h
 - **generate**: Flags: --help, -h
+- **i**: Flags: --force, --help, --quiet, --verbose, -f, -q, -v, -h. Valued: --jobs, -j
 - **implode**: Flags: --help, -h
+- **install**: Flags: --force, --help, --quiet, --verbose, -f, -q, -v, -h. Valued: --jobs, -j
 - **install**: Flags: --help, -h
 - **latest**: Flags: --help, -h, -q, -v
 - **link**: Flags: --help, -h
@@ -462,13 +471,16 @@ Aliases: `fly`
 - **plugins uninstall**: Flags: --help, -h
 - **plugins update**: Flags: --help, -h
 - **prepare**: Flags: --help, -h
+- **prune**: Flags: --dry-run, --help, --plugins, --tools, -n, -h
 - **prune**: Flags: --help, -h
 - **registry**: Flags: --help, -h. Valued: --backend, -b
+- **remove**: Flags: --all, --dry-run, --help, -a, -n, -h
 - **reshim**: Flags: --force, --help, -h
+- **rm**: Flags: --all, --dry-run, --help, -a, -n, -h
 - **run**: Flags: --help, -h
 - **search**: Flags: --help, -h
 - **self-update**: Flags: --help, -h
-- **set**: Flags: --help, --json, -J, -h
+- **set**: Flags: --file, --global, --help, --remove, -f, -g, -h
 - **settings add**: Flags: --help, -h
 - **settings get**: Flags: --help, -h, -q, -v
 - **settings list**: Flags: --help, -h, -q, -v
@@ -495,11 +507,18 @@ Aliases: `fly`
 - **tool-alias ls**: Flags: --help, -h, -q, -v
 - **tool-alias set**: Flags: --help, -h
 - **tool-alias unset**: Flags: --help, -h
-- **trust**: Flags: --help, --show, -h
+- **trust**: Flags: --all, --help, --ignore, --quiet, --show, -a, -h, -q
+- **u**: Flags: --env, --force, --fuzzy, --global, --help, --path, --pin, --quiet, --remove, --verbose, -E, -f, -g, -p, -q, -v, -h. Valued: --cd
+- **uninstall**: Flags: --all, --dry-run, --help, -a, -n, -h
 - **uninstall**: Flags: --help, -h
+- **unset**: Flags: --file, --global, --help, -f, -g, -h
 - **unset**: Flags: --help, -h
+- **untrust**: Flags: --all, --help, -a, -h
 - **unuse**: Flags: --help, -h
+- **up**: Flags: --dry-run, --help, --interactive, -h, -i, -n. Valued: --jobs, -j
+- **upgrade**: Flags: --dry-run, --help, --interactive, -h, -i, -n. Valued: --jobs, -j
 - **upgrade**: Flags: --help, -h
+- **use**: Flags: --env, --force, --fuzzy, --global, --help, --path, --pin, --quiet, --remove, --verbose, -E, -f, -g, -p, -q, -v, -h. Valued: --cd
 - **use**: Flags: --help, -h
 - **watch**: Flags: --help, -h
 - **where**: Flags: --help, -h, -q, -v

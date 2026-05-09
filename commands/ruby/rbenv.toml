@@ -1,7 +1,8 @@
 [[command]]
 name = "rbenv"
-description = "Ruby version manager; supports read-only subcommands for listing versions, shims, and locating executables."
+description = "Ruby version manager that selects which Ruby installation under ~/.rbenv/versions/ is active per directory, shell, or globally via shim wrappers on PATH. The covered read-only subcommands (versions, version, version-name, version-file, version-origin, which, whence, prefix, root, shims, hooks, completions) inspect local state without modifying anything. SafeWrite subcommands operate entirely on local files: install (downloads ruby source via the ruby-build plugin and compiles it under ~/.rbenv/versions; running build scripts under the user-trusted-environment model, same posture as bundle install running gem postinstall), uninstall (removes a version directory), local (writes .ruby-version in cwd), global (writes ~/.rbenv/version), shell (sets the RBENV_VERSION env var — only meaningful when invoked through the rbenv() shell function), and rehash (regenerates shim files). The init subcommand emits shell init code and is left out of coverage; users typically run it once during install. No remote service interaction beyond the source-tarball download performed by ruby-build during install."
 url = "https://github.com/rbenv/rbenv#readme"
+researched_version = "v1.3.2 (January 2026); ruby-build 20260503"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
 [[command.sub]]
@@ -22,8 +23,80 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "versions"
-standalone = ["--help", "-h"]
+standalone = ["--bare", "--help", "-h"]
 
 [[command.sub]]
 name = "which"
+bare = false
 standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "whence"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "prefix"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "hooks"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-name"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-file"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-origin"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completions"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "install"
+level = "SafeWrite"
+standalone = [
+    "--force", "--help", "--keep", "--list", "--list-all", "--patch",
+    "--skip-existing", "--verbose", "--version",
+    "-L", "-f", "-h", "-k", "-l", "-p", "-s", "-v",
+]
+
+[[command.sub]]
+name = "uninstall"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "-f", "-h"]
+
+[[command.sub]]
+name = "local"
+level = "SafeWrite"
+standalone = ["--help", "--unset", "-h"]
+
+[[command.sub]]
+name = "global"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "shell"
+level = "SafeWrite"
+standalone = ["--help", "--unset", "-h"]
+
+[[command.sub]]
+name = "rehash"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "init"
+candidate = true

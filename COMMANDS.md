@@ -322,13 +322,20 @@ Unlisted flags, subcommands, and commands are not allowed.
 <p class="cmd-url"><a href="https://asdf-vm.com/manage/commands.html">https://asdf-vm.com/manage/commands.html</a></p>
 
 - **current**: Flags: --help, -h
+- **env**: Flags: --help, -h
 - **help**: Flags: --help, -h
 - **info**: Flags: --help, -h
+- **install**: Flags: --help, -h
+- **latest**: Flags: --all, --help, -h
 - **list**: Flags: --help, -h
-- **plugin list**: Flags: --help, -h
-- **plugin-list**: Flags: --help, -h
-- **plugin-list-all**: Flags: --help, -h
+- **plugin list**: Flags: --help, --refs, --urls, -h
+- **plugin remove**: Flags: --help, -h
+- **reshim**: Flags: --help, -h
+- **set**: Flags: --help, --home, --parent, -h, -p, -u
+- **shimversions**: Flags: --help, -h
+- **uninstall**: Flags: --help, -h
 - **version**: Flags: --help, -h
+- **where**: Flags: --help, -h
 - **which**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
@@ -762,6 +769,13 @@ Aliases: `@biomejs/biome`
 
 - Requires --check, --diff. - Allowed standalone flags: --check, --diff, --color, --no-color, --fast, --quiet, --verbose, --help, --version
 - Allowed valued flags: --config, --exclude, --extend-exclude, --include, --line-length, --target-version, -l, -t
+
+### `brakeman`
+<p class="cmd-url"><a href="https://brakemanscanner.org/docs/options/">https://brakemanscanner.org/docs/options/</a></p>
+
+- Allowed standalone flags: --color, --compare, --confidence-level, --debug, --ensure-ignore-notes, --ensure-latest, --exit-on-error, --exit-on-warn, --force-scan, --help, --ignore-config-empty, --interactive-ignore, --list-checks, --list-optional-checks, --no-assume-routes, --no-color, --no-exit-on-error, --no-exit-on-warn, --no-highlights, --no-pager, --no-progress, --no-summary, --no-threads, --pager, --progress, --quiet, --rake, --report-direct, --run-all-checks, --separate-models, --show-ignored, --summary, --table-width, --threads, --version, -A, -d, -h, -q
+- Allowed valued flags: --add-checks-path, --allow-check, --app-path, --branch-limit, --check-arguments, --checks, --config-file, --except, --faster, --format, --ignore-config, --ignore-protected, --message-limit, --min-confidence, --no-branching, --only-files, --output, --parser-timeout, --path, --rails3, --rails4, --rails5, --rails6, --rails7, --rails8, --routes, --safe-methods, --skip-checks, --skip-files, --skip-libs, -c, -f, -o, -p, -w
+- Bare invocation allowed
 
 ### `branchdiff`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/branchdiff">https://github.com/michaeldhopkins/branchdiff</a></p>
@@ -1605,6 +1619,15 @@ Aliases: `difftastic`
 
 - Strips flags (-i, -u) and KEY=VALUE pairs, then recursively validates the inner command. Bare invocation allowed.
 
+### `erb_lint`
+<p class="cmd-url"><a href="https://github.com/Shopify/erb_lint">https://github.com/Shopify/erb_lint</a></p>
+
+Aliases: `erblint`
+
+- Allowed standalone flags: --allow-no-files, --autocorrect, --clear-cache, --color, --enable-all-linters, --fail-level, --help, --no-color, --quiet, --stats, --verbose, --version, -a, -h, -q
+- Allowed valued flags: --config, --custom-rule-files, --disable-linters, --enable-linters, --exclude, --format, --lint-all, --stdin, -c, -f
+- Bare invocation allowed
+
 ### `erl`
 <p class="cmd-url"><a href="https://www.erlang.org/docs/26/man/erl">https://www.erlang.org/docs/26/man/erl</a></p>
 
@@ -2180,6 +2203,15 @@ Aliases: `gradlew`
 - **version**: Flags: --help, --short, --template, -h
 - Allowed standalone flags: --help, -h
 
+### `herb`
+<p class="cmd-url"><a href="https://herb-tools.dev">https://herb-tools.dev</a></p>
+
+- **analyze**: Flags: --help, --json, -h, -j. Valued: --config, --format
+- **format**: Flags: --check, --color, --help, --no-color, --write, -h, -w. Valued: --config
+- **lint**: Flags: --color, --fail-fast, --fix, --help, --no-color, --quiet, --verbose, -h, -q, -v. Valued: --config, --exclude, --format, --include
+- **parse**: Flags: --help, --json, --no-color, -h, -j
+- Allowed standalone flags: --help, --version, -h, -V
+
 ### `heroku`
 <p class="cmd-url"><a href="https://devcenter.heroku.com/articles/heroku-cli-commands">https://devcenter.heroku.com/articles/heroku-cli-commands</a></p>
 
@@ -2364,6 +2396,38 @@ Aliases: `gradlew`
 
 - Allowed standalone flags: --about, --bash-comp, --force-color, --help, --meta-out, --monochrome, --pretty, --quiet, --raw, --unbuffer, --version, --yaml-out, --zsh-comp, -C, -M, -a, -h, -m, -p, -q, -r, -u, -y
 - Hyphen-prefixed positional arguments accepted
+
+### `jenv`
+<p class="cmd-url"><a href="https://www.jenv.be/">https://www.jenv.be/</a></p>
+
+- **add**: Flags: --help, --skip-existing, -h
+- **commands**: Flags: --help, --sh, --no-sh, -h
+- **disable-plugin**: Flags: --help, -h
+- **doctor**: Flags: --help, -h
+- **enable-plugin**: Flags: --help, -h
+- **global**: Flags: --help, --unset, -h
+- **help**: Positional args accepted
+- **hooks**: Flags: --help, -h
+- **javahome**: Flags: --help, -h
+- **local**: Flags: --help, --unset, -h
+- **plugin list**: Flags: --help, -h
+- **plugin ls**: Flags: --help, -h
+- **plugins**: Flags: --help, -h
+- **prefix**: Flags: --help, -h
+- **rehash**: Flags: --help, -h
+- **remove**: Flags: --help, -h
+- **root**: Flags: --help, -h
+- **shell**: Flags: --help, --unset, -h
+- **shims**: Flags: --help, --short, -h
+- **version**: Flags: --help, -h
+- **version-file**: Flags: --help, -h
+- **version-file-read**: Flags: --help, -h
+- **version-name**: Flags: --help, -h
+- **version-origin**: Flags: --help, -h
+- **versions**: Flags: --bare, --help, -h
+- **whence**: Flags: --help, --path, -h
+- **which**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `jest`
 <p class="cmd-url"><a href="https://jestjs.io/docs/cli">https://jestjs.io/docs/cli</a></p>
@@ -2878,7 +2942,9 @@ Aliases: `mlocate`, `plocate`
 - **env**: Flags: --help, --json, -J, -h. Valued: --shell, -s
 - **fmt**: Flags: --check, --help, -h
 - **generate**: Flags: --help, -h
+- **i**: Flags: --force, --help, --quiet, --verbose, -f, -q, -v, -h. Valued: --jobs, -j
 - **implode**: Flags: --help, -h
+- **install**: Flags: --force, --help, --quiet, --verbose, -f, -q, -v, -h. Valued: --jobs, -j
 - **install**: Flags: --help, -h
 - **latest**: Flags: --help, -h, -q, -v
 - **link**: Flags: --help, -h
@@ -2895,13 +2961,16 @@ Aliases: `mlocate`, `plocate`
 - **plugins uninstall**: Flags: --help, -h
 - **plugins update**: Flags: --help, -h
 - **prepare**: Flags: --help, -h
+- **prune**: Flags: --dry-run, --help, --plugins, --tools, -n, -h
 - **prune**: Flags: --help, -h
 - **registry**: Flags: --help, -h. Valued: --backend, -b
+- **remove**: Flags: --all, --dry-run, --help, -a, -n, -h
 - **reshim**: Flags: --force, --help, -h
+- **rm**: Flags: --all, --dry-run, --help, -a, -n, -h
 - **run**: Flags: --help, -h
 - **search**: Flags: --help, -h
 - **self-update**: Flags: --help, -h
-- **set**: Flags: --help, --json, -J, -h
+- **set**: Flags: --file, --global, --help, --remove, -f, -g, -h
 - **settings add**: Flags: --help, -h
 - **settings get**: Flags: --help, -h, -q, -v
 - **settings list**: Flags: --help, -h, -q, -v
@@ -2928,11 +2997,18 @@ Aliases: `mlocate`, `plocate`
 - **tool-alias ls**: Flags: --help, -h, -q, -v
 - **tool-alias set**: Flags: --help, -h
 - **tool-alias unset**: Flags: --help, -h
-- **trust**: Flags: --help, --show, -h
+- **trust**: Flags: --all, --help, --ignore, --quiet, --show, -a, -h, -q
+- **u**: Flags: --env, --force, --fuzzy, --global, --help, --path, --pin, --quiet, --remove, --verbose, -E, -f, -g, -p, -q, -v, -h. Valued: --cd
+- **uninstall**: Flags: --all, --dry-run, --help, -a, -n, -h
 - **uninstall**: Flags: --help, -h
+- **unset**: Flags: --file, --global, --help, -f, -g, -h
 - **unset**: Flags: --help, -h
+- **untrust**: Flags: --all, --help, -a, -h
 - **unuse**: Flags: --help, -h
+- **up**: Flags: --dry-run, --help, --interactive, -h, -i, -n. Valued: --jobs, -j
+- **upgrade**: Flags: --dry-run, --help, --interactive, -h, -i, -n. Valued: --jobs, -j
 - **upgrade**: Flags: --help, -h
+- **use**: Flags: --env, --force, --fuzzy, --global, --help, --path, --pin, --quiet, --remove, --verbose, -E, -f, -g, -p, -q, -v, -h. Valued: --cd
 - **use**: Flags: --help, -h
 - **watch**: Flags: --help, -h
 - **where**: Flags: --help, -h, -q, -v
@@ -3774,11 +3850,25 @@ Aliases: `upsun`
 ### `pyenv`
 <p class="cmd-url"><a href="https://github.com/pyenv/pyenv#readme">https://github.com/pyenv/pyenv#readme</a></p>
 
+- **commands**: Flags: --bare, --help, -h
+- **completions**: Flags: --bare, --help, -h
+- **global**: Flags: --help, -h
 - **help**: Flags: --bare, --help, -h
+- **hooks**: Flags: --bare, --help, -h
+- **install**: Flags: --debug, --force, --help, --keep, --list, --patch, --skip-existing, --verbose, --version, -f, -g, -h, -k, -l, -p, -s, -v
+- **local**: Flags: --force, --help, --unset, -f, -h
+- **prefix**: Flags: --bare, --help, -h
+- **rehash**: Flags: --help, -h
 - **root**: Flags: --bare, --help, -h
+- **shell**: Flags: --help, --unset, -h
 - **shims**: Flags: --bare, --help, -h
+- **uninstall**: Flags: --force, --help, -f, -h
 - **version**: Flags: --bare, --help, -h
-- **versions**: Flags: --bare, --help, -h
+- **version-file**: Flags: --bare, --help, -h
+- **version-name**: Flags: --bare, --help, -h
+- **version-origin**: Flags: --bare, --help, -h
+- **versions**: Flags: --bare, --help, --skip-aliases, -h
+- **whence**: Flags: --bare, --help, -h
 - **which**: Flags: --bare, --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
@@ -3906,11 +3996,24 @@ Aliases: `python`
 ### `rbenv`
 <p class="cmd-url"><a href="https://github.com/rbenv/rbenv#readme">https://github.com/rbenv/rbenv#readme</a></p>
 
+- **completions**: Flags: --help, -h
+- **global**: Flags: --help, -h
 - **help**: Flags: --help, -h
+- **hooks**: Flags: --help, -h
+- **install**: Flags: --force, --help, --keep, --list, --list-all, --patch, --skip-existing, --verbose, --version, -L, -f, -h, -k, -l, -p, -s, -v
+- **local**: Flags: --help, --unset, -h
+- **prefix**: Flags: --help, -h
+- **rehash**: Flags: --help, -h
 - **root**: Flags: --help, -h
+- **shell**: Flags: --help, --unset, -h
 - **shims**: Flags: --help, -h
+- **uninstall**: Flags: --force, --help, -f, -h
 - **version**: Flags: --help, -h
-- **versions**: Flags: --help, -h
+- **version-file**: Flags: --help, -h
+- **version-name**: Flags: --help, -h
+- **version-origin**: Flags: --help, -h
+- **versions**: Flags: --bare, --help, -h
+- **whence**: Flags: --help, -h
 - **which**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
@@ -3987,10 +4090,17 @@ Aliases: `python`
 
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `rspec`
+<p class="cmd-url"><a href="https://rspec.info/documentation/">https://rspec.info/documentation/</a></p>
+
+- Allowed standalone flags: --bisect, --color, --deprecation-out, --dry-run, --errors-only, --fail-fast, --fail-if-no-examples, --force-color, --format, --help, --no-color, --no-fail-fast, --no-profile, --only-failures, --order, --profile, --require, --seed, --tty, --version, --warnings, -D, -I, -O, -P, -T, -b, -c, -f, -h, -p, -r, -v, -w
+- Allowed valued flags: --default-path, --example, --exclude-pattern, --filter-files, --init, --no-deprecation-out, --out, --pattern, --tag, -I, -O, -P, -e, -o, -t
+- Bare invocation allowed
+
 ### `rubocop`
 <p class="cmd-url"><a href="https://docs.rubocop.org/rubocop/usage/basic_usage.html">https://docs.rubocop.org/rubocop/usage/basic_usage.html</a></p>
 
-- Allowed standalone flags: --color, --debug, --display-cop-names, --display-only-correctable, --display-only-safe-correctable, --display-style-guide, --extra-details, --help, --lint, --list-target-files, --no-color, --parallel, --show-cops, --show-docs-url, --version, -L, -V, -d, -h, -l
+- Allowed standalone flags: --auto-correct, --auto-correct-all, --autocorrect, --autocorrect-all, --color, --debug, --display-cop-names, --display-only-correctable, --display-only-safe-correctable, --display-style-guide, --extra-details, --fail-fast, --fix-layout, --help, --lint, --list-target-files, --no-color, --parallel, --safe-auto-correct, --safe-autocorrect, --show-cops, --show-docs-url, --version, -A, -L, -V, -a, -d, -h, -l, -x
 - Allowed valued flags: --cache-root, --config, --disable-pending-cops, --enable-pending-cops, --except, --exclude-limit, --fail-level, --format, --only, --out, --require, --stdin, -P, -c, -f, -o, -r
 - Bare invocation allowed
 
@@ -4023,6 +4133,46 @@ Aliases: `python`
 - **target list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
 - **toolchain list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
 - **which**: Flags: --help, -h. Valued: --toolchain
+- Allowed standalone flags: --help, --version, -V, -h
+
+### `rvm`
+<p class="cmd-url"><a href="https://rvm.io/rvm/cli">https://rvm.io/rvm/cli</a></p>
+
+- **alias create**: Flags: --help, -h
+- **alias delete**: Flags: --help, -h
+- **alias list**: Flags: --help, -h
+- **alias show**: Flags: --help, -h
+- **cleanup**: Flags: --help, -h
+- **current**: Flags: --help, -h
+- **disk-usage**: Flags: --help, -h
+- **doctor**: Flags: --help, -h
+- **env**: Flags: --help, -h
+- **gemdir**: Flags: --help, -h
+- **gemhome**: Flags: --help, -h
+- **gempath**: Flags: --help, -h
+- **gemset copy**: Flags: --help, -h
+- **gemset create**: Flags: --help, -h
+- **gemset delete**: Flags: --force, --help, -h
+- **gemset dir**: Flags: --help, -h
+- **gemset empty**: Flags: --force, --help, -h
+- **gemset list**: Flags: --help, -h
+- **gemset list_all**: Flags: --help, -h
+- **gemset name**: Flags: --help, -h
+- **gemset rename**: Flags: --help, -h
+- **gemset use**: Flags: --create, --default, --help, -h
+- **info**: Flags: --help, -h
+- **install**: Flags: --default, --force, --help, -h. Valued: --with-openssl-dir, --with-readline-dir
+- **list**: Flags: --default, --help, -h
+- **ls**: Flags: --default, --help, -h
+- **notes**: Flags: --help, -h
+- **reinstall**: Flags: --force, --help, -h
+- **remove**: Flags: --force, --help, -h
+- **repair**: Flags: --help, -h
+- **requirements**: Flags: --help, -h
+- **strings**: Flags: --help, -h
+- **uninstall**: Flags: --force, --help, -h
+- **use**: Flags: --create, --default, --help, -h
+- **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `safe-chains`
@@ -4105,6 +4255,27 @@ Aliases: `python`
 - **registry namespace**: Allowed arguments: list
 - **vpc private-network**: Allowed arguments: list
 - Allowed standalone flags: --help, -h
+
+### `sdk`
+<p class="cmd-url"><a href="https://sdkman.io/usage">https://sdkman.io/usage</a></p>
+
+- **current**: Flags: --help, -h
+- **default**: Flags: --help, -h
+- **env clear**: Flags: --help, -h
+- **env init**: Flags: --help, -h
+- **env install**: Flags: --help, -h
+- **flush**: Flags: --help, -h
+- **help**: Positional args accepted
+- **home**: Flags: --help, -h
+- **install**: Flags: --help, -h
+- **list**: Flags: --help, -h
+- **offline**: Flags: --help, -h
+- **uninstall**: Flags: --help, -h
+- **update**: Flags: --help, -h
+- **upgrade**: Flags: --help, -h
+- **use**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `sdkmanager`
 <p class="cmd-url"><a href="https://developer.android.com/tools/sdkmanager">https://developer.android.com/tools/sdkmanager</a></p>
@@ -4289,6 +4460,13 @@ Aliases: `python`
 <p class="cmd-url"><a href="https://man.openbsd.org/ssh">https://man.openbsd.org/ssh</a></p>
 
 - Allowed standalone flags: -V
+
+### `standardrb`
+<p class="cmd-url"><a href="https://github.com/standardrb/standard">https://github.com/standardrb/standard</a></p>
+
+- Allowed standalone flags: --auto-correct, --auto-correct-all, --autocorrect, --autocorrect-all, --color, --debug, --display-cop-names, --fail-fast, --fix, --fix-layout, --help, --lint, --list-target-files, --no-color, --no-fix, --parallel, --safe-auto-correct, --safe-autocorrect, --show-cops, --version, -A, -V, -a, -d, -h, -l
+- Allowed valued flags: --cache-root, --config, --except, --fail-level, --format, --only, --out, --require, --stdin, -c, -f, -o, -r
+- Bare invocation allowed
 
 ### `stat`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation</a></p>

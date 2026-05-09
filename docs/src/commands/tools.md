@@ -155,6 +155,13 @@ Aliases: `@biomejs/biome`
 - Requires --check, --diff. - Allowed standalone flags: --check, --diff, --color, --no-color, --fast, --quiet, --verbose, --help, --version
 - Allowed valued flags: --config, --exclude, --extend-exclude, --include, --line-length, --target-version, -l, -t
 
+### `brakeman`
+<p class="cmd-url"><a href="https://brakemanscanner.org/docs/options/">https://brakemanscanner.org/docs/options/</a></p>
+
+- Allowed standalone flags: --color, --compare, --confidence-level, --debug, --ensure-ignore-notes, --ensure-latest, --exit-on-error, --exit-on-warn, --force-scan, --help, --ignore-config-empty, --interactive-ignore, --list-checks, --list-optional-checks, --no-assume-routes, --no-color, --no-exit-on-error, --no-exit-on-warn, --no-highlights, --no-pager, --no-progress, --no-summary, --no-threads, --pager, --progress, --quiet, --rake, --report-direct, --run-all-checks, --separate-models, --show-ignored, --summary, --table-width, --threads, --version, -A, -d, -h, -q
+- Allowed valued flags: --add-checks-path, --allow-check, --app-path, --branch-limit, --check-arguments, --checks, --config-file, --except, --faster, --format, --ignore-config, --ignore-protected, --message-limit, --min-confidence, --no-branching, --only-files, --output, --parser-timeout, --path, --rails3, --rails4, --rails5, --rails6, --rails7, --rails8, --routes, --safe-methods, --skip-checks, --skip-files, --skip-libs, -c, -f, -o, -p, -w
+- Bare invocation allowed
+
 ### `branchdiff`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/branchdiff">https://github.com/michaeldhopkins/branchdiff</a></p>
 
@@ -222,6 +229,15 @@ Aliases: `difftastic`
 
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `erb_lint`
+<p class="cmd-url"><a href="https://github.com/Shopify/erb_lint">https://github.com/Shopify/erb_lint</a></p>
+
+Aliases: `erblint`
+
+- Allowed standalone flags: --allow-no-files, --autocorrect, --clear-cache, --color, --enable-all-linters, --fail-level, --help, --no-color, --quiet, --stats, --verbose, --version, -a, -h, -q
+- Allowed valued flags: --config, --custom-rule-files, --disable-linters, --enable-linters, --exclude, --format, --lint-all, --stdin, -c, -f
+- Bare invocation allowed
+
 ### `erl`
 <p class="cmd-url"><a href="https://www.erlang.org/docs/26/man/erl">https://www.erlang.org/docs/26/man/erl</a></p>
 
@@ -274,6 +290,15 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed standalone flags: --add-cpes-if-none, --by-cve, --help, --only-fixed, --only-notfixed, --quiet, --verbose, --version, -h, -q, -v
 - Allowed valued flags: --config, --distro, --exclude, --fail-on, --file, --key, --name, --output, --platform, --scope, -c, -o
 - Hyphen-prefixed positional arguments accepted
+
+### `herb`
+<p class="cmd-url"><a href="https://herb-tools.dev">https://herb-tools.dev</a></p>
+
+- **analyze**: Flags: --help, --json, -h, -j. Valued: --config, --format
+- **format**: Flags: --check, --color, --help, --no-color, --write, -h, -w. Valued: --config
+- **lint**: Flags: --color, --fail-fast, --fix, --help, --no-color, --quiet, --verbose, -h, -q, -v. Valued: --config, --exclude, --format, --include
+- **parse**: Flags: --help, --json, --no-color, -h, -j
+- Allowed standalone flags: --help, --version, -h, -V
 
 ### `identify`
 <p class="cmd-url"><a href="https://imagemagick.org/script/identify.php">https://imagemagick.org/script/identify.php</a></p>
@@ -436,10 +461,17 @@ Aliases: `python`
 - Allowed standalone flags: --all, --arch-specific, --archive-index, --debug-dump, --dynamic, --file-header, --headers, --help, --histogram, --notes, --program-headers, --relocs, --section-headers, --segments, --symbols, --syms, --unwind, --version, --version-info, --wide, -A, -I, -S, -V, -W, -a, -d, -e, -g, -h, -l, -n, -p, -r, -s, -u
 - Allowed valued flags: --decompress, --dwarf-depth, --dwarf-start, --hex-dump, --relocated-dump, --section-details, --string-dump, -D, -R, -w, -x, -z
 
+### `rspec`
+<p class="cmd-url"><a href="https://rspec.info/documentation/">https://rspec.info/documentation/</a></p>
+
+- Allowed standalone flags: --bisect, --color, --deprecation-out, --dry-run, --errors-only, --fail-fast, --fail-if-no-examples, --force-color, --format, --help, --no-color, --no-fail-fast, --no-profile, --only-failures, --order, --profile, --require, --seed, --tty, --version, --warnings, -D, -I, -O, -P, -T, -b, -c, -f, -h, -p, -r, -v, -w
+- Allowed valued flags: --default-path, --example, --exclude-pattern, --filter-files, --init, --no-deprecation-out, --out, --pattern, --tag, -I, -O, -P, -e, -o, -t
+- Bare invocation allowed
+
 ### `rubocop`
 <p class="cmd-url"><a href="https://docs.rubocop.org/rubocop/usage/basic_usage.html">https://docs.rubocop.org/rubocop/usage/basic_usage.html</a></p>
 
-- Allowed standalone flags: --color, --debug, --display-cop-names, --display-only-correctable, --display-only-safe-correctable, --display-style-guide, --extra-details, --help, --lint, --list-target-files, --no-color, --parallel, --show-cops, --show-docs-url, --version, -L, -V, -d, -h, -l
+- Allowed standalone flags: --auto-correct, --auto-correct-all, --autocorrect, --autocorrect-all, --color, --debug, --display-cop-names, --display-only-correctable, --display-only-safe-correctable, --display-style-guide, --extra-details, --fail-fast, --fix-layout, --help, --lint, --list-target-files, --no-color, --parallel, --safe-auto-correct, --safe-autocorrect, --show-cops, --show-docs-url, --version, -A, -L, -V, -a, -d, -h, -l, -x
 - Allowed valued flags: --cache-root, --config, --disable-pending-cops, --enable-pending-cops, --except, --exclude-limit, --fail-level, --format, --only, --out, --require, --stdin, -P, -c, -f, -o, -r
 - Bare invocation allowed
 
@@ -505,6 +537,13 @@ Aliases: `python`
 
 - Allowed standalone flags: --changed-only, --help, --no-color, --print, --version, -V, -h, -p
 - Allowed valued flags: --base, --base-dir, --filter, --format, --framework, --head, --head-dir
+- Bare invocation allowed
+
+### `standardrb`
+<p class="cmd-url"><a href="https://github.com/standardrb/standard">https://github.com/standardrb/standard</a></p>
+
+- Allowed standalone flags: --auto-correct, --auto-correct-all, --autocorrect, --autocorrect-all, --color, --debug, --display-cop-names, --fail-fast, --fix, --fix-layout, --help, --lint, --list-target-files, --no-color, --no-fix, --parallel, --safe-auto-correct, --safe-autocorrect, --show-cops, --version, -A, -V, -a, -d, -h, -l
+- Allowed valued flags: --cache-root, --config, --except, --fail-level, --format, --only, --out, --require, --stdin, -c, -f, -o, -r
 - Bare invocation allowed
 
 ### `stylelint`

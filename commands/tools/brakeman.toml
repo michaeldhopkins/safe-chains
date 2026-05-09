@@ -1,0 +1,38 @@
+[[command]]
+name = "brakeman"
+description = "Static analysis security scanner for Ruby on Rails applications, distributed as a Ruby gem. Brakeman parses application source code and configuration to surface vulnerability classes (SQL injection, mass assignment, XSS, command injection, unsafe redirect, etc.); it does not execute the application or its dependencies during the scan. Output goes to stdout in a configurable format (text, html, json, junit, sarif, csv, codeclimate, github). The -o/--output flag and -A/--run-all-checks flag are common; --no-pager and --quiet trim output for CI use. The --rake subcommand writes a Rakefile entry but is not commonly invoked from the CLI. Actively maintained with regular releases tracking new Rails CVE patterns."
+url = "https://brakemanscanner.org/docs/options/"
+researched_version = "brakeman ~7.x line; flag surface stable across recent releases as of 2026-05"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--color", "--compare", "--confidence-level",
+    "--debug", "--ensure-ignore-notes", "--ensure-latest",
+    "--exit-on-error", "--exit-on-warn",
+    "--force-scan", "--help",
+    "--ignore-config-empty", "--interactive-ignore",
+    "--list-checks", "--list-optional-checks",
+    "--no-assume-routes", "--no-color", "--no-exit-on-error",
+    "--no-exit-on-warn", "--no-highlights", "--no-pager",
+    "--no-progress", "--no-summary", "--no-threads",
+    "--pager", "--progress", "--quiet",
+    "--rake", "--report-direct", "--run-all-checks",
+    "--separate-models", "--show-ignored", "--summary",
+    "--table-width", "--threads", "--version",
+    "-A", "-d", "-h", "-q",
+]
+valued = [
+    "--add-checks-path", "--allow-check",
+    "--app-path", "--branch-limit", "--check-arguments",
+    "--checks", "--config-file", "--except",
+    "--faster", "--format", "--ignore-config",
+    "--ignore-protected", "--message-limit",
+    "--min-confidence", "--no-branching", "--only-files",
+    "--output", "--parser-timeout", "--path",
+    "--rails3", "--rails4", "--rails5", "--rails6",
+    "--rails7", "--rails8", "--routes",
+    "--safe-methods", "--skip-checks",
+    "--skip-files", "--skip-libs",
+    "-c", "-f", "-o", "-p", "-w",
+]
+write_flags = ["--output", "-o"]

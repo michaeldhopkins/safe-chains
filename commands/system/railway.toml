@@ -55,6 +55,7 @@ standalone = ["--help", "--json", "-h"]
 
 [[command.sub]]
 name = "deployment"
+nested_bare = true
 [[command.sub.sub]]
 name = "list"
 standalone = ["--help", "--json", "-h"]
@@ -62,6 +63,7 @@ valued = ["--environment", "--limit", "--service", "-e", "-s"]
 
 [[command.sub]]
 name = "environment"
+nested_bare = true
 [[command.sub.sub]]
 name = "list"
 standalone = ["--ephemeral", "--help", "--json", "--no-ephemeral", "-h"]
@@ -92,6 +94,7 @@ candidate = true
 
 [[command.sub]]
 name = "service"
+nested_bare = true
 [[command.sub.sub]]
 name = "list"
 standalone = ["--help", "--json", "-h"]
@@ -99,6 +102,7 @@ valued = ["--environment", "-e"]
 
 [[command.sub]]
 name = "variable"
+nested_bare = true
 [[command.sub.sub]]
 name = "list"
 standalone = ["--help", "--json", "--kv", "-h", "-k"]
@@ -118,6 +122,7 @@ valued = ["--environment", "--service", "-e", "-s"]
 
 [[command.sub]]
 name = "volume"
+nested_bare = true
 [[command.sub.sub]]
 name = "list"
 standalone = ["--help", "--json", "-h"]

@@ -1,0 +1,144 @@
+[[command]]
+name = "jenv"
+description = "jenv is an rbenv-style version manager for Java that does not install JDKs itself but registers existing JDK installations and selects which one is active per shell, directory, or globally. It ships as a real Bash CLI (bin/jenv on PATH) plus shims that delegate to the active JDK. Subcommands split cleanly: read-only inspection (versions, version, version-name, version-file, version-origin, which, whence, prefix, root, shims, commands, hooks, javahome, doctor, help), local-only mutation that registers JDKs or writes pin files (add, remove, local, global, shell, rehash, enable-plugin, disable-plugin, plugin, plugins), the macOS-specific `macos-javahome` which writes to per-user launch agents, and `with` which delegates an arbitrary inner command to a chosen Java version. There is no auth model — jenv only touches files under ~/.jenv and whatever JDK paths the user supplies. Release cadence is slow but the project is alive: 0.6.0 shipped on December 5, 2025 after several years of relative quiet, adding `jenv with` and Bellsoft Liberica detection."
+url = "https://www.jenv.be/"
+researched_version = "0.6.0 (December 5, 2025)"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "commands"
+standalone = ["--help", "--sh", "--no-sh", "-h"]
+
+[[command.sub]]
+name = "hooks"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "versions"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "version-name"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-file"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-file-read"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-origin"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "prefix"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "root"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "shims"
+standalone = ["--help", "--short", "-h"]
+
+[[command.sub]]
+name = "which"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "whence"
+bare = false
+standalone = ["--help", "--path", "-h"]
+
+[[command.sub]]
+name = "javahome"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "add"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--skip-existing", "-h"]
+
+[[command.sub]]
+name = "remove"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "local"
+level = "SafeWrite"
+standalone = ["--help", "--unset", "-h"]
+
+[[command.sub]]
+name = "global"
+level = "SafeWrite"
+standalone = ["--help", "--unset", "-h"]
+
+[[command.sub]]
+name = "shell"
+level = "SafeWrite"
+standalone = ["--help", "--unset", "-h"]
+
+[[command.sub]]
+name = "rehash"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "enable-plugin"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "disable-plugin"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugin"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "plugins"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "macos-javahome"
+candidate = true
+
+[[command.sub]]
+name = "with"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true

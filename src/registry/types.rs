@@ -48,6 +48,8 @@ pub(super) struct TomlCommand {
     #[serde(default)]
     pub wrapper: Option<TomlWrapper>,
     #[serde(default)]
+    pub write_flags: Vec<String>,
+    #[serde(default)]
     pub researched_version: Option<String>,
 }
 

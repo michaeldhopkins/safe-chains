@@ -2,6 +2,7 @@
 name = "mise"
 description = "Polyglot dev tool and runtime version manager (successor to rtx, alternative to asdf) that also provides environment variable management and a task runner. The full CLI can install/uninstall tool versions, modify config files, run arbitrary tasks, and self-update. The covered subcommands span a wide range: read-only queries (list, current, which, where, doctor, outdated, search, registry, latest, ls-remote, bin-paths, env, tool, completion, backends ls, tasks list/deps/info), config/settings management (config get/list/set, settings get/list/set/add/unset), plugin operations (plugins list/ls-remote/install/uninstall/update), task execution (tasks run/add/edit), cache management (cache path/clear/prune), and exec delegation (exec with --). The exec subcommand delegates to arbitrary downstream commands. Mise releases very frequently, often multiple times per week, with a YYYY.M.P versioning scheme; new subcommands appear regularly and coverage should be reviewed often."
 url = "https://mise.jdx.dev/cli/"
+researched_version = "v2026.5.3 (May 2026; YYYY.M.P scheme)"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
 [[command.sub]]
@@ -38,7 +39,111 @@ standalone = ["--help", "-h", "-q", "-v"]
 
 [[command.sub]]
 name = "reshim"
+level = "SafeWrite"
 standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "use"
+aliases = ["u"]
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--env", "--force", "--fuzzy", "--global", "--help", "--path",
+    "--pin", "--quiet", "--remove", "--verbose",
+    "-E", "-f", "-g", "-p", "-q", "-v", "-h",
+]
+valued = ["--cd"]
+
+[[command.sub]]
+name = "install"
+aliases = ["i"]
+level = "SafeWrite"
+standalone = [
+    "--force", "--help", "--quiet", "--verbose",
+    "-f", "-q", "-v", "-h",
+]
+valued = ["--jobs", "-j"]
+
+[[command.sub]]
+name = "uninstall"
+aliases = ["remove", "rm"]
+level = "SafeWrite"
+bare = false
+standalone = ["--all", "--dry-run", "--help", "-a", "-n", "-h"]
+
+[[command.sub]]
+name = "upgrade"
+aliases = ["up"]
+level = "SafeWrite"
+standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
+valued = ["--jobs", "-j"]
+
+[[command.sub]]
+name = "prune"
+level = "SafeWrite"
+standalone = ["--dry-run", "--help", "--plugins", "--tools", "-n", "-h"]
+
+[[command.sub]]
+name = "trust"
+level = "SafeWrite"
+standalone = ["--all", "--help", "--ignore", "--quiet", "--show", "-a", "-h", "-q"]
+
+[[command.sub]]
+name = "untrust"
+level = "SafeWrite"
+standalone = ["--all", "--help", "-a", "-h"]
+
+[[command.sub]]
+name = "set"
+level = "SafeWrite"
+standalone = ["--file", "--global", "--help", "--remove", "-f", "-g", "-h"]
+
+[[command.sub]]
+name = "unset"
+level = "SafeWrite"
+standalone = ["--file", "--global", "--help", "-f", "-g", "-h"]
+
+[[command.sub]]
+name = "self-update"
+candidate = true
+
+[[command.sub]]
+name = "u"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--env", "--force", "--fuzzy", "--global", "--help", "--path",
+    "--pin", "--quiet", "--remove", "--verbose",
+    "-E", "-f", "-g", "-p", "-q", "-v", "-h",
+]
+valued = ["--cd"]
+
+[[command.sub]]
+name = "i"
+level = "SafeWrite"
+standalone = [
+    "--force", "--help", "--quiet", "--verbose",
+    "-f", "-q", "-v", "-h",
+]
+valued = ["--jobs", "-j"]
+
+[[command.sub]]
+name = "rm"
+level = "SafeWrite"
+bare = false
+standalone = ["--all", "--dry-run", "--help", "-a", "-n", "-h"]
+
+[[command.sub]]
+name = "remove"
+level = "SafeWrite"
+bare = false
+standalone = ["--all", "--dry-run", "--help", "-a", "-n", "-h"]
+
+[[command.sub]]
+name = "up"
+level = "SafeWrite"
+standalone = ["--dry-run", "--help", "--interactive", "-h", "-i", "-n"]
+valued = ["--jobs", "-j"]
 
 [[command.sub]]
 name = "env"
@@ -81,21 +186,10 @@ name = "completion"
 standalone = ["--help", "-h", "-q", "-v"]
 
 [[command.sub]]
-name = "trust"
-bare = false
-max_positional = 0
-standalone = ["--help", "--show", "-h"]
-
-[[command.sub]]
 name = "fmt"
 bare = false
 max_positional = 0
 standalone = ["--check", "--help", "-h"]
-
-[[command.sub]]
-name = "set"
-max_positional = 0
-standalone = ["--help", "--json", "-J", "-h"]
 
 [[command.sub]]
 name = "config"
