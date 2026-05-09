@@ -15,9 +15,3 @@ pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
     docs
 }
 
-#[cfg(test)]
-pub(super) fn full_registry() -> Vec<&'static super::CommandEntry> {
-    let mut v = Vec::new();
-    v.extend(tmux::REGISTRY);
-    v
-}

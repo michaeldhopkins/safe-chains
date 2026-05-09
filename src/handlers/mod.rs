@@ -103,10 +103,8 @@ pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
 #[cfg(test)]
 #[derive(Debug)]
 pub(crate) enum CommandEntry {
-    Positional { #[allow(dead_code)] cmd: &'static str },
     Custom { cmd: &'static str, valid_prefix: Option<&'static str> },
     Paths { cmd: &'static str, bare_ok: bool, paths: &'static [&'static str] },
-    Delegation { #[allow(dead_code)] cmd: &'static str },
 }
 
 pub fn all_opencode_patterns() -> Vec<String> {
@@ -119,15 +117,10 @@ pub fn all_opencode_patterns() -> Vec<String> {
 #[cfg(test)]
 fn full_registry() -> Vec<&'static CommandEntry> {
     let mut entries = Vec::new();
-    entries.extend(shell::REGISTRY);
-    entries.extend(wrappers::REGISTRY);
     entries.extend(forges::full_registry());
-    entries.extend(node::full_registry());
     entries.extend(jvm::full_registry());
     entries.extend(android::full_registry());
     entries.extend(network::REGISTRY);
-    entries.extend(system::full_registry());
-    entries.extend(perl::REGISTRY);
     entries.extend(coreutils::full_registry());
     entries.extend(fuzzy::full_registry());
     entries
@@ -142,7 +135,6 @@ mod tests {
 
     fn check_entry(entry: &CommandEntry, failures: &mut Vec<String>) {
         match entry {
-            CommandEntry::Positional { .. } | CommandEntry::Delegation { .. } => {}
             CommandEntry::Custom { cmd, valid_prefix } => {
                 let base = valid_prefix.unwrap_or(cmd);
                 let test = format!("{base} {UNKNOWN_FLAG}");

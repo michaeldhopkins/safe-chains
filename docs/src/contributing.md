@@ -4,12 +4,10 @@ Most commands are defined as TOML in the `commands/` directory. See [`commands/S
 
 ## Steps
 
-1. Add the command to the appropriate `commands/*.toml` file (or create a new one)
-2. If you created a new file, register it in `src/registry.rs` via `include_str!`
-3. Add the command name to `HANDLED_CMDS` in `src/handlers/mod.rs`
-4. Run `cargo test` and `cargo clippy -- -D warnings`
-5. Run `./generate-docs.sh` to regenerate documentation
-6. Run `cargo install --path .` to update the installed binary
+1. Add the command to the appropriate `commands/*.toml` file (or create a new one — `build.rs` auto-discovers any `*.toml` under `commands/`)
+2. Run `cargo test` and `cargo clippy -- -D warnings`
+3. Run `./generate-docs.sh` to regenerate documentation
+4. Run `cargo install --path .` to update the installed binary
 
 For commands that need custom validation logic, add a Rust handler in `src/handlers/` and reference it with `handler = "name"` in the TOML.
 

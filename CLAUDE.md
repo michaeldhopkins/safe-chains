@@ -31,7 +31,7 @@ Regenerates COMMANDS.md, builds and deploys the documentation site, and updates 
 One logical change per commit. Do not batch unrelated changes into one commit — we publish detailed changelogs and each entry should describe a single thing.
 
 Examples of one commit:
-- Adding a new command (TOML + HANDLED_CMDS + tests)
+- Adding a new command (TOML + tests)
 - Adding missing flags to an existing command
 - A bug fix to the parser
 - A refactor of a handler
@@ -55,8 +55,8 @@ Fold the bump into the final feat/fix/refactor commit of the stack — do not cr
 ## Development
 
 - Most commands are defined as TOML in `commands/*.toml`. See `commands/SAMPLE.toml` for the complete field reference — it documents every field type, when to use each one, and how they compose. Always check SAMPLE.toml before adding a new field type to ensure you aren't duplicating what existing fields already cover.
-- When adding a new command: research the command first, then add it to the appropriate `commands/*.toml` file with a `description` field, add the name to `HANDLED_CMDS` in `src/handlers/mod.rs`, run the test suite, clippy, and `./generate-docs.sh`. If you create a new TOML file, register it in `src/registry.rs` via `include_str!`.
-- When adding a new TOML field type: design and thoroughly test the generic handler in `src/registry.rs` before using it in any data file. Add comprehensive tests covering every edge case. Update `commands/SAMPLE.toml` with documentation for the new field.
+- When adding a new command: research the command first, then add it to the appropriate `commands/*.toml` file with a `description` field, run the test suite, clippy, and `./generate-docs.sh`. New `*.toml` files under `commands/` are auto-discovered by `build.rs`; no explicit registration needed.
+- When adding a new TOML field type: design and thoroughly test the generic handler in `src/registry/build.rs` before using it in any data file. Add comprehensive tests covering every edge case. Update `commands/SAMPLE.toml` with documentation for the new field.
 - Commands that need custom Rust validation (curl headers, perl AST, fzf --bind parsing) use `handler = "name"` in TOML and a Rust function in `src/handlers/`. This is a last resort — most commands can be expressed declaratively.
 - Do not add comments to code
 - All files must end with a newline
