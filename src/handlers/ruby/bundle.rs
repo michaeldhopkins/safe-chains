@@ -29,13 +29,6 @@ static HELP_ONLY: FlagPolicy = FlagPolicy {
     numeric_dash: false,
 };
 
-/// Legacy fast path for tools that don't yet have a top-level command
-/// allowlist. New entries should land as a top-level TOML and be added
-/// to the bundle-exec delegation match above instead — that path
-/// recursively validates flags so write-mode flags promote the level
-/// correctly. This list will shrink to empty as those land.
-static BUNDLE_EXEC_SAFE: WordSet = WordSet::new(&[]);
-
 pub fn check_bundle_config(tokens: &[Token]) -> Verdict {
     if tokens.len() == 1 {
         return Verdict::Allowed(SafetyLevel::Inert);
@@ -66,90 +59,14 @@ pub fn check_bundle_exec(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && (cmd == "--help" || cmd == "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-    // Tools that are also covered as top-level commands: delegate
-    // through command_verdict so flag-driven level promotion (e.g.
-    // rubocop --autocorrect → SafeWrite) and full flag allowlists
-    // apply, instead of the legacy hard-coded SafeRead shortcut.
-    if matches!(
-        cmd.as_str(),
-        "annotate"
-        | "annotaterb"
-        | "asciidoctor"
-        | "brakeman"
-        | "bridgetown"
-        | "bundle-audit"
-        | "bundler-audit"
-        | "byebug"
-        | "cucumber"
-        | "danger"
-        | "dawn"
-        | "debride"
-        | "erb_lint"
-        | "erblint"
-        | "erd"
-        | "fasterer"
-        | "flay"
-        | "flog"
-        | "foreman"
-        | "fpm"
-        | "gem"
-        | "guard"
-        | "haml"
-        | "haml-lint"
-        | "herb"
-        | "i18n-tasks"
-        | "jekyll"
-        | "kamal"
-        | "kramdown"
-        | "license_finder"
-        | "m"
-        | "middleman"
-        | "mutant"
-        | "overcommit"
-        | "packwerk"
-        | "parallel_cucumber"
-        | "parallel_rspec"
-        | "parallel_spinach"
-        | "parallel_test"
-        | "pry"
-        | "racc"
-        | "railroady"
-        | "rails"
-        | "rake"
-        | "rbs"
-        | "rdoc"
-        | "reek"
-        | "rex"
-        | "rspec"
-        | "rubocop"
-        | "rubycritic"
-        | "ruby-audit"
-        | "rufo"
-        | "sdoc"
-        | "slim-lint"
-        | "slimrb"
-        | "spring"
-        | "srb"
-        | "stackprof"
-        | "standardrb"
-        | "steep"
-        | "stree"
-        | "thor"
-        | "typeprof"
-        | "whenever"
-        | "yard"
-        | "yardoc"
-    ) {
-        let inner = shell_words::join(tokens[1..].iter().map(|t| t.as_str()));
-        return crate::command_verdict(&inner);
-    }
-    if BUNDLE_EXEC_SAFE.contains(cmd) {
-        return Verdict::Allowed(SafetyLevel::SafeRead);
-    }
     if cmd == "appraisal" {
         return check_appraisal(&tokens[1..]);
     }
-    Verdict::Denied
+    // Delegate to the full dispatch so the inner command's flag allowlist
+    // and level-promotion rules apply identically to a direct invocation.
+    // Unknown commands fall through to Verdict::Denied via command_verdict.
+    let inner = shell_words::join(tokens[1..].iter().map(|t| t.as_str()));
+    crate::command_verdict(&inner)
 }
 
 fn check_appraisal(tokens: &[Token]) -> Verdict {
