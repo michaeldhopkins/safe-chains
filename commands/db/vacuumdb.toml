@@ -1,0 +1,35 @@
+[[command]]
+name = "vacuumdb"
+description = "PostgreSQL — runs VACUUM (and optionally ANALYZE) on a database. External-system write (modifies on-disk state and statistics)."
+url = "https://www.postgresql.org/docs/current/app-vacuumdb.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--all", "--analyze", "--analyze-in-stages",
+    "--analyze-only", "--buffer-usage-limit",
+    "--disable-page-skipping", "--echo",
+    "--force-index-cleanup", "--full",
+    "--help", "--index-cleanup",
+    "--jobs", "--maintenance-db",
+    "--min-mxid-age", "--min-xid-age",
+    "--missing-stats-only", "--no-index-cleanup",
+    "--no-process-main", "--no-process-toast",
+    "--no-truncate", "--password", "--no-password",
+    "--quiet", "--schema",
+    "--exclude-schema", "--skip-locked",
+    "--table", "--truncate", "--verbose",
+    "--version",
+    "-?", "-F", "-N", "-P", "-Q", "-V",
+    "-Z", "-a", "-d", "-e", "-f", "-h",
+    "-j", "-n", "-p", "-q", "-t", "-U",
+    "-v", "-w", "-W", "-z",
+]
+valued = [
+    "--buffer-usage-limit", "--dbname",
+    "--exclude-schema", "--host",
+    "--jobs", "--maintenance-db",
+    "--min-mxid-age", "--min-xid-age",
+    "--port", "--schema", "--table", "--username",
+    "-d", "-h", "-j", "-n", "-p", "-t", "-U",
+]

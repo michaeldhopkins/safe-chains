@@ -1,0 +1,9 @@
+[[command]]
+name = "pdfunite"
+description = "Poppler — concatenates multiple PDFs into one. Reads inputs, writes the concatenated PDF to the last positional argument."
+url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfunite.1.html"
+researched_version = "Poppler 24.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["-help", "-q", "-v", "--help", "-?"]

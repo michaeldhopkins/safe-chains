@@ -1,0 +1,154 @@
+[[command]]
+name = "cockroach"
+description = "CockroachDB CLI. Subcommands: `start`, `start-single-node`, `init`, `quit`, `node` (status/decommission/recommission/drain/ls), `cert`, `gen`, `version`, `sql`, `dump`, `userfile`, `auth-session`, `convert-url`, `mt`, `import`, `nodelocal`, `sqlfmt`, `workload`, `debug`, `demo`, `eval`, `connect`, `encode-uri`. Most cluster operations modify or contact a CockroachDB instance (network + external system writes). Read-side: `version`, `node status` (read), `gen` (writes generated files locally), `sqlfmt`."
+url = "https://www.cockroachlabs.com/docs/stable/cockroach-commands.html"
+researched_version = "CockroachDB 24.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--build-tag", "--help", "-h"]
+
+[[command.sub]]
+name = "sqlfmt"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--align", "--help", "--no-simplify", "--print-width", "--use-spaces", "--tab-width", "-h"]
+valued = ["--execute", "-e"]
+
+[[command.sub]]
+name = "gen"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "autocomplete"
+candidate = true
+
+[[command.sub.sub]]
+name = "haproxy"
+candidate = true
+
+[[command.sub.sub]]
+name = "settings-list"
+candidate = true
+
+[[command.sub.sub]]
+name = "encryption-key"
+candidate = true
+
+[[command.sub.sub]]
+name = "example-data"
+candidate = true
+
+[[command.sub.sub]]
+name = "man"
+candidate = true
+
+[[command.sub]]
+name = "node"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "status"
+standalone = ["--all", "--decommission", "--help", "--ranges", "--stats", "-h"]
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "--format", "-h"]
+
+[[command.sub.sub]]
+name = "decommission"
+candidate = true
+
+[[command.sub.sub]]
+name = "recommission"
+candidate = true
+
+[[command.sub.sub]]
+name = "drain"
+candidate = true
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "start-single-node"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "quit"
+candidate = true
+
+[[command.sub]]
+name = "cert"
+candidate = true
+
+[[command.sub]]
+name = "sql"
+candidate = true
+
+[[command.sub]]
+name = "dump"
+candidate = true
+
+[[command.sub]]
+name = "userfile"
+candidate = true
+
+[[command.sub]]
+name = "auth-session"
+candidate = true
+
+[[command.sub]]
+name = "convert-url"
+candidate = true
+
+[[command.sub]]
+name = "mt"
+candidate = true
+
+[[command.sub]]
+name = "import"
+candidate = true
+
+[[command.sub]]
+name = "nodelocal"
+candidate = true
+
+[[command.sub]]
+name = "workload"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true
+
+[[command.sub]]
+name = "demo"
+candidate = true
+
+[[command.sub]]
+name = "eval"
+candidate = true
+
+[[command.sub]]
+name = "connect"
+candidate = true
+
+[[command.sub]]
+name = "encode-uri"
+candidate = true
+
+[[command.sub]]
+name = "sqlproxy"
+candidate = true

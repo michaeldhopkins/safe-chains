@@ -1,0 +1,9 @@
+[[command]]
+name = "mycli"
+description = "Interactive MySQL/MariaDB REPL with autocompletion + syntax highlighting. Bare invocation drops into the REPL. Carve-out: --version / --help only."
+url = "https://www.mycli.net/docs"
+researched_version = "mycli 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

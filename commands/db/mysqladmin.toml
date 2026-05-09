@@ -1,0 +1,38 @@
+[[command]]
+name = "mysqladmin"
+description = "MySQL/MariaDB administrative client. Connects over network and runs subcommands like `status`, `processlist`, `version`, `variables` (read), `extended-status`, `start-replica`, `stop-replica`, `flush-*`, `kill`, `password`, `create db`, `drop db`, `shutdown`, `reload`, `refresh`, `set-variable` (write). Read-side is the carve-out."
+url = "https://dev.mysql.com/doc/refman/8.4/en/mysqladmin.html"
+researched_version = "MySQL 8.x / MariaDB 11.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--connect-timeout", "--count", "--debug",
+    "--debug-check", "--debug-info",
+    "--default-character-set", "--default-auth",
+    "--enable-cleartext-plugin", "--force",
+    "--help", "--host", "--login-path",
+    "--login-timeout", "--no-beep",
+    "--no-defaults", "--password", "--pipe",
+    "--port", "--print-defaults", "--protocol",
+    "--relative", "--shutdown-timeout",
+    "--silent", "--socket", "--sleep",
+    "--ssl", "--ssl-mode", "--ssl-fips-mode",
+    "--user", "--verbose", "--version", "--vertical",
+    "--wait", "-?", "-B", "-C", "-E", "-F", "-G",
+    "-K", "-N", "-O", "-S", "-T", "-V", "-c", "-d",
+    "-e", "-f", "-h", "-i", "-p", "-r",
+    "-s", "-t", "-u", "-v", "-w",
+]
+valued = [
+    "--character-sets-dir", "--connect-timeout",
+    "--count", "--default-auth",
+    "--default-character-set", "--host",
+    "--login-path", "--login-timeout",
+    "--password", "--port", "--protocol",
+    "--shutdown-timeout", "--socket", "--sleep",
+    "--ssl-ca", "--ssl-capath", "--ssl-cert",
+    "--ssl-cipher", "--ssl-key",
+    "--ssl-mode", "--user",
+    "-S", "-c", "-h", "-i", "-p", "-P", "-u",
+]

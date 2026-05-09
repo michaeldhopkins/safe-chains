@@ -1,0 +1,138 @@
+[[command]]
+name = "sls"
+aliases = ["serverless"]
+description = "Serverless Framework CLI. Most subcommands deploy or query AWS / Azure / GCP (network + external system writes). Read-side: `--version`, `--help`, `info`, `print`, `metrics`, `logs`, `dashboard`, `config credentials --check`, `output get`, `output list`, `param list`, `compose`. Write-side: `deploy`, `remove`, `invoke`, `package`, `rollback`, `slstats`, `config credentials`, `config tabcompletion`, `create`, `install`, `uninstall`, `update`, `plugin install/uninstall`, `print`, `param get/set/delete`, `output set/delete`, `studio`."
+url = "https://www.serverless.com/framework/docs/providers/aws/cli-reference"
+researched_version = "Serverless Framework 4.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--debug", "--help", "--verbose", "-h", "-v"]
+valued = ["--config", "--region", "--stage", "-c", "-r", "-s"]
+
+[[command.sub]]
+name = "print"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--debug", "--help", "-h"]
+valued = ["--config", "--format", "--path", "--region", "--stage", "--transform", "-c", "-r", "-s"]
+
+[[command.sub]]
+name = "metrics"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--debug", "--help", "-h"]
+valued = ["--config", "--endTime", "--function", "--region", "--stage", "--startTime", "-c", "-f", "-r", "-s"]
+
+[[command.sub]]
+name = "logs"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--debug", "--help", "--tail", "-h", "-t"]
+valued = ["--config", "--filter", "--function", "--interval", "--region", "--stage", "--startTime", "-c", "-f", "-i", "-r", "-s"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "invoke"
+candidate = true
+
+[[command.sub]]
+name = "package"
+candidate = true
+
+[[command.sub]]
+name = "rollback"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "plugin"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "param"
+candidate = true
+
+[[command.sub]]
+name = "output"
+candidate = true
+
+[[command.sub]]
+name = "studio"
+candidate = true
+
+[[command.sub]]
+name = "dashboard"
+candidate = true
+
+[[command.sub]]
+name = "compose"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "register"
+candidate = true
+
+[[command.sub]]
+name = "support"
+candidate = true
+
+[[command.sub]]
+name = "cleanup"
+candidate = true

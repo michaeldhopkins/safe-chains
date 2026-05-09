@@ -1,0 +1,9 @@
+[[command]]
+name = "nix-build"
+description = "Builds the given Nix expression and writes a result symlink in the working directory. Loads the expression (arbitrary Nix code) and may fetch dependencies from the binary cache (network). --dry-run reports what would be built without building. Carve-out: --version / --help / --dry-run only — meaningful invocations execute Nix."
+url = "https://nix.dev/manual/nix/latest/command-ref/nix-build.html"
+researched_version = "Nix 2.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--dry-run", "--help", "--version", "-h"]

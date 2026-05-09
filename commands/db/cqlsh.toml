@@ -1,0 +1,9 @@
+[[command]]
+name = "cqlsh"
+description = "Cassandra interactive REPL (CQL shell). Bare invocation drops into the REPL connected to the configured node. -e CMD runs CQL non-interactively. Carve-out: --version / --help only."
+url = "https://cassandra.apache.org/doc/latest/cassandra/managing/tools/cqlsh.html"
+researched_version = "Apache Cassandra 5.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

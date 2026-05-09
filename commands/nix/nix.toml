@@ -1,0 +1,352 @@
+[[command]]
+name = "nix"
+description = "Nix unified flake-based CLI. Many subcommands. Read-side: `version`, `eval`, `repl`, `doctor`, `derivation show`, `flake metadata`, `flake show`, `flake check`, `flake info`, `path-info`, `show-derivation`, `store ls`, `store cat`, `store dump-path`, `store ping`, `store info`, `store optimise --help`, `why-depends`, `search`, `registry list`. Write-side: `build`, `develop`, `shell`, `run`, `profile install/remove/list/upgrade/diff-closures/wipe-history`, `flake init/clone/lock/update/new`, `copy`, `store add-file/add-path/copy-log/delete/diff-closures/gc/repair-path/sign-paths/verify`, `bundle`, `daemon`, `key generate-secret`. Network: `flake update`, `copy`, `build` of network-fetched flake refs, `registry pin`."
+url = "https://nix.dev/manual/nix/latest/command-ref/new-cli/nix.html"
+researched_version = "Nix 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "eval"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--apply", "--debug", "--debugger", "--expr", "--file", "--help", "--ignore-try", "--impure", "--json", "--no-net", "--print-build-logs", "--quiet", "--raw", "--read-only", "--refresh", "--store", "--strict", "--write-lock-file", "-L", "-f", "-h", "--help", "-q"]
+valued = ["--arg", "--argstr", "--expr", "--file", "--include", "--option", "--store", "-I", "-f"]
+
+[[command.sub]]
+name = "search"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--debug", "--exclude", "--help", "--inputs-from", "--json", "--no-update-lock-file", "--no-write-lock-file", "--print-build-logs", "--quiet", "--refresh", "-L", "-h", "-q"]
+valued = ["--exclude", "--inputs-from", "--option", "--override-flake", "--override-input", "--store", "-e"]
+
+[[command.sub]]
+name = "show-derivation"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--debug", "--help", "--json", "--no-net", "--quiet", "--recursive", "-h", "-q", "-r"]
+
+[[command.sub]]
+name = "derivation"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--debug", "--help", "-h"]
+valued = ["--store"]
+
+[[command.sub]]
+name = "path-info"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--all", "--closure-size", "--debug", "--help", "--human-readable", "--json", "--quiet", "--recursive", "--sigs", "--size", "-S", "-c", "-h", "-q", "-r", "-s"]
+valued = ["--store", "--from"]
+
+[[command.sub]]
+name = "why-depends"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--all", "--help", "--precise", "-a", "-h"]
+valued = ["--derivation", "--store"]
+
+[[command.sub]]
+name = "store"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--debug", "--help", "--human-readable", "--json", "--long", "--quiet", "--recursive", "-d", "-h", "-l", "-q", "-r"]
+valued = ["--store"]
+
+[[command.sub.sub]]
+name = "cat"
+standalone = ["--help", "-h"]
+valued = ["--store"]
+
+[[command.sub.sub]]
+name = "dump-path"
+standalone = ["--help", "-h"]
+valued = ["--store"]
+
+[[command.sub.sub]]
+name = "ping"
+standalone = ["--help", "-h"]
+valued = ["--store"]
+
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+valued = ["--store"]
+
+[[command.sub.sub]]
+name = "verify"
+standalone = ["--all", "--help", "-a", "-h"]
+valued = ["--store"]
+
+[[command.sub.sub]]
+name = "diff-closures"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "gc"
+candidate = true
+
+[[command.sub.sub]]
+name = "optimise"
+candidate = true
+
+[[command.sub.sub]]
+name = "add-file"
+candidate = true
+
+[[command.sub.sub]]
+name = "add-path"
+candidate = true
+
+[[command.sub.sub]]
+name = "repair-path"
+candidate = true
+
+[[command.sub.sub]]
+name = "sign-paths"
+candidate = true
+
+[[command.sub.sub]]
+name = "make-content-addressed"
+candidate = true
+
+[[command.sub.sub]]
+name = "copy-log"
+candidate = true
+
+[[command.sub.sub]]
+name = "copy-sigs"
+candidate = true
+
+[[command.sub.sub]]
+name = "prefetch-file"
+candidate = true
+
+[[command.sub]]
+name = "flake"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "metadata"
+standalone = ["--debug", "--help", "--json", "--no-update-lock-file", "--no-write-lock-file", "--quiet", "-h", "-q"]
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--all-systems", "--debug", "--help", "--json", "--legacy", "--no-update-lock-file", "--quiet", "-h", "-q"]
+
+[[command.sub.sub]]
+name = "check"
+standalone = ["--all-systems", "--debug", "--help", "--no-build", "--no-update-lock-file", "--quiet", "-h", "-q"]
+
+[[command.sub.sub]]
+name = "info"
+standalone = ["--debug", "--help", "--json", "-h"]
+
+[[command.sub.sub]]
+name = "init"
+candidate = true
+
+[[command.sub.sub]]
+name = "new"
+candidate = true
+
+[[command.sub.sub]]
+name = "clone"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub.sub]]
+name = "lock"
+candidate = true
+
+[[command.sub.sub]]
+name = "archive"
+candidate = true
+
+[[command.sub.sub]]
+name = "prefetch"
+candidate = true
+
+[[command.sub]]
+name = "registry"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "add"
+candidate = true
+
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub.sub]]
+name = "pin"
+candidate = true
+
+[[command.sub]]
+name = "profile"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--debug", "--help", "--json", "-h"]
+valued = ["--profile"]
+
+[[command.sub.sub]]
+name = "history"
+standalone = ["--debug", "--help", "-h"]
+valued = ["--profile"]
+
+[[command.sub.sub]]
+name = "diff-closures"
+standalone = ["--help", "-h"]
+valued = ["--profile"]
+
+[[command.sub.sub]]
+name = "install"
+candidate = true
+
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub.sub]]
+name = "rollback"
+candidate = true
+
+[[command.sub.sub]]
+name = "wipe-history"
+candidate = true
+
+[[command.sub]]
+name = "config"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub.sub]]
+name = "check"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "develop"
+candidate = true
+
+[[command.sub]]
+name = "shell"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "repl"
+candidate = true
+
+[[command.sub]]
+name = "copy"
+candidate = true
+
+[[command.sub]]
+name = "key"
+candidate = true
+
+[[command.sub]]
+name = "fmt"
+candidate = true
+
+[[command.sub]]
+name = "log"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "bundle"
+candidate = true
+
+[[command.sub]]
+name = "daemon"
+candidate = true
+
+[[command.sub]]
+name = "ls-remote"
+candidate = true
+
+[[command.sub]]
+name = "channel"
+candidate = true
+
+[[command.sub]]
+name = "hash"
+candidate = true
+
+[[command.sub]]
+name = "nar"
+candidate = true
+
+[[command.sub]]
+name = "describe-stores"
+candidate = true
+
+[[command.sub]]
+name = "doctor-check"
+candidate = true
+
+[[command.sub]]
+name = "upgrade-nix"
+candidate = true

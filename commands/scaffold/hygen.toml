@@ -1,0 +1,9 @@
+[[command]]
+name = "hygen"
+description = "Hygen — fast scalable code generator. Each invocation runs templates (which can include arbitrary JS in pre/post hooks). Carve-out: --version / --help only."
+url = "https://www.hygen.io/docs/cli/"
+researched_version = "hygen 6.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

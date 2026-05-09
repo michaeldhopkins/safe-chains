@@ -1,0 +1,10 @@
+[[command]]
+name = "pdfdetach"
+description = "Poppler — lists / extracts attachments from a PDF. -list reads; -save writes to disk."
+url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfdetach.1.html"
+researched_version = "Poppler 24.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["-help", "-list", "-q", "-savecont", "-saveall", "-v", "--help", "-?"]
+valued = ["-enc", "-o", "-opw", "-save", "-upw"]

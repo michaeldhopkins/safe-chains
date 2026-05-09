@@ -1,0 +1,24 @@
+[[command]]
+name = "gpustat"
+description = "Quick NVIDIA GPU status (Python). Bare invocation prints stats to stdout. Pure read."
+url = "https://github.com/wookayin/gpustat"
+researched_version = "gpustat 1.x"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = [
+    "--debug", "--force-color", "--gpuname-width",
+    "--help", "--id", "--json", "--no-color",
+    "--no-header", "--show-all", "--show-cmd",
+    "--show-codec", "--show-cores", "--show-fan",
+    "--show-full-cmd", "--show-pid", "--show-power",
+    "--show-pids", "--show-processes",
+    "--show-pwr", "--show-temperature",
+    "--show-throttle-codes", "--show-user",
+    "--version", "--watch",
+    "-a", "-c", "-cu", "-f", "-i", "-h",
+    "-p", "-P", "-u", "-v",
+]
+valued = [
+    "--id", "--watch", "-i",
+]

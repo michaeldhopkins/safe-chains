@@ -1,0 +1,10 @@
+[[command]]
+name = "godot"
+aliases = ["godot4"]
+description = "Godot game engine CLI. Bare invocation opens the editor (GUI). --headless --script runs a script in headless mode (executes user GDScript / C#). --export / --export-pack / --export-debug exports game binaries (project-local SafeWrite). --check-only validates the project without launching."
+url = "https://docs.godotengine.org/en/stable/tutorials/editor/command_line_tutorial.html"
+researched_version = "Godot 4.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

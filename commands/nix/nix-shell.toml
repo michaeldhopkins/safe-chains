@@ -1,0 +1,9 @@
+[[command]]
+name = "nix-shell"
+description = "Drops into an interactive shell with the dependencies of the given Nix expression. Loads the expression (which is arbitrary Nix) and downloads any required derivations from the binary cache (network). The interactive shell is long-running. Carve-out: --version / --help / --pure with --command (still executes user-provided code). Most invocations execute project Nix and shell."
+url = "https://nix.dev/manual/nix/latest/command-ref/nix-shell.html"
+researched_version = "Nix 2.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]

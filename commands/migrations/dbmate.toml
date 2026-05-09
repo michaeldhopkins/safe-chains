@@ -1,0 +1,61 @@
+[[command]]
+name = "dbmate"
+description = "Lightweight, framework-agnostic DB migration tool. Subcommands: `up`, `down`, `new`, `migrate`, `rollback`, `status`, `dump`, `wait`, `drop`, `create`, `version`. Read-side: `version`, `status`. Write-side: `up/down/migrate/rollback/drop/create/dump/new/wait` — all execute SQL or write files."
+url = "https://github.com/amacneil/dbmate"
+researched_version = "dbmate 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--exit-code", "--help", "--quiet", "-h"]
+valued = ["--config-file", "--migrations-dir", "--migrations-table", "--schema-file", "--url", "-d", "-e", "-s", "-u"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "up"
+candidate = true
+
+[[command.sub]]
+name = "down"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "rollback"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "drop"
+candidate = true
+
+[[command.sub]]
+name = "dump"
+candidate = true
+
+[[command.sub]]
+name = "load"
+candidate = true
+
+[[command.sub]]
+name = "wait"
+candidate = true

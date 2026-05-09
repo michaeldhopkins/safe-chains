@@ -1,0 +1,184 @@
+[[command]]
+name = "atlas"
+description = "Atlas (ariga.io) — DDL schema migration tool. Subcommands: `schema apply/inspect/diff/fmt/clean/status/test`, `migrate apply/diff/lint/hash/new/rebase/status/validate/down/import/checksum/seed`, `version`, `license`, `login`, `logout`, `whoami`, `env`. Read-side: `version`, `whoami`, `env`, `schema inspect/diff/fmt/test`, `migrate diff (preview)/lint/status/hash/validate`. Write-side: `migrate apply/down/new/import/seed`, `schema apply/clean`, `login/logout`."
+url = "https://atlasgo.io/cli-reference"
+researched_version = "Atlas 0.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "whoami"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--config", "--env"]
+
+[[command.sub]]
+name = "schema"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "inspect"
+standalone = ["--exclude", "--format", "--help", "-h"]
+valued = ["--config", "--env", "--exclude", "--format", "--schema", "--url", "-c", "-s", "-u"]
+
+[[command.sub.sub]]
+name = "diff"
+standalone = ["--format", "--help", "-h"]
+valued = ["--config", "--env", "--from", "--to", "--dev-url", "--exclude", "--schema", "--format", "-c"]
+
+[[command.sub.sub]]
+name = "fmt"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "test"
+standalone = ["--help", "--run", "-h"]
+valued = ["--config", "--dev-url", "--env", "--run", "-c"]
+
+[[command.sub.sub]]
+name = "apply"
+candidate = true
+
+[[command.sub.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub.sub]]
+name = "status"
+candidate = true
+
+[[command.sub.sub]]
+name = "lint"
+candidate = true
+
+[[command.sub.sub]]
+name = "push"
+candidate = true
+
+[[command.sub.sub]]
+name = "plan"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "diff"
+standalone = ["--dry-run", "--edit", "--exec", "--format", "--help", "--lock", "-h"]
+valued = ["--config", "--dev-url", "--dir", "--env", "--exclude", "--format", "--lock-timeout", "--qualifier", "--schema", "--to", "-c"]
+
+[[command.sub.sub]]
+name = "status"
+standalone = ["--format", "--help", "-h"]
+valued = ["--config", "--dir", "--env", "--format", "--url", "-c", "-u"]
+
+[[command.sub.sub]]
+name = "hash"
+standalone = ["--force", "--help", "-h"]
+valued = ["--config", "--dir", "--env", "-c"]
+
+[[command.sub.sub]]
+name = "lint"
+standalone = ["--help", "-h"]
+valued = ["--base", "--config", "--dev-url", "--dir", "--env", "--format", "--git-base", "--git-dir", "--latest", "-c"]
+
+[[command.sub.sub]]
+name = "validate"
+standalone = ["--help", "-h"]
+valued = ["--config", "--dev-url", "--dir", "--env", "-c"]
+
+[[command.sub.sub]]
+name = "test"
+standalone = ["--help", "--run", "-h"]
+valued = ["--config", "--dev-url", "--dir", "--env", "--run", "-c"]
+
+[[command.sub.sub]]
+name = "apply"
+candidate = true
+
+[[command.sub.sub]]
+name = "down"
+candidate = true
+
+[[command.sub.sub]]
+name = "new"
+candidate = true
+
+[[command.sub.sub]]
+name = "rebase"
+candidate = true
+
+[[command.sub.sub]]
+name = "import"
+candidate = true
+
+[[command.sub.sub]]
+name = "seed"
+candidate = true
+
+[[command.sub.sub]]
+name = "checksum"
+candidate = true
+
+[[command.sub.sub]]
+name = "set"
+candidate = true
+
+[[command.sub.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "license"
+candidate = true
+
+[[command.sub]]
+name = "monitor"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "telemetry"
+candidate = true
+
+[[command.sub]]
+name = "doctor"
+candidate = true

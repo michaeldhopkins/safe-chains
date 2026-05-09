@@ -260,6 +260,16 @@ Aliases: `7zz`, `7za`
 - Allowed valued flags: --config, --exclude, --fail-level, --filter, --format, --globs, --ignored, --out, --reporter, --rule, -f
 - Bare invocation allowed
 
+### `amplify`
+<p class="cmd-url"><a href="https://docs.amplify.aws/gen1/javascript/tools/cli/usage/">https://docs.amplify.aws/gen1/javascript/tools/cli/usage/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **env get**: Flags: --help, -h
+- **env list**: Flags: --help, --json, -h
+- **help**: Positional args accepted
+- **status**: Flags: --debug, --help, --verbose, -h, -v. Valued: --profile
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `amtool`
 <p class="cmd-url"><a href="https://prometheus.io/docs/alerting/latest/clients/">https://prometheus.io/docs/alerting/latest/clients/</a></p>
 
@@ -274,6 +284,18 @@ Aliases: `7zz`, `7za`
 - **template render**: Flags: --help, -h. Valued: --data, --template.glob, --template.text, --type
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `anchor`
+<p class="cmd-url"><a href="https://www.anchor-lang.com/docs/cli">https://www.anchor-lang.com/docs/cli</a></p>
+
+- **cluster list**: Flags: --help, -h
+- **completions**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **idl fetch**: Flags: --help, -h. Valued: --out, -o
+- **idl parse**: Flags: --help, -h. Valued: --file, --out
+- **keys list**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -V
 
 ### `annotate`
 <p class="cmd-url"><a href="https://github.com/ctran/annotate_models">https://github.com/ctran/annotate_models</a></p>
@@ -339,6 +361,11 @@ Aliases: `7zz`, `7za`
 - **encrypt_string**: Flags: --ask-vault-pass, --ask-vault-password, --help, --show-input, --stdin-name, -h, -n. Valued: --encrypt-vault-id, --name, --stdin-name, --vault-id, --vault-password-file
 - **help**: Positional args accepted
 - **view**: Flags: --ask-vault-pass, --ask-vault-password, --help, -h, --vault-password-file. Valued: --vault-id, --vault-password-file, --ask-vault-pass-file. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `anvil`
+<p class="cmd-url"><a href="https://book.getfoundry.sh/reference/anvil/">https://book.getfoundry.sh/reference/anvil/</a></p>
+
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `apkanalyzer`
@@ -420,6 +447,28 @@ Aliases: `7zz`, `7za`
 - **version**: Flags: --client, --grpc-web, --help, --insecure, --loglevel, --output, --server, --short, -h. Valued: --auth-token, --client-crt, --client-crt-key, --config, --core, --grpc-web-root-path, --http-retry-max, --kube-context, --loglevel, --output, --plaintext, --port-forward-namespace, --server, --server-crt
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `aria2c`
+<p class="cmd-url"><a href="https://aria2.github.io/manual/en/html/aria2c.html">https://aria2.github.io/manual/en/html/aria2c.html</a></p>
+
+- Allowed standalone flags: --all-proxy, --allow-overwrite, --allow-piece-length-change, --always-resume, --async-dns, --auto-file-renaming, --auto-save-interval, --bt-detach-seed-only, --bt-enable-hook-after-hash-check, --bt-enable-lpd, --bt-exclude-tracker, --bt-force-encryption, --bt-hash-check-seed, --bt-load-saved-metadata, --bt-meta-data, --bt-metadata-only, --bt-min-crypto-level, --bt-prioritize-piece, --bt-remove-unselected-file, --bt-request-peer-speed-limit, --bt-require-crypto, --bt-save-metadata, --bt-seed-unverified, --bt-stop-timeout, --bt-tracker, --bt-tracker-connect-timeout, --bt-tracker-interval, --bt-tracker-timeout, --ca-certificate, --certificate, --check-certificate, --check-integrity, --checksum, --conditional-get, --conf-path, --connect-timeout, --console-log-level, --content-disposition-default-utf8, --continue, --daemon, --deferred-input, --dht-entry-point, --dht-entry-point6, --dht-file-path, --dht-file-path6, --dht-listen-addr6, --dht-listen-port, --dht-message-timeout, --dir, --disable-ipv6, --disk-cache, --dns-timeout, --download-result, --dscp, --enable-async-dns, --enable-color, --enable-dht, --enable-dht6, --enable-http-keep-alive, --enable-http-pipelining, --enable-mmap, --enable-peer-exchange, --enable-rpc, --event-poll, --exclude-domains, --exclude-paths, --ftp-passwd, --ftp-pasv, --ftp-proxy, --ftp-user, --header, --help, --http-accept-gzip, --http-auth-challenge, --http-no-cache, --http-passwd, --http-proxy, --http-user, --https-proxy, --human-readable, --index-out, --input-file, --keep-unfinished-download-result, --listen-port, --load-cookies, --log, --log-level, --lowest-speed-limit, --max-concurrent-downloads, --max-connection-per-server, --max-download-limit, --max-download-result, --max-file-not-found, --max-mmap-limit, --max-overall-download-limit, --max-overall-upload-limit, --max-resume-failure-tries, --max-tries, --max-upload-limit, --metalink-base-uri, --metalink-enable-unique-protocol, --metalink-file, --metalink-language, --metalink-location, --metalink-os, --metalink-preferred-protocol, --metalink-server, --metalink-version, --min-split-size, --min-tls-version, --multiple-interface, --netrc-path, --no-conf, --no-file-allocation-limit, --no-netrc, --no-want-digest-header, --on-bt-download-complete, --on-download-complete, --on-download-error, --on-download-pause, --on-download-start, --on-download-stop, --out, --parameterized-uri, --pause, --pause-metadata, --peer-id-prefix, --peer-agent, --piece-length, --private-key, --proxy-method, --quiet, --realtime-chunk-checksum, --referer, --remote-time, --remove-control-file, --retry-wait, --reuse-uri, --rpc-allow-origin-all, --rpc-listen-all, --rpc-listen-port, --rpc-max-request-size, --rpc-passwd, --rpc-save-upload-metadata, --rpc-secret, --rpc-secure, --rpc-user, --save-cookies, --save-not-found, --save-session, --save-session-interval, --seed-ratio, --seed-time, --select-file, --server-stat-of, --server-stat-timeout, --show-console-readout, --show-files, --socket-recv-buffer-size, --ssh-host-key-md, --split, --stderr, --stop, --stop-with-process, --stream-piece-selector, --summary-interval, --timeout, --torrent-file, --truncate-console-readout, --uri-selector, --use-head, --user-agent, --version, -D, -V, -Z, -c, -d, -h, -i, -j, -l, -m, -n, -o, -q, -s, -t, -v, -x
+- Allowed valued flags: --all-proxy, --all-proxy-passwd, --all-proxy-user, --bt-tracker, --ca-certificate, --certificate, --checksum, --conf-path, --connect-timeout, --console-log-level, --continue, --dht-entry-point, --dht-file-path, --dir, --disk-cache, --dns-timeout, --exclude-paths, --ftp-passwd, --ftp-proxy, --ftp-user, --header, --http-passwd, --http-proxy, --http-user, --https-proxy, --index-out, --input-file, --listen-port, --load-cookies, --log, --log-level, --lowest-speed-limit, --max-concurrent-downloads, --max-connection-per-server, --max-download-limit, --max-overall-download-limit, --max-overall-upload-limit, --max-tries, --max-upload-limit, --metalink-file, --min-split-size, --out, --parameterized-uri, --proxy-method, --referer, --retry-wait, --rpc-listen-port, --rpc-passwd, --rpc-secret, --rpc-user, --save-cookies, --save-session, --seed-ratio, --seed-time, --select-file, --server-stat-of, --split, --stderr, --summary-interval, --timeout, --torrent-file, --uri-selector, --user-agent, -T, -U, -c, -d, -i, -j, -l, -m, -n, -o, -s, -t, -x
+- Hyphen-prefixed positional arguments accepted
+
+### `arp`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/arp.8.html">https://man7.org/linux/man-pages/man8/arp.8.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -D, -H, -I, -N, -V, -a, -d, -e, -i, -n, -s, -v
+- Allowed valued flags: -A, -H, -I, -f, -i, -s
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `arping`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/arping.8.html">https://man7.org/linux/man-pages/man8/arping.8.html</a></p>
+
+- Allowed standalone flags: --help, --version, -A, -D, -U, -V, -b, -f, -h, -q, -v
+- Allowed valued flags: -c, -I, -i, -s, -S, -T, -w
+- Hyphen-prefixed positional arguments accepted
+
 ### `artillery`
 <p class="cmd-url"><a href="https://www.artillery.io/docs/reference/cli">https://www.artillery.io/docs/reference/cli</a></p>
 
@@ -497,6 +546,26 @@ Aliases: `7zz`, `7za`
 - **telemetry reset**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `atlas`
+<p class="cmd-url"><a href="https://atlasgo.io/cli-reference">https://atlasgo.io/cli-reference</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **env**: Flags: --help, -h. Valued: --config, --env. Positional args accepted
+- **help**: Positional args accepted
+- **migrate diff**: Flags: --dry-run, --edit, --exec, --format, --help, --lock, -h. Valued: --config, --dev-url, --dir, --env, --exclude, --format, --lock-timeout, --qualifier, --schema, --to, -c
+- **migrate hash**: Flags: --force, --help, -h. Valued: --config, --dir, --env, -c
+- **migrate lint**: Flags: --help, -h. Valued: --base, --config, --dev-url, --dir, --env, --format, --git-base, --git-dir, --latest, -c
+- **migrate status**: Flags: --format, --help, -h. Valued: --config, --dir, --env, --format, --url, -c, -u
+- **migrate test**: Flags: --help, --run, -h. Valued: --config, --dev-url, --dir, --env, --run, -c
+- **migrate validate**: Flags: --help, -h. Valued: --config, --dev-url, --dir, --env, -c
+- **schema diff**: Flags: --format, --help, -h. Valued: --config, --env, --from, --to, --dev-url, --exclude, --schema, --format, -c
+- **schema fmt**: Flags: --help, -h
+- **schema inspect**: Flags: --exclude, --format, --help, -h. Valued: --config, --env, --exclude, --format, --schema, --url, -c, -s, -u
+- **schema test**: Flags: --help, --run, -h. Valued: --config, --dev-url, --env, --run, -c
+- **version**: Flags: --help, -h
+- **whoami**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `atuin`
 <p class="cmd-url"><a href="https://atuin.sh/">https://atuin.sh/</a></p>
@@ -992,6 +1061,11 @@ Aliases: `@biomejs/biome`
 - **lint**: Flags: --colors, --help, --json-formatter, --no-errors-on-unmatched, --quiet, --verbose, -h. Valued: --config-path, --max-diagnostics, --stdin-file-path, --vcs-root
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `bitcoin-cli`
+<p class="cmd-url"><a href="https://bitcoincore.org/en/doc/">https://bitcoincore.org/en/doc/</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+
 ### `black`
 <p class="cmd-url"><a href="https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html">https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html</a></p>
 
@@ -1088,6 +1162,11 @@ Aliases: `@biomejs/biome`
 
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `btop`
+<p class="cmd-url"><a href="https://github.com/aristocratos/btop">https://github.com/aristocratos/btop</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `buck2`
 <p class="cmd-url"><a href="https://buck2.build/docs/users/commands/build/">https://buck2.build/docs/users/commands/build/</a></p>
 
@@ -1124,6 +1203,17 @@ Aliases: `@biomejs/biome`
 - **info**: Flags: --debug, --help, -h. Valued: --format
 - **inspect**: Flags: --help, -h. Valued: --format, --type, -f, -t. Positional args accepted
 - **version**: Flags: --help, -h. Valued: --format, --json
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `buildctl`
+<p class="cmd-url"><a href="https://github.com/moby/buildkit">https://github.com/moby/buildkit</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **debug histories**: Flags: --help, -h
+- **debug info**: Flags: --help, -h
+- **debug workers**: Flags: --filter, --help, --verbose, -h, -v
+- **du**: Flags: --filter, --help, --verbose, -h, -v
+- **help**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `bun`
@@ -1256,6 +1346,18 @@ Aliases: `bunzip2`, `bzcat`, `bzip2recover`
 - Allowed valued flags: -A, -B, -d, -n
 - Bare invocation allowed
 
+### `cap`
+<p class="cmd-url"><a href="https://capacitorjs.com/docs/cli">https://capacitorjs.com/docs/cli</a></p>
+
+Aliases: `capacitor`
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **config**: Flags: --help, --json, -h
+- **doctor**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **ls**: Flags: --help, -h. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `cargo`
 <p class="cmd-url"><a href="https://doc.rust-lang.org/cargo/commands/">https://doc.rust-lang.org/cargo/commands/</a></p>
 
@@ -1332,6 +1434,56 @@ Aliases: `bunzip2`, `bzcat`, `bzip2recover`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `cast`
+<p class="cmd-url"><a href="https://book.getfoundry.sh/reference/cast/">https://book.getfoundry.sh/reference/cast/</a></p>
+
+- **4byte**: Positional args accepted
+- **4byte-decode**: Positional args accepted
+- **abi-decode**: Positional args accepted
+- **abi-encode**: Positional args accepted
+- **balance**: Positional args accepted
+- **block**: Positional args accepted
+- **block-number**: Positional args accepted
+- **call**: Positional args accepted
+- **chain**: Positional args accepted
+- **chain-id**: Positional args accepted
+- **client**: Positional args accepted
+- **code**: Positional args accepted
+- **completion**: Flags: --help, -h. Positional args accepted
+- **compute-address**: Positional args accepted
+- **concat-hex**: Positional args accepted
+- **disassemble**: Positional args accepted
+- **format-bytes32-string**: Positional args accepted
+- **from-bin**: Positional args accepted
+- **from-utf8**: Positional args accepted
+- **from-wei**: Positional args accepted
+- **gas-price**: Positional args accepted
+- **help**: Positional args accepted
+- **keccak**: Positional args accepted
+- **logs**: Positional args accepted
+- **lookup-address**: Positional args accepted
+- **max-int**: Positional args accepted
+- **max-uint**: Positional args accepted
+- **min-int**: Positional args accepted
+- **nonce**: Positional args accepted
+- **parse-bytes32-string**: Positional args accepted
+- **receipt**: Positional args accepted
+- **resolve-name**: Positional args accepted
+- **storage**: Positional args accepted
+- **to-ascii**: Positional args accepted
+- **to-base**: Positional args accepted
+- **to-base32**: Positional args accepted
+- **to-bytes32**: Positional args accepted
+- **to-checksum-address**: Positional args accepted
+- **to-dec**: Positional args accepted
+- **to-hex**: Positional args accepted
+- **to-int256**: Positional args accepted
+- **to-uint256**: Positional args accepted
+- **to-wei**: Positional args accepted
+- **tx**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `cat`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation</a></p>
 
@@ -1343,6 +1495,20 @@ Aliases: `bunzip2`, `bzcat`, `bzip2recover`
 
 - Allowed standalone flags: --help, --version, -L, -P, -V, -e, -h
 - Bare invocation allowed
+
+### `cdk`
+<p class="cmd-url"><a href="https://docs.aws.amazon.com/cdk/v2/guide/cli.html">https://docs.aws.amazon.com/cdk/v2/guide/cli.html</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **diff**: Flags: --exclusively, --fail, --help, --security-only, -e, -h. Valued: --app, --context, --profile, --role-arn, --template, -a, -c. Positional args accepted
+- **doctor**: Flags: --help, -h
+- **help**: Positional args accepted
+- **list**: Flags: --help, --long, --show-dependencies, -h, -l. Valued: --app, --context, --profile, --role-arn, --strict, -a, -c. Positional args accepted
+- **ls**: Flags: --help, --long, --show-dependencies, -h, -l. Valued: --app, --context, --profile, --role-arn, --strict, -a, -c. Positional args accepted
+- **notices**: Flags: --help, --unacknowledged, -h, -u
+- **synth**: Flags: --exclusively, --help, --quiet, --validation, -e, -h, -q. Valued: --app, --context, --output, --profile, --role-arn, -a, -c, -o. Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `certbot`
 <p class="cmd-url"><a href="https://eff-certbot.readthedocs.io/en/stable/cli-help.html">https://eff-certbot.readthedocs.io/en/stable/cli-help.html</a></p>
@@ -1383,6 +1549,27 @@ Aliases: `bunzip2`, `bzcat`, `bzip2recover`
 - **tasks**: Flags: --help, -h
 - **version**
 - Allowed standalone flags: --help, --version, -h
+
+### `chalice`
+<p class="cmd-url"><a href="https://aws.github.io/chalice/topics/configfile.html">https://aws.github.io/chalice/topics/configfile.html</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **logs**: Flags: --follow, --help, --include-lambda-messages, -f, -h. Valued: --name, --profile, --since, --stage
+- **url**: Flags: --help, -h. Valued: --profile, --stage
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `chef-client`
+<p class="cmd-url"><a href="https://docs.chef.io/chef_client/">https://docs.chef.io/chef_client/</a></p>
+
+Aliases: `knife`, `chef-solo`, `chef-shell`, `chef`
+
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `chisel`
+<p class="cmd-url"><a href="https://book.getfoundry.sh/reference/chisel/">https://book.getfoundry.sh/reference/chisel/</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `chronic`
 <p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
@@ -1536,6 +1723,13 @@ Aliases: `clojure`
 - **version**: Positional args accepted
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `clusterdb`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-clusterdb.html">https://www.postgresql.org/docs/current/app-clusterdb.html</a></p>
+
+- Allowed standalone flags: --all, --echo, --help, --maintenance-db, --no-password, --password, --quiet, --table, --verbose, --version, -?, -V, -a, -d, -e, -h, -p, -q, -t, -U, -v, -w, -W
+- Allowed valued flags: --dbname, --host, --maintenance-db, --port, --table, --username, -d, -h, -p, -t, -U
+- Bare invocation allowed
+
 ### `cmake`
 <p class="cmd-url"><a href="https://cmake.org/cmake/help/latest/manual/cmake.1.html">https://cmake.org/cmake/help/latest/manual/cmake.1.html</a></p>
 
@@ -1553,6 +1747,16 @@ Aliases: `clojure`
 
 - Allowed standalone flags: --help, --print-bytes, --quiet, --silent, --verbose, --version, -V, -b, -h, -l, -s
 - Allowed valued flags: --bytes, --ignore-initial, -i, -n
+
+### `cockroach`
+<p class="cmd-url"><a href="https://www.cockroachlabs.com/docs/stable/cockroach-commands.html">https://www.cockroachlabs.com/docs/stable/cockroach-commands.html</a></p>
+
+- **help**: Positional args accepted
+- **node ls**: Flags: --help, --format, -h
+- **node status**: Flags: --all, --decommission, --help, --ranges, --stats, -h
+- **sqlfmt**: Flags: --align, --help, --no-simplify, --print-width, --use-spaces, --tab-width, -h. Valued: --execute, -e. Positional args accepted
+- **version**: Flags: --build-tag, --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `code`
 <p class="cmd-url"><a href="https://code.visualstudio.com/docs/configure/command-line">https://code.visualstudio.com/docs/configure/command-line</a></p>
@@ -1650,6 +1854,18 @@ Aliases: `code-insiders`, `codium`
 - **why-not**: Flags: --help, --recursive, --tree, -h, -r, -t
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `conan`
+<p class="cmd-url"><a href="https://docs.conan.io/2/reference/commands.html">https://docs.conan.io/2/reference/commands.html</a></p>
+
+- **graph**: Positional args accepted
+- **help**: Positional args accepted
+- **info**: Positional args accepted
+- **inspect**: Positional args accepted
+- **list**: Positional args accepted
+- **search**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `concurrently`
 <p class="cmd-url"><a href="https://github.com/open-cli-tools/concurrently">https://github.com/open-cli-tools/concurrently</a></p>
 
@@ -1695,6 +1911,21 @@ Aliases: `code-insiders`, `codium`
 
 - **help**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h
+
+### `copilot`
+<p class="cmd-url"><a href="https://aws.github.io/copilot-cli/docs/commands/">https://aws.github.io/copilot-cli/docs/commands/</a></p>
+
+- **app ls**: Flags: --help, -h. Valued: --profile
+- **app show**: Flags: --help, --json, --resources, -h. Valued: --profile
+- **completion**: Flags: --help, -h. Positional args accepted
+- **env ls**: Flags: --help, -h
+- **env show**: Flags: --help, --json, --manifest, --resources, -h
+- **help**: Positional args accepted
+- **svc logs**: Flags: --help, --follow, --json, -f, -h. Valued: --app, --end-time, --filter, --limit, --name, --start-time
+- **svc ls**: Flags: --help, -h
+- **svc show**: Flags: --help, --json, --manifest, --resources, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `coqc`
 <p class="cmd-url"><a href="https://coq.inria.fr/refman/practical-tools/coq-commands.html">https://coq.inria.fr/refman/practical-tools/coq-commands.html</a></p>
@@ -1745,6 +1976,11 @@ Aliases: `code-insiders`, `codium`
 - Allowed standalone flags: --addon, --addon-python, --bug-hunting, --check-config, --check-headers, --check-level, --check-library, --checkers-report, --config-exclude, --debug, --debug-warnings, --debug-symdb, --disable, --dump, --enable, --errorlist, --exception-handling, --executor, --exitcode-suppressions, --file-filter, --file-list, --force, --help, --include, --includes-file, --inconclusive, --inline-suppr, --language, --library, --max-configs, --max-ctu-depth, --no-cppcheck-build-dir, --platform, --plist-output, --profile-translations, --project-configurations, --quiet, --relative-paths, --report-progress, --rule, --rule-file, --showtime, --std, --suppress, --suppress-xml, --suppressions-list, --template, --template-location, --verbose, --version, --xml, -D, -U, -h, -j, -l, -q, -v
 - Allowed valued flags: --cppcheck-build-dir, --config-exclude, --exitcode-suppressions, --executor, --include, --includes-file, --language, --library, --max-configs, --max-ctu-depth, --output-file, --platform, --rule, --rule-file, --std, --suppress, --suppressions-list, --template, --template-location, --xml-version, -D, -I, -U, -i, -j, -l
 
+### `cqlsh`
+<p class="cmd-url"><a href="https://cassandra.apache.org/doc/latest/cassandra/managing/tools/cqlsh.html">https://cassandra.apache.org/doc/latest/cassandra/managing/tools/cqlsh.html</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `craft`
 <p class="cmd-url"><a href="https://craftcms.com/docs/5.x/reference/cli.html">https://craftcms.com/docs/5.x/reference/cli.html</a></p>
 
@@ -1776,6 +2012,41 @@ Aliases: `code-insiders`, `codium`
 - **validate**: Flags: --fast, --help, --remote, --tarball, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, -h
+
+### `create-next-app`
+<p class="cmd-url"><a href="https://nextjs.org/docs/app/api-reference/cli/create-next-app">https://nextjs.org/docs/app/api-reference/cli/create-next-app</a></p>
+
+- Allowed standalone flags: --app, --api, --disable-git, --empty, --eslint, --experimental-app, --help, --import-alias, --javascript, --js, --no-app, --no-eslint, --no-import-alias, --no-src-dir, --no-tailwind, --no-typescript, --reset-preferences, --skip-install, --src-dir, --tailwind, --turbopack, --typescript, --ts, --use-bun, --use-npm, --use-pnpm, --use-yarn, --version, --yes, -h, -v, -y
+- Allowed valued flags: --example, --example-path
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `create-react-app`
+<p class="cmd-url"><a href="https://create-react-app.dev/docs/getting-started">https://create-react-app.dev/docs/getting-started</a></p>
+
+- Allowed standalone flags: --help, --info, --scripts-version, --use-pnp, --use-npm, --verbose, --version, -V, -h
+- Allowed valued flags: --scripts-version, --template, --typescript
+- Hyphen-prefixed positional arguments accepted
+
+### `create-vite`
+<p class="cmd-url"><a href="https://vite.dev/guide/">https://vite.dev/guide/</a></p>
+
+- Allowed standalone flags: --help, --overwrite, --version, -h
+- Allowed valued flags: --template, -t
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `createdb`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-createdb.html">https://www.postgresql.org/docs/current/app-createdb.html</a></p>
+
+- Allowed standalone flags: --echo, --help, --no-password, --password, --version, -?, -V, -e, -h, -p, -U, -w, -W
+- Allowed valued flags: --encoding, --host, --locale, --locale-provider, --lc-collate, --lc-ctype, --icu-locale, --icu-rules, --owner, --password, --port, --strategy, --tablespace, --template, --username, -D, -E, -O, -T, -h, -p, -U
+
+### `createuser`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-createuser.html">https://www.postgresql.org/docs/current/app-createuser.html</a></p>
+
+- Allowed standalone flags: --createdb, --createrole, --echo, --help, --inherit, --login, --no-createdb, --no-createrole, --no-inherit, --no-login, --no-replication, --no-superuser, --no-password, --password, --pwprompt, --replication, --superuser, --version, -?, -D, -E, -I, -L, -P, -R, -S, -V, -d, -e, -i, -l, -r, -s, -h, -p, -U, -w, -W
+- Allowed valued flags: --connection-limit, --host, --port, --role, --username, --valid-until, -c, -g, -h, -p, -U
 
 ### `credo`
 <p class="cmd-url"><a href="https://github.com/rrrene/credo">https://github.com/rrrene/credo</a></p>
@@ -1909,6 +2180,18 @@ Aliases: `@cucumber/cucumber`
 - **help**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `dapr`
+<p class="cmd-url"><a href="https://docs.dapr.io/reference/cli/">https://docs.dapr.io/reference/cli/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **components**: Flags: --all-namespaces, --help, --kubernetes, -A, -h, -k. Valued: --name, --namespace, --output, -n, -o
+- **configurations**: Flags: --all-namespaces, --help, --kubernetes, -A, -h, -k. Valued: --name, --namespace, --output, -n, -o
+- **help**: Positional args accepted
+- **list**: Flags: --all-namespaces, --help, -A, -h. Valued: --kubernetes, --namespace, --output, -k, -n, -o
+- **status**: Flags: --help, --kubernetes, -h, -k. Valued: --output, -o
+- **version**: Flags: --help, -h. Valued: --output, -o
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `dart`
 <p class="cmd-url"><a href="https://dart.dev/tools/dart-tool">https://dart.dev/tools/dart-tool</a></p>
 
@@ -1940,6 +2223,14 @@ Aliases: `@cucumber/cucumber`
 - **kb list**: Flags: --debug, --help, --verbose, -h
 - **kb status**: Flags: --debug, --help, --verbose, -h
 - **scan**: Flags: --count, --debug, --dependencies, --exit-on-warn, --gemfile, --help, --verbose, -C, -G, -d, -h, -z. Valued: --config-file, --output, --report-format, --skip, -F, -O, -S, -c. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `dbmate`
+<p class="cmd-url"><a href="https://github.com/amacneil/dbmate">https://github.com/amacneil/dbmate</a></p>
+
+- **help**: Positional args accepted
+- **status**: Flags: --exit-code, --help, --quiet, -h. Valued: --config-file, --migrations-dir, --migrations-table, --schema-file, --url, -d, -e, -s, -u
+- **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `dbt`
@@ -2014,6 +2305,15 @@ Aliases: `typeset`
 - **read-type**: Flags: --help, -g, -globalDomain, -h. Valued: -app
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `degit`
+<p class="cmd-url"><a href="https://github.com/Rich-Harris/degit">https://github.com/Rich-Harris/degit</a></p>
+
+Aliases: `tiged`
+
+- Allowed standalone flags: --cache, --force, --help, --mode, --verbose, --version, -c, -D, -f, -h, -v
+- Allowed valued flags: --mode, -m
+- Hyphen-prefixed positional arguments accepted
+
 ### `delta`
 <p class="cmd-url"><a href="https://dandavison.github.io/delta/">https://dandavison.github.io/delta/</a></p>
 
@@ -2068,6 +2368,18 @@ Aliases: `dependency-cruise`
 - **search**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+### `devenv`
+<p class="cmd-url"><a href="https://devenv.sh/reference/cli/">https://devenv.sh/reference/cli/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **info**: Flags: --help, -h
+- **inputs**: Flags: --help, -h
+- **search**: Flags: --help, -h. Positional args accepted
+- **tasks list**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `df`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation</a></p>
@@ -2206,6 +2518,32 @@ Aliases: `difftastic`
 - **volume inspect**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **volume ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `docker-buildx`
+<p class="cmd-url"><a href="https://docs.docker.com/buildx/working-with-buildx/">https://docs.docker.com/buildx/working-with-buildx/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **du**: Flags: --help, --verbose, -h, -v. Valued: --builder, --filter
+- **help**: Positional args accepted
+- **inspect**: Flags: --bootstrap, --help, -h. Valued: --builder. Positional args accepted
+- **ls**: Flags: --help, --no-trunc, -h. Valued: --format
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `docker-compose`
+<p class="cmd-url"><a href="https://docs.docker.com/compose/reference/">https://docs.docker.com/compose/reference/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **config**: Flags: --format, --help, --no-consistency, --no-interpolate, --no-normalize, --no-path-resolution, --profiles, --quiet, --resolve-image-digests, --services, --volumes, -h, -q. Valued: --format, --hash, --output, --profile, -o, -p
+- **events**: Flags: --help, --json, -h. Positional args accepted
+- **help**: Positional args accepted
+- **images**: Flags: --help, --quiet, -h, -q. Valued: --format. Positional args accepted
+- **logs**: Flags: --follow, --help, --no-color, --no-log-prefix, --timestamps, -f, -h, -t. Valued: --since, --tail, --until. Positional args accepted
+- **port**: Flags: --help, -h. Valued: --index, --protocol. Positional args accepted
+- **ps**: Flags: --all, --dry-run, --help, --no-trunc, --quiet, --services, -a, -h, -q. Valued: --filter, --format, --status. Positional args accepted
+- **top**: Flags: --help, -h. Positional args accepted
+- **version**: Flags: --format, --help, --short, -f, -h. Valued: --format
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `doctl`
 <p class="cmd-url"><a href="https://docs.digitalocean.com/reference/doctl/">https://docs.digitalocean.com/reference/doctl/</a></p>
@@ -2351,6 +2689,18 @@ Aliases: `difftastic`
 - **up**: Flags: --help, -h. Valued: --config, --out
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `dropdb`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-dropdb.html">https://www.postgresql.org/docs/current/app-dropdb.html</a></p>
+
+- Allowed standalone flags: --echo, --force, --help, --if-exists, --interactive, --no-password, --password, --version, -?, -V, -e, -f, -h, -i, -p, -U, -w, -W
+- Allowed valued flags: --host, --port, --username, -h, -p, -U
+
+### `dropuser`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-dropuser.html">https://www.postgresql.org/docs/current/app-dropuser.html</a></p>
+
+- Allowed standalone flags: --echo, --help, --if-exists, --interactive, --no-password, --password, --version, -?, -V, -e, -h, -i, -p, -U, -w, -W
+- Allowed valued flags: --host, --port, --username, -h, -p, -U
+
 ### `du`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation</a></p>
 
@@ -2431,6 +2781,19 @@ Aliases: `difftastic`
 - **ls**: Flags: --all, --args, --help, --long, -a, -h, -l. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `eb`
+<p class="cmd-url"><a href="https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-getting-started.html">https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-getting-started.html</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **events**: Flags: --follow, --help, -f, -h. Valued: --profile, --region. Positional args accepted
+- **health**: Flags: --help, --mono, --refresh, -h. Valued: --profile, --region, --view. Positional args accepted
+- **help**: Positional args accepted
+- **list**: Flags: --all, --help, --verbose, -a, -h, -v. Valued: --profile, --region
+- **logs**: Flags: --all, --cloudwatch-logs, --cloudwatch-log-source, --help, --instance, --stream, --zip, -a, -h, -z. Valued: --instance, --profile, --region. Positional args accepted
+- **printenv**: Flags: --help, -h. Valued: --profile, --region. Positional args accepted
+- **status**: Flags: --help, --verbose, -h, -v. Valued: --profile, --region. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `echo`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation</a></p>
 
@@ -2473,6 +2836,27 @@ Aliases: `@11ty/eleventy`
 <p class="cmd-url"><a href="https://hexdocs.pm/elixir/main/elixir-cmd.html">https://hexdocs.pm/elixir/main/elixir-cmd.html</a></p>
 
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `emar`
+<p class="cmd-url"><a href="https://emscripten.org/docs/tools_reference/emar.html">https://emscripten.org/docs/tools_reference/emar.html</a></p>
+
+- Allowed standalone flags: --help, --version, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `emcc`
+<p class="cmd-url"><a href="https://emscripten.org/docs/tools_reference/emcc.html">https://emscripten.org/docs/tools_reference/emcc.html</a></p>
+
+Aliases: `em++`
+
+- Allowed standalone flags: --help, --version, -?, -h, -v
+- Hyphen-prefixed positional arguments accepted
+
+### `emconfigure`
+<p class="cmd-url"><a href="https://emscripten.org/docs/compiling/Building-Projects.html">https://emscripten.org/docs/compiling/Building-Projects.html</a></p>
+
+Aliases: `emmake`, `emranlib`, `emstrip`, `emrun`
+
+- Allowed standalone flags: --help, --version, -h
 
 ### `emulator`
 <p class="cmd-url"><a href="https://developer.android.com/studio/run/emulator-commandline">https://developer.android.com/studio/run/emulator-commandline</a></p>
@@ -2598,6 +2982,20 @@ Aliases: `esptool.py`
 - Allowed valued flags: -t, --tabs
 - Bare invocation allowed
 
+### `expect`
+<p class="cmd-url"><a href="https://core.tcl-lang.org/expect/">https://core.tcl-lang.org/expect/</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `expo`
+<p class="cmd-url"><a href="https://docs.expo.dev/more/expo-cli/">https://docs.expo.dev/more/expo-cli/</a></p>
+
+- **config**: Flags: --full, --help, -h. Valued: --type
+- **doctor**: Flags: --fix-dependencies, --help, --offline, --verbose, -h
+- **help**: Positional args accepted
+- **whoami**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `export`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/export.1p.html">https://man7.org/linux/man-pages/man1/export.1p.html</a></p>
 
@@ -2698,6 +3096,14 @@ Aliases: `exa`
 - Allowed valued flags: --config, --exclude, --extend-exclude, --extend-ignore, --filename, --format, --ignore, --max-complexity, --max-line-length, --output-file, --per-file-ignores, --select
 - Bare invocation allowed
 
+### `flang`
+<p class="cmd-url"><a href="https://flang.llvm.org/docs/">https://flang.llvm.org/docs/</a></p>
+
+Aliases: `flang-new`
+
+- Allowed standalone flags: --help, --version, -h, -v
+- Hyphen-prefixed positional arguments accepted
+
 ### `flay`
 <p class="cmd-url"><a href="https://github.com/seattlerb/flay">https://github.com/seattlerb/flay</a></p>
 
@@ -2751,6 +3157,17 @@ Aliases: `fly`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `flyway`
+<p class="cmd-url"><a href="https://documentation.red-gate.com/fd/command-line-184127404.html">https://documentation.red-gate.com/fd/command-line-184127404.html</a></p>
+
+- **check**: Positional args accepted
+- **help**: Positional args accepted
+- **history**: Positional args accepted
+- **info**: Positional args accepted
+- **validate**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `fmt`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation</a></p>
 
@@ -2782,6 +3199,23 @@ Aliases: `fly`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `forge`
+<p class="cmd-url"><a href="https://book.getfoundry.sh/reference/forge/">https://book.getfoundry.sh/reference/forge/</a></p>
+
+- **completions**: Flags: --help, -h. Positional args accepted
+- **config**: Positional args accepted
+- **flatten**: Positional args accepted
+- **geiger**: Positional args accepted
+- **help**: Positional args accepted
+- **inspect**: Positional args accepted
+- **remappings**: Positional args accepted
+- **selectors**: Positional args accepted
+- **tree**: Positional args accepted
+- **verify-bytecode**: Positional args accepted
+- **verify-check**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `fossil`
 <p class="cmd-url"><a href="https://fossil-scm.org/home/help">https://fossil-scm.org/home/help</a></p>
 
@@ -2801,6 +3235,11 @@ Aliases: `fly`
 - **timeline**: Flags: --brief, --full, --help, --limit, --no-graph, --repository, --showfiles, --verbose, -W, -R, -b, -h, -l, -n, -v, -w. Valued: --after, --before, --children, --limit, --repository, --type, --width, -R, -W, -c, -l, -n, -t, -w. Positional args accepted
 - **version**: Flags: --help, --verbose, -h, -v
 - **whatis**: Flags: --help, --repository, --type, --verbose, -R, -h, -v. Valued: --repository, --type, -R. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `foundryup`
+<p class="cmd-url"><a href="https://book.getfoundry.sh/getting-started/installation">https://book.getfoundry.sh/getting-started/installation</a></p>
+
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `fourmolu`
@@ -3001,6 +3440,20 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed valued flags: -v
 - Bare invocation allowed
 
+### `geth`
+<p class="cmd-url"><a href="https://geth.ethereum.org/docs/fundamentals/command-line-options">https://geth.ethereum.org/docs/fundamentals/command-line-options</a></p>
+
+- **help**: Positional args accepted
+- **license**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
+
+### `gfortran`
+<p class="cmd-url"><a href="https://gcc.gnu.org/onlinedocs/gfortran/">https://gcc.gnu.org/onlinedocs/gfortran/</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v, -V
+- Hyphen-prefixed positional arguments accepted
+
 ### `gh`
 <p class="cmd-url"><a href="https://cli.github.com/manual/">https://cli.github.com/manual/</a></p>
 
@@ -3105,6 +3558,11 @@ Aliases: `g++`, `cc`, `c++`
 - Always safe: --version, -v, check-update, version.
 - auth status, api (GET only).
 
+### `glances`
+<p class="cmd-url"><a href="https://glances.readthedocs.io/en/latest/">https://glances.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -V
+
 ### `gleam`
 <p class="cmd-url"><a href="https://gleam.run/documentation/cli/">https://gleam.run/documentation/cli/</a></p>
 
@@ -3125,6 +3583,14 @@ Aliases: `g++`, `cc`, `c++`
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+### `gnatmake`
+<p class="cmd-url"><a href="https://gcc.gnu.org/onlinedocs/gnat_ugn/">https://gcc.gnu.org/onlinedocs/gnat_ugn/</a></p>
+
+Aliases: `gnatls`, `gnatchop`, `gnatpp`, `gnatkr`, `gnatxref`, `gnatfind`, `gnatprep`
+
+- Allowed standalone flags: --help, --version, -h, -v
+- Hyphen-prefixed positional arguments accepted
+
 ### `go`
 <p class="cmd-url"><a href="https://pkg.go.dev/cmd/go">https://pkg.go.dev/cmd/go</a></p>
 
@@ -3137,6 +3603,13 @@ Aliases: `g++`, `cc`, `c++`
 - **version**: Flags: --help, -h, -m, -v
 - **vet**: Flags: --help, -a, -asan, -cover, -h, -json, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -c, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -tags
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `godot`
+<p class="cmd-url"><a href="https://docs.godotengine.org/en/stable/tutorials/editor/command_line_tutorial.html">https://docs.godotengine.org/en/stable/tutorials/editor/command_line_tutorial.html</a></p>
+
+Aliases: `godot4`
+
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `gofmt`
 <p class="cmd-url"><a href="https://pkg.go.dev/cmd/gofmt">https://pkg.go.dev/cmd/gofmt</a></p>
@@ -3181,6 +3654,16 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed standalone flags: --add-options, --all, --clear-tags, --clear-options, --format, --help, --quiet, --remove-tags, --remove-options, --skip-unexported, --sort, --transform, --w, -h, -w
 - Allowed valued flags: --add-tags, --field, --file, --line, --modified, --offset, --override, --remove-options, --remove-tags, --struct, --template, --transform, -add-tags, -clear-tags, -field, -file, -line, -modified, -offset, -override, -remove-options, -remove-tags, -struct, -template, -transform
 
+### `goose`
+<p class="cmd-url"><a href="https://github.com/pressly/goose">https://github.com/pressly/goose</a></p>
+
+- **env**: Positional args accepted
+- **help**: Positional args accepted
+- **status**: Positional args accepted
+- **validate**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
+
 ### `goreleaser`
 <p class="cmd-url"><a href="https://goreleaser.com/">https://goreleaser.com/</a></p>
 
@@ -3217,6 +3700,14 @@ Aliases: `g++`, `cc`, `c++`
 
 - Allowed standalone flags: --check-sigs, --check-trustdb, --fingerprint, --help, --list-config, --list-keys, --list-options, --list-public-keys, --list-secret-keys, --list-sigs, --list-trustdb, --no-tty, --print-md, --quiet, --show-keys, --show-sigs, --verbose, --version, -K, -h, -k, -q, -v
 - Allowed valued flags: --digest-algo, --homedir, --keyring
+
+### `gpustat`
+<p class="cmd-url"><a href="https://github.com/wookayin/gpustat">https://github.com/wookayin/gpustat</a></p>
+
+- Allowed standalone flags: --debug, --force-color, --gpuname-width, --help, --id, --json, --no-color, --no-header, --show-all, --show-cmd, --show-codec, --show-cores, --show-fan, --show-full-cmd, --show-pid, --show-power, --show-pids, --show-processes, --show-pwr, --show-temperature, --show-throttle-codes, --show-user, --version, --watch, -a, -c, -cu, -f, -i, -h, -p, -P, -u, -v
+- Allowed valued flags: --id, --watch, -i
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
 
 ### `gradle`
 <p class="cmd-url"><a href="https://docs.gradle.org/current/userguide/command_line_interface.html">https://docs.gradle.org/current/userguide/command_line_interface.html</a></p>
@@ -3264,11 +3755,24 @@ Aliases: `gradlew`
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
 
+### `grpcurl`
+<p class="cmd-url"><a href="https://github.com/fullstorydev/grpcurl">https://github.com/fullstorydev/grpcurl</a></p>
+
+- Allowed standalone flags: --help, -H, -allow-unknown-fields, -authority, -cacert, -cert, -connect-timeout, -d, -emit-defaults, -expand-headers, -format, -format-error, -help, -import-path, -insecure, -keepalive-time, -key, -keysize-options, -max-msg-sz, -max-time, -msg-template, -plaintext, -proto, -protoset, -protoset-out, -rpc-header, -servername, -unix, -use-reflection, -userconfig, -v, -V, -vv, -version
+- Allowed valued flags: -H, -authority, -cacert, -cert, -connect-timeout, -d, -format, -format-error, -import-path, -keepalive-time, -key, -keysize-options, -max-msg-sz, -max-time, -msg-template, -proto, -protoset, -protoset-out, -rpc-header, -servername, -unix, -userconfig
+- Hyphen-prefixed positional arguments accepted
+
 ### `grype`
 <p class="cmd-url"><a href="https://github.com/anchore/grype">https://github.com/anchore/grype</a></p>
 
 - Allowed standalone flags: --add-cpes-if-none, --by-cve, --help, --only-fixed, --only-notfixed, --quiet, --verbose, --version, -h, -q, -v
 - Allowed valued flags: --config, --distro, --exclude, --fail-on, --file, --key, --name, --output, --platform, --scope, -c, -o
+- Hyphen-prefixed positional arguments accepted
+
+### `gs`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/Use.html">https://ghostscript.readthedocs.io/en/latest/Use.html</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -?
 - Hyphen-prefixed positional arguments accepted
 
 ### `guard`
@@ -3309,6 +3813,18 @@ Aliases: `gradlew`
 
 - Allowed standalone flags: --help, -V, -c, -d, -h, -q, -v, -vv
 - Allowed valued flags: -D, -N, -W, -f, -n, -p, -st
+
+### `hardhat`
+<p class="cmd-url"><a href="https://hardhat.org/hardhat-runner/docs/getting-started">https://hardhat.org/hardhat-runner/docs/getting-started</a></p>
+
+- **check**: Flags: --help, -h
+- **flatten**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **vars get**: Flags: --help, -h
+- **vars list**: Flags: --help, -h
+- **vars path**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `hash`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/hash.1p.html">https://man7.org/linux/man-pages/man1/hash.1p.html</a></p>
@@ -3522,6 +4038,16 @@ Aliases: `gradlew`
 - Allowed valued flags: --cpp-define, --cpp-file, --cpp-include, --data-dir, --encoding, --extension, --git, --hint, --ignore, --language, --lints, --match, --only, --path, --threads, --utf8, --with-refact, -X, -c, -e, -h, -i, -j, -l
 - Bare invocation allowed
 
+### `home-manager`
+<p class="cmd-url"><a href="https://nix-community.github.io/home-manager/">https://nix-community.github.io/home-manager/</a></p>
+
+- **generations**: Flags: --help, -h
+- **help**: Positional args accepted
+- **news**: Flags: --help, --info, -h. Valued: --flake
+- **option**: Flags: --help, -h. Valued: --flake. Positional args accepted
+- **packages**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `host`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/host.1.html">https://man7.org/linux/man-pages/man1/host.1.html</a></p>
 
@@ -3557,6 +4083,11 @@ Aliases: `https`
 
 ### `http-server`
 <p class="cmd-url"><a href="https://github.com/http-party/http-server">https://github.com/http-party/http-server</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `httpyac`
+<p class="cmd-url"><a href="https://httpyac.github.io/guide/cli.html">https://httpyac.github.io/guide/cli.html</a></p>
 
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -3596,6 +4127,13 @@ Aliases: `hf`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
+### `hurl`
+<p class="cmd-url"><a href="https://hurl.dev/docs/manual.html">https://hurl.dev/docs/manual.html</a></p>
+
+- Allowed standalone flags: --color, --compressed, --connect-to, --continue-on-error, --cookie-jar, --curl, --debug, --error-format, --file-root, --from-entry, --glob, --help, --include, --insecure, --interactive, --ipv4, --ipv6, --json, --location, --location-trusted, --max-filesize, --max-redirs, --max-time, --negotiate, --netrc, --netrc-file, --netrc-optional, --no-color, --no-output, --ntlm, --output, --parallel, --path-as-is, --proxy, --report-html, --report-json, --report-junit, --report-tap, --repeat, --report-html-history, --resolve, --retry, --retry-interval, --ssl-no-revoke, --summary, --test, --to-entry, --unix-socket, --user, --user-agent, --variable, --variables-file, --verbose, --very-verbose, --version, -?, -4, -6, -A, -H, -L, -M, -V, -X, -b, -c, -d, -h, -i, -k, -l, -m, -n, -o, -q, -r, -s, -u, -v, -vv
+- Allowed valued flags: --cacert, --cert, --connect-to, --cookie, --cookie-jar, --delay, --error-format, --file-root, --from-entry, --glob, --key, --max-filesize, --max-redirs, --max-time, --netrc-file, --output, --parallel, --proxy, --report-html, --report-junit, --report-tap, --repeat, --resolve, --retry, --retry-interval, --socks5, --to-entry, --unix-socket, --user, --user-agent, --variable, --variables-file, --workers, -A, -H, -X, -b, -c, -d, -m, -o, -r, -u
+- Hyphen-prefixed positional arguments accepted
+
 ### `husky`
 <p class="cmd-url"><a href="https://typicode.github.io/husky/">https://typicode.github.io/husky/</a></p>
 
@@ -3607,6 +4145,11 @@ Aliases: `hf`
 
 - Allowed standalone flags: --help, --health, --tutor, --version, -V, -h
 - Allowed valued flags: --grammar, --config, --log, -c, -g
+
+### `hygen`
+<p class="cmd-url"><a href="https://www.hygen.io/docs/cli/">https://www.hygen.io/docs/cli/</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `hyperfine`
 <p class="cmd-url"><a href="https://github.com/sharkdp/hyperfine#readme">https://github.com/sharkdp/hyperfine#readme</a></p>
@@ -3698,6 +4241,14 @@ Aliases: `hf`
 
 - Allowed standalone flags: --help, -n
 
+### `ignite`
+<p class="cmd-url"><a href="https://docs.ignite.com/references/cli">https://docs.ignite.com/references/cli</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `importmap`
 <p class="cmd-url"><a href="https://github.com/rails/importmap-rails">https://github.com/rails/importmap-rails</a></p>
 
@@ -3707,6 +4258,25 @@ Aliases: `hf`
 - **packages**: Flags: --help, -h
 - Allowed standalone flags: --help, -h
 
+### `influx`
+<p class="cmd-url"><a href="https://docs.influxdata.com/influxdb/v2/reference/cli/influx/">https://docs.influxdata.com/influxdb/v2/reference/cli/influx/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **ping**: Flags: --help, -h. Valued: --host, --http-debug, --skip-verify
+- **transpile**: Flags: --help, -h. Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
+### `influxd`
+<p class="cmd-url"><a href="https://docs.influxdata.com/influxdb/v2/reference/cli/influxd/">https://docs.influxdata.com/influxdb/v2/reference/cli/influxd/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **print-config**: Flags: --help, -h. Valued: --bolt-path, --engine-path, --http-bind-address, --log-level, --secret-store
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `inso`
 <p class="cmd-url"><a href="https://docs.insomnia.rest/inso-cli/install">https://docs.insomnia.rest/inso-cli/install</a></p>
 
@@ -3715,6 +4285,19 @@ Aliases: `hf`
 - **help**: Positional args accepted
 - **lint spec**: Flags: --help, -h. Valued: --src, --working-dir, -w
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `ionic`
+<p class="cmd-url"><a href="https://ionicframework.com/docs/cli">https://ionicframework.com/docs/cli</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **config get**: Flags: --global, --help, --json, -g, -h
+- **config print**: Flags: --global, --help, --json, -g, -h
+- **doctor check**: Flags: --help, -h
+- **doctor list**: Flags: --help, -h
+- **help**: Positional args accepted
+- **info**: Flags: --help, --json, -h
+- **whoami**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `ioreg`
@@ -3739,10 +4322,47 @@ Aliases: `iperf`
 - Allowed standalone flags: --help, --version, -1, -D, -J, -R, -V, -Z, -d, -h, -k, -n, -r, -s, -t, -u, -v, -w, -x
 - Allowed valued flags: --bidir, --cport, --dscp, --bandwidth, --bind, --client, --congestion, --connect-timeout, --debug, --extra-data, --fec, --file, --flowlabel, --format, --get-server-output, --idle-timeout, --interval, --length, --listen-port, --logfile, --mss, --no-delay, --omit, --parallel, --pidfile, --port, --reverse, --sctp, --server, --server-only, --set-mss, --time, --title, --tos, --udp, --window, --zerocopy, -A, -B, -C, -F, -K, -L, -M, -O, -P, -S, -T, -X, -b, -c, -f, -i, -l, -o, -p
 
+### `ipfs`
+<p class="cmd-url"><a href="https://docs.ipfs.tech/reference/kubo/cli/">https://docs.ipfs.tech/reference/kubo/cli/</a></p>
+
+- **block get**: Positional args accepted
+- **block stat**: Positional args accepted
+- **bootstrap list**: Positional args accepted
+- **cat**: Positional args accepted
+- **cid**: Positional args accepted
+- **completion**: Flags: --help, -h. Positional args accepted
+- **dag get**: Positional args accepted
+- **dag resolve**: Positional args accepted
+- **dag stat**: Positional args accepted
+- **dht findpeer**: Positional args accepted
+- **dht findprovs**: Positional args accepted
+- **dht get**: Positional args accepted
+- **dht query**: Positional args accepted
+- **help**: Positional args accepted
+- **id**: Positional args accepted
+- **key list**: Positional args accepted
+- **ls**: Positional args accepted
+- **name resolve**: Positional args accepted
+- **pin ls**: Positional args accepted
+- **pin verify**: Positional args accepted
+- **refs**: Positional args accepted
+- **repo stat**: Positional args accepted
+- **repo verify**: Positional args accepted
+- **repo version**: Positional args accepted
+- **swarm addrs**: Positional args accepted
+- **swarm peers**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `ipython`
 <p class="cmd-url"><a href="https://ipython.org/">https://ipython.org/</a></p>
 
 - Allowed standalone flags: --help, --version, -h
+
+### `iredis`
+<p class="cmd-url"><a href="https://iredis.io/">https://iredis.io/</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -V
 
 ### `isort`
 <p class="cmd-url"><a href="https://pycqa.github.io/isort/docs/configuration/options.html">https://pycqa.github.io/isort/docs/configuration/options.html</a></p>
@@ -4106,6 +4726,18 @@ Aliases: `nbconvert`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
 
+### `kn`
+<p class="cmd-url"><a href="https://knative.dev/docs/client/configure-kn/">https://knative.dev/docs/client/configure-kn/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **revision describe**: Flags: --help, -h
+- **revision list**: Flags: --help, -h
+- **service describe**: Flags: --help, --no-headers, --print-details, --verbose, -h, -v. Valued: --namespace, --output, -n, -o
+- **service list**: Flags: --all-namespaces, --help, --no-headers, -A, -h. Valued: --namespace, --output, -n, -o
+- **version**: Flags: --help, --version, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `knex`
 <p class="cmd-url"><a href="https://knexjs.org/guide/migrations.html">https://knexjs.org/guide/migrations.html</a></p>
 
@@ -4165,12 +4797,35 @@ Aliases: `nbconvert`
 - **whoami**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `kpt`
+<p class="cmd-url"><a href="https://kpt.dev/reference/cli/">https://kpt.dev/reference/cli/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **pkg cat**: Flags: --help, -h. Valued: --annotate, --exclude-non-local, --include-local, --strip-comments, --style
+- **pkg diff**: Flags: --help, -h. Valued: --diff-tool, --diff-tool-opts, --diff-type
+- **pkg tree**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `kramdown`
 <p class="cmd-url"><a href="https://kramdown.gettalong.org/">https://kramdown.gettalong.org/</a></p>
 
 - Allowed standalone flags: --auto-id-prefix, --auto-ids, --enable-coderay, --gfm-quirks, --hard-wrap, --help, --no-auto-ids, --no-config-file, --no-hard-wrap, --smart-quotes, --version, -h, -v
 - Allowed valued flags: --config-file, --coderay-line-numbers, --entity-output, --footnote-nr, --header-offset, --input, --math-engine, --output, --syntax-highlighter, --toc-levels, -i, -o
 - Bare invocation allowed
+
+### `krew`
+<p class="cmd-url"><a href="https://krew.sigs.k8s.io/">https://krew.sigs.k8s.io/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **index list**: Flags: --help, -h
+- **info**: Flags: --help, -h. Positional args accepted
+- **list**: Flags: --help, -h
+- **search**: Flags: --help, -h. Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `ktlint`
 <p class="cmd-url"><a href="https://pinterest.github.io/ktlint/latest/">https://pinterest.github.io/ktlint/latest/</a></p>
@@ -4379,6 +5034,38 @@ Aliases: `nbconvert`
 
 - Requires -archs, -detailed_info, -info, -verify_arch. - Allowed standalone flags: -archs, -detailed_info, -info, -verify_arch, --help, -h
 
+### `liquibase`
+<p class="cmd-url"><a href="https://docs.liquibase.com/commands/home.html">https://docs.liquibase.com/commands/home.html</a></p>
+
+- **db-doc**: Positional args accepted
+- **diff**: Positional args accepted
+- **diff-changelog**: Positional args accepted
+- **generate-changelog**: Positional args accepted
+- **help**: Positional args accepted
+- **history**: Positional args accepted
+- **init**: Positional args accepted
+- **status**: Positional args accepted
+- **tag-exists**: Positional args accepted
+- **validate**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
+
+### `litecli`
+<p class="cmd-url"><a href="https://litecli.com/">https://litecli.com/</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -V
+
+### `llc`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llc.html">https://llvm.org/docs/CommandGuide/llc.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h, -v
+- Hyphen-prefixed positional arguments accepted
+
+### `lli`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/lli.html">https://llvm.org/docs/CommandGuide/lli.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h, -v
+
 ### `llm`
 <p class="cmd-url"><a href="https://llm.datasette.io/en/stable/">https://llm.datasette.io/en/stable/</a></p>
 
@@ -4389,6 +5076,106 @@ Aliases: `nbconvert`
 - **plugins**: Flags: --all, --help, --json, -h
 - **templates**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `llvm-ar`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-ar.html">https://llvm.org/docs/CommandGuide/llvm-ar.html</a></p>
+
+Aliases: `llvm-ranlib`
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-as`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-as.html">https://llvm.org/docs/CommandGuide/llvm-as.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-config`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-config.html">https://llvm.org/docs/CommandGuide/llvm-config.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Bare invocation allowed
+
+### `llvm-cov`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-cov.html">https://llvm.org/docs/CommandGuide/llvm-cov.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-cxxfilt`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-cxxfilt.html">https://llvm.org/docs/CommandGuide/llvm-cxxfilt.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-dis`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-dis.html">https://llvm.org/docs/CommandGuide/llvm-dis.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-link`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-link.html">https://llvm.org/docs/CommandGuide/llvm-link.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-mc`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-mc.html">https://llvm.org/docs/CommandGuide/llvm-mc.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-nm`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-nm.html">https://llvm.org/docs/CommandGuide/llvm-nm.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-objdump`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-objdump.html">https://llvm.org/docs/CommandGuide/llvm-objdump.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-profdata`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-profdata.html">https://llvm.org/docs/CommandGuide/llvm-profdata.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-readobj`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-readobj.html">https://llvm.org/docs/CommandGuide/llvm-readobj.html</a></p>
+
+Aliases: `llvm-readelf`
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-strip`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-strip.html">https://llvm.org/docs/CommandGuide/llvm-strip.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-symbolizer`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-symbolizer.html">https://llvm.org/docs/CommandGuide/llvm-symbolizer.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `lnav`
+<p class="cmd-url"><a href="https://docs.lnav.org/en/latest/cli.html">https://docs.lnav.org/en/latest/cli.html</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -V
+
+### `lncli`
+<p class="cmd-url"><a href="https://lightning.engineering/api-docs/api/lnd/">https://lightning.engineering/api-docs/api/lnd/</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `locale`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/locale.1.html">https://man7.org/linux/man-pages/man1/locale.1.html</a></p>
@@ -4532,6 +5319,13 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - Allowed standalone flags: --bespoke.osc, --bespoke.progress, --bespoke.transition, --browser-protocol, --config-file, --description, --engine, --help, --html, --image, --images, --input-dir, --no-config-file, --no-stdin, --ogImage, --output, --pdf, --pdf-notes, --pdf-outlines, --pdf-outlines.headings, --pdf-outlines.pages, --pptx, --pptx-editable, --preview, --quiet, --server, --stdin, --template, --theme, --themeSet, --title, --toc, --url, --version, --watch, -c, -h, -o, -p, -q, -s, -t, -v, -w
 - Allowed valued flags: --allow-local-files, --browser, --browser-path, --browser-protocol, --browser-timeout, --config-file, --description, --engine, --input-dir, --ogImage, --output, --parallel, --pdf-notes, --theme, --themeSet, --title, --url, -c, -I, -o
 
+### `masscan`
+<p class="cmd-url"><a href="https://github.com/robertdavidgraham/masscan">https://github.com/robertdavidgraham/masscan</a></p>
+
+- Allowed standalone flags: --echo, --echo-cidr, --exclude, --excludefile, --help, --http-user-agent, --includefile, --ping, --rate, --randomize-hosts, --reason, --retries, --source-ip, --source-port, --ttl, --user-agent, --version, --wait, -?, -c, -d, -h, -iL, -iR, -oG, -oJ, -oL, -oU, -oX, -p, -v
+- Allowed valued flags: --banners, --config, --exclude, --excludefile, --http-user-agent, --includefile, --output-filename, --output-format, --rate, --readscan, --retries, --rotate, --rotate-dir, --source-ip, --source-port, --ttl, --wait, -c, -iL, -iR, -oG, -oJ, -oL, -oU, -oX, -p, -r, -w
+- Hyphen-prefixed positional arguments accepted
+
 ### `mc`
 <p class="cmd-url"><a href="https://min.io/docs/minio/linux/reference/minio-mc.html">https://min.io/docs/minio/linux/reference/minio-mc.html</a></p>
 
@@ -4607,6 +5401,13 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - **help**: Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `migrate`
+<p class="cmd-url"><a href="https://github.com/golang-migrate/migrate">https://github.com/golang-migrate/migrate</a></p>
+
+- **help**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
 
 ### `mill`
 <p class="cmd-url"><a href="https://mill-build.com/">https://mill-build.com/</a></p>
@@ -4773,10 +5574,50 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - **matrix**: Flags: --help, -h. Valued: --scenario-name, -s. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -V
 
+### `mongodump`
+<p class="cmd-url"><a href="https://www.mongodb.com/docs/database-tools/mongodump/">https://www.mongodb.com/docs/database-tools/mongodump/</a></p>
+
+- Allowed standalone flags: --allowPartialResults, --archive, --assertExists, --authenticationDatabase, --authenticationMechanism, --collection, --db, --dryRun, --dumpDbUsersAndRoles, --excludeCollection, --excludeCollectionsWithPrefix, --forceTableScan, --gzip, --help, --ipv6, --noIndexRestore, --numParallelCollections, --objcheck, --oplog, --out, --password, --port, --quiet, --readPreference, --ssl, --sslAllowInvalidCertificates, --sslAllowInvalidHostnames, --sslCAFile, --sslPEMKeyFile, --sslPEMKeyPassword, --tlsInsecure, --username, --verbose, --version, --writeConcern, -c, -d, -h, -j, -o, -p, -u, -v
+- Allowed valued flags: --archive, --authenticationDatabase, --authenticationMechanism, --collection, --config, --db, --excludeCollection, --excludeCollectionsWithPrefix, --gssapiHostName, --gssapiServiceName, --host, --numParallelCollections, --out, --password, --port, --query, --queryFile, --readPreference, --sslCAFile, --sslCRLFile, --sslPEMKeyFile, --sslPEMKeyPassword, --tlsCertificateKeyFile, --tlsCAFile, --uri, --username, --writeConcern, -c, -d, -h, -j, -o, -p, -u
+
+### `mongoexport`
+<p class="cmd-url"><a href="https://www.mongodb.com/docs/database-tools/mongoexport/">https://www.mongodb.com/docs/database-tools/mongoexport/</a></p>
+
+- Allowed standalone flags: --assertExists, --authenticationDatabase, --authenticationMechanism, --collection, --db, --forceTableScan, --help, --ipv6, --jsonArray, --noHeaderLine, --objcheck, --password, --port, --quiet, --readPreference, --ssl, --sslAllowInvalidCertificates, --sslAllowInvalidHostnames, --type, --useArrayIndexFields, --username, --verbose, --version, -c, -d, -f, -h, -o, -p, -q, -u, -v
+- Allowed valued flags: --authenticationDatabase, --authenticationMechanism, --collection, --config, --db, --fields, --fieldFile, --host, --jsonFormat, --limit, --out, --password, --port, --query, --queryFile, --readPreference, --skip, --sort, --sslCAFile, --sslCRLFile, --sslPEMKeyFile, --sslPEMKeyPassword, --tlsCertificateKeyFile, --tlsCAFile, --type, --uri, --username, -c, -d, -f, -h, -o, -p, -q, -u
+
+### `mongoimport`
+<p class="cmd-url"><a href="https://www.mongodb.com/docs/database-tools/mongoimport/">https://www.mongodb.com/docs/database-tools/mongoimport/</a></p>
+
+- Allowed standalone flags: --authenticationDatabase, --authenticationMechanism, --bypassDocumentValidation, --collection, --columnsHaveTypes, --db, --drop, --file, --headerline, --help, --ignoreBlanks, --ipv6, --jsonArray, --legacy, --maintainInsertionOrder, --mode, --numInsertionWorkers, --objcheck, --password, --port, --quiet, --readPreference, --ssl, --sslAllowInvalidCertificates, --sslAllowInvalidHostnames, --stopOnError, --type, --upsert, --upsertFields, --username, --verbose, --version, --writeConcern, -c, -d, -f, -h, -j, -p, -u, -v
+- Allowed valued flags: --authenticationDatabase, --authenticationMechanism, --collection, --columnsHaveTypes, --config, --db, --file, --fields, --fieldFile, --gssapiHostName, --gssapiServiceName, --host, --mode, --numInsertionWorkers, --parseGrace, --password, --port, --query, --readPreference, --sslCAFile, --sslCRLFile, --sslPEMKeyFile, --sslPEMKeyPassword, --tlsCertificateKeyFile, --tlsCAFile, --type, --upsertFields, --uri, --username, --writeConcern, -c, -d, -f, -h, -j, -p, -u
+
+### `mongorestore`
+<p class="cmd-url"><a href="https://www.mongodb.com/docs/database-tools/mongorestore/">https://www.mongodb.com/docs/database-tools/mongorestore/</a></p>
+
+- Allowed standalone flags: --archive, --authenticationDatabase, --authenticationMechanism, --bypassDocumentValidation, --collection, --convertLegacyIndexes, --db, --drop, --dryRun, --gzip, --help, --ipv6, --keepIndexVersion, --maintainInsertionOrder, --noIndexRestore, --noOptionsRestore, --nsExclude, --nsFrom, --nsInclude, --nsTo, --numInsertionWorkersPerCollection, --numParallelCollections, --objcheck, --oplogLimit, --oplogReplay, --oplogFile, --password, --port, --preserveUUID, --quiet, --readPreference, --restoreDbUsersAndRoles, --ssl, --sslAllowInvalidCertificates, --sslAllowInvalidHostnames, --sslCAFile, --sslPEMKeyFile, --sslPEMKeyPassword, --stopOnError, --temp-dbpath, --temp-port, --tlsInsecure, --useArrayIndexFields, --username, --verbose, --version, --writeConcern, -c, -d, -h, -j, -p, -u, -v
+- Allowed valued flags: --archive, --authenticationDatabase, --authenticationMechanism, --collection, --config, --db, --gzip, --host, --nsExclude, --nsFrom, --nsInclude, --nsTo, --numInsertionWorkers, --numInsertionWorkersPerCollection, --numParallelCollections, --objcheck, --oplogLimit, --password, --port, --readPreference, --sslCAFile, --sslCRLFile, --sslPEMKeyFile, --sslPEMKeyPassword, --tlsCertificateKeyFile, --tlsCAFile, --uri, --username, --writeConcern, -c, -d, -h, -j, -p, -u
+
 ### `mongosh`
 <p class="cmd-url"><a href="https://www.mongodb.com/docs/mongodb-shell/">https://www.mongodb.com/docs/mongodb-shell/</a></p>
 
 - Allowed standalone flags: --help, --version, -h
+
+### `mongostat`
+<p class="cmd-url"><a href="https://www.mongodb.com/docs/database-tools/mongostat/">https://www.mongodb.com/docs/database-tools/mongostat/</a></p>
+
+- Allowed standalone flags: --all, --authenticationDatabase, --authenticationMechanism, --discover, --help, --http, --humanReadable, --ipv6, --json, --password, --port, --quiet, --ssl, --sslAllowInvalidCertificates, --sslAllowInvalidHostnames, --username, --verbose, --version, -?, -h, -n, -o, -p, -u, -v
+- Allowed valued flags: --authenticationDatabase, --authenticationMechanism, --config, --host, --password, --port, --rowcount, --sslCAFile, --sslCRLFile, --sslPEMKeyFile, --sslPEMKeyPassword, --tlsCertificateKeyFile, --tlsCAFile, --uri, --username, -h, -n, -o, -p, -u
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `mongotop`
+<p class="cmd-url"><a href="https://www.mongodb.com/docs/database-tools/mongotop/">https://www.mongodb.com/docs/database-tools/mongotop/</a></p>
+
+- Allowed standalone flags: --authenticationDatabase, --authenticationMechanism, --help, --ipv6, --json, --locks, --password, --port, --quiet, --ssl, --sslAllowInvalidCertificates, --sslAllowInvalidHostnames, --username, --verbose, --version, -?, -h, -p, -u, -v
+- Allowed valued flags: --authenticationDatabase, --authenticationMechanism, --config, --host, --password, --port, --rowcount, --sslCAFile, --sslCRLFile, --sslPEMKeyFile, --sslPEMKeyPassword, --tlsCertificateKeyFile, --tlsCAFile, --uri, --username, -h, -n, -p, -u
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
 
 ### `mono`
 <p class="cmd-url"><a href="https://www.mono-project.com/docs/about-mono/">https://www.mono-project.com/docs/about-mono/</a></p>
@@ -4835,6 +5676,11 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 
 - Phases: compile, dependency:list, dependency:tree, help:describe, test, test-compile, validate, verify.
 
+### `mycli`
+<p class="cmd-url"><a href="https://www.mycli.net/docs">https://www.mycli.net/docs</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -V
+
 ### `mypy`
 <p class="cmd-url"><a href="https://mypy.readthedocs.io/en/stable/command_line.html">https://mypy.readthedocs.io/en/stable/command_line.html</a></p>
 
@@ -4847,6 +5693,35 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 Aliases: `mariadb`
 
 - Allowed standalone flags: --help, --version, -?, -V
+
+### `mysqladmin`
+<p class="cmd-url"><a href="https://dev.mysql.com/doc/refman/8.4/en/mysqladmin.html">https://dev.mysql.com/doc/refman/8.4/en/mysqladmin.html</a></p>
+
+- Allowed standalone flags: --connect-timeout, --count, --debug, --debug-check, --debug-info, --default-character-set, --default-auth, --enable-cleartext-plugin, --force, --help, --host, --login-path, --login-timeout, --no-beep, --no-defaults, --password, --pipe, --port, --print-defaults, --protocol, --relative, --shutdown-timeout, --silent, --socket, --sleep, --ssl, --ssl-mode, --ssl-fips-mode, --user, --verbose, --version, --vertical, --wait, -?, -B, -C, -E, -F, -G, -K, -N, -O, -S, -T, -V, -c, -d, -e, -f, -h, -i, -p, -r, -s, -t, -u, -v, -w
+- Allowed valued flags: --character-sets-dir, --connect-timeout, --count, --default-auth, --default-character-set, --host, --login-path, --login-timeout, --password, --port, --protocol, --shutdown-timeout, --socket, --sleep, --ssl-ca, --ssl-capath, --ssl-cert, --ssl-cipher, --ssl-key, --ssl-mode, --user, -S, -c, -h, -i, -p, -P, -u
+- Hyphen-prefixed positional arguments accepted
+
+### `mysqlcheck`
+<p class="cmd-url"><a href="https://dev.mysql.com/doc/refman/8.4/en/mysqlcheck.html">https://dev.mysql.com/doc/refman/8.4/en/mysqlcheck.html</a></p>
+
+- Allowed standalone flags: --all-databases, --all-in-1, --analyze, --auto-repair, --character-sets-dir, --check, --check-only-changed, --check-upgrade, --databases, --debug, --debug-check, --debug-info, --default-auth, --default-character-set, --enable-cleartext-plugin, --extended, --fast, --fix-db-names, --fix-table-names, --force, --help, --host, --login-path, --medium-check, --optimize, --password, --pipe, --port, --print-defaults, --protocol, --quick, --repair, --silent, --skip-database, --socket, --ssl, --ssl-mode, --ssl-fips-mode, --tables, --use-frm, --user, --verbose, --version, --write-binlog, -?, -A, -B, -C, -F, -N, -O, -S, -T, -V, -W, -a, -c, -e, -f, -h, -m, -o, -p, -q, -r, -s, -u, -v
+- Allowed valued flags: --databases, --default-auth, --default-character-set, --host, --login-path, --password, --port, --protocol, --socket, --ssl-ca, --ssl-capath, --ssl-cert, --ssl-cipher, --ssl-key, --ssl-mode, --user, -S, -h, -p, -P, -u
+- Hyphen-prefixed positional arguments accepted
+
+### `mysqldump`
+<p class="cmd-url"><a href="https://dev.mysql.com/doc/refman/8.4/en/mysqldump.html">https://dev.mysql.com/doc/refman/8.4/en/mysqldump.html</a></p>
+
+- Allowed standalone flags: --add-drop-database, --add-drop-table, --add-drop-trigger, --add-locks, --all-databases, --allow-keywords, --apply-replica-statements, --apply-slave-statements, --compatible, --complete-insert, --compact, --compress, --create-options, --databases, --debug, --debug-check, --debug-info, --default-character-set, --delayed-insert, --delete-master-logs, --disable-keys, --dump-date, --dump-replica, --dump-slave, --events, --extended-insert, --fields-enclosed-by, --fields-escaped-by, --fields-optionally-enclosed-by, --fields-terminated-by, --flush-logs, --flush-privileges, --force, --help, --hex-blob, --host, --ignore-error, --ignore-table, --include-master-host-port, --insert-ignore, --lines-terminated-by, --lock-all-tables, --lock-tables, --log-error, --login-path, --master-data, --max-allowed-packet, --mysqld-long-query-time, --net-buffer-length, --no-autocommit, --no-create-db, --no-create-info, --no-data, --no-set-names, --no-tablespaces, --opt, --order-by-primary, --password, --pipe, --port, --protocol, --quick, --quote-names, --replace, --routines, --set-charset, --set-gtid-purged, --single-transaction, --show-create-skip-secondary-engine, --skip-add-drop-table, --skip-add-locks, --skip-comments, --skip-compact, --skip-disable-keys, --skip-extended-insert, --skip-lock-tables, --skip-opt, --skip-quick, --skip-quote-names, --skip-set-charset, --skip-triggers, --skip-tz-utc, --socket, --ssl, --tab, --triggers, --tz-utc, --user, --verbose, --version, --where, --xml, -?, -A, -B, -C, -D, -E, -F, -K, -N, -O, -Q, -R, -T, -V, -X, -c, -d, -e, -f, -h, -l, -n, -q, -r, -t, -u, -v, -w, -x
+- Allowed valued flags: --character-sets-dir, --compatible, --databases, --default-character-set, --default-auth, --enable-cleartext-plugin, --exclude-gtids, --fields-enclosed-by, --fields-escaped-by, --fields-optionally-enclosed-by, --fields-terminated-by, --flushlog, --gtid-purged, --host, --ignore-error, --ignore-table, --init-command, --lines-terminated-by, --login-path, --max-allowed-packet, --mysqld-long-query-time, --net-buffer-length, --password, --pid-file, --plugin-dir, --port, --protocol, --result-file, --secure-auth, --server-public-key-path, --set-gtid-purged, --socket, --ssl-ca, --ssl-capath, --ssl-cert, --ssl-cipher, --ssl-fips-mode, --ssl-key, --ssl-mode, --tab, --user, --where, -S, -h, -p, -P, -r, -u, -w
+
+### `mythril`
+<p class="cmd-url"><a href="https://mythril-classic.readthedocs.io/en/master/">https://mythril-classic.readthedocs.io/en/master/</a></p>
+
+Aliases: `myth`
+
+- Allowed standalone flags: --debug, --help, --no-color, --quick, --strategy, --verbose, --version, -?, -c, -d, -f, -g, -h, -l, -o, -q, -r, -s, -t, -v, -x
+- Allowed valued flags: --bin-runtime, --call-depth-limit, --code, --codesize-limit, --create-timeout, --enable-iprof, --execution-timeout, --max-depth, --outform, --quick, --rpc, --rpc-tls, --solv, --solver-timeout, --strategy, --storage, --transaction-count, -c, -l, -o, -r, -s, -t, -x
+- Hyphen-prefixed positional arguments accepted
 
 ### `nbqa`
 <p class="cmd-url"><a href="https://nbqa.readthedocs.io/">https://nbqa.readthedocs.io/</a></p>
@@ -4878,6 +5753,17 @@ Aliases: `mariadb`
 - Allowed standalone flags: --cwd, --deep, --dep, --deprecated, --enginesNode, --errorLevel, --global, --groupFunction, --help, --install, --interactive, --jsonAll, --jsonDeps, --jsonUpgraded, --loglevel, --mergeConfig, --minimal, --no-color, --packageManager, --peer, --pre, --prefix, --root, --silent, --stdin, --target, --timeout, --upgrade, --verbose, --version, -c, -d, -e, -g, -h, -i, -j, -l, -m, -p, -r, -s, -t, -u, -v, -w
 - Allowed valued flags: --color, --concurrency, --configFileName, --configFilePath, --cwd, --filter, --filterResults, --filterVersion, --format, --packageData, --packageFile, --registry, --reject, --registryType, --rejectVersion, --workspace, -f, -x
 - Bare invocation allowed
+
+### `near`
+<p class="cmd-url"><a href="https://github.com/near/near-cli-rs">https://github.com/near/near-cli-rs</a></p>
+
+Aliases: `near-cli`
+
+- **config**: Positional args accepted
+- **extensions**: Positional args accepted
+- **help**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -V
 
 ### `neon`
 <p class="cmd-url"><a href="https://neon.tech/docs/reference/neon-cli">https://neon.tech/docs/reference/neon-cli</a></p>
@@ -5015,6 +5901,91 @@ Aliases: `ionice`
 - Requires -t, -n. - Allowed standalone flags: --help, --version, -n, -v, -V, -h
 - Allowed valued flags: -C, -f, -j, -k, -l, -t
 
+### `nix`
+<p class="cmd-url"><a href="https://nix.dev/manual/nix/latest/command-ref/new-cli/nix.html">https://nix.dev/manual/nix/latest/command-ref/new-cli/nix.html</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **config check**: Flags: --help, -h
+- **config show**: Flags: --help, --json, -h
+- **derivation show**: Flags: --debug, --help, -h. Valued: --store
+- **doctor**: Flags: --help, -h
+- **eval**: Flags: --apply, --debug, --debugger, --expr, --file, --help, --ignore-try, --impure, --json, --no-net, --print-build-logs, --quiet, --raw, --read-only, --refresh, --store, --strict, --write-lock-file, -L, -f, -h, --help, -q. Valued: --arg, --argstr, --expr, --file, --include, --option, --store, -I, -f. Positional args accepted
+- **flake check**: Flags: --all-systems, --debug, --help, --no-build, --no-update-lock-file, --quiet, -h, -q
+- **flake info**: Flags: --debug, --help, --json, -h
+- **flake metadata**: Flags: --debug, --help, --json, --no-update-lock-file, --no-write-lock-file, --quiet, -h, -q
+- **flake show**: Flags: --all-systems, --debug, --help, --json, --legacy, --no-update-lock-file, --quiet, -h, -q
+- **help**: Positional args accepted
+- **path-info**: Flags: --all, --closure-size, --debug, --help, --human-readable, --json, --quiet, --recursive, --sigs, --size, -S, -c, -h, -q, -r, -s. Valued: --store, --from. Positional args accepted
+- **profile diff-closures**: Flags: --help, -h. Valued: --profile
+- **profile history**: Flags: --debug, --help, -h. Valued: --profile
+- **profile list**: Flags: --debug, --help, --json, -h. Valued: --profile
+- **registry list**: Flags: --help, -h
+- **search**: Flags: --debug, --exclude, --help, --inputs-from, --json, --no-update-lock-file, --no-write-lock-file, --print-build-logs, --quiet, --refresh, -L, -h, -q. Valued: --exclude, --inputs-from, --option, --override-flake, --override-input, --store, -e. Positional args accepted
+- **show-derivation**: Flags: --debug, --help, --json, --no-net, --quiet, --recursive, -h, -q, -r. Positional args accepted
+- **store cat**: Flags: --help, -h. Valued: --store
+- **store diff-closures**: Flags: --help, -h
+- **store dump-path**: Flags: --help, -h. Valued: --store
+- **store info**: Flags: --help, -h. Valued: --store
+- **store ls**: Flags: --debug, --help, --human-readable, --json, --long, --quiet, --recursive, -d, -h, -l, -q, -r. Valued: --store
+- **store ping**: Flags: --help, -h. Valued: --store
+- **store verify**: Flags: --all, --help, -a, -h. Valued: --store
+- **version**: Flags: --help, -h
+- **why-depends**: Flags: --all, --help, --precise, -a, -h. Valued: --derivation, --store. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `nix-build`
+<p class="cmd-url"><a href="https://nix.dev/manual/nix/latest/command-ref/nix-build.html">https://nix.dev/manual/nix/latest/command-ref/nix-build.html</a></p>
+
+- Allowed standalone flags: --dry-run, --help, --version, -h
+
+### `nix-channel`
+<p class="cmd-url"><a href="https://nix.dev/manual/nix/latest/command-ref/nix-channel.html">https://nix.dev/manual/nix/latest/command-ref/nix-channel.html</a></p>
+
+- Allowed standalone flags: --help, --version, -h
+
+### `nix-collect-garbage`
+<p class="cmd-url"><a href="https://nix.dev/manual/nix/latest/command-ref/nix-collect-garbage.html">https://nix.dev/manual/nix/latest/command-ref/nix-collect-garbage.html</a></p>
+
+- Allowed standalone flags: --debug, --delete-old, --delete-older-than, --dry-run, --help, --max-freed, --print-dead, --print-live, --print-roots, --quiet, --version, -d, -h, -q
+- Allowed valued flags: --delete-older-than, --max-freed, --option, --profile
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `nix-env`
+<p class="cmd-url"><a href="https://nix.dev/manual/nix/latest/command-ref/nix-env.html">https://nix.dev/manual/nix/latest/command-ref/nix-env.html</a></p>
+
+- Allowed standalone flags: --help, --version, -h
+
+### `nix-instantiate`
+<p class="cmd-url"><a href="https://nix.dev/manual/nix/latest/command-ref/nix-instantiate.html">https://nix.dev/manual/nix/latest/command-ref/nix-instantiate.html</a></p>
+
+- Allowed standalone flags: --help, --version, -h
+
+### `nix-prefetch-url`
+<p class="cmd-url"><a href="https://nix.dev/manual/nix/latest/command-ref/nix-prefetch-url.html">https://nix.dev/manual/nix/latest/command-ref/nix-prefetch-url.html</a></p>
+
+- Allowed standalone flags: --debug, --help, --name, --print-path, --quiet, --type, --unpack, --version, -h
+- Allowed valued flags: --name, --type
+- Hyphen-prefixed positional arguments accepted
+
+### `nix-shell`
+<p class="cmd-url"><a href="https://nix.dev/manual/nix/latest/command-ref/nix-shell.html">https://nix.dev/manual/nix/latest/command-ref/nix-shell.html</a></p>
+
+- Allowed standalone flags: --help, --version, -h
+
+### `nix-store`
+<p class="cmd-url"><a href="https://nix.dev/manual/nix/latest/command-ref/nix-store.html">https://nix.dev/manual/nix/latest/command-ref/nix-store.html</a></p>
+
+- Allowed standalone flags: --help, --version, -h
+
+### `nixos-rebuild`
+<p class="cmd-url"><a href="https://nixos.org/manual/nixos/stable/#sec-changing-config">https://nixos.org/manual/nixos/stable/#sec-changing-config</a></p>
+
+- **dry-activate**: Flags: --help, -h. Valued: --flake
+- **dry-build**: Flags: --help, -h. Valued: --flake
+- **list-generations**: Flags: --help, --json, -h. Valued: --profile-name, -p
+- Allowed standalone flags: --help, --version, -h
+
 ### `nl`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#nl-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#nl-invocation</a></p>
 
@@ -5043,6 +6014,30 @@ Aliases: `ionice`
 <p class="cmd-url"><a href="https://github.com/remy/nodemon">https://github.com/remy/nodemon</a></p>
 
 - Allowed standalone flags: --dump, --help, --quiet, --version, -h, -q, -v
+
+### `nodetool`
+<p class="cmd-url"><a href="https://cassandra.apache.org/doc/latest/cassandra/managing/tools/nodetool/nodetool.html">https://cassandra.apache.org/doc/latest/cassandra/managing/tools/nodetool/nodetool.html</a></p>
+
+- **cfhistograms**: Positional args accepted
+- **cfstats**: Positional args accepted
+- **compactionhistory**: Positional args accepted
+- **compactionstats**: Positional args accepted
+- **describecluster**: Positional args accepted
+- **getendpoints**: Positional args accepted
+- **getlogginglevels**: Positional args accepted
+- **getseeds**: Positional args accepted
+- **getsstables**: Positional args accepted
+- **gettraceprobability**: Positional args accepted
+- **gossipinfo**: Positional args accepted
+- **help**: Positional args accepted
+- **info**: Positional args accepted
+- **ring**: Positional args accepted
+- **status**: Positional args accepted
+- **tablehistograms**: Positional args accepted
+- **tablestats**: Positional args accepted
+- **tpstats**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
 
 ### `nomad`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/nomad/docs/commands">https://developer.hashicorp.com/nomad/docs/commands</a></p>
@@ -5188,6 +6183,11 @@ Aliases: `run-p`, `run-s`
 - **which**: Flags: --help, --lts, --no-colors, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `nvtop`
+<p class="cmd-url"><a href="https://github.com/Syllo/nvtop">https://github.com/Syllo/nvtop</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -V
+
 ### `nx`
 <p class="cmd-url"><a href="https://nx.dev/reference/commands">https://nx.dev/reference/commands</a></p>
 
@@ -5238,6 +6238,13 @@ Aliases: `run-p`, `run-s`
 - Allowed standalone flags: -V, -b, -c, -d, -f, -h, -i, -l, -o, -s, -v, -x, --help, --output-duplicates, --traditional, --version
 - Allowed valued flags: -A, -N, -S, -j, -t, -w, --address-radix, --endian, --format, --read-bytes, --skip-bytes, --strings, --width
 - Bare invocation allowed
+
+### `oha`
+<p class="cmd-url"><a href="https://github.com/hatoo/oha">https://github.com/hatoo/oha</a></p>
+
+- Allowed standalone flags: --debug, --disable-color, --disable-compression, --disable-keepalive, --http2, --help, --insecure, --ipv4, --ipv6, --latency-correction, --no-tui, --reason-codes, --stats-success-breakdown, --use-mode, --version, -A, -H, -V, -a, -c, -d, -h, -m, -n, -q, -r, -t, -z
+- Allowed valued flags: --burst-delay, --burst-rate, --connect-to, --dns-resolver, --dump-urls, --exit-stage-key, --ip-strategy, --max-redirects, --method, --output-format, --proxy, --proxy-http-version, --proxy-username, --proxy-password, --rand-regex-url, --redirect, --redirect-uri, --reproduce-rng-seed, --timeout, --unix-socket, --user-agent, --wait-ongoing-requests-after-deadline, -A, -D, -H, -T, -U, -c, -d, -m, -n, -q, -r, -t, -z
+- Hyphen-prefixed positional arguments accepted
 
 ### `ollama`
 <p class="cmd-url"><a href="https://github.com/ollama/ollama/blob/main/docs/api.md">https://github.com/ollama/ollama/blob/main/docs/api.md</a></p>
@@ -5349,11 +6356,31 @@ Aliases: `run-p`, `run-s`
 - **x509**: Positional args accepted
 - Allowed standalone flags: --help, -help, -version, version
 
+### `opt`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/opt.html">https://llvm.org/docs/CommandGuide/opt.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h, -v
+- Hyphen-prefixed positional arguments accepted
+
 ### `optipng`
 <p class="cmd-url"><a href="https://optipng.sourceforge.net/">https://optipng.sourceforge.net/</a></p>
 
 - Allowed standalone flags: --help, --version, -clobber, -debug, -fix, -force, -full, -help, -keep, -log, -no-bit-depth-reduction, -no-color-type-reduction, -no-create, -no-fix, -no-palette-reduction, -no-reductions, -paranoid, -preserve, -quiet, -simulate, -snip, -strip, -version, -zw, -h, -q
 - Allowed valued flags: -dir, -i, -log, -out, -strip, -zc, -zm, -zs
+
+### `oras`
+<p class="cmd-url"><a href="https://oras.land/docs/category/cli-reference">https://oras.land/docs/category/cli-reference</a></p>
+
+- **blob fetch**: Flags: --help, --insecure, --plain-http, --verbose, -h, -v. Valued: --ca-file, --cert-file, --config, --header, --key-file, --media-type, --output, --password, --registry-config, --username, -o, -p, -u
+- **completion**: Flags: --help, -h. Positional args accepted
+- **discover**: Flags: --help, --insecure, --no-color, --no-tty, --plain-http, -h. Valued: --artifact-type, --ca-file, --cert-file, --config, --distribution-spec, --format, --header, --key-file, --output, --password, --password-stdin, --registry-config, --username, --verbose, -c, -d, -o, -p, -u, -v. Positional args accepted
+- **help**: Positional args accepted
+- **manifest fetch**: Flags: --help, --insecure, --plain-http, --verbose, -h, -v. Valued: --ca-file, --cert-file, --config, --header, --key-file, --media-type, --output, --password, --platform, --registry-config, --username, -o, -p, -u
+- **manifest fetch-config**: Flags: --help, -h. Valued: --ca-file, --cert-file, --config, --header, --key-file, --media-type, --output, --password, --platform, --registry-config, --username, -o, -p, -u
+- **repo ls**: Flags: --help, -h. Valued: --last
+- **repo tags**: Flags: --help, -h. Valued: --last
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `orb`
 <p class="cmd-url"><a href="https://docs.orbstack.dev/cli">https://docs.orbstack.dev/cli</a></p>
@@ -5541,12 +6568,49 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - Allowed valued flags: -d, --delimiters
 - Bare invocation allowed
 
+### `pbcopy`
+<p class="cmd-url"><a href="https://ss64.com/mac/pbcopy.html">https://ss64.com/mac/pbcopy.html</a></p>
+
+Aliases: `pbpaste`
+
+- Allowed standalone flags: --help, -help
+- Allowed valued flags: -Prefer, -pboard
+- Bare invocation allowed
+
 ### `pbzip2`
 <p class="cmd-url"><a href="https://launchpad.net/pbzip2">https://launchpad.net/pbzip2</a></p>
 
 - Allowed standalone flags: --decompress, --force, --help, --keep, --license, --read, --silent, --stdout, --test, --verbose, --version, -1, -2, -3, -4, -5, -6, -7, -8, -9, -V, -c, -d, -f, -h, -k, -l, -q, -r, -S, -t, -v, -z
 - Allowed valued flags: -b, -m, -p
 - Bare invocation allowed
+
+### `pdfdetach`
+<p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfdetach.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfdetach.1.html</a></p>
+
+- Allowed standalone flags: -help, -list, -q, -savecont, -saveall, -v, --help, -?
+- Allowed valued flags: -enc, -o, -opw, -save, -upw
+- Hyphen-prefixed positional arguments accepted
+
+### `pdffonts`
+<p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdffonts.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdffonts.1.html</a></p>
+
+- Allowed standalone flags: -help, -q, -subst, -v, --help, -?
+- Allowed valued flags: -f, -l, -opw, -upw
+- Hyphen-prefixed positional arguments accepted
+
+### `pdfimages`
+<p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfimages.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfimages.1.html</a></p>
+
+- Allowed standalone flags: -all, -ccitt, -help, -j, -jp2, -jbig2, -list, -png, -print-filenames, -q, -tiff, -v, --help, -?
+- Allowed valued flags: -f, -l, -opw, -upw
+- Hyphen-prefixed positional arguments accepted
+
+### `pdfinfo`
+<p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfinfo.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfinfo.1.html</a></p>
+
+- Allowed standalone flags: -box, -dests, -help, -isodates, -js, -listenc, -meta, -rawdates, -q, -struct, -struct-text, -url, -v, --help, -?
+- Allowed valued flags: -enc, -f, -l, -opw, -upw
+- Hyphen-prefixed positional arguments accepted
 
 ### `pdflatex`
 <p class="cmd-url"><a href="https://www.tug.org/applications/pdftex/">https://www.tug.org/applications/pdftex/</a></p>
@@ -5555,6 +6619,46 @@ Aliases: `xelatex`, `lualatex`, `latex`
 
 - Allowed standalone flags: --cnf-line, --draftmode, --enc, --etex, --file-line-error, --file-line-error-style, --fmt, --halt-on-error, --help, --ini, --initialize, --interaction, --ipc, --ipc-start, --mktex, --no-cnf, --no-file-line-error, --no-mktex, --no-parse-first-line, --no-shell-escape, --parse-first-line, --progname, --recorder, --restricted-shell-escape, --shell-restricted, --show-version, --src-specials, --synctex, --translate-file, --version, -help, -version
 - Allowed valued flags: --cnf-line, --enc, --fmt, --halt-on-error, --interaction, --jobname, --kanji, --kanji-internal, --mktex, --mltex, --no-mktex, --no-shell-escape, --output-comment, --output-directory, --output-format, --progname, --recorder, --shell-escape, --shell-restricted, --src-specials, --synctex, --translate-file
+
+### `pdfseparate`
+<p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfseparate.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfseparate.1.html</a></p>
+
+- Allowed standalone flags: -help, -q, -v, --help, -?
+- Allowed valued flags: -f, -l
+- Hyphen-prefixed positional arguments accepted
+
+### `pdftk`
+<p class="cmd-url"><a href="https://www.pdflabs.com/docs/pdftk-cli-examples/">https://www.pdflabs.com/docs/pdftk-cli-examples/</a></p>
+
+- Allowed standalone flags: --help, --version, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `pdftocairo`
+<p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftocairo.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftocairo.1.html</a></p>
+
+- Allowed standalone flags: -antialias, -cropbox, -duplex, -eps, -expand, -gray, -help, -jpeg, -mono, -noshrink, -nocenter, -nocrop, -origpagesizes, -paper, -pdf, -png, -ps, -q, -r, -singlefile, -svg, -tiff, -transp, -v, --help, -?
+- Allowed valued flags: -antialias, -f, -icc, -jpegopt, -l, -opw, -paperh, -paperw, -r, -rx, -ry, -tiffcompression, -thinlinemode, -upw, -x, -y, -W, -H
+- Hyphen-prefixed positional arguments accepted
+
+### `pdftohtml`
+<p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftohtml.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftohtml.1.html</a></p>
+
+- Allowed standalone flags: -c, -fontfullname, -help, -hidden, -i, -noframes, -nomerge, -q, -s, -stdout, -v, -xml, --help, -?
+- Allowed valued flags: -enc, -f, -fmt, -l, -opw, -p, -r, -upw, -zoom
+- Hyphen-prefixed positional arguments accepted
+
+### `pdftotext`
+<p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftotext.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftotext.1.html</a></p>
+
+- Allowed standalone flags: -bbox, -bbox-layout, -cropbox, -eol, -enc, -fixed, -help, -htmlmeta, -layout, -listenc, -nodiag, -nopgbrk, -q, -r, -raw, -tsv, -upw, -v, --help, -?
+- Allowed valued flags: -eol, -enc, -fixed, -l, -marginb, -marginl, -marginr, -margint, -opw, -r, -resolution, -upw, -x, -y, -W, -H
+- Hyphen-prefixed positional arguments accepted
+
+### `pdfunite`
+<p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfunite.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfunite.1.html</a></p>
+
+- Allowed standalone flags: -help, -q, -v, --help, -?
+- Hyphen-prefixed positional arguments accepted
 
 ### `pdm`
 <p class="cmd-url"><a href="https://pdm-project.org/">https://pdm-project.org/</a></p>
@@ -5599,11 +6703,45 @@ Aliases: `xelatex`, `lualatex`, `latex`
 - Allowed valued flags: --bootstrap, --cache-directory, --colors, --columns, --configuration, --coverage, --coverage-clover, --coverage-cobertura, --coverage-crap4j, --coverage-filter, --coverage-html, --coverage-php, --coverage-text, --coverage-xml, --covers, --default-time-limit, --exclude-filter, --exclude-group, --exclude-testsuite, --extension, --filter, --generate-baseline, --group, --include-path, --log-events-text, --log-events-verbose-text, --log-junit, --log-teamcity, --order-by, --random-order-seed, --requires-php-extension, --shard, --test-directory, --test-suffix, --testdox-html, --testdox-text, --testsuite, --use-baseline, --uses, -c, -d
 - Bare invocation allowed
 
+### `pg_basebackup`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgbasebackup.html">https://www.postgresql.org/docs/current/app-pgbasebackup.html</a></p>
+
+- Allowed standalone flags: --checkpoint, --checksum, --compress, --create-slot, --format, --gzip, --help, --max-rate, --no-clean, --no-estimate-size, --no-manifest, --no-password, --no-slot, --no-sync, --no-verify-checksums, --password, --progress, --pgdata, --quiet, --target, --verbose, --version, --waldir, --write-recovery-conf, --wal-method, -?, -C, -D, -F, -N, -P, -R, -S, -T, -V, -X, -Z, -c, -d, -h, -l, -n, -p, -r, -s, -t, -U, -v, -w, -W, -z
+- Allowed valued flags: --checkpoint, --compress, --create-slot, --dbname, --format, --manifest-checksums, --manifest-force-encode, --max-rate, --pgdata, --slot, --target, --tablespace-mapping, --username, --waldir, -c, -D, -F, -T, -d, -h, -l, -p, -S, -r, -s, -t, -U, -Z
+
+### `pg_config`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgconfig.html">https://www.postgresql.org/docs/current/app-pgconfig.html</a></p>
+
+- Allowed standalone flags: --bindir, --cc, --cflags, --cflags_sl, --configure, --cppflags, --cxxflags, --docdir, --help, --htmldir, --includedir, --includedir-server, --ldflags, --ldflags_ex, --ldflags_sl, --libdir, --libs, --localedir, --mandir, --pgxs, --pkgincludedir, --pkglibdir, --sharedir, --sysconfdir, --version, -?
+- Bare invocation allowed
+
+### `pg_controldata`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgcontroldata.html">https://www.postgresql.org/docs/current/app-pgcontroldata.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -V
+- Allowed valued flags: --pgdata, -D
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `pg_ctl`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pg-ctl.html">https://www.postgresql.org/docs/current/app-pg-ctl.html</a></p>
+
+- **help**: Positional args accepted
+- **status**: Flags: --help, -h. Valued: --pgdata, -D
+- Allowed standalone flags: --help, --version, -?, -V
+
 ### `pg_dump`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgdump.html">https://www.postgresql.org/docs/current/app-pgdump.html</a></p>
 
 - Requires --schema-only, -s. - Allowed standalone flags: --help, --no-comments, --no-owner, --no-privileges, --no-tablespaces, --schema-only, --verbose, --version, -V, -h, -s, -v
 - Allowed valued flags: --dbname, --encoding, --file, --format, --host, --port, --schema, --table, --username, -E, -F, -U, -d, -f, -n, -p, -t
+
+### `pg_dumpall`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pg-dumpall.html">https://www.postgresql.org/docs/current/app-pg-dumpall.html</a></p>
+
+- Allowed standalone flags: --clean, --data-only, --disable-dollar-quoting, --disable-triggers, --encoding, --exclude-database, --exclude-pattern, --exclude-table, --exclude-table-data, --filter, --globals-only, --help, --if-exists, --inserts, --load-via-partition-root, --lock-wait-timeout, --no-comments, --no-owner, --no-passwords, --no-publications, --no-reconnect, --no-role-passwords, --no-security-labels, --no-subscriptions, --no-sync, --no-tablespaces, --no-toast-compression, --no-unlogged-table-data, --on-conflict-do-nothing, --quote-all-identifiers, --rows-per-insert, --schema-only, --use-set-session-authorization, --verbose, --version, --with-data, --with-schema, -?, -V, -a, -c, -g, -h, -l, -O, -r, -s, -t, -v, -w, -W, -x
+- Allowed valued flags: --column-inserts, --database, --encoding, --exclude-database, --filter, --lock-wait-timeout, --rows-per-insert, -d, -E, -f, -h, -l, -p, -T, -U
+- Bare invocation allowed
 
 ### `pg_isready`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pg-isready.html">https://www.postgresql.org/docs/current/app-pg-isready.html</a></p>
@@ -5617,6 +6755,17 @@ Aliases: `xelatex`, `lualatex`, `latex`
 
 - Allowed standalone flags: --clean, --create, --data-only, --disable-triggers, --enable-row-security, --exit-on-error, --help, --if-exists, --list, --no-acl, --no-comments, --no-data-for-failed-tables, --no-owner, --no-password, --no-privileges, --no-publications, --no-security-labels, --no-subscriptions, --no-tablespaces, --password, --single-transaction, --strict-names, --use-set-session-authorization, --verbose, --version, -1, -?, -C, -O, -V, -W, -a, -c, -e, -l, -v, -w, -x
 - Allowed valued flags: --dbname, --exclude-schema, --filter, --format, --function, --host, --index, --jobs, --no-data-for-failed-tables, --port, --role, --schema, --section, --superuser, --table, --tablespace, --trigger, --username, -F, -I, -L, -P, -S, -T, -U, -d, -f, -h, -j, -n, -p, -t
+
+### `pgbench`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/pgbench.html">https://www.postgresql.org/docs/current/pgbench.html</a></p>
+
+- Allowed standalone flags: --builtin, --connect, --debug, --define, --exit-on-abort, --fillfactor, --foreign-keys, --help, --init-steps, --initialize, --latency-limit, --log, --log-prefix, --max-tries, --no-vacuum, --partition-method, --partitions, --print-errors, --progress, --progress-timestamp, --protocol, --quiet, --rate, --report-per-command, --retries, --report-latencies, --sampling-rate, --scale, --show-script, --unique-error-msg, --version, -?, -C, -F, -I, -L, -M, -N, -R, -S, -T, -U, -V, -c, -d, -f, -h, -i, -j, -l, -n, -p, -q, -r, -s, -t, -v
+- Allowed valued flags: --builtin, --connect-timeout, --define, --dbname, --file, --fillfactor, --foreign-keys, --host, --init-steps, --jobs, --latency-limit, --log-prefix, --max-tries, --partition-method, --partitions, --port, --protocol, --rate, --retries, --sampling-rate, --scale, --show-script, --time, --username, -D, -F, -T, -U, -c, -d, -f, -h, -j, -p, -r, -s, -t
+
+### `pgcli`
+<p class="cmd-url"><a href="https://www.pgcli.com/docs">https://www.pgcli.com/docs</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -V
 
 ### `pgrep`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/pgrep.1.html">https://man7.org/linux/man-pages/man1/pgrep.1.html</a></p>
@@ -5944,6 +7093,11 @@ Aliases: `upsun`
 - **which**: Flags: --help, -h. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
+### `plop`
+<p class="cmd-url"><a href="https://plopjs.com/documentation/">https://plopjs.com/documentation/</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `plutil`
 <p class="cmd-url"><a href="https://ss64.com/mac/plutil.html">https://ss64.com/mac/plutil.html</a></p>
 
@@ -6057,6 +7211,17 @@ Aliases: `upsun`
 - **show**: Flags: --all, --help, --latest, --no-dev, --outdated, --top-level, --tree, -T, -h, -l, -o. Valued: --why
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `polkadot`
+<p class="cmd-url"><a href="https://wiki.polkadot.network/docs/maintain-sync">https://wiki.polkadot.network/docs/maintain-sync</a></p>
+
+- **chain-info**: Positional args accepted
+- **help**: Positional args accepted
+- **inspect-key**: Positional args accepted
+- **inspect-node-key**: Positional args accepted
+- **verify**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -V
+
 ### `porter`
 <p class="cmd-url"><a href="https://docs.porter.run/standard/cli">https://docs.porter.run/standard/cli</a></p>
 
@@ -6149,6 +7314,11 @@ Aliases: `upsun`
 - **tsdb list**: Flags: --help, --human-readable, -h, -r
 - Allowed standalone flags: --help, --version, -h
 
+### `protoc`
+<p class="cmd-url"><a href="https://protobuf.dev/programming-guides/proto3/">https://protobuf.dev/programming-guides/proto3/</a></p>
+
+- Allowed standalone flags: --help, --version, -h
+
 ### `pry`
 <p class="cmd-url"><a href="https://github.com/pry/pry">https://github.com/pry/pry</a></p>
 
@@ -6208,6 +7378,13 @@ Aliases: `upsun`
 - Allowed valued flags: --file, -f
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+### `puppet`
+<p class="cmd-url"><a href="https://www.puppet.com/docs/puppet/">https://www.puppet.com/docs/puppet/</a></p>
+
+Aliases: `puppet-agent`, `puppet-master`
+
+- Allowed standalone flags: --help, --version, -h, -V
 
 ### `pwd`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation</a></p>
@@ -6306,6 +7483,13 @@ Aliases: `python`
 - **measure**: Flags: --force-share, --help, --image-opts, -U, -h. Valued: --format, --object, --output, --size, --snapshot, --target-format, -O, -f, -l, -o, -s
 - **snapshot**: Flags: --force-share, --help, --image-opts, --list, --quiet, -U, -h, -l, -q. Valued: --format, --object, -f
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `qpdf`
+<p class="cmd-url"><a href="https://qpdf.readthedocs.io/en/stable/cli.html">https://qpdf.readthedocs.io/en/stable/cli.html</a></p>
+
+- Allowed standalone flags: --allow-weak-crypto, --check, --check-linearization, --coalesce-contents, --collate, --compress-streams, --compression-level, --copy-encryption, --copy-attachments-from, --decrypt, --decode-level, --deterministic-id, --disable-signature-verification, --empty, --encryption-file-password, --externalize-inline-images, --filtered-stream-data, --flatten-annotations, --flatten-rotation, --force-version, --generate-appearances, --help, --ignore-xref-streams, --in-place, --keep-files-open, --keep-files-open-threshold, --keep-inline-images, --linearize, --list-attachments, --newline-before-endstream, --no-original-object-ids, --no-warn, --normalize-content, --object-streams, --oi-min-area, --oi-min-height, --oi-min-width, --optimize-images, --password-is-hex-key, --pages, --password-mode, --preserve-unreferenced, --preserve-unreferenced-resources, --qdf, --raw-stream-data, --recompress-flate, --remove-attachment, --remove-page-labels, --remove-restrictions, --remove-unreferenced-resources, --replace-input, --report-mem-usage, --requires-password, --rotate, --show-attachment, --show-encryption, --show-encryption-key, --show-linearization, --show-npages, --show-object, --show-pages, --show-xref, --split-pages, --static-aes-iv, --static-id, --stream-data, --suppress-password-recovery, --suppress-recovery, --underlay, --update-from-json, --verbose, --version, --warning-exit-0, -h
+- Allowed valued flags: --add-attachment, --allow-insecure, --certificate, --copy-attachments-from, --decode-level, --encrypt, --externalize-inline-images, --in-place, --job-json, --job-json-file, --object-streams, --overlay, --pages, --password, --password-file, --password-mode, --rotate, --show-attachment, --show-object, --split-pages, --stream-data, --update-from-json
+- Hyphen-prefixed positional arguments accepted
 
 ### `qsv`
 <p class="cmd-url"><a href="https://github.com/jqnatividad/qsv">https://github.com/jqnatividad/qsv</a></p>
@@ -6494,6 +7678,15 @@ Aliases: `python`
 - Allowed valued flags: --charset, --copy-files, --dcov-class-method-sig, --dcov-method-signature, --dcov-source, --encoding, --extension, --format, --include, --locale, --locale-data-dir, --main, --markup, --op, --page-dir, --ri, --ri-site, --ri-system, --server, --style, --tab-width, --template, --template-stylesheets, --title, --visibility, --write-options, -c, -e, -i, -m, -o, -p, -r, -t, -w
 - Bare invocation allowed
 
+### `react-native`
+<p class="cmd-url"><a href="https://github.com/react-native-community/cli">https://github.com/react-native-community/cli</a></p>
+
+- **config**: Flags: --help, -h. Valued: --platform
+- **doctor**: Flags: --fix, --contributor, --help, -h
+- **help**: Positional args accepted
+- **info**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `read`
 <p class="cmd-url"><a href="https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html">https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html</a></p>
 
@@ -6529,16 +7722,35 @@ Aliases: `python`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `redis-benchmark`
+<p class="cmd-url"><a href="https://redis.io/docs/latest/operate/oss_and_stack/management/optimization/benchmarks/">https://redis.io/docs/latest/operate/oss_and_stack/management/optimization/benchmarks/</a></p>
+
+- Allowed standalone flags: --cluster, --csv, --dbnum, --enable-tracking, --help, --idle, --insecure, --keyspacelen, --latency, --latency-dist, --latency-history, --no-auth-warning, --pipeline, --precision, --quiet, --rps, --seed, --threads, --tls, --tlsv1.2, --tlsv1.3, --user, --verbose, --version, -?, -A, -D, -I, -L, -P, -Q, -S, -V, -a, -c, -d, -e, -h, -i, -k, -l, -n, -p, -q, -r, -t, -u, -v, -x, -y
+- Allowed valued flags: --cacert, --cacertdir, --cert, --cluster, --keyspacelen, --port, --precision, --rps, --seed, --threads, --user, -3, -A, -D, -I, -P, -Q, -T, -a, -c, -d, -e, -h, -i, -k, -l, -n, -p, -r, -t, -u
+- Bare invocation allowed
+
 ### `redis-cli`
 <p class="cmd-url"><a href="https://redis.io/docs/latest/develop/tools/cli/">https://redis.io/docs/latest/develop/tools/cli/</a></p>
 
 - Allowed standalone flags: --help, --version
+
+### `redis-server`
+<p class="cmd-url"><a href="https://redis.io/docs/latest/operate/oss_and_stack/management/admin/">https://redis.io/docs/latest/operate/oss_and_stack/management/admin/</a></p>
+
+- Allowed standalone flags: --check-aof, --check-rdb, --help, --test-memory, --version, -h, -v
 
 ### `reek`
 <p class="cmd-url"><a href="https://github.com/troessner/reek">https://github.com/troessner/reek</a></p>
 
 - Allowed standalone flags: --documentation, --force-exclusion, --help, --no-documentation, --no-progress, --no-wiki-links, --progress, --show-configuration-path, --single-line, --smell, --sort-by-issue-count, --stdin-filename, --success-message, --todo, --verbose, --version, --wiki-links, -V, -h, -n, -s, -v
 - Allowed valued flags: --config, --exclude-paths, --failure-exit-code, --format, --line-numbers-format, --report-format, --success-exit-code, --template, -c, -f
+- Bare invocation allowed
+
+### `reindexdb`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-reindexdb.html">https://www.postgresql.org/docs/current/app-reindexdb.html</a></p>
+
+- Allowed standalone flags: --all, --concurrently, --echo, --help, --index, --maintenance-db, --no-password, --password, --quiet, --schema, --system, --tablespace, --table, --verbose, --version, -?, -V, -a, -d, -e, -h, -i, -j, -n, -p, -q, -s, -t, -U, -v, -w, -W
+- Allowed valued flags: --concurrently, --dbname, --host, --index, --jobs, --maintenance-db, --port, --schema, --table, --tablespace, --username, -d, -h, -i, -j, -n, -p, -S, -T, -t, -U
 - Bare invocation allowed
 
 ### `render`
@@ -6773,6 +7985,25 @@ Aliases: `python`
 - **scan**: Flags: --apply-remediations, --detailed-output, --disable-optional-telemetry, --help, --no-fix-suggestion, -h. Valued: --auth-type, --key, --output, --policy-file, --save-as, --target
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+### `salt`
+<p class="cmd-url"><a href="https://docs.saltproject.io/en/latest/ref/cli/index.html">https://docs.saltproject.io/en/latest/ref/cli/index.html</a></p>
+
+Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt-ssh`
+
+- Allowed standalone flags: --help, --version, -h, -V
+
+### `sam`
+<p class="cmd-url"><a href="https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference.html">https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference.html</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **list endpoints**: Flags: --help, --no-color, --no-prompts, -h. Valued: --config-env, --config-file, --output, --profile, --region, --stack-name
+- **list resources**: Flags: --help, -h. Valued: --config-env, --config-file, --output, --profile, --region, --stack-name, -t, --template-file
+- **list stack-outputs**: Flags: --debug, --help, --no-color, --no-prompts, -h. Valued: --config-env, --config-file, --output, --profile, --region, --stack-name
+- **list testable-resources**: Flags: --help, -h. Valued: --config-env, --config-file, --output, --profile, --region, --stack-name, -t, --template-file
+- **validate**: Flags: --debug, --help, --lint, --no-color, -h. Valued: --config-env, --config-file, --profile, --region, --save-params, -t, --template, --template-file. Positional args accepted
+- Allowed standalone flags: --help, --version, --info, -h, -v
 
 ### `sample`
 <p class="cmd-url"><a href="https://ss64.com/mac/sample.html">https://ss64.com/mac/sample.html</a></p>
@@ -7156,6 +8387,25 @@ Aliases: `python`
 
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `slither`
+<p class="cmd-url"><a href="https://github.com/crytic/slither">https://github.com/crytic/slither</a></p>
+
+- Allowed standalone flags: --checklist, --checklist-with-summary, --debug, --detect, --exclude, --exclude-dependencies, --exclude-high, --exclude-informational, --exclude-low, --exclude-medium, --exclude-optimization, --filter-paths, --fail-high, --fail-low, --fail-medium, --fail-pedantic, --generate-patches, --help, --ignore-compile, --include-paths, --list-detectors, --list-detectors-json, --list-printers, --markdown-root, --no-fail-pedantic, --printers-to-run, --show-ignored-findings, --triage-database, --version
+- Allowed valued flags: --checklist, --config-file, --detect, --exclude, --exclude-dependencies, --filter-paths, --include-paths, --json, --json-types, --markdown-root, --printers-to-run, --sarif, --solc-args, --solc-disable-warnings, --solc-remaps, --solc-working-dir, --triage-database
+
+### `sls`
+<p class="cmd-url"><a href="https://www.serverless.com/framework/docs/providers/aws/cli-reference">https://www.serverless.com/framework/docs/providers/aws/cli-reference</a></p>
+
+Aliases: `serverless`
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **info**: Flags: --debug, --help, --verbose, -h, -v. Valued: --config, --region, --stage, -c, -r, -s. Positional args accepted
+- **logs**: Flags: --debug, --help, --tail, -h, -t. Valued: --config, --filter, --function, --interval, --region, --stage, --startTime, -c, -f, -i, -r, -s. Positional args accepted
+- **metrics**: Flags: --debug, --help, -h. Valued: --config, --endTime, --function, --region, --stage, --startTime, -c, -f, -r, -s. Positional args accepted
+- **print**: Flags: --debug, --help, -h. Valued: --config, --format, --path, --region, --stage, --transform, -c, -r, -s. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `snyk`
 <p class="cmd-url"><a href="https://docs.snyk.io/snyk-cli">https://docs.snyk.io/snyk-cli</a></p>
 
@@ -7165,6 +8415,55 @@ Aliases: `python`
 - **test**: Flags: --all-projects, --all-sub-projects, --detection-depth, --dev, --fail-on, --help, --json, --print-deps, --prune-repeated-subdependencies, --sarif, --scan-all-unmanaged, --severity-threshold, --strict-out-of-sync, -h. Valued: --command, --configuration-attributes, --configuration-matching, --exclude, --file, --org, --package-manager, --packages-folder, --project-name, --reachable, --reachable-timeout, --severity-threshold, --sub-project, --target-reference. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+### `solana`
+<p class="cmd-url"><a href="https://docs.anza.xyz/cli/usage">https://docs.anza.xyz/cli/usage</a></p>
+
+- **address**: Positional args accepted
+- **balance**: Positional args accepted
+- **block**: Positional args accepted
+- **block-height**: Positional args accepted
+- **block-time**: Positional args accepted
+- **cluster-version**: Positional args accepted
+- **completion**: Flags: --help, -h. Positional args accepted
+- **config**: Positional args accepted
+- **confirm**: Positional args accepted
+- **epoch**: Positional args accepted
+- **epoch-info**: Positional args accepted
+- **epoch-schedule**: Positional args accepted
+- **feature**: Positional args accepted
+- **fees**: Positional args accepted
+- **find-program-derived-address**: Positional args accepted
+- **genesis-hash**: Positional args accepted
+- **gossip**: Positional args accepted
+- **help**: Positional args accepted
+- **inflation**: Positional args accepted
+- **largest-accounts**: Positional args accepted
+- **leader-schedule**: Positional args accepted
+- **logs**: Positional args accepted
+- **nonce**: Positional args accepted
+- **nonce-account**: Positional args accepted
+- **ping**: Positional args accepted
+- **rent**: Positional args accepted
+- **slot**: Positional args accepted
+- **stake-account**: Positional args accepted
+- **stake-history**: Positional args accepted
+- **stake-minimum-delegation**: Positional args accepted
+- **stakes**: Positional args accepted
+- **supply**: Positional args accepted
+- **transaction-count**: Positional args accepted
+- **transaction-history**: Positional args accepted
+- **validators**: Positional args accepted
+- **version**: Positional args accepted
+- **vote-account**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -V
+
+### `solc`
+<p class="cmd-url"><a href="https://docs.soliditylang.org/en/latest/using-the-compiler.html">https://docs.soliditylang.org/en/latest/using-the-compiler.html</a></p>
+
+- Allowed standalone flags: --abi, --allow-paths, --asm, --asm-json, --ast, --ast-compact-json, --ast-json, --bin, --bin-runtime, --check-model, --combined-json, --devdoc, --error-recovery, --gas, --help, --ignore-missing, --include-path, --input-file, --ir, --ir-optimized, --lsp, --metadata, --metadata-hash, --metadata-literal, --model-checker-engine, --model-checker-targets, --model-checker-timeout, --no-cbor-metadata, --no-color, --no-optimize-yul, --opcodes, --optimize, --optimize-runs, --optimize-yul, --overwrite, --pretty-json, --standard-json, --storage-layout, --strict-assembly, --userdoc, --version, --yul, -?, -h
+- Allowed valued flags: --allow-paths, --base-path, --combined-json, --debug-info, --evm-version, --include-path, --input-file, --libraries, --metadata-hash, --model-checker-contracts, --model-checker-div-mod-no-slacks, --model-checker-engine, --model-checker-ext-calls, --model-checker-invariants, --model-checker-print-query, --model-checker-show-proved-safe, --model-checker-show-unproved, --model-checker-show-unsupported, --model-checker-solvers, --model-checker-targets, --model-checker-timeout, --optimize-runs, --output-dir, --revert-strings, --via-ir, --yul-dialect, --yul-optimizations, -o
+- Hyphen-prefixed positional arguments accepted
 
 ### `sops`
 <p class="cmd-url"><a href="https://github.com/getsops/sops">https://github.com/getsops/sops</a></p>
@@ -7185,6 +8484,25 @@ Aliases: `python`
 - Allowed standalone flags: --clobber, --combine, --effects-file, --guard, --help, --help-effect, --help-effects, --help-format, --help-formats, --ignore-length, --input-buffer, --magic, --multi-threaded, --no-clobber, --no-dither, --no-glob, --no-show-progress, --norm, --play-rate-arg, --plot, --replay-gain, --show-progress, --single-threaded, --temp, --type, --version, --volume, -?, -D, -G, -M, -N, -q, -r, -S, -T, -V, -V0, -V1, -V2, -V3, -V4, -h, -m, -p, -v
 - Allowed valued flags: --add-comment, --bits, --buffer, --channels, --combine, --comment-file, --effects-file, --encoding, --endian, --input-buffer, --magic, --play-rate-arg, --plot, --rate, --replay-gain, --temp, --type, --volume, -1, -2, -3, -4, -8, -b, -c, -C, -e, -r, -t
 - Hyphen-prefixed positional arguments accepted
+
+### `spack`
+<p class="cmd-url"><a href="https://spack.readthedocs.io/en/latest/command_index.html">https://spack.readthedocs.io/en/latest/command_index.html</a></p>
+
+- **arch**: Positional args accepted
+- **audit**: Positional args accepted
+- **compilers**: Positional args accepted
+- **config**: Positional args accepted
+- **dependencies**: Positional args accepted
+- **dependents**: Positional args accepted
+- **extensions**: Positional args accepted
+- **find**: Positional args accepted
+- **help**: Positional args accepted
+- **info**: Positional args accepted
+- **license**: Positional args accepted
+- **list**: Positional args accepted
+- **spec**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `spctl`
 <p class="cmd-url"><a href="https://ss64.com/mac/spctl.html">https://ss64.com/mac/spctl.html</a></p>
@@ -7228,6 +8546,19 @@ Aliases: `python`
 - **plugins show**: Flags: --help, -h
 - **templates list**: Flags: --help, -h
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -V
+
+### `spl-token`
+<p class="cmd-url"><a href="https://spl.solana.com/token">https://spl.solana.com/token</a></p>
+
+- **account-info**: Positional args accepted
+- **accounts**: Positional args accepted
+- **address**: Positional args accepted
+- **balance**: Positional args accepted
+- **display**: Positional args accepted
+- **help**: Positional args accepted
+- **multisig-info**: Positional args accepted
+- **supply**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -V
 
 ### `sponge`
@@ -7623,6 +8954,25 @@ Aliases: `python`
 - Allowed standalone flags: --color, --concurrency, --dry, --exit-code, --force, --global, --help, --init, --insecure, --interval, --json, --list, --list-all, --no-color, --offline, --parallel, --silent, --status, --summary, --verbose, --version, --watch, -C, -d, -f, -g, -h, -i, -j, -l, -n, -p, -s, -t, -v, -w, -a
 - Allowed valued flags: --dir, --output, --taskfile, -d, -o, -t
 
+### `tcc`
+<p class="cmd-url"><a href="https://bellard.org/tcc/tcc-doc.html">https://bellard.org/tcc/tcc-doc.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h, -v
+
+### `tclsh`
+<p class="cmd-url"><a href="https://www.tcl-lang.org/man/tcl/UserCmd/tclsh.htm">https://www.tcl-lang.org/man/tcl/UserCmd/tclsh.htm</a></p>
+
+Aliases: `wish`
+
+- Allowed standalone flags: --help, --version, -h
+
+### `tcpdump`
+<p class="cmd-url"><a href="https://www.tcpdump.org/manpages/tcpdump.1.html">https://www.tcpdump.org/manpages/tcpdump.1.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -A, -B, -C, -D, -G, -K, -L, -M, -N, -O, -P, -Q, -S, -U, -W, -X, -Z, -c, -d, -e, -f, -h, -i, -j, -l, -n, -p, -q, -r, -s, -t, -u, -v, -w, -x, -y
+- Allowed valued flags: --immediate-mode, --snapshot-length, --time-stamp-precision, --time-stamp-type, -B, -c, -C, -E, -F, -G, -i, -j, -M, -Q, -r, -s, -T, -w, -W, -y, -z, -Z
+- Hyphen-prefixed positional arguments accepted
+
 ### `tea`
 <p class="cmd-url"><a href="https://gitea.com/gitea/tea">https://gitea.com/gitea/tea</a></p>
 
@@ -7777,6 +9127,17 @@ Aliases: `[`
 
 - Recursively validates the inner command.
 
+### `tkn`
+<p class="cmd-url"><a href="https://tekton.dev/docs/cli/">https://tekton.dev/docs/cli/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **pipeline describe**: Flags: --help, --last, -h, -L. Valued: --namespace, --output, -n, -o
+- **pipeline list**: Flags: --all-namespaces, --help, --no-headers, -A, -h. Valued: --namespace, --output, -n, -o
+- **pipeline logs**: Flags: --all, --follow, --help, --last, --prefix, --step, --task, --timestamps, -a, -f, -h. Valued: --namespace, --limit, -n
+- **version**: Flags: --client, --component, --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `tldr`
 <p class="cmd-url"><a href="https://tldr.sh/">https://tldr.sh/</a></p>
 
@@ -7788,6 +9149,16 @@ Aliases: `[`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/tmux.1.html">https://man7.org/linux/man-pages/man1/tmux.1.html</a></p>
 
 - Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, list-keys, list-commands, show-options, show-environment, display-message, info, has-session, start-server. Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, kill-server, attach-session, detach-client, switch-client, new-window, split-window, select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, set-option, set-environment, send-keys. Delegation: run-shell, if-shell, pipe-pane, confirm-before (recursively validates inner commands).
+
+### `tns`
+<p class="cmd-url"><a href="https://docs.nativescript.org/CLI">https://docs.nativescript.org/CLI</a></p>
+
+Aliases: `ns`, `nativescript`
+
+- **doctor**: Flags: --help, -h
+- **help**: Positional args accepted
+- **info**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `todoist`
 <p class="cmd-url"><a href="https://github.com/Doist/todoist-cli">https://github.com/Doist/todoist-cli</a></p>
@@ -7883,6 +9254,14 @@ Aliases: `traceroute6`
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
 
+### `truffle`
+<p class="cmd-url"><a href="https://archive.trufflesuite.com/docs/truffle/reference/truffle-commands/">https://archive.trufflesuite.com/docs/truffle/reference/truffle-commands/</a></p>
+
+- **help**: Positional args accepted
+- **networks**: Flags: --clean, --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `ts`
 <p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
 
@@ -7900,6 +9279,13 @@ Aliases: `traceroute6`
 
 - Requires --help, --noEmit, --version, -h, -v. - Allowed standalone flags: --allowJs, --checkJs, --esModuleInterop, --forceConsistentCasingInFileNames, --help, --incremental, --isolatedModules, --noEmit, --noFallthroughCasesInSwitch, --noImplicitAny, --noImplicitReturns, --noUnusedLocals, --noUnusedParameters, --pretty, --resolveJsonModule, --skipLibCheck, --strict, --strictNullChecks, --version, -h, -v
 - Allowed valued flags: --baseUrl, --jsx, --lib, --module, --moduleResolution, --project, --rootDir, --target
+
+### `tshark`
+<p class="cmd-url"><a href="https://www.wireshark.org/docs/man-pages/tshark.html">https://www.wireshark.org/docs/man-pages/tshark.html</a></p>
+
+- Allowed standalone flags: --help, --version, --list-time-stamp-types, -?, -2, -A, -B, -D, -F, -K, -L, -M, -N, -O, -P, -Q, -S, -T, -U, -V, -W, -X, -Y, -Z, -a, -b, -c, -C, -d, -e, -E, -f, -h, -i, -j, -l, -n, -o, -p, -q, -r, -s, -t, -u, -v, -w, -x, -y, -z
+- Allowed valued flags: -A, -B, -D, -F, -G, -N, -O, -P, -S, -T, -W, -X, -Y, -Z, -b, -c, -C, -d, -e, -E, -f, -i, -j, -l, -n, -o, -p, -r, -s, -t, -w, -y, -z
+- Hyphen-prefixed positional arguments accepted
 
 ### `tsup`
 <p class="cmd-url"><a href="https://tsup.egoist.dev/">https://tsup.egoist.dev/</a></p>
@@ -7978,6 +9364,11 @@ Aliases: `traceroute6`
 - Allowed standalone flags: --all, --help, --kernel-name, --kernel-release, --kernel-version, --machine, --nodename, --operating-system, --processor, --version, -V, -a, -h, -m, -n, -o, -p, -r, -s, -v
 - Bare invocation allowed
 
+### `unbuffer`
+<p class="cmd-url"><a href="https://core.tcl-lang.org/expect/">https://core.tcl-lang.org/expect/</a></p>
+
+- Allowed standalone flags: --help, -h
+
 ### `unexpand`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#unexpand-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#unexpand-invocation</a></p>
 
@@ -8032,6 +9423,13 @@ Aliases: `traceroute6`
 - **tool list**: Flags: --help, --verbose, -h, -v. Valued: --python
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `vacuumdb`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-vacuumdb.html">https://www.postgresql.org/docs/current/app-vacuumdb.html</a></p>
+
+- Allowed standalone flags: --all, --analyze, --analyze-in-stages, --analyze-only, --buffer-usage-limit, --disable-page-skipping, --echo, --force-index-cleanup, --full, --help, --index-cleanup, --jobs, --maintenance-db, --min-mxid-age, --min-xid-age, --missing-stats-only, --no-index-cleanup, --no-process-main, --no-process-toast, --no-truncate, --password, --no-password, --quiet, --schema, --exclude-schema, --skip-locked, --table, --truncate, --verbose, --version, -?, -F, -N, -P, -Q, -V, -Z, -a, -d, -e, -f, -h, -j, -n, -p, -q, -t, -U, -v, -w, -W, -z
+- Allowed valued flags: --buffer-usage-limit, --dbname, --exclude-schema, --host, --jobs, --maintenance-db, --min-mxid-age, --min-xid-age, --port, --schema, --table, --username, -d, -h, -j, -n, -p, -t, -U
+- Bare invocation allowed
+
 ### `vagrant`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/vagrant/docs/cli">https://developer.hashicorp.com/vagrant/docs/cli</a></p>
 
@@ -8078,6 +9476,21 @@ Aliases: `traceroute6`
 - **status**: Flags: --format, --help, -h. Valued: --address, --format
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `vcpkg`
+<p class="cmd-url"><a href="https://learn.microsoft.com/en-us/vcpkg/commands/common-options">https://learn.microsoft.com/en-us/vcpkg/commands/common-options</a></p>
+
+- **depend-info**: Positional args accepted
+- **env**: Positional args accepted
+- **find**: Positional args accepted
+- **hash**: Positional args accepted
+- **help**: Positional args accepted
+- **list**: Positional args accepted
+- **owns**: Positional args accepted
+- **portsdiff**: Positional args accepted
+- **search**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
 
 ### `vegeta`
 <p class="cmd-url"><a href="https://github.com/tsenart/vegeta">https://github.com/tsenart/vegeta</a></p>
@@ -8188,6 +9601,13 @@ Aliases: `traceroute6`
 
 - Allowed standalone flags: --help, --ignore-decorators, --ignore-names, --make-whitelist, --sort-by-size, --verbose, --version, -h, -v
 - Allowed valued flags: --config, --exclude, --min-confidence
+
+### `vyper`
+<p class="cmd-url"><a href="https://docs.vyperlang.org/en/latest/compiling-a-contract.html">https://docs.vyperlang.org/en/latest/compiling-a-contract.html</a></p>
+
+- Allowed standalone flags: --abi, --abi-python, --asm, --ast, --bin-runtime, --bytecode, --bytecode-runtime, --combined-json, --debug, --devdoc, --external-interface, --help, --hex-ir, --interface, --ir, --metadata, --no-bytecode-metadata, --opcodes, --opcodes-runtime, --source-map, --standard-json, --storage-layout, --traceback, --userdoc, --version, -f, -h
+- Allowed valued flags: --evm-version, -f, --no-optimize, --optimize, --output-dir, --output-format, --storage-layout, -O, -o, -p, --root-folder
+- Hyphen-prefixed positional arguments accepted
 
 ### `w`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/w.1.html">https://man7.org/linux/man-pages/man1/w.1.html</a></p>
@@ -8316,6 +9736,13 @@ Aliases: `traceroute6`
 - Allowed valued flags: --files0-from
 - Bare invocation allowed
 
+### `weasyprint`
+<p class="cmd-url"><a href="https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#command-line-api">https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#command-line-api</a></p>
+
+- Allowed standalone flags: --debug, --encoding, --full-fonts, --help, --info, --media-type, --optimize-images, --pdf-forms, --pdf-identifier, --pdf-variant, --pdf-version, --presentational-hints, --quiet, --srgb, --timeout, --uncompressed-pdf, --verbose, --version, -D, -c, -d, -e, -f, -h, -m, -n, -O, -o, -p, -q, -s, -t, -u, -v
+- Allowed valued flags: --base-url, --encoding, --media-type, --optimize-size, --pdf-identifier, --pdf-variant, --pdf-version, --stylesheet, --timeout, -c, -e, -f, -m, -O, -o, -s, -t, -u
+- Hyphen-prefixed positional arguments accepted
+
 ### `webpack`
 <p class="cmd-url"><a href="https://webpack.js.org/api/cli/">https://webpack.js.org/api/cli/</a></p>
 
@@ -8347,6 +9774,13 @@ Aliases: `traceroute6`
 - **show**: Flags: --help, -h. Positional args accepted
 - **showconf**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+### `wget`
+<p class="cmd-url"><a href="https://www.gnu.org/software/wget/">https://www.gnu.org/software/wget/</a></p>
+
+- Allowed standalone flags: --ask-password, --auth-no-challenge, --background, --backup-converted, --backups, --cache, --certificate-type, --check-certificate, --config, --connect-timeout, --content-disposition, --continue, --convert-file-only, --convert-links, --cookies, --cut-dirs, --debug, --delete-after, --directory-prefix, --dns-cache, --dns-timeout, --dont-remove-listing, --egd-file, --exclude-directories, --exclude-domains, --execute, --follow-ftp, --follow-tags, --force-directories, --force-html, --ftp-password, --ftp-stmlf, --ftp-user, --header, --help, --hsts, --hsts-file, --html-extension, --http-keep-alive, --http-password, --http-user, --ignore-case, --ignore-length, --ignore-tags, --include-directories, --inet4-only, --inet6-only, --input-file, --input-metalink, --keep-badhash, --keep-session-cookies, --level, --limit-rate, --load-cookies, --local-encoding, --max-redirect, --metalink-index, --metalink-over-http, --mirror, --no-check-certificate, --no-clobber, --no-config, --no-cookies, --no-directories, --no-dns-cache, --no-glob, --no-host-directories, --no-hsts, --no-http-keep-alive, --no-iri, --no-parent, --no-passive-ftp, --no-proxy, --no-remove-listing, --no-use-server-timestamps, --no-verbose, --no-warc-compression, --no-warc-digests, --no-warc-keep-log, --output-document, --output-file, --page-requisites, --passive-ftp, --password, --post-data, --post-file, --prefer-family, --preserve-permissions, --private-key-type, --progress, --protocol-directories, --proxy, --proxy-password, --proxy-user, --quiet, --quota, --random-file, --random-wait, --read-timeout, --recursive, --referer, --regex-type, --reject, --reject-regex, --rejected-log, --relative, --remote-encoding, --report-speed, --restrict-file-names, --retr-symlinks, --retry-connrefused, --retry-on-http-error, --save-cookies, --save-headers, --server-response, --show-progress, --span-hosts, --spider, --start-pos, --strict-comments, --timeout, --timestamping, --tries, --unlink, --use-askpass, --use-server-timestamps, --user, --user-agent, --verbose, --version, --wait, --waitretry, --warc-cdx, --warc-dedup, --warc-file, --warc-header, --warc-max-size, --warc-tempdir, --xattr, -4, -6, -A, -B, -D, -E, -F, -H, -I, -K, -L, -N, -O, -P, -Q, -R, -S, -T, -U, -V, -X, -Y, -a, -b, -c, -d, -e, -h, -i, -k, -l, -m, -nc, -nd, -nh, -nv, -o, -p, -q, -r, -s, -t, -v, -w, -x, -Z
+- Allowed valued flags: --certificate, --certificate-type, --ciphers, --config, --connect-timeout, --cookies, --crl-file, --cut-dirs, --dns-servers, --dns-timeout, --domains, --exclude-directories, --exclude-domains, --execute, --follow-tags, --ftp-password, --ftp-user, --header, --http-password, --http-user, --ignore-tags, --include-directories, --input-file, --input-metalink, --limit-rate, --load-cookies, --local-encoding, --max-redirect, --metalink-index, --output-document, --output-file, --password, --post-data, --post-file, --prefer-family, --preferred-location, --private-key, --progress, --proxy-password, --proxy-user, --quota, --random-file, --read-timeout, --referer, --regex-type, --reject, --reject-regex, --rejected-log, --remote-encoding, --restrict-file-names, --retry-on-http-error, --save-cookies, --secure-protocol, --start-pos, --timeout, --tries, --user, --user-agent, --wait, --waitretry, --warc-file, --warc-header, --warc-max-size, --warc-tempdir, -A, -B, -D, -I, -O, -P, -Q, -R, -T, -U, -X, -a, -e, -i, -l, -o, -t, -w
+- Hyphen-prefixed positional arguments accepted
 
 ### `whenever`
 <p class="cmd-url"><a href="https://github.com/javan/whenever">https://github.com/javan/whenever</a></p>
@@ -8381,6 +9815,13 @@ Aliases: `traceroute6`
 
 - Allowed standalone flags: --help, --version, -A, -B, -G, -H, -I, -K, -L, -M, -Q, -R, -S, -a, -b, -c, -d, -f, -g, -l, -m, -r, -x
 - Allowed valued flags: -T, -V, -h, -i, -p, -s, -t
+
+### `wkhtmltopdf`
+<p class="cmd-url"><a href="https://wkhtmltopdf.org/usage/wkhtmltopdf.txt">https://wkhtmltopdf.org/usage/wkhtmltopdf.txt</a></p>
+
+- Allowed standalone flags: --collate, --no-collate, --cookie-jar, --copies, --dpi, --extended-help, --grayscale, --help, --htmldoc, --ignore-load-errors, --image-dpi, --image-quality, --license, --log-level, --lowquality, --manpage, --margin-bottom, --margin-left, --margin-right, --margin-top, --no-pdf-compression, --orientation, --page-height, --page-size, --page-width, --print-media-type, --quiet, --read-args-from-stdin, --readme, --resolve-relative-links, --title, --user-style-sheet, --version, -B, -L, -O, -R, -T, -V, -d, -g, -h, -l, -q, -s
+- Allowed valued flags: --allow, --cache-dir, --cookie, --cookie-jar, --custom-header, --default-header, --encoding, --exclude-from-outline, --footer-center, --footer-font-name, --footer-font-size, --footer-html, --footer-left, --footer-line, --footer-right, --footer-spacing, --header-center, --header-font-name, --header-font-size, --header-html, --header-left, --header-line, --header-right, --header-spacing, --javascript-delay, --load-error-handling, --load-media-error-handling, --margin-bottom, --margin-left, --margin-right, --margin-top, --orientation, --outline-depth, --page-offset, --password, --proxy, --proxy-hostname-lookup, --username, --user-style-sheet, --zoom, -B, -L, -O, -R, -T, -d, -l, -s
+- Hyphen-prefixed positional arguments accepted
 
 ### `workon`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/workon">https://github.com/michaeldhopkins/workon</a></p>
@@ -8422,6 +9863,14 @@ Aliases: `traceroute6`
 - Allowed valued flags: --renderer
 - Bare invocation allowed
 
+### `xclip`
+<p class="cmd-url"><a href="https://github.com/astrand/xclip">https://github.com/astrand/xclip</a></p>
+
+- Allowed standalone flags: --help, --version, -help, -d, -display, -f, -filter, -h, -i, -in, -l, -loops, -o, -out, -quiet, -rmlastnl, -silent, -target, -v, -verbose
+- Allowed valued flags: -display, -loops, -selection, -target
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `xcode-select`
 <p class="cmd-url"><a href="https://ss64.com/mac/xcode-select.html">https://ss64.com/mac/xcode-select.html</a></p>
 
@@ -8460,6 +9909,13 @@ Aliases: `traceroute6`
 - **simctl list**: Positional args accepted
 - **stapler validate**: Positional args accepted
 
+### `xh`
+<p class="cmd-url"><a href="https://github.com/ducaale/xh">https://github.com/ducaale/xh</a></p>
+
+- Allowed standalone flags: --all, --auth-type, --bearer, --body, --check-status, --continue, --curl, --curl-long, --debug, --download, --follow, --form, --headers, --help, --ignore-netrc, --ignore-stdin, --insecure, --json, --multipart, --no-style, --offline, --overwrite, --print, --quiet, --raw, --stream, --style, --verbose, --version, -?, -A, -F, -I, -S, -b, -c, -d, -f, -h, -j, -m, -o, -p, -q, -s, -v
+- Allowed valued flags: --auth, --auth-type, --bearer, --cert, --cert-key, --max-redirects, --max-redirects, --output, --print, --proxy, --read-config, --session, --session-read-only, --ssl, --style, --timeout, --verify, -A, -a, -o, -p
+- Hyphen-prefixed positional arguments accepted
+
 ### `xmake`
 <p class="cmd-url"><a href="https://xmake.io/#/manual/builtin_commands">https://xmake.io/#/manual/builtin_commands</a></p>
 
@@ -8480,6 +9936,14 @@ Aliases: `traceroute6`
 
 - Allowed standalone flags: --compact-output, --exit-status, --help, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --version, --xml-output, -C, -M, -R, -S, -V, -c, -e, -h, -n, -r, -s, -x
 - Allowed valued flags: --arg, --argjson, --indent, --xml-dtd, --xml-item-depth, --xml-root, -f
+
+### `xsel`
+<p class="cmd-url"><a href="https://github.com/kfish/xsel">https://github.com/kfish/xsel</a></p>
+
+- Allowed standalone flags: --append, --clear, --clipboard, --delete, --display, --exchange, --follow, --help, --input, --keep, --logfile, --nodetach, --nodaemon, --output, --primary, --secondary, --selection-name, --trailing-newline, --verbose, --version, --zeroflush, -?, -a, -b, -c, -d, -f, -h, -i, -k, -l, -n, -o, -p, -r, -s, -t, -v, -x
+- Allowed valued flags: --display, --logfile, --selection-name
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
 
 ### `xsv`
 <p class="cmd-url"><a href="https://github.com/BurntSushi/xsv">https://github.com/BurntSushi/xsv</a></p>
@@ -8554,6 +10018,11 @@ Aliases: `unxz`, `xzcat`, `lzma`, `unlzma`, `lzcat`
 - **why**: Flags: --help, --json, -h
 - Allowed arguments: test, test:*
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `yo`
+<p class="cmd-url"><a href="https://yeoman.io/">https://yeoman.io/</a></p>
+
+- Allowed standalone flags: --help, --generators, --version, -h, -v
 
 ### `yq`
 <p class="cmd-url"><a href="https://mikefarah.gitbook.io/yq">https://mikefarah.gitbook.io/yq</a></p>

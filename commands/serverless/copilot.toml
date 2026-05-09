@@ -1,0 +1,176 @@
+[[command]]
+name = "copilot"
+description = "AWS Copilot CLI — deploys containerized apps. Most subcommands deploy / inspect AWS resources (network). Read-side: `--version`, `version`, `app ls/show`, `env ls/show`, `svc ls/show`, `job ls`, `pipeline ls/show`, `task ls`. Write-side: `init`, `deploy`, `app init/delete`, `env init/delete/upgrade/override`, `svc init/deploy/delete/exec/logs/pause/resume/status`, `job init/deploy/delete/logs/run`, `pipeline init/deploy/delete/override`, `secret init`, `task run/exec/delete`, `storage init`."
+url = "https://aws.github.io/copilot-cli/docs/commands/"
+researched_version = "AWS Copilot 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "app"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+valued = ["--profile"]
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "--json", "--resources", "-h"]
+valued = ["--profile"]
+
+[[command.sub.sub]]
+name = "init"
+candidate = true
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "env"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "--json", "--manifest", "--resources", "-h"]
+
+[[command.sub.sub]]
+name = "init"
+candidate = true
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub.sub]]
+name = "override"
+candidate = true
+
+[[command.sub.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub.sub]]
+name = "package"
+candidate = true
+
+[[command.sub]]
+name = "svc"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "--json", "--manifest", "--resources", "-h"]
+
+[[command.sub.sub]]
+name = "logs"
+standalone = ["--help", "--follow", "--json", "-f", "-h"]
+valued = ["--app", "--end-time", "--filter", "--limit", "--name", "--start-time"]
+
+[[command.sub.sub]]
+name = "init"
+candidate = true
+
+[[command.sub.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub.sub]]
+name = "pause"
+candidate = true
+
+[[command.sub.sub]]
+name = "resume"
+candidate = true
+
+[[command.sub.sub]]
+name = "status"
+candidate = true
+
+[[command.sub.sub]]
+name = "package"
+candidate = true
+
+[[command.sub.sub]]
+name = "override"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "job"
+candidate = true
+
+[[command.sub]]
+name = "pipeline"
+candidate = true
+
+[[command.sub]]
+name = "secret"
+candidate = true
+
+[[command.sub]]
+name = "task"
+candidate = true
+
+[[command.sub]]
+name = "storage"
+candidate = true
+
+[[command.sub]]
+name = "docs"
+candidate = true
+
+[[command.sub]]
+name = "feedback"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true

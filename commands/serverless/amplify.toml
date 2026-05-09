@@ -1,0 +1,180 @@
+[[command]]
+name = "amplify"
+description = "AWS Amplify CLI. Most subcommands modify cloud resources (network + external system writes). Read-side: `--version`, `status`, `init --check`, `env list`, `env get`, `function list`, `auth list`, `api list`, `storage list`, `hosting list`, `model-intospect list`, `predictions list`. Write-side: `init`, `push`, `pull`, `publish`, `add`, `remove`, `update`, `configure`, `delete`, `console`, `mock`, `serve`, `notifications`, `team-provider-info`, `override`, `function`, `api`, `storage`, `hosting`, `auth`, `predictions`, `analytics`, `notifications`, `storage`, `xr`. Carve-out covers diagnostic / read."
+url = "https://docs.amplify.aws/gen1/javascript/tools/cli/usage/"
+researched_version = "AWS Amplify CLI 12.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--debug", "--help", "--verbose", "-h", "-v"]
+valued = ["--profile"]
+
+[[command.sub]]
+name = "env"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "checkout"
+candidate = true
+
+[[command.sub.sub]]
+name = "add"
+candidate = true
+
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub.sub]]
+name = "import"
+candidate = true
+
+[[command.sub.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "configure"
+candidate = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "console"
+candidate = true
+
+[[command.sub]]
+name = "mock"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "function"
+candidate = true
+
+[[command.sub]]
+name = "api"
+candidate = true
+
+[[command.sub]]
+name = "storage"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "hosting"
+candidate = true
+
+[[command.sub]]
+name = "predictions"
+candidate = true
+
+[[command.sub]]
+name = "analytics"
+candidate = true
+
+[[command.sub]]
+name = "notifications"
+candidate = true
+
+[[command.sub]]
+name = "geo"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "model-introspection"
+candidate = true
+
+[[command.sub]]
+name = "override"
+candidate = true
+
+[[command.sub]]
+name = "team-provider-info"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "diagnose"
+candidate = true
+
+[[command.sub]]
+name = "telemetry"
+candidate = true
+
+[[command.sub]]
+name = "feedback"
+candidate = true

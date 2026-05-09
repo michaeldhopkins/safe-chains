@@ -1,0 +1,9 @@
+[[command]]
+name = "pdftk"
+description = "PDF Toolkit — splits / merges / encrypts / fills forms in PDFs. Reads input PDFs and writes the output to the path after `output`. Pure document transformation — does not execute embedded JS."
+url = "https://www.pdflabs.com/docs/pdftk-cli-examples/"
+researched_version = "pdftk 3.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-h"]

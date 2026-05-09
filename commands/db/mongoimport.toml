@@ -1,0 +1,42 @@
+[[command]]
+name = "mongoimport"
+description = "MongoDB import utility. Reads JSON/CSV/TSV files and writes documents to the configured cluster (network + external system write)."
+url = "https://www.mongodb.com/docs/database-tools/mongoimport/"
+researched_version = "MongoDB Database Tools 100.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--authenticationDatabase", "--authenticationMechanism",
+    "--bypassDocumentValidation", "--collection",
+    "--columnsHaveTypes", "--db",
+    "--drop", "--file", "--headerline",
+    "--help", "--ignoreBlanks", "--ipv6",
+    "--jsonArray", "--legacy", "--maintainInsertionOrder",
+    "--mode", "--numInsertionWorkers", "--objcheck",
+    "--password", "--port", "--quiet",
+    "--readPreference", "--ssl",
+    "--sslAllowInvalidCertificates",
+    "--sslAllowInvalidHostnames",
+    "--stopOnError", "--type",
+    "--upsert", "--upsertFields",
+    "--username", "--verbose", "--version",
+    "--writeConcern",
+    "-c", "-d", "-f", "-h",
+    "-j", "-p", "-u", "-v",
+]
+valued = [
+    "--authenticationDatabase",
+    "--authenticationMechanism", "--collection",
+    "--columnsHaveTypes", "--config",
+    "--db", "--file", "--fields", "--fieldFile",
+    "--gssapiHostName", "--gssapiServiceName",
+    "--host", "--mode", "--numInsertionWorkers",
+    "--parseGrace", "--password", "--port",
+    "--query", "--readPreference",
+    "--sslCAFile", "--sslCRLFile",
+    "--sslPEMKeyFile", "--sslPEMKeyPassword",
+    "--tlsCertificateKeyFile", "--tlsCAFile",
+    "--type", "--upsertFields", "--uri",
+    "--username", "--writeConcern",
+    "-c", "-d", "-f", "-h", "-j", "-p", "-u",
+]

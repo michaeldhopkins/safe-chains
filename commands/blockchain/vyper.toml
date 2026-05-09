@@ -1,0 +1,28 @@
+[[command]]
+name = "vyper"
+description = "Vyper smart contract compiler. Reads .vy source and writes compiled bytecode / ABI."
+url = "https://docs.vyperlang.org/en/latest/compiling-a-contract.html"
+researched_version = "Vyper 0.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--abi", "--abi-python", "--asm",
+    "--ast", "--bin-runtime", "--bytecode",
+    "--bytecode-runtime", "--combined-json",
+    "--debug", "--devdoc", "--external-interface",
+    "--help", "--hex-ir", "--interface",
+    "--ir", "--metadata",
+    "--no-bytecode-metadata", "--opcodes",
+    "--opcodes-runtime", "--source-map",
+    "--standard-json", "--storage-layout",
+    "--traceback", "--userdoc", "--version",
+    "-f", "-h",
+]
+valued = [
+    "--evm-version", "-f",
+    "--no-optimize", "--optimize",
+    "--output-dir", "--output-format",
+    "--storage-layout", "-O", "-o",
+    "-p", "--root-folder",
+]

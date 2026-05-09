@@ -1,0 +1,9 @@
+[[command]]
+name = "yo"
+description = "Yeoman generator runner. Each invocation runs an installed generator (`yo GENERATOR`), which is arbitrary user-supplied code. Carve-out: --version / --help / `yo --generators` (lists installed generators)."
+url = "https://yeoman.io/"
+researched_version = "yo 5.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--generators", "--version", "-h", "-v"]

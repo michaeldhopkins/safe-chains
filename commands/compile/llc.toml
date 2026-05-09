@@ -1,0 +1,9 @@
+[[command]]
+name = "llc"
+description = "LLVM static compiler — compiles LLVM IR (.ll / .bc) to native assembly or object code. Reads IR, writes asm/.o."
+url = "https://llvm.org/docs/CommandGuide/llc.html"
+researched_version = "LLVM 18.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-?", "-h", "-v"]

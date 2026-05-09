@@ -1,0 +1,137 @@
+[[command]]
+name = "ionic"
+description = "Ionic Framework CLI. Subcommands: `start`, `serve`, `build`, `generate`, `init`, `info`, `doctor`, `link`, `login`, `logout`, `whoami`, `signup`, `cordova`, `capacitor`, `cap`, `monitoring`, `ssl`, `enterprise`, `config`, `lab`, `tail`, `repair`. Most subcommands run user code, build, or contact Ionic / cloud services. Read-side: `info`, `doctor`, `whoami`, `config get/print`, `--version`, `--help`."
+url = "https://ionicframework.com/docs/cli"
+researched_version = "@ionic/cli 7.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "doctor"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "check"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "ignore"
+candidate = true
+
+[[command.sub.sub]]
+name = "treat"
+candidate = true
+
+[[command.sub]]
+name = "whoami"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "get"
+standalone = ["--global", "--help", "--json", "-g", "-h"]
+
+[[command.sub.sub]]
+name = "print"
+standalone = ["--global", "--help", "--json", "-g", "-h"]
+
+[[command.sub.sub]]
+name = "set"
+candidate = true
+
+[[command.sub.sub]]
+name = "unset"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "generate"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "link"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "signup"
+candidate = true
+
+[[command.sub]]
+name = "cordova"
+candidate = true
+
+[[command.sub]]
+name = "capacitor"
+candidate = true
+
+[[command.sub]]
+name = "cap"
+candidate = true
+
+[[command.sub]]
+name = "monitoring"
+candidate = true
+
+[[command.sub]]
+name = "ssl"
+candidate = true
+
+[[command.sub]]
+name = "enterprise"
+candidate = true
+
+[[command.sub]]
+name = "lab"
+candidate = true
+
+[[command.sub]]
+name = "repair"
+candidate = true

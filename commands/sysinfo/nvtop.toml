@@ -1,0 +1,9 @@
+[[command]]
+name = "nvtop"
+description = "GPU process monitor (NVIDIA / AMD / Intel). Interactive TUI. Carve-out: --version / --help only."
+url = "https://github.com/Syllo/nvtop"
+researched_version = "nvtop 3.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

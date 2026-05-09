@@ -1,0 +1,9 @@
+[[command]]
+name = "lli"
+description = "LLVM bitcode interpreter — runs LLVM IR via JIT or interpreter. Each invocation executes the IR as a program (arbitrary code). Carve-out: --version / --help only."
+url = "https://llvm.org/docs/CommandGuide/lli.html"
+researched_version = "LLVM 18.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-?", "-h", "-v"]

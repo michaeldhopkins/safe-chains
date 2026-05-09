@@ -1,0 +1,69 @@
+[[command]]
+name = "home-manager"
+description = "Home Manager — manages a user's dotfiles / packages via Nix. Subcommands: `switch` (build + activate), `build` (build only), `news` (show news), `expire-generations`, `instantiate`, `init`, `edit`, `option`, `packages`, `generations`, `remove-generations`, `uninstall`. Read-side: `news`, `option`, `packages`, `generations`, `instantiate --read-only`, `--help`, `--version`. Write-side: `switch`, `build`, `init`, `edit`, `expire-generations`, `remove-generations`, `uninstall` (system-state writes + network)."
+url = "https://nix-community.github.io/home-manager/"
+researched_version = "home-manager 24.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "news"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--info", "-h"]
+valued = ["--flake"]
+
+[[command.sub]]
+name = "option"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--flake"]
+
+[[command.sub]]
+name = "packages"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "generations"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "switch"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "instantiate"
+candidate = true
+
+[[command.sub]]
+name = "expire-generations"
+candidate = true
+
+[[command.sub]]
+name = "remove-generations"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true

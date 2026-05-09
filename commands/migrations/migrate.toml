@@ -1,0 +1,38 @@
+[[command]]
+name = "migrate"
+description = "golang-migrate CLI. Subcommands: `up`, `down`, `drop`, `force`, `goto`, `version`, `create`. Read-side: `version`. Write-side: `up/down/drop/force/goto/create` — all execute SQL or write files."
+url = "https://github.com/golang-migrate/migrate"
+researched_version = "golang-migrate 4.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "up"
+candidate = true
+
+[[command.sub]]
+name = "down"
+candidate = true
+
+[[command.sub]]
+name = "drop"
+candidate = true
+
+[[command.sub]]
+name = "force"
+candidate = true
+
+[[command.sub]]
+name = "goto"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true

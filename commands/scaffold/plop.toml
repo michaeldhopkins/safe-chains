@@ -1,0 +1,9 @@
+[[command]]
+name = "plop"
+description = "Plop — micro-generator framework. Each invocation runs a plopfile.js (arbitrary JS) plus the selected generator's actions. Carve-out: --version / --help only."
+url = "https://plopjs.com/documentation/"
+researched_version = "plop 4.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

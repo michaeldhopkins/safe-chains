@@ -1,0 +1,10 @@
+[[command]]
+name = "emcc"
+aliases = ["em++"]
+description = "Emscripten C/C++ compiler — compiles to WebAssembly / asm.js. Same flag conventions as gcc/clang. Reads source files and writes the compiled .js / .wasm / .html / .o output. Plugins / preprocessor macros load arbitrary code at compile time. The em++ alias targets C++."
+url = "https://emscripten.org/docs/tools_reference/emcc.html"
+researched_version = "Emscripten 3.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-?", "-h", "-v"]

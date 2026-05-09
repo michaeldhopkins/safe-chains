@@ -1,0 +1,18 @@
+[[command]]
+name = "nix-prefetch-url"
+description = "Downloads a file from a URL into the Nix store and prints its content hash. Network operation; writes to the Nix store cache. The diagnostic --help / --version are read-only."
+url = "https://nix.dev/manual/nix/latest/command-ref/nix-prefetch-url.html"
+researched_version = "Nix 2.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--debug", "--help",
+    "--name", "--print-path", "--quiet",
+    "--type", "--unpack",
+    "--version",
+    "-h",
+]
+valued = [
+    "--name", "--type",
+]

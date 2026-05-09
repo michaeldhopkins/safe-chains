@@ -1,0 +1,20 @@
+[[command]]
+name = "clusterdb"
+description = "PostgreSQL — clusters a database (re-orders rows by an index). External-system write."
+url = "https://www.postgresql.org/docs/current/app-clusterdb.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--all", "--echo", "--help",
+    "--maintenance-db", "--no-password",
+    "--password", "--quiet", "--table",
+    "--verbose", "--version",
+    "-?", "-V", "-a", "-d", "-e", "-h",
+    "-p", "-q", "-t", "-U", "-v", "-w", "-W",
+]
+valued = [
+    "--dbname", "--host", "--maintenance-db",
+    "--port", "--table", "--username",
+    "-d", "-h", "-p", "-t", "-U",
+]

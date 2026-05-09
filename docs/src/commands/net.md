@@ -1,5 +1,27 @@
 # Networking
 
+### `aria2c`
+<p class="cmd-url"><a href="https://aria2.github.io/manual/en/html/aria2c.html">https://aria2.github.io/manual/en/html/aria2c.html</a></p>
+
+- Allowed standalone flags: --all-proxy, --allow-overwrite, --allow-piece-length-change, --always-resume, --async-dns, --auto-file-renaming, --auto-save-interval, --bt-detach-seed-only, --bt-enable-hook-after-hash-check, --bt-enable-lpd, --bt-exclude-tracker, --bt-force-encryption, --bt-hash-check-seed, --bt-load-saved-metadata, --bt-meta-data, --bt-metadata-only, --bt-min-crypto-level, --bt-prioritize-piece, --bt-remove-unselected-file, --bt-request-peer-speed-limit, --bt-require-crypto, --bt-save-metadata, --bt-seed-unverified, --bt-stop-timeout, --bt-tracker, --bt-tracker-connect-timeout, --bt-tracker-interval, --bt-tracker-timeout, --ca-certificate, --certificate, --check-certificate, --check-integrity, --checksum, --conditional-get, --conf-path, --connect-timeout, --console-log-level, --content-disposition-default-utf8, --continue, --daemon, --deferred-input, --dht-entry-point, --dht-entry-point6, --dht-file-path, --dht-file-path6, --dht-listen-addr6, --dht-listen-port, --dht-message-timeout, --dir, --disable-ipv6, --disk-cache, --dns-timeout, --download-result, --dscp, --enable-async-dns, --enable-color, --enable-dht, --enable-dht6, --enable-http-keep-alive, --enable-http-pipelining, --enable-mmap, --enable-peer-exchange, --enable-rpc, --event-poll, --exclude-domains, --exclude-paths, --ftp-passwd, --ftp-pasv, --ftp-proxy, --ftp-user, --header, --help, --http-accept-gzip, --http-auth-challenge, --http-no-cache, --http-passwd, --http-proxy, --http-user, --https-proxy, --human-readable, --index-out, --input-file, --keep-unfinished-download-result, --listen-port, --load-cookies, --log, --log-level, --lowest-speed-limit, --max-concurrent-downloads, --max-connection-per-server, --max-download-limit, --max-download-result, --max-file-not-found, --max-mmap-limit, --max-overall-download-limit, --max-overall-upload-limit, --max-resume-failure-tries, --max-tries, --max-upload-limit, --metalink-base-uri, --metalink-enable-unique-protocol, --metalink-file, --metalink-language, --metalink-location, --metalink-os, --metalink-preferred-protocol, --metalink-server, --metalink-version, --min-split-size, --min-tls-version, --multiple-interface, --netrc-path, --no-conf, --no-file-allocation-limit, --no-netrc, --no-want-digest-header, --on-bt-download-complete, --on-download-complete, --on-download-error, --on-download-pause, --on-download-start, --on-download-stop, --out, --parameterized-uri, --pause, --pause-metadata, --peer-id-prefix, --peer-agent, --piece-length, --private-key, --proxy-method, --quiet, --realtime-chunk-checksum, --referer, --remote-time, --remove-control-file, --retry-wait, --reuse-uri, --rpc-allow-origin-all, --rpc-listen-all, --rpc-listen-port, --rpc-max-request-size, --rpc-passwd, --rpc-save-upload-metadata, --rpc-secret, --rpc-secure, --rpc-user, --save-cookies, --save-not-found, --save-session, --save-session-interval, --seed-ratio, --seed-time, --select-file, --server-stat-of, --server-stat-timeout, --show-console-readout, --show-files, --socket-recv-buffer-size, --ssh-host-key-md, --split, --stderr, --stop, --stop-with-process, --stream-piece-selector, --summary-interval, --timeout, --torrent-file, --truncate-console-readout, --uri-selector, --use-head, --user-agent, --version, -D, -V, -Z, -c, -d, -h, -i, -j, -l, -m, -n, -o, -q, -s, -t, -v, -x
+- Allowed valued flags: --all-proxy, --all-proxy-passwd, --all-proxy-user, --bt-tracker, --ca-certificate, --certificate, --checksum, --conf-path, --connect-timeout, --console-log-level, --continue, --dht-entry-point, --dht-file-path, --dir, --disk-cache, --dns-timeout, --exclude-paths, --ftp-passwd, --ftp-proxy, --ftp-user, --header, --http-passwd, --http-proxy, --http-user, --https-proxy, --index-out, --input-file, --listen-port, --load-cookies, --log, --log-level, --lowest-speed-limit, --max-concurrent-downloads, --max-connection-per-server, --max-download-limit, --max-overall-download-limit, --max-overall-upload-limit, --max-tries, --max-upload-limit, --metalink-file, --min-split-size, --out, --parameterized-uri, --proxy-method, --referer, --retry-wait, --rpc-listen-port, --rpc-passwd, --rpc-secret, --rpc-user, --save-cookies, --save-session, --seed-ratio, --seed-time, --select-file, --server-stat-of, --split, --stderr, --summary-interval, --timeout, --torrent-file, --uri-selector, --user-agent, -T, -U, -c, -d, -i, -j, -l, -m, -n, -o, -s, -t, -x
+- Hyphen-prefixed positional arguments accepted
+
+### `arp`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/arp.8.html">https://man7.org/linux/man-pages/man8/arp.8.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -D, -H, -I, -N, -V, -a, -d, -e, -i, -n, -s, -v
+- Allowed valued flags: -A, -H, -I, -f, -i, -s
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `arping`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/arping.8.html">https://man7.org/linux/man-pages/man8/arping.8.html</a></p>
+
+- Allowed standalone flags: --help, --version, -A, -D, -U, -V, -b, -f, -h, -q, -v
+- Allowed valued flags: -c, -I, -i, -s, -S, -T, -w
+- Hyphen-prefixed positional arguments accepted
+
 ### `autossh`
 <p class="cmd-url"><a href="https://www.harding.motd.ca/autossh/">https://www.harding.motd.ca/autossh/</a></p>
 
@@ -42,6 +64,13 @@
 
 - Allowed standalone flags: --help, --version, --hot-restart-version, -h, -?
 
+### `grpcurl`
+<p class="cmd-url"><a href="https://github.com/fullstorydev/grpcurl">https://github.com/fullstorydev/grpcurl</a></p>
+
+- Allowed standalone flags: --help, -H, -allow-unknown-fields, -authority, -cacert, -cert, -connect-timeout, -d, -emit-defaults, -expand-headers, -format, -format-error, -help, -import-path, -insecure, -keepalive-time, -key, -keysize-options, -max-msg-sz, -max-time, -msg-template, -plaintext, -proto, -protoset, -protoset-out, -rpc-header, -servername, -unix, -use-reflection, -userconfig, -v, -V, -vv, -version
+- Allowed valued flags: -H, -authority, -cacert, -cert, -connect-timeout, -d, -format, -format-error, -import-path, -keepalive-time, -key, -keysize-options, -max-msg-sz, -max-time, -msg-template, -proto, -protoset, -protoset-out, -rpc-header, -servername, -unix, -userconfig
+- Hyphen-prefixed positional arguments accepted
+
 ### `haproxy`
 <p class="cmd-url"><a href="https://docs.haproxy.org/3.0/management.html">https://docs.haproxy.org/3.0/management.html</a></p>
 
@@ -54,11 +83,62 @@
 - Allowed standalone flags: --help, --version, -4, -6, -C, -V, -a, -c, -d, -h, -l, -r, -s, -v
 - Allowed valued flags: -D, -N, -R, -T, -W, -i, -m, -t
 
+### `httpyac`
+<p class="cmd-url"><a href="https://httpyac.github.io/guide/cli.html">https://httpyac.github.io/guide/cli.html</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `hurl`
+<p class="cmd-url"><a href="https://hurl.dev/docs/manual.html">https://hurl.dev/docs/manual.html</a></p>
+
+- Allowed standalone flags: --color, --compressed, --connect-to, --continue-on-error, --cookie-jar, --curl, --debug, --error-format, --file-root, --from-entry, --glob, --help, --include, --insecure, --interactive, --ipv4, --ipv6, --json, --location, --location-trusted, --max-filesize, --max-redirs, --max-time, --negotiate, --netrc, --netrc-file, --netrc-optional, --no-color, --no-output, --ntlm, --output, --parallel, --path-as-is, --proxy, --report-html, --report-json, --report-junit, --report-tap, --repeat, --report-html-history, --resolve, --retry, --retry-interval, --ssl-no-revoke, --summary, --test, --to-entry, --unix-socket, --user, --user-agent, --variable, --variables-file, --verbose, --very-verbose, --version, -?, -4, -6, -A, -H, -L, -M, -V, -X, -b, -c, -d, -h, -i, -k, -l, -m, -n, -o, -q, -r, -s, -u, -v, -vv
+- Allowed valued flags: --cacert, --cert, --connect-to, --cookie, --cookie-jar, --delay, --error-format, --file-root, --from-entry, --glob, --key, --max-filesize, --max-redirs, --max-time, --netrc-file, --output, --parallel, --proxy, --report-html, --report-junit, --report-tap, --repeat, --resolve, --retry, --retry-interval, --socks5, --to-entry, --unix-socket, --user, --user-agent, --variable, --variables-file, --workers, -A, -H, -X, -b, -c, -d, -m, -o, -r, -u
+- Hyphen-prefixed positional arguments accepted
+
 ### `ifconfig`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/ifconfig.8.html">https://man7.org/linux/man-pages/man8/ifconfig.8.html</a></p>
 
 - Allowed standalone flags: --help, --version, -L, -V, -a, -h, -l, -s, -v
 - Bare invocation allowed
+
+### `ipfs`
+<p class="cmd-url"><a href="https://docs.ipfs.tech/reference/kubo/cli/">https://docs.ipfs.tech/reference/kubo/cli/</a></p>
+
+- **block get**: Positional args accepted
+- **block stat**: Positional args accepted
+- **bootstrap list**: Positional args accepted
+- **cat**: Positional args accepted
+- **cid**: Positional args accepted
+- **completion**: Flags: --help, -h. Positional args accepted
+- **dag get**: Positional args accepted
+- **dag resolve**: Positional args accepted
+- **dag stat**: Positional args accepted
+- **dht findpeer**: Positional args accepted
+- **dht findprovs**: Positional args accepted
+- **dht get**: Positional args accepted
+- **dht query**: Positional args accepted
+- **help**: Positional args accepted
+- **id**: Positional args accepted
+- **key list**: Positional args accepted
+- **ls**: Positional args accepted
+- **name resolve**: Positional args accepted
+- **pin ls**: Positional args accepted
+- **pin verify**: Positional args accepted
+- **refs**: Positional args accepted
+- **repo stat**: Positional args accepted
+- **repo verify**: Positional args accepted
+- **repo version**: Positional args accepted
+- **swarm addrs**: Positional args accepted
+- **swarm peers**: Positional args accepted
+- **version**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `masscan`
+<p class="cmd-url"><a href="https://github.com/robertdavidgraham/masscan">https://github.com/robertdavidgraham/masscan</a></p>
+
+- Allowed standalone flags: --echo, --echo-cidr, --exclude, --excludefile, --help, --http-user-agent, --includefile, --ping, --rate, --randomize-hosts, --reason, --retries, --source-ip, --source-port, --ttl, --user-agent, --version, --wait, -?, -c, -d, -h, -iL, -iR, -oG, -oJ, -oL, -oU, -oX, -p, -v
+- Allowed valued flags: --banners, --config, --exclude, --excludefile, --http-user-agent, --includefile, --output-filename, --output-format, --rate, --readscan, --retries, --rotate, --rotate-dir, --source-ip, --source-port, --ttl, --wait, -c, -iL, -iR, -oG, -oJ, -oL, -oU, -oX, -p, -r, -w
+- Hyphen-prefixed positional arguments accepted
 
 ### `mdfind`
 <p class="cmd-url"><a href="https://ss64.com/mac/mdfind.html">https://ss64.com/mac/mdfind.html</a></p>
@@ -113,11 +193,23 @@
 
 - Allowed: positional args, -debug, -nodebug, -d2, and valued options (-type=, -query=, -port=, -timeout=, -retry=, -class=, -domain=, -querytype=).
 
+### `oha`
+<p class="cmd-url"><a href="https://github.com/hatoo/oha">https://github.com/hatoo/oha</a></p>
+
+- Allowed standalone flags: --debug, --disable-color, --disable-compression, --disable-keepalive, --http2, --help, --insecure, --ipv4, --ipv6, --latency-correction, --no-tui, --reason-codes, --stats-success-breakdown, --use-mode, --version, -A, -H, -V, -a, -c, -d, -h, -m, -n, -q, -r, -t, -z
+- Allowed valued flags: --burst-delay, --burst-rate, --connect-to, --dns-resolver, --dump-urls, --exit-stage-key, --ip-strategy, --max-redirects, --method, --output-format, --proxy, --proxy-http-version, --proxy-username, --proxy-password, --rand-regex-url, --redirect, --redirect-uri, --reproduce-rng-seed, --timeout, --unix-socket, --user-agent, --wait-ongoing-requests-after-deadline, -A, -D, -H, -T, -U, -c, -d, -m, -n, -q, -r, -t, -z
+- Hyphen-prefixed positional arguments accepted
+
 ### `ping`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/ping.8.html">https://man7.org/linux/man-pages/man8/ping.8.html</a></p>
 
 - Requires -c, --count. - Allowed standalone flags: -4, -6, -D, -O, -R, -a, -d, -n, -q, -v, --help, -h, --version, -V
 - Allowed valued flags: --count, --deadline, --interface, --interval, --ttl, -I, -Q, -S, -W, -c, -i, -l, -s, -t, -w
+
+### `protoc`
+<p class="cmd-url"><a href="https://protobuf.dev/programming-guides/proto3/">https://protobuf.dev/programming-guides/proto3/</a></p>
+
+- Allowed standalone flags: --help, --version, -h
 
 ### `route`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/route.8.html">https://man7.org/linux/man-pages/man8/route.8.html</a></p>
@@ -185,6 +277,13 @@
 
 - Allowed standalone flags: --help, --version, -h, -V
 
+### `tcpdump`
+<p class="cmd-url"><a href="https://www.tcpdump.org/manpages/tcpdump.1.html">https://www.tcpdump.org/manpages/tcpdump.1.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -A, -B, -C, -D, -G, -K, -L, -M, -N, -O, -P, -Q, -S, -U, -W, -X, -Z, -c, -d, -e, -f, -h, -i, -j, -l, -n, -p, -q, -r, -s, -t, -u, -v, -w, -x, -y
+- Allowed valued flags: --immediate-mode, --snapshot-length, --time-stamp-precision, --time-stamp-type, -B, -c, -C, -E, -F, -G, -i, -j, -M, -Q, -r, -s, -T, -w, -W, -y, -z, -Z
+- Hyphen-prefixed positional arguments accepted
+
 ### `traceroute`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/traceroute.8.html">https://man7.org/linux/man-pages/man8/traceroute.8.html</a></p>
 
@@ -201,9 +300,30 @@ Aliases: `traceroute6`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `tshark`
+<p class="cmd-url"><a href="https://www.wireshark.org/docs/man-pages/tshark.html">https://www.wireshark.org/docs/man-pages/tshark.html</a></p>
+
+- Allowed standalone flags: --help, --version, --list-time-stamp-types, -?, -2, -A, -B, -D, -F, -K, -L, -M, -N, -O, -P, -Q, -S, -T, -U, -V, -W, -X, -Y, -Z, -a, -b, -c, -C, -d, -e, -E, -f, -h, -i, -j, -l, -n, -o, -p, -q, -r, -s, -t, -u, -v, -w, -x, -y, -z
+- Allowed valued flags: -A, -B, -D, -F, -G, -N, -O, -P, -S, -T, -W, -X, -Y, -Z, -b, -c, -C, -d, -e, -E, -f, -i, -j, -l, -n, -o, -p, -r, -s, -t, -w, -y, -z
+- Hyphen-prefixed positional arguments accepted
+
+### `wget`
+<p class="cmd-url"><a href="https://www.gnu.org/software/wget/">https://www.gnu.org/software/wget/</a></p>
+
+- Allowed standalone flags: --ask-password, --auth-no-challenge, --background, --backup-converted, --backups, --cache, --certificate-type, --check-certificate, --config, --connect-timeout, --content-disposition, --continue, --convert-file-only, --convert-links, --cookies, --cut-dirs, --debug, --delete-after, --directory-prefix, --dns-cache, --dns-timeout, --dont-remove-listing, --egd-file, --exclude-directories, --exclude-domains, --execute, --follow-ftp, --follow-tags, --force-directories, --force-html, --ftp-password, --ftp-stmlf, --ftp-user, --header, --help, --hsts, --hsts-file, --html-extension, --http-keep-alive, --http-password, --http-user, --ignore-case, --ignore-length, --ignore-tags, --include-directories, --inet4-only, --inet6-only, --input-file, --input-metalink, --keep-badhash, --keep-session-cookies, --level, --limit-rate, --load-cookies, --local-encoding, --max-redirect, --metalink-index, --metalink-over-http, --mirror, --no-check-certificate, --no-clobber, --no-config, --no-cookies, --no-directories, --no-dns-cache, --no-glob, --no-host-directories, --no-hsts, --no-http-keep-alive, --no-iri, --no-parent, --no-passive-ftp, --no-proxy, --no-remove-listing, --no-use-server-timestamps, --no-verbose, --no-warc-compression, --no-warc-digests, --no-warc-keep-log, --output-document, --output-file, --page-requisites, --passive-ftp, --password, --post-data, --post-file, --prefer-family, --preserve-permissions, --private-key-type, --progress, --protocol-directories, --proxy, --proxy-password, --proxy-user, --quiet, --quota, --random-file, --random-wait, --read-timeout, --recursive, --referer, --regex-type, --reject, --reject-regex, --rejected-log, --relative, --remote-encoding, --report-speed, --restrict-file-names, --retr-symlinks, --retry-connrefused, --retry-on-http-error, --save-cookies, --save-headers, --server-response, --show-progress, --span-hosts, --spider, --start-pos, --strict-comments, --timeout, --timestamping, --tries, --unlink, --use-askpass, --use-server-timestamps, --user, --user-agent, --verbose, --version, --wait, --waitretry, --warc-cdx, --warc-dedup, --warc-file, --warc-header, --warc-max-size, --warc-tempdir, --xattr, -4, -6, -A, -B, -D, -E, -F, -H, -I, -K, -L, -N, -O, -P, -Q, -R, -S, -T, -U, -V, -X, -Y, -a, -b, -c, -d, -e, -h, -i, -k, -l, -m, -nc, -nd, -nh, -nv, -o, -p, -q, -r, -s, -t, -v, -w, -x, -Z
+- Allowed valued flags: --certificate, --certificate-type, --ciphers, --config, --connect-timeout, --cookies, --crl-file, --cut-dirs, --dns-servers, --dns-timeout, --domains, --exclude-directories, --exclude-domains, --execute, --follow-tags, --ftp-password, --ftp-user, --header, --http-password, --http-user, --ignore-tags, --include-directories, --input-file, --input-metalink, --limit-rate, --load-cookies, --local-encoding, --max-redirect, --metalink-index, --output-document, --output-file, --password, --post-data, --post-file, --prefer-family, --preferred-location, --private-key, --progress, --proxy-password, --proxy-user, --quota, --random-file, --read-timeout, --referer, --regex-type, --reject, --reject-regex, --rejected-log, --remote-encoding, --restrict-file-names, --retry-on-http-error, --save-cookies, --secure-protocol, --start-pos, --timeout, --tries, --user, --user-agent, --wait, --waitretry, --warc-file, --warc-header, --warc-max-size, --warc-tempdir, -A, -B, -D, -I, -O, -P, -Q, -R, -T, -U, -X, -a, -e, -i, -l, -o, -t, -w
+- Hyphen-prefixed positional arguments accepted
+
 ### `whois`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/whois.1.html">https://man7.org/linux/man-pages/man1/whois.1.html</a></p>
 
 - Allowed standalone flags: --help, --version, -A, -B, -G, -H, -I, -K, -L, -M, -Q, -R, -S, -a, -b, -c, -d, -f, -g, -l, -m, -r, -x
 - Allowed valued flags: -T, -V, -h, -i, -p, -s, -t
+
+### `xh`
+<p class="cmd-url"><a href="https://github.com/ducaale/xh">https://github.com/ducaale/xh</a></p>
+
+- Allowed standalone flags: --all, --auth-type, --bearer, --body, --check-status, --continue, --curl, --curl-long, --debug, --download, --follow, --form, --headers, --help, --ignore-netrc, --ignore-stdin, --insecure, --json, --multipart, --no-style, --offline, --overwrite, --print, --quiet, --raw, --stream, --style, --verbose, --version, -?, -A, -F, -I, -S, -b, -c, -d, -f, -h, -j, -m, -o, -p, -q, -s, -v
+- Allowed valued flags: --auth, --auth-type, --bearer, --cert, --cert-key, --max-redirects, --max-redirects, --output, --print, --proxy, --read-config, --session, --session-read-only, --ssl, --style, --timeout, --verify, -A, -a, -o, -p
+- Hyphen-prefixed positional arguments accepted
 

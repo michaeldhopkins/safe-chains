@@ -1,0 +1,27 @@
+[[command]]
+name = "createuser"
+description = "PostgreSQL — creates a new role. External-system write."
+url = "https://www.postgresql.org/docs/current/app-createuser.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--createdb", "--createrole", "--echo",
+    "--help", "--inherit", "--login",
+    "--no-createdb", "--no-createrole",
+    "--no-inherit", "--no-login",
+    "--no-replication", "--no-superuser",
+    "--no-password", "--password",
+    "--pwprompt", "--replication", "--superuser",
+    "--version",
+    "-?", "-D", "-E", "-I", "-L", "-P",
+    "-R", "-S", "-V", "-d", "-e", "-i", "-l",
+    "-r", "-s",
+    "-h", "-p", "-U", "-w", "-W",
+]
+valued = [
+    "--connection-limit", "--host",
+    "--port", "--role", "--username",
+    "--valid-until",
+    "-c", "-g", "-h", "-p", "-U",
+]

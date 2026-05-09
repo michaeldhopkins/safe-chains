@@ -1,0 +1,9 @@
+[[command]]
+name = "lncli"
+description = "Lightning Network Daemon CLI. Connects to a running `lnd`. Most subcommands query / modify channels and payments (network + external state). Carve-out: --help / --version only."
+url = "https://lightning.engineering/api-docs/api/lnd/"
+researched_version = "lnd 0.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

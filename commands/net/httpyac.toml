@@ -1,0 +1,9 @@
+[[command]]
+name = "httpyac"
+description = "Httpyac — sends HTTP requests defined in .http / .rest files. Bare invocation runs the file (network). Each file can contain JS test scripts that execute. Carve-out: --version / --help only."
+url = "https://httpyac.github.io/guide/cli.html"
+researched_version = "httpyac 6.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

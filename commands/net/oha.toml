@@ -1,0 +1,30 @@
+[[command]]
+name = "oha"
+description = "Rust HTTP load tester. Network — issues many requests to the URL. Pure read of responses + load. --output-format json / --no-tui control output."
+url = "https://github.com/hatoo/oha"
+researched_version = "oha 1.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--debug", "--disable-color", "--disable-compression",
+    "--disable-keepalive", "--http2", "--help",
+    "--insecure", "--ipv4", "--ipv6", "--latency-correction",
+    "--no-tui", "--reason-codes", "--stats-success-breakdown",
+    "--use-mode", "--version",
+    "-A", "-H", "-V", "-a", "-c", "-d",
+    "-h", "-m", "-n", "-q", "-r", "-t", "-z",
+]
+valued = [
+    "--burst-delay", "--burst-rate", "--connect-to",
+    "--dns-resolver", "--dump-urls", "--exit-stage-key",
+    "--ip-strategy", "--max-redirects", "--method",
+    "--output-format", "--proxy", "--proxy-http-version",
+    "--proxy-username", "--proxy-password",
+    "--rand-regex-url", "--redirect", "--redirect-uri",
+    "--reproduce-rng-seed", "--timeout",
+    "--unix-socket", "--user-agent",
+    "--wait-ongoing-requests-after-deadline",
+    "-A", "-D", "-H", "-T", "-U", "-c", "-d",
+    "-m", "-n", "-q", "-r", "-t", "-z",
+]

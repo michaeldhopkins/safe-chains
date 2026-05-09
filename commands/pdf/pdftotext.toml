@@ -1,0 +1,23 @@
+[[command]]
+name = "pdftotext"
+description = "Poppler — converts a PDF to plain text. Reads PDF, writes text to stdout or to <name>.txt. Pure read-and-render."
+url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftotext.1.html"
+researched_version = "Poppler 24.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "-bbox", "-bbox-layout", "-cropbox",
+    "-eol", "-enc", "-fixed", "-help",
+    "-htmlmeta", "-layout",
+    "-listenc", "-nodiag", "-nopgbrk",
+    "-q", "-r", "-raw", "-tsv",
+    "-upw", "-v",
+    "--help", "-?",
+]
+valued = [
+    "-eol", "-enc", "-fixed", "-l",
+    "-marginb", "-marginl", "-marginr",
+    "-margint", "-opw", "-r", "-resolution",
+    "-upw", "-x", "-y", "-W", "-H",
+]

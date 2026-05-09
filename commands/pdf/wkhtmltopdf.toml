@@ -1,0 +1,48 @@
+[[command]]
+name = "wkhtmltopdf"
+description = "wkhtmltopdf — converts HTML to PDF using WebKit. Reads HTML files or URLs (network) and writes a PDF. Note: upstream is no longer maintained but the binary is widely deployed."
+url = "https://wkhtmltopdf.org/usage/wkhtmltopdf.txt"
+researched_version = "wkhtmltopdf 0.x; unmaintained"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--collate", "--no-collate", "--cookie-jar",
+    "--copies", "--dpi",
+    "--extended-help", "--grayscale",
+    "--help", "--htmldoc", "--ignore-load-errors",
+    "--image-dpi", "--image-quality",
+    "--license", "--log-level", "--lowquality",
+    "--manpage", "--margin-bottom", "--margin-left",
+    "--margin-right", "--margin-top",
+    "--no-pdf-compression", "--orientation",
+    "--page-height", "--page-size", "--page-width",
+    "--print-media-type", "--quiet", "--read-args-from-stdin",
+    "--readme", "--resolve-relative-links",
+    "--title", "--user-style-sheet",
+    "--version",
+    "-B", "-L", "-O", "-R", "-T", "-V",
+    "-d", "-g", "-h", "-l", "-q",
+    "-s",
+]
+valued = [
+    "--allow", "--cache-dir", "--cookie",
+    "--cookie-jar", "--custom-header",
+    "--default-header", "--encoding", "--exclude-from-outline",
+    "--footer-center", "--footer-font-name",
+    "--footer-font-size", "--footer-html",
+    "--footer-left", "--footer-line", "--footer-right",
+    "--footer-spacing", "--header-center",
+    "--header-font-name", "--header-font-size",
+    "--header-html", "--header-left", "--header-line",
+    "--header-right", "--header-spacing",
+    "--javascript-delay", "--load-error-handling",
+    "--load-media-error-handling", "--margin-bottom",
+    "--margin-left", "--margin-right", "--margin-top",
+    "--orientation", "--outline-depth",
+    "--page-offset", "--password", "--proxy",
+    "--proxy-hostname-lookup", "--username",
+    "--user-style-sheet", "--zoom",
+    "-B", "-L", "-O", "-R", "-T",
+    "-d", "-l", "-s",
+]

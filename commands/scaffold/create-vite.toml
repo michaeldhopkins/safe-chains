@@ -1,0 +1,10 @@
+[[command]]
+name = "create-vite"
+description = "Vite project scaffolder. Bare invocation prompts interactively for project name + template; non-interactive form: positional name plus --template. Writes a new project directory (project-local SafeWrite). Templates fetched from npm packages on first run (network)."
+url = "https://vite.dev/guide/"
+researched_version = "create-vite 5.x"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--help", "--overwrite", "--version", "-h"]
+valued = ["--template", "-t"]

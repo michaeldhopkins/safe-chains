@@ -1,0 +1,34 @@
+[[command]]
+name = "slither"
+description = "Slither — Solidity static analyzer. Reads .sol files (or a project directory) and reports vulnerabilities to stdout (or to --json/--sarif file). Static — does not execute contracts."
+url = "https://github.com/crytic/slither"
+researched_version = "slither 0.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--checklist", "--checklist-with-summary",
+    "--debug", "--detect", "--exclude",
+    "--exclude-dependencies", "--exclude-high",
+    "--exclude-informational", "--exclude-low",
+    "--exclude-medium", "--exclude-optimization",
+    "--filter-paths", "--fail-high", "--fail-low",
+    "--fail-medium", "--fail-pedantic",
+    "--generate-patches", "--help",
+    "--ignore-compile", "--include-paths",
+    "--list-detectors", "--list-detectors-json",
+    "--list-printers", "--markdown-root",
+    "--no-fail-pedantic", "--printers-to-run",
+    "--show-ignored-findings", "--triage-database",
+    "--version",
+]
+valued = [
+    "--checklist", "--config-file",
+    "--detect", "--exclude", "--exclude-dependencies",
+    "--filter-paths", "--include-paths",
+    "--json", "--json-types", "--markdown-root",
+    "--printers-to-run", "--sarif",
+    "--solc-args", "--solc-disable-warnings",
+    "--solc-remaps", "--solc-working-dir",
+    "--triage-database",
+]
+write_flags = ["--json", "--sarif", "--checklist"]

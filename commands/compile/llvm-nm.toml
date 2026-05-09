@@ -1,0 +1,9 @@
+[[command]]
+name = "llvm-nm"
+description = "LLVM nm — lists symbols from object files / archives. Pure read."
+url = "https://llvm.org/docs/CommandGuide/llvm-nm.html"
+researched_version = "LLVM 18.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-?", "-h"]

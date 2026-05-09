@@ -1,0 +1,15 @@
+[[command]]
+name = "create-react-app"
+description = "Create React App scaffolder (deprecated by React team but still widely used). Writes a new project directory (project-local SafeWrite + npm install — network)."
+url = "https://create-react-app.dev/docs/getting-started"
+researched_version = "create-react-app 5.x; deprecated"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--help", "--info",
+    "--scripts-version", "--use-pnp", "--use-npm",
+    "--verbose", "--version",
+    "-V", "-h",
+]
+valued = ["--scripts-version", "--template", "--typescript"]

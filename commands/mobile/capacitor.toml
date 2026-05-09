@@ -1,0 +1,86 @@
+[[command]]
+name = "cap"
+aliases = ["capacitor"]
+description = "Capacitor CLI — cross-platform native runtime for web. Subcommands: `init`, `add`, `copy`, `sync`, `update`, `run`, `build`, `open`, `serve`, `doctor`, `ls`, `migrate`, `config`. Most subcommands build / sync / run native projects (executes Xcode / Android Studio / npm). Read-side: `ls`, `doctor`, `config`, `--version`, `--help`."
+url = "https://capacitorjs.com/docs/cli"
+researched_version = "Capacitor 6.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "ls"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "copy"
+candidate = true
+
+[[command.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "open"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "telemetry"
+candidate = true
+
+[[command.sub]]
+name = "plugin"
+candidate = true

@@ -1,0 +1,15 @@
+[[command]]
+name = "degit"
+aliases = ["tiged"]
+description = "Clones a Git repository as a project scaffold (without git history). Network read of the repo; writes the cloned tree to the working directory (project-local SafeWrite). tiged is a degit fork."
+url = "https://github.com/Rich-Harris/degit"
+researched_version = "degit 2.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--cache", "--force", "--help",
+    "--mode", "--verbose", "--version",
+    "-c", "-D", "-f", "-h", "-v",
+]
+valued = ["--mode", "-m"]

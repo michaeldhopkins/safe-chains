@@ -1,0 +1,57 @@
+[[command]]
+name = "near"
+aliases = ["near-cli"]
+description = "NEAR Protocol CLI. Subcommands: `account view-account-summary`, `tokens`, `staking`, `contract call-function`, `contract deploy`, `transaction`, `config`, `dev-tool`, `extensions`, `version`, `--help`. Carve-out covers diagnostic + read-only forms."
+url = "https://github.com/near/near-cli-rs"
+researched_version = "near-cli-rs 0.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "config"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "extensions"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "account"
+candidate = true
+
+[[command.sub]]
+name = "tokens"
+candidate = true
+
+[[command.sub]]
+name = "staking"
+candidate = true
+
+[[command.sub]]
+name = "contract"
+candidate = true
+
+[[command.sub]]
+name = "transaction"
+candidate = true
+
+[[command.sub]]
+name = "dev-tool"
+candidate = true
+
+[[command.sub]]
+name = "node"
+candidate = true
+
+[[command.sub]]
+name = "rpc"
+candidate = true

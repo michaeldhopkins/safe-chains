@@ -1,0 +1,70 @@
+[[command]]
+name = "nix-env"
+description = "Manages user-level Nix profile (legacy CLI; flake-based `nix profile` is the modern replacement). Read-side: `--query` (-q) lists installed / available packages, `--switch-profile` reads, `--list-generations`. Write-side: `--install`, `--upgrade`, `--uninstall`, `--switch-generation`, `--rollback`, `--delete-generations`, `--set`, `--set-flag`, `--profile`. Network for installs."
+url = "https://nix.dev/manual/nix/latest/command-ref/nix-env.html"
+researched_version = "Nix 2.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[command.wrapper]
+standalone = ["--quiet", "--keep-failed", "-K", "-Q"]
+valued = ["--arg", "--argstr", "--option", "--profile", "--store", "-A", "-f", "-i", "-r"]
+
+[[command.sub]]
+name = "--query"
+candidate = true
+
+[[command.sub]]
+name = "-q"
+candidate = true
+
+[[command.sub]]
+name = "--list-generations"
+candidate = true
+
+[[command.sub]]
+name = "--install"
+candidate = true
+
+[[command.sub]]
+name = "-i"
+candidate = true
+
+[[command.sub]]
+name = "--upgrade"
+candidate = true
+
+[[command.sub]]
+name = "-u"
+candidate = true
+
+[[command.sub]]
+name = "--uninstall"
+candidate = true
+
+[[command.sub]]
+name = "-e"
+candidate = true
+
+[[command.sub]]
+name = "--switch-generation"
+candidate = true
+
+[[command.sub]]
+name = "-G"
+candidate = true
+
+[[command.sub]]
+name = "--rollback"
+candidate = true
+
+[[command.sub]]
+name = "--delete-generations"
+candidate = true
+
+[[command.sub]]
+name = "--set"
+candidate = true
+
+[[command.sub]]
+name = "--set-flag"
+candidate = true

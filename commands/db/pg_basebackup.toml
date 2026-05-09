@@ -1,0 +1,34 @@
+[[command]]
+name = "pg_basebackup"
+description = "PostgreSQL physical backup tool. Reads from the cluster's primary / standby (network); writes a base backup to the given -D directory. -X stream / fetch / none controls WAL handling."
+url = "https://www.postgresql.org/docs/current/app-pgbasebackup.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--checkpoint", "--checksum", "--compress",
+    "--create-slot", "--format", "--gzip",
+    "--help", "--max-rate", "--no-clean",
+    "--no-estimate-size", "--no-manifest",
+    "--no-password", "--no-slot", "--no-sync",
+    "--no-verify-checksums", "--password",
+    "--progress", "--pgdata", "--quiet",
+    "--target", "--verbose", "--version",
+    "--waldir", "--write-recovery-conf",
+    "--wal-method",
+    "-?", "-C", "-D", "-F", "-N", "-P",
+    "-R", "-S", "-T", "-V", "-X", "-Z",
+    "-c", "-d", "-h", "-l", "-n", "-p",
+    "-r", "-s", "-t", "-U", "-v", "-w", "-W",
+    "-z",
+]
+valued = [
+    "--checkpoint", "--compress",
+    "--create-slot", "--dbname", "--format",
+    "--manifest-checksums", "--manifest-force-encode",
+    "--max-rate", "--pgdata",
+    "--slot", "--target", "--tablespace-mapping",
+    "--username", "--waldir",
+    "-c", "-D", "-F", "-T", "-d", "-h", "-l", "-p",
+    "-S", "-r", "-s", "-t", "-U", "-Z",
+]

@@ -1,0 +1,95 @@
+[[command]]
+name = "docker-buildx"
+description = "Standalone BuildKit-based Docker builder. Same surface as `docker buildx`. Subcommands include `build`, `bake`, `create`, `inspect`, `ls`, `prune`, `rm`, `stop`, `use`, `imagetools`, `version`, `du`. Carve-out covers diagnostic / read-only inspection."
+url = "https://docs.docker.com/buildx/working-with-buildx/"
+researched_version = "buildx 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ls"
+level = "Inert"
+bare = true
+standalone = ["--help", "--no-trunc", "-h"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "inspect"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--bootstrap", "--help", "-h"]
+valued = ["--builder"]
+
+[[command.sub]]
+name = "du"
+level = "Inert"
+bare = true
+standalone = ["--help", "--verbose", "-h", "-v"]
+valued = ["--builder", "--filter"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "bake"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "prune"
+candidate = true
+
+[[command.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "stop"
+candidate = true
+
+[[command.sub]]
+name = "use"
+candidate = true
+
+[[command.sub]]
+name = "imagetools"
+candidate = true
+
+[[command.sub]]
+name = "history"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true
+
+[[command.sub]]
+name = "dial-stdio"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true

@@ -1,0 +1,163 @@
+[[command]]
+name = "docker-compose"
+description = "Docker Compose standalone CLI (separate from `docker compose`). Subcommands include `up`, `down`, `ps`, `logs`, `config`, `build`, `pull`, `push`, `restart`, `start`, `stop`, `kill`, `pause`, `unpause`, `rm`, `exec`, `run`, `top`, `images`, `events`, `version`, `port`, `cp`, `attach`, `wait`, `watch`, `scale`. Most write subs modify cluster state. Read-side: `ps`, `config`, `logs`, `top`, `images`, `port`, `version`, `events`."
+url = "https://docs.docker.com/compose/reference/"
+researched_version = "Docker Compose 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--format", "--help", "--short", "-f", "-h"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = true
+standalone = ["--format", "--help", "--no-consistency", "--no-interpolate", "--no-normalize", "--no-path-resolution", "--profiles", "--quiet", "--resolve-image-digests", "--services", "--volumes", "-h", "-q"]
+valued = ["--format", "--hash", "--output", "--profile", "-o", "-p"]
+
+[[command.sub]]
+name = "ps"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--all", "--dry-run", "--help", "--no-trunc", "--quiet", "--services", "-a", "-h", "-q"]
+valued = ["--filter", "--format", "--status"]
+
+[[command.sub]]
+name = "logs"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--follow", "--help", "--no-color", "--no-log-prefix", "--timestamps", "-f", "-h", "-t"]
+valued = ["--since", "--tail", "--until"]
+
+[[command.sub]]
+name = "top"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "images"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "port"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--index", "--protocol"]
+
+[[command.sub]]
+name = "events"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "up"
+candidate = true
+
+[[command.sub]]
+name = "down"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "restart"
+candidate = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "stop"
+candidate = true
+
+[[command.sub]]
+name = "kill"
+candidate = true
+
+[[command.sub]]
+name = "pause"
+candidate = true
+
+[[command.sub]]
+name = "unpause"
+candidate = true
+
+[[command.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "scale"
+candidate = true
+
+[[command.sub]]
+name = "cp"
+candidate = true
+
+[[command.sub]]
+name = "attach"
+candidate = true
+
+[[command.sub]]
+name = "wait"
+candidate = true
+
+[[command.sub]]
+name = "watch"
+candidate = true
+
+[[command.sub]]
+name = "ls"
+candidate = true
+
+[[command.sub]]
+name = "convert"
+candidate = true

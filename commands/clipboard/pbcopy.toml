@@ -1,0 +1,10 @@
+[[command]]
+name = "pbcopy"
+aliases = ["pbpaste"]
+description = "macOS pasteboard tools. pbcopy reads stdin into the clipboard; pbpaste writes the clipboard contents to stdout. Pure read/write of the system clipboard."
+url = "https://ss64.com/mac/pbcopy.html"
+researched_version = "macOS 14+"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-help"]
+valued = ["-Prefer", "-pboard"]

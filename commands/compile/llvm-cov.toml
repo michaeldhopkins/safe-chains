@@ -1,0 +1,9 @@
+[[command]]
+name = "llvm-cov"
+description = "LLVM coverage report tool. Reads profile data + binaries and writes HTML / text / JSON / lcov reports. Pure read of profile data, write of report files."
+url = "https://llvm.org/docs/CommandGuide/llvm-cov.html"
+researched_version = "LLVM 18.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-?", "-h"]

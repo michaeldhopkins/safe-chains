@@ -1,0 +1,45 @@
+[[command]]
+name = "mongodump"
+description = "MongoDB backup utility. Reads from the configured cluster (network); writes BSON / JSON dump files to --out / --archive (project-local SafeWrite)."
+url = "https://www.mongodb.com/docs/database-tools/mongodump/"
+researched_version = "MongoDB Database Tools 100.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--allowPartialResults", "--archive",
+    "--assertExists", "--authenticationDatabase",
+    "--authenticationMechanism", "--collection",
+    "--db", "--dryRun", "--dumpDbUsersAndRoles",
+    "--excludeCollection", "--excludeCollectionsWithPrefix",
+    "--forceTableScan", "--gzip", "--help",
+    "--ipv6", "--noIndexRestore",
+    "--numParallelCollections",
+    "--objcheck", "--oplog",
+    "--out", "--password", "--port",
+    "--quiet", "--readPreference",
+    "--ssl", "--sslAllowInvalidCertificates",
+    "--sslAllowInvalidHostnames",
+    "--sslCAFile", "--sslPEMKeyFile",
+    "--sslPEMKeyPassword", "--tlsInsecure",
+    "--username", "--verbose", "--version",
+    "--writeConcern",
+    "-c", "-d", "-h", "-j", "-o", "-p",
+    "-u", "-v",
+]
+valued = [
+    "--archive", "--authenticationDatabase",
+    "--authenticationMechanism", "--collection",
+    "--config", "--db", "--excludeCollection",
+    "--excludeCollectionsWithPrefix",
+    "--gssapiHostName", "--gssapiServiceName",
+    "--host", "--numParallelCollections",
+    "--out", "--password", "--port",
+    "--query", "--queryFile",
+    "--readPreference", "--sslCAFile",
+    "--sslCRLFile", "--sslPEMKeyFile",
+    "--sslPEMKeyPassword",
+    "--tlsCertificateKeyFile",
+    "--tlsCAFile", "--uri", "--username",
+    "--writeConcern",
+    "-c", "-d", "-h", "-j", "-o", "-p", "-u",
+]

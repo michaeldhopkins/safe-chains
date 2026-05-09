@@ -1,0 +1,9 @@
+[[command]]
+name = "anvil"
+description = "Foundry — local Ethereum testnet daemon. Bare invocation starts the long-running RPC server (network listener, executes EVM transactions). Carve-out: --version / --help only."
+url = "https://book.getfoundry.sh/reference/anvil/"
+researched_version = "Foundry 2024.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

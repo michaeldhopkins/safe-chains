@@ -1,0 +1,9 @@
+[[command]]
+name = "glances"
+description = "Cross-platform system monitor (Python). Interactive curses TUI by default; can also run as web server (--webserver) or REST API (--quiet)."
+url = "https://glances.readthedocs.io/en/latest/"
+researched_version = "glances 4.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

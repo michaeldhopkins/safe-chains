@@ -1,0 +1,10 @@
+[[command]]
+name = "xclip"
+description = "Linux X11 clipboard tool. -i / -o reads / writes the X selection. Pure clipboard I/O."
+url = "https://github.com/astrand/xclip"
+researched_version = "xclip 0.x"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--version", "-help", "-d", "-display", "-f", "-filter", "-h", "-i", "-in", "-l", "-loops", "-o", "-out", "-quiet", "-rmlastnl", "-silent", "-target", "-v", "-verbose"]
+valued = ["-display", "-loops", "-selection", "-target"]

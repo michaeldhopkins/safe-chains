@@ -1,0 +1,32 @@
+[[command]]
+name = "masscan"
+description = "Mass IP port scanner. Network operation; --output-format / --output-filename writes scan results to disk. Note: scanning external ranges may be illegal in some jurisdictions; users are responsible for use."
+url = "https://github.com/robertdavidgraham/masscan"
+researched_version = "masscan 1.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--echo", "--echo-cidr", "--exclude",
+    "--excludefile", "--help", "--http-user-agent",
+    "--includefile", "--ping", "--rate",
+    "--randomize-hosts", "--reason", "--retries",
+    "--source-ip", "--source-port",
+    "--ttl", "--user-agent", "--version",
+    "--wait",
+    "-?", "-c", "-d", "-h", "-iL", "-iR",
+    "-oG", "-oJ", "-oL", "-oU", "-oX",
+    "-p", "-v",
+]
+valued = [
+    "--banners", "--config",
+    "--exclude", "--excludefile",
+    "--http-user-agent", "--includefile",
+    "--output-filename", "--output-format",
+    "--rate", "--readscan", "--retries",
+    "--rotate", "--rotate-dir",
+    "--source-ip", "--source-port", "--ttl",
+    "--wait",
+    "-c", "-iL", "-iR", "-oG", "-oJ", "-oL", "-oU", "-oX",
+    "-p", "-r", "-w",
+]

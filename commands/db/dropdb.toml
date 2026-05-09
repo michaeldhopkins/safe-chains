@@ -1,0 +1,15 @@
+[[command]]
+name = "dropdb"
+description = "PostgreSQL — drops a database. External-system write."
+url = "https://www.postgresql.org/docs/current/app-dropdb.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--echo", "--force", "--help",
+    "--if-exists", "--interactive",
+    "--no-password", "--password", "--version",
+    "-?", "-V", "-e", "-f", "-h",
+    "-i", "-p", "-U", "-w", "-W",
+]
+valued = ["--host", "--port", "--username", "-h", "-p", "-U"]

@@ -1,0 +1,101 @@
+[[command]]
+name = "sam"
+description = "AWS SAM CLI — Serverless Application Model. Subcommands: `init` (scaffold), `validate` (read), `build` (write — compiles Lambda layers), `local` (runs Lambda locally — invokes user code), `package` (write — uploads to S3 staging), `deploy` (deploys CloudFormation stack — external system writes), `delete`, `logs`, `traces`, `sync`, `list`, `pipeline`, `publish`, `remote`, `mcp`, `version`, `--info`. Read-only diagnostics: `validate`, `list`, `version`, `--info`."
+url = "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference.html"
+researched_version = "AWS SAM CLI 1.x"
+bare_flags = ["--help", "--version", "--info", "-h", "-v"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--debug", "--help", "--lint", "--no-color", "-h"]
+valued = ["--config-env", "--config-file", "--profile", "--region", "--save-params", "-t", "--template", "--template-file"]
+
+[[command.sub]]
+name = "list"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "stack-outputs"
+standalone = ["--debug", "--help", "--no-color", "--no-prompts", "-h"]
+valued = ["--config-env", "--config-file", "--output", "--profile", "--region", "--stack-name"]
+
+[[command.sub.sub]]
+name = "endpoints"
+standalone = ["--help", "--no-color", "--no-prompts", "-h"]
+valued = ["--config-env", "--config-file", "--output", "--profile", "--region", "--stack-name"]
+
+[[command.sub.sub]]
+name = "resources"
+standalone = ["--help", "-h"]
+valued = ["--config-env", "--config-file", "--output", "--profile", "--region", "--stack-name", "-t", "--template-file"]
+
+[[command.sub.sub]]
+name = "testable-resources"
+standalone = ["--help", "-h"]
+valued = ["--config-env", "--config-file", "--output", "--profile", "--region", "--stack-name", "-t", "--template-file"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "local"
+candidate = true
+
+[[command.sub]]
+name = "package"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub]]
+name = "traces"
+candidate = true
+
+[[command.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "pipeline"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "remote"
+candidate = true
+
+[[command.sub]]
+name = "mcp"
+candidate = true

@@ -1,0 +1,18 @@
+[[command]]
+name = "pdftohtml"
+description = "Poppler — converts a PDF to HTML. Reads PDF, writes HTML + images. Pure conversion."
+url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftohtml.1.html"
+researched_version = "Poppler 24.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "-c", "-fontfullname", "-help",
+    "-hidden", "-i", "-noframes", "-nomerge",
+    "-q", "-s", "-stdout", "-v", "-xml",
+    "--help", "-?",
+]
+valued = [
+    "-enc", "-f", "-fmt", "-l", "-opw", "-p",
+    "-r", "-upw", "-zoom",
+]

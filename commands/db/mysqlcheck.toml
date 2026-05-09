@@ -1,0 +1,41 @@
+[[command]]
+name = "mysqlcheck"
+description = "MySQL/MariaDB — checks, repairs, optimizes, or analyzes tables. Network + write to MySQL server."
+url = "https://dev.mysql.com/doc/refman/8.4/en/mysqlcheck.html"
+researched_version = "MySQL 8.x / MariaDB 11.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--all-databases", "--all-in-1",
+    "--analyze", "--auto-repair",
+    "--character-sets-dir", "--check",
+    "--check-only-changed", "--check-upgrade",
+    "--databases", "--debug",
+    "--debug-check", "--debug-info",
+    "--default-auth", "--default-character-set",
+    "--enable-cleartext-plugin", "--extended",
+    "--fast", "--fix-db-names", "--fix-table-names",
+    "--force", "--help", "--host",
+    "--login-path", "--medium-check",
+    "--optimize", "--password", "--pipe",
+    "--port", "--print-defaults", "--protocol",
+    "--quick", "--repair", "--silent",
+    "--skip-database", "--socket",
+    "--ssl", "--ssl-mode", "--ssl-fips-mode",
+    "--tables", "--use-frm", "--user", "--verbose",
+    "--version", "--write-binlog",
+    "-?", "-A", "-B", "-C", "-F", "-N",
+    "-O", "-S", "-T", "-V", "-W", "-a",
+    "-c", "-e", "-f", "-h", "-m", "-o",
+    "-p", "-q", "-r", "-s", "-u", "-v",
+]
+valued = [
+    "--databases", "--default-auth",
+    "--default-character-set", "--host",
+    "--login-path", "--password", "--port",
+    "--protocol", "--socket", "--ssl-ca",
+    "--ssl-capath", "--ssl-cert", "--ssl-cipher",
+    "--ssl-key", "--ssl-mode", "--user",
+    "-S", "-h", "-p", "-P", "-u",
+]

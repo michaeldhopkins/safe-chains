@@ -1,0 +1,187 @@
+[[command]]
+name = "nodetool"
+description = "Apache Cassandra cluster admin tool. Read-side: `version`, `status`, `info`, `ring`, `describecluster`, `gossipinfo`, `tablestats`, `tablehistograms`, `cfstats`, `cfhistograms`, `compactionhistory`, `compactionstats`, `tpstats`, `getlogginglevels`, `gettraceprobability`, `getstreamthroughput`, `gettimeout`, `getconcurrentcompactors`, `getsstables`, `getendpoints`, `getseeds`, `viewbuildstatus`. Write-side: `flush`, `compact`, `repair`, `cleanup`, `drain`, `decommission`, `removenode`, `move`, `setlogginglevel`, `settraceprobability`, `bootstrap`, `replaybatchlog`, `truncatehints`, `disablegossip`, `disablethrift`, `enablegossip`, `enablethrift`, `restorehints`, `stopdaemon`."
+url = "https://cassandra.apache.org/doc/latest/cassandra/managing/tools/nodetool/nodetool.html"
+researched_version = "Apache Cassandra 5.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "status"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "info"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "ring"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "describecluster"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "gossipinfo"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "tablestats"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "tablehistograms"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "cfstats"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "cfhistograms"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "compactionhistory"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "compactionstats"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "tpstats"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "getlogginglevels"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "gettraceprobability"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "getsstables"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "getendpoints"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "getseeds"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "flush"
+candidate = true
+
+[[command.sub]]
+name = "compact"
+candidate = true
+
+[[command.sub]]
+name = "repair"
+candidate = true
+
+[[command.sub]]
+name = "cleanup"
+candidate = true
+
+[[command.sub]]
+name = "drain"
+candidate = true
+
+[[command.sub]]
+name = "decommission"
+candidate = true
+
+[[command.sub]]
+name = "removenode"
+candidate = true
+
+[[command.sub]]
+name = "move"
+candidate = true
+
+[[command.sub]]
+name = "setlogginglevel"
+candidate = true
+
+[[command.sub]]
+name = "settraceprobability"
+candidate = true
+
+[[command.sub]]
+name = "bootstrap"
+candidate = true
+
+[[command.sub]]
+name = "snapshot"
+candidate = true
+
+[[command.sub]]
+name = "clearsnapshot"
+candidate = true
+
+[[command.sub]]
+name = "rebuild"
+candidate = true
+
+[[command.sub]]
+name = "stopdaemon"
+candidate = true
+
+[[command.sub]]
+name = "scrub"
+candidate = true
+
+[[command.sub]]
+name = "verify"
+candidate = true
+
+[[command.sub]]
+name = "rebuild_index"
+candidate = true
+
+[[command.sub]]
+name = "refresh"
+candidate = true
+
+[[command.sub]]
+name = "reload"
+candidate = true
+
+[[command.sub]]
+name = "garbagecollect"
+candidate = true
+
+[[command.sub]]
+name = "upgradesstables"
+candidate = true

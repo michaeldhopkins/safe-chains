@@ -1,0 +1,123 @@
+[[command]]
+name = "cdk"
+description = "AWS Cloud Development Kit. `init` scaffolds a CDK project. `synth` evaluates project code (executes user TS/JS/Python/etc.) and writes CloudFormation templates. `diff` compares synthesized templates to deployed stacks. `list`/`ls` lists stacks (read; runs synth). `bootstrap`, `deploy`, `destroy`, `import`, `migrate`, `gc`, `rollback`, `metadata` mutate or contact AWS (network + external system writes). `doctor`, `notices`, `version`, `--help` are diagnostic / read-only."
+url = "https://docs.aws.amazon.com/cdk/v2/guide/cli.html"
+researched_version = "AWS CDK 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "notices"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--unacknowledged", "-h", "-u"]
+
+[[command.sub]]
+name = "list"
+aliases = ["ls"]
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--long", "--show-dependencies", "-h", "-l"]
+valued = ["--app", "--context", "--profile", "--role-arn", "--strict", "-a", "-c"]
+
+[[command.sub]]
+name = "ls"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--long", "--show-dependencies", "-h", "-l"]
+valued = ["--app", "--context", "--profile", "--role-arn", "--strict", "-a", "-c"]
+
+[[command.sub]]
+name = "synth"
+aliases = ["synthesize"]
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--exclusively", "--help", "--quiet", "--validation", "-e", "-h", "-q"]
+valued = ["--app", "--context", "--output", "--profile", "--role-arn", "-a", "-c", "-o"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--exclusively", "--fail", "--help", "--security-only", "-e", "-h"]
+valued = ["--app", "--context", "--profile", "--role-arn", "--template", "-a", "-c"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "bootstrap"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "watch"
+candidate = true
+
+[[command.sub]]
+name = "destroy"
+candidate = true
+
+[[command.sub]]
+name = "import"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "gc"
+candidate = true
+
+[[command.sub]]
+name = "rollback"
+candidate = true
+
+[[command.sub]]
+name = "metadata"
+candidate = true
+
+[[command.sub]]
+name = "context"
+candidate = true
+
+[[command.sub]]
+name = "drift"
+candidate = true
+
+[[command.sub]]
+name = "acknowledge"
+candidate = true
+
+[[command.sub]]
+name = "ack"
+candidate = true

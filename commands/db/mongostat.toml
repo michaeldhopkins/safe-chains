@@ -1,0 +1,30 @@
+[[command]]
+name = "mongostat"
+description = "MongoDB realtime stats. Reads server status periodically (network)."
+url = "https://www.mongodb.com/docs/database-tools/mongostat/"
+researched_version = "MongoDB Database Tools 100.x"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = [
+    "--all", "--authenticationDatabase",
+    "--authenticationMechanism",
+    "--discover", "--help", "--http",
+    "--humanReadable", "--ipv6", "--json",
+    "--password", "--port", "--quiet",
+    "--ssl", "--sslAllowInvalidCertificates",
+    "--sslAllowInvalidHostnames",
+    "--username", "--verbose", "--version",
+    "-?", "-h", "-n", "-o", "-p", "-u", "-v",
+]
+valued = [
+    "--authenticationDatabase",
+    "--authenticationMechanism", "--config",
+    "--host", "--password", "--port",
+    "--rowcount", "--sslCAFile",
+    "--sslCRLFile", "--sslPEMKeyFile",
+    "--sslPEMKeyPassword",
+    "--tlsCertificateKeyFile", "--tlsCAFile",
+    "--uri", "--username",
+    "-h", "-n", "-o", "-p", "-u",
+]

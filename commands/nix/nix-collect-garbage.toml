@@ -1,0 +1,19 @@
+[[command]]
+name = "nix-collect-garbage"
+description = "Deletes unused Nix store paths (and optionally older user/system profile generations). Modifies the global Nix store (system-state writes). The diagnostic --version / --help and --dry-run / --print-roots are read-only / preview."
+url = "https://nix.dev/manual/nix/latest/command-ref/nix-collect-garbage.html"
+researched_version = "Nix 2.x"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = [
+    "--debug", "--delete-old", "--delete-older-than",
+    "--dry-run", "--help", "--max-freed",
+    "--print-dead", "--print-live", "--print-roots",
+    "--quiet", "--version",
+    "-d", "-h", "-q",
+]
+valued = [
+    "--delete-older-than", "--max-freed",
+    "--option", "--profile",
+]

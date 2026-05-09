@@ -1,0 +1,23 @@
+[[command]]
+name = "create-next-app"
+description = "Next.js project scaffolder. Bare invocation prompts; non-interactive form: positional name plus --typescript / --tailwind / --eslint / --app / --src-dir / --import-alias / --use-npm / --use-pnpm / --use-yarn / --use-bun / --example. Writes a new project directory (project-local SafeWrite). Optional template fetch (network)."
+url = "https://nextjs.org/docs/app/api-reference/cli/create-next-app"
+researched_version = "create-next-app 15.x"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = [
+    "--app", "--api", "--disable-git",
+    "--empty", "--eslint",
+    "--experimental-app", "--help",
+    "--import-alias", "--javascript", "--js",
+    "--no-app", "--no-eslint", "--no-import-alias",
+    "--no-src-dir", "--no-tailwind", "--no-typescript",
+    "--reset-preferences", "--skip-install",
+    "--src-dir", "--tailwind", "--turbopack",
+    "--typescript", "--ts",
+    "--use-bun", "--use-npm", "--use-pnpm", "--use-yarn",
+    "--version", "--yes",
+    "-h", "-v", "-y",
+]
+valued = ["--example", "--example-path"]

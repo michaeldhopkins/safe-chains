@@ -1,0 +1,162 @@
+[[command]]
+name = "forge"
+description = "Foundry — Solidity build / test / deploy tool. Many subcommands. Read-side: `version`, `--help`, `tree`, `inspect`, `selectors`, `flatten`, `doc`, `geiger`, `cache ls`, `config`, `verify-check`, `verify-bytecode`, `--list`, `clean --dry-run`. Write-side: `init`, `build`, `compile`, `test`, `script`, `create`, `coverage`, `snapshot`, `bind`, `bind-json`, `clean`, `cache clean`, `update`, `install`, `remove`, `remappings`, `verify-contract`, `fmt`, `fmt --check`, `gen-completions`, `debug`."
+url = "https://book.getfoundry.sh/reference/forge/"
+researched_version = "Foundry 2024.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "tree"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "inspect"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "selectors"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "flatten"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "geiger"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "config"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "verify-check"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "verify-bytecode"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "remappings"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "completions"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "compile"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "script"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "coverage"
+candidate = true
+
+[[command.sub]]
+name = "snapshot"
+candidate = true
+
+[[command.sub]]
+name = "bind"
+candidate = true
+
+[[command.sub]]
+name = "bind-json"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "cache"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "verify-contract"
+candidate = true
+
+[[command.sub]]
+name = "fmt"
+candidate = true
+
+[[command.sub]]
+name = "doc"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true
+
+[[command.sub]]
+name = "soldeer"
+candidate = true
+
+[[command.sub]]
+name = "selectors-"
+candidate = true
+
+[[command.sub]]
+name = "eip712"
+candidate = true
+
+[[command.sub]]
+name = "lint"
+candidate = true
+
+[[command.sub]]
+name = "generate"
+candidate = true

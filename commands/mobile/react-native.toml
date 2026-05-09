@@ -1,0 +1,93 @@
+[[command]]
+name = "react-native"
+description = "React Native community CLI. Subcommands: `init`, `start`, `run-android`, `run-ios`, `link`, `unlink`, `eject`, `bundle`, `info`, `config`, `log-android`, `log-ios`, `doctor`, `clean`, `profile-hermes`. Most subcommands build, install, or run on a device / simulator (executes user code, contacts package server, modifies device state). Read-side: `info`, `config`, `doctor`, `--version`, `--help`."
+url = "https://github.com/react-native-community/cli"
+researched_version = "@react-native-community/cli 14.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--platform"]
+
+[[command.sub]]
+name = "doctor"
+level = "SafeRead"
+bare = true
+standalone = ["--fix", "--contributor", "--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "run-android"
+candidate = true
+
+[[command.sub]]
+name = "run-ios"
+candidate = true
+
+[[command.sub]]
+name = "link"
+candidate = true
+
+[[command.sub]]
+name = "unlink"
+candidate = true
+
+[[command.sub]]
+name = "eject"
+candidate = true
+
+[[command.sub]]
+name = "bundle"
+candidate = true
+
+[[command.sub]]
+name = "log-android"
+candidate = true
+
+[[command.sub]]
+name = "log-ios"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "profile-hermes"
+candidate = true
+
+[[command.sub]]
+name = "ram-bundle"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true

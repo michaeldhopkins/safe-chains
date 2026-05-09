@@ -1,0 +1,25 @@
+[[command]]
+name = "reindexdb"
+description = "PostgreSQL — runs REINDEX on a database. External-system write."
+url = "https://www.postgresql.org/docs/current/app-reindexdb.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--all", "--concurrently", "--echo",
+    "--help", "--index", "--maintenance-db",
+    "--no-password", "--password", "--quiet",
+    "--schema", "--system", "--tablespace",
+    "--table", "--verbose", "--version",
+    "-?", "-V", "-a", "-d", "-e", "-h",
+    "-i", "-j", "-n", "-p", "-q", "-s", "-t",
+    "-U", "-v", "-w", "-W",
+]
+valued = [
+    "--concurrently", "--dbname", "--host",
+    "--index", "--jobs", "--maintenance-db",
+    "--port", "--schema", "--table",
+    "--tablespace", "--username",
+    "-d", "-h", "-i", "-j", "-n", "-p",
+    "-S", "-T", "-t", "-U",
+]

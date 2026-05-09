@@ -1,0 +1,143 @@
+[[command]]
+name = "liquibase"
+description = "Liquibase database migration tool. Subcommands: `update`, `update-count`, `update-to-tag`, `update-sql`, `update-testing-rollback`, `rollback`, `rollback-count`, `rollback-to-date`, `rollback-sql`, `status`, `history`, `tag`, `tag-exists`, `db-doc`, `diff`, `diff-changelog`, `generate-changelog`, `clear-checksums`, `release-locks`, `validate`, `changelog-sync`, `mark-next-changeset-ran`, `drop-all`, `version`, `init`, `help`. Read-side: `version`, `status`, `history`, `validate`, `diff`, `diff-changelog --output-file=-`, `db-doc`, `tag-exists`."
+url = "https://docs.liquibase.com/commands/home.html"
+researched_version = "Liquibase 4.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "status"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "history"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "validate"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "diff"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "diff-changelog"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "generate-changelog"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "tag-exists"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "db-doc"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "init"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "update-count"
+candidate = true
+
+[[command.sub]]
+name = "update-to-tag"
+candidate = true
+
+[[command.sub]]
+name = "update-sql"
+candidate = true
+
+[[command.sub]]
+name = "update-testing-rollback"
+candidate = true
+
+[[command.sub]]
+name = "rollback"
+candidate = true
+
+[[command.sub]]
+name = "rollback-count"
+candidate = true
+
+[[command.sub]]
+name = "rollback-to-date"
+candidate = true
+
+[[command.sub]]
+name = "rollback-sql"
+candidate = true
+
+[[command.sub]]
+name = "tag"
+candidate = true
+
+[[command.sub]]
+name = "clear-checksums"
+candidate = true
+
+[[command.sub]]
+name = "release-locks"
+candidate = true
+
+[[command.sub]]
+name = "changelog-sync"
+candidate = true
+
+[[command.sub]]
+name = "mark-next-changeset-ran"
+candidate = true
+
+[[command.sub]]
+name = "drop-all"
+candidate = true
+
+[[command.sub]]
+name = "execute-sql"
+candidate = true
+
+[[command.sub]]
+name = "snapshot"
+candidate = true
+
+[[command.sub]]
+name = "calculate-checksum"
+candidate = true
+
+[[command.sub]]
+name = "future-rollback-sql"
+candidate = true
+
+[[command.sub]]
+name = "future-rollback-count-sql"
+candidate = true
+
+[[command.sub]]
+name = "future-rollback-from-tag-sql"
+candidate = true

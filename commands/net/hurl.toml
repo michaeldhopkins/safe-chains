@@ -1,0 +1,55 @@
+[[command]]
+name = "hurl"
+description = "Hurl — runs HTTP requests defined in plain-text .hurl files. Bare invocation reads the .hurl file(s) and makes the requests (network read). --test runs assertions and exits non-zero on failure. --output / --report-html / --report-junit / --report-tap write reports."
+url = "https://hurl.dev/docs/manual.html"
+researched_version = "Hurl 5.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--color", "--compressed",
+    "--connect-to", "--continue-on-error",
+    "--cookie-jar", "--curl",
+    "--debug", "--error-format", "--file-root",
+    "--from-entry", "--glob", "--help",
+    "--include", "--insecure", "--interactive",
+    "--ipv4", "--ipv6", "--json",
+    "--location", "--location-trusted",
+    "--max-filesize", "--max-redirs",
+    "--max-time", "--negotiate",
+    "--netrc", "--netrc-file", "--netrc-optional",
+    "--no-color", "--no-output", "--ntlm",
+    "--output", "--parallel", "--path-as-is",
+    "--proxy", "--report-html", "--report-json",
+    "--report-junit", "--report-tap",
+    "--repeat", "--report-html-history",
+    "--resolve", "--retry", "--retry-interval",
+    "--ssl-no-revoke", "--summary",
+    "--test", "--to-entry", "--unix-socket",
+    "--user", "--user-agent", "--variable",
+    "--variables-file", "--verbose",
+    "--very-verbose", "--version",
+    "-?", "-4", "-6", "-A", "-H", "-L",
+    "-M", "-V", "-X", "-b", "-c", "-d",
+    "-h", "-i", "-k", "-l", "-m", "-n",
+    "-o", "-q", "-r", "-s", "-u",
+    "-v", "-vv",
+]
+valued = [
+    "--cacert", "--cert", "--connect-to",
+    "--cookie", "--cookie-jar",
+    "--delay", "--error-format",
+    "--file-root", "--from-entry", "--glob",
+    "--key", "--max-filesize", "--max-redirs",
+    "--max-time", "--netrc-file",
+    "--output", "--parallel",
+    "--proxy", "--report-html",
+    "--report-junit", "--report-tap",
+    "--repeat", "--resolve", "--retry",
+    "--retry-interval", "--socks5",
+    "--to-entry", "--unix-socket",
+    "--user", "--user-agent", "--variable",
+    "--variables-file", "--workers",
+    "-A", "-H", "-X", "-b", "-c", "-d", "-m",
+    "-o", "-r", "-u",
+]

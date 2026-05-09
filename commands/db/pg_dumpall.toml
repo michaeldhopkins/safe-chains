@@ -1,0 +1,34 @@
+[[command]]
+name = "pg_dumpall"
+description = "PostgreSQL — dumps all databases (and global objects: roles, tablespaces) to SQL. Reads from the configured cluster (network); writes the dump to stdout or to -f FILE. Connection target via -h/-p/-U or PG* env."
+url = "https://www.postgresql.org/docs/current/app-pg-dumpall.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--clean", "--data-only", "--disable-dollar-quoting",
+    "--disable-triggers", "--encoding",
+    "--exclude-database", "--exclude-pattern",
+    "--exclude-table", "--exclude-table-data",
+    "--filter", "--globals-only", "--help",
+    "--if-exists", "--inserts", "--load-via-partition-root",
+    "--lock-wait-timeout", "--no-comments", "--no-owner",
+    "--no-passwords", "--no-publications",
+    "--no-reconnect", "--no-role-passwords",
+    "--no-security-labels", "--no-subscriptions",
+    "--no-sync", "--no-tablespaces", "--no-toast-compression",
+    "--no-unlogged-table-data", "--on-conflict-do-nothing",
+    "--quote-all-identifiers",
+    "--rows-per-insert", "--schema-only",
+    "--use-set-session-authorization",
+    "--verbose", "--version", "--with-data", "--with-schema",
+    "-?", "-V", "-a", "-c", "-g", "-h", "-l", "-O", "-r",
+    "-s", "-t", "-v", "-w", "-W", "-x",
+]
+valued = [
+    "--column-inserts", "--database",
+    "--encoding", "--exclude-database",
+    "--filter", "--lock-wait-timeout",
+    "--rows-per-insert",
+    "-d", "-E", "-f", "-h", "-l", "-p", "-T", "-U",
+]

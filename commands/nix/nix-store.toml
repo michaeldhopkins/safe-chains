@@ -1,0 +1,86 @@
+[[command]]
+name = "nix-store"
+description = "Operates on the Nix store. Read-side: `-q` (--query) variants like --references, --referrers, --requisites, --binding, --hash, --size, --tree, --graph; --realise --dry-run; --gc --print-roots / --print-live / --print-dead / --print-tree; --verify --check-contents (read). Write-side: --realise, --add, --add-fixed, --gc (delete generations), --delete, --dump, --import, --restore, --export, --serve, --optimise, --repair-path, --verify-path, --read-log, --register-substitutes."
+url = "https://nix.dev/manual/nix/latest/command-ref/nix-store.html"
+researched_version = "Nix 2.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[command.wrapper]
+standalone = ["--quiet"]
+valued = ["--option", "--store"]
+
+[[command.sub]]
+name = "--query"
+candidate = true
+
+[[command.sub]]
+name = "-q"
+candidate = true
+
+[[command.sub]]
+name = "--realise"
+candidate = true
+
+[[command.sub]]
+name = "-r"
+candidate = true
+
+[[command.sub]]
+name = "--add"
+candidate = true
+
+[[command.sub]]
+name = "--add-fixed"
+candidate = true
+
+[[command.sub]]
+name = "--gc"
+candidate = true
+
+[[command.sub]]
+name = "--delete"
+candidate = true
+
+[[command.sub]]
+name = "--dump"
+candidate = true
+
+[[command.sub]]
+name = "--restore"
+candidate = true
+
+[[command.sub]]
+name = "--export"
+candidate = true
+
+[[command.sub]]
+name = "--import"
+candidate = true
+
+[[command.sub]]
+name = "--verify"
+candidate = true
+
+[[command.sub]]
+name = "--verify-path"
+candidate = true
+
+[[command.sub]]
+name = "--repair-path"
+candidate = true
+
+[[command.sub]]
+name = "--read-log"
+candidate = true
+
+[[command.sub]]
+name = "-l"
+candidate = true
+
+[[command.sub]]
+name = "--optimise"
+candidate = true
+
+[[command.sub]]
+name = "--serve"
+candidate = true

@@ -1,0 +1,156 @@
+[[command]]
+name = "eb"
+description = "AWS Elastic Beanstalk CLI. Most subcommands contact AWS (network + external system writes). Read-side: `events`, `health`, `list`, `logs`, `printenv`, `status`, `tags --list`, `--version`, `--help`. Write-side: `init`, `create`, `deploy`, `terminate`, `clone`, `restore`, `swap`, `setenv`, `unsetenv`, `tags --add/--update/--delete`, `config save/get/put/list/delete`, `scale`, `migrate`, `platform`, `appversion`, `local`, `ssh`, `console`, `codesource`, `labs`, `repair`."
+url = "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-getting-started.html"
+researched_version = "EB CLI 3.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "events"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--follow", "--help", "-f", "-h"]
+valued = ["--profile", "--region"]
+
+[[command.sub]]
+name = "health"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--mono", "--refresh", "-h"]
+valued = ["--profile", "--region", "--view"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--all", "--help", "--verbose", "-a", "-h", "-v"]
+valued = ["--profile", "--region"]
+
+[[command.sub]]
+name = "logs"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--all", "--cloudwatch-logs", "--cloudwatch-log-source", "--help", "--instance", "--stream", "--zip", "-a", "-h", "-z"]
+valued = ["--instance", "--profile", "--region"]
+
+[[command.sub]]
+name = "printenv"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--profile", "--region"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--verbose", "-h", "-v"]
+valued = ["--profile", "--region"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "terminate"
+candidate = true
+
+[[command.sub]]
+name = "clone"
+candidate = true
+
+[[command.sub]]
+name = "restore"
+candidate = true
+
+[[command.sub]]
+name = "swap"
+candidate = true
+
+[[command.sub]]
+name = "setenv"
+candidate = true
+
+[[command.sub]]
+name = "scale"
+candidate = true
+
+[[command.sub]]
+name = "tags"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "platform"
+candidate = true
+
+[[command.sub]]
+name = "appversion"
+candidate = true
+
+[[command.sub]]
+name = "local"
+candidate = true
+
+[[command.sub]]
+name = "ssh"
+candidate = true
+
+[[command.sub]]
+name = "console"
+candidate = true
+
+[[command.sub]]
+name = "codesource"
+candidate = true
+
+[[command.sub]]
+name = "labs"
+candidate = true
+
+[[command.sub]]
+name = "repair"
+candidate = true
+
+[[command.sub]]
+name = "use"
+candidate = true
+
+[[command.sub]]
+name = "abort"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true

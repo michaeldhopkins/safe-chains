@@ -1,0 +1,10 @@
+[[command]]
+name = "llvm-readobj"
+aliases = ["llvm-readelf"]
+description = "LLVM object-file inspector — equivalent to readelf. Pure read."
+url = "https://llvm.org/docs/CommandGuide/llvm-readobj.html"
+researched_version = "LLVM 18.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-?", "-h"]
