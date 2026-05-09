@@ -1,0 +1,98 @@
+[[command]]
+name = "dapr"
+description = "Dapr CLI — distributed application runtime. Subcommands: `init`, `uninstall`, `run`, `stop`, `dashboard`, `list`, `status`, `components`, `configurations`, `invoke`, `publish`, `mtls`, `logs`, `upgrade`, `version`, `completion`. Most subs run user services or modify cluster state."
+url = "https://docs.dapr.io/reference/cli/"
+researched_version = "dapr 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--all-namespaces", "--help", "-A", "-h"]
+valued = ["--kubernetes", "--namespace", "--output", "-k", "-n", "-o"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--kubernetes", "-h", "-k"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "components"
+level = "SafeRead"
+bare = true
+standalone = ["--all-namespaces", "--help", "--kubernetes", "-A", "-h", "-k"]
+valued = ["--name", "--namespace", "--output", "-n", "-o"]
+
+[[command.sub]]
+name = "configurations"
+level = "SafeRead"
+bare = true
+standalone = ["--all-namespaces", "--help", "--kubernetes", "-A", "-h", "-k"]
+valued = ["--name", "--namespace", "--output", "-n", "-o"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "stop"
+candidate = true
+
+[[command.sub]]
+name = "dashboard"
+candidate = true
+
+[[command.sub]]
+name = "invoke"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "mtls"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "annotate"
+candidate = true
+
+[[command.sub]]
+name = "build-info"
+candidate = true

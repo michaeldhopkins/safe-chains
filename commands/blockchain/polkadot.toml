@@ -1,0 +1,102 @@
+[[command]]
+name = "polkadot"
+description = "Polkadot Relay Chain node. Bare invocation starts the long-running validator / RPC node. Subcommands include `version`, `key`, `purge-chain`, `revert`, `sign`, `verify`, `vanity`, `inspect-key`, `inspect-node-key`, `import-blocks`, `export-blocks`, `export-genesis-state`, `export-genesis-wasm`, `check-block`, `chain-info`, `try-runtime`. Carve-out covers diagnostic / read forms."
+url = "https://wiki.polkadot.network/docs/maintain-sync"
+researched_version = "Polkadot SDK 1.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "chain-info"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "inspect-key"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "inspect-node-key"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "verify"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "key"
+candidate = true
+
+[[command.sub]]
+name = "purge-chain"
+candidate = true
+
+[[command.sub]]
+name = "revert"
+candidate = true
+
+[[command.sub]]
+name = "sign"
+candidate = true
+
+[[command.sub]]
+name = "vanity"
+candidate = true
+
+[[command.sub]]
+name = "import-blocks"
+candidate = true
+
+[[command.sub]]
+name = "export-blocks"
+candidate = true
+
+[[command.sub]]
+name = "export-genesis-state"
+candidate = true
+
+[[command.sub]]
+name = "export-genesis-wasm"
+candidate = true
+
+[[command.sub]]
+name = "check-block"
+candidate = true
+
+[[command.sub]]
+name = "try-runtime"
+candidate = true
+
+[[command.sub]]
+name = "build-spec"
+candidate = true
+
+[[command.sub]]
+name = "benchmark"
+candidate = true
+
+[[command.sub]]
+name = "wasm"
+candidate = true
+
+[[command.sub]]
+name = "prepare-worker"
+candidate = true
+
+[[command.sub]]
+name = "execute-worker"
+candidate = true
+
+[[command.sub]]
+name = "block-time"
+candidate = true

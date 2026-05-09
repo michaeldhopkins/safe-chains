@@ -1,0 +1,51 @@
+[[command]]
+name = "mongorestore"
+description = "MongoDB restore utility. Reads a dump and writes to the configured cluster (network + external system write)."
+url = "https://www.mongodb.com/docs/database-tools/mongorestore/"
+researched_version = "MongoDB Database Tools 100.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--archive", "--authenticationDatabase",
+    "--authenticationMechanism", "--bypassDocumentValidation",
+    "--collection", "--convertLegacyIndexes",
+    "--db", "--drop", "--dryRun",
+    "--gzip", "--help", "--ipv6",
+    "--keepIndexVersion", "--maintainInsertionOrder",
+    "--noIndexRestore", "--noOptionsRestore",
+    "--nsExclude", "--nsFrom", "--nsInclude",
+    "--nsTo", "--numInsertionWorkersPerCollection",
+    "--numParallelCollections",
+    "--objcheck", "--oplogLimit",
+    "--oplogReplay", "--oplogFile",
+    "--password", "--port",
+    "--preserveUUID", "--quiet",
+    "--readPreference", "--restoreDbUsersAndRoles",
+    "--ssl", "--sslAllowInvalidCertificates",
+    "--sslAllowInvalidHostnames",
+    "--sslCAFile", "--sslPEMKeyFile",
+    "--sslPEMKeyPassword", "--stopOnError",
+    "--temp-dbpath", "--temp-port",
+    "--tlsInsecure", "--useArrayIndexFields",
+    "--username", "--verbose", "--version",
+    "--writeConcern",
+    "-c", "-d", "-h", "-j", "-p",
+    "-u", "-v",
+]
+valued = [
+    "--archive", "--authenticationDatabase",
+    "--authenticationMechanism", "--collection",
+    "--config", "--db", "--gzip",
+    "--host", "--nsExclude",
+    "--nsFrom", "--nsInclude", "--nsTo",
+    "--numInsertionWorkers", "--numInsertionWorkersPerCollection",
+    "--numParallelCollections", "--objcheck",
+    "--oplogLimit", "--password", "--port",
+    "--readPreference", "--sslCAFile",
+    "--sslCRLFile", "--sslPEMKeyFile",
+    "--sslPEMKeyPassword",
+    "--tlsCertificateKeyFile", "--tlsCAFile",
+    "--uri", "--username",
+    "--writeConcern",
+    "-c", "-d", "-h", "-j", "-p", "-u",
+]

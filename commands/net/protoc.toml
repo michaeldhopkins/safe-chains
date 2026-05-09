@@ -1,0 +1,9 @@
+[[command]]
+name = "protoc"
+description = "Protocol Buffers compiler — reads .proto files and generates code in the target language via plugins. Plugins (`protoc-gen-*`) are arbitrary executables loaded at compile time. Carve-out: --version / --help only."
+url = "https://protobuf.dev/programming-guides/proto3/"
+researched_version = "protoc 25.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]

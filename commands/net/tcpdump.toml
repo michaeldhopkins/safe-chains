@@ -1,0 +1,25 @@
+[[command]]
+name = "tcpdump"
+description = "Network packet capture. Reads packets from a network interface (-i) or saved pcap (-r) and prints them. -w PATH writes packets to a pcap file. Requires root for live capture in most setups."
+url = "https://www.tcpdump.org/manpages/tcpdump.1.html"
+researched_version = "tcpdump 4.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--help", "--version", "-?", "-A", "-B",
+    "-C", "-D", "-G", "-K", "-L",
+    "-M", "-N", "-O", "-P", "-Q",
+    "-S", "-U", "-W", "-X", "-Z",
+    "-c", "-d", "-e", "-f", "-h", "-i",
+    "-j", "-l", "-n", "-p", "-q",
+    "-r", "-s", "-t", "-u", "-v",
+    "-w", "-x", "-y",
+]
+valued = [
+    "--immediate-mode", "--snapshot-length",
+    "--time-stamp-precision", "--time-stamp-type",
+    "-B", "-c", "-C", "-E", "-F", "-G",
+    "-i", "-j", "-M", "-Q", "-r", "-s",
+    "-T", "-w", "-W", "-y", "-z", "-Z",
+]

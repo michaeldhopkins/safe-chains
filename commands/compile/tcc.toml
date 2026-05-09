@@ -1,0 +1,9 @@
+[[command]]
+name = "tcc"
+description = "TinyCC — small fast C compiler that can also run C source as a script. Reads .c source and writes object / executable output (or runs the source if invoked with -run, which is arbitrary code execution). Carve-out: --help / --version only — meaningful invocations either compile or run user code."
+url = "https://bellard.org/tcc/tcc-doc.html"
+researched_version = "TCC 0.9.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-?", "-h", "-v"]

@@ -1,0 +1,10 @@
+[[command]]
+name = "pg_controldata"
+description = "Prints control information for a PostgreSQL data directory (WAL, checkpoint, locale, etc.). Pure read."
+url = "https://www.postgresql.org/docs/current/app-pgcontroldata.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--version", "-?", "-V"]
+valued = ["--pgdata", "-D"]

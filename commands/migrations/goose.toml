@@ -1,0 +1,65 @@
+[[command]]
+name = "goose"
+description = "Goose Go database migration tool. Subcommands: `up`, `up-by-one`, `up-to`, `down`, `down-to`, `redo`, `reset`, `status`, `version`, `create`, `fix`, `validate`, `env`. Read-side: `status`, `version`, `validate`, `env`. Write-side: `up*/down*/redo/reset/create/fix` — all execute SQL or write files."
+url = "https://github.com/pressly/goose"
+researched_version = "goose 3.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "status"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "validate"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "env"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "up"
+candidate = true
+
+[[command.sub]]
+name = "up-by-one"
+candidate = true
+
+[[command.sub]]
+name = "up-to"
+candidate = true
+
+[[command.sub]]
+name = "down"
+candidate = true
+
+[[command.sub]]
+name = "down-to"
+candidate = true
+
+[[command.sub]]
+name = "redo"
+candidate = true
+
+[[command.sub]]
+name = "reset"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "fix"
+candidate = true

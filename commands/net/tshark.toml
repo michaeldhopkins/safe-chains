@@ -1,0 +1,28 @@
+[[command]]
+name = "tshark"
+description = "Wireshark CLI. Reads packets from interface or pcap and prints / writes pcap output."
+url = "https://www.wireshark.org/docs/man-pages/tshark.html"
+researched_version = "Wireshark 4.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--help", "--version", "--list-time-stamp-types",
+    "-?", "-2", "-A", "-B", "-D", "-F",
+    "-K", "-L", "-M", "-N", "-O", "-P",
+    "-Q", "-S", "-T", "-U", "-V", "-W",
+    "-X", "-Y", "-Z", "-a", "-b", "-c",
+    "-C", "-d", "-e", "-E", "-f", "-h",
+    "-i", "-j", "-l", "-n", "-o", "-p",
+    "-q", "-r", "-s", "-t", "-u", "-v",
+    "-w", "-x", "-y", "-z",
+]
+valued = [
+    "-A", "-B", "-D", "-F", "-G", "-N",
+    "-O", "-P", "-S", "-T", "-W",
+    "-X", "-Y", "-Z", "-b", "-c",
+    "-C", "-d", "-e", "-E", "-f",
+    "-i", "-j", "-l", "-n",
+    "-o", "-p", "-r", "-s", "-t",
+    "-w", "-y", "-z",
+]

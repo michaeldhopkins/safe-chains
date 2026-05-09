@@ -1,0 +1,35 @@
+[[command]]
+name = "mongoexport"
+description = "MongoDB export utility. Reads from the cluster (network) and writes JSON/CSV to stdout (or to --out)."
+url = "https://www.mongodb.com/docs/database-tools/mongoexport/"
+researched_version = "MongoDB Database Tools 100.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--assertExists", "--authenticationDatabase",
+    "--authenticationMechanism", "--collection",
+    "--db", "--forceTableScan", "--help",
+    "--ipv6", "--jsonArray", "--noHeaderLine",
+    "--objcheck", "--password", "--port",
+    "--quiet", "--readPreference",
+    "--ssl", "--sslAllowInvalidCertificates",
+    "--sslAllowInvalidHostnames",
+    "--type", "--useArrayIndexFields",
+    "--username", "--verbose", "--version",
+    "-c", "-d", "-f", "-h", "-o", "-p",
+    "-q", "-u", "-v",
+]
+valued = [
+    "--authenticationDatabase",
+    "--authenticationMechanism", "--collection",
+    "--config", "--db", "--fields",
+    "--fieldFile", "--host", "--jsonFormat",
+    "--limit", "--out", "--password", "--port",
+    "--query", "--queryFile", "--readPreference",
+    "--skip", "--sort", "--sslCAFile",
+    "--sslCRLFile", "--sslPEMKeyFile",
+    "--sslPEMKeyPassword",
+    "--tlsCertificateKeyFile", "--tlsCAFile",
+    "--type", "--uri", "--username",
+    "-c", "-d", "-f", "-h", "-o", "-p", "-q", "-u",
+]

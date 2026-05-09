@@ -1,0 +1,9 @@
+[[command]]
+name = "llvm-link"
+description = "LLVM IR linker — combines multiple .ll/.bc files into one. Pure SafeWrite."
+url = "https://llvm.org/docs/CommandGuide/llvm-link.html"
+researched_version = "LLVM 18.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-?", "-h"]

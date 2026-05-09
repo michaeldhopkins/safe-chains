@@ -1,0 +1,10 @@
+[[command]]
+name = "salt"
+aliases = ["salt-call", "salt-master", "salt-key", "salt-run", "salt-cloud", "salt-ssh"]
+description = "Salt — configuration management. salt-master / salt minions execute states (arbitrary Python). Carve-out: --version / --help only."
+url = "https://docs.saltproject.io/en/latest/ref/cli/index.html"
+researched_version = "Salt 3007.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

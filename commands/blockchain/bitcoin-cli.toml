@@ -1,0 +1,9 @@
+[[command]]
+name = "bitcoin-cli"
+description = "Bitcoin Core JSON-RPC client. Bare invocation calls the configured `bitcoind` over RPC (network read for `getinfo`/`getblockchaininfo`/etc.; write for `sendrawtransaction`/`sendtoaddress`/`importprivkey`/etc.). Carve-out: --version / --help only — meaningful invocations are RPC calls to the daemon."
+url = "https://bitcoincore.org/en/doc/"
+researched_version = "Bitcoin Core 28.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-?", "-h"]

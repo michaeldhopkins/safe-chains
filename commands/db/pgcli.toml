@@ -1,0 +1,9 @@
+[[command]]
+name = "pgcli"
+description = "Interactive PostgreSQL REPL with autocompletion + syntax highlighting. Bare invocation drops into the REPL connected to the configured database. Carve-out: --version / --help only."
+url = "https://www.pgcli.com/docs"
+researched_version = "pgcli 4.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

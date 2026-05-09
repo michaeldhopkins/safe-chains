@@ -1,0 +1,31 @@
+[[command]]
+name = "grpcurl"
+description = "gRPC equivalent of curl. Network read/write of gRPC services. -plaintext bypasses TLS; -d invokes a method with request data."
+url = "https://github.com/fullstorydev/grpcurl"
+researched_version = "grpcurl 1.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--help", "-H", "-allow-unknown-fields", "-authority",
+    "-cacert", "-cert", "-connect-timeout",
+    "-d", "-emit-defaults", "-expand-headers",
+    "-format", "-format-error", "-help",
+    "-import-path", "-insecure", "-keepalive-time",
+    "-key", "-keysize-options", "-max-msg-sz",
+    "-max-time", "-msg-template", "-plaintext",
+    "-proto", "-protoset", "-protoset-out",
+    "-rpc-header", "-servername", "-unix",
+    "-use-reflection", "-userconfig",
+    "-v", "-V", "-vv",
+    "-version",
+]
+valued = [
+    "-H", "-authority", "-cacert", "-cert", "-connect-timeout",
+    "-d", "-format", "-format-error", "-import-path",
+    "-keepalive-time", "-key", "-keysize-options",
+    "-max-msg-sz", "-max-time",
+    "-msg-template", "-proto", "-protoset",
+    "-protoset-out", "-rpc-header", "-servername",
+    "-unix", "-userconfig",
+]

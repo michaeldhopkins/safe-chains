@@ -1,0 +1,9 @@
+[[command]]
+name = "emar"
+description = "Emscripten archiver — wraps `ar` for Emscripten output. Reads object files, writes a static library archive."
+url = "https://emscripten.org/docs/tools_reference/emar.html"
+researched_version = "Emscripten 3.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-h"]

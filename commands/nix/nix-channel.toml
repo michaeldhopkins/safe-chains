@@ -1,0 +1,30 @@
+[[command]]
+name = "nix-channel"
+description = "Manages channels — collections of Nix expressions fetched from URLs. Read-side: `--list`, `--list-generations`, `--help`, `--version`. Write-side: `--add`, `--remove`, `--update` (network), `--rollback`."
+url = "https://nix.dev/manual/nix/latest/command-ref/nix-channel.html"
+researched_version = "Nix 2.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "--list"
+candidate = true
+
+[[command.sub]]
+name = "--list-generations"
+candidate = true
+
+[[command.sub]]
+name = "--add"
+candidate = true
+
+[[command.sub]]
+name = "--remove"
+candidate = true
+
+[[command.sub]]
+name = "--update"
+candidate = true
+
+[[command.sub]]
+name = "--rollback"
+candidate = true

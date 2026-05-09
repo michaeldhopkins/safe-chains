@@ -1,0 +1,9 @@
+[[command]]
+name = "btop"
+description = "Modern resource monitor (htop alternative). Interactive TUI. Carve-out: --version / --help only."
+url = "https://github.com/aristocratos/btop"
+researched_version = "btop 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

@@ -1,0 +1,67 @@
+[[command]]
+name = "chalice"
+description = "AWS Chalice — Python serverless framework. Subcommands: `new-project` (scaffold), `local` (runs the app locally — executes user Python), `deploy` (creates / updates AWS API Gateway + Lambda — network + external writes), `delete`, `logs`, `url`, `package`, `generate-pipeline`, `generate-models`, `invoke`, `dev plan/build`. Read-side: `url`, `logs --follow`, `package --no-pretty-print --pretty`."
+url = "https://aws.github.io/chalice/topics/configfile.html"
+researched_version = "Chalice 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "url"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--profile", "--stage"]
+
+[[command.sub]]
+name = "logs"
+level = "SafeRead"
+bare = true
+standalone = ["--follow", "--help", "--include-lambda-messages", "-f", "-h"]
+valued = ["--name", "--profile", "--since", "--stage"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "new-project"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "local"
+candidate = true
+
+[[command.sub]]
+name = "invoke"
+candidate = true
+
+[[command.sub]]
+name = "package"
+candidate = true
+
+[[command.sub]]
+name = "generate-pipeline"
+candidate = true
+
+[[command.sub]]
+name = "generate-models"
+candidate = true
+
+[[command.sub]]
+name = "dev"
+candidate = true

@@ -1,0 +1,87 @@
+[[command]]
+name = "kpt"
+description = "Kubernetes config packaging — Google's KRM toolkit. Subcommands: `pkg` (init/get/update/diff/tree/cat/get/init), `fn` (eval/render/source/sink), `live` (apply/init/destroy/preview/status), `alpha`. Carve-out covers read forms."
+url = "https://kpt.dev/reference/cli/"
+researched_version = "kpt 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "pkg"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "tree"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "cat"
+standalone = ["--help", "-h"]
+valued = ["--annotate", "--exclude-non-local", "--include-local", "--strip-comments", "--style"]
+
+[[command.sub.sub]]
+name = "diff"
+standalone = ["--help", "-h"]
+valued = ["--diff-tool", "--diff-tool-opts", "--diff-type"]
+
+[[command.sub.sub]]
+name = "init"
+candidate = true
+
+[[command.sub.sub]]
+name = "get"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "fn"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "eval"
+candidate = true
+
+[[command.sub.sub]]
+name = "render"
+candidate = true
+
+[[command.sub.sub]]
+name = "source"
+candidate = true
+
+[[command.sub.sub]]
+name = "sink"
+candidate = true
+
+[[command.sub.sub]]
+name = "doc"
+candidate = true
+
+[[command.sub]]
+name = "live"
+candidate = true
+
+[[command.sub]]
+name = "alpha"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true

@@ -1,0 +1,10 @@
+[[command]]
+name = "puppet"
+aliases = ["puppet-agent", "puppet-master"]
+description = "Puppet configuration management. Subcommands `apply`, `agent`, `cert`, `config`, `module`, `resource`, `lookup`, `parser`, `task`, `plan` apply manifests (arbitrary Ruby) or modify managed nodes. Carve-out: --version / --help only."
+url = "https://www.puppet.com/docs/puppet/"
+researched_version = "Puppet 8.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

@@ -1,0 +1,18 @@
+[[command]]
+name = "pdfinfo"
+description = "Poppler — prints PDF metadata (title, producer, page sizes, etc.). Pure read."
+url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfinfo.1.html"
+researched_version = "Poppler 24.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "-box", "-dests", "-help",
+    "-isodates", "-js", "-listenc", "-meta",
+    "-rawdates", "-q", "-struct",
+    "-struct-text", "-url", "-v",
+    "--help", "-?",
+]
+valued = [
+    "-enc", "-f", "-l", "-opw", "-upw",
+]

@@ -1,0 +1,48 @@
+[[command]]
+name = "influxd"
+description = "InfluxDB OSS server daemon. Bare invocation starts the database server (long-running, listens). Subcommands: `version`, `print-config` (read), `recovery`, `inspect`, `upgrade`, `downgrade`. Carve-out covers diagnostic / read-only forms."
+url = "https://docs.influxdata.com/influxdb/v2/reference/cli/influxd/"
+researched_version = "InfluxDB 2.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "print-config"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--bolt-path", "--engine-path", "--http-bind-address", "--log-level", "--secret-store"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "recovery"
+candidate = true
+
+[[command.sub]]
+name = "inspect"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "downgrade"
+candidate = true

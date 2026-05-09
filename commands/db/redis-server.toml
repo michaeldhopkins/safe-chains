@@ -1,0 +1,9 @@
+[[command]]
+name = "redis-server"
+description = "Redis server daemon. Bare invocation starts the server (long-running, listens). --version / --help / --test-memory / --check-aof / --check-rdb are diagnostic. Carve-out covers diagnostic forms only."
+url = "https://redis.io/docs/latest/operate/oss_and_stack/management/admin/"
+researched_version = "Redis 7.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--check-aof", "--check-rdb", "--help", "--test-memory", "--version", "-h", "-v"]

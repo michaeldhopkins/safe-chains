@@ -1,0 +1,213 @@
+[[command]]
+name = "spl-token"
+description = "Solana SPL Token CLI. Many subcommands. Read-side: `accounts`, `address`, `balance`, `display`, `gc`, `multisig-info`, `supply`, `account-info`, `--version`, `--help`. Write-side: `create-token`, `create-account`, `create-multisig`, `mint`, `burn`, `transfer`, `freeze`, `thaw`, `wrap`, `unwrap`, `approve`, `revoke`, `close`, `authorize`, `enable-required-transfer-memos`, `disable-required-transfer-memos`."
+url = "https://spl.solana.com/token"
+researched_version = "SPL Token 4.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "accounts"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "address"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "balance"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "display"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "supply"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "account-info"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "multisig-info"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "create-token"
+candidate = true
+
+[[command.sub]]
+name = "create-account"
+candidate = true
+
+[[command.sub]]
+name = "create-multisig"
+candidate = true
+
+[[command.sub]]
+name = "mint"
+candidate = true
+
+[[command.sub]]
+name = "burn"
+candidate = true
+
+[[command.sub]]
+name = "transfer"
+candidate = true
+
+[[command.sub]]
+name = "freeze"
+candidate = true
+
+[[command.sub]]
+name = "thaw"
+candidate = true
+
+[[command.sub]]
+name = "wrap"
+candidate = true
+
+[[command.sub]]
+name = "unwrap"
+candidate = true
+
+[[command.sub]]
+name = "approve"
+candidate = true
+
+[[command.sub]]
+name = "revoke"
+candidate = true
+
+[[command.sub]]
+name = "close"
+candidate = true
+
+[[command.sub]]
+name = "authorize"
+candidate = true
+
+[[command.sub]]
+name = "set-transfer-fee"
+candidate = true
+
+[[command.sub]]
+name = "withdraw-withheld-tokens"
+candidate = true
+
+[[command.sub]]
+name = "harvest-withheld-tokens-to-mint"
+candidate = true
+
+[[command.sub]]
+name = "deposit-with-confidential-extension"
+candidate = true
+
+[[command.sub]]
+name = "withdraw-with-confidential-extension"
+candidate = true
+
+[[command.sub]]
+name = "withdraw-excess-lamports"
+candidate = true
+
+[[command.sub]]
+name = "transfer-with-confidential-extension"
+candidate = true
+
+[[command.sub]]
+name = "configure-confidential-transfer-account"
+candidate = true
+
+[[command.sub]]
+name = "enable-confidential-credits"
+candidate = true
+
+[[command.sub]]
+name = "disable-confidential-credits"
+candidate = true
+
+[[command.sub]]
+name = "enable-non-confidential-credits"
+candidate = true
+
+[[command.sub]]
+name = "disable-non-confidential-credits"
+candidate = true
+
+[[command.sub]]
+name = "enable-required-transfer-memos"
+candidate = true
+
+[[command.sub]]
+name = "disable-required-transfer-memos"
+candidate = true
+
+[[command.sub]]
+name = "set-interest-rate"
+candidate = true
+
+[[command.sub]]
+name = "update-default-account-state"
+candidate = true
+
+[[command.sub]]
+name = "set-transfer-hook"
+candidate = true
+
+[[command.sub]]
+name = "initialize-metadata"
+candidate = true
+
+[[command.sub]]
+name = "update-metadata"
+candidate = true
+
+[[command.sub]]
+name = "initialize-group"
+candidate = true
+
+[[command.sub]]
+name = "update-group-max-size"
+candidate = true
+
+[[command.sub]]
+name = "update-group-authority"
+candidate = true
+
+[[command.sub]]
+name = "initialize-member"
+candidate = true
+
+[[command.sub]]
+name = "gc"
+candidate = true
+
+[[command.sub]]
+name = "set-cookie"
+candidate = true
+
+[[command.sub]]
+name = "metadata"
+candidate = true
+
+[[command.sub]]
+name = "wrap-existing"
+candidate = true
+
+[[command.sub]]
+name = "sync-native"
+candidate = true

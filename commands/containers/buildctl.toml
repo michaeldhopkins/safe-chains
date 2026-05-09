@@ -1,0 +1,71 @@
+[[command]]
+name = "buildctl"
+description = "BuildKit client. Subcommands: `build`, `dial-stdio`, `du`, `prune`, `debug`. Read-side: `du`, `debug *`. Write-side: `build` (writes images to local store / registry — network), `prune` (removes cache)."
+url = "https://github.com/moby/buildkit"
+researched_version = "BuildKit 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "du"
+level = "SafeRead"
+bare = true
+standalone = ["--filter", "--help", "--verbose", "-h", "-v"]
+
+[[command.sub]]
+name = "debug"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "workers"
+standalone = ["--filter", "--help", "--verbose", "-h", "-v"]
+
+[[command.sub.sub]]
+name = "histories"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub.sub]]
+name = "monitor"
+candidate = true
+
+[[command.sub.sub]]
+name = "dump-llb"
+candidate = true
+
+[[command.sub.sub]]
+name = "get-policy"
+candidate = true
+
+[[command.sub.sub]]
+name = "validate-policy"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "dial-stdio"
+candidate = true
+
+[[command.sub]]
+name = "prune"
+candidate = true

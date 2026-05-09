@@ -1,0 +1,25 @@
+[[command]]
+name = "pdftocairo"
+description = "Poppler — converts a PDF to PNG / JPEG / TIFF / PDF / PS / EPS / SVG using Cairo. Reads PDF, writes converted output. Pure conversion."
+url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftocairo.1.html"
+researched_version = "Poppler 24.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "-antialias", "-cropbox", "-duplex",
+    "-eps", "-expand", "-gray", "-help",
+    "-jpeg", "-mono", "-noshrink", "-nocenter",
+    "-nocrop", "-origpagesizes",
+    "-paper", "-pdf", "-png", "-ps",
+    "-q", "-r", "-singlefile", "-svg",
+    "-tiff", "-transp", "-v",
+    "--help", "-?",
+]
+valued = [
+    "-antialias", "-f", "-icc", "-jpegopt",
+    "-l", "-opw", "-paperh", "-paperw",
+    "-r", "-rx", "-ry",
+    "-tiffcompression", "-thinlinemode",
+    "-upw", "-x", "-y", "-W", "-H",
+]

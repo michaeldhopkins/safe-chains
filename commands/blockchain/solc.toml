@@ -1,0 +1,48 @@
+[[command]]
+name = "solc"
+description = "Solidity compiler. Reads .sol source files and writes compiled bytecode / ABI / metadata. Yul / Solidity inline assembly are compiled to bytecode. Pure compilation."
+url = "https://docs.soliditylang.org/en/latest/using-the-compiler.html"
+researched_version = "solc 0.8.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--abi", "--allow-paths", "--asm",
+    "--asm-json", "--ast", "--ast-compact-json",
+    "--ast-json", "--bin", "--bin-runtime",
+    "--check-model", "--combined-json",
+    "--devdoc", "--error-recovery",
+    "--gas", "--help", "--ignore-missing",
+    "--include-path", "--input-file",
+    "--ir", "--ir-optimized",
+    "--lsp", "--metadata", "--metadata-hash",
+    "--metadata-literal", "--model-checker-engine",
+    "--model-checker-targets", "--model-checker-timeout",
+    "--no-cbor-metadata", "--no-color",
+    "--no-optimize-yul", "--opcodes", "--optimize",
+    "--optimize-runs", "--optimize-yul",
+    "--overwrite", "--pretty-json",
+    "--standard-json", "--storage-layout",
+    "--strict-assembly", "--userdoc",
+    "--version", "--yul",
+    "-?", "-h",
+]
+valued = [
+    "--allow-paths", "--base-path", "--combined-json",
+    "--debug-info", "--evm-version",
+    "--include-path", "--input-file",
+    "--libraries", "--metadata-hash",
+    "--model-checker-contracts",
+    "--model-checker-div-mod-no-slacks",
+    "--model-checker-engine", "--model-checker-ext-calls",
+    "--model-checker-invariants",
+    "--model-checker-print-query", "--model-checker-show-proved-safe",
+    "--model-checker-show-unproved",
+    "--model-checker-show-unsupported",
+    "--model-checker-solvers",
+    "--model-checker-targets", "--model-checker-timeout",
+    "--optimize-runs",
+    "--output-dir", "--revert-strings",
+    "--via-ir", "--yul-dialect", "--yul-optimizations",
+    "-o",
+]

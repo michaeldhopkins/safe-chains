@@ -1,0 +1,20 @@
+[[command]]
+name = "createdb"
+description = "PostgreSQL — creates a new database on the configured server. External-system write. Connection target via -h/-p/-U."
+url = "https://www.postgresql.org/docs/current/app-createdb.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--echo", "--help", "--no-password",
+    "--password", "--version",
+    "-?", "-V", "-e", "-h", "-p",
+    "-U", "-w", "-W",
+]
+valued = [
+    "--encoding", "--host", "--locale", "--locale-provider",
+    "--lc-collate", "--lc-ctype", "--icu-locale", "--icu-rules",
+    "--owner", "--password", "--port", "--strategy",
+    "--tablespace", "--template", "--username",
+    "-D", "-E", "-O", "-T", "-h", "-p", "-U",
+]

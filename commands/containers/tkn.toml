@@ -1,0 +1,124 @@
+[[command]]
+name = "tkn"
+description = "Tekton CLI — manages Tekton Pipelines on Kubernetes. Subcommands: `pipeline`, `pipelinerun`, `task`, `taskrun`, `clustertask`, `eventlistener`, `triggerbinding`, `triggertemplate`, `clustertriggerbinding`, `customrun`, `pipelineresource`, `bundle`, `chains`, `hub`, `version`, `--help`. Most subs contact the cluster."
+url = "https://tekton.dev/docs/cli/"
+researched_version = "tkn 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--client", "--component", "--help", "-h"]
+
+[[command.sub]]
+name = "pipeline"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--all-namespaces", "--help", "--no-headers", "-A", "-h"]
+valued = ["--namespace", "--output", "-n", "-o"]
+
+[[command.sub.sub]]
+name = "describe"
+standalone = ["--help", "--last", "-h", "-L"]
+valued = ["--namespace", "--output", "-n", "-o"]
+
+[[command.sub.sub]]
+name = "logs"
+standalone = ["--all", "--follow", "--help", "--last", "--prefix", "--step", "--task", "--timestamps", "-a", "-f", "-h"]
+valued = ["--namespace", "--limit", "-n"]
+
+[[command.sub.sub]]
+name = "create"
+candidate = true
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "start"
+candidate = true
+
+[[command.sub.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "pipelinerun"
+candidate = true
+
+[[command.sub]]
+name = "pr"
+candidate = true
+
+[[command.sub]]
+name = "task"
+candidate = true
+
+[[command.sub]]
+name = "taskrun"
+candidate = true
+
+[[command.sub]]
+name = "tr"
+candidate = true
+
+[[command.sub]]
+name = "clustertask"
+candidate = true
+
+[[command.sub]]
+name = "ct"
+candidate = true
+
+[[command.sub]]
+name = "eventlistener"
+candidate = true
+
+[[command.sub]]
+name = "triggerbinding"
+candidate = true
+
+[[command.sub]]
+name = "triggertemplate"
+candidate = true
+
+[[command.sub]]
+name = "clustertriggerbinding"
+candidate = true
+
+[[command.sub]]
+name = "customrun"
+candidate = true
+
+[[command.sub]]
+name = "pipelineresource"
+candidate = true
+
+[[command.sub]]
+name = "bundle"
+candidate = true
+
+[[command.sub]]
+name = "chains"
+candidate = true
+
+[[command.sub]]
+name = "hub"
+candidate = true
+
+[[command.sub]]
+name = "options"
+candidate = true

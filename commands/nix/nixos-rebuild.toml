@@ -1,0 +1,67 @@
+[[command]]
+name = "nixos-rebuild"
+description = "NixOS system manager. Subcommands: `switch` (build + activate as default), `boot` (build + set as boot default), `test` (build + activate without setting boot default), `build` (build only), `dry-build` (compute deps, no build), `dry-activate` (compute changes, no activation), `edit`, `build-vm`, `build-vm-with-bootloader`, `list-generations`, `repl`. Most subcommands modify system state (system-wide writes) and may contact binary caches (network). The carve-out covers diagnostic / read forms."
+url = "https://nixos.org/manual/nixos/stable/#sec-changing-config"
+researched_version = "NixOS 24.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list-generations"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--json", "-h"]
+valued = ["--profile-name", "-p"]
+
+[[command.sub]]
+name = "dry-build"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--flake"]
+
+[[command.sub]]
+name = "dry-activate"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--flake"]
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "switch"
+candidate = true
+
+[[command.sub]]
+name = "boot"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "build-vm"
+candidate = true
+
+[[command.sub]]
+name = "build-vm-with-bootloader"
+candidate = true
+
+[[command.sub]]
+name = "repl"
+candidate = true
+
+[[command.sub]]
+name = "build-image"
+candidate = true
+
+[[command.sub]]
+name = "switch-and-update"
+candidate = true

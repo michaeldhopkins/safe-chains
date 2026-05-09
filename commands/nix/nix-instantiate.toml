@@ -1,0 +1,9 @@
+[[command]]
+name = "nix-instantiate"
+description = "Instantiates a Nix expression — turns it into a store derivation (.drv) without building. --eval evaluates an expression and prints the result. Loads project Nix code at evaluation time. --parse just parses without evaluating."
+url = "https://nix.dev/manual/nix/latest/command-ref/nix-instantiate.html"
+researched_version = "Nix 2.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]

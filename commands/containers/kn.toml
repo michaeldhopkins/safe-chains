@@ -1,0 +1,123 @@
+[[command]]
+name = "kn"
+description = "Knative CLI. Subcommands: `service` (create/delete/describe/list/update/apply), `revision` (list/describe/delete), `route` (list/describe), `trigger`, `broker`, `eventtype`, `subscription`, `channel`, `domain`, `version`, `--help`. Most subs contact the cluster (network)."
+url = "https://knative.dev/docs/client/configure-kn/"
+researched_version = "kn 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "service"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--all-namespaces", "--help", "--no-headers", "-A", "-h"]
+valued = ["--namespace", "--output", "-n", "-o"]
+
+[[command.sub.sub]]
+name = "describe"
+standalone = ["--help", "--no-headers", "--print-details", "--verbose", "-h", "-v"]
+valued = ["--namespace", "--output", "-n", "-o"]
+
+[[command.sub.sub]]
+name = "create"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "apply"
+candidate = true
+
+[[command.sub.sub]]
+name = "import"
+candidate = true
+
+[[command.sub.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "revision"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "describe"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "route"
+candidate = true
+
+[[command.sub]]
+name = "trigger"
+candidate = true
+
+[[command.sub]]
+name = "broker"
+candidate = true
+
+[[command.sub]]
+name = "eventtype"
+candidate = true
+
+[[command.sub]]
+name = "subscription"
+candidate = true
+
+[[command.sub]]
+name = "channel"
+candidate = true
+
+[[command.sub]]
+name = "container"
+candidate = true
+
+[[command.sub]]
+name = "domain"
+candidate = true
+
+[[command.sub]]
+name = "options"
+candidate = true
+
+[[command.sub]]
+name = "plugin"
+candidate = true
+
+[[command.sub]]
+name = "func"
+candidate = true
+
+[[command.sub]]
+name = "source"
+candidate = true

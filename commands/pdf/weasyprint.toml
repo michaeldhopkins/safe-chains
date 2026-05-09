@@ -1,0 +1,28 @@
+[[command]]
+name = "weasyprint"
+description = "Renders HTML/CSS to PDF (and PNG). Reads HTML or URL, writes PDF/PNG to the second positional argument. Network reads when input is a URL."
+url = "https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#command-line-api"
+researched_version = "WeasyPrint 65.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--debug", "--encoding", "--full-fonts",
+    "--help", "--info", "--media-type",
+    "--optimize-images", "--pdf-forms",
+    "--pdf-identifier", "--pdf-variant",
+    "--pdf-version", "--presentational-hints",
+    "--quiet", "--srgb", "--timeout",
+    "--uncompressed-pdf", "--verbose", "--version",
+    "-D", "-c", "-d", "-e", "-f", "-h",
+    "-m", "-n", "-O", "-o", "-p", "-q",
+    "-s", "-t", "-u", "-v",
+]
+valued = [
+    "--base-url", "--encoding",
+    "--media-type", "--optimize-size",
+    "--pdf-identifier", "--pdf-variant",
+    "--pdf-version", "--stylesheet",
+    "--timeout",
+    "-c", "-e", "-f", "-m", "-O", "-o", "-s", "-t", "-u",
+]

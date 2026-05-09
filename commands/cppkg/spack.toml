@@ -1,0 +1,278 @@
+[[command]]
+name = "spack"
+description = "Spack — HPC package manager. Many subcommands. Read-side: `list`, `info`, `find`, `dependents`, `dependencies`, `arch`, `compilers`, `compiler list`, `version`, `help`, `pkg list`, `extensions`, `repo list`, `mirror list`, `module loads`, `concretize -p`, `spec`. Write-side: `install`, `uninstall`, `compiler add/remove`, `repo add/remove/create`, `mirror add/remove/create`, `module refresh`, `clean`, `gpg`, `bootstrap`, `env activate/create/remove/list/loads`."
+url = "https://spack.readthedocs.io/en/latest/command_index.html"
+researched_version = "Spack 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "list"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "info"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "find"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "dependents"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "dependencies"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "arch"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "compilers"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "spec"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "extensions"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "license"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "config"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "audit"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "compiler"
+candidate = true
+
+[[command.sub]]
+name = "repo"
+candidate = true
+
+[[command.sub]]
+name = "mirror"
+candidate = true
+
+[[command.sub]]
+name = "module"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "gpg"
+candidate = true
+
+[[command.sub]]
+name = "bootstrap"
+candidate = true
+
+[[command.sub]]
+name = "env"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "develop"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "fetch"
+candidate = true
+
+[[command.sub]]
+name = "stage"
+candidate = true
+
+[[command.sub]]
+name = "build-env"
+candidate = true
+
+[[command.sub]]
+name = "buildcache"
+candidate = true
+
+[[command.sub]]
+name = "ci"
+candidate = true
+
+[[command.sub]]
+name = "checksum"
+candidate = true
+
+[[command.sub]]
+name = "deconcretize"
+candidate = true
+
+[[command.sub]]
+name = "load"
+candidate = true
+
+[[command.sub]]
+name = "unload"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "verify"
+candidate = true
+
+[[command.sub]]
+name = "view"
+candidate = true
+
+[[command.sub]]
+name = "cd"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub]]
+name = "log-parse"
+candidate = true
+
+[[command.sub]]
+name = "patch"
+candidate = true
+
+[[command.sub]]
+name = "diff"
+candidate = true
+
+[[command.sub]]
+name = "tags"
+candidate = true
+
+[[command.sub]]
+name = "blame"
+candidate = true
+
+[[command.sub]]
+name = "url"
+candidate = true
+
+[[command.sub]]
+name = "pkg"
+candidate = true
+
+[[command.sub]]
+name = "graph"
+candidate = true
+
+[[command.sub]]
+name = "concretize"
+candidate = true
+
+[[command.sub]]
+name = "containerize"
+candidate = true
+
+[[command.sub]]
+name = "extension"
+candidate = true
+
+[[command.sub]]
+name = "pydoc"
+candidate = true
+
+[[command.sub]]
+name = "external"
+candidate = true
+
+[[command.sub]]
+name = "git"
+candidate = true
+
+[[command.sub]]
+name = "license"
+candidate = true
+
+[[command.sub]]
+name = "providers"
+candidate = true
+
+[[command.sub]]
+name = "python"
+candidate = true
+
+[[command.sub]]
+name = "reindex"
+candidate = true
+
+[[command.sub]]
+name = "resource"
+candidate = true
+
+[[command.sub]]
+name = "restage"
+candidate = true
+
+[[command.sub]]
+name = "setup"
+candidate = true
+
+[[command.sub]]
+name = "solve"
+candidate = true
+
+[[command.sub]]
+name = "style"
+candidate = true
+
+[[command.sub]]
+name = "tutorial"
+candidate = true

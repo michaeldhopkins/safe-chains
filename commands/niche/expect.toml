@@ -1,0 +1,9 @@
+[[command]]
+name = "expect"
+description = "Expect — programmatic interaction with text-mode programs. Bare invocation drops into REPL; -f FILE runs a script (arbitrary code that drives other programs). Carve-out: --help / --version only."
+url = "https://core.tcl-lang.org/expect/"
+researched_version = "Expect 5.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

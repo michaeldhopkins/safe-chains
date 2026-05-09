@@ -1,0 +1,155 @@
+[[command]]
+name = "anchor"
+description = "Anchor — Solana smart contract framework. Subcommands: `init`, `build`, `test`, `verify`, `deploy`, `upgrade`, `idl init/upgrade/fetch/parse/build`, `migrate`, `cluster`, `localnet`, `account`, `airdrop`, `keys list/sync`, `new`, `run`, `shell`, `clean`, `expand`, `--version`, `--help`. Carve-out: --version / --help / `keys list` / `idl fetch` / `cluster list`."
+url = "https://www.anchor-lang.com/docs/cli"
+researched_version = "Anchor 0.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "keys"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "idl"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "fetch"
+standalone = ["--help", "-h"]
+valued = ["--out", "-o"]
+
+[[command.sub.sub]]
+name = "parse"
+standalone = ["--help", "-h"]
+valued = ["--file", "--out"]
+
+[[command.sub.sub]]
+name = "build"
+candidate = true
+
+[[command.sub.sub]]
+name = "init"
+candidate = true
+
+[[command.sub.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub.sub]]
+name = "set-buffer"
+candidate = true
+
+[[command.sub.sub]]
+name = "set-authority"
+candidate = true
+
+[[command.sub.sub]]
+name = "close"
+candidate = true
+
+[[command.sub.sub]]
+name = "convert"
+candidate = true
+
+[[command.sub.sub]]
+name = "type"
+candidate = true
+
+[[command.sub]]
+name = "cluster"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completions"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "verify"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "localnet"
+candidate = true
+
+[[command.sub]]
+name = "account"
+candidate = true
+
+[[command.sub]]
+name = "airdrop"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "shell"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "expand"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true

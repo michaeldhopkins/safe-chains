@@ -1,0 +1,34 @@
+[[command]]
+name = "xh"
+description = "Httpie alternative in Rust — fast, friendly HTTP client. Bare invocation makes a request (network). --download / --output write to file."
+url = "https://github.com/ducaale/xh"
+researched_version = "xh 0.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--all", "--auth-type", "--bearer",
+    "--body", "--check-status", "--continue",
+    "--curl", "--curl-long", "--debug",
+    "--download", "--follow", "--form",
+    "--headers", "--help", "--ignore-netrc",
+    "--ignore-stdin", "--insecure",
+    "--json", "--multipart", "--no-style",
+    "--offline", "--overwrite", "--print",
+    "--quiet", "--raw", "--stream",
+    "--style", "--verbose", "--version",
+    "-?", "-A", "-F", "-I", "-S",
+    "-b", "-c", "-d", "-f", "-h",
+    "-j", "-m", "-o", "-p", "-q", "-s",
+    "-v",
+]
+valued = [
+    "--auth", "--auth-type", "--bearer",
+    "--cert", "--cert-key", "--max-redirects",
+    "--max-redirects", "--output", "--print",
+    "--proxy", "--read-config",
+    "--session", "--session-read-only",
+    "--ssl", "--style", "--timeout",
+    "--verify",
+    "-A", "-a", "-o", "-p",
+]

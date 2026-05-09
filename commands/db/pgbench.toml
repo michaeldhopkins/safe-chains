@@ -1,0 +1,38 @@
+[[command]]
+name = "pgbench"
+description = "PostgreSQL benchmarking tool. Initializes test tables (-i) and runs read/write workloads against the configured database (network + database writes)."
+url = "https://www.postgresql.org/docs/current/pgbench.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--builtin", "--connect", "--debug",
+    "--define", "--exit-on-abort",
+    "--fillfactor", "--foreign-keys",
+    "--help", "--init-steps", "--initialize",
+    "--latency-limit", "--log",
+    "--log-prefix", "--max-tries",
+    "--no-vacuum", "--partition-method",
+    "--partitions", "--print-errors", "--progress",
+    "--progress-timestamp", "--protocol",
+    "--quiet", "--rate", "--report-per-command",
+    "--retries", "--report-latencies", "--sampling-rate",
+    "--scale", "--show-script", "--unique-error-msg",
+    "--version", "-?", "-C", "-F", "-I", "-L",
+    "-M", "-N", "-R", "-S", "-T", "-U",
+    "-V", "-c", "-d", "-f", "-h", "-i", "-j",
+    "-l", "-n", "-p", "-q", "-r", "-s", "-t", "-v",
+]
+valued = [
+    "--builtin", "--connect-timeout", "--define",
+    "--dbname", "--file", "--fillfactor",
+    "--foreign-keys", "--host", "--init-steps",
+    "--jobs", "--latency-limit", "--log-prefix",
+    "--max-tries", "--partition-method",
+    "--partitions", "--port", "--protocol",
+    "--rate", "--retries",
+    "--sampling-rate", "--scale", "--show-script",
+    "--time", "--username",
+    "-D", "-F", "-T", "-U", "-c", "-d", "-f", "-h",
+    "-j", "-p", "-r", "-s", "-t",
+]

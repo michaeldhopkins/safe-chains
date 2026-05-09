@@ -1,0 +1,92 @@
+[[command]]
+name = "truffle"
+description = "Truffle — Ethereum dev framework (deprecated by ConsenSys but still in use). Subcommands: `compile`, `console`, `migrate`, `test`, `deploy`, `develop`, `init`, `unbox`, `version`, `db`, `dashboard`, `debug`, `exec`, `networks`, `obtain`, `opcode`, `preserve`, `publish`, `run`, `watch`. Carve-out: `version`, `--help`, `networks`."
+url = "https://archive.trufflesuite.com/docs/truffle/reference/truffle-commands/"
+researched_version = "Truffle 5.x; deprecated"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "networks"
+level = "SafeRead"
+bare = true
+standalone = ["--clean", "--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "compile"
+candidate = true
+
+[[command.sub]]
+name = "console"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "develop"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "unbox"
+candidate = true
+
+[[command.sub]]
+name = "db"
+candidate = true
+
+[[command.sub]]
+name = "dashboard"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "obtain"
+candidate = true
+
+[[command.sub]]
+name = "opcode"
+candidate = true
+
+[[command.sub]]
+name = "preserve"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "watch"
+candidate = true

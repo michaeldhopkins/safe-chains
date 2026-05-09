@@ -1,0 +1,10 @@
+[[command]]
+name = "llvm-ar"
+aliases = ["llvm-ranlib"]
+description = "LLVM archiver — manages static library (.a) archives. Same key-letter syntax as `ar`. r/q/x/d/s mutate archives, t/p are read."
+url = "https://llvm.org/docs/CommandGuide/llvm-ar.html"
+researched_version = "LLVM 18.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-?", "-h"]

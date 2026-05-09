@@ -1,0 +1,142 @@
+[[command]]
+name = "vcpkg"
+description = "Microsoft C++ package manager. Subcommands include `install`, `remove`, `update`, `upgrade`, `list`, `search`, `version`, `format-manifest`, `add`, `bootstrap`, `cache`, `ci-clean`, `contact`, `create`, `depend-info`, `edit`, `env`, `export`, `fetch`, `find`, `hash`, `help`, `integrate`, `new`, `owns`, `portsdiff`, `set-installed`, `use`, `x-update-baseline`, `x-history`, `x-set-installed`. Read-side: `list`, `search`, `version`, `find`, `depend-info`, `owns`, `portsdiff`, `hash`, `format-manifest --check`, `help`, `env`. Write-side: `install`, `remove`, `update`, `upgrade`, `format-manifest`, `add`, `bootstrap`, `cache`, `create`, `export`, `set-installed`, `integrate install/remove`, `x-update-baseline`."
+url = "https://learn.microsoft.com/en-us/vcpkg/commands/common-options"
+researched_version = "vcpkg 2024.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "list"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "search"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "find"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "depend-info"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "owns"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "portsdiff"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "hash"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "env"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "format-manifest"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "bootstrap"
+candidate = true
+
+[[command.sub]]
+name = "cache"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "fetch"
+candidate = true
+
+[[command.sub]]
+name = "integrate"
+candidate = true
+
+[[command.sub]]
+name = "set-installed"
+candidate = true
+
+[[command.sub]]
+name = "x-update-baseline"
+candidate = true
+
+[[command.sub]]
+name = "x-history"
+candidate = true
+
+[[command.sub]]
+name = "x-set-installed"
+candidate = true
+
+[[command.sub]]
+name = "ci"
+candidate = true
+
+[[command.sub]]
+name = "ci-clean"
+candidate = true
+
+[[command.sub]]
+name = "contact"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "use"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true

@@ -1,0 +1,9 @@
+[[command]]
+name = "chisel"
+description = "Foundry — Solidity REPL / shell. Bare invocation drops into a stateful Solidity prompt that executes user code. Carve-out: --version / --help only."
+url = "https://book.getfoundry.sh/reference/chisel/"
+researched_version = "Foundry 2024.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

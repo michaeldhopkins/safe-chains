@@ -1,0 +1,21 @@
+[[command]]
+name = "xsel"
+description = "Linux X11 selection tool. -i / -o reads / writes the X selection. Pure clipboard I/O."
+url = "https://github.com/kfish/xsel"
+researched_version = "xsel 1.x"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = [
+    "--append", "--clear", "--clipboard",
+    "--delete", "--display", "--exchange",
+    "--follow", "--help", "--input",
+    "--keep", "--logfile", "--nodetach",
+    "--nodaemon", "--output", "--primary",
+    "--secondary", "--selection-name",
+    "--trailing-newline", "--verbose", "--version", "--zeroflush",
+    "-?", "-a", "-b", "-c", "-d", "-f",
+    "-h", "-i", "-k", "-l", "-n",
+    "-o", "-p", "-r", "-s", "-t", "-v", "-x",
+]
+valued = ["--display", "--logfile", "--selection-name"]

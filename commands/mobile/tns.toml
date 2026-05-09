@@ -1,0 +1,91 @@
+[[command]]
+name = "tns"
+aliases = ["ns", "nativescript"]
+description = "NativeScript CLI. Subcommands: `create`, `add`, `run`, `build`, `prepare`, `deploy`, `debug`, `device`, `test`, `update`, `migrate`, `clean`, `info`, `doctor`, `package-manager`, `extension`, `setup`, `dev-test`, `config`, `proxy`, `usage-reports`. Most subcommands build / run on devices. Read-side: `info`, `doctor`, `--version`, `--help`."
+url = "https://docs.nativescript.org/CLI"
+researched_version = "NativeScript 8.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "prepare"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true
+
+[[command.sub]]
+name = "device"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "package-manager"
+candidate = true
+
+[[command.sub]]
+name = "extension"
+candidate = true
+
+[[command.sub]]
+name = "setup"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "proxy"
+candidate = true
+
+[[command.sub]]
+name = "usage-reports"
+candidate = true

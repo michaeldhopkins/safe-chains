@@ -1,0 +1,119 @@
+[[command]]
+name = "conan"
+description = "C++ package manager. Subcommands: `install`, `create`, `build`, `export`, `export-pkg`, `upload`, `download`, `inspect`, `cache`, `lock`, `source`, `package`, `remove`, `list`, `search`, `info`, `graph`, `workspace`, `config`, `profile`, `remote`, `editable`, `version`, `--help`. Read-side: `inspect`, `info`, `search`, `list`, `graph info`, `version`, `config show`, `profile show`, `remote list`. Write-side: `install`, `create`, `build`, `export`, `export-pkg`, `upload`, `download`, `cache`, `lock`, `source`, `package`, `remove`, `config install/init/home`, `profile new/update/remove/detect`, `remote add/remove/login/logout/update`."
+url = "https://docs.conan.io/2/reference/commands.html"
+researched_version = "Conan 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "inspect"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "search"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "list"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "info"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "graph"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "export-pkg"
+candidate = true
+
+[[command.sub]]
+name = "upload"
+candidate = true
+
+[[command.sub]]
+name = "download"
+candidate = true
+
+[[command.sub]]
+name = "cache"
+candidate = true
+
+[[command.sub]]
+name = "lock"
+candidate = true
+
+[[command.sub]]
+name = "source"
+candidate = true
+
+[[command.sub]]
+name = "package"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "profile"
+candidate = true
+
+[[command.sub]]
+name = "remote"
+candidate = true
+
+[[command.sub]]
+name = "editable"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "workspace"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true

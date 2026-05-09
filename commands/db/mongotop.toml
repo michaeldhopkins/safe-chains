@@ -1,0 +1,29 @@
+[[command]]
+name = "mongotop"
+description = "MongoDB realtime per-collection read/write usage. Reads server status periodically (network)."
+url = "https://www.mongodb.com/docs/database-tools/mongotop/"
+researched_version = "MongoDB Database Tools 100.x"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = [
+    "--authenticationDatabase",
+    "--authenticationMechanism", "--help",
+    "--ipv6", "--json", "--locks",
+    "--password", "--port", "--quiet",
+    "--ssl", "--sslAllowInvalidCertificates",
+    "--sslAllowInvalidHostnames",
+    "--username", "--verbose", "--version",
+    "-?", "-h", "-p", "-u", "-v",
+]
+valued = [
+    "--authenticationDatabase",
+    "--authenticationMechanism", "--config",
+    "--host", "--password", "--port",
+    "--rowcount", "--sslCAFile",
+    "--sslCRLFile", "--sslPEMKeyFile",
+    "--sslPEMKeyPassword",
+    "--tlsCertificateKeyFile", "--tlsCAFile",
+    "--uri", "--username",
+    "-h", "-n", "-p", "-u",
+]

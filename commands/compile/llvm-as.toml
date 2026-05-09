@@ -1,0 +1,9 @@
+[[command]]
+name = "llvm-as"
+description = "LLVM assembler — converts text IR (.ll) to bitcode (.bc). Pure SafeWrite."
+url = "https://llvm.org/docs/CommandGuide/llvm-as.html"
+researched_version = "LLVM 18.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-?", "-h"]

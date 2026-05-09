@@ -1,0 +1,32 @@
+[[command]]
+name = "redis-benchmark"
+description = "Redis performance benchmark. Connects to a Redis instance and issues commands at high rate (network + write to redis if non-read commands are used)."
+url = "https://redis.io/docs/latest/operate/oss_and_stack/management/optimization/benchmarks/"
+researched_version = "Redis 7.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--cluster", "--csv", "--dbnum",
+    "--enable-tracking", "--help",
+    "--idle", "--insecure",
+    "--keyspacelen", "--latency", "--latency-dist",
+    "--latency-history", "--no-auth-warning",
+    "--pipeline", "--precision", "--quiet",
+    "--rps", "--seed", "--threads",
+    "--tls", "--tlsv1.2", "--tlsv1.3",
+    "--user", "--verbose", "--version",
+    "-?", "-A", "-D", "-I", "-L", "-P",
+    "-Q", "-S", "-V", "-a", "-c", "-d",
+    "-e", "-h", "-i", "-k", "-l",
+    "-n", "-p", "-q", "-r", "-t", "-u",
+    "-v", "-x", "-y",
+]
+valued = [
+    "--cacert", "--cacertdir",
+    "--cert", "--cluster", "--keyspacelen",
+    "--port", "--precision", "--rps",
+    "--seed", "--threads", "--user",
+    "-3", "-A", "-D", "-I", "-P", "-Q",
+    "-T", "-a", "-c", "-d", "-e", "-h",
+    "-i", "-k", "-l", "-n", "-p", "-r", "-t", "-u",
+]

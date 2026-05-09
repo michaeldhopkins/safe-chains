@@ -1,0 +1,375 @@
+[[command]]
+name = "ipfs"
+description = "IPFS — InterPlanetary File System. Subcommands: `init`, `add`, `cat`, `get`, `ls`, `pin`, `swarm`, `dht`, `block`, `dag`, `refs`, `name`, `key`, `repo`, `daemon`, `id`, `version`, `config`, `bootstrap`, `cid`. Most subs read or write to the local IPFS daemon (network + system-state). Read-side: `id`, `cat`, `get` (reads from network and writes to disk), `ls`, `version`, `pin ls`, `block stat/get`, `refs`, `name resolve`, `key list`, `bootstrap list`, `cid base32/format/codecs/hashes`, `swarm peers`, `dht findprovs`, `repo stat`."
+url = "https://docs.ipfs.tech/reference/kubo/cli/"
+researched_version = "Kubo (go-ipfs) 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "id"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "cat"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "ls"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "refs"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "cid"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "block"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "stat"
+allow_all = true
+
+[[command.sub.sub]]
+name = "get"
+allow_all = true
+
+[[command.sub.sub]]
+name = "put"
+candidate = true
+
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "dag"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "get"
+allow_all = true
+
+[[command.sub.sub]]
+name = "stat"
+allow_all = true
+
+[[command.sub.sub]]
+name = "resolve"
+allow_all = true
+
+[[command.sub.sub]]
+name = "put"
+candidate = true
+
+[[command.sub.sub]]
+name = "import"
+candidate = true
+
+[[command.sub.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "pin"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "ls"
+allow_all = true
+
+[[command.sub.sub]]
+name = "verify"
+allow_all = true
+
+[[command.sub.sub]]
+name = "add"
+candidate = true
+
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub.sub]]
+name = "remote"
+candidate = true
+
+[[command.sub]]
+name = "key"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+allow_all = true
+
+[[command.sub.sub]]
+name = "gen"
+candidate = true
+
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub.sub]]
+name = "rename"
+candidate = true
+
+[[command.sub.sub]]
+name = "import"
+candidate = true
+
+[[command.sub.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "swarm"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "peers"
+allow_all = true
+
+[[command.sub.sub]]
+name = "addrs"
+allow_all = true
+
+[[command.sub.sub]]
+name = "connect"
+candidate = true
+
+[[command.sub.sub]]
+name = "disconnect"
+candidate = true
+
+[[command.sub.sub]]
+name = "filters"
+candidate = true
+
+[[command.sub.sub]]
+name = "limit"
+candidate = true
+
+[[command.sub.sub]]
+name = "stats"
+candidate = true
+
+[[command.sub]]
+name = "dht"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "findprovs"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub.sub]]
+name = "findpeer"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub.sub]]
+name = "get"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub.sub]]
+name = "query"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub.sub]]
+name = "put"
+candidate = true
+
+[[command.sub.sub]]
+name = "provide"
+candidate = true
+
+[[command.sub]]
+name = "name"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "resolve"
+allow_all = true
+
+[[command.sub.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub.sub]]
+name = "pubsub"
+candidate = true
+
+[[command.sub]]
+name = "repo"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "stat"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub.sub]]
+name = "verify"
+allow_all = true
+
+[[command.sub.sub]]
+name = "gc"
+candidate = true
+
+[[command.sub.sub]]
+name = "fsck"
+candidate = true
+
+[[command.sub.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub.sub]]
+name = "ds"
+candidate = true
+
+[[command.sub]]
+name = "bootstrap"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+allow_all = true
+
+[[command.sub.sub]]
+name = "add"
+candidate = true
+
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "get"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "daemon"
+candidate = true
+
+[[command.sub]]
+name = "shutdown"
+candidate = true
+
+[[command.sub]]
+name = "log"
+candidate = true
+
+[[command.sub]]
+name = "diag"
+candidate = true
+
+[[command.sub]]
+name = "files"
+candidate = true
+
+[[command.sub]]
+name = "stats"
+candidate = true
+
+[[command.sub]]
+name = "object"
+candidate = true
+
+[[command.sub]]
+name = "p2p"
+candidate = true
+
+[[command.sub]]
+name = "filestore"
+candidate = true
+
+[[command.sub]]
+name = "multibase"
+candidate = true
+
+[[command.sub]]
+name = "tar"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "unixfs"
+candidate = true
+
+[[command.sub]]
+name = "urlstore"
+candidate = true
+
+[[command.sub]]
+name = "routing"
+candidate = true
+
+[[command.sub]]
+name = "pubsub"
+candidate = true
+
+[[command.sub]]
+name = "ping"
+candidate = true
+
+[[command.sub]]
+name = "mount"
+candidate = true
+
+[[command.sub]]
+name = "resolve"
+candidate = true
+
+[[command.sub]]
+name = "commands"
+candidate = true

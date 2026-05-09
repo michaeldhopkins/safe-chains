@@ -1,0 +1,61 @@
+[[command]]
+name = "pg_ctl"
+description = "PostgreSQL — start / stop / restart / reload / kill / register / unregister / status / promote a local Postgres instance. Most subcommands modify a local cluster's state. Read-side: `status`, `--version`, `--help`."
+url = "https://www.postgresql.org/docs/current/app-pg-ctl.html"
+researched_version = "PostgreSQL 16.x"
+bare_flags = ["--help", "--version", "-?", "-V"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--pgdata", "-D"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "initdb"
+candidate = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "stop"
+candidate = true
+
+[[command.sub]]
+name = "restart"
+candidate = true
+
+[[command.sub]]
+name = "reload"
+candidate = true
+
+[[command.sub]]
+name = "promote"
+candidate = true
+
+[[command.sub]]
+name = "logrotate"
+candidate = true
+
+[[command.sub]]
+name = "kill"
+candidate = true
+
+[[command.sub]]
+name = "register"
+candidate = true
+
+[[command.sub]]
+name = "unregister"
+candidate = true

@@ -1,0 +1,10 @@
+[[command]]
+name = "chef-client"
+aliases = ["knife", "chef-solo", "chef-shell", "chef"]
+description = "Chef configuration management client / utilities. Each invocation runs Chef cookbooks (arbitrary Ruby with system access). Carve-out: --version / --help only."
+url = "https://docs.chef.io/chef_client/"
+researched_version = "Chef Infra Client 18.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

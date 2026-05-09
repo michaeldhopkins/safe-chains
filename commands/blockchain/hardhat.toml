@@ -1,0 +1,107 @@
+[[command]]
+name = "hardhat"
+description = "Hardhat — Ethereum dev environment for Solidity. Subcommands: `compile`, `console`, `test`, `coverage`, `node`, `run`, `flatten`, `verify`, `clean`, `help`, `init`, `check`, `vars`. Bare invocation runs `hardhat help`. Most subs execute Hardhat config (arbitrary JS/TS) or contracts. Carve-out: `--version`, `--help`, `flatten`, `check`, `vars list`."
+url = "https://hardhat.org/hardhat-runner/docs/getting-started"
+researched_version = "Hardhat 2.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "flatten"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "vars"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "set"
+candidate = true
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "path"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "compile"
+candidate = true
+
+[[command.sub]]
+name = "console"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "coverage"
+candidate = true
+
+[[command.sub]]
+name = "node"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "verify"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "ignition"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "size-contracts"
+candidate = true
+
+[[command.sub]]
+name = "ethdebug"
+candidate = true
+
+[[command.sub]]
+name = "typechain"
+candidate = true

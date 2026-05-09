@@ -1,0 +1,9 @@
+[[command]]
+name = "litecli"
+description = "Interactive SQLite REPL with autocompletion. Bare invocation opens the REPL on the named DB. Carve-out: --version / --help only."
+url = "https://litecli.com/"
+researched_version = "litecli 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

@@ -1,0 +1,131 @@
+[[command]]
+name = "influx"
+description = "InfluxDB CLI (v2). Most subcommands contact the configured Influx server (network). Read-side: `auth list`, `bucket list`, `org list`, `task list`, `user list`, `query`, `version`, `--help`, `dashboards list`, `secret list`, `telegrafs list`, `task list`, `transpile`. Write-side: `auth create/delete/update`, `bucket create/delete/update`, `org create/delete/update`, `setup`, `task create/run/update/delete`, `user create/delete`, `write`, `delete`, `apply`, `export`."
+url = "https://docs.influxdata.com/influxdb/v2/reference/cli/influx/"
+researched_version = "Influx CLI 2.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ping"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--host", "--http-debug", "--skip-verify"]
+
+[[command.sub]]
+name = "transpile"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "bucket"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "dashboards"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "apply"
+candidate = true
+
+[[command.sub]]
+name = "org"
+candidate = true
+
+[[command.sub]]
+name = "query"
+candidate = true
+
+[[command.sub]]
+name = "secret"
+candidate = true
+
+[[command.sub]]
+name = "setup"
+candidate = true
+
+[[command.sub]]
+name = "stacks"
+candidate = true
+
+[[command.sub]]
+name = "task"
+candidate = true
+
+[[command.sub]]
+name = "telegrafs"
+candidate = true
+
+[[command.sub]]
+name = "user"
+candidate = true
+
+[[command.sub]]
+name = "v1"
+candidate = true
+
+[[command.sub]]
+name = "write"
+candidate = true
+
+[[command.sub]]
+name = "backup"
+candidate = true
+
+[[command.sub]]
+name = "restore"
+candidate = true
+
+[[command.sub]]
+name = "remote"
+candidate = true
+
+[[command.sub]]
+name = "replication"
+candidate = true
+
+[[command.sub]]
+name = "external"
+candidate = true
+
+[[command.sub]]
+name = "scripts"
+candidate = true
+
+[[command.sub]]
+name = "templates"
+candidate = true

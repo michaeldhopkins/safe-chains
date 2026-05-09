@@ -1,0 +1,9 @@
+[[command]]
+name = "lnav"
+description = "Logfile Navigator — interactive curses-based log viewer. Bare invocation drops into the TUI on the given log files. -n / --no-default headless mode prints to stdout. -c CMD runs an internal lnav command. Carve-out: --version / --help only."
+url = "https://docs.lnav.org/en/latest/cli.html"
+researched_version = "lnav 0.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

@@ -1,0 +1,120 @@
+[[command]]
+name = "devenv"
+description = "devenv.sh — fast composable developer environments using Nix. Subcommands: `init`, `up`, `shell`, `info`, `version`, `search`, `update`, `processes`, `tasks`, `inputs`, `containers`, `gc`, `ci`. Most subcommands read or update devenv.nix and contact Nix / cachix.org (network). The carve-out covers diagnostic / read forms."
+url = "https://devenv.sh/reference/cli/"
+researched_version = "devenv 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "search"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "inputs"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "tasks"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "up"
+candidate = true
+
+[[command.sub]]
+name = "shell"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "container"
+candidate = true
+
+[[command.sub]]
+name = "containers"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "processes"
+candidate = true
+
+[[command.sub]]
+name = "gc"
+candidate = true
+
+[[command.sub]]
+name = "ci"
+candidate = true
+
+[[command.sub]]
+name = "assemble"
+candidate = true
+
+[[command.sub]]
+name = "direnvrc"
+candidate = true
+
+[[command.sub]]
+name = "print-dev-env"
+candidate = true
+
+[[command.sub]]
+name = "repl"
+candidate = true
+
+[[command.sub]]
+name = "secret"
+candidate = true
+
+[[command.sub]]
+name = "secrets"
+candidate = true

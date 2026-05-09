@@ -1,0 +1,15 @@
+[[command]]
+name = "dropuser"
+description = "PostgreSQL — drops a role. External-system write."
+url = "https://www.postgresql.org/docs/current/app-dropuser.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--echo", "--help", "--if-exists",
+    "--interactive", "--no-password",
+    "--password", "--version",
+    "-?", "-V", "-e", "-h", "-i",
+    "-p", "-U", "-w", "-W",
+]
+valued = ["--host", "--port", "--username", "-h", "-p", "-U"]

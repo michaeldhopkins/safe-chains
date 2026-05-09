@@ -1,0 +1,10 @@
+[[command]]
+name = "gnatmake"
+aliases = ["gnatls", "gnatchop", "gnatpp", "gnatkr", "gnatxref", "gnatfind", "gnatprep"]
+description = "Ada / GNAT compiler driver and utilities. gnatmake compiles Ada source; gnatls lists info; gnatchop splits a file; gnatpp pretty-prints; gnatkr makes krunched names; gnatxref / gnatfind index source; gnatprep is a preprocessor. Most write output."
+url = "https://gcc.gnu.org/onlinedocs/gnat_ugn/"
+researched_version = "GNAT 14.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-h", "-v"]

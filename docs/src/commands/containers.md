@@ -11,6 +11,17 @@
 - **version**: Flags: --help, -h. Valued: --format, --json
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `buildctl`
+<p class="cmd-url"><a href="https://github.com/moby/buildkit">https://github.com/moby/buildkit</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **debug histories**: Flags: --help, -h
+- **debug info**: Flags: --help, -h
+- **debug workers**: Flags: --filter, --help, --verbose, -h, -v
+- **du**: Flags: --filter, --help, --verbose, -h, -v
+- **help**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `copa`
 <p class="cmd-url"><a href="https://project-copacetic.github.io/copacetic/website/">https://project-copacetic.github.io/copacetic/website/</a></p>
 
@@ -49,6 +60,18 @@
 - **namespaces list**: Flags: --help, --quiet, -h, -q
 - **namespaces ls**: Flags: --help, --quiet, -h, -q
 - **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `dapr`
+<p class="cmd-url"><a href="https://docs.dapr.io/reference/cli/">https://docs.dapr.io/reference/cli/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **components**: Flags: --all-namespaces, --help, --kubernetes, -A, -h, -k. Valued: --name, --namespace, --output, -n, -o
+- **configurations**: Flags: --all-namespaces, --help, --kubernetes, -A, -h, -k. Valued: --name, --namespace, --output, -n, -o
+- **help**: Positional args accepted
+- **list**: Flags: --all-namespaces, --help, -A, -h. Valued: --kubernetes, --namespace, --output, -k, -n, -o
+- **status**: Flags: --help, --kubernetes, -h, -k. Valued: --output, -o
+- **version**: Flags: --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `dive`
@@ -106,6 +129,32 @@
 - **volume inspect**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - **volume ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `docker-buildx`
+<p class="cmd-url"><a href="https://docs.docker.com/buildx/working-with-buildx/">https://docs.docker.com/buildx/working-with-buildx/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **du**: Flags: --help, --verbose, -h, -v. Valued: --builder, --filter
+- **help**: Positional args accepted
+- **inspect**: Flags: --bootstrap, --help, -h. Valued: --builder. Positional args accepted
+- **ls**: Flags: --help, --no-trunc, -h. Valued: --format
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `docker-compose`
+<p class="cmd-url"><a href="https://docs.docker.com/compose/reference/">https://docs.docker.com/compose/reference/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **config**: Flags: --format, --help, --no-consistency, --no-interpolate, --no-normalize, --no-path-resolution, --profiles, --quiet, --resolve-image-digests, --services, --volumes, -h, -q. Valued: --format, --hash, --output, --profile, -o, -p
+- **events**: Flags: --help, --json, -h. Positional args accepted
+- **help**: Positional args accepted
+- **images**: Flags: --help, --quiet, -h, -q. Valued: --format. Positional args accepted
+- **logs**: Flags: --follow, --help, --no-color, --no-log-prefix, --timestamps, -f, -h, -t. Valued: --since, --tail, --until. Positional args accepted
+- **port**: Flags: --help, -h. Valued: --index, --protocol. Positional args accepted
+- **ps**: Flags: --all, --dry-run, --help, --no-trunc, --quiet, --services, -a, -h, -q. Valued: --filter, --format, --status. Positional args accepted
+- **top**: Flags: --help, -h. Positional args accepted
+- **version**: Flags: --format, --help, --short, -f, -h. Valued: --format
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `flux`
 <p class="cmd-url"><a href="https://fluxcd.io/flux/cmd/flux/">https://fluxcd.io/flux/cmd/flux/</a></p>
@@ -184,6 +233,41 @@
 - **get nodes**: Flags: --help, -h. Valued: --name
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+### `kn`
+<p class="cmd-url"><a href="https://knative.dev/docs/client/configure-kn/">https://knative.dev/docs/client/configure-kn/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **revision describe**: Flags: --help, -h
+- **revision list**: Flags: --help, -h
+- **service describe**: Flags: --help, --no-headers, --print-details, --verbose, -h, -v. Valued: --namespace, --output, -n, -o
+- **service list**: Flags: --all-namespaces, --help, --no-headers, -A, -h. Valued: --namespace, --output, -n, -o
+- **version**: Flags: --help, --version, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `kpt`
+<p class="cmd-url"><a href="https://kpt.dev/reference/cli/">https://kpt.dev/reference/cli/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **pkg cat**: Flags: --help, -h. Valued: --annotate, --exclude-non-local, --include-local, --strip-comments, --style
+- **pkg diff**: Flags: --help, -h. Valued: --diff-tool, --diff-tool-opts, --diff-type
+- **pkg tree**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `krew`
+<p class="cmd-url"><a href="https://krew.sigs.k8s.io/">https://krew.sigs.k8s.io/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **index list**: Flags: --help, -h
+- **info**: Flags: --help, -h. Positional args accepted
+- **list**: Flags: --help, -h
+- **search**: Flags: --help, -h. Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `kubectl`
 <p class="cmd-url"><a href="https://kubernetes.io/docs/reference/kubectl/">https://kubernetes.io/docs/reference/kubectl/</a></p>
@@ -269,6 +353,20 @@
 - **version**: Flags: --help, --format, -f, -h. Valued: --format, -f
 - **volume inspect**: Flags: --help, -h. Valued: --format, -f
 - **volume ls**: Flags: --help, --quiet, --size, -h, -q. Valued: --filter, --format, -f
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `oras`
+<p class="cmd-url"><a href="https://oras.land/docs/category/cli-reference">https://oras.land/docs/category/cli-reference</a></p>
+
+- **blob fetch**: Flags: --help, --insecure, --plain-http, --verbose, -h, -v. Valued: --ca-file, --cert-file, --config, --header, --key-file, --media-type, --output, --password, --registry-config, --username, -o, -p, -u
+- **completion**: Flags: --help, -h. Positional args accepted
+- **discover**: Flags: --help, --insecure, --no-color, --no-tty, --plain-http, -h. Valued: --artifact-type, --ca-file, --cert-file, --config, --distribution-spec, --format, --header, --key-file, --output, --password, --password-stdin, --registry-config, --username, --verbose, -c, -d, -o, -p, -u, -v. Positional args accepted
+- **help**: Positional args accepted
+- **manifest fetch**: Flags: --help, --insecure, --plain-http, --verbose, -h, -v. Valued: --ca-file, --cert-file, --config, --header, --key-file, --media-type, --output, --password, --platform, --registry-config, --username, -o, -p, -u
+- **manifest fetch-config**: Flags: --help, -h. Valued: --ca-file, --cert-file, --config, --header, --key-file, --media-type, --output, --password, --platform, --registry-config, --username, -o, -p, -u
+- **repo ls**: Flags: --help, -h. Valued: --last
+- **repo tags**: Flags: --help, -h. Valued: --last
+- **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `orb`
@@ -375,6 +473,17 @@
 - Allowed standalone flags: --all-namespaces, --color, --diff-container, --ephemeral-containers, --help, --include-hidden, --init-containers, --no-follow, --only-log-lines, --timestamps, --version, -A, -h
 - Allowed valued flags: --container, --container-state, --context, --exclude, --exclude-container, --exclude-pod, --highlight, --include, --kubeconfig, --max-log-requests, --namespace, --node, --output, --selector, --since, --tail, --template, --timezone, -c, -e, -l, -n, -o, -s, -t
 - Hyphen-prefixed positional arguments accepted
+
+### `tkn`
+<p class="cmd-url"><a href="https://tekton.dev/docs/cli/">https://tekton.dev/docs/cli/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **help**: Positional args accepted
+- **pipeline describe**: Flags: --help, --last, -h, -L. Valued: --namespace, --output, -n, -o
+- **pipeline list**: Flags: --all-namespaces, --help, --no-headers, -A, -h. Valued: --namespace, --output, -n, -o
+- **pipeline logs**: Flags: --all, --follow, --help, --last, --prefix, --step, --task, --timestamps, -a, -f, -h. Valued: --namespace, --limit, -n
+- **version**: Flags: --client, --component, --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `velero`
 <p class="cmd-url"><a href="https://velero.io/docs/">https://velero.io/docs/</a></p>

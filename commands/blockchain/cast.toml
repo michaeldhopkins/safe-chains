@@ -1,0 +1,347 @@
+[[command]]
+name = "cast"
+description = "Foundry — Swiss Army knife for interacting with Ethereum chains. Many subcommands. Read-side: `call`, `code`, `block`, `block-number`, `chain`, `chain-id`, `client`, `compute-address`, `gas-price`, `nonce`, `storage`, `tx`, `receipt`, `logs`, `lookup-address`, `resolve-name`, `balance`, `balance-of`, `wallet address`, `wallet vanity`, `4byte`, `4byte-decode`, `abi-decode`, `abi-encode`, `decode-string`, `decode-uint`, `decode-int`, `to-*` conversion subs, `format-bytes32-string`, `parse-bytes32-string`, `keccak`, `from-bin`, `from-utf8`, `concat-hex`, `--version`, `--help`. Write-side: `send`, `mktx`, `publish`, `wallet new/import/derive/sign/decrypt-keystore`, `bind`, `etherscan-source`, `disassemble` (read), `wallet new-mnemonic`."
+url = "https://book.getfoundry.sh/reference/cast/"
+researched_version = "Foundry 2024.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "call"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "code"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "block"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "block-number"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "chain"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "chain-id"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "client"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "compute-address"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "gas-price"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "nonce"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "storage"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "tx"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "receipt"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "logs"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "lookup-address"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "resolve-name"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "balance"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "4byte"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "4byte-decode"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "abi-decode"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "abi-encode"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "keccak"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "disassemble"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "to-ascii"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "to-base"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "to-base32"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "to-bytes32"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "to-checksum-address"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "to-dec"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "to-hex"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "to-int256"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "to-uint256"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "to-wei"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "from-wei"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "from-utf8"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "from-bin"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "format-bytes32-string"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "parse-bytes32-string"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "concat-hex"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "max-int"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "min-int"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "max-uint"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "send"
+candidate = true
+
+[[command.sub]]
+name = "mktx"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "wallet"
+candidate = true
+
+[[command.sub]]
+name = "bind"
+candidate = true
+
+[[command.sub]]
+name = "etherscan-source"
+candidate = true
+
+[[command.sub]]
+name = "estimate"
+candidate = true
+
+[[command.sub]]
+name = "decode-error"
+candidate = true
+
+[[command.sub]]
+name = "decode-event"
+candidate = true
+
+[[command.sub]]
+name = "decode-string"
+candidate = true
+
+[[command.sub]]
+name = "decode-uint"
+candidate = true
+
+[[command.sub]]
+name = "decode-int"
+candidate = true
+
+[[command.sub]]
+name = "decode-transaction"
+candidate = true
+
+[[command.sub]]
+name = "rpc"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "sig"
+candidate = true
+
+[[command.sub]]
+name = "selectors"
+candidate = true
+
+[[command.sub]]
+name = "namehash"
+candidate = true
+
+[[command.sub]]
+name = "shl"
+candidate = true
+
+[[command.sub]]
+name = "shr"
+candidate = true
+
+[[command.sub]]
+name = "interface"
+candidate = true
+
+[[command.sub]]
+name = "create2"
+candidate = true
+
+[[command.sub]]
+name = "eip712-domain"
+candidate = true
+
+[[command.sub]]
+name = "ens-namehash"
+candidate = true
+
+[[command.sub]]
+name = "find-block"
+candidate = true
+
+[[command.sub]]
+name = "index"
+candidate = true
+
+[[command.sub]]
+name = "call-trace"
+candidate = true
+
+[[command.sub]]
+name = "stop-impersonating"
+candidate = true
+
+[[command.sub]]
+name = "impersonate-account"
+candidate = true

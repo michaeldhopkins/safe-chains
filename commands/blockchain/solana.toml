@@ -1,0 +1,323 @@
+[[command]]
+name = "solana"
+description = "Solana CLI. Many subcommands. Read-side: `--version`, `address`, `balance`, `block`, `block-height`, `block-time`, `cluster-version`, `confirm`, `epoch`, `epoch-info`, `epoch-schedule`, `fees`, `find-program-derived-address`, `genesis-hash`, `gossip`, `inflation`, `largest-accounts`, `leader-schedule`, `live-slots`, `logs`, `nonce`, `nonce-account`, `ping`, `program show`, `program dump`, `rent`, `slot`, `stake-account`, `stake-history`, `stakes`, `stake-minimum-delegation`, `supply`, `transaction-count`, `transaction-history`, `transfer --dry-run`, `validators`, `vote-account`, `vote-update-validator --dry-run`, `wait-for-max-stake`, `withdraw-stake --dry-run`. Write-side: `airdrop`, `transfer`, `delegate-stake`, `deactivate-stake`, `merge-stake`, `split-stake`, `withdraw-stake`, `create-stake-account`, `create-vote-account`, `vote-update-commission`, `vote-update-validator`, `withdraw-from-vote-account`, `program deploy/upgrade/close`, `account`, `nonce-authorize`, `new-nonce`, `withdraw-from-nonce-account`, `create-nonce-account`, `decode-transaction`, `verify-program-deploy`."
+url = "https://docs.anza.xyz/cli/usage"
+researched_version = "Solana CLI 2.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "address"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "balance"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "block"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "block-height"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "block-time"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "cluster-version"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "config"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "confirm"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "epoch"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "epoch-info"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "epoch-schedule"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "fees"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "feature"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "find-program-derived-address"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "genesis-hash"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "gossip"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "inflation"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "largest-accounts"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "leader-schedule"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "logs"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "nonce"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "nonce-account"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "ping"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "rent"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "slot"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "stake-account"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "stake-history"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "stake-minimum-delegation"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "stakes"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "supply"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "transaction-count"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "transaction-history"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "validators"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "vote-account"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "airdrop"
+candidate = true
+
+[[command.sub]]
+name = "transfer"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "program"
+candidate = true
+
+[[command.sub]]
+name = "program-v4"
+candidate = true
+
+[[command.sub]]
+name = "create-account-lookup-table"
+candidate = true
+
+[[command.sub]]
+name = "delegate-stake"
+candidate = true
+
+[[command.sub]]
+name = "deactivate-stake"
+candidate = true
+
+[[command.sub]]
+name = "merge-stake"
+candidate = true
+
+[[command.sub]]
+name = "split-stake"
+candidate = true
+
+[[command.sub]]
+name = "withdraw-stake"
+candidate = true
+
+[[command.sub]]
+name = "create-stake-account"
+candidate = true
+
+[[command.sub]]
+name = "create-vote-account"
+candidate = true
+
+[[command.sub]]
+name = "vote-update-commission"
+candidate = true
+
+[[command.sub]]
+name = "vote-update-validator"
+candidate = true
+
+[[command.sub]]
+name = "withdraw-from-vote-account"
+candidate = true
+
+[[command.sub]]
+name = "vote-authorize-voter"
+candidate = true
+
+[[command.sub]]
+name = "vote-authorize-withdrawer"
+candidate = true
+
+[[command.sub]]
+name = "create-nonce-account"
+candidate = true
+
+[[command.sub]]
+name = "withdraw-from-nonce-account"
+candidate = true
+
+[[command.sub]]
+name = "new-nonce"
+candidate = true
+
+[[command.sub]]
+name = "nonce-authorize"
+candidate = true
+
+[[command.sub]]
+name = "stake-authorize"
+candidate = true
+
+[[command.sub]]
+name = "decode-transaction"
+candidate = true
+
+[[command.sub]]
+name = "verify-program-deploy"
+candidate = true
+
+[[command.sub]]
+name = "wait-for-max-stake"
+candidate = true
+
+[[command.sub]]
+name = "account"
+candidate = true
+
+[[command.sub]]
+name = "create-address-with-seed"
+candidate = true
+
+[[command.sub]]
+name = "withdraw-stake-from-vote"
+candidate = true
+
+[[command.sub]]
+name = "extend-program"
+candidate = true
+
+[[command.sub]]
+name = "redelegate-stake"
+candidate = true
+
+[[command.sub]]
+name = "stake-set-lockup"
+candidate = true
+
+[[command.sub]]
+name = "live-slots"
+candidate = true

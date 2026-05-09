@@ -1,0 +1,9 @@
+[[command]]
+name = "foundryup"
+description = "Installs / updates Foundry components (forge / cast / anvil / chisel) from GitHub releases (network + system-state writes to ~/.foundry)."
+url = "https://book.getfoundry.sh/getting-started/installation"
+researched_version = "Foundry 2024.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

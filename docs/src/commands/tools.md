@@ -711,6 +711,11 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed standalone flags: --debug, --diff, --help, --no-stash, --print-config, --quiet, --relative, --shell, --verbose, --version, -d, -h, -p, -q, -V, -v
 - Allowed valued flags: --allow-empty, --concurrent, --config, --cwd, --diff-filter, --max-arg-length, -c, -r
 
+### `lnav`
+<p class="cmd-url"><a href="https://docs.lnav.org/en/latest/cli.html">https://docs.lnav.org/en/latest/cli.html</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -V
+
 ### `lua`
 <p class="cmd-url"><a href="https://www.lua.org/manual/5.4/readme.html">https://www.lua.org/manual/5.4/readme.html</a></p>
 

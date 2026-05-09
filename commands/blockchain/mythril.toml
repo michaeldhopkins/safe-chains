@@ -1,0 +1,26 @@
+[[command]]
+name = "mythril"
+aliases = ["myth"]
+description = "Mythril — security analysis tool for Ethereum smart contracts. Reads bytecode / Solidity, performs symbolic execution, reports vulnerabilities. Static analysis."
+url = "https://mythril-classic.readthedocs.io/en/master/"
+researched_version = "mythril 0.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--debug", "--help", "--no-color",
+    "--quick", "--strategy", "--verbose",
+    "--version", "-?", "-c", "-d", "-f", "-g",
+    "-h", "-l", "-o", "-q", "-r", "-s",
+    "-t", "-v", "-x",
+]
+valued = [
+    "--bin-runtime", "--call-depth-limit", "--code",
+    "--codesize-limit", "--create-timeout",
+    "--enable-iprof", "--execution-timeout",
+    "--max-depth", "--outform", "--quick",
+    "--rpc", "--rpc-tls", "--solv",
+    "--solver-timeout", "--strategy",
+    "--storage", "--transaction-count",
+    "-c", "-l", "-o", "-r", "-s", "-t", "-x",
+]

@@ -1,0 +1,101 @@
+[[command]]
+name = "expo"
+description = "Expo CLI — for React Native + Expo SDK projects. Subcommands: `start`, `run:ios`, `run:android`, `prebuild`, `export`, `export:embed`, `install`, `add`, `customize`, `config`, `doctor`, `whoami`, `login`, `logout`, `register`, `metro-config`, `module`, `eject` (deprecated), `client:install:ios`, `client:install:android`. Most subcommands compile, run, or contact Expo services (network + executes user code). Read-side: `whoami`, `config --type`, `doctor` (read parts), `--version`, `--help`."
+url = "https://docs.expo.dev/more/expo-cli/"
+researched_version = "Expo CLI 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "whoami"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = true
+standalone = ["--full", "--help", "-h"]
+valued = ["--type"]
+
+[[command.sub]]
+name = "doctor"
+level = "SafeRead"
+bare = true
+standalone = ["--fix-dependencies", "--help", "--offline", "--verbose", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "run:ios"
+candidate = true
+
+[[command.sub]]
+name = "run:android"
+candidate = true
+
+[[command.sub]]
+name = "prebuild"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "export:embed"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "customize"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "register"
+candidate = true
+
+[[command.sub]]
+name = "module"
+candidate = true
+
+[[command.sub]]
+name = "metro-config"
+candidate = true
+
+[[command.sub]]
+name = "client:install:ios"
+candidate = true
+
+[[command.sub]]
+name = "client:install:android"
+candidate = true

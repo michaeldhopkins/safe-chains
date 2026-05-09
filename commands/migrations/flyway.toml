@@ -1,0 +1,66 @@
+[[command]]
+name = "flyway"
+description = "Flyway database migration tool. Subcommands: `info`, `migrate`, `validate`, `clean`, `baseline`, `repair`, `undo`, `history`, `auth`, `prepare`, `check`, `version`. Read-side: `info`, `validate`, `version`, `--help`, `--version`. Write-side: `migrate`, `clean`, `baseline`, `repair`, `undo` — all execute SQL against the configured database."
+url = "https://documentation.red-gate.com/fd/command-line-184127404.html"
+researched_version = "Flyway 10.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "info"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "validate"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "history"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "check"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "baseline"
+candidate = true
+
+[[command.sub]]
+name = "repair"
+candidate = true
+
+[[command.sub]]
+name = "undo"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "prepare"
+candidate = true
+
+[[command.sub]]
+name = "snapshot"
+candidate = true

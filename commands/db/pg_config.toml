@@ -1,0 +1,18 @@
+[[command]]
+name = "pg_config"
+description = "Prints PostgreSQL build / install configuration. Pure read."
+url = "https://www.postgresql.org/docs/current/app-pgconfig.html"
+researched_version = "PostgreSQL 16.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--bindir", "--cc", "--cflags", "--cflags_sl",
+    "--configure", "--cppflags", "--cxxflags",
+    "--docdir", "--help", "--htmldir",
+    "--includedir", "--includedir-server", "--ldflags",
+    "--ldflags_ex", "--ldflags_sl", "--libdir",
+    "--libs", "--localedir", "--mandir",
+    "--pgxs", "--pkgincludedir", "--pkglibdir",
+    "--sharedir", "--sysconfdir", "--version",
+    "-?",
+]

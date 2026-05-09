@@ -6,6 +6,11 @@
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
 
+### `btop`
+<p class="cmd-url"><a href="https://github.com/aristocratos/btop">https://github.com/aristocratos/btop</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `cal`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/cal.1.html">https://man7.org/linux/man-pages/man1/cal.1.html</a></p>
 
@@ -26,6 +31,19 @@
 - Allowed standalone flags: --bytes, --gibi, --giga, --help, --human, --kibi, --kilo, --lohi, --mebi, --mega, --si, --tebi, --tera, --total, --version, --wide, -V, -b, -g, -h, -k, -l, -m, -t, -v, -w
 - Allowed valued flags: --count, --seconds, -c, -s
 - Bare invocation allowed
+
+### `glances`
+<p class="cmd-url"><a href="https://glances.readthedocs.io/en/latest/">https://glances.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -V
+
+### `gpustat`
+<p class="cmd-url"><a href="https://github.com/wookayin/gpustat">https://github.com/wookayin/gpustat</a></p>
+
+- Allowed standalone flags: --debug, --force-color, --gpuname-width, --help, --id, --json, --no-color, --no-header, --show-all, --show-cmd, --show-codec, --show-cores, --show-fan, --show-full-cmd, --show-pid, --show-power, --show-pids, --show-processes, --show-pwr, --show-temperature, --show-throttle-codes, --show-user, --version, --watch, -a, -c, -cu, -f, -i, -h, -p, -P, -u, -v
+- Allowed valued flags: --id, --watch, -i
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
 
 ### `groups`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#groups-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#groups-invocation</a></p>
@@ -100,6 +118,11 @@
 - Allowed standalone flags: --all, --help, --version, -V, -h
 - Allowed valued flags: --ignore
 - Bare invocation allowed
+
+### `nvtop`
+<p class="cmd-url"><a href="https://github.com/Syllo/nvtop">https://github.com/Syllo/nvtop</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -V
 
 ### `pgrep`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/pgrep.1.html">https://man7.org/linux/man-pages/man1/pgrep.1.html</a></p>

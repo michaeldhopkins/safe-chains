@@ -1,0 +1,118 @@
+[[command]]
+name = "oras"
+description = "ORAS — OCI registry artifact tool. Subcommands: `attach`, `blob`, `copy`, `cp`, `discover`, `login`, `logout`, `manifest`, `pull`, `push`, `repo`, `tag`, `version`, `--help`. Most subs contact registries (network). Read-side: `version`, `discover`, `manifest fetch/get-config`, `blob fetch/get-config`, `repo ls/tags`."
+url = "https://oras.land/docs/category/cli-reference"
+researched_version = "ORAS 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "discover"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--insecure", "--no-color", "--no-tty", "--plain-http", "-h"]
+valued = ["--artifact-type", "--ca-file", "--cert-file", "--config", "--distribution-spec", "--format", "--header", "--key-file", "--output", "--password", "--password-stdin", "--registry-config", "--username", "--verbose", "-c", "-d", "-o", "-p", "-u", "-v"]
+
+[[command.sub]]
+name = "manifest"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "fetch"
+standalone = ["--help", "--insecure", "--plain-http", "--verbose", "-h", "-v"]
+valued = ["--ca-file", "--cert-file", "--config", "--header", "--key-file", "--media-type", "--output", "--password", "--platform", "--registry-config", "--username", "-o", "-p", "-u"]
+
+[[command.sub.sub]]
+name = "fetch-config"
+standalone = ["--help", "-h"]
+valued = ["--ca-file", "--cert-file", "--config", "--header", "--key-file", "--media-type", "--output", "--password", "--platform", "--registry-config", "--username", "-o", "-p", "-u"]
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "blob"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "fetch"
+standalone = ["--help", "--insecure", "--plain-http", "--verbose", "-h", "-v"]
+valued = ["--ca-file", "--cert-file", "--config", "--header", "--key-file", "--media-type", "--output", "--password", "--registry-config", "--username", "-o", "-p", "-u"]
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "repo"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+valued = ["--last"]
+
+[[command.sub.sub]]
+name = "tags"
+standalone = ["--help", "-h"]
+valued = ["--last"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "attach"
+candidate = true
+
+[[command.sub]]
+name = "copy"
+candidate = true
+
+[[command.sub]]
+name = "cp"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "tag"
+candidate = true
+
+[[command.sub]]
+name = "resolve"
+candidate = true

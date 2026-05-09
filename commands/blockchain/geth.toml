@@ -1,0 +1,74 @@
+[[command]]
+name = "geth"
+description = "Go-Ethereum — Ethereum execution layer client. Bare invocation starts the node (long-running, listens, syncs from peers). Subcommands: `version`, `console`, `attach`, `account`, `init`, `db`, `dump`, `dumpgenesis`, `export`, `import`, `removedb`, `snapshot`, `js`, `license`. Carve-out covers diagnostic / read forms."
+url = "https://geth.ethereum.org/docs/fundamentals/command-line-options"
+researched_version = "Geth 1.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "license"
+allow_all = true
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "console"
+candidate = true
+
+[[command.sub]]
+name = "attach"
+candidate = true
+
+[[command.sub]]
+name = "account"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "db"
+candidate = true
+
+[[command.sub]]
+name = "dump"
+candidate = true
+
+[[command.sub]]
+name = "dumpgenesis"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "import"
+candidate = true
+
+[[command.sub]]
+name = "removedb"
+candidate = true
+
+[[command.sub]]
+name = "snapshot"
+candidate = true
+
+[[command.sub]]
+name = "js"
+candidate = true
+
+[[command.sub]]
+name = "wallet"
+candidate = true
+
+[[command.sub]]
+name = "show-deprecated-flags"
+candidate = true
