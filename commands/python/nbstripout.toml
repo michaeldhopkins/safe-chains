@@ -1,0 +1,27 @@
+[[command]]
+name = "nbstripout"
+description = "Strips outputs from Jupyter notebooks. Without --textconv, modifies notebooks in place (project-local SafeWrite). `--install` writes a git filter config; `--uninstall` removes it; `--status`/`--is-installed` are read-only. Active project."
+url = "https://github.com/kynan/nbstripout"
+researched_version = "nbstripout 0.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--attributes", "--drop-empty-cells",
+    "--dry-run", "--extra-keys", "--force",
+    "--global", "--help",
+    "--include-files-from-stdin",
+    "--install", "--is-installed",
+    "--keep-count", "--keep-id",
+    "--keep-metadata-keys", "--keep-output",
+    "--max-size", "--max-size-bytes",
+    "--no-empty-cells", "--no-strip-init-cells",
+    "--strip-empty-cells", "--strip-init-cells",
+    "--status", "--system",
+    "--textconv", "--uninstall", "--verify",
+    "--version",
+    "-f", "-h", "-t",
+]
+valued = [
+    "--attributes", "--extra-keys",
+    "--keep-metadata-keys", "--max-size",
+]

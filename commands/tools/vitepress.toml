@@ -1,0 +1,36 @@
+[[command]]
+name = "vitepress"
+description = "Vue-flavoured static site generator built on Vite. `build` writes the rendered site to .vitepress/dist (project-local SafeWrite). `dev` / `serve` run long-running servers. `init` scaffolds a docs project. The .vitepress/config.{js,ts,mts} is loaded at startup (arbitrary Node)."
+url = "https://vitepress.dev/reference/cli"
+researched_version = "vitepress 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--help", "--mpa", "-h"]
+valued = ["--base", "--cache-dir", "--out-dir"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "dev"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "preview"
+candidate = true

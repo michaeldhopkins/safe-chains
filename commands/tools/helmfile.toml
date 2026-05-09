@@ -1,0 +1,125 @@
+[[command]]
+name = "helmfile"
+description = "Wraps helm to manage releases declaratively. `lint`, `diff`, `template`, `list`, `status`, `cache list`, `version` are read-only. `apply`, `sync`, `delete`, `destroy`, `rollback`, `repos`, `deps`, `cache cleanup`, `init`, `write-values`, `chart prepare` modify cluster state or local state. Most operations contact the Kubernetes API and the configured Helm repositories (network)."
+url = "https://helmfile.readthedocs.io/"
+researched_version = "helmfile 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[command.wrapper]
+standalone = ["--allow-no-matching-release", "--debug", "--disable-force-update", "--enable-live-output", "--no-color", "--quiet", "--strict-parsing"]
+valued = ["--args", "--color", "--environment", "--file", "--helm-binary", "--helmfile", "--kube-context", "--log-level", "--namespace", "-b", "-e", "-f", "-l", "-n"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--full", "--help", "--output", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--include-transitive-needs", "--skip-deps", "--skip-needs", "-h"]
+valued = ["--args", "--concurrency", "--selector", "--values", "-l"]
+
+[[command.sub]]
+name = "template"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--include-crds", "--include-needs", "--include-transitive-needs", "--no-hooks", "--skip-cleanup", "--skip-deps", "--skip-needs", "--skip-tests", "--validate", "-h"]
+valued = ["--args", "--concurrency", "--debug", "--output-dir", "--output-dir-template", "--selector", "--set", "--show-only", "--values", "-l"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = true
+standalone = ["--context", "--detailed-exitcode", "--help", "--include-needs", "--include-tests", "--include-transitive-needs", "--no-hooks", "--show-secrets", "--skip-cleanup", "--skip-deps", "--skip-needs", "--suppress-diff", "--suppress-secrets", "--three-way-merge", "-h"]
+valued = ["--args", "--concurrency", "--reset-values", "--retain-values-files", "--selector", "--set", "--show-only", "--values", "-l"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--keep-temp-dir", "--output", "--skip-charts", "-h"]
+valued = ["--output", "--selector", "-l"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--args", "--concurrency", "--selector", "-l"]
+
+[[command.sub]]
+name = "cache"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "cleanup"
+candidate = true
+
+[[command.sub]]
+name = "fetch"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--skip-cleanup", "--skip-deps", "-h"]
+valued = ["--concurrency", "--output-dir", "--selector", "-l"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "apply"
+candidate = true
+
+[[command.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "destroy"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "rollback"
+candidate = true
+
+[[command.sub]]
+name = "repos"
+candidate = true
+
+[[command.sub]]
+name = "deps"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "write-values"
+candidate = true
+
+[[command.sub]]
+name = "chart"
+candidate = true

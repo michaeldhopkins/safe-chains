@@ -1,0 +1,116 @@
+[[command]]
+name = "jupyter"
+description = "Jupyter — interactive notebooks / labs. `notebook`, `lab`, `console`, `kernel`, `qtconsole`, `server`, `nbclassic` start long-running interactive sessions or servers (network listeners + arbitrary code execution via kernels). `nbconvert`, `nbextension`, `serverextension`, `kernelspec`, `migrate`, `troubleshoot` modify project / config files. `--paths`, `--config-dir`, `--data-dir`, `--runtime-dir`, `--version`, `--help`, `troubleshoot --output-format json` are read-only diagnostics."
+url = "https://docs.jupyter.org/en/latest/projects/jupyter-command.html"
+researched_version = "jupyter-core 5.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "--paths"
+candidate = true
+
+[[command.sub]]
+name = "--config-dir"
+candidate = true
+
+[[command.sub]]
+name = "--data-dir"
+candidate = true
+
+[[command.sub]]
+name = "--runtime-dir"
+candidate = true
+
+[[command.sub]]
+name = "troubleshoot"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "notebook"
+candidate = true
+
+[[command.sub]]
+name = "nbconvert"
+candidate = true
+
+[[command.sub]]
+name = "lab"
+candidate = true
+
+[[command.sub]]
+name = "labextension"
+candidate = true
+
+[[command.sub]]
+name = "labhub"
+candidate = true
+
+[[command.sub]]
+name = "console"
+candidate = true
+
+[[command.sub]]
+name = "kernel"
+candidate = true
+
+[[command.sub]]
+name = "kernelspec"
+candidate = true
+
+[[command.sub]]
+name = "migrate"
+candidate = true
+
+[[command.sub]]
+name = "qtconsole"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "serverextension"
+candidate = true
+
+[[command.sub]]
+name = "nbextension"
+candidate = true
+
+[[command.sub]]
+name = "execute"
+candidate = true
+
+[[command.sub]]
+name = "trust"
+candidate = true
+
+[[command.sub]]
+name = "bundlerextension"
+candidate = true
+
+[[command.sub]]
+name = "events"
+candidate = true
+
+[[command.sub]]
+name = "shutdown"
+candidate = true
+
+[[command.sub]]
+name = "nbclassic"
+candidate = true
+
+[[command.sub]]
+name = "fileid"
+candidate = true

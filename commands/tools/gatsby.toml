@@ -1,0 +1,77 @@
+[[command]]
+name = "gatsby"
+description = "Gatsby — React-based static / dynamic site generator. `build` compiles a production build (writes public/). `develop` / `serve` run long-running servers. `clean` removes .cache and public/. `new` scaffolds from a starter (network — clones a Git repo and runs npm install). `info`, `feedback`, `repl` are diagnostic / interactive. `plugin <add|ls>` modifies gatsby-config.js. The build pipeline loads gatsby-config.js / gatsby-node.js — those are arbitrary Node executed at every command. Active project."
+url = "https://www.gatsbyjs.com/docs/reference/gatsby-cli/"
+researched_version = "gatsby 5.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+bare = true
+standalone = ["--clipboard", "--help", "-h", "-C"]
+
+[[command.sub]]
+name = "telemetry"
+level = "Inert"
+bare = true
+standalone = ["--disable", "--enable", "--help", "-d", "-e", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--graphql-tracing", "--help",
+    "--log-pages", "--no-color",
+    "--no-uglify", "--open-tracing-config-file",
+    "--prefix-paths", "--profile",
+    "--verbose", "--write-to-file",
+    "-V", "-h",
+]
+
+[[command.sub]]
+name = "clean"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "develop"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "repl"
+candidate = true
+
+[[command.sub]]
+name = "plugin"
+candidate = true
+
+[[command.sub]]
+name = "options"
+candidate = true
+
+[[command.sub]]
+name = "recipes"
+candidate = true
+
+[[command.sub]]
+name = "feedback"
+candidate = true

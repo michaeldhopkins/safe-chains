@@ -1,0 +1,116 @@
+[[command]]
+name = "plenv"
+description = "Perl version manager (plenv). `version`, `versions`, `which`, `whence`, `global`, `local`, `shell`, `commands`, `prefix`, `root`, `init` are read or scaffolding. `install`, `uninstall`, `rehash`, `migrate-modules`, `install-cpanm`, `install-modules` modify the user's plenv directory and may contact MetaCPAN (network)."
+url = "https://github.com/tokuhirom/plenv"
+researched_version = "plenv 2.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "versions"
+level = "Inert"
+bare = true
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "which"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "whence"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "--path", "-h"]
+
+[[command.sub]]
+name = "global"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "local"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--help", "--unset", "-h"]
+
+[[command.sub]]
+name = "shell"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--help", "--unset", "-h"]
+
+[[command.sub]]
+name = "commands"
+level = "Inert"
+bare = true
+standalone = ["--help", "--no-sh", "--sh", "-h"]
+
+[[command.sub]]
+name = "prefix"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "root"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "init"
+level = "Inert"
+bare = true
+standalone = ["--help", "--no-rehash", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "rehash"
+candidate = true
+
+[[command.sub]]
+name = "migrate-modules"
+candidate = true
+
+[[command.sub]]
+name = "install-cpanm"
+candidate = true
+
+[[command.sub]]
+name = "install-modules"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "list-modules"
+candidate = true
+
+[[command.sub]]
+name = "switch"
+candidate = true

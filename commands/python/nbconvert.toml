@@ -1,0 +1,31 @@
+[[command]]
+name = "jupyter-nbconvert"
+aliases = ["nbconvert"]
+description = "Converts notebooks to other formats (HTML, PDF, Markdown, Python, Slides, AsciiDoc). Reads .ipynb files and writes converted output. --execute runs cells (executes Python — arbitrary code) before exporting. --to selects the target format. --output / --output-dir control output paths."
+url = "https://nbconvert.readthedocs.io/"
+researched_version = "nbconvert 7.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--allow-chromium-download", "--allow-errors",
+    "--clear-output", "--debug",
+    "--disable-chromium-sandbox", "--embed-images",
+    "--exec", "--execute", "--from",
+    "--generate-config", "--help",
+    "--inplace", "--log-level", "--no-input",
+    "--no-prompt", "--no-stdin",
+    "--show-config", "--show-config-json",
+    "--stdin", "--stdout", "--version",
+    "--writer", "-h", "-y",
+]
+valued = [
+    "--config", "--ExecutePreprocessor.timeout",
+    "--ExecutePreprocessor.kernel-name",
+    "--ExecutePreprocessor.kernel_name",
+    "--from", "--log-level",
+    "--nbformat", "--output", "--output-dir",
+    "--post", "--reveal-prefix",
+    "--template", "--template-file",
+    "--to", "--use-frontmatter", "--writer",
+    "-c", "-y",
+]

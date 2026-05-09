@@ -1,0 +1,127 @@
+[[command]]
+name = "wandb"
+description = "Weights & Biases CLI — experiment tracking. Most subcommands contact W&B's servers over the network. `version`, `status`, `--help`, `controller`, `sweep --print` are read-only. `login`, `logout`, `online`, `offline` change local credentials. `init`, `agent`, `sweep`, `launch`, `finish`, `artifact <get|put>`, `local` modify state and run user-supplied training scripts."
+url = "https://docs.wandb.ai/ref/cli/"
+researched_version = "wandb 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--settings", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "verify"
+candidate = true
+
+[[command.sub]]
+name = "online"
+candidate = true
+
+[[command.sub]]
+name = "offline"
+candidate = true
+
+[[command.sub]]
+name = "enabled"
+candidate = true
+
+[[command.sub]]
+name = "disabled"
+candidate = true
+
+[[command.sub]]
+name = "agent"
+candidate = true
+
+[[command.sub]]
+name = "sweep"
+candidate = true
+
+[[command.sub]]
+name = "launch"
+candidate = true
+
+[[command.sub]]
+name = "launch-agent"
+candidate = true
+
+[[command.sub]]
+name = "launch-sweep"
+candidate = true
+
+[[command.sub]]
+name = "controller"
+candidate = true
+
+[[command.sub]]
+name = "artifact"
+candidate = true
+
+[[command.sub]]
+name = "local"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "scheduler"
+candidate = true
+
+[[command.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "restore"
+candidate = true
+
+[[command.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub]]
+name = "service"
+candidate = true
+
+[[command.sub]]
+name = "docker"
+candidate = true
+
+[[command.sub]]
+name = "docker-run"
+candidate = true
+
+[[command.sub]]
+name = "beta"
+candidate = true
+
+[[command.sub]]
+name = "job"
+candidate = true

@@ -1,0 +1,88 @@
+[[command]]
+name = "mlflow"
+description = "MLflow CLI — model lifecycle / experiment tracking. `ui`, `server` open long-running HTTP servers (network listeners). `runs list/describe`, `experiments list/search`, `artifacts list/download`, `models list/get`, `version`, `--help` are read-only. `runs delete/restore`, `experiments create/delete/restore/rename`, `artifacts log-artifact`, `models {create,update,delete}` modify the tracking store. `gc`, `db upgrade` mutate state. `recipes`, `models serve`, `sagemaker deploy/build` deploy or run inference. The carve-out covers diagnostic forms only."
+url = "https://mlflow.org/docs/latest/cli.html"
+researched_version = "mlflow 2.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--mask-envs"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "ui"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "gateway"
+candidate = true
+
+[[command.sub]]
+name = "deployments"
+candidate = true
+
+[[command.sub]]
+name = "runs"
+candidate = true
+
+[[command.sub]]
+name = "experiments"
+candidate = true
+
+[[command.sub]]
+name = "artifacts"
+candidate = true
+
+[[command.sub]]
+name = "models"
+candidate = true
+
+[[command.sub]]
+name = "recipes"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "db"
+candidate = true
+
+[[command.sub]]
+name = "gc"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "sagemaker"
+candidate = true
+
+[[command.sub]]
+name = "azureml"
+candidate = true

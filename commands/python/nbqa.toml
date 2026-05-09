@@ -1,0 +1,9 @@
+[[command]]
+name = "nbqa"
+description = "Runs Python QA tools (black, isort, flake8, mypy, pylint, pyupgrade, etc.) on Jupyter notebooks. The first positional argument is the inner tool name; nbqa wraps the inner tool's invocation. Since the inner tool is arbitrary, only the diagnostic --help / --version / --nbqa-version are part of the safe surface."
+url = "https://nbqa.readthedocs.io/"
+researched_version = "nbqa 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--nbqa-help", "--nbqa-version", "--version", "-h", "-V"]

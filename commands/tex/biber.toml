@@ -1,0 +1,43 @@
+[[command]]
+name = "biber"
+description = "Bibliography processor for biblatex. Reads .bcf and .bib sources, writes .bbl output. Stable; no shell escape. Uses configurable encoding, sorting, and unicode handling."
+url = "https://biblatex-biber.sourceforge.net/"
+researched_version = "biber 2.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--cache", "--clrmacros", "--collate-options",
+    "--convert-control", "--debug",
+    "--decodecharsset", "--dot-include",
+    "--fastsort", "--help", "--input-format",
+    "--listsep", "--logfile", "--mincrossrefs",
+    "--minxrefs", "--mssplit", "--no-bblsafechars",
+    "--no-bibwarn", "--noconf",
+    "--nodieonerror", "--noinit",
+    "--nolog", "--nostdmacros",
+    "--no-bblencoding", "--onlylog",
+    "--output-encoding", "--output-format",
+    "--output-indent", "--output-resolve",
+    "--output-safechars", "--output-safecharsset",
+    "--quiet", "--recodedata", "--strict",
+    "--sortdebug", "--tool", "--trace",
+    "--validate-config", "--validate-control",
+    "--validate-datamodel", "--version",
+    "--wraplines",
+    "-h", "-q", "-v",
+]
+valued = [
+    "--cache", "--decodecharsset",
+    "--input-directory", "--input-encoding",
+    "--input-format", "--logfile",
+    "--macros", "--mincrossrefs",
+    "--mssplit", "--namesep",
+    "--output-directory", "--output-encoding",
+    "--output-fieldcase", "--output-file",
+    "--output-format", "--output-indent",
+    "--output-legacy-dates", "--output-resolve",
+    "--output-safecharsset",
+    "--recodedata", "--ssl-host-name",
+    "--tool-config", "--vsval",
+    "--xnamesep", "--xsuffix",
+]

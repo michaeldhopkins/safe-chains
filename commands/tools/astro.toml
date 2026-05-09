@@ -1,0 +1,90 @@
+[[command]]
+name = "astro"
+description = "Astro — modern web framework / static-or-server site builder. `build` writes the rendered site to dist/ (project-local SafeWrite). `dev`/`preview` run long-running dev/preview servers. `check` runs type checks (read). `add <integration>` installs an integration (npm install — network). `sync` writes generated TypeScript types into the project. `info` is read-only diagnostic. `telemetry enable/disable/reset` toggles a local config flag. `create-key` writes an encryption key. `db <push|gen|verify|execute|export>` interact with Astro DB. astro.config.mjs is loaded at every command (arbitrary Node)."
+url = "https://docs.astro.build/en/reference/cli-reference/"
+researched_version = "astro 5.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--root"]
+
+[[command.sub]]
+name = "telemetry"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "enable"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "disable"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "reset"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--minimumFailingSeverity", "--minimumSeverity", "--noSync", "--watch", "-h", "-w"]
+valued = ["--root", "--tsconfig"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+standalone = ["--devOutput", "--force", "--help", "--no-deploy", "-h"]
+valued = ["--config", "--mode", "--root", "--site"]
+
+[[command.sub]]
+name = "sync"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--config", "--mode", "--root"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "dev"
+candidate = true
+
+[[command.sub]]
+name = "preview"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "create-key"
+candidate = true
+
+[[command.sub]]
+name = "db"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "link"
+candidate = true

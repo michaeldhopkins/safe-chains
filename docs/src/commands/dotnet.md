@@ -8,3 +8,9 @@
 - **test**: Flags: --blame, --blame-crash, --blame-hang, --force, --help, --list-tests, --no-build, --no-dependencies, --no-restore, --nologo, -h. Valued: --arch, --artifacts-path, --blame-crash-collect-always, --blame-crash-dump-type, --blame-hang-dump-type, --blame-hang-timeout, --collect, --configuration, --diag, --environment, --filter, --framework, --logger, --os, --output, --property, --results-directory, --runtime, --settings, --test-adapter-path, --verbosity, -a, -c, -d, -e, -f, -l, -o, -r, -s, -v
 - Allowed standalone flags: --help, --info, --list-runtimes, --list-sdks, --version, -V, -h
 
+### `fantomas`
+<p class="cmd-url"><a href="https://github.com/fsprojects/fantomas">https://github.com/fsprojects/fantomas</a></p>
+
+- Allowed standalone flags: --check, --daemon, --force, --help, --out, --profile, --quiet, --recurse, --standalone, --strict, --verbose, --version, -h, -r
+- Allowed valued flags: --config, --exclude, --include, --out, --parallel
+

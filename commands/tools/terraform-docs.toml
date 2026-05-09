@@ -1,0 +1,34 @@
+[[command]]
+name = "terraform-docs"
+description = "Generates Markdown / JSON / YAML / asciidoc / etc. documentation from Terraform module sources. Reads .tf files and prints (or writes) docs. --output-file writes to disk; otherwise output goes to stdout. --output-mode {inject|replace} writes into existing README files (project-local SafeWrite). Pure static analysis — does not run terraform."
+url = "https://terraform-docs.io/"
+researched_version = "terraform-docs 0.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--anchor", "--default", "--escape",
+    "--footer-from", "--header-from",
+    "--help", "--hide", "--hide-all",
+    "--html", "--indent",
+    "--lockfile", "--no-color",
+    "--no-anchor", "--no-default",
+    "--no-escape", "--no-footer-from",
+    "--no-header-from", "--no-html",
+    "--no-required", "--no-sensitive",
+    "--no-type", "--read-comments",
+    "--recursive", "--required",
+    "--sensitive",
+    "--show", "--show-all", "--sort",
+    "--sort-by", "--type", "--version",
+    "-c", "-h",
+]
+valued = [
+    "--config", "--footer-from",
+    "--header-from", "--lockfile",
+    "--mode", "--output", "--output-file",
+    "--output-mode", "--output-template",
+    "--output-values-from", "--output-values",
+    "--recursive-path", "--sort-by",
+    "-O", "-c", "-l",
+]
+write_flags = ["--output", "--output-file"]

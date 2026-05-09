@@ -1,0 +1,155 @@
+[[command]]
+name = "bw"
+description = "Bitwarden CLI — manages Bitwarden vault items. Every meaningful subcommand contacts the Bitwarden server over the network. `list`, `get`, `status`, `fingerprint`, `template`, `pending` are read-only. `sync` syncs local state with the server. `lock`, `unlock`, `login`, `logout` change session state. `create`, `edit`, `delete`, `restore`, `move`, `share`, `confirm`, `import`, `export` mutate vault data."
+url = "https://bitwarden.com/help/cli/"
+researched_version = "bw 2025.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "fingerprint"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--organizationid", "--pretty", "--quiet", "--raw", "--response", "--session", "--trash", "-h"]
+valued = ["--collectionid", "--folderid", "--nointeraction", "--organizationid", "--search", "--session", "--url"]
+
+[[command.sub]]
+name = "get"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--pretty", "--raw", "--response", "-h"]
+valued = ["--itemid", "--organizationid", "--output", "--session"]
+write_flags = ["--output"]
+
+[[command.sub]]
+name = "template"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--pretty", "-h"]
+
+[[command.sub]]
+name = "encode"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "pending"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--shell"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "lock"
+candidate = true
+
+[[command.sub]]
+name = "unlock"
+candidate = true
+
+[[command.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "generate"
+candidate = true
+
+[[command.sub]]
+name = "send"
+candidate = true
+
+[[command.sub]]
+name = "receive"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "restore"
+candidate = true
+
+[[command.sub]]
+name = "move"
+candidate = true
+
+[[command.sub]]
+name = "share"
+candidate = true
+
+[[command.sub]]
+name = "confirm"
+candidate = true
+
+[[command.sub]]
+name = "import"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "device-approval"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true

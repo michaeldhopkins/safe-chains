@@ -1,0 +1,36 @@
+[[command]]
+name = "pdflatex"
+aliases = ["xelatex", "lualatex", "latex"]
+description = "TeX engine — compiles .tex source to .pdf (or .dvi for `latex`). Writes auxiliary files (.aux/.log/.toc/.out/etc.) plus the output PDF. `\\write18` shell-escape (controlled by --shell-escape / --no-shell-escape) lets documents execute external commands; default in TeX Live is restricted-shell-escape. Stable. Same flag surface for xelatex and lualatex."
+url = "https://www.tug.org/applications/pdftex/"
+researched_version = "pdfTeX / XeTeX / LuaTeX bundled with TeX Live"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--cnf-line", "--draftmode", "--enc",
+    "--etex", "--file-line-error",
+    "--file-line-error-style", "--fmt",
+    "--halt-on-error", "--help", "--ini",
+    "--initialize", "--interaction",
+    "--ipc", "--ipc-start",
+    "--mktex", "--no-cnf",
+    "--no-file-line-error", "--no-mktex",
+    "--no-parse-first-line", "--no-shell-escape",
+    "--parse-first-line", "--progname",
+    "--recorder", "--restricted-shell-escape",
+    "--shell-restricted",
+    "--show-version", "--src-specials",
+    "--synctex", "--translate-file", "--version",
+    "-help", "-version",
+]
+valued = [
+    "--cnf-line", "--enc", "--fmt", "--halt-on-error",
+    "--interaction", "--jobname", "--kanji",
+    "--kanji-internal", "--mktex",
+    "--mltex", "--no-mktex",
+    "--no-shell-escape", "--output-comment",
+    "--output-directory", "--output-format",
+    "--progname", "--recorder",
+    "--shell-escape", "--shell-restricted",
+    "--src-specials", "--synctex", "--translate-file",
+]

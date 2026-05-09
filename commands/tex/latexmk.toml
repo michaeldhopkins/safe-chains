@@ -1,0 +1,46 @@
+[[command]]
+name = "latexmk"
+description = "Automated LaTeX build orchestrator. Runs latex/pdflatex/xelatex/lualatex plus bibtex/biber and re-runs as needed until cross-references converge. Reads .tex sources and writes .pdf/.dvi/.aux/.log/.toc/.bbl etc. Each invocation also executes `\\write18` shell-escape calls if the underlying engine is configured to allow them. Stable, mature."
+url = "https://mg.readthedocs.io/latexmk.html"
+researched_version = "latexmk 4.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--help", "--version", "-CA", "-c", "-C",
+    "-cd", "-cd-", "-commands", "-dependents",
+    "-deps", "-deps-", "-deps-out=",
+    "-dvi", "-dvi-", "-dvilua", "-dvilua-",
+    "-emulate-aux-dir", "-f", "-f-",
+    "-failure-cmd", "-g", "-gg",
+    "-h", "-help", "-jobname=", "-l",
+    "-l-", "-latex", "-latex=",
+    "-latexoption=", "-list", "-logfilewarninglist",
+    "-lualatex", "-lualatex-", "-make",
+    "-MF", "-makeindexfudge", "-makeindexfudge-",
+    "-MP", "-MT", "-new-viewer", "-new-viewer-",
+    "-norc", "-nodependents", "-nofileline-error-",
+    "-nofileline-error", "-nopdf-",
+    "-nodeps", "-nodeps-", "-pdf", "-pdfdvi",
+    "-pdflua", "-pdfps", "-pdfxe", "-pdf-",
+    "-print=", "-pretex=",
+    "-ps", "-ps-", "-pv", "-pv-",
+    "-pvc", "-pvc-", "-pvctimeout",
+    "-quiet", "-r", "-recorder", "-recorder-",
+    "-rules", "-rules-", "-showextraoptions",
+    "-silent", "-stdtexinputs", "-time",
+    "-use-make", "-use-make-",
+    "-v", "-verbose", "-version",
+    "-view=", "-Werror", "-x", "-xelatex", "-xelatex-",
+    "--",
+]
+valued = [
+    "-deps-out", "-fdb-ext", "-jobname",
+    "-output-directory",
+    "--output-directory",
+    "-quote", "-shell-escape",
+    "-no-shell-escape",
+    "-output-format=",
+    "-pretex",
+    "-time",
+    "-aux-directory",
+]

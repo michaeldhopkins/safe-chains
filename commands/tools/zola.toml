@@ -1,0 +1,48 @@
+[[command]]
+name = "zola"
+description = "Static site generator written in Rust. `init` scaffolds a new site (project-local SafeWrite). `build` writes the rendered site to public/ (or wherever --output-dir points). `check` validates content links and template parsing without writing (read). `serve` runs the long-running dev server. Tera templates are sandboxed — does not execute project code at template-render time. Active project on the 0.x line."
+url = "https://www.getzola.org/documentation/getting-started/cli-usage/"
+researched_version = "zola 0.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--force", "--help", "-f", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--drafts", "--force", "--help",
+    "--minify", "-h",
+]
+valued = [
+    "--base-url", "--config", "--output-dir",
+    "--root", "-c", "-o", "-r", "-u",
+]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--drafts", "--help", "--skip-external-links", "-h"]
+valued = ["--config", "--root"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "serve"
+candidate = true

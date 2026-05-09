@@ -1,0 +1,108 @@
+[[command]]
+name = "pass"
+description = "Password store — manages a tree of GPG-encrypted password files under ~/.password-store. Read-side: `show` (alias bare invocation with a name), `ls`/`list`, `find`/`search`, `grep`. Write-side: `init`, `insert`, `edit`, `generate`, `rm`, `mv`, `cp`. The `git` subcommand delegates to `git` for the password store's repo. The diagnostic --help and --version are benign."
+url = "https://www.passwordstore.org/"
+researched_version = "pass 1.7.x; surface stable"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "show"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--clip", "--help", "--qrcode", "-c", "-h", "-q"]
+
+[[command.sub]]
+name = "ls"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "find"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "search"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "grep"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--extended-regexp", "--help", "--ignore-case", "-E", "-h", "-i"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "insert"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "generate"
+candidate = true
+
+[[command.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "mv"
+candidate = true
+
+[[command.sub]]
+name = "rename"
+candidate = true
+
+[[command.sub]]
+name = "cp"
+candidate = true
+
+[[command.sub]]
+name = "copy"
+candidate = true
+
+[[command.sub]]
+name = "git"
+candidate = true

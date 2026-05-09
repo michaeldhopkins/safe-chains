@@ -1,0 +1,125 @@
+[[command]]
+name = "gleam"
+description = "Gleam — friendly typed language on the Erlang/JavaScript runtime. `build`, `compile`, `check`, `format`, `test`, `run`, `shell`, `deps download/list/update`, `add`, `remove`, `clean`, `new`, `docs build/publish`, `export`, `lsp`, `publish`, `update`, `hex` execute or modify project state. `format --check` is read-only. `--help`, `--version` are diagnostic. Active project."
+url = "https://gleam.run/documentation/cli/"
+researched_version = "gleam 1.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "format"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--check", "--help", "--stdin", "-h"]
+write_flags = []
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--no-print-progress", "--target", "-h"]
+valued = ["--target"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--no-print-progress", "--warnings-as-errors", "-h"]
+valued = ["--target"]
+
+[[command.sub]]
+name = "deps"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "tree"
+standalone = ["--help", "-h"]
+valued = ["--package"]
+
+[[command.sub.sub]]
+name = "download"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "compile"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "shell"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "docs"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "lsp"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "hex"
+candidate = true
+
+[[command.sub]]
+name = "fix"
+candidate = true
+
+[[command.sub]]
+name = "compile-package"
+candidate = true
+
+[[command.sub]]
+name = "fix-doc"
+candidate = true

@@ -1,0 +1,141 @@
+[[command]]
+name = "consul"
+description = "HashiCorp Consul CLI — service mesh / KV / catalog. Most subcommands contact a Consul server (network). Carve-out covers diagnostic / read-only inspection: `version`, `members`, `monitor` (read but interactive), `info`, `validate`, `kv get/list`, `catalog list-services/list-nodes/list-datacenters`, `services list`, `acl token list/read`."
+url = "https://developer.hashicorp.com/consul/commands"
+researched_version = "Consul 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-format", "-h"]
+valued = ["-format"]
+
+[[command.sub]]
+name = "members"
+level = "SafeRead"
+bare = true
+standalone = ["--detailed", "--help", "--wan", "-detailed", "-h", "-wan"]
+valued = ["-filter", "-format", "-http-addr", "-status", "-token", "-token-file"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["-http-addr", "-token", "-token-file"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-quiet"]
+valued = ["-config-format"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "agent"
+candidate = true
+
+[[command.sub]]
+name = "kv"
+candidate = true
+
+[[command.sub]]
+name = "acl"
+candidate = true
+
+[[command.sub]]
+name = "catalog"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "connect"
+candidate = true
+
+[[command.sub]]
+name = "event"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "force-leave"
+candidate = true
+
+[[command.sub]]
+name = "intention"
+candidate = true
+
+[[command.sub]]
+name = "join"
+candidate = true
+
+[[command.sub]]
+name = "leave"
+candidate = true
+
+[[command.sub]]
+name = "lock"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "maint"
+candidate = true
+
+[[command.sub]]
+name = "monitor"
+candidate = true
+
+[[command.sub]]
+name = "operator"
+candidate = true
+
+[[command.sub]]
+name = "peering"
+candidate = true
+
+[[command.sub]]
+name = "reload"
+candidate = true
+
+[[command.sub]]
+name = "rtt"
+candidate = true
+
+[[command.sub]]
+name = "services"
+candidate = true
+
+[[command.sub]]
+name = "snapshot"
+candidate = true
+
+[[command.sub]]
+name = "tls"
+candidate = true
+
+[[command.sub]]
+name = "troubleshoot"
+candidate = true
+
+[[command.sub]]
+name = "watch"
+candidate = true

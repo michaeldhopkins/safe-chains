@@ -1,0 +1,22 @@
+[[command]]
+name = "gpg"
+description = "GNU Privacy Guard — OpenPGP encryption and signing. The CLI is flag-driven (commands like --list-keys, --encrypt, --sign appear as long flags). This carve-out covers the read-only inspection flags: --list-keys / -k / --list-public-keys, --list-secret-keys / -K, --list-sigs, --check-sigs, --fingerprint, --list-trustdb, --list-config, --list-options, --print-md, --version, --help. Encrypt / decrypt / sign / key-management / network keyserver flags are not part of the safe surface here — those are mutating or external-system operations and should be invoked deliberately by the user."
+url = "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html"
+researched_version = "GnuPG 2.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--check-sigs", "--check-trustdb",
+    "--fingerprint", "--help",
+    "--list-config", "--list-keys",
+    "--list-options", "--list-public-keys",
+    "--list-secret-keys", "--list-sigs",
+    "--list-trustdb", "--no-tty", "--print-md",
+    "--quiet", "--show-keys", "--show-sigs",
+    "--verbose", "--version",
+    "-K", "-h", "-k", "-q", "-v",
+]
+valued = [
+    "--digest-algo",
+    "--homedir", "--keyring",
+]

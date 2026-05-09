@@ -1,0 +1,165 @@
+[[command]]
+name = "hugo"
+description = "Hugo — Go-powered static site generator. Bare invocation runs `hugo build` and writes the generated site to ./public (project-local SafeWrite). `serve` / `server` runs the long-running dev HTTP server (loads the site config and theme code at startup). `new <kind> <path>` writes a content/site/theme/layout file. `mod <fetch|init|tidy|graph|verify|vendor>` fetches Go modules from the registry (network). `gen autocomplete/man/chromastyles/docs` writes generated reference files. `config <print|mounts>`, `env`, `version`, `list <drafts|expired|future|all>`, `check ulimit` are read-only diagnostics. Active project on the 0.x line."
+url = "https://gohugo.io/commands/hugo/"
+researched_version = "Hugo 0.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+nested_bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "print"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "mounts"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "drafts"
+standalone = ["--help", "-h"]
+valued = ["--source", "-s"]
+
+[[command.sub.sub]]
+name = "expired"
+standalone = ["--help", "-h"]
+valued = ["--source", "-s"]
+
+[[command.sub.sub]]
+name = "future"
+standalone = ["--help", "-h"]
+valued = ["--source", "-s"]
+
+[[command.sub.sub]]
+name = "all"
+standalone = ["--help", "-h"]
+valued = ["--source", "-s"]
+
+[[command.sub.sub]]
+name = "published"
+standalone = ["--help", "-h"]
+valued = ["--source", "-s"]
+
+[[command.sub]]
+name = "check"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "ulimit"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--cleanDestinationDir", "--clock",
+    "--config", "--configDir", "--debug",
+    "--destination", "--disableFastRender",
+    "--enableGitInfo", "--forceSyncStatic",
+    "--gc", "--help", "--ignoreCache",
+    "--minify", "--noBuildLock", "--noChmod",
+    "--noTimes", "--printI18nWarnings",
+    "--printMemoryUsage", "--printPathWarnings",
+    "--printUnusedTemplates", "--quiet",
+    "--renderToMemory", "--templateMetrics",
+    "--templateMetricsHints", "--trace", "--verbose",
+    "-D", "-E", "-F", "-d", "-e", "-h", "-q", "-s",
+    "-t", "-v",
+]
+valued = [
+    "--baseURL", "--cacheDir", "--clock",
+    "--contentDir", "--destination",
+    "--environment", "--i18n",
+    "--layoutDir", "--logFile",
+    "--logLevel", "--memstats",
+    "--noChmod", "--noTimes",
+    "--panicOnWarning", "--source",
+    "--theme", "--themesDir",
+    "--workers",
+    "-b", "-l",
+]
+
+[[command.sub]]
+name = "new"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--force", "--help", "--quiet", "-f", "-h"]
+valued = ["--config", "--editor", "--kind", "--source", "-c", "-s"]
+
+[[command.sub]]
+name = "gen"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "autocomplete"
+standalone = ["--help", "--type", "-h"]
+valued = ["--completionfile", "--type"]
+
+[[command.sub.sub]]
+name = "chromastyles"
+standalone = ["--help", "-h"]
+valued = ["--highlightStyle", "--linesStyle", "--lineNumbersInlineStyle", "--style"]
+
+[[command.sub.sub]]
+name = "docs"
+standalone = ["--help", "-h"]
+valued = ["--dir"]
+
+[[command.sub.sub]]
+name = "man"
+standalone = ["--help", "-h"]
+valued = ["--dir"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "convert"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "import"
+candidate = true
+
+[[command.sub]]
+name = "mod"
+candidate = true

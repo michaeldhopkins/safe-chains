@@ -1,0 +1,16 @@
+[[command]]
+name = "cpan"
+description = "Perl CPAN client. Default mode (or `-i MODULE`) installs modules, fetching tarballs from CPAN (network) and running build scripts (arbitrary Perl). `-l` lists installed modules (read). `-D MODULE` shows module details (read). `-h`/`-V` are diagnostics. The carve-out covers read-only forms."
+url = "https://metacpan.org/pod/cpan"
+researched_version = "Perl 5.x bundled cpan"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--version", "-D", "-L", "-V",
+    "-a", "-c", "-f", "-g", "-h", "-l",
+    "-r", "-w",
+]
+valued = [
+    "--mirror",
+    "-i", "-j", "-J", "-O", "-T", "-d", "-m", "-x",
+]
