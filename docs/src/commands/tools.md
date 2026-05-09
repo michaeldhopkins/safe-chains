@@ -138,6 +138,12 @@
 - Requires --dryrun, --graph, --list, -l, -n. - Allowed standalone flags: --dryrun, --graph, --help, --list, --version, -h, -l, -n
 - Allowed valued flags: --action-offline-mode, --artifact-server-path, --container-architecture, --env, --env-file, --eventpath, --input, --job, --matrix, --platform, --pull, --remote-name, --secret, --secret-file, --var, --var-file, --workflows, -E, -P, -W, -e, -j, -s
 
+### `asciidoctor`
+<p class="cmd-url"><a href="https://docs.asciidoctor.org/asciidoctor/latest/cli/">https://docs.asciidoctor.org/asciidoctor/latest/cli/</a></p>
+
+- Allowed standalone flags: --embedded, --help, --no-header-footer, --quiet, --safe, --section-numbers, --sourcemap, --timings, --trace, --verbose, --version, --warnings, -V, -e, -h, -n, -q, -s, -t, -v, -w
+- Allowed valued flags: --attribute, --backend, --base-dir, --destination-dir, --doctype, --eruby, --failure-level, --log-level, --out-file, --safe-mode, --source-dir, -B, -D, -R, -S, -a, -b, -d, -o
+
 ### `biome`
 <p class="cmd-url"><a href="https://biomejs.dev/reference/cli/">https://biomejs.dev/reference/cli/</a></p>
 
@@ -203,6 +209,17 @@ Aliases: `clang++`
 - Allowed standalone flags: --backtrace, --color, --dry-run, --expand, --guess, --help, --i18n-keywords, --i18n-languages, --init, --no-color, --no-diff, --no-multiline, --no-snippets, --no-source, --no-strict, --publish, --publish-quiet, --quiet, --retry, --snippets, --strict, --verbose, --version, --wip, -V, -b, -d, -e, -h, -q
 - Allowed valued flags: --ci-environment, --format, --format-options, --language, --lines, --name, --order, --out, --profile, --require, --require-module, --retry, --tags, -f, -i, -l, -n, -o, -p, -r, -t
 - Bare invocation allowed
+
+### `dawn`
+<p class="cmd-url"><a href="https://github.com/thesp0nge/dawnscanner">https://github.com/thesp0nge/dawnscanner</a></p>
+
+- **help**: Positional args accepted
+- **kb find**: Flags: --debug, --help, --verbose, -h
+- **kb lint**: Flags: --debug, --help, --verbose, -h
+- **kb list**: Flags: --debug, --help, --verbose, -h
+- **kb status**: Flags: --debug, --help, --verbose, -h
+- **scan**: Flags: --count, --debug, --dependencies, --exit-on-warn, --gemfile, --help, --verbose, -C, -G, -d, -h, -z. Valued: --config-file, --output, --report-format, --skip, -F, -O, -S, -c. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `depcheck`
 <p class="cmd-url"><a href="https://github.com/depcheck/depcheck">https://github.com/depcheck/depcheck</a></p>
@@ -286,6 +303,13 @@ Aliases: `erblint`
 
 - Allowed standalone flags: --all, --blame, --continue, --details, --group, --help, --methods-only, --quiet, --score, --verbose, --version, -a, -b, -c, -d, -g, -h, -m, -q, -s, -v, --18, --19
 - Allowed valued flags: --extra-options, --include, --require, -I, -e, -r
+- Hyphen-prefixed positional arguments accepted
+
+### `fpm`
+<p class="cmd-url"><a href="https://fpm.readthedocs.io/">https://fpm.readthedocs.io/</a></p>
+
+- Allowed standalone flags: --debug, --debug-workspace, --force, --help, --no-auto-depends, --no-depends, --source-date-epoch-from-changelog, --template-scripts, --verbose, --version, -f, -h
+- Allowed valued flags: --after-install, --after-remove, --after-upgrade, --architecture, --before-install, --before-remove, --before-upgrade, --category, --chdir, --config-files, --conflicts, --depends, --description, --directories, --epoch, --exclude, --exclude-file, --fpm-options-file, --input-type, --inputs, --iteration, --license, --log, --maintainer, --name, --output-type, --package, --package-name-suffix, --prefix, --provides, --replaces, --source-date-epoch-default, --template-value, --url, --vendor, --version, --workdir, -C, -S, -a, -d, -m, -n, -p, -s, -t, -v, -x
 - Hyphen-prefixed positional arguments accepted
 
 ### `frames`
@@ -373,6 +397,13 @@ Aliases: `g++`, `cc`, `c++`
 
 - Allowed standalone flags: --debug, --dependencies, --exports, --files, --help, --include-entry-exports, --include-libs, --isolate-workspaces, --no-config-hints, --no-exit-code, --no-gitignore, --no-progress, --performance, --production, --strict, --version, -V, -h
 - Allowed valued flags: --cache-location, --config, --exclude, --include, --max-issues, --reporter, --tags, --tsConfig, --workspace, -W, -c, -t
+- Bare invocation allowed
+
+### `kramdown`
+<p class="cmd-url"><a href="https://kramdown.gettalong.org/">https://kramdown.gettalong.org/</a></p>
+
+- Allowed standalone flags: --auto-id-prefix, --auto-ids, --enable-coderay, --gfm-quirks, --hard-wrap, --help, --no-auto-ids, --no-config-file, --no-hard-wrap, --smart-quotes, --version, -h, -v
+- Allowed valued flags: --config-file, --coderay-line-numbers, --entity-output, --footnote-nr, --header-offset, --input, --math-engine, --output, --syntax-highlighter, --toc-levels, -i, -o
 - Bare invocation allowed
 
 ### `ldd`

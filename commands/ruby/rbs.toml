@@ -1,0 +1,168 @@
+[[command]]
+name = "rbs"
+description = "Ruby's standard-library tool for working with RBS type signatures. Read-only subcommands: `ast` (print env JSON), `list`, `ancestors`, `methods`, `method`, `constant`, `paths`, `parse` (syntax check, including from -e CODE strings), `validate`, `subtract`, `diff`. `annotate` rewrites RBS files in place to pull RDoc comments. `prototype rb` and `prototype rbi` generate RBS by parsing source — when -o or --out-dir is given they write files. `prototype runtime` introspects loaded classes at runtime (loads application Ruby — same risk profile as `rails runner`). `vendor` copies gem RBS into vendor/sigs (project-local SafeWrite). `collection install/update` write rbs_collection.lock.yaml and download/copy gem RBS. `test` is a runtime wrapper that spawns the target program with type-check shims — not pure analysis. Stable bundled with Ruby; v4.x line is current."
+url = "https://github.com/ruby/rbs"
+researched_version = "rbs 4.0.2 (March 2026)"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "ast"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--class", "--help", "--interface", "--module", "-h"]
+valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "ancestors"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--instance", "--singleton", "-h"]
+valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "methods"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--help", "--inherit", "--instance",
+    "--no-inherit", "--singleton", "-h",
+]
+valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "method"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--instance", "--singleton", "-h"]
+valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "constant"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--context", "-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "paths"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--silent", "-h"]
+valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "parse"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--method-type", "--type", "-h"]
+valued = ["-e", "-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "subtract"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "annotate"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--arglists", "--filename",
+    "--gems", "--help", "--home",
+    "--no-arglists", "--no-filename",
+    "--no-gems", "--no-home",
+    "--no-site", "--no-system",
+    "--site", "--system", "-h",
+]
+valued = ["--dir", "-d", "-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "prototype"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--force", "--help", "--merge", "--outline", "--todo", "-h"]
+valued = [
+    "--base-dir", "--method-owner", "--out-dir",
+    "-I", "--collection", "--repo", "--log-level",
+    "-r",
+]
+
+[[command.sub]]
+name = "vendor"
+level = "SafeWrite"
+bare = true
+standalone = ["--clean", "--help", "--no-clean", "-h"]
+valued = ["--vendor-dir", "-I", "--collection", "--repo", "--log-level", "-r"]
+
+[[command.sub]]
+name = "collection"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "init"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "install"
+standalone = ["--frozen", "--help", "--stdout", "-h"]
+valued = ["--config"]
+
+[[command.sub.sub]]
+name = "update"
+standalone = ["--help", "--stdout", "-h"]
+valued = ["--config"]
+
+[[command.sub.sub]]
+name = "clean"
+standalone = ["--help", "-h"]
+valued = ["--config"]
+
+[[command.sub.sub]]
+name = "config"
+standalone = ["--help", "-h"]
+valued = ["--config"]
+
+[[command.sub.sub]]
+name = "uninstall"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "test"
+candidate = true

@@ -1,0 +1,38 @@
+[[command]]
+name = "danger"
+description = "Runs a Dangerfile (arbitrary Ruby) against pull requests in CI to leave automated comments. The whole tool is structured around evaluating user-supplied Ruby — `danger pr`, `danger local`, and bare `danger` all load and execute the Dangerfile, which can call out to GitHub/GitLab/Bitbucket APIs, enforce rules, or run any other Ruby code. The diagnostic flags --version and --help do not load the Dangerfile. Active maintenance on the 9.x line."
+url = "https://danger.systems/"
+researched_version = "danger 9.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "pr"
+candidate = true
+
+[[command.sub]]
+name = "local"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "plugins"
+candidate = true
+
+[[command.sub]]
+name = "systems"
+candidate = true
+
+[[command.sub]]
+name = "dry_run"
+candidate = true
+
+[[command.sub]]
+name = "runner"
+candidate = true

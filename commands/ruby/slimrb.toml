@@ -1,0 +1,9 @@
+[[command]]
+name = "slimrb"
+description = "Renders Slim templates to HTML by evaluating the template — embedded Ruby in expressions and code lines is executed at render time. Outputs to stdout by default. Only the diagnostic flags --help and --version have a fixed safe surface; rendering any template runs arbitrary Ruby."
+url = "https://github.com/slim-template/slim"
+researched_version = "slim 5.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

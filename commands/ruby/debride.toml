@@ -1,0 +1,17 @@
+[[command]]
+name = "debride"
+description = "Static analyzer that finds methods which are defined but never called within the analyzed paths. Parses Ruby source via prism (or ruby_parser with --legacy); does not execute application code. Output goes to stdout; --json or --yaml change format. -r/--rails enables Rails-aware heuristics. -e/--exclude skips paths; -w/--whitelist skips a list of method names; -m/--minimum sets the minimum-uses threshold. Companion binaries `debride_rm` (which auto-removes flagged methods) and `debride_rails_whitelist` ship with the same gem but are separate executables and are not part of this allowlist. Slow but steady seattlerb maintenance."
+url = "https://github.com/seattlerb/debride"
+researched_version = "debride 1.15.1 (January 2026)"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--help", "--json", "--legacy", "--rails",
+    "--verbose", "--version", "--yaml",
+    "-h", "-r", "-v",
+]
+valued = [
+    "--exclude", "--focus", "--minimum", "--whitelist",
+    "-e", "-f", "-m", "-w",
+]

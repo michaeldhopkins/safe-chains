@@ -1,0 +1,26 @@
+[[command]]
+name = "mutant"
+description = "Mutation testing tool. `mutant run` mutates the application's source AST and re-runs the test suite for each mutation to detect tests that don't observe the mutated behaviour — every invocation executes both the application code and the test suite. The `subscription` subcommand contacts the licence server. Only the diagnostic flags --version and --help have a fixed safe surface."
+url = "https://github.com/mbj/mutant"
+researched_version = "mutant 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "subscription"
+candidate = true
+
+[[command.sub]]
+name = "environment"
+candidate = true
+
+[[command.sub]]
+name = "util"
+candidate = true

@@ -1,0 +1,176 @@
+[[command]]
+name = "stree"
+description = "Syntax Tree CLI — Ruby parser, formatter, and traversal toolkit. Read subcommands: `ast`/`a` (print AST), `check`/`c` (verify formatting; non-zero exit on mismatch), `ctags` (emit ctags index to stdout), `debug` (idempotency self-test), `doc` (print doc-tree IR), `expr`/`e` (pattern-match the first expression), `format`/`f` (print formatted source to stdout), `json`/`j` (serialize as JSON), `match`/`m` (pattern-match whole input), `search`/`s` (find pattern matches), `version`, `help`. The `write`/`w` subcommand formats files in place — promotes to SafeWrite. `lsp` is the long-running language-server mode. The global `--plugins=NAMES` option `require`s the listed plugin libraries before running, which loads arbitrary Ruby — not part of the safe surface."
+url = "https://github.com/ruby-syntax-tree/syntax_tree"
+researched_version = "syntax_tree 6.3.0 (July 2025)"
+bare_flags = ["--help", "--version", "-h"]
+
+[command.wrapper]
+valued = [
+    "--config", "--extension", "--ignore-files",
+    "--print-width", "--target-ruby-version",
+]
+
+[[command.sub]]
+name = "ast"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "a"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "c"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "ctags"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "debug"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "doc"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "expr"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "e"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "format"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "f"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "json"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "j"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "match"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "m"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "search"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "s"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "write"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "w"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-e"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "lsp"
+candidate = true

@@ -1,0 +1,19 @@
+[[command]]
+name = "rex"
+description = "Lexical scanner generator for Ruby — companion to racc. Reads a `.rex` rules file and emits a Ruby scanner class to a file (defaults to <input>.rb). Pure code generation; does not execute scanner actions at generation time. Distributed as the rexical gem; surface is small and frozen."
+url = "https://github.com/tenderlove/rexical"
+researched_version = "rexical 1.x; surface stable"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--check-only", "--debug", "--dependency",
+    "--help", "--ignore-case", "--ignorecase",
+    "--independent", "--no-comment", "--stub",
+    "--version",
+    "-C", "-d", "-h", "-i", "-s",
+]
+valued = [
+    "--output-file",
+    "-o",
+]

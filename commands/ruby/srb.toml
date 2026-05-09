@@ -1,0 +1,56 @@
+[[command]]
+name = "srb"
+description = "Stripe's gradual type checker for Ruby. Bare `srb` defaults to the `tc` (typecheck) subcommand. `srb tc` reads Ruby source plus RBI files and reports type violations to stdout — does not execute application code at type-check time. The -a/--autocorrect flag rewrites source files in place; --suggest-typed and --suggest-unsafe also produce file-modifying suggestions. `srb init` scaffolds the sorbet/ directory (and shells out to tapioca / `bundle exec srb-rbi-*`, which boot the Rails environment to introspect classes — that's arbitrary code execution). `srb rbi` regenerates RBI files. The --lsp flag puts the binary in long-running language-server mode. Active weekly cadence — flag surface is fast-moving."
+url = "https://sorbet.org/docs/cli"
+researched_version = "sorbet 0.6.13169 (April 2026); flag surface evolves frequently"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "tc"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = [
+    "--autocorrect", "--check-out-of-order-constant-references",
+    "--color", "--did-you-mean", "--enable-experimental-rbs-assertions",
+    "--enable-experimental-rbs-comments", "--enable-experimental-rbs-signatures",
+    "--enable-experimental-requires-ancestor", "--enable-experimental-rspec",
+    "--experimental-ruby3-keyword-args", "--force-hashing",
+    "--help", "--license", "--no-config", "--no-did-you-mean",
+    "--no-error-count", "--no-error-sections",
+    "--no-stdlib", "--progress", "--quiet",
+    "--silence-dev-message", "--simulate-crash",
+    "--stdout-hup-hack", "--suggest-typed", "--suggest-unsafe",
+    "--suppress-non-critical", "--track-untyped",
+    "--typed-super", "--uniquely-defined-behavior",
+    "--verbose", "--version",
+    "-P", "-a", "-h", "-q", "-v",
+]
+valued = [
+    "--allowed-extension", "--censor-for-snapshot-tests",
+    "--dir", "--error-url-base", "--file",
+    "--forcibly-silence-lsp-multiple-dir-error",
+    "--ignore", "--isolate-error-code",
+    "--max-cache-size-bytes", "--max-threads",
+    "--metrics-prefix", "--minimize-to-rbi",
+    "--parser", "--print", "--remove-path-prefix",
+    "--stop-after", "--suppress-error-code",
+    "--suppress-payload-superclass-redefinition-for",
+    "--typed", "--typed-override",
+    "-e", "-p",
+]
+write_flags = [
+    "--autocorrect", "--suggest-typed", "--suggest-unsafe", "-a",
+]
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "rbi"
+candidate = true
+
+[[command.sub]]
+name = "help"
+allow_all = true

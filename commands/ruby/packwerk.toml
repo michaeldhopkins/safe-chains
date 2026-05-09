@@ -1,0 +1,42 @@
+[[command]]
+name = "packwerk"
+description = "Shopify's package-boundary enforcer for Rails monoliths. Static analyzer that loads the Rails app via autoloading to introspect class references — that boots project initializers, so each invocation effectively executes user code. `check` reports cross-package violations; `validate` verifies package config integrity (read). `update-todo` rewrites `package_todo.yml` files with the current set of violations (project-local SafeWrite). `init` scaffolds packwerk.yml plus a root package.yml. `version`/`help` are diagnostic. Active development on the 3.x line."
+url = "https://github.com/Shopify/packwerk"
+researched_version = "packwerk 3.3.0 (May 2026)"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--no-parallel", "--parallel", "-h"]
+valued = ["--offenses-formatter", "--packages"]
+
+[[command.sub]]
+name = "update-todo"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--help", "--no-parallel", "--parallel", "-h"]
+valued = ["--offenses-formatter", "--packages"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true

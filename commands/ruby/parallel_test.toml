@@ -1,0 +1,26 @@
+[[command]]
+name = "parallel_test"
+aliases = ["parallel_rspec", "parallel_cucumber", "parallel_spinach"]
+description = "Runs Test::Unit/Minitest, RSpec, Cucumber, or Spinach test suites in parallel by sharding tests across worker processes. Each binary (parallel_test, parallel_rspec, parallel_cucumber, parallel_spinach) defaults to a different inner test type but the flag surface is identical. Like rspec, parallel_test executes the application's test code (and any setup/teardown blocks) — same SafeRead risk profile. The -e/--exec flag substitutes a custom command for the inner runner; that's an arbitrary command and not part of the safe surface. The runtime log (-r) and grouping flags affect how work is distributed but do not change the execution risk."
+url = "https://github.com/grosser/parallel_tests"
+researched_version = "parallel_tests 4.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--combine-stderr", "--first-is-1", "--help",
+    "--isolate", "--multiply-processes", "--non-parallel",
+    "--prefix-output-with-test-env-number", "--quiet",
+    "--serialize-stdout", "--single", "--verbose",
+    "--verbose-command", "--verbose-process-command",
+    "--verbose-rerun-command",
+    "-h", "-i", "-q",
+]
+valued = [
+    "--group-by", "--ignore-tags", "--isolate-n",
+    "--nice", "--only-group", "--pattern",
+    "--pattern-exclude", "--processes", "--runtime-log",
+    "--specify-groups", "--suffix", "--test-options",
+    "--type",
+    "-n", "-o", "-p", "-r", "-s", "-t",
+]

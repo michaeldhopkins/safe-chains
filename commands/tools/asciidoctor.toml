@@ -1,0 +1,24 @@
+[[command]]
+name = "asciidoctor"
+description = "AsciiDoc to HTML/DocBook/manpage converter, written in Ruby. Default behaviour is to write a converted file alongside each input (e.g. `foo.adoc` → `foo.html`); -o/--out-file specifies a different path or `-` for stdout, and -D/--destination-dir relocates the output directory. Pure document conversion — does not execute embedded code blocks. -r/--require loads arbitrary Ruby libraries and -T/--template-dir loads custom Ruby converter templates; -I/--load-path prepends to $LOAD_PATH. Those three flags are not part of the safe surface here. --safe-mode {unsafe|safe|server|secure} controls how `include::` directives resolve; allowed but users opting into `unsafe` enable broad include resolution. Active 2.0.x line; the 2.1 line is on hold while the AsciiDoc spec stabilises."
+url = "https://docs.asciidoctor.org/asciidoctor/latest/cli/"
+researched_version = "asciidoctor 2.0.26 (October 2025)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--embedded", "--help",
+    "--no-header-footer", "--quiet", "--safe",
+    "--section-numbers", "--sourcemap",
+    "--timings", "--trace",
+    "--verbose", "--version",
+    "--warnings",
+    "-V", "-e", "-h", "-n", "-q", "-s",
+    "-t", "-v", "-w",
+]
+valued = [
+    "--attribute", "--backend", "--base-dir",
+    "--destination-dir", "--doctype", "--eruby",
+    "--failure-level", "--log-level", "--out-file",
+    "--safe-mode", "--source-dir",
+    "-B", "-D", "-R", "-S", "-a", "-b", "-d", "-o",
+]

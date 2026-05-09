@@ -7,7 +7,6 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 
 [[command.sub]]
 name = "doctor"
-aliases = ["hyde"]
 level = "SafeRead"
 bare = true
 standalone = ["--help", "--trace", "-h", "-t"]

@@ -1,0 +1,228 @@
+[[command]]
+name = "i18n-tasks"
+description = "i18n key checker and YAML/JSON locale data manager for Rails projects. Read-side subcommands: `missing`, `unused`, `find`, `health`, `eq-base`, `data`, `config`, `gem-path`, plus the `check-*` family (`check-consistent-interpolations`, `check-reserved-interpolations`, `check-normalized`). Write-side: `normalize`, `add-missing`, `remove-unused`, `prune`, `mv`, `cp`, `rm`, `data-merge`, `data-write`, `data-remove`, `check-prism`. Network-touching: `translate-missing` and `tree-translate` call out to a translation backend (Google/DeepL/OpenAI/etc., backend-selectable). `irb` opens a Pry/IRB-style REPL. The `tree-*` data-pipeline commands print to stdout but read from stdin. Running scans boots the host Rails app to discover key usages, so each invocation effectively executes project Ruby. Actively maintained on the 1.x line."
+url = "https://github.com/glebm/i18n-tasks"
+researched_version = "i18n-tasks 1.1.2 (December 2025)"
+bare_flags = ["--help", "--version", "-h"]
+
+[command.wrapper]
+standalone = ["--verbose"]
+valued = ["--config", "-c"]
+
+[[command.sub]]
+name = "missing"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--pattern", "-t", "--types"]
+
+[[command.sub]]
+name = "unused"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--no-strict", "--strict", "-h"]
+
+[[command.sub]]
+name = "find"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--no-strict", "--strict", "-h"]
+
+[[command.sub]]
+name = "health"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--out-format"]
+
+[[command.sub]]
+name = "eq-base"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--out-format"]
+
+[[command.sub]]
+name = "check-consistent-interpolations"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--out-format"]
+
+[[command.sub]]
+name = "check-reserved-interpolations"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--out-format"]
+
+[[command.sub]]
+name = "check-normalized"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "data"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--nostdin", "-h"]
+valued = ["--data-format"]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "gem-path"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "normalize"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h", "-p", "--pattern-router"]
+
+[[command.sub]]
+name = "add-missing"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--help", "--nil-value", "-h"]
+valued = ["--pattern", "-v", "--value"]
+
+[[command.sub]]
+name = "remove-unused"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = [
+    "--confirm", "--help", "--keep-order",
+    "--no-strict", "--strict", "-h", "-k",
+]
+valued = ["--pattern"]
+
+[[command.sub]]
+name = "prune"
+level = "SafeWrite"
+bare = true
+standalone = ["--confirm", "--help", "--keep-order", "-h", "-k"]
+
+[[command.sub]]
+name = "mv"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "cp"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "rm"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "data-merge"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--nostdin", "-h"]
+valued = ["--data-format"]
+
+[[command.sub]]
+name = "data-write"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--nostdin", "-h"]
+valued = ["--data-format"]
+
+[[command.sub]]
+name = "data-remove"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--nostdin", "-h"]
+valued = ["--data-format"]
+
+[[command.sub]]
+name = "tree-merge"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--nostdin", "-h"]
+valued = ["--data-format"]
+
+[[command.sub]]
+name = "tree-filter"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--data-format", "--pattern"]
+
+[[command.sub]]
+name = "tree-mv"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--all-locales", "--help", "-h"]
+valued = ["--data-format"]
+
+[[command.sub]]
+name = "tree-subtract"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--nostdin", "-h"]
+valued = ["--data-format"]
+
+[[command.sub]]
+name = "tree-set-value"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--nostdin", "-h"]
+valued = ["--data-format", "--pattern", "-v", "--value"]
+
+[[command.sub]]
+name = "tree-convert"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--data-format", "-f", "--from", "-t", "--to"]
+
+[[command.sub]]
+name = "check-prism"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--prism-mode"]
+
+[[command.sub]]
+name = "translate-missing"
+candidate = true
+
+[[command.sub]]
+name = "tree-translate"
+candidate = true
+
+[[command.sub]]
+name = "irb"
+candidate = true
