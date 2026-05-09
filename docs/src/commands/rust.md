@@ -15,6 +15,7 @@
 <p class="cmd-url"><a href="https://github.com/Canop/bacon">https://github.com/Canop/bacon</a></p>
 
 - Allowed standalone flags: --help, --prefs, --version, -h, -v
+- Bare invocation allowed
 
 ### `cargo`
 <p class="cmd-url"><a href="https://doc.rust-lang.org/cargo/commands/">https://doc.rust-lang.org/cargo/commands/</a></p>
