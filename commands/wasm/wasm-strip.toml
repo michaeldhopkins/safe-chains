@@ -1,0 +1,10 @@
+[[command]]
+name = "wasm-strip"
+description = "WABT — strips custom sections from a WebAssembly binary. Bare invocation rewrites the file in place (project-local SafeWrite). -k / --keep-section preserves named sections."
+url = "https://github.com/WebAssembly/wabt"
+researched_version = "WABT 1.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-h", "-v"]
+valued = ["--keep-section", "-k"]

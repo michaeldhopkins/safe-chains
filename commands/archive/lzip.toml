@@ -1,0 +1,24 @@
+[[command]]
+name = "lzip"
+aliases = ["lunzip", "lzcat", "plzip"]
+description = "LZIP compressor. Bare invocation reads files and writes <name>.lz (or stdout with -c). -d/--decompress reverses. -t/--test verifies (read). -l/--list prints metadata (read). plzip is the parallel variant."
+url = "https://www.nongnu.org/lzip/"
+researched_version = "lzip 1.x; plzip 1.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--check-lib", "--compress", "--decompress",
+    "--empty", "--fast", "--force",
+    "--help", "--ignore-trailing", "--keep",
+    "--list", "--loose-trailing", "--quiet",
+    "--stdout", "--test", "--threads",
+    "--verbose", "--version", "--volume",
+    "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
+    "-A", "-D", "-F", "-S", "-V",
+    "-a", "-c", "-d", "-f", "-h",
+    "-k", "-l", "-n", "-q", "-s", "-t", "-v", "-z",
+]
+valued = [
+    "--match-length", "--member-size",
+    "--volume-size", "-m", "-n", "-s",
+]

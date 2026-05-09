@@ -1,0 +1,139 @@
+[[command]]
+name = "wasm-tools"
+description = "Bytecode Alliance multi-tool for the WebAssembly binary format. Subcommands include `validate`, `parse`, `print`, `dump`, `objdump`, `mutate`, `shrink`, `smith`, `strip`, `compose`, `component`, `metadata`, `addr2line`, `demangle`, `targets`, `embed-cmp`. Most are pure read or static SafeWrite (parse / print / validate / dump / objdump / demangle / targets / metadata) — the wasm itself isn't executed."
+url = "https://github.com/bytecodealliance/wasm-tools"
+researched_version = "wasm-tools 1.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "parse"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--output", "--features", "-o"]
+
+[[command.sub]]
+name = "print"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--no-fold", "--quiet", "--skeleton", "-f", "-h", "-q"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--features"]
+
+[[command.sub]]
+name = "dump"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--features"]
+
+[[command.sub]]
+name = "objdump"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+
+[[command.sub]]
+name = "strip"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "--all", "--all-custom", "-a", "-h", "-q"]
+valued = ["--delete", "--output", "-d", "-o"]
+
+[[command.sub]]
+name = "demangle"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "metadata"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "--json", "--quiet", "-h", "-q"]
+
+[[command.sub.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "addr2line"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--addresses", "--basenames", "--demangle", "--functions", "--help", "--inlines", "--llvm", "--pretty-print", "--quiet", "-C", "-a", "-e", "-f", "-h", "-i", "-p", "-q", "-s"]
+valued = ["--exe"]
+
+[[command.sub]]
+name = "targets"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "shrink"
+candidate = true
+
+[[command.sub]]
+name = "mutate"
+candidate = true
+
+[[command.sub]]
+name = "smith"
+candidate = true
+
+[[command.sub]]
+name = "compose"
+candidate = true
+
+[[command.sub]]
+name = "component"
+candidate = true
+
+[[command.sub]]
+name = "embed-cmp"
+candidate = true
+
+[[command.sub]]
+name = "json-from-wast"
+candidate = true
+
+[[command.sub]]
+name = "wast"
+candidate = true
+
+[[command.sub]]
+name = "wit-smith"
+candidate = true

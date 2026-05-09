@@ -1,0 +1,21 @@
+[[command]]
+name = "bombardier"
+description = "Fast HTTP load testing tool (Go). Bare invocation makes many HTTP requests to the configured URL (network + load). The diagnostic --help / --version are read-only."
+url = "https://github.com/codesenberg/bombardier"
+researched_version = "bombardier 1.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--version", "-h", "-v"]
+valued = [
+    "--body", "--body-file", "--cert",
+    "--connections", "--duration",
+    "--fasthttp", "--format", "--header",
+    "--http", "--insecure", "--key",
+    "--latencies", "--method",
+    "--no-print", "--print",
+    "--rate", "--requests", "--timeout",
+    "-H", "-T", "-c", "-d", "-f",
+    "-i", "-k", "-l", "-m", "-n",
+    "-o", "-p", "-q", "-r", "-t",
+]

@@ -1,0 +1,14 @@
+[[command]]
+name = "wrk"
+description = "Modern HTTP benchmarking tool. Bare invocation makes many HTTP requests to the URL (network + load). -s SCRIPT loads a Lua script for custom request generation (executes Lua). The diagnostic --help / --version are read-only."
+url = "https://github.com/wg/wrk"
+researched_version = "wrk 4.x"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "--latency", "--version", "-?", "-h", "-v"]
+valued = [
+    "--connections", "--duration",
+    "--header", "--script", "--threads",
+    "--timeout",
+    "-H", "-c", "-d", "-s", "-t",
+]

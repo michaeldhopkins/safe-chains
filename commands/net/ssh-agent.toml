@@ -1,0 +1,13 @@
+[[command]]
+name = "ssh-agent"
+description = "Starts an SSH authentication agent in the background. Prints shell-eval output describing the socket and PID so the user can `eval $(ssh-agent)`. The agent is a long-running daemon. Carve-out: --help / --version / -k (kill) / -s/-c (output format) only."
+url = "https://man.openbsd.org/ssh-agent"
+researched_version = "OpenSSH 9.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help", "-?", "-D", "-a", "-c",
+    "-d", "-h", "-k", "-q", "-s",
+    "-t", "-v",
+]
+valued = ["-E", "-O", "-P", "-a", "-t"]

@@ -1,0 +1,42 @@
+[[command]]
+name = "vegeta"
+description = "HTTP load tester (Go). Subcommands: `attack`, `report`, `dump`, `encode`, `plot`. `attack` makes many HTTP requests according to the configured rate / duration / target file (network + load). `report`/`dump`/`encode`/`plot` analyse a saved attack result file (read or local SafeWrite)."
+url = "https://github.com/tsenart/vegeta"
+researched_version = "vegeta 12.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "report"
+level = "SafeRead"
+bare = true
+standalone = ["--every", "--help", "--type", "--output", "-h"]
+valued = ["--every", "--output", "--type"]
+
+[[command.sub]]
+name = "dump"
+level = "SafeRead"
+bare = true
+standalone = ["--dumper", "--help", "--output", "-h"]
+valued = ["--dumper", "--output"]
+
+[[command.sub]]
+name = "encode"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--output", "--to", "-h"]
+valued = ["--output", "--to"]
+
+[[command.sub]]
+name = "plot"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--output", "--threshold", "--title", "-h"]
+valued = ["--output", "--threshold", "--title"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "attack"
+candidate = true

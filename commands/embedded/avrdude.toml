@@ -1,0 +1,18 @@
+[[command]]
+name = "avrdude"
+description = "AVR firmware programmer. Bare invocation flashes / reads / verifies an AVR microcontroller via -U memtype:r/w/v:filename. Most operations access an attached programmer / MCU (system-state writes outside this CLI). The diagnostic -? / -V / -? -p PART (lists supported parts) are read-only."
+url = "https://www.nongnu.org/avrdude/user-manual/avrdude.html"
+researched_version = "AVRDUDE 7.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "-?", "-D", "-F", "-O",
+    "-V", "-e", "-h", "-l", "-n",
+    "-q", "-s", "-t", "-u", "-v",
+]
+valued = [
+    "-A", "-B", "-C", "-E", "-P",
+    "-T", "-U", "-V", "-X", "-b",
+    "-c", "-i", "-l", "-p", "-r",
+    "-x",
+]

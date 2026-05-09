@@ -1,0 +1,178 @@
+[[command]]
+name = "idf.py"
+description = "ESP-IDF build helper. Bare invocation runs `idf.py build`. Most subcommands compile / flash / monitor an ESP32 (system-state writes outside this CLI when flashing). Read-side: `--version`, `--help`, `dependencies`, `partition-table`, `size`, `size-components`, `size-files`, `efuse-summary`. Write-side: `build`, `app`, `bootloader`, `flash`, `monitor`, `clean`, `fullclean`, `python-clean`, `set-target`, `reconfigure`, `menuconfig`, `confserver`, `gen_compile_commands`, `merge-bin`, `erase-flash`."
+url = "https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/build-system.html"
+researched_version = "ESP-IDF 5.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dependencies"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "partition-table"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "size"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "size-components"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "size-files"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "efuse-summary"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "app"
+candidate = true
+
+[[command.sub]]
+name = "bootloader"
+candidate = true
+
+[[command.sub]]
+name = "flash"
+candidate = true
+
+[[command.sub]]
+name = "encrypted-flash"
+candidate = true
+
+[[command.sub]]
+name = "monitor"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "fullclean"
+candidate = true
+
+[[command.sub]]
+name = "python-clean"
+candidate = true
+
+[[command.sub]]
+name = "set-target"
+candidate = true
+
+[[command.sub]]
+name = "reconfigure"
+candidate = true
+
+[[command.sub]]
+name = "menuconfig"
+candidate = true
+
+[[command.sub]]
+name = "confserver"
+candidate = true
+
+[[command.sub]]
+name = "gen_compile_commands"
+candidate = true
+
+[[command.sub]]
+name = "merge-bin"
+candidate = true
+
+[[command.sub]]
+name = "erase-flash"
+candidate = true
+
+[[command.sub]]
+name = "uf2"
+candidate = true
+
+[[command.sub]]
+name = "save-defconfig"
+candidate = true
+
+[[command.sub]]
+name = "create-project"
+candidate = true
+
+[[command.sub]]
+name = "create-component"
+candidate = true
+
+[[command.sub]]
+name = "openocd"
+candidate = true
+
+[[command.sub]]
+name = "gdb"
+candidate = true
+
+[[command.sub]]
+name = "gdbgui"
+candidate = true
+
+[[command.sub]]
+name = "gdbtui"
+candidate = true
+
+[[command.sub]]
+name = "coredump-info"
+candidate = true
+
+[[command.sub]]
+name = "coredump-debug"
+candidate = true
+
+[[command.sub]]
+name = "docs"
+candidate = true
+
+[[command.sub]]
+name = "post-debug"
+candidate = true
+
+[[command.sub]]
+name = "qemu"
+candidate = true
+
+[[command.sub]]
+name = "tools"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "fullinstall"
+candidate = true

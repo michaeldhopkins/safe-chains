@@ -1,0 +1,16 @@
+[[command]]
+name = "jsonlint"
+description = "JSON linter. Reads .json files and reports parse errors. -i pretty-prints to stdout (read). -c is the older 'sort and prettify' default. -m is YAML-mode validation."
+url = "https://github.com/zaach/jsonlint"
+researched_version = "jsonlint 1.x"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = [
+    "--compact", "--help", "--in-place",
+    "--insert-final-newline", "--prettify",
+    "--quiet", "--sort-keys", "--version",
+    "-V", "-c", "-h", "-i", "-p",
+    "-q", "-s", "-v",
+]
+valued = ["--indent", "--mode", "-m", "-t"]

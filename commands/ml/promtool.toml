@@ -1,0 +1,129 @@
+[[command]]
+name = "promtool"
+description = "Prometheus tooling — checks configs, queries, rules, and metrics. Read-side: `check config`, `check rules`, `check metrics`, `check service-discovery`, `check web-config`, `check healthy`, `check ready`, `query instant`, `query range`, `query series`, `query labels`, `tsdb analyze`, `tsdb list`, `tsdb dump`, `debug metrics`, `debug pprof`, `debug all`, `test rules`. Write-side: `tsdb create-blocks-from`, `push metrics`. Network: query / debug / push contact a Prometheus server."
+url = "https://prometheus.io/docs/prometheus/latest/command-line/promtool/"
+researched_version = "promtool 2.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "check"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "config"
+standalone = ["--help", "--syntax-only", "-h"]
+valued = ["--lint", "--lint-fatal"]
+
+[[command.sub.sub]]
+name = "rules"
+standalone = ["--help", "-h"]
+valued = ["--lint", "--lint-fatal"]
+
+[[command.sub.sub]]
+name = "metrics"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "service-discovery"
+standalone = ["--help", "-h"]
+valued = ["--timeout"]
+
+[[command.sub.sub]]
+name = "web-config"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "healthy"
+standalone = ["--help", "-h"]
+valued = ["--http.config.file", "--url"]
+
+[[command.sub.sub]]
+name = "ready"
+standalone = ["--help", "-h"]
+valued = ["--http.config.file", "--url"]
+
+[[command.sub]]
+name = "query"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "instant"
+standalone = ["--help", "-h"]
+valued = ["--http.config.file", "--time", "-o"]
+
+[[command.sub.sub]]
+name = "range"
+standalone = ["--help", "-h"]
+valued = ["--end", "--http.config.file", "--start", "--step", "-o"]
+
+[[command.sub.sub]]
+name = "series"
+standalone = ["--help", "-h"]
+valued = ["--end", "--http.config.file", "--match", "--start", "-o"]
+
+[[command.sub.sub]]
+name = "labels"
+standalone = ["--help", "-h"]
+valued = ["--end", "--http.config.file", "--match", "--start", "-o"]
+
+[[command.sub.sub]]
+name = "analyze"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "tsdb"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "analyze"
+standalone = ["--extended", "--help", "-h"]
+valued = ["--limit", "--match"]
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--human-readable", "-h", "-r"]
+
+[[command.sub.sub]]
+name = "dump"
+standalone = ["--help", "--sandbox-dir-root", "-h"]
+valued = ["--match", "--max-block-time", "--min-block-time"]
+
+[[command.sub.sub]]
+name = "create-blocks-from"
+candidate = true
+
+[[command.sub]]
+name = "test"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "rules"
+standalone = ["--debug", "--help", "--ignore-unknown-fields", "--junit", "-h"]
+
+[[command.sub]]
+name = "debug"
+nested_bare = false
+
+[[command.sub.sub]]
+name = "pprof"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "metrics"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "all"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "experimental"
+candidate = true

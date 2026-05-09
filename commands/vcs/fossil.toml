@@ -1,0 +1,336 @@
+[[command]]
+name = "fossil"
+description = "Fossil — distributed version control + bug tracker + wiki + forum in a single SQLite-backed binary. Many subcommands. Read-side: `info`, `status`, `timeline`, `diff`, `cat`, `finfo`, `branch list`, `branch info`, `tag list`, `version`, `extras`, `help`, `whatis`, `ls`. Write-side: `add`, `addremove`, `commit`, `ci`, `update`, `merge`, `mv`, `cp`, `rm`, `revert`, `tag`, `branch new`, `pull`, `push`, `sync`, `clone`, `init`, `new`, `open`, `close`, `rebuild`, `purge`. Network ops: `clone`, `pull`, `push`, `sync`, `server`, `ui`."
+url = "https://fossil-scm.org/home/help"
+researched_version = "Fossil 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--verbose", "-h", "-v"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--comment-format", "--help", "--repository", "--verbose", "-R", "-h", "-v"]
+valued = ["--repository", "-R"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--all", "--changed", "--differ", "--dotfiles", "--header", "--help", "--ifchanged", "--limit", "--repository", "--verbose", "-R", "-a", "-c", "-d", "-h", "-v"]
+valued = ["--repository", "-R"]
+
+[[command.sub]]
+name = "timeline"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--brief", "--full", "--help", "--limit", "--no-graph", "--repository", "--showfiles", "--verbose", "-W", "-R", "-b", "-h", "-l", "-n", "-v", "-w"]
+valued = ["--after", "--before", "--children", "--limit", "--repository", "--type", "--width", "-R", "-W", "-c", "-l", "-n", "-t", "-w"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--brief", "--checkin", "--context", "--diff-binary", "--exclude", "--from", "--help", "--ignore-all-space", "--ignore-blank-lines", "--ignore-case", "--ignore-eol-ws", "--ignore-space-at-eol", "--ignore-trailing-cr", "--include", "--internal", "--invert", "--no-dir-prefix", "--numstat", "--quiet", "--repository", "--show-summary", "--side-by-side", "--strip-trailing-cr", "--strip-trailing-lf", "--strip-trailing-spaces", "--strip-trailing-whitespace", "--tk", "--to", "--unified", "--verbose", "--versions", "--web", "-N", "-R", "-W", "-Z", "-b", "-c", "-h", "-i", "-q", "-r", "-u", "-v", "-w", "-y", "-z"]
+valued = ["--against", "--diff-binary", "--exec-abs-paths", "--exec-rel-paths", "--from", "--internal", "--repository", "--strip-trailing-spaces", "--strip-trailing-whitespace", "--to", "--unified", "-N", "-R", "-W", "-c", "-r", "-y"]
+
+[[command.sub]]
+name = "cat"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--repository", "-R", "-h", "-r"]
+valued = ["--repository", "-R", "-r"]
+
+[[command.sub]]
+name = "finfo"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--limit", "--no-graph", "--offset", "--print", "--repository", "--show-id", "--showid", "--status", "--type", "--width", "-R", "-h", "-l", "-p", "-w"]
+valued = ["--branch", "--limit", "--repository", "--type", "--width", "-R", "-l", "-w"]
+
+[[command.sub]]
+name = "branch"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--all", "--closed", "--help", "--repository", "--verbose", "-a", "-c", "-h", "-r", "-v"]
+valued = ["--repository", "-R"]
+
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "--repository", "-R", "-h"]
+valued = ["--repository", "-R"]
+
+[[command.sub.sub]]
+name = "current"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "new"
+candidate = true
+
+[[command.sub.sub]]
+name = "close"
+candidate = true
+
+[[command.sub.sub]]
+name = "reopen"
+candidate = true
+
+[[command.sub]]
+name = "tag"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--all", "--inverse", "--help", "--raw", "--repository", "-R", "-a", "-h", "-i"]
+valued = ["--limit", "--prefix", "--repository", "-R"]
+
+[[command.sub.sub]]
+name = "find"
+standalone = ["--help", "-h"]
+valued = ["--repository", "--type", "-R"]
+
+[[command.sub.sub]]
+name = "add"
+candidate = true
+
+[[command.sub.sub]]
+name = "cancel"
+candidate = true
+
+[[command.sub]]
+name = "extras"
+level = "SafeRead"
+bare = true
+standalone = ["--abs-paths", "--case-sensitive", "--dotfiles", "--header", "--help", "--ignore", "--repository", "--rel-paths", "-R", "-h"]
+valued = ["--ignore", "--repository", "-R"]
+
+[[command.sub]]
+name = "ls"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--age", "--help", "--repository", "--type", "--verbose", "-R", "-h", "-l", "-r", "-v"]
+valued = ["--repository", "--type", "-R", "-r"]
+
+[[command.sub]]
+name = "whatis"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--repository", "--type", "--verbose", "-R", "-h", "-v"]
+valued = ["--repository", "--type", "-R"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "addremove"
+candidate = true
+
+[[command.sub]]
+name = "commit"
+candidate = true
+
+[[command.sub]]
+name = "ci"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "merge"
+candidate = true
+
+[[command.sub]]
+name = "mv"
+candidate = true
+
+[[command.sub]]
+name = "cp"
+candidate = true
+
+[[command.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "revert"
+candidate = true
+
+[[command.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "clone"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "open"
+candidate = true
+
+[[command.sub]]
+name = "close"
+candidate = true
+
+[[command.sub]]
+name = "rebuild"
+candidate = true
+
+[[command.sub]]
+name = "purge"
+candidate = true
+
+[[command.sub]]
+name = "stash"
+candidate = true
+
+[[command.sub]]
+name = "ui"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "wiki"
+candidate = true
+
+[[command.sub]]
+name = "ticket"
+candidate = true
+
+[[command.sub]]
+name = "forum"
+candidate = true
+
+[[command.sub]]
+name = "user"
+candidate = true
+
+[[command.sub]]
+name = "settings"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "scrub"
+candidate = true
+
+[[command.sub]]
+name = "test-content-deltify"
+candidate = true
+
+[[command.sub]]
+name = "all"
+candidate = true
+
+[[command.sub]]
+name = "deconstruct"
+candidate = true
+
+[[command.sub]]
+name = "reconstruct"
+candidate = true
+
+[[command.sub]]
+name = "test-detach"
+candidate = true
+
+[[command.sub]]
+name = "test-attach"
+candidate = true
+
+[[command.sub]]
+name = "annotate"
+candidate = true
+
+[[command.sub]]
+name = "blame"
+candidate = true
+
+[[command.sub]]
+name = "praise"
+candidate = true
+
+[[command.sub]]
+name = "rename"
+candidate = true
+
+[[command.sub]]
+name = "checkout"
+candidate = true
+
+[[command.sub]]
+name = "co"
+candidate = true
+
+[[command.sub]]
+name = "amend"
+candidate = true
+
+[[command.sub]]
+name = "stash-list"
+candidate = true
+
+[[command.sub]]
+name = "search"
+candidate = true
+
+[[command.sub]]
+name = "rebase"
+candidate = true
+
+[[command.sub]]
+name = "alerts"
+candidate = true
+
+[[command.sub]]
+name = "cgi"
+candidate = true
+
+[[command.sub]]
+name = "fts-config"
+candidate = true
+
+[[command.sub]]
+name = "configuration"
+candidate = true

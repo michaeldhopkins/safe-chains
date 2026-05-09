@@ -71,29 +71,6 @@
 - **sandbox**: Positional args accepted
 - Allowed standalone flags: --help, --version, -V, -h
 
-### `hf`
-<p class="cmd-url"><a href="https://huggingface.co/docs/huggingface_hub/guides/cli">https://huggingface.co/docs/huggingface_hub/guides/cli</a></p>
-
-- **cache ls**: Flags: --help, -h
-- **cache verify**: Flags: --help, -h
-- **collections info**: Flags: --help, -h
-- **collections ls**: Flags: --help, -h. Valued: --limit, --owner
-- **datasets info**: Flags: --help, -h
-- **datasets ls**: Flags: --help, -h. Valued: --author, --filter, --limit, --search, --sort
-- **datasets parquet**: Flags: --help, -h
-- **discussions diff**: Flags: --help, -h
-- **discussions info**: Flags: --help, -h
-- **discussions list**: Flags: --help, -h
-- **env**: Flags: --help, -h
-- **jobs logs**: Flags: --help, -h. Valued: --tail
-- **jobs ps**: Flags: --help, -h
-- **models info**: Flags: --help, -h
-- **models ls**: Flags: --help, -h. Valued: --author, --filter, --limit, --search, --sort
-- **spaces info**: Flags: --help, -h
-- **spaces ls**: Flags: --help, -h. Valued: --author, --filter, --limit, --search, --sort
-- **version**: Flags: --help, -h
-- Allowed standalone flags: --help, --version, -V, -h
-
 ### `llm`
 <p class="cmd-url"><a href="https://llm.datasette.io/en/stable/">https://llm.datasette.io/en/stable/</a></p>
 

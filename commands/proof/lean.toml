@@ -1,0 +1,9 @@
+[[command]]
+name = "lean"
+description = "Lean 4 — theorem prover and dependently-typed programming language. Bare invocation runs the .lean file (executes Lean code). --version / --help are diagnostic. --print-paths and --features inspect the install."
+url = "https://lean-lang.org/lean4/doc/lean.html"
+researched_version = "Lean 4.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--features", "--githash", "--print-paths", "--version", "-h", "-v"]

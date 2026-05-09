@@ -1,0 +1,103 @@
+[[command]]
+name = "molecule"
+description = "Ansible role / collection testing framework. `test` runs the full lifecycle (creates ephemeral hosts, runs playbooks against them, destroys — heavily affects local state). Other subcommands (`create`, `converge`, `verify`, `destroy`, `idempotence`, `lint`, `check`) execute portions of the lifecycle. `list`, `dependency`, `matrix`, `--version`, `--help` are read-only inspection."
+url = "https://ansible.readthedocs.io/projects/molecule/usage/"
+researched_version = "molecule 24.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--format", "--scenario-name", "-s"]
+
+[[command.sub]]
+name = "matrix"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--scenario-name", "-s"]
+
+[[command.sub]]
+name = "drivers"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "converge"
+candidate = true
+
+[[command.sub]]
+name = "verify"
+candidate = true
+
+[[command.sub]]
+name = "destroy"
+candidate = true
+
+[[command.sub]]
+name = "idempotence"
+candidate = true
+
+[[command.sub]]
+name = "lint"
+candidate = true
+
+[[command.sub]]
+name = "check"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "syntax"
+candidate = true
+
+[[command.sub]]
+name = "side-effect"
+candidate = true
+
+[[command.sub]]
+name = "prepare"
+candidate = true
+
+[[command.sub]]
+name = "cleanup"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "reset"
+candidate = true
+
+[[command.sub]]
+name = "dependency"
+candidate = true

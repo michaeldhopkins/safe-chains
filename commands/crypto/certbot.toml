@@ -1,0 +1,78 @@
+[[command]]
+name = "certbot"
+description = "Let's Encrypt CLI — automatically issues, renews, and revokes TLS certificates. Most subcommands contact ACME servers (network) and write certificates to /etc/letsencrypt or the configured config-dir. Read-side: `certificates`, `show_account`, `plugins`, `--version`, `--help`, `--list-accounts`. Write-side: `certonly`, `renew`, `run`, `revoke`, `register`, `unregister`, `update_account`, `delete`, `install`, `enhance`, `update_symlinks`. The carve-out covers diagnostic / inventory forms only."
+url = "https://eff-certbot.readthedocs.io/en/stable/cli-help.html"
+researched_version = "certbot 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "certificates"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--no-color", "-h"]
+valued = ["--cert-name", "--config", "--config-dir", "--logs-dir"]
+
+[[command.sub]]
+name = "plugins"
+level = "SafeRead"
+bare = true
+standalone = ["--authenticators", "--help", "--init", "--installers", "--prepare", "-h"]
+valued = ["--config-dir"]
+
+[[command.sub]]
+name = "show_account"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "certonly"
+candidate = true
+
+[[command.sub]]
+name = "renew"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "revoke"
+candidate = true
+
+[[command.sub]]
+name = "register"
+candidate = true
+
+[[command.sub]]
+name = "unregister"
+candidate = true
+
+[[command.sub]]
+name = "update_account"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "enhance"
+candidate = true
+
+[[command.sub]]
+name = "update_symlinks"
+candidate = true
+
+[[command.sub]]
+name = "rollback"
+candidate = true

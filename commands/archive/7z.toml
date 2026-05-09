@@ -1,0 +1,30 @@
+[[command]]
+name = "7z"
+aliases = ["7zz", "7za"]
+description = "7-Zip archive tool. Subcommand-style first positional: a (add/create), x (extract with paths), e (extract flat), d (delete from archive), l (list), t (test integrity), u (update), rn (rename), b (benchmark), h (hash), i (info). a/x/e/d/u/rn modify archives or write extracted files (project-local SafeWrite). l/t/h/i/b are read-only."
+url = "https://7-zip.org/"
+researched_version = "7-Zip 24.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--", "--help", "-?", "-an", "-aoa",
+    "-aos", "-aou", "-aot", "-bb", "-bd",
+    "-bse0", "-bse1", "-bse2", "-bso0",
+    "-bso1", "-bso2", "-bsp0", "-bsp1",
+    "-bsp2", "-h", "-mhe", "-mhe=on", "-mhe=off",
+    "-mmt", "-mqs", "-r", "-r-", "-r0",
+    "-sccUTF-8", "-scrc", "-sdel", "-sfx",
+    "-sni", "-sns", "-snh", "-snl", "-so",
+    "-spd", "-spe", "-spf", "-spl", "-ssc",
+    "-ssc-", "-ssp", "-stx", "-stx-",
+    "-t7z", "-tar", "-tbzip2", "-tgzip",
+    "-tlzma", "-txz", "-tzip", "-y",
+]
+valued = [
+    "-ai", "-ax", "-bb", "-i", "-m",
+    "-mhe", "-mmt", "-o", "-p",
+    "-px", "-r", "-scs", "-sdel",
+    "-spe", "-stm", "-stx",
+    "-t", "-w", "-x",
+]

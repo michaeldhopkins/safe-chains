@@ -1,0 +1,10 @@
+[[command]]
+name = "dive"
+description = "Image-layer inspector — explores the contents of a container image layer by layer. Bare invocation opens an interactive TUI on the named image. --ci runs in non-interactive mode and prints a report (read). Pulls images from registries (network) when needed. The carve-out covers --ci, --version, --help and the build-via-dive feature is intentionally out (`dive build` runs `docker build`)."
+url = "https://github.com/wagoodman/dive"
+researched_version = "dive 0.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--ci", "--help", "--source", "--version", "-h", "-v"]
+valued = ["--ci-config", "--config", "--highestPercentage", "--highestUserWastedPercent", "--lowestEfficiency", "--source"]

@@ -1,0 +1,38 @@
+[[command]]
+name = "code"
+aliases = ["code-insiders", "codium"]
+description = "VS Code CLI — opens files / diffs in the editor and manages extensions. Most invocations launch the GUI editor. Read-side: --version, --help, --list-extensions, --status, --locate-shell-integration-path. Write-side: --install-extension, --uninstall-extension, --update-extensions, --enable-proposed-api. Editor-launching modes: bare, --diff a b, --merge a b base out, --goto, --add."
+url = "https://code.visualstudio.com/docs/configure/command-line"
+researched_version = "VS Code 1.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--add", "--category", "--diff", "--disable-extensions",
+    "--disable-features", "--disable-gpu", "--disable-telemetry",
+    "--extensions-dir", "--goto", "--help",
+    "--inspect-brk-extensions", "--inspect-extensions",
+    "--list-extensions", "--locale",
+    "--locate-shell-integration-path", "--log",
+    "--max-memory", "--merge",
+    "--new-window", "--no-sandbox",
+    "--open-url", "--port",
+    "--prof-startup", "--profile",
+    "--ready-to-launch", "--reuse-window",
+    "--show-versions", "--status",
+    "--sync", "--telemetry", "--trace",
+    "--user-data-dir", "--verbose", "--version",
+    "--wait", "-a", "-d", "-g", "-h", "-m", "-n",
+    "-r", "-s", "-v", "-w",
+]
+valued = [
+    "--add", "--category", "--diff",
+    "--enable-proposed-api", "--extensions-dir",
+    "--goto", "--inspect-brk-extensions",
+    "--inspect-extensions", "--install-extension",
+    "--locale", "--log", "--max-memory",
+    "--merge", "--open-url", "--port",
+    "--profile", "--show-versions",
+    "--sync", "--uninstall-extension",
+    "--user-data-dir",
+]
+write_flags = ["--install-extension", "--uninstall-extension", "--update-extensions"]

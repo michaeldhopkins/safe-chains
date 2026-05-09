@@ -1,0 +1,9 @@
+[[command]]
+name = "mosh"
+description = "Mobile shell — long-running interactive shell over UDP that survives network changes. Bare invocation connects to the remote (network + interactive). Carve-out: --help / --version only."
+url = "https://mosh.org/"
+researched_version = "mosh 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]

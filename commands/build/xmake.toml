@@ -1,0 +1,124 @@
+[[command]]
+name = "xmake"
+description = "xmake — modern C/C++ build tool with Lua project description. Many subcommands. Read-side: `--version`, `--help`, `info`, `list`, `show`, `lua`, `format` (with -c check). Write-side: `build`, `config`, `install`, `package`, `run`, `test`, `clean`, `update`, `upgrade`, `repo`, `f` (configure shortcut), `b` (build shortcut), `r` (run shortcut). Bare invocation runs the build."
+url = "https://xmake.io/#/manual/builtin_commands"
+researched_version = "xmake 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "show"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--config", "--list", "-l"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "lua"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "b"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "f"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "r"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "package"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "format"
+candidate = true
+
+[[command.sub]]
+name = "lint"
+candidate = true
+
+[[command.sub]]
+name = "project"
+candidate = true
+
+[[command.sub]]
+name = "macro"
+candidate = true
+
+[[command.sub]]
+name = "repo"
+candidate = true
+
+[[command.sub]]
+name = "require"
+candidate = true
+
+[[command.sub]]
+name = "service"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "global"
+candidate = true
+
+[[command.sub]]
+name = "watch"
+candidate = true

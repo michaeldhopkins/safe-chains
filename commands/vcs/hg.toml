@@ -1,0 +1,338 @@
+[[command]]
+name = "hg"
+description = "Mercurial — distributed version control. Read-side: `log`, `diff`, `status`, `summary`, `id`, `paths`, `parents`, `heads`, `branch` (no args), `branches`, `bookmarks`, `tags`, `cat`, `annotate`, `manifest`, `files`, `grep`, `tip`, `version`, `config` (--show), `archive --dry-run`, `verify`, `outgoing` / `incoming` (network). Write-side: `commit`, `add`, `addremove`, `forget`, `remove`, `rename`, `copy`, `revert`, `import`, `export`, `bundle`, `merge`, `update`, `pull`, `push`, `clone`, `init`, `branch <name>`, `bookmark`, `tag`, `rollback`, `rebase`, `graft`, `histedit`, `strip`, `convert`."
+url = "https://www.mercurial-scm.org/doc/hg.1.html"
+researched_version = "Mercurial 6.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+valued = ["-T", "--template"]
+
+[[command.sub]]
+name = "log"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--branch", "--copies", "--debug", "--follow", "--follow-first", "--git", "--graph", "--hidden", "--help", "--no-merges", "--patch", "--quiet", "--removed", "--reverse", "--stat", "--style", "--template", "--user", "--verbose", "-G", "-M", "-T", "-b", "-c", "-d", "-f", "-g", "-h", "-k", "-l", "-p", "-q", "-r", "-u", "-v", "-y"]
+valued = ["--branch", "--date", "--exclude", "--include", "--keyword", "--limit", "--prune", "--rev", "--style", "--template", "--user", "-T", "-X", "-d", "-f", "-k", "-l", "-r", "-u"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--change", "--git", "--ignore-all-space", "--ignore-blank-lines", "--ignore-space-change", "--ignore-space-at-eol", "--ignore-changes", "--mar", "--no-binary", "--no-dates", "--noprefix", "--nodates", "--patch", "--reverse", "--show-function", "--stat", "--text", "--unified", "--word-diff", "-B", "-Z", "-a", "-b", "-c", "-g", "-h", "-p", "-r", "-w"]
+valued = ["--change", "--exclude", "--include", "--rev", "--root", "--unified", "-I", "-U", "-X", "-c", "-r"]
+
+[[command.sub]]
+name = "status"
+aliases = ["st"]
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--all", "--added", "--clean", "--copies", "--deleted", "--ignored", "--modified", "--no-status", "--print0", "--quiet", "--removed", "--rev", "--terse", "--unknown", "-0", "-A", "-C", "-T", "-a", "-c", "-d", "-h", "-i", "-m", "-n", "-q", "-r", "-u"]
+valued = ["--change", "--exclude", "--include", "--rev", "--terse", "-I", "-X", "-r", "-t"]
+
+[[command.sub]]
+name = "summary"
+aliases = ["sum"]
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--remote", "-h"]
+
+[[command.sub]]
+name = "id"
+aliases = ["identify"]
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--branch", "--bookmarks", "--debug", "--help", "--id", "--num", "--tags", "-B", "-b", "-h", "-i", "-n", "-r", "-t"]
+valued = ["--rev", "-r"]
+
+[[command.sub]]
+name = "paths"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--quiet", "--verbose", "-q", "-v"]
+
+[[command.sub]]
+name = "parents"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--rev", "--style", "--template", "-T", "-r"]
+
+[[command.sub]]
+name = "heads"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--active", "--closed", "--help", "-a", "-c", "-h"]
+valued = ["--rev", "--style", "--template", "-T", "-r"]
+
+[[command.sub]]
+name = "branches"
+level = "SafeRead"
+bare = true
+standalone = ["--active", "--closed", "--help", "-a", "-c", "-h"]
+valued = ["--rev", "--style", "--template", "-T", "-r"]
+
+[[command.sub]]
+name = "branch"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--clean", "--force", "--help", "-C", "-f", "-h"]
+
+[[command.sub]]
+name = "bookmarks"
+aliases = ["bookmark", "bm"]
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--active", "--all", "--delete", "--force", "--help", "--inactive", "--rename", "-B", "-d", "-f", "-h", "-i", "-l", "-m"]
+valued = ["--rev", "-r"]
+
+[[command.sub]]
+name = "tags"
+level = "SafeRead"
+bare = true
+standalone = ["--debug", "--help", "--quiet", "--verbose", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "cat"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--decode", "--help", "-h"]
+valued = ["--exclude", "--include", "--output", "--rev", "--template", "-I", "-T", "-X", "-o", "-r"]
+
+[[command.sub]]
+name = "annotate"
+aliases = ["blame"]
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--changeset", "--date", "--file", "--follow", "--help", "--ignore-all-space", "--ignore-blank-lines", "--ignore-space-change", "--ignore-space-at-eol", "--line-number", "--no-binary", "--no-follow", "--number", "--quiet", "--text", "--user", "--verbose", "-B", "-Z", "-a", "-b", "-c", "-d", "-f", "-h", "-l", "-n", "-q", "-u", "-v", "-w"]
+valued = ["--exclude", "--include", "--rev", "--skip", "-I", "-X", "-r"]
+
+[[command.sub]]
+name = "manifest"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--all", "--debug", "--help", "-h"]
+valued = ["--rev", "-r"]
+
+[[command.sub]]
+name = "files"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--print0", "--quiet", "--verbose", "-0", "-h", "-q", "-v"]
+valued = ["--exclude", "--include", "--rev", "-I", "-T", "-X", "-r"]
+
+[[command.sub]]
+name = "grep"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--all", "--all-files", "--diff", "--files-with-matches", "--ignore-case", "--help", "--line-number", "--print0", "--rev", "-0", "-a", "-d", "-h", "-i", "-l", "-n", "-r"]
+valued = ["--exclude", "--include", "--rev", "--user", "-I", "-X", "-r", "-u"]
+
+[[command.sub]]
+name = "tip"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--patch", "--style", "--template", "-T", "-h", "-p"]
+
+[[command.sub]]
+name = "verify"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "outgoing"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--bookmarks", "--branch", "--force", "--graph", "--help", "--insecure", "--newest-first", "--patch", "--ssh", "--remotecmd", "-B", "-G", "-S", "-b", "-f", "-h", "-l", "-n", "-p", "-r"]
+valued = ["--branch", "--rev", "--ssh", "--remotecmd", "-r"]
+
+[[command.sub]]
+name = "incoming"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--bookmarks", "--branch", "--bundle", "--force", "--graph", "--help", "--insecure", "--newest-first", "--patch", "-B", "-G", "-S", "-b", "-f", "-h", "-l", "-n", "-p", "-r"]
+valued = ["--branch", "--bundle", "--rev", "--ssh", "--remotecmd", "-r"]
+
+[[command.sub]]
+name = "config"
+aliases = ["showconfig"]
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--debug", "--edit", "--global", "--help", "--local", "--non-shared", "--quiet", "--user", "-e", "-h", "-q"]
+valued = ["--source", "-T", "--template"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "commit"
+candidate = true
+
+[[command.sub]]
+name = "ci"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "addremove"
+candidate = true
+
+[[command.sub]]
+name = "forget"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "rename"
+candidate = true
+
+[[command.sub]]
+name = "mv"
+candidate = true
+
+[[command.sub]]
+name = "copy"
+candidate = true
+
+[[command.sub]]
+name = "cp"
+candidate = true
+
+[[command.sub]]
+name = "revert"
+candidate = true
+
+[[command.sub]]
+name = "import"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "bundle"
+candidate = true
+
+[[command.sub]]
+name = "unbundle"
+candidate = true
+
+[[command.sub]]
+name = "merge"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "up"
+candidate = true
+
+[[command.sub]]
+name = "checkout"
+candidate = true
+
+[[command.sub]]
+name = "co"
+candidate = true
+
+[[command.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "clone"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "tag"
+candidate = true
+
+[[command.sub]]
+name = "rollback"
+candidate = true
+
+[[command.sub]]
+name = "rebase"
+candidate = true
+
+[[command.sub]]
+name = "graft"
+candidate = true
+
+[[command.sub]]
+name = "histedit"
+candidate = true
+
+[[command.sub]]
+name = "strip"
+candidate = true
+
+[[command.sub]]
+name = "convert"
+candidate = true
+
+[[command.sub]]
+name = "fixup"
+candidate = true
+
+[[command.sub]]
+name = "phase"
+candidate = true
+
+[[command.sub]]
+name = "shelve"
+candidate = true
+
+[[command.sub]]
+name = "unshelve"
+candidate = true
+
+[[command.sub]]
+name = "purge"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true

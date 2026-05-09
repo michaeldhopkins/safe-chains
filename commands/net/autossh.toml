@@ -1,0 +1,9 @@
+[[command]]
+name = "autossh"
+description = "Starts a long-running ssh session that automatically restarts on failure. Wraps `ssh` with the same flag surface plus a few autossh-specific flags. Carve-out: -V (version) / -M PORT (monitor port) / -h --help / -f (background) handling — meaningful invocation runs ssh."
+url = "https://www.harding.motd.ca/autossh/"
+researched_version = "autossh 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "-V", "-h"]

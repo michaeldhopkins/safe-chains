@@ -1,0 +1,18 @@
+[[command]]
+name = "copa"
+description = "Copacetic — patches container images to fix vulnerabilities reported by Trivy/Grype. The `patch` subcommand pulls the source image (network), applies fixes, and pushes the patched image back. `version` and `--help` are diagnostic. Carve-out covers diagnostic forms only."
+url = "https://project-copacetic.github.io/copacetic/website/"
+researched_version = "copa 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "patch"
+candidate = true

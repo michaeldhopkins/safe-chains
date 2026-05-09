@@ -1,0 +1,19 @@
+[[command]]
+name = "yamllint"
+description = "Linter for YAML files. Reads .yml / .yaml files and reports formatting / style issues. Pure read."
+url = "https://yamllint.readthedocs.io/"
+researched_version = "yamllint 1.x"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = [
+    "--help", "--list-files",
+    "--no-warnings", "--strict",
+    "--version",
+    "-h", "-s", "-v",
+]
+valued = [
+    "--config-data", "--config-file",
+    "--format",
+    "-c", "-d", "-f",
+]

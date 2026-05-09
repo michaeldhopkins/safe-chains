@@ -1,0 +1,21 @@
+[[command]]
+name = "traefik"
+description = "Traefik reverse proxy. Bare invocation starts the server. `version` prints version. `healthcheck` queries a running instance (network read). The carve-out covers diagnostic / version forms — server-mode invocations are not part of the safe surface."
+url = "https://doc.traefik.io/traefik/reference/cli-overview/"
+researched_version = "Traefik 3.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "healthcheck"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--api.dashboard", "--api.entryPoint", "--api.insecure", "--ping.entryPoint"]
+
+[[command.sub]]
+name = "help"
+allow_all = true

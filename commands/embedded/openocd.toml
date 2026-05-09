@@ -1,0 +1,9 @@
+[[command]]
+name = "openocd"
+description = "Open On-Chip Debugger. Bare invocation starts a long-running debug server connected to an attached JTAG / SWD probe. Reads/writes the target's flash and registers (system-state writes outside this CLI). The diagnostic --version / --help are read-only."
+url = "https://openocd.org/doc/html/Running.html"
+researched_version = "OpenOCD 0.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-?", "-h", "-v"]

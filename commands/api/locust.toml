@@ -1,0 +1,9 @@
+[[command]]
+name = "locust"
+description = "Locust — Python load testing framework. Bare invocation reads locustfile.py and starts the load test (executes Python + makes network requests). `--version` is diagnostic. Carve-out covers diagnostic forms only."
+url = "https://docs.locust.io/en/stable/"
+researched_version = "locust 2.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

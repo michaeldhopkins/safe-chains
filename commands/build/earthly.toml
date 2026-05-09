@@ -1,0 +1,103 @@
+[[command]]
+name = "earthly"
+description = "Earthly — containerized build tool combining Docker + Make. Bare invocation runs an Earthfile target (executes container builds + arbitrary commands). Carve-out: --version / --help / `account`/`org`/`secrets list` (read forms)."
+url = "https://docs.earthly.dev/docs/earthly-command"
+researched_version = "earthly 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "doc"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--all-targets", "--help", "-a", "-h"]
+
+[[command.sub]]
+name = "ls"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--all", "--args", "--help", "--long", "-a", "-h", "-l"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "secret"
+candidate = true
+
+[[command.sub]]
+name = "secrets"
+candidate = true
+
+[[command.sub]]
+name = "account"
+candidate = true
+
+[[command.sub]]
+name = "org"
+candidate = true
+
+[[command.sub]]
+name = "registry"
+candidate = true
+
+[[command.sub]]
+name = "satellite"
+candidate = true
+
+[[command.sub]]
+name = "billing"
+candidate = true
+
+[[command.sub]]
+name = "prune"
+candidate = true
+
+[[command.sub]]
+name = "bootstrap"
+candidate = true
+
+[[command.sub]]
+name = "docker"
+candidate = true
+
+[[command.sub]]
+name = "docker-build"
+candidate = true
+
+[[command.sub]]
+name = "preview"
+candidate = true
+
+[[command.sub]]
+name = "feature"
+candidate = true
+
+[[command.sub]]
+name = "github"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true

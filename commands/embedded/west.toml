@@ -1,0 +1,139 @@
+[[command]]
+name = "west"
+description = "Zephyr RTOS multi-repo / build tool. Many subcommands. Read-side: `version`, `list`, `manifest`, `topdir`, `status`, `forall`, `compare`, `diff`, `help`, `config`. Write-side: `init`, `update`, `build`, `flash`, `debug`, `attach`, `boards`, `sign`, `sdk install/list/select`, `zephyr-export`, `bindesc`, `twister`, `shields`."
+url = "https://docs.zephyrproject.org/latest/develop/west/index.html"
+researched_version = "west 1.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--all", "--help", "--manifest-path-from-yaml", "-a", "-h"]
+valued = ["--format", "-f"]
+
+[[command.sub]]
+name = "manifest"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--freeze", "--help", "--path", "--resolve", "--validate", "-h"]
+valued = ["--out", "-o"]
+
+[[command.sub]]
+name = "topdir"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--quiet", "--stat", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "compare"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--all", "--help", "--exit-code", "-a", "-h"]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--delete", "--global", "--help", "--list", "--local", "--system", "-D", "-d", "-h", "-l"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "forall"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "flash"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true
+
+[[command.sub]]
+name = "debugserver"
+candidate = true
+
+[[command.sub]]
+name = "attach"
+candidate = true
+
+[[command.sub]]
+name = "boards"
+candidate = true
+
+[[command.sub]]
+name = "sign"
+candidate = true
+
+[[command.sub]]
+name = "sdk"
+candidate = true
+
+[[command.sub]]
+name = "zephyr-export"
+candidate = true
+
+[[command.sub]]
+name = "bindesc"
+candidate = true
+
+[[command.sub]]
+name = "twister"
+candidate = true
+
+[[command.sub]]
+name = "shields"
+candidate = true
+
+[[command.sub]]
+name = "rtt"
+candidate = true
+
+[[command.sub]]
+name = "blobs"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+candidate = true
+
+[[command.sub]]
+name = "patch"
+candidate = true

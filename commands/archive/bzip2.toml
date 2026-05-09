@@ -1,0 +1,19 @@
+[[command]]
+name = "bzip2"
+aliases = ["bunzip2", "bzcat", "bzip2recover"]
+description = "Block-sorting compressor. Bare invocation reads files and writes <name>.bz2 (or to stdout with -c). -d/--decompress reverses. -t/--test verifies (read). -k/--keep retains source. The aliases bunzip2 / bzcat / bzip2recover select decompress / cat / recovery mode."
+url = "https://sourceware.org/bzip2/"
+researched_version = "bzip2 1.0.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--compress", "--decompress", "--exponential",
+    "--fast", "--force", "--help",
+    "--keep", "--license", "--quiet",
+    "--repetitive-best", "--repetitive-fast",
+    "--small", "--stdout", "--test",
+    "--verbose", "--version",
+    "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
+    "-L", "-V", "-c", "-d", "-f", "-h", "-k",
+    "-q", "-s", "-t", "-v", "-z",
+]

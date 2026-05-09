@@ -1,0 +1,155 @@
+[[command]]
+name = "spin"
+description = "Fermyon Spin — framework + runtime for WebAssembly serverless apps. Subcommands include `up`, `build`, `deploy`, `new`, `add`, `templates`, `plugins`, `registry`, `logs`, `link`, `unlink`, `init`, `cloud`, `watch`, `doctor`, `version`, `help`. `up` runs the long-running local server (executes user wasm). `build` compiles components (project-local SafeWrite + may invoke cargo / npm / etc.). `deploy` and `cloud` push to Fermyon Cloud (network)."
+url = "https://developer.fermyon.com/spin/v3/cli-reference"
+researched_version = "spin 3.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "templates"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "install"
+candidate = true
+
+[[command.sub.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "plugins"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--all", "--summary", "--verbose", "-a", "-h"]
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "search"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "install"
+candidate = true
+
+[[command.sub.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "up"
+candidate = true
+
+[[command.sub]]
+name = "watch"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "cloud"
+candidate = true
+
+[[command.sub]]
+name = "registry"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub]]
+name = "link"
+candidate = true
+
+[[command.sub]]
+name = "unlink"
+candidate = true
+
+[[command.sub]]
+name = "trigger"
+candidate = true
+
+[[command.sub]]
+name = "wasi"
+candidate = true
+
+[[command.sub]]
+name = "external"
+candidate = true
+
+[[command.sub]]
+name = "key-value"
+candidate = true
+
+[[command.sub]]
+name = "kv"
+candidate = true
+
+[[command.sub]]
+name = "sqlite"
+candidate = true
+
+[[command.sub]]
+name = "variables"
+candidate = true
