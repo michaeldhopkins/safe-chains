@@ -1511,6 +1511,16 @@ Aliases: `capacitor`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `cdk version`
+- `cdk synth`
+- `cdk synthesize`
+- `cdk list`
+- `cdk ls`
+- `cdk diff`
+- `cdk doctor`
+
 ### `certbot`
 <p class="cmd-url"><a href="https://eff-certbot.readthedocs.io/en/stable/cli-help.html">https://eff-certbot.readthedocs.io/en/stable/cli-help.html</a></p>
 
@@ -3986,6 +3996,14 @@ Aliases: `gradlew`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `hexo version`
+- `hexo list page`
+- `hexo config`
+- `hexo generate`
+- `hexo g`
+
 ### `hey`
 <p class="cmd-url"><a href="https://github.com/basecamp/hey-cli">https://github.com/basecamp/hey-cli</a></p>
 
@@ -4039,6 +4057,22 @@ Aliases: `gradlew`
 - **verify**: Flags: --help, -h
 - **version**: Flags: --help, -h. Valued: -T, --template
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `hg log`
+- `hg status`
+- `hg st`
+- `hg summary`
+- `hg sum`
+- `hg id`
+- `hg identify`
+- `hg blame foo.py`
+- `hg annotate foo.py`
+- `hg bookmarks`
+- `hg bm`
+- `hg config`
+- `hg showconfig`
 
 ### `hlint`
 <p class="cmd-url"><a href="https://github.com/ndmitchell/hlint">https://github.com/ndmitchell/hlint</a></p>
@@ -4897,6 +4931,35 @@ Aliases: `nbconvert`
 - **whoami**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `koyeb apps list`
+- `koyeb app list`
+- `koyeb a list`
+- `koyeb deployments list`
+- `koyeb deployment list`
+- `koyeb dep list`
+- `koyeb d list`
+- `koyeb services list`
+- `koyeb service list`
+- `koyeb svc list`
+- `koyeb s list`
+- `koyeb instances list`
+- `koyeb instance list`
+- `koyeb inst list`
+- `koyeb i list`
+- `koyeb secrets list`
+- `koyeb secret list`
+- `koyeb sec list`
+- `koyeb domains list`
+- `koyeb domain list`
+- `koyeb dom list`
+- `koyeb regions list`
+- `koyeb region list`
+- `koyeb organizations list`
+- `koyeb organization list`
+- `koyeb org list`
+
 ### `kpt`
 <p class="cmd-url"><a href="https://kpt.dev/reference/cli/">https://kpt.dev/reference/cli/</a></p>
 
@@ -5621,6 +5684,19 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - **where**: Flags: --help, -h, -q, -v
 - **which**: Flags: --help, -h, -q, -v
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `mise list`
+- `mise use ruby@4.0.3`
+- `mise u ruby@4.0.3`
+- `mise install ruby@4`
+- `mise i ruby@4`
+- `mise uninstall ruby@4`
+- `mise rm ruby@4`
+- `mise remove ruby@4`
+- `mise upgrade`
+- `mise up`
 
 ### `mix`
 <p class="cmd-url"><a href="https://hexdocs.pm/mix/Mix.html">https://hexdocs.pm/mix/Mix.html</a></p>
@@ -8201,6 +8277,15 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 - **whoami**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `scalingo apps`
+- `scalingo self`
+- `scalingo whoami`
+- `scalingo logs`
+- `scalingo l`
+- `scalingo --version`
+
 ### `sccache`
 <p class="cmd-url"><a href="https://github.com/mozilla/sccache">https://github.com/mozilla/sccache</a></p>
 
@@ -8927,6 +9012,26 @@ Aliases: `serverless`
 - **stat**: Flags: --changelist, --config-dir, --depth, --help, --ignore-externals, --incremental, --no-ignore, --quiet, --show-updates, --verbose, --xml, -N, -h, -q, -u, -v. Valued: --changelist, --config-dir, --config-option, --depth. Positional args accepted
 - **status**: Flags: --changelist, --config-dir, --depth, --help, --ignore-externals, --incremental, --no-ignore, --quiet, --show-updates, --verbose, --xml, -N, -h, -q, -u, -v. Valued: --changelist, --config-dir, --config-option, --depth. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `svn log`
+- `svn status`
+- `svn stat`
+- `svn st`
+- `svn list`
+- `svn ls`
+- `svn info`
+- `svn diff`
+- `svn blame foo.c`
+- `svn praise foo.c`
+- `svn annotate foo.c`
+- `svn ann foo.c`
+- `svn proplist`
+- `svn plist`
+- `svn pl`
+- `svn propget svn:keywords foo.c`
+- `svn pget svn:keywords foo.c`
 
 ### `sw_vers`
 <p class="cmd-url"><a href="https://ss64.com/mac/sw_vers.html">https://ss64.com/mac/sw_vers.html</a></p>

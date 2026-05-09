@@ -8,6 +8,7 @@ pub struct CommandDoc {
     pub description: String,
     pub aliases: Vec<String>,
     pub category: String,
+    pub examples: Vec<String>,
 }
 
 pub enum DocKind {
@@ -28,7 +29,7 @@ impl CommandDoc {
             })
             .collect::<Vec<_>>()
             .join("\n");
-        Self { name: name.to_string(), kind: DocKind::Handler, url, description, aliases: Vec::new(), category: category.to_string() }
+        Self { name: name.to_string(), kind: DocKind::Handler, url, description, aliases: Vec::new(), category: category.to_string(), examples: Vec::new() }
     }
 
     pub fn wordset(name: &'static str, url: &'static str, words: &WordSet, category: &str) -> Self {
@@ -258,6 +259,13 @@ fn render_command_entry(doc: &CommandDoc) -> String {
         out.push_str(&format!("Aliases: {}\n\n", alias_str.join(", ")));
     }
     out.push_str(&format!("{}\n\n", doc.description));
+    if !doc.examples.is_empty() {
+        out.push_str("**Examples:**\n\n");
+        for ex in &doc.examples {
+            out.push_str(&format!("- `{ex}`\n"));
+        }
+        out.push('\n');
+    }
     out
 }
 

@@ -479,6 +479,35 @@ Aliases: `fly`
 - **whoami**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `koyeb apps list`
+- `koyeb app list`
+- `koyeb a list`
+- `koyeb deployments list`
+- `koyeb deployment list`
+- `koyeb dep list`
+- `koyeb d list`
+- `koyeb services list`
+- `koyeb service list`
+- `koyeb svc list`
+- `koyeb s list`
+- `koyeb instances list`
+- `koyeb instance list`
+- `koyeb inst list`
+- `koyeb i list`
+- `koyeb secrets list`
+- `koyeb secret list`
+- `koyeb sec list`
+- `koyeb domains list`
+- `koyeb domain list`
+- `koyeb dom list`
+- `koyeb regions list`
+- `koyeb region list`
+- `koyeb organizations list`
+- `koyeb organization list`
+- `koyeb org list`
+
 ### `launchctl`
 <p class="cmd-url"><a href="https://ss64.com/mac/launchctl.html">https://ss64.com/mac/launchctl.html</a></p>
 
@@ -615,6 +644,19 @@ Aliases: `fly`
 - **where**: Flags: --help, -h, -q, -v
 - **which**: Flags: --help, -h, -q, -v
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `mise list`
+- `mise use ruby@4.0.3`
+- `mise u ruby@4.0.3`
+- `mise install ruby@4`
+- `mise i ruby@4`
+- `mise uninstall ruby@4`
+- `mise rm ruby@4`
+- `mise remove ruby@4`
+- `mise upgrade`
+- `mise up`
 
 ### `neon`
 <p class="cmd-url"><a href="https://neon.tech/docs/reference/neon-cli">https://neon.tech/docs/reference/neon-cli</a></p>
@@ -987,6 +1029,15 @@ Aliases: `upsun`
 - **user-timeline**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
 - **whoami**: Flags: --help, -h. Valued: --addon, --app, --database, --region, -a
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `scalingo apps`
+- `scalingo self`
+- `scalingo whoami`
+- `scalingo logs`
+- `scalingo l`
+- `scalingo --version`
 
 ### `security`
 <p class="cmd-url"><a href="https://ss64.com/mac/security.html">https://ss64.com/mac/security.html</a></p>

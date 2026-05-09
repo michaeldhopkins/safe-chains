@@ -128,6 +128,22 @@
 - **version**: Flags: --help, -h. Valued: -T, --template
 - Allowed standalone flags: --help, --version, -h, -v
 
+**Examples:**
+
+- `hg log`
+- `hg status`
+- `hg st`
+- `hg summary`
+- `hg sum`
+- `hg id`
+- `hg identify`
+- `hg blame foo.py`
+- `hg annotate foo.py`
+- `hg bookmarks`
+- `hg bm`
+- `hg config`
+- `hg showconfig`
+
 ### `jj`
 <p class="cmd-url"><a href="https://jj-vcs.github.io/jj/latest/cli-reference/">https://jj-vcs.github.io/jj/latest/cli-reference/</a></p>
 
@@ -225,6 +241,26 @@
 - **stat**: Flags: --changelist, --config-dir, --depth, --help, --ignore-externals, --incremental, --no-ignore, --quiet, --show-updates, --verbose, --xml, -N, -h, -q, -u, -v. Valued: --changelist, --config-dir, --config-option, --depth. Positional args accepted
 - **status**: Flags: --changelist, --config-dir, --depth, --help, --ignore-externals, --incremental, --no-ignore, --quiet, --show-updates, --verbose, --xml, -N, -h, -q, -u, -v. Valued: --changelist, --config-dir, --config-option, --depth. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `svn log`
+- `svn status`
+- `svn stat`
+- `svn st`
+- `svn list`
+- `svn ls`
+- `svn info`
+- `svn diff`
+- `svn blame foo.c`
+- `svn praise foo.c`
+- `svn annotate foo.c`
+- `svn ann foo.c`
+- `svn proplist`
+- `svn plist`
+- `svn pl`
+- `svn propget svn:keywords foo.c`
+- `svn pget svn:keywords foo.c`
 
 ### `tig`
 <p class="cmd-url"><a href="https://jonas.github.io/tig/">https://jonas.github.io/tig/</a></p>
