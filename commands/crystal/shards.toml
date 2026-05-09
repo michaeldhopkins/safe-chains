@@ -1,0 +1,81 @@
+[[command]]
+name = "shards"
+description = "Crystal package manager. `install`, `update`, `prune` modify the project's lib/ and shard.lock (project-local SafeWrite plus network fetches from upstream registries). `init` scaffolds shard.yml. `check`, `list`, `outdated`, `version`, `lock`, `tree` are read-only inspections."
+url = "https://github.com/crystal-lang/shards"
+researched_version = "shards 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--tree", "-h"]
+
+[[command.sub]]
+name = "outdated"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--up-to-date", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "tree"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "lock"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--update"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "install"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--ignore-crystal-version", "--local", "--production", "--skip-postinstall", "--skip-executables", "--without-development", "-h"]
+
+[[command.sub]]
+name = "update"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--help", "--ignore-crystal-version", "--local", "--production", "--skip-postinstall", "--skip-executables", "--without-development", "-h"]
+
+[[command.sub]]
+name = "prune"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true

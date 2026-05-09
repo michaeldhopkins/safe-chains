@@ -1,0 +1,23 @@
+[[command]]
+name = "scalafmt"
+description = "Code formatter for Scala. Without --test, rewrites files in place. --test mode reports formatting diff and exits non-zero on mismatch (read). --stdin / --stdout configure piping. --list lists files that would be reformatted. Active project."
+url = "https://scalameta.org/scalafmt/"
+researched_version = "scalafmt 3.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--check", "--debug", "--diff",
+    "--diff-branch", "--exclude",
+    "--git", "--help", "--include",
+    "--list", "--non-interactive",
+    "--quiet", "--respect-project-filters",
+    "--stdin", "--stdout",
+    "--test", "--verbose", "--version",
+    "-V", "-h", "-q",
+]
+valued = [
+    "--config", "--config-str",
+    "--dialect",
+    "--exclude", "--include",
+    "-c",
+]

@@ -1,0 +1,23 @@
+[[command]]
+name = "swc"
+description = "@swc/cli — Rust-based TypeScript / JavaScript compiler. Reads source files and writes transpiled output to --out-dir or stdout. The compile/transform step does not execute the source code. swc loads .swcrc / pyroject configuration which can reference plugins; plugins are WASM modules loaded at compile time."
+url = "https://swc.rs/docs/usage/cli"
+researched_version = "@swc/cli 0.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--copy-files", "--delete-dir-on-start",
+    "--help", "--ignore-dir", "--include-dotfiles",
+    "--no-swcrc", "--only", "--quiet",
+    "--source-maps", "--source-maps-inline",
+    "--strip-leading-paths", "--sync",
+    "--version", "--watch",
+    "-D", "-d", "-h", "-q", "-w",
+]
+valued = [
+    "--config", "--config-file", "--env-name",
+    "--extensions", "--filename", "--ignore",
+    "--out-dir", "--out-file",
+    "--source-file-name", "--source-map-target",
+    "--source-root", "-C", "-o",
+]

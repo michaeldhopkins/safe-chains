@@ -1,0 +1,70 @@
+[[command]]
+name = "safety"
+description = "Vulnerability scanner for Python dependencies. `check` and `scan` look up installed packages or a requirements file against an advisory database (network — fetches the DB if not cached). `auth` and `firewall` are interactive / external-system flows. The diagnostic --version and --help do not contact the network. Active project on the 3.x line."
+url = "https://docs.safetycli.com/"
+researched_version = "safety 3.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--bare", "--continue-on-error",
+    "--exit-code", "--full-report",
+    "--help", "--ignore-unpinned-requirements",
+    "--json", "--no-cache",
+    "--policy-file", "--proxy-required",
+    "--save-html", "--save-json",
+    "--short-report",
+    "-h",
+]
+valued = [
+    "--api", "--cache",
+    "--db", "--exclude", "--file",
+    "--ignore", "--key",
+    "--output", "--proxy-host", "--proxy-port",
+    "--proxy-protocol",
+    "-i", "-o", "-r",
+]
+write_flags = ["--save-html", "--save-json", "--output", "-o"]
+
+[[command.sub]]
+name = "scan"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--apply-remediations", "--detailed-output",
+    "--disable-optional-telemetry", "--help",
+    "--no-fix-suggestion",
+    "-h",
+]
+valued = [
+    "--auth-type", "--key", "--output",
+    "--policy-file", "--save-as",
+    "--target",
+]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "firewall"
+candidate = true
+
+[[command.sub]]
+name = "license"
+candidate = true
+
+[[command.sub]]
+name = "configure"
+candidate = true

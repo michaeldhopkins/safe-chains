@@ -1,0 +1,18 @@
+[[command]]
+name = "selene"
+description = "Linter for Lua and Roblox Lua, written in Rust. Reads source files and reports findings to stdout. Static — does not execute Lua. Active project."
+url = "https://github.com/Kampfkarren/selene"
+researched_version = "selene 0.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--allow-warnings", "--cache",
+    "--color", "--display-style", "--help",
+    "--no-exclude", "--no-summary",
+    "--num-threads", "--quiet", "--version",
+    "-V", "-h", "-q",
+]
+valued = [
+    "--config", "--display-style",
+    "--num-threads", "--pattern",
+]

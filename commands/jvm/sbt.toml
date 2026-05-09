@@ -1,0 +1,18 @@
+[[command]]
+name = "sbt"
+description = "Scala build tool. Bare invocation drops into an interactive REPL that runs project tasks (compile, test, run, etc.) — every task executes user code. Each non-flag positional is also a task to run. Only the diagnostic flags --help, --numeric-version, and --no-server / --traces have a fixed safe surface; meaningful builds run arbitrary Scala."
+url = "https://www.scala-sbt.org/"
+researched_version = "sbt 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = [
+    "--debug", "--error", "--help",
+    "--info", "--jvm-debug",
+    "--no-colors", "--no-server",
+    "--no-share", "--numeric-version",
+    "--script-version", "--supershell",
+    "--traces", "--verbose", "--version",
+    "--warn",
+    "-V", "-d", "-h", "-v",
+]

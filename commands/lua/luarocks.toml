@@ -1,0 +1,115 @@
+[[command]]
+name = "luarocks"
+description = "Lua package manager. `install`, `make`, `build`, `remove`, `purge`, `pack`, `upload` modify state and may contact the registry (network + system writes). `list`, `show`, `search`, `path`, `which`, `lint`, `config`, `test`, `doc`, `help` are mostly read-only inspections. The `run` / `exec` mechanism executes user code."
+url = "https://luarocks.org/"
+researched_version = "luarocks 3.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--no-tree-of", "--outdated", "--porcelain", "-h"]
+valued = ["--tree"]
+
+[[command.sub]]
+name = "show"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--home", "--issues", "--list", "--mversion", "--rock-licenses", "--rock-tree", "--rockspec", "-h"]
+
+[[command.sub]]
+name = "search"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--all", "--binary", "--help", "--porcelain", "--source", "-h"]
+
+[[command.sub]]
+name = "path"
+level = "SafeRead"
+bare = true
+standalone = ["--bin", "--full", "--help", "--lr-bin", "--lr-cpath", "--lr-path", "--lua-path", "--lua-cpath", "-h"]
+
+[[command.sub]]
+name = "which"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--lua-incdir", "--lua-libdir", "--lua-ver", "--rock-trees", "--system-config", "--user-config", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "make"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "purge"
+candidate = true
+
+[[command.sub]]
+name = "pack"
+candidate = true
+
+[[command.sub]]
+name = "upload"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "new_version"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "download"
+candidate = true
+
+[[command.sub]]
+name = "write_rockspec"
+candidate = true
+
+[[command.sub]]
+name = "doc"
+candidate = true

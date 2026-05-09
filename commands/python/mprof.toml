@@ -1,0 +1,45 @@
+[[command]]
+name = "mprof"
+description = "Memory profiler driver from the memory-profiler package. The `run` subcommand executes a target Python program with memory sampling; `plot` renders a saved profile (read-only). Carve-out covers the read forms plus help/version."
+url = "https://github.com/pythonprofilers/memory_profiler"
+researched_version = "memory_profiler 0.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "clean"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "rm"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "attach"
+candidate = true
+
+[[command.sub]]
+name = "plot"
+candidate = true
+
+[[command.sub]]
+name = "peak"
+candidate = true

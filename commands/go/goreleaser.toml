@@ -1,0 +1,79 @@
+[[command]]
+name = "goreleaser"
+description = "Release automation for Go projects. `check` validates `.goreleaser.yml` (read). `init` writes a starter config (SafeWrite). `release`, `build`, `publish`, `announce`, `subscribe`, `verify` produce or upload artifacts — release/publish/announce contact remote registries (Docker, GitHub Releases, Snapcraft, S3, etc.) and write external state. Carve-out covers diagnostic / config-validation forms."
+url = "https://goreleaser.com/"
+researched_version = "goreleaser 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+valued = ["--config", "--load-env-files", "-f"]
+
+[[command.sub]]
+name = "healthcheck"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--quiet", "-h", "-q"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--config", "-f"]
+
+[[command.sub]]
+name = "schema"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "completion"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "jsonschema"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "release"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "announce"
+candidate = true
+
+[[command.sub]]
+name = "subscribe"
+candidate = true
+
+[[command.sub]]
+name = "verify"
+candidate = true
+
+[[command.sub]]
+name = "continue"
+candidate = true

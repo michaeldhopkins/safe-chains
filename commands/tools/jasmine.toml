@@ -1,0 +1,17 @@
+[[command]]
+name = "jasmine"
+description = "Behavior-driven test runner for Node.js. Bare invocation runs the configured test specs (executes project code — same risk profile as jest/vitest). The diagnostic --help and --version are benign."
+url = "https://jasmine.github.io/"
+researched_version = "jasmine 5.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--color", "--filter", "--help",
+    "--no-color", "--random",
+    "--seed", "--stop-on-failure", "--version",
+    "-h",
+]
+valued = [
+    "--config", "--reporter",
+    "--require",
+]

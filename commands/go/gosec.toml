@@ -1,0 +1,26 @@
+[[command]]
+name = "gosec"
+description = "Static security scanner for Go. Reads source files, applies a configurable rule set, and reports issues to stdout. Does not execute project code. -fmt selects the output format; -out writes a report file. -severity / -confidence filter results; -tags applies build tags. Active project."
+url = "https://github.com/securego/gosec"
+researched_version = "gosec 2.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--exclude-generated",
+    "--no-fail", "--nosec",
+    "--quiet", "--sort",
+    "--stdout", "--track-suppressions",
+    "--verbose",
+    "-h", "-q",
+]
+valued = [
+    "--concurrency", "--conf",
+    "--confidence", "--exclude",
+    "--exclude-dir", "--fmt",
+    "--include", "--out",
+    "--severity", "--tags",
+    "-conf", "-confidence", "-exclude",
+    "-exclude-dir", "-fmt", "-include",
+    "-out", "-severity", "-tags",
+]
+write_flags = ["--out", "-out"]

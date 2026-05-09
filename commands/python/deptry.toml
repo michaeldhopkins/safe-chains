@@ -1,0 +1,21 @@
+[[command]]
+name = "deptry"
+description = "Static analyzer for Python project dependencies — identifies unused, missing, transitive, and misplaced dependencies by parsing source imports and comparing to pyproject.toml / requirements files. Does not execute project code. Reports findings to stdout. Active project."
+url = "https://deptry.com/"
+researched_version = "deptry 0.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--ignore-unused",
+    "--known-first-party", "--no-ansi",
+    "--per-rule-ignores", "--verbose", "--version",
+    "-h", "-v",
+]
+valued = [
+    "--config", "--exclude", "--extend-exclude",
+    "--ignore", "--json-output", "--package-module-name-map",
+    "--pep621-dev-dependency-groups",
+    "--per-rule-ignores", "--requirements-files",
+    "--requirements-files-dev",
+    "-e", "-ee", "-i", "-o", "-pdd",
+]

@@ -1,0 +1,39 @@
+[[command]]
+name = "nyc"
+description = "Istanbul coverage tool — wraps a test runner and produces a report. Bare invocation runs the wrapped command (arbitrary code execution). `nyc report` prints reports from previously-recorded coverage (read-only). `nyc check-coverage` enforces thresholds. `nyc instrument` writes instrumented copies of source files. `nyc merge` and `nyc help` are utilities."
+url = "https://github.com/istanbuljs/nyc"
+researched_version = "nyc 17.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "report"
+level = "SafeRead"
+bare = true
+standalone = ["--all", "--clean", "--help", "-h"]
+valued = ["--reporter", "--report-dir", "--temp-directory", "-r"]
+
+[[command.sub]]
+name = "check-coverage"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h", "--per-file"]
+valued = ["--branches", "--functions", "--lines", "--statements"]
+
+[[command.sub]]
+name = "instrument"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--complete-copy", "--delete", "--help", "--in-place", "-h"]
+valued = ["--exclude", "--include", "--require", "--source-map"]
+
+[[command.sub]]
+name = "merge"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true

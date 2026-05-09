@@ -1,0 +1,9 @@
+[[command]]
+name = "nim"
+description = "Nim language launcher. Subcommands `c`/`cpp`/`js`/`objc` compile to native code (SafeWrite). `r`/`run`/`compile -r` execute the program (arbitrary code). `check`, `dump`, `dependencies`, `genDepend`, `idetools`, `pretty`, `parse` are static analyses. `e` evaluates a Nimscript file. The diagnostic --version, --help, and the `check` / `pretty` / `dump` modes are part of the safe surface."
+url = "https://nim-lang.org/docs/nimc.html"
+researched_version = "nim 2.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

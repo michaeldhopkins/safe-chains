@@ -1,0 +1,19 @@
+[[command]]
+name = "revive"
+description = "Modern, faster successor to golint. Static linter for Go that reports style and correctness issues. Output goes to stdout in plain/json/checkstyle/etc. format. -formatter selects the renderer; -config points at a TOML config; -exclude/-include filter patterns. Active project."
+url = "https://revive.run/"
+researched_version = "revive 1.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help", "--version",
+    "-h",
+]
+valued = [
+    "--config", "--exclude",
+    "--formatter", "--include",
+    "--max_open_files", "--set_exit_status",
+    "-config", "-exclude", "-formatter",
+    "-include", "-max_open_files",
+    "-set_exit_status",
+]

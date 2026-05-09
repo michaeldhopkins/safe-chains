@@ -1,0 +1,29 @@
+[[command]]
+name = "clang-tidy"
+description = "LLVM static linter for C/C++. Reads compilation units (typically driven by compile_commands.json) and reports issues. --fix and --fix-errors apply the auto-fixable suggestions to source files (project-local SafeWrite via write_flags). --export-fixes writes a YAML file of suggestions instead. --list-checks is purely diagnostic."
+url = "https://clang.llvm.org/extra/clang-tidy/"
+researched_version = "clang-tidy — LLVM 18+"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--allow-enabling-analyzer-alpha-checkers",
+    "--allow-no-checks", "--dump-config",
+    "--enable-check-profile", "--explain-config",
+    "--extra-arg", "--extra-arg-before",
+    "--fix", "--fix-errors",
+    "--fix-notes", "--format-style",
+    "--help", "--help-list",
+    "--help-list-hidden",
+    "--list-checks", "--no-output", "--quiet",
+    "--system-headers", "--use-color", "--verify-config",
+    "--version",
+]
+valued = [
+    "--checks", "--config", "--config-file",
+    "--export-fixes", "--header-filter",
+    "--header-filter", "--line-filter",
+    "--load", "--p", "--source-filter",
+    "--store-check-profile", "--vfsoverlay",
+    "--warnings-as-errors",
+]
+write_flags = ["--fix", "--fix-errors", "--fix-notes", "--export-fixes"]

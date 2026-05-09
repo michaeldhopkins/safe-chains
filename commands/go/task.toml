@@ -1,0 +1,26 @@
+[[command]]
+name = "task"
+description = "Task runner / build tool with a YAML config (Taskfile.yml). Each invocation runs the matching task definition, which contains arbitrary shell — same risk profile as Make. The diagnostic --version / --help and `-l/--list` (list tasks without running) and `-a/--list-all` are part of the safe surface."
+url = "https://taskfile.dev/"
+researched_version = "task 3.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--color", "--concurrency", "--dry",
+    "--exit-code", "--force", "--global",
+    "--help", "--init", "--insecure",
+    "--interval", "--json",
+    "--list", "--list-all",
+    "--no-color", "--offline",
+    "--parallel", "--silent",
+    "--status", "--summary",
+    "--verbose", "--version",
+    "--watch",
+    "-C", "-d", "-f", "-g", "-h", "-i",
+    "-j", "-l", "-n", "-p", "-s", "-t", "-v", "-w",
+    "-a",
+]
+valued = [
+    "--dir", "--output", "--taskfile",
+    "-d", "-o", "-t",
+]

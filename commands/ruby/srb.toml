@@ -9,7 +9,6 @@ bare_flags = ["--help", "--version", "-h"]
 name = "tc"
 level = "SafeRead"
 bare = true
-positional_style = true
 standalone = [
     "--autocorrect", "--check-out-of-order-constant-references",
     "--color", "--did-you-mean", "--enable-experimental-rbs-assertions",

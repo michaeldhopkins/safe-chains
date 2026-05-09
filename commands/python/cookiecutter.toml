@@ -1,0 +1,13 @@
+[[command]]
+name = "cookiecutter"
+description = "Project scaffolder — clones a template repository (network if remote URL/short slug is given) and renders a new directory tree in the current working directory. Templates can include arbitrary pre/post hook Python that executes during generation, so each invocation effectively runs hostile-or-trusted Ruby... Python from the template. Carve-out: --version / --help / --list-installed are read-only."
+url = "https://cookiecutter.readthedocs.io/"
+researched_version = "cookiecutter 2.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = [
+    "--debug-file", "--help",
+    "--list-installed", "--version",
+    "-h",
+]

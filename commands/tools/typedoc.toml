@@ -1,0 +1,34 @@
+[[command]]
+name = "typedoc"
+description = "Documentation generator for TypeScript projects. Reads .ts source plus tsconfig.json and emits HTML or JSON documentation to the configured --out directory (default ./docs). Static — does not execute project code at parse time, but loads project tsconfig.json. Active project."
+url = "https://typedoc.org/"
+researched_version = "typedoc 0.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--cleanOutputDir", "--disableSources",
+    "--emit", "--exclude", "--excludeExternals",
+    "--excludeInternal", "--excludePrivate",
+    "--excludeProtected", "--excludeReferences",
+    "--gitRevision", "--help", "--includeVersion",
+    "--json", "--logLevel", "--logfile",
+    "--name", "--readme", "--showConfig",
+    "--skipErrorChecking", "--sort",
+    "--treatWarningsAsErrors",
+    "--validation",
+    "--version", "--watch",
+]
+valued = [
+    "--basePath", "--cname", "--customCss",
+    "--entryPoints", "--entryPointStrategy",
+    "--excludeNotDocumented", "--excludeTags",
+    "--externalSymbolLinkMappings",
+    "--gitRemote", "--githubPages",
+    "--hideGenerator", "--htmlLang",
+    "--lightHighlightTheme", "--darkHighlightTheme",
+    "--media", "--out", "--options",
+    "--plugin", "--requiredToBeDocumented",
+    "--searchInComments", "--theme",
+    "--titleLink", "--tsconfig",
+    "--visibilityFilters",
+]

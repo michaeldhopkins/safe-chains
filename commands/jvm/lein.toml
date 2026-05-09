@@ -1,0 +1,82 @@
+[[command]]
+name = "lein"
+description = "Leiningen — Clojure project tool. Subcommands include `repl`, `run`, `test`, `compile`, `uberjar`, `install`, `deploy`, `release`, `clean`, `deps`, `new`, `version`, `help`. Every task that builds or runs Clojure executes project code. `version` and `help` and `--help` are diagnostic. Carve-out covers diagnostic forms only."
+url = "https://leiningen.org/"
+researched_version = "Leiningen 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "repl"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "compile"
+candidate = true
+
+[[command.sub]]
+name = "uberjar"
+candidate = true
+
+[[command.sub]]
+name = "jar"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "release"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "deps"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "do"
+candidate = true
+
+[[command.sub]]
+name = "trampoline"
+candidate = true
+
+[[command.sub]]
+name = "with-profile"
+candidate = true
+
+[[command.sub]]
+name = "update-in"
+candidate = true
+
+[[command.sub]]
+name = "show-profiles"
+candidate = true

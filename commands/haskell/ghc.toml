@@ -1,0 +1,9 @@
+[[command]]
+name = "ghc"
+description = "Glasgow Haskell Compiler. Reads .hs source files and writes object/binary output (or runs them with --interactive / runghc-style invocations). Compilation involves Template Haskell which can execute arbitrary Haskell at compile time. Carve-out: --help / --version only."
+url = "https://www.haskell.org/ghc/"
+researched_version = "GHC 9.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--info", "--numeric-version", "--print-global-package-db", "--print-libdir", "--print-project-version", "--supported-extensions", "--supported-languages", "--version", "-?"]

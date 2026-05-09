@@ -1,0 +1,43 @@
+[[command]]
+name = "mkdocs"
+description = "Static documentation site generator for Markdown. `new DIRECTORY` scaffolds a new project. `build` writes the rendered site to the configured site_dir (default ./site). `serve` runs a local development server with live-reload (loads mkdocs.yml plugins, which are arbitrary Python). `gh-deploy` builds and pushes to a GitHub Pages branch (network — git push to remote). The serve and gh-deploy subcommands load and execute project Python through plugins at startup."
+url = "https://www.mkdocs.org/"
+researched_version = "mkdocs 1.6.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--clean", "--dirty", "--help",
+    "--no-strict", "--quiet", "--strict", "--verbose",
+    "-c", "-h", "-q", "-s", "-v",
+]
+valued = [
+    "--config-file", "--site-dir", "--theme",
+    "-d", "-f", "-t",
+]
+
+[[command.sub]]
+name = "new"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "--quiet", "--verbose", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "gh-deploy"
+candidate = true
+
+[[command.sub]]
+name = "get-deps"
+candidate = true

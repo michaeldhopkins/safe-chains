@@ -1,0 +1,126 @@
+[[command]]
+name = "dune"
+description = "OCaml/Reason build system. Subcommands `build`, `runtest`, `test`, `exec`, `utop`, `install`, `clean`, `promote` execute or modify project artifacts (running tests / executables = arbitrary code execution). `describe`, `external-lib-deps`, `printenv`, `rules`, `cache trim`, `top` are diagnostic. `init` scaffolds files. Carve-out covers diagnostic / introspective forms."
+url = "https://dune.readthedocs.io/"
+researched_version = "dune 3.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "describe"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "package-entries"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "workspace"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "external-lib-deps"
+standalone = ["--help", "--missing", "-h"]
+
+[[command.sub.sub]]
+name = "installed-libraries"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "opam-files"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "pp"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "aliases"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "contexts"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "printenv"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "rules"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--makefile", "-h", "-m"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "runtest"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "utop"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "promote"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "cache"
+candidate = true
+
+[[command.sub]]
+name = "rpc"
+candidate = true
+
+[[command.sub]]
+name = "subst"
+candidate = true
+
+[[command.sub]]
+name = "format-dune-file"
+candidate = true
+
+[[command.sub]]
+name = "ocaml-merlin"
+candidate = true
+
+[[command.sub]]
+name = "ocaml"
+candidate = true

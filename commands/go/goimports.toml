@@ -1,0 +1,15 @@
+[[command]]
+name = "goimports"
+description = "Updates Go import lines, adding missing ones and removing unreferenced ones. Without -w, prints the modified source to stdout. -d shows a unified diff (read). -l lists changed files. -w rewrites files in place (project-local SafeWrite via write_flags). Bundled with golang.org/x/tools."
+url = "https://pkg.go.dev/golang.org/x/tools/cmd/goimports"
+researched_version = "goimports — golang.org/x/tools; surface stable"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--cpuprofile", "--d", "--e",
+    "--format-only", "--help",
+    "--l", "--srcdir", "--v", "--w",
+    "-d", "-e", "-h", "-l", "-v", "-w",
+]
+valued = ["--local", "-local", "--srcdir", "-srcdir"]
+write_flags = ["--w", "-w"]

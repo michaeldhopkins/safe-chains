@@ -1,0 +1,155 @@
+[[command]]
+name = "stack"
+description = "Curated Haskell project tool that pins to LTS snapshots. `build`, `test`, `bench`, `run`, `exec`, `ghci`, `repl`, `install` execute Haskell project code. `setup`, `update`, `unpack`, `templates` contact Stackage / Hackage / GitHub (network). `path`, `ls`, `dot`, `query`, `script-interpreter`, `config env` are read-only. `init`, `new` scaffold projects. The carve-out covers diagnostic forms."
+url = "https://docs.haskellstack.org/"
+researched_version = "stack 2.x or 3.x"
+bare_flags = ["--help", "--version", "--numeric-version", "-V", "-h"]
+
+[[command.sub]]
+name = "path"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--bin-path", "--compiler-bin", "--compiler-exe", "--compiler-tools-bin", "--global-bin-path", "--global-config", "--global-hoogle-root", "--global-stack-root", "--ghc-paths", "--locals", "--programs", "--snapshot-bin-path", "--snapshot-doc-root", "--snapshot-install-root", "--snapshot-pkg-db", "--local-bin", "--local-bin-path", "--local-doc-root", "--local-hoogle-root", "--local-hpc-root", "--local-install-root", "--local-pkg-db", "--project-root", "-h"]
+
+[[command.sub]]
+name = "ls"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "snapshots"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "dependencies"
+standalone = ["--help", "-h"]
+valued = ["--depth"]
+
+[[command.sub.sub]]
+name = "stack-colls"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "globals"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "tools"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "query"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dot"
+level = "SafeRead"
+bare = true
+standalone = ["--external", "--help", "--include-base", "--no-include-base", "--no-prune", "--prune", "-h"]
+valued = ["--depth"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "bench"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "ghci"
+candidate = true
+
+[[command.sub]]
+name = "repl"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "setup"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "templates"
+candidate = true
+
+[[command.sub]]
+name = "unpack"
+candidate = true
+
+[[command.sub]]
+name = "upload"
+candidate = true
+
+[[command.sub]]
+name = "sdist"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "purge"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "haddock"
+candidate = true
+
+[[command.sub]]
+name = "ide"
+candidate = true
+
+[[command.sub]]
+name = "list-dependencies"
+candidate = true
+
+[[command.sub]]
+name = "freeze"
+candidate = true

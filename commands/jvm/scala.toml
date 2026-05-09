@@ -1,0 +1,9 @@
+[[command]]
+name = "scala"
+description = "Scala launcher — runs scripts, classes, jars, or starts a REPL. Each invocation either evaluates Scala source or executes precompiled classes (arbitrary code). The diagnostic --version, -version, --help are part of the safe surface."
+url = "https://docs.scala-lang.org/scala3/reference/cli/cli.html"
+researched_version = "scala 3.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-help", "-version", "-V"]

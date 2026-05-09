@@ -1,0 +1,18 @@
+[[command]]
+name = "pydocstyle"
+description = "Docstring style checker for Python — verifies that modules, classes, functions, and methods have docstrings conforming to PEP 257 and other selectable conventions. Parses source statically; does not execute project code. Reports findings to stdout. Stable on the 6.x line."
+url = "https://github.com/PyCQA/pydocstyle"
+researched_version = "pydocstyle 6.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--count", "--debug", "--explain",
+    "--help", "--source", "--verbose", "--version",
+    "-d", "-e", "-h", "-s", "-v",
+]
+valued = [
+    "--add-ignore", "--add-select", "--config",
+    "--convention", "--ignore", "--ignore-decorators",
+    "--ignore-self-only-init", "--match", "--match-dir",
+    "--property-decorators", "--select",
+]

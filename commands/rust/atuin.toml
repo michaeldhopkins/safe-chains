@@ -1,0 +1,132 @@
+[[command]]
+name = "atuin"
+description = "Magical shell history. `search` queries history (read). `import auto/zsh/bash/fish` reads a shell history file and writes to atuin's local DB. `stats` shows aggregate counts. `sync`, `sync-status`, `register`, `login`, `logout`, `key`, `account` contact a sync server (network). `history start/end/list` modify the local DB. `daemon` runs a long-running background sync server. `init` prints shell init code. The carve-out covers read-only diagnostic forms."
+url = "https://atuin.sh/"
+researched_version = "atuin 18.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "init"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--disable-ctrl-r", "--disable-up-arrow", "--help", "-h"]
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "stats"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--count", "--ngram"]
+
+[[command.sub]]
+name = "search"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = [
+    "--cmd-only", "--exit", "--exit",
+    "--filter-mode", "--help",
+    "--human", "--inline-height",
+    "--interactive", "--keymap-mode",
+    "--reverse", "--shell-up-key-binding",
+    "--cwd", "--exclude-cwd", "--exclude-exit",
+    "--exit", "--limit",
+    "-h", "-i", "-r",
+]
+valued = [
+    "--after", "--before", "--cmd-only",
+    "--cwd", "--delete", "--delete-it-all",
+    "--exit", "--filter-mode", "--format",
+    "--limit", "--offset",
+    "--search-mode", "--session",
+    "--user",
+    "-c", "-e", "-f",
+]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "import"
+candidate = true
+
+[[command.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "register"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "history"
+candidate = true
+
+[[command.sub]]
+name = "store"
+candidate = true
+
+[[command.sub]]
+name = "kv"
+candidate = true
+
+[[command.sub]]
+name = "account"
+candidate = true
+
+[[command.sub]]
+name = "daemon"
+candidate = true
+
+[[command.sub]]
+name = "key"
+candidate = true
+
+[[command.sub]]
+name = "default-config"
+candidate = true
+
+[[command.sub]]
+name = "doctor"
+candidate = true
+
+[[command.sub]]
+name = "wrapped"
+candidate = true
+
+[[command.sub]]
+name = "uuid"
+candidate = true
+
+[[command.sub]]
+name = "gen-completions"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "dotfiles"
+candidate = true

@@ -1,0 +1,20 @@
+[[command]]
+name = "lint-staged"
+description = "Runs configured linters/formatters against files staged in git. The configured commands (in package.json `lint-staged` or .lintstagedrc) are arbitrary shell — every invocation runs whatever the project's config dictates. Carve-out covers the diagnostic --version and --help only, plus the read-only --debug / --print-config / --diff modes that don't actually run the underlying lint commands."
+url = "https://github.com/lint-staged/lint-staged"
+researched_version = "lint-staged 15.x"
+level = "Inert"
+bare = false
+standalone = [
+    "--debug", "--diff", "--help",
+    "--no-stash", "--print-config",
+    "--quiet", "--relative", "--shell",
+    "--verbose", "--version",
+    "-d", "-h", "-p", "-q", "-V", "-v",
+]
+valued = [
+    "--allow-empty", "--concurrent",
+    "--config", "--cwd", "--diff-filter",
+    "--max-arg-length",
+    "-c", "-r",
+]

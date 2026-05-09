@@ -1,0 +1,24 @@
+[[command]]
+name = "c8"
+description = "Native Node.js coverage tool — wraps any subprocess and uses V8's built-in coverage to produce a report. The wrapped subprocess is the user's test command (arbitrary code execution). `c8 report` prints reports from a previously-recorded coverage directory (read-only). `c8 check-coverage` enforces thresholds against an existing report."
+url = "https://github.com/bcoe/c8"
+researched_version = "c8 10.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "report"
+level = "SafeRead"
+bare = true
+standalone = ["--all", "--allowExternal", "--clean", "--help", "-h"]
+valued = ["--reporter", "--reports-dir", "--temp-directory", "-r"]
+
+[[command.sub]]
+name = "check-coverage"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--branches", "--functions", "--lines", "--per-file", "--statements"]
+
+[[command.sub]]
+name = "help"
+allow_all = true

@@ -1,0 +1,23 @@
+[[command]]
+name = "autopep8"
+description = "Automatically formats Python code to conform to PEP 8. Without -i, prints the modified source to stdout. -i / --in-place rewrites files; --diff prints a unified diff (read). -r/--recursive descends directories. -aaa is the most aggressive correction mode. Stable."
+url = "https://github.com/hhatto/autopep8"
+researched_version = "autopep8 2.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--aggressive", "--diff", "--exit-code",
+    "--experimental", "--global-config", "--help",
+    "--ignore-local-config", "--in-place",
+    "--list-fixes", "--pep8-passes",
+    "--recursive", "--verbose", "--version",
+    "-a", "-d", "-h", "-i", "-r", "-v",
+]
+valued = [
+    "--exclude", "--global-config", "--ignore",
+    "--indent-size", "--jobs",
+    "--line-range", "--max-line-length",
+    "--select",
+    "-j", "-l",
+]
+write_flags = ["--in-place", "-i"]

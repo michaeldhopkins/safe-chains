@@ -1,0 +1,26 @@
+[[command]]
+name = "ameba"
+description = "Static linter for Crystal. Reads source files and reports issues. --fix rewrites files (project-local SafeWrite via write_flags). --gen-config writes a config file. Static — does not execute project code."
+url = "https://github.com/crystal-ameba/ameba"
+researched_version = "ameba 1.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--all", "--colour",
+    "--except", "--explain",
+    "--fail-level", "--fix",
+    "--gen-config",
+    "--help", "--no-color",
+    "--only", "--rules",
+    "--silent", "--version",
+    "-c", "-d", "-e", "-h", "-s", "-v",
+]
+valued = [
+    "--config", "--exclude",
+    "--fail-level", "--filter",
+    "--format", "--globs",
+    "--ignored", "--out",
+    "--reporter", "--rule",
+    "-f",
+]
+write_flags = ["--fix", "--out"]

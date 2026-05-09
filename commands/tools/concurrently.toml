@@ -1,0 +1,9 @@
+[[command]]
+name = "concurrently"
+description = "Runs multiple shell commands in parallel with grouped output. Each positional argument is an arbitrary shell command — `concurrently \"npm:test\" \"npm:lint\"` runs both. Since every meaningful invocation runs user-supplied shell, only --help / --version are part of the safe surface."
+url = "https://github.com/open-cli-tools/concurrently"
+researched_version = "concurrently 9.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

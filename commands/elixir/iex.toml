@@ -1,0 +1,9 @@
+[[command]]
+name = "iex"
+description = "Elixir interactive shell — REPL. Every meaningful invocation evaluates user input. Carve-out: --version / --help only."
+url = "https://hexdocs.pm/iex/"
+researched_version = "iex — bundled with Elixir 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

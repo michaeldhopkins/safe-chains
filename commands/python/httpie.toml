@@ -1,0 +1,37 @@
+[[command]]
+name = "http"
+aliases = ["https"]
+description = "Httpie — modern HTTP client with a colorised, JSON-aware UI. Each invocation makes an HTTP(S) request to the given URL (network) and prints the response. Does not execute server-supplied code. The --download flag writes the response body to a file (output filename derived from URL or controlled by --output). --auth supplies credentials; --session and --session-read-only persist or load named credential bundles to ~/.httpie/. Active maintenance."
+url = "https://httpie.io/docs/cli"
+researched_version = "httpie 3.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--all", "--body", "--check-status",
+    "--continue", "--debug", "--default-scheme",
+    "--download", "--follow", "--form",
+    "--headers", "--help", "--ignore-stdin",
+    "--ignore-netrc", "--json",
+    "--meta", "--multipart",
+    "--no-stream", "--offline",
+    "--overwrite", "--pretty", "--print",
+    "--quiet", "--stream", "--style",
+    "--traceback", "--verbose", "--verify",
+    "--version",
+    "-F", "-I", "-S", "-b", "-c", "-d", "-f",
+    "-h", "-j", "-m", "-o", "-p", "-q", "-s",
+    "-v",
+]
+valued = [
+    "--auth", "--auth-type", "--bearer",
+    "--cert", "--cert-key", "--cert-key-pass",
+    "--chunked", "--compress", "--default-scheme",
+    "--format-options", "--max-headers",
+    "--max-redirects", "--output",
+    "--path-as-is", "--proxy", "--response-charset",
+    "--response-mime", "--session",
+    "--session-read-only", "--ssl",
+    "--timeout",
+    "-A", "-a", "-x",
+]
+write_flags = ["--download", "--output", "-d", "-o"]

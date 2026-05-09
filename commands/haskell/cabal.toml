@@ -1,0 +1,130 @@
+[[command]]
+name = "cabal"
+description = "Common Architecture for Building Applications and Libraries — Haskell project tool. `build`, `run`, `test`, `bench`, `repl`, `exec` execute project Haskell code. `update` and `install`, `fetch`, `get`, `list`, `info`, `outdated` contact Hackage (network). `freeze` writes cabal.project.freeze. `init` scaffolds a project. `check`, `report`, `path` are read-only diagnostics. Carve-out covers the diagnostic and read-only inspection forms."
+url = "https://cabal.readthedocs.io/"
+researched_version = "cabal-install 3.x"
+bare_flags = ["--help", "--version", "--numeric-version", "-V", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--verbose", "-v"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--simple-output", "-h"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "outdated"
+level = "SafeRead"
+bare = true
+standalone = ["--exit-code", "--freeze-file", "--help", "--minor", "--new-freeze-file", "--simple-output", "-h"]
+valued = ["--ignore", "--minor", "--package-env"]
+
+[[command.sub]]
+name = "path"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--output-format"]
+
+[[command.sub]]
+name = "user-config"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list-bin"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "configure"
+candidate = true
+
+[[command.sub]]
+name = "freeze"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "fetch"
+candidate = true
+
+[[command.sub]]
+name = "get"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "bench"
+candidate = true
+
+[[command.sub]]
+name = "repl"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "haddock"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "report"
+candidate = true
+
+[[command.sub]]
+name = "upload"
+candidate = true
+
+[[command.sub]]
+name = "sdist"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true

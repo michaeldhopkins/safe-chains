@@ -1,0 +1,125 @@
+[[command]]
+name = "dvc"
+description = "Data Version Control — Git-companion tool for ML/data projects. Many subcommands `pull`, `push`, `fetch`, `import`, `import-url` contact remote storage (S3/GS/Azure/SSH/HTTP — network). `repro` and `exp run` execute pipeline scripts (arbitrary code). `add`, `commit`, `move`, `remove`, `unprotect`, `checkout` modify working tree and DVC files (project-local SafeWrite). Read subcommands: `version`, `status`, `diff`, `metrics show`, `params diff`, `plots show`, `dag`, `data status`, `cache dir`, `doctor`, `config --show`, `list/list-url`. The carve-out covers the read-only / diagnostic surface here."
+url = "https://dvc.org/"
+researched_version = "dvc 3.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "doctor"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--all-branches", "--all-commits", "--all-tags", "--cloud", "--help", "--json", "--quiet", "--remote", "--verbose", "-A", "-T", "-a", "-c", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--hide-missing", "--json", "--md", "--quiet", "--show-hash", "--targets", "--verbose", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "dag"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--dot", "--full", "--help", "--mermaid", "--md", "--outs", "--quiet", "--verbose", "-h", "-q", "-v"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--dvc-only", "--help", "--json", "--quiet", "-R", "-h", "-q"]
+valued = ["--rev"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "commit"
+candidate = true
+
+[[command.sub]]
+name = "checkout"
+candidate = true
+
+[[command.sub]]
+name = "fetch"
+candidate = true
+
+[[command.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "import"
+candidate = true
+
+[[command.sub]]
+name = "import-url"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "move"
+candidate = true
+
+[[command.sub]]
+name = "repro"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "exp"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "remote"
+candidate = true
+
+[[command.sub]]
+name = "metrics"
+candidate = true
+
+[[command.sub]]
+name = "params"
+candidate = true
+
+[[command.sub]]
+name = "plots"
+candidate = true

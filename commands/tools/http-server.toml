@@ -1,0 +1,9 @@
+[[command]]
+name = "http-server"
+description = "Simple zero-config HTTP server that serves static files from the given directory. Each invocation opens a network listener on the configured port. The static file server itself does not execute project code, but binding network ports is a side effect outside this CLI invocation. Carve-out: --help / --version / --robots toggle. The `--cors` and `--port` flags configure the listener that this carve-out does not start."
+url = "https://github.com/http-party/http-server"
+researched_version = "http-server 14.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

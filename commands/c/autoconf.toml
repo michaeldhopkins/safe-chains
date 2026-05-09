@@ -1,0 +1,18 @@
+[[command]]
+name = "autoconf"
+description = "Autoconf — generates a portable configure script from configure.ac. Reads M4 sources and writes a `configure` shell script. Static code generation — does not execute the resulting configure script. Stable GNU tool."
+url = "https://www.gnu.org/software/autoconf/"
+researched_version = "autoconf 2.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--debug", "--force", "--help",
+    "--trace", "--verbose", "--version",
+    "--warnings",
+    "-V", "-d", "-f", "-h", "-o", "-t", "-v",
+]
+valued = [
+    "--include", "--output",
+    "--prepend-include", "--trace",
+    "-B", "-I", "-W", "-o", "-t",
+]

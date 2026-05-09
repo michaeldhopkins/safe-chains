@@ -1,0 +1,55 @@
+[[command]]
+name = "vite"
+description = "Frontend build tool. `build` writes production assets to dist/ (project-local SafeWrite). `preview` serves the build output for local inspection (network listener). `dev`/`serve` run the dev server with HMR — both load the user's vite.config.{js,ts} which is arbitrary JS executed at startup. `optimize` rewrites the dependency cache. Active project."
+url = "https://vite.dev/"
+researched_version = "vite 5.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[command.wrapper]
+standalone = ["--clearScreen", "--debug", "--filter", "--force", "--profile", "-d", "-f"]
+valued = ["--base", "--config", "--logLevel", "--mode", "-c", "-l", "-m"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--app", "--emptyOutDir", "--help",
+    "--manifest", "--minify", "--no-watch",
+    "--sourcemap", "--ssr",
+    "--ssrManifest", "--watch", "--write",
+    "-h", "-w",
+]
+valued = [
+    "--assetsDir", "--assetsInlineLimit",
+    "--outDir", "--target",
+]
+
+[[command.sub]]
+name = "preview"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--cors", "--help", "--https",
+    "--open", "--strictPort",
+    "-h",
+]
+valued = ["--host", "--port"]
+
+[[command.sub]]
+name = "optimize"
+level = "SafeWrite"
+bare = true
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "dev"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true

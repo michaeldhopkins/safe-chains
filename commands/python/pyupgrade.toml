@@ -1,0 +1,18 @@
+[[command]]
+name = "pyupgrade"
+description = "Rewrites Python source to use newer language idioms (f-strings, dict/set comprehensions, etc.). Bare invocation rewrites files in place. --py-3-plus / --py-3-N-plus targets a specific minimum Python version. Static AST transformer — does not execute project code. Stable, popular pre-commit-friendly tool."
+url = "https://github.com/asottile/pyupgrade"
+researched_version = "pyupgrade 3.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--exit-zero-even-if-changed", "--help",
+    "--keep-mock", "--keep-percent-format",
+    "--keep-runtime-typing", "--py3-only",
+    "--py3-plus", "--py35-plus", "--py36-plus",
+    "--py37-plus", "--py38-plus",
+    "--py39-plus", "--py310-plus",
+    "--py311-plus", "--py312-plus",
+    "--py313-plus",
+    "-h",
+]

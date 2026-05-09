@@ -1,0 +1,25 @@
+[[command]]
+name = "sphinx-apidoc"
+description = "Sphinx helper that walks a Python package tree and generates .rst stubs for autodoc. Reads source layout, writes .rst files into the output directory (project-local). Does not import or execute project code at generation time. Active project."
+url = "https://www.sphinx-doc.org/en/master/man/sphinx-apidoc.html"
+researched_version = "Sphinx 7.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--ext-autodoc", "--ext-coverage", "--ext-doctest",
+    "--ext-githubpages", "--ext-ifconfig", "--ext-mathjax",
+    "--ext-viewcode", "--follow-links",
+    "--force", "--help",
+    "--implicit-namespaces", "--include-private",
+    "--module-first", "--no-headings", "--no-toc",
+    "--quiet", "--remove-old", "--separate",
+    "--tocfile", "--version",
+    "-E", "-F", "-M", "-T", "-e", "-f", "-h", "-l", "-n",
+    "-o", "-q", "-s", "-t",
+]
+valued = [
+    "--author", "--dot", "--extension",
+    "--maxdepth", "--release", "--suffix",
+    "--tocfile-name", "--templatedir", "--version",
+    "-A", "-H", "-R", "-V", "-d",
+]

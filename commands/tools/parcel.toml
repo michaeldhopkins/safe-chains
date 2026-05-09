@@ -1,0 +1,38 @@
+[[command]]
+name = "parcel"
+description = "Zero-configuration web application bundler. `build` produces a production bundle (SafeWrite). `serve`/bare runs the dev server (long-running, executes config code). `watch` runs incremental rebuilds. Configuration is loaded from .parcelrc and .browserslistrc. Active project on the 2.x line."
+url = "https://parceljs.org/"
+researched_version = "parcel 2.x"
+bare_flags = ["--help", "--version", "-h", "-v", "-V"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--detailed-report", "--help", "--no-cache",
+    "--no-content-hash", "--no-optimize",
+    "--no-scope-hoist", "--no-source-maps",
+    "--profile", "--watch-for-stdin",
+    "-h",
+]
+valued = [
+    "--cache-dir", "--config", "--dist-dir",
+    "--log-level", "--public-url",
+    "--reporter", "--target",
+]
+
+[[command.sub]]
+name = "watch"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--cache-dir", "--config", "--dist-dir", "--target"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "serve"
+candidate = true

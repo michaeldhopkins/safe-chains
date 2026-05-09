@@ -1,0 +1,9 @@
+[[command]]
+name = "jcmd"
+description = "JDK diagnostic command — connects to a running JVM by PID or process name and issues commands. Most subcommands (Thread.print, GC.run, VM.info, etc.) read JVM state, but several (Compiler.codecache_dump, GC.heap_dump, JFR.start/stop) write files or modify the target JVM's state. Bare invocation lists all running JVMs (read). Targeting a PID is an external-process operation that affects state outside this CLI invocation. Carve-out: bare-listing / -l / -h."
+url = "https://docs.oracle.com/en/java/javase/21/docs/specs/man/jcmd.html"
+researched_version = "jcmd — bundled with JDK 21+"
+level = "SafeRead"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h", "-help", "-l"]

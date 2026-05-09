@@ -1,0 +1,54 @@
+[[command]]
+name = "tap"
+description = "Node.js test framework that emits TAP (Test Anything Protocol). Bare invocation runs the configured tests (executes project code). `report` reads coverage data and prints reports. `dump-config` and `versions` are diagnostic. The other subcommands (`run`, `mocharc`, `build`, `init`, `plugin`, `repl`) execute tests, scaffold files, or open a REPL."
+url = "https://node-tap.org/"
+researched_version = "tap 21.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "versions"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dump-config"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "report"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--coverage-reporter"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "plugin"
+candidate = true
+
+[[command.sub]]
+name = "repl"
+candidate = true
+
+[[command.sub]]
+name = "mocharc"
+candidate = true

@@ -1,0 +1,18 @@
+[[command]]
+name = "vulture"
+description = "Static analyzer that finds dead Python code (unused variables, imports, functions, classes, attributes). Parses source via AST; does not execute project code. Reports findings to stdout in line:col format. --make-whitelist emits a whitelist file; -v shows progress. Stable."
+url = "https://github.com/jendrikseipp/vulture"
+researched_version = "vulture 2.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--ignore-decorators",
+    "--ignore-names",
+    "--make-whitelist", "--sort-by-size",
+    "--verbose", "--version",
+    "-h", "-v",
+]
+valued = [
+    "--config", "--exclude",
+    "--min-confidence",
+]

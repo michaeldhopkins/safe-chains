@@ -1,0 +1,52 @@
+[[command]]
+name = "sqlx"
+description = "sqlx-cli — companion CLI for the sqlx Rust crate. `migrate add NAME` and `migrate build-script` write project files (SafeWrite). `migrate info` is a read-only inspection of the migrations table (network — connects to DB). `migrate run`, `migrate revert`, `database create`, `database drop`, `database reset`, `database setup`, and `prepare` connect to and modify the configured database (external system writes — not part of safe surface)."
+url = "https://github.com/launchbadge/sqlx/tree/main/sqlx-cli"
+researched_version = "sqlx-cli 0.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "migrate"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "add"
+standalone = ["--help", "--reversible", "--sequential", "--source", "--timestamp", "-h", "-r", "-s"]
+valued = ["--source"]
+
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+valued = ["--database-url", "--source", "-D"]
+
+[[command.sub.sub]]
+name = "build-script"
+standalone = ["--force", "--help", "-h"]
+valued = ["--source"]
+
+[[command.sub.sub]]
+name = "run"
+candidate = true
+
+[[command.sub.sub]]
+name = "revert"
+candidate = true
+
+[[command.sub]]
+name = "completions"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "database"
+candidate = true
+
+[[command.sub]]
+name = "prepare"
+candidate = true

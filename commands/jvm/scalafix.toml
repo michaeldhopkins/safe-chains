@@ -1,0 +1,26 @@
+[[command]]
+name = "scalafix"
+description = "Refactoring and linting tool for Scala. Default mode rewrites source files in place. --check mode reports violations without modifying files. --rules selects rules; --test runs in dry-run + check mode. The custom-rule mechanism loads arbitrary Scala from -classpath / --tool-classpath, so users opt into trusted rule sources."
+url = "https://scalacenter.github.io/scalafix/"
+researched_version = "scalafix 0.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--auto-classpath", "--check",
+    "--debug", "--diff", "--exclude",
+    "--help", "--include", "--non-interactive",
+    "--no-stale-semanticdb", "--quiet-parse-errors",
+    "--scalac-options", "--stdout",
+    "--stdin", "--syntactic",
+    "--test", "--triggered", "--verbose", "--version",
+    "-V", "-h", "-q",
+]
+valued = [
+    "--auto-classpath-roots", "--bash",
+    "--classpath", "--config", "--diff-base",
+    "--exclude", "--files", "--format",
+    "--include", "--rules", "--scala-version",
+    "--source-root", "--sourceroot",
+    "--tool-classpath",
+    "-c", "-r",
+]

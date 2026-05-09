@@ -1,0 +1,26 @@
+[[command]]
+name = "credo"
+description = "Static analysis tool for Elixir. Reads source files, applies a configurable rule set, and reports issues. Does not execute project code at analysis time. The `gen.config` and `gen.check` subcommands write template files (project-local SafeWrite). `suggest` and `list` are read-only. `explain` is interactive."
+url = "https://github.com/rrrene/credo"
+researched_version = "credo 1.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--all", "--all-priorities",
+    "--checks-without-tag", "--config-name",
+    "--debug", "--enable-disabled-files",
+    "--files-included", "--files-excluded",
+    "--format", "--help", "--ignore",
+    "--ignore-checks", "--min-priority",
+    "--mute-exit-status", "--no-color",
+    "--only", "--read-from-stdin",
+    "--save-config", "--show-source",
+    "--strict", "--verbose", "--version",
+    "-A", "-a", "-h", "-v",
+]
+valued = [
+    "--config-file", "--config-name",
+    "--format", "--ignore-checks",
+    "--strict",
+    "-C",
+]

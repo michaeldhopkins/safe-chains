@@ -1,0 +1,127 @@
+[[command]]
+name = "hatch"
+description = "Modern Python project manager. Many subcommands. Read-side: `version` (without args), `status`, `dep show`, `env show`, `project metadata`. Write/build: `new` (scaffold), `build` (writes dist/), `clean`, `version <new>` (rewrites pyproject.toml). External: `publish` (uploads to PyPI), `python install/remove`, `env create/prune/remove` (manage interpreters and environments). Run/run-shell/test/fmt execute project code. Active project on the 1.x line."
+url = "https://hatch.pypa.io/"
+researched_version = "hatch 1.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[command.wrapper]
+standalone = ["--no-interactive", "-n", "--quiet", "-q", "--verbose", "-v"]
+valued = ["--cache-dir", "--config", "--data-dir", "--env", "--project", "-e", "-p"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+standalone = ["--clean", "--clean-hooks-after", "--clean-only", "--ext", "--help", "-c", "-h"]
+valued = ["--hooks-only", "--target", "-t"]
+
+[[command.sub]]
+name = "clean"
+level = "SafeWrite"
+bare = true
+standalone = ["--ext", "--help", "--no-hooks", "-h"]
+valued = ["--target", "-t"]
+
+[[command.sub]]
+name = "new"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--cli", "--help", "--init", "-h", "-i"]
+
+[[command.sub]]
+name = "dep"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "hash"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--ascii", "--force-ascii", "--help", "--json", "-h"]
+
+[[command.sub.sub]]
+name = "find"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "create"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "prune"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "remove"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "run"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "project"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "metadata"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "python"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "shell"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "fmt"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "self"
+candidate = true

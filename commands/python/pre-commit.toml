@@ -1,0 +1,98 @@
+[[command]]
+name = "pre-commit"
+description = "Multi-language framework for managing pre-commit / pre-push / commit-msg hooks. install writes git hook scripts into .git/hooks/ that delegate to pre-commit on commit. uninstall removes them. autoupdate rewrites .pre-commit-config.yaml with newer hook revisions (network — fetches each repo's tags). gc cleans unused hooks from the cache. clean removes the entire pre-commit cache. validate-config and validate-manifest are read-only schema checks. sample-config prints a default config to stdout. run, hook-impl, try-repo, init-templatedir, migrate-config all execute hook commands or modify config files — those are not part of the safe surface."
+url = "https://pre-commit.com/"
+researched_version = "pre-commit 4.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "install"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--allow-missing-config", "--config",
+    "--help", "--install-hooks", "--overwrite",
+    "-c", "-f", "-h",
+]
+valued = ["--hook-type", "-t"]
+
+[[command.sub]]
+name = "uninstall"
+level = "SafeWrite"
+bare = true
+standalone = ["--config", "--help", "-c", "-h"]
+valued = ["--hook-type", "-t"]
+
+[[command.sub]]
+name = "install-hooks"
+level = "SafeWrite"
+bare = true
+standalone = ["--config", "--help", "-c", "-h"]
+
+[[command.sub]]
+name = "autoupdate"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--bleeding-edge", "--config",
+    "--dry-run", "--freeze",
+    "--help", "--jobs",
+    "-c", "-h", "-j",
+]
+valued = ["--repo"]
+
+[[command.sub]]
+name = "validate-config"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "validate-manifest"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "sample-config"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "gc"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "clean"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "hook-impl"
+candidate = true
+
+[[command.sub]]
+name = "try-repo"
+candidate = true
+
+[[command.sub]]
+name = "init-templatedir"
+candidate = true
+
+[[command.sub]]
+name = "migrate-config"
+candidate = true

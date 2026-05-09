@@ -1,0 +1,130 @@
+[[command]]
+name = "opam"
+description = "OPAM — OCaml package manager. `install`, `remove`, `update`, `upgrade`, `pin`, `repository add/remove`, `switch create/import/install`, `lock` modify the user's opam state and download packages from upstream (network + system-state writes). `list`, `show`, `search`, `info`, `var`, `env`, `config list`, `option`, `tree`, `clean`, `--version`, `--help` are read-only diagnostics. `init` scaffolds the user's ~/.opam (system-state write)."
+url = "https://opam.ocaml.org/doc/man/index.html"
+researched_version = "opam 2.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--all", "--available", "--columns", "--depexts", "--depopts", "--installable", "--installed", "--no-color", "--normalise", "--pinned", "--readonly", "--recursive", "--required-by", "--resolve", "--safe", "--separator", "--silent", "--sort", "--debug", "--help", "--root", "-h"]
+valued = ["--field-match", "--fields", "--filter", "--repos", "--search", "--switch", "-A", "-i", "-s"]
+
+[[command.sub]]
+name = "show"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--all-versions", "--depexts", "--field", "--just-file", "--list-files", "--no-color", "--normalise", "--raw", "--share", "--debug", "--help", "-h"]
+
+[[command.sub]]
+name = "search"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--case-sensitive", "--debug", "--help", "--installed", "--no-color", "-c", "-h"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--all-versions", "--depexts", "--just-file", "--list-files", "--debug", "--help", "-h"]
+
+[[command.sub]]
+name = "var"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--debug", "--global", "--help", "-h"]
+
+[[command.sub]]
+name = "env"
+level = "SafeRead"
+bare = true
+standalone = ["--csh", "--debug", "--fish", "--help", "--inplace-path", "--no-color", "--readonly", "--revert", "--safe", "--sexp", "--shell", "--sh", "--zsh", "-h"]
+valued = ["--shell", "--switch"]
+
+[[command.sub]]
+name = "tree"
+level = "SafeRead"
+bare = true
+standalone = ["--debug", "--help", "--no-color", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "pin"
+candidate = true
+
+[[command.sub]]
+name = "switch"
+candidate = true
+
+[[command.sub]]
+name = "repository"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "lock"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "option"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "source"
+candidate = true
+
+[[command.sub]]
+name = "lint"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "admin"
+candidate = true

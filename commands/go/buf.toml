@@ -1,0 +1,102 @@
+[[command]]
+name = "buf"
+description = "Buf — modern protobuf tooling. Read subcommands: `lint`, `format` (without --write), `breaking`, `ls-files`, `mod ls-paths/inputs`, `build`, `convert`, `dep graph/prune`. Write: `format --write` rewrites .proto files; `generate` writes generated code to disk; `mod prune/init/update` modify buf.yaml/buf.lock. Network: `push`, `mod update` (fetches from BSR), `registry login/logout`, `mod commit/branch`. Active project on the 1.x line."
+url = "https://buf.build/docs/"
+researched_version = "buf 1.x"
+bare_flags = ["--help", "--version", "-h"]
+
+[command.wrapper]
+standalone = ["--debug"]
+valued = ["--config", "--disable-symlinks", "--exclude-imports", "--log-format", "--timeout", "--verbose"]
+
+[[command.sub]]
+name = "lint"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--exclude-imports", "--help", "-h"]
+valued = ["--config", "--error-format", "--exclude-path", "--path"]
+
+[[command.sub]]
+name = "build"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--as-file-descriptor-set", "--disable-symlinks", "--exclude-imports", "--exclude-source-info", "--help", "-h"]
+valued = ["--config", "--exclude-path", "--output", "--path", "-o"]
+
+[[command.sub]]
+name = "format"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--diff", "--exit-code", "--help", "--write", "-d", "-h", "-w"]
+valued = ["--config", "--exclude-path", "--output", "--path", "-o"]
+write_flags = ["--write", "-w"]
+
+[[command.sub]]
+name = "breaking"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--exclude-imports", "--help", "--limit-to-input-files", "-h"]
+valued = ["--against", "--against-config", "--config", "--error-format", "--exclude-path", "--path"]
+
+[[command.sub]]
+name = "convert"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--from-format", "--help", "--to-format", "-h"]
+valued = ["--from", "--output", "--to", "--type", "-o"]
+
+[[command.sub]]
+name = "ls-files"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--include-imports", "--include-import-paths", "-h"]
+valued = ["--config", "--format"]
+
+[[command.sub]]
+name = "generate"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = ["--clean", "--debug", "--help", "--include-imports", "--include-types", "--include-wkt", "-h"]
+valued = ["--config", "--exclude-path", "--include-types", "--output", "--path", "--template", "--type", "-o"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "registry"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "dep"
+candidate = true
+
+[[command.sub]]
+name = "mod"
+candidate = true
+
+[[command.sub]]
+name = "studio"
+candidate = true

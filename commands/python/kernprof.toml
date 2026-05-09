@@ -1,0 +1,9 @@
+[[command]]
+name = "kernprof"
+description = "Line profiler driver — runs a target Python program with line-by-line timing instrumentation enabled. Running the target program is arbitrary code execution. Only --help / --version have a fixed safe surface."
+url = "https://github.com/pyutils/line_profiler"
+researched_version = "line_profiler 4.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

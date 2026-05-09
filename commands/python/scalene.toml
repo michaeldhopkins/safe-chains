@@ -1,0 +1,9 @@
+[[command]]
+name = "scalene"
+description = "Sampling profiler for Python that reports CPU, GPU, and memory usage. Each invocation runs the given Python program (or attaches to a PID) and produces a report. Running the target program is arbitrary code execution. Only the diagnostic flags --help and --version have a fixed safe surface."
+url = "https://github.com/plasma-umass/scalene"
+researched_version = "scalene 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h"]

@@ -1,0 +1,76 @@
+[[command]]
+name = "knex"
+description = "Knex.js CLI — generates and runs migrations and seeds for the Knex query builder. `migrate:make` and `seed:make` scaffold new files (SafeWrite). `migrate:latest`, `migrate:up`, `migrate:down`, `migrate:rollback`, `migrate:list`, `migrate:status`, `migrate:currentVersion`, `seed:run` connect to the configured database. The list/status/currentVersion variants are read-only DB queries."
+url = "https://knexjs.org/guide/migrations.html"
+researched_version = "knex 3.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--cjs", "--esm", "--help", "-h", "-x"]
+valued = ["--client"]
+
+[[command.sub]]
+name = "migrate:make"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--cjs", "--esm", "--stub", "--timestamp-filename-date", "-h"]
+valued = ["--knexfile", "--knexpath", "--specific"]
+
+[[command.sub]]
+name = "seed:make"
+level = "SafeWrite"
+bare = false
+standalone = ["--cjs", "--esm", "--help", "-h"]
+valued = ["--knexfile", "--knexpath", "--stub", "--timestamp-filename-date"]
+
+[[command.sub]]
+name = "migrate:list"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--env", "--knexfile", "--knexpath"]
+
+[[command.sub]]
+name = "migrate:status"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--env", "--knexfile", "--knexpath"]
+
+[[command.sub]]
+name = "migrate:currentVersion"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--env", "--knexfile", "--knexpath"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "migrate:latest"
+candidate = true
+
+[[command.sub]]
+name = "migrate:up"
+candidate = true
+
+[[command.sub]]
+name = "migrate:down"
+candidate = true
+
+[[command.sub]]
+name = "migrate:rollback"
+candidate = true
+
+[[command.sub]]
+name = "migrate:unlock"
+candidate = true
+
+[[command.sub]]
+name = "seed:run"
+candidate = true
