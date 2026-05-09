@@ -1671,11 +1671,8 @@ use super::*;
         let mut failures = Vec::new();
         for (name, spec) in TOML_REGISTRY.iter() {
             match &spec.kind {
-                DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. } => {
-                    if policy.flag_style == FlagStyle::Positional {
-                        continue;
-                    }
-                }
+                DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. }
+                    if policy.flag_style == FlagStyle::Positional => continue,
                 DispatchKind::Custom { .. } => continue,
                 _ => {}
             }
@@ -1685,6 +1682,35 @@ use super::*;
             }
         }
         assert!(failures.is_empty(), "TOML commands accepted unknown flags:\n{}", failures.join("\n"));
+    }
+
+    /// Data-defined spec: every TOML can declare `examples_safe` and
+    /// `examples_denied` strings that exercise canonical and alias
+    /// invocations. This test runs each through `is_safe_command` and
+    /// flags any drift between the TOML and the runtime dispatcher.
+    /// Use to lock in alias correctness, security boundaries, and
+    /// representative agent invocations.
+    #[test]
+    fn toml_examples_match_dispatch() {
+        let mut failures = Vec::new();
+        for (name, spec) in TOML_REGISTRY.iter() {
+            // Skip alias entries — examples live on the canonical spec only.
+            if name != &spec.name {
+                continue;
+            }
+            for ex in &spec.examples_safe {
+                if !crate::is_safe_command(ex) {
+                    failures.push(format!("{}: examples_safe rejected: {ex:?}", spec.name));
+                }
+            }
+            for ex in &spec.examples_denied {
+                if crate::is_safe_command(ex) {
+                    failures.push(format!("{}: examples_denied accepted: {ex:?}", spec.name));
+                }
+            }
+        }
+        assert!(failures.is_empty(),
+            "TOML examples drift from dispatcher:\n{}", failures.join("\n"));
     }
 
     #[test]

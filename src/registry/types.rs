@@ -51,6 +51,14 @@ pub(super) struct TomlCommand {
     pub write_flags: Vec<String>,
     #[serde(default)]
     pub researched_version: Option<String>,
+    /// Sample invocations that double as test fixtures.
+    /// `examples_safe` must validate as Allowed; `examples_denied` must validate as Denied.
+    /// Use these to exercise aliases and canonical forms (e.g. `mise use` and `mise u`)
+    /// so drift between the TOML and runtime dispatch fails the test suite.
+    #[serde(default)]
+    pub examples_safe: Vec<String>,
+    #[serde(default)]
+    pub examples_denied: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -72,6 +80,8 @@ pub(super) struct TomlSub {
     pub name: String,
     #[serde(default)]
     pub candidate: Option<bool>,
+    #[serde(default)]
+    pub aliases: Vec<String>,
     #[serde(default)]
     pub level: Option<TomlLevel>,
     #[serde(default)]
@@ -143,6 +153,13 @@ pub struct CommandSpec {
     /// docs or used at runtime. Surfaces in tests and as a tripwire
     /// when researching newer versions of the same tool.
     pub researched_version: Option<String>,
+    /// Sample invocations that the registry test runs through `is_safe_command`.
+    /// Each `examples_safe` entry must produce `Verdict::Allowed`.
+    pub examples_safe: Vec<String>,
+    /// Sample invocations that must be denied. Use these to lock in security
+    /// boundaries (e.g. `srb tc --metrics-file=/etc/passwd` should always
+    /// be denied; recording it here catches regressions).
+    pub examples_denied: Vec<String>,
     pub(super) kind: DispatchKind,
 }
 
