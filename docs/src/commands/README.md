@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 773 commands across 53 categories.
+safe-chains knows 869 commands across 62 categories.
 
 ## Glossary
 
@@ -17,21 +17,27 @@ safe-chains knows 773 commands across 53 categories.
 
 Unlisted flags, subcommands, and commands are not allowed.
 
-- [AI Tools](ai.md) (8 commands)
+- [AI Tools](ai.md) (7 commands)
 - [Android](android.md) (10 commands)
-- [Ansible](ansible.md) (5 commands)
+- [Ansible](ansible.md) (7 commands)
+- [API / Load Testing](api.md) (12 commands)
+- [Compression / Archive](archive.md) (10 commands)
 - [Binary Analysis](binary.md) (9 commands)
+- [Build Systems](build.md) (5 commands)
 - [Shell Builtins](builtins.md) (22 commands)
 - [C / C++](c.md) (7 commands)
 - [Cloud Providers](cloud.md) (9 commands)
-- [Containers](containers.md) (23 commands)
+- [Containers](containers.md) (28 commands)
+- [Cryptography](crypto.md) (3 commands)
 - [Crystal](crystal.md) (3 commands)
 - [D](d.md) (1 commands)
 - [Dart / Flutter](dart.md) (2 commands)
 - [Data Processing](data.md) (25 commands)
 - [Database Clients](db.md) (7 commands)
 - [.NET](dotnet.md) (21 commands)
+- [Editors](editors.md) (3 commands)
 - [Elixir / Erlang](elixir.md) (2 commands)
+- [Embedded](embedded.md) (7 commands)
 - [Erlang](erlang.md) (1 commands)
 - [Code Forges](forges.md) (5 commands)
 - [Filesystem](fs.md) (24 commands)
@@ -47,13 +53,15 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Lua](lua.md) (2 commands)
 - [ImageMagick](magick.md) (1 commands)
 - [Media](media.md) (10 commands)
-- [Networking](net.md) (16 commands)
+- [ML / Observability](ml.md) (7 commands)
+- [Networking](net.md) (31 commands)
 - [Nim](nim.md) (2 commands)
 - [Node.js](node.md) (16 commands)
 - [OCaml](ocaml.md) (3 commands)
 - [Perl](perl.md) (4 commands)
 - [PHP](php.md) (7 commands)
 - [Package Managers](pm.md) (5 commands)
+- [Theorem Provers](proof.md) (8 commands)
 - [Python](python.md) (51 commands)
 - [R](r.md) (2 commands)
 - [Racket](racket.md) (1 commands)
@@ -66,8 +74,9 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [System](system.md) (62 commands)
 - [TeX / LaTeX](tex.md) (3 commands)
 - [Text Processing](text.md) (27 commands)
-- [Developer Tools](tools.md) (186 commands)
-- [Version Control](vcs.md) (5 commands)
+- [Developer Tools](tools.md) (192 commands)
+- [Version Control](vcs.md) (9 commands)
+- [WebAssembly](wasm.md) (10 commands)
 - [Shell Wrappers](wrappers.md) (7 commands)
 - [Xcode](xcode.md) (17 commands)
 

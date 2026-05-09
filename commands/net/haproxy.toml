@@ -1,0 +1,9 @@
+[[command]]
+name = "haproxy"
+description = "HAProxy load balancer. Bare invocation starts the server. -c checks config (read). -V verbose. -vv prints detailed version. -f loads a config file. Carve-out covers diagnostic forms — server-mode invocations are not part of the safe surface."
+url = "https://docs.haproxy.org/3.0/management.html"
+researched_version = "HAProxy 2.x"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "-V", "-c", "-d", "-h", "-q", "-v", "-vv"]
+valued = ["-D", "-N", "-W", "-f", "-n", "-p", "-st"]

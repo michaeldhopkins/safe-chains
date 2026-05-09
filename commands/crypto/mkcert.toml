@@ -1,0 +1,26 @@
+[[command]]
+name = "mkcert"
+description = "Local CA and certificate generator for development. -install creates and installs a local CA into the system trust store (one-time setup; system-state write). -uninstall removes it. Bare invocation with one or more domains writes a cert + key in the current directory (project-local SafeWrite). -CAROOT prints the CA path. -version prints the version."
+url = "https://github.com/FiloSottile/mkcert"
+researched_version = "mkcert 1.x"
+level = "SafeWrite"
+bare = true
+positional_style = true
+standalone = [
+    "--CAROOT", "--cert-file", "--csr",
+    "--ecdsa", "--help",
+    "--install", "--key-file",
+    "--p12-file", "--pkcs12",
+    "--uninstall", "--version",
+    "-CAROOT", "-cert-file", "-csr",
+    "-ecdsa", "-help",
+    "-install", "-key-file",
+    "-p12-file", "-pkcs12",
+    "-uninstall", "-version",
+]
+valued = [
+    "--cert-file", "--client",
+    "--csr", "--key-file", "--p12-file",
+    "-cert-file", "-client",
+    "-csr", "-key-file", "-p12-file",
+]

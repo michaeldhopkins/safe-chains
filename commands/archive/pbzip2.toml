@@ -1,0 +1,19 @@
+[[command]]
+name = "pbzip2"
+description = "Parallel bzip2 — multi-threaded bzip2-compatible compressor. Same flag shape as bzip2 plus -p# for thread count and -m# for memory."
+url = "https://launchpad.net/pbzip2"
+researched_version = "pbzip2 1.1.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--decompress", "--force", "--help",
+    "--keep", "--license", "--read",
+    "--silent", "--stdout", "--test",
+    "--verbose", "--version",
+    "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
+    "-V", "-c", "-d", "-f", "-h", "-k", "-l",
+    "-q", "-r", "-S", "-t", "-v", "-z",
+]
+valued = [
+    "-b", "-m", "-p",
+]

@@ -1,0 +1,35 @@
+[[command]]
+name = "iperf3"
+aliases = ["iperf"]
+description = "Network throughput tester. -c HOST runs as client (network). -s runs as server (network listener, long-running). Diagnostic --version / --help / -h."
+url = "https://iperf.fr/iperf-doc.php"
+researched_version = "iperf3 3.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--version",
+    "-1", "-D", "-J", "-R", "-V", "-Z",
+    "-d", "-h", "-k", "-n", "-r",
+    "-s", "-t", "-u", "-v",
+    "-w", "-x",
+]
+valued = [
+    "--bidir", "--cport", "--dscp",
+    "--bandwidth", "--bind", "--client",
+    "--congestion", "--connect-timeout",
+    "--debug", "--extra-data",
+    "--fec", "--file", "--flowlabel",
+    "--format", "--get-server-output",
+    "--idle-timeout", "--interval",
+    "--length", "--listen-port", "--logfile",
+    "--mss", "--no-delay", "--omit",
+    "--parallel", "--pidfile", "--port",
+    "--reverse", "--sctp", "--server",
+    "--server-only", "--set-mss",
+    "--time", "--title", "--tos", "--udp",
+    "--window", "--zerocopy",
+    "-A", "-B", "-C", "-F", "-K", "-L", "-M",
+    "-O", "-P", "-S", "-T", "-X",
+    "-b", "-c", "-f", "-i", "-l",
+    "-o", "-p",
+]

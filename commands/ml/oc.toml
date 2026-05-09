@@ -1,0 +1,243 @@
+[[command]]
+name = "oc"
+description = "OpenShift CLI (Red Hat). Mostly Kubernetes-compatible (mirrors kubectl), with OpenShift-specific extensions. Most subcommands contact a cluster (network); writes mutate cluster state. Carve-out covers diagnostic + read-only inspection."
+url = "https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/getting-started-cli.html"
+researched_version = "oc 4.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--client", "--help", "--output", "--short", "-h", "-o"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "whoami"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--show-context", "--show-server", "--show-token", "-c", "-h", "-t"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--all-namespaces", "--help", "--suggest", "--verbose", "-A", "-h", "-v"]
+valued = ["--namespace", "--output", "-n", "-o"]
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "describe"
+candidate = true
+
+[[command.sub]]
+name = "explain"
+candidate = true
+
+[[command.sub]]
+name = "get"
+candidate = true
+
+[[command.sub]]
+name = "logs"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "new-app"
+candidate = true
+
+[[command.sub]]
+name = "new-build"
+candidate = true
+
+[[command.sub]]
+name = "new-project"
+candidate = true
+
+[[command.sub]]
+name = "project"
+candidate = true
+
+[[command.sub]]
+name = "projects"
+candidate = true
+
+[[command.sub]]
+name = "rollout"
+candidate = true
+
+[[command.sub]]
+name = "scale"
+candidate = true
+
+[[command.sub]]
+name = "expose"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "apply"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "patch"
+candidate = true
+
+[[command.sub]]
+name = "set"
+candidate = true
+
+[[command.sub]]
+name = "import-image"
+candidate = true
+
+[[command.sub]]
+name = "policy"
+candidate = true
+
+[[command.sub]]
+name = "process"
+candidate = true
+
+[[command.sub]]
+name = "tag"
+candidate = true
+
+[[command.sub]]
+name = "rsh"
+candidate = true
+
+[[command.sub]]
+name = "rsync"
+candidate = true
+
+[[command.sub]]
+name = "port-forward"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true
+
+[[command.sub]]
+name = "image"
+candidate = true
+
+[[command.sub]]
+name = "registry"
+candidate = true
+
+[[command.sub]]
+name = "extract"
+candidate = true
+
+[[command.sub]]
+name = "adm"
+candidate = true
+
+[[command.sub]]
+name = "wait"
+candidate = true
+
+[[command.sub]]
+name = "annotate"
+candidate = true
+
+[[command.sub]]
+name = "label"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "secrets"
+candidate = true
+
+[[command.sub]]
+name = "events"
+candidate = true
+
+[[command.sub]]
+name = "diff"
+candidate = true
+
+[[command.sub]]
+name = "kustomize"
+candidate = true
+
+[[command.sub]]
+name = "plugin"
+candidate = true
+
+[[command.sub]]
+name = "options"
+candidate = true
+
+[[command.sub]]
+name = "api-resources"
+candidate = true
+
+[[command.sub]]
+name = "api-versions"
+candidate = true
+
+[[command.sub]]
+name = "cluster-info"
+candidate = true
+
+[[command.sub]]
+name = "top"
+candidate = true
+
+[[command.sub]]
+name = "cp"
+candidate = true
+
+[[command.sub]]
+name = "alpha"
+candidate = true
+
+[[command.sub]]
+name = "kube-controller-manager"
+candidate = true

@@ -1,0 +1,9 @@
+[[command]]
+name = "sshfs"
+description = "Mounts a remote SSH host as a local filesystem via FUSE. Bare invocation mounts the remote (system-state write — creates a FUSE mount). -h --help is read-only."
+url = "https://github.com/libfuse/sshfs"
+researched_version = "sshfs 3.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-V"]

@@ -1,0 +1,112 @@
+[[command]]
+name = "ctr"
+description = "containerd's low-level CLI. Most subcommands modify containerd's namespaces, images, containers, snapshots (system-state writes; network for image pulls). Carve-out covers --version / --help and the obvious read-only inspection forms only."
+url = "https://github.com/containerd/containerd/blob/main/docs/getting-started.md"
+researched_version = "containerd 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "namespaces"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--quiet", "-h", "-q"]
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "--quiet", "-h", "-q"]
+
+[[command.sub.sub]]
+name = "create"
+candidate = true
+
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub.sub]]
+name = "label"
+candidate = true
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "containers"
+candidate = true
+
+[[command.sub]]
+name = "content"
+candidate = true
+
+[[command.sub]]
+name = "events"
+candidate = true
+
+[[command.sub]]
+name = "image"
+candidate = true
+
+[[command.sub]]
+name = "images"
+candidate = true
+
+[[command.sub]]
+name = "leases"
+candidate = true
+
+[[command.sub]]
+name = "plugins"
+candidate = true
+
+[[command.sub]]
+name = "pprof"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "snapshots"
+candidate = true
+
+[[command.sub]]
+name = "tasks"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "oci"
+candidate = true
+
+[[command.sub]]
+name = "shim"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "sandbox"
+candidate = true
+
+[[command.sub]]
+name = "sandboxes"
+candidate = true

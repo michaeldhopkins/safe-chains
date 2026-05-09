@@ -1,0 +1,154 @@
+[[command]]
+name = "lake"
+description = "Lean 4 package manager / build tool (in-tree with Lean). Many subcommands. Read-side: `--version`, `--help`, `print-paths`, `lean-runtime`, `env`, `serve`, `test --help`, `query`, `manifest`. Write-side: `build`, `clean`, `update`, `init`, `new`, `pack`, `unpack`, `uplift`, `setup-file`, `script`, `exe`, `add`, `lint`, `test` (executes), `check-build`, `check-test`."
+url = "https://lean-lang.org/lean4/doc/quickstart.html"
+researched_version = "Lean 4.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "print-paths"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "manifest"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--manifest"]
+
+[[command.sub]]
+name = "query"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "lean-runtime"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true
+
+[[command.sub]]
+name = "pack"
+candidate = true
+
+[[command.sub]]
+name = "unpack"
+candidate = true
+
+[[command.sub]]
+name = "uplift"
+candidate = true
+
+[[command.sub]]
+name = "setup-file"
+candidate = true
+
+[[command.sub]]
+name = "script"
+candidate = true
+
+[[command.sub]]
+name = "scripts"
+candidate = true
+
+[[command.sub]]
+name = "exe"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "lint"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "check-build"
+candidate = true
+
+[[command.sub]]
+name = "check-test"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "translate-config"
+candidate = true
+
+[[command.sub]]
+name = "lean"
+candidate = true
+
+[[command.sub]]
+name = "self-check"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "resolve"
+candidate = true
+
+[[command.sub]]
+name = "post-update"
+candidate = true
+
+[[command.sub]]
+name = "gather"
+candidate = true

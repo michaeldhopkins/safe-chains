@@ -1,0 +1,15 @@
+[[command]]
+name = "wasm-objdump"
+description = "WABT — disassembles / inspects a WebAssembly binary. Reads the .wasm file and prints headers / details / disassembly to stdout. Pure read."
+url = "https://github.com/WebAssembly/wabt"
+researched_version = "WABT 1.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--debug", "--details", "--disassemble",
+    "--enable-all", "--full-contents",
+    "--headers", "--help", "--raw",
+    "-D", "-d", "-h", "-j", "-s", "-x",
+]
+valued = ["--section"]

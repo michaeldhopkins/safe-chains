@@ -1,0 +1,9 @@
+[[command]]
+name = "agda"
+description = "Agda — dependently-typed programming language and proof assistant. Bare invocation type-checks / compiles the given .agda file, executing tactics and macros (arbitrary code). Carve-out: --version / --help only."
+url = "https://agda.readthedocs.io/en/latest/tools/command-line-options.html"
+researched_version = "Agda 2.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-?", "-V", "-h"]

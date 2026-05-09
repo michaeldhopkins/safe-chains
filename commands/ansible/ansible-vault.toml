@@ -1,0 +1,53 @@
+[[command]]
+name = "ansible-vault"
+description = "Manages encrypted Ansible vault files. Subcommands: `view` / `decrypt` (read encrypted content), `encrypt` / `encrypt_string` / `rekey` (write — re-encrypt or replace files), `edit` (interactive — opens $EDITOR), `create` (interactive new). Each invocation reads or writes the local vault file with the configured password source."
+url = "https://docs.ansible.com/ansible/latest/cli/ansible-vault.html"
+researched_version = "Ansible 9.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "view"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "-h", "--vault-password-file"]
+valued = ["--vault-id", "--vault-password-file", "--ask-vault-pass-file"]
+
+[[command.sub]]
+name = "decrypt"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "-h"]
+valued = ["--output", "--vault-id", "--vault-password-file"]
+
+[[command.sub]]
+name = "encrypt"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--ask-vault-pass", "--ask-vault-password", "--encrypt-vault-id", "--help", "-h"]
+valued = ["--encrypt-vault-id", "--output", "--vault-id", "--vault-password-file"]
+
+[[command.sub]]
+name = "encrypt_string"
+level = "SafeRead"
+bare = false
+standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "--show-input", "--stdin-name", "-h", "-n"]
+valued = ["--encrypt-vault-id", "--name", "--stdin-name", "--vault-id", "--vault-password-file"]
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "rekey"
+candidate = true
+
+[[command.sub]]
+name = "help"
+allow_all = true

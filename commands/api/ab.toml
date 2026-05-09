@@ -1,0 +1,18 @@
+[[command]]
+name = "ab"
+description = "Apache Bench — HTTP load benchmarking. Bare invocation makes many HTTP requests to the configured URL (network — and the load can affect external systems). The diagnostic -h / -V are read-only."
+url = "https://httpd.apache.org/docs/current/programs/ab.html"
+researched_version = "ab 2.x"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "-?", "-S", "-V",
+    "-d", "-e", "-h", "-i", "-k", "-q",
+    "-r", "-v", "-w",
+]
+valued = [
+    "-A", "-B", "-C", "-E", "-H",
+    "-P", "-T", "-X", "-Z", "-b",
+    "-c", "-f", "-g", "-l", "-m",
+    "-n", "-p", "-s", "-t", "-u", "-z",
+]

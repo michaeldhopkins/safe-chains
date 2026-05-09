@@ -377,6 +377,16 @@ Aliases: `difftastic`
 - Allowed valued flags: --only, --output, --sort, --style, --theme, --width
 - Bare invocation allowed
 
+### `editorconfig-checker`
+<p class="cmd-url"><a href="https://github.com/editorconfig-checker/editorconfig-checker">https://github.com/editorconfig-checker/editorconfig-checker</a></p>
+
+Aliases: `ec`
+
+- Allowed standalone flags: --debug, --disable-end-of-line, --disable-indent-size, --disable-indentation, --disable-insert-final-newline, --disable-max-line-length, --disable-trim-trailing-whitespace, --dry-run, --exclude, --format, --help, --ignore-defaults, --init, --list, --no-color, --quiet, --show-version, --verbose, --version, -config, -debug, -disable-end-of-line, -disable-indent-size, -disable-indentation, -disable-insert-final-newline, -disable-max-line-length, -disable-trim-trailing-whitespace, -dry-run, -exclude, -format, -h, -help, -ignore-defaults, -init, -list, -no-color, -quiet, -v, -verbose, -version
+- Allowed valued flags: --config, --exclude, --format, -config, -exclude, -format
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `eleventy`
 <p class="cmd-url"><a href="https://www.11ty.dev/docs/usage/">https://www.11ty.dev/docs/usage/</a></p>
 
@@ -395,6 +405,13 @@ Aliases: `@11ty/eleventy`
 <p class="cmd-url"><a href="https://eradman.com/entrproject/">https://eradman.com/entrproject/</a></p>
 
 - Allowed standalone flags: --help, --version, -h
+
+### `envsubst`
+<p class="cmd-url"><a href="https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html">https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html</a></p>
+
+- Allowed standalone flags: --help, --variables, --version, -V, -h, -v
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
 
 ### `erb_lint`
 <p class="cmd-url"><a href="https://github.com/Shopify/erb_lint">https://github.com/Shopify/erb_lint</a></p>
@@ -634,6 +651,14 @@ Aliases: `g++`, `cc`, `c++`
 <p class="cmd-url"><a href="https://kellyjonbrazil.github.io/jc/">https://kellyjonbrazil.github.io/jc/</a></p>
 
 - Allowed standalone flags: --about, --bash-comp, --force-color, --help, --meta-out, --monochrome, --pretty, --quiet, --raw, --unbuffer, --version, --yaml-out, --zsh-comp, -C, -M, -a, -h, -m, -p, -q, -r, -u, -y
+- Hyphen-prefixed positional arguments accepted
+
+### `jsonlint`
+<p class="cmd-url"><a href="https://github.com/zaach/jsonlint">https://github.com/zaach/jsonlint</a></p>
+
+- Allowed standalone flags: --compact, --help, --in-place, --insert-final-newline, --prettify, --quiet, --sort-keys, --version, -V, -c, -h, -i, -p, -q, -s, -v
+- Allowed valued flags: --indent, --mode, -m, -t
+- Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
 ### `just`
@@ -894,6 +919,13 @@ Aliases: `run-p`, `run-s`
 - Allowed pre-flag: -d <directive>=<value> where <directive> is one of date.timezone, display_errors, error_reporting, max_execution_time, max_input_time, max_input_vars, memory_limit, opcache.enable, opcache.enable_cli, post_max_size, upload_max_filesize
 - Subcommands: artisan, please — matched by exact name or by the basename of an absolute or relative path (e.g. `php /Users/me/project/please stache:clear`)
 
+### `pkg-config`
+<p class="cmd-url"><a href="https://www.freedesktop.org/wiki/Software/pkg-config/">https://www.freedesktop.org/wiki/Software/pkg-config/</a></p>
+
+- Allowed standalone flags: --atleast-pkgconfig-version, --atleast-version, --cflags, --cflags-only-I, --cflags-only-other, --debug, --define-prefix, --define-variable, --digit-cflags, --dont-define-prefix, --errors-to-stdout, --exact-version, --exists, --help, --keep-system-cflags, --keep-system-libs, --libs, --libs-only-L, --libs-only-l, --libs-only-other, --list-all, --list-package-names, --max-version, --maximum-traverse-depth, --modversion, --msvc-syntax, --newlines, --no-cache, --no-uninstalled, --print-errors, --print-provides, --print-requires, --print-requires-private, --print-variables, --short-errors, --silence-errors, --static, --uninstalled, --usage, --validate, --variable, --version, -?
+- Allowed valued flags: --atleast-version, --define-variable, --exact-version, --max-version, --maximum-traverse-depth, --prefix-variable, --variable
+- Hyphen-prefixed positional arguments accepted
+
 ### `pm2`
 <p class="cmd-url"><a href="https://pm2.keymetrics.io/">https://pm2.keymetrics.io/</a></p>
 
@@ -1110,6 +1142,13 @@ Aliases: `python`
 
 - Allowed standalone flags: --color, --external-sources, --help, --list-optional, --norc, --severity, --version, --wiki-link-count, -C, -V, -a, -h, -x
 - Allowed valued flags: --enable, --exclude, --format, --include, --rcfile, --severity, --shell, --source-path, --wiki-link-count, -P, -S, -W, -e, -f, -i, -o, -s
+
+### `shfmt`
+<p class="cmd-url"><a href="https://github.com/mvdan/sh">https://github.com/mvdan/sh</a></p>
+
+- Allowed standalone flags: --help, -V, -bn, -ci, -d, -fn, -h, -i, -kp, -l, -ln, -mn, -p, -s, -sr, -tojson, -version, -w
+- Allowed valued flags: --apply-ignore, --check, --filename, --from-json, --lang, --list, --write, -filename, -from-json, -i, -lang, -ln
+- Bare invocation allowed
 
 ### `size-limit`
 <p class="cmd-url"><a href="https://github.com/ai/size-limit">https://github.com/ai/size-limit</a></p>
@@ -1390,6 +1429,14 @@ Aliases: `python`
 <p class="cmd-url"><a href="https://github.com/BurntSushi/xsv">https://github.com/BurntSushi/xsv</a></p>
 
 - Allowed standalone flags: --help, --version, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `yamllint`
+<p class="cmd-url"><a href="https://yamllint.readthedocs.io/">https://yamllint.readthedocs.io/</a></p>
+
+- Allowed standalone flags: --help, --list-files, --no-warnings, --strict, --version, -h, -s, -v
+- Allowed valued flags: --config-data, --config-file, --format, -c, -d, -f
+- Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
 ### `yard`

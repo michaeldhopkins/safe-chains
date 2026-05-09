@@ -1,0 +1,134 @@
+[[command]]
+name = "pants"
+description = "Pants — polyglot build system. Many goals. Read-side: `list`, `peek`, `dependencies`, `dependees`, `paths`, `roots`, `filter`, `count-loc`, `version`, `help`, `help-advanced`, `help-all`, `lint --help`. Write-side: `package`, `run`, `test`, `lint --fix`, `fmt`, `fmt --check`, `check`, `tailor`, `update-build-files`, `generate-lockfiles`, `export`, `export-codegen`, `export-deps`, `repl`, `experimental-py-constraints`, `publish`."
+url = "https://www.pantsbuild.org/docs/concepts/goals"
+researched_version = "Pants 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "help-advanced"
+allow_all = true
+
+[[command.sub]]
+name = "help-all"
+allow_all = true
+
+[[command.sub]]
+name = "list"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "peek"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "dependencies"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "dependees"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "paths"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "roots"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "filter"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "count-loc"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "validate"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "fmt"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "lint"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "check"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "package"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "tailor"
+candidate = true
+
+[[command.sub]]
+name = "update-build-files"
+candidate = true
+
+[[command.sub]]
+name = "generate-lockfiles"
+candidate = true
+
+[[command.sub]]
+name = "generate-snapshots"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "export-codegen"
+candidate = true
+
+[[command.sub]]
+name = "export-deps"
+candidate = true
+
+[[command.sub]]
+name = "repl"
+candidate = true
+
+[[command.sub]]
+name = "experimental-explorer"
+candidate = true

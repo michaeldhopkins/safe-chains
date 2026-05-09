@@ -1,0 +1,23 @@
+[[command]]
+name = "hadolint"
+description = "Dockerfile linter. Reads Dockerfile(s) and reports issues. --no-fail / --error-rules / --ignore / --trusted-registry control reporting. Static — does not invoke Docker. Active project."
+url = "https://github.com/hadolint/hadolint"
+researched_version = "hadolint 2.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--config", "--disable-ignore-pragma",
+    "--failure-threshold", "--format",
+    "--help", "--ignore", "--no-color",
+    "--no-fail", "--require-label",
+    "--strict-labels", "--trusted-registry",
+    "--verbose", "--version",
+    "-V", "-c", "-h", "-t", "-v",
+]
+valued = [
+    "--config", "--failure-threshold", "--format",
+    "--ignore", "--require-label",
+    "--trusted-registry",
+    "-c", "-f", "-t",
+]

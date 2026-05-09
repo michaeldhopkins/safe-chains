@@ -1,0 +1,46 @@
+[[command]]
+name = "zstd"
+aliases = ["unzstd", "zstdcat", "zstdmt"]
+description = "Zstandard compressor. Bare invocation reads files and writes <name>.zst (or to -o PATH). -d / --decompress is the reverse. -t / --test verifies an archive (read). -l / --list prints metadata (read). -k / --keep retains the source. The aliases unzstd / zstdcat / zstdmt switch default behaviour (decompress / cat / multithread)."
+url = "https://github.com/facebook/zstd"
+researched_version = "zstd 1.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--adapt", "--check", "--compress",
+    "--content-size", "--decompress",
+    "--exclude-compressed", "--fast",
+    "--filelist", "--force", "--format",
+    "--from-stdin", "--help",
+    "--keep", "--list", "--long",
+    "--max", "--memory",
+    "--no-check", "--no-content-size",
+    "--no-dictID", "--no-progress",
+    "--no-row-match-finder",
+    "--no-sparse",
+    "--num-threads", "--patch-from",
+    "--progress", "--quiet",
+    "--rm", "--row-match-finder",
+    "--rsyncable", "--sparse", "--stdout",
+    "--summary", "--test",
+    "--threads", "--train", "--train-cover",
+    "--train-fastcover",
+    "--ultra", "--verbose", "--version",
+    "--with-progress",
+    "-1", "-2", "-3", "-4", "-5", "-6", "-7",
+    "-8", "-9", "-D", "-K", "-M", "-T",
+    "-V", "-c", "-d", "-f", "-h", "-k",
+    "-l", "-q", "-r", "-t", "-v", "-z",
+]
+valued = [
+    "--adapt", "--block-size", "--dictionary",
+    "--exclude", "--filelist",
+    "--format", "--long", "--maxdict",
+    "--maxmem", "--memory",
+    "--num-threads", "--output",
+    "--output-dir-flat", "--output-dir-mirror",
+    "--patch-from", "--threads",
+    "--train", "--train-cover", "--train-fastcover",
+    "--write-data-blocks",
+    "-D", "-T", "-o",
+]

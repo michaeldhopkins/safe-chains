@@ -1,0 +1,30 @@
+[[command]]
+name = "pigz"
+aliases = ["unpigz"]
+description = "Parallel gzip — multi-threaded gzip-compatible compressor. Bare invocation reads files and writes <name>.gz (or stdout with -c). -d/--decompress reverses. -t/--test verifies (read). -l/--list prints metadata (read)."
+url = "https://zlib.net/pigz/"
+researched_version = "pigz 2.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--ascii", "--best", "--blocksize",
+    "--compress", "--decompress", "--fast",
+    "--force", "--help", "--independent",
+    "--iterations", "--keep", "--license",
+    "--list", "--maxsplits", "--name",
+    "--no-name", "--no-time", "--objsize",
+    "--processes", "--quiet", "--recursive",
+    "--rsyncable", "--stdout",
+    "--suffix", "--symlinks", "--synchronous",
+    "--test", "--time", "--verbose",
+    "--version",
+    "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
+    "-K", "-L", "-N", "-T", "-V",
+    "-c", "-d", "-f", "-h", "-i", "-k", "-l", "-n",
+    "-p", "-q", "-r", "-t", "-v", "-z", "-y",
+]
+valued = [
+    "--blocksize", "--iterations",
+    "--maxsplits", "--objsize", "--processes",
+    "--suffix", "-S", "-b", "-p",
+]

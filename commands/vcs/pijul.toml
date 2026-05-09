@@ -1,0 +1,189 @@
+[[command]]
+name = "pijul"
+description = "Pijul — modern distributed version control. Read-side: `log`, `status`, `diff`, `change`, `version`, `archive`, `key list`, `channel list`, `credit`. Write-side: `record`, `apply`, `unrecord`, `reset`, `revert`, `add`, `remove`, `mv`, `init`, `clone`, `pull`, `push`, `fork`, `tag`, `archive --to`, `protocol`, `key generate`, `channel new/delete/rename`, `credentials`, `identity`."
+url = "https://pijul.org/manual/"
+researched_version = "pijul 1.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "log"
+level = "SafeRead"
+bare = true
+standalone = ["--description", "--filter", "--full-hashes", "--hash-only", "--help", "--limit", "--no-cache", "--state", "-h"]
+valued = ["--channel", "--description", "--filter", "--limit", "--repository"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--full-hashes", "--help", "--no-mtime", "--short", "-h"]
+valued = ["--channel", "--repository"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--full-hashes", "--help", "--inodes", "--json", "--no-color", "--short", "--untracked", "-h", "-s"]
+valued = ["--channel", "--repository"]
+
+[[command.sub]]
+name = "change"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--full-hashes", "--help", "--inverse", "--json", "-h"]
+valued = ["--channel", "--repository"]
+
+[[command.sub]]
+name = "credit"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--unrecorded", "-h"]
+valued = ["--channel", "--repository"]
+
+[[command.sub]]
+name = "channel"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--repository"]
+
+[[command.sub.sub]]
+name = "switch"
+candidate = true
+
+[[command.sub.sub]]
+name = "new"
+candidate = true
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub.sub]]
+name = "rename"
+candidate = true
+
+[[command.sub]]
+name = "key"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "generate"
+candidate = true
+
+[[command.sub.sub]]
+name = "set-channel"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "clone"
+candidate = true
+
+[[command.sub]]
+name = "fork"
+candidate = true
+
+[[command.sub]]
+name = "record"
+candidate = true
+
+[[command.sub]]
+name = "apply"
+candidate = true
+
+[[command.sub]]
+name = "unrecord"
+candidate = true
+
+[[command.sub]]
+name = "reset"
+candidate = true
+
+[[command.sub]]
+name = "revert"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "mv"
+candidate = true
+
+[[command.sub]]
+name = "ls"
+candidate = true
+
+[[command.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "tag"
+candidate = true
+
+[[command.sub]]
+name = "archive"
+candidate = true
+
+[[command.sub]]
+name = "protocol"
+candidate = true
+
+[[command.sub]]
+name = "credentials"
+candidate = true
+
+[[command.sub]]
+name = "identity"
+candidate = true
+
+[[command.sub]]
+name = "remote"
+candidate = true
+
+[[command.sub]]
+name = "git"
+candidate = true

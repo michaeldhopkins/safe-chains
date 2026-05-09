@@ -37,3 +37,23 @@
 - Requires --list-hosts, --list-tasks, --list-tags, --syntax-check. - Allowed standalone flags: --help, --list-hosts, --list-tags, --list-tasks, --syntax-check, --version, -h
 - Allowed valued flags: --connection, --extra-vars, --inventory, --limit, --tags, --skip-tags, -C, -c, -e, -i, -l, -t
 
+### `ansible-vault`
+<p class="cmd-url"><a href="https://docs.ansible.com/ansible/latest/cli/ansible-vault.html">https://docs.ansible.com/ansible/latest/cli/ansible-vault.html</a></p>
+
+- **decrypt**: Flags: --ask-vault-pass, --ask-vault-password, --help, -h. Valued: --output, --vault-id, --vault-password-file. Positional args accepted
+- **encrypt**: Flags: --ask-vault-pass, --ask-vault-password, --encrypt-vault-id, --help, -h. Valued: --encrypt-vault-id, --output, --vault-id, --vault-password-file. Positional args accepted
+- **encrypt_string**: Flags: --ask-vault-pass, --ask-vault-password, --help, --show-input, --stdin-name, -h, -n. Valued: --encrypt-vault-id, --name, --stdin-name, --vault-id, --vault-password-file
+- **help**: Positional args accepted
+- **view**: Flags: --ask-vault-pass, --ask-vault-password, --help, -h, --vault-password-file. Valued: --vault-id, --vault-password-file, --ask-vault-pass-file. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `molecule`
+<p class="cmd-url"><a href="https://ansible.readthedocs.io/projects/molecule/usage/">https://ansible.readthedocs.io/projects/molecule/usage/</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **drivers**: Flags: --help, -h. Valued: --format
+- **help**: Positional args accepted
+- **list**: Flags: --help, -h. Valued: --format, --scenario-name, -s
+- **matrix**: Flags: --help, -h. Valued: --scenario-name, -s. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -V
+

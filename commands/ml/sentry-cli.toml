@@ -1,0 +1,127 @@
+[[command]]
+name = "sentry-cli"
+description = "Sentry CLI — manages releases, source maps, and crash artifacts. Most subcommands contact a Sentry server (network). Read-side: `info`, `login`, `releases list`, `releases info`, `releases files <release> list`, `organizations list`, `projects list`, `monitors list`, `events list`. Write-side: `releases new/finalize/delete/set-commits/files <release> upload/delete`, `sourcemaps upload/inject/explain`, `debug-files upload/check/find`, `send-event`, `send-envelope`, `mcp-server`, `monitors run/event/status`, `update`."
+url = "https://docs.sentry.io/cli/"
+researched_version = "sentry-cli 2.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = true
+standalone = ["--config-status-json", "--help", "-h"]
+
+[[command.sub]]
+name = "completions"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "releases"
+candidate = true
+
+[[command.sub]]
+name = "issues"
+candidate = true
+
+[[command.sub]]
+name = "events"
+candidate = true
+
+[[command.sub]]
+name = "files"
+candidate = true
+
+[[command.sub]]
+name = "deploys"
+candidate = true
+
+[[command.sub]]
+name = "send-event"
+candidate = true
+
+[[command.sub]]
+name = "send-envelope"
+candidate = true
+
+[[command.sub]]
+name = "send-metric"
+candidate = true
+
+[[command.sub]]
+name = "sourcemaps"
+candidate = true
+
+[[command.sub]]
+name = "upload-dif"
+candidate = true
+
+[[command.sub]]
+name = "upload-proguard"
+candidate = true
+
+[[command.sub]]
+name = "debug-files"
+candidate = true
+
+[[command.sub]]
+name = "react-native"
+candidate = true
+
+[[command.sub]]
+name = "monitors"
+candidate = true
+
+[[command.sub]]
+name = "monitors-run"
+candidate = true
+
+[[command.sub]]
+name = "organizations"
+candidate = true
+
+[[command.sub]]
+name = "projects"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "kvstore"
+candidate = true
+
+[[command.sub]]
+name = "mcp-server"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "send"
+candidate = true
+
+[[command.sub]]
+name = "bash-hook"
+candidate = true

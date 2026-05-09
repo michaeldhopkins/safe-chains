@@ -1,0 +1,28 @@
+[[command]]
+name = "siege"
+description = "HTTP regression and load tester. Bare invocation makes many HTTP requests to the configured URL (network + load). Configuration via .siegerc or flags."
+url = "https://www.joedog.org/siege-manual/"
+researched_version = "siege 4.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--benchmark", "--config",
+    "--get", "--help", "--internet",
+    "--mark", "--no-follow",
+    "--no-parser", "--quiet",
+    "--reps", "--time", "--user-agent",
+    "--verbose", "--version",
+    "-?", "-A", "-C", "-H", "-L",
+    "-R", "-V", "-b", "-c", "-d", "-f",
+    "-g", "-h", "-i", "-l", "-m",
+    "-q", "-r", "-t", "-u", "-v",
+]
+valued = [
+    "--config", "--delay", "--file",
+    "--header", "--log", "--mark",
+    "--reps", "--rc", "--time",
+    "--user-agent",
+    "-A", "-H", "-d", "-f",
+    "-l", "-m", "-r", "-t",
+]

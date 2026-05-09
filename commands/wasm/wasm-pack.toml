@@ -1,0 +1,34 @@
+[[command]]
+name = "wasm-pack"
+description = "Builds, tests, and publishes Rust crates as WebAssembly. `build` compiles the crate via cargo + wasm-bindgen and writes pkg/ output (project-local SafeWrite + executes build.rs / proc-macros). `test` builds and runs tests in headless browsers (executes user code). `pack`, `publish` write or upload artifacts. `login` saves npm auth state. The carve-out covers diagnostic forms only — meaningful invocations execute Rust at build time."
+url = "https://rustwasm.github.io/wasm-pack/book/commands.html"
+researched_version = "wasm-pack 0.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "pack"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true

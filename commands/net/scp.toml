@@ -1,0 +1,19 @@
+[[command]]
+name = "scp"
+description = "Secure copy — copies files between local and remote hosts using SSH. Network operation. Each invocation copies the source(s) (last arg is destination). The destination can be local or `user@host:path`. -r recursively copies directories. -3 routes through the local host."
+url = "https://man.openbsd.org/scp"
+researched_version = "OpenSSH 9.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--help", "-3", "-4", "-6",
+    "-A", "-B", "-C", "-D",
+    "-O", "-P", "-R", "-T", "-d",
+    "-h", "-p", "-q", "-r",
+    "-v", "-x",
+]
+valued = [
+    "-D", "-F", "-J", "-P", "-S", "-c",
+    "-i", "-l", "-o", "-s",
+]

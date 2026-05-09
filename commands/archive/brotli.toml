@@ -1,0 +1,22 @@
+[[command]]
+name = "brotli"
+description = "Brotli compressor. Bare invocation reads files and writes <name>.br (or to stdout with -c). -d/--decompress reverses. -t/--test verifies (read). -k/--keep retains source. -q sets quality."
+url = "https://github.com/google/brotli"
+researched_version = "brotli 1.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--best", "--compress", "--decompress",
+    "--fast", "--force", "--gapless",
+    "--help", "--keep", "--no-copy-stat",
+    "--quality", "--quiet", "--stdout",
+    "--suffix", "--test", "--verbose",
+    "--version", "--window",
+    "-Z", "-c", "-d", "-f", "-h", "-j", "-k",
+    "-n", "-q", "-t", "-v", "-w", "-z",
+]
+valued = [
+    "--input", "--output", "--quality",
+    "--repeat", "--suffix", "--window",
+    "-S", "-i", "-o", "-q", "-w",
+]

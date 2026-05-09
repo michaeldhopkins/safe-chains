@@ -1,0 +1,76 @@
+[[command]]
+name = "wasmtime"
+description = "Wasmtime — runtime for WebAssembly modules / components. Subcommands: `run`, `serve`, `compile`, `explore`, `objdump`, `wast`, `settings`, `config`. `run` and `serve` execute the wasm module — runs arbitrary code (wasm sandboxed, but still user-supplied). `compile` AOT-compiles a .wasm to a `.cwasm` file (project-local SafeWrite). `explore`, `objdump`, `wast`, `settings list` are read-only inspection. `config new/get/set` modifies wasmtime's user config."
+url = "https://docs.wasmtime.dev/cli.html"
+researched_version = "Wasmtime 25.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "compile"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--allow-precompiled", "--debug-info", "--help", "-D", "-W", "-h"]
+valued = ["--cache", "--codegen", "--config", "--module", "--module-name", "--optimize", "--output", "--target", "--profile", "--wasm", "-O", "-T", "-o"]
+
+[[command.sub]]
+name = "explore"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "objdump"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--debug", "--help", "-D", "-d", "-h"]
+
+[[command.sub]]
+name = "wast"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--debug", "--help", "-D", "-W", "-h"]
+valued = ["--config", "--cranelift", "--profile", "--wasm"]
+
+[[command.sub]]
+name = "settings"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "new"
+standalone = ["--force", "--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true

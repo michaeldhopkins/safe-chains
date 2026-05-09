@@ -1,0 +1,9 @@
+[[command]]
+name = "envoy"
+description = "Envoy proxy. Bare invocation starts the proxy (long-running, listens). --version prints version. --help, -? show help. --hot-restart-version helps coordinate hot restarts. Carve-out covers diagnostic forms only."
+url = "https://www.envoyproxy.io/docs/envoy/latest/operations/cli"
+researched_version = "Envoy 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "--hot-restart-version", "-h", "-?"]

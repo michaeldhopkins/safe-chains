@@ -1,5 +1,26 @@
 # Version Control
 
+### `fossil`
+<p class="cmd-url"><a href="https://fossil-scm.org/home/help">https://fossil-scm.org/home/help</a></p>
+
+- **branch current**: Flags: --help, -h
+- **branch info**: Flags: --help, --repository, -R, -h. Valued: --repository, -R
+- **branch list**: Flags: --all, --closed, --help, --repository, --verbose, -a, -c, -h, -r, -v. Valued: --repository, -R
+- **cat**: Flags: --help, --repository, -R, -h, -r. Valued: --repository, -R, -r. Positional args accepted
+- **diff**: Flags: --brief, --checkin, --context, --diff-binary, --exclude, --from, --help, --ignore-all-space, --ignore-blank-lines, --ignore-case, --ignore-eol-ws, --ignore-space-at-eol, --ignore-trailing-cr, --include, --internal, --invert, --no-dir-prefix, --numstat, --quiet, --repository, --show-summary, --side-by-side, --strip-trailing-cr, --strip-trailing-lf, --strip-trailing-spaces, --strip-trailing-whitespace, --tk, --to, --unified, --verbose, --versions, --web, -N, -R, -W, -Z, -b, -c, -h, -i, -q, -r, -u, -v, -w, -y, -z. Valued: --against, --diff-binary, --exec-abs-paths, --exec-rel-paths, --from, --internal, --repository, --strip-trailing-spaces, --strip-trailing-whitespace, --to, --unified, -N, -R, -W, -c, -r, -y. Positional args accepted
+- **extras**: Flags: --abs-paths, --case-sensitive, --dotfiles, --header, --help, --ignore, --repository, --rel-paths, -R, -h. Valued: --ignore, --repository, -R
+- **finfo**: Flags: --help, --limit, --no-graph, --offset, --print, --repository, --show-id, --showid, --status, --type, --width, -R, -h, -l, -p, -w. Valued: --branch, --limit, --repository, --type, --width, -R, -l, -w. Positional args accepted
+- **help**: Positional args accepted
+- **info**: Flags: --comment-format, --help, --repository, --verbose, -R, -h, -v. Valued: --repository, -R. Positional args accepted
+- **ls**: Flags: --age, --help, --repository, --type, --verbose, -R, -h, -l, -r, -v. Valued: --repository, --type, -R, -r. Positional args accepted
+- **status**: Flags: --all, --changed, --differ, --dotfiles, --header, --help, --ifchanged, --limit, --repository, --verbose, -R, -a, -c, -d, -h, -v. Valued: --repository, -R
+- **tag find**: Flags: --help, -h. Valued: --repository, --type, -R
+- **tag list**: Flags: --all, --inverse, --help, --raw, --repository, -R, -a, -h, -i. Valued: --limit, --prefix, --repository, -R
+- **timeline**: Flags: --brief, --full, --help, --limit, --no-graph, --repository, --showfiles, --verbose, -W, -R, -b, -h, -l, -n, -v, -w. Valued: --after, --before, --children, --limit, --repository, --type, --width, -R, -W, -c, -l, -n, -t, -w. Positional args accepted
+- **version**: Flags: --help, --verbose, -h, -v
+- **whatis**: Flags: --help, --repository, --type, --verbose, -R, -h, -v. Valued: --repository, --type, -R. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `git`
 <p class="cmd-url"><a href="https://git-scm.com/docs">https://git-scm.com/docs</a></p>
 
@@ -71,6 +92,35 @@
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
 
+### `hg`
+<p class="cmd-url"><a href="https://www.mercurial-scm.org/doc/hg.1.html">https://www.mercurial-scm.org/doc/hg.1.html</a></p>
+
+- **annotate**: Flags: --changeset, --date, --file, --follow, --help, --ignore-all-space, --ignore-blank-lines, --ignore-space-change, --ignore-space-at-eol, --line-number, --no-binary, --no-follow, --number, --quiet, --text, --user, --verbose, -B, -Z, -a, -b, -c, -d, -f, -h, -l, -n, -q, -u, -v, -w. Valued: --exclude, --include, --rev, --skip, -I, -X, -r. Positional args accepted
+- **bookmarks**: Flags: --active, --all, --delete, --force, --help, --inactive, --rename, -B, -d, -f, -h, -i, -l, -m. Valued: --rev, -r. Positional args accepted
+- **branch**: Flags: --clean, --force, --help, -C, -f, -h. Positional args accepted
+- **branches**: Flags: --active, --closed, --help, -a, -c, -h. Valued: --rev, --style, --template, -T, -r
+- **cat**: Flags: --decode, --help, -h. Valued: --exclude, --include, --output, --rev, --template, -I, -T, -X, -o, -r. Positional args accepted
+- **config**: Flags: --debug, --edit, --global, --help, --local, --non-shared, --quiet, --user, -e, -h, -q. Valued: --source, -T, --template. Positional args accepted
+- **diff**: Flags: --change, --git, --ignore-all-space, --ignore-blank-lines, --ignore-space-change, --ignore-space-at-eol, --ignore-changes, --mar, --no-binary, --no-dates, --noprefix, --nodates, --patch, --reverse, --show-function, --stat, --text, --unified, --word-diff, -B, -Z, -a, -b, -c, -g, -h, -p, -r, -w. Valued: --change, --exclude, --include, --rev, --root, --unified, -I, -U, -X, -c, -r. Positional args accepted
+- **files**: Flags: --help, --print0, --quiet, --verbose, -0, -h, -q, -v. Valued: --exclude, --include, --rev, -I, -T, -X, -r. Positional args accepted
+- **grep**: Flags: --all, --all-files, --diff, --files-with-matches, --ignore-case, --help, --line-number, --print0, --rev, -0, -a, -d, -h, -i, -l, -n, -r. Valued: --exclude, --include, --rev, --user, -I, -X, -r, -u. Positional args accepted
+- **heads**: Flags: --active, --closed, --help, -a, -c, -h. Valued: --rev, --style, --template, -T, -r. Positional args accepted
+- **help**: Positional args accepted
+- **id**: Flags: --branch, --bookmarks, --debug, --help, --id, --num, --tags, -B, -b, -h, -i, -n, -r, -t. Valued: --rev, -r. Positional args accepted
+- **incoming**: Flags: --bookmarks, --branch, --bundle, --force, --graph, --help, --insecure, --newest-first, --patch, -B, -G, -S, -b, -f, -h, -l, -n, -p, -r. Valued: --branch, --bundle, --rev, --ssh, --remotecmd, -r. Positional args accepted
+- **log**: Flags: --branch, --copies, --debug, --follow, --follow-first, --git, --graph, --hidden, --help, --no-merges, --patch, --quiet, --removed, --reverse, --stat, --style, --template, --user, --verbose, -G, -M, -T, -b, -c, -d, -f, -g, -h, -k, -l, -p, -q, -r, -u, -v, -y. Valued: --branch, --date, --exclude, --include, --keyword, --limit, --prune, --rev, --style, --template, --user, -T, -X, -d, -f, -k, -l, -r, -u. Positional args accepted
+- **manifest**: Flags: --all, --debug, --help, -h. Valued: --rev, -r. Positional args accepted
+- **outgoing**: Flags: --bookmarks, --branch, --force, --graph, --help, --insecure, --newest-first, --patch, --ssh, --remotecmd, -B, -G, -S, -b, -f, -h, -l, -n, -p, -r. Valued: --branch, --rev, --ssh, --remotecmd, -r. Positional args accepted
+- **parents**: Flags: --help, -h. Valued: --rev, --style, --template, -T, -r. Positional args accepted
+- **paths**: Flags: --help, --quiet, --verbose, -q, -v. Positional args accepted
+- **status**: Flags: --all, --added, --clean, --copies, --deleted, --ignored, --modified, --no-status, --print0, --quiet, --removed, --rev, --terse, --unknown, -0, -A, -C, -T, -a, -c, -d, -h, -i, -m, -n, -q, -r, -u. Valued: --change, --exclude, --include, --rev, --terse, -I, -X, -r, -t. Positional args accepted
+- **summary**: Flags: --help, --remote, -h
+- **tags**: Flags: --debug, --help, --quiet, --verbose, -h, -q, -v
+- **tip**: Flags: --help, --patch, --style, --template, -T, -h, -p
+- **verify**: Flags: --help, -h
+- **version**: Flags: --help, -h. Valued: -T, --template
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `jj`
 <p class="cmd-url"><a href="https://jj-vcs.github.io/jj/latest/cli-reference/">https://jj-vcs.github.io/jj/latest/cli-reference/</a></p>
 
@@ -127,6 +177,37 @@
 - **workspace root**: Positional args accepted
 - **workspace update-stale**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h
+
+### `pijul`
+<p class="cmd-url"><a href="https://pijul.org/manual/">https://pijul.org/manual/</a></p>
+
+- **change**: Flags: --full-hashes, --help, --inverse, --json, -h. Valued: --channel, --repository. Positional args accepted
+- **channel list**: Flags: --help, -h. Valued: --repository
+- **completion**: Flags: --help, -h. Positional args accepted
+- **credit**: Flags: --help, --unrecorded, -h. Valued: --channel, --repository. Positional args accepted
+- **diff**: Flags: --full-hashes, --help, --inodes, --json, --no-color, --short, --untracked, -h, -s. Valued: --channel, --repository. Positional args accepted
+- **help**: Positional args accepted
+- **key list**: Flags: --help, -h
+- **log**: Flags: --description, --filter, --full-hashes, --hash-only, --help, --limit, --no-cache, --state, -h. Valued: --channel, --description, --filter, --limit, --repository
+- **status**: Flags: --full-hashes, --help, --no-mtime, --short, -h. Valued: --channel, --repository. Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -V
+
+### `svn`
+<p class="cmd-url"><a href="https://subversion.apache.org/docs/release-notes/1.14.html">https://subversion.apache.org/docs/release-notes/1.14.html</a></p>
+
+- **blame**: Flags: --force, --help, --use-merge-history, --xml, -g, -h, -r, -v, -x. Valued: --config-dir, --diff-cmd, --extensions, --password, --revision, --username, -r, -x. Positional args accepted
+- **cat**: Flags: --help, --ignore-keywords, -h, -r. Valued: --config-dir, --password, --revision, --username, -r. Positional args accepted
+- **diff**: Flags: --diff-cmd, --force, --git, --help, --no-diff-deleted, --no-diff-added, --no-diff-statistics, --notice-ancestry, --patch-compatible, --summarize, --xml, -c, -h, -r, -x. Valued: --changelist, --config-dir, --config-option, --depth, --diff-cmd, --extensions, --internal-diff, --new, --old, --password, --revision, --username, -c, -r, -x. Positional args accepted
+- **help**: Positional args accepted
+- **info**: Flags: --help, --include-externals, --incremental, --recursive, --targets, --xml, -R, -h, -r. Valued: --changelist, --config-dir, --depth, --password, --revision, --targets, --username, -r. Positional args accepted
+- **list**: Flags: --depth, --help, --incremental, --recursive, --verbose, --xml, -R, -h, -r, -v. Valued: --config-dir, --depth, --password, --revision, --username, -r. Positional args accepted
+- **log**: Flags: --all-revprops, --diff, --help, --incremental, --quiet, --revprop, --search, --stop-on-copy, --use-merge-history, --verbose, --with-all-revprops, --with-no-revprops, --xml, -c, -g, -h, -l, -q, -r, -v. Valued: --changelist, --config-dir, --config-option, --depth, --diff-cmd, --limit, --password, --revision, --search-and, --targets, --username, --with-revprop, --xml-file, -c, -g, -l, -r. Positional args accepted
+- **mergeinfo**: Flags: --from-source, --help, --show-revs, -h. Valued: --config-dir, --password, --revision, --username, -R, -r. Positional args accepted
+- **propget**: Flags: --depth, --help, --no-newline, --recursive, --revprop, --show-inherited-props, --strict, --verbose, --xml, -R, -h, -r, -v. Valued: --changelist, --config-dir, --depth, --password, --revision, --username, -r. Positional args accepted
+- **proplist**: Flags: --depth, --help, --incremental, --quiet, --recursive, --revprop, --show-inherited-props, --verbose, --xml, -R, -h, -q, -r, -v. Valued: --changelist, --config-dir, --depth, --password, --revision, --username, -r. Positional args accepted
+- **status**: Flags: --changelist, --config-dir, --depth, --help, --ignore-externals, --incremental, --no-ignore, --quiet, --show-updates, --verbose, --xml, -N, -h, -q, -u, -v. Valued: --changelist, --config-dir, --config-option, --depth. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `tig`
 <p class="cmd-url"><a href="https://jonas.github.io/tig/">https://jonas.github.io/tig/</a></p>

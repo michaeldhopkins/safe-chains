@@ -1,0 +1,141 @@
+[[command]]
+name = "buck2"
+description = "Meta's Buck2 — fast monorepo build tool. Many subcommands. Read-side: `query`, `targets`, `audit`, `cquery`, `uquery`, `aquery`, `bxl`, `complete`, `expand-external-cells`, `help`, `version` / `--version`. Write-side: `build`, `run`, `test`, `install`, `clean`, `init`, `kill`, `killall`, `log`, `materialize`, `profile`, `rage`, `server`, `subscribe`, `validate`, `cancel-test`."
+url = "https://buck2.build/docs/users/commands/build/"
+researched_version = "buck2 2024.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "targets"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--json", "--show-output", "--show-target-hash", "-h"]
+valued = ["--config", "--config-file", "--target-platforms", "-c"]
+
+[[command.sub]]
+name = "query"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--json", "--output-attributes", "-h"]
+
+[[command.sub]]
+name = "uquery"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "cquery"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "aquery"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "audit"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "kill"
+candidate = true
+
+[[command.sub]]
+name = "killall"
+candidate = true
+
+[[command.sub]]
+name = "log"
+candidate = true
+
+[[command.sub]]
+name = "materialize"
+candidate = true
+
+[[command.sub]]
+name = "profile"
+candidate = true
+
+[[command.sub]]
+name = "rage"
+candidate = true
+
+[[command.sub]]
+name = "root"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true
+
+[[command.sub]]
+name = "status"
+candidate = true
+
+[[command.sub]]
+name = "subscribe"
+candidate = true
+
+[[command.sub]]
+name = "starlark"
+candidate = true
+
+[[command.sub]]
+name = "bxl"
+candidate = true
+
+[[command.sub]]
+name = "expand-external-cells"
+candidate = true
+
+[[command.sub]]
+name = "validate"
+candidate = true

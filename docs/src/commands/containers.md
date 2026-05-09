@@ -11,6 +11,13 @@
 - **version**: Flags: --help, -h. Valued: --format, --json
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `copa`
+<p class="cmd-url"><a href="https://project-copacetic.github.io/copacetic/website/">https://project-copacetic.github.io/copacetic/website/</a></p>
+
+- **help**: Positional args accepted
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
 ### `cosign`
 <p class="cmd-url"><a href="https://github.com/sigstore/cosign">https://github.com/sigstore/cosign</a></p>
 
@@ -33,6 +40,22 @@
 - **validate**: Flags: --fast, --help, --remote, --tarball, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, -h
+
+### `ctr`
+<p class="cmd-url"><a href="https://github.com/containerd/containerd/blob/main/docs/getting-started.md">https://github.com/containerd/containerd/blob/main/docs/getting-started.md</a></p>
+
+- **help**: Positional args accepted
+- **info**: Flags: --help, -h
+- **namespaces list**: Flags: --help, --quiet, -h, -q
+- **namespaces ls**: Flags: --help, --quiet, -h, -q
+- **version**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h, -v
+
+### `dive`
+<p class="cmd-url"><a href="https://github.com/wagoodman/dive">https://github.com/wagoodman/dive</a></p>
+
+- Allowed standalone flags: --ci, --help, --source, --version, -h, -v
+- Allowed valued flags: --ci-config, --config, --highestPercentage, --highestUserWastedPercent, --lowestEfficiency, --source
 
 ### `docker`
 <p class="cmd-url"><a href="https://docs.docker.com/reference/cli/docker/">https://docs.docker.com/reference/cli/docker/</a></p>
@@ -92,6 +115,13 @@
 - **help**: Positional args accepted
 - **version**: Flags: --client, --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `hadolint`
+<p class="cmd-url"><a href="https://github.com/hadolint/hadolint">https://github.com/hadolint/hadolint</a></p>
+
+- Allowed standalone flags: --config, --disable-ignore-pragma, --failure-threshold, --format, --help, --ignore, --no-color, --no-fail, --require-label, --strict-labels, --trusted-registry, --verbose, --version, -V, -c, -h, -t, -v
+- Allowed valued flags: --config, --failure-threshold, --format, --ignore, --require-label, --trusted-registry, -c, -f, -t
+- Hyphen-prefixed positional arguments accepted
 
 ### `helm`
 <p class="cmd-url"><a href="https://helm.sh/docs/helm/">https://helm.sh/docs/helm/</a></p>
@@ -215,6 +245,31 @@
 - **status**: Flags: --format, --help, --output, -h, -o. Valued: --node, --profile, -n, -p
 - **version**: Flags: --components, --help, --output, --short, -h, -o
 - Allowed standalone flags: --help, --version, -h
+
+### `nerdctl`
+<p class="cmd-url"><a href="https://github.com/containerd/nerdctl">https://github.com/containerd/nerdctl</a></p>
+
+- **completion**: Flags: --help, -h. Positional args accepted
+- **events**: Flags: --help, -h. Valued: --filter, --format, --since, --until, -f
+- **help**: Positional args accepted
+- **image history**: Flags: --help, --human, --no-trunc, --quiet, -H, -h, -q. Valued: --format
+- **image inspect**: Flags: --help, --mode, -h. Valued: --format, --mode, -f
+- **image ls**: Flags: --all, --digests, --help, --names, --no-trunc, --quiet, -a, -h, -q. Valued: --filter, --format, -f
+- **images**: Flags: --all, --digests, --help, --names, --no-trunc, --quiet, -a, -h, -q. Valued: --filter, --format, -f. Positional args accepted
+- **info**: Flags: --debug, --help, --mode, -h. Valued: --format, --mode, -f
+- **inspect**: Flags: --help, --mode, --size, -h, -s. Valued: --format, --mode, --type, -f. Positional args accepted
+- **logs**: Flags: --details, --follow, --help, --timestamps, -f, -h, -t. Valued: --since, --tail, --until, -n. Positional args accepted
+- **network inspect**: Flags: --help, -h. Valued: --format, --mode, -f
+- **network ls**: Flags: --help, --no-trunc, --quiet, -h, -q. Valued: --filter, --format, -f
+- **port**: Flags: --help, -h. Positional args accepted
+- **ps**: Flags: --all, --help, --latest, --no-trunc, --quiet, --size, -a, -h, -l, -n, -q, -s. Valued: --filter, --format, --last, -f
+- **stats**: Flags: --all, --help, --no-stream, --no-trunc, -a, -h. Valued: --format. Positional args accepted
+- **system info**: Flags: --help, -h. Valued: --format, --mode, -f
+- **top**: Flags: --help, -h. Positional args accepted
+- **version**: Flags: --help, --format, -f, -h. Valued: --format, -f
+- **volume inspect**: Flags: --help, -h. Valued: --format, -f
+- **volume ls**: Flags: --help, --quiet, --size, -h, -q. Valued: --filter, --format, -f
+- Allowed standalone flags: --help, --version, -h, -v
 
 ### `orb`
 <p class="cmd-url"><a href="https://docs.orbstack.dev/cli">https://docs.orbstack.dev/cli</a></p>

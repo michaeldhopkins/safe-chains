@@ -1,0 +1,27 @@
+[[command]]
+name = "lz4"
+aliases = ["unlz4", "lz4cat", "lz4c"]
+description = "Extremely fast compressor. Bare invocation reads files and writes <name>.lz4 (or stdout with -c). -d/--decompress reverses. -t verifies (read). -l lists metadata (read). -k keeps source."
+url = "https://github.com/lz4/lz4"
+researched_version = "lz4 1.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--best", "--compress", "--decompress",
+    "--fast", "--favor-decSpeed", "--force",
+    "--help", "--keep", "--list", "--long-help",
+    "--multiple", "--no-frame-crc",
+    "--no-progress", "--no-sparse",
+    "--no-test", "--quiet", "--rm",
+    "--sparse", "--stdout", "--test",
+    "--uncompress", "--verbose", "--version",
+    "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
+    "-A", "-B", "-BD", "-BI", "-BX",
+    "-V", "-c", "-d", "-f", "-h", "-k",
+    "-l", "-m", "-q", "-r", "-t", "-v", "-z",
+]
+valued = [
+    "--block-size", "--content-size",
+    "--favor-decSpeed", "--frame-block-size",
+    "-B", "-D", "-S",
+]

@@ -1,0 +1,191 @@
+[[command]]
+name = "wasmer"
+description = "Wasmer — WebAssembly runtime + package manager. Many subcommands. Read-side: `version`, `cache`, `info`, `inspect`, `whoami`, `binfmt list`, `package show`, `validate`, `wasm-objdump`, `wasm2wat`, `wat2wasm`. Write/run side: `run`, `compile`, `create-exe`, `create-obj`, `init`, `add`, `remove`, `publish`, `package`, `template`, `gen-c-header`, `journal`, `app`, `domain`, `secrets`, `volume`, `connect`, `tunnel`, `auth`, `login`, `logout`, `binfmt register/unregister`, `config`. The carve-out covers diagnostic + read-only inspection."
+url = "https://docs.wasmer.io/runtime/cli"
+researched_version = "Wasmer 5.x"
+bare_flags = ["--help", "--version", "-h", "-v", "-V"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--verbose", "-h", "-v"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "inspect"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "wasm-objdump"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--all", "--debug", "--details", "--disassemble", "--header", "--help", "--imports", "--exports", "-D", "-d", "-h", "-x"]
+
+[[command.sub]]
+name = "wast"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "wasm2wat"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--output"]
+
+[[command.sub]]
+name = "wat2wasm"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--output"]
+
+[[command.sub]]
+name = "whoami"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completions"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "compile"
+candidate = true
+
+[[command.sub]]
+name = "create-exe"
+candidate = true
+
+[[command.sub]]
+name = "create-obj"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub]]
+name = "package"
+candidate = true
+
+[[command.sub]]
+name = "template"
+candidate = true
+
+[[command.sub]]
+name = "gen-c-header"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "app"
+candidate = true
+
+[[command.sub]]
+name = "config"
+candidate = true
+
+[[command.sub]]
+name = "cache"
+candidate = true
+
+[[command.sub]]
+name = "journal"
+candidate = true
+
+[[command.sub]]
+name = "domain"
+candidate = true
+
+[[command.sub]]
+name = "secrets"
+candidate = true
+
+[[command.sub]]
+name = "volume"
+candidate = true
+
+[[command.sub]]
+name = "tunnel"
+candidate = true
+
+[[command.sub]]
+name = "container"
+candidate = true
+
+[[command.sub]]
+name = "winget"
+candidate = true
+
+[[command.sub]]
+name = "binfmt"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "gen-completions"
+candidate = true
+
+[[command.sub]]
+name = "namespace"
+candidate = true
+
+[[command.sub]]
+name = "self-update"
+candidate = true
+
+[[command.sub]]
+name = "ssh"
+candidate = true

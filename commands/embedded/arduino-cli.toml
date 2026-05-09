@@ -1,0 +1,208 @@
+[[command]]
+name = "arduino-cli"
+description = "Arduino CLI. Many subcommands. Read-side: `version`, `config dump`, `config get`, `core list`, `core search`, `lib list`, `lib search`, `lib deps`, `board list`, `board listall`, `board search`, `board details`, `sketch help`, `compile --show-properties`. Write-side: `compile`, `upload` (writes to flash on a connected board — system-state outside this CLI), `core install/uninstall/update-index/upgrade`, `lib install/uninstall/update-index/upgrade`, `sketch new/archive`, `config init/set/add/remove/delete`, `board attach`, `cache clean`, `daemon`, `update`."
+url = "https://arduino.github.io/arduino-cli/latest/commands/arduino-cli/"
+researched_version = "arduino-cli 1.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "dump"
+standalone = ["--help", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "init"
+candidate = true
+
+[[command.sub.sub]]
+name = "set"
+candidate = true
+
+[[command.sub.sub]]
+name = "add"
+candidate = true
+
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "core"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--all", "--help", "--updatable", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "search"
+standalone = ["--all", "--help", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "install"
+candidate = true
+
+[[command.sub.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub.sub]]
+name = "update-index"
+candidate = true
+
+[[command.sub.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "lib"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--all", "--help", "--updatable", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "search"
+standalone = ["--help", "--names", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "deps"
+standalone = ["--help", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "examples"
+standalone = ["--help", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "install"
+candidate = true
+
+[[command.sub.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub.sub]]
+name = "update-index"
+candidate = true
+
+[[command.sub.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "board"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--watch", "-h", "-w"]
+valued = ["--discovery-timeout", "--format"]
+
+[[command.sub.sub]]
+name = "listall"
+standalone = ["--help", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "search"
+standalone = ["--help", "--show-hidden", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "details"
+standalone = ["--full", "--help", "--list-programmers", "-h"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "attach"
+candidate = true
+
+[[command.sub]]
+name = "compile"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--clean", "--export-binaries", "--help", "--only-compilation-database", "--quiet", "--show-properties", "--verbose", "--warnings", "-h", "-q", "-v"]
+valued = ["--build-cache-path", "--build-path", "--build-property", "--config-file", "--encrypt-key", "--export-dir", "--fqbn", "--input-dir", "--input-file", "--keys-keychain", "--libraries", "--library", "--log-file", "--log-level", "--no-color", "--optimize-for-debug", "--port", "--profile", "--programmer", "--protocol", "--show-properties", "--sign-key", "--vid-pid", "--warnings", "--upload"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "upload"
+candidate = true
+
+[[command.sub]]
+name = "burn-bootloader"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true
+
+[[command.sub]]
+name = "monitor"
+candidate = true
+
+[[command.sub]]
+name = "outdated"
+candidate = true
+
+[[command.sub]]
+name = "sketch"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "cache"
+candidate = true
+
+[[command.sub]]
+name = "daemon"
+candidate = true
+
+[[command.sub]]
+name = "version-check"
+candidate = true
+
+[[command.sub]]
+name = "feedback"
+candidate = true

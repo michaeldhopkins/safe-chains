@@ -1,0 +1,95 @@
+[[command]]
+name = "huggingface-cli"
+aliases = ["hf"]
+description = "Hugging Face CLI. Most subcommands contact huggingface.co (network). Read-side: `whoami`, `version`, `env`, `lfs-multipart-upload`, `repo files list`, `dataset list`, `model list`, `space list`. Write-side: `login`, `logout`, `download` (writes to local cache), `upload` (pushes to Hub), `repo create/delete`, `delete-cache`, `tag`, `lfs-enable-largefiles`, `scan-cache`. The carve-out covers diagnostic / read forms."
+url = "https://huggingface.co/docs/huggingface_hub/main/en/guides/cli"
+researched_version = "huggingface_hub 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "whoami"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--token"]
+
+[[command.sub]]
+name = "scan-cache"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--verbose", "-h", "-v"]
+valued = ["--dir"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "download"
+candidate = true
+
+[[command.sub]]
+name = "upload"
+candidate = true
+
+[[command.sub]]
+name = "upload-large-folder"
+candidate = true
+
+[[command.sub]]
+name = "repo"
+candidate = true
+
+[[command.sub]]
+name = "repo-files"
+candidate = true
+
+[[command.sub]]
+name = "delete-cache"
+candidate = true
+
+[[command.sub]]
+name = "tag"
+candidate = true
+
+[[command.sub]]
+name = "lfs-enable-largefiles"
+candidate = true
+
+[[command.sub]]
+name = "lfs-multipart-upload"
+candidate = true
+
+[[command.sub]]
+name = "system"
+candidate = true
+
+[[command.sub]]
+name = "user"
+candidate = true
+
+[[command.sub]]
+name = "delete-repo"
+candidate = true

@@ -1,0 +1,19 @@
+[[command]]
+name = "wasm-validate"
+description = "WABT — validates a WebAssembly binary against the spec. Pure read."
+url = "https://github.com/WebAssembly/wabt"
+researched_version = "WABT 1.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--enable-all", "--enable-bulk-memory",
+    "--enable-exceptions", "--enable-gc",
+    "--enable-multi-memory", "--enable-multi-value",
+    "--enable-mutable-globals", "--enable-reference-types",
+    "--enable-relaxed-simd", "--enable-simd",
+    "--enable-tail-call", "--enable-threads",
+    "--help", "--ignore-custom-section-errors",
+    "--no-debug-names", "--verbose", "--version",
+    "-h", "-v",
+]

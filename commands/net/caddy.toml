@@ -1,0 +1,126 @@
+[[command]]
+name = "caddy"
+description = "Caddy web server. Subcommands: `version`, `validate`, `fmt`, `adapt`, `environ`, `list-modules`, `build-info`, `hash-password`, `manpage` are read-only or static. `run`, `start`, `stop`, `reload`, `reverse-proxy`, `respond`, `file-server`, `untrust`, `trust`, `upgrade`, `add-package`, `remove-package` start servers, modify trust stores, or contact APIs. Active project on the 2.x line."
+url = "https://caddyserver.com/docs/command-line"
+researched_version = "caddy 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+bare = true
+standalone = ["--config", "--help", "-h"]
+valued = ["--adapter", "--config"]
+
+[[command.sub]]
+name = "fmt"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--diff", "--help", "--overwrite", "-h", "-o"]
+
+[[command.sub]]
+name = "adapt"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "--pretty", "--validate", "-p", "-h"]
+valued = ["--adapter", "--config"]
+
+[[command.sub]]
+name = "environ"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list-modules"
+level = "Inert"
+bare = true
+standalone = ["--help", "--packages", "--versions", "-h"]
+
+[[command.sub]]
+name = "build-info"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "hash-password"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--algorithm", "--plaintext"]
+
+[[command.sub]]
+name = "manpage"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--directory"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "stop"
+candidate = true
+
+[[command.sub]]
+name = "reload"
+candidate = true
+
+[[command.sub]]
+name = "reverse-proxy"
+candidate = true
+
+[[command.sub]]
+name = "respond"
+candidate = true
+
+[[command.sub]]
+name = "file-server"
+candidate = true
+
+[[command.sub]]
+name = "untrust"
+candidate = true
+
+[[command.sub]]
+name = "trust"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "add-package"
+candidate = true
+
+[[command.sub]]
+name = "remove-package"
+candidate = true
+
+[[command.sub]]
+name = "storage"
+candidate = true

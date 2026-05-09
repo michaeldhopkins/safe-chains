@@ -1,0 +1,52 @@
+[[command]]
+name = "waf"
+description = "Waf — Python build system. Bare invocation reads `wscript` (arbitrary Python) and runs the configured build. Subcommands include `configure`, `build`, `clean`, `install`, `uninstall`, `dist`, `distcheck`, `list`, `step`, `version`. Carve-out: --version / --help / `list` only."
+url = "https://waf.io/book/"
+researched_version = "Waf 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "configure"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "clean"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "dist"
+candidate = true
+
+[[command.sub]]
+name = "distcheck"
+candidate = true
+
+[[command.sub]]
+name = "step"
+candidate = true

@@ -1,0 +1,97 @@
+[[command]]
+name = "elan"
+description = "Lean version manager (rustup-style). Read-side: `--version`, `which`, `show`, `toolchain list`, `default`, `override list`, `completions`. Write-side: `install`, `update`, `uninstall`, `self update`, `default`, `override set/unset`, `toolchain link/install/uninstall`, `link`."
+url = "https://github.com/leanprover/elan"
+researched_version = "elan 3.x"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+[[command.sub]]
+name = "show"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "which"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "toolchain"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "install"
+candidate = true
+
+[[command.sub.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub.sub]]
+name = "link"
+candidate = true
+
+[[command.sub]]
+name = "default"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "override"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "set"
+candidate = true
+
+[[command.sub.sub]]
+name = "unset"
+candidate = true
+
+[[command.sub]]
+name = "completions"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "self"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "telemetry"
+candidate = true

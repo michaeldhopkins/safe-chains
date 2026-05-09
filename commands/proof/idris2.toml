@@ -1,0 +1,9 @@
+[[command]]
+name = "idris2"
+description = "Idris 2 — dependently-typed pure-functional programming language. Bare invocation drops into the REPL. --check, --build, --install, --exec all run the user's Idris source (arbitrary code at compile time via elaborator scripts). Carve-out: --version / --help only."
+url = "https://idris2.readthedocs.io/en/latest/reference/cmdline.html"
+researched_version = "Idris 2.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

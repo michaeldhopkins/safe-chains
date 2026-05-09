@@ -1,0 +1,38 @@
+[[command]]
+name = "coqc"
+description = "Coq proof compiler — compiles a .v Coq source file into .vo / .glob output. Loads required libraries; tactic plugins are arbitrary OCaml. Active project."
+url = "https://coq.inria.fr/refman/practical-tools/coq-commands.html"
+researched_version = "Coq 8.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--help", "--version", "-Q", "-R",
+    "-async-proofs-cache", "-async-proofs-cache-evict",
+    "-batch", "-bt", "-color",
+    "-debug", "-d", "-emacs",
+    "-h", "-help", "-impredicative-set",
+    "-indices-matter", "-list-tags",
+    "-mangle-names", "-native-compiler",
+    "-native-output-dir", "-no-bool-eq",
+    "-noinit", "-q", "-quiet",
+    "-time", "-time-file",
+    "-type-in-type", "-v", "-vm",
+    "-vmcompile", "-vos", "-vok", "-vio",
+    "-w", "-where",
+]
+valued = [
+    "-I", "-Q", "-R", "-arg", "-async-proofs-cache",
+    "-async-proofs-tac-error-resilience",
+    "-async-proofs-worker-priority",
+    "-bytecode-compiler", "-color",
+    "-coqlib", "-l", "-load-ml-source",
+    "-load-ml-object", "-load-vernac-object",
+    "-load-vernac-source", "-load-vernac-source-verbose",
+    "-mangle-names", "-native-compiler",
+    "-native-output-dir",
+    "-o", "-quick", "-require", "-require-import",
+    "-require-export", "-rfrom", "-rifrom",
+    "-set", "-time-file", "-top",
+    "-w",
+]

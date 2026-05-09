@@ -1,0 +1,49 @@
+[[command]]
+name = "newman"
+description = "Postman command-line collection runner. `run COLLECTION_FILE` executes a Postman collection (network requests + arbitrary pre-request / test JS scripts inside the collection — same risk profile as running tests). Carve-out covers `--version` and `run` (the only meaningful subcommand)."
+url = "https://learning.postman.com/docs/collections/using-newman-cli/command-line-integration-with-newman/"
+researched_version = "newman 6.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "run"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--bail", "--color", "--delay-request",
+    "--disable-unicode", "--export-cookie-jar",
+    "--export-environment", "--export-globals",
+    "--ignore-redirects", "--insecure",
+    "--insecure-file-read", "--no-color",
+    "--no-summary",
+    "--reporter", "--reporters",
+    "--ssl-extra-ca-certs", "--suppress-exit-code",
+    "--timeout", "--timeout-request",
+    "--timeout-script", "--verbose",
+    "--working-dir",
+    "-h", "-v",
+]
+valued = [
+    "--cookie-jar", "--delay-request",
+    "--environment", "--export-collection",
+    "--export-cookie-jar",
+    "--export-environment", "--export-globals",
+    "--folder", "--global-var",
+    "--globals", "--iteration-count",
+    "--iteration-data", "--reporter",
+    "--reporters", "--ssl-client-cert",
+    "--ssl-client-cert-list", "--ssl-client-key",
+    "--ssl-client-passphrase", "--ssl-extra-ca-certs",
+    "--timeout", "--timeout-request",
+    "--timeout-script", "--working-dir",
+    "-d", "-e", "-g", "-k", "-n", "-r",
+]
+
+[[command.sub]]
+name = "help"
+allow_all = true

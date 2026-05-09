@@ -1,0 +1,40 @@
+[[command]]
+name = "xz"
+aliases = ["unxz", "xzcat", "lzma", "unlzma", "lzcat"]
+description = "XZ Utils compressor. Bare invocation reads files and writes <name>.xz (or to stdout with -c). -d/--decompress is the reverse. -t/--test verifies (read). -l/--list prints metadata (read). -k/--keep retains source. The aliases unxz / xzcat / lzma / unlzma / lzcat select default behaviour."
+url = "https://tukaani.org/xz/"
+researched_version = "XZ Utils 5.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--check", "--compress", "--decompress",
+    "--extreme", "--fast", "--files",
+    "--files0", "--force", "--format",
+    "--help", "--ignore-check", "--info-alloc",
+    "--keep", "--list", "--lzma1",
+    "--lzma2", "--memlimit",
+    "--memlimit-compress", "--memlimit-decompress",
+    "--memlimit-mt-decompress",
+    "--no-adjust", "--no-sparse",
+    "--no-warn", "--quiet", "--robot",
+    "--single-stream", "--stdout",
+    "--suffix", "--threads",
+    "--to-stdout", "--uncompress",
+    "--verbose", "--version",
+    "-0", "-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9",
+    "-C", "-F", "-H", "-Q", "-T", "-V",
+    "-c", "-d", "-e", "-f", "-h", "-k",
+    "-l", "-q", "-t", "-v", "-z",
+]
+valued = [
+    "--block-size", "--check", "--delta",
+    "--files", "--files0", "--filters",
+    "--filters1", "--filters2", "--filters3",
+    "--filters4", "--flush-timeout",
+    "--format", "--lzma1", "--lzma2",
+    "--memlimit-compress",
+    "--memlimit-decompress", "--memlimit-mt-decompress",
+    "--memory", "--presets", "--suffix",
+    "--threads", "--x86",
+    "-C", "-F", "-M", "-S", "-T",
+]

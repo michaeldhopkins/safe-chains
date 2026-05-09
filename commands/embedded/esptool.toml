@@ -1,0 +1,109 @@
+[[command]]
+name = "esptool"
+aliases = ["esptool.py"]
+description = "Espressif esptool — flashes / reads / inspects ESP8266 / ESP32 chips over a serial port. Most subcommands access a connected MCU (system-state writes outside this CLI). Read-side: `version`, `chip_id`, `flash_id`, `read_mac`, `read_efuse`, `read_flash`, `read_flash_status`, `read_partitions`, `image_info`, `dump_mem`. Write-side: `write_flash`, `erase_flash`, `erase_region`, `make_image`, `merge_bin`, `elf2image`, `verify_flash`, `write_efuse`, `write_flash_status`, `run`. Carve-out covers diagnostic + read forms."
+url = "https://docs.espressif.com/projects/esptool/en/latest/esp32/"
+researched_version = "esptool 4.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "chip_id"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "flash_id"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "read_mac"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "image_info"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--version", "-v"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "write_flash"
+candidate = true
+
+[[command.sub]]
+name = "erase_flash"
+candidate = true
+
+[[command.sub]]
+name = "erase_region"
+candidate = true
+
+[[command.sub]]
+name = "read_flash"
+candidate = true
+
+[[command.sub]]
+name = "verify_flash"
+candidate = true
+
+[[command.sub]]
+name = "elf2image"
+candidate = true
+
+[[command.sub]]
+name = "make_image"
+candidate = true
+
+[[command.sub]]
+name = "merge_bin"
+candidate = true
+
+[[command.sub]]
+name = "dump_mem"
+candidate = true
+
+[[command.sub]]
+name = "load_ram"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "write_mem"
+candidate = true
+
+[[command.sub]]
+name = "read_mem"
+candidate = true
+
+[[command.sub]]
+name = "flash_id"
+candidate = true
+
+[[command.sub]]
+name = "read_flash_status"
+candidate = true
+
+[[command.sub]]
+name = "write_flash_status"
+candidate = true
+
+[[command.sub]]
+name = "get_security_info"
+candidate = true

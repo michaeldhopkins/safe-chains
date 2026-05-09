@@ -1,0 +1,26 @@
+[[command]]
+name = "ssh-keygen"
+description = "OpenSSH key utility. Generates and manages SSH keys. -y prints the public key for an existing private key (read). -l/--fingerprint prints fingerprints (read). -E sets fingerprint hash. -F looks up host keys (read). -R removes hosts from known_hosts (write). -p changes passphrases (write). -t TYPE -f FILE creates a new keypair (write). -A regenerates host keys (system-state write). -L prints CA-issued cert info."
+url = "https://man.openbsd.org/ssh-keygen"
+researched_version = "OpenSSH 9.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "-?", "-A", "-B", "-D",
+    "-E", "-F", "-G", "-H", "-I", "-K",
+    "-L", "-M", "-N", "-O", "-P",
+    "-Q", "-R", "-S", "-T", "-U",
+    "-V", "-W", "-Y", "-a", "-b", "-c",
+    "-e", "-f", "-g", "-h", "-i",
+    "-k", "-l", "-m", "-n", "-o",
+    "-p", "-q", "-r", "-s", "-t", "-u",
+    "-v", "-w", "-x", "-y", "-z",
+]
+valued = [
+    "-A", "-B", "-D", "-E", "-F", "-G",
+    "-I", "-K", "-M", "-N", "-O", "-P",
+    "-Q", "-R", "-S", "-T", "-V", "-W",
+    "-Y", "-a", "-b", "-e", "-f",
+    "-h", "-i", "-k", "-m", "-n",
+    "-o", "-r", "-s", "-t", "-u", "-w", "-z",
+]

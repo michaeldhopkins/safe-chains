@@ -1,0 +1,9 @@
+[[command]]
+name = "coqtop"
+description = "Coq interactive REPL. Bare invocation drops into the REPL. Carve-out: --version / --help only."
+url = "https://coq.inria.fr/refman/practical-tools/coq-commands.html"
+researched_version = "Coq 8.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

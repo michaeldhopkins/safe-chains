@@ -1,0 +1,39 @@
+[[command]]
+name = "pkg-config"
+description = "Provides compile / link flags for installed libraries. Reads .pc files and prints results. Pure read."
+url = "https://www.freedesktop.org/wiki/Software/pkg-config/"
+researched_version = "pkg-config 0.x"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = [
+    "--atleast-pkgconfig-version", "--atleast-version",
+    "--cflags", "--cflags-only-I",
+    "--cflags-only-other", "--debug",
+    "--define-prefix", "--define-variable",
+    "--digit-cflags", "--dont-define-prefix",
+    "--errors-to-stdout", "--exact-version",
+    "--exists", "--help", "--keep-system-cflags",
+    "--keep-system-libs", "--libs",
+    "--libs-only-L", "--libs-only-l",
+    "--libs-only-other", "--list-all",
+    "--list-package-names", "--max-version",
+    "--maximum-traverse-depth",
+    "--modversion", "--msvc-syntax",
+    "--newlines",
+    "--no-cache", "--no-uninstalled",
+    "--print-errors", "--print-provides",
+    "--print-requires", "--print-requires-private",
+    "--print-variables", "--short-errors",
+    "--silence-errors", "--static",
+    "--uninstalled", "--usage",
+    "--validate", "--variable",
+    "--version",
+    "-?",
+]
+valued = [
+    "--atleast-version", "--define-variable",
+    "--exact-version", "--max-version",
+    "--maximum-traverse-depth",
+    "--prefix-variable", "--variable",
+]

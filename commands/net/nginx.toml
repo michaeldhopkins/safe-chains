@@ -1,0 +1,9 @@
+[[command]]
+name = "nginx"
+description = "NGINX web server / reverse proxy. Bare invocation starts the server (long-running). -t tests config (read). -V prints version + build info (read). -T tests + dumps full config (read). -s SIGNAL (stop, quit, reload, reopen) signals a running master process (system-state write). Carve-out covers diagnostic forms — server-control invocations are candidates."
+url = "https://nginx.org/en/docs/switches.html"
+researched_version = "nginx 1.x"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "-?", "-V", "-h", "-q", "-t", "-T", "-v"]
+valued = ["-c", "-e", "-g", "-p", "-s"]

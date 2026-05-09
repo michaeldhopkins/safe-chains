@@ -1,0 +1,32 @@
+[[command]]
+name = "wat2wasm"
+description = "WABT — assembles a WebAssembly text file (.wat) into binary (.wasm). Reads the .wat file and writes the .wasm output. -o sets the output path. Pure assembly — does not execute the wasm."
+url = "https://github.com/WebAssembly/wabt"
+researched_version = "WABT 1.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--debug-names", "--debug-parser",
+    "--disable-bulk-memory", "--disable-exceptions",
+    "--disable-extended-const", "--disable-function-references",
+    "--disable-gc", "--disable-memory64", "--disable-multi-memory",
+    "--disable-multi-value", "--disable-mutable-globals",
+    "--disable-reference-types", "--disable-relaxed-simd",
+    "--disable-saturating-float-to-int", "--disable-sign-extension",
+    "--disable-simd", "--disable-tail-call",
+    "--disable-threads", "--enable-all", "--enable-annotations",
+    "--enable-bulk-memory", "--enable-code-metadata",
+    "--enable-exceptions", "--enable-extended-const",
+    "--enable-function-references", "--enable-gc",
+    "--enable-memory64", "--enable-multi-memory",
+    "--enable-multi-value", "--enable-mutable-globals",
+    "--enable-reference-types", "--enable-relaxed-simd",
+    "--enable-saturating-float-to-int", "--enable-sign-extension",
+    "--enable-simd", "--enable-tail-call", "--enable-threads",
+    "--help", "--ignore-custom-section-errors",
+    "--no-canonicalize-leb128s", "--relocatable",
+    "--validate", "--verbose", "--version",
+    "-h", "-r", "-v",
+]
+valued = ["--output", "-o"]

@@ -1,0 +1,71 @@
+[[command]]
+name = "artillery"
+description = "Artillery — load testing toolkit (Node). `run` executes a YAML test plan (network + arbitrary JS test scripts inside the plan). `quick` runs a quick test against a URL. `report` reads JSON results and prints/writes HTML (read or SafeWrite). `version`/`--help` diagnostic. Cloud subcommands contact Artillery Cloud."
+url = "https://www.artillery.io/docs/reference/cli"
+researched_version = "artillery 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "report"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "dino"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "quick"
+candidate = true
+
+[[command.sub]]
+name = "run-fargate"
+candidate = true
+
+[[command.sub]]
+name = "run-lambda"
+candidate = true
+
+[[command.sub]]
+name = "convert"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "stop"
+candidate = true
+
+[[command.sub]]
+name = "cloud"
+candidate = true

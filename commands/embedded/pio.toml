@@ -1,0 +1,168 @@
+[[command]]
+name = "pio"
+aliases = ["platformio"]
+description = "PlatformIO CLI — embedded development. Many subcommands. Read-side: `--version`, `pkg list`, `pkg search`, `pkg show`, `pkg outdated`, `boards`, `device list`, `device monitor` (carve), `home`, `system info`, `account whoami`, `org list`, `team list`, `project init --check`. Write-side: `run`, `test`, `pkg install/uninstall/update`, `device monitor`, `update`, `upgrade`, `account login/logout/show/register/forgot-password/destroy/token`, `org create/destroy/add/remove`, `team create/destroy/add/remove`, `project init`, `ci`, `home --shutdown`, `remote run/test/agent/device list`."
+url = "https://docs.platformio.org/en/latest/core/userguide/"
+researched_version = "PlatformIO 6.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "boards"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--installed", "--json-output", "-h", "-i"]
+
+[[command.sub]]
+name = "system"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "--json-output", "-h"]
+
+[[command.sub.sub]]
+name = "completion"
+candidate = true
+
+[[command.sub.sub]]
+name = "prune"
+candidate = true
+
+[[command.sub]]
+name = "pkg"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--global", "--help", "--json-output", "--only-libraries", "--only-platforms", "--only-tools", "-g", "-h"]
+valued = ["--environment", "--platform", "--storage-dir", "-d", "-e"]
+
+[[command.sub.sub]]
+name = "search"
+standalone = ["--help", "--json-output", "-h"]
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--global", "--help", "-g", "-h"]
+valued = ["--environment", "--storage-dir", "-d", "-e"]
+
+[[command.sub.sub]]
+name = "outdated"
+standalone = ["--global", "--help", "-g", "-h"]
+valued = ["--environment", "--storage-dir", "-d", "-e"]
+
+[[command.sub.sub]]
+name = "install"
+candidate = true
+
+[[command.sub.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub.sub]]
+name = "publish"
+candidate = true
+
+[[command.sub.sub]]
+name = "unpublish"
+candidate = true
+
+[[command.sub]]
+name = "device"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "--json-output", "--logical", "--mdns", "--serial", "-h"]
+
+[[command.sub.sub]]
+name = "monitor"
+candidate = true
+
+[[command.sub]]
+name = "home"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "test"
+candidate = true
+
+[[command.sub]]
+name = "ci"
+candidate = true
+
+[[command.sub]]
+name = "check"
+candidate = true
+
+[[command.sub]]
+name = "debug"
+candidate = true
+
+[[command.sub]]
+name = "project"
+candidate = true
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "remote"
+candidate = true
+
+[[command.sub]]
+name = "account"
+candidate = true
+
+[[command.sub]]
+name = "org"
+candidate = true
+
+[[command.sub]]
+name = "team"
+candidate = true
+
+[[command.sub]]
+name = "package"
+candidate = true
+
+[[command.sub]]
+name = "settings"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "ide-config"
+candidate = true

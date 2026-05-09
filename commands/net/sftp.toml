@@ -1,0 +1,9 @@
+[[command]]
+name = "sftp"
+description = "Interactive secure file transfer client over SSH. Bare invocation drops into the interactive sftp shell on the remote host. -b BATCHFILE runs commands non-interactively from a file (still arbitrary). Carve-out: --help / --version only."
+url = "https://man.openbsd.org/sftp"
+researched_version = "OpenSSH 9.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "-?", "-h"]

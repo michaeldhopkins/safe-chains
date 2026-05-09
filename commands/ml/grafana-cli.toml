@@ -1,0 +1,50 @@
+[[command]]
+name = "grafana-cli"
+description = "Grafana CLI — manages Grafana plugins, admin tasks, etc. Most subcommands modify Grafana state or contact the Grafana server (network). Read-side: `--help`, `--version`, `plugins list-versions`, `plugins list-remote`, `plugins ls`, `admin data-migration sql`. Write-side: `plugins install`, `plugins update`, `plugins update-all`, `plugins remove`, `admin reset-admin-password`, `admin migrate-data-source`, `admin secrets-migration`, `admin user-manager update`, `cli-secrets-bridge`."
+url = "https://grafana.com/docs/grafana/latest/cli/"
+researched_version = "grafana 11.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "plugins"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list-remote"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list-versions"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "install"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub.sub]]
+name = "update-all"
+candidate = true
+
+[[command.sub.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "admin"
+candidate = true
+
+[[command.sub]]
+name = "cli-secrets-bridge"
+candidate = true

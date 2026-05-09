@@ -1,0 +1,40 @@
+[[command]]
+name = "otel-cli"
+description = "OpenTelemetry CLI — emits OTLP telemetry from shell scripts. `span` / `span event` / `span background` / `exec` send telemetry to the configured OTLP endpoint (network). `status` queries the local config (read). `version` is diagnostic. The carve-out covers diagnostic forms only — emitting spans is a candidate due to the network side."
+url = "https://github.com/equinix-labs/otel-cli"
+researched_version = "otel-cli 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--config", "--endpoint", "--otlp-insecure", "--protocol", "--timeout"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "span"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "server"
+candidate = true

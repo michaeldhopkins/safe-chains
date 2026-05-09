@@ -1,0 +1,22 @@
+[[command]]
+name = "shfmt"
+description = "Shell formatter (mvdan/sh). Without -w, prints formatted source to stdout. -d shows a diff (read). -l lists files that would be reformatted. -w rewrites files in place (project-local SafeWrite via write_flags). Static — does not execute the shell scripts."
+url = "https://github.com/mvdan/sh"
+researched_version = "shfmt 3.x"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help", "-V", "-bn",
+    "-ci", "-d", "-fn", "-h",
+    "-i", "-kp", "-l", "-ln",
+    "-mn", "-p", "-s", "-sr", "-tojson",
+    "-version", "-w",
+]
+valued = [
+    "--apply-ignore", "--check",
+    "--filename", "--from-json", "--lang",
+    "--list", "--write",
+    "-filename", "-from-json", "-i",
+    "-lang", "-ln",
+]
+write_flags = ["-w", "--write"]

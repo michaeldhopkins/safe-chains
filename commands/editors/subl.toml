@@ -1,0 +1,9 @@
+[[command]]
+name = "subl"
+description = "Sublime Text CLI — opens files in the editor. Most invocations launch the GUI. Carve-out: --version / --help only."
+url = "https://www.sublimetext.com/docs/command_line.html"
+researched_version = "Sublime Text 4"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

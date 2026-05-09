@@ -1,0 +1,13 @@
+[[command]]
+name = "ar"
+description = "GNU ar — manage archives (.a static libraries). The first arg is a key letter (often combined with modifiers): r/q create or update, x extract, t list, p print, d delete. Modifiers: c (don't warn), v (verbose), s (write index), u (only newer), o (preserve dates). r/q/x/d/s mutate or extract; t/p are read."
+url = "https://sourceware.org/binutils/docs/binutils/ar.html"
+researched_version = "GNU ar 2.x"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = [
+    "--help", "--plugin", "--target",
+    "--thin", "--version",
+]
+valued = ["--plugin", "--target"]

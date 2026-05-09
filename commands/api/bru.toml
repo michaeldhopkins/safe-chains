@@ -1,0 +1,9 @@
+[[command]]
+name = "bru"
+description = "Bruno CLI — open-source API client (Postman alternative). `run` executes a collection (network requests + JS test scripts — same risk profile as Postman/newman). Carve-out: --version / --help only — meaningful invocations execute requests."
+url = "https://docs.usebruno.com/bru-cli/overview"
+researched_version = "@usebruno/cli 1.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]

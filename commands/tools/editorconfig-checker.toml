@@ -1,0 +1,30 @@
+[[command]]
+name = "editorconfig-checker"
+aliases = ["ec"]
+description = "Lints files for .editorconfig conformance. Reads files, reports violations. Pure read."
+url = "https://github.com/editorconfig-checker/editorconfig-checker"
+researched_version = "editorconfig-checker 3.x"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = [
+    "--debug", "--disable-end-of-line",
+    "--disable-indent-size", "--disable-indentation",
+    "--disable-insert-final-newline",
+    "--disable-max-line-length",
+    "--disable-trim-trailing-whitespace",
+    "--dry-run", "--exclude",
+    "--format", "--help", "--ignore-defaults",
+    "--init", "--list", "--no-color",
+    "--quiet", "--show-version", "--verbose",
+    "--version",
+    "-config", "-debug", "-disable-end-of-line",
+    "-disable-indent-size", "-disable-indentation",
+    "-disable-insert-final-newline", "-disable-max-line-length",
+    "-disable-trim-trailing-whitespace",
+    "-dry-run", "-exclude", "-format", "-h",
+    "-help", "-ignore-defaults",
+    "-init", "-list", "-no-color",
+    "-quiet", "-v", "-verbose", "-version",
+]
+valued = ["--config", "--exclude", "--format", "-config", "-exclude", "-format"]

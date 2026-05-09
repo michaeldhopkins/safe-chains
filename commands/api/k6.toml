@@ -1,0 +1,80 @@
+[[command]]
+name = "k6"
+description = "Grafana k6 — JavaScript load testing tool. `run` executes a JS test script against the target (network + arbitrary JS code execution). `cloud` uploads runs to k6 Cloud (network). `inspect`, `version`, `archive`, `convert` are read-only or local SafeWrite. The carve-out covers diagnostic + read-only forms."
+url = "https://grafana.com/docs/k6/latest/using-k6/k6-cli/"
+researched_version = "k6 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "inspect"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--execution-requirements", "--help", "-h"]
+
+[[command.sub]]
+name = "archive"
+level = "SafeWrite"
+bare = false
+positional_style = true
+standalone = ["--exclude-env-vars", "--help", "-h"]
+valued = ["--archive-out", "--config", "--include-system-env-vars", "--out", "-O", "-c", "-o"]
+
+[[command.sub]]
+name = "convert"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--correlate", "--help", "-h"]
+valued = ["--enable-status-code-checks", "--no-batch", "--only", "--output", "--return-on-failed-check", "--skip", "-o"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "cloud"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "stats"
+candidate = true
+
+[[command.sub]]
+name = "pause"
+candidate = true
+
+[[command.sub]]
+name = "resume"
+candidate = true
+
+[[command.sub]]
+name = "scale"
+candidate = true
+
+[[command.sub]]
+name = "status"
+candidate = true
+
+[[command.sub]]
+name = "new"
+candidate = true

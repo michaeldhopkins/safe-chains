@@ -1,0 +1,341 @@
+[[command]]
+name = "nerdctl"
+description = "containerd CLI — Docker-compatible CLI on top of containerd. Most subcommands manage containers, images, networks, volumes (system-state writes, network for registries). Read-side: `version`, `info`, `ps`, `inspect`, `logs`, `top`, `stats`, `port`, `images`, `image inspect`, `image history`, `network ls`, `network inspect`, `volume ls`, `volume inspect`, `compose ps`, `compose top`, `compose logs`, `system prune --dry-run`, `events`, `system info`. Carve-out covers diagnostic + read-only inspection."
+url = "https://github.com/containerd/nerdctl"
+researched_version = "nerdctl 2.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--format", "-f", "-h"]
+valued = ["--format", "-f"]
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+bare = true
+standalone = ["--debug", "--help", "--mode", "-h"]
+valued = ["--format", "--mode", "-f"]
+
+[[command.sub]]
+name = "ps"
+level = "Inert"
+bare = true
+standalone = ["--all", "--help", "--latest", "--no-trunc", "--quiet", "--size", "-a", "-h", "-l", "-n", "-q", "-s"]
+valued = ["--filter", "--format", "--last", "-f"]
+
+[[command.sub]]
+name = "inspect"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "--mode", "--size", "-h", "-s"]
+valued = ["--format", "--mode", "--type", "-f"]
+
+[[command.sub]]
+name = "logs"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--details", "--follow", "--help", "--timestamps", "-f", "-h", "-t"]
+valued = ["--since", "--tail", "--until", "-n"]
+
+[[command.sub]]
+name = "top"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "stats"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--all", "--help", "--no-stream", "--no-trunc", "-a", "-h"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "port"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "images"
+level = "Inert"
+bare = true
+positional_style = true
+standalone = ["--all", "--digests", "--help", "--names", "--no-trunc", "--quiet", "-a", "-h", "-q"]
+valued = ["--filter", "--format", "-f"]
+
+[[command.sub]]
+name = "image"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--all", "--digests", "--help", "--names", "--no-trunc", "--quiet", "-a", "-h", "-q"]
+valued = ["--filter", "--format", "-f"]
+
+[[command.sub.sub]]
+name = "inspect"
+standalone = ["--help", "--mode", "-h"]
+valued = ["--format", "--mode", "-f"]
+
+[[command.sub.sub]]
+name = "history"
+standalone = ["--help", "--human", "--no-trunc", "--quiet", "-H", "-h", "-q"]
+valued = ["--format"]
+
+[[command.sub.sub]]
+name = "build"
+candidate = true
+
+[[command.sub.sub]]
+name = "load"
+candidate = true
+
+[[command.sub.sub]]
+name = "save"
+candidate = true
+
+[[command.sub.sub]]
+name = "tag"
+candidate = true
+
+[[command.sub.sub]]
+name = "push"
+candidate = true
+
+[[command.sub.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub.sub]]
+name = "prune"
+candidate = true
+
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "network"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "--no-trunc", "--quiet", "-h", "-q"]
+valued = ["--filter", "--format", "-f"]
+
+[[command.sub.sub]]
+name = "inspect"
+standalone = ["--help", "-h"]
+valued = ["--format", "--mode", "-f"]
+
+[[command.sub.sub]]
+name = "create"
+candidate = true
+
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub.sub]]
+name = "prune"
+candidate = true
+
+[[command.sub]]
+name = "volume"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "ls"
+standalone = ["--help", "--quiet", "--size", "-h", "-q"]
+valued = ["--filter", "--format", "-f"]
+
+[[command.sub.sub]]
+name = "inspect"
+standalone = ["--help", "-h"]
+valued = ["--format", "-f"]
+
+[[command.sub.sub]]
+name = "create"
+candidate = true
+
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub.sub]]
+name = "prune"
+candidate = true
+
+[[command.sub]]
+name = "events"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+valued = ["--filter", "--format", "--since", "--until", "-f"]
+
+[[command.sub]]
+name = "system"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "info"
+standalone = ["--help", "-h"]
+valued = ["--format", "--mode", "-f"]
+
+[[command.sub.sub]]
+name = "events"
+candidate = true
+
+[[command.sub.sub]]
+name = "prune"
+candidate = true
+
+[[command.sub.sub]]
+name = "df"
+candidate = true
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "exec"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "start"
+candidate = true
+
+[[command.sub]]
+name = "stop"
+candidate = true
+
+[[command.sub]]
+name = "restart"
+candidate = true
+
+[[command.sub]]
+name = "kill"
+candidate = true
+
+[[command.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "pause"
+candidate = true
+
+[[command.sub]]
+name = "unpause"
+candidate = true
+
+[[command.sub]]
+name = "wait"
+candidate = true
+
+[[command.sub]]
+name = "rename"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "commit"
+candidate = true
+
+[[command.sub]]
+name = "cp"
+candidate = true
+
+[[command.sub]]
+name = "build"
+candidate = true
+
+[[command.sub]]
+name = "push"
+candidate = true
+
+[[command.sub]]
+name = "pull"
+candidate = true
+
+[[command.sub]]
+name = "tag"
+candidate = true
+
+[[command.sub]]
+name = "rmi"
+candidate = true
+
+[[command.sub]]
+name = "save"
+candidate = true
+
+[[command.sub]]
+name = "load"
+candidate = true
+
+[[command.sub]]
+name = "import"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "compose"
+candidate = true
+
+[[command.sub]]
+name = "namespace"
+candidate = true
+
+[[command.sub]]
+name = "container"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "logout"
+candidate = true
+
+[[command.sub]]
+name = "ipfs"
+candidate = true
+
+[[command.sub]]
+name = "apparmor"
+candidate = true
+
+[[command.sub]]
+name = "builder"
+candidate = true

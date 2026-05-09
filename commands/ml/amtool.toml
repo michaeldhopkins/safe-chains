@@ -1,0 +1,96 @@
+[[command]]
+name = "amtool"
+description = "Alertmanager CLI — manages silences, alerts, and configuration on a running Alertmanager. Most subcommands contact the Alertmanager server (network). Read-side: `version`, `alert query`, `silence query`, `cluster show`, `config show`, `config routes show`, `template render`, `check-config`. Write-side: `silence add`, `silence expire`, `silence import`, `silence update`, `alert add`, `config update`."
+url = "https://prometheus.io/docs/alerting/latest/clients/"
+researched_version = "alertmanager 0.x"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "check-config"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "alert"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "query"
+standalone = ["--active", "--expired", "--help", "--inhibited", "--silenced", "--unprocessed", "-h"]
+valued = ["--receiver"]
+
+[[command.sub.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "silence"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "query"
+standalone = ["--expired", "--help", "--quiet", "--within", "-h", "-q"]
+
+[[command.sub.sub]]
+name = "add"
+candidate = true
+
+[[command.sub.sub]]
+name = "expire"
+candidate = true
+
+[[command.sub.sub]]
+name = "import"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "cluster"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "show"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "routes"
+nested_bare = true
+
+[[command.sub.sub.sub]]
+name = "show"
+standalone = ["--help", "-h"]
+
+[[command.sub.sub.sub]]
+name = "test"
+standalone = ["--help", "--verify-receivers", "-h"]
+valued = ["--config.file", "--tree"]
+
+[[command.sub]]
+name = "template"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "render"
+standalone = ["--help", "-h"]
+valued = ["--data", "--template.glob", "--template.text", "--type"]
+
+[[command.sub]]
+name = "help"
+allow_all = true

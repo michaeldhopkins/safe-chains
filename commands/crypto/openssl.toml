@@ -1,0 +1,239 @@
+[[command]]
+name = "openssl"
+description = "OpenSSL — cryptography toolkit. Sub-driven CLI with a separate command for each operation. Read-side subs include version, ciphers, list, engine, errstr, and the `-noout`-style read of x509 / pkey / req / crl / pkcs12 / pkcs7 / asn1parse / dgst. Write-side subs include req (with -new), x509 (with -req), genrsa, genpkey, gendsa, ecparam, ca, enc, pkcs12 (with -export), pkcs7, ts, rand, smime, cms, srp, dhparam, dsaparam, gendh. The s_client / s_server / ocsp subs make network connections; speed is a CPU-intensive benchmark; engine subs may invoke external libraries. Mature, ubiquitous."
+url = "https://docs.openssl.org/master/man1/openssl/"
+researched_version = "OpenSSL 3.x"
+bare_flags = ["--help", "-help", "-version", "version"]
+
+[[command.sub]]
+name = "version"
+allow_all = true
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "ciphers"
+allow_all = true
+
+[[command.sub]]
+name = "list"
+allow_all = true
+
+[[command.sub]]
+name = "engine"
+allow_all = true
+
+[[command.sub]]
+name = "errstr"
+allow_all = true
+
+[[command.sub]]
+name = "x509"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "req"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "pkey"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "rsa"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "ec"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "dsa"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "dh"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "dhparam"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "dsaparam"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "ecparam"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "genrsa"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "genpkey"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "gendsa"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "gendh"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "crl"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "crl2pkcs7"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "pkcs7"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "pkcs8"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "pkcs12"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "asn1parse"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "dgst"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "enc"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "rand"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "rehash"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "smime"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "cms"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "ts"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "ca"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "verify"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "passwd"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "prime"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "kdf"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "mac"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "fipsinstall"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "info"
+allow_all = true
+level = "SafeRead"
+
+[[command.sub]]
+name = "nseq"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "spkac"
+allow_all = true
+level = "SafeWrite"
+
+[[command.sub]]
+name = "srp"
+candidate = true
+
+[[command.sub]]
+name = "s_client"
+candidate = true
+
+[[command.sub]]
+name = "s_server"
+candidate = true
+
+[[command.sub]]
+name = "s_time"
+candidate = true
+
+[[command.sub]]
+name = "ocsp"
+candidate = true
+
+[[command.sub]]
+name = "speed"
+candidate = true

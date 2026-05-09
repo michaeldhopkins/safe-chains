@@ -1,0 +1,259 @@
+[[command]]
+name = "svn"
+description = "Subversion — centralized version control. Read-side: `log`, `diff`, `status`, `info`, `cat`, `list`, `ls`, `blame`, `praise`, `annotate`, `proplist`, `propget`, `pget`, `plist`, `pl`, `propedit`, `propdel`, `mergeinfo`, `cleanup --help`, `--version`, `--help`. Write-side: `add`, `commit`, `ci`, `update`, `up`, `co`, `checkout`, `import`, `export`, `mkdir`, `rm`, `delete`, `del`, `move`, `mv`, `rename`, `ren`, `copy`, `cp`, `lock`, `unlock`, `merge`, `propset`, `pset`, `revert`, `resolve`, `resolved`, `switch`, `relocate`, `cleanup`."
+url = "https://subversion.apache.org/docs/release-notes/1.14.html"
+researched_version = "Subversion 1.14"
+bare_flags = ["--help", "--version", "-h", "-v"]
+
+[[command.sub]]
+name = "log"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--all-revprops", "--diff", "--help", "--incremental", "--quiet", "--revprop", "--search", "--stop-on-copy", "--use-merge-history", "--verbose", "--with-all-revprops", "--with-no-revprops", "--xml", "-c", "-g", "-h", "-l", "-q", "-r", "-v"]
+valued = ["--changelist", "--config-dir", "--config-option", "--depth", "--diff-cmd", "--limit", "--password", "--revision", "--search-and", "--targets", "--username", "--with-revprop", "--xml-file", "-c", "-g", "-l", "-r"]
+
+[[command.sub]]
+name = "diff"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--diff-cmd", "--force", "--git", "--help", "--no-diff-deleted", "--no-diff-added", "--no-diff-statistics", "--notice-ancestry", "--patch-compatible", "--summarize", "--xml", "-c", "-h", "-r", "-x"]
+valued = ["--changelist", "--config-dir", "--config-option", "--depth", "--diff-cmd", "--extensions", "--internal-diff", "--new", "--old", "--password", "--revision", "--username", "-c", "-r", "-x"]
+
+[[command.sub]]
+name = "status"
+aliases = ["stat", "st"]
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--changelist", "--config-dir", "--depth", "--help", "--ignore-externals", "--incremental", "--no-ignore", "--quiet", "--show-updates", "--verbose", "--xml", "-N", "-h", "-q", "-u", "-v"]
+valued = ["--changelist", "--config-dir", "--config-option", "--depth"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "--include-externals", "--incremental", "--recursive", "--targets", "--xml", "-R", "-h", "-r"]
+valued = ["--changelist", "--config-dir", "--depth", "--password", "--revision", "--targets", "--username", "-r"]
+
+[[command.sub]]
+name = "cat"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "--ignore-keywords", "-h", "-r"]
+valued = ["--config-dir", "--password", "--revision", "--username", "-r"]
+
+[[command.sub]]
+name = "list"
+aliases = ["ls"]
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--depth", "--help", "--incremental", "--recursive", "--verbose", "--xml", "-R", "-h", "-r", "-v"]
+valued = ["--config-dir", "--depth", "--password", "--revision", "--username", "-r"]
+
+[[command.sub]]
+name = "blame"
+aliases = ["praise", "annotate", "ann"]
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--force", "--help", "--use-merge-history", "--xml", "-g", "-h", "-r", "-v", "-x"]
+valued = ["--config-dir", "--diff-cmd", "--extensions", "--password", "--revision", "--username", "-r", "-x"]
+
+[[command.sub]]
+name = "proplist"
+aliases = ["plist", "pl"]
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--depth", "--help", "--incremental", "--quiet", "--recursive", "--revprop", "--show-inherited-props", "--verbose", "--xml", "-R", "-h", "-q", "-r", "-v"]
+valued = ["--changelist", "--config-dir", "--depth", "--password", "--revision", "--username", "-r"]
+
+[[command.sub]]
+name = "propget"
+aliases = ["pget", "pg"]
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--depth", "--help", "--no-newline", "--recursive", "--revprop", "--show-inherited-props", "--strict", "--verbose", "--xml", "-R", "-h", "-r", "-v"]
+valued = ["--changelist", "--config-dir", "--depth", "--password", "--revision", "--username", "-r"]
+
+[[command.sub]]
+name = "mergeinfo"
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--from-source", "--help", "--show-revs", "-h"]
+valued = ["--config-dir", "--password", "--revision", "--username", "-R", "-r"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+
+[[command.sub]]
+name = "add"
+candidate = true
+
+[[command.sub]]
+name = "commit"
+candidate = true
+
+[[command.sub]]
+name = "ci"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
+
+[[command.sub]]
+name = "up"
+candidate = true
+
+[[command.sub]]
+name = "checkout"
+candidate = true
+
+[[command.sub]]
+name = "co"
+candidate = true
+
+[[command.sub]]
+name = "import"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "mkdir"
+candidate = true
+
+[[command.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true
+
+[[command.sub]]
+name = "del"
+candidate = true
+
+[[command.sub]]
+name = "move"
+candidate = true
+
+[[command.sub]]
+name = "mv"
+candidate = true
+
+[[command.sub]]
+name = "rename"
+candidate = true
+
+[[command.sub]]
+name = "copy"
+candidate = true
+
+[[command.sub]]
+name = "cp"
+candidate = true
+
+[[command.sub]]
+name = "lock"
+candidate = true
+
+[[command.sub]]
+name = "unlock"
+candidate = true
+
+[[command.sub]]
+name = "merge"
+candidate = true
+
+[[command.sub]]
+name = "propset"
+candidate = true
+
+[[command.sub]]
+name = "pset"
+candidate = true
+
+[[command.sub]]
+name = "ps"
+candidate = true
+
+[[command.sub]]
+name = "propedit"
+candidate = true
+
+[[command.sub]]
+name = "pedit"
+candidate = true
+
+[[command.sub]]
+name = "pe"
+candidate = true
+
+[[command.sub]]
+name = "propdel"
+candidate = true
+
+[[command.sub]]
+name = "pdel"
+candidate = true
+
+[[command.sub]]
+name = "pd"
+candidate = true
+
+[[command.sub]]
+name = "revert"
+candidate = true
+
+[[command.sub]]
+name = "resolve"
+candidate = true
+
+[[command.sub]]
+name = "resolved"
+candidate = true
+
+[[command.sub]]
+name = "switch"
+candidate = true
+
+[[command.sub]]
+name = "sw"
+candidate = true
+
+[[command.sub]]
+name = "relocate"
+candidate = true
+
+[[command.sub]]
+name = "cleanup"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "patch"
+candidate = true
+
+[[command.sub]]
+name = "upgrade"
+candidate = true
+
+[[command.sub]]
+name = "youngest"
+candidate = true

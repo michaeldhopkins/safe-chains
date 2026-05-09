@@ -1,0 +1,9 @@
+[[command]]
+name = "swipl"
+description = "SWI-Prolog REPL / runtime. Bare invocation drops into the REPL. -g GOAL / -t GOAL / -s SCRIPT execute Prolog (arbitrary code). Carve-out: --version / --help only."
+url = "https://www.swi-prolog.org/pldoc/man?section=cmdline"
+researched_version = "SWI-Prolog 9.x"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]
