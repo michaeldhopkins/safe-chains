@@ -5523,6 +5523,8 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - **combine**: Positional args accepted
 - **compare**: Positional args accepted
 - **composite**: Positional args accepted
+- **convert**: delegates to inner command
+- **identify**: delegates to inner command
 - **mogrify**: Positional args accepted
 - **montage**: Positional args accepted
 - **stream**: Positional args accepted
@@ -5696,6 +5698,7 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - **edit**: Flags: --help, -h
 - **en**: Flags: --help, -h
 - **env**: Flags: --help, --json, -J, -h. Valued: --shell, -s
+- **exec**: delegates to inner command
 - **fmt**: Flags: --check, --help, -h
 - **generate**: Flags: --help, -h
 - **i**: Flags: --force, --help, --quiet, --verbose, -f, -q, -v, -h. Valued: --jobs, -j
@@ -7063,7 +7066,8 @@ Aliases: `xelatex`, `lualatex`, `latex`
 
 - Routing: the handler walks `-d KEY=VALUE` directives (KEY allowlist in Rust because the validation is custom — see is_safe_ini_pair), then basename-normalizes the next token. `--help` / `--version` / etc. as the final token match [command.fallback]; `artisan` and `please` (or any path whose basename is one of those) match the corresponding [[command.sub]] and re-dispatch via the top-level `artisan` / `please` command.
 
-
+- **artisan**: delegates to inner command
+- **please**: delegates to inner command
 
 - **Fallback grammar (engaged when no sub matches):**
 - Allowed standalone flags: --help, --info, --ini, --modules, --version, -V, -h, -i, -m, -v
@@ -8216,6 +8220,7 @@ Aliases: `python`
 
 - **component list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
 - **doc**: Flags: --alloc, --book, --cargo, --core, --edition-guide, --embedded-book, --help, --nomicon, --path, --proc_macro, --reference, --rust-by-example, --rustc, --rustdoc, --std, --test, --unstable-book, -h. Valued: --toolchain
+- **run**: delegates to inner command
 - **show**: Flags: --help, --installed, -h, -v
 - **target list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
 - **toolchain list**: Flags: --help, --installed, -h, -v. Valued: --toolchain

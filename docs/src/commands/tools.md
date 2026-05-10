@@ -962,7 +962,8 @@ Aliases: `run-p`, `run-s`
 
 - Routing: the handler walks `-d KEY=VALUE` directives (KEY allowlist in Rust because the validation is custom — see is_safe_ini_pair), then basename-normalizes the next token. `--help` / `--version` / etc. as the final token match [command.fallback]; `artisan` and `please` (or any path whose basename is one of those) match the corresponding [[command.sub]] and re-dispatch via the top-level `artisan` / `please` command.
 
-
+- **artisan**: delegates to inner command
+- **please**: delegates to inner command
 
 - **Fallback grammar (engaged when no sub matches):**
 - Allowed standalone flags: --help, --info, --ini, --modules, --version, -V, -h, -i, -m, -v

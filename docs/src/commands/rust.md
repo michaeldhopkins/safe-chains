@@ -110,6 +110,7 @@
 
 - **component list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
 - **doc**: Flags: --alloc, --book, --cargo, --core, --edition-guide, --embedded-book, --help, --nomicon, --path, --proc_macro, --reference, --rust-by-example, --rustc, --rustdoc, --std, --test, --unstable-book, -h. Valued: --toolchain
+- **run**: delegates to inner command
 - **show**: Flags: --help, --installed, -h, -v
 - **target list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
 - **toolchain list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
