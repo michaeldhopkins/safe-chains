@@ -2414,6 +2414,110 @@ delegate_after = "--"
     }
 
     #[test]
+    fn handler_command_renders_handler_policies_and_data() {
+        // Regression: [command.handler_policy.*] and
+        // [command.handler_data] blocks must surface in auto-rendered
+        // docs alongside doc_body / subs / fallback. Without this,
+        // handler-using commands like gh/glab (whose dispatch matrix
+        // lives in Rust but whose per-policy WordSets live in TOML)
+        // would silently strip the data from rendered docs.
+        let spec = load_one(r#"
+[[command]]
+name = "demo-policies"
+handler = "demo_handler"
+doc_body = "Routing prose."
+
+[command.handler_data]
+read_subs = ["alpha", "beta", "gamma"]
+actions = ["list", "view"]
+
+[command.handler_policy.list]
+bare = true
+standalone = ["--help", "--all", "-h"]
+valued = ["--limit"]
+
+[command.handler_policy.view]
+bare = false
+standalone = ["--web", "-w"]
+"#);
+        let doc = spec.to_command_doc();
+        assert!(
+            doc.description.contains("Handler-side flag policies"),
+            "handler_policy section header must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("**list**"),
+            "handler_policy.list must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("**view**"),
+            "handler_policy.view must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("--limit"),
+            "handler_policy flag detail must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("Handler-side data"),
+            "handler_data section header must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("alpha, beta, gamma"),
+            "handler_data list values must render: {}",
+            doc.description,
+        );
+    }
+
+    #[test]
+    fn handler_word_list_returns_declared_values() {
+        let spec = load_one(r#"
+[[command]]
+name = "demo-wl"
+handler = "demo_handler"
+
+[command.handler_data]
+allowlist = ["foo", "bar"]
+"#);
+        // The spec is loaded but not registered in the global registry,
+        // so we have to use the spec directly. Verify the build kept
+        // the list intact via the kind.
+        match &spec.kind {
+            DispatchKind::Custom { handler_data, .. } => {
+                let actual = handler_data.get("allowlist").map(Vec::as_slice).unwrap_or(&[]);
+                assert_eq!(actual, &["foo".to_string(), "bar".to_string()]);
+            }
+            other => panic!("expected Custom, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn check_handler_policy_returns_false_for_missing_key() {
+        // Built spec without the requested policy key — handler should
+        // get back `false` (i.e. denial) rather than a panic.
+        let spec = load_one(r#"
+[[command]]
+name = "demo-cp"
+handler = "demo_handler"
+
+[command.handler_policy.list]
+bare = true
+standalone = ["--help"]
+"#);
+        match &spec.kind {
+            DispatchKind::Custom { handler_policies, .. } => {
+                assert!(handler_policies.contains_key("list"));
+                assert!(!handler_policies.contains_key("nope"));
+            }
+            other => panic!("expected Custom, got {other:?}"),
+        }
+    }
+
+    #[test]
     fn handler_command_renders_subs_and_fallback_data() {
         // Auto-render: a handler-using command's [[command.sub]] and
         // [command.fallback] data must surface in the doc description

@@ -3531,9 +3531,10 @@ Aliases: `g++`, `cc`, `c++`
 ### `gh`
 <p class="cmd-url"><a href="https://cli.github.com/manual/">https://cli.github.com/manual/</a></p>
 
-- Subcommands alias, attestation, cache, codespace, config, extension, gist, gpg-key, issue, label, org, pr, project, release, repo, ruleset, run, secret, ssh-key, variable, workflow are allowed with actions: checks, diff, list, status, verify, view, watch.
-- Always safe: --version, search, status.
-- auth status, browse (requires --no-browser), run rerun (SafeWrite), release download (requires --output), api (read-only: implicit GET or explicit -X GET, with --paginate, --slurp, --jq, --template, --cache, --preview, --include, --silent, --verbose, --hostname, -H for Accept and X-GitHub-Api-Version headers).
+- Routing: handler dispatches the sub × action matrix (read-only subs × {checks, diff, list, status, verify, view, watch}) via per-action TOML-declared policies, with parent-specific overrides for `run` (RUN_LIST/RUN_VIEW/RUN_WATCH) and `release` (RELEASE_LIST/RELEASE_VIEW). Special-case subs in the handler: `auth status` (Inert), `browse` (requires --no-browser, Inert), `run rerun` (SafeWrite), `release download` (requires --output, SafeWrite), `search`/`status` (Inert), `api` (its own sub-handler — REST and GraphQL with read-only methods and header allowlist). All flag-policy data lives in [command.handler_policy.*] blocks below.
+
+- **Fallback grammar (engaged when no sub matches):**
+- Allowed standalone flags: --help, --version, -V, -h
 
 ### `ghc`
 <p class="cmd-url"><a href="https://www.haskell.org/ghc/">https://www.haskell.org/ghc/</a></p>

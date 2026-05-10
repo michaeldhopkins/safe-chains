@@ -1,0 +1,155 @@
+[[command]]
+name = "gh"
+description = "GitHub's official CLI. Most subcommands wrap REST or GraphQL calls against api.github.com over authenticated HTTPS. Read-only operations (`gh pr list`, `gh issue view`, `gh run watch`, `gh release list`, etc.) query data; write operations create or mutate repository state (`gh pr create`, `gh issue close`, `gh release create`, etc.) and are not covered. `gh run rerun` re-queues a workflow run — accepted as SafeWrite because it doesn't lose history. `gh release download` writes downloaded asset bytes to a local path — SafeWrite, gated on `-O`/`--output` being present so the destination is explicit. `gh browse` opens a browser by default, accepted only when `-n`/`--no-browser` suppresses that. `gh api` lets the user issue arbitrary REST or GraphQL requests; covered only for read-style methods (implicit GET or explicit `-X GET`) with a narrow header allowlist (Accept, X-GitHub-Api-Version) and a GraphQL mutation veto. Releases roughly monthly with a stable command surface; new flags appear regularly."
+url = "https://cli.github.com/manual/"
+handler = "gh"
+researched_version = "gh 2.x"
+doc_body = "Routing: handler dispatches the sub × action matrix (read-only subs × {checks, diff, list, status, verify, view, watch}) via per-action TOML-declared policies, with parent-specific overrides for `run` (RUN_LIST/RUN_VIEW/RUN_WATCH) and `release` (RELEASE_LIST/RELEASE_VIEW). Special-case subs in the handler: `auth status` (Inert), `browse` (requires --no-browser, Inert), `run rerun` (SafeWrite), `release download` (requires --output, SafeWrite), `search`/`status` (Inert), `api` (its own sub-handler — REST and GraphQL with read-only methods and header allowlist). All flag-policy data lives in [command.handler_policy.*] blocks below."
+
+# --version / --help at length 2.
+[command.fallback]
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]
+
+# Sub × action matrix data the handler walks at dispatch time.
+[command.handler_data]
+read_only_subs = [
+  "alias", "attestation", "cache", "codespace", "config",
+  "extension", "gist", "gpg-key",
+  "issue", "label", "org", "pr", "project", "release",
+  "repo", "ruleset", "run", "secret",
+  "ssh-key", "variable", "workflow",
+]
+read_only_actions = ["checks", "diff", "list", "status", "verify", "view", "watch"]
+
+# 17 named flag policies. Each is the flag surface for one (action) or
+# (parent, action) cell of the matrix; the handler picks the right one
+# at dispatch time. Listed in the same order as the original Rust
+# WordSets for ease of audit.
+
+[command.handler_policy.list]
+bare = true
+standalone = [
+  "--all", "--archived", "--comments", "--draft",
+  "--fork", "--no-archived", "--source", "--web",
+  "-a", "-w",
+]
+valued = [
+  "--app", "--assignee", "--author", "--base",
+  "--env", "--head", "--jq", "--json",
+  "--key", "--label", "--language", "--limit",
+  "--mention", "--milestone", "--order", "--org",
+  "--ref", "--repo", "--search", "--sort",
+  "--state", "--template", "--topic", "--user", "--visibility",
+  "-B", "-H", "-L", "-O", "-R", "-S",
+  "-e", "-k", "-l", "-o", "-q", "-r", "-u",
+]
+
+[command.handler_policy.view]
+bare = false
+standalone = ["--comments", "--web", "--yaml", "-c", "-w", "-y"]
+valued = ["--branch", "--jq", "--json", "--ref", "--repo", "--template", "-R", "-b", "-q", "-r"]
+
+[command.handler_policy.diff]
+bare = false
+standalone = ["--name-only", "--patch", "--web", "-w"]
+valued = ["--color", "--repo", "-R"]
+
+[command.handler_policy.checks]
+bare = false
+standalone = ["--fail-fast", "--required", "--watch", "--web", "-w"]
+valued = ["--interval", "--jq", "--json", "--repo", "--template", "-R", "-i", "-q"]
+
+[command.handler_policy.status]
+bare = false
+standalone = ["--exit-status", "--log", "--log-failed", "--web", "-w"]
+valued = ["--jq", "--json", "--repo", "--template", "-R", "-q"]
+
+[command.handler_policy.run_list]
+bare = true
+standalone = []
+valued = [
+  "--branch", "--commit", "--created", "--event",
+  "--jq", "--json", "--limit", "--repo",
+  "--status", "--template", "--user", "--workflow",
+  "-L", "-R", "-b", "-q", "-u", "-w",
+]
+
+[command.handler_policy.run_view]
+bare = false
+standalone = ["--exit-status", "--log", "--log-failed", "--verbose", "--web", "-v", "-w"]
+valued = ["--attempt", "--job", "--jq", "--json", "--repo", "--template", "-R", "-j", "-q"]
+
+[command.handler_policy.run_watch]
+bare = false
+standalone = ["--exit-status"]
+valued = ["--interval", "--repo", "-R", "-i"]
+
+[command.handler_policy.release_list]
+bare = true
+standalone = ["--exclude-drafts", "--exclude-pre-releases"]
+valued = ["--jq", "--json", "--limit", "--order", "--repo", "--template", "-L", "-R", "-q"]
+
+[command.handler_policy.release_view]
+bare = false
+standalone = ["--web", "-w"]
+valued = ["--jq", "--json", "--repo", "--template", "-R", "-q"]
+
+[command.handler_policy.search]
+bare = false
+standalone = [
+  "--archived", "--draft", "--include-forks", "--locked", "--merged",
+  "--no-assignee", "--no-label", "--no-milestone", "--no-project",
+  "--web", "-w",
+]
+valued = [
+  "--app", "--assignee", "--author",
+  "--checks", "--closed", "--commenter", "--comments", "--committer",
+  "--created", "--filename", "--followers", "--forks",
+  "--good-first-issues", "--hash", "--help-wanted-issues",
+  "--include", "--interactions", "--involves", "--jq", "--json",
+  "--label", "--language", "--license", "--limit",
+  "--match", "--mentions", "--merged-at", "--milestone",
+  "--number", "--order", "--owner", "--parent", "--project",
+  "--reactions", "--repo", "--review", "--review-requested", "--reviewed-by",
+  "--size", "--sort", "--stars", "--state",
+  "--team-mentions", "--team-review-requested", "--template",
+  "--topic", "--updated", "--visibility",
+  "-L", "-R", "-q",
+]
+
+[command.handler_policy.release_download]
+bare = false
+standalone = ["--clobber", "--skip-existing"]
+valued = ["--archive", "--dir", "--output", "--pattern", "--repo", "-A", "-D", "-O", "-R", "-p"]
+
+[command.handler_policy.simple_list]
+bare = true
+standalone = ["--all", "--archived", "--fork", "--no-archived", "--source", "--web", "-a", "-w"]
+valued = [
+  "--env", "--jq", "--json", "--key", "--language", "--limit",
+  "--order", "--org", "--ref", "--repo", "--search",
+  "--sort", "--template", "--topic", "--user", "--visibility",
+  "-L", "-O", "-R", "-S", "-e", "-k", "-l", "-o", "-q", "-r", "-u",
+]
+
+[command.handler_policy.simple_view]
+bare = false
+standalone = ["--web", "--yaml", "-w", "-y"]
+valued = ["--jq", "--json", "--ref", "--repo", "--template", "-R", "-q", "-r"]
+
+[command.handler_policy.run_rerun]
+bare = false
+standalone = ["--debug", "--failed"]
+valued = ["--job", "--repo", "-R", "-j"]
+
+[command.handler_policy.browse]
+bare = false
+standalone = [
+  "--actions", "--no-browser", "--projects",
+  "--releases", "--settings", "--wiki",
+  "-a", "-c", "-n", "-p", "-r", "-s", "-w",
+]
+valued = ["--branch", "--commit", "--repo", "-R", "-b"]

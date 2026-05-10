@@ -77,6 +77,37 @@ pub(super) struct TomlCommand {
     /// responsible for invoking it via `registry::try_fallback_grammar()`.
     #[serde(default)]
     pub fallback: Option<TomlFallback>,
+    /// Named flag policies the handler references by string key. Used when
+    /// a handler's dispatch logic genuinely can't move to TOML (e.g. gh's
+    /// sub × action matrix) but the per-policy WordSets are still data that
+    /// should live in TOML. The handler reads them via
+    /// `registry::check_handler_policy(cmd, key, tokens)`.
+    #[serde(default)]
+    pub handler_policy: std::collections::HashMap<String, TomlHandlerPolicy>,
+    /// Named string lists the handler references by string key. Same
+    /// motivation as `handler_policy` but for plain word sets (allowed
+    /// subcommand names, ini directives, etc.). Read via
+    /// `registry::handler_word_list(cmd, key)`.
+    #[serde(default)]
+    pub handler_data: std::collections::HashMap<String, Vec<String>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub(super) struct TomlHandlerPolicy {
+    #[serde(default)]
+    pub standalone: Vec<String>,
+    #[serde(default)]
+    pub valued: Vec<String>,
+    #[serde(default)]
+    pub bare: Option<bool>,
+    #[serde(default)]
+    pub max_positional: Option<usize>,
+    #[serde(default)]
+    pub tolerate_unknown_short: Option<bool>,
+    #[serde(default)]
+    pub tolerate_unknown_long: Option<bool>,
+    #[serde(default)]
+    pub numeric_dash: Option<bool>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -274,6 +305,13 @@ pub(super) enum DispatchKind {
         /// via `registry::try_fallback_grammar()`. `None` unless the
         /// handler uses the helper.
         fallback: Option<FallbackSpec>,
+        /// Named flag policies the handler consults via
+        /// `registry::check_handler_policy()`. Empty unless the handler
+        /// has dispatch logic that picks a policy by name at runtime.
+        handler_policies: std::collections::HashMap<String, OwnedPolicy>,
+        /// Named string lists the handler reads via
+        /// `registry::handler_word_list()`.
+        handler_data: std::collections::HashMap<String, Vec<String>>,
     },
 }
 
