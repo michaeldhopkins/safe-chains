@@ -9201,9 +9201,11 @@ Aliases: `serverless`
 ### `sysctl`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/sysctl.8.html">https://man7.org/linux/man-pages/man8/sysctl.8.html</a></p>
 
+- Read-only: any token containing `=` is rejected so write-style invocations (`sysctl foo=bar`, `sysctl -w key=value`) cannot reach the kernel.
+
+- **Fallback grammar (engaged when no sub matches):**
 - Allowed standalone flags: --help, -A, -N, -X, -a, -b, -d, -e, -h, -l, -n, -o, -q, -x
 - Allowed valued flags: -B, -r
-- Read-only queries of kernel parameters
 
 ### `system_profiler`
 <p class="cmd-url"><a href="https://ss64.com/mac/system_profiler.html">https://ss64.com/mac/system_profiler.html</a></p>

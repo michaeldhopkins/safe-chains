@@ -3,7 +3,10 @@ name = "sysctl"
 description = "System utility for reading and modifying kernel parameters (tunables) exposed via /proc/sys on Linux or the sysctl MIB on macOS/BSD. Writing kernel parameters (sysctl -w) can change fundamental system behavior including networking stack configuration, memory management, security settings, and process limits -- some changes can destabilize the system or weaken security. The coverage (via custom handler) is restricted to read-only queries that display current parameter values. The write (-w), load (-p), and --system operations that modify kernel parameters are outside coverage. The interface is extremely stable as part of the base OS."
 handler = "sysctl"
 url = "https://man7.org/linux/man-pages/man8/sysctl.8.html"
-doc_body = """
-- Allowed standalone flags: --help, -A, -N, -X, -a, -b, -d, -e, -h, -l, -n, -o, -q, -x
-- Allowed valued flags: -B, -r
-- Read-only queries of kernel parameters"""
+doc_body = "Read-only: any token containing `=` is rejected so write-style invocations (`sysctl foo=bar`, `sysctl -w key=value`) cannot reach the kernel."
+
+[command.fallback]
+level = "Inert"
+bare = false
+standalone = ["--help", "-A", "-N", "-X", "-a", "-b", "-d", "-e", "-h", "-l", "-n", "-o", "-q", "-x"]
+valued = ["-B", "-r"]
