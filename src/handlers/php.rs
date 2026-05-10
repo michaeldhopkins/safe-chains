@@ -1,11 +1,14 @@
 use crate::parse::{Token, WordSet};
+use crate::registry;
 use crate::verdict::{SafetyLevel, Verdict};
 
-static PHP_BARE_FLAGS: WordSet = WordSet::new(&[
-    "--help", "--info", "--ini", "--modules", "--version",
-    "-V", "-h", "-i", "-m", "-v",
-]);
-
+// PHP_SAFE_INI_DIRECTIVES is data, but it is tightly coupled to the
+// `-d KEY=VALUE` pre-flag-scan validation (see is_safe_ini_pair) which
+// the declarative TOML schema doesn't express — the value must be a
+// `KEY=VALUE` pair where the KEY is in this allowlist. Adding a TOML
+// primitive for "valued flag with key allowlist for KEY=VALUE form" is
+// a future refinement; until then this list lives in Rust as a known
+// exception to the data-in-TOML principle.
 static PHP_SAFE_INI_DIRECTIVES: WordSet = WordSet::new(&[
     "date.timezone",
     "display_errors",
@@ -19,8 +22,6 @@ static PHP_SAFE_INI_DIRECTIVES: WordSet = WordSet::new(&[
     "post_max_size",
     "upload_max_filesize",
 ]);
-
-static PHP_DELEGATE_SUBS: WordSet = WordSet::new(&["artisan", "please"]);
 
 fn is_safe_ini_pair(value: &str) -> bool {
     let Some((key, _)) = value.split_once('=') else {
@@ -58,26 +59,31 @@ pub fn is_safe_php(tokens: &[Token]) -> Verdict {
     };
     let arg_str = arg.as_str();
 
-    if i + 1 == tokens.len() && PHP_BARE_FLAGS.contains(arg_str) {
-        return Verdict::Allowed(SafetyLevel::Inert);
+    // Bare diagnostic flag as the final token: probe the [command.fallback]
+    // grammar with a synthetic two-token slice so `php -d X=1 --version`
+    // is validated the same way as `php --version`.
+    if i + 1 == tokens.len() {
+        let probe = [tokens[0].clone(), arg.clone()];
+        if let Some(v @ Verdict::Allowed(_)) = registry::try_fallback_grammar("php", &probe) {
+            return v;
+        }
     }
 
+    // Delegate-by-basename: the script path's basename must match a
+    // declared sub (`artisan`, `please`). delegate_skip = 0 on the sub
+    // dispatches the (normalized) token tail to command_verdict so the
+    // inner top-level command's TOML drives validation.
     let basename = std::path::Path::new(arg_str)
         .file_name()
         .and_then(|s| s.to_str())
         .unwrap_or(arg_str);
-
-    if !PHP_DELEGATE_SUBS.contains(basename) {
-        return Verdict::Denied;
-    }
-
-    let mut parts: Vec<&str> = Vec::with_capacity(tokens.len() - i);
-    parts.push(basename);
+    let mut probe = Vec::with_capacity(tokens.len() - i + 1);
+    probe.push(tokens[0].clone());
+    probe.push(Token::from_raw(basename.to_string()));
     for t in &tokens[i + 1..] {
-        parts.push(t.as_str());
+        probe.push(t.clone());
     }
-    let inner = shell_words::join(parts);
-    crate::command_verdict(&inner)
+    registry::try_sub_dispatch("php", &probe).unwrap_or(Verdict::Denied)
 }
 
 // Laravel's cache:clear is treated as SafeWrite for any well-formed
