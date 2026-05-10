@@ -1326,11 +1326,21 @@ Aliases: `python`
 ### `tilt`
 <p class="cmd-url"><a href="https://docs.tilt.dev/cli/tilt">https://docs.tilt.dev/cli/tilt</a></p>
 
-- Bare invocation, `--help`, `-h`, `--version`, `-v`, `-V` allowed (both binaries)
-- Ruby tilt: `--list`, `-l` to list engines; `tilt FILE` to render a template; `--type/-t TYPE`, `--layout/-y LAYOUT` valued flags. File argument must look like a path (contain `/`, `.`, or be `-` for stdin) — bare words (e.g. `tilt up`) are rejected since they're indistinguishable from K8s tilt subcommands.
-- K8s tilt diagnostic subs: `version`, `doctor`, `verify-install` (Inert)
-- K8s tilt help/completion: `help [topic]`, `completion [shell]` (Inert)
-- K8s tilt read subs: `get [resource]`, `describe [resource]` with kubectl-style flags (`-n/--namespace`, `-l/--selector`, `-o/--output`, `--field-selector`, `--context`, `--kubeconfig`, `-A/--all-namespaces`, `-w/--watch`)
+- Routing: a K8s tilt sub name selects that sub; otherwise the Ruby template-engine fallback grammar applies, with the first positional required to look like a path so bare words (e.g. `tilt up`) are rejected as unknown K8s subcommands.
+
+- **completion**: Flags: --help, -h
+- **describe**: Flags: --help, --no-headers, --show-labels, --watch, -A, -h, -w. Valued: --context, --field-selector, --kubeconfig, --namespace, --output, --selector, -l, -n, -o
+- **doctor**: Flags: --help, -h
+- **get**: Flags: --help, --no-headers, --show-labels, --watch, -A, -h, -w. Valued: --context, --field-selector, --kubeconfig, --namespace, --output, --selector, -l, -n, -o
+- **help**: Flags: --help, -h
+- **verify-install**: Flags: --help, -h
+- **version**: Flags: --help, -h
+
+- **Fallback grammar (engaged when no sub matches):**
+- Bare invocation allowed
+- Allowed standalone flags: --help, --list, --version, -V, -h, -l, -v
+- Allowed valued flags: --layout, --type, -t, -y
+- First positional must look like a path (contains `/`, `.`, or is `-` for stdin)
 
 **Examples:**
 
