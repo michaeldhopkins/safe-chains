@@ -1,90 +1,25 @@
-use crate::parse::{Token, WordSet};
+//! GitLab CLI dispatch. All flag-policy data and sub × action
+//! allowlists live in `commands/forges/glab.toml`. The handler is the
+//! matrix routing logic plus the always-safe-bare-subs check and
+//! delegation to gh's API sub-handler for `glab api`.
+use crate::parse::Token;
+use crate::registry;
 use crate::verdict::{SafetyLevel, Verdict};
-use crate::policy::{self, FlagPolicy, FlagTolerance};
 
-static GLAB_READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
-    "ci", "cluster", "deploy-key", "gpg-key", "incident", "issue",
-    "iteration", "label", "milestone", "mr", "release", "repo",
-    "schedule", "snippet", "ssh-key", "stack", "variable",
-]);
+fn check_policy(key: &str, tokens: &[Token], level: SafetyLevel) -> Verdict {
+    if registry::check_handler_policy("glab", key, tokens) {
+        Verdict::Allowed(level)
+    } else {
+        Verdict::Denied
+    }
+}
 
-static GLAB_READ_ONLY_ACTIONS: WordSet =
-    WordSet::new(&["diff", "issues", "list", "status", "view"]);
-
-static GLAB_ALWAYS_SAFE: WordSet =
-    WordSet::new(&["--version", "-v", "check-update", "version"]);
-
-static GLAB_AUTH_SAFE: WordSet =
-    WordSet::new(&["status"]);
-
-static GLAB_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--all", "--closed", "--draft", "--help", "--merged",
-        "-A", "-M", "-a", "-c", "-d", "-g", "-h", "-q",
-    ]),
-    valued: WordSet::flags(&[
-        "--assignee", "--author", "--group", "--label",
-        "--milestone", "--not-label", "--order", "--output",
-        "--page", "--per-page", "--repo", "--reviewer",
-        "--search", "--sort", "--source-branch", "--state",
-        "--target-branch",
-        "-F", "-P", "-R", "-S", "-a", "-g", "-l", "-m", "-o", "-p", "-r", "-s", "-t",
-    ]),
-    bare: true,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--comments", "--help", "--resolved", "--system-logs",
-        "--unresolved", "--web",
-        "-c", "-h", "-p", "-s", "-w",
-    ]),
-    valued: WordSet::flags(&[
-        "--output", "--page", "--per-page", "--repo",
-        "-F", "-P", "-R", "-p",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--help", "--raw",
-        "-h",
-    ]),
-    valued: WordSet::flags(&[
-        "--color", "--repo",
-        "-R",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GLAB_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--help",
-        "-h", "-q",
-    ]),
-    valued: WordSet::flags(&[
-        "--output", "--page", "--per-page", "--repo",
-        "-F", "-P", "-R", "-p",
-    ]),
-    bare: true,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-fn glab_action_policy(action: &str) -> &'static FlagPolicy {
+fn action_policy_key(action: &str) -> &'static str {
     match action {
-        "list" | "issues" => &GLAB_LIST_POLICY,
-        "view" => &GLAB_VIEW_POLICY,
-        "diff" => &GLAB_DIFF_POLICY,
-        "status" => &GLAB_SIMPLE_POLICY,
-        _ => &GLAB_SIMPLE_POLICY,
+        "list" | "issues" => "list",
+        "view" => "view",
+        "diff" => "diff",
+        _ => "simple",
     }
 }
 
@@ -92,58 +27,70 @@ pub fn is_safe_glab(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
         return Verdict::Denied;
     }
-    let subcmd = &tokens[1];
 
-    if GLAB_READ_ONLY_SUBCOMMANDS.contains(subcmd) {
-        if tokens.len() < 3 || !GLAB_READ_ONLY_ACTIONS.contains(&tokens[2]) {
-            return Verdict::Denied;
-        }
-        let policy = glab_action_policy(tokens[2].as_str());
-        return if policy::check(&tokens[2..], policy) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
+    // `glab --help` / `glab --version` / `glab -h` / `glab -v` at length 2.
+    if let Some(v @ Verdict::Allowed(_)) = registry::try_fallback_grammar("glab", tokens) {
+        return v;
     }
 
-    if GLAB_ALWAYS_SAFE.contains(subcmd) {
-        return if tokens.len() == 2 { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
+    let subcmd = tokens[1].as_str();
+
+    // Always-safe bare subs: `glab version`, `glab check-update`. No
+    // extra arguments allowed.
+    if registry::handler_word_list("glab", "always_safe_bare_subs")
+        .iter()
+        .any(|s| s == subcmd)
+    {
+        return if tokens.len() == 2 {
+            Verdict::Allowed(SafetyLevel::Inert)
+        } else {
+            Verdict::Denied
+        };
     }
 
     if subcmd == "auth" {
-        if tokens.len() < 3 || !GLAB_AUTH_SAFE.contains(&tokens[2]) {
+        if tokens.len() < 3 || tokens[2].as_str() != "status" {
             return Verdict::Denied;
         }
-        return if policy::check(&tokens[2..], &GLAB_SIMPLE_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
+        return check_policy("simple", &tokens[2..], SafetyLevel::Inert);
     }
 
+    // `glab api` shares the GitHub API sub-handler — same shape (REST
+    // and GraphQL with read-only methods plus a narrow header
+    // allowlist). Pass the full token list per gh's calling convention.
     if subcmd == "api" {
         return super::gh::is_safe_gh_api(tokens);
     }
 
-    Verdict::Denied
+    // Read-only sub × action matrix.
+    if registry::handler_word_list("glab", "read_only_subs")
+        .iter()
+        .any(|s| s == subcmd)
+    {
+        let Some(action) = tokens.get(2).map(|t| t.as_str()) else {
+            return Verdict::Denied;
+        };
+        if !registry::handler_word_list("glab", "read_only_actions")
+            .iter()
+            .any(|a| a == action)
+        {
+            return Verdict::Denied;
+        }
+        return check_policy(action_policy_key(action), &tokens[2..], SafetyLevel::Inert);
+    }
 
+    Verdict::Denied
 }
 
-pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    match cmd {
-        "glab" => Some(is_safe_glab(tokens)),
-        _ => None,
-    }
+pub(in crate::handlers::forges) fn dispatch(_cmd: &str, _tokens: &[Token]) -> Option<Verdict> {
+    // glab is dispatched through the TOML registry now
+    // (handler = "glab" in commands/forges/glab.toml).
+    None
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocBuilder, wordset_items};
-    vec![
-        CommandDoc::handler("glab",
-            "https://glab.readthedocs.io/en/latest/",
-            DocBuilder::new()
-                .section(format!("Subcommands {} are allowed with actions: {}.",
-                    wordset_items(&GLAB_READ_ONLY_SUBCOMMANDS),
-                    wordset_items(&GLAB_READ_ONLY_ACTIONS)))
-                .section(format!("Always safe: {}.",
-                    wordset_items(&GLAB_ALWAYS_SAFE)))
-                .section("auth status, api (GET only).")
-                .section("")
-                .build(),
-            "forges"),
-    ]
+    // glab's docs come from the TOML registry's auto-render.
+    Vec::new()
 }
 
 #[cfg(test)]

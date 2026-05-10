@@ -1,0 +1,64 @@
+[[command]]
+name = "glab"
+description = "Third-party GitLab CLI (gitlab-org/cli, formerly profclems/glab). Wraps GitLab's REST/GraphQL APIs over authenticated HTTPS. Read-only operations (`glab mr list`, `glab issue view`, `glab ci status`, `glab release list`, etc.) query data; write operations like `glab mr create`, `glab issue close`, etc. are not covered. `glab api` issues arbitrary REST requests and is governed by gh's API sub-handler (read-only methods, header allowlist). Top-level always-safe forms: `glab --version`, `glab -v`, `glab version`, `glab check-update`. Active project with monthly-ish releases."
+url = "https://gitlab.com/gitlab-org/cli"
+handler = "glab"
+researched_version = "glab 1.x (2026)"
+doc_body = "Routing: handler dispatches the read-only sub × action matrix via the per-action [command.handler_policy.*] blocks below. Special-case subs: `auth status` (Inert), `--version` / `-v` / `version` / `check-update` as terminal forms (Inert), `api` (delegates to gh's API sub-handler — read-only methods, narrow header allowlist)."
+
+# --version / --help / -v / -h at length 2, and `version` / `check-update`
+# as bare subcommand forms.
+[command.fallback]
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-h", "-v"]
+
+[command.handler_data]
+read_only_subs = [
+  "ci", "cluster", "deploy-key", "gpg-key", "incident", "issue",
+  "iteration", "label", "milestone", "mr", "release", "repo",
+  "schedule", "snippet", "ssh-key", "stack", "variable",
+]
+read_only_actions = ["diff", "issues", "list", "status", "view"]
+always_safe_bare_subs = ["check-update", "version"]
+
+[command.handler_policy.list]
+bare = true
+standalone = [
+  "--all", "--closed", "--draft", "--help", "--merged",
+  "-A", "-M", "-a", "-c", "-d", "-g", "-h", "-q",
+]
+valued = [
+  "--assignee", "--author", "--group", "--label",
+  "--milestone", "--not-label", "--order", "--output",
+  "--page", "--per-page", "--repo", "--reviewer",
+  "--search", "--sort", "--source-branch", "--state",
+  "--target-branch",
+  "-F", "-P", "-R", "-S", "-a", "-g", "-l", "-m", "-o", "-p", "-r", "-s", "-t",
+]
+
+[command.handler_policy.view]
+bare = false
+standalone = [
+  "--comments", "--help", "--resolved", "--system-logs",
+  "--unresolved", "--web",
+  "-c", "-h", "-p", "-s", "-w",
+]
+valued = [
+  "--output", "--page", "--per-page", "--repo",
+  "-F", "-P", "-R", "-p",
+]
+
+[command.handler_policy.diff]
+bare = false
+standalone = ["--help", "--raw", "-h"]
+valued = ["--color", "--repo", "-R"]
+
+[command.handler_policy.simple]
+bare = true
+standalone = ["--help", "-h", "-q"]
+valued = [
+  "--output", "--page", "--per-page", "--repo",
+  "-F", "-P", "-R", "-p",
+]
