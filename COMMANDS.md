@@ -7061,9 +7061,12 @@ Aliases: `xelatex`, `lualatex`, `latex`
 ### `php`
 <p class="cmd-url"><a href="https://www.php.net/manual/en/features.commandline.options.php">https://www.php.net/manual/en/features.commandline.options.php</a></p>
 
+- Routing: the handler walks `-d KEY=VALUE` directives (KEY allowlist in Rust because the validation is custom — see is_safe_ini_pair), then basename-normalizes the next token. `--help` / `--version` / etc. as the final token match [command.fallback]; `artisan` and `please` (or any path whose basename is one of those) match the corresponding [[command.sub]] and re-dispatch via the top-level `artisan` / `please` command.
+
+
+
+- **Fallback grammar (engaged when no sub matches):**
 - Allowed standalone flags: --help, --info, --ini, --modules, --version, -V, -h, -i, -m, -v
-- Allowed pre-flag: `-d DIRECTIVE=VALUE` where DIRECTIVE is one of date.timezone, display_errors, error_reporting, max_execution_time, max_input_time, max_input_vars, memory_limit, opcache.enable, opcache.enable_cli, post_max_size, upload_max_filesize
-- Subcommands: artisan, please — matched by exact name or by the basename of an absolute or relative path (e.g. `php /Users/me/project/please stache:clear`)
 
 ### `phpstan`
 <p class="cmd-url"><a href="https://phpstan.org/user-guide/command-line-usage">https://phpstan.org/user-guide/command-line-usage</a></p>
