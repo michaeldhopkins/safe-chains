@@ -8,6 +8,8 @@
 - **combine**: Positional args accepted
 - **compare**: Positional args accepted
 - **composite**: Positional args accepted
+- **convert**: delegates to inner command
+- **identify**: delegates to inner command
 - **mogrify**: Positional args accepted
 - **montage**: Positional args accepted
 - **stream**: Positional args accepted

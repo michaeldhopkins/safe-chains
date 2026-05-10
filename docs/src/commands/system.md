@@ -570,6 +570,7 @@ Aliases: `fly`
 - **edit**: Flags: --help, -h
 - **en**: Flags: --help, -h
 - **env**: Flags: --help, --json, -J, -h. Valued: --shell, -s
+- **exec**: delegates to inner command
 - **fmt**: Flags: --check, --help, -h
 - **generate**: Flags: --help, -h
 - **i**: Flags: --force, --help, --quiet, --verbose, -f, -q, -v, -h. Valued: --jobs, -j
