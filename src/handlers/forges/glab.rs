@@ -6,23 +6,6 @@ use crate::parse::Token;
 use crate::registry;
 use crate::verdict::{SafetyLevel, Verdict};
 
-fn check_policy(key: &str, tokens: &[Token], level: SafetyLevel) -> Verdict {
-    if registry::check_handler_policy("glab", key, tokens) {
-        Verdict::Allowed(level)
-    } else {
-        Verdict::Denied
-    }
-}
-
-fn action_policy_key(action: &str) -> &'static str {
-    match action {
-        "list" | "issues" => "list",
-        "view" => "view",
-        "diff" => "diff",
-        _ => "simple",
-    }
-}
-
 pub fn is_safe_glab(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
         return Verdict::Denied;
@@ -36,7 +19,7 @@ pub fn is_safe_glab(tokens: &[Token]) -> Verdict {
     let subcmd = tokens[1].as_str();
 
     // Always-safe bare subs: `glab version`, `glab check-update`. No
-    // extra arguments allowed.
+    // extra arguments allowed (length must be exactly 2).
     if registry::handler_word_list("glab", "always_safe_bare_subs")
         .iter()
         .any(|s| s == subcmd)
@@ -48,38 +31,15 @@ pub fn is_safe_glab(tokens: &[Token]) -> Verdict {
         };
     }
 
-    if subcmd == "auth" {
-        if tokens.len() < 3 || tokens[2].as_str() != "status" {
-            return Verdict::Denied;
-        }
-        return check_policy("simple", &tokens[2..], SafetyLevel::Inert);
-    }
-
-    // `glab api` shares the GitHub API sub-handler — same shape (REST
-    // and GraphQL with read-only methods plus a narrow header
-    // allowlist). Pass the full token list per gh's calling convention.
+    // `glab api` shares the GitHub API sub-handler. Pass the full
+    // token list per gh's calling convention.
     if subcmd == "api" {
         return super::gh::is_safe_gh_api(tokens);
     }
 
-    // Read-only sub × action matrix.
-    if registry::handler_word_list("glab", "read_only_subs")
-        .iter()
-        .any(|s| s == subcmd)
-    {
-        let Some(action) = tokens.get(2).map(|t| t.as_str()) else {
-            return Verdict::Denied;
-        };
-        if !registry::handler_word_list("glab", "read_only_actions")
-            .iter()
-            .any(|a| a == action)
-        {
-            return Verdict::Denied;
-        }
-        return check_policy(action_policy_key(action), &tokens[2..], SafetyLevel::Inert);
-    }
-
-    Verdict::Denied
+    // Everything else is the read-only sub × action matrix (including
+    // `auth status` as a one-parent, one-action matrix entry).
+    registry::try_matrix_dispatch("glab", tokens).unwrap_or(Verdict::Denied)
 }
 
 pub(in crate::handlers::forges) fn dispatch(_cmd: &str, _tokens: &[Token]) -> Option<Verdict> {

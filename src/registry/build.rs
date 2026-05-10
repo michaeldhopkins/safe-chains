@@ -35,6 +35,31 @@ pub(super) fn build_policy(
     }
 }
 
+fn build_matrix(toml: TomlMatrix) -> MatrixSpec {
+    let actions = toml
+        .actions
+        .into_iter()
+        .map(|(name, action)| {
+            let built = match action {
+                TomlMatrixAction::Policy(policy_key) => MatrixAction {
+                    policy_key,
+                    guard: None,
+                    guard_short: None,
+                },
+                TomlMatrixAction::Detailed { policy, guard, guard_short } => {
+                    MatrixAction { policy_key: policy, guard, guard_short }
+                }
+            };
+            (name, built)
+        })
+        .collect();
+    MatrixSpec {
+        parents: toml.parents,
+        level: toml.level.into(),
+        actions,
+    }
+}
+
 fn build_handler_policy(toml: TomlHandlerPolicy) -> OwnedPolicy {
     build_policy(
         toml.standalone,
@@ -133,6 +158,7 @@ fn build_sub_kind(toml: TomlSub) -> DispatchKind {
             fallback: None,
             handler_policies: std::collections::HashMap::new(),
             handler_data: std::collections::HashMap::new(),
+            matrices: Vec::new(),
         };
     }
     if toml.allow_all.unwrap_or(false) {
@@ -247,6 +273,50 @@ fn assert_flat_or_structured(toml: &TomlCommand) {
     }
 }
 
+fn assert_matrix_policy_keys_exist(toml: &TomlCommand) {
+    if toml.matrix.is_empty() {
+        return;
+    }
+    for matrix in &toml.matrix {
+        for (action_name, action) in &matrix.actions {
+            let policy_key = match action {
+                TomlMatrixAction::Policy(k) => k,
+                TomlMatrixAction::Detailed { policy, .. } => policy,
+            };
+            if !toml.handler_policy.contains_key(policy_key) {
+                panic!(
+                    "command '{}' matrix action `{}` references \
+                     handler_policy `{}` which is not declared. \
+                     Add a [command.handler_policy.{}] block or fix the typo.",
+                    toml.name, action_name, policy_key, policy_key,
+                );
+            }
+        }
+    }
+}
+
+fn assert_matrix_no_duplicate_parent_action(toml: &TomlCommand) {
+    if toml.matrix.len() < 2 {
+        return;
+    }
+    let mut seen: std::collections::HashSet<(String, String)> = std::collections::HashSet::new();
+    for matrix in &toml.matrix {
+        for parent in &matrix.parents {
+            for action in matrix.actions.keys() {
+                let key = (parent.clone(), action.clone());
+                if !seen.insert(key) {
+                    panic!(
+                        "command '{}' matrix has duplicate (parent, action) pair \
+                         (`{}`, `{}`). The first match would silently win — \
+                         consolidate into one matrix block or remove the duplicate.",
+                        toml.name, parent, action,
+                    );
+                }
+            }
+        }
+    }
+}
+
 fn assert_fallback_requires_handler(toml: &TomlCommand) {
     if toml.fallback.is_some() && toml.handler.is_none() {
         panic!(
@@ -264,6 +334,8 @@ fn assert_fallback_requires_handler(toml: &TomlCommand) {
 pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     assert_flat_or_structured(&toml);
     assert_fallback_requires_handler(&toml);
+    assert_matrix_policy_keys_exist(&toml);
+    assert_matrix_no_duplicate_parent_action(&toml);
     check_no_legacy_positional_style(&toml.name, toml.positional_style);
     let cat = category.to_string();
     let desc = toml.description.unwrap_or_default();
@@ -300,6 +372,11 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             .into_iter()
             .map(|(k, v)| (k, build_handler_policy(v)))
             .collect();
+        let matrices = toml
+            .matrix
+            .into_iter()
+            .map(build_matrix)
+            .collect();
         return CommandSpec {
             name: toml.name,
             description: desc,
@@ -316,6 +393,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 fallback,
                 handler_policies,
                 handler_data: toml.handler_data,
+                matrices,
             },
         };
     }

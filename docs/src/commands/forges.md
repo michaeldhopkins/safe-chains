@@ -18,7 +18,39 @@
 ### `gh`
 <p class="cmd-url"><a href="https://cli.github.com/manual/">https://cli.github.com/manual/</a></p>
 
-- Routing: handler dispatches the sub × action matrix (read-only subs × {checks, diff, list, status, verify, view, watch}) via per-action TOML-declared policies, with parent-specific overrides for `run` (RUN_LIST/RUN_VIEW/RUN_WATCH) and `release` (RELEASE_LIST/RELEASE_VIEW). Special-case subs in the handler: `auth status` (Inert), `browse` (requires --no-browser, Inert), `run rerun` (SafeWrite), `release download` (requires --output, SafeWrite), `search`/`status` (Inert), `api` (its own sub-handler — REST and GraphQL with read-only methods and header allowlist). All flag-policy data lives in [command.handler_policy.*] blocks below.
+- Routing: [[command.matrix]] blocks below cover the sub × action grid (read-only subs and their action verbs → handler_policy by name). The handler's remaining logic is the universal `<sub> --help` shortcut, the `api` sub-handler (REST/GraphQL with method/header/mutation rules), and the dispatch from there into try_sub_dispatch / try_matrix_dispatch.
+
+- **Sub × action matrix:**
+- Parents (Inert): alias, attestation, cache, codespace, config, extension, gist, gpg-key, issue, label, org, pr, project, repo, ruleset, secret, ssh-key, variable, workflow
+-   - **checks** → policy `checks`
+-   - **diff** → policy `diff`
+-   - **list** → policy `list`
+-   - **status** → policy `status`
+-   - **verify** → policy `simple_view`
+-   - **view** → policy `view`
+-   - **watch** → policy `simple_view`
+- Parents (Inert): run
+-   - **checks** → policy `simple_view`
+-   - **diff** → policy `simple_view`
+-   - **list** → policy `run_list`
+-   - **status** → policy `simple_view`
+-   - **verify** → policy `simple_view`
+-   - **view** → policy `run_view`
+-   - **watch** → policy `run_watch`
+- Parents (SafeWrite): run
+-   - **rerun** → policy `run_rerun`
+- Parents (Inert): release
+-   - **checks** → policy `simple_list`
+-   - **diff** → policy `simple_list`
+-   - **list** → policy `release_list`
+-   - **status** → policy `simple_list`
+-   - **verify** → policy `simple_list`
+-   - **view** → policy `release_view`
+-   - **watch** → policy `simple_list`
+- Parents (SafeWrite): release
+-   - **download** → policy `release_download` (requires -O/--output)
+- Parents (Inert): auth
+-   - **status** → policy `simple_list`
 
 - **Fallback grammar (engaged when no sub matches):**
 - Allowed standalone flags: --help, --version, -V, -h
@@ -41,14 +73,20 @@
 - **status**: Flags: --exit-status, --log, --log-failed, --web, -w. Valued: --jq, --json, --repo, --template, -R, -q
 - **view**: Flags: --comments, --web, --yaml, -c, -w, -y. Valued: --branch, --jq, --json, --ref, --repo, --template, -R, -b, -q, -r
 
-- **Handler-side data:**
-- **read_only_actions**: checks, diff, list, status, verify, view, watch
-- **read_only_subs**: alias, attestation, cache, codespace, config, extension, gist, gpg-key, issue, label, org, pr, project, release, repo, ruleset, run, secret, ssh-key, variable, workflow
-
 ### `glab`
 <p class="cmd-url"><a href="https://gitlab.com/gitlab-org/cli">https://gitlab.com/gitlab-org/cli</a></p>
 
-- Routing: handler dispatches the read-only sub × action matrix via the per-action [command.handler_policy.*] blocks below. Special-case subs: `auth status` (Inert), `--version` / `-v` / `version` / `check-update` as terminal forms (Inert), `api` (delegates to gh's API sub-handler — read-only methods, narrow header allowlist).
+- Routing: [[command.matrix]] blocks below cover the read-only sub × action grid. Top-level terminal forms `glab version` and `glab check-update` are handled by the handler (no flags allowed). `glab api` delegates to gh's API sub-handler.
+
+- **Sub × action matrix:**
+- Parents (Inert): ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable
+-   - **diff** → policy `diff`
+-   - **issues** → policy `list`
+-   - **list** → policy `list`
+-   - **status** → policy `simple`
+-   - **view** → policy `view`
+- Parents (Inert): auth
+-   - **status** → policy `simple`
 
 - **Fallback grammar (engaged when no sub matches):**
 - Allowed standalone flags: --help, --version, -h, -v
@@ -61,8 +99,6 @@
 
 - **Handler-side data:**
 - **always_safe_bare_subs**: check-update, version
-- **read_only_actions**: diff, issues, list, status, view
-- **read_only_subs**: ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable
 
 ### `jjpr`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/jjpr">https://github.com/michaeldhopkins/jjpr</a></p>

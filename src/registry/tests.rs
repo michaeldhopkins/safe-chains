@@ -1871,6 +1871,69 @@ standalone = ["--help", "-h"]
     }
 
     #[test]
+    fn matrix_referencing_unknown_policy_panics() {
+        // Silent-deny would otherwise hide typos: a matrix entry whose
+        // policy_key doesn't match any [command.handler_policy.*] would
+        // dispatch to "policy not found → Denied," masking the typo.
+        let result = std::panic::catch_unwind(|| {
+            load_one(r#"
+[[command]]
+name = "demo-bad-matrix"
+handler = "demo_handler"
+
+[command.handler_policy.real]
+bare = true
+standalone = ["--help"]
+
+[[command.matrix]]
+parents = ["alpha"]
+level = "Inert"
+[command.matrix.actions]
+list = "rael"
+"#);
+        });
+        assert!(
+            result.is_err(),
+            "matrix referencing an unknown handler_policy must panic at build time",
+        );
+    }
+
+    #[test]
+    fn matrix_with_duplicate_parent_action_panics() {
+        // Latent ordering footgun: if two matrices both contain the
+        // same (parent, action), only the first match wins. Panicking
+        // at build forces the author to consolidate.
+        let result = std::panic::catch_unwind(|| {
+            load_one(r#"
+[[command]]
+name = "demo-dup-matrix"
+handler = "demo_handler"
+
+[command.handler_policy.a]
+bare = true
+[command.handler_policy.b]
+bare = true
+
+[[command.matrix]]
+parents = ["alpha"]
+level = "Inert"
+[command.matrix.actions]
+list = "a"
+
+[[command.matrix]]
+parents = ["alpha"]
+level = "SafeWrite"
+[command.matrix.actions]
+list = "b"
+"#);
+        });
+        assert!(
+            result.is_err(),
+            "duplicate (parent, action) across matrices must panic at build time",
+        );
+    }
+
+    #[test]
     fn fallback_without_handler_panics() {
         let result = std::panic::catch_unwind(|| {
             load_one(r#"
@@ -2409,6 +2472,73 @@ delegate_after = "--"
         assert!(
             doc.description.contains("delegates"),
             "delegation must be indicated: {}",
+            doc.description,
+        );
+    }
+
+    #[test]
+    fn matrix_dispatch_routes_parent_action_to_policy() {
+        // The [[command.matrix]] primitive expresses "parent ∈ list ×
+        // action ∈ map → handler_policy by name." This test exercises:
+        // (a) the simple form (action = "policy_name"), (b) the
+        // detailed form with a guard, (c) auto-render surfaces it.
+        let spec = load_one(r#"
+[[command]]
+name = "demo-matrix"
+handler = "demo_handler"
+
+[command.handler_policy.list_policy]
+bare = true
+standalone = ["--help", "--limit"]
+
+[command.handler_policy.download_policy]
+bare = false
+standalone = ["--output"]
+
+[[command.matrix]]
+parents = ["alpha", "beta"]
+level = "Inert"
+[command.matrix.actions]
+list = "list_policy"
+
+[[command.matrix]]
+parents = ["alpha"]
+level = "SafeWrite"
+[command.matrix.actions.download]
+policy = "download_policy"
+guard = "--output"
+guard_short = "-O"
+"#);
+        match &spec.kind {
+            DispatchKind::Custom { matrices, .. } => {
+                assert_eq!(matrices.len(), 2);
+                assert_eq!(matrices[0].level, SafetyLevel::Inert);
+                assert_eq!(matrices[1].level, SafetyLevel::SafeWrite);
+                let list_action = matrices[0].actions.get("list").expect("list action");
+                assert_eq!(list_action.policy_key, "list_policy");
+                assert!(list_action.guard.is_none());
+                let dl = matrices[1].actions.get("download").expect("download action");
+                assert_eq!(dl.policy_key, "download_policy");
+                assert_eq!(dl.guard.as_deref(), Some("--output"));
+                assert_eq!(dl.guard_short.as_deref(), Some("-O"));
+            }
+            other => panic!("expected Custom, got {other:?}"),
+        }
+
+        let doc = spec.to_command_doc();
+        assert!(
+            doc.description.contains("Sub × action matrix"),
+            "matrix section header must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("alpha, beta"),
+            "parents must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("requires -O/--output"),
+            "guard must render: {}",
             doc.description,
         );
     }

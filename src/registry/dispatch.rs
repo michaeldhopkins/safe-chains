@@ -285,6 +285,18 @@ pub(super) fn check_handler_policy_owned(tokens: &[Token], policy: &OwnedPolicy)
     check_owned(tokens, policy)
 }
 
+pub(super) fn dispatch_matrix_action(
+    tokens: &[Token],
+    policy: &OwnedPolicy,
+    level: SafetyLevel,
+) -> Verdict {
+    if check_owned(tokens, policy) {
+        Verdict::Allowed(level)
+    } else {
+        Verdict::Denied
+    }
+}
+
 /// Applies a TOML-declared fallback grammar. Used by
 /// `registry::try_fallback_grammar()`.
 pub(super) fn dispatch_fallback(tokens: &[Token], spec: &FallbackSpec) -> Verdict {
