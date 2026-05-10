@@ -13,7 +13,7 @@ max_positional = 0
 name = "dns"
 [[command.sub.sub]]
 name = "query"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 [[command.sub.sub]]
 name = "status"
@@ -113,7 +113,7 @@ max_positional = 0
 
 [[command.sub]]
 name = "version"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

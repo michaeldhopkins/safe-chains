@@ -20,7 +20,7 @@ valued = ["--address", "--format"]
 name = "read"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--field", "--help", "--mount", "-h"]
 valued = ["--address", "--field", "--format", "--namespace"]
 
@@ -28,7 +28,7 @@ valued = ["--address", "--field", "--format", "--namespace"]
 name = "list"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--detailed", "--help", "--mount", "-h"]
 valued = ["--address", "--format", "--namespace"]
 

@@ -4,7 +4,7 @@ description = "Converts the text output of common CLI tools (ps, ls, ifconfig, e
 url = "https://kellyjonbrazil.github.io/jc/"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--about", "--bash-comp", "--force-color", "--help", "--meta-out",
     "--monochrome", "--pretty", "--quiet", "--raw", "--unbuffer",

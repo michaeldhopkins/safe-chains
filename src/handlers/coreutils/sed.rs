@@ -1,6 +1,6 @@
 use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{self, FlagPolicy, FlagTolerance};
 
 fn expr_has_exec(token: &Token) -> bool {
     let bytes = token.as_bytes();
@@ -82,8 +82,7 @@ static SED_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 fn is_safe_sed(tokens: &[Token]) -> bool {

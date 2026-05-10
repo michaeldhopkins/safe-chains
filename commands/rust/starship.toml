@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h", "-V"]
 name = "init"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--print-full-init", "-h"]
 
 [[command.sub]]
@@ -23,14 +23,14 @@ valued = ["--cmd-duration", "--continuation", "--jobs", "--keymap", "--logical-p
 name = "module"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--list", "-h", "-l"]
 
 [[command.sub]]
 name = "preset"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--list", "-h", "-l"]
 valued = ["--output", "-o"]
 
@@ -63,7 +63,7 @@ standalone = ["--help", "-h"]
 name = "completions"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

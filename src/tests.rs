@@ -895,6 +895,7 @@ safe_read! {
     level_timeout_cargo_test: "timeout 120 cargo test",
     level_env_cargo_test: "env RUST_BACKTRACE=1 cargo test",
     level_pipe_cargo_test: "cargo test | grep PASS",
+    level_hexo_render_no_output: "hexo render src/foo.md",
 }
 
 safe_write! {
@@ -956,4 +957,7 @@ safe_write! {
 
     assign_with_redirect_safewrite: "x=1 > file.txt",
     assign_with_etc_passwd_safewrite: "x=1 > /etc/passwd",
+
+    hexo_render_with_output_promotes: "hexo render src/foo.md -o out.html",
+    hexo_render_with_long_output_promotes: "hexo render src/foo.md --output out.html",
 }

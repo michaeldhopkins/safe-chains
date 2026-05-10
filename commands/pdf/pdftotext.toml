@@ -5,7 +5,7 @@ url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftotext.1.html"
 researched_version = "Poppler 24.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "-bbox", "-bbox-layout", "-cropbox",
     "-eol", "-enc", "-fixed", "-help",

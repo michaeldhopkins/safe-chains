@@ -5,7 +5,7 @@ url = "https://man.openbsd.org/ssh-copy-id"
 researched_version = "OpenSSH 9.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "-f", "-h",
     "-n", "-s", "-x",

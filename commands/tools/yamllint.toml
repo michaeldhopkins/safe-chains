@@ -5,7 +5,7 @@ url = "https://yamllint.readthedocs.io/"
 researched_version = "yamllint 1.x"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "--list-files",
     "--no-warnings", "--strict",

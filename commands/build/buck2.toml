@@ -13,7 +13,7 @@ standalone = ["--help", "-h"]
 name = "targets"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "--show-output", "--show-target-hash", "-h"]
 valued = ["--config", "--config-file", "--target-platforms", "-c"]
 
@@ -21,28 +21,28 @@ valued = ["--config", "--config-file", "--target-platforms", "-c"]
 name = "query"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "--output-attributes", "-h"]
 
 [[command.sub]]
 name = "uquery"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "-h"]
 
 [[command.sub]]
 name = "cquery"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "-h"]
 
 [[command.sub]]
 name = "aquery"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "-h"]
 
 [[command.sub]]
@@ -54,7 +54,7 @@ allow_all = true
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

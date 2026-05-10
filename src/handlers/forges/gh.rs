@@ -1,6 +1,6 @@
 use crate::parse::{Token, WordSet, has_flag};
 use crate::verdict::{SafetyLevel, Verdict};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{self, FlagPolicy, FlagTolerance};
 
 static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
@@ -20,8 +20,7 @@ static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: true,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -35,8 +34,7 @@ static GH_VIEW_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_DIFF_POLICY: FlagPolicy = FlagPolicy {
@@ -50,8 +48,7 @@ static GH_DIFF_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_CHECKS_POLICY: FlagPolicy = FlagPolicy {
@@ -65,8 +62,7 @@ static GH_CHECKS_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_STATUS_POLICY: FlagPolicy = FlagPolicy {
@@ -80,8 +76,7 @@ static GH_STATUS_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_RUN_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -94,8 +89,7 @@ static GH_RUN_LIST_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: true,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_RUN_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -109,8 +103,7 @@ static GH_RUN_VIEW_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_RUN_WATCH_POLICY: FlagPolicy = FlagPolicy {
@@ -123,8 +116,7 @@ static GH_RUN_WATCH_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_RELEASE_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -137,8 +129,7 @@ static GH_RELEASE_LIST_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: true,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_RELEASE_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -152,8 +143,7 @@ static GH_RELEASE_VIEW_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_SEARCH_POLICY: FlagPolicy = FlagPolicy {
@@ -185,8 +175,7 @@ static GH_SEARCH_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_RELEASE_DOWNLOAD_POLICY: FlagPolicy = FlagPolicy {
@@ -197,8 +186,7 @@ static GH_RELEASE_DOWNLOAD_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
@@ -214,8 +202,7 @@ static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: true,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_SIMPLE_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -226,8 +213,7 @@ static GH_SIMPLE_VIEW_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GH_RUN_RERUN_POLICY: FlagPolicy = FlagPolicy {
@@ -235,8 +221,7 @@ static GH_RUN_RERUN_POLICY: FlagPolicy = FlagPolicy {
     valued: WordSet::flags(&["--job", "--repo", "-R", "-j"]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
@@ -262,8 +247,7 @@ static GH_BROWSE_POLICY: FlagPolicy = FlagPolicy {
     valued: WordSet::flags(&["--branch", "--commit", "--repo", "-R", "-b"]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static API_STANDALONE: WordSet = WordSet::new(&[

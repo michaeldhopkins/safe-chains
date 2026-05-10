@@ -5,6 +5,6 @@ url = "https://man7.org/linux/man-pages/man8/arping.8.html"
 researched_version = "iputils 2.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-A", "-D", "-U", "-V", "-b", "-f", "-h", "-q", "-v"]
 valued = ["-c", "-I", "-i", "-s", "-S", "-T", "-w"]

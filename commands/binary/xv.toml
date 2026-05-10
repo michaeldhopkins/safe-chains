@@ -4,5 +4,5 @@ description = "Interactive terminal-based hex viewer written in Rust. Read-only:
 url = "https://github.com/gyscos/xv"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["-V", "-h", "--help", "--version"]

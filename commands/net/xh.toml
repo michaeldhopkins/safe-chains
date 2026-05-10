@@ -5,7 +5,7 @@ url = "https://github.com/ducaale/xh"
 researched_version = "xh 0.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--all", "--auth-type", "--bearer",
     "--body", "--check-status", "--continue",

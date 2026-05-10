@@ -6,23 +6,27 @@ bare_flags = ["--help", "--version", "-h"]
 
 [[command.sub]]
 name = "completion"
-positional_style = true
+tolerate_unknown_short = true
 
 [[command.sub]]
 name = "config"
 nested_bare = true
 [[command.sub.sub]]
 name = "check"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "credits"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "diagnose"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "version"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true

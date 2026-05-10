@@ -6,5 +6,5 @@ url = "https://emscripten.org/docs/tools_reference/emcc.html"
 researched_version = "Emscripten 3.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-?", "-h", "-v"]

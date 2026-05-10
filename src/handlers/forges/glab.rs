@@ -1,6 +1,6 @@
 use crate::parse::{Token, WordSet};
 use crate::verdict::{SafetyLevel, Verdict};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{self, FlagPolicy, FlagTolerance};
 
 static GLAB_READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
     "ci", "cluster", "deploy-key", "gpg-key", "incident", "issue",
@@ -32,8 +32,7 @@ static GLAB_LIST_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: true,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
@@ -48,8 +47,7 @@ static GLAB_VIEW_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
@@ -63,8 +61,7 @@ static GLAB_DIFF_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static GLAB_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
@@ -78,8 +75,7 @@ static GLAB_SIMPLE_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: true,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 fn glab_action_policy(action: &str) -> &'static FlagPolicy {

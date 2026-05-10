@@ -58,7 +58,7 @@ level = "SafeRead"
 name = "completions"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -157,7 +157,7 @@ candidate = true
 name = "lint"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--json"]
 valued = ["--root", "--config-path", "--severity"]
 

@@ -39,7 +39,7 @@ valued = ["--target", "-t"]
 name = "new"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--cli", "--help", "--init", "-h", "-i"]
 
 [[command.sub]]

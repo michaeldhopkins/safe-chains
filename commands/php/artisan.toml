@@ -16,7 +16,7 @@ valued = ["--format"]
 
 [[command.sub]]
 name = "help"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -29,12 +29,12 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "completion"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "config:show"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

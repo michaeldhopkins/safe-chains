@@ -4,7 +4,7 @@ description = "Scans container images and filesystems for known vulnerabilities 
 url = "https://github.com/anchore/grype"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--add-cpes-if-none", "--by-cve", "--help",
     "--only-fixed", "--only-notfixed", "--quiet",

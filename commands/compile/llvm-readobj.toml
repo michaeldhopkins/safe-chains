@@ -6,5 +6,5 @@ url = "https://llvm.org/docs/CommandGuide/llvm-readobj.html"
 researched_version = "LLVM 18.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-?", "-h"]

@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h", "-V"]
 name = "format"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--check", "--help", "--stdin", "-h"]
 write_flags = []
 

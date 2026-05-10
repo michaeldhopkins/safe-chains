@@ -5,7 +5,7 @@ url = "https://wkhtmltopdf.org/usage/wkhtmltopdf.txt"
 researched_version = "wkhtmltopdf 0.x; unmaintained"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--collate", "--no-collate", "--cookie-jar",
     "--copies", "--dpi",

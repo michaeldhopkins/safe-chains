@@ -1,14 +1,13 @@
 use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{self, FlagPolicy, FlagTolerance};
 
 static BUNDLE_CONFIG_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&["--help", "-h"]),
     valued: WordSet::flags(&[]),
     bare: true,
     max_positional: Some(1),
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static BUNDLE_CONFIG_GET_POLICY: FlagPolicy = FlagPolicy {
@@ -16,8 +15,7 @@ static BUNDLE_CONFIG_GET_POLICY: FlagPolicy = FlagPolicy {
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static HELP_ONLY: FlagPolicy = FlagPolicy {
@@ -25,8 +23,7 @@ static HELP_ONLY: FlagPolicy = FlagPolicy {
     valued: WordSet::flags(&[]),
     bare: false,
     max_positional: Some(0),
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 pub fn check_bundle_config(tokens: &[Token]) -> Verdict {

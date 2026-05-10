@@ -7,11 +7,14 @@ bare_flags = ["--help", "--version", "-h"]
 examples_safe = [
     "atlas doctor",
     "atlas migrate status",
+    "atlas schema status",
+    "atlas schema lint",
     "atlas whoami",
 ]
 examples_denied = [
     "atlas migrate apply --url postgres://...",
     "atlas schema apply --to file://schema.hcl",
+    "atlas schema plan",
 ]
 
 [[command.sub]]
@@ -28,7 +31,7 @@ standalone = ["--help", "-h"]
 name = "env"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--config", "--env"]
 
@@ -67,7 +70,7 @@ candidate = true
 name = "status"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--format"]
 valued = ["--config", "--env", "--url", "-c", "-u", "--format", "--from", "--to", "--dev-url"]
 
@@ -75,7 +78,7 @@ valued = ["--config", "--env", "--url", "-c", "-u", "--format", "--from", "--to"
 name = "lint"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--config", "--env", "--dev-url", "--format", "--url", "-c", "-u"]
 
@@ -165,7 +168,7 @@ candidate = true
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

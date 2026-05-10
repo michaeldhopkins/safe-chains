@@ -13,7 +13,7 @@ allow_all = true
 name = "list"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-?", "-AllVersions", "-IncludeDelisted", "-NonInteractive", "-PreRelease", "-help"]
 valued = ["-ConfigFile", "-Source", "-Verbosity"]
 
@@ -21,7 +21,7 @@ valued = ["-ConfigFile", "-Source", "-Verbosity"]
 name = "search"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-?", "-PreRelease", "-help"]
 valued = ["-ConfigFile", "-Source", "-Take", "-Verbosity"]
 
@@ -29,7 +29,7 @@ valued = ["-ConfigFile", "-Source", "-Take", "-Verbosity"]
 name = "spec"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-?", "-Force", "-help"]
 valued = ["-AssemblyPath"]
 
@@ -37,7 +37,7 @@ valued = ["-AssemblyPath"]
 name = "config"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-?", "-AsPath", "-help"]
 valued = ["-ConfigFile"]
 
@@ -45,7 +45,7 @@ valued = ["-ConfigFile"]
 name = "locals"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-?", "-clear", "-help", "-list"]
 valued = ["-Verbosity"]
 
@@ -53,7 +53,7 @@ valued = ["-Verbosity"]
 name = "verify"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-?", "-All", "-Signatures", "-help"]
 valued = ["-CertificateFingerprint", "-ConfigFile", "-Verbosity"]
 
@@ -61,7 +61,7 @@ valued = ["-CertificateFingerprint", "-ConfigFile", "-Verbosity"]
 name = "sources"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-?", "-Format", "-help"]
 valued = ["-ConfigFile", "-Format", "-Name", "-Password", "-Source", "-StorePasswordInClearText", "-Username", "-ProtocolVersion", "-Verbosity"]
 

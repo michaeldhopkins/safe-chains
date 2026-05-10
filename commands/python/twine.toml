@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h"]
 name = "check"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--strict", "-h"]
 
 [[command.sub]]

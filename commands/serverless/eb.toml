@@ -1,6 +1,17 @@
 [[command]]
 name = "eb"
 description = "AWS Elastic Beanstalk CLI. Most subcommands contact AWS (network + external system writes). Read-side: `events`, `health`, `list`, `logs`, `printenv`, `status`, `tags --list`, `--version`, `--help`. Write-side: `init`, `create`, `deploy`, `terminate`, `clone`, `restore`, `swap`, `setenv`, `unsetenv`, `tags --add/--update/--delete`, `config save/get/put/list/delete`, `scale`, `migrate`, `platform`, `appversion`, `local`, `ssh`, `console`, `codesource`, `labs`, `repair`."
+examples_safe = [
+    "eb logs",
+    "eb status",
+    "eb events",
+]
+examples_denied = [
+    "eb logs --cloudwatch-logs",
+    "eb logs --cloudwatch-log-source",
+    "eb deploy",
+    "eb terminate",
+]
 url = "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-getting-started.html"
 researched_version = "EB CLI 3.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
@@ -9,7 +20,7 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 name = "events"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--follow", "--help", "-f", "-h"]
 valued = ["--profile", "--region"]
 
@@ -17,7 +28,7 @@ valued = ["--profile", "--region"]
 name = "health"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--mono", "--refresh", "-h"]
 valued = ["--profile", "--region", "--view"]
 
@@ -32,15 +43,14 @@ valued = ["--profile", "--region"]
 name = "logs"
 level = "SafeRead"
 bare = true
-positional_style = true
-standalone = ["--all", "--cloudwatch-logs", "--cloudwatch-log-source", "--help", "--instance", "--stream", "--zip", "-a", "-h", "-z"]
+standalone = ["--all", "--help", "--instance", "--stream", "--zip", "-a", "-h", "-z"]
 valued = ["--instance", "--profile", "--region"]
 
 [[command.sub]]
 name = "printenv"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--profile", "--region"]
 
@@ -48,7 +58,7 @@ valued = ["--profile", "--region"]
 name = "status"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--verbose", "-h", "-v"]
 valued = ["--profile", "--region"]
 
@@ -56,7 +66,7 @@ valued = ["--profile", "--region"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

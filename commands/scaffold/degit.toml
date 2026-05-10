@@ -6,7 +6,7 @@ url = "https://github.com/Rich-Harris/degit"
 researched_version = "degit 2.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--cache", "--force", "--help",
     "--mode", "--verbose", "--version",

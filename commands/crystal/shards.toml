@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 name = "version"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -59,7 +59,7 @@ standalone = ["--help", "--ignore-crystal-version", "--local", "--production", "
 name = "update"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--ignore-crystal-version", "--local", "--production", "--skip-postinstall", "--skip-executables", "--without-development", "-h"]
 
 [[command.sub]]

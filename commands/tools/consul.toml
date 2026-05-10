@@ -28,7 +28,7 @@ valued = ["-http-addr", "-token", "-token-file"]
 name = "validate"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-quiet"]
 valued = ["-config-format"]
 

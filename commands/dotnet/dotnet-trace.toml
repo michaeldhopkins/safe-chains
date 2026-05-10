@@ -21,7 +21,7 @@ standalone = ["--help", "-h"]
 name = "convert"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--format", "--output", "-o"]
 
@@ -29,7 +29,7 @@ valued = ["--format", "--output", "-o"]
 name = "report"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--max-depth"]
 

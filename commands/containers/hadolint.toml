@@ -5,7 +5,7 @@ url = "https://github.com/hadolint/hadolint"
 researched_version = "hadolint 2.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--config", "--disable-ignore-pragma",
     "--failure-threshold", "--format",

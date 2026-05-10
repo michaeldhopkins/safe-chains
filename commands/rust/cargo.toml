@@ -126,7 +126,8 @@ valued = ["--manifest-path", "--message-format", "--package", "-p"]
 name = "help"
 level = "Inert"
 max_positional = 1
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "info"
@@ -427,7 +428,7 @@ valued = ["--color", "--config", "--manifest-path"]
 [[command.sub]]
 name = "version"
 standalone = ["--help", "-h"]
-positional_style = true
+tolerate_unknown_short = true
 
 [[command.sub]]
 name = "bloat"

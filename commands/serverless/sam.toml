@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "--info", "-h", "-v"]
 name = "validate"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "--lint", "--no-color", "-h"]
 valued = ["--config-env", "--config-file", "--profile", "--region", "--save-params", "-t", "--template", "--template-file"]
 
@@ -41,7 +41,7 @@ valued = ["--config-env", "--config-file", "--output", "--profile", "--region", 
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

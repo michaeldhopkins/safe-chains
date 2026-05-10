@@ -13,14 +13,14 @@ standalone = ["--help", "-h"]
 name = "format"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--check", "--help", "-h"]
 
 [[command.sub]]
 name = "check"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--emit-llvm-ir", "--help", "--main", "--no-color", "--no-link", "--time", "-h"]
 valued = ["--main", "--target"]
 
@@ -28,7 +28,7 @@ valued = ["--main", "--target"]
 name = "build"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--build-host", "--debug", "--dev", "--emit-llvm-ir", "--help", "--linker", "--main", "--no-color", "--no-link", "--optimize", "--prebuilt-platform", "--profiling", "--release", "--standalone", "--time", "-h", "-O"]
 valued = ["--linker", "--main", "--optimize", "--output", "--prebuilt-platform", "--target"]
 
@@ -36,7 +36,7 @@ valued = ["--linker", "--main", "--optimize", "--output", "--prebuilt-platform",
 name = "docs"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--output"]
 

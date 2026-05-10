@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h"]
 name = "list"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--no-tree-of", "--outdated", "--porcelain", "-h"]
 valued = ["--tree"]
 
@@ -17,14 +17,14 @@ valued = ["--tree"]
 name = "show"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--home", "--issues", "--list", "--mversion", "--rock-licenses", "--rock-tree", "--rockspec", "-h"]
 
 [[command.sub]]
 name = "search"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--binary", "--help", "--porcelain", "--source", "-h"]
 
 [[command.sub]]
@@ -37,21 +37,21 @@ standalone = ["--bin", "--full", "--help", "--lr-bin", "--lr-cpath", "--lr-path"
 name = "which"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "lint"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "config"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--lua-incdir", "--lua-libdir", "--lua-ver", "--rock-trees", "--system-config", "--user-config", "-h"]
 
 [[command.sub]]

@@ -266,7 +266,8 @@ valued = [
 
 [[command.sub]]
 name = "help"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "log"
@@ -519,7 +520,7 @@ handler = "git_remote"
 [[command.sub]]
 name = "rev-parse"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--absolute-git-dir",
     "--all",
@@ -592,16 +593,19 @@ valued = [
 name = "stash"
 [[command.sub.sub]]
 name = "--help"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "-h"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "list"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "show"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--patch", "--stat", "-h", "-p", "-u"]
 [[command.sub.sub]]
 name = "push"

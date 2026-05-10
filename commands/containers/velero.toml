@@ -14,7 +14,7 @@ valued = ["--namespace", "--timeout", "-n"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -25,7 +25,7 @@ allow_all = true
 name = "get"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-o", "--output"]
 valued = ["-n", "--namespace", "-l", "--selector", "-o", "--output", "--kubeconfig", "--kubecontext"]
 
@@ -33,7 +33,7 @@ valued = ["-n", "--namespace", "-l", "--selector", "-o", "--output", "--kubeconf
 name = "describe"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--details", "--features", "--insecure-skip-tls-verify", "--volume-details"]
 valued = ["-n", "--namespace", "-l", "--selector", "--kubeconfig", "--kubecontext"]
 
@@ -41,7 +41,7 @@ valued = ["-n", "--namespace", "-l", "--selector", "--kubeconfig", "--kubecontex
 name = "logs"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--insecure-skip-tls-verify"]
 valued = ["-n", "--namespace", "--kubeconfig", "--kubecontext", "--timeout", "--caCertFile"]
 

@@ -40,7 +40,7 @@ standalone = ["--help", "-h"]
 name = "query"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -150,7 +150,7 @@ candidate = true
 name = "list-dependencies"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--depth", "--prune", "--include-base", "--separator"]
 

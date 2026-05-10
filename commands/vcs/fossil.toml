@@ -13,7 +13,7 @@ standalone = ["--help", "--verbose", "-h", "-v"]
 name = "info"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--comment-format", "--help", "--repository", "--verbose", "-R", "-h", "-v"]
 valued = ["--repository", "-R"]
 
@@ -28,7 +28,7 @@ valued = ["--repository", "-R"]
 name = "timeline"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--brief", "--full", "--help", "--limit", "--no-graph", "--repository", "--showfiles", "--verbose", "-W", "-R", "-b", "-h", "-l", "-n", "-v", "-w"]
 valued = ["--after", "--before", "--children", "--limit", "--repository", "--type", "--width", "-R", "-W", "-c", "-l", "-n", "-t", "-w"]
 
@@ -36,7 +36,7 @@ valued = ["--after", "--before", "--children", "--limit", "--repository", "--typ
 name = "diff"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--brief", "--checkin", "--context", "--diff-binary", "--exclude", "--from", "--help", "--ignore-all-space", "--ignore-blank-lines", "--ignore-case", "--ignore-eol-ws", "--ignore-space-at-eol", "--ignore-trailing-cr", "--include", "--internal", "--invert", "--no-dir-prefix", "--numstat", "--quiet", "--repository", "--show-summary", "--side-by-side", "--strip-trailing-cr", "--strip-trailing-lf", "--strip-trailing-spaces", "--strip-trailing-whitespace", "--tk", "--to", "--unified", "--verbose", "--versions", "--web", "-N", "-R", "-W", "-Z", "-b", "-c", "-h", "-i", "-q", "-r", "-u", "-v", "-w", "-y", "-z"]
 valued = ["--against", "--diff-binary", "--exec-abs-paths", "--exec-rel-paths", "--from", "--internal", "--repository", "--strip-trailing-spaces", "--strip-trailing-whitespace", "--to", "--unified", "-N", "-R", "-W", "-c", "-r", "-y"]
 
@@ -44,7 +44,7 @@ valued = ["--against", "--diff-binary", "--exec-abs-paths", "--exec-rel-paths", 
 name = "cat"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--repository", "-R", "-h", "-r"]
 valued = ["--repository", "-R", "-r"]
 
@@ -52,7 +52,7 @@ valued = ["--repository", "-R", "-r"]
 name = "finfo"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--limit", "--no-graph", "--offset", "--print", "--repository", "--show-id", "--showid", "--status", "--type", "--width", "-R", "-h", "-l", "-p", "-w"]
 valued = ["--branch", "--limit", "--repository", "--type", "--width", "-R", "-l", "-w"]
 
@@ -119,7 +119,7 @@ valued = ["--ignore", "--repository", "-R"]
 name = "ls"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--age", "--help", "--repository", "--type", "--verbose", "-R", "-h", "-l", "-r", "-v"]
 valued = ["--repository", "--type", "-R", "-r"]
 
@@ -127,7 +127,7 @@ valued = ["--repository", "--type", "-R", "-r"]
 name = "whatis"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--repository", "--type", "--verbose", "-R", "-h", "-v"]
 valued = ["--repository", "--type", "-R"]
 
@@ -315,7 +315,7 @@ candidate = true
 name = "search"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--all", "--checkin", "--documentation", "--forum", "--ticket", "--unindexed", "--wiki"]
 valued = ["--limit", "-n"]
 

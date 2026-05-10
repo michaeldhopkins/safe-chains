@@ -6,32 +6,32 @@ bare_flags = ["--help", "--version", "-h"]
 
 [[command.sub]]
 name = "status"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--full", "--help", "--lines", "--no-pager", "-a", "-h", "-l"]
 valued = ["-n", "--output", "-o"]
 
 [[command.sub]]
 name = "show"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--help", "--no-pager", "-a", "-h"]
 valued = ["--property", "-p"]
 
 [[command.sub]]
 name = "is-active"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 
 [[command.sub]]
 name = "is-enabled"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 
 [[command.sub]]
 name = "is-failed"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 
 [[command.sub]]
@@ -67,5 +67,5 @@ standalone = ["--all", "--help", "--no-pager", "--plain", "--reverse", "-a", "-h
 [[command.sub]]
 name = "cat"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--no-pager", "-h"]

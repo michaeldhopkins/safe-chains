@@ -5,7 +5,7 @@ url = "https://github.com/codesenberg/bombardier"
 researched_version = "bombardier 1.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-h", "-v"]
 valued = [
     "--body", "--body-file", "--cert",

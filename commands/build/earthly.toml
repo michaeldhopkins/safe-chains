@@ -9,21 +9,21 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 name = "doc"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all-targets", "--help", "-a", "-h"]
 
 [[command.sub]]
 name = "ls"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--args", "--help", "--long", "-a", "-h", "-l"]
 
 [[command.sub]]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

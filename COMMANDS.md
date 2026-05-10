@@ -574,6 +574,8 @@ Aliases: `7zz`, `7za`
 
 - `atlas doctor`
 - `atlas migrate status`
+- `atlas schema status`
+- `atlas schema lint`
 - `atlas whoami`
 
 ### `atuin`
@@ -1111,6 +1113,14 @@ Aliases: `@biomejs/biome`
 - **list**: Flags: --first, --format, --help, --json, --json-lines, --last, --short, --sort-by, -h. Valued: --exclude, --exclude-from, --first, --format, --last, --match-archives, --patterns-from, --sort-by, -a, -e. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `borg check repo`
+- `borg config repo`
+- `borg list repo`
+- `borg info repo`
+- `borg version`
 
 ### `brakeman`
 <p class="cmd-url"><a href="https://brakemanscanner.org/docs/options/">https://brakemanscanner.org/docs/options/</a></p>
@@ -2794,7 +2804,7 @@ Aliases: `difftastic`
 ### `dvc`
 <p class="cmd-url"><a href="https://dvc.org/">https://dvc.org/</a></p>
 
-- **add**: Flags: --external, --file, --force, --glob, --help, --no-commit, --quiet, --recursive, --remote, --to-remote, --verbose, -R, -f, -h, -q, -v. Valued: --desc, --file, --meta, --out, --remote, --type, -o. Positional args accepted
+- **add**: Flags: --external, --file, --force, --glob, --help, --no-commit, --quiet, --recursive, --remote, --verbose, -R, -f, -h, -q, -v. Valued: --desc, --file, --meta, --out, --remote, --type, -o
 - **checkout**: Flags: --allow-missing, --force, --help, --quiet, --recursive, --relink, --summary, -R, -f, -h, -q. Positional args accepted
 - **commit**: Flags: --data-only, --force, --help, --no-commit, --quiet, --recursive, --relink, --verbose, -R, -d, -f, -h, -q, -v. Positional args accepted
 - **dag**: Flags: --dot, --full, --help, --mermaid, --md, --outs, --quiet, --verbose, -h, -q, -v. Positional args accepted
@@ -2808,6 +2818,12 @@ Aliases: `difftastic`
 - **unprotect**: Flags: --help, --quiet, -h, -q. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `dvc add data.csv`
+- `dvc status`
+- `dvc version`
 
 ### `earthly`
 <p class="cmd-url"><a href="https://docs.earthly.dev/docs/earthly-command">https://docs.earthly.dev/docs/earthly-command</a></p>
@@ -2826,10 +2842,16 @@ Aliases: `difftastic`
 - **health**: Flags: --help, --mono, --refresh, -h. Valued: --profile, --region, --view. Positional args accepted
 - **help**: Positional args accepted
 - **list**: Flags: --all, --help, --verbose, -a, -h, -v. Valued: --profile, --region
-- **logs**: Flags: --all, --cloudwatch-logs, --cloudwatch-log-source, --help, --instance, --stream, --zip, -a, -h, -z. Valued: --instance, --profile, --region. Positional args accepted
+- **logs**: Flags: --all, --help, --instance, --stream, --zip, -a, -h, -z. Valued: --instance, --profile, --region
 - **printenv**: Flags: --help, -h. Valued: --profile, --region. Positional args accepted
 - **status**: Flags: --help, --verbose, -h, -v. Valued: --profile, --region. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `eb logs`
+- `eb status`
+- `eb events`
 
 ### `echo`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation</a></p>
@@ -3168,6 +3190,12 @@ Aliases: `flang-new`
 - **logs**: Flags: --help, -h. Valued: -d, --device-id
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `flutter logs`
+- `flutter logs -d ABC123`
+- `flutter doctor`
 
 ### `flux`
 <p class="cmd-url"><a href="https://fluxcd.io/flux/cmd/flux/">https://fluxcd.io/flux/cmd/flux/</a></p>
@@ -4694,7 +4722,11 @@ Aliases: `iperf`
 - Allowed standalone flags: --compact, --help, --in-place, --insert-final-newline, --prettify, --quiet, --sort-keys, --version, -V, -c, -h, -i, -p, -q, -s, -v
 - Allowed valued flags: --indent, --mode, -m, -t
 - Bare invocation allowed
-- Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `jsonlint file.json`
+- `jsonlint --version`
 
 ### `jstack`
 <p class="cmd-url"><a href="https://docs.oracle.com/en/java/javase/21/docs/specs/man/jstack.html">https://docs.oracle.com/en/java/javase/21/docs/specs/man/jstack.html</a></p>
@@ -5537,7 +5569,7 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - **cat**: Flags: --encrypt-key, --help, --rewind, -h. Valued: --encrypt-key, --rewind, --version-id. Positional args accepted
 - **completion**: Flags: --help, -h. Positional args accepted
 - **du**: Flags: --depth, --help, --recursive, --rewind, --versions, -d, -h, -r. Valued: --depth, --rewind. Positional args accepted
-- **find**: Flags: --help, --ignore, --metadata, --name, --newer-than, --older-than, --path, --print, --recursive, --regex, --rewind, --versions, --watch, -h, -r. Valued: --exec, --maxdepth, --mindepth, --name, --newer-than, --older-than, --path, --print, --regex. Positional args accepted
+- **find**: Flags: --help, --ignore, --metadata, --name, --newer-than, --older-than, --path, --print, --recursive, --regex, --rewind, --versions, --watch, -h, -r. Valued: --maxdepth, --mindepth, --name, --newer-than, --older-than, --path, --print, --regex
 - **head**: Flags: --encrypt-key, --help, --rewind, -h. Valued: --encrypt-key, -n, --lines, --rewind, --version-id. Positional args accepted
 - **help**: Positional args accepted
 - **ls**: Flags: --help, --incomplete, --metadata, --no-color, --recursive, --rewind, --summarize, --versions, -I, -h, -r, -S. Positional args accepted
@@ -5545,6 +5577,12 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - **tree**: Flags: --depth, --files, --help, --no-color, -d, -f, -h. Valued: --depth. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `mc ls bucket`
+- `mc find bucket --name foo`
+- `mc version`
 
 ### `mcs`
 <p class="cmd-url"><a href="https://www.mono-project.com/docs/about-mono/languages/csharp/">https://www.mono-project.com/docs/about-mono/languages/csharp/</a></p>
@@ -9404,14 +9442,11 @@ Aliases: `[`
 ### `tilt`
 <p class="cmd-url"><a href="https://docs.tilt.dev/cli/tilt">https://docs.tilt.dev/cli/tilt</a></p>
 
-- **completion**: Flags: --help, -h. Positional args accepted
-- **describe**: Flags: --help, -h, -A, --all-namespaces, --show-events. Valued: -n, --namespace, -l, --selector, -o, --output. Positional args accepted
-- **doctor**: Flags: --help, -h. Valued: --output, -o
-- **get**: Flags: --help, -h, -A, --all-namespaces, -w, --watch, --no-headers. Valued: -n, --namespace, -l, --selector, --field-selector, -o, --output. Positional args accepted
-- **help**: Positional args accepted
-- **verify-install**: Flags: --help, -h
-- **version**: Flags: --help, -h
-- Allowed standalone flags: --help, --version, -h, -v
+- Bare invocation, `--help`, `-h`, `--version`, `-v`, `-V` allowed (both binaries)
+- Ruby tilt: `--list`, `-l` to list engines; `tilt FILE` to render a template; `--type/-t TYPE`, `--layout/-y LAYOUT` valued flags. File argument must look like a path (contain `/`, `.`, or be `-` for stdin) — bare words (e.g. `tilt up`) are rejected since they're indistinguishable from K8s tilt subcommands.
+- K8s tilt diagnostic subs: `version`, `doctor`, `verify-install` (Inert)
+- K8s tilt help/completion: `help [topic]`, `completion [shell]` (Inert)
+- K8s tilt read subs: `get [resource]`, `describe [resource]` with kubectl-style flags (`-n/--namespace`, `-l/--selector`, `-o/--output`, `--field-selector`, `--context`, `--kubeconfig`, `-A/--all-namespaces`, `-w/--watch`)
 
 ### `time`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/time.1.html">https://man7.org/linux/man-pages/man1/time.1.html</a></p>

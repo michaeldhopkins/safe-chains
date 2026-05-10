@@ -6,7 +6,7 @@ url = "https://github.com/editorconfig-checker/editorconfig-checker"
 researched_version = "editorconfig-checker 3.x"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--debug", "--disable-end-of-line",
     "--disable-indent-size", "--disable-indentation",

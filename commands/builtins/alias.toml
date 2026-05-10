@@ -4,5 +4,5 @@ description = "Defines or lists shell aliases in the current session. Effects ar
 url = "https://man7.org/linux/man-pages/man1/alias.1p.html"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["-p"]

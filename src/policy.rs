@@ -1,9 +1,52 @@
 use crate::parse::{Token, WordSet};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum FlagStyle {
+/// Whether unrecognized flag-shaped tokens are denied or silently accepted
+/// as positional arguments. The default (Strict) makes the allowlist
+/// authoritative — any unrecognized `-X` or `--foo` is denied.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum UnknownTolerance {
+    /// Deny every unrecognized flag-shaped token. The safe default.
+    #[default]
     Strict,
-    Positional,
+    /// Accept unknown single-dash tokens (`-X`, `-help`, `-mayDie`) as
+    /// positional. Reject unknown double-dash. Use for tools like
+    /// `pdftotext` that have single-dash long flags.
+    Short,
+    /// Accept unknown double-dash tokens (`--foo`, `--foo=value`) as
+    /// positional. Reject unknown single-dash. Dangerous: most modern
+    /// destructive flags are double-dash, so enabling this can silently
+    /// accept mutating options. Reserved for tools with genuinely
+    /// unbounded long-flag surfaces (AWS CLI service flags).
+    Long,
+    /// Accept both single-dash and double-dash unknowns as positional.
+    /// Most permissive; combines the cost of `Short` and `Long`.
+    Both,
+}
+
+impl UnknownTolerance {
+    pub const fn allows_short(self) -> bool {
+        matches!(self, Self::Short | Self::Both)
+    }
+    pub const fn allows_long(self) -> bool {
+        matches!(self, Self::Long | Self::Both)
+    }
+}
+
+/// How the dispatcher treats tokens that look like flags but aren't in the
+/// allowlist. `unknown` controls flag-shaped unknowns; `numeric_dash` opts
+/// into `-NUMBER` shorthand (e.g. `head -20`).
+#[derive(Clone, Copy, Debug, Default)]
+pub struct FlagTolerance {
+    pub unknown: UnknownTolerance,
+    pub numeric_dash: bool,
+}
+
+impl FlagTolerance {
+    /// Strict allowlist: deny every unrecognized flag-shaped token.
+    /// `const`-callable for use in static `FlagPolicy` literals.
+    pub const fn strict() -> Self {
+        Self { unknown: UnknownTolerance::Strict, numeric_dash: false }
+    }
 }
 
 pub trait FlagSet {
@@ -43,8 +86,7 @@ pub struct FlagPolicy {
     pub valued: WordSet,
     pub bare: bool,
     pub max_positional: Option<usize>,
-    pub flag_style: FlagStyle,
-    pub numeric_dash: bool,
+    pub tolerance: FlagTolerance,
 }
 
 impl FlagPolicy {
@@ -62,10 +104,10 @@ impl FlagPolicy {
         if self.bare {
             lines.push("- Bare invocation allowed".to_string());
         }
-        if self.flag_style == FlagStyle::Positional {
+        if self.tolerance.unknown != UnknownTolerance::Strict {
             lines.push("- Hyphen-prefixed positional arguments accepted".to_string());
         }
-        if self.numeric_dash {
+        if self.tolerance.numeric_dash {
             lines.push("- Numeric shorthand accepted (e.g. -20 for -n 20)".to_string());
         }
         if lines.is_empty() && !self.bare {
@@ -83,8 +125,7 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
         &policy.valued,
         policy.bare,
         policy.max_positional,
-        policy.flag_style,
-        policy.numeric_dash,
+        policy.tolerance,
     )
 }
 
@@ -94,8 +135,7 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
     valued: &V,
     bare: bool,
     max_positional: Option<usize>,
-    flag_style: FlagStyle,
-    numeric_dash: bool,
+    tolerance: FlagTolerance,
 ) -> bool {
     if tokens.len() == 1 {
         return bare;
@@ -117,7 +157,7 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
             continue;
         }
 
-        if numeric_dash && t.len() > 1 && t[1..].bytes().all(|b| b.is_ascii_digit()) {
+        if tolerance.numeric_dash && t.len() > 1 && t[1..].bytes().all(|b| b.is_ascii_digit()) {
             i += 1;
             continue;
         }
@@ -137,7 +177,8 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
                 i += 1;
                 continue;
             }
-            if flag_style == FlagStyle::Positional {
+            // `--foo=value` forms are governed by the long-flag tolerance.
+            if tolerance.unknown.allows_long() {
                 positionals += 1;
                 i += 1;
                 continue;
@@ -146,7 +187,7 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
         }
 
         if t.starts_with("--") {
-            if flag_style == FlagStyle::Positional {
+            if tolerance.unknown.allows_long() {
                 positionals += 1;
                 i += 1;
                 continue;
@@ -169,7 +210,7 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
                 }
                 break;
             }
-            if flag_style == FlagStyle::Positional {
+            if tolerance.unknown.allows_short() {
                 positionals += 1;
                 break;
             }
@@ -195,8 +236,7 @@ mod tests {
         ]),
         bare: false,
         max_positional: None,
-        flag_style: FlagStyle::Strict,
-        numeric_dash: false,
+        tolerance: FlagTolerance::strict(),
     };
 
     fn toks(words: &[&str]) -> Vec<Token> {
@@ -215,8 +255,7 @@ mod tests {
             valued: WordSet::flags(&[]),
             bare: true,
             max_positional: None,
-            flag_style: FlagStyle::Strict,
-            numeric_dash: false,
+            tolerance: FlagTolerance::strict(),
         };
         assert!(check(&toks(&["uname"]), &policy));
     }
@@ -324,8 +363,7 @@ mod tests {
         valued: WordSet::flags(&["--skip-fields", "-f", "-s"]),
         bare: true,
         max_positional: Some(1),
-        flag_style: FlagStyle::Strict,
-        numeric_dash: false,
+        tolerance: FlagTolerance::strict(),
     };
 
     #[test]
@@ -358,59 +396,155 @@ mod tests {
         assert!(check(&toks(&["uniq"]), &LIMITED_POLICY));
     }
 
-    static POSITIONAL_POLICY: FlagPolicy = FlagPolicy {
+    static BOTH_TOLERANCES_POLICY: FlagPolicy = FlagPolicy {
         standalone: WordSet::flags(&["-E", "-e", "-n"]),
         valued: WordSet::flags(&[]),
         bare: true,
         max_positional: None,
-        flag_style: FlagStyle::Positional,
-        numeric_dash: false,
+        tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false },
     };
 
     #[test]
-    fn positional_style_unknown_long() {
-        assert!(check(&toks(&["echo", "--unknown", "hello"]), &POSITIONAL_POLICY));
+    fn both_tolerances_accept_unknown_long() {
+        assert!(check(&toks(&["echo", "--unknown", "hello"]), &BOTH_TOLERANCES_POLICY));
     }
 
     #[test]
-    fn positional_style_unknown_short() {
-        assert!(check(&toks(&["echo", "-x", "hello"]), &POSITIONAL_POLICY));
+    fn both_tolerances_accept_unknown_short() {
+        assert!(check(&toks(&["echo", "-x", "hello"]), &BOTH_TOLERANCES_POLICY));
     }
 
     #[test]
-    fn positional_style_dashes() {
-        assert!(check(&toks(&["echo", "---"]), &POSITIONAL_POLICY));
+    fn both_tolerances_accept_triple_dash() {
+        assert!(check(&toks(&["echo", "---"]), &BOTH_TOLERANCES_POLICY));
     }
 
     #[test]
-    fn positional_style_known_flags_still_work() {
-        assert!(check(&toks(&["echo", "-n", "hello"]), &POSITIONAL_POLICY));
+    fn both_tolerances_known_flags_still_work() {
+        assert!(check(&toks(&["echo", "-n", "hello"]), &BOTH_TOLERANCES_POLICY));
     }
 
     #[test]
-    fn positional_style_combo_known() {
-        assert!(check(&toks(&["echo", "-ne", "hello"]), &POSITIONAL_POLICY));
+    fn both_tolerances_combo_known_short() {
+        assert!(check(&toks(&["echo", "-ne", "hello"]), &BOTH_TOLERANCES_POLICY));
     }
 
     #[test]
-    fn positional_style_combo_unknown_byte() {
-        assert!(check(&toks(&["echo", "-nx", "hello"]), &POSITIONAL_POLICY));
+    fn both_tolerances_combo_unknown_short_byte() {
+        assert!(check(&toks(&["echo", "-nx", "hello"]), &BOTH_TOLERANCES_POLICY));
     }
 
     #[test]
-    fn positional_style_unknown_eq() {
-        assert!(check(&toks(&["echo", "--foo=bar"]), &POSITIONAL_POLICY));
+    fn both_tolerances_unknown_eq_form() {
+        assert!(check(&toks(&["echo", "--foo=bar"]), &BOTH_TOLERANCES_POLICY));
+    }
+
+    // ============ Narrow tolerance: short-only ============
+    // tolerate_unknown_short = true accepts unknown single-dash tokens
+    // (-X, -mayDie, -help) as positional, while leaving double-dash unknowns
+    // strict. This is the safer setting because most modern destructive
+    // flags are double-dash.
+
+    static SHORT_ONLY_POLICY: FlagPolicy = FlagPolicy {
+        standalone: WordSet::flags(&["--help"]),
+        valued: WordSet::flags(&[]),
+        bare: false,
+        max_positional: None,
+        tolerance: FlagTolerance { unknown: UnknownTolerance::Short, numeric_dash: false },
+    };
+
+    #[test]
+    fn short_only_accepts_unknown_dash_letter() {
+        assert!(check(&toks(&["sample", "-mayDie"]), &SHORT_ONLY_POLICY));
     }
 
     #[test]
-    fn positional_style_with_max_positional() {
+    fn short_only_accepts_single_dash_long_word() {
+        // pdftotext-style: `-help`, `-layout`, `-version` (single dash + word)
+        assert!(check(&toks(&["pdftotext", "-layout"]), &SHORT_ONLY_POLICY));
+    }
+
+    #[test]
+    fn short_only_denies_unknown_double_dash() {
+        // The whole point of the narrow split: --evil-flag must not slip
+        // through when only short-tolerance is on.
+        assert!(!check(&toks(&["sample", "--evil-flag"]), &SHORT_ONLY_POLICY));
+    }
+
+    #[test]
+    fn short_only_denies_unknown_eq_form() {
+        assert!(!check(&toks(&["sample", "--evil=value"]), &SHORT_ONLY_POLICY));
+    }
+
+    #[test]
+    fn short_only_known_long_flag_still_works() {
+        assert!(check(&toks(&["sample", "--help"]), &SHORT_ONLY_POLICY));
+    }
+
+    // ============ Narrow tolerance: long-only ============
+    // tolerate_unknown_long = true accepts unknown double-dash tokens as
+    // positional. This is the dangerous form; reserved for tools like AWS
+    // CLI whose long-flag surface is genuinely unbounded.
+
+    static LONG_ONLY_POLICY: FlagPolicy = FlagPolicy {
+        standalone: WordSet::flags(&["--help"]),
+        valued: WordSet::flags(&[]),
+        bare: false,
+        max_positional: None,
+        tolerance: FlagTolerance { unknown: UnknownTolerance::Long, numeric_dash: false },
+    };
+
+    #[test]
+    fn long_only_accepts_unknown_double_dash() {
+        assert!(check(&toks(&["aws", "--some-aws-flag"]), &LONG_ONLY_POLICY));
+    }
+
+    #[test]
+    fn long_only_accepts_unknown_eq_form() {
+        assert!(check(
+            &toks(&["aws", "--filter=Name=tag,Values=foo"]),
+            &LONG_ONLY_POLICY,
+        ));
+    }
+
+    #[test]
+    fn long_only_denies_unknown_short_dash() {
+        assert!(!check(&toks(&["aws", "-x"]), &LONG_ONLY_POLICY));
+    }
+
+    // ============ Both tolerances false: strict ============
+
+    static STRICT_POLICY: FlagPolicy = FlagPolicy {
+        standalone: WordSet::flags(&["--help"]),
+        valued: WordSet::flags(&[]),
+        bare: false,
+        max_positional: None,
+        tolerance: FlagTolerance::strict(),
+    };
+
+    #[test]
+    fn strict_denies_unknown_short() {
+        assert!(!check(&toks(&["foo", "-evil"]), &STRICT_POLICY));
+    }
+
+    #[test]
+    fn strict_denies_unknown_long() {
+        assert!(!check(&toks(&["foo", "--evil"]), &STRICT_POLICY));
+    }
+
+    #[test]
+    fn strict_known_flag_passes() {
+        assert!(check(&toks(&["foo", "--help"]), &STRICT_POLICY));
+    }
+
+    #[test]
+    fn both_tolerances_with_max_positional() {
         let policy = FlagPolicy {
             standalone: WordSet::flags(&["-n"]),
             valued: WordSet::flags(&[]),
             bare: true,
             max_positional: Some(2),
-            flag_style: FlagStyle::Positional,
-            numeric_dash: false,
+            tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false },
         };
         assert!(check(&toks(&["echo", "--unknown", "hello"]), &policy));
         assert!(!check(&toks(&["echo", "--a", "--b", "--c"]), &policy));
@@ -424,8 +558,7 @@ mod tests {
         valued: WordSet::flags(&["--bytes", "--lines", "-c", "-n"]),
         bare: true,
         max_positional: None,
-        flag_style: FlagStyle::Strict,
-        numeric_dash: true,
+        tolerance: FlagTolerance { numeric_dash: true, ..FlagTolerance::strict() },
     };
 
     #[test]

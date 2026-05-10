@@ -23,7 +23,7 @@ valued = [
 name = "new"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "--verbose", "-h", "-q", "-v"]
 
 [[command.sub]]

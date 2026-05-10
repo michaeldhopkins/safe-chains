@@ -5,5 +5,5 @@ url = "https://joeyh.name/code/moreutils/"
 researched_version = "moreutils sponge; surface stable"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-a", "-h"]

@@ -5,7 +5,7 @@ url = "https://github.com/seattlerb/flay"
 researched_version = "flay 2.x; surface frozen"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--diff", "--help", "--liberal",
     "--summary", "--verbose", "--version",

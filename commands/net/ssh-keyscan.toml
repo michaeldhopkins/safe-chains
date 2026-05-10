@@ -5,7 +5,7 @@ url = "https://man.openbsd.org/ssh-keyscan"
 researched_version = "OpenSSH 9.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "-4", "-6", "-D",
     "-H", "-O", "-c", "-h",

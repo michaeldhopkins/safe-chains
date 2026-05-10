@@ -20,7 +20,7 @@ valued = ["--channel", "--description", "--filter", "--limit", "--repository"]
 name = "status"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--full-hashes", "--help", "--no-mtime", "--short", "-h"]
 valued = ["--channel", "--repository"]
 
@@ -28,7 +28,7 @@ valued = ["--channel", "--repository"]
 name = "diff"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--full-hashes", "--help", "--inodes", "--json", "--no-color", "--short", "--untracked", "-h", "-s"]
 valued = ["--channel", "--repository"]
 
@@ -36,7 +36,7 @@ valued = ["--channel", "--repository"]
 name = "change"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--full-hashes", "--help", "--inverse", "--json", "-h"]
 valued = ["--channel", "--repository"]
 
@@ -44,7 +44,7 @@ valued = ["--channel", "--repository"]
 name = "credit"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--unrecorded", "-h"]
 valued = ["--channel", "--repository"]
 
@@ -93,7 +93,7 @@ candidate = true
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -152,7 +152,7 @@ candidate = true
 name = "ls"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--repo-path", "--repository"]
 

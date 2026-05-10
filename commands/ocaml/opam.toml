@@ -16,28 +16,28 @@ valued = ["--field-match", "--fields", "--filter", "--repos", "--search", "--swi
 name = "show"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all-versions", "--depexts", "--field", "--just-file", "--list-files", "--no-color", "--normalise", "--raw", "--share", "--debug", "--help", "-h"]
 
 [[command.sub]]
 name = "search"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--case-sensitive", "--debug", "--help", "--installed", "--no-color", "-c", "-h"]
 
 [[command.sub]]
 name = "info"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all-versions", "--depexts", "--just-file", "--list-files", "--debug", "--help", "-h"]
 
 [[command.sub]]
 name = "var"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--global", "--help", "-h"]
 
 [[command.sub]]
@@ -121,7 +121,7 @@ candidate = true
 name = "lint"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--normalize", "--short", "-s", "--check-upstream", "--package"]
 valued = ["--filter", "-f", "--package", "--warnings", "-W"]
 

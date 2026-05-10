@@ -5,7 +5,7 @@ url = "https://github.com/hatoo/oha"
 researched_version = "oha 1.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--debug", "--disable-color", "--disable-compression",
     "--disable-keepalive", "--http2", "--help",

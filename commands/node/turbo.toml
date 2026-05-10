@@ -7,7 +7,7 @@ bare_flags = ["--help", "--version", "-h"]
 [[command.sub]]
 name = "run"
 level = "SafeRead"
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--affected", "--cache-dir", "--continue", "--dry-run",
     "--env-mode", "--force", "--framework-inference",

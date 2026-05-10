@@ -4,4 +4,5 @@ description = "Legacy ImageMagick command that converts between image formats an
 url = "https://imagemagick.org/script/convert.php"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true

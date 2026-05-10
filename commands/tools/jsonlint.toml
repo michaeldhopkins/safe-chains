@@ -5,7 +5,6 @@ url = "https://github.com/zaach/jsonlint"
 researched_version = "jsonlint 1.x"
 level = "SafeRead"
 bare = true
-positional_style = true
 standalone = [
     "--compact", "--help", "--in-place",
     "--insert-final-newline", "--prettify",
@@ -14,3 +13,9 @@ standalone = [
     "-q", "-s", "-v",
 ]
 valued = ["--indent", "--mode", "-m", "-t"]
+write_flags = ["--in-place"]
+examples_safe = [
+    "jsonlint file.json",
+    "jsonlint --version",
+]
+examples_denied = []

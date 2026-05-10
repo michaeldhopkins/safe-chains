@@ -24,7 +24,7 @@ valued = ["--data-file", "--directory", "--fail-under", "--precision", "--title"
 [[command.sub]]
 name = "run"
 level = "SafeRead"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--append", "--branch", "--concurrency", "--help", "--parallel", "--source", "--timid", "-a", "-h", "-p"]
 valued = ["--context", "--data-file", "--include", "--omit", "--rcfile", "--source"]
 

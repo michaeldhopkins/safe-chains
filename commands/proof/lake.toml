@@ -32,7 +32,7 @@ valued = ["--manifest"]
 name = "query"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

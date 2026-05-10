@@ -13,35 +13,35 @@ standalone = ["--check", "--deps", "--help", "-h"]
 name = "about"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--full", "--help", "--json", "-h"]
 
 [[command.sub]]
 name = "ls"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "lsd"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-R", "-h"]
 
 [[command.sub]]
 name = "lsl"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "lsf"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--absolute", "--csv", "--dir-slash", "--files-only", "--dirs-only", "--help", "--recursive", "-R", "-h"]
 valued = ["--format", "--separator", "--time-format", "-F"]
 
@@ -49,28 +49,28 @@ valued = ["--format", "--separator", "--time-format", "-F"]
 name = "lsjson"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--dirs-only", "--encrypted", "--files-only", "--help", "--no-mimetype", "--no-modtime", "--original", "--recursive", "--stat", "-h", "-M", "-R"]
 
 [[command.sub]]
 name = "tree"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--dirs-only", "--full-path", "--help", "--noindent", "--protections", "--quote", "--size", "--sort-ctime", "--sort-modtime", "--sort-reverse", "--unsorted", "-D", "-Q", "-a", "-c", "-d", "-h", "-r", "-s", "-t"]
 
 [[command.sub]]
 name = "size"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "-h"]
 
 [[command.sub]]
 name = "cat"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--head", "--help", "--tail", "-h"]
 valued = ["--count", "--head", "--offset", "--tail"]
 
@@ -78,7 +78,7 @@ valued = ["--count", "--head", "--offset", "--tail"]
 name = "check"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--checkfile", "--combined", "--differ", "--download", "--error", "--help", "--match", "--missing-on-dst", "--missing-on-src", "--one-way", "-h"]
 valued = ["--checkfile", "--combined", "--differ", "--error", "--match", "--missing-on-dst", "--missing-on-src"]
 
@@ -86,7 +86,7 @@ valued = ["--checkfile", "--combined", "--differ", "--error", "--match", "--miss
 name = "md5sum"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--base64", "--checkfile", "--download", "--help", "-h"]
 valued = ["--checkfile", "--output-file"]
 
@@ -94,7 +94,7 @@ valued = ["--checkfile", "--output-file"]
 name = "sha1sum"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--base64", "--checkfile", "--download", "--help", "-h"]
 valued = ["--checkfile", "--output-file"]
 
@@ -102,7 +102,7 @@ valued = ["--checkfile", "--output-file"]
 name = "hashsum"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--base64", "--checkfile", "--download", "--help", "-h"]
 valued = ["--checkfile", "--output-file"]
 
@@ -110,7 +110,7 @@ valued = ["--checkfile", "--output-file"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

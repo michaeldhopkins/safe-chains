@@ -15,7 +15,7 @@ standalone = ["--help", "-h"]
 name = "build"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--mpa", "-h"]
 valued = ["--base", "--cache-dir", "--out-dir"]
 

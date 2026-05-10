@@ -34,7 +34,7 @@ valued = ["-T", "--template"]
 name = "log"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--branch", "--copies", "--debug", "--follow", "--follow-first", "--git", "--graph", "--hidden", "--help", "--no-merges", "--patch", "--quiet", "--removed", "--reverse", "--stat", "--style", "--template", "--user", "--verbose", "-G", "-M", "-T", "-b", "-c", "-d", "-f", "-g", "-h", "-k", "-l", "-p", "-q", "-r", "-u", "-v", "-y"]
 valued = ["--branch", "--date", "--exclude", "--include", "--keyword", "--limit", "--prune", "--rev", "--style", "--template", "--user", "-T", "-X", "-d", "-f", "-k", "-l", "-r", "-u"]
 
@@ -42,7 +42,7 @@ valued = ["--branch", "--date", "--exclude", "--include", "--keyword", "--limit"
 name = "diff"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--change", "--git", "--ignore-all-space", "--ignore-blank-lines", "--ignore-space-change", "--ignore-space-at-eol", "--ignore-changes", "--mar", "--no-binary", "--no-dates", "--noprefix", "--nodates", "--patch", "--reverse", "--show-function", "--stat", "--text", "--unified", "--word-diff", "-B", "-Z", "-a", "-b", "-c", "-g", "-h", "-p", "-r", "-w"]
 valued = ["--change", "--exclude", "--include", "--rev", "--root", "--unified", "-I", "-U", "-X", "-c", "-r"]
 
@@ -51,7 +51,7 @@ name = "status"
 aliases = ["st"]
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--added", "--clean", "--copies", "--deleted", "--ignored", "--modified", "--no-status", "--print0", "--quiet", "--removed", "--rev", "--terse", "--unknown", "-0", "-A", "-C", "-T", "-a", "-c", "-d", "-h", "-i", "-m", "-n", "-q", "-r", "-u"]
 valued = ["--change", "--exclude", "--include", "--rev", "--terse", "-I", "-X", "-r", "-t"]
 
@@ -67,7 +67,7 @@ name = "id"
 aliases = ["identify"]
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--branch", "--bookmarks", "--debug", "--help", "--id", "--num", "--tags", "-B", "-b", "-h", "-i", "-n", "-r", "-t"]
 valued = ["--rev", "-r"]
 
@@ -75,14 +75,14 @@ valued = ["--rev", "-r"]
 name = "paths"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "--verbose", "-q", "-v"]
 
 [[command.sub]]
 name = "parents"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--rev", "--style", "--template", "-T", "-r"]
 
@@ -90,7 +90,7 @@ valued = ["--rev", "--style", "--template", "-T", "-r"]
 name = "heads"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--active", "--closed", "--help", "-a", "-c", "-h"]
 valued = ["--rev", "--style", "--template", "-T", "-r"]
 
@@ -105,7 +105,7 @@ valued = ["--rev", "--style", "--template", "-T", "-r"]
 name = "branch"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--clean", "--force", "--help", "-C", "-f", "-h"]
 
 [[command.sub]]
@@ -113,7 +113,7 @@ name = "bookmarks"
 aliases = ["bookmark", "bm"]
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--active", "--all", "--delete", "--force", "--help", "--inactive", "--rename", "-B", "-d", "-f", "-h", "-i", "-l", "-m"]
 valued = ["--rev", "-r"]
 
@@ -127,7 +127,7 @@ standalone = ["--debug", "--help", "--quiet", "--verbose", "-h", "-q", "-v"]
 name = "cat"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--decode", "--help", "-h"]
 valued = ["--exclude", "--include", "--output", "--rev", "--template", "-I", "-T", "-X", "-o", "-r"]
 
@@ -136,7 +136,7 @@ name = "annotate"
 aliases = ["blame"]
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--changeset", "--date", "--file", "--follow", "--help", "--ignore-all-space", "--ignore-blank-lines", "--ignore-space-change", "--ignore-space-at-eol", "--line-number", "--no-binary", "--no-follow", "--number", "--quiet", "--text", "--user", "--verbose", "-B", "-Z", "-a", "-b", "-c", "-d", "-f", "-h", "-l", "-n", "-q", "-u", "-v", "-w"]
 valued = ["--exclude", "--include", "--rev", "--skip", "-I", "-X", "-r"]
 
@@ -144,7 +144,7 @@ valued = ["--exclude", "--include", "--rev", "--skip", "-I", "-X", "-r"]
 name = "manifest"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--debug", "--help", "-h"]
 valued = ["--rev", "-r"]
 
@@ -152,7 +152,7 @@ valued = ["--rev", "-r"]
 name = "files"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--print0", "--quiet", "--verbose", "-0", "-h", "-q", "-v"]
 valued = ["--exclude", "--include", "--rev", "-I", "-T", "-X", "-r"]
 
@@ -160,7 +160,7 @@ valued = ["--exclude", "--include", "--rev", "-I", "-T", "-X", "-r"]
 name = "grep"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--all-files", "--diff", "--files-with-matches", "--ignore-case", "--help", "--line-number", "--print0", "--rev", "-0", "-a", "-d", "-h", "-i", "-l", "-n", "-r"]
 valued = ["--exclude", "--include", "--rev", "--user", "-I", "-X", "-r", "-u"]
 
@@ -180,7 +180,7 @@ standalone = ["--help", "-h"]
 name = "outgoing"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--bookmarks", "--branch", "--force", "--graph", "--help", "--insecure", "--newest-first", "--patch", "--ssh", "--remotecmd", "-B", "-G", "-S", "-b", "-f", "-h", "-l", "-n", "-p", "-r"]
 valued = ["--branch", "--rev", "--ssh", "--remotecmd", "-r"]
 
@@ -188,7 +188,7 @@ valued = ["--branch", "--rev", "--ssh", "--remotecmd", "-r"]
 name = "incoming"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--bookmarks", "--branch", "--bundle", "--force", "--graph", "--help", "--insecure", "--newest-first", "--patch", "-B", "-G", "-S", "-b", "-f", "-h", "-l", "-n", "-p", "-r"]
 valued = ["--branch", "--bundle", "--rev", "--ssh", "--remotecmd", "-r"]
 
@@ -197,7 +197,7 @@ name = "config"
 aliases = ["showconfig"]
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--edit", "--global", "--help", "--local", "--non-shared", "--quiet", "--user", "-e", "-h", "-q"]
 valued = ["--source", "-T", "--template"]
 

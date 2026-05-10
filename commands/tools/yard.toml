@@ -101,7 +101,7 @@ valued = []
 name = "diff"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--added", "--all", "--compact", "--debug",
     "--help", "--modified", "--no-progress",
@@ -135,7 +135,7 @@ allow_all = true
 name = "ri"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

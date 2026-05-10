@@ -5,7 +5,7 @@ url = "https://hurl.dev/docs/manual.html"
 researched_version = "Hurl 5.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--color", "--compressed",
     "--connect-to", "--continue-on-error",

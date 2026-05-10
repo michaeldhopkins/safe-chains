@@ -38,7 +38,7 @@ standalone = ["--help", "--verbose", "-h", "-v"]
 name = "show"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -51,7 +51,7 @@ standalone = ["--help", "-h"]
 name = "init"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--package", "-h"]
 valued = ["--template", "-t"]
 

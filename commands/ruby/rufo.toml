@@ -5,7 +5,7 @@ url = "https://github.com/ruby-formatter/rufo"
 researched_version = "rufo 0.18.2 (December 2025)"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--check", "--help", "--simple-exit", "--version",
     "-c", "-h", "-x",

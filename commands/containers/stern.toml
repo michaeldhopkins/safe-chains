@@ -4,7 +4,7 @@ description = "Multi-pod and multi-container log tailing tool for Kubernetes. Al
 url = "https://github.com/stern/stern"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--all-namespaces", "--color", "--diff-container",
     "--ephemeral-containers", "--help", "--include-hidden",

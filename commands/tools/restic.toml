@@ -17,7 +17,7 @@ standalone = ["--help", "-h"]
 name = "snapshots"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--compact", "--help", "--latest", "-c", "-h"]
 valued = ["--group-by", "--host", "--path", "--tag", "-H"]
 
@@ -25,14 +25,14 @@ valued = ["--group-by", "--host", "--path", "--tag", "-H"]
 name = "list"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "ls"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--long", "--recursive", "-h", "-l"]
 valued = ["--host", "--path", "--tag", "-H"]
 
@@ -40,7 +40,7 @@ valued = ["--host", "--path", "--tag", "-H"]
 name = "stats"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--host", "--mode", "--path", "--tag", "-H"]
 
@@ -48,7 +48,7 @@ valued = ["--host", "--mode", "--path", "--tag", "-H"]
 name = "find"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--blob", "--help", "--ignore-case", "--long", "--newest", "--oldest", "--pack", "--show-pack-id", "--tree", "-h", "-i", "-l"]
 valued = ["--host", "--path", "--snapshot", "--tag", "-H", "-N", "-O", "-s"]
 
@@ -56,14 +56,14 @@ valued = ["--host", "--path", "--snapshot", "--tag", "-H", "-N", "-O", "-s"]
 name = "cat"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "dump"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--archive", "--help", "-a", "-h"]
 valued = ["--host", "--path", "--tag", "-H"]
 
@@ -78,14 +78,14 @@ valued = ["--read-data-subset"]
 name = "diff"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--metadata", "-h"]
 
 [[command.sub]]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

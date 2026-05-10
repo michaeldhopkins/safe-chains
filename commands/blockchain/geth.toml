@@ -41,7 +41,7 @@ candidate = true
 name = "dump"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--iterative", "--nocode", "--nostorage", "--incompletes"]
 valued = ["--datadir", "--start", "--limit"]
 

@@ -21,7 +21,7 @@ valued = ["--format"]
 name = "images"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--digests", "--help", "--history", "--json", "--no-trunc", "--noheading", "--quiet", "-a", "-h", "-n", "-q"]
 valued = ["--filter", "--format", "-f"]
 
@@ -36,7 +36,7 @@ valued = ["--filter", "--format", "-f"]
 name = "inspect"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--format", "--type", "-f", "-t"]
 

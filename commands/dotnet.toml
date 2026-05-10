@@ -216,7 +216,7 @@ candidate = true
 name = "verify"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--all", "-v"]
 valued = ["--certificate-fingerprint", "--configfile", "--verbosity"]
 

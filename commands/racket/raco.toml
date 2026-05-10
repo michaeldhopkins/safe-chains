@@ -13,14 +13,14 @@ allow_all = true
 name = "doc"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--no-build", "-h"]
 
 [[command.sub]]
 name = "docs"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

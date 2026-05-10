@@ -102,6 +102,6 @@ valued = ["--output", "-o"]
 [[command.sub]]
 name = "diff"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--field-manager", "--force-conflicts", "--help", "--prune", "--server-side", "-h"]
 valued = ["-f", "--filename", "-k", "--kustomize", "-l", "--selector", "--prune-allowlist"]

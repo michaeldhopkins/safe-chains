@@ -5,7 +5,7 @@ url = "https://github.com/wookayin/gpustat"
 researched_version = "gpustat 1.x"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--debug", "--force-color", "--gpuname-width",
     "--help", "--id", "--json", "--no-color",

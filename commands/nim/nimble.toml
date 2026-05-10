@@ -15,7 +15,7 @@ standalone = ["--help", "--installed", "--ver", "-h", "-i"]
 name = "search"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--ver", "-h"]
 
 [[command.sub]]
@@ -34,21 +34,21 @@ standalone = ["--help", "-h"]
 name = "path"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "dump"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--ini", "--json", "-h"]
 
 [[command.sub]]
 name = "manifest"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

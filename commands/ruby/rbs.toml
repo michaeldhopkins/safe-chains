@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h"]
 name = "ast"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 
@@ -24,7 +24,7 @@ valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 name = "ancestors"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--instance", "--singleton", "-h"]
 valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 
@@ -32,7 +32,7 @@ valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 name = "methods"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "--inherit", "--instance",
     "--no-inherit", "--singleton", "-h",
@@ -43,7 +43,7 @@ valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 name = "method"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--instance", "--singleton", "-h"]
 valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 
@@ -51,7 +51,7 @@ valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 name = "constant"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--context", "-I", "--collection", "--repo", "--log-level", "-r"]
 
@@ -73,7 +73,7 @@ valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 name = "parse"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--method-type", "--type", "-h"]
 valued = ["-e", "-I", "--collection", "--repo", "--log-level", "-r"]
 
@@ -81,7 +81,7 @@ valued = ["-e", "-I", "--collection", "--repo", "--log-level", "-r"]
 name = "subtract"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 
@@ -89,7 +89,7 @@ valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 name = "diff"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 
@@ -97,7 +97,7 @@ valued = ["-I", "--collection", "--repo", "--log-level", "-r"]
 name = "annotate"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--arglists", "--filename",
     "--gems", "--help", "--home",
@@ -112,7 +112,7 @@ valued = ["--dir", "-d", "-I", "--collection", "--repo", "--log-level", "-r"]
 name = "prototype"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--force", "--help", "--merge", "--outline", "--todo", "-h"]
 valued = [
     "--base-dir", "--method-owner", "--out-dir",

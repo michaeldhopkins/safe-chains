@@ -10,52 +10,64 @@ valued = ["--sdk", "--toolchain"]
 [[command.sub]]
 name = "--find"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "--show-sdk-build-version"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "--show-sdk-path"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "--show-sdk-platform-path"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "--show-sdk-platform-version"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "--show-sdk-version"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "--show-toolchain-path"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "simctl"
 [[command.sub.sub]]
 name = "list"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "stapler"
 [[command.sub.sub]]
 name = "validate"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "notarytool"
 [[command.sub.sub]]
 name = "history"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "info"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "log"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true

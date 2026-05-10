@@ -15,7 +15,7 @@ name = "entity"
 [[command.sub.sub]]
 name = "search"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--fields-filter", "--type"]
 [[command.sub.sub]]

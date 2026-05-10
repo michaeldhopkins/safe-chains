@@ -5,7 +5,7 @@ url = "https://github.com/robertdavidgraham/masscan"
 researched_version = "masscan 1.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--echo", "--echo-cidr", "--exclude",
     "--excludefile", "--help", "--http-user-agent",

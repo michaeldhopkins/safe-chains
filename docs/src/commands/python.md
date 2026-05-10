@@ -88,7 +88,7 @@
 ### `dvc`
 <p class="cmd-url"><a href="https://dvc.org/">https://dvc.org/</a></p>
 
-- **add**: Flags: --external, --file, --force, --glob, --help, --no-commit, --quiet, --recursive, --remote, --to-remote, --verbose, -R, -f, -h, -q, -v. Valued: --desc, --file, --meta, --out, --remote, --type, -o. Positional args accepted
+- **add**: Flags: --external, --file, --force, --glob, --help, --no-commit, --quiet, --recursive, --remote, --verbose, -R, -f, -h, -q, -v. Valued: --desc, --file, --meta, --out, --remote, --type, -o
 - **checkout**: Flags: --allow-missing, --force, --help, --quiet, --recursive, --relink, --summary, -R, -f, -h, -q. Positional args accepted
 - **commit**: Flags: --data-only, --force, --help, --no-commit, --quiet, --recursive, --relink, --verbose, -R, -d, -f, -h, -q, -v. Positional args accepted
 - **dag**: Flags: --dot, --full, --help, --mermaid, --md, --outs, --quiet, --verbose, -h, -q, -v. Positional args accepted
@@ -102,6 +102,12 @@
 - **unprotect**: Flags: --help, --quiet, -h, -q. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `dvc add data.csv`
+- `dvc status`
+- `dvc version`
 
 ### `hatch`
 <p class="cmd-url"><a href="https://hatch.pypa.io/">https://hatch.pypa.io/</a></p>

@@ -13,7 +13,7 @@ valued = ["--config", "-c"]
 name = "missing"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--pattern", "-t", "--types"]
 
@@ -21,21 +21,21 @@ valued = ["--pattern", "-t", "--types"]
 name = "unused"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--no-strict", "--strict", "-h"]
 
 [[command.sub]]
 name = "find"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--no-strict", "--strict", "-h"]
 
 [[command.sub]]
 name = "health"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--out-format"]
 
@@ -43,7 +43,7 @@ valued = ["--out-format"]
 name = "eq-base"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--out-format"]
 
@@ -51,7 +51,7 @@ valued = ["--out-format"]
 name = "check-consistent-interpolations"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--out-format"]
 
@@ -59,7 +59,7 @@ valued = ["--out-format"]
 name = "check-reserved-interpolations"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--out-format"]
 
@@ -67,14 +67,14 @@ valued = ["--out-format"]
 name = "check-normalized"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "data"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--nostdin", "-h"]
 valued = ["--data-format"]
 
@@ -82,7 +82,7 @@ valued = ["--data-format"]
 name = "config"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -101,7 +101,7 @@ standalone = ["--help", "-h", "-p", "--pattern-router"]
 name = "add-missing"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--nil-value", "-h"]
 valued = ["--pattern", "-v", "--value"]
 
@@ -109,7 +109,7 @@ valued = ["--pattern", "-v", "--value"]
 name = "remove-unused"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--confirm", "--help", "--keep-order",
     "--no-strict", "--strict", "-h", "-k",
@@ -126,21 +126,21 @@ standalone = ["--confirm", "--help", "--keep-order", "-h", "-k"]
 name = "mv"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "cp"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "rm"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -182,7 +182,7 @@ valued = ["--data-format", "--pattern"]
 name = "tree-mv"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all-locales", "--help", "-h"]
 valued = ["--data-format"]
 
@@ -197,7 +197,7 @@ valued = ["--data-format"]
 name = "tree-set-value"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--nostdin", "-h"]
 valued = ["--data-format", "--pattern", "-v", "--value"]
 

@@ -5,6 +5,6 @@ url = "https://www.postgresql.org/docs/current/app-pgcontroldata.html"
 researched_version = "PostgreSQL 16.x"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-?", "-V"]
 valued = ["--pgdata", "-D"]

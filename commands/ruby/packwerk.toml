@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h"]
 name = "check"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--no-parallel", "--parallel", "-h"]
 valued = ["--offenses-formatter", "--packages"]
 
@@ -17,7 +17,7 @@ valued = ["--offenses-formatter", "--packages"]
 name = "update-todo"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--no-parallel", "--parallel", "-h"]
 valued = ["--offenses-formatter", "--packages"]
 

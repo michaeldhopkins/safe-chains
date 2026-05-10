@@ -4,5 +4,5 @@ description = "Fast CSV command-line toolkit written in Rust by BurntSushi, prov
 url = "https://github.com/BurntSushi/xsv"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-h"]

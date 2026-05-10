@@ -6,30 +6,35 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 
 [[command.sub]]
 name = "completion"
-positional_style = true
+tolerate_unknown_short = true
 
 [[command.sub]]
 name = "init"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "issue"
 nested_bare = true
 [[command.sub.sub]]
 name = "list"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "view"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "me"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "sprint"
 nested_bare = true
 [[command.sub.sub]]
 name = "list"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true

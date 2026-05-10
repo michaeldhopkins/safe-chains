@@ -9,7 +9,8 @@ valued = ["--config", "--disable", "--enable", "-c"]
 [[command.sub]]
 name = "apply"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "cloud"
@@ -17,16 +18,20 @@ nested_bare = true
 [[command.sub.sub]]
 name = "apply"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "diff"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "list"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "status"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "completion"
@@ -39,12 +44,14 @@ name = "debug"
 nested_bare = true
 [[command.sub.sub]]
 name = "app-server"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "exec"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "features"
@@ -52,11 +59,13 @@ nested_bare = true
 [[command.sub.sub]]
 name = "disable"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "enable"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "list"
 standalone = ["--help", "-h"]
@@ -65,7 +74,8 @@ max_positional = 0
 [[command.sub]]
 name = "fork"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "mcp"
@@ -73,28 +83,35 @@ nested_bare = true
 [[command.sub.sub]]
 name = "add"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "get"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "list"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "remove"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "resume"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "review"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "sandbox"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true

@@ -32,7 +32,7 @@ standalone = ["--help", "-h"]
 name = "image_info"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--version", "-v"]
 

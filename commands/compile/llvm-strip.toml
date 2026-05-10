@@ -5,5 +5,5 @@ url = "https://llvm.org/docs/CommandGuide/llvm-strip.html"
 researched_version = "LLVM 18.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-?", "-h"]

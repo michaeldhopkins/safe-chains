@@ -5,7 +5,7 @@ url = "https://man.openbsd.org/ssh-add"
 researched_version = "OpenSSH 9.x"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "-?", "-A", "-D", "-K",
     "-L", "-T", "-V", "-X", "-c", "-d",

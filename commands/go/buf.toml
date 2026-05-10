@@ -13,7 +13,7 @@ valued = ["--config", "--disable-symlinks", "--exclude-imports", "--log-format",
 name = "lint"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--exclude-imports", "--help", "-h"]
 valued = ["--config", "--error-format", "--exclude-path", "--path"]
 
@@ -21,7 +21,7 @@ valued = ["--config", "--error-format", "--exclude-path", "--path"]
 name = "build"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--as-file-descriptor-set", "--disable-symlinks", "--exclude-imports", "--exclude-source-info", "--help", "-h"]
 valued = ["--config", "--exclude-path", "--output", "--path", "-o"]
 
@@ -29,7 +29,7 @@ valued = ["--config", "--exclude-path", "--output", "--path", "-o"]
 name = "format"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--diff", "--exit-code", "--help", "--write", "-d", "-h", "-w"]
 valued = ["--config", "--exclude-path", "--output", "--path", "-o"]
 write_flags = ["--write", "-w"]
@@ -38,7 +38,7 @@ write_flags = ["--write", "-w"]
 name = "breaking"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--exclude-imports", "--help", "--limit-to-input-files", "-h"]
 valued = ["--against", "--against-config", "--config", "--error-format", "--exclude-path", "--path"]
 
@@ -46,7 +46,7 @@ valued = ["--against", "--against-config", "--config", "--error-format", "--excl
 name = "convert"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--from-format", "--help", "--to-format", "-h"]
 valued = ["--from", "--output", "--to", "--type", "-o"]
 
@@ -54,7 +54,7 @@ valued = ["--from", "--output", "--to", "--type", "-o"]
 name = "ls-files"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--include-imports", "--include-import-paths", "-h"]
 valued = ["--config", "--format"]
 
@@ -62,7 +62,7 @@ valued = ["--config", "--format"]
 name = "generate"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--clean", "--debug", "--help", "--include-imports", "--include-types", "--include-wkt", "-h"]
 valued = ["--config", "--exclude-path", "--include-types", "--output", "--path", "--template", "--type", "-o"]
 
@@ -70,7 +70,7 @@ valued = ["--config", "--exclude-path", "--include-types", "--output", "--path",
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

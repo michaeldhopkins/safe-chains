@@ -5,7 +5,7 @@ url = "https://nextjs.org/docs/app/api-reference/cli/create-next-app"
 researched_version = "create-next-app 15.x"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--app", "--api", "--disable-git",
     "--empty", "--eslint",

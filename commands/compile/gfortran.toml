@@ -5,5 +5,5 @@ url = "https://gcc.gnu.org/onlinedocs/gfortran/"
 researched_version = "GCC 14.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-h", "-v", "-V"]

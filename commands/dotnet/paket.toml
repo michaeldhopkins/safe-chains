@@ -39,7 +39,7 @@ standalone = ["--help", "-h"]
 name = "find-packages"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--max", "--source"]
 
@@ -47,7 +47,7 @@ valued = ["--max", "--source"]
 name = "find-package-versions"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--max", "--source"]
 
@@ -55,7 +55,7 @@ valued = ["--max", "--source"]
 name = "find-refs"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--group"]
 
@@ -63,7 +63,7 @@ valued = ["--group"]
 name = "why"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--details", "--help", "-h"]
 valued = ["--group"]
 

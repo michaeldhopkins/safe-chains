@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h"]
 name = "analyze"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--cache", "--enable-experiment", "--fatal-infos", "--fatal-warnings", "--format", "--help", "--no-fatal-infos", "--no-fatal-warnings", "--packages", "--verbose", "-h", "-v"]
 valued = ["--directory"]
 
@@ -17,7 +17,7 @@ valued = ["--directory"]
 name = "format"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--enable-experiment", "--fix", "--follow-links", "--help", "--machine", "--set-exit-if-changed", "--show", "--show-help-hidden", "--summary", "-h"]
 valued = ["--line-length", "--output", "--language-version", "--page-width", "--selection", "--style", "-l", "-o"]
 write_flags = ["--output", "-o"]

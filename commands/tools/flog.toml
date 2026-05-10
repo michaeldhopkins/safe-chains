@@ -5,7 +5,7 @@ url = "https://github.com/seattlerb/flog"
 researched_version = "flog 4.x; surface frozen"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--all", "--blame", "--continue",
     "--details", "--group", "--help",

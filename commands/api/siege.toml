@@ -5,7 +5,7 @@ url = "https://www.joedog.org/siege-manual/"
 researched_version = "siege 4.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--benchmark", "--config",
     "--get", "--help", "--internet",

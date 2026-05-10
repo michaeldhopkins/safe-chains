@@ -5,7 +5,7 @@ url = "https://man.openbsd.org/scp"
 researched_version = "OpenSSH 9.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "-3", "-4", "-6",
     "-A", "-B", "-C", "-D",

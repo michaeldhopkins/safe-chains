@@ -21,7 +21,7 @@ standalone = ["--help", "-h"]
 name = "report"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--coverage-reporter"]
 

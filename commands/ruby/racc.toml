@@ -5,7 +5,7 @@ url = "https://github.com/ruby/racc"
 researched_version = "racc 1.x; surface stable"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--check-only", "--debug", "--embedded",
     "--frozen", "--help",

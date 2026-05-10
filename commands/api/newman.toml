@@ -13,7 +13,7 @@ standalone = ["--help", "-h"]
 name = "run"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--bail", "--color", "--delay-request",
     "--disable-unicode", "--export-cookie-jar",
