@@ -49,6 +49,46 @@ impl FlagTolerance {
     }
 }
 
+/// Predicate over the first positional token of a fallback grammar.
+/// Lets a TOML-declared fallback say "the first positional must look
+/// like a path" without the handler hardcoding the test.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum PositionalShape {
+    /// Looks like a file path: contains `/`, contains `.`, or is `-`
+    /// (the conventional stdin marker). Rejects flag-shaped tokens.
+    Path,
+}
+
+impl PositionalShape {
+    pub fn matches(self, token: &str) -> bool {
+        match self {
+            Self::Path => looks_like_path(token),
+        }
+    }
+
+    pub fn from_name(name: &str) -> Option<Self> {
+        match name {
+            "path" => Some(Self::Path),
+            _ => None,
+        }
+    }
+}
+
+/// Heuristic for "this token looks like a file path." Used by the
+/// `path` `PositionalShape`. Conservative on purpose — a bare word
+/// like `Tiltfile` is a valid filename in cwd but the heuristic
+/// rejects it to avoid swallowing flag-less subcommands. Callers
+/// that want bare-name acceptance should match a sub block instead.
+pub fn looks_like_path(token: &str) -> bool {
+    if token.is_empty() {
+        return false;
+    }
+    if token.starts_with('-') {
+        return token == "-";
+    }
+    token.contains('/') || token.contains('.')
+}
+
 pub trait FlagSet {
     fn contains_flag(&self, token: &str) -> bool;
     fn contains_short(&self, byte: u8) -> bool;
@@ -604,5 +644,51 @@ mod tests {
     #[test]
     fn numeric_dash_disabled_rejects_multi_digit() {
         assert!(!check(&toks(&["grep", "-20", "pattern"]), &TEST_POLICY));
+    }
+
+    #[test]
+    fn looks_like_path_accepts_relative() {
+        assert!(looks_like_path("./Tiltfile"));
+        assert!(looks_like_path("path/to/file"));
+    }
+
+    #[test]
+    fn looks_like_path_accepts_dotted() {
+        assert!(looks_like_path("Tiltfile.dev"));
+        assert!(looks_like_path("file.rb"));
+    }
+
+    #[test]
+    fn looks_like_path_accepts_stdin_dash() {
+        assert!(looks_like_path("-"));
+    }
+
+    #[test]
+    fn looks_like_path_rejects_flag() {
+        assert!(!looks_like_path("--help"));
+        assert!(!looks_like_path("-x"));
+    }
+
+    #[test]
+    fn looks_like_path_rejects_bare_word() {
+        assert!(!looks_like_path("Tiltfile"));
+        assert!(!looks_like_path("up"));
+    }
+
+    #[test]
+    fn looks_like_path_rejects_empty() {
+        assert!(!looks_like_path(""));
+    }
+
+    #[test]
+    fn positional_shape_path_matches() {
+        assert!(PositionalShape::Path.matches("./file.rb"));
+        assert!(!PositionalShape::Path.matches("--flag"));
+    }
+
+    #[test]
+    fn positional_shape_from_name() {
+        assert_eq!(PositionalShape::from_name("path"), Some(PositionalShape::Path));
+        assert_eq!(PositionalShape::from_name("nope"), None);
     }
 }

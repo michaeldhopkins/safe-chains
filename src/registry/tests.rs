@@ -1752,6 +1752,183 @@ use super::*;
             "TOML examples drift from dispatcher:\n{}", failures.join("\n"));
     }
 
+    /// Regression guard: `examples_safe`/`examples_denied` must appear
+    /// before any `[[command.sub]]` or `[command.fallback]` table in
+    /// each TOML file. TOML semantics scope inline keys to the
+    /// most-recently-opened table, so examples written *after* a
+    /// nested table silently get attached to that table and dropped
+    /// from the command. Walks every `commands/**/*.toml` and asserts
+    /// each `[[command]]` block that mentions an `examples_*` field
+    /// produces a non-empty list on the parsed spec.
+    #[test]
+    fn examples_appear_before_nested_tables_in_every_toml() {
+        use std::fs;
+        use std::path::PathBuf;
+
+        fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
+            for entry in fs::read_dir(dir).unwrap() {
+                let entry = entry.unwrap();
+                let path = entry.path();
+                if path.is_dir() {
+                    walk(&path, out);
+                } else if path.extension().and_then(|e| e.to_str()) == Some("toml") {
+                    if path.file_name().and_then(|n| n.to_str()) == Some("SAMPLE.toml") {
+                        continue;
+                    }
+                    out.push(path);
+                }
+            }
+        }
+
+        let mut files = Vec::new();
+        walk(std::path::Path::new("commands"), &mut files);
+        assert!(!files.is_empty(), "expected commands/ to contain TOML files");
+
+        let mut failures = Vec::new();
+        for path in files {
+            let source = fs::read_to_string(&path).unwrap();
+            let parsed: toml::Value = match toml::from_str(&source) {
+                Ok(v) => v,
+                Err(e) => {
+                    failures.push(format!("{}: parse error: {e}", path.display()));
+                    continue;
+                }
+            };
+            let Some(cmds) = parsed.get("command").and_then(|v| v.as_array()) else {
+                continue;
+            };
+            for cmd in cmds {
+                let Some(name) = cmd.get("name").and_then(|v| v.as_str()) else {
+                    continue;
+                };
+                if source.contains("examples_safe")
+                    && cmd.get("examples_safe").is_none()
+                {
+                    failures.push(format!(
+                        "{}: command `{name}` — `examples_safe` text in file but \
+                         not attached to [[command]] (move it above any \
+                         [[command.sub]] / [command.fallback] table)",
+                        path.display(),
+                    ));
+                }
+                if source.contains("examples_denied")
+                    && cmd.get("examples_denied").is_none()
+                {
+                    failures.push(format!(
+                        "{}: command `{name}` — `examples_denied` text in file \
+                         but not attached to [[command]] (move it above any \
+                         [[command.sub]] / [command.fallback] table)",
+                        path.display(),
+                    ));
+                }
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "TOML examples misordered:\n{}",
+            failures.join("\n"),
+        );
+    }
+
+    #[test]
+    fn handler_with_subs_and_fallback_builds_custom_kind() {
+        // Verify that a handler-using TOML carries its [[command.sub]]
+        // and [command.fallback] data through into DispatchKind::Custom.
+        // Without this, try_sub_dispatch / try_fallback_grammar would
+        // see empty data and silently deny everything the handler asks
+        // about.
+        let spec = load_one(r#"
+[[command]]
+name = "demo-handler"
+handler = "demo"
+
+[[command.sub]]
+name = "diag"
+max_positional = 0
+
+[command.fallback]
+level = "Inert"
+bare = true
+max_positional = 1
+positional_shape = "path"
+standalone = ["--help", "-h"]
+"#);
+        match &spec.kind {
+            DispatchKind::Custom { handler_name, subs, fallback, .. } => {
+                assert_eq!(handler_name, "demo");
+                let names: Vec<_> = subs.iter().map(|s| s.name.as_str()).collect();
+                assert_eq!(names, vec!["diag"]);
+                let f = fallback.as_ref().expect("fallback present");
+                assert_eq!(f.level, SafetyLevel::Inert);
+                assert_eq!(f.policy.max_positional, Some(1));
+                assert_eq!(
+                    f.positional_shape,
+                    Some(crate::policy::PositionalShape::Path),
+                );
+            }
+            other => panic!("expected Custom, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn fallback_without_handler_panics() {
+        let result = std::panic::catch_unwind(|| {
+            load_one(r#"
+[[command]]
+name = "demo-orphan-fallback"
+bare = true
+
+[command.fallback]
+level = "Inert"
+bare = true
+"#);
+        });
+        assert!(
+            result.is_err(),
+            "fallback declared without a handler should panic — \
+             try_fallback_grammar is only invoked from handlers, so the \
+             block is dead config",
+        );
+    }
+
+    #[test]
+    fn unknown_positional_shape_panics() {
+        let result = std::panic::catch_unwind(|| {
+            load_one(r#"
+[[command]]
+name = "demo-bad-shape"
+handler = "demo"
+
+[command.fallback]
+level = "Inert"
+positional_shape = "not-a-real-shape"
+"#);
+        });
+        assert!(
+            result.is_err(),
+            "loading an unknown positional_shape should panic with diagnostic",
+        );
+    }
+
+    #[test]
+    fn handler_without_fallback_field_has_none() {
+        // Regression: a handler-using TOML with no [command.fallback]
+        // block must produce `fallback: None` so try_fallback_grammar
+        // returns None and the handler can deny.
+        let spec = load_one(r#"
+[[command]]
+name = "demo-no-fallback"
+handler = "demo"
+"#);
+        match &spec.kind {
+            DispatchKind::Custom { subs, fallback, .. } => {
+                assert!(subs.is_empty());
+                assert!(fallback.is_none());
+            }
+            other => panic!("expected Custom, got {other:?}"),
+        }
+    }
+
     #[test]
     fn deny_field_denies_every_invocation() {
         let source = r#"

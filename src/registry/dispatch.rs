@@ -274,3 +274,24 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
 pub fn dispatch_spec(tokens: &[Token], spec: &CommandSpec) -> Verdict {
     dispatch_kind(tokens, &spec.kind, &CMD_HANDLERS)
 }
+
+/// Dispatches a sub's kind directly, used by `registry::try_sub_dispatch`
+/// when a handler-using command consults its TOML-declared subs.
+pub(super) fn dispatch_sub_kind(tokens: &[Token], kind: &DispatchKind) -> Verdict {
+    dispatch_kind(tokens, kind, &SUB_HANDLERS)
+}
+
+/// Applies a TOML-declared fallback grammar. Used by
+/// `registry::try_fallback_grammar()`.
+pub(super) fn dispatch_fallback(tokens: &[Token], spec: &FallbackSpec) -> Verdict {
+    if let Some(shape) = spec.positional_shape
+        && let Some(first) = super::policy::first_positional(tokens, &spec.policy)
+        && !shape.matches(first)
+    {
+        return Verdict::Denied;
+    }
+    if !check_owned(tokens, &spec.policy) {
+        return Verdict::Denied;
+    }
+    Verdict::Allowed(spec.level)
+}

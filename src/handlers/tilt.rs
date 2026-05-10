@@ -1,198 +1,24 @@
-//! Disambiguates two distinct tools that share the binary name `tilt`:
+//! `tilt` is two distinct CLIs sharing one binary name. Process inspection
+//! can't tell which is on PATH, so the handler routes the first token to
+//! the correct grammar:
 //!
-//! - **Ruby tilt** (gem `tilt`): a template engine. `tilt FILE` renders a
-//!   template to stdout. Flags: `--list/-l` (engines), `--type/-t TYPE`,
-//!   `--layout/-y LAYOUT`. No subcommands.
+//! - **K8s tilt** (tilt-dev/tilt) sub names → that sub's TOML-declared policy.
+//! - **Ruby tilt** (gem `tilt`, a template engine) → fallback policy. It
+//!   accepts at most one positional and requires it to look like a path,
+//!   so a bare-word first token (`tilt up`) is denied — those would be
+//!   K8s subs we deliberately don't allowlist.
 //!
-//! - **Kubernetes tilt** (tilt-dev/tilt): a containerized dev environment.
-//!   `tilt up/down/ci/...` mutates a local cluster. Diagnostic subs are
-//!   `version`, `doctor`, `verify-install`, `completion`, `help`, plus
-//!   kubectl-style `get` and `describe`.
-//!
-//! Without process inspection there's no way to know which binary the
-//! user has on `$PATH`. We use the first token after `tilt` to pick a
-//! grammar: K8s sub names route to K8s validation; flag/file shapes
-//! route to Ruby template-engine validation. Forms ambiguous to either
-//! grammar (bare `tilt`, `tilt --help`, `tilt --version`) are accepted
-//! at Inert.
-use crate::parse::{Token, WordSet};
-use crate::verdict::{SafetyLevel, Verdict};
-
-static K8S_DIAGNOSTIC_SUBS: WordSet =
-    WordSet::new(&["doctor", "verify-install", "version"]);
-static K8S_PASSTHROUGH_SUBS: WordSet = WordSet::new(&["completion", "help"]);
-static K8S_READ_SUBS: WordSet = WordSet::new(&["describe", "get"]);
-
-static SHARED_BARE_FLAGS: WordSet =
-    WordSet::new(&["--help", "--version", "-V", "-h", "-v"]);
-static RUBY_LIST_FLAGS: WordSet = WordSet::new(&["--list", "-l"]);
-static RUBY_VALUED_FLAGS: WordSet =
-    WordSet::new(&["--layout", "--type", "-t", "-y"]);
-
-static K8S_GET_BARE: WordSet = WordSet::new(&[
-    "--help", "--no-headers", "--show-labels", "--watch",
-    "-A", "-h", "-w",
-]);
-static K8S_GET_VALUED: WordSet = WordSet::new(&[
-    "--context", "--field-selector", "--kubeconfig", "--namespace",
-    "--output", "--selector",
-    "-l", "-n", "-o",
-]);
+//! All grammar data lives in `commands/tools/tilt.toml`. This file is
+//! pure dispatch logic.
+use crate::parse::Token;
+use crate::registry;
+use crate::verdict::Verdict;
 
 pub fn check_tilt(tokens: &[Token]) -> Verdict {
-    if tokens.len() == 1 {
-        return Verdict::Allowed(SafetyLevel::Inert);
+    if let Some(verdict) = registry::try_sub_dispatch("tilt", tokens) {
+        return verdict;
     }
-    let first = tokens[1].as_str();
-
-    // Shared diagnostic bare flags (same in Ruby and K8s tilt).
-    if tokens.len() == 2 && SHARED_BARE_FLAGS.contains(first) {
-        return Verdict::Allowed(SafetyLevel::Inert);
-    }
-
-    // Ruby tilt: --list / -l prints engine list, no further args.
-    if tokens.len() == 2 && RUBY_LIST_FLAGS.contains(first) {
-        return Verdict::Allowed(SafetyLevel::Inert);
-    }
-
-    if K8S_DIAGNOSTIC_SUBS.contains(first) {
-        return validate_diagnostic_sub(tokens);
-    }
-    if K8S_PASSTHROUGH_SUBS.contains(first) {
-        return validate_passthrough_sub(tokens);
-    }
-    if K8S_READ_SUBS.contains(first) {
-        return validate_get_describe(tokens);
-    }
-
-    validate_ruby_render(tokens)
-}
-
-fn validate_diagnostic_sub(tokens: &[Token]) -> Verdict {
-    // version / doctor / verify-install — accept --help/-h only after the sub.
-    let mut i = 2;
-    while i < tokens.len() {
-        let t = tokens[i].as_str();
-        if matches!(t, "--help" | "-h") {
-            i += 1;
-            continue;
-        }
-        return Verdict::Denied;
-    }
-    Verdict::Allowed(SafetyLevel::Inert)
-}
-
-fn validate_passthrough_sub(tokens: &[Token]) -> Verdict {
-    // help <topic> / completion <shell>: accept any non-flag token plus --help/-h.
-    let mut i = 2;
-    while i < tokens.len() {
-        let t = tokens[i].as_str();
-        if matches!(t, "--help" | "-h") {
-            i += 1;
-            continue;
-        }
-        if t.starts_with('-') {
-            return Verdict::Denied;
-        }
-        i += 1;
-    }
-    Verdict::Allowed(SafetyLevel::Inert)
-}
-
-fn validate_get_describe(tokens: &[Token]) -> Verdict {
-    // K8s tilt get/describe: kubectl-style read. Accept the standard read flags.
-    let mut i = 2;
-    while i < tokens.len() {
-        let t = tokens[i].as_str();
-        if K8S_GET_BARE.contains(t) {
-            i += 1;
-            continue;
-        }
-        if K8S_GET_VALUED.contains(t) {
-            if tokens.get(i + 1).is_none() {
-                return Verdict::Denied;
-            }
-            i += 2;
-            continue;
-        }
-        if let Some(eq) = t.find('=') {
-            let key = &t[..eq];
-            if K8S_GET_VALUED.contains(key) {
-                i += 1;
-                continue;
-            }
-        }
-        if t.starts_with('-') {
-            return Verdict::Denied;
-        }
-        // Positional: resource type / name. Allow any non-flag token.
-        i += 1;
-    }
-    Verdict::Allowed(SafetyLevel::SafeRead)
-}
-
-fn looks_like_template_file(s: &str) -> bool {
-    s == "-" || s.contains('/') || s.contains('.')
-}
-
-fn validate_ruby_render(tokens: &[Token]) -> Verdict {
-    // Ruby tilt: optional flags, then a single template file (or `-` for stdin).
-    let mut i = 1;
-    let mut saw_file = false;
-    while i < tokens.len() {
-        let t = tokens[i].as_str();
-
-        // Bare `-` is the stdin file marker, not a flag.
-        if t == "-" {
-            if saw_file {
-                return Verdict::Denied;
-            }
-            saw_file = true;
-            i += 1;
-            continue;
-        }
-
-        if RUBY_LIST_FLAGS.contains(t) {
-            i += 1;
-            continue;
-        }
-        if RUBY_VALUED_FLAGS.contains(t) {
-            if tokens.get(i + 1).is_none() {
-                return Verdict::Denied;
-            }
-            i += 2;
-            continue;
-        }
-        if let Some(eq) = t.find('=') {
-            let key = &t[..eq];
-            if RUBY_VALUED_FLAGS.contains(key) {
-                i += 1;
-                continue;
-            }
-        }
-        if matches!(t, "--help" | "-h" | "--version" | "-v" | "-V") {
-            i += 1;
-            continue;
-        }
-
-        if !t.starts_with('-') {
-            // Reject bare-word first positionals that look like K8s subs we
-            // didn't allowlist (up, down, ci, deploy, etc.) — without a path
-            // shape, Ruby tilt would error and K8s tilt would mutate.
-            if !looks_like_template_file(t) {
-                return Verdict::Denied;
-            }
-            if saw_file {
-                return Verdict::Denied;
-            }
-            saw_file = true;
-            i += 1;
-            continue;
-        }
-
-        return Verdict::Denied;
-    }
-    Verdict::Allowed(SafetyLevel::Inert)
+    registry::try_fallback_grammar("tilt", tokens).unwrap_or(Verdict::Denied)
 }
 
 #[cfg(test)]
@@ -272,10 +98,6 @@ mod tests {
         // Multi-positional (Ruby tilt takes one file)
         two_files: "tilt a.erb b.erb",
 
-        // Valued flag missing value
-        type_missing_value: "tilt --type",
-        layout_missing_value: "tilt -y",
-
         // Sub + bad arg
         version_extra: "tilt version foo",
         doctor_with_dash_flag: "tilt doctor --evil",
@@ -303,5 +125,63 @@ mod tests {
             verdict("tilt doctor"),
             Verdict::Allowed(SafetyLevel::Inert),
         );
+    }
+
+    /// Proptests of the grammar-selection invariant: K8s sub name → sub
+    /// policy verdict; otherwise → fallback verdict. They synthesize
+    /// inputs the unit tests don't enumerate (random resource names,
+    /// random extensions) and would catch regressions in
+    /// `try_sub_dispatch` / `try_fallback_grammar` routing logic.
+    use proptest::prelude::*;
+    proptest! {
+        #[test]
+        fn get_with_random_resource_is_safe_read(
+            resource in "[a-z][a-z0-9-]{0,15}",
+        ) {
+            let cmd = format!("tilt get {resource}");
+            prop_assert_eq!(
+                crate::command_verdict(&cmd),
+                Verdict::Allowed(SafetyLevel::SafeRead),
+            );
+        }
+
+        #[test]
+        fn describe_with_random_resource_is_safe_read(
+            resource in "[a-z][a-z0-9-]{0,15}",
+            name in "[a-z][a-z0-9-]{0,15}",
+        ) {
+            let cmd = format!("tilt describe {resource} {name}");
+            prop_assert_eq!(
+                crate::command_verdict(&cmd),
+                Verdict::Allowed(SafetyLevel::SafeRead),
+            );
+        }
+
+        #[test]
+        fn random_path_shaped_arg_is_inert(
+            stem in "[a-z][a-z0-9_]{0,15}",
+            ext in "(erb|haml|md|slim|txt)",
+        ) {
+            let cmd = format!("tilt {stem}.{ext}");
+            prop_assert_eq!(
+                crate::command_verdict(&cmd),
+                Verdict::Allowed(SafetyLevel::Inert),
+            );
+        }
+
+        #[test]
+        fn random_bare_word_is_denied(
+            word in "[a-z][a-z0-9-]{0,15}",
+        ) {
+            // Bare-word tokens that aren't K8s sub names must be denied
+            // by the Ruby fallback (path-shape predicate).
+            let known_subs = [
+                "doctor", "verify-install", "version",
+                "completion", "help", "describe", "get",
+            ];
+            prop_assume!(!known_subs.contains(&word.as_str()));
+            let cmd = format!("tilt {word}");
+            prop_assert_eq!(crate::command_verdict(&cmd), Verdict::Denied);
+        }
     }
 }

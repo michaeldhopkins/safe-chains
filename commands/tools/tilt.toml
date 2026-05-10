@@ -11,3 +11,111 @@ doc_body = """
 - K8s tilt help/completion: `help [topic]`, `completion [shell]` (Inert)
 - K8s tilt read subs: `get [resource]`, `describe [resource]` with kubectl-style flags (`-n/--namespace`, `-l/--selector`, `-o/--output`, `--field-selector`, `--context`, `--kubeconfig`, `-A/--all-namespaces`, `-w/--watch`)
 """
+examples_safe = [
+  "tilt",
+  "tilt --help",
+  "tilt -h",
+  "tilt --version",
+  "tilt -v",
+  "tilt -V",
+  "tilt --list",
+  "tilt -l",
+  "tilt template.erb",
+  "tilt views/index.haml",
+  "tilt /tmp/page.md",
+  "tilt -",
+  "tilt --type erb template.erb",
+  "tilt -t erb template.erb",
+  "tilt --type=erb template.erb",
+  "tilt --layout layout.erb page.erb",
+  "tilt -y layout.erb page.erb",
+  "tilt page.erb -t erb",
+  "tilt version",
+  "tilt version --help",
+  "tilt doctor",
+  "tilt verify-install",
+  "tilt completion bash",
+  "tilt help",
+  "tilt help up",
+  "tilt get pod",
+  "tilt get pod my-pod",
+  "tilt get pod -n default",
+  "tilt get pod --namespace=default",
+  "tilt get pod -A",
+  "tilt describe pod my-pod",
+  "tilt describe pod my-pod -n prod",
+]
+examples_denied = [
+  "tilt up",
+  "tilt down",
+  "tilt ci",
+  "tilt apply -f manifest",
+  "tilt delete resource",
+  "tilt trigger build",
+  "tilt logs",
+  "tilt dump engine",
+  "tilt foo",
+  "tilt template",
+  "tilt --evil",
+  "tilt -X",
+  "tilt a.erb b.erb",
+  "tilt version foo",
+  "tilt doctor --evil",
+]
+
+# K8s tilt diagnostic subs. The handler dispatches these via
+# `registry::try_sub_dispatch("tilt", _)`. Bare invocation of each
+# sub is allowed (e.g. `tilt version`); the only flag accepted after
+# the sub is `--help/-h`.
+[[command.sub]]
+name = "doctor"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "verify-install"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+# K8s tilt help/completion: accept any non-flag positional plus --help/-h.
+# `tilt help up` and `tilt completion bash` are common forms.
+[[command.sub]]
+name = "completion"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+# K8s tilt kubectl-style read subs. SafeRead — these print resources
+# from the local Kubernetes cluster but don't mutate them.
+[[command.sub]]
+name = "describe"
+level = "SafeRead"
+standalone = ["--help", "--no-headers", "--show-labels", "--watch", "-A", "-h", "-w"]
+valued = ["--context", "--field-selector", "--kubeconfig", "--namespace", "--output", "--selector", "-l", "-n", "-o"]
+
+[[command.sub]]
+name = "get"
+level = "SafeRead"
+standalone = ["--help", "--no-headers", "--show-labels", "--watch", "-A", "-h", "-w"]
+valued = ["--context", "--field-selector", "--kubeconfig", "--namespace", "--output", "--selector", "-l", "-n", "-o"]
+
+# Ruby tilt fallback grammar. Engaged when no K8s sub matches. Accepts
+# at most one positional and requires it to look like a path (contains
+# `/`, `.`, or is `-` for stdin) so bare-word tokens like `up` or
+# `template` — which would be K8s tilt subs we deliberately don't
+# allowlist — are rejected. Inert because rendering a template doesn't
+# touch the network or modify state.
+[command.fallback]
+level = "Inert"
+bare = true
+max_positional = 1
+positional_shape = "path"
+standalone = ["--help", "--list", "--version", "-V", "-h", "-l", "-v"]
+valued = ["--layout", "--type", "-t", "-y"]

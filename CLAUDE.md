@@ -61,6 +61,30 @@ Fold the bump into the final feat/fix/refactor commit of the stack — do not cr
 - Do not add comments to code
 - All files must end with a newline
 
+## When to use a Rust handler
+
+Handlers are for **logic**, not **data**. A handler exists to make a routing or validation decision the declarative TOML shape can't express — not to hold a pile of allowed flags. If you find yourself writing `static FOO_FLAGS: WordSet = WordSet::new(&[...])` inside `src/handlers/`, you have data in the wrong place.
+
+Gold standard: `src/handlers/ruby/bundle.rs::check_bundle_exec` — a few lines of pure dispatch with zero hardcoded data. The recently-rewritten `src/handlers/tilt.rs` is the clean example for handlers that want both subs and a fallback grammar:
+
+```rust
+pub fn check_tilt(tokens: &[Token]) -> Verdict {
+    if let Some(verdict) = registry::try_sub_dispatch("tilt", tokens) {
+        return verdict;
+    }
+    registry::try_fallback_grammar("tilt", tokens).unwrap_or(Verdict::Denied)
+}
+```
+
+All flags, sub names, and shape predicates live in `commands/tools/tilt.toml`. The handler is logic only.
+
+How to apply:
+- Allowed sub names → `[[command.sub]]` blocks in TOML, dispatched via `registry::try_sub_dispatch(cmd_name, tokens)`.
+- Alternate grammar engaged when no sub matches → `[command.fallback]` block in TOML, dispatched via `registry::try_fallback_grammar(cmd_name, tokens)`.
+- A predicate over the first positional (e.g. "must look like a path") → `positional_shape = "path"` on the fallback. Adding new shapes is a one-line `PositionalShape` enum addition plus a match arm in `policy::PositionalShape::matches()`.
+
+If a handler still wants hardcoded data, that means the TOML schema is missing an expressive primitive. Extend the schema (`TomlFallback`, `PositionalShape`, etc.) before adding more `WordSet` constants. The TOML field name and the corresponding Rust logic should be analogous so the data/logic mapping is obvious — `[command.fallback]` ↔ `try_fallback_grammar()`, `positional_shape` ↔ `PositionalShape::matches()`.
+
 ## Researching a new command
 
 Before adding a command, research it and write a `description` field that serves as a safety analysis. The description is NOT a summary of what we support — it's an independent assessment of the command's behavior and risk profile, as if written by a security researcher who doesn't know how we'll use the report.

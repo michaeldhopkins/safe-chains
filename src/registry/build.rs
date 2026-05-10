@@ -35,6 +35,32 @@ pub(super) fn build_policy(
     }
 }
 
+fn build_fallback(parent: &str, toml: TomlFallback) -> FallbackSpec {
+    let policy = build_policy(
+        toml.standalone,
+        toml.valued,
+        toml.bare,
+        toml.max_positional,
+        toml.tolerate_unknown_short,
+        toml.tolerate_unknown_long,
+        toml.numeric_dash,
+    );
+    let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
+    let positional_shape = toml.positional_shape.as_deref().map(|name| {
+        crate::policy::PositionalShape::from_name(name).unwrap_or_else(|| {
+            panic!(
+                "{}: unknown fallback positional_shape `{}` (known: path)",
+                parent, name
+            )
+        })
+    });
+    FallbackSpec {
+        policy,
+        level,
+        positional_shape,
+    }
+}
+
 fn allow_all_policy() -> OwnedPolicy {
     OwnedPolicy {
         standalone: Vec::new(),
@@ -88,7 +114,12 @@ pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
 
 fn build_sub_kind(toml: TomlSub) -> DispatchKind {
     if let Some(handler_name) = toml.handler {
-        return DispatchKind::Custom { handler_name, doc_body: toml.doc_body };
+        return DispatchKind::Custom {
+            handler_name,
+            doc_body: toml.doc_body,
+            subs: Vec::new(),
+            fallback: None,
+        };
     }
     if toml.allow_all.unwrap_or(false) {
         return DispatchKind::Policy {
@@ -202,9 +233,23 @@ fn assert_flat_or_structured(toml: &TomlCommand) {
     }
 }
 
+fn assert_fallback_requires_handler(toml: &TomlCommand) {
+    if toml.fallback.is_some() && toml.handler.is_none() {
+        panic!(
+            "command '{}' declares [command.fallback] without a handler. \
+             Fallback grammars are only consulted via \
+             registry::try_fallback_grammar() from a Rust handler — without \
+             handler = \"...\" the block is silently dropped. \
+             Either set handler or remove [command.fallback].",
+            toml.name,
+        );
+    }
+}
+
 #[allow(clippy::too_many_lines)]
 pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     assert_flat_or_structured(&toml);
+    assert_fallback_requires_handler(&toml);
     check_no_legacy_positional_style(&toml.name, toml.positional_style);
     let cat = category.to_string();
     let desc = toml.description.unwrap_or_default();
@@ -234,6 +279,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         };
     }
     if let Some(handler_name) = toml.handler {
+        let subs = filter_candidates(toml.sub).flat_map(build_subs).collect();
+        let fallback = toml.fallback.map(|f| build_fallback(&toml.name, f));
         return CommandSpec {
             name: toml.name,
             description: desc,
@@ -243,7 +290,12 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             researched_version,
             examples_safe,
             examples_denied,
-            kind: DispatchKind::Custom { handler_name, doc_body: toml.doc_body },
+            kind: DispatchKind::Custom {
+                handler_name,
+                doc_body: toml.doc_body,
+                subs,
+                fallback,
+            },
         };
     }
 
