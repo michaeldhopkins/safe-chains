@@ -46,7 +46,11 @@ allow_all = true
 
 [[command.sub]]
 name = "get"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "-A", "--all-namespaces", "--watch-errors", "--no-header"]
+valued = ["-n", "--namespace", "--context", "--kubeconfig", "--label-selector", "--status-selector", "--timeout"]
 
 [[command.sub]]
 name = "events"
@@ -54,19 +58,35 @@ candidate = true
 
 [[command.sub]]
 name = "logs"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "-A", "--all-namespaces", "-f", "--follow"]
+valued = ["-n", "--namespace", "--context", "--kubeconfig", "--level", "--kind", "--name", "--since", "--tail"]
 
 [[command.sub]]
 name = "stats"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "-A", "--all-namespaces"]
+valued = ["-n", "--namespace", "--context", "--kubeconfig"]
 
 [[command.sub]]
 name = "trace"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-n", "--namespace", "--api-version", "--kind", "--context", "--kubeconfig"]
 
 [[command.sub]]
 name = "tree"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "--compact"]
+valued = ["-n", "--namespace", "--context", "--kubeconfig"]
 
 [[command.sub]]
 name = "bootstrap"

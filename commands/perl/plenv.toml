@@ -109,7 +109,9 @@ candidate = true
 
 [[command.sub]]
 name = "list-modules"
-candidate = true
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "switch"

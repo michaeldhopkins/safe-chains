@@ -117,7 +117,11 @@ candidate = true
 
 [[command.sub]]
 name = "check"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "--silent", "-s", "--verbose", "-v", "--json-output"]
+valued = ["-d", "--project-dir", "-c", "--project-conf", "-e", "--environment", "--severity", "--skip-packages", "--pattern"]
 
 [[command.sub]]
 name = "debug"

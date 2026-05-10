@@ -575,6 +575,7 @@ Aliases: `g++`, `cc`, `c++`
 - **init**: Flags: --clone, --debug, --draft, --drafts, --help, --no-clone, --silent, --verbose, -h. Positional args accepted
 - **list**: Flags: --help, -h. Positional args accepted
 - **new**: Flags: --draft, --drafts, --help, --replace, --slug, -h, -r, -s. Valued: --path, -p. Positional args accepted
+- **render**: Flags: --help, -h. Valued: -o, --output, -e, --engine. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -824,12 +825,24 @@ Aliases: `g++`, `cc`, `c++`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/nomad/docs/commands">https://developer.hashicorp.com/nomad/docs/commands</a></p>
 
 - **agent-info**: Flags: --help, -h. Valued: -address
+- **alloc-status**: Flags: --help, -h, -short, -stats, -verbose, -json. Valued: -address, -namespace, -region, -token, -token-file, -t. Positional args accepted
 - **fmt**: Flags: --check, --help, --list, --recursive, --write, -c, -h, -l, -recursive, -w. Positional args accepted
 - **help**: Positional args accepted
+- **monitor**: Flags: --help, -h, -json, -no-color. Valued: -address, -region, -namespace, -token, -token-file, -log-level, -node-id, -server-id. Positional args accepted
+- **node-status**: Flags: --help, -h, -short, -stats, -verbose, -self, -allocs, -json. Valued: -address, -class, -namespace, -region, -token, -token-file, -t, -pool. Positional args accepted
 - **status**: Flags: --help, -h. Valued: -address, -namespace, -region, -token, -token-file. Positional args accepted
 - **validate**: Flags: --help, -h. Valued: -vault-namespace, -vault-token. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `nomad status`
+- `nomad node-status`
+- `nomad node-status -short`
+- `nomad alloc-status abc123`
+- `nomad agent-info`
+- `nomad version`
 
 ### `npm-run-all`
 <p class="cmd-url"><a href="https://github.com/mysticatea/npm-run-all">https://github.com/mysticatea/npm-run-all</a></p>
@@ -1178,6 +1191,7 @@ Aliases: `python`
 - **diagnose**: Flags: --enable-templating, --enable-rpc, --help, --yaml-only, -h. Valued: --filename, --output, -f, -o, --rpc-port
 - **find-configs**: Flags: --help, -h. Valued: --directory, --output, -d, -o
 - **help**: Positional args accepted
+- **inspect**: Flags: --help, -h. Valued: -f, --filename, -o, --output, --module, -m. Positional args accepted
 - **version**: Flags: --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -1295,7 +1309,9 @@ Aliases: `python`
 <p class="cmd-url"><a href="https://docs.tilt.dev/cli/tilt">https://docs.tilt.dev/cli/tilt</a></p>
 
 - **completion**: Flags: --help, -h. Positional args accepted
+- **describe**: Flags: --help, -h, -A, --all-namespaces, --show-events. Valued: -n, --namespace, -l, --selector, -o, --output. Positional args accepted
 - **doctor**: Flags: --help, -h. Valued: --output, -o
+- **get**: Flags: --help, -h, -A, --all-namespaces, -w, --watch, --no-headers. Valued: -n, --namespace, -l, --selector, --field-selector, -o, --output. Positional args accepted
 - **help**: Positional args accepted
 - **verify-install**: Flags: --help, -h
 - **version**: Flags: --help, -h

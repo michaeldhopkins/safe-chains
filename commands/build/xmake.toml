@@ -85,7 +85,10 @@ candidate = true
 
 [[command.sub]]
 name = "lint"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "-q", "--quiet", "-v", "--verbose", "-D", "--diagnosis"]
 
 [[command.sub]]
 name = "project"

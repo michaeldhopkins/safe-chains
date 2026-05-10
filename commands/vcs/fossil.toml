@@ -313,7 +313,11 @@ candidate = true
 
 [[command.sub]]
 name = "search"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "--all", "--checkin", "--documentation", "--forum", "--ticket", "--unindexed", "--wiki"]
+valued = ["--limit", "-n"]
 
 [[command.sub]]
 name = "rebase"

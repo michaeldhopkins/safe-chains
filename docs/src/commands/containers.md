@@ -70,6 +70,7 @@
 - **configurations**: Flags: --all-namespaces, --help, --kubernetes, -A, -h, -k. Valued: --name, --namespace, --output, -n, -o
 - **help**: Positional args accepted
 - **list**: Flags: --all-namespaces, --help, -A, -h. Valued: --kubernetes, --namespace, --output, -k, -n, -o
+- **logs**: Flags: --help, -h. Valued: -a, --app-id, -k, --kubernetes, -n, --namespace, -p, --pod-name, -c, --container. Positional args accepted
 - **status**: Flags: --help, --kubernetes, -h, -k. Valued: --output, -o
 - **version**: Flags: --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
@@ -150,6 +151,7 @@
 - **help**: Positional args accepted
 - **images**: Flags: --help, --quiet, -h, -q. Valued: --format. Positional args accepted
 - **logs**: Flags: --follow, --help, --no-color, --no-log-prefix, --timestamps, -f, -h, -t. Valued: --since, --tail, --until. Positional args accepted
+- **ls**: Flags: --help, -h, -a, --all, -q, --quiet. Valued: --filter, --format
 - **port**: Flags: --help, -h. Valued: --index, --protocol. Positional args accepted
 - **ps**: Flags: --all, --dry-run, --help, --no-trunc, --quiet, --services, -a, -h, -q. Valued: --filter, --format, --status. Positional args accepted
 - **top**: Flags: --help, -h. Positional args accepted
@@ -161,7 +163,12 @@
 
 - **check**: Flags: --help, --pre, -h. Valued: --components, --components-extra, --kustomization, --source
 - **completion**: Flags: --help, -h. Positional args accepted
+- **get**: Flags: --help, -h, -A, --all-namespaces, --watch-errors, --no-header. Valued: -n, --namespace, --context, --kubeconfig, --label-selector, --status-selector, --timeout. Positional args accepted
 - **help**: Positional args accepted
+- **logs**: Flags: --help, -h, -A, --all-namespaces, -f, --follow. Valued: -n, --namespace, --context, --kubeconfig, --level, --kind, --name, --since, --tail. Positional args accepted
+- **stats**: Flags: --help, -h, -A, --all-namespaces. Valued: -n, --namespace, --context, --kubeconfig. Positional args accepted
+- **trace**: Flags: --help, -h. Valued: -n, --namespace, --api-version, --kind, --context, --kubeconfig. Positional args accepted
+- **tree**: Flags: --help, -h, --compact. Valued: -n, --namespace, --context, --kubeconfig. Positional args accepted
 - **version**: Flags: --client, --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -221,6 +228,7 @@
 
 - **completion**: Flags: --help, -h. Positional args accepted
 - **help**: Positional args accepted
+- **inspect**: Flags: --help, -h, -t, --tree, --raw. Valued: -a, --app, -n, --namespace, --filter, --kubeconfig-context, --kubeconfig. Positional args accepted
 - **list**: Flags: --all-namespaces, --help, --namespace, -A, -h, -n. Valued: --namespace, -n
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
@@ -315,7 +323,9 @@
 
 - **check**: Flags: --allow-mismatched-policy-controller, --cli-version-override, --config, --cni-namespace, --crds, --deletion-pending, --enable-pprof, --expected-version, --help, --ipv6, --linkerd-cni-enabled, --multicluster, --no-policy, --no-tls-policy, --output, --pre, --proxy, --retry-deadline, --short, --wait, -h, -o. Valued: --cni-namespace, --config, --expected-version, --namespace, --output, --retry-deadline, --wait, -n, -o
 - **completion**: Flags: --help, -h. Positional args accepted
+- **diagnostics**: Flags: --help, -h. Valued: --linkerd-namespace, -L, --context, --kubeconfig, --api-addr. Positional args accepted
 - **help**: Positional args accepted
+- **metrics**: Flags: --help, -h. Valued: -n, --namespace, --linkerd-namespace, -L, --context, --kubeconfig. Positional args accepted
 - **version**: Flags: --client, --help, --proxy, --short, -h. Valued: --namespace
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -489,7 +499,10 @@
 <p class="cmd-url"><a href="https://velero.io/docs/">https://velero.io/docs/</a></p>
 
 - **completion**: Flags: --help, -h. Positional args accepted
+- **describe**: Flags: --help, -h, --details, --features, --insecure-skip-tls-verify, --volume-details. Valued: -n, --namespace, -l, --selector, --kubeconfig, --kubecontext. Positional args accepted
+- **get**: Flags: --help, -h, -o, --output. Valued: -n, --namespace, -l, --selector, -o, --output, --kubeconfig, --kubecontext. Positional args accepted
 - **help**: Positional args accepted
+- **logs**: Flags: --help, -h, --insecure-skip-tls-verify. Valued: -n, --namespace, --kubeconfig, --kubecontext, --timeout, --caCertFile. Positional args accepted
 - **version**: Flags: --client-only, --help, --timeout, -h. Valued: --namespace, --timeout, -n
 - Allowed standalone flags: --help, --version, -h, -v
 

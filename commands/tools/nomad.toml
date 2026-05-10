@@ -107,7 +107,11 @@ candidate = true
 
 [[command.sub]]
 name = "monitor"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "-json", "-no-color"]
+valued = ["-address", "-region", "-namespace", "-token", "-token-file", "-log-level", "-node-id", "-server-id"]
 
 [[command.sub]]
 name = "namespace"

@@ -150,7 +150,11 @@ candidate = true
 
 [[command.sub]]
 name = "ls"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--repo-path", "--repository"]
 
 [[command.sub]]
 name = "pull"

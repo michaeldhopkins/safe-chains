@@ -1065,8 +1065,14 @@ Aliases: `upsun`
 
 - **completion**: Flags: --help, -h. Positional args accepted
 - **help**: Positional args accepted
+- **status**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `supabase status`
+- `supabase version`
 
 ### `sysctl`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/sysctl.8.html">https://man7.org/linux/man-pages/man8/sysctl.8.html</a></p>

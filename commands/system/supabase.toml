@@ -4,6 +4,15 @@ description = "Supabase CLI — managed Postgres + Auth + Storage + Edge Functio
 url = "https://supabase.com/docs/reference/cli/introduction"
 researched_version = "supabase 1.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "supabase status",
+    "supabase version",
+]
+examples_denied = [
+    "supabase start",
+    "supabase db reset",
+    "supabase functions deploy myfunc",
+]
 
 [[command.sub]]
 name = "version"
@@ -50,7 +59,9 @@ candidate = true
 
 [[command.sub]]
 name = "status"
-candidate = true
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db"

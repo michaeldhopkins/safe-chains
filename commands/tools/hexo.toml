@@ -88,7 +88,12 @@ candidate = true
 
 [[command.sub]]
 name = "render"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-o", "--output", "-e", "--engine"]
+write_flags = ["-o", "--output"]
 
 [[command.sub]]
 name = "migrate"

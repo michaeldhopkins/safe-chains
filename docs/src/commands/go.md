@@ -94,6 +94,7 @@
 - **init**: Flags: --help, -h. Valued: --config, -f
 - **jsonschema**: Flags: --help, -h. Valued: --output, -o
 - **schema**: Flags: --help, -h. Valued: --output, -o
+- **verify**: Flags: --help, -h, --debug. Valued: -f, --config, --checksum-file. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `gosec`

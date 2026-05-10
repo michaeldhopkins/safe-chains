@@ -4,6 +4,19 @@ description = "Magical shell history. `search` queries history (read). `import a
 url = "https://atuin.sh/"
 researched_version = "atuin 18.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
+examples_safe = [
+    "atuin doctor",
+    "atuin default-config",
+    "atuin uuid",
+    "atuin info",
+    "atuin stats",
+    "atuin search foo",
+]
+examples_denied = [
+    "atuin sync",
+    "atuin login",
+    "atuin import auto",
+]
 
 [[command.sub]]
 name = "init"
@@ -105,11 +118,15 @@ candidate = true
 
 [[command.sub]]
 name = "default-config"
-candidate = true
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "doctor"
-candidate = true
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "wrapped"
@@ -117,7 +134,9 @@ candidate = true
 
 [[command.sub]]
 name = "uuid"
-candidate = true
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "gen-completions"

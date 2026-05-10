@@ -23,15 +23,27 @@ allow_all = true
 
 [[command.sub]]
 name = "get"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "-o", "--output"]
+valued = ["-n", "--namespace", "-l", "--selector", "-o", "--output", "--kubeconfig", "--kubecontext"]
 
 [[command.sub]]
 name = "describe"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "--details", "--features", "--insecure-skip-tls-verify", "--volume-details"]
+valued = ["-n", "--namespace", "-l", "--selector", "--kubeconfig", "--kubecontext"]
 
 [[command.sub]]
 name = "logs"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "--insecure-skip-tls-verify"]
+valued = ["-n", "--namespace", "--kubeconfig", "--kubecontext", "--timeout", "--caCertFile"]
 
 [[command.sub]]
 name = "backup"

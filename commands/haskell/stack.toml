@@ -148,7 +148,11 @@ candidate = true
 
 [[command.sub]]
 name = "list-dependencies"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--depth", "--prune", "--include-base", "--separator"]
 
 [[command.sub]]
 name = "freeze"

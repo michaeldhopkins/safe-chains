@@ -214,7 +214,11 @@ candidate = true
 
 [[command.sub.sub]]
 name = "verify"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "--all", "-v"]
+valued = ["--certificate-fingerprint", "--configfile", "--verbosity"]
 
 [[command.sub.sub]]
 name = "trust"

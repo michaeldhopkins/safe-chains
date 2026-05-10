@@ -3,13 +3,25 @@
 ### `atuin`
 <p class="cmd-url"><a href="https://atuin.sh/">https://atuin.sh/</a></p>
 
+- **default-config**: Flags: --help, -h
+- **doctor**: Flags: --help, -h
 - **help**: Positional args accepted
 - **info**: Flags: --help, -h
 - **init**: Flags: --disable-ctrl-r, --disable-up-arrow, --help, -h. Positional args accepted
 - **search**: Flags: --cmd-only, --exit, --exit, --filter-mode, --help, --human, --inline-height, --interactive, --keymap-mode, --reverse, --shell-up-key-binding, --cwd, --exclude-cwd, --exclude-exit, --exit, --limit, -h, -i, -r. Valued: --after, --before, --cmd-only, --cwd, --delete, --delete-it-all, --exit, --filter-mode, --format, --limit, --offset, --search-mode, --session, --user, -c, -e, -f. Positional args accepted
 - **stats**: Flags: --help, -h. Valued: --count, --ngram. Positional args accepted
+- **uuid**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `atuin doctor`
+- `atuin default-config`
+- `atuin uuid`
+- `atuin info`
+- `atuin stats`
+- `atuin search foo`
 
 ### `bacon`
 <p class="cmd-url"><a href="https://github.com/Canop/bacon">https://github.com/Canop/bacon</a></p>
