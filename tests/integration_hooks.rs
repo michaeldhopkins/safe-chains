@@ -23,12 +23,15 @@ fn run_hook(args: &[&str], stdin_payload: &str) -> (String, String, i32) {
         .stderr(Stdio::piped())
         .spawn()
         .expect("spawn safe-chains");
-    child
-        .stdin
-        .as_mut()
-        .unwrap()
-        .write_all(stdin_payload.as_bytes())
-        .unwrap();
+    match child.stdin.as_mut().unwrap().write_all(stdin_payload.as_bytes()) {
+        Ok(()) => {}
+        // Short-circuit error paths (e.g. unknown subcommand) exit before
+        // reading stdin, which races with our write and surfaces as
+        // BrokenPipe. The test is asserting on stdout/exit code, not on
+        // a successful stdin handshake — tolerate the race.
+        Err(e) if e.kind() == std::io::ErrorKind::BrokenPipe => {}
+        Err(e) => panic!("write to safe-chains stdin failed: {e}"),
+    }
     let out = child.wait_with_output().expect("wait");
     (
         String::from_utf8_lossy(&out.stdout).into_owned(),
