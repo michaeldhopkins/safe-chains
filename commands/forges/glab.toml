@@ -4,7 +4,7 @@ description = "Third-party GitLab CLI (gitlab-org/cli, formerly profclems/glab).
 url = "https://gitlab.com/gitlab-org/cli"
 handler = "glab"
 researched_version = "glab 1.x (2026)"
-doc_body = "Routing: [[command.matrix]] blocks below cover the read-only sub × action grid. Top-level terminal forms `glab version` and `glab check-update` are handled by the handler (no flags allowed). `glab api` delegates to gh's API sub-handler."
+doc_body = ""
 
 # --version / --help / -v / -h at length 2.
 [command.fallback]
@@ -13,9 +13,25 @@ bare = false
 max_positional = 0
 standalone = ["--help", "--version", "-h", "-v"]
 
-# Always-safe bare subcommand forms: `glab version`, `glab check-update`.
-[command.handler_data]
-always_safe_bare_subs = ["check-update", "version"]
+# `glab api` shares gh's API sub-handler — same REST/GraphQL semantics.
+[[command.sub]]
+name = "api"
+handler = "gh_api"
+doc_body = "Read-only REST/GraphQL — same rules as `gh api`."
+
+# Terminal subcommand forms: `glab version`, `glab check-update`.
+# bare = true and max_positional = 0 with no flags accepted.
+[[command.sub]]
+name = "version"
+level = "Inert"
+bare = true
+max_positional = 0
+
+[[command.sub]]
+name = "check-update"
+level = "Inert"
+bare = true
+max_positional = 0
 
 # Read-only sub × action grid. Same shape for every parent — no
 # parent-specific overrides like gh has.

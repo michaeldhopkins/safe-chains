@@ -128,10 +128,15 @@ fn filter_candidates(subs: Vec<TomlSub>) -> impl Iterator<Item = TomlSub> {
 
 /// Builds one SubSpec per alias (canonical name first, then each alias).
 /// All entries share the same kind via Clone — the dispatcher doesn't care
-/// which name the user invoked.
-pub(super) fn build_subs(toml: TomlSub) -> Vec<SubSpec> {
+/// which name the user invoked. `handler_policies` is consulted only by
+/// subs that set `policy = "key"`.
+pub(super) fn build_subs(
+    parent: &str,
+    toml: TomlSub,
+    handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
+) -> Vec<SubSpec> {
     let aliases = toml.aliases.clone();
-    let canonical = build_sub(toml);
+    let canonical = build_sub(parent, toml, handler_policies);
     let mut out = Vec::with_capacity(1 + aliases.len());
     for alias in aliases {
         out.push(SubSpec {
@@ -143,13 +148,21 @@ pub(super) fn build_subs(toml: TomlSub) -> Vec<SubSpec> {
     out
 }
 
-pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
+pub(super) fn build_sub(
+    parent: &str,
+    toml: TomlSub,
+    handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
+) -> SubSpec {
     check_no_legacy_positional_style(&toml.name, toml.positional_style);
     let name = toml.name.clone();
-    SubSpec { name, kind: build_sub_kind(toml) }
+    SubSpec { name, kind: build_sub_kind(parent, toml, handler_policies) }
 }
 
-fn build_sub_kind(toml: TomlSub) -> DispatchKind {
+fn build_sub_kind(
+    parent: &str,
+    toml: TomlSub,
+    handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
+) -> DispatchKind {
     if let Some(handler_name) = toml.handler {
         return DispatchKind::Custom {
             handler_name,
@@ -175,7 +188,9 @@ fn build_sub_kind(toml: TomlSub) -> DispatchKind {
     }
     if !toml.sub.is_empty() {
         return DispatchKind::Branching {
-            subs: filter_candidates(toml.sub).flat_map(build_subs).collect(),
+            subs: filter_candidates(toml.sub)
+                .flat_map(|s| build_subs(parent, s, handler_policies))
+                .collect(),
             bare_flags: Vec::new(),
             bare_ok: toml.nested_bare.unwrap_or(false),
             pre_standalone: toml.standalone,
@@ -184,19 +199,43 @@ fn build_sub_kind(toml: TomlSub) -> DispatchKind {
             first_arg_level: SafetyLevel::Inert,
         };
     }
-    build_policy_sub_kind(toml)
+    build_policy_sub_kind(parent, toml, handler_policies)
 }
 
-fn build_policy_sub_kind(toml: TomlSub) -> DispatchKind {
-    let policy = build_policy(
-        toml.standalone,
-        toml.valued,
-        toml.bare,
-        toml.max_positional,
-        toml.tolerate_unknown_short,
-        toml.tolerate_unknown_long,
-        toml.numeric_dash,
-    );
+fn build_policy_sub_kind(
+    parent: &str,
+    toml: TomlSub,
+    handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
+) -> DispatchKind {
+    let policy = if let Some(key) = &toml.policy {
+        if !toml.standalone.is_empty() || !toml.valued.is_empty() {
+            panic!(
+                "command '{parent}' sub `{}` sets both `policy = \"{}\"` and \
+                 inline standalone/valued — pick one. Either drop the inline \
+                 lists (and rely on the referenced handler_policy) or drop \
+                 the `policy` field.",
+                toml.name, key,
+            );
+        }
+        handler_policies.get(key).cloned().unwrap_or_else(|| {
+            panic!(
+                "command '{parent}' sub `{}` references handler_policy \
+                 `{key}` which is not declared. Add a \
+                 [command.handler_policy.{key}] block or fix the typo.",
+                toml.name,
+            )
+        })
+    } else {
+        build_policy(
+            toml.standalone,
+            toml.valued,
+            toml.bare,
+            toml.max_positional,
+            toml.tolerate_unknown_short,
+            toml.tolerate_unknown_long,
+            toml.numeric_dash,
+        )
+    };
     let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
     if !toml.write_flags.is_empty() {
         return DispatchKind::WriteFlagged {
@@ -365,13 +404,18 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         };
     }
     if let Some(handler_name) = toml.handler {
-        let subs = filter_candidates(toml.sub).flat_map(build_subs).collect();
-        let fallback = toml.fallback.map(|f| build_fallback(&toml.name, f));
-        let handler_policies = toml
+        // Build handler_policies first so subs that use `policy = "key"`
+        // can resolve the reference at build time.
+        let handler_policies: std::collections::HashMap<String, OwnedPolicy> = toml
             .handler_policy
             .into_iter()
             .map(|(k, v)| (k, build_handler_policy(v)))
             .collect();
+        let parent_name = toml.name.clone();
+        let subs = filter_candidates(toml.sub)
+            .flat_map(|s| build_subs(&parent_name, s, &handler_policies))
+            .collect();
+        let fallback = toml.fallback.map(|f| build_fallback(&toml.name, f));
         let matrices = toml
             .matrix
             .into_iter()
@@ -401,6 +445,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     if let Some(w) = toml.wrapper {
         if !toml.sub.is_empty() || !toml.bare_flags.is_empty() {
             let first_arg_level = toml.level.unwrap_or(TomlLevel::Inert).into();
+            let parent_name = toml.name.clone();
             return CommandSpec {
                 name: toml.name,
                 description: desc,
@@ -412,7 +457,9 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 examples_denied,
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
-                    subs: filter_candidates(toml.sub).flat_map(build_subs).collect(),
+                    subs: filter_candidates(toml.sub)
+                        .flat_map(|s| build_subs(&parent_name, s, &std::collections::HashMap::new()))
+                        .collect(),
                     pre_standalone: w.standalone,
                     pre_valued: w.valued,
                     bare_ok: toml.bare.unwrap_or(false),
@@ -442,6 +489,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
 
     if !toml.sub.is_empty() || !toml.bare_flags.is_empty() {
         let first_arg_level = toml.level.unwrap_or(TomlLevel::Inert).into();
+        let parent_name = toml.name.clone();
         return CommandSpec {
             name: toml.name,
             description: desc,
@@ -453,7 +501,9 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             examples_denied,
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
-                subs: filter_candidates(toml.sub).flat_map(build_subs).collect(),
+                subs: filter_candidates(toml.sub)
+                    .flat_map(|s| build_subs(&parent_name, s, &std::collections::HashMap::new()))
+                    .collect(),
                 pre_standalone: Vec::new(),
                 pre_valued: Vec::new(),
                 bare_ok: toml.bare.unwrap_or(false),

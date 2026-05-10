@@ -4,7 +4,7 @@ description = "GitHub's official CLI. Most subcommands wrap REST or GraphQL call
 url = "https://cli.github.com/manual/"
 handler = "gh"
 researched_version = "gh 2.x"
-doc_body = "Routing: [[command.matrix]] blocks below cover the sub × action grid (read-only subs and their action verbs → handler_policy by name). The handler's remaining logic is the universal `<sub> --help` shortcut, the `api` sub-handler (REST/GraphQL with method/header/mutation rules), and the dispatch from there into try_sub_dispatch / try_matrix_dispatch."
+doc_body = ""
 
 # --version / --help at length 2.
 [command.fallback]
@@ -12,6 +12,34 @@ level = "Inert"
 bare = false
 max_positional = 0
 standalone = ["--help", "--version", "-V", "-h"]
+
+# `gh api` — REST and GraphQL with read-only methods, narrow header
+# allowlist, GraphQL mutation veto. Its logic doesn't fit any
+# declarative shape; the Rust sub-handler at `gh_api` handles it.
+[[command.sub]]
+name = "api"
+handler = "gh_api"
+doc_body = "Read-only REST/GraphQL: implicit GET or explicit `-X GET`. Allowed flags: --paginate, --slurp, --silent, --include, --verbose, --jq, --json, --template, --cache, --preview, --hostname. Headers via -H/--header limited to Accept and X-GitHub-Api-Version. -f/-F/--field/--raw-field require -X GET on REST endpoints; on the graphql endpoint, mutation queries are denied."
+
+# Single-sub forms (no action verb, just `gh <sub> [flags]`). Each
+# references its matching [command.handler_policy.*] by name so the
+# flag list isn't duplicated.
+[[command.sub]]
+name = "browse"
+policy = "browse"
+guard = "--no-browser"
+guard_short = "-n"
+level = "Inert"
+
+[[command.sub]]
+name = "search"
+policy = "search"
+level = "Inert"
+
+[[command.sub]]
+name = "status"
+policy = "simple_list"
+level = "Inert"
 
 # Sub × action matrix. The handler walks these blocks via
 # registry::try_matrix_dispatch — for each block, if tokens[1] is in

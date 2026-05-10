@@ -18,7 +18,10 @@
 ### `gh`
 <p class="cmd-url"><a href="https://cli.github.com/manual/">https://cli.github.com/manual/</a></p>
 
-- Routing: [[command.matrix]] blocks below cover the sub × action grid (read-only subs and their action verbs → handler_policy by name). The handler's remaining logic is the universal `<sub> --help` shortcut, the `api` sub-handler (REST/GraphQL with method/header/mutation rules), and the dispatch from there into try_sub_dispatch / try_matrix_dispatch.
+- **api**: Read-only REST/GraphQL: implicit GET or explicit `-X GET`. Allowed flags: --paginate, --slurp, --silent, --include, --verbose, --jq, --json, --template, --cache, --preview, --hostname. Headers via -H/--header limited to Accept and X-GitHub-Api-Version. -f/-F/--field/--raw-field require -X GET on REST endpoints; on the graphql endpoint, mutation queries are denied.
+- **browse** (requires --no-browser, -n): Flags: --actions, --no-browser, --projects, --releases, --settings, --wiki, -a, -c, -n, -p, -r, -s, -w. Valued: --branch, --commit, --repo, -R, -b
+- **search**: Flags: --archived, --draft, --include-forks, --locked, --merged, --no-assignee, --no-label, --no-milestone, --no-project, --web, -w. Valued: --app, --assignee, --author, --checks, --closed, --commenter, --comments, --committer, --created, --filename, --followers, --forks, --good-first-issues, --hash, --help-wanted-issues, --include, --interactions, --involves, --jq, --json, --label, --language, --license, --limit, --match, --mentions, --merged-at, --milestone, --number, --order, --owner, --parent, --project, --reactions, --repo, --review, --review-requested, --reviewed-by, --size, --sort, --stars, --state, --team-mentions, --team-review-requested, --template, --topic, --updated, --visibility, -L, -R, -q
+- **status**: Flags: --all, --archived, --fork, --no-archived, --source, --web, -a, -w. Valued: --env, --jq, --json, --key, --language, --limit, --order, --org, --ref, --repo, --search, --sort, --template, --topic, --user, --visibility, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
 
 - **Sub × action matrix:**
 - Parents (Inert): alias, attestation, cache, codespace, config, extension, gist, gpg-key, issue, label, org, pr, project, repo, ruleset, secret, ssh-key, variable, workflow
@@ -76,7 +79,9 @@
 ### `glab`
 <p class="cmd-url"><a href="https://gitlab.com/gitlab-org/cli">https://gitlab.com/gitlab-org/cli</a></p>
 
-- Routing: [[command.matrix]] blocks below cover the read-only sub × action grid. Top-level terminal forms `glab version` and `glab check-update` are handled by the handler (no flags allowed). `glab api` delegates to gh's API sub-handler.
+- **api**: Read-only REST/GraphQL — same rules as `gh api`.
+- **check-update**
+- **version**
 
 - **Sub × action matrix:**
 - Parents (Inert): ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable
@@ -96,9 +101,6 @@
 - **list**: Flags: --all, --closed, --draft, --help, --merged, -A, -M, -a, -c, -d, -g, -h, -q. Valued: --assignee, --author, --group, --label, --milestone, --not-label, --order, --output, --page, --per-page, --repo, --reviewer, --search, --sort, --source-branch, --state, --target-branch, -F, -P, -R, -S, -a, -g, -l, -m, -o, -p, -r, -s, -t
 - **simple**: Flags: --help, -h, -q. Valued: --output, --page, --per-page, --repo, -F, -P, -R, -p
 - **view**: Flags: --comments, --help, --resolved, --system-logs, --unresolved, --web, -c, -h, -p, -s, -w. Valued: --output, --page, --per-page, --repo, -F, -P, -R, -p
-
-- **Handler-side data:**
-- **always_safe_bare_subs**: check-update, version
 
 ### `jjpr`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/jjpr">https://github.com/michaeldhopkins/jjpr</a></p>

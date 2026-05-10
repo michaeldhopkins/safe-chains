@@ -1871,6 +1871,105 @@ standalone = ["--help", "-h"]
     }
 
     #[test]
+    fn sub_policy_ref_resolves_to_handler_policy() {
+        // `policy = "key"` on a [[command.sub]] block copies the
+        // referenced handler_policy into the sub's effective flag
+        // policy at build time. Lets a single-sub form re-use a matrix
+        // entry's flag list without duplication.
+        let spec = load_one(r#"
+[[command]]
+name = "demo-policy-ref"
+handler = "demo_handler"
+
+[command.handler_policy.shared]
+bare = false
+standalone = ["--help", "--web", "-h", "-w"]
+valued = ["--repo"]
+
+[[command.sub]]
+name = "browse"
+policy = "shared"
+guard = "--no-browser"
+guard_short = "-n"
+level = "Inert"
+
+[[command.sub]]
+name = "search"
+policy = "shared"
+level = "Inert"
+"#);
+        match &spec.kind {
+            DispatchKind::Custom { subs, .. } => {
+                let browse = subs.iter().find(|s| s.name == "browse").unwrap();
+                match &browse.kind {
+                    DispatchKind::RequireAny { policy, require_any, .. } => {
+                        assert!(policy.standalone.iter().any(|f| f == "--web"));
+                        assert!(policy.valued.iter().any(|f| f == "--repo"));
+                        assert!(require_any.iter().any(|f| f == "--no-browser"));
+                        assert!(require_any.iter().any(|f| f == "-n"));
+                    }
+                    other => panic!("expected RequireAny (guard sets it), got {other:?}"),
+                }
+                let search = subs.iter().find(|s| s.name == "search").unwrap();
+                match &search.kind {
+                    DispatchKind::Policy { policy, .. } => {
+                        assert!(policy.standalone.iter().any(|f| f == "--web"));
+                        assert!(policy.valued.iter().any(|f| f == "--repo"));
+                    }
+                    other => panic!("expected Policy, got {other:?}"),
+                }
+            }
+            other => panic!("expected Custom, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn sub_policy_ref_unknown_key_panics() {
+        let result = std::panic::catch_unwind(|| {
+            load_one(r#"
+[[command]]
+name = "demo-bad-ref"
+handler = "demo_handler"
+
+[command.handler_policy.real]
+bare = true
+
+[[command.sub]]
+name = "browse"
+policy = "rael"
+"#);
+        });
+        assert!(
+            result.is_err(),
+            "[[command.sub]] policy referencing an unknown handler_policy must panic",
+        );
+    }
+
+    #[test]
+    fn sub_policy_ref_with_inline_lists_panics() {
+        let result = std::panic::catch_unwind(|| {
+            load_one(r#"
+[[command]]
+name = "demo-dup-ref"
+handler = "demo_handler"
+
+[command.handler_policy.shared]
+bare = true
+standalone = ["--help"]
+
+[[command.sub]]
+name = "browse"
+policy = "shared"
+standalone = ["--extra"]
+"#);
+        });
+        assert!(
+            result.is_err(),
+            "mixing `policy` ref with inline standalone/valued must panic",
+        );
+    }
+
+    #[test]
     fn matrix_referencing_unknown_policy_panics() {
         // Silent-deny would otherwise hide typos: a matrix entry whose
         // policy_key doesn't match any [command.handler_policy.*] would
