@@ -1332,6 +1332,41 @@ Aliases: `python`
 - K8s tilt help/completion: `help [topic]`, `completion [shell]` (Inert)
 - K8s tilt read subs: `get [resource]`, `describe [resource]` with kubectl-style flags (`-n/--namespace`, `-l/--selector`, `-o/--output`, `--field-selector`, `--context`, `--kubeconfig`, `-A/--all-namespaces`, `-w/--watch`)
 
+**Examples:**
+
+- `tilt`
+- `tilt --help`
+- `tilt -h`
+- `tilt --version`
+- `tilt -v`
+- `tilt -V`
+- `tilt --list`
+- `tilt -l`
+- `tilt template.erb`
+- `tilt views/index.haml`
+- `tilt /tmp/page.md`
+- `tilt -`
+- `tilt --type erb template.erb`
+- `tilt -t erb template.erb`
+- `tilt --type=erb template.erb`
+- `tilt --layout layout.erb page.erb`
+- `tilt -y layout.erb page.erb`
+- `tilt page.erb -t erb`
+- `tilt version`
+- `tilt version --help`
+- `tilt doctor`
+- `tilt verify-install`
+- `tilt completion bash`
+- `tilt help`
+- `tilt help up`
+- `tilt get pod`
+- `tilt get pod my-pod`
+- `tilt get pod -n default`
+- `tilt get pod --namespace=default`
+- `tilt get pod -A`
+- `tilt describe pod my-pod`
+- `tilt describe pod my-pod -n prod`
+
 ### `tldr`
 <p class="cmd-url"><a href="https://tldr.sh/">https://tldr.sh/</a></p>
 

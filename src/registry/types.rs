@@ -71,6 +71,39 @@ pub(super) struct TomlCommand {
     /// `.safe-chains.toml` denies every gh form for that project).
     #[serde(default)]
     pub deny: Option<bool>,
+    /// Alternate grammar engaged when standard sub-dispatch finds no match.
+    /// Only meaningful for handler-using commands (e.g. tilt's Ruby template
+    /// engine fallback when no Kubernetes tilt sub matches). The handler is
+    /// responsible for invoking it via `registry::try_fallback_grammar()`.
+    #[serde(default)]
+    pub fallback: Option<TomlFallback>,
+}
+
+#[derive(Debug, Deserialize)]
+pub(super) struct TomlFallback {
+    #[serde(default)]
+    pub level: Option<TomlLevel>,
+    #[serde(default)]
+    pub bare: Option<bool>,
+    #[serde(default)]
+    pub max_positional: Option<usize>,
+    #[serde(default)]
+    pub standalone: Vec<String>,
+    #[serde(default)]
+    pub valued: Vec<String>,
+    #[serde(default)]
+    pub tolerate_unknown_short: Option<bool>,
+    #[serde(default)]
+    pub tolerate_unknown_long: Option<bool>,
+    #[serde(default)]
+    pub numeric_dash: Option<bool>,
+    /// Named predicate the handler applies to the first positional arg.
+    /// Currently the only value is `"path"` — accepts a token shaped like
+    /// a file path (contains `/`, `.`, or is `-` for stdin). Adding new
+    /// shapes is a one-line `PositionalShape` enum addition plus a match
+    /// arm in `policy::positional_matches_shape()`.
+    #[serde(default)]
+    pub positional_shape: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -233,6 +266,14 @@ pub(super) enum DispatchKind {
         #[allow(dead_code)]
         handler_name: String,
         doc_body: Option<String>,
+        /// TOML-declared subs the handler may consult via
+        /// `registry::try_sub_dispatch()`. Empty unless the handler
+        /// uses the helper.
+        subs: Vec<SubSpec>,
+        /// TOML-declared alternate grammar the handler may consult
+        /// via `registry::try_fallback_grammar()`. `None` unless the
+        /// handler uses the helper.
+        fallback: Option<FallbackSpec>,
     },
 }
 
@@ -243,4 +284,11 @@ pub struct OwnedPolicy {
     pub bare: bool,
     pub max_positional: Option<usize>,
     pub tolerance: crate::policy::FlagTolerance,
+}
+
+#[derive(Debug, Clone)]
+pub(super) struct FallbackSpec {
+    pub policy: OwnedPolicy,
+    pub level: SafetyLevel,
+    pub positional_shape: Option<crate::policy::PositionalShape>,
 }

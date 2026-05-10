@@ -375,6 +375,39 @@
 # handler = "laravel_cache_clear"
 # doc_body = "requires --store with one of file, array, null"
 
+# Handlers should hold LOGIC, not DATA. If your handler wants a static
+# `WordSet` of allowed flags or sub names, that data belongs in TOML.
+# A handler-using command can declare `[[command.sub]]` blocks (the
+# handler dispatches them via `registry::try_sub_dispatch(name, tokens)`)
+# and a `[command.fallback]` block — an alternate grammar engaged when
+# no sub matches (dispatched via `registry::try_fallback_grammar(name, tokens)`).
+# `commands/tools/tilt.toml` and `src/handlers/tilt.rs` are the canonical
+# example: tilt's K8s subs live in TOML, the Ruby template-engine grammar
+# is the fallback, and the Rust handler is a few lines of dispatch.
+
+# ─────────────────────────────────────────────────────────────────────
+# COMMAND.FALLBACK — alternate grammar for handler-using commands
+# ─────────────────────────────────────────────────────────────────────
+#
+# Engaged when the handler calls `registry::try_fallback_grammar(name, tokens)`
+# and `[[command.sub]]` dispatch found no match. Mirrors the flat-policy
+# fields available on a sub block, plus `positional_shape`.
+#
+# [command.fallback]
+# level = "Inert"                       # SafetyLevel for matching invocations
+# bare = true                           # is bare invocation allowed
+# max_positional = 1                    # cap on non-flag arguments
+# positional_shape = "path"             # predicate over the first positional;
+#                                       # only "path" is supported today —
+#                                       # accepts tokens shaped like a file
+#                                       # path (contain `/`, contain `.`, or
+#                                       # are `-` for stdin) and rejects flags
+# standalone = ["--help", "--list", "-h", "-l"]
+# valued = ["--type", "-t"]
+# tolerate_unknown_short = false
+# tolerate_unknown_long = false
+# numeric_dash = false
+
 # ─────────────────────────────────────────────────────────────────────
 # RESEARCHED_VERSION — record which upstream version was last vetted
 # ─────────────────────────────────────────────────────────────────────

@@ -15,6 +15,8 @@ pub use build::{build_registry, load_toml};
 pub use dispatch::dispatch_spec;
 pub use types::{CommandSpec, OwnedPolicy};
 
+use types::DispatchKind;
+
 type HandlerFn = fn(&[Token]) -> Verdict;
 
 static CMD_HANDLERS: LazyLock<HashMap<&'static str, HandlerFn>> =
@@ -52,6 +54,37 @@ pub fn toml_command_names() -> Vec<&'static str> {
         .keys()
         .map(|k| k.as_str())
         .collect()
+}
+
+/// Look up `cmd_name`'s TOML-declared subs (set via `[[command.sub]]`
+/// blocks alongside `handler = "..."`) and dispatch the one whose name
+/// matches `tokens[1]`. Returns `None` if no sub matched, so the
+/// handler can fall through to its fallback grammar (or deny).
+pub fn try_sub_dispatch(cmd_name: &str, tokens: &[Token]) -> Option<Verdict> {
+    let spec = handler_spec(cmd_name)?;
+    let DispatchKind::Custom { subs, .. } = &spec.kind else {
+        return None;
+    };
+    let arg = tokens.get(1)?.as_str();
+    let sub = subs.iter().find(|s| s.name == arg)?;
+    Some(dispatch::dispatch_sub_kind(&tokens[1..], &sub.kind))
+}
+
+/// Apply `cmd_name`'s TOML-declared `[command.fallback]` grammar.
+/// Returns `None` if no fallback is declared.
+pub fn try_fallback_grammar(cmd_name: &str, tokens: &[Token]) -> Option<Verdict> {
+    let spec = handler_spec(cmd_name)?;
+    let DispatchKind::Custom { fallback, .. } = &spec.kind else {
+        return None;
+    };
+    let f = fallback.as_ref()?;
+    Some(dispatch::dispatch_fallback(tokens, f))
+}
+
+fn handler_spec(cmd_name: &str) -> Option<&'static CommandSpec> {
+    CUSTOM_REGISTRY
+        .get(cmd_name)
+        .or_else(|| TOML_REGISTRY.get(cmd_name))
 }
 
 pub fn toml_command_docs() -> Vec<crate::docs::CommandDoc> {
