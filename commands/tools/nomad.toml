@@ -4,6 +4,19 @@ description = "HashiCorp Nomad CLI — cluster scheduler. Most subcommands conta
 url = "https://developer.hashicorp.com/nomad/docs/commands"
 researched_version = "Nomad 1.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "nomad status",
+    "nomad node-status",
+    "nomad node-status -short",
+    "nomad alloc-status abc123",
+    "nomad agent-info",
+    "nomad version",
+]
+examples_denied = [
+    "nomad alloc-status",
+    "nomad job run example.nomad",
+    "nomad node-drain -enable web",
+]
 
 [[command.sub]]
 name = "version"
@@ -54,7 +67,11 @@ candidate = true
 
 [[command.sub]]
 name = "alloc-status"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "-short", "-stats", "-verbose", "-json"]
+valued = ["-address", "-namespace", "-region", "-token", "-token-file", "-t"]
 
 [[command.sub]]
 name = "client-config"
@@ -106,7 +123,11 @@ candidate = true
 
 [[command.sub]]
 name = "node-status"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "-short", "-stats", "-verbose", "-self", "-allocs", "-json"]
+valued = ["-address", "-class", "-namespace", "-region", "-token", "-token-file", "-t", "-pool"]
 
 [[command.sub]]
 name = "operator"
