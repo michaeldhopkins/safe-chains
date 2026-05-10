@@ -2375,6 +2375,108 @@ deny = true
     }
 
     #[test]
+    fn handler_command_renders_delegating_subs() {
+        // Regression: subs whose kind is DelegateSkip / DelegateAfterSeparator
+        // used to render nothing in SubSpec::doc_line, so handler-using
+        // commands like magick (delegate_skip = 0 on convert/identify) and
+        // php (delegate_skip = 0 on artisan/please) silently dropped
+        // those subs from auto-rendered docs. They must surface as
+        // delegation lines now.
+        let spec = load_one(r#"
+[[command]]
+name = "demo-delegate"
+handler = "demo_handler"
+
+[[command.sub]]
+name = "passthrough"
+delegate_skip = 0
+
+[[command.sub]]
+name = "after"
+delegate_after = "--"
+"#);
+        let doc = spec.to_command_doc();
+        assert!(
+            doc.description.contains("**passthrough**"),
+            "delegate_skip sub label must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("**after**"),
+            "delegate_after sub label must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("delegates"),
+            "delegation must be indicated: {}",
+            doc.description,
+        );
+    }
+
+    #[test]
+    fn handler_command_renders_subs_and_fallback_data() {
+        // Auto-render: a handler-using command's [[command.sub]] and
+        // [command.fallback] data must surface in the doc description
+        // alongside any handwritten doc_body, so docs stay in sync with
+        // the TOML allowlist instead of relying on hand-edited prose.
+        let spec = load_one(r#"
+[[command]]
+name = "demo-render"
+handler = "demo_handler"
+doc_body = "Routing prose explaining the dispatch."
+
+[[command.sub]]
+name = "diag"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+standalone = ["--help"]
+
+[command.fallback]
+level = "Inert"
+bare = true
+max_positional = 1
+positional_shape = "path"
+standalone = ["--help"]
+valued = ["--type"]
+"#);
+        let doc = spec.to_command_doc();
+        assert!(
+            doc.description.contains("Routing prose explaining"),
+            "doc_body must still render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("**diag**"),
+            "TOML-declared sub `diag` must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("**list**"),
+            "TOML-declared sub `list` must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("Fallback grammar"),
+            "fallback grammar header must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("--type"),
+            "fallback valued flags must render: {}",
+            doc.description,
+        );
+        assert!(
+            doc.description.contains("must look like a path"),
+            "positional_shape must render: {}",
+            doc.description,
+        );
+    }
+
+    #[test]
     fn handler_sub_with_doc_body_renders_in_parent_body() {
         let spec = load_one(r#"
             [[command]]

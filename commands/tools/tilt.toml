@@ -4,13 +4,7 @@ description = "Two distinct CLIs share this name. Ruby's tilt template-engine ge
 url = "https://docs.tilt.dev/cli/tilt"
 researched_version = "Ruby tilt 2.x; tilt-dev/tilt 0.x"
 handler = "tilt"
-doc_body = """
-- Bare invocation, `--help`, `-h`, `--version`, `-v`, `-V` allowed (both binaries)
-- Ruby tilt: `--list`, `-l` to list engines; `tilt FILE` to render a template; `--type/-t TYPE`, `--layout/-y LAYOUT` valued flags. File argument must look like a path (contain `/`, `.`, or be `-` for stdin) — bare words (e.g. `tilt up`) are rejected since they're indistinguishable from K8s tilt subcommands.
-- K8s tilt diagnostic subs: `version`, `doctor`, `verify-install` (Inert)
-- K8s tilt help/completion: `help [topic]`, `completion [shell]` (Inert)
-- K8s tilt read subs: `get [resource]`, `describe [resource]` with kubectl-style flags (`-n/--namespace`, `-l/--selector`, `-o/--output`, `--field-selector`, `--context`, `--kubeconfig`, `-A/--all-namespaces`, `-w/--watch`)
-"""
+doc_body = "Routing: a K8s tilt sub name selects that sub; otherwise the Ruby template-engine fallback grammar applies, with the first positional required to look like a path so bare words (e.g. `tilt up`) are rejected as unknown K8s subcommands."
 examples_safe = [
   "tilt",
   "tilt --help",

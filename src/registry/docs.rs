@@ -1,5 +1,25 @@
 use super::types::*;
 
+fn describe_fallback(f: &FallbackSpec) -> String {
+    let mut lines = vec!["**Fallback grammar (engaged when no sub matches):**".to_string()];
+    if f.policy.bare {
+        lines.push("- Bare invocation allowed".to_string());
+    }
+    if !f.policy.standalone.is_empty() {
+        lines.push(format!("- Allowed standalone flags: {}", f.policy.standalone.join(", ")));
+    }
+    if !f.policy.valued.is_empty() {
+        lines.push(format!("- Allowed valued flags: {}", f.policy.valued.join(", ")));
+    }
+    match f.positional_shape {
+        Some(crate::policy::PositionalShape::Path) => {
+            lines.push("- First positional must look like a path (contains `/`, `.`, or is `-` for stdin)".to_string());
+        }
+        None => {}
+    }
+    lines.join("\n")
+}
+
 impl CommandSpec {
     pub(super) fn to_command_doc(&self) -> crate::docs::CommandDoc {
         let description = match &self.kind {
@@ -37,7 +57,26 @@ impl CommandSpec {
                 let args = patterns.join(", ");
                 format!("Allowed first arguments: {args}")
             }
-            DispatchKind::Custom { doc_body, .. } => doc_body.clone().unwrap_or_default(),
+            DispatchKind::Custom { doc_body, subs, fallback, .. } => {
+                let mut sections: Vec<String> = Vec::new();
+                if let Some(body) = doc_body
+                    && !body.trim().is_empty()
+                {
+                    sections.push(body.clone());
+                }
+                let mut sub_lines = Vec::new();
+                for sub in subs {
+                    sub.doc_line("", &mut sub_lines);
+                }
+                if !sub_lines.is_empty() {
+                    sub_lines.sort();
+                    sections.push(sub_lines.join("\n"));
+                }
+                if let Some(f) = fallback {
+                    sections.push(describe_fallback(f));
+                }
+                sections.join("\n\n")
+            }
             DispatchKind::WriteFlagged { policy, .. } => policy.describe(),
             DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => String::new(),
         };
@@ -147,7 +186,9 @@ impl SubSpec {
                     out.push(format!("- **{label}**: {summary}"));
                 }
             }
-            DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => {}
+            DispatchKind::DelegateAfterSeparator { .. } | DispatchKind::DelegateSkip { .. } => {
+                out.push(format!("- **{label}**: delegates to inner command"));
+            }
             DispatchKind::Custom { doc_body, .. } => {
                 if let Some(body) = doc_body {
                     out.push(format!("- **{label}**: {body}"));
