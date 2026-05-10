@@ -42,6 +42,8 @@ Once safe-chains is active, most of your existing `Bash(...)` approved commands 
 
 More importantly, broad patterns can weaken your security. A pattern like `Bash(bash *)` will approve `bash -c "rm -rf /"` — Claude Code matches the pattern before safe-chains gets a chance to recursively validate the inner command.
 
+For project-specific scripts or in-house CLIs safe-chains doesn't ship a definition for, [Custom Commands](custom-commands.md) are an alternative to broad `Bash(...)` approvals — same flag-level validation as built-ins.
+
 Review your approved commands and remove any that safe-chains covers. A good prompt for this:
 
 ```
