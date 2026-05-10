@@ -441,6 +441,20 @@
 #     policy = "download_policy"
 #     guard = "--output"
 #     guard_short = "-O"
+#
+# `policy = "key"` on a [[command.sub]] — references a
+#   [command.handler_policy.KEY] by name and copies its flag list into
+#   this sub's effective policy. Lets a single-sub form (no action
+#   verb, optionally with a guard) share the same WordSets a matrix
+#   entry would use, without duplicating them. Mutually exclusive with
+#   inline `standalone` / `valued` on the sub.
+#
+#     [[command.sub]]
+#     name = "browse"
+#     policy = "browse"
+#     guard = "--no-browser"
+#     guard_short = "-n"
+#     level = "Inert"
 
 # ─────────────────────────────────────────────────────────────────────
 # RESEARCHED_VERSION — record which upstream version was last vetted

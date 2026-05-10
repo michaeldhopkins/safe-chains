@@ -3,7 +3,7 @@
 //! sub × action matrix routing logic plus a sub-handler for `gh api`
 //! whose REST-vs-GraphQL routing, explicit-GET-for-fields rule, header
 //! allowlist, and GraphQL mutation veto can't move to TOML.
-use crate::parse::{Token, WordSet, has_flag};
+use crate::parse::{Token, WordSet};
 use crate::registry;
 use crate::verdict::{SafetyLevel, Verdict};
 
@@ -37,66 +37,31 @@ fn is_safe_api_header(value: &str) -> bool {
         || trimmed.eq_ignore_ascii_case("X-GitHub-Api-Version")
 }
 
-fn check_policy(key: &str, tokens: &[Token], level: SafetyLevel) -> Verdict {
-    if registry::check_handler_policy("gh", key, tokens) {
-        Verdict::Allowed(level)
-    } else {
-        Verdict::Denied
-    }
-}
-
 pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
         return Verdict::Denied;
     }
-
-    // `gh --help`, `gh --version` → fallback grammar.
     if let Some(v @ Verdict::Allowed(_)) = registry::try_fallback_grammar("gh", tokens) {
         return v;
     }
-
-    let subcmd = tokens[1].as_str();
-
-    // Universal `gh <sub> --help` at length 3.
+    // Universal `gh <sub> --help` at length 3. The only piece of pure
+    // handler logic — every sub forwards `--help` to its own help text,
+    // which we don't model per-sub.
     if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-
-    // `gh api` has its own sub-handler — its REST/GraphQL routing,
-    // header allowlist, explicit-GET-required-for-fields rule, and
-    // GraphQL mutation veto can't be expressed declaratively. Called
-    // with the full `gh api ...` token list so glab can share the same
-    // function.
-    if subcmd == "api" {
-        return is_safe_gh_api(tokens);
+    if let Some(v) = registry::try_sub_dispatch("gh", tokens) {
+        return v;
     }
-
-    // Single-sub forms whose flag policy lives in a named handler_policy
-    // but whose shape (no action verb, or a guard requirement) doesn't
-    // fit [[command.matrix]]. Kept as handler logic; the data they
-    // consult is still in TOML.
-    if subcmd == "search" {
-        if tokens.len() < 3 {
-            return Verdict::Denied;
-        }
-        return check_policy("search", &tokens[2..], SafetyLevel::Inert);
-    }
-    if subcmd == "status" {
-        return check_policy("simple_list", &tokens[1..], SafetyLevel::Inert);
-    }
-    if subcmd == "browse" {
-        if !has_flag(&tokens[1..], Some("-n"), Some("--no-browser")) {
-            return Verdict::Denied;
-        }
-        return check_policy("browse", &tokens[1..], SafetyLevel::Inert);
-    }
-
-    // Everything else is the sub × action matrix.
     registry::try_matrix_dispatch("gh", tokens).unwrap_or(Verdict::Denied)
 }
 
+/// Sub-handler for `gh api ...` / `glab api ...`. Called with tokens
+/// in sub-dispatch convention: `tokens[0] = "api"`, `tokens[1] =
+/// endpoint`, `tokens[2..] = args`. glab dispatches with
+/// `super::gh::is_safe_gh_api(&tokens[1..])`.
 pub fn is_safe_gh_api(tokens: &[Token]) -> Verdict {
-    let endpoint = tokens.get(2).map(|t| t.as_str()).unwrap_or("");
+    let endpoint = tokens.get(1).map(|t| t.as_str()).unwrap_or("");
     if endpoint == "graphql" {
         return is_safe_gh_api_graphql(tokens);
     }
@@ -139,7 +104,8 @@ fn extract_field_value(tokens: &[Token], i: usize) -> Option<(&str, &str)> {
 }
 
 fn is_safe_gh_api_graphql(tokens: &[Token]) -> Verdict {
-    let mut i = 3;
+    // tokens[0] = "api", tokens[1] = "graphql", args start at i=2.
+    let mut i = 2;
     while i < tokens.len() {
         let token = &tokens[i];
 
@@ -193,7 +159,11 @@ fn is_safe_gh_api_graphql(tokens: &[Token]) -> Verdict {
 }
 
 fn is_safe_gh_api_rest(tokens: &[Token]) -> Verdict {
-    let mut i = 2;
+    // tokens[0] = "api", tokens[1] = endpoint, tokens[2..] = args.
+    // Start at i=1 so the endpoint walks past as a positional (no-op
+    // in every flag branch), matching the original `is_safe_gh_api_rest`
+    // semantics under the full-tokens convention.
+    let mut i = 1;
     let mut has_fields = false;
     let mut has_explicit_get = false;
     while i < tokens.len() {

@@ -4,41 +4,18 @@
 //! delegation to gh's API sub-handler for `glab api`.
 use crate::parse::Token;
 use crate::registry;
-use crate::verdict::{SafetyLevel, Verdict};
+use crate::verdict::Verdict;
 
 pub fn is_safe_glab(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
         return Verdict::Denied;
     }
-
-    // `glab --help` / `glab --version` / `glab -h` / `glab -v` at length 2.
     if let Some(v @ Verdict::Allowed(_)) = registry::try_fallback_grammar("glab", tokens) {
         return v;
     }
-
-    let subcmd = tokens[1].as_str();
-
-    // Always-safe bare subs: `glab version`, `glab check-update`. No
-    // extra arguments allowed (length must be exactly 2).
-    if registry::handler_word_list("glab", "always_safe_bare_subs")
-        .iter()
-        .any(|s| s == subcmd)
-    {
-        return if tokens.len() == 2 {
-            Verdict::Allowed(SafetyLevel::Inert)
-        } else {
-            Verdict::Denied
-        };
+    if let Some(v) = registry::try_sub_dispatch("glab", tokens) {
+        return v;
     }
-
-    // `glab api` shares the GitHub API sub-handler. Pass the full
-    // token list per gh's calling convention.
-    if subcmd == "api" {
-        return super::gh::is_safe_gh_api(tokens);
-    }
-
-    // Everything else is the read-only sub × action matrix (including
-    // `auth status` as a one-parent, one-action matrix entry).
     registry::try_matrix_dispatch("glab", tokens).unwrap_or(Verdict::Denied)
 }
 

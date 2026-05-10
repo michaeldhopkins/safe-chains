@@ -215,6 +215,13 @@ pub(super) struct TomlSub {
     pub guard_short: Option<String>,
     #[serde(default)]
     pub allow_all: Option<bool>,
+    /// Reference a `[command.handler_policy.KEY]` block by name, copying
+    /// its standalone/valued/bare/etc. into this sub's effective policy.
+    /// Lets a single-sub form (search, browse, gh status) re-use the
+    /// same flag list a matrix entry would, without duplicating the
+    /// WordSets. Mutually exclusive with inline standalone/valued.
+    #[serde(default)]
+    pub policy: Option<String>,
     #[serde(default)]
     pub sub: Vec<TomlSub>,
     #[serde(default)]
