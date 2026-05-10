@@ -6953,7 +6953,7 @@ Aliases: `xelatex`, `lualatex`, `latex`
 <p class="cmd-url"><a href="https://www.php.net/manual/en/features.commandline.options.php">https://www.php.net/manual/en/features.commandline.options.php</a></p>
 
 - Allowed standalone flags: --help, --info, --ini, --modules, --version, -V, -h, -i, -m, -v
-- Allowed pre-flag: -d <directive>=<value> where <directive> is one of date.timezone, display_errors, error_reporting, max_execution_time, max_input_time, max_input_vars, memory_limit, opcache.enable, opcache.enable_cli, post_max_size, upload_max_filesize
+- Allowed pre-flag: `-d DIRECTIVE=VALUE` where DIRECTIVE is one of date.timezone, display_errors, error_reporting, max_execution_time, max_input_time, max_input_vars, memory_limit, opcache.enable, opcache.enable_cli, post_max_size, upload_max_filesize
 - Subcommands: artisan, please — matched by exact name or by the basename of an absolute or relative path (e.g. `php /Users/me/project/please stache:clear`)
 
 ### `phpstan`
