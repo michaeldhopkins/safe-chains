@@ -39,7 +39,11 @@ candidate = true
 
 [[command.sub]]
 name = "dump"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "--iterative", "--nocode", "--nostorage", "--incompletes"]
+valued = ["--datadir", "--start", "--limit"]
 
 [[command.sub]]
 name = "dumpgenesis"

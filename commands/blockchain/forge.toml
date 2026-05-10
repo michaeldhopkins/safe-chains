@@ -155,7 +155,11 @@ candidate = true
 
 [[command.sub]]
 name = "lint"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "--json"]
+valued = ["--root", "--config-path", "--severity"]
 
 [[command.sub]]
 name = "generate"

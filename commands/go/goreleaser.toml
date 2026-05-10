@@ -72,7 +72,11 @@ candidate = true
 
 [[command.sub]]
 name = "verify"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "--debug"]
+valued = ["-f", "--config", "--checksum-file"]
 
 [[command.sub]]
 name = "continue"

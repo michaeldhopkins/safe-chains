@@ -437,6 +437,7 @@ Aliases: `pip3`
 - **completion**: Flags: --help, -h. Positional args accepted
 - **help**: Positional args accepted
 - **status**: Flags: --help, --settings, -h
+- **verify**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `yapf`

@@ -156,7 +156,10 @@ candidate = true
 
 [[command.sub]]
 name = "ls"
-candidate = true
+level = "Inert"
+bare = true
+standalone = ["--help", "-h", "-a", "--all", "-q", "--quiet"]
+valued = ["--filter", "--format"]
 
 [[command.sub]]
 name = "convert"

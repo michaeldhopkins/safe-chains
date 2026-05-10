@@ -551,6 +551,7 @@ Aliases: `7zz`, `7za`
 <p class="cmd-url"><a href="https://atlasgo.io/cli-reference">https://atlasgo.io/cli-reference</a></p>
 
 - **completion**: Flags: --help, -h. Positional args accepted
+- **doctor**: Flags: --help, -h
 - **env**: Flags: --help, -h. Valued: --config, --env. Positional args accepted
 - **help**: Positional args accepted
 - **migrate diff**: Flags: --dry-run, --edit, --exec, --format, --help, --lock, -h. Valued: --config, --dev-url, --dir, --env, --exclude, --format, --lock-timeout, --qualifier, --schema, --to, -c
@@ -562,21 +563,41 @@ Aliases: `7zz`, `7za`
 - **schema diff**: Flags: --format, --help, -h. Valued: --config, --env, --from, --to, --dev-url, --exclude, --schema, --format, -c
 - **schema fmt**: Flags: --help, -h
 - **schema inspect**: Flags: --exclude, --format, --help, -h. Valued: --config, --env, --exclude, --format, --schema, --url, -c, -s, -u
+- **schema lint**: Flags: --help, -h. Valued: --config, --env, --dev-url, --format, --url, -c, -u. Positional args accepted
+- **schema status**: Flags: --help, -h, --format. Valued: --config, --env, --url, -c, -u, --format, --from, --to, --dev-url. Positional args accepted
 - **schema test**: Flags: --help, --run, -h. Valued: --config, --dev-url, --env, --run, -c
 - **version**: Flags: --help, -h
 - **whoami**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
 
+**Examples:**
+
+- `atlas doctor`
+- `atlas migrate status`
+- `atlas whoami`
+
 ### `atuin`
 <p class="cmd-url"><a href="https://atuin.sh/">https://atuin.sh/</a></p>
 
+- **default-config**: Flags: --help, -h
+- **doctor**: Flags: --help, -h
 - **help**: Positional args accepted
 - **info**: Flags: --help, -h
 - **init**: Flags: --disable-ctrl-r, --disable-up-arrow, --help, -h. Positional args accepted
 - **search**: Flags: --cmd-only, --exit, --exit, --filter-mode, --help, --human, --inline-height, --interactive, --keymap-mode, --reverse, --shell-up-key-binding, --cwd, --exclude-cwd, --exclude-exit, --exit, --limit, -h, -i, -r. Valued: --after, --before, --cmd-only, --cwd, --delete, --delete-it-all, --exit, --filter-mode, --format, --limit, --offset, --search-mode, --session, --user, -c, -e, -f. Positional args accepted
 - **stats**: Flags: --help, -h. Valued: --count, --ngram. Positional args accepted
+- **uuid**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `atuin doctor`
+- `atuin default-config`
+- `atuin uuid`
+- `atuin info`
+- `atuin stats`
+- `atuin search foo`
 
 ### `autoconf`
 <p class="cmd-url"><a href="https://www.gnu.org/software/autoconf/">https://www.gnu.org/software/autoconf/</a></p>
@@ -1171,6 +1192,7 @@ Aliases: `@biomejs/biome`
 <p class="cmd-url"><a href="https://buck2.build/docs/users/commands/build/">https://buck2.build/docs/users/commands/build/</a></p>
 
 - **aquery**: Flags: --help, --json, -h. Positional args accepted
+- **audit**: Positional args accepted
 - **completion**: Flags: --help, -h. Positional args accepted
 - **cquery**: Flags: --help, --json, -h. Positional args accepted
 - **help**: Positional args accepted
@@ -2199,6 +2221,7 @@ Aliases: `@cucumber/cucumber`
 - **configurations**: Flags: --all-namespaces, --help, --kubernetes, -A, -h, -k. Valued: --name, --namespace, --output, -n, -o
 - **help**: Positional args accepted
 - **list**: Flags: --all-namespaces, --help, -A, -h. Valued: --kubernetes, --namespace, --output, -k, -n, -o
+- **logs**: Flags: --help, -h. Valued: -a, --app-id, -k, --kubernetes, -n, --namespace, -p, --pod-name, -c, --container. Positional args accepted
 - **status**: Flags: --help, --kubernetes, -h, -k. Valued: --output, -o
 - **version**: Flags: --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
@@ -2550,6 +2573,7 @@ Aliases: `difftastic`
 - **help**: Positional args accepted
 - **images**: Flags: --help, --quiet, -h, -q. Valued: --format. Positional args accepted
 - **logs**: Flags: --follow, --help, --no-color, --no-log-prefix, --timestamps, -f, -h, -t. Valued: --since, --tail, --until. Positional args accepted
+- **ls**: Flags: --help, -h, -a, --all, -q, --quiet. Valued: --filter, --format
 - **port**: Flags: --help, -h. Valued: --index, --protocol. Positional args accepted
 - **ps**: Flags: --all, --dry-run, --help, --no-trunc, --quiet, --services, -a, -h, -q. Valued: --filter, --format, --status. Positional args accepted
 - **top**: Flags: --help, -h. Positional args accepted
@@ -2591,6 +2615,7 @@ Aliases: `difftastic`
 - **list**: Flags: --deprecated, --help, --highest-minor, --highest-patch, --include-prerelease, --include-transitive, --outdated, --vulnerable, -h. Valued: --config, --format, --framework, --source, --verbosity, -v
 - **new**: Flags: --diagnostics, --dry-run, --force, --help, --list, --update-apply, --update-check, -d, -h, -l. Valued: --author, --columns, --columns-all, --language, --name, --no-update-check, --output, --project, --type, --verbosity, -lang, -n, -o
 - **nuget list**: Flags: --help, -h
+- **nuget verify**: Flags: --help, -h, --all, -v. Valued: --certificate-fingerprint, --configfile, --verbosity. Positional args accepted
 - **nuget**: Flags: --help, -h
 - **pack**: Flags: --force, --help, --include-source, --include-symbols, --no-build, --no-dependencies, --no-restore, --nologo, --serviceable, --tl, -h. Valued: --artifacts-path, --configuration, --output, --property, --runtime, --source, --verbosity, --version-suffix, -c, -o, -p, -r, -s, -v
 - **publish**: Flags: --disable-build-servers, --force, --help, --no-build, --no-dependencies, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --manifest, --os, --output, --property, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -p, -r, -s, -v
@@ -2724,6 +2749,7 @@ Aliases: `difftastic`
 
 - **describe**: Flags: --data-list, --help, --import-paths, -h. Valued: --arch, --build, --compiler, --config, --data. Positional args accepted
 - **help**: Positional args accepted
+- **lint**: Flags: --help, -h, --report, --syntax-check, --styleCheck. Valued: --config, -c, --build, -b. Positional args accepted
 - **list**: Flags: --help, -h
 - **search**: Flags: --help, -h. Valued: --registry. Positional args accepted
 - **version**: Flags: --help, -h
@@ -3139,6 +3165,7 @@ Aliases: `flang-new`
 - **doctor**: Flags: --help, --android-licenses, --check-for-remote-artifacts, --verbose, -v, -h
 - **emulators**: Flags: --help, -h. Valued: --launch, --name
 - **help**: Positional args accepted
+- **logs**: Flags: --help, -h. Valued: -d, --device-id
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -3147,7 +3174,12 @@ Aliases: `flang-new`
 
 - **check**: Flags: --help, --pre, -h. Valued: --components, --components-extra, --kustomization, --source
 - **completion**: Flags: --help, -h. Positional args accepted
+- **get**: Flags: --help, -h, -A, --all-namespaces, --watch-errors, --no-header. Valued: -n, --namespace, --context, --kubeconfig, --label-selector, --status-selector, --timeout. Positional args accepted
 - **help**: Positional args accepted
+- **logs**: Flags: --help, -h, -A, --all-namespaces, -f, --follow. Valued: -n, --namespace, --context, --kubeconfig, --level, --kind, --name, --since, --tail. Positional args accepted
+- **stats**: Flags: --help, -h, -A, --all-namespaces. Valued: -n, --namespace, --context, --kubeconfig. Positional args accepted
+- **trace**: Flags: --help, -h. Valued: -n, --namespace, --api-version, --kind, --context, --kubeconfig. Positional args accepted
+- **tree**: Flags: --help, -h, --compact. Valued: -n, --namespace, --context, --kubeconfig. Positional args accepted
 - **version**: Flags: --client, --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -3219,6 +3251,7 @@ Aliases: `fly`
 - **geiger**: Positional args accepted
 - **help**: Positional args accepted
 - **inspect**: Positional args accepted
+- **lint**: Flags: --help, -h, --json. Valued: --root, --config-path, --severity. Positional args accepted
 - **remappings**: Positional args accepted
 - **selectors**: Positional args accepted
 - **tree**: Positional args accepted
@@ -3240,6 +3273,7 @@ Aliases: `fly`
 - **help**: Positional args accepted
 - **info**: Flags: --comment-format, --help, --repository, --verbose, -R, -h, -v. Valued: --repository, -R. Positional args accepted
 - **ls**: Flags: --age, --help, --repository, --type, --verbose, -R, -h, -l, -r, -v. Valued: --repository, --type, -R, -r. Positional args accepted
+- **search**: Flags: --help, -h, --all, --checkin, --documentation, --forum, --ticket, --unindexed, --wiki. Valued: --limit, -n. Positional args accepted
 - **status**: Flags: --all, --changed, --differ, --dotfiles, --header, --help, --ifchanged, --limit, --repository, --verbose, -R, -a, -c, -d, -h, -v. Valued: --repository, -R
 - **tag find**: Flags: --help, -h. Valued: --repository, --type, -R
 - **tag list**: Flags: --all, --inverse, --help, --raw, --repository, -R, -a, -h, -i. Valued: --limit, --prefix, --repository, -R
@@ -3454,6 +3488,7 @@ Aliases: `g++`, `cc`, `c++`
 ### `geth`
 <p class="cmd-url"><a href="https://geth.ethereum.org/docs/fundamentals/command-line-options">https://geth.ethereum.org/docs/fundamentals/command-line-options</a></p>
 
+- **dump**: Flags: --help, -h, --iterative, --nocode, --nostorage, --incompletes. Valued: --datadir, --start, --limit. Positional args accepted
 - **help**: Positional args accepted
 - **license**: Positional args accepted
 - **version**: Positional args accepted
@@ -3685,6 +3720,7 @@ Aliases: `godot4`
 - **init**: Flags: --help, -h. Valued: --config, -f
 - **jsonschema**: Flags: --help, -h. Valued: --output, -o
 - **schema**: Flags: --help, -h. Valued: --output, -o
+- **verify**: Flags: --help, -h, --debug. Valued: -f, --config, --checksum-file. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `gosec`
@@ -3993,6 +4029,7 @@ Aliases: `gradlew`
 - **init**: Flags: --clone, --debug, --draft, --drafts, --help, --no-clone, --silent, --verbose, -h. Positional args accepted
 - **list**: Flags: --help, -h. Positional args accepted
 - **new**: Flags: --draft, --drafts, --help, --replace, --slug, -h, -r, -s. Valued: --path, -p. Positional args accepted
+- **render**: Flags: --help, -h. Valued: -o, --output, -e, --engine. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -4288,6 +4325,7 @@ Aliases: `hf`
 <p class="cmd-url"><a href="https://docs.ignite.com/references/cli">https://docs.ignite.com/references/cli</a></p>
 
 - **completion**: Flags: --help, -h. Positional args accepted
+- **doctor**: Flags: --help, -h
 - **help**: Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
@@ -4739,6 +4777,7 @@ Aliases: `nbconvert`
 
 - **completion**: Flags: --help, -h. Positional args accepted
 - **help**: Positional args accepted
+- **inspect**: Flags: --help, -h, -t, --tree, --raw. Valued: -a, --app, -n, --namespace, --filter, --kubeconfig-context, --kubeconfig. Positional args accepted
 - **list**: Flags: --all-namespaces, --help, --namespace, -A, -h, -n. Valued: --namespace, -n
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
@@ -5151,7 +5190,9 @@ Aliases: `nbconvert`
 
 - **check**: Flags: --allow-mismatched-policy-controller, --cli-version-override, --config, --cni-namespace, --crds, --deletion-pending, --enable-pprof, --expected-version, --help, --ipv6, --linkerd-cni-enabled, --multicluster, --no-policy, --no-tls-policy, --output, --pre, --proxy, --retry-deadline, --short, --wait, -h, -o. Valued: --cni-namespace, --config, --expected-version, --namespace, --output, --retry-deadline, --wait, -n, -o
 - **completion**: Flags: --help, -h. Positional args accepted
+- **diagnostics**: Flags: --help, -h. Valued: --linkerd-namespace, -L, --context, --kubeconfig, --api-addr. Positional args accepted
 - **help**: Positional args accepted
+- **metrics**: Flags: --help, -h. Valued: -n, --namespace, --linkerd-namespace, -L, --context, --kubeconfig. Positional args accepted
 - **version**: Flags: --client, --help, --proxy, --short, -h. Valued: --namespace
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -6084,13 +6125,16 @@ Aliases: `ionice`
 - **config check**: Flags: --help, -h
 - **config show**: Flags: --help, --json, -h
 - **derivation show**: Flags: --debug, --help, -h. Valued: --store
+- **describe-stores**: Flags: --help, -h, --json
 - **doctor**: Flags: --help, -h
+- **doctor-check**: Flags: --help, -h. Positional args accepted
 - **eval**: Flags: --apply, --debug, --debugger, --expr, --file, --help, --ignore-try, --impure, --json, --no-net, --print-build-logs, --quiet, --raw, --read-only, --refresh, --store, --strict, --write-lock-file, -L, -f, -h, --help, -q. Valued: --arg, --argstr, --expr, --file, --include, --option, --store, -I, -f. Positional args accepted
 - **flake check**: Flags: --all-systems, --debug, --help, --no-build, --no-update-lock-file, --quiet, -h, -q
 - **flake info**: Flags: --debug, --help, --json, -h
 - **flake metadata**: Flags: --debug, --help, --json, --no-update-lock-file, --no-write-lock-file, --quiet, -h, -q
 - **flake show**: Flags: --all-systems, --debug, --help, --json, --legacy, --no-update-lock-file, --quiet, -h, -q
 - **help**: Positional args accepted
+- **log**: Flags: --help, -h. Positional args accepted
 - **path-info**: Flags: --all, --closure-size, --debug, --help, --human-readable, --json, --quiet, --recursive, --sigs, --size, -S, -c, -h, -q, -r, -s. Valued: --store, --from. Positional args accepted
 - **profile diff-closures**: Flags: --help, -h. Valued: --profile
 - **profile history**: Flags: --debug, --help, -h. Valued: --profile
@@ -6219,12 +6263,24 @@ Aliases: `ionice`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/nomad/docs/commands">https://developer.hashicorp.com/nomad/docs/commands</a></p>
 
 - **agent-info**: Flags: --help, -h. Valued: -address
+- **alloc-status**: Flags: --help, -h, -short, -stats, -verbose, -json. Valued: -address, -namespace, -region, -token, -token-file, -t. Positional args accepted
 - **fmt**: Flags: --check, --help, --list, --recursive, --write, -c, -h, -l, -recursive, -w. Positional args accepted
 - **help**: Positional args accepted
+- **monitor**: Flags: --help, -h, -json, -no-color. Valued: -address, -region, -namespace, -token, -token-file, -log-level, -node-id, -server-id. Positional args accepted
+- **node-status**: Flags: --help, -h, -short, -stats, -verbose, -self, -allocs, -json. Valued: -address, -class, -namespace, -region, -token, -token-file, -t, -pool. Positional args accepted
 - **status**: Flags: --help, -h. Valued: -address, -namespace, -region, -token, -token-file. Positional args accepted
 - **validate**: Flags: --help, -h. Valued: -vault-namespace, -vault-token. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `nomad status`
+- `nomad node-status`
+- `nomad node-status -short`
+- `nomad alloc-status abc123`
+- `nomad agent-info`
+- `nomad version`
 
 ### `northflank`
 <p class="cmd-url"><a href="https://northflank.com/docs/v1/api/use-the-cli">https://northflank.com/docs/v1/api/use-the-cli</a></p>
@@ -6395,8 +6451,15 @@ Aliases: `run-p`, `run-s`
 <p class="cmd-url"><a href="https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/getting-started-cli.html">https://docs.openshift.com/container-platform/latest/cli_reference/openshift_cli/getting-started-cli.html</a></p>
 
 - **completion**: Flags: --help, -h. Positional args accepted
+- **describe**: Flags: --help, -h, -A, --all-namespaces, --show-events. Valued: -n, --namespace, -l, --selector, --field-selector, -f, --filename, --context, --kubeconfig. Positional args accepted
+- **diff**: Flags: --help, -h, -R, --recursive, --show-managed-fields. Valued: -f, --filename, -n, --namespace, --context, --kubeconfig. Positional args accepted
+- **events**: Flags: --help, -h, -A, --all-namespaces, -w, --watch, --no-headers. Valued: -n, --namespace, --for, --types, -o, --output, --context, --kubeconfig. Positional args accepted
+- **explain**: Flags: --help, -h, --recursive. Valued: --api-version, --output, -o, --context, --kubeconfig. Positional args accepted
+- **get**: Flags: --help, -h, -A, --all-namespaces, -w, --watch, --watch-only, --no-headers, --show-labels, --show-kind. Valued: -n, --namespace, -l, --selector, --field-selector, -o, --output, --context, --kubeconfig. Positional args accepted
 - **help**: Positional args accepted
+- **logs**: Flags: --help, -h, -f, --follow, --all-containers, --prefix, --timestamps, --previous, -p, --ignore-errors. Valued: -n, --namespace, -c, --container, --since, --since-time, --tail, --limit-bytes, --context, --kubeconfig. Positional args accepted
 - **status**: Flags: --all-namespaces, --help, --suggest, --verbose, -A, -h, -v. Valued: --namespace, --output, -n, -o
+- **top**: Flags: --help, -h, -A, --all-namespaces, --containers, --no-headers, --use-protocol-buffers. Valued: -n, --namespace, -l, --selector, --field-selector, --context, --kubeconfig, --sort-by. Positional args accepted
 - **version**: Flags: --client, --help, --output, --short, -h, -o. Valued: --output, -o
 - **whoami**: Flags: --help, --show-context, --show-server, --show-token, -c, -h, -t
 - Allowed standalone flags: --help, --version, -h, -v
@@ -6463,6 +6526,7 @@ Aliases: `run-p`, `run-s`
 - **env**: Flags: --csh, --debug, --fish, --help, --inplace-path, --no-color, --readonly, --revert, --safe, --sexp, --shell, --sh, --zsh, -h. Valued: --shell, --switch
 - **help**: Positional args accepted
 - **info**: Flags: --all-versions, --depexts, --just-file, --list-files, --debug, --help, -h. Positional args accepted
+- **lint**: Flags: --help, -h, --normalize, --short, -s, --check-upstream, --package. Valued: --filter, -f, --package, --warnings, -W. Positional args accepted
 - **list**: Flags: --all, --available, --columns, --depexts, --depopts, --installable, --installed, --no-color, --normalise, --pinned, --readonly, --recursive, --required-by, --resolve, --safe, --separator, --silent, --sort, --debug, --help, --root, -h. Valued: --field-match, --fields, --filter, --repos, --search, --switch, -A, -i, -s
 - **search**: Flags: --case-sensitive, --debug, --help, --installed, --no-color, -c, -h. Positional args accepted
 - **show**: Flags: --all-versions, --depexts, --field, --just-file, --list-files, --no-color, --normalise, --raw, --share, --debug, --help, -h. Positional args accepted
@@ -6998,6 +7062,7 @@ Aliases: `unpigz`
 - **help**: Positional args accepted
 - **key list**: Flags: --help, -h
 - **log**: Flags: --description, --filter, --full-hashes, --hash-only, --help, --limit, --no-cache, --state, -h. Valued: --channel, --description, --filter, --limit, --repository
+- **ls**: Flags: --help, -h. Valued: --repo-path, --repository. Positional args accepted
 - **status**: Flags: --full-hashes, --help, --no-mtime, --short, -h. Valued: --channel, --repository. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
@@ -7014,6 +7079,7 @@ Aliases: `unpigz`
 Aliases: `platformio`
 
 - **boards**: Flags: --help, --installed, --json-output, -h, -i. Positional args accepted
+- **check**: Flags: --help, -h, --silent, -s, --verbose, -v, --json-output. Valued: -d, --project-dir, -c, --project-conf, -e, --environment, --severity, --skip-packages, --pattern. Positional args accepted
 - **completion**: Flags: --help, -h. Positional args accepted
 - **device list**: Flags: --help, --json-output, --logical, --mdns, --serial, -h
 - **help**: Positional args accepted
@@ -7259,6 +7325,7 @@ Aliases: `upsun`
 - **global**: Flags: --help, -h. Positional args accepted
 - **help**: Positional args accepted
 - **init**: Flags: --help, --no-rehash, -h
+- **list-modules**: Flags: --help, -h
 - **local**: Flags: --help, --unset, -h. Positional args accepted
 - **prefix**: Flags: --help, -h. Positional args accepted
 - **root**: Flags: --help, -h
@@ -8546,6 +8613,7 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 - **diagnose**: Flags: --enable-templating, --enable-rpc, --help, --yaml-only, -h. Valued: --filename, --output, -f, -o, --rpc-port
 - **find-configs**: Flags: --help, -h. Valued: --directory, --output, -d, -o
 - **help**: Positional args accepted
+- **inspect**: Flags: --help, -h. Valued: -f, --filename, -o, --output, --module, -m. Positional args accepted
 - **version**: Flags: --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -8681,8 +8749,10 @@ Aliases: `serverless`
 - **config**: Positional args accepted
 - **dependencies**: Positional args accepted
 - **dependents**: Positional args accepted
+- **diff**: Flags: --help, -h, -a, --attribute, --first. Positional args accepted
 - **extensions**: Positional args accepted
 - **find**: Positional args accepted
+- **graph**: Flags: --help, -h, --ascii, --dot, --static, -i, --installed, -d, --deptype. Positional args accepted
 - **help**: Positional args accepted
 - **info**: Positional args accepted
 - **license**: Positional args accepted
@@ -8843,6 +8913,7 @@ Aliases: `serverless`
 
 - **dot**: Flags: --external, --help, --include-base, --no-include-base, --no-prune, --prune, -h. Valued: --depth
 - **help**: Positional args accepted
+- **list-dependencies**: Flags: --help, -h. Valued: --depth, --prune, --include-base, --separator. Positional args accepted
 - **ls dependencies**: Flags: --help, -h. Valued: --depth
 - **ls globals**: Flags: --help, -h
 - **ls snapshots**: Flags: --help, -h
@@ -8977,8 +9048,14 @@ Aliases: `serverless`
 
 - **completion**: Flags: --help, -h. Positional args accepted
 - **help**: Positional args accepted
+- **status**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `supabase status`
+- `supabase version`
 
 ### `svelte-check`
 <p class="cmd-url"><a href="https://svelte.dev/docs/cli/sv-check">https://svelte.dev/docs/cli/sv-check</a></p>
@@ -9328,7 +9405,9 @@ Aliases: `[`
 <p class="cmd-url"><a href="https://docs.tilt.dev/cli/tilt">https://docs.tilt.dev/cli/tilt</a></p>
 
 - **completion**: Flags: --help, -h. Positional args accepted
+- **describe**: Flags: --help, -h, -A, --all-namespaces, --show-events. Valued: -n, --namespace, -l, --selector, -o, --output. Positional args accepted
 - **doctor**: Flags: --help, -h. Valued: --output, -o
+- **get**: Flags: --help, -h, -A, --all-namespaces, -w, --watch, --no-headers. Valued: -n, --namespace, -l, --selector, --field-selector, -o, --output. Positional args accepted
 - **help**: Positional args accepted
 - **verify-install**: Flags: --help, -h
 - **version**: Flags: --help, -h
@@ -9723,7 +9802,10 @@ Aliases: `traceroute6`
 <p class="cmd-url"><a href="https://velero.io/docs/">https://velero.io/docs/</a></p>
 
 - **completion**: Flags: --help, -h. Positional args accepted
+- **describe**: Flags: --help, -h, --details, --features, --insecure-skip-tls-verify, --volume-details. Valued: -n, --namespace, -l, --selector, --kubeconfig, --kubecontext. Positional args accepted
+- **get**: Flags: --help, -h, -o, --output. Valued: -n, --namespace, -l, --selector, -o, --output, --kubeconfig, --kubecontext. Positional args accepted
 - **help**: Positional args accepted
+- **logs**: Flags: --help, -h, --insecure-skip-tls-verify. Valued: -n, --namespace, --kubeconfig, --kubecontext, --timeout, --caCertFile. Positional args accepted
 - **version**: Flags: --client-only, --help, --timeout, -h. Valued: --namespace, --timeout, -n
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -9852,6 +9934,7 @@ Aliases: `traceroute6`
 - **completion**: Flags: --help, -h. Positional args accepted
 - **help**: Positional args accepted
 - **status**: Flags: --help, --settings, -h
+- **verify**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `wasm-objdump`
@@ -10138,6 +10221,7 @@ Aliases: `traceroute6`
 
 - **help**: Positional args accepted
 - **info**: Flags: --help, -h. Positional args accepted
+- **lint**: Flags: --help, -h, -q, --quiet, -v, --verbose, -D, --diagnosis. Positional args accepted
 - **lua**: Flags: --help, -h. Positional args accepted
 - **show**: Flags: --help, -h. Valued: --config, --list, -l. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v

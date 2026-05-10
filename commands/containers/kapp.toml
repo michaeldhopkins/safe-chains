@@ -37,7 +37,11 @@ candidate = true
 
 [[command.sub]]
 name = "inspect"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "-t", "--tree", "--raw"]
+valued = ["-a", "--app", "-n", "--namespace", "--filter", "--kubeconfig-context", "--kubeconfig"]
 
 [[command.sub]]
 name = "logs"

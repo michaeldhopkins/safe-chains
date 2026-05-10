@@ -119,7 +119,11 @@ candidate = true
 
 [[command.sub]]
 name = "lint"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "--normalize", "--short", "-s", "--check-upstream", "--package"]
+valued = ["--filter", "-f", "--package", "--warnings", "-W"]
 
 [[command.sub]]
 name = "publish"

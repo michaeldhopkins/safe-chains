@@ -191,7 +191,10 @@ candidate = true
 
 [[command.sub]]
 name = "diff"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "-a", "--attribute", "--first"]
 
 [[command.sub]]
 name = "tags"
@@ -211,7 +214,10 @@ candidate = true
 
 [[command.sub]]
 name = "graph"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "--ascii", "--dot", "--static", "-i", "--installed", "-d", "--deptype"]
 
 [[command.sub]]
 name = "concretize"

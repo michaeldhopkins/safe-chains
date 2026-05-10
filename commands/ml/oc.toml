@@ -29,19 +29,35 @@ candidate = true
 
 [[command.sub]]
 name = "describe"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "-A", "--all-namespaces", "--show-events"]
+valued = ["-n", "--namespace", "-l", "--selector", "--field-selector", "-f", "--filename", "--context", "--kubeconfig"]
 
 [[command.sub]]
 name = "explain"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "--recursive"]
+valued = ["--api-version", "--output", "-o", "--context", "--kubeconfig"]
 
 [[command.sub]]
 name = "get"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "-A", "--all-namespaces", "-w", "--watch", "--watch-only", "--no-headers", "--show-labels", "--show-kind"]
+valued = ["-n", "--namespace", "-l", "--selector", "--field-selector", "-o", "--output", "--context", "--kubeconfig"]
 
 [[command.sub]]
 name = "logs"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "-f", "--follow", "--all-containers", "--prefix", "--timestamps", "--previous", "-p", "--ignore-errors"]
+valued = ["-n", "--namespace", "-c", "--container", "--since", "--since-time", "--tail", "--limit-bytes", "--context", "--kubeconfig"]
 
 [[command.sub]]
 name = "completion"
@@ -196,11 +212,19 @@ candidate = true
 
 [[command.sub]]
 name = "events"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "-A", "--all-namespaces", "-w", "--watch", "--no-headers"]
+valued = ["-n", "--namespace", "--for", "--types", "-o", "--output", "--context", "--kubeconfig"]
 
 [[command.sub]]
 name = "diff"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "-R", "--recursive", "--show-managed-fields"]
+valued = ["-f", "--filename", "-n", "--namespace", "--context", "--kubeconfig"]
 
 [[command.sub]]
 name = "kustomize"
@@ -228,7 +252,11 @@ candidate = true
 
 [[command.sub]]
 name = "top"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h", "-A", "--all-namespaces", "--containers", "--no-headers", "--use-protocol-buffers"]
+valued = ["-n", "--namespace", "-l", "--selector", "--field-selector", "--context", "--kubeconfig", "--sort-by"]
 
 [[command.sub]]
 name = "cp"

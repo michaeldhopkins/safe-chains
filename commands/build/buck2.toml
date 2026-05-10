@@ -47,7 +47,8 @@ standalone = ["--help", "--json", "-h"]
 
 [[command.sub]]
 name = "audit"
-candidate = true
+level = "SafeRead"
+allow_all = true
 
 [[command.sub]]
 name = "completion"

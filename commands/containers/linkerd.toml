@@ -66,7 +66,11 @@ candidate = true
 
 [[command.sub]]
 name = "diagnostics"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--linkerd-namespace", "-L", "--context", "--kubeconfig", "--api-addr"]
 
 [[command.sub]]
 name = "identity"
@@ -74,7 +78,11 @@ candidate = true
 
 [[command.sub]]
 name = "metrics"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["-n", "--namespace", "--linkerd-namespace", "-L", "--context", "--kubeconfig"]
 
 [[command.sub]]
 name = "endpoints"

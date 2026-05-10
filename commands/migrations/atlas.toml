@@ -65,11 +65,19 @@ candidate = true
 
 [[command.sub.sub]]
 name = "status"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h", "--format"]
+valued = ["--config", "--env", "--url", "-c", "-u", "--format", "--from", "--to", "--dev-url"]
 
 [[command.sub.sub]]
 name = "lint"
-candidate = true
+level = "SafeRead"
+bare = true
+positional_style = true
+standalone = ["--help", "-h"]
+valued = ["--config", "--env", "--dev-url", "--format", "--url", "-c", "-u"]
 
 [[command.sub.sub]]
 name = "push"

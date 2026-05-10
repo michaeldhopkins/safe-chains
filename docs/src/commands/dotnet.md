@@ -30,6 +30,7 @@
 - **list**: Flags: --deprecated, --help, --highest-minor, --highest-patch, --include-prerelease, --include-transitive, --outdated, --vulnerable, -h. Valued: --config, --format, --framework, --source, --verbosity, -v
 - **new**: Flags: --diagnostics, --dry-run, --force, --help, --list, --update-apply, --update-check, -d, -h, -l. Valued: --author, --columns, --columns-all, --language, --name, --no-update-check, --output, --project, --type, --verbosity, -lang, -n, -o
 - **nuget list**: Flags: --help, -h
+- **nuget verify**: Flags: --help, -h, --all, -v. Valued: --certificate-fingerprint, --configfile, --verbosity. Positional args accepted
 - **nuget**: Flags: --help, -h
 - **pack**: Flags: --force, --help, --include-source, --include-symbols, --no-build, --no-dependencies, --no-restore, --nologo, --serviceable, --tl, -h. Valued: --artifacts-path, --configuration, --output, --property, --runtime, --source, --verbosity, --version-suffix, -c, -o, -p, -r, -s, -v
 - **publish**: Flags: --disable-build-servers, --force, --help, --no-build, --no-dependencies, --no-restore, --nologo, --self-contained, --tl, --use-current-runtime, -h. Valued: --arch, --artifacts-path, --configuration, --framework, --manifest, --os, --output, --property, --runtime, --source, --verbosity, --version-suffix, -a, -c, -f, -o, -p, -r, -s, -v

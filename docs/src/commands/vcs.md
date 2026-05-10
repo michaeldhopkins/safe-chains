@@ -13,6 +13,7 @@
 - **help**: Positional args accepted
 - **info**: Flags: --comment-format, --help, --repository, --verbose, -R, -h, -v. Valued: --repository, -R. Positional args accepted
 - **ls**: Flags: --age, --help, --repository, --type, --verbose, -R, -h, -l, -r, -v. Valued: --repository, --type, -R, -r. Positional args accepted
+- **search**: Flags: --help, -h, --all, --checkin, --documentation, --forum, --ticket, --unindexed, --wiki. Valued: --limit, -n. Positional args accepted
 - **status**: Flags: --all, --changed, --differ, --dotfiles, --header, --help, --ifchanged, --limit, --repository, --verbose, -R, -a, -c, -d, -h, -v. Valued: --repository, -R
 - **tag find**: Flags: --help, -h. Valued: --repository, --type, -R
 - **tag list**: Flags: --all, --inverse, --help, --raw, --repository, -R, -a, -h, -i. Valued: --limit, --prefix, --repository, -R
@@ -212,6 +213,7 @@
 - **help**: Positional args accepted
 - **key list**: Flags: --help, -h
 - **log**: Flags: --description, --filter, --full-hashes, --hash-only, --help, --limit, --no-cache, --state, -h. Valued: --channel, --description, --filter, --limit, --repository
+- **ls**: Flags: --help, -h. Valued: --repo-path, --repository. Positional args accepted
 - **status**: Flags: --full-hashes, --help, --no-mtime, --short, -h. Valued: --channel, --repository. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V

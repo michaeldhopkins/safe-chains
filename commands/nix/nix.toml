@@ -309,7 +309,10 @@ candidate = true
 
 [[command.sub]]
 name = "log"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "edit"
@@ -341,11 +344,16 @@ candidate = true
 
 [[command.sub]]
 name = "describe-stores"
-candidate = true
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h", "--json"]
 
 [[command.sub]]
 name = "doctor-check"
-candidate = true
+level = "SafeRead"
+bare = false
+positional_style = true
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "upgrade-nix"

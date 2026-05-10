@@ -36,7 +36,9 @@ candidate = true
 
 [[command.sub]]
 name = "verify"
-candidate = true
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "online"
