@@ -23,12 +23,46 @@
 - **Fallback grammar (engaged when no sub matches):**
 - Allowed standalone flags: --help, --version, -V, -h
 
-### `glab`
-<p class="cmd-url"><a href="https://glab.readthedocs.io/en/latest/">https://glab.readthedocs.io/en/latest/</a></p>
+- **Handler-side flag policies:**
+- **browse**: Flags: --actions, --no-browser, --projects, --releases, --settings, --wiki, -a, -c, -n, -p, -r, -s, -w. Valued: --branch, --commit, --repo, -R, -b
+- **checks**: Flags: --fail-fast, --required, --watch, --web, -w. Valued: --interval, --jq, --json, --repo, --template, -R, -i, -q
+- **diff**: Flags: --name-only, --patch, --web, -w. Valued: --color, --repo, -R
+- **list**: Flags: --all, --archived, --comments, --draft, --fork, --no-archived, --source, --web, -a, -w. Valued: --app, --assignee, --author, --base, --env, --head, --jq, --json, --key, --label, --language, --limit, --mention, --milestone, --order, --org, --ref, --repo, --search, --sort, --state, --template, --topic, --user, --visibility, -B, -H, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
+- **release_download**: Flags: --clobber, --skip-existing. Valued: --archive, --dir, --output, --pattern, --repo, -A, -D, -O, -R, -p
+- **release_list**: Flags: --exclude-drafts, --exclude-pre-releases. Valued: --jq, --json, --limit, --order, --repo, --template, -L, -R, -q
+- **release_view**: Flags: --web, -w. Valued: --jq, --json, --repo, --template, -R, -q
+- **run_list**: Valued: --branch, --commit, --created, --event, --jq, --json, --limit, --repo, --status, --template, --user, --workflow, -L, -R, -b, -q, -u, -w
+- **run_rerun**: Flags: --debug, --failed. Valued: --job, --repo, -R, -j
+- **run_view**: Flags: --exit-status, --log, --log-failed, --verbose, --web, -v, -w. Valued: --attempt, --job, --jq, --json, --repo, --template, -R, -j, -q
+- **run_watch**: Flags: --exit-status. Valued: --interval, --repo, -R, -i
+- **search**: Flags: --archived, --draft, --include-forks, --locked, --merged, --no-assignee, --no-label, --no-milestone, --no-project, --web, -w. Valued: --app, --assignee, --author, --checks, --closed, --commenter, --comments, --committer, --created, --filename, --followers, --forks, --good-first-issues, --hash, --help-wanted-issues, --include, --interactions, --involves, --jq, --json, --label, --language, --license, --limit, --match, --mentions, --merged-at, --milestone, --number, --order, --owner, --parent, --project, --reactions, --repo, --review, --review-requested, --reviewed-by, --size, --sort, --stars, --state, --team-mentions, --team-review-requested, --template, --topic, --updated, --visibility, -L, -R, -q
+- **simple_list**: Flags: --all, --archived, --fork, --no-archived, --source, --web, -a, -w. Valued: --env, --jq, --json, --key, --language, --limit, --order, --org, --ref, --repo, --search, --sort, --template, --topic, --user, --visibility, -L, -O, -R, -S, -e, -k, -l, -o, -q, -r, -u
+- **simple_view**: Flags: --web, --yaml, -w, -y. Valued: --jq, --json, --ref, --repo, --template, -R, -q, -r
+- **status**: Flags: --exit-status, --log, --log-failed, --web, -w. Valued: --jq, --json, --repo, --template, -R, -q
+- **view**: Flags: --comments, --web, --yaml, -c, -w, -y. Valued: --branch, --jq, --json, --ref, --repo, --template, -R, -b, -q, -r
 
-- Subcommands ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable are allowed with actions: diff, issues, list, status, view.
-- Always safe: --version, -v, check-update, version.
-- auth status, api (GET only).
+- **Handler-side data:**
+- **read_only_actions**: checks, diff, list, status, verify, view, watch
+- **read_only_subs**: alias, attestation, cache, codespace, config, extension, gist, gpg-key, issue, label, org, pr, project, release, repo, ruleset, run, secret, ssh-key, variable, workflow
+
+### `glab`
+<p class="cmd-url"><a href="https://gitlab.com/gitlab-org/cli">https://gitlab.com/gitlab-org/cli</a></p>
+
+- Routing: handler dispatches the read-only sub × action matrix via the per-action [command.handler_policy.*] blocks below. Special-case subs: `auth status` (Inert), `--version` / `-v` / `version` / `check-update` as terminal forms (Inert), `api` (delegates to gh's API sub-handler — read-only methods, narrow header allowlist).
+
+- **Fallback grammar (engaged when no sub matches):**
+- Allowed standalone flags: --help, --version, -h, -v
+
+- **Handler-side flag policies:**
+- **diff**: Flags: --help, --raw, -h. Valued: --color, --repo, -R
+- **list**: Flags: --all, --closed, --draft, --help, --merged, -A, -M, -a, -c, -d, -g, -h, -q. Valued: --assignee, --author, --group, --label, --milestone, --not-label, --order, --output, --page, --per-page, --repo, --reviewer, --search, --sort, --source-branch, --state, --target-branch, -F, -P, -R, -S, -a, -g, -l, -m, -o, -p, -r, -s, -t
+- **simple**: Flags: --help, -h, -q. Valued: --output, --page, --per-page, --repo, -F, -P, -R, -p
+- **view**: Flags: --comments, --help, --resolved, --system-logs, --unresolved, --web, -c, -h, -p, -s, -w. Valued: --output, --page, --per-page, --repo, -F, -P, -R, -p
+
+- **Handler-side data:**
+- **always_safe_bare_subs**: check-update, version
+- **read_only_actions**: diff, issues, list, status, view
+- **read_only_subs**: ci, cluster, deploy-key, gpg-key, incident, issue, iteration, label, milestone, mr, release, repo, schedule, snippet, ssh-key, stack, variable
 
 ### `jjpr`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/jjpr">https://github.com/michaeldhopkins/jjpr</a></p>
