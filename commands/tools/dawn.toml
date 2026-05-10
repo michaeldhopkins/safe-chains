@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 name = "scan"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--count", "--debug", "--dependencies",
     "--exit-on-warn", "--gemfile",

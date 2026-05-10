@@ -5,6 +5,6 @@ url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdffonts.1.html"
 researched_version = "Poppler 24.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["-help", "-q", "-subst", "-v", "--help", "-?"]
 valued = ["-f", "-l", "-opw", "-upw"]

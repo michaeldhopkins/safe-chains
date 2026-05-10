@@ -7,7 +7,7 @@ bare_flags = ["--help", "--version", "-h"]
 [[command.sub]]
 name = "test"
 level = "SafeRead"
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--all-projects", "--all-sub-projects", "--detection-depth",
     "--dev", "--fail-on", "--help", "--json", "--print-deps",
@@ -29,7 +29,7 @@ name = "code"
 [[command.sub.sub]]
 name = "test"
 level = "SafeRead"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "--sarif", "--severity-threshold", "-h"]
 valued = ["--org"]
 
@@ -38,7 +38,7 @@ name = "iac"
 [[command.sub.sub]]
 name = "test"
 level = "SafeRead"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "--sarif", "--scan", "--severity-threshold", "-h"]
 valued = ["--detection-depth", "--org", "--rules", "--target-name"]
 
@@ -48,7 +48,7 @@ name = "container"
 name = "test"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "--severity-threshold", "-h"]
 valued = ["--exclude-base-image-vulns", "--file", "--org", "--platform"]
 

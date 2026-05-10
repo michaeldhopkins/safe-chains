@@ -28,7 +28,7 @@ valued = ["--filter", "--format", "--last", "-f"]
 name = "inspect"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--mode", "--size", "-h", "-s"]
 valued = ["--format", "--mode", "--type", "-f"]
 
@@ -36,7 +36,7 @@ valued = ["--format", "--mode", "--type", "-f"]
 name = "logs"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--details", "--follow", "--help", "--timestamps", "-f", "-h", "-t"]
 valued = ["--since", "--tail", "--until", "-n"]
 
@@ -44,14 +44,14 @@ valued = ["--since", "--tail", "--until", "-n"]
 name = "top"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "stats"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--help", "--no-stream", "--no-trunc", "-a", "-h"]
 valued = ["--format"]
 
@@ -59,14 +59,14 @@ valued = ["--format"]
 name = "port"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "images"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--digests", "--help", "--names", "--no-trunc", "--quiet", "-a", "-h", "-q"]
 valued = ["--filter", "--format", "-f"]
 
@@ -205,7 +205,7 @@ candidate = true
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

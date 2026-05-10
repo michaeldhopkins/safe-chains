@@ -19,14 +19,14 @@ standalone = ["--help", "-h"]
 name = "fingerprint"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "list"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--organizationid", "--pretty", "--quiet", "--raw", "--response", "--session", "--trash", "-h"]
 valued = ["--collectionid", "--folderid", "--nointeraction", "--organizationid", "--search", "--session", "--url"]
 
@@ -34,7 +34,7 @@ valued = ["--collectionid", "--folderid", "--nointeraction", "--organizationid",
 name = "get"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--pretty", "--raw", "--response", "-h"]
 valued = ["--itemid", "--organizationid", "--output", "--session"]
 write_flags = ["--output"]
@@ -43,7 +43,7 @@ write_flags = ["--output"]
 name = "template"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--pretty", "-h"]
 
 [[command.sub]]
@@ -56,7 +56,7 @@ standalone = ["--help", "-h"]
 name = "pending"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

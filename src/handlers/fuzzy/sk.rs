@@ -1,5 +1,5 @@
 use crate::parse::{Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{self, FlagPolicy, FlagTolerance};
 use crate::verdict::{SafetyLevel, Verdict};
 
 static SK_POLICY: FlagPolicy = FlagPolicy {
@@ -24,8 +24,7 @@ static SK_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: true,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static HISTORY_FLAGS: WordSet = WordSet::flags(&["--history"]);

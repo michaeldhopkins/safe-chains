@@ -16,7 +16,7 @@ valued = ["--format", "--scenario-name", "-s"]
 name = "matrix"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--scenario-name", "-s"]
 
@@ -31,7 +31,7 @@ valued = ["--format"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

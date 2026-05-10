@@ -5,7 +5,7 @@ url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfimages.1.html"
 researched_version = "Poppler 24.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "-all", "-ccitt", "-help", "-j", "-jp2",
     "-jbig2", "-list", "-png", "-print-filenames",

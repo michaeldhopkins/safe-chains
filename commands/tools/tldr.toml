@@ -4,6 +4,6 @@ description = "Community-driven command-line cheat sheet client that displays si
 url = "https://tldr.sh/"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--list", "--version", "-h", "-l", "-v"]
 valued = ["--language", "--platform", "-L", "-p"]

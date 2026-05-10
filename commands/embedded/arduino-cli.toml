@@ -144,7 +144,7 @@ candidate = true
 name = "compile"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--clean", "--export-binaries", "--help", "--only-compilation-database", "--quiet", "--show-properties", "--verbose", "--warnings", "-h", "-q", "-v"]
 valued = ["--build-cache-path", "--build-path", "--build-property", "--config-file", "--encrypt-key", "--export-dir", "--fqbn", "--input-dir", "--input-file", "--keys-keychain", "--libraries", "--library", "--log-file", "--log-level", "--no-color", "--optimize-for-debug", "--port", "--profile", "--programmer", "--protocol", "--show-properties", "--sign-key", "--vid-pid", "--warnings", "--upload"]
 
@@ -152,7 +152,7 @@ valued = ["--build-cache-path", "--build-path", "--build-property", "--config-fi
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

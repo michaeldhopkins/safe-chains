@@ -5,5 +5,5 @@ url = "https://ghostscript.readthedocs.io/en/latest/Use.html"
 researched_version = "Ghostscript 10.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-h", "-?"]

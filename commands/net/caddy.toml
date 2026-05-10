@@ -20,7 +20,7 @@ valued = ["--adapter", "--config"]
 name = "fmt"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--diff", "--help", "--overwrite", "-h", "-o"]
 
 [[command.sub]]
@@ -66,7 +66,7 @@ valued = ["--directory"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

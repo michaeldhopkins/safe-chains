@@ -1,6 +1,16 @@
 [[command]]
 name = "mc"
 description = "MinIO Client — S3-compatible CLI. Subcommands contact the configured S3 endpoint (network). Read-side: `ls`, `find`, `stat`, `du`, `cat`, `head`, `tree`, `version`, `alias list`, `config host list`. Write-side: `cp`, `mv`, `rm`, `mb`, `rb`, `mirror`, `sync`, `pipe`, `tag set/remove`, `replicate`, `share`, `event add/remove`, `policy set/unset`, `admin`, `ilm`, `legalhold`, `retention`, `lock`."
+examples_safe = [
+    "mc ls bucket",
+    "mc find bucket --name foo",
+    "mc version",
+]
+examples_denied = [
+    "mc find bucket --exec rm",
+    "mc cp src dst",
+    "mc rm bucket/file",
+]
 url = "https://min.io/docs/minio/linux/reference/minio-mc.html"
 researched_version = "mc 2025.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
@@ -17,22 +27,21 @@ standalone = ["--help", "-h"]
 name = "ls"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--incomplete", "--metadata", "--no-color", "--recursive", "--rewind", "--summarize", "--versions", "-I", "-h", "-r", "-S"]
 
 [[command.sub]]
 name = "find"
 level = "SafeRead"
 bare = false
-positional_style = true
 standalone = ["--help", "--ignore", "--metadata", "--name", "--newer-than", "--older-than", "--path", "--print", "--recursive", "--regex", "--rewind", "--versions", "--watch", "-h", "-r"]
-valued = ["--exec", "--maxdepth", "--mindepth", "--name", "--newer-than", "--older-than", "--path", "--print", "--regex"]
+valued = ["--maxdepth", "--mindepth", "--name", "--newer-than", "--older-than", "--path", "--print", "--regex"]
 
 [[command.sub]]
 name = "stat"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--encrypt-key", "--help", "--no-list", "--recursive", "--rewind", "--versions", "-h", "-r"]
 valued = ["--encrypt-key", "--rewind", "--version-id"]
 
@@ -40,7 +49,7 @@ valued = ["--encrypt-key", "--rewind", "--version-id"]
 name = "du"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--depth", "--help", "--recursive", "--rewind", "--versions", "-d", "-h", "-r"]
 valued = ["--depth", "--rewind"]
 
@@ -48,7 +57,7 @@ valued = ["--depth", "--rewind"]
 name = "cat"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--encrypt-key", "--help", "--rewind", "-h"]
 valued = ["--encrypt-key", "--rewind", "--version-id"]
 
@@ -56,7 +65,7 @@ valued = ["--encrypt-key", "--rewind", "--version-id"]
 name = "head"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--encrypt-key", "--help", "--rewind", "-h"]
 valued = ["--encrypt-key", "-n", "--lines", "--rewind", "--version-id"]
 
@@ -64,7 +73,7 @@ valued = ["--encrypt-key", "-n", "--lines", "--rewind", "--version-id"]
 name = "tree"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--depth", "--files", "--help", "--no-color", "-d", "-f", "-h"]
 valued = ["--depth"]
 
@@ -96,7 +105,7 @@ candidate = true
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

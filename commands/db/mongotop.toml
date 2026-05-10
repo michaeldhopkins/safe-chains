@@ -5,7 +5,7 @@ url = "https://www.mongodb.com/docs/database-tools/mongotop/"
 researched_version = "MongoDB Database Tools 100.x"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--authenticationDatabase",
     "--authenticationMechanism", "--help",

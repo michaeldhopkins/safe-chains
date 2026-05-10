@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::policy::FlagStyle;
+use crate::policy::{FlagTolerance, UnknownTolerance};
 use crate::verdict::SafetyLevel;
 
 use super::types::*;
@@ -10,20 +10,28 @@ pub(super) fn build_policy(
     valued: Vec<String>,
     bare: Option<bool>,
     max_positional: Option<usize>,
-    positional_style: Option<bool>,
+    tolerate_unknown_short: Option<bool>,
+    tolerate_unknown_long: Option<bool>,
     numeric_dash: Option<bool>,
 ) -> OwnedPolicy {
+    let unknown = match (
+        tolerate_unknown_short.unwrap_or(false),
+        tolerate_unknown_long.unwrap_or(false),
+    ) {
+        (false, false) => UnknownTolerance::Strict,
+        (true, false) => UnknownTolerance::Short,
+        (false, true) => UnknownTolerance::Long,
+        (true, true) => UnknownTolerance::Both,
+    };
     OwnedPolicy {
         standalone,
         valued,
         bare: bare.unwrap_or(true),
         max_positional,
-        flag_style: if positional_style.unwrap_or(false) {
-            FlagStyle::Positional
-        } else {
-            FlagStyle::Strict
+        tolerance: FlagTolerance {
+            unknown,
+            numeric_dash: numeric_dash.unwrap_or(false),
         },
-        numeric_dash: numeric_dash.unwrap_or(false),
     }
 }
 
@@ -33,8 +41,21 @@ fn allow_all_policy() -> OwnedPolicy {
         valued: Vec::new(),
         bare: true,
         max_positional: None,
-        flag_style: FlagStyle::Positional,
-        numeric_dash: false,
+        tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false },
+    }
+}
+
+fn check_no_legacy_positional_style(name: &str, ps: Option<bool>) {
+    if ps.is_some() {
+        panic!(
+            "command '{name}': `positional_style` was removed. Use \
+             `tolerate_unknown_short = true` for tools with single-dash \
+             flags (pdftotext -help, sample -mayDie). Use \
+             `tolerate_unknown_long = true` ONLY for tools whose \
+             double-dash flag surface is genuinely unbounded (AWS CLI \
+             style); double-dash unknowns silently pass when this is \
+             on, which has caused safety bugs. Most tools need neither."
+        );
     }
 }
 
@@ -60,115 +81,83 @@ pub(super) fn build_subs(toml: TomlSub) -> Vec<SubSpec> {
 }
 
 pub(super) fn build_sub(toml: TomlSub) -> SubSpec {
+    check_no_legacy_positional_style(&toml.name, toml.positional_style);
+    let name = toml.name.clone();
+    SubSpec { name, kind: build_sub_kind(toml) }
+}
+
+fn build_sub_kind(toml: TomlSub) -> DispatchKind {
     if let Some(handler_name) = toml.handler {
-        return SubSpec {
-            name: toml.name,
-            kind: DispatchKind::Custom { handler_name, doc_body: toml.doc_body },
-        };
+        return DispatchKind::Custom { handler_name, doc_body: toml.doc_body };
     }
-
     if toml.allow_all.unwrap_or(false) {
-        return SubSpec {
-            name: toml.name,
-            kind: DispatchKind::Policy {
-                policy: allow_all_policy(),
-                level: toml.level.unwrap_or(TomlLevel::Inert).into(),
-            },
+        return DispatchKind::Policy {
+            policy: allow_all_policy(),
+            level: toml.level.unwrap_or(TomlLevel::Inert).into(),
         };
     }
-
     if let Some(sep) = toml.delegate_after {
-        return SubSpec {
-            name: toml.name,
-            kind: DispatchKind::DelegateAfterSeparator { separator: sep },
-        };
+        return DispatchKind::DelegateAfterSeparator { separator: sep };
     }
-
     if let Some(skip) = toml.delegate_skip {
-        return SubSpec {
-            name: toml.name,
-            kind: DispatchKind::DelegateSkip { skip },
-        };
+        return DispatchKind::DelegateSkip { skip };
     }
-
     if !toml.sub.is_empty() {
-        return SubSpec {
-            name: toml.name,
-            kind: DispatchKind::Branching {
-                subs: filter_candidates(toml.sub).flat_map(build_subs).collect(),
-                bare_flags: Vec::new(),
-                bare_ok: toml.nested_bare.unwrap_or(false),
-                pre_standalone: toml.standalone,
-                pre_valued: toml.valued,
-                first_arg: Vec::new(),
-                first_arg_level: SafetyLevel::Inert,
-            },
+        return DispatchKind::Branching {
+            subs: filter_candidates(toml.sub).flat_map(build_subs).collect(),
+            bare_flags: Vec::new(),
+            bare_ok: toml.nested_bare.unwrap_or(false),
+            pre_standalone: toml.standalone,
+            pre_valued: toml.valued,
+            first_arg: Vec::new(),
+            first_arg_level: SafetyLevel::Inert,
         };
     }
+    build_policy_sub_kind(toml)
+}
 
+fn build_policy_sub_kind(toml: TomlSub) -> DispatchKind {
     let policy = build_policy(
         toml.standalone,
         toml.valued,
         toml.bare,
         toml.max_positional,
-        toml.positional_style,
+        toml.tolerate_unknown_short,
+        toml.tolerate_unknown_long,
         toml.numeric_dash,
     );
     let level: SafetyLevel = toml.level.unwrap_or(TomlLevel::Inert).into();
-
     if !toml.write_flags.is_empty() {
-        return SubSpec {
-            name: toml.name,
-            kind: DispatchKind::WriteFlagged {
-                policy,
-                base_level: level,
-                write_flags: toml.write_flags,
-            },
+        return DispatchKind::WriteFlagged {
+            policy,
+            base_level: level,
+            write_flags: toml.write_flags,
         };
     }
-
     if let Some(guard) = toml.guard {
         let mut require_any = vec![guard];
         if let Some(short) = toml.guard_short {
             require_any.push(short);
         }
-        return SubSpec {
-            name: toml.name,
-            kind: DispatchKind::RequireAny {
-                require_any,
-                policy,
-                level,
-                accept_bare_help: true,
-            },
+        return DispatchKind::RequireAny {
+            require_any,
+            policy,
+            level,
+            accept_bare_help: true,
         };
     }
-
     if !toml.first_arg.is_empty() {
-        return SubSpec {
-            name: toml.name,
-            kind: DispatchKind::FirstArg {
-                patterns: toml.first_arg,
-                level,
-            },
-        };
+        return DispatchKind::FirstArg { patterns: toml.first_arg, level };
     }
-
     if !toml.require_any.is_empty() {
-        return SubSpec {
-            name: toml.name,
-            kind: DispatchKind::RequireAny {
-                require_any: toml.require_any,
-                policy,
-                level,
-                accept_bare_help: false,
-            },
+        return DispatchKind::RequireAny {
+            require_any: toml.require_any,
+            policy,
+            level,
+            accept_bare_help: false,
         };
     }
-
-    SubSpec {
-        name: toml.name,
-        kind: DispatchKind::Policy { policy, level },
-    }
+    DispatchKind::Policy { policy, level }
 }
 
 /// Diagnostic for a configuration class that silently breaks flag dispatch:
@@ -192,8 +181,11 @@ fn assert_flat_or_structured(toml: &TomlCommand) {
     if toml.max_positional.is_some() {
         conflicts.push("max_positional");
     }
-    if toml.positional_style.is_some() {
-        conflicts.push("positional_style");
+    if toml.tolerate_unknown_short.is_some() {
+        conflicts.push("tolerate_unknown_short");
+    }
+    if toml.tolerate_unknown_long.is_some() {
+        conflicts.push("tolerate_unknown_long");
     }
     if toml.numeric_dash.is_some() {
         conflicts.push("numeric_dash");
@@ -213,6 +205,7 @@ fn assert_flat_or_structured(toml: &TomlCommand) {
 #[allow(clippy::too_many_lines)]
 pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     assert_flat_or_structured(&toml);
+    check_no_legacy_positional_style(&toml.name, toml.positional_style);
     let cat = category.to_string();
     let desc = toml.description.unwrap_or_default();
     let researched_version = toml.researched_version;
@@ -234,8 +227,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                     valued: Vec::new(),
                     bare: false,
                     max_positional: Some(0),
-                    flag_style: crate::policy::FlagStyle::Strict,
-                    numeric_dash: false,
+                    tolerance: FlagTolerance::default(),
                 },
                 level: SafetyLevel::Inert,
             },
@@ -325,7 +317,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         toml.valued,
         toml.bare,
         toml.max_positional,
-        toml.positional_style,
+        toml.tolerate_unknown_short,
+        toml.tolerate_unknown_long,
         toml.numeric_dash,
     );
 

@@ -9,339 +9,407 @@ valued = ["--output", "--query", "--subscription", "-o"]
 
 [[command.sub]]
 name = "version"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "account"
 first_arg = ["list", "show", "list-locations"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "group"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "vm"
 first_arg = ["list", "show", "list-sizes", "list-ip-addresses"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "network"
 [[command.sub.sub]]
 name = "vnet"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "nsg"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "public-ip"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "nic"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "aks"
 first_arg = ["list", "show", "get-credentials"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "webapp"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "functionapp"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "storage"
 [[command.sub.sub]]
 name = "account"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "sql"
 [[command.sub.sub]]
 name = "server"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "db"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "ad"
 [[command.sub.sub]]
 name = "user"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "group"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "app"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "sp"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "resource"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "monitor"
 [[command.sub.sub]]
 name = "metrics"
 first_arg = ["list"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "log-analytics"
 first_arg = ["query"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "keyvault"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "acr"
 [[command.sub.sub]]
 name = "list"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "show"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "repository"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "cosmosdb"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "appservice"
 first_arg = ["list-locations", "plan"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "batch"
 first_arg = ["account", "application", "certificate", "job", "node", "pool", "task"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "cdn"
 first_arg = ["custom-domain", "edge-node", "endpoint", "name-exists", "origin", "profile", "waf-policy"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "cognitiveservices"
 first_arg = ["account", "list", "usage"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "container"
 first_arg = ["list", "logs", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "containerapp"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "disk"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "dns"
 first_arg = ["record-set", "zone"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "eventhubs"
 first_arg = ["eventhub", "namespace"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "hdinsight"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "identity"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "iot"
 first_arg = ["central", "dps", "hub"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "logicapp"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "managed-cassandra"
 first_arg = ["cluster", "datacenter"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "maps"
 first_arg = ["account"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "mariadb"
 first_arg = ["db", "server"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "mysql"
 first_arg = ["db", "flexible-server", "server"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "netappfiles"
 first_arg = ["account", "pool", "snapshot", "volume"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "notification-hub"
 first_arg = ["authorization-rule", "credential", "list", "namespace"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "postgres"
 first_arg = ["db", "flexible-server", "server"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "redis"
 first_arg = ["list", "list-keys", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "relay"
 first_arg = ["hyco", "namespace", "wcfrelay"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "search"
 first_arg = ["admin-key", "query-key", "service"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "servicebus"
 first_arg = ["namespace", "queue", "topic"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "sf"
 first_arg = ["application", "cluster", "managed-application-type", "managed-cluster", "service"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "sig"
 first_arg = ["image-definition", "image-version", "list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "signalr"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "spring"
 first_arg = ["app", "certificate", "config-server", "eureka-server", "service-registry"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "staticwebapp"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "synapse"
 first_arg = ["spark", "sql", "workspace"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "tag"
 first_arg = ["list"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "ts"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "vmss"
 first_arg = ["list", "list-instances", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "security"
 first_arg = ["alert", "assessment", "contact", "pricing", "secure-score", "setting", "task"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "policy"
 first_arg = ["assignment", "definition", "set-definition", "state"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "role"
 first_arg = ["assignment", "definition"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "lock"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "feature"
 first_arg = ["list", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "provider"
 first_arg = ["list", "operation", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "deployment"
 first_arg = ["list", "operation", "show"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "advisor"
 first_arg = ["configuration", "recommendation"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 
 [[command.sub]]
 name = "consumption"
 first_arg = ["budget", "marketplace", "pricesheet", "reservation", "usage"]
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true

@@ -20,7 +20,7 @@ valued = ["--format", "-f"]
 name = "manifest"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--freeze", "--help", "--path", "--resolve", "--validate", "-h"]
 valued = ["--out", "-o"]
 
@@ -34,28 +34,28 @@ standalone = ["--help", "-h"]
 name = "status"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "diff"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "--stat", "-h", "-q", "-s"]
 
 [[command.sub]]
 name = "compare"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--help", "--exit-code", "-a", "-h"]
 
 [[command.sub]]
 name = "config"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--delete", "--global", "--help", "--list", "--local", "--system", "-D", "-d", "-h", "-l"]
 
 [[command.sub]]

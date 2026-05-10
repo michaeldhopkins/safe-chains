@@ -1,5 +1,5 @@
 use crate::parse::{Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{self, FlagPolicy, FlagTolerance};
 use crate::verdict::{SafetyLevel, Verdict};
 
 static FZF_STANDALONE: WordSet = WordSet::flags(&[
@@ -42,8 +42,7 @@ static FZF_POLICY: FlagPolicy = FlagPolicy {
     valued: FZF_VALUED,
     bare: true,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 fn bind_value_is_safe(val: &str) -> bool {

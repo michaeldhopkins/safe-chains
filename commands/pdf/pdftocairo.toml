@@ -5,7 +5,7 @@ url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftocairo.1.html"
 researched_version = "Poppler 24.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "-antialias", "-cropbox", "-duplex",
     "-eps", "-expand", "-gray", "-help",

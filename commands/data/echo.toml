@@ -4,5 +4,6 @@ description = "Prints arguments to stdout. Completely inert — no flags cause s
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 standalone = ["-E", "-e", "-n"]

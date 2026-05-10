@@ -4,4 +4,5 @@ description = "Command safety checker that validates bash commands against an al
 url = "https://github.com/michaeldhopkins/safe-chains#readme"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true

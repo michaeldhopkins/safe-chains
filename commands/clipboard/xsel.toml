@@ -5,7 +5,7 @@ url = "https://github.com/kfish/xsel"
 researched_version = "xsel 1.x"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--append", "--clear", "--clipboard",
     "--delete", "--display", "--exchange",

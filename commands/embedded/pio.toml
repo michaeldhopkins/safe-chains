@@ -10,7 +10,7 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 name = "boards"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--installed", "--json-output", "-h", "-i"]
 
 [[command.sub]]
@@ -96,7 +96,7 @@ candidate = true
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -119,7 +119,7 @@ candidate = true
 name = "check"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--silent", "-s", "--verbose", "-v", "--json-output"]
 valued = ["-d", "--project-dir", "-c", "--project-conf", "-e", "--environment", "--severity", "--skip-packages", "--pattern"]
 

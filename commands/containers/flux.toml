@@ -37,7 +37,7 @@ candidate = true
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -48,7 +48,7 @@ allow_all = true
 name = "get"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-A", "--all-namespaces", "--watch-errors", "--no-header"]
 valued = ["-n", "--namespace", "--context", "--kubeconfig", "--label-selector", "--status-selector", "--timeout"]
 
@@ -60,7 +60,7 @@ candidate = true
 name = "logs"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-A", "--all-namespaces", "-f", "--follow"]
 valued = ["-n", "--namespace", "--context", "--kubeconfig", "--level", "--kind", "--name", "--since", "--tail"]
 
@@ -68,7 +68,7 @@ valued = ["-n", "--namespace", "--context", "--kubeconfig", "--level", "--kind",
 name = "stats"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-A", "--all-namespaces"]
 valued = ["-n", "--namespace", "--context", "--kubeconfig"]
 
@@ -76,7 +76,7 @@ valued = ["-n", "--namespace", "--context", "--kubeconfig"]
 name = "trace"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["-n", "--namespace", "--api-version", "--kind", "--context", "--kubeconfig"]
 
@@ -84,7 +84,7 @@ valued = ["-n", "--namespace", "--api-version", "--kind", "--context", "--kubeco
 name = "tree"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--compact"]
 valued = ["-n", "--namespace", "--context", "--kubeconfig"]
 

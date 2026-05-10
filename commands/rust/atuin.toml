@@ -22,7 +22,7 @@ examples_denied = [
 name = "init"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--disable-ctrl-r", "--disable-up-arrow", "--help", "-h"]
 
 [[command.sub]]
@@ -35,7 +35,7 @@ standalone = ["--help", "-h"]
 name = "stats"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--count", "--ngram"]
 
@@ -43,7 +43,7 @@ valued = ["--count", "--ngram"]
 name = "search"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--cmd-only", "--exit", "--exit",
     "--filter-mode", "--help",

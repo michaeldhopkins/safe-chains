@@ -21,7 +21,7 @@ valued = ["--format", "--hash", "--output", "--profile", "-o", "-p"]
 name = "ps"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--dry-run", "--help", "--no-trunc", "--quiet", "--services", "-a", "-h", "-q"]
 valued = ["--filter", "--format", "--status"]
 
@@ -29,7 +29,7 @@ valued = ["--filter", "--format", "--status"]
 name = "logs"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--follow", "--help", "--no-color", "--no-log-prefix", "--timestamps", "-f", "-h", "-t"]
 valued = ["--since", "--tail", "--until"]
 
@@ -37,14 +37,14 @@ valued = ["--since", "--tail", "--until"]
 name = "top"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "images"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 valued = ["--format"]
 
@@ -52,7 +52,7 @@ valued = ["--format"]
 name = "port"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--index", "--protocol"]
 
@@ -60,14 +60,14 @@ valued = ["--index", "--protocol"]
 name = "events"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "-h"]
 
 [[command.sub]]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

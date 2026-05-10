@@ -5,7 +5,7 @@ url = "https://create-react-app.dev/docs/getting-started"
 researched_version = "create-react-app 5.x; deprecated"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "--info",
     "--scripts-version", "--use-pnp", "--use-npm",

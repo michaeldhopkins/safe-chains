@@ -5,7 +5,7 @@ url = "https://www.gnu.org/software/wget/"
 researched_version = "GNU Wget 1.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--ask-password", "--auth-no-challenge",
     "--background", "--backup-converted",

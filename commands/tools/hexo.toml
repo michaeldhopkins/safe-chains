@@ -24,21 +24,21 @@ standalone = ["--help", "-h"]
 name = "config"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "list"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "init"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--clone", "--debug", "--draft", "--drafts", "--help", "--no-clone", "--silent", "--verbose", "-h"]
 
 [[command.sub]]
@@ -66,7 +66,7 @@ standalone = ["--help", "-h"]
 name = "new"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--draft", "--drafts", "--help", "--replace", "--slug", "-h", "-r", "-s"]
 valued = ["--path", "-p"]
 
@@ -90,7 +90,7 @@ candidate = true
 name = "render"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["-o", "--output", "-e", "--engine"]
 write_flags = ["-o", "--output"]

@@ -5,7 +5,7 @@ url = "https://github.com/WebAssembly/wabt"
 researched_version = "WABT 1.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--debug-names", "--debug-parser",
     "--disable-bulk-memory", "--disable-exceptions",

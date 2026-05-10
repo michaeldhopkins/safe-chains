@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 name = "show"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--config", "--list", "-l"]
 
@@ -17,14 +17,14 @@ valued = ["--config", "--list", "-l"]
 name = "info"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "lua"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -87,7 +87,7 @@ candidate = true
 name = "lint"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-q", "--quiet", "-v", "--verbose", "-D", "--diagnosis"]
 
 [[command.sub]]

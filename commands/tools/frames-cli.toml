@@ -4,7 +4,7 @@ description = "Frames device screenshots with official Apple product bezels, aut
 url = "https://github.com/viticci/frames-cli"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "--version", "-h", "-V",
     "--json",

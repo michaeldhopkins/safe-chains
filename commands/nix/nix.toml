@@ -19,7 +19,7 @@ standalone = ["--help", "-h"]
 name = "eval"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--apply", "--debug", "--debugger", "--expr", "--file", "--help", "--ignore-try", "--impure", "--json", "--no-net", "--print-build-logs", "--quiet", "--raw", "--read-only", "--refresh", "--store", "--strict", "--write-lock-file", "-L", "-f", "-h", "--help", "-q"]
 valued = ["--arg", "--argstr", "--expr", "--file", "--include", "--option", "--store", "-I", "-f"]
 
@@ -27,7 +27,7 @@ valued = ["--arg", "--argstr", "--expr", "--file", "--include", "--option", "--s
 name = "search"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--exclude", "--help", "--inputs-from", "--json", "--no-update-lock-file", "--no-write-lock-file", "--print-build-logs", "--quiet", "--refresh", "-L", "-h", "-q"]
 valued = ["--exclude", "--inputs-from", "--option", "--override-flake", "--override-input", "--store", "-e"]
 
@@ -35,7 +35,7 @@ valued = ["--exclude", "--inputs-from", "--option", "--override-flake", "--overr
 name = "show-derivation"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "--json", "--no-net", "--quiet", "--recursive", "-h", "-q", "-r"]
 
 [[command.sub]]
@@ -51,7 +51,7 @@ valued = ["--store"]
 name = "path-info"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--closure-size", "--debug", "--help", "--human-readable", "--json", "--quiet", "--recursive", "--sigs", "--size", "-S", "-c", "-h", "-q", "-r", "-s"]
 valued = ["--store", "--from"]
 
@@ -59,7 +59,7 @@ valued = ["--store", "--from"]
 name = "why-depends"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--help", "--precise", "-a", "-h"]
 valued = ["--derivation", "--store"]
 
@@ -268,7 +268,7 @@ standalone = ["--help", "-h"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -311,7 +311,7 @@ candidate = true
 name = "log"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -352,7 +352,7 @@ standalone = ["--help", "-h", "--json"]
 name = "doctor-check"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

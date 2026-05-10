@@ -5,7 +5,7 @@ url = "https://github.com/fullstorydev/grpcurl"
 researched_version = "grpcurl 1.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "-H", "-allow-unknown-fields", "-authority",
     "-cacert", "-cert", "-connect-timeout",

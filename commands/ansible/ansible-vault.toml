@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 name = "view"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "-h", "--vault-password-file"]
 valued = ["--vault-id", "--vault-password-file", "--ask-vault-pass-file"]
 
@@ -17,7 +17,7 @@ valued = ["--vault-id", "--vault-password-file", "--ask-vault-pass-file"]
 name = "decrypt"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "-h"]
 valued = ["--output", "--vault-id", "--vault-password-file"]
 
@@ -25,7 +25,7 @@ valued = ["--output", "--vault-id", "--vault-password-file"]
 name = "encrypt"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--ask-vault-pass", "--ask-vault-password", "--encrypt-vault-id", "--help", "-h"]
 valued = ["--encrypt-vault-id", "--output", "--vault-id", "--vault-password-file"]
 

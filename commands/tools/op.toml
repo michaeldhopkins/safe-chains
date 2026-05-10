@@ -115,7 +115,7 @@ standalone = ["--help", "-h"]
 name = "read"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--force", "--help", "--no-newline", "-h", "-n"]
 valued = ["--account", "--out-file"]
 write_flags = ["--out-file"]
@@ -139,7 +139,7 @@ allow_all = true
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

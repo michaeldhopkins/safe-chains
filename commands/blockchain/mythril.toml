@@ -6,7 +6,7 @@ url = "https://mythril-classic.readthedocs.io/en/master/"
 researched_version = "mythril 0.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--debug", "--help", "--no-color",
     "--quick", "--strategy", "--verbose",

@@ -4,5 +4,6 @@ description = "Evaluates conditional expressions (file tests, string comparisons
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#test-invocation"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 aliases = ["["]

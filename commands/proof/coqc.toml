@@ -5,7 +5,7 @@ url = "https://coq.inria.fr/refman/practical-tools/coq-commands.html"
 researched_version = "Coq 8.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "--version", "-Q", "-R",
     "-async-proofs-cache", "-async-proofs-cache-evict",

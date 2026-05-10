@@ -9,7 +9,7 @@ bare_flags = ["--help", "-h"]
 name = "print"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "--no-prefix-comments", "--skip-generated", "--skip-vendor", "-h"]
 valued = ["--custom-order", "--section", "-s"]
 
@@ -17,7 +17,7 @@ valued = ["--custom-order", "--section", "-s"]
 name = "diff"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "--no-prefix-comments", "--skip-generated", "--skip-vendor", "-h"]
 valued = ["--custom-order", "--section", "-s"]
 
@@ -25,7 +25,7 @@ valued = ["--custom-order", "--section", "-s"]
 name = "list"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "--skip-generated", "--skip-vendor", "-h"]
 valued = ["--section", "-s"]
 
@@ -33,7 +33,7 @@ valued = ["--section", "-s"]
 name = "write"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "--no-prefix-comments", "--skip-generated", "--skip-vendor", "-h"]
 valued = ["--custom-order", "--section", "-s"]
 

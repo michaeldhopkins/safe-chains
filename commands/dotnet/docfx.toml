@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 name = "metadata"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--disableDefaultFilter", "--disableGitFeatures", "--force", "--help", "--namespaceLayout", "--shouldSkipMarkup", "-?", "-h"]
 valued = ["--filter", "--globalNamespaceId", "--logLevel", "--logFile", "--memberLayout", "--namespaceLayout", "--outputFormat", "--output", "--property", "--repositoryRoot", "-l", "-o", "-p"]
 
@@ -17,7 +17,7 @@ valued = ["--filter", "--globalNamespaceId", "--logLevel", "--logFile", "--membe
 name = "build"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--changesFile", "--cleanupCacheHistory", "--debug", "--disableGitFeatures", "--dryRun", "--exportRawModel", "--exportViewModel", "--force", "--forcePostProcess", "--help", "--keepFileLink", "--lruSize", "--maxParallelism", "--noLangKeyword", "--postProcessors", "--rawModelOutputFolder", "--serve", "--templateFolder", "--viewModelOutputFolder", "-?", "-f", "-h"]
 valued = ["--changesFile", "--exportRawModel", "--exportViewModel", "--globalMetadata", "--globalMetadataFiles", "--fileMetadata", "--fileMetadataFiles", "--logLevel", "--logFile", "--lruSize", "--markdownEngineName", "--markdownEngineProperties", "--maxParallelism", "--output", "--postProcessors", "--templateFolder", "--theme", "-l", "-o", "-t"]
 

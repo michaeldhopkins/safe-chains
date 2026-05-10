@@ -23,7 +23,7 @@ valued = ["--branches", "--functions", "--lines", "--statements"]
 name = "instrument"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--complete-copy", "--delete", "--help", "--in-place", "-h"]
 valued = ["--exclude", "--include", "--require", "--source-map"]
 
@@ -31,7 +31,7 @@ valued = ["--exclude", "--include", "--require", "--source-map"]
 name = "merge"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

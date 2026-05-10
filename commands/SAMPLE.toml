@@ -11,8 +11,21 @@
 # FIELD DEFAULTS (omit when the default is what you want):
 #   level       = "Inert"    (alternatives: "SafeRead", "SafeWrite")
 #   bare        = true       (command can run with no arguments)
-#   positional_style = false (unknown flags are rejected; if true, they're
-#                             treated as positional arguments)
+#   tolerate_unknown_short = false  (unknown -X tokens are rejected; if true,
+#                                    accepted as positional. Use for tools
+#                                    like `pdftotext -help`, `sample -mayDie`)
+#   tolerate_unknown_long  = false  (unknown --foo tokens are rejected; if
+#                                    true, accepted as positional. AVOID
+#                                    unless the tool's long-flag surface is
+#                                    genuinely unbounded — most modern
+#                                    destructive flags are double-dash, so
+#                                    this silently passes things like --repair,
+#                                    --delete, --to-remote, etc.)
+#
+# `positional_style = true` is the legacy single-bool form of these two; it
+# was removed because removing a flag from the allowlist did NOT deny it
+# while positional_style was on (the unknown form still slipped through as
+# a positional). The build panics if any TOML still sets it.
 #
 # CHOOSING THE RIGHT PATTERN:
 #
@@ -69,7 +82,15 @@
 # level = "Inert"                        # Inert | SafeRead | SafeWrite
 # bare = false                           # false = requires at least one argument
 # # max_positional = 2                   # optional; limits positional arg count
-# # positional_style = true              # optional; treats unknown -flags as args
+# # tolerate_unknown_short = true        # optional; treats unknown -X / -word
+#                                        #   tokens as positional. Use for
+#                                        #   tools like `pdftotext -help`.
+# # tolerate_unknown_long = true         # optional; treats unknown --foo
+#                                        #   tokens as positional. DANGEROUS:
+#                                        #   most destructive flags are
+#                                        #   double-dash. Reserve for tools
+#                                        #   like AWS CLI whose long-flag
+#                                        #   surface is genuinely unbounded.
 # # numeric_dash = true                  # optional; accepts -NUMBER shorthand
 #                                        #   (e.g. head -20 ≡ head -n 20).
 #                                        #   Only for commands with POSIX -number legacy syntax.
@@ -201,8 +222,9 @@
 # ─────────────────────────────────────────────────────────────────────
 #
 # Use for: help subcommands that accept any topic as an argument.
-# Internally equivalent to a policy with positional_style = true and
-# no flags listed, but allow_all is clearer about intent.
+# Internally equivalent to a policy with both `tolerate_unknown_short` and
+# `tolerate_unknown_long` set and no flags listed, but allow_all is clearer
+# about intent.
 
 # [[command.sub]]
 # name = "help"

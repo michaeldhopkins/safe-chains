@@ -21,7 +21,7 @@ valued = ["--cni-namespace", "--config", "--expected-version", "--namespace", "-
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -68,7 +68,7 @@ candidate = true
 name = "diagnostics"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--linkerd-namespace", "-L", "--context", "--kubeconfig", "--api-addr"]
 
@@ -80,7 +80,7 @@ candidate = true
 name = "metrics"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["-n", "--namespace", "--linkerd-namespace", "-L", "--context", "--kubeconfig"]
 

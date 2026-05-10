@@ -4,6 +4,17 @@ description = "Flutter SDK CLI. `analyze`, `doctor`, `devices`, `emulators`, `pr
 url = "https://docs.flutter.dev/reference/flutter-cli"
 researched_version = "Flutter 3.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "flutter logs",
+    "flutter logs -d ABC123",
+    "flutter doctor",
+]
+examples_denied = [
+    "flutter logs --clear",
+    "flutter logs --evil-flag",
+    "flutter run",
+    "flutter build apk",
+]
 
 [[command.sub]]
 name = "doctor"
@@ -29,15 +40,16 @@ valued = ["--launch", "--name"]
 name = "analyze"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--congratulate", "--current-package", "--fatal-infos", "--fatal-warnings", "--help", "--machine", "--no-fatal-infos", "--no-fatal-warnings", "--no-pub", "--preamble", "--watch", "-h"]
 valued = ["--cache", "--exit-code", "--write"]
+write_flags = ["--write"]
 
 [[command.sub]]
 name = "channel"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

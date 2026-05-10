@@ -5,5 +5,5 @@ url = "https://github.com/DamirSvrtan/fasterer"
 researched_version = "fasterer 0.x; surface stable"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-h", "-v"]

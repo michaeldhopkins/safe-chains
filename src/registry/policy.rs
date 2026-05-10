@@ -10,7 +10,6 @@ pub(super) fn check_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {
         policy.valued.as_slice(),
         policy.bare,
         policy.max_positional,
-        policy.flag_style,
-        policy.numeric_dash,
+        policy.tolerance,
     )
 }

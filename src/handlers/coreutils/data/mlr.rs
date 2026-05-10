@@ -1,7 +1,7 @@
 use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::WordSet;
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{self, FlagPolicy, FlagTolerance, UnknownTolerance};
 
 static MLR_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
@@ -19,8 +19,7 @@ static MLR_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Positional,
-    numeric_dash: false,
+    tolerance: FlagTolerance { unknown: UnknownTolerance::Both, numeric_dash: false },
 };
 
 fn is_safe_mlr(tokens: &[Token]) -> Verdict {

@@ -5,7 +5,7 @@ url = "https://github.com/tmm1/stackprof"
 researched_version = "stackprof 0.2.28 (February 2026)"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--alphabetical-flamegraph", "--callgrind",
     "--d3-flamegraph", "--debug", "--dump",

@@ -5,7 +5,7 @@ url = "https://nix.dev/manual/nix/latest/command-ref/nix-collect-garbage.html"
 researched_version = "Nix 2.x"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--debug", "--delete-old", "--delete-older-than",
     "--dry-run", "--help", "--max-freed",

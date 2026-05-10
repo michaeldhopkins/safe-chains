@@ -31,7 +31,7 @@ valued = ["--src", "--type", "--output", "--working-dir", "-o", "-t", "-w"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

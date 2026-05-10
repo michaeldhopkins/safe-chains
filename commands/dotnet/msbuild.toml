@@ -5,7 +5,7 @@ url = "https://learn.microsoft.com/en-us/visualstudio/msbuild/msbuild-command-li
 researched_version = "MSBuild 17.x"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "/binaryLogger", "/check", "/clp", "/consoleLoggerParameters",
     "/debug", "/detailedSummary", "/distributedFileLogger",

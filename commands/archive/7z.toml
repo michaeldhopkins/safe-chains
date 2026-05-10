@@ -6,7 +6,7 @@ url = "https://7-zip.org/"
 researched_version = "7-Zip 24.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--", "--help", "-?", "-an", "-aoa",
     "-aos", "-aou", "-aot", "-bb", "-bd",

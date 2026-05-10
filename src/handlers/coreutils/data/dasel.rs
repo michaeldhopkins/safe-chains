@@ -1,6 +1,6 @@
 use crate::parse::{Token, WordSet};
 use crate::verdict::{SafetyLevel, Verdict};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{self, FlagPolicy, FlagTolerance};
 
 static DASEL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
@@ -15,8 +15,7 @@ static DASEL_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: true,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 static MUTATING_SUBS: WordSet = WordSet::new(&["delete", "put"]);

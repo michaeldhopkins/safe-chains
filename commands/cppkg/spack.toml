@@ -193,7 +193,7 @@ candidate = true
 name = "diff"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-a", "--attribute", "--first"]
 
 [[command.sub]]
@@ -216,7 +216,7 @@ candidate = true
 name = "graph"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--ascii", "--dot", "--static", "-i", "--installed", "-d", "--deptype"]
 
 [[command.sub]]

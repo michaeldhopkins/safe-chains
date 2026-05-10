@@ -4,6 +4,6 @@ description = "Reads a line from standard input and assigns it to shell variable
 url = "https://pubs.opengroup.org/onlinepubs/9799919799/utilities/read.html"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["-r", "-s"]
 valued = ["-a", "-d", "-n", "-p", "-t", "-u"]

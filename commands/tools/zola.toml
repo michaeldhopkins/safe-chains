@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h", "-V"]
 name = "init"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--force", "--help", "-f", "-h"]
 
 [[command.sub]]
@@ -36,7 +36,7 @@ valued = ["--config", "--root"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

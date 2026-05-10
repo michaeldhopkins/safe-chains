@@ -19,35 +19,35 @@ standalone = ["--bare", "--help", "-h"]
 name = "which"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "whence"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--path", "-h"]
 
 [[command.sub]]
 name = "global"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "local"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--unset", "-h"]
 
 [[command.sub]]
 name = "shell"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--unset", "-h"]
 
 [[command.sub]]
@@ -60,7 +60,7 @@ standalone = ["--help", "--no-sh", "--sh", "-h"]
 name = "prefix"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

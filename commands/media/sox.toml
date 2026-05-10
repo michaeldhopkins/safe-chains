@@ -5,7 +5,7 @@ url = "https://sox.sourceforge.net/"
 researched_version = "SoX 14.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--clobber", "--combine", "--effects-file",
     "--guard", "--help", "--help-effect",

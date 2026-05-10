@@ -5,7 +5,7 @@ url = "https://www.freedesktop.org/wiki/Software/pkg-config/"
 researched_version = "pkg-config 0.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--atleast-pkgconfig-version", "--atleast-version",
     "--cflags", "--cflags-only-I",

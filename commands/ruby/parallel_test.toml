@@ -6,7 +6,7 @@ url = "https://github.com/grosser/parallel_tests"
 researched_version = "parallel_tests 4.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--combine-stderr", "--first-is-1", "--help",
     "--isolate", "--multiply-processes", "--non-parallel",

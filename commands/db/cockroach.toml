@@ -13,7 +13,7 @@ standalone = ["--build-tag", "--help", "-h"]
 name = "sqlfmt"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--align", "--help", "--no-simplify", "--print-width", "--use-spaces", "--tab-width", "-h"]
 valued = ["--execute", "-e"]
 

@@ -5,7 +5,7 @@ url = "https://qpdf.readthedocs.io/en/stable/cli.html"
 researched_version = "qpdf 11.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--allow-weak-crypto", "--check", "--check-linearization",
     "--coalesce-contents", "--collate", "--compress-streams",

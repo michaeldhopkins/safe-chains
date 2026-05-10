@@ -31,7 +31,7 @@ candidate = true
 name = "describe"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-A", "--all-namespaces", "--show-events"]
 valued = ["-n", "--namespace", "-l", "--selector", "--field-selector", "-f", "--filename", "--context", "--kubeconfig"]
 
@@ -39,7 +39,7 @@ valued = ["-n", "--namespace", "-l", "--selector", "--field-selector", "-f", "--
 name = "explain"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--recursive"]
 valued = ["--api-version", "--output", "-o", "--context", "--kubeconfig"]
 
@@ -47,7 +47,7 @@ valued = ["--api-version", "--output", "-o", "--context", "--kubeconfig"]
 name = "get"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-A", "--all-namespaces", "-w", "--watch", "--watch-only", "--no-headers", "--show-labels", "--show-kind"]
 valued = ["-n", "--namespace", "-l", "--selector", "--field-selector", "-o", "--output", "--context", "--kubeconfig"]
 
@@ -55,7 +55,7 @@ valued = ["-n", "--namespace", "-l", "--selector", "--field-selector", "-o", "--
 name = "logs"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-f", "--follow", "--all-containers", "--prefix", "--timestamps", "--previous", "-p", "--ignore-errors"]
 valued = ["-n", "--namespace", "-c", "--container", "--since", "--since-time", "--tail", "--limit-bytes", "--context", "--kubeconfig"]
 
@@ -63,7 +63,7 @@ valued = ["-n", "--namespace", "-c", "--container", "--since", "--since-time", "
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -214,7 +214,7 @@ candidate = true
 name = "events"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-A", "--all-namespaces", "-w", "--watch", "--no-headers"]
 valued = ["-n", "--namespace", "--for", "--types", "-o", "--output", "--context", "--kubeconfig"]
 
@@ -222,7 +222,7 @@ valued = ["-n", "--namespace", "--for", "--types", "-o", "--output", "--context"
 name = "diff"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-R", "--recursive", "--show-managed-fields"]
 valued = ["-f", "--filename", "-n", "--namespace", "--context", "--kubeconfig"]
 
@@ -254,7 +254,7 @@ candidate = true
 name = "top"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "-A", "--all-namespaces", "--containers", "--no-headers", "--use-protocol-buffers"]
 valued = ["-n", "--namespace", "-l", "--selector", "--field-selector", "--context", "--kubeconfig", "--sort-by"]
 

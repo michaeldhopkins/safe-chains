@@ -20,7 +20,7 @@ valued = ["--bolt-path", "--engine-path", "--http-bind-address", "--log-level", 
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

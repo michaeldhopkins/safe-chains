@@ -5,7 +5,7 @@ url = "https://www.wireshark.org/docs/man-pages/tshark.html"
 researched_version = "Wireshark 4.x"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "--version", "--list-time-stamp-types",
     "-?", "-2", "-A", "-B", "-D", "-F",

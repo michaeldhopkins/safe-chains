@@ -10,7 +10,7 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 name = "info"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "--verbose", "-h", "-v"]
 valued = ["--config", "--region", "--stage", "-c", "-r", "-s"]
 
@@ -18,7 +18,7 @@ valued = ["--config", "--region", "--stage", "-c", "-r", "-s"]
 name = "print"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "-h"]
 valued = ["--config", "--format", "--path", "--region", "--stage", "--transform", "-c", "-r", "-s"]
 
@@ -26,7 +26,7 @@ valued = ["--config", "--format", "--path", "--region", "--stage", "--transform"
 name = "metrics"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "-h"]
 valued = ["--config", "--endTime", "--function", "--region", "--stage", "--startTime", "-c", "-f", "-r", "-s"]
 
@@ -34,7 +34,7 @@ valued = ["--config", "--endTime", "--function", "--region", "--stage", "--start
 name = "logs"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "--tail", "-h", "-t"]
 valued = ["--config", "--filter", "--function", "--interval", "--region", "--stage", "--startTime", "-c", "-f", "-i", "-r", "-s"]
 
@@ -42,7 +42,7 @@ valued = ["--config", "--filter", "--function", "--interval", "--region", "--sta
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

@@ -1,6 +1,5 @@
 use serde::Deserialize;
 
-use crate::policy::FlagStyle;
 use crate::verdict::SafetyLevel;
 
 #[derive(Debug, Deserialize)]
@@ -25,8 +24,16 @@ pub(super) struct TomlCommand {
     pub bare: Option<bool>,
     #[serde(default)]
     pub max_positional: Option<usize>,
+    /// Removed in favor of `tolerate_unknown_short` / `tolerate_unknown_long`.
+    /// Build panics if any TOML still sets this — see SAMPLE.toml for the
+    /// migration guidance. Kept on the deserializer struct so the panic
+    /// message can name the offending command instead of a serde error.
     #[serde(default)]
     pub positional_style: Option<bool>,
+    #[serde(default)]
+    pub tolerate_unknown_short: Option<bool>,
+    #[serde(default)]
+    pub tolerate_unknown_long: Option<bool>,
     #[serde(default)]
     pub numeric_dash: Option<bool>,
     #[serde(default)]
@@ -93,8 +100,13 @@ pub(super) struct TomlSub {
     pub bare: Option<bool>,
     #[serde(default)]
     pub max_positional: Option<usize>,
+    /// Removed; see TomlCommand::positional_style.
     #[serde(default)]
     pub positional_style: Option<bool>,
+    #[serde(default)]
+    pub tolerate_unknown_short: Option<bool>,
+    #[serde(default)]
+    pub tolerate_unknown_long: Option<bool>,
     #[serde(default)]
     pub numeric_dash: Option<bool>,
     #[serde(default)]
@@ -230,6 +242,5 @@ pub struct OwnedPolicy {
     pub valued: Vec<String>,
     pub bare: bool,
     pub max_positional: Option<usize>,
-    pub flag_style: FlagStyle,
-    pub numeric_dash: bool,
+    pub tolerance: crate::policy::FlagTolerance,
 }

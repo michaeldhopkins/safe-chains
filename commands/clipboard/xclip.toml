@@ -5,6 +5,6 @@ url = "https://github.com/astrand/xclip"
 researched_version = "xclip 0.x"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-help", "-d", "-display", "-f", "-filter", "-h", "-i", "-in", "-l", "-loops", "-o", "-out", "-quiet", "-rmlastnl", "-silent", "-target", "-v", "-verbose"]
 valued = ["-display", "-loops", "-selection", "-target"]

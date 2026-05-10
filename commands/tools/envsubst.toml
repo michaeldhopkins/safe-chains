@@ -5,5 +5,5 @@ url = "https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation
 researched_version = "GNU gettext envsubst"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--variables", "--version", "-V", "-h", "-v"]

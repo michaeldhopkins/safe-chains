@@ -1,6 +1,6 @@
 use crate::verdict::{SafetyLevel, Verdict};
 use crate::parse::{Token, WordSet};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{self, FlagPolicy, FlagTolerance};
 
 fn strip_regex_literals(s: &str) -> String {
     let bytes = s.as_bytes();
@@ -106,8 +106,7 @@ static AWK_POLICY: FlagPolicy = FlagPolicy {
     ]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 fn is_safe_awk(tokens: &[Token]) -> bool {

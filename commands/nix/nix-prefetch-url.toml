@@ -5,7 +5,7 @@ url = "https://nix.dev/manual/nix/latest/command-ref/nix-prefetch-url.html"
 researched_version = "Nix 2.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--debug", "--help",
     "--name", "--print-path", "--quiet",

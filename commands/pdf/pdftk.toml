@@ -5,5 +5,5 @@ url = "https://www.pdflabs.com/docs/pdftk-cli-examples/"
 researched_version = "pdftk 3.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--version", "-h"]

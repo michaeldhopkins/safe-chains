@@ -34,7 +34,7 @@ examples_denied = [
 name = "log"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all-revprops", "--diff", "--help", "--incremental", "--quiet", "--revprop", "--search", "--stop-on-copy", "--use-merge-history", "--verbose", "--with-all-revprops", "--with-no-revprops", "--xml", "-c", "-g", "-h", "-l", "-q", "-r", "-v"]
 valued = ["--changelist", "--config-dir", "--config-option", "--depth", "--diff-cmd", "--limit", "--password", "--revision", "--search-and", "--targets", "--username", "--with-revprop", "--xml-file", "-c", "-g", "-l", "-r"]
 
@@ -42,7 +42,7 @@ valued = ["--changelist", "--config-dir", "--config-option", "--depth", "--diff-
 name = "diff"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--diff-cmd", "--force", "--git", "--help", "--no-diff-deleted", "--no-diff-added", "--no-diff-statistics", "--notice-ancestry", "--patch-compatible", "--summarize", "--xml", "-c", "-h", "-r", "-x"]
 valued = ["--changelist", "--config-dir", "--config-option", "--depth", "--diff-cmd", "--extensions", "--internal-diff", "--new", "--old", "--password", "--revision", "--username", "-c", "-r", "-x"]
 
@@ -51,7 +51,7 @@ name = "status"
 aliases = ["stat", "st"]
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--changelist", "--config-dir", "--depth", "--help", "--ignore-externals", "--incremental", "--no-ignore", "--quiet", "--show-updates", "--verbose", "--xml", "-N", "-h", "-q", "-u", "-v"]
 valued = ["--changelist", "--config-dir", "--config-option", "--depth"]
 
@@ -59,7 +59,7 @@ valued = ["--changelist", "--config-dir", "--config-option", "--depth"]
 name = "info"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--include-externals", "--incremental", "--recursive", "--targets", "--xml", "-R", "-h", "-r"]
 valued = ["--changelist", "--config-dir", "--depth", "--password", "--revision", "--targets", "--username", "-r"]
 
@@ -67,7 +67,7 @@ valued = ["--changelist", "--config-dir", "--depth", "--password", "--revision",
 name = "cat"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--ignore-keywords", "-h", "-r"]
 valued = ["--config-dir", "--password", "--revision", "--username", "-r"]
 
@@ -76,7 +76,7 @@ name = "list"
 aliases = ["ls"]
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--depth", "--help", "--incremental", "--recursive", "--verbose", "--xml", "-R", "-h", "-r", "-v"]
 valued = ["--config-dir", "--depth", "--password", "--revision", "--username", "-r"]
 
@@ -85,7 +85,7 @@ name = "blame"
 aliases = ["praise", "annotate", "ann"]
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--force", "--help", "--use-merge-history", "--xml", "-g", "-h", "-r", "-v", "-x"]
 valued = ["--config-dir", "--diff-cmd", "--extensions", "--password", "--revision", "--username", "-r", "-x"]
 
@@ -94,7 +94,7 @@ name = "proplist"
 aliases = ["plist", "pl"]
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--depth", "--help", "--incremental", "--quiet", "--recursive", "--revprop", "--show-inherited-props", "--verbose", "--xml", "-R", "-h", "-q", "-r", "-v"]
 valued = ["--changelist", "--config-dir", "--depth", "--password", "--revision", "--username", "-r"]
 
@@ -103,7 +103,7 @@ name = "propget"
 aliases = ["pget", "pg"]
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--depth", "--help", "--no-newline", "--recursive", "--revprop", "--show-inherited-props", "--strict", "--verbose", "--xml", "-R", "-h", "-r", "-v"]
 valued = ["--changelist", "--config-dir", "--depth", "--password", "--revision", "--username", "-r"]
 
@@ -111,7 +111,7 @@ valued = ["--changelist", "--config-dir", "--depth", "--password", "--revision",
 name = "mergeinfo"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--from-source", "--help", "--show-revs", "-h"]
 valued = ["--config-dir", "--password", "--revision", "--username", "-R", "-r"]
 

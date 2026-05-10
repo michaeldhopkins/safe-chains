@@ -1,7 +1,6 @@
 use super::*;
     use super::types::DispatchKind;
     use crate::parse::Token;
-    use crate::policy::FlagStyle;
     use crate::verdict::{SafetyLevel, Verdict};
 
     fn toks(words: &[&str]) -> Vec<Token> {
@@ -180,18 +179,32 @@ use super::*;
     }
 
     #[test]
-    fn flat_positional_style() {
+    fn flat_tolerate_unknown_long() {
         let spec = load_one(r#"
             [[command]]
             name = "echo"
             bare = true
-            positional_style = true
+            tolerate_unknown_long = true
             standalone = ["-n", "-e"]
         "#);
         assert_eq!(
             dispatch_spec(&toks(&["echo", "--unknown", "hello"]), &spec),
             Verdict::Allowed(SafetyLevel::Inert),
         );
+    }
+
+    #[test]
+    fn legacy_positional_style_panics() {
+        let result = std::panic::catch_unwind(|| {
+            load_one(r#"
+                [[command]]
+                name = "demo-legacy"
+                bare = true
+                positional_style = true
+            "#);
+        });
+        assert!(result.is_err(),
+            "loading positional_style = true should panic with migration guidance");
     }
 
     #[test]
@@ -1630,12 +1643,12 @@ use super::*;
     }
 
     #[test]
-    fn positional_style_unknown_eq() {
+    fn tolerate_unknown_long_eq_form() {
         let spec = load_one(r#"
             [[command]]
             name = "echo"
             bare = true
-            positional_style = true
+            tolerate_unknown_long = true
         "#);
         assert_eq!(
             dispatch_spec(&toks(&["echo", "--foo=bar"]), &spec),
@@ -1644,12 +1657,12 @@ use super::*;
     }
 
     #[test]
-    fn positional_style_with_max() {
+    fn tolerate_unknown_long_with_max() {
         let spec = load_one(r#"
             [[command]]
             name = "echo"
             bare = true
-            positional_style = true
+            tolerate_unknown_long = true
             max_positional = 2
         "#);
         assert_eq!(
@@ -1659,6 +1672,27 @@ use super::*;
         assert_eq!(
             dispatch_spec(&toks(&["echo", "--a", "--b", "--c"]), &spec),
             Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn tolerate_unknown_short_denies_unknown_double_dash() {
+        // The whole point of the narrow split: short-tolerance does not
+        // accept --unknown.
+        let spec = load_one(r#"
+            [[command]]
+            name = "echo"
+            bare = true
+            tolerate_unknown_short = true
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["echo", "--evil"]), &spec),
+            Verdict::Denied,
+        );
+        // Single-dash long words still pass.
+        assert_eq!(
+            dispatch_spec(&toks(&["echo", "-help"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
         );
     }
 
@@ -1672,7 +1706,12 @@ use super::*;
         for (name, spec) in TOML_REGISTRY.iter() {
             match &spec.kind {
                 DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. }
-                    if policy.flag_style == FlagStyle::Positional => continue,
+                    // Skip only commands that explicitly accept double-dash
+                    // unknowns (the dangerous tolerance). Commands using just
+                    // `tolerate_unknown_short` are still tested — the whole
+                    // point of the narrow split is that they correctly deny
+                    // double-dash unknowns.
+                    if policy.tolerance.unknown.allows_long() => continue,
                 DispatchKind::Custom { .. } => continue,
                 _ => {}
             }
@@ -2004,14 +2043,14 @@ deny = true
                 }
             }
             DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. }
-                if policy.flag_style == FlagStyle::Strict =>
+                if !policy.tolerance.unknown.allows_long() =>
             {
                 let test = format!("{prefix} --xyzzy-unknown-42");
                 if crate::is_safe_command(&test) {
                     failures.push(format!("{prefix}: accepted unknown flag"));
                 }
             }
-            DispatchKind::WriteFlagged { policy, .. } if policy.flag_style == FlagStyle::Strict => {
+            DispatchKind::WriteFlagged { policy, .. } if !policy.tolerance.unknown.allows_long() => {
                 let test = format!("{prefix} --xyzzy-unknown-42");
                 if crate::is_safe_command(&test) {
                     failures.push(format!("{prefix}: accepted unknown flag"));
@@ -2048,11 +2087,11 @@ deny = true
                 }
             }
             DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. }
-                if policy.flag_style == FlagStyle::Strict =>
+                if !policy.tolerance.unknown.allows_long() =>
             {
                 paths.push(prefix.to_string());
             }
-            DispatchKind::WriteFlagged { policy, .. } if policy.flag_style == FlagStyle::Strict => {
+            DispatchKind::WriteFlagged { policy, .. } if !policy.tolerance.unknown.allows_long() => {
                 paths.push(prefix.to_string());
             }
             _ => {}

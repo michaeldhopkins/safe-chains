@@ -13,7 +13,7 @@ standalone = ["--help", "-h"]
 name = "compile"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--allow-precompiled", "--debug-info", "--help", "-D", "-W", "-h"]
 valued = ["--cache", "--codegen", "--config", "--module", "--module-name", "--optimize", "--output", "--target", "--profile", "--wasm", "-O", "-T", "-o"]
 
@@ -21,7 +21,7 @@ valued = ["--cache", "--codegen", "--config", "--module", "--module-name", "--op
 name = "explore"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--output", "-o"]
 
@@ -29,14 +29,14 @@ valued = ["--output", "-o"]
 name = "objdump"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "-D", "-d", "-h"]
 
 [[command.sub]]
 name = "wast"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--debug", "--help", "-D", "-W", "-h"]
 valued = ["--config", "--cranelift", "--profile", "--wasm"]
 
@@ -60,7 +60,7 @@ standalone = ["--force", "--help", "-h"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

@@ -15,7 +15,7 @@ standalone = ["--help", "-h"]
 name = "search"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--registry"]
 
@@ -23,7 +23,7 @@ valued = ["--registry"]
 name = "describe"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--data-list", "--help", "--import-paths", "-h"]
 valued = ["--arch", "--build", "--compiler", "--config", "--data"]
 
@@ -55,7 +55,7 @@ candidate = true
 name = "lint"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h", "--report", "--syntax-check", "--styleCheck"]
 valued = ["--config", "-c", "--build", "-b"]
 

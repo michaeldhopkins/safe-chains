@@ -9,7 +9,7 @@ bare_flags = ["--help", "--version", "-h"]
 name = "check"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--daemon", "--help", "--no-daemon",
     "--no-type-check", "--type-check",
@@ -29,7 +29,7 @@ write_flags = ["--save-expectations"]
 name = "checkfile"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all-rbs", "--all-ruby", "--help", "--stdin", "-h"]
 valued = ["--jobs", "--steepfile", "-j"]
 
@@ -44,7 +44,7 @@ valued = ["--steepfile"]
 name = "ancestors"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--instance", "--singleton", "-h"]
 valued = ["--steepfile"]
 
@@ -52,7 +52,7 @@ valued = ["--steepfile"]
 name = "methods"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "--inherit", "--instance",
     "--no-inherit", "--singleton", "-h",
@@ -63,7 +63,7 @@ valued = ["--steepfile"]
 name = "method"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--instance", "--singleton", "-h"]
 valued = ["--steepfile"]
 
@@ -71,7 +71,7 @@ valued = ["--steepfile"]
 name = "validate"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--severity-level", "--steepfile"]
 
@@ -79,7 +79,7 @@ valued = ["--severity-level", "--steepfile"]
 name = "annotations"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--steepfile"]
 
@@ -104,7 +104,7 @@ valued = ["--steepfile"]
 name = "stats"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--format", "--jobs", "--steep-command", "--steepfile", "-j"]
 
@@ -130,7 +130,7 @@ valued = ["--output", "--root", "-o"]
 name = "vendor"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--clean", "--help", "--no-clean", "-h"]
 
 [[command.sub]]

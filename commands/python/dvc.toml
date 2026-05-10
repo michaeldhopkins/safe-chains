@@ -4,6 +4,16 @@ description = "Data Version Control — Git-companion tool for ML/data projects.
 url = "https://dvc.org/"
 researched_version = "dvc 3.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
+examples_safe = [
+    "dvc add data.csv",
+    "dvc status",
+    "dvc version",
+]
+examples_denied = [
+    "dvc add --to-remote data.csv",
+    "dvc push",
+    "dvc repro",
+]
 
 [[command.sub]]
 name = "version"
@@ -19,28 +29,28 @@ standalone = ["--help", "-h"]
 name = "status"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all-branches", "--all-commits", "--all-tags", "--cloud", "--help", "--json", "--quiet", "--remote", "--verbose", "-A", "-T", "-a", "-c", "-h", "-q", "-v"]
 
 [[command.sub]]
 name = "diff"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--hide-missing", "--json", "--md", "--quiet", "--show-hash", "--targets", "--verbose", "-h", "-q", "-v"]
 
 [[command.sub]]
 name = "dag"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--dot", "--full", "--help", "--mermaid", "--md", "--outs", "--quiet", "--verbose", "-h", "-q", "-v"]
 
 [[command.sub]]
 name = "list"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--dvc-only", "--help", "--json", "--quiet", "-R", "-h", "-q"]
 valued = ["--rev"]
 
@@ -52,43 +62,42 @@ allow_all = true
 name = "add"
 level = "SafeWrite"
 bare = false
-positional_style = true
-standalone = ["--external", "--file", "--force", "--glob", "--help", "--no-commit", "--quiet", "--recursive", "--remote", "--to-remote", "--verbose", "-R", "-f", "-h", "-q", "-v"]
+standalone = ["--external", "--file", "--force", "--glob", "--help", "--no-commit", "--quiet", "--recursive", "--remote", "--verbose", "-R", "-f", "-h", "-q", "-v"]
 valued = ["--desc", "--file", "--meta", "--out", "--remote", "--type", "-o"]
 
 [[command.sub]]
 name = "commit"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--data-only", "--force", "--help", "--no-commit", "--quiet", "--recursive", "--relink", "--verbose", "-R", "-d", "-f", "-h", "-q", "-v"]
 
 [[command.sub]]
 name = "checkout"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--allow-missing", "--force", "--help", "--quiet", "--recursive", "--relink", "--summary", "-R", "-f", "-h", "-q"]
 
 [[command.sub]]
 name = "remove"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--outs", "--quiet", "--verbose", "-h", "-q", "-v"]
 
 [[command.sub]]
 name = "move"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "--verbose", "-h", "-q", "-v"]
 
 [[command.sub]]
 name = "unprotect"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 
 [[command.sub]]

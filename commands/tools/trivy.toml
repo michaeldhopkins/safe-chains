@@ -8,7 +8,7 @@ bare_flags = ["--help", "--version", "-h"]
 name = "fs"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--ignore-unfixed", "--json", "--quiet", "--severity", "-h", "-q"]
 valued = ["--cache-dir", "--config", "--exit-code", "--format", "--ignorefile", "--output", "--scanners", "--severity", "--skip-dirs", "--skip-files", "--template", "--timeout", "-f", "-o", "-s"]
 
@@ -16,7 +16,7 @@ valued = ["--cache-dir", "--config", "--exit-code", "--format", "--ignorefile", 
 name = "image"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--ignore-unfixed", "--json", "--quiet", "-h", "-q"]
 valued = ["--cache-dir", "--config", "--exit-code", "--format", "--ignorefile", "--output", "--scanners", "--severity", "--skip-dirs", "--skip-files", "--template", "--timeout", "-f", "-o", "-s"]
 
@@ -24,7 +24,7 @@ valued = ["--cache-dir", "--config", "--exit-code", "--format", "--ignorefile", 
 name = "config"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "--quiet", "-h", "-q"]
 valued = ["--exit-code", "--format", "--ignorefile", "--output", "--severity", "--skip-dirs", "--skip-files", "--template", "-f", "-o", "-s"]
 
@@ -32,7 +32,7 @@ valued = ["--exit-code", "--format", "--ignorefile", "--output", "--severity", "
 name = "sbom"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--json", "--quiet", "-h", "-q"]
 valued = ["--artifact-type", "--cache-dir", "--format", "--output", "-f", "-o"]
 

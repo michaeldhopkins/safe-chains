@@ -5,5 +5,5 @@ url = "https://joeyh.name/code/moreutils/"
 researched_version = "moreutils isutf8; surface stable"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--invert", "--list", "--quiet", "-h", "-i", "-l", "-q"]

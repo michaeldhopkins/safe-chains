@@ -216,6 +216,14 @@ Aliases: `@biomejs/biome`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
+**Examples:**
+
+- `borg check repo`
+- `borg config repo`
+- `borg list repo`
+- `borg info repo`
+- `borg version`
+
 ### `brakeman`
 <p class="cmd-url"><a href="https://brakemanscanner.org/docs/options/">https://brakemanscanner.org/docs/options/</a></p>
 
@@ -669,7 +677,11 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed standalone flags: --compact, --help, --in-place, --insert-final-newline, --prettify, --quiet, --sort-keys, --version, -V, -c, -h, -i, -p, -q, -s, -v
 - Allowed valued flags: --indent, --mode, -m, -t
 - Bare invocation allowed
-- Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `jsonlint file.json`
+- `jsonlint --version`
 
 ### `just`
 <p class="cmd-url"><a href="https://just.systems/man/en/">https://just.systems/man/en/</a></p>
@@ -770,7 +782,7 @@ Aliases: `g++`, `cc`, `c++`
 - **cat**: Flags: --encrypt-key, --help, --rewind, -h. Valued: --encrypt-key, --rewind, --version-id. Positional args accepted
 - **completion**: Flags: --help, -h. Positional args accepted
 - **du**: Flags: --depth, --help, --recursive, --rewind, --versions, -d, -h, -r. Valued: --depth, --rewind. Positional args accepted
-- **find**: Flags: --help, --ignore, --metadata, --name, --newer-than, --older-than, --path, --print, --recursive, --regex, --rewind, --versions, --watch, -h, -r. Valued: --exec, --maxdepth, --mindepth, --name, --newer-than, --older-than, --path, --print, --regex. Positional args accepted
+- **find**: Flags: --help, --ignore, --metadata, --name, --newer-than, --older-than, --path, --print, --recursive, --regex, --rewind, --versions, --watch, -h, -r. Valued: --maxdepth, --mindepth, --name, --newer-than, --older-than, --path, --print, --regex
 - **head**: Flags: --encrypt-key, --help, --rewind, -h. Valued: --encrypt-key, -n, --lines, --rewind, --version-id. Positional args accepted
 - **help**: Positional args accepted
 - **ls**: Flags: --help, --incomplete, --metadata, --no-color, --recursive, --rewind, --summarize, --versions, -I, -h, -r, -S. Positional args accepted
@@ -778,6 +790,12 @@ Aliases: `g++`, `cc`, `c++`
 - **tree**: Flags: --depth, --files, --help, --no-color, -d, -f, -h. Valued: --depth. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `mc ls bucket`
+- `mc find bucket --name foo`
+- `mc version`
 
 ### `mdbook`
 <p class="cmd-url"><a href="https://rust-lang.github.io/mdBook/">https://rust-lang.github.io/mdBook/</a></p>
@@ -1308,14 +1326,11 @@ Aliases: `python`
 ### `tilt`
 <p class="cmd-url"><a href="https://docs.tilt.dev/cli/tilt">https://docs.tilt.dev/cli/tilt</a></p>
 
-- **completion**: Flags: --help, -h. Positional args accepted
-- **describe**: Flags: --help, -h, -A, --all-namespaces, --show-events. Valued: -n, --namespace, -l, --selector, -o, --output. Positional args accepted
-- **doctor**: Flags: --help, -h. Valued: --output, -o
-- **get**: Flags: --help, -h, -A, --all-namespaces, -w, --watch, --no-headers. Valued: -n, --namespace, -l, --selector, --field-selector, -o, --output. Positional args accepted
-- **help**: Positional args accepted
-- **verify-install**: Flags: --help, -h
-- **version**: Flags: --help, -h
-- Allowed standalone flags: --help, --version, -h, -v
+- Bare invocation, `--help`, `-h`, `--version`, `-v`, `-V` allowed (both binaries)
+- Ruby tilt: `--list`, `-l` to list engines; `tilt FILE` to render a template; `--type/-t TYPE`, `--layout/-y LAYOUT` valued flags. File argument must look like a path (contain `/`, `.`, or be `-` for stdin) — bare words (e.g. `tilt up`) are rejected since they're indistinguishable from K8s tilt subcommands.
+- K8s tilt diagnostic subs: `version`, `doctor`, `verify-install` (Inert)
+- K8s tilt help/completion: `help [topic]`, `completion [shell]` (Inert)
+- K8s tilt read subs: `get [resource]`, `describe [resource]` with kubectl-style flags (`-n/--namespace`, `-l/--selector`, `-o/--output`, `--field-selector`, `--context`, `--kubeconfig`, `-A/--all-namespaces`, `-w/--watch`)
 
 ### `tldr`
 <p class="cmd-url"><a href="https://tldr.sh/">https://tldr.sh/</a></p>

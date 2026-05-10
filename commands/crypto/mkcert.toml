@@ -5,7 +5,7 @@ url = "https://github.com/FiloSottile/mkcert"
 researched_version = "mkcert 1.x"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--CAROOT", "--cert-file", "--csr",
     "--ecdsa", "--help",

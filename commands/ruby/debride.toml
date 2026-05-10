@@ -5,7 +5,7 @@ url = "https://github.com/seattlerb/debride"
 researched_version = "debride 1.15.1 (January 2026)"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "--json", "--legacy", "--rails",
     "--verbose", "--version", "--yaml",

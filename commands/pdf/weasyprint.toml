@@ -5,7 +5,7 @@ url = "https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#command-
 researched_version = "WeasyPrint 65.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--debug", "--encoding", "--full-fonts",
     "--help", "--info", "--media-type",

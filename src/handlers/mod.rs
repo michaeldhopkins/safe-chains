@@ -34,6 +34,7 @@ pub mod php;
 pub mod ruby;
 pub mod shell;
 pub mod system;
+pub mod tilt;
 pub mod vcs;
 pub mod wrappers;
 
@@ -49,6 +50,7 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
         ("magick", magick::is_safe_magick as HandlerFn),
         ("php", php::is_safe_php as HandlerFn),
         ("sysctl", system::sysctl::is_safe_sysctl as HandlerFn),
+        ("tilt", tilt::check_tilt as HandlerFn),
     ])
 }
 

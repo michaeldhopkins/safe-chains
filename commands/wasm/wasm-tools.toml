@@ -13,7 +13,7 @@ standalone = ["--help", "-h"]
 name = "parse"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 valued = ["--output", "--features", "-o"]
 
@@ -21,7 +21,7 @@ valued = ["--output", "--features", "-o"]
 name = "print"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--no-fold", "--quiet", "--skeleton", "-f", "-h", "-q"]
 valued = ["--output", "-o"]
 
@@ -29,7 +29,7 @@ valued = ["--output", "-o"]
 name = "validate"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 valued = ["--features"]
 
@@ -37,7 +37,7 @@ valued = ["--features"]
 name = "dump"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 valued = ["--features"]
 
@@ -45,14 +45,14 @@ valued = ["--features"]
 name = "objdump"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 
 [[command.sub]]
 name = "strip"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "--all", "--all-custom", "-a", "-h", "-q"]
 valued = ["--delete", "--output", "-d", "-o"]
 
@@ -60,7 +60,7 @@ valued = ["--delete", "--output", "-d", "-o"]
 name = "demangle"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 valued = ["--output", "-o"]
 
@@ -80,7 +80,7 @@ candidate = true
 name = "addr2line"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--addresses", "--basenames", "--demangle", "--functions", "--help", "--inlines", "--llvm", "--pretty-print", "--quiet", "-C", "-a", "-e", "-f", "-h", "-i", "-p", "-q", "-s"]
 valued = ["--exe"]
 
@@ -88,14 +88,14 @@ valued = ["--exe"]
 name = "targets"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--quiet", "-h", "-q"]
 
 [[command.sub]]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

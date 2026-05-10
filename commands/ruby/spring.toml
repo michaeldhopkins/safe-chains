@@ -21,7 +21,7 @@ standalone = ["--help", "-h"]
 name = "binstub"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--help", "--remove", "-h"]
 
 [[command.sub]]

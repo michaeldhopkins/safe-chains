@@ -101,7 +101,7 @@ valued = [
 name = "new"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--force", "--help", "--quiet", "-f", "-h"]
 valued = ["--config", "--editor", "--kind", "--source", "-c", "-s"]
 
@@ -133,7 +133,7 @@ valued = ["--dir"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

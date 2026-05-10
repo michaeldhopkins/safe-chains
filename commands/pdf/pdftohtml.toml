@@ -5,7 +5,7 @@ url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftohtml.1.html"
 researched_version = "Poppler 24.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "-c", "-fontfullname", "-help",
     "-hidden", "-i", "-noframes", "-nomerge",

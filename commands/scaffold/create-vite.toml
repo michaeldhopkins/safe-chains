@@ -5,6 +5,6 @@ url = "https://vite.dev/guide/"
 researched_version = "create-vite 5.x"
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--overwrite", "--version", "-h"]
 valued = ["--template", "-t"]

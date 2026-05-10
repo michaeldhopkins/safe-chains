@@ -4,5 +4,5 @@ description = "Terminal-based JSON viewer and processor that reads JSON from std
 url = "https://github.com/antonmedv/fx"
 level = "Inert"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--raw", "--slurp", "--themes", "--version", "-h", "-r", "-s"]

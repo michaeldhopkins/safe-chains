@@ -1,5 +1,3 @@
-use crate::policy::FlagStyle;
-
 use super::types::*;
 
 impl CommandSpec {
@@ -67,10 +65,10 @@ impl OwnedPolicy {
         if self.bare {
             lines.push("- Bare invocation allowed".to_string());
         }
-        if self.flag_style == FlagStyle::Positional {
+        if self.tolerance.unknown != crate::policy::UnknownTolerance::Strict {
             lines.push("- Hyphen-prefixed positional arguments accepted".to_string());
         }
-        if self.numeric_dash {
+        if self.tolerance.numeric_dash {
             lines.push("- Numeric shorthand accepted (e.g. -20 for -n 20)".to_string());
         }
         if lines.is_empty() && !self.bare {
@@ -87,10 +85,10 @@ impl OwnedPolicy {
         if !self.valued.is_empty() {
             parts.push(format!("Valued: {}", self.valued.join(", ")));
         }
-        if self.flag_style == FlagStyle::Positional {
+        if self.tolerance.unknown != crate::policy::UnknownTolerance::Strict {
             parts.push("Positional args accepted".to_string());
         }
-        if self.numeric_dash {
+        if self.tolerance.numeric_dash {
             parts.push("Numeric -N accepted".to_string());
         }
         parts.join(". ")

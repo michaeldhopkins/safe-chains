@@ -13,14 +13,14 @@ standalone = ["--help", "-h"]
 name = "inspect"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--execution-requirements", "--help", "-h"]
 
 [[command.sub]]
 name = "archive"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--exclude-env-vars", "--help", "-h"]
 valued = ["--archive-out", "--config", "--include-system-env-vars", "--out", "-O", "-c", "-o"]
 
@@ -28,7 +28,7 @@ valued = ["--archive-out", "--config", "--include-system-env-vars", "--out", "-O
 name = "convert"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--correlate", "--help", "-h"]
 valued = ["--enable-status-code-checks", "--no-batch", "--only", "--output", "--return-on-failed-check", "--skip", "-o"]
 
@@ -36,7 +36,7 @@ valued = ["--enable-status-code-checks", "--no-batch", "--only", "--output", "--
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

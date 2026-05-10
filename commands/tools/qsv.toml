@@ -4,5 +4,5 @@ description = "Blazing-fast CSV data-wrangling toolkit written in Rust, a fork a
 url = "https://github.com/jqnatividad/qsv"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--envlist", "--help", "--list", "--update", "--version", "-h"]

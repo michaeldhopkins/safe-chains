@@ -5,7 +5,7 @@ url = "https://github.com/tenderlove/rexical"
 researched_version = "rexical 1.x; surface stable"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--check-only", "--debug", "--dependency",
     "--help", "--ignore-case", "--ignorecase",

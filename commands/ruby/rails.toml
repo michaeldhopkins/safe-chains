@@ -159,7 +159,8 @@ standalone = ["--help", "-h"]
 [[command.sub]]
 name = "test"
 level = "SafeRead"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 bare = true
 
 [[command.sub]]
@@ -185,13 +186,15 @@ standalone = ["--help", "-h"]
 [[command.sub]]
 name = "generate"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 bare = false
 
 [[command.sub]]
 name = "g"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 bare = false
 
 [[command.sub]]

@@ -5,7 +5,7 @@ url = "https://docs.vyperlang.org/en/latest/compiling-a-contract.html"
 researched_version = "Vyper 0.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--abi", "--abi-python", "--asm",
     "--ast", "--bin-runtime", "--bytecode",

@@ -5,7 +5,7 @@ url = "https://sourceware.org/binutils/docs/binutils/ar.html"
 researched_version = "GNU ar 2.x"
 level = "SafeWrite"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = [
     "--help", "--plugin", "--target",
     "--thin", "--version",

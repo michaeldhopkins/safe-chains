@@ -42,7 +42,7 @@ valued = ["--name", "--namespace", "--output", "-n", "-o"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -85,7 +85,7 @@ candidate = true
 name = "logs"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["-a", "--app-id", "-k", "--kubernetes", "-n", "--namespace", "-p", "--pod-name", "-c", "--container"]
 

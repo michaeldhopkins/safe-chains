@@ -21,7 +21,7 @@ valued = ["--failure-threshold", "--meshConfigFile", "--namespace", "--output", 
 name = "proxy-status"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--file", "--help", "--multi-xds", "--xds-via-agents", "-f", "-h"]
 valued = ["--file", "--multi-xds", "--output", "--revision", "-f", "-o"]
 
@@ -65,7 +65,7 @@ standalone = ["--help", "-h"]
 name = "validate"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--no-validate", "--output", "--quiet", "--referential", "-f", "-h", "-o", "-q"]
 valued = ["--filename", "--output", "-f", "-o"]
 
@@ -73,7 +73,7 @@ valued = ["--filename", "--output", "-f", "-o"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

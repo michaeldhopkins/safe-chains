@@ -13,7 +13,7 @@ standalone = ["--help", "-h"]
 name = "discover"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--insecure", "--no-color", "--no-tty", "--plain-http", "-h"]
 valued = ["--artifact-type", "--ca-file", "--cert-file", "--config", "--distribution-spec", "--format", "--header", "--key-file", "--output", "--password", "--password-stdin", "--registry-config", "--username", "--verbose", "-c", "-d", "-o", "-p", "-u", "-v"]
 
@@ -74,7 +74,7 @@ valued = ["--last"]
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

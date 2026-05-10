@@ -1,6 +1,6 @@
 use crate::parse::{Token, WordSet};
 use crate::verdict::{SafetyLevel, Verdict};
-use crate::policy::{self, FlagPolicy, FlagStyle};
+use crate::policy::{self, FlagPolicy, FlagTolerance};
 
 static SYSCTL_POLICY: FlagPolicy = FlagPolicy {
     standalone: WordSet::flags(&[
@@ -11,8 +11,7 @@ static SYSCTL_POLICY: FlagPolicy = FlagPolicy {
     valued: WordSet::flags(&["-B", "-r"]),
     bare: false,
     max_positional: None,
-    flag_style: FlagStyle::Strict,
-    numeric_dash: false,
+    tolerance: FlagTolerance::strict(),
 };
 
 pub(crate) fn is_safe_sysctl(tokens: &[Token]) -> Verdict {

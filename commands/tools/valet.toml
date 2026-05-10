@@ -10,7 +10,7 @@ allow_all = true
 
 [[command.sub]]
 name = "list"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--raw", "-h"]
 valued = ["--format"]
 
@@ -44,7 +44,7 @@ standalone = ["--help", "--ignore-output", "--plain", "-h"]
 
 [[command.sub]]
 name = "log"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-f", "-h"]
 
 [[command.sub]]
@@ -58,19 +58,19 @@ standalone = ["--help", "-h"]
 [[command.sub]]
 name = "start"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "stop"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "restart"
 level = "SafeWrite"
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

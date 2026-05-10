@@ -39,7 +39,7 @@ standalone = ["--help", "--unacknowledged", "-h", "-u"]
 name = "list"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--long", "--show-dependencies", "-h", "-l"]
 valued = ["--app", "--context", "--profile", "--role-arn", "--strict", "-a", "-c"]
 
@@ -47,7 +47,7 @@ valued = ["--app", "--context", "--profile", "--role-arn", "--strict", "-a", "-c
 name = "ls"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "--long", "--show-dependencies", "-h", "-l"]
 valued = ["--app", "--context", "--profile", "--role-arn", "--strict", "-a", "-c"]
 
@@ -56,7 +56,7 @@ name = "synth"
 aliases = ["synthesize"]
 level = "SafeWrite"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--exclusively", "--help", "--quiet", "--validation", "-e", "-h", "-q"]
 valued = ["--app", "--context", "--output", "--profile", "--role-arn", "-a", "-c", "-o"]
 
@@ -64,7 +64,7 @@ valued = ["--app", "--context", "--output", "--profile", "--role-arn", "-a", "-c
 name = "diff"
 level = "SafeRead"
 bare = true
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--exclusively", "--fail", "--help", "--security-only", "-e", "-h"]
 valued = ["--app", "--context", "--profile", "--role-arn", "--template", "-a", "-c"]
 
@@ -72,7 +72,7 @@ valued = ["--app", "--context", "--profile", "--role-arn", "--template", "-a", "
 name = "completion"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]

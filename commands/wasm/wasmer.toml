@@ -13,35 +13,35 @@ standalone = ["--help", "--verbose", "-h", "-v"]
 name = "validate"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "inspect"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "wasm-objdump"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--all", "--debug", "--details", "--disassemble", "--header", "--help", "--imports", "--exports", "-D", "-d", "-h", "-x"]
 
 [[command.sub]]
 name = "wast"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "wasm2wat"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--output"]
 
@@ -49,7 +49,7 @@ valued = ["--output"]
 name = "wat2wasm"
 level = "SafeRead"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 valued = ["--output"]
 
@@ -63,7 +63,7 @@ standalone = ["--help", "-h"]
 name = "completions"
 level = "Inert"
 bare = false
-positional_style = true
+tolerate_unknown_short = true
 standalone = ["--help", "-h"]
 
 [[command.sub]]
