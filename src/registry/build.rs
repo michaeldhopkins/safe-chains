@@ -35,6 +35,18 @@ pub(super) fn build_policy(
     }
 }
 
+fn build_handler_policy(toml: TomlHandlerPolicy) -> OwnedPolicy {
+    build_policy(
+        toml.standalone,
+        toml.valued,
+        toml.bare,
+        toml.max_positional,
+        toml.tolerate_unknown_short,
+        toml.tolerate_unknown_long,
+        toml.numeric_dash,
+    )
+}
+
 fn build_fallback(parent: &str, toml: TomlFallback) -> FallbackSpec {
     let policy = build_policy(
         toml.standalone,
@@ -119,6 +131,8 @@ fn build_sub_kind(toml: TomlSub) -> DispatchKind {
             doc_body: toml.doc_body,
             subs: Vec::new(),
             fallback: None,
+            handler_policies: std::collections::HashMap::new(),
+            handler_data: std::collections::HashMap::new(),
         };
     }
     if toml.allow_all.unwrap_or(false) {
@@ -281,6 +295,11 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     if let Some(handler_name) = toml.handler {
         let subs = filter_candidates(toml.sub).flat_map(build_subs).collect();
         let fallback = toml.fallback.map(|f| build_fallback(&toml.name, f));
+        let handler_policies = toml
+            .handler_policy
+            .into_iter()
+            .map(|(k, v)| (k, build_handler_policy(v)))
+            .collect();
         return CommandSpec {
             name: toml.name,
             description: desc,
@@ -295,6 +314,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 doc_body: toml.doc_body,
                 subs,
                 fallback,
+                handler_policies,
+                handler_data: toml.handler_data,
             },
         };
     }

@@ -1,5 +1,40 @@
 use super::types::*;
 
+fn describe_handler_policies(
+    policies: &std::collections::HashMap<String, OwnedPolicy>,
+) -> Option<String> {
+    if policies.is_empty() {
+        return None;
+    }
+    let mut keys: Vec<&String> = policies.keys().collect();
+    keys.sort();
+    let mut lines = vec!["**Handler-side flag policies:**".to_string()];
+    for key in keys {
+        let summary = policies[key].flag_summary();
+        if summary.is_empty() {
+            lines.push(format!("- **{key}**"));
+        } else {
+            lines.push(format!("- **{key}**: {summary}"));
+        }
+    }
+    Some(lines.join("\n"))
+}
+
+fn describe_handler_data(
+    data: &std::collections::HashMap<String, Vec<String>>,
+) -> Option<String> {
+    if data.is_empty() {
+        return None;
+    }
+    let mut keys: Vec<&String> = data.keys().collect();
+    keys.sort();
+    let mut lines = vec!["**Handler-side data:**".to_string()];
+    for key in keys {
+        lines.push(format!("- **{key}**: {}", data[key].join(", ")));
+    }
+    Some(lines.join("\n"))
+}
+
 fn describe_fallback(f: &FallbackSpec) -> String {
     let mut lines = vec!["**Fallback grammar (engaged when no sub matches):**".to_string()];
     if f.policy.bare {
@@ -57,7 +92,7 @@ impl CommandSpec {
                 let args = patterns.join(", ");
                 format!("Allowed first arguments: {args}")
             }
-            DispatchKind::Custom { doc_body, subs, fallback, .. } => {
+            DispatchKind::Custom { doc_body, subs, fallback, handler_policies, handler_data, .. } => {
                 let mut sections: Vec<String> = Vec::new();
                 if let Some(body) = doc_body
                     && !body.trim().is_empty()
@@ -74,6 +109,12 @@ impl CommandSpec {
                 }
                 if let Some(f) = fallback {
                     sections.push(describe_fallback(f));
+                }
+                if let Some(s) = describe_handler_policies(handler_policies) {
+                    sections.push(s);
+                }
+                if let Some(s) = describe_handler_data(handler_data) {
+                    sections.push(s);
                 }
                 sections.join("\n\n")
             }

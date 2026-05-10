@@ -1,255 +1,18 @@
+//! GitHub CLI dispatch. All flag-policy data and the sub × action
+//! allowlists live in `commands/forges/gh.toml`. The handler is the
+//! sub × action matrix routing logic plus a sub-handler for `gh api`
+//! whose REST-vs-GraphQL routing, explicit-GET-for-fields rule, header
+//! allowlist, and GraphQL mutation veto can't move to TOML.
 use crate::parse::{Token, WordSet, has_flag};
+use crate::registry;
 use crate::verdict::{SafetyLevel, Verdict};
-use crate::policy::{self, FlagPolicy, FlagTolerance};
 
-static GH_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--all", "--archived", "--comments", "--draft",
-        "--fork", "--no-archived", "--source", "--web",
-        "-a", "-w",
-    ]),
-    valued: WordSet::flags(&[
-        "--app", "--assignee", "--author", "--base",
-        "--env", "--head", "--jq", "--json",
-        "--key", "--label", "--language", "--limit",
-        "--mention", "--milestone", "--order", "--org",
-        "--ref", "--repo", "--search", "--sort",
-        "--state", "--template", "--topic", "--user", "--visibility",
-        "-B", "-H", "-L", "-O", "-R", "-S",
-        "-e", "-k", "-l", "-o", "-q", "-r", "-u",
-    ]),
-    bare: true,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--comments", "--web", "--yaml",
-        "-c", "-w", "-y",
-    ]),
-    valued: WordSet::flags(&[
-        "--branch", "--jq", "--json", "--ref", "--repo", "--template",
-        "-R", "-b", "-q", "-r",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_DIFF_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--name-only", "--patch", "--web",
-        "-w",
-    ]),
-    valued: WordSet::flags(&[
-        "--color", "--repo",
-        "-R",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_CHECKS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--fail-fast", "--required", "--watch", "--web",
-        "-w",
-    ]),
-    valued: WordSet::flags(&[
-        "--interval", "--jq", "--json", "--repo", "--template",
-        "-R", "-i", "-q",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_STATUS_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--exit-status", "--log", "--log-failed", "--web",
-        "-w",
-    ]),
-    valued: WordSet::flags(&[
-        "--jq", "--json", "--repo", "--template",
-        "-R", "-q",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_RUN_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[]),
-    valued: WordSet::flags(&[
-        "--branch", "--commit", "--created", "--event",
-        "--jq", "--json", "--limit", "--repo",
-        "--status", "--template", "--user", "--workflow",
-        "-L", "-R", "-b", "-q", "-u", "-w",
-    ]),
-    bare: true,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_RUN_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--exit-status", "--log", "--log-failed", "--verbose", "--web",
-        "-v", "-w",
-    ]),
-    valued: WordSet::flags(&[
-        "--attempt", "--job", "--jq", "--json", "--repo", "--template",
-        "-R", "-j", "-q",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_RUN_WATCH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--exit-status",
-    ]),
-    valued: WordSet::flags(&[
-        "--interval", "--repo",
-        "-R", "-i",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_RELEASE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--exclude-drafts", "--exclude-pre-releases",
-    ]),
-    valued: WordSet::flags(&[
-        "--jq", "--json", "--limit", "--order", "--repo", "--template",
-        "-L", "-R", "-q",
-    ]),
-    bare: true,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_RELEASE_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--web",
-        "-w",
-    ]),
-    valued: WordSet::flags(&[
-        "--jq", "--json", "--repo", "--template",
-        "-R", "-q",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_SEARCH_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--archived", "--draft", "--include-forks", "--locked",
-        "--merged",
-        "--no-assignee", "--no-label", "--no-milestone", "--no-project",
-        "--web",
-        "-w",
-    ]),
-    valued: WordSet::flags(&[
-        "--app", "--assignee", "--author",
-        "--checks", "--closed", "--commenter", "--comments", "--committer",
-        "--created",
-        "--filename", "--followers", "--forks",
-        "--good-first-issues", "--hash", "--help-wanted-issues",
-        "--include", "--interactions", "--involves",
-        "--jq", "--json",
-        "--label", "--language", "--license", "--limit",
-        "--match", "--mentions", "--merged-at", "--milestone",
-        "--number", "--order", "--owner",
-        "--parent", "--project",
-        "--reactions", "--repo", "--review", "--review-requested",
-        "--reviewed-by",
-        "--size", "--sort", "--stars", "--state",
-        "--team-mentions", "--team-review-requested", "--template",
-        "--topic", "--updated", "--visibility",
-        "-L", "-R", "-q",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_RELEASE_DOWNLOAD_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--clobber", "--skip-existing"]),
-    valued: WordSet::flags(&[
-        "--archive", "--dir", "--output", "--pattern", "--repo",
-        "-A", "-D", "-O", "-R", "-p",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_SIMPLE_LIST_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--all", "--archived", "--fork", "--no-archived", "--source", "--web",
-        "-a", "-w",
-    ]),
-    valued: WordSet::flags(&[
-        "--env", "--jq", "--json", "--key", "--language", "--limit",
-        "--order", "--org", "--ref", "--repo", "--search",
-        "--sort", "--template", "--topic", "--user", "--visibility",
-        "-L", "-O", "-R", "-S", "-e", "-k", "-l", "-o", "-q", "-r", "-u",
-    ]),
-    bare: true,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_SIMPLE_VIEW_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--web", "--yaml", "-w", "-y"]),
-    valued: WordSet::flags(&[
-        "--jq", "--json", "--ref", "--repo", "--template",
-        "-R", "-q", "-r",
-    ]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static GH_RUN_RERUN_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&["--debug", "--failed"]),
-    valued: WordSet::flags(&["--job", "--repo", "-R", "-j"]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
-static READ_ONLY_SUBCOMMANDS: WordSet = WordSet::new(&[
-    "alias", "attestation", "cache", "codespace", "config",
-    "extension", "gist", "gpg-key",
-    "issue", "label", "org", "pr", "project", "release",
-    "repo", "ruleset", "run", "secret",
-    "ssh-key", "variable", "workflow",
-]);
-
-static READ_ONLY_ACTIONS: WordSet =
-    WordSet::new(&["checks", "diff", "list", "status", "verify", "view", "watch"]);
-
-static ALWAYS_SAFE_SUBCOMMANDS: WordSet =
-    WordSet::new(&["--version", "search", "status"]);
-
-static GH_BROWSE_POLICY: FlagPolicy = FlagPolicy {
-    standalone: WordSet::flags(&[
-        "--actions", "--no-browser", "--projects",
-        "--releases", "--settings", "--wiki",
-        "-a", "-c", "-n", "-p", "-r", "-s", "-w",
-    ]),
-    valued: WordSet::flags(&["--branch", "--commit", "--repo", "-R", "-b"]),
-    bare: false,
-    max_positional: None,
-    tolerance: FlagTolerance::strict(),
-};
-
+// The api sub's flag surface. These lists stay in Rust as a known
+// exception to the data-in-TOML principle: the field flags' semantics
+// (require explicit `-X GET` on REST; veto mutation queries on
+// GraphQL; pair as KEY=VALUE) are coupled to the validation logic
+// just above. Adding a TOML primitive for "valued flag with KEY=VALUE
+// content rules" is a future schema refinement.
 static API_STANDALONE: WordSet = WordSet::new(&[
     "--include", "--paginate", "--silent", "--slurp", "--verbose",
     "-i",
@@ -274,108 +37,149 @@ fn is_safe_api_header(value: &str) -> bool {
         || trimmed.eq_ignore_ascii_case("X-GitHub-Api-Version")
 }
 
-fn gh_action_policy(action: &str) -> &'static FlagPolicy {
+fn action_policy_key(action: &str) -> &'static str {
     match action {
-        "list" => &GH_LIST_POLICY,
-        "view" => &GH_VIEW_POLICY,
-        "diff" => &GH_DIFF_POLICY,
-        "checks" => &GH_CHECKS_POLICY,
-        "status" => &GH_STATUS_POLICY,
-        "verify" | "watch" => &GH_SIMPLE_VIEW_POLICY,
-        _ => &GH_SIMPLE_LIST_POLICY,
+        "list" => "list",
+        "view" => "view",
+        "diff" => "diff",
+        "checks" => "checks",
+        "status" => "status",
+        "verify" | "watch" => "simple_view",
+        _ => "simple_list",
     }
 }
 
-fn gh_run_action_policy(action: &str) -> &'static FlagPolicy {
+fn run_action_policy_key(action: &str) -> &'static str {
     match action {
-        "list" => &GH_RUN_LIST_POLICY,
-        "view" => &GH_RUN_VIEW_POLICY,
-        "watch" => &GH_RUN_WATCH_POLICY,
-        _ => &GH_SIMPLE_VIEW_POLICY,
+        "list" => "run_list",
+        "view" => "run_view",
+        "watch" => "run_watch",
+        _ => "simple_view",
     }
 }
 
-fn gh_release_action_policy(action: &str) -> &'static FlagPolicy {
+fn release_action_policy_key(action: &str) -> &'static str {
     match action {
-        "download" => &GH_RELEASE_DOWNLOAD_POLICY,
-        "list" => &GH_RELEASE_LIST_POLICY,
-        "view" => &GH_RELEASE_VIEW_POLICY,
-        _ => &GH_SIMPLE_LIST_POLICY,
+        "list" => "release_list",
+        "view" => "release_view",
+        _ => "simple_list",
     }
+}
+
+fn check_policy(key: &str, tokens: &[Token], level: SafetyLevel) -> Verdict {
+    if registry::check_handler_policy("gh", key, tokens) {
+        Verdict::Allowed(level)
+    } else {
+        Verdict::Denied
+    }
+}
+
+fn is_read_only_sub(s: &str) -> bool {
+    registry::handler_word_list("gh", "read_only_subs")
+        .iter()
+        .any(|sub| sub == s)
+}
+
+fn is_read_only_action(s: &str) -> bool {
+    registry::handler_word_list("gh", "read_only_actions")
+        .iter()
+        .any(|action| action == s)
 }
 
 pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
     if tokens.len() < 2 {
         return Verdict::Denied;
     }
-    if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
+
+    // `gh --help`, `gh --version` → fallback grammar.
+    if let Some(v @ Verdict::Allowed(_)) = registry::try_fallback_grammar("gh", tokens) {
+        return v;
+    }
+
+    let subcmd = tokens[1].as_str();
+
+    // Universal `gh <sub> --help` at length 3.
+    if tokens.len() == 3 && matches!(tokens[2].as_str(), "--help" | "-h") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-    let subcmd = &tokens[1];
 
-    if tokens.len() == 3 && (tokens[2] == "--help" || tokens[2] == "-h") {
-        return Verdict::Allowed(SafetyLevel::Inert);
-    }
-
-    if subcmd == "search" {
-        return if tokens.len() >= 3 && policy::check(&tokens[2..], &GH_SEARCH_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
-    }
-
-    if subcmd == "status" {
-        return if policy::check(&tokens[1..], &GH_SIMPLE_LIST_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
-    }
-
-    if subcmd == "run" && tokens.len() >= 3 && tokens[2] == "rerun" {
-        return if policy::check(&tokens[2..], &GH_RUN_RERUN_POLICY)
-        { Verdict::Allowed(SafetyLevel::SafeWrite) }
-        else { Verdict::Denied };
-    }
-
-    if subcmd == "release" && tokens.len() >= 3 && tokens[2] == "download" {
-        return if has_flag(&tokens[2..], Some("-O"), Some("--output"))
-            && policy::check(&tokens[2..], &GH_RELEASE_DOWNLOAD_POLICY) { Verdict::Allowed(SafetyLevel::SafeWrite) } else { Verdict::Denied };
-    }
-
-    if READ_ONLY_SUBCOMMANDS.contains(subcmd) {
-        if tokens.len() < 3 || !READ_ONLY_ACTIONS.contains(&tokens[2]) {
-            return Verdict::Denied;
-        }
-        let action = tokens[2].as_str();
-        let policy = if subcmd == "run" {
-            gh_run_action_policy(action)
-        } else if subcmd == "release" {
-            gh_release_action_policy(action)
-        } else {
-            gh_action_policy(action)
-        };
-        return if policy::check(&tokens[2..], policy) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
-    }
-
-    if subcmd == "auth" {
-        if tokens.len() < 3 {
-            return Verdict::Denied;
-        }
-        if tokens[2] == "status" {
-            return if policy::check(&tokens[2..], &GH_SIMPLE_LIST_POLICY) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
-        }
-        return Verdict::Denied;
-    }
-
-    if subcmd == "browse" {
-        return if has_flag(&tokens[1..], Some("-n"), Some("--no-browser"))
-            && policy::check(&tokens[1..], &GH_BROWSE_POLICY)
-        { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
-    }
-
+    // `gh api` has its own sub-handler — its REST/GraphQL routing,
+    // header allowlist, explicit-GET-required-for-fields rule, and
+    // GraphQL mutation veto can't be expressed declaratively. Called
+    // with the full `gh api ...` token list so glab can share the same
+    // function.
     if subcmd == "api" {
         return is_safe_gh_api(tokens);
     }
 
-    Verdict::Denied
+    if subcmd == "search" {
+        if tokens.len() < 3 {
+            return Verdict::Denied;
+        }
+        return check_policy("search", &tokens[2..], SafetyLevel::Inert);
+    }
 
+    if subcmd == "status" {
+        return check_policy("simple_list", &tokens[1..], SafetyLevel::Inert);
+    }
+
+    if subcmd == "auth" {
+        if tokens.len() < 3 || tokens[2].as_str() != "status" {
+            return Verdict::Denied;
+        }
+        return check_policy("simple_list", &tokens[2..], SafetyLevel::Inert);
+    }
+
+    if subcmd == "browse" {
+        if !has_flag(&tokens[1..], Some("-n"), Some("--no-browser")) {
+            return Verdict::Denied;
+        }
+        return check_policy("browse", &tokens[1..], SafetyLevel::Inert);
+    }
+
+    if subcmd == "run" {
+        let Some(action) = tokens.get(2).map(|t| t.as_str()) else {
+            return Verdict::Denied;
+        };
+        if action == "rerun" {
+            return check_policy("run_rerun", &tokens[2..], SafetyLevel::SafeWrite);
+        }
+        if !is_read_only_action(action) {
+            return Verdict::Denied;
+        }
+        return check_policy(run_action_policy_key(action), &tokens[2..], SafetyLevel::Inert);
+    }
+
+    if subcmd == "release" {
+        let Some(action) = tokens.get(2).map(|t| t.as_str()) else {
+            return Verdict::Denied;
+        };
+        if action == "download" {
+            if !has_flag(&tokens[2..], Some("-O"), Some("--output")) {
+                return Verdict::Denied;
+            }
+            return check_policy("release_download", &tokens[2..], SafetyLevel::SafeWrite);
+        }
+        if !is_read_only_action(action) {
+            return Verdict::Denied;
+        }
+        return check_policy(release_action_policy_key(action), &tokens[2..], SafetyLevel::Inert);
+    }
+
+    if is_read_only_sub(subcmd) {
+        let Some(action) = tokens.get(2).map(|t| t.as_str()) else {
+            return Verdict::Denied;
+        };
+        if !is_read_only_action(action) {
+            return Verdict::Denied;
+        }
+        return check_policy(action_policy_key(action), &tokens[2..], SafetyLevel::Inert);
+    }
+
+    Verdict::Denied
 }
 
-pub(in crate::handlers::forges) fn is_safe_gh_api(tokens: &[Token]) -> Verdict {
+pub fn is_safe_gh_api(tokens: &[Token]) -> Verdict {
     let endpoint = tokens.get(2).map(|t| t.as_str()).unwrap_or("");
     if endpoint == "graphql" {
         return is_safe_gh_api_graphql(tokens);
@@ -544,35 +348,15 @@ fn is_safe_gh_api_rest(tokens: &[Token]) -> Verdict {
     Verdict::Allowed(SafetyLevel::Inert)
 }
 
-pub(in crate::handlers::forges) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    match cmd {
-        "gh" => Some(is_safe_gh(tokens)),
-        _ => None,
-    }
+pub(in crate::handlers::forges) fn dispatch(_cmd: &str, _tokens: &[Token]) -> Option<Verdict> {
+    // `gh` is dispatched through the TOML registry now (handler = "gh"
+    // in commands/forges/gh.toml). Same for `glab` via its own handler.
+    None
 }
 
 pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    use crate::docs::{CommandDoc, DocBuilder, wordset_items};
-    vec![
-        CommandDoc::handler("gh",
-            "https://cli.github.com/manual/",
-            DocBuilder::new()
-                .section(format!("Subcommands {} are allowed with actions: {}.",
-                    wordset_items(&READ_ONLY_SUBCOMMANDS),
-                    wordset_items(&READ_ONLY_ACTIONS)))
-                .section(format!("Always safe: {}.",
-                    wordset_items(&ALWAYS_SAFE_SUBCOMMANDS)))
-                .section("auth status, browse (requires --no-browser), \
-                          run rerun (SafeWrite), \
-                          release download (requires --output), \
-                          api (read-only: implicit GET or explicit -X GET, \
-                          with --paginate, --slurp, --jq, --template, \
-                          --cache, --preview, --include, --silent, --verbose, --hostname, \
-                          -H for Accept and X-GitHub-Api-Version headers).")
-                .section("")
-                .build(),
-            "forges"),
-    ]
+    // gh's docs come from the TOML registry's auto-render.
+    Vec::new()
 }
 
 #[cfg(test)]

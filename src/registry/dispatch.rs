@@ -281,6 +281,10 @@ pub(super) fn dispatch_sub_kind(tokens: &[Token], kind: &DispatchKind) -> Verdic
     dispatch_kind(tokens, kind, &SUB_HANDLERS)
 }
 
+pub(super) fn check_handler_policy_owned(tokens: &[Token], policy: &OwnedPolicy) -> bool {
+    check_owned(tokens, policy)
+}
+
 /// Applies a TOML-declared fallback grammar. Used by
 /// `registry::try_fallback_grammar()`.
 pub(super) fn dispatch_fallback(tokens: &[Token], spec: &FallbackSpec) -> Verdict {
