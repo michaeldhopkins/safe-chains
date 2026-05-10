@@ -63,6 +63,12 @@ deny = true
 
 Three lines and `gh` is denied in this project — bare invocation, subcommands, and every flag.
 
+## Generate one with an AI
+
+Paste your tool's `--help` output and this prompt into Claude or another LLM:
+
+> Generate a safe-chains custom command definition. Use the schema in <https://github.com/michaeldhopkins/safe-chains/blob/main/commands/SAMPLE.toml>. Output a single TOML block I can paste into `.safe-chains.toml`. Cover read-only and idempotent subcommands; omit destructive ones.
+
 ## Skipping custom files: `SAFE_CHAINS_NO_LOCAL`
 
 Set `SAFE_CHAINS_NO_LOCAL=1` to skip the project-local walk and the user-level lookup. Two reasons:
