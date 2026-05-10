@@ -3,8 +3,72 @@ name = "magick"
 description = "ImageMagick 7's unified binary, supporting over 200 image formats. Three documented calling forms: (1) subcommand-explicit, e.g. `magick convert in.png out.png`, `magick identify in.png`, `magick mogrify ...`; (2) convert-implicit, e.g. `magick in.png -resize 1200x out.png`, which preserves the IM6 `convert` legacy syntax; (3) script-driven, `magick [...] -script script.msl [...]`, which executes an MSL (Magick Scripting Language) script — arbitrary code execution. The identify subcommand is read-only; convert, composite, compare, mogrify, montage, stream, and the legacy combine alias read inputs and write outputs (mogrify modifies in place by default). The conjure, display, animate, and import subcommands are out of scope for headless validation: conjure runs MSL scripts, display and animate launch long-running GUI viewers requiring an X server, and import captures screen content (privacy-relevant + GUI-bound). Processing crafted image files has historically been a CVE source — memory corruption in libpng/libavif, SSRF via SVG/MVG delegate programs, the ImageTragick MSL/EPHEMERAL pseudo-format issues from 2016. Modern releases ship a hardened policy.xml that restricts most pseudo-format codecs (MSL, MVG, EPHEMERAL, HTTPS, etc.) by default, which is the deeper defense layer; behavior depends on the specific build's policy.xml. ImageMagick releases frequently with security patches."
 url = "https://imagemagick.org/script/command-line-tools.php"
 handler = "magick"
-doc_body = """
-- Bare flags: --help, --version, -V, -h
-- Subcommand-explicit form: `magick <sub> <args>` for sub in {compare, composite, convert, identify, mogrify, montage, stream, combine}
-- Convert-implicit form: `magick <input> [options] <output>` — equivalent to `magick convert <input> [options] <output>`, validated by the convert top-level command surface
-- `magick identify ...` is Inert (read-only); other forms are SafeWrite"""
+doc_body = "Routing: explicit subcommands match a [[command.sub]] block; bare diagnostic flags match [command.fallback]; otherwise the implicit-convert form delegates to `convert` only when the first positional looks like a file path. The `-script` token is denied anywhere as MSL execution."
+
+# Subcommand-explicit forms that delegate to their own top-level
+# command (whose TOML defines the precise flag policy). delegate_skip = 0
+# passes the entire token list (including the sub name) to the inner
+# command_verdict so `magick convert in.png out.png` becomes
+# `convert in.png out.png`.
+[[command.sub]]
+name = "convert"
+delegate_skip = 0
+
+[[command.sub]]
+name = "identify"
+delegate_skip = 0
+
+# Legacy ImageMagick passthrough subs. SafeWrite — they read inputs
+# and write outputs (mogrify modifies in place). The flag surface is
+# huge and stable; we accept any flag the underlying tool accepts.
+[[command.sub]]
+name = "combine"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "compare"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "composite"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "mogrify"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "montage"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "stream"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+# Bare diagnostic flags: `magick --help`, `magick --version`. The
+# fallback grammar engages only when no sub matches and provides a
+# zero-positional flag-only invocation; the implicit-convert
+# delegation in the handler covers everything else.
+[command.fallback]
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-V", "-h"]
