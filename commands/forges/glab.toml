@@ -4,24 +4,42 @@ description = "Third-party GitLab CLI (gitlab-org/cli, formerly profclems/glab).
 url = "https://gitlab.com/gitlab-org/cli"
 handler = "glab"
 researched_version = "glab 1.x (2026)"
-doc_body = "Routing: handler dispatches the read-only sub × action matrix via the per-action [command.handler_policy.*] blocks below. Special-case subs: `auth status` (Inert), `--version` / `-v` / `version` / `check-update` as terminal forms (Inert), `api` (delegates to gh's API sub-handler — read-only methods, narrow header allowlist)."
+doc_body = "Routing: [[command.matrix]] blocks below cover the read-only sub × action grid. Top-level terminal forms `glab version` and `glab check-update` are handled by the handler (no flags allowed). `glab api` delegates to gh's API sub-handler."
 
-# --version / --help / -v / -h at length 2, and `version` / `check-update`
-# as bare subcommand forms.
+# --version / --help / -v / -h at length 2.
 [command.fallback]
 level = "Inert"
 bare = false
 max_positional = 0
 standalone = ["--help", "--version", "-h", "-v"]
 
+# Always-safe bare subcommand forms: `glab version`, `glab check-update`.
 [command.handler_data]
-read_only_subs = [
+always_safe_bare_subs = ["check-update", "version"]
+
+# Read-only sub × action grid. Same shape for every parent — no
+# parent-specific overrides like gh has.
+[[command.matrix]]
+parents = [
   "ci", "cluster", "deploy-key", "gpg-key", "incident", "issue",
   "iteration", "label", "milestone", "mr", "release", "repo",
   "schedule", "snippet", "ssh-key", "stack", "variable",
 ]
-read_only_actions = ["diff", "issues", "list", "status", "view"]
-always_safe_bare_subs = ["check-update", "version"]
+level = "Inert"
+[command.matrix.actions]
+diff = "diff"
+issues = "list"
+list = "list"
+status = "simple"
+view = "view"
+
+# `auth status` is also a parent × action shape, just with one parent
+# and one action.
+[[command.matrix]]
+parents = ["auth"]
+level = "Inert"
+[command.matrix.actions]
+status = "simple"
 
 [command.handler_policy.list]
 bare = true

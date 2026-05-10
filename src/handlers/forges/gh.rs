@@ -37,53 +37,12 @@ fn is_safe_api_header(value: &str) -> bool {
         || trimmed.eq_ignore_ascii_case("X-GitHub-Api-Version")
 }
 
-fn action_policy_key(action: &str) -> &'static str {
-    match action {
-        "list" => "list",
-        "view" => "view",
-        "diff" => "diff",
-        "checks" => "checks",
-        "status" => "status",
-        "verify" | "watch" => "simple_view",
-        _ => "simple_list",
-    }
-}
-
-fn run_action_policy_key(action: &str) -> &'static str {
-    match action {
-        "list" => "run_list",
-        "view" => "run_view",
-        "watch" => "run_watch",
-        _ => "simple_view",
-    }
-}
-
-fn release_action_policy_key(action: &str) -> &'static str {
-    match action {
-        "list" => "release_list",
-        "view" => "release_view",
-        _ => "simple_list",
-    }
-}
-
 fn check_policy(key: &str, tokens: &[Token], level: SafetyLevel) -> Verdict {
     if registry::check_handler_policy("gh", key, tokens) {
         Verdict::Allowed(level)
     } else {
         Verdict::Denied
     }
-}
-
-fn is_read_only_sub(s: &str) -> bool {
-    registry::handler_word_list("gh", "read_only_subs")
-        .iter()
-        .any(|sub| sub == s)
-}
-
-fn is_read_only_action(s: &str) -> bool {
-    registry::handler_word_list("gh", "read_only_actions")
-        .iter()
-        .any(|action| action == s)
 }
 
 pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
@@ -112,24 +71,19 @@ pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
         return is_safe_gh_api(tokens);
     }
 
+    // Single-sub forms whose flag policy lives in a named handler_policy
+    // but whose shape (no action verb, or a guard requirement) doesn't
+    // fit [[command.matrix]]. Kept as handler logic; the data they
+    // consult is still in TOML.
     if subcmd == "search" {
         if tokens.len() < 3 {
             return Verdict::Denied;
         }
         return check_policy("search", &tokens[2..], SafetyLevel::Inert);
     }
-
     if subcmd == "status" {
         return check_policy("simple_list", &tokens[1..], SafetyLevel::Inert);
     }
-
-    if subcmd == "auth" {
-        if tokens.len() < 3 || tokens[2].as_str() != "status" {
-            return Verdict::Denied;
-        }
-        return check_policy("simple_list", &tokens[2..], SafetyLevel::Inert);
-    }
-
     if subcmd == "browse" {
         if !has_flag(&tokens[1..], Some("-n"), Some("--no-browser")) {
             return Verdict::Denied;
@@ -137,46 +91,8 @@ pub fn is_safe_gh(tokens: &[Token]) -> Verdict {
         return check_policy("browse", &tokens[1..], SafetyLevel::Inert);
     }
 
-    if subcmd == "run" {
-        let Some(action) = tokens.get(2).map(|t| t.as_str()) else {
-            return Verdict::Denied;
-        };
-        if action == "rerun" {
-            return check_policy("run_rerun", &tokens[2..], SafetyLevel::SafeWrite);
-        }
-        if !is_read_only_action(action) {
-            return Verdict::Denied;
-        }
-        return check_policy(run_action_policy_key(action), &tokens[2..], SafetyLevel::Inert);
-    }
-
-    if subcmd == "release" {
-        let Some(action) = tokens.get(2).map(|t| t.as_str()) else {
-            return Verdict::Denied;
-        };
-        if action == "download" {
-            if !has_flag(&tokens[2..], Some("-O"), Some("--output")) {
-                return Verdict::Denied;
-            }
-            return check_policy("release_download", &tokens[2..], SafetyLevel::SafeWrite);
-        }
-        if !is_read_only_action(action) {
-            return Verdict::Denied;
-        }
-        return check_policy(release_action_policy_key(action), &tokens[2..], SafetyLevel::Inert);
-    }
-
-    if is_read_only_sub(subcmd) {
-        let Some(action) = tokens.get(2).map(|t| t.as_str()) else {
-            return Verdict::Denied;
-        };
-        if !is_read_only_action(action) {
-            return Verdict::Denied;
-        }
-        return check_policy(action_policy_key(action), &tokens[2..], SafetyLevel::Inert);
-    }
-
-    Verdict::Denied
+    // Everything else is the sub × action matrix.
+    registry::try_matrix_dispatch("gh", tokens).unwrap_or(Verdict::Denied)
 }
 
 pub fn is_safe_gh_api(tokens: &[Token]) -> Verdict {

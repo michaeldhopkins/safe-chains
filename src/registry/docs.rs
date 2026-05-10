@@ -35,6 +35,29 @@ fn describe_handler_data(
     Some(lines.join("\n"))
 }
 
+fn describe_matrices(matrices: &[MatrixSpec]) -> Option<String> {
+    if matrices.is_empty() {
+        return None;
+    }
+    let mut lines = vec!["**Sub × action matrix:**".to_string()];
+    for matrix in matrices {
+        let parents = matrix.parents.join(", ");
+        lines.push(format!("- Parents ({:?}): {parents}", matrix.level));
+        let mut actions: Vec<&String> = matrix.actions.keys().collect();
+        actions.sort();
+        for name in actions {
+            let action = &matrix.actions[name];
+            let guard = match (&action.guard, &action.guard_short) {
+                (Some(long), Some(short)) => format!(" (requires {short}/{long})"),
+                (Some(long), None) => format!(" (requires {long})"),
+                _ => String::new(),
+            };
+            lines.push(format!("  - **{name}** → policy `{}`{guard}", action.policy_key));
+        }
+    }
+    Some(lines.join("\n"))
+}
+
 fn describe_fallback(f: &FallbackSpec) -> String {
     let mut lines = vec!["**Fallback grammar (engaged when no sub matches):**".to_string()];
     if f.policy.bare {
@@ -92,7 +115,7 @@ impl CommandSpec {
                 let args = patterns.join(", ");
                 format!("Allowed first arguments: {args}")
             }
-            DispatchKind::Custom { doc_body, subs, fallback, handler_policies, handler_data, .. } => {
+            DispatchKind::Custom { doc_body, subs, fallback, handler_policies, handler_data, matrices, .. } => {
                 let mut sections: Vec<String> = Vec::new();
                 if let Some(body) = doc_body
                     && !body.trim().is_empty()
@@ -106,6 +129,9 @@ impl CommandSpec {
                 if !sub_lines.is_empty() {
                     sub_lines.sort();
                     sections.push(sub_lines.join("\n"));
+                }
+                if let Some(s) = describe_matrices(matrices) {
+                    sections.push(s);
                 }
                 if let Some(f) = fallback {
                     sections.push(describe_fallback(f));

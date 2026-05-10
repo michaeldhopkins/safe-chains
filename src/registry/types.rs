@@ -90,6 +90,38 @@ pub(super) struct TomlCommand {
     /// `registry::handler_word_list(cmd, key)`.
     #[serde(default)]
     pub handler_data: std::collections::HashMap<String, Vec<String>>,
+    /// Parent × action → policy matrices. One block declares: "for
+    /// these parent subcommand names, each of these action verbs maps
+    /// to a named `handler_policy` and validates at this safety level."
+    /// Lets handlers express their dispatch tables as data instead of
+    /// `match` arms. Walked by `registry::try_matrix_dispatch()`.
+    #[serde(default)]
+    pub matrix: Vec<TomlMatrix>,
+}
+
+#[derive(Debug, Deserialize)]
+pub(super) struct TomlMatrix {
+    pub parents: Vec<String>,
+    pub level: TomlLevel,
+    pub actions: std::collections::HashMap<String, TomlMatrixAction>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub(super) enum TomlMatrixAction {
+    /// Shorthand: `list = "policy_name"` — references handler_policy by
+    /// name; no guard required.
+    Policy(String),
+    /// Detailed form: `download = { policy = "release_download", guard
+    /// = "--output", guard_short = "-O" }`. The guard flag must be
+    /// present in the action's args for the dispatch to succeed.
+    Detailed {
+        policy: String,
+        #[serde(default)]
+        guard: Option<String>,
+        #[serde(default)]
+        guard_short: Option<String>,
+    },
 }
 
 #[derive(Debug, Deserialize)]
@@ -312,6 +344,9 @@ pub(super) enum DispatchKind {
         /// Named string lists the handler reads via
         /// `registry::handler_word_list()`.
         handler_data: std::collections::HashMap<String, Vec<String>>,
+        /// Sub × action matrices the handler walks via
+        /// `registry::try_matrix_dispatch()`.
+        matrices: Vec<MatrixSpec>,
     },
 }
 
@@ -322,6 +357,20 @@ pub struct OwnedPolicy {
     pub bare: bool,
     pub max_positional: Option<usize>,
     pub tolerance: crate::policy::FlagTolerance,
+}
+
+#[derive(Debug, Clone)]
+pub(super) struct MatrixSpec {
+    pub parents: Vec<String>,
+    pub level: SafetyLevel,
+    pub actions: std::collections::HashMap<String, MatrixAction>,
+}
+
+#[derive(Debug, Clone)]
+pub(super) struct MatrixAction {
+    pub policy_key: String,
+    pub guard: Option<String>,
+    pub guard_short: Option<String>,
 }
 
 #[derive(Debug, Clone)]

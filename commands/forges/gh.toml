@@ -4,7 +4,7 @@ description = "GitHub's official CLI. Most subcommands wrap REST or GraphQL call
 url = "https://cli.github.com/manual/"
 handler = "gh"
 researched_version = "gh 2.x"
-doc_body = "Routing: handler dispatches the sub × action matrix (read-only subs × {checks, diff, list, status, verify, view, watch}) via per-action TOML-declared policies, with parent-specific overrides for `run` (RUN_LIST/RUN_VIEW/RUN_WATCH) and `release` (RELEASE_LIST/RELEASE_VIEW). Special-case subs in the handler: `auth status` (Inert), `browse` (requires --no-browser, Inert), `run rerun` (SafeWrite), `release download` (requires --output, SafeWrite), `search`/`status` (Inert), `api` (its own sub-handler — REST and GraphQL with read-only methods and header allowlist). All flag-policy data lives in [command.handler_policy.*] blocks below."
+doc_body = "Routing: [[command.matrix]] blocks below cover the sub × action grid (read-only subs and their action verbs → handler_policy by name). The handler's remaining logic is the universal `<sub> --help` shortcut, the `api` sub-handler (REST/GraphQL with method/header/mutation rules), and the dispatch from there into try_sub_dispatch / try_matrix_dispatch."
 
 # --version / --help at length 2.
 [command.fallback]
@@ -13,16 +13,80 @@ bare = false
 max_positional = 0
 standalone = ["--help", "--version", "-V", "-h"]
 
-# Sub × action matrix data the handler walks at dispatch time.
-[command.handler_data]
-read_only_subs = [
+# Sub × action matrix. The handler walks these blocks via
+# registry::try_matrix_dispatch — for each block, if tokens[1] is in
+# `parents` and tokens[2] is in `actions`, validates tokens[2..]
+# against the named handler_policy at the matrix's level.
+
+# Most read-only subs share this mapping.
+[[command.matrix]]
+parents = [
   "alias", "attestation", "cache", "codespace", "config",
   "extension", "gist", "gpg-key",
-  "issue", "label", "org", "pr", "project", "release",
-  "repo", "ruleset", "run", "secret",
+  "issue", "label", "org", "pr", "project",
+  "repo", "ruleset", "secret",
   "ssh-key", "variable", "workflow",
 ]
-read_only_actions = ["checks", "diff", "list", "status", "verify", "view", "watch"]
+level = "Inert"
+[command.matrix.actions]
+checks = "checks"
+diff = "diff"
+list = "list"
+status = "status"
+verify = "simple_view"
+view = "view"
+watch = "simple_view"
+
+# `run` has its own per-action policies.
+[[command.matrix]]
+parents = ["run"]
+level = "Inert"
+[command.matrix.actions]
+checks = "simple_view"
+diff = "simple_view"
+list = "run_list"
+status = "simple_view"
+verify = "simple_view"
+view = "run_view"
+watch = "run_watch"
+
+# `run rerun` re-queues a workflow run — SafeWrite, separate matrix.
+[[command.matrix]]
+parents = ["run"]
+level = "SafeWrite"
+[command.matrix.actions]
+rerun = "run_rerun"
+
+# `release` overrides too.
+[[command.matrix]]
+parents = ["release"]
+level = "Inert"
+[command.matrix.actions]
+checks = "simple_list"
+diff = "simple_list"
+list = "release_list"
+status = "simple_list"
+verify = "simple_list"
+view = "release_view"
+watch = "simple_list"
+
+# `release download` writes asset bytes — SafeWrite, requires
+# -O/--output so the destination is explicit.
+[[command.matrix]]
+parents = ["release"]
+level = "SafeWrite"
+[command.matrix.actions.download]
+policy = "release_download"
+guard = "--output"
+guard_short = "-O"
+
+# Top-level read-only subs that aren't sub × action: `auth status`,
+# `search <thing>`, `gh status`. Single-matrix entries for each.
+[[command.matrix]]
+parents = ["auth"]
+level = "Inert"
+[command.matrix.actions]
+status = "simple_list"
 
 # 17 named flag policies. Each is the flag surface for one (action) or
 # (parent, action) cell of the matrix; the handler picks the right one

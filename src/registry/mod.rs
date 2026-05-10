@@ -81,6 +81,39 @@ pub fn try_fallback_grammar(cmd_name: &str, tokens: &[Token]) -> Option<Verdict>
     Some(dispatch::dispatch_fallback(tokens, f))
 }
 
+/// Dispatch `tokens` against `cmd_name`'s `[[command.matrix]]`
+/// blocks. Looks at `tokens[1]` (parent) and `tokens[2]` (action),
+/// finds the first matrix whose `parents` contains the parent and
+/// whose `actions` map contains the action, then validates
+/// `tokens[2..]` against the named policy (and a guard flag if the
+/// matrix entry declared one). Returns `None` if no matrix matched —
+/// the handler can then fall through to its remaining special cases
+/// or deny.
+pub fn try_matrix_dispatch(cmd_name: &str, tokens: &[Token]) -> Option<Verdict> {
+    let spec = handler_spec(cmd_name)?;
+    let DispatchKind::Custom { matrices, handler_policies, .. } = &spec.kind else {
+        return None;
+    };
+    let parent = tokens.get(1)?.as_str();
+    let action = tokens.get(2)?.as_str();
+    for matrix in matrices {
+        if !matrix.parents.iter().any(|p| p == parent) {
+            continue;
+        }
+        let Some(action_spec) = matrix.actions.get(action) else { continue; };
+        if let Some(long) = action_spec.guard.as_deref()
+            && !crate::parse::has_flag(&tokens[2..], action_spec.guard_short.as_deref(), Some(long))
+        {
+            return Some(Verdict::Denied);
+        }
+        let Some(policy) = handler_policies.get(&action_spec.policy_key) else {
+            return Some(Verdict::Denied);
+        };
+        return Some(dispatch::dispatch_matrix_action(&tokens[2..], policy, matrix.level));
+    }
+    None
+}
+
 /// Validate `tokens` against `cmd_name`'s named flag policy declared
 /// in a `[command.handler_policy.KEY]` block. Returns `false` if no
 /// such policy is declared or the tokens fail it. Used by handlers

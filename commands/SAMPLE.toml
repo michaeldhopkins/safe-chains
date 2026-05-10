@@ -409,6 +409,40 @@
 # numeric_dash = false
 
 # ─────────────────────────────────────────────────────────────────────
+# HANDLER POLICIES / DATA / MATRIX — data the handler walks
+# ─────────────────────────────────────────────────────────────────────
+#
+# For handlers whose dispatch logic genuinely can't move to TOML (e.g.
+# gh's sub × action matrix) but whose per-policy WordSets and parent/
+# action allowlists should still be data, not Rust constants.
+#
+# `[command.handler_policy.NAME]` — a named flag policy. The handler
+#   reads it via `registry::check_handler_policy(cmd, key, tokens)`.
+#   Same fields as [command.fallback]: standalone, valued, bare,
+#   max_positional, tolerate_unknown_short, tolerate_unknown_long,
+#   numeric_dash.
+#
+# `[command.handler_data]` — named string lists (sub allowlists,
+#   action allowlists, directive keys). Read via
+#   `registry::handler_word_list(cmd, key)`.
+#
+# `[[command.matrix]]` — parent × action → policy mappings. Each
+#   block says "for these parent subcommand names, this action verb
+#   maps to this `handler_policy` and validates at this safety level."
+#   Walked by `registry::try_matrix_dispatch(cmd, tokens)`. Lets a
+#   handler express its dispatch table as data instead of `match` arms.
+#
+#   Shorthand form (no guard required):
+#     [command.matrix.actions]
+#     list = "list_policy"
+#
+#   Detailed form (action requires a specific flag to be present):
+#     [command.matrix.actions.download]
+#     policy = "download_policy"
+#     guard = "--output"
+#     guard_short = "-O"
+
+# ─────────────────────────────────────────────────────────────────────
 # RESEARCHED_VERSION — record which upstream version was last vetted
 # ─────────────────────────────────────────────────────────────────────
 #
