@@ -1,78 +1,52 @@
-use crate::parse::{Token, WordSet};
-use crate::verdict::{SafetyLevel, Verdict};
+//! `magick` is ImageMagick 7's unified entry point. The grammar is
+//! routed by the first token: explicit subs (`magick convert ...`)
+//! match a TOML-declared sub; bare diagnostic flags match the fallback
+//! grammar; anything else is the IM6-legacy implicit-convert form
+//! (`magick in.png -resize 1200x out.png`), which dispatches through
+//! the top-level `convert` command's policy.
+//!
+//! Two pieces of LOGIC the declarative TOML can't express:
+//!   1. `-script` (MSL execution) is denied anywhere in the token
+//!      stream — not just as a leading flag.
+//!   2. The implicit-convert delegation is gated on the first
+//!      positional looking like a file path. Without that gate, bare
+//!      words like `animate`, `conjure`, `display`, or `import` would
+//!      flow into convert's permissive positional list and be silently
+//!      allowed.
+//!
+//! All sub names, allowed flags, and safety levels live in
+//! `commands/magick.toml`.
+use crate::parse::Token;
+use crate::registry;
+use crate::verdict::Verdict;
 
-// Image-processing legacy tools that read input files and write output
-// files. SafeWrite under positional-style semantics matching convert.
-static MAGICK_SAFE_SUBS: WordSet = WordSet::new(&[
-    "combine", "compare", "composite", "convert", "identify",
-    "mogrify", "montage", "stream",
-]);
-
-// Subcommands intentionally not in coverage:
-//   animate, display — long-running interactive GUI viewers
-//                      (require X11/screen, never finish on their own)
-//   import           — screen capture; reads the user's screen content
-//                      to a file, requires a display server
-//   conjure          — executes MSL (Magick Scripting Language)
-//                      scripts; arbitrary code execution path
-
-// ImageMagick 7's `magick` accepts three documented calling forms:
-//
-//   1. Subcommand-explicit:   `magick convert in.png out.png`,
-//                             `magick identify in.png`, etc.
-//   2. Convert-implicit:      `magick in.png -resize 1200x out.png`
-//                             (the IM6 `convert` legacy syntax that
-//                             IM7 preserves)
-//   3. Script-driven:         `magick [...] -script script.msl [...]`
-//                             — runs an MSL script. Out of coverage:
-//                             arbitrary script execution.
-//
-// We accept forms 1 and 2 and deny form 3. For the explicit form we
-// route to the existing top-level `convert` and `identify` surfaces
-// (their TOMLs define the precise flag/positional rules); for the
-// other safe legacy tools we apply the same SafeWrite + positional-
-// style verdict that the magick.toml subs originally had. For the
-// implicit form we treat the entire invocation as `convert` and
-// re-dispatch.
-//
-// Pseudo-format prefixes (`msl:`, `mvg:`, `ephemeral:`, etc.) and
-// HTTP-fetched inputs are governed by ImageMagick's policy.xml, the
-// same defense layer the standalone `convert` command relies on.
 pub fn is_safe_magick(tokens: &[Token]) -> Verdict {
-    if tokens.len() == 2
-        && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V")
-    {
-        return Verdict::Allowed(SafetyLevel::Inert);
-    }
-
     if tokens[1..].iter().any(|t| t.as_str() == "-script") {
         return Verdict::Denied;
     }
-
-    let Some(first) = tokens.get(1) else {
+    if let Some(verdict) = registry::try_sub_dispatch("magick", tokens) {
+        return verdict;
+    }
+    if let Some(v @ Verdict::Allowed(_)) = registry::try_fallback_grammar("magick", tokens) {
+        return v;
+    }
+    // Implicit-convert delegation. If the first token after `magick` is
+    // flag-shaped (starts with `-` and isn't bare `-`), pass through to
+    // convert without further checks — convert's policy decides. This
+    // covers IM6-legacy forms like `magick -list font`, `magick -resize
+    // 1200x in.png out.png`, where leading options precede the file.
+    // Otherwise the first token must look like a file path; this gate
+    // is what excludes bare-word bypasses (`magick conjure script.msl`,
+    // `magick display photo.jpg`) that convert's permissive positional
+    // policy would otherwise rescue.
+    let first = tokens[1].as_str();
+    let leading_flag = first.starts_with('-') && first != "-";
+    if !leading_flag && !crate::policy::looks_like_path(first) {
         return Verdict::Denied;
-    };
-    let first_str = first.as_str();
-
-    if matches!(first_str, "animate" | "conjure" | "display" | "import") {
-        return Verdict::Denied;
     }
-
-    if first_str == "convert" || first_str == "identify" {
-        let inner = shell_words::join(tokens[1..].iter().map(|t| t.as_str()));
-        return crate::command_verdict(&inner);
-    }
-
-    if MAGICK_SAFE_SUBS.contains(first_str) {
-        return Verdict::Allowed(SafetyLevel::SafeWrite);
-    }
-
-    let mut parts: Vec<&str> = Vec::with_capacity(tokens.len());
-    parts.push("convert");
-    for t in &tokens[1..] {
-        parts.push(t.as_str());
-    }
-    let inner = shell_words::join(parts);
+    let inner = shell_words::join(
+        std::iter::once("convert").chain(tokens[1..].iter().map(|t| t.as_str())),
+    );
     crate::command_verdict(&inner)
 }
 
@@ -104,6 +78,14 @@ mod tests {
         magick_montage: "magick montage *.png montage.png",
         magick_combine: "magick combine a.png b.png combined.png",
         magick_stream: "magick stream image.png pixels.gray",
+
+        // IM6-legacy implicit-convert forms with leading options: the
+        // first token is flag-shaped, so the path-shape gate is bypassed
+        // and delegation flows through convert's policy.
+        magick_implicit_list_font: "magick -list font",
+        magick_implicit_list_color: "magick -list color",
+        magick_implicit_leading_resize: "magick -resize 1200x in.png out.png",
+        magick_implicit_leading_quality: "magick -quality 85 in.jpg out.jpg",
     }
 
     denied! {
