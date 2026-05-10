@@ -40,6 +40,10 @@ safe-chains --level inert "cargo test"       # exit 1 (safe-read > inert)
 safe-chains --level safe-read "cargo test"   # exit 0
 ```
 
+## Custom commands
+
+Drop a `.safe-chains.toml` in your repo (or `~/.config/safe-chains.toml` for all projects) to add tools safe-chains doesn't know about, or to lock down a built-in command. See the [Custom Commands docs](https://www.michaeldhopkins.com/docs/safe-chains/custom-commands.html).
+
 ## Contributing
 
 Found a safe command safe-chains should support? [Submit an issue.](https://github.com/michaeldhopkins/safe-chains/issues/new?template=command-request.yml)
