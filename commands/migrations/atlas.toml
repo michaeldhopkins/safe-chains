@@ -4,6 +4,15 @@ description = "Atlas (ariga.io) — DDL schema migration tool. Subcommands: `sch
 url = "https://atlasgo.io/cli-reference"
 researched_version = "Atlas 0.x"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "atlas doctor",
+    "atlas migrate status",
+    "atlas whoami",
+]
+examples_denied = [
+    "atlas migrate apply --url postgres://...",
+    "atlas schema apply --to file://schema.hcl",
+]
 
 [[command.sub]]
 name = "version"
@@ -181,4 +190,6 @@ candidate = true
 
 [[command.sub]]
 name = "doctor"
-candidate = true
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
