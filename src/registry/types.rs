@@ -84,12 +84,6 @@ pub(super) struct TomlCommand {
     /// `registry::check_handler_policy(cmd, key, tokens)`.
     #[serde(default)]
     pub handler_policy: std::collections::HashMap<String, TomlHandlerPolicy>,
-    /// Named string lists the handler references by string key. Same
-    /// motivation as `handler_policy` but for plain word sets (allowed
-    /// subcommand names, ini directives, etc.). Read via
-    /// `registry::handler_word_list(cmd, key)`.
-    #[serde(default)]
-    pub handler_data: std::collections::HashMap<String, Vec<String>>,
     /// Parent × action → policy matrices. One block declares: "for
     /// these parent subcommand names, each of these action verbs maps
     /// to a named `handler_policy` and validates at this safety level."
@@ -353,9 +347,6 @@ pub(super) enum DispatchKind {
         /// `registry::check_handler_policy()`. Empty unless the handler
         /// has dispatch logic that picks a policy by name at runtime.
         handler_policies: std::collections::HashMap<String, OwnedPolicy>,
-        /// Named string lists the handler reads via
-        /// `registry::handler_word_list()`.
-        handler_data: std::collections::HashMap<String, Vec<String>>,
         /// Sub × action matrices the handler walks via
         /// `registry::try_matrix_dispatch()`.
         matrices: Vec<MatrixSpec>,

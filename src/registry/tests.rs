@@ -2764,28 +2764,6 @@ watch = "shared"
     }
 
     #[test]
-    fn handler_word_list_returns_declared_values() {
-        let spec = load_one(r#"
-[[command]]
-name = "demo-wl"
-handler = "demo_handler"
-
-[command.handler_data]
-allowlist = ["foo", "bar"]
-"#);
-        // The spec is loaded but not registered in the global registry,
-        // so we have to use the spec directly. Verify the build kept
-        // the list intact via the kind.
-        match &spec.kind {
-            DispatchKind::Custom { handler_data, .. } => {
-                let actual = handler_data.get("allowlist").map(Vec::as_slice).unwrap_or(&[]);
-                assert_eq!(actual, &["foo".to_string(), "bar".to_string()]);
-            }
-            other => panic!("expected Custom, got {other:?}"),
-        }
-    }
-
-    #[test]
     fn check_handler_policy_returns_false_for_missing_key() {
         // Built spec without the requested policy key — handler should
         // get back `false` (i.e. denial) rather than a panic.
