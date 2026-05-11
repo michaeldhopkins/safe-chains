@@ -287,6 +287,11 @@ pub struct CommandSpec {
 pub(super) struct SubSpec {
     pub name: String,
     pub kind: DispatchKind,
+    /// If this sub was declared with `policy = "key"`, the referenced
+    /// handler_policy name is preserved for docs rendering so a sub
+    /// that points at a policy also shown in **Shared flag sets** can
+    /// render as a reference rather than duplicating the flag list.
+    pub policy_ref: Option<String>,
 }
 
 #[derive(Debug, Clone)]

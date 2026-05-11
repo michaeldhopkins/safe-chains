@@ -2626,7 +2626,7 @@ guard_short = "-O"
 
         let doc = spec.to_command_doc();
         assert!(
-            doc.description.contains("Sub × action matrix"),
+            doc.description.contains("Subcommands by action verb"),
             "matrix section header must render: {}",
             doc.description,
         );
@@ -2643,61 +2643,122 @@ guard_short = "-O"
     }
 
     #[test]
-    fn handler_command_renders_handler_policies_and_data() {
-        // Regression: [command.handler_policy.*] and
-        // [command.handler_data] blocks must surface in auto-rendered
-        // docs alongside doc_body / subs / fallback. Without this,
-        // handler-using commands like gh/glab (whose dispatch matrix
-        // lives in Rust but whose per-policy WordSets live in TOML)
-        // would silently strip the data from rendered docs.
+    fn matrix_inlines_single_use_policy_summaries() {
+        // Reader-friendly: a matrix action whose policy is referenced
+        // only by that one entry should inline the flag list right
+        // there, not force a scroll to a "shared flag sets" section.
         let spec = load_one(r#"
 [[command]]
-name = "demo-policies"
+name = "demo-inline"
 handler = "demo_handler"
-doc_body = "Routing prose."
 
-[command.handler_data]
-read_subs = ["alpha", "beta", "gamma"]
-actions = ["list", "view"]
-
-[command.handler_policy.list]
-bare = true
-standalone = ["--help", "--all", "-h"]
-valued = ["--limit"]
-
-[command.handler_policy.view]
+[command.handler_policy.unique]
 bare = false
-standalone = ["--web", "-w"]
+standalone = ["--only-here"]
+valued = ["--only-valued"]
+
+[[command.matrix]]
+parents = ["alpha"]
+level = "Inert"
+[command.matrix.actions]
+list = "unique"
 "#);
         let doc = spec.to_command_doc();
         assert!(
-            doc.description.contains("Handler-side flag policies"),
-            "handler_policy section header must render: {}",
+            doc.description.contains("--only-here"),
+            "single-use policy flags must inline into the matrix entry: {}",
             doc.description,
         );
         assert!(
-            doc.description.contains("**list**"),
-            "handler_policy.list must render: {}",
+            !doc.description.contains("Shared flag sets"),
+            "shared-flag-sets header must NOT render when all policies are single-use: {}",
+            doc.description,
+        );
+    }
+
+    #[test]
+    fn sub_with_shared_policy_ref_renders_reference_not_inline() {
+        // Regression: a [[command.sub]] using `policy = "key"` where
+        // the same key is also referenced 2+ times in the matrix must
+        // render the sub as `- **name** — see `key` below`, not
+        // inline the flag list. Otherwise the same list appears in
+        // both the sub bullet and the **Shared flag sets** section.
+        let spec = load_one(r#"
+[[command]]
+name = "demo-shared-sub"
+handler = "demo_handler"
+
+[command.handler_policy.canonical]
+bare = false
+standalone = ["--unique-flag-marker"]
+valued = ["--unique-valued-marker"]
+
+[[command.sub]]
+name = "alias-sub"
+policy = "canonical"
+level = "Inert"
+
+[[command.matrix]]
+parents = ["alpha", "beta"]
+level = "Inert"
+[command.matrix.actions]
+verify = "canonical"
+watch = "canonical"
+"#);
+        let doc = spec.to_command_doc();
+        assert!(
+            doc.description.contains("**alias-sub** — see `canonical` below"),
+            "sub with shared policy_ref must render as reference: {}",
+            doc.description,
+        );
+        // Unique flag marker appears exactly once — in the shared
+        // section. Not in the sub, not duplicated in the matrix.
+        let count = doc.description.matches("--unique-flag-marker").count();
+        assert_eq!(
+            count, 1,
+            "shared policy flag list must render exactly once (in Shared flag sets): {}",
+            doc.description,
+        );
+    }
+
+    #[test]
+    fn matrix_references_shared_policies_in_their_own_section() {
+        // A policy used 2+ times in the matrix should appear in a
+        // **Shared flag sets** section below, with each matrix entry
+        // referencing it by name instead of duplicating the flag list.
+        let spec = load_one(r#"
+[[command]]
+name = "demo-shared"
+handler = "demo_handler"
+
+[command.handler_policy.shared]
+bare = false
+standalone = ["--web", "-w"]
+valued = ["--repo"]
+
+[[command.matrix]]
+parents = ["alpha", "beta"]
+level = "Inert"
+[command.matrix.actions]
+verify = "shared"
+watch = "shared"
+"#);
+        let doc = spec.to_command_doc();
+        assert!(
+            doc.description.contains("Shared flag sets"),
+            "shared section must render when a policy is used 2+ times: {}",
             doc.description,
         );
         assert!(
-            doc.description.contains("**view**"),
-            "handler_policy.view must render: {}",
+            doc.description.contains("see `shared` below"),
+            "matrix entry must reference the shared policy by name: {}",
             doc.description,
         );
-        assert!(
-            doc.description.contains("--limit"),
-            "handler_policy flag detail must render: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("Handler-side data"),
-            "handler_data section header must render: {}",
-            doc.description,
-        );
-        assert!(
-            doc.description.contains("alpha, beta, gamma"),
-            "handler_data list values must render: {}",
+        // Flag list should appear in shared section, not twice inline.
+        let occurrences = doc.description.matches("--web").count();
+        assert_eq!(
+            occurrences, 1,
+            "shared policy flags should appear once (in the shared section), not be duplicated across matrix entries: {}",
             doc.description,
         );
     }
@@ -2793,8 +2854,8 @@ valued = ["--type"]
             doc.description,
         );
         assert!(
-            doc.description.contains("Fallback grammar"),
-            "fallback grammar header must render: {}",
+            doc.description.contains("Without a subcommand"),
+            "bare-flag section header must render: {}",
             doc.description,
         );
         assert!(

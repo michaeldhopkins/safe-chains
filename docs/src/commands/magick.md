@@ -14,6 +14,6 @@
 - **montage**: Positional args accepted
 - **stream**: Positional args accepted
 
-- **Fallback grammar (engaged when no sub matches):**
+- **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -V, -h
 

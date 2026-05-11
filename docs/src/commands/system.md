@@ -1080,7 +1080,7 @@ Aliases: `upsun`
 
 - Read-only: any token containing `=` is rejected so write-style invocations (`sysctl foo=bar`, `sysctl -w key=value`) cannot reach the kernel.
 
-- **Fallback grammar (engaged when no sub matches):**
+- **Without a subcommand:**
 - Allowed standalone flags: --help, -A, -N, -X, -a, -b, -d, -e, -h, -l, -n, -o, -q, -x
 - Allowed valued flags: -B, -r
 

@@ -142,6 +142,7 @@ pub(super) fn build_subs(
         out.push(SubSpec {
             name: alias,
             kind: canonical.kind.clone(),
+            policy_ref: canonical.policy_ref.clone(),
         });
     }
     out.push(canonical);
@@ -155,7 +156,12 @@ pub(super) fn build_sub(
 ) -> SubSpec {
     check_no_legacy_positional_style(&toml.name, toml.positional_style);
     let name = toml.name.clone();
-    SubSpec { name, kind: build_sub_kind(parent, toml, handler_policies) }
+    let policy_ref = toml.policy.clone();
+    SubSpec {
+        name,
+        kind: build_sub_kind(parent, toml, handler_policies),
+        policy_ref,
+    }
 }
 
 fn build_sub_kind(
