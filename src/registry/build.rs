@@ -176,7 +176,6 @@ fn build_sub_kind(
             subs: Vec::new(),
             fallback: None,
             handler_policies: std::collections::HashMap::new(),
-            handler_data: std::collections::HashMap::new(),
             matrices: Vec::new(),
         };
     }
@@ -442,7 +441,6 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 subs,
                 fallback,
                 handler_policies,
-                handler_data: toml.handler_data,
                 matrices,
             },
         };

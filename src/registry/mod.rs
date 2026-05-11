@@ -129,20 +129,6 @@ pub fn check_handler_policy(cmd_name: &str, key: &str, tokens: &[Token]) -> bool
     dispatch::check_handler_policy_owned(tokens, policy)
 }
 
-/// Look up a TOML-declared `[command.handler_data.KEY]` string list.
-/// Used by handlers that need data-driven allowlists (sub name sets,
-/// directive keys, etc.) without enumerating each entry as a
-/// `[[command.sub]]` block. Returns an empty slice if the key isn't
-/// declared.
-pub fn handler_word_list(cmd_name: &str, key: &str) -> &'static [String] {
-    static EMPTY: Vec<String> = Vec::new();
-    let Some(spec) = handler_spec(cmd_name) else { return &EMPTY; };
-    let DispatchKind::Custom { handler_data, .. } = &spec.kind else {
-        return &EMPTY;
-    };
-    handler_data.get(key).map_or(&EMPTY, |v| v.as_slice())
-}
-
 fn handler_spec(cmd_name: &str) -> Option<&'static CommandSpec> {
     CUSTOM_REGISTRY
         .get(cmd_name)
