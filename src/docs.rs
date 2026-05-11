@@ -21,7 +21,10 @@ impl CommandDoc {
         let description = raw
             .lines()
             .map(|line| {
-                if line.is_empty() || line.starts_with("- ") {
+                // Leave already-bulleted lines (top-level OR indented
+                // sub-bullets like `  - **action**`) alone; prepend
+                // `- ` only to plain prose lines.
+                if line.is_empty() || line.trim_start().starts_with("- ") {
                     line.to_string()
                 } else {
                     format!("- {line}")
