@@ -74,7 +74,6 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
         .or_else(|| crate::registry::custom_dispatch(tokens))
         .or_else(|| shell::dispatch(cmd, tokens))
         .or_else(|| wrappers::dispatch(cmd, tokens))
-        .or_else(|| forges::dispatch(cmd, tokens))
         .or_else(|| node::dispatch(cmd, tokens))
         .or_else(|| jvm::dispatch(cmd, tokens))
         .or_else(|| android::dispatch(cmd, tokens))
@@ -90,7 +89,6 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
     let mut docs = Vec::new();
-    docs.extend(forges::command_docs());
     docs.extend(node::command_docs());
     docs.extend(jvm::command_docs());
     docs.extend(android::command_docs());

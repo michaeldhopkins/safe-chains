@@ -234,17 +234,6 @@ fn is_safe_gh_api_rest(tokens: &[Token]) -> Verdict {
     Verdict::Allowed(SafetyLevel::Inert)
 }
 
-pub(in crate::handlers::forges) fn dispatch(_cmd: &str, _tokens: &[Token]) -> Option<Verdict> {
-    // `gh` is dispatched through the TOML registry now (handler = "gh"
-    // in commands/forges/gh.toml). Same for `glab` via its own handler.
-    None
-}
-
-pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    // gh's docs come from the TOML registry's auto-render.
-    Vec::new()
-}
-
 #[cfg(test)]
 pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
     crate::handlers::CommandEntry::Paths { cmd: "gh", bare_ok: false, paths: &[
