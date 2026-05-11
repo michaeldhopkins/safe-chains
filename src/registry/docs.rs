@@ -1,16 +1,33 @@
 use super::types::*;
 
-fn describe_handler_policies(
-    policies: &std::collections::HashMap<String, OwnedPolicy>,
+fn matrix_policy_usage(
+    matrices: &[MatrixSpec],
+) -> std::collections::HashMap<&str, usize> {
+    let mut usage: std::collections::HashMap<&str, usize> = std::collections::HashMap::new();
+    for matrix in matrices {
+        for action in matrix.actions.values() {
+            *usage.entry(action.policy_key.as_str()).or_insert(0) += 1;
+        }
+    }
+    usage
+}
+
+fn describe_shared_policies(
+    matrices: &[MatrixSpec],
+    handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
 ) -> Option<String> {
-    if policies.is_empty() {
+    let usage = matrix_policy_usage(matrices);
+    let mut shared: Vec<&String> = handler_policies
+        .keys()
+        .filter(|k| usage.get(k.as_str()).copied().unwrap_or(0) >= 2)
+        .collect();
+    shared.sort();
+    if shared.is_empty() {
         return None;
     }
-    let mut keys: Vec<&String> = policies.keys().collect();
-    keys.sort();
-    let mut lines = vec!["**Handler-side flag policies:**".to_string()];
-    for key in keys {
-        let summary = policies[key].flag_summary();
+    let mut lines = vec!["**Shared flag sets:**".to_string()];
+    for key in shared {
+        let summary = handler_policies[key].flag_summary();
         if summary.is_empty() {
             lines.push(format!("- **{key}**"));
         } else {
@@ -20,29 +37,19 @@ fn describe_handler_policies(
     Some(lines.join("\n"))
 }
 
-fn describe_handler_data(
-    data: &std::collections::HashMap<String, Vec<String>>,
+fn describe_matrices(
+    matrices: &[MatrixSpec],
+    handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
 ) -> Option<String> {
-    if data.is_empty() {
-        return None;
-    }
-    let mut keys: Vec<&String> = data.keys().collect();
-    keys.sort();
-    let mut lines = vec!["**Handler-side data:**".to_string()];
-    for key in keys {
-        lines.push(format!("- **{key}**: {}", data[key].join(", ")));
-    }
-    Some(lines.join("\n"))
-}
-
-fn describe_matrices(matrices: &[MatrixSpec]) -> Option<String> {
     if matrices.is_empty() {
         return None;
     }
-    let mut lines = vec!["**Sub × action matrix:**".to_string()];
+    let usage = matrix_policy_usage(matrices);
+    let mut lines = vec!["**Subcommands by action verb:**".to_string()];
     for matrix in matrices {
         let parents = matrix.parents.join(", ");
-        lines.push(format!("- Parents ({:?}): {parents}", matrix.level));
+        let level = format!("{:?}", matrix.level);
+        lines.push(format!("- **{parents}** ({level})"));
         let mut actions: Vec<&String> = matrix.actions.keys().collect();
         actions.sort();
         for name in actions {
@@ -52,14 +59,31 @@ fn describe_matrices(matrices: &[MatrixSpec]) -> Option<String> {
                 (Some(long), None) => format!(" (requires {long})"),
                 _ => String::new(),
             };
-            lines.push(format!("  - **{name}** → policy `{}`{guard}", action.policy_key));
+            let shared_count = usage.get(action.policy_key.as_str()).copied().unwrap_or(0);
+            if shared_count >= 2 {
+                // Reference by name — the flag list shows up in
+                // **Shared flag sets** below.
+                lines.push(format!(
+                    "  - **{name}**{guard} — see `{}` below",
+                    action.policy_key,
+                ));
+            } else if let Some(policy) = handler_policies.get(&action.policy_key) {
+                let summary = policy.flag_summary();
+                if summary.is_empty() {
+                    lines.push(format!("  - **{name}**{guard}"));
+                } else {
+                    lines.push(format!("  - **{name}**{guard}: {summary}"));
+                }
+            } else {
+                lines.push(format!("  - **{name}**{guard}"));
+            }
         }
     }
     Some(lines.join("\n"))
 }
 
 fn describe_fallback(f: &FallbackSpec) -> String {
-    let mut lines = vec!["**Fallback grammar (engaged when no sub matches):**".to_string()];
+    let mut lines = vec!["**Without a subcommand:**".to_string()];
     if f.policy.bare {
         lines.push("- Bare invocation allowed".to_string());
     }
@@ -115,31 +139,50 @@ impl CommandSpec {
                 let args = patterns.join(", ");
                 format!("Allowed first arguments: {args}")
             }
-            DispatchKind::Custom { doc_body, subs, fallback, handler_policies, handler_data, matrices, .. } => {
+            DispatchKind::Custom { doc_body, subs, fallback, handler_policies, matrices, .. } => {
                 let mut sections: Vec<String> = Vec::new();
                 if let Some(body) = doc_body
                     && !body.trim().is_empty()
                 {
                     sections.push(body.clone());
                 }
+                // Policies referenced 2+ times across the matrix render
+                // as a separate "Shared flag sets" section. Subs whose
+                // policy_ref points at one of these render as a
+                // reference too, so the flag list appears exactly once
+                // (in the shared section).
+                let shared_keys: std::collections::HashSet<&str> =
+                    matrix_policy_usage(matrices)
+                        .iter()
+                        .filter(|(_, count)| **count >= 2)
+                        .map(|(k, _)| *k)
+                        .collect();
                 let mut sub_lines = Vec::new();
                 for sub in subs {
-                    sub.doc_line("", &mut sub_lines);
+                    if let Some(ref_name) = sub.policy_ref.as_deref()
+                        && shared_keys.contains(ref_name)
+                    {
+                        sub_lines.push(format!(
+                            "- **{}** — see `{ref_name}` below",
+                            sub.name,
+                        ));
+                    } else {
+                        sub.doc_line("", &mut sub_lines);
+                    }
                 }
                 if !sub_lines.is_empty() {
                     sub_lines.sort();
                     sections.push(sub_lines.join("\n"));
                 }
-                if let Some(s) = describe_matrices(matrices) {
-                    sections.push(s);
-                }
+                // Reader-friendly order: named subs → bare-flag forms →
+                // sub × action grid → shared flag-set definitions.
                 if let Some(f) = fallback {
                     sections.push(describe_fallback(f));
                 }
-                if let Some(s) = describe_handler_policies(handler_policies) {
+                if let Some(s) = describe_matrices(matrices, handler_policies) {
                     sections.push(s);
                 }
-                if let Some(s) = describe_handler_data(handler_data) {
+                if let Some(s) = describe_shared_policies(matrices, handler_policies) {
                     sections.push(s);
                 }
                 sections.join("\n\n")

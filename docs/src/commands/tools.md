@@ -965,7 +965,7 @@ Aliases: `run-p`, `run-s`
 - **artisan**: delegates to inner command
 - **please**: delegates to inner command
 
-- **Fallback grammar (engaged when no sub matches):**
+- **Without a subcommand:**
 - Allowed standalone flags: --help, --info, --ini, --modules, --version, -V, -h, -i, -m, -v
 
 ### `pkg-config`
@@ -1340,7 +1340,7 @@ Aliases: `python`
 - **verify-install**: Flags: --help, -h
 - **version**: Flags: --help, -h
 
-- **Fallback grammar (engaged when no sub matches):**
+- **Without a subcommand:**
 - Bare invocation allowed
 - Allowed standalone flags: --help, --list, --version, -V, -h, -l, -v
 - Allowed valued flags: --layout, --type, -t, -y
