@@ -19,17 +19,6 @@ pub fn is_safe_glab(tokens: &[Token]) -> Verdict {
     registry::try_matrix_dispatch("glab", tokens).unwrap_or(Verdict::Denied)
 }
 
-pub(in crate::handlers::forges) fn dispatch(_cmd: &str, _tokens: &[Token]) -> Option<Verdict> {
-    // glab is dispatched through the TOML registry now
-    // (handler = "glab" in commands/forges/glab.toml).
-    None
-}
-
-pub fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    // glab's docs come from the TOML registry's auto-render.
-    Vec::new()
-}
-
 #[cfg(test)]
 pub(super) const REGISTRY: &[crate::handlers::CommandEntry] = &[
     crate::handlers::CommandEntry::Paths { cmd: "glab", bare_ok: false, paths: &[
