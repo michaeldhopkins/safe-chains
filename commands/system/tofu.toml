@@ -1,0 +1,276 @@
+[[command]]
+name = "tofu"
+description = "Linux Foundation fork of Terraform 1.5 (the last MPL-licensed version before HashiCorp's BSL change). Infrastructure-as-code CLI that provisions and manages cloud resources via declarative configuration files. Same command surface as Terraform: plan, apply, and destroy create/modify/delete real cloud infrastructure and can trigger arbitrary provider-defined operations. Read-only subcommands (validate, output, show, state list/show, graph, providers, providers schema, version) inspect local state and configuration without modifying infrastructure. fmt reformats `.tf` files in place unless -check is passed. init downloads provider plugins from the configured registries and writes them into .terraform/ — outbound traffic is HTTP GETs for provider names/binaries, no user data leaves. get downloads modules to local. providers lock and providers mirror download to local. logout invalidates the locally stored credential for the current host (auth lifecycle, not user-data mutation). init's -migrate-state and -force-copy flags can write state to a remote backend during backend migration — explicitly excluded from the allowlist. plan reads remote state and computes a diff (no infra mutation, but interactive and slow); apply/destroy/import/taint/untaint/force-unlock and state mv/rm/push/replace-provider mutate state or infrastructure and are not covered. Flag parsing follows Go's flag package — both `-foo` and `--foo` forms are accepted by the binary, so this allowlist includes both spellings of every flag. OpenTofu releases on its own cadence (v1.11.5 stable as of Feb 2026, v1.12.0 in development); flag surface tracks Terraform's closely with occasional OpenTofu-specific additions."
+url = "https://opentofu.org/docs/cli/commands/"
+researched_version = "OpenTofu 1.11.5 (2026-02)"
+bare_flags = ["--help", "--version", "-V", "-h", "-help", "-version"]
+
+examples_safe = [
+  "tofu --help",
+  "tofu --version",
+  "tofu -version",
+  "tofu version",
+  "tofu version --json",
+  "tofu version -json",
+  "tofu validate",
+  "tofu validate --json",
+  "tofu validate -no-color",
+  "tofu validate --var foo=bar",
+  "tofu fmt --check",
+  "tofu fmt -check",
+  "tofu fmt --check --recursive",
+  "tofu fmt --check --diff",
+  "tofu show",
+  "tofu show --json",
+  "tofu show -state",
+  "tofu output",
+  "tofu output --json",
+  "tofu output myvar",
+  "tofu output --raw myvar",
+  "tofu graph",
+  "tofu graph --type=plan",
+  "tofu graph -type=apply",
+  "tofu providers",
+  "tofu providers schema --json",
+  "tofu providers lock",
+  "tofu providers lock --platform=linux_amd64",
+  "tofu providers mirror /tmp/mirror",
+  "tofu state list",
+  "tofu state show aws_instance.foo",
+  "tofu get",
+  "tofu get --update",
+  "tofu init",
+  "tofu init --upgrade",
+  "tofu init -upgrade",
+  "tofu init --backend-config=bucket=mybucket",
+  "tofu init -input=false",
+  "tofu init -lock=false",
+  "tofu init -input=false -lock=false -upgrade",
+  "tofu init -lockfile=readonly",
+  "tofu logout",
+  "tofu logout app.terraform.io",
+]
+
+examples_denied = [
+  "tofu apply",
+  "tofu apply --auto-approve",
+  "tofu destroy",
+  "tofu destroy --auto-approve",
+  "tofu import aws_instance.foo i-12345",
+  "tofu plan",
+  "tofu refresh",
+  "tofu login",
+  "tofu console",
+  "tofu test",
+  "tofu taint aws_instance.foo",
+  "tofu untaint aws_instance.foo",
+  "tofu force-unlock LOCKID",
+  "tofu state mv aws_instance.foo aws_instance.bar",
+  "tofu state rm aws_instance.foo",
+  "tofu state push terraform.tfstate",
+  "tofu state replace-provider hashicorp/aws opentofu/aws",
+  "tofu init --migrate-state",
+  "tofu init --force-copy",
+  "tofu fmt",
+  "tofu fmt --recursive",
+  "tofu show --evil-flag",
+  "tofu unknown-subcommand",
+]
+
+# ─────────────────────────────────────────────────────────────────────
+# Read-only subcommands (Inert)
+# ─────────────────────────────────────────────────────────────────────
+
+[[command.sub]]
+name = "fmt"
+# Without -check, fmt rewrites files in place. Guard requires the
+# user to opt into read-only mode.
+guard = "--check"
+guard_short = "-check"
+standalone = [
+  "--check", "--diff", "--help", "--no-color", "--recursive",
+  "-check", "-diff", "-h", "-help", "-no-color", "-recursive",
+]
+
+[[command.sub]]
+name = "graph"
+standalone = [
+  "--draw-cycles", "--help",
+  "-draw-cycles", "-h", "-help",
+]
+valued = [
+  "--plan", "--type", "--var", "--var-file",
+  "-plan", "-type", "-var", "-var-file",
+]
+
+[[command.sub]]
+name = "output"
+standalone = [
+  "--help", "--json", "--no-color", "--raw", "--show-sensitive",
+  "-h", "-help", "-json", "-no-color", "-raw", "-show-sensitive",
+]
+valued = [
+  "--state", "--var", "--var-file",
+  "-state", "-var", "-var-file",
+]
+
+[[command.sub]]
+name = "providers"
+nested_bare = true
+standalone = ["--help", "-h", "-help"]
+valued = ["--var", "--var-file", "-var", "-var-file"]
+
+# `providers schema` outputs provider/resource schema info to stdout.
+# No network, no writes. Requires `tofu init` to have been run first.
+[[command.sub.sub]]
+name = "schema"
+level = "Inert"
+standalone = ["--help", "--json", "--no-color", "-h", "-help", "-json", "-no-color"]
+valued = ["--var", "--var-file", "-var", "-var-file"]
+
+# `providers lock` queries provider registries for checksums and
+# writes the dependency lockfile. Outbound HTTP GETs; inbound
+# checksum metadata; local write only. SafeWrite.
+[[command.sub.sub]]
+name = "lock"
+level = "SafeWrite"
+standalone = [
+  "--help", "--no-color",
+  "-h", "-help", "-no-color",
+]
+valued = [
+  "--fs-mirror", "--net-mirror", "--platform", "--var", "--var-file",
+  "-fs-mirror", "-net-mirror", "-platform", "-var", "-var-file",
+]
+
+# `providers mirror` downloads provider binaries to a local mirror
+# directory for offline installs. Inbound downloads; local writes
+# only. SafeWrite.
+[[command.sub.sub]]
+name = "mirror"
+level = "SafeWrite"
+standalone = ["--help", "-h", "-help"]
+valued = [
+  "--platform", "--lock-file", "--var", "--var-file",
+  "-platform", "-lock-file", "-var", "-var-file",
+]
+
+[[command.sub]]
+name = "show"
+standalone = [
+  "--config", "--help", "--json", "--no-color", "--show-sensitive", "--state",
+  "-config", "-h", "-help", "-json", "-no-color", "-show-sensitive", "-state",
+]
+valued = [
+  "--module", "--plan", "--var", "--var-file",
+  "-module", "-plan", "-var", "-var-file",
+]
+
+[[command.sub]]
+name = "state"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h", "-help"]
+valued = ["--id", "--state", "--var", "--var-file", "-id", "-state", "-var", "-var-file"]
+
+[[command.sub.sub]]
+name = "show"
+bare = false
+standalone = ["--help", "-h", "-help"]
+valued = ["--state", "--var", "--var-file", "-state", "-var", "-var-file"]
+
+[[command.sub]]
+name = "validate"
+standalone = [
+  "--help", "--json", "--no-color",
+  "-h", "-help", "-json", "-no-color",
+]
+valued = ["--var", "--var-file", "-var", "-var-file"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "--json", "-h", "-help", "-json"]
+
+# ─────────────────────────────────────────────────────────────────────
+# SafeWrite subcommands (downloads to local / clears local credentials)
+# ─────────────────────────────────────────────────────────────────────
+
+# `tofu get` downloads modules referenced by configuration into the
+# local module cache. Inbound HTTP only.
+[[command.sub]]
+name = "get"
+level = "SafeWrite"
+standalone = [
+  "--help", "--no-color", "--update",
+  "-h", "-help", "-no-color", "-update",
+]
+
+# `tofu init` prepares the working directory: downloads provider
+# plugins to .terraform/, writes the dependency lockfile, and
+# initializes the configured backend (without writing state to it —
+# state writes happen on apply/refresh). Outbound traffic is HTTP
+# GETs for provider names/binaries from configured registries; no
+# user data is sent.
+#
+# Deliberately omitted: -migrate-state and -force-copy. Both can
+# write state to a (possibly remote) backend when changing backends,
+# which is server-side mutation outside SafeWrite scope.
+#
+# -input / -lock / -get / -backend accept both bare form
+# (`-input` ⇒ true) and value form (`-input=false`, common in CI),
+# so they appear in both `standalone` and `valued`.
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+standalone = [
+  "--backend", "--get", "--help", "--input", "--json", "--lock",
+  "--no-color", "--reconfigure", "--upgrade",
+  "-backend", "-get", "-h", "-help", "-input", "-json", "-lock",
+  "-no-color", "-reconfigure", "-upgrade",
+]
+valued = [
+  "--backend", "--backend-config", "--from-module", "--get",
+  "--input", "--lock", "--lock-timeout", "--lockfile",
+  "--plugin-dir", "--target", "--test-directory", "--var", "--var-file",
+  "-backend", "-backend-config", "-from-module", "-get",
+  "-input", "-lock", "-lock-timeout", "-lockfile",
+  "-plugin-dir", "-target", "-test-directory", "-var", "-var-file",
+]
+
+# `tofu logout` clears the locally stored credential for the
+# specified host (or `app.terraform.io` by default). Auth lifecycle,
+# not user-data mutation.
+[[command.sub]]
+name = "logout"
+level = "SafeWrite"
+standalone = ["--help", "-h", "-help"]
+
+# ─────────────────────────────────────────────────────────────────────
+# Considered but deliberately not approved
+# ─────────────────────────────────────────────────────────────────────
+
+# `plan` reads remote state and computes a diff against the
+# configuration. No infrastructure mutation, but it can be
+# interactive (prompts for missing variables) and slow (cloud API
+# rate-limit-bound). Would need a `-var-file`/`-input=false` guard
+# pattern to be safe in non-interactive context. Defer.
+[[command.sub]]
+name = "plan"
+candidate = true
+
+# `refresh` reads remote infrastructure state and writes the local
+# state file. When the backend is remote (S3/GCS/Terraform Cloud),
+# refresh writes the updated state to that backend — server-side
+# mutation. Deferred pending consensus on whether the remote-backend
+# write counts as "the destination IS the source-of-truth."
+[[command.sub]]
+name = "refresh"
+candidate = true
+
+# `login` is an interactive credential flow (OAuth/browser or token
+# prompt). The interactivity, not the auth itself, is the
+# disqualifier — non-interactive headless agent contexts can't
+# complete the flow.
+[[command.sub]]
+name = "login"
+candidate = true

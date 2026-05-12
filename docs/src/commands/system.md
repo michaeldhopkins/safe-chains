@@ -1141,6 +1141,72 @@ Aliases: `upsun`
 
 - Read-only: list-sessions, list-windows, list-panes, list-clients, list-buffers, list-keys, list-commands, show-options, show-environment, display-message, info, has-session, start-server. Session management (SafeWrite): new-session, kill-session, kill-window, kill-pane, kill-server, attach-session, detach-client, switch-client, new-window, split-window, select-window, select-pane, rename-session, rename-window, resize-pane, resize-window, set-option, set-environment, send-keys. Delegation: run-shell, if-shell, pipe-pane, confirm-before (recursively validates inner commands).
 
+### `tofu`
+<p class="cmd-url"><a href="https://opentofu.org/docs/cli/commands/">https://opentofu.org/docs/cli/commands/</a></p>
+
+- **fmt** (requires --check, -check): Flags: --check, --diff, --help, --no-color, --recursive, -check, -diff, -h, -help, -no-color, -recursive
+- **get**: Flags: --help, --no-color, --update, -h, -help, -no-color, -update
+- **graph**: Flags: --draw-cycles, --help, -draw-cycles, -h, -help. Valued: --plan, --type, --var, --var-file, -plan, -type, -var, -var-file
+- **init**: Flags: --backend, --get, --help, --input, --json, --lock, --no-color, --reconfigure, --upgrade, -backend, -get, -h, -help, -input, -json, -lock, -no-color, -reconfigure, -upgrade. Valued: --backend, --backend-config, --from-module, --get, --input, --lock, --lock-timeout, --lockfile, --plugin-dir, --target, --test-directory, --var, --var-file, -backend, -backend-config, -from-module, -get, -input, -lock, -lock-timeout, -lockfile, -plugin-dir, -target, -test-directory, -var, -var-file
+- **logout**: Flags: --help, -h, -help
+- **output**: Flags: --help, --json, --no-color, --raw, --show-sensitive, -h, -help, -json, -no-color, -raw, -show-sensitive. Valued: --state, --var, --var-file, -state, -var, -var-file
+- **providers lock**: Flags: --help, --no-color, -h, -help, -no-color. Valued: --fs-mirror, --net-mirror, --platform, --var, --var-file, -fs-mirror, -net-mirror, -platform, -var, -var-file
+- **providers mirror**: Flags: --help, -h, -help. Valued: --platform, --lock-file, --var, --var-file, -platform, -lock-file, -var, -var-file
+- **providers schema**: Flags: --help, --json, --no-color, -h, -help, -json, -no-color. Valued: --var, --var-file, -var, -var-file
+- **providers**: Flags: --help, -h, -help. Valued: --var, --var-file, -var, -var-file
+- **show**: Flags: --config, --help, --json, --no-color, --show-sensitive, --state, -config, -h, -help, -json, -no-color, -show-sensitive, -state. Valued: --module, --plan, --var, --var-file, -module, -plan, -var, -var-file
+- **state list**: Flags: --help, -h, -help. Valued: --id, --state, --var, --var-file, -id, -state, -var, -var-file
+- **state show**: Flags: --help, -h, -help. Valued: --state, --var, --var-file, -state, -var, -var-file
+- **validate**: Flags: --help, --json, --no-color, -h, -help, -json, -no-color. Valued: --var, --var-file, -var, -var-file
+- **version**: Flags: --help, --json, -h, -help, -json
+- Allowed standalone flags: --help, --version, -V, -h, -help, -version
+
+**Examples:**
+
+- `tofu --help`
+- `tofu --version`
+- `tofu -version`
+- `tofu version`
+- `tofu version --json`
+- `tofu version -json`
+- `tofu validate`
+- `tofu validate --json`
+- `tofu validate -no-color`
+- `tofu validate --var foo=bar`
+- `tofu fmt --check`
+- `tofu fmt -check`
+- `tofu fmt --check --recursive`
+- `tofu fmt --check --diff`
+- `tofu show`
+- `tofu show --json`
+- `tofu show -state`
+- `tofu output`
+- `tofu output --json`
+- `tofu output myvar`
+- `tofu output --raw myvar`
+- `tofu graph`
+- `tofu graph --type=plan`
+- `tofu graph -type=apply`
+- `tofu providers`
+- `tofu providers schema --json`
+- `tofu providers lock`
+- `tofu providers lock --platform=linux_amd64`
+- `tofu providers mirror /tmp/mirror`
+- `tofu state list`
+- `tofu state show aws_instance.foo`
+- `tofu get`
+- `tofu get --update`
+- `tofu init`
+- `tofu init --upgrade`
+- `tofu init -upgrade`
+- `tofu init --backend-config=bucket=mybucket`
+- `tofu init -input=false`
+- `tofu init -lock=false`
+- `tofu init -input=false -lock=false -upgrade`
+- `tofu init -lockfile=readonly`
+- `tofu logout`
+- `tofu logout app.terraform.io`
+
 ### `vagrant`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/vagrant/docs/cli">https://developer.hashicorp.com/vagrant/docs/cli</a></p>
 
