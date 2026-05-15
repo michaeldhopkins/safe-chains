@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1039 commands across 75 categories.
+safe-chains knows 1040 commands across 75 categories.
 
 ## Glossary
 
@@ -77,7 +77,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [R](r.md) (2 commands)
 - [Racket](racket.md) (1 commands)
 - [Roc](roc.md) (1 commands)
-- [Ruby](ruby.md) (45 commands)
+- [Ruby](ruby.md) (46 commands)
 - [Rust](rust.md) (8 commands)
 - [Project Scaffolders](scaffold.md) (7 commands)
 - [Search](search.md) (7 commands)
