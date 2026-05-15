@@ -738,14 +738,15 @@ Aliases: `neonctl`
 ### `overmind`
 <p class="cmd-url"><a href="https://github.com/DarthSim/overmind">https://github.com/DarthSim/overmind</a></p>
 
-- **connect**: Flags: --help, -h
-- **echo**: Flags: --help, -h
-- **kill**: Flags: --help, -h
-- **quit**: Flags: --help, -h
-- **restart**: Flags: --help, -h
-- **start**: Flags: --daemonize, --help, --no-port, -D, -N, -h. Valued: --colors, --formation, --port, --port-step, --procfile, --root, --socket, --title, -T, -c, -f, -l, -p, -r, -s
-- **status**: Flags: --help, -h
-- **stop**: Flags: --help, -h
+- **connect**: Flags: --control-mode, --help, -c, -h. Valued: --network, --socket, -S, -s
+- **echo**: Flags: --help, -h. Valued: --network, --socket, -S, -s
+- **help**: Flags: --help, -h
+- **kill**: Flags: --help, -h. Valued: --network, --socket, -S, -s
+- **quit**: Flags: --help, -h. Valued: --network, --socket, -S, -s
+- **restart**: Flags: --help, -h. Valued: --network, --socket, -S, -s
+- **start**: Flags: --any-can-die, --daemonize, --help, --no-port, --show-timestamps, -D, -N, -T, -h. Valued: --auto-restart, --can-die, --colors, --formation, --formation-port-step, --ignored-processes, --network, --port, --port-step, --procfile, --processes, --root, --shell, --socket, --stop-signals, --timeout, --title, --tmux-config, -F, -H, -P, -S, -b, -c, -d, -f, -i, -l, -m, -p, -r, -s, -t, -w, -x
+- **status**: Flags: --help, -h. Valued: --network, --socket, -S, -s
+- **stop**: Flags: --help, -h. Valued: --network, --socket, -S, -s
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `packer`
