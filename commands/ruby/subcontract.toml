@@ -1,0 +1,13 @@
+[[command]]
+name = "subcontract"
+description = "Ruby process launcher gem (pitluga/subcontractor) typically used inside a Procfile entry to run a child process under a specific Ruby version manager (rvm, rbenv, chruby) and/or from a different working directory. All flags configure the launch environment; the wrapper itself does not modify files or touch the network. The flags `--rvm`, `--rbenv`, `--chruby`, `--choose-env` select a Ruby manager; `--chdir` changes directory before exec; `--signal` sets the kill signal. Everything after `--` is the actual command to execute, whose safety is what determines the overall invocation. Note that `-h` means `--chruby`, not help -- `--help` is the only help flag. The project is mature with no recent releases."
+url = "https://github.com/pitluga/subcontractor"
+researched_version = "subcontractor gem ~1.x (CLI flag surface unchanged since 2014)"
+[command.wrapper]
+standalone = ["--help"]
+valued = [
+    "--chdir", "--choose-env", "--chruby", "--rbenv", "--rvm", "--signal",
+    "-b", "-c", "-d", "-h", "-r", "-s",
+]
+separator = "--"
+bare_ok = true

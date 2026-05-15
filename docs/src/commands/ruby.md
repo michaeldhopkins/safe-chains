@@ -467,6 +467,11 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - **write**: Flags: --help, -h. Valued: -e
 - Allowed standalone flags: --help, --version, -h
 
+### `subcontract`
+<p class="cmd-url"><a href="https://github.com/pitluga/subcontractor">https://github.com/pitluga/subcontractor</a></p>
+
+- Recursively validates the inner command.
+
 ### `thor`
 <p class="cmd-url"><a href="https://github.com/rails/thor">https://github.com/rails/thor</a></p>
 

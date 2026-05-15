@@ -9143,6 +9143,11 @@ Aliases: `serverless`
 - Allowed standalone flags: --allow-empty-input, --cache, --color, --disable-default-ignores, --help, --no-color, --quiet, --version, -h, -q
 - Allowed valued flags: --config, --config-basedir, --custom-formatter, --custom-syntax, --formatter, --ignore-path, --ignore-pattern, --max-warnings, --output-file, --report-descriptionless-disables, --report-invalid-scope-disables, --report-needless-disables, -f, -o
 
+### `subcontract`
+<p class="cmd-url"><a href="https://github.com/pitluga/subcontractor">https://github.com/pitluga/subcontractor</a></p>
+
+- Recursively validates the inner command.
+
 ### `subl`
 <p class="cmd-url"><a href="https://www.sublimetext.com/docs/command_line.html">https://www.sublimetext.com/docs/command_line.html</a></p>
 
