@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1042 commands across 75 categories.
+safe-chains knows 1043 commands across 75 categories.
 
 ## Glossary
 
@@ -45,7 +45,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Embedded](embedded.md) (7 commands)
 - [Erlang](erlang.md) (1 commands)
 - [Code Forges](forges.md) (5 commands)
-- [Filesystem](fs.md) (26 commands)
+- [Filesystem](fs.md) (27 commands)
 - [Fuzzy Finders](fuzzy.md) (7 commands)
 - [Game Engines](game.md) (1 commands)
 - [Gleam](gleam.md) (1 commands)
