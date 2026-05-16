@@ -1,8 +1,10 @@
 [[command]]
 name = "ssh"
-description = "OpenSSH client for encrypted remote login, command execution, and tunnel/port-forwarding over untrusted networks. An unrestricted ssh invocation establishes an authenticated connection to a remote host and can execute arbitrary commands, forward local/remote ports, create SOCKS proxies, and tunnel X11 connections -- it is one of the most powerful network tools available. The coverage is restricted to -V, which prints the OpenSSH version and build information locally and exits immediately without making any network connections or reading any configuration files. No remote host is contacted."
+description = "OpenSSH client for encrypted remote login, command execution, and tunnel/port-forwarding over untrusted networks. An unrestricted ssh invocation establishes an authenticated connection to a remote host and can execute arbitrary commands, forward local/remote ports, create SOCKS proxies, and tunnel X11 connections -- it is one of the most powerful network tools available. Coverage is restricted to three read-only flags that perform no network I/O and never connect: -V prints the OpenSSH version and exits; -G prints the resolved ssh_config after evaluating Host and Match blocks for the given (optional) target and exits; -Q queries the locally compiled-in list of supported algorithms (cipher, mac, kex, key, sig, protocol-version, etc.). All three resolve only against local configuration files and the binary's own build options."
 url = "https://man.openbsd.org/ssh"
 level = "Inert"
 bare = false
-max_positional = 0
-standalone = ["-V"]
+require_any = ["-G", "-Q", "-V"]
+max_positional = 1
+standalone = ["-G", "-V"]
+valued = ["-Q"]
