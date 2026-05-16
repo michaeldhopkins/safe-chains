@@ -5865,6 +5865,13 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - **new**: Flags: --help, --quiet, --verbose, -h, -q, -v. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -V
 
+### `mktemp`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mktemp-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mktemp-invocation</a></p>
+
+- Allowed standalone flags: --directory, --dry-run, --help, --quiet, --tmpdir, --version, -d, -q, -t, -u
+- Allowed valued flags: --suffix, --tmpdir, -p, -t
+- Bare invocation allowed
+
 ### `mlflow`
 <p class="cmd-url"><a href="https://mlflow.org/docs/latest/cli.html">https://mlflow.org/docs/latest/cli.html</a></p>
 
