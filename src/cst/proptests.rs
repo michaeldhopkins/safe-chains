@@ -130,6 +130,8 @@ fn arb_cmd(depth: u32) -> BoxedStrategy<Cmd> {
             ),
             prop::option::of(arb_script(depth - 1)),
         ).prop_map(|(branches, else_body)| Cmd::If { branches, else_body }),
+        1 => prop::collection::vec(arb_word(0), 1..4)
+            .prop_map(|words| Cmd::DoubleBracket { words, redirs: vec![] }),
     ]
     .boxed()
 }

