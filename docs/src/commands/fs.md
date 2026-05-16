@@ -104,6 +104,13 @@ Aliases: `exa`
 - Allowed valued flags: --block-size, --color, --format, --hide, --hyperlink, --ignore, --quoting-style, --sort, --tabsize, --time, --time-style, --width, -I, -T, -w
 - Bare invocation allowed
 
+### `mktemp`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mktemp-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mktemp-invocation</a></p>
+
+- Allowed standalone flags: --directory, --dry-run, --help, --quiet, --tmpdir, --version, -d, -q, -t, -u
+- Allowed valued flags: --suffix, --tmpdir, -p, -t
+- Bare invocation allowed
+
 ### `pwd`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation</a></p>
 

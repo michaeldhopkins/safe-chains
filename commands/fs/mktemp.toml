@@ -1,0 +1,16 @@
+[[command]]
+name = "mktemp"
+description = "Creates a unique local temporary file (or directory with -d) using a template containing trailing 'X' characters that get replaced with a random suffix, then prints the path. Always writes to local disk (under $TMPDIR or the directory given by -p/--tmpdir). The -u/--dry-run flag still creates the file but unlinks it before exiting (race-prone). No network or remote effects. BSD and GNU implementations differ slightly on -t and -p semantics — both implementations accept these flags but interpret them differently. Stable utility from coreutils (GNU) and macOS base; flag surface unchanged for many years."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#mktemp-invocation"
+researched_version = "GNU coreutils 9.x + BSD mktemp (macOS 15 / Sequoia); flag surface intersected"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--directory", "--dry-run", "--help", "--quiet",
+    "--tmpdir", "--version",
+    "-d", "-q", "-t", "-u",
+]
+valued = [
+    "--suffix", "--tmpdir",
+    "-p", "-t",
+]
