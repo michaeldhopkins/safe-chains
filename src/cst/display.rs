@@ -128,6 +128,17 @@ impl fmt::Display for Cmd {
                 }
                 f.write_str(" fi")
             }
+            Cmd::DoubleBracket { words, redirs } => {
+                f.write_str("[[")?;
+                for w in words {
+                    write!(f, " {w}")?;
+                }
+                f.write_str(" ]]")?;
+                for r in redirs {
+                    write!(f, " {r}")?;
+                }
+                Ok(())
+            }
         }
     }
 }

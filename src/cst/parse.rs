@@ -156,6 +156,7 @@ fn command(input: &mut &str) -> ModalResult<Cmd> {
         while_cmd,
         until_cmd,
         if_cmd,
+        double_bracket_cmd,
         simple_cmd.map(Cmd::Simple),
     ))
     .parse_next(input)
@@ -614,6 +615,99 @@ fn cond_then_body(input: &mut &str) -> ModalResult<Branch> {
     sep.parse_next(input)?;
     let body = script.parse_next(input)?;
     Ok(Branch { cond, body })
+}
+
+fn double_bracket_cmd(input: &mut &str) -> ModalResult<Cmd> {
+    if !input.starts_with("[[") {
+        return backtrack();
+    }
+    let bytes = input.as_bytes();
+    if bytes.len() < 3 || !matches!(bytes[2], b' ' | b'\t' | b'\n') {
+        return backtrack();
+    }
+    *input = &input[2..];
+
+    let mut words: Vec<Word> = Vec::new();
+    loop {
+        ws.parse_next(input)?;
+        if at_double_bracket_end(input) {
+            *input = &input[2..];
+            let redirs = trailing_redirs(input)?;
+            return Ok(Cmd::DoubleBracket { words, redirs });
+        }
+        if input.is_empty() {
+            return backtrack();
+        }
+        let w = bracket_word.parse_next(input)?;
+        words.push(w);
+    }
+}
+
+fn at_double_bracket_end(input: &str) -> bool {
+    if !input.starts_with("]]") {
+        return false;
+    }
+    let after = &input[2..];
+    after.is_empty()
+        || after.starts_with(|c: char| {
+            matches!(c, ' ' | '\t' | '\n' | ';' | '&' | '|' | ')' | '>' | '<')
+        })
+}
+
+fn bracket_word(input: &mut &str) -> ModalResult<Word> {
+    repeat(1.., bracket_word_part).map(Word).parse_next(input)
+}
+
+fn bracket_word_part(input: &mut &str) -> ModalResult<WordPart> {
+    if input.is_empty() {
+        return backtrack();
+    }
+    if matches!(input.as_bytes()[0], b' ' | b'\t' | b'\n') {
+        return backtrack();
+    }
+    if at_double_bracket_end(input) {
+        return backtrack();
+    }
+    alt((
+        single_quoted,
+        double_quoted,
+        arith_sub,
+        cmd_sub,
+        backtick_part,
+        escaped,
+        dollar_lit(is_bracket_literal),
+        bracket_lit,
+    ))
+    .parse_next(input)
+}
+
+fn is_bracket_literal(c: char) -> bool {
+    !matches!(c, '\'' | '"' | '`' | '\\' | '$' | ' ' | '\t' | '\n')
+}
+
+fn bracket_lit(input: &mut &str) -> ModalResult<WordPart> {
+    // Byte-by-byte scan relies on every stop char being single-byte ASCII —
+    // multibyte UTF-8 continuation bytes always pass `is_bracket_literal` and
+    // get consumed as part of the same `Lit`, so `end` only lands on a char
+    // boundary.
+    let bytes = input.as_bytes();
+    let mut end = 0;
+    while end < bytes.len() {
+        let c = bytes[end] as char;
+        if !is_bracket_literal(c) {
+            break;
+        }
+        if c == ']' && at_double_bracket_end(&input[end..]) {
+            break;
+        }
+        end += 1;
+    }
+    if end == 0 {
+        return backtrack();
+    }
+    let lit = input[..end].to_string();
+    *input = &input[end..];
+    Ok(WordPart::Lit(lit))
 }
 
 fn name(input: &mut &str) -> ModalResult<String> {

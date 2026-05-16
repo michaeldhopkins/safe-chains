@@ -57,6 +57,10 @@ pub enum Cmd {
         branches: Vec<Branch>,
         else_body: Option<Script>,
     },
+    DoubleBracket {
+        words: Vec<Word>,
+        redirs: Vec<Redir>,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -213,6 +217,10 @@ impl Cmd {
                     })
                     .collect(),
                 else_body: else_body.as_ref().map(|e| e.normalize_as_body()),
+            },
+            Cmd::DoubleBracket { words, redirs } => Cmd::DoubleBracket {
+                words: words.iter().map(|w| w.normalize()).collect(),
+                redirs: normalize_redirs(redirs),
             },
         }
     }
