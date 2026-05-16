@@ -5857,6 +5857,12 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+### `mkdir`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mkdir-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mkdir-invocation</a></p>
+
+- Allowed standalone flags: --help, --parents, --verbose, --version, -Z, -p, -v
+- Allowed valued flags: --context, --mode, -m
+
 ### `mkdocs`
 <p class="cmd-url"><a href="https://www.mkdocs.org/">https://www.mkdocs.org/</a></p>
 
