@@ -1,0 +1,15 @@
+[[command]]
+name = "mkdir"
+description = "Creates one or more local directories. Operates only on the local filesystem under the user's permissions. -p/--parents creates intermediate directories as needed; -m/--mode sets the mode; -v/--verbose prints each path created. GNU coreutils adds -Z/--context for SELinux. Stable utility on BSD and GNU; flag surface unchanged for many years."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#mkdir-invocation"
+researched_version = "GNU coreutils 9.x + BSD mkdir (macOS 15 / Sequoia)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--parents", "--verbose", "--version",
+    "-Z", "-p", "-v",
+]
+valued = [
+    "--context", "--mode",
+    "-m",
+]
