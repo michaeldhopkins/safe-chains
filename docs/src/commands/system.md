@@ -1060,7 +1060,8 @@ Aliases: `upsun`
 ### `ssh`
 <p class="cmd-url"><a href="https://man.openbsd.org/ssh">https://man.openbsd.org/ssh</a></p>
 
-- Allowed standalone flags: -V
+- Requires -G, -Q, -V. - Allowed standalone flags: -G, -V
+- Allowed valued flags: -Q
 
 ### `supabase`
 <p class="cmd-url"><a href="https://supabase.com/docs/reference/cli/introduction">https://supabase.com/docs/reference/cli/introduction</a></p>
