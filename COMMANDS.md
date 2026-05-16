@@ -8186,6 +8186,11 @@ Aliases: `python`
 - Allowed valued flags: --format, --width, -f, -w
 - Bare invocation allowed
 
+### `rm`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#rm-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#rm-invocation</a></p>
+
+- Requires --help, --version. - Allowed standalone flags: --help, --version
+
 ### `roc`
 <p class="cmd-url"><a href="https://www.roc-lang.org/">https://www.roc-lang.org/</a></p>
 

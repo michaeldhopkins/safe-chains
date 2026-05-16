@@ -134,6 +134,11 @@ Aliases: `exa`
 - Allowed standalone flags: --canonicalize-existing, --canonicalize-missing, --help, --logical, --no-symlinks, --physical, --quiet, --strip, --version, --zero, -L, -P, -V, -e, -h, -m, -q, -s, -z
 - Allowed valued flags: --relative-base, --relative-to
 
+### `rm`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#rm-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#rm-invocation</a></p>
+
+- Requires --help, --version. - Allowed standalone flags: --help, --version
+
 ### `stat`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation</a></p>
 
