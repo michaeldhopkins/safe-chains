@@ -1,10 +1,20 @@
 [[command]]
 name = "ssh"
-description = "OpenSSH client for encrypted remote login, command execution, and tunnel/port-forwarding over untrusted networks. An unrestricted ssh invocation establishes an authenticated connection to a remote host and can execute arbitrary commands, forward local/remote ports, create SOCKS proxies, and tunnel X11 connections -- it is one of the most powerful network tools available. Coverage is restricted to three read-only flags that perform no network I/O and never connect: -V prints the OpenSSH version and exits; -G prints the resolved ssh_config after evaluating Host and Match blocks for the given (optional) target and exits; -Q queries the locally compiled-in list of supported algorithms (cipher, mac, kex, key, sig, protocol-version, etc.). All three resolve only against local configuration files and the binary's own build options."
+description = "OpenSSH client for encrypted remote login, command execution, and tunnel/port-forwarding over untrusted networks. An unrestricted ssh invocation can execute arbitrary commands, forward local/remote ports, create SOCKS proxies, and tunnel X11 connections. Coverage is restricted to two patterns: (1) read-only inspection flags that perform no network I/O -- -V (version), -G (print resolved ssh_config and exit), -Q (query supported algorithms); (2) the auth-probe pattern `ssh -T -o BatchMode=yes <host>` which opens a TCP connection only to test whether authentication succeeds and exits with no remote command executed, no PTY allocated, and no interactive prompts. Additional connection-shaping flags (-l, -p, -i, -F, -4, -6, -q, -v) and extra -o KEY=VALUE pairs are accepted in the probe form, but -o values that enable forwarding, tunneling, X11, agent forwarding, proxy commands, or local-command execution are rejected so they can't be smuggled in via -o."
 url = "https://man.openbsd.org/ssh"
+researched_version = "OpenSSH ~10.x (man page authoritative as of 2026-05)"
+handler = "ssh"
+doc_body = """
+- Allowed forms:
+  - `ssh -V` — print version, no network
+  - `ssh -G [host]` — print resolved ssh_config and exit, no network
+  - `ssh -Q <query>` — list locally compiled-in algorithms, no network
+  - `ssh -T -o BatchMode=yes <host>` — auth probe; no PTY, no prompts, no remote command, no port forwarding. May include extra -o options, -l/-p/-i/-F/-4/-6/-q/-v.
+"""
+
+[command.fallback]
 level = "Inert"
 bare = false
-require_any = ["-G", "-Q", "-V"]
 max_positional = 1
 standalone = ["-G", "-V"]
 valued = ["-Q"]

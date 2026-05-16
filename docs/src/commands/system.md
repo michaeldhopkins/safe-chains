@@ -1060,7 +1060,15 @@ Aliases: `upsun`
 ### `ssh`
 <p class="cmd-url"><a href="https://man.openbsd.org/ssh">https://man.openbsd.org/ssh</a></p>
 
-- Requires -G, -Q, -V. - Allowed standalone flags: -G, -V
+- Allowed forms:
+  - `ssh -V` — print version, no network
+  - `ssh -G [host]` — print resolved ssh_config and exit, no network
+  - `ssh -Q <query>` — list locally compiled-in algorithms, no network
+  - `ssh -T -o BatchMode=yes <host>` — auth probe; no PTY, no prompts, no remote command, no port forwarding. May include extra -o options, -l/-p/-i/-F/-4/-6/-q/-v.
+
+
+- **Without a subcommand:**
+- Allowed standalone flags: -G, -V
 - Allowed valued flags: -Q
 
 ### `supabase`

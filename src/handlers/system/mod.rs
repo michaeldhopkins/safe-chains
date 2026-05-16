@@ -1,4 +1,5 @@
 pub(crate) mod plutil;
+pub(crate) mod ssh;
 pub(crate) mod sysctl;
 mod tmux;
 
