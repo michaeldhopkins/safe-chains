@@ -1,25 +1,27 @@
 [[command]]
 name = "rspec"
-description = "Ruby's behaviour-driven test framework. Loads the application code under test (so executes Ruby code at test time, including any side-effects test setup performs — DB connections, ActiveRecord migrations on the test schema, network mocks, etc.). Output is a test report to stdout; with --format documentation/progress/html/json/junit and --out it writes a report file. The --bisect flag re-runs the suite repeatedly to narrow failure ordering. --dry-run prints test names without running them. The --tag, --example, --pattern, --exclude-pattern flags scope which examples run. RSpec follows roughly annual major releases with monthly point releases; the CLI surface is highly stable."
+description = "Ruby's behaviour-driven test framework. Loads the application code under test (so executes Ruby code at test time, including any side-effects test setup performs — DB connections, ActiveRecord migrations on the test schema, network mocks, etc.). Output is a test report to stdout; with --format documentation/progress/html/json/junit and --out it writes a report file. The --bisect flag re-runs the suite repeatedly to narrow failure ordering. --dry-run prints test names without running them. The --tag, --example, --pattern, --exclude-pattern flags scope which examples run. --drb dispatches the run to a DRb server. RSpec follows roughly annual major releases with monthly point releases; the CLI surface is highly stable."
 url = "https://rspec.info/documentation/"
-researched_version = "rspec ~3.x line; flag surface stable across recent releases as of 2026-05"
+researched_version = "rspec-core main branch (2026-05; option_parser.rb authoritative)"
 level = "SafeRead"
 bare = true
 standalone = [
-    "--bisect", "--color", "--deprecation-out",
-    "--dry-run", "--errors-only", "--fail-fast",
-    "--fail-if-no-examples", "--force-color",
-    "--format", "--help", "--no-color", "--no-fail-fast",
-    "--no-profile", "--only-failures", "--order",
-    "--profile", "--require", "--seed",
-    "--tty", "--version", "--warnings",
-    "-D", "-I", "-O", "-P", "-T",
-    "-b", "-c", "-f", "-h", "-p", "-r", "-v", "-w",
+    "--backtrace", "--bisect", "--drb", "--dry-run",
+    "--fail-fast", "--force-color", "--force-colour",
+    "--help", "--init", "--next-failure",
+    "--no-color", "--no-colour", "--no-drb", "--no-fail-fast",
+    "--no-profile", "--only-failures", "--profile",
+    "--version", "--warnings",
+    "-X", "-b", "-h", "-n", "-p", "-v", "-w",
 ]
 valued = [
-    "--default-path", "--example", "--exclude-pattern",
-    "--filter-files", "--init", "--no-deprecation-out",
-    "--out", "--pattern", "--tag",
-    "-I", "-O", "-P", "-e", "-o", "-t",
+    "--bisect", "--default-path", "--deprecation-out",
+    "--drb-port", "--error-exit-code", "--example",
+    "--example-matches", "--exclude-pattern", "--fail-fast",
+    "--failure-exit-code", "--format", "--options",
+    "--order", "--out", "--pattern", "--profile",
+    "--require", "--seed", "--tag",
+    "-E", "-I", "-O", "-P",
+    "-e", "-f", "-o", "-p", "-r", "-t",
 ]
-write_flags = ["--out", "-o"]
+write_flags = ["--deprecation-out", "--out", "-o"]

@@ -8215,8 +8215,8 @@ Aliases: `python`
 ### `rspec`
 <p class="cmd-url"><a href="https://rspec.info/documentation/">https://rspec.info/documentation/</a></p>
 
-- Allowed standalone flags: --bisect, --color, --deprecation-out, --dry-run, --errors-only, --fail-fast, --fail-if-no-examples, --force-color, --format, --help, --no-color, --no-fail-fast, --no-profile, --only-failures, --order, --profile, --require, --seed, --tty, --version, --warnings, -D, -I, -O, -P, -T, -b, -c, -f, -h, -p, -r, -v, -w
-- Allowed valued flags: --default-path, --example, --exclude-pattern, --filter-files, --init, --no-deprecation-out, --out, --pattern, --tag, -I, -O, -P, -e, -o, -t
+- Allowed standalone flags: --backtrace, --bisect, --drb, --dry-run, --fail-fast, --force-color, --force-colour, --help, --init, --next-failure, --no-color, --no-colour, --no-drb, --no-fail-fast, --no-profile, --only-failures, --profile, --version, --warnings, -X, -b, -h, -n, -p, -v, -w
+- Allowed valued flags: --bisect, --default-path, --deprecation-out, --drb-port, --error-exit-code, --example, --example-matches, --exclude-pattern, --fail-fast, --failure-exit-code, --format, --options, --order, --out, --pattern, --profile, --require, --seed, --tag, -E, -I, -O, -P, -e, -f, -o, -p, -r, -t
 - Bare invocation allowed
 
 ### `rsync`
