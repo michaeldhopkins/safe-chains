@@ -1391,6 +1391,63 @@ use super::*;
     }
 
     #[test]
+    fn structured_wrapper_combined_short_cluster() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "toolbox"
+            bare_flags = ["--help", "-h"]
+            [command.wrapper]
+            standalone = ["--verbose", "-v"]
+
+            [[command.sub]]
+            name = "list"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["toolbox", "-vv", "list"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["toolbox", "-vvv", "list"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["toolbox", "-vx", "list"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
+    fn structured_wrapper_bare_flag_after_wrapper() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "toolbox"
+            bare_flags = ["--help", "-h"]
+            [command.wrapper]
+            standalone = ["--verbose", "-v"]
+            valued = ["--log-level"]
+
+            [[command.sub]]
+            name = "list"
+        "#);
+        assert_eq!(
+            dispatch_spec(&toks(&["toolbox", "--verbose", "--help"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["toolbox", "--help", "--verbose"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["toolbox", "--log-level", "info", "--help", "-v"]), &spec),
+            Verdict::Allowed(SafetyLevel::Inert),
+        );
+        assert_eq!(
+            dispatch_spec(&toks(&["toolbox", "--help", "stray"]), &spec),
+            Verdict::Denied,
+        );
+    }
+
+    #[test]
     fn structured_wrapper_rejects_unknown_sub() {
         let spec = load_one(r#"
             [[command]]

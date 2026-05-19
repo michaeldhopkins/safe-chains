@@ -1,4 +1,5 @@
 use crate::parse::Token;
+use crate::policy::FlagSet;
 use crate::verdict::{SafetyLevel, Verdict};
 
 use super::policy::check_owned;
@@ -81,22 +82,37 @@ fn skip_pre_flags(
     tokens: &[Token],
     pre_standalone: &[String],
     pre_valued: &[String],
+    start: usize,
 ) -> usize {
-    let mut i = 1;
+    let mut i = start;
     while i < tokens.len() {
         let t = &tokens[i];
-        if !t.starts_with('-') {
+        let s = t.as_str();
+        if !s.starts_with('-') {
             break;
         }
-        if pre_valued.iter().any(|f| t == f.as_str()) {
+        if pre_valued.contains_flag(s) {
             i += 2;
             continue;
         }
-        if pre_valued.iter().any(|f| t.as_str().starts_with(&format!("{f}="))) {
+        if let Some((flag, _)) = s.split_once('=')
+            && pre_valued.contains_flag(flag)
+        {
             i += 1;
             continue;
         }
-        if pre_standalone.iter().any(|f| t == f.as_str()) {
+        if pre_standalone.contains_flag(s) {
+            i += 1;
+            continue;
+        }
+        // POSIX-style short-flag cluster (`-vv`, `-vy`): every byte after
+        // the dash must be a known standalone short. Mirrors the same
+        // logic in policy::check_flags for non-wrapper subs.
+        let bytes = s.as_bytes();
+        if bytes.len() > 2
+            && bytes[1] != b'-'
+            && bytes[1..].iter().all(|&b| pre_standalone.contains_short(b))
+        {
             i += 1;
             continue;
         }
@@ -115,19 +131,21 @@ fn dispatch_branching(
     first_arg: &[String],
     first_arg_level: SafetyLevel,
 ) -> Verdict {
-    let start = skip_pre_flags(tokens, pre_standalone, pre_valued);
+    let start = skip_pre_flags(tokens, pre_standalone, pre_valued, 1);
     if start >= tokens.len() {
         return if bare_ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
     }
     let arg = tokens[start].as_str();
-    if bare_flags.is_empty() && matches!(arg, "--help" | "-h") {
-        if tokens.len() == start + 1 {
+    let is_bare_flag = bare_flags.iter().any(|f| f == arg)
+        || (bare_flags.is_empty() && matches!(arg, "--help" | "-h"));
+    if is_bare_flag {
+        let after = skip_pre_flags(tokens, pre_standalone, pre_valued, start + 1);
+        if after >= tokens.len() {
             return Verdict::Allowed(SafetyLevel::Inert);
         }
-        return Verdict::Denied;
-    }
-    if start + 1 == tokens.len() && bare_flags.iter().any(|f| f == arg) {
-        return Verdict::Allowed(SafetyLevel::Inert);
+        if bare_flags.is_empty() {
+            return Verdict::Denied;
+        }
     }
     if let Some(sub) = subs.iter().find(|s| s.name == arg) {
         return dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS);
