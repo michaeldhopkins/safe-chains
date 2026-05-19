@@ -9736,6 +9736,14 @@ Aliases: `td`
 - Allowed standalone flags: --compact-output, --exit-status, --help, --null-input, --raw-input, --raw-output, --slurp, --sort-keys, --tab, --toml-output, --version, -C, -M, -R, -S, -V, -c, -e, -h, -n, -r, -s, -t
 - Allowed valued flags: --arg, --argjson, --indent, -f
 
+### `toolbox`
+<p class="cmd-url"><a href="https://github.com/containers/toolbox">https://github.com/containers/toolbox</a></p>
+
+- **help**: Positional args accepted
+- **list**: Flags: --containers, --help, --images, -c, -h, -i
+- **ls**: Flags: --containers, --help, --images, -c, -h, -i
+- Allowed standalone flags: --help, -h
+
 ### `top`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/top.1.html">https://man7.org/linux/man-pages/man1/top.1.html</a></p>
 
