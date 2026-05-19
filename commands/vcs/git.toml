@@ -644,6 +644,15 @@ valued = [
 ]
 
 [[command.sub]]
+name = "symbolic-ref"
+bare = false
+max_positional = 1
+standalone = [
+    "--help", "--no-recurse", "--quiet", "--recurse", "--short",
+    "-h", "-q",
+]
+
+[[command.sub]]
 name = "tag"
 standalone = [
     "--help", "--list", "--no-color", "--no-column",

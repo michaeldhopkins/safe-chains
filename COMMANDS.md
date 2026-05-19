@@ -3632,6 +3632,7 @@ Aliases: `g++`, `cc`, `c++`
 - **stash list**: Positional args accepted
 - **stash show**: Flags: --help, --patch, --stat, -h, -p, -u. Positional args accepted
 - **status**: Flags: --ahead-behind, --branch, --help, --ignore-submodules, --long, --no-ahead-behind, --no-renames, --null, --renames, --short, --show-stash, --verbose, -b, -h, -s, -v, -z. Valued: --column, --find-renames, --ignored, --porcelain, --untracked-files, -M, -u
+- **symbolic-ref**: Flags: --help, --no-recurse, --quiet, --recurse, --short, -h, -q
 - **tag**: Flags: --help, --list, --no-color, --no-column, --verify, -h, -l, -v. Valued: --color, --column, --contains, --format, --merged, --no-contains, --no-merged, --points-at, --sort, -n
 - **verify-commit**: Flags: --help, --raw, --verbose, -h, -v
 - **verify-tag**: Flags: --help, --raw, --verbose, -h, -v. Valued: --format
