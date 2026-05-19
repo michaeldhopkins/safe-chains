@@ -495,6 +495,14 @@
 - **version**: Flags: --client, --component, --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `toolbox`
+<p class="cmd-url"><a href="https://github.com/containers/toolbox">https://github.com/containers/toolbox</a></p>
+
+- **help**: Positional args accepted
+- **list**: Flags: --containers, --help, --images, -c, -h, -i
+- **ls**: Flags: --containers, --help, --images, -c, -h, -i
+- Allowed standalone flags: --help, -h
+
 ### `velero`
 <p class="cmd-url"><a href="https://velero.io/docs/">https://velero.io/docs/</a></p>
 

@@ -1,0 +1,49 @@
+[[command]]
+name = "toolbox"
+description = "Fedora's wrapper around Podman for interactive Linux development environments in OCI containers. Read-only subcommands (list/ls, help) report container and image state. Write subcommands (create) pull images from registries and create OCI containers; rm and rmi destroy containers and images, with --all/--force escalations. enter and run execute arbitrary code inside a Toolbx container; because such containers share the host's home directory, X11/Wayland sockets, networking, USB devices, systemd journal, and SSH agent by design, code inside them is effectively code on the host. init-container is the in-container entrypoint, not for interactive use. The project releases slowly (0.3 in September 2025) but the subcommand surface itself has been stable for years."
+url = "https://github.com/containers/toolbox"
+researched_version = "0.3 (September 2025)"
+bare_flags = ["--help", "-h"]
+
+[command.wrapper]
+standalone = ["--log-podman", "--verbose", "-v"]
+valued = ["--log-level"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--containers", "--help", "--images", "-c", "-h", "-i"]
+
+[[command.sub]]
+name = "ls"
+level = "Inert"
+standalone = ["--containers", "--help", "--images", "-c", "-h", "-i"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "enter"
+candidate = true
+
+[[command.sub]]
+name = "init-container"
+candidate = true
+
+[[command.sub]]
+name = "rm"
+candidate = true
+
+[[command.sub]]
+name = "rmi"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
