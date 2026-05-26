@@ -1630,6 +1630,13 @@ Aliases: `knife`, `chef-solo`, `chef-shell`, `chef`
 
 - Allowed standalone flags: --help, -e, -v
 
+### `circuschief`
+<p class="cmd-url"><a href="https://github.com/ferrislucas/Circus-Chief">https://github.com/ferrislucas/Circus-Chief</a></p>
+
+- Allowed standalone flags: --help, --no-analytics, --version, -h, -v
+- Allowed valued flags: --port, -p
+- Bare invocation allowed
+
 ### `cksum`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation</a></p>
 
