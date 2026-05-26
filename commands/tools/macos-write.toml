@@ -1,0 +1,97 @@
+[[command]]
+name = "compression_tool"
+description = "Encodes or decodes files using the macOS Compression framework. -encode and -decode are the two operating modes; -a / -A pick the algorithm (zlib, lzma, lzfse, lz4, lz4_raw). Reads from -i or stdin and writes to -o or stdout. Entirely local."
+url = "https://keith.github.io/xcode-man-pages/compression_tool.1.html"
+researched_version = "macOS 14 compression_tool(1)"
+level = "SafeWrite"
+bare = false
+standalone = ["-encode", "-decode", "-v", "-h"]
+valued = ["-a", "-A", "-b", "-t", "-i", "-o"]
+
+[[command]]
+name = "desdp"
+description = "Generates a scripting definition (sdef) file from a scriptable application, writing it to standard output. The source dictionary can be an aete resource or Cocoa suite definition files. Reads the application; does not modify it. The output is text that the operator would redirect to disk. Entirely local."
+url = "https://keith.github.io/xcode-man-pages/desdp.1.html"
+researched_version = "macOS 14 desdp(1)"
+level = "SafeWrite"
+bare = false
+
+[[command]]
+name = "hiutil"
+description = "Creates and inspects Help Viewer indices (.helpindex / .cshelpindex). --create builds a new index from a directory of HTML files (write); --list-files, --list-anchors, --list-anchor-dictionary, --list-index-versions, --list-min-term-length, --list-stopwords, --list-terms read existing indices (info). --purge-caches terminates Help Viewer/helpd and clears their persisted caches. Entirely local."
+url = "https://keith.github.io/xcode-man-pages/hiutil.1.html"
+researched_version = "macOS 14 hiutil(1)"
+level = "SafeWrite"
+bare_flags = ["--help", "-h", "--version", "-V"]
+standalone = [
+    "--create", "-C",
+    "--purge-caches", "-P",
+    "--list-anchors", "-A",
+    "--list-anchor-dictionary", "-D",
+    "--list-index-versions", "-E",
+    "--list-files", "-F",
+    "--list-min-term-length", "-M",
+    "--list-stopwords", "-S",
+    "--list-terms", "-T",
+    "-1",
+    "--anchors", "-a",
+    "-g",
+    "--verbose", "-v",
+]
+valued = [
+    "--index-format", "-I",
+    "--file", "-f",
+    "-m",
+    "-s",
+    "-r",
+    "-t",
+]
+
+[[command]]
+name = "logger"
+description = "Writes a message to the system log via syslog(3). Reads either the positional message argument, the file given to -f, or standard input. -p controls priority; -t sets the log tag; -s also mirrors the message to stderr. POSIX-standardized surface; entirely local."
+url = "https://keith.github.io/xcode-man-pages/logger.1.html"
+researched_version = "macOS 14 logger(1); POSIX.2 surface frozen"
+level = "SafeWrite"
+standalone = ["-i", "-s"]
+valued = ["-f", "-p", "-t"]
+
+[[command]]
+name = "notifyutil"
+description = "Interacts with the notify(3) notification system. -p posts a notification for a key; -s sets a state value; -g reads a state value. -w registers and waits for notifications (synchronous). -port/-file/-check/-signal/-dispatch select the registration transport. -M multiplexes; -R re-registers after notifyd restart. Posting notifications affects other processes on the host."
+url = "https://keith.github.io/xcode-man-pages/notifyutil.1.html"
+researched_version = "macOS 14 notifyutil(1)"
+level = "SafeWrite"
+tolerate_unknown_short = true
+standalone = ["-q", "-v", "-M", "-R", "-port", "-file", "-check", "-dispatch"]
+valued = ["-z", "-p", "-w", "-g", "-s", "-signal"]
+
+[[command]]
+name = "resolveLinks"
+description = "Resolves HeaderDoc cross-reference link requests in a directory of HTML files. Rewrites files in place to point apple_ref anchors at concrete targets; -n disables file writes (still produces the seed output file). -x writes a cross-reference seed file for use with -s on subsequent runs. Entirely local; primarily invoked by gatherHeaderDoc."
+url = "https://keith.github.io/xcode-man-pages/resolveLinks.1.html"
+researched_version = "macOS 14 resolveLinks(1)"
+level = "SafeWrite"
+bare = false
+standalone = ["-a", "-D", "-h", "-n", "-N", "-P"]
+valued = ["-b", "-d", "-i", "-r", "-s", "-S", "-t", "-x"]
+
+[[command]]
+name = "sdp"
+description = "Transforms a scripting definition (sdef) file into Scripting Bridge Objective-C headers (-fh) or legacy Cocoa scripting suite files (-fa, -fs, -ft). Reads sdef from stdin or a positional file; writes to the directory or file given to -o (default: current directory). Entirely local."
+url = "https://keith.github.io/xcode-man-pages/sdp.1.html"
+researched_version = "macOS 14 sdp(1)"
+level = "SafeWrite"
+bare = false
+standalone = ["-A", "--hidden"]
+valued = ["-f", "-o", "-V", "-N", "--basename", "-i"]
+
+[[command]]
+name = "xip"
+description = "Creates or expands signed .xip archives. As of macOS Sierra, only Apple-signed archives are trusted, and the create/sign side is deprecated for third-party use. --expand extracts an archive into the current working directory. The --sign mode requires a Developer ID identity in the keychain and is excluded here. Entirely local."
+url = "https://keith.github.io/xcode-man-pages/xip.1.html"
+researched_version = "macOS 14 xip(1)"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--expand"]

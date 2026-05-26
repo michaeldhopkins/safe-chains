@@ -1,0 +1,56 @@
+[[command]]
+name = "footprint"
+description = "Reports memory consumption for one or more processes (selected by PID or by exact / partial process name) or for a saved .memgraph file. Read-only; uses the same task introspection APIs as vmmap(1) and leaks(1). Xcode CLI tools; surface stable."
+url = "https://keith.github.io/xcode-man-pages/footprint.1.html"
+researched_version = "macOS 14 (Xcode CLI tools)"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = [
+    "--all", "--forkCorpse", "--help", "--json", "--proc", "--skip",
+    "--swapped", "--sysFootprint", "--targetChildren", "--wide", "--wired",
+    "--vmObjectDirty",
+    "-a", "-h", "-s", "-t", "-v", "-w", "-y",
+]
+valued = [
+    "--exclude", "--format", "--minFootprint", "--pid", "--sample", "--sort",
+    "-f", "-j", "-p", "-x",
+]
+
+[[command]]
+name = "fuser"
+description = "POSIX utility that prints the PIDs of processes with one or more named files open. Read-only; walks /dev/kmem-style process tables (on macOS, via the libproc interface). POSIX surface; frozen."
+url = "https://man7.org/linux/man-pages/man1/fuser.1.html"
+researched_version = "POSIX fuser; surface frozen"
+level = "Inert"
+bare = false
+standalone = ["-c", "-f", "-u"]
+
+[[command]]
+name = "iostat"
+description = "Reports kernel I/O statistics for terminals, block devices, and CPU. Read-only; samples kernel statistics counters. macOS variant differs from Linux iostat. Surface frozen."
+url = "https://keith.github.io/xcode-man-pages/iostat.8.html"
+researched_version = "macOS 14 (surface frozen)"
+level = "Inert"
+bare = true
+standalone = ["-?", "-C", "-I", "-K", "-T", "-U", "-d", "-o"]
+valued = ["-c", "-n", "-w"]
+
+[[command]]
+name = "ipcs"
+description = "Reports System V interprocess-communication status — message queues, semaphore sets, and shared-memory segments — for the local system. Read-only; calls msgctl/semctl/shmctl with IPC_STAT. BSD-derived; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/ipcs.1.html"
+researched_version = "macOS 14 (surface frozen)"
+level = "Inert"
+bare = true
+standalone = ["-M", "-Q", "-S", "-T", "-a", "-b", "-c", "-m", "-o", "-p", "-q", "-s", "-t"]
+valued = ["-u"]
+
+[[command]]
+name = "ipcrm"
+description = "Removes System V IPC objects — message queues, shared-memory segments, and semaphore sets — from the local kernel. Destructive within the local System V IPC namespace. Only the owning user (or root) can remove. BSD-derived; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/ipcrm.1.html"
+researched_version = "macOS 14"
+level = "SafeWrite"
+bare = false
+valued = ["-M", "-Q", "-S", "-m", "-q", "-s"]

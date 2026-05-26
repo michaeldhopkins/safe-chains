@@ -1,0 +1,115 @@
+[[command]]
+name = "vmmap"
+description = "macOS developer tool that prints the virtual memory regions of a target process (selected by PID, partial executable name, or memgraph file). Read-only inspector — walks the target's VM map via task_for_pid and prints region kind, permissions, share mode, size, and backing dylib. Bundled with the Xcode command line tools; surface has been stable for years."
+url = "https://keith.github.io/xcode-man-pages/vmmap.1.html"
+researched_version = "macOS 14"
+level = "Inert"
+bare = false
+standalone = [
+    "--allSplitLibs", "--attributes", "--interleaved", "--noCoalesce",
+    "--pages", "--sortBySize", "--submap", "--summary", "--verbose", "--wide",
+    "-h", "-s", "-v", "-w",
+]
+
+[[command]]
+name = "leaks"
+description = "Searches a process's address space for malloc-allocated buffers not reachable from any pointer in registers, stacks, globals, or other live malloc blocks. Accepts a PID, partial executable name, or .memgraph file. Bundled with the Xcode CLI tools."
+url = "https://keith.github.io/xcode-man-pages/leaks.1.html"
+researched_version = "macOS 14 (Xcode CLI tools)"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = [
+    "--help", "-autoreleasePools", "-conservative", "-fullContent",
+    "-fullStackHistory", "-groupByType", "-list", "-noContent", "-nosources",
+    "-nostacks", "-quiet", "-readonlyContent", "-referenceTree",
+]
+valued = ["-debug", "-diffFrom", "-exclude", "-traceTree"]
+
+[[command]]
+name = "heap"
+description = "Lists every malloc-allocated buffer in a target process's heap, grouped by class name, type (Objective-C / C++ / CFType), or binary image. Accepts a PID, partial executable name, or .memgraph file. Read-only: walks the target's malloc zones via the malloc-zone introspection API. Xcode CLI tools; surface stable."
+url = "https://keith.github.io/xcode-man-pages/heap.1.html"
+researched_version = "macOS 14 (Xcode CLI tools)"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = [
+    "--help", "-H", "-guessNonObjects", "-humanReadable", "-noContent",
+    "-s", "-showSizes", "-sortBySize", "-sumObjectFields", "-z", "-zones",
+]
+valued = ["-addresses", "-diffFrom"]
+
+[[command]]
+name = "malloc_history"
+description = "Prints the allocation backtraces for malloc blocks and anonymous VM regions in a process, given a PID / partial name / memgraph plus one or more block addresses. Requires the target to have been launched with MallocStackLogging. Read-only. Xcode CLI tools; surface stable."
+url = "https://keith.github.io/xcode-man-pages/malloc_history.1.html"
+researched_version = "macOS 14 (Xcode CLI tools)"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = [
+    "--help", "-allByCount", "-allBySize", "-allEvents", "-callTree",
+    "-chargeSystemLibraries", "-collapseRecursion", "-highWaterMark",
+    "-ignoreThreads", "-invert", "-showContent", "-virtual",
+]
+
+[[command]]
+name = "stringdups"
+description = "Inspects a process's malloc blocks and reports clusters of blocks with identical content, useful for finding duplicate-string memory waste. Read-only: walks the target's malloc heap via the introspection API. Accepts a PID, partial executable name, or memgraph. Xcode CLI tools."
+url = "https://keith.github.io/xcode-man-pages/stringdups.1.html"
+researched_version = "macOS 14 (Xcode CLI tools)"
+level = "Inert"
+bare = false
+standalone = ["--help", "-callTrees", "-invertCallTrees", "-nostacks", "-stringsOnly"]
+valued = ["-minimumCount"]
+
+[[command]]
+name = "latency"
+description = "Real-time monitor for scheduler and interrupt latency on macOS. Uses the kernel tracing facility (requires root) to sample scheduling delays for a given thread priority and interrupt-service delays. Apple ships this with macOS; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/latency.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = false
+standalone = ["-h", "-m"]
+valued = ["-R", "-c", "-it", "-l", "-n", "-p", "-st"]
+
+[[command]]
+name = "sc_usage"
+description = "Top-style live sampler of system-call and page-fault rates for a single process (selected by PID, command name, or `-E <path>` to launch a new process). Uses the kernel tracing facility, so it requires root. Apple ships this with macOS; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/sc_usage.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = false
+standalone = ["-e", "-l"]
+valued = ["-E", "-c", "-s"]
+
+[[command]]
+name = "timerfires"
+description = "Lists timers as they fire in real time on macOS. DTrace-backed; requires root. Read-only: only observes timer fire events. Apple ships this with macOS; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/timerfires.1.html"
+researched_version = "macOS 14"
+level = "Inert"
+bare = false
+standalone = ["-a", "-g", "-s", "-v"]
+valued = ["-n", "-p", "-t"]
+
+[[command]]
+name = "imptrace"
+description = "Real-time trace of Mach importance-donation events. DTrace-backed; requires root. Read-only diagnostic. Apple ships this with macOS; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/imptrace.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+standalone = ["-d", "-i", "-s"]
+valued = ["-p"]
+
+[[command]]
+name = "lockstat"
+description = "DTrace front-end that reports kernel lock contention, hold, and profile-interrupt statistics. Requires root because it loads DTrace probes into the running kernel. Read-only — observes lock activity. Inherited from Solaris; surface stable on macOS."
+url = "https://keith.github.io/xcode-man-pages/lockstat.1m.html"
+researched_version = "macOS 14 (Solaris-inherited; surface frozen)"
+level = "Inert"
+bare = true
+standalone = ["-A", "-C", "-E", "-H", "-I", "-S", "-T", "-V", "-W", "-c", "-g", "-k", "-p", "-w"]
+valued = ["-D", "-b", "-d", "-e", "-f", "-h", "-i", "-l", "-n", "-o", "-s", "-t", "-x"]

@@ -1,0 +1,36 @@
+[[command]]
+name = "zcmp"
+aliases = ["zdiff"]
+description = "Wrappers that invoke cmp or diff on gzip-, bzip2-, xz-, or lzma-compressed files (selected by extension). Options are passed through to cmp(1) or diff(1)."
+url = "https://www.gnu.org/software/gzip/"
+researched_version = "gzip 1.x (macOS bundled)"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+
+[[command]]
+name = "zforce"
+description = "Rename gzip-compressed files to end in .gz so gzip(1) does not compress them twice. Files that already have .gz / -gz / _gz / .tgz / .taz suffixes, or are not gzip-compressed, are ignored. Overwrites existing files without warning."
+url = "https://www.gnu.org/software/gzip/"
+researched_version = "gzip 1.x (macOS bundled)"
+level = "SafeWrite"
+bare = false
+
+[[command]]
+name = "zless"
+aliases = ["zmore"]
+description = "Paginate compress(1)- or gzip(1)-compressed text. zless uses less(1); zmore uses more(1) (or whatever $PAGER points to). Any flags are passed through to the pager."
+url = "https://www.gnu.org/software/gzip/"
+researched_version = "gzip 1.x (macOS bundled)"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true
+
+[[command]]
+name = "znew"
+description = "Recompress .Z files (LZW / compress(1)) as .gz files. -f overwrites existing .gz output, -t tests integrity before deleting the original .Z, -v reports compression ratio, -9 selects gzip -9, -K keeps the .Z if it is smaller."
+url = "https://www.gnu.org/software/gzip/"
+researched_version = "gzip 1.x (macOS bundled)"
+level = "SafeWrite"
+bare = false
+standalone = ["-9", "-K", "-f", "-t", "-v"]

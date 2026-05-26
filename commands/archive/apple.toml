@@ -1,0 +1,131 @@
+[[command]]
+name = "aa"
+description = "Apple Archive (.aar) manipulation tool. Subcommands: archive (create), append (mutate existing archive), extract (write files to disk), list (read-only), convert (write new archive), manifest (alias for archive -manifest), verify (read), check-and-fix (mutate target dir). Uses Apple-style single-dash long flags (-d, -i, -o, -a, -b, -password, -key, -recipient-pub, etc.). Encryption is optional but supported via -password*, -key*, -recipient-* options. macOS only; flag surface is stable but Apple ships changes with the OS."
+url = "https://developer.apple.com/documentation/applearchive"
+researched_version = "macOS 14 aa(1)"
+
+[[command.sub]]
+name = "archive"
+level = "SafeWrite"
+tolerate_unknown_short = true
+
+[[command.sub]]
+name = "append"
+level = "SafeWrite"
+tolerate_unknown_short = true
+
+[[command.sub]]
+name = "extract"
+level = "SafeWrite"
+tolerate_unknown_short = true
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+tolerate_unknown_short = true
+
+[[command.sub]]
+name = "convert"
+level = "SafeWrite"
+tolerate_unknown_short = true
+
+[[command.sub]]
+name = "manifest"
+level = "SafeWrite"
+tolerate_unknown_short = true
+
+[[command.sub]]
+name = "verify"
+level = "Inert"
+tolerate_unknown_short = true
+
+[[command.sub]]
+name = "check-and-fix"
+level = "SafeWrite"
+tolerate_unknown_short = true
+
+[[command]]
+name = "aea"
+description = "Apple Encrypted Archive (.aea) tool. Subcommands: encrypt (create), decrypt (write), sign (mutate), append (mutate), id (read identifying header). Uses Apple-style single-dash long flags including -profile, -a (algorithm), -b (block size), -key, -password, -sign-priv, -sign-pub, -recipient-pub, -recipient-priv, -master-key, -auth-data."
+url = "https://developer.apple.com/documentation/applearchive"
+researched_version = "macOS 14 aea(1)"
+
+[[command.sub]]
+name = "encrypt"
+level = "SafeWrite"
+tolerate_unknown_short = true
+
+[[command.sub]]
+name = "decrypt"
+level = "SafeWrite"
+tolerate_unknown_short = true
+
+[[command.sub]]
+name = "sign"
+level = "SafeWrite"
+tolerate_unknown_short = true
+
+[[command.sub]]
+name = "append"
+level = "SafeWrite"
+tolerate_unknown_short = true
+
+[[command.sub]]
+name = "id"
+level = "Inert"
+tolerate_unknown_short = true
+
+[[command]]
+name = "archiveutil"
+description = "CLI for macOS Archive Utility. As of macOS 15.0 the documented subcommand is extractXcodeAEA, which extracts an Xcode Apple Encrypted Archive to disk."
+url = "https://developer.apple.com/documentation/archiveutility"
+researched_version = "macOS 14 archiveutil(1)"
+level = "SafeWrite"
+bare = false
+
+[[command.sub]]
+name = "extractXcodeAEA"
+level = "SafeWrite"
+bare = false
+max_positional = 1
+
+[[command]]
+name = "xar"
+description = "eXtensible ARchiver (used for .pkg and similar). One of -c (create), -t (list), -x (extract) is required; all three require -f to name the archive. Flags include --compression, --compression-args, --toc-cksum, --file-cksum, --exclude, --keep-existing, -C (chdir before extract). Apple has deprecated xar and recommends alternative formats."
+url = "https://mackyle.github.io/xar/"
+researched_version = "xar 1.8 (macOS bundled)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--coalesce-heap", "--distribution",
+    "--dump-header", "--dump-toc-cksum",
+    "--keep-existing", "--keep-setuid",
+    "--link-same",
+    "-C", "-P", "-a", "-c", "-f",
+    "-j", "-k", "-l", "-p", "-s",
+    "-t", "-v", "-x", "-z",
+]
+valued = [
+    "--compression", "--compression-args",
+    "--dump-toc", "--exclude",
+    "--extract-subdoc", "--file-cksum",
+    "--list-subdocs", "--no-compress",
+    "--prop-exclude", "--prop-include",
+    "--rsize", "--toc-cksum",
+]
+
+[[command]]
+name = "stz"
+description = "Apple Streamable Archive tool. The documented subcommand is extract, which writes a streamable archive's contents to a new output directory. Optional --hash-type, --hash-size, --hashes-file verify integrity during extraction."
+url = "https://developer.apple.com/documentation"
+researched_version = "macOS 14 stz(1) (first shipped 15.5)"
+level = "SafeWrite"
+bare = false
+
+[[command.sub]]
+name = "extract"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--hash-type", "--hash-size", "--hashes-file"]

@@ -1,0 +1,34 @@
+[[command]]
+name = "netlog"
+description = "Logs a one-line summary for each TCP, UDP, and QUIC flow on the local system when the flow closes. Read-only: subscribes to per-socket close events via SystemConfiguration / Network framework symptomsd hooks. macOS ship; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/netlog.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+standalone = ["-N", "-Z", "-c", "-h", "-v"]
+valued = ["-I", "-i", "-m", "-p", "-t"]
+
+[[command]]
+name = "nettop"
+description = "Live top-style display of network sockets and per-process traffic on macOS. Read-only: queries the kernel for socket state and accumulates byte/packet counts per interface. macOS ship; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/nettop.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+standalone = ["-P", "-c", "-d", "-h", "-n", "-x"]
+valued = ["-J", "-L", "-j", "-k", "-l", "-m", "-p", "-s", "-t"]
+
+[[command]]
+name = "netusage"
+description = "Front-end to symptomsd's per-app/per-process network traffic statistics database on macOS. Read-only inspection actions show ingress/egress byte counts per app or process across interfaces. macOS ship; surface stable but lightly documented."
+url = "https://keith.github.io/xcode-man-pages/netusage.1.html"
+researched_version = "macOS 14 (system binary; surface stable)"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--compact", "--help", "--interactive", "--unitize", "-h", "-p", "-r"]
+valued = [
+    "--all-traffic", "--app-traffic", "--interval", "--lookup-name",
+    "--lookup-uuid", "--process-traffic",
+    "-d", "-e", "-n", "-s",
+]

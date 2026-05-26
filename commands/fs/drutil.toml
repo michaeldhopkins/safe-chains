@@ -1,0 +1,105 @@
+[[command]]
+name = "drutil"
+description = "Front-end to the macOS DiscRecording framework for interacting with attached CD/DVD burners. Subcommands cover read-only queries (info, list, status, discinfo, trackinfo, getconfig, cdtext, toc, atip, size, version, subchannel, filename, dumpiso, dumpudf), media erase / burn operations (burn, erase, bulkerase), tray motion (tray, eject), and polling (poll). The -drive global flag narrows the candidate drive list. macOS-bundled utility, surface unchanged since Mac OS X 10.3."
+url = "https://ss64.com/mac/drutil.html"
+researched_version = "macOS 14 (Apple stock)"
+
+[command.wrapper]
+valued = ["-drive"]
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+standalone = ["-xml"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = ["-xml"]
+
+[[command.sub]]
+name = "status"
+level = "Inert"
+standalone = ["-xml"]
+
+[[command.sub]]
+name = "discinfo"
+level = "Inert"
+standalone = ["-xml"]
+
+[[command.sub]]
+name = "trackinfo"
+level = "Inert"
+standalone = ["-xml"]
+
+[[command.sub]]
+name = "getconfig"
+level = "Inert"
+max_positional = 1
+
+[[command.sub]]
+name = "cdtext"
+level = "Inert"
+
+[[command.sub]]
+name = "toc"
+level = "Inert"
+
+[[command.sub]]
+name = "atip"
+level = "Inert"
+
+[[command.sub]]
+name = "subchannel"
+level = "Inert"
+
+[[command.sub]]
+name = "filename"
+level = "Inert"
+max_positional = 1
+
+[[command.sub]]
+name = "size"
+level = "Inert"
+max_positional = 2
+
+[[command.sub]]
+name = "version"
+level = "Inert"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "burn"
+candidate = true
+
+[[command.sub]]
+name = "erase"
+candidate = true
+
+[[command.sub]]
+name = "bulkerase"
+candidate = true
+
+[[command.sub]]
+name = "tray"
+candidate = true
+
+[[command.sub]]
+name = "eject"
+candidate = true
+
+[[command.sub]]
+name = "poll"
+candidate = true
+
+[[command.sub]]
+name = "dumpiso"
+candidate = true
+
+[[command.sub]]
+name = "dumpudf"
+candidate = true

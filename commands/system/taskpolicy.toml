@@ -1,0 +1,9 @@
+[[command]]
+name = "taskpolicy"
+description = "Two modes: (1) `taskpolicy [flags] <program> [args...]` forks, alters the I/O and scheduling policy of the new process via setiopolicy_np(3) and setpriority(2), then execs the inner program; child processes inherit the policy. (2) `taskpolicy [-b|-B] [-t tier] [-l tier] -p <pid>` changes the policy of an already running process. macOS ship; surface frozen since 2013."
+url = "https://keith.github.io/xcode-man-pages/taskpolicy.8.html"
+researched_version = "macOS 14 (surface frozen)"
+
+[command.wrapper]
+standalone = ["-B", "-a", "-b", "-s"]
+valued = ["-P", "-S", "-c", "-d", "-g", "-j", "-l", "-m", "-p", "-t"]

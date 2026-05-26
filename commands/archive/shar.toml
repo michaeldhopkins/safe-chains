@@ -1,0 +1,7 @@
+[[command]]
+name = "shar"
+description = "Write a sh(1) shell script to stdout that, when run, recreates the named files and directories. Directories must appear on the command line before their contents (find(1) provides this ordering). Output is plain text; shar itself does not modify the filesystem."
+url = "https://www.freebsd.org/cgi/man.cgi?shar"
+researched_version = "BSD shar (macOS bundled)"
+level = "Inert"
+bare = false

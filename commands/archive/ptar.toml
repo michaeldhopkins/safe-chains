@@ -1,0 +1,35 @@
+[[command]]
+name = "ptar"
+description = "tar-like utility written in Perl on top of Archive::Tar. One of -c (create), -x (extract), or -t (list) is required. -f names the archive (default ./default.tar; - for stdin/stdout), -z toggles zlib compression, -v prints filenames, -C runs in CPAN mode (drops 022 from permissions), -T reads filenames-to-create from a list."
+url = "https://metacpan.org/dist/Archive-Tar/view/bin/ptar"
+researched_version = "Perl Archive::Tar (perl 5.34+)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-C", "-c", "-h", "-t",
+    "-v", "-x", "-z",
+]
+valued = ["-T", "-f"]
+
+[[command]]
+name = "ptardiff"
+description = "Diff the contents of a tar archive against the corresponding extracted directory in the current working directory. Read-only; writes differences to stdout."
+url = "https://metacpan.org/dist/Archive-Tar/view/bin/ptardiff"
+researched_version = "Perl Archive::Tar (perl 5.34+)"
+level = "Inert"
+bare = false
+max_positional = 1
+standalone = ["-h"]
+
+[[command]]
+name = "ptargrep"
+description = "Apply a Perl regex to the contents of files inside one or more tar archives. By default matching files are extracted to disk; --list-only / -l prints matching pathnames instead. --basename / -b ignores directory paths on extraction, --ignore-case / -i is case-insensitive, --verbose / -v logs to stderr."
+url = "https://metacpan.org/dist/Archive-Tar/view/bin/ptargrep"
+researched_version = "Perl Archive::Tar (perl 5.34+)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--basename", "--help", "--ignore-case",
+    "--list-only", "--verbose",
+    "-?", "-b", "-i", "-l", "-v",
+]

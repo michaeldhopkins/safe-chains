@@ -1,0 +1,9 @@
+[[command]]
+name = "scutil"
+description = "Manages System Configuration parameters. Bare invocation opens an interactive shell against the dynamic store. --get reads a named persistent preference (ComputerName, LocalHostName, HostName); --dns / --proxy print current DNS and proxy configuration; -r checks host reachability; -w waits for a dynamic-store key. --set updates a preference (requires super-user); --renew triggers re-evaluation of an interface; --prefs opens an interactive session against raw preference data; --nc manages VPN connections. Entirely local."
+url = "https://keith.github.io/xcode-man-pages/scutil.8.html"
+researched_version = "macOS 14 scutil(8)"
+level = "Inert"
+bare = true
+standalone = ["--dns", "--proxy", "--help", "-h"]
+valued = ["--get", "-r", "-w", "-t"]

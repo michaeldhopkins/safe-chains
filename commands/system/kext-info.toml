@@ -1,0 +1,57 @@
+[[command]]
+name = "kextstat"
+description = "Lists kernel extensions (kexts) currently loaded into the running kernel, with their load index, reference count, kernel address, size, wired bytes, bundle identifier, version, and linkage. Read-only; queries the kernel via the IOKit framework. Deprecated in favor of `kmutil showloaded` but still ships and runs on current macOS. Surface stable."
+url = "https://keith.github.io/xcode-man-pages/kextstat.8.html"
+researched_version = "macOS 14 (deprecated; surface frozen)"
+level = "Inert"
+bare = true
+standalone = ["--arch", "--help", "--list-only", "--no-kernel", "--sort", "-a", "-h", "-k", "-l", "-s"]
+valued = ["--bundle-id", "-b"]
+
+[[command]]
+name = "kextfind"
+description = "Searches for kernel extensions in /System/Library/Extensions, /Library/Extensions, or named directories, matching on bundle id, info-dictionary properties, loaded/loadable status, architecture, declared symbols, and other attributes. Deprecated in favor of `kmutil find` but still ships. macOS ship; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/kextfind.8.html"
+researched_version = "macOS 14 (deprecated; surface frozen)"
+level = "Inert"
+bare = true
+tolerate_unknown_long = true
+standalone = [
+    "--and", "--authentic", "--case-insensitive", "--dependencies-met",
+    "--dependencies-missing", "--echo", "--executable", "--has-plugins",
+    "--help", "--inauthentic", "--invalid", "--kernel-resource", "--library",
+    "--loadable", "--loaded", "--no-executable", "--no-paths", "--nonloadable",
+    "--not", "--null", "--or", "--plugin", "--print", "--print0",
+    "--relative-paths", "--substring", "--subtree-immediate", "--system-extensions",
+    "--valid", "--warnings", "-0", "-d", "-e", "-h", "-i", "-l", "-nd", "-nl", "-nv", "-nx", "-s", "-v", "-w", "-x",
+]
+valued = [
+    "--arch", "--arch-exact", "--bundle-id", "--bundle-name",
+    "--defines-symbol", "--match-property", "--match-property-exists",
+    "--property", "--property-exists", "--references-symbol",
+    "--report", "--search-item", "--set-arch",
+    "-B", "-arch", "-ax", "-b", "-dsym", "-f", "-m", "-me", "-p", "-pe", "-rsym",
+]
+
+[[command]]
+name = "kextlibs"
+description = "Examines a kext executable and prints the OSBundleLibraries (kernel libraries — KPI / pseudo-extensions — needed to link it). Read-only. Deprecated in favor of `kmutil libraries`. macOS ship; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/kextlibs.8.html"
+researched_version = "macOS 14 (deprecated; surface frozen)"
+level = "Inert"
+bare = false
+standalone = [
+    "--all-symbols", "--compatible-versions", "--help", "--multdef-symbols",
+    "--non-kpi", "--onedef-symbols", "--undef-symbols", "--xml",
+    "-c", "-h",
+]
+valued = ["--arch", "--repository", "-a", "-r"]
+
+[[command]]
+name = "klist_cdhashes"
+description = "Reports information about kexts approved via the System Kernel Extension List (SKEL) on macOS. Read-only; the man page notes the command 'should not be run directly'. Apple ships it with macOS; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/klist_cdhashes.8.html"
+researched_version = "macOS 14 (surface frozen)"
+level = "Inert"
+bare = true
+max_positional = 0

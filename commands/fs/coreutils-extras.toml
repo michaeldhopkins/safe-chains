@@ -1,0 +1,89 @@
+[[command]]
+name = "sync"
+aliases = ["gsync"]
+description = "Flushes filesystem caches to persistent storage. BSD sync (macOS) takes no arguments and flushes all dirty buffers. GNU sync (gsync) optionally accepts file arguments and -d/-f modifiers to scope the flush. Does not modify file contents; only ensures pending writes are committed. Stable utility on both BSD and GNU."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sync-invocation"
+researched_version = "GNU coreutils 9.7 + BSD sync (macOS 14)"
+level = "Inert"
+bare = true
+standalone = [
+    "--data", "--file-system", "--help", "--version",
+    "-d", "-f",
+]
+
+[[command]]
+name = "pathchk"
+aliases = ["gpathchk"]
+description = "Checks whether the given pathnames are valid or portable. Writes diagnostics to stderr for arguments longer than PATH_MAX, components longer than NAME_MAX, or non-searchable directory components. -p restricts to the POSIX portable filename character set; -P (BSD) or --portability (GNU) adds checks for empty names and leading hyphens. Strictly read-only; does not create or modify any file."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#pathchk-invocation"
+researched_version = "GNU coreutils 9.7 + BSD pathchk (macOS 14)"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--portability", "--version",
+    "-P", "-p",
+]
+
+[[command]]
+name = "rs"
+description = "Reads whitespace-separated values from standard input, reshapes the resulting array, and writes the result to standard output. Pure stdin-to-stdout transform; never touches the filesystem or network. Flag syntax is unusual — short flags cluster with inline character or numeric values (-cx, -k3) — but every form is read-only. BSD-derived utility, surface frozen."
+url = "https://man.freebsd.org/cgi/man.cgi?rs"
+researched_version = "macOS 14 (Apple stock, BSD-derived)"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true
+
+[[command]]
+name = "pl"
+description = "Old-style ASCII property-list syntax checker. Reads a property-list file (or stdin if --input is omitted) and writes a normalized form to stdout (or --output). Local-only; no network access. macOS-bundled utility, surface unchanged since Mac OS X 10.5."
+url = "https://ss64.com/mac/pl.html"
+researched_version = "macOS 14 (Apple stock)"
+level = "Inert"
+bare = true
+valued = ["--input", "--output"]
+
+[[command]]
+name = "quota"
+description = "Displays per-user and per-group disk usage limits on filesystems with quotas enabled. -u prints user quotas (default), -g prints group quotas, -v includes filesystems where no storage is allocated, -q prints only over-quota entries. Strictly read-only: prints the quota database to stdout. Only super-users may pass a user argument to view others' quotas; non-super-users can only query groups they belong to. BSD-derived utility, surface frozen since 4.2BSD."
+url = "https://man.freebsd.org/cgi/man.cgi?quota"
+researched_version = "macOS 14 (Apple stock, BSD-derived)"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = ["-g", "-q", "-u", "-v"]
+
+[[command]]
+name = "gtruncate"
+description = "GNU truncate: shrinks or extends each named file to a specified size, creating it if necessary. -s/--size accepts an absolute size, or a relative size prefixed with +, -, %, /, <, > to extend, reduce, round, or clamp. -r/--reference sets the target size from another file. -c skips creating non-existent files. Operates only on the local filesystem. Stable coreutils utility."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#truncate-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--io-blocks", "--no-create", "--version",
+    "-c", "-o",
+]
+valued = [
+    "--reference", "--size",
+    "-r", "-s",
+]
+
+[[command]]
+name = "gunlink"
+description = "GNU unlink: calls unlink(2) on a single named file, removing one directory entry. Refuses directories and refuses more than one argument — strictly a single-file remove. Operates only on the local filesystem under the user's permissions. Stable coreutils utility, frozen surface."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#unlink-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "SafeWrite"
+bare = false
+max_positional = 1
+standalone = ["--help", "--version"]
+
+[[command]]
+name = "gmknod"
+description = "GNU mknod: creates a block special, character special, or FIFO file with the given name. Block and character types require explicit major/minor numbers and root privileges to install — most ordinary uses are TYPE=p (FIFO), equivalent to mkfifo. -m/--mode sets the mode. Operates only on the local filesystem. Stable coreutils utility."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#mknod-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--version", "-Z"]
+valued = ["--context", "--mode", "-m"]

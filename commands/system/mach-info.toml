@@ -1,0 +1,36 @@
+[[command]]
+name = "lskq"
+description = "Enumerates a process's kqueues and the kevents registered on them. Read-only; queries the kernel via `proc_pidinfo()`. Useful for debugging file-descriptor leaks and stuck event registrations. macOS ship; surface frozen since the man page was written."
+url = "https://keith.github.io/xcode-man-pages/lskq.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+standalone = ["-a", "-e", "-h", "-r", "-v"]
+valued = ["-p"]
+
+[[command]]
+name = "lsmp"
+description = "Prints the Mach port name space for a target task (process) — every active port right, its kernel object id, right kind, flags, importance boost count, notification requests, refcounts, queue limit, and identifier. Read-only; queries the kernel via `mach_port_space_info`. macOS ship; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/lsmp.1.html"
+researched_version = "macOS 14 (surface frozen)"
+level = "Inert"
+bare = false
+standalone = ["-a", "-h", "-v"]
+valued = ["-j", "-p"]
+
+[[command]]
+name = "lsvfs"
+description = "Lists installed virtual filesystem modules — apfs, devfs, autofs, etc. — with refcount and flags, or just the named modules if any vfsname arguments are supplied. Read-only; calls `getvfsbyname()`. BSD-derived; surface frozen since FreeBSD 2.0."
+url = "https://man7.org/linux/man-pages/man1/lsvfs.1.html"
+researched_version = "macOS 14"
+level = "Inert"
+bare = true
+
+[[command]]
+name = "taskinfo"
+description = "Diagnostic that prints the kernel's task-level policy state — QoS clamp, role, latency/throughput tiers, jetsam band, and (with `-threads`) per-thread policy — for a process named or by PID, or all processes if no argument is given. Read-only. macOS ship; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/taskinfo.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+standalone = ["--boosts", "--dq", "--threads"]

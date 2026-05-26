@@ -1,0 +1,41 @@
+[[command]]
+name = "dtruss"
+description = "DTrace-based syscall tracer (the macOS analog of Solaris truss). Two modes: attach to an existing PID (`-p <pid>`), or run a fresh command. Requires root because it loads DTrace probes. Read-only — observes syscalls and prints PID/LWPID, relative timestamps, elapsed/on-CPU times, and the syscall name with arguments. macOS ship; surface frozen (v0.80, June 2005)."
+url = "https://keith.github.io/xcode-man-pages/dtruss.1m.html"
+researched_version = "macOS 14 (surface frozen)"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+standalone = ["-L", "-a", "-c", "-d", "-e", "-f", "-h", "-l", "-o", "-s"]
+valued = ["-W", "-b", "-n", "-p", "-t"]
+
+[[command]]
+name = "plockstat"
+description = "DTrace front-end that prints statistics about POSIX user-space mutexes and read/write locks held by a process — contention events with `-C`, hold events with `-H`, both with `-A`. Requires root because it loads DTrace probes. macOS ship; surface frozen since 2007."
+url = "https://keith.github.io/xcode-man-pages/plockstat.1.html"
+researched_version = "macOS 14 (surface frozen)"
+level = "Inert"
+bare = false
+standalone = ["-A", "-C", "-H", "-V", "-v"]
+valued = ["-e", "-n", "-p", "-s", "-x"]
+
+[[command]]
+name = "spindump"
+description = "Profiles every process on the system over a sampling window — by default 10 seconds at 10 millisecond intervals — collecting user and kernel callstacks and writing a report. Read-only in the sense that it does not modify any process; profiling overhead is small. macOS ship; surface stable."
+url = "https://keith.github.io/xcode-man-pages/spindump.8.html"
+researched_version = "macOS 14 (surface stable)"
+level = "Inert"
+bare = true
+tolerate_unknown_long = true
+standalone = [
+    "-aggregateCallstacks", "-arrow", "-displayIdleWorkqueueThreads", "-heavy",
+    "-noBinary", "-noFile", "-noProcessingWhileSampling", "-onlyBlocked",
+    "-onlyRunnable", "-onlyTarget", "-reverse", "-sampleWithoutTarget",
+    "-stdout", "-threadPriorityThreshold", "-timeline", "-wait",
+]
+valued = [
+    "-batteryStatsInterval", "-endIndex", "-i", "-indexRange", "-microstackshots",
+    "-microstackshotsDuration", "-microstackshotsIntervalMin", "-microstackshotsSave",
+    "-microstackshotsStart", "-notarget", "-o", "-proc", "-siginfo",
+    "-startIndex", "-timelimit",
+]

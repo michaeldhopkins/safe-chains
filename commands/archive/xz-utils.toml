@@ -1,0 +1,54 @@
+[[command]]
+name = "xzcmp"
+aliases = ["xzdiff", "lzcmp", "lzdiff"]
+description = "Wrappers that invoke cmp or diff on contents of files compressed with xz, gzip, bzip2, lzop, zstd, or lz4. Options other than --help/--version are passed to cmp(1) or diff(1). lzcmp / lzdiff are deprecated aliases retained for LZMA Utils compatibility."
+url = "https://tukaani.org/xz/"
+researched_version = "XZ Utils 5.x"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "--version"]
+
+[[command]]
+name = "xzgrep"
+aliases = ["xzegrep", "xzfgrep", "lzgrep", "lzegrep", "lzfgrep"]
+description = "Run grep on files decompressed with xz, gzip, bzip2, lzop, zstd, or lz4. Most grep options are passed through; xzegrep / xzfgrep are aliases for `xzgrep -E` / `xzgrep -F`. lz* names are deprecated LZMA-Utils aliases retained for compatibility."
+url = "https://tukaani.org/xz/"
+researched_version = "XZ Utils 5.x"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+
+[[command]]
+name = "xzdec"
+aliases = ["lzmadec"]
+description = "Small liblzma-based decompressor for .xz files (xzdec) or .lzma files (lzmadec). Always writes decompressed data to stdout; never creates or removes files. -d / -k / -c are ignored xz-compatibility no-ops."
+url = "https://tukaani.org/xz/"
+researched_version = "XZ Utils 5.x"
+level = "Inert"
+bare = true
+standalone = [
+    "--decompress", "--help", "--keep",
+    "--no-warn", "--quiet", "--stdout",
+    "--to-stdout", "--uncompress", "--version",
+    "-Q", "-V", "-c", "-d", "-h", "-k", "-q",
+]
+
+[[command]]
+name = "lzmainfo"
+description = "Read the first 13 bytes of an .lzma file, decode the header (dictionary size, uncompressed size for non-streamed archives), and print to stdout. Included in XZ Utils for backward compatibility with LZMA Utils."
+url = "https://tukaani.org/xz/"
+researched_version = "XZ Utils 5.x"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version"]
+
+[[command]]
+name = "xzless"
+aliases = ["xzmore", "lzless", "lzmore"]
+description = "Paginate xz-, lzma-, gzip-, bzip2-, lzop-, zstd-, or lz4-compressed text using less(1) (xzless / lzless) or more(1) (xzmore / lzmore). lzless / lzmore are deprecated LZMA-Utils aliases."
+url = "https://tukaani.org/xz/"
+researched_version = "XZ Utils 5.x"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true

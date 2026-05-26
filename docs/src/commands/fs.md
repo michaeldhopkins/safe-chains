@@ -1,5 +1,10 @@
 # Filesystem
 
+### `afscexpand`
+<p class="cmd-url"><a href="https://ss64.com/mac/afscexpand.html">https://ss64.com/mac/afscexpand.html</a></p>
+
+- Allowed standalone flags: -c
+
 ### `basename`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#basename-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#basename-invocation</a></p>
 
@@ -14,11 +19,22 @@
 - Allowed valued flags: --color, --decorations, --diff-context, --file-name, --highlight-line, --italic-text, --language, --line-range, --map-syntax, --paging, --style, --tabs, --terminal-width, --theme, --wrap, -H, -l, -m, -r
 - Bare invocation allowed
 
+### `cap_mkdb`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?cap_mkdb">https://man.freebsd.org/cgi/man.cgi?cap_mkdb</a></p>
+
+- Allowed standalone flags: -v
+- Allowed valued flags: -f
+
 ### `cd`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/cd.1p.html">https://man7.org/linux/man-pages/man1/cd.1p.html</a></p>
 
 - Allowed standalone flags: --help, --version, -L, -P, -V, -e, -h
 - Bare invocation allowed
+
+### `chflags`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?chflags">https://man.freebsd.org/cgi/man.cgi?chflags</a></p>
+
+- Allowed standalone flags: -H, -L, -P, -R, -f, -h, -v, -x
 
 ### `cmp`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/cmp.1.html">https://man7.org/linux/man-pages/man1/cmp.1.html</a></p>
@@ -31,6 +47,14 @@
 
 - Allowed standalone flags: --brief, --ed, --expand-tabs, --help, --initial-tab, --left-column, --minimal, --normal, --paginate, --rcs, --report-identical-files, --side-by-side, --speed-large-files, --strip-trailing-cr, --suppress-blank-empty, --suppress-common-lines, --text, --version, -B, -E, -N, -P, -T, -V, -Z, -a, -b, -c, -d, -e, -f, -h, -i, -l, -n, -p, -q, -r, -s, -t, -u, -v, -w, -y
 - Allowed valued flags: --changed-group-format, --color, --context, --from-file, --horizon-lines, --ifdef, --ignore-matching-lines, --label, --line-format, --new-group-format, --new-line-format, --old-group-format, --old-line-format, --show-function-line, --starting-file, --tabsize, --to-file, --unchanged-group-format, --unchanged-line-format, --unified, --width, -C, -D, -F, -I, -L, -S, -U, -W
+
+### `cp`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#cp-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#cp-invocation</a></p>
+
+Aliases: `gcp`
+
+- Allowed standalone flags: --archive, --force, --help, --interactive, --no-clobber, --no-dereference, --no-target-directory, --one-file-system, --parents, --recursive, --remove-destination, --symbolic-link, --update, --verbose, --version, -H, -L, -N, -P, -R, -S, -T, -X, -a, -c, -f, -h, -i, -l, -n, -p, -r, -s, -u, -v, -x
+- Allowed valued flags: --backup, --preserve, --reflink, --sparse, --suffix, --target-directory, -t
 
 ### `date`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation</a></p>
@@ -65,6 +89,29 @@
 - Allowed standalone flags: --help, --version, --zero, -V, -h, -z
 - Bare invocation allowed
 
+### `dot_clean`
+<p class="cmd-url"><a href="https://ss64.com/mac/dot_clean.html">https://ss64.com/mac/dot_clean.html</a></p>
+
+- Allowed standalone flags: --keep=mostrecent, --keep=dotbar, --keep=native, -f, -h, -m, -n, -s, -v
+
+### `drutil`
+<p class="cmd-url"><a href="https://ss64.com/mac/drutil.html">https://ss64.com/mac/drutil.html</a></p>
+
+- **atip**
+- **cdtext**
+- **discinfo**: Flags: -xml
+- **filename**
+- **getconfig**
+- **help**: Positional args accepted
+- **info**: Flags: -xml
+- **list**: Flags: -xml
+- **size**
+- **status**: Flags: -xml
+- **subchannel**
+- **toc**
+- **trackinfo**: Flags: -xml
+- **version**
+
 ### `du`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation</a></p>
 
@@ -92,10 +139,54 @@ Aliases: `exa`
 
 - Positional predicates allowed. -exec/-execdir allowed when the executed command is itself safe.
 
+### `fs_usage`
+<p class="cmd-url"><a href="https://ss64.com/mac/fs_usage.html">https://ss64.com/mac/fs_usage.html</a></p>
+
+- Allowed standalone flags: -F, -b, -e, -w
+- Allowed valued flags: -E, -R, -S, -f, -t
+- Bare invocation allowed
+
+### `GetFileInfo`
+<p class="cmd-url"><a href="https://ss64.com/mac/getfileinfo.html">https://ss64.com/mac/getfileinfo.html</a></p>
+
+- Allowed standalone flags: -P, -c, -d, -m, -t
+- Allowed valued flags: -a
+- Hyphen-prefixed positional arguments accepted
+
+### `gmknod`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mknod-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mknod-invocation</a></p>
+
+- Allowed standalone flags: --help, --version, -Z
+- Allowed valued flags: --context, --mode, -m
+
+### `gtruncate`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#truncate-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#truncate-invocation</a></p>
+
+- Allowed standalone flags: --help, --io-blocks, --no-create, --version, -c, -o
+- Allowed valued flags: --reference, --size, -r, -s
+
+### `gunlink`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#unlink-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#unlink-invocation</a></p>
+
+- Allowed standalone flags: --help, --version
+
 ### `gzip`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/gzip.1.html">https://man7.org/linux/man-pages/man1/gzip.1.html</a></p>
 
 - Requires -l, --list, -t, --test. - Allowed standalone flags: -l, --list, -t, --test, -v, --verbose, --help, -h, --version, -V
+
+### `ln`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#ln-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#ln-invocation</a></p>
+
+Aliases: `gln`, `link`, `glink`
+
+- Allowed standalone flags: --directory, --force, --help, --interactive, --logical, --no-dereference, --no-target-directory, --physical, --relative, --symbolic, --verbose, --version, -F, -L, -P, -T, -d, -f, -h, -i, -n, -r, -s, -v, -w
+- Allowed valued flags: --backup, --suffix, --target-directory, -S, -t
+
+### `lockf`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?lockf">https://man.freebsd.org/cgi/man.cgi?lockf</a></p>
+
+- Recursively validates the inner command.
 
 ### `ls`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation</a></p>
@@ -104,17 +195,72 @@ Aliases: `exa`
 - Allowed valued flags: --block-size, --color, --format, --hide, --hyperlink, --ignore, --quoting-style, --sort, --tabsize, --time, --time-style, --width, -I, -T, -w
 - Bare invocation allowed
 
+### `lsbom`
+<p class="cmd-url"><a href="https://ss64.com/mac/lsbom.html">https://ss64.com/mac/lsbom.html</a></p>
+
+- Allowed standalone flags: --help, -b, -c, -d, -f, -h, -l, -m, -s, -x
+- Allowed valued flags: --arch, -p
+
+### `mkbom`
+<p class="cmd-url"><a href="https://ss64.com/mac/mkbom.html">https://ss64.com/mac/mkbom.html</a></p>
+
+- Allowed standalone flags: --help, -h, -s
+- Allowed valued flags: -i
+
 ### `mkdir`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mkdir-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mkdir-invocation</a></p>
 
 - Allowed standalone flags: --help, --parents, --verbose, --version, -Z, -p, -v
 - Allowed valued flags: --context, --mode, -m
 
+### `mkfifo`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mkfifo-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mkfifo-invocation</a></p>
+
+Aliases: `gmkfifo`
+
+- Allowed standalone flags: --help, --version, -Z
+- Allowed valued flags: --context, --mode, -m
+
+### `mkfile`
+<p class="cmd-url"><a href="https://ss64.com/mac/mkfile.html">https://ss64.com/mac/mkfile.html</a></p>
+
+- Allowed standalone flags: -n, -v
+
 ### `mktemp`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mktemp-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mktemp-invocation</a></p>
 
+Aliases: `gmktemp`
+
 - Allowed standalone flags: --directory, --dry-run, --help, --quiet, --tmpdir, --version, -d, -q, -t, -u
 - Allowed valued flags: --suffix, --tmpdir, -p, -t
+- Bare invocation allowed
+
+### `mtree`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?mtree">https://man.freebsd.org/cgi/man.cgi?mtree</a></p>
+
+- Allowed standalone flags: -D, -L, -P, -S, -U, -c, -d, -e, -i, -n, -q, -r, -u, -w, -x
+- Allowed valued flags: -K, -X, -f, -k, -p, -s
+- Bare invocation allowed
+
+### `mv`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mv-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mv-invocation</a></p>
+
+Aliases: `gmv`
+
+- Allowed standalone flags: --force, --help, --interactive, --no-clobber, --no-target-directory, --strip-trailing-slashes, --update, --verbose, --version, -T, -f, -h, -i, -n, -u, -v
+- Allowed valued flags: --backup, --suffix, --target-directory, -S, -t
+
+### `pathchk`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pathchk-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pathchk-invocation</a></p>
+
+Aliases: `gpathchk`
+
+- Allowed standalone flags: --help, --portability, --version, -P, -p
+
+### `pl`
+<p class="cmd-url"><a href="https://ss64.com/mac/pl.html">https://ss64.com/mac/pl.html</a></p>
+
+- Allowed valued flags: --input, --output
 - Bare invocation allowed
 
 ### `pwd`
@@ -122,6 +268,18 @@ Aliases: `exa`
 
 - Allowed standalone flags: --help, --version, -L, -P, -V, -h
 - Bare invocation allowed
+
+### `quota`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?quota">https://man.freebsd.org/cgi/man.cgi?quota</a></p>
+
+- Allowed standalone flags: -g, -q, -u, -v
+- Bare invocation allowed
+
+### `rdfind`
+<p class="cmd-url"><a href="https://rdfind.pauldreik.se/">https://rdfind.pauldreik.se/</a></p>
+
+- Allowed standalone flags: --help, --version, -h, -n, -v
+- Allowed valued flags: -checksum, -deleteduplicates, -deterministic, -dryrun, -followsymlinks, -ignoreempty, -makehardlinks, -makeresultsfile, -makesymlinks, -maxsize, -minsize, -outputname, -removeidentinode, -sleep
 
 ### `readlink`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#readlink-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#readlink-invocation</a></p>
@@ -139,17 +297,48 @@ Aliases: `exa`
 
 - Requires --help, --version. - Allowed standalone flags: --help, --version
 
+### `rmdir`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#rmdir-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#rmdir-invocation</a></p>
+
+Aliases: `grmdir`
+
+- Allowed standalone flags: --help, --ignore-fail-on-non-empty, --parents, --verbose, --version, -p, -v
+
+### `rs`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?rs">https://man.freebsd.org/cgi/man.cgi?rs</a></p>
+
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `stat`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation</a></p>
 
+Aliases: `gstat`
+
 - Allowed standalone flags: --dereference, --file-system, --help, --terse, --version, -F, -L, -V, -h, -l, -n, -q, -r, -s, -x
 - Allowed valued flags: --format, --printf, -c, -f, -t
+
+### `sync`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sync-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#sync-invocation</a></p>
+
+Aliases: `gsync`
+
+- Allowed standalone flags: --data, --file-system, --help, --version, -d, -f
+- Bare invocation allowed
 
 ### `tar`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/tar.1.html">https://man7.org/linux/man-pages/man1/tar.1.html</a></p>
 
 - Listing mode only (requires -t or --list). Old-style flags accepted (e.g. tar tf, tar tzf).
 - Flags: -f, -j, -J, -v, -z, -O, --bzip2, --file, --gzip, --xz, --zstd.
+
+### `touch`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#touch-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#touch-invocation</a></p>
+
+Aliases: `gtouch`
+
+- Allowed standalone flags: --help, --no-create, --no-dereference, --version, -A, -a, -c, -h, -m
+- Allowed valued flags: --date, --reference, --time, -d, -r, -t
 
 ### `tree`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/tree.1.html">https://man7.org/linux/man-pages/man1/tree.1.html</a></p>
@@ -158,10 +347,33 @@ Aliases: `exa`
 - Allowed valued flags: --charset, --filelimit, --filesfrom, --sort, --timefmt, -H, -I, -L, -P, -T
 - Bare invocation allowed
 
+### `unvis`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?unvis">https://man.freebsd.org/cgi/man.cgi?unvis</a></p>
+
+- Allowed standalone flags: -H, -e, -h, -m
+- Bare invocation allowed
+
 ### `unzip`
 <p class="cmd-url"><a href="https://linux.die.net/man/1/unzip">https://linux.die.net/man/1/unzip</a></p>
 
 - Requires -c, -l, -p, -t, -Z. - Allowed standalone flags: -1, -2, -C, -M, -T, -Z, -c, -h, -l, -m, -p, -q, -s, -t, -v, -z, --help, --version, -V
+
+### `vis`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?vis">https://man.freebsd.org/cgi/man.cgi?vis</a></p>
+
+- Allowed standalone flags: -N, -M, -S, -b, -c, -f, -h, -l, -m, -n, -o, -s, -t, -w
+- Allowed valued flags: -F, -e
+- Bare invocation allowed
+
+### `wait4path`
+<p class="cmd-url"><a href="https://ss64.com/mac/wait4path.html">https://ss64.com/mac/wait4path.html</a></p>
+
+- Positional arguments only
+
+### `xattr`
+<p class="cmd-url"><a href="https://ss64.com/mac/xattr.html">https://ss64.com/mac/xattr.html</a></p>
+
+- Allowed standalone flags: --help, -c, -d, -h, -l, -p, -r, -s, -v, -w, -x
 
 ### `zipinfo`
 <p class="cmd-url"><a href="https://linux.die.net/man/1/zipinfo">https://linux.die.net/man/1/zipinfo</a></p>

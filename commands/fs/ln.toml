@@ -1,0 +1,18 @@
+[[command]]
+name = "ln"
+aliases = ["gln", "link", "glink"]
+description = "Creates a directory entry (hard link by default, symbolic link with -s/--symbolic) that points to an existing file. -f overwrites an existing target, -i prompts. When invoked as `link`, takes exactly two non-flag arguments and performs a single link(2) call. Always operates on the local filesystem under the user's permissions. BSD ln (macOS) and GNU ln share short flags; GNU adds --backup, --relative, and other long forms. Stable utility, frozen surface."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#ln-invocation"
+researched_version = "GNU coreutils 9.7 + BSD ln (macOS 14)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--directory", "--force", "--help", "--interactive",
+    "--logical", "--no-dereference", "--no-target-directory",
+    "--physical", "--relative", "--symbolic", "--verbose", "--version",
+    "-F", "-L", "-P", "-T", "-d", "-f", "-h", "-i", "-n", "-r", "-s", "-v", "-w",
+]
+valued = [
+    "--backup", "--suffix", "--target-directory",
+    "-S", "-t",
+]

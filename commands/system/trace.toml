@@ -1,0 +1,44 @@
+[[command]]
+name = "trace"
+description = "Records and modifies .atrc Darwin trace files — packages of kdebug events, Unified Logging records, and machine-config metadata used by Instruments System Trace, spindump(1), and ktrace(1). Subcommands: record (sample the live system into a new .atrc file), amend (add a provider to an existing trace), trim (extract a range), plans (list trace plans), providers (list available trace providers). macOS ship; surface relatively new and evolving with newer Instruments features."
+url = "https://keith.github.io/xcode-man-pages/trace.1.html"
+researched_version = "macOS 14"
+
+[[command.sub]]
+name = "record"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--compress", "--experimental", "--help", "--overwrite", "--unsafe", "-h"]
+valued = [
+    "--add", "--end-after-duration", "--end-after-kdebug-events-size",
+    "--end-on-kdebug-event", "--end-on-notification", "--notify-after-end",
+    "--notify-after-start", "--omit", "--plan",
+]
+
+[[command.sub]]
+name = "amend"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--experimental", "--help", "--unsafe", "-h"]
+valued = ["--add"]
+
+[[command.sub]]
+name = "trim"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--end-time", "--output", "--start-time"]
+
+[[command.sub]]
+name = "plans"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "providers"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]

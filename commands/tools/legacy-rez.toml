@@ -1,0 +1,50 @@
+[[command]]
+name = "DeRez"
+description = "Decompiles the resource fork of a file into Rez source text, written to standard output. Reads the named resource file (and optional type-declaration files); does not modify the input. Part of the deprecated Carbon tooling chain — last meaningful change predates Xcode 6 and the binary still ships in /usr/bin solely for legacy resource workflows. Entirely local; no network."
+url = "https://keith.github.io/xcode-man-pages/DeRez.1.html"
+researched_version = "Xcode-shipped Carbon utility; surface frozen post-Xcode-6 deprecation"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+standalone = ["-c", "-compatible", "-e", "-escape", "-noResolve", "-p", "-rd", "-useDF"]
+valued = ["-d", "-define", "-i", "-is", "-isysroot", "-m", "-maxstringsize", "-only", "-s", "-script", "-skip", "-u", "-undef"]
+
+[[command]]
+name = "Rez"
+description = "Compiles resource description (.r) files into a resource fork. Reads source files and writes a Rez.out file (or the file given to -o); can also overwrite existing resources. Part of the deprecated Carbon tooling chain — last meaningful change predates Xcode 6. Entirely local; no network."
+url = "https://keith.github.io/xcode-man-pages/Rez.1.html"
+researched_version = "Xcode-shipped Carbon utility; surface frozen post-Xcode-6 deprecation"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["-a", "-align", "-append", "-m", "-modification", "-noResolve", "-ov", "-p", "-progress", "-rd", "-ro", "-useDF"]
+valued = ["-arch", "-c", "-creator", "-d", "-define", "-F", "-i", "-is", "-isysroot", "-o", "-s", "-script", "-t", "-type", "-u", "-undef"]
+
+[[command]]
+name = "ResMerger"
+description = "Merges Carbon resource forks (or data forks) from multiple input files into a single output resource file. Writes the destination given to -o. Part of the deprecated Carbon tooling chain — last meaningful change predates Xcode 6. Entirely local; no network."
+url = "https://keith.github.io/xcode-man-pages/ResMerger.1.html"
+researched_version = "Xcode-shipped Carbon utility; surface frozen post-Xcode-6 deprecation"
+level = "SafeWrite"
+bare = false
+standalone = ["-append", "-a"]
+valued = ["-fileCreator", "-fileType", "-srcIs", "-dstIs", "-skip", "-o"]
+
+[[command]]
+name = "SetFile"
+description = "Sets HFS+ file attributes (creator, type, creation/modification date, Finder attribute bits) on the named files. Modifies the files in place. Part of the deprecated Carbon tooling chain — last meaningful change predates Xcode 6. Entirely local; no network."
+url = "https://keith.github.io/xcode-man-pages/SetFile.1.html"
+researched_version = "Xcode-shipped Carbon utility; surface frozen post-Xcode-6 deprecation"
+level = "SafeWrite"
+bare = false
+standalone = ["-P"]
+valued = ["-a", "-c", "-d", "-m", "-t"]
+
+[[command]]
+name = "SplitForks"
+description = "Splits a two-fork HFS+ file into AppleDouble format — the data fork stays in place and the resource fork (with HFS metadata) is written to a sibling ._name file. With -s the original resource fork is removed after splitting. Part of the deprecated Carbon tooling chain — last meaningful change predates Xcode 6. Entirely local; no network."
+url = "https://keith.github.io/xcode-man-pages/SplitForks.1.html"
+researched_version = "Xcode-shipped Carbon utility; surface frozen post-Xcode-6 deprecation"
+level = "SafeWrite"
+bare = false
+standalone = ["-s", "-v"]

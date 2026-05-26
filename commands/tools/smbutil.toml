@@ -1,0 +1,67 @@
+[[command]]
+name = "smbutil"
+description = "Interface to the SMB requester. lookup resolves a NetBIOS name to an IP; status resolves a host to NetBIOS workgroup/system; view lists shares available on a server (issues an authenticated SMB call); identity displays the user identity for an authenticated session; dfs prints Dfs referrals; statshares, multichannel, snapshot, and smbstat report attributes of already-mounted shares. The view/identity/dfs subs may prompt for or send credentials to the named server. Mounting and unmounting are handled by mount_smbfs and unmount, not smbutil."
+url = "https://keith.github.io/xcode-man-pages/smbutil.1.html"
+researched_version = "macOS 14 smbutil(1)"
+bare_flags = ["-h", "--help", "-v"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "lookup"
+level = "Inert"
+bare = false
+standalone = ["-e", "-h", "--help"]
+valued = ["-w", "-t"]
+
+[[command.sub]]
+name = "status"
+level = "Inert"
+bare = false
+standalone = ["-a", "-e", "-h", "--help"]
+
+[[command.sub]]
+name = "view"
+level = "Inert"
+bare = false
+standalone = ["-A", "-N", "-G", "-g", "-a", "-f", "-h", "--help"]
+
+[[command.sub]]
+name = "identity"
+level = "Inert"
+bare = false
+standalone = ["-N", "-h", "--help"]
+
+[[command.sub]]
+name = "dfs"
+level = "Inert"
+bare = false
+standalone = ["-h", "--help"]
+
+[[command.sub]]
+name = "statshares"
+level = "Inert"
+standalone = ["-a", "-h", "--help"]
+valued = ["-m", "-f"]
+
+[[command.sub]]
+name = "multichannel"
+level = "Inert"
+standalone = ["-a", "-i", "-c", "-s", "-x", "-h", "--help"]
+valued = ["-m", "-f"]
+
+[[command.sub]]
+name = "snapshot"
+level = "Inert"
+standalone = ["-a", "-h", "--help"]
+valued = ["-m", "-f"]
+
+[[command.sub]]
+name = "smbstat"
+level = "Inert"
+bare = false
+standalone = ["-h", "--help"]
+valued = ["-f"]

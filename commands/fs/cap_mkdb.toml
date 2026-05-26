@@ -1,0 +1,9 @@
+[[command]]
+name = "cap_mkdb"
+description = "Builds a hashed termcap-style capability database (a `.db` file) by concatenating the named input files. Writes one output file derived from the first input's basename, or from -f's argument. Operates only on the local filesystem. BSD-derived utility, frozen surface."
+url = "https://man.freebsd.org/cgi/man.cgi?cap_mkdb"
+researched_version = "macOS 14 (Apple stock, BSD-derived)"
+level = "SafeWrite"
+bare = false
+standalone = ["-v"]
+valued = ["-f"]

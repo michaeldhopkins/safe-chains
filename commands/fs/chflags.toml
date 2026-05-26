@@ -1,0 +1,8 @@
+[[command]]
+name = "chflags"
+description = "Modifies BSD file flags on local files (archive, immutable, append-only, hidden, nodump, opaque). -R recurses; some flags require super-user. Operates only on the local filesystem. Setting system-immutable or system-append flags can lock files against the owner — undo requires the same elevation. BSD-derived utility, surface unchanged since 4.4BSD."
+url = "https://man.freebsd.org/cgi/man.cgi?chflags"
+researched_version = "macOS 14 (Apple stock, BSD-derived)"
+level = "SafeWrite"
+bare = false
+standalone = ["-H", "-L", "-P", "-R", "-f", "-h", "-v", "-x"]

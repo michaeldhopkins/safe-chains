@@ -1,0 +1,12 @@
+[[command]]
+name = "xattr"
+description = "Displays, modifies, or removes the extended attributes of files and directories. Default form (xattr file) lists attribute names; -p prints a named attribute value; -w sets an attribute; -d removes one named attribute; -c clears all attributes. -r recurses into directories. Local-only; no network access. macOS-bundled utility, surface stable since 10.6."
+url = "https://ss64.com/mac/xattr.html"
+researched_version = "macOS 14 (Apple stock)"
+level = "Inert"
+bare = false
+write_flags = ["-w", "-d", "-c"]
+standalone = [
+    "--help",
+    "-c", "-d", "-h", "-l", "-p", "-r", "-s", "-v", "-w", "-x",
+]

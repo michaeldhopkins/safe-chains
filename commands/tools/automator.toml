@@ -1,0 +1,9 @@
+[[command]]
+name = "automator"
+description = "Runs an Automator workflow file. -i supplies workflow input (text or stdin with '-'); -D name=value sets workflow variables; -v runs in verbose mode. Workflows can perform arbitrary scripted actions (AppleScript, shell, etc.) — the tool itself only schedules the run."
+url = "https://keith.github.io/xcode-man-pages/automator.1.html"
+researched_version = "macOS 14 automator(1)"
+level = "SafeRead"
+bare = false
+standalone = ["-v"]
+valued = ["-i", "-D"]

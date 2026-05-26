@@ -1,0 +1,39 @@
+[[command]]
+name = "at"
+description = "BSD/POSIX scheduled-job utility for queuing shell commands to run at a later time via launchd's atrun. `at <time>` reads commands from stdin or -f file and spools them to /usr/lib/cron/jobs/ for atrun to execute under the user's shell. atrun is disabled by default on macOS, but enabling it is a per-system decision and once enabled at-spooled jobs run with the invoking user's environment, working directory, and uid. Read-only forms — listing the queue (`at -l`), examining a queued job (`at -c <jobid>`), and removing a queue entry (`at -r`) — only affect the user's own at queue. POSIX surface; flags are essentially frozen."
+url = "https://man7.org/linux/man-pages/man1/at.1p.html"
+researched_version = "POSIX at(1); BSD implementation on macOS, surface frozen"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-V", "-b", "-c", "-d", "-l", "-m", "-r", "-v"]
+valued = ["-f", "-q", "-t"]
+
+[[command]]
+name = "atq"
+description = "Lists the invoking user's pending at(1) jobs (or every user's jobs if run as superuser). Read-only query of the at spool directory."
+url = "https://man7.org/linux/man-pages/man1/atq.1p.html"
+researched_version = "POSIX at(1); surface frozen"
+level = "Inert"
+bare = true
+standalone = ["--help", "-V", "-v"]
+valued = ["-q"]
+
+[[command]]
+name = "atrm"
+description = "Removes one or more pending at(1) jobs by job id. Modifies the local at spool but does not execute arbitrary code; restricted to the invoking user's own jobs (or anyone's, for the superuser)."
+url = "https://man7.org/linux/man-pages/man1/atrm.1p.html"
+researched_version = "POSIX at(1); surface frozen"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-V"]
+max_positional = 16
+
+[[command]]
+name = "batch"
+description = "Alias for `at -b`. Spools a shell-script job (read from stdin or -f file) to run when the system load average drops below 1.5 times the number of active CPUs. Same atrun-based execution model as at(1); jobs run with the invoking user's environment and uid."
+url = "https://man7.org/linux/man-pages/man1/batch.1p.html"
+researched_version = "POSIX at(1); surface frozen"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-V", "-m", "-v"]
+valued = ["-f", "-q"]

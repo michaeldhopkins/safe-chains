@@ -1,0 +1,10 @@
+[[command]]
+name = "compress"
+aliases = ["uncompress"]
+description = "Lempel-Ziv compressor / decompressor. compress renames each file to <name>.Z; uncompress restores the original. -c writes to stdout instead of replacing the file. -f overwrites without prompting (and, for compress, writes output even if it isn't smaller). -v reports compression ratio. -b limits the code size (9-16 bits, compress only)."
+url = "https://www.freebsd.org/cgi/man.cgi?compress"
+researched_version = "BSD compress (macOS bundled)"
+level = "SafeWrite"
+bare = true
+standalone = ["-c", "-f", "-v"]
+valued = ["-b"]

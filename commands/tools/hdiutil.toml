@@ -1,0 +1,121 @@
+[[command]]
+name = "hdiutil"
+description = "Manipulates disk images via the DiskImages framework. Read-only verbs (info, imageinfo, checksum, verify, isencrypted, plugins, pmap, udifderez) inspect images or the global state. Mutating verbs (attach/mount, detach/unmount, mountvol, create, convert, compact, resize, segment, burn, erasekeys, chpass, makehybrid, udifrez) modify the host (attach exposes a kernel attack surface and applies mount options) or write new image files. help prints minimal usage. Entirely local."
+url = "https://keith.github.io/xcode-man-pages/hdiutil.1.html"
+researched_version = "macOS 14 hdiutil(1)"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+standalone = ["-verbose", "-quiet", "-debug", "-plist", "-puppetstrings", "-help", "-h"]
+
+[[command.sub]]
+name = "imageinfo"
+level = "Inert"
+bare = false
+standalone = ["-verbose", "-quiet", "-debug", "-plist", "-puppetstrings", "-format", "-checksum", "-encryption", "-bookmark", "-help", "-h"]
+valued = ["-imagekey", "-srcimagekey"]
+
+[[command.sub]]
+name = "checksum"
+level = "Inert"
+bare = false
+standalone = ["-verbose", "-quiet", "-debug", "-plist", "-puppetstrings", "-help", "-h"]
+valued = ["-imagekey", "-srcimagekey", "-type"]
+
+[[command.sub]]
+name = "verify"
+level = "Inert"
+bare = false
+standalone = ["-verbose", "-quiet", "-debug", "-plist", "-puppetstrings", "-help", "-h"]
+valued = ["-imagekey", "-srcimagekey"]
+
+[[command.sub]]
+name = "isencrypted"
+level = "Inert"
+bare = false
+standalone = ["-verbose", "-quiet", "-debug", "-plist", "-puppetstrings", "-help", "-h"]
+
+[[command.sub]]
+name = "plugins"
+level = "Inert"
+standalone = ["-verbose", "-quiet", "-debug", "-plist", "-puppetstrings", "-help", "-h"]
+
+[[command.sub]]
+name = "pmap"
+level = "Inert"
+bare = false
+standalone = ["-verbose", "-quiet", "-debug", "-plist", "-puppetstrings", "-help", "-h"]
+
+[[command.sub]]
+name = "udifderez"
+level = "Inert"
+bare = false
+standalone = ["-verbose", "-quiet", "-debug", "-plist", "-puppetstrings", "-help", "-h"]
+valued = ["-xml"]
+
+[[command.sub]]
+name = "attach"
+candidate = true
+
+[[command.sub]]
+name = "mount"
+candidate = true
+
+[[command.sub]]
+name = "detach"
+candidate = true
+
+[[command.sub]]
+name = "unmount"
+candidate = true
+
+[[command.sub]]
+name = "mountvol"
+candidate = true
+
+[[command.sub]]
+name = "create"
+candidate = true
+
+[[command.sub]]
+name = "convert"
+candidate = true
+
+[[command.sub]]
+name = "compact"
+candidate = true
+
+[[command.sub]]
+name = "resize"
+candidate = true
+
+[[command.sub]]
+name = "segment"
+candidate = true
+
+[[command.sub]]
+name = "burn"
+candidate = true
+
+[[command.sub]]
+name = "erasekeys"
+candidate = true
+
+[[command.sub]]
+name = "chpass"
+candidate = true
+
+[[command.sub]]
+name = "makehybrid"
+candidate = true
+
+[[command.sub]]
+name = "udifrez"
+candidate = true
