@@ -1,0 +1,118 @@
+[[command]]
+name = "pg_amcheck"
+description = "PostgreSQL — runs the amcheck extension's corruption-detection functions against one or more databases. Connects to a running cluster (network); does not write to disk. Reports problems found in B-tree indexes and heap relations. The `--parent-check` and `--rootdescend` options take stronger relation-level locks that block concurrent INSERT/UPDATE/DELETE on the checked indexes. `--install-missing` would install the amcheck extension in the server (a remote write) and is excluded here. Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/app-pgamcheck.html"
+researched_version = "PostgreSQL 18.3"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--all", "--checkunique", "--echo",
+    "--exclude-toast-pointers", "--heapallindexed",
+    "--help", "--no-dependent-indexes",
+    "--no-dependent-toast", "--no-password",
+    "--no-strict-names", "--on-error-stop",
+    "--parent-check", "--password", "--progress",
+    "--rootdescend", "--verbose", "--version",
+    "-?", "-P", "-V", "-a", "-e", "-v", "-w", "-W",
+]
+valued = [
+    "--database", "--dbname", "--endblock",
+    "--exclude-database", "--exclude-index",
+    "--exclude-relation", "--exclude-schema",
+    "--exclude-table", "--host", "--index",
+    "--jobs", "--maintenance-db", "--port",
+    "--relation", "--schema", "--skip",
+    "--startblock", "--table", "--username",
+    "-D", "-I", "-R", "-S", "-T", "-U",
+    "-d", "-h", "-i", "-j", "-p", "-r",
+    "-s", "-t",
+]
+
+[[command]]
+name = "pg_verifybackup"
+description = "PostgreSQL — verifies the integrity of a base backup produced by pg_basebackup against the backup_manifest file the server emitted. Reads files in the backup directory, compares checksums, and (for plain-format backups) invokes pg_waldump internally to parse WAL records that would be replayed during restore. Pure read; does not modify the backup. Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/app-pgverifybackup.html"
+researched_version = "PostgreSQL 18.3"
+level = "Inert"
+bare = false
+standalone = [
+    "--exit-on-error", "--help", "--no-parse-wal",
+    "--progress", "--quiet", "--skip-checksums",
+    "--version",
+    "-?", "-P", "-V", "-e", "-n", "-q", "-s",
+]
+valued = [
+    "--format", "--ignore", "--manifest-path",
+    "--wal-directory",
+    "-F", "-i", "-m", "-w",
+]
+
+[[command]]
+name = "pg_waldump"
+description = "PostgreSQL — renders the write-ahead log of a cluster in human-readable form for debugging and educational purposes. Pure read of WAL segment files; the optional --save-fullpage flag is excluded here (it would write extracted full-page images to disk). Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/pgwaldump.html"
+researched_version = "PostgreSQL 18.3"
+level = "Inert"
+bare = false
+standalone = [
+    "--bkp-details", "--follow", "--fullpage",
+    "--help", "--quiet", "--version",
+    "-?", "-V", "-b", "-f", "-q", "-w",
+]
+valued = [
+    "--block", "--end", "--fork", "--limit",
+    "--path", "--relation", "--rmgr", "--start",
+    "--stats", "--timeline", "--xid",
+    "-B", "-F", "-R", "-e", "-n", "-p", "-r",
+    "-s", "-t", "-x", "-z",
+]
+
+[[command]]
+name = "pg_walsummary"
+description = "PostgreSQL — prints the contents of the binary WAL summary files written under pg_wal/summaries. These files index, per relation fork, the blocks modified within a WAL range and support incremental backup. Pure read."
+url = "https://www.postgresql.org/docs/current/pgwalsummary.html"
+researched_version = "PostgreSQL 18.3"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--individual", "--quiet", "--version",
+    "-?", "-V", "-i", "-q",
+]
+
+[[command]]
+name = "pg_test_timing"
+description = "PostgreSQL — measures the per-call overhead of the system's clock_gettime / equivalent timer source and confirms the clock never moves backward. Used to gauge whether EXPLAIN ANALYZE timing is reliable. Pure read; no filesystem or network activity."
+url = "https://www.postgresql.org/docs/current/pgtesttiming.html"
+researched_version = "PostgreSQL 18.3"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-?", "-V"]
+valued = ["--duration", "-d"]
+
+[[command]]
+name = "pg_test_fsync"
+description = "PostgreSQL — benchmarks the available wal_sync_method choices to help DBAs pick the fastest fsync method for their hardware. Writes a small test file (`pg_test_fsync.out` in the current directory by default, or the path given by -f) and runs fsync/fdatasync against it repeatedly. The output file is the only filesystem write."
+url = "https://www.postgresql.org/docs/current/pgtestfsync.html"
+researched_version = "PostgreSQL 18.3"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--version", "-?", "-V"]
+valued = ["--filename", "--secs-per-test", "-f", "-s"]
+
+[[command]]
+name = "oid2name"
+description = "PostgreSQL contrib utility — resolves PostgreSQL OIDs to relation, database, and tablespace names by connecting to the cluster and querying system catalogs. Pure read. Distributed as part of contrib; ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/oid2name.html"
+researched_version = "PostgreSQL 18.3"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--indexes", "--quiet", "--system-objects",
+    "--tablespaces", "--version",
+    "-?", "-V", "-i", "-q", "-s", "-x",
+]
+valued = [
+    "--dbname", "--filenode", "--host", "--oid",
+    "--port", "--tablename", "--username",
+    "-H", "-U", "-d", "-f", "-o", "-p", "-t",
+]

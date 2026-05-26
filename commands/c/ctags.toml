@@ -1,0 +1,9 @@
+[[command]]
+name = "ctags"
+description = "BSD ctags. Reads C, Pascal, Fortran, yacc, lex, and Lisp source files and writes a `tags` index file (or a path given by `-f`, with `-f -` writing to stdout) that ex/vi can use to jump to definitions. `-a` appends rather than overwrites; `-u` updates entries for the listed files (slow). `-x` switches to printing a human-readable index on stdout instead of writing a tags file. POSIX.1-2001 surface; frozen for decades. No network."
+url = "https://keith.github.io/xcode-man-pages/ctags.1.html"
+researched_version = "macOS 14 BSD ctags (man page dated 2023-05-23)"
+level = "SafeWrite"
+bare = false
+standalone = ["-B", "-F", "-T", "-a", "-d", "-u", "-v", "-w", "-x"]
+valued = ["-f"]

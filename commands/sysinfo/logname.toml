@@ -1,0 +1,10 @@
+[[command]]
+name = "logname"
+aliases = ["glogname"]
+description = "Prints the user's login name. Explicitly ignores the LOGNAME and USER environment variables — the value comes from the kernel record of the controlling session. POSIX-standard; no flags on the BSD form. The GNU coreutils variant adds --help and --version."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#logname-invocation"
+researched_version = "GNU coreutils 9.7 (April 2025); BSD form is POSIX, frozen"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version"]

@@ -1,0 +1,17 @@
+[[command]]
+name = "lldb"
+description = "LLVM's interactive debugger. Most real invocations of lldb either load an executable and step into its code, attach to a running process by pid or name, or run a batch script of commands. Once started, lldb's `run`, `process attach`, `expression`, and `command script import` give it equivalent power to running arbitrary code as the user. The only forms with no execution side effects are the pure information flags: `--version`, `--help`, `--python-path`, `--print-script-interpreter-info`. Tracks LLVM major releases (roughly every six months)."
+url = "https://lldb.llvm.org/man/lldb.html"
+researched_version = "LLVM 19+ lldb"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = [
+    "--help",
+    "--print-script-interpreter-info",
+    "--python-path",
+    "--version",
+    "-P",
+    "-h",
+    "-v",
+]

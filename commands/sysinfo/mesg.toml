@@ -1,0 +1,8 @@
+[[command]]
+name = "mesg"
+description = "Controls whether other users can write to the current terminal via talk(1) or write(1). With no argument, prints the current allow/disallow state. 'mesg n' disallows writes, 'mesg y' permits them. Affects only the controlling terminal of the calling process; no other system state changes, no network. Surface has been frozen since the BSD era."
+url = "https://keith.github.io/xcode-man-pages/mesg.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+max_positional = 1

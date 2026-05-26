@@ -1,0 +1,36 @@
+[[command]]
+name = "gdbm_dump"
+description = "GDBM utility that writes a text (ASCII, the default) or binary dump of the contents of a GDBM database file to a target file or standard output. The ASCII format preserves metadata (mode and ownership) so gdbm_load can recreate an exact copy. Local-filesystem write of the dump file. The GDBM surface is extremely slow-moving (last meaningful CLI changes around 2013-2021)."
+url = "https://www.gnu.org.ua/software/gdbm/manual/gdbm_dump.html"
+researched_version = "GNU gdbm 1.24"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--usage", "--version",
+    "-V", "-h",
+]
+valued = [
+    "--format",
+    "-H",
+]
+
+[[command]]
+name = "gdbm_load"
+description = "GDBM utility that reads a dump file (produced by gdbm_dump or by gdbmtool `export`) and recreates a GDBM database from it. With --update, adds key/value pairs to an existing database; with --replace, overwrites duplicate keys; otherwise creates a new database. Local-filesystem write of the target DB file. Surface is extremely slow-moving."
+url = "https://www.gnu.org.ua/software/gdbm/manual/gdbm_load.html"
+researched_version = "GNU gdbm 1.24"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--mmap", "--no-meta", "--replace",
+    "--update", "--usage", "--version",
+    "-M", "-U", "-V", "-h", "-n", "-r",
+]
+valued = [
+    "--block-size", "--cache-size", "--mode", "--user",
+    "-b", "-c", "-m", "-u",
+]
+
+[[command]]
+name = "gdbmtool"
+candidate = true

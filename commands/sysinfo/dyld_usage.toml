@@ -1,0 +1,9 @@
+[[command]]
+name = "dyld_usage"
+description = "Real-time dynamic-linker activity monitor on macOS, modelled on fs_usage. Streams dyld operations (image loads, dlopen, dlsym) for one or more processes (selected by PID or by command name) until interrupted. Requires root because it uses the kernel tracing facility, but does not write to disk on its own — output goes to stdout. -j emits JSON, -t adds a timeout for scripted use, -R replays a previously recorded raw trace file, -e inverts the process filter to exclude rather than include the listed processes. Apple ships dyld_usage with macOS; surface has been stable since the 10.x era."
+url = "https://keith.github.io/xcode-man-pages/dyld_usage.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+standalone = ["-e", "-j", "-h"]
+valued = ["-f", "-t", "-R", "-S", "-E"]

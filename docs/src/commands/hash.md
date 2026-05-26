@@ -24,11 +24,23 @@
 ### `md5sum`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#md5sum-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#md5sum-invocation</a></p>
 
+Aliases: `gmd5sum`
+
 - Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
 - Bare invocation allowed
 
 ### `sha1sum`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sha1sum-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#sha1sum-invocation</a></p>
+
+Aliases: `gsha1sum`
+
+- Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
+- Bare invocation allowed
+
+### `sha224sum`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities">https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities</a></p>
+
+Aliases: `gsha224sum`
 
 - Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
 - Bare invocation allowed
@@ -36,11 +48,23 @@
 ### `sha256sum`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities">https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities</a></p>
 
+Aliases: `gsha256sum`
+
+- Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
+- Bare invocation allowed
+
+### `sha384sum`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities">https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities</a></p>
+
+Aliases: `gsha384sum`
+
 - Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
 - Bare invocation allowed
 
 ### `sha512sum`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities">https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities</a></p>
+
+Aliases: `gsha512sum`
 
 - Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
 - Bare invocation allowed

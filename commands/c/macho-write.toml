@@ -1,0 +1,118 @@
+[[command]]
+name = "install_name_tool"
+description = "Edits LC_ID_DYLIB, LC_LOAD_DYLIB, and LC_RPATH load commands in an existing Mach-O binary. -id rewrites the install name of a dylib; -change rewrites one dependent install name; -rpath rewrites an existing rpath; -add_rpath appends an rpath; -delete_rpath drops one. All operations modify the file passed as the final positional argument in place. No new file is produced and the surface contains no read-only forms. No network."
+url = "https://keith.github.io/xcode-man-pages/install_name_tool.1.html"
+researched_version = "macOS 14 / Xcode 15 (man page dated 2009-03-04)"
+level = "SafeWrite"
+bare = false
+valued = ["-add_rpath", "-change", "-delete_rpath", "-id", "-rpath"]
+
+[[command]]
+name = "nmedit"
+description = "Rewrites the symbol table of a Mach-O object or static archive so that global symbols not listed in the file given to -s become private extern (in dylibs) or static (elsewhere); -R does the inverse. -A keeps absolute and Objective-C class globals as global. By default the input file is modified in place; -o redirects to a new output file. Distinct from strip in that it preserves the debug-symbol entries for the symbols it demotes."
+url = "https://keith.github.io/xcode-man-pages/nmedit.1.html"
+researched_version = "macOS 14 / Xcode 15 (man page dated 2007-05-29)"
+level = "SafeWrite"
+bare = false
+standalone = ["-A", "-D", "-p"]
+valued = ["-R", "-arch", "-o", "-s"]
+
+[[command]]
+name = "segedit"
+description = "Extracts or replaces named sections in a Mach-O object file. -extract writes the contents of a (segment, section) pair to a data file (or stdout when the path is `-`). -replace builds a new output file from the input plus replacement section data; -output names the new file. Only sections in segments marked SG_NORELOC can be replaced. Does not operate on universal binaries — use lipo first. No network."
+url = "https://keith.github.io/xcode-man-pages/segedit.1.html"
+researched_version = "macOS 14 / Xcode 15 (man page dated 2018-06-25)"
+level = "SafeWrite"
+bare = false
+valued = ["-extract", "-output", "-replace"]
+
+[[command]]
+name = "strip"
+description = "Rewrites the symbol table of Mach-O object files, dynamic libraries, executables, and static archives in place. The default behavior with no flags removes (on dyld-loaded files) all locals and debug entries, or (on static binaries) the entire symbol table. -S removes debug entries; -x removes locals; -u keeps undefineds; -r keeps dynamically-referenced symbols; -s/-R take per-symbol allow/deny lists; -c collapses a dylib down to a stub library; -no_uuid/-no_split_info/-no_atom_info drop specific load commands. -o writes to a new path instead of in place."
+url = "https://keith.github.io/xcode-man-pages/strip.1.html"
+researched_version = "macOS 14 / Xcode 15 (man page dated 2023-06-23)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-A", "-D", "-N", "-S", "-T", "-X", "-c", "-n", "-r", "-u",
+    "-v", "-x",
+    "-no_atom_info", "-no_code_signature_warning",
+    "-no_split_info", "-no_uuid",
+]
+valued = ["-R", "-arch", "-d", "-i", "-o", "-s"]
+
+[[command]]
+name = "bitcode_strip"
+description = "Reads one Mach-O input file and writes a new output file (-o) with the __LLVM bitcode segment stripped (-r), reduced to a marker (-m), or — with -l — with the native code removed and only the bitcode kept. By default the code-signature load commands are stripped along with the bitcode (since the signature is invalidated); -keep_cs preserves them for later re-signing. Universal binaries are processed per slice. No network."
+url = "https://keith.github.io/xcode-man-pages/bitcode_strip.1.html"
+researched_version = "macOS 14 / Xcode 15 (man page dated 2020-06-23)"
+level = "SafeWrite"
+bare = false
+standalone = ["-keep_cs", "-l", "-m", "-r", "-v"]
+valued = ["-o"]
+
+[[command]]
+name = "codesign_allocate"
+description = "Reserves space inside a Mach-O file for a future code signature blob, so that codesign(1) can later attach a signature without disturbing the rest of the binary. -i names the input; -o names the output; -a <arch> <size> (or -A <cputype> <cpusubtype> <size>) reserves <size> bytes per slice (size must be a multiple of 16). -r removes any existing code-signature load command (equivalent to a zero-byte allocation). -p page-aligns the reserved region."
+url = "https://keith.github.io/xcode-man-pages/codesign_allocate.1.html"
+researched_version = "macOS 14 / Xcode 15 (man page dated 2017-04-17)"
+level = "SafeWrite"
+bare = false
+standalone = ["-p", "-r"]
+valued = ["-A", "-a", "-i", "-o"]
+
+[[command]]
+name = "ctf_insert"
+description = "Inserts Compact C Type Format (CTF) data into a Mach-O mach_kernel image by creating a new (__CTF,__ctf) section per architecture. Reads one input mach_kernel, one CTF data file per architecture specified with -arch <arch> <file>, and writes the merged result to -o <output>. Refuses to operate on a file that already contains a __CTF section. Used by the macOS kernel build; not part of an everyday userland workflow."
+url = "https://keith.github.io/xcode-man-pages/ctf_insert.1.html"
+researched_version = "macOS 14 / Xcode 15 (man page dated 2020-06-23)"
+level = "SafeWrite"
+bare = false
+valued = ["-arch", "-o"]
+
+[[command]]
+name = "dsymutil"
+description = "LLVM tool that links the per-object DWARF debug-info found in an executable's debug map into a single .dSYM bundle (or, with --flat, a .dwarf companion file). Read-only forms: --dump-debug-map prints the debug map as YAML and exits without producing a .dSYM, --symtab/-s prints the symbol table and exits, --verify runs the DWARF verifier. The default mode writes a .dSYM next to the executable; -o redirects the output path. --update rebuilds an existing .dSYM's accelerator tables. No network. Tracks LLVM major releases."
+url = "https://llvm.org/docs/CommandGuide/dsymutil.html"
+researched_version = "LLVM 19+ (man page dated 2025-12-15)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--dump-debug-map",
+    "--fat64",
+    "--flat",
+    "--gen-reproducer",
+    "--help",
+    "--keep-function-for-static",
+    "--minimize",
+    "--no-object-timestamp",
+    "--no-odr",
+    "--no-output",
+    "--no-swiftmodule-timestamp",
+    "--quiet",
+    "--remarks-drop-without-debug",
+    "--statistics",
+    "--symtab",
+    "--toolchain",
+    "--update",
+    "--verbose",
+    "--verify",
+    "--version",
+    "-S", "-f", "-h", "-q", "-s", "-u", "-v", "-y", "-z",
+]
+valued = [
+    "--accelerator",
+    "--arch",
+    "--build-variant-suffix",
+    "--num-threads",
+    "--object-prefix-map",
+    "--oso-prepend-path",
+    "--out",
+    "--remarks-output-format",
+    "--remarks-prepend-path",
+    "--reproducer",
+    "--use-reproducer",
+    "-D",
+    "-j",
+    "-o",
+]

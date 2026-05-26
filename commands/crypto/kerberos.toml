@@ -1,0 +1,97 @@
+[[command]]
+name = "kinit"
+description = "Acquire initial Kerberos tickets. Authenticates against the KDC as the given principal (default: current user) and stores the resulting TGT in the local credential cache (typically ~/Library/Caches/krb5cc_* on macOS, /tmp/krb5cc_uid elsewhere, or whatever KRB5CCNAME or -c specifies). Can also read a key from a keytab via -t/--keytab or use the default keytab via -k. The -R/--renew form refreshes an existing renewable ticket. Network operations are local to the realm's KDC; ticket data is written only to the local cache. Heimdal's surface has not changed in many years."
+url = "https://www.h5l.org/manual/HEAD/info/heimdal/kinit-_002d-acquire-initial-tickets.html"
+researched_version = "Heimdal (macOS bundled); surface stable since 2006"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--afslog", "--anonymous", "--canonicalize", "--enterprise",
+    "--forwardable", "--help", "--no-addresses", "--no-forwardable",
+    "--proxiable", "--renew", "--renewable", "--use-keytab",
+    "--validate", "--verbose", "--version",
+    "-A", "-R", "-V", "-f", "-k", "-p", "-v",
+]
+valued = [
+    "--cache", "--enctypes", "--extra-addresses", "--fcache-version",
+    "--keytab", "--lifetime", "--password-file", "--renewable-life",
+    "--server", "--start-time",
+    "-a", "-c", "-e", "-l", "-r", "-s", "-t",
+    "-S",
+]
+
+[[command]]
+name = "klist"
+description = "List Kerberos credentials. Reads the current credential cache (or one specified via -c/--cache) and prints the stored tickets, optionally including flags (-f), AFS tokens (-T), or a cache list (-l/--list-caches). The -s/-t/--test forms exit silently with status 0 only if an active TGT exists. Strictly read-only: no network, no cache modification. Heimdal's surface has not changed in many years."
+url = "https://www.h5l.org/manual/HEAD/info/heimdal/klist-_002d-list-Kerberos-credentials.html"
+researched_version = "Heimdal (macOS bundled); surface stable since 2006"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--list-caches", "--test", "--tokens", "--v5",
+    "--verbose", "--version",
+    "-5", "-T", "-f", "-h", "-l", "-s", "-t", "-v",
+]
+valued = ["--cache", "-c"]
+
+[[command]]
+name = "kdestroy"
+description = "Destroy Kerberos tickets. Removes either a specific credential from the local cache (via --credential=principal) or all tickets in the current cache (default), or every cache with -A/-a/--all. Writes to the local credential cache only; does not contact the KDC. --no-unlog and --no-delete-v4 narrow the removal to v5 credentials. Heimdal's surface has not changed in many years."
+url = "https://www.h5l.org/manual/HEAD/info/heimdal/kdestroy-_002d-remove-one-credential-or-destroy-the-current-ticket-file.html"
+researched_version = "Heimdal (macOS bundled); surface stable since 2006"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--all", "--help", "--no-delete-v4", "--no-unlog", "--version",
+    "-A", "-a",
+]
+valued = ["--cache", "--credential", "--principal", "-c", "-p"]
+
+[[command]]
+name = "kswitch"
+description = "Switch the default Kerberos credential cache. Updates the local cache-collection state to point at a different cache identified by -c/--cache (path), -p/--principal (principal name), or -t/--type (cache type). The -i/--interactive form prompts for a cache from a menu. Affects only the local cache-collection pointer; does not contact the KDC. Heimdal's surface has not changed in many years."
+url = "https://www.h5l.org/manual/HEAD/info/heimdal/kswitch.html"
+researched_version = "Heimdal (macOS bundled); surface stable since 2009"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--interactive", "--version", "-i"]
+valued = ["--cache", "--principal", "--type", "-c", "-p", "-t"]
+
+[[command]]
+name = "kgetcred"
+description = "Get a Kerberos service ticket. Uses an existing TGT in the local credential cache to obtain a ticket for a specific service principal, and stores the result in the cache. The --no-transit-check flag relaxes cross-realm transit verification; --canonicalize asks the KDC to canonicalize the principal. Network operations go to the realm's KDC; ticket data is written only to the local cache. Heimdal's surface has not changed in many years."
+url = "https://www.h5l.org/manual/HEAD/info/heimdal/kgetcred.html"
+researched_version = "Heimdal (macOS bundled); surface stable since 2004"
+level = "SafeWrite"
+bare = false
+standalone = ["--canonicalize", "--help", "--no-transit-check", "--version"]
+valued = ["--cache", "--enctype", "-c", "-e"]
+
+[[command]]
+name = "krb5-config"
+description = "Print build flags for linking against Heimdal libraries. Reports compiler and linker options for the krb5, gssapi, kadm-client, or kadm-server libraries based on --cflags, --libs, --prefix, and --exec-prefix. Strictly read-only: prints to stdout, never modifies any state. The output is consumed by build systems. Heimdal's surface has not changed since Heimdal 0.3d (2000)."
+url = "https://www.h5l.org/manual/HEAD/info/heimdal/krb5_002dconfig.html"
+researched_version = "Heimdal (macOS bundled); surface frozen"
+level = "Inert"
+bare = true
+standalone = ["--cflags", "--help", "--libs", "--version"]
+valued = ["--exec-prefix", "--prefix"]
+
+[[command]]
+name = "kcc"
+description = "Heimdal Kerberos credential-cache tool. Wraps the cache-management subcommands of kinit, klist, and kdestroy under a single multiplexed entry point. The man page documents only --version and --help; the actual subcommand set is exposed via `kcc help` and overlaps with the per-tool commands. Without a subcommand, kcc prints its own help. Heimdal's surface has not changed in many years."
+url = "https://www.h5l.org/manual/HEAD/info/heimdal/kcc.html"
+researched_version = "Heimdal (macOS bundled); kcc first shipped 2011"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version"]
+
+[[command]]
+name = "checkLocalKDC"
+description = "Apple LocalKDC integrity checker. Reads /Library/Keychains/System.keychain, /etc/krb5.keytab, and /var/db/krb5kdc/kdc.conf, validates the LocalKDC's principal database, and prints results. The man page explicitly states the script is non-destructive and can be re-run safely. No arguments; no flags. First appeared in Mac OS X 10.7; surface has not changed since."
+url = "https://opensource.apple.com/source/Heimdal/"
+researched_version = "macOS 14 (Sequoia); surface frozen since 10.7"
+level = "Inert"
+bare = true
+max_positional = 0

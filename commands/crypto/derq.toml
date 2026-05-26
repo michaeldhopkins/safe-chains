@@ -1,0 +1,10 @@
+[[command]]
+name = "derq"
+description = "Apple CoreEntitlements query tool. Queries DER-encoded entitlement blobs read from a file/stdin (query), extracted from a Mach-O binary (macho), or read from a running process via csops(2) (cs ops). Output goes to stdout or -o output_file in DER or XML form. Query language (DERQL) is a left-to-right list of select/match operations against the entitlement structure; it cannot execute arbitrary code or modify the source. Apple ships derq with the OS; surface is stable across recent macOS releases."
+url = "https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/"
+researched_version = "macOS 14 (Sequoia)"
+level = "Inert"
+bare = false
+standalone = ["--pretty", "--raw", "--xml"]
+valued = ["-f", "-i", "-o", "-p"]
+tolerate_unknown_short = true

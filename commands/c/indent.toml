@@ -1,0 +1,9 @@
+[[command]]
+name = "indent"
+description = "BSD C source formatter. When given only an input file, rewrites it in place and saves the original with a `.BAK` suffix (or the suffix from $SIMPLE_BACKUP_SUFFIX). With both input and output paths, writes the formatted result to the output file. With `-st`, reads stdin and writes stdout. The flag surface is large and uses single-dash compound forms (`-i8`, `-c33`, `-ts8`, `-T<typename>`, `-P<file>`, `-U<file>`, plus many pairs like `-bl`/`-br`, `-cs`/`-ncs`); these are all formatting knobs and do not change what indent reads or writes. Reads only the file paths given on the command line and the optional `.indent.pro` profile (unless `-npro` is set); no network."
+url = "https://keith.github.io/xcode-man-pages/indent.1.html"
+researched_version = "macOS 14 (BSD indent; man page dated 2023)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["-st", "-npro", "--version"]

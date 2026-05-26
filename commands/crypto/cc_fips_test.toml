@@ -1,0 +1,8 @@
+[[command]]
+name = "cc_fips_test"
+description = "Apple corecrypto FIPS Power-On Self-Test (POST) validator. Runs the corecrypto library's built-in self-test suite, which the launchd typically invokes at boot. Exits 0 on success, non-zero on failure. Takes no arguments and accepts no flags per the man page. Strictly read-only: tests in-process algorithms and reports the result; does not modify any state or contact the network. macOS-internal tool with no recent surface changes."
+url = "https://developer.apple.com/security/"
+researched_version = "macOS 14 (Sequoia); surface frozen since 2012"
+level = "Inert"
+bare = true
+max_positional = 0

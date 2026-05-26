@@ -1,0 +1,36 @@
+[[command]]
+name = "hostid"
+description = "Prints the numeric (hexadecimal) host identifier returned by gethostid(3). Part of GNU coreutils; no flags besides --help and --version. Surface has been frozen for decades."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#hostid-invocation"
+researched_version = "GNU coreutils 9.7 (April 2025)"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--version"]
+
+[[command]]
+name = "hostinfo"
+description = "Prints Mach host information: kernel version string, processor configuration, available physical memory, and scheduling statistics. Read-only with no flags or arguments. macOS system binary; surface is frozen."
+url = "https://keith.github.io/xcode-man-pages/hostinfo.8.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+max_positional = 0
+
+[[command]]
+name = "machine"
+description = "Prints the machine type (the host's CPU architecture identifier). No flags, no arguments, no side effects. macOS system binary; surface frozen since 1991."
+url = "https://keith.github.io/xcode-man-pages/machine.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+max_positional = 0
+
+[[command]]
+name = "pagesize"
+description = "Prints the system page size in bytes, as returned by getpagesize(3). No flags, no arguments. Surface unchanged since 4.2BSD."
+url = "https://keith.github.io/xcode-man-pages/pagesize.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+max_positional = 0

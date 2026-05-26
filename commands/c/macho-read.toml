@@ -1,0 +1,138 @@
+[[command]]
+name = "cmpdylib"
+description = "Compares two dynamic shared libraries to determine whether they are ABI-compatible: verifies architectures match, that every global symbol defined in the old library is still defined in the new one, and that compatibility version numbers monotonically increase. Read-only: takes two file arguments, prints any incompatibilities to stdout, sets a non-zero exit status when incompatible. No network. Surface frozen since 1997."
+url = "https://keith.github.io/xcode-man-pages/cmpdylib.1.html"
+researched_version = "macOS 14 / Xcode 15 (man page dated 1997-11-03)"
+level = "Inert"
+bare = false
+max_positional = 2
+
+[[command]]
+name = "dyld_info"
+description = "Inspects fixup, segment, symbol, and Objective-C information that dyld uses when loading Mach-O binaries and dylibs. Read-only: parses one or more files (or every dylib in the shared cache with -all_dyld_cache) and prints structured information. With no flags it prints platform, segments, and linked dylibs. Supports targeted views via -exports, -imports, -fixups, -fixup_chains, -function_starts, -load_commands, -section, -all_sections, plus validation modes. No network."
+url = "https://keith.github.io/xcode-man-pages/dyld_info.1.html"
+researched_version = "macOS 14 / Xcode 15 (man page dated 2025-05-05)"
+level = "Inert"
+bare = false
+standalone = [
+    "-all_dyld_cache",
+    "-all_sections",
+    "-all_sections_bytes",
+    "-disassemble",
+    "-dlopens",
+    "-dlsyms",
+    "-exports",
+    "-fixup_chain_details",
+    "-fixup_chain_header",
+    "-fixup_chains",
+    "-fixups",
+    "-function_starts",
+    "-function_variants",
+    "-imports",
+    "-inits",
+    "-linked_dylibs",
+    "-load_commands",
+    "-no_validate",
+    "-objc",
+    "-opcodes",
+    "-platform",
+    "-segments",
+    "-shared_region",
+    "-symbolic_fixups",
+    "-uuid",
+    "-validate_only",
+    "--help",
+    "-h",
+]
+valued = [
+    "-all_dir",
+    "-arch",
+    "-section",
+    "-section_bytes",
+]
+
+[[command]]
+name = "dwarfdump"
+description = "LLVM tool that parses DWARF debug-info sections in object files, archives, and .dSYM bundles and prints them in human-readable form, with optional verification of the DWARF tree (--verify). Read-only: reads one or more files (or stdin when given `-`) and writes to stdout, or to a path given via -o (still a textual dump — does not modify input files). Supports section selectors (--debug-info, --debug-line, etc.), name/address lookup (--find, --name, --lookup), and JSON statistics (--statistics). No network. Tracks LLVM major releases."
+url = "https://llvm.org/docs/CommandGuide/dwarfdump.html"
+researched_version = "LLVM 19+ (man page dated 2025-12-15)"
+level = "Inert"
+bare = true
+standalone = [
+    "--all", "--apple-names", "--apple-namespaces", "--apple-objc",
+    "--apple-types", "--color", "--diff", "--eh-frame",
+    "--gdb-index", "--help", "--help-list", "--ignore-case",
+    "--quiet", "--regex", "--show-children", "--show-form",
+    "--show-parents", "--show-section-sizes", "--show-sources",
+    "--statistics", "--summarize-types", "--uuid", "--verbose",
+    "--verify", "--version",
+    "-F", "-a", "-c", "-h", "-i", "-p", "-u", "-v", "-x",
+]
+valued = [
+    "--arch", "--debug-abbrev", "--debug-addr", "--debug-aranges",
+    "--debug-cu-index", "--debug-frame", "--debug-gnu-pubnames",
+    "--debug-gnu-pubtypes", "--debug-info", "--debug-line",
+    "--debug-line-str", "--debug-loc", "--debug-loclists",
+    "--debug-macro", "--debug-names", "--debug-pubnames",
+    "--debug-pubtypes", "--debug-ranges", "--debug-rnglists",
+    "--debug-str", "--debug-str-offsets", "--debug-tu-index",
+    "--debug-types", "--find", "--lookup", "--name",
+    "--parent-recurse-depth", "--recurse-depth",
+    "-f", "-n", "-o", "-r",
+]
+
+[[command]]
+name = "llvm-otool"
+description = "Otool-compatible command-line shim that translates classic otool arguments into either otool-classic or llvm-objdump invocations. Read-only inspection of Mach-O headers, load commands, libraries, section contents, disassembly, and symbol tables. -objdump (or --object-tool-path objdump) routes to objdump in otool compatibility mode; the default routes to otool-classic. -show-objdump-command prints the synthesized objdump command without running anything. Ships with LLVM; tracks LLVM major releases."
+url = "https://llvm.org/docs/CommandGuide/llvm-otool.html"
+researched_version = "LLVM 19+ (Apple toolchain shim)"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "-objdump",
+    "-show-objdump-command",
+    "--help",
+    "-h",
+]
+valued = [
+    "-object-tool-path",
+    "--object-tool-path",
+]
+
+[[command]]
+name = "pagestuff"
+description = "Describes how a Mach-O or universal binary's structure (headers, segments, sections, symbol tables, code-signature blob) maps onto logical pages on the current host. -a prints every page; -p prints sections with offsets and lengths; bare page numbers print the contents of those specific pages. Read-only: takes one file argument; no writes, no network. Surface frozen since 2020."
+url = "https://keith.github.io/xcode-man-pages/pagestuff.1.html"
+researched_version = "macOS 14 (man page dated 2020-06-23)"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+standalone = ["-a", "-p"]
+valued = ["-arch", "-pagesize"]
+
+[[command]]
+name = "unwinddump"
+description = "Reads the __TEXT/__unwind_info section of a Mach-O binary and prints the compact unwind table used by the runtime to unwind C++ and x86_64 Objective-C exceptions. Read-only: takes one or more files and prints to stdout. -arch restricts a universal binary to a single architecture. Surface frozen since 2008."
+url = "https://keith.github.io/xcode-man-pages/unwinddump.1.html"
+researched_version = "macOS 14 (man page dated 2008-11-07)"
+level = "Inert"
+bare = false
+valued = ["-arch"]
+
+[[command]]
+name = "lorder"
+description = "Reads object files and static archives, uses nm(1) to determine which symbols each file defines and references, and prints the resulting dependency edges as pairs of file names — intended to be fed to tsort(1) when ordering objects for a single-pass static link. Read-only: only opens the files named on the command line, prints to stdout. Honors the NM and NMFLAGS environment variables. POSIX/legacy; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/lorder.1.html"
+researched_version = "macOS 14 (man page dated 2024-02-27)"
+level = "Inert"
+bare = false
+
+[[command]]
+name = "dltest"
+description = "Tiny unixODBC utility that checks whether a given symbol can be resolved in a given shared object. Read-only: dlopens the library, dlsyms the symbol, prints whether the symbol was found, exits. Takes either no arguments (prints help) or exactly two: an absolute library path and a symbol name. No network."
+url = "https://www.unixodbc.org/doc/dltest.html"
+researched_version = "unixODBC 2.3.12"
+level = "Inert"
+bare = true
+max_positional = 2

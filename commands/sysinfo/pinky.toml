@@ -1,0 +1,11 @@
+[[command]]
+name = "pinky"
+description = "Lightweight finger (local only). Reads /var/run/utmpx and prints information about logged-in users in short or long format. --lookup canonicalizes hostnames via DNS, which is the only outbound network touch and is opt-in. Part of GNU coreutils; surface is stable."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#pinky-invocation"
+researched_version = "GNU coreutils 9.7 (April 2025)"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--lookup", "--version",
+    "-b", "-f", "-h", "-i", "-l", "-p", "-q", "-s", "-w",
+]

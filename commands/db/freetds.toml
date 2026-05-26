@@ -1,0 +1,51 @@
+[[command]]
+name = "bsqldb"
+description = "FreeTDS batch SQL processor that uses DB-Library to send the SQL script on standard input (or -i FILE) to a Sybase or Microsoft SQL Server and write results to standard output (or -o FILE). Functions as a non-interactive equivalent of Sybase/Microsoft `isql`; uses `go` on its own line as a batch separator. Whether a given run reads or writes the remote database is determined entirely by the SQL the user supplies. FreeTDS releases roughly once a year; the command surface has been stable since FreeTDS 0.63 (2004)."
+url = "https://www.freetds.org/userguide/bsqldb.htm"
+researched_version = "FreeTDS 1.5.13"
+level = "SafeRead"
+bare = true
+standalone = ["-h", "-q", "-v"]
+valued = ["-D", "-H", "-P", "-R", "-S", "-U", "-e", "-i", "-o", "-t"]
+
+[[command]]
+name = "bsqlodbc"
+description = "FreeTDS batch SQL processor that uses the ODBC API to send the SQL script on standard input (or -i FILE) to the configured server and write results to standard output (or -o FILE). Non-interactive equivalent of Sybase/Microsoft `isql`; uses `go` on its own line as a batch separator. The read/write impact on the remote DB is determined by the SQL the user supplies. FreeTDS surface has been stable since FreeTDS 0.65 (2005)."
+url = "https://www.freetds.org/userguide/bsqlodbc.htm"
+researched_version = "FreeTDS 1.5.13"
+level = "SafeRead"
+bare = true
+standalone = ["-h", "-q", "-v"]
+valued = ["-D", "-P", "-S", "-U", "-V", "-e", "-i", "-o", "-t"]
+
+[[command]]
+name = "defncopy"
+description = "FreeTDS utility that connects to a Microsoft (or ancient Sybase) server and extracts the SQL source text of named stored procedures, views, and (via sp_help) tables as a CREATE script written to standard output or -o FILE. Pure read on the remote server. The -i option exists in the synopsis but is not currently implemented. Surface has been stable since FreeTDS 0.63 (2004)."
+url = "https://www.freetds.org/userguide/defncopy.htm"
+researched_version = "FreeTDS 1.5.13"
+level = "SafeRead"
+bare = false
+standalone = ["-v"]
+valued = ["-D", "-P", "-S", "-U", "-i", "-o"]
+
+[[command]]
+name = "osql"
+description = "FreeTDS diagnostic shell script that checks the unixODBC configuration files for a given DSN and, if everything is in order, invokes the unixODBC `isql` against that DSN. Useful for verifying an ODBC + FreeTDS install. Connects to the named server; the interactive isql session that follows can issue arbitrary SQL. Surface has been stable since FreeTDS 0.65 (2005)."
+url = "https://www.freetds.org/userguide/osql.htm"
+researched_version = "FreeTDS 1.5.13"
+level = "SafeRead"
+bare = false
+valued = ["-I", "-P", "-S", "-U"]
+
+[[command]]
+name = "tsql"
+description = "FreeTDS diagnostic tool that uses libtds directly (bypassing the FreeTDS client libraries) to connect to a Sybase or Microsoft SQL Server and run interactive queries, primarily for testing the TDS protocol implementation against a server. -C prints compile-time configuration; -L lists Microsoft server instances on a host. Any SQL the user types in the interactive session is sent to the remote server. Surface has been stable since FreeTDS 0.60 (2003)."
+url = "https://www.freetds.org/userguide/tsql.htm"
+researched_version = "FreeTDS 1.5.13"
+level = "SafeRead"
+bare = false
+standalone = ["-C", "-L", "-v"]
+valued = [
+    "-D", "-H", "-I", "-J", "-P", "-S", "-U",
+    "-a", "-o", "-p", "-r", "-t",
+]

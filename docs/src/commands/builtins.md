@@ -129,6 +129,8 @@ Aliases: `typeset`
 ### `whoami`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#whoami-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#whoami-invocation</a></p>
 
+Aliases: `gwhoami`
+
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
 

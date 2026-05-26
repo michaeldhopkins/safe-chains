@@ -1,0 +1,9 @@
+[[command]]
+name = "encode_keychange"
+description = "Net-SNMP utility that produces the SNMPv3 KeyChange string (RFC 2274) for rotating a USM user's authentication or privacy key. Takes the old and new passphrases (-O, -N, or stdin, or ~/.snmp/passphrase.ek), the engineID (-E), and the hash transform (-t md5 or -t sha1), and prints the KeyChange string to stdout. Strictly local: derives keys in-process, never contacts an SNMP agent. The Net-SNMP CLI surface for this helper is essentially frozen."
+url = "https://net-snmp.sourceforge.io/docs/man/encode_keychange.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = ["-P", "-V", "-f", "-h", "-v"]
+valued = ["-E", "-N", "-O", "-t"]
