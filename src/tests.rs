@@ -731,6 +731,9 @@ denied! {
     agy_plugin_disable: "agy plugin disable foo",
     agy_plugins_install: "agy plugins install foo",
     agy_dangerously_skip: "agy --dangerously-skip-permissions",
+
+    circuschief_unknown_flag: "circuschief --evil",
+    circuschief_positional: "circuschief foo",
     sample_unknown_flag: "sample 48066 --evil-flag",
     sample_with_file_flag: "sample 48066 -file /tmp/profile.txt",
 
@@ -1004,6 +1007,18 @@ safe_write! {
     jj_workspace_add: "jj workspace add ../ws2",
     jj_workspace_forget: "jj workspace forget default",
     jj_workspace_rename: "jj workspace rename new-name",
+
+    level_circuschief_bare: "circuschief",
+    level_circuschief_port_long: "circuschief --port 8080",
+    level_circuschief_port_short: "circuschief -p 8080",
+    level_circuschief_no_analytics: "circuschief --no-analytics",
+    level_circuschief_port_plus_analytics: "circuschief -p 5000 --no-analytics",
+    level_circuschief_help: "circuschief --help",
+    level_circuschief_version: "circuschief --version",
+    level_circuschief_short_h: "circuschief -h",
+    level_circuschief_short_v: "circuschief -v",
+    level_npx_circuschief: "npx circuschief",
+    level_npx_circuschief_port: "npx circuschief -p 8080",
 
     redirect_to_file: "echo hello > file.txt",
     redirect_append: "cat file >> output.txt",

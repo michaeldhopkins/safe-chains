@@ -16,6 +16,13 @@
 
 - Allowed standalone flags: --check-update, --help, --just-check-update, --list-models, --models, --show-prompts, --show-release-notes, --show-repo-map, --version, -V, -h
 
+### `circuschief`
+<p class="cmd-url"><a href="https://github.com/ferrislucas/Circus-Chief">https://github.com/ferrislucas/Circus-Chief</a></p>
+
+- Allowed standalone flags: --help, --no-analytics, --version, -h, -v
+- Allowed valued flags: --port, -p
+- Bare invocation allowed
+
 ### `claude`
 <p class="cmd-url"><a href="https://docs.anthropic.com/en/docs/claude-code">https://docs.anthropic.com/en/docs/claude-code</a></p>
 

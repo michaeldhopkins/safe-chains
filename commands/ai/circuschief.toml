@@ -1,0 +1,10 @@
+[[command]]
+name = "circuschief"
+description = "Circus Chief is a touch-optimized control plane for managing AI coding agents (Claude Code, OpenAI Codex, Google Gemini CLI). The CLI form starts a long-running local web server (default port 5000) that exposes a browser UI from which agents can be launched, restarted, scheduled, and inspected. The server itself spawns child agent processes and writes git worktrees, session history, and project metadata under the user's home directory; it does not modify the working tree until an agent within it makes edits. Bare invocation and `--port`/`-p` and `--no-analytics` start the server; `--help`/`-h` and `--version`/`-v` print and exit without binding a port. Released under Apache-2.0; npm package `circuschief` is the standard distribution channel so `npx circuschief` is the common invocation form."
+url = "https://github.com/ferrislucas/Circus-Chief"
+researched_version = "circuschief @ HEAD on 2026-06-01"
+level = "SafeWrite"
+bare = true
+max_positional = 0
+standalone = ["--help", "--no-analytics", "--version", "-h", "-v"]
+valued = ["--port", "-p"]
