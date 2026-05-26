@@ -1397,6 +1397,13 @@ Aliases: `bunzip2`, `bzcat`, `bzip2recover`
 - Allowed valued flags: -A, -B, -d, -n
 - Bare invocation allowed
 
+### `cancel`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-cancel.html">https://www.cups.org/doc/man-cancel.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -a, -x
+- Allowed valued flags: -U, -h, -u
+- Bare invocation allowed
+
 ### `cap`
 <p class="cmd-url"><a href="https://capacitorjs.com/docs/cli">https://capacitorjs.com/docs/cli</a></p>
 
@@ -5552,6 +5559,46 @@ Aliases: `mlocate`, `plocate`
 - Allowed standalone flags: --alphanum, --ignore-case, -d, -f
 - Allowed valued flags: --terminate, -t
 
+### `lp`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lp.html">https://www.cups.org/doc/man-lp.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -c, -m, -s
+- Allowed valued flags: -H, -P, -U, -d, -h, -i, -n, -o, -q, -t
+
+### `lpoptions`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lpoptions.html">https://www.cups.org/doc/man-lpoptions.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -l
+- Allowed valued flags: -U, -d, -h, -o, -p, -r, -x
+- Bare invocation allowed
+
+### `lpq`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lpq.html">https://www.cups.org/doc/man-lpq.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -a, -l
+- Allowed valued flags: -P, -U, -h
+- Bare invocation allowed
+
+### `lpr`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lpr.html">https://www.cups.org/doc/man-lpr.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -h, -l, -m, -p, -q
+- Allowed valued flags: -#, -C, -H, -J, -P, -T, -U, -o
+
+### `lprm`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lprm.html">https://www.cups.org/doc/man-lprm.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E
+- Allowed valued flags: -P, -U, -h
+- Bare invocation allowed
+
+### `lpstat`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lpstat.html">https://www.cups.org/doc/man-lpstat.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -H, -R, -d, -e, -l, -r, -s, -t, -a, -c, -o, -p, -u, -v
+- Allowed valued flags: -W, -h
+- Bare invocation allowed
+
 ### `ls`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation</a></p>
 
@@ -9499,6 +9546,14 @@ Aliases: `serverless`
 - **show**: Flags: --all, --help, --no-pager, -a, -h. Valued: --property, -p. Positional args accepted
 - **status**: Flags: --all, --full, --help, --lines, --no-pager, -a, -h, -l. Valued: -n, --output, -o. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
+
+### `tabs`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/tabs.1.html">https://man7.org/linux/man-pages/man1/tabs.1.html</a></p>
+
+- Allowed standalone flags: -a, -a2, -c, -c2, -c3, -f, -p, -s, -u
+- Allowed valued flags: -T
+- Bare invocation allowed
+- Numeric shorthand accepted (e.g. -20 for -n 20)
 
 ### `tac`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation</a></p>

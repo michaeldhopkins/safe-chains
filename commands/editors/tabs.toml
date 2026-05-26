@@ -1,0 +1,13 @@
+[[command]]
+name = "tabs"
+description = "Emits terminal escape sequences that clear and reset hardware tab stops at predefined or user-specified columns. Read-only: writes ANSI/curses sequences to stdout and exits; never touches the filesystem or executes other commands. POSIX utility, BSD on macOS; surface frozen for decades."
+url = "https://man7.org/linux/man-pages/man1/tabs.1.html"
+researched_version = "macOS 14 BSD tabs"
+level = "Inert"
+bare = true
+max_positional = 1
+numeric_dash = true
+standalone = [
+    "-a", "-a2", "-c", "-c2", "-c3", "-f", "-p", "-s", "-u",
+]
+valued = ["-T"]
