@@ -109,6 +109,10 @@ Backfill is not feasible for older TOMLs that pre-date the field. The right time
 
 When safe-chains' classification differs from upstream behavior because the upstream changed, the upstream wins: treat the divergence as a follow-up to update our TOML, not a reason to keep our older shape.
 
+### Obsolete entries are fine if they stayed safe
+
+If a subcommand, flag, or task name was removed or renamed in a newer upstream version, you do NOT have to remove it from the allowlist — keep it as long as it cannot become **unsafe** in the latest researched version. A removed task that is now a no-op (or "task not found" error) carries no risk and helps users on older codebases. The bar for removing an obsolete entry is: "the same name now does something unsafe upstream." A short note in the description acknowledging the historical entries (e.g. "db:structure:load/dump date to pre-Rails-6 and are no-ops on current Rails") is preferable to silently dropping them.
+
 ## Documentation style
 
 Doc strings in `command_docs()` must only describe what is **allowed**. This is an allowlist-only program.
