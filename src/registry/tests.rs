@@ -2964,3 +2964,152 @@ valued = ["--type"]
             Verdict::Denied,
         );
     }
+
+    // -------------------------------------------------------------------
+    // eval_safe build-time validation
+    // -------------------------------------------------------------------
+
+    #[test]
+    #[should_panic(expected = "eval_safe_flags` without `eval_safe = true")]
+    fn eval_safe_flags_without_tag_panics_command() {
+        load_one(r#"
+            [[command]]
+            name = "ssh-agent"
+            bare = true
+            eval_safe_flags = ["-s"]
+        "#);
+    }
+
+    #[test]
+    #[should_panic(expected = "eval_safe_flags` without `eval_safe = true")]
+    fn eval_safe_flags_without_tag_panics_sub() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            [[command.sub]]
+            name = "init"
+            eval_safe_flags = ["--shims"]
+        "#);
+    }
+
+    #[test]
+    #[should_panic(expected = "eval_safe = true` at the command level AND")]
+    fn eval_safe_command_with_subs_panics() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            eval_safe = true
+            [[command.sub]]
+            name = "init"
+        "#);
+    }
+
+    #[test]
+    #[should_panic(expected = "eval_safe = true` AND `handler")]
+    fn eval_safe_handler_command_panics() {
+        load_one(r#"
+            [[command]]
+            name = "php"
+            handler = "php"
+            eval_safe = true
+        "#);
+    }
+
+    #[test]
+    #[should_panic(expected = "eval_safe = true` AND `[command.wrapper]")]
+    fn eval_safe_wrapper_command_panics() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            eval_safe = true
+            [command.wrapper]
+            positional_skip = 1
+        "#);
+    }
+
+    #[test]
+    #[should_panic(expected = "deny = true` and `eval_safe = true")]
+    fn eval_safe_with_deny_panics() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            deny = true
+            eval_safe = true
+        "#);
+    }
+
+    #[test]
+    #[should_panic(expected = "eval_safe = true` AND has nested")]
+    fn eval_safe_sub_with_nested_subs_panics() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            [[command.sub]]
+            name = "config"
+            eval_safe = true
+            [[command.sub.sub]]
+            name = "get"
+        "#);
+    }
+
+    #[test]
+    #[should_panic(expected = "eval_safe = true` AND `handler")]
+    fn eval_safe_handler_sub_panics() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            [[command.sub]]
+            name = "init"
+            handler = "php"
+            eval_safe = true
+        "#);
+    }
+
+    #[test]
+    #[should_panic(expected = "eval_safe = true` AND delegates")]
+    fn eval_safe_delegate_sub_panics() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            [[command.sub]]
+            name = "exec"
+            delegate_after = "--"
+            eval_safe = true
+        "#);
+    }
+
+    #[test]
+    fn eval_safe_on_flat_command_builds() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "ssh-agent"
+            bare = true
+            eval_safe = true
+        "#);
+        assert!(spec.eval_safe);
+        assert!(spec.eval_safe_flags.is_empty());
+    }
+
+    #[test]
+    fn eval_safe_on_leaf_sub_builds() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            [[command.sub]]
+            name = "init"
+            bare = false
+            max_positional = 1
+            standalone = ["--shims"]
+            eval_safe = true
+            eval_safe_flags = ["--shims"]
+        "#);
+        // The walker tests live in src/tests.rs and exercise the full
+        // path; here we only confirm the build succeeds for a tagged
+        // leaf sub.
+        let DispatchKind::Branching { subs, .. } = &spec.kind else {
+            panic!("expected branching kind, got {:?}", spec.kind);
+        };
+        let init = subs.iter().find(|s| s.name == "init").expect("init sub");
+        assert!(init.eval_safe);
+        assert_eq!(init.eval_safe_flags, vec!["--shims".to_string()]);
+    }

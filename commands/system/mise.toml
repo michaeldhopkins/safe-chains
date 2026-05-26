@@ -400,6 +400,8 @@ name = "activate"
 bare = true
 max_positional = 1
 standalone = ["--help", "-h", "--shims", "--quiet", "--no-hook-env"]
+eval_safe = true
+eval_safe_flags = ["--shims", "--quiet", "--no-hook-env"]
 
 [[command.sub]]
 name = "deactivate"
