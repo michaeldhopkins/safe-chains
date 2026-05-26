@@ -95,7 +95,7 @@ fn is_safe_grep(tokens: &[Token]) -> Verdict {
 
 pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
     match cmd {
-        "grep" | "egrep" | "fgrep" => Some(is_safe_grep(tokens)),
+        "grep" | "egrep" | "fgrep" | "rgrep" => Some(is_safe_grep(tokens)),
         _ => None,
     }
 }
@@ -103,7 +103,7 @@ pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> O
 pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
     use crate::docs::{DocBuilder, wordset_items};
     vec![
-        crate::docs::CommandDoc::handler("grep / egrep / fgrep",
+        crate::docs::CommandDoc::handler("grep / egrep / fgrep / rgrep",
             "https://www.gnu.org/software/grep/manual/grep.html",
             DocBuilder::new()
                 .wordset(&GREP_STANDALONE)
@@ -149,6 +149,8 @@ mod tests {
         line_regexp: "grep -x 'exact match' file.txt",
         egrep: "egrep 'foo|bar' file.txt",
         fgrep: "fgrep 'literal string' file.txt",
+        rgrep: "rgrep pattern src/",
+        rgrep_with_include: "rgrep --include '*.rs' pattern src/",
         exclude_dir: "grep -r --exclude-dir=node_modules pattern .",
         null_flag: "grep -Z pattern file.txt",
         combined_with_valued: "grep -rnA3 pattern src/",
