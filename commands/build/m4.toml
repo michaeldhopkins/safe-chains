@@ -1,0 +1,10 @@
+[[command]]
+name = "m4"
+description = "General-purpose macro processor with a built-in macro language. The standard GNU M4 distribution exposes the syscmd and esyscmd builtins, which execute arbitrary shell commands from inside an m4 input file — meaning any m4 invocation against attacker-controllable input can run arbitrary code. Reads FILEs (or stdin) and writes the expanded result to stdout. Used heavily inside autotools (autoconf, autoheader, autom4te run m4 internally). Part of GNU M4; very stable, slow-moving project. Excluded from this allowlist; autotools projects invoke m4 via autoconf/autom4te subprocesses which are allowlisted separately."
+url = "https://www.gnu.org/software/m4/manual/"
+researched_version = "GNU M4 1.4.19"
+candidate = true
+
+[[command]]
+name = "M4"
+candidate = true

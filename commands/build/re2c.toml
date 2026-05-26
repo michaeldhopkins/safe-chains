@@ -1,0 +1,32 @@
+[[command]]
+name = "re2c"
+aliases = ["re2d", "re2go", "re2hs", "re2js", "re2ocaml", "re2py", "re2rust", "re2swift", "re2v", "re2zig"]
+description = "Fast lexical analyzer generator. Reads a C/C++ source file containing re2c blocks (or stdin via '-') and writes a generated source file via -o or to stdout. Despite the name, the same binary generates code for several target languages depending on configuration; sibling commands (re2d, re2go, re2hs, re2js, re2ocaml, re2py, re2rust, re2swift, re2v, re2zig) are pre-configured frontends for specific target languages but share the same flag surface. Active project; minor releases every few months."
+url = "https://re2c.org/manual/manual.html"
+researched_version = "re2c 4.0"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_long = true
+standalone = [
+    "--bit-vectors", "--case-insensitive", "--case-inverted",
+    "--case-ranges", "--computed-gotos", "--debug-output",
+    "--dump-adfa", "--dump-cfg", "--dump-closure-stats",
+    "--dump-dfa-det", "--dump-dfa-min", "--dump-dfa-raw",
+    "--dump-dfa-tagopt", "--dump-interf", "--dump-nfa",
+    "--empty-class", "--eof", "--flex-syntax", "--help",
+    "--input-encoding", "--loop-switch", "--nested-ifs",
+    "--no-debug-info", "--no-generation-date", "--no-optimize-tags",
+    "--no-unsafe", "--no-version", "--posix-captures", "--reusable",
+    "--start-conditions", "--stats", "--storable-state", "--tags",
+    "--unicode-group", "--utf8", "--verbose", "--version",
+    "-1", "-8", "-?", "-D", "-F", "-S", "-T", "-V", "-W",
+    "-b", "-c", "-d", "-e", "-f", "-g", "-h", "-i", "-r",
+    "-s", "-u", "-v", "-w", "-x",
+]
+valued = [
+    "--api", "--api-style", "--depfile",
+    "--encoding-policy", "--header", "--include", "--input",
+    "--lang", "--location-format", "--no-warn", "--output",
+    "--posix-prefix", "--skeleton", "--target", "--type-header",
+    "-I", "-o", "-t",
+]

@@ -1,0 +1,29 @@
+[[command]]
+name = "pkgbuild"
+description = "macOS Installer tool that builds a component package (.pkg) from on-disk files. --root packages an entire destination root; --component packages a single bundle; --analyze writes a template component property list. --sign optionally adds a digital signature using a keychain identity. Writes the output package to the path given as the final positional argument. Apple-shipped; surface evolves with macOS releases."
+url = "https://x-stream.github.io/man/macos/pkgbuild.1.html"
+researched_version = "macOS 15 (Sequoia) pkgbuild"
+level = "SafeWrite"
+bare = false
+standalone = ["--analyze", "--help", "--large-payload", "--nopayload", "--quiet", "--timestamp", "-h"]
+valued = [
+    "--cert", "--component", "--component-plist", "--compression",
+    "--filter", "--identifier", "--install-location", "--keychain",
+    "--min-os-version", "--ownership", "--prior", "--root",
+    "--scripts", "--sign", "--version",
+]
+
+[[command]]
+name = "productbuild"
+description = "macOS Installer tool that builds a product archive (.pkg) for the macOS Installer or the Mac App Store. Modes: --component (one bundle), --content (in-app content), --root (destination root), --distribution (assemble from a distribution file and packages), --synthesize (write a distribution file without packaging). --sign optionally adds a digital signature using a keychain identity. Writes the output to the final positional path. Apple-shipped; surface evolves with macOS releases."
+url = "https://x-stream.github.io/man/macos/productbuild.1.html"
+researched_version = "macOS 15 (Sequoia) productbuild"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--large-payload", "--quiet", "--synthesize", "--timestamp", "-h"]
+valued = [
+    "--cert", "--component", "--component-compression", "--content",
+    "--distribution", "--identifier", "--keychain", "--package",
+    "--package-path", "--plugins", "--product", "--resources",
+    "--root", "--scripts", "--sign", "--ui", "--version",
+]
