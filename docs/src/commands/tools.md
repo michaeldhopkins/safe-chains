@@ -1153,10 +1153,10 @@ Aliases: `python`
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `safe-chains`
-<p class="cmd-url"><a href="https://github.com/michaeldhopkins/safe-chains#readme">https://github.com/michaeldhopkins/safe-chains#readme</a></p>
+<p class="cmd-url"><a href="https://github.com/michaeldhopkins/safe-chains">https://github.com/michaeldhopkins/safe-chains</a></p>
 
-- Bare invocation allowed
-- Hyphen-prefixed positional arguments accepted
+- Allowed standalone flags: --help, --list-commands, --list-tools, --version, -V, -h
+- Allowed valued flags: --level
 
 ### `secretlint`
 <p class="cmd-url"><a href="https://github.com/secretlint/secretlint">https://github.com/secretlint/secretlint</a></p>
