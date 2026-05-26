@@ -1,0 +1,13 @@
+[[command]]
+name = "mount"
+description = "Mounts filesystems and, when invoked with no source/target arguments, lists the currently mounted filesystems. Bare `mount` and `mount -t TYPE` (without a source and target) are read-only listing operations on both Linux util-linux mount(8) and macOS mount(8); with one or two positional arguments the command performs a mount system call, which requires root and modifies kernel state. The CLI surface is very stable — util-linux and macOS each ship new flags rarely (years between additions)."
+url = "https://man7.org/linux/man-pages/man8/mount.8.html"
+researched_version = "util-linux 2.40 (2024); macOS 14 mount(8)"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = [
+    "--help", "--show-labels", "--verbose", "--version",
+    "-V", "-h", "-l", "-v",
+]
+valued = ["--test-opts", "--types", "-O", "-t"]

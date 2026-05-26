@@ -3139,6 +3139,13 @@ Aliases: `exa`
 
 - Positional predicates allowed. -exec/-execdir allowed when the executed command is itself safe.
 
+### `findmnt`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/findmnt.8.html">https://man7.org/linux/man-pages/man8/findmnt.8.html</a></p>
+
+- Allowed standalone flags: --all, --ascii, --bytes, --canonicalize, --df, --evaluate, --first-only, --fstab, --help, --invert, --json, --kernel, --list, --mtab, --no-canonicalize, --noheadings, --notruncate, --nofsroot, --pairs, --poll, --raw, --shell, --submounts, --verbose, --verify, --version, -A, -C, -D, -J, -P, -R, -V, -a, -b, -c, -e, -f, -h, -i, -k, -l, -m, -n, -p, -r, -s, -u, -v, -x, -y
+- Allowed valued flags: --direction, --mountpoint, --options, --output, --source, --tab-file, --target, --task, --timeout, --types, -F, -M, -N, -O, -S, -T, -d, -o, -t, -w
+- Bare invocation allowed
+
 ### `firebase`
 <p class="cmd-url"><a href="https://firebase.google.com/docs/cli">https://firebase.google.com/docs/cli</a></p>
 
@@ -5977,6 +5984,18 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 <p class="cmd-url"><a href="https://mosh.org/">https://mosh.org/</a></p>
 
 - Allowed standalone flags: --help, --version, -h
+
+### `mount`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/mount.8.html">https://man7.org/linux/man-pages/man8/mount.8.html</a></p>
+
+- Allowed standalone flags: --help, --show-labels, --verbose, --version, -V, -h, -l, -v
+- Allowed valued flags: --test-opts, --types, -O, -t
+- Bare invocation allowed
+
+### `mountpoint`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/mountpoint.1.html">https://man7.org/linux/man-pages/man1/mountpoint.1.html</a></p>
+
+- Allowed standalone flags: --devno, --fs-devno, --help, --nofollow, --quiet, --show, --version, -V, -d, -h, -q, -x
 
 ### `mprof`
 <p class="cmd-url"><a href="https://github.com/pythonprofilers/memory_profiler">https://github.com/pythonprofilers/memory_profiler</a></p>
