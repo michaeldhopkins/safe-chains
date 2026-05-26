@@ -397,9 +397,9 @@ delegate_after = "--"
 
 [[command.sub]]
 name = "activate"
-bare = false
-max_positional = 0
-standalone = ["--help", "-h"]
+bare = true
+max_positional = 1
+standalone = ["--help", "-h", "--shims", "--quiet", "--no-hook-env"]
 
 [[command.sub]]
 name = "deactivate"
