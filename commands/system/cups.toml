@@ -1,0 +1,73 @@
+[[command]]
+name = "lpstat"
+description = "Queries the CUPS scheduler for printer, class, and job status. Read-only: speaks the IPP protocol over a local socket (or, with `-h`, a remote host) and prints the response. Has no flag that modifies queue or printer state. CUPS has shipped this surface since the late 1990s; flag set has been stable for years."
+url = "https://www.cups.org/doc/man-lpstat.html"
+researched_version = "CUPS 2.4 (2024)"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--version",
+    "-E", "-H", "-R", "-d", "-e", "-l", "-r", "-s", "-t",
+    "-a", "-c", "-o", "-p", "-u", "-v",
+]
+valued = ["-W", "-h"]
+
+[[command]]
+name = "lpq"
+description = "Shows the current print queue for one or more CUPS destinations. Read-only: issues IPP queries to the CUPS daemon and prints the result. Accepts an optional `+interval` positional that polls until the queue empties; that polling is a read loop, not a write. CUPS surface stable for years."
+url = "https://www.cups.org/doc/man-lpq.html"
+researched_version = "CUPS 2.4 (2024)"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-E", "-a", "-l"]
+valued = ["-P", "-U", "-h"]
+
+[[command]]
+name = "lp"
+description = "Submits files to a CUPS print destination via the IPP protocol over a local Unix socket. Locally modifies CUPS queue state on the host; no network egress unless `-h` is used to target a remote server. `-i job-id` operates on an existing job. The CUPS lp surface has been stable across recent releases; modern lp does not have a delete-after-print option (use lpr -r for that, which is deliberately omitted from lpr's allowlist here)."
+url = "https://www.cups.org/doc/man-lp.html"
+researched_version = "CUPS 2.4 (2024)"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--version", "-E", "-c", "-m", "-s"]
+valued = ["-H", "-P", "-U", "-d", "-h", "-i", "-n", "-o", "-q", "-t"]
+
+[[command]]
+name = "lpr"
+description = "BSD-syntax print client that submits files to CUPS over IPP. Locally modifies CUPS queue state. `-r` (delete-the-file-after-print) is omitted from this allowlist because it deletes arbitrary user files at SafeWrite level and is rarely the intent; manual approval is the right gate for it. `-h` here disables the printed banner page (different from lp's `-h`, which is a server address). CUPS surface stable."
+url = "https://www.cups.org/doc/man-lpr.html"
+researched_version = "CUPS 2.4 (2024)"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--version", "-E", "-h", "-l", "-m", "-p", "-q"]
+valued = ["-#", "-C", "-H", "-J", "-P", "-T", "-U", "-o"]
+
+[[command]]
+name = "lprm"
+description = "Cancels one or more print jobs from a CUPS queue via IPP. Modifies local queue state; no filesystem writes. Bare `lprm` cancels the user's most recent job; positional job IDs cancel those specific jobs. CUPS surface stable."
+url = "https://www.cups.org/doc/man-lprm.html"
+researched_version = "CUPS 2.4 (2024)"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--version", "-E"]
+valued = ["-P", "-U", "-h"]
+
+[[command]]
+name = "cancel"
+description = "CUPS-native job-cancel command. `-a` cancels every job on a destination; `-x` purges the job records rather than just cancelling. Modifies local CUPS queue state via IPP; no filesystem writes."
+url = "https://www.cups.org/doc/man-cancel.html"
+researched_version = "CUPS 2.4 (2024)"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--version", "-E", "-a", "-x"]
+valued = ["-U", "-h", "-u"]
+
+[[command]]
+name = "lpoptions"
+description = "Reads or writes the user-level CUPS options file at `~/.cups/lpoptions`, listing per-destination defaults (media size, sides, quality, etc.) or setting them. `-l` is a pure read; the rest of the flags read and write the options file. CUPS surface stable."
+url = "https://www.cups.org/doc/man-lpoptions.html"
+researched_version = "CUPS 2.4 (2024)"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--version", "-E", "-l"]
+valued = ["-U", "-d", "-h", "-o", "-p", "-r", "-x"]

@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1061 commands across 75 categories.
+safe-chains knows 1069 commands across 75 categories.
 
 ## Glossary
 
@@ -40,7 +40,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Data Processing](data.md) (27 commands)
 - [Database Clients](db.md) (40 commands)
 - [.NET](dotnet.md) (21 commands)
-- [Editors](editors.md) (3 commands)
+- [Editors](editors.md) (4 commands)
 - [Elixir / Erlang](elixir.md) (2 commands)
 - [Embedded](embedded.md) (7 commands)
 - [Erlang](erlang.md) (1 commands)
@@ -84,7 +84,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Serverless / IaC](serverless.md) (7 commands)
 - [Swift](swift.md) (1 commands)
 - [System Info](sysinfo.md) (37 commands)
-- [System](system.md) (64 commands)
+- [System](system.md) (71 commands)
 - [TeX / LaTeX](tex.md) (3 commands)
 - [Text Processing](text.md) (29 commands)
 - [Developer Tools](tools.md) (193 commands)

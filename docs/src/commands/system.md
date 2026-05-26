@@ -64,6 +64,13 @@
 - **uses**: Flags: --cask, --formula, --help, --include-build, --include-optional, --include-test, --installed, --missing, --recursive, --skip-recommended, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `cancel`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-cancel.html">https://www.cups.org/doc/man-cancel.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -a, -x
+- Allowed valued flags: -U, -h, -u
+- Bare invocation allowed
+
 ### `cf`
 <p class="cmd-url"><a href="https://cli.cloudfoundry.org/en-US/v8/">https://cli.cloudfoundry.org/en-US/v8/</a></p>
 
@@ -533,6 +540,46 @@ Aliases: `fly`
 - **stats**: Flags: --help, -h
 - **stream**: Flags: --backtrace, --debug, --help, --info, --loss, --mach-continuous-time, --signpost, -h. Valued: --color, --level, --predicate, --process, --source, --style, --timeout, --type
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `lp`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lp.html">https://www.cups.org/doc/man-lp.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -c, -m, -s
+- Allowed valued flags: -H, -P, -U, -d, -h, -i, -n, -o, -q, -t
+
+### `lpoptions`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lpoptions.html">https://www.cups.org/doc/man-lpoptions.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -l
+- Allowed valued flags: -U, -d, -h, -o, -p, -r, -x
+- Bare invocation allowed
+
+### `lpq`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lpq.html">https://www.cups.org/doc/man-lpq.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -a, -l
+- Allowed valued flags: -P, -U, -h
+- Bare invocation allowed
+
+### `lpr`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lpr.html">https://www.cups.org/doc/man-lpr.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -h, -l, -m, -p, -q
+- Allowed valued flags: -#, -C, -H, -J, -P, -T, -U, -o
+
+### `lprm`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lprm.html">https://www.cups.org/doc/man-lprm.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E
+- Allowed valued flags: -P, -U, -h
+- Bare invocation allowed
+
+### `lpstat`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-lpstat.html">https://www.cups.org/doc/man-lpstat.html</a></p>
+
+- Allowed standalone flags: --help, --version, -E, -H, -R, -d, -e, -l, -r, -s, -t, -a, -c, -o, -p, -u, -v
+- Allowed valued flags: -W, -h
+- Bare invocation allowed
 
 ### `make`
 <p class="cmd-url"><a href="https://www.gnu.org/software/make/manual/make.html">https://www.gnu.org/software/make/manual/make.html</a></p>
