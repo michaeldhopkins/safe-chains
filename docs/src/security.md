@@ -8,38 +8,21 @@ Auto-approval of destructive, write, or state-changing commands. An agentic tool
 
 ## Security properties
 
-**Allowlist-only.** Unrecognized commands are never approved.
+- Allowlist-only: unrecognized commands are never approved.
 
-**Per-segment validation.** Commands with shell operators (`&&`, `|`, `;`, `&`) are split into segments. Each segment must independently pass validation. One safe segment cannot cause another to be approved.
+- Per-segment validation: commands with shell operators (`&&`, `|`, `;`, `&`) are split into segments that are independently evaluated. All segments must return safe to approve the command.
 
-**Redirection handling.** Output redirection (`>`, `>>`) to `/dev/null` is `inert`. Output redirection to any other file is allowed at `safe-write` level. Input redirection (`<`), here-strings (`<<<`), and here-documents (`<<`, `<<-`) are allowed.
-
-**Substitution validation.** Command substitutions (`$(...)`) are extracted and recursively validated. `echo $(git log)` is approved because `git log` is safe. `echo $(rm -rf /)` is not. `bash -c` and `sh -c` recursively validate their arguments.
-
-**No shell evaluation.** `eval`, `exec`, `source`, and `.` (dot-source) are never approved when they would execute arbitrary commands.
-
-**Settings guardrails.** When matching commands against your Claude Code settings patterns, segments containing `>`, `<`, backticks, or `$()` are never approved via settings, even if a pattern matches. This prevents `Bash(./script *)` from approving `./script > /etc/passwd`.
+Settings guardrails: when matching commands against your Claude Code settings patterns, segments containing `>`, `<`, backticks, or `$()` are never approved via settings, even if a pattern matches. This prevents `Bash(./script *)` from approving `./script > /etc/passwd`.
 
 ## What it does not prevent
 
-- **Information disclosure.** Read-only commands can read sensitive files (`cat ~/.ssh/id_rsa`). Sensitive contents would be read by the model provider. We recommend pairing safe-chains with a hook to block reading `~/.ssh`, `../credentials` and similar directories.
-- **Unrecognized commands.** Commands safe-chains doesn't handle are passed through to the normal permission flow, not blocked.
-- **Broad user-approved patterns.** If you add patterns like `Bash(bash *)` to your Claude Code settings, safe-chains will match them per-segment without recursive validation, matching Claude Code's own behavior. See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands).
-
-## What safe-chains is not
-
-- **Not a sandbox.** It does not restrict what commands can do once they run. It only decides whether to auto-approve the permission prompt.
-- **Not a firewall.** While unsafe commands are not approved, it does not filter at the network layer or file system operations layer.
-- **Not an inspection tool.** It evaluates based on path, args and flags, not binary signatures.
+- Information disclosure: read-only commands can read sensitive files (`cat ~/.ssh/id_rsa`). Sensitive contents would be read by the model provider. We recommend pairing safe-chains with a hook to block reading `~/.ssh`, `../credentials` and similar directories.
+- Unrecognized commands: commands safe-chains doesn't handle are passed through to the normal permission flow for your harness.
+- Chaining with broad approvals: if you add patterns like `Bash(bash *)` to your Claude Code settings, safe-chains will match them per-segment without recursive validation, matching Claude Code's own behavior. See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands).
 
 ## Testing approach
 
-Every command handler is covered by multiple layers of automated testing:
-
-- **Unknown flag rejection.** Every command is automatically tested to verify it rejects unknown flags and subcommands.
-- **Property verification.** Systematic tests verify that `help_eligible` declarations match actual behavior, that `bare=false` policies reject bare invocations, that guarded subcommands require their guard flags, and that nested subcommands reject bare parent invocations.
-- **Per-handler tests.** Each handler includes explicit safe/denied test cases covering expected approvals and rejections.
-- **Examples lock-in.** TOML commands can declare `examples_safe` and `examples_denied` invocations. A test runs each through the dispatcher and fails if any example produces the wrong verdict — catching regressions where an alias stops working or a security boundary loosens.
+Every command handler is covered by multiple layers of automated testing. Each handler includes explicit safe/denied test cases covering expected approvals and rejections. Every command has a spec suite. Every *type* of data definition in safe-chains has a test suite. 
 
 ## Reporting vulnerabilities
 
