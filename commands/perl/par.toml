@@ -1,0 +1,44 @@
+[[command]]
+name = "pp"
+description = "PAR Packager (the user-facing tool of the PAR module ecosystem). Reads one or more Perl scripts and bundles them, plus their detected module dependencies, into a single executable file (or a .par archive with -p, or a self-extracting Perl script with -P). The -e/-E flag packages a one-liner string; -c runs `perl -c file` to check syntax during dependency detection; -x actually executes the script under perl while scanning. The whole tool's purpose is to write executable output to disk under -o filename. PAR is a niche but actively maintained CPAN distribution; recent releases come every year or two."
+url = "https://metacpan.org/pod/pp"
+researched_version = "PAR-Packer 1.060"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--addlist", "--bundle", "--clean", "--compile", "--compress",
+    "--dependent", "--evalfeature", "--execute", "--force", "--gui",
+    "--help", "--lib", "--multiarch", "--noscan", "--par", "--perlscript",
+    "--reusable", "--run", "--save", "--sign", "--verbose", "--version",
+    "--warning",
+    "-B", "-C", "-S", "-T", "-V", "-X", "-c", "-d", "-g", "-h",
+    "-n", "-p", "-r", "-s", "-u", "-v", "-z",
+]
+valued = [
+    "--addfile", "--cachedeps", "--cipher", "--eval", "--filter",
+    "--icon", "--info", "--link", "--log", "--manifest", "--modfilter",
+    "--module", "--output", "--tempcache", "--xargs",
+    "-A", "-E", "-F", "-I", "-L", "-M", "-N", "-a", "-cd", "-e",
+    "-f", "-i", "-l", "-m", "-o", "-x",
+]
+
+[[command]]
+name = "par.pl"
+description = "PAR archive runner and packer (Perl implementation). Runs scripts inside a .par archive (-A foo.par MYSCRIPT), pre-loads .par files into @INC (-I), packs a CPAN dist into a PAR distribution (-p), or makes a self-contained Perl script from a .par (-O FILE). The -i / -s / -v / -u forms install / sign / verify / uninstall PAR distributions and accept URLs or `cpan://` references — those are network operations and are excluded here. The local pack/run forms are SafeWrite (they create files in the working tree). PAR distribution releases ~yearly."
+url = "https://metacpan.org/pod/par.pl"
+researched_version = "PAR 1.020"
+level = "SafeWrite"
+bare = false
+standalone = ["-B", "-b", "-h", "-p"]
+valued = ["-A", "-I", "-M", "-O"]
+
+[[command]]
+name = "parl"
+description = "Compiled-C variant of par.pl with the same surface. Runs scripts inside .par archives (-A), pre-loads .par files (-I), packs a CPAN dist (-p), or builds a stand-alone binary from a .par (-O FILE). The install / sign / verify / uninstall forms (-i, -s, -v, -u) accept URLs and `cpan://` references and are excluded here. Local pack/run forms are SafeWrite. Distributed with PAR-Packer."
+url = "https://metacpan.org/pod/parl"
+researched_version = "PAR-Packer 1.060"
+level = "SafeWrite"
+bare = false
+standalone = ["-B", "-b", "-h", "-p"]
+valued = ["-A", "-I", "-M", "-O"]

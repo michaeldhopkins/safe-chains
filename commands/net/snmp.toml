@@ -1,0 +1,217 @@
+[[command]]
+name = "snmpbulkget"
+description = "Issues an SNMP GETBULK request to a network entity and prints the returned variables. Read-only at the agent level (GETBULK is a query). Generates network traffic. SNMPv3 authentication and privacy passphrases may appear on the command line. Part of Net-SNMP; the common-options surface is documented in snmpcmd(1) and is shared across all Net-SNMP query tools. Releases roughly yearly."
+url = "https://net-snmp.sourceforge.io/docs/man/snmpbulkget.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = [
+    "-d", "-h", "--help", "-H", "-V", "--version",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-r", "-t", "-v", "-Y",
+    "-l", "-n",
+    "-a", "-A", "-e", "-E", "-u", "-x", "-X", "-Z",
+    "-c",
+    "-Cn", "-Cr",
+]
+
+[[command]]
+name = "snmpbulkwalk"
+description = "Walks an OID subtree by issuing SNMP GETBULK requests, printing each variable encountered. Read-only at the agent level. Generates network traffic. SNMPv3 authentication and privacy passphrases may appear on the command line. Part of Net-SNMP; the common-options surface is documented in snmpcmd(1)."
+url = "https://net-snmp.sourceforge.io/docs/man/snmpbulkwalk.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = [
+    "-d", "-h", "--help", "-H", "-V", "--version",
+    "-Cc", "-Ci", "-Cp",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-r", "-t", "-v", "-Y",
+    "-l", "-n",
+    "-a", "-A", "-e", "-E", "-u", "-x", "-X", "-Z",
+    "-c",
+    "-Cn", "-Cr",
+]
+
+[[command]]
+name = "snmpdelta"
+description = "Polls integer OIDs over SNMP at intervals and reports deltas between successive readings. Read-only at the agent level. Generates repeated network traffic for the duration of the run. The -Cl flag would write per-instance config files to the current working directory and is excluded here. Part of Net-SNMP; the common-options surface is documented in snmpcmd(1)."
+url = "https://net-snmp.sourceforge.io/docs/man/snmpdelta.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = [
+    "-d", "-h", "--help", "-H", "-V", "--version",
+    "-Cf", "-Ct", "-Cs", "-CS", "-Cm", "-Ck", "-CT",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-r", "-t", "-v", "-Y",
+    "-l", "-n",
+    "-a", "-A", "-e", "-E", "-u", "-x", "-X", "-Z",
+    "-c",
+    "-CF", "-Cp", "-CP", "-Cv",
+]
+
+[[command]]
+name = "snmpdf"
+description = "Networked df: queries a remote SNMP agent's hrStorageTable (or dskTable with -Cu) and prints disk usage on the remote host. Read-only at the agent level. Generates network traffic. Part of Net-SNMP; the common-options surface is documented in snmpcmd(1)."
+url = "https://net-snmp.sourceforge.io/docs/man/snmpdf.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = [
+    "-d", "-h", "--help", "-H", "-V", "--version",
+    "-Cu",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-r", "-t", "-v", "-Y",
+    "-l", "-n",
+    "-a", "-A", "-e", "-E", "-u", "-x", "-X", "-Z",
+    "-c",
+]
+
+[[command]]
+name = "snmpget"
+description = "Issues an SNMP GET request for one or more OIDs and prints the returned variables. Read-only at the agent level. Generates network traffic. SNMPv3 authentication and privacy passphrases may appear on the command line. Part of Net-SNMP; the common-options surface is documented in snmpcmd(1)."
+url = "https://net-snmp.sourceforge.io/docs/man/snmpget.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = [
+    "-d", "-h", "--help", "-H", "-V", "--version",
+    "-Cf",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-r", "-t", "-v", "-Y",
+    "-l", "-n",
+    "-a", "-A", "-e", "-E", "-u", "-x", "-X", "-Z",
+    "-c",
+]
+
+[[command]]
+name = "snmpgetnext"
+description = "Issues an SNMP GETNEXT request for one or more OIDs and prints the lexicographically next variable for each. Read-only at the agent level. Generates network traffic. Part of Net-SNMP; the common-options surface is documented in snmpcmd(1)."
+url = "https://net-snmp.sourceforge.io/docs/man/snmpgetnext.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = [
+    "-d", "-h", "--help", "-H", "-V", "--version",
+    "-Cf",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-r", "-t", "-v", "-Y",
+    "-l", "-n",
+    "-a", "-A", "-e", "-E", "-u", "-x", "-X", "-Z",
+    "-c",
+]
+
+[[command]]
+name = "snmpnetstat"
+description = "Networked netstat: queries a remote SNMP agent and displays socket lists, interface statistics, routing tables, and per-protocol counters. Read-only at the agent level. Generates network traffic. Part of Net-SNMP; the common-options surface is documented in snmpcmd(1)."
+url = "https://net-snmp.sourceforge.io/docs/man/snmpnetstat.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = [
+    "-d", "-h", "--help", "-H", "-V", "--version",
+    "-Ca", "-Cn", "-Ci", "-Co", "-Cr", "-Cs",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-r", "-t", "-v", "-Y",
+    "-l", "-n",
+    "-a", "-A", "-e", "-E", "-u", "-x", "-X", "-Z",
+    "-c",
+    "-CI", "-Cp",
+]
+
+[[command]]
+name = "snmpstatus"
+description = "Issues a fixed series of SNMP queries and prints a summary line for an agent (description, uptime, packet counters, interface up/down state). Read-only at the agent level. Generates network traffic. Part of Net-SNMP; the common-options surface is documented in snmpcmd(1)."
+url = "https://net-snmp.sourceforge.io/docs/man/snmpstatus.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = [
+    "-d", "-h", "--help", "-H", "-V", "--version",
+    "-Cf",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-r", "-t", "-v", "-Y",
+    "-l", "-n",
+    "-a", "-A", "-e", "-E", "-u", "-x", "-X", "-Z",
+    "-c",
+]
+
+[[command]]
+name = "snmptable"
+description = "Walks an SNMP table OID and renders the results as a formatted table. Read-only at the agent level. Generates network traffic. Part of Net-SNMP; the common-options surface is documented in snmpcmd(1)."
+url = "https://net-snmp.sourceforge.io/docs/man/snmptable.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = [
+    "-d", "-h", "--help", "-H", "-V", "--version",
+    "-Cb", "-CB", "-Ch", "-CH", "-Ci", "-Cl",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-r", "-t", "-v", "-Y",
+    "-l", "-n",
+    "-a", "-A", "-e", "-E", "-u", "-x", "-X", "-Z",
+    "-c",
+    "-Cc", "-Cf", "-Cr", "-Cw",
+]
+
+[[command]]
+name = "snmptest"
+description = "Interactive SNMP request tool. Prompts for variables to query and sends GET/GETNEXT/SET requests to an agent. The interactive prompt can issue SET requests, which write to the remote agent; misuse depends on the user's choices at the prompt. Read-only on the local filesystem. Generates network traffic. Part of Net-SNMP; the common-options surface is documented in snmpcmd(1)."
+url = "https://net-snmp.sourceforge.io/docs/man/snmptest.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = [
+    "-d", "-h", "--help", "-H", "-V", "--version",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-r", "-t", "-v", "-Y",
+    "-l", "-n",
+    "-a", "-A", "-e", "-E", "-u", "-x", "-X", "-Z",
+    "-c",
+]
+
+[[command]]
+name = "snmptranslate"
+description = "Local MIB translation tool. Converts SNMP OIDs between numeric and symbolic forms, dumps MIB structure, and prints details about MIB objects. Does not connect to any agent — all work is local against the loaded MIB modules. Read-only on the local filesystem. Part of Net-SNMP."
+url = "https://net-snmp.sourceforge.io/docs/man/snmptranslate.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = true
+standalone = [
+    "-h", "--help", "-V", "--version",
+    "-Td", "-Tp", "-Ta", "-Tl", "-To", "-Ts", "-Tt", "-Tz", "-Tb", "-Tn",
+    "-On", "-Of", "-Os", "-OS", "-OU",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-w",
+]
+
+[[command]]
+name = "snmpwalk"
+description = "Walks an OID subtree by issuing SNMP GETNEXT requests and prints each variable encountered. Read-only at the agent level. Generates network traffic. SNMPv3 authentication and privacy passphrases may appear on the command line. Part of Net-SNMP; the common-options surface is documented in snmpcmd(1)."
+url = "https://net-snmp.sourceforge.io/docs/man/snmpwalk.html"
+researched_version = "Net-SNMP 5.9.4"
+level = "Inert"
+bare = false
+standalone = [
+    "-d", "-h", "--help", "-H", "-V", "--version",
+    "-Cc", "-Ci", "-CI", "-Cp", "-Ct",
+]
+valued = [
+    "-D", "-I", "-L", "-m", "-M", "-O", "-P", "-r", "-t", "-v", "-Y",
+    "-l", "-n",
+    "-a", "-A", "-e", "-E", "-u", "-x", "-X", "-Z",
+    "-c",
+    "-CE",
+]

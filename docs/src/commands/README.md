@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1094 commands across 75 categories.
+safe-chains knows 1158 commands across 75 categories.
 
 ## Glossary
 
@@ -26,7 +26,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Blockchain / Crypto](blockchain.md) (20 commands)
 - [Build Systems](build.md) (5 commands)
 - [Shell Builtins](builtins.md) (22 commands)
-- [C / C++](c.md) (7 commands)
+- [C / C++](c.md) (9 commands)
 - [Clipboard](clipboard.md) (3 commands)
 - [Cloud Providers](cloud.md) (10 commands)
 - [Compilation Toolchains](compile.md) (24 commands)
@@ -62,14 +62,14 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Database Migrations](migrations.md) (6 commands)
 - [ML / Observability](ml.md) (7 commands)
 - [Mobile Frameworks](mobile.md) (5 commands)
-- [Networking](net.md) (45 commands)
+- [Networking](net.md) (71 commands)
 - [Niche / Esoteric](niche.md) (3 commands)
 - [Nim](nim.md) (2 commands)
 - [Nix](nix.md) (12 commands)
 - [Node.js](node.md) (16 commands)
 - [OCaml](ocaml.md) (3 commands)
 - [PDF / Document](pdf.md) (27 commands)
-- [Perl](perl.md) (4 commands)
+- [Perl](perl.md) (40 commands)
 - [PHP](php.md) (7 commands)
 - [Package Managers](pm.md) (5 commands)
 - [Theorem Provers](proof.md) (8 commands)

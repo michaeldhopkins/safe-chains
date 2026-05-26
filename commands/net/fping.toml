@@ -1,0 +1,25 @@
+[[command]]
+name = "fping"
+description = "ICMP echo probe for many hosts in parallel. Sends ECHO_REQUEST packets to one or more targets (or a generated address range, or a list read from a file) and reports which are alive. Read-only with respect to the filesystem; generates ICMP network traffic. Without -c/-C (count) or -x/-X (reachable thresholds), -l (loop) runs indefinitely. May require setuid/raw socket privileges on some systems. Releases roughly twice a year."
+url = "https://www.fping.org/"
+researched_version = "fping 5.5"
+level = "Inert"
+bare = false
+require_any = ["-c", "--count", "-C", "--vcount", "-x", "--reachable", "-X", "--fast-reachable"]
+standalone = [
+    "--help", "--version",
+    "--ipv4", "--ipv6", "--alive", "--addr", "--rdns",
+    "--timestamp", "--elapsed", "--dontfrag", "--name",
+    "--netdata", "--outage", "--quiet", "--random", "--stats",
+    "--unreach", "--loop", "--all",
+    "-4", "-6", "-a", "-A", "-d", "-D", "-e", "-h",
+    "-l", "-M", "-m", "-n", "-N", "-o", "-q", "-R", "-s", "-u", "-v",
+]
+valued = [
+    "--size", "--backoff", "--count", "--vcount", "--file",
+    "--generate", "--ttl", "--iface", "--interval", "--tos",
+    "--period", "--squiet", "--retry", "--src", "--timeout",
+    "--reachable", "--fast-reachable",
+    "-b", "-B", "-c", "-C", "-f", "-g", "-H", "-i", "-I",
+    "-O", "-p", "-Q", "-r", "-S", "-t", "-T", "-x", "-X",
+]

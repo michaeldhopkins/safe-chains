@@ -1,0 +1,13 @@
+[[command]]
+name = "xsubpp"
+description = "XS-to-C compiler — reads a .xs file and emits the C glue code that wraps Perl-callable XSUBs around C functions. Output is written to --output FILE or stdout. Normally invoked by ExtUtils::MakeMaker / Module::Build during a module build, but can be run by hand. Bundled with Perl core (ExtUtils-ParseXS distribution); the CLI surface is small and stable across Perl 5 releases."
+url = "https://metacpan.org/pod/distribution/ExtUtils-ParseXS/lib/ExtUtils/ParseXS.pm"
+researched_version = "ExtUtils-ParseXS 3.x (Perl 5.34+ bundled)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-C++", "-except", "-hiertype", "-noargtypes", "-noinout",
+    "-nolinenumbers", "-nooptimize", "-noversioncheck", "-prototypes",
+    "-v",
+]
+valued = ["-output", "-s", "-strip", "-typemap"]

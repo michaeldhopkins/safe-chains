@@ -1,0 +1,19 @@
+[[command]]
+name = "headerdoc2html"
+description = "Apple HeaderDoc processor (Perl implementation) that parses C/C++/Objective-C header files looking for specially formatted /*! ... */ comments and emits an HTML documentation tree to the directory named by -o (default: current directory). Implementation dates to the early 2000s; Apple has effectively superseded it with DocC but still ships the binary in macOS. Surface is frozen."
+url = "https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/"
+researched_version = "macOS 14 (HeaderDoc tool, 2003-era)"
+level = "SafeWrite"
+bare = false
+standalone = ["-H", "-X", "-d", "-h", "-p", "-q", "-u", "-v", "-x"]
+valued = ["-o"]
+
+[[command]]
+name = "gatherheaderdoc"
+description = "Apple HeaderDoc index-page generator. Given a directory containing headerdoc2html output, writes an HTML index page linking to each header's docs. Same vintage and ship channel as headerdoc2html; surface is one positional and effectively frozen."
+url = "https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/"
+researched_version = "macOS 14 (HeaderDoc tool, 2003-era)"
+level = "SafeWrite"
+bare = false
+max_positional = 2
+standalone = ["-h"]

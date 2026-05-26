@@ -1,0 +1,85 @@
+[[command]]
+name = "pod2html"
+description = "POD-to-HTML converter (Pod::Html frontend). Reads POD source from --infile or stdin and writes HTML to --outfile or stdout. --cachedir creates and writes a cache file. The tool defaults to stdout but supports --outfile and --cachedir; classified at the higher level. Bundled with Perl core (Pod-Html distribution); surface stable for years."
+url = "https://metacpan.org/pod/pod2html"
+researched_version = "Pod-Html 1.33 (Perl 5.34+ bundled)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--backlink", "--flush", "--header", "--help", "--index",
+    "--nobacklink", "--noheader", "--noindex", "--nopoderrors",
+    "--noquiet", "--norecurse", "--noverbose", "--poderrors", "--quiet",
+    "--recurse", "--verbose",
+]
+valued = [
+    "--cachedir", "--css", "--htmldir", "--htmlroot", "--infile",
+    "--outfile", "--podpath", "--podroot", "--title",
+]
+
+[[command]]
+name = "pod2man"
+description = "POD-to-*roff converter (Pod::Man frontend) for generating manual pages. Reads POD from a positional input file (or stdin) and writes nroff/troff to a positional output file or stdout. Accepts pairs of input/output for batch conversion. Defaults to stdout but writes files when output positionals are present; classified at the higher level. Bundled with Perl core (podlators distribution); active maintenance, occasional minor releases."
+url = "https://metacpan.org/pod/pod2man"
+researched_version = "podlators 4.14 (Perl 5.34+ bundled)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--help", "--lax", "--nourls", "--official", "--stderr", "--utf8",
+    "--verbose", "-h", "-l", "-o", "-u", "-v",
+]
+valued = [
+    "--center", "--date", "--errors", "--fixed", "--fixedbold",
+    "--fixedbolditalic", "--fixeditalic", "--lquote", "--name",
+    "--quotes", "--release", "--rquote", "--section",
+    "-c", "-d", "-n", "-q", "-r", "-s",
+]
+
+[[command]]
+name = "pod2text"
+description = "POD-to-plain-text converter (Pod::Text frontend). Reads POD from positional input (or stdin) and writes plain ASCII (optionally ANSI-colored or termcap-styled) to positional output or stdout. Defaults to stdout but supports output filenames as positionals; classified at the higher level. Bundled with Perl core (podlators distribution)."
+url = "https://metacpan.org/pod/pod2text"
+researched_version = "podlators 4.14 (Perl 5.34+ bundled)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--alt", "--code", "--color", "--help", "--loose", "--nourls",
+    "--overstrike", "--sentence", "--stderr", "--termcap", "--utf8",
+    "-a", "-c", "-h", "-l", "-o", "-s", "-t", "-u",
+]
+valued = [
+    "--errors", "--indent", "--left-margin", "--margin", "--quotes",
+    "--width",
+    "-i", "-m", "-q", "-w",
+]
+
+[[command]]
+name = "pod2usage"
+description = "Pod::Usage frontend that prints the SYNOPSIS / OPTIONS section of a POD document as a usage message. Reads from a positional input file or stdin and writes to --output or stdout. Bundled with Perl core (Pod-Usage distribution)."
+url = "https://metacpan.org/pod/pod2usage"
+researched_version = "Pod-Usage 2.x (Perl 5.34+ bundled)"
+level = "SafeWrite"
+bare = true
+standalone = ["-help", "-man", "-utf8"]
+valued = ["-exit", "-formatter", "-output", "-pathlist", "-verbose"]
+
+[[command]]
+name = "pod2readme"
+description = "Pod::Readme frontend that extracts the README-relevant POD from a Perl module file and writes it as text, markdown, html, or another format. Default target is a README file in the current directory; --stdout prints to stdout instead, --output overrides the filename, --backup keeps a backup of any overwritten file. Distributed as Pod-Readme on CPAN; surface stable since 1.x."
+url = "https://metacpan.org/pod/pod2readme"
+researched_version = "Pod-Readme 1.2.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--backup", "--force", "--help", "--no-backup", "--stdout",
+    "-F", "-b", "-c", "-h",
+]
+valued = ["--format", "--output", "--target", "-f", "-o", "-t"]
+
+[[command]]
+name = "podchecker"
+description = "POD-syntax linter built on Pod::Checker. Reads each given file (or stdin) and prints syntax-error diagnostics to stderr; exit status reports whether errors were found (0 ok, 1 syntax errors, 2 no POD content). Read-only. --warnings/--nowarnings tune the warning level. Ships with Perl core (Pod-Checker distribution); surface is three flags and effectively frozen."
+url = "https://metacpan.org/pod/podchecker"
+researched_version = "Pod-Checker 1.74"
+level = "Inert"
+bare = true
+standalone = ["--help", "--man", "--nowarnings", "--warnings"]

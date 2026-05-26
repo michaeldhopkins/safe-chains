@@ -1,0 +1,9 @@
+[[command]]
+name = "config_data"
+description = "Module::Build helper that queries (and, in modes excluded here, mutates) the `Foo::ConfigData` package shipped with Perl modules built via Module::Build. The --module flag selects the module; --feature NAME prints whether a boolean feature is enabled; --config NAME prints the Data::Dumper representation of a configuration value. The mutation forms (--set_feature, --set_config, --eval) rewrite the on-disk ConfigData module and are not modelled here. Module::Build is in long-term maintenance mode on CPAN; CLI surface is stable."
+url = "https://metacpan.org/pod/distribution/Module-Build/scripts/config_data"
+researched_version = "Module-Build 0.4234"
+level = "Inert"
+bare = false
+standalone = ["--help"]
+valued = ["--config", "--feature", "--module"]

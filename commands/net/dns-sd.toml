@@ -1,0 +1,13 @@
+[[command]]
+name = "dns-sd"
+description = "Multicast DNS (mDNS) and DNS Service Discovery (DNS-SD) test tool. Issues mDNS queries or browses for advertised services on the local link; can also register or proxy-advertise services, which announce content on the network. The flag selects the operation: -E/-F list browse/registration domains, -B browses for services of a type, -L looks up a specific service, -q queries any DNS name, -G resolves a name to addresses, -Z dumps a zone-file rendering, -V prints the daemon version. Register (-R), proxy (-P), and record-registration variants modify what other devices see on the network and are excluded here. Ships with macOS; the flag surface has been frozen for years."
+url = "https://developer.apple.com/library/archive/documentation/Networking/Conceptual/dns_discovery_api/Introduction.html"
+researched_version = "macOS 14 (Sonoma), surface frozen"
+level = "Inert"
+bare = false
+require_any = ["-E", "-F", "-B", "-L", "-q", "-G", "-Z", "-V"]
+max_positional = 3
+standalone = [
+    "-E", "-F", "-B", "-L", "-q", "-G", "-Z", "-V",
+    "-4", "-6",
+]

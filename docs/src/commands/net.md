@@ -52,6 +52,13 @@
 - -H/--header allowed with safe headers (Accept, User-Agent, Authorization, Cookie, Cache-Control, Range, etc.).
 - -o/--output and -O/--remote-name allowed (writes files).
 
+### `delv`
+<p class="cmd-url"><a href="https://bind9.readthedocs.io/en/latest/manpages.html#delv-dns-lookup-and-validation-utility">https://bind9.readthedocs.io/en/latest/manpages.html#delv-dns-lookup-and-validation-utility</a></p>
+
+- Allowed standalone flags: -4, -6, -h, -i, -m, -v
+- Allowed valued flags: -a, -b, -c, -d, -p, -q, -t, -x
+- Bare invocation allowed
+
 ### `dig`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/dig.1.html">https://man7.org/linux/man-pages/man1/dig.1.html</a></p>
 
@@ -59,10 +66,21 @@
 - Allowed valued flags: -b, -c, -f, -k, -p, -q, -t, -x, -y
 - Bare invocation allowed
 
+### `dns-sd`
+<p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/Networking/Conceptual/dns_discovery_api/Introduction.html">https://developer.apple.com/library/archive/documentation/Networking/Conceptual/dns_discovery_api/Introduction.html</a></p>
+
+- Requires -E, -F, -B, -L, -q, -G, -Z, -V. - Allowed standalone flags: -E, -F, -B, -L, -q, -G, -Z, -V, -4, -6
+
 ### `envoy`
 <p class="cmd-url"><a href="https://www.envoyproxy.io/docs/envoy/latest/operations/cli">https://www.envoyproxy.io/docs/envoy/latest/operations/cli</a></p>
 
 - Allowed standalone flags: --help, --version, --hot-restart-version, -h, -?
+
+### `fping`
+<p class="cmd-url"><a href="https://www.fping.org/">https://www.fping.org/</a></p>
+
+- Requires -c, --count, -C, --vcount, -x, --reachable, -X, --fast-reachable. - Allowed standalone flags: --help, --version, --ipv4, --ipv6, --alive, --addr, --rdns, --timestamp, --elapsed, --dontfrag, --name, --netdata, --outage, --quiet, --random, --stats, --unreach, --loop, --all, -4, -6, -a, -A, -d, -D, -e, -h, -l, -M, -m, -n, -N, -o, -q, -R, -s, -u, -v
+- Allowed valued flags: --size, --backoff, --count, --vcount, --file, --generate, --ttl, --iface, --interval, --tos, --period, --squiet, --retry, --src, --timeout, --reachable, --fast-reachable, -b, -B, -c, -C, -f, -g, -H, -i, -I, -O, -p, -Q, -r, -S, -t, -T, -x, -X
 
 ### `grpcurl`
 <p class="cmd-url"><a href="https://github.com/fullstorydev/grpcurl">https://github.com/fullstorydev/grpcurl</a></p>
@@ -101,6 +119,26 @@
 - Allowed standalone flags: --help, --version, -L, -V, -a, -h, -l, -s, -v
 - Bare invocation allowed
 
+### `ip2cc`
+<p class="cmd-url"><a href="https://metacpan.org/dist/IP-Country">https://metacpan.org/dist/IP-Country</a></p>
+
+- Bare invocation allowed
+
+### `ipconfig`
+<p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/Networking/Conceptual/SystemConfigFrameworks/SC_Intro/SC_Intro.html">https://developer.apple.com/library/archive/documentation/Networking/Conceptual/SystemConfigFrameworks/SC_Intro/SC_Intro.html</a></p>
+
+- **getdhcpduid**
+- **getdhcpiaid**
+- **getifaddr**
+- **getiflist**
+- **getoption**
+- **getpacket**
+- **getra**
+- **getsummary**
+- **getv6packet**
+- **ifcount**
+- **waitall**
+
 ### `ipfs`
 <p class="cmd-url"><a href="https://docs.ipfs.tech/reference/kubo/cli/">https://docs.ipfs.tech/reference/kubo/cli/</a></p>
 
@@ -132,6 +170,45 @@
 - **swarm peers**: Positional args accepted
 - **version**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `ippfind`
+<p class="cmd-url"><a href="https://openprinting.github.io/cups/doc/man-ippfind.html">https://openprinting.github.io/cups/doc/man-ippfind.html</a></p>
+
+- Allowed standalone flags: --help, --version, --false, --ls, --local, --print, --print-name, --quiet, --remote, --true, --not, --and, --or, -4, -6, -l, -p, -q, -r, -s
+- Allowed valued flags: --domain, --host, --literal-name, --name, --path, --port, --txt, --uri, -T, -V, -N, -P, -d, -h, -n, -t, -u
+- Bare invocation allowed
+
+### `ipptool`
+<p class="cmd-url"><a href="https://openprinting.github.io/cups/doc/man-ipptool.html">https://openprinting.github.io/cups/doc/man-ipptool.html</a></p>
+
+- Allowed standalone flags: --help, --stop-after-include-error, --version, -4, -6, -C, -E, -I, -L, -S, -X, -c, -h, -l, -q, -t, -v
+- Allowed valued flags: -T, -V, -d, -f, -i, -n
+
+### `ldapcompare`
+<p class="cmd-url"><a href="https://www.openldap.org/software/man.cgi?query=ldapcompare">https://www.openldap.org/software/man.cgi?query=ldapcompare</a></p>
+
+- Allowed standalone flags: -n, -v, -z, -M, -MM, -x, -W, -I, -Q, -Z, -ZZ
+- Allowed valued flags: -d, -D, -w, -y, -H, -h, -p, -P, -e, -E, -O, -U, -R, -X, -Y
+
+### `ldapsearch`
+<p class="cmd-url"><a href="https://www.openldap.org/software/man.cgi?query=ldapsearch">https://www.openldap.org/software/man.cgi?query=ldapsearch</a></p>
+
+- Allowed standalone flags: -n, -c, -u, -v, -A, -M, -MM, -L, -LL, -LLL, -x, -W, -I, -Q, -Z, -ZZ
+- Allowed valued flags: -S, -d, -f, -D, -w, -y, -H, -h, -p, -b, -s, -a, -P, -e, -E, -l, -z, -O, -U, -R, -X, -Y
+- Bare invocation allowed
+
+### `ldapurl`
+<p class="cmd-url"><a href="https://www.openldap.org/software/man.cgi?query=ldapurl">https://www.openldap.org/software/man.cgi?query=ldapurl</a></p>
+
+- Allowed valued flags: -a, -b, -e, -E, -f, -H, -h, -p, -s, -S
+- Bare invocation allowed
+
+### `ldapwhoami`
+<p class="cmd-url"><a href="https://www.openldap.org/software/man.cgi?query=ldapwhoami">https://www.openldap.org/software/man.cgi?query=ldapwhoami</a></p>
+
+- Allowed standalone flags: -n, -v, -z, -x, -W, -I, -Q, -Z, -ZZ
+- Allowed valued flags: -d, -D, -w, -y, -H, -h, -p, -e, -E, -O, -U, -R, -X, -Y
+- Bare invocation allowed
 
 ### `masscan`
 <p class="cmd-url"><a href="https://github.com/robertdavidgraham/masscan">https://github.com/robertdavidgraham/masscan</a></p>
@@ -200,6 +277,13 @@
 - Allowed valued flags: --burst-delay, --burst-rate, --connect-to, --dns-resolver, --dump-urls, --exit-stage-key, --ip-strategy, --max-redirects, --method, --output-format, --proxy, --proxy-http-version, --proxy-username, --proxy-password, --rand-regex-url, --redirect, --redirect-uri, --reproduce-rng-seed, --timeout, --unix-socket, --user-agent, --wait-ongoing-requests-after-deadline, -A, -D, -H, -T, -U, -c, -d, -m, -n, -q, -r, -t, -z
 - Hyphen-prefixed positional arguments accepted
 
+### `pcp-htop`
+<p class="cmd-url"><a href="https://man.archlinux.org/man/pcp-htop.1.en">https://man.archlinux.org/man/pcp-htop.1.en</a></p>
+
+- Allowed standalone flags: --help, --no-color, --no-colour, --no-function-bar, --no-meters, --no-mouse, --no-unicode, --readonly, --tree, --version, -C, -M, -U, -V, -h, -t
+- Allowed valued flags: --delay, --drop-capabilities, --filter, --highlight-changes, --pid, --sort-key, --user, -F, -H, -d, -p, -s, -u
+- Bare invocation allowed
+
 ### `ping`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/ping.8.html">https://man7.org/linux/man-pages/man8/ping.8.html</a></p>
 
@@ -229,6 +313,85 @@
 <p class="cmd-url"><a href="https://man.openbsd.org/sftp">https://man.openbsd.org/sftp</a></p>
 
 - Allowed standalone flags: --help, -?, -h
+
+### `snmpbulkget`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpbulkget.html">https://net-snmp.sourceforge.io/docs/man/snmpbulkget.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -Cn, -Cr
+
+### `snmpbulkwalk`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpbulkwalk.html">https://net-snmp.sourceforge.io/docs/man/snmpbulkwalk.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cc, -Ci, -Cp
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -Cn, -Cr
+
+### `snmpdelta`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpdelta.html">https://net-snmp.sourceforge.io/docs/man/snmpdelta.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cf, -Ct, -Cs, -CS, -Cm, -Ck, -CT
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -CF, -Cp, -CP, -Cv
+
+### `snmpdf`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpdf.html">https://net-snmp.sourceforge.io/docs/man/snmpdf.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cu
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c
+
+### `snmpget`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpget.html">https://net-snmp.sourceforge.io/docs/man/snmpget.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cf
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c
+
+### `snmpgetnext`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpgetnext.html">https://net-snmp.sourceforge.io/docs/man/snmpgetnext.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cf
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c
+
+### `snmpnetstat`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpnetstat.html">https://net-snmp.sourceforge.io/docs/man/snmpnetstat.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Ca, -Cn, -Ci, -Co, -Cr, -Cs
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -CI, -Cp
+
+### `snmpstatus`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpstatus.html">https://net-snmp.sourceforge.io/docs/man/snmpstatus.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cf
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c
+
+### `snmptable`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmptable.html">https://net-snmp.sourceforge.io/docs/man/snmptable.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cb, -CB, -Ch, -CH, -Ci, -Cl
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -Cc, -Cf, -Cr, -Cw
+
+### `snmptest`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmptest.html">https://net-snmp.sourceforge.io/docs/man/snmptest.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c
+
+### `snmptranslate`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmptranslate.html">https://net-snmp.sourceforge.io/docs/man/snmptranslate.html</a></p>
+
+- Allowed standalone flags: -h, --help, -V, --version, -Td, -Tp, -Ta, -Tl, -To, -Ts, -Tt, -Tz, -Tb, -Tn, -On, -Of, -Os, -OS, -OU
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -w
+- Bare invocation allowed
+
+### `snmpwalk`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpwalk.html">https://net-snmp.sourceforge.io/docs/man/snmpwalk.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cc, -Ci, -CI, -Cp, -Ct
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -CE
+
+### `sntp`
+<p class="cmd-url"><a href="https://www.eecis.udel.edu/~mills/ntp/html/sntp.html">https://www.eecis.udel.edu/~mills/ntp/html/sntp.html</a></p>
+
+- Allowed standalone flags: --help, --version, --ipv4, --ipv6, --authentication, --broadcast, --concurrent, --usereservedport, --wait, -?, -4, -6, -a, -b, -c, -d, -r
+- Allowed valued flags: --bctimeout, --debug-level, --set-debug-level, --gap, --keyfile, --ntpversion, --steplimit, --uctimeout, -B, -D, -g, -k, -M, -n, -o, -t, -u
 
 ### `ss`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/ss.8.html">https://man7.org/linux/man-pages/man8/ss.8.html</a></p>
@@ -306,6 +469,12 @@ Aliases: `traceroute6`
 - Allowed standalone flags: --help, --version, --list-time-stamp-types, -?, -2, -A, -B, -D, -F, -K, -L, -M, -N, -O, -P, -Q, -S, -T, -U, -V, -W, -X, -Y, -Z, -a, -b, -c, -C, -d, -e, -E, -f, -h, -i, -j, -l, -n, -o, -p, -q, -r, -s, -t, -u, -v, -w, -x, -y, -z
 - Allowed valued flags: -A, -B, -D, -F, -G, -N, -O, -P, -S, -T, -W, -X, -Y, -Z, -b, -c, -C, -d, -e, -E, -f, -i, -j, -l, -n, -o, -p, -r, -s, -t, -w, -y, -z
 - Hyphen-prefixed positional arguments accepted
+
+### `unbound-host`
+<p class="cmd-url"><a href="https://nlnetlabs.nl/documentation/unbound/unbound-host/">https://nlnetlabs.nl/documentation/unbound/unbound-host/</a></p>
+
+- Allowed standalone flags: -h, -v, -d, -D, -r, -4, -6
+- Allowed valued flags: -c, -t, -y, -f, -F, -C
 
 ### `wget`
 <p class="cmd-url"><a href="https://www.gnu.org/software/wget/">https://www.gnu.org/software/wget/</a></p>

@@ -1,0 +1,9 @@
+[[command]]
+name = "libnetcfg"
+description = "Configuration helper for libnet (the Net::FTP / Net::SMTP / Net::NNTP family). Without arguments prints the current libnet.cfg. With -c launches an interactive configurator that writes a new libnet.cfg to the current directory (-o overrides the output path). -i selects the old config to read from. Bundled with Perl core; libnet itself is in long-term maintenance. Surface is small and stable."
+url = "https://metacpan.org/pod/libnetcfg"
+researched_version = "libnet 3.x (Perl 5.34+ bundled)"
+level = "SafeWrite"
+bare = true
+standalone = ["-c", "-d", "-h"]
+valued = ["-i", "-o"]

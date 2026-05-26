@@ -1,0 +1,9 @@
+[[command]]
+name = "encguess"
+description = "Heuristic that guesses the character encoding of file(s) by trying each candidate from a suspect list (default: ascii, utf8, UTF-16/32 with BOM) until all but one are eliminated. Read-only: opens each file for reading, prints the guess to stdout. -s overrides the suspect list, -S prints the catalogue of recognised encodings, -u suppresses unidentified-file lines. Bundled with Perl core; the CLI surface is four flags and effectively frozen."
+url = "https://metacpan.org/pod/distribution/Encode/bin/encguess"
+researched_version = "Encode 3.x (Perl 5.34+ bundled)"
+level = "Inert"
+bare = false
+standalone = ["-S", "-h", "-u"]
+valued = ["-s"]

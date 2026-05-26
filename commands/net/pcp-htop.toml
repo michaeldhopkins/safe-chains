@@ -1,0 +1,19 @@
+[[command]]
+name = "pcp-htop"
+description = "Performance Co-Pilot variant of htop. Interactive process viewer that reads metrics from a local or remote PCP archive or live PMDA. Displays processes, CPU, memory, and load; supports sorting, filtering, tree view, and per-user/per-pid filtering. Does not modify processes by default; --readonly explicitly disables the interactive kill/renice features. PCP releases monthly."
+url = "https://man.archlinux.org/man/pcp-htop.1.en"
+researched_version = "PCP 7.1.5"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = [
+    "--help", "--no-color", "--no-colour", "--no-function-bar",
+    "--no-meters", "--no-mouse", "--no-unicode", "--readonly",
+    "--tree", "--version",
+    "-C", "-M", "-U", "-V", "-h", "-t",
+]
+valued = [
+    "--delay", "--drop-capabilities", "--filter",
+    "--highlight-changes", "--pid", "--sort-key", "--user",
+    "-F", "-H", "-d", "-p", "-s", "-u",
+]

@@ -1,0 +1,17 @@
+[[command]]
+name = "xgettext.pl"
+description = "Locale::Maketext::Extract translation-string extractor (the Perl-ecosystem analogue of GNU xgettext). Scans the listed source files for translatable strings — Perl maketext/gettext calls, TT2 templates, Mason, YAML, plain text templates — and writes a Portable Object (.po) file to --output (or messages.po in --output-dir by default). Writes one .po file. Distributed as Locale-Maketext-Extract on CPAN; the CLI is stable, plugin-extensible."
+url = "https://metacpan.org/pod/xgettext.pl"
+researched_version = "Locale-Maketext-Extract 1.00"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--gnu-gettext", "--help", "--no-warnings", "--use-gettext-style",
+    "--verbose", "--wrap",
+    "-W", "-g", "-h", "-now", "-u", "-v",
+]
+valued = [
+    "--default-domain", "--directory", "--files-from", "--output",
+    "--output-dir", "--plugin",
+    "-D", "-P", "-d", "-f", "-o", "-p",
+]

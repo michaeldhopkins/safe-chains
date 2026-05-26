@@ -1,0 +1,8 @@
+[[command]]
+name = "ip2cc"
+description = "Looks up a country code for an IP address or hostname using a local IP::Country Perl database. With one argument it prints the country and exits; with no argument it enters an interactive prompt loop. Does not generate network traffic and does not modify the local filesystem. Ships as a wrapper around the CPAN IP::Country module; the CLI surface is a single optional positional argument and has been frozen since 2002."
+url = "https://metacpan.org/dist/IP-Country"
+researched_version = "IP::Country 2.28"
+level = "Inert"
+bare = true
+max_positional = 1

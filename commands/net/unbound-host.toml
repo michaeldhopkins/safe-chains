@@ -1,0 +1,13 @@
+[[command]]
+name = "unbound-host"
+description = "DNS lookup utility using the Unbound validating resolver library. Performs forward or reverse DNS resolution and reports DNSSEC validation status (secure/insecure/bogus) with -v. Generates network traffic to root servers by default, or to forwarders configured via -C/-r. Read-only locally: only consumes the supplied config or resolv.conf. The -D and -y flags pin trust anchors; -f/-F read key files. Tracks Unbound releases (monthly stable patches)."
+url = "https://nlnetlabs.nl/documentation/unbound/unbound-host/"
+researched_version = "Unbound 1.24.2"
+level = "Inert"
+bare = false
+standalone = [
+    "-h", "-v", "-d", "-D", "-r", "-4", "-6",
+]
+valued = [
+    "-c", "-t", "-y", "-f", "-F", "-C",
+]

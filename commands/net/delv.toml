@@ -1,0 +1,9 @@
+[[command]]
+name = "delv"
+description = "DNS lookup and validation utility from ISC BIND. Sends DNS queries to a configured or specified nameserver and validates the responses using DNSSEC, simulating the behavior of a validating resolver. Every invocation generates network traffic to a DNS server. Does not modify the local filesystem. The CLI surface is stable; BIND 9 releases monthly stable patches but the delv flag set has been frozen for years."
+url = "https://bind9.readthedocs.io/en/latest/manpages.html#delv-dns-lookup-and-validation-utility"
+researched_version = "BIND 9.20.23"
+level = "Inert"
+bare = true
+standalone = ["-4", "-6", "-h", "-i", "-m", "-v"]
+valued = ["-a", "-b", "-c", "-d", "-p", "-q", "-t", "-x"]
