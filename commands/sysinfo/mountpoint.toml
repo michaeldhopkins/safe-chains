@@ -1,0 +1,13 @@
+[[command]]
+name = "mountpoint"
+description = "Checks whether a given path is a mountpoint by querying the kernel (statmount(2) on Linux 6.8+, or /proc/self/mountinfo on older kernels). Read-only: prints the result and exits, with no flags that modify state. Ships with util-linux on Linux; not available on macOS by default. Flag surface is very stable."
+url = "https://man7.org/linux/man-pages/man1/mountpoint.1.html"
+researched_version = "util-linux 2.40 (2024)"
+level = "Inert"
+bare = false
+max_positional = 1
+standalone = [
+    "--devno", "--fs-devno", "--help", "--nofollow", "--quiet",
+    "--show", "--version",
+    "-V", "-d", "-h", "-q", "-x",
+]
