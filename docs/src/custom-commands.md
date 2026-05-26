@@ -5,7 +5,7 @@ safe-chains ships definitions for hundreds of tools. If your project uses an in-
 - **`.safe-chains.toml`** in your repo root (or any parent directory)
 - **`~/.config/safe-chains.toml`** for definitions that apply across all your projects
 
-When a name appears in more than one place, the more local definition wins: project beats user, user beats built-in.
+When a command appears in more than one custom definition, the more local definition is used.
 
 ## Add a tool safe-chains doesn't know
 

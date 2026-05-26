@@ -12,7 +12,9 @@ Take this command from the introduction:
 find src -name "*.rs" -exec grep -l "TODO" {} \; | sort | while read f; do echo "=== $f ==="; grep -n "TODO" "$f"; done
 ```
 
-safe-chains parses this and validates every leaf:
+Normally, you would be prompted to run this by your agent, and you would have to run some sort of auto- or permission-skipping mode to not be prompted, which could allow anything to be run.
+
+Running [from a hook](#installation.md), safe-chains parses this and validates every leaf:
 
 1. **Pipeline segment 1:** `find src -name "*.rs" -exec grep -l "TODO" {} \;`
    - `find` is allowed with positional predicates
@@ -24,15 +26,7 @@ safe-chains parses this and validates every leaf:
    - `echo "=== $f ==="` passes
    - `grep -n "TODO" "$f"` passes (`-n` is an allowed flag)
 
-Every leaf is safe, so the entire command is approved.
-
-## Compound commands
-
-Shell compound commands (`for`/`while`/`until` loops and `if`/`elif`/`else` conditionals) are parsed and each leaf command is validated recursively, supporting arbitrary nesting depth.
-
-Output redirection (`>`, `>>`) to `/dev/null` is `inert`. Output redirection to other files is allowed at `safe-write` level. Input redirection (`<`), here-strings (`<<<`), and here-documents (`<<`, `<<-`) are allowed.
-
-Backticks and command substitution (`$(...)`) are recursively validated.
+Every leaf is safe, so the entire command is auto-approved without over-extending permissions to the agent.
 
 ## Interaction with approved commands
 
