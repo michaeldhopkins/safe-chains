@@ -10,6 +10,8 @@
 ### `cksum`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#cksum-invocation</a></p>
 
+Aliases: `gcksum`
+
 - Allowed standalone flags: --base64, --check, --help, --raw, --strict, --tag, --untagged, --version, --warn, --zero, -V, -c, -h, -w, -z
 - Allowed valued flags: --algorithm, --length, -a, -l
 - Bare invocation allowed
@@ -78,6 +80,8 @@ Aliases: `gsha512sum`
 
 ### `sum`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sum-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#sum-invocation</a></p>
+
+Aliases: `gsum`
 
 - Allowed standalone flags: --help, --sysv, --version, -V, -h, -r, -s
 - Bare invocation allowed

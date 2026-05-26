@@ -3,6 +3,8 @@
 ### `base64`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#base64-invocation</a></p>
 
+Aliases: `gbase64`
+
 - Allowed standalone flags: --decode, --help, --ignore-garbage, --version, -D, -V, -d, -h, -i
 - Allowed valued flags: --wrap, -b, -w
 - Bare invocation allowed
@@ -30,12 +32,16 @@ Aliases: `gcsplit`
 ### `echo`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation</a></p>
 
+Aliases: `gecho`
+
 - Allowed standalone flags: -E, -e, -n
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
 ### `expr`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation</a></p>
+
+Aliases: `gexpr`
 
 - Hyphen-prefixed positional arguments accepted
 
@@ -109,10 +115,14 @@ Aliases: `gnumfmt`
 ### `printf`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#printf-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#printf-invocation</a></p>
 
+Aliases: `gprintf`
+
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `seq`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation</a></p>
+
+Aliases: `gseq`
 
 - Allowed standalone flags: --equal-width, --help, --version, -V, -h, -w
 - Allowed valued flags: --format, --separator, -f, -s, -t
@@ -120,12 +130,16 @@ Aliases: `gnumfmt`
 ### `shuf`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#shuf-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#shuf-invocation</a></p>
 
+Aliases: `gshuf`
+
 - Allowed standalone flags: --echo, --help, --repeat, --version, --zero-terminated, -V, -e, -h, -r, -z
 - Allowed valued flags: --head-count, --input-range, --random-source, -i, -n
 - Bare invocation allowed
 
 ### `sort`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation</a></p>
+
+Aliases: `gsort`
 
 - Allowed standalone flags: --check, --debug, --dictionary-order, --general-numeric-sort, --help, --human-numeric-sort, --ignore-case, --ignore-leading-blanks, --ignore-nonprinting, --merge, --month-sort, --numeric-sort, --random-sort, --reverse, --stable, --unique, --version, --version-sort, --zero-terminated, -C, -M, -R, -V, -b, -c, -d, -f, -g, -h, -i, -m, -n, -r, -s, -u, -z
 - Allowed valued flags: --batch-size, --buffer-size, --field-separator, --files0-from, --key, --parallel, --random-source, --sort, --temporary-directory, -S, -T, -k, -t

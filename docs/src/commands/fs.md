@@ -8,6 +8,8 @@
 ### `basename`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#basename-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#basename-invocation</a></p>
 
+Aliases: `gbasename`
+
 - Allowed standalone flags: --help, --multiple, --version, --zero, -V, -a, -h, -z
 - Allowed valued flags: --suffix, -s
 - Bare invocation allowed
@@ -59,6 +61,8 @@ Aliases: `gcp`
 ### `date`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation</a></p>
 
+Aliases: `gdate`
+
 - Allowed standalone flags: --help, --rfc-2822, --rfc-email, --universal, --utc, --version, -R, -V, -h, -j, -n, -u
 - Allowed valued flags: --date, --iso-8601, --reference, --rfc-3339, -I, -d, -f, -r, -v, -z
 - Bare invocation allowed
@@ -73,6 +77,8 @@ Aliases: `gcp`
 ### `df`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#df-invocation</a></p>
 
+Aliases: `gdf`
+
 - Allowed standalone flags: --all, --help, --human-readable, --inodes, --local, --no-sync, --portability, --print-type, --si, --sync, --total, --version, -H, -P, -T, -V, -a, -h, -i, -k, -l
 - Allowed valued flags: --block-size, --exclude-type, --output, --type, -B, -t, -x
 - Bare invocation allowed
@@ -85,6 +91,8 @@ Aliases: `gcp`
 
 ### `dirname`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation</a></p>
+
+Aliases: `gdirname`
 
 - Allowed standalone flags: --help, --version, --zero, -V, -h, -z
 - Bare invocation allowed
@@ -114,6 +122,8 @@ Aliases: `gcp`
 
 ### `du`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation</a></p>
+
+Aliases: `gdu`
 
 - Allowed standalone flags: --all, --apparent-size, --bytes, --count-links, --dereference, --dereference-args, --help, --human-readable, --inodes, --no-dereference, --null, --one-file-system, --separate-dirs, --si, --summarize, --total, --version, -0, -D, -H, -L, -P, -S, -V, -a, -b, -c, -h, -k, -l, -m, -s, -x
 - Allowed valued flags: --block-size, --exclude, --files0-from, --max-depth, --threshold, --time, --time-style, -B, -d, -t
@@ -191,6 +201,8 @@ Aliases: `gln`, `link`, `glink`
 ### `ls`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation</a></p>
 
+Aliases: `gls`, `gdir`, `gvdir`, `dir`, `vdir`
+
 - Allowed standalone flags: --all, --almost-all, --author, --classify, --context, --dereference, --dereference-command-line, --dereference-command-line-symlink-to-dir, --directory, --escape, --file-type, --full-time, --group-directories-first, --help, --hide-control-chars, --human-readable, --indicator-style, --inode, --kibibytes, --literal, --no-group, --numeric-uid-gid, --quote-name, --recursive, --reverse, --show-control-chars, --si, --size, --version, -1, -A, -B, -C, -F, -G, -H, -L, -N, -Q, -R, -S, -U, -V, -X, -Z, -a, -c, -d, -f, -g, -h, -i, -k, -l, -m, -n, -o, -p, -q, -r, -s, -t, -u, -v, -x
 - Allowed valued flags: --block-size, --color, --format, --hide, --hyperlink, --ignore, --quoting-style, --sort, --tabsize, --time, --time-style, --width, -I, -T, -w
 - Bare invocation allowed
@@ -209,6 +221,8 @@ Aliases: `gln`, `link`, `glink`
 
 ### `mkdir`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mkdir-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mkdir-invocation</a></p>
+
+Aliases: `gmkdir`
 
 - Allowed standalone flags: --help, --parents, --verbose, --version, -Z, -p, -v
 - Allowed valued flags: --context, --mode, -m
@@ -266,6 +280,8 @@ Aliases: `gpathchk`
 ### `pwd`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation</a></p>
 
+Aliases: `gpwd`
+
 - Allowed standalone flags: --help, --version, -L, -P, -V, -h
 - Bare invocation allowed
 
@@ -284,16 +300,22 @@ Aliases: `gpathchk`
 ### `readlink`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#readlink-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#readlink-invocation</a></p>
 
+Aliases: `greadlink`
+
 - Allowed standalone flags: --canonicalize, --canonicalize-existing, --canonicalize-missing, --help, --no-newline, --verbose, --version, --zero, -V, -e, -f, -h, -m, -n, -v, -z
 
 ### `realpath`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#realpath-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#realpath-invocation</a></p>
+
+Aliases: `grealpath`
 
 - Allowed standalone flags: --canonicalize-existing, --canonicalize-missing, --help, --logical, --no-symlinks, --physical, --quiet, --strip, --version, --zero, -L, -P, -V, -e, -h, -m, -q, -s, -z
 - Allowed valued flags: --relative-base, --relative-to
 
 ### `rm`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#rm-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#rm-invocation</a></p>
+
+Aliases: `grm`
 
 - Requires --help, --version. - Allowed standalone flags: --help, --version
 

@@ -23,7 +23,7 @@
 ### `nice`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#nice-invocation</a></p>
 
-Aliases: `ionice`
+Aliases: `ionice`, `gnice`
 
 - Recursively validates the inner command.
 
@@ -34,6 +34,8 @@ Aliases: `ionice`
 
 ### `timeout`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#timeout-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#timeout-invocation</a></p>
+
+Aliases: `gtimeout`
 
 - Recursively validates the inner command.
 
