@@ -1,9 +1,16 @@
 #![allow(clippy::unwrap_used)]
 
-use safe_chains::is_safe_command;
+use safe_chains::{command_verdict, is_safe_command, SafetyLevel, Verdict};
 
 fn check(cmd: &str) -> bool {
     is_safe_command(cmd)
+}
+
+fn level(cmd: &str) -> SafetyLevel {
+    match command_verdict(cmd) {
+        Verdict::Allowed(lvl) => lvl,
+        Verdict::Denied => panic!("expected allowed: {cmd}"),
+    }
 }
 
 #[test]
@@ -327,4 +334,93 @@ fn gh_api_mixed_safe_and_unsafe() {
     assert!(!check("gh api repos/o/r/pulls --cache 60s -H 'Authorization: Bearer x'"));
     assert!(!check("gh api repos/o/r/pulls --jq '.[]' --input data.json"));
     assert!(!check("gh api repos/o/r/pulls --paginate --field key=val"));
+}
+
+// ── rake: direct invocation ───────────────────────────────────────────
+
+#[test]
+fn rake_readonly_tasks() {
+    assert!(check("rake db:migrate:status"));
+    assert!(check("rake db:version"));
+    assert!(check("rake routes"));
+    assert!(check("rake about"));
+    assert!(check("rake stats"));
+    assert!(check("rake time:zones:all"));
+}
+
+#[test]
+fn rake_writable_tasks() {
+    assert!(check("rake db:migrate"));
+    assert!(check("rake db:create"));
+    assert!(check("rake db:seed"));
+    assert!(check("rake db:schema:load"));
+    assert!(check("rake tmp:clear"));
+    assert!(check("rake log:clear"));
+    assert!(check("rake assets:precompile"));
+    assert!(check("rake cache:clear"));
+}
+
+#[test]
+fn rake_test_tasks() {
+    assert!(check("rake test"));
+    assert!(check("rake test:system"));
+}
+
+#[test]
+fn rake_runner_help() {
+    assert!(check("rake runner:help"));
+}
+
+#[test]
+fn rake_obsolete_pre_rails_6_tasks_kept() {
+    // No-ops on current Rails, retained for older codebases per the
+    // "obsolete-entries-are-fine-if-still-safe" policy.
+    assert!(check("rake db:structure:dump"));
+    assert!(check("rake db:structure:load"));
+    assert!(check("rake test:units"));
+    assert!(check("rake test:functionals"));
+    assert!(check("rake test:integration"));
+}
+
+#[test]
+fn rake_safety_levels_match_behavior() {
+    assert_eq!(level("rake db:migrate:status"), SafetyLevel::Inert);
+    assert_eq!(level("rake db:version"), SafetyLevel::Inert);
+    assert_eq!(level("rake routes"), SafetyLevel::Inert);
+    assert_eq!(level("rake db:migrate"), SafetyLevel::SafeWrite);
+    assert_eq!(level("rake db:seed"), SafetyLevel::SafeWrite);
+    assert_eq!(level("rake assets:precompile"), SafetyLevel::SafeWrite);
+    assert_eq!(level("rake test"), SafetyLevel::SafeRead);
+    assert_eq!(level("rake test:system"), SafetyLevel::SafeRead);
+}
+
+#[test]
+fn rake_with_env_args() {
+    assert!(check("rake db:migrate:status RAILS_ENV=test"));
+    assert!(check("rake db:migrate RAILS_ENV=development DISABLE_SPRING=1"));
+    assert!(check("rake db:migrate --trace"));
+}
+
+#[test]
+fn rake_through_mise_exec() {
+    assert!(check("mise exec -- bundle exec rake db:migrate:status RAILS_ENV=test"));
+    assert!(check("mise exec -- bundle exec rake db:migrate"));
+}
+
+#[test]
+fn rake_destructive_tasks_denied() {
+    assert!(!check("rake db:drop"));
+    assert!(!check("rake db:rollback"));
+    assert!(!check("rake db:reset"));
+    assert!(!check("rake db:purge"));
+    assert!(!check("rake db:migrate:redo"));
+    assert!(!check("rake db:migrate:reset"));
+}
+
+#[test]
+fn rake_unknown_tasks_denied() {
+    assert!(!check("rake my_custom_task"));
+    assert!(!check("rake foo:bar"));
+    assert!(!check("rake -e 'system(\"rm -rf /\")'"));
+    assert!(!check("rake -T"));
 }

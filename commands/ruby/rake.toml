@@ -1,9 +1,203 @@
 [[command]]
 name = "rake"
-description = "Ruby's Make-style build/automation tool. Tasks are defined in a Rakefile (plus rakelib/*.rake), which is itself arbitrary Ruby loaded at startup — even the introspection flags (-T, -D, -W, -P, -A) load and execute top-level Rakefile code as a side effect, so the only fixed safe surface is the bare diagnostic flags --help and --version. Bare invocation runs the default task. v13.4.2 dates to April 2026; the flag set has been frozen for years."
+description = "Ruby's Make-style build/automation tool. Tasks are defined in a Rakefile (plus rakelib/*.rake), which is itself arbitrary Ruby loaded at startup — even introspection flags (-T, -D, -W, -P, -A) load and execute top-level Rakefile code as a side effect, and -e/-E/-r execute arbitrary Ruby directly. Bare invocation runs the default task. Within a Rails project, the standard rake task surface (db:*, tmp:*, log:*, assets:*, cache:*, time:*, plus diagnostic tasks routes/about/stats/notes/middleware/initializers/secret/runner:help and the test:* family) is shipped by Rails' own gems (railties, Active Record, etc.) and is identical to what `bin/rails <task>` delegates to — both load the same Rakefile and execute the same task code. Read-only tasks (db:version, db:migrate:status, time:zones:all, time:zones:local, routes, about, stats, notes, middleware, initializers, secret, runner:help, assets:reveal, assets:reveal:full) display information without modifying state, though most still require a live DB connection. Schema/data tasks (db:create, db:migrate, db:seed, db:prepare, db:setup, db:fixtures:load, db:schema:load, db:schema:dump) modify the connected database the same way `rails db:migrate` does — typically a local development DB, but they connect to whatever config/database.yml or DATABASE_URL points at. tmp:clear, tmp:create, tmp:cache:clear, log:clear, cache:clear, assets:precompile, assets:clean, and assets:clobber write inside the project tree. db:drop/db:reset/db:rollback/db:purge/db:migrate:redo/db:migrate:reset destroy schema or data and are not covered. A few historical names (db:structure:load/dump, test:units, test:functionals, test:integration) date to pre-Rails-6 and are retained for older codebases; on current Rails they are no-ops if invoked. rake v13.4.2 dates to April 2026; the flag set has been frozen for years."
 url = "https://github.com/ruby/rake"
 researched_version = "rake v13.4.2 (April 2026)"
-level = "Inert"
-bare = false
-max_positional = 0
-standalone = ["--help", "--version", "-V", "-h"]
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "about"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "stats"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "notes"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "routes"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "middleware"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "initializers"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "secret"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "runner:help"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "time:zones:all"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "time:zones:local"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "assets:reveal"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "assets:reveal:full"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:version"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:migrate:status"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:create"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:migrate"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:seed"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:prepare"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:setup"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:fixtures:load"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:schema:load"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:schema:dump"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:structure:load"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:structure:dump"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "tmp:clear"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "tmp:create"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "tmp:cache:clear"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "log:clear"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "assets:precompile"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "assets:clean"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "assets:clobber"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "cache:clear"
+level = "SafeWrite"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "test"
+level = "SafeRead"
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+bare = true
+
+[[command.sub]]
+name = "test:units"
+level = "SafeRead"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "test:functionals"
+level = "SafeRead"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "test:integration"
+level = "SafeRead"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "test:system"
+level = "SafeRead"
+standalone = ["--help", "--quiet", "--silent", "--trace", "-h", "-q", "-s"]
+
+[[command.sub]]
+name = "db:drop"
+candidate = true
+
+[[command.sub]]
+name = "db:reset"
+candidate = true
+
+[[command.sub]]
+name = "db:rollback"
+candidate = true
+
+[[command.sub]]
+name = "db:purge"
+candidate = true
+
+[[command.sub]]
+name = "db:migrate:redo"
+candidate = true
+
+[[command.sub]]
+name = "db:migrate:reset"
+candidate = true

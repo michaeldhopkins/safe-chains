@@ -7965,6 +7965,43 @@ Aliases: `python`
 ### `rake`
 <p class="cmd-url"><a href="https://github.com/ruby/rake">https://github.com/ruby/rake</a></p>
 
+- **about**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **assets:clean**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **assets:clobber**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **assets:precompile**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **assets:reveal**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **assets:reveal:full**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **cache:clear**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:create**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:fixtures:load**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:migrate**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:migrate:status**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:prepare**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:schema:dump**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:schema:load**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:seed**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:setup**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:structure:dump**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:structure:load**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **db:version**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **initializers**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **log:clear**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **middleware**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **notes**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **routes**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **runner:help**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **secret**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **stats**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **test**: Positional args accepted
+- **test:functionals**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **test:integration**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **test:system**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **test:units**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **time:zones:all**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **time:zones:local**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **tmp:cache:clear**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **tmp:clear**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **tmp:create**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `rbenv`
