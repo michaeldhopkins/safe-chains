@@ -1,0 +1,9 @@
+[[command]]
+name = "iconutil"
+description = "macOS utility for converting between `.iconset` directories and `.icns` icon files, and for extracting icons from compiled `.car` asset catalogs. Always a write operation: emits a converted icon file to disk (-o overrides the default location). The --convert {icns|iconset} flag is required to choose direction. Entirely local; no network access. Surface is small and frozen (man page last updated in 2012)."
+url = "https://keith.github.io/xcode-man-pages/iconutil.1.html"
+researched_version = "macOS 14 (man page dated 2012-04-10; surface unchanged)"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--convert", "--output", "-c", "-o"]

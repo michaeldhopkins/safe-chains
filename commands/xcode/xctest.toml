@@ -1,0 +1,8 @@
+[[command]]
+name = "xctest"
+description = "Runs the tests inside a compiled XCTest bundle. Takes a bundle path and an optional `-XCTest test-identifiers` list to scope which classes/methods run. Executes arbitrary developer-written test code, so its effects depend entirely on the test bundle; treat the same way as `cargo test`: produces no build artifacts but runs real code in the local process. Intended for test bundles outside an app's PlugIns directory; for in-app tests use `xcodebuild test`. Surface is tiny and frozen since the 2013 man page."
+url = "https://keith.github.io/xcode-man-pages/xctest.1.html"
+researched_version = "Xcode 15 / macOS 14 (man page dated 2013-11-14)"
+level = "SafeRead"
+bare = false
+valued = ["-XCTest"]

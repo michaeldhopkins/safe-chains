@@ -1,0 +1,77 @@
+[[command]]
+name = "xcresulttool"
+description = "Inspector for Xcode `.xcresult` result bundles produced by `xcodebuild`. `get` (build-results, test-results summary/tests/insights/test-details/activities/metrics, log, content-availability, object) and `metadata get`, `formatDescription get`/`diff`, `graph`, `version`, and `compare` are read-only — they emit JSON/text/markdown to stdout or to an output path supplied by --output-path. `export` (diagnostics, attachments, metrics, object) writes extracted files/directories to --output-path. `merge` writes a new combined `.xcresult` bundle to --output-path. `metadata addExternalLocation` mutates the input bundle in place to record an external link. Local files only; no network. Surface evolves with Xcode result-bundle schema; man page dated 2025."
+url = "https://keith.github.io/xcode-man-pages/xcresulttool.1.html"
+researched_version = "Xcode 15 / macOS 14 (man page dated 2025)"
+
+[[command.sub]]
+name = "get"
+level = "Inert"
+bare = false
+standalone = ["--compact", "--schema", "--help", "-h"]
+valued = [
+    "--format",
+    "--id",
+    "--path",
+    "--schema-version",
+    "--test-id",
+    "--type",
+]
+
+[[command.sub]]
+name = "formatDescription"
+level = "Inert"
+bare = false
+standalone = ["--hash", "--include-event-stream-types", "--help", "-h"]
+valued = ["--format"]
+
+[[command.sub]]
+name = "graph"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--path"]
+
+[[command.sub]]
+name = "version"
+level = "Inert"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "compare"
+level = "Inert"
+bare = false
+standalone = [
+    "--analyzer-issues",
+    "--build-warnings",
+    "--compact",
+    "--schema",
+    "--summary",
+    "--test-failures",
+    "--tests",
+    "--help",
+    "-h",
+]
+valued = ["--baseline-path", "--schema-version"]
+
+[[command.sub]]
+name = "metadata"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--path"]
+[[command.sub.sub]]
+name = "addExternalLocation"
+candidate = true
+
+[[command.sub]]
+name = "export"
+candidate = true
+
+[[command.sub]]
+name = "merge"
+candidate = true

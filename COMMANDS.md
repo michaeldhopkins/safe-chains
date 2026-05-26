@@ -196,6 +196,12 @@ Aliases: `7zz`, `7za`
 - Requires --dryrun, --graph, --list, -l, -n. - Allowed standalone flags: --dryrun, --graph, --help, --list, --version, -h, -l, -n
 - Allowed valued flags: --action-offline-mode, --artifact-server-path, --container-architecture, --env, --env-file, --eventpath, --input, --job, --matrix, --platform, --pull, --remote-name, --secret, --secret-file, --var, --var-file, --workflows, -E, -P, -W, -e, -j, -s
 
+### `actool`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/actool.1.html">https://keith.github.io/xcode-man-pages/actool.1.html</a></p>
+
+- Allowed standalone flags: --compress-pngs, --enable-on-demand-resources, --errors, --include-all-app-icons, --include-sticker-content, --notices, --print-contents, --skip-app-store-deployment, --version, --warnings, --help, -h
+- Allowed valued flags: --accent-color, --alternate-app-icon, --app-icon, --asset-pack-output-specifications, --compile, --filter-for-device-model, --filter-for-device-os-version, --include-partial-info-plist-localizations, --launch-image, --minimum-deployment-target, --output-format, --output-partial-info-plist, --platform, --product-type, --standalone-icon-behavior, --sticker-pack-identifier-prefix, --sticker-pack-strings-file, --stickers-icon-role, --target-device, --widget-background-color
+
 ### `adb`
 <p class="cmd-url"><a href="https://developer.android.com/tools/adb">https://developer.android.com/tools/adb</a></p>
 
@@ -2205,6 +2211,12 @@ Aliases: `@cucumber/cucumber`
 - Allowed valued flags: --backtrace, --config, --format, --format-options, --i18n-keywords, --language, --name, --order, --paths, --require, --require-module, --retry, --retry-tag-filter, --tags, --world-parameters, -b, -c, -f, -i, -n, -p, -r, -t, -w
 - Bare invocation allowed
 
+### `cupstestppd`
+<p class="cmd-url"><a href="https://www.cups.org/doc/man-cupstestppd.html">https://www.cups.org/doc/man-cupstestppd.html</a></p>
+
+- Allowed standalone flags: --help, -h, -q, -r, -v, -vv
+- Allowed valued flags: -I, -R, -W
+
 ### `curl`
 <p class="cmd-url"><a href="https://curl.se/docs/manpage.html">https://curl.se/docs/manpage.html</a></p>
 
@@ -2872,6 +2884,12 @@ Aliases: `difftastic`
 - `dvc status`
 - `dvc version`
 
+### `dvipdf`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, -h, -?
+- Hyphen-prefixed positional arguments accepted
+
 ### `earthly`
 <p class="cmd-url"><a href="https://docs.earthly.dev/docs/earthly-command">https://docs.earthly.dev/docs/earthly-command</a></p>
 
@@ -2989,6 +3007,12 @@ Aliases: `emmake`, `emranlib`, `emstrip`, `emrun`
 
 - Allowed standalone flags: --help, --variables, --version, -V, -h, -v
 - Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `eps2eps`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, -h, -?
 - Hyphen-prefixed positional arguments accepted
 
 ### `erb_lint`
@@ -3201,6 +3225,11 @@ Aliases: `exa`
 - **login:list**: Flags: --help, -h
 - **projects:list**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `fix-qdf`
+<p class="cmd-url"><a href="https://qpdf.readthedocs.io/en/stable/qdf.html">https://qpdf.readthedocs.io/en/stable/qdf.html</a></p>
+
+- Bare invocation allowed
 
 ### `flake8`
 <p class="cmd-url"><a href="https://flake8.pycqa.org/en/latest/user/invocation.html">https://flake8.pycqa.org/en/latest/user/invocation.html</a></p>
@@ -3559,6 +3588,18 @@ Aliases: `g++`, `cc`, `c++`
 - **stale**: Flags: --all, --help, --local, --prerelease, --remote, --versions, -a, -h, -i, -l, -r. Valued: --version, -v
 - **which**: Flags: --all, --help, --local, --prerelease, --remote, --versions, -a, -h, -i, -l, -r. Valued: --version, -v
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `gen_bridge_metadata`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/gen_bridge_metadata.1.html">https://keith.github.io/xcode-man-pages/gen_bridge_metadata.1.html</a></p>
+
+- Allowed standalone flags: --64-bit, --arm64e, --debug, --no-32-bit, --no-64-bit, --private, --version, --help, -d, -h, -p, -v
+- Allowed valued flags: --cflags, --cflags-64, --exception, --format, --framework, --output, -C, -F, -c, -e, -f, -o
+
+### `genstrings`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/genstrings.1.html">https://keith.github.io/xcode-man-pages/genstrings.1.html</a></p>
+
+- Allowed standalone flags: -SwiftUI, -a, -bigEndian, -d, -littleEndian, -macRoman, -noPositionalParameters, -q, -u, --help, -h
+- Allowed valued flags: -encoding, -o, -s, -skipTable
 
 ### `getconf`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/getconf.1.html">https://man7.org/linux/man-pages/man1/getconf.1.html</a></p>
@@ -3960,6 +4001,12 @@ Aliases: `gradlew`
 <p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/Use.html">https://ghostscript.readthedocs.io/en/latest/Use.html</a></p>
 
 - Allowed standalone flags: --help, --version, -h, -?
+- Hyphen-prefixed positional arguments accepted
+
+### `gsnd`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, -h, -?
 - Hyphen-prefixed positional arguments accepted
 
 ### `guard`
@@ -4408,6 +4455,18 @@ Aliases: `hf`
 - **tree-subtract**: Flags: --help, --nostdin, -h. Valued: --data-format
 - **unused**: Flags: --help, --no-strict, --strict, -h. Positional args accepted
 - Allowed standalone flags: --help, --version, -h
+
+### `ibtool`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/ibtool.1.html">https://keith.github.io/xcode-man-pages/ibtool.1.html</a></p>
+
+- Allowed standalone flags: --all, --classes, --connections, --enable-auto-layout, --errors, --hierarchy, --localizable-all, --localizable-geometry, --localizable-other, --localizable-stringarrays, --localizable-strings, --localizable-to-many-relationships, --localize-incremental, --notices, --objects, --reference-external-strings-file, --remove-plugin-dependencies, --update-constraints, --update-frames, --upgrade, --version, --version-history, --warnings, --help, -h
+- Allowed valued flags: --bundle, --companion-strings-file, --compile, --convert, --export, --export-strings-file, --export-xliff, --flatten, --import, --import-strings-file, --import-xliff, --incremental-file, --module, --output-format, --previous-file, --source-language, --strip, --target-language, --write
+
+### `iconutil`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/iconutil.1.html">https://keith.github.io/xcode-man-pages/iconutil.1.html</a></p>
+
+- Allowed standalone flags: --help, -h
+- Allowed valued flags: --convert, --output, -c, -o
 
 ### `iconv`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/iconv.1.html">https://man7.org/linux/man-pages/man1/iconv.1.html</a></p>
@@ -5271,6 +5330,12 @@ Aliases: `nbconvert`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `layerutil`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/layerutil.1.html">https://keith.github.io/xcode-man-pages/layerutil.1.html</a></p>
+
+- Allowed standalone flags: --help, --palette-image, --version, -V, -c, -h
+- Allowed valued flags: --display-gamut, --flattened-image, --gpu-compression, --lossy-compression, --output, --scale, -f, -g, -l, -o, -p, -s
+
 ### `ldd`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/ldd.1.html">https://man7.org/linux/man-pages/man1/ldd.1.html</a></p>
 
@@ -5823,6 +5888,18 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - **help**: Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `mig`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/mig.1.html">https://keith.github.io/xcode-man-pages/mig.1.html</a></p>
+
+- Allowed standalone flags: -B, -K, -L, -MD, -Q, -S, -V, -b, -cpp, -k, -l, -q, -s, -split, -v
+- Allowed valued flags: -arch, -cc, -dheader, -header, -i, -iheader, -isysroot, -maxonstack, -migcom, -server, -sheader, -user
+
+### `migcom`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/migcom.1.html">https://keith.github.io/xcode-man-pages/migcom.1.html</a></p>
+
+- Allowed standalone flags: -B, -K, -L, -Q, -S, -V, -b, -k, -l, -q, -s, -split, -v
+- Allowed valued flags: -dheader, -header, -i, -iheader, -maxonstack, -server, -sheader, -user
 
 ### `migrate`
 <p class="cmd-url"><a href="https://github.com/golang-migrate/migrate">https://github.com/golang-migrate/migrate</a></p>
@@ -7095,6 +7172,12 @@ Aliases: `pcretest`
 - Allowed valued flags: -C, -S, -error, -pattern, -subject, -t, -tm
 - Bare invocation allowed
 
+### `pdf2ps`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, -h, -?
+- Hyphen-prefixed positional arguments accepted
+
 ### `pdfdetach`
 <p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfdetach.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfdetach.1.html</a></p>
 
@@ -7213,6 +7296,16 @@ Aliases: `xelatex`, `lualatex`, `latex`
 - Allowed standalone flags: --bail, --cache-result, --ci, --compact, --debug, --dirty, --display-deprecations, --display-errors, --display-incomplete, --display-notices, --display-phpunit-deprecations, --display-skipped, --display-warnings, --do-not-cache-result, --dont-report-useless-tests, --enforce-time-limit, --fail-on-deprecation, --fail-on-empty-test-suite, --fail-on-incomplete, --fail-on-notice, --fail-on-phpunit-deprecation, --fail-on-risky, --fail-on-skipped, --fail-on-warning, --flaky, --globals-backup, --help, --list-groups, --list-suites, --list-test-files, --list-tests, --mutate, --no-configuration, --no-coverage, --no-extensions, --no-logging, --no-output, --no-progress, --no-results, --notes, --parallel, --path-coverage, --profile, --retry, --reverse-list, --static-backup, --stderr, --stop-on-defect, --stop-on-deprecation, --stop-on-error, --stop-on-failure, --stop-on-incomplete, --stop-on-notice, --stop-on-risky, --stop-on-skipped, --stop-on-warning, --strict-coverage, --strict-global-state, --teamcity, --testdox, --testdox-summary, --todos, --warm-coverage-cache, -h
 - Allowed valued flags: --bootstrap, --cache-directory, --colors, --columns, --configuration, --coverage, --coverage-clover, --coverage-cobertura, --coverage-crap4j, --coverage-filter, --coverage-html, --coverage-php, --coverage-text, --coverage-xml, --covers, --default-time-limit, --exclude-filter, --exclude-group, --exclude-testsuite, --extension, --filter, --generate-baseline, --group, --include-path, --log-events-text, --log-events-verbose-text, --log-junit, --log-teamcity, --order-by, --random-order-seed, --requires-php-extension, --shard, --test-directory, --test-suffix, --testdox-html, --testdox-text, --testsuite, --use-baseline, --uses, -c, -d
 - Bare invocation allowed
+
+### `pf2afm`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Positional arguments only
+
+### `pfbtopfa`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Positional arguments only
 
 ### `pg_basebackup`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgbasebackup.html">https://www.postgresql.org/docs/current/app-pgbasebackup.html</a></p>
@@ -7778,6 +7871,11 @@ Aliases: `upsun`
 - Requires --check, --list-different, -c, -l. - Allowed standalone flags: --check, --list-different, --no-config, --no-editorconfig, --no-semi, --single-quote, --jsx-single-quote, --bracket-same-line, --help, --version, -c, -l
 - Allowed valued flags: --config, --ignore-path, --parser, --plugin, --print-width, --tab-width, --trailing-comma, --end-of-line, --prose-wrap
 
+### `printafm`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Positional arguments only
+
 ### `printenv`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation</a></p>
 
@@ -7848,6 +7946,28 @@ Aliases: `upsun`
 - Allowed standalone flags: --cumulative, --deselect, --forest, --headers, --help, --info, --no-headers, --version, -A, -C, -H, -L, -M, -N, -S, -T, -V, -Z, -a, -c, -d, -e, -f, -h, -j, -l, -m, -r, -v, -w, -x
 - Allowed valued flags: --cols, --columns, --format, --group, --pid, --ppid, --rows, --sid, --sort, --tty, --user, --width, -G, -O, -U, -g, -n, -o, -p, -s, -t, -u
 - Bare invocation allowed
+
+### `ps2ascii`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Bare invocation allowed
+
+### `ps2epsi`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Positional arguments only
+
+### `ps2pdfwr`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, -h, -?
+- Hyphen-prefixed positional arguments accepted
+
+### `ps2ps`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, -h, -?
+- Hyphen-prefixed positional arguments accepted
 
 ### `pscale`
 <p class="cmd-url"><a href="https://planetscale.com/docs/reference/planetscale-cli">https://planetscale.com/docs/reference/planetscale-cli</a></p>
@@ -10644,6 +10764,12 @@ Aliases: `traceroute6`
 - Allowed valued flags: --renderer
 - Bare invocation allowed
 
+### `xccov`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xccov.1.html">https://keith.github.io/xcode-man-pages/xccov.1.html</a></p>
+
+- **diff**: Flags: --json, --help, -h. Valued: --path-equivalence
+- **view**: Flags: --archive, --file-list, --json, --only-targets, --report, --help, -h. Valued: --file, --files-for-target, --functions-for-file
+
 ### `xclip`
 <p class="cmd-url"><a href="https://github.com/astrand/xclip">https://github.com/astrand/xclip</a></p>
 
@@ -10674,6 +10800,16 @@ Aliases: `traceroute6`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `xcresulttool`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xcresulttool.1.html">https://keith.github.io/xcode-man-pages/xcresulttool.1.html</a></p>
+
+- **compare**: Flags: --analyzer-issues, --build-warnings, --compact, --schema, --summary, --test-failures, --tests, --help, -h. Valued: --baseline-path, --schema-version
+- **formatDescription**: Flags: --hash, --include-event-stream-types, --help, -h. Valued: --format
+- **get**: Flags: --compact, --schema, --help, -h. Valued: --format, --id, --path, --schema-version, --test-id, --type
+- **graph**: Flags: --help, -h. Valued: --path
+- **metadata get**: Flags: --help, -h. Valued: --path
+- **version**: Flags: --help, -h
+
 ### `xcrun`
 <p class="cmd-url"><a href="https://ss64.com/mac/xcrun.html">https://ss64.com/mac/xcrun.html</a></p>
 
@@ -10689,6 +10825,21 @@ Aliases: `traceroute6`
 - **notarytool log**: Positional args accepted
 - **simctl list**: Positional args accepted
 - **stapler validate**: Positional args accepted
+
+### `xctest`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xctest.1.html">https://keith.github.io/xcode-man-pages/xctest.1.html</a></p>
+
+- Allowed valued flags: -XCTest
+
+### `xctrace`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xctrace.1.html">https://keith.github.io/xcode-man-pages/xctrace.1.html</a></p>
+
+- **export**: Flags: --har, --quiet, --toc, --help, -h. Valued: --input, --output, --xpath
+- **help**: Positional args accepted
+- **import**: Flags: --quiet, --help, -h. Valued: --input, --instrument, --output, --package, --template
+- **list**: Allowed arguments: devices, templates, instruments
+- **symbolicate**: Flags: --quiet, --help, -h. Valued: --dsym, --input, --output
+- **version**: Flags: --help, -h
 
 ### `xh`
 <p class="cmd-url"><a href="https://github.com/ducaale/xh">https://github.com/ducaale/xh</a></p>

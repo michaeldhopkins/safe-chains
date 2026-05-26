@@ -1,0 +1,29 @@
+[[command]]
+name = "layerutil"
+description = "Creates a compiled layered image stack (`.lcr`) file from a layered input source such as an `.lsr` directory or a Photoshop `.psd` file. Always a write operation: produces the `.lcr` (or, with --flattened-image, a flattened `.jpeg`) at the path given by -o. Reads only the input file; no network access. Small flag surface for compression, scale, and gamut control; man page frozen since 2017."
+url = "https://keith.github.io/xcode-man-pages/layerutil.1.html"
+researched_version = "Xcode 15 / macOS 14 (man page dated 2017-11-13)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help",
+    "--palette-image",
+    "--version",
+    "-V",
+    "-c",
+    "-h",
+]
+valued = [
+    "--display-gamut",
+    "--flattened-image",
+    "--gpu-compression",
+    "--lossy-compression",
+    "--output",
+    "--scale",
+    "-f",
+    "-g",
+    "-l",
+    "-o",
+    "-p",
+    "-s",
+]

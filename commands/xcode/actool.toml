@@ -1,0 +1,43 @@
+[[command]]
+name = "actool"
+description = "Xcode asset-catalog compiler that verifies, prints, updates, and compiles `.xcassets` documents into `Assets.car` binaries used at runtime by iOS/macOS/tvOS/watchOS apps. With --compile <path> it writes a CAR file (and optional partial Info.plist) to disk; with --print-contents or --version it only reads and emits a plist on stdout. All input/output paths are local file system; no network access. The flag surface is large but well-defined (~30 flags for compile, sticker pack, ODR, output, listing, version) and changes only with new Xcode releases. Ships with Xcode; release cadence follows Xcode majors."
+url = "https://keith.github.io/xcode-man-pages/actool.1.html"
+researched_version = "Xcode 15 / macOS 14 (man page dated 2018-03-09; surface unchanged through current Xcode)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--compress-pngs",
+    "--enable-on-demand-resources",
+    "--errors",
+    "--include-all-app-icons",
+    "--include-sticker-content",
+    "--notices",
+    "--print-contents",
+    "--skip-app-store-deployment",
+    "--version",
+    "--warnings",
+    "--help",
+    "-h",
+]
+valued = [
+    "--accent-color",
+    "--alternate-app-icon",
+    "--app-icon",
+    "--asset-pack-output-specifications",
+    "--compile",
+    "--filter-for-device-model",
+    "--filter-for-device-os-version",
+    "--include-partial-info-plist-localizations",
+    "--launch-image",
+    "--minimum-deployment-target",
+    "--output-format",
+    "--output-partial-info-plist",
+    "--platform",
+    "--product-type",
+    "--standalone-icon-behavior",
+    "--sticker-pack-identifier-prefix",
+    "--sticker-pack-strings-file",
+    "--stickers-icon-role",
+    "--target-device",
+    "--widget-background-color",
+]

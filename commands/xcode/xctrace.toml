@@ -1,0 +1,52 @@
+[[command]]
+name = "xctrace"
+description = "Command-line front-end to Instruments for recording, importing, exporting, remodeling, and symbolicating `.trace` files. `list devices|templates|instruments`, `help`, `export`, and `version` are read-only and emit XML/text to stdout (or to --output). `import` reads a supported foreign format (e.g. `.ktrace`, `.logarchive`) and writes a new `.trace` file. `symbolicate` and `remodel` rewrite an existing `.trace` in place or to a new path. `record` is qualitatively different: it can launch arbitrary binaries (`--launch -- cmd args`), attach to running processes (`--attach pid|name`), set environment variables for those processes (`--env VAR=value`), redirect their stdio, and install third-party Instruments packages (`--package`) — effectively arbitrary code execution. Ships with Xcode."
+url = "https://keith.github.io/xcode-man-pages/xctrace.1.html"
+researched_version = "Xcode 15 / macOS 14 (man page dated 2023-01-03)"
+
+[[command.sub]]
+name = "help"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+bare = false
+first_arg = ["devices", "templates", "instruments"]
+standalone = ["--quiet", "--help", "-h"]
+
+[[command.sub]]
+name = "version"
+level = "Inert"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "export"
+level = "Inert"
+bare = false
+standalone = ["--har", "--quiet", "--toc", "--help", "-h"]
+valued = ["--input", "--output", "--xpath"]
+
+[[command.sub]]
+name = "import"
+level = "SafeWrite"
+bare = false
+standalone = ["--quiet", "--help", "-h"]
+valued = ["--input", "--instrument", "--output", "--package", "--template"]
+
+[[command.sub]]
+name = "symbolicate"
+level = "SafeWrite"
+bare = false
+standalone = ["--quiet", "--help", "-h"]
+valued = ["--dsym", "--input", "--output"]
+
+[[command.sub]]
+name = "record"
+candidate = true
+
+[[command.sub]]
+name = "remodel"
+candidate = true

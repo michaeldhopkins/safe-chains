@@ -1,0 +1,71 @@
+[[command]]
+name = "mig"
+description = "Mach Interface Generator: takes a `.defs` specification file and generates Remote Procedure Call client/server source code for Mach IPC. Always a write operation — produces user.c, server.c, and matching headers (paths controlled by -user, -server, -header, -sheader, -iheader, -dheader). Internally invokes the C preprocessor (-cc lets the caller pick which one) and then `migcom` to do the actual code generation. The man page notes that any additional unrecognized options are forwarded to the C compiler unchanged; this allowlist accepts only the documented MIG-specific flags, so the pass-through path is not enabled. Reads only the specification file; no network. Surface frozen since 2009."
+url = "https://keith.github.io/xcode-man-pages/mig.1.html"
+researched_version = "macOS 14 (man page dated 2009-11-20; surface frozen)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-B",
+    "-K",
+    "-L",
+    "-MD",
+    "-Q",
+    "-S",
+    "-V",
+    "-b",
+    "-cpp",
+    "-k",
+    "-l",
+    "-q",
+    "-s",
+    "-split",
+    "-v",
+]
+valued = [
+    "-arch",
+    "-cc",
+    "-dheader",
+    "-header",
+    "-i",
+    "-iheader",
+    "-isysroot",
+    "-maxonstack",
+    "-migcom",
+    "-server",
+    "-sheader",
+    "-user",
+]
+
+[[command]]
+name = "migcom"
+description = "Internal compiler used by `mig` to generate Mach IPC client/server source code. Not normally invoked directly — `mig` runs the C preprocessor on the spec file and then pipes the result into `migcom` on stdin. Always a write operation; outputs are user/server `.c` files and matching headers at the paths given by -user/-server/-header/-sheader/-iheader/-dheader. Reads from stdin only. Surface frozen since 2009."
+url = "https://keith.github.io/xcode-man-pages/migcom.1.html"
+researched_version = "macOS 14 (man page dated 2009-11-20; surface frozen)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-B",
+    "-K",
+    "-L",
+    "-Q",
+    "-S",
+    "-V",
+    "-b",
+    "-k",
+    "-l",
+    "-q",
+    "-s",
+    "-split",
+    "-v",
+]
+valued = [
+    "-dheader",
+    "-header",
+    "-i",
+    "-iheader",
+    "-maxonstack",
+    "-server",
+    "-sheader",
+    "-user",
+]
