@@ -1,0 +1,53 @@
+[[command]]
+name = "agy"
+description = "Google's Antigravity CLI — a terminal coding agent that reads, edits, and executes code through a multi-step reasoning loop. The bare invocation opens an interactive TUI that runs the agent against the current workspace; `-p/--print` runs it non-interactively against a single prompt. Both forms execute arbitrary code via tool calls. The `changelog` and `plugin list` (alias `plugins list`) subcommands are read-only views over locally cached state; `help [topic]` prints documentation; `install`/`update`/`plugin install`/`plugin uninstall`/`plugin enable`/`plugin disable` modify environment, the binary, or plugin state. Released as v1.0.0 in late 2025 and shipping point releases roughly monthly; the surface is still stabilizing."
+url = "https://antigravity.google/docs/cli-overview"
+researched_version = "agy 1.0.4 (2026)"
+bare_flags = ["--help", "--version", "-V", "-h"]
+
+[[command.sub]]
+name = "changelog"
+level = "Inert"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub]]
+name = "help"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "plugin"
+aliases = ["plugins"]
+nested_bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--help", "-h"]
+max_positional = 0
+
+[[command.sub.sub]]
+name = "install"
+candidate = true
+
+[[command.sub.sub]]
+name = "uninstall"
+candidate = true
+
+[[command.sub.sub]]
+name = "enable"
+candidate = true
+
+[[command.sub.sub]]
+name = "disable"
+candidate = true
+
+[[command.sub]]
+name = "install"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
