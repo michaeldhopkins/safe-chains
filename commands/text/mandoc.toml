@@ -1,0 +1,9 @@
+[[command]]
+name = "mandoc"
+description = "Formats mdoc(7) or man(7) manual-page source into plain text, HTML, PDF, PostScript, or other display formats, writing to stdout. Read-only: parses the input file(s) (or stdin) and emits formatted output without modifying the source. The `-T` flag selects the output format; `-O` accepts a comma-separated list of output options (indent, paper size, etc.) — none of those options invoke external commands. Mandoc releases roughly once per year and the flag set is stable across releases."
+url = "https://mandoc.bsd.lv/man/mandoc.1.html"
+researched_version = "mandoc 1.14.6 (2021); current 1.14.x line, slow cadence"
+level = "Inert"
+bare = true
+standalone = ["-a", "-c", "-man", "-mdoc"]
+valued = ["-I", "-K", "-O", "-T", "-W"]

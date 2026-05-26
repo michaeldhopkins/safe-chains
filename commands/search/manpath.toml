@@ -1,0 +1,9 @@
+[[command]]
+name = "manpath"
+description = "Prints the search path used by man(1) to locate manual pages, derived from $MANPATH, /etc/manpath.config, and per-user defaults. Read-only: produces a colon-separated path on stdout and exits. The mandoc/BSD form takes only `-L` (long form), `-d` (debug), and `-q` (quiet) and has been stable for years."
+url = "https://man7.org/linux/man-pages/man1/manpath.1.html"
+researched_version = "macOS 14 / mandoc 1.14.6 (BSD)"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["-L", "-d", "-q"]

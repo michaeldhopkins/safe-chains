@@ -415,6 +415,14 @@ Aliases: `7zz`, `7za`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `apropos`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/apropos.1.html">https://man7.org/linux/man-pages/man1/apropos.1.html</a></p>
+
+Aliases: `whatis`
+
+- Allowed standalone flags: -d
+- Allowed valued flags: -s
+
 ### `ar`
 <p class="cmd-url"><a href="https://sourceware.org/binutils/docs/binutils/ar.html">https://sourceware.org/binutils/docs/binutils/ar.html</a></p>
 
@@ -2381,6 +2389,12 @@ Aliases: `tiged`
 
 - Allowed standalone flags: --blame-code-style, --blame-palette, --color-only, --dark, --diff-highlight, --diff-so-fancy, --help, --hyperlinks, --keep-plus-minus-markers, --light, --line-numbers, --list-languages, --list-syntax-themes, --navigate, --no-gitconfig, --raw, --relative-paths, --show-config, --show-syntax-themes, --side-by-side, --version, -V, -h, -n, -s
 - Allowed valued flags: --commit-decoration-style, --commit-style, --config, --diff-stat-align-width, --features, --file-added-label, --file-decoration-style, --file-modified-label, --file-removed-label, --file-renamed-label, --file-style, --file-transformation, --hunk-header-decoration-style, --hunk-header-file-style, --hunk-header-line-number-style, --hunk-header-style, --hunk-label, --inline-hint-style, --inspect-raw-lines, --line-buffer-size, --line-fill-method, --line-numbers-left-format, --line-numbers-left-style, --line-numbers-minus-style, --line-numbers-plus-style, --line-numbers-right-format, --line-numbers-right-style, --line-numbers-zero-style, --map-styles, --max-line-distance, --max-line-length, --merge-conflict-begin-symbol, --merge-conflict-end-symbol, --merge-conflict-ours-diff-header-decoration-style, --merge-conflict-ours-diff-header-style, --merge-conflict-theirs-diff-header-decoration-style, --merge-conflict-theirs-diff-header-style, --minus-emph-style, --minus-empty-line-marker-style, --minus-non-emph-style, --minus-style, --paging, --plus-emph-style, --plus-empty-line-marker-style, --plus-non-emph-style, --plus-style, --syntax-theme, --tabs, --true-color, --whitespace-error-style, --width, -w
+- Bare invocation allowed
+
+### `demandoc`
+<p class="cmd-url"><a href="https://mandoc.bsd.lv/man/demandoc.1.html">https://mandoc.bsd.lv/man/demandoc.1.html</a></p>
+
+- Allowed standalone flags: -w
 - Bare invocation allowed
 
 ### `deno`
@@ -5524,6 +5538,12 @@ Aliases: `mlocate`, `plocate`
 - **stream**: Flags: --backtrace, --debug, --help, --info, --loss, --mach-continuous-time, --signpost, -h. Valued: --color, --level, --predicate, --process, --source, --style, --timeout, --type
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `look`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/look.1.html">https://man7.org/linux/man-pages/man1/look.1.html</a></p>
+
+- Allowed standalone flags: --alphanum, --ignore-case, -d, -f
+- Allowed valued flags: --terminate, -t
+
 ### `ls`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#ls-invocation</a></p>
 
@@ -5626,6 +5646,19 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 
 - Allowed standalone flags: --all, --apropos, --default, --help, --local-file, --regex, --update, --version, --whatis, --where, --where-cat, --wildcard, -V, -a, -f, -h, -k, -l, -u, -w
 - Allowed valued flags: --config-file, --encoding, --extension, --locale, --manpath, --sections, --systems, -C, -E, -L, -M, -S, -e, -m
+
+### `mandoc`
+<p class="cmd-url"><a href="https://mandoc.bsd.lv/man/mandoc.1.html">https://mandoc.bsd.lv/man/mandoc.1.html</a></p>
+
+- Allowed standalone flags: -a, -c, -man, -mdoc
+- Allowed valued flags: -I, -K, -O, -T, -W
+- Bare invocation allowed
+
+### `manpath`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/manpath.1.html">https://man7.org/linux/man-pages/man1/manpath.1.html</a></p>
+
+- Allowed standalone flags: -L, -d, -q
+- Bare invocation allowed
 
 ### `markdownlint`
 <p class="cmd-url"><a href="https://github.com/igorshubovych/markdownlint-cli">https://github.com/igorshubovych/markdownlint-cli</a></p>

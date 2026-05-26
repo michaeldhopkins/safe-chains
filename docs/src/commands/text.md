@@ -39,6 +39,12 @@
 - Allowed standalone flags: -V, -h, -n, -s, -w, -z, --complement, --help, --only-delimited, --version, --zero-terminated
 - Allowed valued flags: -b, -c, -d, -f, --bytes, --characters, --delimiter, --fields, --output-delimiter
 
+### `demandoc`
+<p class="cmd-url"><a href="https://mandoc.bsd.lv/man/demandoc.1.html">https://mandoc.bsd.lv/man/demandoc.1.html</a></p>
+
+- Allowed standalone flags: -w
+- Bare invocation allowed
+
 ### `expand`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation</a></p>
 
@@ -87,6 +93,13 @@
 
 - Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
 - Allowed valued flags: -P, -b, -h, -j, -p, -t, -x, -y, -z, --LINE-NUMBERS, --LONG-PROMPT, --pattern, --prompt, --shift, --tabs, --tag, --window
+- Bare invocation allowed
+
+### `mandoc`
+<p class="cmd-url"><a href="https://mandoc.bsd.lv/man/mandoc.1.html">https://mandoc.bsd.lv/man/mandoc.1.html</a></p>
+
+- Allowed standalone flags: -a, -c, -man, -mdoc
+- Allowed valued flags: -I, -K, -O, -T, -W
 - Bare invocation allowed
 
 ### `more`
