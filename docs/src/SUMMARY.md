@@ -6,7 +6,6 @@
 
 - [Installation](installation.md)
 - [Configuration](configuration.md)
-- [Usage](usage.md)
 - [Safety Levels](safety-levels.md)
 - [Custom Commands](custom-commands.md)
 
