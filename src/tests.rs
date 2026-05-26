@@ -1034,10 +1034,8 @@ denied! {
     help_brew_install_denied: "brew install --help",
     help_cargo_login_redirect_denied: "cargo login --help 2>&1",
 
-    version_unhandled_shred: "shred --version",
     version_unhandled_dd: "dd --version",
     version_unhandled_chmod: "chmod --version",
-    help_unhandled_shred: "shred --help",
     help_pip_install_trailing: "pip install evil --help",
     help_curl_data_trailing: "curl -d data --help",
     version_pip_install_trailing: "pip install evil --version",
@@ -1233,8 +1231,6 @@ denied! {
     hey_todo_add_denied: "hey todo add 'pick up milk'",
     python3_script: "python3 script.py",
     node_app: "node app.js",
-    tee_output: "tee output.txt",
-    tee_append: "tee -a logfile",
 
     awk_system: "awk 'BEGIN{system(\"rm\")}'",
 

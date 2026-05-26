@@ -1,0 +1,104 @@
+[[command]]
+name = "aspell"
+description = "Interactive/streaming spell checker. Read mode (list/pipe) is a pure stdin-to-stdout filter. The default 'check' interactive mode can modify the target file in place; coverage restricted to read subcommands."
+url = "https://aspell.net/"
+researched_version = "aspell 0.60"
+bare_flags = ["--help", "--version", "-?"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+standalone = ["--help", "--reverse", "-r"]
+valued = ["--lang", "--mode", "--encoding", "-l", "-m"]
+
+[[command.sub]]
+name = "pipe"
+level = "Inert"
+standalone = ["--help"]
+valued = ["--lang", "--mode", "--encoding", "-l", "-m"]
+
+[[command.sub]]
+name = "dump"
+level = "Inert"
+allow_all = true
+
+[[command.sub]]
+name = "config"
+level = "Inert"
+allow_all = true
+
+[[command.sub]]
+name = "dicts"
+level = "Inert"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "filters"
+level = "Inert"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "modes"
+level = "Inert"
+standalone = ["--help"]
+
+[[command.sub]]
+name = "check"
+candidate = true
+
+[[command.sub]]
+name = "soundslike"
+level = "Inert"
+standalone = ["--help"]
+valued = ["--lang", "-l"]
+
+[[command]]
+name = "ispell"
+description = "Interactive spell checker. Coverage restricted to the streaming -a/-l/-A modes which read from stdin and write to stdout. The default interactive mode is not covered (modifies files in place)."
+url = "https://www.cs.hmc.edu/~geoff/ispell.html"
+researched_version = "ispell 3.x"
+level = "Inert"
+bare = false
+standalone = ["-a", "-A", "-l", "-v", "-V", "--help", "--version"]
+valued = ["-d", "-p", "-w", "-T"]
+
+[[command]]
+name = "hunspell"
+description = "Spell checker with morphological analysis. The -l/-G/-d list modes are pure stdin-to-stdout filters. The default in-place mode is not covered."
+url = "https://hunspell.github.io/"
+researched_version = "hunspell 1.7"
+level = "Inert"
+bare = false
+standalone = [
+    "-1", "-D", "-G", "-H", "-L", "-O", "-P", "-X",
+    "-a", "-h", "-l", "-m", "-n", "-r", "-s", "-t", "-u",
+    "-v", "-w", "-x",
+    "--help", "--version",
+]
+valued = ["-d", "-p", "-i", "-o"]
+
+[[command]]
+name = "dict"
+description = "Client for DICT protocol dictionary servers. Read-only query of a remote dictionary server over TCP."
+url = "https://man7.org/linux/man-pages/man1/dict.1.html"
+researched_version = "dictd 1.13"
+level = "SafeRead"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--help", "--version",
+    "-a", "-D", "-I", "-S", "-V", "-i", "-r", "-s",
+]
+valued = [
+    "--host", "--port", "--database", "--strategy", "--match",
+    "-h", "-p", "-d", "-m", "-c", "-u", "-k", "-C", "-P",
+]
+
+[[command]]
+name = "hyphen"
+description = "Hyphenation pattern utility from libhyphen. Pure stdin-to-stdout filter that emits hyphenation positions. Local-only."
+url = "https://github.com/hunspell/hyphen"
+researched_version = "hyphen 2.8"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true

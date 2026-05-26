@@ -1,0 +1,191 @@
+[[command]]
+name = "cjpeg"
+description = "IJG/libjpeg-turbo JPEG encoder. Reads PPM/PGM/BMP/Targa/PNG and writes JPEG to stdout (default) or to -outfile PATH. Flags tune quality, smoothing, progressive/baseline mode, restart interval, and optimisation. No network. libjpeg-turbo 3.x surface; very stable."
+url = "https://libjpeg-turbo.org/"
+researched_version = "libjpeg-turbo 3.0.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-arithmetic", "-baseline", "-grayscale", "-greyscale",
+    "-rgb", "-rgb565",
+    "-optimize", "-optimise", "-progressive",
+    "-help", "-version", "-verbose", "-debug",
+    "-h", "-?",
+    "-icc",
+]
+valued = [
+    "-quality", "-q",
+    "-qtables", "-qslots",
+    "-sample", "-smooth",
+    "-restart",
+    "-dct", "-dpi",
+    "-maxmemory", "-memdst",
+    "-outfile", "-o",
+    "-scans",
+    "-target", "-strict",
+]
+
+[[command]]
+name = "djpeg"
+description = "IJG/libjpeg-turbo JPEG decoder. Reads a JPEG and writes a PPM/PGM/BMP/Targa/PNG to stdout (default) or -outfile PATH. Flags select output format and scaling. No network. libjpeg-turbo 3.x surface; very stable."
+url = "https://libjpeg-turbo.org/"
+researched_version = "libjpeg-turbo 3.0.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-bmp", "-gif", "-os2", "-pnm", "-rle", "-targa", "-tga",
+    "-grayscale", "-greyscale", "-rgb", "-rgb565",
+    "-fast", "-nosmooth",
+    "-help", "-version", "-verbose", "-debug",
+    "-h", "-?",
+    "-icc",
+]
+valued = [
+    "-colors", "-colours",
+    "-dct", "-dither", "-map",
+    "-maxmemory",
+    "-outfile", "-o",
+    "-scale",
+    "-strict",
+]
+
+[[command]]
+name = "cjxl"
+description = "libjxl JPEG XL encoder. Reads PNG/JPEG/APNG/EXR/PPM/PFM/PGX and writes a .jxl file. Many flags control distance (quality), effort, modular vs VarDCT, progressive, animation. No network. libjxl 0.10+ — surface still evolving but core flags stable."
+url = "https://github.com/libjxl/libjxl"
+researched_version = "libjxl 0.10.x"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--help", "-h", "--version", "-V",
+    "--lossless_jpeg", "--jpeg_reconstruction_cfl",
+    "--container", "--allow_expert_options",
+    "--centerfirst", "--codestream_level",
+    "--noise",
+    "--gaborish", "--patches",
+    "--quiet", "-q", "--verbose", "-v",
+    "--photon_noise",
+    "--allow_jpeg_reconstruction",
+    "--modular",
+    "--no_progressive",
+    "--progressive",
+    "--responsive",
+    "--strip",
+]
+valued = [
+    "-d", "--distance",
+    "--quality",
+    "-e", "--effort",
+    "-E", "--epf",
+    "-x", "--dec-hints",
+    "-m",
+    "--num_threads",
+    "--num_reps",
+    "--brotli_effort",
+    "--dots",
+    "--group_order",
+    "--center_x", "--center_y",
+    "--colortransform",
+    "--mquality",
+    "--colorspace",
+    "--frame_indexing",
+    "--progressive_dc",
+    "--progressive_ac",
+    "--qprogressive_ac",
+    "--target_size",
+    "--target_bpp",
+    "--intensity_target",
+    "--saliency_num_progressive_steps",
+    "--saliency_map_filename",
+    "--saliency_threshold",
+    "--photon_noise_iso",
+    "--modular_palette_colors",
+    "--modular_predictor",
+    "--modular_colorspace",
+    "--modular_channel_colors_global_percent",
+    "--modular_channel_colors_group_percent",
+    "--modular_ma_tree_learning_percent",
+    "--modular_nb_prev_channels",
+    "--print_profile",
+]
+
+[[command]]
+name = "djxl"
+description = "libjxl JPEG XL decoder. Reads a .jxl file and writes PNG/PPM/PFM/EXR/JPG. The output extension picks the format. No network. libjxl 0.10+; surface stable for the common decode path."
+url = "https://github.com/libjxl/libjxl"
+researched_version = "libjxl 0.10.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "-h", "--version", "-V",
+    "--quiet", "-q", "--verbose", "-v",
+    "--allow_partial_files",
+    "--print_info",
+    "--print_read_bytes",
+    "--disable_output",
+    "--norender_spotcolors",
+    "--print_profile",
+    "--allow_more_progressive_steps",
+]
+valued = [
+    "--num_threads",
+    "--num_reps",
+    "--bits_per_sample",
+    "--display_nits",
+    "--color_space",
+    "--downsampling",
+    "--pixels_to_jpeg_quality",
+    "--jpeg_quality",
+    "--tone_map",
+    "--render_spotcolors",
+    "--preview_out",
+    "--icc_out",
+    "--orig_icc_out",
+    "--metadata_out",
+    "--output_format",
+]
+
+[[command]]
+name = "jpegtran"
+description = "IJG/libjpeg-turbo lossless JPEG transformer. Rotates, flips, crops, transposes, or rewrites a JPEG without re-encoding. -outfile sets destination; -copy controls metadata propagation. No network. libjpeg-turbo 3.x surface; very stable."
+url = "https://libjpeg-turbo.org/"
+researched_version = "libjpeg-turbo 3.0.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-arithmetic", "-grayscale", "-greyscale",
+    "-optimize", "-optimise",
+    "-perfect", "-progressive", "-rotate",
+    "-strict", "-transpose", "-transverse", "-trim",
+    "-help", "-version", "-verbose", "-debug",
+    "-h", "-?",
+    "-icc",
+]
+valued = [
+    "-copy", "-crop", "-drop", "-flip",
+    "-maxmemory",
+    "-outfile", "-o",
+    "-restart",
+    "-scale", "-scans",
+    "-wipe",
+]
+
+[[command]]
+name = "rdjpgcom"
+description = "libjpeg comment reader. Prints any text comments (COM markers) embedded in a JPEG to stdout. Read-only."
+url = "https://libjpeg-turbo.org/"
+researched_version = "libjpeg-turbo 3.0.x"
+level = "Inert"
+bare = false
+standalone = ["-help", "-verbose", "-h", "-?"]
+
+[[command]]
+name = "wrjpgcom"
+description = "libjpeg comment writer. Reads a JPEG, inserts or replaces a COM marker, and writes the result to stdout (or to -outfile PATH). -comment text supplies the comment inline; -cfile reads it from a file. No network."
+url = "https://libjpeg-turbo.org/"
+researched_version = "libjpeg-turbo 3.0.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-replace", "-help", "-h", "-?"]
+valued = ["-comment", "-cfile", "-outfile", "-o"]

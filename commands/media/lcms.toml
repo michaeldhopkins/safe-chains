@@ -1,0 +1,100 @@
+[[command]]
+name = "jpgicc"
+description = "Little CMS JPEG ICC profile applier. Reads a JPEG, applies an ICC source/destination transform, and writes a new JPEG. -i sets the input profile; -o the output profile. -q controls quality. No network. LittleCMS 2.x."
+url = "https://www.littlecms.com/"
+researched_version = "Little CMS 2.16"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help",
+    "-v", "-V",
+    "-b",
+    "-d",
+    "-e", "-l",
+    "-n", "-p",
+    "-s",
+    "-x",
+]
+valued = [
+    "-i", "-o",
+    "-t",
+    "-q",
+    "-w",
+    "-c",
+]
+
+[[command]]
+name = "tificc"
+description = "Little CMS TIFF ICC profile applier. Reads a TIFF, applies an ICC source/destination transform, and writes a new TIFF. -i input profile; -o output profile. No network. LittleCMS 2.x."
+url = "https://www.littlecms.com/"
+researched_version = "Little CMS 2.16"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help",
+    "-v", "-V",
+    "-b",
+    "-d", "-e",
+    "-k", "-l",
+    "-n", "-p",
+    "-s",
+    "-x",
+]
+valued = [
+    "-i", "-o",
+    "-t",
+    "-w",
+    "-c",
+]
+
+[[command]]
+name = "psicc"
+description = "Little CMS PostScript ICC profile generator. Reads an ICC profile and writes a PostScript Color Space Array or CRD. -i input profile; -o destination .ps. No network. LittleCMS 2.x."
+url = "https://www.littlecms.com/"
+researched_version = "Little CMS 2.16"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help",
+    "-v", "-V",
+    "-c",
+]
+valued = ["-i", "-o", "-t"]
+
+[[command]]
+name = "linkicc"
+description = "Little CMS device-link ICC profile builder. Takes two or more ICC profiles plus an output filename and writes a device-link ICC. No network. LittleCMS 2.x."
+url = "https://www.littlecms.com/"
+researched_version = "Little CMS 2.16"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help",
+    "-v", "-V",
+    "-8",
+]
+valued = [
+    "-o",
+    "-d", "-D",
+    "-c", "-t",
+    "-k",
+]
+
+[[command]]
+name = "transicc"
+description = "Little CMS colour-space conversion calculator. Reads source/destination ICC profiles and interactively transforms colour values (or reads them from -i FILE, writes to -o FILE). No network. LittleCMS 2.x."
+url = "https://www.littlecms.com/"
+researched_version = "Little CMS 2.16"
+level = "SafeRead"
+bare = false
+standalone = [
+    "-h", "--help",
+    "-v", "-V",
+    "-c", "-w", "-x",
+    "-n",
+]
+valued = [
+    "-i", "-o",
+    "-l", "-t",
+    "-p",
+]

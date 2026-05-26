@@ -1,0 +1,62 @@
+[[command]]
+name = "recode"
+description = "Converts text between character sets and surface encodings. Default mode reads stdin and writes stdout; with file arguments and no -- options recode rewrites files in place. Coverage is restricted to the streaming/list forms."
+url = "https://github.com/rrthomas/recode"
+researched_version = "recode 3.7.x"
+level = "Inert"
+bare = false
+standalone = [
+    "--copy", "--force", "--help", "--known", "--list",
+    "--quiet", "--silent", "--touch", "--verbose", "--version",
+    "-V", "-f", "-h", "-k", "-l", "-q", "-t", "-v",
+]
+valued = [
+    "--charsets-source", "--graphics", "--header",
+    "--language", "--source", "--strict",
+    "-C", "-S", "-d", "-g", "-i", "-s",
+]
+
+[[command]]
+name = "uconv"
+description = "ICU-based character set converter and Unicode transformation tool. Pure stdin-to-stdout filter; never modifies files in place. Ships with ICU."
+url = "https://unicode-org.github.io/icu/userguide/icu/utilities.html#uconv"
+researched_version = "ICU 74+"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--version", "-?", "-h", "-V",
+    "-i", "-l", "-L", "-s", "-v",
+    "--invalid-skip", "--list-code",
+    "--show-cps", "--silent", "--verbose",
+]
+valued = [
+    "--add-signature", "--callback", "--copyright", "--encoding",
+    "--from-callback", "--from-code", "--match", "--name",
+    "--output", "--to-callback", "--to-code", "--transliterate",
+    "-c", "-f", "-o", "-t", "-x",
+]
+
+[[command]]
+name = "base32"
+description = "Encodes or decodes Base32. Pure stdin/stdout filter; no filesystem writes, no network. Coreutils; frozen surface."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#base32-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "Inert"
+bare = true
+standalone = ["--decode", "--help", "--ignore-garbage", "--version", "-d", "-h", "-i"]
+valued = ["--wrap", "-w"]
+
+[[command]]
+name = "basenc"
+description = "Generic base-N encoder/decoder (base64, base32, base32hex, base16, z85, etc.). Pure stdin/stdout filter. Coreutils."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#basenc-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "Inert"
+bare = true
+standalone = [
+    "--base16", "--base2lsbf", "--base2msbf", "--base32",
+    "--base32hex", "--base64", "--base64url", "--decode",
+    "--help", "--ignore-garbage", "--version", "--z85",
+    "-d", "-h", "-i",
+]
+valued = ["--wrap", "-w"]

@@ -341,7 +341,6 @@ mod tests {
         rm_rf: "rm -rf /",
         curl_post: "curl -X POST https://example.com",
         node_app: "node app.js",
-        tee_output: "tee output.txt",
 
 
         redirect_target_subst_rm: "echo hello > $(rm -rf /)",

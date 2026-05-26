@@ -1,0 +1,109 @@
+[[command]]
+name = "opj_compress"
+description = "OpenJPEG JPEG-2000 encoder. Reads PNG/PNM/PGX/BMP/TIFF/RAW/TGA/JPG and writes .j2k/.jp2. -i sets input; -o sets output. Many flags tune rate, layer count, tile size, progression order, ROI. No network. OpenJPEG 2.5+; surface stable."
+url = "https://github.com/uclouvain/openjpeg"
+researched_version = "OpenJPEG 2.5.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help", "-help", "-V", "--version", "-v",
+    "-EPH", "-SOP",
+    "-PLT", "-TLM",
+    "-MCT",
+    "-IMF",
+    "-poc",
+]
+valued = [
+    "-i", "-o", "-OutFor",
+    "-r", "-q", "-n", "-b", "-c", "-t", "-p",
+    "-d", "-s", "-M",
+    "-F", "-mct", "-cinema2K", "-cinema4K", "-jpip",
+    "-ImgDir", "-TP",
+    "-threads",
+    "-W", "-w",
+    "-ROI",
+    "-mode",
+    "-X",
+    "-z",
+]
+
+[[command]]
+name = "opj_decompress"
+description = "OpenJPEG JPEG-2000 decoder. Reads .j2k/.jp2 and writes PNG/PNM/PGX/BMP/TIFF/RAW/TGA. -i input; -o output. No network. OpenJPEG 2.5+."
+url = "https://github.com/uclouvain/openjpeg"
+researched_version = "OpenJPEG 2.5.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help", "-help", "-V", "--version", "-v",
+    "-force-rgb", "-upsample", "-split-pnm",
+    "-allow-partial",
+]
+valued = [
+    "-i", "-o", "-OutFor",
+    "-ImgDir",
+    "-r", "-l",
+    "-d", "-t",
+    "-precision",
+    "-threads",
+    "-quiet",
+    "-c",
+]
+
+[[command]]
+name = "opj_dump"
+description = "OpenJPEG JPEG-2000 inspector. Prints codestream and box structure for a .j2k/.jp2. -i input; -o writes the report to a file. Read-only."
+url = "https://github.com/uclouvain/openjpeg"
+researched_version = "OpenJPEG 2.5.x"
+level = "Inert"
+bare = false
+standalone = [
+    "-h", "--help", "-help", "-V", "--version", "-v",
+]
+valued = ["-i", "-o", "-ImgDir", "-f"]
+
+[[command]]
+name = "jasper"
+description = "JasPer JPEG-2000 codec CLI. Converts between many image formats (JPEG-2000, BMP, PNM, PGX, JPG, MIF, RAS). --input/--output pick paths; --input-format/--output-format pick formats. No network. JasPer 4.x."
+url = "https://www.ece.uvic.ca/~frodo/jasper/"
+researched_version = "JasPer 4.2.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help", "-V", "--version",
+    "--verbose",
+    "--force-srgb",
+]
+valued = [
+    "-f", "--input",
+    "-F", "--output",
+    "-t", "--input-format",
+    "-T", "--output-format",
+    "-O", "--output-option",
+    "-x", "--debug-level",
+    "--cmpt",
+]
+
+[[command]]
+name = "jbig2dec"
+description = "Artifex JBIG2 decoder. Reads a JBIG2 stream and writes PBM/PNG output. -o sets output; --hash prints a hash of pages instead. No network. jbig2dec 0.20+."
+url = "https://github.com/ArtifexSoftware/jbig2dec"
+researched_version = "jbig2dec 0.20"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help", "-V", "--version",
+    "--quiet", "-q",
+    "--verbose", "-v",
+    "--hash",
+    "--embedded",
+    "-e",
+    "--pdf",
+    "-p",
+    "--no-render",
+    "-t",
+]
+valued = [
+    "-o", "--output",
+    "-T", "--report-threshold",
+]

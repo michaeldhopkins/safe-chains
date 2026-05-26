@@ -1,0 +1,76 @@
+[[command]]
+name = "heif-dec"
+description = "libheif HEIC/HEIF decoder. Reads a HEIF/AVIF file and writes JPEG/PNG/Y4M. The output filename derives from the input or -o sets it. No network. libheif 1.18+; surface stable."
+url = "https://github.com/strukturag/libheif"
+researched_version = "libheif 1.18.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help", "-v", "--version",
+    "--quiet",
+    "--with-aux",
+    "--with-xmp",
+    "--with-exif",
+    "--no-colons",
+    "--list-decoders",
+]
+valued = [
+    "-o", "--output",
+    "-q", "--quality",
+    "-d", "--decoder",
+    "--png-compression-level",
+]
+
+[[command]]
+name = "heif-enc"
+description = "libheif HEIC/HEIF encoder. Reads JPEG/PNG/Y4M and writes a .heic/.avif file. -q controls quality; -L enables lossless; -e selects encoder; -o sets the output. No network. libheif 1.18+."
+url = "https://github.com/strukturag/libheif"
+researched_version = "libheif 1.18.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help", "-v", "--version",
+    "-L", "--lossless",
+    "--avif", "--heic",
+    "--no-alpha",
+    "--list-encoders",
+    "--list-encoder-parameters",
+    "--quiet",
+    "--thumbnail-bbox",
+]
+valued = [
+    "-q", "--quality",
+    "-o", "--output",
+    "-e", "--encoder",
+    "-p", "--parameter",
+    "-t", "--thumb",
+    "--chroma",
+    "--bit-depth",
+    "--matrix_coefficients",
+    "--colour_primaries",
+    "--transfer_characteristic",
+    "--full_range_flag",
+]
+
+[[command]]
+name = "heif-thumbnailer"
+description = "libheif thumbnail generator. Reads a HEIC/HEIF and writes a downscaled PNG thumbnail. -s sets the size; the second argument is the output PNG. No network."
+url = "https://github.com/strukturag/libheif"
+researched_version = "libheif 1.18.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "--help", "-v", "--version"]
+valued = ["-s", "--size"]
+
+[[command]]
+name = "heif-info"
+description = "libheif inspector. Prints item, image, and metadata info for a HEIC/HEIF file. Read-only."
+url = "https://github.com/strukturag/libheif"
+researched_version = "libheif 1.18.x"
+level = "Inert"
+bare = false
+standalone = [
+    "-h", "--help", "-v", "--version",
+    "--dump-boxes",
+    "--no-colors",
+]

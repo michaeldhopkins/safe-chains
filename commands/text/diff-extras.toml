@@ -1,0 +1,59 @@
+[[command]]
+name = "diff3"
+description = "Compares three files line by line to identify changes between two derivatives of a common ancestor. Read-only; writes merged or diff output to stdout. Part of GNU diffutils; stable."
+url = "https://www.gnu.org/software/diffutils/manual/diffutils.html#diff3-Invocation"
+researched_version = "GNU diffutils 3.10"
+level = "Inert"
+bare = false
+standalone = [
+    "--easy-only", "--ed", "--help", "--initial-tab", "--merge",
+    "--overlap-only", "--show-all", "--show-overlap",
+    "--strip-trailing-cr", "--text", "--version",
+    "-3", "-A", "-E", "-T", "-V", "-X", "-a", "-e", "-h", "-i", "-m", "-x",
+]
+valued = ["--diff-program", "--label", "-L"]
+
+[[command]]
+name = "sdiff"
+description = "Side-by-side diff. Coverage is restricted to non-interactive read-only forms."
+url = "https://www.gnu.org/software/diffutils/manual/diffutils.html#sdiff-Invocation"
+researched_version = "GNU diffutils 3.10"
+level = "Inert"
+bare = false
+standalone = [
+    "--expand-tabs", "--help", "--ignore-all-space",
+    "--ignore-blank-lines", "--ignore-case",
+    "--ignore-space-change", "--ignore-tab-expansion",
+    "--left-column", "--minimal", "--speed-large-files",
+    "--strip-trailing-cr", "--suppress-common-lines",
+    "--text", "--version",
+    "-B", "-E", "-H", "-V", "-a", "-b", "-d", "-h", "-i", "-l", "-s", "-t",
+]
+valued = ["--diff-program", "--ignore-matching-lines", "--tabsize", "--width", "-I", "-W"]
+
+[[command]]
+name = "wdiff"
+description = "Word-level diff between two text files. Read-only; writes annotated text to stdout. GNU wdiff; stable."
+url = "https://www.gnu.org/software/wdiff/"
+researched_version = "GNU wdiff 1.2.2"
+level = "Inert"
+bare = false
+standalone = [
+    "--auto-pager", "--avoid-wraps", "--copyright", "--end-delete",
+    "--end-insert", "--help", "--ignore-case", "--less-mode",
+    "--line-numbers", "--no-common", "--no-deleted",
+    "--no-init-term", "--no-inserted", "--printer", "--start-delete",
+    "--start-insert", "--statistics", "--terminal", "--version",
+    "-1", "-2", "-3", "-C", "-V", "-a", "-c", "-d", "-h", "-i",
+    "-l", "-n", "-p", "-s", "-t", "-w", "-y", "-z",
+]
+valued = ["--diff-input", "-W"]
+
+[[command]]
+name = "diffstat"
+description = "Summarizes a diff into a histogram of file changes (lines added/removed). Read-only filter; writes summary to stdout. Stable upstream."
+url = "https://invisible-island.net/diffstat/"
+researched_version = "diffstat 1.66"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true

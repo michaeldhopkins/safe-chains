@@ -1,0 +1,103 @@
+[[command]]
+name = "colrm"
+description = "Removes specified columns from each line of stdin, writing the trimmed result to stdout. Read-only filter. util-linux."
+url = "https://man7.org/linux/man-pages/man1/colrm.1.html"
+researched_version = "util-linux 2.40"
+level = "Inert"
+bare = true
+max_positional = 2
+standalone = ["--help", "--version", "-V", "-h"]
+
+[[command]]
+name = "jot"
+description = "Prints sequential or random data (numbers, characters) to stdout. BSD-derived utility; pure stdout producer with no filesystem access or network."
+url = "https://man.freebsd.org/cgi/man.cgi?jot"
+researched_version = "macOS 14 / FreeBSD jot"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true
+
+[[command]]
+name = "lam"
+description = "Laminates files: concatenates them line by line into multi-column output. Read-only filter to stdout. BSD-derived."
+url = "https://man.freebsd.org/cgi/man.cgi?lam"
+researched_version = "macOS 14 / FreeBSD lam"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+
+[[command]]
+name = "units"
+description = "Interactive or single-shot unit converter. Pure arithmetic and unit-database lookup; the -f flag reads a units database file but does not modify it. No network access in normal operation. GNU units; stable."
+url = "https://www.gnu.org/software/units/"
+researched_version = "GNU units 2.x"
+level = "Inert"
+bare = true
+standalone = [
+    "--check", "--compact", "--exponential", "--help", "--one-line",
+    "--quiet", "--strict", "--terse", "--units", "--verbose", "--version",
+    "-1", "-V", "-c", "-e", "-h", "-q", "-s", "-t", "-v",
+]
+valued = [
+    "--digits", "--file", "--history", "--log", "--output-format",
+    "-d", "-f", "-H", "-L", "-o",
+]
+
+[[command]]
+name = "dc"
+description = "Reverse-Polish arbitrary-precision desk calculator. Reads from stdin or files; computation is purely numeric with no filesystem writes and no shell command execution. POSIX/GNU; stable."
+url = "https://www.gnu.org/software/bc/manual/dc-1.05/html_mono/dc.html"
+researched_version = "GNU dc / BSD dc"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-V", "-h"]
+valued = ["--expression", "--file", "-e", "-f"]
+
+[[command]]
+name = "what"
+description = "Prints SCCS-style version strings (@(#)...) embedded in files. Strictly read-only metadata extraction; writes results to stdout. BSD/POSIX; frozen surface."
+url = "https://man.freebsd.org/cgi/man.cgi?what"
+researched_version = "macOS 14 / FreeBSD what"
+level = "Inert"
+bare = false
+standalone = ["-V", "-h", "-q", "-s"]
+
+[[command]]
+name = "lessecho"
+description = "Helper used by less to echo arguments with special-character quoting. Pure stdout producer; no filesystem writes, no network."
+url = "https://man7.org/linux/man-pages/man1/lessecho.1.html"
+researched_version = "less 668"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true
+
+[[command]]
+name = "ncal"
+description = "Displays a calendar, optionally with week numbers, Easter date, or month-name conversions. Pure stdout producer; no filesystem or network access. BSD-derived; stable."
+url = "https://man.freebsd.org/cgi/man.cgi?ncal"
+researched_version = "macOS 14 / FreeBSD ncal"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true
+
+[[command]]
+name = "recode-sr-latin"
+description = "Transliterates Serbian Cyrillic text to Latin script. Read-only stdin-to-stdout filter. Part of gettext; stable."
+url = "https://www.gnu.org/software/gettext/manual/html_node/recode_002dsr_002dlatin-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-h", "-V"]
+
+[[command]]
+name = "soelim"
+description = "Reads roff source and inlines any .so requests by reading and substituting the referenced files. Read-only filter to stdout. groff/mandoc utility."
+url = "https://man7.org/linux/man-pages/man1/soelim.1.html"
+researched_version = "GNU groff 1.23 / mandoc"
+level = "Inert"
+bare = true
+standalone = [
+    "--compatible", "--help", "--raw", "--tex", "--version",
+    "-C", "-r", "-t", "-v",
+]
+valued = ["-I"]
