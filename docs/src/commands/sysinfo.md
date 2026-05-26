@@ -76,6 +76,8 @@
 ### `groups`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#groups-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#groups-invocation</a></p>
 
+Aliases: `ggroups`
+
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
 
@@ -268,6 +270,8 @@ Aliases: `glogname`
 ### `sleep`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#sleep-invocation</a></p>
 
+Aliases: `gsleep`
+
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `sw_vers`
@@ -298,6 +302,8 @@ Aliases: `glogname`
 ### `tty`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#tty-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#tty-invocation</a></p>
 
+Aliases: `gtty`
+
 - Allowed standalone flags: --help, --quiet, --silent, --version, -V, -h, -s
 - Bare invocation allowed
 
@@ -311,6 +317,8 @@ Aliases: `guname`
 
 ### `uptime`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation</a></p>
+
+Aliases: `guptime`
 
 - Allowed standalone flags: --help, --pretty, --since, --version, -V, -h, -p, -s
 - Bare invocation allowed

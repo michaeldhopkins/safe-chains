@@ -43,6 +43,8 @@
 ### `cat`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#cat-invocation</a></p>
 
+Aliases: `gcat`
+
 - Allowed standalone flags: -A, -E, -T, -V, -b, -e, -h, -l, -n, -s, -t, -u, -v, --help, --number, --number-nonblank, --show-all, --show-ends, --show-nonprinting, --show-tabs, --squeeze-blank, --version
 - Bare invocation allowed
 
@@ -69,11 +71,15 @@
 ### `comm`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#comm-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#comm-invocation</a></p>
 
+Aliases: `gcomm`
+
 - Allowed standalone flags: -1, -2, -3, -V, -h, -i, -z, --check-order, --help, --nocheck-order, --total, --version, --zero-terminated
 - Allowed valued flags: --output-delimiter
 
 ### `cut`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#cut-invocation</a></p>
+
+Aliases: `gcut`
 
 - Allowed standalone flags: -V, -h, -n, -s, -w, -z, --complement, --help, --only-delimited, --version, --zero-terminated
 - Allowed valued flags: -b, -c, -d, -f, --bytes, --characters, --delimiter, --fields, --output-delimiter
@@ -121,6 +127,8 @@ Aliases: `gdircolors`
 ### `expand`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation</a></p>
 
+Aliases: `gexpand`
+
 - Allowed standalone flags: -V, -h, -i, --help, --initial, --version
 - Allowed valued flags: -t, --tabs
 - Bare invocation allowed
@@ -128,12 +136,16 @@ Aliases: `gdircolors`
 ### `fmt`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation</a></p>
 
+Aliases: `gfmt`
+
 - Allowed standalone flags: -V, -c, -h, -m, -n, -s, -u, --crown-margin, --help, --split-only, --tagged-paragraph, --uniform-spacing, --version
 - Allowed valued flags: -d, -g, -l, -p, -t, -w, --goal, --prefix, --width
 - Bare invocation allowed
 
 ### `fold`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#fold-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#fold-invocation</a></p>
+
+Aliases: `gfold`
 
 - Allowed standalone flags: -V, -b, -h, -s, --bytes, --help, --spaces, --version
 - Allowed valued flags: -w, --width
@@ -161,6 +173,8 @@ Aliases: `gdircolors`
 
 ### `head`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation</a></p>
+
+Aliases: `ghead`
 
 - Allowed standalone flags: -V, -h, -q, -v, -z, --help, --quiet, --silent, --verbose, --version, --zero-terminated
 - Allowed valued flags: -c, -n, --bytes, --lines
@@ -359,6 +373,8 @@ Aliases: `gjoin`
 ### `nl`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#nl-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#nl-invocation</a></p>
 
+Aliases: `gnl`
+
 - Allowed standalone flags: -V, -p, --help, --no-renumber, --version
 - Allowed valued flags: -b, -d, -f, -h, -i, -l, -n, -s, -v, -w, --body-numbering, --footer-numbering, --header-numbering, --join-blank-lines, --line-increment, --number-format, --number-separator, --number-width, --section-delimiter, --starting-line-number
 - Bare invocation allowed
@@ -378,6 +394,8 @@ Aliases: `gnohup`
 
 ### `paste`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#paste-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#paste-invocation</a></p>
+
+Aliases: `gpaste`
 
 - Allowed standalone flags: -V, -h, -s, -z, --help, --serial, --version, --zero-terminated
 - Allowed valued flags: -d, --delimiters
@@ -427,6 +445,8 @@ Aliases: `gptx`
 
 ### `rev`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/rev.1.html">https://man7.org/linux/man-pages/man1/rev.1.html</a></p>
+
+Aliases: `grev`
 
 - Allowed standalone flags: -V, -h, --help, --version
 - Bare invocation allowed
@@ -480,12 +500,16 @@ Aliases: `gshred`
 ### `tac`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#tac-invocation</a></p>
 
+Aliases: `gtac`
+
 - Allowed standalone flags: -V, -b, -h, -r, --before, --help, --regex, --version
 - Allowed valued flags: -s, --separator
 - Bare invocation allowed
 
 ### `tail`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#tail-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#tail-invocation</a></p>
+
+Aliases: `gtail`
 
 - Allowed standalone flags: -F, -V, -f, -h, -q, -r, -v, -z, --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated
 - Allowed valued flags: -b, -c, -n, --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval
@@ -525,6 +549,8 @@ Aliases: `gtee`
 ### `tr`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation</a></p>
 
+Aliases: `gtr`
+
 - Allowed standalone flags: -C, -V, -c, -d, -h, -s, --complement, --delete, --help, --squeeze-repeats, --truncate-set1, --version
 
 ### `tsort`
@@ -551,6 +577,8 @@ Aliases: `gtsort`
 ### `unexpand`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#unexpand-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#unexpand-invocation</a></p>
 
+Aliases: `gunexpand`
+
 - Allowed standalone flags: -V, -a, -h, --all, --first-only, --help, --version
 - Allowed valued flags: -t, --tabs
 - Bare invocation allowed
@@ -567,6 +595,8 @@ Aliases: `unifdefall`
 ### `uniq`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#uniq-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#uniq-invocation</a></p>
 
+Aliases: `guniq`
+
 - Allowed standalone flags: -D, -V, -c, -d, -h, -i, -u, -z, --count, --help, --ignore-case, --repeated, --unique, --version, --zero-terminated
 - Allowed valued flags: -f, -s, -w, --all-repeated, --check-chars, --group, --skip-chars, --skip-fields
 - Bare invocation allowed
@@ -580,6 +610,8 @@ Aliases: `unifdefall`
 
 ### `wc`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#wc-invocation</a></p>
+
+Aliases: `gwc`
 
 - Allowed standalone flags: -L, -V, -c, -h, -l, -m, -w, --bytes, --chars, --help, --lines, --max-line-length, --version, --words, --zero-terminated
 - Allowed valued flags: --files0-from

@@ -54,6 +54,8 @@ Aliases: `typeset`
 ### `false`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#false-invocation</a></p>
 
+Aliases: `gfalse`
+
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
 
@@ -73,6 +75,8 @@ Aliases: `typeset`
 
 ### `printenv`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#printenv-invocation</a></p>
+
+Aliases: `gprintenv`
 
 - Allowed standalone flags: --help, --null, --version, -0, -V, -h
 - Bare invocation allowed
@@ -94,6 +98,8 @@ Aliases: `typeset`
 
 ### `true`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#true-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#true-invocation</a></p>
+
+Aliases: `gtrue`
 
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed

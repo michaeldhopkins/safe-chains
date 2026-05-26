@@ -22,6 +22,8 @@
 ### `od`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#od-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#od-invocation</a></p>
 
+Aliases: `god`
+
 - Allowed standalone flags: -V, -b, -c, -d, -f, -h, -i, -l, -o, -s, -v, -x, --help, --output-duplicates, --traditional, --version
 - Allowed valued flags: -A, -N, -S, -j, -t, -w, --address-radix, --endian, --format, --read-bytes, --skip-bytes, --strings, --width
 - Bare invocation allowed

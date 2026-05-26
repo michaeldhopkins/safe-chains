@@ -1,5 +1,6 @@
 [[command]]
 name = "rm"
+aliases = ["grm"]
 description = "Removes files and (with -r/-R) directory trees from the local filesystem. Operates under the user's permissions and cannot reach remote systems, but is catastrophic when targeted at the wrong path (rm -rf /, rm -rf ~, etc.) — the binary itself doesn't distinguish a safe target from a dangerous one. Coverage is therefore restricted to the two informational forms that never delete anything: --help prints the usage summary; --version prints the binary version. Every form that removes a file remains out of coverage. Extremely stable on both BSD and GNU; flag surface unchanged for years."
 url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#rm-invocation"
 researched_version = "GNU coreutils 9.x + BSD rm (macOS 15 / Sequoia)"
