@@ -145,6 +145,10 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
         return sub_v.combine(redir_v);
     }
 
+    if cmd.words[0].eval() == "eval" {
+        return eval_verdict(cmd).combine(sub_v).combine(redir_v);
+    }
+
     let tokens: Vec<Token> = cmd.words.iter().map(|w| Token::from_raw(w.eval())).collect();
     if tokens.is_empty() {
         return Verdict::Allowed(SafetyLevel::Inert);
@@ -152,6 +156,125 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
 
     let cmd_v = handlers::dispatch(&tokens);
     sub_v.combine(cmd_v).combine(redir_v)
+}
+
+fn eval_verdict(cmd: &SimpleCmd) -> Verdict {
+    if cmd.words.len() < 2 {
+        return Verdict::Denied;
+    }
+    for arg in &cmd.words[1..] {
+        if !arg_is_eval_safe(arg) {
+            return Verdict::Denied;
+        }
+    }
+    Verdict::Allowed(SafetyLevel::Inert)
+}
+
+fn arg_is_eval_safe(word: &Word) -> bool {
+    let mut found_safe = false;
+    for part in &word.0 {
+        match part {
+            WordPart::Lit(s) | WordPart::SQuote(s) => {
+                if !s.chars().all(char::is_whitespace) {
+                    return false;
+                }
+            }
+            WordPart::Escape(c) => {
+                if !c.is_whitespace() {
+                    return false;
+                }
+            }
+            WordPart::CmdSub(script) => {
+                if !script_yields_eval_safe(script) {
+                    return false;
+                }
+                found_safe = true;
+            }
+            WordPart::Backtick(raw) => {
+                let Some(script) = parse(raw) else {
+                    return false;
+                };
+                if !script_yields_eval_safe(&script) {
+                    return false;
+                }
+                found_safe = true;
+            }
+            WordPart::DQuote(inner) => {
+                if !arg_is_eval_safe(inner) {
+                    return false;
+                }
+                if has_substitution(inner) {
+                    found_safe = true;
+                }
+            }
+            WordPart::ProcSub(_) | WordPart::Arith(_) => return false,
+        }
+    }
+    found_safe
+}
+
+fn script_yields_eval_safe(script: &Script) -> bool {
+    if script.0.len() != 1 {
+        return false;
+    }
+    let stmt = &script.0[0];
+    if !matches!(stmt.op, None | Some(ListOp::Semi)) {
+        return false;
+    }
+    let pipeline = &stmt.pipeline;
+    if pipeline.bang || pipeline.commands.len() != 1 {
+        return false;
+    }
+    let Cmd::Simple(s) = &pipeline.commands[0] else {
+        return false;
+    };
+    if !s.env.is_empty() || !s.redirs.is_empty() {
+        return false;
+    }
+    for w in &s.words {
+        if !word_is_plain_literal(w) {
+            return false;
+        }
+    }
+    let tokens: Vec<Token> = s.words.iter().map(|w| Token::from_raw(w.eval())).collect();
+    if tokens.is_empty() {
+        return false;
+    }
+    crate::registry::is_eval_safe_invocation(&tokens)
+}
+
+/// True iff every character of `word` is drawn from the bare-literal
+/// alphabet: ASCII alphanumerics plus `_`, `-`, `.`, `/`, `=`. Words
+/// matching this shape consist entirely of identifier-style or
+/// path-style tokens that the shell will pass through to the
+/// substituted command unchanged at runtime.
+///
+/// Required for words inside eval-safe substitutions because the
+/// "stdout is shell-init code" trust depends on the contributor having
+/// vetted what gets passed to the tool. Restricting the alphabet to
+/// chars with no shell-expansion semantics keeps the substituted
+/// invocation static across parse-time and runtime — what you see in
+/// the source is what the tool receives.
+fn word_is_plain_literal(word: &Word) -> bool {
+    word.0.iter().all(part_is_plain_literal)
+}
+
+fn part_is_plain_literal(part: &WordPart) -> bool {
+    match part {
+        WordPart::Lit(s) | WordPart::SQuote(s) => s.chars().all(is_bare_literal_char),
+        WordPart::Escape(c) => is_bare_literal_char(*c),
+        WordPart::DQuote(inner) => word_is_plain_literal(inner),
+        WordPart::CmdSub(_) | WordPart::ProcSub(_) | WordPart::Backtick(_) | WordPart::Arith(_) => false,
+    }
+}
+
+/// Bare-literal alphabet: ASCII alphanumerics plus a tight punctuation
+/// set covering identifiers (`_`, `-`), versions / paths (`.`, `/`),
+/// and the long-flag value form (`=`). New chars require an explicit
+/// eval-safe use case — add by extending this match, never by
+/// excluding individual hostile chars.
+fn is_bare_literal_char(c: char) -> bool {
+    c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.' | '/' | '=')
 }
 
 pub(crate) fn check_redirects(redirs: &[Redir]) -> bool {

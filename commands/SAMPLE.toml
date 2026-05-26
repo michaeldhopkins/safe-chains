@@ -482,6 +482,85 @@
 # moment to fill it in, not before.
 
 # ─────────────────────────────────────────────────────────────────────
+# EVAL_SAFE — tag invocations safe to substitute inside `eval "$(...)"`
+# ─────────────────────────────────────────────────────────────────────
+#
+# Use for: commands whose stdout is documented shell-init code (e.g.
+# `mise activate bash`, `ssh-agent`, `starship init bash`). Lets the
+# check accept `eval "$(CMD ...)"` for the specific tagged invocation.
+#
+# Set `eval_safe = true` at the leaf dispatch node — the [[command]]
+# itself for flat commands, the [[command.sub]] for subcommands, or
+# the [[command.sub.sub]] for nested ones. The tag is leaf-precise:
+# tagging a parent does NOT propagate to its subs.
+#
+# [[command.sub]]
+# name = "activate"
+# bare = true
+# max_positional = 1
+# standalone = ["--help", "-h", "--shims", "--quiet", "--no-hook-env"]
+# eval_safe = true
+# eval_safe_flags = ["--shims", "--quiet", "--no-hook-env"]
+#
+# `eval_safe_flags` is the allowlist of `-`-prefixed tokens permitted
+# inside the substitution. Default empty — meaning only the bare form
+# plus positionals are eval-safe. Omit flags like `--help` and
+# `--version` whose output is not shell-init code.
+#
+# Positionals (e.g. `bash` for the shell name) are not in the flag
+# list — they're vetted by the regular `max_positional` check.
+# Tagging the sub asserts that every valid positional combination
+# produces shell-init stdout.
+#
+# Flat command, bare form only:
+#
+# [[command]]
+# name = "ssh-agent"
+# bare = true
+# eval_safe = true
+#
+# CONTRIBUTOR VETTING CHECKLIST — before tagging:
+#   1. The sub's stdout is documented shell-init code (link to the
+#      upstream docs in the description).
+#   2. The tool writes errors to stderr, never stdout (a stdout error
+#      message would be eval'd).
+#   3. Each flag in `eval_safe_flags` has been confirmed to keep the
+#      stdout shape (e.g. boolean toggles are safe; valued flags whose
+#      value embeds in output need extra care because the eval walker
+#      only checks the flag NAME, not its value).
+#   4. Every valid positional this sub accepts produces shell-init
+#      output — including unusual values, paths, etc.
+#
+# SHAPE REQUIREMENTS — the check enforces:
+#   - The eval substitution must be exactly one simple command (no
+#     pipelines, no `!`, no trailing `&`, no env prefix, no redirects,
+#     no nested substitutions).
+#   - Every word in the substitution must be a bare literal: every
+#     character drawn from `[a-zA-Z0-9_./=-]`. Words made of this
+#     alphabet are passed to the substituted command unchanged at
+#     runtime, so what the contributor sees in the eval is what the
+#     tool receives. Anything outside the alphabet (a `$` in `$VAR`,
+#     a `*` in a glob, a `{` in brace expansion, whitespace, etc.)
+#     would defer the value to runtime and defeat per-tag vetting.
+#
+# BUILD-TIME CHECKS — the build panics if:
+#   - `eval_safe_flags` is set without `eval_safe = true`.
+#   - `eval_safe = true` is set on a command/sub that has nested
+#     subs (tag the specific sub-sub instead — the walker is leaf-
+#     precise, not greedy).
+#   - `eval_safe = true` is set on a handler-based or wrapper
+#     command (those use Rust dispatch the walker can't introspect).
+#   - `eval_safe = true` is set on a `delegate_after` / `delegate_skip`
+#     sub (those forward to an unrelated inner command).
+#   - Both `deny = true` and `eval_safe = true` are set.
+#
+# CUSTOM TOMLS: every field documented in SAMPLE.toml — including
+# `eval_safe` and `eval_safe_flags` — applies in project-level
+# `.safe-chains.toml` and user-level `~/.config/safe-chains.toml`.
+# The user owns those files; eval-safety in a custom TOML is the
+# same trust model as adding any other command override.
+
+# ─────────────────────────────────────────────────────────────────────
 # DENY — shortcut for "every invocation of this command is denied"
 # ─────────────────────────────────────────────────────────────────────
 #

@@ -135,6 +135,64 @@ fn handler_spec(cmd_name: &str) -> Option<&'static CommandSpec> {
         .or_else(|| TOML_REGISTRY.get(cmd_name))
 }
 
+/// Returns true iff this invocation is tagged eval-safe — meaning its
+/// stdout is documented shell-init code that can safely be substituted
+/// inside `eval "$(...)"`.
+///
+/// The walker descends through `DispatchKind::Branching` matching subs
+/// token-by-token. The leaf is the deepest matched node (where no further
+/// sub matches). `eval_safe` is checked only at the leaf — ancestor tags
+/// do NOT propagate. After confirming the leaf is tagged, every
+/// `-`-prefixed token in the remaining tail must appear in
+/// `eval_safe_flags`; positionals are unrestricted.
+///
+/// Tagged nodes are vetted manually per-command (see SAMPLE.toml). This
+/// function does not validate that `tokens` is syntactically allowed —
+/// callers must have already passed it through the regular dispatcher.
+pub fn is_eval_safe_invocation(tokens: &[Token]) -> bool {
+    if tokens.is_empty() {
+        return false;
+    }
+    let cmd = tokens[0].command_name();
+    let Some(spec) = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd)) else {
+        return false;
+    };
+    walk_to_eval_safe_leaf(&tokens[1..], &spec.kind, spec.eval_safe, &spec.eval_safe_flags)
+}
+
+fn walk_to_eval_safe_leaf(
+    remaining: &[Token],
+    kind: &DispatchKind,
+    eval_safe: bool,
+    eval_safe_flags: &[String],
+) -> bool {
+    if let DispatchKind::Branching { subs, .. } = kind
+        && let Some(arg) = remaining.first()
+        && let Some(sub) = subs.iter().find(|s| s.name == arg.as_str())
+    {
+        return walk_to_eval_safe_leaf(
+            &remaining[1..],
+            &sub.kind,
+            sub.eval_safe,
+            &sub.eval_safe_flags,
+        );
+    }
+    if !eval_safe {
+        return false;
+    }
+    for t in remaining {
+        let s = t.as_str();
+        if !s.starts_with('-') {
+            continue;
+        }
+        let bare = s.split_once('=').map_or(s, |(k, _)| k);
+        if !eval_safe_flags.iter().any(|f| f == bare) {
+            return false;
+        }
+    }
+    true
+}
+
 pub fn toml_command_docs() -> Vec<crate::docs::CommandDoc> {
     TOML_REGISTRY
         .iter()

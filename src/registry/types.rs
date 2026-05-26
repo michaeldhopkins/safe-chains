@@ -66,6 +66,19 @@ pub(super) struct TomlCommand {
     pub examples_safe: Vec<String>,
     #[serde(default)]
     pub examples_denied: Vec<String>,
+    /// Marks this command's leaf invocation as safe inside
+    /// `eval "$(CMD ...)"`. Set on flat commands whose stdout is documented
+    /// shell-init code (e.g. `ssh-agent`). The leaf is the deepest matched
+    /// dispatch node — tagging here does NOT propagate to subs; each sub
+    /// must be tagged independently. Unset = not eval-safe (the default).
+    #[serde(default)]
+    pub eval_safe: Option<bool>,
+    /// Flag allowlist that extends `eval_safe = true` — these `-`-prefixed
+    /// tokens are also permitted inside the substitution. Default empty,
+    /// meaning only the bare form plus positionals are eval-safe.
+    /// Build panics if this is set without `eval_safe = true`.
+    #[serde(default)]
+    pub eval_safe_flags: Vec<String>,
     /// Shortcut: every invocation of this command is denied. Used in custom
     /// TOMLs to lock down a built-in (e.g. `name = "gh", deny = true` in
     /// `.safe-chains.toml` denies every gh form for that project).
@@ -234,6 +247,19 @@ pub(super) struct TomlSub {
     pub handler: Option<String>,
     #[serde(default)]
     pub doc_body: Option<String>,
+    /// Marks this sub's leaf invocation as safe inside
+    /// `eval "$(CMD SUB ...)"`. The leaf is the deepest matched dispatch
+    /// node — if this sub has nested sub-subs and the invocation matches
+    /// deeper, the tag does NOT apply; the sub-sub must be tagged itself.
+    /// Unset = not eval-safe (the default).
+    #[serde(default)]
+    pub eval_safe: Option<bool>,
+    /// Flag allowlist that extends `eval_safe = true` — these `-`-prefixed
+    /// tokens are also permitted inside the substitution. Default empty,
+    /// meaning only the bare form plus positionals are eval-safe.
+    /// Build panics if this is set without `eval_safe = true`.
+    #[serde(default)]
+    pub eval_safe_flags: Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]
@@ -274,6 +300,12 @@ pub struct CommandSpec {
     /// boundaries (e.g. `srb tc --metrics-file=/etc/passwd` should always
     /// be denied; recording it here catches regressions).
     pub examples_denied: Vec<String>,
+    /// True when this command's bare invocation (no sub) is tagged as
+    /// safe-to-eval. Walked by `registry::is_eval_safe_invocation()`.
+    pub eval_safe: bool,
+    /// Flag allowlist extending `eval_safe` — flags permitted in the
+    /// substituted invocation when the walker stops at this node.
+    pub eval_safe_flags: Vec<String>,
     pub(super) kind: DispatchKind,
 }
 
@@ -286,6 +318,12 @@ pub(super) struct SubSpec {
     /// that points at a policy also shown in **Shared flag sets** can
     /// render as a reference rather than duplicating the flag list.
     pub policy_ref: Option<String>,
+    /// True when this sub's leaf invocation is tagged as safe-to-eval.
+    /// Walked by `registry::is_eval_safe_invocation()`.
+    pub eval_safe: bool,
+    /// Flag allowlist extending `eval_safe` — flags permitted in the
+    /// substituted invocation when the walker stops at this sub.
+    pub eval_safe_flags: Vec<String>,
 }
 
 #[derive(Debug, Clone)]

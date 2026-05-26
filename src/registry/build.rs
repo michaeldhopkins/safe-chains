@@ -143,6 +143,8 @@ pub(super) fn build_subs(
             name: alias,
             kind: canonical.kind.clone(),
             policy_ref: canonical.policy_ref.clone(),
+            eval_safe: canonical.eval_safe,
+            eval_safe_flags: canonical.eval_safe_flags.clone(),
         });
     }
     out.push(canonical);
@@ -151,16 +153,106 @@ pub(super) fn build_subs(
 
 pub(super) fn build_sub(
     parent: &str,
-    toml: TomlSub,
+    mut toml: TomlSub,
     handler_policies: &std::collections::HashMap<String, OwnedPolicy>,
 ) -> SubSpec {
     check_no_legacy_positional_style(&toml.name, toml.positional_style);
     let name = toml.name.clone();
     let policy_ref = toml.policy.clone();
+    let eval_safe = toml.eval_safe.unwrap_or(false);
+    let eval_safe_flags = std::mem::take(&mut toml.eval_safe_flags);
+    assert_eval_safe_flags_require_tag(parent, &name, eval_safe, &eval_safe_flags);
+    assert_sub_eval_safe_only_on_leaf(parent, &toml);
     SubSpec {
         name,
         kind: build_sub_kind(parent, toml, handler_policies),
         policy_ref,
+        eval_safe,
+        eval_safe_flags,
+    }
+}
+
+fn assert_eval_safe_flags_require_tag(parent: &str, name: &str, eval_safe: bool, flags: &[String]) {
+    if !flags.is_empty() && !eval_safe {
+        panic!(
+            "command '{parent}' sub `{name}` declares `eval_safe_flags` without \
+             `eval_safe = true`. The flag allowlist only takes effect when the \
+             sub is tagged eval-safe. Add `eval_safe = true` or drop \
+             `eval_safe_flags`."
+        );
+    }
+}
+
+fn assert_sub_eval_safe_only_on_leaf(parent: &str, toml: &TomlSub) {
+    if toml.eval_safe != Some(true) {
+        return;
+    }
+    if !toml.sub.is_empty() {
+        panic!(
+            "command '{parent}' sub `{}` sets `eval_safe = true` AND has \
+             nested [[command.sub.sub]] blocks. eval_safe must be tagged on \
+             a leaf node — move the tag onto the specific sub-sub that emits \
+             shell-init code. Otherwise the walker accepts any unmatched \
+             sub-sub name as a positional, which is counter-intuitive.",
+            toml.name,
+        );
+    }
+    if toml.handler.is_some() {
+        panic!(
+            "command '{parent}' sub `{}` sets `eval_safe = true` AND \
+             `handler = \"...\"`. Handler-based subs run Rust dispatch logic \
+             whose shape the eval walker cannot introspect — eval-safety \
+             requires a declarative leaf the registry can reason about.",
+            toml.name,
+        );
+    }
+    if toml.delegate_after.is_some() || toml.delegate_skip.is_some() {
+        panic!(
+            "command '{parent}' sub `{}` sets `eval_safe = true` AND \
+             delegates to an inner command (delegate_after / delegate_skip). \
+             The inner command's output is unrelated to this sub's vetting \
+             — drop `eval_safe`.",
+            toml.name,
+        );
+    }
+}
+
+fn assert_command_eval_safe_only_on_leaf(toml: &TomlCommand) {
+    if toml.eval_safe != Some(true) {
+        return;
+    }
+    if !toml.sub.is_empty() {
+        panic!(
+            "command '{}' sets `eval_safe = true` at the command level AND \
+             has [[command.sub]] blocks. Move the tag onto the specific \
+             sub that emits shell-init code (e.g. `mise activate`) — \
+             command-level tagging on a structured command is counter-\
+             intuitive.",
+            toml.name,
+        );
+    }
+    if toml.handler.is_some() {
+        panic!(
+            "command '{}' sets `eval_safe = true` AND `handler = \"...\"`. \
+             Handler-based commands run Rust dispatch logic whose shape the \
+             eval walker cannot introspect.",
+            toml.name,
+        );
+    }
+    if toml.wrapper.is_some() {
+        panic!(
+            "command '{}' sets `eval_safe = true` AND `[command.wrapper]`. \
+             Wrappers forward to an inner command — tagging the wrapper \
+             would tag every wrapped invocation. Drop `eval_safe`.",
+            toml.name,
+        );
+    }
+    if toml.deny.unwrap_or(false) {
+        panic!(
+            "command '{}' sets both `deny = true` and `eval_safe = true`. \
+             These are contradictory — deny silently dominates. Drop one.",
+            toml.name,
+        );
     }
 }
 
@@ -380,12 +472,23 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     assert_fallback_requires_handler(&toml);
     assert_matrix_policy_keys_exist(&toml);
     assert_matrix_no_duplicate_parent_action(&toml);
+    assert_command_eval_safe_only_on_leaf(&toml);
     check_no_legacy_positional_style(&toml.name, toml.positional_style);
     let cat = category.to_string();
     let desc = toml.description.unwrap_or_default();
     let researched_version = toml.researched_version;
     let examples_safe = toml.examples_safe;
     let examples_denied = toml.examples_denied;
+    let eval_safe = toml.eval_safe.unwrap_or(false);
+    let eval_safe_flags = toml.eval_safe_flags;
+    if !eval_safe_flags.is_empty() && !eval_safe {
+        panic!(
+            "command '{}' declares `eval_safe_flags` without `eval_safe = true`. \
+             The flag allowlist only takes effect when the command is tagged \
+             eval-safe. Add `eval_safe = true` or drop `eval_safe_flags`.",
+            toml.name,
+        );
+    }
     if toml.deny.unwrap_or(false) {
         return CommandSpec {
             name: toml.name,
@@ -396,6 +499,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             researched_version,
             examples_safe,
             examples_denied,
+            eval_safe,
+            eval_safe_flags: eval_safe_flags.clone(),
             kind: DispatchKind::Policy {
                 policy: OwnedPolicy {
                     standalone: Vec::new(),
@@ -435,6 +540,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             researched_version,
             examples_safe,
             examples_denied,
+            eval_safe,
+            eval_safe_flags: eval_safe_flags.clone(),
             kind: DispatchKind::Custom {
                 handler_name,
                 doc_body: toml.doc_body,
@@ -459,6 +566,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 researched_version,
                 examples_safe,
                 examples_denied,
+                eval_safe,
+                eval_safe_flags: eval_safe_flags.clone(),
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
                     subs: filter_candidates(toml.sub)
@@ -481,6 +590,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             researched_version,
             examples_safe,
             examples_denied,
+            eval_safe,
+            eval_safe_flags: eval_safe_flags.clone(),
             kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
                 valued: w.valued,
@@ -503,6 +614,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             researched_version,
             examples_safe,
             examples_denied,
+            eval_safe,
+            eval_safe_flags: eval_safe_flags.clone(),
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
                 subs: filter_candidates(toml.sub)
@@ -539,6 +652,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             researched_version,
             examples_safe,
             examples_denied,
+            eval_safe,
+            eval_safe_flags: eval_safe_flags.clone(),
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
                 level,
@@ -556,6 +671,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             researched_version,
             examples_safe,
             examples_denied,
+            eval_safe,
+            eval_safe_flags: eval_safe_flags.clone(),
             kind: DispatchKind::WriteFlagged {
                 policy,
                 base_level: level,
@@ -574,6 +691,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             researched_version,
             examples_safe,
             examples_denied,
+            eval_safe,
+            eval_safe_flags: eval_safe_flags.clone(),
             kind: DispatchKind::RequireAny {
                 require_any: toml.require_any,
                 policy,
@@ -592,6 +711,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         researched_version,
         examples_safe,
         examples_denied,
+        eval_safe,
+        eval_safe_flags,
         kind: DispatchKind::Policy {
             policy,
             level,
@@ -638,6 +759,8 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
             researched_version: spec.researched_version.clone(),
             examples_safe: vec![],
             examples_denied: vec![],
+            eval_safe: spec.eval_safe,
+            eval_safe_flags: spec.eval_safe_flags.clone(),
             kind: spec.kind.clone(),
         });
     }
