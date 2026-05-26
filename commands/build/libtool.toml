@@ -1,0 +1,40 @@
+[[command]]
+name = "libtool"
+aliases = ["glibtool"]
+description = "On Linux/BSD this is GNU Libtool, a portable wrapper around the system linker that produces shared and static libraries. On macOS this name is occupied by Apple's libtool (also reachable as glibtool's counterpart) which combines object files into static (.a) or dynamic (Mach-O dylib) libraries via -static or -dynamic. Both implementations write libraries to the -o output path; both are inert with --help/--version. The flag surfaces differ between the two implementations — GNU Libtool drives configure-time wrapper scripts while Apple's libtool is a direct ld(1) driver — but both ultimately produce on-disk artifacts."
+url = "https://www.gnu.org/software/libtool/manual/libtool.html"
+researched_version = "GNU Libtool 2.5.4 + Apple cctools libtool (2025)"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_long = true
+tolerate_unknown_short = true
+standalone = [
+    "--config", "--debug", "--dry-run", "--features", "--finish",
+    "--help", "--help-all", "--no-quiet", "--no-silent",
+    "--no-verbose", "--no-warnings", "--quiet", "--silent",
+    "--verbose", "--version",
+    "--static", "--dynamic", "--noall_load",
+    "-V", "-c", "-h", "-n", "-q", "-s", "-v",
+]
+valued = [
+    "--mode", "--preserve-dup-deps", "--tag", "--warnings",
+    "-W",
+    "-o", "-install_name", "-compatibility_version", "-current_version",
+    "-arch_only", "-filelist",
+]
+
+[[command]]
+name = "libtoolize"
+aliases = ["glibtoolize"]
+description = "GNU Libtool helper that prepares a source package to use libtool by installing config.sub, config.guess, ltmain.sh and the libtool macros. --dry-run prints what would change without touching files; --force overwrites existing files. Available as glibtoolize on macOS (Homebrew). Part of GNU Libtool."
+url = "https://www.gnu.org/software/libtool/manual/libtool.html#LT_005fINIT"
+researched_version = "GNU Libtool 2.5.4"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--copy", "--debug", "--dry-run", "--force", "--help",
+    "--install", "--no-warnings", "--nonrecursive", "--quiet",
+    "--recursive", "--subproject", "--verbose", "--version",
+    "-c", "-f", "-h", "-i", "-n", "-q", "-v",
+]
+valued = ["--ltdl", "--warnings", "-W"]

@@ -1,0 +1,101 @@
+[[command]]
+name = "bison"
+description = "GNU Project parser generator (yacc replacement). Reads a grammar file (typically .y/.ypp/.y++) and writes a C/C++ parser, optional header, optional VCG graph, and optional verbose .output file. Output filenames are derived from the input prefix or from -o. Part of GNU Bison; releases roughly yearly."
+url = "https://www.gnu.org/software/bison/manual/"
+researched_version = "GNU Bison 3.8.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--debug", "--defines", "--fixed-output-files", "--graph",
+    "--help", "--no-lines", "--no-parser", "--token-table",
+    "--verbose", "--version", "--yacc",
+    "-V", "-d", "-g", "-h", "-k", "-l", "-n", "-t", "-v", "-y",
+]
+valued = [
+    "--file-prefix", "--name-prefix", "--output-file", "--output",
+    "-b", "-o", "-p",
+]
+
+[[command]]
+name = "yacc"
+description = "POSIX LALR(1) parser generator. On most modern systems yacc is a wrapper for bison -y or for Berkeley yacc (byacc). Reads a grammar file and writes y.tab.c (the parser) and optionally y.tab.h (the header) and y.output (a human-readable description) to the current directory. -o overrides the output filename."
+url = "https://pubs.opengroup.org/onlinepubs/9699919799/utilities/yacc.html"
+researched_version = "POSIX yacc; commonly bison 3.8 or byacc 20240109"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--version",
+    "-B", "-L", "-P", "-V", "-d", "-g", "-h", "-i", "-l",
+    "-r", "-s", "-t", "-v", "-y",
+]
+valued = ["-b", "-H", "-o", "-p"]
+
+[[command]]
+name = "byacc"
+description = "Berkeley yacc parser generator. Reads a grammar file and writes y.tab.c (and optionally y.tab.h, y.output, y.tab.i) to the current directory. -o overrides the output filename. -P generates a reentrant parser; -B enables backtracking (btyacc) features. Released by Thomas Dickey roughly twice a year."
+url = "https://invisible-island.net/byacc/"
+researched_version = "byacc 20240109"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--version",
+    "-B", "-L", "-P", "-V", "-d", "-g", "-h", "-i", "-l",
+    "-r", "-s", "-t", "-v", "-y",
+]
+valued = ["-b", "-H", "-o", "-p"]
+
+[[command]]
+name = "flex"
+description = "Fast lexical analyzer generator. Reads a .l/.ll/.lex file and writes a C/C++ scanner (default lex.yy.c) plus an optional header file. -o overrides the output filename. Part of the flex project; the upstream is mostly maintenance-mode but minor releases ship every few years."
+url = "https://westes.github.io/flex/manual/"
+researched_version = "flex 2.6.4"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--7bit", "--8bit", "--align", "--backup", "--batch",
+    "--bison-bridge", "--bison-locations", "--case-insensitive",
+    "--c++", "--debug", "--ecs", "--fast", "--full", "--hex",
+    "--help", "--interactive", "--lex-compat", "--meta-ecs",
+    "--nodefault", "--noline", "--nounistd", "--nowarn",
+    "--perf-report", "--posix-compat", "--reentrant", "--stdinit",
+    "--stdout", "--trace", "--verbose", "--version", "--yylineno",
+    "-+", "-7", "-8", "-B", "-Ca", "-Ce", "-Cem", "-Cf", "-CF",
+    "-Cm", "-Cr", "-F", "-I", "-L", "-R", "-T", "-V", "-X",
+    "-?", "-b", "-c", "-d", "-f", "-h", "-i", "-l", "-n",
+    "-p", "-s", "-t", "-v", "-w",
+]
+valued = [
+    "--header-file", "--outfile", "--prefix", "--skel",
+    "--tables-file", "--yyclass",
+    "-D", "-P", "-S", "-o",
+]
+
+[[command]]
+name = "gperf"
+description = "GNU perfect hash function generator. Reads keyword input (default stdin or INPUT-FILE) and writes generated C/C++ lookup code to stdout or to the file given by --output-file. Many short flags accept values via short-attached syntax (e.g. -k1,2,4). Part of GNU; stable, slow-moving project."
+url = "https://www.gnu.org/software/gperf/manual/"
+researched_version = "GNU gperf 3.1"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_short = true
+standalone = [
+    "--compare-lengths", "--compare-strncmp", "--debug",
+    "--duplicates", "--enum", "--global-table", "--help",
+    "--ignore-case", "--includes", "--null-strings", "--pic",
+    "--readonly-tables", "--seven-bit", "--struct-type",
+    "--version",
+    "-C", "-D", "-E", "-G", "-I", "-P", "-T", "-c", "-d",
+    "-h", "-l", "-n", "-r", "-t", "-v",
+]
+valued = [
+    "--class-name", "--delimiters", "--hash-function-name",
+    "--initial-asso", "--initializer-suffix", "--jump",
+    "--key-positions", "--language", "--length-table-name",
+    "--lookup-function-name", "--multiple-iterations",
+    "--output-file", "--size-multiple", "--size-type",
+    "--slot-name", "--string-pool-name", "--switch",
+    "--word-array-name",
+    "-F", "-H", "-K", "-L", "-N", "-Q", "-S", "-W", "-Z",
+    "-e", "-i", "-j", "-k", "-m", "-s",
+]

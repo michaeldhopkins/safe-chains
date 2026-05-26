@@ -1,0 +1,19 @@
+[[command]]
+name = "yapp"
+description = "Perl frontend to the Parse::Yapp module. Reads a grammar file (default extension .yp) and writes a Perl LALR(1) parser module (default <grammar>.pm) to the current directory. -s emits a standalone module with the driver included; -v also writes a <grammar>.output description. Part of the Parse::Yapp CPAN distribution."
+url = "https://metacpan.org/dist/Parse-Yapp/view/yapp"
+researched_version = "Parse::Yapp 1.21"
+level = "SafeWrite"
+bare = false
+standalone = ["-V", "-h", "-n", "-s", "-v"]
+valued = ["-b", "-m", "-o", "-t"]
+
+[[command]]
+name = "eyapp"
+description = "Perl frontend to the Parse::Eyapp module. Reads a grammar file (default extension .eyp) and writes a Perl LALR(1) object-oriented parser module (default <grammar>.pm) to the current directory. -s emits a standalone module with the parsing driver, AST helpers and base classes included. Part of the Parse::Eyapp CPAN distribution."
+url = "https://metacpan.org/dist/Parse-Eyapp/view/lib/Parse/Eyapp.pod"
+researched_version = "Parse::Eyapp 1.21"
+level = "SafeWrite"
+bare = false
+standalone = ["-N", "-T", "-V", "-h", "-l", "-n", "-s", "-v"]
+valued = ["-B", "-C", "-b", "-c", "-m", "-o", "-t"]

@@ -1,0 +1,124 @@
+[[command]]
+name = "aclocal"
+description = "GNU Automake helper that regenerates aclocal.m4 by scanning configure.ac (or configure.in) and pulling in the m4 macro definitions used by the project. Writes aclocal.m4 in the current directory; --install also copies third-party m4 files into the first -I directory. --dry-run inspects what would change without touching files. Part of GNU Automake; releases roughly yearly."
+url = "https://www.gnu.org/software/automake/manual/html_node/aclocal-Invocation.html"
+researched_version = "GNU automake 1.17 (July 2024)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--diff", "--dry-run", "--force", "--help", "--install",
+    "--print-ac-dir", "--verbose", "--version",
+]
+valued = [
+    "--automake-acdir", "--aclocal-path", "--output",
+    "--system-acdir", "--warnings", "-I", "-W",
+]
+
+[[command]]
+name = "autoheader"
+description = "GNU Autoconf helper that creates a template C header (config.h.in) of #define statements from configure.ac. Reads configure.ac (or a TEMPLATE-FILE argument) and writes a header template alongside it. Part of GNU Autoconf; releases roughly every few years."
+url = "https://www.gnu.org/software/autoconf/manual/html_node/autoheader-Invocation.html"
+researched_version = "GNU Autoconf 2.72 (December 2023)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--debug", "--force", "--help", "--verbose", "--version",
+    "-V", "-d", "-f", "-h", "-v",
+]
+valued = [
+    "--prepend-include", "--include", "--warnings",
+    "-B", "-I", "-W",
+]
+
+[[command]]
+name = "autom4te"
+description = "GNU Autoconf wrapper around GNU M4 that caches expansions of M4 frozen files. Runs M4 over input FILES and writes the result to stdout or the file given by --output. Can produce trace output or M4 frozen state files. Like m4 itself it can expand macros that execute shell, but autom4te's role in autotools projects is to drive autoconf-style processing; treat it as a code generator that writes wherever -o points. Part of GNU Autoconf."
+url = "https://www.gnu.org/software/autoconf/manual/html_node/autom4te-Invocation.html"
+researched_version = "GNU Autoconf 2.72 (December 2023)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--debug", "--force", "--freeze", "--help", "--melt",
+    "--no-cache", "--verbose", "--version",
+    "-F", "-M", "-V", "-d", "-f", "-h", "-v",
+]
+valued = [
+    "--cache", "--language", "--mode", "--output", "--preselect",
+    "--prepend-include", "--include", "--trace", "--warnings",
+    "-B", "-C", "-I", "-W", "-l", "-m", "-o", "-p", "-t",
+]
+
+[[command]]
+name = "autopoint"
+description = "GNU gettext helper that copies standard gettext infrastructure files (po/Makevars, autoconf macros) into a source package. Reads the project's configure.ac to determine which gettext version to install. --dry-run reports what would change without touching files. Part of GNU gettext."
+url = "https://www.gnu.org/software/gettext/manual/html_node/autopoint-Invocation.html"
+researched_version = "GNU gettext-tools 1.0 (January 2026)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--dry-run", "--force", "--help", "--version",
+    "-f", "-n",
+]
+
+[[command]]
+name = "autoreconf"
+description = "GNU Autoconf driver that re-runs autoconf, aclocal, autoheader, automake, autopoint/gettextize, libtoolize, intltoolize and gtkdocize as needed to regenerate the GNU Build System files in a project. By default only remakes files older than their sources; --force rebuilds everything. --install copies missing standard auxiliary files. -m re-runs configure && make. Part of GNU Autoconf."
+url = "https://www.gnu.org/software/autoconf/manual/html_node/autoreconf-Invocation.html"
+researched_version = "GNU Autoconf 2.72 (December 2023)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--debug", "--force", "--help", "--install", "--make",
+    "--no-recursive", "--symlink", "--verbose", "--version",
+    "-V", "-d", "-f", "-h", "-i", "-m", "-s", "-v",
+]
+valued = [
+    "--prepend-include", "--include", "--warnings",
+    "-B", "-I", "-W",
+]
+
+[[command]]
+name = "autoscan"
+description = "GNU Autoconf helper that examines source files in SRCDIR (or the current directory) for common portability problems and writes a preliminary configure.scan to the current directory. Part of GNU Autoconf."
+url = "https://www.gnu.org/software/autoconf/manual/html_node/autoscan-Invocation.html"
+researched_version = "GNU Autoconf 2.72 (December 2023)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--debug", "--help", "--verbose", "--version",
+    "-V", "-d", "-h", "-v",
+]
+valued = [
+    "--prepend-include", "--include",
+    "-B", "-I",
+]
+
+[[command]]
+name = "autoupdate"
+description = "GNU Autoconf helper that updates configure.ac (or a TEMPLATE-FILE argument) to the syntax of the current Autoconf version. Backs up the original. Part of GNU Autoconf."
+url = "https://www.gnu.org/software/autoconf/manual/html_node/autoupdate-Invocation.html"
+researched_version = "GNU Autoconf 2.72 (December 2023)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--debug", "--force", "--help", "--verbose", "--version",
+    "-V", "-d", "-f", "-h", "-v",
+]
+valued = [
+    "--prepend-include", "--include",
+    "-B", "-I",
+]
+
+[[command]]
+name = "gettextize"
+description = "GNU gettext command that installs or upgrades the gettext infrastructure in a source package (po/ directory, autoconf macros, Makefile fragments). --dry-run prints modifications without performing them. Part of GNU gettext; the modern Autotools workflow prefers autopoint, but gettextize is still present for the initial setup step."
+url = "https://www.gnu.org/software/gettext/manual/html_node/gettextize-Invocation.html"
+researched_version = "GNU gettext-tools 1.0 (January 2026)"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--dry-run", "--force", "--help", "--no-changelog",
+    "--symlink", "--version",
+    "-f", "-n",
+]
+valued = ["--po-dir"]
