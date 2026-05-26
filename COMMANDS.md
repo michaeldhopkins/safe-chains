@@ -8292,6 +8292,7 @@ Aliases: `python`
 <p class="cmd-url"><a href="https://www.ruby-lang.org/en/documentation/">https://www.ruby-lang.org/en/documentation/</a></p>
 
 - Allowed standalone flags: --help, --version, -V, -h, -v
+- Allowed valued flags: -c
 
 ### `ruby-audit`
 <p class="cmd-url"><a href="https://github.com/civisanalytics/ruby_audit">https://github.com/civisanalytics/ruby_audit</a></p>
