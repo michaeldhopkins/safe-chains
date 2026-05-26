@@ -1057,6 +1057,15 @@ Aliases: `upsun`
 - **verify-cert**: Flags: --help, -L, -h, -l, -q. Valued: -c, -k, -n, -p, -r
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `sfltool`
+<p class="cmd-url"><a href="https://www.unix.com/man-page/osx/1/sfltool/">https://www.unix.com/man-page/osx/1/sfltool/</a></p>
+
+- **csinfo**: Flags: --help, -h
+- **dumpbtm**: Flags: --help, -h
+- **list**: Flags: --help, -h
+- **list-info**: Flags: --help, -h
+- Allowed standalone flags: --help, -h
+
 ### `ssh`
 <p class="cmd-url"><a href="https://man.openbsd.org/ssh">https://man.openbsd.org/ssh</a></p>
 

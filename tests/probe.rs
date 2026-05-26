@@ -424,3 +424,45 @@ fn rake_unknown_tasks_denied() {
     assert!(!check("rake -e 'system(\"rm -rf /\")'"));
     assert!(!check("rake -T"));
 }
+
+// ── sfltool: macOS SharedFileList / btm inspector ─────────────────────
+
+#[test]
+fn sfltool_readonly_subs() {
+    assert!(check("sfltool dumpbtm"));
+    assert!(check("sfltool list"));
+    assert!(check("sfltool list-info"));
+    assert!(check("sfltool csinfo"));
+}
+
+#[test]
+fn sfltool_chained_pipelines() {
+    assert!(check("sfltool dumpbtm | head -20"));
+    assert!(check("sfltool dumpbtm 2>/dev/null | awk '/^Records:/,/^$/'"));
+    assert!(check("sfltool dumpbtm 2>&1 | wc -l"));
+    assert!(check("sfltool list | sort"));
+}
+
+#[test]
+fn sfltool_destructive_subs_denied() {
+    assert!(!check("sfltool archive"));
+    assert!(!check("sfltool clear"));
+    assert!(!check("sfltool resetbtm"));
+    assert!(!check("sfltool resetlist"));
+}
+
+#[test]
+fn sfltool_bare_and_help() {
+    assert!(check("sfltool --help"));
+    assert!(check("sfltool -h"));
+    assert!(!check("sfltool"));
+    assert!(!check("sfltool unknown-sub"));
+}
+
+#[test]
+fn sfltool_safety_levels() {
+    assert_eq!(level("sfltool dumpbtm"), SafetyLevel::SafeRead);
+    assert_eq!(level("sfltool list"), SafetyLevel::SafeRead);
+    assert_eq!(level("sfltool list-info"), SafetyLevel::SafeRead);
+    assert_eq!(level("sfltool csinfo"), SafetyLevel::SafeRead);
+}

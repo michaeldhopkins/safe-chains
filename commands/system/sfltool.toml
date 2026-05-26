@@ -1,0 +1,42 @@
+[[command]]
+name = "sfltool"
+description = "macOS-only command-line interface to the LaunchServices SharedFileList framework and the Background Task Manager (btm) database. The SharedFileList store is where the system keeps recent-items lists (Finder Recents, recent servers, share points, favorite items, saved searches, the sidebar's top section). The btm database is the macOS Ventura+ store that tracks login items, launch agents, and background services for the System Settings → Login Items pane. sfltool dumpbtm writes a textual dump of the btm database to stdout (read-only). sfltool list prints the registered SharedFileList list identifiers (read-only); sfltool list-info adds size/metadata details (read-only). sfltool csinfo prints code-signing info for sfltool itself (read-only). sfltool archive [-z] creates a directory (or .tar.gz with -z) under /tmp containing a snapshot of the SharedFileList persistent stores. sfltool clear wipes user-level SharedFileList state on disk (Finder Recents and similar caches rebuild on next access). sfltool resetbtm and sfltool resetlist require admin authorization and reset the btm and SharedFileList stores respectively. Apple ships sfltool as part of every macOS release; the subcommand surface is stable and only changes when LaunchServices itself changes."
+url = "https://www.unix.com/man-page/osx/1/sfltool/"
+researched_version = "sfltool on macOS 15 (Darwin 24, 2025); surface frozen"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "dumpbtm"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "list-info"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "csinfo"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "archive"
+candidate = true
+
+[[command.sub]]
+name = "clear"
+candidate = true
+
+[[command.sub]]
+name = "resetbtm"
+candidate = true
+
+[[command.sub]]
+name = "resetlist"
+candidate = true
