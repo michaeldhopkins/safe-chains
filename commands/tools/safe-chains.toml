@@ -1,8 +1,10 @@
 [[command]]
 name = "safe-chains"
-description = "Command safety checker that validates bash commands against an allowlist of safe, read-only operations. Parses shell syntax (pipes, chains, subshells) and returns a safety verdict without executing anything. Purely read-only with no side effects. Actively maintained."
-url = "https://github.com/michaeldhopkins/safe-chains#readme"
+description = "Allowlist judge for bash commands used by coding agents. Reads a candidate command from stdin (hook mode) or as a positional argument and classifies it; never executes the candidate. `--list-commands`, `--list-tools`, `--version`, and `--help` are pure read-only meta operations. `--level` adjusts the safety threshold the CLI judge applies. `--setup`, `--auto-detect`, and `--tool` write the hook into another tool's config; `--opencode-config` and `--generate-book` write configuration or documentation to the local filesystem. Surface stable; new command data ships in roughly biweekly minor releases."
+url = "https://github.com/michaeldhopkins/safe-chains"
+researched_version = "safe-chains 0.187.0"
 level = "Inert"
-bare = true
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+bare = false
+max_positional = 1
+standalone = ["--help", "--list-commands", "--list-tools", "--version", "-V", "-h"]
+valued = ["--level"]

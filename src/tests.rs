@@ -108,6 +108,15 @@ safe! {
     stapler_validate_quiet: "stapler validate -q App.app",
     stapler_validate_verbose: "stapler validate -v App.app",
 
+    safe_chains_judge: "safe-chains 'cargo test'",
+    safe_chains_judge_with_pipe: "safe-chains 'mandoc -mdoc /usr/share/man/man1/ls.1'",
+    safe_chains_list_commands: "safe-chains --list-commands",
+    safe_chains_version_long: "safe-chains --version",
+    safe_chains_version_short: "safe-chains -V",
+    safe_chains_help: "safe-chains --help",
+    safe_chains_level_flag: "safe-chains --level safe-read 'cargo test'",
+    safe_chains_list_tools: "safe-chains --list-tools",
+
     agy_version: "agy --version",
     agy_version_short: "agy -V",
     agy_help: "agy --help",
@@ -815,6 +824,11 @@ denied! {
     stapler_unknown_sub: "stapler unknown App.app",
     stapler_validate_bare: "stapler validate",
     stapler_staple_two_paths: "stapler staple a.app b.app",
+
+    safe_chains_bare: "safe-chains",
+    safe_chains_opencode_config: "safe-chains --opencode-config",
+    safe_chains_generate_book: "safe-chains --generate-book",
+    safe_chains_two_positionals: "safe-chains 'foo' 'bar'",
 
     agy_bare: "agy",
     agy_print_prompt: "agy -p 'do thing'",
