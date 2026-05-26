@@ -11,6 +11,9 @@ pub fn is_safe_shell(tokens: &[Token]) -> Verdict {
     if tokens.len() == 2 && matches!(tokens[1].as_str(), "--help" | "-h" | "--version" | "-V") {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
+    if tokens.len() == 3 && tokens[1].as_str() == "-n" {
+        return Verdict::Allowed(SafetyLevel::Inert);
+    }
     let Some(idx) = tokens.iter().position(|t| *t == "-c") else {
         return Verdict::Denied;
     };

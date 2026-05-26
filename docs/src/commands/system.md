@@ -794,7 +794,7 @@ Aliases: `fly`
 ### `mise`
 <p class="cmd-url"><a href="https://mise.jdx.dev/cli/">https://mise.jdx.dev/cli/</a></p>
 
-- **activate**: Flags: --help, -h
+- **activate**: Flags: --help, -h, --shims, --quiet, --no-hook-env
 - **backends list**: Flags: --help, -h, -q, -v
 - **backends ls**: Flags: --help, -h, -q, -v
 - **bin-paths**: Flags: --help, -h, -q, -v

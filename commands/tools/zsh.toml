@@ -1,0 +1,10 @@
+[[command]]
+name = "zsh"
+description = "Z shell. Like bash, the bare invocation `zsh script.zsh` executes the script with full user privileges, and `-c CMD` runs an inline command. `-n` parses the script and reports syntax errors without executing any statement — equivalent to ruby `-c` or bash `-n`. The default macOS user shell since Catalina; flag surface is stable across the 5.x line."
+url = "https://zsh.sourceforge.io/Doc/Release/Invocation.html"
+researched_version = "Zsh 5.9"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version"]
+valued = ["-n"]

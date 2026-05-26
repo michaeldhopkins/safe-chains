@@ -7448,7 +7448,7 @@ Aliases: `gmd5sum`
 ### `mise`
 <p class="cmd-url"><a href="https://mise.jdx.dev/cli/">https://mise.jdx.dev/cli/</a></p>
 
-- **activate**: Flags: --help, -h
+- **activate**: Flags: --help, -h, --shims, --quiet, --no-hook-env
 - **backends list**: Flags: --help, -h, -q, -v
 - **backends ls**: Flags: --help, -h, -q, -v
 - **bin-paths**: Flags: --help, -h, -q, -v
@@ -14205,6 +14205,12 @@ Aliases: `zmore`
 
 - **query**: Flags: --all, --exclude, --help, --interactive, --list, --score, -a, -h, -i, -l, -s
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `zsh`
+<p class="cmd-url"><a href="https://zsh.sourceforge.io/Doc/Release/Invocation.html">https://zsh.sourceforge.io/Doc/Release/Invocation.html</a></p>
+
+- Allowed standalone flags: --help, --version
+- Allowed valued flags: -n
 
 ### `zstd`
 <p class="cmd-url"><a href="https://github.com/facebook/zstd">https://github.com/facebook/zstd</a></p>

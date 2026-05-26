@@ -1825,3 +1825,9 @@ Aliases: `python`
 - **query**: Flags: --all, --exclude, --help, --interactive, --list, --score, -a, -h, -i, -l, -s
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `zsh`
+<p class="cmd-url"><a href="https://zsh.sourceforge.io/Doc/Release/Invocation.html">https://zsh.sourceforge.io/Doc/Release/Invocation.html</a></p>
+
+- Allowed standalone flags: --help, --version
+- Allowed valued flags: -n
+
