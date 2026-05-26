@@ -1,0 +1,16 @@
+[[command]]
+name = "pcre2test"
+aliases = ["pcretest"]
+description = "Interactive tester for the PCRE2 regular-expression library (and the legacy PCRE1 for `pcretest`). Reads a sequence of regex patterns and subject strings from an input file or stdin and prints the match results to stdout. The second positional argument selects an output file rather than stdout — this is deliberately not enabled in safe-chains' surface (max_positional = 1) so output always flows through the shell redirection layer where it can be tracked. With one or zero positional arguments the tool is read-only: it parses input, runs library calls in-process, and writes results."
+url = "https://www.pcre.org/current/doc/html/pcre2test.html"
+researched_version = "PCRE2 10.45 (2026); PCRE1 8.45 EOL"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = [
+    "--help", "--version",
+    "-16", "-32", "-8", "-AC", "-E", "-LM", "-LP", "-LS", "-T", "-TM",
+    "-ac", "-b", "-d", "-dfa", "-help", "-i", "-jit", "-jitfast",
+    "-jitverify", "-malloc", "-q", "-unittest", "-v",
+]
+valued = ["-C", "-S", "-error", "-pattern", "-subject", "-t", "-tm"]

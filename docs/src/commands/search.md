@@ -53,6 +53,23 @@ Aliases: `mlocate`, `plocate`
 - Allowed standalone flags: -L, -d, -q
 - Bare invocation allowed
 
+### `pcre2grep`
+<p class="cmd-url"><a href="https://www.pcre.org/current/doc/html/pcre2grep.html">https://www.pcre.org/current/doc/html/pcre2grep.html</a></p>
+
+Aliases: `pcregrep`
+
+- Allowed standalone flags: --allow-lookaround-bsk, --file-offsets, --help, --line-buffered, --line-offsets, --no-group-separator, --no-jit, --posix-digit, --posix-pattern-file, --text, --count, --case-restrict, --fixed-strings, --with-filename, --no-filename, --ignore-case, --files-with-matches, --files-without-match, --multiline, --line-number, --no-ucp, --quiet, --recursive, --no-messages, --total-count, --utf, --utf-allow-invalid, --version, --invert-match, --word-regex, --word-regexp, --line-regex, --line-regexp, --null, -E, -F, -H, -I, -L, -M, -P, -U, -V, -Z, -a, -c, -h, -i, -l, -n, -q, -r, -s, -t, -u, -v, -w, -x
+- Allowed valued flags: --after-context, --before-context, --binary-files, --buffer-size, --color, --colour, --context, --depth-limit, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --file-list, --group-separator, --heap-limit, --include, --include-dir, --include-from, --label, --locale, --match-limit, --max-buffer-size, --max-count, --newline, --om-capture, --om-separator, --only-matching, --output, --recursion-limit, --regex, --regexp, -A, -B, -C, -D, -N, -O, -d, -e, -f, -m, -o
+
+### `pcre2test`
+<p class="cmd-url"><a href="https://www.pcre.org/current/doc/html/pcre2test.html">https://www.pcre.org/current/doc/html/pcre2test.html</a></p>
+
+Aliases: `pcretest`
+
+- Allowed standalone flags: --help, --version, -16, -32, -8, -AC, -E, -LM, -LP, -LS, -T, -TM, -ac, -b, -d, -dfa, -help, -i, -jit, -jitfast, -jitverify, -malloc, -q, -unittest, -v
+- Allowed valued flags: -C, -S, -error, -pattern, -subject, -t, -tm
+- Bare invocation allowed
+
 ### `rg`
 <p class="cmd-url"><a href="https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md">https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md</a></p>
 

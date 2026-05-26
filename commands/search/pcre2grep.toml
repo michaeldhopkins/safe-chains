@@ -1,0 +1,37 @@
+[[command]]
+name = "pcre2grep"
+aliases = ["pcregrep"]
+description = "grep variant that uses Perl-compatible regular expressions (PCRE2 or, for the legacy `pcregrep`, PCRE1). Read-only: matches input lines against a pattern and writes matches to stdout. Reads files, stdin, or transparently decompresses `.gz` and `.bz2`. The `-O/--output` flag emits substituted text but only to stdout. PCRE2 ships as part of the pcre2 project; PCRE1 (pcregrep) is end-of-life as of 2025 but the surface is frozen and still safe."
+url = "https://www.pcre.org/current/doc/html/pcre2grep.html"
+researched_version = "PCRE2 10.45 (2026); PCRE1 8.45 EOL"
+level = "Inert"
+bare = false
+standalone = [
+    "--allow-lookaround-bsk", "--file-offsets", "--help", "--line-buffered",
+    "--line-offsets", "--no-group-separator", "--no-jit",
+    "--posix-digit", "--posix-pattern-file",
+    "--text", "--count", "--case-restrict", "--fixed-strings",
+    "--with-filename", "--no-filename", "--ignore-case",
+    "--files-with-matches", "--files-without-match", "--multiline",
+    "--line-number", "--no-ucp", "--quiet", "--recursive",
+    "--no-messages", "--total-count", "--utf", "--utf-allow-invalid",
+    "--version", "--invert-match", "--word-regex", "--word-regexp",
+    "--line-regex", "--line-regexp", "--null",
+    "-E", "-F", "-H", "-I", "-L", "-M", "-P", "-U", "-V", "-Z",
+    "-a", "-c", "-h", "-i", "-l", "-n", "-q", "-r", "-s", "-t",
+    "-u", "-v", "-w", "-x",
+]
+valued = [
+    "--after-context", "--before-context", "--binary-files",
+    "--buffer-size", "--color", "--colour", "--context",
+    "--depth-limit", "--devices", "--directories",
+    "--exclude", "--exclude-dir", "--exclude-from",
+    "--file", "--file-list", "--group-separator", "--heap-limit",
+    "--include", "--include-dir", "--include-from",
+    "--label", "--locale", "--match-limit", "--max-buffer-size",
+    "--max-count", "--newline", "--om-capture", "--om-separator",
+    "--only-matching", "--output", "--recursion-limit",
+    "--regex", "--regexp",
+    "-A", "-B", "-C", "-D", "-N", "-O",
+    "-d", "-e", "-f", "-m", "-o",
+]
