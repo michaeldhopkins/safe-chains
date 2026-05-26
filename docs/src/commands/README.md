@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1050 commands across 75 categories.
+safe-chains knows 1055 commands across 75 categories.
 
 ## Glossary
 
@@ -80,13 +80,13 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Ruby](ruby.md) (46 commands)
 - [Rust](rust.md) (8 commands)
 - [Project Scaffolders](scaffold.md) (7 commands)
-- [Search](search.md) (7 commands)
+- [Search](search.md) (10 commands)
 - [Serverless / IaC](serverless.md) (7 commands)
 - [Swift](swift.md) (1 commands)
 - [System Info](sysinfo.md) (37 commands)
 - [System](system.md) (64 commands)
 - [TeX / LaTeX](tex.md) (3 commands)
-- [Text Processing](text.md) (27 commands)
+- [Text Processing](text.md) (29 commands)
 - [Developer Tools](tools.md) (193 commands)
 - [Version Control](vcs.md) (9 commands)
 - [WebAssembly](wasm.md) (10 commands)

@@ -1,0 +1,10 @@
+[[command]]
+name = "look"
+description = "Performs a binary-search prefix lookup against a sorted text file (defaults to /usr/share/dict/words). Read-only: opens the file, locates the matching prefix range, and writes matching lines to stdout. POSIX utility with a stable two-flag surface."
+url = "https://man7.org/linux/man-pages/man1/look.1.html"
+researched_version = "macOS 14 (BSD)"
+level = "Inert"
+bare = false
+max_positional = 2
+standalone = ["--alphanum", "--ignore-case", "-d", "-f"]
+valued = ["--terminate", "-t"]

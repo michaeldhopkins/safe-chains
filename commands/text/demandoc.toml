@@ -1,0 +1,8 @@
+[[command]]
+name = "demandoc"
+description = "Strips roff formatting from mdoc(7) or man(7) source and emits only the text content to stdout, either as full lines or as a word list (`-w`). Read-only: never modifies its input. Ships with mandoc; surface has been a single flag for years."
+url = "https://mandoc.bsd.lv/man/demandoc.1.html"
+researched_version = "mandoc 1.14.6 (2021)"
+level = "Inert"
+bare = true
+standalone = ["-w"]

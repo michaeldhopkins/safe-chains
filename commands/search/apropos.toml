@@ -1,0 +1,10 @@
+[[command]]
+name = "apropos"
+aliases = ["whatis"]
+description = "Searches the whatis database for manual-page short descriptions matching the given keyword(s). `apropos KEYWORD` returns every page whose one-line description contains the keyword; `whatis KEYWORD` looks up an exact name match. Both are read-only and only consult the pre-built whatis index. The macOS implementation (mandoc-derived) has had the same compact flag surface for years."
+url = "https://man7.org/linux/man-pages/man1/apropos.1.html"
+researched_version = "macOS 14 / mandoc 1.14.6 (BSD)"
+level = "Inert"
+bare = false
+standalone = ["-d"]
+valued = ["-s"]

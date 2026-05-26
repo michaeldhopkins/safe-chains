@@ -12,6 +12,14 @@
 - Allowed standalone flags: --ackmate, --all-text, --all-types, --case-sensitive, --color, --column, --count, --filename, --files-with-matches, --files-without-matches, --fixed-strings, --follow, --group, --heading, --help, --hidden, --ignore-case, --invert-match, --line-numbers, --literal, --no-break, --no-color, --no-filename, --no-follow, --no-group, --no-heading, --no-numbers, --nobreak, --nocolor, --nofilename, --nofollow, --nogroup, --noheading, --nonumbers, --null, --numbers, --one-device, --only-matching, --print-all-files, --print-long-lines, --search-binary, --search-files, --search-zip, --silent, --smart-case, --stats, --unrestricted, --version, --vimgrep, --word-regexp, -0, -H, -L, -Q, -S, -U, -V, -a, -c, -f, -h, -i, -l, -n, -s, -u, -v, -w
 - Allowed valued flags: --after, --before, --context, --depth, --file-search-regex, --ignore, --max-count, --pager, --path-to-ignore, --workers, -A, -B, -C, -G, -g, -m
 
+### `apropos`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/apropos.1.html">https://man7.org/linux/man-pages/man1/apropos.1.html</a></p>
+
+Aliases: `whatis`
+
+- Allowed standalone flags: -d
+- Allowed valued flags: -s
+
 ### `fd`
 <p class="cmd-url"><a href="https://github.com/sharkdp/fd#readme">https://github.com/sharkdp/fd#readme</a></p>
 
@@ -32,6 +40,18 @@ Aliases: `mlocate`, `plocate`
 
 - Allowed standalone flags: --all, --basename, --count, --existing, --follow, --help, --ignore-case, --null, --quiet, --statistics, --version, --wholename, -0, -A, -S, -V, -b, -c, -e, -h, -i, -q, -w
 - Allowed valued flags: --database, --limit, -d, -l, -n
+
+### `look`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/look.1.html">https://man7.org/linux/man-pages/man1/look.1.html</a></p>
+
+- Allowed standalone flags: --alphanum, --ignore-case, -d, -f
+- Allowed valued flags: --terminate, -t
+
+### `manpath`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/manpath.1.html">https://man7.org/linux/man-pages/man1/manpath.1.html</a></p>
+
+- Allowed standalone flags: -L, -d, -q
+- Bare invocation allowed
 
 ### `rg`
 <p class="cmd-url"><a href="https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md">https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md</a></p>
