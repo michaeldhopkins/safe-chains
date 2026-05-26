@@ -1,0 +1,12 @@
+[[command]]
+name = "cupstestppd"
+description = "CUPS conformance tester for PPD (PostScript Printer Description) files. Reads one or more PPD files (or stdin when `-` is given as the sole positional) and reports whether they conform to the Adobe PPD 4.3 specification; results are written to stdout. Read-only against the filesystem. The -R option lets the caller redirect filter/profile lookups to a non-system root, which only affects what is checked, not what is written. Apple has marked PPD support for deprecation in a future CUPS release, so this surface is effectively frozen."
+url = "https://www.cups.org/doc/man-cupstestppd.html"
+researched_version = "CUPS 2.4.x (Apple build copyright 2007-2019; surface frozen)"
+level = "Inert"
+bare = false
+standalone = [
+    "--help",
+    "-h", "-q", "-r", "-v", "-vv",
+]
+valued = ["-I", "-R", "-W"]

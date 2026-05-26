@@ -1,0 +1,8 @@
+[[command]]
+name = "fix-qdf"
+description = "qpdf utility for repairing PDF files that have been hand-edited in QDF form. Recomputes stream lengths, cross-reference table entries, and object stream offset tables. With no arguments it reads stdin and writes stdout; with one positional argument it reads that file and writes stdout; the synopsis allows a second positional naming an output file. Reads the input but does not modify it in place. qpdf releases roughly twice a year; the fix-qdf surface has been stable since the QDF mode was introduced."
+url = "https://qpdf.readthedocs.io/en/stable/qdf.html"
+researched_version = "qpdf 12.2.0"
+level = "SafeWrite"
+bare = true
+max_positional = 2

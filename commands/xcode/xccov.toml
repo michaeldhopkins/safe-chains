@@ -1,0 +1,35 @@
+[[command]]
+name = "xccov"
+description = "Reads Xcode code-coverage data — either `.xccovreport` / `.xccovarchive` files or `.xcresult` bundles produced by `xcodebuild test` — and prints it in text or JSON form. The `view` and `diff` subcommands are pure read operations: they only emit to stdout. The `merge` subcommand combines multiple report/archive inputs and writes a merged report/archive to disk (defaults to `merged.xccovreport`/`merged.xccovarchive` in cwd). Local files only; no network. Ships with Xcode; surface stable since 2018."
+url = "https://keith.github.io/xcode-man-pages/xccov.1.html"
+researched_version = "Xcode 15 / macOS 14 (man page dated 2018)"
+
+[[command.sub]]
+name = "view"
+level = "Inert"
+bare = false
+standalone = [
+    "--archive",
+    "--file-list",
+    "--json",
+    "--only-targets",
+    "--report",
+    "--help",
+    "-h",
+]
+valued = [
+    "--file",
+    "--files-for-target",
+    "--functions-for-file",
+]
+
+[[command.sub]]
+name = "diff"
+level = "Inert"
+bare = false
+standalone = ["--json", "--help", "-h"]
+valued = ["--path-equivalence"]
+
+[[command.sub]]
+name = "merge"
+candidate = true

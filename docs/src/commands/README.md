@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1069 commands across 75 categories.
+safe-chains knows 1094 commands across 75 categories.
 
 ## Glossary
 
@@ -68,7 +68,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Nix](nix.md) (12 commands)
 - [Node.js](node.md) (16 commands)
 - [OCaml](ocaml.md) (3 commands)
-- [PDF / Document](pdf.md) (14 commands)
+- [PDF / Document](pdf.md) (27 commands)
 - [Perl](perl.md) (4 commands)
 - [PHP](php.md) (7 commands)
 - [Package Managers](pm.md) (5 commands)
@@ -91,5 +91,5 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Version Control](vcs.md) (10 commands)
 - [WebAssembly](wasm.md) (10 commands)
 - [Shell Wrappers](wrappers.md) (7 commands)
-- [Xcode](xcode.md) (17 commands)
+- [Xcode](xcode.md) (29 commands)
 

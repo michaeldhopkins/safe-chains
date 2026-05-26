@@ -1,0 +1,26 @@
+[[command]]
+name = "genstrings"
+description = "Scans C, Objective-C, C++, Objective-C++, or Swift source files and generates `.strings` localization tables (default `Localizable.strings`, or per-table files driven by NSLocalizedStringFromTable() calls in the source). Always writes — either creates new `.strings` files in the current directory or in -o <outputDir>, or, with -a, appends to existing ones. Reads only the files passed as positional arguments; no network access. Output encoding is UTF-16 (host endian unless -bigEndian/-littleEndian forces it). Ships with Xcode; surface stable since 2019."
+url = "https://keith.github.io/xcode-man-pages/genstrings.1.html"
+researched_version = "Xcode 15 / macOS 14 (man page dated 2019-06-12)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-SwiftUI",
+    "-a",
+    "-bigEndian",
+    "-d",
+    "-littleEndian",
+    "-macRoman",
+    "-noPositionalParameters",
+    "-q",
+    "-u",
+    "--help",
+    "-h",
+]
+valued = [
+    "-encoding",
+    "-o",
+    "-s",
+    "-skipTable",
+]

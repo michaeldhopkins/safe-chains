@@ -1,0 +1,35 @@
+[[command]]
+name = "gen_bridge_metadata"
+description = "Generates Objective-C bridge metadata (`.bridgesupport` XML, or a `.dylib` for inline-function support) from a framework or a list of C/Objective-C headers, for use by bridges such as PyObjC. With -o <file> or --format dylib it writes to disk; without -o, final-format metadata goes to stdout. The -c/--cflags and -C/--cflags-64 flags pass arbitrary flags through to the underlying C compiler, which the tool invokes to parse the headers — these are constrained to compilation but are still a wide surface. Reads only local headers/frameworks; no network. Frozen surface (man page dated 2010)."
+url = "https://keith.github.io/xcode-man-pages/gen_bridge_metadata.1.html"
+researched_version = "macOS 14 (man page dated 2010-05-24; surface essentially frozen)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--64-bit",
+    "--arm64e",
+    "--debug",
+    "--no-32-bit",
+    "--no-64-bit",
+    "--private",
+    "--version",
+    "--help",
+    "-d",
+    "-h",
+    "-p",
+    "-v",
+]
+valued = [
+    "--cflags",
+    "--cflags-64",
+    "--exception",
+    "--format",
+    "--framework",
+    "--output",
+    "-C",
+    "-F",
+    "-c",
+    "-e",
+    "-f",
+    "-o",
+]

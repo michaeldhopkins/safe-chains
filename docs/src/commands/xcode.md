@@ -1,5 +1,11 @@
 # Xcode
 
+### `actool`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/actool.1.html">https://keith.github.io/xcode-man-pages/actool.1.html</a></p>
+
+- Allowed standalone flags: --compress-pngs, --enable-on-demand-resources, --errors, --include-all-app-icons, --include-sticker-content, --notices, --print-contents, --skip-app-store-deployment, --version, --warnings, --help, -h
+- Allowed valued flags: --accent-color, --alternate-app-icon, --app-icon, --asset-pack-output-specifications, --compile, --filter-for-device-model, --filter-for-device-os-version, --include-partial-info-plist-localizations, --launch-image, --minimum-deployment-target, --output-format, --output-partial-info-plist, --platform, --product-type, --standalone-icon-behavior, --sticker-pack-identifier-prefix, --sticker-pack-strings-file, --stickers-icon-role, --target-device, --widget-background-color
+
 ### `agvtool`
 <p class="cmd-url"><a href="https://developer.apple.com/library/archive/qa/qa1827/_index.html">https://developer.apple.com/library/archive/qa/qa1827/_index.html</a></p>
 
@@ -14,10 +20,52 @@
 - Requires --display, --verify, -d, -v. - Allowed standalone flags: --deep, --display, --verify, -R, -d, -v, --help, -h
 - Allowed valued flags: --verbose
 
+### `gen_bridge_metadata`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/gen_bridge_metadata.1.html">https://keith.github.io/xcode-man-pages/gen_bridge_metadata.1.html</a></p>
+
+- Allowed standalone flags: --64-bit, --arm64e, --debug, --no-32-bit, --no-64-bit, --private, --version, --help, -d, -h, -p, -v
+- Allowed valued flags: --cflags, --cflags-64, --exception, --format, --framework, --output, -C, -F, -c, -e, -f, -o
+
+### `genstrings`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/genstrings.1.html">https://keith.github.io/xcode-man-pages/genstrings.1.html</a></p>
+
+- Allowed standalone flags: -SwiftUI, -a, -bigEndian, -d, -littleEndian, -macRoman, -noPositionalParameters, -q, -u, --help, -h
+- Allowed valued flags: -encoding, -o, -s, -skipTable
+
+### `ibtool`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/ibtool.1.html">https://keith.github.io/xcode-man-pages/ibtool.1.html</a></p>
+
+- Allowed standalone flags: --all, --classes, --connections, --enable-auto-layout, --errors, --hierarchy, --localizable-all, --localizable-geometry, --localizable-other, --localizable-stringarrays, --localizable-strings, --localizable-to-many-relationships, --localize-incremental, --notices, --objects, --reference-external-strings-file, --remove-plugin-dependencies, --update-constraints, --update-frames, --upgrade, --version, --version-history, --warnings, --help, -h
+- Allowed valued flags: --bundle, --companion-strings-file, --compile, --convert, --export, --export-strings-file, --export-xliff, --flatten, --import, --import-strings-file, --import-xliff, --incremental-file, --module, --output-format, --previous-file, --source-language, --strip, --target-language, --write
+
+### `iconutil`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/iconutil.1.html">https://keith.github.io/xcode-man-pages/iconutil.1.html</a></p>
+
+- Allowed standalone flags: --help, -h
+- Allowed valued flags: --convert, --output, -c, -o
+
+### `layerutil`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/layerutil.1.html">https://keith.github.io/xcode-man-pages/layerutil.1.html</a></p>
+
+- Allowed standalone flags: --help, --palette-image, --version, -V, -c, -h
+- Allowed valued flags: --display-gamut, --flattened-image, --gpu-compression, --lossy-compression, --output, --scale, -f, -g, -l, -o, -p, -s
+
 ### `lipo`
 <p class="cmd-url"><a href="https://ss64.com/mac/lipo.html">https://ss64.com/mac/lipo.html</a></p>
 
 - Requires -archs, -detailed_info, -info, -verify_arch. - Allowed standalone flags: -archs, -detailed_info, -info, -verify_arch, --help, -h
+
+### `mig`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/mig.1.html">https://keith.github.io/xcode-man-pages/mig.1.html</a></p>
+
+- Allowed standalone flags: -B, -K, -L, -MD, -Q, -S, -V, -b, -cpp, -k, -l, -q, -s, -split, -v
+- Allowed valued flags: -arch, -cc, -dheader, -header, -i, -iheader, -isysroot, -maxonstack, -migcom, -server, -sheader, -user
+
+### `migcom`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/migcom.1.html">https://keith.github.io/xcode-man-pages/migcom.1.html</a></p>
+
+- Allowed standalone flags: -B, -K, -L, -Q, -S, -V, -b, -k, -l, -q, -s, -split, -v
+- Allowed valued flags: -dheader, -header, -i, -iheader, -maxonstack, -server, -sheader, -user
 
 ### `periphery`
 <p class="cmd-url"><a href="https://github.com/peripheryapp/periphery">https://github.com/peripheryapp/periphery</a></p>
@@ -107,6 +155,12 @@
 - Allowed valued flags: --renderer
 - Bare invocation allowed
 
+### `xccov`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xccov.1.html">https://keith.github.io/xcode-man-pages/xccov.1.html</a></p>
+
+- **diff**: Flags: --json, --help, -h. Valued: --path-equivalence
+- **view**: Flags: --archive, --file-list, --json, --only-targets, --report, --help, -h. Valued: --file, --files-for-target, --functions-for-file
+
 ### `xcode-select`
 <p class="cmd-url"><a href="https://ss64.com/mac/xcode-select.html">https://ss64.com/mac/xcode-select.html</a></p>
 
@@ -129,6 +183,16 @@
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `xcresulttool`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xcresulttool.1.html">https://keith.github.io/xcode-man-pages/xcresulttool.1.html</a></p>
+
+- **compare**: Flags: --analyzer-issues, --build-warnings, --compact, --schema, --summary, --test-failures, --tests, --help, -h. Valued: --baseline-path, --schema-version
+- **formatDescription**: Flags: --hash, --include-event-stream-types, --help, -h. Valued: --format
+- **get**: Flags: --compact, --schema, --help, -h. Valued: --format, --id, --path, --schema-version, --test-id, --type
+- **graph**: Flags: --help, -h. Valued: --path
+- **metadata get**: Flags: --help, -h. Valued: --path
+- **version**: Flags: --help, -h
+
 ### `xcrun`
 <p class="cmd-url"><a href="https://ss64.com/mac/xcrun.html">https://ss64.com/mac/xcrun.html</a></p>
 
@@ -144,4 +208,19 @@
 - **notarytool log**: Positional args accepted
 - **simctl list**: Positional args accepted
 - **stapler validate**: Positional args accepted
+
+### `xctest`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xctest.1.html">https://keith.github.io/xcode-man-pages/xctest.1.html</a></p>
+
+- Allowed valued flags: -XCTest
+
+### `xctrace`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xctrace.1.html">https://keith.github.io/xcode-man-pages/xctrace.1.html</a></p>
+
+- **export**: Flags: --har, --quiet, --toc, --help, -h. Valued: --input, --output, --xpath
+- **help**: Positional args accepted
+- **import**: Flags: --quiet, --help, -h. Valued: --input, --instrument, --output, --package, --template
+- **list**: Allowed arguments: devices, templates, instruments
+- **symbolicate**: Flags: --quiet, --help, -h. Valued: --dsym, --input, --output
+- **version**: Flags: --help, -h
 

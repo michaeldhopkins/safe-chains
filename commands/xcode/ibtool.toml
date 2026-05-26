@@ -1,0 +1,55 @@
+[[command]]
+name = "ibtool"
+description = "Xcode tool for compiling, inspecting, and localizing Interface Builder documents (`.xib`, `.storyboard`, `.nib`). Inspection flags (--objects, --hierarchy, --connections, --classes, --version-history, --localizable-*, --all, --version) read a document and emit a plist on stdout. The compile/strip/import/export/upgrade/refactor flags (--compile, --strip, --write, --upgrade, --convert, --import-strings-file, --import-xliff, --enable-auto-layout, --update-frames, --update-constraints, --localize-incremental, --remove-plugin-dependencies, --export-strings-file, --export-xliff) write new files to disk. All paths are local; no network access. Surface is stable; ships with Xcode."
+url = "https://keith.github.io/xcode-man-pages/ibtool.1.html"
+researched_version = "Xcode 15 / macOS 14 (man page dated 2015-03-19)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--all",
+    "--classes",
+    "--connections",
+    "--enable-auto-layout",
+    "--errors",
+    "--hierarchy",
+    "--localizable-all",
+    "--localizable-geometry",
+    "--localizable-other",
+    "--localizable-stringarrays",
+    "--localizable-strings",
+    "--localizable-to-many-relationships",
+    "--localize-incremental",
+    "--notices",
+    "--objects",
+    "--reference-external-strings-file",
+    "--remove-plugin-dependencies",
+    "--update-constraints",
+    "--update-frames",
+    "--upgrade",
+    "--version",
+    "--version-history",
+    "--warnings",
+    "--help",
+    "-h",
+]
+valued = [
+    "--bundle",
+    "--companion-strings-file",
+    "--compile",
+    "--convert",
+    "--export",
+    "--export-strings-file",
+    "--export-xliff",
+    "--flatten",
+    "--import",
+    "--import-strings-file",
+    "--import-xliff",
+    "--incremental-file",
+    "--module",
+    "--output-format",
+    "--previous-file",
+    "--source-language",
+    "--strip",
+    "--target-language",
+    "--write",
+]
