@@ -8664,6 +8664,15 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `sfltool`
+<p class="cmd-url"><a href="https://www.unix.com/man-page/osx/1/sfltool/">https://www.unix.com/man-page/osx/1/sfltool/</a></p>
+
+- **csinfo**: Flags: --help, -h
+- **dumpbtm**: Flags: --help, -h
+- **list**: Flags: --help, -h
+- **list-info**: Flags: --help, -h
+- Allowed standalone flags: --help, -h
+
 ### `sftp`
 <p class="cmd-url"><a href="https://man.openbsd.org/sftp">https://man.openbsd.org/sftp</a></p>
 
