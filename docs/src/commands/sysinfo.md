@@ -18,11 +18,32 @@
 - Allowed valued flags: -A, -B, -d, -n
 - Bare invocation allowed
 
+### `dscacheutil`
+<p class="cmd-url"><a href="https://ss64.com/mac/dscacheutil.html">https://ss64.com/mac/dscacheutil.html</a></p>
+
+- Requires -q, -cachedump, -configuration, -statistics, -h. - Allowed standalone flags: -h, -cachedump, -buckets, -configuration, -statistics
+- Allowed valued flags: -q, -entries, -a
+
+### `dsmemberutil`
+<p class="cmd-url"><a href="https://ss64.com/mac/dsmemberutil.html">https://ss64.com/mac/dsmemberutil.html</a></p>
+
+- **checkmembership**: Flags: -v. Valued: -u, -U, -x, -s, -g, -G, -X, -S
+- **getid**: Flags: -v. Valued: -U, -G, -s, -S, -X
+- **getsid**: Flags: -v. Valued: -u, -g, -U, -G, -X
+- **getuuid**: Flags: -v. Valued: -u, -U, -x, -s, -g, -G, -X, -S
+
 ### `dust`
 <p class="cmd-url"><a href="https://github.com/bootandy/dust#readme">https://github.com/bootandy/dust#readme</a></p>
 
 - Allowed standalone flags: --bars-on-right, --files0-from, --help, --ignore-all-in-file, --invert-filter, --no-colors, --no-percent-bars, --only-dir, --only-file, --skip-total, --version, -D, -F, -H, -P, -R, -S, -V, -b, -c, -f, -h, -i, -p, -r, -s
 - Allowed valued flags: --depth, --exclude, --filter, --terminal_width, -M, -X, -d, -e, -n, -t, -v, -w, -z
+- Bare invocation allowed
+
+### `dyld_usage`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/dyld_usage.1.html">https://keith.github.io/xcode-man-pages/dyld_usage.1.html</a></p>
+
+- Allowed standalone flags: -e, -j, -h
+- Allowed valued flags: -f, -t, -R, -S, -E
 - Bare invocation allowed
 
 ### `findmnt`
@@ -58,6 +79,22 @@
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
 
+### `hostid`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#hostid-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#hostid-invocation</a></p>
+
+- Allowed standalone flags: --help, --version
+- Bare invocation allowed
+
+### `hostinfo`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/hostinfo.8.html">https://keith.github.io/xcode-man-pages/hostinfo.8.html</a></p>
+
+- Bare invocation allowed
+
+### `hpmdiagnose`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/hpmdiagnose.1.html">https://keith.github.io/xcode-man-pages/hpmdiagnose.1.html</a></p>
+
+- Bare invocation allowed
+
 ### `htop`
 <p class="cmd-url"><a href="https://htop.dev/">https://htop.dev/</a></p>
 
@@ -67,6 +104,8 @@
 
 ### `id`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation</a></p>
+
+Aliases: `gid`
 
 - Allowed standalone flags: --context, --group, --groups, --help, --name, --real, --user, --version, --zero, -G, -V, -Z, -g, -h, -n, -p, -r, -u, -z
 - Bare invocation allowed
@@ -92,6 +131,13 @@
 - Allowed valued flags: --limit, --present, --since, --time-format, --until, -f, -n, -p, -s, -t
 - Bare invocation allowed
 
+### `lastcomm`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/lastcomm.1.html">https://keith.github.io/xcode-man-pages/lastcomm.1.html</a></p>
+
+- Allowed standalone flags: -w
+- Allowed valued flags: -f
+- Bare invocation allowed
+
 ### `lastlog`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/lastlog.8.html">https://man7.org/linux/man-pages/man8/lastlog.8.html</a></p>
 
@@ -103,6 +149,14 @@
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/locale.1.html">https://man7.org/linux/man-pages/man1/locale.1.html</a></p>
 
 - Allowed standalone flags: --all-locales, --category-name, --charmaps, --help, --keyword-name, --verbose, --version, -V, -a, -c, -h, -k, -m, -v
+- Bare invocation allowed
+
+### `logname`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#logname-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#logname-invocation</a></p>
+
+Aliases: `glogname`
+
+- Allowed standalone flags: --help, --version
 - Bare invocation allowed
 
 ### `lsblk`
@@ -119,6 +173,16 @@
 - Allowed valued flags: -F, -S, -T, -a, -c, -d, -g, -i, -k, -o, -p, -r, -s, -u
 - Bare invocation allowed
 
+### `machine`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/machine.1.html">https://keith.github.io/xcode-man-pages/machine.1.html</a></p>
+
+- Bare invocation allowed
+
+### `mesg`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/mesg.1.html">https://keith.github.io/xcode-man-pages/mesg.1.html</a></p>
+
+- Bare invocation allowed
+
 ### `mount`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/mount.8.html">https://man7.org/linux/man-pages/man8/mount.8.html</a></p>
 
@@ -130,6 +194,13 @@
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/mountpoint.1.html">https://man7.org/linux/man-pages/man1/mountpoint.1.html</a></p>
 
 - Allowed standalone flags: --devno, --fs-devno, --help, --nofollow, --quiet, --show, --version, -V, -d, -h, -q, -x
+
+### `nfsstat`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/nfsstat.1.html">https://keith.github.io/xcode-man-pages/nfsstat.1.html</a></p>
+
+- Allowed standalone flags: -c, -e, -s, -u, -v, -E, -3, -4
+- Allowed valued flags: -w, -n, -m, -f
+- Bare invocation allowed
 
 ### `nproc`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#nproc-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#nproc-invocation</a></p>
@@ -143,11 +214,33 @@
 
 - Allowed standalone flags: --help, --version, -h, -V
 
+### `pagesize`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/pagesize.1.html">https://keith.github.io/xcode-man-pages/pagesize.1.html</a></p>
+
+- Bare invocation allowed
+
+### `path_helper`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/path_helper.8.html">https://keith.github.io/xcode-man-pages/path_helper.8.html</a></p>
+
+- Allowed standalone flags: -c, -s
+- Bare invocation allowed
+
+### `pcsstatus`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/pcsstatus.1.html">https://keith.github.io/xcode-man-pages/pcsstatus.1.html</a></p>
+
+- Bare invocation allowed
+
 ### `pgrep`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/pgrep.1.html">https://man7.org/linux/man-pages/man1/pgrep.1.html</a></p>
 
 - Allowed standalone flags: --count, --delimiter, --full, --help, --inverse, --lightweight, --list-full, --list-name, --newest, --oldest, --version, -L, -V, -a, -c, -f, -h, -i, -l, -n, -o, -v, -w, -x
 - Allowed valued flags: --euid, --group, --parent, --pgroup, --pidfile, --session, --terminal, --uid, -F, -G, -P, -U, -d, -g, -s, -t, -u
+
+### `pinky`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pinky-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pinky-invocation</a></p>
+
+- Allowed standalone flags: --help, --lookup, --version, -b, -f, -h, -i, -l, -p, -q, -s, -w
+- Bare invocation allowed
 
 ### `procs`
 <p class="cmd-url"><a href="https://github.com/dalance/procs#readme">https://github.com/dalance/procs#readme</a></p>
@@ -196,6 +289,11 @@
 - Allowed valued flags: -detailLevel, -timeout
 - Bare invocation allowed
 
+### `tbtdiagnose`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/tbtdiagnose.1.html">https://keith.github.io/xcode-man-pages/tbtdiagnose.1.html</a></p>
+
+- Bare invocation allowed
+
 ### `top`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/top.1.html">https://man7.org/linux/man-pages/man1/top.1.html</a></p>
 
@@ -212,6 +310,8 @@
 ### `uname`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#uname-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#uname-invocation</a></p>
 
+Aliases: `guname`
+
 - Allowed standalone flags: --all, --help, --kernel-name, --kernel-release, --kernel-version, --machine, --nodename, --operating-system, --processor, --version, -V, -a, -h, -m, -n, -o, -p, -r, -s, -v
 - Bare invocation allowed
 
@@ -220,6 +320,19 @@
 
 - Allowed standalone flags: --help, --pretty, --since, --version, -V, -h, -p, -s
 - Bare invocation allowed
+
+### `users`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#users-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#users-invocation</a></p>
+
+Aliases: `gusers`
+
+- Allowed standalone flags: --help, --version
+- Bare invocation allowed
+
+### `viewdiagnostic`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/viewdiagnostic.1.html">https://keith.github.io/xcode-man-pages/viewdiagnostic.1.html</a></p>
+
+- Positional arguments only
 
 ### `vm_stat`
 <p class="cmd-url"><a href="https://ss64.com/mac/vm_stat.html">https://ss64.com/mac/vm_stat.html</a></p>
@@ -236,6 +349,8 @@
 
 ### `who`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation</a></p>
+
+Aliases: `gwho`
 
 - Allowed standalone flags: --all, --boot, --count, --dead, --heading, --help, --login, --lookup, --mesg, --message, --process, --runlevel, --short, --time, --users, --version, --writable, -H, -S, -T, -V, -a, -b, -d, -h, -l, -m, -p, -q, -r, -s, -t, -u, -w
 - Bare invocation allowed

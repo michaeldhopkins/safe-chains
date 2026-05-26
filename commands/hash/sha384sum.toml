@@ -1,0 +1,14 @@
+[[command]]
+name = "sha384sum"
+aliases = ["gsha384sum"]
+description = "Computes or verifies SHA-384 cryptographic checksums. Strictly read-only: reads file contents, computes hashes, and prints results to stdout. The --check flag reads a checksum file and verifies listed files against their recorded hashes. Does not modify files or access the network. Part of GNU coreutils with a very stable CLI surface. The gsha384sum alias is the Homebrew-prefixed name on macOS."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities"
+researched_version = "GNU coreutils 9.6"
+level = "Inert"
+bare = true
+standalone = [
+    "--binary", "--check", "--help", "--ignore-missing", "--quiet",
+    "--status", "--strict", "--tag", "--text", "--version", "--warn",
+    "--zero",
+    "-V", "-b", "-c", "-h", "-t", "-w", "-z",
+]

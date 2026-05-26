@@ -1,0 +1,10 @@
+[[command]]
+name = "ld"
+description = "Apple's Mach-O static linker. Combines object files and libraries, resolves references, and produces an executable, dylib, bundle, or merged object file (`-r`). Always writes — to `a.out` by default, or to the path given via `-o`. The flag surface is large and single-dash: dozens of `-l<name>` library-search forms, `-L<dir>` and `-F<dir>` search-path forms, `-framework <name>`, `-arch <arch>`, `-syslibroot <sdk>`, `-rpath`, `-install_name`, plus many specialized link-mode flags. Surface evolves with Xcode releases."
+url = "https://keith.github.io/xcode-man-pages/ld.1.html"
+researched_version = "macOS 14 / Xcode 15 (Apple ld; ld_prime default)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "--version"]
+valued = ["-o"]

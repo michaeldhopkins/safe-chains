@@ -1,0 +1,10 @@
+[[command]]
+name = "users"
+aliases = ["gusers"]
+description = "Lists the login names of users currently on the system, sorted, space-separated, on a single line. BSD form has no flags. The GNU coreutils form takes an optional FILE argument (default /var/run/utmp[x])."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#users-invocation"
+researched_version = "GNU coreutils 9.7 (April 2025); BSD form frozen"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = ["--help", "--version"]

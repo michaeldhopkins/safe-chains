@@ -1,0 +1,9 @@
+[[command]]
+name = "path_helper"
+description = "Helper for constructing PATH and MANPATH from /etc/paths, /etc/paths.d, /etc/manpaths, and /etc/manpaths.d. Writes shell commands to stdout (-c for csh, -s for sh); invoked from shell profile scripts. Does not modify any files. The man page notes it 'should not be invoked directly' — but it is otherwise harmless. macOS system binary at /usr/libexec/path_helper; surface frozen since 2007."
+url = "https://keith.github.io/xcode-man-pages/path_helper.8.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["-c", "-s"]

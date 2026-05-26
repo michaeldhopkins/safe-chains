@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1158 commands across 75 categories.
+safe-chains knows 1258 commands across 75 categories.
 
 ## Glossary
 
@@ -26,19 +26,19 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Blockchain / Crypto](blockchain.md) (20 commands)
 - [Build Systems](build.md) (5 commands)
 - [Shell Builtins](builtins.md) (22 commands)
-- [C / C++](c.md) (9 commands)
+- [C / C++](c.md) (33 commands)
 - [Clipboard](clipboard.md) (3 commands)
 - [Cloud Providers](cloud.md) (10 commands)
 - [Compilation Toolchains](compile.md) (24 commands)
 - [Config Management](configmgmt.md) (3 commands)
 - [Containers](containers.md) (38 commands)
 - [C++ Package Managers](cppkg.md) (3 commands)
-- [Cryptography](crypto.md) (3 commands)
+- [Cryptography](crypto.md) (34 commands)
 - [Crystal](crystal.md) (3 commands)
 - [D](d.md) (1 commands)
 - [Dart / Flutter](dart.md) (2 commands)
 - [Data Processing](data.md) (27 commands)
-- [Database Clients](db.md) (40 commands)
+- [Database Clients](db.md) (65 commands)
 - [.NET](dotnet.md) (21 commands)
 - [Editors](editors.md) (4 commands)
 - [Elixir / Erlang](elixir.md) (2 commands)
@@ -50,7 +50,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Game Engines](game.md) (1 commands)
 - [Gleam](gleam.md) (1 commands)
 - [Go](go.md) (18 commands)
-- [Hashing](hash.md) (9 commands)
+- [Hashing](hash.md) (11 commands)
 - [Haskell](haskell.md) (6 commands)
 - [Julia](julia.md) (1 commands)
 - [JVM](jvm.md) (23 commands)
@@ -83,7 +83,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Search](search.md) (12 commands)
 - [Serverless / IaC](serverless.md) (7 commands)
 - [Swift](swift.md) (1 commands)
-- [System Info](sysinfo.md) (37 commands)
+- [System Info](sysinfo.md) (55 commands)
 - [System](system.md) (71 commands)
 - [TeX / LaTeX](tex.md) (3 commands)
 - [Text Processing](text.md) (29 commands)

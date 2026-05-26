@@ -1,0 +1,49 @@
+[[command]]
+name = "sha1"
+description = "BSD-style SHA-1 utility (macOS/FreeBSD). Reads file contents or strings passed via -s, computes SHA-1 digests, and prints them to stdout. The -c flag compares against a known digest; -p echoes stdin while appending the checksum. Strictly read-only: no file output, no network. Note: SHA-1 has known collision vulnerabilities and should not be relied on for security purposes. The BSD CLI surface is essentially frozen."
+url = "https://man.freebsd.org/cgi/man.cgi?query=sha1"
+researched_version = "macOS 14 (Sequoia); BSD surface frozen"
+level = "Inert"
+bare = true
+standalone = ["--help", "--passthrough", "--quiet", "--reverse", "--self-test", "--time-trial", "--version", "-V", "-h", "-p", "-q", "-r", "-t", "-x"]
+valued = ["--check", "--string", "-c", "-s"]
+
+[[command]]
+name = "sha224"
+description = "BSD-style SHA-224 utility (macOS/FreeBSD). Reads file contents or strings passed via -s, computes SHA-224 digests, and prints them to stdout. The -c flag compares against a known digest; -p echoes stdin while appending the checksum. Strictly read-only: no file output, no network. The BSD CLI surface is essentially frozen."
+url = "https://man.freebsd.org/cgi/man.cgi?query=sha224"
+researched_version = "macOS 14 (Sequoia); BSD surface frozen"
+level = "Inert"
+bare = true
+standalone = ["--help", "--passthrough", "--quiet", "--reverse", "--self-test", "--time-trial", "--version", "-V", "-h", "-p", "-q", "-r", "-t", "-x"]
+valued = ["--check", "--string", "-c", "-s"]
+
+[[command]]
+name = "sha256"
+description = "BSD-style SHA-256 utility (macOS/FreeBSD). Reads file contents or strings passed via -s, computes SHA-256 digests, and prints them to stdout. The -c flag compares against a known digest; -p echoes stdin while appending the checksum. Strictly read-only: no file output, no network. The BSD CLI surface is essentially frozen."
+url = "https://man.freebsd.org/cgi/man.cgi?query=sha256"
+researched_version = "macOS 14 (Sequoia); BSD surface frozen"
+level = "Inert"
+bare = true
+standalone = ["--help", "--passthrough", "--quiet", "--reverse", "--self-test", "--time-trial", "--version", "-V", "-h", "-p", "-q", "-r", "-t", "-x"]
+valued = ["--check", "--string", "-c", "-s"]
+
+[[command]]
+name = "sha384"
+description = "BSD-style SHA-384 utility (macOS/FreeBSD). Reads file contents or strings passed via -s, computes SHA-384 digests, and prints them to stdout. The -c flag compares against a known digest; -p echoes stdin while appending the checksum. Strictly read-only: no file output, no network. The BSD CLI surface is essentially frozen."
+url = "https://man.freebsd.org/cgi/man.cgi?query=sha384"
+researched_version = "macOS 14 (Sequoia); BSD surface frozen"
+level = "Inert"
+bare = true
+standalone = ["--help", "--passthrough", "--quiet", "--reverse", "--self-test", "--time-trial", "--version", "-V", "-h", "-p", "-q", "-r", "-t", "-x"]
+valued = ["--check", "--string", "-c", "-s"]
+
+[[command]]
+name = "sha512"
+description = "BSD-style SHA-512 utility (macOS/FreeBSD). Reads file contents or strings passed via -s, computes SHA-512 digests, and prints them to stdout. The -c flag compares against a known digest; -p echoes stdin while appending the checksum. Strictly read-only: no file output, no network. The BSD CLI surface is essentially frozen."
+url = "https://man.freebsd.org/cgi/man.cgi?query=sha512"
+researched_version = "macOS 14 (Sequoia); BSD surface frozen"
+level = "Inert"
+bare = true
+standalone = ["--help", "--passthrough", "--quiet", "--reverse", "--self-test", "--time-trial", "--version", "-V", "-h", "-p", "-q", "-r", "-t", "-x"]
+valued = ["--check", "--string", "-c", "-s"]

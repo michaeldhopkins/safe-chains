@@ -1,0 +1,10 @@
+[[command]]
+name = "gcore"
+description = "Captures a core file image of a running process so it can later be examined with lldb. Doubly invasive: gcore reads the address space of another process (which requires either the same uid as the target or root) and writes a potentially very large core file to disk (`-o <path>` or `-c <pathformat>`; default destination governed by the kern.corefile sysctl). `-s` suspends the target while dumping. `-x stack|compact|full` selects how much of the address space to capture; `full` (the default) writes everything mapped. No network."
+url = "https://keith.github.io/xcode-man-pages/gcore.1.html"
+researched_version = "macOS 14 / Xcode 15"
+level = "SafeWrite"
+bare = false
+max_positional = 1
+standalone = ["-s", "-v"]
+valued = ["-b", "-c", "-o", "-x"]

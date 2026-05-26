@@ -1,0 +1,12 @@
+[[command]]
+name = "nfsstat"
+description = "Reports NFS statistics: client RPC counters, server RPC counters, exported-directory stats, active-user stats, and mount details. Reads kernel counters and the local NFS configuration — does not contact remote servers itself, although the data describes traffic to them. -3/-4 narrow to a single NFS protocol version; -f JSON prints as JSON; -w wait runs an interval-summary mode. The -z flag zeros the in-kernel counters and is a state mutation; it is excluded here. Surface tracks the macOS NFS implementation — it is essentially frozen between releases."
+url = "https://keith.github.io/xcode-man-pages/nfsstat.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+standalone = [
+    "-c", "-e", "-s", "-u", "-v", "-E",
+    "-3", "-4",
+]
+valued = ["-w", "-n", "-m", "-f"]

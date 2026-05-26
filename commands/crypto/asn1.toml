@@ -1,0 +1,32 @@
+[[command]]
+name = "asn1Coding"
+description = "ASN.1 DER encoder from GNU Libtasn1. Reads a DEFINITIONS file and an ASSIGNMENTS file, generates the DER encoding of the value assignments, and writes the result to a file via -o/--output. Strictly local: no network, no execution of arbitrary code. The --check/-c flag verifies syntax only without producing output. Libtasn1's CLI surface is essentially frozen; releases are infrequent."
+url = "https://www.gnu.org/software/libtasn1/manual/html_node/Invoking-asn1Coding.html"
+researched_version = "GNU Libtasn1 4.21.0"
+level = "SafeWrite"
+bare = false
+standalone = ["--check", "--help", "--version", "-c", "-h", "-v"]
+valued = ["--output", "-o"]
+
+[[command]]
+name = "asn1Decoding"
+description = "ASN.1 DER decoder from GNU Libtasn1. Reads an encoded DER file and an ASN.1 DEFINITIONS file, parses the data against the named ASN1TYPE element, and prints the decoded structure to stdout. Strictly read-only: no output file flag, no network, no side effects. The --strict and --no-time-strict flags tune DER strictness; --benchmark times the decode. Libtasn1's CLI surface is essentially frozen."
+url = "https://www.gnu.org/software/libtasn1/manual/html_node/Invoking-asn1Decoding.html"
+researched_version = "GNU Libtasn1 4.21.0"
+level = "Inert"
+bare = false
+standalone = [
+    "--benchmark", "--help", "--no-time-strict", "--strict",
+    "--version",
+    "-b", "-h", "-s", "-t", "-v",
+]
+
+[[command]]
+name = "asn1Parser"
+description = "ASN.1 syntax-tree generator from GNU Libtasn1. Reads a file with ASN.1 DEFINITIONS and writes a C array suitable for use with libtasn1 functions, either to stdout or to a file via -o/--output. The --check/-c flag verifies syntax only. Strictly local: no network, no execution of arbitrary code. Libtasn1's CLI surface is essentially frozen."
+url = "https://www.gnu.org/software/libtasn1/manual/html_node/Invoking-asn1Parser.html"
+researched_version = "GNU Libtasn1 4.21.0"
+level = "SafeWrite"
+bare = false
+standalone = ["--check", "--help", "--version", "-c", "-h", "-v"]
+valued = ["--name", "--output", "-n", "-o"]

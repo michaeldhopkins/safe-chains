@@ -1,0 +1,127 @@
+[[command]]
+name = "danetool"
+description = "GnuTLS DANE tool. Generates DNS TLSA resource records from a certificate or public key and verifies DANE entries against a host. Can connect to a server (via --check or to fetch a certificate) using --starttls-proto for the application handshake, and uses DNSSEC resolution. All operations are queries: --tlsa-rr prints record data, --check verifies an entry, --outfile writes the generated record locally. Does not modify remote state. GnuTLS's CLI is stable across minor versions; new flags arrive roughly once a year."
+url = "https://www.gnutls.org/manual/html_node/danetool-Invocation.html"
+researched_version = "GnuTLS 3.8.10"
+level = "Inert"
+bare = false
+standalone = [
+    "--app-proto", "--ca", "--check-ca", "--check-ee", "--help",
+    "--inder", "--inraw", "--insecure", "--local", "--local-dns",
+    "--more-help", "--no-domain", "--no-inder", "--no-local-dns",
+    "--no-print-raw", "--print-raw", "--quiet", "--tlsa-rr",
+    "--verbose", "--x509",
+    "-!", "-V", "-h",
+]
+valued = [
+    "--attime", "--check", "--debug", "--dlv", "--domain",
+    "--hash", "--host", "--load-certificate", "--load-pubkey",
+    "--outfile", "--port", "--proto", "--starttls-proto",
+    "--version",
+    "-d", "-v",
+]
+
+[[command]]
+name = "ocsptool"
+description = "GnuTLS OCSP CLI. Generates OCSP requests (--generate-request), parses and prints OCSP requests and responses (--request-info, --response-info), verifies responses against a signer or trust store (--verify-response), and queries OCSP servers over HTTP (--ask). All operations are read-only queries against either a local file or a remote OCSP responder. --outfile writes generated request/response data locally. Does not modify any remote state. GnuTLS ships ocsptool alongside the library; the CLI surface is stable."
+url = "https://www.gnutls.org/manual/html_node/ocsptool-Invocation.html"
+researched_version = "GnuTLS 3.8.10"
+level = "Inert"
+bare = false
+standalone = [
+    "--generate-request", "--help", "--ignore-errors", "--inder",
+    "--more-help", "--no-inder", "--no-nonce", "--nonce",
+    "--outder", "--outpem", "--request-info", "--response-info",
+    "--verbose", "--verify-allow-broken", "--verify-response",
+    "-!", "-V", "-e", "-h", "-i", "-j", "-q",
+]
+valued = [
+    "--ask", "--attime", "--debug", "--infile", "--load-cert",
+    "--load-chain", "--load-issuer", "--load-request",
+    "--load-response", "--load-signer", "--load-trust",
+    "--outfile", "--version",
+    "-Q", "-S", "-d", "-v",
+]
+
+[[command]]
+name = "p11tool"
+description = "GnuTLS PKCS #11 tool for operations on smart cards and HSM tokens. Has both read-only modes (list tokens, list certificates, list private keys, list mechanisms, --info) and destructive modes (--initialize, --initialize-pin, --initialize-so-pin, --generate-privkey, --delete, --write, --export) that are excluded here. Operates on hardware via the PKCS #11 API; some operations require a PIN supplied via the GNUTLS_PIN environment variable. GnuTLS releases p11tool on the GnuTLS cadence (roughly yearly)."
+url = "https://www.gnutls.org/manual/html_node/p11tool-Invocation.html"
+researched_version = "GnuTLS 3.8.10"
+level = "Inert"
+bare = false
+standalone = [
+    "--detailed-url", "--help", "--info", "--list-all",
+    "--list-all-certs", "--list-all-privkeys", "--list-all-trusted",
+    "--list-certs", "--list-keys", "--list-mechanisms",
+    "--list-privkeys", "--list-token-urls", "--list-tokens",
+    "--login", "--more-help", "--no-detailed-url", "--no-login",
+    "--no-so-login", "--only-urls", "--so-login", "--verbose",
+    "-!", "-V", "-h",
+]
+valued = ["--debug", "--outfile", "--provider", "--version", "-d", "-v"]
+
+[[command]]
+name = "psktool"
+description = "GnuTLS pre-shared key (PSK) generator. Creates random keys for use with TLS-PSK and appends them in hexadecimal form to a PSK file specified via -p/--pskfile, indexed by the -u/--username identity. Always writes to a local key file; does not query the network. The default key size is 32 bytes; -s/--keysize sets a different size up to 512. GnuTLS's CLI is stable."
+url = "https://www.gnutls.org/manual/html_node/psktool-Invocation.html"
+researched_version = "GnuTLS 3.8.10"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--more-help", "--passwd", "-!", "-V", "-h"]
+valued = [
+    "--debug", "--keysize", "--pskfile", "--username", "--version",
+    "-d", "-p", "-s", "-u", "-v",
+]
+
+[[command]]
+name = "tpmtool"
+description = "GnuTLS TPM tool for operations against the local Trusted Platform Module. Has both read-only modes (--list lists stored keys, --pubkey prints a key's public portion, --test-sign verifies a sign/verify round-trip) and destructive modes (--generate-rsa, --delete) that are excluded here. Operates entirely on local hardware. GnuTLS's CLI is stable across minor versions."
+url = "https://www.gnutls.org/manual/html_node/tpmtool-Invocation.html"
+researched_version = "GnuTLS 3.8.10"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--list", "--more-help", "--srk-well-known",
+    "--verbose",
+    "-!", "-V", "-h",
+]
+valued = [
+    "--debug", "--infile", "--outfile", "--pubkey", "--test-sign",
+    "--version",
+    "-d", "-v",
+]
+
+[[command]]
+name = "gnutls-certtool"
+description = "GnuTLS X.509 certificate tool, installed as gnutls-certtool on macOS to avoid conflicting with Apple's certtool. Generates and inspects certificates, CSRs, and private keys: read-only modes parse and print (--certificate-info, --pubkey-info, --fingerprint), generation modes create artifacts (--generate-self-signed, --generate-certificate, --generate-request, --generate-privkey, --update-certificate). All output goes to --outfile or stdout; PINs for PKCS#11 URIs come from GNUTLS_PIN. Does not modify keychains or remote state. GnuTLS's CLI surface is stable; new flags arrive roughly once a year."
+url = "https://www.gnutls.org/manual/html_node/certtool-Invocation.html"
+researched_version = "GnuTLS 3.8.10"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--certificate-info", "--certificate-pubkey", "--fingerprint",
+    "--generate-certificate", "--generate-crl", "--generate-dh-params",
+    "--generate-privkey", "--generate-proxy", "--generate-request",
+    "--generate-self-signed", "--help", "--key-id", "--more-help",
+    "--no-text", "--p7-detached-sign", "--p7-generate",
+    "--p7-info", "--p7-sign", "--p7-verify", "--pkcs8",
+    "--pubkey-info", "--smime-to-p7", "--text", "--to-p12",
+    "--to-p8", "--to-rsa", "--update-certificate", "--v1",
+    "--verbose", "--verify-allow-broken", "--verify-chain",
+    "--verify-crl", "--verify-profile",
+    "-!", "-V", "-c", "-h", "-i", "-s", "-u",
+]
+valued = [
+    "--attime", "--bits", "--crl-dist-points", "--curve",
+    "--debug", "--dh-info", "--dsa-info", "--ecc-info",
+    "--hash", "--infile", "--inder", "--key-type",
+    "--load-ca-certificate", "--load-ca-privkey", "--load-certificate",
+    "--load-crl", "--load-data", "--load-privkey", "--load-pubkey",
+    "--load-request", "--load-sigfile", "--no-crq-extensions",
+    "--outfile", "--password", "--pkcs-cipher", "--provable",
+    "--provider", "--rsa-info", "--sec-param", "--seed",
+    "--template", "--verify-email", "--verify-hostname",
+    "--verify-purpose", "--version",
+    "-d", "-v",
+]

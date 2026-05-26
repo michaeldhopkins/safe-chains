@@ -1,0 +1,38 @@
+[[command]]
+name = "dsmemberutil"
+description = "macOS membership-API command-line wrapper. Subcommands: getuuid (UID/GID/name/SID → UUID), getid (UUID → UID/GID), getsid (UID/GID/UUID → SID), checkmembership (is a user a member of a group), and flushcache (drop the in-memory membership cache). Read verbs query system identity services; they do not write to any external system. checkmembership is the main everyday use. flushcache mutates a per-process or per-system cache and is excluded here. Surface is frozen — has not changed in many macOS releases."
+url = "https://ss64.com/mac/dsmemberutil.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+bare = false
+
+[[command.sub]]
+name = "checkmembership"
+level = "Inert"
+bare = false
+standalone = ["-v"]
+valued = ["-u", "-U", "-x", "-s", "-g", "-G", "-X", "-S"]
+
+[[command.sub]]
+name = "getuuid"
+level = "Inert"
+bare = false
+standalone = ["-v"]
+valued = ["-u", "-U", "-x", "-s", "-g", "-G", "-X", "-S"]
+
+[[command.sub]]
+name = "getid"
+level = "Inert"
+bare = false
+standalone = ["-v"]
+valued = ["-U", "-G", "-s", "-S", "-X"]
+
+[[command.sub]]
+name = "getsid"
+level = "Inert"
+bare = false
+standalone = ["-v"]
+valued = ["-u", "-g", "-U", "-G", "-X"]
+
+[[command.sub]]
+name = "flushcache"
+candidate = true

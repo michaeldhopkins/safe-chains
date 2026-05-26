@@ -1,0 +1,15 @@
+[[command]]
+name = "dscacheutil"
+description = "macOS Directory Service cache utility. Replaces the old lookupd inspection surface: -q runs a user/group/host/mount/protocol/rpc/service lookup (returns cached data or fetches and caches it), -cachedump prints an overview of the cache (with optional -buckets and -entries detail), -configuration prints the active Directory Service search policy, -statistics prints hit/miss counters, and -flushcache wipes the entire cache. Read verbs touch the directory subsystem (LDAP/Active Directory/local users) the way any name-resolution call does — no separate network surface beyond the system resolver. -flushcache mutates system-wide caching state and is noted in the man page as 'should only be used in extreme cases', so it is excluded from this allowlist. Flag surface is frozen — this binary has been unchanged since Mac OS X 10.5."
+url = "https://ss64.com/mac/dscacheutil.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = false
+require_any = ["-q", "-cachedump", "-configuration", "-statistics", "-h"]
+standalone = [
+    "-h",
+    "-cachedump", "-buckets",
+    "-configuration",
+    "-statistics",
+]
+valued = ["-q", "-entries", "-a"]

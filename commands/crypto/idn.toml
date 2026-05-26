@@ -1,0 +1,29 @@
+[[command]]
+name = "idn"
+description = "GNU Libidn IDN command-line tool. Converts strings between Unicode and ASCII Compatible Encoding (ACE) per IDNA, encodes/decodes Punycode, performs StringPrep normalization (Nameprep, iSCSI, Nodeprep, Resourceprep, trace, SASLprep), and NFKC-normalizes input. Reads arguments from the command line or stdin; writes the converted output to stdout. Strictly local: no network, no file output. The CLI surface is stable; Libidn releases roughly once a year."
+url = "https://www.gnu.org/software/libidn/manual/libidn.html"
+researched_version = "GNU Libidn 1.43"
+level = "Inert"
+bare = true
+standalone = [
+    "--allow-unassigned", "--debug", "--help", "--idna-to-ascii",
+    "--idna-to-unicode", "--nfkc", "--no-tld", "--punycode-decode",
+    "--punycode-encode", "--quiet", "--stringprep",
+    "--usestd3asciirules", "--version",
+    "-V", "-a", "-d", "-e", "-h", "-n", "-s", "-u",
+]
+valued = ["--profile", "-p"]
+
+[[command]]
+name = "idn2"
+description = "GNU Libidn2 IDNA2008/TR46 conversion tool. Converts DNS labels between Unicode and ASCII Compatible Encoding (ACE) using IDNA2008 with optional TR46 transitional or non-transitional processing. The --lookup mode (default) performs the standard IDNA lookup conversion; --decode reverses Punycode; --register applies the IDNA registration profile. Reads arguments or stdin; prints to stdout. Strictly local: no network, no file output. Libidn2 releases roughly once a year."
+url = "https://www.gnu.org/software/libidn/manual/libidn2.html"
+researched_version = "Libidn2 2.3.8"
+level = "Inert"
+bare = true
+standalone = [
+    "--debug", "--decode", "--help", "--lookup", "--no-alabelroundtrip",
+    "--no-tr46", "--quiet", "--register", "--tr46nt", "--tr46t",
+    "--usestd3asciirules", "--version",
+    "-N", "-T", "-V", "-d", "-h", "-l", "-r",
+]

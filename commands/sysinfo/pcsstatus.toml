@@ -1,0 +1,8 @@
+[[command]]
+name = "pcsstatus"
+description = "Prints the current status of PCS (Per-application iCloud encryption) credentials stored in the Keychain. Read-only; no flags, no arguments. macOS system binary; surface frozen since macOS 10.10."
+url = "https://keith.github.io/xcode-man-pages/pcsstatus.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+max_positional = 0

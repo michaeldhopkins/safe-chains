@@ -1,0 +1,9 @@
+[[command]]
+name = "csreq"
+description = "Apple Code Signing Requirement compiler. Reads a Code Requirement from -r (either a literal source text prefixed with =, a file path, or - for stdin), parses it through Security.framework's requirement compiler, and emits either canonical text to stdout (-t) or binary form to a file (-b output). The binary form is consumed by codesign(1) and Code Signing verification APIs. Strictly local: no network, no execution of the requirement code (it is compiled but not evaluated against any code). The surface has been stable since Mac OS 10.5 (2006)."
+url = "https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/"
+researched_version = "macOS 14 (Sequoia); surface stable since 10.5"
+level = "SafeWrite"
+bare = false
+standalone = ["-t", "-v"]
+valued = ["-b", "-r"]

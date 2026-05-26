@@ -538,6 +538,11 @@ Aliases: `whatis`
 - **view:clear**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `as`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/as.1.html">https://keith.github.io/xcode-man-pages/as.1.html</a></p>
+
+- Allowed standalone flags: --help, --version, -v
+
 ### `asciidoctor`
 <p class="cmd-url"><a href="https://docs.asciidoctor.org/asciidoctor/latest/cli/">https://docs.asciidoctor.org/asciidoctor/latest/cli/</a></p>
 
@@ -564,6 +569,23 @@ Aliases: `whatis`
 - **where**: Flags: --help, -h
 - **which**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `asn1Coding`
+<p class="cmd-url"><a href="https://www.gnu.org/software/libtasn1/manual/html_node/Invoking-asn1Coding.html">https://www.gnu.org/software/libtasn1/manual/html_node/Invoking-asn1Coding.html</a></p>
+
+- Allowed standalone flags: --check, --help, --version, -c, -h, -v
+- Allowed valued flags: --output, -o
+
+### `asn1Decoding`
+<p class="cmd-url"><a href="https://www.gnu.org/software/libtasn1/manual/html_node/Invoking-asn1Decoding.html">https://www.gnu.org/software/libtasn1/manual/html_node/Invoking-asn1Decoding.html</a></p>
+
+- Allowed standalone flags: --benchmark, --help, --no-time-strict, --strict, --version, -b, -h, -s, -t, -v
+
+### `asn1Parser`
+<p class="cmd-url"><a href="https://www.gnu.org/software/libtasn1/manual/html_node/Invoking-asn1Parser.html">https://www.gnu.org/software/libtasn1/manual/html_node/Invoking-asn1Parser.html</a></p>
+
+- Allowed standalone flags: --check, --help, --version, -c, -h, -v
+- Allowed valued flags: --name, --output, -n, -o
 
 ### `astro`
 <p class="cmd-url"><a href="https://docs.astro.build/en/reference/cli-reference/">https://docs.astro.build/en/reference/cli-reference/</a></p>
@@ -1148,6 +1170,12 @@ Aliases: `@biomejs/biome`
 - **lint**: Flags: --colors, --help, --json-formatter, --no-errors-on-unmatched, --quiet, --verbose, -h. Valued: --config-path, --max-diagnostics, --stdin-file-path, --vcs-root
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `bitcode_strip`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/bitcode_strip.1.html">https://keith.github.io/xcode-man-pages/bitcode_strip.1.html</a></p>
+
+- Allowed standalone flags: -keep_cs, -l, -m, -r, -v
+- Allowed valued flags: -o
+
 ### `bitcoin-cli`
 <p class="cmd-url"><a href="https://bitcoincore.org/en/doc/">https://bitcoincore.org/en/doc/</a></p>
 
@@ -1256,6 +1284,20 @@ Aliases: `@biomejs/biome`
 <p class="cmd-url"><a href="https://docs.usebruno.com/bru-cli/overview">https://docs.usebruno.com/bru-cli/overview</a></p>
 
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `bsqldb`
+<p class="cmd-url"><a href="https://www.freetds.org/userguide/bsqldb.htm">https://www.freetds.org/userguide/bsqldb.htm</a></p>
+
+- Allowed standalone flags: -h, -q, -v
+- Allowed valued flags: -D, -H, -P, -R, -S, -U, -e, -i, -o, -t
+- Bare invocation allowed
+
+### `bsqlodbc`
+<p class="cmd-url"><a href="https://www.freetds.org/userguide/bsqlodbc.htm">https://www.freetds.org/userguide/bsqlodbc.htm</a></p>
+
+- Allowed standalone flags: -h, -q, -v
+- Allowed valued flags: -D, -P, -S, -U, -V, -e, -i, -o, -t
+- Bare invocation allowed
 
 ### `btop`
 <p class="cmd-url"><a href="https://github.com/aristocratos/btop">https://github.com/aristocratos/btop</a></p>
@@ -1400,6 +1442,16 @@ Aliases: `bunzip2`, `bzcat`, `bzip2recover`
 - **help**: Positional args accepted
 - **report**: Flags: --all, --allowExternal, --clean, --help, -h. Valued: --reporter, --reports-dir, --temp-directory, -r
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `c89`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/c89.1.html">https://keith.github.io/xcode-man-pages/c89.1.html</a></p>
+
+- Allowed standalone flags: --help, --version, -v
+
+### `c99`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/c99.1.html">https://keith.github.io/xcode-man-pages/c99.1.html</a></p>
+
+- Allowed standalone flags: --help, --version, -v
 
 ### `cabal`
 <p class="cmd-url"><a href="https://cabal.readthedocs.io/">https://cabal.readthedocs.io/</a></p>
@@ -1593,6 +1645,11 @@ Aliases: `capacitor`
 - Allowed standalone flags: -A, -E, -T, -V, -b, -e, -h, -l, -n, -s, -t, -u, -v, --help, --number, --number-nonblank, --show-all, --show-ends, --show-nonprinting, --show-tabs, --squeeze-blank, --version
 - Bare invocation allowed
 
+### `cc_fips_test`
+<p class="cmd-url"><a href="https://developer.apple.com/security/">https://developer.apple.com/security/</a></p>
+
+- Bare invocation allowed
+
 ### `cd`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/cd.1p.html">https://man7.org/linux/man-pages/man1/cd.1p.html</a></p>
 
@@ -1672,6 +1729,11 @@ Aliases: `capacitor`
 - **logs**: Flags: --follow, --help, --include-lambda-messages, -f, -h. Valued: --name, --profile, --since, --stage
 - **url**: Flags: --help, -h. Valued: --profile, --stage
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `checkLocalKDC`
+<p class="cmd-url"><a href="https://opensource.apple.com/source/Heimdal/">https://opensource.apple.com/source/Heimdal/</a></p>
+
+- Bare invocation allowed
 
 ### `chef-client`
 <p class="cmd-url"><a href="https://docs.chef.io/chef_client/">https://docs.chef.io/chef_client/</a></p>
@@ -1869,6 +1931,11 @@ Aliases: `clojure`
 - Allowed standalone flags: --help, --print-bytes, --quiet, --silent, --verbose, --version, -V, -b, -h, -l, -s
 - Allowed valued flags: --bytes, --ignore-initial, -i, -n
 
+### `cmpdylib`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/cmpdylib.1.html">https://keith.github.io/xcode-man-pages/cmpdylib.1.html</a></p>
+
+- Positional arguments only
+
 ### `cockroach`
 <p class="cmd-url"><a href="https://www.cockroachlabs.com/docs/stable/cockroach-commands.html">https://www.cockroachlabs.com/docs/stable/cockroach-commands.html</a></p>
 
@@ -1893,6 +1960,12 @@ Aliases: `code-insiders`, `codium`
 
 - Requires --display, --verify, -d, -v. - Allowed standalone flags: --deep, --display, --verify, -R, -d, -v, --help, -h
 - Allowed valued flags: --verbose
+
+### `codesign_allocate`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/codesign_allocate.1.html">https://keith.github.io/xcode-man-pages/codesign_allocate.1.html</a></p>
+
+- Allowed standalone flags: -p, -r
+- Allowed valued flags: -A, -a, -i, -o
 
 ### `codex`
 <p class="cmd-url"><a href="https://github.com/openai/codex">https://github.com/openai/codex</a></p>
@@ -2229,6 +2302,12 @@ Aliases: `gcsplit`
 - Allowed standalone flags: --elide-empty-files, --help, --keep-files, --quiet, --silent, --suppress-matched, --version, -k, -s, -z
 - Allowed valued flags: --digits, --prefix, --suffix-format, -b, -f, -n
 
+### `csreq`
+<p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/">https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/</a></p>
+
+- Allowed standalone flags: -t, -v
+- Allowed valued flags: -b, -r
+
 ### `csrutil`
 <p class="cmd-url"><a href="https://ss64.com/mac/csrutil.html">https://ss64.com/mac/csrutil.html</a></p>
 
@@ -2236,6 +2315,17 @@ Aliases: `gcsplit`
 - **report**: Flags: --help, -h
 - **status**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `ctags`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/ctags.1.html">https://keith.github.io/xcode-man-pages/ctags.1.html</a></p>
+
+- Allowed standalone flags: -B, -F, -T, -a, -d, -u, -v, -w, -x
+- Allowed valued flags: -f
+
+### `ctf_insert`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/ctf_insert.1.html">https://keith.github.io/xcode-man-pages/ctf_insert.1.html</a></p>
+
+- Allowed valued flags: -arch, -o
 
 ### `ctr`
 <p class="cmd-url"><a href="https://github.com/containerd/containerd/blob/main/docs/getting-started.md">https://github.com/containerd/containerd/blob/main/docs/getting-started.md</a></p>
@@ -2321,6 +2411,12 @@ Aliases: `@cucumber/cucumber`
 - **users list**: Flags: --help, -h
 - **users show**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `danetool`
+<p class="cmd-url"><a href="https://www.gnutls.org/manual/html_node/danetool-Invocation.html">https://www.gnutls.org/manual/html_node/danetool-Invocation.html</a></p>
+
+- Allowed standalone flags: --app-proto, --ca, --check-ca, --check-ee, --help, --inder, --inraw, --insecure, --local, --local-dns, --more-help, --no-domain, --no-inder, --no-local-dns, --no-print-raw, --print-raw, --quiet, --tlsa-rr, --verbose, --x509, -!, -V, -h
+- Allowed valued flags: --attime, --check, --debug, --dlv, --domain, --hash, --host, --load-certificate, --load-pubkey, --outfile, --port, --proto, --starttls-proto, --version, -d, -v
 
 ### `danger`
 <p class="cmd-url"><a href="https://danger.systems/">https://danger.systems/</a></p>
@@ -2460,6 +2556,12 @@ Aliases: `typeset`
 - **read-type**: Flags: --help, -g, -globalDomain, -h. Valued: -app
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `defncopy`
+<p class="cmd-url"><a href="https://www.freetds.org/userguide/defncopy.htm">https://www.freetds.org/userguide/defncopy.htm</a></p>
+
+- Allowed standalone flags: -v
+- Allowed valued flags: -D, -P, -S, -U, -i, -o
+
 ### `degit`
 <p class="cmd-url"><a href="https://github.com/Rich-Harris/degit">https://github.com/Rich-Harris/degit</a></p>
 
@@ -2520,6 +2622,13 @@ Aliases: `dependency-cruise`
 
 - Allowed standalone flags: --help, --ignore-unused, --known-first-party, --no-ansi, --per-rule-ignores, --verbose, --version, -h, -v
 - Allowed valued flags: --config, --exclude, --extend-exclude, --ignore, --json-output, --package-module-name-map, --pep621-dev-dependency-groups, --per-rule-ignores, --requirements-files, --requirements-files-dev, -e, -ee, -i, -o, -pdd
+
+### `derq`
+<p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/">https://developer.apple.com/library/archive/documentation/Security/Conceptual/CodeSigningGuide/</a></p>
+
+- Allowed standalone flags: --pretty, --raw, --xml
+- Allowed valued flags: -f, -i, -o, -p
+- Hyphen-prefixed positional arguments accepted
 
 ### `detekt`
 <p class="cmd-url"><a href="https://detekt.dev/docs/gettingstarted/cli/">https://detekt.dev/docs/gettingstarted/cli/</a></p>
@@ -2621,6 +2730,11 @@ Aliases: `difftastic`
 
 - Allowed standalone flags: --ci, --help, --source, --version, -h, -v
 - Allowed valued flags: --ci-config, --config, --highestPercentage, --highestUserWastedPercent, --lowestEfficiency, --source
+
+### `dltest`
+<p class="cmd-url"><a href="https://www.unixodbc.org/doc/dltest.html">https://www.unixodbc.org/doc/dltest.html</a></p>
+
+- Bare invocation allowed
 
 ### `dlv`
 <p class="cmd-url"><a href="https://github.com/go-delve/delve">https://github.com/go-delve/delve</a></p>
@@ -2876,6 +2990,26 @@ Aliases: `difftastic`
 - Allowed standalone flags: --echo, --help, --if-exists, --interactive, --no-password, --password, --version, -?, -V, -e, -h, -i, -p, -U, -w, -W
 - Allowed valued flags: --host, --port, --username, -h, -p, -U
 
+### `dscacheutil`
+<p class="cmd-url"><a href="https://ss64.com/mac/dscacheutil.html">https://ss64.com/mac/dscacheutil.html</a></p>
+
+- Requires -q, -cachedump, -configuration, -statistics, -h. - Allowed standalone flags: -h, -cachedump, -buckets, -configuration, -statistics
+- Allowed valued flags: -q, -entries, -a
+
+### `dsmemberutil`
+<p class="cmd-url"><a href="https://ss64.com/mac/dsmemberutil.html">https://ss64.com/mac/dsmemberutil.html</a></p>
+
+- **checkmembership**: Flags: -v. Valued: -u, -U, -x, -s, -g, -G, -X, -S
+- **getid**: Flags: -v. Valued: -U, -G, -s, -S, -X
+- **getsid**: Flags: -v. Valued: -u, -g, -U, -G, -X
+- **getuuid**: Flags: -v. Valued: -u, -U, -x, -s, -g, -G, -X, -S
+
+### `dsymutil`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/dsymutil.html">https://llvm.org/docs/CommandGuide/dsymutil.html</a></p>
+
+- Allowed standalone flags: --dump-debug-map, --fat64, --flat, --gen-reproducer, --help, --keep-function-for-static, --minimize, --no-object-timestamp, --no-odr, --no-output, --no-swiftmodule-timestamp, --quiet, --remarks-drop-without-debug, --statistics, --symtab, --toolchain, --update, --verbose, --verify, --version, -S, -f, -h, -q, -s, -u, -v, -y, -z
+- Allowed valued flags: --accelerator, --arch, --build-variant-suffix, --num-threads, --object-prefix-map, --oso-prepend-path, --out, --remarks-output-format, --remarks-prepend-path, --reproducer, --use-reproducer, -D, -j, -o
+
 ### `du`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#du-invocation</a></p>
 
@@ -2960,6 +3094,26 @@ Aliases: `difftastic`
 - Allowed standalone flags: --help, -h, -?
 - Hyphen-prefixed positional arguments accepted
 
+### `dwarfdump`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/dwarfdump.html">https://llvm.org/docs/CommandGuide/dwarfdump.html</a></p>
+
+- Allowed standalone flags: --all, --apple-names, --apple-namespaces, --apple-objc, --apple-types, --color, --diff, --eh-frame, --gdb-index, --help, --help-list, --ignore-case, --quiet, --regex, --show-children, --show-form, --show-parents, --show-section-sizes, --show-sources, --statistics, --summarize-types, --uuid, --verbose, --verify, --version, -F, -a, -c, -h, -i, -p, -u, -v, -x
+- Allowed valued flags: --arch, --debug-abbrev, --debug-addr, --debug-aranges, --debug-cu-index, --debug-frame, --debug-gnu-pubnames, --debug-gnu-pubtypes, --debug-info, --debug-line, --debug-line-str, --debug-loc, --debug-loclists, --debug-macro, --debug-names, --debug-pubnames, --debug-pubtypes, --debug-ranges, --debug-rnglists, --debug-str, --debug-str-offsets, --debug-tu-index, --debug-types, --find, --lookup, --name, --parent-recurse-depth, --recurse-depth, -f, -n, -o, -r
+- Bare invocation allowed
+
+### `dyld_info`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/dyld_info.1.html">https://keith.github.io/xcode-man-pages/dyld_info.1.html</a></p>
+
+- Allowed standalone flags: -all_dyld_cache, -all_sections, -all_sections_bytes, -disassemble, -dlopens, -dlsyms, -exports, -fixup_chain_details, -fixup_chain_header, -fixup_chains, -fixups, -function_starts, -function_variants, -imports, -inits, -linked_dylibs, -load_commands, -no_validate, -objc, -opcodes, -platform, -segments, -shared_region, -symbolic_fixups, -uuid, -validate_only, --help, -h
+- Allowed valued flags: -all_dir, -arch, -section, -section_bytes
+
+### `dyld_usage`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/dyld_usage.1.html">https://keith.github.io/xcode-man-pages/dyld_usage.1.html</a></p>
+
+- Allowed standalone flags: -e, -j, -h
+- Allowed valued flags: -f, -t, -R, -S, -E
+- Bare invocation allowed
+
 ### `earthly`
 <p class="cmd-url"><a href="https://docs.earthly.dev/docs/earthly-command">https://docs.earthly.dev/docs/earthly-command</a></p>
 
@@ -2994,6 +3148,12 @@ Aliases: `difftastic`
 - Allowed standalone flags: -E, -e, -n
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+### `ecpg`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-ecpg.html">https://www.postgresql.org/docs/current/app-ecpg.html</a></p>
+
+- Allowed standalone flags: --help, --regression, --version, -?, -c, -h, -i, -t, -v
+- Allowed valued flags: -C, -D, -I, -o, -r
 
 ### `editorconfig-checker`
 <p class="cmd-url"><a href="https://github.com/editorconfig-checker/editorconfig-checker">https://github.com/editorconfig-checker/editorconfig-checker</a></p>
@@ -3068,6 +3228,12 @@ Aliases: `emmake`, `emranlib`, `emstrip`, `emrun`
 
 - Allowed standalone flags: -S, -h, -u
 - Allowed valued flags: -s
+
+### `encode_keychange`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/encode_keychange.html">https://net-snmp.sourceforge.io/docs/man/encode_keychange.html</a></p>
+
+- Allowed standalone flags: -P, -V, -f, -h, -v
+- Allowed valued flags: -E, -N, -O, -t
 
 ### `entr`
 <p class="cmd-url"><a href="https://eradman.com/entrproject/">https://eradman.com/entrproject/</a></p>
@@ -3280,6 +3446,24 @@ Aliases: `exa`
 
 - Allowed standalone flags: --help, -bitexact, -byte_binary_prefix, -find_stream_info, -h, -hide_banner, -no_unit, -of, -output_format, -pretty, -print_format, -show_chapters, -show_data, -show_data_hash, -show_entries, -show_error, -show_format, -show_format_entry, -show_frames, -show_log, -show_packets, -show_pixel_formats, -show_private_data, -show_program_version, -show_programs, -show_streams, -show_versions, -sexagesimal, -unit, -version, -v, -loglevel
 - Allowed valued flags: -count_frames, -count_packets, -fflags, -i, -loglevel, -of, -output_format, -print_format, -probesize, -read_intervals, -select_streams, -show_entries, -show_format_entry, -show_streams_info, -stream_specifier
+
+### `fido2-assert`
+<p class="cmd-url"><a href="https://developers.yubico.com/libfido2/Manuals/fido2-assert.html">https://developers.yubico.com/libfido2/Manuals/fido2-assert.html</a></p>
+
+- Allowed standalone flags: -G, -V, -b, -d, -h, -p, -r, -u, -v, -w
+- Allowed valued flags: -i, -o, -t
+
+### `fido2-cred`
+<p class="cmd-url"><a href="https://developers.yubico.com/libfido2/Manuals/fido2-cred.html">https://developers.yubico.com/libfido2/Manuals/fido2-cred.html</a></p>
+
+- Allowed standalone flags: -M, -V, -b, -d, -h, -q, -r, -u, -v, -w
+- Allowed valued flags: -a, -c, -i, -o, -t
+
+### `fido2-token`
+<p class="cmd-url"><a href="https://developers.yubico.com/libfido2/Manuals/fido2-token.html">https://developers.yubico.com/libfido2/Manuals/fido2-token.html</a></p>
+
+- Allowed standalone flags: -I, -L, -V, -b, -c, -d, -e, -r
+- Allowed valued flags: -k
 
 ### `file`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/file.1.html">https://man7.org/linux/man-pages/man1/file.1.html</a></p>
@@ -3671,6 +3855,24 @@ Aliases: `g++`, `cc`, `c++`
 - **workflows**: Allowed arguments: describe, executions, list
 - Allowed standalone flags: --help, -h, --version
 
+### `gcore`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/gcore.1.html">https://keith.github.io/xcode-man-pages/gcore.1.html</a></p>
+
+- Allowed standalone flags: -s, -v
+- Allowed valued flags: -b, -c, -o, -x
+
+### `gdbm_dump`
+<p class="cmd-url"><a href="https://www.gnu.org.ua/software/gdbm/manual/gdbm_dump.html">https://www.gnu.org.ua/software/gdbm/manual/gdbm_dump.html</a></p>
+
+- Allowed standalone flags: --help, --usage, --version, -V, -h
+- Allowed valued flags: --format, -H
+
+### `gdbm_load`
+<p class="cmd-url"><a href="https://www.gnu.org.ua/software/gdbm/manual/gdbm_load.html">https://www.gnu.org.ua/software/gdbm/manual/gdbm_load.html</a></p>
+
+- Allowed standalone flags: --help, --mmap, --no-meta, --replace, --update, --usage, --version, -M, -U, -V, -h, -n, -r
+- Allowed valued flags: --block-size, --cache-size, --mode, --user, -b, -c, -m, -u
+
 ### `gem`
 <p class="cmd-url"><a href="https://guides.rubygems.org/command-reference/">https://guides.rubygems.org/command-reference/</a></p>
 
@@ -3917,6 +4119,12 @@ Aliases: `gnatls`, `gnatchop`, `gnatpp`, `gnatkr`, `gnatxref`, `gnatfind`, `gnat
 
 - Allowed standalone flags: --help, --version, -h, -v
 - Hyphen-prefixed positional arguments accepted
+
+### `gnutls-certtool`
+<p class="cmd-url"><a href="https://www.gnutls.org/manual/html_node/certtool-Invocation.html">https://www.gnutls.org/manual/html_node/certtool-Invocation.html</a></p>
+
+- Allowed standalone flags: --certificate-info, --certificate-pubkey, --fingerprint, --generate-certificate, --generate-crl, --generate-dh-params, --generate-privkey, --generate-proxy, --generate-request, --generate-self-signed, --help, --key-id, --more-help, --no-text, --p7-detached-sign, --p7-generate, --p7-info, --p7-sign, --p7-verify, --pkcs8, --pubkey-info, --smime-to-p7, --text, --to-p12, --to-p8, --to-rsa, --update-certificate, --v1, --verbose, --verify-allow-broken, --verify-chain, --verify-crl, --verify-profile, -!, -V, -c, -h, -i, -s, -u
+- Allowed valued flags: --attime, --bits, --crl-dist-points, --curve, --debug, --dh-info, --dsa-info, --ecc-info, --hash, --infile, --inder, --key-type, --load-ca-certificate, --load-ca-privkey, --load-certificate, --load-crl, --load-data, --load-privkey, --load-pubkey, --load-request, --load-sigfile, --no-crq-extensions, --outfile, --password, --pkcs-cipher, --provable, --provider, --rsa-info, --sec-param, --seed, --template, --verify-email, --verify-hostname, --verify-purpose, --version, -d, -v
 
 ### `go`
 <p class="cmd-url"><a href="https://pkg.go.dev/cmd/go">https://pkg.go.dev/cmd/go</a></p>
@@ -4441,10 +4649,26 @@ Aliases: `gradlew`
 - Allowed standalone flags: --help, --version, -4, -6, -C, -V, -a, -c, -d, -h, -l, -r, -s, -v
 - Allowed valued flags: -D, -N, -R, -T, -W, -i, -m, -t
 
+### `hostid`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#hostid-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#hostid-invocation</a></p>
+
+- Allowed standalone flags: --help, --version
+- Bare invocation allowed
+
+### `hostinfo`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/hostinfo.8.html">https://keith.github.io/xcode-man-pages/hostinfo.8.html</a></p>
+
+- Bare invocation allowed
+
 ### `hostname`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/hostname.1.html">https://man7.org/linux/man-pages/man1/hostname.1.html</a></p>
 
 - Allowed standalone flags: --help, --version, -A, -I, -V, -d, -f, -h, -i, -s
+- Bare invocation allowed
+
+### `hpmdiagnose`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/hpmdiagnose.1.html">https://keith.github.io/xcode-man-pages/hpmdiagnose.1.html</a></p>
+
 - Bare invocation allowed
 
 ### `htmlq`
@@ -4603,6 +4827,8 @@ Aliases: `hf`
 ### `id`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#id-invocation</a></p>
 
+Aliases: `gid`
+
 - Allowed standalone flags: --context, --group, --groups, --help, --name, --real, --user, --version, --zero, -G, -V, -Z, -g, -h, -n, -p, -r, -u, -z
 - Bare invocation allowed
 
@@ -4624,6 +4850,19 @@ Aliases: `hf`
 - **size-files**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `idn`
+<p class="cmd-url"><a href="https://www.gnu.org/software/libidn/manual/libidn.html">https://www.gnu.org/software/libidn/manual/libidn.html</a></p>
+
+- Allowed standalone flags: --allow-unassigned, --debug, --help, --idna-to-ascii, --idna-to-unicode, --nfkc, --no-tld, --punycode-decode, --punycode-encode, --quiet, --stringprep, --usestd3asciirules, --version, -V, -a, -d, -e, -h, -n, -s, -u
+- Allowed valued flags: --profile, -p
+- Bare invocation allowed
+
+### `idn2`
+<p class="cmd-url"><a href="https://www.gnu.org/software/libidn/manual/libidn2.html">https://www.gnu.org/software/libidn/manual/libidn2.html</a></p>
+
+- Allowed standalone flags: --debug, --decode, --help, --lookup, --no-alabelroundtrip, --no-tr46, --quiet, --register, --tr46nt, --tr46t, --usestd3asciirules, --version, -N, -T, -V, -d, -h, -l, -r
+- Bare invocation allowed
 
 ### `idris2`
 <p class="cmd-url"><a href="https://idris2.readthedocs.io/en/latest/reference/cmdline.html">https://idris2.readthedocs.io/en/latest/reference/cmdline.html</a></p>
@@ -4664,6 +4903,12 @@ Aliases: `hf`
 - **packages**: Flags: --help, -h
 - Allowed standalone flags: --help, -h
 
+### `indent`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/indent.1.html">https://keith.github.io/xcode-man-pages/indent.1.html</a></p>
+
+- Allowed standalone flags: -st, -npro, --version
+- Hyphen-prefixed positional arguments accepted
+
 ### `influx`
 <p class="cmd-url"><a href="https://docs.influxdata.com/influxdb/v2/reference/cli/influx/">https://docs.influxdata.com/influxdb/v2/reference/cli/influx/</a></p>
 
@@ -4683,6 +4928,12 @@ Aliases: `hf`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
 
+### `initdb`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-initdb.html">https://www.postgresql.org/docs/current/app-initdb.html</a></p>
+
+- Allowed standalone flags: --allow-group-access, --data-checksums, --debug, --discard-caches, --help, --no-clean, --no-data-checksums, --no-instructions, --no-locale, --no-sync, --no-sync-data-files, --pwprompt, --show, --sync-only, --version, -?, -A, -N, -S, -V, -W, -d, -g, -k, -n, -s
+- Allowed valued flags: --auth, --auth-host, --auth-local, --builtin-locale, --encoding, --icu-locale, --icu-rules, --lc-collate, --lc-ctype, --lc-messages, --lc-monetary, --lc-numeric, --lc-time, --locale, --locale-provider, --pgdata, --pwfile, --set, --sync-method, --text-search-config, --username, --wal-segsize, --waldir, -D, -E, -L, -T, -U, -X, -c
+
 ### `inso`
 <p class="cmd-url"><a href="https://docs.insomnia.rest/inso-cli/install">https://docs.insomnia.rest/inso-cli/install</a></p>
 
@@ -4692,6 +4943,11 @@ Aliases: `hf`
 - **lint spec**: Flags: --help, -h. Valued: --src, --working-dir, -w
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `install_name_tool`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/install_name_tool.1.html">https://keith.github.io/xcode-man-pages/install_name_tool.1.html</a></p>
+
+- Allowed valued flags: -add_rpath, -change, -delete_rpath, -id, -rpath
 
 ### `instmodsh`
 <p class="cmd-url"><a href="https://metacpan.org/pod/instmodsh">https://metacpan.org/pod/instmodsh</a></p>
@@ -5163,6 +5419,19 @@ Aliases: `nbconvert`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `kcc`
+<p class="cmd-url"><a href="https://www.h5l.org/manual/HEAD/info/heimdal/kcc.html">https://www.h5l.org/manual/HEAD/info/heimdal/kcc.html</a></p>
+
+- Allowed standalone flags: --help, --version
+- Bare invocation allowed
+
+### `kdestroy`
+<p class="cmd-url"><a href="https://www.h5l.org/manual/HEAD/info/heimdal/kdestroy-_002d-remove-one-credential-or-destroy-the-current-ticket-file.html">https://www.h5l.org/manual/HEAD/info/heimdal/kdestroy-_002d-remove-one-credential-or-destroy-the-current-ticket-file.html</a></p>
+
+- Allowed standalone flags: --all, --help, --no-delete-v4, --no-unlog, --version, -A, -a
+- Allowed valued flags: --cache, --credential, --principal, -c, -p
+- Bare invocation allowed
+
 ### `kernprof`
 <p class="cmd-url"><a href="https://github.com/pyutils/line_profiler">https://github.com/pyutils/line_profiler</a></p>
 
@@ -5174,6 +5443,12 @@ Aliases: `nbconvert`
 - **-list**: Flags: --help, -h, -rfc, -v. Valued: -alias, -keystore, -storepass, -storetype
 - **-printcert**: Flags: --help, -h, -rfc, -v. Valued: -file, -jarfile
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `kgetcred`
+<p class="cmd-url"><a href="https://www.h5l.org/manual/HEAD/info/heimdal/kgetcred.html">https://www.h5l.org/manual/HEAD/info/heimdal/kgetcred.html</a></p>
+
+- Allowed standalone flags: --canonicalize, --help, --no-transit-check, --version
+- Allowed valued flags: --cache, --enctype, -c, -e
 
 ### `kill`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/kill.1.html">https://man7.org/linux/man-pages/man1/kill.1.html</a></p>
@@ -5188,6 +5463,20 @@ Aliases: `nbconvert`
 - **get nodes**: Flags: --help, -h. Valued: --name
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+### `kinit`
+<p class="cmd-url"><a href="https://www.h5l.org/manual/HEAD/info/heimdal/kinit-_002d-acquire-initial-tickets.html">https://www.h5l.org/manual/HEAD/info/heimdal/kinit-_002d-acquire-initial-tickets.html</a></p>
+
+- Allowed standalone flags: --afslog, --anonymous, --canonicalize, --enterprise, --forwardable, --help, --no-addresses, --no-forwardable, --proxiable, --renew, --renewable, --use-keytab, --validate, --verbose, --version, -A, -R, -V, -f, -k, -p, -v
+- Allowed valued flags: --cache, --enctypes, --extra-addresses, --fcache-version, --keytab, --lifetime, --password-file, --renewable-life, --server, --start-time, -a, -c, -e, -l, -r, -s, -t, -S
+- Bare invocation allowed
+
+### `klist`
+<p class="cmd-url"><a href="https://www.h5l.org/manual/HEAD/info/heimdal/klist-_002d-list-Kerberos-credentials.html">https://www.h5l.org/manual/HEAD/info/heimdal/klist-_002d-list-Kerberos-credentials.html</a></p>
+
+- Allowed standalone flags: --help, --list-caches, --test, --tokens, --v5, --verbose, --version, -5, -T, -f, -h, -l, -s, -t, -v
+- Allowed valued flags: --cache, -c
+- Bare invocation allowed
 
 ### `kn`
 <p class="cmd-url"><a href="https://knative.dev/docs/client/configure-kn/">https://knative.dev/docs/client/configure-kn/</a></p>
@@ -5398,6 +5687,13 @@ Aliases: `nbconvert`
 - Allowed valued flags: --config-file, --coderay-line-numbers, --entity-output, --footnote-nr, --header-offset, --input, --math-engine, --output, --syntax-highlighter, --toc-levels, -i, -o
 - Bare invocation allowed
 
+### `krb5-config`
+<p class="cmd-url"><a href="https://www.h5l.org/manual/HEAD/info/heimdal/krb5_002dconfig.html">https://www.h5l.org/manual/HEAD/info/heimdal/krb5_002dconfig.html</a></p>
+
+- Allowed standalone flags: --cflags, --help, --libs, --version
+- Allowed valued flags: --exec-prefix, --prefix
+- Bare invocation allowed
+
 ### `krew`
 <p class="cmd-url"><a href="https://krew.sigs.k8s.io/">https://krew.sigs.k8s.io/</a></p>
 
@@ -5409,6 +5705,12 @@ Aliases: `nbconvert`
 - **search**: Flags: --help, -h. Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `kswitch`
+<p class="cmd-url"><a href="https://www.h5l.org/manual/HEAD/info/heimdal/kswitch.html">https://www.h5l.org/manual/HEAD/info/heimdal/kswitch.html</a></p>
+
+- Allowed standalone flags: --help, --interactive, --version, -i
+- Allowed valued flags: --cache, --principal, --type, -c, -p, -t
 
 ### `ktlint`
 <p class="cmd-url"><a href="https://pinterest.github.io/ktlint/latest/">https://pinterest.github.io/ktlint/latest/</a></p>
@@ -5477,6 +5779,13 @@ Aliases: `nbconvert`
 - Allowed valued flags: --limit, --present, --since, --time-format, --until, -f, -n, -p, -s, -t
 - Bare invocation allowed
 
+### `lastcomm`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/lastcomm.1.html">https://keith.github.io/xcode-man-pages/lastcomm.1.html</a></p>
+
+- Allowed standalone flags: -w
+- Allowed valued flags: -f
+- Bare invocation allowed
+
 ### `lastlog`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/lastlog.8.html">https://man7.org/linux/man-pages/man8/lastlog.8.html</a></p>
 
@@ -5513,6 +5822,13 @@ Aliases: `nbconvert`
 
 - Allowed standalone flags: --help, --palette-image, --version, -V, -c, -h
 - Allowed valued flags: --display-gamut, --flattened-image, --gpu-compression, --lossy-compression, --output, --scale, -f, -g, -l, -o, -p, -s
+
+### `ld`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/ld.1.html">https://keith.github.io/xcode-man-pages/ld.1.html</a></p>
+
+- Allowed standalone flags: --help, --version
+- Allowed valued flags: -o
+- Hyphen-prefixed positional arguments accepted
 
 ### `ldapcompare`
 <p class="cmd-url"><a href="https://www.openldap.org/software/man.cgi?query=ldapcompare">https://www.openldap.org/software/man.cgi?query=ldapcompare</a></p>
@@ -5685,6 +6001,11 @@ Aliases: `nbconvert`
 - Allowed standalone flags: --help, --version, -?, -h, -v
 - Hyphen-prefixed positional arguments accepted
 
+### `lldb`
+<p class="cmd-url"><a href="https://lldb.llvm.org/man/lldb.html">https://lldb.llvm.org/man/lldb.html</a></p>
+
+- Allowed standalone flags: --help, --print-script-interpreter-info, --python-path, --version, -P, -h, -v
+
 ### `lli`
 <p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/lli.html">https://llvm.org/docs/CommandGuide/lli.html</a></p>
 
@@ -5764,6 +6085,13 @@ Aliases: `llvm-ranlib`
 - Allowed standalone flags: --help, --version, -?, -h
 - Hyphen-prefixed positional arguments accepted
 
+### `llvm-otool`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-otool.html">https://llvm.org/docs/CommandGuide/llvm-otool.html</a></p>
+
+- Allowed standalone flags: -objdump, -show-objdump-command, --help, -h
+- Allowed valued flags: -object-tool-path, --object-tool-path
+- Hyphen-prefixed positional arguments accepted
+
 ### `llvm-profdata`
 <p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-profdata.html">https://llvm.org/docs/CommandGuide/llvm-profdata.html</a></p>
 
@@ -5829,11 +6157,24 @@ Aliases: `mlocate`, `plocate`
 - **stream**: Flags: --backtrace, --debug, --help, --info, --loss, --mach-continuous-time, --signpost, -h. Valued: --color, --level, --predicate, --process, --source, --style, --timeout, --type
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `logname`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#logname-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#logname-invocation</a></p>
+
+Aliases: `glogname`
+
+- Allowed standalone flags: --help, --version
+- Bare invocation allowed
+
 ### `look`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/look.1.html">https://man7.org/linux/man-pages/man1/look.1.html</a></p>
 
 - Allowed standalone flags: --alphanum, --ignore-case, -d, -f
 - Allowed valued flags: --terminate, -t
+
+### `lorder`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/lorder.1.html">https://keith.github.io/xcode-man-pages/lorder.1.html</a></p>
+
+- Positional arguments only
 
 ### `lp`
 <p class="cmd-url"><a href="https://www.cups.org/doc/man-lp.html">https://www.cups.org/doc/man-lp.html</a></p>
@@ -5944,6 +6285,11 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - Allowed standalone flags: --force, --help, --pipe, --verbose, --version, -V, -c, -f, -h, -v
 - Allowed valued flags: --directory, --rename, --suffix, --type, -C, -o, -s, -t
 - Hyphen-prefixed positional arguments accepted
+
+### `machine`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/machine.1.html">https://keith.github.io/xcode-man-pages/machine.1.html</a></p>
+
+- Bare invocation allowed
 
 ### `madge`
 <p class="cmd-url"><a href="https://github.com/pahen/madge">https://github.com/pahen/madge</a></p>
@@ -6063,6 +6409,8 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 ### `md5sum`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#md5sum-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#md5sum-invocation</a></p>
 
+Aliases: `gmd5sum`
+
 - Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
 - Bare invocation allowed
 
@@ -6091,6 +6439,11 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 
 - Allowed standalone flags: --Help, --Help-Outputs, --Info-Capacities, --Info-Parameters, --Info-Parameters_CSV, --Info-OutputFormats, --Info-Version, --LogFile, --Output, --Version, -f, -h
 - Allowed valued flags: --BlockMethod, --Inform, --LogFile, --Output, --ParseSpeed, --ReadByHuman, --Trace_Format, --Trace_Level, -i
+
+### `mesg`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/mesg.1.html">https://keith.github.io/xcode-man-pages/mesg.1.html</a></p>
+
+- Bare invocation allowed
 
 ### `meson`
 <p class="cmd-url"><a href="https://mesonbuild.com/Commands.html">https://mesonbuild.com/Commands.html</a></p>
@@ -6609,6 +6962,13 @@ Aliases: `neonctl`
 - **lint**: Flags: --dir, --help, --quiet, --strict, -d, -h. Valued: --cache-location, --ext, --max-warnings, --output-file, --resolve-plugins-relative-to, -c
 - Allowed standalone flags: --help, --version, -h
 
+### `nfsstat`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/nfsstat.1.html">https://keith.github.io/xcode-man-pages/nfsstat.1.html</a></p>
+
+- Allowed standalone flags: -c, -e, -s, -u, -v, -E, -3, -4
+- Allowed valued flags: -w, -n, -m, -f
+- Bare invocation allowed
+
 ### `nginx`
 <p class="cmd-url"><a href="https://nginx.org/en/docs/switches.html">https://nginx.org/en/docs/switches.html</a></p>
 
@@ -6763,6 +7123,12 @@ Aliases: `ionice`
 
 - Allowed standalone flags: --help, --version, -h, -V, -sT, -sn, -sP, -sL, -sV, -Pn, -PE, -PP, -PM, -F, --open, --reason, --traceroute, -n, -R, -4, -6, -v, -vv, -vvv, -d, -d1, -d2, -d3, -d4, -d5, -d6, -d7, -d8, -d9, --packet-trace, --no-stylesheet, -T0, -T1, -T2, -T3, -T4, -T5, --system-dns, --version-light, --version-all
 - Allowed valued flags: -p, --exclude-ports, --top-ports, --port-ratio, --max-retries, --host-timeout, --scan-delay, --max-scan-delay, --min-rate, --max-rate, --min-parallelism, --max-parallelism, --min-hostgroup, --max-hostgroup, --min-rtt-timeout, --max-rtt-timeout, --initial-rtt-timeout, --exclude, --dns-servers, -e, --source-port, -g, --ttl, --version-intensity
+
+### `nmedit`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/nmedit.1.html">https://keith.github.io/xcode-man-pages/nmedit.1.html</a></p>
+
+- Allowed standalone flags: -A, -D, -p
+- Allowed valued flags: -R, -arch, -o, -s
 
 ### `node`
 <p class="cmd-url"><a href="https://nodejs.org/api/cli.html">https://nodejs.org/api/cli.html</a></p>
@@ -7019,6 +7385,12 @@ Aliases: `gnumfmt`
 - Allowed valued flags: --config, --doc-comments, --doc-comments-padding, --enable-outside-detected-project, --exclude, --impl, --include, --intf, --margin, --max-iters, --name, --ocaml-version, --output, --profile, --use-file
 - Bare invocation allowed
 
+### `ocsptool`
+<p class="cmd-url"><a href="https://www.gnutls.org/manual/html_node/ocsptool-Invocation.html">https://www.gnutls.org/manual/html_node/ocsptool-Invocation.html</a></p>
+
+- Allowed standalone flags: --generate-request, --help, --ignore-errors, --inder, --more-help, --no-inder, --no-nonce, --nonce, --outder, --outpem, --request-info, --response-info, --verbose, --verify-allow-broken, --verify-response, -!, -V, -e, -h, -i, -j, -q
+- Allowed valued flags: --ask, --attime, --debug, --infile, --load-cert, --load-chain, --load-issuer, --load-request, --load-response, --load-signer, --load-trust, --outfile, --version, -Q, -S, -d, -v
+
 ### `od`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#od-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#od-invocation</a></p>
 
@@ -7026,12 +7398,31 @@ Aliases: `gnumfmt`
 - Allowed valued flags: -A, -N, -S, -j, -t, -w, --address-radix, --endian, --format, --read-bytes, --skip-bytes, --strings, --width
 - Bare invocation allowed
 
+### `odbc_config`
+<p class="cmd-url"><a href="https://www.unixodbc.org/doc/odbc_config.html">https://www.unixodbc.org/doc/odbc_config.html</a></p>
+
+- Allowed standalone flags: --bin-prefix, --cflags, --exec-prefix, --header, --include-prefix, --lib-prefix, --libs, --libtool-libs, --odbcini, --odbcinstini, --odbcversion, --prefix, --static-libs, --ulen, --version
+- Bare invocation allowed
+
+### `odbcinst`
+<p class="cmd-url"><a href="https://www.unixodbc.org/doc/odbcinst.html">https://www.unixodbc.org/doc/odbcinst.html</a></p>
+
+- Allowed standalone flags: --version, -d, -h, -j, -l, -q, -s, -v
+- Allowed valued flags: -n
+
 ### `oha`
 <p class="cmd-url"><a href="https://github.com/hatoo/oha">https://github.com/hatoo/oha</a></p>
 
 - Allowed standalone flags: --debug, --disable-color, --disable-compression, --disable-keepalive, --http2, --help, --insecure, --ipv4, --ipv6, --latency-correction, --no-tui, --reason-codes, --stats-success-breakdown, --use-mode, --version, -A, -H, -V, -a, -c, -d, -h, -m, -n, -q, -r, -t, -z
 - Allowed valued flags: --burst-delay, --burst-rate, --connect-to, --dns-resolver, --dump-urls, --exit-stage-key, --ip-strategy, --max-redirects, --method, --output-format, --proxy, --proxy-http-version, --proxy-username, --proxy-password, --rand-regex-url, --redirect, --redirect-uri, --reproduce-rng-seed, --timeout, --unix-socket, --user-agent, --wait-ongoing-requests-after-deadline, -A, -D, -H, -T, -U, -c, -d, -m, -n, -q, -r, -t, -z
 - Hyphen-prefixed positional arguments accepted
+
+### `oid2name`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/oid2name.html">https://www.postgresql.org/docs/current/oid2name.html</a></p>
+
+- Allowed standalone flags: --help, --indexes, --quiet, --system-objects, --tablespaces, --version, -?, -V, -i, -q, -s, -x
+- Allowed valued flags: --dbname, --filenode, --host, --oid, --port, --tablename, --username, -H, -U, -d, -f, -o, -p, -t
+- Bare invocation allowed
 
 ### `ollama`
 <p class="cmd-url"><a href="https://github.com/ollama/ollama/blob/main/docs/api.md">https://github.com/ollama/ollama/blob/main/docs/api.md</a></p>
@@ -7207,6 +7598,11 @@ Aliases: `gnumfmt`
 - Allowed valued flags: --cabal-default-extensions, --cabal-extension, --ghc-opt, --mode, --package-name, --start-line, --start-column, --end-line, --end-column, -o
 - Bare invocation allowed
 
+### `osql`
+<p class="cmd-url"><a href="https://www.freetds.org/userguide/osql.htm">https://www.freetds.org/userguide/osql.htm</a></p>
+
+- Allowed valued flags: -I, -P, -S, -U
+
 ### `otel-cli`
 <p class="cmd-url"><a href="https://github.com/equinix-labs/otel-cli">https://github.com/equinix-labs/otel-cli</a></p>
 
@@ -7248,6 +7644,12 @@ Aliases: `gnumfmt`
 - Allowed valued flags: --allow, --config, --deny, --format, --max-warnings, --tsconfig, --warn, -A, -D, -W, -f
 - Bare invocation allowed
 
+### `p11tool`
+<p class="cmd-url"><a href="https://www.gnutls.org/manual/html_node/p11tool-Invocation.html">https://www.gnutls.org/manual/html_node/p11tool-Invocation.html</a></p>
+
+- Allowed standalone flags: --detailed-url, --help, --info, --list-all, --list-all-certs, --list-all-privkeys, --list-all-trusted, --list-certs, --list-keys, --list-mechanisms, --list-privkeys, --list-token-urls, --list-tokens, --login, --more-help, --no-detailed-url, --no-login, --no-so-login, --only-urls, --so-login, --verbose, -!, -V, -h
+- Allowed valued flags: --debug, --outfile, --provider, --version, -d, -v
+
 ### `packer`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/packer/docs/commands">https://developer.hashicorp.com/packer/docs/commands</a></p>
 
@@ -7266,6 +7668,18 @@ Aliases: `gnumfmt`
 - **validate**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+### `pagesize`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/pagesize.1.html">https://keith.github.io/xcode-man-pages/pagesize.1.html</a></p>
+
+- Bare invocation allowed
+
+### `pagestuff`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/pagestuff.1.html">https://keith.github.io/xcode-man-pages/pagestuff.1.html</a></p>
+
+- Allowed standalone flags: -a, -p
+- Allowed valued flags: -arch, -pagesize
+- Hyphen-prefixed positional arguments accepted
 
 ### `paket`
 <p class="cmd-url"><a href="https://fsprojects.github.io/Paket/paket-commands.html">https://fsprojects.github.io/Paket/paket-commands.html</a></p>
@@ -7369,6 +7783,12 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - Allowed valued flags: -d, --delimiters
 - Bare invocation allowed
 
+### `path_helper`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/path_helper.8.html">https://keith.github.io/xcode-man-pages/path_helper.8.html</a></p>
+
+- Allowed standalone flags: -c, -s
+- Bare invocation allowed
+
 ### `pbcopy`
 <p class="cmd-url"><a href="https://ss64.com/mac/pbcopy.html">https://ss64.com/mac/pbcopy.html</a></p>
 
@@ -7407,6 +7827,11 @@ Aliases: `pcretest`
 
 - Allowed standalone flags: --help, --version, -16, -32, -8, -AC, -E, -LM, -LP, -LS, -T, -TM, -ac, -b, -d, -dfa, -help, -i, -jit, -jitfast, -jitverify, -malloc, -q, -unittest, -v
 - Allowed valued flags: -C, -S, -error, -pattern, -subject, -t, -tm
+- Bare invocation allowed
+
+### `pcsstatus`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/pcsstatus.1.html">https://keith.github.io/xcode-man-pages/pcsstatus.1.html</a></p>
+
 - Bare invocation allowed
 
 ### `pdf2ps`
@@ -7544,11 +7969,36 @@ Aliases: `xelatex`, `lualatex`, `latex`
 
 - Positional arguments only
 
+### `pg_amcheck`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgamcheck.html">https://www.postgresql.org/docs/current/app-pgamcheck.html</a></p>
+
+- Allowed standalone flags: --all, --checkunique, --echo, --exclude-toast-pointers, --heapallindexed, --help, --no-dependent-indexes, --no-dependent-toast, --no-password, --no-strict-names, --on-error-stop, --parent-check, --password, --progress, --rootdescend, --verbose, --version, -?, -P, -V, -a, -e, -v, -w, -W
+- Allowed valued flags: --database, --dbname, --endblock, --exclude-database, --exclude-index, --exclude-relation, --exclude-schema, --exclude-table, --host, --index, --jobs, --maintenance-db, --port, --relation, --schema, --skip, --startblock, --table, --username, -D, -I, -R, -S, -T, -U, -d, -h, -i, -j, -p, -r, -s, -t
+- Bare invocation allowed
+
+### `pg_archivecleanup`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/pgarchivecleanup.html">https://www.postgresql.org/docs/current/pgarchivecleanup.html</a></p>
+
+- Allowed standalone flags: --clean-backup-history, --debug, --dry-run, --help, --version, -?, -V, -b, -d, -n
+- Allowed valued flags: --strip-extension, -x
+
 ### `pg_basebackup`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgbasebackup.html">https://www.postgresql.org/docs/current/app-pgbasebackup.html</a></p>
 
 - Allowed standalone flags: --checkpoint, --checksum, --compress, --create-slot, --format, --gzip, --help, --max-rate, --no-clean, --no-estimate-size, --no-manifest, --no-password, --no-slot, --no-sync, --no-verify-checksums, --password, --progress, --pgdata, --quiet, --target, --verbose, --version, --waldir, --write-recovery-conf, --wal-method, -?, -C, -D, -F, -N, -P, -R, -S, -T, -V, -X, -Z, -c, -d, -h, -l, -n, -p, -r, -s, -t, -U, -v, -w, -W, -z
 - Allowed valued flags: --checkpoint, --compress, --create-slot, --dbname, --format, --manifest-checksums, --manifest-force-encode, --max-rate, --pgdata, --slot, --target, --tablespace-mapping, --username, --waldir, -c, -D, -F, -T, -d, -h, -l, -p, -S, -r, -s, -t, -U, -Z
+
+### `pg_checksums`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgchecksums.html">https://www.postgresql.org/docs/current/app-pgchecksums.html</a></p>
+
+- Allowed standalone flags: --check, --disable, --enable, --help, --no-sync, --progress, --verbose, --version, -?, -N, -P, -V, -c, -d, -e, -v
+- Allowed valued flags: --filenode, --pgdata, --sync-method, -D, -f
+
+### `pg_combinebackup`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgcombinebackup.html">https://www.postgresql.org/docs/current/app-pgcombinebackup.html</a></p>
+
+- Allowed standalone flags: --clone, --copy, --copy-file-range, --debug, --dry-run, --help, --link, --no-manifest, --no-sync, --version, -?, -N, -V, -d, -k, -n
+- Allowed valued flags: --manifest-checksums, --output, --sync-method, --tablespace-mapping, -T, -o
 
 ### `pg_config`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgconfig.html">https://www.postgresql.org/docs/current/app-pgconfig.html</a></p>
@@ -7591,11 +8041,66 @@ Aliases: `xelatex`, `lualatex`, `latex`
 - Allowed valued flags: --dbname, --host, --port, --timeout, --username, -U, -d, -h, -p, -t
 - Bare invocation allowed
 
+### `pg_receivewal`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgreceivewal.html">https://www.postgresql.org/docs/current/app-pgreceivewal.html</a></p>
+
+- Allowed standalone flags: --help, --if-not-exists, --no-loop, --no-password, --no-sync, --synchronous, --verbose, --version, -?, -V, -n, -v, -w, -W
+- Allowed valued flags: --compress, --dbname, --directory, --endpos, --host, --port, --slot, --status-interval, --username, -D, -E, -S, -U, -Z, -d, -h, -p, -s
+
+### `pg_recvlogical`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgrecvlogical.html">https://www.postgresql.org/docs/current/app-pgrecvlogical.html</a></p>
+
+- Allowed standalone flags: --enable-failover, --enable-two-phase, --help, --if-not-exists, --no-loop, --no-password, --start, --two-phase, --verbose, --version, -?, -V, -n, -t, -v, -w, -W
+- Allowed valued flags: --dbname, --endpos, --file, --fsync-interval, --host, --option, --plugin, --port, --slot, --startpos, --status-interval, --username, -E, -F, -I, -P, -S, -U, -d, -f, -o, -p, -s
+
 ### `pg_restore`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgrestore.html">https://www.postgresql.org/docs/current/app-pgrestore.html</a></p>
 
 - Allowed standalone flags: --clean, --create, --data-only, --disable-triggers, --enable-row-security, --exit-on-error, --help, --if-exists, --list, --no-acl, --no-comments, --no-data-for-failed-tables, --no-owner, --no-password, --no-privileges, --no-publications, --no-security-labels, --no-subscriptions, --no-tablespaces, --password, --single-transaction, --strict-names, --use-set-session-authorization, --verbose, --version, -1, -?, -C, -O, -V, -W, -a, -c, -e, -l, -v, -w, -x
 - Allowed valued flags: --dbname, --exclude-schema, --filter, --format, --function, --host, --index, --jobs, --no-data-for-failed-tables, --port, --role, --schema, --section, --superuser, --table, --tablespace, --trigger, --username, -F, -I, -L, -P, -S, -T, -U, -d, -f, -h, -j, -n, -p, -t
+
+### `pg_rewind`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgrewind.html">https://www.postgresql.org/docs/current/app-pgrewind.html</a></p>
+
+- Allowed standalone flags: --debug, --dry-run, --help, --no-ensure-shutdown, --no-sync, --progress, --restore-target-wal, --version, --write-recovery-conf, -?, -N, -P, -R, -V, -c, -n
+- Allowed valued flags: --config-file, --source-pgdata, --source-server, --sync-method, --target-pgdata, -D
+
+### `pg_test_fsync`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/pgtestfsync.html">https://www.postgresql.org/docs/current/pgtestfsync.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -V
+- Allowed valued flags: --filename, --secs-per-test, -f, -s
+- Bare invocation allowed
+
+### `pg_test_timing`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/pgtesttiming.html">https://www.postgresql.org/docs/current/pgtesttiming.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -V
+- Allowed valued flags: --duration, -d
+- Bare invocation allowed
+
+### `pg_upgrade`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/pgupgrade.html">https://www.postgresql.org/docs/current/pgupgrade.html</a></p>
+
+- Allowed standalone flags: --check, --clone, --copy, --copy-file-range, --help, --link, --no-statistics, --no-sync, --retain, --swap, --verbose, --version, -?, -N, -V, -c, -k, -r, -v
+- Allowed valued flags: --jobs, --new-bindir, --new-datadir, --new-options, --new-port, --old-bindir, --old-datadir, --old-options, --old-port, --set-char-signedness, --socketdir, --sync-method, --username, -B, -D, -O, -P, -U, -b, -d, -j, -o, -p, -s
+
+### `pg_verifybackup`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-pgverifybackup.html">https://www.postgresql.org/docs/current/app-pgverifybackup.html</a></p>
+
+- Allowed standalone flags: --exit-on-error, --help, --no-parse-wal, --progress, --quiet, --skip-checksums, --version, -?, -P, -V, -e, -n, -q, -s
+- Allowed valued flags: --format, --ignore, --manifest-path, --wal-directory, -F, -i, -m, -w
+
+### `pg_waldump`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/pgwaldump.html">https://www.postgresql.org/docs/current/pgwaldump.html</a></p>
+
+- Allowed standalone flags: --bkp-details, --follow, --fullpage, --help, --quiet, --version, -?, -V, -b, -f, -q, -w
+- Allowed valued flags: --block, --end, --fork, --limit, --path, --relation, --rmgr, --start, --stats, --timeline, --xid, -B, -F, -R, -e, -n, -p, -r, -s, -t, -x, -z
+
+### `pg_walsummary`
+<p class="cmd-url"><a href="https://www.postgresql.org/docs/current/pgwalsummary.html">https://www.postgresql.org/docs/current/pgwalsummary.html</a></p>
+
+- Allowed standalone flags: --help, --individual, --quiet, --version, -?, -V, -i, -q
 
 ### `pgbench`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/pgbench.html">https://www.postgresql.org/docs/current/pgbench.html</a></p>
@@ -7677,6 +8182,12 @@ Aliases: `unpigz`
 
 - Requires -c, --count. - Allowed standalone flags: -4, -6, -D, -O, -R, -a, -d, -n, -q, -v, --help, -h, --version, -V
 - Allowed valued flags: --count, --deadline, --interface, --interval, --ttl, -I, -Q, -S, -W, -c, -i, -l, -s, -t, -w
+
+### `pinky`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pinky-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pinky-invocation</a></p>
+
+- Allowed standalone flags: --help, --lookup, --version, -b, -f, -h, -i, -l, -p, -q, -s, -w
+- Bare invocation allowed
 
 ### `pio`
 <p class="cmd-url"><a href="https://docs.platformio.org/en/latest/core/userguide/">https://docs.platformio.org/en/latest/core/userguide/</a></p>
@@ -8272,6 +8783,12 @@ Aliases: `upsun`
 - **help**: Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `psktool`
+<p class="cmd-url"><a href="https://www.gnutls.org/manual/html_node/psktool-Invocation.html">https://www.gnutls.org/manual/html_node/psktool-Invocation.html</a></p>
+
+- Allowed standalone flags: --help, --more-help, --passwd, -!, -V, -h
+- Allowed valued flags: --debug, --keysize, --pskfile, --username, --version, -d, -p, -s, -u, -v
 
 ### `psql`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-psql.html">https://www.postgresql.org/docs/current/app-psql.html</a></p>
@@ -9196,6 +9713,11 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 - Allowed valued flags: --expression, --file, --line-length, -e, -f, -l
 - Inline expressions validated for safety
 
+### `segedit`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/segedit.1.html">https://keith.github.io/xcode-man-pages/segedit.1.html</a></p>
+
+- Allowed valued flags: -extract, -output, -replace
+
 ### `selecta`
 <p class="cmd-url"><a href="https://github.com/garybernhardt/selecta">https://github.com/garybernhardt/selecta</a></p>
 
@@ -9259,20 +9781,77 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 
 - Allowed standalone flags: --help, -?, -h
 
+### `sha1`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?query=sha1">https://man.freebsd.org/cgi/man.cgi?query=sha1</a></p>
+
+- Allowed standalone flags: --help, --passthrough, --quiet, --reverse, --self-test, --time-trial, --version, -V, -h, -p, -q, -r, -t, -x
+- Allowed valued flags: --check, --string, -c, -s
+- Bare invocation allowed
+
 ### `sha1sum`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sha1sum-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#sha1sum-invocation</a></p>
 
+Aliases: `gsha1sum`
+
 - Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
+- Bare invocation allowed
+
+### `sha224`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?query=sha224">https://man.freebsd.org/cgi/man.cgi?query=sha224</a></p>
+
+- Allowed standalone flags: --help, --passthrough, --quiet, --reverse, --self-test, --time-trial, --version, -V, -h, -p, -q, -r, -t, -x
+- Allowed valued flags: --check, --string, -c, -s
+- Bare invocation allowed
+
+### `sha224sum`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities">https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities</a></p>
+
+Aliases: `gsha224sum`
+
+- Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
+- Bare invocation allowed
+
+### `sha256`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?query=sha256">https://man.freebsd.org/cgi/man.cgi?query=sha256</a></p>
+
+- Allowed standalone flags: --help, --passthrough, --quiet, --reverse, --self-test, --time-trial, --version, -V, -h, -p, -q, -r, -t, -x
+- Allowed valued flags: --check, --string, -c, -s
 - Bare invocation allowed
 
 ### `sha256sum`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities">https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities</a></p>
 
+Aliases: `gsha256sum`
+
 - Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
+- Bare invocation allowed
+
+### `sha384`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?query=sha384">https://man.freebsd.org/cgi/man.cgi?query=sha384</a></p>
+
+- Allowed standalone flags: --help, --passthrough, --quiet, --reverse, --self-test, --time-trial, --version, -V, -h, -p, -q, -r, -t, -x
+- Allowed valued flags: --check, --string, -c, -s
+- Bare invocation allowed
+
+### `sha384sum`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities">https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities</a></p>
+
+Aliases: `gsha384sum`
+
+- Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
+- Bare invocation allowed
+
+### `sha512`
+<p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?query=sha512">https://man.freebsd.org/cgi/man.cgi?query=sha512</a></p>
+
+- Allowed standalone flags: --help, --passthrough, --quiet, --reverse, --self-test, --time-trial, --version, -V, -h, -p, -q, -r, -t, -x
+- Allowed valued flags: --check, --string, -c, -s
 - Bare invocation allowed
 
 ### `sha512sum`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities">https://www.gnu.org/software/coreutils/manual/coreutils.html#sha2-utilities</a></p>
+
+Aliases: `gsha512sum`
 
 - Allowed standalone flags: --binary, --check, --help, --ignore-missing, --quiet, --status, --strict, --tag, --text, --version, --warn, --zero, -V, -b, -c, -h, -t, -w, -z
 - Bare invocation allowed
@@ -9877,6 +10456,12 @@ Aliases: `serverless`
 - Allowed standalone flags: -V, -a, -f, -h, -w, --all, --help, --include-all-whitespace, --print-file-name, --version
 - Allowed valued flags: -T, -e, -n, -o, -s, -t, --bytes, --encoding, --output-separator, --radix, --target
 
+### `strip`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/strip.1.html">https://keith.github.io/xcode-man-pages/strip.1.html</a></p>
+
+- Allowed standalone flags: -A, -D, -N, -S, -T, -X, -c, -n, -r, -u, -v, -x, -no_atom_info, -no_code_signature_warning, -no_split_info, -no_uuid
+- Allowed valued flags: -R, -arch, -d, -i, -o, -s
+
 ### `stylelint`
 <p class="cmd-url"><a href="https://stylelint.io/user-guide/cli/">https://stylelint.io/user-guide/cli/</a></p>
 
@@ -10113,6 +10698,11 @@ Aliases: `serverless`
 
 - Allowed standalone flags: --color, --concurrency, --dry, --exit-code, --force, --global, --help, --init, --insecure, --interval, --json, --list, --list-all, --no-color, --offline, --parallel, --silent, --status, --summary, --verbose, --version, --watch, -C, -d, -f, -g, -h, -i, -j, -l, -n, -p, -s, -t, -v, -w, -a
 - Allowed valued flags: --dir, --output, --taskfile, -d, -o, -t
+
+### `tbtdiagnose`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/tbtdiagnose.1.html">https://keith.github.io/xcode-man-pages/tbtdiagnose.1.html</a></p>
+
+- Bare invocation allowed
 
 ### `tcc`
 <p class="cmd-url"><a href="https://bellard.org/tcc/tcc-doc.html">https://bellard.org/tcc/tcc-doc.html</a></p>
@@ -10480,6 +11070,12 @@ Aliases: `td`
 - **run**: Flags: --help, --no-recreate-pkg, --skip-missing-interpreters, -h. Valued: -e, -f, --override, --result-json
 - Allowed standalone flags: --help, --version, -h
 
+### `tpmtool`
+<p class="cmd-url"><a href="https://www.gnutls.org/manual/html_node/tpmtool-Invocation.html">https://www.gnutls.org/manual/html_node/tpmtool-Invocation.html</a></p>
+
+- Allowed standalone flags: --help, --list, --more-help, --srk-well-known, --verbose, -!, -V, -h
+- Allowed valued flags: --debug, --infile, --outfile, --pubkey, --test-sign, --version, -d, -v
+
 ### `tr`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#tr-invocation</a></p>
 
@@ -10565,6 +11161,12 @@ Aliases: `traceroute6`
 - Allowed valued flags: -A, -B, -D, -F, -G, -N, -O, -P, -S, -T, -W, -X, -Y, -Z, -b, -c, -C, -d, -e, -E, -f, -i, -j, -l, -n, -o, -p, -r, -s, -t, -w, -y, -z
 - Hyphen-prefixed positional arguments accepted
 
+### `tsql`
+<p class="cmd-url"><a href="https://www.freetds.org/userguide/tsql.htm">https://www.freetds.org/userguide/tsql.htm</a></p>
+
+- Allowed standalone flags: -C, -L, -v
+- Allowed valued flags: -D, -H, -I, -J, -P, -S, -U, -a, -o, -p, -r, -t
+
 ### `tsup`
 <p class="cmd-url"><a href="https://tsup.egoist.dev/">https://tsup.egoist.dev/</a></p>
 
@@ -10639,6 +11241,8 @@ Aliases: `traceroute6`
 ### `uname`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#uname-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#uname-invocation</a></p>
 
+Aliases: `guname`
+
 - Allowed standalone flags: --all, --help, --kernel-name, --kernel-release, --kernel-version, --machine, --nodename, --operating-system, --processor, --version, -V, -a, -h, -m, -n, -o, -p, -r, -s, -v
 - Bare invocation allowed
 
@@ -10673,6 +11277,11 @@ Aliases: `traceroute6`
 - Allowed standalone flags: --help, --version, -V, -f, -h, -n, -v
 - Bare invocation allowed
 
+### `unwinddump`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/unwinddump.1.html">https://keith.github.io/xcode-man-pages/unwinddump.1.html</a></p>
+
+- Allowed valued flags: -arch
+
 ### `unzip`
 <p class="cmd-url"><a href="https://linux.die.net/man/1/unzip">https://linux.die.net/man/1/unzip</a></p>
 
@@ -10682,6 +11291,14 @@ Aliases: `traceroute6`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#uptime-invocation</a></p>
 
 - Allowed standalone flags: --help, --pretty, --since, --version, -V, -h, -p, -s
+- Bare invocation allowed
+
+### `users`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#users-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#users-invocation</a></p>
+
+Aliases: `gusers`
+
+- Allowed standalone flags: --help, --version
 - Bare invocation allowed
 
 ### `usql`
@@ -10827,6 +11444,11 @@ Aliases: `traceroute6`
 <p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
 
 - Allowed standalone flags: --help, --verbose
+
+### `viewdiagnostic`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/viewdiagnostic.1.html">https://keith.github.io/xcode-man-pages/viewdiagnostic.1.html</a></p>
+
+- Positional arguments only
 
 ### `vipe`
 <p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
@@ -11101,11 +11723,15 @@ Aliases: `traceroute6`
 ### `who`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation</a></p>
 
+Aliases: `gwho`
+
 - Allowed standalone flags: --all, --boot, --count, --dead, --heading, --help, --login, --lookup, --mesg, --message, --process, --runlevel, --short, --time, --users, --version, --writable, -H, -S, -T, -V, -a, -b, -d, -h, -l, -m, -p, -q, -r, -s, -t, -u, -w
 - Bare invocation allowed
 
 ### `whoami`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#whoami-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#whoami-invocation</a></p>
+
+Aliases: `gwhoami`
 
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed

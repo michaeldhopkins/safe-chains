@@ -1,0 +1,9 @@
+[[command]]
+name = "lastcomm"
+description = "Prints process accounting records in reverse order: each previously executed command, the user who ran it, flags accumulated by the accounting system (super-user, fork-without-exec, core-dumped, signal-terminated), CPU time used, start time, and elapsed time. Reads /var/account/acct (or a file given with -f), which is typically empty on a fresh macOS install unless system accounting has been turned on. Read-only. Accepts a positional filter of command name, user name, or terminal name. Surface unchanged since 3.0BSD."
+url = "https://keith.github.io/xcode-man-pages/lastcomm.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+standalone = ["-w"]
+valued = ["-f"]

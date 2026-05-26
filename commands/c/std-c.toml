@@ -1,0 +1,29 @@
+[[command]]
+name = "c89"
+description = "POSIX standard C89 compiler driver. On macOS this is a thin wrapper that invokes clang in C89 mode and produces object files or an executable (defaulting to `a.out`). The same caveats as any C compiler apply: compiles source the caller provides and the resulting binary will be run by something. Compatibility surface frozen by POSIX."
+url = "https://keith.github.io/xcode-man-pages/c89.1.html"
+researched_version = "macOS 14 / Xcode 15 (POSIX-mandated surface)"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-v"]
+
+[[command]]
+name = "c99"
+description = "POSIX standard C99 compiler driver. On macOS this is a thin wrapper that invokes clang in C99 mode and produces object files or an executable (defaulting to `a.out`). Same flag surface as c89. Compatibility surface frozen by POSIX."
+url = "https://keith.github.io/xcode-man-pages/c99.1.html"
+researched_version = "macOS 14 / Xcode 15 (POSIX-mandated surface)"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-v"]
+
+[[command]]
+name = "as"
+description = "macOS assembler. As of recent toolchains the standalone `as` binary is deprecated and delegates to clang's integrated assembler. Invocation compiles `.s` source into a `.o` object file (or whatever -o names). Identical execution-risk profile to clang itself: the produced object is later linked and run."
+url = "https://keith.github.io/xcode-man-pages/as.1.html"
+researched_version = "macOS 14 / Xcode 15 (man page dated 2023-08-23)"
+level = "Inert"
+bare = false
+max_positional = 0
+standalone = ["--help", "--version", "-v"]

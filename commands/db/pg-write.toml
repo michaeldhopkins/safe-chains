@@ -1,0 +1,189 @@
+[[command]]
+name = "ecpg"
+description = "PostgreSQL embedded SQL preprocessor for C. Translates .pgc source files (C with embedded `EXEC SQL` directives) into ordinary .c files that can then be compiled and linked against libecpg. Reads input files; writes the corresponding C output (or to a file given with -o). Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/app-ecpg.html"
+researched_version = "PostgreSQL 18.3"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--regression", "--version",
+    "-?", "-c", "-h", "-i", "-t", "-v",
+]
+valued = [
+    "-C", "-D", "-I", "-o", "-r",
+]
+
+[[command]]
+name = "initdb"
+description = "PostgreSQL — creates a new database cluster on disk: the data directory tree, shared catalog tables, and the postgres, template0, and template1 databases. Writes a substantial filesystem layout under -D / $PGDATA. --show prints the chosen settings without doing anything. Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/app-initdb.html"
+researched_version = "PostgreSQL 18.3"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--allow-group-access", "--data-checksums",
+    "--debug", "--discard-caches", "--help",
+    "--no-clean", "--no-data-checksums",
+    "--no-instructions", "--no-locale",
+    "--no-sync", "--no-sync-data-files",
+    "--pwprompt", "--show", "--sync-only",
+    "--version",
+    "-?", "-A", "-N", "-S", "-V", "-W",
+    "-d", "-g", "-k", "-n", "-s",
+]
+valued = [
+    "--auth", "--auth-host", "--auth-local",
+    "--builtin-locale", "--encoding",
+    "--icu-locale", "--icu-rules",
+    "--lc-collate", "--lc-ctype", "--lc-messages",
+    "--lc-monetary", "--lc-numeric", "--lc-time",
+    "--locale", "--locale-provider", "--pgdata",
+    "--pwfile", "--set", "--sync-method",
+    "--text-search-config", "--username",
+    "--wal-segsize", "--waldir",
+    "-D", "-E", "-L", "-T", "-U", "-X",
+    "-c",
+]
+
+[[command]]
+name = "pg_archivecleanup"
+description = "PostgreSQL — deletes WAL segment files from an archive directory older than a given keep file. Can be invoked as the cluster's archive_cleanup_command or as a standalone tool. Pure local-filesystem write (deletes files in the archive directory passed as the first positional argument). --dry-run reports what would be removed without deleting. Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/pgarchivecleanup.html"
+researched_version = "PostgreSQL 18.3"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--clean-backup-history", "--debug",
+    "--dry-run", "--help", "--version",
+    "-?", "-V", "-b", "-d", "-n",
+]
+valued = [
+    "--strip-extension",
+    "-x",
+]
+
+[[command]]
+name = "pg_checksums"
+description = "PostgreSQL — checks, enables, or disables data-page checksums in a cluster's data directory. The cluster must be shut down cleanly before running. -c/--check is read-only; -e/--enable rewrites relation file blocks with new checksums in place; -d/--disable updates pg_control. All modes act on a local data directory. Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/app-pgchecksums.html"
+researched_version = "PostgreSQL 18.3"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--check", "--disable", "--enable", "--help",
+    "--no-sync", "--progress", "--verbose", "--version",
+    "-?", "-N", "-P", "-V", "-c", "-d", "-e", "-v",
+]
+valued = [
+    "--filenode", "--pgdata", "--sync-method",
+    "-D", "-f",
+]
+
+[[command]]
+name = "pg_combinebackup"
+description = "PostgreSQL — reconstructs a synthetic full backup from a full backup and one or more incremental backups produced by pg_basebackup. Reads the chain of backup directories supplied as positional arguments and writes the combined output to the directory named with -o/--output. --dry-run reports what would be written without producing output. Local-filesystem write. Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/app-pgcombinebackup.html"
+researched_version = "PostgreSQL 18.3"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--clone", "--copy", "--copy-file-range",
+    "--debug", "--dry-run", "--help", "--link",
+    "--no-manifest", "--no-sync", "--version",
+    "-?", "-N", "-V", "-d", "-k", "-n",
+]
+valued = [
+    "--manifest-checksums", "--output",
+    "--sync-method", "--tablespace-mapping",
+    "-T", "-o",
+]
+
+[[command]]
+name = "pg_receivewal"
+description = "PostgreSQL — streams WAL segments from a running cluster over the replication protocol and writes them to a local directory passed with -D, optionally compressing them with gzip or lz4. Local-filesystem write; the connection to the source server is read-side. --create-slot and --drop-slot would mutate remote server state and are excluded here. Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/app-pgreceivewal.html"
+researched_version = "PostgreSQL 18.3"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--if-not-exists", "--no-loop",
+    "--no-password", "--no-sync", "--synchronous",
+    "--verbose", "--version",
+    "-?", "-V", "-n", "-v", "-w", "-W",
+]
+valued = [
+    "--compress", "--dbname", "--directory",
+    "--endpos", "--host", "--port", "--slot",
+    "--status-interval", "--username",
+    "-D", "-E", "-S", "-U", "-Z",
+    "-d", "-h", "-p", "-s",
+]
+
+[[command]]
+name = "pg_recvlogical"
+description = "PostgreSQL — controls logical decoding replication slots and streams decoded data from them to a local file. The --create-slot and --drop-slot modes would mutate server state; only --start is exposed here, which streams an existing slot's output to a local file. Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/app-pgrecvlogical.html"
+researched_version = "PostgreSQL 18.3"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--enable-failover", "--enable-two-phase",
+    "--help", "--if-not-exists", "--no-loop",
+    "--no-password", "--start", "--two-phase",
+    "--verbose", "--version",
+    "-?", "-V", "-n", "-t", "-v", "-w", "-W",
+]
+valued = [
+    "--dbname", "--endpos", "--file",
+    "--fsync-interval", "--host", "--option",
+    "--plugin", "--port", "--slot", "--startpos",
+    "--status-interval", "--username",
+    "-E", "-F", "-I", "-P", "-S", "-U",
+    "-d", "-f", "-o", "-p", "-s",
+]
+
+[[command]]
+name = "pg_rewind"
+description = "PostgreSQL — synchronizes a target data directory with a source data directory or running source server that was forked from it (typical use: bringing an old primary back as a standby after failover). Modifies the local target data directory in place (only the changed blocks plus configuration and WAL). The source can be a local directory (--source-pgdata) or a remote cluster (--source-server CONNSTR); the source is read-side. --dry-run examines without modifying. Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/app-pgrewind.html"
+researched_version = "PostgreSQL 18.3"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--debug", "--dry-run", "--help",
+    "--no-ensure-shutdown", "--no-sync",
+    "--progress", "--restore-target-wal",
+    "--version", "--write-recovery-conf",
+    "-?", "-N", "-P", "-R", "-V", "-c", "-n",
+]
+valued = [
+    "--config-file", "--source-pgdata",
+    "--source-server", "--sync-method",
+    "--target-pgdata",
+    "-D",
+]
+
+[[command]]
+name = "pg_upgrade"
+description = "PostgreSQL — performs an in-place major-version upgrade of a cluster by reusing the old data files and rebuilding only the system catalogs. Heavy local data directory mutation: copies, hard-links, clones, or swaps files from the old cluster (-d/--old-datadir) into the new cluster (-D/--new-datadir) and runs upgrade SQL. -c/--check examines the clusters without modifying them. Note: an upgrade causes the destination to execute arbitrary code chosen by the source superusers. Ships with the annual PostgreSQL major release."
+url = "https://www.postgresql.org/docs/current/pgupgrade.html"
+researched_version = "PostgreSQL 18.3"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--check", "--clone", "--copy",
+    "--copy-file-range", "--help", "--link",
+    "--no-statistics", "--no-sync", "--retain",
+    "--swap", "--verbose", "--version",
+    "-?", "-N", "-V", "-c", "-k", "-r", "-v",
+]
+valued = [
+    "--jobs", "--new-bindir", "--new-datadir",
+    "--new-options", "--new-port",
+    "--old-bindir", "--old-datadir",
+    "--old-options", "--old-port",
+    "--set-char-signedness", "--socketdir",
+    "--sync-method", "--username",
+    "-B", "-D", "-O", "-P", "-U",
+    "-b", "-d", "-j", "-o", "-p", "-s",
+]

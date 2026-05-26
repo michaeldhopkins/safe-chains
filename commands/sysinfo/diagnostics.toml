@@ -1,0 +1,26 @@
+[[command]]
+name = "hpmdiagnose"
+description = "Collects diagnostic information for USB-C issues on Apple Silicon and Intel Macs. Bare invocation only; no flags. Output goes to stdout (and a tarball under /private/var/tmp on some macOS versions). Read-only with respect to system state. macOS system binary; surface frozen since 2016."
+url = "https://keith.github.io/xcode-man-pages/hpmdiagnose.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+max_positional = 0
+
+[[command]]
+name = "tbtdiagnose"
+description = "Collects diagnostic information for Thunderbolt issues. Bare invocation only; no flags. Reads system state and writes a report to a temp directory. macOS system binary; surface frozen since 2016."
+url = "https://keith.github.io/xcode-man-pages/tbtdiagnose.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = true
+max_positional = 0
+
+[[command]]
+name = "viewdiagnostic"
+description = "Translates a crash report or other diagnostic report file into a textual representation, for human inspection. Takes a single path argument and prints to stdout. Not a GUI tool — the man page recommends parsers use the as-written format and reserves viewdiagnostic for visualization. macOS system binary; surface frozen."
+url = "https://keith.github.io/xcode-man-pages/viewdiagnostic.1.html"
+researched_version = "macOS 14 (system binary; surface frozen)"
+level = "Inert"
+bare = false
+max_positional = 1

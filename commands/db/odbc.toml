@@ -1,0 +1,27 @@
+[[command]]
+name = "odbc_config"
+description = "unixODBC information tool that prints how unixODBC was compiled and installed on the system: include and library paths, compiler/linker flags, ODBC specification version, and the locations of the system odbc.ini and odbcinst.ini configuration files. Pure read; intended for use in build systems integrating an ODBC client. unixODBC surface is essentially frozen (last release 2.3.12, 2021)."
+url = "https://www.unixodbc.org/doc/odbc_config.html"
+researched_version = "unixODBC 2.3.12"
+level = "Inert"
+bare = true
+standalone = [
+    "--bin-prefix", "--cflags", "--exec-prefix",
+    "--header", "--include-prefix", "--lib-prefix",
+    "--libs", "--libtool-libs", "--odbcini",
+    "--odbcinstini", "--odbcversion", "--prefix",
+    "--static-libs", "--ulen", "--version",
+]
+
+[[command]]
+name = "odbcinst"
+description = "unixODBC configuration utility. Read actions: -j prints the active unixODBC configuration (paths to odbc.ini / odbcinst.ini, etc.) and -q queries the listed objects in odbc.ini / odbcinst.ini. Write actions (-i install, -u uninstall, -c create-data-source, -m manage-data-sources) modify those configuration files and are excluded here. Object selectors -d (driver, odbcinst.ini) and -s (data source, odbc.ini), the -n NAME selector, and -l / -h scoping flags are kept since they qualify a read action. unixODBC surface is essentially frozen (last release 2.3.12, 2021)."
+url = "https://www.unixodbc.org/doc/odbcinst.html"
+researched_version = "unixODBC 2.3.12"
+level = "Inert"
+bare = false
+standalone = [
+    "--version",
+    "-d", "-h", "-j", "-l", "-q", "-s", "-v",
+]
+valued = ["-n"]
