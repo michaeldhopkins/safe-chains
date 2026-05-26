@@ -1,27 +1,29 @@
 # safe-chains
 
-Agentic coding tools prompt you dozens of times for commands like `git log --oneline | head -20`, `cargo test && cargo clippy -- -D warnings`, or even `find src -name "*.rs" -exec grep -l "TODO" {} \; | sort | while read f; do echo "=== $f ==="; grep -n "TODO" "$f"; done`. You approve them all, and eventually stop reading the prompts, which is exactly when a destructive command slips through.
+Agentic coding tools prompt you dozens of times per session for commands like 
+- `git log --oneline | head -20`
+- `cargo test && cargo clippy -- -D warnings`
+- or even `find src -name "*.rs" -exec grep -l "TODO" {} \; | sort | while read f; do echo "=== $f ==="; grep -n "TODO" "$f"; done`.
 
-safe-chains parses these commands (pipes, chains, loops, subshells, nested wrappers) and auto-approves them when every segment is verifiably safe. The prompts that remain are the ones worth reading.
+You approve them all, and eventually stop reading the prompts, which is exactly when a destructive command slips through.
 
-It covers {{#include includes/command-count.md}} commands with flag-level validation, compound command parsing, and recursive subshell expansion, all deterministic, with no AI in the loop. If safe-chains isn't sure, it doesn't guess. It leaves the prompt for you.
+**safe-chains** parses these commands (pipes, chains, loops, subshells, nested wrappers) and approves only when every segment is verifiably safe. Now, you only get prompted to approve a command when something interesting comes along.
 
-safe-chains works as a Claude Code pre-hook, a CLI tool, or an OpenCode plugin.
+safe-chains covers {{#include includes/command-count.md}} commands with flag-level validation, compound command parsing, and recursive subshell expansion, all deterministically, not based on a model's guess like with Claude's auto mode.
+
+## How it works
+
+With your agent harness configured to run safe-chains from a hook, each Bash command is analyzed and gets a decision response.
+
+Or, just run safe-chains yourself in your terminal to learn about a command. It's fun!
+```bash
+safe-chains "ls -la | head -5"    # exit 0 = safe
+safe-chains "rm -rf /"            # exit 1 = unsafe
+```
 
 ## Getting started
 
 - [Installation](installation.md)
 - [Configuration](configuration.md)
-- [Usage](usage.md)
-- [Safety Levels](safety-levels.md)
-- [Custom Commands](custom-commands.md)
-
-## How it works
-
 - [Overview](how-it-works.md)
-- [Security](security.md)
-
-## Command reference
-
-- [Overview](commands/README.md) — glossary and category index
-- [Adding Commands](contributing.md) — how to contribute new commands
+- [Custom Commands](custom-commands.md)
