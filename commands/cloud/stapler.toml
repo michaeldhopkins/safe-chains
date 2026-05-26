@@ -1,0 +1,19 @@
+[[command]]
+name = "stapler"
+description = "macOS tool that attaches Apple-issued notarization tickets to signed `.dmg`, `.pkg`, or app bundles. `stapler staple <path>` writes the ticket into the target on disk; `stapler validate <path>` reads and verifies an existing ticket without modifying the file. Ships with the Xcode Command Line Tools; surface has been a two-verb-plus-path shape since notarization launched in 2018."
+url = "https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/customizing_the_notarization_workflow"
+researched_version = "Xcode 15 / macOS 14 stapler"
+
+[[command.sub]]
+name = "staple"
+level = "SafeWrite"
+bare = false
+max_positional = 1
+standalone = ["-q", "-v"]
+
+[[command.sub]]
+name = "validate"
+level = "Inert"
+bare = false
+max_positional = 1
+standalone = ["-q", "-v"]

@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1057 commands across 75 categories.
+safe-chains knows 1061 commands across 75 categories.
 
 ## Glossary
 
@@ -28,7 +28,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Shell Builtins](builtins.md) (22 commands)
 - [C / C++](c.md) (7 commands)
 - [Clipboard](clipboard.md) (3 commands)
-- [Cloud Providers](cloud.md) (9 commands)
+- [Cloud Providers](cloud.md) (10 commands)
 - [Compilation Toolchains](compile.md) (24 commands)
 - [Config Management](configmgmt.md) (3 commands)
 - [Containers](containers.md) (38 commands)
@@ -37,7 +37,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Crystal](crystal.md) (3 commands)
 - [D](d.md) (1 commands)
 - [Dart / Flutter](dart.md) (2 commands)
-- [Data Processing](data.md) (25 commands)
+- [Data Processing](data.md) (27 commands)
 - [Database Clients](db.md) (40 commands)
 - [.NET](dotnet.md) (21 commands)
 - [Editors](editors.md) (3 commands)
@@ -88,7 +88,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [TeX / LaTeX](tex.md) (3 commands)
 - [Text Processing](text.md) (29 commands)
 - [Developer Tools](tools.md) (193 commands)
-- [Version Control](vcs.md) (9 commands)
+- [Version Control](vcs.md) (10 commands)
 - [WebAssembly](wasm.md) (10 commands)
 - [Shell Wrappers](wrappers.md) (7 commands)
 - [Xcode](xcode.md) (17 commands)
