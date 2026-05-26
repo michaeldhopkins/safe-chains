@@ -1,0 +1,106 @@
+[[command]]
+name = "uuencode"
+description = "BSD-era binary-to-ASCII encoder. Reads a file (or stdin) and writes a uuencoded or Base64-encoded stream (with -m) to stdout or to the file named by -o. The trailing positional `name` is the filename embedded in the encoded stream for uudecode to use. macOS ships this as one binary shared with uudecode/b64encode/b64decode/bintrans/base64; the surface is POSIX-style and effectively frozen."
+url = "https://man.openbsd.org/uuencode"
+researched_version = "macOS 14 bintrans (frozen surface)"
+level = "SafeWrite"
+bare = false
+standalone = ["-m", "-r"]
+valued = ["-o"]
+
+[[command]]
+name = "uudecode"
+description = "BSD-era ASCII-to-binary decoder. Reads a uuencoded or Base64-encoded stream from file(s) or stdin and writes the decoded binary to a file (either the name embedded in the stream or one named by -o). The -p flag forces output to stdout. Same shared binary as uuencode/b64*; surface effectively frozen."
+url = "https://man.openbsd.org/uudecode"
+researched_version = "macOS 14 bintrans (frozen surface)"
+level = "SafeWrite"
+bare = false
+standalone = ["-c", "-i", "-m", "-p", "-r", "-s"]
+valued = ["-o"]
+
+[[command]]
+name = "b64encode"
+description = "Base64 encoder; equivalent to `uuencode -m`. Writes encoded output to stdout or to the file named by -o, with optional column-wrap via -w. Shares one binary with uuencode/uudecode/bintrans; surface effectively frozen."
+url = "https://man.openbsd.org/uuencode"
+researched_version = "macOS 14 bintrans (frozen surface)"
+level = "SafeWrite"
+bare = false
+standalone = ["-r"]
+valued = ["-o", "-w"]
+
+[[command]]
+name = "b64decode"
+description = "Base64 decoder; equivalent to `uudecode -m`. Reads Base64 input and writes binary to the file named by -o (or, without -o, to the file name embedded in the stream). Shares one binary with uuencode/uudecode/bintrans; surface effectively frozen."
+url = "https://man.openbsd.org/uudecode"
+researched_version = "macOS 14 bintrans (frozen surface)"
+level = "SafeWrite"
+bare = false
+standalone = ["-c", "-i", "-m", "-p", "-r", "-s"]
+valued = ["-o"]
+
+[[command]]
+name = "bintrans"
+description = "Generic dispatcher for the uuencode/uudecode/b64encode/b64decode/base64/qp (quoted-printable) family — the first positional selects the algorithm, the remaining tokens are passed through. All sub-algorithms read input from a file or stdin and write the encoded/decoded result to stdout or to the file named by -o. Shares one binary with the per-algorithm names; surface effectively frozen."
+url = "https://man.openbsd.org/bintrans"
+researched_version = "macOS 14 bintrans (frozen surface)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["-c", "-d", "-i", "-m", "-p", "-r", "-s", "-u"]
+valued = ["-b", "-o", "-w"]
+
+[[command]]
+name = "applesingle"
+description = "One of three names (alongside binhex and macbinary) for a single Apple-supplied tool that encodes/decodes Mac-specific binary container formats. Verbs are `probe` (inspect file, no writes), `decode` (writes the contained file to disk under -C dir or -o outfile), and `encode` (reads file(s) and writes a container to stdout via -c or to the file under -o). Decoders write files; encoders default to stdout but support -o file. Ships with macOS; man page dates to 2005 and the surface has not changed since."
+url = "https://opensource.apple.com/source/file_cmds/"
+researched_version = "macOS 14 (Darwin tool, 2005-era)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--force", "--help", "--pipe", "--verbose", "--version", "-V", "-c", "-f", "-h", "-v"]
+valued = ["--directory", "--rename", "--suffix", "-C", "-o", "-s"]
+
+[[command]]
+name = "binhex"
+description = "Alias for the applesingle/macbinary tool that defaults to the BinHex (.hqx) encoding. Verbs are `probe`, `decode`, and `encode`. Same binary as applesingle/macbinary; surface unchanged since 2005."
+url = "https://opensource.apple.com/source/file_cmds/"
+researched_version = "macOS 14 (Darwin tool, 2005-era)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--force", "--help", "--no-runlength-encoding", "--pipe",
+    "--verbose", "--version", "-R", "-V", "-c", "-f", "-h", "-v",
+]
+valued = ["--directory", "--rename", "--suffix", "-C", "-o", "-s"]
+
+[[command]]
+name = "macbinary"
+description = "Alias for the applesingle/binhex tool that defaults to the MacBinary encoding. Verbs are `probe`, `decode`, and `encode`. -t selects MacBinary version 1-3. Same binary as applesingle/binhex; surface unchanged since 2005."
+url = "https://opensource.apple.com/source/file_cmds/"
+researched_version = "macOS 14 (Darwin tool, 2005-era)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--force", "--help", "--pipe", "--verbose", "--version", "-V", "-c", "-f", "-h", "-v"]
+valued = ["--directory", "--rename", "--suffix", "--type", "-C", "-o", "-s", "-t"]
+
+[[command]]
+name = "binhex.pl"
+description = "Convert::BinHex frontend that encodes each given file to file.hqx in the source directory (or a directory given by -o). Writes one .hqx file per input file. Bundled with the Convert-BinHex CPAN distribution; the CLI surface is two flags and has not changed in years."
+url = "https://metacpan.org/pod/Convert::BinHex"
+researched_version = "Convert::BinHex 1.125"
+level = "SafeWrite"
+bare = false
+standalone = ["-v"]
+valued = ["-o"]
+
+[[command]]
+name = "debinhex.pl"
+description = "Convert::BinHex frontend that decodes each given .hqx file into the original binary file (output name dictated by the BinHex stream itself) in the source directory or a directory given by -o. Bundled with Convert-BinHex; two-flag surface."
+url = "https://metacpan.org/pod/Convert::BinHex"
+researched_version = "Convert::BinHex 1.125"
+level = "SafeWrite"
+bare = false
+standalone = ["-v"]
+valued = ["-o"]

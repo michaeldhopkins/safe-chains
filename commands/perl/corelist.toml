@@ -1,0 +1,13 @@
+[[command]]
+name = "corelist"
+description = "Command-line frontend to the Module::CoreList Perl module that answers questions about which perl release first shipped a given module, feature, or utility. Pure data query: reads from Module::CoreList's bundled tables and writes results to stdout. Does not touch the network, the filesystem, or installed modules. Supports module-version lookup, perl-release-date lookup (-r), util-to-version mapping (--utils), feature-bundle queries (--feature), upstream maintenance lookup (--upstream), and diffing two perl versions (--diff). Ships inside Perl core and revises with perl itself (~yearly minor releases); the CLI surface is small and frozen."
+url = "https://metacpan.org/pod/corelist"
+researched_version = "Module::CoreList 5.20240320 (Perl 5.34+)"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--diff", "--feature", "--help", "--man", "--upstream", "--utils",
+    "-?", "-a", "-d", "-f", "-help", "-man", "-u", "-v",
+]
+valued = ["-r"]

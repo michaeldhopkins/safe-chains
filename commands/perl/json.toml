@@ -1,0 +1,19 @@
+[[command]]
+name = "json_pp"
+description = "JSON::PP command utility — reads structured data from stdin in a chosen input format (json or eval), converts to a chosen output format (json, dumper, or null) on stdout. Read-only stdin-to-stdout filter. -json_opt tunes JSON::PP behaviour (pretty/canonical/utf8/etc). Pure Perl, no XS; ships with Perl core. The JSON::PP module is stable; CLI surface tiny and unchanged for years."
+url = "https://metacpan.org/pod/json_pp"
+researched_version = "JSON::PP 4.x (Perl 5.34+ bundled)"
+level = "Inert"
+bare = true
+standalone = ["-V", "-v"]
+valued = ["-f", "-json_opt", "-t"]
+
+[[command]]
+name = "json_xs"
+description = "JSON::XS command utility — converts between a wide set of input formats (json, cbor, storable, bencode, yaml, etc.) and a similar set of output formats on stdin/stdout. Read-only stdin-to-stdout filter for the documented format flags. The tool also accepts -e CODE which evaluates arbitrary Perl on the decoded data before re-encoding; that mode is excluded here. Distributed with JSON-XS on CPAN; surface and format names are stable across the 4.x series."
+url = "https://metacpan.org/pod/json_xs"
+researched_version = "JSON-XS 4.03"
+level = "Inert"
+bare = true
+standalone = ["-v"]
+valued = ["-f", "-t"]

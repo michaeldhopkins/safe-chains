@@ -1,0 +1,8 @@
+[[command]]
+name = "instmodsh"
+description = "Interactive shell built on ExtUtils::Installed that lets the user list installed Perl modules, list files belonging to a module, and validate that the packlist matches the on-disk files. Takes no command-line arguments — drops straight into a REPL. Bundled with Perl core; surface (which is essentially zero) is frozen."
+url = "https://metacpan.org/pod/instmodsh"
+researched_version = "ExtUtils-MakeMaker (Perl 5.34+ bundled)"
+level = "SafeRead"
+bare = true
+max_positional = 0

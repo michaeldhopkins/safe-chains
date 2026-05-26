@@ -421,6 +421,13 @@ Aliases: `7zz`, `7za`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `applesingle`
+<p class="cmd-url"><a href="https://opensource.apple.com/source/file_cmds/">https://opensource.apple.com/source/file_cmds/</a></p>
+
+- Allowed standalone flags: --force, --help, --pipe, --verbose, --version, -V, -c, -f, -h, -v
+- Allowed valued flags: --directory, --rename, --suffix, -C, -o, -s
+- Hyphen-prefixed positional arguments accepted
+
 ### `apropos`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/apropos.1.html">https://man7.org/linux/man-pages/man1/apropos.1.html</a></p>
 
@@ -1022,6 +1029,18 @@ Aliases: `whatis`
 - Allowed valued flags: --length, -l
 - Bare invocation allowed
 
+### `b64decode`
+<p class="cmd-url"><a href="https://man.openbsd.org/uudecode">https://man.openbsd.org/uudecode</a></p>
+
+- Allowed standalone flags: -c, -i, -m, -p, -r, -s
+- Allowed valued flags: -o
+
+### `b64encode`
+<p class="cmd-url"><a href="https://man.openbsd.org/uuencode">https://man.openbsd.org/uuencode</a></p>
+
+- Allowed standalone flags: -r
+- Allowed valued flags: -o, -w
+
 ### `bacon`
 <p class="cmd-url"><a href="https://github.com/Canop/bacon">https://github.com/Canop/bacon</a></p>
 
@@ -1097,6 +1116,26 @@ Aliases: `whatis`
 
 - Allowed standalone flags: --cache, --clrmacros, --collate-options, --convert-control, --debug, --decodecharsset, --dot-include, --fastsort, --help, --input-format, --listsep, --logfile, --mincrossrefs, --minxrefs, --mssplit, --no-bblsafechars, --no-bibwarn, --noconf, --nodieonerror, --noinit, --nolog, --nostdmacros, --no-bblencoding, --onlylog, --output-encoding, --output-format, --output-indent, --output-resolve, --output-safechars, --output-safecharsset, --quiet, --recodedata, --strict, --sortdebug, --tool, --trace, --validate-config, --validate-control, --validate-datamodel, --version, --wraplines, -h, -q, -v
 - Allowed valued flags: --cache, --decodecharsset, --input-directory, --input-encoding, --input-format, --logfile, --macros, --mincrossrefs, --mssplit, --namesep, --output-directory, --output-encoding, --output-fieldcase, --output-file, --output-format, --output-indent, --output-legacy-dates, --output-resolve, --output-safecharsset, --recodedata, --ssl-host-name, --tool-config, --vsval, --xnamesep, --xsuffix
+
+### `binhex`
+<p class="cmd-url"><a href="https://opensource.apple.com/source/file_cmds/">https://opensource.apple.com/source/file_cmds/</a></p>
+
+- Allowed standalone flags: --force, --help, --no-runlength-encoding, --pipe, --verbose, --version, -R, -V, -c, -f, -h, -v
+- Allowed valued flags: --directory, --rename, --suffix, -C, -o, -s
+- Hyphen-prefixed positional arguments accepted
+
+### `binhex.pl`
+<p class="cmd-url"><a href="https://metacpan.org/pod/Convert::BinHex">https://metacpan.org/pod/Convert::BinHex</a></p>
+
+- Allowed standalone flags: -v
+- Allowed valued flags: -o
+
+### `bintrans`
+<p class="cmd-url"><a href="https://man.openbsd.org/bintrans">https://man.openbsd.org/bintrans</a></p>
+
+- Allowed standalone flags: -c, -d, -i, -m, -p, -r, -s, -u
+- Allowed valued flags: -b, -o, -w
+- Hyphen-prefixed positional arguments accepted
 
 ### `biome`
 <p class="cmd-url"><a href="https://biomejs.dev/reference/cli/">https://biomejs.dev/reference/cli/</a></p>
@@ -1961,6 +2000,12 @@ Aliases: `code-insiders`, `codium`
 - **list**: Flags: --explicit, --export, --full-name, --help, --json, --no-pip, --revisions, -e, -f, -h. Valued: --name, --prefix, -n, -p
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `config_data`
+<p class="cmd-url"><a href="https://metacpan.org/pod/distribution/Module-Build/scripts/config_data">https://metacpan.org/pod/distribution/Module-Build/scripts/config_data</a></p>
+
+- Allowed standalone flags: --help
+- Allowed valued flags: --config, --feature, --module
+
 ### `consul`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/consul/commands">https://developer.hashicorp.com/consul/commands</a></p>
 
@@ -2020,6 +2065,13 @@ Aliases: `code-insiders`, `codium`
 <p class="cmd-url"><a href="https://coq.inria.fr/refman/practical-tools/coq-commands.html">https://coq.inria.fr/refman/practical-tools/coq-commands.html</a></p>
 
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `corelist`
+<p class="cmd-url"><a href="https://metacpan.org/pod/corelist">https://metacpan.org/pod/corelist</a></p>
+
+- Allowed standalone flags: --diff, --feature, --help, --man, --upstream, --utils, -?, -a, -d, -f, -help, -man, -u, -v
+- Allowed valued flags: -r
+- Hyphen-prefixed positional arguments accepted
 
 ### `cosign`
 <p class="cmd-url"><a href="https://github.com/sigstore/cosign">https://github.com/sigstore/cosign</a></p>
@@ -2376,6 +2428,12 @@ Aliases: `@cucumber/cucumber`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `debinhex.pl`
+<p class="cmd-url"><a href="https://metacpan.org/pod/Convert::BinHex">https://metacpan.org/pod/Convert::BinHex</a></p>
+
+- Allowed standalone flags: -v
+- Allowed valued flags: -o
+
 ### `debride`
 <p class="cmd-url"><a href="https://github.com/seattlerb/debride">https://github.com/seattlerb/debride</a></p>
 
@@ -2416,6 +2474,13 @@ Aliases: `tiged`
 
 - Allowed standalone flags: --blame-code-style, --blame-palette, --color-only, --dark, --diff-highlight, --diff-so-fancy, --help, --hyperlinks, --keep-plus-minus-markers, --light, --line-numbers, --list-languages, --list-syntax-themes, --navigate, --no-gitconfig, --raw, --relative-paths, --show-config, --show-syntax-themes, --side-by-side, --version, -V, -h, -n, -s
 - Allowed valued flags: --commit-decoration-style, --commit-style, --config, --diff-stat-align-width, --features, --file-added-label, --file-decoration-style, --file-modified-label, --file-removed-label, --file-renamed-label, --file-style, --file-transformation, --hunk-header-decoration-style, --hunk-header-file-style, --hunk-header-line-number-style, --hunk-header-style, --hunk-label, --inline-hint-style, --inspect-raw-lines, --line-buffer-size, --line-fill-method, --line-numbers-left-format, --line-numbers-left-style, --line-numbers-minus-style, --line-numbers-plus-style, --line-numbers-right-format, --line-numbers-right-style, --line-numbers-zero-style, --map-styles, --max-line-distance, --max-line-length, --merge-conflict-begin-symbol, --merge-conflict-end-symbol, --merge-conflict-ours-diff-header-decoration-style, --merge-conflict-ours-diff-header-style, --merge-conflict-theirs-diff-header-decoration-style, --merge-conflict-theirs-diff-header-style, --minus-emph-style, --minus-empty-line-marker-style, --minus-non-emph-style, --minus-style, --paging, --plus-emph-style, --plus-empty-line-marker-style, --plus-non-emph-style, --plus-style, --syntax-theme, --tabs, --true-color, --whitespace-error-style, --width, -w
+- Bare invocation allowed
+
+### `delv`
+<p class="cmd-url"><a href="https://bind9.readthedocs.io/en/latest/manpages.html#delv-dns-lookup-and-validation-utility">https://bind9.readthedocs.io/en/latest/manpages.html#delv-dns-lookup-and-validation-utility</a></p>
+
+- Allowed standalone flags: -4, -6, -h, -i, -m, -v
+- Allowed valued flags: -a, -b, -c, -d, -p, -q, -t, -x
 - Bare invocation allowed
 
 ### `demandoc`
@@ -2561,6 +2626,11 @@ Aliases: `difftastic`
 <p class="cmd-url"><a href="https://github.com/go-delve/delve">https://github.com/go-delve/delve</a></p>
 
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `dns-sd`
+<p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/Networking/Conceptual/dns_discovery_api/Introduction.html">https://developer.apple.com/library/archive/documentation/Networking/Conceptual/dns_discovery_api/Introduction.html</a></p>
+
+- Requires -E, -F, -B, -L, -q, -G, -Z, -V. - Allowed standalone flags: -E, -F, -B, -L, -q, -G, -Z, -V, -4, -6
 
 ### `docfx`
 <p class="cmd-url"><a href="https://dotnet.github.io/docfx/reference/docfx-cli-reference/docfx.html">https://dotnet.github.io/docfx/reference/docfx-cli-reference/docfx.html</a></p>
@@ -2987,6 +3057,18 @@ Aliases: `emmake`, `emranlib`, `emstrip`, `emrun`
 
 - Allowed standalone flags: --help, --version, -V, -h, -help, -list-avds, -version
 
+### `enc2xs`
+<p class="cmd-url"><a href="https://metacpan.org/pod/enc2xs">https://metacpan.org/pod/enc2xs</a></p>
+
+- Allowed standalone flags: -Q, -q, -v
+- Allowed valued flags: -M, -f, -o
+
+### `encguess`
+<p class="cmd-url"><a href="https://metacpan.org/pod/distribution/Encode/bin/encguess">https://metacpan.org/pod/distribution/Encode/bin/encguess</a></p>
+
+- Allowed standalone flags: -S, -h, -u
+- Allowed valued flags: -s
+
 ### `entr`
 <p class="cmd-url"><a href="https://eradman.com/entrproject/">https://eradman.com/entrproject/</a></p>
 
@@ -3217,6 +3299,13 @@ Aliases: `exa`
 - Allowed valued flags: --direction, --mountpoint, --options, --output, --source, --tab-file, --target, --task, --timeout, --types, -F, -M, -N, -O, -S, -T, -d, -o, -t, -w
 - Bare invocation allowed
 
+### `findrule`
+<p class="cmd-url"><a href="https://metacpan.org/pod/File::Find::Rule">https://metacpan.org/pod/File::Find::Rule</a></p>
+
+- Allowed standalone flags: -h, --help
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `firebase`
 <p class="cmd-url"><a href="https://firebase.google.com/docs/cli">https://firebase.google.com/docs/cli</a></p>
 
@@ -3405,6 +3494,12 @@ Aliases: `fly`
 - Allowed valued flags: --config, --ghc-opt, --mode, --package-name, --start-line, --start-column, --end-line, --end-column, -o
 - Bare invocation allowed
 
+### `fping`
+<p class="cmd-url"><a href="https://www.fping.org/">https://www.fping.org/</a></p>
+
+- Requires -c, --count, -C, --vcount, -x, --reachable, -X, --fast-reachable. - Allowed standalone flags: --help, --version, --ipv4, --ipv6, --alive, --addr, --rdns, --timestamp, --elapsed, --dontfrag, --name, --netdata, --outage, --quiet, --random, --stats, --unreach, --loop, --all, -4, -6, -a, -A, -d, -D, -e, -h, -l, -M, -m, -n, -N, -o, -q, -R, -s, -u, -v
+- Allowed valued flags: --size, --backoff, --count, --vcount, --file, --generate, --ttl, --iface, --interval, --tos, --period, --squiet, --retry, --src, --timeout, --reachable, --fast-reachable, -b, -B, -c, -C, -f, -g, -H, -i, -I, -O, -p, -Q, -r, -S, -t, -T, -x, -X
+
 ### `fpm`
 <p class="cmd-url"><a href="https://fpm.readthedocs.io/">https://fpm.readthedocs.io/</a></p>
 
@@ -3450,6 +3545,11 @@ Aliases: `dotnet-fsi`
 - Allowed standalone flags: --help, --show-info, --show-scores, --version, -h, -i, -v
 - Allowed valued flags: --lines, --prompt, --query, --show-matches, --tty, -e, -l, -p, -q, -t
 - Bare invocation allowed
+
+### `gatherheaderdoc`
+<p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/">https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/</a></p>
+
+- Allowed standalone flags: -h
 
 ### `gatsby`
 <p class="cmd-url"><a href="https://www.gatsbyjs.com/docs/reference/gatsby-cli/">https://www.gatsbyjs.com/docs/reference/gatsby-cli/</a></p>
@@ -4023,6 +4123,20 @@ Aliases: `gradlew`
 
 - Requires -l, --list, -t, --test. - Allowed standalone flags: -l, --list, -t, --test, -v, --verbose, --help, -h, --version, -V
 
+### `h2ph`
+<p class="cmd-url"><a href="https://metacpan.org/pod/h2ph">https://metacpan.org/pod/h2ph</a></p>
+
+- Allowed standalone flags: -D, -Q, -a, -e, -h, -l, -r
+- Allowed valued flags: -d
+- Bare invocation allowed
+
+### `h2xs`
+<p class="cmd-url"><a href="https://metacpan.org/pod/h2xs">https://metacpan.org/pod/h2xs</a></p>
+
+- Allowed standalone flags: --beta-version, --debugging, --force, --gen-accessors, --global, --help, --omit-XS, --omit-autoload, --omit-changes, --omit-const-func, --omit-constant, --omit-pod, --overwrite-ok, --skip-autoloader, --skip-exporter, --skip-ppport, --skip-strict, --skip-warnings, --use-new-tests, --use-old-tests, --version, -?, -A, -B, -C, -O, -P, -X, -a, -d, -f, -g, -h, -k, -m, -v, -x
+- Allowed valued flags: --compat-version, --cpp-flags, --default-type, --func-mask, --gen-tied-var, --name, --omit-enums, --opaque-re, --remove-prefix, --const-subs, -F, -M, -b, -e, -n, -o, -p, -s, -t
+- Bare invocation allowed
+
 ### `hadolint`
 <p class="cmd-url"><a href="https://github.com/hadolint/hadolint">https://github.com/hadolint/hadolint</a></p>
 
@@ -4131,6 +4245,12 @@ Aliases: `gradlew`
 - Allowed valued flags: -c, -n, --bytes, --lines
 - Bare invocation allowed
 - Numeric shorthand accepted (e.g. -20 for -n 20)
+
+### `headerdoc2html`
+<p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/">https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/</a></p>
+
+- Allowed standalone flags: -H, -X, -d, -h, -p, -q, -u, -v, -x
+- Allowed valued flags: -o
 
 ### `helm`
 <p class="cmd-url"><a href="https://helm.sh/docs/helm/">https://helm.sh/docs/helm/</a></p>
@@ -4332,6 +4452,12 @@ Aliases: `gradlew`
 
 - Allowed standalone flags: --detect-base, --help, --ignore-whitespace, --pretty, --remove-nodes, --text, --version, -B, -V, -h, -p, -t, -w
 - Allowed valued flags: --attribute, --base, --filename, --output, -a, -b, -f, -o
+
+### `htmltree`
+<p class="cmd-url"><a href="https://metacpan.org/pod/HTML::TreeBuilder">https://metacpan.org/pod/HTML::TreeBuilder</a></p>
+
+- Allowed standalone flags: -h, -w
+- Hyphen-prefixed positional arguments accepted
 
 ### `htop`
 <p class="cmd-url"><a href="https://htop.dev/">https://htop.dev/</a></p>
@@ -4567,6 +4693,11 @@ Aliases: `hf`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `instmodsh`
+<p class="cmd-url"><a href="https://metacpan.org/pod/instmodsh">https://metacpan.org/pod/instmodsh</a></p>
+
+- Bare invocation allowed
+
 ### `ionic`
 <p class="cmd-url"><a href="https://ionicframework.com/docs/cli">https://ionicframework.com/docs/cli</a></p>
 
@@ -4593,6 +4724,26 @@ Aliases: `hf`
 - Allowed standalone flags: --accumulated, --batch, --help, --kilobytes, --only, --processes, --quiet, --version, -P, -V, -a, -b, -h, -k, -o, -q, -t
 - Allowed valued flags: --delay, --iter, --pid, --user, -d, -n, -p, -u
 - Bare invocation allowed
+
+### `ip2cc`
+<p class="cmd-url"><a href="https://metacpan.org/dist/IP-Country">https://metacpan.org/dist/IP-Country</a></p>
+
+- Bare invocation allowed
+
+### `ipconfig`
+<p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/Networking/Conceptual/SystemConfigFrameworks/SC_Intro/SC_Intro.html">https://developer.apple.com/library/archive/documentation/Networking/Conceptual/SystemConfigFrameworks/SC_Intro/SC_Intro.html</a></p>
+
+- **getdhcpduid**
+- **getdhcpiaid**
+- **getifaddr**
+- **getiflist**
+- **getoption**
+- **getpacket**
+- **getra**
+- **getsummary**
+- **getv6packet**
+- **ifcount**
+- **waitall**
 
 ### `iperf3`
 <p class="cmd-url"><a href="https://iperf.fr/iperf-doc.php">https://iperf.fr/iperf-doc.php</a></p>
@@ -4633,6 +4784,19 @@ Aliases: `iperf`
 - **swarm peers**: Positional args accepted
 - **version**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `ippfind`
+<p class="cmd-url"><a href="https://openprinting.github.io/cups/doc/man-ippfind.html">https://openprinting.github.io/cups/doc/man-ippfind.html</a></p>
+
+- Allowed standalone flags: --help, --version, --false, --ls, --local, --print, --print-name, --quiet, --remote, --true, --not, --and, --or, -4, -6, -l, -p, -q, -r, -s
+- Allowed valued flags: --domain, --host, --literal-name, --name, --path, --port, --txt, --uri, -T, -V, -N, -P, -d, -h, -n, -t, -u
+- Bare invocation allowed
+
+### `ipptool`
+<p class="cmd-url"><a href="https://openprinting.github.io/cups/doc/man-ipptool.html">https://openprinting.github.io/cups/doc/man-ipptool.html</a></p>
+
+- Allowed standalone flags: --help, --stop-after-include-error, --version, -4, -6, -C, -E, -I, -L, -S, -X, -c, -h, -l, -q, -t, -v
+- Allowed valued flags: -T, -V, -d, -f, -i, -n
 
 ### `ipython`
 <p class="cmd-url"><a href="https://ipython.org/">https://ipython.org/</a></p>
@@ -4885,6 +5049,20 @@ Aliases: `iperf`
 
 - Allowed standalone flags: --ascii-output, --color-output, --compact-output, --exit-status, --help, --join-output, --monochrome-output, --null-input, --raw-input, --raw-output, --raw-output0, --seq, --slurp, --sort-keys, --tab, --version, -C, -M, -R, -S, -V, -c, -e, -g, -h, -j, -n, -r, -s
 - Allowed valued flags: --arg, --argjson, --args, --from-file, --indent, --jsonargs, --rawfile, --slurpfile, -f
+- Bare invocation allowed
+
+### `json_pp`
+<p class="cmd-url"><a href="https://metacpan.org/pod/json_pp">https://metacpan.org/pod/json_pp</a></p>
+
+- Allowed standalone flags: -V, -v
+- Allowed valued flags: -f, -json_opt, -t
+- Bare invocation allowed
+
+### `json_xs`
+<p class="cmd-url"><a href="https://metacpan.org/pod/json_xs">https://metacpan.org/pod/json_xs</a></p>
+
+- Allowed standalone flags: -v
+- Allowed valued flags: -f, -t
 - Bare invocation allowed
 
 ### `jsonlint`
@@ -5336,6 +5514,32 @@ Aliases: `nbconvert`
 - Allowed standalone flags: --help, --palette-image, --version, -V, -c, -h
 - Allowed valued flags: --display-gamut, --flattened-image, --gpu-compression, --lossy-compression, --output, --scale, -f, -g, -l, -o, -p, -s
 
+### `ldapcompare`
+<p class="cmd-url"><a href="https://www.openldap.org/software/man.cgi?query=ldapcompare">https://www.openldap.org/software/man.cgi?query=ldapcompare</a></p>
+
+- Allowed standalone flags: -n, -v, -z, -M, -MM, -x, -W, -I, -Q, -Z, -ZZ
+- Allowed valued flags: -d, -D, -w, -y, -H, -h, -p, -P, -e, -E, -O, -U, -R, -X, -Y
+
+### `ldapsearch`
+<p class="cmd-url"><a href="https://www.openldap.org/software/man.cgi?query=ldapsearch">https://www.openldap.org/software/man.cgi?query=ldapsearch</a></p>
+
+- Allowed standalone flags: -n, -c, -u, -v, -A, -M, -MM, -L, -LL, -LLL, -x, -W, -I, -Q, -Z, -ZZ
+- Allowed valued flags: -S, -d, -f, -D, -w, -y, -H, -h, -p, -b, -s, -a, -P, -e, -E, -l, -z, -O, -U, -R, -X, -Y
+- Bare invocation allowed
+
+### `ldapurl`
+<p class="cmd-url"><a href="https://www.openldap.org/software/man.cgi?query=ldapurl">https://www.openldap.org/software/man.cgi?query=ldapurl</a></p>
+
+- Allowed valued flags: -a, -b, -e, -E, -f, -H, -h, -p, -s, -S
+- Bare invocation allowed
+
+### `ldapwhoami`
+<p class="cmd-url"><a href="https://www.openldap.org/software/man.cgi?query=ldapwhoami">https://www.openldap.org/software/man.cgi?query=ldapwhoami</a></p>
+
+- Allowed standalone flags: -n, -v, -z, -x, -W, -I, -Q, -Z, -ZZ
+- Allowed valued flags: -d, -D, -w, -y, -H, -h, -p, -e, -E, -O, -U, -R, -X, -Y
+- Bare invocation allowed
+
 ### `ldd`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/ldd.1.html">https://man7.org/linux/man-pages/man1/ldd.1.html</a></p>
 
@@ -5358,6 +5562,13 @@ Aliases: `nbconvert`
 
 - Allowed standalone flags: -E, -F, -G, -I, -J, -K, -L, -M, -N, -Q, -R, -S, -V, -W, -X, -a, -c, -e, -f, -g, -i, -m, -n, -q, -r, -s, -w, --QUIT-AT-EOF, --RAW-CONTROL-CHARS, --chop-long-lines, --help, --ignore-case, --no-init, --quiet, --quit-at-eof, --quit-if-one-screen, --raw-control-chars, --silent, --squeeze-blank-lines, --version
 - Allowed valued flags: -P, -b, -h, -j, -p, -t, -x, -y, -z, --LINE-NUMBERS, --LONG-PROMPT, --pattern, --prompt, --shift, --tabs, --tag, --window
+- Bare invocation allowed
+
+### `libnetcfg`
+<p class="cmd-url"><a href="https://metacpan.org/pod/libnetcfg">https://metacpan.org/pod/libnetcfg</a></p>
+
+- Allowed standalone flags: -c, -d, -h
+- Allowed valued flags: -i, -o
 - Bare invocation allowed
 
 ### `license-checker`
@@ -5726,6 +5937,13 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 <p class="cmd-url"><a href="https://github.com/qrush/m">https://github.com/qrush/m</a></p>
 
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `macbinary`
+<p class="cmd-url"><a href="https://opensource.apple.com/source/file_cmds/">https://opensource.apple.com/source/file_cmds/</a></p>
+
+- Allowed standalone flags: --force, --help, --pipe, --verbose, --version, -V, -c, -f, -h, -v
+- Allowed valued flags: --directory, --rename, --suffix, --type, -C, -o, -s, -t
+- Hyphen-prefixed positional arguments accepted
 
 ### `madge`
 <p class="cmd-url"><a href="https://github.com/pahen/madge">https://github.com/pahen/madge</a></p>
@@ -7097,6 +7315,12 @@ Aliases: `gnumfmt`
 
 - Allowed standalone flags: --help, --version, -h
 
+### `par.pl`
+<p class="cmd-url"><a href="https://metacpan.org/pod/par.pl">https://metacpan.org/pod/par.pl</a></p>
+
+- Allowed standalone flags: -B, -b, -h, -p
+- Allowed valued flags: -A, -I, -M, -O
+
 ### `parallel`
 <p class="cmd-url"><a href="https://www.gnu.org/software/parallel/">https://www.gnu.org/software/parallel/</a></p>
 
@@ -7118,6 +7342,12 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - **help**: Positional args accepted
 - **watch**: Flags: --help, -h. Valued: --cache-dir, --config, --dist-dir, --target
 - Allowed standalone flags: --help, --version, -h, -v, -V
+
+### `parl`
+<p class="cmd-url"><a href="https://metacpan.org/pod/parl">https://metacpan.org/pod/parl</a></p>
+
+- Allowed standalone flags: -B, -b, -h, -p
+- Allowed valued flags: -A, -I, -M, -O
 
 ### `pass`
 <p class="cmd-url"><a href="https://www.passwordstore.org/">https://www.passwordstore.org/</a></p>
@@ -7153,6 +7383,13 @@ Aliases: `pbpaste`
 
 - Allowed standalone flags: --decompress, --force, --help, --keep, --license, --read, --silent, --stdout, --test, --verbose, --version, -1, -2, -3, -4, -5, -6, -7, -8, -9, -V, -c, -d, -f, -h, -k, -l, -q, -r, -S, -t, -v, -z
 - Allowed valued flags: -b, -m, -p
+- Bare invocation allowed
+
+### `pcp-htop`
+<p class="cmd-url"><a href="https://man.archlinux.org/man/pcp-htop.1.en">https://man.archlinux.org/man/pcp-htop.1.en</a></p>
+
+- Allowed standalone flags: --help, --no-color, --no-colour, --no-function-bar, --no-meters, --no-mouse, --no-unicode, --readonly, --tree, --version, -C, -M, -U, -V, -h, -t
+- Allowed valued flags: --delay, --drop-capabilities, --filter, --highlight-changes, --pid, --sort-key, --user, -F, -H, -d, -p, -s, -u
 - Bare invocation allowed
 
 ### `pcre2grep`
@@ -7530,6 +7767,11 @@ Aliases: `pip3`
 - Requires --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist. - Allowed standalone flags: --check-signature, --export-plist, --file-info, --file-info-plist, --files, --group-pkgs, --groups, --groups-plist, --packages, --payload-files, --pkg-groups, --pkg-info, --pkg-info-plist, --pkgs, --pkgs-plist, --regexp, --help, -h
 - Allowed valued flags: --volume
 
+### `pl2pm`
+<p class="cmd-url"><a href="https://metacpan.org/pod/pl2pm">https://metacpan.org/pod/pl2pm</a></p>
+
+- Allowed standalone flags: -h
+
 ### `platform`
 <p class="cmd-url"><a href="https://docs.platform.sh/administration/cli.html">https://docs.platform.sh/administration/cli.html</a></p>
 
@@ -7764,6 +8006,46 @@ Aliases: `upsun`
 - **spec which**: Flags: --help, -h. Valued: --version
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `pod2html`
+<p class="cmd-url"><a href="https://metacpan.org/pod/pod2html">https://metacpan.org/pod/pod2html</a></p>
+
+- Allowed standalone flags: --backlink, --flush, --header, --help, --index, --nobacklink, --noheader, --noindex, --nopoderrors, --noquiet, --norecurse, --noverbose, --poderrors, --quiet, --recurse, --verbose
+- Allowed valued flags: --cachedir, --css, --htmldir, --htmlroot, --infile, --outfile, --podpath, --podroot, --title
+- Bare invocation allowed
+
+### `pod2man`
+<p class="cmd-url"><a href="https://metacpan.org/pod/pod2man">https://metacpan.org/pod/pod2man</a></p>
+
+- Allowed standalone flags: --help, --lax, --nourls, --official, --stderr, --utf8, --verbose, -h, -l, -o, -u, -v
+- Allowed valued flags: --center, --date, --errors, --fixed, --fixedbold, --fixedbolditalic, --fixeditalic, --lquote, --name, --quotes, --release, --rquote, --section, -c, -d, -n, -q, -r, -s
+- Bare invocation allowed
+
+### `pod2readme`
+<p class="cmd-url"><a href="https://metacpan.org/pod/pod2readme">https://metacpan.org/pod/pod2readme</a></p>
+
+- Allowed standalone flags: --backup, --force, --help, --no-backup, --stdout, -F, -b, -c, -h
+- Allowed valued flags: --format, --output, --target, -f, -o, -t
+
+### `pod2text`
+<p class="cmd-url"><a href="https://metacpan.org/pod/pod2text">https://metacpan.org/pod/pod2text</a></p>
+
+- Allowed standalone flags: --alt, --code, --color, --help, --loose, --nourls, --overstrike, --sentence, --stderr, --termcap, --utf8, -a, -c, -h, -l, -o, -s, -t, -u
+- Allowed valued flags: --errors, --indent, --left-margin, --margin, --quotes, --width, -i, -m, -q, -w
+- Bare invocation allowed
+
+### `pod2usage`
+<p class="cmd-url"><a href="https://metacpan.org/pod/pod2usage">https://metacpan.org/pod/pod2usage</a></p>
+
+- Allowed standalone flags: -help, -man, -utf8
+- Allowed valued flags: -exit, -formatter, -output, -pathlist, -verbose
+- Bare invocation allowed
+
+### `podchecker`
+<p class="cmd-url"><a href="https://metacpan.org/pod/podchecker">https://metacpan.org/pod/podchecker</a></p>
+
+- Allowed standalone flags: --help, --man, --nowarnings, --warnings
+- Bare invocation allowed
+
 ### `podman`
 <p class="cmd-url"><a href="https://docs.podman.io/en/latest/Commands.html">https://docs.podman.io/en/latest/Commands.html</a></p>
 
@@ -7850,6 +8132,13 @@ Aliases: `upsun`
 - **target list**: Flags: --help, --preview, -h. Valued: --cluster, --project
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `pp`
+<p class="cmd-url"><a href="https://metacpan.org/pod/pp">https://metacpan.org/pod/pp</a></p>
+
+- Allowed standalone flags: --addlist, --bundle, --clean, --compile, --compress, --dependent, --evalfeature, --execute, --force, --gui, --help, --lib, --multiarch, --noscan, --par, --perlscript, --reusable, --run, --save, --sign, --verbose, --version, --warning, -B, -C, -S, -T, -V, -X, -c, -d, -g, -h, -n, -p, -r, -s, -u, -v, -z
+- Allowed valued flags: --addfile, --cachedeps, --cipher, --eval, --filter, --icon, --info, --link, --log, --manifest, --modfilter, --module, --output, --tempcache, --xargs, -A, -E, -F, -I, -L, -M, -N, -a, -cd, -e, -f, -i, -l, -m, -o, -x
+- Hyphen-prefixed positional arguments accepted
+
 ### `pre-commit`
 <p class="cmd-url"><a href="https://pre-commit.com/">https://pre-commit.com/</a></p>
 
@@ -7934,6 +8223,13 @@ Aliases: `upsun`
 <p class="cmd-url"><a href="https://protobuf.dev/programming-guides/proto3/">https://protobuf.dev/programming-guides/proto3/</a></p>
 
 - Allowed standalone flags: --help, --version, -h
+
+### `prove`
+<p class="cmd-url"><a href="https://metacpan.org/pod/prove">https://metacpan.org/pod/prove</a></p>
+
+- Allowed standalone flags: --QUIET, --blib, --color, --comments, --count, --directives, --dry, --failures, --help, --ignore-exit, --lib, --man, --merge, --nocolor, --nocount, --norc, --normalize, --parse, --quiet, --recurse, --reverse, --shuffle, --timer, --trap, --verbose, --version, -?, -D, -H, -Q, -T, -V, -W, -b, -c, -f, -h, -l, -m, -o, -p, -q, -r, -s, -t, -v, -w
+- Allowed valued flags: --archive, --exec, --ext, --formatter, --harness, --jobs, --rc, --rules, --source, --state, --statefile, -I, -M, -P, -a, -e, -j
+- Bare invocation allowed
 
 ### `pry`
 <p class="cmd-url"><a href="https://github.com/pry/pry">https://github.com/pry/pry</a></p>
@@ -8799,6 +9095,12 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 - `scalingo l`
 - `scalingo --version`
 
+### `scandeps.pl`
+<p class="cmd-url"><a href="https://metacpan.org/pod/scandeps.pl">https://metacpan.org/pod/scandeps.pl</a></p>
+
+- Allowed standalone flags: --bundle, --modtree, --no-recurse, --verbose, -B, -R, -T, -V
+- Allowed valued flags: --cachedeps, -C
+
 ### `sccache`
 <p class="cmd-url"><a href="https://github.com/mozilla/sccache">https://github.com/mozilla/sccache</a></p>
 
@@ -9115,6 +9417,85 @@ Aliases: `serverless`
 - **metrics**: Flags: --debug, --help, -h. Valued: --config, --endTime, --function, --region, --stage, --startTime, -c, -f, -r, -s. Positional args accepted
 - **print**: Flags: --debug, --help, -h. Valued: --config, --format, --path, --region, --stage, --transform, -c, -r, -s. Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `snmpbulkget`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpbulkget.html">https://net-snmp.sourceforge.io/docs/man/snmpbulkget.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -Cn, -Cr
+
+### `snmpbulkwalk`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpbulkwalk.html">https://net-snmp.sourceforge.io/docs/man/snmpbulkwalk.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cc, -Ci, -Cp
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -Cn, -Cr
+
+### `snmpdelta`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpdelta.html">https://net-snmp.sourceforge.io/docs/man/snmpdelta.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cf, -Ct, -Cs, -CS, -Cm, -Ck, -CT
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -CF, -Cp, -CP, -Cv
+
+### `snmpdf`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpdf.html">https://net-snmp.sourceforge.io/docs/man/snmpdf.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cu
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c
+
+### `snmpget`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpget.html">https://net-snmp.sourceforge.io/docs/man/snmpget.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cf
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c
+
+### `snmpgetnext`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpgetnext.html">https://net-snmp.sourceforge.io/docs/man/snmpgetnext.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cf
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c
+
+### `snmpnetstat`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpnetstat.html">https://net-snmp.sourceforge.io/docs/man/snmpnetstat.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Ca, -Cn, -Ci, -Co, -Cr, -Cs
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -CI, -Cp
+
+### `snmpstatus`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpstatus.html">https://net-snmp.sourceforge.io/docs/man/snmpstatus.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cf
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c
+
+### `snmptable`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmptable.html">https://net-snmp.sourceforge.io/docs/man/snmptable.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cb, -CB, -Ch, -CH, -Ci, -Cl
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -Cc, -Cf, -Cr, -Cw
+
+### `snmptest`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmptest.html">https://net-snmp.sourceforge.io/docs/man/snmptest.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c
+
+### `snmptranslate`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmptranslate.html">https://net-snmp.sourceforge.io/docs/man/snmptranslate.html</a></p>
+
+- Allowed standalone flags: -h, --help, -V, --version, -Td, -Tp, -Ta, -Tl, -To, -Ts, -Tt, -Tz, -Tb, -Tn, -On, -Of, -Os, -OS, -OU
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -w
+- Bare invocation allowed
+
+### `snmpwalk`
+<p class="cmd-url"><a href="https://net-snmp.sourceforge.io/docs/man/snmpwalk.html">https://net-snmp.sourceforge.io/docs/man/snmpwalk.html</a></p>
+
+- Allowed standalone flags: -d, -h, --help, -H, -V, --version, -Cc, -Ci, -CI, -Cp, -Ct
+- Allowed valued flags: -D, -I, -L, -m, -M, -O, -P, -r, -t, -v, -Y, -l, -n, -a, -A, -e, -E, -u, -x, -X, -Z, -c, -CE
+
+### `sntp`
+<p class="cmd-url"><a href="https://www.eecis.udel.edu/~mills/ntp/html/sntp.html">https://www.eecis.udel.edu/~mills/ntp/html/sntp.html</a></p>
+
+- Allowed standalone flags: --help, --version, --ipv4, --ipv6, --authentication, --broadcast, --concurrent, --usereservedport, --wait, -?, -4, -6, -a, -b, -c, -d, -r
+- Allowed valued flags: --bctimeout, --debug-level, --set-debug-level, --gap, --keyfile, --ntpversion, --steplimit, --uctimeout, -B, -D, -g, -k, -M, -n, -o, -t, -u
 
 ### `snyk`
 <p class="cmd-url"><a href="https://docs.snyk.io/snyk-cli">https://docs.snyk.io/snyk-cli</a></p>
@@ -10261,6 +10642,12 @@ Aliases: `traceroute6`
 - Allowed standalone flags: --all, --help, --kernel-name, --kernel-release, --kernel-version, --machine, --nodename, --operating-system, --processor, --version, -V, -a, -h, -m, -n, -o, -p, -r, -s, -v
 - Bare invocation allowed
 
+### `unbound-host`
+<p class="cmd-url"><a href="https://nlnetlabs.nl/documentation/unbound/unbound-host/">https://nlnetlabs.nl/documentation/unbound/unbound-host/</a></p>
+
+- Allowed standalone flags: -h, -v, -d, -D, -r, -4, -6
+- Allowed valued flags: -c, -t, -y, -f, -F, -C
+
 ### `unbuffer`
 <p class="cmd-url"><a href="https://core.tcl-lang.org/expect/">https://core.tcl-lang.org/expect/</a></p>
 
@@ -10301,6 +10688,18 @@ Aliases: `traceroute6`
 <p class="cmd-url"><a href="https://github.com/xo/usql">https://github.com/xo/usql</a></p>
 
 - Allowed standalone flags: --help, --version, -V
+
+### `uudecode`
+<p class="cmd-url"><a href="https://man.openbsd.org/uudecode">https://man.openbsd.org/uudecode</a></p>
+
+- Allowed standalone flags: -c, -i, -m, -p, -r, -s
+- Allowed valued flags: -o
+
+### `uuencode`
+<p class="cmd-url"><a href="https://man.openbsd.org/uuencode">https://man.openbsd.org/uuencode</a></p>
+
+- Allowed standalone flags: -m, -r
+- Allowed valued flags: -o
 
 ### `uuidgen`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/uuidgen.1.html">https://man7.org/linux/man-pages/man1/uuidgen.1.html</a></p>
@@ -10841,6 +11240,12 @@ Aliases: `traceroute6`
 - **symbolicate**: Flags: --quiet, --help, -h. Valued: --dsym, --input, --output
 - **version**: Flags: --help, -h
 
+### `xgettext.pl`
+<p class="cmd-url"><a href="https://metacpan.org/pod/xgettext.pl">https://metacpan.org/pod/xgettext.pl</a></p>
+
+- Allowed standalone flags: --gnu-gettext, --help, --no-warnings, --use-gettext-style, --verbose, --wrap, -W, -g, -h, -now, -u, -v
+- Allowed valued flags: --default-domain, --directory, --files-from, --output, --output-dir, --plugin, -D, -P, -d, -f, -o, -p
+
 ### `xh`
 <p class="cmd-url"><a href="https://github.com/ducaale/xh">https://github.com/ducaale/xh</a></p>
 
@@ -10877,6 +11282,12 @@ Aliases: `traceroute6`
 - Allowed valued flags: --display, --logfile, --selection-name
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+### `xsubpp`
+<p class="cmd-url"><a href="https://metacpan.org/pod/distribution/ExtUtils-ParseXS/lib/ExtUtils/ParseXS.pm">https://metacpan.org/pod/distribution/ExtUtils-ParseXS/lib/ExtUtils/ParseXS.pm</a></p>
+
+- Allowed standalone flags: -C++, -except, -hiertype, -noargtypes, -noinout, -nolinenumbers, -nooptimize, -noversioncheck, -prototypes, -v
+- Allowed valued flags: -output, -s, -strip, -typemap
 
 ### `xsv`
 <p class="cmd-url"><a href="https://github.com/BurntSushi/xsv">https://github.com/BurntSushi/xsv</a></p>

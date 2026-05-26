@@ -1,0 +1,18 @@
+[[command]]
+name = "ippfind"
+description = "Finds IPP printers and other services advertised on the local network via DNS-SD/mDNS. Probes the network for service registrations (no writes), then prints or lists attributes for each match. Expressions resemble find(1) — regex tests on domain, host, name, port, URI, plus boolean composition. The --exec/-x expression would run an arbitrary external program for each match and is excluded here (the program it spawns is invisible to surrounding tooling). Ships with CUPS; tracks CUPS releases, roughly yearly minor versions."
+url = "https://openprinting.github.io/cups/doc/man-ippfind.html"
+researched_version = "CUPS 2.4.19"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--version",
+    "--false", "--ls", "--local", "--print", "--print-name",
+    "--quiet", "--remote", "--true", "--not", "--and", "--or",
+    "-4", "-6", "-l", "-p", "-q", "-r", "-s",
+]
+valued = [
+    "--domain", "--host", "--literal-name", "--name",
+    "--path", "--port", "--txt", "--uri",
+    "-T", "-V", "-N", "-P", "-d", "-h", "-n", "-t", "-u",
+]

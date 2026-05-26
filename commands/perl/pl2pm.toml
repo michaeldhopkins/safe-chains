@@ -1,0 +1,8 @@
+[[command]]
+name = "pl2pm"
+description = "Mechanical converter from Perl 4 `.pl` library files to Perl 5 `.pm` module files. Reads each given .pl file and writes a sibling .pm with light syntactic rewrites (package declaration, autoload stubs). Modifies the working tree by creating .pm files next to the inputs. Bundled with Perl core; surface is zero flags and frozen — the tool is described in its own docs as `a first step` and has not received meaningful changes in many years."
+url = "https://metacpan.org/pod/pl2pm"
+researched_version = "Perl 5.34+ bundled"
+level = "SafeWrite"
+bare = false
+standalone = ["-h"]

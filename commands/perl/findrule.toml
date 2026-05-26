@@ -1,0 +1,9 @@
+[[command]]
+name = "findrule"
+description = "File::Find::Rule CLI wrapper that mirrors GNU find(1)'s expression model — each rule is a dash-prefixed predicate (e.g. -file, -name, -directory, -mtime) optionally followed by an argument or a parenthesized list. Read-only filesystem traversal: stat()s files, prints matches to stdout, does not modify anything. The full predicate vocabulary depends on which File::Find::Rule extension modules are installed (findrule auto-loads them all). Released as part of File-Find-Rule on CPAN; the CLI is a thin wrapper and the core rule names have been stable for over a decade."
+url = "https://metacpan.org/pod/File::Find::Rule"
+researched_version = "File-Find-Rule 0.34"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true
+standalone = ["-h", "--help"]

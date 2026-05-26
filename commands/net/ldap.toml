@@ -1,0 +1,63 @@
+[[command]]
+name = "ldapcompare"
+description = "OpenLDAP compare client. Binds to an LDAP server, performs a compare extended operation against a DN and asserted attribute value, and returns TRUE/FALSE/UNDEFINED. Read-only at the directory level (no write extended operation). Generates network traffic with each invocation; passwords may be supplied on the command line, in a file, or interactively. The CLI surface is essentially frozen across OpenLDAP 2.4 and 2.6."
+url = "https://www.openldap.org/software/man.cgi?query=ldapcompare"
+researched_version = "OpenLDAP 2.6.13"
+level = "Inert"
+bare = false
+standalone = [
+    "-n", "-v", "-z", "-M", "-MM",
+    "-x", "-W", "-I", "-Q",
+    "-Z", "-ZZ",
+]
+valued = [
+    "-d", "-D", "-w", "-y", "-H", "-h", "-p", "-P",
+    "-e", "-E", "-O", "-U", "-R", "-X", "-Y",
+]
+
+[[command]]
+name = "ldapsearch"
+description = "OpenLDAP search client. Binds to an LDAP server, performs a search, and returns matching entries in LDIF. Read-only at the directory level. Generates network traffic with each invocation; the -f option reads a series of search filters from a file. The -t/-T/-F flags would write retrieved binary values to local temp files and are excluded here. The CLI surface is essentially frozen across OpenLDAP 2.4 and 2.6."
+url = "https://www.openldap.org/software/man.cgi?query=ldapsearch"
+researched_version = "OpenLDAP 2.6.13"
+level = "Inert"
+bare = true
+standalone = [
+    "-n", "-c", "-u", "-v", "-A", "-M", "-MM",
+    "-L", "-LL", "-LLL",
+    "-x", "-W", "-I", "-Q",
+    "-Z", "-ZZ",
+]
+valued = [
+    "-S", "-d", "-f", "-D", "-w", "-y", "-H", "-h", "-p",
+    "-b", "-s", "-a", "-P", "-e", "-E", "-l", "-z",
+    "-O", "-U", "-R", "-X", "-Y",
+]
+
+[[command]]
+name = "ldapurl"
+description = "OpenLDAP URL formatter. Composes an LDAP URI from components (host, port, base DN, scheme, filter, attributes, scope) or decomposes a supplied URI back into components. Local-only: does not connect to any LDAP server and does not touch the filesystem. The CLI surface is small and essentially frozen across OpenLDAP 2.4 and 2.6."
+url = "https://www.openldap.org/software/man.cgi?query=ldapurl"
+researched_version = "OpenLDAP 2.6.13"
+level = "Inert"
+bare = true
+valued = [
+    "-a", "-b", "-e", "-E", "-f", "-H", "-h", "-p", "-s", "-S",
+]
+
+[[command]]
+name = "ldapwhoami"
+description = "OpenLDAP Who Am I? client. Binds to an LDAP server, issues the Who Am I? extended operation, and prints the bound identity. Read-only at the directory level. Generates network traffic with each invocation. The CLI surface is essentially frozen across OpenLDAP 2.4 and 2.6."
+url = "https://www.openldap.org/software/man.cgi?query=ldapwhoami"
+researched_version = "OpenLDAP 2.6.13"
+level = "Inert"
+bare = true
+standalone = [
+    "-n", "-v", "-z",
+    "-x", "-W", "-I", "-Q",
+    "-Z", "-ZZ",
+]
+valued = [
+    "-d", "-D", "-w", "-y", "-H", "-h", "-p",
+    "-e", "-E", "-O", "-U", "-R", "-X", "-Y",
+]

@@ -1,0 +1,75 @@
+[[command]]
+name = "ipconfig"
+description = "macOS utility that communicates with the IPConfiguration agent to view and control IP configuration state. The read commands (waitall, getifaddr, ifcount, getoption, getpacket, getv6packet, getra, getsummary, getdhcpduid, getdhcpiaid, getiflist) print current addresses, DHCP packets, router advertisements, and identifiers without modifying state. The write commands (set, setverbose) tear down existing services and configure new ones, require root, and are excluded here. Ships with macOS; the surface has been stable since 10.0."
+url = "https://developer.apple.com/library/archive/documentation/Networking/Conceptual/SystemConfigFrameworks/SC_Intro/SC_Intro.html"
+researched_version = "macOS 14 (Sonoma), surface frozen"
+
+[[command.sub]]
+name = "waitall"
+level = "SafeRead"
+max_positional = 0
+
+[[command.sub]]
+name = "getifaddr"
+level = "Inert"
+bare = false
+max_positional = 1
+
+[[command.sub]]
+name = "ifcount"
+level = "Inert"
+max_positional = 0
+
+[[command.sub]]
+name = "getoption"
+level = "Inert"
+bare = false
+max_positional = 2
+
+[[command.sub]]
+name = "getpacket"
+level = "Inert"
+bare = false
+max_positional = 1
+
+[[command.sub]]
+name = "getv6packet"
+level = "Inert"
+bare = false
+max_positional = 1
+
+[[command.sub]]
+name = "getra"
+level = "Inert"
+bare = false
+max_positional = 1
+
+[[command.sub]]
+name = "getsummary"
+level = "Inert"
+bare = false
+max_positional = 1
+
+[[command.sub]]
+name = "getiflist"
+level = "Inert"
+max_positional = 0
+
+[[command.sub]]
+name = "getdhcpduid"
+level = "Inert"
+max_positional = 0
+
+[[command.sub]]
+name = "getdhcpiaid"
+level = "Inert"
+bare = false
+max_positional = 1
+
+[[command.sub]]
+name = "set"
+candidate = true
+
+[[command.sub]]
+name = "setverbose"
+candidate = true

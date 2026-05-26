@@ -1,0 +1,9 @@
+[[command]]
+name = "enc2xs"
+description = "Encode-module extension generator. Reads .ucm (Unicode Character Mapping) or .enc (Tcl encoding) files and produces a Perl XS extension skeleton (Makefile.PL, .pm, .c, .t) implementing a new encoding for the Encode module. Writes generated files into the current directory or the directory named by -o. -C updates Encode::ConfigLocal in the installed perl tree (system-wide install — excluded here, mutates installed perl). Bundled with Perl core (Encode distribution); the CLI surface is small and stable."
+url = "https://metacpan.org/pod/enc2xs"
+researched_version = "Encode 3.x (Perl 5.34+ bundled)"
+level = "SafeWrite"
+bare = false
+standalone = ["-Q", "-q", "-v"]
+valued = ["-M", "-f", "-o"]

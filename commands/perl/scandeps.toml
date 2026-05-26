@@ -1,0 +1,9 @@
+[[command]]
+name = "scandeps.pl"
+description = "Module::ScanDeps frontend that statically inspects the given Perl source files (or recursively their dependencies) and prints a PREREQ_PM-style list of required modules to stdout. The static-scan mode is read-only. The tool also supports -c (compiles the code via perl -c, runs BEGIN blocks), -x/--execute (runs the code under perl), and -e CODE / --xargs (evaluates a Perl string); those modes are arbitrary code execution and are excluded here. Distributed with Module-ScanDeps on CPAN; CLI surface stable for years."
+url = "https://metacpan.org/pod/scandeps.pl"
+researched_version = "Module-ScanDeps 1.36"
+level = "Inert"
+bare = false
+standalone = ["--bundle", "--modtree", "--no-recurse", "--verbose", "-B", "-R", "-T", "-V"]
+valued = ["--cachedeps", "-C"]

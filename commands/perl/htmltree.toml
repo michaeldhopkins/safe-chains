@@ -1,0 +1,9 @@
+[[command]]
+name = "htmltree"
+description = "HTML::TreeBuilder demonstrator that parses each given HTML file (or stdin) and dumps the parsed DOM as text to stdout. Read-only: opens files for reading, prints a tree representation. -D[number] sets HTML::TreeBuilder::Debug verbosity; -w enables tree warnings; -h prints help. Bundled with HTML-Tree on CPAN; minimal CLI surface, effectively frozen since 2015."
+url = "https://metacpan.org/pod/HTML::TreeBuilder"
+researched_version = "HTML-Tree 5.07"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+standalone = ["-h", "-w"]

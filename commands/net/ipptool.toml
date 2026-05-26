@@ -1,0 +1,15 @@
+[[command]]
+name = "ipptool"
+description = "Sends Internet Printing Protocol (IPP) requests defined by a testfile to a printer or IPP server and reports the results. Connects over the network to the specified printer-uri using HTTP/IPP, optionally with TLS (-E forces upgrade, -S forces dedicated TLS). The testfile drives the exchange; output is plain text, CSV, or CUPS test report (-t). The --ippserver flag and the -P flag write attribute and XML plist files locally; both are excluded. Ships with CUPS; the CLI surface tracks CUPS releases, currently about one minor release per year."
+url = "https://openprinting.github.io/cups/doc/man-ipptool.html"
+researched_version = "CUPS 2.4.19"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--help", "--stop-after-include-error", "--version",
+    "-4", "-6", "-C", "-E", "-I", "-L", "-S", "-X",
+    "-c", "-h", "-l", "-q", "-t", "-v",
+]
+valued = [
+    "-T", "-V", "-d", "-f", "-i", "-n",
+]

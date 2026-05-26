@@ -1,0 +1,21 @@
+[[command]]
+name = "prove"
+description = "Test::Harness command-line runner that executes one or more TAP-emitting test scripts (typically Perl t/*.t files but anything via --exec INTERPRETER) and prints pass/fail summaries. Runs arbitrary user-provided test code, so it is not inert; it does not by itself modify project source. --archive FILE writes a TAP archive tarball; --state[=file] reads and writes a .prove state file in the current directory to remember last-run results. Distributed as Test-Harness on CPAN and bundled with Perl core; the CLI has been broadly stable since the App::Prove rewrite (2008-era) and continues to receive incremental updates."
+url = "https://metacpan.org/pod/prove"
+researched_version = "Test-Harness 3.44"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--QUIET", "--blib", "--color", "--comments", "--count",
+    "--directives", "--dry", "--failures", "--help", "--ignore-exit",
+    "--lib", "--man", "--merge", "--nocolor", "--nocount", "--norc",
+    "--normalize", "--parse", "--quiet", "--recurse", "--reverse",
+    "--shuffle", "--timer", "--trap", "--verbose", "--version",
+    "-?", "-D", "-H", "-Q", "-T", "-V", "-W", "-b", "-c", "-f", "-h",
+    "-l", "-m", "-o", "-p", "-q", "-r", "-s", "-t", "-v", "-w",
+]
+valued = [
+    "--archive", "--exec", "--ext", "--formatter", "--harness",
+    "--jobs", "--rc", "--rules", "--source", "--state", "--statefile",
+    "-I", "-M", "-P", "-a", "-e", "-j",
+]

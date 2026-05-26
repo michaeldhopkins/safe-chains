@@ -1,0 +1,33 @@
+[[command]]
+name = "h2ph"
+description = "Reads C header file(s) (or stdin) and writes corresponding Perl `.ph` header files to a destination directory (default: Perl's installsitearch; -d overrides). -r recurses through given directories; -a additionally follows #include chains via the system C compiler's include path; -l replicates symlinks. Output is generated Perl source. Bundled with Perl core; surface is small and stable."
+url = "https://metacpan.org/pod/h2ph"
+researched_version = "Perl 5.34+ bundled"
+level = "SafeWrite"
+bare = true
+standalone = ["-D", "-Q", "-a", "-e", "-h", "-l", "-r"]
+valued = ["-d"]
+
+[[command]]
+name = "h2xs"
+description = "Generates a Perl extension skeleton (Makefile.PL, .pm, .xs, t/, Changes, MANIFEST) from one or more C header files, or with -X for a pure-Perl module with no XS. Writes a new module directory under the current directory; -O overwrites an existing one. -F passes additional flags to the C preprocessor when scanning headers. Bundled with Perl core; surface is large but stable across Perl 5 releases."
+url = "https://metacpan.org/pod/h2xs"
+researched_version = "Perl 5.34+ bundled"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--beta-version", "--debugging", "--force", "--gen-accessors",
+    "--global", "--help", "--omit-XS", "--omit-autoload",
+    "--omit-changes", "--omit-const-func", "--omit-constant",
+    "--omit-pod", "--overwrite-ok", "--skip-autoloader", "--skip-exporter",
+    "--skip-ppport", "--skip-strict", "--skip-warnings",
+    "--use-new-tests", "--use-old-tests", "--version",
+    "-?", "-A", "-B", "-C", "-O", "-P", "-X", "-a", "-d", "-f",
+    "-g", "-h", "-k", "-m", "-v", "-x",
+]
+valued = [
+    "--compat-version", "--cpp-flags", "--default-type", "--func-mask",
+    "--gen-tied-var", "--name", "--omit-enums", "--opaque-re",
+    "--remove-prefix", "--const-subs",
+    "-F", "-M", "-b", "-e", "-n", "-o", "-p", "-s", "-t",
+]

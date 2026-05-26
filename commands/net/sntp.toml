@@ -1,0 +1,19 @@
+[[command]]
+name = "sntp"
+description = "Simple Network Time Protocol client. Queries one or more NTP servers and prints the offset, optionally stepping or slewing the system clock. The flags that change the clock (-S/--step, -s/--slew) and the flags that write local state files (-K/--kod, -l/--filelog, -z on the macOS port) are excluded here, leaving only the query and diagnostic flags. macOS ships its own simplified sntp; the Network Time Foundation distribution is a separate codebase. Both share the same short-flag conventions for the clock-modifying flags."
+url = "https://www.eecis.udel.edu/~mills/ntp/html/sntp.html"
+researched_version = "macOS 14 sntp + NTF ntp-4.2.8p18"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--version",
+    "--ipv4", "--ipv6", "--authentication", "--broadcast",
+    "--concurrent", "--usereservedport", "--wait",
+    "-?", "-4", "-6", "-a", "-b", "-c", "-d", "-r",
+]
+valued = [
+    "--bctimeout", "--debug-level", "--set-debug-level",
+    "--gap", "--keyfile", "--ntpversion", "--steplimit",
+    "--uctimeout",
+    "-B", "-D", "-g", "-k", "-M", "-n", "-o", "-t", "-u",
+]
