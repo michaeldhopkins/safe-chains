@@ -1,0 +1,13 @@
+[[command]]
+name = "mtree"
+description = "Maps a directory hierarchy and either prints a specification, reads one back to verify, or applies one. Default mode reads a spec from stdin (or -f) and reports drift versus the live tree (read-only). -c emits a new spec to stdout (read-only — no filesystem writes). -U / -u modify the live tree to match the spec (chown, chmod, chtime, create missing dirs/symlinks). -r removes files not described in the spec. BSD-derived utility; macOS extends keywords with APFS-specific concepts (purgeable, dataless, protectionclass). Surface stable for years."
+url = "https://man.freebsd.org/cgi/man.cgi?mtree"
+researched_version = "macOS 14 (Apple stock, BSD-derived)"
+level = "Inert"
+bare = true
+write_flags = ["-U", "-u", "-r"]
+standalone = [
+    "-D", "-L", "-P", "-S", "-U", "-c", "-d", "-e",
+    "-i", "-n", "-q", "-r", "-u", "-w", "-x",
+]
+valued = ["-K", "-X", "-f", "-k", "-p", "-s"]

@@ -1,0 +1,8 @@
+[[command]]
+name = "afscexpand"
+description = "Decompresses files that were stored with HFS+ transparent compression, walking the given paths recursively but staying on the starting filesystem. By default the files are rewritten in place; with -c the decompressed content is printed to standard output instead. Local-only; no network access. macOS-only utility, surface unchanged since Mac OS X 10.6."
+url = "https://ss64.com/mac/afscexpand.html"
+researched_version = "macOS 14 (Apple stock)"
+level = "SafeWrite"
+bare = false
+standalone = ["-c"]

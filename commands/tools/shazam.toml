@@ -1,0 +1,40 @@
+[[command]]
+name = "shazam"
+description = "Utility for ShazamKit. signature generates a .shazamsignature file from a media input (write). custom-catalog has read and write subs: display prints the contents of an existing catalog file; create, update, export, and remove modify or extract data on disk. Entirely local; no network."
+url = "https://developer.apple.com/documentation/shazamkit"
+researched_version = "macOS 14 shazam(1)"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "signature"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--input", "--output"]
+
+[[command.sub]]
+name = "custom-catalog"
+nested_bare = true
+
+[[command.sub.sub]]
+name = "display"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--input"]
+
+[[command.sub.sub]]
+name = "create"
+candidate = true
+
+[[command.sub.sub]]
+name = "update"
+candidate = true
+
+[[command.sub.sub]]
+name = "export"
+candidate = true
+
+[[command.sub.sub]]
+name = "remove"
+candidate = true

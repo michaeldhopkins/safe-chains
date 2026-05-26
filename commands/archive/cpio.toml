@@ -1,0 +1,30 @@
+[[command]]
+name = "cpio"
+description = "Copy files to and from archives. Exactly one mode is required: -i / --extract reads an archive from stdin and extracts (or with -t, lists), -o / --create reads filenames from stdin and writes an archive to stdout, -p / --pass-through copies files to a destination directory. Supports formats including newc, odc, pax, ustar, and reads tar/pax/cpio/zip/jar/ar/ISO9660. -y / -J / -z / -Z / --lzma / --lz4 / --zstd / --lzop / --lrzip select compression on output. --insecure disables symlink/absolute-path/.. defenses on extract."
+url = "https://www.freebsd.org/cgi/man.cgi?cpio"
+researched_version = "libarchive bsdcpio (macOS bundled)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--binary", "--create", "--dot",
+    "--extract", "--help", "--insecure",
+    "--link", "--list", "--lrzip", "--lz4",
+    "--lzma", "--lzop", "--make-directories",
+    "--null", "--numeric-uid-gid",
+    "--no-preserve-owner", "--pass-through",
+    "--preserve-modification-time",
+    "--preserve-owner", "--pwb", "--quiet",
+    "--unconditional", "--verbose",
+    "--version", "--xz", "--zstd",
+    "-0", "-6", "-7", "-A", "-B", "-J",
+    "-L", "-V", "-Z", "-a", "-c", "-d",
+    "-i", "-j", "-l", "-m", "-n", "-o",
+    "-p", "-r", "-t", "-u", "-v", "-y", "-z",
+]
+valued = [
+    "--file", "--format", "--owner",
+    "--passphrase",
+    "-C", "-E", "-F", "-H", "-I",
+    "-O", "-R", "-f",
+]

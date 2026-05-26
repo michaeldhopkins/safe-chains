@@ -1,0 +1,24 @@
+[[command]]
+name = "osacompile"
+description = "Compiles AppleScript (or another OSA language) source into a script file. With -e, accepts inline command source; with -o, controls the output path. By default writes a.scpt in the current directory. -x marks output as execute-only; -s/-u shape applet packaging. The compile step is local and does not execute the script — but the produced .scpt/.app is an arbitrary-code artifact. Entirely local; no network."
+url = "https://keith.github.io/xcode-man-pages/osacompile.1.html"
+researched_version = "macOS 14 osacompile(1)"
+level = "SafeWrite"
+standalone = ["-d", "-x", "-s", "-u"]
+valued = ["-l", "-e", "-o", "-r", "-t", "-c"]
+
+[[command]]
+name = "osadecompile"
+description = "Writes the source text of a compiled AppleScript or OSA script file to standard output. Reads the script's compiled form; the correct language component is detected from the file contents. No options. Entirely local; no network."
+url = "https://keith.github.io/xcode-man-pages/osadecompile.1.html"
+researched_version = "macOS 14 osadecompile(1)"
+level = "Inert"
+bare = false
+
+[[command]]
+name = "osalang"
+description = "Prints information about installed OSA scripting languages. With no options, lists names suitable for osacompile -l / osascript -l. -d prints only the default language; -l adds component subtype, manufacturer, and capability flags; -L additionally prints the language description. Read-only."
+url = "https://keith.github.io/xcode-man-pages/osalang.1.html"
+researched_version = "macOS 14 osalang(1)"
+level = "Inert"
+standalone = ["-d", "-l", "-L"]

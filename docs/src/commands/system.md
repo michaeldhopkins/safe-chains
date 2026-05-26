@@ -21,6 +21,31 @@
 - **which**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `at`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/at.1p.html">https://man7.org/linux/man-pages/man1/at.1p.html</a></p>
+
+- Allowed standalone flags: --help, -V, -b, -c, -d, -l, -m, -r, -v
+- Allowed valued flags: -f, -q, -t
+
+### `atq`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/atq.1p.html">https://man7.org/linux/man-pages/man1/atq.1p.html</a></p>
+
+- Allowed standalone flags: --help, -V, -v
+- Allowed valued flags: -q
+- Bare invocation allowed
+
+### `atrm`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/atrm.1p.html">https://man7.org/linux/man-pages/man1/atrm.1p.html</a></p>
+
+- Allowed standalone flags: --help, -V
+
+### `batch`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/batch.1p.html">https://man7.org/linux/man-pages/man1/batch.1p.html</a></p>
+
+- Allowed standalone flags: --help, -V, -m, -v
+- Allowed valued flags: -f, -q
+- Bare invocation allowed
+
 ### `bazel`
 <p class="cmd-url"><a href="https://bazel.build/reference/command-line-reference">https://bazel.build/reference/command-line-reference</a></p>
 
@@ -63,6 +88,11 @@
 - **upgrade** (requires --dry-run): Flags: --cask, --debug, --dry-run, --fetch-HEAD, --formula, --greedy, --greedy-auto-updates, --greedy-latest, --help, --quiet, --verbose, -d, -h, -n, -q, -v
 - **uses**: Flags: --cask, --formula, --help, --include-build, --include-optional, --include-test, --installed, --missing, --recursive, --skip-recommended, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `caffeinate`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/caffeinate.8.html">https://keith.github.io/xcode-man-pages/caffeinate.8.html</a></p>
+
+- Recursively validates the inner command.
 
 ### `cancel`
 <p class="cmd-url"><a href="https://www.cups.org/doc/man-cancel.html">https://www.cups.org/doc/man-cancel.html</a></p>
@@ -281,6 +311,20 @@
 - **listFilesystems**: Flags: --help, -h, -plist
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `dtruss`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/dtruss.1m.html">https://keith.github.io/xcode-man-pages/dtruss.1m.html</a></p>
+
+- Allowed standalone flags: -L, -a, -c, -d, -e, -f, -h, -l, -o, -s
+- Allowed valued flags: -W, -b, -n, -p, -t
+- Hyphen-prefixed positional arguments accepted
+
+### `eslogger`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/eslogger.1.html">https://keith.github.io/xcode-man-pages/eslogger.1.html</a></p>
+
+- Allowed standalone flags: --list-events, --oslog
+- Allowed valued flags: --format, --oslog-category, --oslog-subsystem
+- Hyphen-prefixed positional arguments accepted
+
 ### `fastlane`
 <p class="cmd-url"><a href="https://docs.fastlane.tools/">https://docs.fastlane.tools/</a></p>
 
@@ -316,6 +360,30 @@ Aliases: `fly`
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `footprint`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/footprint.1.html">https://keith.github.io/xcode-man-pages/footprint.1.html</a></p>
+
+- Allowed standalone flags: --all, --forkCorpse, --help, --json, --proc, --skip, --swapped, --sysFootprint, --targetChildren, --wide, --wired, --vmObjectDirty, -a, -h, -s, -t, -v, -w, -y
+- Allowed valued flags: --exclude, --format, --minFootprint, --pid, --sample, --sort, -f, -j, -p, -x
+- Hyphen-prefixed positional arguments accepted
+
+### `fuser`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/fuser.1.html">https://man7.org/linux/man-pages/man1/fuser.1.html</a></p>
+
+- Allowed standalone flags: -c, -f, -u
+
+### `gkill`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/kill.1.html">https://man7.org/linux/man-pages/man1/kill.1.html</a></p>
+
+- Allowed standalone flags: --help, --list, --table, --version, -L, -l, -t
+
+### `heap`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/heap.1.html">https://keith.github.io/xcode-man-pages/heap.1.html</a></p>
+
+- Allowed standalone flags: --help, -H, -guessNonObjects, -humanReadable, -noContent, -s, -showSizes, -sortBySize, -sumObjectFields, -z, -zones
+- Allowed valued flags: -addresses, -diffFrom
+- Hyphen-prefixed positional arguments accepted
+
 ### `heroku`
 <p class="cmd-url"><a href="https://devcenter.heroku.com/articles/heroku-cli-commands">https://devcenter.heroku.com/articles/heroku-cli-commands</a></p>
 
@@ -349,6 +417,32 @@ Aliases: `fly`
 - **todo list**: Flags: --help, --json, -h. Valued: --base-url, --cookie, --token
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `imptrace`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/imptrace.1.html">https://keith.github.io/xcode-man-pages/imptrace.1.html</a></p>
+
+- Allowed standalone flags: -d, -i, -s
+- Allowed valued flags: -p
+- Bare invocation allowed
+
+### `iostat`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/iostat.8.html">https://keith.github.io/xcode-man-pages/iostat.8.html</a></p>
+
+- Allowed standalone flags: -?, -C, -I, -K, -T, -U, -d, -o
+- Allowed valued flags: -c, -n, -w
+- Bare invocation allowed
+
+### `ipcrm`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/ipcrm.1.html">https://keith.github.io/xcode-man-pages/ipcrm.1.html</a></p>
+
+- Allowed valued flags: -M, -Q, -S, -m, -q, -s
+
+### `ipcs`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/ipcs.1.html">https://keith.github.io/xcode-man-pages/ipcs.1.html</a></p>
+
+- Allowed standalone flags: -M, -Q, -S, -T, -a, -b, -c, -m, -o, -p, -q, -s, -t
+- Allowed valued flags: -u
+- Bare invocation allowed
+
 ### `journalctl`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/journalctl.1.html">https://man7.org/linux/man-pages/man1/journalctl.1.html</a></p>
 
@@ -356,10 +450,43 @@ Aliases: `fly`
 - Allowed valued flags: --after-cursor, --boot, --cursor, --directory, --facility, --field, --file, --identifier, --lines, --machine, --output, --priority, --since, --unit, --until, --user-unit, -D, -F, -M, -S, -U, -g, -n, -o, -p, -t, -u
 - Bare invocation allowed
 
+### `kextfind`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/kextfind.8.html">https://keith.github.io/xcode-man-pages/kextfind.8.html</a></p>
+
+- Allowed standalone flags: --and, --authentic, --case-insensitive, --dependencies-met, --dependencies-missing, --echo, --executable, --has-plugins, --help, --inauthentic, --invalid, --kernel-resource, --library, --loadable, --loaded, --no-executable, --no-paths, --nonloadable, --not, --null, --or, --plugin, --print, --print0, --relative-paths, --substring, --subtree-immediate, --system-extensions, --valid, --warnings, -0, -d, -e, -h, -i, -l, -nd, -nl, -nv, -nx, -s, -v, -w, -x
+- Allowed valued flags: --arch, --arch-exact, --bundle-id, --bundle-name, --defines-symbol, --match-property, --match-property-exists, --property, --property-exists, --references-symbol, --report, --search-item, --set-arch, -B, -arch, -ax, -b, -dsym, -f, -m, -me, -p, -pe, -rsym
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `kextlibs`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/kextlibs.8.html">https://keith.github.io/xcode-man-pages/kextlibs.8.html</a></p>
+
+- Allowed standalone flags: --all-symbols, --compatible-versions, --help, --multdef-symbols, --non-kpi, --onedef-symbols, --undef-symbols, --xml, -c, -h
+- Allowed valued flags: --arch, --repository, -a, -r
+
+### `kextstat`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/kextstat.8.html">https://keith.github.io/xcode-man-pages/kextstat.8.html</a></p>
+
+- Allowed standalone flags: --arch, --help, --list-only, --no-kernel, --sort, -a, -h, -k, -l, -s
+- Allowed valued flags: --bundle-id, -b
+- Bare invocation allowed
+
 ### `kill`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/kill.1.html">https://man7.org/linux/man-pages/man1/kill.1.html</a></p>
 
 - Requires -0, -L, -l. - Allowed standalone flags: --help, -0, -L, -h, -l
+
+### `killall`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/killall.1.html">https://man7.org/linux/man-pages/man1/killall.1.html</a></p>
+
+- Allowed standalone flags: --help, -I, -d, -e, -l, -m, -q, -s, -v, -z
+- Allowed valued flags: -SIGNAL, -c, -t, -u
+- Hyphen-prefixed positional arguments accepted
+
+### `klist_cdhashes`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/klist_cdhashes.8.html">https://keith.github.io/xcode-man-pages/klist_cdhashes.8.html</a></p>
+
+- Bare invocation allowed
 
 ### `koyeb`
 <p class="cmd-url"><a href="https://www.koyeb.com/docs/build-and-deploy/cli">https://www.koyeb.com/docs/build-and-deploy/cli</a></p>
@@ -515,6 +642,25 @@ Aliases: `fly`
 - `koyeb organization list`
 - `koyeb org list`
 
+### `ktrace`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/ktrace.1.html">https://keith.github.io/xcode-man-pages/ktrace.1.html</a></p>
+
+- **artrace**: Flags: -n, -r. Valued: --kperf, --notify-tracing-started, --remote, --stackshot-flags, --type, -F, -T, -b, -c, -f, -i, -o, -p, -t. Positional args accepted
+- **compress**: Valued: -l
+- **config**: Flags: --help, -h
+- **decode**: Flags: --help, -h
+- **dump**: Flags: --disable-coprocessors, --include-log-content, -E, -h. Valued: --notify-tracing-started, --stackshot-flags, -T, -b, -f, -l, -p. Positional args accepted
+- **info**: Flags: --help, -h
+- **machine**: Flags: --help, -h
+- **symbolicate**: Flags: --help, -h
+- **trace**: Flags: --continuous, --csv, --disable-coprocessors, --json, --json-64, --ndjson, --no-default-codes-files, --only-named-events, -A, -C, -E, -N, -S, -h, -n, -r, -s, -t, -u. Valued: -R, -T, -b, -f, -p, -x. Positional args accepted
+
+### `latency`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/latency.1.html">https://keith.github.io/xcode-man-pages/latency.1.html</a></p>
+
+- Allowed standalone flags: -h, -m
+- Allowed valued flags: -R, -c, -it, -l, -n, -p, -st
+
 ### `launchctl`
 <p class="cmd-url"><a href="https://ss64.com/mac/launchctl.html">https://ss64.com/mac/launchctl.html</a></p>
 
@@ -531,6 +677,20 @@ Aliases: `fly`
 - **resolveport**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `leaks`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/leaks.1.html">https://keith.github.io/xcode-man-pages/leaks.1.html</a></p>
+
+- Allowed standalone flags: --help, -autoreleasePools, -conservative, -fullContent, -fullStackHistory, -groupByType, -list, -noContent, -nosources, -nostacks, -quiet, -readonlyContent, -referenceTree
+- Allowed valued flags: -debug, -diffFrom, -exclude, -traceTree
+- Hyphen-prefixed positional arguments accepted
+
+### `lockstat`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/lockstat.1m.html">https://keith.github.io/xcode-man-pages/lockstat.1m.html</a></p>
+
+- Allowed standalone flags: -A, -C, -E, -H, -I, -S, -T, -V, -W, -c, -g, -k, -p, -w
+- Allowed valued flags: -D, -b, -d, -e, -f, -h, -i, -l, -n, -o, -s, -t, -x
+- Bare invocation allowed
 
 ### `log`
 <p class="cmd-url"><a href="https://ss64.com/mac/log.html">https://ss64.com/mac/log.html</a></p>
@@ -581,11 +741,47 @@ Aliases: `fly`
 - Allowed valued flags: -W, -h
 - Bare invocation allowed
 
+### `lsappinfo`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/lsappinfo.8.html">https://keith.github.io/xcode-man-pages/lsappinfo.8.html</a></p>
+
+- **find**: Positional args accepted
+- **front**: Positional args accepted
+- **info**: Positional args accepted
+- **list**: Positional args accepted
+- **metainfo**: Positional args accepted
+- **processList**: Positional args accepted
+- **sharedMemory**: Positional args accepted
+- **visibleProcessList**: Positional args accepted
+
+### `lskq`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/lskq.1.html">https://keith.github.io/xcode-man-pages/lskq.1.html</a></p>
+
+- Allowed standalone flags: -a, -e, -h, -r, -v
+- Allowed valued flags: -p
+- Bare invocation allowed
+
+### `lsmp`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/lsmp.1.html">https://keith.github.io/xcode-man-pages/lsmp.1.html</a></p>
+
+- Allowed standalone flags: -a, -h, -v
+- Allowed valued flags: -j, -p
+
+### `lsvfs`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/lsvfs.1.html">https://man7.org/linux/man-pages/man1/lsvfs.1.html</a></p>
+
+- Bare invocation allowed
+
 ### `make`
 <p class="cmd-url"><a href="https://www.gnu.org/software/make/manual/make.html">https://www.gnu.org/software/make/manual/make.html</a></p>
 
 - Requires -n, --dry-run, --just-print, --recon, -p, --print-data-base. - Allowed standalone flags: --dry-run, --help, --just-print, --print-data-base, --question, --recon, --version, -V, -h, -n, -p, -q
 - Allowed valued flags: --directory, --file, --jobs, --makefile, -C, -f, -j
+
+### `malloc_history`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/malloc_history.1.html">https://keith.github.io/xcode-man-pages/malloc_history.1.html</a></p>
+
+- Allowed standalone flags: --help, -allByCount, -allBySize, -allEvents, -callTree, -chargeSystemLibraries, -collapseRecursion, -highWaterMark, -ignoreThreads, -invert, -showContent, -virtual
+- Hyphen-prefixed positional arguments accepted
 
 ### `meson`
 <p class="cmd-url"><a href="https://mesonbuild.com/Commands.html">https://mesonbuild.com/Commands.html</a></p>
@@ -728,6 +924,27 @@ Aliases: `neonctl`
 - **teams:list**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, -h
 
+### `netlog`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/netlog.1.html">https://keith.github.io/xcode-man-pages/netlog.1.html</a></p>
+
+- Allowed standalone flags: -N, -Z, -c, -h, -v
+- Allowed valued flags: -I, -i, -m, -p, -t
+- Bare invocation allowed
+
+### `nettop`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/nettop.1.html">https://keith.github.io/xcode-man-pages/nettop.1.html</a></p>
+
+- Allowed standalone flags: -P, -c, -d, -h, -n, -x
+- Allowed valued flags: -J, -L, -j, -k, -l, -m, -p, -s, -t
+- Bare invocation allowed
+
+### `netusage`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/netusage.1.html">https://keith.github.io/xcode-man-pages/netusage.1.html</a></p>
+
+- Allowed standalone flags: --compact, --help, --interactive, --unitize, -h, -p, -r
+- Allowed valued flags: --all-traffic, --app-traffic, --interval, --lookup-name, --lookup-uuid, --process-traffic, -d, -e, -n, -s
+- Hyphen-prefixed positional arguments accepted
+
 ### `networksetup`
 <p class="cmd-url"><a href="https://ss64.com/mac/networksetup.html">https://ss64.com/mac/networksetup.html</a></p>
 
@@ -816,6 +1033,19 @@ Aliases: `neonctl`
 - Allowed standalone flags: --help, --quiet, --version, -V, -q
 - Allowed valued flags: --dbname, --host, --port, --timeout, --username, -U, -d, -h, -p, -t
 - Bare invocation allowed
+
+### `pgrep`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/pgrep.1.html">https://man7.org/linux/man-pages/man1/pgrep.1.html</a></p>
+
+- Allowed standalone flags: --help, -L, -a, -f, -i, -l, -n, -o, -q, -v, -x
+- Allowed valued flags: -F, -G, -P, -U, -d, -g, -t, -u
+
+### `pkill`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/pkill.1.html">https://man7.org/linux/man-pages/man1/pkill.1.html</a></p>
+
+- Allowed standalone flags: --help, -I, -L, -a, -f, -i, -l, -n, -o, -q, -v, -x
+- Allowed valued flags: -F, -G, -P, -SIGNAL, -U, -d, -g, -t, -u
+- Hyphen-prefixed positional arguments accepted
 
 ### `platform`
 <p class="cmd-url"><a href="https://docs.platform.sh/administration/cli.html">https://docs.platform.sh/administration/cli.html</a></p>
@@ -933,6 +1163,12 @@ Aliases: `upsun`
 - **workers**: Flags: --help, --no-header, -h. Valued: --columns, --environment, --format, --project, -c, -e, -p
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `plockstat`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/plockstat.1.html">https://keith.github.io/xcode-man-pages/plockstat.1.html</a></p>
+
+- Allowed standalone flags: -A, -C, -H, -V, -v
+- Allowed valued flags: -e, -n, -p, -s, -x
+
 ### `pmset`
 <p class="cmd-url"><a href="https://ss64.com/mac/pmset.html">https://ss64.com/mac/pmset.html</a></p>
 
@@ -1030,6 +1266,17 @@ Aliases: `upsun`
 - **workspaces**: Flags: --confirm, --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `sandbox-exec`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/sandbox-exec.1.html">https://keith.github.io/xcode-man-pages/sandbox-exec.1.html</a></p>
+
+- Recursively validates the inner command.
+
+### `sc_usage`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/sc_usage.1.html">https://keith.github.io/xcode-man-pages/sc_usage.1.html</a></p>
+
+- Allowed standalone flags: -e, -l
+- Allowed valued flags: -E, -c, -s
+
 ### `scalingo`
 <p class="cmd-url"><a href="https://doc.scalingo.com/platform/cli/start">https://doc.scalingo.com/platform/cli/start</a></p>
 
@@ -1113,6 +1360,14 @@ Aliases: `upsun`
 - **list-info**: Flags: --help, -h
 - Allowed standalone flags: --help, -h
 
+### `spindump`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/spindump.8.html">https://keith.github.io/xcode-man-pages/spindump.8.html</a></p>
+
+- Allowed standalone flags: -aggregateCallstacks, -arrow, -displayIdleWorkqueueThreads, -heavy, -noBinary, -noFile, -noProcessingWhileSampling, -onlyBlocked, -onlyRunnable, -onlyTarget, -reverse, -sampleWithoutTarget, -stdout, -threadPriorityThreshold, -timeline, -wait
+- Allowed valued flags: -batteryStatsInterval, -endIndex, -i, -indexRange, -microstackshots, -microstackshotsDuration, -microstackshotsIntervalMin, -microstackshotsSave, -microstackshotsStart, -notarget, -o, -proc, -siginfo, -startIndex, -timelimit
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
 ### `ssh`
 <p class="cmd-url"><a href="https://man.openbsd.org/ssh">https://man.openbsd.org/ssh</a></p>
 
@@ -1126,6 +1381,12 @@ Aliases: `upsun`
 - **Without a subcommand:**
 - Allowed standalone flags: -G, -V
 - Allowed valued flags: -Q
+
+### `stringdups`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/stringdups.1.html">https://keith.github.io/xcode-man-pages/stringdups.1.html</a></p>
+
+- Allowed standalone flags: --help, -callTrees, -invertCallTrees, -nostacks, -stringsOnly
+- Allowed valued flags: -minimumCount
 
 ### `supabase`
 <p class="cmd-url"><a href="https://supabase.com/docs/reference/cli/introduction">https://supabase.com/docs/reference/cli/introduction</a></p>
@@ -1188,6 +1449,17 @@ Aliases: `upsun`
 - **whois**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, --version, -h
 
+### `taskinfo`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/taskinfo.1.html">https://keith.github.io/xcode-man-pages/taskinfo.1.html</a></p>
+
+- Allowed standalone flags: --boosts, --dq, --threads
+- Bare invocation allowed
+
+### `taskpolicy`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/taskpolicy.8.html">https://keith.github.io/xcode-man-pages/taskpolicy.8.html</a></p>
+
+- Recursively validates the inner command.
+
 ### `terraform`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/terraform/cli/commands">https://developer.hashicorp.com/terraform/cli/commands</a></p>
 
@@ -1201,6 +1473,12 @@ Aliases: `upsun`
 - **validate**: Flags: --help, --json, --no-color, -h
 - **version**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `timerfires`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/timerfires.1.html">https://keith.github.io/xcode-man-pages/timerfires.1.html</a></p>
+
+- Allowed standalone flags: -a, -g, -s, -v
+- Allowed valued flags: -n, -p, -t
 
 ### `tmux`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/tmux.1.html">https://man7.org/linux/man-pages/man1/tmux.1.html</a></p>
@@ -1273,6 +1551,15 @@ Aliases: `upsun`
 - `tofu logout`
 - `tofu logout app.terraform.io`
 
+### `trace`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/trace.1.html">https://keith.github.io/xcode-man-pages/trace.1.html</a></p>
+
+- **amend**: Flags: --experimental, --help, --unsafe, -h. Valued: --add. Positional args accepted
+- **plans**: Flags: --help, -h
+- **providers**: Flags: --help, -h
+- **record**: Flags: --compress, --experimental, --help, --overwrite, --unsafe, -h. Valued: --add, --end-after-duration, --end-after-kdebug-events-size, --end-on-kdebug-event, --end-on-notification, --notify-after-end, --notify-after-start, --omit, --plan. Positional args accepted
+- **trim**: Flags: --help, -h. Valued: --end-time, --output, --start-time
+
 ### `vagrant`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/vagrant/docs/cli">https://developer.hashicorp.com/vagrant/docs/cli</a></p>
 
@@ -1295,6 +1582,11 @@ Aliases: `upsun`
 - **project ls**: Flags: --help, --json, -h, -j. Valued: --scope, -S
 - **whoami**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `vmmap`
+<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/vmmap.1.html">https://keith.github.io/xcode-man-pages/vmmap.1.html</a></p>
+
+- Allowed standalone flags: --allSplitLibs, --attributes, --interleaved, --noCoalesce, --pages, --sortBySize, --submap, --summary, --verbose, --wide, -h, -s, -v, -w
 
 ### `wg`
 <p class="cmd-url"><a href="https://www.wireguard.com/quickstart/">https://www.wireguard.com/quickstart/</a></p>

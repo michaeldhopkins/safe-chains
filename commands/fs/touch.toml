@@ -1,0 +1,16 @@
+[[command]]
+name = "touch"
+aliases = ["gtouch"]
+description = "Updates the access and modification timestamps of a file and creates the file if it does not exist. Local-only: operates on the file system under the user's permissions and does not access the network. BSD touch (macOS) and GNU touch (gtouch on macOS) have overlapping but not identical flag surfaces — BSD adds -A (adjust by relative offset), GNU adds --no-create / --no-dereference long forms. Stable utility with a frozen flag surface for years."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#touch-invocation"
+researched_version = "GNU coreutils 9.7 + BSD touch (macOS 14)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "--no-create", "--no-dereference", "--version",
+    "-A", "-a", "-c", "-h", "-m",
+]
+valued = [
+    "--date", "--reference", "--time",
+    "-d", "-r", "-t",
+]

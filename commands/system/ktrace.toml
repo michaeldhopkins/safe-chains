@@ -1,0 +1,100 @@
+[[command]]
+name = "ktrace"
+description = "Records, dumps, and configures kernel trace events on macOS. info shows current config (read-only). trace prints events live. dump writes a kernel trace file to a local path. The mutation subs (init, setopt, enable, disable, remove, reset, emit) reconfigure persistent kernel tracing state and are excluded here. macOS ship; surface stable."
+url = "https://keith.github.io/xcode-man-pages/ktrace.1.html"
+researched_version = "macOS 14 (surface stable)"
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "trace"
+level = "Inert"
+bare = true
+tolerate_unknown_long = true
+standalone = [
+    "--continuous", "--csv", "--disable-coprocessors", "--json", "--json-64",
+    "--ndjson", "--no-default-codes-files", "--only-named-events",
+    "-A", "-C", "-E", "-N", "-S", "-h", "-n", "-r", "-s", "-t", "-u",
+]
+valued = ["-R", "-T", "-b", "-f", "-p", "-x"]
+
+[[command.sub]]
+name = "dump"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--disable-coprocessors", "--include-log-content", "-E", "-h"]
+valued = ["--notify-tracing-started", "--stackshot-flags", "-T", "-b", "-f", "-l", "-p"]
+
+[[command.sub]]
+name = "decode"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "symbolicate"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "machine"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "config"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "compress"
+level = "SafeWrite"
+bare = false
+valued = ["-l"]
+
+[[command.sub]]
+name = "artrace"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_long = true
+standalone = ["-n", "-r"]
+valued = [
+    "--kperf", "--notify-tracing-started", "--remote", "--stackshot-flags",
+    "--type", "-F", "-T", "-b", "-c", "-f", "-i", "-o", "-p", "-t",
+]
+
+[[command.sub]]
+name = "init"
+candidate = true
+
+[[command.sub]]
+name = "setopt"
+candidate = true
+
+[[command.sub]]
+name = "enable"
+candidate = true
+
+[[command.sub]]
+name = "disable"
+candidate = true
+
+[[command.sub]]
+name = "remove"
+candidate = true
+
+[[command.sub]]
+name = "reset"
+candidate = true
+
+[[command.sub]]
+name = "emit"
+candidate = true

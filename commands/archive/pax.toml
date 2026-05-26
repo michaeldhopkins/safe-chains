@@ -1,0 +1,19 @@
+[[command]]
+name = "pax"
+description = "Read, write, and list members of file archives and copy directory hierarchies. The presence of -r and/or -w selects mode: neither = list, -r = extract, -w = write archive, -r -w = copy. Supports cpio, bcpio, svr4cpio, svr4crc, tar, and ustar formats via -x. -f names the archive (default stdin for list/read, stdout for write). -z and -j select gzip and bzip2 compression. -k refuses to overwrite."
+url = "https://www.freebsd.org/cgi/man.cgi?pax"
+researched_version = "BSD pax (macOS bundled)"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_short = true
+standalone = [
+    "-0", "-D", "-H", "-L", "-O", "-P",
+    "-X", "-Y", "-Z",
+    "-a", "-c", "-d", "-i", "-j", "-k",
+    "-l", "-n", "-r", "-t", "-u", "-v",
+    "-w", "-z",
+]
+valued = [
+    "-B", "-E", "-G", "-T", "-U",
+    "-b", "-f", "-o", "-p", "-s", "-x",
+]

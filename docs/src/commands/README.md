@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1278 commands across 75 categories.
+safe-chains knows 1428 commands across 75 categories.
 
 ## Glossary
 
@@ -21,7 +21,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Android](android.md) (10 commands)
 - [Ansible](ansible.md) (7 commands)
 - [API / Load Testing](api.md) (12 commands)
-- [Compression / Archive](archive.md) (10 commands)
+- [Compression / Archive](archive.md) (50 commands)
 - [Binary Analysis](binary.md) (9 commands)
 - [Blockchain / Crypto](blockchain.md) (20 commands)
 - [Build Systems](build.md) (25 commands)
@@ -45,7 +45,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Embedded](embedded.md) (7 commands)
 - [Erlang](erlang.md) (1 commands)
 - [Code Forges](forges.md) (5 commands)
-- [Filesystem](fs.md) (27 commands)
+- [Filesystem](fs.md) (58 commands)
 - [Fuzzy Finders](fuzzy.md) (7 commands)
 - [Game Engines](game.md) (1 commands)
 - [Gleam](gleam.md) (1 commands)
@@ -83,11 +83,11 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Search](search.md) (12 commands)
 - [Serverless / IaC](serverless.md) (7 commands)
 - [Swift](swift.md) (1 commands)
-- [System Info](sysinfo.md) (55 commands)
-- [System](system.md) (71 commands)
+- [System Info](sysinfo.md) (54 commands)
+- [System](system.md) (115 commands)
 - [TeX / LaTeX](tex.md) (3 commands)
 - [Text Processing](text.md) (29 commands)
-- [Developer Tools](tools.md) (193 commands)
+- [Developer Tools](tools.md) (229 commands)
 - [Version Control](vcs.md) (10 commands)
 - [WebAssembly](wasm.md) (10 commands)
 - [Shell Wrappers](wrappers.md) (7 commands)

@@ -1,0 +1,23 @@
+[[command]]
+name = "screen"
+description = "Full-screen window manager that multiplexes a physical terminal between several processes. Bare invocation opens a fresh session running the user's shell; -r reattaches an existing session; -ls / -list lists sessions; -wipe cleans up dead sessions. Sessions create utmp records and persist after detach. Entirely local."
+url = "https://www.gnu.org/software/screen/manual/screen.html"
+researched_version = "GNU screen 5.0 (matches macOS-shipped screen)"
+level = "SafeRead"
+tolerate_unknown_short = true
+standalone = [
+    "-a", "-A",
+    "-d", "-D",
+    "-h", "--help",
+    "-l", "-L",
+    "-list", "-ls",
+    "-m",
+    "-O",
+    "-q",
+    "-r", "-R",
+    "-U",
+    "-v", "--version",
+    "-wipe",
+    "-x",
+]
+valued = ["-c", "-e", "-p", "-s", "-S", "-t", "-T"]

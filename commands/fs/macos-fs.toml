@@ -1,0 +1,95 @@
+[[command]]
+name = "fs_usage"
+description = "Real-time tracing tool that prints filesystem-related system calls and page faults as they occur. Read-only with respect to filesystem state but uses the kernel tracing facility and requires root privileges. Output filters (-f mode) can be limited to network, filesys, pathname, exec, diskio, or cachehit. macOS-bundled diagnostic utility with a stable surface."
+url = "https://ss64.com/mac/fs_usage.html"
+researched_version = "macOS 14 (Apple stock)"
+level = "Inert"
+bare = true
+standalone = ["-F", "-b", "-e", "-w"]
+valued = ["-E", "-R", "-S", "-f", "-t"]
+
+[[command]]
+name = "GetFileInfo"
+description = "Prints Carbon-style file attributes (Finder flags, creator/type codes, creation/modification dates) of files and directories. Deprecated since Xcode 6 but still shipped on macOS as part of the command-line tools. Strictly read-only: reads file attributes and prints them. macOS-bundled utility; surface frozen by deprecation."
+url = "https://ss64.com/mac/getfileinfo.html"
+researched_version = "macOS 14 (Apple stock, deprecated)"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+standalone = ["-P", "-c", "-d", "-m", "-t"]
+valued = ["-a"]
+
+[[command]]
+name = "dot_clean"
+description = "Merges Apple Double `._*` resource-fork files with their matching native files in each given directory. Modifies extended attributes on the native side and may delete the `._*` companion files (-m always; -n if no matching native exists). --keep=mostrecent|dotbar|native selects the precedence policy. Operates only on local mounts under the user's permissions. macOS-bundled utility, surface stable since 10.8."
+url = "https://ss64.com/mac/dot_clean.html"
+researched_version = "macOS 14 (Apple stock)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--keep=mostrecent", "--keep=dotbar", "--keep=native",
+    "-f", "-h", "-m", "-n", "-s", "-v",
+]
+
+[[command]]
+name = "mkfile"
+description = "Creates one or more zero-filled regular files of a specified size (suffixed with b/k/m/g). -n creates a sparse file with the size noted but no blocks allocated until written. Intended for NFS swap; for general use the sticky bit it sets is removed by chmod(1). Local-only; no network access. macOS-bundled utility, surface unchanged since 1997."
+url = "https://ss64.com/mac/mkfile.html"
+researched_version = "macOS 14 (Apple stock)"
+level = "SafeWrite"
+bare = false
+standalone = ["-n", "-v"]
+
+[[command]]
+name = "lsbom"
+description = "Lists the contents of a Bill-of-Materials (`.bom`) file as used by macOS installer packages. Strictly read-only: parses the BOM and prints entries to stdout. -p customizes the columns; --arch selects which Mach-O slice's size and checksum to display. macOS-bundled utility, surface stable for years."
+url = "https://ss64.com/mac/lsbom.html"
+researched_version = "macOS 14 (Apple stock)"
+level = "Inert"
+bare = false
+standalone = [
+    "--help",
+    "-b", "-c", "-d", "-f", "-h", "-l", "-m", "-s", "-x",
+]
+valued = ["--arch", "-p"]
+
+[[command]]
+name = "mkbom"
+description = "Creates a binary Bill-of-Materials (`.bom`) file from either a source directory tree or an lsbom-formatted file listing. The output `.bom` is overwritten if it already exists. Local-only; no network access. macOS-bundled utility used by package construction tools."
+url = "https://ss64.com/mac/mkbom.html"
+researched_version = "macOS 14 (Apple stock)"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h", "-s"]
+valued = ["-i"]
+
+[[command]]
+name = "vis"
+description = "Filter that converts non-printable characters in its input into a visible representation, in one of several formats (C-style, octal, URI percent-encoding, MIME quoted-printable, etc.). Strictly a stdin-to-stdout transform with optional file arguments read as input; no writes to the filesystem. BSD-derived utility, surface frozen."
+url = "https://man.freebsd.org/cgi/man.cgi?vis"
+researched_version = "macOS 14 (Apple stock, BSD-derived)"
+level = "Inert"
+bare = true
+standalone = [
+    "-N", "-M", "-S", "-b", "-c", "-f", "-h", "-l",
+    "-m", "-n", "-o", "-s", "-t", "-w",
+]
+valued = ["-F", "-e"]
+
+[[command]]
+name = "unvis"
+description = "Reverses vis(1) encoding, transforming a visible representation of data back to its original form. Optional file arguments are read as input; output goes to stdout. -h decodes URI percent-encoding (RFC 1808), -H decodes HTML entities (RFC 1866), -m decodes MIME quoted-printable. BSD-derived utility, surface frozen since 4.4BSD."
+url = "https://man.freebsd.org/cgi/man.cgi?unvis"
+researched_version = "macOS 14 (Apple stock, BSD-derived)"
+level = "Inert"
+bare = true
+standalone = ["-H", "-e", "-h", "-m"]
+
+[[command]]
+name = "wait4path"
+description = "Blocks until the given path appears in the filesystem namespace, then exits. Read-only: re-checks the mount table after each update and never modifies anything. Useful in early-boot or networked-mount scripts. macOS-bundled utility, surface frozen since 2013."
+url = "https://ss64.com/mac/wait4path.html"
+researched_version = "macOS 14 (Apple stock)"
+level = "Inert"
+bare = false
+max_positional = 1

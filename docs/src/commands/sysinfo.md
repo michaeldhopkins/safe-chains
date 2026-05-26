@@ -230,12 +230,6 @@ Aliases: `glogname`
 
 - Bare invocation allowed
 
-### `pgrep`
-<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/pgrep.1.html">https://man7.org/linux/man-pages/man1/pgrep.1.html</a></p>
-
-- Allowed standalone flags: --count, --delimiter, --full, --help, --inverse, --lightweight, --list-full, --list-name, --newest, --oldest, --version, -L, -V, -a, -c, -f, -h, -i, -l, -n, -o, -v, -w, -x
-- Allowed valued flags: --euid, --group, --parent, --pgroup, --pidfile, --session, --terminal, --uid, -F, -G, -P, -U, -d, -g, -s, -t, -u
-
 ### `pinky`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pinky-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pinky-invocation</a></p>
 

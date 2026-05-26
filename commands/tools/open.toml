@@ -1,0 +1,8 @@
+[[command]]
+name = "open"
+description = "LaunchServices-backed file/URL opener. Without -a or -b, opens the file in the application registered for its type; -a names an application by path, -b by bundle identifier. URLs are opened in the registered handler (default browser for http(s)). -e / -t edit the file in TextEdit or the default text editor; -f reads stdin into a temp file and opens it. -R reveals the file in Finder. -W waits for the launched app to exit. --env, --stdin/--stdout/--stderr, and --args influence the launched application's environment and arguments. Opens GUI applications that may then act independently."
+url = "https://ss64.com/mac/open.html"
+researched_version = "macOS 14 open(1)"
+level = "SafeRead"
+standalone = ["-e", "-t", "-f", "-F", "-W", "-R", "-n", "-g", "-j", "-h"]
+valued = ["-a", "-b", "-u", "-s", "--env", "--stderr", "--stdin", "--stdout", "--arch"]

@@ -1,0 +1,19 @@
+[[command]]
+name = "rdfind"
+description = "Scans one or more directory trees, computes content checksums, and reports duplicate files. By default writes a results.txt summary in the current directory but does not modify or delete the duplicates. Action flags -makesymlinks, -makehardlinks, and -deleteduplicates change duplicates into links or remove them; -dryrun previews without acting. Reads from disk only; no network access. Project releases a few times a year — flag surface is mostly stable."
+url = "https://rdfind.pauldreik.se/"
+researched_version = "rdfind 1.6.0 (2024)"
+level = "SafeRead"
+bare = false
+write_flags = ["-makesymlinks", "-makehardlinks", "-deleteduplicates"]
+standalone = [
+    "--help", "--version",
+    "-h", "-n", "-v",
+]
+valued = [
+    "-checksum", "-deleteduplicates", "-deterministic",
+    "-dryrun", "-followsymlinks", "-ignoreempty",
+    "-makehardlinks", "-makeresultsfile", "-makesymlinks",
+    "-maxsize", "-minsize", "-outputname",
+    "-removeidentinode", "-sleep",
+]

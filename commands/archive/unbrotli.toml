@@ -1,0 +1,16 @@
+[[command]]
+name = "unbrotli"
+description = "Equivalent to `brotli --decompress`. Reads brotli-compressed files (default suffix .br) and writes the decompressed result to a sibling file; -c / --stdout writes to stdout instead, -k / --keep preserves the source, -j / --rm removes it, -f / --force overwrites existing output."
+url = "https://github.com/google/brotli"
+researched_version = "brotli 1.x"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--force", "--help", "--keep",
+    "--no-copy-stat", "--rm",
+    "--stdout", "--suffix", "--test",
+    "--verbose", "--version",
+    "-c", "-f", "-h", "-j", "-k",
+    "-n", "-t", "-v",
+]
+valued = ["--output", "--suffix", "-S", "-o"]

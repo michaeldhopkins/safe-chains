@@ -1,0 +1,9 @@
+[[command]]
+name = "PlistBuddy"
+description = "Reads and writes property list files. Without -c, runs an interactive REPL whose commands include Print (read), Save, Set, Add, Copy, Delete, Merge, Import, Clear, Revert, and Exit. -c executes a single command and exits; the same command surface (Print … Set … Add …) is accepted there, so the same flag can carry a read or a write. -x writes the output as XML where applicable. -l prevents symlink traversal. Entirely local; no network."
+url = "https://keith.github.io/xcode-man-pages/PlistBuddy.8.html"
+researched_version = "macOS 14 PlistBuddy(8)"
+level = "SafeWrite"
+bare = false
+standalone = ["-x", "-l", "-h"]
+valued = ["-c"]

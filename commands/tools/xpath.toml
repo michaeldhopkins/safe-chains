@@ -1,0 +1,8 @@
+[[command]]
+name = "xpath"
+description = "Perl script that runs XPath queries against XML documents. -e provides one or more query strings (multiple -e are sequenced; the final query's result is what's printed). With no file argument, reads XML from stdin. -n disables loading external DTDs. -q suppresses non-error output. Read-only; entirely local."
+url = "https://metacpan.org/pod/XML::XPath"
+researched_version = "XML::XPath Perl module bundled with macOS 14"
+level = "Inert"
+standalone = ["-n", "-q"]
+valued = ["-e", "-s", "-p"]

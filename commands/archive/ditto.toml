@@ -1,0 +1,30 @@
+[[command]]
+name = "ditto"
+description = "Copy directory hierarchies and create/extract archives (CPIO via -c, optionally compressed with -z / -j; PKZip via -c -k; extraction via -x). Preserves resource forks, extended attributes, ACLs, and quarantine metadata by default on macOS; toggled with --rsrc / --norsrc / --extattr / --noextattr / --acl / --noacl / --qtn / --noqtn. --arch thins universal binaries; --bom limits the copy set."
+url = "https://ss64.com/mac/ditto.html"
+researched_version = "ditto (macOS 14+)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--acl", "--clone", "--extattr",
+    "--help", "--hfsCompression",
+    "--keepBinaries", "--keepParent",
+    "--noacl", "--nocache", "--noclone",
+    "--noextattr", "--nohfsCompression",
+    "--nonAtomicCopies", "--nopersistRootless",
+    "--nopreserveHFSCompression", "--noqtn",
+    "--norsrc", "--password",
+    "--persistRootless",
+    "--preserveHFSCompression", "--qtn",
+    "--rsrc", "--sequesterRsrc",
+    "--segmentLargeFiles",
+    "-V", "-X", "-c", "-h", "-j",
+    "-k", "-v", "-x", "-z",
+]
+valued = [
+    "--arch", "--bom", "--keepBinariesList",
+    "--keepBinariesPattern", "--lang",
+    "--option", "--outBom",
+    "--zlibCompressionLevel",
+]

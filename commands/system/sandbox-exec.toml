@@ -1,0 +1,8 @@
+[[command]]
+name = "sandbox-exec"
+description = "Deprecated macOS utility that enters a Seatbelt sandbox using a profile (file path with `-f`, pre-defined name with `-n`, or inline SBPL string with `-p`) and execs a command inside it. Apple recommends new code use the App Sandbox entitlements instead, but sandbox-exec still works and remains common in research, fuzzing, and shell-based isolation harnesses. Surface frozen since 2017."
+url = "https://keith.github.io/xcode-man-pages/sandbox-exec.1.html"
+researched_version = "macOS 14 (deprecated; surface frozen)"
+
+[command.wrapper]
+valued = ["-D", "-f", "-n", "-p"]

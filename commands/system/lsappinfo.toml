@@ -1,0 +1,65 @@
+[[command]]
+name = "lsappinfo"
+description = "Queries CoreApplicationServices for application state on the local login session — the same state Activity Monitor and Dock use. Read-only inspection subcommands print ASN-keyed application data; the kill, restart, removeFile, createFile, and launch subcommands modify or terminate apps and are excluded here. macOS ship; surface stable but lightly documented."
+url = "https://keith.github.io/xcode-man-pages/lsappinfo.8.html"
+researched_version = "macOS 14 (surface stable)"
+
+[[command.sub]]
+name = "front"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "find"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "info"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "list"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "processList"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "visibleProcessList"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "metainfo"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "sharedMemory"
+allow_all = true
+level = "Inert"
+
+[[command.sub]]
+name = "kill"
+candidate = true
+
+[[command.sub]]
+name = "restart"
+candidate = true
+
+[[command.sub]]
+name = "removeFile"
+candidate = true
+
+[[command.sub]]
+name = "createFile"
+candidate = true
+
+[[command.sub]]
+name = "launch"
+candidate = true

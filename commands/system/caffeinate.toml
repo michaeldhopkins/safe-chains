@@ -1,0 +1,10 @@
+[[command]]
+name = "caffeinate"
+description = "Holds IOKit power-management assertions to prevent the system from sleeping. With no inner command it holds assertions until killed; with `caffeinate [flags] <utility> [args...]` it forks, execs the utility, holds the assertions for the utility's lifetime, and exits when the utility does. macOS ship; surface frozen since 2012."
+url = "https://keith.github.io/xcode-man-pages/caffeinate.8.html"
+researched_version = "macOS 14 (surface frozen)"
+
+[command.wrapper]
+standalone = ["-d", "-i", "-m", "-s", "-u"]
+valued = ["-t", "-w"]
+bare_ok = true

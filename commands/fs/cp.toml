@@ -1,0 +1,20 @@
+[[command]]
+name = "cp"
+aliases = ["gcp"]
+description = "Copies files and directory trees on the local filesystem. Always writes new files under the user's permissions; -R/-r recurses, -f silently overwrites, -p preserves attributes, -c uses clonefile(2) on APFS. Does not reach the network. BSD cp (macOS) and GNU cp differ on long flags (only GNU exposes --recursive, --preserve, --archive long forms); the short-flag set is broadly compatible. Stable utility with a long-frozen flag surface."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#cp-invocation"
+researched_version = "GNU coreutils 9.7 + BSD cp (macOS 14)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--archive", "--force", "--help", "--interactive",
+    "--no-clobber", "--no-dereference", "--no-target-directory",
+    "--one-file-system", "--parents", "--recursive",
+    "--remove-destination", "--symbolic-link", "--update", "--verbose", "--version",
+    "-H", "-L", "-N", "-P", "-R", "-S", "-T", "-X",
+    "-a", "-c", "-f", "-h", "-i", "-l", "-n", "-p", "-r", "-s", "-u", "-v", "-x",
+]
+valued = [
+    "--backup", "--preserve", "--reflink", "--sparse", "--suffix", "--target-directory",
+    "-t",
+]

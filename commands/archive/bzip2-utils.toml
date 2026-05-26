@@ -1,0 +1,29 @@
+[[command]]
+name = "bzcmp"
+aliases = ["bzdiff"]
+description = "Wrappers that invoke cmp or diff on bzip2-compressed files. Any options are passed through to cmp(1) or diff(1). With one filename, compares it against the corresponding .bz2; with two filenames, decompresses as needed and compares."
+url = "https://sourceware.org/bzip2/"
+researched_version = "bzip2 1.0.x"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+
+[[command]]
+name = "bzgrep"
+aliases = ["bzegrep", "bzfgrep"]
+description = "grep / egrep / fgrep wrappers that decompress bzip2-compressed input on the fly. All grep options are passed through; behaves like grep(1) on the decompressed text."
+url = "https://sourceware.org/bzip2/"
+researched_version = "bzip2 1.0.x"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+
+[[command]]
+name = "bzmore"
+aliases = ["bzless"]
+description = "Paginate bzip2-compressed (and uncompressed) text using more(1) or less(1)."
+url = "https://sourceware.org/bzip2/"
+researched_version = "bzip2 1.0.x"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true

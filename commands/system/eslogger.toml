@@ -1,0 +1,10 @@
+[[command]]
+name = "eslogger"
+description = "Endpoint Security event logger: subscribes to one or more notify events from the Endpoint Security framework (process exec, fork, exit, file open, mount, screensharing attach/detach, etc.) and emits each event as JSON Lines to stdout, or as JSON to the unified logging system with `--oslog`. Must be run as super-user. Read-only — Endpoint Security notify events are observation-only by design. macOS 11+; surface evolving with Endpoint Security itself."
+url = "https://keith.github.io/xcode-man-pages/eslogger.1.html"
+researched_version = "macOS 14"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--list-events", "--oslog"]
+valued = ["--format", "--oslog-category", "--oslog-subsystem"]

@@ -1,0 +1,41 @@
+[[command]]
+name = "killall"
+description = "BSD utility for sending signals to processes selected by name (not PID). `killall <name>` sends SIGTERM to every process whose argv[0] (or argv list, with -m) matches; `killall -<SIG> <name>` sends a different signal. Destructive in the same way kill(1) is. Read-only forms — `-l` lists available signal names; `-d` and `-s` print what would be signaled without actually doing it — let callers preview a match before committing. macOS uses the FreeBSD implementation; flag surface is stable."
+url = "https://man7.org/linux/man-pages/man1/killall.1.html"
+researched_version = "FreeBSD killall(1) on macOS 14; surface frozen"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-I", "-d", "-e", "-l", "-m", "-q", "-s", "-v", "-z"]
+valued = ["-SIGNAL", "-c", "-t", "-u"]
+
+[[command]]
+name = "pkill"
+description = "BSD utility that finds processes matching a pattern (regular expression against argv[0], or the full argument list with -f) and sends them a signal — SIGTERM by default, or `-<SIG>` for any other signal. The selection filters (-U, -G, -P, -t, -u, -F, -g) narrow which matching processes are signaled. `-I` requests interactive confirmation before each signal. Flag surface stable across BSDs."
+url = "https://man7.org/linux/man-pages/man1/pkill.1.html"
+researched_version = "FreeBSD pkill(1) on macOS 14; surface frozen"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-I", "-L", "-a", "-f", "-i", "-l", "-n", "-o", "-q", "-v", "-x"]
+valued = ["-F", "-G", "-P", "-SIGNAL", "-U", "-d", "-g", "-t", "-u"]
+
+[[command]]
+name = "pgrep"
+description = "Read-only companion to pkill(1): finds processes matching a pattern (regex against argv[0], or the full argument list with -f) and prints their PIDs and optionally names. Same selection filters as pkill — `-U`, `-G`, `-P`, `-t`, `-u`, `-F`, `-g` — and the same modifiers. Never signals anything. Stable BSD utility."
+url = "https://man7.org/linux/man-pages/man1/pgrep.1.html"
+researched_version = "FreeBSD pgrep(1) on macOS 14; surface frozen"
+level = "Inert"
+bare = false
+standalone = ["--help", "-L", "-a", "-f", "-i", "-l", "-n", "-o", "-q", "-v", "-x"]
+valued = ["-F", "-G", "-P", "-U", "-d", "-g", "-t", "-u"]
+
+[[command]]
+name = "gkill"
+description = "GNU coreutils kill: sends a signal to one or more PIDs, or lists/tables signal information. Default invocation `gkill <pid>` delivers SIGTERM; `-s <sig>` / `--signal <sig>` / `-<sig>` deliver another. Read-only modes are `-l`/`--list` to enumerate signal names and `-t`/`--table` to print a signal-info table. Coverage exposes only the listing modes."
+url = "https://man7.org/linux/man-pages/man1/kill.1.html"
+researched_version = "GNU coreutils 9.7 (April 2025)"
+level = "Inert"
+bare = false
+standalone = ["--help", "--list", "--table", "--version", "-L", "-l", "-t"]
+max_positional = 1

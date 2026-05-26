@@ -1,0 +1,176 @@
+[[command]]
+name = "app-sso"
+description = "Controls and reports on the Kerberos and Platform SSO extensions. Most flags (--listrealms, --realminfo, --sitecode, --messages, --state) print configuration to stdout. --authenticate, --logout, --changepassword, --reset, and --keychainoption mutate the SSO credential cache (kerberos tickets, keychain entries) and are excluded here. Entirely local; versioning follows macOS releases."
+url = "https://keith.github.io/xcode-man-pages/app-sso.1.html"
+researched_version = "macOS 14 app-sso(1)"
+level = "Inert"
+bare = false
+standalone = ["--listrealms", "--messages", "--state", "--help", "-h", "-l", "-m", "-s", "-v"]
+valued = ["--realminfo", "--sitecode", "-i"]
+
+[[command]]
+name = "assetutil"
+description = "Processes .car asset-catalog files. -I prints a JSON description to stdout (read-only). -Z runs an integrity check. The thinning flags (-i, -s, -p, -M, -g, -t, -n) filter assets and, when combined with -o, write a thinned output catalog; without -o the source file is overwritten. Entirely local; no network."
+url = "https://keith.github.io/xcode-man-pages/assetutil.1.html"
+researched_version = "macOS 14 assetutil(1)"
+level = "Inert"
+bare = false
+standalone = ["-V", "-I", "-Z", "-T"]
+valued = ["-i", "-s", "-p", "-M", "-g", "-h", "-t", "-c", "-o", "-n"]
+
+[[command]]
+name = "fileproviderctl"
+description = "Introspects File Provider extensions. The enumerate/ls subcommands list provider contents; validate runs the validation suite against a provider; dump prints the state of the file-provider subsystem. materialize forces an item to be written to disk (downloads cloud content) and is excluded here. Entirely local."
+url = "https://keith.github.io/xcode-man-pages/fileproviderctl.1.html"
+researched_version = "macOS 14 fileproviderctl(1)"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "enumerate"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ls"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "validate"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "dump"
+level = "Inert"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "materialize"
+candidate = true
+
+[[command]]
+name = "fileurltool"
+description = "Exercises the NSURL / CFURL resource-property APIs against file:// URLs. The get, check, getflags, getvolflags, and keys subcommands read properties or capabilities; the set subcommand writes resource properties on the target URL (e.g. labels, hidden bits) and is excluded here. Entirely local; no network."
+url = "https://keith.github.io/xcode-man-pages/fileurltool.1.html"
+researched_version = "macOS 14 fileurltool(1)"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "get"
+level = "Inert"
+bare = false
+standalone = ["--by-path", "--by-ref", "--cf1", "--cfm", "--ns1", "--nsm", "--print-type", "--print-cache", "--leaks", "--help", "-h"]
+
+[[command.sub]]
+name = "check"
+level = "Inert"
+bare = false
+standalone = ["--by-path", "--by-ref", "--help", "-h"]
+
+[[command.sub]]
+name = "getflags"
+level = "Inert"
+bare = false
+standalone = ["--by-path", "--by-ref", "--help", "-h"]
+
+[[command.sub]]
+name = "getvolflags"
+level = "Inert"
+bare = false
+standalone = ["--by-path", "--by-ref", "--help", "-h"]
+
+[[command.sub]]
+name = "keys"
+level = "Inert"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "set"
+candidate = true
+
+[[command]]
+name = "productutil"
+description = "Apple internal product archive utility, documented as not meant to be invoked directly. The man page lists no subcommands or flags. Entirely local."
+url = "https://keith.github.io/xcode-man-pages/productutil.1.html"
+researched_version = "macOS 14 productutil(1)"
+level = "Inert"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "reset"
+description = "Initializes the terminal state, equivalent to tput reset. Sends terminal initialization sequences from terminfo to stdout; does not touch the filesystem. Optional -T overrides the terminal type from $TERM. Entirely local."
+url = "https://keith.github.io/xcode-man-pages/tput.1.html"
+researched_version = "ncurses tput(1) shipped with macOS 14"
+level = "Inert"
+bare = true
+standalone = ["-V"]
+valued = ["-T"]
+
+[[command]]
+name = "sdef"
+description = "Extracts the scripting definition (sdef) from a scriptable application and writes it to standard output. Reads the application's bundle; does not modify it. Output can be piped to sdp. Entirely local; no network."
+url = "https://keith.github.io/xcode-man-pages/sdef.1.html"
+researched_version = "macOS 14 sdef(1)"
+level = "Inert"
+bare = false
+
+[[command]]
+name = "systemstats"
+description = "Prints a selection of system power-usage statistics to standard output. No flags modify state; --help prints a usage summary. Entirely local."
+url = "https://keith.github.io/xcode-man-pages/systemstats.8.html"
+researched_version = "macOS 14 systemstats(8)"
+level = "Inert"
+bare = true
+tolerate_unknown_long = true
+standalone = ["--help", "-h"]
+
+[[command]]
+name = "uttype"
+description = "Queries the system about Uniform Type Identifiers. Lists declared UTTypes, filters by --extension / --conformsto / --tag, and prints type metadata. Reads the LaunchServices type database; does not modify it. Entirely local; first shipped in macOS 11."
+url = "https://keith.github.io/xcode-man-pages/uttype.1.html"
+researched_version = "macOS 14 uttype(1)"
+level = "Inert"
+bare = true
+standalone = ["--all", "--verbose", "--help", "-h"]
+valued = ["--extension", "--conformsto", "--tag", "--mime-type", "--description"]
+
+[[command]]
+name = "wdutil"
+description = "Wireless Diagnostics command line. The info subcommand prints the Wi-Fi status panel content to stdout (read-only). The diagnose, log, and dump subcommands require sudo and either run the full diagnostic suite (writing a logarchive to /var/tmp) or toggle wireless logging — all system-mutating and excluded here."
+url = "https://keith.github.io/xcode-man-pages/wdutil.8.html"
+researched_version = "macOS 14 wdutil(8)"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "info"
+level = "Inert"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "diagnose"
+candidate = true
+
+[[command.sub]]
+name = "log"
+candidate = true
+
+[[command.sub]]
+name = "dump"
+candidate = true
+
+[[command]]
+name = "umtool"
+description = "UserManagement diagnostic tool. The sole documented subcommand sysdiagnose writes diagnostic data for collection by sysdiagnose. Output goes to stdout; intended for support data collection."
+url = "https://keith.github.io/xcode-man-pages/umtool.1.html"
+researched_version = "macOS 14 umtool(1)"
+bare_flags = ["--help", "-h"]
+
+[[command.sub]]
+name = "sysdiagnose"
+level = "Inert"
+standalone = ["--help", "-h"]
