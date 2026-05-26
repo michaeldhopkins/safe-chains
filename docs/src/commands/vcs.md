@@ -219,6 +219,13 @@
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
+### `scalar`
+<p class="cmd-url"><a href="https://git-scm.com/docs/scalar">https://git-scm.com/docs/scalar</a></p>
+
+- **diagnose**: Flags: --help, -h
+- **list**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `svn`
 <p class="cmd-url"><a href="https://subversion.apache.org/docs/release-notes/1.14.html">https://subversion.apache.org/docs/release-notes/1.14.html</a></p>
 

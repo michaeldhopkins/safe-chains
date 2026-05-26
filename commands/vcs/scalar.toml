@@ -1,0 +1,44 @@
+[[command]]
+name = "scalar"
+description = "Microsoft-originated Git utility (now part of the upstream Git source tree) for managing very large monorepos. `scalar clone` creates a partial clone with optimised settings; `scalar register`/`unregister` adds or removes a repository from the background-maintenance list; `scalar run` executes a maintenance task; `scalar reconfigure` refreshes config; `scalar delete` removes an enlistment from disk. `scalar list` and `scalar diagnose` are read-only — list enumerates registered enlistments, diagnose writes a zip of logs/statistics. Ships with Git itself since 2.38; the surface is rarely revised."
+url = "https://git-scm.com/docs/scalar"
+researched_version = "Git 2.46 (2025) — surface stable across recent releases"
+bare_flags = ["--help", "--version", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "diagnose"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "clone"
+candidate = true
+
+[[command.sub]]
+name = "register"
+candidate = true
+
+[[command.sub]]
+name = "unregister"
+candidate = true
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "reconfigure"
+candidate = true
+
+[[command.sub]]
+name = "delete"
+candidate = true

@@ -2156,6 +2156,14 @@ Aliases: `code-insiders`, `codium`
 
 - Allowed standalone flags: --help, --version, -?, -help
 
+### `csplit`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/csplit">https://www.gnu.org/software/coreutils/csplit</a></p>
+
+Aliases: `gcsplit`
+
+- Allowed standalone flags: --elide-empty-files, --help, --keep-files, --quiet, --silent, --suppress-matched, --version, -k, -s, -z
+- Allowed valued flags: --digits, --prefix, --suffix-format, -b, -f, -n
+
 ### `csrutil`
 <p class="cmd-url"><a href="https://ss64.com/mac/csrutil.html">https://ss64.com/mac/csrutil.html</a></p>
 
@@ -6593,6 +6601,15 @@ Aliases: `run-p`, `run-s`
 
 - Allowed standalone flags: --help, --version, --?, -h, -?
 
+### `numfmt`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/numfmt">https://www.gnu.org/software/coreutils/numfmt</a></p>
+
+Aliases: `gnumfmt`
+
+- Allowed standalone flags: --debug, --grouping, --header, --help, --version, --zero-terminated, -z
+- Allowed valued flags: --delimiter, --field, --format, --from, --from-unit, --invalid, --padding, --round, --suffix, --to, --to-unit, -d
+- Bare invocation allowed
+
 ### `nvm`
 <p class="cmd-url"><a href="https://github.com/nvm-sh/nvm#readme">https://github.com/nvm-sh/nvm#readme</a></p>
 
@@ -8545,6 +8562,13 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 - Allowed valued flags: --config, --config-str, --dialect, --exclude, --include, -c
 - Bare invocation allowed
 
+### `scalar`
+<p class="cmd-url"><a href="https://git-scm.com/docs/scalar">https://git-scm.com/docs/scalar</a></p>
+
+- **diagnose**: Flags: --help, -h
+- **list**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+
 ### `scalene`
 <p class="cmd-url"><a href="https://github.com/plasma-umass/scalene">https://github.com/plasma-umass/scalene</a></p>
 
@@ -9210,6 +9234,12 @@ Aliases: `serverless`
 - Allowed standalone flags: --auto-correct, --auto-correct-all, --autocorrect, --autocorrect-all, --color, --debug, --display-cop-names, --fail-fast, --fix, --fix-layout, --help, --lint, --list-target-files, --no-color, --no-fix, --parallel, --safe-auto-correct, --safe-autocorrect, --show-cops, --version, -A, -V, -a, -d, -h, -l
 - Allowed valued flags: --cache-root, --config, --except, --fail-level, --format, --only, --out, --require, --stdin, -c, -f, -o, -r
 - Bare invocation allowed
+
+### `stapler`
+<p class="cmd-url"><a href="https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/customizing_the_notarization_workflow">https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/customizing_the_notarization_workflow</a></p>
+
+- **staple**: Flags: -q, -v
+- **validate**: Flags: -q, -v
 
 ### `starship`
 <p class="cmd-url"><a href="https://starship.rs/">https://starship.rs/</a></p>

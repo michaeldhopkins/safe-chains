@@ -1,0 +1,19 @@
+[[command]]
+name = "numfmt"
+aliases = ["gnumfmt"]
+description = "GNU coreutils utility that reformats numbers between raw and human-readable representations (KiB, MiB, K, M, …). Read-only: parses numbers from stdin or positional arguments, applies scaling and formatting per `--from`/`--to`, and writes results to stdout. Ships with coreutils on Linux and via Homebrew (`gnumfmt`) on macOS; the surface has been stable since coreutils 8.21 (2013)."
+url = "https://www.gnu.org/software/coreutils/numfmt"
+researched_version = "coreutils 9.7 (2025)"
+level = "Inert"
+bare = true
+standalone = [
+    "--debug", "--grouping", "--header", "--help", "--version",
+    "--zero-terminated",
+    "-z",
+]
+valued = [
+    "--delimiter", "--field", "--format", "--from", "--from-unit",
+    "--invalid", "--padding", "--round", "--suffix", "--to",
+    "--to-unit",
+    "-d",
+]

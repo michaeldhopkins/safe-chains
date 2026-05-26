@@ -14,6 +14,14 @@
 - Allowed valued flags: --expression, --file, --ibase, --obase, --redefine, --scale, --seed, -E, -I, -O, -S, -e, -f, -r
 - Bare invocation allowed
 
+### `csplit`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/csplit">https://www.gnu.org/software/coreutils/csplit</a></p>
+
+Aliases: `gcsplit`
+
+- Allowed standalone flags: --elide-empty-files, --help, --keep-files, --quiet, --silent, --suppress-matched, --version, -k, -s, -z
+- Allowed valued flags: --digits, --prefix, --suffix-format, -b, -f, -n
+
 ### `dasel`
 <p class="cmd-url"><a href="https://github.com/TomWright/dasel">https://github.com/TomWright/dasel</a></p>
 
@@ -88,6 +96,15 @@
 <p class="cmd-url"><a href="https://miller.readthedocs.io/">https://miller.readthedocs.io/</a></p>
 
 - Data processing allowed. Verbs and file arguments accepted.
+
+### `numfmt`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/numfmt">https://www.gnu.org/software/coreutils/numfmt</a></p>
+
+Aliases: `gnumfmt`
+
+- Allowed standalone flags: --debug, --grouping, --header, --help, --version, --zero-terminated, -z
+- Allowed valued flags: --delimiter, --field, --format, --from, --from-unit, --invalid, --padding, --round, --suffix, --to, --to-unit, -d
+- Bare invocation allowed
 
 ### `printf`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#printf-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#printf-invocation</a></p>

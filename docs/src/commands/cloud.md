@@ -542,6 +542,12 @@
 - **vpc private-network**: Allowed arguments: list
 - Allowed standalone flags: --help, -h
 
+### `stapler`
+<p class="cmd-url"><a href="https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/customizing_the_notarization_workflow">https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/customizing_the_notarization_workflow</a></p>
+
+- **staple**: Flags: -q, -v
+- **validate**: Flags: -q, -v
+
 ### `vultr-cli`
 <p class="cmd-url"><a href="https://github.com/vultr/vultr-cli">https://github.com/vultr/vultr-cli</a></p>
 

@@ -1,0 +1,17 @@
+[[command]]
+name = "csplit"
+aliases = ["gcsplit"]
+description = "Splits a file into pieces based on context patterns (line numbers or regex matches), writing each piece to a sequentially-named output file (`xx00`, `xx01`, …). Writes new files in the current directory unconditionally, so the bare invocation is a local-filesystem write. The macOS BSD form supports `-k`/`-s`/`-f`/`-n`; the GNU form (`gcsplit` via Homebrew, or `csplit` on Linux) adds `--prefix`/`--suffix-format`/`--digits`/`--keep-files`/`--quiet`/`--elide-empty-files`/`--suppress-matched`. POSIX utility with a frozen surface."
+url = "https://www.gnu.org/software/coreutils/csplit"
+researched_version = "coreutils 9.7 (2025); macOS 14 BSD"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--elide-empty-files", "--help", "--keep-files", "--quiet",
+    "--silent", "--suppress-matched", "--version",
+    "-k", "-s", "-z",
+]
+valued = [
+    "--digits", "--prefix", "--suffix-format",
+    "-b", "-f", "-n",
+]
