@@ -1,0 +1,274 @@
+[[command]]
+name = "fax2ps"
+description = "libtiff fax-to-PostScript converter. Reads a TIFF facsimile and writes PostScript to stdout (or -o PATH). No network. libtiff 4.x; surface frozen."
+url = "https://libtiff.gitlab.io/libtiff/tools/fax2ps.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?", "-S", "-l", "-r", "-p"]
+valued = ["-o", "-x", "-y", "-W", "-H", "-m", "-s"]
+
+[[command]]
+name = "fax2tiff"
+description = "libtiff raw-fax to TIFF converter. Reads Group 3/4 raw fax data and writes a Class F TIFF. -o sets the output file. No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/fax2tiff.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "-?", "-1", "-2", "-3", "-4",
+    "-B", "-L", "-M", "-R",
+    "-A", "-P",
+    "-c", "-f", "-l", "-m", "-p",
+    "-s", "-u", "-U", "-v", "-z",
+]
+valued = ["-o", "-X", "-r"]
+
+[[command]]
+name = "pal2rgb"
+description = "libtiff palette→RGB TIFF converter. Reads a palette TIFF and writes a full-colour RGB TIFF. No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/pal2rgb.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?", "-p", "-C", "-r"]
+valued = ["-c"]
+
+[[command]]
+name = "ppm2tiff"
+description = "libtiff PPM→TIFF converter. Reads a PPM/PGM/PBM file (or stdin when input is `-`) and writes a TIFF. -c sets compression. No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/ppm2tiff.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?"]
+valued = ["-R", "-c", "-r"]
+
+[[command]]
+name = "raw2tiff"
+description = "libtiff raw-pixel→TIFF converter. Reads a raw pixel-stream file and writes a TIFF, given pixel dimensions / format flags. No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/raw2tiff.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?", "-L", "-M", "-S", "-f"]
+valued = [
+    "-c", "-d", "-i", "-l", "-o", "-p",
+    "-r", "-s", "-w", "-W",
+    "-H", "-b",
+    "-n",
+]
+
+[[command]]
+name = "rgb2ycbcr"
+description = "libtiff non-YCbCr→YCbCr TIFF converter. Reads an RGB TIFF and writes a YCbCr-encoded TIFF. No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/rgb2ycbcr.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-?"]
+valued = ["-c", "-r", "-h", "-v"]
+
+[[command]]
+name = "thumbnail"
+description = "libtiff multi-image TIFF thumbnail generator. Reads a multi-page TIFF and writes a copy with a thumbnail image embedded per page. No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/thumbnail.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-?"]
+valued = ["-c", "-w", "-h", "-N", "-f", "-s"]
+
+[[command]]
+name = "tiff2bw"
+description = "libtiff colour→greyscale TIFF converter. Reads an RGB TIFF and writes an 8-bit greyscale TIFF. No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiff2bw.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?"]
+valued = ["-c", "-r", "-R", "-G", "-B"]
+
+[[command]]
+name = "tiff2pdf"
+description = "libtiff TIFF→PDF converter. Reads a TIFF and writes a PDF. -o sets the destination. No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiff2pdf.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?", "-d", "-i", "-n", "-P", "-q"]
+valued = [
+    "-a", "-A", "-b", "-c",
+    "-e", "-f", "-F", "-j",
+    "-k", "-l", "-L", "-m", "-M",
+    "-o", "-p", "-r", "-s", "-S",
+    "-t", "-T", "-u", "-U", "-w",
+    "-x", "-y", "-z",
+]
+
+[[command]]
+name = "tiff2ps"
+description = "libtiff TIFF→PostScript converter. Reads a TIFF and writes PostScript to stdout (or -o PATH). No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiff2ps.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-?", "-1", "-2", "-3",
+    "-a", "-A", "-c", "-d", "-D",
+    "-e", "-E", "-i", "-m",
+    "-O", "-p", "-r", "-s",
+    "-T", "-u", "-U", "-v",
+    "-z",
+]
+valued = [
+    "-b", "-f", "-H", "-h", "-L",
+    "-M", "-o",
+    "-P", "-S", "-t", "-w",
+    "-W", "-x", "-y",
+]
+
+[[command]]
+name = "tiff2rgba"
+description = "libtiff TIFF→RGBA TIFF converter. Reads a TIFF and writes an RGBA-format TIFF. No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiff2rgba.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?", "-n"]
+valued = ["-b", "-c", "-r"]
+
+[[command]]
+name = "tiff2icns"
+description = "macOS TIFF→Apple Icon (.icns) converter. Reads a TIFF and writes a .icns file. No network."
+url = "https://ss64.com/mac/tiff2icns.html"
+researched_version = "macOS 14; surface frozen"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?", "-noLarge"]
+
+[[command]]
+name = "tiffcmp"
+description = "libtiff comparator. Compares two TIFF files and reports the first difference (or all with -l). Read-only."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiffcmp.html"
+researched_version = "libtiff 4.6.x"
+level = "Inert"
+bare = false
+standalone = ["-h", "-?", "-l", "-z"]
+valued = ["-t"]
+
+[[command]]
+name = "tiffcp"
+description = "libtiff copy/convert. Reads one or more TIFF inputs and writes a TIFF output; can recompress, change tiling, strip layout, or merge pages. Last positional argument is the destination. No network."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiffcp.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "-?", "-a", "-i", "-s", "-t", "-8",
+    "-S",
+]
+valued = [
+    "-b", "-B", "-c", "-f", "-l",
+    "-o", "-p", "-r", "-w",
+    "-x", "-z",
+]
+
+[[command]]
+name = "tiffcrop"
+description = "libtiff cropper. Reads a TIFF, crops/rotates/reorganises selected regions, and writes a new TIFF. Last positional argument is the destination. No network."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiffcrop.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?", "-D", "-E", "-F", "-H", "-I", "-N", "-O", "-R", "-S", "-U", "-Z"]
+valued = [
+    "-a", "-A", "-b", "-B", "-c",
+    "-C", "-f",
+    "-J", "-K", "-l",
+    "-L", "-m", "-M",
+    "-p", "-P",
+    "-X", "-Y",
+]
+
+[[command]]
+name = "tiffdither"
+description = "libtiff greyscale→bilevel TIFF dither. Reads a greyscale TIFF and writes a bilevel TIFF using Floyd-Steinberg. No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiffdither.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?"]
+valued = ["-c", "-f", "-r", "-t"]
+
+[[command]]
+name = "tiffmedian"
+description = "libtiff median-cut TIFF quantiser. Reads a true-colour TIFF and writes a palette TIFF with at most -c colours. No network."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiffmedian.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?", "-d", "-f"]
+valued = ["-C", "-c", "-r"]
+
+[[command]]
+name = "tiffset"
+description = "libtiff TIFF tag setter. Sets, unsets, or copies named/numeric TIFF tag values on an existing TIFF in place. Modifies the file. No network."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiffset.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?", "-S"]
+valued = ["-s", "-sf", "-u", "-d"]
+
+[[command]]
+name = "tiffsplit"
+description = "libtiff multi-page splitter. Reads a multi-image TIFF and writes one single-image TIFF per page, named by an optional prefix. No network. libtiff 4.x."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiffsplit.html"
+researched_version = "libtiff 4.6.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "-?"]
+
+[[command]]
+name = "tiffutil"
+description = "macOS TIFF utility. Adds, removes, extracts, or lists pages of a TIFF; converts between formats; bundles multi-page TIFFs. No network. macOS surface frozen."
+url = "https://ss64.com/mac/tiffutil.html"
+researched_version = "macOS 14; surface frozen"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "-h", "-?",
+    "-cat", "-cathidpi", "-cathidpicheck",
+    "-extract", "-extractAll", "-extractScale",
+    "-extractScaleFactor",
+    "-print", "-show",
+    "-summary",
+    "-keepCompression",
+    "-noEmbeddedThumbs", "-noStripThumbs",
+    "-stripThumbs",
+    "-verbose",
+    "-version",
+]
+valued = ["-out"]
+
+[[command]]
+name = "tiffdump"
+description = "libtiff raw-tag dumper. Reads a TIFF and prints all tags, offsets, and values verbatim. Read-only."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiffdump.html"
+researched_version = "libtiff 4.6.x"
+level = "Inert"
+bare = false
+standalone = ["-h", "-?", "-v"]
+valued = ["-o", "-m"]
+
+[[command]]
+name = "tiffinfo"
+description = "libtiff inspector. Reads a TIFF and prints a human-readable summary of tags, image directories, and data layout. Read-only."
+url = "https://libtiff.gitlab.io/libtiff/tools/tiffinfo.html"
+researched_version = "libtiff 4.6.x"
+level = "Inert"
+bare = false
+standalone = ["-h", "-?", "-c", "-D", "-d", "-i", "-j", "-r", "-s", "-w", "-z"]
+valued = ["-f", "-o"]

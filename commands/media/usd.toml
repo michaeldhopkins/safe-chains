@@ -1,0 +1,123 @@
+[[command]]
+name = "usdcat"
+description = "Pixar OpenUSD canonical reader/writer. Reads a USD file (.usd/.usda/.usdc/.usdz) and writes its flattened form to stdout (default) or to --out PATH. --usdFormat selects ascii/crate. No network. OpenUSD 24.x."
+url = "https://openusd.org/release/toolset.html"
+researched_version = "OpenUSD 24.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help",
+    "--flatten",
+    "--flattenLayerStack",
+    "--skipSourceFileComment",
+    "--loadOnly",
+    "--validate",
+]
+valued = [
+    "-o", "--out",
+    "--usdFormat",
+    "--mask",
+    "--layerMetadata",
+]
+
+[[command]]
+name = "usdcrush"
+description = "Pixar OpenUSD asset packager. Bundles a USD scene plus its referenced asset dependencies into a single .usdz. -o sets the output. No network."
+url = "https://openusd.org/release/toolset.html"
+researched_version = "OpenUSD 24.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "--help", "--verbose", "-v", "--checkCompliance"]
+valued = ["-o", "--out"]
+
+[[command]]
+name = "usdextract"
+description = "Pixar OpenUSD asset extractor. Extracts a USD file and its assets from a .usdz package. Writes into the current directory or -o PATH. No network."
+url = "https://openusd.org/release/toolset.html"
+researched_version = "OpenUSD 24.x"
+level = "SafeWrite"
+bare = false
+standalone = ["-h", "--help", "--verbose", "-v"]
+valued = ["-o", "--out"]
+
+[[command]]
+name = "usdrecord"
+description = "Pixar OpenUSD rendered-image generator. Renders one or more frames of a USD scene to an image file (usually PNG). --frames sets the frame range; --imageWidth controls the resolution; positional output path receives the image. No network."
+url = "https://openusd.org/release/toolset.html"
+researched_version = "OpenUSD 24.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help",
+    "--disableGpu",
+    "--disableCameraLight",
+    "--enableDomeLightVisibility",
+]
+valued = [
+    "--frames",
+    "--imageWidth",
+    "--camera",
+    "--purposes",
+    "--complexity",
+    "--renderer",
+    "--colorCorrectionMode",
+    "--traceToFile",
+    "--traceFormat",
+    "--memstats",
+]
+
+[[command]]
+name = "usdzip"
+description = "Pixar OpenUSD .usdz packager. Bundles a USD file plus its dependencies into a deterministic .usdz archive. First positional is the destination; remaining positionals are inputs. No network."
+url = "https://openusd.org/release/toolset.html"
+researched_version = "OpenUSD 24.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help",
+    "-r", "--recurse",
+    "-l", "--list",
+    "-d", "--dump",
+    "--checkCompliance",
+]
+valued = ["--asset", "--arkitAsset"]
+
+[[command]]
+name = "usdchecker"
+description = "Pixar OpenUSD validator. Reads a USD file, applies Pixar's compliance rule-set, and prints any violations. Read-only inspector."
+url = "https://openusd.org/release/toolset.html"
+researched_version = "OpenUSD 24.x"
+level = "Inert"
+bare = false
+standalone = [
+    "-h", "--help",
+    "-s", "--skipVariants",
+    "-p", "--rootPackageOnly",
+    "--arkit",
+    "--strict",
+    "--dumpRules",
+    "--verbose",
+    "-v",
+]
+valued = [
+    "-o", "--out",
+    "--variantSets",
+]
+
+[[command]]
+name = "usdtree"
+description = "Pixar OpenUSD scenegraph printer. Reads a USD file and prints its prim hierarchy as an ascii tree. Read-only."
+url = "https://openusd.org/release/toolset.html"
+researched_version = "OpenUSD 24.x"
+level = "Inert"
+bare = false
+standalone = [
+    "-h", "--help",
+    "-u", "--unloaded",
+    "-a", "--attributes",
+    "-m", "--metadata",
+    "-s", "--simple",
+    "-f", "--flatten",
+    "-i", "--inactive",
+    "-p", "--population",
+]

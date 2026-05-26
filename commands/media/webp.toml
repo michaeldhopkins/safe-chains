@@ -1,0 +1,99 @@
+[[command]]
+name = "dwebp"
+description = "libwebp decoder. Reads a WebP file and writes PNG/PPM/PGM/PAM/YUV/BMP/TIFF. -o sets the destination; stdout when -o is `-`. No network. Active project, libwebp 1.x."
+url = "https://developers.google.com/speed/webp/docs/dwebp"
+researched_version = "libwebp 1.4.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "-help", "-H", "-longhelp", "-version",
+    "-alpha", "-bmp", "-pam", "-pgm", "-pnm", "-ppm",
+    "-tiff", "-yuv",
+    "-nofancy", "-nofilter", "-nodither",
+    "-mt", "-noasm",
+    "-quiet", "-v",
+    "-incremental",
+    "-flip",
+]
+valued = [
+    "-o",
+    "-crop",
+    "-resize", "-scale",
+    "-dither", "-alpha_dither",
+    "-size",
+]
+
+[[command]]
+name = "webpinfo"
+description = "libwebp WebP inspector. Prints chunk structure, payload sizes, format metadata, and integrity diagnostics for a WebP file. Read-only."
+url = "https://developers.google.com/speed/webp/docs/webp_lossless_bitstream_specification"
+researched_version = "libwebp 1.4.x"
+level = "Inert"
+bare = false
+standalone = [
+    "-h", "-help", "-H", "-longhelp", "-version",
+    "-summary", "-quiet",
+    "-bitstream_info",
+    "-diag",
+]
+
+[[command]]
+name = "webpmux"
+description = "libwebp muxer. Creates/edits WebP files: assembles animated WebP from frames, sets/extracts/strips ICC/XMP/EXIF metadata, sets background/loop count. -o writes the output file. No network."
+url = "https://developers.google.com/speed/webp/docs/webpmux"
+researched_version = "libwebp 1.4.x"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "-h", "-help", "-H", "-longhelp", "-version",
+    "-info",
+]
+valued = [
+    "-o",
+    "-frame", "-loop", "-bgcolor",
+    "-get", "-set", "-strip",
+    "-duration",
+]
+
+[[command]]
+name = "img2webp"
+description = "libwebp animated WebP builder. Takes a list of input frame images (PNG/JPEG/TIFF/WebP) plus per-frame options and writes an animated .webp. -o sets the output path. No network."
+url = "https://developers.google.com/speed/webp/docs/img2webp"
+researched_version = "libwebp 1.4.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "-help", "-H", "-longhelp", "-version",
+    "-lossy", "-lossless", "-mixed",
+    "-mt", "-v",
+]
+valued = [
+    "-o", "-d", "-q", "-m",
+    "-loop",
+    "-min_size",
+    "-kmin", "-kmax",
+    "-metadata",
+    "-near_lossless",
+]
+
+[[command]]
+name = "gif2webp"
+description = "libwebp GIF→WebP converter. Reads an animated GIF and writes an animated WebP. -o sets the destination. -lossy/-lossless/-mixed pick the encoding mode. No network."
+url = "https://developers.google.com/speed/webp/docs/gif2webp"
+researched_version = "libwebp 1.4.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "-help", "-H", "-longhelp", "-version",
+    "-lossy", "-lossless", "-mixed",
+    "-mt", "-v", "-quiet",
+    "-min_size",
+]
+valued = [
+    "-o", "-q", "-m",
+    "-kmin", "-kmax",
+    "-f",
+    "-metadata",
+    "-loop_compatibility",
+]

@@ -1,0 +1,142 @@
+[[command]]
+name = "avmediainfo"
+description = "macOS AVFoundation media inspector. Prints track, codec, and container metadata for movie / audio files. Read-only."
+url = "https://ss64.com/mac/avmediainfo.html"
+researched_version = "macOS 14; AVFoundation surface frozen"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "-h",
+    "--brief",
+    "--verbose",
+    "--include-formatreader",
+    "--json",
+    "--ignore-tracks",
+    "--list-formats",
+]
+valued = [
+    "--track-index",
+    "--track-id",
+]
+
+[[command]]
+name = "avconvert"
+description = "macOS AVFoundation media converter. Reads a movie/audio file and writes a transcoded copy. --preset selects an output preset; --source / --output (or -s/-o) pick paths. No network. macOS surface frozen."
+url = "https://ss64.com/mac/avconvert.html"
+researched_version = "macOS 14; AVFoundation surface frozen"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--help", "-h",
+    "--progress",
+    "--verbose", "-v",
+    "--replace", "-r",
+    "--disableMetadataFilter",
+    "--allowMixedSourceTracks",
+    "--list-presets",
+    "--preserveLivePhoto",
+    "--optimize", "-O",
+]
+valued = [
+    "--source", "-s",
+    "--output", "-o",
+    "--preset", "-p",
+    "--start", "--duration", "--end",
+    "--frameRate",
+    "--metadata",
+    "--audioOnly",
+    "--realtime",
+]
+
+[[command]]
+name = "qlmanage"
+description = "macOS Quick Look CLI. Subcommand-style flags: -p shows a preview window, -t writes a thumbnail PNG/JPEG to disk, -g loads a generator, -m prints generator/server status. -o sets the output directory for -t. macOS-only; surface frozen."
+url = "https://ss64.com/mac/qlmanage.html"
+researched_version = "macOS 14; surface frozen"
+level = "SafeRead"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "-h", "--help",
+    "-p", "-t", "-m",
+    "-d",
+    "-r", "-x",
+    "-z",
+    "-i",
+    "-f",
+]
+valued = [
+    "-o",
+    "-s",
+    "-g",
+    "-c",
+    "-pluginIDs",
+]
+write_flags = ["-t", "-o"]
+
+[[command]]
+name = "screencapture"
+description = "macOS screen capture utility. Captures the entire screen, a window, or a region to a file (or to the clipboard with -c). The trailing positional is the output path; file extension picks PNG/JPEG/TIFF/PDF. -i interactively prompts for a selection. No network. macOS surface essentially frozen."
+url = "https://ss64.com/mac/screencapture.html"
+researched_version = "macOS 14; surface frozen"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "-h", "-?",
+    "-c", "-C", "-d",
+    "-i", "-I",
+    "-J",
+    "-l",
+    "-m", "-M",
+    "-o",
+    "-O",
+    "-P", "-p",
+    "-r",
+    "-s",
+    "-S",
+    "-u",
+    "-U",
+    "-V",
+    "-v",
+    "-w",
+    "-W",
+    "-x",
+]
+valued = [
+    "-D",
+    "-G",
+    "-R",
+    "-T",
+    "-t",
+    "-B",
+]
+
+[[command]]
+name = "imgcmp"
+description = "macOS image comparison utility. Reads two image files and prints similarity / pixel-difference metrics. Read-only."
+url = "https://ss64.com/mac/imgcmp.html"
+researched_version = "macOS 14; surface frozen"
+level = "Inert"
+bare = false
+standalone = ["-h", "--help", "-v", "--verbose"]
+valued = ["-t", "--threshold"]
+
+[[command]]
+name = "imginfo"
+description = "macOS image information utility. Prints format, dimensions, colour profile, and metadata for an image file. Read-only."
+url = "https://ss64.com/mac/imginfo.html"
+researched_version = "macOS 14; surface frozen"
+level = "Inert"
+bare = false
+standalone = ["-h", "--help", "-v", "--verbose", "-f", "--format-only"]
+
+[[command]]
+name = "lsm"
+description = "macOS Latent Semantic Mapping CLI. Reads a corpus of text files and prints classification or similarity results using the system LSM framework. Read-only inspection."
+url = "https://developer.apple.com/documentation/latentsemanticmapping"
+researched_version = "macOS 14; surface frozen"
+level = "Inert"
+bare = true
+standalone = ["-h", "--help", "-v", "--verbose"]

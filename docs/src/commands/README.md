@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1428 commands across 75 categories.
+safe-chains knows 1568 commands across 75 categories.
 
 ## Glossary
 
@@ -58,7 +58,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Common Lisp](lisp.md) (2 commands)
 - [Lua](lua.md) (2 commands)
 - [ImageMagick](magick.md) (1 commands)
-- [Media](media.md) (10 commands)
+- [Media](media.md) (84 commands)
 - [Database Migrations](migrations.md) (6 commands)
 - [ML / Observability](ml.md) (7 commands)
 - [Mobile Frameworks](mobile.md) (5 commands)
@@ -86,7 +86,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [System Info](sysinfo.md) (54 commands)
 - [System](system.md) (115 commands)
 - [TeX / LaTeX](tex.md) (3 commands)
-- [Text Processing](text.md) (29 commands)
+- [Text Processing](text.md) (95 commands)
 - [Developer Tools](tools.md) (229 commands)
 - [Version Control](vcs.md) (10 commands)
 - [WebAssembly](wasm.md) (10 commands)

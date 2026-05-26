@@ -1,0 +1,218 @@
+[[command]]
+name = "gettext"
+description = "Looks up a translated string in a message catalog and prints it. Read-only catalog lookup writing to stdout. Part of GNU gettext; stable."
+url = "https://www.gnu.org/software/gettext/manual/html_node/gettext-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = false
+standalone = ["--help", "--version", "-E", "-h", "-n", "-V", "-s"]
+valued = ["--domain", "--env", "-d", "-e"]
+
+[[command]]
+name = "ngettext"
+description = "Looks up a singular/plural translated string in a message catalog and prints it. Read-only lookup. GNU gettext."
+url = "https://www.gnu.org/software/gettext/manual/html_node/ngettext-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = false
+standalone = ["--help", "--version", "-E", "-h", "-V"]
+valued = ["--domain", "--env", "-d", "-e"]
+
+[[command]]
+name = "envsubst"
+description = "Substitutes environment variable references in stdin and writes the result to stdout. Pure filter; no filesystem writes. GNU gettext."
+url = "https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = true
+standalone = ["--help", "--variables", "--version", "-V", "-h", "-v"]
+
+[[command]]
+name = "msgcat"
+description = "Concatenates and merges PO message catalogs. Output goes to stdout by default; -o writes to a file. Local-only. GNU gettext."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msgcat-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = true
+tolerate_unknown_long = true
+standalone = ["--help", "--version", "-h", "-V"]
+valued = ["--output-file", "--files-from", "-o", "-f", "-D"]
+
+[[command]]
+name = "msgcmp"
+description = "Compares two PO files to verify all messages are translated. Read-only; writes diagnostics to stderr."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msgcmp-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--help", "--version", "-h", "-V"]
+
+[[command]]
+name = "msgcomm"
+description = "Finds messages common to multiple PO files. Output to stdout or -o file. Local-only."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msgcomm-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--help", "--version"]
+valued = ["--output-file", "-o", "-D"]
+
+[[command]]
+name = "msgattrib"
+description = "Filters PO messages by attribute (translated/untranslated/fuzzy). Output to stdout or -o file. Local-only."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msgattrib-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--help", "--version"]
+valued = ["--output-file", "-o"]
+
+[[command]]
+name = "msgconv"
+description = "Converts a PO file's character encoding. Output to stdout or -o file. Local-only."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msgconv-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--help", "--version"]
+valued = ["--output-file", "--to-code", "-o", "-t"]
+
+[[command]]
+name = "msgen"
+description = "Creates an English PO file from a POT template. Output to stdout or -o file."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msgen-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--help", "--version"]
+valued = ["--output-file", "-o"]
+
+[[command]]
+name = "msgexec"
+description = "Applies a command to each message in a PO file. Wrapper-like; safety depends on the inner command."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msgexec-Invocation.html"
+researched_version = "GNU gettext 0.23"
+[command.wrapper]
+standalone = ["--help", "--version"]
+valued = ["--input", "-i", "--newline"]
+
+[[command]]
+name = "msgfilter"
+description = "Filters PO messages through a command. Wrapper-like; safety depends on the inner command."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msgfilter-Invocation.html"
+researched_version = "GNU gettext 0.23"
+[command.wrapper]
+standalone = ["--help", "--version", "--keep-header"]
+valued = ["--input", "--output-file", "-i", "-o"]
+
+[[command]]
+name = "msggrep"
+description = "Greps PO messages by various selectors. Output to stdout or -o file. Local-only."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msggrep-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--help", "--version", "-e", "-K", "-T", "-C", "-J", "-N"]
+valued = ["--output-file", "--regexp", "-o", "-E"]
+
+[[command]]
+name = "msguniq"
+description = "Unifies duplicate translations in a PO file. Output to stdout or -o file."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msguniq-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "Inert"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--help", "--version", "--repeated", "--unique"]
+valued = ["--output-file", "-o"]
+
+[[command]]
+name = "msgfmt"
+description = "Compiles PO files into binary MO files (or other catalog formats). Writes local files only."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msgfmt-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--help", "--version", "--check", "--statistics", "--verbose", "-c", "-v"]
+valued = ["--output-file", "--directory", "-o", "-d", "-D", "-l"]
+
+[[command]]
+name = "msgunfmt"
+description = "Reverses msgfmt: decompiles a MO file back into a PO file. Writes local files only."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msgunfmt-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--help", "--version"]
+valued = ["--output-file", "-o"]
+
+[[command]]
+name = "msginit"
+description = "Creates a new PO file from a POT template, prefilling the header. Writes local files."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msginit-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_long = true
+standalone = ["--help", "--version", "--no-translator"]
+valued = ["--input", "--output-file", "--locale", "-i", "-o", "-l"]
+
+[[command]]
+name = "msgmerge"
+description = "Merges a new POT template into an existing PO file. Writes local files."
+url = "https://www.gnu.org/software/gettext/manual/html_node/msgmerge-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--help", "--version", "--update", "--backup", "-U", "-N"]
+valued = ["--output-file", "-o", "-D"]
+
+[[command]]
+name = "xgettext"
+description = "Extracts translatable strings from source code into a POT template. Writes local files only."
+url = "https://www.gnu.org/software/gettext/manual/html_node/xgettext-Invocation.html"
+researched_version = "GNU gettext 0.23"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_long = true
+standalone = ["--help", "--version", "--join-existing", "-j"]
+valued = [
+    "--default-domain", "--directory", "--files-from", "--output",
+    "--output-dir", "--language", "--from-code", "--keyword",
+    "-d", "-D", "-f", "-o", "-p", "-L", "-k",
+]
+
+[[command]]
+name = "gencat"
+description = "Compiles NLS catalog source files into binary catalogs. Writes local files only."
+url = "https://man7.org/linux/man-pages/man1/gencat.1.html"
+researched_version = "glibc gencat"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--version", "--new", "-V", "-h"]
+valued = ["--lang", "-l"]
+
+[[command]]
+name = "localedef"
+description = "Compiles locale definition files into the binary form used by the locale system. Writes locale files; typical installation targets are system paths requiring privilege."
+url = "https://man7.org/linux/man-pages/man1/localedef.1.html"
+researched_version = "glibc localedef"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--alias-file", "--force", "--help", "--list-archive",
+    "--no-archive", "--no-hard-links", "--no-warnings",
+    "--posix", "--quiet", "--replace", "--verbose", "--version",
+    "--warnings",
+    "-A", "-c", "-f", "-i", "-u", "-v",
+]
+valued = ["--charmap", "--inputfile", "--prefix", "--repertoire-map"]

@@ -1,0 +1,21 @@
+[[command]]
+name = "unifdef"
+aliases = ["unifdefall"]
+description = "Removes C preprocessor #ifdef/#ifndef blocks based on -D and -U definitions. Writes to stdout by default; -o writes to file; -m modifies in place. Local-only."
+url = "https://dotat.at/prog/unifdef/"
+researched_version = "unifdef 2.12"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["-h", "-V"]
+valued = ["-o"]
+
+[[command]]
+name = "rename"
+description = "Perl-style bulk file renamer (the file-rename / perl-rename utility). Renames files on the local filesystem per a Perl expression. Local-only filesystem write."
+url = "https://metacpan.org/dist/File-Rename/view/rename"
+researched_version = "File-Rename 2.x"
+level = "SafeWrite"
+bare = false
+standalone = ["--force", "--help", "--man", "--no-act", "--verbose", "--version", "-V", "-f", "-n", "-v"]
+valued = ["--expr", "-e"]

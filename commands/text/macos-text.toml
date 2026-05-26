@@ -1,0 +1,25 @@
+[[command]]
+name = "textutil"
+description = "macOS utility to convert between text formats (txt, rtf, html, doc, odt). Reads input files and writes converted output, either to a specified file or alongside the input. Local-only; no network."
+url = "https://ss64.com/mac/textutil.html"
+researched_version = "macOS 14"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "-info", "-cat", "-convert", "-strip", "-stdin", "-stdout", "-help",
+    "-noload",
+]
+valued = [
+    "-format", "-encoding", "-extension", "-fontname", "-fontsize",
+    "-inputencoding", "-output", "-outputdir",
+]
+
+[[command]]
+name = "tab2space"
+description = "Expands tabs to spaces and fixes line endings in source files. Can rewrite files in place. Local-only."
+url = "https://man.freebsd.org/cgi/man.cgi?tab2space"
+researched_version = "BSD tab2space"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true

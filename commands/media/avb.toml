@@ -1,0 +1,39 @@
+[[command]]
+name = "avbanalyse"
+description = "macOS Audio-Video Bridging (AVB) network analyser. Inspects AVB-enabled interfaces and prints diagnostic information. Read-only network/local inspection."
+url = "https://ss64.com/mac/avbanalyse.html"
+researched_version = "macOS 14; surface frozen"
+level = "Inert"
+bare = true
+standalone = ["-h", "--help", "-v", "--verbose"]
+valued = ["-i", "--interface"]
+
+[[command]]
+name = "avbcapture"
+description = "macOS AVB capture diagnostic. Captures AVB streams from the network for analysis. Read-only network probe; writes captured data only when explicitly redirected by the user."
+url = "https://ss64.com/mac/avbcapture.html"
+researched_version = "macOS 14; surface frozen"
+level = "Inert"
+bare = true
+standalone = ["-h", "--help", "-v", "--verbose"]
+valued = ["-i", "--interface", "-d", "--duration", "-o", "--output"]
+
+[[command]]
+name = "avbdiagnose"
+description = "macOS AVB diagnostic collector. Gathers AVB-related state and prints a summary report. Read-only inspection."
+url = "https://ss64.com/mac/avbdiagnose.html"
+researched_version = "macOS 14; surface frozen"
+level = "Inert"
+bare = true
+standalone = ["-h", "--help", "-v", "--verbose"]
+valued = ["-i", "--interface", "-o", "--output"]
+
+[[command]]
+name = "avbutil"
+description = "macOS Audio-Video Bridging configuration utility. Enables/disables AVB on network interfaces, lists current AVB state, and tweaks AVB parameters. Modifies local system network configuration."
+url = "https://ss64.com/mac/avbutil.html"
+researched_version = "macOS 14; surface frozen"
+level = "SafeWrite"
+bare = true
+standalone = ["-h", "--help", "list", "show", "enable", "disable", "status"]
+valued = ["-i", "--interface"]

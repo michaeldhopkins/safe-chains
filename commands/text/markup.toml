@@ -1,0 +1,55 @@
+[[command]]
+name = "tidy"
+description = "HTML/XHTML/XML validator and pretty-printer. Reads input and writes corrected output to stdout, or in place with -m. Local-only; does not fetch URLs in normal modes."
+url = "https://www.html-tidy.org/"
+researched_version = "html-tidy 5.x"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_short = true
+standalone = [
+    "-asxhtml", "-asxml", "-ashtml", "-clean", "-config", "-help",
+    "-help-config", "-help-option", "-i", "-indent", "-language",
+    "-m", "-modify", "-n", "-numeric", "-omit", "-q", "-quiet",
+    "-show-config", "-show-body-only", "-upper", "-utf8", "-v", "-version",
+    "-w", "-xml", "-h",
+    "--help", "--version",
+]
+valued = [
+    "-access", "-encoding", "-errors", "-file", "-output",
+    "-show-errors", "-wrap", "-o",
+]
+
+[[command]]
+name = "xsltproc"
+description = "Command-line XSLT processor (libxslt). Applies a stylesheet to an XML document and writes the transformed result to stdout (or to -o). Local-only by default."
+url = "https://gitlab.gnome.org/GNOME/libxslt"
+researched_version = "libxslt 1.1"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--catalogs", "--debug", "--debugger", "--dumpextensions",
+    "--encoding", "--help", "--html", "--load-trace", "--maxdepth",
+    "--noblanks", "--nodict", "--nomkdir", "--nonet", "--novalid",
+    "--nowrite", "--pedantic", "--profile", "--repeat",
+    "--timing", "--verbose", "--version", "--writesubtree",
+    "--xinclude", "-v", "-V",
+]
+valued = [
+    "--maxparserdepth", "--maxvars", "--output", "--param",
+    "--stringparam", "-o", "-p",
+]
+
+[[command]]
+name = "xmlcatalog"
+description = "Looks up entries in or modifies XML/SGML catalogs. Read-only queries by default; -add/-del modify the catalog file. Coverage focuses on lookup forms."
+url = "https://gitlab.gnome.org/GNOME/libxml2"
+researched_version = "libxml2 2.13"
+level = "SafeRead"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--shell", "--sgml", "--verbose", "-v",
+    "--noout", "--create",
+]
+valued = ["--add", "--del"]

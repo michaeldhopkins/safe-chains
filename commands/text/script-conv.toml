@@ -1,0 +1,47 @@
+[[command]]
+name = "a2p"
+description = "Converts awk scripts to Perl. Reads an awk script and writes equivalent Perl to stdout. Pure source-to-source transformer; no filesystem writes."
+url = "https://perldoc.perl.org/a2p"
+researched_version = "Perl 5.34+"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true
+
+[[command]]
+name = "s2p"
+aliases = ["psed"]
+description = "Converts sed scripts to Perl. Reads a sed script and writes equivalent Perl to stdout. Pure source-to-source transformer."
+url = "https://perldoc.perl.org/s2p"
+researched_version = "Perl 5.34+"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true
+
+[[command]]
+name = "zlib-flate"
+description = "Raw zlib compress/decompress filter from qpdf. Pure stdin-to-stdout transformer; no filesystem access."
+url = "https://qpdf.readthedocs.io/"
+researched_version = "qpdf 12.x"
+level = "Inert"
+bare = true
+standalone = ["-compress", "-uncompress"]
+valued = ["-level"]
+
+[[command]]
+name = "word-list-compress"
+description = "Compresses/decompresses Aspell word lists. Pure stdin-to-stdout filter; never modifies files in place."
+url = "https://aspell.net/"
+researched_version = "aspell 0.60"
+level = "Inert"
+bare = false
+standalone = ["c", "d"]
+
+[[command]]
+name = "lesskey"
+description = "Compiles a less keybindings source file into the binary form less reads. Writes a single local file (~/.less by default). Local-only."
+url = "https://man7.org/linux/man-pages/man1/lesskey.1.html"
+researched_version = "less 668"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--version", "-V"]
+valued = ["--output", "-o"]

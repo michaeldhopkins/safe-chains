@@ -1,0 +1,163 @@
+[[command]]
+name = "yes"
+aliases = ["gyes"]
+description = "Repeatedly prints a string (default: 'y') to stdout until killed. Pure stdout producer; no filesystem writes, no network. POSIX/coreutils; frozen surface."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#yes-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version"]
+
+[[command]]
+name = "tee"
+aliases = ["gtee"]
+description = "Reads from stdin and writes to stdout AND to each named file. Writes local files only (does not access network or invoke other programs). -a/--append extends rather than truncates. Part of GNU coreutils; surface frozen for decades."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#tee-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--append", "--help", "--ignore-interrupts", "--output-error",
+    "--version",
+    "-a", "-i", "-p",
+]
+
+[[command]]
+name = "tsort"
+aliases = ["gtsort"]
+description = "Performs topological sort on whitespace-separated pairs of names from stdin or a file. Pure read-only computation; writes ordered output to stdout. POSIX/coreutils."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#tsort-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = ["--help", "--version"]
+
+[[command]]
+name = "nohup"
+aliases = ["gnohup"]
+description = "Runs a command immune to SIGHUP, redirecting stdout/stderr to nohup.out (or specified file) if attached to a terminal. Wraps an inner command; safety depends on the inner command. POSIX/coreutils."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#nohup-invocation"
+researched_version = "GNU coreutils 9.7"
+[command.wrapper]
+standalone = ["--help", "--version"]
+
+[[command]]
+name = "join"
+aliases = ["gjoin"]
+description = "Performs a relational join on two sorted files based on a common field. Read-only: reads both files and writes joined records to stdout. POSIX/coreutils; surface frozen."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#join-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "Inert"
+bare = false
+standalone = [
+    "--check-order", "--header", "--help", "--ignore-case",
+    "--nocheck-order", "--version", "--zero-terminated",
+    "-V", "-h", "-i", "-z",
+]
+valued = [
+    "--empty", "--output-delimiter",
+    "-1", "-2", "-a", "-e", "-j", "-o", "-t", "-v",
+]
+
+[[command]]
+name = "dircolors"
+aliases = ["gdircolors"]
+description = "Outputs shell commands to set LS_COLORS from a configuration file or built-in defaults. Pure stdout producer; no filesystem writes. Coreutils."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#dircolors-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "Inert"
+bare = true
+standalone = [
+    "--bourne-shell", "--c-shell", "--csh", "--help", "--print-database",
+    "--print-ls-colors", "--sh", "--version",
+    "-V", "-b", "-c", "-h", "-p",
+]
+
+[[command]]
+name = "shred"
+aliases = ["gshred"]
+description = "Overwrites files repeatedly to make recovery harder, optionally removing them. Destructive local-filesystem write; safety level reflects that. -u removes the file after overwriting. Coreutils."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#shred-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--exact", "--force", "--help", "--remove", "--verbose",
+    "--version", "--zero",
+    "-f", "-u", "-v", "-x", "-z",
+]
+valued = ["--iterations", "--random-source", "--size", "-n", "-s"]
+
+[[command]]
+name = "ptx"
+aliases = ["gptx"]
+description = "Produces a permuted (KWIC) index of input. Read-only filter to stdout. Coreutils; frozen surface."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#ptx-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "Inert"
+bare = true
+standalone = [
+    "--auto-reference", "--flag-truncation", "--help",
+    "--ignore-case", "--references", "--version",
+    "-A", "-G", "-O", "-T", "-f", "-r",
+]
+valued = [
+    "--break-file", "--gap-size", "--ignore-file",
+    "--macro-name", "--only-file", "--sentence-regexp",
+    "--width", "--word-regexp", "--format",
+    "-F", "-M", "-S", "-W", "-b", "-g", "-i", "-o", "-w",
+]
+
+[[command]]
+name = "pr"
+aliases = ["gpr"]
+description = "Paginates and formats text for printing, with options for headers, columns, line numbering, and double-spacing. Read-only filter to stdout. Coreutils."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#pr-invocation"
+researched_version = "GNU coreutils 9.7"
+level = "Inert"
+bare = true
+tolerate_unknown_short = true
+standalone = [
+    "--double-space", "--expand-tabs", "--first-line-number", "--form-feed",
+    "--help", "--join-lines", "--merge", "--no-file-warnings",
+    "--number-lines", "--omit-header", "--omit-pagination",
+    "--page-width", "--pages", "--show-control-chars",
+    "--show-nonprinting", "--show-tabs", "--version",
+    "-F", "-J", "-T", "-V", "-d", "-f", "-h", "-l", "-m", "-r", "-t", "-v",
+]
+valued = [
+    "--columns", "--header", "--indent", "--length",
+    "--separator", "--sep-string", "--width",
+    "-N", "-S", "-W", "-e", "-i", "-n", "-o", "-s", "-w",
+]
+
+[[command]]
+name = "stdbuf"
+description = "Runs an inner command with adjusted stdio buffering. The wrapper itself only sets buffering; safety depends on the inner command. Coreutils."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#stdbuf-invocation"
+researched_version = "GNU coreutils 9.7"
+[command.wrapper]
+standalone = ["--help", "--version"]
+valued = ["--error", "--input", "--output", "-e", "-i", "-o"]
+
+[[command]]
+name = "tput"
+description = "Looks up terminfo capabilities and outputs the corresponding escape sequence or numeric value. Read-only terminfo lookup; writes the result to stdout. ncurses utility, very stable."
+url = "https://man7.org/linux/man-pages/man1/tput.1.html"
+researched_version = "ncurses 6.x"
+level = "Inert"
+bare = false
+tolerate_unknown_short = true
+standalone = ["-S", "-V"]
+valued = ["-T"]
+
+[[command]]
+name = "ul"
+description = "Translates underscores and backspaces in input into the terminal's underline sequences. Read-only stdin-to-stdout filter; never modifies files. util-linux."
+url = "https://man7.org/linux/man-pages/man1/ul.1.html"
+researched_version = "util-linux 2.40"
+level = "Inert"
+bare = true
+standalone = ["--help", "--version", "-V", "-h", "-i"]
+valued = ["--terminal", "-t"]

@@ -1,0 +1,153 @@
+[[command]]
+name = "afconvert"
+description = "Apple CoreAudio file converter. Reads a source audio file and writes a new one in the requested format (e.g. WAV/AIFF/CAF/MP3/AAC/ALAC). Many flags control format, bit-depth, sample rate, channel layout, and quality. No network. CoreAudio surface, essentially frozen across macOS releases."
+url = "https://ss64.com/mac/afconvert.html"
+researched_version = "macOS 14; CoreAudio surface frozen"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--help", "--soundcheck-generate", "--soundcheck-read",
+    "-h",
+    "--print-codecs", "--print-encoders", "--print-decoders",
+    "--print-formats", "--print-from-formats", "--print-to-formats",
+    "--print-channel-layouts", "--print-supported-formats",
+    "-v",
+]
+valued = [
+    "-b", "-c", "-d", "-e", "-f", "-l",
+    "-o", "-q", "-r", "-s", "-t",
+    "--bitdepth", "--channellayout", "--channels",
+    "--data-format", "--file-format",
+    "--mix", "--output-dir", "--quality",
+    "--sample-rate", "--src-complexity",
+    "--strategy", "--useragent", "--verbose",
+]
+
+[[command]]
+name = "afhash"
+description = "macOS CoreAudio SHA-1 hash for audio file payloads. With -x prints the embedded hash; -c compares two files. -w writes a new hash into the file (mutates the audio file). Frozen surface."
+url = "https://ss64.com/mac/afhash.html"
+researched_version = "macOS 14; CoreAudio surface frozen"
+level = "Inert"
+bare = false
+standalone = ["-c", "-h", "-x", "-w"]
+write_flags = ["-w"]
+
+[[command]]
+name = "afida"
+description = "macOS Audio File Image Distortion Analyzer. Reads an audio file and prints analysis to stdout. Frozen CoreAudio surface."
+url = "https://ss64.com/mac/afida.html"
+researched_version = "macOS 14; CoreAudio surface frozen"
+level = "Inert"
+bare = false
+standalone = ["-h"]
+
+[[command]]
+name = "afinfo"
+description = "macOS CoreAudio inspector. Prints format, duration, bit-rate, channel layout, and metadata for an audio file. Read-only. Frozen surface."
+url = "https://ss64.com/mac/afinfo.html"
+researched_version = "macOS 14; CoreAudio surface frozen"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h", "-b", "-i", "-r", "-x", "--brief", "--info-only", "--no-fileformat", "--warnings"]
+
+[[command]]
+name = "afplay"
+description = "macOS CoreAudio audio file player. Plays the given audio file to the default output device. -t limits playback duration; -r sets rate; -v sets volume; -q controls quality. No file output, no network. Frozen surface."
+url = "https://ss64.com/mac/afplay.html"
+researched_version = "macOS 14; CoreAudio surface frozen"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "-h", "-d", "--debug"]
+valued = ["-t", "--time", "-r", "--rate", "-v", "--volume", "-q", "--quality"]
+
+[[command]]
+name = "auval"
+description = "macOS Audio Unit validation tool. Runs a battery of tests against installed AudioUnits to confirm they implement the AU API correctly. -a lists all units; -v / -vt validate a specific component by type/subtype/manufacturer. Read-only inspection of installed plugins; no file output beyond stdout/stderr."
+url = "https://ss64.com/mac/auval.html"
+researched_version = "macOS 14; CoreAudio surface frozen"
+level = "SafeRead"
+bare = true
+standalone = [
+    "-a", "-A", "-h", "--help",
+    "-bl", "-l", "-q", "-r", "-s",
+    "-strict", "-w", "-veryverbose",
+]
+valued = ["-v", "-vt", "-de", "-f"]
+
+[[command]]
+name = "say"
+description = "macOS speech synthesiser. Speaks the supplied text (or stdin / -f file) through the default audio output, or writes synthesised audio to --output-file. -v selects a voice; -r sets the rate. No network. Frozen surface."
+url = "https://ss64.com/mac/say.html"
+researched_version = "macOS 14; surface frozen"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help", "-h",
+    "--interactive", "-i",
+    "--progress",
+    "--quality",
+]
+valued = [
+    "-v", "--voice",
+    "-r", "--rate",
+    "-f", "--input-file",
+    "-o", "--output-file",
+    "--data-format",
+    "--file-format",
+    "--channels",
+    "--bit-rate",
+    "--network-send",
+    "--audio-device",
+]
+write_flags = ["-o", "--output-file"]
+
+[[command]]
+name = "lame"
+description = "LAME MP3 encoder. Reads PCM/WAV/AIFF input and writes MP3 output. Bare invocation reads from stdin / writes to stdout when given `-`. Many flags control bit-rate, VBR mode, psychoacoustic tuning, and ID3 metadata. No network. Project effectively frozen since 3.100 (2017)."
+url = "https://lame.sourceforge.io/"
+researched_version = "lame 3.100 (2017, frozen)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--help", "--longhelp", "--help-id3", "--license",
+    "--version", "--silent", "--brief", "--verbose",
+    "--decode", "--decode-mp3delay", "--mp3input",
+    "--ogginput", "--nogap", "--nogapout",
+    "--scale", "--scale-l", "--scale-r",
+    "--replaygain-fast", "--replaygain-accurate", "--noreplaygain",
+    "--clipdetect", "--freeformat",
+    "--strictly-enforce-ISO",
+    "--abr", "--cbr",
+    "--allshort", "--noshort",
+    "--athonly", "--noath", "--athaa-sensitivity",
+    "--cwlimit", "--notemp", "--nspsytune",
+    "--nssafejoint", "--nsmsfix",
+    "--preset", "--alt-preset",
+    "--add-id3v2", "--pad-id3v2",
+    "--ignore-tag-errors",
+    "--id3v1-only", "--id3v2-only",
+    "--id3v2-utf16", "--id3v2-latin1",
+    "--space-id3v1",
+    "-h", "-?", "-v", "-V", "-S",
+    "-a", "-d", "-x",
+    "-r", "-s", "-m", "-q",
+]
+valued = [
+    "-b", "-B", "-F",
+    "-Q",
+    "-t", "-T",
+    "--bitwidth", "--signed", "--unsigned",
+    "--little-endian", "--big-endian",
+    "--vbr-old", "--vbr-new", "--vbr",
+    "--resample", "--lowpass", "--lowpass-width",
+    "--highpass", "--highpass-width",
+    "--athlower", "--athtype",
+    "--athaa-type", "--athaa-loudapprox",
+    "--tt", "--ta", "--tl", "--ty", "--tc", "--tn", "--tg", "--tv",
+    "--ti", "--pad-id3v2-size",
+    "--genre-list",
+    "-p",
+]
