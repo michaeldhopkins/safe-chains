@@ -374,6 +374,7 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 <p class="cmd-url"><a href="https://www.ruby-lang.org/en/documentation/">https://www.ruby-lang.org/en/documentation/</a></p>
 
 - Allowed standalone flags: --help, --version, -V, -h, -v
+- Allowed valued flags: -c
 
 ### `rufo`
 <p class="cmd-url"><a href="https://github.com/ruby-formatter/rufo">https://github.com/ruby-formatter/rufo</a></p>

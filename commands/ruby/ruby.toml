@@ -1,8 +1,10 @@
 [[command]]
 name = "ruby"
-description = "Ruby interpreter; limited to help and version flags with no script execution."
+description = "Ruby interpreter. `ruby script.rb` executes the script. `-c` is a parse-only syntax check — it does not execute the script body, BEGIN blocks, or END blocks; just prints `Syntax OK` or a parse error and exits. `-e CODE` runs inline code, `-r LIB` requires (loads and executes) a library, `-x` finds a `#!ruby` line in the file and starts execution from there. Ruby's CLI surface is very stable across major releases; flag semantics do not change between minor versions."
 url = "https://www.ruby-lang.org/en/documentation/"
+researched_version = "Ruby 3.4.2 (2025-02-15)"
 level = "Inert"
 bare = false
 max_positional = 0
 standalone = ["--help", "--version", "-V", "-h", "-v"]
+valued = ["-c"]
