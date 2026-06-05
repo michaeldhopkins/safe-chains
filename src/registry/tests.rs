@@ -2998,6 +2998,7 @@ valued = ["--type"]
         load_one(r#"
             [[command]]
             name = "demo"
+            researched_version = "test"
             eval_safe = true
             [[command.sub]]
             name = "init"
@@ -3010,6 +3011,7 @@ valued = ["--type"]
         load_one(r#"
             [[command]]
             name = "php"
+            researched_version = "test"
             handler = "php"
             eval_safe = true
         "#);
@@ -3021,6 +3023,7 @@ valued = ["--type"]
         load_one(r#"
             [[command]]
             name = "demo"
+            researched_version = "test"
             eval_safe = true
             [command.wrapper]
             positional_skip = 1
@@ -3033,6 +3036,7 @@ valued = ["--type"]
         load_one(r#"
             [[command]]
             name = "demo"
+            researched_version = "test"
             deny = true
             eval_safe = true
         "#);
@@ -3044,6 +3048,7 @@ valued = ["--type"]
         load_one(r#"
             [[command]]
             name = "demo"
+            researched_version = "test"
             [[command.sub]]
             name = "config"
             eval_safe = true
@@ -3058,6 +3063,7 @@ valued = ["--type"]
         load_one(r#"
             [[command]]
             name = "demo"
+            researched_version = "test"
             [[command.sub]]
             name = "init"
             handler = "php"
@@ -3071,6 +3077,7 @@ valued = ["--type"]
         load_one(r#"
             [[command]]
             name = "demo"
+            researched_version = "test"
             [[command.sub]]
             name = "exec"
             delegate_after = "--"
@@ -3085,9 +3092,54 @@ valued = ["--type"]
             name = "ssh-agent"
             bare = true
             eval_safe = true
+            researched_version = "OpenSSH 9.8"
         "#);
         assert!(spec.eval_safe);
         assert!(spec.eval_safe_flags.is_empty());
+    }
+
+    #[test]
+    #[should_panic(expected = "but no `researched_version")]
+    fn eval_safe_command_without_researched_version_panics() {
+        load_one(r#"
+            [[command]]
+            name = "ssh-agent"
+            bare = true
+            eval_safe = true
+        "#);
+    }
+
+    #[test]
+    #[should_panic(expected = "but no `researched_version")]
+    fn eval_safe_sub_without_command_researched_version_panics() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            [[command.sub]]
+            name = "init"
+            bare = false
+            max_positional = 1
+            eval_safe = true
+        "#);
+    }
+
+    #[test]
+    fn eval_safe_sub_with_command_researched_version_builds() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            [[command.sub]]
+            name = "init"
+            bare = false
+            max_positional = 1
+            eval_safe = true
+        "#);
+        let DispatchKind::Branching { subs, .. } = &spec.kind else {
+            panic!("expected branching kind");
+        };
+        let init = subs.iter().find(|s| s.name == "init").expect("init sub");
+        assert!(init.eval_safe);
     }
 
     #[test]
@@ -3095,6 +3147,7 @@ valued = ["--type"]
         let spec = load_one(r#"
             [[command]]
             name = "demo"
+            researched_version = "v1.0"
             [[command.sub]]
             name = "init"
             bare = false
