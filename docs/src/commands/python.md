@@ -180,6 +180,22 @@ Aliases: `nbconvert`
 
 - Allowed standalone flags: --help, --version, -h, -V
 
+### `mamba`
+<p class="cmd-url"><a href="https://mamba.readthedocs.io/">https://mamba.readthedocs.io/</a></p>
+
+- **info**: Flags: --help, --json, -h
+- **list**: Flags: --help, --json, -h. Valued: --name, --prefix, -n, -p
+- **shell hook**: Flags: --help, -h. Valued: --shell, -s
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `mamba info`
+- `mamba list`
+- `eval "$(mamba shell hook --shell bash)"`
+- `eval "$(mamba shell hook -s zsh)"`
+- `eval "$(mamba shell hook --shell fish)"`
+
 ### `mkdocs`
 <p class="cmd-url"><a href="https://www.mkdocs.org/">https://www.mkdocs.org/</a></p>
 

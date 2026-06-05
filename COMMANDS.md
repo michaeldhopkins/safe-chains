@@ -7333,6 +7333,22 @@ Aliases: `lunzip`, `lzcat`, `plzip`
 - Allowed standalone flags: --help, -allByCount, -allBySize, -allEvents, -callTree, -chargeSystemLibraries, -collapseRecursion, -highWaterMark, -ignoreThreads, -invert, -showContent, -virtual
 - Hyphen-prefixed positional arguments accepted
 
+### `mamba`
+<p class="cmd-url"><a href="https://mamba.readthedocs.io/">https://mamba.readthedocs.io/</a></p>
+
+- **info**: Flags: --help, --json, -h
+- **list**: Flags: --help, --json, -h. Valued: --name, --prefix, -n, -p
+- **shell hook**: Flags: --help, -h. Valued: --shell, -s
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `mamba info`
+- `mamba list`
+- `eval "$(mamba shell hook --shell bash)"`
+- `eval "$(mamba shell hook -s zsh)"`
+- `eval "$(mamba shell hook --shell fish)"`
+
 ### `man`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/man.1.html">https://man7.org/linux/man-pages/man1/man.1.html</a></p>
 
