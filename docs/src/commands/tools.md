@@ -1822,8 +1822,15 @@ Aliases: `python`
 ### `zoxide`
 <p class="cmd-url"><a href="https://github.com/ajeetdsouza/zoxide">https://github.com/ajeetdsouza/zoxide</a></p>
 
+- **init**: Flags: --help, --no-aliases, --no-cmd, -h
 - **query**: Flags: --all, --exclude, --help, --interactive, --list, --score, -a, -h, -i, -l, -s
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `eval "$(zoxide init bash)"`
+- `eval "$(zoxide init zsh --no-cmd)"`
+- `eval "$(zoxide init fish --no-aliases)"`
 
 ### `zsh`
 <p class="cmd-url"><a href="https://zsh.sourceforge.io/Doc/Release/Invocation.html">https://zsh.sourceforge.io/Doc/Release/Invocation.html</a></p>
