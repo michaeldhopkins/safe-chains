@@ -7,7 +7,7 @@
 - **doctor**: Flags: --help, -h
 - **help**: Positional args accepted
 - **info**: Flags: --help, -h
-- **init**: Flags: --disable-ctrl-r, --disable-up-arrow, --help, -h. Positional args accepted
+- **init**: Flags: --disable-ai, --disable-ctrl-r, --disable-up-arrow, --help, -h. Positional args accepted
 - **search**: Flags: --cmd-only, --exit, --exit, --filter-mode, --help, --human, --inline-height, --interactive, --keymap-mode, --reverse, --shell-up-key-binding, --cwd, --exclude-cwd, --exclude-exit, --exit, --limit, -h, -i, -r. Valued: --after, --before, --cmd-only, --cwd, --delete, --delete-it-all, --exit, --filter-mode, --format, --limit, --offset, --search-mode, --session, --user, -c, -e, -f. Positional args accepted
 - **stats**: Flags: --help, -h. Valued: --count, --ngram. Positional args accepted
 - **uuid**: Flags: --help, -h
@@ -22,6 +22,9 @@
 - `atuin info`
 - `atuin stats`
 - `atuin search foo`
+- `eval "$(atuin init bash)"`
+- `eval "$(atuin init zsh --disable-ctrl-r --disable-up-arrow)"`
+- `eval "$(atuin init fish --disable-ai)"`
 
 ### `bacon`
 <p class="cmd-url"><a href="https://github.com/Canop/bacon">https://github.com/Canop/bacon</a></p>
