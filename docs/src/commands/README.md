@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1570 commands across 75 categories.
+safe-chains knows 1571 commands across 75 categories.
 
 ## Glossary
 
@@ -49,7 +49,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Fuzzy Finders](fuzzy.md) (7 commands)
 - [Game Engines](game.md) (1 commands)
 - [Gleam](gleam.md) (1 commands)
-- [Go](go.md) (18 commands)
+- [Go](go.md) (19 commands)
 - [Hashing](hash.md) (11 commands)
 - [Haskell](haskell.md) (6 commands)
 - [Julia](julia.md) (1 commands)

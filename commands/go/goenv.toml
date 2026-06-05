@@ -1,0 +1,87 @@
+[[command]]
+name = "goenv"
+description = "Go version manager modeled on rbenv that selects which Go installation under $GOENV_ROOT/versions is active per directory, shell, or globally via shim wrappers on PATH. The covered read-only subcommands (versions, version, version-name, version-file, version-origin, which, whence, prefix, root, shims, hooks, completions, help) inspect local state without modifying anything. The init subcommand with `-` prints shell init code to stdout (canonical pattern: `eval \"$(goenv init - bash)\"`); the optional `--no-rehash` skips the rehash phase. Releases follow Go's cadence: regular updates a few times per year."
+url = "https://github.com/go-nv/goenv"
+researched_version = "3.1.3 (2026-06-04)"
+bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "goenv versions",
+    "goenv version",
+    "goenv which go",
+    "eval \"$(goenv init -)\"",
+    "eval \"$(goenv init - bash)\"",
+    "eval \"$(goenv init - zsh --no-rehash)\"",
+]
+examples_denied = [
+    "goenv init bash",
+    "goenv init",
+    "eval \"$(goenv init bash)\"",
+    "eval \"$(goenv init - --help)\"",
+    "eval \"$(goenv init - $SHELL)\"",
+]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "root"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "shims"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "versions"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "which"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "whence"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "prefix"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "hooks"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-name"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-file"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-origin"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completions"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "init"
+level = "Inert"
+bare = false
+max_positional = 1
+standalone = ["-", "--help", "--no-rehash", "-h"]
+require_any = ["-"]
+eval_safe = true
+eval_safe_flags = ["-", "--no-rehash"]

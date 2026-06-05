@@ -4758,6 +4758,34 @@ Aliases: `godot4`
 
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `goenv`
+<p class="cmd-url"><a href="https://github.com/go-nv/goenv">https://github.com/go-nv/goenv</a></p>
+
+- **completions**: Flags: --help, -h
+- **help**: Flags: --help, -h
+- **hooks**: Flags: --help, -h
+- **init** (requires -): Flags: -, --help, --no-rehash, -h
+- **prefix**: Flags: --help, -h
+- **root**: Flags: --help, -h
+- **shims**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- **version-file**: Flags: --help, -h
+- **version-name**: Flags: --help, -h
+- **version-origin**: Flags: --help, -h
+- **versions**: Flags: --bare, --help, -h
+- **whence**: Flags: --help, -h
+- **which**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `goenv versions`
+- `goenv version`
+- `goenv which go`
+- `eval "$(goenv init -)"`
+- `eval "$(goenv init - bash)"`
+- `eval "$(goenv init - zsh --no-rehash)"`
+
 ### `gofmt`
 <p class="cmd-url"><a href="https://pkg.go.dev/cmd/gofmt">https://pkg.go.dev/cmd/gofmt</a></p>
 
