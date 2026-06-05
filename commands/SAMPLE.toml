@@ -553,6 +553,10 @@
 #   - `eval_safe = true` is set on a `delegate_after` / `delegate_skip`
 #     sub (those forward to an unrelated inner command).
 #   - Both `deny = true` and `eval_safe = true` are set.
+#   - Any `eval_safe = true` tag exists on the command or its subs
+#     but `researched_version` is not set. The tag is a snapshot
+#     claim — the version pins which upstream the contributor vetted
+#     against, so re-research can diff cleanly.
 #
 # CUSTOM TOMLS: every field documented in SAMPLE.toml — including
 # `eval_safe` and `eval_safe_flags` — applies in project-level

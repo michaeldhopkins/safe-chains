@@ -217,6 +217,28 @@ fn assert_sub_eval_safe_only_on_leaf(parent: &str, toml: &TomlSub) {
     }
 }
 
+fn assert_eval_safe_tagged_command_has_researched_version(toml: &TomlCommand) {
+    let command_tagged = toml.eval_safe == Some(true);
+    let any_sub_tagged = toml_has_any_eval_safe_sub(&toml.sub);
+    if !command_tagged && !any_sub_tagged {
+        return;
+    }
+    if toml.researched_version.is_none() {
+        panic!(
+            "command '{}' has `eval_safe = true` (on the command or a sub) \
+             but no `researched_version`. eval-safe tags pin a per-tag trust \
+             claim against a specific upstream snapshot — add the version \
+             you researched (e.g. `researched_version = \"v2026.5.3\"`) so \
+             the next contributor knows what to diff against.",
+            toml.name,
+        );
+    }
+}
+
+fn toml_has_any_eval_safe_sub(subs: &[TomlSub]) -> bool {
+    subs.iter().any(|s| s.eval_safe == Some(true) || toml_has_any_eval_safe_sub(&s.sub))
+}
+
 fn assert_command_eval_safe_only_on_leaf(toml: &TomlCommand) {
     if toml.eval_safe != Some(true) {
         return;
@@ -473,6 +495,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     assert_matrix_policy_keys_exist(&toml);
     assert_matrix_no_duplicate_parent_action(&toml);
     assert_command_eval_safe_only_on_leaf(&toml);
+    assert_eval_safe_tagged_command_has_researched_version(&toml);
     check_no_legacy_positional_style(&toml.name, toml.positional_style);
     let cat = category.to_string();
     let desc = toml.description.unwrap_or_default();
