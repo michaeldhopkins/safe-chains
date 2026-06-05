@@ -1,0 +1,87 @@
+[[command]]
+name = "nodenv"
+description = "Node.js version manager modeled on rbenv that selects which Node installation under $NODENV_ROOT/versions is active per directory, shell, or globally via shim wrappers on PATH. The covered read-only subcommands (versions, version, version-name, version-file, version-origin, which, whence, prefix, root, shims, hooks, completions, help) inspect local state without modifying anything. The init subcommand with `-` prints shell init code to stdout (canonical pattern: `eval \"$(nodenv init - bash)\"`); the optional `--no-rehash` skips the rehash phase. No remote service interaction beyond the source-tarball download performed by node-build during install."
+url = "https://github.com/nodenv/nodenv#readme"
+researched_version = "v1.6.2 (2025-07-30)"
+bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "nodenv versions",
+    "nodenv version",
+    "nodenv which node",
+    "eval \"$(nodenv init -)\"",
+    "eval \"$(nodenv init - bash)\"",
+    "eval \"$(nodenv init - zsh --no-rehash)\"",
+]
+examples_denied = [
+    "nodenv init bash",
+    "nodenv init",
+    "eval \"$(nodenv init bash)\"",
+    "eval \"$(nodenv init - --help)\"",
+    "eval \"$(nodenv init - $SHELL)\"",
+]
+
+[[command.sub]]
+name = "help"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "root"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "shims"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "versions"
+standalone = ["--bare", "--help", "-h"]
+
+[[command.sub]]
+name = "which"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "whence"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "prefix"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "hooks"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-name"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-file"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "version-origin"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "completions"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "init"
+level = "Inert"
+bare = false
+max_positional = 1
+standalone = ["-", "--help", "--no-rehash", "-h"]
+require_any = ["-"]
+eval_safe = true
+eval_safe_flags = ["-", "--no-rehash"]

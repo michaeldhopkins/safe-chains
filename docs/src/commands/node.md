@@ -70,6 +70,34 @@
 - **lint**: Flags: --dir, --help, --quiet, --strict, -d, -h. Valued: --cache-location, --ext, --max-warnings, --output-file, --resolve-plugins-relative-to, -c
 - Allowed standalone flags: --help, --version, -h
 
+### `nodenv`
+<p class="cmd-url"><a href="https://github.com/nodenv/nodenv#readme">https://github.com/nodenv/nodenv#readme</a></p>
+
+- **completions**: Flags: --help, -h
+- **help**: Flags: --help, -h
+- **hooks**: Flags: --help, -h
+- **init** (requires -): Flags: -, --help, --no-rehash, -h
+- **prefix**: Flags: --help, -h
+- **root**: Flags: --help, -h
+- **shims**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- **version-file**: Flags: --help, -h
+- **version-name**: Flags: --help, -h
+- **version-origin**: Flags: --help, -h
+- **versions**: Flags: --bare, --help, -h
+- **whence**: Flags: --help, -h
+- **which**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `nodenv versions`
+- `nodenv version`
+- `nodenv which node`
+- `eval "$(nodenv init -)"`
+- `eval "$(nodenv init - bash)"`
+- `eval "$(nodenv init - zsh --no-rehash)"`
+
 ### `npm`
 <p class="cmd-url"><a href="https://docs.npmjs.com/cli">https://docs.npmjs.com/cli</a></p>
 
