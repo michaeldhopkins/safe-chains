@@ -338,6 +338,7 @@ Aliases: `pip3`
 - **global**: Flags: --help, -h
 - **help**: Flags: --bare, --help, -h
 - **hooks**: Flags: --bare, --help, -h
+- **init** (requires -, --path): Flags: -, --help, --no-push-path, --no-rehash, --path, -h
 - **install**: Flags: --debug, --force, --help, --keep, --list, --patch, --skip-existing, --verbose, --version, -f, -g, -h, -k, -l, -p, -s, -v
 - **local**: Flags: --force, --help, --unset, -f, -h
 - **prefix**: Flags: --bare, --help, -h
@@ -354,6 +355,15 @@ Aliases: `pip3`
 - **whence**: Flags: --bare, --help, -h
 - **which**: Flags: --bare, --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `pyenv versions`
+- `pyenv version`
+- `pyenv which python`
+- `eval "$(pyenv init -)"`
+- `eval "$(pyenv init - bash)"`
+- `eval "$(pyenv init --path zsh --no-rehash)"`
 
 ### `pyflakes`
 <p class="cmd-url"><a href="https://github.com/PyCQA/pyflakes">https://github.com/PyCQA/pyflakes</a></p>

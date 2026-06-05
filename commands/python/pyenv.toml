@@ -1,9 +1,25 @@
 [[command]]
 name = "pyenv"
-description = "Python version manager that selects which Python installation under $PYENV_ROOT/versions is active per directory, shell, or globally via shim wrappers on PATH. The covered read-only subcommands (versions, version, version-name, version-file, version-origin, which, whence, prefix, root, shims, hooks, commands, completions) inspect local state without modifying anything. SafeWrite subcommands operate entirely on local files: install (downloads python source via the python-build plugin and compiles it under $PYENV_ROOT/versions; running build scripts under the user-trusted-environment model, same posture as pip install running setup.py), uninstall (removes a version directory), local (writes .python-version in cwd; can take multiple versions for multi-Python projects), global (writes $PYENV_ROOT/version), shell (sets the PYENV_VERSION env var — only meaningful when invoked through the pyenv() shell function), and rehash (regenerates shim files). The init and exec subcommands run shell init code or arbitrary commands and are left out of coverage. No remote service interaction beyond the source-tarball download performed by python-build during install."
+description = "Python version manager that selects which Python installation under $PYENV_ROOT/versions is active per directory, shell, or globally via shim wrappers on PATH. The covered read-only subcommands (versions, version, version-name, version-file, version-origin, which, whence, prefix, root, shims, hooks, commands, completions) inspect local state without modifying anything. SafeWrite subcommands operate entirely on local files: install (downloads python source via the python-build plugin and compiles it under $PYENV_ROOT/versions; running build scripts under the user-trusted-environment model, same posture as pip install running setup.py), uninstall (removes a version directory), local (writes .python-version in cwd; can take multiple versions for multi-Python projects), global (writes $PYENV_ROOT/version), shell (sets the PYENV_VERSION env var — only meaningful when invoked through the pyenv() shell function), and rehash (regenerates shim files). The init subcommand prints shell init code when invoked with `-` (full init, canonical: `eval \"$(pyenv init - bash)\"`) or `--path` (PATH-only init); the optional `--no-rehash` and `--no-push-path` toggles tune what is emitted. No remote service interaction beyond the source-tarball download performed by python-build during install."
 url = "https://github.com/pyenv/pyenv#readme"
-researched_version = "v2.6.30 (May 2026)"
+researched_version = "v2.7.1 (2026-06-03)"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "pyenv versions",
+    "pyenv version",
+    "pyenv which python",
+    "eval \"$(pyenv init -)\"",
+    "eval \"$(pyenv init - bash)\"",
+    "eval \"$(pyenv init --path zsh --no-rehash)\"",
+]
+examples_denied = [
+    "pyenv init bash",
+    "pyenv init --install",
+    "eval \"$(pyenv init bash)\"",
+    "eval \"$(pyenv init --install)\"",
+    "eval \"$(pyenv init - --help)\"",
+    "eval \"$(pyenv init - $SHELL)\"",
+]
 
 [[command.sub]]
 name = "help"
@@ -107,4 +123,10 @@ candidate = true
 
 [[command.sub]]
 name = "init"
-candidate = true
+level = "Inert"
+bare = false
+max_positional = 1
+standalone = ["-", "--help", "--no-push-path", "--no-rehash", "--path", "-h"]
+require_any = ["-", "--path"]
+eval_safe = true
+eval_safe_flags = ["-", "--no-push-path", "--no-rehash", "--path"]
