@@ -294,9 +294,16 @@
 
 - **export**: Flags: --help, -h
 - **fetchurl**: Flags: --help, -h
+- **hook**: Flags: --help, -h
 - **status**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `eval "$(direnv hook bash)"`
+- `eval "$(direnv hook zsh)"`
+- `eval "$(direnv hook fish)"`
 
 ### `diskutil`
 <p class="cmd-url"><a href="https://ss64.com/mac/diskutil.html">https://ss64.com/mac/diskutil.html</a></p>
