@@ -2,8 +2,18 @@
 name = "starship"
 description = "Cross-shell prompt. `init <shell>` prints shell init code to stdout (read-only). `module <name>` evaluates and prints a single prompt module (typically a read-only filesystem/git probe). `prompt`, `print-config` are read-only display. `bug-report`, `explain`, `timings`, `preset`, `toggle`, `completions`, `session` are diagnostic. `config` opens an editor (interactive). Active project."
 url = "https://starship.rs/"
-researched_version = "starship 1.x"
+researched_version = "v1.25.1 (2026-04-30)"
 bare_flags = ["--help", "--version", "-h", "-V"]
+examples_safe = [
+    "eval \"$(starship init bash)\"",
+    "eval \"$(starship init zsh)\"",
+    "eval \"$(starship init fish --print-full-init)\"",
+]
+examples_denied = [
+    "eval \"$(starship init --help)\"",
+    "eval \"$(starship init bash --print-full-init=$VAR)\"",
+    "eval \"$(starship prompt)\"",
+]
 
 [[command.sub]]
 name = "init"
@@ -11,6 +21,8 @@ level = "Inert"
 bare = false
 tolerate_unknown_short = true
 standalone = ["--help", "--print-full-init", "-h"]
+eval_safe = true
+eval_safe_flags = ["--print-full-init"]
 
 [[command.sub]]
 name = "prompt"

@@ -149,3 +149,9 @@
 - **timings**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
+**Examples:**
+
+- `eval "$(starship init bash)"`
+- `eval "$(starship init zsh)"`
+- `eval "$(starship init fish --print-full-init)"`
+
