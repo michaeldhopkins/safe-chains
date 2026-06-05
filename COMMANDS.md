@@ -7555,6 +7555,9 @@ Aliases: `gmd5sum`
 - `mise remove ruby@4`
 - `mise upgrade`
 - `mise up`
+- `eval "$(mise activate bash)"`
+- `eval "$(mise activate bash --shims)"`
+- `eval "$(mise activate /bin/zsh --quiet)"`
 
 ### `mix`
 <p class="cmd-url"><a href="https://hexdocs.pm/mix/Mix.html">https://hexdocs.pm/mix/Mix.html</a></p>
