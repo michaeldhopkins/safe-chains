@@ -3097,9 +3097,16 @@ Aliases: `gdircolors`
 
 - **export**: Flags: --help, -h
 - **fetchurl**: Flags: --help, -h
+- **hook**: Flags: --help, -h
 - **status**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `eval "$(direnv hook bash)"`
+- `eval "$(direnv hook zsh)"`
+- `eval "$(direnv hook fish)"`
 
 ### `dirname`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#dirname-invocation</a></p>
