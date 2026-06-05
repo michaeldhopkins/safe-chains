@@ -1,8 +1,22 @@
 [[command]]
 name = "fnm"
-description = "Fast Node.js version manager written in Rust. The list, ls-remote, current, and default subcommands are purely read-only queries that inspect locally installed versions or fetch available versions from a remote registry. None of these subcommands execute arbitrary code or modify the filesystem. Moderately active project with releases a few times per year."
+description = "Fast Node.js version manager written in Rust. The list, ls-remote, current, and default subcommands are purely read-only queries that inspect locally installed versions or fetch available versions from a remote registry. The env subcommand prints shell init code that wires fnm into the shell (canonical: `eval \"$(fnm env --use-on-cd)\"`). None of these subcommands execute arbitrary code or modify the filesystem. Moderately active project with releases a few times per year."
 url = "https://github.com/Schniz/fnm#readme"
+researched_version = "v1.39.0 (2026-03-06)"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "fnm list",
+    "fnm current",
+    "eval \"$(fnm env)\"",
+    "eval \"$(fnm env --use-on-cd)\"",
+    "eval \"$(fnm env --shell bash --use-on-cd)\"",
+]
+examples_denied = [
+    "eval \"$(fnm env --json)\"",
+    "eval \"$(fnm env --help)\"",
+    "eval \"$(fnm env --shell $SHELL)\"",
+    "eval \"$(fnm current)\"",
+]
 
 [[command.sub]]
 name = "current"
@@ -23,3 +37,12 @@ standalone = ["--help", "-h"]
 name = "ls-remote"
 level = "Inert"
 standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "env"
+level = "Inert"
+max_positional = 0
+standalone = ["--help", "--multi", "--use-on-cd", "-h"]
+valued = ["--shell"]
+eval_safe = true
+eval_safe_flags = ["--multi", "--shell", "--use-on-cd"]

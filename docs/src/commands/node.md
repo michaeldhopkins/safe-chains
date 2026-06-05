@@ -35,9 +35,18 @@
 
 - **current**: Flags: --help, -h
 - **default**: Flags: --help, -h
+- **env**: Flags: --help, --multi, --use-on-cd, -h. Valued: --shell
 - **list**: Flags: --help, -h
 - **ls-remote**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `fnm list`
+- `fnm current`
+- `eval "$(fnm env)"`
+- `eval "$(fnm env --use-on-cd)"`
+- `eval "$(fnm env --shell bash --use-on-cd)"`
 
 ### `jest`
 <p class="cmd-url"><a href="https://jestjs.io/docs/cli">https://jestjs.io/docs/cli</a></p>
