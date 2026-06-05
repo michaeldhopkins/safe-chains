@@ -1,0 +1,41 @@
+[[command]]
+name = "mamba"
+description = "Faster C++ reimplementation of the conda package manager from QuantStack, sharing conda's environment and channel model. `mamba info` and `mamba list` are read-only queries that inspect locally installed packages and environment metadata. The `shell hook` sub-sub prints shell init code that wires mamba's activate / deactivate functions into the current shell (canonical: `eval \"$(mamba shell hook --shell bash)\"`). Unlike conda's `shell.<X> hook` pattern, mamba uses a unified `shell hook` with a `--shell` / `-s` flag. install, create, activate, deactivate, remove, update, search, run modify state or contact remote services and are not covered here. Actively maintained; releases monthly."
+url = "https://mamba.readthedocs.io/"
+researched_version = "2.8.0 (2026-06-05)"
+bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "mamba info",
+    "mamba list",
+    "eval \"$(mamba shell hook --shell bash)\"",
+    "eval \"$(mamba shell hook -s zsh)\"",
+    "eval \"$(mamba shell hook --shell fish)\"",
+]
+examples_denied = [
+    "eval \"$(mamba shell activate myenv)\"",
+    "eval \"$(mamba shell hook --shell $SHELL)\"",
+    "eval \"$(mamba shell hook --help)\"",
+    "eval \"$(mamba info)\"",
+    "eval \"$(mamba list)\"",
+]
+
+[[command.sub]]
+name = "info"
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "list"
+standalone = ["--help", "--json", "-h"]
+valued = ["--name", "--prefix", "-n", "-p"]
+
+[[command.sub]]
+name = "shell"
+nested_bare = false
+[[command.sub.sub]]
+name = "hook"
+level = "Inert"
+max_positional = 0
+standalone = ["--help", "-h"]
+valued = ["--shell", "-s"]
+eval_safe = true
+eval_safe_flags = ["--shell", "-s"]

@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1571 commands across 75 categories.
+safe-chains knows 1572 commands across 75 categories.
 
 ## Glossary
 
@@ -73,7 +73,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [PHP](php.md) (7 commands)
 - [Package Managers](pm.md) (5 commands)
 - [Theorem Provers](proof.md) (8 commands)
-- [Python](python.md) (51 commands)
+- [Python](python.md) (52 commands)
 - [R](r.md) (2 commands)
 - [Racket](racket.md) (1 commands)
 - [Roc](roc.md) (1 commands)
