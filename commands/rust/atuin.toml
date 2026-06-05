@@ -2,7 +2,7 @@
 name = "atuin"
 description = "Magical shell history. `search` queries history (read). `import auto/zsh/bash/fish` reads a shell history file and writes to atuin's local DB. `stats` shows aggregate counts. `sync`, `sync-status`, `register`, `login`, `logout`, `key`, `account` contact a sync server (network). `history start/end/list` modify the local DB. `daemon` runs a long-running background sync server. `init` prints shell init code. The carve-out covers read-only diagnostic forms."
 url = "https://atuin.sh/"
-researched_version = "atuin 18.x"
+researched_version = "v18.16.1 (2026-05-12)"
 bare_flags = ["--help", "--version", "-h", "-V"]
 examples_safe = [
     "atuin doctor",
@@ -11,11 +11,17 @@ examples_safe = [
     "atuin info",
     "atuin stats",
     "atuin search foo",
+    "eval \"$(atuin init bash)\"",
+    "eval \"$(atuin init zsh --disable-ctrl-r --disable-up-arrow)\"",
+    "eval \"$(atuin init fish --disable-ai)\"",
 ]
 examples_denied = [
     "atuin sync",
     "atuin login",
     "atuin import auto",
+    "eval \"$(atuin init --help)\"",
+    "eval \"$(atuin init bash --disable-ai=$VAR)\"",
+    "eval \"$(atuin search foo)\"",
 ]
 
 [[command.sub]]
@@ -23,7 +29,9 @@ name = "init"
 level = "Inert"
 bare = false
 tolerate_unknown_short = true
-standalone = ["--disable-ctrl-r", "--disable-up-arrow", "--help", "-h"]
+standalone = ["--disable-ai", "--disable-ctrl-r", "--disable-up-arrow", "--help", "-h"]
+eval_safe = true
+eval_safe_flags = ["--disable-ai", "--disable-ctrl-r", "--disable-up-arrow"]
 
 [[command.sub]]
 name = "info"
