@@ -1,8 +1,22 @@
 [[command]]
 name = "conda"
-description = "Cross-platform package and environment manager for Python and data science. conda list and conda info are read-only queries that inspect locally installed packages and environment metadata. conda config with --show or --show-sources is a read-only view of the configuration; other config operations can modify settings. None of these subcommands install or remove packages. list may read the lockfile and environment directories. Mature, stable project maintained by Anaconda, Inc."
+description = "Cross-platform package and environment manager for Python and data science. conda list and conda info are read-only queries that inspect locally installed packages and environment metadata. conda config with --show or --show-sources is a read-only view of the configuration; other config operations can modify settings. The hidden `shell.<shell> hook` subcommand prints shell init code that wires conda's activate/deactivate functions into the shell (canonical: `eval \"$(conda shell.bash hook)\"`); it is what `conda init` writes into the user's shell rc. None of these subcommands install or remove packages. list may read the lockfile and environment directories. Mature, stable project maintained by Anaconda, Inc."
 url = "https://docs.conda.io/projects/conda/en/stable/commands/index.html"
+researched_version = "26.5.2 (2026-06-01)"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "conda list",
+    "conda info",
+    "eval \"$(conda shell.bash hook)\"",
+    "eval \"$(conda shell.zsh hook)\"",
+    "eval \"$(conda shell.fish hook)\"",
+]
+examples_denied = [
+    "eval \"$(conda shell.bash activate myenv)\"",
+    "eval \"$(conda shell.bash hook --dev)\"",
+    "eval \"$(conda shell.bash)\"",
+    "eval \"$(conda list)\"",
+]
 
 [[command.sub]]
 name = "list"
@@ -29,3 +43,30 @@ standalone = [
     "-h", "-q", "-v",
 ]
 valued = ["--env", "--file", "--name", "--prefix", "-f", "-n", "-p"]
+
+[[command.sub]]
+name = "shell.bash"
+nested_bare = false
+[[command.sub.sub]]
+name = "hook"
+level = "Inert"
+max_positional = 0
+eval_safe = true
+
+[[command.sub]]
+name = "shell.zsh"
+nested_bare = false
+[[command.sub.sub]]
+name = "hook"
+level = "Inert"
+max_positional = 0
+eval_safe = true
+
+[[command.sub]]
+name = "shell.fish"
+nested_bare = false
+[[command.sub.sub]]
+name = "hook"
+level = "Inert"
+max_positional = 0
+eval_safe = true

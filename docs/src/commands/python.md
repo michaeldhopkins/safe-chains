@@ -41,7 +41,18 @@
 - **config** (requires --show, --show-sources): Flags: --help, --json, --quiet, --show, --show-sources, --verbose, -h, -q, -v. Valued: --env, --file, --name, --prefix, -f, -n, -p
 - **info**: Flags: --all, --envs, --help, --json, --verbose, -a, -e, -h, -v
 - **list**: Flags: --explicit, --export, --full-name, --help, --json, --no-pip, --revisions, -e, -f, -h. Valued: --name, --prefix, -n, -p
+- **shell.bash hook**
+- **shell.fish hook**
+- **shell.zsh hook**
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `conda list`
+- `conda info`
+- `eval "$(conda shell.bash hook)"`
+- `eval "$(conda shell.zsh hook)"`
+- `eval "$(conda shell.fish hook)"`
 
 ### `cookiecutter`
 <p class="cmd-url"><a href="https://cookiecutter.readthedocs.io/">https://cookiecutter.readthedocs.io/</a></p>
