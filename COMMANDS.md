@@ -8291,6 +8291,34 @@ Aliases: `gnl`
 
 - Allowed standalone flags: --dump, --help, --quiet, --version, -h, -q, -v
 
+### `nodenv`
+<p class="cmd-url"><a href="https://github.com/nodenv/nodenv#readme">https://github.com/nodenv/nodenv#readme</a></p>
+
+- **completions**: Flags: --help, -h
+- **help**: Flags: --help, -h
+- **hooks**: Flags: --help, -h
+- **init** (requires -): Flags: -, --help, --no-rehash, -h
+- **prefix**: Flags: --help, -h
+- **root**: Flags: --help, -h
+- **shims**: Flags: --help, -h
+- **version**: Flags: --help, -h
+- **version-file**: Flags: --help, -h
+- **version-name**: Flags: --help, -h
+- **version-origin**: Flags: --help, -h
+- **versions**: Flags: --bare, --help, -h
+- **whence**: Flags: --help, -h
+- **which**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `nodenv versions`
+- `nodenv version`
+- `nodenv which node`
+- `eval "$(nodenv init -)"`
+- `eval "$(nodenv init - bash)"`
+- `eval "$(nodenv init - zsh --no-rehash)"`
+
 ### `nodetool`
 <p class="cmd-url"><a href="https://cassandra.apache.org/doc/latest/cassandra/managing/tools/nodetool/nodetool.html">https://cassandra.apache.org/doc/latest/cassandra/managing/tools/nodetool/nodetool.html</a></p>
 
