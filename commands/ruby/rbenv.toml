@@ -1,9 +1,24 @@
 [[command]]
 name = "rbenv"
-description = "Ruby version manager that selects which Ruby installation under ~/.rbenv/versions/ is active per directory, shell, or globally via shim wrappers on PATH. The covered read-only subcommands (versions, version, version-name, version-file, version-origin, which, whence, prefix, root, shims, hooks, completions) inspect local state without modifying anything. SafeWrite subcommands operate entirely on local files: install (downloads ruby source via the ruby-build plugin and compiles it under ~/.rbenv/versions; running build scripts under the user-trusted-environment model, same posture as bundle install running gem postinstall), uninstall (removes a version directory), local (writes .ruby-version in cwd), global (writes ~/.rbenv/version), shell (sets the RBENV_VERSION env var — only meaningful when invoked through the rbenv() shell function), and rehash (regenerates shim files). The init subcommand emits shell init code and is left out of coverage; users typically run it once during install. No remote service interaction beyond the source-tarball download performed by ruby-build during install."
+description = "Ruby version manager that selects which Ruby installation under ~/.rbenv/versions/ is active per directory, shell, or globally via shim wrappers on PATH. The covered read-only subcommands (versions, version, version-name, version-file, version-origin, which, whence, prefix, root, shims, hooks, completions) inspect local state without modifying anything. SafeWrite subcommands operate entirely on local files: install (downloads ruby source via the ruby-build plugin and compiles it under ~/.rbenv/versions; running build scripts under the user-trusted-environment model, same posture as bundle install running gem postinstall), uninstall (removes a version directory), local (writes .ruby-version in cwd), global (writes ~/.rbenv/version), shell (sets the RBENV_VERSION env var — only meaningful when invoked through the rbenv() shell function), and rehash (regenerates shim files). The init subcommand with `-` prints shell init code to stdout (canonical pattern: `eval \"$(rbenv init - bash)\"`); the optional `--no-rehash` skips the rehash phase. No remote service interaction beyond the source-tarball download performed by ruby-build during install."
 url = "https://github.com/rbenv/rbenv#readme"
-researched_version = "v1.3.2 (January 2026); ruby-build 20260503"
+researched_version = "v1.3.2 (2025-01-08); ruby-build 20260503"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "rbenv versions",
+    "rbenv version",
+    "rbenv which ruby",
+    "eval \"$(rbenv init -)\"",
+    "eval \"$(rbenv init - bash)\"",
+    "eval \"$(rbenv init - zsh --no-rehash)\"",
+]
+examples_denied = [
+    "rbenv init bash",
+    "rbenv init",
+    "eval \"$(rbenv init bash)\"",
+    "eval \"$(rbenv init - --help)\"",
+    "eval \"$(rbenv init - $SHELL)\"",
+]
 
 [[command.sub]]
 name = "help"
@@ -99,4 +114,10 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "init"
-candidate = true
+level = "Inert"
+bare = false
+max_positional = 1
+standalone = ["-", "--help", "--no-rehash", "-h"]
+require_any = ["-"]
+eval_safe = true
+eval_safe_flags = ["-", "--no-rehash"]

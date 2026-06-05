@@ -313,6 +313,7 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - **global**: Flags: --help, -h
 - **help**: Flags: --help, -h
 - **hooks**: Flags: --help, -h
+- **init** (requires -): Flags: -, --help, --no-rehash, -h
 - **install**: Flags: --force, --help, --keep, --list, --list-all, --patch, --skip-existing, --verbose, --version, -L, -f, -h, -k, -l, -p, -s, -v
 - **local**: Flags: --help, --unset, -h
 - **prefix**: Flags: --help, -h
@@ -329,6 +330,15 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - **whence**: Flags: --help, -h
 - **which**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `rbenv versions`
+- `rbenv version`
+- `rbenv which ruby`
+- `eval "$(rbenv init -)"`
+- `eval "$(rbenv init - bash)"`
+- `eval "$(rbenv init - zsh --no-rehash)"`
 
 ### `rbs`
 <p class="cmd-url"><a href="https://github.com/ruby/rbs">https://github.com/ruby/rbs</a></p>
