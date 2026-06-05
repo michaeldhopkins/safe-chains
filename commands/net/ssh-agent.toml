@@ -2,12 +2,27 @@
 name = "ssh-agent"
 description = "Starts an SSH authentication agent in the background. Prints shell-eval output describing the socket and PID so the user can `eval $(ssh-agent)`. The agent is a long-running daemon. Carve-out: --help / --version / -k (kill) / -s/-c (output format) only."
 url = "https://man.openbsd.org/ssh-agent"
-researched_version = "OpenSSH 9.x"
+researched_version = "OpenBSD-current 2026-05-27"
 level = "SafeRead"
 bare = true
+eval_safe = true
+eval_safe_flags = ["-c", "-k", "-s"]
+examples_safe = [
+    "ssh-agent",
+    "ssh-agent -s",
+    "eval \"$(ssh-agent)\"",
+    "eval \"$(ssh-agent -s)\"",
+    "eval \"$(ssh-agent -s -k)\"",
+]
+examples_denied = [
+    "eval \"$(ssh-agent -D)\"",
+    "eval \"$(ssh-agent -d)\"",
+    "eval \"$(ssh-agent --help)\"",
+    "eval \"$(ssh-agent -a /tmp/sock)\"",
+]
 standalone = [
-    "--help", "-?", "-D", "-a", "-c",
+    "--help", "-?", "-D", "-c",
     "-d", "-h", "-k", "-q", "-s",
-    "-t", "-v",
+    "-v",
 ]
 valued = ["-E", "-O", "-P", "-a", "-t"]

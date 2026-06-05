@@ -11854,6 +11854,14 @@ Aliases: `gsort`
 - Allowed valued flags: -E, -O, -P, -a, -t
 - Bare invocation allowed
 
+**Examples:**
+
+- `ssh-agent`
+- `ssh-agent -s`
+- `eval "$(ssh-agent)"`
+- `eval "$(ssh-agent -s)"`
+- `eval "$(ssh-agent -s -k)"`
+
 ### `ssh-copy-id`
 <p class="cmd-url"><a href="https://man.openbsd.org/ssh-copy-id">https://man.openbsd.org/ssh-copy-id</a></p>
 
