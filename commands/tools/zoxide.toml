@@ -1,8 +1,19 @@
 [[command]]
 name = "zoxide"
-description = "Smarter cd replacement that learns directory usage patterns and enables fast jumping via fuzzy matching. The query subcommand searches the internal database and prints matching paths to stdout without changing the working directory. zoxide add and remove (not exposed here) modify the database. Actively maintained with a few releases per year; v0.9.9 shipped January 2026."
+description = "Smarter cd replacement that learns directory usage patterns and enables fast jumping via fuzzy matching. The query subcommand searches the internal database and prints matching paths to stdout without changing the working directory. The init subcommand prints the per-shell hook function used to wire the `z` and `zi` commands (canonical setup: `eval \"$(zoxide init bash)\"`). zoxide add and remove (not exposed here) modify the database. Actively maintained with a few releases per year."
 url = "https://github.com/ajeetdsouza/zoxide"
+researched_version = "v0.9.9 (2026-01-31)"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "eval \"$(zoxide init bash)\"",
+    "eval \"$(zoxide init zsh --no-cmd)\"",
+    "eval \"$(zoxide init fish --no-aliases)\"",
+]
+examples_denied = [
+    "eval \"$(zoxide init --help)\"",
+    "eval \"$(zoxide init $SHELL)\"",
+    "eval \"$(zoxide query foo)\"",
+]
 
 [[command.sub]]
 name = "query"
@@ -11,5 +22,13 @@ standalone = [
     "--list", "--score",
     "-a", "-h", "-i", "-l", "-s",
 ]
+
+[[command.sub]]
+name = "init"
+bare = false
+max_positional = 1
+standalone = ["--help", "--no-aliases", "--no-cmd", "-h"]
+eval_safe = true
+eval_safe_flags = ["--no-aliases", "--no-cmd"]
 
 # Language runtime version/help queries
