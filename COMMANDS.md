@@ -11928,6 +11928,12 @@ Aliases: `gsort`
 - **timings**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
+**Examples:**
+
+- `eval "$(starship init bash)"`
+- `eval "$(starship init zsh)"`
+- `eval "$(starship init fish --print-full-init)"`
+
 ### `stat`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#stat-invocation</a></p>
 
