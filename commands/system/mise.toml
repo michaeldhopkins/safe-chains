@@ -15,10 +15,16 @@ examples_safe = [
     "mise remove ruby@4",
     "mise upgrade",
     "mise up",
+    "eval \"$(mise activate bash)\"",
+    "eval \"$(mise activate bash --shims)\"",
+    "eval \"$(mise activate /bin/zsh --quiet)\"",
 ]
 examples_denied = [
     "mise exec",
     "mise tasks run my-task",
+    "eval \"$(mise activate --help)\"",
+    "eval \"$(mise list)\"",
+    "eval \"$(mise activate $SHELL)\"",
 ]
 
 [[command.sub]]

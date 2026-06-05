@@ -901,6 +901,9 @@ Aliases: `fly`
 - `mise remove ruby@4`
 - `mise upgrade`
 - `mise up`
+- `eval "$(mise activate bash)"`
+- `eval "$(mise activate bash --shims)"`
+- `eval "$(mise activate /bin/zsh --quiet)"`
 
 ### `neon`
 <p class="cmd-url"><a href="https://neon.tech/docs/reference/neon-cli">https://neon.tech/docs/reference/neon-cli</a></p>
