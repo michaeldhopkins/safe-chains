@@ -543,6 +543,31 @@
 #     a `*` in a glob, a `{` in brace expansion, whitespace, etc.)
 #     would defer the value to runtime and defeat per-tag vetting.
 #
+#
+# VALUED-FLAG VALUE ALLOWLIST — for flags whose value determines
+# whether stdout is shell-init code. `aws --format env` produces shell
+# exports; `aws --format json` produces JSON that would crash an eval.
+# Declare the allowed values per flag:
+#
+# [[command.sub.sub]]
+# name = "export-credentials"
+# valued = ["--format", "--profile"]
+# eval_safe = true
+# eval_safe_flags = ["--format", "--profile"]
+# [command.sub.sub.eval_safe_flag_values]
+# --format = ["env", "env-no-export", "fish", "powershell", "windows-cmd"]
+#
+# A flag in eval_safe_flag_values is structurally a "valued" flag:
+# the walker requires the value (via `--flag VALUE` or `--flag=VALUE`)
+# and rejects the invocation if the value is missing or not in the
+# allowlist. The values themselves must be drawn from the bare-literal
+# alphabet — the build panics otherwise.
+#
+# For valued flags whose value doesn't affect stdout shape (like
+# `--profile NAME` selecting which credential profile to read), put
+# the flag in `eval_safe_flags` but NOT in `eval_safe_flag_values` —
+# any bare-literal value is then accepted.
+#
 # BUILD-TIME CHECKS — the build panics if:
 #   - `eval_safe_flags` is set without `eval_safe = true`.
 #   - `eval_safe = true` is set on a command/sub that has nested
@@ -557,6 +582,10 @@
 #     but `researched_version` is not set. The tag is a snapshot
 #     claim — the version pins which upstream the contributor vetted
 #     against, so re-research can diff cleanly.
+#   - A flag appears in `eval_safe_flag_values` but not in
+#     `eval_safe_flags` (the value allowlist would never fire).
+#   - Any allowed value contains characters outside the bare-literal
+#     alphabet `[a-zA-Z0-9_./=-]`.
 #
 # CUSTOM TOMLS: every field documented in SAMPLE.toml — including
 # `eval_safe` and `eval_safe_flags` — applies in project-level

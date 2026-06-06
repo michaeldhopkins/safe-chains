@@ -79,6 +79,14 @@ pub(super) struct TomlCommand {
     /// Build panics if this is set without `eval_safe = true`.
     #[serde(default)]
     pub eval_safe_flags: Vec<String>,
+    /// Per-valued-flag value allowlist. Maps each valued flag (which
+    /// MUST also appear in `eval_safe_flags`) to the set of values
+    /// permitted in eval substitutions. Use for tools where the flag's
+    /// value determines stdout shape (`aws --format env` vs
+    /// `--format json`). Default empty = no value restriction beyond
+    /// the bare-literal alphabet.
+    #[serde(default)]
+    pub eval_safe_flag_values: std::collections::HashMap<String, Vec<String>>,
     /// Shortcut: every invocation of this command is denied. Used in custom
     /// TOMLs to lock down a built-in (e.g. `name = "gh", deny = true` in
     /// `.safe-chains.toml` denies every gh form for that project).
@@ -260,6 +268,11 @@ pub(super) struct TomlSub {
     /// Build panics if this is set without `eval_safe = true`.
     #[serde(default)]
     pub eval_safe_flags: Vec<String>,
+    /// Per-valued-flag value allowlist (same semantics as the
+    /// command-level field). Maps each valued flag (which MUST also
+    /// appear in `eval_safe_flags`) to its permitted values.
+    #[serde(default)]
+    pub eval_safe_flag_values: std::collections::HashMap<String, Vec<String>>,
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]
@@ -306,6 +319,10 @@ pub struct CommandSpec {
     /// Flag allowlist extending `eval_safe` — flags permitted in the
     /// substituted invocation when the walker stops at this node.
     pub eval_safe_flags: Vec<String>,
+    /// Per-valued-flag value allowlist. When the walker hits a flag
+    /// listed here, the value following the flag (separated by `=` or
+    /// space) must be in this list.
+    pub eval_safe_flag_values: std::collections::HashMap<String, Vec<String>>,
     pub(super) kind: DispatchKind,
 }
 
@@ -324,6 +341,9 @@ pub(super) struct SubSpec {
     /// Flag allowlist extending `eval_safe` — flags permitted in the
     /// substituted invocation when the walker stops at this sub.
     pub eval_safe_flags: Vec<String>,
+    /// Per-valued-flag value allowlist (same semantics as on
+    /// `CommandSpec`).
+    pub eval_safe_flag_values: std::collections::HashMap<String, Vec<String>>,
 }
 
 #[derive(Debug, Clone)]
