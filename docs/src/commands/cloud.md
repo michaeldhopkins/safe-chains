@@ -263,6 +263,9 @@
 - `aws configure export-credentials`
 - `aws configure export-credentials --format env`
 - `aws configure export-credentials --format env --profile dev`
+- `eval "$(aws configure export-credentials --format env)"`
+- `eval "$(aws configure export-credentials --format env-no-export --profile dev)"`
+- `eval "$(aws configure export-credentials --format=fish)"`
 
 ### `az`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/cli/azure/">https://learn.microsoft.com/en-us/cli/azure/</a></p>
