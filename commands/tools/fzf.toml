@@ -1,0 +1,20 @@
+[[command]]
+name = "fzf"
+description = "General-purpose command-line fuzzy finder. The interactive fuzzy-finder mode (the default `fzf` invocation) reads from stdin, displays a TUI, and writes the selection to stdout; the Rust handler validates flag combinations and rejects `--bind` actions containing `(` (action execution like `execute(vim {})`). The shell-init flags `--bash`, `--zsh`, `--fish`, and `--nushell` print per-shell key bindings and fuzzy completion setup to stdout for eval (canonical: `eval \"$(fzf --bash)\"`). Released frequently; shell-init flag surface has been stable across the v0.4x-v0.7x line."
+url = "https://github.com/junegunn/fzf#readme"
+researched_version = "v0.73.1 (2026-05-25)"
+handler = "fzf"
+eval_safe = true
+eval_safe_flags = ["--bash", "--fish", "--nushell", "--zsh"]
+eval_safe_required_flags = ["--bash", "--fish", "--nushell", "--zsh"]
+examples_safe = [
+    "eval \"$(fzf --bash)\"",
+    "eval \"$(fzf --zsh)\"",
+    "eval \"$(fzf --fish)\"",
+    "eval \"$(fzf --nushell)\"",
+]
+examples_denied = [
+    "eval \"$(fzf)\"",
+    "eval \"$(fzf --help)\"",
+    "eval \"$(fzf --multi)\"",
+]

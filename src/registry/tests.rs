@@ -3005,16 +3005,29 @@ valued = ["--type"]
         "#);
     }
 
+    /// Command-level `eval_safe = true` IS allowed alongside
+    /// `handler = "..."`. The walker reads spec.eval_safe directly at
+    /// the leaf; no handler introspection is needed. The contributor
+    /// takes responsibility for vouching that every invocation the
+    /// handler accepts AND that passes the eval_safe_* flag checks
+    /// produces shell-init stdout. Sub-level handler+eval_safe is
+    /// still rejected because it'd require descending the handler's
+    /// own dispatch tree.
     #[test]
-    #[should_panic(expected = "eval_safe = true` AND `handler")]
-    fn eval_safe_handler_command_panics() {
-        load_one(r#"
+    fn eval_safe_handler_command_builds() {
+        let spec = load_one(r#"
             [[command]]
             name = "php"
             researched_version = "test"
             handler = "php"
             eval_safe = true
+            eval_safe_flags = ["--bash"]
+            eval_safe_required_flags = ["--bash"]
         "#);
+        assert!(spec.eval_safe);
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["php", "--bash"])));
+        // Required flag missing => denied.
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["php"])));
     }
 
     #[test]

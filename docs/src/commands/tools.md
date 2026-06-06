@@ -550,6 +550,18 @@ Aliases: `erblint`
 - Allowed valued flags: --color, -c, --spacing, -s, --batch, -b, --output, -o, --device, -d, --subfolder, --assets
 - Hyphen-prefixed positional arguments accepted
 
+### `fzf`
+<p class="cmd-url"><a href="https://github.com/junegunn/fzf#readme">https://github.com/junegunn/fzf#readme</a></p>
+
+
+
+**Examples:**
+
+- `eval "$(fzf --bash)"`
+- `eval "$(fzf --zsh)"`
+- `eval "$(fzf --fish)"`
+- `eval "$(fzf --nushell)"`
+
 ### `gatsby`
 <p class="cmd-url"><a href="https://www.gatsbyjs.com/docs/reference/gatsby-cli/">https://www.gatsbyjs.com/docs/reference/gatsby-cli/</a></p>
 
