@@ -544,6 +544,23 @@
 #     would defer the value to runtime and defeat per-tag vetting.
 #
 #
+# REQUIRED FLAGS — for tools whose bare invocation isn't shell-init.
+# `fzf` is an interactive fuzzy finder by default; it produces shell-
+# init code only when called with `--bash`, `--zsh`, `--fish`, or
+# `--nushell`. Declare the required-from-set:
+#
+# [[command]]
+# name = "fzf"
+# eval_safe = true
+# eval_safe_flags = ["--bash", "--zsh", "--fish", "--nushell"]
+# eval_safe_required_flags = ["--bash", "--zsh", "--fish", "--nushell"]
+#
+# At least one entry from `eval_safe_required_flags` must appear in
+# the substituted invocation. Every entry must also appear in
+# `eval_safe_flags` — the build panics otherwise. Default empty =
+# no required flag (the bare-invocation form is fine, as for
+# mise activate / ssh-agent / starship init).
+#
 # VALUED-FLAG VALUE ALLOWLIST — for flags whose value determines
 # whether stdout is shell-init code. `aws --format env` produces shell
 # exports; `aws --format json` produces JSON that would crash an eval.
@@ -586,6 +603,8 @@
 #     `eval_safe_flags` (the value allowlist would never fire).
 #   - Any allowed value contains characters outside the bare-literal
 #     alphabet `[a-zA-Z0-9_./=-]`.
+#   - A flag appears in `eval_safe_required_flags` but not in
+#     `eval_safe_flags` (the requirement could never be satisfied).
 #
 # CUSTOM TOMLS: every field documented in SAMPLE.toml — including
 # `eval_safe` and `eval_safe_flags` — applies in project-level
