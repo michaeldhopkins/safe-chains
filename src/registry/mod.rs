@@ -139,12 +139,14 @@ fn handler_spec(cmd_name: &str) -> Option<&'static CommandSpec> {
 /// stdout is documented shell-init code that can safely be substituted
 /// inside `eval "$(...)"`.
 ///
-/// The walker descends through `DispatchKind::Branching` matching subs
-/// token-by-token. The leaf is the deepest matched node (where no further
-/// sub matches). `eval_safe` is checked only at the leaf — ancestor tags
-/// do NOT propagate. After confirming the leaf is tagged, every
-/// `-`-prefixed token in the remaining tail must appear in
-/// `eval_safe_flags`; positionals are unrestricted.
+/// The walker descends through `DispatchKind::Branching` AND
+/// `DispatchKind::Custom` matching subs token-by-token (handler-based
+/// commands such as `gh` can have tagged TOML-declared subs even though
+/// the handler does the actual dispatch). The leaf is the deepest matched
+/// node (where no further sub matches). `eval_safe` is checked only at
+/// the leaf — ancestor tags do NOT propagate. After confirming the leaf
+/// is tagged, every `-`-prefixed token in the remaining tail must appear
+/// in `eval_safe_flags`; positionals are unrestricted.
 ///
 /// Tagged nodes are vetted manually per-command (see SAMPLE.toml). This
 /// function does not validate that `tokens` is syntactically allowed —
@@ -157,6 +159,16 @@ pub fn is_eval_safe_invocation(tokens: &[Token]) -> bool {
     let Some(spec) = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd)) else {
         return false;
     };
+    is_eval_safe_for_spec(spec, tokens)
+}
+
+/// Spec-local variant used by tests so they can build a `CommandSpec`
+/// via `load_toml` and exercise the walker without touching the global
+/// `TOML_REGISTRY`.
+pub(crate) fn is_eval_safe_for_spec(spec: &CommandSpec, tokens: &[Token]) -> bool {
+    if tokens.is_empty() {
+        return false;
+    }
     walk_to_eval_safe_leaf(&tokens[1..], &spec.kind, spec.eval_safe, &spec.eval_safe_flags)
 }
 
@@ -166,7 +178,11 @@ fn walk_to_eval_safe_leaf(
     eval_safe: bool,
     eval_safe_flags: &[String],
 ) -> bool {
-    if let DispatchKind::Branching { subs, .. } = kind
+    let subs_opt = match kind {
+        DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => Some(subs),
+        _ => None,
+    };
+    if let Some(subs) = subs_opt
         && let Some(arg) = remaining.first()
         && let Some(sub) = subs.iter().find(|s| s.name == arg.as_str())
     {

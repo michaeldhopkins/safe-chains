@@ -3166,3 +3166,154 @@ valued = ["--type"]
         assert!(init.eval_safe);
         assert_eq!(init.eval_safe_flags, vec!["--shims".to_string()]);
     }
+
+    // -------------------------------------------------------------------
+    // Walker descent — Branching and Custom kinds
+    // -------------------------------------------------------------------
+
+    /// A tagged leaf sub inside a handler-based (Custom kind) command is
+    /// reached by the walker. Before Gap A this descent silently failed
+    /// because the walker only matched `Branching`.
+    #[test]
+    fn walker_descends_custom_subs() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "php"
+            handler = "php"
+            researched_version = "v1.0"
+            [[command.sub]]
+            name = "demo-init"
+            bare = true
+            max_positional = 0
+            eval_safe = true
+        "#);
+        assert!(matches!(spec.kind, DispatchKind::Custom { .. }));
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["php", "demo-init"])));
+    }
+
+    /// Untagged subs inside a Custom kind do NOT inherit the parent's
+    /// status. The walker descends to the leaf and finds it untagged.
+    #[test]
+    fn walker_custom_untagged_sub_denied() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "php"
+            handler = "php"
+            researched_version = "v1.0"
+            [[command.sub]]
+            name = "demo-init"
+            bare = true
+            max_positional = 0
+        "#);
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["php", "demo-init"])));
+    }
+
+    /// Walker descent through Custom must behave identically to Branching
+    /// when the sub structure is the same. This isolates the descent
+    /// change from any unintended behavior shift.
+    #[test]
+    fn walker_branching_and_custom_descent_agree() {
+        let branching = load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            [[command.sub]]
+            name = "init"
+            bare = true
+            max_positional = 0
+            eval_safe = true
+        "#);
+        let custom = load_one(r#"
+            [[command]]
+            name = "demo"
+            handler = "php"
+            researched_version = "v1.0"
+            [[command.sub]]
+            name = "init"
+            bare = true
+            max_positional = 0
+            eval_safe = true
+        "#);
+        for tail in [vec!["init"], vec!["init", "x"], vec!["other"], vec![]] {
+            let mut tokens = vec!["demo"];
+            tokens.extend(tail.iter().copied());
+            let parsed = toks(&tokens);
+            assert_eq!(
+                super::is_eval_safe_for_spec(&branching, &parsed),
+                super::is_eval_safe_for_spec(&custom, &parsed),
+                "descent disagrees for tail {tail:?}",
+            );
+        }
+    }
+
+    /// Empty token list never returns true (defense in depth — caller
+    /// shouldn't pass empties but we guarantee the answer regardless).
+    #[test]
+    fn walker_empty_tokens_returns_false() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            bare = true
+            eval_safe = true
+        "#);
+        assert!(!super::is_eval_safe_for_spec(&spec, &[]));
+    }
+
+    proptest::proptest! {
+        /// For any spec built from a tagged sub-only TOML, the walker
+        /// returns true iff the tokens exactly traverse to the tagged
+        /// sub and the tail satisfies the flag allowlist. We model the
+        /// tail as a single shell-name positional plus a subset of the
+        /// allowed flags — both should always be eval-safe.
+        #[test]
+        fn walker_accepts_traversal_to_tagged_leaf(
+            shell in proptest::string::string_regex("[a-z]{1,8}").expect("regex"),
+            extra_flags in proptest::collection::vec(proptest::sample::select(vec!["--alpha", "--beta", "--gamma"]), 0..4),
+        ) {
+            let spec = load_one(r#"
+                [[command]]
+                name = "demo"
+                researched_version = "v1.0"
+                [[command.sub]]
+                name = "init"
+                bare = false
+                max_positional = 1
+                standalone = ["--alpha", "--beta", "--gamma"]
+                eval_safe = true
+                eval_safe_flags = ["--alpha", "--beta", "--gamma"]
+            "#);
+            let mut words = vec!["demo".to_string(), "init".to_string(), shell.clone()];
+            for f in &extra_flags { words.push((*f).to_string()); }
+            let tokens: Vec<Token> = words.iter().map(|s| Token::from_test(s.as_str())).collect();
+            proptest::prop_assert!(
+                super::is_eval_safe_for_spec(&spec, &tokens),
+                "walker rejected legal traversal: {words:?}"
+            );
+        }
+
+        /// For any spec whose tagged sub's eval_safe_flags is empty, ANY
+        /// flag in the substituted tail is denied. This is the
+        /// allowlist-only invariant: presence-of-tag alone never opens
+        /// the flag surface.
+        #[test]
+        fn walker_rejects_any_flag_when_allowlist_empty(
+            flag in proptest::sample::select(vec!["--anything", "--help", "-v", "-h", "--evil"]),
+        ) {
+            let spec = load_one(r#"
+                [[command]]
+                name = "demo"
+                researched_version = "v1.0"
+                [[command.sub]]
+                name = "init"
+                bare = true
+                max_positional = 0
+                eval_safe = true
+            "#);
+            let tokens = toks(&["demo", "init", flag]);
+            proptest::prop_assert!(
+                !super::is_eval_safe_for_spec(&spec, &tokens),
+                "walker accepted flag despite empty allowlist: {flag}"
+            );
+        }
+    }
