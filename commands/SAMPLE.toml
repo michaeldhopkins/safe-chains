@@ -555,11 +555,18 @@
 # eval_safe_flags = ["--bash", "--zsh", "--fish", "--nushell"]
 # eval_safe_required_flags = ["--bash", "--zsh", "--fish", "--nushell"]
 #
-# At least one entry from `eval_safe_required_flags` must appear in
-# the substituted invocation. Every entry must also appear in
-# `eval_safe_flags` — the build panics otherwise. Default empty =
-# no required flag (the bare-invocation form is fine, as for
-# mise activate / ssh-agent / starship init).
+# Semantics: AT LEAST ONE entry from `eval_safe_required_flags` must
+# appear in the substituted invocation. Two-or-more of the set is
+# also accepted — the contributor's tag promises "every allowed
+# combination produces shell-init code," not "exactly one of these."
+# In practice the tool typically takes the last (e.g. fzf picks the
+# last `--bash`/`--zsh`); both the literal "two are present" form
+# AND the resulting single-shell output remain eval-safe.
+#
+# Every entry must also appear in `eval_safe_flags` — the build
+# panics otherwise. Default empty = no required flag (the bare-
+# invocation form is fine, as for mise activate / ssh-agent /
+# starship init).
 #
 # VALUED-FLAG VALUE ALLOWLIST — for flags whose value determines
 # whether stdout is shell-init code. `aws --format env` produces shell
@@ -581,9 +588,19 @@
 # alphabet — the build panics otherwise.
 #
 # For valued flags whose value doesn't affect stdout shape (like
-# `--profile NAME` selecting which credential profile to read), put
-# the flag in `eval_safe_flags` but NOT in `eval_safe_flag_values` —
-# any bare-literal value is then accepted.
+# `--profile NAME` selecting which credential profile to read), the
+# explicit-unrestricted form `--profile = []` declares: "I considered
+# this valued flag; any bare-literal value preserves shell-init
+# output." The walker still consumes the value but skips the value
+# allowlist check.
+#
+# REQUIRED: every valued flag (i.e. every flag also listed in the
+# sub's `valued`) that appears in `eval_safe_flags` MUST declare its
+# value posture here — either a concrete allowlist or `[]`. Omitting
+# an entry panics at build time. This forces every contributor to
+# make an explicit choice and prevents the aws v0.196.0 near-miss
+# pattern (where `--format` defaulted to `process` JSON and a missing
+# value posture would silently substitute JSON into eval).
 #
 # BUILD-TIME CHECKS — the build panics if:
 #   - `eval_safe_flags` is set without `eval_safe = true`.
@@ -605,6 +622,15 @@
 #     alphabet `[a-zA-Z0-9_./=-]`.
 #   - A flag appears in `eval_safe_required_flags` but not in
 #     `eval_safe_flags` (the requirement could never be satisfied).
+#   - A flag appears in `eval_safe_flags` AND in the sub's `valued`
+#     list, but has no entry in `eval_safe_flag_values`. Every valued
+#     flag tagged eval-safe must declare its value posture (concrete
+#     allowlist OR explicit-unrestricted `= []`) so a future contributor
+#     adding a short alias of the flag can't silently widen the surface.
+#   - Any field unrecognized by the matrix or matrix-action schema
+#     appears in a `[[command.matrix]]` block. The matrix schema does
+#     NOT support `eval_safe` — tag the underlying `[[command.sub]]`
+#     declarations instead.
 #
 # CUSTOM TOMLS: every field documented in SAMPLE.toml — including
 # `eval_safe` and `eval_safe_flags` — applies in project-level

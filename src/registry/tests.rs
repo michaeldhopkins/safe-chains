@@ -3337,6 +3337,7 @@ valued = ["--type"]
             eval_safe_flags = ["--format", "--profile"]
             [command.sub.eval_safe_flag_values]
             --format = ["env", "env-no-export", "fish", "powershell", "windows-cmd"]
+            --profile = []
         "#)
     }
 
@@ -3366,6 +3367,20 @@ valued = ["--type"]
         // --format with no following token is denied — the flag is
         // structurally valued in eval_safe_flag_values.
         assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format"])));
+    }
+
+    #[test]
+    fn flag_value_allowlist_rejects_empty_value() {
+        let spec = aws_export_credentials_spec();
+        // Empty value via either form is denied for any valued flag
+        // declared in eval_safe_flag_values — including the
+        // explicit-unrestricted `--profile = []` posture. The bare-
+        // literal alphabet check vacuously passes empty strings, so
+        // the walker has to reject explicitly.
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format="])));
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format", ""])));
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile="])));
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile", ""])));
     }
 
     #[test]
@@ -3596,4 +3611,161 @@ valued = ["--type"]
                 words, any_present, actual,
             );
         }
+    }
+
+    // -------------------------------------------------------------------
+    // Adversarial-review hardening (must-fix #1, H3, H4)
+    // -------------------------------------------------------------------
+
+    /// Must-fix #1: a valued flag tagged eval-safe without an entry in
+    /// `eval_safe_flag_values` panics at build time. This catches the
+    /// aws v0.196.0 near-miss pattern where `--format` defaulting to
+    /// `process` (JSON) would substitute JSON into eval.
+    #[test]
+    #[should_panic(expected = "Every valued flag tagged eval-safe must declare its value posture")]
+    fn valued_flag_without_value_posture_panics_sub() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            [[command.sub]]
+            name = "export"
+            bare = true
+            max_positional = 0
+            valued = ["--format"]
+            eval_safe = true
+            eval_safe_flags = ["--format"]
+        "#);
+    }
+
+    /// Same check applied at command level for flat commands.
+    #[test]
+    #[should_panic(expected = "Every valued flag tagged eval-safe must declare its value posture")]
+    fn valued_flag_without_value_posture_panics_command() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            bare = true
+            valued = ["--format"]
+            eval_safe = true
+            eval_safe_flags = ["--format"]
+        "#);
+    }
+
+    /// Explicit-unrestricted form (`= []`) is the documented opt-out
+    /// for valued flags whose value doesn't affect stdout shape (like
+    /// `--profile NAME`). The build must accept this — it's the
+    /// contributor declaring "I considered this and decided no value
+    /// allowlist is needed."
+    #[test]
+    fn valued_flag_explicit_unrestricted_builds() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            [[command.sub]]
+            name = "export"
+            bare = true
+            max_positional = 0
+            valued = ["--profile"]
+            eval_safe = true
+            eval_safe_flags = ["--profile"]
+            [command.sub.eval_safe_flag_values]
+            --profile = []
+        "#);
+        // Walker accepts any bare-literal value for the unrestricted flag.
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile", "dev"])));
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile=staging"])));
+        // But the flag is still structurally valued: missing value denies.
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile"])));
+    }
+
+    /// H3: combined short-flag clusters (`-sk`) are intentionally
+    /// denied even when the individual flags are tagged. The walker
+    /// compares the whole token `-sk` against `eval_safe_flags`; it
+    /// never matches the entries `-s` and `-k` separately. This
+    /// matters because cluster parsing has subtle order-dependent
+    /// semantics across tools and the eval-safe contract should be
+    /// "the exact flag-token the contributor vetted, not a cluster."
+    #[test]
+    fn walker_denies_combined_short_cluster() {
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            bare = true
+            standalone = ["-s", "-k", "-sk"]
+            eval_safe = true
+            eval_safe_flags = ["-s", "-k"]
+        "#);
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-s"])));
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-k"])));
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-s", "-k"])));
+        // Clustering: walker compares "-sk" against eval_safe_flags
+        // which has individual "-s" and "-k". Whole-token mismatch =>
+        // deny. Even though the dispatcher would accept (if the
+        // contributor added "-sk" to standalone), the walker says no.
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "-sk"])));
+    }
+
+    /// H2 (clarification): the walker is intentionally INDEPENDENT of
+    /// dispatcher constraints like max_positional. Eval-safety is
+    /// gated end-to-end by `cst/check.rs::eval_verdict`, which runs
+    /// `word_sub_verdict` (full dispatcher validation) BEFORE the
+    /// walker. By the time the walker runs, the dispatcher has
+    /// already accepted the invocation. The walker only adds the
+    /// extra "is this tagged eval-safe" check on top.
+    ///
+    /// So a property like "walker accept => dispatcher accept" is
+    /// neither true (walker may accept token sequences the
+    /// dispatcher denies, like `cmd init a a` exceeding
+    /// max_positional) nor required for safety. The
+    /// `eval_verdict.combine(word_sub_verdict)` composition is what
+    /// guarantees end-to-end safety. We test that composition via the
+    /// `eval_*` tests in `src/tests.rs`, not here.
+
+    /// H4: an unrecognized field inside a matrix block (e.g. a
+    /// contributor putting `eval_safe = true` directly on a matrix
+    /// action) fails at TOML parse time rather than silently doing
+    /// nothing. eval-safe tagging lives on TOML-declared subs, never
+    /// on matrix actions — but the schema previously accepted
+    /// arbitrary extra fields and dropped them.
+    #[test]
+    fn matrix_unknown_field_rejected() {
+        let result = std::panic::catch_unwind(|| {
+            load_one(r#"
+                [[command]]
+                name = "demo"
+                handler = "php"
+                researched_version = "v1.0"
+                [[command.matrix]]
+                parents = ["a"]
+                level = "Inert"
+                eval_safe = true
+                actions.foo = "p1"
+                [command.handler_policy.p1]
+                standalone = ["--x"]
+            "#);
+        });
+        assert!(result.is_err(), "matrix block with eval_safe should panic at parse time");
+    }
+
+    #[test]
+    fn matrix_action_detailed_unknown_field_rejected() {
+        let result = std::panic::catch_unwind(|| {
+            load_one(r#"
+                [[command]]
+                name = "demo"
+                handler = "php"
+                researched_version = "v1.0"
+                [[command.matrix]]
+                parents = ["a"]
+                level = "Inert"
+                actions.foo = { policy = "p1", eval_safe = true }
+                [command.handler_policy.p1]
+                standalone = ["--x"]
+            "#);
+        });
+        assert!(result.is_err(), "matrix action with eval_safe should panic at parse time");
     }

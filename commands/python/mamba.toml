@@ -39,3 +39,6 @@ standalone = ["--help", "-h"]
 valued = ["--shell", "-s"]
 eval_safe = true
 eval_safe_flags = ["--shell", "-s"]
+[command.sub.sub.eval_safe_flag_values]
+--shell = ["bash", "cmd.exe", "dash", "fish", "nu", "posix", "powershell", "tcsh", "xonsh", "zsh"]
+-s = ["bash", "cmd.exe", "dash", "fish", "nu", "posix", "powershell", "tcsh", "xonsh", "zsh"]

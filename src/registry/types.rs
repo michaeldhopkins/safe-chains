@@ -122,6 +122,7 @@ pub(super) struct TomlCommand {
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(super) struct TomlMatrix {
     pub parents: Vec<String>,
     pub level: TomlLevel,
@@ -137,13 +138,17 @@ pub(super) enum TomlMatrixAction {
     /// Detailed form: `download = { policy = "release_download", guard
     /// = "--output", guard_short = "-O" }`. The guard flag must be
     /// present in the action's args for the dispatch to succeed.
-    Detailed {
-        policy: String,
-        #[serde(default)]
-        guard: Option<String>,
-        #[serde(default)]
-        guard_short: Option<String>,
-    },
+    Detailed(TomlMatrixActionDetailed),
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(super) struct TomlMatrixActionDetailed {
+    pub policy: String,
+    #[serde(default)]
+    pub guard: Option<String>,
+    #[serde(default)]
+    pub guard_short: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

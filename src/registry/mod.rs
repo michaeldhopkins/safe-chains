@@ -226,11 +226,15 @@ fn walk_to_eval_safe_leaf(
             seen_required = true;
         }
         if let Some(allowed) = eval_safe_flag_values.get(bare) {
-            // Valued flag with a value allowlist. The value can arrive
-            // either as `--flag=VALUE` (eq_value is Some) or as the
-            // next token (`--flag VALUE`). Either way it must appear
-            // in `allowed`; a flag in eval_safe_flag_values is
-            // structurally required to carry a value.
+            // Valued flag declared in eval_safe_flag_values. The value
+            // arrives either as `--flag=VALUE` (eq_value is Some) or as
+            // the next token (`--flag VALUE`); either way the walker
+            // consumes it because a flag in eval_safe_flag_values is
+            // structurally valued.
+            //
+            // `allowed` empty = explicit-unrestricted: contributor
+            // vetted that any bare-literal value preserves shell-init
+            // output. Non-empty = value must appear in the allowlist.
             let value: &str = if let Some(v) = eq_value {
                 v
             } else if let Some(next) = remaining.get(i + 1) {
@@ -240,7 +244,16 @@ fn walk_to_eval_safe_leaf(
             } else {
                 return false;
             };
-            if !allowed.iter().any(|av| av == value) {
+            // Empty value is denied even under the explicit-
+            // unrestricted (`= []`) posture: `--flag=` and an empty
+            // following token never represent a meaningful tool
+            // argument. The bare-literal alphabet check is per-char
+            // and vacuously passes empty strings, so the walker
+            // has to reject explicitly.
+            if value.is_empty() {
+                return false;
+            }
+            if !allowed.is_empty() && !allowed.iter().any(|av| av == value) {
                 return false;
             }
         }
