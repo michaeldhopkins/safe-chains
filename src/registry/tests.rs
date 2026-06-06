@@ -3470,3 +3470,130 @@ valued = ["--type"]
             );
         }
     }
+
+    // -------------------------------------------------------------------
+    // Required-flag-from-set (Gap B)
+    // -------------------------------------------------------------------
+
+    fn fzf_shell_init_spec() -> CommandSpec {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            bare = false
+            max_positional = 0
+            standalone = ["--bash", "--zsh", "--fish", "--nushell"]
+            eval_safe = true
+            eval_safe_flags = ["--bash", "--zsh", "--fish", "--nushell"]
+            eval_safe_required_flags = ["--bash", "--zsh", "--fish", "--nushell"]
+        "#)
+    }
+
+    #[test]
+    fn required_flags_bare_invocation_denied() {
+        let spec = fzf_shell_init_spec();
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo"])));
+    }
+
+    #[test]
+    fn required_flags_one_present_allowed() {
+        let spec = fzf_shell_init_spec();
+        for flag in ["--bash", "--zsh", "--fish", "--nushell"] {
+            assert!(
+                super::is_eval_safe_for_spec(&spec, &toks(&["demo", flag])),
+                "{flag} should satisfy required-flag check",
+            );
+        }
+    }
+
+    #[test]
+    fn required_flags_two_present_allowed() {
+        let spec = fzf_shell_init_spec();
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--bash", "--zsh"])));
+    }
+
+    #[test]
+    fn required_flags_unrelated_allowed_flag_denied() {
+        // Allowlist a "harmless" flag alongside the required set, but
+        // require one of the init flags. An invocation with only the
+        // harmless flag should still be denied.
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            bare = false
+            max_positional = 0
+            standalone = ["--bash", "--zsh", "--verbose"]
+            eval_safe = true
+            eval_safe_flags = ["--bash", "--zsh", "--verbose"]
+            eval_safe_required_flags = ["--bash", "--zsh"]
+        "#);
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--bash"])));
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--bash", "--verbose"])));
+        // --verbose alone misses the required set.
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "--verbose"])));
+    }
+
+    #[test]
+    fn required_flags_empty_does_not_constrain() {
+        // Default behavior (mise activate shape): empty required_flags
+        // means bare invocation is fine.
+        let spec = load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            [[command.sub]]
+            name = "activate"
+            bare = true
+            max_positional = 0
+            eval_safe = true
+        "#);
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "activate"])));
+    }
+
+    #[test]
+    #[should_panic(expected = "eval_safe_required_flags` but not in `eval_safe_flags")]
+    fn required_flag_not_in_allowlist_panics() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            bare = false
+            max_positional = 0
+            standalone = ["--bash"]
+            eval_safe = true
+            eval_safe_flags = ["--bash"]
+            eval_safe_required_flags = ["--bash", "--zsh"]
+        "#);
+    }
+
+    proptest::proptest! {
+        /// For any spec with `eval_safe_required_flags = [...]`, the
+        /// walker accepts iff at least one of those flags is present
+        /// in the invocation (and every flag is in the allowlist).
+        /// We model the invocation as a random subset of the allowed
+        /// flags.
+        #[test]
+        fn walker_required_flag_invariant(
+            include_bash in proptest::bool::ANY,
+            include_zsh in proptest::bool::ANY,
+            include_fish in proptest::bool::ANY,
+            include_nushell in proptest::bool::ANY,
+        ) {
+            let spec = fzf_shell_init_spec();
+            let mut words = vec!["demo"];
+            if include_bash { words.push("--bash"); }
+            if include_zsh { words.push("--zsh"); }
+            if include_fish { words.push("--fish"); }
+            if include_nushell { words.push("--nushell"); }
+            let any_present = include_bash || include_zsh || include_fish || include_nushell;
+            let tokens = toks(&words);
+            let actual = super::is_eval_safe_for_spec(&spec, &tokens);
+            proptest::prop_assert_eq!(
+                actual,
+                any_present,
+                "walker disagreed for {:?}: expected {}, got {}",
+                words, any_present, actual,
+            );
+        }
+    }

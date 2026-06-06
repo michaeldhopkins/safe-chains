@@ -146,6 +146,7 @@ pub(super) fn build_subs(
             eval_safe: canonical.eval_safe,
             eval_safe_flags: canonical.eval_safe_flags.clone(),
             eval_safe_flag_values: canonical.eval_safe_flag_values.clone(),
+            eval_safe_required_flags: canonical.eval_safe_required_flags.clone(),
         });
     }
     out.push(canonical);
@@ -163,8 +164,10 @@ pub(super) fn build_sub(
     let eval_safe = toml.eval_safe.unwrap_or(false);
     let eval_safe_flags = std::mem::take(&mut toml.eval_safe_flags);
     let eval_safe_flag_values = std::mem::take(&mut toml.eval_safe_flag_values);
+    let eval_safe_required_flags = std::mem::take(&mut toml.eval_safe_required_flags);
     assert_eval_safe_flags_require_tag(parent, &name, eval_safe, &eval_safe_flags);
     assert_eval_safe_flag_values_consistent(parent, &name, &eval_safe_flags, &eval_safe_flag_values);
+    assert_eval_safe_required_flags_consistent(parent, &name, &eval_safe_flags, &eval_safe_required_flags);
     assert_sub_eval_safe_only_on_leaf(parent, &toml);
     SubSpec {
         name,
@@ -173,6 +176,7 @@ pub(super) fn build_sub(
         eval_safe,
         eval_safe_flags,
         eval_safe_flag_values,
+        eval_safe_required_flags,
     }
 }
 
@@ -208,6 +212,26 @@ fn assert_eval_safe_flag_values_consistent(
 
 fn is_bare_literal_char(c: char) -> bool {
     c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.' | '/' | '=')
+}
+
+fn assert_eval_safe_required_flags_consistent(
+    parent: &str,
+    name: &str,
+    eval_safe_flags: &[String],
+    eval_safe_required_flags: &[String],
+) {
+    for flag in eval_safe_required_flags {
+        if !eval_safe_flags.iter().any(|f| f == flag) {
+            panic!(
+                "command '{parent}' sub `{name}` lists `{flag}` in \
+                 `eval_safe_required_flags` but not in `eval_safe_flags`. \
+                 A required-flag constraint must be a subset of the \
+                 allowed-flag set — otherwise the flag is required AND \
+                 immediately denied. Add `{flag}` to `eval_safe_flags` or \
+                 remove it from `eval_safe_required_flags`."
+            );
+        }
+    }
 }
 
 fn assert_eval_safe_flags_require_tag(parent: &str, name: &str, eval_safe: bool, flags: &[String]) {
@@ -543,6 +567,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     let eval_safe = toml.eval_safe.unwrap_or(false);
     let eval_safe_flags = toml.eval_safe_flags;
     let eval_safe_flag_values = toml.eval_safe_flag_values;
+    let eval_safe_required_flags = toml.eval_safe_required_flags;
     if !eval_safe_flags.is_empty() && !eval_safe {
         panic!(
             "command '{}' declares `eval_safe_flags` without `eval_safe = true`. \
@@ -557,6 +582,12 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         &eval_safe_flags,
         &eval_safe_flag_values,
     );
+    assert_eval_safe_required_flags_consistent(
+        &toml.name,
+        "<command>",
+        &eval_safe_flags,
+        &eval_safe_required_flags,
+    );
     if toml.deny.unwrap_or(false) {
         return CommandSpec {
             name: toml.name,
@@ -570,6 +601,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe,
             eval_safe_flags: eval_safe_flags.clone(),
             eval_safe_flag_values: eval_safe_flag_values.clone(),
+            eval_safe_required_flags: eval_safe_required_flags.clone(),
             kind: DispatchKind::Policy {
                 policy: OwnedPolicy {
                     standalone: Vec::new(),
@@ -612,6 +644,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe,
             eval_safe_flags: eval_safe_flags.clone(),
             eval_safe_flag_values: eval_safe_flag_values.clone(),
+            eval_safe_required_flags: eval_safe_required_flags.clone(),
             kind: DispatchKind::Custom {
                 handler_name,
                 doc_body: toml.doc_body,
@@ -639,6 +672,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 eval_safe,
                 eval_safe_flags: eval_safe_flags.clone(),
                 eval_safe_flag_values: eval_safe_flag_values.clone(),
+                eval_safe_required_flags: eval_safe_required_flags.clone(),
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
                     subs: filter_candidates(toml.sub)
@@ -664,6 +698,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe,
             eval_safe_flags: eval_safe_flags.clone(),
             eval_safe_flag_values: eval_safe_flag_values.clone(),
+            eval_safe_required_flags: eval_safe_required_flags.clone(),
             kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
                 valued: w.valued,
@@ -689,6 +724,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe,
             eval_safe_flags: eval_safe_flags.clone(),
             eval_safe_flag_values: eval_safe_flag_values.clone(),
+            eval_safe_required_flags: eval_safe_required_flags.clone(),
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
                 subs: filter_candidates(toml.sub)
@@ -728,6 +764,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe,
             eval_safe_flags: eval_safe_flags.clone(),
             eval_safe_flag_values: eval_safe_flag_values.clone(),
+            eval_safe_required_flags: eval_safe_required_flags.clone(),
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
                 level,
@@ -748,6 +785,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe,
             eval_safe_flags: eval_safe_flags.clone(),
             eval_safe_flag_values: eval_safe_flag_values.clone(),
+            eval_safe_required_flags: eval_safe_required_flags.clone(),
             kind: DispatchKind::WriteFlagged {
                 policy,
                 base_level: level,
@@ -769,6 +807,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe,
             eval_safe_flags: eval_safe_flags.clone(),
             eval_safe_flag_values: eval_safe_flag_values.clone(),
+            eval_safe_required_flags: eval_safe_required_flags.clone(),
             kind: DispatchKind::RequireAny {
                 require_any: toml.require_any,
                 policy,
@@ -790,6 +829,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         eval_safe,
         eval_safe_flags,
         eval_safe_flag_values,
+        eval_safe_required_flags,
         kind: DispatchKind::Policy {
             policy,
             level,
@@ -839,6 +879,7 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
             eval_safe: spec.eval_safe,
             eval_safe_flags: spec.eval_safe_flags.clone(),
             eval_safe_flag_values: spec.eval_safe_flag_values.clone(),
+            eval_safe_required_flags: spec.eval_safe_required_flags.clone(),
             kind: spec.kind.clone(),
         });
     }

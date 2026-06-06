@@ -87,6 +87,13 @@ pub(super) struct TomlCommand {
     /// the bare-literal alphabet.
     #[serde(default)]
     pub eval_safe_flag_values: std::collections::HashMap<String, Vec<String>>,
+    /// Flags where AT LEAST ONE must appear in the eval substitution.
+    /// Use for tools whose bare invocation isn't shell-init code:
+    /// `fzf` is interactive without `--bash|--zsh|--fish|--nushell`.
+    /// Every entry must also appear in `eval_safe_flags`. Default
+    /// empty = no required flags (bare invocation is fine).
+    #[serde(default)]
+    pub eval_safe_required_flags: Vec<String>,
     /// Shortcut: every invocation of this command is denied. Used in custom
     /// TOMLs to lock down a built-in (e.g. `name = "gh", deny = true` in
     /// `.safe-chains.toml` denies every gh form for that project).
@@ -273,6 +280,10 @@ pub(super) struct TomlSub {
     /// appear in `eval_safe_flags`) to its permitted values.
     #[serde(default)]
     pub eval_safe_flag_values: std::collections::HashMap<String, Vec<String>>,
+    /// Flags where AT LEAST ONE must appear (same semantics as the
+    /// command-level field).
+    #[serde(default)]
+    pub eval_safe_required_flags: Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy, Deserialize)]
@@ -323,6 +334,9 @@ pub struct CommandSpec {
     /// listed here, the value following the flag (separated by `=` or
     /// space) must be in this list.
     pub eval_safe_flag_values: std::collections::HashMap<String, Vec<String>>,
+    /// Flags where at least one must appear in the substituted
+    /// invocation. Empty = no required-flag constraint.
+    pub eval_safe_required_flags: Vec<String>,
     pub(super) kind: DispatchKind,
 }
 
@@ -344,6 +358,9 @@ pub(super) struct SubSpec {
     /// Per-valued-flag value allowlist (same semantics as on
     /// `CommandSpec`).
     pub eval_safe_flag_values: std::collections::HashMap<String, Vec<String>>,
+    /// Flags where at least one must appear in the substituted
+    /// invocation (same semantics as on `CommandSpec`).
+    pub eval_safe_required_flags: Vec<String>,
 }
 
 #[derive(Debug, Clone)]

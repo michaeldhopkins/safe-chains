@@ -175,6 +175,7 @@ pub(crate) fn is_eval_safe_for_spec(spec: &CommandSpec, tokens: &[Token]) -> boo
         spec.eval_safe,
         &spec.eval_safe_flags,
         &spec.eval_safe_flag_values,
+        &spec.eval_safe_required_flags,
     )
 }
 
@@ -184,6 +185,7 @@ fn walk_to_eval_safe_leaf(
     eval_safe: bool,
     eval_safe_flags: &[String],
     eval_safe_flag_values: &std::collections::HashMap<String, Vec<String>>,
+    eval_safe_required_flags: &[String],
 ) -> bool {
     let subs_opt = match kind {
         DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => Some(subs),
@@ -199,12 +201,14 @@ fn walk_to_eval_safe_leaf(
             sub.eval_safe,
             &sub.eval_safe_flags,
             &sub.eval_safe_flag_values,
+            &sub.eval_safe_required_flags,
         );
     }
     if !eval_safe {
         return false;
     }
     let mut i = 0;
+    let mut seen_required = false;
     while i < remaining.len() {
         let s = remaining[i].as_str();
         if !s.starts_with('-') {
@@ -217,6 +221,9 @@ fn walk_to_eval_safe_leaf(
         };
         if !eval_safe_flags.iter().any(|f| f == bare) {
             return false;
+        }
+        if eval_safe_required_flags.iter().any(|f| f == bare) {
+            seen_required = true;
         }
         if let Some(allowed) = eval_safe_flag_values.get(bare) {
             // Valued flag with a value allowlist. The value can arrive
@@ -238,6 +245,9 @@ fn walk_to_eval_safe_leaf(
             }
         }
         i += 1;
+    }
+    if !eval_safe_required_flags.is_empty() && !seen_required {
+        return false;
     }
     true
 }
