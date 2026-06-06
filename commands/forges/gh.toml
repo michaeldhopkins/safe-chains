@@ -3,7 +3,7 @@ name = "gh"
 description = "GitHub's official CLI. Most subcommands wrap REST or GraphQL calls against api.github.com over authenticated HTTPS. Read-only operations (`gh pr list`, `gh issue view`, `gh run watch`, `gh release list`, etc.) query data; write operations create or mutate repository state (`gh pr create`, `gh issue close`, `gh release create`, etc.) and are not covered. `gh run rerun` re-queues a workflow run — accepted as SafeWrite because it doesn't lose history. `gh release download` writes downloaded asset bytes to a local path — SafeWrite, gated on `-O`/`--output` being present so the destination is explicit. `gh browse` opens a browser by default, accepted only when `-n`/`--no-browser` suppresses that. `gh api` lets the user issue arbitrary REST or GraphQL requests; covered only for read-style methods (implicit GET or explicit `-X GET`) with a narrow header allowlist (Accept, X-GitHub-Api-Version) and a GraphQL mutation veto. Releases roughly monthly with a stable command surface; new flags appear regularly."
 url = "https://cli.github.com/manual/"
 handler = "gh"
-researched_version = "gh 2.x"
+researched_version = "v2.93.0 (2026-05-27)"
 doc_body = ""
 
 # --version / --help at length 2.
@@ -40,6 +40,23 @@ level = "Inert"
 name = "status"
 policy = "simple_list"
 level = "Inert"
+
+# `gh completion <shell>` prints the Cobra-generated completion script
+# to stdout for shell init (canonical: `eval "$(gh completion bash)"`).
+# Supported shells per `gh completion --help`: bash, fish, powershell,
+# zsh.
+[[command.sub]]
+name = "completion"
+level = "Inert"
+bare = false
+max_positional = 1
+standalone = ["--help", "--no-descriptions", "-h"]
+valued = ["--shell", "-s"]
+eval_safe = true
+eval_safe_flags = ["--no-descriptions", "--shell", "-s"]
+[command.sub.eval_safe_flag_values]
+--shell = ["bash", "fish", "powershell", "zsh"]
+-s = ["bash", "fish", "powershell", "zsh"]
 
 # Sub × action matrix. The handler walks these blocks via
 # registry::try_matrix_dispatch — for each block, if tokens[1] is in

@@ -4549,6 +4549,7 @@ Aliases: `g++`, `cc`, `c++`
 
 - **api**: Read-only REST/GraphQL: implicit GET or explicit `-X GET`. Allowed flags: --paginate, --slurp, --silent, --include, --verbose, --jq, --json, --template, --cache, --preview, --hostname. Headers via -H/--header limited to Accept and X-GitHub-Api-Version. -f/-F/--field/--raw-field require -X GET on REST endpoints; on the graphql endpoint, mutation queries are denied.
 - **browse** (requires --no-browser, -n): Flags: --actions, --no-browser, --projects, --releases, --settings, --wiki, -a, -c, -n, -p, -r, -s, -w. Valued: --branch, --commit, --repo, -R, -b
+- **completion**: Flags: --help, --no-descriptions, -h. Valued: --shell, -s
 - **search**: Flags: --archived, --draft, --include-forks, --locked, --merged, --no-assignee, --no-label, --no-milestone, --no-project, --web, -w. Valued: --app, --assignee, --author, --checks, --closed, --commenter, --comments, --committer, --created, --filename, --followers, --forks, --good-first-issues, --hash, --help-wanted-issues, --include, --interactions, --involves, --jq, --json, --label, --language, --license, --limit, --match, --mentions, --merged-at, --milestone, --number, --order, --owner, --parent, --project, --reactions, --repo, --review, --review-requested, --reviewed-by, --size, --sort, --stars, --state, --team-mentions, --team-review-requested, --template, --topic, --updated, --visibility, -L, -R, -q
 - **status** — see `simple_list` below
 
