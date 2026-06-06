@@ -169,7 +169,13 @@ pub(crate) fn is_eval_safe_for_spec(spec: &CommandSpec, tokens: &[Token]) -> boo
     if tokens.is_empty() {
         return false;
     }
-    walk_to_eval_safe_leaf(&tokens[1..], &spec.kind, spec.eval_safe, &spec.eval_safe_flags)
+    walk_to_eval_safe_leaf(
+        &tokens[1..],
+        &spec.kind,
+        spec.eval_safe,
+        &spec.eval_safe_flags,
+        &spec.eval_safe_flag_values,
+    )
 }
 
 fn walk_to_eval_safe_leaf(
@@ -177,6 +183,7 @@ fn walk_to_eval_safe_leaf(
     kind: &DispatchKind,
     eval_safe: bool,
     eval_safe_flags: &[String],
+    eval_safe_flag_values: &std::collections::HashMap<String, Vec<String>>,
 ) -> bool {
     let subs_opt = match kind {
         DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => Some(subs),
@@ -191,20 +198,46 @@ fn walk_to_eval_safe_leaf(
             &sub.kind,
             sub.eval_safe,
             &sub.eval_safe_flags,
+            &sub.eval_safe_flag_values,
         );
     }
     if !eval_safe {
         return false;
     }
-    for t in remaining {
-        let s = t.as_str();
+    let mut i = 0;
+    while i < remaining.len() {
+        let s = remaining[i].as_str();
         if !s.starts_with('-') {
+            i += 1;
             continue;
         }
-        let bare = s.split_once('=').map_or(s, |(k, _)| k);
+        let (bare, eq_value) = match s.split_once('=') {
+            Some((k, v)) => (k, Some(v)),
+            None => (s, None),
+        };
         if !eval_safe_flags.iter().any(|f| f == bare) {
             return false;
         }
+        if let Some(allowed) = eval_safe_flag_values.get(bare) {
+            // Valued flag with a value allowlist. The value can arrive
+            // either as `--flag=VALUE` (eq_value is Some) or as the
+            // next token (`--flag VALUE`). Either way it must appear
+            // in `allowed`; a flag in eval_safe_flag_values is
+            // structurally required to carry a value.
+            let value: &str = if let Some(v) = eq_value {
+                v
+            } else if let Some(next) = remaining.get(i + 1) {
+                let v = next.as_str();
+                i += 1;
+                v
+            } else {
+                return false;
+            };
+            if !allowed.iter().any(|av| av == value) {
+                return false;
+            }
+        }
+        i += 1;
     }
     true
 }

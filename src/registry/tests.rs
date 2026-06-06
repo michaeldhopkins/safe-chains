@@ -3317,3 +3317,156 @@ valued = ["--type"]
             );
         }
     }
+
+    // -------------------------------------------------------------------
+    // Per-flag value allowlist (Gap C)
+    // -------------------------------------------------------------------
+
+    fn aws_export_credentials_spec() -> CommandSpec {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            [[command.sub]]
+            name = "export"
+            bare = true
+            max_positional = 0
+            standalone = ["--help"]
+            valued = ["--format", "--profile"]
+            eval_safe = true
+            eval_safe_flags = ["--format", "--profile"]
+            [command.sub.eval_safe_flag_values]
+            --format = ["env", "env-no-export", "fish", "powershell", "windows-cmd"]
+        "#)
+    }
+
+    #[test]
+    fn flag_value_allowlist_accepts_listed_value_space_form() {
+        let spec = aws_export_credentials_spec();
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format", "env"])));
+    }
+
+    #[test]
+    fn flag_value_allowlist_accepts_listed_value_eq_form() {
+        let spec = aws_export_credentials_spec();
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format=env"])));
+    }
+
+    #[test]
+    fn flag_value_allowlist_rejects_unlisted_value() {
+        let spec = aws_export_credentials_spec();
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format", "json"])));
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format=json"])));
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format=process"])));
+    }
+
+    #[test]
+    fn flag_value_allowlist_rejects_missing_value() {
+        let spec = aws_export_credentials_spec();
+        // --format with no following token is denied — the flag is
+        // structurally valued in eval_safe_flag_values.
+        assert!(!super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--format"])));
+    }
+
+    #[test]
+    fn flag_value_allowlist_does_not_affect_other_flags() {
+        let spec = aws_export_credentials_spec();
+        // --profile is allowed without value-checking (not in
+        // eval_safe_flag_values); any value reaching the walker is OK
+        // because the bare-literal alphabet was checked upstream.
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile", "dev"])));
+        assert!(super::is_eval_safe_for_spec(&spec, &toks(&["demo", "export", "--profile=dev"])));
+    }
+
+    #[test]
+    fn flag_value_allowlist_combines_with_other_flags() {
+        let spec = aws_export_credentials_spec();
+        assert!(super::is_eval_safe_for_spec(
+            &spec,
+            &toks(&["demo", "export", "--format", "env", "--profile", "dev"]),
+        ));
+        // Bad value still denies, even with other valid flags present.
+        assert!(!super::is_eval_safe_for_spec(
+            &spec,
+            &toks(&["demo", "export", "--profile", "dev", "--format", "json"]),
+        ));
+    }
+
+    #[test]
+    #[should_panic(expected = "eval_safe_flag_values` but not in `eval_safe_flags")]
+    fn flag_value_without_flag_in_allowlist_panics() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            [[command.sub]]
+            name = "export"
+            bare = true
+            max_positional = 0
+            valued = ["--format"]
+            eval_safe = true
+            eval_safe_flags = ["--profile"]
+            [command.sub.eval_safe_flag_values]
+            --format = ["env"]
+        "#);
+    }
+
+    #[test]
+    #[should_panic(expected = "characters outside `[a-zA-Z0-9_./=-]")]
+    fn flag_value_with_expansion_trigger_panics() {
+        load_one(r#"
+            [[command]]
+            name = "demo"
+            researched_version = "v1.0"
+            [[command.sub]]
+            name = "export"
+            bare = true
+            max_positional = 0
+            standalone = ["--format"]
+            eval_safe = true
+            eval_safe_flags = ["--format"]
+            [command.sub.eval_safe_flag_values]
+            --format = ["$EVIL"]
+        "#);
+    }
+
+    proptest::proptest! {
+        /// For any spec with `eval_safe_flag_values = {"--format": [<set>]}`,
+        /// only values in the set are accepted, regardless of form
+        /// (space-separated or `=`-joined). Generated test values are
+        /// constrained to the bare-literal alphabet to bypass the
+        /// upstream alphabet check.
+        #[test]
+        fn walker_value_allowlist_is_exhaustive(
+            value in proptest::string::string_regex("[a-z]{1,8}").expect("regex"),
+            form in proptest::sample::select(vec!["space", "eq"]),
+        ) {
+            let allowed_values = ["env", "json", "fish", "windows-cmd"];
+            let spec = load_one(r#"
+                [[command]]
+                name = "demo"
+                researched_version = "v1.0"
+                [[command.sub]]
+                name = "export"
+                bare = true
+                max_positional = 0
+                standalone = ["--format"]
+                eval_safe = true
+                eval_safe_flags = ["--format"]
+                [command.sub.eval_safe_flag_values]
+                --format = ["env", "json", "fish", "windows-cmd"]
+            "#);
+            let tokens = match form {
+                "eq" => toks(&["demo", "export", &format!("--format={value}")]),
+                _ => toks(&["demo", "export", "--format", &value]),
+            };
+            let expected = allowed_values.iter().any(|v| *v == value.as_str());
+            let actual = super::is_eval_safe_for_spec(&spec, &tokens);
+            proptest::prop_assert_eq!(
+                actual,
+                expected,
+                "walker disagreed for value {:?} (form={}): expected {}, got {}",
+                value, form, expected, actual,
+            );
+        }
+    }
