@@ -993,6 +993,7 @@ Aliases: `whatis`
 - **comprehend**: Allowed arguments: describe-*, get-*, list-*
 - **compute-optimizer**: Allowed arguments: describe-*, get-*, list-*
 - **configservice**: Allowed arguments: describe-*, get-*, list-*
+- **configure export-credentials**: Flags: --help. Valued: --format, --profile
 - **configure get**: Flags: --help
 - **configure list**: Flags: --help
 - **connect**: Allowed arguments: describe-*, get-*, list-*
@@ -1183,6 +1184,14 @@ Aliases: `whatis`
 - **workspaces-web**: Allowed arguments: describe-*, get-*, list-*
 - **xray**: Allowed arguments: describe-*, get-*, list-*
 - Allowed standalone flags: --help, --version
+
+**Examples:**
+
+- `aws sts get-caller-identity`
+- `aws s3 ls`
+- `aws configure export-credentials`
+- `aws configure export-credentials --format env`
+- `aws configure export-credentials --format env --profile dev`
 
 ### `az`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/cli/azure/">https://learn.microsoft.com/en-us/cli/azure/</a></p>
@@ -11969,7 +11978,7 @@ Aliases: `gsort`
 ### `ssh-agent`
 <p class="cmd-url"><a href="https://man.openbsd.org/ssh-agent">https://man.openbsd.org/ssh-agent</a></p>
 
-- Allowed standalone flags: --help, -?, -D, -a, -c, -d, -h, -k, -q, -s, -t, -v
+- Allowed standalone flags: --help, -?, -D, -c, -d, -h, -k, -q, -s, -v
 - Allowed valued flags: -E, -O, -P, -a, -t
 - Bare invocation allowed
 

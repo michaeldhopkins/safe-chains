@@ -1,8 +1,16 @@
 [[command]]
 name = "aws"
-description = "Unified command-line interface for managing all Amazon Web Services resources. The full CLI can create, modify, and delete cloud infrastructure, manage IAM policies, and exfiltrate data from S3/Secrets Manager. Authenticated via credentials in ~/.aws or environment variables. Releases multiple times per week; very high project velocity."
+description = "Unified command-line interface for managing all Amazon Web Services resources. The full CLI can create, modify, and delete cloud infrastructure, manage IAM policies, and exfiltrate data from S3/Secrets Manager. Authenticated via credentials in ~/.aws or environment variables. The `configure export-credentials` sub-sub prints temporary credentials in the requested format (default is `process` JSON for credential_process; `env`, `env-no-export`, `powershell`, `windows-cmd`, `fish` produce shell-init variants). Releases multiple times per week; very high project velocity."
 url = "https://docs.aws.amazon.com/cli/latest/"
+researched_version = "2.34.63"
 bare_flags = ["--help", "--version"]
+examples_safe = [
+    "aws sts get-caller-identity",
+    "aws s3 ls",
+    "aws configure export-credentials",
+    "aws configure export-credentials --format env",
+    "aws configure export-credentials --format env --profile dev",
+]
 [command.wrapper]
 standalone = ["--debug", "--no-paginate", "--no-sign-request", "--no-verify-ssl"]
 valued = [
@@ -20,6 +28,12 @@ standalone = ["--help"]
 name = "get"
 bare = false
 standalone = ["--help"]
+[[command.sub.sub]]
+name = "export-credentials"
+level = "Inert"
+max_positional = 0
+standalone = ["--help"]
+valued = ["--format", "--profile"]
 
 [[command.sub]]
 name = "sts"

@@ -411,7 +411,7 @@
 ### `ssh-agent`
 <p class="cmd-url"><a href="https://man.openbsd.org/ssh-agent">https://man.openbsd.org/ssh-agent</a></p>
 
-- Allowed standalone flags: --help, -?, -D, -a, -c, -d, -h, -k, -q, -s, -t, -v
+- Allowed standalone flags: --help, -?, -D, -c, -d, -h, -k, -q, -s, -v
 - Allowed valued flags: -E, -O, -P, -a, -t
 - Bare invocation allowed
 
