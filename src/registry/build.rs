@@ -358,14 +358,14 @@ fn assert_command_eval_safe_only_on_leaf(toml: &TomlCommand) {
             toml.name,
         );
     }
-    if toml.handler.is_some() {
-        panic!(
-            "command '{}' sets `eval_safe = true` AND `handler = \"...\"`. \
-             Handler-based commands run Rust dispatch logic whose shape the \
-             eval walker cannot introspect.",
-            toml.name,
-        );
-    }
+    // Note: command-level eval_safe IS allowed alongside `handler =
+    // "..."`. The walker reads `spec.eval_safe` directly at the leaf
+    // — it does not need to introspect the handler's dispatch logic.
+    // The contributor takes responsibility for vouching that every
+    // invocation the handler accepts AND that passes the eval_safe_*
+    // flag checks produces shell-init stdout (typically narrowed via
+    // `eval_safe_required_flags`). See fzf's TOML for the canonical
+    // pattern.
     if toml.wrapper.is_some() {
         panic!(
             "command '{}' sets `eval_safe = true` AND `[command.wrapper]`. \

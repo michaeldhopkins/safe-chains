@@ -8,9 +8,9 @@ static FZF_STANDALONE: WordSet = WordSet::flags(&[
     "--help", "--highlight-line", "--keep-right", "--literal",
     "--man", "--multi", "--no-bold", "--no-color", "--no-hscroll",
     "--no-input", "--no-multi-line", "--no-scrollbar", "--no-separator",
-    "--no-sort", "--print-query", "--print0", "--read0",
+    "--no-sort", "--nushell", "--print-query", "--print0", "--read0",
     "--select-1", "--sync", "--tac", "--track", "--version", "--wrap",
-    "--zero",
+    "--zero", "--zsh",
     "-0", "-1", "-V", "-e", "-h", "-i", "-m",
 ]);
 

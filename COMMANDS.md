@@ -4304,6 +4304,18 @@ Aliases: `dotnet-fsi`
 
 - Fuzzy finder. --bind allowed with UI-only actions (no command execution). Display, filtering, and layout flags allowed.
 
+### `fzf`
+<p class="cmd-url"><a href="https://github.com/junegunn/fzf#readme">https://github.com/junegunn/fzf#readme</a></p>
+
+
+
+**Examples:**
+
+- `eval "$(fzf --bash)"`
+- `eval "$(fzf --zsh)"`
+- `eval "$(fzf --fish)"`
+- `eval "$(fzf --nushell)"`
+
 ### `fzy`
 <p class="cmd-url"><a href="https://github.com/jhawthorn/fzy">https://github.com/jhawthorn/fzy</a></p>
 
