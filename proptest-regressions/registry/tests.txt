@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc d9e787bf8ff912d62e9b06dd10f662dee2a896693dd85f956c0f16f3af878157 # shrinks to seed = 0, suffix = "aaaaa"
+cc 8a65c91e4354795bbd644f9439cc93751fd575dfa1c6c18266587d72b8878ff0 # shrinks to tail = ["a", "a"]

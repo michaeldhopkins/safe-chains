@@ -46,8 +46,12 @@ fn build_matrix(toml: TomlMatrix) -> MatrixSpec {
                     guard: None,
                     guard_short: None,
                 },
-                TomlMatrixAction::Detailed { policy, guard, guard_short } => {
-                    MatrixAction { policy_key: policy, guard, guard_short }
+                TomlMatrixAction::Detailed(d) => {
+                    MatrixAction {
+                        policy_key: d.policy,
+                        guard: d.guard,
+                        guard_short: d.guard_short,
+                    }
                 }
             };
             (name, built)
@@ -165,8 +169,10 @@ pub(super) fn build_sub(
     let eval_safe_flags = std::mem::take(&mut toml.eval_safe_flags);
     let eval_safe_flag_values = std::mem::take(&mut toml.eval_safe_flag_values);
     let eval_safe_required_flags = std::mem::take(&mut toml.eval_safe_required_flags);
+    let valued_for_check = toml.valued.clone();
     assert_eval_safe_flags_require_tag(parent, &name, eval_safe, &eval_safe_flags);
     assert_eval_safe_flag_values_consistent(parent, &name, &eval_safe_flags, &eval_safe_flag_values);
+    assert_eval_safe_valued_flags_declared(parent, &name, &eval_safe_flags, &valued_for_check, &eval_safe_flag_values);
     assert_eval_safe_required_flags_consistent(parent, &name, &eval_safe_flags, &eval_safe_required_flags);
     assert_sub_eval_safe_only_on_leaf(parent, &toml);
     SubSpec {
@@ -229,6 +235,43 @@ fn assert_eval_safe_required_flags_consistent(
                  allowed-flag set — otherwise the flag is required AND \
                  immediately denied. Add `{flag}` to `eval_safe_flags` or \
                  remove it from `eval_safe_required_flags`."
+            );
+        }
+    }
+}
+
+/// Every valued flag in `eval_safe_flags` must declare its value
+/// posture in `eval_safe_flag_values`: either a concrete value
+/// allowlist (`["env", "fish"]`) OR the explicit-unrestricted form
+/// (`[]`). Without this, a contributor adding a short alias like
+/// `-f` for an already-tagged `--format` would silently widen the
+/// eval-safe surface to any value of `-f` — the v0.196.0 aws
+/// near-miss in disguise.
+fn assert_eval_safe_valued_flags_declared(
+    parent: &str,
+    name: &str,
+    eval_safe_flags: &[String],
+    valued: &[String],
+    eval_safe_flag_values: &std::collections::HashMap<String, Vec<String>>,
+) {
+    for flag in eval_safe_flags {
+        if !valued.iter().any(|v| v == flag) {
+            continue;
+        }
+        if !eval_safe_flag_values.contains_key(flag) {
+            panic!(
+                "command '{parent}' sub `{name}` lists `{flag}` in \
+                 `eval_safe_flags` AND in `valued`, but `{flag}` has no \
+                 entry in `eval_safe_flag_values`. Every valued flag \
+                 tagged eval-safe must declare its value posture: \
+                 either a concrete allowlist of safe values \
+                 (`{flag} = [\"value-a\", \"value-b\"]`) or the \
+                 explicit-unrestricted form (`{flag} = []`) signaling \
+                 the contributor vetted that any value preserves shell-\
+                 init output. Omitting an entry means the walker can't \
+                 tell whether the value-following-flag is supposed to \
+                 be checked, and a future short alias of `{flag}` \
+                 could silently widen the eval-safe surface."
             );
         }
     }
@@ -501,7 +544,7 @@ fn assert_matrix_policy_keys_exist(toml: &TomlCommand) {
         for (action_name, action) in &matrix.actions {
             let policy_key = match action {
                 TomlMatrixAction::Policy(k) => k,
-                TomlMatrixAction::Detailed { policy, .. } => policy,
+                TomlMatrixAction::Detailed(d) => &d.policy,
             };
             if !toml.handler_policy.contains_key(policy_key) {
                 panic!(
@@ -580,6 +623,13 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         &toml.name,
         "<command>",
         &eval_safe_flags,
+        &eval_safe_flag_values,
+    );
+    assert_eval_safe_valued_flags_declared(
+        &toml.name,
+        "<command>",
+        &eval_safe_flags,
+        &toml.valued,
         &eval_safe_flag_values,
     );
     assert_eval_safe_required_flags_consistent(

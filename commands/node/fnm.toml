@@ -46,3 +46,5 @@ standalone = ["--help", "--multi", "--use-on-cd", "-h"]
 valued = ["--shell"]
 eval_safe = true
 eval_safe_flags = ["--multi", "--shell", "--use-on-cd"]
+[command.sub.eval_safe_flag_values]
+--shell = ["bash", "fish", "powershell", "zsh"]
