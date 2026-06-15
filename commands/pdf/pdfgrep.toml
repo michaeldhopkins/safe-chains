@@ -1,0 +1,19 @@
+[[command]]
+name = "pdfgrep"
+description = "Searches for a regex PATTERN in each PDF FILE and prints matching lines to stdout — grep semantics for PDFs. Built on Poppler; read-only against the input PDFs. Writes nothing to disk in default operation; the `--cache` flag enables an opt-in on-disk cache of extracted text. Output formatting flags mirror GNU grep (`-i`, `-n`, `-c`, `-l`, `-L`, `-o`, `-q`, `-A`/`-B`/`-C` for context, `-r`/`-R` for recursive directory traversal). PDF-specific flags include `--password` for encrypted PDFs, `--page-range`, `--page-number`, and `--unac` for unaccented matching. Recursive mode accepts `--include`/`--exclude` glob filters for filename matching (grep convention). Stable surface across the 2.x line."
+url = "https://pdfgrep.org/"
+researched_version = "pdfgrep 2.2.0"
+level = "SafeRead"
+bare = false
+standalone = [
+    "--cache", "--debug", "--help", "--unac", "--version", "--warn-empty",
+    "-F", "-H", "-L", "-P", "-R", "-V", "-Z",
+    "-c", "-h", "-i", "-l", "-n", "-o", "-p", "-q", "-r",
+]
+valued = [
+    "--after-context", "--before-context", "--color", "--context",
+    "--exclude", "--file", "--include",
+    "--match-prefix-separator", "--max-count",
+    "--page-range", "--password", "--regexp",
+    "-A", "-B", "-C", "-e", "-f", "-m",
+]
