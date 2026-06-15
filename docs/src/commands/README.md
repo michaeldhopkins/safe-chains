@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1573 commands across 75 categories.
+safe-chains knows 1574 commands across 75 categories.
 
 ## Glossary
 
@@ -29,7 +29,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [C / C++](c.md) (33 commands)
 - [Clipboard](clipboard.md) (3 commands)
 - [Cloud Providers](cloud.md) (10 commands)
-- [Compilation Toolchains](compile.md) (24 commands)
+- [Compilation Toolchains](compile.md) (25 commands)
 - [Config Management](configmgmt.md) (3 commands)
 - [Containers](containers.md) (38 commands)
 - [C++ Package Managers](cppkg.md) (3 commands)

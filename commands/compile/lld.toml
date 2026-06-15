@@ -1,0 +1,10 @@
+[[command]]
+name = "lld"
+aliases = ["ld.lld", "ld64.lld", "lld-link", "wasm-ld"]
+description = "LLD — LLVM's linker. Reads object files, archives, and shared libraries and writes an executable, shared library, or relocatable object. Invoked under several driver names that select the output format: `ld.lld` (ELF, the canonical Unix name), `ld64.lld` (Mach-O for Darwin), `lld-link` (COFF for Windows), `wasm-ld` (WebAssembly), and bare `lld` (selects one of the above based on argv[0] or `-flavor`). Standard linker operations: file path arguments, `-o output`, `-L library-search-dir`, `-l libname`, `-T linker-script`. Plugins (`-plugin`) are LLVM LTO codegen plugins, not arbitrary post-link hooks. No auto-loaded scripts or shell-out behavior. Pure SafeWrite — writes the named output file."
+url = "https://lld.llvm.org/"
+researched_version = "LLVM 22.x"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "--version", "-?", "-h", "-v"]
