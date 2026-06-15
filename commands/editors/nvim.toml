@@ -1,0 +1,16 @@
+[[command]]
+name = "nvim"
+description = "Neovim — modal editor fork of Vim with Lua scripting and an embedded API. Bare invocation and file-opening forms drop into an interactive session. The covered flag surface stays inside session constraints and metadata. Session-constraint flags: `-R` read-only, `-m`/`-M` modifications disabled, `--clean`/`--noplugin` disable user config, `-n` disable swap. Display flags: `-p`/`-o`/`-O` for tabs/splits with optional count suffix, `+N` line positioning via numeric_dash. Recovery: `-r`/`-L` list and recover swap files. Mode selectors: `-d` diff, `-b` binary, `-A` arabic, `-H` hebrew. Valued flags whose value is metadata: `-T <terminal>`, `-i <shada>`, `-t <tag>`, `-q <errorfile>`, `--startuptime <file>`. Diagnostic: `--help`, `-?`, `-h`, `--version`, `-v`, `-D` debug. Frequent point releases on the 0.x line; this surface has been stable since 0.9."
+url = "https://neovim.io/"
+researched_version = "Neovim 0.12.3 (2026-06-10)"
+level = "Inert"
+bare = true
+numeric_dash = true
+standalone = [
+    "--clean", "--help", "--noplugin", "--version",
+    "-?", "-A", "-D", "-H", "-L", "-M", "-R",
+    "-b", "-d", "-h", "-m", "-n", "-r", "-v",
+]
+valued = [
+    "--startuptime", "-T", "-i", "-q", "-t",
+]
