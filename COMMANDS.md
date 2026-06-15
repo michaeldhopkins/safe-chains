@@ -8589,6 +8589,14 @@ Aliases: `gnumfmt`
 - Allowed valued flags: --delimiter, --field, --format, --from, --from-unit, --invalid, --padding, --round, --suffix, --to, --to-unit, -d
 - Bare invocation allowed
 
+### `nvim`
+<p class="cmd-url"><a href="https://neovim.io/">https://neovim.io/</a></p>
+
+- Allowed standalone flags: --clean, --help, --noplugin, --version, -?, -A, -D, -H, -L, -M, -R, -b, -d, -h, -m, -n, -r, -v
+- Allowed valued flags: --startuptime, -T, -i, -q, -t
+- Bare invocation allowed
+- Numeric shorthand accepted (e.g. -20 for -n 20)
+
 ### `nvm`
 <p class="cmd-url"><a href="https://github.com/nvm-sh/nvm#readme">https://github.com/nvm-sh/nvm#readme</a></p>
 
