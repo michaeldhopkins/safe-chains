@@ -2,7 +2,7 @@
 name = "llvm-mc"
 description = "LLVM machine-code playground — assembles / disassembles target asm. Reads source, writes asm / object output."
 url = "https://llvm.org/docs/CommandGuide/llvm-mc.html"
-researched_version = "LLVM 18.x"
+researched_version = "LLVM 22.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true

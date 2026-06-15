@@ -2,7 +2,7 @@
 name = "llvm-link"
 description = "LLVM IR linker — combines multiple .ll/.bc files into one. Pure SafeWrite."
 url = "https://llvm.org/docs/CommandGuide/llvm-link.html"
-researched_version = "LLVM 18.x"
+researched_version = "LLVM 22.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true

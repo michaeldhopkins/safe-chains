@@ -2,7 +2,7 @@
 name = "llvm-profdata"
 description = "LLVM profile data tool — merges / shows / overlaps profile data files. Reads / writes .profraw / .profdata."
 url = "https://llvm.org/docs/CommandGuide/llvm-profdata.html"
-researched_version = "LLVM 18.x"
+researched_version = "LLVM 22.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true

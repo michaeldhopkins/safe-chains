@@ -2,7 +2,7 @@
 name = "llc"
 description = "LLVM static compiler — compiles LLVM IR (.ll / .bc) to native assembly or object code. Reads IR, writes asm/.o."
 url = "https://llvm.org/docs/CommandGuide/llc.html"
-researched_version = "LLVM 18.x"
+researched_version = "LLVM 22.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true

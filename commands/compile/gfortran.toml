@@ -2,7 +2,7 @@
 name = "gfortran"
 description = "GNU Fortran compiler. Reads .f / .f90 / .f95 / .f03 source and writes compiled object / executable output. Same flag conventions as gcc."
 url = "https://gcc.gnu.org/onlinedocs/gfortran/"
-researched_version = "GCC 14.x"
+researched_version = "GCC 16.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true

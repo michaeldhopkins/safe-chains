@@ -2,7 +2,7 @@
 name = "opt"
 description = "LLVM optimizer — runs optimization / analysis passes on LLVM IR. Reads .ll/.bc, writes optimized .ll/.bc to -o or stdout."
 url = "https://llvm.org/docs/CommandGuide/opt.html"
-researched_version = "LLVM 18.x"
+researched_version = "LLVM 22.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true

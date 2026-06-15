@@ -2,7 +2,7 @@
 name = "llvm-strip"
 description = "LLVM strip — removes symbols from object / executable files. Rewrites the file in place (project-local SafeWrite)."
 url = "https://llvm.org/docs/CommandGuide/llvm-strip.html"
-researched_version = "LLVM 18.x"
+researched_version = "LLVM 22.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true
