@@ -6945,6 +6945,14 @@ Aliases: `glibtoolize`
 - Allowed standalone flags: --help, --version, -?, -h, -v
 - Hyphen-prefixed positional arguments accepted
 
+### `lld`
+<p class="cmd-url"><a href="https://lld.llvm.org/">https://lld.llvm.org/</a></p>
+
+Aliases: `ld.lld`, `ld64.lld`, `lld-link`, `wasm-ld`
+
+- Allowed standalone flags: --help, --version, -?, -h, -v
+- Hyphen-prefixed positional arguments accepted
+
 ### `lldb`
 <p class="cmd-url"><a href="https://lldb.llvm.org/man/lldb.html">https://lldb.llvm.org/man/lldb.html</a></p>
 
