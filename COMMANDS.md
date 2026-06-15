@@ -13518,6 +13518,16 @@ Aliases: `gusers`
 
 - Positional arguments only
 
+### `vim`
+<p class="cmd-url"><a href="https://www.vim.org/">https://www.vim.org/</a></p>
+
+Aliases: `vi`, `view`, `rvim`, `vimdiff`, `rview`, `ex`
+
+- Allowed standalone flags: --clean, --help, --log, --noplugin, --not-a-term, --startuptime, --ttyfail, --version, -C, -D, -L, -M, -N, -R, -Z, -b, -d, -h, -l, -m, -n, -r, -v, -x, -y
+- Allowed valued flags: -T, -i, -q, -t
+- Bare invocation allowed
+- Numeric shorthand accepted (e.g. -20 for -n 20)
+
 ### `vipe`
 <p class="cmd-url"><a href="https://joeyh.name/code/moreutils/">https://joeyh.name/code/moreutils/</a></p>
 
