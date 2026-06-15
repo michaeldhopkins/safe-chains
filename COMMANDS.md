@@ -9193,6 +9193,12 @@ Aliases: `pcretest`
 - Allowed valued flags: -f, -l, -opw, -upw
 - Hyphen-prefixed positional arguments accepted
 
+### `pdfgrep`
+<p class="cmd-url"><a href="https://pdfgrep.org/">https://pdfgrep.org/</a></p>
+
+- Allowed standalone flags: --cache, --debug, --help, --unac, --version, --warn-empty, -F, -H, -L, -P, -R, -V, -Z, -c, -h, -i, -l, -n, -o, -p, -q, -r
+- Allowed valued flags: --after-context, --before-context, --color, --context, --exclude, --file, --include, --match-prefix-separator, --max-count, --page-range, --password, --regexp, -A, -B, -C, -e, -f, -m
+
 ### `pdfimages`
 <p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfimages.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfimages.1.html</a></p>
 
