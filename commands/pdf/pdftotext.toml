@@ -2,7 +2,7 @@
 name = "pdftotext"
 description = "Poppler — converts a PDF to plain text. Reads PDF, writes text to stdout or to <name>.txt. Pure read-and-render."
 url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftotext.1.html"
-researched_version = "Poppler 24.x"
+researched_version = "Poppler 25.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true

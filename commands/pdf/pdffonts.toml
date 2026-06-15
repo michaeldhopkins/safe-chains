@@ -2,7 +2,7 @@
 name = "pdffonts"
 description = "Poppler — lists fonts used in a PDF. Pure read."
 url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdffonts.1.html"
-researched_version = "Poppler 24.x"
+researched_version = "Poppler 25.x"
 level = "SafeRead"
 bare = false
 tolerate_unknown_short = true

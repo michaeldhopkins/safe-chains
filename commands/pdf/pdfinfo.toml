@@ -2,7 +2,7 @@
 name = "pdfinfo"
 description = "Poppler — prints PDF metadata (title, producer, page sizes, etc.). Pure read."
 url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfinfo.1.html"
-researched_version = "Poppler 24.x"
+researched_version = "Poppler 25.x"
 level = "SafeRead"
 bare = false
 tolerate_unknown_short = true

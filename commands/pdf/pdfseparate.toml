@@ -2,7 +2,7 @@
 name = "pdfseparate"
 description = "Poppler — splits a PDF into per-page files. Reads input PDF, writes per-page PDFs to a pattern (e.g. `page-%d.pdf`)."
 url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfseparate.1.html"
-researched_version = "Poppler 24.x"
+researched_version = "Poppler 25.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true

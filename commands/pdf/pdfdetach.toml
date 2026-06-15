@@ -2,7 +2,7 @@
 name = "pdfdetach"
 description = "Poppler — lists / extracts attachments from a PDF. -list reads; -save writes to disk."
 url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfdetach.1.html"
-researched_version = "Poppler 24.x"
+researched_version = "Poppler 25.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true

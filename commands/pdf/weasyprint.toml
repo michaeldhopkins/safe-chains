@@ -2,7 +2,7 @@
 name = "weasyprint"
 description = "Renders HTML/CSS to PDF (and PNG). Reads HTML or URL, writes PDF/PNG to the second positional argument. Network reads when input is a URL."
 url = "https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#command-line-api"
-researched_version = "WeasyPrint 65.x"
+researched_version = "WeasyPrint 67.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true

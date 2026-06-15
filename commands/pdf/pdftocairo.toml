@@ -2,7 +2,7 @@
 name = "pdftocairo"
 description = "Poppler — converts a PDF to PNG / JPEG / TIFF / PDF / PS / EPS / SVG using Cairo. Reads PDF, writes converted output. Pure conversion."
 url = "https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftocairo.1.html"
-researched_version = "Poppler 24.x"
+researched_version = "Poppler 25.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true
