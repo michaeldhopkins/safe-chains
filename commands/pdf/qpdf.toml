@@ -2,15 +2,15 @@
 name = "qpdf"
 description = "QPDF — PDF transformation library / CLI. Reads a PDF and writes the transformed output. --check, --show-encryption, --show-pages, --show-object, --json (read forms). --linearize, --encrypt, --decrypt, --pages, --rotate, --object-streams, --remove-restrictions write a new file."
 url = "https://qpdf.readthedocs.io/en/stable/cli.html"
-researched_version = "qpdf 11.x"
+researched_version = "qpdf 12.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true
 standalone = [
     "--allow-weak-crypto", "--check", "--check-linearization",
     "--coalesce-contents", "--collate", "--compress-streams",
-    "--compression-level", "--copy-encryption", "--copy-attachments-from",
-    "--decrypt", "--decode-level", "--deterministic-id",
+    "--compression-level", "--copy-encryption",
+    "--decrypt", "--deterministic-id",
     "--disable-signature-verification", "--empty",
     "--encryption-file-password", "--externalize-inline-images",
     "--filtered-stream-data", "--flatten-annotations",
@@ -20,29 +20,34 @@ standalone = [
     "--keep-inline-images", "--linearize", "--list-attachments",
     "--newline-before-endstream", "--no-original-object-ids",
     "--no-warn", "--normalize-content",
-    "--object-streams", "--oi-min-area", "--oi-min-height",
+    "--oi-min-area", "--oi-min-height",
     "--oi-min-width", "--optimize-images", "--password-is-hex-key",
-    "--pages", "--password-mode", "--preserve-unreferenced",
+    "--password-mode", "--preserve-unreferenced",
     "--preserve-unreferenced-resources", "--qdf",
     "--raw-stream-data", "--recompress-flate",
     "--remove-attachment", "--remove-page-labels",
     "--remove-restrictions", "--remove-unreferenced-resources",
     "--replace-input", "--report-mem-usage",
-    "--requires-password", "--rotate", "--show-attachment",
+    "--requires-password",
     "--show-encryption", "--show-encryption-key",
     "--show-linearization", "--show-npages",
-    "--show-object", "--show-pages",
+    "--show-pages",
     "--show-xref", "--split-pages", "--static-aes-iv",
-    "--static-id", "--stream-data", "--suppress-password-recovery",
-    "--suppress-recovery", "--underlay", "--update-from-json",
+    "--static-id", "--suppress-password-recovery",
+    "--suppress-recovery", "--underlay",
     "--verbose", "--version", "--warning-exit-0",
     "-h",
 ]
+# Strictly-valued flags. Several of these were previously also
+# listed in `standalone`, which let the dispatcher accept invocations
+# like `qpdf --encrypt input.pdf output.pdf` where qpdf itself
+# requires the user-password/owner-password/key-length triplet after
+# `--encrypt`. Cross-checked against qpdf 12.x docs.
 valued = [
     "--add-attachment", "--allow-insecure",
     "--certificate", "--copy-attachments-from",
     "--decode-level", "--encrypt", "--externalize-inline-images",
-    "--in-place", "--job-json", "--job-json-file",
+    "--job-json", "--job-json-file",
     "--object-streams", "--overlay", "--pages",
     "--password", "--password-file", "--password-mode",
     "--rotate", "--show-attachment", "--show-object",
