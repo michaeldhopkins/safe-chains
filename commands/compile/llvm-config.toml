@@ -2,7 +2,7 @@
 name = "llvm-config"
 description = "LLVM build-config introspection. Pure read."
 url = "https://llvm.org/docs/CommandGuide/llvm-config.html"
-researched_version = "LLVM 18.x"
+researched_version = "LLVM 22.x"
 level = "SafeRead"
 bare = true
 standalone = ["--help", "--version", "-?", "-h"]

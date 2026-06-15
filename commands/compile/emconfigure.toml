@@ -3,7 +3,7 @@ name = "emconfigure"
 aliases = ["emmake", "emranlib", "emstrip", "emrun"]
 description = "Emscripten wrappers — `emconfigure` runs ./configure with CC=emcc, `emmake` runs make with EMSCRIPTEN flags, `emranlib`/`emstrip` wrap binutils. `emrun` runs Emscripten output in a browser. Each wrapper invokes the real underlying tool which is arbitrary execution. Carve-out: --help / --version only."
 url = "https://emscripten.org/docs/compiling/Building-Projects.html"
-researched_version = "Emscripten 3.x"
+researched_version = "Emscripten 6.x"
 level = "Inert"
 bare = false
 max_positional = 0

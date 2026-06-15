@@ -2,7 +2,7 @@
 name = "llvm-cxxfilt"
 description = "Demangles C++ symbols (Itanium / Microsoft / Rust ABIs). Reads input, writes demangled output. Pure read."
 url = "https://llvm.org/docs/CommandGuide/llvm-cxxfilt.html"
-researched_version = "LLVM 18.x"
+researched_version = "LLVM 22.x"
 level = "SafeRead"
 bare = true
 tolerate_unknown_short = true

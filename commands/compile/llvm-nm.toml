@@ -2,7 +2,7 @@
 name = "llvm-nm"
 description = "LLVM nm — lists symbols from object files / archives. Pure read."
 url = "https://llvm.org/docs/CommandGuide/llvm-nm.html"
-researched_version = "LLVM 18.x"
+researched_version = "LLVM 22.x"
 level = "SafeRead"
 bare = false
 tolerate_unknown_short = true
