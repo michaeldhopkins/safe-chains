@@ -2,7 +2,7 @@
 name = "gs"
 description = "Ghostscript — PostScript / PDF interpreter and converter. Reads PS/PDF files and writes converted output (PDF/PS/PNG/JPEG/etc.) to the path specified by -sOutputFile=. Pure conversion — does not execute the document. -dSAFER mode (default in modern Ghostscript) restricts file access. -dBATCH -dNOPAUSE are common automation flags."
 url = "https://ghostscript.readthedocs.io/en/latest/Use.html"
-researched_version = "Ghostscript 10.x"
+researched_version = "Ghostscript 10.06.0 (Sept 2025)"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true
