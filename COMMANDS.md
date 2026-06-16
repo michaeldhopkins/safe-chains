@@ -5503,7 +5503,7 @@ Aliases: `hf`
 ### `hx`
 <p class="cmd-url"><a href="https://docs.helix-editor.com/">https://docs.helix-editor.com/</a></p>
 
-- Allowed standalone flags: --help, --health, --tutor, --version, -V, -h
+- Allowed standalone flags: --help, --health, --tutor, --version, -V, -h, -v
 - Allowed valued flags: --grammar, --config, --log, -c, -g
 
 ### `hygen`

@@ -2,9 +2,9 @@
 name = "hx"
 description = "Helix — modal terminal editor. Bare invocation opens the interactive editor. -g/--grammar fetches/builds tree-sitter grammars. --health diagnoses install. Carve-out: --version / --help / --health / --tutor / --grammar."
 url = "https://docs.helix-editor.com/"
-researched_version = "Helix 24.x"
+researched_version = "Helix 25.07"
 level = "Inert"
 bare = false
 max_positional = 0
-standalone = ["--help", "--health", "--tutor", "--version", "-V", "-h"]
+standalone = ["--help", "--health", "--tutor", "--version", "-V", "-h", "-v"]
 valued = ["--grammar", "--config", "--log", "-c", "-g"]
