@@ -13919,8 +13919,8 @@ Aliases: `gwc`
 ### `weasyprint`
 <p class="cmd-url"><a href="https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#command-line-api">https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#command-line-api</a></p>
 
-- Allowed standalone flags: --debug, --encoding, --full-fonts, --help, --info, --media-type, --optimize-images, --pdf-forms, --pdf-identifier, --pdf-variant, --pdf-version, --presentational-hints, --quiet, --srgb, --timeout, --uncompressed-pdf, --verbose, --version, -D, -c, -d, -e, -f, -h, -m, -n, -O, -o, -p, -q, -s, -t, -u, -v
-- Allowed valued flags: --base-url, --encoding, --media-type, --optimize-size, --pdf-identifier, --pdf-variant, --pdf-version, --stylesheet, --timeout, -c, -e, -f, -m, -O, -o, -s, -t, -u
+- Allowed standalone flags: --custom-metadata, --debug, --encoding, --fail-on-http-errors, --full-fonts, --help, --hinting, --info, --media-type, --no-http-redirects, --optimize-images, --pdf-forms, --pdf-identifier, --pdf-tags, --pdf-variant, --pdf-version, --presentational-hints, --quiet, --srgb, --timeout, --uncompressed-pdf, --verbose, --version, -D, -c, -d, -e, -f, -h, -m, -n, -O, -o, -p, -q, -s, -t, -u, -v
+- Allowed valued flags: --allowed-protocols, --attachment, --attachment-relationship, --base-url, --cache-folder, --dpi, --encoding, --jpeg-quality, --media-type, --optimize-size, --output-intent, --pdf-identifier, --pdf-variant, --pdf-version, --stylesheet, --timeout, --xmp-metadata, -D, -a, -c, -e, -f, -j, -m, -O, -o, -s, -t, -u
 - Hyphen-prefixed positional arguments accepted
 
 ### `webpack`

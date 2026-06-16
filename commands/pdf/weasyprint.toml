@@ -7,10 +7,13 @@ level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true
 standalone = [
-    "--debug", "--encoding", "--full-fonts",
-    "--help", "--info", "--media-type",
+    "--custom-metadata", "--debug",
+    "--encoding", "--fail-on-http-errors",
+    "--full-fonts", "--help", "--hinting",
+    "--info", "--media-type",
+    "--no-http-redirects",
     "--optimize-images", "--pdf-forms",
-    "--pdf-identifier", "--pdf-variant",
+    "--pdf-identifier", "--pdf-tags", "--pdf-variant",
     "--pdf-version", "--presentational-hints",
     "--quiet", "--srgb", "--timeout",
     "--uncompressed-pdf", "--verbose", "--version",
@@ -19,10 +22,16 @@ standalone = [
     "-s", "-t", "-u", "-v",
 ]
 valued = [
-    "--base-url", "--encoding",
+    "--allowed-protocols",
+    "--attachment", "--attachment-relationship",
+    "--base-url", "--cache-folder",
+    "--dpi", "--encoding",
+    "--jpeg-quality",
     "--media-type", "--optimize-size",
+    "--output-intent",
     "--pdf-identifier", "--pdf-variant",
     "--pdf-version", "--stylesheet",
-    "--timeout",
-    "-c", "-e", "-f", "-m", "-O", "-o", "-s", "-t", "-u",
+    "--timeout", "--xmp-metadata",
+    "-D", "-a", "-c", "-e", "-f", "-j",
+    "-m", "-O", "-o", "-s", "-t", "-u",
 ]
