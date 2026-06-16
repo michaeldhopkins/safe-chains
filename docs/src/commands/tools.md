@@ -404,6 +404,14 @@ Aliases: `difftastic`
 - Allowed standalone flags: --check-only, --help, --list-languages, --missing-as-empty, --skip-unchanged, --strip-cr, --version
 - Allowed valued flags: --background, --byte-limit, --color, --context, --display, --graph-limit, --language, --override, --parse-error-limit, --sort-paths, --syntax-highlight, --tab-width, --width
 
+### `dot`
+<p class="cmd-url"><a href="https://graphviz.org/doc/info/command.html">https://graphviz.org/doc/info/command.html</a></p>
+
+Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
+
+- Allowed standalone flags: --help, -?, -O, -P, -V, -q, -v, -x, -y
+- Allowed valued flags: -A, -E, -G, -K, -N, -T, -n, -o, -s
+
 ### `drizzle-kit`
 <p class="cmd-url"><a href="https://orm.drizzle.team/docs/kit-overview">https://orm.drizzle.team/docs/kit-overview</a></p>
 
