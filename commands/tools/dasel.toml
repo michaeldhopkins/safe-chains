@@ -1,0 +1,35 @@
+[[command]]
+name = "dasel"
+description = "Multi-format data query CLI — parses JSON, YAML, TOML, XML, CSV, plus a generic structured query language. In v3, bare invocation defaults to the `query` subcommand: reads input from stdin or a file inferred by extension (or `--in <format>`), runs the query, writes the result to stdout (or to the format set by `--out`). Mutations in the query language (`.foo = bar`, append/delete syntax) compose into the output stream — the original file is not modified unless the user redirects. v3 dropped the per-operation subcommands (`put`, `delete`, `append`) in favor of unified query mutations, but v2 still in the wild used those subcommands to write back in place (`dasel put -f a.json -v x .foo`). The CLI is built on kong (Go) in v3 and accepts the `--long` or `-x` form for flags. Does not touch the network in either version."
+url = "https://daseldocs.tomwright.me/"
+researched_version = "dasel 3.11.0"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--colour", "--compact", "--help",
+    "--length", "--multiple",
+    "--no-colour", "--null",
+    "--plain", "--root",
+    "--unstable", "--version",
+    "-h", "-m", "-n",
+]
+valued = [
+    "--config", "--file", "--in",
+    "--out", "--parser",
+    "--read", "--read-flag",
+    "--rw-flag", "--selector",
+    "--var", "--write",
+    "--write-flag",
+    "-c", "-f", "-i", "-o",
+    "-p", "-r", "-s", "-w",
+]
+examples_safe = [
+    "dasel",
+    "dasel --version",
+    "dasel -f data.json '.foo'",
+    "dasel --file data.json --selector '.foo.bar'",
+    "dasel -f data.json --in json --out yaml '.foo'",
+]
+examples_denied = [
+    "dasel --exec /bin/sh",
+]
