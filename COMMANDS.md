@@ -10459,6 +10459,13 @@ Aliases: `puppet-agent`, `puppet-master`
 
 - Allowed standalone flags: --help, --version, -h, -V
 
+### `pv`
+<p class="cmd-url"><a href="https://www.ivarch.com/programs/pv.shtml">https://www.ivarch.com/programs/pv.shtml</a></p>
+
+- Allowed standalone flags: --help, --version, -0, -8, -I, -T, -V, -a, -b, -c, -e, -f, -g, -h, -k, -l, -n, -p, -q, -r, -t, -v, -W
+- Allowed valued flags: -A, -B, -D, -F, -H, -J, -L, -N, -i, -m, -s, -u, -w
+- Bare invocation allowed
+
 ### `pwd`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation</a></p>
 

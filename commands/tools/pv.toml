@@ -1,0 +1,32 @@
+[[command]]
+name = "pv"
+description = "Pipe Viewer — a Unix filter that copies stdin to stdout while displaying transfer rate, ETA, and progress on stderr. The canonical use is as a pipeline filter (`cat large_file | pv | gzip > out.gz`). Display / format / rate-limit knobs include progress bar (`-p`), timer (`-t`), ETA / fineta (`-e` / `-I`), rate (`-r`), average rate (`-a`), bytes (`-b`), buffer percent (`-T`), gauge (`-g`), numeric (`-n`), quiet (`-q`), bits (`-8`), SI multipliers (`-k`), line mode (`-l`), null-terminated lines (`-0`), stats (`-v`), force visual (`-f`), cursor (`-c`), wait (`-W`). Valued metadata: `-F <format>`, `-s <size>`, `-i <secs>` update interval, `-m <secs>` average window, `-w <width>`, `-H <height>`, `-N <name>` prefix, `-u <style>`, `-A <bytes>` last written, `-D <secs>` delay start, `-L <rate>` rate limit, `-B <bytes>` buffer size, `-J <bytes>` pipe buffer. pv also offers entry points that step outside pure stdin → stdout: `-o <file>` writes the output to a file, `-P <pidfile>` writes its own PID to a pidfile, `-U <file>` uses a staging file, `-M` spawns a child command, `-d <pid>[:fd]` watches another process's file descriptor, `-R <pid>` sends a remote-control signal, and `-Q <pid>` queries a running pv."
+url = "https://www.ivarch.com/programs/pv.shtml"
+researched_version = "pv 1.9.31"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help", "--version",
+    "-0", "-8", "-I", "-T", "-V",
+    "-a", "-b", "-c", "-e", "-f",
+    "-g", "-h", "-k", "-l", "-n",
+    "-p", "-q", "-r", "-t", "-v",
+    "-W",
+]
+valued = [
+    "-A", "-B", "-D", "-F", "-H",
+    "-J", "-L", "-N", "-i", "-m",
+    "-s", "-u", "-w",
+]
+examples_safe = [
+    "pv",
+    "pv -L 1M",
+    "pv -s 100M -N input",
+    "pv --help",
+]
+examples_denied = [
+    "pv -M echo",
+    "pv -o /tmp/out",
+    "pv -d 1234",
+    "pv -R 1234",
+]
