@@ -1,0 +1,9 @@
+[[command]]
+name = "llvm-libtool-darwin"
+description = "LLVM Darwin libtool — builds static libraries from object files. Mirrors macOS `libtool(1)` for cross-compilation to Mach-O targets. Writes the archive output (project-local SafeWrite)."
+url = "https://llvm.org/docs/CommandGuide/llvm-libtool-darwin.html"
+researched_version = "LLVM 22.x"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "--version", "-?", "-h"]

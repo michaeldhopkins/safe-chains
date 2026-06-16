@@ -1,0 +1,9 @@
+[[command]]
+name = "llvm-xray"
+description = "LLVM XRay analyzer — read-only post-processor for XRay instrumentation logs (`xray-log.*`). Subcommands include `extract`, `account`, `convert`, `graph`, `stack`, `fdr-dump` — all read input traces and write summary text or JSON to stdout."
+url = "https://llvm.org/docs/CommandGuide/llvm-xray.html"
+researched_version = "LLVM 22.x"
+level = "SafeRead"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "--version", "-?", "-h"]

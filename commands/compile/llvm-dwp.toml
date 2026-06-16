@@ -1,0 +1,9 @@
+[[command]]
+name = "llvm-dwp"
+description = "LLVM DWARF package — bundles split-debug `.dwo` files into a single `.dwp` package for distribution. Writes the package output (project-local SafeWrite)."
+url = "https://llvm.org/docs/CommandGuide/llvm-dwp.html"
+researched_version = "LLVM 22.x"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "--version", "-?", "-h"]
