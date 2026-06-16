@@ -349,6 +349,13 @@ Aliases: `@cucumber/cucumber`
 - Allowed valued flags: --backtrace, --config, --format, --format-options, --i18n-keywords, --language, --name, --order, --paths, --require, --require-module, --retry, --retry-tag-filter, --tags, --world-parameters, -b, -c, -f, -i, -n, -p, -r, -t, -w
 - Bare invocation allowed
 
+### `dasel`
+<p class="cmd-url"><a href="https://daseldocs.tomwright.me/">https://daseldocs.tomwright.me/</a></p>
+
+- Allowed standalone flags: --colour, --compact, --help, --length, --multiple, --no-colour, --null, --plain, --root, --unstable, --version, -h, -m, -n
+- Allowed valued flags: --config, --file, --in, --out, --parser, --read, --read-flag, --rw-flag, --selector, --var, --write, --write-flag, -c, -f, -i, -o, -p, -r, -s, -w
+- Bare invocation allowed
+
 ### `dawn`
 <p class="cmd-url"><a href="https://github.com/thesp0nge/dawnscanner">https://github.com/thesp0nge/dawnscanner</a></p>
 

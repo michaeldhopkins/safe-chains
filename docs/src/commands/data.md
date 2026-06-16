@@ -24,11 +24,6 @@ Aliases: `gcsplit`
 - Allowed standalone flags: --elide-empty-files, --help, --keep-files, --quiet, --silent, --suppress-matched, --version, -k, -s, -z
 - Allowed valued flags: --digits, --prefix, --suffix-format, -b, -f, -n
 
-### `dasel`
-<p class="cmd-url"><a href="https://github.com/TomWright/dasel">https://github.com/TomWright/dasel</a></p>
-
-- Read-only queries allowed. select subcommand allowed.
-
 ### `echo`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#echo-invocation</a></p>
 

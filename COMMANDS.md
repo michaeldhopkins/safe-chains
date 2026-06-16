@@ -2820,9 +2820,11 @@ Aliases: `gcut`
 - Allowed standalone flags: --help, --version, -h
 
 ### `dasel`
-<p class="cmd-url"><a href="https://github.com/TomWright/dasel">https://github.com/TomWright/dasel</a></p>
+<p class="cmd-url"><a href="https://daseldocs.tomwright.me/">https://daseldocs.tomwright.me/</a></p>
 
-- Read-only queries allowed. select subcommand allowed.
+- Allowed standalone flags: --colour, --compact, --help, --length, --multiple, --no-colour, --null, --plain, --root, --unstable, --version, -h, -m, -n
+- Allowed valued flags: --config, --file, --in, --out, --parser, --read, --read-flag, --rw-flag, --selector, --var, --write, --write-flag, -c, -f, -i, -o, -p, -r, -s, -w
+- Bare invocation allowed
 
 ### `date`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation</a></p>
