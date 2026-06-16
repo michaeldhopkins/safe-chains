@@ -2,7 +2,7 @@
 name = "ssh-add"
 description = "Manages keys held by ssh-agent. Bare invocation adds default keys (~/.ssh/id_*). -l lists fingerprints (read). -L lists public keys (read). -d removes keys, -D removes all keys, -e removes from PKCS#11. -X locks/unlocks the agent. The agent is a long-running process the user already started — ssh-add only sends commands to it."
 url = "https://man.openbsd.org/ssh-add"
-researched_version = "OpenSSH 9.x"
+researched_version = "OpenSSH 10.x"
 level = "SafeWrite"
 bare = true
 tolerate_unknown_short = true

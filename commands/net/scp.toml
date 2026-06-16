@@ -2,7 +2,7 @@
 name = "scp"
 description = "Secure copy — copies files between local and remote hosts using SSH. Network operation. Each invocation copies the source(s) (last arg is destination). The destination can be local or `user@host:path`. -r recursively copies directories. -3 routes through the local host."
 url = "https://man.openbsd.org/scp"
-researched_version = "OpenSSH 9.x"
+researched_version = "OpenSSH 10.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true
