@@ -71,6 +71,13 @@
 
 - Requires -E, -F, -B, -L, -q, -G, -Z, -V. - Allowed standalone flags: -E, -F, -B, -L, -q, -G, -Z, -V, -4, -6
 
+### `doggo`
+<p class="cmd-url"><a href="https://doggo.mrkaran.dev/">https://doggo.mrkaran.dev/</a></p>
+
+- Allowed standalone flags: --aa, --ad, --any, --cd, --color, --cookie, --debug, --do, --ede, --help, --ipv4, --ipv6, --json, --nsid, --padding, --rd, --reverse, --search, --short, --time, --version, --z, -4, -6, -J, -h, -x
+- Allowed valued flags: --bufsize, --class, --ecs, --gp-from, --gp-limit, --nameserver, --ndots, --query, --skip-hostname-verification, --strategy, --tls-hostname, --type, -c, -n, -q, -t
+- Hyphen-prefixed positional arguments accepted
+
 ### `envoy`
 <p class="cmd-url"><a href="https://www.envoyproxy.io/docs/envoy/latest/operations/cli">https://www.envoyproxy.io/docs/envoy/latest/operations/cli</a></p>
 
