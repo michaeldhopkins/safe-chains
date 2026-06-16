@@ -1,0 +1,10 @@
+[[command]]
+name = "as"
+aliases = ["gas"]
+description = "GNU assembler — translates assembly source into object files. The canonical `as` binary on Linux is GNU binutils; on macOS it forwards to the Clang integrated assembler. Reads the input assembly; writes the object output to the path given by `-o` (default `a.out`). Project-local SafeWrite. Most often invoked transitively by `gcc` / `clang` but also reachable directly from build scripts."
+url = "https://sourceware.org/binutils/docs/as/"
+researched_version = "GNU binutils 2.43.x"
+level = "SafeWrite"
+bare = true
+tolerate_unknown_short = true
+standalone = ["--help", "--version", "-?", "-h", "-v"]

@@ -617,9 +617,13 @@ Aliases: `whatis`
 - Allowed standalone flags: --help, --version, -V, -h
 
 ### `as`
-<p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/as.1.html">https://keith.github.io/xcode-man-pages/as.1.html</a></p>
+<p class="cmd-url"><a href="https://sourceware.org/binutils/docs/as/">https://sourceware.org/binutils/docs/as/</a></p>
 
-- Allowed standalone flags: --help, --version, -v
+Aliases: `gas`
+
+- Allowed standalone flags: --help, --version, -?, -h, -v
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
 
 ### `asciidoctor`
 <p class="cmd-url"><a href="https://docs.asciidoctor.org/asciidoctor/latest/cli/">https://docs.asciidoctor.org/asciidoctor/latest/cli/</a></p>
@@ -8083,6 +8087,12 @@ Aliases: `pico`, `rnano`
 - Allowed valued flags: -C, -J, -Q, -T, -X, -Y, -o, -r
 - Bare invocation allowed
 
+### `nasm`
+<p class="cmd-url"><a href="https://www.nasm.us/">https://www.nasm.us/</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h, -v
+- Hyphen-prefixed positional arguments accepted
+
 ### `nbqa`
 <p class="cmd-url"><a href="https://nbqa.readthedocs.io/">https://nbqa.readthedocs.io/</a></p>
 
@@ -14324,6 +14334,12 @@ Aliases: `xzmore`, `lzless`, `lzmore`
 - **why**: Flags: --help, --json, -h
 - Allowed arguments: test, test:*
 - Allowed standalone flags: --help, --version, -V, -h
+
+### `yasm`
+<p class="cmd-url"><a href="https://yasm.tortall.net/">https://yasm.tortall.net/</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
 
 ### `yes`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#yes-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#yes-invocation</a></p>

@@ -1,0 +1,9 @@
+[[command]]
+name = "yasm"
+description = "Yasm — modular assembler that can parse NASM and GAS syntax and emit ELF, Mach-O, COFF, Win32, RDF, or raw binary object files. Reads the input assembly; writes the object output to the path given by `-o` or a name derived from the input. Project-local SafeWrite. Long stable since the 1.3.x line; commonly used by cryptography and video-codec projects."
+url = "https://yasm.tortall.net/"
+researched_version = "Yasm 1.3.x"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "--version", "-?", "-h"]
