@@ -1,0 +1,31 @@
+[[command]]
+name = "pdftops"
+description = "Poppler — converts a PDF to PostScript so it can be printed or further processed. Reads PDF input; writes the PostScript / EPS output to the second positional (or stdout via `-`). Pure conversion."
+url = "https://manpages.ubuntu.com/manpages/noble/en/man1/pdftops.1.html"
+researched_version = "Poppler 25.x"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "-binary", "-duplex", "-eps", "-expand",
+    "-form", "-h",
+    "-level1", "-level1sep",
+    "-level2", "-level2sep",
+    "-level3", "-level3sep",
+    "-nocenter", "-nocrop",
+    "-noembcidps", "-noembcidtt",
+    "-noembt1", "-noembtt",
+    "-noshrink", "-opi",
+    "-optimizecolorspace", "-origpagesizes",
+    "-overprint", "-passfonts",
+    "-preload", "-q", "-v",
+    "--help", "-?",
+]
+valued = [
+    "-aaRaster",
+    "-defaultcmykprofile", "-defaultgrayprofile", "-defaultrgbprofile",
+    "-f", "-l", "-opw",
+    "-paper", "-paperh", "-paperw",
+    "-processcolorformat", "-processcolorprofile",
+    "-r", "-rasterize", "-upw",
+]
