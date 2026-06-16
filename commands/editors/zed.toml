@@ -1,0 +1,14 @@
+[[command]]
+name = "zed"
+description = "Zed — multiplayer code editor from the Atom team, written in Rust on a custom GPU rendering stack. Bare invocation launches the editor; positional file arguments are opened (`path:line:column` syntax for cursor positioning). The covered flag surface stays inside window-behavior and read-only forms. Window behavior: `-a`/`--add` add to current workspace, `-n`/`--new` new workspace, `-r`/`--reuse` reuse window, `-e`/`--existing` open in existing window, `--classic` pre-sidebar behavior. Wait / launch: `-w`/`--wait` block until paths close, `--foreground` run in foreground. Diagnostic: `-v`/`--version`, `--system-specs`. Diff view: `--diff <old> <new>` opens a side-by-side compare. Active project on the 1.x line; CLI surface has been stable since 0.180."
+url = "https://zed.dev/"
+researched_version = "Zed 1.7.x"
+level = "Inert"
+bare = true
+standalone = [
+    "--add", "--classic", "--diff",
+    "--existing", "--foreground",
+    "--help", "--new", "--reuse",
+    "--system-specs", "--version", "--wait",
+    "-a", "-e", "-h", "-n", "-r", "-v", "-w",
+]
