@@ -2,7 +2,7 @@
 name = "ssh-copy-id"
 description = "Installs a public SSH key on a remote host's ~/.ssh/authorized_keys. Connects to the remote (network) and modifies the remote authorized_keys (external system write — the carve-out is intentional given how common this pattern is for dev workstation setup)."
 url = "https://man.openbsd.org/ssh-copy-id"
-researched_version = "OpenSSH 9.x"
+researched_version = "OpenSSH 10.x"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true

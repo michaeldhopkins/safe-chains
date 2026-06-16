@@ -2,7 +2,7 @@
 name = "ssh-keyscan"
 description = "Fetches public SSH host keys from remote hosts (network read). Output goes to stdout in a format suitable for known_hosts. Each invocation makes outbound TCP connections to the listed hosts."
 url = "https://man.openbsd.org/ssh-keyscan"
-researched_version = "OpenSSH 9.x"
+researched_version = "OpenSSH 10.x"
 level = "SafeRead"
 bare = false
 tolerate_unknown_short = true
