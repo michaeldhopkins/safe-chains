@@ -2268,8 +2268,8 @@ Aliases: `clojure`
 
 Aliases: `code-insiders`, `codium`
 
-- Allowed standalone flags: --add, --category, --diff, --disable-extensions, --disable-features, --disable-gpu, --disable-telemetry, --extensions-dir, --goto, --help, --inspect-brk-extensions, --inspect-extensions, --list-extensions, --locale, --locate-shell-integration-path, --log, --max-memory, --merge, --new-window, --no-sandbox, --open-url, --port, --prof-startup, --profile, --ready-to-launch, --reuse-window, --show-versions, --status, --sync, --telemetry, --trace, --user-data-dir, --verbose, --version, --wait, -a, -d, -g, -h, -m, -n, -r, -s, -v, -w
-- Allowed valued flags: --add, --category, --diff, --enable-proposed-api, --extensions-dir, --goto, --inspect-brk-extensions, --inspect-extensions, --install-extension, --locale, --log, --max-memory, --merge, --open-url, --port, --profile, --show-versions, --sync, --uninstall-extension, --user-data-dir
+- Allowed standalone flags: --add, --category, --diff, --disable-extensions, --disable-features, --disable-gpu, --disable-telemetry, --extensions-dir, --goto, --help, --inspect-brk-extensions, --inspect-extensions, --list-extensions, --locale, --locate-shell-integration-path, --log, --max-memory, --merge, --new-window, --no-sandbox, --open-url, --port, --pre-release, --prof-startup, --profile, --ready-to-launch, --remove, --reuse-window, --show-versions, --status, --sync, --telemetry, --trace, --user-data-dir, --verbose, --version, --wait, -a, -d, -g, -h, -m, -n, -r, -s, -v, -w
+- Allowed valued flags: --add, --add-mcp, --category, --diff, --disable-extension, --enable-proposed-api, --extensions-dir, --goto, --inspect-brk-extensions, --inspect-extensions, --install-extension, --locale, --log, --max-memory, --merge, --open-url, --port, --profile, --remove, --show-versions, --sync, --uninstall-extension, --user-data-dir
 - Bare invocation allowed
 
 ### `codesign`

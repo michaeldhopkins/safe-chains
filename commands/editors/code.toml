@@ -1,9 +1,9 @@
 [[command]]
 name = "code"
 aliases = ["code-insiders", "codium"]
-description = "VS Code CLI — opens files / diffs in the editor and manages extensions. Most invocations launch the GUI editor. Read-side: --version, --help, --list-extensions, --status, --locate-shell-integration-path. Write-side: --install-extension, --uninstall-extension, --update-extensions, --enable-proposed-api. Editor-launching modes: bare, --diff a b, --merge a b base out, --goto, --add."
+description = "VS Code CLI — opens files / diffs in the editor and manages extensions. Most invocations launch the GUI editor. Read-side: --version, --help, --list-extensions, --status, --locate-shell-integration-path. Write-side: --install-extension, --uninstall-extension, --update-extensions, --enable-proposed-api, --disable-extension (singular, valued), --add-mcp (writes an MCP server definition to the user profile). Editor-launching modes: bare, --diff a b, --merge a b base out, --goto, --add, --remove. The `--pre-release` modifier toggles whether extension management commands target pre-release versions."
 url = "https://code.visualstudio.com/docs/configure/command-line"
-researched_version = "VS Code 1.x"
+researched_version = "VS Code 1.123"
 level = "SafeRead"
 bare = true
 standalone = [
@@ -15,9 +15,9 @@ standalone = [
     "--locate-shell-integration-path", "--log",
     "--max-memory", "--merge",
     "--new-window", "--no-sandbox",
-    "--open-url", "--port",
+    "--open-url", "--port", "--pre-release",
     "--prof-startup", "--profile",
-    "--ready-to-launch", "--reuse-window",
+    "--ready-to-launch", "--remove", "--reuse-window",
     "--show-versions", "--status",
     "--sync", "--telemetry", "--trace",
     "--user-data-dir", "--verbose", "--version",
@@ -25,14 +25,17 @@ standalone = [
     "-r", "-s", "-v", "-w",
 ]
 valued = [
-    "--add", "--category", "--diff",
-    "--enable-proposed-api", "--extensions-dir",
+    "--add", "--add-mcp", "--category", "--diff",
+    "--disable-extension", "--enable-proposed-api", "--extensions-dir",
     "--goto", "--inspect-brk-extensions",
     "--inspect-extensions", "--install-extension",
     "--locale", "--log", "--max-memory",
     "--merge", "--open-url", "--port",
-    "--profile", "--show-versions",
+    "--profile", "--remove", "--show-versions",
     "--sync", "--uninstall-extension",
     "--user-data-dir",
 ]
-write_flags = ["--install-extension", "--uninstall-extension", "--update-extensions"]
+write_flags = [
+    "--add-mcp", "--enable-proposed-api",
+    "--install-extension", "--uninstall-extension", "--update-extensions",
+]
