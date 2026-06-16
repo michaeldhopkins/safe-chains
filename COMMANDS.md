@@ -9224,6 +9224,12 @@ Aliases: `pcretest`
 
 - Bare invocation allowed
 
+### `pdf2dsc`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, -h, -?
+- Hyphen-prefixed positional arguments accepted
+
 ### `pdf2ps`
 <p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
 
@@ -10222,6 +10228,30 @@ Aliases: `gprintf`
 <p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
 
 - Positional arguments only
+
+### `ps2pdf`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, -h, -?
+- Hyphen-prefixed positional arguments accepted
+
+### `ps2pdf12`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, -h, -?
+- Hyphen-prefixed positional arguments accepted
+
+### `ps2pdf13`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, -h, -?
+- Hyphen-prefixed positional arguments accepted
+
+### `ps2pdf14`
+<p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
+
+- Allowed standalone flags: --help, -h, -?
+- Hyphen-prefixed positional arguments accepted
 
 ### `ps2pdfwr`
 <p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
