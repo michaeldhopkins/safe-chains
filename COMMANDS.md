@@ -9342,6 +9342,12 @@ Aliases: `pcretest`
 - Allowed valued flags: -enc, -f, -l, -opw, -upw
 - Hyphen-prefixed positional arguments accepted
 
+### `pdfjam`
+<p class="cmd-url"><a href="https://github.com/rrthomas/pdfjam">https://github.com/rrthomas/pdfjam</a></p>
+
+- Allowed standalone flags: --batch, --booklet, --checkfiles, --clip, --frame, --help, --keepinfo, --landscape, --noautoscale, --quiet, --twoside, --vanilla, --version, -V, -h, -q
+- Allowed valued flags: --angle, --builddir, --nup, --offset, --outfile, --paper, --pdfauthor, --pdfkeywords, --pdfsubject, --pdftitle, --runs, --scale, --signature, --suffix, --trim, --viewport, -o
+
 ### `pdflatex`
 <p class="cmd-url"><a href="https://www.tug.org/applications/pdftex/">https://www.tug.org/applications/pdftex/</a></p>
 
