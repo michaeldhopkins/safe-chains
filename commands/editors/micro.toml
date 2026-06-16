@@ -1,0 +1,8 @@
+[[command]]
+name = "micro"
+description = "micro — modern terminal editor with mouse support, syntax highlighting, and a tabbed multi-pane interface. Bare invocation opens an empty buffer; positional file arguments are opened for editing. `+LINE` and `+LINE:COL` are cursor-position positional sigils. The covered flag surface stays inside diagnostic forms: `-version` shows version info, `-options` shows option help, `-debug` writes session debug info to `./log.txt` in the current working directory. Active project; this surface has been stable across the 2.x line."
+url = "https://micro-editor.github.io/"
+researched_version = "micro 2.0.15"
+level = "Inert"
+bare = true
+standalone = ["-debug", "-options", "-version", "--help"]

@@ -7553,6 +7553,12 @@ Aliases: `gmd5sum`
 - **introspect**: Flags: --all, --benchmarks, --buildoptions, --buildsystem-files, --dependencies, --help, --installed, --projectinfo, --targets, --tests, -a, -h. Valued: --backend, --indent
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `micro`
+<p class="cmd-url"><a href="https://micro-editor.github.io/">https://micro-editor.github.io/</a></p>
+
+- Allowed standalone flags: -debug, -options, -version, --help
+- Bare invocation allowed
+
 ### `middleman`
 <p class="cmd-url"><a href="https://middlemanapp.com/basics/install/">https://middlemanapp.com/basics/install/</a></p>
 
@@ -8067,6 +8073,15 @@ Aliases: `myth`
 - Allowed standalone flags: --debug, --help, --no-color, --quick, --strategy, --verbose, --version, -?, -c, -d, -f, -g, -h, -l, -o, -q, -r, -s, -t, -v, -x
 - Allowed valued flags: --bin-runtime, --call-depth-limit, --code, --codesize-limit, --create-timeout, --enable-iprof, --execution-timeout, --max-depth, --outform, --quick, --rpc, --rpc-tls, --solv, --solver-timeout, --strategy, --storage, --transaction-count, -c, -l, -o, -r, -s, -t, -x
 - Hyphen-prefixed positional arguments accepted
+
+### `nano`
+<p class="cmd-url"><a href="https://www.nano-editor.org/">https://www.nano-editor.org/</a></p>
+
+Aliases: `pico`, `rnano`
+
+- Allowed standalone flags: --help, --version, -!, -/, -0, -@, -A, -B, -D, -E, -F, -G, -H, -I, -K, -L, -M, -N, -O, -P, -R, -S, -U, -V, -W, -Z, -_, -a, -b, -c, -d, -e, -g, -h, -i, -j, -k, -l, -m, -n, -p, -q, -t, -u, -v, -w, -x, -y, -z
+- Allowed valued flags: -C, -J, -Q, -T, -X, -Y, -o, -r
+- Bare invocation allowed
 
 ### `nbqa`
 <p class="cmd-url"><a href="https://nbqa.readthedocs.io/">https://nbqa.readthedocs.io/</a></p>
