@@ -1,0 +1,9 @@
+[[command]]
+name = "nasm"
+description = "Netwide Assembler — assembles x86 / x86-64 source files (.asm, .s) into object files (ELF, Mach-O, COFF, raw binary, etc.). Reads the input assembly; writes the object output to the path given by `-o` or to a name derived from the input. Project-local SafeWrite."
+url = "https://www.nasm.us/"
+researched_version = "NASM 2.16.x"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "--version", "-?", "-h", "-v"]
