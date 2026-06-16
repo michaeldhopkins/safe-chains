@@ -1167,6 +1167,13 @@ Aliases: `run-p`, `run-s`
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+### `pv`
+<p class="cmd-url"><a href="https://www.ivarch.com/programs/pv.shtml">https://www.ivarch.com/programs/pv.shtml</a></p>
+
+- Allowed standalone flags: --help, --version, -0, -8, -I, -T, -V, -a, -b, -c, -e, -f, -g, -h, -k, -l, -n, -p, -q, -r, -t, -v, -W
+- Allowed valued flags: -A, -B, -D, -F, -H, -J, -L, -N, -i, -m, -s, -u, -w
+- Bare invocation allowed
+
 ### `pylint`
 <p class="cmd-url"><a href="https://pylint.readthedocs.io/en/latest/user_guide/usage/run.html">https://pylint.readthedocs.io/en/latest/user_guide/usage/run.html</a></p>
 
