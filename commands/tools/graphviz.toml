@@ -1,0 +1,27 @@
+[[command]]
+name = "dot"
+aliases = ["neato", "twopi", "circo", "fdp", "sfdp", "patchwork", "osage", "nop"]
+description = "Graphviz — renders DOT-language graph descriptions into images (PNG, SVG, PDF, PS, etc.) or other layout-aware formats. Reads a `.dot` / `.gv` source file (or stdin); writes the rendered output to stdout, an auto-named file (`-O`), or `-o <outfile>`. Rendering knobs: `-T <format>` selects the output format and optional renderer, `-K <layout>` overrides the layout engine, `-G` / `-N` / `-E` / `-A` set graph / node / edge / general attributes, `-s <scale>` sets input scale, `-n <num>` is the no-op flag for neato. Diagnostic: `-V`, `-v`, `-q`, `-?`. The driver-name aliases (neato, twopi, circo, fdp, sfdp, patchwork, osage, nop) are separate binaries (often symlinks to `dot`) that each default to a specific layout. Graphviz also exposes `-l <library>` which loads a PostScript library file whose code is embedded in PS output — an arbitrary-code entry point on the rendering side. Produces image / vector output to the path the user supplies."
+url = "https://graphviz.org/doc/info/command.html"
+researched_version = "Graphviz 13.1.2"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--help", "-?",
+    "-O", "-P", "-V", "-q", "-v",
+    "-x", "-y",
+]
+valued = [
+    "-A", "-E", "-G", "-K", "-N",
+    "-T", "-n", "-o", "-s",
+]
+examples_safe = [
+    "dot -Tpng graph.dot -o out.png",
+    "dot -Tsvg graph.dot",
+    "neato -Tpdf graph.dot -o out.pdf",
+    "dot -V",
+    "dot -Kfdp -Tpng graph.dot -O",
+]
+examples_denied = [
+    "dot -l /tmp/evil.ps -Tps graph.dot",
+]

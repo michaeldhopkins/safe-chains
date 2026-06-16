@@ -3310,6 +3310,14 @@ Aliases: `gdirname`
 - Allowed valued flags: --bufsize, --class, --ecs, --gp-from, --gp-limit, --nameserver, --ndots, --query, --skip-hostname-verification, --strategy, --tls-hostname, --type, -c, -n, -q, -t
 - Hyphen-prefixed positional arguments accepted
 
+### `dot`
+<p class="cmd-url"><a href="https://graphviz.org/doc/info/command.html">https://graphviz.org/doc/info/command.html</a></p>
+
+Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
+
+- Allowed standalone flags: --help, -?, -O, -P, -V, -q, -v, -x, -y
+- Allowed valued flags: -A, -E, -G, -K, -N, -T, -n, -o, -s
+
 ### `dot_clean`
 <p class="cmd-url"><a href="https://ss64.com/mac/dot_clean.html">https://ss64.com/mac/dot_clean.html</a></p>
 
