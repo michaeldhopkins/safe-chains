@@ -1,0 +1,78 @@
+[[command]]
+name = "wg"
+description = "WireGuard configuration utility. The read-only subcommands cover: `show` prints interface status and peer endpoints; `showconf` dumps the in-kernel config in CONFIGURATION FILE FORMAT; `genkey` / `genpsk` print fresh base64 private / preshared keys to stdout; `pubkey` reads a private key from stdin and prints its public key. Note that `wg show <iface> private-key` and `wg show <iface> preshared-keys` print the in-kernel SECRET material to stdout — these field selectors are intended for scripted backup but expose secrets to whatever consumes the output. The state-modifying subcommands (`set`, `setconf`, `addconf`, `syncconf`) require root and write to the kernel interface — they are not in scope. Active project; the wireguard-tools surface is byte-for-byte stable across the v1.0.x line."
+url = "https://man7.org/linux/man-pages/man8/wg.8.html"
+researched_version = "wireguard-tools v1.0.20260223"
+bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "wg",
+    "wg show",
+    "wg show all",
+    "wg show wg0",
+    "wg show wg0 endpoints",
+    "wg showconf wg0",
+    "wg genkey",
+    "wg genpsk",
+    "wg pubkey",
+]
+examples_denied = [
+    "wg set wg0 peer ABC allowed-ips 0.0.0.0/0",
+    "wg setconf wg0 /tmp/conf",
+    "wg addconf wg0 /tmp/conf",
+    "wg syncconf wg0 /tmp/conf",
+]
+
+[[command.sub]]
+name = "show"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help",
+    "all", "interfaces",
+    "allowed-ips", "dump", "endpoints",
+    "fwmark", "latest-handshakes", "listen-port",
+    "peers", "persistent-keepalive",
+    "preshared-keys", "private-key",
+    "public-key", "transfer",
+    "-h",
+]
+
+[[command.sub]]
+name = "showconf"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "genkey"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "genpsk"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "pubkey"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "set"
+candidate = true
+
+[[command.sub]]
+name = "setconf"
+candidate = true
+
+[[command.sub]]
+name = "addconf"
+candidate = true
+
+[[command.sub]]
+name = "syncconf"
+candidate = true
