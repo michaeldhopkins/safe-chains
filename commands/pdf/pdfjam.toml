@@ -1,0 +1,38 @@
+[[command]]
+name = "pdfjam"
+description = "Bash wrapper around LaTeX's pdfpages package for n-up / scaling / paper-resizing / booklet / signature arrangements of an existing PDF. Reads input PDFs, generates a small LaTeX driver document, runs pdflatex/xelatex/lualatex on it, and writes the rearranged output PDF. Arrangement knobs include --nup, --paper, --landscape, --angle, --scale, --frame, --booklet, --signature, --twoside, --noautoscale, --trim, --viewport, --offset, --clip; metadata knobs include --pdftitle, --pdfauthor, --pdfsubject, --pdfkeywords, --keepinfo; output knobs include -o / --outfile, --suffix, --builddir, --runs; operating modes include --batch, --vanilla, --checkfiles, -q. pdfjam also exposes three arbitrary-code entry points: `--latex <path>` overrides the TeX engine binary, `--latexopts \"...\"` forwards arbitrary options (including `-shell-escape` which enables LaTeX `\\write18{cmd}` shell escape), and `--preamble \"...\"` injects arbitrary LaTeX code into the generated driver document."
+url = "https://github.com/rrthomas/pdfjam"
+researched_version = "pdfjam 4.3.1 (2026-04-02)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--batch", "--booklet", "--checkfiles",
+    "--clip", "--frame", "--help",
+    "--keepinfo", "--landscape",
+    "--noautoscale", "--quiet",
+    "--twoside", "--vanilla",
+    "--version",
+    "-V", "-h", "-q",
+]
+valued = [
+    "--angle", "--builddir",
+    "--nup", "--offset",
+    "--outfile", "--paper",
+    "--pdfauthor", "--pdfkeywords",
+    "--pdfsubject", "--pdftitle",
+    "--runs", "--scale",
+    "--signature", "--suffix",
+    "--trim", "--viewport",
+    "-o",
+]
+examples_safe = [
+    "pdfjam --nup 2x1 input.pdf",
+    "pdfjam --landscape --paper a4paper input.pdf",
+    "pdfjam --booklet true --signature 4 input.pdf",
+    "pdfjam -o out.pdf input.pdf",
+]
+examples_denied = [
+    "pdfjam --latex /tmp/evil input.pdf",
+    "pdfjam --latexopts '-shell-escape' input.pdf",
+    "pdfjam --preamble '\\\\immediate\\\\write18{rm -rf /}' input.pdf",
+]
