@@ -84,6 +84,56 @@ bare = false
 max_positional = 2
 
 [[command]]
+name = "pdf2dsc"
+description = "Ghostscript wrapper script. Runs gs with -sDEVICE=pdfwrite -dGenerateDSC to emit a DSC (Document Structuring Conventions) sidecar describing the structure of a PDF. Reads the first positional PDF; writes the DSC file to the second positional. Forwards any -X flags directly to gs. Ghostscript releases roughly once a year; the wrapper script surface has been stable for decades."
+url = "https://ghostscript.readthedocs.io/en/latest/"
+researched_version = "Ghostscript 10.06.0 (Sept 2025)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command]]
+name = "ps2pdf"
+description = "Ghostscript wrapper script. Adds CompatibilityLevel=1.4 then delegates to ps2pdfwr. Reads input.[e]ps (or stdin via `-`); writes output.pdf to the second positional (or stdout via `-`). Forwards any -X flags directly to gs. Ghostscript releases roughly once a year; the wrapper script surface has been stable for decades."
+url = "https://ghostscript.readthedocs.io/en/latest/"
+researched_version = "Ghostscript 10.06.0 (Sept 2025)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command]]
+name = "ps2pdf12"
+description = "Ghostscript wrapper script. Adds CompatibilityLevel=1.2 then delegates to ps2pdfwr. Reads input.[e]ps (or stdin via `-`); writes output.pdf to the second positional (or stdout via `-`). Forwards any -X flags directly to gs. Ghostscript releases roughly once a year; the wrapper script surface has been stable for decades."
+url = "https://ghostscript.readthedocs.io/en/latest/"
+researched_version = "Ghostscript 10.06.0 (Sept 2025)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command]]
+name = "ps2pdf13"
+description = "Ghostscript wrapper script. Adds CompatibilityLevel=1.3 then delegates to ps2pdfwr. Reads input.[e]ps (or stdin via `-`); writes output.pdf to the second positional (or stdout via `-`). Forwards any -X flags directly to gs. Ghostscript releases roughly once a year; the wrapper script surface has been stable for decades."
+url = "https://ghostscript.readthedocs.io/en/latest/"
+researched_version = "Ghostscript 10.06.0 (Sept 2025)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command]]
+name = "ps2pdf14"
+description = "Ghostscript wrapper script. Adds CompatibilityLevel=1.4 then delegates to ps2pdfwr. Reads input.[e]ps (or stdin via `-`); writes output.pdf to the second positional (or stdout via `-`). Forwards any -X flags directly to gs. Ghostscript releases roughly once a year; the wrapper script surface has been stable for decades."
+url = "https://ghostscript.readthedocs.io/en/latest/"
+researched_version = "Ghostscript 10.06.0 (Sept 2025)"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command]]
 name = "ps2pdfwr"
 description = "Ghostscript wrapper script. Runs gs with -sDEVICE=pdfwrite to convert PostScript to PDF without forcing a CompatibilityLevel. The version-specific ps2pdf/ps2pdf12/ps2pdf13/ps2pdf14 wrappers all delegate here after adding their own compatibility flag. Reads input.[e]ps (or stdin via `-`); writes output.pdf to the second positional (or stdout via `-`). Forwards any -X flags directly to gs. Ghostscript releases roughly once a year; the wrapper script surface has been stable for decades."
 url = "https://ghostscript.readthedocs.io/en/latest/"
