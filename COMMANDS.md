@@ -14382,6 +14382,12 @@ Aliases: `zdiff`
 
 - Hyphen-prefixed positional arguments accepted
 
+### `zed`
+<p class="cmd-url"><a href="https://zed.dev/">https://zed.dev/</a></p>
+
+- Allowed standalone flags: --add, --classic, --diff, --existing, --foreground, --help, --new, --reuse, --system-specs, --version, --wait, -a, -e, -h, -n, -r, -v, -w
+- Bare invocation allowed
+
 ### `zellij`
 <p class="cmd-url"><a href="https://zellij.dev/">https://zellij.dev/</a></p>
 
