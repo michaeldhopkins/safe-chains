@@ -1,0 +1,17 @@
+[[command]]
+name = "emacs"
+description = "GNU Emacs — the extensible editor. Bare invocation launches the interactive editor; positional file arguments are opened for editing. The covered flag surface is restricted to the safe-mode setup flags that constrain or skip user-customization: `-q`/`--no-init-file` skip the user's init.el, `-Q`/`--quick` apply minimum customization (also implies --no-site-file and --no-x-resources), `--no-site-file` skip site-start.el, `--no-site-lisp` exclude site-lisp from load-path, `--no-splash`, `--no-x-resources`, `--no-desktop`, `--no-build-details`, `--debug-init`, `--module-assertions`. Display: `-nw`/`--no-window-system` for terminal mode. Diagnostic: `--version`, `--help`. Active project with annual releases on the 28.x / 29.x / 30.x line; this safe-mode surface has been stable for many years."
+url = "https://www.gnu.org/software/emacs/"
+researched_version = "GNU Emacs 30.x"
+level = "Inert"
+bare = true
+standalone = [
+    "--debug-init", "--help",
+    "--module-assertions",
+    "--no-build-details", "--no-desktop",
+    "--no-init-file", "--no-site-file",
+    "--no-site-lisp", "--no-splash",
+    "--no-window-system", "--no-x-resources",
+    "--quick", "--version",
+    "-Q", "-h", "-nw", "-q",
+]

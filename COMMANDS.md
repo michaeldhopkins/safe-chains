@@ -3681,6 +3681,12 @@ Aliases: `@11ty/eleventy`
 
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `emacs`
+<p class="cmd-url"><a href="https://www.gnu.org/software/emacs/">https://www.gnu.org/software/emacs/</a></p>
+
+- Allowed standalone flags: --debug-init, --help, --module-assertions, --no-build-details, --no-desktop, --no-init-file, --no-site-file, --no-site-lisp, --no-splash, --no-window-system, --no-x-resources, --quick, --version, -Q, -h, -nw, -q
+- Bare invocation allowed
+
 ### `emar`
 <p class="cmd-url"><a href="https://emscripten.org/docs/tools_reference/emar.html">https://emscripten.org/docs/tools_reference/emar.html</a></p>
 
