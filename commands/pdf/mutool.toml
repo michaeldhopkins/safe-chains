@@ -1,0 +1,142 @@
+[[command]]
+name = "mutool"
+description = "MuPDF's command-line companion — a Swiss-army knife for inspecting and transforming PDFs, XPS, EPUB, and CBZ documents. Dispatches to per-task subcommands: read-only diagnostics (audit, grep, info, show, trace) and conversion / transform subs (bake, barcode, clean, convert, create, draw, extract, merge, pages, poster, recolor, sign, trim). The `run` subcommand executes arbitrary JavaScript and is recorded as candidate (deliberately uncovered). Active project — MuPDF 1.27.x cadence."
+url = "https://mupdf.readthedocs.io/"
+researched_version = "MuPDF 1.27.2"
+bare_flags = ["--help", "--version", "-h", "-V"]
+
+# --- Read-only diagnostics --------------------------------------------
+
+[[command.sub]]
+name = "audit"
+level = "SafeRead"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "grep"
+level = "SafeRead"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "info"
+level = "SafeRead"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "show"
+level = "SafeRead"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "trace"
+level = "SafeRead"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+# --- Conversion / transform (write project-local output) --------------
+
+[[command.sub]]
+name = "bake"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "barcode"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "clean"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "convert"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "create"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "draw"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "extract"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "merge"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "pages"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "poster"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "recolor"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "sign"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+[[command.sub]]
+name = "trim"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "-h", "-?"]
+
+# --- Considered but not approved --------------------------------------
+
+[[command.sub]]
+name = "run"
+candidate = true

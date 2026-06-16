@@ -8024,6 +8024,29 @@ Aliases: `gmktemp`
 - **help**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `mutool`
+<p class="cmd-url"><a href="https://mupdf.readthedocs.io/">https://mupdf.readthedocs.io/</a></p>
+
+- **audit**: Flags: --help, -h, -?. Positional args accepted
+- **bake**: Flags: --help, -h, -?. Positional args accepted
+- **barcode**: Flags: --help, -h, -?. Positional args accepted
+- **clean**: Flags: --help, -h, -?. Positional args accepted
+- **convert**: Flags: --help, -h, -?. Positional args accepted
+- **create**: Flags: --help, -h, -?. Positional args accepted
+- **draw**: Flags: --help, -h, -?. Positional args accepted
+- **extract**: Flags: --help, -h, -?. Positional args accepted
+- **grep**: Flags: --help, -h, -?. Positional args accepted
+- **info**: Flags: --help, -h, -?. Positional args accepted
+- **merge**: Flags: --help, -h, -?. Positional args accepted
+- **pages**: Flags: --help, -h, -?. Positional args accepted
+- **poster**: Flags: --help, -h, -?. Positional args accepted
+- **recolor**: Flags: --help, -h, -?. Positional args accepted
+- **show**: Flags: --help, -h, -?. Positional args accepted
+- **sign**: Flags: --help, -h, -?. Positional args accepted
+- **trace**: Flags: --help, -h, -?. Positional args accepted
+- **trim**: Flags: --help, -h, -?. Positional args accepted
+- Allowed standalone flags: --help, --version, -h, -V
+
 ### `mv`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#mv-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#mv-invocation</a></p>
 
