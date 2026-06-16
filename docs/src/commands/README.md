@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1599 commands across 75 categories.
+safe-chains knows 1600 commands across 75 categories.
 
 ## Glossary
 
@@ -62,7 +62,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Database Migrations](migrations.md) (6 commands)
 - [ML / Observability](ml.md) (7 commands)
 - [Mobile Frameworks](mobile.md) (5 commands)
-- [Networking](net.md) (72 commands)
+- [Networking](net.md) (73 commands)
 - [Niche / Esoteric](niche.md) (3 commands)
 - [Nim](nim.md) (2 commands)
 - [Nix](nix.md) (12 commands)
