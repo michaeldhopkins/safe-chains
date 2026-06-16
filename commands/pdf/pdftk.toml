@@ -1,8 +1,8 @@
 [[command]]
 name = "pdftk"
-description = "PDF Toolkit — splits / merges / encrypts / fills forms in PDFs. Reads input PDFs and writes the output to the path after `output`. Pure document transformation — does not execute embedded JS."
+description = "PDF Toolkit — splits / merges / encrypts / fills forms in PDFs. The CLI uses a positional grammar rather than long flags: an invocation looks like `pdftk INPUT [INPUT ...] OPERATION [OP ARGS] [output OUT_FILE] [encrypt_... OPTS] [verbose] [dont_ask|do_ask]`. Operations: cat (combine page ranges), shuffle (interleave), burst (split to pages), rotate, attach_files, unpack_files, dump_data[_fields|_annots|_utf8], generate_fdf, fill_form, update_info, background, multibackground, stamp, multistamp. Encryption tokens (`encrypt_40bit`, `encrypt_128bit`, `encrypt_aes128`, `owner_pw`, `user_pw`, `allow=Printing|ModifyContents|CopyContents|...`) follow the operation. Reads input PDFs and writes the output to the path after `output`. pdftk does not execute embedded JavaScript in current pdftk-java versions. Active project — pdftk-java continues the original pdftk surface."
 url = "https://www.pdflabs.com/docs/pdftk-cli-examples/"
-researched_version = "pdftk 3.x"
+researched_version = "pdftk-java 3.3.3"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true
