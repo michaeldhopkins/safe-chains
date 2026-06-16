@@ -1,0 +1,19 @@
+[[command]]
+name = "nano"
+aliases = ["pico", "rnano"]
+description = "GNU nano — modeless terminal editor descended from Pico. Bare invocation opens an empty buffer; positional file arguments are opened for editing. The covered flag surface stays inside session display, behavior tweaks, and operating constraints. Display / behavior: `-A` smart-home, `-B` save backups, `-E` convert tabs to spaces, `-G` no autoindent, `-H` log search/replace history, `-I` ignore rcfiles, `-K` raw kbd input, `-L` no newlines at EOF, `-M` trim trailing whitespace, `-N` no conversion to Unix, `-O` ignore home, `-P` log cursor position, `-S` smooth scrolling, `-U` quick blank, `-W` strict whitespace, `-Z` suspend (modern terminals), `-a`, `-b`, `-c`, `-d`, `-e`, `-g`, `-i`, `-j`, `-k`, `-l`, `-m`, `-n`, `-p`, `-q`, `-t`, `-u`, `-w`, `-x`, `-y`, `-z`, `-!`, `-@`, `-/`, `-_`, `-0`. Safety constraints: `-R` restricted mode (no suspend, no out-of-cwd writes, no external commands), `-v` view-mode (read-only). Diagnostic: `--help`, `-h`, `--version`, `-V`. Valued metadata: `-C <backup-dir>`, `-J <stripe-col>`, `-Q <quote-regex>`, `-T <tab-size>`, `-X <word-chars>`, `-Y <syntax-name>`, `-o <operating-dir>`, `-r <fill-width>`. Active project with annual releases."
+url = "https://www.nano-editor.org/"
+researched_version = "GNU nano 9.0 (2026-04-08)"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--version",
+    "-!", "-/", "-0", "-@", "-A", "-B", "-D", "-E", "-F", "-G",
+    "-H", "-I", "-K", "-L", "-M", "-N", "-O", "-P", "-R", "-S",
+    "-U", "-V", "-W", "-Z",
+    "-_",
+    "-a", "-b", "-c", "-d", "-e", "-g", "-h", "-i", "-j", "-k",
+    "-l", "-m", "-n", "-p", "-q", "-t", "-u", "-v", "-w", "-x",
+    "-y", "-z",
+]
+valued = ["-C", "-J", "-Q", "-T", "-X", "-Y", "-o", "-r"]
