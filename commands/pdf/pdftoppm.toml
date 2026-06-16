@@ -1,0 +1,26 @@
+[[command]]
+name = "pdftoppm"
+description = "Poppler — renders PDF pages to PPM / PGM / PBM (default), PNG, JPEG, or TIFF image files. Reads a PDF input; writes one image per page (or one combined file with `-singlefile`) to the second positional. Pure conversion."
+url = "https://manpages.ubuntu.com/manpages/noble/en/man1/pdftoppm.1.html"
+researched_version = "Poppler 25.x"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "-cropbox", "-e", "-forcenum", "-gray",
+    "-h", "-hide-annotations", "-jpeg",
+    "-mono", "-o", "-png",
+    "-progress", "-q",
+    "-scale-dimension-before-rotation", "-singlefile",
+    "-tiff", "-v",
+    "--help", "-?",
+]
+valued = [
+    "-H", "-W", "-aa", "-aaVector",
+    "-defaultcmykprofile", "-defaultgrayprofile", "-defaultrgbprofile",
+    "-displayprofile", "-f", "-freetype", "-jpegopt",
+    "-l", "-opw", "-r", "-rx", "-ry",
+    "-scale-to", "-scale-to-x", "-scale-to-y",
+    "-sep", "-sz", "-thinlinemode",
+    "-tiffcompression", "-upw", "-x", "-y",
+]

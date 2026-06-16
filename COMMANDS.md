@@ -9305,6 +9305,20 @@ Aliases: `xelatex`, `lualatex`, `latex`
 - Allowed valued flags: -enc, -f, -fmt, -l, -opw, -p, -r, -upw, -zoom
 - Hyphen-prefixed positional arguments accepted
 
+### `pdftoppm`
+<p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/noble/en/man1/pdftoppm.1.html">https://manpages.ubuntu.com/manpages/noble/en/man1/pdftoppm.1.html</a></p>
+
+- Allowed standalone flags: -cropbox, -e, -forcenum, -gray, -h, -hide-annotations, -jpeg, -mono, -o, -png, -progress, -q, -scale-dimension-before-rotation, -singlefile, -tiff, -v, --help, -?
+- Allowed valued flags: -H, -W, -aa, -aaVector, -defaultcmykprofile, -defaultgrayprofile, -defaultrgbprofile, -displayprofile, -f, -freetype, -jpegopt, -l, -opw, -r, -rx, -ry, -scale-to, -scale-to-x, -scale-to-y, -sep, -sz, -thinlinemode, -tiffcompression, -upw, -x, -y
+- Hyphen-prefixed positional arguments accepted
+
+### `pdftops`
+<p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/noble/en/man1/pdftops.1.html">https://manpages.ubuntu.com/manpages/noble/en/man1/pdftops.1.html</a></p>
+
+- Allowed standalone flags: -binary, -duplex, -eps, -expand, -form, -h, -level1, -level1sep, -level2, -level2sep, -level3, -level3sep, -nocenter, -nocrop, -noembcidps, -noembcidtt, -noembt1, -noembtt, -noshrink, -opi, -optimizecolorspace, -origpagesizes, -overprint, -passfonts, -preload, -q, -v, --help, -?
+- Allowed valued flags: -aaRaster, -defaultcmykprofile, -defaultgrayprofile, -defaultrgbprofile, -f, -l, -opw, -paper, -paperh, -paperw, -processcolorformat, -processcolorprofile, -r, -rasterize, -upw
+- Hyphen-prefixed positional arguments accepted
+
 ### `pdftotext`
 <p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftotext.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdftotext.1.html</a></p>
 
