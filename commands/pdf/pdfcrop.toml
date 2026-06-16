@@ -1,0 +1,35 @@
+[[command]]
+name = "pdfcrop"
+description = "Perl script that crops a PDF to its bounding box (whitespace trim) or to a fixed border. Internally pipes the input through Ghostscript (for bbox computation) and a TeX engine (pdfTeX, XeTeX, or LuaTeX, selected by `--pdftex` / `--xetex` / `--luatex`) to write the cropped PDF output. Built-in safe shapes include paper sizing (`--papersize`, `--margins`, `--bbox`, `--clip`), engine selectors (`--pdftex`, `--xetex`, `--luatex`), output knobs (`--resolution`, `--hires`, `--pdfversion`), and `--restricted` mode which forwards `-dSAFER` to Ghostscript and `--no-shell-escape` to TeX. pdfcrop also exposes four binary-path overrides (`--gscmd`, `--pdftexcmd`, `--xetexcmd`, `--luatexcmd`) that let the user point any of the helper invocations at an arbitrary executable; these are arbitrary-code entry points. Writes the cropped PDF to the path the user supplies as the second positional."
+url = "https://www.ctan.org/pkg/pdfcrop"
+researched_version = "pdfcrop 1.40"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--clip", "--debug", "--help",
+    "--hires", "--ini", "--luatex",
+    "--noclip", "--nodebug", "--nohires",
+    "--noini", "--noverbose", "--pdftex",
+    "--restricted", "--verbose",
+    "--version", "--xetex",
+    "-q",
+]
+valued = [
+    "--bbox", "--bbox-odd", "--bbox-even",
+    "--margins",
+    "--papersize", "--pdfversion",
+    "--resolution",
+]
+examples_safe = [
+    "pdfcrop input.pdf",
+    "pdfcrop input.pdf output.pdf",
+    "pdfcrop --margins 10 input.pdf",
+    "pdfcrop --bbox '10 20 30 40' input.pdf",
+    "pdfcrop --restricted --xetex input.pdf",
+]
+examples_denied = [
+    "pdfcrop --gscmd /tmp/evil input.pdf",
+    "pdfcrop --pdftexcmd /tmp/evil input.pdf",
+    "pdfcrop --xetexcmd /tmp/evil input.pdf",
+    "pdfcrop --luatexcmd /tmp/evil input.pdf",
+]

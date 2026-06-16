@@ -9302,6 +9302,12 @@ Aliases: `pcretest`
 - Allowed standalone flags: --help, -h, -?
 - Hyphen-prefixed positional arguments accepted
 
+### `pdfcrop`
+<p class="cmd-url"><a href="https://www.ctan.org/pkg/pdfcrop">https://www.ctan.org/pkg/pdfcrop</a></p>
+
+- Allowed standalone flags: --clip, --debug, --help, --hires, --ini, --luatex, --noclip, --nodebug, --nohires, --noini, --noverbose, --pdftex, --restricted, --verbose, --version, --xetex, -q
+- Allowed valued flags: --bbox, --bbox-odd, --bbox-even, --initex, --margins, --papersize, --pdfversion, --resolution
+
 ### `pdfdetach`
 <p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfdetach.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfdetach.1.html</a></p>
 
