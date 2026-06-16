@@ -1,0 +1,42 @@
+[[command]]
+name = "doggo"
+description = "Modern command-line DNS client. Reads DNS records from one or more nameservers and prints them; no writes. Bare invocation accepts the domain to query as a positional (e.g. `doggo example.com`); record types (A, MX, etc.), classes, and nameserver addresses prefixed with `@` are also positional. Cobra-based CLI, so each flag accepts both the `--long` and `=value` forms. Supports DNS-over-HTTPS / DoT / DoQ via the `@protocol://host` syntax. Active project — Rust-style Go binary by Karan Sharma. Reads only — no flag in the surface modifies system DNS settings or writes files outside stdout."
+url = "https://doggo.mrkaran.dev/"
+researched_version = "doggo 1.1.7 (2026-05-25)"
+level = "SafeRead"
+bare = false
+tolerate_unknown_short = true
+standalone = [
+    "--aa", "--ad", "--any",
+    "--cd", "--color", "--cookie",
+    "--debug", "--do", "--ede",
+    "--help", "--ipv4", "--ipv6",
+    "--json", "--nsid", "--padding",
+    "--rd", "--reverse",
+    "--search", "--short",
+    "--skip-hostname-verification",
+    "--time", "--version", "--z",
+    "-4", "-6", "-J", "-h",
+    "-x",
+]
+valued = [
+    "--bufsize", "--class",
+    "--ecs", "--gp-from", "--gp-limit",
+    "--nameserver", "--ndots",
+    "--query", "--strategy",
+    "--tls-hostname",
+    "--type",
+    "-c", "-n", "-q", "-t",
+]
+examples_safe = [
+    "doggo example.com",
+    "doggo example.com @1.1.1.1",
+    "doggo example.com MX",
+    "doggo example.com @tls://1.1.1.1 --skip-hostname-verification",
+    "doggo --json example.com",
+    "doggo -t AAAA example.com",
+]
+examples_denied = [
+    "doggo --output /tmp/dns.json example.com",
+    "doggo example.com --exec curl",
+]
