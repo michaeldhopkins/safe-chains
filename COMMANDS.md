@@ -7013,6 +7013,18 @@ Aliases: `llvm-ranlib`
 - Allowed standalone flags: --help, --version, -?, -h
 - Hyphen-prefixed positional arguments accepted
 
+### `llvm-dwp`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-dwp.html">https://llvm.org/docs/CommandGuide/llvm-dwp.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-libtool-darwin`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-libtool-darwin.html">https://llvm.org/docs/CommandGuide/llvm-libtool-darwin.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
 ### `llvm-link`
 <p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-link.html">https://llvm.org/docs/CommandGuide/llvm-link.html</a></p>
 
@@ -7031,6 +7043,12 @@ Aliases: `llvm-ranlib`
 - Allowed standalone flags: --help, --version, -?, -h
 - Hyphen-prefixed positional arguments accepted
 
+### `llvm-objcopy`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-objcopy.html">https://llvm.org/docs/CommandGuide/llvm-objcopy.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
 ### `llvm-objdump`
 <p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-objdump.html">https://llvm.org/docs/CommandGuide/llvm-objdump.html</a></p>
 
@@ -7042,6 +7060,12 @@ Aliases: `llvm-ranlib`
 
 - Allowed standalone flags: -objdump, -show-objdump-command, --help, -h
 - Allowed valued flags: -object-tool-path, --object-tool-path
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-pdbutil`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-pdbutil.html">https://llvm.org/docs/CommandGuide/llvm-pdbutil.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
 - Hyphen-prefixed positional arguments accepted
 
 ### `llvm-profdata`
@@ -7058,6 +7082,12 @@ Aliases: `llvm-readelf`
 - Allowed standalone flags: --help, --version, -?, -h
 - Hyphen-prefixed positional arguments accepted
 
+### `llvm-size`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-size.html">https://llvm.org/docs/CommandGuide/llvm-size.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Hyphen-prefixed positional arguments accepted
+
 ### `llvm-strip`
 <p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-strip.html">https://llvm.org/docs/CommandGuide/llvm-strip.html</a></p>
 
@@ -7069,6 +7099,19 @@ Aliases: `llvm-readelf`
 
 - Allowed standalone flags: --help, --version, -?, -h
 - Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-undname`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-undname.html">https://llvm.org/docs/CommandGuide/llvm-undname.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
+- Bare invocation allowed
+- Hyphen-prefixed positional arguments accepted
+
+### `llvm-xray`
+<p class="cmd-url"><a href="https://llvm.org/docs/CommandGuide/llvm-xray.html">https://llvm.org/docs/CommandGuide/llvm-xray.html</a></p>
+
+- Allowed standalone flags: --help, --version, -?, -h
 - Hyphen-prefixed positional arguments accepted
 
 ### `ln`

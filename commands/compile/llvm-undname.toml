@@ -1,0 +1,9 @@
+[[command]]
+name = "llvm-undname"
+description = "LLVM MSVC name demangler — converts mangled Microsoft C++ symbols back to their source-level form. Reads names from argv or stdin, writes demangled output to stdout. Mirrors `llvm-cxxfilt` semantics for the Itanium ABI."
+url = "https://llvm.org/docs/CommandGuide/llvm-undname.html"
+researched_version = "LLVM 22.x"
+level = "SafeRead"
+bare = true
+tolerate_unknown_short = true
+standalone = ["--help", "--version", "-?", "-h"]

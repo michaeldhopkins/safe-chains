@@ -1,0 +1,9 @@
+[[command]]
+name = "llvm-objcopy"
+description = "LLVM objcopy — copies / transforms object files between formats. Reads an input object file and writes a transformed output (project-local SafeWrite). Commonly invoked by embedded and cross-compilation builds. `llvm-bitcode-strip` is the bitcode-stripping driver name."
+url = "https://llvm.org/docs/CommandGuide/llvm-objcopy.html"
+researched_version = "LLVM 22.x"
+level = "SafeWrite"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "--version", "-?", "-h"]

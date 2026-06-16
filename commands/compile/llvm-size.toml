@@ -1,0 +1,9 @@
+[[command]]
+name = "llvm-size"
+description = "LLVM size — prints the size of each section in an object file or executable. Pure read; mirrors POSIX `size(1)`."
+url = "https://llvm.org/docs/CommandGuide/llvm-size.html"
+researched_version = "LLVM 22.x"
+level = "SafeRead"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "--version", "-?", "-h"]
