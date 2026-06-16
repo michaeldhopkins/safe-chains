@@ -1,0 +1,24 @@
+[[command]]
+name = "ipcalc"
+description = "IPv4 CIDR calculator. Pure-compute: takes an address and an optional netmask or CIDR prefix, prints the network, broadcast, host range, classful designation, and binary representation. No file I/O or network activity — Inert. Useful for AI agents reasoning about subnet boundaries before generating config. The kjokjo/ipcalc Perl implementation is the canonical one packaged on most distros; surface has been stable for decades. Note: `-h` is the HTML-output toggle (not help); `--help` is the help form."
+url = "https://jodies.de/ipcalc"
+researched_version = "ipcalc 0.51"
+level = "Inert"
+bare = false
+standalone = [
+    "--class", "--deaggregate", "--help",
+    "--html", "--nobinary", "--nocolor",
+    "--split", "--version",
+    "-b", "-c", "-d", "-h", "-n", "-s", "-v",
+]
+examples_safe = [
+    "ipcalc 192.168.1.0/24",
+    "ipcalc 10.0.0.0 255.0.0.0",
+    "ipcalc --html 192.168.1.0/24",
+    "ipcalc --deaggregate 192.168.0.0-192.168.5.255",
+    "ipcalc --split 192.168.1.0/24 64 64 64",
+    "ipcalc --version",
+]
+examples_denied = [
+    "ipcalc --output /tmp/out 192.168.1.0/24",
+]

@@ -131,6 +131,11 @@
 
 - Bare invocation allowed
 
+### `ipcalc`
+<p class="cmd-url"><a href="https://jodies.de/ipcalc">https://jodies.de/ipcalc</a></p>
+
+- Allowed standalone flags: --class, --deaggregate, --help, --html, --nobinary, --nocolor, --split, --version, -b, -c, -d, -h, -n, -s, -v
+
 ### `ipconfig`
 <p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/Networking/Conceptual/SystemConfigFrameworks/SC_Intro/SC_Intro.html">https://developer.apple.com/library/archive/documentation/Networking/Conceptual/SystemConfigFrameworks/SC_Intro/SC_Intro.html</a></p>
 
