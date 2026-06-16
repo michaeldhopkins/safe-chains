@@ -356,6 +356,14 @@ Aliases: `@cucumber/cucumber`
 - Allowed valued flags: --config, --file, --in, --out, --parser, --read, --read-flag, --rw-flag, --selector, --var, --write, --write-flag, -c, -f, -i, -o, -p, -r, -s, -w
 - Bare invocation allowed
 
+**Examples:**
+
+- `dasel`
+- `dasel --version`
+- `dasel -f data.json '.foo'`
+- `dasel --file data.json --selector '.foo.bar'`
+- `dasel -f data.json --in json --out yaml '.foo'`
+
 ### `dawn`
 <p class="cmd-url"><a href="https://github.com/thesp0nge/dawnscanner">https://github.com/thesp0nge/dawnscanner</a></p>
 
@@ -418,6 +426,14 @@ Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
 
 - Allowed standalone flags: --help, -?, -O, -P, -V, -q, -v, -x, -y
 - Allowed valued flags: -A, -E, -G, -K, -N, -T, -n, -o, -s
+
+**Examples:**
+
+- `dot -Tpng graph.dot -o out.png`
+- `dot -Tsvg graph.dot`
+- `neato -Tpdf graph.dot -o out.pdf`
+- `dot -V`
+- `dot -Kfdp -Tpng graph.dot -O`
 
 ### `drizzle-kit`
 <p class="cmd-url"><a href="https://orm.drizzle.team/docs/kit-overview">https://orm.drizzle.team/docs/kit-overview</a></p>
@@ -1173,6 +1189,13 @@ Aliases: `run-p`, `run-s`
 - Allowed standalone flags: --help, --version, -0, -8, -I, -T, -V, -a, -b, -c, -e, -f, -g, -h, -k, -l, -n, -p, -q, -r, -t, -v, -W
 - Allowed valued flags: -A, -B, -D, -F, -H, -J, -L, -N, -i, -m, -s, -u, -w
 - Bare invocation allowed
+
+**Examples:**
+
+- `pv`
+- `pv -L 1M`
+- `pv -s 100M -N input`
+- `pv --help`
 
 ### `pylint`
 <p class="cmd-url"><a href="https://pylint.readthedocs.io/en/latest/user_guide/usage/run.html">https://pylint.readthedocs.io/en/latest/user_guide/usage/run.html</a></p>
