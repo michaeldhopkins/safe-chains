@@ -2826,6 +2826,14 @@ Aliases: `gcut`
 - Allowed valued flags: --config, --file, --in, --out, --parser, --read, --read-flag, --rw-flag, --selector, --var, --write, --write-flag, -c, -f, -i, -o, -p, -r, -s, -w
 - Bare invocation allowed
 
+**Examples:**
+
+- `dasel`
+- `dasel --version`
+- `dasel -f data.json '.foo'`
+- `dasel --file data.json --selector '.foo.bar'`
+- `dasel -f data.json --in json --out yaml '.foo'`
+
 ### `date`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation</a></p>
 
@@ -3308,9 +3316,18 @@ Aliases: `gdirname`
 ### `doggo`
 <p class="cmd-url"><a href="https://doggo.mrkaran.dev/">https://doggo.mrkaran.dev/</a></p>
 
-- Allowed standalone flags: --aa, --ad, --any, --cd, --color, --cookie, --debug, --do, --ede, --help, --ipv4, --ipv6, --json, --nsid, --padding, --rd, --reverse, --search, --short, --time, --version, --z, -4, -6, -J, -h, -x
-- Allowed valued flags: --bufsize, --class, --ecs, --gp-from, --gp-limit, --nameserver, --ndots, --query, --skip-hostname-verification, --strategy, --tls-hostname, --type, -c, -n, -q, -t
+- Allowed standalone flags: --aa, --ad, --any, --cd, --color, --cookie, --debug, --do, --ede, --help, --ipv4, --ipv6, --json, --nsid, --padding, --rd, --reverse, --search, --short, --skip-hostname-verification, --time, --version, --z, -4, -6, -J, -h, -x
+- Allowed valued flags: --bufsize, --class, --ecs, --gp-from, --gp-limit, --nameserver, --ndots, --query, --strategy, --tls-hostname, --type, -c, -n, -q, -t
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `doggo example.com`
+- `doggo example.com @1.1.1.1`
+- `doggo example.com MX`
+- `doggo example.com @tls://1.1.1.1 --skip-hostname-verification`
+- `doggo --json example.com`
+- `doggo -t AAAA example.com`
 
 ### `dot`
 <p class="cmd-url"><a href="https://graphviz.org/doc/info/command.html">https://graphviz.org/doc/info/command.html</a></p>
@@ -3319,6 +3336,14 @@ Aliases: `neato`, `twopi`, `circo`, `fdp`, `sfdp`, `patchwork`, `osage`, `nop`
 
 - Allowed standalone flags: --help, -?, -O, -P, -V, -q, -v, -x, -y
 - Allowed valued flags: -A, -E, -G, -K, -N, -T, -n, -o, -s
+
+**Examples:**
+
+- `dot -Tpng graph.dot -o out.png`
+- `dot -Tsvg graph.dot`
+- `neato -Tpdf graph.dot -o out.pdf`
+- `dot -V`
+- `dot -Kfdp -Tpng graph.dot -O`
 
 ### `dot_clean`
 <p class="cmd-url"><a href="https://ss64.com/mac/dot_clean.html">https://ss64.com/mac/dot_clean.html</a></p>
@@ -5517,7 +5542,7 @@ Aliases: `hf`
 ### `hurl`
 <p class="cmd-url"><a href="https://hurl.dev/docs/manual.html">https://hurl.dev/docs/manual.html</a></p>
 
-- Allowed standalone flags: --color, --compressed, --connect-to, --continue-on-error, --cookie-jar, --curl, --debug, --digest, --error-format, --file-root, --from-entry, --glob, --help, --http1.0, --http1.1, --http2, --http3, --include, --insecure, --interactive, --ipv4, --ipv6, --json, --location, --location-trusted, --max-filesize, --max-redirs, --max-time, --negotiate, --netrc, --netrc-file, --netrc-optional, --no-assert, --no-color, --no-cookie-store, --no-output, --no-pretty, --ntlm, --output, --parallel, --path-as-is, --pretty, --progress-bar, --proxy, --report-html, --report-json, --report-junit, --report-tap, --repeat, --report-html-history, --resolve, --retry, --retry-interval, --ssl-no-revoke, --summary, --test, --to-entry, --unix-socket, --user, --user-agent, --variable, --variables-file, --verbose, --very-verbose, --version, -0, -?, -4, -6, -A, -H, -L, -M, -V, -X, -b, -c, -d, -h, -i, -k, -l, -m, -n, -o, -q, -r, -s, -u, -v, -vv, -x
+- Allowed standalone flags: --color, --compressed, --connect-to, --continue-on-error, --cookie-jar, --curl, --debug, --digest, --error-format, --file-root, --from-entry, --glob, --help, --http1.0, --http1.1, --http2, --http3, --include, --insecure, --interactive, --ipv4, --ipv6, --json, --location, --location-trusted, --max-filesize, --max-redirs, --max-time, --negotiate, --netrc, --netrc-file, --netrc-optional, --no-assert, --no-color, --no-cookie-store, --no-output, --no-pretty, --ntlm, --output, --parallel, --path-as-is, --pretty, --progress-bar, --proxy, --report-html, --report-json, --report-junit, --report-tap, --repeat, --report-html-history, --resolve, --retry, --retry-interval, --ssl-no-revoke, --summary, --test, --to-entry, --unix-socket, --user, --user-agent, --variable, --variables-file, --verbose, --very-verbose, --version, -0, -?, -4, -6, -A, -H, -L, -M, -V, -X, -b, -c, -d, -h, -i, -k, -l, -m, -n, -o, -q, -r, -s, -u, -v, -vv
 - Allowed valued flags: --aws-sigv4, --cacert, --cert, --connect-timeout, --connect-to, --cookie, --cookie-jar, --delay, --error-format, --file-root, --from-entry, --glob, --jobs, --key, --limit-rate, --max-filesize, --max-redirs, --max-time, --netrc-file, --no-proxy, --output, --parallel, --pinnedpubkey, --proxy, --report-html, --report-junit, --report-tap, --repeat, --resolve, --retry, --retry-interval, --secret, --secrets-file, --socks5, --to-entry, --unix-socket, --user, --user-agent, --variable, --variables-file, --verbosity, --workers, -A, -E, -H, -X, -b, -c, -d, -m, -o, -r, -u, -x
 - Hyphen-prefixed positional arguments accepted
 
@@ -5796,6 +5821,15 @@ Aliases: `gid`
 <p class="cmd-url"><a href="https://jodies.de/ipcalc">https://jodies.de/ipcalc</a></p>
 
 - Allowed standalone flags: --class, --deaggregate, --help, --html, --nobinary, --nocolor, --split, --version, -b, -c, -d, -h, -n, -s, -v
+
+**Examples:**
+
+- `ipcalc 192.168.1.0/24`
+- `ipcalc 10.0.0.0 255.0.0.0`
+- `ipcalc --html 192.168.1.0/24`
+- `ipcalc --deaggregate 192.168.0.0-192.168.5.255`
+- `ipcalc --split 192.168.1.0/24 64 64 64`
+- `ipcalc --version`
 
 ### `ipconfig`
 <p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/Networking/Conceptual/SystemConfigFrameworks/SC_Intro/SC_Intro.html">https://developer.apple.com/library/archive/documentation/Networking/Conceptual/SystemConfigFrameworks/SC_Intro/SC_Intro.html</a></p>
@@ -9316,7 +9350,15 @@ Aliases: `pcretest`
 <p class="cmd-url"><a href="https://www.ctan.org/pkg/pdfcrop">https://www.ctan.org/pkg/pdfcrop</a></p>
 
 - Allowed standalone flags: --clip, --debug, --help, --hires, --ini, --luatex, --noclip, --nodebug, --nohires, --noini, --noverbose, --pdftex, --restricted, --verbose, --version, --xetex, -q
-- Allowed valued flags: --bbox, --bbox-odd, --bbox-even, --initex, --margins, --papersize, --pdfversion, --resolution
+- Allowed valued flags: --bbox, --bbox-odd, --bbox-even, --margins, --papersize, --pdfversion, --resolution
+
+**Examples:**
+
+- `pdfcrop input.pdf`
+- `pdfcrop input.pdf output.pdf`
+- `pdfcrop --margins 10 input.pdf`
+- `pdfcrop --bbox '10 20 30 40' input.pdf`
+- `pdfcrop --restricted --xetex input.pdf`
 
 ### `pdfdetach`
 <p class="cmd-url"><a href="https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfdetach.1.html">https://manpages.ubuntu.com/manpages/jammy/en/man1/pdfdetach.1.html</a></p>
@@ -9357,6 +9399,13 @@ Aliases: `pcretest`
 
 - Allowed standalone flags: --batch, --booklet, --checkfiles, --clip, --frame, --help, --keepinfo, --landscape, --noautoscale, --quiet, --twoside, --vanilla, --version, -V, -h, -q
 - Allowed valued flags: --angle, --builddir, --nup, --offset, --outfile, --paper, --pdfauthor, --pdfkeywords, --pdfsubject, --pdftitle, --runs, --scale, --signature, --suffix, --trim, --viewport, -o
+
+**Examples:**
+
+- `pdfjam --nup 2x1 input.pdf`
+- `pdfjam --landscape --paper a4paper input.pdf`
+- `pdfjam --booklet true --signature 4 input.pdf`
+- `pdfjam -o out.pdf input.pdf`
 
 ### `pdflatex`
 <p class="cmd-url"><a href="https://www.tug.org/applications/pdftex/">https://www.tug.org/applications/pdftex/</a></p>
@@ -10465,6 +10514,13 @@ Aliases: `puppet-agent`, `puppet-master`
 - Allowed standalone flags: --help, --version, -0, -8, -I, -T, -V, -a, -b, -c, -e, -f, -g, -h, -k, -l, -n, -p, -q, -r, -t, -v, -W
 - Allowed valued flags: -A, -B, -D, -F, -H, -J, -L, -N, -i, -m, -s, -u, -w
 - Bare invocation allowed
+
+**Examples:**
+
+- `pv`
+- `pv -L 1M`
+- `pv -s 100M -N input`
+- `pv --help`
 
 ### `pwd`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pwd-invocation</a></p>
@@ -14429,6 +14485,26 @@ Aliases: `gyes`
 
 - Allowed standalone flags: --colors, --exit-status, --help, --no-colors, --no-doc, --null-input, --prettyPrint, --version, -C, -M, -N, -P, -V, -e, -h, -r
 - Allowed valued flags: --arg, --argjson, --expression, --front-matter, --indent, --input-format, --output-format, -I, -p
+
+### `yt-dlp`
+<p class="cmd-url"><a href="https://github.com/yt-dlp/yt-dlp">https://github.com/yt-dlp/yt-dlp</a></p>
+
+Aliases: `youtube-dl`
+
+- Allowed standalone flags: --abort-on-error, --abort-on-unavailable-fragment, --add-metadata, --allow-playlist-files, --audio-multistreams, --check-all-formats, --check-formats, --clean-info-json, --continue, --default-search, --dump-pages, --dump-single-json, --embed-chapters, --embed-info-json, --embed-metadata, --embed-subs, --embed-thumbnail, --extract-audio, --flat-playlist, --force-generic-extractor, --force-ipv4, --force-ipv6, --force-write-archive, --get-comments, --get-description, --get-duration, --get-filename, --get-format, --get-id, --get-thumbnail, --get-title, --get-url, --hls-prefer-ffmpeg, --hls-prefer-native, --hls-use-mpegts, --ignore-config, --ignore-errors, --ignore-no-formats-error, --keep-fragments, --keep-video, --legacy-server-connect, --list-formats, --list-subs, --list-thumbnails, --mark-watched, --mtime, --newline, --no-abort-on-error, --no-add-metadata, --no-call-home, --no-check-certificate, --no-clean-info-json, --no-color, --no-colors, --no-config, --no-continue, --no-cookies, --no-embed-chapters, --no-embed-info-json, --no-embed-metadata, --no-embed-subs, --no-embed-thumbnail, --no-fixup-comments, --no-format-sort-force, --no-get-comments, --no-keep-fragments, --no-keep-video, --no-mark-watched, --no-mtime, --no-overwrites, --no-part, --no-playlist, --no-playlist-reverse, --no-post-overwrites, --no-progress, --no-quiet, --no-resize-buffer, --no-restrict-filenames, --no-simulate, --no-skip-unavailable-fragments, --no-split-chapters, --no-update, --no-warnings, --no-write-annotations, --no-write-archive, --no-write-auto-subs, --no-write-comments, --no-write-description, --no-write-info-json, --no-write-link, --no-write-playlist-metafiles, --no-write-subs, --no-write-thumbnail, --no-write-url-link, --overwrites, --paths-only, --playlist-random, --playlist-reverse, --prefer-free-formats, --print-json, --print-to-file, --print-traffic, --progress, --quiet, --resize-buffer, --restrict-filenames, --reverse-playlist, --simulate, --skip-download, --skip-unavailable-fragments, --split-chapters, --verbose, --version, --write-annotations, --write-auto-subs, --write-comments, --write-description, --write-info-json, --write-link, --write-playlist-metafiles, --write-subs, --write-thumbnail, --write-url-link, --xattrs, -4, -6, -F, -J, -c, -h, -i, -j, -k, -q, -s, -v, -w, -x
+- Allowed valued flags: --add-headers, --audio-format, --audio-quality, --batch-file, --bidi-workaround, --break-match-filter, --break-on-existing, --break-per-input, --buffer-size, --cache-dir, --client-certificate, --client-certificate-key, --client-certificate-password, --compat-options, --concurrent-fragments, --convert-subs, --convert-thumbnails, --cookies, --cookies-from-browser, --cookies-from-firefox, --credentials, --datebefore, --dateafter, --download-archive, --download-sections, --encoding, --extractor-args, --extractor-retries, --ffmpeg-location, --file-access-retries, --fixup, --force-overwrites, --format, --format-sort, --format-sort-force, --fragment-retries, --geo-bypass, --geo-bypass-country, --geo-bypass-ip-block, --http-chunk-size, --id, --impersonate, --limit-rate, --load-info-json, --match-filter, --match-title, --max-downloads, --max-filesize, --max-sleep-interval, --merge-output-format, --min-filesize, --min-sleep-interval, --netrc-location, --no-allow-unplayable-formats, --output, --output-na-placeholder, --paths, --password, --playlist-end, --playlist-items, --playlist-start, --port, --print, --proxy, --recode-video, --referer, --reject-title, --remux-video, --rendezvous, --retries, --retry-sleep, --rm-cache-dir, --socket-timeout, --source-address, --sponsorblock-api, --sponsorblock-chapter-title, --sponsorblock-mark, --sponsorblock-remove, --sub-format, --sub-langs, --sub-format-fallback, --throttled-rate, --trim-filenames, --twofactor, --user-agent, --username, --video-multistreams, --video-password, --wait-for-video, --write-pages, --xff, -N, -P, -R, -S, -T, -a, -f, -o, -p, -r, -t, -u
+
+**Examples:**
+
+- `yt-dlp https://example.com/v`
+- `yt-dlp -f best https://example.com/v`
+- `yt-dlp -x --audio-format mp3 https://example.com/v`
+- `yt-dlp --write-subs --sub-langs en https://example.com/v`
+- `yt-dlp -o 'out.%(ext)s' https://example.com/v`
+- `yt-dlp --download-archive done.txt https://example.com/p`
+- `yt-dlp -F https://example.com/v`
+- `yt-dlp --proxy http://proxy:8080 https://example.com/v`
+- `youtube-dl https://example.com/v`
 
 ### `ytt`
 <p class="cmd-url"><a href="https://carvel.dev/ytt/">https://carvel.dev/ytt/</a></p>
