@@ -10642,9 +10642,25 @@ Aliases: `python`
 ### `qpdf`
 <p class="cmd-url"><a href="https://qpdf.readthedocs.io/en/stable/cli.html">https://qpdf.readthedocs.io/en/stable/cli.html</a></p>
 
-- Allowed standalone flags: --allow-weak-crypto, --check, --check-linearization, --coalesce-contents, --collate, --compress-streams, --compression-level, --copy-encryption, --decrypt, --deterministic-id, --disable-signature-verification, --empty, --encryption-file-password, --externalize-inline-images, --filtered-stream-data, --flatten-annotations, --flatten-rotation, --force-version, --generate-appearances, --help, --ignore-xref-streams, --in-place, --keep-files-open, --keep-files-open-threshold, --keep-inline-images, --linearize, --list-attachments, --newline-before-endstream, --no-original-object-ids, --no-warn, --normalize-content, --oi-min-area, --oi-min-height, --oi-min-width, --optimize-images, --password-is-hex-key, --password-mode, --preserve-unreferenced, --preserve-unreferenced-resources, --qdf, --raw-stream-data, --recompress-flate, --remove-attachment, --remove-page-labels, --remove-restrictions, --remove-unreferenced-resources, --replace-input, --report-mem-usage, --requires-password, --show-encryption, --show-encryption-key, --show-linearization, --show-npages, --show-pages, --show-xref, --split-pages, --static-aes-iv, --static-id, --suppress-password-recovery, --suppress-recovery, --underlay, --verbose, --version, --warning-exit-0, -h
-- Allowed valued flags: --add-attachment, --allow-insecure, --certificate, --copy-attachments-from, --decode-level, --encrypt, --externalize-inline-images, --job-json, --job-json-file, --object-streams, --overlay, --pages, --password, --password-file, --password-mode, --rotate, --show-attachment, --show-object, --split-pages, --stream-data, --update-from-json
+- Allowed standalone flags: --allow-weak-crypto, --check, --check-linearization, --coalesce-contents, --collate, --compress-streams, --compression-level, --copy-encryption, --copyright, --decrypt, --deterministic-id, --disable-signature-verification, --empty, --encryption-file-password, --externalize-inline-images, --filtered-stream-data, --flatten-annotations, --flatten-rotation, --force-version, --generate-appearances, --help, --ignore-xref-streams, --in-place, --is-encrypted, --job-json-help, --json-help, --keep-files-open, --keep-files-open-threshold, --keep-inline-images, --linearize, --list-attachments, --newline-before-endstream, --no-original-object-ids, --no-warn, --normalize-content, --oi-min-area, --oi-min-height, --oi-min-width, --optimize-images, --password-is-hex-key, --password-mode, --preserve-unreferenced, --preserve-unreferenced-resources, --qdf, --raw-stream-data, --recompress-flate, --remove-attachment, --remove-page-labels, --remove-restrictions, --remove-unreferenced-resources, --replace-input, --report-mem-usage, --requires-password, --show-crypto, --show-encryption, --show-encryption-key, --show-linearization, --show-npages, --show-pages, --show-xref, --split-pages, --static-aes-iv, --static-id, --suppress-password-recovery, --suppress-recovery, --test-json-schema, --underlay, --verbose, --version, --warning-exit-0, --with-images, --zopfli, -h
+- Allowed valued flags: --add-attachment, --allow-insecure, --certificate, --copy-attachments-from, --decode-level, --encrypt, --externalize-inline-images, --help, --job-json, --job-json-file, --json-key, --json-object, --json-stream-prefix, --linearize-pass1, --object-streams, --overlay, --pages, --password, --password-file, --password-mode, --rotate, --show-attachment, --show-object, --split-pages, --stream-data, --update-from-json
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `qpdf --help`
+- `qpdf --help=all`
+- `qpdf --help=encryption`
+- `qpdf --copyright`
+- `qpdf --show-crypto`
+- `qpdf --is-encrypted in.pdf`
+- `qpdf --json-help`
+- `qpdf --job-json-help`
+- `qpdf --zopfli`
+- `qpdf in.pdf out.pdf`
+- `qpdf --linearize in.pdf out.pdf`
+- `qpdf --show-pages --with-images in.pdf`
+- `qpdf --json-key=pages --json-key=encrypt in.pdf`
 
 ### `qsv`
 <p class="cmd-url"><a href="https://github.com/jqnatividad/qsv">https://github.com/jqnatividad/qsv</a></p>

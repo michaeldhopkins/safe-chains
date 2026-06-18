@@ -1,8 +1,8 @@
 [[command]]
 name = "qpdf"
-description = "QPDF — PDF transformation library / CLI. Reads a PDF and writes the transformed output. --check, --show-encryption, --show-pages, --show-object, --json (read forms). --linearize, --encrypt, --decrypt, --pages, --rotate, --object-streams, --remove-restrictions write a new file."
+description = "QPDF — PDF transformation library / CLI. Reads a PDF and writes the transformed output. Inspection forms: --check, --show-encryption, --show-pages, --show-object, --json, --is-encrypted, --requires-password, --copyright, --show-crypto, --json-help, --job-json-help, --zopfli. Transformation forms: --linearize, --encrypt, --decrypt, --pages, --rotate, --object-streams, --remove-restrictions, --replace-input. The `--help` flag accepts a topic selector (`--help=encryption`, `--help=all`, etc.) for focused help output."
 url = "https://qpdf.readthedocs.io/en/stable/cli.html"
-researched_version = "qpdf 12.x"
+researched_version = "qpdf 12.2.0"
 level = "SafeWrite"
 bare = false
 tolerate_unknown_short = true
@@ -10,12 +10,16 @@ standalone = [
     "--allow-weak-crypto", "--check", "--check-linearization",
     "--coalesce-contents", "--collate", "--compress-streams",
     "--compression-level", "--copy-encryption",
+    "--copyright",
     "--decrypt", "--deterministic-id",
     "--disable-signature-verification", "--empty",
     "--encryption-file-password", "--externalize-inline-images",
     "--filtered-stream-data", "--flatten-annotations",
     "--flatten-rotation", "--force-version", "--generate-appearances",
     "--help", "--ignore-xref-streams", "--in-place",
+    "--is-encrypted",
+    "--job-json-help",
+    "--json-help",
     "--keep-files-open", "--keep-files-open-threshold",
     "--keep-inline-images", "--linearize", "--list-attachments",
     "--newline-before-endstream", "--no-original-object-ids",
@@ -29,13 +33,18 @@ standalone = [
     "--remove-restrictions", "--remove-unreferenced-resources",
     "--replace-input", "--report-mem-usage",
     "--requires-password",
+    "--show-crypto",
     "--show-encryption", "--show-encryption-key",
     "--show-linearization", "--show-npages",
     "--show-pages",
     "--show-xref", "--split-pages", "--static-aes-iv",
     "--static-id", "--suppress-password-recovery",
-    "--suppress-recovery", "--underlay",
+    "--suppress-recovery",
+    "--test-json-schema",
+    "--underlay",
     "--verbose", "--version", "--warning-exit-0",
+    "--with-images",
+    "--zopfli",
     "-h",
 ]
 # Strictly-valued flags. Several of these were previously also
@@ -47,10 +56,28 @@ valued = [
     "--add-attachment", "--allow-insecure",
     "--certificate", "--copy-attachments-from",
     "--decode-level", "--encrypt", "--externalize-inline-images",
+    "--help",
     "--job-json", "--job-json-file",
+    "--json-key", "--json-object", "--json-stream-prefix",
+    "--linearize-pass1",
     "--object-streams", "--overlay", "--pages",
     "--password", "--password-file", "--password-mode",
     "--rotate", "--show-attachment", "--show-object",
     "--split-pages", "--stream-data",
     "--update-from-json",
+]
+examples_safe = [
+    "qpdf --help",
+    "qpdf --help=all",
+    "qpdf --help=encryption",
+    "qpdf --copyright",
+    "qpdf --show-crypto",
+    "qpdf --is-encrypted in.pdf",
+    "qpdf --json-help",
+    "qpdf --job-json-help",
+    "qpdf --zopfli",
+    "qpdf in.pdf out.pdf",
+    "qpdf --linearize in.pdf out.pdf",
+    "qpdf --show-pages --with-images in.pdf",
+    "qpdf --json-key=pages --json-key=encrypt in.pdf",
 ]
