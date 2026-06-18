@@ -498,6 +498,8 @@
 ### `toolbox`
 <p class="cmd-url"><a href="https://github.com/containers/toolbox">https://github.com/containers/toolbox</a></p>
 
+Aliases: `toolbx`
+
 - **help**: Positional args accepted
 - **list**: Flags: --containers, --help, --images, -c, -h, -i
 - **ls**: Flags: --containers, --help, --images, -c, -h, -i
