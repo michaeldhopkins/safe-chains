@@ -1,0 +1,99 @@
+[[command]]
+name = "sem"
+description = "Semantic version control CLI from Ataraxy-Labs — operates on a git repository like git itself, but at the level of code entities (functions / classes / methods) extracted via tree-sitter (26 languages). Subcommands include `diff` (entity-level diff between commits / against staged), `blame` (per-entity attribution), `log` (commit history filtered to a single entity), `impact` (downstream dependents / dependent tests of an entity), `entities` (list all entities in a path), and `context` (assemble entity-centric context for an LLM). All of these read the git history through the in-process git2 library — no shell-out to git, no language servers, no network. `setup` registers sem as the configured git differ and installs a pre-commit hook; `unsetup` removes them. `mcp` launches a Model Context Protocol server (long-running daemon) so AI agents can call sem over MCP. `update` self-replaces the installed `sem` binary."
+url = "https://github.com/Ataraxy-Labs/sem"
+researched_version = "sem 0.13.0 (2026-06-17)"
+bare_flags = ["--help", "--version"]
+examples_safe = [
+    "sem --version",
+    "sem diff",
+    "sem diff --staged",
+    "sem diff --commit HEAD~5",
+    "sem diff --from main --to HEAD --format json",
+    "sem blame src/auth.ts",
+    "sem log my_function --limit 20",
+    "sem impact my_function --tests --json",
+    "sem entities src/",
+    "sem context my_function --budget 4000",
+]
+examples_denied = [
+    "sem setup",
+    "sem unsetup",
+    "sem mcp",
+]
+
+[[command.sub]]
+name = "diff"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--json", "--staged",
+    "--verbose", "-v",
+]
+valued = [
+    "--commit", "--file-exts",
+    "--format", "--from", "--to",
+]
+
+[[command.sub]]
+name = "blame"
+level = "Inert"
+bare = false
+standalone = ["--help", "--json"]
+
+[[command.sub]]
+name = "log"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--json",
+    "--verbose", "-v",
+]
+valued = ["--limit"]
+
+[[command.sub]]
+name = "impact"
+level = "Inert"
+bare = false
+standalone = [
+    "--dependents", "--deps",
+    "--help", "--json",
+    "--no-default-excludes",
+    "--tests",
+]
+valued = ["--file"]
+
+[[command.sub]]
+name = "entities"
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--json",
+    "--no-default-excludes",
+]
+
+[[command.sub]]
+name = "context"
+level = "Inert"
+bare = false
+standalone = [
+    "--help", "--json",
+    "--no-default-excludes",
+]
+valued = ["--budget"]
+
+[[command.sub]]
+name = "setup"
+candidate = true
+
+[[command.sub]]
+name = "unsetup"
+candidate = true
+
+[[command.sub]]
+name = "mcp"
+candidate = true
+
+[[command.sub]]
+name = "update"
+candidate = true
