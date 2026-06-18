@@ -1399,6 +1399,30 @@ Aliases: `python`
 - Allowed standalone flags: --help, --no-color, --no-maskSecrets, --no-terminalLink, --profile, --version, -h
 - Allowed valued flags: --format, --locale, --secretlintignore, --secretlintrc, --secretlintrcJSON
 
+### `sem`
+<p class="cmd-url"><a href="https://github.com/Ataraxy-Labs/sem">https://github.com/Ataraxy-Labs/sem</a></p>
+
+- **blame**: Flags: --help, --json
+- **context**: Flags: --help, --json, --no-default-excludes. Valued: --budget
+- **diff**: Flags: --help, --json, --staged, --verbose, -v. Valued: --commit, --file-exts, --format, --from, --to
+- **entities**: Flags: --help, --json, --no-default-excludes
+- **impact**: Flags: --dependents, --deps, --help, --json, --no-default-excludes, --tests. Valued: --file
+- **log**: Flags: --help, --json, --verbose, -v. Valued: --limit
+- Allowed standalone flags: --help, --version
+
+**Examples:**
+
+- `sem --version`
+- `sem diff`
+- `sem diff --staged`
+- `sem diff --commit HEAD~5`
+- `sem diff --from main --to HEAD --format json`
+- `sem blame src/auth.ts`
+- `sem log my_function --limit 20`
+- `sem impact my_function --tests --json`
+- `sem entities src/`
+- `sem context my_function --budget 4000`
+
 ### `semgrep`
 <p class="cmd-url"><a href="https://semgrep.dev/docs/cli-reference/">https://semgrep.dev/docs/cli-reference/</a></p>
 
