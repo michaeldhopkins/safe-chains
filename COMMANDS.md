@@ -4203,6 +4203,16 @@ Aliases: `fly`
 - **version**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
+### `fm`
+<p class="cmd-url"><a href="https://developer.apple.com/documentation/FoundationModels">https://developer.apple.com/documentation/FoundationModels</a></p>
+
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `fm --version`
+- `fm --help`
+
 ### `fmt`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#fmt-invocation</a></p>
 
