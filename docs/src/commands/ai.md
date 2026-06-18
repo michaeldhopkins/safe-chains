@@ -102,6 +102,16 @@ Aliases: `antigravity`
 - **sandbox**: Positional args accepted
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `fm`
+<p class="cmd-url"><a href="https://developer.apple.com/documentation/FoundationModels">https://developer.apple.com/documentation/FoundationModels</a></p>
+
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `fm --version`
+- `fm --help`
+
 ### `llm`
 <p class="cmd-url"><a href="https://llm.datasette.io/en/stable/">https://llm.datasette.io/en/stable/</a></p>
 

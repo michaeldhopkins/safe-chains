@@ -1,0 +1,47 @@
+[[command]]
+name = "fm"
+description = "Apple's first-party `fm` CLI for the Foundation Models framework — announced at WWDC 2026, shipping pre-installed on macOS 27. Runs on-device against Apple Intelligence's Neural Engine models with no network round-trip to Apple servers for inference. Subcommand surface as documented in the WWDC 2026 session: `respond` issues a single prompt and prints the completion to stdout (piping-friendly), `chat` opens an interactive REPL with session save / resume, `serve` starts an OpenAI Chat Completions-compatible HTTP server, `schema` generates a JSON schema for structured output, `token-count` reports the token count of a prompt, `available` lists installed models, `quota-usage` reports the per-process inference budget. Tool-calling is supported through the framework but only over an in-process Swift API — the CLI itself does not provide a flag that lets the model spawn shell commands. The `chat` REPL is interactive and the `serve` HTTP daemon is long-running and binds a TCP port. The `respond` / `available` / `token-count` / `quota-usage` / `schema` forms are short-lived, on-device, and intended for unattended use. The binary is not shipping yet on macOS 26.x; this entry records the announced surface so the eventual classification can be made against verified behaviour rather than from scratch."
+url = "https://developer.apple.com/documentation/FoundationModels"
+researched_version = "fm (macOS 27 / WWDC 2026 announcement; binary not yet shipping on macOS 26.x)"
+bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "fm --version",
+    "fm --help",
+]
+examples_denied = [
+    "fm respond 'hi'",
+    "fm chat",
+    "fm serve",
+    "fm schema",
+    "fm token-count",
+    "fm available",
+    "fm quota-usage",
+]
+
+[[command.sub]]
+name = "respond"
+candidate = true
+
+[[command.sub]]
+name = "chat"
+candidate = true
+
+[[command.sub]]
+name = "serve"
+candidate = true
+
+[[command.sub]]
+name = "schema"
+candidate = true
+
+[[command.sub]]
+name = "token-count"
+candidate = true
+
+[[command.sub]]
+name = "available"
+candidate = true
+
+[[command.sub]]
+name = "quota-usage"
+candidate = true
