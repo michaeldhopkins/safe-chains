@@ -3,6 +3,8 @@
 ### `agy`
 <p class="cmd-url"><a href="https://antigravity.google/docs/cli-overview">https://antigravity.google/docs/cli-overview</a></p>
 
+Aliases: `antigravity`
+
 - **changelog**: Flags: --help, -h
 - **help**: Positional args accepted
 - **plugin list**: Flags: --help, -h
@@ -10,6 +12,17 @@
 - **plugins list**: Flags: --help, -h
 - **plugins**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `agy --version`
+- `agy --help`
+- `agy changelog`
+- `agy help`
+- `agy help plugin`
+- `agy plugin list`
+- `agy plugins list`
+- `antigravity --version`
 
 ### `aider`
 <p class="cmd-url"><a href="https://aider.chat/docs/">https://aider.chat/docs/</a></p>
