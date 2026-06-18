@@ -1,9 +1,28 @@
 [[command]]
 name = "agy"
-description = "Google's Antigravity CLI — a terminal coding agent that reads, edits, and executes code through a multi-step reasoning loop. The bare invocation opens an interactive TUI that runs the agent against the current workspace; `-p/--print` runs it non-interactively against a single prompt. Both forms execute arbitrary code via tool calls. The `changelog` and `plugin list` (alias `plugins list`) subcommands are read-only views over locally cached state; `help [topic]` prints documentation; `install`/`update`/`plugin install`/`plugin uninstall`/`plugin enable`/`plugin disable` modify environment, the binary, or plugin state. Released as v1.0.0 in late 2025 and shipping point releases roughly monthly; the surface is still stabilizing."
+aliases = ["antigravity"]
+description = "Google's Antigravity CLI — a terminal coding agent that reads, edits, and executes code through a multi-step reasoning loop. The bare invocation opens an interactive TUI that runs the agent against the current workspace; `-p/--print` runs it non-interactively against a single prompt. Both forms execute arbitrary code via tool calls. The `changelog` and `plugin list` (alias `plugins list`) subcommands are read-only views over locally cached state; `help [topic]` prints documentation; `install`/`update`/`plugin install`/`plugin uninstall`/`plugin enable`/`plugin disable` modify environment, the binary, or plugin state; `models` is documented as listing available AI models but reaches Google's auth refresh and quota endpoints; the precise network behaviour and what it persists locally have not been independently verified yet. Released as v1.0.0 in late 2025 and shipping point releases roughly monthly; the surface is still stabilizing."
 url = "https://antigravity.google/docs/cli-overview"
 researched_version = "agy 1.0.4 (2026)"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "agy --version",
+    "agy --help",
+    "agy changelog",
+    "agy help",
+    "agy help plugin",
+    "agy plugin list",
+    "agy plugins list",
+    "antigravity --version",
+]
+examples_denied = [
+    "agy -p 'write code'",
+    "agy install",
+    "agy update",
+    "agy models",
+    "agy plugin install foo",
+    "agy plugin enable foo",
+]
 
 [[command.sub]]
 name = "changelog"
@@ -50,4 +69,8 @@ candidate = true
 
 [[command.sub]]
 name = "update"
+candidate = true
+
+[[command.sub]]
+name = "models"
 candidate = true
