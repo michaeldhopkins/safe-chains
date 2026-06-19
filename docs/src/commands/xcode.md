@@ -127,7 +127,57 @@
 ### `simctl`
 <p class="cmd-url"><a href="https://developer.apple.com/documentation/xcode/simctl">https://developer.apple.com/documentation/xcode/simctl</a></p>
 
+- **addmedia**: Flags: --help, -h
+- **appinfo**: Flags: --help, -h
+- **boot**: Flags: --help, -h. Valued: --arch
+- **clone**: Flags: --help, -h
+- **create**: Flags: --help, -h
+- **delete**: Flags: --help, -h
+- **erase**: Flags: --help, -h
+- **getenv**: Flags: --help, -h
+- **icloud_sync**: Flags: --help, -h
+- **install**: Flags: --help, -h
+- **keyboard**: Flags: --help, -h
+- **keychain**: Flags: --help, -h
+- **launch**: Flags: --console, --console-pty, --help, --stdout, --stderr, --terminate-running-process, --wait-for-debugger, -h
 - **list**: Flags: --help, --json, --verbose, -h, -j, -v
+- **openurl**: Flags: --help, -h
+- **pair**: Flags: --help, -h
+- **privacy**: Flags: --help, -h
+- **push**: Flags: --help, -h
+- **rename**: Flags: --help, -h
+- **shutdown**: Flags: --help, -h
+- **status_bar**: Flags: --help, -h. Valued: --batteryLevel, --batteryState, --cellularBars, --cellularMode, --dataNetwork, --operatorName, --time, --wifiBars, --wifiMode
+- **terminate**: Flags: --help, -h
+- **ui**: Flags: --help, -h
+- **uninstall**: Flags: --help, -h
+- **unpair**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `simctl list`
+- `simctl list devices`
+- `simctl list runtimes --json`
+- `simctl getenv booted HOME`
+- `simctl boot 'iPhone 15'`
+- `simctl shutdown all`
+- `simctl shutdown booted`
+- `simctl erase all`
+- `simctl erase 'iPhone 15'`
+- `simctl install booted MyApp.app`
+- `simctl uninstall booted com.example.app`
+- `simctl launch booted com.example.app`
+- `simctl launch --console-pty booted com.example.app`
+- `simctl terminate booted com.example.app`
+- `simctl openurl booted https://example.com`
+- `simctl addmedia booted photo.jpg`
+- `simctl push booted com.example.app push.json`
+- `simctl status_bar booted clear`
+- `simctl appinfo booted com.example.app`
+- `simctl create 'iPhone 15 Test' 'iPhone 15'`
+- `simctl clone 'iPhone 15' 'iPhone 15 Test'`
+- `simctl delete unavailable`
 
 ### `spctl`
 <p class="cmd-url"><a href="https://ss64.com/mac/spctl.html">https://ss64.com/mac/spctl.html</a></p>
