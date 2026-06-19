@@ -14451,11 +14451,22 @@ Aliases: `gwhoami`
 - **--show-sdk-platform-version**: Positional args accepted
 - **--show-sdk-version**: Positional args accepted
 - **--show-toolchain-path**: Positional args accepted
-- **notarytool history**: Positional args accepted
-- **notarytool info**: Positional args accepted
-- **notarytool log**: Positional args accepted
-- **simctl list**: Positional args accepted
-- **stapler validate**: Positional args accepted
+- **actool**: delegates to inner command
+- **agvtool**: delegates to inner command
+- **codesign**: delegates to inner command
+- **ibtool**: delegates to inner command
+- **lipo**: delegates to inner command
+- **pkgutil**: delegates to inner command
+- **plutil**: delegates to inner command
+- **simctl**: delegates to inner command
+- **spctl**: delegates to inner command
+- **stapler**: delegates to inner command
+- **swift**: delegates to inner command
+- **xcodebuild**: delegates to inner command
+- **xcresulttool**: delegates to inner command
+- **xctest**: delegates to inner command
+- **xctrace**: delegates to inner command
+- Allowed standalone flags: --help, -h
 
 ### `xctest`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xctest.1.html">https://keith.github.io/xcode-man-pages/xctest.1.html</a></p>

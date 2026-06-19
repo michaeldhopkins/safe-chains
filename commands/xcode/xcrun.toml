@@ -1,8 +1,9 @@
 [[command]]
 name = "xcrun"
-description = "macOS developer tool dispatcher that locates and executes tools within the active Xcode toolchain. The query flags (--find, --show-sdk-path, --show-sdk-version, --show-sdk-build-version, --show-sdk-platform-path, --show-sdk-platform-version, --show-toolchain-path) are read-only — they print paths or version strings. When used as a wrapper (xcrun <tool> ...), it exec's the inner tool, so safety depends entirely on the delegated command. --sdk and --toolchain select which toolchain to search. Part of Xcode command-line tools; versioning follows Xcode releases."
+description = "macOS developer tool dispatcher that locates and executes tools within the active Xcode toolchain. The query flags (--find, --show-sdk-path, --show-sdk-version, --show-sdk-build-version, --show-sdk-platform-path, --show-sdk-platform-version, --show-toolchain-path) are read-only — they print paths or version strings. When used as a wrapper (`xcrun <tool> ...`), it exec's the inner tool, so safety is delegated to that tool's allowlist. --sdk and --toolchain select which toolchain to search. Part of Xcode command-line tools; versioning follows Xcode releases."
 url = "https://ss64.com/mac/xcrun.html"
-bare_flags = []
+researched_version = "Xcode 16 / xcrun 16.x"
+bare_flags = ["--help", "-h"]
 [command.wrapper]
 standalone = ["-l", "-n", "-v", "--log", "--no-cache", "--verbose"]
 valued = ["--sdk", "--toolchain"]
@@ -44,30 +45,73 @@ tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
+name = "xcodebuild"
+delegate_skip = 0
+
+[[command.sub]]
+name = "swift"
+delegate_skip = 0
+
+[[command.sub]]
 name = "simctl"
-[[command.sub.sub]]
-name = "list"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+delegate_skip = 0
+
+[[command.sub]]
+name = "actool"
+delegate_skip = 0
+
+[[command.sub]]
+name = "agvtool"
+delegate_skip = 0
+
+[[command.sub]]
+name = "codesign"
+delegate_skip = 0
+
+[[command.sub]]
+name = "ibtool"
+delegate_skip = 0
+
+[[command.sub]]
+name = "lipo"
+delegate_skip = 0
+
+[[command.sub]]
+name = "pkgutil"
+delegate_skip = 0
+
+[[command.sub]]
+name = "plutil"
+delegate_skip = 0
+
+[[command.sub]]
+name = "spctl"
+delegate_skip = 0
 
 [[command.sub]]
 name = "stapler"
-[[command.sub.sub]]
-name = "validate"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+delegate_skip = 0
+
+[[command.sub]]
+name = "xcresulttool"
+delegate_skip = 0
+
+[[command.sub]]
+name = "xctest"
+delegate_skip = 0
+
+[[command.sub]]
+name = "xctrace"
+delegate_skip = 0
+
+[[command.sub]]
+name = "altool"
+candidate = true
 
 [[command.sub]]
 name = "notarytool"
-[[command.sub.sub]]
-name = "history"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
-[[command.sub.sub]]
-name = "info"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
-[[command.sub.sub]]
-name = "log"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+candidate = true
+
+[[command.sub]]
+name = "iphoneos"
+candidate = true
