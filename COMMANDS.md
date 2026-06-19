@@ -365,6 +365,38 @@ Aliases: `antigravity`
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+### `allume`
+<p class="cmd-url"><a href="https://museapp.com/cli-setup/">https://museapp.com/cli-setup/</a></p>
+
+Aliases: `muse`
+
+- **board-content**: Flags: --help, -h
+- **board-create**: Flags: --help, -h. Valued: --workspace
+- **card-content**: Flags: --help, -h
+- **card-move**: Flags: --help, -h
+- **delete**: Flags: --help, -h
+- **list-workspaces**: Flags: --help, -h
+- **note-create**: Flags: --help, -h. Valued: --board, --workspace
+- **open**: Flags: --help, -h
+- **search**: Flags: --help, -h. Valued: --workspace, --type
+- **url-create**: Flags: --help, -h. Valued: --board, --workspace
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `allume --version`
+- `allume list-workspaces`
+- `allume search 'kanban'`
+- `allume board-content abc123`
+- `allume card-content xyz789`
+- `allume open card xyz789`
+- `allume note-create 'Quick note'`
+- `allume url-create https://example.com`
+- `allume board-create 'New Project'`
+- `allume card-move xyz789 def456`
+- `allume delete card xyz789`
+- `muse list-workspaces`
+
 ### `ameba`
 <p class="cmd-url"><a href="https://github.com/crystal-ameba/ameba">https://github.com/crystal-ameba/ameba</a></p>
 
