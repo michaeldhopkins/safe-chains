@@ -14295,8 +14295,23 @@ Aliases: `gwhoami`
 <p class="cmd-url"><a href="https://github.com/yonaskolb/XcodeGen">https://github.com/yonaskolb/XcodeGen</a></p>
 
 - **dump**: Flags: --help, --no-env, --quiet, -h, -n, -q. Valued: --project-root, --spec, --type, -r, -s, -t
+- **generate**: Flags: --help, --no-env, --only-plists, --quiet, --use-cache, -c, -h, -n, -q. Valued: --cache-path, --project, --project-root, --spec, -p, -r, -s
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `xcodegen --version`
+- `xcodegen --help`
+- `xcodegen generate`
+- `xcodegen generate --spec project.yml`
+- `xcodegen generate -s project.yml -p out/`
+- `xcodegen generate --quiet --use-cache`
+- `xcodegen generate --only-plists`
+- `xcodegen generate --no-env`
+- `xcodegen dump`
+- `xcodegen dump --spec project.yml --type json`
+- `xcodegen version`
 
 ### `xcresulttool`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xcresulttool.1.html">https://keith.github.io/xcode-man-pages/xcresulttool.1.html</a></p>

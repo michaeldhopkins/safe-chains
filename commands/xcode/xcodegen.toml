@@ -1,14 +1,58 @@
 [[command]]
 name = "xcodegen"
-description = "Generates Xcode project files (.xcodeproj) from a YAML or JSON project specification. The dump subcommand is read-only — it parses the spec and prints the resolved project configuration to stdout without creating any files. The generate subcommand (default action) writes a .xcodeproj to disk, which is a local write operation. No network access. The project sees periodic releases (several per year) tracking Xcode and Swift evolution."
+description = "Generates Xcode project files (.xcodeproj) from a YAML or JSON project specification. The `generate` subcommand (the default if no sub is given) parses `project.yml`, writes the resolved `.xcodeproj` to disk, and optionally caches the result under `~/.xcodegen/cache/`. The spec language exposes `preGenCommand` / `postGenCommand` hooks that xcodegen invokes as shell commands before / after generation; this is intended for things like running `mint bootstrap` or regenerating string catalogs, and is no more privileged than the project's own build phases — the user controls the YAML. The `dump` subcommand is read-only: it parses the spec and prints the resolved project configuration to stdout without creating any files. `version` prints the version string. No network access. The project sees periodic releases (xcodegen 2.45.x tracks Xcode 16 / Swift 6)."
 url = "https://github.com/yonaskolb/XcodeGen"
+researched_version = "xcodegen 2.45.4"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "xcodegen --version",
+    "xcodegen --help",
+    "xcodegen generate",
+    "xcodegen generate --spec project.yml",
+    "xcodegen generate -s project.yml -p out/",
+    "xcodegen generate --quiet --use-cache",
+    "xcodegen generate --only-plists",
+    "xcodegen generate --no-env",
+    "xcodegen dump",
+    "xcodegen dump --spec project.yml --type json",
+    "xcodegen version",
+]
+examples_denied = [
+    "xcodegen evil-sub",
+    "xcodegen generate --evil",
+]
+
+[[command.sub]]
+name = "generate"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--help", "--no-env", "--only-plists",
+    "--quiet", "--use-cache",
+    "-c", "-h", "-n", "-q",
+]
+valued = [
+    "--cache-path", "--project",
+    "--project-root", "--spec",
+    "-p", "-r", "-s",
+]
 
 [[command.sub]]
 name = "dump"
-standalone = ["--help", "--no-env", "--quiet", "-h", "-n", "-q"]
-valued = ["--project-root", "--spec", "--type", "-r", "-s", "-t"]
+level = "Inert"
+bare = true
+standalone = [
+    "--help", "--no-env",
+    "--quiet",
+    "-h", "-n", "-q",
+]
+valued = [
+    "--project-root", "--spec", "--type",
+    "-r", "-s", "-t",
+]
 
 [[command.sub]]
 name = "version"
+level = "Inert"
+bare = true
 standalone = ["--help", "-h"]
