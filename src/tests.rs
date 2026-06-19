@@ -1196,7 +1196,7 @@ denied! {
     safe_chains_bare: "safe-chains",
     safe_chains_opencode_config: "safe-chains --opencode-config",
     safe_chains_generate_book: "safe-chains --generate-book",
-    safe_chains_two_positionals: "safe-chains 'foo' 'bar'",
+    safe_chains_three_positionals: "safe-chains 'foo' 'bar' 'baz'",
 
     tabs_unknown_flag: "tabs --evil",
     tabs_two_positionals: "tabs 1,5 9,13",
