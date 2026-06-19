@@ -13547,7 +13547,12 @@ Aliases: `gtty`
 ### `tuist`
 <p class="cmd-url"><a href="https://docs.tuist.dev/en/cli/">https://docs.tuist.dev/en/cli/</a></p>
 
+- **build**: Flags: --build-output-path, --clean, --generate, --help, --no-binary-cache, --no-clean, --rosetta, --skip-signing, --verbose, -h. Valued: --configuration, --derived-data-path, --destination, --device, --os, --passthrough-xcodebuild-arguments, --path, --platform, --scheme, -c, -p
+- **clean**: Flags: --help, --verbose, -h. Valued: --path, -p
 - **dump**: Flags: --help, --json, --verbose, -h. Valued: --path, -p
+- **edit**: Flags: --help, --permanent, --verbose, -h, -P. Valued: --path, -p
+- **fetch**: Flags: --help, --update, --verbose, -h. Valued: --path, -p
+- **generate**: Flags: --binary-cache, --help, --json, --no-binary-cache, --no-open, --open, --verbose, -h. Valued: --configuration, --destination, --device, --os, --path, --platform, --rosetta, -c, -p
 - **graph**: Flags: --help, --json, --verbose, -h. Valued: --format, --path, -f, -p
 - **hash cache**: Flags: --help, --json, --verbose, -h. Valued: --path, -p
 - **hash selective-testing**: Flags: --help, --json, --verbose, -h. Valued: --path, -p
@@ -13557,11 +13562,34 @@ Aliases: `gtty`
 - **inspect implicit-imports**: Flags: --help, --json, --verbose, -h. Valued: --path, -p
 - **inspect redundant-imports**: Flags: --help, --json, --verbose, -h. Valued: --path, -p
 - **inspect test**: Flags: --help, --json, --verbose, -h. Valued: --path, -p
+- **install**: Flags: --help, --update, --verbose, -h. Valued: --path, -p
 - **migration check-empty-settings**: Flags: --help, -h. Valued: --path, -p
 - **migration list-targets**: Flags: --help, -h. Valued: --path, -p
 - **scaffold list**: Flags: --help, --json, -h. Valued: --path, -p
+- **test**: Flags: --clean, --generate, --help, --ignore-binary-cache, --no-binary-cache, --no-clean, --no-selective-testing, --no-upload-results, --rosetta, --skip-signing, --skip-ui-tests, --verbose, --without-selective-testing, -h. Valued: --configuration, --derived-data-path, --destination, --device, --os, --passthrough-xcodebuild-arguments, --path, --platform, --result-bundle-path, --retry-count, --scheme, --skip-test-targets, --test-plan, --test-targets, -c, -p
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `tuist --version`
+- `tuist version`
+- `tuist generate`
+- `tuist generate --no-open`
+- `tuist generate --no-open -p .`
+- `tuist generate App Watch`
+- `tuist build`
+- `tuist build MyTarget --configuration Release`
+- `tuist test`
+- `tuist test --skip-ui-tests`
+- `tuist clean`
+- `tuist clean dependencies manifests`
+- `tuist install`
+- `tuist install --update`
+- `tuist edit`
+- `tuist dump`
+- `tuist graph --format json`
+- `tuist inspect dependencies`
 
 ### `turbo`
 <p class="cmd-url"><a href="https://turbo.build/repo/docs/reference/command-line-reference">https://turbo.build/repo/docs/reference/command-line-reference</a></p>

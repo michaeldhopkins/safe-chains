@@ -1,8 +1,33 @@
 [[command]]
 name = "tuist"
-description = "Xcode project generation and management platform that reads a Swift-based manifest and produces .xcodeproj/.xcworkspace files. Read-only subcommands (dump, graph, inspect, hash, migration check/list, scaffold list, version) analyze the project manifest without modifying it. Write subcommands (generate, edit, build, test, clean, fetch) create or modify Xcode projects, download dependencies, or invoke xcodebuild. fetch contacts the network to resolve Swift package dependencies. Tuist follows 6-week development cycles with frequent releases; the CLI surface is actively evolving."
+description = "Xcode project generation and management platform that reads a Swift-based manifest and produces .xcodeproj/.xcworkspace files. Read-only subcommands (dump, graph, inspect, hash, migration check/list, scaffold list, version) analyze the project manifest without modifying it. Write subcommands (generate, build, test, clean, install, edit, fetch) create or modify Xcode projects, download dependencies, or invoke xcodebuild. install and fetch contact the network to resolve Swift package and Tuist plugin dependencies. Tuist follows 6-week development cycles with frequent releases; the CLI surface is actively evolving."
 url = "https://docs.tuist.dev/en/cli/"
+researched_version = "Tuist 4.x"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "tuist --version",
+    "tuist version",
+    "tuist generate",
+    "tuist generate --no-open",
+    "tuist generate --no-open -p .",
+    "tuist generate App Watch",
+    "tuist build",
+    "tuist build MyTarget --configuration Release",
+    "tuist test",
+    "tuist test --skip-ui-tests",
+    "tuist clean",
+    "tuist clean dependencies manifests",
+    "tuist install",
+    "tuist install --update",
+    "tuist edit",
+    "tuist dump",
+    "tuist graph --format json",
+    "tuist inspect dependencies",
+]
+examples_denied = [
+    "tuist run MyApp",
+    "tuist cache warm",
+]
 
 [[command.sub]]
 name = "dump"
@@ -73,3 +98,126 @@ valued = ["--path", "-p"]
 [[command.sub]]
 name = "version"
 standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "generate"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--binary-cache", "--help", "--json",
+    "--no-binary-cache", "--no-open",
+    "--open", "--verbose",
+    "-h",
+]
+valued = [
+    "--configuration",
+    "--destination",
+    "--device",
+    "--os",
+    "--path",
+    "--platform",
+    "--rosetta",
+    "-c", "-p",
+]
+
+[[command.sub]]
+name = "build"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--build-output-path",
+    "--clean", "--generate",
+    "--help",
+    "--no-binary-cache", "--no-clean",
+    "--rosetta",
+    "--skip-signing",
+    "--verbose",
+    "-h",
+]
+valued = [
+    "--configuration",
+    "--derived-data-path",
+    "--destination",
+    "--device", "--os",
+    "--passthrough-xcodebuild-arguments",
+    "--path",
+    "--platform",
+    "--scheme",
+    "-c", "-p",
+]
+
+[[command.sub]]
+name = "test"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--clean", "--generate",
+    "--help",
+    "--ignore-binary-cache",
+    "--no-binary-cache",
+    "--no-clean",
+    "--no-selective-testing",
+    "--no-upload-results",
+    "--rosetta",
+    "--skip-signing",
+    "--skip-ui-tests",
+    "--verbose",
+    "--without-selective-testing",
+    "-h",
+]
+valued = [
+    "--configuration",
+    "--derived-data-path",
+    "--destination",
+    "--device", "--os",
+    "--passthrough-xcodebuild-arguments",
+    "--path",
+    "--platform",
+    "--result-bundle-path",
+    "--retry-count",
+    "--scheme",
+    "--skip-test-targets",
+    "--test-plan",
+    "--test-targets",
+    "-c", "-p",
+]
+
+[[command.sub]]
+name = "clean"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--verbose", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "install"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--update", "--verbose", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "edit"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--permanent", "--verbose", "-h", "-P"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "fetch"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--update", "--verbose", "-h"]
+valued = ["--path", "-p"]
+
+[[command.sub]]
+name = "run"
+candidate = true
+
+[[command.sub]]
+name = "cache"
+candidate = true
+
+[[command.sub]]
+name = "deploy"
+candidate = true
