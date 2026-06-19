@@ -1,8 +1,37 @@
 [[command]]
 name = "lipo"
-description = "macOS tool for creating and inspecting universal (fat) binaries containing multiple CPU architectures. The inspection flags (-info, -detailed_info, -archs, -verify_arch) are read-only — they print which architectures a binary contains. The creation/modification flags (-create, -thin, -extract, -remove, -replace, -output) produce or alter binary files. Entirely local; no network access. Part of Xcode command-line tools; versioning follows macOS/Xcode releases."
+description = "macOS tool for creating and inspecting universal (fat) binaries containing multiple CPU architectures. The inspection flags (-info, -detailed_info, -archs, -verify_arch) are read-only — they print which architectures a binary contains. The creation / modification flags (-create, -thin, -extract, -extract_family, -remove, -replace) produce or alter binary files; each requires `-output <path>` for the destination. Entirely local; no network access. The command ships at SafeWrite as a single allowlist entry because the read-only and write-side modes share a flag grammar — a hook configured at SafeRead and below will prompt on the inspection forms; promote to SafeWrite to skip the prompt. Part of Xcode command-line tools; versioning follows macOS/Xcode releases."
 url = "https://ss64.com/mac/lipo.html"
-level = "Inert"
+researched_version = "Xcode 16 / lipo 16.x"
+level = "SafeWrite"
 bare = false
-require_any = ["-archs", "-detailed_info", "-info", "-verify_arch"]
-standalone = ["-archs", "-detailed_info", "-info", "-verify_arch", "--help", "-h"]
+require_any = [
+    "-archs", "-create", "-detailed_info",
+    "-extract", "-extract_family", "-info",
+    "-remove", "-replace", "-thin",
+    "-verify_arch",
+]
+standalone = [
+    "-archs", "-create", "-detailed_info",
+    "-info", "-verify_arch",
+    "--help", "-h",
+]
+valued = [
+    "-arch", "-extract", "-extract_family",
+    "-output", "-remove", "-replace",
+    "-segalign", "-thin",
+]
+examples_safe = [
+    "lipo -info MyBinary",
+    "lipo -archs MyBinary",
+    "lipo -detailed_info MyBinary",
+    "lipo -verify_arch arm64 x86_64 MyBinary",
+    "lipo -create x86_64.o arm64.o -output universal.o",
+    "lipo MyBinary -thin arm64 -output arm64-only",
+    "lipo MyBinary -extract arm64 -output arm64.o",
+    "lipo MyBinary -remove arm64 -output without-arm64.o",
+]
+examples_denied = [
+    "lipo",
+    "lipo MyBinary",
+]
