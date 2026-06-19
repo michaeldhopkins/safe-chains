@@ -144,6 +144,38 @@
 - Allowed standalone flags: --armor, --decrypt, --encrypt, --help, --passphrase, --version, -a, -d, -e, -h, -p
 - Allowed valued flags: --identity, --output, --recipient, --recipients-file, -R, -i, -o, -r
 
+### `allume`
+<p class="cmd-url"><a href="https://museapp.com/cli-setup/">https://museapp.com/cli-setup/</a></p>
+
+Aliases: `muse`
+
+- **board-content**: Flags: --help, -h
+- **board-create**: Flags: --help, -h. Valued: --workspace
+- **card-content**: Flags: --help, -h
+- **card-move**: Flags: --help, -h
+- **delete**: Flags: --help, -h
+- **list-workspaces**: Flags: --help, -h
+- **note-create**: Flags: --help, -h. Valued: --board, --workspace
+- **open**: Flags: --help, -h
+- **search**: Flags: --help, -h. Valued: --workspace, --type
+- **url-create**: Flags: --help, -h. Valued: --board, --workspace
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `allume --version`
+- `allume list-workspaces`
+- `allume search 'kanban'`
+- `allume board-content abc123`
+- `allume card-content xyz789`
+- `allume open card xyz789`
+- `allume note-create 'Quick note'`
+- `allume url-create https://example.com`
+- `allume board-create 'New Project'`
+- `allume card-move xyz789 def456`
+- `allume delete card xyz789`
+- `muse list-workspaces`
+
 ### `ansible-lint`
 <p class="cmd-url"><a href="https://ansible.readthedocs.io/projects/lint/">https://ansible.readthedocs.io/projects/lint/</a></p>
 

@@ -1,0 +1,92 @@
+[[command]]
+name = "allume"
+aliases = ["muse"]
+description = "Companion CLI for the Allume (formerly Muse) Mac knowledge-management app. Communicates with the running desktop application over a sandboxed local pipe — no network round-trip — to read workspaces, boards, cards and to make small edits. Read-only subs (list-workspaces, search, board-content, card-content, open) enumerate or print local Allume state; write subs (note-create, url-create, board-create, card-move, delete) mutate the local Allume database through the running app. The `cli uninstall` subcommand removes the symlink at /usr/local/bin/allume; it modifies host state outside the project tree and stays out of scope. The project is renamed from Muse to Allume but the binary may still ship as either name."
+url = "https://museapp.com/cli-setup/"
+researched_version = "Allume CLI (2026-06)"
+bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "allume --version",
+    "allume list-workspaces",
+    "allume search 'kanban'",
+    "allume board-content abc123",
+    "allume card-content xyz789",
+    "allume open card xyz789",
+    "allume note-create 'Quick note'",
+    "allume url-create https://example.com",
+    "allume board-create 'New Project'",
+    "allume card-move xyz789 def456",
+    "allume delete card xyz789",
+    "muse list-workspaces",
+]
+examples_denied = [
+    "allume cli uninstall",
+]
+
+[[command.sub]]
+name = "list-workspaces"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "search"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--workspace", "--type"]
+
+[[command.sub]]
+name = "board-content"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "card-content"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "open"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "note-create"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--board", "--workspace"]
+
+[[command.sub]]
+name = "url-create"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--board", "--workspace"]
+
+[[command.sub]]
+name = "board-create"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--workspace"]
+
+[[command.sub]]
+name = "card-move"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "delete"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "cli"
+candidate = true
