@@ -1,8 +1,28 @@
 [[command]]
 name = "pod"
-description = "CocoaPods dependency manager for Swift and Objective-C projects. Read-only subcommands (list, search, info, env, spec cat, spec which) query the spec repository or local state. Write subcommands (install, update, init, deintegrate) modify the Pods/ directory, Podfile.lock, and the Xcode workspace. install and update contact the network to download specs and pod source code. CocoaPods is in maintenance mode (trunk goes read-only Dec 2026), with releases limited to roughly twice per year for Xcode compatibility."
+description = "CocoaPods dependency manager for Swift and Objective-C projects. Read-only subcommands (list, search, info, env, outdated, spec cat, spec which) query the spec repository or local state. Write subcommands (install, update, init, deintegrate, repo update) modify the Pods/ directory, Podfile.lock, and the Xcode workspace. install / update / outdated / repo update contact the network to download or refresh CocoaPods specs and pod source code. CocoaPods is in maintenance mode (trunk goes read-only Dec 2026), with releases limited to roughly twice per year for Xcode compatibility."
 url = "https://guides.cocoapods.org/terminal/commands.html"
+researched_version = "CocoaPods 1.16.x"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "pod --version",
+    "pod env",
+    "pod list",
+    "pod search Alamofire",
+    "pod outdated",
+    "pod install",
+    "pod install --repo-update --verbose",
+    "pod update",
+    "pod update Alamofire",
+    "pod init",
+    "pod repo update",
+    "pod spec cat Alamofire",
+]
+examples_denied = [
+    "pod trunk push MyPod.podspec",
+    "pod deintegrate",
+    "pod cache clean --all",
+]
 
 [[command.sub]]
 name = "env"
@@ -18,9 +38,82 @@ name = "list"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
+name = "outdated"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help",
+    "--no-ansi",
+    "--no-repo-update",
+    "--silent",
+    "--verbose",
+    "-h",
+]
+
+[[command.sub]]
 name = "search"
 bare = false
 standalone = ["--help", "--simple", "--stats", "--web", "-h"]
+
+[[command.sub]]
+name = "install"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--clean-install",
+    "--deployment",
+    "--help",
+    "--no-ansi",
+    "--no-clean",
+    "--no-integrate",
+    "--no-repo-update",
+    "--repo-update",
+    "--silent",
+    "--verbose",
+    "-h",
+]
+valued = ["--project-directory"]
+
+[[command.sub]]
+name = "update"
+level = "SafeWrite"
+bare = true
+standalone = [
+    "--clean-install",
+    "--help",
+    "--no-ansi",
+    "--no-clean",
+    "--no-integrate",
+    "--no-repo-update",
+    "--silent",
+    "--sources",
+    "--verbose",
+    "-h",
+]
+valued = ["--exclude-pods", "--project-directory", "--sources"]
+
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--no-ansi", "--silent", "--verbose", "-h"]
+
+[[command.sub]]
+name = "repo"
+nested_bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub.sub]]
+name = "list"
+level = "SafeRead"
+bare = true
+standalone = ["--count-only", "--help", "--no-ansi", "--silent", "--verbose", "-h"]
+
+[[command.sub.sub]]
+name = "update"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "--no-ansi", "--silent", "--verbose", "-h"]
 
 [[command.sub]]
 name = "spec"

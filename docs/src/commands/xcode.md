@@ -96,11 +96,33 @@
 
 - **env**: Flags: --help, -h
 - **info**: Flags: --help, -h
+- **init**: Flags: --help, --no-ansi, --silent, --verbose, -h
+- **install**: Flags: --clean-install, --deployment, --help, --no-ansi, --no-clean, --no-integrate, --no-repo-update, --repo-update, --silent, --verbose, -h. Valued: --project-directory
 - **list**: Flags: --help, -h
+- **outdated**: Flags: --help, --no-ansi, --no-repo-update, --silent, --verbose, -h
+- **repo list**: Flags: --count-only, --help, --no-ansi, --silent, --verbose, -h
+- **repo update**: Flags: --help, --no-ansi, --silent, --verbose, -h
+- **repo**: Flags: --help, -h
 - **search**: Flags: --help, --simple, --stats, --web, -h
 - **spec cat**: Flags: --help, -h. Valued: --version
 - **spec which**: Flags: --help, -h. Valued: --version
+- **update**: Flags: --clean-install, --help, --no-ansi, --no-clean, --no-integrate, --no-repo-update, --silent, --sources, --verbose, -h. Valued: --exclude-pods, --project-directory, --sources
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `pod --version`
+- `pod env`
+- `pod list`
+- `pod search Alamofire`
+- `pod outdated`
+- `pod install`
+- `pod install --repo-update --verbose`
+- `pod update`
+- `pod update Alamofire`
+- `pod init`
+- `pod repo update`
+- `pod spec cat Alamofire`
 
 ### `simctl`
 <p class="cmd-url"><a href="https://developer.apple.com/documentation/xcode/simctl">https://developer.apple.com/documentation/xcode/simctl</a></p>
