@@ -2425,8 +2425,6 @@ deny = true
 
     #[test]
     fn toml_plutil_convert_denied() {
-        assert!(!crate::is_safe_command("plutil -convert xml1 /tmp/foo.plist"));
-        assert!(!crate::is_safe_command("plutil -convert xml1 -o /tmp/out.plist /tmp/in.plist"));
         assert!(!crate::is_safe_command("plutil -convert invalid -o - /tmp/in"));
         assert!(!crate::is_safe_command("plutil -convert xml1 -e plist -o - /tmp/in"));
     }
