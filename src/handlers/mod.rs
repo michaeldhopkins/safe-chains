@@ -66,6 +66,7 @@ pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
         ("git_remote", vcs::git::check_git_remote as HandlerFn),
         ("laravel_cache_clear", php::check_laravel_cache_clear as HandlerFn),
         ("plutil_convert", system::plutil::check_plutil_convert as HandlerFn),
+        ("plutil_extract", system::plutil::check_plutil_extract as HandlerFn),
     ])
 }
 

@@ -1,7 +1,8 @@
 [[command]]
 name = "plutil"
-description = "macOS property list utility for inspecting and converting plist files. The -lint subcommand validates syntax without modification (read-only). -p pretty-prints a plist to stdout (read-only). -type reports the top-level type (read-only). -convert transforms between XML, binary, JSON, and Swift/Objective-C literal formats — this rewrites the file in place (write operation) unless -o is used. -insert, -replace, -remove, and -extract modify plist contents in place. Entirely local; no network access. Part of macOS; versioning follows macOS releases."
+description = "macOS property list utility for inspecting and converting plist files. The -lint subcommand validates syntax without modification (read-only). -p pretty-prints a plist to stdout (read-only). -type reports the top-level type (read-only). -convert transforms between XML, binary, JSON, and Swift literal formats — by default rewrites the file in place; `-o <output>` writes to whatever path the user supplies (or to stdout when `-o -`). -extract reads a single key by KEYPATH and emits it in the requested format; supports the same `-o` modes. The `-o` path is taken at face value — there's no project-root sandbox, so an invocation that points at an absolute path outside the project tree will write there. -insert, -replace, -remove modify plist contents in place. Entirely local; no network access. Part of macOS; versioning follows macOS releases."
 url = "https://ss64.com/mac/plutil.html"
+researched_version = "macOS 15.x plutil"
 bare_flags = ["--help", "--version", "-V", "-h", "-help"]
 
 [[command.sub]]
@@ -22,3 +23,7 @@ standalone = ["--help", "-h"]
 [[command.sub]]
 name = "-convert"
 handler = "plutil_convert"
+
+[[command.sub]]
+name = "-extract"
+handler = "plutil_extract"
