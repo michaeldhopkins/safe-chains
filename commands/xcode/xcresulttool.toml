@@ -1,14 +1,14 @@
 [[command]]
 name = "xcresulttool"
-description = "Inspector for Xcode `.xcresult` result bundles produced by `xcodebuild`. `get` (build-results, test-results summary/tests/insights/test-details/activities/metrics, log, content-availability, object) and `metadata get`, `formatDescription get`/`diff`, `graph`, `version`, and `compare` are read-only — they emit JSON/text/markdown to stdout or to an output path supplied by --output-path. `export` (diagnostics, attachments, metrics, object) writes extracted files/directories to --output-path. `merge` writes a new combined `.xcresult` bundle to --output-path. `metadata addExternalLocation` mutates the input bundle in place to record an external link. Local files only; no network. Surface evolves with Xcode result-bundle schema; man page dated 2025."
+description = "Inspector for Xcode `.xcresult` result bundles produced by `xcodebuild`. `get` (build-results, test-results summary/tests/insights/test-details/activities/metrics, log, content-availability, object) and `metadata get`, `formatDescription get`/`diff`, `graph`, `version`, and `compare` are read-only — they emit JSON/text/markdown to stdout or to an output path supplied by --output-path. The `--legacy` flag selects the pre-Xcode-16 result-bundle schema and is required by tools that haven't migrated (xcbeautify, fastlane, most CI integrations). `export` (diagnostics, attachments, metrics, object) writes extracted files/directories to --output-path. `merge` writes a new combined `.xcresult` bundle to --output-path. `metadata addExternalLocation` mutates the input bundle in place to record an external link. Local files only; no network. Surface evolves with Xcode result-bundle schema; man page dated 2025."
 url = "https://keith.github.io/xcode-man-pages/xcresulttool.1.html"
-researched_version = "Xcode 15 / macOS 14 (man page dated 2025)"
+researched_version = "Xcode 16 / xcresulttool 16.x"
 
 [[command.sub]]
 name = "get"
 level = "Inert"
 bare = false
-standalone = ["--compact", "--schema", "--help", "-h"]
+standalone = ["--compact", "--legacy", "--schema", "--help", "-h"]
 valued = [
     "--format",
     "--id",
@@ -22,7 +22,7 @@ valued = [
 name = "formatDescription"
 level = "Inert"
 bare = false
-standalone = ["--hash", "--include-event-stream-types", "--help", "-h"]
+standalone = ["--hash", "--include-event-stream-types", "--legacy", "--help", "-h"]
 valued = ["--format"]
 
 [[command.sub]]
@@ -46,6 +46,7 @@ standalone = [
     "--analyzer-issues",
     "--build-warnings",
     "--compact",
+    "--legacy",
     "--schema",
     "--summary",
     "--test-failures",
@@ -70,8 +71,14 @@ candidate = true
 
 [[command.sub]]
 name = "export"
-candidate = true
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "--legacy", "-h"]
+valued = ["--id", "--output-path", "--path", "--type"]
 
 [[command.sub]]
 name = "merge"
-candidate = true
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output-path"]
