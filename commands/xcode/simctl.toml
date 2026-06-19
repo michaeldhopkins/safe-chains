@@ -1,8 +1,202 @@
 [[command]]
 name = "simctl"
-description = "Xcode Simulator control tool for managing iOS/watchOS/tvOS/visionOS simulator devices and runtimes. The list subcommand is read-only — it enumerates available devices, runtimes, device types, and pairs. Write subcommands (create, delete, boot, shutdown, install, launch, openurl, etc.) modify simulator state, create/destroy devices, or launch apps. Some operations (runtime download) contact Apple's servers. Part of Xcode; versioning follows Xcode releases."
+description = "Xcode Simulator control tool for managing iOS/watchOS/tvOS/visionOS simulator devices and runtimes. The `list` and `getenv` subcommands are read-only — they enumerate available devices, runtimes, device types, pairs, or print one environment variable from the device. Write subcommands act on a sandboxed simulator process: `boot`, `shutdown`, `erase`, `create`, `delete`, `clone`, `pair`, `unpair`, `rename` change simulator inventory and state; `install`, `uninstall`, `launch`, `terminate`, `openurl`, `addmedia`, `push`, `privacy`, `keychain`, `keyboard`, `status_bar`, `ui` operate on a booted simulator. `appinfo` reads an installed app's Info.plist on a booted simulator (read-only). None of these touch host state outside `~/Library/Developer/CoreSimulator/`, but a few (notably `runtime` for installing simulator runtimes, and any flow that downloads simulator content) reach Apple's servers and download large payloads. The simctl surface tracks Xcode releases."
 url = "https://developer.apple.com/documentation/xcode/simctl"
+researched_version = "Xcode 16 / simctl 16.x"
+bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "simctl list",
+    "simctl list devices",
+    "simctl list runtimes --json",
+    "simctl getenv booted HOME",
+    "simctl boot 'iPhone 15'",
+    "simctl shutdown all",
+    "simctl shutdown booted",
+    "simctl erase all",
+    "simctl erase 'iPhone 15'",
+    "simctl install booted MyApp.app",
+    "simctl uninstall booted com.example.app",
+    "simctl launch booted com.example.app",
+    "simctl launch --console-pty booted com.example.app",
+    "simctl terminate booted com.example.app",
+    "simctl openurl booted https://example.com",
+    "simctl addmedia booted photo.jpg",
+    "simctl push booted com.example.app push.json",
+    "simctl status_bar booted clear",
+    "simctl appinfo booted com.example.app",
+    "simctl create 'iPhone 15 Test' 'iPhone 15'",
+    "simctl clone 'iPhone 15' 'iPhone 15 Test'",
+    "simctl delete unavailable",
+]
+examples_denied = [
+    "simctl runtime add foo.dmg",
+    "simctl spawn booted /bin/bash",
+]
 
 [[command.sub]]
 name = "list"
+level = "Inert"
+bare = true
 standalone = ["--help", "--json", "--verbose", "-h", "-j", "-v"]
+
+[[command.sub]]
+name = "getenv"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "boot"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--arch"]
+
+[[command.sub]]
+name = "shutdown"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "erase"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "create"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "clone"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "delete"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "rename"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "pair"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "unpair"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "install"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "uninstall"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "launch"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--console", "--console-pty",
+    "--help", "--stdout", "--stderr",
+    "--terminate-running-process",
+    "--wait-for-debugger",
+    "-h",
+]
+
+[[command.sub]]
+name = "terminate"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "openurl"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "addmedia"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "push"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "appinfo"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "status_bar"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = [
+    "--batteryLevel", "--batteryState", "--cellularBars",
+    "--cellularMode", "--dataNetwork", "--operatorName",
+    "--time", "--wifiBars", "--wifiMode",
+]
+
+[[command.sub]]
+name = "keychain"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "privacy"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "keyboard"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "ui"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "icloud_sync"
+candidate = true
+
+[[command.sub]]
+name = "spawn"
+candidate = true
+
+[[command.sub]]
+name = "runtime"
+candidate = true
