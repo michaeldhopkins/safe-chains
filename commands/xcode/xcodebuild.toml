@@ -1,38 +1,132 @@
 [[command]]
 name = "xcodebuild"
-description = "Apple's build system CLI for compiling, testing, archiving, and exporting Xcode projects. The query subcommands (-list, -showBuildSettings, -showdestinations, -showsdks, -version) are read-only — they inspect project configuration without building. Build actions (build, test, archive, clean, install) write to derived data, produce artifacts, and can execute arbitrary build phase scripts embedded in the project. test can also run on physical devices or simulators. No direct network access, but build phases and test actions can do anything. Part of Xcode; versioning follows Xcode releases."
+description = "Apple's build system CLI for compiling, testing, archiving, and exporting Xcode projects. The grammar is flag-driven with one or more positional `<action>` verbs at the end and optional `KEY=VALUE` build-setting overrides interleaved with the verbs. Read-only forms: `-list`, `-showBuildSettings`, `-showdestinations`, `-showsdks`, `-showTestPlans`, `-version`, `-showFirstLaunchExperience`, `-showPartialBuildSettings`. Build actions: `build`, `build-for-testing`, `test`, `test-without-building`, `archive`, `clean`, `analyze`, `docbuild`. These run the project's compile / link / Run Script Build Phases (which can execute arbitrary shell) and write outputs to `-derivedDataPath` (default `~/Library/Developer/Xcode/DerivedData/`) or `-archivePath`. The `install` and `installsrc` actions write to `$DSTROOT/$INSTALL_PATH`; if the invocation overrides those build settings to a path outside the project tree, the install can land anywhere the user has write access. `KEY=VALUE` positionals override per-invocation build settings (`CODE_SIGNING_ALLOWED=NO`, `CONFIGURATION_BUILD_DIR=...`, etc.); the syntax is unbounded by design and is the standard way developers control xcodebuild. Versioning follows Xcode releases (Xcode 16.x as of mid-2026)."
 url = "https://developer.apple.com/documentation/xcode/xcodebuild"
-bare_flags = ["--help", "--version", "-V", "-h"]
-
-[[command.sub]]
-name = "-list"
-standalone = ["--help", "-h", "-json"]
-valued = ["-project", "-workspace"]
-
-[[command.sub]]
-name = "-showBuildSettings"
-standalone = ["--help", "-h", "-json"]
-valued = [
-    "-configuration", "-destination", "-project",
-    "-scheme", "-sdk", "-target", "-workspace",
+researched_version = "Xcode 16 / xcodebuild 16.x"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-alltargets",
+    "-allowProvisioningDeviceRegistration",
+    "-allowProvisioningUpdates",
+    "-checkFirstLaunchStatus",
+    "-disableAutomaticPackageResolution",
+    "-disablePackageRepositoryCache",
+    "-dry-run",
+    "-enableAddressSanitizer",
+    "-enableCodeCoverage",
+    "-enableThreadSanitizer",
+    "-enableUndefinedBehaviorSanitizer",
+    "-hideShellScriptEnvironment",
+    "-json",
+    "-license",
+    "-list",
+    "-onlyUsePackageVersionsFromResolvedFile",
+    "-parallelizeTargets",
+    "-quiet",
+    "-resolvePackageDependencies",
+    "-runFirstLaunch",
+    "-showBuildSettings",
+    "-showBuildSettingsForIndex",
+    "-showComponent",
+    "-showFirstLaunchExperience",
+    "-showPartialBuildSettings",
+    "-showTestPlans",
+    "-showdestinations",
+    "-showsdks",
+    "-skipMacroValidation",
+    "-skipPackagePluginValidation",
+    "-skipPackageSignatureValidation",
+    "-skipPackageUpdates",
+    "-skipUnavailableActions",
+    "-usePackageSupportBuiltinSCM",
+    "-verbose",
+    "-version",
+    "--help",
+    "--version",
+    "-V",
+    "-h",
 ]
-
-[[command.sub]]
-name = "-showdestinations"
-standalone = ["--help", "-h", "-json"]
 valued = [
-    "-configuration", "-destination", "-project",
-    "-scheme", "-sdk", "-target", "-workspace",
+    "-arch",
+    "-archivePath",
+    "-buildVersion",
+    "-configuration",
+    "-defaultLanguage",
+    "-defaultPackageRegistryURL",
+    "-derivedDataPath",
+    "-destination",
+    "-destination-timeout",
+    "-exportArchive",
+    "-exportFormat",
+    "-exportLanguage",
+    "-exportLocalizations",
+    "-exportNotarizedApp",
+    "-exportOptionsPlist",
+    "-exportPath",
+    "-find-executable",
+    "-find-library",
+    "-importComponent",
+    "-importLocalizations",
+    "-importPath",
+    "-jobs",
+    "-localizationPath",
+    "-maximum-concurrent-test-device-destinations",
+    "-maximum-concurrent-test-simulator-destinations",
+    "-maximum-parallel-testing-workers",
+    "-only-testing",
+    "-only-testing:TEST-IDENTIFIER",
+    "-onlyTesting",
+    "-packageAuthorizationProvider",
+    "-packageCachePath",
+    "-packageDependencySCMToRegistryTransformation",
+    "-packageFingerprintPolicy",
+    "-packageSigningEntityPolicy",
+    "-parallel-testing-enabled",
+    "-parallel-testing-worker-count",
+    "-prepareDeviceSupport",
+    "-project",
+    "-resultBundlePath",
+    "-resultBundleVersion",
+    "-resultStreamPath",
+    "-retry-tests-on-failure",
+    "-runDestination",
+    "-runDestinationTimeout",
+    "-scheme",
+    "-scmProvider",
+    "-sdk",
+    "-skip-testing",
+    "-skip-testing:TEST-IDENTIFIER",
+    "-skipTesting",
+    "-target",
+    "-test-enumeration-format",
+    "-test-enumeration-output-path",
+    "-test-enumeration-style",
+    "-test-iterations",
+    "-test-repetition-relaunch-enabled",
+    "-test-timeouts-enabled",
+    "-testLanguage",
+    "-testPlan",
+    "-testProductsPath",
+    "-testRegion",
+    "-toolchain",
+    "-workspace",
+    "-xcconfig",
+    "-xctestrun",
 ]
-
-[[command.sub]]
-name = "-showsdks"
-standalone = ["--help", "-h", "-json"]
-valued = [
-    "-configuration", "-destination", "-project",
-    "-scheme", "-sdk", "-target", "-workspace",
+tolerate_unknown_short = true
+examples_safe = [
+    "xcodebuild -version",
+    "xcodebuild -showsdks",
+    "xcodebuild -showdestinations -project Foo.xcodeproj -scheme Foo",
+    "xcodebuild -list -project Foo.xcodeproj",
+    "xcodebuild -project Foo.xcodeproj -scheme Foo -list",
+    "xcodebuild -project Foo.xcodeproj -scheme Foo build",
+    "xcodebuild -project Foo.xcodeproj -scheme Foo -configuration Debug build",
+    "xcodebuild -project Foo.xcodeproj -scheme Foo -configuration Debug -destination 'platform=macOS' build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=\"\"",
+    "xcodebuild -workspace Foo.xcworkspace -scheme Foo -configuration Release archive -archivePath build/Foo.xcarchive",
+    "xcodebuild -project Foo.xcodeproj -scheme Foo test -destination 'platform=iOS Simulator,name=iPhone 15' -enableCodeCoverage",
+    "xcodebuild -project Foo.xcodeproj -scheme Foo clean",
+    "xcodebuild -project Foo.xcodeproj -scheme Foo analyze",
+    "xcodebuild -project Foo.xcodeproj -scheme Foo docbuild",
 ]
-
-[[command.sub]]
-name = "-version"
-standalone = ["--help", "-h"]

@@ -14271,12 +14271,25 @@ Aliases: `gwhoami`
 ### `xcodebuild`
 <p class="cmd-url"><a href="https://developer.apple.com/documentation/xcode/xcodebuild">https://developer.apple.com/documentation/xcode/xcodebuild</a></p>
 
-- **-list**: Flags: --help, -h, -json. Valued: -project, -workspace
-- **-showBuildSettings**: Flags: --help, -h, -json. Valued: -configuration, -destination, -project, -scheme, -sdk, -target, -workspace
-- **-showdestinations**: Flags: --help, -h, -json. Valued: -configuration, -destination, -project, -scheme, -sdk, -target, -workspace
-- **-showsdks**: Flags: --help, -h, -json. Valued: -configuration, -destination, -project, -scheme, -sdk, -target, -workspace
-- **-version**: Flags: --help, -h
-- Allowed standalone flags: --help, --version, -V, -h
+- Allowed standalone flags: -alltargets, -allowProvisioningDeviceRegistration, -allowProvisioningUpdates, -checkFirstLaunchStatus, -disableAutomaticPackageResolution, -disablePackageRepositoryCache, -dry-run, -enableAddressSanitizer, -enableCodeCoverage, -enableThreadSanitizer, -enableUndefinedBehaviorSanitizer, -hideShellScriptEnvironment, -json, -license, -list, -onlyUsePackageVersionsFromResolvedFile, -parallelizeTargets, -quiet, -resolvePackageDependencies, -runFirstLaunch, -showBuildSettings, -showBuildSettingsForIndex, -showComponent, -showFirstLaunchExperience, -showPartialBuildSettings, -showTestPlans, -showdestinations, -showsdks, -skipMacroValidation, -skipPackagePluginValidation, -skipPackageSignatureValidation, -skipPackageUpdates, -skipUnavailableActions, -usePackageSupportBuiltinSCM, -verbose, -version, --help, --version, -V, -h
+- Allowed valued flags: -arch, -archivePath, -buildVersion, -configuration, -defaultLanguage, -defaultPackageRegistryURL, -derivedDataPath, -destination, -destination-timeout, -exportArchive, -exportFormat, -exportLanguage, -exportLocalizations, -exportNotarizedApp, -exportOptionsPlist, -exportPath, -find-executable, -find-library, -importComponent, -importLocalizations, -importPath, -jobs, -localizationPath, -maximum-concurrent-test-device-destinations, -maximum-concurrent-test-simulator-destinations, -maximum-parallel-testing-workers, -only-testing, -only-testing:TEST-IDENTIFIER, -onlyTesting, -packageAuthorizationProvider, -packageCachePath, -packageDependencySCMToRegistryTransformation, -packageFingerprintPolicy, -packageSigningEntityPolicy, -parallel-testing-enabled, -parallel-testing-worker-count, -prepareDeviceSupport, -project, -resultBundlePath, -resultBundleVersion, -resultStreamPath, -retry-tests-on-failure, -runDestination, -runDestinationTimeout, -scheme, -scmProvider, -sdk, -skip-testing, -skip-testing:TEST-IDENTIFIER, -skipTesting, -target, -test-enumeration-format, -test-enumeration-output-path, -test-enumeration-style, -test-iterations, -test-repetition-relaunch-enabled, -test-timeouts-enabled, -testLanguage, -testPlan, -testProductsPath, -testRegion, -toolchain, -workspace, -xcconfig, -xctestrun
+- Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `xcodebuild -version`
+- `xcodebuild -showsdks`
+- `xcodebuild -showdestinations -project Foo.xcodeproj -scheme Foo`
+- `xcodebuild -list -project Foo.xcodeproj`
+- `xcodebuild -project Foo.xcodeproj -scheme Foo -list`
+- `xcodebuild -project Foo.xcodeproj -scheme Foo build`
+- `xcodebuild -project Foo.xcodeproj -scheme Foo -configuration Debug build`
+- `xcodebuild -project Foo.xcodeproj -scheme Foo -configuration Debug -destination 'platform=macOS' build CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""`
+- `xcodebuild -workspace Foo.xcworkspace -scheme Foo -configuration Release archive -archivePath build/Foo.xcarchive`
+- `xcodebuild -project Foo.xcodeproj -scheme Foo test -destination 'platform=iOS Simulator,name=iPhone 15' -enableCodeCoverage`
+- `xcodebuild -project Foo.xcodeproj -scheme Foo clean`
+- `xcodebuild -project Foo.xcodeproj -scheme Foo analyze`
+- `xcodebuild -project Foo.xcodeproj -scheme Foo docbuild`
 
 ### `xcodegen`
 <p class="cmd-url"><a href="https://github.com/yonaskolb/XcodeGen">https://github.com/yonaskolb/XcodeGen</a></p>
