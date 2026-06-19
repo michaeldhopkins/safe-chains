@@ -12737,8 +12737,17 @@ Aliases: `gsum`
 ### `swiftformat`
 <p class="cmd-url"><a href="https://github.com/nicklockwood/SwiftFormat">https://github.com/nicklockwood/SwiftFormat</a></p>
 
-- Requires --dryrun, --lint. - Allowed standalone flags: --dryrun, --lenient, --lint, --quiet, --strict, --verbose, --help, -h
-- Allowed valued flags: --config, --disable, --enable, --rules
+- Allowed standalone flags: --dryrun, --help, --lenient, --lint, --quiet, --strict, --verbose, -h
+- Allowed valued flags: --config, --disable, --enable, --exclude, --reporter, --report, --rules, --swiftversion
+
+**Examples:**
+
+- `swiftformat Sources/`
+- `swiftformat --lint Sources/`
+- `swiftformat --dryrun .`
+- `swiftformat --enable redundantSelf Sources/`
+- `swiftformat --config .swiftformat Sources/`
+- `swiftformat --reporter github-actions-log .`
 
 ### `swiftlint`
 <p class="cmd-url"><a href="https://github.com/realm/SwiftLint">https://github.com/realm/SwiftLint</a></p>

@@ -2,11 +2,27 @@
 name = "swiftformat"
 description = "Opinionated code formatter for Swift source files. In default mode, it rewrites files in place — a write operation. --lint mode reports formatting violations to stderr without modifying files (read-only). --dryrun previews what would change without writing (read-only). The tool parses Swift source into a token stream and applies configurable rules; it never contacts the network. SwiftFormat has nightly automated releases from the develop branch, with frequent rule additions and behavioral changes; ongoing review of new rules is warranted."
 url = "https://github.com/nicklockwood/SwiftFormat"
-level = "SafeRead"
+researched_version = "SwiftFormat 0.55.x"
+level = "SafeWrite"
 bare = false
-require_any = ["--dryrun", "--lint"]
 standalone = [
-    "--dryrun", "--lenient", "--lint", "--quiet", "--strict", "--verbose",
-    "--help", "-h",
+    "--dryrun", "--help", "--lenient", "--lint",
+    "--quiet", "--strict", "--verbose",
+    "-h",
 ]
-valued = ["--config", "--disable", "--enable", "--rules"]
+valued = [
+    "--config", "--disable", "--enable",
+    "--exclude", "--reporter", "--report",
+    "--rules", "--swiftversion",
+]
+examples_safe = [
+    "swiftformat Sources/",
+    "swiftformat --lint Sources/",
+    "swiftformat --dryrun .",
+    "swiftformat --enable redundantSelf Sources/",
+    "swiftformat --config .swiftformat Sources/",
+    "swiftformat --reporter github-actions-log .",
+]
+examples_denied = [
+    "swiftformat --evil Sources/",
+]
