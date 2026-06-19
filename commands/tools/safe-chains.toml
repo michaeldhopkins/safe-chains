@@ -1,10 +1,33 @@
 [[command]]
 name = "safe-chains"
-description = "Allowlist judge for bash commands used by coding agents. Reads a candidate command from stdin (hook mode) or as a positional argument and classifies it; never executes the candidate. `--list-commands`, `--list-tools`, `--version`, and `--help` are pure read-only meta operations. `--level` adjusts the safety threshold the CLI judge applies. `--setup`, `--auto-detect`, and `--tool` write the hook into another tool's config; `--opencode-config` and `--generate-book` write configuration or documentation to the local filesystem. Surface stable; new command data ships in roughly biweekly minor releases."
+description = "Allowlist judge for bash commands used by coding agents. Reads a candidate command from stdin (hook mode) or as a positional argument and classifies it; never executes the candidate. The `hook <TOOL>` subcommand reads the named tool's hook envelope from stdin, classifies the embedded shell command, and writes that tool's hook reply to stdout — used as the integration point with Claude Code, Codex, Cursor, Gemini, Copilot, Qwen, Droid, and OpenCode. `--list-commands`, `--list-tools`, `--version`, and `--help` are pure read-only meta operations. `--level` adjusts the safety threshold the CLI judge applies. `--setup`, `--auto-detect`, and `--tool` write the hook into another tool's config; `--opencode-config` and `--generate-book` write configuration or documentation to the local filesystem. Surface stable; new command data ships in roughly biweekly minor releases."
 url = "https://github.com/michaeldhopkins/safe-chains"
-researched_version = "safe-chains 0.187.0"
+researched_version = "safe-chains 0.200.0"
 level = "Inert"
 bare = false
-max_positional = 1
+max_positional = 2
 standalone = ["--help", "--list-commands", "--list-tools", "--version", "-V", "-h"]
 valued = ["--level"]
+examples_safe = [
+    "safe-chains --version",
+    "safe-chains --list-tools",
+    "safe-chains --list-commands",
+    "safe-chains 'pod install'",
+    "safe-chains --level safe-write 'pod install'",
+    "safe-chains hook claude",
+    "safe-chains hook codex",
+    "safe-chains hook cursor",
+    "safe-chains hook gemini",
+    "safe-chains hook copilot",
+    "safe-chains hook qwen",
+    "safe-chains hook droid",
+    "safe-chains hook opencode",
+    "safe-chains help",
+    "safe-chains help hook",
+]
+examples_denied = [
+    "safe-chains",
+    "safe-chains --opencode-config",
+    "safe-chains --generate-book",
+    "safe-chains --setup",
+]

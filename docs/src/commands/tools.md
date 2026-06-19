@@ -1367,6 +1367,24 @@ Aliases: `python`
 - Allowed standalone flags: --help, --list-commands, --list-tools, --version, -V, -h
 - Allowed valued flags: --level
 
+**Examples:**
+
+- `safe-chains --version`
+- `safe-chains --list-tools`
+- `safe-chains --list-commands`
+- `safe-chains 'pod install'`
+- `safe-chains --level safe-write 'pod install'`
+- `safe-chains hook claude`
+- `safe-chains hook codex`
+- `safe-chains hook cursor`
+- `safe-chains hook gemini`
+- `safe-chains hook copilot`
+- `safe-chains hook qwen`
+- `safe-chains hook droid`
+- `safe-chains hook opencode`
+- `safe-chains help`
+- `safe-chains help hook`
+
 ### `screen`
 <p class="cmd-url"><a href="https://www.gnu.org/software/screen/manual/screen.html">https://www.gnu.org/software/screen/manual/screen.html</a></p>
 
