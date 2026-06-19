@@ -7031,7 +7031,19 @@ Aliases: `glibtoolize`
 ### `lipo`
 <p class="cmd-url"><a href="https://ss64.com/mac/lipo.html">https://ss64.com/mac/lipo.html</a></p>
 
-- Requires -archs, -detailed_info, -info, -verify_arch. - Allowed standalone flags: -archs, -detailed_info, -info, -verify_arch, --help, -h
+- Requires -archs, -create, -detailed_info, -extract, -extract_family, -info, -remove, -replace, -thin, -verify_arch. - Allowed standalone flags: -archs, -create, -detailed_info, -info, -verify_arch, --help, -h
+- Allowed valued flags: -arch, -extract, -extract_family, -output, -remove, -replace, -segalign, -thin
+
+**Examples:**
+
+- `lipo -info MyBinary`
+- `lipo -archs MyBinary`
+- `lipo -detailed_info MyBinary`
+- `lipo -verify_arch arm64 x86_64 MyBinary`
+- `lipo -create x86_64.o arm64.o -output universal.o`
+- `lipo MyBinary -thin arm64 -output arm64-only`
+- `lipo MyBinary -extract arm64 -output arm64.o`
+- `lipo MyBinary -remove arm64 -output without-arm64.o`
 
 ### `liquibase`
 <p class="cmd-url"><a href="https://docs.liquibase.com/commands/home.html">https://docs.liquibase.com/commands/home.html</a></p>
