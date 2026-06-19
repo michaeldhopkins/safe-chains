@@ -7363,6 +7363,20 @@ Aliases: `glogname`
 
 - Positional arguments only
 
+### `lore`
+<p class="cmd-url"><a href="https://epicgames.github.io/lore/">https://epicgames.github.io/lore/</a></p>
+
+- **completions**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `lore --version`
+- `lore --help`
+- `lore completions bash`
+- `lore completions zsh`
+- `lore completions fish`
+
 ### `lp`
 <p class="cmd-url"><a href="https://www.cups.org/doc/man-lp.html">https://www.cups.org/doc/man-lp.html</a></p>
 
@@ -12010,7 +12024,6 @@ Aliases: `gshuf`
 - **delete**: Flags: --help, -h
 - **erase**: Flags: --help, -h
 - **getenv**: Flags: --help, -h
-- **icloud_sync**: Flags: --help, -h
 - **install**: Flags: --help, -h
 - **keyboard**: Flags: --help, -h
 - **keychain**: Flags: --help, -h

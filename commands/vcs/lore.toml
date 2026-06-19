@@ -1,0 +1,76 @@
+[[command]]
+name = "lore"
+description = "Epic Games' source-control system (released open-source 2025-2026). Workflow targets the large monorepos used in game / engine development, with a dedicated Lore Server backend. Install scripts at epicgames.github.io/lore land the `lore` binary on PATH; the full command reference lives at lore.epicgames.com. As of this stub the only forms verified safe in isolation are the diagnostic ones (`--version`, `--help`, `lore completions <shell>`). The full subcommand grammar — `repository`, `revision`, `file`, `auth`, `layer`, `branch`, `stage`, `history`, `sync`, `lock`, `clone`, `login`, `link`, and others — has not been individually researched yet, and the upstream surface differs significantly from Git's (no `log`, no `pull`, no `checkout` — branch operations live under `branch switch`, history under `history`). Subcommands beyond `completions` are kept as candidates until each is verified against the actual CLI."
+url = "https://epicgames.github.io/lore/"
+researched_version = "lore (stub, 2026-06)"
+bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "lore --version",
+    "lore --help",
+    "lore completions bash",
+    "lore completions zsh",
+    "lore completions fish",
+]
+examples_denied = [
+    "lore status",
+    "lore commit -m wip",
+    "lore push",
+]
+
+[[command.sub]]
+name = "completions"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "repository"
+candidate = true
+
+[[command.sub]]
+name = "revision"
+candidate = true
+
+[[command.sub]]
+name = "file"
+candidate = true
+
+[[command.sub]]
+name = "branch"
+candidate = true
+
+[[command.sub]]
+name = "stage"
+candidate = true
+
+[[command.sub]]
+name = "history"
+candidate = true
+
+[[command.sub]]
+name = "sync"
+candidate = true
+
+[[command.sub]]
+name = "lock"
+candidate = true
+
+[[command.sub]]
+name = "clone"
+candidate = true
+
+[[command.sub]]
+name = "auth"
+candidate = true
+
+[[command.sub]]
+name = "login"
+candidate = true
+
+[[command.sub]]
+name = "link"
+candidate = true
+
+[[command.sub]]
+name = "layer"
+candidate = true
