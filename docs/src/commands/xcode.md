@@ -332,6 +332,7 @@
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xccov.1.html">https://keith.github.io/xcode-man-pages/xccov.1.html</a></p>
 
 - **diff**: Flags: --json, --help, -h. Valued: --path-equivalence
+- **merge** (requires --outArchive, --outReport): Flags: --help, -h. Valued: --outArchive, --outReport
 - **view**: Flags: --archive, --file-list, --json, --only-targets, --report, --help, -h. Valued: --file, --files-for-target, --functions-for-file
 
 ### `xcode-select`
