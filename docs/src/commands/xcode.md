@@ -32,8 +32,19 @@
 ### `codesign`
 <p class="cmd-url"><a href="https://ss64.com/mac/codesign.html">https://ss64.com/mac/codesign.html</a></p>
 
-- Requires --display, --verify, -d, -v. - Allowed standalone flags: --deep, --display, --verify, -R, -d, -v, --help, -h
-- Allowed valued flags: --verbose
+- Requires --display, --verify, -d, -v. - Allowed standalone flags: --deep, --display, --verify, --xml, -R, -d, -v, --help, -h
+- Allowed valued flags: --entitlements, --requirements, --verbose, -r
+
+**Examples:**
+
+- `codesign -dv MyApp.app`
+- `codesign --display --verify MyApp.app`
+- `codesign --verify --deep MyApp.app`
+- `codesign -d --entitlements - MyApp.app`
+- `codesign -d --entitlements :- MyApp.app`
+- `codesign -d --requirements - MyApp.app`
+- `codesign -d --xml --entitlements - MyApp.app`
+- `codesign -dv --verbose=4 MyApp.app`
 
 ### `gen_bridge_metadata`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/gen_bridge_metadata.1.html">https://keith.github.io/xcode-man-pages/gen_bridge_metadata.1.html</a></p>

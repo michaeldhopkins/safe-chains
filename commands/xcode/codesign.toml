@@ -1,9 +1,34 @@
 [[command]]
 name = "codesign"
-description = "macOS code signing and verification tool. In display mode (--display / -d), it reads and prints the signing identity, entitlements, and certificate chain of a binary — purely read-only. In verify mode (--verify / -v), it checks whether a signature is valid — also read-only. The signing mode (default, with --sign / -s) modifies the binary by embedding a cryptographic signature and is a write operation. --deep recurses into nested bundles. Part of Xcode command-line tools; versioning follows macOS/Xcode releases."
+description = "macOS code signing and verification tool. In display mode (--display / -d), it reads and prints the signing identity, entitlements, requirements, and certificate chain of a binary — purely read-only. `-d --entitlements -` prints the entitlement plist to stdout. `-d --requirements -` prints the designated requirement. In verify mode (--verify / -v), it checks whether a signature is valid — also read-only. The signing mode (default, with --sign / -s) modifies the binary by embedding a cryptographic signature and is a write operation. --deep recurses into nested bundles. Part of Xcode command-line tools; versioning follows macOS/Xcode releases."
 url = "https://ss64.com/mac/codesign.html"
+researched_version = "Xcode 16 / codesign 16.x"
 level = "Inert"
 bare = false
 require_any = ["--display", "--verify", "-d", "-v"]
-standalone = ["--deep", "--display", "--verify", "-R", "-d", "-v", "--help", "-h"]
-valued = ["--verbose"]
+standalone = [
+    "--deep", "--display", "--verify",
+    "--xml",
+    "-R", "-d", "-v", "--help", "-h",
+]
+valued = [
+    "--entitlements",
+    "--requirements",
+    "--verbose",
+    "-r",
+]
+examples_safe = [
+    "codesign -dv MyApp.app",
+    "codesign --display --verify MyApp.app",
+    "codesign --verify --deep MyApp.app",
+    "codesign -d --entitlements - MyApp.app",
+    "codesign -d --entitlements :- MyApp.app",
+    "codesign -d --requirements - MyApp.app",
+    "codesign -d --xml --entitlements - MyApp.app",
+    "codesign -dv --verbose=4 MyApp.app",
+]
+examples_denied = [
+    "codesign -s ident MyApp.app",
+    "codesign --sign ident MyApp.app",
+    "codesign --remove-signature MyApp.app",
+]
