@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1608 commands across 75 categories.
+safe-chains knows 1609 commands across 75 categories.
 
 ## Glossary
 
@@ -88,7 +88,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [TeX / LaTeX](tex.md) (3 commands)
 - [Text Processing](text.md) (95 commands)
 - [Developer Tools](tools.md) (236 commands)
-- [Version Control](vcs.md) (10 commands)
+- [Version Control](vcs.md) (11 commands)
 - [WebAssembly](wasm.md) (10 commands)
 - [Shell Wrappers](wrappers.md) (7 commands)
 - [Xcode](xcode.md) (29 commands)

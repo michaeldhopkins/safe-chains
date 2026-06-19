@@ -174,7 +174,6 @@
 - **delete**: Flags: --help, -h
 - **erase**: Flags: --help, -h
 - **getenv**: Flags: --help, -h
-- **icloud_sync**: Flags: --help, -h
 - **install**: Flags: --help, -h
 - **keyboard**: Flags: --help, -h
 - **keychain**: Flags: --help, -h

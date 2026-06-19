@@ -203,6 +203,20 @@
 - **workspace update-stale**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h
 
+### `lore`
+<p class="cmd-url"><a href="https://epicgames.github.io/lore/">https://epicgames.github.io/lore/</a></p>
+
+- **completions**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `lore --version`
+- `lore --help`
+- `lore completions bash`
+- `lore completions zsh`
+- `lore completions fish`
+
 ### `pijul`
 <p class="cmd-url"><a href="https://pijul.org/manual/">https://pijul.org/manual/</a></p>
 
