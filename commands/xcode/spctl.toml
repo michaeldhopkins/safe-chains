@@ -1,9 +1,23 @@
 [[command]]
 name = "spctl"
-description = "macOS system policy (Gatekeeper) assessment tool. In assess mode (--assess / -a), it checks whether an application or installer package passes Gatekeeper policy — this is read-only and may contact Apple's notarization servers over the network to verify tickets. Write operations (--add, --remove, --enable, --disable) modify the security policy database and typically require root. --type selects between execute, install, and open contexts. Part of macOS; versioning follows macOS releases."
+description = "macOS system policy (Gatekeeper) assessment tool. In assess mode (--assess / -a), it checks whether an application or installer package passes Gatekeeper policy — this is read-only and may contact Apple's notarization servers over the network to verify tickets. Write operations (--add, --remove, --enable, --disable) modify the security policy database and typically require root. --type selects between execute, install, and open contexts. The `--verbose` flag works as a bare standalone (`--verbose`) or with an optional level (`--verbose=4` / `--verbose 4`). Part of macOS; versioning follows macOS releases."
 url = "https://ss64.com/mac/spctl.html"
+researched_version = "macOS 15.x spctl"
 level = "Inert"
 bare = false
 require_any = ["--assess", "-a"]
 standalone = ["--assess", "--verbose", "-a", "-v", "--help", "-h"]
-valued = ["--context", "--type", "-t"]
+valued = ["--context", "--type", "--verbose", "-t"]
+examples_safe = [
+    "spctl --assess MyApp.app",
+    "spctl -a -t exec MyApp.app",
+    "spctl --assess --verbose MyApp.app",
+    "spctl --assess --verbose=4 MyApp.app",
+    "spctl --assess --verbose 4 MyApp.app",
+    "spctl --assess --type install Package.pkg",
+]
+examples_denied = [
+    "spctl --add MyApp.app",
+    "spctl --disable",
+    "spctl",
+]

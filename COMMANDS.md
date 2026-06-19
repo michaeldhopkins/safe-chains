@@ -12286,7 +12286,16 @@ Aliases: `gsort`
 <p class="cmd-url"><a href="https://ss64.com/mac/spctl.html">https://ss64.com/mac/spctl.html</a></p>
 
 - Requires --assess, -a. - Allowed standalone flags: --assess, --verbose, -a, -v, --help, -h
-- Allowed valued flags: --context, --type, -t
+- Allowed valued flags: --context, --type, --verbose, -t
+
+**Examples:**
+
+- `spctl --assess MyApp.app`
+- `spctl -a -t exec MyApp.app`
+- `spctl --assess --verbose MyApp.app`
+- `spctl --assess --verbose=4 MyApp.app`
+- `spctl --assess --verbose 4 MyApp.app`
+- `spctl --assess --type install Package.pkg`
 
 ### `specdiff`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/specdiff">https://github.com/michaeldhopkins/specdiff</a></p>
