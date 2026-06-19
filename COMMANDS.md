@@ -12753,11 +12753,27 @@ Aliases: `gsum`
 <p class="cmd-url"><a href="https://github.com/realm/SwiftLint">https://github.com/realm/SwiftLint</a></p>
 
 - **analyze**: Flags: --help, --quiet, --strict, -h. Valued: --compiler-log-path, --config, --path, --reporter
+- **autocorrect**: Flags: --format, --help, --no-cache, --quiet, --strict, --use-script-input-files, -h. Valued: --config, --path, --reporter
+- **fix**: Flags: --format, --help, --no-cache, --quiet, --strict, --use-script-input-files, -h. Valued: --config, --path, --reporter
 - **lint**: Flags: --help, --no-cache, --quiet, --strict, -h. Valued: --config, --path, --reporter
 - **reporters**: Flags: --help, -h
 - **rules**: Flags: --disabled, --enabled, --help, -h. Valued: --config, --reporter
 - **version**: Flags: --help, -h
-- Allowed standalone flags: --help, --version, -V, -h
+- Allowed standalone flags: --help, --no-cache, --quiet, --strict, --version, -V, -h
+
+**Examples:**
+
+- `swiftlint lint`
+- `swiftlint lint --reporter github-actions-logging`
+- `swiftlint analyze --compiler-log-path xcodebuild.log`
+- `swiftlint fix`
+- `swiftlint fix --format`
+- `swiftlint autocorrect`
+- `swiftlint rules`
+- `swiftlint reporters`
+- `swiftlint version`
+- `swiftlint --version`
+- `swiftlint --help`
 
 ### `swipl`
 <p class="cmd-url"><a href="https://www.swi-prolog.org/pldoc/man?section=cmdline">https://www.swi-prolog.org/pldoc/man?section=cmdline</a></p>
