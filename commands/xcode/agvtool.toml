@@ -2,19 +2,53 @@
 name = "agvtool"
 description = "Apple-generic versioning tool that reads and writes version numbers in Xcode project files. The query subcommands (what-version, what-marketing-version, vers, mvers) are read-only — they print the current version from the .xcodeproj. The write subcommands (new-version, new-marketing-version, bump) modify Info.plist and project.pbxproj files in place. Entirely local; no network access. Part of Xcode command-line tools; versioning follows Xcode releases."
 url = "https://developer.apple.com/library/archive/qa/qa1827/_index.html"
+researched_version = "Xcode 16 / agvtool 16.x"
+examples_safe = [
+    "agvtool what-version",
+    "agvtool what-marketing-version",
+    "agvtool vers",
+    "agvtool mvers",
+    "agvtool new-version 1.2.3",
+    "agvtool new-version -all 1.2.3",
+    "agvtool new-marketing-version 1.0",
+    "agvtool bump",
+    "agvtool bump -all",
+]
 
 [[command.sub]]
 name = "mvers"
+level = "SafeRead"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "vers"
+level = "SafeRead"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "what-marketing-version"
+level = "SafeRead"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "what-version"
+level = "SafeRead"
 standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "new-version"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-all", "-h"]
+
+[[command.sub]]
+name = "new-marketing-version"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "bump"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-all", "-h"]

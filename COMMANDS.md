@@ -294,10 +294,25 @@ Aliases: `7zz`, `7za`
 ### `agvtool`
 <p class="cmd-url"><a href="https://developer.apple.com/library/archive/qa/qa1827/_index.html">https://developer.apple.com/library/archive/qa/qa1827/_index.html</a></p>
 
+- **bump**: Flags: --help, -all, -h
 - **mvers**: Flags: --help, -h
+- **new-marketing-version**: Flags: --help, -h
+- **new-version**: Flags: --help, -all, -h
 - **vers**: Flags: --help, -h
 - **what-marketing-version**: Flags: --help, -h
 - **what-version**: Flags: --help, -h
+
+**Examples:**
+
+- `agvtool what-version`
+- `agvtool what-marketing-version`
+- `agvtool vers`
+- `agvtool mvers`
+- `agvtool new-version 1.2.3`
+- `agvtool new-version -all 1.2.3`
+- `agvtool new-marketing-version 1.0`
+- `agvtool bump`
+- `agvtool bump -all`
 
 ### `agy`
 <p class="cmd-url"><a href="https://antigravity.google/docs/cli-overview">https://antigravity.google/docs/cli-overview</a></p>
