@@ -14507,10 +14507,12 @@ Aliases: `gwhoami`
 ### `xcresulttool`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xcresulttool.1.html">https://keith.github.io/xcode-man-pages/xcresulttool.1.html</a></p>
 
-- **compare**: Flags: --analyzer-issues, --build-warnings, --compact, --schema, --summary, --test-failures, --tests, --help, -h. Valued: --baseline-path, --schema-version
-- **formatDescription**: Flags: --hash, --include-event-stream-types, --help, -h. Valued: --format
-- **get**: Flags: --compact, --schema, --help, -h. Valued: --format, --id, --path, --schema-version, --test-id, --type
+- **compare**: Flags: --analyzer-issues, --build-warnings, --compact, --legacy, --schema, --summary, --test-failures, --tests, --help, -h. Valued: --baseline-path, --schema-version
+- **export**: Flags: --help, --legacy, -h. Valued: --id, --output-path, --path, --type
+- **formatDescription**: Flags: --hash, --include-event-stream-types, --legacy, --help, -h. Valued: --format
+- **get**: Flags: --compact, --legacy, --schema, --help, -h. Valued: --format, --id, --path, --schema-version, --test-id, --type
 - **graph**: Flags: --help, -h. Valued: --path
+- **merge**: Flags: --help, -h. Valued: --output-path
 - **metadata get**: Flags: --help, -h. Valued: --path
 - **version**: Flags: --help, -h
 
