@@ -61,6 +61,19 @@ Fold the bump into the final feat/fix/refactor commit of the stack — do not cr
 - Do not add comments to code
 - All files must end with a newline
 
+## Targets and hooks
+
+Before touching any `src/targets/*.rs` (per-tool hook integration) or the
+context the hook surfaces to agents, read `HARNESS-BEHAVIORS.md`. It is the
+consolidated reference for how each harness drives its PreToolUse hook: the
+decision-contract per tool (field name and accepted values — getting this wrong
+fails *silently*), the abstain/timing model, and which targets support
+`additionalContext`.
+
+When a harness's own docs disagree with `HARNESS-BEHAVIORS.md`, the harness
+wins: update both the relevant `targets/*.rs` and `HARNESS-BEHAVIORS.md` to
+match, in the same change.
+
 ## When to use a Rust handler
 
 Handlers are for **logic**, not **data**. A handler exists to make a routing or validation decision the declarative TOML shape can't express — not to hold a pile of allowed flags. If you find yourself writing `static FOO_FLAGS: WordSet = WordSet::new(&[...])` inside `src/handlers/`, you have data in the wrong place.
