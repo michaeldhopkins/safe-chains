@@ -1,7 +1,7 @@
 pub(crate) mod check;
-#[cfg(test)]
 mod display;
 mod eval;
+mod explain;
 mod parse;
 #[cfg(test)]
 mod proptests;
@@ -114,6 +114,7 @@ pub enum Redir {
 }
 
 pub use check::{command_verdict, is_safe_command, is_safe_pipeline};
+pub use explain::{Explanation, SegmentReport, explain, explain_with_coverage};
 pub use parse::parse;
 
 impl Word {

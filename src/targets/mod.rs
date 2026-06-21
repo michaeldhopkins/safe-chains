@@ -29,6 +29,20 @@ pub trait HookFormat: Send + Sync {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError>;
 
     fn render_response(&self, verdict: Verdict) -> HookResponse;
+
+    /// Surface explanatory context to the model on a non-approval *without*
+    /// changing the permission decision (the command still flows through the
+    /// tool's normal approval path, and the user's own allowlist still applies).
+    ///
+    /// The default abstains silently — same as today's empty deny body. A target
+    /// overrides this only when its hook schema has a verified field for
+    /// injecting model-visible context without a permission decision.
+    fn render_context(&self, _context: &str) -> HookResponse {
+        HookResponse {
+            stdout: String::new(),
+            exit_code: 0,
+        }
+    }
 }
 
 #[derive(Debug)]

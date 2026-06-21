@@ -14,6 +14,10 @@ pub struct Cli {
     #[arg(long, value_enum)]
     pub level: Option<SafetyLevel>,
 
+    /// Print a per-segment breakdown of why a command would or would not auto-approve.
+    #[arg(long)]
+    pub explain: bool,
+
     /// List all supported commands in Markdown format
     #[arg(long)]
     pub list_commands: bool,

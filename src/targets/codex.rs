@@ -266,4 +266,13 @@ mod tests {
         let r = CodexHookFormat.render_response(Verdict::Denied);
         assert_eq!(r.stdout, "");
     }
+
+    #[test]
+    fn render_context_defaults_to_abstain() {
+        // Codex's hook schema isn't verified for context injection, so it keeps
+        // the safe default: emit nothing, leaving the normal flow untouched.
+        let r = CodexHookFormat.render_context("anything");
+        assert_eq!(r.stdout, "");
+        assert_eq!(r.exit_code, 0);
+    }
 }

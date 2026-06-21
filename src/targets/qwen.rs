@@ -112,6 +112,21 @@ impl HookFormat for QwenHookFormat {
             }
         }
     }
+
+    fn render_context(&self, context: &str) -> HookResponse {
+        // Qwen mirrors Claude Code's hookSpecificOutput envelope, including
+        // additionalContext (injects model-visible text, no permission decision).
+        let body = json!({
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "additionalContext": context,
+            }
+        });
+        HookResponse {
+            stdout: serde_json::to_string(&body).unwrap_or_default(),
+            exit_code: 0,
+        }
+    }
 }
 
 fn hook_entry(binary: &str) -> Value {

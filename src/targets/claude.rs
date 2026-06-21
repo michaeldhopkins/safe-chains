@@ -111,6 +111,22 @@ impl HookFormat for ClaudeHookFormat {
             }
         }
     }
+
+    fn render_context(&self, context: &str) -> HookResponse {
+        // additionalContext injects model-visible text without a
+        // permissionDecision, so the normal approval flow (and the user's own
+        // allowlist) is untouched.
+        let body = json!({
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "additionalContext": context,
+            }
+        });
+        HookResponse {
+            stdout: serde_json::to_string(&body).unwrap_or_default(),
+            exit_code: 0,
+        }
+    }
 }
 
 fn hook_entry(binary: &str) -> Value {
@@ -262,6 +278,20 @@ mod tests {
         let r = ClaudeHookFormat.render_response(Verdict::Denied);
         assert_eq!(r.exit_code, 0);
         assert_eq!(r.stdout, "");
+    }
+
+    #[test]
+    fn render_context_injects_additional_context_without_decision() {
+        let r = ClaudeHookFormat.render_context("hello model");
+        assert_eq!(r.exit_code, 0);
+        let v: Value = serde_json::from_str(&r.stdout).unwrap();
+        assert_eq!(
+            v.pointer("/hookSpecificOutput/additionalContext")
+                .and_then(|c| c.as_str()),
+            Some("hello model"),
+        );
+        // Crucial: no permissionDecision, so the user's allowlist/flow is untouched.
+        assert!(v.pointer("/hookSpecificOutput/permissionDecision").is_none());
     }
 
     #[test]
