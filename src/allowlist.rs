@@ -102,6 +102,18 @@ impl Matcher {
     pub fn is_empty(&self) -> bool {
         self.exact.is_empty() && self.globs.is_empty()
     }
+
+    #[cfg(test)]
+    pub(crate) fn from_allow_patterns(patterns: &[&str]) -> Self {
+        let mut m = Matcher {
+            exact: HashSet::new(),
+            globs: Vec::new(),
+        };
+        for p in patterns {
+            m.add_pattern(&format!("Bash({p})"));
+        }
+        m
+    }
 }
 
 pub fn is_cmd_covered(cmd: &Cmd, patterns: &Matcher) -> bool {

@@ -25,7 +25,7 @@ pub(crate) fn is_safe_script(script: &Script) -> bool {
     script_verdict(script).is_allowed()
 }
 
-fn pipeline_verdict(pipeline: &Pipeline) -> Verdict {
+pub(crate) fn pipeline_verdict(pipeline: &Pipeline) -> Verdict {
     pipeline.commands.iter()
         .map(cmd_verdict)
         .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
@@ -51,7 +51,7 @@ pub(crate) fn normalize_for_matching(cmd: &SimpleCmd) -> String {
     cmd.words.iter().map(|w| w.eval()).collect::<Vec<_>>().join(" ")
 }
 
-fn cmd_verdict(cmd: &Cmd) -> Verdict {
+pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
     match cmd {
         Cmd::Simple(s) => simple_verdict(s),
         Cmd::Subshell { body, redirs } | Cmd::BraceGroup { body, redirs } => {

@@ -31,6 +31,12 @@ fn run_cli(command: &str, threshold: SafetyLevel) {
     process::exit(i32::from(!ok));
 }
 
+fn run_explain(command: &str) -> ! {
+    let explanation = safe_chains::cst::explain(command);
+    print!("{}", explanation.render());
+    process::exit(i32::from(!explanation.is_allowed()));
+}
+
 fn run_setup(name: Option<String>, auto_detect: bool) -> ! {
     let Some(home) = std::env::var_os("HOME") else {
         eprintln!("Error: HOME environment variable not set");
@@ -117,28 +123,20 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
 
     let project_dir = input.cwd.as_deref().map(Path::new);
     let patterns = safe_chains::allowlist::Matcher::load_with_project_dir(project_dir);
-    if patterns.is_empty() {
-        process::exit(0);
-    }
+    let explanation = safe_chains::cst::explain_with_coverage(&input.command, &patterns);
 
-    let Some(script) = safe_chains::cst::parse(&input.command) else {
-        process::exit(0);
-    };
-
-    let all_covered = script.0.iter().all(|stmt| {
-        safe_chains::cst::is_safe_pipeline(&stmt.pipeline)
-            || stmt
-                .pipeline
-                .commands
-                .iter()
-                .all(|cmd| safe_chains::allowlist::is_cmd_covered(cmd, &patterns))
-    });
-
-    if all_covered {
+    if explanation.is_allowed() {
         let response = format.render_response(Verdict::Allowed(SafetyLevel::Inert));
         let _ = io::stdout().write_all(response.stdout.as_bytes());
         process::exit(response.exit_code);
     }
+
+    if explanation.should_surface() {
+        let response = format.render_context(&explanation.render());
+        let _ = io::stdout().write_all(response.stdout.as_bytes());
+        process::exit(response.exit_code);
+    }
+
     process::exit(0);
 }
 
@@ -164,6 +162,9 @@ fn main() {
             } else if cli.opencode_config {
                 print_opencode_config();
             } else if let Some(command) = cli.command {
+                if cli.explain {
+                    run_explain(&command);
+                }
                 let threshold = cli.level.unwrap_or(SafetyLevel::SafeWrite);
                 run_cli(&command, threshold);
             } else if io::stdin().is_terminal() {
