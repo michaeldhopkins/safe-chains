@@ -169,6 +169,22 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
     )
 }
 
+fn consumes_next_value(next: Option<&Token>) -> bool {
+    match next {
+        None => false,
+        Some(t) => {
+            let b = t.as_bytes();
+            // An option-like token (starts with `-` and isn't a negative
+            // number) is never the value of a preceding valued flag. Consuming
+            // it would let an execution-enabling flag ride in as a bogus
+            // "value" — e.g. `node --check --require=evil.js`, where node runs
+            // the `--require` preload even in syntax-check mode. Negative
+            // numbers (`head -n -5`) and a lone `-` (stdin) are real values.
+            !(b.len() > 1 && b[0] == b'-' && !b[1].is_ascii_digit())
+        }
+    }
+}
+
 pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
     tokens: &[Token],
     standalone: &S,
@@ -208,7 +224,11 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
         }
 
         if valued.contains_flag(t) {
-            i += 2;
+            if consumes_next_value(tokens.get(i + 1)) {
+                i += 2;
+            } else {
+                i += 1;
+            }
             continue;
         }
 
@@ -245,7 +265,7 @@ pub fn check_flags<S: FlagSet + ?Sized, V: FlagSet + ?Sized>(
                 continue;
             }
             if valued.contains_short(b) {
-                if is_last {
+                if is_last && consumes_next_value(tokens.get(i + 1)) {
                     i += 1;
                 }
                 break;
@@ -396,6 +416,45 @@ mod tests {
     #[test]
     fn single_short_in_wordset_and_byte_array() {
         assert!(check(&toks(&["grep", "-c", "pattern"]), &TEST_POLICY));
+    }
+
+    static SYNTAX_CHECK_POLICY: FlagPolicy = FlagPolicy {
+        standalone: WordSet::flags(&["--help", "-h"]),
+        valued: WordSet::flags(&["--check", "-c"]),
+        bare: false,
+        max_positional: Some(0),
+        tolerance: FlagTolerance::strict(),
+    };
+
+    #[test]
+    fn valued_flag_consumes_path_value() {
+        assert!(check(&toks(&["node", "--check", "app.js"]), &SYNTAX_CHECK_POLICY));
+        assert!(check(&toks(&["node", "-c", "app.js"]), &SYNTAX_CHECK_POLICY));
+    }
+
+    #[test]
+    fn valued_flag_does_not_swallow_following_long_option() {
+        assert!(!check(
+            &toks(&["node", "--check", "--require=./evil.js"]),
+            &SYNTAX_CHECK_POLICY,
+        ));
+    }
+
+    #[test]
+    fn valued_short_does_not_swallow_following_option() {
+        assert!(!check(&toks(&["node", "-c", "-r./evil.js"]), &SYNTAX_CHECK_POLICY));
+    }
+
+    #[test]
+    fn valued_flag_still_consumes_negative_number() {
+        let policy = FlagPolicy {
+            standalone: WordSet::flags(&[]),
+            valued: WordSet::flags(&["-n"]),
+            bare: false,
+            max_positional: Some(1),
+            tolerance: FlagTolerance::strict(),
+        };
+        assert!(check(&toks(&["head", "-n", "-5", "file"]), &policy));
     }
 
     static LIMITED_POLICY: FlagPolicy = FlagPolicy {
