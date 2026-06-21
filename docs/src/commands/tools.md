@@ -989,6 +989,7 @@ Aliases: `g++`, `cc`, `c++`
 <p class="cmd-url"><a href="https://nodejs.org/api/cli.html">https://nodejs.org/api/cli.html</a></p>
 
 - Allowed standalone flags: --help, --version, -h, -v
+- Allowed valued flags: --check, -c
 
 ### `nodemon`
 <p class="cmd-url"><a href="https://github.com/remy/nodemon">https://github.com/remy/nodemon</a></p>
