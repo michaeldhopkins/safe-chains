@@ -1,7 +1,8 @@
 [[command]]
 name = "jj"
-description = "Git-compatible version control system with an opinionated, simpler model — automatic working-copy commits, first-class conflicts, and operation log for undo. Read-only operations (log, diff, show, status, file show, bookmark list, config list) inspect repo state. Write operations (new, commit, describe, rebase, squash, split, abandon, restore) modify the local change graph but never contact the network. git fetch downloads from remotes; git push uploads — both are network operations. The CLI is evolving rapidly with releases roughly every 1-2 weeks (still pre-1.0); new subcommands and flag changes are frequent and require ongoing review."
+description = "Git-compatible version control system with an opinionated, simpler model — automatic working-copy commits, first-class conflicts, and operation log for undo. Read-only operations (log, diff, show, status, file show, bookmark list, config get/list/path) inspect repo state. Write operations (new, commit, describe, rebase, squash, split, abandon, restore) modify the local change graph but never contact the network. git fetch downloads from remotes; git push uploads — both are network operations. `config set`/`unset`/`edit` write config files: although local and offline, the value of a config key can name a program jj later executes — `git.executable-path`, `merge-tools.*.program`, `signing.backends.*.program`, `ui.pager`, `ui.editor` — so a single config write (e.g. `jj config set --user git.executable-path /tmp/x`) reconfigures how the next jj command runs and is a deferred code-execution vector, not a contained local edit; `config edit` additionally spawns $EDITOR. The CLI is evolving rapidly with releases roughly every 1-2 weeks (still pre-1.0); new subcommands and flag changes are frequent and require ongoing review."
 url = "https://jj-vcs.github.io/jj/latest/cli-reference/"
+researched_version = "jj 0.39.0 (config subcommand reviewed)"
 bare_flags = ["--help", "--version", "-h"]
 [command.wrapper]
 standalone = ["--debug", "--ignore-immutable", "--ignore-working-copy", "--no-pager", "--quiet", "--verbose"]
@@ -218,6 +219,10 @@ tolerate_unknown_short = true
 tolerate_unknown_long = true
 [[command.sub.sub]]
 name = "list"
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "path"
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 

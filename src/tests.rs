@@ -844,6 +844,9 @@ safe! {
     jj_git_fetch: "jj git fetch",
     jj_git_import: "jj git import",
     jj_bookmark_list: "jj bookmark list",
+    jj_config_get: "jj config get user.name",
+    jj_config_list: "jj config list",
+    jj_config_path: "jj config path",
 
     hash_bare: "hash",
     hash_r: "hash -r",
@@ -1392,6 +1395,10 @@ denied! {
     sysctl_assign_denied: "sysctl kern.maxproc=2048",
     sysctl_assign_ostype_denied: "sysctl kern.ostype=evil",
 
+    jj_config_set: "jj config set --user user.name t",
+    jj_config_set_executable_path: "jj config set --user git.executable-path /tmp/evil",
+    jj_config_unset: "jj config unset --user user.name",
+    jj_config_edit: "jj config edit --user",
     jj_git_push: "jj git push",
     jj_git_push_bookmark: "jj git push --bookmark main",
 
