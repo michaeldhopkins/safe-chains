@@ -6185,6 +6185,7 @@ Aliases: `iperf`
 - **commit**: Positional args accepted
 - **config get**: Positional args accepted
 - **config list**: Positional args accepted
+- **config path**: Positional args accepted
 - **describe**: Positional args accepted
 - **diff**: Positional args accepted
 - **duplicate**: Positional args accepted
