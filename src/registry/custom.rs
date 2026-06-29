@@ -3,11 +3,26 @@ use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use serde::Deserialize;
+use sha2::{Digest, Sha256};
+
 use super::build::{insert_spec, load_toml};
 use super::types::CommandSpec;
 
 const REPO_FILENAME: &str = ".safe-chains.toml";
 const USER_FILENAME: &str = "safe-chains.toml";
+
+#[derive(Deserialize)]
+struct TrustedEntry {
+    path: String,
+    sha256: String,
+}
+
+#[derive(Deserialize)]
+struct TrustedConfig {
+    #[serde(default)]
+    trusted: Vec<TrustedEntry>,
+}
 
 /// Walk up from CWD looking for a project-level custom TOML.
 fn find_repo_custom() -> Option<PathBuf> {
@@ -32,29 +47,168 @@ fn find_user_custom() -> Option<PathBuf> {
     candidate.is_file().then_some(candidate)
 }
 
-/// Apply user-level then repo-level custom TOMLs to the registry,
-/// in that order so repo-level wins on conflicts.
+fn parse_trusted(source: &str) -> Vec<TrustedEntry> {
+    toml::from_str::<TrustedConfig>(source)
+        .map(|c| c.trusted)
+        .unwrap_or_default()
+}
+
+fn sha256_hex(bytes: &[u8]) -> String {
+    Sha256::digest(bytes).iter().map(|b| format!("{b:02x}")).collect()
+}
+
+/// A repo `.safe-chains.toml` is honored only when the user has pinned its
+/// directory in the user config and the file's hash matches the pin. The
+/// directory the agent works in is otherwise untrusted — it can write the file
+/// freely, so reading it on sight would let an agent approve any command by
+/// editing the file first. See `docs/design/trusted-customization.md`.
+fn repo_is_trusted(repo_file: &Path, bytes: &[u8], trusted: &[TrustedEntry]) -> bool {
+    let Some(parent) = repo_file.parent() else {
+        return false;
+    };
+    let Ok(dir) = fs::canonicalize(parent) else {
+        return false;
+    };
+    let hash = sha256_hex(bytes);
+    trusted.iter().any(|t| {
+        t.sha256.trim().eq_ignore_ascii_case(&hash)
+            && fs::canonicalize(&t.path).map(|p| p == dir).unwrap_or(false)
+    })
+}
+
+/// Apply user-level then repo-level custom TOMLs to the registry, in that order
+/// so a trusted repo-level definition wins on conflicts. The user file
+/// (`~/.config/safe-chains.toml`) is trusted as-is and also carries the
+/// `[[trusted]]` list that pins repo files.
 pub(super) fn apply_custom(map: &mut HashMap<String, CommandSpec>) {
     if env::var_os("SAFE_CHAINS_NO_LOCAL").is_some() {
         return;
     }
-    if let Some(path) = find_user_custom() {
-        apply_file(map, &path, "custom-user");
+
+    let mut trusted = Vec::new();
+    if let Some(path) = find_user_custom()
+        && let Ok(source) = fs::read_to_string(&path)
+    {
+        for spec in load_toml(&source, "custom-user") {
+            insert_spec(map, spec);
+        }
+        trusted = parse_trusted(&source);
     }
-    if let Some(path) = find_repo_custom() {
-        apply_file(map, &path, "custom-project");
+
+    if let Some(repo_file) = find_repo_custom()
+        && let Ok(bytes) = fs::read(&repo_file)
+        && repo_is_trusted(&repo_file, &bytes, &trusted)
+        && let Ok(source) = std::str::from_utf8(&bytes)
+    {
+        for spec in load_toml(source, "custom-project") {
+            insert_spec(map, spec);
+        }
     }
 }
 
-fn apply_file(map: &mut HashMap<String, CommandSpec>, path: &Path, category: &'static str) {
-    let source = match fs::read_to_string(path) {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!("safe-chains: failed to read {}: {e}", path.display());
-            return;
-        }
-    };
-    for spec in load_toml(&source, category) {
-        insert_spec(map, spec);
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sha256_hex_known_vectors() {
+        assert_eq!(
+            sha256_hex(b""),
+            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        );
+        assert_eq!(
+            sha256_hex(b"abc"),
+            "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        );
+    }
+
+    #[test]
+    fn parse_trusted_reads_entries() {
+        let src = r#"
+            [[trusted]]
+            path = "/a/b"
+            sha256 = "abc123"
+
+            [[trusted]]
+            path = "/c/d"
+            sha256 = "def456"
+        "#;
+        let t = parse_trusted(src);
+        assert_eq!(t.len(), 2);
+        assert_eq!(t[0].path, "/a/b");
+        assert_eq!(t[1].sha256, "def456");
+    }
+
+    #[test]
+    fn parse_trusted_absent_or_malformed_is_empty() {
+        assert!(parse_trusted("[[command]]\nname = \"x\"").is_empty());
+        assert!(parse_trusted("not valid toml {{{").is_empty());
+        assert!(parse_trusted("").is_empty());
+    }
+
+    #[test]
+    fn load_toml_tolerates_trusted_sections() {
+        // A user config holding only [[trusted]] must parse to zero commands,
+        // not panic on a missing `command` field.
+        assert!(load_toml("[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n", "custom-user").is_empty());
+        // command alongside trusted: command parsed, trusted ignored here.
+        let specs = load_toml(
+            "[[command]]\nname = \"myco\"\nbare = true\n\n[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n",
+            "custom-user",
+        );
+        assert_eq!(specs.len(), 1);
+    }
+
+    fn write_repo_file(dir: &Path, body: &str) -> PathBuf {
+        let f = dir.join(REPO_FILENAME);
+        fs::write(&f, body).unwrap();
+        f
+    }
+
+    #[test]
+    fn repo_trusted_when_path_and_hash_match() {
+        let dir = tempfile::tempdir().unwrap();
+        let body = "[[command]]\nname = \"myco\"\n";
+        let f = write_repo_file(dir.path(), body);
+        let canon = fs::canonicalize(dir.path()).unwrap();
+        let trusted = vec![TrustedEntry {
+            path: canon.to_string_lossy().into_owned(),
+            sha256: sha256_hex(body.as_bytes()),
+        }];
+        assert!(repo_is_trusted(&f, body.as_bytes(), &trusted));
+    }
+
+    #[test]
+    fn repo_untrusted_when_hash_differs() {
+        let dir = tempfile::tempdir().unwrap();
+        let f = write_repo_file(dir.path(), "[[command]]\nname = \"myco\"\n");
+        let canon = fs::canonicalize(dir.path()).unwrap();
+        let trusted = vec![TrustedEntry {
+            path: canon.to_string_lossy().into_owned(),
+            sha256: sha256_hex(b"different content"),
+        }];
+        // An agent rewrote the file after it was pinned: hash no longer matches.
+        let tampered = b"[[command]]\nname = \"curl\"\nlevel = \"Inert\"\n";
+        assert!(!repo_is_trusted(&f, tampered, &trusted));
+    }
+
+    #[test]
+    fn repo_untrusted_when_path_not_listed() {
+        let dir = tempfile::tempdir().unwrap();
+        let body = "[[command]]\nname = \"myco\"\n";
+        let f = write_repo_file(dir.path(), body);
+        let trusted = vec![TrustedEntry {
+            path: "/some/other/dir".to_string(),
+            sha256: sha256_hex(body.as_bytes()),
+        }];
+        assert!(!repo_is_trusted(&f, body.as_bytes(), &trusted));
+    }
+
+    #[test]
+    fn repo_untrusted_when_list_empty() {
+        let dir = tempfile::tempdir().unwrap();
+        let body = "[[command]]\nname = \"myco\"\n";
+        let f = write_repo_file(dir.path(), body);
+        assert!(!repo_is_trusted(&f, body.as_bytes(), &[]));
     }
 }
