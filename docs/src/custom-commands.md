@@ -1,11 +1,28 @@
 # Custom Commands
 
-safe-chains ships definitions for hundreds of tools. If your project uses an in-house CLI it doesn't recognize, or you want to disallow a built-in command for a specific project, drop a TOML file in either of these locations:
+safe-chains ships definitions for hundreds of tools. To add an in-house CLI or disallow a built-in command, write a TOML file in one of two places:
 
-- **`.safe-chains.toml`** in your repo root (or any parent directory)
-- **`~/.config/safe-chains.toml`** for definitions that apply across all your projects
+- **`~/.config/safe-chains.toml`** — applies everywhere, trusted automatically.
+- **`.safe-chains.toml`** in a repo (or any parent directory) — applies to that project, once you trust the directory.
 
-When a command appears in more than one custom definition, the more local definition is used.
+When a command is defined in both, a trusted project definition overrides the user-level one.
+
+## Project files must be trusted
+
+A repo's `.safe-chains.toml` sits inside the code safe-chains checks, and whatever edits the repo can edit that file. safe-chains ignores it until you pin the directory in your user config:
+
+```toml
+# ~/.config/safe-chains.toml
+[[trusted]]
+path = "/Users/you/work/acme"
+sha256 = "9f2b…"   # shasum -a 256 acme/.safe-chains.toml
+```
+
+safe-chains honors the project file only while its contents match `sha256`. A change to the file un-trusts it until you review the change and trust it again.
+
+Home directory level config (`~/.config/safe-chains.toml` and `~/.claude/settings.json`) is trusted without pinning. Be careful granting access to these directories.
+
+Granting trust requires a manual edit for now.
 
 ## Add a tool safe-chains doesn't know
 
@@ -68,6 +85,8 @@ Three lines and `gh` is denied in this project — bare invocation, subcommands,
 Paste your tool's `--help` output and this prompt into Claude or another LLM:
 
 > Generate a safe-chains custom command definition. Use the schema in <https://github.com/michaeldhopkins/safe-chains/blob/main/commands/SAMPLE.toml>. Output a single TOML block I can paste into `.safe-chains.toml`. Cover read-only and idempotent subcommands; omit destructive ones.
+
+If you paste it into a repo's `.safe-chains.toml`, pin the directory afterward (see [Project files must be trusted](#project-files-must-be-trusted)).
 
 ## Skipping custom files: `SAFE_CHAINS_NO_LOCAL`
 

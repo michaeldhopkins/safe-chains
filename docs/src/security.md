@@ -14,6 +14,10 @@ Auto-approval of destructive, write, or state-changing commands. An agentic tool
 
 Settings guardrails: when matching commands against your Claude Code settings patterns, segments containing `>`, `<`, backticks, or `$()` are never approved via settings, even if a pattern matches. This prevents `Bash(./script *)` from approving `./script > /etc/passwd`.
 
+## Trusted configuration
+
+Custom definitions outside of ~/.config and ~/.claude must be trusted. See [Trusted configuration](#trusted-configuration).
+
 ## What it does not prevent
 
 - Information disclosure: read-only commands can read sensitive files (`cat ~/.ssh/id_rsa`). Sensitive contents would be read by the model provider. We recommend pairing safe-chains with a hook to block reading `~/.ssh`, `../credentials` and similar directories.
