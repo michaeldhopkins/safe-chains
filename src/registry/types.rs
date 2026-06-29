@@ -4,6 +4,10 @@ use crate::verdict::SafetyLevel;
 
 #[derive(Debug, Deserialize)]
 pub(super) struct TomlFile {
+    // Defaulted so a user config that contains only `[[trusted]]` (the repo-pin
+    // list, parsed separately) is valid. Unknown tables like `[[trusted]]` are
+    // ignored here.
+    #[serde(default)]
     pub command: Vec<TomlCommand>,
 }
 
