@@ -1,5 +1,4 @@
 use std::io::{self, IsTerminal, Read, Write};
-use std::path::Path;
 use std::process;
 
 use clap::{CommandFactory, Parser};
@@ -121,8 +120,7 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
         process::exit(response.exit_code);
     }
 
-    let project_dir = input.cwd.as_deref().map(Path::new);
-    let patterns = safe_chains::allowlist::Matcher::load_with_project_dir(project_dir);
+    let patterns = safe_chains::allowlist::Matcher::load();
     let explanation = safe_chains::cst::explain_with_coverage(&input.command, &patterns);
 
     if explanation.is_allowed() {

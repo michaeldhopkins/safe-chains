@@ -9,31 +9,27 @@ pub struct Matcher {
 }
 
 impl Matcher {
+    /// Load allowlist patterns from trusted home config only
+    /// (`~/.claude/settings.json`). A project's `.claude/settings.json` is
+    /// intentionally not read: it lives in the working tree the agent edits, and
+    /// the harness applies its own project settings directly. See
+    /// `docs/design/trusted-customization.md`.
     pub fn load() -> Self {
-        Self::load_with_project_dir(
-            std::env::var_os("CLAUDE_PROJECT_DIR")
-                .or_else(|| std::env::var_os("CWD"))
-                .as_deref()
-                .map(Path::new),
-        )
+        match std::env::var_os("HOME") {
+            Some(home) => Self::load_from_home(Path::new(&home)),
+            None => Matcher {
+                exact: HashSet::new(),
+                globs: Vec::new(),
+            },
+        }
     }
 
-    pub fn load_with_project_dir(project_dir: Option<&Path>) -> Self {
+    fn load_from_home(home: &Path) -> Self {
         let mut patterns = Matcher {
             exact: HashSet::new(),
             globs: Vec::new(),
         };
-
-        if let Some(home) = std::env::var_os("HOME") {
-            patterns.load_file(&Path::new(&home).join(".claude/settings.json"));
-        }
-
-        if let Some(dir) = project_dir {
-            let base = dir.join(".claude");
-            patterns.load_file(&base.join("settings.json"));
-            patterns.load_file(&base.join("settings.local.json"));
-        }
-
+        patterns.load_file(&home.join(".claude/settings.json"));
         patterns
     }
 
@@ -442,58 +438,51 @@ mod tests {
     }
 
     #[test]
-    fn load_with_project_dir_reads_local_settings() {
-        let dir = tempfile::tempdir().unwrap();
-        let claude_dir = dir.path().join(".claude");
+    fn load_from_home_reads_home_settings() {
+        let home = tempfile::tempdir().unwrap();
+        let claude_dir = home.path().join(".claude");
         fs::create_dir_all(&claude_dir).unwrap();
         fs::write(
-            claude_dir.join("settings.local.json"),
+            claude_dir.join("settings.json"),
             r#"{"permissions":{"allow":["Bash(./generate-docs.sh:*)"]}}"#,
         )
         .unwrap();
-        let p = Matcher::load_with_project_dir(Some(dir.path()));
+        let p = Matcher::load_from_home(home.path());
         assert!(p.matches_cmd(&cmd("./generate-docs.sh")));
         assert!(p.matches_cmd(&cmd("./generate-docs.sh --verbose")));
         assert!(!p.matches_cmd(&cmd("./evil.sh")));
     }
 
     #[test]
-    fn load_with_project_dir_reads_both_settings_files() {
-        let dir = tempfile::tempdir().unwrap();
-        let claude_dir = dir.path().join(".claude");
+    fn load_from_home_ignores_project_settings() {
+        // A project's .claude/settings.json living next to home is never read:
+        // only ~/.claude/settings.json is. Here the project tree has an allow
+        // entry that must not take effect.
+        let home = tempfile::tempdir().unwrap();
+        let project = tempfile::tempdir().unwrap();
+        let project_claude = project.path().join(".claude");
+        fs::create_dir_all(&project_claude).unwrap();
+        fs::write(
+            project_claude.join("settings.json"),
+            r#"{"permissions":{"allow":["Bash(rm -rf *)"]}}"#,
+        )
+        .unwrap();
+        let p = Matcher::load_from_home(home.path());
+        assert!(!p.matches_cmd(&cmd("rm -rf /")));
+        assert!(p.is_empty());
+    }
+
+    #[test]
+    fn load_from_home_chains_with_builtins() {
+        let home = tempfile::tempdir().unwrap();
+        let claude_dir = home.path().join(".claude");
         fs::create_dir_all(&claude_dir).unwrap();
         fs::write(
             claude_dir.join("settings.json"),
-            r#"{"permissions":{"allow":["Bash(cargo install:*)"]}}"#,
-        )
-        .unwrap();
-        fs::write(
-            claude_dir.join("settings.local.json"),
             r#"{"permissions":{"allow":["Bash(./generate-docs.sh:*)"]}}"#,
         )
         .unwrap();
-        let p = Matcher::load_with_project_dir(Some(dir.path()));
-        assert!(p.matches_cmd(&cmd("cargo install --path .")));
-        assert!(p.matches_cmd(&cmd("./generate-docs.sh")));
-    }
-
-    #[test]
-    fn load_with_no_project_dir_skips_project_settings() {
-        let p = Matcher::load_with_project_dir(None);
-        assert!(!p.matches_cmd(&cmd("./generate-docs.sh")));
-    }
-
-    #[test]
-    fn load_with_project_dir_chains_with_builtins() {
-        let dir = tempfile::tempdir().unwrap();
-        let claude_dir = dir.path().join(".claude");
-        fs::create_dir_all(&claude_dir).unwrap();
-        fs::write(
-            claude_dir.join("settings.local.json"),
-            r#"{"permissions":{"allow":["Bash(./generate-docs.sh:*)"]}}"#,
-        )
-        .unwrap();
-        let p = Matcher::load_with_project_dir(Some(dir.path()));
+        let p = Matcher::load_from_home(home.path());
         assert!(all_covered("cargo test && ./generate-docs.sh", &p));
         assert!(!all_covered("cargo test && ./evil.sh", &p));
     }
