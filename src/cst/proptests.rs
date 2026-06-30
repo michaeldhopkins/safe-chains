@@ -426,7 +426,15 @@ proptest! {
     #[test]
     fn file_redirect_promotes_to_safewrite(
         cmd_word in arb_shell_word(),
-        target in arb_shell_word().prop_filter("not /dev/null", |s| s != "/dev/null"),
+        // Safe write targets only: an in-tree relative data path. Absolute,
+        // home, parent-escaping, and auto-executed (.git/.envrc) targets are
+        // covered by the unsafe-target test below.
+        target in arb_shell_word().prop_filter("safe in-tree write target", |s| {
+            !s.starts_with('/')
+                && !s.starts_with("..")
+                && !s.contains("/../")
+                && !s.split('/').any(|seg| seg == ".git" || seg == ".envrc")
+        }),
         fd in 0..3u32,
         append in any::<bool>(),
     ) {
@@ -444,6 +452,27 @@ proptest! {
             check::redirect_verdict(&cmd.redirs),
             crate::verdict::Verdict::Allowed(crate::verdict::SafetyLevel::SafeWrite),
         );
+    }
+
+    #[test]
+    fn redirect_to_auto_executed_target_is_denied(
+        // Targets another tool auto-executes/trusts, or that escape the tree.
+        target in prop_oneof![
+            Just(".git/hooks/pre-commit".to_string()),
+            Just(".envrc".to_string()),
+            arb_env_name().prop_map(|n| format!("sub/{n}/.git/config")),
+            arb_env_name().prop_map(|n| format!("/etc/{n}")),
+            arb_env_name().prop_map(|n| format!("../{n}")),
+            arb_env_name().prop_map(|n| format!("$HOME/.ssh/{n}")),
+        ],
+        append in any::<bool>(),
+    ) {
+        let redirs = vec![Redir::Write {
+            fd: 1,
+            target: Word(vec![WordPart::Lit(target)]),
+            append,
+        }];
+        prop_assert_eq!(check::redirect_verdict(&redirs), crate::verdict::Verdict::Denied);
     }
 
     #[test]

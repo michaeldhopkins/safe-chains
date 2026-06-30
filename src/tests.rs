@@ -1059,6 +1059,13 @@ safe! {
 denied! {
     for_redirect_target_cmdsub_denied: "for f in a b; do echo $f; done > $(evil)",
     for_redirect_unsafe_body_denied: "for f in a b; do rm -rf $f; done 2>/dev/null",
+    redirect_git_hook_denied: "echo x > .git/hooks/pre-commit",
+    redirect_envrc_denied: "echo x > .envrc",
+    redirect_ssh_authkeys_denied: "echo x > ~/.ssh/authorized_keys",
+    redirect_etc_passwd_denied: "echo x > /etc/passwd",
+    redirect_home_var_ssh_denied: "echo x > $HOME/.ssh/authorized_keys",
+    redirect_parent_escape_denied: "echo x > ../sibling/out.txt",
+    redirect_append_git_hook_denied: "echo x >> .git/hooks/post-commit",
     heredoc_pipe_to_bash_unsafe: "cat <<'EOF' | bash\nrm -rf /\nEOF",
     heredoc_pipe_to_bash_safe_inner: "cat <<EOF | bash\nls\nEOF",
     heredoc_strip_tabs_pipe_to_bash: "cat <<-EOF | bash\n\trm -rf /\n\tEOF",
@@ -1612,7 +1619,8 @@ safe_write! {
     cat_redirect_to_tmp: "cat < /tmp/x > /tmp/y",
 
     assign_with_redirect_safewrite: "x=1 > file.txt",
-    assign_with_etc_passwd_safewrite: "x=1 > /etc/passwd",
+    redirect_to_tmp_safewrite: "echo hi > /tmp/scratch.txt",
+    redirect_to_subdir_safewrite: "echo hi > build/out.txt",
 
     hexo_render_with_output_promotes: "hexo render src/foo.md -o out.html",
     hexo_render_with_long_output_promotes: "hexo render src/foo.md --output out.html",

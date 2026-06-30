@@ -389,8 +389,15 @@ mod tests {
     #[test]
     fn file_redirect_promoted_to_safewrite() {
         let p = empty();
-        let c = cmd("echo > /etc/passwd");
+        let c = cmd("echo > out.txt");
         assert!(is_covered(&c, &p));
+    }
+
+    #[test]
+    fn redirect_to_sensitive_target_not_covered() {
+        let p = empty();
+        assert!(!is_covered(&cmd("echo > /etc/passwd"), &p));
+        assert!(!is_covered(&cmd("echo > .git/hooks/pre-commit"), &p));
     }
 
     #[test]

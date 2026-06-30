@@ -310,14 +310,46 @@ pub(crate) fn check_redirects(redirs: &[Redir]) -> bool {
     })
 }
 
+/// Whether a redirect *write* target is an ordinary data file we can
+/// auto-approve. Safe: a relative path inside the working tree, or a temp/std
+/// path. Not safe (falls through to manual approval): home dotfiles and any
+/// path another tool auto-executes or trusts — `.git/` (hooks, config), a
+/// `.envrc` (direnv runs it on `cd`), `~`-anchored and absolute system paths,
+/// and parent-escaping paths. A redirect there can plant a git hook, an SSH
+/// key, or a shell/direnv init that runs later. A `$`-bearing target is
+/// unverifiable (it may expand to `$HOME/.ssh/...`), so it is treated as unsafe.
+fn is_safe_write_target(path: &str) -> bool {
+    if path.starts_with("/tmp/")
+        || path.starts_with("/private/tmp/")
+        || path.starts_with("/var/tmp/")
+        || path.starts_with("/dev/stdout")
+        || path.starts_with("/dev/stderr")
+        || path.starts_with("/dev/fd/")
+    {
+        return true;
+    }
+    if path.starts_with('/') || path.starts_with('~') || path.contains('$') {
+        return false;
+    }
+    if path == ".." || path.starts_with("../") || path.contains("/../") || path.ends_with("/..") {
+        return false;
+    }
+    !path.split('/').any(|seg| seg == ".git" || seg == ".envrc")
+}
+
 pub(crate) fn redirect_verdict(redirs: &[Redir]) -> Verdict {
     let mut level = Verdict::Allowed(SafetyLevel::Inert);
     for r in redirs {
         match r {
             Redir::Write { target, .. } => {
                 level = level.combine(word_sub_verdict(target));
-                if target.eval() != "/dev/null" {
+                let t = target.eval();
+                if t == "/dev/null" {
+                    // Inert: no side effect, no promotion.
+                } else if is_safe_write_target(&t) {
                     level = level.combine(Verdict::Allowed(SafetyLevel::SafeWrite));
+                } else {
+                    level = level.combine(Verdict::Denied);
                 }
             }
             Redir::Read { target, .. } => {
