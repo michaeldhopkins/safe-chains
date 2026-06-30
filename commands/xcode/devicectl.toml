@@ -1,0 +1,106 @@
+[[command]]
+name = "devicectl"
+description = "Apple CoreDevice CLI (normally invoked as `xcrun devicectl`) for inspecting and managing connected Apple devices. `list devices` and `list preferredDDI` enumerate devices and Developer Disk Image availability. `device info <...>` inspects device state — details, lock state, running processes, installed apps, displays, DDI services, and app-container file listings — without changing anything. The state-changing verbs act on an external physical device: `device install app` / `device uninstall app` add or remove apps (uninstall destroys the app's data container), `device copy` transfers files to or from the device, `device process launch/terminate/signal/resume/suspend` run or control processes on the device, `device reboot` restarts it, `device notification`/`device orientation` post device state, and `manage pair/unpair` change the host-device trust relationship. `device info appIcon` and `diagnose` read the device but write a file to the host. Introduced in Xcode 15; the verb tree is stable but flags track Xcode releases."
+url = "https://theapplewiki.com/wiki/Devicectl"
+researched_version = "Xcode 16 / CoreDevice (devicectl)"
+bare_flags = ["--help", "--version", "-h"]
+examples = [
+    "devicectl list devices",
+    "devicectl list preferredDDI",
+    "devicectl device info details --device 00008132-0001",
+    "devicectl device info apps -d 00008132-0001",
+    "devicectl device info processes --device 00008132-0001",
+    "devicectl device info files --device 00008132-0001",
+    "xcrun devicectl list devices",
+]
+examples_denied = [
+    "devicectl device install app --device 00008132-0001 /tmp/My.app",
+    "devicectl device uninstall app --device 00008132-0001 com.example.app",
+    "devicectl device copy to --device 00008132-0001 a b",
+    "devicectl device process launch --device 00008132-0001 com.example.app",
+    "devicectl device reboot --device 00008132-0001",
+    "devicectl manage pair",
+    "xcrun devicectl device install app --device 00008132-0001 /tmp/My.app",
+]
+[command.wrapper]
+standalone = ["-q", "-v", "--quiet", "--verbose"]
+valued = ["--device", "--json-output", "--log-output", "--timeout", "-d", "-j", "-l", "-t"]
+
+[[command.sub]]
+name = "list"
+nested_bare = true
+[[command.sub.sub]]
+name = "devices"
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "preferredDDI"
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "device"
+nested_bare = true
+[[command.sub.sub]]
+name = "info"
+nested_bare = true
+[[command.sub.sub.sub]]
+name = "details"
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "lockState"
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "processes"
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "apps"
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "displays"
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "ddiServices"
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "files"
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "appIcon"
+candidate = true
+[[command.sub.sub]]
+name = "install"
+candidate = true
+[[command.sub.sub]]
+name = "uninstall"
+candidate = true
+[[command.sub.sub]]
+name = "copy"
+candidate = true
+[[command.sub.sub]]
+name = "process"
+candidate = true
+[[command.sub.sub]]
+name = "reboot"
+candidate = true
+[[command.sub.sub]]
+name = "notification"
+candidate = true
+[[command.sub.sub]]
+name = "orientation"
+candidate = true
+
+[[command.sub]]
+name = "manage"
+candidate = true
+
+[[command.sub]]
+name = "diagnose"
+candidate = true
