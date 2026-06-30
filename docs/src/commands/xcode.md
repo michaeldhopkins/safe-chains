@@ -46,6 +46,20 @@
 - `codesign -d --xml --entitlements - MyApp.app`
 - `codesign -dv --verbose=4 MyApp.app`
 
+### `devicectl`
+<p class="cmd-url"><a href="https://theapplewiki.com/wiki/Devicectl">https://theapplewiki.com/wiki/Devicectl</a></p>
+
+- **device info apps**: Positional args accepted
+- **device info ddiServices**: Positional args accepted
+- **device info details**: Positional args accepted
+- **device info displays**: Positional args accepted
+- **device info files**: Positional args accepted
+- **device info lockState**: Positional args accepted
+- **device info processes**: Positional args accepted
+- **list devices**: Positional args accepted
+- **list preferredDDI**: Positional args accepted
+- Allowed standalone flags: --help, --version, -h
+
 ### `gen_bridge_metadata`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/gen_bridge_metadata.1.html">https://keith.github.io/xcode-man-pages/gen_bridge_metadata.1.html</a></p>
 
@@ -409,6 +423,7 @@
 - **actool**: delegates to inner command
 - **agvtool**: delegates to inner command
 - **codesign**: delegates to inner command
+- **devicectl**: delegates to inner command
 - **ibtool**: delegates to inner command
 - **lipo**: delegates to inner command
 - **pkgutil**: delegates to inner command
@@ -421,7 +436,7 @@
 - **xcresulttool**: delegates to inner command
 - **xctest**: delegates to inner command
 - **xctrace**: delegates to inner command
-- Allowed standalone flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
 
 ### `xctest`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/xctest.1.html">https://keith.github.io/xcode-man-pages/xctest.1.html</a></p>

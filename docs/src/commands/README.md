@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1609 commands across 75 categories.
+safe-chains knows 1610 commands across 75 categories.
 
 ## Glossary
 
@@ -91,5 +91,5 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Version Control](vcs.md) (11 commands)
 - [WebAssembly](wasm.md) (10 commands)
 - [Shell Wrappers](wrappers.md) (7 commands)
-- [Xcode](xcode.md) (29 commands)
+- [Xcode](xcode.md) (30 commands)
 
