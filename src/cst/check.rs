@@ -65,19 +65,34 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             }
             body_v.combine(redir_v)
         }
-        Cmd::For { items, body, .. } => {
-            let items_v = words_sub_verdict(items);
-            let body_v = script_verdict(body);
-            items_v.combine(body_v)
+        Cmd::For { items, body, redirs, .. } => {
+            let redir_v = redirect_verdict(redirs);
+            if let Verdict::Denied = redir_v {
+                return Verdict::Denied;
+            }
+            words_sub_verdict(items)
+                .combine(script_verdict(body))
+                .combine(redir_v)
         }
-        Cmd::While { cond, body } | Cmd::Until { cond, body } => {
-            script_verdict(cond).combine(script_verdict(body))
+        Cmd::While { cond, body, redirs } | Cmd::Until { cond, body, redirs } => {
+            let redir_v = redirect_verdict(redirs);
+            if let Verdict::Denied = redir_v {
+                return Verdict::Denied;
+            }
+            script_verdict(cond)
+                .combine(script_verdict(body))
+                .combine(redir_v)
         }
         Cmd::If {
             branches,
             else_body,
+            redirs,
         } => {
-            let mut v = Verdict::Allowed(SafetyLevel::Inert);
+            let redir_v = redirect_verdict(redirs);
+            if let Verdict::Denied = redir_v {
+                return Verdict::Denied;
+            }
+            let mut v = redir_v;
             for b in branches {
                 v = v.combine(script_verdict(&b.cond)).combine(script_verdict(&b.body));
             }
@@ -228,7 +243,15 @@ fn script_yields_eval_safe(script: &Script) -> bool {
     let Cmd::Simple(s) = &pipeline.commands[0] else {
         return false;
     };
-    if !s.env.is_empty() || !s.redirs.is_empty() {
+    if !s.env.is_empty() {
+        return false;
+    }
+    // A redirect inside the substitution is allowed only if it's inert:
+    // stderr suppression (`2>/dev/null`), an fd dup (`2>&1`), or `/dev/null`.
+    // A redirect that writes a real file is SafeWrite, not inert, so
+    // `mise activate bash > evil` is rejected — eval-safe must not gain a
+    // file-write side effect, and diverting stdout to a file is pointless here.
+    if redirect_verdict(&s.redirs) != Verdict::Allowed(SafetyLevel::Inert) {
         return false;
     }
     for w in &s.words {

@@ -119,9 +119,9 @@ fn arb_cmd(depth: u32) -> BoxedStrategy<Cmd> {
             arb_env_name(),
             prop::collection::vec(arb_word(0), 1..3),
             arb_script(depth - 1),
-        ).prop_map(|(var, items, body)| Cmd::For { var, items, body }),
+        ).prop_map(|(var, items, body)| Cmd::For { var, items, body, redirs: vec![] }),
         1 => (arb_script(depth - 1), arb_script(depth - 1))
-            .prop_map(|(cond, body)| Cmd::While { cond, body }),
+            .prop_map(|(cond, body)| Cmd::While { cond, body, redirs: vec![] }),
         1 => (
             prop::collection::vec(
                 (arb_script(depth - 1), arb_script(depth - 1))
@@ -129,7 +129,7 @@ fn arb_cmd(depth: u32) -> BoxedStrategy<Cmd> {
                 1..3,
             ),
             prop::option::of(arb_script(depth - 1)),
-        ).prop_map(|(branches, else_body)| Cmd::If { branches, else_body }),
+        ).prop_map(|(branches, else_body)| Cmd::If { branches, else_body, redirs: vec![] }),
         1 => prop::collection::vec(arb_word(0), 1..4)
             .prop_map(|words| Cmd::DoubleBracket { words, redirs: vec![] }),
     ]
@@ -345,6 +345,7 @@ proptest! {
             var,
             items,
             body: unsafe_script(),
+            redirs: vec![],
         };
         prop_assert!(!check::is_safe_cmd(&cmd));
     }
@@ -354,6 +355,7 @@ proptest! {
         let cmd = Cmd::While {
             cond: safe_cond,
             body: unsafe_script(),
+            redirs: vec![],
         };
         prop_assert!(!check::is_safe_cmd(&cmd));
     }
@@ -363,6 +365,7 @@ proptest! {
         let cmd = Cmd::While {
             cond: unsafe_script(),
             body: safe_body,
+            redirs: vec![],
         };
         prop_assert!(!check::is_safe_cmd(&cmd));
     }
@@ -375,6 +378,7 @@ proptest! {
                 body: unsafe_script(),
             }],
             else_body: None,
+            redirs: vec![],
         };
         prop_assert!(!check::is_safe_cmd(&cmd));
     }
@@ -387,6 +391,7 @@ proptest! {
                 body: safe_body,
             }],
             else_body: None,
+            redirs: vec![],
         };
         prop_assert!(!check::is_safe_cmd(&cmd));
     }
@@ -399,6 +404,7 @@ proptest! {
                 body: safe_body,
             }],
             else_body: Some(unsafe_script()),
+            redirs: vec![],
         };
         prop_assert!(!check::is_safe_cmd(&cmd));
     }
@@ -412,6 +418,7 @@ proptest! {
             var,
             items: vec![Word(vec![WordPart::CmdSub(unsafe_script())])],
             body: safe_body,
+            redirs: vec![],
         };
         prop_assert!(!check::is_safe_cmd(&cmd));
     }
