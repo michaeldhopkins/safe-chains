@@ -1507,6 +1507,7 @@ safe_read! {
 }
 
 safe_write! {
+    level_workon_bare: "workon",
     for_loop_redirect_to_file: "for f in a b; do echo $f; done > out.txt",
     level_cargo_build: "cargo build",
     level_cargo_build_help: "cargo build --help",
