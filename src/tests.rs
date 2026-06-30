@@ -29,6 +29,9 @@ safe! {
     eval_mise_activate_unquoted: "eval $(mise activate bash)",
     eval_mise_activate_backtick: "eval `mise activate bash`",
     eval_two_mise_activates: "eval \"$(mise activate bash)\" \"$(mise activate zsh)\"",
+    eval_mise_activate_stderr_devnull: "eval \"$(mise activate bash 2>/dev/null)\"",
+    eval_mise_activate_stderr_merge: "eval \"$(mise activate bash 2>&1)\"",
+    eval_mise_activate_stdout_devnull: "eval \"$(mise activate bash > /dev/null)\"",
 
     ruby_syntax_check_absolute_path: "ruby -c /tmp/foo.rb",
     ruby_syntax_check_clustered: "ruby -cscript.rb",
@@ -764,6 +767,11 @@ safe! {
     if_elif: "if test -f a; then echo a; elif test -f b; then echo b; else echo c; fi",
     nested_if_in_for: "for x in 1 2; do if test $x = 1; then echo one; fi; done",
     nested_for_in_if: "if true; then for x in 1 2; do echo $x; done; fi",
+    for_redirect_devnull: "for f in a b; do echo $f; done 2>/dev/null",
+    for_redirect_pipe: "for f in src/a src/b; do echo $f; done 2>&1 | head -5",
+    while_redirect_devnull: "while true; do echo x; done 2>/dev/null",
+    if_redirect_stderr: "if true; then echo x; fi 2>&1",
+    gh_api_for_loop: "for f in a.rs b.rs; do echo \"== $f ==\"; gh api repos/o/r/contents/$f --jq .content | base64 -d; done 2>&1 | head -260",
     bare_negation: "! echo hello",
     bare_negation_test: "! test -f foo",
     keyword_as_data: "echo for; echo done; echo if; echo fi",
@@ -1049,6 +1057,8 @@ safe! {
 }
 
 denied! {
+    for_redirect_target_cmdsub_denied: "for f in a b; do echo $f; done > $(evil)",
+    for_redirect_unsafe_body_denied: "for f in a b; do rm -rf $f; done 2>/dev/null",
     heredoc_pipe_to_bash_unsafe: "cat <<'EOF' | bash\nrm -rf /\nEOF",
     heredoc_pipe_to_bash_safe_inner: "cat <<EOF | bash\nls\nEOF",
     heredoc_strip_tabs_pipe_to_bash: "cat <<-EOF | bash\n\trm -rf /\n\tEOF",
@@ -1140,7 +1150,8 @@ denied! {
     eval_arith: "eval \"$(( 1 + 2 ))\"",
     eval_process_substitution: "eval <(mise activate bash)",
     eval_piped_sub: "eval \"$(mise activate bash | cat)\"",
-    eval_mise_sub_with_redir: "eval \"$(mise activate bash > /dev/null)\"",
+    eval_mise_sub_redir_unsafe_target: "eval \"$(mise activate bash > $(evil))\"",
+    eval_mise_sub_redir_to_file: "eval \"$(mise activate bash > evil)\"",
     eval_mise_activate_help: "eval \"$(mise activate --help)\"",
     eval_mise_activate_h: "eval \"$(mise activate -h)\"",
     eval_mise_activate_bang: "eval \"$(! mise activate bash)\"",
@@ -1496,6 +1507,7 @@ safe_read! {
 }
 
 safe_write! {
+    for_loop_redirect_to_file: "for f in a b; do echo $f; done > out.txt",
     level_cargo_build: "cargo build",
     level_cargo_build_help: "cargo build --help",
     level_cargo_doc: "cargo doc",

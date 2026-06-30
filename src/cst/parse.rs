@@ -554,7 +554,8 @@ fn for_cmd(input: &mut &str) -> ModalResult<Cmd> {
     };
 
     let body = do_done_body.parse_next(input)?;
-    Ok(Cmd::For { var, items, body })
+    let redirs = trailing_redirs(input)?;
+    Ok(Cmd::For { var, items, body, redirs })
 }
 
 fn while_cmd(input: &mut &str) -> ModalResult<Cmd> {
@@ -562,7 +563,8 @@ fn while_cmd(input: &mut &str) -> ModalResult<Cmd> {
     ws.parse_next(input)?;
     let cond = script.parse_next(input)?;
     let body = do_done_body.parse_next(input)?;
-    Ok(Cmd::While { cond, body })
+    let redirs = trailing_redirs(input)?;
+    Ok(Cmd::While { cond, body, redirs })
 }
 
 fn until_cmd(input: &mut &str) -> ModalResult<Cmd> {
@@ -570,7 +572,8 @@ fn until_cmd(input: &mut &str) -> ModalResult<Cmd> {
     ws.parse_next(input)?;
     let cond = script.parse_next(input)?;
     let body = do_done_body.parse_next(input)?;
-    Ok(Cmd::Until { cond, body })
+    let redirs = trailing_redirs(input)?;
+    Ok(Cmd::Until { cond, body, redirs })
 }
 
 fn do_done_body(input: &mut &str) -> ModalResult<Script> {
@@ -605,7 +608,8 @@ fn if_cmd(input: &mut &str) -> ModalResult<Cmd> {
 
     sep.parse_next(input)?;
     eat_keyword(input, "fi")?;
-    Ok(Cmd::If { branches, else_body })
+    let redirs = trailing_redirs(input)?;
+    Ok(Cmd::If { branches, else_body, redirs })
 }
 
 fn cond_then_body(input: &mut &str) -> ModalResult<Branch> {
@@ -853,6 +857,30 @@ mod tests {
         } else { panic!("expected Subshell with redir"); }
     }
     #[test]
+    fn for_loop_with_redirect() {
+        if let Cmd::For { redirs, .. } = &p("for f in a b; do echo $f; done 2>/dev/null").0[0].pipeline.commands[0] {
+            assert_eq!(redirs.len(), 1);
+        } else { panic!("expected For with redir"); }
+    }
+    #[test]
+    fn for_loop_redirect_then_pipe() {
+        // `done 2>&1 | head` — redirect on the loop, then a pipe.
+        let pl = &p("for f in a b; do echo $f; done 2>&1 | head -5").0[0].pipeline;
+        assert_eq!(pl.commands.len(), 2);
+        assert!(matches!(&pl.commands[0], Cmd::For { redirs, .. } if redirs.len() == 1));
+    }
+    #[test]
+    fn while_and_if_with_redirect() {
+        assert!(matches!(
+            &p("while true; do echo x; done 2>/dev/null").0[0].pipeline.commands[0],
+            Cmd::While { redirs, .. } if redirs.len() == 1
+        ));
+        assert!(matches!(
+            &p("if true; then echo x; fi 2>&1").0[0].pipeline.commands[0],
+            Cmd::If { redirs, .. } if redirs.len() == 1
+        ));
+    }
+    #[test]
     fn background() { assert_eq!(p("ls & echo done").0[0].op, Some(ListOp::Amp)); }
 
     #[test]
@@ -943,14 +971,14 @@ mod tests {
     fn while_loop() { assert!(matches!(&p("while test -f /tmp/foo; do sleep 1; done").0[0].pipeline.commands[0], Cmd::While { .. })); }
     #[test]
     fn if_then_fi() {
-        if let Cmd::If { branches, else_body } = &p("if test -f foo; then echo exists; fi").0[0].pipeline.commands[0] {
+        if let Cmd::If { branches, else_body, .. } = &p("if test -f foo; then echo exists; fi").0[0].pipeline.commands[0] {
             assert_eq!(branches.len(), 1);
             assert!(else_body.is_none());
         } else { panic!("expected If"); }
     }
     #[test]
     fn if_elif_else() {
-        if let Cmd::If { branches, else_body } = &p("if test -f a; then echo a; elif test -f b; then echo b; else echo c; fi").0[0].pipeline.commands[0] {
+        if let Cmd::If { branches, else_body, .. } = &p("if test -f a; then echo a; elif test -f b; then echo b; else echo c; fi").0[0].pipeline.commands[0] {
             assert_eq!(branches.len(), 2);
             assert!(else_body.is_some());
         } else { panic!("expected If"); }

@@ -8,6 +8,13 @@ fn write_sep(f: &mut fmt::Formatter<'_>, trailing_op: Option<ListOp>) -> fmt::Re
     Ok(())
 }
 
+fn write_redirs(f: &mut fmt::Formatter<'_>, redirs: &[Redir]) -> fmt::Result {
+    for r in redirs {
+        write!(f, " {r}")?;
+    }
+    Ok(())
+}
+
 fn write_body(f: &mut fmt::Formatter<'_>, script: &Script) -> fmt::Result {
     for (i, stmt) in script.0.iter().enumerate() {
         if i > 0 {
@@ -83,7 +90,7 @@ impl fmt::Display for Cmd {
                 }
                 Ok(())
             }
-            Cmd::For { var, items, body } => {
+            Cmd::For { var, items, body, redirs } => {
                 write!(f, "for {var}")?;
                 if !items.is_empty() {
                     f.write_str(" in")?;
@@ -94,23 +101,26 @@ impl fmt::Display for Cmd {
                 write_sep(f, None)?;
                 write!(f, " do ")?;
                 write_body(f, body)?;
-                f.write_str(" done")
+                f.write_str(" done")?;
+                write_redirs(f, redirs)
             }
-            Cmd::While { cond, body } => {
+            Cmd::While { cond, body, redirs } => {
                 write!(f, "while {cond}")?;
                 write_sep(f, cond.0.last().and_then(|s| s.op))?;
                 write!(f, " do ")?;
                 write_body(f, body)?;
-                f.write_str(" done")
+                f.write_str(" done")?;
+                write_redirs(f, redirs)
             }
-            Cmd::Until { cond, body } => {
+            Cmd::Until { cond, body, redirs } => {
                 write!(f, "until {cond}")?;
                 write_sep(f, cond.0.last().and_then(|s| s.op))?;
                 write!(f, " do ")?;
                 write_body(f, body)?;
-                f.write_str(" done")
+                f.write_str(" done")?;
+                write_redirs(f, redirs)
             }
-            Cmd::If { branches, else_body } => {
+            Cmd::If { branches, else_body, redirs } => {
                 for (i, branch) in branches.iter().enumerate() {
                     if i == 0 {
                         write!(f, "if {}", branch.cond)?;
@@ -126,7 +136,8 @@ impl fmt::Display for Cmd {
                     write!(f, " else ")?;
                     write_body(f, eb)?;
                 }
-                f.write_str(" fi")
+                f.write_str(" fi")?;
+                write_redirs(f, redirs)
             }
             Cmd::DoubleBracket { words, redirs } => {
                 f.write_str("[[")?;
@@ -281,6 +292,18 @@ mod tests {
     fn display_if() {
         let s = parse("if true; then echo yes; else echo no; fi").unwrap();
         assert_eq!(s.to_string(), "if true; then echo yes; else echo no; fi");
+    }
+
+    #[test]
+    fn display_for_with_redirect() {
+        let s = parse("for x in 1 2; do echo $x; done 2>/dev/null").unwrap();
+        assert_eq!(s.to_string(), "for x in 1 2; do echo $x; done 2> /dev/null");
+    }
+
+    #[test]
+    fn display_if_with_redirect() {
+        let s = parse("if true; then echo yes; fi 2>&1").unwrap();
+        assert_eq!(s.to_string(), "if true; then echo yes; fi 2>&1");
     }
 
     #[test]

@@ -44,18 +44,22 @@ pub enum Cmd {
         var: String,
         items: Vec<Word>,
         body: Script,
+        redirs: Vec<Redir>,
     },
     While {
         cond: Script,
         body: Script,
+        redirs: Vec<Redir>,
     },
     Until {
         cond: Script,
         body: Script,
+        redirs: Vec<Redir>,
     },
     If {
         branches: Vec<Branch>,
         else_body: Option<Script>,
+        redirs: Vec<Redir>,
     },
     DoubleBracket {
         words: Vec<Word>,
@@ -196,20 +200,23 @@ impl Cmd {
                 body: body.normalize_as_body(),
                 redirs: normalize_redirs(redirs),
             },
-            Cmd::For { var, items, body } => Cmd::For {
+            Cmd::For { var, items, body, redirs } => Cmd::For {
                 var: var.clone(),
                 items: items.iter().map(|w| w.normalize()).collect(),
                 body: body.normalize_as_body(),
+                redirs: normalize_redirs(redirs),
             },
-            Cmd::While { cond, body } => Cmd::While {
+            Cmd::While { cond, body, redirs } => Cmd::While {
                 cond: cond.normalize_as_body(),
                 body: body.normalize_as_body(),
+                redirs: normalize_redirs(redirs),
             },
-            Cmd::Until { cond, body } => Cmd::Until {
+            Cmd::Until { cond, body, redirs } => Cmd::Until {
                 cond: cond.normalize_as_body(),
                 body: body.normalize_as_body(),
+                redirs: normalize_redirs(redirs),
             },
-            Cmd::If { branches, else_body } => Cmd::If {
+            Cmd::If { branches, else_body, redirs } => Cmd::If {
                 branches: branches
                     .iter()
                     .map(|b| Branch {
@@ -218,6 +225,7 @@ impl Cmd {
                     })
                     .collect(),
                 else_body: else_body.as_ref().map(|e| e.normalize_as_body()),
+                redirs: normalize_redirs(redirs),
             },
             Cmd::DoubleBracket { words, redirs } => Cmd::DoubleBracket {
                 words: words.iter().map(|w| w.normalize()).collect(),
