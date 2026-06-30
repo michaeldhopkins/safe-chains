@@ -1,8 +1,9 @@
 [[command]]
 name = "workon"
-description = "Lightweight CLI for managing working directories and project context. With only --help and --version exposed and no positional arguments, it is purely informational. Single-maintainer project."
+description = "Per-project terminal/VCS session manager. As of 0.16.0 it always operates on the current directory (the earlier `[PROJECT]` positional was removed). Bare `workon` and the action flags create or switch session context and can launch the configured editor/shell and create VCS worktrees: `-w` adds a worktree, `--name` names the session, `--new-session` forces a fresh session (replacing the old `-n` shortcut, now a hidden no-op — it previously recreated the session), `-r`/`--resume` reattaches, `-c`/`--config` selects a config file. `--help` and `--version` are the only read-only forms. Single-maintainer project on a fast pre-1.0 cadence (0.17.x); the flag surface is still moving."
 url = "https://github.com/michaeldhopkins/workon"
-level = "Inert"
+researched_version = "workon 0.17.1"
+level = "SafeWrite"
 bare = true
 max_positional = 0
 standalone = ["--help", "--version", "-V", "-h"]
