@@ -1882,9 +1882,9 @@ Aliases: `capacitor`
 - **bench**: Flags: --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **bloat**: Flags: --crates, --filter, --help, --lib, --no-default-features, --release, --time, --wide, -h. Valued: --bin, --example, --features, --jobs, --manifest-path, --message-format, --package, --target, -j, -n, -p
 - **build**: Flags: --all-features, --all-targets, --benches, --bins, --build-plan, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
-- **check**: Flags: --all-features, --all-targets, --benches, --bins, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
+- **check**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, --version, --workspace, -V, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **clean**: Flags: --doc, --dry-run, --frozen, --help, --locked, --offline, --release, --workspace, -h, -n, --quiet, -q, -r, -v. Valued: --color, --config, --lockfile-path, --manifest-path, --package, --profile, --target, --target-dir, -Z, -p
-- **clippy**: Flags: --all-features, --all-targets, --benches, --bins, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-deps, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
+- **clippy**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-deps, --offline, --release, --tests, --timings, --unit-graph, --version, --workspace, -V, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **config get**: Flags: --frozen, --help, --locked, --offline, --show-origin, -h, --quiet, -q, -v. Valued: --color, --config, --format, --merged, -Z
 - **criterion**: Flags: --all, --all-features, --all-targets, --benches, --bins, --debug, --examples, --frozen, --help, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --tests, --verbose, --version, --workspace, -V, -h, -v. Valued: --bench, --bin, --color, --criterion-manifest-path, --example, --exclude, --features, --history-description, --history-id, --jobs, --manifest-path, --message-format, --output-format, --package, --plotting-backend, --target, --target-dir, --test, -Z, -j, -p
 - **cyclonedx**: Flags: --all, --all-features, --help, --license-strict, --no-default-features, --quiet, --target-in-filename, --top-level, --verbose, --version, -V, -a, -h, -q, -v. Valued: --describe, --features, --format, --license-accept-named, --manifest-path, --override-filename, --spec-version, --target, -F, -f
@@ -1897,6 +1897,7 @@ Aliases: `capacitor`
 - **generate-lockfile**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
 - **help**: Positional args accepted
 - **info**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --index, --registry
+- **init**: Flags: --bin, --frozen, --help, --lib, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --edition, --name, --registry, --vcs, -Z
 - **install**: Flags: --all-features, --bins, --debug, --force, --frozen, --help, --ignore-rust-version, --keep-going, --locked, --no-default-features, --no-track, --offline, --quiet, --timings, --verbose, -f, -h, -q, -v. Valued: --bin, --color, --config, --example, --features, --jobs, --message-format, --path, --profile, --root, --target, --target-dir, -F, -Z, -j
 - **license**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
 - **llvm-cov**: Flags: --all-features, --all-targets, --help, --html, --json, --lcov, --lib, --locked, --no-cfg-coverage, --no-default-features, --no-fail-fast, --no-run, --open, --release, --text, -h. Valued: --bin, --branch, --codecov, --cobertura, --color, --config, --example, --exclude, --features, --ignore-filename-regex, --ignore-run-fail, --jobs, --manifest-path, --output-dir, --output-path, --package, --profile, --target, --target-dir, --test, -j, -p
@@ -1909,10 +1910,12 @@ Aliases: `capacitor`
 - **msrv show**: Flags: --help, --no-log, --no-user-output, -h. Valued: --log-level, --log-target, --manifest-path, --output-format, --path
 - **msrv verify**: Flags: --all-features, --help, --ignore-lockfile, --include-all-patch-releases, --no-check-feedback, --no-default-features, --no-log, --no-user-output, -h. Valued: --component, --features, --log-level, --log-target, --manifest-path, --max, --maximum, --min, --minimum, --output-format, --path, --release-source, --rust-version, --target
 - **msrv**: Flags: --help, --no-log, --no-user-output, --version, -V, -h. Valued: --log-level, --log-target, --manifest-path, --output-format, --path
+- **new**: Flags: --bin, --frozen, --help, --lib, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --edition, --name, --registry, --vcs, -Z
 - **nextest archive**: Flags: --all-features, --help, --locked, --no-default-features, --release, -h. Valued: --archive-file, --archive-format, --cargo-profile, --features, --manifest-path, --package, --target, --target-dir, -p
 - **nextest list**: Flags: --all-features, --help, --lib, --locked, --no-default-features, --release, -T, -h. Valued: --bin, --color, --config, --exclude, --features, --manifest-path, --message-format, --package, --partition, --profile, --target, --target-dir, --test, -E, -p
 - **nextest run**: Flags: --all-features, --all-targets, --help, --lib, --locked, --no-capture, --no-default-features, --no-fail-fast, --release, --status-level, -h. Valued: --bin, --cargo-profile, --color, --config, --exclude, --features, --jobs, --manifest-path, --package, --partition, --profile, --retries, --target, --target-dir, --test, --test-threads, --threads, -E, -j, -p
 - **nextest show-config**: Flags: --help, -h
+- **nextest**: Flags: --help, --version, -V, -h
 - **outdated**: Flags: --aggressive, --color, --depth, --exit-code, --features, --help, --manifest-path, --packages, --root-deps-only, --verbose, --workspace, -R, -V, -d, -h, -n, --quiet, -q, -r, -v, -w. Valued: --color, --depth, --exclude, --features, --ignore, --manifest-path, --packages, -d, -e, -i, -p
 - **package** (requires --list, -l): Flags: --all-features, --allow-dirty, --exclude-lockfile, --frozen, --help, --keep-going, --list, --locked, --no-default-features, --no-metadata, --no-verify, --offline, --workspace, -h, -l, --quiet, -q, -v. Valued: --color, --config, --exclude, --features, --index, --jobs, --lockfile-path, --manifest-path, --message-format, --package, --registry, --target, --target-dir, -F, -Z, -j, -p
 - **pkgid**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
@@ -3936,6 +3939,13 @@ Aliases: `erblint`
 - Allowed standalone flags: --list-events, --oslog
 - Allowed valued flags: --format, --oslog-category, --oslog-subsystem
 - Hyphen-prefixed positional arguments accepted
+
+### `espeak-ng`
+<p class="cmd-url"><a href="https://github.com/espeak-ng/espeak-ng">https://github.com/espeak-ng/espeak-ng</a></p>
+
+- Allowed standalone flags: --help, --ipa, --stdin, --version, --voices, -h, -m, -q, -x, -z
+- Allowed valued flags: --path, --pho, --punct, --sep, --tie, -a, -b, -f, -g, -k, -l, -p, -s, -v
+- Bare invocation allowed
 
 ### `esptool`
 <p class="cmd-url"><a href="https://docs.espressif.com/projects/esptool/en/latest/esp32/">https://docs.espressif.com/projects/esptool/en/latest/esp32/</a></p>

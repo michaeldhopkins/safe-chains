@@ -1,0 +1,15 @@
+[[command]]
+name = "espeak-ng"
+description = "Compact open-source speech synthesizer and text-to-phoneme (grapheme-to-phoneme) engine. Bare invocation and a text argument read text and either speak it (transient audio) or, with -q, produce no audio; --ipa/-x/-X print phonemes or translation rules to stdout (read-only). -f reads an input text file; --stdin reads stdin; -v/-s/-p/-a/-g/-k/-l tune voice and prosody. It never writes files, executes code, or touches the network in these forms. The file-writing and data-building forms (-w to write a WAV, --compile/--compile-debug to rebuild voice/dictionary data, --phonout to write a phoneme trace) are out of the read-only surface here. Actively maintained; the CLI surface is stable."
+url = "https://github.com/espeak-ng/espeak-ng"
+researched_version = "espeak-ng 1.52"
+level = "SafeRead"
+bare = true
+standalone = [
+    "--help", "--ipa", "--stdin", "--version", "--voices", "-h",
+    "-m", "-q", "-x", "-z",
+]
+valued = [
+    "--path", "--pho", "--punct", "--sep", "--tie",
+    "-a", "-b", "-f", "-g", "-k", "-l", "-p", "-s", "-v",
+]

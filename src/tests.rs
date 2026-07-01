@@ -852,6 +852,10 @@ safe! {
     jj_git_fetch: "jj git fetch",
     jj_git_import: "jj git import",
     jj_bookmark_list: "jj bookmark list",
+    cargo_nextest_version: "cargo nextest --version",
+    espeak_ipa: "espeak-ng -q --ipa -v en-us -- \"-Zephyr\"",
+    espeak_text: "espeak-ng --ipa -v en-us hello",
+    espeak_voices: "espeak-ng --voices",
     jj_config_get: "jj config get user.name",
     jj_config_list: "jj config list",
     jj_config_path: "jj config path",
@@ -1134,8 +1138,10 @@ denied! {
     cargo_vet_certify_denied: "cargo vet certify serde 1.0.0",
     cargo_fix_denied: "cargo fix",
     cargo_rustc_denied: "cargo rustc",
-    cargo_new_denied: "cargo new foo",
+    cargo_new_bare_denied: "cargo new",
     cargo_add_denied: "cargo add serde",
+    espeak_wav_write_denied: "espeak-ng -w out.wav hello",
+    espeak_compile_denied: "espeak-ng --compile=en",
     cargo_config_set_denied: "cargo config set build.target x86_64",
     cargo_report_unknown_denied: "cargo report unknown-report",
 
@@ -1474,6 +1480,10 @@ safe_read! {
     level_cargo_test: "cargo test",
     level_cargo_clippy: "cargo clippy",
     level_cargo_check: "cargo check",
+    level_cargo_check_workspace: "cargo check --workspace",
+    level_cargo_check_exclude: "cargo check --workspace --exclude foo",
+    level_cargo_clippy_workspace: "cargo clippy --workspace",
+    level_cargo_clippy_version: "cargo clippy --version",
     level_cargo_bench: "cargo bench",
     level_cargo_publish_dry: "cargo publish --dry-run",
     level_cargo_udeps: "cargo udeps",
@@ -1514,6 +1524,9 @@ safe_read! {
 }
 
 safe_write! {
+    level_cargo_init: "cargo init",
+    level_cargo_init_named: "cargo init --name billlocal --vcs none",
+    level_cargo_new: "cargo new myproj --lib",
     level_workon_bare: "workon",
     for_loop_redirect_to_file: "for f in a b; do echo $f; done > out.txt",
     level_cargo_build: "cargo build",

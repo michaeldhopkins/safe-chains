@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1610 commands across 75 categories.
+safe-chains knows 1611 commands across 75 categories.
 
 ## Glossary
 
@@ -58,7 +58,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Common Lisp](lisp.md) (2 commands)
 - [Lua](lua.md) (2 commands)
 - [ImageMagick](magick.md) (1 commands)
-- [Media](media.md) (84 commands)
+- [Media](media.md) (85 commands)
 - [Database Migrations](migrations.md) (6 commands)
 - [ML / Observability](ml.md) (7 commands)
 - [Mobile Frameworks](mobile.md) (5 commands)

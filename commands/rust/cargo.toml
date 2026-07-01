@@ -34,6 +34,34 @@ valued = [
 ]
 
 [[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+max_positional = 1
+standalone = [
+    "--bin", "--frozen", "--help", "--lib", "--locked", "--offline",
+    "-h", "--quiet", "-q", "-v",
+]
+valued = [
+    "--color", "--config", "--edition", "--name", "--registry", "--vcs",
+    "-Z",
+]
+
+[[command.sub]]
+name = "new"
+level = "SafeWrite"
+bare = false
+max_positional = 1
+standalone = [
+    "--bin", "--frozen", "--help", "--lib", "--locked", "--offline",
+    "-h", "--quiet", "-q", "-v",
+]
+valued = [
+    "--color", "--config", "--edition", "--name", "--registry", "--vcs",
+    "-Z",
+]
+
+[[command.sub]]
 name = "build"
 level = "SafeWrite"
 standalone = [
@@ -54,15 +82,15 @@ valued = [
 name = "check"
 level = "SafeRead"
 standalone = [
-    "--all-features", "--all-targets", "--benches", "--bins", "--examples",
+    "--all", "--all-features", "--all-targets", "--benches", "--bins", "--examples",
     "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--offline",
-    "--release", "--tests", "--timings", "--unit-graph",
-    "-h", "--quiet", "-q", "-v",
+    "--release", "--tests", "--timings", "--unit-graph", "--version", "--workspace",
+    "-V", "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--bench", "--bin", "--color", "--config", "--example",
-    "--features", "--jobs", "--manifest-path", "--message-format",
+    "--exclude", "--features", "--jobs", "--manifest-path", "--message-format",
     "--package", "--profile", "--target", "--target-dir", "--test",
     "-Z", "-j", "-p",
 ]
@@ -71,15 +99,15 @@ valued = [
 name = "clippy"
 level = "SafeRead"
 standalone = [
-    "--all-features", "--all-targets", "--benches", "--bins", "--examples",
+    "--all", "--all-features", "--all-targets", "--benches", "--bins", "--examples",
     "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--no-deps",
     "--offline", "--release", "--tests", "--timings", "--unit-graph",
-    "-h", "--quiet", "-q", "-v",
+    "--version", "--workspace", "-V", "-h", "--quiet", "-q", "-v",
 ]
 valued = [
     "--bench", "--bin", "--color", "--config", "--example",
-    "--features", "--jobs", "--manifest-path", "--message-format",
+    "--exclude", "--features", "--jobs", "--manifest-path", "--message-format",
     "--package", "--profile", "--target", "--target-dir", "--test",
     "-Z", "-j", "-p",
 ]
@@ -289,6 +317,8 @@ valued = ["--color", "--config", "--manifest-path"]
 
 [[command.sub]]
 name = "nextest"
+nested_bare = true
+standalone = ["--help", "--version", "-V", "-h"]
 [[command.sub.sub]]
 name = "run"
 level = "SafeRead"
