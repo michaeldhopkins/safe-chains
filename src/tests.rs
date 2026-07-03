@@ -1061,6 +1061,8 @@ safe! {
 }
 
 denied! {
+    workon_destroy_no_save_denied: "workon destroy --no-save",
+    workon_unknown_sub_denied: "workon frobnicate",
     for_redirect_target_cmdsub_denied: "for f in a b; do echo $f; done > $(evil)",
     for_redirect_unsafe_body_denied: "for f in a b; do rm -rf $f; done 2>/dev/null",
     redirect_git_hook_denied: "echo x > .git/hooks/pre-commit",
@@ -1447,6 +1449,14 @@ denied! {
 }
 
 inert! {
+    level_workon_bare: "workon",
+    level_workon_workspace: "workon -w --name feature",
+    level_workon_config: "workon -c mylayout",
+    level_workon_new_session: "workon --new-session",
+    level_workon_list: "workon list",
+    level_workon_list_json: "workon list --json",
+    level_workon_path: "workon path",
+    level_workon_path_ref: "workon path ws-abc123",
     level_cat: "cat file.txt",
     level_grep: "grep foo file.txt",
     level_echo: "echo hello",
@@ -1527,7 +1537,11 @@ safe_write! {
     level_cargo_init: "cargo init",
     level_cargo_init_named: "cargo init --name billlocal --vcs none",
     level_cargo_new: "cargo new myproj --lib",
-    level_workon_bare: "workon",
+    level_workon_create: "workon create --name feat -c layout",
+    level_workon_attach: "workon attach",
+    level_workon_attach_ref: "workon attach ws-abc123",
+    level_workon_destroy: "workon destroy",
+    level_workon_destroy_ref: "workon destroy /path/to/ws",
     for_loop_redirect_to_file: "for f in a b; do echo $f; done > out.txt",
     level_cargo_build: "cargo build",
     level_cargo_build_help: "cargo build --help",

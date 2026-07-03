@@ -1,9 +1,47 @@
 [[command]]
 name = "workon"
-description = "Per-project terminal/VCS session manager. As of 0.16.0 it always operates on the current directory (the earlier `[PROJECT]` positional was removed). Bare `workon` and the action flags create or switch session context and can launch the configured editor/shell and create VCS worktrees: `-w` adds a worktree, `--name` names the session, `--new-session` forces a fresh session (replacing the old `-n` shortcut, now a hidden no-op — it previously recreated the session), `-r`/`--resume` reattaches, `-c`/`--config` selects a config file. `--help` and `--version` are the only read-only forms. Single-maintainer project on a fast pre-1.0 cadence (0.17.x); the flag surface is still moving."
+description = "Development workspace launcher (Zellij sessions over jj/git worktrees). Two modes. Root session mode operates on the current directory (no positional since 0.16.0): bare `workon` and `-w` (ephemeral jj workspace), `--name`, `--new-session` (delete the existing session and start fresh), `--skip-copy-ignored`, `-r`/`--resume`, `-c`/`--config` all launch or switch a session and can start the configured editor/layout — a local action. Since 0.18.0 on-disk layout/config files are gated behind a hand-pinned trust list, so an untrusted project config is not run. The 0.19.0 subcommands are a headless lifecycle: `create` provisions a persistent worktree and prints its path (no session), `attach [ref]` opens an existing workspace in a session, `destroy [ref]` tears a workspace down (bookmarking rescued work by default; `--no-save` discards uncommitted work), `list` and `path [ref]` are read-only (enumerate workspaces / print a directory). No network in any of these. Single-maintainer project on a fast pre-1.0 cadence."
 url = "https://github.com/michaeldhopkins/workon"
-researched_version = "workon 0.17.1"
+researched_version = "workon 0.20.0"
 level = "SafeWrite"
 bare = true
+bare_flags = ["--help", "--version", "-V", "-h"]
+[command.wrapper]
+standalone = ["--new-session", "--skip-copy-ignored", "-n", "-w"]
+valued = ["--config", "--name", "--resume", "-c", "-r"]
+
+[[command.sub]]
+name = "create"
+level = "SafeWrite"
 max_positional = 0
-standalone = ["--help", "--version", "-V", "-h"]
+standalone = ["--help", "--json", "--skip-copy-ignored", "-h"]
+valued = ["--config", "--name", "-c"]
+
+[[command.sub]]
+name = "attach"
+level = "SafeWrite"
+bare = true
+max_positional = 1
+standalone = ["--help", "-h"]
+valued = ["--config", "-c"]
+
+[[command.sub]]
+name = "destroy"
+level = "SafeWrite"
+bare = true
+max_positional = 1
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "list"
+level = "Inert"
+bare = true
+max_positional = 0
+standalone = ["--help", "--json", "-h"]
+
+[[command.sub]]
+name = "path"
+level = "Inert"
+bare = true
+max_positional = 1
+standalone = ["--help", "-h"]
