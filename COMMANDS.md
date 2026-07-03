@@ -14456,6 +14456,11 @@ Aliases: `gwhoami`
 ### `workon`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/workon">https://github.com/michaeldhopkins/workon</a></p>
 
+- **attach**: Flags: --help, -h. Valued: --config, -c
+- **create**: Flags: --help, --json, --skip-copy-ignored, -h. Valued: --config, --name, -c
+- **destroy**: Flags: --help, --json, -h
+- **list**: Flags: --help, --json, -h
+- **path**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
 
