@@ -426,6 +426,7 @@ Depth for their catalogs, subordinate to this spec's model:
 `behavioral-taxonomy-levels` (Stage 3: the default levels) ·
 `behavioral-taxonomy-pilot` (golden-set seed, R1–R7) ·
 `behavioral-taxonomy-pilot2` (tree-heavy conversion, R8–R15) ·
+`behavioral-taxonomy-pilot3` (novel behaviors, R16–R23) ·
 `behavioral-taxonomy-payload-frame` (the config/API frame, decomposed) ·
 `…-delegation` (frame
 algebra, supply-chain ecosystem table) · `…-isolation` (strength ladder, breach
