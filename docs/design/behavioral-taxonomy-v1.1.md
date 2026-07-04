@@ -1,4 +1,8 @@
-# Behavioral Capability Model — spec v1.1 (canonical)
+# Behavioral Capability Model — spec v1.1 (superseded)
+
+> **Superseded by `behavioral-taxonomy-v1.2.md`** (2026-07-04), which folds in
+> pilots 2–3, the payload frame, resolution depth, and HP-11–14. Retained for
+> history; read v1.2 for the current model.
 
 Status: canonical draft (2026-07-03). Consolidates the design series into one
 reviewable spec. Supersedes the *model* in `behavioral-taxonomy-v1.md` and folds
