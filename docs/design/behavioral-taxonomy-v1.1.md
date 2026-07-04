@@ -308,6 +308,38 @@ not a spec to reproduce: divergences are deliberate, logged as
 delivered through the trusted-config model from v0.205.0 and validated by the same
 proptest contract.
 
+### 4.4 Resolution depth — a level demands only what it needs
+
+A capability can be described at increasing **resolution**: coarse (cheap, always
+available) to fine (expensive, sometimes impossible). Resolution is *epistemic* —
+how much we know — distinct from a facet's severity. A level's predicate
+implicitly names the resolution it needs to decide, and the analyzer resolves
+**lazily**, only as deep as some active clause references. Where the needed
+resolution is unavailable — no parser for a payload language, an unpinnable
+argument — the facet takes its **worst term** and the clause fails: the
+allowlist floor, unchanged.
+
+This is the guarantee that safe-chains **need not become a universal interpreter.**
+The same fact is describable coarsely or finely, and a level chooses. For a
+payload-bearing command (`kubectl apply -f`, `psql -c`; see
+`behavioral-taxonomy-payload-frame`), three coarse postures cover most levels
+without parsing a byte of the payload language:
+
+- **payload-forbid** — "no payload delegation at all." Decides at the coarsest
+  resolution: *is there a payload?*
+- **payload-blind allow** — "a payload from a trusted source is fine, contents
+  irrelevant." Decides at presence + source integrity.
+- **payload-aware** — "I must know the verb / selector / body." Descends to the
+  payload grammar; if no resolver exists for that language, it denies rather than
+  guesses.
+
+Deep payload grammars are therefore built **incrementally**, only for the
+`(language, level)` pairs that demand that depth; their absence denies safely
+instead of blocking progress. Most levels stop at the coarse postures. The
+principle generalizes past payloads — every facet has a cheap coarse reading and a
+costlier precise one — but payloads are where it earns its keep, because it is the
+difference between a library of optional resolvers and a universal parser.
+
 ---
 
 ## 5. Non-arbitrariness protocol
