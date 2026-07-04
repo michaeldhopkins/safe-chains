@@ -116,6 +116,20 @@ stdin *content* rather than a symlink. Surfaced by pilot-2 #21.
 per-tool mitigations (`--one-top-level`, `tar --keep-old-files`, `unzip -d` + path
 audit) exist but are not checkable from the command shape.
 
+### HP-12 · Ambient-state target locus — `status: open`
+For every remote / payload-frame command (`kubectl apply`, `aws …`, `psql`,
+`gh api`), *which* remote is hit — dev cluster or prod, throwaway account or the
+billing one — is set by **session state**: the kubeconfig context, `AWS_PROFILE`,
+`$KUBECONFIG`, `gcloud config`, `$DATABASE_URL`. Not the command line. So the
+dominant facet (locus = which remote, and thus the blast radius) is invisible to
+the checker: `kubectl apply -f x.yaml` is harmless against kind and catastrophic
+against prod, same bytes. Generalizes HP-4 to blast radius; see
+`behavioral-taxonomy-payload-frame` §4.2.
+*Lead:* reading the ambient target (kubeconfig/env) is itself fraught — it can
+change after the read (TOCTOU) and reading may have cost. Possibly a level-side
+policy: strict levels refuse payload/remote commands whose target isn't pinned
+*on the command line* (`--context`, `--profile`, explicit host).
+
 ---
 
 ## Parked policy decisions
