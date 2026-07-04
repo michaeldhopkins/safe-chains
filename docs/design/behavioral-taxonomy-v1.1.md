@@ -392,7 +392,10 @@ annex `safety-foundations` §5).
 
 Depth for their catalogs, subordinate to this spec's model:
 `behavioral-taxonomy-levels` (Stage 3: the default levels) ·
-`behavioral-taxonomy-pilot` (golden-set seed, R1–R7) · `…-delegation` (frame
+`behavioral-taxonomy-pilot` (golden-set seed, R1–R7) ·
+`behavioral-taxonomy-pilot2` (tree-heavy conversion, R8–R15) ·
+`behavioral-taxonomy-payload-frame` (the config/API frame, decomposed) ·
+`…-delegation` (frame
 algebra, supply-chain ecosystem table) · `…-isolation` (strength ladder, breach
 catalog) · `…-information-flow` + `…-flow-engine` (flow analysis, session taint) ·
 `safety-foundations` (theory grounding, the four-artifact program) ·
