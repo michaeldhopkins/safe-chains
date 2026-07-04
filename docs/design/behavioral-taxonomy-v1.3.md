@@ -1,28 +1,28 @@
-# Behavioral Capability Model — spec v1.2 (superseded)
+# Behavioral Capability Model — spec v1.3 (canonical)
 
-> **Superseded by `behavioral-taxonomy-v1.3.md`** (2026-07-04), a touch-up folding
-> the R24–R26 refinements (locus split, trigger escape/kind, infra/admin) into the
-> facet and level definitions. Retained for history; read v1.3 for the current model.
+Status: canonical draft (2026-07-04). Supersedes `behavioral-taxonomy-v1.2.md`.
+A touch-up folding the three refinements (R24–R26, annex
+`behavioral-taxonomy-refinements`) into the facet and level definitions; it
+otherwise carries the v1.2 model whole (three pilots, 65 commands, R1–R23; the
+payload frame + resolution depth; the survey; HP-1–14). Not yet implemented.
 
-Status: canonical draft (2026-07-04). Supersedes `behavioral-taxonomy-v1.1.md`.
-Folds in three pilots (65 commands, R1–R23), the payload frame + resolution-depth
-principle, the per-language survey, and the hard-problems log (HP-1–14). The
-deep-dive docs remain reference annexes (§9). Not yet implemented.
+**Changes from v1.2** (corrections, integrated):
+- **Locus splits into two axes** (R25): a `local` depth ordinal
+  (`process … machine < device < kernel`) and a separate `remote` reach carrying
+  destination + pinned-vs-ambient. `kernel` and `remote` are not comparable, so a
+  single ordinal mis-ordered them.
+- **Persistence trigger is not a flat ordinal** (R24): an `escape` ordinal
+  (`immediate < detached < recurring < boot`) plus a `kind` (`clock`/`event`,
+  categorical, under `recurring`). v1.2's five-term line ranked `scheduled`/`event`
+  falsely.
+- **`infra` is remote-cloud-operator** (R26); local-privileged **`admin`** is a
+  distinct sibling. `infra` operationalizes HP-12 (`locus.remote = pinned`) and gates
+  irreversible remote destroy to a prompt. `device`/`kernel` are deny-by-default at
+  every shipped level.
 
-**What changed from v1.1** (integrated, not appended):
-- Locus gains sub-filesystem rungs `device`, `kernel` (R18).
-- Persistence gains a **trigger** sub-axis (R16).
-- Scale now modifies **disclosure**, not only destroy (R23).
-- Disclosure/Secret channels are an **open set** with a worst-case default (R17,
-  HP-13); reads can cross a **principal** boundary (R19).
-- The interpreter/declarative/API frames collapse into one **payload frame** with a
-  four-gate decomposition (R9/R11); a new **interactive frame** (R16).
-- Argument resolution adds **operand roles** (R10) and names two resolution limits
-  it cannot see: content-derived locus (HP-11) and ambient-state locus (HP-12).
-- Declassifier/endorser become **curated allowlists** that reject obfuscation (R21).
-- **Injection-point flags** are execute-adding modifiers (R22).
-- A deny-by-default **`infra`** level above `developer` (R12).
-- The **conversion unit is the leaf form**; a tool is a forest of profiles (R8).
+(For the v1.1→v1.2 changes — payload frame, resolution depth, device/kernel loci,
+open-set channels, injection-point modifiers, leaf-form granularity — see v1.2's
+header; all carried forward here.)
 
 ---
 
@@ -69,12 +69,22 @@ future commands) · `authorize` (change credentials/trust/access) · `control`
 (start/stop/signal processes, services, devices).
 
 ### 2.2 Reach
-**Locus** (ordinal): `process` → `temp` → `sandbox-scope` (§3.2) → `worktree` →
-`worktree-trusted` (`.git/`, `.envrc`, hooks, CI configs) → `user` (`~`, keychain) →
-`machine` (`/etc`, services, other users) → **`device`** (raw block/char devices,
-beneath the filesystem: `dd of=/dev/rdisk0`, `mount`) → **`kernel`** (module /
-extension load: `kmutil load`) → `remote` (another host/device). `device`/`kernel`
-are new (R18): they void the abstractions every higher-numbered fs locus assumes.
+**Locus** (compound — two axes, R25). A single ordinal cannot hold both "how deep
+into this host" and "which other host"; `kernel` and `remote` are different places,
+not more/less of one thing.
+- **`local`** (ordinal depth): `process` → `temp` → `sandbox-scope` (§3.2) →
+  `worktree` → `worktree-trusted` (`.git/`, `.envrc`, hooks, CI configs) → `user`
+  (`~`, keychain) → `machine` (`/etc`, services, other users) → **`device`** (raw
+  block/char devices, beneath the filesystem: `dd of=/dev/rdisk0`, `mount`) →
+  **`kernel`** (module/extension load: `kmutil load`). `device`/`kernel` (R18) void
+  the abstractions every higher fs rung assumes and are deny-by-default everywhere
+  (§4.3).
+- **`remote`** (reach): `none` · `fixed` · `arbitrary`, plus a **pinned-vs-ambient**
+  bit — whether the target host is named on the command line (`--context`,
+  `--profile`, explicit host) or comes from session state. Same axis as
+  Network.destination; the pinned bit is what `infra` gates on (HP-12, §4.3).
+
+A predicate reads e.g. `locus.local ≤ worktree ∧ locus.remote = none`.
 
 **Scale** (ordinal): `single` → `bounded` (a glob/dir/explicit list) → `unbounded`
 (recursion / mass op). **Scale modifies destroy *and* disclosure** (R23): a
@@ -96,11 +106,18 @@ flags re-add loci (§3.2).
 `irreversible`. Environment-dependent cases resolve worst-case (HP-8).
 
 **Persistence** (compound). *Level*: `transient` → `data` → `reconfiguring`
-(alters future commands) → `installing` (adds executables/services/hooks). *Trigger*
-(new, R16): `immediate` → `scheduled` (`cron`, `at`) → `event` (`watchexec`, fs
-hooks) → `boot` (login/startup items) → `detached` (`nohup`/`setsid`, survives the
-session). Trigger says *when/how often* the installed effect fires, decoupled from
-the check. (`crontab` = installing·scheduled; `nohup cmd &` = —·detached.)
+(alters future commands) → `installing` (adds executables/services/hooks).
+*Trigger* (R16, R24) — how far execution escapes the check — is itself two parts:
+- **`escape`** (ordinal, the part levels gate on): `immediate` (done on return) →
+  `detached` (one instance survives the session: `nohup`/`setsid`) → `recurring`
+  (re-fires until removed) → `boot` (re-fires and survives reboot: `systemctl
+  enable`, `@reboot`, login items).
+- **`kind`** (categorical, under `recurring`): `clock` (`cron`, `at`) vs `event`
+  (`watchexec`, git hooks, `.envrc` on cd) — for the `because` string, not a severity
+  rung, because a per-save `event` can fire more than a monthly `clock`.
+
+Trigger is orthogonal to Level: `nohup sleep 1000 &` is `transient · detached`
+(escapes the session, installs nothing); `crontab` is `installing · recurring/clock`.
 
 ### 2.4 Information exposure
 **Disclosure** (ordinal audience): `none` → `local-process` (stdout → the
@@ -143,8 +160,8 @@ Populated for provisioning tools (`terraform apply`, `aws … create`).
 ### 2.8 The capability record
 ```
 capability {
-  operation · locus · scale · authority · isolation
-  reversibility · persistence{level,trigger}
+  operation · locus{local,remote} · scale · authority · isolation
+  reversibility · persistence{level, trigger{escape,kind}}
   disclosure{audience,channel,principal} · secret{level,channel,principal}
   network{direction,destination,payload} · execution(+supply_chain) · cost
   delegate: <nested profile | frame> | none        # §3.1
@@ -221,9 +238,10 @@ Two limits the pass **cannot** see, logged as open problems:
   archive (zip-slip); locus depends on consumed data, not the command line.
 - **Ambient-state locus (HP-12)** — which remote a payload/API command hits is set
   by session state (kube-context, `AWS_PROFILE`, `$DATABASE_URL`), not the command
-  line, so the dominant facet (which remote / prod-vs-dev) is invisible. Possible
-  level-side answer: strict levels refuse payload/remote commands whose target isn't
-  pinned on the command line.
+  line, so the dominant facet (which remote / prod-vs-dev) is invisible. This feeds
+  the `locus.remote` **pinned-vs-ambient** bit (§2.2): a target from session state
+  resolves `remote = ambient` → worst-case, and `infra` admits remote mutation only
+  when `remote = pinned` (§4.3). A mitigation, not a closure.
 
 ### 3.4 Information flow
 Safety is often a property of *flows*. The shell's data edges are visible in the CST
@@ -273,9 +291,9 @@ Three primitives express every level, conditional payload grants included:
 ```toml
 [level.write-local]
 operation     = ["observe", "create", "mutate"]
-locus         = "<= worktree"        # excludes worktree-trusted/user/machine/device/kernel/remote
+locus         = { local = "<= worktree", remote = "none" }   # R25 two axes
 reversibility = "<= recoverable"
-persistence   = "<= data"            # excludes reconfiguring/installing; trigger must be immediate
+persistence   = { level = "<= data", trigger = "<= immediate" }  # R24: no deferred exec
 scale         = "<= bounded"
 network       = "none"
 execution     = "<= caller-inline"
@@ -284,6 +302,8 @@ flow          = { low_integrity_exec = "forbid", secret_outbound = "forbid" }
 
 [level.developer]
 extends = "write-local"
+locus       = { local = "<= worktree-trusted", remote = "fixed" }
+persistence = { level = "<= installing", trigger = "<= detached" }  # background a dev server
 [[level.developer.allow]]            # supply-chain build carve-in
 operation    = ["execute"]
 execution    = "<= network-sourced"
@@ -294,6 +314,9 @@ operation = ["communicate"]
 network   = { direction = "<= outbound", destination = "<= fixed", payload = "<= fetches" }
 ```
 
+`device`/`kernel` appear in no level's `locus.local` ceiling — they are
+deny-by-default everywhere and require an explicit hand-authored allowance.
+
 ### 4.2 The proptest contract
 Ceilings + sets make the engine provable (type-directed generation over `Profile`):
 **facet-monotonicity** (an admitted profile stays admitted when any one facet is made
@@ -301,15 +324,21 @@ Ceilings + sets make the engine provable (type-directed generation over `Profile
 ⇒ superset** · **totality** · **round-trip** · **golden-set anchor**.
 
 ### 4.3 The default set
-Designed in `behavioral-taxonomy-levels.md`: `inert ⊂ read-local ⊂ write-local ⊂
-developer`, a **`contained-mode`** sibling (isolation may instead be a *modifier* —
-open, HP-2), and now a deny-by-default **`infra`** level above `developer` (R12) for
-remote/metered/production-blast-radius commands (`terraform apply`, `aws … create`,
-`kubectl apply` to prod, root installs). `infra` is opt-in and deliberately authored;
-its existence is evidence that the default set does not span the space and that
-user-defined levels are load-bearing. Today's flat `SafeWrite` allow-set is an
-**impact baseline**, not a spec to reproduce: divergences are deliberate
-(`intended-tightening` / `unacceptable-breakage`), logged, not regressions.
+Designed in `behavioral-taxonomy-levels.md` + `…-refinements.md`:
+`inert ⊂ read-local ⊂ write-local ⊂ developer`, a **`contained-mode`** sibling
+(isolation may instead be a *modifier* — open, HP-2), and two deny-by-default
+operator levels (R26): **`infra`** (remote-cloud: `terraform apply`, `kubectl
+apply`, `aws … create`) and its distinct sibling **`admin`** (local-privileged:
+`sudo apt`, `systemctl`, `/etc`). `infra` admits remote mutation only when
+`locus.remote = pinned` (HP-12) and caps `reversibility ≤ effortful` so irreversible
+remote destroy (`terraform destroy`, `kubectl delete ns prod`) still prompts. Both
+are opt-in and deliberately authored — evidence that the default set does not span
+the space and that user-defined levels are load-bearing. The trigger/locus ladders
+across the set (`…-refinements` §1–2): trigger `immediate → detached → boot`; locus
+`worktree → worktree-trusted → machine`, `device`/`kernel` never. Today's flat
+`SafeWrite` allow-set is an **impact baseline**, not a spec to reproduce:
+divergences are deliberate (`intended-tightening` / `unacceptable-breakage`), logged,
+not regressions.
 
 ### 4.4 Resolution depth — a level demands only what it needs
 A capability is describable at increasing **resolution** (epistemic, distinct from
@@ -372,19 +401,23 @@ Reusable beyond safe-chains (the CLI-design DB and the book derive from it — a
 
 ## 7. Decisions resolved vs deferred
 
-**Resolved in v1.2:** the payload frame unifies interpreter/declarative/API;
-resolution depth bounds the interpreter surface; `device`/`kernel` loci; persistence
-trigger axis; scale modifies disclosure; curated declassifier/endorser; injection-point
-modifiers; operand roles; the `infra` level; leaf-form granularity.
+**Resolved (v1.2 + v1.3):** the payload frame unifies interpreter/declarative/API;
+resolution depth bounds the interpreter surface; `device`/`kernel` loci; scale
+modifies disclosure; curated declassifier/endorser; injection-point modifiers;
+operand roles; leaf-form granularity. **v1.3 adds:** locus as `local`+`remote` axes
+(R25); the trigger `escape` ordinal + `kind` (R24, fixing the severity ordering);
+`infra` as remote-cloud with `locus.remote = pinned` and a prompt-gate on
+irreversible destroy (R26).
 
-**Deferred:** exact level contents (`developer` supply-chain thresholds, `infra`
-predicate, the `contained-mode`-vs-modifier question); the trigger axis's severity
-ordering; whether the channel set can ever be closed (HP-13); golden-set beyond the
+**Deferred:** exact level contents (`developer` supply-chain thresholds, the
+`infra`/`admin` predicates beyond the sketch, the `contained-mode`-vs-modifier
+question and whether it composes with `infra`); the local-privileged **`admin`**
+predicate; whether the channel set can ever be closed (HP-13); golden-set beyond the
 pilot seed; compiled-artifact format; per-language R3 resolvers beyond k8s.
 
 ## 8. Open problems
 
-Fourteen live entries in `hard-problems.md`, the ones v1.2 does **not** solve: the
+Fourteen live entries in `hard-problems.md`, the ones v1.3 does **not** solve: the
 contained/modifier question (HP-1/2), cross-session flow (HP-3), env/toolchain
 reinterpretation (HP-4), path-shape≠target and content-derived locus (HP-5/11),
 indirection (HP-6), opaque interpreter payloads (HP-7), state-dependent
