@@ -6,7 +6,7 @@ A touch-up folding the three refinements (R24–R26, annex
 otherwise carries the v1.2 model whole (three pilots, 65 commands, R1–R23; the
 payload frame + resolution depth; the survey; HP-1–14). Not yet implemented.
 
-**Changes from v1.2** (corrections, integrated):
+**Changes from v1.2** (corrections and one addition, integrated):
 - **Locus splits into two axes** (R25): a `local` depth ordinal
   (`process … machine < device < kernel`) and a separate `remote` reach carrying
   destination + pinned-vs-ambient. `kernel` and `remote` are not comparable, so a
@@ -19,6 +19,10 @@ payload frame + resolution depth; the survey; HP-1–14). Not yet implemented.
   distinct sibling. `infra` operationalizes HP-12 (`locus.remote = pinned`) and gates
   irreversible remote destroy to a prompt. `device`/`kernel` are deny-by-default at
   every shipped level.
+- **Graceful coexistence** (§4.5): adoption is per-command and atomic at the tool
+  subtree; an un-converted command keeps the legacy three-level classification for all
+  its subcommands/flags/args, mapped onto the lattice via the Stage-3 bridge. The
+  new machinery is invisible until a command is converted.
 
 (For the v1.1→v1.2 changes — payload frame, resolution depth, device/kernel loci,
 open-set channels, injection-point modifiers, leaf-form granularity — see v1.2's
@@ -351,6 +355,44 @@ interpreter.** For a payload command, three coarse postures cover most levels:
 `payload-aware` (descends to the body grammar; denies if no resolver). Deep grammars
 are built incrementally per `(language, level)` — k8s first (§3.1.1).
 
+### 4.5 Coexistence with the legacy model (graceful adoption)
+
+The behavioral model is adopted **incrementally, one command at a time**; it never
+requires a flag-day rewrite of the corpus. A command is either **converted** (has a
+v1.3 behavior profile) or **legacy** (carries only an old
+`Inert`/`SafeRead`/`SafeWrite` level). Conversion is **atomic at the command (tool)
+granularity**: until a tool's whole subtree — every subcommand, flag, and
+argument-shape — is converted, the tool stays legacy. There is no half-converted
+command; a converted `git` brings all of `git`'s forms with it, and an un-converted
+one keeps the legacy classification for all of them.
+
+At check time the engine dispatches per top-level command:
+- **Converted** → resolve the behavior profile (§1) and evaluate it against the
+  active level's predicate (§4).
+- **Legacy** → run the existing classifier (yielding `Inert`/`SafeRead`/`SafeWrite`
+  or `Denied`), then **map that legacy level onto the lattice** via the Stage-3
+  bridge (`Inert→inert`, `SafeRead→read-local`, `SafeWrite→developer` — the
+  compatibility anchor, `behavioral-taxonomy-levels` §1) and admit iff the mapped
+  level lies within the active level.
+- **Unclassified** (neither) → denied, as today. The allowlist floor is unchanged.
+
+Consequences:
+- **Non-disruptive by default.** The shipped default level is `developer` (≈ the old
+  `SafeWrite` threshold), so converted *and* legacy commands auto-approve exactly as
+  they do today until a user opts into a stricter level. The new machinery is
+  invisible until adopted.
+- **Stricter levels still adjudicate legacy commands** through the bridge: select
+  `read-local` and a legacy-`SafeWrite` tool is held out — without that tool having
+  been converted.
+- **Conversion is monotone and reviewable.** Converting a command replaces its legacy
+  `level` with behavior profiles; the golden-set diff (§5) shows the per-level verdict
+  change, labelled `intended-tightening` / `unacceptable-breakage`. A command is never
+  worse off than its legacy behavior by accident.
+
+This is what makes Stage 5 (§6) safe to run gradually: the corpus is a mix of
+converted and legacy tools for as long as it takes, and correctness never depends on
+finishing.
+
 ---
 
 ## 5. Non-arbitrariness protocol
@@ -392,7 +434,8 @@ Reusable beyond safe-chains (the CLI-design DB and the book derive from it — a
   measure against today as an impact baseline; grow the golden-set. Contents await a
   better-understood data model (`hard-problems`).
 - Stage 4 — engine behind a flag; old-vs-new diff over the corpus.
-- Stage 5 — migrate the corpus incrementally (un-migrated → legacy tier).
+- Stage 5 — migrate the corpus incrementally, one command at a time; un-converted
+  tools keep the legacy classification (§4.5). Correctness never depends on finishing.
 - Stage 6 — extract the registry; safe-chains consumes the artifact.
 - Stage 7 — user-defined levels; session-taint store; the first payload R3 resolver
   (k8s).
