@@ -428,6 +428,7 @@ Depth for their catalogs, subordinate to this spec's model:
 `behavioral-taxonomy-pilot2` (tree-heavy conversion, R8–R15) ·
 `behavioral-taxonomy-pilot3` (novel behaviors, R16–R23) ·
 `behavioral-taxonomy-payload-frame` (the config/API frame, decomposed) ·
+`behavioral-taxonomy-payload-survey` (per-language R3 survey; build k8s first) ·
 `…-delegation` (frame
 algebra, supply-chain ecosystem table) · `…-isolation` (strength ladder, breach
 catalog) · `…-information-flow` + `…-flow-engine` (flow analysis, session taint) ·
