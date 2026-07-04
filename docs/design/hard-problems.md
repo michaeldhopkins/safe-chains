@@ -128,7 +128,11 @@ against prod, same bytes. Generalizes HP-4 to blast radius; see
 *Lead:* reading the ambient target (kubeconfig/env) is itself fraught — it can
 change after the read (TOCTOU) and reading may have cost. Possibly a level-side
 policy: strict levels refuse payload/remote commands whose target isn't pinned
-*on the command line* (`--context`, `--profile`, explicit host).
+*on the command line* (`--context`, `--profile`, explicit host). **Concretized**
+(`behavioral-taxonomy-refinements` §3, R26): the `infra` level admits remote
+mutation only when `locus.remote = pinned` — an ambient target resolves to
+worst-case and prompts. This is a mitigation, not a closure: it moves the risk
+from silent to explicit, not away.
 
 ### HP-13 · Channel completeness — `status: open`
 Disclosure / Secret / Network enumerate file + stdout + known-network

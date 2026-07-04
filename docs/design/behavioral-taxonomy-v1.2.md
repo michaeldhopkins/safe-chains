@@ -391,7 +391,9 @@ are named and worst-cased, not hidden.
 
 ## 9. Reference annexes
 
-`behavioral-taxonomy-levels` (default levels) · `…-pilot` / `…-pilot2` / `…-pilot3`
+`behavioral-taxonomy-levels` (default levels) ·
+`behavioral-taxonomy-refinements` (trigger axis, sub-machine loci, infra; R24–R26) ·
+`…-pilot` / `…-pilot2` / `…-pilot3`
 (65-form golden-set seed, R1–R23) · `…-payload-frame` + `…-payload-survey` (the
 payload frame and per-language R3 build order) · `…-delegation` (frame algebra,
 supply-chain table) · `…-isolation` (strength ladder, breach catalog) ·
