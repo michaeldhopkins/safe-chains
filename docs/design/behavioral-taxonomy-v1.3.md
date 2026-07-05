@@ -418,11 +418,14 @@ deputy, Denning IFC — annex `safety-foundations`).
 
 ## 6. Engine, data, and program
 
-**Profile-resolution engine.** Capabilities attach to grammar nodes (additive /
-modifier / gating); the engine unions additive capabilities, applies modifiers in a
-pinned order (§3.5), resolves argument-derived facets (§3.3) and delegation (§3.1),
-builds the CST dataflow graph, then evaluates the active level's predicate + flow
-policy at the resolution it demands (§4.4).
+**Profile-resolution engine** (designed in `behavioral-taxonomy-engine`).
+Capabilities attach to grammar nodes (additive / modifier / gating); the engine
+unions additive capabilities, applies modifiers in a pinned order (§3.5), resolves
+argument-derived facets (§3.3) and delegation (§3.1), builds the CST dataflow graph,
+then evaluates the active level's predicate + flow policy at the resolution it demands
+(§4.4). It replaces only the leaf verdict of a *converted* command inside today's
+`simple_verdict`; the CST fold, redirect handling, and delegation re-entry are reused
+verbatim, and a three-state flag (`legacy`/`shadow`/`new`) drives the rollout.
 
 **Capability registry** (its own project). Owns the schema, taxonomy/level/golden-set
 data, the delegator/breach/supply-chain/payload catalogs, validation (`because` +
@@ -435,7 +438,10 @@ Reusable beyond safe-chains (the CLI-design DB and the book derive from it — a
 - **Stage 3 (in progress)** — level design: pin the default set as TOML clauses;
   measure against today as an impact baseline; grow the golden-set. Contents await a
   better-understood data model (`hard-problems`).
-- Stage 4 — engine behind a flag; old-vs-new diff over the corpus.
+- Stage 4 — engine behind a flag; old-vs-new diff over the corpus
+  (`behavioral-taxonomy-engine`). First slice: convert `cat`/`grep` (additive read)
+  and `rm` (modifier pipeline) to stand up the harness + proptests before any
+  delegating or payload command.
 - Stage 5 — migrate the corpus incrementally, one command at a time; un-converted
   tools keep the legacy classification (§4.5). Correctness never depends on finishing.
 - Stage 6 — extract the registry; safe-chains consumes the artifact.
@@ -474,6 +480,7 @@ are named and worst-cased, not hidden.
 ## 9. Reference annexes
 
 `behavioral-taxonomy-levels` (default levels) ·
+`behavioral-taxonomy-engine` (Stage-4 profile-resolution engine) ·
 `behavioral-taxonomy-refinements` (trigger axis, sub-machine loci, infra; R24–R26) ·
 `…-pilot` / `…-pilot2` / `…-pilot3`
 (65-form golden-set seed, R1–R23) · `…-payload-frame` + `…-payload-survey` +
