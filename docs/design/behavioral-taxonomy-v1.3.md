@@ -216,9 +216,11 @@ deep as it needs (annexes `payload-frame`, `payload-survey`):
 **Structured-surface rule.** Where the tool exposes verb+resource as *subcommands*
 (`aws ec2 run-instances`, `kubectl delete ns/prod`) it is already tree-allowlisted;
 engage payload parsing only for the **raw hatch** (`-X`, `-c`, `--raw`, `-f -`). The
-survey's build order: k8s R3 (gate 4) first; REST decides at gate 1+2 and a
-structured body recurses to its language's resolver; SQL is payload-forbid or a
-narrow read-only sublanguage; HCL stops at gate 1 (`plan` already executes).
+survey's build order: k8s R3 (gate 4) first (designed in
+`behavioral-taxonomy-k8s-resolver` — a bounded Pod-Security-Standards + RBAC
+dotted-path scan); REST decides at gate 1+2 and a structured body recurses to its
+language's resolver; SQL is payload-forbid or a narrow read-only sublanguage; HCL
+stops at gate 1 (`plan` already executes).
 
 ### 3.2 Isolation strength & breaches
 An isolation frame is capability reduction; breaches are re-grants. Containment is
@@ -474,8 +476,9 @@ are named and worst-cased, not hidden.
 `behavioral-taxonomy-levels` (default levels) ·
 `behavioral-taxonomy-refinements` (trigger axis, sub-machine loci, infra; R24–R26) ·
 `…-pilot` / `…-pilot2` / `…-pilot3`
-(65-form golden-set seed, R1–R23) · `…-payload-frame` + `…-payload-survey` (the
-payload frame and per-language R3 build order) · `…-delegation` (frame algebra,
+(65-form golden-set seed, R1–R23) · `…-payload-frame` + `…-payload-survey` +
+`…-k8s-resolver` (the payload frame, per-language R3 build order, and the k8s R3
+resolver) · `…-delegation` (frame algebra,
 supply-chain table) · `…-isolation` (strength ladder, breach catalog) ·
 `…-information-flow` + `…-flow-engine` (flow analysis, session taint) · `hard-problems`
 (open gaps) · `safety-foundations` (theory) · `reading-list` (bibliography).
