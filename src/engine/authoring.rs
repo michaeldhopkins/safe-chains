@@ -14,7 +14,7 @@
 use std::collections::BTreeMap;
 use std::sync::LazyLock;
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 use super::facet::FacetTerm;
 use super::level::{Clause, Level, OrdBound};
@@ -179,86 +179,118 @@ fn parse_term<T: FacetTerm>(s: &str) -> Result<T, String> {
 
 // ── the TOML schema ────────────────────────────────────────────────────────────
 
-#[derive(Deserialize)]
+// Serialization mirrors deserialization so a compiled level round-trips back to
+// equivalent TOML (`skip_serializing_if` keeps unset facets out of the output).
+
+#[derive(Deserialize, Serialize)]
 struct TomlLevelSet {
     #[serde(default)]
     level: BTreeMap<String, TomlLevel>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct TomlLevel {
+    #[serde(skip_serializing_if = "Option::is_none")]
     extends: Option<String>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     allow: Vec<TomlClause>,
-    #[serde(default)]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     deny: Vec<TomlClause>,
 }
 
-#[derive(Deserialize, Default)]
+#[derive(Deserialize, Serialize, Default)]
 #[serde(deny_unknown_fields)]
 struct TomlClause {
+    #[serde(skip_serializing_if = "Option::is_none")]
     operation: Option<StringOrVec>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     locus: Option<TomlLocus>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     scale: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     authority: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     isolation: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     reversibility: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     persistence: Option<TomlPersistence>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     disclosure: Option<TomlDisclosure>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     secret: Option<TomlSecret>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     network: Option<TomlNetwork>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     execution: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     cost: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct TomlLocus {
+    #[serde(skip_serializing_if = "Option::is_none")]
     local: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     remote: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     binding: Option<StringOrVec>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct TomlPersistence {
+    #[serde(skip_serializing_if = "Option::is_none")]
     level: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     trigger: Option<TomlTrigger>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct TomlTrigger {
+    #[serde(skip_serializing_if = "Option::is_none")]
     escape: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     kind: Option<StringOrVec>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct TomlDisclosure {
+    #[serde(skip_serializing_if = "Option::is_none")]
     audience: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     channel: Option<StringOrVec>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     principal: Option<StringOrVec>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct TomlSecret {
+    #[serde(skip_serializing_if = "Option::is_none")]
     level: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     channel: Option<StringOrVec>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     principal: Option<StringOrVec>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(deny_unknown_fields)]
 struct TomlNetwork {
+    #[serde(skip_serializing_if = "Option::is_none")]
     direction: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     destination: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     payload: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 #[serde(untagged)]
 enum StringOrVec {
     One(String),
@@ -498,5 +530,143 @@ mod tests {
                 }
             }
         }
+    }
+
+    // ── round-trip: Level -> TOML -> Level is identity ──────────────────────────────
+    //
+    // The reverse of build_clause: a compiled clause serializes back to equivalent
+    // TOML that recompiles to the same clause. Only the operators the parser produces
+    // (<=, >=, exact) occur; a two-sided range never comes from parsing.
+
+    fn bound_str<T: FacetTerm>(b: OrdBound<T>) -> String {
+        match (b.min, b.max) {
+            (Some(lo), Some(hi)) if lo == hi => lo.as_str().to_string(),
+            (None, Some(hi)) => format!("<= {}", hi.as_str()),
+            (Some(lo), None) => format!(">= {}", lo.as_str()),
+            _ => panic!("non-representable bound (a parsed level never produces a two-sided range)"),
+        }
+    }
+
+    fn opt_bound_str<T: FacetTerm>(b: Option<OrdBound<T>>) -> Option<String> {
+        b.map(bound_str)
+    }
+
+    fn set_str<T: FacetTerm>(v: &[T]) -> StringOrVec {
+        StringOrVec::Many(v.iter().map(|t| t.as_str().to_string()).collect())
+    }
+
+    fn clause_to_toml(c: &Clause) -> TomlClause {
+        let locus = (c.local_locus.is_some()
+            || c.remote_reach.is_some()
+            || c.remote_binding.is_some())
+        .then(|| TomlLocus {
+            local: opt_bound_str(c.local_locus),
+            remote: opt_bound_str(c.remote_reach),
+            binding: c.remote_binding.as_deref().map(set_str),
+        });
+        let persistence = (c.persistence_level.is_some()
+            || c.trigger_escape.is_some()
+            || c.trigger_kind.is_some())
+        .then(|| TomlPersistence {
+            level: opt_bound_str(c.persistence_level),
+            trigger: (c.trigger_escape.is_some() || c.trigger_kind.is_some()).then(|| TomlTrigger {
+                escape: opt_bound_str(c.trigger_escape),
+                kind: c.trigger_kind.as_deref().map(set_str),
+            }),
+        });
+        let disclosure = (c.disclosure_audience.is_some()
+            || c.disclosure_channel.is_some()
+            || c.disclosure_principal.is_some())
+        .then(|| TomlDisclosure {
+            audience: opt_bound_str(c.disclosure_audience),
+            channel: c.disclosure_channel.as_deref().map(set_str),
+            principal: c.disclosure_principal.as_deref().map(set_str),
+        });
+        let secret = (c.secret_level.is_some()
+            || c.secret_channel.is_some()
+            || c.secret_principal.is_some())
+        .then(|| TomlSecret {
+            level: opt_bound_str(c.secret_level),
+            channel: c.secret_channel.as_deref().map(set_str),
+            principal: c.secret_principal.as_deref().map(set_str),
+        });
+        let network = (c.net_direction.is_some()
+            || c.net_destination.is_some()
+            || c.net_payload.is_some())
+        .then(|| TomlNetwork {
+            direction: opt_bound_str(c.net_direction),
+            destination: opt_bound_str(c.net_destination),
+            payload: opt_bound_str(c.net_payload),
+        });
+        TomlClause {
+            operation: c.operation.as_deref().map(set_str),
+            locus,
+            scale: opt_bound_str(c.scale),
+            authority: opt_bound_str(c.authority),
+            isolation: opt_bound_str(c.isolation),
+            reversibility: opt_bound_str(c.reversibility),
+            persistence,
+            disclosure,
+            secret,
+            network,
+            execution: opt_bound_str(c.execution),
+            cost: opt_bound_str(c.cost),
+        }
+    }
+
+    fn round_trip(levels: &[Level]) -> Vec<Level> {
+        let level = levels
+            .iter()
+            .map(|l| {
+                let tl = TomlLevel {
+                    extends: None,
+                    allow: l.allow.iter().map(clause_to_toml).collect(),
+                    deny: l.deny.iter().map(clause_to_toml).collect(),
+                };
+                (l.name.clone(), tl)
+            })
+            .collect();
+        let source = toml::to_string(&TomlLevelSet { level }).expect("serialize");
+        build_level_set(&source).expect("re-parse serialized levels")
+    }
+
+    fn assert_round_trips(levels: &[Level]) {
+        let round = round_trip(levels);
+        for original in levels {
+            let back = round.iter().find(|l| l.name == original.name).expect("level survives");
+            assert_eq!(original.allow, back.allow, "{} allow clauses", original.name);
+            assert_eq!(original.deny, back.deny, "{} deny clauses", original.name);
+        }
+    }
+
+    #[test]
+    fn authored_levels_round_trip() {
+        assert_round_trips(default_levels());
+    }
+
+    #[test]
+    fn every_facet_round_trips() {
+        // a kitchen-sink level exercising every reverse-conversion branch
+        let src = r#"
+            [level.sink]
+            [[level.sink.allow]]
+            operation = ["observe", "create", "destroy"]
+            locus = { local = "<= machine", remote = "<= fixed", binding = ["pinned", "ambient"] }
+            scale = "<= bounded"
+            authority = "<= root"
+            isolation = "<= vm"
+            reversibility = "<= effortful"
+            persistence = { level = "<= installing", trigger = { escape = "<= boot", kind = ["clock", "event"] } }
+            disclosure = { audience = "<= public", channel = ["filesystem", "network"], principal = ["own"] }
+            secret = { level = ">= reads", channel = ["credential-store"], principal = ["cross"] }
+            network = { direction = "<= outbound", destination = "<= arbitrary", payload = "<= sends-host-data" }
+            execution = "<= network-sourced"
+            cost = "<= quota"
+            [[level.sink.deny]]
+            operation = ["destroy"]
+            reversibility = ">= irreversible"
+        "#;
+        let levels = build_level_set(src).expect("compiles");
+        assert_round_trips(&levels);
     }
 }
