@@ -1,0 +1,57 @@
+# Default safety levels — the behavioral capability model
+# (docs/design/behavioral-taxonomy-v1.4.md §4.3). Authored from the spec and
+# compiled to `engine::level::Level` by `engine::authoring`.
+#
+# This file currently defines the three local, no-execution levels. The upper
+# levels (developer, admin, infra, yolo) gate on the supply-chain sub-facets and
+# the flow policy, which land in later commits; they are added here then.
+#
+# A clause constrains only the facets that discriminate the level; an omitted
+# facet is unconstrained. Ordinal facets take "<= term" / ">= term" / "term"
+# (exact); categorical facets take a term or a list of terms.
+
+[level.inert]
+# No real state read or changed: --version, --help, arithmetic, > /dev/null.
+[[level.inert.allow]]
+operation = ["observe"]
+locus = { local = "<= temp", remote = "none" }
+scale = "<= single"
+reversibility = "none"
+persistence = { level = "transient" }
+disclosure = { audience = "<= local-process" }
+secret = { level = "none" }
+network = { direction = "none" }
+execution = "<= self"
+authority = "user"
+cost = "none"
+
+[level.read-local]
+# Also observe real local state: git status, ls, cat ./notes. Reading a secret
+# to stdout still fails (secret <= uses-ambient excludes `reads`).
+extends = "inert"
+[[level.read-local.allow]]
+operation = ["observe"]
+locus = { local = "<= user", remote = "none" }
+reversibility = "none"
+persistence = { level = "transient" }
+disclosure = { audience = "<= local-process" }
+secret = { level = "<= uses-ambient" }
+network = { direction = "<= loopback" }
+execution = "<= self"
+authority = "user"
+
+[level.write-local]
+# Also create/mutate ordinary local data with no downstream execution: touch,
+# echo > file, git commit. No reconfiguring/installing, no mass ops, no network.
+extends = "read-local"
+[[level.write-local.allow]]
+operation = ["observe", "create", "mutate"]
+locus = { local = "<= worktree", remote = "none" }
+scale = "<= bounded"
+reversibility = "<= recoverable"
+persistence = { level = "<= data" }
+disclosure = { audience = "<= local-process" }
+secret = { level = "<= uses-ambient" }
+network = { direction = "none" }
+execution = "<= caller-inline"
+authority = "user"

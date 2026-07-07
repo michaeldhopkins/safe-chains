@@ -5,5 +5,6 @@
 //! level predicate language (§4.1) and the profile-resolution engine (annex
 //! `behavioral-taxonomy-engine`).
 
+pub mod authoring;
 pub mod facet;
 pub mod level;
