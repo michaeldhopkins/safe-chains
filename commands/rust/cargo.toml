@@ -285,10 +285,10 @@ standalone = [
     "--examples", "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--no-fail-fast",
     "--no-run", "--offline", "--release", "--tests", "--timings", "--unit-graph",
-    "-h", "--quiet", "-q", "-v",
+    "--workspace", "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--bench", "--bin", "--color", "--config", "--example",
+    "--bench", "--bin", "--color", "--config", "--example", "--exclude",
     "--features", "--jobs", "--manifest-path", "--message-format",
     "--package", "--profile", "--target", "--target-dir", "--test",
     "-Z", "-j", "-p",
