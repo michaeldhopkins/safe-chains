@@ -9058,6 +9058,86 @@ Aliases: `gnumfmt`
 - Allowed valued flags: --config, --doc-comments, --doc-comments-padding, --enable-outside-detected-project, --exclude, --impl, --include, --intf, --margin, --max-iters, --name, --ocaml-version, --output, --profile, --use-file
 - Bare invocation allowed
 
+### `oci`
+<p class="cmd-url"><a href="https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/">https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/</a></p>
+
+- **audit event**: Allowed arguments: list
+- **budgets alert-rule**: Allowed arguments: list, get
+- **budgets budget**: Allowed arguments: list, get
+- **bv boot-volume**: Allowed arguments: list, get
+- **bv volume**: Allowed arguments: list, get
+- **bv volume-backup**: Allowed arguments: list, get
+- **bv volume-group**: Allowed arguments: list, get
+- **compute boot-volume-attachment**: Allowed arguments: list, get
+- **compute image**: Allowed arguments: list, get
+- **compute instance**: Allowed arguments: list, get
+- **compute shape**: Allowed arguments: list
+- **compute vnic-attachment**: Allowed arguments: list, get
+- **db autonomous-database**: Allowed arguments: list, get
+- **db backup**: Allowed arguments: list, get
+- **db database**: Allowed arguments: list, get
+- **db db-home**: Allowed arguments: list, get
+- **db db-node**: Allowed arguments: list, get
+- **db db-system**: Allowed arguments: list, get
+- **fs export**: Allowed arguments: list, get
+- **fs file-system**: Allowed arguments: list, get
+- **fs mount-target**: Allowed arguments: list, get
+- **fs snapshot**: Allowed arguments: list, get
+- **iam availability-domain**: Allowed arguments: list
+- **iam compartment**: Allowed arguments: list, get
+- **iam dynamic-group**: Allowed arguments: list, get
+- **iam fault-domain**: Allowed arguments: list
+- **iam group**: Allowed arguments: list, get
+- **iam policy**: Allowed arguments: list, get
+- **iam region**: Allowed arguments: list
+- **iam tag**: Allowed arguments: list, get
+- **iam tag-namespace**: Allowed arguments: list, get
+- **iam user**: Allowed arguments: list, get
+- **lb backend**: Allowed arguments: list, get
+- **lb backend-set**: Allowed arguments: list, get
+- **lb certificate**: Allowed arguments: list, get
+- **lb listener**: Allowed arguments: list, get
+- **lb load-balancer**: Allowed arguments: list, get
+- **limits limit-definition**: Allowed arguments: list
+- **limits limit-value**: Allowed arguments: list
+- **limits resource-availability**: Allowed arguments: get
+- **limits service**: Allowed arguments: list
+- **logging log**: Allowed arguments: list, get
+- **logging log-group**: Allowed arguments: list, get
+- **monitoring alarm**: Allowed arguments: list, get
+- **network drg**: Allowed arguments: list, get
+- **network internet-gateway**: Allowed arguments: list, get
+- **network nat-gateway**: Allowed arguments: list, get
+- **network nsg**: Allowed arguments: list, get
+- **network public-ip**: Allowed arguments: list, get
+- **network route-table**: Allowed arguments: list, get
+- **network security-list**: Allowed arguments: list, get
+- **network service-gateway**: Allowed arguments: list, get
+- **network subnet**: Allowed arguments: list, get
+- **network vcn**: Allowed arguments: list, get
+- **os bucket**: Allowed arguments: list, get
+- **os ns**: Allowed arguments: get
+- **os object**: Allowed arguments: list
+- **os preauth-request**: Allowed arguments: list, get
+- **work-requests work-request**: Allowed arguments: list, get
+- **work-requests work-request-error**: Allowed arguments: list
+- **work-requests work-request-log-entry**: Allowed arguments: list
+- Allowed standalone flags: --help, --version, -v
+
+**Examples:**
+
+- `oci iam compartment list --compartment-id ocid1.tenancy.oc1..aaa`
+- `oci iam region list`
+- `oci compute instance list --compartment-id ocid1.compartment.oc1..aaa`
+- `oci compute instance get --instance-id ocid1.instance.oc1..aaa`
+- `oci network vcn list --compartment-id ocid1.compartment.oc1..aaa`
+- `oci bv volume list --compartment-id ocid1.compartment.oc1..aaa`
+- `oci os ns get`
+- `oci os bucket list --compartment-id ocid1.compartment.oc1..aaa --namespace-name n`
+- `oci os object list --bucket-name b --namespace-name n`
+- `oci db autonomous-database list --compartment-id ocid1.compartment.oc1..aaa`
+- `oci lb load-balancer list --compartment-id ocid1.compartment.oc1..aaa`
+
 ### `ocsptool`
 <p class="cmd-url"><a href="https://www.gnutls.org/manual/html_node/ocsptool-Invocation.html">https://www.gnutls.org/manual/html_node/ocsptool-Invocation.html</a></p>
 
