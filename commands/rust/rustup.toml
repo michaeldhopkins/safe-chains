@@ -4,6 +4,21 @@ description = "Rust toolchain installer and manager; supports listing components
 url = "https://rust-lang.github.io/rustup/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
+examples_safe = [
+  "rustup target list",
+  "rustup target list --installed",
+  "rustup target add wasm32-unknown-unknown",
+  "rustup target remove wasm32-unknown-unknown",
+  "rustup component list",
+  "rustup toolchain list",
+  "rustup show",
+]
+examples_denied = [
+  "rustup self update",
+  "rustup update",
+  "rustup toolchain install nightly",
+]
+
 [[command.sub]]
 name = "component"
 
@@ -40,6 +55,23 @@ name = "target"
 name = "list"
 level = "Inert"
 standalone = ["--help", "--installed", "-h", "-v"]
+valued = ["--toolchain"]
+
+# `target add` downloads the target's precompiled std (HTTP GET from
+# static.rust-lang.org) and installs it into the active toolchain under
+# ~/.rustup. Inbound download + local write; no user data leaves.
+[[command.sub.sub]]
+name = "add"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+valued = ["--toolchain"]
+
+# `target remove` deletes an installed target's files from the local
+# toolchain. Local write only.
+[[command.sub.sub]]
+name = "remove"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
 valued = ["--toolchain"]
 
 [[command.sub]]
