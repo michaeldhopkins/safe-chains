@@ -1,37 +1,37 @@
-# Behavioral Capability Model — spec v1.3 (superseded)
+# Behavioral Capability Model — spec v1.4 (canonical)
 
-> **Superseded by `behavioral-taxonomy-v1.4.md`** (2026-07-07), which consolidates the
-> settled default level set (`ci`/`admin`/`infra` + containment-as-modifier), the
-> level-authoring rule (R27), the golden-set answer key, and the HP-15 secret-audience
-> principle. Retained for history; read v1.4 for the current model.
+Status: canonical draft (2026-07-07). Supersedes `behavioral-taxonomy-v1.3.md`.
+Consolidates the level work done since v1.3 — the full default level set, the
+level-authoring rule, containment resolved to a modifier, and the golden-set as the
+concrete answer key — into one clean canon. Carries the whole v1.3 model (three
+pilots, 65 commands, R1–R23; the payload frame + resolution depth; the survey; the
+locus/trigger/coexistence refinements R24–R26). Not yet implemented.
 
-Status: canonical draft (2026-07-04). Supersedes `behavioral-taxonomy-v1.2.md`.
-A touch-up folding the three refinements (R24–R26, annex
-`behavioral-taxonomy-refinements`) into the facet and level definitions; it
-otherwise carries the v1.2 model whole (three pilots, 65 commands, R1–R23; the
-payload frame + resolution depth; the survey; HP-1–14). Not yet implemented.
+**Changes from v1.3** (all integrated below):
+- **The default level set is settled** (§4.3): `inert ⊂ read-local ⊂ write-local ⊂
+  developer ⊂ yolo`, with two deny-by-default siblings off `developer` — **`admin`**
+  (local root) and **`infra`** (remote cloud) — and **two modifiers, not levels**:
+  **containment** (isolation) and **`pinned-provenance`** (opt-in supply-chain
+  tightening). **`yolo`** is the opt-in top of the local ladder — allow-almost-everything
+  minus five catastrophe corners. Both `ci` and `contained-mode` are retired as levels
+  (each was an axis that turned out to be a modifier). This resolves HP-1/HP-2.
+- **Level authoring** (R27, §4.1): `extends` unions clauses, so it only *loosens*. A
+  *stricter* level is authored up from a lower base plus a tightened clause, not by
+  restricting a looser one. The one subtractive case is the *loosest* level: `yolo` uses
+  a bounded, allow-only `deny` clause to carve catastrophe corners out of
+  allow-everything. Extend to loosen; build up to tighten; `deny` only to subtract from
+  the top.
+- **The golden-set** (§5, annex `…-golden-set`): the frozen answer key — the 65-command
+  corpus × every level → auto-run or ask — now exists, with its judgment calls decided.
+  It is the falsifiability anchor and the Stage-4 regression fixture.
+- **The secret-disclosure *channel*** (§2.4, HP-15): a secret read is not the hazard;
+  a secret read whose output reaches the model (stdout / the chat) is. `cat secret`
+  (to the chat) is denied; `tool --password-stdin < secret` (consumed, not shown) is
+  allowlist-able. Gate on the disclosure *audience*, not on "a secret was read."
 
-**Changes from v1.2** (corrections and one addition, integrated):
-- **Locus splits into two axes** (R25): a `local` depth ordinal
-  (`process … machine < device < kernel`) and a separate `remote` reach carrying
-  destination + pinned-vs-ambient. `kernel` and `remote` are not comparable, so a
-  single ordinal mis-ordered them.
-- **Persistence trigger is not a flat ordinal** (R24): an `escape` ordinal
-  (`immediate < detached < recurring < boot`) plus a `kind` (`clock`/`event`,
-  categorical, under `recurring`). v1.2's five-term line ranked `scheduled`/`event`
-  falsely.
-- **`infra` is remote-cloud-operator** (R26); local-privileged **`admin`** is a
-  distinct sibling. `infra` operationalizes HP-12 (`locus.remote = pinned`) and gates
-  irreversible remote destroy to a prompt. `device`/`kernel` are deny-by-default at
-  every shipped level.
-- **Graceful coexistence** (§4.5): adoption is per-command and atomic at the tool
-  subtree; an un-converted command keeps the legacy three-level classification for all
-  its subcommands/flags/args, mapped onto the lattice via the Stage-3 bridge. The
-  new machinery is invisible until a command is converted.
-
-(For the v1.1→v1.2 changes — payload frame, resolution depth, device/kernel loci,
-open-set channels, injection-point modifiers, leaf-form granularity — see v1.2's
-header; all carried forward here.)
+(For the v1.1→v1.3 changes — payload frame, resolution depth, device/kernel loci,
+open-set channels, injection-point modifiers, leaf-form granularity, locus/trigger
+split, coexistence — see the v1.2/v1.3 headers; all carried forward here.)
 
 ---
 
@@ -145,6 +145,16 @@ Both facets range over a **channel** and a **principal** (R17/R19, HP-13):
   process's memory or argv) with no fs or network touch. `secret=reads` and the
   disclosure audience must account for "belongs to another principal," not just file
   paths.
+
+**A secret read is not the hazard; the audience is** (HP-15). Reading secret material
+is dangerous specifically when its output reaches the model — `disclosure.audience =
+local-process` (stdout → the agent). `cat ~/.ssh/id_rsa` sends the key to the chat and
+is denied; `tool --password-stdin < secret`, `export K=$(cat secret)`, and `ssh-add
+key` feed the secret to a *consumer* without ever printing it, and are allowlist-able
+per that consumer. The flow analysis (§3.4) reads this off the command *shape* — a bare
+`cat secret` goes to stdout; `cat secret | tool` / `tool < secret` goes to `tool`. So
+**gate on the disclosure audience, not on "a secret was touched."** `secret →
+stdout-to-model` denies; `secret → another consumer, not the model` is admissible.
 
 ### 2.5 Channel (network)
 **Network** (compound): *Direction* `none · loopback · outbound · inbound-listen` ×
@@ -328,6 +338,21 @@ network   = { direction = "<= outbound", destination = "<= fixed", payload = "<=
 `device`/`kernel` appear in no level's `locus.local` ceiling — they are
 deny-by-default everywhere and require an explicit hand-authored allowance.
 
+**`extends` composes upward only** (R27). Adding a clause can only *widen* the
+admissible region, so `extends` builds *looser* levels — `admin`/`infra` (supersets of
+`developer`) extend it correctly. A **stricter** level cannot be authored by
+"extending and restricting" a looser one: inheriting `developer`'s permissive build
+clause would let a floating-tag install through, so a stricter variant is built **up
+from a lower base** plus its tightened clause. The discipline: **extend to loosen;
+build up from a lower base to tighten.** The one exception is the *loosest* level:
+`yolo` (§4.3) is "allow-almost-everything minus a few catastrophe corners," a shape a
+positive-only language can't express without tiling the complement — so the language
+gains a bounded **`deny`** clause, evaluated after allows and **allow-only** (it can
+only *remove* capability, never grant it). Because `deny` is monotonic-downward it can't
+be misused to forge a stricter level from a looser base — which is exactly why the R27
+worry does *not* apply to it. Net: no `restricts`-for-stricter primitive; one
+`deny`-for-the-loosest primitive, whose only client is `yolo`.
+
 ### 4.2 The proptest contract
 Ceilings + sets make the engine provable (type-directed generation over `Profile`):
 **facet-monotonicity** (an admitted profile stays admitted when any one facet is made
@@ -336,23 +361,30 @@ Ceilings + sets make the engine provable (type-directed generation over `Profile
 
 ### 4.3 The default set
 Designed in `behavioral-taxonomy-levels.md` + `…-refinements.md`:
-`inert ⊂ read-local ⊂ write-local ⊂ developer`, with three siblings off `developer` —
-**`ci`** (a *stricter* developer for unattended pipelines: hash-verified deps from
-signed sources only, no floating-tag or `curl|sh` bootstraps; a pipeline selects it),
-**`infra`** (remote-cloud operator: `terraform apply`, `kubectl apply`, `aws … create`
-— deny-by-default), and **`admin`** (local privileged: `sudo apt`, `systemctl`, `/etc`
-— deny-by-default). `infra` admits remote mutation only when `locus.remote = pinned`
+`inert ⊂ read-local ⊂ write-local ⊂ developer ⊂ yolo`, with two deny-by-default
+siblings off `developer` — **`infra`** (remote-cloud operator: `terraform apply`,
+`kubectl apply`, `aws … create`) and **`admin`** (local privileged: `sudo apt`,
+`systemctl`, `/etc`). `infra` admits remote mutation only when `locus.remote = pinned`
 (HP-12) and caps `reversibility ≤ effortful` so irreversible remote destroy
 (`terraform destroy`, `kubectl delete ns prod`) still prompts; `admin` admits
 root/machine and root supply-chain installs but never `device`/`kernel`, unbounded
 destroy, or `curl|sudo bash`. Both operator levels are opt-in and deliberately
 authored — evidence that the default set does not span the space and that user-defined
-levels are load-bearing. **Containment is a *modifier*, not a level** (HP-1/HP-2,
-`…-refinements` §5): a confirmed sandbox is the §3.2 isolation transform on the
-*profile*, which composes with any level for free — the retired `contained-mode`
-was subsumed by it. Authoring note (R27): `extends` unions clauses (loosens), so a
-stricter level like `ci` is built up from a lower base, not by restricting a looser
-one. The trigger/locus ladders
+levels are load-bearing. **`yolo`** (`…-refinements` §6) is the opt-in top of the
+*local* ladder: "do anything to a machine I own or can throw away — `sudo`, `rm`,
+installs — short of the irrecoverable." It folds in `admin`'s non-catastrophic grants
+and loosens fetches to any destination, then subtracts five **catastrophe corners** —
+wide irreversible destroy (`mkfs`, `dd of=/dev/sda`, `rm -rf ~`), `device`/`kernel`,
+`curl | sudo bash`, anything remote-mutating (still `infra`), and secret-to-chat/external
+(HP-15). It is the sole client of the level language's bounded, allow-only `deny` clause
+(§4.1). **Two modifiers, not levels** (HP-1/HP-2, `…-refinements` §5): **containment** —
+a confirmed sandbox is the §3.2 isolation transform on the *profile*, composing with any
+level for free (the retired `contained-mode` was subsumed by it) — and
+**`pinned-provenance`**, an opt-in tightening of the supply-chain clause (what the
+retired `ci` level really was: a preference knob, not a tier, since safe-chains is always
+human-in-the-loop). Authoring note (R27): `extends` unions clauses (loosens), so a
+stricter level is built up from a lower base, not by restricting a looser one. The
+trigger/locus ladders
 across the set (`…-refinements` §1–2): trigger `immediate → detached → boot`; locus
 `worktree → worktree-trusted → machine`, `device`/`kernel` never. Today's flat
 `SafeWrite` allow-set is an **impact baseline**, not a spec to reproduce:
@@ -374,7 +406,7 @@ are built incrementally per `(language, level)` — k8s first (§3.1.1).
 
 The behavioral model is adopted **incrementally, one command at a time**; it never
 requires a flag-day rewrite of the corpus. A command is either **converted** (has a
-v1.3 behavior profile) or **legacy** (carries only an old
+behavior profile) or **legacy** (carries only an old
 `Inert`/`SafeRead`/`SafeWrite` level). Conversion is **atomic at the command (tool)
 granularity**: until a tool's whole subtree — every subcommand, flag, and
 argument-shape — is converted, the tool stays legacy. There is no half-converted
@@ -417,9 +449,11 @@ finishing.
    ≥2 examples (one positive, one negative near-miss). No `N3`.
 2. **Every classification cites its discriminator** in `because`.
 3. **Evidence mandatory**: `source` + `url` + `researched_version`.
-4. **Golden-set** — a frozen corpus of forms with expected facet values (seeded by
-   the three pilots, 65 forms). Any taxonomy change must keep it classifiable and
-   re-review the diffs.
+4. **Golden-set** — the frozen answer key (annex `behavioral-taxonomy-golden-set`):
+   the 65-command corpus × every level → auto-run or ask, its judgment calls decided.
+   This is the falsifiability anchor and the Stage-4 regression fixture — the engine's
+   verdict must match every cell, and any change is deliberate and recorded. A new
+   command added to the model lands a golden-set row at the same time.
 5. **Adding a term requires a demonstrated gap** — a real form the vocabulary can't
    express (the bar the pilots meet: R18 device/kernel came from `dd`/`kmutil`, the
    trigger axis from `cron`/`nohup`, the payload frame from `kubectl apply`/`psql`).
@@ -448,9 +482,10 @@ Reusable beyond safe-chains (the CLI-design DB and the book derive from it — a
 
 **Staged roadmap.**
 - Stages 0–2 — **done**: model, three pilots, deep-dives, payload survey, this spec.
-- **Stage 3 (in progress)** — level design: pin the default set as TOML clauses;
-  measure against today as an impact baseline; grow the golden-set. Contents await a
-  better-understood data model (`hard-problems`).
+- **Stage 3 (largely done)** — level design: the default set is pinned (§4.3), the
+  golden-set is built with its judgment calls decided (§5, annex `…-golden-set`).
+  Remaining: per-ecosystem "pinned" definitions and the final `developer` supply-chain
+  thresholds.
 - Stage 4 — engine behind a flag; old-vs-new diff over the corpus
   (`behavioral-taxonomy-engine`). First slice: convert `cat`/`grep` (additive read)
   and `rm` (modifier pipeline) to stand up the harness + proptests before any
@@ -465,39 +500,49 @@ Reusable beyond safe-chains (the CLI-design DB and the book derive from it — a
 
 ## 7. Decisions resolved vs deferred
 
-**Resolved (v1.2 + v1.3):** the payload frame unifies interpreter/declarative/API;
-resolution depth bounds the interpreter surface; `device`/`kernel` loci; scale
-modifies disclosure; curated declassifier/endorser; injection-point modifiers;
-operand roles; leaf-form granularity. **v1.3 adds:** locus as `local`+`remote` axes
-(R25); the trigger `escape` ordinal + `kind` (R24, fixing the severity ordering);
-`infra` as remote-cloud with `locus.remote = pinned` and a prompt-gate on
-irreversible destroy (R26); the `admin` local-root level, the `ci` stricter-developer
-level, and containment resolved to a modifier — `contained-mode` retired (R27,
-`…-refinements` §4–5; resolves HP-1/HP-2).
+**Resolved (through v1.4):** the payload frame unifies interpreter/declarative/API;
+resolution depth bounds the interpreter surface; `device`/`kernel` loci; scale modifies
+disclosure; curated declassifier/endorser; injection-point modifiers; operand roles;
+leaf-form granularity; locus as `local`+`remote` axes (R25); the trigger `escape`
+ordinal + `kind` (R24). **v1.4 settles the levels:** the default set `inert ⊂
+read-local ⊂ write-local ⊂ developer ⊂ yolo` with the `admin`/`infra` deny-by-default
+siblings, and **two modifiers, not levels** — containment (isolation) and
+`pinned-provenance` — with `ci` and `contained-mode` both retired (resolves HP-1/HP-2);
+the level-authoring rule (R27, `extends` only loosens) plus the bounded allow-only
+`deny` clause whose sole client is `yolo`; the **golden-set** as the decided answer key
+(§5); and the secret-disclosure-*audience* principle (HP-15 design). The R27
+open question is resolved: no `restricts`-for-stricter primitive is wanted; the
+loosest level gets a monotonic-downward `deny` instead.
 
-**Deferred:** exact `developer` supply-chain thresholds and per-ecosystem pinning;
-whether the level language wants an explicit `restricts`/override primitive (R27);
-whether the channel set can ever be closed (HP-13); golden-set beyond the pilot seed;
-compiled-artifact format; per-language R3 resolvers beyond k8s.
+**Deferred:** whether the channel set can ever be closed (HP-13); *implementing* the
+HP-15 secret-audience gate and the `pinned-provenance` modifier (its per-ecosystem
+`pinned` test is now specified — annex `delegation` B.6 — but not yet wired); the exact
+boundary of `yolo`'s integrity-flow relaxation (user-level exec allowed, root not — any
+user-level exceptions?); the `git push` variance (a per-user/repo setting);
+compiled-artifact format; per-language
+R3 resolvers beyond k8s.
 
 ## 8. Open problems
 
-Twelve live entries in `hard-problems.md`, the ones v1.3 does **not** solve
-(HP-1/HP-2, the contained/unattended split, are now resolved — §4.3, R27):
+Thirteen live entries in `hard-problems.md`, the ones v1.4 does **not** solve
+(HP-1/HP-2, the contained/unattended split, are resolved — §4.3, R27):
 cross-session flow (HP-3), env/toolchain reinterpretation (HP-4), path-shape≠target
 and content-derived locus (HP-5/11), indirection (HP-6), opaque interpreter payloads
 (HP-7), state-dependent reversibility/scale (HP-8), read-as-exfil across principals
 (HP-9), composition (HP-10), ambient-state target locus (HP-12), channel completeness
-(HP-13), and deferred/triggered/interactive execution (HP-14). The spec's honesty is
+(HP-13), deferred/triggered/interactive execution (HP-14), and the secret-disclosure
+audience gate (HP-15 — designed in §2.4, not yet implemented). The spec's honesty is
 that these are named and worst-cased, not hidden.
 
 ## 9. Reference annexes
 
+`behavioral-taxonomy-golden-set` (the answer key: 65 commands × levels → run/ask) ·
 `behavioral-taxonomy-levels` (default levels) ·
 `behavioral-taxonomy-engine` (Stage-4 profile-resolution engine) ·
-`behavioral-taxonomy-refinements` (trigger axis, sub-machine loci, infra; R24–R26) ·
+`behavioral-taxonomy-refinements` (trigger axis, sub-machine loci, admin/infra,
+containment + `ci`→modifier resolution, the `yolo` level + `deny` clause §6; R24–R27) ·
 `…-pilot` / `…-pilot2` / `…-pilot3`
-(65-form golden-set seed, R1–R23) · `…-payload-frame` + `…-payload-survey` +
+(65-command corpus, R1–R23) · `…-payload-frame` + `…-payload-survey` +
 `…-k8s-resolver` (the payload frame, per-language R3 build order, and the k8s R3
 resolver) · `…-delegation` (frame algebra,
 supply-chain table) · `…-isolation` (strength ladder, breach catalog) ·

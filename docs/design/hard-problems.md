@@ -19,10 +19,12 @@ The `ci` level fused two independent ideas: **unattended** (no human to catch a
 bad dependency → *tighten* provenance: pinned, no `curl|sh`) and **contained** (a
 sandbox bounds blast radius → *relax* reach). They pull in opposite directions and
 have no reason to travel together.
-**Resolved** (`behavioral-taxonomy-refinements` §5): the two axes separate cleanly —
-**contained** becomes the isolation *modifier* (HP-2), **unattended** becomes the
-**`ci`** *level* (a stricter `developer`, tightened provenance). They compose: a
-containerized CI job is the `ci` predicate over a sandbox-clamped profile.
+**Resolved** (`behavioral-taxonomy-refinements` §5): the two axes separate cleanly — and
+**both are modifiers, not levels**. **contained** becomes the isolation *modifier*
+(HP-2); **unattended** was first modeled as a stricter `ci` *level*, but that level would
+never be selected in a human-in-the-loop hook, so it is **retired** — its one durable
+idea (tighter provenance) becomes the opt-in **`pinned-provenance`** modifier. Neither is
+a tier; both transform the profile the active level judges.
 
 ### HP-2 · Is containment a level or a modifier? — `status: resolved`
 A confirmed sandbox shifts the admissible region of *whatever level you're in*
@@ -182,15 +184,18 @@ Real choices about level contents (`behavioral-taxonomy-levels.md` §6). Several
 now **decided** in the golden-set (§5):
 
 - **Floating versions in `developer`** → DECIDED: auto-run at `developer` (`npm install
-  left-pad`); the stricter `ci` asks.
+  left-pad`); the opt-in `pinned-provenance` modifier (retired `ci`) flips them to ask.
 - **Bounded destroy** → DECIDED: `rm ./file` and `rm -rf ./dir` both wait for
   `developer`; `write-local` doesn't auto-delete.
 - **Exec-surface in `developer`** → DECIDED implicitly: allowing `npm install` at
   `developer` puts `install-hook` (lifecycle scripts) inside it.
 
 Still open:
-- **Per-ecosystem "pinned" test** — what counts as pinned for npm / pip / cargo / go /
-  apt (needed to make the `ci` and unpinned-install rules concrete).
+- **Per-ecosystem "pinned" test** → DECIDED (annex `delegation` B.6): the
+  `floating < version < hash-verified` ladder mapped to concrete command forms for
+  npm / pip / cargo / go / apt. `developer` has no pinning floor; the
+  `pinned-provenance` modifier requires `≥ hash-verified` (`apt`: `≥ version`, signed).
+  Remaining is *implementing* the modifier, not defining it.
 - **`git push` auto-run** → DEFERRED as a configurable point of variance (golden-set
   §5.4): teams and individuals disagree; likely a per-user / per-repo setting, not one
   fixed answer.
@@ -202,7 +207,8 @@ Still open:
   segmentation + the Scale facet, not a recursion bound (v1.1 §3.1).
 - **Level definitions look arbitrary** → the TOML clause model + facet-monotonicity
   proptest makes "never arbitrary" enforceable (v1.1 §4.1–4.2).
-- **HP-1 contained-vs-unattended** → two axes separated: contained → isolation
-  modifier, unattended → the `ci` level (`…-refinements` §5).
+- **HP-1 contained-vs-unattended** → two axes separated, both modifiers: contained →
+  isolation modifier, unattended → the `pinned-provenance` modifier (`ci` level retired,
+  `…-refinements` §5).
 - **HP-2 containment level-or-modifier** → modifier; subsumed by §3.2 isolation,
   `contained-mode` retired as a level (`…-refinements` §5).

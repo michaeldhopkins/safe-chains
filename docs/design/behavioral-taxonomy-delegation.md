@@ -195,18 +195,19 @@ Each row is a golden-set candidate; each fact needs a citation in the registry.
 
 Because every point is describable, a level can state its acceptance precisely:
 
-- A `developer` level might accept fetched-code execution iff
+- The `developer` level accepts fetched-code execution iff
   `source ∈ {public-registry, signed-repo, private-registry, vendored}` **and**
-  `pinning ≥ hash-verified` **and** `exec-surface ≤ build-script` — i.e. "I accept
-  pinned, verified deps that run build scripts, from real registries." That admits
-  `cargo build`, `go build`, `npm ci --ignore-scripts`,
-  `pip install --require-hashes --only-binary=:all:`, but **not**
-  `curl | sh` (unverified-url), **not** `npm install foo@latest` (floating +
-  install-hook), **not** `docker run img:latest` (floating tag).
-- A stricter `ci` level might additionally require `exec-surface ≤ none` (download
-  only; run builds in a separate sandboxed step).
-- The point: each admit/reject is justified by a named fact ("rejected: `pinning`
-  is `floating`"), never a taste call.
+  `exec-surface ≤ build-script` — i.e. "I accept deps that run build/install scripts,
+  from real registries." It gates on **source and exec-surface, not pinning** (golden-set
+  §5.3): `npm install foo@latest` and a floating `pip install requests` **admit** (the
+  source is a recognized registry), while `curl | sh` (`unverified-url`) does **not**.
+  `cargo build`, `go build`, `npm ci`, `docker run img:latest` all admit.
+- The opt-in **`pinned-provenance`** modifier (the retired `ci` level's one durable idea)
+  adds the pinning floor for users who want it — `pinning ≥ hash-verified` and
+  `source ≠ unverified-url` on whatever level is active — flipping `npm install foo@latest`
+  and `docker run img:latest` (floating) to *ask*. See B.6 for the per-ecosystem test.
+- The point: each admit/reject is justified by a named fact ("rejected: `source` is
+  `unverified-url`"), never a taste call.
 
 ## B.5 Per-artifact reputation is a different layer
 
@@ -215,6 +216,45 @@ scripts), not the identity ("is `left-pad` safe"). Per-package reputation/known-
 malware is an **orthogonal future data source** that could annotate a specific
 artifact, layered on top. Keeping them separate preserves non-arbitrariness: the
 mechanism is describable and stable; reputation is a separate, evolving feed.
+
+## B.6 The pinning ladder, per ecosystem
+
+The `pinning` sub-facet is an ordinal `floating < version < hash-verified < digest`. It
+measures two things that usually move together but not always: **is the version fixed**,
+and **is the content cryptographically verified** (so a re-published or tampered artifact
+is caught). `hash-verified` means both. This table is the concrete test — what each
+command form / on-disk state resolves to — so a level or the `pinned-provenance` modifier
+can cite a fact instead of a guess.
+
+| ecosystem | `floating` | `version` | `hash-verified` (reproducible) |
+|---|---|---|---|
+| **npm** | `npm install foo`, `foo@latest`, `foo@^1` | `foo@1.2.3` (exact) | `npm ci` — installs from `package-lock.json` `integrity` (sha512) |
+| **pip** | `pip install requests`, `requests>=2` | `requests==2.31.0` | `pip install --require-hashes -r req.txt` (`--hash=sha256:…`); a poetry/uv/Pipfile lock |
+| **cargo** | `cargo install foo`, `cargo add foo` | `cargo install foo --version 1.2.3` | build/test against `Cargo.lock` (checksums; crates.io immutable); `cargo install --locked` |
+| **go** | `go get foo@latest`, `go install foo@latest` | `…@v1.2.3` | build against `go.sum`; `@v1.2.3` is itself sum-db verified by default |
+| **apt** | `apt install nginx` (repo's current) | `apt install nginx=1.24.0` | *always signed* — Release file is GPG-signed, package hashes within; integrity is not the variable, the **version** is |
+
+**Two facts the table makes precise:**
+
+1. **Some ecosystems verify integrity by default** — `go` (`go.sum` + sumdb), `cargo`
+   (`Cargo.lock` checksums), `apt` (repo signatures). For these the *only* thing a bare
+   `floating` invocation leaves loose is *which version*, not *whether the bytes are
+   authentic*. `npm`/`pip` without a lockfile/`--require-hashes` trust the registry to
+   serve the same bytes for a version number — so their `version` is genuinely weaker
+   than their `hash-verified`.
+2. **`apt` sits differently** — its integrity floor is always `signed-repo`, so its rows
+   never fall to a tampering risk; `apt install nginx=1.24.0` is the reproducible form.
+   This is why `admin`'s supply-chain clause is `source ∈ {distro-repo, signed-repo} ∧
+   pinning ≥ version` rather than `≥ hash-verified`: a signed distro package pinned to a
+   version *is* the strong form for that ecosystem.
+
+**The two thresholds that consume this:**
+- **`developer`** — *no pinning floor.* Any row admits as long as `source` is a
+  recognized registry (B.4, golden-set §5.3). `npm install foo@latest` runs.
+- **`pinned-provenance`** (opt-in modifier) — requires `pinning ≥ hash-verified`
+  (`apt`: `≥ version`, since signed). Flips `npm install foo@latest`,
+  `pip install requests`, `docker run img:tag`, `go get …@latest` to *ask*; leaves
+  `npm ci`, `--require-hashes`, `Cargo.lock` builds, `img@sha256:…` auto-running.
 
 ---
 
