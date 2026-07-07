@@ -331,15 +331,23 @@ Ceilings + sets make the engine provable (type-directed generation over `Profile
 
 ### 4.3 The default set
 Designed in `behavioral-taxonomy-levels.md` + `…-refinements.md`:
-`inert ⊂ read-local ⊂ write-local ⊂ developer`, a **`contained-mode`** sibling
-(isolation may instead be a *modifier* — open, HP-2), and two deny-by-default
-operator levels (R26): **`infra`** (remote-cloud: `terraform apply`, `kubectl
-apply`, `aws … create`) and its distinct sibling **`admin`** (local-privileged:
-`sudo apt`, `systemctl`, `/etc`). `infra` admits remote mutation only when
-`locus.remote = pinned` (HP-12) and caps `reversibility ≤ effortful` so irreversible
-remote destroy (`terraform destroy`, `kubectl delete ns prod`) still prompts. Both
-are opt-in and deliberately authored — evidence that the default set does not span
-the space and that user-defined levels are load-bearing. The trigger/locus ladders
+`inert ⊂ read-local ⊂ write-local ⊂ developer`, with three siblings off `developer` —
+**`ci`** (a *stricter* developer for unattended pipelines: hash-verified deps from
+signed sources only, no floating-tag or `curl|sh` bootstraps; a pipeline selects it),
+**`infra`** (remote-cloud operator: `terraform apply`, `kubectl apply`, `aws … create`
+— deny-by-default), and **`admin`** (local privileged: `sudo apt`, `systemctl`, `/etc`
+— deny-by-default). `infra` admits remote mutation only when `locus.remote = pinned`
+(HP-12) and caps `reversibility ≤ effortful` so irreversible remote destroy
+(`terraform destroy`, `kubectl delete ns prod`) still prompts; `admin` admits
+root/machine and root supply-chain installs but never `device`/`kernel`, unbounded
+destroy, or `curl|sudo bash`. Both operator levels are opt-in and deliberately
+authored — evidence that the default set does not span the space and that user-defined
+levels are load-bearing. **Containment is a *modifier*, not a level** (HP-1/HP-2,
+`…-refinements` §5): a confirmed sandbox is the §3.2 isolation transform on the
+*profile*, which composes with any level for free — the retired `contained-mode`
+was subsumed by it. Authoring note (R27): `extends` unions clauses (loosens), so a
+stricter level like `ci` is built up from a lower base, not by restricting a looser
+one. The trigger/locus ladders
 across the set (`…-refinements` §1–2): trigger `immediate → detached → boot`; locus
 `worktree → worktree-trusted → machine`, `device`/`kernel` never. Today's flat
 `SafeWrite` allow-set is an **impact baseline**, not a spec to reproduce:
@@ -458,24 +466,25 @@ modifies disclosure; curated declassifier/endorser; injection-point modifiers;
 operand roles; leaf-form granularity. **v1.3 adds:** locus as `local`+`remote` axes
 (R25); the trigger `escape` ordinal + `kind` (R24, fixing the severity ordering);
 `infra` as remote-cloud with `locus.remote = pinned` and a prompt-gate on
-irreversible destroy (R26).
+irreversible destroy (R26); the `admin` local-root level, the `ci` stricter-developer
+level, and containment resolved to a modifier — `contained-mode` retired (R27,
+`…-refinements` §4–5; resolves HP-1/HP-2).
 
-**Deferred:** exact level contents (`developer` supply-chain thresholds, the
-`infra`/`admin` predicates beyond the sketch, the `contained-mode`-vs-modifier
-question and whether it composes with `infra`); the local-privileged **`admin`**
-predicate; whether the channel set can ever be closed (HP-13); golden-set beyond the
-pilot seed; compiled-artifact format; per-language R3 resolvers beyond k8s.
+**Deferred:** exact `developer` supply-chain thresholds and per-ecosystem pinning;
+whether the level language wants an explicit `restricts`/override primitive (R27);
+whether the channel set can ever be closed (HP-13); golden-set beyond the pilot seed;
+compiled-artifact format; per-language R3 resolvers beyond k8s.
 
 ## 8. Open problems
 
-Fourteen live entries in `hard-problems.md`, the ones v1.3 does **not** solve: the
-contained/modifier question (HP-1/2), cross-session flow (HP-3), env/toolchain
-reinterpretation (HP-4), path-shape≠target and content-derived locus (HP-5/11),
-indirection (HP-6), opaque interpreter payloads (HP-7), state-dependent
-reversibility/scale (HP-8), read-as-exfil across principals (HP-9), composition
-(HP-10), ambient-state target locus (HP-12), channel completeness (HP-13), and
-deferred/triggered/interactive execution (HP-14). The spec's honesty is that these
-are named and worst-cased, not hidden.
+Twelve live entries in `hard-problems.md`, the ones v1.3 does **not** solve
+(HP-1/HP-2, the contained/unattended split, are now resolved — §4.3, R27):
+cross-session flow (HP-3), env/toolchain reinterpretation (HP-4), path-shape≠target
+and content-derived locus (HP-5/11), indirection (HP-6), opaque interpreter payloads
+(HP-7), state-dependent reversibility/scale (HP-8), read-as-exfil across principals
+(HP-9), composition (HP-10), ambient-state target locus (HP-12), channel completeness
+(HP-13), and deferred/triggered/interactive execution (HP-14). The spec's honesty is
+that these are named and worst-cased, not hidden.
 
 ## 9. Reference annexes
 
