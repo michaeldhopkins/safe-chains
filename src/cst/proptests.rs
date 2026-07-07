@@ -430,10 +430,11 @@ proptest! {
         // home, parent-escaping, and auto-executed (.git/.envrc) targets are
         // covered by the unsafe-target test below.
         target in arb_shell_word().prop_filter("safe in-tree write target", |s| {
-            !s.starts_with('/')
-                && !s.starts_with("..")
-                && !s.contains("/../")
-                && !s.split('/').any(|seg| seg == ".git" || seg == ".envrc")
+            !s.is_empty()
+                && !s.starts_with('/')
+                && !s.starts_with('~')
+                && !s.contains('$')
+                && !s.split('/').any(|seg| seg == ".." || seg == ".git" || seg == ".envrc")
         }),
         fd in 0..3u32,
         append in any::<bool>(),
