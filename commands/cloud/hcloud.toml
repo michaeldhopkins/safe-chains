@@ -2,7 +2,28 @@
 name = "hcloud"
 description = "Command-line interface for managing Hetzner Cloud resources (servers, volumes, networks, firewalls, load balancers). The full CLI can create, modify, and delete infrastructure. Authenticated via project-scoped API token. Open-source Go project with moderate release velocity."
 url = "https://github.com/hetznercloud/cli"
+researched_version = "v1.66.0 (2026-06-24)"
 bare_flags = ["--help", "--version", "-h", "-v"]
+
+examples_safe = [
+  "hcloud version",
+  "hcloud server list",
+  "hcloud server list -o json",
+  "hcloud server describe my-server",
+  "hcloud image list --type system",
+  "hcloud datacenter list",
+  "hcloud iso list",
+  "hcloud zone list",
+  "hcloud all list",
+  "hcloud context list",
+]
+examples_denied = [
+  "hcloud server create --name x --type cx11 --image debian-12",
+  "hcloud server delete my-server",
+  "hcloud server ssh my-server",
+  "hcloud server poweroff my-server",
+  "hcloud context create prod",
+]
 [command.wrapper]
 valued = ["--poll-interval"]
 
@@ -183,5 +204,74 @@ valued = ["--output", "--selector", "-l", "-o"]
 [[command.sub.sub]]
 name = "describe"
 bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+# Reference catalogs (read-only): images/ISOs and type/box catalogs.
+[[command.sub]]
+name = "iso"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "load-balancer-type"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "storage-box-type"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "storage-box"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+[[command.sub]]
+name = "zone"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+valued = ["--output", "--selector", "-l", "-o"]
+[[command.sub.sub]]
+name = "describe"
+bare = false
+standalone = ["--help", "-h"]
+valued = ["--output", "-o"]
+
+# `hcloud all list` enumerates every resource (read-only).
+[[command.sub]]
+name = "all"
+[[command.sub.sub]]
+name = "list"
 standalone = ["--help", "-h"]
 valued = ["--output", "-o"]

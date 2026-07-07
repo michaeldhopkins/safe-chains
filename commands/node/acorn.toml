@@ -1,0 +1,28 @@
+[[command]]
+name = "acorn"
+description = "JavaScript parser CLI (the acornjs parser, shipped as `bin/acorn`) that reads a JS source file — or stdin — and prints its abstract syntax tree as JSON to stdout. It parses but does not execute JavaScript: no eval, no runtime, no network, no state change beyond stdout. Flags select the ECMAScript target version (--ecma3/--ecma5/--ecmaYYYY), module vs script mode (--module), and output form (--locations, --compact, --tokenize, and --silent for syntax-check-only, which emits nothing and just sets exit status). The only input is the source it reads; the only output is the AST. Distinct from the discontinued acorn.io Kubernetes CLI of the same name. Mature, stable project (acorn 8.x); the CLI flag surface changes rarely."
+url = "https://github.com/acornjs/acorn/blob/master/acorn/README.md"
+researched_version = "acorn 8.x (2026)"
+level = "SafeRead"
+bare = true
+max_positional = 1
+standalone = [
+  "--allow-hash-bang", "--compact",
+  "--ecma2015", "--ecma2016", "--ecma2017", "--ecma2018", "--ecma2019",
+  "--ecma2020", "--ecma2021", "--ecma2022", "--ecma2023", "--ecma2024",
+  "--ecma2025", "--ecma2026", "--ecma3", "--ecma5",
+  "--help", "--locations", "--module", "--silent", "--tokenize",
+]
+
+examples_safe = [
+  "acorn --help",
+  "acorn file.js",
+  "acorn --module app.mjs",
+  "acorn --ecma2022 --locations x.js",
+  "acorn --silent x.js",
+  "acorn --tokenize x.js",
+]
+examples_denied = [
+  "acorn --nonexistent-flag x.js",
+  "acorn a.js b.js",
+]
