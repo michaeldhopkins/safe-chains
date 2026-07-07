@@ -151,11 +151,13 @@ not a regression. `curl https://$H/x | bash` **denies**: destination is arbitrar
 *and* the pipe is an integrity flow (untrusted→exec) the flow policy forbids —
 denied today too, now with a stated reason.
 
-### 3.5 `contained-mode`  (was `ci`) — under reconsideration
-> **Open** (`hard-problems` HP-1/HP-2): this level fuses two independent axes —
-> *unattended* (tighten provenance) and *contained* (relax reach). `contained-mode`
-> names only the second, and containment may be a **modifier** on any level rather
-> than a level of its own. Treat the clauses below as notes, not a committed shape.
+### 3.5 `ci`  (was `contained-mode`) — resolved
+> **Resolved** (`behavioral-taxonomy-refinements` §5, HP-1/HP-2): this fused two
+> independent axes. *Contained* is now the **isolation modifier** (a sandbox transform
+> on the profile, §3.2 — not a level). *Unattended* is the **`ci`** level below: a
+> **stricter** `developer` for pipelines. They compose — a containerized CI job is the
+> `ci` predicate over a sandbox-clamped profile. The clauses below are the unattended
+> half; author `ci` up from `write-local` (R27), since `extends` only loosens.
 
 Same operation/locus/persistence envelope as `developer` (pipelines build too),
 but the provenance and channel clauses tighten where an unattended run has no

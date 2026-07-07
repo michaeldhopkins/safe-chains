@@ -166,6 +166,121 @@ repo would declare it.
 
 ---
 
+## 4. The `admin` level (the local-privileged sibling)
+
+`admin` is the trust model `infra` split away from: **administering *this machine* as
+root**. Where `infra` is remote + ambient-cloud-auth, `admin` is local + `sudo`. It
+extends `developer` (a root context can do everything a dev box can) and adds
+machine-scoped, elevated operations.
+
+```toml
+[level.admin]                          # local privileged sysadmin; deny-by-default, opt-in
+extends = "developer"
+
+[[level.admin.allow]]                  # write / reconfigure / control the local machine as root
+operation     = ["create", "mutate", "destroy", "configure", "control"]
+locus         = { local = "<= machine", remote = "none" }   # /etc, services, system paths
+authority     = "<= root"                                   # sudo/doas (developer caps at user)
+persistence   = "<= installing"
+reversibility = "<= effortful"                              # irreversible wipes still prompt
+scale         = "<= bounded"                                # unbounded destroy still prompts
+
+[[level.admin.allow]]                  # system package managers (apt/dnf/pacman/brew) as root
+operation    = ["execute"]
+execution    = "<= network-sourced"
+authority    = "<= root"
+supply_chain = { source = ["distro-repo", "public-registry", "signed-repo"],
+                 pinning = ">= version", exec_surface = "<= install-hook" }
+network      = { direction = "<= outbound", destination = "<= fixed", payload = "<= fetches" }
+flow         = { low_integrity_exec = "forbid", secret_outbound = "forbid" }
+```
+
+**What it admits, and the honest line it draws.** `admin` accepts the corpus's worst
+combination on purpose: **root supply-chain execution** — `sudo apt install nginx`
+runs the maintainer's `postinst` as root (pilot-2). That *is* system administration.
+But it is bounded: `source ∈ {distro-repo, registry, signed-repo}`, `pinning ≥
+version`, `exec-surface ≤ install-hook`, `destination = fixed`. So *install a signed
+package as root, yes; run a downloaded script as root, no* — `curl x | sudo bash`
+still fails, because the destination is arbitrary **and** the flow policy forbids
+low-integrity→exec regardless of authority. Root does not relax the flow doctrine.
+
+**Four fact-cited exclusions:**
+1. **No `device`/`kernel`.** `dd of=/dev/rdisk0`, `kmutil load` stay deny-everywhere
+   (§2) — routine admin never needs raw-disk or ring-0 un-prompted.
+2. **No unbounded destroy.** `sudo rm -rf /`, disk wipes (`scale = unbounded`) still
+   prompt even at root.
+3. **No remote.** Cloud mutation is `infra`; `admin.remote = none`. Administering a
+   box and operating a cloud are different grants.
+4. **No arbitrary-source supply chain.** As above — the `curl | sudo bash` class.
+
+`admin` and `infra` are **siblings, incomparable**: local-root vs remote-cloud. A
+laptop enables `admin` (`brew`/`apt`/`systemctl`) and never `infra`; a CI runner
+enables `infra` and never a human's `/etc`; a platform box enables both. Both are
+deny-by-default, opt-in through the trusted-config model. (`brew` without `sudo`
+installs into a user-writable prefix — that stays `developer`; the `admin`-only cases
+are the ones that need `sudo` / touch `/etc` / control services.)
+
+---
+
+## 5. Containment is a *modifier*, not a level (resolving HP-1 & HP-2)
+
+The `contained-mode` level (née `ci`) was a mis-modeling. Pinning it the way we
+pinned `infra` shows it fused **two orthogonal axes** (HP-1), which resolve to two
+*different kinds of thing*:
+
+- **contained** — a confirmed sandbox bounds blast radius → *relax* reach.
+- **unattended** — no human to catch tampering → *tighten* provenance.
+
+**Contained → a modifier (this is HP-2's answer).** A sandbox transforms the
+**profile**, not the predicate — and the isolation mechanism (§3.2) already does
+exactly that: it clamps nested `locus` to `sandbox-scope`, caps `reversibility` to
+`recoverable` (a sandbox is disposable), and re-adds breach loci on `-v /:/host` /
+`--privileged` / `--pid=host`. So "`developer`-in-a-sandbox admits more than
+`developer`" is **not a new level** — it is the *same* `developer` predicate
+evaluating a profile the isolation modifier has already tamed. Because the modifier
+runs *before* whatever predicate is active, containment composes with **every** level
+for free (this settles the refinements "still open": yes, an `infra` operator inside a
+confirmed CI sandbox is just `infra` evaluated against a sandbox-clamped profile).
+`contained-mode` is therefore **retired as a level** — it is subsumed by §3.2.
+
+**Unattended → a level (`ci`).** This axis *does* change the predicate: with no human
+watching, the acceptable supply-chain is tighter. So it is a real level — `ci` — a
+**stricter** `developer`:
+
+```toml
+[level.ci]                             # unattended pipeline: stricter provenance
+extends = "write-local"                # NB: built up from write-local, not down from developer (R27)
+[[level.ci.allow]]                     # builds, but only hash-verified from signed sources
+operation    = ["execute"]
+execution    = "<= network-sourced"
+supply_chain = { source = ["signed-repo", "private-registry", "vendored"],
+                 pinning = ">= hash-verified", exec_surface = "<= build-script" }
+[[level.ci.allow]]                     # outbound fetch to fixed endpoints
+operation = ["communicate"]
+network   = { direction = "<= outbound", destination = "<= fixed", payload = "<= fetches" }
+```
+
+`ci` forbids the floating-tag installs and public-registry / unverified-url bootstraps
+that `developer` tolerates, because an unattended run can't notice a swapped
+dependency. It is a level a pipeline *selects*; being stricter, it needs no
+deny-by-default gate.
+
+**R27 — `extends` composes *upward* only.** Note `ci` is built from `write-local`
+plus a tight build clause, **not** by "extending `developer` and restricting it."
+The level-TOML `extends` unions allow-clauses, which only ever makes a level *looser*;
+inheriting `developer` would drag in its permissive build clause and a floating-tag
+install would match it. So a **stricter** variant must be authored from a lower base
+plus its tightened clause. `admin`/`infra` (supersets of `developer`) extend it
+correctly; `ci` (a subset) cannot. Authoring discipline: extend to loosen, build up
+from a lower base to tighten.
+
+**The dissolved conflation, cleanly:** the old `ci`/`contained-mode` splits into the
+**isolation modifier** (contained; §3.2, no level) and the **`ci` level** (unattended;
+stricter build), which *compose* — a containerized CI job is the `ci` predicate over a
+sandbox-clamped profile.
+
+---
+
 ## Net effect
 
 **New findings for v1.3:**
@@ -178,6 +293,13 @@ repo would declare it.
 - **R26** — `infra` is remote-cloud-operator; `admin` (local-privileged) is a
   distinct sibling. `infra` operationalizes HP-12 (`remote = pinned`) and gates
   irreversible remote destroy to a prompt.
+- **R27** — `extends` composes *upward* (unions allow-clauses → looser). A stricter
+  level (`ci`) must be authored from a lower base plus a tightened clause, not by
+  restricting a looser one. Extend to loosen; build up to tighten (§5).
+- **§4/§5 resolutions** — `admin` fully specified (local root, deny-by-default,
+  four exclusions). `contained-mode` retired as a level: containment is a **modifier**
+  (subsumed by §3.2 isolation, HP-2), and the unattended axis becomes the **`ci`**
+  level (stricter `developer`, HP-1).
 
 **Level ladders pinned (across the shipped set):**
 - trigger: immediate (strict) → detached (developer) → boot (infra).
@@ -189,6 +311,14 @@ repo would declare it.
 `admin` sibling) → `behavioral-taxonomy-levels`. HP-12 gains a concrete mitigation
 (`locus.remote = pinned`) worth noting in the log.
 
-**Still open:** the `admin` local-privileged predicate; whether `contained-mode`
-(HP-2) composes with `infra` (an operator inside a sandboxed CI runner); the exact
-`recurring` kind's effect, if any, on admissibility.
+**Revised default set:** `inert ⊂ read-local ⊂ write-local ⊂ developer`, with three
+siblings off `developer` — **`ci`** (stricter provenance; a pipeline selects it),
+**`admin`** (local root; deny-by-default), **`infra`** (remote cloud; deny-by-default)
+— plus the **isolation modifier** (containment) that applies to any level via §3.2.
+`contained-mode` is gone.
+
+**Still open:** the exact effect (if any) of the `recurring` trigger *kind*
+(clock vs event) on admissibility; whether `ci`'s tightened source set should be
+per-ecosystem; and — surfaced by R27 — whether the level language wants an explicit
+`restricts`/override primitive, or whether "author stricter from a lower base" is a
+sufficient discipline.

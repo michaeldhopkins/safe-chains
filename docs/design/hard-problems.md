@@ -14,26 +14,28 @@ Status ∈ `open` · `partial` (some design exists) · `parked` (deferred by cho
 
 ## Modeling gaps
 
-### HP-1 · Contained vs. unattended are two axes, not one — `status: open`
+### HP-1 · Contained vs. unattended are two axes, not one — `status: resolved`
 The `ci` level fused two independent ideas: **unattended** (no human to catch a
 bad dependency → *tighten* provenance: pinned, no `curl|sh`) and **contained** (a
 sandbox bounds blast radius → *relax* reach). They pull in opposite directions and
-have no reason to travel together. Renaming `ci` → `contained-mode` names only the
-second. The model has no vocabulary for "unattended" as a first-class condition.
-*Lead:* maybe two orthogonal knobs (a provenance floor + a containment credit)
-rather than a named level. See HP-2.
+have no reason to travel together.
+**Resolved** (`behavioral-taxonomy-refinements` §5): the two axes separate cleanly —
+**contained** becomes the isolation *modifier* (HP-2), **unattended** becomes the
+**`ci`** *level* (a stricter `developer`, tightened provenance). They compose: a
+containerized CI job is the `ci` predicate over a sandbox-clamped profile.
 
-### HP-2 · Is containment a level or a modifier? — `status: open`
+### HP-2 · Is containment a level or a modifier? — `status: resolved`
 A confirmed sandbox shifts the admissible region of *whatever level you're in*
 (isolation clamps locus → `sandbox-scope`, v1.1 §3.2). That is the behavior of a
-**modifier** applied to a profile, not a distinct level. If so, `contained-mode`
-shouldn't exist as a rung — instead every level has a "…-in-a-sandbox" variant
-derived by the same transform. Open question: does the modifier compose cleanly
-with the level predicate (transform the profile, then test), or does the
-*isolation credit* (does this level trust this sandbox kind?) entangle the two?
-*Lead:* model modifiers (isolation, `sudo`/privilege, `--dry-run`) as profile
-transforms evaluated before the level predicate; keep the "credit" decision on the
-level side.
+**modifier** applied to a profile, not a distinct level.
+**Resolved** (`…-refinements` §5): **modifier.** A sandbox transforms the profile
+(clamp `locus` to `sandbox-scope`, cap `reversibility` to `recoverable`, re-add
+breach loci) *before* the level predicate runs — which is exactly the existing §3.2
+isolation mechanism. So containment is subsumed by §3.2 and composes with every level
+for free; `contained-mode` is retired as a level. The "isolation credit" (does this
+level trust this sandbox kind?) stays on the level side and does not entangle the
+transform — the modifier only ever *reduces* the profile, so a level can always
+choose to still deny.
 
 ### HP-3 · Cross-command / cross-session flow — the statelessness wall — `status: partial`
 The per-command profile cannot see that command **A** wrote a script and command
@@ -181,3 +183,7 @@ understood (`behavioral-taxonomy-levels.md` §6):
   segmentation + the Scale facet, not a recursion bound (v1.1 §3.1).
 - **Level definitions look arbitrary** → the TOML clause model + facet-monotonicity
   proptest makes "never arbitrary" enforceable (v1.1 §4.1–4.2).
+- **HP-1 contained-vs-unattended** → two axes separated: contained → isolation
+  modifier, unattended → the `ci` level (`…-refinements` §5).
+- **HP-2 containment level-or-modifier** → modifier; subsumed by §3.2 isolation,
+  `contained-mode` retired as a level (`…-refinements` §5).
