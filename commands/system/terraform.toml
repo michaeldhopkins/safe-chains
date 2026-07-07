@@ -4,10 +4,31 @@ description = "Infrastructure-as-code CLI that provisions and manages cloud reso
 url = "https://developer.hashicorp.com/terraform/cli/commands"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
+examples_safe = [
+  "terraform fmt",
+  "terraform fmt -recursive",
+  "terraform fmt --recursive",
+  "terraform fmt --check",
+  "terraform fmt -check -diff",
+  "terraform validate",
+  "terraform version",
+]
+examples_denied = [
+  "terraform apply",
+  "terraform destroy",
+  "terraform plan",
+]
+
+# `terraform fmt` rewrites `.tf` files in place (unless -check/-diff,
+# which only report drift). A local file rewrite in the working tree —
+# no network, no state. Go's flag parser accepts both `-foo` and `--foo`.
 [[command.sub]]
 name = "fmt"
-guard = "--check"
-standalone = ["--check", "--diff", "--help", "--no-color", "--recursive", "-h"]
+level = "SafeWrite"
+standalone = [
+  "--check", "-check", "--diff", "-diff", "--help", "-help",
+  "--no-color", "-no-color", "--recursive", "-recursive", "-h",
+]
 
 [[command.sub]]
 name = "graph"
