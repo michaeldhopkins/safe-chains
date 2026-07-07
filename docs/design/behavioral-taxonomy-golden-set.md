@@ -20,18 +20,20 @@ it does, plus more):
 - **developer** — the everyday default; also *build / install / fetch* tooling:
   `cargo build`, `npm ci`, `git fetch`.
 
-Three siblings branch off `developer` (not a straight line — §4):
+Then three more, off to the side (not a straight line — §4):
 
-- **ci** — like `developer` but *pickier about downloaded code* (pinned, verified
-  dependencies only). Stricter; for automation with no human watching.
 - **admin** — also *root / system* changes: `sudo apt install`, `systemctl`, `/etc`.
 - **infra** — also *cloud / remote* changes: `terraform apply`, `kubectl apply`.
+- **yolo** — the opt-in top of the *local* ladder: do anything to a machine you own or
+  can throw away — `sudo`, `rm`, installs — *short of the irrecoverable* (no disk wipe,
+  no kernel, no `curl|sudo bash`, nothing remote, no secret dumped out).
 
 ## 2. How to read the table
 
 **✓** = auto-run (no prompt).  **·** = stop and ask the human.  **†** = deliberately
-left configurable / a known point of variance (§5). Columns are the four nesting
-levels; the sibling levels are the deltas in §4.
+left configurable / a known point of variance (§5). Columns are the four everyday
+nesting levels; `yolo` (the opt-in loosest local level) and the `admin`/`infra` siblings
+are given as deltas in §4.
 
 ## 3. The corpus
 
@@ -158,11 +160,6 @@ levels; the sibling levels are the deltas in §4.
 
 ## 4. The sibling levels (deltas from `developer`)
 
-**ci** (stricter — unattended automation): same as `developer`, except unpinned /
-unverified downloaded code flips to **·** — `npm install left-pad`, floating
-`pip install`, and any build/install from a source that isn't pinned-and-signed.
-(`git push`, `git config`, etc. stay whatever `developer` is.)
-
 **admin** (adds root/system): same as `developer`, plus these flip to **✓** —
 `sudo apt install`, `apt-get install`, `systemctl restart`, `echo x > /etc/hosts`,
 `crontab -e`. **Still ·, even here:** `rm -rf /`, `dd` to a disk, `kmutil load` — the
@@ -174,6 +171,17 @@ these flip to **✓** — `terraform apply`, `kubectl apply -f …`, `helm insta
 is named on the command line, not taken from ambient config.* **Still ·, even here:**
 `kubectl delete namespace prod`, `terraform destroy`, `gh api -X DELETE …`,
 `psql … DROP` — irreversible remote destruction always asks, even for an operator.
+
+**yolo** (opt-in; do anything local short of the irrecoverable): the widest local grant.
+It flips to **✓** everything in `admin` *plus* the local rows `developer` still asks on —
+`rm -rf ./anything`, `direnv allow`, `source ./env.sh`, `curl https://get.tool.sh | sh`
+(as *you*, not root), `git rebase -i`, `crontab -e`, arbitrary project scripts. **Still
+· even here — the five catastrophe corners:** wide irreversible destroy (`rm -rf /`,
+`sudo rm -rf /var`, `dd of=/dev/sda`, `mkfs`); below-the-filesystem / kernel (`dd` to a
+device, `kmutil load`, `mount`); `curl … | sudo bash` (unseen code *as root*); anything
+that leaves the box (`git push`, `ssh host '…'`, `terraform apply`, `aws s3 sync` up,
+`/dev/tcp` and DNS exfil); and any secret dumped to the chat/outward (`cat ~/.ssh/id_rsa`,
+`curl -d @secret`). `yolo` is a *local* license and it never bricks the machine.
 
 ## 5. Decisions (settled 2026-07-07)
 
@@ -194,7 +202,9 @@ is named on the command line, not taken from ambient config.* **Still ·, even h
    `rm -rf ./node_modules` both wait for the everyday level; `write-local` doesn't
    auto-delete. Revisit if too conservative.
 3. **Unpinned install → auto-run at `developer`** (`npm install left-pad`, floating
-   `pip install`). The stricter `ci` level still asks (it requires a fixed version).
+   `pip install`). The opt-in `pinned-provenance` modifier (what the retired `ci` level
+   really was — a preference knob, not a tier) flips these to ask by requiring a
+   verified, pinned source.
 4. **`git push` → ask (·), even at `developer`** — it affects other people, so it's
    treated differently from local work. **† Pinned as a known point of variance:**
    whether a plain push should auto-run is a common disagreement — it depends on the

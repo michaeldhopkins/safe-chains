@@ -243,41 +243,139 @@ for free (this settles the refinements "still open": yes, an `infra` operator in
 confirmed CI sandbox is just `infra` evaluated against a sandbox-clamped profile).
 `contained-mode` is therefore **retired as a level** — it is subsumed by §3.2.
 
-**Unattended → a level (`ci`).** This axis *does* change the predicate: with no human
-watching, the acceptable supply-chain is tighter. So it is a real level — `ci` — a
-**stricter** `developer`:
+**Unattended → an optional *modifier*, not a level (`ci` retired).** This axis
+looked like it changed the predicate — with no human watching, tolerate only tighter
+provenance — so it was first modeled as a stricter `developer` level, `ci`. But
+safe-chains runs as a **human-in-the-loop** hook: there is always a person at the
+prompt. The unattended scenario `ci` was built for does not occur in this deployment,
+so the level would never be selected — dead weight in the ladder. Its one durable idea,
+*prefer pinned/verified provenance*, is a **preference knob**, not a capability tier: a
+user on a sensitive repo may want "`developer`, but require hash-verified installs."
+That is a **modifier** dialed on top of a level — exactly the fate of containment above.
+So `ci` is **retired as a level**; the provenance-strictness becomes an optional
+`pinned-provenance` modifier (off by default) that tightens the supply-chain clause of
+whatever level is active:
 
 ```toml
-[level.ci]                             # unattended pipeline: stricter provenance
-extends = "write-local"                # NB: built up from write-local, not down from developer (R27)
-[[level.ci.allow]]                     # builds, but only hash-verified from signed sources
-operation    = ["execute"]
-execution    = "<= network-sourced"
-supply_chain = { source = ["signed-repo", "private-registry", "vendored"],
-                 pinning = ">= hash-verified", exec_surface = "<= build-script" }
-[[level.ci.allow]]                     # outbound fetch to fixed endpoints
-operation = ["communicate"]
-network   = { direction = "<= outbound", destination = "<= fixed", payload = "<= fetches" }
+[modifier.pinned-provenance]           # opt-in; tightens supply-chain on the active level
+supply_chain = { pinning = ">= hash-verified", source ≠ "unverified-url" }
 ```
 
-`ci` forbids the floating-tag installs and public-registry / unverified-url bootstraps
-that `developer` tolerates, because an unattended run can't notice a swapped
-dependency. It is a level a pipeline *selects*; being stricter, it needs no
-deny-by-default gate.
+Like every modifier it transforms the profile-check, not the level, so it composes with
+`developer`, `admin`, or `infra` for free — and, being off by default, costs nothing to
+the everyday user who never runs unattended.
 
-**R27 — `extends` composes *upward* only.** Note `ci` is built from `write-local`
-plus a tight build clause, **not** by "extending `developer` and restricting it."
-The level-TOML `extends` unions allow-clauses, which only ever makes a level *looser*;
-inheriting `developer` would drag in its permissive build clause and a floating-tag
-install would match it. So a **stricter** variant must be authored from a lower base
-plus its tightened clause. `admin`/`infra` (supersets of `developer`) extend it
-correctly; `ci` (a subset) cannot. Authoring discipline: extend to loosen, build up
-from a lower base to tighten.
+**R27 still stands — `extends` composes *upward* only.** With `ci` gone, every
+remaining level is either looser (built by `extends`) or a deny-by-default sibling
+(`admin`/`infra`) authored up from a low base. No shipped level is
+"`developer`-minus-something," so the extend-only-loosens rule is never fought. The
+open question R27 raised — *does the level language need a `restricts` primitive to
+author **stricter** levels?* — is answered **no**: a stricter level is always built up
+from a lower base. §6 shows the one place a subtractive primitive *does* earn its keep,
+and it is the opposite case — the **loosest** level, removing a few catastrophe corners
+from allow-almost-everything.
 
-**The dissolved conflation, cleanly:** the old `ci`/`contained-mode` splits into the
-**isolation modifier** (contained; §3.2, no level) and the **`ci` level** (unattended;
-stricter build), which *compose* — a containerized CI job is the `ci` predicate over a
-sandbox-clamped profile.
+**The dissolved conflation, cleanly:** the old `ci`/`contained-mode` was two orthogonal
+axes, and **both** turn out to be modifiers, not levels — **containment** (isolation,
+§3.2) and **pinned-provenance** (this section). Neither is a tier; both transform the
+profile the active level judges. That is the third false level the model has shed
+(recursion axis → gone; containment → modifier; `ci` → modifier), and each removal made
+the ladder simpler and more honest.
+
+---
+
+## 6. The `yolo` level — allow-almost-everything, minus catastrophe (opt-in)
+
+**Intent:** "I am on a machine I own or can throw away — a personal dev box, a VM, a
+container I will delete. Stop asking me about `sudo`, `rm`, and installs. Still stop me
+from the handful of things that can't be undone." It is the top of the *local* ladder,
+strictly looser than `developer`, and **off by default** — opted into per-environment
+through the same trusted-config gate `admin`/`infra` use. It folds in the
+non-catastrophic parts of `admin` (local root: `sudo apt install`, `systemctl restart`,
+editing `/etc`) so privileged-local friction disappears, and it loosens `developer`'s
+network clause to allow arbitrary-destination **fetches** (pulling data can't wreck a
+box). It draws the line at five **catastrophe corners** — irrecoverable acts it refuses
+even here:
+
+- **C1 — irrecoverable wide destruction.** `destroy ∧ reversibility = irreversible ∧
+  (scale ≥ machine-wide ∨ target ∈ {block-device, filesystem, system-path})`. `mkfs`,
+  `dd of=/dev/sda`, `rm -rf /`, `rm -rf ~`, repartition. Project-scoped deletes
+  (`rm -rf ./node_modules`, `rm -rf ~/oldproject`) stay allowed — bounded, recoverable.
+- **C2 — kernel / firmware / device state.** raw block-device writes, `insmod`/`modprobe`,
+  firmware/EFI/NVRAM flash. This is the `device`/`kernel` line `admin` already draws;
+  `yolo` keeps it. (Editing `/etc` — a reversible `machine`-locus mutate — stays allowed.)
+- **C3 — unverified remote code as root.** `execute ∧ authority = root ∧
+  supply_chain.source = unverified-url` — the `curl … | sudo bash` shape. `yolo`
+  licenses *your* commands, not the internet's, at root. (`curl … | bash` as the *user*
+  is allowed — recoverable, userspace.)
+- **C4 — anything that leaves this machine.** remote *mutation* (`locus.remote ≥
+  mutate`: `git push`, `kubectl apply`, cloud-resource writes) and outbound sends
+  carrying host data. `yolo` is a **local** license (the SafeWrite-scope principle); it
+  does not extend trust to the network. Remote fetch (`git fetch`, `npm install`) stays
+  allowed; remote mutation remains `infra`.
+- **C5 — secret disclosure to chat / external.** `secret = true ∧ disclosure.audience ∈
+  {chat, external}` (HP-15). A leaked key never un-leaks. Piping a secret into a local
+  tool that consumes it is fine; dumping it where it persists is not.
+
+Everything *not* in C1–C5 auto-runs: arbitrary local code, any local edit, installs
+(pinned or floating), local `git`, and privileged local administration short of the
+corners.
+
+### 6.1 Why `yolo` needs a subtractive primitive (and stricter levels don't)
+
+`yolo` is the first level whose natural definition is "allow almost everything **except**
+a few corners." Every other level is a union of positive allow-boxes — you state what is
+*in*. `yolo` is the complement: a maximal-local allow with holes punched in it. A
+positive-only language can only express a hole by *tiling its complement* — to exclude
+one 3-facet corner `{destroy ∧ irreversible ∧ wide}` you write three overlapping boxes
+whose union is everything-but-the-corner. For one corner that is tolerable; for the
+genuinely-interior corners here (C1 and C3 sit *inside* the maximal allow's box) it
+explodes into an unauditable pile of clauses. (C2/C4/C5 fall out of *scoping* the
+positive allow — simply don't grant device/kernel, remote-mutation, or host-data sends —
+so only C1 and C3 truly need subtraction.)
+
+So `yolo` is the honest motivation for a **bounded, allow-only** subtractive clause:
+
+```toml
+[level.yolo]                           # opt-in; top of the local ladder
+[[level.yolo.allow]]                   # maximal LOCAL grant: any op, up to root, any scale
+operation     = ["observe","create","mutate","destroy","execute","communicate","configure","control"]
+locus         = { local = "<= machine", remote = "<= fetch-only" }   # machine, not device/kernel (C2 by scope)
+authority     = "<= root"
+persistence   = "<= installing"
+scale         = "<= unbounded"
+reversibility = "<= irreversible"
+execution     = "<= network-sourced"
+network       = { direction = "<= outbound", destination = "<= arbitrary", payload = "<= fetches" }  # C4/C5 by scope
+[[level.yolo.deny]]                     # C1 — irrecoverable wide destruction (interior corner)
+operation = ["destroy"]; reversibility = "irreversible"; scale = ">= machine-wide"
+[[level.yolo.deny]]                     # C1b — irreversible write over a system path / whole fs
+operation = ["destroy","mutate"]; reversibility = "irreversible"; locus = { local = ">= machine" }
+[[level.yolo.deny]]                     # C3 — unverified remote code as root (interior corner)
+operation = ["execute"]; authority = "root"; supply_chain = { source = ["unverified-url"] }
+```
+
+`deny` clauses are evaluated **after** allows and only ever *remove* capability — a
+`deny` can never grant. That is what makes the primitive safe to add: it is
+**monotonic-downward**, so it cannot be misused to sneak capability into a level (the
+R27 worry runs the other way — it feared a subtractive form used to *forge* a stricter
+level from a looser base). This resolves R27's open question cleanly: the level language
+wants **not** a `restricts`-for-stricter primitive, but a `deny`-for-the-loosest one,
+used solely where the honest shape is "allow-all minus catastrophe." `yolo` is its only
+client.
+
+### 6.2 Contract and tests
+- **`yolo ⊃ developer`** and **`yolo ⊃ (admin ∩ ¬catastrophe)`**; `infra` (remote
+  mutation) stays outside it by C4. `yolo` is the top of the local ladder.
+- **Proptest additions:** (a) *deny-monotonicity* — adding any `deny` clause only shrinks
+  the admitted set (∀ profile: `admits(yolo) ⇒ admits(allow-only-yolo)`); (b)
+  *catastrophe-floor* — every profile matching C1–C5 is denied by `yolo` (the golden-set
+  `mkfs` / `dd of=/dev/sda` / `curl|sudo bash` / `git push` / secret-to-chat rows all
+  `✗`); (c) *no-forge* — the deny-only property: `yolo` never admits a profile its
+  maximal allow didn't already grant.
+- **Golden-set** gains a `yolo` column right of `developer`: `✓` on `sudo apt install`,
+  `sudo systemctl restart`, `rm -rf ~/oldproject`; `✗` (ask) on `git push`,
+  `dd of=/dev/disk2`, `mkfs`, exfil, cloud writes.
 
 ---
 
@@ -294,12 +392,15 @@ sandbox-clamped profile.
   distinct sibling. `infra` operationalizes HP-12 (`remote = pinned`) and gates
   irreversible remote destroy to a prompt.
 - **R27** — `extends` composes *upward* (unions allow-clauses → looser). A stricter
-  level (`ci`) must be authored from a lower base plus a tightened clause, not by
-  restricting a looser one. Extend to loosen; build up to tighten (§5).
+  level must be authored from a lower base plus a tightened clause, not by restricting a
+  looser one. Extend to loosen; build up to tighten (§5). With `ci` retired, no shipped
+  level fights this rule; a subtractive primitive is needed only for the *loosest* level
+  (§6), never a stricter one.
 - **§4/§5 resolutions** — `admin` fully specified (local root, deny-by-default,
-  four exclusions). `contained-mode` retired as a level: containment is a **modifier**
-  (subsumed by §3.2 isolation, HP-2), and the unattended axis becomes the **`ci`**
-  level (stricter `developer`, HP-1).
+  four exclusions). Both halves of the old `ci`/`contained-mode` conflation resolve to
+  **modifiers, not levels**: containment → the isolation modifier (subsumed by §3.2,
+  HP-2), and unattended-provenance → the optional `pinned-provenance` modifier (HP-1).
+  `ci` is retired as a level.
 
 **Level ladders pinned (across the shipped set):**
 - trigger: immediate (strict) → detached (developer) → boot (infra).
@@ -311,14 +412,16 @@ sandbox-clamped profile.
 `admin` sibling) → `behavioral-taxonomy-levels`. HP-12 gains a concrete mitigation
 (`locus.remote = pinned`) worth noting in the log.
 
-**Revised default set:** `inert ⊂ read-local ⊂ write-local ⊂ developer`, with three
-siblings off `developer` — **`ci`** (stricter provenance; a pipeline selects it),
-**`admin`** (local root; deny-by-default), **`infra`** (remote cloud; deny-by-default)
-— plus the **isolation modifier** (containment) that applies to any level via §3.2.
-`contained-mode` is gone.
+**Revised default set:** `inert ⊂ read-local ⊂ write-local ⊂ developer ⊂ yolo`, with two
+deny-by-default siblings off `developer` — **`admin`** (local root) and **`infra`**
+(remote cloud) — plus two **modifiers** that apply to any level: **containment**
+(isolation, §3.2) and **`pinned-provenance`** (opt-in supply-chain tightening). `ci`
+and `contained-mode` are both gone as levels. **`yolo`** (§6) is the opt-in top of the
+local ladder — allow-almost-everything minus five catastrophe corners — and the sole
+client of the level language's bounded, allow-only `deny` clause.
 
 **Still open:** the exact effect (if any) of the `recurring` trigger *kind*
-(clock vs event) on admissibility; whether `ci`'s tightened source set should be
-per-ecosystem; and — surfaced by R27 — whether the level language wants an explicit
-`restricts`/override primitive, or whether "author stricter from a lower base" is a
-sufficient discipline.
+(clock vs event) on admissibility; and the per-ecosystem definition of `pinning ≥
+version` / `≥ hash-verified` (the supply-chain sub-facet catalog, annex `delegation`).
+The R27 `restricts`-primitive question is resolved: not needed for stricter levels; a
+bounded subtractive form is used only by the loose level (§6).

