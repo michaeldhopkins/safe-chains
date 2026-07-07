@@ -1,0 +1,394 @@
+[[command]]
+name = "oci"
+description = "Oracle Cloud Infrastructure CLI — an auto-generated client covering essentially every OCI service through a uniform `oci <service> <resource> <action>` grammar. The full CLI creates, modifies, and deletes cloud infrastructure and can incur cost. Authenticated via ~/.oci/config API keys or session tokens; every non-help command is an authenticated API call using the ambient config/profile, so `list`/`get` reads enumerate or fetch the account's live resources (non-mutating, no cost). Only the `list` and `get` actions are covered, per resource. Deliberately excluded: `oci raw-request` — a free-form HTTP escape hatch whose `--http-method` accepts any verb (GET/POST/PUT/PATCH/DELETE), so it cannot be classified by verb; `oci os object get` and other blob downloads, which require `--file` and write to the local filesystem; `oci setup *` and `oci session *`, which are interactive credential/config setup and browser auth; and every mutating action (create/update/delete/launch/terminate/start/stop/reboot/change-compartment/bulk-*/import/export/rotate/restore/move/copy). Because reads take many query flags (--compartment-id, filters, paging), read actions tolerate unknown flags — the action token itself is constrained to list/get, so no flag can turn a read into a write. Oracle ships weekly, so the service/resource surface grows continuously; this allowlist covers common services and is expected to be revisited and expanded."
+url = "https://docs.oracle.com/en-us/iaas/tools/oci-cli/latest/oci_cli_docs/"
+researched_version = "3.89.0 (2026; oracle/oci-cli, weekly cadence)"
+bare_flags = ["--help", "--version", "-v"]
+
+examples_safe = [
+  "oci iam compartment list --compartment-id ocid1.tenancy.oc1..aaa",
+  "oci iam region list",
+  "oci compute instance list --compartment-id ocid1.compartment.oc1..aaa",
+  "oci compute instance get --instance-id ocid1.instance.oc1..aaa",
+  "oci network vcn list --compartment-id ocid1.compartment.oc1..aaa",
+  "oci bv volume list --compartment-id ocid1.compartment.oc1..aaa",
+  "oci os ns get",
+  "oci os bucket list --compartment-id ocid1.compartment.oc1..aaa --namespace-name n",
+  "oci os object list --bucket-name b --namespace-name n",
+  "oci db autonomous-database list --compartment-id ocid1.compartment.oc1..aaa",
+  "oci lb load-balancer list --compartment-id ocid1.compartment.oc1..aaa",
+]
+examples_denied = [
+  "oci compute instance launch --compartment-id X --shape Y --image-id Z --subnet-id S",
+  "oci compute instance terminate --instance-id X",
+  "oci network vcn delete --vcn-id X",
+  "oci os object get --namespace-name n --bucket-name b --name f --file out",
+  "oci os object put --namespace-name n --bucket-name b --name f --file in",
+  "oci raw-request --http-method GET --target-uri https://api/x",
+  "oci raw-request --http-method DELETE --target-uri https://api/x",
+  "oci setup config",
+  "oci session authenticate",
+]
+
+[command.wrapper]
+standalone = ["--debug", "--no-retry"]
+valued = [
+  "--auth", "--cert-bundle", "--cli-rc-file", "--config-file",
+  "--endpoint", "--output", "--profile", "--query", "--region", "--request-id",
+]
+
+# ─────────────────────────────────────────────────────────────────────
+# Read actions per resource: first_arg constrains the action token to
+# list/get; tolerate_unknown_* admits the query flags (--compartment-id,
+# --*-id, filters, paging). A read cannot mutate regardless of its flags.
+# `oci raw-request`, `oci setup`, `oci session`, and mutating actions are
+# excluded by omission. `os object` allows `list` only (get writes a file).
+# ─────────────────────────────────────────────────────────────────────
+
+[[command.sub]]
+name = "iam"
+[[command.sub.sub]]
+name = "compartment"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "user"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "group"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "policy"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "dynamic-group"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "region"
+first_arg = ["list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "availability-domain"
+first_arg = ["list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "fault-domain"
+first_arg = ["list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "tag-namespace"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "tag"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "compute"
+[[command.sub.sub]]
+name = "instance"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "image"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "shape"
+first_arg = ["list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "boot-volume-attachment"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "vnic-attachment"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "network"
+[[command.sub.sub]]
+name = "vcn"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "subnet"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "security-list"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "route-table"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "internet-gateway"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "nat-gateway"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "service-gateway"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "drg"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "nsg"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "public-ip"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "bv"
+[[command.sub.sub]]
+name = "volume"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "boot-volume"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "volume-backup"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "volume-group"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "os"
+[[command.sub.sub]]
+name = "ns"
+first_arg = ["get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "bucket"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+# `object get` requires --file and writes to the local filesystem — excluded.
+[[command.sub.sub]]
+name = "object"
+first_arg = ["list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "preauth-request"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "db"
+[[command.sub.sub]]
+name = "database"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "db-system"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "autonomous-database"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "db-home"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "db-node"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "backup"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "lb"
+[[command.sub.sub]]
+name = "load-balancer"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "backend"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "backend-set"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "listener"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "certificate"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "fs"
+[[command.sub.sub]]
+name = "file-system"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "mount-target"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "export"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "snapshot"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "monitoring"
+[[command.sub.sub]]
+name = "alarm"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "logging"
+[[command.sub.sub]]
+name = "log-group"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "log"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "limits"
+[[command.sub.sub]]
+name = "limit-value"
+first_arg = ["list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "limit-definition"
+first_arg = ["list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "resource-availability"
+first_arg = ["get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "service"
+first_arg = ["list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "budgets"
+[[command.sub.sub]]
+name = "budget"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "alert-rule"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "audit"
+[[command.sub.sub]]
+name = "event"
+first_arg = ["list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+
+[[command.sub]]
+name = "work-requests"
+[[command.sub.sub]]
+name = "work-request"
+first_arg = ["list", "get"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "work-request-error"
+first_arg = ["list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "work-request-log-entry"
+first_arg = ["list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
