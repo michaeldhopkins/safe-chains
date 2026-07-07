@@ -74,7 +74,10 @@ pub struct Clause {
     pub net_direction: Option<OrdBound<NetDirection>>,
     pub net_destination: Option<OrdBound<NetDestination>>,
     pub net_payload: Option<OrdBound<NetPayload>>,
-    pub execution: Option<OrdBound<ExecutionTrust>>,
+    pub execution_trust: Option<OrdBound<ExecutionTrust>>,
+    pub supply_source: Option<Vec<SupplySource>>,
+    pub pinning: Option<OrdBound<Pinning>>,
+    pub exec_surface: Option<Vec<ExecSurface>>,
     pub cost: Option<OrdBound<Cost>>,
 }
 
@@ -101,8 +104,22 @@ impl Clause {
             && ord_admits(self.net_direction, cap.network.direction)
             && ord_admits(self.net_destination, cap.network.destination)
             && ord_admits(self.net_payload, cap.network.payload)
-            && ord_admits(self.execution, cap.execution)
+            && ord_admits(self.execution_trust, cap.execution.trust)
+            && self.supply_chain_admits(cap.execution.supply_chain)
             && ord_admits(self.cost, cap.cost)
+    }
+
+    /// Supply-chain constraints apply only to network-sourced code. A capability with
+    /// no supply chain (`None` — nothing downloaded) satisfies them vacuously.
+    fn supply_chain_admits(&self, sc: Option<SupplyChain>) -> bool {
+        match sc {
+            None => true,
+            Some(sc) => {
+                set_admits(self.supply_source.as_deref(), sc.source)
+                    && ord_admits(self.pinning, sc.pinning)
+                    && set_admits(self.exec_surface.as_deref(), sc.exec_surface)
+            }
+        }
     }
 }
 
@@ -237,6 +254,56 @@ mod tests {
             c
         }]);
         assert!(!yolo.admits(&wipe));
+    }
+
+    #[test]
+    fn supply_chain_gates_network_sourced_code_and_is_vacuous_otherwise() {
+        // a developer-shaped clause: network-sourced execution is fine, but only from a
+        // recognized registry (not an unverified URL).
+        let dev = Level::new("dev").allowing(Clause {
+            execution_trust: Some(OrdBound::at_most(ExecutionTrust::NetworkSourced)),
+            supply_source: Some(vec![
+                SupplySource::PublicRegistry,
+                SupplySource::SignedRepo,
+                SupplySource::PrivateRegistry,
+                SupplySource::Vendored,
+            ]),
+            ..Default::default()
+        });
+
+        // cargo build — network-sourced from a public registry
+        let build = Profile::of(vec![{
+            let mut c = cap(Operation::Execute);
+            c.execution = Execution {
+                trust: ExecutionTrust::NetworkSourced,
+                supply_chain: Some(SupplyChain {
+                    source: SupplySource::PublicRegistry,
+                    pinning: Pinning::HashVerified,
+                    exec_surface: ExecSurface::BuildScript,
+                }),
+            };
+            c
+        }]);
+        assert!(dev.admits(&build), "cargo build from a registry");
+
+        // curl | sh — network-sourced from an unverified URL
+        let curl_sh = Profile::of(vec![{
+            let mut c = cap(Operation::Execute);
+            c.execution = Execution {
+                trust: ExecutionTrust::NetworkSourced,
+                supply_chain: Some(SupplyChain {
+                    source: SupplySource::UnverifiedUrl,
+                    pinning: Pinning::Floating,
+                    exec_surface: ExecSurface::RunArtifact,
+                }),
+            };
+            c
+        }]);
+        assert!(!dev.admits(&curl_sh), "curl | sh is an unverified-url source");
+
+        // cat file — no downloaded code, so the supply-chain constraint is vacuous
+        let plain = Profile::of(vec![cap(Operation::Observe)]);
+        assert!(dev.admits(&plain), "a command with no supply chain passes vacuously");
     }
 
     #[test]

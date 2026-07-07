@@ -46,6 +46,9 @@ prop_compose! {
             arb_term::<Principal>(), arb_term::<NetDirection>(), arb_term::<NetDestination>(),
             arb_term::<NetPayload>(), arb_term::<ExecutionTrust>(), arb_term::<Cost>(),
         ),
+        g4 in (
+            arb_term::<SupplySource>(), arb_term::<Pinning>(), arb_term::<ExecSurface>(), any::<bool>(),
+        ),
     ) -> Capability {
         Capability {
             operation: g1.0,
@@ -58,7 +61,14 @@ prop_compose! {
             disclosure: Disclosure { audience: g2.3, channel: g2.4, principal: g2.5 },
             secret: Secret { level: g2.6, channel: g2.7, principal: g3.0 },
             network: Network { direction: g3.1, destination: g3.2, payload: g3.3 },
-            execution: g3.4,
+            execution: Execution {
+                trust: g3.4,
+                supply_chain: g4.3.then_some(SupplyChain {
+                    source: g4.0,
+                    pinning: g4.1,
+                    exec_surface: g4.2,
+                }),
+            },
             cost: g3.5,
             because: String::new(),
         }
@@ -83,6 +93,7 @@ prop_compose! {
             arb_opt_set::<Principal>(), arb_opt_bound::<NetDirection>(),
             arb_opt_bound::<NetDestination>(), arb_opt_bound::<NetPayload>(),
             arb_opt_bound::<ExecutionTrust>(), arb_opt_bound::<Cost>(),
+            arb_opt_set::<SupplySource>(), arb_opt_bound::<Pinning>(), arb_opt_set::<ExecSurface>(),
         ),
     ) -> Clause {
         Clause {
@@ -92,7 +103,8 @@ prop_compose! {
             disclosure_audience: g2.3, disclosure_channel: g2.4, disclosure_principal: g2.5,
             secret_level: g2.6, secret_channel: g2.7, secret_principal: g3.0,
             net_direction: g3.1, net_destination: g3.2, net_payload: g3.3,
-            execution: g3.4, cost: g3.5,
+            execution_trust: g3.4, cost: g3.5,
+            supply_source: g3.6, pinning: g3.7, exec_surface: g3.8,
         }
     }
 }
@@ -140,8 +152,10 @@ pub(crate) fn lowered_variants(cap: &Capability) -> Vec<Capability> {
         lower(cap, |c| c.network.direction, |c, v| c.network.direction = v),
         lower(cap, |c| c.network.destination, |c, v| c.network.destination = v),
         lower(cap, |c| c.network.payload, |c, v| c.network.payload = v),
-        lower(cap, |c| c.execution, |c, v| c.execution = v),
+        lower(cap, |c| c.execution.trust, |c, v| c.execution.trust = v),
         lower(cap, |c| c.cost, |c, v| c.cost = v),
+        // `pinning` is a trust facet (higher = safer); its monotonicity direction is
+        // inverted and no default level floors it, so it is not lowered here.
     ]
     .into_iter()
     .flatten()
