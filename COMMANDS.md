@@ -215,6 +215,21 @@ Aliases: `7zz`, `7za`
 - Allowed valued flags: --automake-acdir, --aclocal-path, --output, --system-acdir, --warnings, -I, -W
 - Bare invocation allowed
 
+### `acorn`
+<p class="cmd-url"><a href="https://github.com/acornjs/acorn/blob/master/acorn/README.md">https://github.com/acornjs/acorn/blob/master/acorn/README.md</a></p>
+
+- Allowed standalone flags: --allow-hash-bang, --compact, --ecma2015, --ecma2016, --ecma2017, --ecma2018, --ecma2019, --ecma2020, --ecma2021, --ecma2022, --ecma2023, --ecma2024, --ecma2025, --ecma2026, --ecma3, --ecma5, --help, --locations, --module, --silent, --tokenize
+- Bare invocation allowed
+
+**Examples:**
+
+- `acorn --help`
+- `acorn file.js`
+- `acorn --module app.mjs`
+- `acorn --ecma2022 --locations x.js`
+- `acorn --silent x.js`
+- `acorn --tokenize x.js`
+
 ### `act`
 <p class="cmd-url"><a href="https://nektosact.com/">https://nektosact.com/</a></p>
 
@@ -1926,10 +1941,10 @@ Aliases: `capacitor`
 - **run**: Flags: --help, -h
 - **search**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --index, --limit, --registry
 - **semver-checks check-release**: Flags: --all-features, --default-features, --help, --verbose, -h, -v. Valued: --baseline-rev, --baseline-root, --baseline-version, --color, --config-path, --current-rustdoc, --exclude, --features, --manifest-path, --package, --release-type, --target, -j, -p
-- **test**: Flags: --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
+- **test**: Flags: --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, --workspace, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **tree**: Flags: --all-features, --duplicates, --frozen, --help, --ignore-rust-version, --locked, --no-dedupe, --no-default-features, --offline, -d, -e, -h, -i, --quiet, -q, -v. Valued: --charset, --color, --config, --depth, --edges, --features, --format, --invert, --manifest-path, --package, --prefix, --prune, --target, -p
 - **udeps**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --help, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --workspace, --version, -V, -h, --quiet, -q, -v. Valued: --backend, --bench, --bin, --color, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --output, --package, --profile, --target, --target-dir, --test, -j, -p
-- **update** (requires --dry-run): Flags: --aggressive, --dry-run, --frozen, --help, --locked, --offline, --recursive, --workspace, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path, --package, --precise, -p
+- **update**: Flags: --aggressive, --dry-run, --frozen, --help, --locked, --offline, --recursive, --workspace, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path, --package, --precise, -p
 - **vendor**: Flags: --frozen, --help, --locked, --no-delete, --offline, --respect-source-config, --versioned-dirs, -h, --quiet, -q, -v. Valued: --color, --config, --lockfile-path, --manifest-path, --sync, -Z, -s
 - **verify-project**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
 - **version**: Flags: --help, -h. Positional args accepted
@@ -3385,21 +3400,58 @@ Aliases: `gdirname`
 <p class="cmd-url"><a href="https://docs.digitalocean.com/reference/doctl/">https://docs.digitalocean.com/reference/doctl/</a></p>
 
 - **account get**: Flags: --help, -h
+- **account ratelimit**: Flags: --help, -h
 - **apps get**: Flags: --help, -h
 - **apps list**: Flags: --help, -h
+- **auth list**: Flags: --help, -h
 - **balance get**: Flags: --help, -h
+- **billing-history list**: Flags: --help, -h
+- **compute action**: Allowed arguments: list, get
+- **compute cdn**: Allowed arguments: list, get
+- **compute certificate**: Allowed arguments: list, get
+- **compute domain**: Allowed arguments: list, get
 - **compute droplet**: Allowed arguments: list, get
 - **compute firewall**: Allowed arguments: list, get
 - **compute image**: Allowed arguments: list, get
+- **compute load-balancer**: Allowed arguments: list, get
 - **compute region**: Allowed arguments: list
+- **compute reserved-ip**: Allowed arguments: list, get
 - **compute size**: Allowed arguments: list
+- **compute snapshot**: Allowed arguments: list, get
+- **compute ssh-key**: Allowed arguments: list, get
+- **compute tag**: Allowed arguments: list, get
 - **compute volume**: Allowed arguments: list, get
 - **databases get**: Flags: --help, -h
 - **databases list**: Flags: --help, -h
+- **invoice**: Allowed arguments: list, get, summary
 - **kubernetes cluster**: Allowed arguments: list, get
+- **monitoring alert**: Allowed arguments: list, get
+- **projects get**: Flags: --help, -h
 - **projects list**: Flags: --help, -h
+- **registry get**: Flags: --help, -h
 - **version**
+- **vpcs get**: Flags: --help, -h
+- **vpcs list**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `doctl version`
+- `doctl account get`
+- `doctl account ratelimit`
+- `doctl balance get`
+- `doctl billing-history list`
+- `doctl invoice list`
+- `doctl auth list`
+- `doctl compute droplet list`
+- `doctl compute droplet get 12345`
+- `doctl compute snapshot list`
+- `doctl compute load-balancer list`
+- `doctl databases list`
+- `doctl kubernetes cluster list`
+- `doctl registry get`
+- `doctl vpcs list`
+- `doctl monitoring alert list`
 
 ### `doggo`
 <p class="cmd-url"><a href="https://doggo.mrkaran.dev/">https://doggo.mrkaran.dev/</a></p>
@@ -5256,6 +5308,7 @@ Aliases: `ggroups`
 ### `hcloud`
 <p class="cmd-url"><a href="https://github.com/hetznercloud/cli">https://github.com/hetznercloud/cli</a></p>
 
+- **all list**: Flags: --help, -h. Valued: --output, -o
 - **certificate describe**: Flags: --help, -h. Valued: --output, -o
 - **certificate list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
 - **context active**: Flags: --help, -h
@@ -5268,8 +5321,12 @@ Aliases: `ggroups`
 - **floating-ip list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
 - **image describe**: Flags: --help, -h. Valued: --output, -o
 - **image list**: Flags: --help, -h. Valued: --output, --selector, --type, -l, -o
+- **iso describe**: Flags: --help, -h. Valued: --output, -o
+- **iso list**: Flags: --help, -h. Valued: --output, -o
 - **load-balancer describe**: Flags: --help, -h. Valued: --output, -o
 - **load-balancer list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **load-balancer-type describe**: Flags: --help, -h. Valued: --output, -o
+- **load-balancer-type list**: Flags: --help, -h. Valued: --output, -o
 - **location describe**: Flags: --help, -h. Valued: --output, -o
 - **location list**: Flags: --help, -h. Valued: --output, -o
 - **network describe**: Flags: --help, -h. Valued: --output, -o
@@ -5284,10 +5341,29 @@ Aliases: `ggroups`
 - **server-type list**: Flags: --help, -h. Valued: --output, -o
 - **ssh-key describe**: Flags: --help, -h. Valued: --output, -o
 - **ssh-key list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **storage-box describe**: Flags: --help, -h. Valued: --output, -o
+- **storage-box list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **storage-box-type describe**: Flags: --help, -h. Valued: --output, -o
+- **storage-box-type list**: Flags: --help, -h. Valued: --output, -o
 - **version**
 - **volume describe**: Flags: --help, -h. Valued: --output, -o
 - **volume list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **zone describe**: Flags: --help, -h. Valued: --output, -o
+- **zone list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `hcloud version`
+- `hcloud server list`
+- `hcloud server list -o json`
+- `hcloud server describe my-server`
+- `hcloud image list --type system`
+- `hcloud datacenter list`
+- `hcloud iso list`
+- `hcloud zone list`
+- `hcloud all list`
+- `hcloud context list`
 
 ### `hdiutil`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/hdiutil.1.html">https://keith.github.io/xcode-man-pages/hdiutil.1.html</a></p>
@@ -11410,10 +11486,22 @@ Aliases: `grmdir`
 - **doc**: Flags: --alloc, --book, --cargo, --core, --edition-guide, --embedded-book, --help, --nomicon, --path, --proc_macro, --reference, --rust-by-example, --rustc, --rustdoc, --std, --test, --unstable-book, -h. Valued: --toolchain
 - **run**: delegates to inner command
 - **show**: Flags: --help, --installed, -h, -v
+- **target add**: Flags: --help, -h. Valued: --toolchain
 - **target list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
+- **target remove**: Flags: --help, -h. Valued: --toolchain
 - **toolchain list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
 - **which**: Flags: --help, -h. Valued: --toolchain
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `rustup target list`
+- `rustup target list --installed`
+- `rustup target add wasm32-unknown-unknown`
+- `rustup target remove wasm32-unknown-unknown`
+- `rustup component list`
+- `rustup toolchain list`
+- `rustup show`
 
 ### `rvm`
 <p class="cmd-url"><a href="https://rvm.io/rvm/cli">https://rvm.io/rvm/cli</a></p>
@@ -13123,7 +13211,7 @@ Aliases: `gtee`
 ### `terraform`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/terraform/cli/commands">https://developer.hashicorp.com/terraform/cli/commands</a></p>
 
-- **fmt** (requires --check): Flags: --check, --diff, --help, --no-color, --recursive, -h
+- **fmt**: Flags: --check, -check, --diff, -diff, --help, -help, --no-color, -no-color, --recursive, -recursive, -h
 - **graph**: Flags: --draw-cycles, --help, -h. Valued: --plan, --type
 - **output**: Flags: --help, --json, --no-color, --raw, -h. Valued: --state
 - **providers**: Flags: --help, -h
@@ -13133,6 +13221,16 @@ Aliases: `gtee`
 - **validate**: Flags: --help, --json, --no-color, -h
 - **version**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `terraform fmt`
+- `terraform fmt -recursive`
+- `terraform fmt --recursive`
+- `terraform fmt --check`
+- `terraform fmt -check -diff`
+- `terraform validate`
+- `terraform version`
 
 ### `terraform-docs`
 <p class="cmd-url"><a href="https://terraform-docs.io/">https://terraform-docs.io/</a></p>
@@ -13428,7 +13526,7 @@ Aliases: `td`
 ### `tofu`
 <p class="cmd-url"><a href="https://opentofu.org/docs/cli/commands/">https://opentofu.org/docs/cli/commands/</a></p>
 
-- **fmt** (requires --check, -check): Flags: --check, --diff, --help, --no-color, --recursive, -check, -diff, -h, -help, -no-color, -recursive
+- **fmt**: Flags: --check, --diff, --help, --no-color, --recursive, -check, -diff, -h, -help, -no-color, -recursive
 - **get**: Flags: --help, --no-color, --update, -h, -help, -no-color, -update
 - **graph**: Flags: --draw-cycles, --help, -draw-cycles, -h, -help. Valued: --plan, --type, --var, --var-file, -plan, -type, -var, -var-file
 - **init**: Flags: --backend, --get, --help, --input, --json, --lock, --no-color, --reconfigure, --upgrade, -backend, -get, -h, -help, -input, -json, -lock, -no-color, -reconfigure, -upgrade. Valued: --backend, --backend-config, --from-module, --get, --input, --lock, --lock-timeout, --lockfile, --plugin-dir, --target, --test-directory, --var, --var-file, -backend, -backend-config, -from-module, -get, -input, -lock, -lock-timeout, -lockfile, -plugin-dir, -target, -test-directory, -var, -var-file
@@ -13457,6 +13555,9 @@ Aliases: `td`
 - `tofu validate --json`
 - `tofu validate -no-color`
 - `tofu validate --var foo=bar`
+- `tofu fmt`
+- `tofu fmt --recursive`
+- `tofu fmt -recursive`
 - `tofu fmt --check`
 - `tofu fmt -check`
 - `tofu fmt --check --recursive`

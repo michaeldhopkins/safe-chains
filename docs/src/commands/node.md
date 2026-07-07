@@ -1,5 +1,20 @@
 # Node.js
 
+### `acorn`
+<p class="cmd-url"><a href="https://github.com/acornjs/acorn/blob/master/acorn/README.md">https://github.com/acornjs/acorn/blob/master/acorn/README.md</a></p>
+
+- Allowed standalone flags: --allow-hash-bang, --compact, --ecma2015, --ecma2016, --ecma2017, --ecma2018, --ecma2019, --ecma2020, --ecma2021, --ecma2022, --ecma2023, --ecma2024, --ecma2025, --ecma2026, --ecma3, --ecma5, --help, --locations, --module, --silent, --tokenize
+- Bare invocation allowed
+
+**Examples:**
+
+- `acorn --help`
+- `acorn file.js`
+- `acorn --module app.mjs`
+- `acorn --ecma2022 --locations x.js`
+- `acorn --silent x.js`
+- `acorn --tokenize x.js`
+
 ### `bun`
 <p class="cmd-url"><a href="https://bun.sh/docs/cli">https://bun.sh/docs/cli</a></p>
 

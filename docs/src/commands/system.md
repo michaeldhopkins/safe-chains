@@ -1473,7 +1473,7 @@ Aliases: `upsun`
 ### `terraform`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/terraform/cli/commands">https://developer.hashicorp.com/terraform/cli/commands</a></p>
 
-- **fmt** (requires --check): Flags: --check, --diff, --help, --no-color, --recursive, -h
+- **fmt**: Flags: --check, -check, --diff, -diff, --help, -help, --no-color, -no-color, --recursive, -recursive, -h
 - **graph**: Flags: --draw-cycles, --help, -h. Valued: --plan, --type
 - **output**: Flags: --help, --json, --no-color, --raw, -h. Valued: --state
 - **providers**: Flags: --help, -h
@@ -1483,6 +1483,16 @@ Aliases: `upsun`
 - **validate**: Flags: --help, --json, --no-color, -h
 - **version**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `terraform fmt`
+- `terraform fmt -recursive`
+- `terraform fmt --recursive`
+- `terraform fmt --check`
+- `terraform fmt -check -diff`
+- `terraform validate`
+- `terraform version`
 
 ### `timerfires`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/timerfires.1.html">https://keith.github.io/xcode-man-pages/timerfires.1.html</a></p>
@@ -1498,7 +1508,7 @@ Aliases: `upsun`
 ### `tofu`
 <p class="cmd-url"><a href="https://opentofu.org/docs/cli/commands/">https://opentofu.org/docs/cli/commands/</a></p>
 
-- **fmt** (requires --check, -check): Flags: --check, --diff, --help, --no-color, --recursive, -check, -diff, -h, -help, -no-color, -recursive
+- **fmt**: Flags: --check, --diff, --help, --no-color, --recursive, -check, -diff, -h, -help, -no-color, -recursive
 - **get**: Flags: --help, --no-color, --update, -h, -help, -no-color, -update
 - **graph**: Flags: --draw-cycles, --help, -draw-cycles, -h, -help. Valued: --plan, --type, --var, --var-file, -plan, -type, -var, -var-file
 - **init**: Flags: --backend, --get, --help, --input, --json, --lock, --no-color, --reconfigure, --upgrade, -backend, -get, -h, -help, -input, -json, -lock, -no-color, -reconfigure, -upgrade. Valued: --backend, --backend-config, --from-module, --get, --input, --lock, --lock-timeout, --lockfile, --plugin-dir, --target, --test-directory, --var, --var-file, -backend, -backend-config, -from-module, -get, -input, -lock, -lock-timeout, -lockfile, -plugin-dir, -target, -test-directory, -var, -var-file
@@ -1527,6 +1537,9 @@ Aliases: `upsun`
 - `tofu validate --json`
 - `tofu validate -no-color`
 - `tofu validate --var foo=bar`
+- `tofu fmt`
+- `tofu fmt --recursive`
+- `tofu fmt -recursive`
 - `tofu fmt --check`
 - `tofu fmt -check`
 - `tofu fmt --check --recursive`
