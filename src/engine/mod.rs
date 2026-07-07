@@ -8,3 +8,6 @@
 pub mod authoring;
 pub mod facet;
 pub mod level;
+
+#[cfg(test)]
+mod testgen;
