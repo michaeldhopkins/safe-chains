@@ -160,21 +160,40 @@ for. Surfaced by pilot-3 §A.
 boot | detached`) plus an **interactive frame** whose nested payload is opaque and
 unbounded → worst-case for the granted context.
 
+### HP-15 · Secret disclosure channel: to-chat vs consumed-by-a-tool — `status: partial`
+A *secret read* is not inherently unsafe; a secret read whose output reaches the
+**model** (stdout / the chat) is. `cat ~/.ssh/id_rsa` dumps the key to the agent;
+`tool --password-stdin < secret` or `export K=$(cat secret)` feed it to a consumer
+*without* exposing it. The default must deny the first and allow the second (the
+user's call, deciding the golden-set). The model already has the vocabulary: the
+disclosure-*audience* facet ("local-process = stdout → the model" vs another sink) and
+the flow analysis, which sees from the command shape whether a secret's output goes to
+stdout or into a pipe / redirect / `$()` consumer. Surfaced by `…-golden-set` §5.1.
+*Lead:* gate the level rules and flow doctrine on the disclosure *audience*, not merely
+on "a secret was read" — `secret → stdout-to-model` denies, `secret → other consumer`
+is allowlist-able per that consumer. Design clear; needs wiring into the level clauses
++ the flow pass.
+
 ---
 
 ## Parked policy decisions
 
-Not modeling gaps — real choices deferred until the data model is better
-understood (`behavioral-taxonomy-levels.md` §6):
+Real choices about level contents (`behavioral-taxonomy-levels.md` §6). Several are
+now **decided** in the golden-set (§5):
 
-- **Floating versions in `developer`** — deny unpinned `pip install foo` /
-  `npm i foo@latest` (a build script from an unaudited resolved version runs)?
-- **Exec-surface ceiling** — is `install-hook` (npm preinstall) inside or outside
-  `developer`, or only `build-script`?
-- **Bounded destroy in `write-local`** — does `rm ./file` (non-recursive, in-tree)
-  belong in `write-local`, or only `developer`?
-- **Per-ecosystem `pinning ≥ version` test** — what counts as "pinned" for each of
-  npm / pip / cargo / go / apt.
+- **Floating versions in `developer`** → DECIDED: auto-run at `developer` (`npm install
+  left-pad`); the stricter `ci` asks.
+- **Bounded destroy** → DECIDED: `rm ./file` and `rm -rf ./dir` both wait for
+  `developer`; `write-local` doesn't auto-delete.
+- **Exec-surface in `developer`** → DECIDED implicitly: allowing `npm install` at
+  `developer` puts `install-hook` (lifecycle scripts) inside it.
+
+Still open:
+- **Per-ecosystem "pinned" test** — what counts as pinned for npm / pip / cargo / go /
+  apt (needed to make the `ci` and unpinned-install rules concrete).
+- **`git push` auto-run** → DEFERRED as a configurable point of variance (golden-set
+  §5.4): teams and individuals disagree; likely a per-user / per-repo setting, not one
+  fixed answer.
 
 ---
 
