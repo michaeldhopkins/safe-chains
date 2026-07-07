@@ -54,6 +54,7 @@ macro_rules! safe_write {
 pub mod cli;
 pub mod cst;
 pub mod docs;
+pub mod engine;
 mod handlers;
 pub use handlers::all_opencode_patterns;
 pub mod parse;
