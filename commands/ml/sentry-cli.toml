@@ -1,9 +1,31 @@
 [[command]]
 name = "sentry-cli"
-description = "Sentry CLI — manages releases, source maps, and crash artifacts. Most subcommands contact a Sentry server (network). Read-side: `info`, `login`, `releases list`, `releases info`, `releases files <release> list`, `organizations list`, `projects list`, `monitors list`, `events list`. Write-side: `releases new/finalize/delete/set-commits/files <release> upload/delete`, `sourcemaps upload/inject/explain`, `debug-files upload/check/find`, `send-event`, `send-envelope`, `mcp-server`, `monitors run/event/status`, `update`."
+description = "Sentry CLI — manages releases, source maps, and crash artifacts against a Sentry organization. Most subcommands contact the Sentry API over the network using an ambient auth token (SENTRY_AUTH_TOKEN / ~/.sentryclirc). Read-only network subcommands (`info`, `releases list`, `releases info`, `projects list`, `organizations list`, `issues list`, `events list`) query and mutate nothing. A handful are purely local: `releases propose-version` (derives a version from git HEAD), `debug-files check/find/print-sources` (inspect a debug-info file on disk), and `bash-hook` (prints a shell snippet to stdout). `debug-files bundle-sources/bundle-jvm` and `sourcemaps inject` write local files only. Everything else mutates the remote or executes code and is not covered: `releases new/finalize/delete/set-commits`, `deploys`, `issues mutate`, all `upload`/`sourcemaps upload`/`debug-files upload` (network uploads), `send-event`/`send-envelope` (exfiltrate local data to a DSN), `monitors run -- <cmd>` (wraps and executes an arbitrary command), and `login`/`logout` (interactive credential lifecycle). Rust project, frequent releases; 2.x→3.x dropped legacy API-key auth and the `files`/`send-metric` subcommands."
 url = "https://docs.sentry.io/cli/"
-researched_version = "sentry-cli 2.x"
+researched_version = "sentry-cli 3.5.1 (2026-06-16)"
 bare_flags = ["--help", "--version", "-h", "-V"]
+
+examples_safe = [
+  "sentry-cli info",
+  "sentry-cli releases list",
+  "sentry-cli releases info abc123",
+  "sentry-cli releases propose-version",
+  "sentry-cli projects list",
+  "sentry-cli organizations list",
+  "sentry-cli issues list",
+  "sentry-cli debug-files check ./app.dSYM",
+  "sentry-cli sourcemaps inject ./dist",
+  "sentry-cli bash-hook",
+]
+examples_denied = [
+  "sentry-cli releases new v1.0",
+  "sentry-cli releases finalize v1.0",
+  "sentry-cli sourcemaps upload ./dist",
+  "sentry-cli debug-files upload ./app.dSYM",
+  "sentry-cli send-event -m hello",
+  "sentry-cli monitors run my-monitor -- ./backup.sh",
+  "sentry-cli login",
+]
 
 [[command.sub]]
 name = "info"
@@ -26,17 +48,37 @@ allow_all = true
 name = "login"
 candidate = true
 
+# `list`/`info` read; `propose-version` derives a version from git (local).
+# Mutating verbs (new/finalize/delete/set-commits/files upload) are not covered.
 [[command.sub]]
 name = "releases"
-candidate = true
+[[command.sub.sub]]
+name = "list"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "info"
+level = "SafeRead"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "propose-version"
+level = "Inert"
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "issues"
-candidate = true
+[[command.sub.sub]]
+name = "list"
+level = "SafeRead"
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "events"
-candidate = true
+[[command.sub.sub]]
+name = "list"
+level = "SafeRead"
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "files"
@@ -58,9 +100,15 @@ candidate = true
 name = "send-metric"
 candidate = true
 
+# `inject` rewrites local JS/map files with debug IDs (local write). `upload`
+# and `explain` are not covered.
 [[command.sub]]
 name = "sourcemaps"
-candidate = true
+[[command.sub.sub]]
+name = "inject"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "upload-dif"
@@ -70,9 +118,34 @@ candidate = true
 name = "upload-proguard"
 candidate = true
 
+# `check`/`find`/`print-sources` inspect debug-info files on disk (local read);
+# `bundle-sources`/`bundle-jvm` write a local bundle. `upload` is not covered.
 [[command.sub]]
 name = "debug-files"
-candidate = true
+[[command.sub.sub]]
+name = "check"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "find"
+level = "Inert"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "print-sources"
+level = "Inert"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "bundle-sources"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "bundle-jvm"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "react-native"
@@ -88,11 +161,17 @@ candidate = true
 
 [[command.sub]]
 name = "organizations"
-candidate = true
+[[command.sub.sub]]
+name = "list"
+level = "SafeRead"
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "projects"
-candidate = true
+[[command.sub.sub]]
+name = "list"
+level = "SafeRead"
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "update"
@@ -122,6 +201,8 @@ candidate = true
 name = "send"
 candidate = true
 
+# Prints a bash trap snippet to stdout (what the caller does with it is theirs).
 [[command.sub]]
 name = "bash-hook"
-candidate = true
+level = "Inert"
+standalone = ["--help", "-h"]
