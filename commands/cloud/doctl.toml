@@ -1,8 +1,37 @@
 [[command]]
 name = "doctl"
-description = "Official command-line interface for managing DigitalOcean cloud resources. The full CLI can create, destroy, and modify droplets, databases, Kubernetes clusters, and DNS records. Authenticated via personal access token stored in config or environment. Actively maintained open-source project with moderate release velocity."
+description = "Official command-line interface for managing DigitalOcean cloud resources. The full CLI can create, destroy, and modify droplets, databases, Kubernetes clusters, and DNS records. Authenticated via a personal access token stored in config or environment; every non-help command is an authenticated call to the DigitalOcean API using the ambient token, so `list`/`get` reads enumerate the account's live cloud inventory (non-mutating, no cost). Read-shaped subcommands with side effects to watch: `kubernetes cluster kubeconfig save` writes a kubeconfig and repoints kubectl at the cluster, and `registry login` writes Docker credentials — both are excluded. `compute ssh` and `apps console` open interactive sessions (arbitrary remote execution); `serverless`/`functions` invoke and deploy execute code; `auth init/switch` mutate the local credential context. Actively maintained; roughly weekly-to-biweekly releases, so the subcommand/flag surface moves fast."
 url = "https://docs.digitalocean.com/reference/doctl/"
+researched_version = "v1.163.0 (2026-06-25)"
 bare_flags = ["--help", "--version", "-h", "-v"]
+
+examples_safe = [
+  "doctl version",
+  "doctl account get",
+  "doctl account ratelimit",
+  "doctl balance get",
+  "doctl billing-history list",
+  "doctl invoice list",
+  "doctl auth list",
+  "doctl compute droplet list",
+  "doctl compute droplet get 12345",
+  "doctl compute snapshot list",
+  "doctl compute load-balancer list",
+  "doctl databases list",
+  "doctl kubernetes cluster list",
+  "doctl registry get",
+  "doctl vpcs list",
+  "doctl monitoring alert list",
+]
+examples_denied = [
+  "doctl compute droplet create --region nyc1 --size s-1vcpu-1gb --image ubuntu-22-04-x64 web",
+  "doctl compute droplet delete 12345",
+  "doctl compute ssh 12345",
+  "doctl kubernetes cluster kubeconfig save my-cluster",
+  "doctl registry login",
+  "doctl auth init",
+  "doctl apps console my-app",
+]
 [command.wrapper]
 valued = ["--access-token", "--context", "--output", "-o", "-t"]
 
@@ -13,6 +42,9 @@ name = "version"
 name = "account"
 [[command.sub.sub]]
 name = "get"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ratelimit"
 standalone = ["--help", "-h"]
 
 [[command.sub]]
@@ -48,6 +80,42 @@ standalone = ["--help", "-h"]
 name = "firewall"
 first_arg = ["list", "get"]
 standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "snapshot"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "load-balancer"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "domain"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "certificate"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "ssh-key"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "reserved-ip"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "cdn"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "action"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "tag"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "databases"
@@ -80,4 +148,52 @@ standalone = ["--help", "-h"]
 name = "projects"
 [[command.sub.sub]]
 name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "billing-history"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "invoice"
+first_arg = ["list", "get", "summary"]
+standalone = ["--help", "-h"]
+
+# Read of configured auth contexts only. `auth init`/`switch`/`remove`/`token`
+# mutate or expose the local credential and are deliberately omitted.
+[[command.sub]]
+name = "auth"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "monitoring"
+[[command.sub.sub]]
+name = "alert"
+first_arg = ["list", "get"]
+standalone = ["--help", "-h"]
+
+# `registry get` reads the registry. `registry login`/`logout` (Docker cred
+# writes) and `kubernetes-manifest` are deliberately omitted.
+[[command.sub]]
+name = "registry"
+[[command.sub.sub]]
+name = "get"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "vpcs"
+[[command.sub.sub]]
+name = "list"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "get"
+bare = false
 standalone = ["--help", "-h"]
