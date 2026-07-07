@@ -344,21 +344,58 @@
 <p class="cmd-url"><a href="https://docs.digitalocean.com/reference/doctl/">https://docs.digitalocean.com/reference/doctl/</a></p>
 
 - **account get**: Flags: --help, -h
+- **account ratelimit**: Flags: --help, -h
 - **apps get**: Flags: --help, -h
 - **apps list**: Flags: --help, -h
+- **auth list**: Flags: --help, -h
 - **balance get**: Flags: --help, -h
+- **billing-history list**: Flags: --help, -h
+- **compute action**: Allowed arguments: list, get
+- **compute cdn**: Allowed arguments: list, get
+- **compute certificate**: Allowed arguments: list, get
+- **compute domain**: Allowed arguments: list, get
 - **compute droplet**: Allowed arguments: list, get
 - **compute firewall**: Allowed arguments: list, get
 - **compute image**: Allowed arguments: list, get
+- **compute load-balancer**: Allowed arguments: list, get
 - **compute region**: Allowed arguments: list
+- **compute reserved-ip**: Allowed arguments: list, get
 - **compute size**: Allowed arguments: list
+- **compute snapshot**: Allowed arguments: list, get
+- **compute ssh-key**: Allowed arguments: list, get
+- **compute tag**: Allowed arguments: list, get
 - **compute volume**: Allowed arguments: list, get
 - **databases get**: Flags: --help, -h
 - **databases list**: Flags: --help, -h
+- **invoice**: Allowed arguments: list, get, summary
 - **kubernetes cluster**: Allowed arguments: list, get
+- **monitoring alert**: Allowed arguments: list, get
+- **projects get**: Flags: --help, -h
 - **projects list**: Flags: --help, -h
+- **registry get**: Flags: --help, -h
 - **version**
+- **vpcs get**: Flags: --help, -h
+- **vpcs list**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `doctl version`
+- `doctl account get`
+- `doctl account ratelimit`
+- `doctl balance get`
+- `doctl billing-history list`
+- `doctl invoice list`
+- `doctl auth list`
+- `doctl compute droplet list`
+- `doctl compute droplet get 12345`
+- `doctl compute snapshot list`
+- `doctl compute load-balancer list`
+- `doctl databases list`
+- `doctl kubernetes cluster list`
+- `doctl registry get`
+- `doctl vpcs list`
+- `doctl monitoring alert list`
 
 ### `exo`
 <p class="cmd-url"><a href="https://community.exoscale.com/documentation/tools/exoscale-cli/">https://community.exoscale.com/documentation/tools/exoscale-cli/</a></p>
@@ -476,6 +513,7 @@
 ### `hcloud`
 <p class="cmd-url"><a href="https://github.com/hetznercloud/cli">https://github.com/hetznercloud/cli</a></p>
 
+- **all list**: Flags: --help, -h. Valued: --output, -o
 - **certificate describe**: Flags: --help, -h. Valued: --output, -o
 - **certificate list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
 - **context active**: Flags: --help, -h
@@ -488,8 +526,12 @@
 - **floating-ip list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
 - **image describe**: Flags: --help, -h. Valued: --output, -o
 - **image list**: Flags: --help, -h. Valued: --output, --selector, --type, -l, -o
+- **iso describe**: Flags: --help, -h. Valued: --output, -o
+- **iso list**: Flags: --help, -h. Valued: --output, -o
 - **load-balancer describe**: Flags: --help, -h. Valued: --output, -o
 - **load-balancer list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **load-balancer-type describe**: Flags: --help, -h. Valued: --output, -o
+- **load-balancer-type list**: Flags: --help, -h. Valued: --output, -o
 - **location describe**: Flags: --help, -h. Valued: --output, -o
 - **location list**: Flags: --help, -h. Valued: --output, -o
 - **network describe**: Flags: --help, -h. Valued: --output, -o
@@ -504,10 +546,29 @@
 - **server-type list**: Flags: --help, -h. Valued: --output, -o
 - **ssh-key describe**: Flags: --help, -h. Valued: --output, -o
 - **ssh-key list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **storage-box describe**: Flags: --help, -h. Valued: --output, -o
+- **storage-box list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **storage-box-type describe**: Flags: --help, -h. Valued: --output, -o
+- **storage-box-type list**: Flags: --help, -h. Valued: --output, -o
 - **version**
 - **volume describe**: Flags: --help, -h. Valued: --output, -o
 - **volume list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
+- **zone describe**: Flags: --help, -h. Valued: --output, -o
+- **zone list**: Flags: --help, -h. Valued: --output, --selector, -l, -o
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `hcloud version`
+- `hcloud server list`
+- `hcloud server list -o json`
+- `hcloud server describe my-server`
+- `hcloud image list --type system`
+- `hcloud datacenter list`
+- `hcloud iso list`
+- `hcloud zone list`
+- `hcloud all list`
+- `hcloud context list`
 
 ### `linode-cli`
 <p class="cmd-url"><a href="https://www.linode.com/docs/products/tools/cli/get-started/">https://www.linode.com/docs/products/tools/cli/get-started/</a></p>

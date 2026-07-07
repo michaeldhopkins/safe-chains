@@ -86,10 +86,10 @@
 - **run**: Flags: --help, -h
 - **search**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --index, --limit, --registry
 - **semver-checks check-release**: Flags: --all-features, --default-features, --help, --verbose, -h, -v. Valued: --baseline-rev, --baseline-root, --baseline-version, --color, --config-path, --current-rustdoc, --exclude, --features, --manifest-path, --package, --release-type, --target, -j, -p
-- **test**: Flags: --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
+- **test**: Flags: --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, --workspace, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **tree**: Flags: --all-features, --duplicates, --frozen, --help, --ignore-rust-version, --locked, --no-dedupe, --no-default-features, --offline, -d, -e, -h, -i, --quiet, -q, -v. Valued: --charset, --color, --config, --depth, --edges, --features, --format, --invert, --manifest-path, --package, --prefix, --prune, --target, -p
 - **udeps**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --help, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --workspace, --version, -V, -h, --quiet, -q, -v. Valued: --backend, --bench, --bin, --color, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --output, --package, --profile, --target, --target-dir, --test, -j, -p
-- **update** (requires --dry-run): Flags: --aggressive, --dry-run, --frozen, --help, --locked, --offline, --recursive, --workspace, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path, --package, --precise, -p
+- **update**: Flags: --aggressive, --dry-run, --frozen, --help, --locked, --offline, --recursive, --workspace, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path, --package, --precise, -p
 - **vendor**: Flags: --frozen, --help, --locked, --no-delete, --offline, --respect-source-config, --versioned-dirs, -h, --quiet, -q, -v. Valued: --color, --config, --lockfile-path, --manifest-path, --sync, -Z, -s
 - **verify-project**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
 - **version**: Flags: --help, -h. Positional args accepted
@@ -118,10 +118,22 @@
 - **doc**: Flags: --alloc, --book, --cargo, --core, --edition-guide, --embedded-book, --help, --nomicon, --path, --proc_macro, --reference, --rust-by-example, --rustc, --rustdoc, --std, --test, --unstable-book, -h. Valued: --toolchain
 - **run**: delegates to inner command
 - **show**: Flags: --help, --installed, -h, -v
+- **target add**: Flags: --help, -h. Valued: --toolchain
 - **target list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
+- **target remove**: Flags: --help, -h. Valued: --toolchain
 - **toolchain list**: Flags: --help, --installed, -h, -v. Valued: --toolchain
 - **which**: Flags: --help, -h. Valued: --toolchain
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `rustup target list`
+- `rustup target list --installed`
+- `rustup target add wasm32-unknown-unknown`
+- `rustup target remove wasm32-unknown-unknown`
+- `rustup component list`
+- `rustup toolchain list`
+- `rustup show`
 
 ### `sccache`
 <p class="cmd-url"><a href="https://github.com/mozilla/sccache">https://github.com/mozilla/sccache</a></p>
