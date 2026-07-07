@@ -6,3 +6,4 @@
 //! `behavioral-taxonomy-engine`).
 
 pub mod facet;
+pub mod level;
