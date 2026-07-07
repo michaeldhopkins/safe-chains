@@ -7128,6 +7128,10 @@ Aliases: `glibtoolize`
 <p class="cmd-url"><a href="https://www.linode.com/docs/products/tools/cli/get-started/">https://www.linode.com/docs/products/tools/cli/get-started/</a></p>
 
 - **account events-list**: Flags: --help
+- **account invoice-view**: Flags: --help
+- **account invoices-list**: Flags: --help
+- **account notifications-list**: Flags: --help
+- **account transfer**: Flags: --help
 - **account view**: Flags: --help
 - **databases list**: Flags: --help
 - **domains list**: Flags: --help
@@ -7136,17 +7140,45 @@ Aliases: `glibtoolize`
 - **firewalls view**: Flags: --help
 - **images list**: Flags: --help
 - **images view**: Flags: --help
+- **linodes kernels**: Flags: --help
 - **linodes list**: Flags: --help
+- **linodes types**: Flags: --help
 - **linodes view**: Flags: --help
 - **lke cluster-view**: Flags: --help
 - **lke clusters-list**: Flags: --help
+- **networking ip-view**: Flags: --help
+- **networking ips-list**: Flags: --help
 - **nodebalancers list**: Flags: --help
 - **nodebalancers view**: Flags: --help
 - **profile view**: Flags: --help
 - **regions list**: Flags: --help
+- **regions view**: Flags: --help
+- **stackscripts list**: Flags: --help
+- **stackscripts view**: Flags: --help
+- **tags list**: Flags: --help
+- **tickets list**: Flags: --help
+- **tickets view**: Flags: --help
 - **volumes list**: Flags: --help
 - **volumes view**: Flags: --help
+- **vpcs list**: Flags: --help
+- **vpcs view**: Flags: --help
 - Allowed standalone flags: --help, --version
+
+**Examples:**
+
+- `linode-cli linodes list`
+- `linode-cli linodes view 123`
+- `linode-cli linodes types`
+- `linode-cli linodes kernels`
+- `linode-cli regions list`
+- `linode-cli images list`
+- `linode-cli volumes list`
+- `linode-cli account view`
+- `linode-cli account invoices-list`
+- `linode-cli tickets list`
+- `linode-cli stackscripts list`
+- `linode-cli vpcs list`
+- `linode-cli tags list`
 
 ### `lint`
 <p class="cmd-url"><a href="https://developer.android.com/studio/write/lint">https://developer.android.com/studio/write/lint</a></p>
@@ -11925,10 +11957,37 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 ### `sentry-cli`
 <p class="cmd-url"><a href="https://docs.sentry.io/cli/">https://docs.sentry.io/cli/</a></p>
 
+- **bash-hook**: Flags: --help, -h
 - **completions**: Flags: --help, -h. Positional args accepted
+- **debug-files bundle-jvm**: Flags: --help, -h
+- **debug-files bundle-sources**: Flags: --help, -h
+- **debug-files check**: Flags: --help, -h
+- **debug-files find**: Flags: --help, -h
+- **debug-files print-sources**: Flags: --help, -h
+- **events list**: Flags: --help, -h
 - **help**: Positional args accepted
 - **info**: Flags: --config-status-json, --help, -h
+- **issues list**: Flags: --help, -h
+- **organizations list**: Flags: --help, -h
+- **projects list**: Flags: --help, -h
+- **releases info**: Flags: --help, -h
+- **releases list**: Flags: --help, -h
+- **releases propose-version**: Flags: --help, -h
+- **sourcemaps inject**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `sentry-cli info`
+- `sentry-cli releases list`
+- `sentry-cli releases info abc123`
+- `sentry-cli releases propose-version`
+- `sentry-cli projects list`
+- `sentry-cli organizations list`
+- `sentry-cli issues list`
+- `sentry-cli debug-files check ./app.dSYM`
+- `sentry-cli sourcemaps inject ./dist`
+- `sentry-cli bash-hook`
 
 ### `seq`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#seq-invocation</a></p>
