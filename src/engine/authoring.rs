@@ -419,4 +419,84 @@ mod tests {
         assert_eq!(clause.reversibility, Some(OrdBound::at_most(Reversibility::Recoverable)));
         assert_eq!(clause.authority, Some(OrdBound::exactly(Authority::Root)));
     }
+
+    // ── facet-monotonicity: the coherence check on the authored levels ──────────────
+    //
+    // A level is coherent iff making any command *less* severe never flips it from
+    // admitted to denied. An allow clause with an ordinal *floor* (or an exact bound
+    // on a non-minimum term) would break this — the check exists to catch that in
+    // hand-authored TOML.
+
+    use crate::engine::testgen::{arb_profile, lowered_variants};
+    use proptest::prelude::*;
+
+    fn assert_monotone_from(lvl: &Level, boundary: Capability) {
+        assert!(
+            lvl.admits(&Profile::of(vec![boundary.clone()])),
+            "{}: boundary capability should be admitted",
+            lvl.name,
+        );
+        for lowered in lowered_variants(&boundary) {
+            assert!(
+                lvl.admits(&Profile::of(vec![lowered.clone()])),
+                "{}: admitted a boundary cap but denied it after lowering one facet:\n  {:?}\n  {:?}",
+                lvl.name,
+                boundary,
+                lowered,
+            );
+        }
+    }
+
+    #[test]
+    fn authored_levels_are_monotone_at_their_ceilings() {
+        let levels = default_levels();
+
+        let mut inert_cap = Capability::new(Operation::Observe);
+        inert_cap.locus.local = LocalLocus::Temp;
+        inert_cap.disclosure.audience = DisclosureAudience::LocalProcess;
+        inert_cap.execution = ExecutionTrust::SelfCode;
+        assert_monotone_from(level(levels, "inert"), inert_cap);
+
+        let mut read_cap = Capability::new(Operation::Observe);
+        read_cap.locus.local = LocalLocus::User;
+        read_cap.secret.level = SecretLevel::UsesAmbient;
+        read_cap.network.direction = NetDirection::Loopback;
+        read_cap.disclosure.audience = DisclosureAudience::LocalProcess;
+        read_cap.execution = ExecutionTrust::SelfCode;
+        assert_monotone_from(level(levels, "read-local"), read_cap);
+
+        let mut write_cap = Capability::new(Operation::Mutate);
+        write_cap.locus.local = LocalLocus::Worktree;
+        write_cap.scale = Scale::Bounded;
+        write_cap.reversibility = Reversibility::Recoverable;
+        write_cap.persistence.level = PersistenceLevel::Data;
+        write_cap.secret.level = SecretLevel::UsesAmbient;
+        write_cap.disclosure.audience = DisclosureAudience::LocalProcess;
+        write_cap.execution = ExecutionTrust::CallerInline;
+        assert_monotone_from(level(levels, "write-local"), write_cap);
+    }
+
+    proptest! {
+        /// For any profile an authored level admits, lowering any single ordinal facet
+        /// of any capability keeps the profile admitted.
+        #[test]
+        fn authored_levels_are_facet_monotone(profile in arb_profile()) {
+            for lvl in default_levels() {
+                if !lvl.admits(&profile) {
+                    continue;
+                }
+                for (i, cap) in profile.capabilities.iter().enumerate() {
+                    for lowered in lowered_variants(cap) {
+                        let mut lowered_profile = profile.clone();
+                        lowered_profile.capabilities[i] = lowered;
+                        prop_assert!(
+                            lvl.admits(&lowered_profile),
+                            "{} broke facet-monotonicity",
+                            lvl.name,
+                        );
+                    }
+                }
+            }
+        }
+    }
 }
