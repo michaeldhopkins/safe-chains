@@ -574,6 +574,10 @@
 <p class="cmd-url"><a href="https://www.linode.com/docs/products/tools/cli/get-started/">https://www.linode.com/docs/products/tools/cli/get-started/</a></p>
 
 - **account events-list**: Flags: --help
+- **account invoice-view**: Flags: --help
+- **account invoices-list**: Flags: --help
+- **account notifications-list**: Flags: --help
+- **account transfer**: Flags: --help
 - **account view**: Flags: --help
 - **databases list**: Flags: --help
 - **domains list**: Flags: --help
@@ -582,17 +586,45 @@
 - **firewalls view**: Flags: --help
 - **images list**: Flags: --help
 - **images view**: Flags: --help
+- **linodes kernels**: Flags: --help
 - **linodes list**: Flags: --help
+- **linodes types**: Flags: --help
 - **linodes view**: Flags: --help
 - **lke cluster-view**: Flags: --help
 - **lke clusters-list**: Flags: --help
+- **networking ip-view**: Flags: --help
+- **networking ips-list**: Flags: --help
 - **nodebalancers list**: Flags: --help
 - **nodebalancers view**: Flags: --help
 - **profile view**: Flags: --help
 - **regions list**: Flags: --help
+- **regions view**: Flags: --help
+- **stackscripts list**: Flags: --help
+- **stackscripts view**: Flags: --help
+- **tags list**: Flags: --help
+- **tickets list**: Flags: --help
+- **tickets view**: Flags: --help
 - **volumes list**: Flags: --help
 - **volumes view**: Flags: --help
+- **vpcs list**: Flags: --help
+- **vpcs view**: Flags: --help
 - Allowed standalone flags: --help, --version
+
+**Examples:**
+
+- `linode-cli linodes list`
+- `linode-cli linodes view 123`
+- `linode-cli linodes types`
+- `linode-cli linodes kernels`
+- `linode-cli regions list`
+- `linode-cli images list`
+- `linode-cli volumes list`
+- `linode-cli account view`
+- `linode-cli account invoices-list`
+- `linode-cli tickets list`
+- `linode-cli stackscripts list`
+- `linode-cli vpcs list`
+- `linode-cli tags list`
 
 ### `scw`
 <p class="cmd-url"><a href="https://github.com/scaleway/scaleway-cli">https://github.com/scaleway/scaleway-cli</a></p>
