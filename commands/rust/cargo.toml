@@ -432,9 +432,7 @@ valued = [
 
 [[command.sub]]
 name = "update"
-guard = "--dry-run"
-level = "Inert"
-bare = false
+level = "SafeWrite"
 standalone = [
     "--aggressive", "--dry-run", "--frozen", "--help",
     "--locked", "--offline", "--recursive", "--workspace",

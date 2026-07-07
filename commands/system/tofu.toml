@@ -16,6 +16,9 @@ examples_safe = [
   "tofu validate --json",
   "tofu validate -no-color",
   "tofu validate --var foo=bar",
+  "tofu fmt",
+  "tofu fmt --recursive",
+  "tofu fmt -recursive",
   "tofu fmt --check",
   "tofu fmt -check",
   "tofu fmt --check --recursive",
@@ -71,8 +74,6 @@ examples_denied = [
   "tofu state replace-provider hashicorp/aws opentofu/aws",
   "tofu init --migrate-state",
   "tofu init --force-copy",
-  "tofu fmt",
-  "tofu fmt --recursive",
   "tofu show --evil-flag",
   "tofu unknown-subcommand",
 ]
@@ -80,17 +81,6 @@ examples_denied = [
 # ─────────────────────────────────────────────────────────────────────
 # Read-only subcommands (Inert)
 # ─────────────────────────────────────────────────────────────────────
-
-[[command.sub]]
-name = "fmt"
-# Without -check, fmt rewrites files in place. Guard requires the
-# user to opt into read-only mode.
-guard = "--check"
-guard_short = "-check"
-standalone = [
-  "--check", "--diff", "--help", "--no-color", "--recursive",
-  "-check", "-diff", "-h", "-help", "-no-color", "-recursive",
-]
 
 [[command.sub]]
 name = "graph"
@@ -192,8 +182,19 @@ name = "version"
 standalone = ["--help", "--json", "-h", "-help", "-json"]
 
 # ─────────────────────────────────────────────────────────────────────
-# SafeWrite subcommands (downloads to local / clears local credentials)
+# SafeWrite subcommands (local file writes / downloads / credential clear)
 # ─────────────────────────────────────────────────────────────────────
+
+# `tofu fmt` rewrites `.tf` files in place (unless -check/-diff, which
+# only report drift). A local file rewrite in the working tree — no
+# network, no state. Both `-foo` and `--foo` spellings.
+[[command.sub]]
+name = "fmt"
+level = "SafeWrite"
+standalone = [
+  "--check", "--diff", "--help", "--no-color", "--recursive",
+  "-check", "-diff", "-h", "-help", "-no-color", "-recursive",
+]
 
 # `tofu get` downloads modules referenced by configuration into the
 # local module cache. Inbound HTTP only.
