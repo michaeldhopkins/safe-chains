@@ -144,7 +144,16 @@ fn build_clause(tc: TomlClause) -> Result<Clause, String> {
         c.net_destination = opt_bound(n.destination.as_deref())?;
         c.net_payload = opt_bound(n.payload.as_deref())?;
     }
-    c.execution = opt_bound(tc.execution.as_deref())?;
+    c.execution_trust = opt_bound(tc.execution.as_deref())?;
+    if let Some(sc) = tc.supply_chain {
+        if let Some(s) = sc.source {
+            c.supply_source = Some(parse_set(&s)?);
+        }
+        c.pinning = opt_bound(sc.pinning.as_deref())?;
+        if let Some(e) = sc.exec_surface {
+            c.exec_surface = Some(parse_set(&e)?);
+        }
+    }
     c.cost = opt_bound(tc.cost.as_deref())?;
     Ok(c)
 }
@@ -225,6 +234,8 @@ struct TomlClause {
     #[serde(skip_serializing_if = "Option::is_none")]
     execution: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    supply_chain: Option<TomlSupplyChain>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     cost: Option<String>,
 }
 
@@ -288,6 +299,17 @@ struct TomlNetwork {
     destination: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     payload: Option<String>,
+}
+
+#[derive(Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+struct TomlSupplyChain {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    source: Option<StringOrVec>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pinning: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    exec_surface: Option<StringOrVec>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -486,7 +508,7 @@ mod tests {
         let mut inert_cap = Capability::new(Operation::Observe);
         inert_cap.locus.local = LocalLocus::Temp;
         inert_cap.disclosure.audience = DisclosureAudience::LocalProcess;
-        inert_cap.execution = ExecutionTrust::SelfCode;
+        inert_cap.execution.trust = ExecutionTrust::SelfCode;
         assert_monotone_from(level(levels, "inert"), inert_cap);
 
         let mut read_cap = Capability::new(Operation::Observe);
@@ -494,7 +516,7 @@ mod tests {
         read_cap.secret.level = SecretLevel::UsesAmbient;
         read_cap.network.direction = NetDirection::Loopback;
         read_cap.disclosure.audience = DisclosureAudience::LocalProcess;
-        read_cap.execution = ExecutionTrust::SelfCode;
+        read_cap.execution.trust = ExecutionTrust::SelfCode;
         assert_monotone_from(level(levels, "read-local"), read_cap);
 
         let mut write_cap = Capability::new(Operation::Mutate);
@@ -504,7 +526,7 @@ mod tests {
         write_cap.persistence.level = PersistenceLevel::Data;
         write_cap.secret.level = SecretLevel::UsesAmbient;
         write_cap.disclosure.audience = DisclosureAudience::LocalProcess;
-        write_cap.execution = ExecutionTrust::CallerInline;
+        write_cap.execution.trust = ExecutionTrust::CallerInline;
         assert_monotone_from(level(levels, "write-local"), write_cap);
     }
 
@@ -598,6 +620,14 @@ mod tests {
             destination: opt_bound_str(c.net_destination),
             payload: opt_bound_str(c.net_payload),
         });
+        let supply_chain = (c.supply_source.is_some()
+            || c.pinning.is_some()
+            || c.exec_surface.is_some())
+        .then(|| TomlSupplyChain {
+            source: c.supply_source.as_deref().map(set_str),
+            pinning: opt_bound_str(c.pinning),
+            exec_surface: c.exec_surface.as_deref().map(set_str),
+        });
         TomlClause {
             operation: c.operation.as_deref().map(set_str),
             locus,
@@ -609,7 +639,8 @@ mod tests {
             disclosure,
             secret,
             network,
-            execution: opt_bound_str(c.execution),
+            execution: opt_bound_str(c.execution_trust),
+            supply_chain,
             cost: opt_bound_str(c.cost),
         }
     }
@@ -661,6 +692,7 @@ mod tests {
             secret = { level = ">= reads", channel = ["credential-store"], principal = ["cross"] }
             network = { direction = "<= outbound", destination = "<= arbitrary", payload = "<= sends-host-data" }
             execution = "<= network-sourced"
+            supply_chain = { source = ["public-registry", "signed-repo"], pinning = ">= version", exec_surface = ["build-script", "install-hook"] }
             cost = "<= quota"
             [[level.sink.deny]]
             operation = ["destroy"]

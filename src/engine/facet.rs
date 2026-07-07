@@ -289,8 +289,7 @@ ordinal_term! {
 
 ordinal_term! {
     /// Where executed code comes from (v1.4 §2.6, local-trust ladder). When
-    /// `NetworkSourced`, the supply-chain sub-facets (source/pinning/exec-surface)
-    /// refine it — those are added in the network-sourced-execution commit.
+    /// `NetworkSourced`, the supply-chain sub-facets ([`SupplyChain`]) refine it.
     ExecutionTrust {
         None => "none",
         SelfCode => "self",
@@ -298,6 +297,42 @@ ordinal_term! {
         CallerFile => "caller-file",
         AmbientConfig => "ambient-config",   // Makefile/hooks/.envrc/plugins
         NetworkSourced => "network-sourced",
+    }
+}
+
+categorical_term! {
+    /// Where network-sourced code came from (v1.4 §2.6). Categorical — a level lists
+    /// the sources it accepts rather than assuming a severity order.
+    SupplySource {
+        UnverifiedUrl => "unverified-url",
+        PublicRegistry => "public-registry",
+        SignedRepo => "signed-repo",
+        PrivateRegistry => "private-registry",
+        Vendored => "vendored",
+    }
+}
+
+ordinal_term! {
+    /// How tightly a fetched artifact is pinned (v1.4 §2.6). A *trust* ladder: higher
+    /// is safer, so a level floors it (`>= version`) rather than ceilings it.
+    Pinning {
+        Floating => "floating",
+        Version => "version",
+        HashVerified => "hash-verified",
+        Digest => "digest",
+    }
+}
+
+categorical_term! {
+    /// When/what fetched code runs (v1.4 §2.6). Categorical — the risk order across
+    /// install-hook / build-script / call-time / run-artifact is genuinely unclear, so
+    /// a level lists the surfaces it accepts instead of ceiling-ing a false ladder.
+    ExecSurface {
+        None => "none",
+        InstallHook => "install-hook",   // code on install (npm lifecycle, pip setup.py)
+        BuildScript => "build-script",   // code on build (cargo build.rs, node-gyp)
+        CallTime => "call-time",         // deps' code runs only when your program runs
+        RunArtifact => "run-artifact",   // you execute the fetched binary/image
     }
 }
 
@@ -361,6 +396,24 @@ pub struct Network {
     pub payload: NetPayload,
 }
 
+/// The provenance of network-sourced code (v1.4 §2.6).
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
+pub struct SupplyChain {
+    pub source: SupplySource,
+    pub pinning: Pinning,
+    pub exec_surface: ExecSurface,
+}
+
+/// Code provenance: the local-trust rung, plus supply-chain detail when the code is
+/// network-sourced (v1.4 §2.6). `supply_chain` is present only for network-sourced
+/// execution — a command running no downloaded code leaves it `None`, and a level's
+/// supply-chain constraints are then vacuously satisfied.
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq, Hash)]
+pub struct Execution {
+    pub trust: ExecutionTrust,
+    pub supply_chain: Option<SupplyChain>,
+}
+
 /// One capability — a single point in facet-space (v1.4 §2.8). Facets left unset
 /// default to their zero term. `because` cites the discriminator (§5); the nested
 /// delegate profile and supply-chain sub-facets arrive with the mechanisms that
@@ -377,7 +430,7 @@ pub struct Capability {
     pub disclosure: Disclosure,
     pub secret: Secret,
     pub network: Network,
-    pub execution: ExecutionTrust,
+    pub execution: Execution,
     pub cost: Cost,
     pub because: String,
 }
@@ -454,6 +507,9 @@ mod tests {
         assert_term_strings_roundtrip::<NetDestination>();
         assert_term_strings_roundtrip::<NetPayload>();
         assert_term_strings_roundtrip::<ExecutionTrust>();
+        assert_term_strings_roundtrip::<SupplySource>();
+        assert_term_strings_roundtrip::<Pinning>();
+        assert_term_strings_roundtrip::<ExecSurface>();
         assert_term_strings_roundtrip::<Cost>();
     }
 
@@ -473,6 +529,7 @@ mod tests {
         assert_zero_is_minimum::<NetDestination>();
         assert_zero_is_minimum::<NetPayload>();
         assert_zero_is_minimum::<ExecutionTrust>();
+        assert_zero_is_minimum::<Pinning>();
         assert_zero_is_minimum::<Cost>();
     }
 
@@ -490,6 +547,7 @@ mod tests {
         assert!(DisclosureAudience::LocalProcess < DisclosureAudience::Public);
         assert!(SecretLevel::Reads < SecretLevel::Transmits);
         assert!(ExecutionTrust::SelfCode < ExecutionTrust::NetworkSourced);
+        assert!(Pinning::Floating < Pinning::HashVerified);
     }
 
     #[test]
@@ -504,7 +562,8 @@ mod tests {
         assert_eq!(cap.secret.level, SecretLevel::None);
         assert_eq!(cap.disclosure.audience, DisclosureAudience::None);
         assert_eq!(cap.network.direction, NetDirection::None);
-        assert_eq!(cap.execution, ExecutionTrust::None);
+        assert_eq!(cap.execution.trust, ExecutionTrust::None);
+        assert!(cap.execution.supply_chain.is_none());
         assert_eq!(cap.cost, Cost::None);
         assert!(cap.because.is_empty());
     }
