@@ -133,7 +133,12 @@ Trigger is orthogonal to Level: `nohup sleep 1000 &` is `transient · detached`
 agent/model provider) → `local-persistent` (other local users) → `trusted-remote` →
 `shared-remote` → `public`.
 
-**Secret** (ordinal): `none` → `uses-ambient` → `reads` → `writes` → `transmits`.
+**Secret** (ordinal): `none` → `uses-ambient` → `reads` → `writes` → `transmits`. This is
+**credential-extraction intent**, asserted *positively per command* (annex `…-engine`
+§0): `security find-generic-password -w`, `gpg -d`, `ssh-add` reach `reads`; `cat`/`echo`
+are `none` — they move bytes and can neither certify nor detect that those bytes are a
+credential. The sensitivity of *arbitrary file content* is **not** this facet; it is
+carried by `disclosure` + `locus` (below).
 
 Both facets range over a **channel** and a **principal** (R17/R19, HP-13):
 - *Channels* are an **open set** — filesystem, stdout-to-model, network, clipboard
@@ -146,15 +151,20 @@ Both facets range over a **channel** and a **principal** (R17/R19, HP-13):
   disclosure audience must account for "belongs to another principal," not just file
   paths.
 
-**A secret read is not the hazard; the audience is** (HP-15). Reading secret material
-is dangerous specifically when its output reaches the model — `disclosure.audience =
-local-process` (stdout → the agent). `cat ~/.ssh/id_rsa` sends the key to the chat and
-is denied; `tool --password-stdin < secret`, `export K=$(cat secret)`, and `ssh-add
-key` feed the secret to a *consumer* without ever printing it, and are allowlist-able
-per that consumer. The flow analysis (§3.4) reads this off the command *shape* — a bare
-`cat secret` goes to stdout; `cat secret | tool` / `tool < secret` goes to `tool`. So
-**gate on the disclosure audience, not on "a secret was touched."** `secret →
-stdout-to-model` denies; `secret → another consumer, not the model` is admissible.
+**The hazard is the audience, not the read — and safe-chains never *detects* a secret
+file** (HP-15; annex `…-engine` §0). Detecting secret paths would be a denylist: anything
+off the list is certified safe by omission. Instead, reading file **content** to the
+model is `disclosure.audience = local-process` at `locus = classify_locus(path)`, and a
+level admits it only within a locus it *positively* trusts. `cat ~/.ssh/id_rsa` is denied
+because it is a **`user`-scope content read to the model** — the same locus bound denies
+the unanticipated `cat ~/.config/newtool/token` for free — **not** because `id_rsa` was
+recognized. `tool --password-stdin < secret`, `export K=$(cat secret)`, and `ssh-add key`
+feed material to a *consumer*, not the model (`disclosure.audience ≠ local-process`), and
+are admissible per that consumer; the flow analysis (§3.4) reads the audience off the
+command *shape*. A read a level *does* accept (a worktree-local file at a level that
+trusts worktree content — `./notes.md` and `./.env` alike, indistinguishable without a
+denylist) is a **named, located** residual risk of that level, never a gap in a list. So
+**gate on `disclosure` audience + `locus`, not on "a secret was touched."**
 
 ### 2.5 Channel (network)
 **Network** (compound): *Direction* `none · loopback · outbound · inbound-listen` ×
