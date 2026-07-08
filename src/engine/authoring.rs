@@ -359,19 +359,25 @@ mod tests {
     }
 
     #[test]
-    fn read_local_reads_the_worktree_but_refuses_a_secret_and_a_write() {
+    fn read_local_reads_the_worktree_but_refuses_home_extraction_and_writes() {
         let levels = default_levels();
         let read_local = level(levels, "read-local");
         assert!(read_local.admits(&observe_at(LocalLocus::Worktree)), "cat ./notes");
-        assert!(read_local.admits(&observe_at(LocalLocus::User)), "cat ~/.config");
+        assert!(read_local.admits(&observe_at(LocalLocus::WorktreeTrusted)), "git status reads .git");
 
-        let secret = {
+        // home content read — denied by LOCUS, not by any secret detection
+        // (cat ~/.ssh/id_rsa: locus=user, secret=none — cat extracts no credential)
+        assert!(!read_local.admits(&observe_at(LocalLocus::User)), "cat ~/.ssh/id_rsa");
+
+        // a credential-extraction command — denied by the positive secret claim
+        // (security find-generic-password -w: secret=reads, regardless of locus)
+        let extraction = {
             let mut c = Capability::new(Operation::Observe);
-            c.locus.local = LocalLocus::User;
             c.secret.level = SecretLevel::Reads;
             Profile::of(vec![c])
         };
-        assert!(!read_local.admits(&secret), "cat ~/.ssh/id_rsa");
+        assert!(!read_local.admits(&extraction), "keychain extraction");
+
         assert!(!read_local.admits(&Profile::of(vec![Capability::new(Operation::Create)])), "a write");
     }
 
@@ -512,7 +518,7 @@ mod tests {
         assert_monotone_from(level(levels, "inert"), inert_cap);
 
         let mut read_cap = Capability::new(Operation::Observe);
-        read_cap.locus.local = LocalLocus::User;
+        read_cap.locus.local = LocalLocus::WorktreeTrusted;
         read_cap.secret.level = SecretLevel::UsesAmbient;
         read_cap.network.direction = NetDirection::Loopback;
         read_cap.disclosure.audience = DisclosureAudience::LocalProcess;
