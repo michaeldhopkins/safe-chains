@@ -14,7 +14,8 @@ it does, plus more):
 
 - **inert** — auto-runs only what changes and reads nothing real: `--version`,
   `--help`, `echo`, arithmetic.
-- **read-local** — also *looks* at your files/state: `cat`, `ls`, `git status`.
+- **read-local** — also *reads worktree files/state*: `cat ./x`, `ls`, `git status`.
+  Content reads beyond the worktree (`cat ~/.ssh/id_rsa`) are denied by locus.
 - **write-local** — also *edits your own project files*: `touch`, `echo > file`,
   `git commit`.
 - **developer** — the everyday default; also *build / install / fetch* tooling:
@@ -37,22 +38,26 @@ are given as deltas in §4.
 
 ## 3. The corpus
 
-### Pure reads — look, change nothing
+### Pure reads — look, change nothing (worktree-scoped)
 | command | inert | read-local | write-local | developer |
 |---|:--:|:--:|:--:|:--:|
 | `node --version`, `echo hi` | ✓ | ✓ | ✓ | ✓ |
 | `git status` · `ls -la` · `cat ./notes.md` · `grep -r foo src/` | · | ✓ | ✓ | ✓ |
 | `git clean -n` (dry-run — lists, deletes nothing) | · | ✓ | ✓ | ✓ |
 | `gpg --verify sig file` (checks a signature) | · | ✓ | ✓ | ✓ |
-| `ps aux` (may show other processes' secret args) | · | ✓ | ✓ | ✓ |
-| `pbpaste` (reads the clipboard — may hold a secret) | · | ✓ | ✓ | ✓ |
 
-### Reading a secret *to the screen* — always ask (§5.1)
+### Reading content to the model — judged by locus, not a secret list (§5.1)
+No path is *detected* as secret (that would be a denylist); a read is bounded by where
+the file is (`classify_locus`) and defaults to the least-safe read when the path can't be
+placed positively. `./notes.md` and `./.env` are indistinguishable — both worktree — so
+they share a verdict; the residual risk of a worktree secret is a stated property of any
+level that trusts worktree content.
 | command | inert | read-local | write-local | developer |
 |---|:--:|:--:|:--:|:--:|
-| `cat ~/.ssh/id_rsa` · `cat .env` · `env` | · | · | · | · |
-| `security find-generic-password -w GH_TOKEN` (keychain) | · | · | · | · |
-| `base64 secret.txt` (encoded ≠ protected — still the secret) | · | · | · | · |
+| worktree content: `cat ./.env` · `base64 ./x.txt` (same as `cat ./notes.md`) | · | ✓ | ✓ | ✓ |
+| home / absolute content: `cat ~/.ssh/id_rsa` · `cat ~/.aws/credentials` · `tar czf - ~/.ssh` | · | · | · | · |
+| credential-extraction commands: `security find-generic-password -w` · `gpg -d file` | · | · | · | · |
+| cross-principal / ambient content: `ps aux` (others' argv) · `pbpaste` (clipboard) · `env` | · | · | · | · |
 | `tar czf - ~/.ssh ~/.aws` (bundles secrets to stdout) | · | · | · | · |
 
 ### Edit your own project files
@@ -180,24 +185,28 @@ It flips to **✓** everything in `admin` *plus* the local rows `developer` stil
 `sudo rm -rf /var`, `dd of=/dev/sda`, `mkfs`); below-the-filesystem / kernel (`dd` to a
 device, `kmutil load`, `mount`); `curl … | sudo bash` (unseen code *as root*); anything
 that leaves the box (`git push`, `ssh host '…'`, `terraform apply`, `aws s3 sync` up,
-`/dev/tcp` and DNS exfil); and any secret dumped to the chat/outward (`cat ~/.ssh/id_rsa`,
-`curl -d @secret`). `yolo` is a *local* license and it never bricks the machine.
+`/dev/tcp` and DNS exfil); and content-to-model reads from **beyond the worktree**
+(`cat ~/.ssh/id_rsa`) — egress to the model provider, bounded by locus, no file
+*detected* as secret. `yolo` is a *local* license and it never bricks the machine.
 
 ## 5. Decisions (settled 2026-07-07)
 
-1. **Reading secret files → always ask (·), every level.** `cat ~/.ssh/id_rsa`,
-   `cat .env`, `env` are never auto-run. **But a distinction to build into the model**
-   (raised while deciding this): the danger is specifically *dumping the secret into
-   the chat* — the secret's contents reach stdout, which the agent/model then sees.
-   *Referencing or piping* a secret so it flows to a tool **without** being shown is a
-   different, less-dangerous act, and should be allowlist-able. Safer forms:
-   - `docker login -u u --password-stdin < ~/.token` — the token goes into a tool's
-     stdin, never to the screen.
-   - `export API_KEY=$(cat ~/.key)` — read into an env var, not printed.
-   - `ssh-add ~/.ssh/id_rsa` — loaded into the agent, not printed.
-   So: **`secret → stdout (the chat)` = ask/deny; `secret → some other consumer, not
-   the chat` = allowlist-able.** See the taxonomy note below — a refinement to
-   implement, not just a golden-set cell.
+1. **File reads are judged by locus, never by a secret list** (revised 2026-07-08 —
+   the fail-closed principle, `…-engine` §0). safe-chains does **not** detect secret
+   files; that is a denylist (unlisted = safe by omission). A read of file *content* to
+   the model is `disclosure = content-to-model` at `locus = classify_locus(path)`, and a
+   level admits it only within a locus it positively trusts:
+   - **worktree content** (`cat ./notes.md`, `cat ./.env`) → auto at `read-local`+.
+     `./notes.md` and `./.env` are indistinguishable without a denylist; the residual
+     risk of a worktree secret is the stated price of trusting worktree content.
+   - **home / absolute content** (`cat ~/.ssh/id_rsa`, `cat /etc/shadow`) → ask — denied
+     by locus, which also catches the unanticipated `cat ~/.config/newtool/token`.
+   - **credential-extraction commands** (`security find-generic-password -w`, `gpg -d`)
+     → ask — a *positive* `secret = reads` claim about the command, not the path.
+   - **secret → a consumer, not the model** is still fine: `docker login
+     --password-stdin < ~/.token`, `export K=$(cat ~/.key)`, `ssh-add key` feed material
+     to a tool (`disclosure ≠ content-to-model`) and stay allowlist-able. The flow
+     analysis reads the audience off the command shape (taxonomy note below).
 2. **Deleting your own files → both at `developer`** (for now). `rm ./file` and
    `rm -rf ./node_modules` both wait for the everyday level; `write-local` doesn't
    auto-delete. Revisit if too conservative.
@@ -215,17 +224,20 @@ that leaves the box (`git push`, `ssh host '…'`, `terraform apply`, `aws s3 sy
 `./gradlew` / `make deploy` / `npm run deploy` (run project-controlled scripts) →
 `developer`; `nohup … &` → `developer`; `crontab` under `admin` → ✓.
 
-### Taxonomy note — the secret-disclosure *channel* (from decision 1)
+### Taxonomy note — locus + disclosure, not secret detection (from decision 1)
 
-A *secret read* is not inherently unsafe; **a secret read whose output reaches the
-model (stdout / the chat) is.** The disclosure-audience facet already separates
-"local-process = stdout → the agent/model" from other audiences, and the flow analysis
-can tell the two apart from the *shape* of the command — a bare `cat secret` sends its
-output to the model, while `cat secret | tool` or `tool < secret` sends it to `tool`.
-The level rules and flow doctrine should gate on *that*, so `cat ~/.aws/credentials`
-(to the chat) stays denied while `aws-vault exec -- …` / `tool --password-stdin <
-secret` (secret consumed, not shown) can be allowlisted. Feeds the Disclosure facet
-and the flow doctrine; logged as `hard-problems` HP-15 until implemented.
+Two facets carry what a naïve "secret detector" would have — and, unlike a detector,
+they fail closed (`…-engine` §0). **`locus`** bounds *where* the content lives
+(`classify_locus`): worktree content is trusted at `read-local`+; home/absolute content
+is not; an unpinnable `$VAR` path falls to the worst rung. **`disclosure.audience`**
+bounds *where the content goes*: the flow analysis reads it off the command shape — a
+bare `cat X` sends content to the model (`local-process`), while `cat X | tool` or
+`tool < X` sends it to `tool`. A level gates on `locus` **and** `disclosure`, so
+`cat ~/.aws/credentials` (home content → model) is denied by locus while
+`aws-vault exec -- …` / `tool --password-stdin < secret` (consumed, not shown) is
+allowlist-able by audience. The `secret` facet itself is reserved for commands that
+*positively* extract credentials. Feeds Disclosure + Locus + the flow doctrine; logged
+as `hard-problems` HP-15.
 
 ## 6. Next
 

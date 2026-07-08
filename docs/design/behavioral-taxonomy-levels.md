@@ -98,21 +98,26 @@ cost           = none
 Matches old Inert: `--version`, `--help`, arithmetic, `> /dev/null`. This is the
 fold identity.
 
-### 3.2 `read-local`  (adds observation of real state)
+### 3.2 `read-local`  (adds observation of worktree state)
 ```
 operation      = observe
-locus          ≤ user                 # may read ~/.config, /etc; reading, not writing
+locus.local    ≤ worktree-trusted     # worktree + .git reads; NOT home/absolute content
 reversibility  = none                 # observe has no effect to reverse
 persistence    = transient
 disclosure     ≤ local-process
-secret         ≤ uses-ambient         # may rely on ambient creds to read; must not READ secret material
+secret         ≤ uses-ambient         # may rely on ambient creds; credential-EXTRACTION (secret=reads) fails
 network        ≤ loopback
 execution      ≤ self
 ```
-Reproduces old SafeRead: `git status`, `ls`, `cat ./notes`. Note the honest
-tightening the old model lacked: `cat ~/.ssh/id_rsa` has `secret=reads` →
-**fails** `read-local` (it did not, cleanly, before — a strict improvement the
-golden-set records as an intentional diff, §5).
+Reproduces old SafeRead's worktree cases: `git status`, `ls`, `cat ./notes`,
+`grep -r foo src/`. The honest tightening (fail-closed, §0 of annex `…-engine`):
+content reads are bounded by **locus**, so `cat ~/.ssh/id_rsa` **fails** `read-local`
+because it is a `user`-scope content read to the model — *not* because `id_rsa` was
+detected as secret (that would be a denylist). The same bound denies the
+unanticipated `cat ~/.config/newtool/token`; a worktree read a level trusts
+(`./.env` ≡ `./notes.md`) is a named residual risk, not a list gap. `secret ≤
+uses-ambient` now excludes credential-*extraction* commands (keychain). The golden-set
+records the home-read tightening as an intentional diff (§5).
 
 ### 3.3 `write-local`  (adds local data mutation, no execution/reconfig)
 ```
@@ -257,8 +262,9 @@ row. Until then, the golden-set is authored by hand from this spec and the curre
 | invocation | honest profile (abbrev) | inert | read-local | write-local | developer | yolo |
 |---|---|:--:|:--:|:--:|:--:|:--:|
 | `node --version` | observe·process | ✓ | ✓ | ✓ | ✓ | ✓ |
-| `git status` | observe·worktree | ✗ | ✓ | ✓ | ✓ | ✓ |
-| `cat ~/.ssh/id_rsa` | observe·user·secret=reads·→chat | ✗ | ✗¹ | ✗ | ✗ | ✗² |
+| `git status` | observe·worktree-trusted | ✗ | ✓ | ✓ | ✓ | ✓ |
+| `cat ./notes.md` · `cat ./.env` | observe·worktree·→model | ✗ | ✓ | ✓ | ✓ | ✓ |
+| `cat ~/.ssh/id_rsa` | observe·**user**·→model | ✗ | ✗¹ | ✗ | ✗ | ✗² |
 | `touch build/out` | create·worktree·data | ✗ | ✗ | ✓ | ✓ | ✓ |
 | `rm -rf ./node_modules` | destroy·worktree·bounded·recoverable | ✗ | ✗ | ✗³ | ✓ | ✓ |
 | `git config core.pager x` | configure·reconfiguring | ✗ | ✗ | ✗ | ✓ | ✓ |
@@ -271,8 +277,12 @@ row. Until then, the golden-set is authored by hand from this spec and the curre
 | `dd of=/dev/sda …` · `mkfs …` | destroy·device·irreversible | ✗ | ✗ | ✗ | ✗ | ✗¹⁰ |
 | `git push` | mutate·remote | ✗ | ✗ | ✗ | ·† | ✗¹¹ |
 
-¹ `intended-tightening` — old SafeRead read key files; the honest denial is wanted.
-² C5: a secret whose output reaches the chat is denied even at `yolo` (HP-15).
+¹ `intended-tightening` — denied by **locus** (a `user`-scope content read to the model),
+  not by detecting `id_rsa` as secret (§0 fail-closed). `./notes.md` and `./.env` (both
+  worktree) are admitted alike — a named residual risk, not a list gap.
+² Denied by locus+disclosure even at `yolo`: content-to-model from beyond the worktree is
+  egress to the model provider, outside `yolo`'s *local* license (the fail-closed
+  successor to the old secret→chat corner — no file is *detected* as secret).
 ³ `bounded` worktree destroy waits for `developer`; `write-local` doesn't auto-delete.
 ⁴ `yolo` allows floating installs — looser than `developer`, and not a catastrophe corner.
 ⁵ arbitrary destination + integrity flow — denied at `developer` (and today).

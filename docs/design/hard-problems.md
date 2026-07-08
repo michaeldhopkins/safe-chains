@@ -162,19 +162,20 @@ for. Surfaced by pilot-3 §A.
 boot | detached`) plus an **interactive frame** whose nested payload is opaque and
 unbounded → worst-case for the granted context.
 
-### HP-15 · Secret disclosure channel: to-chat vs consumed-by-a-tool — `status: partial`
-A *secret read* is not inherently unsafe; a secret read whose output reaches the
-**model** (stdout / the chat) is. `cat ~/.ssh/id_rsa` dumps the key to the agent;
-`tool --password-stdin < secret` or `export K=$(cat secret)` feed it to a consumer
-*without* exposing it. The default must deny the first and allow the second (the
-user's call, deciding the golden-set). The model already has the vocabulary: the
-disclosure-*audience* facet ("local-process = stdout → the model" vs another sink) and
-the flow analysis, which sees from the command shape whether a secret's output goes to
-stdout or into a pipe / redirect / `$()` consumer. Surfaced by `…-golden-set` §5.1.
-*Lead:* gate the level rules and flow doctrine on the disclosure *audience*, not merely
-on "a secret was read" — `secret → stdout-to-model` denies, `secret → other consumer`
-is allowlist-able per that consumer. Design clear; needs wiring into the level clauses
-+ the flow pass.
+### HP-15 · Content-to-model exposure: locus + audience, never a secret detector — `status: partial`
+Reframed 2026-07-08 by the fail-closed principle (`…-engine` §0). safe-chains does
+**not** detect secret files — that is a denylist (unlisted = safe by omission). The work
+a detector would have done is carried by two fail-closed facets: **`locus`**
+(`classify_locus` — worktree content trusted, home/absolute not, unpinnable → worst) and
+**`disclosure.audience`** (the flow analysis reads off the command shape whether content
+goes to the model or into a pipe/redirect/`$()` consumer). `cat ~/.ssh/id_rsa` is denied
+because it is a `user`-scope content read to the model — which also catches the
+unanticipated `cat ~/.config/newtool/token` — while `tool --password-stdin < secret` /
+`export K=$(cat secret)` feed a *consumer* (`audience ≠ content-to-model`) and stay
+allowlist-able. The `secret` facet is reserved for commands that *positively* extract
+credentials (keychain, `gpg -d`). *Lead:* wire level clauses to gate on `locus` +
+`disclosure.audience`; the flow pass supplies the audience. Design clear; needs the
+disclosure classifier + the flow pass.
 
 ---
 
