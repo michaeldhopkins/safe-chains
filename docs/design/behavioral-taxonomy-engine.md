@@ -9,6 +9,51 @@ This changes **classification**, not **parsing** — the CST, its fold, and the
 delegation re-entry points are reused verbatim; only the leaf verdict of a
 *converted* command is computed a new way.
 
+## 0. Safety by positive assertion — the fail-closed rule
+
+A profile is a **conjunction of positive safety claims**, never a set of detected
+hazards. This is the allowlist principle applied *per facet*: safety on an axis is
+something the resolver must *earn* by understanding the command form, and any axis it
+cannot affirmatively bound resolves to that facet's **worst term** — never to zero.
+
+The distinction is the whole ballgame, and there is a one-line test for it:
+
+> **A facet classifier is allowlist-valid iff its behavior on *unrecognized* input is
+> the worst term.**
+
+`classify_locus` passes — an unpinnable `$VAR`/`..` path resolves to `machine`, and only
+*recognized* shapes earn a lower rung. A hypothetical `classify_secret(path)` that
+returns `secret = none` for paths off a known-secret list **fails** — it certifies
+everything unlisted as safe *by omission*, which is a denylist in a classifier's
+clothes. The same trap exists on every axis (a "network-command detector" leaks the
+novel network tool); the cure is uniform: **fail closed**.
+
+Consequences that shape the resolver:
+
+- **The `§2.8` "facets default to their zero term" is a data-model convenience the
+  resolver must not lean on.** `network = none` has to be earned ("`echo` provably opens
+  no socket"), not inherited from a struct default. The resolver's finalizer
+  worst-cases every facet a command form did not positively claim — a converted command
+  that forgets an axis fails *safe* (asks), never *open*.
+- **There is no secret path-detector.** `secret` splits into (a) *credential-extraction
+  intent*, a positive per-**command** claim (`security find-generic-password -w`,
+  `gpg -d`, `ssh-add` → `reads`; `cat`/`echo` → `none` — `cat` extracts no credential,
+  it is a byte-reader), and (b) *content exposure*, carried by `disclosure` (audience)
+  + `locus`, both fail-closed. `cat ~/.ssh/id_rsa` is denied because it is a
+  `user`-scope `content-to-model` read, **not** because `id_rsa` was recognized — so the
+  unanticipated `cat ~/.config/newtool/token` is denied by the same bound, for free.
+  The residual risk a level *does* accept (e.g. `cat ./.env` at a level that trusts
+  worktree content-reads) is then a **named, located** property of that level, not a gap
+  hidden in an incomplete list.
+- **Converting a command means certifying all twelve axes**, positively — the research
+  bar rises from "is it dangerous?" to "can I prove it is bounded on every axis?". That
+  cost is the price of a trustworthy allowlist.
+- **Enforceable, not aspirational:** every facet classifier must be
+  *worst-case-dominant on unrecognized input* — a proptest (feed adversarial arguments,
+  assert nothing resolves below worst-case without a positive match) is the gate each
+  classifier passes. This strengthens §2.3's worst-case rule from *unresolved values* to
+  *unaddressed facets*.
+
 ## 1. Where the engine attaches
 
 Today a command line is folded to a `Verdict` bottom-up: `command_verdict` →
@@ -98,9 +143,11 @@ worst-case. Cross-segment compounding (`a && b | c`) is **not** delegation — t
 
 ### 2.3 Argument resolution and worst-case
 
-Locus, secret, disclosure audience, network destination, and scale are functions of
-argument *values*, resolved by classifiers that generalize the predicates the current
-code already has: `is_safe_write_target` (`src/cst/check.rs`) becomes `classify_locus`
+Locus, disclosure audience, network destination, and scale are functions of argument
+*values*, resolved by **fail-closed** classifiers (§0) that generalize the predicates
+the current code already has (`secret` is *not* here — it is credential-extraction
+intent, a positive per-*command* claim, §0):
+`is_safe_write_target` (`src/cst/check.rs`) becomes `classify_locus`
 over a write target (the same `/tmp`, `.git/`, `.envrc`, `$`-bearing, parent-escape
 distinctions become `local` ordinal rungs); `PositionalShape`/`looks_like_path`
 (`src/policy.rs`) becomes a shape input to the same classifier; `consumes_next_value`
@@ -108,10 +155,11 @@ distinctions become `local` ordinal rungs); `PositionalShape`/`looks_like_path`
 token is an argument. Operand roles (source vs sink for `rsync`/`scp`) flip the
 dominant facet per v1.3 §3.3.
 
-**Rule (unchanged posture):** any value that cannot be pinned — `$VAR`, glob, stdin, a
-substitution — takes the facet's worst term, and the assumption is recorded in
+**Rule (§0, at the value level):** any value that cannot be pinned — `$VAR`, glob,
+stdin, a substitution — takes the facet's worst term, and the assumption is recorded in
 `because`. This is the profile-level statement of the allowlist floor already enforced
-by denying unresolved substitutions (`src/cst/check.rs`).
+by denying unresolved substitutions (`src/cst/check.rs`), and the same fail-closed
+posture §0 extends from unresolved *values* to unaddressed *facets*.
 
 ### 2.4 Modifier order
 
