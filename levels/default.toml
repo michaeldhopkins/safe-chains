@@ -26,12 +26,16 @@ authority = "user"
 cost = "none"
 
 [level.read-local]
-# Also observe real local state: git status, ls, cat ./notes. Reading a secret
-# to stdout still fails (secret <= uses-ambient excludes `reads`).
+# Also observe worktree state: git status, ls, cat ./notes, grep -r src/. Content
+# reads are bounded by LOCUS (fail-closed, engine §0): worktree(-trusted) content
+# is trusted; home/absolute content (cat ~/.ssh/id_rsa) is above this level, denied
+# by locus, not by any secret list. `secret <= uses-ambient` still excludes
+# credential-EXTRACTION commands (keychain -> secret=reads). Machine-wide reads
+# (ps aux) are denied by their resolved locus, not a clause here.
 extends = "inert"
 [[level.read-local.allow]]
 operation = ["observe"]
-locus = { local = "<= user", remote = "none" }
+locus = { local = "<= worktree-trusted", remote = "none" }
 reversibility = "none"
 persistence = { level = "transient" }
 disclosure = { audience = "<= local-process" }
