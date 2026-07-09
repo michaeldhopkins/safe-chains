@@ -418,12 +418,16 @@ fn resolve_cp(tokens: &[Token]) -> Profile {
     const CP: Flags = Flags {
         short: b"HLNPRXacdfhilnprsuvx",
         valued_short: b"tS",
+        // `--backup`/`--preserve`/`--reflink`/`--sparse` take OPTIONAL args (`--backup[=X]`)
+        // — only ever glued, never the next token — so they are boolean longs (a glued
+        // `=value` is tolerated by `classify`), not `valued_long`.
         long: &[
-            "--archive", "--force", "--help", "--interactive", "--no-clobber", "--no-dereference",
-            "--no-target-directory", "--one-file-system", "--parents", "--recursive",
-            "--remove-destination", "--symbolic-link", "--update", "--verbose", "--version",
+            "--archive", "--backup", "--force", "--help", "--interactive", "--no-clobber",
+            "--no-dereference", "--no-target-directory", "--one-file-system", "--parents",
+            "--preserve", "--recursive", "--reflink", "--remove-destination", "--sparse",
+            "--symbolic-link", "--update", "--verbose", "--version",
         ],
-        valued_long: &["--backup", "--preserve", "--reflink", "--sparse", "--suffix", "--target-directory"],
+        valued_long: &["--suffix", "--target-directory"],
     };
     let Some(operands) = CP.positionals(tokens) else {
         return Profile::of(vec![Capability::worst("cp: unrecognized flag — worst-cased (§0)")]);
@@ -1035,6 +1039,18 @@ mod tests {
         }
         // a glued -t pointing outside the worktree is still denied by the dest locus.
         assert_eq!(project(&resolve(&toks(&["cp", "-t/etc", "./a"])).expect("cp")), Verdict::Denied, "cp -t/etc");
+
+        // optional-argument longs (--backup[=X], --preserve[=X]) must NOT swallow the
+        // source operand: bare and glued forms both leave ./a a source and ./b the dest.
+        for form in [
+            vec!["cp", "--backup", "./a", "./b"],
+            vec!["cp", "--preserve", "./a", "./b"],
+            vec!["cp", "--preserve=mode", "./a", "./b"],
+        ] {
+            let c = resolve(&toks(&form)).expect("cp");
+            assert_eq!(c.capabilities.len(), 2, "{form:?}: source read + dest write");
+            assert_eq!(project(&c), Verdict::Allowed(SafetyLevel::SafeWrite), "{form:?}");
+        }
 
         // recursion raises scale to unbounded; a lone operand / unknown flag worst-cases.
         assert_eq!(resolve(&toks(&["cp", "-r", "./a", "./b"])).expect("cp").capabilities[0].scale, Scale::Unbounded);
