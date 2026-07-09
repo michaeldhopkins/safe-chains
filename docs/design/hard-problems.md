@@ -189,6 +189,31 @@ separates *attesting* a typicality from *auto-approving* on it. Reputation-adjac
 (`delegation` B.5); rides beside the facets, not inside a facet ordinal. Open: per-claim
 vs per-capability; residual representation; whether any default level accepts `attested`.
 
+### HP-17 · Session-scoped human grants must be unforgeable by the agent — `status: proposed`
+A user wants to allow a normally-not-allowed command *for the current session only*
+(approve `terraform apply` once, forget it when the session ends). Storing the allowance
+is trivial; the hard part is that it must be writable **only through a channel the agent
+cannot drive.** Every agent-writable store — a file, a cwd config, an env var the agent
+sets — is forgeable: the agent just writes the allowance and runs the command. This is
+the *same* threat as an agent dropping `.safe-chains.toml` to escalate its own trust; a
+session-allow file is that hole again. Only two channels are unforgeable: (1) the
+**harness's own human-approval memory** — a keypress the agent can't synthesize — reached
+only if safe-chains **abstains** rather than returns `allow` (an `allow` *suppresses* the
+prompt, so no approval can be remembered); and (2) a **separate human TTY/UI** the agent
+lacks (the `!` REPL prefix, a menu-bar app). *Key realization:* the harness already gives
+unforgeable **scoping** for free (the `session_id` in the hook payload) and unforgeable
+**write-auth** for free (approve-and-remember), so the feature is really the
+**deny-vs-abstain distinction**, not a new store — abstain on "above-level but not
+catastrophic," let the harness own session memory. Modeled cleanly, a session grant is a
+temporary extra allow-clause unioned onto the active level, keyed by `session_id`, and
+expressed as a capability **profile, not a raw string** (a string is gamed by a
+semantically-equal variant; a loose pattern over-grants). *Lead:* don't build an internal
+store; lean on the harness. If safe-chains must own it, a local daemon keyed by
+`session_id`, written only via an out-of-band human UI. Connects to HP-3 (statelessness)
+and HP-4. *Broader lead:* pursue **deeper harness integrations** to prototype the
+abstain→remember loop and a first-class session-grant channel — an easily-configurable
+harness like **`pi`** is a strong candidate to build this against.
+
 ---
 
 ## Parked policy decisions
@@ -196,12 +221,18 @@ vs per-capability; residual representation; whether any default level accepts `a
 Real choices about level contents (`behavioral-taxonomy-levels.md` §6). Several are
 now **decided** in the golden-set (§5):
 
-- **Floating versions in `developer`** → DECIDED: auto-run at `developer` (`npm install
-  left-pad`); the opt-in `pinned-provenance` modifier (retired `ci`) flips them to ask.
-- **Bounded destroy** → DECIDED: `rm ./file` and `rm -rf ./dir` both wait for
-  `developer`; `write-local` doesn't auto-delete.
-- **Exec-surface in `developer`** → DECIDED implicitly: allowing `npm install` at
-  `developer` puts `install-hook` (lifecycle scripts) inside it.
+- **Floating versions in `developer`** → REVISED (2026-07-09): `developer`'s install
+  clause now requires **pinned** (`≥ hash-verified`), so floating `npm install left-pad`
+  asks. Tighter than the earlier "auto-run floating" call — a deliberate nudge toward
+  reproducible installs. (Supersedes the `pinned-provenance`-as-opt-in framing for the
+  default level; the clause lands with the npm/cargo resolvers.)
+- **Bounded destroy** → DECIDED & SHIPPED: `rm ./file` and `rm -rf ./dir` auto-run within
+  the worktree at `developer`; `write-local` doesn't auto-delete. (Destroy carve-in
+  authored in `levels/default.toml`.)
+- **Exec-surface in `developer`** → REVISED (2026-07-09): `developer` requires install
+  **scripts disabled** (`exec-surface = none`, e.g. `npm install --ignore-scripts`), so a
+  lifecycle-script install asks. Reverses the earlier "install-hook is inside developer"
+  call; same reproducible-installs rationale.
 
 Still open:
 - **Per-ecosystem "pinned" test** → DECIDED (annex `delegation` B.6): the
