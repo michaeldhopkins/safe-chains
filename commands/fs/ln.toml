@@ -16,3 +16,4 @@ valued = [
     "--backup", "--suffix", "--target-directory",
     "-S", "-t",
 ]
+examples_safe = ["ln -s ./target ./link", "ln ./a ./b"]
