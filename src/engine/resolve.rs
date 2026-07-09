@@ -409,11 +409,11 @@ fn resolve_touch(tokens: &[Token]) -> Profile {
 /// NOT to the model — no `local-process` disclosure); the destination is a `create` at its
 /// locus. Two things fall out of the locus model with no secret detection: `cp
 /// ~/.ssh/id_rsa ./x` denies because the SOURCE read is at `user` (above read-local), and
-/// `cp ./x ~/y` denies because the DEST write is at `user` (above write-local). The
-/// destination may silently overwrite existing content, so its reversibility is `effortful`
-/// (→ `developer`) — UNLESS `-n`/`--no-clobber` guarantees no overwrite, which drops it to
-/// `trivial` (→ `write-local`). That flag is the safe-form remediation, the same shape as
-/// `--ignore-scripts`.
+/// `cp ./x ~/y` denies because the DEST write is at `user` (above write-local). Overwriting
+/// a worktree file is `recoverable` (the repo-recoverable assumption, HP-8) — the same
+/// write-local treatment the golden-set gives `echo > config.json`; `-n`/`--no-clobber`
+/// cannot overwrite at all, so it is `trivial`. Both land at write-local: unlike a delete,
+/// a copy is create/overwrite, not destroy.
 fn resolve_cp(tokens: &[Token]) -> Profile {
     const CP: Flags = Flags {
         short: b"HLNPRXacdfhilnprsuvx",
@@ -442,7 +442,10 @@ fn resolve_cp(tokens: &[Token]) -> Profile {
         || has_flag(tokens, Some("-a"), Some("--archive"));
     let no_clobber = has_flag(tokens, Some("-n"), Some("--no-clobber"));
     let scale = breadth_scale(sources, recursive);
-    let dest_rev = if no_clobber { Reversibility::Trivial } else { Reversibility::Effortful };
+    // Overwriting a worktree file is recoverable (repo-recoverable, HP-8), like echo > f;
+    // -n can't overwrite, so it's trivial. Both admit at write-local (a copy is a write,
+    // not a destroy).
+    let dest_rev = if no_clobber { Reversibility::Trivial } else { Reversibility::Recoverable };
 
     let mut caps: Vec<Capability> = sources.iter().map(|s| copies_source(classify_locus(s), scale)).collect();
     caps.push(writes(
@@ -1001,11 +1004,15 @@ mod tests {
         use crate::engine::bridge::project;
         use crate::verdict::{SafetyLevel, Verdict};
 
-        // plain cp may clobber the dest → effortful create → developer (SafeWrite, the
-        // default level). The -n form cannot clobber → trivial → write-local (also
-        // SafeWrite today, but a genuinely lower level).
-        assert_eq!(project(&resolve(&toks(&["cp", "./a", "./b"])).expect("cp")), Verdict::Allowed(SafetyLevel::SafeWrite), "cp ./a ./b");
-        assert_eq!(project(&resolve(&toks(&["cp", "-n", "./a", "./b"])).expect("cp")), Verdict::Allowed(SafetyLevel::SafeWrite), "cp -n ./a ./b");
+        // a copy is a create/overwrite, not a destroy → write-local (SafeWrite), matching
+        // echo > config.json. Overwriting is recoverable; -n can't clobber (trivial). Both
+        // write-local — the destroy-vs-create boundary keeps cp below rm.
+        let plain = resolve(&toks(&["cp", "./a", "./b"])).expect("cp");
+        assert_eq!(plain.capabilities.last().unwrap().reversibility, Reversibility::Recoverable, "dest overwrite");
+        assert_eq!(project(&plain), Verdict::Allowed(SafetyLevel::SafeWrite), "cp ./a ./b");
+        let nc = resolve(&toks(&["cp", "-n", "./a", "./b"])).expect("cp");
+        assert_eq!(nc.capabilities.last().unwrap().reversibility, Reversibility::Trivial, "-n cannot clobber");
+        assert_eq!(project(&nc), Verdict::Allowed(SafetyLevel::SafeWrite), "cp -n ./a ./b");
 
         // reading a home/system SOURCE is denied by the source locus — no secret detector,
         // just the read locus (cp can't smuggle ~/.ssh/id_rsa into the worktree).

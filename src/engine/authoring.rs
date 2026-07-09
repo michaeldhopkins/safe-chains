@@ -424,17 +424,16 @@ mod tests {
         assert!(!developer.admits(&destroy_at(LocalLocus::User)), "rm -rf ~");
         assert!(!developer.admits(&destroy_at(LocalLocus::Machine)), "rm -rf /");
 
-        // the carve-in is not destroy-specific: a clobbering create (cp ./a ./b, effortful)
-        // admits at developer too, but not at write-local (discovered building cp).
-        let clobber = {
+        // the boundary is destroy vs create/overwrite: overwriting your own worktree file
+        // (a recoverable create — echo > f, cp ./a ./b) stays at write-local, NOT developer.
+        let overwrite = {
             let mut c = Capability::new(Operation::Create);
             c.locus.local = LocalLocus::Worktree;
-            c.reversibility = Reversibility::Effortful;
+            c.reversibility = Reversibility::Recoverable;
             c.persistence.level = PersistenceLevel::Data;
             Profile::of(vec![c])
         };
-        assert!(!write_local.admits(&clobber), "clobbering cp waits for developer");
-        assert!(developer.admits(&clobber), "cp ./a ./b");
+        assert!(write_local.admits(&overwrite), "cp ./a ./b is write-local (create), not developer");
         // developer still inherits every write-local grant
         let touch = {
             let mut c = Capability::new(Operation::Create);

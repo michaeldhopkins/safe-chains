@@ -68,14 +68,14 @@ authority = "user"
 # scripts disabled (tighter than the spec's floating+build-script default — a
 # deliberate nudge toward reproducible, script-free installs; see levels §3.4).
 extends = "write-local"
-# Effortful-to-undo, possibly-mass writes to your own project files: rm -rf
-# ./node_modules (destroy), a clobbering cp ./a ./b (create), an in-place edit
-# (mutate). write-local caps these at recoverable+bounded; developer relaxes both,
-# but only WITHIN the worktree — .git/ and home/system sit at worktree-trusted+ and
-# stay denied by locus. Not destroy-specific: any local write that a clobber makes
-# effortful lands here (discovered building cp).
+# Delete your own project files: rm ./f, rm -rf ./node_modules. The golden-set
+# boundary is create/overwrite (write-local) vs DESTROY (developer) — overwriting
+# your own file (echo > f, cp ./a ./b) is recoverable and stays at write-local; only
+# deletion, effortful to undo, waits for developer. Recursive and effortful deletion
+# is admitted, but only WITHIN the worktree — .git/ and home/system sit at
+# worktree-trusted+ and stay denied by locus.
 [[level.developer.allow]]
-operation = ["create", "mutate", "destroy"]
+operation = ["destroy"]
 locus = { local = "<= worktree", remote = "none" }
 scale = "<= unbounded"
 reversibility = "<= effortful"
