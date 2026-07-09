@@ -599,6 +599,49 @@ mod tests {
         assert!(read_local().admits(&p));
     }
 
+    /// The complete resolved capability for a single-capability invocation, with
+    /// `because` cleared so the assertion is over the **facets** (not the prose).
+    fn one_cap(cmd: &[&str]) -> Capability {
+        let p = resolve(&toks(cmd)).expect("resolves");
+        assert_eq!(p.capabilities.len(), 1, "{cmd:?} is a single-capability invocation");
+        let mut c = p.capabilities[0].clone();
+        c.because = String::new();
+        c
+    }
+
+    /// Golden profiles: assert **every** facet of the resolved capability for
+    /// representative invocations. This is the "all facets covered" check (§0) — struct
+    /// equality means a facet the resolver forgot (left at a wrong default) or set wrong
+    /// fails the test, per command. When commands carry TOML profiles, the expected
+    /// profile is derived from the TOML instead of hand-built here.
+    #[test]
+    fn golden_profiles_cover_every_facet() {
+        // echo — the reference `structural` profile: observe, process-scoped, output to
+        // the model, and every other axis provably zero.
+        let mut echo = Capability::new(Operation::Observe);
+        echo.disclosure.audience = DisclosureAudience::LocalProcess;
+        assert_eq!(one_cap(&["echo", "hi"]), echo, "echo");
+
+        // cat of a worktree file — observe · worktree · content-to-model.
+        let mut cat = Capability::new(Operation::Observe);
+        cat.locus.local = LocalLocus::Worktree;
+        cat.disclosure.audience = DisclosureAudience::LocalProcess;
+        assert_eq!(one_cap(&["cat", "./notes.md"]), cat, "cat ./notes.md");
+
+        // cat of a home file — same, but locus rises to user (the only facet that moves).
+        let mut cat_home = cat.clone();
+        cat_home.locus.local = LocalLocus::User;
+        assert_eq!(one_cap(&["cat", "~/.ssh/id_rsa"]), cat_home, "cat ~/.ssh/id_rsa");
+
+        // grep of a worktree file — like cat, bounded to the single searched file.
+        assert_eq!(one_cap(&["grep", "foo", "file.txt"]), cat, "grep foo file.txt");
+
+        // grep -r — the recursive search raises scale to unbounded and nothing else.
+        let mut grep_r = cat.clone();
+        grep_r.scale = Scale::Unbounded;
+        assert_eq!(one_cap(&["grep", "-r", "foo", "src/"]), grep_r, "grep -r foo src/");
+    }
+
     #[test]
     fn worst_case_is_denied_even_by_a_permissive_yolo_shaped_level() {
         use crate::engine::level::{Clause, Level, OrdBound};
