@@ -20,6 +20,7 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
         "cat" => resolve_cat,
         "grep" => resolve_grep,
         "rm" => resolve_rm,
+        "mkdir" => resolve_mkdir,
         _ => return None,
     };
     // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`,
@@ -311,12 +312,113 @@ fn resolve_rm(tokens: &[Token]) -> Profile {
 }
 
 fn destroys(locus: LocalLocus, scale: Scale) -> Capability {
-    let mut c = Capability::new(Operation::Destroy);
+    writes(
+        Operation::Destroy,
+        locus,
+        scale,
+        Reversibility::Effortful,        // recoverable only from backups (fail-closed)
+        PersistenceLevel::Transient,     // a delete leaves nothing behind
+        "rm deletes files (recoverable only from out-of-band backups)",
+    )
+}
+
+/// A local write capability (the create/mutate/destroy family), placed at `locus`. The
+/// caller supplies the reversibility and persistence that fit the operation — `trivial` +
+/// `data` for a fresh mkdir/touch, `effortful` + `transient` for a delete, `effortful` +
+/// `data` for a clobbering copy.
+fn writes(
+    op: Operation,
+    locus: LocalLocus,
+    scale: Scale,
+    reversibility: Reversibility,
+    persistence: PersistenceLevel,
+    because: &str,
+) -> Capability {
+    let mut c = Capability::new(op);
     c.locus.local = locus;
     c.scale = scale;
-    c.reversibility = Reversibility::Effortful; // recoverable only from backups (fail-closed)
-    c.because = "rm deletes files (recoverable only from out-of-band backups)".to_string();
+    c.reversibility = reversibility;
+    c.persistence.level = persistence;
+    c.because = because.to_string();
     c
+}
+
+/// Breadth of a filesystem effect: `unbounded` when recursing, `bounded` for a glob or
+/// several operands, else `single`. Shared by rm/mkdir/touch/cp.
+fn breadth_scale(operands: &[&str], recursive: bool) -> Scale {
+    if recursive {
+        Scale::Unbounded
+    } else if operands.len() > 1 || operands.iter().any(|p| p.contains(['*', '?', '['])) {
+        Scale::Bounded
+    } else {
+        Scale::Single
+    }
+}
+
+/// Whether every flag (up to `--`) is recognized. `valued` flags (matched as whole tokens,
+/// short or long) consume their following token as a value — skipped so a dash-leading
+/// value (`touch -d '-1 day'`) is not misread as a flag. An unrecognized flag → the caller
+/// worst-cases (§0).
+fn flags_recognized(tokens: &[Token], short: &[u8], long: &[&str], valued: &[&str]) -> bool {
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        if t == "--" {
+            break;
+        }
+        if t == "-" || !t.starts_with('-') {
+            i += 1;
+            continue;
+        }
+        let name = t.split('=').next().unwrap_or(t);
+        if valued.contains(&t) {
+            if !t.contains('=') {
+                i += 1; // skip the value token
+            }
+        } else {
+            let ok = if t.starts_with("--") {
+                long.contains(&name)
+            } else {
+                t.bytes().skip(1).all(|b| short.contains(&b))
+            };
+            if !ok {
+                return false;
+            }
+        }
+        i += 1;
+    }
+    true
+}
+
+/// `mkdir DIR…` — creates directories. Non-destructive (fails on an existing target; `-p`
+/// is idempotent), so reversibility is `trivial` — a fresh empty dir is `rmdir`-removable.
+/// `-m`/`--mode`/`--context` take a value; `locus` per operand is `classify_locus`.
+fn resolve_mkdir(tokens: &[Token]) -> Profile {
+    const SHORT: &[u8] = b"pvZ";
+    const LONG: &[&str] = &["--parents", "--verbose", "--help", "--version"];
+    const VALUED: &[&str] = &["-m", "--mode", "--context"];
+    if !flags_recognized(tokens, SHORT, LONG, VALUED) {
+        return Profile::of(vec![Capability::worst("mkdir: unrecognized flag — worst-cased (§0)")]);
+    }
+    let dirs = positionals(tokens, |f| VALUED.contains(&f));
+    if dirs.is_empty() {
+        return Profile::of(vec![Capability::worst("mkdir: no operand — worst-cased (§0)")]);
+    }
+    let scale = breadth_scale(&dirs, false);
+    Profile::of(
+        dirs.iter()
+            .map(|p| {
+                writes(
+                    Operation::Create,
+                    classify_locus(p),
+                    scale,
+                    Reversibility::Trivial,
+                    PersistenceLevel::Data,
+                    "mkdir creates a directory",
+                )
+            })
+            .collect(),
+    )
 }
 
 /// Whether every `rm` flag is recognized-benign. `--no-preserve-root` (which enables
@@ -735,6 +837,30 @@ mod tests {
         rm.locus.local = LocalLocus::Worktree;
         rm.reversibility = Reversibility::Effortful;
         assert_eq!(one_cap(&["rm", "./x"]), rm, "rm ./x");
+
+        // mkdir — create · worktree · trivial · leaves data. A fresh dir is rmdir-removable.
+        let mut mkdir = Capability::new(Operation::Create);
+        mkdir.locus.local = LocalLocus::Worktree;
+        mkdir.reversibility = Reversibility::Trivial;
+        mkdir.persistence.level = PersistenceLevel::Data;
+        assert_eq!(one_cap(&["mkdir", "./build"]), mkdir, "mkdir ./build");
+    }
+
+    #[test]
+    fn mkdir_creates_in_the_worktree_but_not_beyond_it() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+        // a fresh dir is a trivial-reversibility create → write-local (SafeWrite)
+        for cmd in [vec!["mkdir", "./build"], vec!["mkdir", "-p", "a/b/c"], vec!["mkdir", "-m", "755", "./x"]] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("mkdir")), Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd:?}");
+        }
+        // outside the worktree → denied by locus
+        for cmd in [vec!["mkdir", "/etc/evil"], vec!["mkdir", "~/newdir"], vec!["mkdir", "$HOME/x"]] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("mkdir")), Verdict::Denied, "{cmd:?}");
+        }
+        // fail-closed on an unknown flag / no operand
+        assert_eq!(project(&resolve(&toks(&["mkdir", "-Q", "x"])).expect("mkdir")), Verdict::Denied, "unknown flag");
+        assert_eq!(project(&resolve(&toks(&["mkdir"])).expect("mkdir")), Verdict::Denied, "no operand");
     }
 
     #[test]
