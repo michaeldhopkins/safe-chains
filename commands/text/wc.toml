@@ -11,3 +11,4 @@ standalone = [
     "--max-line-length", "--version", "--words", "--zero-terminated",
 ]
 valued = ["--files0-from"]
+examples_safe = ["wc -l src/main.rs", "wc -w README.md"]
