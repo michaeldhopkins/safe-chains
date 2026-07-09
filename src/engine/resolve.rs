@@ -31,6 +31,9 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
     let resolver: fn(&[Token]) -> Profile = match arg0.command_name() {
         "echo" => resolve_echo,
         "cat" => resolve_cat,
+        "head" => resolve_head,
+        "tail" => resolve_tail,
+        "wc" => resolve_wc,
         "grep" => resolve_grep,
         "rm" => resolve_rm,
         "mkdir" => resolve_mkdir,
@@ -94,9 +97,71 @@ fn resolve_cat(tokens: &[Token]) -> Profile {
             "--show-tabs", "--squeeze-blank", "--help", "--version",
         ],
         valued_long: &[],
+        numeric_shorthand: false,
     };
     let Some(files) = CAT.positionals(tokens) else {
         return worst("cat: unrecognized flag — worst-cased (§0)");
+    };
+    Profile::of(reads_to_model(&files, Scale::Single))
+}
+
+/// `head FILE…` / `tail FILE…` — read a bounded prefix/suffix of each file to the model.
+/// Same `observe · content-to-model` shape as `cat`; the only wrinkles are the value flags
+/// (`-n`/`-c`) and the obsolete `-NUM` count form (`head -20`), which `numeric_shorthand`
+/// recognizes. `tail -f`/`-F` follows appends — a streaming read of the *same* file's
+/// content, so it carries no extra capability (the locus already bounds what it can see).
+fn resolve_head(tokens: &[Token]) -> Profile {
+    const HEAD: Flags = Flags {
+        short: b"Vhqvz",
+        valued_short: b"cn",
+        long: &["--help", "--quiet", "--silent", "--verbose", "--version", "--zero-terminated"],
+        valued_long: &["--bytes", "--lines"],
+        numeric_shorthand: true,
+    };
+    let Some(files) = HEAD.positionals(tokens) else {
+        return worst("head: unrecognized flag — worst-cased (§0)");
+    };
+    Profile::of(reads_to_model(&files, Scale::Single))
+}
+
+fn resolve_tail(tokens: &[Token]) -> Profile {
+    const TAIL: Flags = Flags {
+        short: b"FVfhqrvz",
+        valued_short: b"bcn",
+        long: &[
+            "--follow", "--help", "--quiet", "--retry", "--silent", "--verbose", "--version",
+            "--zero-terminated",
+        ],
+        valued_long: &["--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"],
+        numeric_shorthand: true,
+    };
+    let Some(files) = TAIL.positionals(tokens) else {
+        return worst("tail: unrecognized flag — worst-cased (§0)");
+    };
+    Profile::of(reads_to_model(&files, Scale::Single))
+}
+
+/// `wc FILE…` — reads each file's content (to count lines/words/bytes) and prints the
+/// counts. It reads the same content `cat` does, so it is gated identically by `locus`
+/// (only the *output* differs — counts, not content — which no facet distinguishes).
+/// `--files0-from=F` reads an arbitrary, unpinnable set of paths listed in `F` (or stdin
+/// with `-`), which cannot be classified → worst-case (§0).
+fn resolve_wc(tokens: &[Token]) -> Profile {
+    const WC: Flags = Flags {
+        short: b"LVclmw",
+        valued_short: &[],
+        long: &[
+            "--bytes", "--chars", "--help", "--lines", "--max-line-length", "--version",
+            "--words", "--zero-terminated",
+        ],
+        valued_long: &["--files0-from"],
+        numeric_shorthand: false,
+    };
+    if WC.value(tokens, 0, "--files0-from").is_some() {
+        return worst("wc --files0-from reads an unpinnable set of files — worst-cased (§0)");
+    }
+    let Some(files) = WC.positionals(tokens) else {
+        return worst("wc: unrecognized flag — worst-cased (§0)");
     };
     Profile::of(reads_to_model(&files, Scale::Single))
 }
@@ -262,6 +327,7 @@ fn resolve_rm(tokens: &[Token]) -> Profile {
             "--one-file-system", "--preserve-root", "--help", "--version",
         ],
         valued_long: &[],
+        numeric_shorthand: false,
     };
     let Some(operands) = RM.positionals(tokens) else {
         return worst("rm: unrecognized/dangerous flag — worst-cased (§0)");
@@ -283,6 +349,7 @@ fn resolve_mkdir(tokens: &[Token]) -> Profile {
         valued_short: b"m",
         long: &["--parents", "--verbose", "--help", "--version"],
         valued_long: &["--mode", "--context"],
+        numeric_shorthand: false,
     };
     let Some(dirs) = MKDIR.positionals(tokens) else {
         return worst("mkdir: unrecognized flag — worst-cased (§0)");
@@ -305,6 +372,7 @@ fn resolve_touch(tokens: &[Token]) -> Profile {
         valued_short: b"rtd",
         long: &["--no-create", "--no-dereference", "--help", "--version"],
         valued_long: &["--reference", "--date", "--time"],
+        numeric_shorthand: false,
     };
     let Some(files) = TOUCH.positionals(tokens) else {
         return worst("touch: unrecognized flag — worst-cased (§0)");
@@ -340,6 +408,7 @@ fn resolve_cp(tokens: &[Token]) -> Profile {
             "--symbolic-link", "--update", "--verbose", "--version",
         ],
         valued_long: &["--suffix", "--target-directory"],
+        numeric_shorthand: false,
     };
     let (sources, dest) = match sources_and_dest(&CP, tokens, "cp") {
         Ok(sd) => sd,
@@ -399,6 +468,7 @@ fn resolve_mv(tokens: &[Token]) -> Profile {
             "--version",
         ],
         valued_long: &["--suffix", "--target-directory"],
+        numeric_shorthand: false,
     };
     let (sources, dest) = match sources_and_dest(&MV, tokens, "mv") {
         Ok(sd) => sd,
@@ -498,6 +568,36 @@ mod tests {
         let p = resolve(&toks(&["cat", "--", "-n"])).expect("cat");
         assert_eq!(p.capabilities.len(), 1, "-n after -- is a filename");
         assert!(read_local().admits(&p));
+    }
+
+    #[test]
+    fn head_tail_wc_read_like_cat_and_honor_numeric_shorthand() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+        // worktree reads → read-local (SafeRead); home reads → denied by locus, same as cat.
+        for cmd in [
+            vec!["head", "README.md"],
+            vec!["head", "-n", "5", "src/main.rs"],
+            vec!["head", "-20", "src/main.rs"],   // obsolete -NUM form must parse
+            vec!["tail", "-f", "./log.txt"],       // follow is still a bounded read
+            vec!["tail", "-n", "100", "./log.txt"],
+            vec!["wc", "-l", "./notes.md"],
+        ] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("read")), Verdict::Allowed(SafetyLevel::SafeRead), "{cmd:?}");
+        }
+        // reading stdin (`-`) is process-scoped → inert, like `cat -`.
+        assert_eq!(project(&resolve(&toks(&["wc", "-c", "-"])).expect("wc")), Verdict::Allowed(SafetyLevel::Inert), "wc stdin");
+        for cmd in [vec!["head", "~/.ssh/id_rsa"], vec!["tail", "/etc/shadow"], vec!["wc", "-l", "$SECRET"]] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("read")), Verdict::Denied, "{cmd:?} beyond worktree");
+        }
+        // -NUM consumes no operand: `head -20 file` reads exactly `file`, not a phantom "20".
+        let p = resolve(&toks(&["head", "-20", "src/main.rs"])).expect("head");
+        assert_eq!(p.capabilities.len(), 1, "-20 is the count, not a file");
+        // wc --files0-from reads an unpinnable set → worst-case → denied.
+        assert_eq!(project(&resolve(&toks(&["wc", "--files0-from=list"])).expect("wc")), Verdict::Denied, "--files0-from");
+        assert_eq!(project(&resolve(&toks(&["wc", "--files0-from", "-"])).expect("wc")), Verdict::Denied, "--files0-from -");
+        // unknown flags fail closed.
+        assert_eq!(project(&resolve(&toks(&["head", "-Z", "x"])).expect("head")), Verdict::Denied, "unknown flag");
     }
 
     #[test]

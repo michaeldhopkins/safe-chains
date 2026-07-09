@@ -12,3 +12,4 @@ standalone = [
     "--verbose", "--version", "--zero-terminated",
 ]
 valued = ["-b", "-c", "-n", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]
+examples_safe = ["tail -n 50 src/main.rs", "tail -f ./app.log"]

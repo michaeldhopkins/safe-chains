@@ -11,3 +11,4 @@ standalone = [
     "--help", "--quiet", "--silent", "--verbose", "--version", "--zero-terminated",
 ]
 valued = ["-c", "-n", "--bytes", "--lines"]
+examples_safe = ["head README.md", "head -n 20 src/main.rs", "head -20 src/main.rs"]

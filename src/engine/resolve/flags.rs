@@ -7,12 +7,14 @@ use crate::parse::Token;
 /// A flag spec for a fixed-flag-set command. `short` flags are single chars that cluster
 /// (`-rf`); `valued_*` flags take a value, glued (`-tDIR`, `--dir=X`) or as the next token
 /// (`-t DIR`, `--dir X`). A valued short ends its cluster and takes the glued remainder or
-/// the next token.
+/// the next token. `numeric_shorthand` recognizes the obsolete `-NUM` count form
+/// (`head -20`, `tail -5`) — the digits are the inline value, so it takes no operand.
 pub(super) struct Flags {
     pub(super) short: &'static [u8],
     pub(super) valued_short: &'static [u8],
     pub(super) long: &'static [&'static str],
     pub(super) valued_long: &'static [&'static str],
+    pub(super) numeric_shorthand: bool,
 }
 
 enum FlagKind {
@@ -66,6 +68,10 @@ impl Flags {
             return FlagKind::Unknown;
         }
         let bytes = t.as_bytes();
+        // Obsolete `-NUM` count shorthand (head/tail): the digits are the inline value.
+        if self.numeric_shorthand && bytes.len() > 1 && bytes[1..].iter().all(|b| b.is_ascii_digit()) {
+            return FlagKind::Boolean;
+        }
         let mut k = 1;
         while k < bytes.len() {
             let b = bytes[k];
