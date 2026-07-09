@@ -169,8 +169,30 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
 
-    let cmd_v = handlers::dispatch(&tokens);
+    let cmd_v = leaf_verdict(&tokens);
     sub_v.combine(cmd_v).combine(redir_v)
+}
+
+/// The command leaf's verdict, gated by the engine mode (`…-engine` §4). In `legacy`
+/// (default) the legacy classifier is authoritative and the engine never runs; in `new`
+/// the engine is authoritative for commands it can resolve; in `shadow` the engine runs
+/// alongside and divergences are reported, but legacy still decides.
+fn leaf_verdict(tokens: &[Token]) -> Verdict {
+    use crate::engine::bridge::{Mode, engine_verdict, mode};
+    let legacy = handlers::dispatch(tokens);
+    match mode() {
+        Mode::Legacy => legacy,
+        Mode::New => engine_verdict(tokens).unwrap_or(legacy),
+        Mode::Shadow => {
+            if let Some(engine) = engine_verdict(tokens)
+                && engine != legacy
+            {
+                let name = tokens.first().map_or("", |t| t.as_str());
+                eprintln!("safe-chains[shadow]: `{name}` legacy={legacy} engine={engine}");
+            }
+            legacy
+        }
+    }
 }
 
 fn eval_verdict(cmd: &SimpleCmd) -> Verdict {

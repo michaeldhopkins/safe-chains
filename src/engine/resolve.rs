@@ -7,8 +7,51 @@
 //! `is_safe_write_target` branch order (`src/cst/check.rs`, a 2-bucket boolean) into
 //! the full [`LocalLocus`] ladder (v1.4 §2.2).
 
-use super::facet::{Capability, DisclosureAudience, LocalLocus, Operation, Profile, Scale};
+use super::facet::*;
 use crate::parse::{Token, has_flag};
+
+/// A maximally-severe capability — worst-cased on every axis, so no **well-formed** level
+/// admits it (§0). In particular its `locus.local = kernel`, and `device`/`kernel` are
+/// deny-by-default at every level (v1.4 §4.3), so any level whose allow caps locus below
+/// them (all of them) rejects it — even a permissive `yolo`-shaped allow. The resolver
+/// returns this when it hits something it cannot certify (an unrecognized flag), keeping
+/// the engine from ever being *looser* than a flag-strict classifier.
+fn worst_case(because: &str) -> Capability {
+    Capability {
+        operation: Operation::Execute,
+        locus: Locus {
+            local: LocalLocus::Kernel,
+            remote: RemoteReach::Arbitrary,
+            binding: RemoteBinding::Ambient,
+        },
+        scale: Scale::Unbounded,
+        authority: Authority::OtherUser,
+        isolation: Isolation::None,
+        reversibility: Reversibility::Irreversible,
+        persistence: Persistence {
+            level: PersistenceLevel::Installing,
+            trigger: Trigger { escape: TriggerEscape::Boot, kind: TriggerKind::None },
+        },
+        disclosure: Disclosure {
+            audience: DisclosureAudience::Public,
+            channel: Channel::Unknown,
+            principal: Principal::Cross,
+        },
+        secret: Secret {
+            level: SecretLevel::Transmits,
+            channel: Channel::Unknown,
+            principal: Principal::Cross,
+        },
+        network: Network {
+            direction: NetDirection::Outbound,
+            destination: NetDestination::Arbitrary,
+            payload: NetPayload::SendsHostData,
+        },
+        execution: Execution { trust: ExecutionTrust::NetworkSourced, supply_chain: None },
+        cost: Cost::Quota,
+        because: because.to_string(),
+    }
+}
 
 /// Resolve a command's leaf tokens to its behavior profile, or `None` if the command
 /// has no resolver yet (the caller then worst-cases / falls back to the legacy
@@ -43,8 +86,46 @@ fn resolve_echo(_tokens: &[Token]) -> Profile {
 /// `classify_locus` (fail-closed: `$VAR`/`..` → `machine`). `cat`'s flags (`-n`/`-A`/…)
 /// only format output and take no values.
 fn resolve_cat(tokens: &[Token]) -> Profile {
+    if !cat_flags_all_benign(tokens) {
+        return Profile::of(vec![worst_case("cat: unrecognized flag — worst-cased (§0)")]);
+    }
     let files = positionals(tokens, |_| false);
     Profile::of(reads_to_model(&files, Scale::Single))
+}
+
+/// Whether every flag before `--` is a recognized-benign `cat` flag (output formatting,
+/// no value). Any other flag is uncertifiable → the caller worst-cases (§0).
+fn cat_flags_all_benign(tokens: &[Token]) -> bool {
+    const SHORT: &[u8] = b"AbeEnstTuv";
+    const LONG: &[&str] = &[
+        "--number",
+        "--number-nonblank",
+        "--show-all",
+        "--show-ends",
+        "--show-nonprinting",
+        "--show-tabs",
+        "--squeeze-blank",
+        "--help",
+        "--version",
+    ];
+    for t in &tokens[1..] {
+        let t = t.as_str();
+        if t == "--" {
+            break;
+        }
+        if t == "-" || !t.starts_with('-') {
+            continue;
+        }
+        let ok = if t.starts_with("--") {
+            LONG.contains(&t)
+        } else {
+            t.bytes().skip(1).all(|b| SHORT.contains(&b))
+        };
+        if !ok {
+            return false;
+        }
+    }
+    true
 }
 
 /// One `observe · content-to-model` capability per path (empty list = reads stdin). A
@@ -88,6 +169,7 @@ fn resolve_grep(tokens: &[Token]) -> Profile {
     let mut files = Vec::new(); // positional file operands
     let mut pattern_files = Vec::new(); // -f/--file pattern files grep reads
     let mut pattern_from_flag = false;
+    let mut unknown_flag = false;
     let mut flags_done = false;
     let mut i = 1;
     while i < tokens.len() {
@@ -111,20 +193,33 @@ fn resolve_grep(tokens: &[Token]) -> Profile {
             } else if t == "--regexp" {
                 pattern_from_flag = true;
                 i += 2;
+            } else if t.starts_with("--regexp=") {
+                pattern_from_flag = true;
+                i += 1;
             } else {
-                // --regexp=… (pattern) or any other long flag; inline values stay in-token
-                pattern_from_flag |= t.starts_with("--regexp=");
+                unknown_flag |= !grep_long_known(t);
                 i += 1;
             }
         } else {
-            let (pattern_file, from_flag, consumes_next) = grep_short_cluster(t, next);
+            let (pattern_file, from_flag, consumes_next, recognized) = grep_short_cluster(t, next);
             pattern_files.extend(pattern_file);
             pattern_from_flag |= from_flag;
+            unknown_flag |= !recognized;
             i += if consumes_next { 2 } else { 1 };
         }
     }
 
-    if !pattern_from_flag && !files.is_empty() {
+    if unknown_flag {
+        return Profile::of(vec![worst_case("grep: unrecognized flag — worst-cased (§0)")]);
+    }
+    if files.is_empty() {
+        // No positional operand → grep has no pattern (a `-e`/`-f` pattern still needs a
+        // search target). This is a usage error; the legacy classifier denies it, so the
+        // engine must not be looser — worst-case (§0).
+        return Profile::of(vec![worst_case("grep: no pattern operand — worst-cased (§0)")]);
+    }
+
+    if !pattern_from_flag {
         files.remove(0); // the first positional is the PATTERN, not a file
     }
     if recursive && files.is_empty() {
@@ -141,23 +236,49 @@ fn resolve_grep(tokens: &[Token]) -> Profile {
 
 /// Parse a grep short-option cluster (e.g. `-ifpatterns`), honoring GNU semantics that a
 /// value-taking short consumes the rest of its cluster (glued) or the next token.
-/// Returns `(pattern_file, pattern_from_flag, consumes_next_token)`:
+/// Returns `(pattern_file, pattern_from_flag, consumes_next_token, all_recognized)`:
 /// `-f` → a pattern *file* read; `-e` → a pattern *string*; `-m`/`-A`/`-B`/`-C`/`-d` → a
-/// count/action value to skip; other chars are standalone.
-fn grep_short_cluster<'a>(cluster: &'a str, next: Option<&'a str>) -> (Option<&'a str>, bool, bool) {
+/// count/action value to skip; a set of standalone benign shorts; **anything else** (e.g.
+/// `-P`, which enables code-executing PCRE) is unrecognized → the caller worst-cases (§0).
+fn grep_short_cluster<'a>(
+    cluster: &'a str,
+    next: Option<&'a str>,
+) -> (Option<&'a str>, bool, bool, bool) {
+    // NB: `r` (recursive) is benign, but `R` (--dereference-recursive) follows symlinks
+    // and can escape the classified locus, so it is NOT benign — it worst-cases.
+    const BENIGN: &[u8] = b"ivnclLoqswxHhaIrzZEFGbU";
     let bytes = cluster.as_bytes();
     let mut k = 1;
     while k < bytes.len() {
         let glued = &cluster[k + 1..];
         let has_glued = !glued.is_empty();
         match bytes[k] {
-            b'f' => return (if has_glued { Some(glued) } else { next }, true, !has_glued),
-            b'e' => return (None, true, !has_glued),
-            b'm' | b'A' | b'B' | b'C' | b'd' => return (None, false, !has_glued),
-            _ => k += 1,
+            b'f' => return (if has_glued { Some(glued) } else { next }, true, !has_glued, true),
+            b'e' => return (None, true, !has_glued, true),
+            b'm' | b'A' | b'B' | b'C' | b'd' => return (None, false, !has_glued, true),
+            b if BENIGN.contains(&b) => k += 1,
+            _ => return (None, false, false, false), // unrecognized short → worst-case
         }
     }
-    (None, false, false)
+    (None, false, false, true)
+}
+
+/// Whether a grep long flag (its `--name`, ignoring any `=value`) is recognized-benign.
+/// `--perl-regexp` and anything unlisted are not → worst-case (§0).
+fn grep_long_known(flag: &str) -> bool {
+    const KNOWN: &[&str] = &[
+        "--recursive", "--ignore-case", "--invert-match", // NB: --dereference-recursive
+        // (symlink-following) is intentionally absent → worst-case (M2)
+        "--line-number", "--count", "--files-with-matches", "--files-without-match",
+        "--only-matching", "--word-regexp", "--line-regexp", "--fixed-strings",
+        "--extended-regexp", "--basic-regexp", "--with-filename", "--no-filename",
+        "--quiet", "--silent", "--no-messages", "--null", "--byte-offset", "--text",
+        "--color", "--colour", "--help", "--version", "--after-context", "--before-context",
+        "--context", "--max-count", "--include", "--exclude", "--exclude-dir",
+        "--include-dir", "--binary-files", "--devices", "--directories",
+    ];
+    let name = flag.split('=').next().unwrap_or(flag);
+    KNOWN.contains(&name)
 }
 
 /// The positional (non-flag) operands of an invocation: skips `tokens[0]` (the command),
@@ -205,8 +326,8 @@ pub fn classify_locus(path: &str) -> LocalLocus {
     {
         return LocalLocus::Process;
     }
-    // Raw block/char devices — beneath the filesystem (dd of=/dev/rdisk0, mount).
-    if is_block_device(path) {
+    // Raw block/char devices — beneath the filesystem (dd of=/dev/rdisk0, /dev/mem).
+    if is_raw_device(path) {
         return LocalLocus::Device;
     }
     // Temp — process-scoped scratch.
@@ -220,9 +341,13 @@ pub fn classify_locus(path: &str) -> LocalLocus {
     if has_trusted_segment(path) {
         return LocalLocus::WorktreeTrusted;
     }
-    // The user's own home / keychain scope.
-    if path.starts_with('~') {
+    // The user's own home (`~` or `~/…`). Another user's home (`~name…`) is a different
+    // principal → machine, per the `machine` rung's "other users" definition.
+    if path == "~" || path.starts_with("~/") {
         return LocalLocus::User;
+    }
+    if path.starts_with('~') {
+        return LocalLocus::Machine;
     }
     // Any other absolute path — /etc, /usr, services, another user's home.
     if path.starts_with('/') {
@@ -232,19 +357,14 @@ pub fn classify_locus(path: &str) -> LocalLocus {
     LocalLocus::Worktree
 }
 
-/// A raw block/char device node (not a standard stream — those are handled first).
-/// The prefix list is curated and conservative; unmatched `/dev/*` nodes fall through
-/// to the general `machine` rule.
-fn is_block_device(path: &str) -> bool {
+/// A raw block/char device node — block storage or raw memory/ports, beneath the
+/// filesystem (not a standard stream; those are handled first). Curated and
+/// conservative; other `/dev/*` nodes fall through to the general `machine` rule.
+fn is_raw_device(path: &str) -> bool {
     const DEVICE_PREFIXES: &[&str] = &[
-        "/dev/disk",
-        "/dev/rdisk",
-        "/dev/sd",
-        "/dev/nvme",
-        "/dev/hd",
-        "/dev/vd",
-        "/dev/mmcblk",
-        "/dev/loop",
+        "/dev/disk", "/dev/rdisk", "/dev/sd", "/dev/nvme", "/dev/hd", "/dev/vd",
+        "/dev/mmcblk", "/dev/loop", // block storage
+        "/dev/mem", "/dev/kmem", "/dev/port", "/dev/mtd", // raw memory / ports / flash
     ];
     DEVICE_PREFIXES.iter().any(|p| path.starts_with(p))
 }
@@ -276,6 +396,8 @@ mod tests {
         assert_eq!(classify_locus("/dev/rdisk0"), LocalLocus::Device);
         assert_eq!(classify_locus("/dev/sda1"), LocalLocus::Device);
         assert_eq!(classify_locus("/dev/nvme0n1"), LocalLocus::Device);
+        assert_eq!(classify_locus("/dev/mem"), LocalLocus::Device, "raw memory");
+        assert_eq!(classify_locus("/dev/kmem"), LocalLocus::Device);
     }
 
     #[test]
@@ -305,6 +427,7 @@ mod tests {
         assert_eq!(classify_locus("~/.ssh/id_rsa"), LocalLocus::User);
         assert_eq!(classify_locus("~/.config/foo"), LocalLocus::User);
         assert_eq!(classify_locus("~"), LocalLocus::User);
+        assert_eq!(classify_locus("~bob/.ssh/id_rsa"), LocalLocus::Machine, "another user's home");
     }
 
     #[test]
@@ -474,6 +597,42 @@ mod tests {
         let p = resolve(&toks(&["grep", "-i", "-n", "foo", "file.txt"])).expect("grep");
         assert_eq!(p.capabilities.len(), 1, "-i -n standalone; foo pattern; file.txt file");
         assert!(read_local().admits(&p));
+    }
+
+    #[test]
+    fn worst_case_is_denied_even_by_a_permissive_yolo_shaped_level() {
+        use crate::engine::level::{Clause, Level, OrdBound};
+        // a yolo-shaped level: allow anything local up to `machine`, minus a destroy corner
+        let yolo = Level::new("yolo-ish")
+            .allowing(Clause {
+                local_locus: Some(OrdBound::at_most(LocalLocus::Machine)),
+                ..Default::default()
+            })
+            .denying(Clause {
+                operation: Some(vec![Operation::Destroy]),
+                reversibility: Some(OrdBound::at_least(Reversibility::Irreversible)),
+                ..Default::default()
+            });
+        let wc = Profile::of(vec![worst_case("test")]);
+        assert!(!yolo.admits(&wc), "worst_case (locus=kernel) exceeds even a machine-capped allow");
+    }
+
+    #[test]
+    fn unrecognized_flags_worst_case_fail_closed() {
+        for cmd in [
+            vec!["cat", "-Z", "./x"],
+            vec!["cat", "--wat", "./x"],
+            vec!["grep", "-P", "foo", "f"], // PCRE → (?{code}) executes; must not slip through
+            vec!["grep", "--perl-regexp", "foo", "f"],
+            vec!["grep", "-iP", "foo", "f"], // unknown char inside a cluster
+            vec!["grep", "-R", "foo", "dir"], // -R follows symlinks → escapes locus (M2)
+        ] {
+            let p = resolve(&toks(&cmd)).expect("resolver");
+            assert!(!inert().admits(&p) && !read_local().admits(&p), "{cmd:?} must worst-case");
+        }
+        // recognized-benign flags still resolve normally
+        assert!(read_local().admits(&resolve(&toks(&["cat", "-nA", "./x"])).expect("cat")));
+        assert!(read_local().admits(&resolve(&toks(&["grep", "-rin", "foo", "src/"])).expect("grep")));
     }
 
     use proptest::prelude::*;
