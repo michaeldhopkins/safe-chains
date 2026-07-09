@@ -2,12 +2,25 @@
 //! (annex `behavioral-taxonomy-engine`). Runs via `engine::bridge` behind
 //! `SAFE_CHAINS_ENGINE` (default `legacy`, so it is not authoritative by default).
 //!
-//! Argument classification is the reusable core: `classify_locus` refines the existing
-//! `is_safe_write_target` branch order (`src/cst/check.rs`, a 2-bucket boolean) into
-//! the full [`LocalLocus`] ladder (v1.4 §2.2); the per-command resolvers build on it.
+//! This file holds the dispatch (`resolve`) and the per-command `resolve_*` functions;
+//! the shared toolkit they build on lives in submodules: [`flags`] (the getopt-style
+//! flag walker), [`locus`] (`classify_locus` — the [`LocalLocus`] ladder that refines the
+//! old `is_safe_write_target` boolean, v1.4 §2.2), and [`capability`] (the builders that
+//! stamp out each `Capability` with the facet pairing its operation warrants).
 
 use super::facet::*;
 use crate::parse::{Token, has_flag};
+
+mod capability;
+mod flags;
+mod locus;
+
+use capability::{
+    breadth_scale, copies_source, creates, destroys, overwrites, reads_content, reads_to_model,
+    relocates, worst,
+};
+use flags::Flags;
+use locus::classify_locus;
 
 /// Resolve a command's leaf tokens to its behavior profile, or `None` if the command
 /// has no resolver yet (the caller then worst-cases / falls back to the legacy
@@ -86,33 +99,6 @@ fn resolve_cat(tokens: &[Token]) -> Profile {
         return worst("cat: unrecognized flag — worst-cased (§0)");
     };
     Profile::of(reads_to_model(&files, Scale::Single))
-}
-
-/// One `observe · content-to-model` capability per path (empty list = reads stdin). A
-/// `-` operand is stdin (process-scoped); every other path is placed by `classify_locus`.
-fn reads_to_model(paths: &[&str], scale: Scale) -> Vec<Capability> {
-    if paths.is_empty() {
-        return vec![reads_content(LocalLocus::Process, scale, "reads stdin")];
-    }
-    paths
-        .iter()
-        .map(|p| {
-            if *p == "-" {
-                reads_content(LocalLocus::Process, scale, "reads stdin (-)")
-            } else {
-                reads_content(classify_locus(p), scale, "reads file content to the model")
-            }
-        })
-        .collect()
-}
-
-fn reads_content(locus: LocalLocus, scale: Scale, because: &str) -> Capability {
-    let mut c = Capability::new(Operation::Observe);
-    c.locus.local = locus;
-    c.scale = scale;
-    c.disclosure.audience = DisclosureAudience::LocalProcess; // content → the model
-    c.because = because.to_string();
-    c
 }
 
 /// `grep PATTERN FILE…` — searches files and prints matching lines (file content) to the
@@ -288,78 +274,6 @@ fn resolve_rm(tokens: &[Token]) -> Profile {
     Profile::of(operands.iter().map(|p| destroys(classify_locus(p), scale)).collect())
 }
 
-fn destroys(locus: LocalLocus, scale: Scale) -> Capability {
-    writes(
-        Operation::Destroy,
-        locus,
-        scale,
-        Reversibility::Effortful,        // recoverable only from backups (fail-closed)
-        PersistenceLevel::Transient,     // a delete leaves nothing behind
-        "rm deletes files (recoverable only from out-of-band backups)",
-    )
-}
-
-/// The private builder behind the write-family capability constructors (`creates`,
-/// `overwrites`, `relocates`, `destroys`): a write at `locus` with the reversibility and
-/// persistence the operation warrants. Resolvers call the named constructors, never this —
-/// the intent (and the enum pairing) then lives in exactly one place.
-fn writes(
-    op: Operation,
-    locus: LocalLocus,
-    scale: Scale,
-    reversibility: Reversibility,
-    persistence: PersistenceLevel,
-    because: &str,
-) -> Capability {
-    let mut c = Capability::new(op);
-    c.locus.local = locus;
-    c.scale = scale;
-    c.reversibility = reversibility;
-    c.persistence.level = persistence;
-    c.because = because.to_string();
-    c
-}
-
-/// A fresh file or directory (`mkdir`, `touch`): `create` at `locus`, `trivial` to undo
-/// (`rmdir`/`rm` the new entry), leaving ordinary data.
-fn creates(locus: LocalLocus, scale: Scale) -> Capability {
-    writes(Operation::Create, locus, scale, Reversibility::Trivial, PersistenceLevel::Data, "creates a file or directory")
-}
-
-/// A destination write that may clobber existing content (`cp`/`mv` dest): `create` at
-/// `locus`, `recoverable` (the repo-recoverable assumption, HP-8) — or `trivial` when
-/// `--no-clobber` guarantees no overwrite.
-fn overwrites(locus: LocalLocus, scale: Scale, no_clobber: bool) -> Capability {
-    let reversibility = if no_clobber { Reversibility::Trivial } else { Reversibility::Recoverable };
-    writes(Operation::Create, locus, scale, reversibility, PersistenceLevel::Data, "writes the destination; may overwrite existing content unless --no-clobber")
-}
-
-/// A moved-from source (`mv` src): `mutate` at `locus` — the entry leaves that directory —
-/// `trivial` to undo (`mv` back), leaving nothing behind. NOT a destroy: the content
-/// survives at the destination, which is why `mv` stays at write-local and `rm` does not.
-fn relocates(locus: LocalLocus, scale: Scale) -> Capability {
-    writes(Operation::Mutate, locus, scale, Reversibility::Trivial, PersistenceLevel::Transient, "mv removes the source from its old location (trivially reversible: mv back)")
-}
-
-/// The fail-closed profile (§0): a single worst-case capability citing `because` — the
-/// standard return when a resolver cannot certify an invocation (unknown flag, missing
-/// operand, spoofed path).
-fn worst(because: &str) -> Profile {
-    Profile::of(vec![Capability::worst(because)])
-}
-
-/// Breadth of a filesystem effect: `unbounded` when recursing, `bounded` for a glob or
-/// several operands, else `single`. Shared by rm/mkdir/touch/cp.
-fn breadth_scale(operands: &[&str], recursive: bool) -> Scale {
-    if recursive {
-        Scale::Unbounded
-    } else if operands.len() > 1 || operands.iter().any(|p| p.contains(['*', '?', '['])) {
-        Scale::Bounded
-    } else {
-        Scale::Single
-    }
-}
-
 /// `mkdir DIR…` — creates directories. Non-destructive (fails on an existing target; `-p`
 /// is idempotent), so reversibility is `trivial` — a fresh empty dir is `rmdir`-removable.
 /// `-m`/`--mode`/`--context` take a value; `locus` per operand is `classify_locus`.
@@ -442,16 +356,6 @@ fn resolve_cp(tokens: &[Token]) -> Profile {
     Profile::of(caps)
 }
 
-/// A `cp` source read: `observe` at the source locus, but with NO `local-process`
-/// disclosure — the bytes are copied to a file, not printed to the model.
-fn copies_source(locus: LocalLocus, scale: Scale) -> Capability {
-    let mut c = Capability::new(Operation::Observe);
-    c.locus.local = locus;
-    c.scale = scale;
-    c.because = "cp reads the source file".to_string();
-    c
-}
-
 /// Split a `SRC… DEST` invocation (`cp`/`mv`) into its sources and destination.
 /// `-t`/`--target-directory` names the dest explicitly (every operand is then a source);
 /// otherwise the last operand is the dest and the rest are sources. Fails closed (§0),
@@ -508,270 +412,9 @@ fn resolve_mv(tokens: &[Token]) -> Profile {
     Profile::of(caps)
 }
 
-/// A getopt-style flag spec for a fixed-flag-set command. `short` flags are single chars
-/// that cluster (`-rf`); `valued_*` flags take a value, either glued (`-tDIR`, `--dir=X`)
-/// or as the next token (`-t DIR`, `--dir X`). A valued short ends its cluster and takes
-/// the glued remainder or the next token. (`grep` keeps its own parser — its shorts carry
-/// richer semantics: a value-short can supply a *pattern* to read vs a count to skip.)
-struct Flags {
-    short: &'static [u8],
-    valued_short: &'static [u8],
-    long: &'static [&'static str],
-    valued_long: &'static [&'static str],
-}
-
-enum FlagKind {
-    Unknown,
-    Boolean,
-    ValuedGlued, // the value is inside this token (`-tX`, `--dir=X`)
-    ValuedNext,  // the value is the following token (`-t X`, `--dir X`)
-}
-
-impl Flags {
-    /// The positional operands up to `--`, or `None` if any flag is unrecognized (the
-    /// caller then worst-cases, §0). A valued flag's value is consumed, never returned as a
-    /// positional; a bare `-` is a positional (stdin).
-    fn positionals<'a>(&self, tokens: &'a [Token]) -> Option<Vec<&'a str>> {
-        let mut out = Vec::new();
-        let mut flags_done = false;
-        let mut i = 1;
-        while i < tokens.len() {
-            let t = tokens[i].as_str();
-            if !flags_done && t == "--" {
-                flags_done = true;
-            } else if flags_done || t == "-" || !t.starts_with('-') {
-                out.push(t);
-            } else {
-                match self.classify(t) {
-                    FlagKind::Unknown => return None,
-                    FlagKind::ValuedNext => i += 1, // also skip the value token
-                    FlagKind::Boolean | FlagKind::ValuedGlued => {}
-                }
-            }
-            i += 1;
-        }
-        Some(out)
-    }
-
-    /// Classify one flag token against the spec.
-    fn classify(&self, t: &str) -> FlagKind {
-        if let Some(rest) = t.strip_prefix("--") {
-            let name_len = rest.split('=').next().unwrap_or(rest).len();
-            let full = &t[..2 + name_len];
-            let has_eq = t.len() > 2 + name_len;
-            if self.valued_long.contains(&full) {
-                return if has_eq { FlagKind::ValuedGlued } else { FlagKind::ValuedNext };
-            }
-            if self.long.contains(&full) {
-                // A boolean long never consumes the NEXT token; a glued `=value` is its
-                // optional-argument form (`rm --interactive=always`) — accept and consume
-                // just this token.
-                return if has_eq { FlagKind::ValuedGlued } else { FlagKind::Boolean };
-            }
-            return FlagKind::Unknown;
-        }
-        let bytes = t.as_bytes();
-        let mut k = 1;
-        while k < bytes.len() {
-            let b = bytes[k];
-            if self.valued_short.contains(&b) {
-                return if k + 1 < bytes.len() { FlagKind::ValuedGlued } else { FlagKind::ValuedNext };
-            }
-            if self.short.contains(&b) {
-                k += 1;
-            } else {
-                return FlagKind::Unknown;
-            }
-        }
-        FlagKind::Boolean
-    }
-
-    /// The value of a specific valued flag (glued or next-token), if present.
-    fn value<'a>(&self, tokens: &'a [Token], short: u8, long: &str) -> Option<&'a str> {
-        let mut i = 1;
-        while i < tokens.len() {
-            let t = tokens[i].as_str();
-            if t == "--" {
-                break;
-            }
-            if t.starts_with("--") {
-                if let Some(v) = t.strip_prefix(long).and_then(|r| r.strip_prefix('=')) {
-                    return Some(v);
-                }
-                if t == long {
-                    return tokens.get(i + 1).map(Token::as_str);
-                }
-            } else if t.starts_with('-') && t != "-" {
-                let bytes = t.as_bytes();
-                let mut k = 1;
-                while k < bytes.len() {
-                    let b = bytes[k];
-                    if b == short && self.valued_short.contains(&b) {
-                        let glued = &t[k + 1..];
-                        return if glued.is_empty() { tokens.get(i + 1).map(Token::as_str) } else { Some(glued) };
-                    }
-                    if self.valued_short.contains(&b) {
-                        break; // a different valued short consumes the rest of the cluster
-                    }
-                    k += 1;
-                }
-            }
-            i += 1;
-        }
-        None
-    }
-}
-
-/// The filesystem rung a path reaches (v1.4 §2.2). A value that cannot be pinned —
-/// a `$VAR` expansion or a `..` parent-escape — takes the worst-case fs rung
-/// (`machine`), matching the allowlist floor `is_safe_write_target` already enforces
-/// by denying such targets.
-///
-/// The same classifier serves reads and writes; the *level* draws the line
-/// (`read-local` admits `<= user`, `write-local` admits `<= worktree`), which is the
-/// refinement the facet model buys over the old single boolean.
-pub fn classify_locus(path: &str) -> LocalLocus {
-    // Unpinnable FIRST (§0 fail-closed): a `$VAR` expansion or a `..` escape could name
-    // anything, so no positive (lower) classification is sound — not even a `/tmp/`
-    // prefix, since `/tmp/$X` can expand through `..` to anywhere. Worst-case to
-    // `machine` (the top fs rung; raw devices need an explicit /dev/ match).
-    if path.contains('$') || is_parent_escape(path) {
-        return LocalLocus::Machine;
-    }
-    // Standard streams — no real filesystem is touched.
-    if matches!(path, "/dev/null" | "/dev/stdout" | "/dev/stderr" | "/dev/tty")
-        || path.starts_with("/dev/fd/")
-    {
-        return LocalLocus::Process;
-    }
-    // Raw block/char devices — beneath the filesystem (dd of=/dev/rdisk0, /dev/mem).
-    if is_raw_device(path) {
-        return LocalLocus::Device;
-    }
-    // Temp — process-scoped scratch.
-    if path.starts_with("/tmp/")
-        || path.starts_with("/private/tmp/")
-        || path.starts_with("/var/tmp/")
-    {
-        return LocalLocus::Temp;
-    }
-    // Files another tool auto-executes or trusts (.git/ hooks & config, .envrc).
-    if has_trusted_segment(path) {
-        return LocalLocus::WorktreeTrusted;
-    }
-    // The user's own home (`~` or `~/…`). Another user's home (`~name…`) is a different
-    // principal → machine, per the `machine` rung's "other users" definition.
-    if path == "~" || path.starts_with("~/") {
-        return LocalLocus::User;
-    }
-    if path.starts_with('~') {
-        return LocalLocus::Machine;
-    }
-    // Any other absolute path — /etc, /usr, services, another user's home.
-    if path.starts_with('/') {
-        return LocalLocus::Machine;
-    }
-    // A plain relative path inside the working tree.
-    LocalLocus::Worktree
-}
-
-/// A raw block/char device node — block storage or raw memory/ports, beneath the
-/// filesystem (not a standard stream; those are handled first). Curated and
-/// conservative; other `/dev/*` nodes fall through to the general `machine` rule.
-fn is_raw_device(path: &str) -> bool {
-    const DEVICE_PREFIXES: &[&str] = &[
-        "/dev/disk", "/dev/rdisk", "/dev/sd", "/dev/nvme", "/dev/hd", "/dev/vd",
-        "/dev/mmcblk", "/dev/loop", // block storage
-        "/dev/mem", "/dev/kmem", "/dev/port", "/dev/mtd", // raw memory / ports / flash
-    ];
-    DEVICE_PREFIXES.iter().any(|p| path.starts_with(p))
-}
-
-fn is_parent_escape(path: &str) -> bool {
-    path == ".." || path.starts_with("../") || path.contains("/../") || path.ends_with("/..")
-}
-
-/// Whether any path segment is a directory a tool auto-executes or trusts. Matches
-/// today's `is_safe_write_target` (`.git`, `.envrc`); CI-config trees (`.github/`,
-/// `.gitlab-ci.yml`) are a future refinement of this set.
-fn has_trusted_segment(path: &str) -> bool {
-    path.split('/').any(|seg| seg == ".git" || seg == ".envrc")
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn standard_streams_are_process_scoped() {
-        assert_eq!(classify_locus("/dev/null"), LocalLocus::Process);
-        assert_eq!(classify_locus("/dev/stdout"), LocalLocus::Process);
-        assert_eq!(classify_locus("/dev/fd/3"), LocalLocus::Process);
-    }
-
-    #[test]
-    fn raw_devices_are_device_rung() {
-        assert_eq!(classify_locus("/dev/rdisk0"), LocalLocus::Device);
-        assert_eq!(classify_locus("/dev/sda1"), LocalLocus::Device);
-        assert_eq!(classify_locus("/dev/nvme0n1"), LocalLocus::Device);
-        assert_eq!(classify_locus("/dev/mem"), LocalLocus::Device, "raw memory");
-        assert_eq!(classify_locus("/dev/kmem"), LocalLocus::Device);
-    }
-
-    #[test]
-    fn temp_paths_are_temp() {
-        assert_eq!(classify_locus("/tmp/scratch"), LocalLocus::Temp);
-        assert_eq!(classify_locus("/private/tmp/x"), LocalLocus::Temp);
-        assert_eq!(classify_locus("/var/tmp/y"), LocalLocus::Temp);
-    }
-
-    #[test]
-    fn plain_relative_paths_are_worktree() {
-        assert_eq!(classify_locus("notes.md"), LocalLocus::Worktree);
-        assert_eq!(classify_locus("src/engine/mod.rs"), LocalLocus::Worktree);
-        assert_eq!(classify_locus("build/out"), LocalLocus::Worktree);
-    }
-
-    #[test]
-    fn trusted_dotdirs_are_worktree_trusted() {
-        assert_eq!(classify_locus(".git/hooks/pre-commit"), LocalLocus::WorktreeTrusted);
-        assert_eq!(classify_locus(".git/config"), LocalLocus::WorktreeTrusted);
-        assert_eq!(classify_locus(".envrc"), LocalLocus::WorktreeTrusted);
-        assert_eq!(classify_locus("nested/.git/x"), LocalLocus::WorktreeTrusted);
-    }
-
-    #[test]
-    fn home_paths_are_user() {
-        assert_eq!(classify_locus("~/.ssh/id_rsa"), LocalLocus::User);
-        assert_eq!(classify_locus("~/.config/foo"), LocalLocus::User);
-        assert_eq!(classify_locus("~"), LocalLocus::User);
-        assert_eq!(classify_locus("~bob/.ssh/id_rsa"), LocalLocus::Machine, "another user's home");
-    }
-
-    #[test]
-    fn other_absolute_paths_are_machine() {
-        assert_eq!(classify_locus("/etc/hosts"), LocalLocus::Machine);
-        assert_eq!(classify_locus("/usr/local/bin/x"), LocalLocus::Machine);
-        assert_eq!(classify_locus("/Users/someone/notes"), LocalLocus::Machine);
-    }
-
-    #[test]
-    fn unresolvable_paths_worst_case_to_machine() {
-        assert_eq!(classify_locus("$HOME/.ssh/id_rsa"), LocalLocus::Machine);
-        assert_eq!(classify_locus("$OUT/file"), LocalLocus::Machine);
-        assert_eq!(classify_locus("../secret"), LocalLocus::Machine);
-        assert_eq!(classify_locus("a/../../etc/passwd"), LocalLocus::Machine);
-        assert_eq!(classify_locus("dir/.."), LocalLocus::Machine);
-    }
-
-    #[test]
-    fn an_unpinnable_marker_dominates_every_otherwise_safe_prefix() {
-        // conservative: an unpinnable segment can't be trusted, even under a safe prefix
-        assert_eq!(classify_locus("build/$ARTIFACT"), LocalLocus::Machine);
-        assert_eq!(classify_locus("/tmp/$X"), LocalLocus::Machine, "$ beats the /tmp prefix");
-        assert_eq!(classify_locus("/tmp/a/../../etc/passwd"), LocalLocus::Machine, ".. escapes /tmp");
-        assert_eq!(classify_locus("/dev/null$"), LocalLocus::Machine, "$ beats /dev/null");
-    }
 
     fn toks(parts: &[&str]) -> Vec<Token> {
         parts.iter().map(|p| Token::from_test(p)).collect()
@@ -1253,24 +896,5 @@ mod tests {
         // recognized-benign flags still resolve normally
         assert!(read_local().admits(&resolve(&toks(&["cat", "-nA", "./x"])).expect("cat")));
         assert!(read_local().admits(&resolve(&toks(&["grep", "-rin", "foo", "src/"])).expect("grep")));
-    }
-
-    use proptest::prelude::*;
-
-    proptest! {
-        /// Fail-closed (§0): a `$` anywhere forces the worst rung, whatever the rest
-        /// looks like — the classifier can never be talked below `machine` by a
-        /// safe-looking prefix wrapped around an unpinnable expansion.
-        #[test]
-        fn a_dollar_anywhere_forces_machine(s in ".{0,30}") {
-            prop_assert_eq!(classify_locus(&format!("{s}$")), LocalLocus::Machine);
-        }
-
-        /// Fail-closed: a `..` parent-escape forces the worst rung.
-        #[test]
-        fn a_parent_escape_forces_machine(s in "[a-zA-Z0-9/_]{0,20}") {
-            prop_assert_eq!(classify_locus(&format!("{s}/../x")), LocalLocus::Machine);
-            prop_assert_eq!(classify_locus(&format!("../{s}")), LocalLocus::Machine);
-        }
     }
 }
