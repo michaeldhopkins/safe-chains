@@ -19,6 +19,7 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
         "echo" => resolve_echo,
         "cat" => resolve_cat,
         "grep" => resolve_grep,
+        "rm" => resolve_rm,
         _ => return None,
     };
     // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`,
@@ -276,6 +277,70 @@ fn grep_long_known(flag: &str) -> bool {
     KNOWN.contains(&name)
 }
 
+/// `rm FILE…` — deletes files. Positive certification (§0): `operation = destroy`, no
+/// network/execution/secret. `locus` per operand is `classify_locus`; `-r`/`-R` recurse
+/// (`scale = unbounded`). `reversibility = effortful` — a delete is recoverable only from
+/// out-of-band backups; we do NOT assume VCS/trash (fail-closed). NB: `-f` (--force) only
+/// suppresses prompts — it does NOT raise reversibility for `rm` (the danger of `rm -rf`
+/// is the *recursion*, not the force), so the generic "--force → irreversible" modifier
+/// is command-specific, not universal.
+fn resolve_rm(tokens: &[Token]) -> Profile {
+    if !rm_flags_all_benign(tokens) {
+        return Profile::of(vec![Capability::worst("rm: unrecognized/dangerous flag — worst-cased (§0)")]);
+    }
+    let operands = positionals(tokens, |_| false);
+    if operands.is_empty() {
+        return Profile::of(vec![Capability::worst("rm: no operand — worst-cased (§0)")]);
+    }
+    let recursive = has_flag(tokens, Some("-r"), Some("--recursive")) || has_flag(tokens, Some("-R"), None);
+    let scale = if recursive {
+        Scale::Unbounded
+    } else if operands.len() > 1 || operands.iter().any(|p| p.contains(['*', '?', '['])) {
+        Scale::Bounded
+    } else {
+        Scale::Single
+    };
+    Profile::of(operands.iter().map(|p| destroys(classify_locus(p), scale)).collect())
+}
+
+fn destroys(locus: LocalLocus, scale: Scale) -> Capability {
+    let mut c = Capability::new(Operation::Destroy);
+    c.locus.local = locus;
+    c.scale = scale;
+    c.reversibility = Reversibility::Effortful; // recoverable only from backups (fail-closed)
+    c.because = "rm deletes files (recoverable only from out-of-band backups)".to_string();
+    c
+}
+
+/// Whether every `rm` flag is recognized-benign. `--no-preserve-root` (which enables
+/// `rm -rf /`) is intentionally absent → worst-case (§0). `--interactive[=WHEN]` and other
+/// `=value` longs are matched on their `--name`.
+fn rm_flags_all_benign(tokens: &[Token]) -> bool {
+    const SHORT: &[u8] = b"fiIrRdv";
+    const LONG: &[&str] = &[
+        "--force", "--interactive", "--recursive", "--dir", "--verbose", "--one-file-system",
+        "--preserve-root", "--help", "--version",
+    ];
+    for t in &tokens[1..] {
+        let t = t.as_str();
+        if t == "--" {
+            break;
+        }
+        if t == "-" || !t.starts_with('-') {
+            continue;
+        }
+        let ok = if t.starts_with("--") {
+            LONG.contains(&t.split('=').next().unwrap_or(t))
+        } else {
+            t.bytes().skip(1).all(|b| SHORT.contains(&b))
+        };
+        if !ok {
+            return false;
+        }
+    }
+    true
+}
+
 /// The positional (non-flag) operands of an invocation: skips `tokens[0]` (the command),
 /// flags, and — for flags `takes_value` reports true and that are not inline `--x=y` —
 /// their following value. `--` ends flag parsing; a bare `-` is a positional (stdin).
@@ -492,7 +557,7 @@ mod tests {
 
     #[test]
     fn an_unresearched_command_has_no_resolver() {
-        assert!(resolve(&toks(&["rm", "-rf", "/"])).is_none(), "unresearched → caller worst-cases");
+        assert!(resolve(&toks(&["ls", "-la"])).is_none(), "unresearched → caller worst-cases");
         assert!(resolve(&[]).is_none(), "empty tokens");
     }
 
@@ -657,6 +722,12 @@ mod tests {
         let mut grep_r = cat.clone();
         grep_r.scale = Scale::Unbounded;
         assert_eq!(one_cap(&["grep", "-r", "foo", "src/"]), grep_r, "grep -r foo src/");
+
+        // rm — destroy · worktree · effortful; no net/exec/secret.
+        let mut rm = Capability::new(Operation::Destroy);
+        rm.locus.local = LocalLocus::Worktree;
+        rm.reversibility = Reversibility::Effortful;
+        assert_eq!(one_cap(&["rm", "./x"]), rm, "rm ./x");
     }
 
     #[test]
@@ -675,6 +746,49 @@ mod tests {
             });
         let wc = Profile::of(vec![Capability::worst("test")]);
         assert!(!yolo.admits(&wc), "worst_case (locus=kernel) exceeds even a machine-capped allow");
+    }
+
+    #[test]
+    fn rm_destroys_and_is_denied_by_the_current_ladder() {
+        use crate::engine::bridge::project;
+        use crate::verdict::Verdict;
+        // no authored level admits `destroy`, so every rm currently projects to Denied
+        for cmd in [
+            vec!["rm", "./stale.log"],
+            vec!["rm", "-rf", "./node_modules"],
+            vec!["rm", "-rf", "/"],
+            vec!["rm", "a", "b", "c"],
+        ] {
+            let p = resolve(&toks(&cmd)).expect("rm resolves");
+            assert!(p.capabilities.iter().all(|c| c.operation == Operation::Destroy), "{cmd:?} destroys");
+            assert_eq!(project(&p), Verdict::Denied, "{cmd:?} denied (no destroy level yet)");
+        }
+    }
+
+    #[test]
+    fn rm_flag_and_operand_fail_closed() {
+        use crate::engine::bridge::project;
+        use crate::verdict::Verdict;
+        for cmd in [
+            vec!["rm", "--no-preserve-root", "-rf", "/"], // enables rm -rf / → must worst-case
+            vec!["rm", "-Z", "x"],                        // unknown flag
+            vec!["rm"],                                   // no operand (usage error)
+            vec!["./rm", "x"],                            // basename spoof
+        ] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("resolves")), Verdict::Denied, "{cmd:?}");
+        }
+    }
+
+    #[test]
+    fn rm_scale_and_force_semantics() {
+        let cap = |cmd: &[&str]| resolve(&toks(cmd)).expect("rm").capabilities[0].clone();
+        assert_eq!(cap(&["rm", "./x"]).scale, Scale::Single);
+        assert_eq!(cap(&["rm", "a", "b"]).scale, Scale::Bounded, "multiple operands");
+        assert_eq!(cap(&["rm", "*.log"]).scale, Scale::Bounded, "a glob");
+        assert_eq!(cap(&["rm", "-r", "./dir"]).scale, Scale::Unbounded, "recursive");
+        // -f only suppresses prompts — it does NOT raise reversibility for rm
+        assert_eq!(cap(&["rm", "./x"]).reversibility, Reversibility::Effortful);
+        assert_eq!(cap(&["rm", "-f", "./x"]).reversibility, Reversibility::Effortful, "-f is not a raiser");
     }
 
     #[test]
