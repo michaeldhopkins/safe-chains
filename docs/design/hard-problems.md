@@ -221,6 +221,38 @@ and HP-4. *Broader lead:* pursue **deeper harness integrations** to prototype th
 abstain→remember loop and a first-class session-grant channel — an easily-configurable
 harness like **`pi`** is a strong candidate to build this against.
 
+### HP-18 · Capability laundering — equivalent commands must gate equivalently — `status: partial`
+Each command is resolved independently, but many reach the *same* capability by different
+means: `cp ~/.ssh/id_rsa ./x`, `ln ~/.ssh/id_rsa ./x` (alias), `install`, `dd if= of=`,
+`rsync`, `tar cf ./x ~/.ssh` all bridge a home file's content into the tree. If one
+resolver under-gates an operand, it becomes a *bypass* of the others. The root cause is
+that a command's safety-relevant effect (which locus it reaches) can diverge from its
+surface verb — `ln` "creates a link," but the effect is a read-bridge to the target
+(caught in the `ln` resolver; annex `…-engine`). The general discipline: **every operand a
+command touches must contribute a capability at that operand's locus** — no operand
+silently dropped.
+*What a test must assert:* the STRICT property, not monotonicity. Locus-monotonicity ("a
+more-sensitive operand never loosens the verdict") does NOT catch an *ignored* operand,
+because ignoring leaves the verdict unchanged, and unchanged is "not looser". The guard
+must *force* denial: a hot path (`/etc/shadow`, `~/.ssh`, `$VAR`, `..`-escape) in any
+touched-path role must deny.
+*Leads, weakest→strongest:*
+1. **Family differential (shipped):** `transfer_commands_gate_both_operand_roles` sweeps a
+   `TRANSFER_CMDS` list × hot paths × {source, dest}. Adding `install`/`dd`/`rsync` = adding
+   to the list; a forgotten role fails loudly. Manual list; can't derive `ln ≡ cp`.
+2. **Structural — make it unrepresentable:** a shared `transfer_profile(sources, dest,
+   per_source, per_dest)` builder that every dual-operand resolver funnels through (they
+   already share `sources_and_dest` for *parsing*; share the *assembly* too). Every source
+   maps through `per_source`, the dest through `per_dest`, by construction — the hand-written
+   caps loop that dropped `ln`'s target can't recur. Backstop the irregular cases with (1).
+3. **Operand-role annotation + corpus sweep (general):** each resolver declares which
+   positional slots are touched paths and their role (read / write / bridge) — extending the
+   existing `positional_shape` TOML primitive so resolver *and* test share one source of
+   truth. A generic proptest then asserts the *conservation law* — ∀ touched path `p`, the
+   profile contains a cap at `classify_locus(p)` — across every resolver, catching a future
+   single-file reader that forgets its `observe`, not just transfers. Needs the annotation to
+   distinguish path slots from non-path ones (grep's pattern, head's count).
+
 ---
 
 ## Parked policy decisions
