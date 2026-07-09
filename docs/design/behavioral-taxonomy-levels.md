@@ -140,6 +140,13 @@ worktree` or unresolvable-locus→worst-case (v1.1 §3.3). `git config core.page
 (persistence=reconfiguring) and `npm install` (execution=network-sourced) sit
 *above* write-local — correctly, and unlike the old flat SafeWrite.
 
+The `operation` line is the write-local ↔ developer boundary: **create/mutate**
+(including an *overwrite* — `echo > config.json`, `cp ./a ./b`, whose reversibility
+is `recoverable` under the repo-recoverable assumption) is write-local, while
+**destroy** (`rm`, `find -delete`) waits for `developer`. The split is by operation,
+not reversibility — deletion is held one level higher as a matter of policy (golden-set
+§3, decision 2), even though a tracked file is itself recoverable.
+
 ### 3.4 `developer`  (the default level)
 Everything in `write-local`, relaxed on exactly the axes a dev-box trust model
 warrants:
