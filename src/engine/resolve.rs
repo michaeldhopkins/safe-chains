@@ -21,6 +21,7 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
         "grep" => resolve_grep,
         "rm" => resolve_rm,
         "mkdir" => resolve_mkdir,
+        "touch" => resolve_touch,
         _ => return None,
     };
     // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`,
@@ -415,6 +416,40 @@ fn resolve_mkdir(tokens: &[Token]) -> Profile {
                     Reversibility::Trivial,
                     PersistenceLevel::Data,
                     "mkdir creates a directory",
+                )
+            })
+            .collect(),
+    )
+}
+
+/// `touch FILE…` — creates empty files or bumps timestamps. It never destroys content, so
+/// reversibility is `trivial`. `operation = create` covers both the create and the
+/// mtime-mutate case (both admit at `write-local`, so the create/mutate ambiguity a static
+/// classifier can't resolve is verdict-irrelevant). `-r`/`-t`/`-d` take a value; the `-r`
+/// reference is only an mtime read (metadata, not content) and carries no read capability.
+fn resolve_touch(tokens: &[Token]) -> Profile {
+    const SHORT: &[u8] = b"Aacmh";
+    const LONG: &[&str] = &["--no-create", "--no-dereference", "--help", "--version"];
+    const VALUED: &[&str] = &["-r", "-t", "-d", "--reference", "--date", "--time"];
+    if !flags_recognized(tokens, SHORT, LONG, VALUED) {
+        return Profile::of(vec![Capability::worst("touch: unrecognized flag — worst-cased (§0)")]);
+    }
+    let files = positionals(tokens, |f| VALUED.contains(&f));
+    if files.is_empty() {
+        return Profile::of(vec![Capability::worst("touch: no operand — worst-cased (§0)")]);
+    }
+    let scale = breadth_scale(&files, false);
+    Profile::of(
+        files
+            .iter()
+            .map(|p| {
+                writes(
+                    Operation::Create,
+                    classify_locus(p),
+                    scale,
+                    Reversibility::Trivial,
+                    PersistenceLevel::Data,
+                    "touch creates a file or updates its timestamp",
                 )
             })
             .collect(),
@@ -844,6 +879,9 @@ mod tests {
         mkdir.reversibility = Reversibility::Trivial;
         mkdir.persistence.level = PersistenceLevel::Data;
         assert_eq!(one_cap(&["mkdir", "./build"]), mkdir, "mkdir ./build");
+
+        // touch — the same create · worktree · trivial · data shape as mkdir.
+        assert_eq!(one_cap(&["touch", "./new.txt"]), mkdir, "touch ./new.txt");
     }
 
     #[test]
@@ -861,6 +899,29 @@ mod tests {
         // fail-closed on an unknown flag / no operand
         assert_eq!(project(&resolve(&toks(&["mkdir", "-Q", "x"])).expect("mkdir")), Verdict::Denied, "unknown flag");
         assert_eq!(project(&resolve(&toks(&["mkdir"])).expect("mkdir")), Verdict::Denied, "no operand");
+    }
+
+    #[test]
+    fn touch_creates_in_the_worktree_and_skips_valued_flag_values() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+        for cmd in [
+            vec!["touch", "./new.txt"],
+            vec!["touch", "-c", "existing"],
+            vec!["touch", "-r", "ref.txt", "./out"], // -r consumes ref.txt as its value, not an operand
+            vec!["touch", "-d", "-1 day", "./out"],  // dash-leading value must not read as a flag
+        ] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("touch")), Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd:?}");
+        }
+        // the -r reference value is consumed, so `./out` (worktree) is the only operand —
+        // a home reference file does NOT drag the whole command to the home locus.
+        let p = resolve(&toks(&["touch", "-r", "~/.bashrc", "./out"])).expect("touch");
+        assert_eq!(p.capabilities.len(), 1, "only ./out is an operand");
+        assert_eq!(p.capabilities[0].locus.local, LocalLocus::Worktree);
+        // beyond the worktree, and fail-closed cases
+        assert_eq!(project(&resolve(&toks(&["touch", "/etc/x"])).expect("touch")), Verdict::Denied, "system path");
+        assert_eq!(project(&resolve(&toks(&["touch", "-Z", "x"])).expect("touch")), Verdict::Denied, "unknown flag");
+        assert_eq!(project(&resolve(&toks(&["touch"])).expect("touch")), Verdict::Denied, "no operand");
     }
 
     #[test]
