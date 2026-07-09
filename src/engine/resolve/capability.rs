@@ -105,12 +105,14 @@ pub(super) fn breadth_scale(operands: &[&str], recursive: bool) -> Scale {
     }
 }
 
-/// A `cp` source read: `observe` at the source locus, but with NO `local-process`
-/// disclosure — the bytes are copied to a file, not printed to the model.
-pub(super) fn copies_source(locus: LocalLocus, scale: Scale) -> Capability {
+/// A non-disclosing read: `observe` at `locus` with NO `local-process` disclosure — the
+/// content flows to a file or link, not to the model. Used by `cp` (its source) and `ln`
+/// (its target, whose content becomes reachable *through* the link — cp-by-reference), so
+/// a home/system operand denies on the read locus just as it would for `cat`.
+pub(super) fn observes(locus: LocalLocus, scale: Scale, because: &str) -> Capability {
     let mut c = Capability::new(Operation::Observe);
     c.locus.local = locus;
     c.scale = scale;
-    c.because = "cp reads the source file".to_string();
+    c.because = because.to_string();
     c
 }

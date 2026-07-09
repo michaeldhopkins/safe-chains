@@ -16,7 +16,7 @@ mod flags;
 mod locus;
 
 use capability::{
-    breadth_scale, copies_source, creates, destroys, overwrites, reads_content, reads_to_model,
+    breadth_scale, creates, destroys, observes, overwrites, reads_content, reads_to_model,
     relocates, worst,
 };
 use flags::Flags;
@@ -40,6 +40,7 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
         "touch" => resolve_touch,
         "cp" => resolve_cp,
         "mv" => resolve_mv,
+        "ln" => resolve_ln,
         _ => return None,
     };
     // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`,
@@ -420,7 +421,8 @@ fn resolve_cp(tokens: &[Token]) -> Profile {
     let no_clobber = has_flag(tokens, Some("-n"), Some("--no-clobber"));
     let scale = breadth_scale(&sources, recursive);
 
-    let mut caps: Vec<Capability> = sources.iter().map(|s| copies_source(classify_locus(s), scale)).collect();
+    let mut caps: Vec<Capability> =
+        sources.iter().map(|s| observes(classify_locus(s), scale, "cp reads the source file")).collect();
     caps.push(overwrites(classify_locus(dest), scale, no_clobber));
     Profile::of(caps)
 }
@@ -479,6 +481,44 @@ fn resolve_mv(tokens: &[Token]) -> Profile {
 
     let mut caps: Vec<Capability> = sources.iter().map(|s| relocates(classify_locus(s), scale)).collect();
     caps.push(overwrites(classify_locus(dest), scale, no_clobber));
+    Profile::of(caps)
+}
+
+/// `ln TARGET… LINK` — creates a link (hard, or symbolic with `-s`). It is **cp
+/// by reference**: the link makes the target's content reachable at the LINK's locus, so a
+/// link to a home/system target is the same bridge a `cp` of it would be. To stop `ln`
+/// being a `cp`-bypass, the target is gated on its own locus exactly like `cp`'s source
+/// (`observes`); `ln ~/.ssh/id_rsa ./x` denies just as `cp` does. The link itself is a
+/// `create`/overwrite at the LINK's locus — `trivial` (rm the link), or `recoverable` when
+/// `-f` clobbers an existing entry. Same `SRC… DEST` operand shape as `cp`/`mv`.
+///
+/// The target string is NOT followed (§0.2 scope): the bridge is caught only when we see
+/// the `ln`; a pre-existing symlink read is the documented HP-5 residual.
+fn resolve_ln(tokens: &[Token]) -> Profile {
+    const LN: Flags = Flags {
+        short: b"FLPTdfhinrsvw",
+        valued_short: b"St",
+        // `--backup` takes an optional arg (glued only) → boolean long, not valued_long.
+        long: &[
+            "--backup", "--directory", "--force", "--help", "--interactive", "--logical",
+            "--no-dereference", "--no-target-directory", "--physical", "--relative",
+            "--symbolic", "--verbose", "--version",
+        ],
+        valued_long: &["--suffix", "--target-directory"],
+        numeric_shorthand: false,
+    };
+    let (targets, link) = match sources_and_dest(&LN, tokens, "ln") {
+        Ok(sd) => sd,
+        Err(profile) => return profile,
+    };
+    let force = has_flag(tokens, Some("-f"), Some("--force"));
+    let scale = breadth_scale(&targets, false);
+
+    let mut caps: Vec<Capability> = targets
+        .iter()
+        .map(|t| observes(classify_locus(t), scale, "ln bridges the link to its target's locus (cp-by-reference)"))
+        .collect();
+    caps.push(overwrites(classify_locus(link), scale, !force));
     Profile::of(caps)
 }
 
@@ -765,6 +805,18 @@ mod tests {
         mv_dst.reversibility = Reversibility::Recoverable;
         mv_dst.persistence.level = PersistenceLevel::Data;
         assert_eq!(clear_because(&mv.capabilities[1]), mv_dst, "mv dest write");
+
+        // ln ./a ./b — target bridged (observe, no model disclosure) + link create (trivial,
+        // no -f). Same facet shapes as cp -n, the point being ln reuses `observes`.
+        let ln = resolve(&toks(&["ln", "./a", "./b"])).expect("ln");
+        let mut ln_tgt = Capability::new(Operation::Observe);
+        ln_tgt.locus.local = LocalLocus::Worktree;
+        assert_eq!(clear_because(&ln.capabilities[0]), ln_tgt, "ln target bridge");
+        let mut ln_link = Capability::new(Operation::Create);
+        ln_link.locus.local = LocalLocus::Worktree;
+        ln_link.reversibility = Reversibility::Trivial;
+        ln_link.persistence.level = PersistenceLevel::Data;
+        assert_eq!(clear_because(&ln.capabilities[1]), ln_link, "ln link create");
     }
 
     fn clear_because(c: &Capability) -> Capability {
@@ -874,6 +926,29 @@ mod tests {
         assert_eq!(t.capabilities.len(), 3, "2 sources + 1 dest");
         assert_eq!(project(&resolve(&toks(&["mv", "./only"])).expect("mv")), Verdict::Denied, "no dest");
         assert_eq!(project(&resolve(&toks(&["mv", "-Q", "./a", "./b"])).expect("mv")), Verdict::Denied, "unknown flag");
+    }
+
+    #[test]
+    fn ln_is_cp_by_reference_and_gates_the_target_locus() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+
+        // a worktree link (hard or symbolic) is target-read + link-create → write-local.
+        for cmd in [vec!["ln", "./a", "./b"], vec!["ln", "-s", "./target", "./link"]] {
+            let p = resolve(&toks(&cmd)).expect("ln");
+            assert_eq!(p.capabilities[0].operation, Operation::Observe, "target is a bridged read");
+            assert_eq!(project(&p), Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd:?}");
+        }
+        // the cp-bypass is closed: linking a home/system TARGET denies on the target locus,
+        // exactly as `cp` of it would (a link would otherwise alias the secret into the tree).
+        assert_eq!(project(&resolve(&toks(&["ln", "~/.ssh/id_rsa", "./x"])).expect("ln")), Verdict::Denied, "hard link to home");
+        assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/passwd", "./x"])).expect("ln")), Verdict::Denied, "symlink to system");
+        // writing the LINK outside the worktree denies on the link locus.
+        assert_eq!(project(&resolve(&toks(&["ln", "-s", "./a", "~/evil"])).expect("ln")), Verdict::Denied, "link into home");
+        // -t DIR, lone operand, unknown flag.
+        assert_eq!(resolve(&toks(&["ln", "-t", "./dir", "./a", "./b"])).expect("ln -t").capabilities.len(), 3);
+        assert_eq!(project(&resolve(&toks(&["ln", "./only"])).expect("ln")), Verdict::Denied, "no link name");
+        assert_eq!(project(&resolve(&toks(&["ln", "-Q", "./a", "./b"])).expect("ln")), Verdict::Denied, "unknown flag");
     }
 
     #[test]
