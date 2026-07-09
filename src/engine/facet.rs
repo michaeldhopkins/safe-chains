@@ -440,6 +440,49 @@ impl Capability {
     pub fn new(operation: Operation) -> Self {
         Self { operation, ..Self::default() }
     }
+
+    /// A maximally-severe capability — every axis at its worst term, so no well-formed
+    /// level admits it (`locus.local = kernel` alone denies it everywhere, v1.4 §4.3).
+    /// The resolver returns this when it cannot certify something (§0), keeping the
+    /// engine from being *looser* than a strict classifier on a form it doesn't
+    /// understand. Ordinal worsts are the ladder tops; categorical worsts are the
+    /// hazardous term (`Channel::Unknown`, `Principal::Cross`).
+    pub fn worst(because: impl Into<String>) -> Self {
+        Self {
+            operation: Operation::Execute,
+            locus: Locus {
+                local: LocalLocus::Kernel,
+                remote: RemoteReach::Arbitrary,
+                binding: RemoteBinding::Ambient,
+            },
+            scale: Scale::Unbounded,
+            authority: Authority::OtherUser,
+            isolation: Isolation::None,
+            reversibility: Reversibility::Irreversible,
+            persistence: Persistence {
+                level: PersistenceLevel::Installing,
+                trigger: Trigger { escape: TriggerEscape::Boot, kind: TriggerKind::None },
+            },
+            disclosure: Disclosure {
+                audience: DisclosureAudience::Public,
+                channel: Channel::Unknown,
+                principal: Principal::Cross,
+            },
+            secret: Secret {
+                level: SecretLevel::Transmits,
+                channel: Channel::Unknown,
+                principal: Principal::Cross,
+            },
+            network: Network {
+                direction: NetDirection::InboundListen,
+                destination: NetDestination::Arbitrary,
+                payload: NetPayload::SendsHostData,
+            },
+            execution: Execution { trust: ExecutionTrust::NetworkSourced, supply_chain: None },
+            cost: Cost::Quota,
+            because: because.into(),
+        }
+    }
 }
 
 /// The set of capabilities a resolved command line exhibits (v1.4 §2.8, §4.1). A

@@ -454,6 +454,32 @@ mod tests {
     }
 
     #[test]
+    fn scalar_facet_values_parse() {
+        // a set-valued facet given as a scalar (StringOrVec::One), not an array
+        let src = r#"
+            [level.x]
+            [[level.x.allow]]
+            operation = "observe"
+            locus = { binding = "pinned" }
+        "#;
+        let levels = build_level_set(src).expect("compiles");
+        let c = &level(&levels, "x").allow[0];
+        assert_eq!(c.operation, Some(vec![Operation::Observe]));
+        assert_eq!(c.remote_binding, Some(vec![RemoteBinding::Pinned]));
+    }
+
+    #[test]
+    fn a_mutual_extends_cycle_is_a_compile_error() {
+        let src = r#"
+            [level.a]
+            extends = "b"
+            [level.b]
+            extends = "a"
+        "#;
+        assert!(build_level_set(src).is_err());
+    }
+
+    #[test]
     fn missing_base_is_a_compile_error() {
         let src = r#"
             [level.child]
