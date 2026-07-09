@@ -63,7 +63,7 @@ level that trusts worktree content.
 ### Edit your own project files
 | command | inert | read-local | write-local | developer |
 |---|:--:|:--:|:--:|:--:|
-| `touch build/out` · `echo x > config.json` · `mkdir -p dist` | · | · | ✓ | ✓ |
+| `touch build/out` · `echo x > config.json` · `mkdir -p dist` · `cp ./a ./b` | · | · | ✓ | ✓ |
 | `git commit -m x` | · | · | ✓ | ✓ |
 | `gpg -e -r bob file` (writes an encrypted file) | · | · | ✓ | ✓ |
 
@@ -238,6 +238,13 @@ bare `cat X` sends content to the model (`local-process`), while `cat X | tool` 
 allowlist-able by audience. The `secret` facet itself is reserved for commands that
 *positively* extract credentials. Feeds Disclosure + Locus + the flow doctrine; logged
 as `hard-problems` HP-15.
+
+A command with two operands of different roles makes the point sharp: `cp SRC DEST`
+resolves to a read at `locus(SRC)` **and** a write at `locus(DEST)`, each gated
+independently. `cp ~/.ssh/id_rsa ./x` denies on the *source* locus (reading `user`) and
+`cp ./x ~/backdoor` denies on the *dest* locus (writing `user`) — no path is inspected
+for secret-ness, and even `cp ~/.ssh/id_rsa /dev/stdout` (exfil to the model) is caught
+by the source read locus regardless of where it writes.
 
 ## 6. Next
 
