@@ -171,13 +171,13 @@ mod tests {
         assert_eq!(apply_mode(Mode::Shadow, legacy, &cat), legacy, "shadow: legacy still decides");
 
         // an unresolvable command → New falls back to legacy
-        let unresolved = toks(&["ls", "-la"]);
+        let unresolved = toks(resolve::UNRESOLVED_CMD);
         assert_eq!(apply_mode(Mode::New, legacy, &unresolved), legacy, "no resolver → legacy");
     }
 
     #[test]
     fn engine_verdict_is_none_for_unresearched_commands() {
-        assert!(engine_verdict(&toks(&["ls", "-la"])).is_none());
+        assert!(engine_verdict(&toks(resolve::UNRESOLVED_CMD)).is_none());
         assert_eq!(engine_verdict(&toks(&["echo", "hi"])), Some(Verdict::Allowed(SafetyLevel::Inert)));
         assert_eq!(
             engine_verdict(&toks(&["cat", "./notes.md"])),

@@ -35,6 +35,13 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
     Some(resolver(tokens))
 }
 
+/// A command name with no resolver and no plausible future one — the stable stand-in for
+/// "unresearched" across engine tests. Using a real tool here is a trap: when `rm` gained
+/// a resolver, three tests that used `rm` as their unresearched example silently broke.
+/// A name that will never be a real tool can never be silently repurposed.
+#[cfg(test)]
+pub(crate) const UNRESOLVED_CMD: &[&str] = &["safe-chains-unresolved-sentinel"];
+
 /// Whether `arg0` is a trusted way to invoke a standard tool: a bare name (found via
 /// `$PATH`) or an absolute path under a standard system bin directory. A path elsewhere
 /// (`./x`, `/tmp/x`, `~/bin/x`) may be an impostor.
@@ -557,7 +564,7 @@ mod tests {
 
     #[test]
     fn an_unresearched_command_has_no_resolver() {
-        assert!(resolve(&toks(&["ls", "-la"])).is_none(), "unresearched → caller worst-cases");
+        assert!(resolve(&toks(UNRESOLVED_CMD)).is_none(), "unresearched → caller worst-cases");
         assert!(resolve(&[]).is_none(), "empty tokens");
     }
 
