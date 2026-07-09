@@ -22,6 +22,7 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
         "rm" => resolve_rm,
         "mkdir" => resolve_mkdir,
         "touch" => resolve_touch,
+        "cp" => resolve_cp,
         _ => return None,
     };
     // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`,
@@ -456,6 +457,90 @@ fn resolve_touch(tokens: &[Token]) -> Profile {
     )
 }
 
+/// `cp SRC… DEST` — the first resolver that both READS and WRITES, at potentially
+/// different loci. Each source is an `observe` at its own locus (content flows file→file,
+/// NOT to the model — no `local-process` disclosure); the destination is a `create` at its
+/// locus. Two things fall out of the locus model with no secret detection: `cp
+/// ~/.ssh/id_rsa ./x` denies because the SOURCE read is at `user` (above read-local), and
+/// `cp ./x ~/y` denies because the DEST write is at `user` (above write-local). The
+/// destination may silently overwrite existing content, so its reversibility is `effortful`
+/// (→ `developer`) — UNLESS `-n`/`--no-clobber` guarantees no overwrite, which drops it to
+/// `trivial` (→ `write-local`). That flag is the safe-form remediation, the same shape as
+/// `--ignore-scripts`.
+fn resolve_cp(tokens: &[Token]) -> Profile {
+    const SHORT: &[u8] = b"HLNPRXacdfhilnprsuvx";
+    const LONG: &[&str] = &[
+        "--archive", "--force", "--help", "--interactive", "--no-clobber", "--no-dereference",
+        "--no-target-directory", "--one-file-system", "--parents", "--recursive",
+        "--remove-destination", "--symbolic-link", "--update", "--verbose", "--version",
+    ];
+    const VALUED: &[&str] =
+        &["--backup", "--preserve", "--reflink", "--sparse", "--suffix", "--target-directory", "-t", "-S"];
+    if !flags_recognized(tokens, SHORT, LONG, VALUED) {
+        return Profile::of(vec![Capability::worst("cp: unrecognized flag — worst-cased (§0)")]);
+    }
+    let operands = positionals(tokens, |f| VALUED.contains(&f));
+    // With -t/--target-directory the dest is the flag's value and every operand is a
+    // source; otherwise the last operand is the dest and the rest are sources.
+    let (sources, dest): (&[&str], &str) = match target_directory(tokens) {
+        Some(d) => (operands.as_slice(), d),
+        None => match operands.split_last() {
+            Some((last, rest)) if !rest.is_empty() => (rest, *last),
+            _ => return Profile::of(vec![Capability::worst("cp: needs a source and a destination — worst-cased (§0)")]),
+        },
+    };
+    let recursive = has_flag(tokens, Some("-r"), Some("--recursive"))
+        || has_flag(tokens, Some("-R"), None)
+        || has_flag(tokens, Some("-a"), Some("--archive"));
+    let no_clobber = has_flag(tokens, Some("-n"), Some("--no-clobber"));
+    let scale = breadth_scale(sources, recursive);
+    let dest_rev = if no_clobber { Reversibility::Trivial } else { Reversibility::Effortful };
+
+    let mut caps: Vec<Capability> = sources.iter().map(|s| copies_source(classify_locus(s), scale)).collect();
+    caps.push(writes(
+        Operation::Create,
+        classify_locus(dest),
+        scale,
+        dest_rev,
+        PersistenceLevel::Data,
+        "cp writes the destination; may overwrite existing content unless --no-clobber",
+    ));
+    Profile::of(caps)
+}
+
+/// A `cp` source read: `observe` at the source locus, but with NO `local-process`
+/// disclosure — the bytes are copied to a file, not printed to the model.
+fn copies_source(locus: LocalLocus, scale: Scale) -> Capability {
+    let mut c = Capability::new(Operation::Observe);
+    c.locus.local = locus;
+    c.scale = scale;
+    c.because = "cp reads the source file".to_string();
+    c
+}
+
+/// The `-t DIR` / `--target-directory[=DIR]` value, if present — the explicit destination
+/// that makes every positional a source.
+fn target_directory(tokens: &[Token]) -> Option<&str> {
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        if t == "--" {
+            break;
+        }
+        if let Some(d) = t.strip_prefix("--target-directory=") {
+            return Some(d);
+        }
+        if t == "-t" || t == "--target-directory" {
+            return tokens.get(i + 1).map(Token::as_str);
+        }
+        if let Some(d) = t.strip_prefix("-t").filter(|d| !d.is_empty() && !t.starts_with("--")) {
+            return Some(d);
+        }
+        i += 1;
+    }
+    None
+}
+
 /// Whether every `rm` flag is recognized-benign. `--no-preserve-root` (which enables
 /// `rm -rf /`) is intentionally absent → worst-case (§0). `--interactive[=WHEN]` and other
 /// `=value` longs are matched on their `--name`.
@@ -882,6 +967,25 @@ mod tests {
 
         // touch — the same create · worktree · trivial · data shape as mkdir.
         assert_eq!(one_cap(&["touch", "./new.txt"]), mkdir, "touch ./new.txt");
+
+        // cp -n ./a ./b — a guaranteed-non-clobbering copy is TWO capabilities:
+        // a source read (observe, worktree, NO model disclosure) and a trivial dest create.
+        let cp = resolve(&toks(&["cp", "-n", "./a", "./b"])).expect("cp");
+        assert_eq!(cp.capabilities.len(), 2, "cp = source read + dest write");
+        let mut src = Capability::new(Operation::Observe);
+        src.locus.local = LocalLocus::Worktree; // disclosure.audience stays `none`: file→file
+        assert_eq!(clear_because(&cp.capabilities[0]), src, "cp source read");
+        let mut dst = Capability::new(Operation::Create);
+        dst.locus.local = LocalLocus::Worktree;
+        dst.reversibility = Reversibility::Trivial; // -n → cannot overwrite
+        dst.persistence.level = PersistenceLevel::Data;
+        assert_eq!(clear_because(&cp.capabilities[1]), dst, "cp -n dest write");
+    }
+
+    fn clear_because(c: &Capability) -> Capability {
+        let mut c = c.clone();
+        c.because = String::new();
+        c
     }
 
     #[test]
@@ -899,6 +1003,36 @@ mod tests {
         // fail-closed on an unknown flag / no operand
         assert_eq!(project(&resolve(&toks(&["mkdir", "-Q", "x"])).expect("mkdir")), Verdict::Denied, "unknown flag");
         assert_eq!(project(&resolve(&toks(&["mkdir"])).expect("mkdir")), Verdict::Denied, "no operand");
+    }
+
+    #[test]
+    fn cp_splits_source_and_dest_loci_and_overwrite_gates_the_level() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+
+        // plain cp may clobber the dest → effortful create → developer (SafeWrite, the
+        // default level). The -n form cannot clobber → trivial → write-local (also
+        // SafeWrite today, but a genuinely lower level).
+        assert_eq!(project(&resolve(&toks(&["cp", "./a", "./b"])).expect("cp")), Verdict::Allowed(SafetyLevel::SafeWrite), "cp ./a ./b");
+        assert_eq!(project(&resolve(&toks(&["cp", "-n", "./a", "./b"])).expect("cp")), Verdict::Allowed(SafetyLevel::SafeWrite), "cp -n ./a ./b");
+
+        // reading a home/system SOURCE is denied by the source locus — no secret detector,
+        // just the read locus (cp can't smuggle ~/.ssh/id_rsa into the worktree).
+        assert_eq!(project(&resolve(&toks(&["cp", "~/.ssh/id_rsa", "./x"])).expect("cp")), Verdict::Denied, "home source");
+        assert_eq!(project(&resolve(&toks(&["cp", "/etc/shadow", "./x"])).expect("cp")), Verdict::Denied, "system source");
+        // writing a home/system DEST is denied by the dest locus.
+        assert_eq!(project(&resolve(&toks(&["cp", "./x", "~/backdoor"])).expect("cp")), Verdict::Denied, "home dest");
+        assert_eq!(project(&resolve(&toks(&["cp", "./x", "/etc/cron.d/x"])).expect("cp")), Verdict::Denied, "system dest");
+
+        // -t DIR makes every positional a source; the dir is the dest.
+        let t = resolve(&toks(&["cp", "-t", "./dest", "./a", "./b"])).expect("cp -t");
+        assert_eq!(t.capabilities.len(), 3, "2 sources + 1 dest");
+        assert_eq!(project(&t), Verdict::Allowed(SafetyLevel::SafeWrite), "cp -t ./dest ./a ./b");
+
+        // recursion raises scale to unbounded; a lone operand / unknown flag worst-cases.
+        assert_eq!(resolve(&toks(&["cp", "-r", "./a", "./b"])).expect("cp").capabilities[0].scale, Scale::Unbounded);
+        assert_eq!(project(&resolve(&toks(&["cp", "./only"])).expect("cp")), Verdict::Denied, "no dest");
+        assert_eq!(project(&resolve(&toks(&["cp", "-Q", "./a", "./b"])).expect("cp")), Verdict::Denied, "unknown flag");
     }
 
     #[test]

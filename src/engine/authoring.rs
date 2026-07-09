@@ -423,6 +423,18 @@ mod tests {
         assert!(!developer.admits(&destroy_at(LocalLocus::WorktreeTrusted)), "rm -rf .git");
         assert!(!developer.admits(&destroy_at(LocalLocus::User)), "rm -rf ~");
         assert!(!developer.admits(&destroy_at(LocalLocus::Machine)), "rm -rf /");
+
+        // the carve-in is not destroy-specific: a clobbering create (cp ./a ./b, effortful)
+        // admits at developer too, but not at write-local (discovered building cp).
+        let clobber = {
+            let mut c = Capability::new(Operation::Create);
+            c.locus.local = LocalLocus::Worktree;
+            c.reversibility = Reversibility::Effortful;
+            c.persistence.level = PersistenceLevel::Data;
+            Profile::of(vec![c])
+        };
+        assert!(!write_local.admits(&clobber), "clobbering cp waits for developer");
+        assert!(developer.admits(&clobber), "cp ./a ./b");
         // developer still inherits every write-local grant
         let touch = {
             let mut c = Capability::new(Operation::Create);
