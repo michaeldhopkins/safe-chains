@@ -26,15 +26,38 @@ pub enum Mode {
     New,
 }
 
-static MODE: LazyLock<Mode> = LazyLock::new(|| match std::env::var("SAFE_CHAINS_ENGINE") {
-    Ok(v) if v == "shadow" => Mode::Shadow,
-    Ok(v) if v == "new" => Mode::New,
-    _ => Mode::Legacy,
-});
+static MODE: LazyLock<Mode> =
+    LazyLock::new(|| parse_mode(std::env::var("SAFE_CHAINS_ENGINE").ok().as_deref()));
+
+fn parse_mode(value: Option<&str>) -> Mode {
+    match value {
+        Some("shadow") => Mode::Shadow,
+        Some("new") => Mode::New,
+        _ => Mode::Legacy,
+    }
+}
 
 /// The active engine mode (read once from `SAFE_CHAINS_ENGINE`).
 pub fn mode() -> Mode {
     *MODE
+}
+
+/// Combine the legacy verdict with the engine's, per mode — the seam `cst::check`'s
+/// `leaf_verdict` calls. `legacy` is the classifier's verdict for the same tokens.
+pub fn apply_mode(mode: Mode, legacy: Verdict, tokens: &[Token]) -> Verdict {
+    match mode {
+        Mode::Legacy => legacy,
+        Mode::New => engine_verdict(tokens).unwrap_or(legacy),
+        Mode::Shadow => {
+            if let Some(engine) = engine_verdict(tokens)
+                && engine != legacy
+            {
+                let name = tokens.first().map_or("", |t| t.as_str());
+                eprintln!("safe-chains[shadow]: `{name}` legacy={legacy} engine={engine}");
+            }
+            legacy
+        }
+    }
 }
 
 /// The engine's verdict for a command whose resolver exists, or `None` if it has none
@@ -101,6 +124,43 @@ mod tests {
             c
         }]);
         assert_eq!(project(&home), Verdict::Denied);
+
+        // touch build/out — create·worktree·data → write-local → SafeWrite (the
+        // to_legacy `_ => SafeWrite` arm; no resolver emits this yet)
+        let write = Profile::of(vec![{
+            let mut c = Capability::new(Operation::Create);
+            c.locus.local = LocalLocus::Worktree;
+            c.scale = Scale::Bounded;
+            c.reversibility = Reversibility::Recoverable;
+            c.persistence.level = PersistenceLevel::Data;
+            c
+        }]);
+        assert_eq!(project(&write), Verdict::Allowed(SafetyLevel::SafeWrite));
+    }
+
+    #[test]
+    fn parse_mode_reads_the_selector() {
+        assert_eq!(parse_mode(Some("shadow")), Mode::Shadow);
+        assert_eq!(parse_mode(Some("new")), Mode::New);
+        assert_eq!(parse_mode(None), Mode::Legacy);
+        assert_eq!(parse_mode(Some("garbage")), Mode::Legacy);
+        assert_eq!(parse_mode(Some("")), Mode::Legacy);
+    }
+
+    #[test]
+    fn apply_mode_dispatches_the_leaf_by_mode() {
+        let cat = toks(&["cat", "./notes.md"]);
+        let legacy = Verdict::Allowed(SafetyLevel::Inert); // legacy classifies cat as inert
+        let engine = engine_verdict(&cat).expect("cat resolves"); // read-local → SafeRead
+        assert_ne!(engine, legacy, "cat: the engine tightens inert → read-local");
+
+        assert_eq!(apply_mode(Mode::Legacy, legacy, &cat), legacy, "legacy authoritative");
+        assert_eq!(apply_mode(Mode::New, legacy, &cat), engine, "new: engine authoritative");
+        assert_eq!(apply_mode(Mode::Shadow, legacy, &cat), legacy, "shadow: legacy still decides");
+
+        // an unresolvable command → New falls back to legacy
+        let rm = toks(&["rm", "-rf", "/"]);
+        assert_eq!(apply_mode(Mode::New, legacy, &rm), legacy, "no resolver → legacy");
     }
 
     #[test]
@@ -164,6 +224,7 @@ mod tests {
     /// and becomes TOML-derived when commands carry profile data (§7).
     #[test]
     fn the_engine_corpus_gate() {
+        let mut exercised = 0usize;
         for (name, safe, denied) in crate::registry::corpus_examples() {
             for ex in safe.iter().chain(denied.iter()) {
                 if ex.contains(['|', '>', '<', '&', ';', '$', '`', '(', '\n']) {
@@ -171,6 +232,7 @@ mod tests {
                 }
                 let t = toks(&ex.split_whitespace().collect::<Vec<_>>());
                 let Some(profile) = crate::engine::resolve::resolve(&t) else { continue };
+                exercised += 1;
 
                 for c in &profile.capabilities {
                     assert!(!c.because.is_empty(), "unjustified capability for `{ex}` ({name})");
@@ -184,5 +246,9 @@ mod tests {
                 );
             }
         }
+        // non-vacuity: the gate must actually resolve engine examples, or it is a green
+        // test proving nothing (the trap that hid its own emptiness). Every resolvable
+        // command must contribute at least one example.
+        assert!(exercised >= 5, "corpus gate exercised only {exercised} engine resolutions — vacuous?");
     }
 }

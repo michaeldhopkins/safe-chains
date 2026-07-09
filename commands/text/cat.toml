@@ -10,3 +10,4 @@ standalone = [
     "--help", "--number", "--number-nonblank", "--show-all", "--show-ends",
     "--show-nonprinting", "--show-tabs", "--squeeze-blank", "--version",
 ]
+examples_safe = ["cat README.md", "cat src/main.rs", "cat /etc/hostname"]
