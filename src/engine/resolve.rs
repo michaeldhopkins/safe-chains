@@ -7,8 +7,8 @@
 //! `is_safe_write_target` branch order (`src/cst/check.rs`, a 2-bucket boolean) into
 //! the full [`LocalLocus`] ladder (v1.4 §2.2).
 
-use super::facet::{Capability, DisclosureAudience, LocalLocus, Operation, Profile};
-use crate::parse::Token;
+use super::facet::{Capability, DisclosureAudience, LocalLocus, Operation, Profile, Scale};
+use crate::parse::{Token, has_flag};
 
 /// Resolve a command's leaf tokens to its behavior profile, or `None` if the command
 /// has no resolver yet (the caller then worst-cases / falls back to the legacy
@@ -17,6 +17,8 @@ use crate::parse::Token;
 pub fn resolve(tokens: &[Token]) -> Option<Profile> {
     match tokens.first()?.command_name() {
         "echo" => Some(resolve_echo(tokens)),
+        "cat" => Some(resolve_cat(tokens)),
+        "grep" => Some(resolve_grep(tokens)),
         _ => None,
     }
 }
@@ -32,6 +34,153 @@ fn resolve_echo(_tokens: &[Token]) -> Profile {
     c.disclosure.audience = DisclosureAudience::LocalProcess; // its output reaches the model
     c.because = "echo prints its arguments to stdout; no fs/net/exec/secret".to_string();
     Profile::of(vec![c])
+}
+
+/// `cat FILE…` — reads each file's content to stdout (→ the model). Positive
+/// certification (§0): `operation = observe`, `secret = none` (a byte-reader extracts no
+/// credential — the sensitivity of the *content* is carried by `locus` + `disclosure`,
+/// not by detecting a secret path), no network/execution. `locus` per file is
+/// `classify_locus` (fail-closed: `$VAR`/`..` → `machine`). `cat`'s flags (`-n`/`-A`/…)
+/// only format output and take no values.
+fn resolve_cat(tokens: &[Token]) -> Profile {
+    let files = positionals(tokens, |_| false);
+    Profile::of(reads_to_model(&files, Scale::Single))
+}
+
+/// One `observe · content-to-model` capability per path (empty list = reads stdin). A
+/// `-` operand is stdin (process-scoped); every other path is placed by `classify_locus`.
+fn reads_to_model(paths: &[&str], scale: Scale) -> Vec<Capability> {
+    if paths.is_empty() {
+        return vec![reads_content(LocalLocus::Process, scale, "reads stdin")];
+    }
+    paths
+        .iter()
+        .map(|p| {
+            if *p == "-" {
+                reads_content(LocalLocus::Process, scale, "reads stdin (-)")
+            } else {
+                reads_content(classify_locus(p), scale, "reads file content to the model")
+            }
+        })
+        .collect()
+}
+
+fn reads_content(locus: LocalLocus, scale: Scale, because: &str) -> Capability {
+    let mut c = Capability::new(Operation::Observe);
+    c.locus.local = locus;
+    c.scale = scale;
+    c.disclosure.audience = DisclosureAudience::LocalProcess; // content → the model
+    c.because = because.to_string();
+    c
+}
+
+/// `grep PATTERN FILE…` — searches files and prints matching lines (file content) to the
+/// model. Like `cat` for its file operands, with three grep-specific twists: the first
+/// positional is the *pattern* (not a file) unless `-e`/`-f` supplied it; `-f FILE` names
+/// a pattern file grep also *reads*; and `-r`/`-R` searches recursively (`scale =
+/// unbounded`). Same positive certification as `cat` (observe, `secret = none`, no
+/// net/exec); `locus` per read is `classify_locus`.
+fn resolve_grep(tokens: &[Token]) -> Profile {
+    let recursive = has_flag(tokens, Some("-r"), Some("--recursive"))
+        || has_flag(tokens, Some("-R"), None);
+    let scale = if recursive { Scale::Unbounded } else { Scale::Single };
+
+    let mut files = Vec::new(); // positional file operands
+    let mut pattern_files = Vec::new(); // -f/--file pattern files grep reads
+    let mut pattern_from_flag = false;
+    let mut flags_done = false;
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        let next = tokens.get(i + 1).map(Token::as_str);
+        if !flags_done && t == "--" {
+            flags_done = true;
+            i += 1;
+        } else if flags_done || !t.starts_with('-') || t == "-" {
+            files.push(t);
+            i += 1;
+        } else if t.starts_with("--") {
+            if let Some(v) = t.strip_prefix("--file=") {
+                pattern_from_flag = true;
+                pattern_files.push(v);
+                i += 1;
+            } else if t == "--file" {
+                pattern_from_flag = true;
+                pattern_files.extend(next);
+                i += 2;
+            } else if t == "--regexp" {
+                pattern_from_flag = true;
+                i += 2;
+            } else {
+                // --regexp=… (pattern) or any other long flag; inline values stay in-token
+                pattern_from_flag |= t.starts_with("--regexp=");
+                i += 1;
+            }
+        } else {
+            let (pattern_file, from_flag, consumes_next) = grep_short_cluster(t, next);
+            pattern_files.extend(pattern_file);
+            pattern_from_flag |= from_flag;
+            i += if consumes_next { 2 } else { 1 };
+        }
+    }
+
+    if !pattern_from_flag && !files.is_empty() {
+        files.remove(0); // the first positional is the PATTERN, not a file
+    }
+    if recursive && files.is_empty() {
+        files.push("."); // grep -r with no path searches the cwd
+    }
+
+    let mut caps: Vec<Capability> = pattern_files
+        .iter()
+        .map(|f| reads_content(classify_locus(f), Scale::Single, "reads a grep -f pattern file"))
+        .collect();
+    caps.extend(reads_to_model(&files, scale));
+    Profile::of(caps)
+}
+
+/// Parse a grep short-option cluster (e.g. `-ifpatterns`), honoring GNU semantics that a
+/// value-taking short consumes the rest of its cluster (glued) or the next token.
+/// Returns `(pattern_file, pattern_from_flag, consumes_next_token)`:
+/// `-f` → a pattern *file* read; `-e` → a pattern *string*; `-m`/`-A`/`-B`/`-C`/`-d` → a
+/// count/action value to skip; other chars are standalone.
+fn grep_short_cluster<'a>(cluster: &'a str, next: Option<&'a str>) -> (Option<&'a str>, bool, bool) {
+    let bytes = cluster.as_bytes();
+    let mut k = 1;
+    while k < bytes.len() {
+        let glued = &cluster[k + 1..];
+        let has_glued = !glued.is_empty();
+        match bytes[k] {
+            b'f' => return (if has_glued { Some(glued) } else { next }, true, !has_glued),
+            b'e' => return (None, true, !has_glued),
+            b'm' | b'A' | b'B' | b'C' | b'd' => return (None, false, !has_glued),
+            _ => k += 1,
+        }
+    }
+    (None, false, false)
+}
+
+/// The positional (non-flag) operands of an invocation: skips `tokens[0]` (the command),
+/// flags, and — for flags `takes_value` reports true and that are not inline `--x=y` —
+/// their following value. `--` ends flag parsing; a bare `-` is a positional (stdin).
+fn positionals(tokens: &[Token], takes_value: impl Fn(&str) -> bool) -> Vec<&str> {
+    let mut out = Vec::new();
+    let mut flags_done = false;
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        if !flags_done && t == "--" {
+            flags_done = true;
+        } else if !flags_done && t.starts_with('-') && t != "-" {
+            if takes_value(t) && !t.contains('=') {
+                i += 1; // also skip this flag's value
+            }
+        } else {
+            out.push(t);
+        }
+        i += 1;
+    }
+    out
 }
 
 /// The filesystem rung a path reaches (v1.4 §2.2). A value that cannot be pinned —
@@ -187,11 +336,19 @@ mod tests {
         parts.iter().map(|p| Token::from_test(p)).collect()
     }
 
-    fn inert() -> &'static crate::engine::level::Level {
+    fn level(name: &str) -> &'static crate::engine::level::Level {
         crate::engine::authoring::default_levels()
             .iter()
-            .find(|l| l.name == "inert")
-            .expect("inert level exists")
+            .find(|l| l.name == name)
+            .expect("level exists")
+    }
+
+    fn inert() -> &'static crate::engine::level::Level {
+        level("inert")
+    }
+
+    fn read_local() -> &'static crate::engine::level::Level {
+        level("read-local")
     }
 
     #[test]
@@ -219,6 +376,104 @@ mod tests {
     fn an_unresearched_command_has_no_resolver() {
         assert!(resolve(&toks(&["rm", "-rf", "/"])).is_none(), "unresearched → caller worst-cases");
         assert!(resolve(&[]).is_none(), "empty tokens");
+    }
+
+    #[test]
+    fn cat_of_a_worktree_file_is_read_local() {
+        let p = resolve(&toks(&["cat", "./notes.md"])).expect("cat");
+        assert!(read_local().admits(&p), "cat ./notes.md");
+        assert!(!inert().admits(&p), "reading a real file is above inert");
+    }
+
+    #[test]
+    fn cat_beyond_the_worktree_is_denied_by_locus() {
+        for path in ["~/.ssh/id_rsa", "/etc/hosts", "$SECRET", "../outside"] {
+            let p = resolve(&toks(&["cat", path])).expect("cat");
+            assert!(!read_local().admits(&p), "cat {path} is above read-local by locus");
+        }
+    }
+
+    #[test]
+    fn cat_stdin_is_process_scoped() {
+        assert!(inert().admits(&resolve(&toks(&["cat"])).expect("cat")), "no operand → stdin");
+        assert!(inert().admits(&resolve(&toks(&["cat", "-"])).expect("cat -")), "- → stdin");
+    }
+
+    #[test]
+    fn cat_reads_every_file_operand_and_one_home_read_sinks_it() {
+        let p = resolve(&toks(&["cat", "-n", "a.txt", "src/b.rs"])).expect("cat");
+        assert_eq!(p.capabilities.len(), 2, "-n is a flag; two files");
+        assert!(read_local().admits(&p), "both worktree");
+
+        let mixed = resolve(&toks(&["cat", "a.txt", "~/.ssh/id_rsa"])).expect("cat");
+        assert!(!read_local().admits(&mixed), "one home read sinks the whole profile");
+    }
+
+    #[test]
+    fn cat_double_dash_treats_the_rest_as_files() {
+        let p = resolve(&toks(&["cat", "--", "-n"])).expect("cat");
+        assert_eq!(p.capabilities.len(), 1, "-n after -- is a filename");
+        assert!(read_local().admits(&p));
+    }
+
+    #[test]
+    fn grep_reads_its_files_not_the_pattern() {
+        let p = resolve(&toks(&["grep", "foo", "file.txt"])).expect("grep");
+        assert_eq!(p.capabilities.len(), 1, "the pattern is not a file");
+        assert!(read_local().admits(&p));
+    }
+
+    #[test]
+    fn grep_beyond_the_worktree_is_denied() {
+        for args in [
+            vec!["grep", "foo", "~/.ssh/config"],
+            vec!["grep", "-r", "foo", "~"],
+            vec!["grep", "foo", "$DIR"],
+        ] {
+            let p = resolve(&toks(&args)).expect("grep");
+            assert!(!read_local().admits(&p), "{args:?}");
+        }
+    }
+
+    #[test]
+    fn grep_recursive_is_unbounded_and_defaults_to_cwd() {
+        let p = resolve(&toks(&["grep", "-r", "foo", "src/"])).expect("grep");
+        assert!(p.capabilities.iter().all(|c| c.scale == Scale::Unbounded), "-r → unbounded");
+        assert!(read_local().admits(&p), "recursive worktree search");
+
+        let cwd = resolve(&toks(&["grep", "-r", "foo"])).expect("grep");
+        assert!(cwd.capabilities.iter().all(|c| c.locus.local == LocalLocus::Worktree), "cwd, not stdin");
+        assert!(read_local().admits(&cwd));
+    }
+
+    #[test]
+    fn grep_e_and_f_supply_the_pattern_so_positionals_are_files() {
+        // -e: pattern is the flag's value; file.txt is the only file
+        let e = resolve(&toks(&["grep", "-e", "foo", "file.txt"])).expect("grep -e");
+        assert_eq!(e.capabilities.len(), 1);
+        assert!(read_local().admits(&e));
+
+        // -f: the pattern FILE is itself a read
+        let f = resolve(&toks(&["grep", "-f", "patterns.txt", "file.txt"])).expect("grep -f");
+        assert_eq!(f.capabilities.len(), 2, "patterns.txt + file.txt");
+        assert!(read_local().admits(&f));
+
+        let home = resolve(&toks(&["grep", "-f", "~/.secret-patterns", "file.txt"])).expect("grep -f");
+        assert!(!read_local().admits(&home), "a home pattern file is denied by locus");
+
+        // glued short value: -fpatterns.txt and -ifpatterns.txt both name a pattern file
+        let glued = resolve(&toks(&["grep", "-fpatterns.txt", "file.txt"])).expect("grep -f glued");
+        assert_eq!(glued.capabilities.len(), 2, "glued -f value is still a read");
+        let glued_home = resolve(&toks(&["grep", "-if~/.secrets", "x"])).expect("grep -if glued");
+        assert!(!read_local().admits(&glued_home), "glued home pattern file denied by locus");
+    }
+
+    #[test]
+    fn grep_stdin_and_standalone_flags() {
+        assert!(inert().admits(&resolve(&toks(&["grep", "foo"])).expect("grep")), "no file → stdin");
+        let p = resolve(&toks(&["grep", "-i", "-n", "foo", "file.txt"])).expect("grep");
+        assert_eq!(p.capabilities.len(), 1, "-i -n standalone; foo pattern; file.txt file");
+        assert!(read_local().admits(&p));
     }
 
     use proptest::prelude::*;
