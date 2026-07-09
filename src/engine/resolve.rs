@@ -17,7 +17,7 @@ mod locus;
 
 use capability::{
     breadth_scale, creates, destroys, observes, overwrites, reads_content, reads_to_model,
-    relocates, worst,
+    relocates, transfer_profile, worst,
 };
 use flags::Flags;
 use locus::classify_locus;
@@ -420,11 +420,13 @@ fn resolve_cp(tokens: &[Token]) -> Profile {
         || has_flag(tokens, Some("-a"), Some("--archive"));
     let no_clobber = has_flag(tokens, Some("-n"), Some("--no-clobber"));
     let scale = breadth_scale(&sources, recursive);
-
-    let mut caps: Vec<Capability> =
-        sources.iter().map(|s| observes(classify_locus(s), scale, "cp reads the source file")).collect();
-    caps.push(overwrites(classify_locus(dest), scale, no_clobber));
-    Profile::of(caps)
+    transfer_profile(
+        &sources,
+        dest,
+        scale,
+        |loc, sc| observes(loc, sc, "cp reads the source file"),
+        |loc, sc| overwrites(loc, sc, no_clobber),
+    )
 }
 
 /// Split a `SRC… DEST` invocation (`cp`/`mv`) into its sources and destination.
@@ -478,10 +480,7 @@ fn resolve_mv(tokens: &[Token]) -> Profile {
     };
     let no_clobber = has_flag(tokens, Some("-n"), Some("--no-clobber"));
     let scale = breadth_scale(&sources, false); // mv has no recursion flag; a dir move is one rename
-
-    let mut caps: Vec<Capability> = sources.iter().map(|s| relocates(classify_locus(s), scale)).collect();
-    caps.push(overwrites(classify_locus(dest), scale, no_clobber));
-    Profile::of(caps)
+    transfer_profile(&sources, dest, scale, relocates, |loc, sc| overwrites(loc, sc, no_clobber))
 }
 
 /// `ln TARGET… LINK` — creates a link (hard, or symbolic with `-s`). It is **cp
@@ -513,13 +512,13 @@ fn resolve_ln(tokens: &[Token]) -> Profile {
     };
     let force = has_flag(tokens, Some("-f"), Some("--force"));
     let scale = breadth_scale(&targets, false);
-
-    let mut caps: Vec<Capability> = targets
-        .iter()
-        .map(|t| observes(classify_locus(t), scale, "ln bridges the link to its target's locus (cp-by-reference)"))
-        .collect();
-    caps.push(overwrites(classify_locus(link), scale, !force));
-    Profile::of(caps)
+    transfer_profile(
+        &targets,
+        link,
+        scale,
+        |loc, sc| observes(loc, sc, "ln bridges the link to its target's locus (cp-by-reference)"),
+        |loc, sc| overwrites(loc, sc, !force),
+    )
 }
 
 #[cfg(test)]

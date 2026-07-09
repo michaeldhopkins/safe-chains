@@ -116,3 +116,23 @@ pub(super) fn observes(locus: LocalLocus, scale: Scale, because: &str) -> Capabi
     c.because = because.to_string();
     c
 }
+
+/// The profile of a content-transfer command (`cp`/`mv`/`ln`): one capability per SOURCE
+/// operand plus one for the DEST, each gated at its own locus. Assembling it here — rather
+/// than by hand in each resolver — makes a *dropped operand role* unrepresentable: every
+/// source flows through `per_source` and the dest through `per_dest`, by construction, so
+/// the omission that made `ln` a `cp`-bypass (HP-18) cannot recur. Callers close over any
+/// extra parameters (the `because` string, the `--no-clobber` flag) to fit the uniform
+/// `Fn(locus, scale) -> Capability` shape.
+pub(super) fn transfer_profile(
+    sources: &[&str],
+    dest: &str,
+    scale: Scale,
+    per_source: impl Fn(LocalLocus, Scale) -> Capability,
+    per_dest: impl Fn(LocalLocus, Scale) -> Capability,
+) -> Profile {
+    let mut caps: Vec<Capability> =
+        sources.iter().map(|s| per_source(classify_locus(s), scale)).collect();
+    caps.push(per_dest(classify_locus(dest), scale));
+    Profile::of(caps)
+}
