@@ -222,6 +222,20 @@ mod tests {
         }
     }
 
+    /// The never-looser invariant above holds over the commands legacy *allowlisted*. The
+    /// `developer` level is the deliberate exception: it admits well-modeled operations the
+    /// hand-built allowlist could only DENY — e.g. deleting your own project files. This
+    /// test pins that divergence as intended, not a regression, and as the reason `new`
+    /// mode is opt-in (default `legacy` keeps the conservative behavior; §4.5).
+    #[test]
+    fn developer_intentionally_admits_worktree_destroy_that_legacy_denies() {
+        let rm = "rm -rf ./node_modules";
+        assert_eq!(crate::command_verdict(rm), Verdict::Denied, "legacy allowlist denies rm deletion");
+        let engine = engine_verdict(&toks(&rm.split_whitespace().collect::<Vec<_>>())).expect("rm resolves");
+        assert_eq!(engine, Verdict::Allowed(SafetyLevel::SafeWrite), "developer admits it — intended");
+        assert!(!not_looser(Verdict::Denied, engine), "and it IS looser than legacy, by design");
+    }
+
     /// The data-driven corpus gate (the systematic test C1 slipped past): run **every**
     /// command's real `examples_safe`/`examples_denied` through the engine and assert,
     /// per resolvable example, the dimensions that hold today —
