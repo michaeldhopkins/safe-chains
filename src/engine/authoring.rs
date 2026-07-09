@@ -347,7 +347,7 @@ mod tests {
     fn the_default_ladder_compiles() {
         let levels = default_levels();
         let names: Vec<&str> = levels.iter().map(|l| l.name.as_str()).collect();
-        assert_eq!(names, ["inert", "read-local", "write-local"]);
+        assert_eq!(names, ["inert", "read-local", "write-local", "developer"]);
     }
 
     #[test]
@@ -402,6 +402,34 @@ mod tests {
             Profile::of(vec![c])
         };
         assert!(!write_local.admits(&install), "installing is above write-local");
+    }
+
+    #[test]
+    fn developer_deletes_within_the_worktree_but_not_beyond_it() {
+        let levels = default_levels();
+        let (write_local, developer) = (level(levels, "write-local"), level(levels, "developer"));
+
+        let destroy_at = |local| {
+            let mut c = Capability::new(Operation::Destroy);
+            c.locus.local = local;
+            c.scale = Scale::Unbounded; // rm -rf
+            c.reversibility = Reversibility::Effortful;
+            Profile::of(vec![c])
+        };
+        // recursive/effortful worktree delete admits at developer, but not at write-local
+        assert!(!write_local.admits(&destroy_at(LocalLocus::Worktree)), "rm waits for developer");
+        assert!(developer.admits(&destroy_at(LocalLocus::Worktree)), "rm -rf ./node_modules");
+        // .git/ (worktree-trusted), home, and system deletion stay above developer
+        assert!(!developer.admits(&destroy_at(LocalLocus::WorktreeTrusted)), "rm -rf .git");
+        assert!(!developer.admits(&destroy_at(LocalLocus::User)), "rm -rf ~");
+        assert!(!developer.admits(&destroy_at(LocalLocus::Machine)), "rm -rf /");
+        // developer still inherits every write-local grant
+        let touch = {
+            let mut c = Capability::new(Operation::Create);
+            c.locus.local = LocalLocus::Worktree;
+            Profile::of(vec![c])
+        };
+        assert!(developer.admits(&touch), "developer ⊇ write-local");
     }
 
     #[test]

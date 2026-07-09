@@ -59,3 +59,26 @@ secret = { level = "<= uses-ambient" }
 network = { direction = "none" }
 execution = "<= caller-inline"
 authority = "user"
+
+[level.developer]
+# The everyday dev-box default. So far only its DESTROY carve-in is authored: the
+# supply-chain build/install clause and the outbound-fetch clause land with their
+# resolvers (npm, cargo, git) in later commits, when they can be exercised. The
+# install clause, when it lands, will require BOTH a pinned source AND install
+# scripts disabled (tighter than the spec's floating+build-script default — a
+# deliberate nudge toward reproducible, script-free installs; see levels §3.4).
+extends = "write-local"
+# Delete your own project files: rm ./f, rm -rf ./node_modules. Recursive and
+# effortful-to-recover deletion is admitted, but only WITHIN the worktree (not
+# .git/ or home/system, which sit at worktree-trusted+ and are denied by locus).
+[[level.developer.allow]]
+operation = ["destroy"]
+locus = { local = "<= worktree", remote = "none" }
+scale = "<= unbounded"
+reversibility = "<= effortful"
+persistence = { level = "<= data" }
+disclosure = { audience = "<= local-process" }
+secret = { level = "<= uses-ambient" }
+network = { direction = "none" }
+execution = "<= self"
+authority = "user"

@@ -756,19 +756,24 @@ mod tests {
     }
 
     #[test]
-    fn rm_destroys_and_is_denied_by_the_current_ladder() {
+    fn rm_within_the_worktree_projects_to_developer_but_beyond_it_denies() {
         use crate::engine::bridge::project;
-        use crate::verdict::Verdict;
-        // no authored level admits `destroy`, so every rm currently projects to Denied
+        use crate::verdict::{SafetyLevel, Verdict};
+        // `developer` admits destroy WITHIN the worktree (golden-set decision 2), even
+        // recursive/effortful; it maps to the legacy SafeWrite ceiling.
         for cmd in [
             vec!["rm", "./stale.log"],
             vec!["rm", "-rf", "./node_modules"],
-            vec!["rm", "-rf", "/"],
             vec!["rm", "a", "b", "c"],
         ] {
             let p = resolve(&toks(&cmd)).expect("rm resolves");
             assert!(p.capabilities.iter().all(|c| c.operation == Operation::Destroy), "{cmd:?} destroys");
-            assert_eq!(project(&p), Verdict::Denied, "{cmd:?} denied (no destroy level yet)");
+            assert_eq!(project(&p), Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd:?} → developer");
+        }
+        // Deletion that reaches beyond the worktree (home/system) is above `developer`,
+        // denied by locus — no clause admits a machine/user-scoped destroy.
+        for cmd in [vec!["rm", "-rf", "/"], vec!["rm", "-rf", "~/notes"], vec!["rm", "/etc/hosts"]] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("rm")), Verdict::Denied, "{cmd:?} beyond worktree");
         }
     }
 
