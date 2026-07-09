@@ -177,6 +177,18 @@ credentials (keychain, `gpg -d`). *Lead:* wire level clauses to gate on `locus` 
 `disclosure.audience`; the flow pass supplies the audience. Design clear; needs the
 disclosure classifier + the flow pass.
 
+### HP-16 · The binary basis over-denies "usually safe" reads — `status: proposed`
+§0's fail-closed rule has two states — `structural` (proven → auto) and `worst-case`
+(unresolved → ask) — and shoves "safe in the normal case but not provably always" into
+the second. `ps aux` is the exemplar: cross-principal argv is secret-free ~99.9% of the
+time but can carry a password (the argv-secret anti-pattern). *Proposal* (`…-engine`
+§0.1): a third **`attested`** basis — a positively-researched typicality with a *named*
+residual — and a per-level **residual tolerance** deciding whether `attested` auto-runs.
+Keeps it allowlist-honest (positive claim, named residual, absence → worst-case) and
+separates *attesting* a typicality from *auto-approving* on it. Reputation-adjacent
+(`delegation` B.5); rides beside the facets, not inside a facet ordinal. Open: per-claim
+vs per-capability; residual representation; whether any default level accepts `attested`.
+
 ---
 
 ## Parked policy decisions

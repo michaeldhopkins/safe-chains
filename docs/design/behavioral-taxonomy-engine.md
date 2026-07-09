@@ -54,6 +54,51 @@ Consequences that shape the resolver:
   classifier passes. This strengthens §2.3's worst-case rule from *unresolved values* to
   *unaddressed facets*.
 
+## 0.1 Proposed (not settled): the attested-typical basis
+
+§0 is binary — a facet claim is either **structural** (proven from the command form →
+auto-approvable) or **worst-case** (unresolved → ask). That over-denies a real third
+case: a read safe in the normal case but not provably always. `ps aux` is the exemplar —
+its cross-principal argv is secret-free ~99.9% of the time, but can carry a password
+passed on another process's command line. (Note the risk there is *content*, not
+"cross-principal" per se, and it is partly **structural**: argv-presence is
+flag-determined, so plain `ps -o pid,comm` is `structural`-safe and only the
+argv-requesting form is uncertain.)
+
+**Proposal:** give each safety claim an explicit **basis**, and the residual it implies:
+
+| basis | residual | example |
+|---|---|---|
+| `structural` | none — provable from the form | `echo "lit"` (no fs); `ps -o pid,comm` (no argv) |
+| `attested` | small, **named** — researched typicality | `ps aux`: "typically secret-free; residual = secret-in-argv" |
+| `worst-case` | unbounded — unresolved | a `$VAR` path; an unresearched command |
+
+A **level declares a residual tolerance**: a strict level auto-approves only
+`structural`; a pragmatic level accepts `attested` (opting into named residuals); nothing
+auto-approves `worst-case`. The *same* `ps aux` is then auto at a residual-tolerant level
+and ask at a strict one — for a stated, reviewable reason.
+
+Two properties keep it allowlist-honest:
+- The basis is always a **positive** claim — a structural proof, or a researched
+  attestation with a *named* residual — and its absence falls to `worst-case`. This is
+  **not** safe-by-omission; it is the opposite of the old "auto-run with a *may hold a
+  secret* parenthetical," which hid the residual instead of naming it.
+- **Attesting is separate from auto-approving.** The `basis`/`residual` is a *fact about
+  the command* (researched, recorded in `because`/evidence), independent of whether any
+  shipped level acts on it. We can attest "`ps aux` is typically safe" without a default
+  level auto-approving on it.
+
+**Boundary:** this is reputation-adjacent (`delegation` B.5 — the taxonomy classifies the
+*mechanism*, not the identity), so it rides as an annotation **beside** the facets (a
+per-claim `basis`), never smeared into a facet ordinal. The facets stay crisp; the
+epistemics ride alongside.
+
+**Status: proposed, not settled.** `echo` (the first resolver slice) is pure `structural`
+and unaffected; `ps` would be the first client. Open questions: whether `basis` attaches
+per-facet-claim or per-capability; how `residual` is represented (a free-text name vs a
+small enum of residual kinds); and whether any *default* level accepts `attested`, or it
+stays strictly opt-in.
+
 ## 1. Where the engine attaches
 
 Today a command line is folded to a `Verdict` bottom-up: `command_verdict` →
