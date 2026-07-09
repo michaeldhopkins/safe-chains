@@ -8,3 +8,4 @@ bare = true
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 standalone = ["-E", "-e", "-n"]
+examples_safe = ["echo hello world", "echo -n done"]

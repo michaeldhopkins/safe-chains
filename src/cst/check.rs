@@ -178,21 +178,8 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
 /// the engine is authoritative for commands it can resolve; in `shadow` the engine runs
 /// alongside and divergences are reported, but legacy still decides.
 fn leaf_verdict(tokens: &[Token]) -> Verdict {
-    use crate::engine::bridge::{Mode, engine_verdict, mode};
     let legacy = handlers::dispatch(tokens);
-    match mode() {
-        Mode::Legacy => legacy,
-        Mode::New => engine_verdict(tokens).unwrap_or(legacy),
-        Mode::Shadow => {
-            if let Some(engine) = engine_verdict(tokens)
-                && engine != legacy
-            {
-                let name = tokens.first().map_or("", |t| t.as_str());
-                eprintln!("safe-chains[shadow]: `{name}` legacy={legacy} engine={engine}");
-            }
-            legacy
-        }
-    }
+    crate::engine::bridge::apply_mode(crate::engine::bridge::mode(), legacy, tokens)
 }
 
 fn eval_verdict(cmd: &SimpleCmd) -> Verdict {
