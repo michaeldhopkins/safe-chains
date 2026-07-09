@@ -67,6 +67,13 @@ resolve safely at check time (resolving may itself have effects; the FS can chan
 after).
 *Lead:* worst-case any path whose target isn't statically pinnable — but that is
 coarse and may over-deny common safe cases. No clean answer yet.
+*Partial (creation-time):* when a link is *created* (`ln [-s] TARGET LINK`), the target
+is **explicit on the command line**, not something we'd have to resolve — so the `ln`
+resolver gates the target on its own locus (`observes`), closing the in-session
+"`ln` as a `cp`-bypass" hole (`ln ~/.ssh/id_rsa ./x` denies like `cp`). This does *not*
+touch the residual: a symlink created *outside* our observation still reads worktree-local
+when later followed (we classify by literal spelling, §0.2). Creation we can gate; a
+pre-existing link we cannot.
 
 ### HP-6 · Indirection: safe-looking names that run project code — `status: partial`
 `./gradlew`, `./mvnw`, `npm run x`, a shell function or alias shadowing a real
