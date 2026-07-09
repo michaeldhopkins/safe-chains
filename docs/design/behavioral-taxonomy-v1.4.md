@@ -534,15 +534,16 @@ R3 resolvers beyond k8s.
 
 ## 8. Open problems
 
-Thirteen live entries in `hard-problems.md`, the ones v1.4 does **not** solve
+Live entries in `hard-problems.md`, the ones v1.4 does **not** solve
 (HP-1/HP-2, the contained/unattended split, are resolved — §4.3, R27):
 cross-session flow (HP-3), env/toolchain reinterpretation (HP-4), path-shape≠target
 and content-derived locus (HP-5/11), indirection (HP-6), opaque interpreter payloads
 (HP-7), state-dependent reversibility/scale (HP-8), read-as-exfil across principals
 (HP-9), composition (HP-10), ambient-state target locus (HP-12), channel completeness
-(HP-13), deferred/triggered/interactive execution (HP-14), and the secret-disclosure
-audience gate (HP-15 — designed in §2.4, not yet implemented). The spec's honesty is
-that these are named and worst-cased, not hidden.
+(HP-13), deferred/triggered/interactive execution (HP-14), the content-to-model exposure
+gate (HP-15 — reframed to locus + disclosure, fail-closed, §2.4, not yet wired), and the
+proposed `attested`-basis third epistemic state (HP-16, `…-engine` §0.1). The spec's
+honesty is that these are named and worst-cased, not hidden.
 
 ## 9. Reference annexes
 
