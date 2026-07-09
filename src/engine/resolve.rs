@@ -32,9 +32,7 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
     // standard bin paths are trusted. (Legacy classifies purely by basename and inherits
     // the spoof; the engine is stricter here, which keeps it never-looser.)
     if !trusted_command_path(arg0.as_str()) {
-        return Some(Profile::of(vec![Capability::worst(
-            "resolvable name invoked from a non-standard path — possible spoof (§0)",
-        )]));
+        return Some(worst("resolvable name invoked from a non-standard path — possible spoof (§0)"));
     }
     Some(resolver(tokens))
 }
@@ -85,7 +83,7 @@ fn resolve_cat(tokens: &[Token]) -> Profile {
         valued_long: &[],
     };
     let Some(files) = CAT.positionals(tokens) else {
-        return Profile::of(vec![Capability::worst("cat: unrecognized flag — worst-cased (§0)")]);
+        return worst("cat: unrecognized flag — worst-cased (§0)");
     };
     Profile::of(reads_to_model(&files, Scale::Single))
 }
@@ -181,13 +179,13 @@ fn resolve_grep(tokens: &[Token]) -> Profile {
     }
 
     if unknown_flag {
-        return Profile::of(vec![Capability::worst("grep: unrecognized flag — worst-cased (§0)")]);
+        return worst("grep: unrecognized flag — worst-cased (§0)");
     }
     if files.is_empty() {
         // No positional operand → grep has no pattern (a `-e`/`-f` pattern still needs a
         // search target). This is a usage error; the legacy classifier denies it, so the
         // engine must not be looser — worst-case (§0).
-        return Profile::of(vec![Capability::worst("grep: no pattern operand — worst-cased (§0)")]);
+        return worst("grep: no pattern operand — worst-cased (§0)");
     }
 
     if !pattern_from_flag {
@@ -280,10 +278,10 @@ fn resolve_rm(tokens: &[Token]) -> Profile {
         valued_long: &[],
     };
     let Some(operands) = RM.positionals(tokens) else {
-        return Profile::of(vec![Capability::worst("rm: unrecognized/dangerous flag — worst-cased (§0)")]);
+        return worst("rm: unrecognized/dangerous flag — worst-cased (§0)");
     };
     if operands.is_empty() {
-        return Profile::of(vec![Capability::worst("rm: no operand — worst-cased (§0)")]);
+        return worst("rm: no operand — worst-cased (§0)");
     }
     let recursive = has_flag(tokens, Some("-r"), Some("--recursive")) || has_flag(tokens, Some("-R"), None);
     let scale = breadth_scale(&operands, recursive);
@@ -301,10 +299,10 @@ fn destroys(locus: LocalLocus, scale: Scale) -> Capability {
     )
 }
 
-/// A local write capability (the create/mutate/destroy family), placed at `locus`. The
-/// caller supplies the reversibility and persistence that fit the operation — `trivial` +
-/// `data` for a fresh mkdir/touch, `effortful` + `transient` for a delete, `effortful` +
-/// `data` for a clobbering copy.
+/// The private builder behind the write-family capability constructors (`creates`,
+/// `overwrites`, `relocates`, `destroys`): a write at `locus` with the reversibility and
+/// persistence the operation warrants. Resolvers call the named constructors, never this —
+/// the intent (and the enum pairing) then lives in exactly one place.
 fn writes(
     op: Operation,
     locus: LocalLocus,
@@ -322,6 +320,34 @@ fn writes(
     c
 }
 
+/// A fresh file or directory (`mkdir`, `touch`): `create` at `locus`, `trivial` to undo
+/// (`rmdir`/`rm` the new entry), leaving ordinary data.
+fn creates(locus: LocalLocus, scale: Scale) -> Capability {
+    writes(Operation::Create, locus, scale, Reversibility::Trivial, PersistenceLevel::Data, "creates a file or directory")
+}
+
+/// A destination write that may clobber existing content (`cp`/`mv` dest): `create` at
+/// `locus`, `recoverable` (the repo-recoverable assumption, HP-8) — or `trivial` when
+/// `--no-clobber` guarantees no overwrite.
+fn overwrites(locus: LocalLocus, scale: Scale, no_clobber: bool) -> Capability {
+    let reversibility = if no_clobber { Reversibility::Trivial } else { Reversibility::Recoverable };
+    writes(Operation::Create, locus, scale, reversibility, PersistenceLevel::Data, "writes the destination; may overwrite existing content unless --no-clobber")
+}
+
+/// A moved-from source (`mv` src): `mutate` at `locus` — the entry leaves that directory —
+/// `trivial` to undo (`mv` back), leaving nothing behind. NOT a destroy: the content
+/// survives at the destination, which is why `mv` stays at write-local and `rm` does not.
+fn relocates(locus: LocalLocus, scale: Scale) -> Capability {
+    writes(Operation::Mutate, locus, scale, Reversibility::Trivial, PersistenceLevel::Transient, "mv removes the source from its old location (trivially reversible: mv back)")
+}
+
+/// The fail-closed profile (§0): a single worst-case capability citing `because` — the
+/// standard return when a resolver cannot certify an invocation (unknown flag, missing
+/// operand, spoofed path).
+fn worst(because: &str) -> Profile {
+    Profile::of(vec![Capability::worst(because)])
+}
+
 /// Breadth of a filesystem effect: `unbounded` when recursing, `bounded` for a glob or
 /// several operands, else `single`. Shared by rm/mkdir/touch/cp.
 fn breadth_scale(operands: &[&str], recursive: bool) -> Scale {
@@ -334,8 +360,6 @@ fn breadth_scale(operands: &[&str], recursive: bool) -> Scale {
     }
 }
 
-/// Whether every flag (up to `--`) is recognized. `valued` flags (matched as whole tokens,
-/// short or long) consume their following token as a value — skipped so a dash-leading
 /// `mkdir DIR…` — creates directories. Non-destructive (fails on an existing target; `-p`
 /// is idempotent), so reversibility is `trivial` — a fresh empty dir is `rmdir`-removable.
 /// `-m`/`--mode`/`--context` take a value; `locus` per operand is `classify_locus`.
@@ -347,26 +371,13 @@ fn resolve_mkdir(tokens: &[Token]) -> Profile {
         valued_long: &["--mode", "--context"],
     };
     let Some(dirs) = MKDIR.positionals(tokens) else {
-        return Profile::of(vec![Capability::worst("mkdir: unrecognized flag — worst-cased (§0)")]);
+        return worst("mkdir: unrecognized flag — worst-cased (§0)");
     };
     if dirs.is_empty() {
-        return Profile::of(vec![Capability::worst("mkdir: no operand — worst-cased (§0)")]);
+        return worst("mkdir: no operand — worst-cased (§0)");
     }
     let scale = breadth_scale(&dirs, false);
-    Profile::of(
-        dirs.iter()
-            .map(|p| {
-                writes(
-                    Operation::Create,
-                    classify_locus(p),
-                    scale,
-                    Reversibility::Trivial,
-                    PersistenceLevel::Data,
-                    "mkdir creates a directory",
-                )
-            })
-            .collect(),
-    )
+    Profile::of(dirs.iter().map(|p| creates(classify_locus(p), scale)).collect())
 }
 
 /// `touch FILE…` — creates empty files or bumps timestamps. It never destroys content, so
@@ -382,27 +393,13 @@ fn resolve_touch(tokens: &[Token]) -> Profile {
         valued_long: &["--reference", "--date", "--time"],
     };
     let Some(files) = TOUCH.positionals(tokens) else {
-        return Profile::of(vec![Capability::worst("touch: unrecognized flag — worst-cased (§0)")]);
+        return worst("touch: unrecognized flag — worst-cased (§0)");
     };
     if files.is_empty() {
-        return Profile::of(vec![Capability::worst("touch: no operand — worst-cased (§0)")]);
+        return worst("touch: no operand — worst-cased (§0)");
     }
     let scale = breadth_scale(&files, false);
-    Profile::of(
-        files
-            .iter()
-            .map(|p| {
-                writes(
-                    Operation::Create,
-                    classify_locus(p),
-                    scale,
-                    Reversibility::Trivial,
-                    PersistenceLevel::Data,
-                    "touch creates a file or updates its timestamp",
-                )
-            })
-            .collect(),
-    )
+    Profile::of(files.iter().map(|p| creates(classify_locus(p), scale)).collect())
 }
 
 /// `cp SRC… DEST` — the first resolver that both READS and WRITES, at potentially
@@ -430,37 +427,18 @@ fn resolve_cp(tokens: &[Token]) -> Profile {
         ],
         valued_long: &["--suffix", "--target-directory"],
     };
-    let Some(operands) = CP.positionals(tokens) else {
-        return Profile::of(vec![Capability::worst("cp: unrecognized flag — worst-cased (§0)")]);
-    };
-    // With -t/--target-directory the dest is the flag's value and every operand is a
-    // source; otherwise the last operand is the dest and the rest are sources.
-    let (sources, dest): (&[&str], &str) = match CP.value(tokens, b't', "--target-directory") {
-        Some(d) => (operands.as_slice(), d),
-        None => match operands.split_last() {
-            Some((last, rest)) if !rest.is_empty() => (rest, *last),
-            _ => return Profile::of(vec![Capability::worst("cp: needs a source and a destination — worst-cased (§0)")]),
-        },
+    let (sources, dest) = match sources_and_dest(&CP, tokens, "cp") {
+        Ok(sd) => sd,
+        Err(profile) => return profile,
     };
     let recursive = has_flag(tokens, Some("-r"), Some("--recursive"))
         || has_flag(tokens, Some("-R"), None)
         || has_flag(tokens, Some("-a"), Some("--archive"));
     let no_clobber = has_flag(tokens, Some("-n"), Some("--no-clobber"));
-    let scale = breadth_scale(sources, recursive);
-    // Overwriting a worktree file is recoverable (repo-recoverable, HP-8), like echo > f;
-    // -n can't overwrite, so it's trivial. Both admit at write-local (a copy is a write,
-    // not a destroy).
-    let dest_rev = if no_clobber { Reversibility::Trivial } else { Reversibility::Recoverable };
+    let scale = breadth_scale(&sources, recursive);
 
     let mut caps: Vec<Capability> = sources.iter().map(|s| copies_source(classify_locus(s), scale)).collect();
-    caps.push(writes(
-        Operation::Create,
-        classify_locus(dest),
-        scale,
-        dest_rev,
-        PersistenceLevel::Data,
-        "cp writes the destination; may overwrite existing content unless --no-clobber",
-    ));
+    caps.push(overwrites(classify_locus(dest), scale, no_clobber));
     Profile::of(caps)
 }
 
@@ -472,6 +450,28 @@ fn copies_source(locus: LocalLocus, scale: Scale) -> Capability {
     c.scale = scale;
     c.because = "cp reads the source file".to_string();
     c
+}
+
+/// Split a `SRC… DEST` invocation (`cp`/`mv`) into its sources and destination.
+/// `-t`/`--target-directory` names the dest explicitly (every operand is then a source);
+/// otherwise the last operand is the dest and the rest are sources. Fails closed (§0),
+/// returning the ready-to-return worst-case `Profile`, on an unrecognized flag or a missing
+/// source+dest pair.
+fn sources_and_dest<'a>(
+    flags: &Flags,
+    tokens: &'a [Token],
+    cmd: &str,
+) -> Result<(Vec<&'a str>, &'a str), Profile> {
+    let Some(operands) = flags.positionals(tokens) else {
+        return Err(worst(&format!("{cmd}: unrecognized flag — worst-cased (§0)")));
+    };
+    if let Some(dest) = flags.value(tokens, b't', "--target-directory") {
+        return Ok((operands, dest));
+    }
+    match operands.split_last() {
+        Some((last, rest)) if !rest.is_empty() => Ok((rest.to_vec(), *last)),
+        _ => Err(worst(&format!("{cmd}: needs a source and a destination — worst-cased (§0)"))),
+    }
 }
 
 /// `mv SRC… DEST` — `cp` + `rm` fused, but the source side is the interesting difference:
@@ -496,41 +496,15 @@ fn resolve_mv(tokens: &[Token]) -> Profile {
         ],
         valued_long: &["--suffix", "--target-directory"],
     };
-    let Some(operands) = MV.positionals(tokens) else {
-        return Profile::of(vec![Capability::worst("mv: unrecognized flag — worst-cased (§0)")]);
-    };
-    let (sources, dest): (&[&str], &str) = match MV.value(tokens, b't', "--target-directory") {
-        Some(d) => (operands.as_slice(), d),
-        None => match operands.split_last() {
-            Some((last, rest)) if !rest.is_empty() => (rest, *last),
-            _ => return Profile::of(vec![Capability::worst("mv: needs a source and a destination — worst-cased (§0)")]),
-        },
+    let (sources, dest) = match sources_and_dest(&MV, tokens, "mv") {
+        Ok(sd) => sd,
+        Err(profile) => return profile,
     };
     let no_clobber = has_flag(tokens, Some("-n"), Some("--no-clobber"));
-    let scale = breadth_scale(sources, false);
-    let dest_rev = if no_clobber { Reversibility::Trivial } else { Reversibility::Recoverable };
+    let scale = breadth_scale(&sources, false); // mv has no recursion flag; a dir move is one rename
 
-    let mut caps: Vec<Capability> = sources
-        .iter()
-        .map(|s| {
-            writes(
-                Operation::Mutate,
-                classify_locus(s),
-                scale,
-                Reversibility::Trivial, // the content survives at the destination — mv back
-                PersistenceLevel::Transient, // the source location loses the entry
-                "mv removes the source from its old location (trivially reversible: mv back)",
-            )
-        })
-        .collect();
-    caps.push(writes(
-        Operation::Create,
-        classify_locus(dest),
-        scale,
-        dest_rev,
-        PersistenceLevel::Data,
-        "mv writes the destination; may overwrite existing content unless --no-clobber",
-    ));
+    let mut caps: Vec<Capability> = sources.iter().map(|s| relocates(classify_locus(s), scale)).collect();
+    caps.push(overwrites(classify_locus(dest), scale, no_clobber));
     Profile::of(caps)
 }
 
