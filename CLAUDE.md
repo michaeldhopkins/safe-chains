@@ -1,5 +1,27 @@
 # CLAUDE.md
 
+## Scope / trust model
+
+safe-chains identifies a command by its **executable name and path** — never by
+inspecting the binary's content or signature. It trusts that `cat` is GNU `cat`, that
+`git` is git, and so on. Verifying that a binary is genuinely the tool it is named is
+**out of scope** by design: this is a static, string-only classifier, not a sandbox or
+an integrity checker.
+
+Consequences to keep in mind (do not try to "fix" these by reading the filesystem — a
+static classifier must not, and it would be TOCTOU-racy anyway):
+
+- A `$PATH` shadow or a planted binary named after a safe tool is classified as that
+  tool. (Mitigation the capability engine applies: a resolvable name reached via a
+  *non-standard path* — `./cat`, `/tmp/cat` — is worst-cased; a bare name resolved via
+  `$PATH`, and standard bin paths, are trusted.)
+- Symlinks are not followed: a path is classified by its literal spelling, so a worktree
+  symlink pointing outside the worktree reads as worktree-local.
+
+If a threat model requires defending against a hostile checkout or `$PATH`, that belongs
+to the harness/sandbox, not to safe-chains. See `docs/design/behavioral-taxonomy-engine.md`
+§0.2.
+
 ## Testing
 
 ```bash
