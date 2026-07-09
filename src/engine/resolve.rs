@@ -23,6 +23,7 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
         "mkdir" => resolve_mkdir,
         "touch" => resolve_touch,
         "cp" => resolve_cp,
+        "mv" => resolve_mv,
         _ => return None,
     };
     // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`,
@@ -471,6 +472,66 @@ fn copies_source(locus: LocalLocus, scale: Scale) -> Capability {
     c.scale = scale;
     c.because = "cp reads the source file".to_string();
     c
+}
+
+/// `mv SRC… DEST` — `cp` + `rm` fused, but the source side is the interesting difference:
+/// `mv` *relocates* a file, it does not annihilate it. So the source is a **`mutate`** at
+/// its locus (the entry leaves that directory) with **`trivial`** reversibility — `mv` it
+/// back — NOT `rm`'s `effortful` `destroy`. That single facet keeps `mv ./a ./b` at
+/// write-local while `rm ./a` waits for developer. Both operands are gated by their locus:
+/// `mv ~/x ./y` denies on the source write (`user`), `mv ./x ~/y` on the dest write, and
+/// `mv .git/config ./x` denies on the source (worktree-*trusted*, above write-local) even
+/// though `cp .git/config ./x` is allowed — moving a trusted file mutates `.git`, copying
+/// only reads it. The dest is a `create`/overwrite exactly like `cp` (recoverable, or
+/// `trivial` under `-n`). `mv` has no recursion flag — a directory move is one rename.
+fn resolve_mv(tokens: &[Token]) -> Profile {
+    const MV: Flags = Flags {
+        short: b"Tfhinuv",
+        valued_short: b"tS",
+        // `--backup` takes an optional arg (glued only) → boolean long, not valued_long.
+        long: &[
+            "--backup", "--force", "--help", "--interactive", "--no-clobber",
+            "--no-target-directory", "--strip-trailing-slashes", "--update", "--verbose",
+            "--version",
+        ],
+        valued_long: &["--suffix", "--target-directory"],
+    };
+    let Some(operands) = MV.positionals(tokens) else {
+        return Profile::of(vec![Capability::worst("mv: unrecognized flag — worst-cased (§0)")]);
+    };
+    let (sources, dest): (&[&str], &str) = match MV.value(tokens, b't', "--target-directory") {
+        Some(d) => (operands.as_slice(), d),
+        None => match operands.split_last() {
+            Some((last, rest)) if !rest.is_empty() => (rest, *last),
+            _ => return Profile::of(vec![Capability::worst("mv: needs a source and a destination — worst-cased (§0)")]),
+        },
+    };
+    let no_clobber = has_flag(tokens, Some("-n"), Some("--no-clobber"));
+    let scale = breadth_scale(sources, false);
+    let dest_rev = if no_clobber { Reversibility::Trivial } else { Reversibility::Recoverable };
+
+    let mut caps: Vec<Capability> = sources
+        .iter()
+        .map(|s| {
+            writes(
+                Operation::Mutate,
+                classify_locus(s),
+                scale,
+                Reversibility::Trivial, // the content survives at the destination — mv back
+                PersistenceLevel::Transient, // the source location loses the entry
+                "mv removes the source from its old location (trivially reversible: mv back)",
+            )
+        })
+        .collect();
+    caps.push(writes(
+        Operation::Create,
+        classify_locus(dest),
+        scale,
+        dest_rev,
+        PersistenceLevel::Data,
+        "mv writes the destination; may overwrite existing content unless --no-clobber",
+    ));
+    Profile::of(caps)
 }
 
 /// A getopt-style flag spec for a fixed-flag-set command. `short` flags are single chars
@@ -974,6 +1035,19 @@ mod tests {
         dst.reversibility = Reversibility::Trivial; // -n → cannot overwrite
         dst.persistence.level = PersistenceLevel::Data;
         assert_eq!(clear_because(&cp.capabilities[1]), dst, "cp -n dest write");
+
+        // mv ./a ./b — a relocation: source MUTATE (trivial, transient — the entry leaves)
+        // + dest CREATE (recoverable overwrite). Contrast cp's source, which is an observe.
+        let mv = resolve(&toks(&["mv", "./a", "./b"])).expect("mv");
+        let mut mv_src = Capability::new(Operation::Mutate);
+        mv_src.locus.local = LocalLocus::Worktree;
+        mv_src.reversibility = Reversibility::Trivial;
+        assert_eq!(clear_because(&mv.capabilities[0]), mv_src, "mv source relocation");
+        let mut mv_dst = Capability::new(Operation::Create);
+        mv_dst.locus.local = LocalLocus::Worktree;
+        mv_dst.reversibility = Reversibility::Recoverable;
+        mv_dst.persistence.level = PersistenceLevel::Data;
+        assert_eq!(clear_because(&mv.capabilities[1]), mv_dst, "mv dest write");
     }
 
     fn clear_because(c: &Capability) -> Capability {
@@ -1056,6 +1130,33 @@ mod tests {
         assert_eq!(resolve(&toks(&["cp", "-r", "./a", "./b"])).expect("cp").capabilities[0].scale, Scale::Unbounded);
         assert_eq!(project(&resolve(&toks(&["cp", "./only"])).expect("cp")), Verdict::Denied, "no dest");
         assert_eq!(project(&resolve(&toks(&["cp", "-Q", "./a", "./b"])).expect("cp")), Verdict::Denied, "unknown flag");
+    }
+
+    #[test]
+    fn mv_relocates_within_the_worktree_and_gates_both_loci() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+
+        // a move within the worktree is a mutate (source) + create (dest), both trivial/
+        // recoverable → write-local, NOT developer. Unlike rm, a move relocates, not destroys.
+        let m = resolve(&toks(&["mv", "./a", "./b"])).expect("mv");
+        assert_eq!(m.capabilities[0].operation, Operation::Mutate, "source is a relocation, not a destroy");
+        assert_eq!(m.capabilities[0].reversibility, Reversibility::Trivial, "mv back");
+        assert_eq!(project(&m), Verdict::Allowed(SafetyLevel::SafeWrite), "mv ./a ./b");
+
+        // both loci are gated as writes: source-out and dest-out both deny.
+        assert_eq!(project(&resolve(&toks(&["mv", "~/.ssh/id_rsa", "./x"])).expect("mv")), Verdict::Denied, "source in home");
+        assert_eq!(project(&resolve(&toks(&["mv", "./x", "~/exfil"])).expect("mv")), Verdict::Denied, "dest in home");
+        // moving a worktree-TRUSTED file mutates .git → denied, even though cp of it is
+        // allowed (cp only READS .git/config; the dest write puts cp at SafeWrite).
+        assert_eq!(project(&resolve(&toks(&["mv", ".git/config", "./x"])).expect("mv")), Verdict::Denied, "mv .git/config");
+        assert_eq!(project(&resolve(&toks(&["cp", ".git/config", "./x"])).expect("cp")), Verdict::Allowed(SafetyLevel::SafeWrite), "cp .git/config reads");
+
+        // -t DIR and glued forms; fail-closed on unknown flag / lone operand.
+        let t = resolve(&toks(&["mv", "-t", "./dest", "./a", "./b"])).expect("mv -t");
+        assert_eq!(t.capabilities.len(), 3, "2 sources + 1 dest");
+        assert_eq!(project(&resolve(&toks(&["mv", "./only"])).expect("mv")), Verdict::Denied, "no dest");
+        assert_eq!(project(&resolve(&toks(&["mv", "-Q", "./a", "./b"])).expect("mv")), Verdict::Denied, "unknown flag");
     }
 
     #[test]
