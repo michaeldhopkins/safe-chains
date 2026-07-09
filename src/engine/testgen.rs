@@ -47,7 +47,7 @@ prop_compose! {
             arb_term::<NetPayload>(), arb_term::<ExecutionTrust>(), arb_term::<Cost>(),
         ),
         g4 in (
-            arb_term::<SupplySource>(), arb_term::<Pinning>(), arb_term::<ExecSurface>(), any::<bool>(),
+            arb_term::<SupplySource>(), arb_term::<Pinning>(), arb_term::<ExecSurface>(),
         ),
     ) -> Capability {
         Capability {
@@ -63,7 +63,8 @@ prop_compose! {
             network: Network { direction: g3.1, destination: g3.2, payload: g3.3 },
             execution: Execution {
                 trust: g3.4,
-                supply_chain: g4.3.then_some(SupplyChain {
+                // model invariant (§2.6): supply_chain is present iff network-sourced
+                supply_chain: (g3.4 == ExecutionTrust::NetworkSourced).then_some(SupplyChain {
                     source: g4.0,
                     pinning: g4.1,
                     exec_surface: g4.2,
@@ -143,7 +144,6 @@ pub(crate) fn lowered_variants(cap: &Capability) -> Vec<Capability> {
         lower(cap, |c| c.locus.remote, |c, v| c.locus.remote = v),
         lower(cap, |c| c.scale, |c, v| c.scale = v),
         lower(cap, |c| c.authority, |c, v| c.authority = v),
-        lower(cap, |c| c.isolation, |c, v| c.isolation = v),
         lower(cap, |c| c.reversibility, |c, v| c.reversibility = v),
         lower(cap, |c| c.persistence.level, |c, v| c.persistence.level = v),
         lower(cap, |c| c.persistence.trigger.escape, |c, v| c.persistence.trigger.escape = v),
@@ -154,8 +154,10 @@ pub(crate) fn lowered_variants(cap: &Capability) -> Vec<Capability> {
         lower(cap, |c| c.network.payload, |c, v| c.network.payload = v),
         lower(cap, |c| c.execution.trust, |c, v| c.execution.trust = v),
         lower(cap, |c| c.cost, |c, v| c.cost = v),
-        // `pinning` is a trust facet (higher = safer); its monotonicity direction is
-        // inverted and no default level floors it, so it is not lowered here.
+        // `pinning` and `isolation` are TRUST facets (higher = safer; a level *floors*
+        // them — "containment is earned", §3.2). Their monotonicity direction is inverted
+        // (making a command less severe means RAISING them), so they are not lowered here;
+        // lowering them would falsely flag a coherent floored level as non-monotone.
     ]
     .into_iter()
     .flatten()

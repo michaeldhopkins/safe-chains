@@ -82,8 +82,22 @@ pub struct Clause {
 }
 
 impl Clause {
-    /// Whether every constrained facet of this clause admits `cap`.
+    /// Whether this clause **admits** `cap` (allow-clause semantics).
     pub fn admits(&self, cap: &Capability) -> bool {
+        self.check(cap, Role::Allow)
+    }
+
+    /// Whether this clause **matches** `cap` for removal (deny-clause semantics). Differs
+    /// from `admits` only on the optional `supply_chain`: a deny constrained on a
+    /// supply-chain facet does **not** match a capability that has no supply chain (it is
+    /// not in the denied corner), whereas an allow treats the absence as vacuously
+    /// satisfied. Sharing one body with a naive vacuous-true rule would make a
+    /// supply-chain-only deny wrongly match every non-supply-chain capability.
+    fn matches_as_deny(&self, cap: &Capability) -> bool {
+        self.check(cap, Role::Deny)
+    }
+
+    fn check(&self, cap: &Capability, role: Role) -> bool {
         set_admits(self.operation.as_deref(), cap.operation)
             && ord_admits(self.local_locus, cap.locus.local)
             && ord_admits(self.remote_reach, cap.locus.remote)
@@ -105,15 +119,24 @@ impl Clause {
             && ord_admits(self.net_destination, cap.network.destination)
             && ord_admits(self.net_payload, cap.network.payload)
             && ord_admits(self.execution_trust, cap.execution.trust)
-            && self.supply_chain_admits(cap.execution.supply_chain)
+            && self.supply_chain_admits(cap.execution.supply_chain, role)
             && ord_admits(self.cost, cap.cost)
     }
 
-    /// Supply-chain constraints apply only to network-sourced code. A capability with
-    /// no supply chain (`None` — nothing downloaded) satisfies them vacuously.
-    fn supply_chain_admits(&self, sc: Option<SupplyChain>) -> bool {
+    /// Supply-chain constraints apply only to network-sourced code. For an **allow**, a
+    /// capability with no supply chain (`None`) satisfies them vacuously. For a **deny**,
+    /// a clause that constrains the supply chain does **not** match a `None` capability —
+    /// it is not in the denied corner — while an unconstrained deny is unaffected.
+    fn supply_chain_admits(&self, sc: Option<SupplyChain>, role: Role) -> bool {
         match sc {
-            None => true,
+            None => match role {
+                Role::Allow => true,
+                Role::Deny => {
+                    self.supply_source.is_none()
+                        && self.pinning.is_none()
+                        && self.exec_surface.is_none()
+                }
+            },
             Some(sc) => {
                 set_admits(self.supply_source.as_deref(), sc.source)
                     && ord_admits(self.pinning, sc.pinning)
@@ -121,6 +144,13 @@ impl Clause {
             }
         }
     }
+}
+
+/// Which side a clause is evaluated on — the two differ only on absent `supply_chain`.
+#[derive(Copy, Clone, PartialEq, Eq)]
+enum Role {
+    Allow,
+    Deny,
 }
 
 /// A safety level: a name, its allow clauses (disjunction), and its deny clauses
@@ -156,7 +186,7 @@ impl Level {
     /// Whether a single capability is admissible: some allow clause admits it and no
     /// deny clause matches it.
     pub fn admits_capability(&self, cap: &Capability) -> bool {
-        self.allow.iter().any(|c| c.admits(cap)) && !self.deny.iter().any(|c| c.admits(cap))
+        self.allow.iter().any(|c| c.admits(cap)) && !self.deny.iter().any(|c| c.matches_as_deny(cap))
     }
 
     /// Whether a whole profile passes: every capability is admissible. The empty
@@ -304,6 +334,34 @@ mod tests {
         // cat file — no downloaded code, so the supply-chain constraint is vacuous
         let plain = Profile::of(vec![cap(Operation::Observe)]);
         assert!(dev.admits(&plain), "a command with no supply chain passes vacuously");
+    }
+
+    #[test]
+    fn a_supply_chain_deny_does_not_match_a_capability_without_one() {
+        // "deny unverified-url sources" must NOT accidentally deny `cat file` (no supply
+        // chain) — the vacuous-truth asymmetry between allow and deny (review finding #1).
+        let level = Level::new("x").allowing(Clause::default()).denying(Clause {
+            supply_source: Some(vec![SupplySource::UnverifiedUrl]),
+            ..Default::default()
+        });
+
+        let plain = Profile::of(vec![cap(Operation::Observe)]);
+        assert!(level.admits(&plain), "a supply-chain deny must not match a no-supply-chain cap");
+
+        // but curl|sh (network-sourced, unverified-url) IS still caught by the deny corner
+        let curl_sh = Profile::of(vec![{
+            let mut c = cap(Operation::Execute);
+            c.execution = Execution {
+                trust: ExecutionTrust::NetworkSourced,
+                supply_chain: Some(SupplyChain {
+                    source: SupplySource::UnverifiedUrl,
+                    pinning: Pinning::Floating,
+                    exec_surface: ExecSurface::RunArtifact,
+                }),
+            };
+            c
+        }]);
+        assert!(!level.admits(&curl_sh), "the deny corner still catches the unverified-url source");
     }
 
     #[test]

@@ -56,6 +56,19 @@ pub fn toml_command_names() -> Vec<&'static str> {
         .collect()
 }
 
+/// Every command's canonical name with its declared `examples_safe` / `examples_denied`
+/// — the corpus the engine's shadow diff harness runs against.
+#[cfg(test)]
+pub(crate) fn corpus_examples()
+-> Vec<(&'static str, &'static [String], &'static [String])> {
+    TOML_REGISTRY
+        .iter()
+        .map(|(name, spec)| {
+            (name.as_str(), spec.examples_safe.as_slice(), spec.examples_denied.as_slice())
+        })
+        .collect()
+}
+
 /// Look up `cmd_name`'s TOML-declared subs (set via `[[command.sub]]`
 /// blocks alongside `handler = "..."`) and dispatch the one whose name
 /// matches `tokens[1]`. Returns `None` if no sub matched, so the
