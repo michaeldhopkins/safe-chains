@@ -99,6 +99,29 @@ per-facet-claim or per-capability; how `residual` is represented (a free-text na
 small enum of residual kinds); and whether any *default* level accepts `attested`, or it
 stays strictly opt-in.
 
+## 0.2 Residuals of static analysis (named, not hidden)
+
+The resolver is a **pure function of the command string** — it never touches the
+filesystem (which would be TOCTOU-racy against a mutable tree anyway). Three limits
+follow, and the honest posture is to name them:
+
+- **Symlinks/hardlinks defeat `locus`.** `classify_locus` sees the literal path, so a
+  worktree symlink `./link → /etc/shadow` classifies as `worktree` and is admitted at a
+  worktree-trusting level, though it reads a machine-scope file. The `..` normalization
+  escape *is* caught (→ worst-case); symbolic links cannot be, statically. A residual of
+  path-based classification, accepted by levels that trust worktree content.
+- **Command identity is a basename + path heuristic.** A bare `cat` trusts `$PATH`
+  resolution to the real coreutils; a `$PATH` shadow is invisible. The resolver *does*
+  worst-case a resolvable name reached via a non-standard path (`./cat`, `/tmp/cat`,
+  `~/bin/grep`) — closing the planted-binary case — but a `$PATH`-shadowed bare `cat` is
+  inherently trusted. (The legacy classifier keys purely on basename and hardens neither.)
+- **TOCTOU.** Any static verdict can be invalidated by a filesystem change between check
+  and exec. safe-chains is an allowlist gate, not a sandbox; it bounds what it *certifies*,
+  not what the OS *enforces*.
+
+These are the boundary of what a string-only, side-effect-free resolver can promise;
+where a level accepts one, it is a stated property of that level.
+
 ## 1. Where the engine attaches
 
 Today a command line is folded to a `Verdict` bottom-up: `command_verdict` →
