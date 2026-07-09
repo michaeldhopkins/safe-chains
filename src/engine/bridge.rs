@@ -150,20 +150,33 @@ mod tests {
         }
     }
 
-    /// The specified §5 corpus-diff harness (the test C1 slipped past): run **every**
-    /// command's real `examples_safe`/`examples_denied` through both paths and assert the
-    /// engine is never looser — not a hand-picked list. Only simple (single-command)
-    /// examples are comparable at the leaf; chains/redirects/substitutions are the CST's
-    /// job, not this leaf's.
+    /// The data-driven corpus gate (the systematic test C1 slipped past): run **every**
+    /// command's real `examples_safe`/`examples_denied` through the engine and assert,
+    /// per resolvable example, the dimensions that hold today —
+    ///   1. **never looser** than legacy (engine ≤ legacy; also subsumes "an
+    ///      examples_denied that resolves stays denied", since legacy denies it),
+    ///   2. **justified** — every resolved capability cites a `because` (§5),
+    ///   3. **total** — resolution and projection never panic.
+    /// It grows automatically as commands convert; today it exercises the resolvable
+    /// commands and skips the rest. Only bare single commands are comparable at the leaf
+    /// (chains/redirects/substitutions are the CST's job). The full per-facet completeness
+    /// dimension is the golden-profile check (`resolve::golden_profiles_cover_every_facet`)
+    /// and becomes TOML-derived when commands carry profile data (§7).
     #[test]
-    fn the_engine_is_never_looser_over_the_example_corpus() {
+    fn the_engine_corpus_gate() {
         for (name, safe, denied) in crate::registry::corpus_examples() {
             for ex in safe.iter().chain(denied.iter()) {
                 if ex.contains(['|', '>', '<', '&', ';', '$', '`', '(', '\n']) {
-                    continue; // not a bare single command — skip the leaf comparison
+                    continue; // not a bare single command
                 }
                 let t = toks(&ex.split_whitespace().collect::<Vec<_>>());
-                let Some(engine) = engine_verdict(&t) else { continue };
+                let Some(profile) = crate::engine::resolve::resolve(&t) else { continue };
+
+                for c in &profile.capabilities {
+                    assert!(!c.because.is_empty(), "unjustified capability for `{ex}` ({name})");
+                }
+
+                let engine = project(&profile);
                 let legacy = crate::command_verdict(ex);
                 assert!(
                     not_looser(legacy, engine),
