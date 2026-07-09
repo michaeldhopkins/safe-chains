@@ -1,57 +1,13 @@
 //! The profile resolver — turning a parsed command into its behavior profile
-//! (annex `behavioral-taxonomy-engine`). Dormant: nothing here is wired into the
-//! live classifier yet.
+//! (annex `behavioral-taxonomy-engine`). Runs via `engine::bridge` behind
+//! `SAFE_CHAINS_ENGINE` (default `legacy`, so it is not authoritative by default).
 //!
-//! This module starts with argument classification — the reusable predicates that
-//! read a facet off an argument value. `classify_locus` refines the existing
+//! Argument classification is the reusable core: `classify_locus` refines the existing
 //! `is_safe_write_target` branch order (`src/cst/check.rs`, a 2-bucket boolean) into
-//! the full [`LocalLocus`] ladder (v1.4 §2.2).
+//! the full [`LocalLocus`] ladder (v1.4 §2.2); the per-command resolvers build on it.
 
 use super::facet::*;
 use crate::parse::{Token, has_flag};
-
-/// A maximally-severe capability — worst-cased on every axis, so no **well-formed** level
-/// admits it (§0). In particular its `locus.local = kernel`, and `device`/`kernel` are
-/// deny-by-default at every level (v1.4 §4.3), so any level whose allow caps locus below
-/// them (all of them) rejects it — even a permissive `yolo`-shaped allow. The resolver
-/// returns this when it hits something it cannot certify (an unrecognized flag), keeping
-/// the engine from ever being *looser* than a flag-strict classifier.
-fn worst_case(because: &str) -> Capability {
-    Capability {
-        operation: Operation::Execute,
-        locus: Locus {
-            local: LocalLocus::Kernel,
-            remote: RemoteReach::Arbitrary,
-            binding: RemoteBinding::Ambient,
-        },
-        scale: Scale::Unbounded,
-        authority: Authority::OtherUser,
-        isolation: Isolation::None,
-        reversibility: Reversibility::Irreversible,
-        persistence: Persistence {
-            level: PersistenceLevel::Installing,
-            trigger: Trigger { escape: TriggerEscape::Boot, kind: TriggerKind::None },
-        },
-        disclosure: Disclosure {
-            audience: DisclosureAudience::Public,
-            channel: Channel::Unknown,
-            principal: Principal::Cross,
-        },
-        secret: Secret {
-            level: SecretLevel::Transmits,
-            channel: Channel::Unknown,
-            principal: Principal::Cross,
-        },
-        network: Network {
-            direction: NetDirection::Outbound,
-            destination: NetDestination::Arbitrary,
-            payload: NetPayload::SendsHostData,
-        },
-        execution: Execution { trust: ExecutionTrust::NetworkSourced, supply_chain: None },
-        cost: Cost::Quota,
-        because: because.to_string(),
-    }
-}
 
 /// Resolve a command's leaf tokens to its behavior profile, or `None` if the command
 /// has no resolver yet (the caller then worst-cases / falls back to the legacy
@@ -87,7 +43,7 @@ fn resolve_echo(_tokens: &[Token]) -> Profile {
 /// only format output and take no values.
 fn resolve_cat(tokens: &[Token]) -> Profile {
     if !cat_flags_all_benign(tokens) {
-        return Profile::of(vec![worst_case("cat: unrecognized flag — worst-cased (§0)")]);
+        return Profile::of(vec![Capability::worst("cat: unrecognized flag — worst-cased (§0)")]);
     }
     let files = positionals(tokens, |_| false);
     Profile::of(reads_to_model(&files, Scale::Single))
@@ -162,8 +118,9 @@ fn reads_content(locus: LocalLocus, scale: Scale, because: &str) -> Capability {
 /// unbounded`). Same positive certification as `cat` (observe, `secret = none`, no
 /// net/exec); `locus` per read is `classify_locus`.
 fn resolve_grep(tokens: &[Token]) -> Profile {
-    let recursive = has_flag(tokens, Some("-r"), Some("--recursive"))
-        || has_flag(tokens, Some("-R"), None);
+    // `-r` (or --recursive); `-R`/--dereference-recursive is not benign and worst-cases
+    // in the walk below, so it needn't be detected here.
+    let recursive = has_flag(tokens, Some("-r"), Some("--recursive"));
     let scale = if recursive { Scale::Unbounded } else { Scale::Single };
 
     let mut files = Vec::new(); // positional file operands
@@ -201,22 +158,30 @@ fn resolve_grep(tokens: &[Token]) -> Profile {
                 i += 1;
             }
         } else {
-            let (pattern_file, from_flag, consumes_next, recognized) = grep_short_cluster(t, next);
-            pattern_files.extend(pattern_file);
-            pattern_from_flag |= from_flag;
-            unknown_flag |= !recognized;
-            i += if consumes_next { 2 } else { 1 };
+            match grep_short_cluster(t, next) {
+                GrepShort::Unrecognized => {
+                    unknown_flag = true;
+                    i += 1;
+                }
+                GrepShort::Standalone => i += 1,
+                GrepShort::Pattern { file, consumes_next } => {
+                    pattern_files.extend(file);
+                    pattern_from_flag = true;
+                    i += if consumes_next { 2 } else { 1 };
+                }
+                GrepShort::SkipValue { consumes_next } => i += if consumes_next { 2 } else { 1 },
+            }
         }
     }
 
     if unknown_flag {
-        return Profile::of(vec![worst_case("grep: unrecognized flag — worst-cased (§0)")]);
+        return Profile::of(vec![Capability::worst("grep: unrecognized flag — worst-cased (§0)")]);
     }
     if files.is_empty() {
         // No positional operand → grep has no pattern (a `-e`/`-f` pattern still needs a
         // search target). This is a usage error; the legacy classifier denies it, so the
         // engine must not be looser — worst-case (§0).
-        return Profile::of(vec![worst_case("grep: no pattern operand — worst-cased (§0)")]);
+        return Profile::of(vec![Capability::worst("grep: no pattern operand — worst-cased (§0)")]);
     }
 
     if !pattern_from_flag {
@@ -234,16 +199,22 @@ fn resolve_grep(tokens: &[Token]) -> Profile {
     Profile::of(caps)
 }
 
+/// The outcome of parsing one grep short-option cluster.
+enum GrepShort<'a> {
+    /// An unrecognized short (e.g. `-P`, code-executing PCRE) → the caller worst-cases.
+    Unrecognized,
+    /// All chars benign; no value taken.
+    Standalone,
+    /// `-e`/`-f` supplied the pattern (so positionals are files); `-f`'s value, if any,
+    /// is a pattern file grep reads.
+    Pattern { file: Option<&'a str>, consumes_next: bool },
+    /// `-m`/`-A`/`-B`/`-C`/`-d` — a count/action value to skip.
+    SkipValue { consumes_next: bool },
+}
+
 /// Parse a grep short-option cluster (e.g. `-ifpatterns`), honoring GNU semantics that a
 /// value-taking short consumes the rest of its cluster (glued) or the next token.
-/// Returns `(pattern_file, pattern_from_flag, consumes_next_token, all_recognized)`:
-/// `-f` → a pattern *file* read; `-e` → a pattern *string*; `-m`/`-A`/`-B`/`-C`/`-d` → a
-/// count/action value to skip; a set of standalone benign shorts; **anything else** (e.g.
-/// `-P`, which enables code-executing PCRE) is unrecognized → the caller worst-cases (§0).
-fn grep_short_cluster<'a>(
-    cluster: &'a str,
-    next: Option<&'a str>,
-) -> (Option<&'a str>, bool, bool, bool) {
+fn grep_short_cluster<'a>(cluster: &'a str, next: Option<&'a str>) -> GrepShort<'a> {
     // NB: `r` (recursive) is benign, but `R` (--dereference-recursive) follows symlinks
     // and can escape the classified locus, so it is NOT benign — it worst-cases.
     const BENIGN: &[u8] = b"ivnclLoqswxHhaIrzZEFGbU";
@@ -251,16 +222,19 @@ fn grep_short_cluster<'a>(
     let mut k = 1;
     while k < bytes.len() {
         let glued = &cluster[k + 1..];
-        let has_glued = !glued.is_empty();
+        let has = !glued.is_empty();
         match bytes[k] {
-            b'f' => return (if has_glued { Some(glued) } else { next }, true, !has_glued, true),
-            b'e' => return (None, true, !has_glued, true),
-            b'm' | b'A' | b'B' | b'C' | b'd' => return (None, false, !has_glued, true),
+            b'f' => {
+                let file = if has { Some(glued) } else { next };
+                return GrepShort::Pattern { file, consumes_next: !has };
+            }
+            b'e' => return GrepShort::Pattern { file: None, consumes_next: !has },
+            b'm' | b'A' | b'B' | b'C' | b'd' => return GrepShort::SkipValue { consumes_next: !has },
             b if BENIGN.contains(&b) => k += 1,
-            _ => return (None, false, false, false), // unrecognized short → worst-case
+            _ => return GrepShort::Unrecognized,
         }
     }
-    (None, false, false, true)
+    GrepShort::Standalone
 }
 
 /// Whether a grep long flag (its `--name`, ignoring any `=value`) is recognized-benign.
@@ -592,6 +566,28 @@ mod tests {
     }
 
     #[test]
+    fn grep_long_flags() {
+        // --file / --file= name a pattern file grep also reads (2 caps)
+        assert_eq!(resolve(&toks(&["grep", "--file", "p.txt", "f.txt"])).expect("grep").capabilities.len(), 2);
+        assert_eq!(resolve(&toks(&["grep", "--file=p.txt", "f.txt"])).expect("grep").capabilities.len(), 2);
+
+        // --regexp supplies the pattern; the positional is the file
+        let r = resolve(&toks(&["grep", "--regexp", "foo", "f.txt"])).expect("grep");
+        assert_eq!(r.capabilities.len(), 1);
+        assert!(read_local().admits(&r));
+
+        // a space-separated long value (`--max-count 5`) is imprecise — `5` is read as a
+        // phantom positional — but FAIL-SAFE: still worktree-bounded, admitted at
+        // read-local, never looser. (Precise handling needs the TOML flag schema.)
+        let m = resolve(&toks(&["grep", "--max-count", "5", "foo", "f.txt"])).expect("grep");
+        assert!(read_local().admits(&m), "--max-count 5 is fail-safe (imprecise)");
+
+        // an unknown long flag worst-cases
+        let bad = resolve(&toks(&["grep", "--perl-regexp", "foo", "f"])).expect("grep");
+        assert!(!read_local().admits(&bad));
+    }
+
+    #[test]
     fn grep_stdin_and_standalone_flags() {
         assert!(inert().admits(&resolve(&toks(&["grep", "foo"])).expect("grep")), "no file → stdin");
         let p = resolve(&toks(&["grep", "-i", "-n", "foo", "file.txt"])).expect("grep");
@@ -656,7 +652,7 @@ mod tests {
                 reversibility: Some(OrdBound::at_least(Reversibility::Irreversible)),
                 ..Default::default()
             });
-        let wc = Profile::of(vec![worst_case("test")]);
+        let wc = Profile::of(vec![Capability::worst("test")]);
         assert!(!yolo.admits(&wc), "worst_case (locus=kernel) exceeds even a machine-capped allow");
     }
 
