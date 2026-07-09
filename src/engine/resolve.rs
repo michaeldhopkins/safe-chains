@@ -1072,4 +1072,36 @@ mod tests {
         assert!(read_local().admits(&resolve(&toks(&["cat", "-nA", "./x"])).expect("cat")));
         assert!(read_local().admits(&resolve(&toks(&["grep", "-rin", "foo", "src/"])).expect("grep")));
     }
+
+    use proptest::prelude::*;
+
+    /// The content-transfer commands: every one moves/bridges content between a source and
+    /// a destination operand, so BOTH roles must be locus-gated. Extend this list as
+    /// `install`/`dd`/`rsync`/`tar` land — a resolver that forgets to gate a role then fails
+    /// the property below (the `ln` cp-bypass class, §HP re: capability laundering).
+    const TRANSFER_CMDS: &[&str] = &["cp", "mv", "ln"];
+
+    /// A sensitive path that must never be laundered through a transfer command, in any
+    /// role. Covers each locus rung above the worktree AND the two unpinnable markers.
+    const HOT_PATHS: &[&str] = &["/etc/shadow", "~/.ssh/id_rsa", "$SECRET", "../out", "~/.aws"];
+
+    proptest! {
+        /// No capability laundering: a hot path in EITHER operand role of a transfer command
+        /// denies — you can neither pull a secret in (`cp ~/.ssh/id_rsa ./x`) nor push one
+        /// out (`cp ./x /etc/cron.d/y`). This is the STRICT property that catches an ignored
+        /// operand; plain locus-monotonicity does not, because ignoring a role leaves the
+        /// verdict unchanged, and unchanged is "not looser".
+        #[test]
+        fn transfer_commands_gate_both_operand_roles(
+            cmd in prop::sample::select(TRANSFER_CMDS),
+            hot in prop::sample::select(HOT_PATHS),
+        ) {
+            use crate::engine::bridge::project;
+            use crate::verdict::Verdict;
+            let hot_source = resolve(&toks(&[cmd, hot, "./safe"])).expect("resolves");
+            prop_assert_eq!(project(&hot_source), Verdict::Denied, "{} hot SOURCE ({})", cmd, hot);
+            let hot_dest = resolve(&toks(&[cmd, "./safe", hot])).expect("resolves");
+            prop_assert_eq!(project(&hot_dest), Verdict::Denied, "{} hot DEST ({})", cmd, hot);
+        }
+    }
 }
