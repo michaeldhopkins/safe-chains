@@ -74,46 +74,19 @@ fn resolve_echo(_tokens: &[Token]) -> Profile {
 /// `classify_locus` (fail-closed: `$VAR`/`..` → `machine`). `cat`'s flags (`-n`/`-A`/…)
 /// only format output and take no values.
 fn resolve_cat(tokens: &[Token]) -> Profile {
-    if !cat_flags_all_benign(tokens) {
+    const CAT: Flags = Flags {
+        short: b"AbeEnstTuv",
+        valued_short: &[],
+        long: &[
+            "--number", "--number-nonblank", "--show-all", "--show-ends", "--show-nonprinting",
+            "--show-tabs", "--squeeze-blank", "--help", "--version",
+        ],
+        valued_long: &[],
+    };
+    let Some(files) = CAT.positionals(tokens) else {
         return Profile::of(vec![Capability::worst("cat: unrecognized flag — worst-cased (§0)")]);
-    }
-    let files = positionals(tokens, |_| false);
+    };
     Profile::of(reads_to_model(&files, Scale::Single))
-}
-
-/// Whether every flag before `--` is a recognized-benign `cat` flag (output formatting,
-/// no value). Any other flag is uncertifiable → the caller worst-cases (§0).
-fn cat_flags_all_benign(tokens: &[Token]) -> bool {
-    const SHORT: &[u8] = b"AbeEnstTuv";
-    const LONG: &[&str] = &[
-        "--number",
-        "--number-nonblank",
-        "--show-all",
-        "--show-ends",
-        "--show-nonprinting",
-        "--show-tabs",
-        "--squeeze-blank",
-        "--help",
-        "--version",
-    ];
-    for t in &tokens[1..] {
-        let t = t.as_str();
-        if t == "--" {
-            break;
-        }
-        if t == "-" || !t.starts_with('-') {
-            continue;
-        }
-        let ok = if t.starts_with("--") {
-            LONG.contains(&t)
-        } else {
-            t.bytes().skip(1).all(|b| SHORT.contains(&b))
-        };
-        if !ok {
-            return false;
-        }
-    }
-    true
 }
 
 /// One `observe · content-to-model` capability per path (empty list = reads stdin). A
@@ -295,21 +268,24 @@ fn grep_long_known(flag: &str) -> bool {
 /// is the *recursion*, not the force), so the generic "--force → irreversible" modifier
 /// is command-specific, not universal.
 fn resolve_rm(tokens: &[Token]) -> Profile {
-    if !rm_flags_all_benign(tokens) {
+    // `--no-preserve-root` (which enables `rm -rf /`) is intentionally absent → worst-case.
+    const RM: Flags = Flags {
+        short: b"fiIrRdv",
+        valued_short: &[],
+        long: &[
+            "--force", "--interactive", "--recursive", "--dir", "--verbose",
+            "--one-file-system", "--preserve-root", "--help", "--version",
+        ],
+        valued_long: &[],
+    };
+    let Some(operands) = RM.positionals(tokens) else {
         return Profile::of(vec![Capability::worst("rm: unrecognized/dangerous flag — worst-cased (§0)")]);
-    }
-    let operands = positionals(tokens, |_| false);
+    };
     if operands.is_empty() {
         return Profile::of(vec![Capability::worst("rm: no operand — worst-cased (§0)")]);
     }
     let recursive = has_flag(tokens, Some("-r"), Some("--recursive")) || has_flag(tokens, Some("-R"), None);
-    let scale = if recursive {
-        Scale::Unbounded
-    } else if operands.len() > 1 || operands.iter().any(|p| p.contains(['*', '?', '['])) {
-        Scale::Bounded
-    } else {
-        Scale::Single
-    };
+    let scale = breadth_scale(&operands, recursive);
     Profile::of(operands.iter().map(|p| destroys(classify_locus(p), scale)).collect())
 }
 
@@ -359,50 +335,19 @@ fn breadth_scale(operands: &[&str], recursive: bool) -> Scale {
 
 /// Whether every flag (up to `--`) is recognized. `valued` flags (matched as whole tokens,
 /// short or long) consume their following token as a value — skipped so a dash-leading
-/// value (`touch -d '-1 day'`) is not misread as a flag. An unrecognized flag → the caller
-/// worst-cases (§0).
-fn flags_recognized(tokens: &[Token], short: &[u8], long: &[&str], valued: &[&str]) -> bool {
-    let mut i = 1;
-    while i < tokens.len() {
-        let t = tokens[i].as_str();
-        if t == "--" {
-            break;
-        }
-        if t == "-" || !t.starts_with('-') {
-            i += 1;
-            continue;
-        }
-        let name = t.split('=').next().unwrap_or(t);
-        if valued.contains(&t) {
-            if !t.contains('=') {
-                i += 1; // skip the value token
-            }
-        } else {
-            let ok = if t.starts_with("--") {
-                long.contains(&name)
-            } else {
-                t.bytes().skip(1).all(|b| short.contains(&b))
-            };
-            if !ok {
-                return false;
-            }
-        }
-        i += 1;
-    }
-    true
-}
-
 /// `mkdir DIR…` — creates directories. Non-destructive (fails on an existing target; `-p`
 /// is idempotent), so reversibility is `trivial` — a fresh empty dir is `rmdir`-removable.
 /// `-m`/`--mode`/`--context` take a value; `locus` per operand is `classify_locus`.
 fn resolve_mkdir(tokens: &[Token]) -> Profile {
-    const SHORT: &[u8] = b"pvZ";
-    const LONG: &[&str] = &["--parents", "--verbose", "--help", "--version"];
-    const VALUED: &[&str] = &["-m", "--mode", "--context"];
-    if !flags_recognized(tokens, SHORT, LONG, VALUED) {
+    const MKDIR: Flags = Flags {
+        short: b"pvZ",
+        valued_short: b"m",
+        long: &["--parents", "--verbose", "--help", "--version"],
+        valued_long: &["--mode", "--context"],
+    };
+    let Some(dirs) = MKDIR.positionals(tokens) else {
         return Profile::of(vec![Capability::worst("mkdir: unrecognized flag — worst-cased (§0)")]);
-    }
-    let dirs = positionals(tokens, |f| VALUED.contains(&f));
+    };
     if dirs.is_empty() {
         return Profile::of(vec![Capability::worst("mkdir: no operand — worst-cased (§0)")]);
     }
@@ -429,13 +374,15 @@ fn resolve_mkdir(tokens: &[Token]) -> Profile {
 /// classifier can't resolve is verdict-irrelevant). `-r`/`-t`/`-d` take a value; the `-r`
 /// reference is only an mtime read (metadata, not content) and carries no read capability.
 fn resolve_touch(tokens: &[Token]) -> Profile {
-    const SHORT: &[u8] = b"Aacmh";
-    const LONG: &[&str] = &["--no-create", "--no-dereference", "--help", "--version"];
-    const VALUED: &[&str] = &["-r", "-t", "-d", "--reference", "--date", "--time"];
-    if !flags_recognized(tokens, SHORT, LONG, VALUED) {
+    const TOUCH: Flags = Flags {
+        short: b"Aacmh",
+        valued_short: b"rtd",
+        long: &["--no-create", "--no-dereference", "--help", "--version"],
+        valued_long: &["--reference", "--date", "--time"],
+    };
+    let Some(files) = TOUCH.positionals(tokens) else {
         return Profile::of(vec![Capability::worst("touch: unrecognized flag — worst-cased (§0)")]);
-    }
-    let files = positionals(tokens, |f| VALUED.contains(&f));
+    };
     if files.is_empty() {
         return Profile::of(vec![Capability::worst("touch: no operand — worst-cased (§0)")]);
     }
@@ -468,21 +415,22 @@ fn resolve_touch(tokens: &[Token]) -> Profile {
 /// `trivial` (→ `write-local`). That flag is the safe-form remediation, the same shape as
 /// `--ignore-scripts`.
 fn resolve_cp(tokens: &[Token]) -> Profile {
-    const SHORT: &[u8] = b"HLNPRXacdfhilnprsuvx";
-    const LONG: &[&str] = &[
-        "--archive", "--force", "--help", "--interactive", "--no-clobber", "--no-dereference",
-        "--no-target-directory", "--one-file-system", "--parents", "--recursive",
-        "--remove-destination", "--symbolic-link", "--update", "--verbose", "--version",
-    ];
-    const VALUED: &[&str] =
-        &["--backup", "--preserve", "--reflink", "--sparse", "--suffix", "--target-directory", "-t", "-S"];
-    if !flags_recognized(tokens, SHORT, LONG, VALUED) {
+    const CP: Flags = Flags {
+        short: b"HLNPRXacdfhilnprsuvx",
+        valued_short: b"tS",
+        long: &[
+            "--archive", "--force", "--help", "--interactive", "--no-clobber", "--no-dereference",
+            "--no-target-directory", "--one-file-system", "--parents", "--recursive",
+            "--remove-destination", "--symbolic-link", "--update", "--verbose", "--version",
+        ],
+        valued_long: &["--backup", "--preserve", "--reflink", "--sparse", "--suffix", "--target-directory"],
+    };
+    let Some(operands) = CP.positionals(tokens) else {
         return Profile::of(vec![Capability::worst("cp: unrecognized flag — worst-cased (§0)")]);
-    }
-    let operands = positionals(tokens, |f| VALUED.contains(&f));
+    };
     // With -t/--target-directory the dest is the flag's value and every operand is a
     // source; otherwise the last operand is the dest and the rest are sources.
-    let (sources, dest): (&[&str], &str) = match target_directory(tokens) {
+    let (sources, dest): (&[&str], &str) = match CP.value(tokens, b't', "--target-directory") {
         Some(d) => (operands.as_slice(), d),
         None => match operands.split_last() {
             Some((last, rest)) if !rest.is_empty() => (rest, *last),
@@ -518,79 +466,118 @@ fn copies_source(locus: LocalLocus, scale: Scale) -> Capability {
     c
 }
 
-/// The `-t DIR` / `--target-directory[=DIR]` value, if present — the explicit destination
-/// that makes every positional a source.
-fn target_directory(tokens: &[Token]) -> Option<&str> {
-    let mut i = 1;
-    while i < tokens.len() {
-        let t = tokens[i].as_str();
-        if t == "--" {
-            break;
-        }
-        if let Some(d) = t.strip_prefix("--target-directory=") {
-            return Some(d);
-        }
-        if t == "-t" || t == "--target-directory" {
-            return tokens.get(i + 1).map(Token::as_str);
-        }
-        if let Some(d) = t.strip_prefix("-t").filter(|d| !d.is_empty() && !t.starts_with("--")) {
-            return Some(d);
-        }
-        i += 1;
-    }
-    None
+/// A getopt-style flag spec for a fixed-flag-set command. `short` flags are single chars
+/// that cluster (`-rf`); `valued_*` flags take a value, either glued (`-tDIR`, `--dir=X`)
+/// or as the next token (`-t DIR`, `--dir X`). A valued short ends its cluster and takes
+/// the glued remainder or the next token. (`grep` keeps its own parser — its shorts carry
+/// richer semantics: a value-short can supply a *pattern* to read vs a count to skip.)
+struct Flags {
+    short: &'static [u8],
+    valued_short: &'static [u8],
+    long: &'static [&'static str],
+    valued_long: &'static [&'static str],
 }
 
-/// Whether every `rm` flag is recognized-benign. `--no-preserve-root` (which enables
-/// `rm -rf /`) is intentionally absent → worst-case (§0). `--interactive[=WHEN]` and other
-/// `=value` longs are matched on their `--name`.
-fn rm_flags_all_benign(tokens: &[Token]) -> bool {
-    const SHORT: &[u8] = b"fiIrRdv";
-    const LONG: &[&str] = &[
-        "--force", "--interactive", "--recursive", "--dir", "--verbose", "--one-file-system",
-        "--preserve-root", "--help", "--version",
-    ];
-    for t in &tokens[1..] {
-        let t = t.as_str();
-        if t == "--" {
-            break;
-        }
-        if t == "-" || !t.starts_with('-') {
-            continue;
-        }
-        let ok = if t.starts_with("--") {
-            LONG.contains(&t.split('=').next().unwrap_or(t))
-        } else {
-            t.bytes().skip(1).all(|b| SHORT.contains(&b))
-        };
-        if !ok {
-            return false;
-        }
-    }
-    true
+enum FlagKind {
+    Unknown,
+    Boolean,
+    ValuedGlued, // the value is inside this token (`-tX`, `--dir=X`)
+    ValuedNext,  // the value is the following token (`-t X`, `--dir X`)
 }
 
-/// The positional (non-flag) operands of an invocation: skips `tokens[0]` (the command),
-/// flags, and — for flags `takes_value` reports true and that are not inline `--x=y` —
-/// their following value. `--` ends flag parsing; a bare `-` is a positional (stdin).
-fn positionals(tokens: &[Token], takes_value: impl Fn(&str) -> bool) -> Vec<&str> {
-    let mut out = Vec::new();
-    let mut flags_done = false;
-    let mut i = 1;
-    while i < tokens.len() {
-        let t = tokens[i].as_str();
-        if !flags_done && t == "--" {
-            flags_done = true;
-        } else if !flags_done && t.starts_with('-') && t != "-" {
-            if takes_value(t) && !t.contains('=') {
-                i += 1; // also skip this flag's value
+impl Flags {
+    /// The positional operands up to `--`, or `None` if any flag is unrecognized (the
+    /// caller then worst-cases, §0). A valued flag's value is consumed, never returned as a
+    /// positional; a bare `-` is a positional (stdin).
+    fn positionals<'a>(&self, tokens: &'a [Token]) -> Option<Vec<&'a str>> {
+        let mut out = Vec::new();
+        let mut flags_done = false;
+        let mut i = 1;
+        while i < tokens.len() {
+            let t = tokens[i].as_str();
+            if !flags_done && t == "--" {
+                flags_done = true;
+            } else if flags_done || t == "-" || !t.starts_with('-') {
+                out.push(t);
+            } else {
+                match self.classify(t) {
+                    FlagKind::Unknown => return None,
+                    FlagKind::ValuedNext => i += 1, // also skip the value token
+                    FlagKind::Boolean | FlagKind::ValuedGlued => {}
+                }
             }
-        } else {
-            out.push(t);
+            i += 1;
         }
-        i += 1;
+        Some(out)
     }
-    out
+
+    /// Classify one flag token against the spec.
+    fn classify(&self, t: &str) -> FlagKind {
+        if let Some(rest) = t.strip_prefix("--") {
+            let name_len = rest.split('=').next().unwrap_or(rest).len();
+            let full = &t[..2 + name_len];
+            let has_eq = t.len() > 2 + name_len;
+            if self.valued_long.contains(&full) {
+                return if has_eq { FlagKind::ValuedGlued } else { FlagKind::ValuedNext };
+            }
+            if self.long.contains(&full) {
+                // A boolean long never consumes the NEXT token; a glued `=value` is its
+                // optional-argument form (`rm --interactive=always`) — accept and consume
+                // just this token.
+                return if has_eq { FlagKind::ValuedGlued } else { FlagKind::Boolean };
+            }
+            return FlagKind::Unknown;
+        }
+        let bytes = t.as_bytes();
+        let mut k = 1;
+        while k < bytes.len() {
+            let b = bytes[k];
+            if self.valued_short.contains(&b) {
+                return if k + 1 < bytes.len() { FlagKind::ValuedGlued } else { FlagKind::ValuedNext };
+            }
+            if self.short.contains(&b) {
+                k += 1;
+            } else {
+                return FlagKind::Unknown;
+            }
+        }
+        FlagKind::Boolean
+    }
+
+    /// The value of a specific valued flag (glued or next-token), if present.
+    fn value<'a>(&self, tokens: &'a [Token], short: u8, long: &str) -> Option<&'a str> {
+        let mut i = 1;
+        while i < tokens.len() {
+            let t = tokens[i].as_str();
+            if t == "--" {
+                break;
+            }
+            if t.starts_with("--") {
+                if let Some(v) = t.strip_prefix(long).and_then(|r| r.strip_prefix('=')) {
+                    return Some(v);
+                }
+                if t == long {
+                    return tokens.get(i + 1).map(Token::as_str);
+                }
+            } else if t.starts_with('-') && t != "-" {
+                let bytes = t.as_bytes();
+                let mut k = 1;
+                while k < bytes.len() {
+                    let b = bytes[k];
+                    if b == short && self.valued_short.contains(&b) {
+                        let glued = &t[k + 1..];
+                        return if glued.is_empty() { tokens.get(i + 1).map(Token::as_str) } else { Some(glued) };
+                    }
+                    if self.valued_short.contains(&b) {
+                        break; // a different valued short consumes the rest of the cluster
+                    }
+                    k += 1;
+                }
+            }
+            i += 1;
+        }
+        None
+    }
 }
 
 /// The filesystem rung a path reaches (v1.4 §2.2). A value that cannot be pinned —
@@ -1000,6 +987,10 @@ mod tests {
         for cmd in [vec!["mkdir", "/etc/evil"], vec!["mkdir", "~/newdir"], vec!["mkdir", "$HOME/x"]] {
             assert_eq!(project(&resolve(&toks(&cmd)).expect("mkdir")), Verdict::Denied, "{cmd:?}");
         }
+        // a glued valued short (-m755) and its value must not be read as operands
+        let g = resolve(&toks(&["mkdir", "-m755", "./x"])).expect("mkdir");
+        assert_eq!(g.capabilities.len(), 1, "-m755 glued: only ./x is an operand");
+        assert_eq!(g.capabilities[0].locus.local, LocalLocus::Worktree);
         // fail-closed on an unknown flag / no operand
         assert_eq!(project(&resolve(&toks(&["mkdir", "-Q", "x"])).expect("mkdir")), Verdict::Denied, "unknown flag");
         assert_eq!(project(&resolve(&toks(&["mkdir"])).expect("mkdir")), Verdict::Denied, "no operand");
@@ -1024,10 +1015,19 @@ mod tests {
         assert_eq!(project(&resolve(&toks(&["cp", "./x", "~/backdoor"])).expect("cp")), Verdict::Denied, "home dest");
         assert_eq!(project(&resolve(&toks(&["cp", "./x", "/etc/cron.d/x"])).expect("cp")), Verdict::Denied, "system dest");
 
-        // -t DIR makes every positional a source; the dir is the dest.
-        let t = resolve(&toks(&["cp", "-t", "./dest", "./a", "./b"])).expect("cp -t");
-        assert_eq!(t.capabilities.len(), 3, "2 sources + 1 dest");
-        assert_eq!(project(&t), Verdict::Allowed(SafetyLevel::SafeWrite), "cp -t ./dest ./a ./b");
+        // -t DIR makes every positional a source; the dir is the dest. All three spellings
+        // (separate, --long=, and glued short) must parse the same way.
+        for form in [
+            vec!["cp", "-t", "./dest", "./a", "./b"],
+            vec!["cp", "--target-directory=./dest", "./a", "./b"],
+            vec!["cp", "-t./dest", "./a", "./b"], // glued short — previously worst-cased
+        ] {
+            let t = resolve(&toks(&form)).expect("cp -t");
+            assert_eq!(t.capabilities.len(), 3, "{form:?}: 2 sources + 1 dest");
+            assert_eq!(project(&t), Verdict::Allowed(SafetyLevel::SafeWrite), "{form:?}");
+        }
+        // a glued -t pointing outside the worktree is still denied by the dest locus.
+        assert_eq!(project(&resolve(&toks(&["cp", "-t/etc", "./a"])).expect("cp")), Verdict::Denied, "cp -t/etc");
 
         // recursion raises scale to unbounded; a lone operand / unknown flag worst-cases.
         assert_eq!(resolve(&toks(&["cp", "-r", "./a", "./b"])).expect("cp").capabilities[0].scale, Scale::Unbounded);
@@ -1086,6 +1086,7 @@ mod tests {
             vec!["rm", "./stale.log"],
             vec!["rm", "-rf", "./node_modules"],
             vec!["rm", "a", "b", "c"],
+            vec!["rm", "--interactive=always", "./x"], // optional-arg long: must not worst-case
         ] {
             let p = resolve(&toks(&cmd)).expect("rm resolves");
             assert!(p.capabilities.iter().all(|c| c.operation == Operation::Destroy), "{cmd:?} destroys");
