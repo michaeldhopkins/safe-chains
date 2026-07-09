@@ -14,12 +14,33 @@ use crate::parse::{Token, has_flag};
 /// classifier — §0 fail-closed). Redirects, substitutions, and chain semantics are the
 /// surrounding CST's job, not this leaf's (annex `…-engine` §1).
 pub fn resolve(tokens: &[Token]) -> Option<Profile> {
-    match tokens.first()?.command_name() {
-        "echo" => Some(resolve_echo(tokens)),
-        "cat" => Some(resolve_cat(tokens)),
-        "grep" => Some(resolve_grep(tokens)),
-        _ => None,
+    let arg0 = tokens.first()?;
+    let resolver: fn(&[Token]) -> Profile = match arg0.command_name() {
+        "echo" => resolve_echo,
+        "cat" => resolve_cat,
+        "grep" => resolve_grep,
+        _ => return None,
+    };
+    // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`,
+    // `~/bin/grep`) is not necessarily the real tool — a planted binary named `cat` would
+    // be certified as safe coreutils. Don't certify it; worst-case (§0). Bare names and
+    // standard bin paths are trusted. (Legacy classifies purely by basename and inherits
+    // the spoof; the engine is stricter here, which keeps it never-looser.)
+    if !trusted_command_path(arg0.as_str()) {
+        return Some(Profile::of(vec![Capability::worst(
+            "resolvable name invoked from a non-standard path — possible spoof (§0)",
+        )]));
     }
+    Some(resolver(tokens))
+}
+
+/// Whether `arg0` is a trusted way to invoke a standard tool: a bare name (found via
+/// `$PATH`) or an absolute path under a standard system bin directory. A path elsewhere
+/// (`./x`, `/tmp/x`, `~/bin/x`) may be an impostor.
+fn trusted_command_path(arg0: &str) -> bool {
+    const STD_BINS: &[&str] =
+        &["/usr/bin/", "/bin/", "/usr/local/bin/", "/opt/homebrew/bin/", "/sbin/", "/usr/sbin/"];
+    !arg0.contains('/') || STD_BINS.iter().any(|p| arg0.starts_with(p))
 }
 
 /// `echo` — the reference *structural* certification (§0): every facet is positively
@@ -654,6 +675,20 @@ mod tests {
             });
         let wc = Profile::of(vec![Capability::worst("test")]);
         assert!(!yolo.admits(&wc), "worst_case (locus=kernel) exceeds even a machine-capped allow");
+    }
+
+    #[test]
+    fn a_resolvable_name_from_a_non_standard_path_worst_cases() {
+        // ./cat, /tmp/cat, ~/bin/grep may be impostors → worst-case, not certified safe
+        for cmd in [vec!["./cat", "x"], vec!["/tmp/cat", "x"], vec!["~/bin/grep", "foo", "f"]] {
+            let p = resolve(&toks(&cmd)).expect("resolvable name");
+            assert!(!read_local().admits(&p), "{cmd:?} from a non-standard path must worst-case");
+        }
+        // bare names and standard bin paths resolve normally
+        assert!(read_local().admits(&resolve(&toks(&["cat", "./notes.md"])).expect("cat")));
+        assert!(read_local().admits(&resolve(&toks(&["/usr/bin/cat", "./notes.md"])).expect("cat")));
+        // a non-resolvable command from any path → None (the engine doesn't claim it)
+        assert!(resolve(&toks(&["/tmp/mytool", "x"])).is_none());
     }
 
     #[test]

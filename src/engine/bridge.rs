@@ -72,6 +72,14 @@ pub fn engine_verdict(tokens: &[Token]) -> Option<Verdict> {
 /// ascending local chain (inert ⊂ read-local ⊂ write-local), so the first match is the
 /// minimum.
 pub fn project(profile: &Profile) -> Verdict {
+    if profile.capabilities.is_empty() {
+        // Fail-closed (§0): an empty profile means the resolver produced NO capability.
+        // Every level vacuously admits it (`all` of zero capabilities is true), so without
+        // this guard it would project to the lowest level (`inert`) — the *most*
+        // permissive, inverting the principle. A genuinely-inert command emits an explicit
+        // observe capability, never an empty profile.
+        return Verdict::Denied;
+    }
     for level in default_levels() {
         if level.admits(profile) {
             return Verdict::Allowed(to_legacy(&level.name));
@@ -136,6 +144,10 @@ mod tests {
             c
         }]);
         assert_eq!(project(&write), Verdict::Allowed(SafetyLevel::SafeWrite));
+
+        // an EMPTY profile must fail closed (Denied), NOT project to inert — every level
+        // vacuously admits it, so the guard is what stops "resolved to nothing" = "safe".
+        assert_eq!(project(&Profile::of(vec![])), Verdict::Denied);
     }
 
     #[test]
