@@ -12,6 +12,20 @@ static FIND_DANGEROUS_FLAGS: WordSet = WordSet::new(&[
 ]);
 
 pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict {
+    // find's `{}` placeholder is substituted with each traversed path, which lives UNDER
+    // find's path operand. So the nested command's locus is find's traversal scope, not a
+    // bare worktree name: `find /etc -exec rm {}` deletes /etc files, not `./file`. Bind `{}`
+    // to a path under each find operand and delegate once per operand (deny-absorbing), so a
+    // system/home traversal denies. Default operand `.` when none is given (find's default).
+    let bases: Vec<&str> = {
+        let leading: Vec<&str> = tokens[1..]
+            .iter()
+            .take_while(|t| !t.as_str().starts_with('-'))
+            .map(Token::as_str)
+            .collect();
+        if leading.is_empty() { vec!["."] } else { leading }
+    };
+
     let mut level = SafetyLevel::Inert;
     let mut i = 1;
     while i < tokens.len() {
@@ -28,14 +42,16 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
             if cmd_start >= cmd_end {
                 return Verdict::Denied;
             }
-            let exec_words: Vec<&str> = tokens[cmd_start..cmd_end]
-                .iter()
-                .map(|t| if t.as_str() == "{}" { "file" } else { t.as_str() })
-                .collect();
-            let exec_cmd = shell_words::join(exec_words);
-            match crate::command_verdict(&exec_cmd) {
-                Verdict::Denied => return Verdict::Denied,
-                Verdict::Allowed(l) => level = level.max(l),
+            for base in &bases {
+                let bound = format!("{}/f", base.trim_end_matches('/'));
+                let exec_words: Vec<String> = tokens[cmd_start..cmd_end]
+                    .iter()
+                    .map(|t| t.as_str().replace("{}", &bound))
+                    .collect();
+                match crate::command_verdict(&shell_words::join(&exec_words)) {
+                    Verdict::Denied => return Verdict::Denied,
+                    Verdict::Allowed(l) => level = level.max(l),
+                }
             }
             i = cmd_end + 1;
             continue;
