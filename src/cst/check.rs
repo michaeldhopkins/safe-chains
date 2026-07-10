@@ -202,8 +202,7 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
 
 /// The command leaf's verdict, gated by the engine mode (`…-engine` §4). In `legacy`
 /// (default) the legacy classifier is authoritative and the engine never runs; in `new`
-/// the engine is authoritative for commands it can resolve; in `shadow` the engine runs
-/// alongside and divergences are reported, but legacy still decides.
+/// the engine is authoritative for commands it can resolve and legacy handles the rest.
 fn leaf_verdict(tokens: &[Token]) -> Verdict {
     let legacy = handlers::dispatch(tokens);
     crate::engine::bridge::apply_mode(crate::engine::bridge::mode(), legacy, tokens)

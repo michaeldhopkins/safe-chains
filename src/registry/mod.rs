@@ -57,7 +57,7 @@ pub fn toml_command_names() -> Vec<&'static str> {
 }
 
 /// Every command's canonical name with its declared `examples_safe` / `examples_denied`
-/// — the corpus the engine's shadow diff harness runs against.
+/// — the corpus the engine's never-looser corpus gate runs against.
 #[cfg(test)]
 pub(crate) fn corpus_examples()
 -> Vec<(&'static str, &'static [String], &'static [String])> {
