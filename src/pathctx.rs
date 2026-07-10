@@ -87,6 +87,20 @@ pub fn resolve(path: &str) -> Cow<'_, str> {
     resolved.map_or(Cow::Borrowed(path), Cow::Owned)
 }
 
+/// Resolve a `cd` target to a new absolute working directory, or `None` if it can't be
+/// pinned statically (`cd`, `cd -`, `cd ~…`, `cd $VAR`) — the caller then leaves the running
+/// cwd unchanged. `cur` is the current cwd, needed to resolve a *relative* target. Used by
+/// intra-line `cd` tracking (HP-19 #2).
+pub fn join_cwd(cur: Option<&str>, target: &str) -> Option<String> {
+    if target.starts_with('~') || target.contains('$') {
+        return None; // home / unpinnable
+    }
+    if target.starts_with('/') {
+        return Some(lexical_join("/", target)); // absolute — normalize
+    }
+    cur.filter(|c| c.starts_with('/')).map(|c| lexical_join(c, target)) // relative
+}
+
 /// Lexically join `rel` onto absolute `cwd`, resolving `.`/`..` without touching the disk,
 /// then express the result relative to `root` if it's inside, or absolute if it escaped.
 fn project_relative_or_absolute(cwd: &str, root: &str, rel: &str) -> String {

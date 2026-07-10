@@ -15,9 +15,36 @@ pub fn is_safe_command(input: &str) -> bool {
 }
 
 fn script_verdict(script: &Script) -> Verdict {
-    script.0.iter()
-        .map(|stmt| pipeline_verdict(&stmt.pipeline))
-        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
+    // HP-19 #2: track cwd across statements. Each statement is evaluated with the current
+    // running cwd installed (so a later relative path resolves against it), and a `cd DIR`
+    // statement updates that running cwd for the statements after it. Fail-open: an
+    // unresolvable `cd` (bare / `~` / `$VAR`) leaves the running cwd unchanged.
+    let mut running = crate::pathctx::cwd();
+    let mut verdict = Verdict::Allowed(SafetyLevel::Inert);
+    for stmt in &script.0 {
+        let v = {
+            let _cwd = crate::pathctx::enter_cwd(running.clone());
+            pipeline_verdict(&stmt.pipeline)
+        };
+        verdict = verdict.combine(v);
+        let next = cd_target(&stmt.pipeline).and_then(|t| crate::pathctx::join_cwd(running.as_deref(), &t));
+        if next.is_some() {
+            running = next;
+        }
+    }
+    verdict
+}
+
+/// The target of a statement-level `cd DIR` (a single simple command named `cd`), for cwd
+/// tracking. `None` for anything else, or `cd` with no plain positional (bare `cd`, `cd -`).
+fn cd_target(pipeline: &Pipeline) -> Option<String> {
+    let [Cmd::Simple(s)] = pipeline.commands.as_slice() else {
+        return None;
+    };
+    if s.words.first()?.eval() != "cd" {
+        return None;
+    }
+    s.words.iter().skip(1).map(|w| w.eval()).find(|a| !a.starts_with('-'))
 }
 
 #[cfg(test)]
