@@ -87,6 +87,7 @@ impl HookFormat for QwenHookFormat {
         Ok(HookInput {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
+            root: super::env_root("QWEN_PROJECT_DIR"),
         })
     }
 

@@ -113,6 +113,12 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
         process::exit(0);
     };
 
+    // HP-19: install the harness cwd/root so relative paths resolve against the real
+    // directory for the whole evaluation (verdict and explainer).
+    let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
+        cwd: input.cwd.clone(),
+        root: input.root.clone(),
+    });
     let verdict = safe_chains::command_verdict(&input.command);
     if verdict.is_allowed() {
         let response = format.render_response(verdict);
@@ -160,6 +166,10 @@ fn main() {
             } else if cli.opencode_config {
                 print_opencode_config();
             } else if let Some(command) = cli.command {
+                let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
+                    cwd: cli.cwd,
+                    root: cli.root,
+                });
                 if cli.explain {
                     run_explain(&command);
                 }

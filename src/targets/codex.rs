@@ -87,6 +87,7 @@ impl HookFormat for CodexHookFormat {
         Ok(HookInput {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
+            root: None, // codex sends cwd but no distinct project root (HARNESS-BEHAVIORS.md)
         })
     }
 

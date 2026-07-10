@@ -110,6 +110,7 @@ impl HookFormat for CopilotHookFormat {
         Ok(HookInput {
             command: inner.command.unwrap_or_default(),
             cwd: envelope.cwd,
+            root: None, // copilot sends cwd but no documented project root
         })
     }
 
