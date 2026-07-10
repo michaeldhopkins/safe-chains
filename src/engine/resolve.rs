@@ -242,8 +242,16 @@ fn resolve_grep(tokens: &[Token]) -> Profile {
             } else if t.starts_with("--regexp=") {
                 pattern_from_flag = true;
                 i += 1;
+            } else if grep_long_known(t) {
+                i += 1;
+            } else if grep_long_dangerous(t) {
+                unknown_flag = true;
+                i += 1;
             } else {
-                unknown_flag |= !grep_long_known(t);
+                // An unrecognized `--token` is not a grep flag: it is the search PATTERN
+                // (grep patterns commonly look like `-->`, `---`, `--foo`). Treat it as a
+                // positional so the file operands classify the read, matching legacy.
+                files.push(t);
                 i += 1;
             }
         } else {
@@ -342,6 +350,15 @@ fn grep_long_known(flag: &str) -> bool {
     ];
     let name = flag.split('=').next().unwrap_or(flag);
     KNOWN.contains(&name)
+}
+
+/// The long spellings of the dangerous grep shorts `-P`/`-R`: `--perl-regexp` (PCRE can
+/// execute code via `(?{...})`) and `--dereference-recursive` (follows symlinks out of the
+/// classified locus, M2). Recognized so both spellings worst-case; every OTHER unrecognized
+/// `--token` is a search pattern, not a flag.
+fn grep_long_dangerous(flag: &str) -> bool {
+    let name = flag.split('=').next().unwrap_or(flag);
+    matches!(name, "--perl-regexp" | "--dereference-recursive")
 }
 
 /// `rm FILE…` — deletes files. Positive certification (§0): `operation = destroy`, no
@@ -1039,9 +1056,36 @@ mod tests {
         let m = resolve(&toks(&["grep", "--max-count", "5", "foo", "f.txt"])).expect("grep");
         assert!(read_local().admits(&m), "--max-count 5 is fail-safe (imprecise)");
 
-        // an unknown long flag worst-cases
+        // a dangerous long flag (PCRE code-exec) worst-cases
         let bad = resolve(&toks(&["grep", "--perl-regexp", "foo", "f"])).expect("grep");
         assert!(!read_local().admits(&bad));
+    }
+
+    #[test]
+    fn grep_dash_patterns_are_search_patterns_not_flags() {
+        // A `--`-prefixed token that is not a recognized grep flag is a SEARCH PATTERN, not
+        // an unknown flag — grep patterns commonly look like `-->`, `---`, `--foo`. The
+        // engine must read the file operand at read-local, matching the legacy handler, not
+        // worst-case it.
+        for args in [
+            vec!["grep", "-->", "file.txt"],
+            vec!["grep", "---", "file.txt"],
+            vec!["grep", "--some-pattern", "file.txt"],
+            vec!["grep", "-rn", "-->", "src/"],
+            vec!["grep", "-i", "-r", "-n", "-->", "src/"],
+        ] {
+            let p = resolve(&toks(&args)).expect("grep");
+            assert!(read_local().admits(&p), "dash-pattern should read-local: {args:?}");
+            assert!(!inert().admits(&p), "it still reads a file: {args:?}");
+        }
+        // but the genuinely-dangerous longs (the long spellings of -P/-R) still worst-case
+        for args in [
+            vec!["grep", "--perl-regexp", "foo", "f"],
+            vec!["grep", "--dereference-recursive", "foo", "dir"],
+        ] {
+            let p = resolve(&toks(&args)).expect("grep");
+            assert!(!read_local().admits(&p), "dangerous long must worst-case: {args:?}");
+        }
     }
 
     #[test]
