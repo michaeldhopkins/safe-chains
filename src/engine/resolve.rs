@@ -1382,6 +1382,27 @@ mod tests {
         assert_eq!(project(&resolve(&toks(&["sed", "-Q", "./foo"])).expect("sed")), Verdict::Denied, "unknown flag");
     }
 
+    /// PROOF of the cwd-blindness gap — a CHARACTERIZATION of current, UNSOUND behavior, not
+    /// an endorsement. `classify_locus` takes only the path string and assumes relative ==
+    /// worktree; there is no cwd input. So a relative operand is scored worktree-local even
+    /// when the shell is elsewhere. When the classifier becomes cwd-aware these flip.
+    #[test]
+    fn gap_cwd_blind_classifier_scores_relative_operands_as_worktree() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+
+        // Under `cd /etc`, `*` is /etc/*, `passwd` is /etc/passwd — but classify_locus can't
+        // tell; every relative operand is `worktree`, with no cwd to say otherwise.
+        for p in ["*", "passwd", "hosts", "config", "cron.d"] {
+            assert_eq!(classify_locus(p), LocalLocus::Worktree, "{p}: assumed worktree, cwd unknown");
+        }
+        // Consequence: a sweeping edit/copy is scored write-local — SOUND ONLY if cwd really
+        // is the worktree. If the shell is in /etc, these hit /etc/*.
+        assert_eq!(project(&resolve(&toks(&["sed", "-i", "s/a/b/", "*"])).expect("sed")), Verdict::Allowed(SafetyLevel::SafeWrite), "sed -i * (unsound if cwd != worktree)");
+        assert_eq!(project(&resolve(&toks(&["dd", "if=./x", "of=passwd"])).expect("dd")), Verdict::Allowed(SafetyLevel::SafeWrite), "dd of=passwd");
+        assert_eq!(project(&resolve(&toks(&["cp", "./payload", "config"])).expect("cp")), Verdict::Allowed(SafetyLevel::SafeWrite), "cp ./payload config");
+    }
+
     #[test]
     fn touch_creates_in_the_worktree_and_skips_valued_flag_values() {
         use crate::engine::bridge::project;
