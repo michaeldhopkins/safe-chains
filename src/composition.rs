@@ -19,12 +19,11 @@
 #[cfg(test)]
 mod tests {
     use crate::command_verdict;
-    use crate::engine::bridge::{with_mode, Mode};
     use crate::verdict::Verdict;
 
-    /// Verdict with the engine authoritative (its eventual default).
+    /// Verdict with the engine authoritative (now the default and only path).
     fn new_verdict(cmd: &str) -> Verdict {
-        with_mode(Mode::New, || command_verdict(cmd))
+        command_verdict(cmd)
     }
 
     /// True when `comp` grants no more than `reference` — wrapping never loosened. A

@@ -750,8 +750,9 @@ safe! {
     help_cargo_build: "cargo build --help",
 
     for_echo: "for x in 1 2 3; do echo $x; done",
-    for_pipe: "for f in *.txt; do cat $f | grep pattern; done",
     for_empty_body: "for x in 1 2 3; do; done",
+    // engine-authoritative: sed -i on a worktree file is write-local; piping to head is inert.
+    pipeline_sed_inplace_worktree: "sed -i 's/foo/bar/' file | head",
     for_multiple: "for x in 1 2; do echo $x; done; for y in a b; do echo $y; done",
     for_nested: "for x in 1 2; do for y in a b; do echo $x $y; done; done",
     for_then_cmd: "for x in 1 2; do echo $x; done && echo finished",
@@ -957,7 +958,6 @@ safe! {
     brace_group_nested: "{ { echo inner; }; echo outer; }",
     brace_group_with_subshell: "{ (cd /tmp && ls); echo done; }",
     brace_group_in_chain: "{ echo a; } && { echo b; }",
-    brace_group_with_for: "for f in *.txt; do { echo $f; cat $f; } > combined.txt; done",
     brace_group_help_var: "{ echo $HOME; }",
     brace_group_redir_to_devnull: "{ echo noisy; echo more; } > /dev/null",
     subshell_with_redirect: "(echo hello) > /tmp/out.txt",
@@ -1065,6 +1065,8 @@ denied! {
     workon_unknown_sub_denied: "workon frobnicate",
     for_redirect_target_cmdsub_denied: "for f in a b; do echo $f; done > $(evil)",
     for_redirect_unsafe_body_denied: "for f in a b; do rm -rf $f; done 2>/dev/null",
+    for_loop_variable_path_denied: "for f in *.txt; do cat $f | grep pattern; done",
+    brace_group_variable_path_denied: "for f in *.txt; do { echo $f; cat $f; } > combined.txt; done",
     redirect_git_hook_denied: "echo x > .git/hooks/pre-commit",
     redirect_envrc_denied: "echo x > .envrc",
     redirect_ssh_authkeys_denied: "echo x > ~/.ssh/authorized_keys",
@@ -1082,7 +1084,6 @@ denied! {
     help_brew_install_denied: "brew install --help",
     help_cargo_login_redirect_denied: "cargo login --help 2>&1",
 
-    version_unhandled_dd: "dd --version",
     version_unhandled_chmod: "chmod --version",
     help_pip_install_trailing: "pip install evil --help",
     help_curl_data_trailing: "curl -d data --help",
@@ -1393,7 +1394,6 @@ denied! {
     recursive_nice_version: "nice rm -rf / --version",
 
     pipeline_find_delete: "find . -name '*.py' -delete | wc -l",
-    pipeline_sed_inplace: "sed -i 's/foo/bar/' file | head",
 
     for_rm: "for x in 1 2 3; do rm $x; done",
     for_unsafe_subst: "for x in $(rm -rf /); do echo $x; done",
@@ -1457,9 +1457,9 @@ inert! {
     level_workon_list_json: "workon list --json",
     level_workon_path: "workon path",
     level_workon_path_ref: "workon path ws-abc123",
-    level_cat: "cat file.txt",
-    level_grep: "grep foo file.txt",
     level_echo: "echo hello",
+    // engine-authoritative: dd resolves --version to a pure inert version print.
+    dd_version_inert: "dd --version",
     level_ls: "ls -la",
     level_git_log: "git log --oneline",
     level_git_diff: "git diff",
@@ -1470,8 +1470,6 @@ inert! {
     level_cargo_msrv_list: "cargo msrv list",
     level_cargo_msrv_show: "cargo msrv show",
     level_cargo_vet_dump_graph: "cargo vet dump-graph",
-    level_find_grep: "find . -name '*.py' -exec grep pattern {} +",
-    level_pipe_inert: "grep foo file | head -5",
     level_env_bare: "env",
     level_timeout_ls: "timeout 5 ls -la",
     level_bash_version: "bash --version",
@@ -1485,6 +1483,12 @@ inert! {
 }
 
 safe_read! {
+    // engine-authoritative: reading a real file's content discloses it to the model →
+    // read-local (SafeRead), finer than the old blanket `inert`.
+    level_cat: "cat file.txt",
+    level_grep: "grep foo file.txt",
+    level_find_grep: "find . -name '*.py' -exec grep pattern {} +",
+    level_pipe_read: "grep foo file | head -5",
     level_xctest_bundle: "xctest /tmp/MyTests.xctest",
     level_xctest_specific: "xctest -XCTest TestClass/testMethod /tmp/MyTests.xctest",
     level_cargo_test: "cargo test",

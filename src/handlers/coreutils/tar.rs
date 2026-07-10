@@ -142,18 +142,21 @@ mod tests {
         tar_old_style_tvf: "tar tvf archive.tar",
         tar_old_style_tzf: "tar tzf archive.tar.gz",
         tar_old_style_tjf: "tar tjf archive.tar.bz2",
+        // engine-authoritative: creating/appending a WORKTREE archive from WORKTREE members
+        // is admitted at write-local. Extraction stays denied (the archive controls the
+        // written paths), as do the bare/no-op forms.
+        tar_create: "tar -cf archive.tar files/",
+        tar_append: "tar -rf archive.tar newfile",
+        tar_update: "tar -uf archive.tar newfile",
+        tar_bundled_create: "tar -tcf archive.tar",
+        tar_old_style_cf: "tar cf archive.tar files/",
     }
 
     denied! {
-        tar_create: "tar -cf archive.tar files/",
         tar_extract: "tar -xf archive.tar",
-        tar_append: "tar -rf archive.tar newfile",
-        tar_update: "tar -uf archive.tar newfile",
         tar_bare: "tar",
         tar_no_list: "tar -f archive.tar",
         tar_bundled_extract: "tar -txf archive.tar",
-        tar_bundled_create: "tar -tcf archive.tar",
         tar_old_style_xf: "tar xf archive.tar",
-        tar_old_style_cf: "tar cf archive.tar files/",
     }
 }

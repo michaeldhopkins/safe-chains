@@ -269,7 +269,7 @@ mod tests {
 
     #[test]
     fn single_unsafe_command_is_denied_without_redundant_culprit() {
-        let e = explain("rm -rf /tmp/x");
+        let e = explain("rm -rf /");
         assert!(!e.is_allowed());
         assert_eq!(e.segments.len(), 1);
         assert_eq!(e.segments[0].culprit, None);
@@ -277,9 +277,9 @@ mod tests {
 
     #[test]
     fn one_torpedo_marks_only_that_segment() {
-        let e = explain("git status && rm -rf /tmp/x && echo done");
+        let e = explain("git status && rm -rf / && echo done");
         assert!(!e.is_allowed());
-        assert_eq!(marks("git status && rm -rf /tmp/x && echo done"), vec![true, false, true]);
+        assert_eq!(marks("git status && rm -rf / && echo done"), vec![true, false, true]);
         assert!(e.segments.iter().all(|s| s.culprit.is_none()));
     }
 
@@ -298,7 +298,7 @@ mod tests {
 
     #[test]
     fn culprit_is_first_denied_in_a_pipeline() {
-        let e = explain("grep foo file | rm -rf /tmp/x");
+        let e = explain("grep foo file | rm -rf /");
         assert!(!e.is_allowed());
         assert_eq!(e.segments.len(), 1);
         assert_eq!(e.segments[0].culprit.as_deref(), Some("rm"));
@@ -343,10 +343,10 @@ mod tests {
 
     #[test]
     fn surfaces_only_the_mixed_bundling_case() {
-        assert!(explain("git status && rm -rf x && echo done").should_surface());
+        assert!(explain("git status && rm -rf / && echo done").should_surface());
         assert!(!explain("ls && pwd").should_surface(), "all-safe: nothing to teach");
-        assert!(!explain("rm -rf a && rm -rf b").should_surface(), "all-denied: no rescue");
-        assert!(!explain("rm -rf x").should_surface(), "single denied: no chaining lesson");
+        assert!(!explain("rm -rf / && rm -rf /etc").should_surface(), "all-denied: no rescue");
+        assert!(!explain("rm -rf /").should_surface(), "single denied: no chaining lesson");
         assert!(!explain("echo 'unterminated").should_surface(), "unparseable");
     }
 
@@ -355,7 +355,7 @@ mod tests {
     #[test]
     fn coverage_overlay_flips_a_user_allowed_segment() {
         let patterns = Matcher::from_allow_patterns(&["rm *"]);
-        let e = explain_with_coverage("git status && rm -rf /tmp/x && echo done", &patterns);
+        let e = explain_with_coverage("git status && rm -rf / && echo done", &patterns);
         assert!(e.is_allowed(), "user allowlisted rm, so the chain auto-approves");
         assert!(e.segments.iter().all(|s| s.verdict.is_allowed()));
         assert!(!e.should_surface());
@@ -364,9 +364,9 @@ mod tests {
     #[test]
     fn coverage_overlay_leaves_uncovered_segments_denied() {
         let patterns = Matcher::from_allow_patterns(&["rm *"]);
-        let e = explain_with_coverage("rm -rf /tmp/x && cargo publish", &patterns);
+        let e = explain_with_coverage("rm -rf / && cargo publish", &patterns);
         assert!(!e.is_allowed());
-        assert_eq!(marks_cov("rm -rf /tmp/x && cargo publish", &patterns), vec![true, false]);
+        assert_eq!(marks_cov("rm -rf / && cargo publish", &patterns), vec![true, false]);
     }
 
     fn marks_cov(input: &str, patterns: &Matcher) -> Vec<bool> {
@@ -381,9 +381,9 @@ mod tests {
 
     #[test]
     fn render_mixed_chain_lists_marks_and_split_tip() {
-        let out = explain("git status && rm -rf /tmp/x && echo done").render();
+        let out = explain("git status && rm -rf / && echo done").render();
         assert!(out.contains("✓  git status"));
-        assert!(out.contains("✗  rm -rf /tmp/x"));
+        assert!(out.contains("✗  rm -rf /"));
         assert!(out.contains("✓  echo done"));
         assert!(out.contains("1 of 3 segments"));
         assert!(out.contains("not a block"), "must clarify it is not a block: {out}");
@@ -393,7 +393,7 @@ mod tests {
 
     #[test]
     fn render_stateful_chain_says_belongs_in_one_call() {
-        let out = explain("cd build && rm -rf x && echo done").render();
+        let out = explain("cd build && rm -rf / && echo done").render();
         assert!(out.contains("belong in one call"), "stateful chain must not advise splitting: {out}");
         assert!(out.contains("not a request to re-run"));
         assert!(!out.contains("separate tool calls"));
@@ -401,7 +401,7 @@ mod tests {
 
     #[test]
     fn render_pipeline_culprit_disambiguates_failing_stage() {
-        let out = explain("grep foo file | rm -rf /tmp/x").render();
+        let out = explain("grep foo file | rm -rf /").render();
         assert!(out.contains("(rm)"), "pipeline should name the failing stage: {out}");
     }
 

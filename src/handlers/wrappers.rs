@@ -127,6 +127,8 @@ mod tests {
         timeout_preserve_status: "timeout --preserve-status 120 git status",
         time_bundle_exec: "time bundle exec rspec",
         time_git_log: "time git log --oneline -5",
+        // engine-authoritative: `time rm file` deletes a WORKTREE file → developer.
+        time_worktree_rm: "time rm file",
         env_bare: "env",
         env_safe_command: "env ls -la",
         env_with_var: "env FOO=bar ls -la",
@@ -153,7 +155,6 @@ mod tests {
         timeout_git_push_denied: "timeout 120 git push origin main",
         timeout_rm_denied: "timeout 60 rm -rf /",
         time_git_push_denied: "time git push",
-        time_rm_denied: "time rm file",
         env_rm_denied: "env rm -rf /",
         env_sh_denied: "env sh -c 'rm -rf /'",
         env_python_denied: "env python3 evil.py",
