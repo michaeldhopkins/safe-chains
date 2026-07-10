@@ -102,6 +102,7 @@ impl HookFormat for GeminiHookFormat {
         Ok(HookInput {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
+            root: super::env_root("GEMINI_PROJECT_DIR"),
         })
     }
 

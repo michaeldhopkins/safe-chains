@@ -72,16 +72,19 @@ struct CursorHookEnvelope {
     command: String,
     #[serde(default)]
     cwd: Option<String>,
+    #[serde(default)]
+    workspace_roots: Vec<String>,
 }
 
 impl HookFormat for CursorHookFormat {
     fn parse_input(&self, stdin: &str) -> Result<HookInput, ParseError> {
-        let envelope: CursorHookEnvelope = serde_json::from_str(stdin).map_err(|e| ParseError {
-            message: e.to_string(),
-        })?;
+        let mut envelope: CursorHookEnvelope =
+            serde_json::from_str(stdin).map_err(|e| ParseError { message: e.to_string() })?;
         Ok(HookInput {
             command: envelope.command,
             cwd: envelope.cwd,
+            // cursor sends the project root(s) in the payload; take the first.
+            root: (!envelope.workspace_roots.is_empty()).then(|| envelope.workspace_roots.swap_remove(0)),
         })
     }
 
@@ -247,6 +250,17 @@ mod tests {
     fn parse_input_rejects_garbage() {
         assert!(CursorHookFormat.parse_input("not json").is_err());
         assert!(CursorHookFormat.parse_input("{}").is_err());
+    }
+
+    #[test]
+    fn parse_input_takes_the_project_root_from_workspace_roots() {
+        let stdin = r#"{"command": "ls", "cwd": "/w/p/sub", "workspace_roots": ["/w/p", "/w/other"]}"#;
+        let parsed = CursorHookFormat.parse_input(stdin).unwrap();
+        assert_eq!(parsed.cwd.as_deref(), Some("/w/p/sub"));
+        assert_eq!(parsed.root.as_deref(), Some("/w/p"), "first workspace root");
+        // absent workspace_roots → no root
+        let bare = CursorHookFormat.parse_input(r#"{"command": "ls"}"#).unwrap();
+        assert_eq!(bare.root, None);
     }
 
     #[test]

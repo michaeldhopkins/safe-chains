@@ -96,6 +96,7 @@ impl HookFormat for DroidHookFormat {
         Ok(HookInput {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
+            root: super::env_root("FACTORY_PROJECT_DIR"),
         })
     }
 

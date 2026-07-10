@@ -14,6 +14,16 @@ pub struct Cli {
     #[arg(long, value_enum)]
     pub level: Option<SafetyLevel>,
 
+    /// Working directory to resolve relative paths against (as a harness hook would pass).
+    /// Pair with --root so e.g. `cd`-relative writes classify against the real directory.
+    #[arg(long)]
+    pub cwd: Option<String>,
+
+    /// Project root, so a relative path under it is worktree-local and one outside it (the
+    /// cwd having escaped the project) is scored as its real absolute target.
+    #[arg(long)]
+    pub root: Option<String>,
+
     /// Print a per-segment breakdown of why a command would or would not auto-approve.
     #[arg(long)]
     pub explain: bool,

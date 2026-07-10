@@ -61,6 +61,15 @@ impl std::error::Error for ParseError {}
 pub struct HookInput {
     pub command: String,
     pub cwd: Option<String>,
+    /// The project root, when the harness supplies one (HP-19) — a `*_PROJECT_DIR` env var
+    /// for most, `workspace_roots` in the payload for cursor. Absent for codex/copilot.
+    pub root: Option<String>,
+}
+
+/// Read a harness project-root env var from the hook process environment (set by the
+/// harness, not the agent's shell — see HARNESS-BEHAVIORS.md). Empty → `None`.
+pub(crate) fn env_root(var: &str) -> Option<String> {
+    std::env::var(var).ok().filter(|s| !s.is_empty())
 }
 
 pub struct HookResponse {
