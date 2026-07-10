@@ -1678,18 +1678,19 @@ fn cwd_context_closes_the_cross_invocation_write_hole() {
     assert!(command_verdict("echo ok > ./x").is_allowed(), "no ctx: ./x allowed (fallback)");
 }
 
-/// STILL OPEN until HP-19 #2 (intra-line cd tracking). Here the `cd /etc` happens
-/// mid-command, so the harness's payload `cwd` is the *pre-command* project dir — the ctx
-/// from #1 can't help. The later `> ./x` still resolves against the project and passes. This
-/// characterization flips once the CST tracks `cd` across `&&` and updates the ambient cwd.
+/// FIXED (HP-19 #2): an intra-line `cd` is tracked across the chain. The harness reports the
+/// project as `cwd` (the `cd` hasn't run yet), but the CST walk updates the running cwd, so
+/// `cd /etc && echo > ./x` resolves `./x` to `/etc/x` and denies — while a `cd` that stays
+/// in the project keeps later writes allowed.
 #[test]
-fn gap_intra_line_cd_not_yet_tracked() {
+fn intra_line_cd_reclassifies_later_relative_writes() {
     use crate::pathctx::PathCtx;
-    // The harness reports the project dir (the cd is inside the command, not yet run).
     let ctx = PathCtx { cwd: Some("/home/u/proj".into()), root: Some("/home/u/proj".into()) };
-    assert!(!command_verdict_in("echo pwned > /etc/x", ctx.clone()).is_allowed(), "direct /etc redirect denied");
-    assert!(
-        command_verdict_in("cd /etc && echo pwned > ./x", ctx).is_allowed(),
-        "intra-line cd not tracked yet: ./x still resolves against the project → passes",
-    );
+    assert!(!command_verdict_in("cd /etc && echo pwned > ./x", ctx.clone()).is_allowed(), "cd /etc → ./x is /etc/x, denied");
+    assert!(!command_verdict_in("cd /etc && echo pwned > passwd", ctx.clone()).is_allowed(), "cd /etc → passwd denied");
+    assert!(!command_verdict_in("cd ../../etc && echo x > ./y", ctx.clone()).is_allowed(), "cd .. escaping the project denied");
+    // a cd that stays inside the project leaves later writes allowed
+    assert!(command_verdict_in("cd ./build && echo x > ./y", ctx.clone()).is_allowed(), "cd into a subdir stays worktree");
+    // order matters: a write BEFORE the cd is still in the project
+    assert!(command_verdict_in("echo x > ./y && cd /etc", ctx).is_allowed(), "write precedes the cd → project");
 }
