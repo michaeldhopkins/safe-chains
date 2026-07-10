@@ -289,13 +289,15 @@ that implied so were wrong. It is closeable; two independent halves:
 *The load-bearing prerequisite for (1):* resolving `cwd + relative` only distinguishes
 "in the project" from "in `/etc`" if we know the **project root** — and safe-chains is a
 static string classifier that must **not** touch the filesystem (no `git rev-parse`), so
-the root must arrive as **input**. Today there is no root input: only cursor's payload even
-mentions `workspace_roots`, and no target parses it. Options: harness-provided root
-(`CLAUDE_PROJECT_DIR` env, cursor `workspace_roots`, spotty and per-harness);
-install-time-recorded root baked into the hook invocation (harness-agnostic, tamper-resistant
-if outside the repo); NOT a derived root (violates §0.2). When neither `cwd` nor root is
-available (e.g. opencode), fall back to today's relative-is-worktree assumption — use the
-signal when present, never regress usability.
+the root must arrive as **input**, at *runtime*, per session. The chosen source is the
+**harness at runtime** (`CLAUDE_PROJECT_DIR` env for claude, `GEMINI_PROJECT_DIR` /
+`FACTORY_PROJECT_DIR` / `QWEN_PROJECT_DIR` for gemini/droid/qwen, cursor `workspace_roots`
+in the payload) — these are set per session and so work for a **global install** (the
+common case: one hook in `~/.claude/settings.json` serving every project). An
+install-time-recorded root is a dead end for exactly that reason — a global hook has no one
+project — so it is not pursued; a derived root violates §0.2. When the harness supplies no
+root (codex/copilot) or no cwd (opencode), fall back to today's relative-is-worktree
+assumption; closing the loophole there needs those harnesses to add a runtime root.
 
 ---
 
