@@ -258,7 +258,20 @@ touched-path role must deny.
    contract in TOML (alongside `positional_shape`) so declarative and Rust resolvers share
    one schema.
 
-### HP-19 · The classifier is blind to the real cwd — `status: open`
+### HP-19 · The classifier is blind to the real cwd — `status: resolved (with residuals)`
+**Resolved.** A relative path now resolves against the harness cwd/root before
+classification, via a scoped ambient context (`src/pathctx.rs`), read as a one-liner by
+both legacy `is_safe_write_target` and engine `classify_locus`. Cross-invocation is closed
+(harness `cwd`/`root` threaded through `command_verdict_in` / the hook); intra-line
+`cd /etc && …` is closed by cwd tracking across chain statements in `script_verdict`.
+Per-harness roots wired (env `*_PROJECT_DIR` for claude/gemini/droid/qwen; cursor
+`workspace_roots`); the standalone CLI takes `--cwd`/`--root`. **Residuals:** codex/copilot
+supply no distinct root and opencode no cwd → those fall back to relative-is-worktree (the
+loophole persists there until they gain a root — see HARNESS-BEHAVIORS.md); an unpinnable
+`cd` (`~`/`$VAR`/bare) leaves the running cwd unchanged (fail-open); and the env-var roots
+are documented-but-unverified until the owed e2e harness tests run. Original analysis below.
+
+### HP-19 (analysis) · The classifier was blind to the real cwd
 A relative path is scored **worktree-local unconditionally** — `classify_locus` (and
 legacy's `is_safe_write_target`) never consult the actual working directory. So an agent
 that `cd`s out of the project launders past the locus gate: `cd /etc && echo x > ./x`
