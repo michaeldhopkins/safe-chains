@@ -58,6 +58,7 @@ pub mod engine;
 mod handlers;
 pub use handlers::all_opencode_patterns;
 pub mod parse;
+pub mod pathctx;
 pub mod policy;
 pub mod registry;
 pub mod allowlist;
@@ -71,6 +72,14 @@ pub fn is_safe_command(command: &str) -> bool {
 }
 
 pub fn command_verdict(command: &str) -> Verdict {
+    cst::command_verdict(command)
+}
+
+/// Classify `command` with the harness-supplied directory context installed (HP-19), so
+/// relative paths resolve against the real `cwd`/`root`. `command_verdict(cmd)` is the
+/// no-context form (`PathCtx::default()`), preserving every existing caller.
+pub fn command_verdict_in(command: &str, ctx: pathctx::PathCtx) -> Verdict {
+    let _guard = pathctx::enter(ctx);
     cst::command_verdict(command)
 }
 

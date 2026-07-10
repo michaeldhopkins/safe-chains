@@ -5,6 +5,10 @@
 use crate::engine::facet::LocalLocus;
 
 pub(crate) fn classify_locus(path: &str) -> LocalLocus {
+    // HP-19: resolve a relative path against the harness cwd/root first, so under `cd /etc`
+    // a relative operand is scored as `/etc/…`. No context → path unchanged (status quo).
+    let resolved = crate::pathctx::resolve(path);
+    let path: &str = &resolved;
     // Unpinnable FIRST (§0 fail-closed): a `$VAR` expansion or a `..` escape could name
     // anything, so no positive (lower) classification is sound — not even a `/tmp/`
     // prefix, since `/tmp/$X` can expand through `..` to anywhere. Worst-case to
