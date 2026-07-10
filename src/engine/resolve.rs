@@ -28,7 +28,7 @@ use locus::classify_locus;
 /// surrounding CST's job, not this leaf's (annex `…-engine` §1).
 pub fn resolve(tokens: &[Token]) -> Option<Profile> {
     let arg0 = tokens.first()?;
-    let (_, resolver) = RESOLVERS.iter().find(|(name, _)| *name == arg0.command_name())?;
+    let (_, resolver, _) = RESOLVERS.iter().find(|(name, _, _)| *name == arg0.command_name())?;
     // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`,
     // `~/bin/grep`) is not necessarily the real tool — a planted binary named `cat` would
     // be certified as safe coreutils. Don't certify it; worst-case (§0). Bare names and
@@ -43,22 +43,39 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
 /// A per-command resolver: leaf tokens → behavior profile.
 type Resolver = fn(&[Token]) -> Profile;
 
-/// The dispatch table: every resolvable command and its resolver. A data table (rather than
-/// a `match`) so tests can enumerate the full resolvable set — the conservation sweep
-/// (`every_touched_path_operand_is_gated`) requires a probe for each name here.
-const RESOLVERS: &[(&str, Resolver)] = &[
-    ("echo", resolve_echo),
-    ("cat", resolve_cat),
-    ("head", resolve_head),
-    ("tail", resolve_tail),
-    ("wc", resolve_wc),
-    ("grep", resolve_grep),
-    ("rm", resolve_rm),
-    ("mkdir", resolve_mkdir),
-    ("touch", resolve_touch),
-    ("cp", resolve_cp),
-    ("mv", resolve_mv),
-    ("ln", resolve_ln),
+/// A resolver's operand contract — which POSITIONAL slots (after flag parsing) are touched
+/// paths. Declared beside each resolver so the conservation sweep (HP-18 rung 3,
+/// `every_touched_path_operand_is_gated`) derives its probes from one source of truth,
+/// rather than a parallel test table that could drift from the resolvers.
+#[derive(Clone, Copy)]
+enum Operands {
+    /// No path operands — only literal args (`echo`).
+    None,
+    /// Every positional is a touched path — cat/head/tail/wc/rm/mkdir/touch.
+    Paths,
+    /// Positional 0 is a pattern; the rest are touched paths (`grep`).
+    PatternThenPaths,
+    /// Sources… then a destination, every positional a touched path — cp/mv/ln.
+    Transfer,
+}
+
+/// The dispatch table: every resolvable command, its resolver, and its operand contract. A
+/// data table (rather than a `match`) so the conservation sweep enumerates the full set and
+/// derives a probe per touched slot — adding a resolver means declaring its [`Operands`]
+/// here, and the sweep covers it automatically.
+const RESOLVERS: &[(&str, Resolver, Operands)] = &[
+    ("echo", resolve_echo, Operands::None),
+    ("cat", resolve_cat, Operands::Paths),
+    ("head", resolve_head, Operands::Paths),
+    ("tail", resolve_tail, Operands::Paths),
+    ("wc", resolve_wc, Operands::Paths),
+    ("grep", resolve_grep, Operands::PatternThenPaths),
+    ("rm", resolve_rm, Operands::Paths),
+    ("mkdir", resolve_mkdir, Operands::Paths),
+    ("touch", resolve_touch, Operands::Paths),
+    ("cp", resolve_cp, Operands::Transfer),
+    ("mv", resolve_mv, Operands::Transfer),
+    ("ln", resolve_ln, Operands::Transfer),
 ];
 
 /// A command name with no resolver and no plausible future one — the stable stand-in for
@@ -1111,57 +1128,41 @@ mod tests {
         }
     }
 
-    /// Conservation probes (HP-18 rung 3): one template per *touched-path* operand slot of
-    /// every resolver, with `@` marking the slot to fill with a hot path. Non-path slots are
-    /// deliberately excluded — `grep`'s first positional is a PATTERN, `head -n 5`'s `5` is a
-    /// count — which is exactly the per-command knowledge a blind sweep can't infer. Every
-    /// resolver in `RESOLVERS` must appear here or in `NO_PATH_COMMANDS`.
-    const PROBES: &[&[&str]] = &[
-        &["cat", "@"],
-        &["head", "@"],
-        &["head", "-n", "5", "@"],
-        &["tail", "@"],
-        &["wc", "-l", "@"],
-        &["grep", "PATTERN", "@"], // the FILE slot, not the pattern
-        &["rm", "@"],
-        &["mkdir", "@"],
-        &["touch", "@"],
-        &["cp", "@", "./safe"], // source
-        &["cp", "./safe", "@"], // dest
-        &["mv", "@", "./safe"],
-        &["mv", "./safe", "@"],
-        &["ln", "@", "./safe"], // target
-        &["ln", "./safe", "@"], // link
-    ];
-
-    /// Resolvers that consume NO path operand (only literal args) — exempt from the sweep.
-    const NO_PATH_COMMANDS: &[&str] = &["echo"];
+    /// The touched-path probe invocations for a resolver, derived from its declared
+    /// [`Operands`] contract: `hot` fills each touched slot in turn, other slots get a benign
+    /// path. Non-path slots (grep's pattern) are never filled with `hot`.
+    fn probes<'a>(cmd: &'a str, kind: Operands, hot: &'a str) -> Vec<Vec<&'a str>> {
+        match kind {
+            Operands::None => vec![],
+            Operands::Paths => vec![vec![cmd, hot]],
+            Operands::PatternThenPaths => vec![vec![cmd, "PATTERN", hot]],
+            Operands::Transfer => vec![vec![cmd, hot, "./safe"], vec![cmd, "./safe", hot]],
+        }
+    }
 
     /// The conservation law (HP-18): every touched path operand must contribute a capability
     /// at its own locus, so a hot path in ANY touched slot forces denial — no operand is
-    /// silently dropped. This generalizes the transfer differential to the whole corpus and
-    /// would catch a future single-file reader that forgets its `observe`. The completeness
-    /// check ties `PROBES` to the live dispatch table: adding a resolver without a probe (or
-    /// a `NO_PATH_COMMANDS` entry) fails here.
+    /// silently dropped. Generalizes the transfer differential to the whole corpus and would
+    /// catch a future single-file reader that forgets its `observe`. The probes are derived
+    /// from each resolver's [`Operands`] contract in `RESOLVERS` — one source of truth, so
+    /// adding a resolver (which must declare its `Operands`) is covered automatically.
     #[test]
     fn every_touched_path_operand_is_gated() {
         use crate::engine::bridge::project;
         use crate::verdict::Verdict;
 
-        for (name, _) in RESOLVERS {
-            let has_probe = PROBES.iter().any(|p| p[0] == *name) || NO_PATH_COMMANDS.contains(name);
-            assert!(has_probe, "resolver `{name}` has no conservation probe (add to PROBES or NO_PATH_COMMANDS)");
-        }
-
         let mut exercised = 0usize;
-        for probe in PROBES {
+        for (name, _, kind) in RESOLVERS {
             for hot in HOT_PATHS {
-                let cmd: Vec<&str> = probe.iter().map(|&t| if t == "@" { *hot } else { t }).collect();
-                let profile = resolve(&toks(&cmd)).expect("resolves");
-                assert_eq!(project(&profile), Verdict::Denied, "{cmd:?}: touched hot path not gated");
-                exercised += 1;
+                for cmd in probes(name, *kind, hot) {
+                    let profile = resolve(&toks(&cmd)).expect("resolves");
+                    assert_eq!(project(&profile), Verdict::Denied, "{cmd:?}: touched hot path not gated");
+                    exercised += 1;
+                }
             }
         }
-        assert!(exercised >= HOT_PATHS.len() * PROBES.len(), "sweep ran {exercised}");
+        // Non-vacuity: every path-bearing resolver contributed at least one probe per hot path.
+        let path_bearing = RESOLVERS.iter().filter(|(_, _, k)| !matches!(k, Operands::None)).count();
+        assert!(exercised >= path_bearing * HOT_PATHS.len(), "sweep ran only {exercised}");
     }
 }
