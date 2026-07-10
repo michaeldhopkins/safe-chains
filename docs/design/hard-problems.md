@@ -299,6 +299,26 @@ project — so it is not pursued; a derived root violates §0.2. When the harnes
 root (codex/copilot) or no cwd (opencode), fall back to today's relative-is-worktree
 assumption; closing the loophole there needs those harnesses to add a runtime root.
 
+### HP-20 · A positive path-admissibility model, finer than the locus ladder — `status: parked`
+Shadow validation surfaced this: the engine denies `cat /etc/hosts` (machine locus →
+above read-local) the same way it denies `cat /etc/shadow`, because the locus ladder
+(worktree / user / machine / …) is coarse and lumps every `/etc/*` file together. That is
+correct fail-closed behavior, but it over-denies benign system reads the current allowlist
+permits — the headline cost of ever making the engine authoritative.
+*The wrong fix:* a hand-picked list of "safe" paths (`/etc/hosts`, `/etc/os-release`, …).
+That is a denylist's evil twin and rots the same way the command allowlist would if it were
+an ad-hoc list.
+*The right shape (the insight):* treat **paths like commands** — a positive, structured
+classifier over path segments, where the *level* draws the line, so a stricter level admits
+fewer paths than a looser one (exactly as it already admits fewer *loci*). Concretely: refine
+the `machine` rung into positively-recognized sub-classes (a read-only system-config file vs
+a credential store vs a device), each admitted at the level that warrants it — the same
+"positive assertion per facet, unrecognized → worst term" discipline (§0) applied to path
+shape instead of command name. Relates to HP-16 (an `attested` "usually-safe" read is the
+epistemic version of the same problem: `cat /etc/hosts` is benign ~always but not provably).
+*Big task; deliberately not now.* Recorded so the "authoritative engine" decision has the
+tightening cost, and its principled fix, on the table.
+
 ---
 
 ## Parked policy decisions
