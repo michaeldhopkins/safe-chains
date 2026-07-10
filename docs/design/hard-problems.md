@@ -245,15 +245,18 @@ touched-path role must deny.
    already share `sources_and_dest` for *parsing*; share the *assembly* too). Every source
    maps through `per_source`, the dest through `per_dest`, by construction — the hand-written
    caps loop that dropped `ln`'s target can't recur. Backstop the irregular cases with (1).
-3. **Operand-role annotation + corpus sweep (shipped, test-side):**
+3. **Operand-role annotation + corpus sweep (shipped):**
    `every_touched_path_operand_is_gated` asserts the *conservation law* — a hot path in any
    touched-path slot forces denial — across **every** resolver, catching a future single-file
    reader that forgets its `observe`, not just transfers. The per-command slot knowledge
-   (which positionals are touched paths vs `grep`'s pattern / `head`'s count) lives in a
-   `PROBES` table, tied to the live dispatch (`RESOLVERS`) by a completeness check so a new
-   resolver without a probe fails. *Remaining refinement:* move that annotation resolver-side
-   (extend the `positional_shape` TOML primitive) so the resolver and the sweep share ONE
-   source of truth instead of a parallel test table — folds into the TOML-profile migration.
+   (which positionals are touched paths vs `grep`'s pattern / `head`'s count) is an
+   `Operands` contract declared **beside each resolver** in the `RESOLVERS` dispatch table;
+   the sweep derives its probes from it — one source of truth. Completeness is now
+   type-enforced: `Operands` is a required field of every `RESOLVERS` entry, so a resolver
+   *cannot* be added without declaring its contract, and the sweep then covers it
+   automatically. *Remaining polish (with the TOML-profile migration):* express that same
+   contract in TOML (alongside `positional_shape`) so declarative and Rust resolvers share
+   one schema.
 
 ---
 
