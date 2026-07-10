@@ -7,11 +7,10 @@
 #[cfg(test)]
 mod tests {
     use crate::command_verdict;
-    use crate::engine::bridge::{with_mode, Mode};
     use crate::engine::resolve::regions::with_os;
 
     fn allows_on(os: &'static str, cmd: &str) -> bool {
-        with_os(os, || with_mode(Mode::New, || command_verdict(cmd)).is_allowed())
+        with_os(os, || command_verdict(cmd).is_allowed())
     }
 
     /// Assert an allow/deny split under a forced platform.

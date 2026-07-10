@@ -321,7 +321,11 @@ fn grep_short_cluster<'a>(cluster: &'a str, next: Option<&'a str>) -> GrepShort<
     let bytes = cluster.as_bytes();
     let mut k = 1;
     while k < bytes.len() {
-        let glued = &cluster[k + 1..];
+        // Non-ASCII bytes aren't flags and would make `cluster[k + 1..]` slice mid-char.
+        if !bytes[k].is_ascii() {
+            return GrepShort::Unrecognized;
+        }
+        let glued = &cluster[k + 1..]; // safe: bytes[k] is ASCII → k+1 is a char boundary
         let has = !glued.is_empty();
         match bytes[k] {
             b'f' => {
@@ -822,7 +826,12 @@ fn sed_cluster<'a>(cluster: &'a str, next: Option<&'a str>, boolset: &[u8]) -> S
     let bytes = cluster.as_bytes();
     let mut k = 0;
     while k < bytes.len() {
-        let glued = &cluster[k + 1..];
+        // A flag byte is ASCII; a non-ASCII lead/continuation byte is not a flag, and slicing
+        // `cluster[k + 1..]` at it would land mid-char and panic. Bail as unrecognized.
+        if !bytes[k].is_ascii() {
+            return SedShort::Bad;
+        }
+        let glued = &cluster[k + 1..]; // safe: bytes[k] is ASCII → k+1 is a char boundary
         let has = !glued.is_empty();
         match bytes[k] {
             b'i' => return SedShort::InPlace, // -i[SUFFIX]: the rest of the cluster is the suffix

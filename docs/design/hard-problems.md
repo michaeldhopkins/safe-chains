@@ -299,7 +299,7 @@ project — so it is not pursued; a derived root violates §0.2. When the harnes
 root (codex/copilot) or no cwd (opencode), fall back to today's relative-is-worktree
 assumption; closing the loophole there needs those harnesses to add a runtime root.
 
-### HP-20 · A positive path-admissibility model, finer than the locus ladder — `status: parked`
+### HP-20 · A positive path-admissibility model, finer than the locus ladder — `status: resolved (2026-07-11)`
 Shadow validation surfaced this: the engine denies `cat /etc/hosts` (machine locus →
 above read-local) the same way it denies `cat /etc/shadow`, because the locus ladder
 (worktree / user / machine / …) is coarse and lumps every `/etc/*` file together. That is
@@ -318,6 +318,17 @@ shape instead of command name. Relates to HP-16 (an `attested` "usually-safe" re
 epistemic version of the same problem: `cat /etc/hosts` is benign ~always but not provably).
 *Big task; deliberately not now.* Recorded so the "authoritative engine" decision has the
 tightening cost, and its principled fix, on the table.
+
+**Resolved (2026-07-11), the way the note predicted.** `regions/default.toml` is the positive,
+structured path classifier — the read/write analogue of the command allowlist. Path shapes map
+to ROLES (`public-config`, `kernel-info`, `credential-store`, `device`, …); each role projects
+to the `LocalLocus` ladder through a **read face** and a **write face**, so `/etc/hosts` reads
+at read-local while its write stays at `machine` (denied). Matching is most-specific-wins,
+OS-scoped, fail-closed to `unknown` (deny). The old hand-coded `locus.rs` prefixes
+(devices/temp/trusted/home) folded into the data. Levels were untouched — the whole model plugs
+in at the capability-builder seam (`read_locus`/`write_locus`). `reads_secret`, persistence for
+system-config writes, and a `trigger-surface` role are modeled in the region table and left as
+sequenced enrichments. Ships with the engine's go-live as the default.
 
 ---
 

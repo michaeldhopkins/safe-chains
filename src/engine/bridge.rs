@@ -1,75 +1,14 @@
-//! Coexistence bridge (v1.4 §4.5; annex `…-engine` §4). Runs the profile resolver
-//! alongside the legacy classifier behind the `SAFE_CHAINS_ENGINE` selector, and
-//! projects a resolved profile back to a legacy [`Verdict`] so the existing ceiling
-//! gate (`main::run_cli`) keeps working unchanged.
-//!
-//! Default is `legacy` — the engine does not run and behavior is byte-identical. Only
-//! commands with a resolver (`resolve::resolve` → `Some`) are ever computed by the
-//! engine; everything else stays on the legacy path.
-
-use std::sync::LazyLock;
+//! Engine bridge (v1.4 §4.5; annex `…-engine` §4). Projects a resolved capability profile
+//! back to a legacy [`Verdict`] so the existing ceiling gate (`main::run_cli`) keeps working
+//! unchanged. The engine is authoritative for every command it can resolve
+//! (`resolve::resolve` → `Some`); the legacy classifier handles the rest. There is no
+//! opt-out — `cst::check::leaf_verdict` calls `engine_verdict(tokens).unwrap_or(legacy)`.
 
 use super::authoring::default_levels;
 use super::facet::Profile;
 use super::resolve;
 use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
-
-/// The rollout selector (annex `…-engine` §5).
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum Mode {
-    /// Current classifier is authoritative; the engine does not run (default).
-    Legacy,
-    /// The engine is authoritative for commands it can resolve; legacy for the rest.
-    New,
-}
-
-static MODE: LazyLock<Mode> =
-    LazyLock::new(|| parse_mode(std::env::var("SAFE_CHAINS_ENGINE").ok().as_deref()));
-
-fn parse_mode(value: Option<&str>) -> Mode {
-    match value {
-        Some("new") => Mode::New,
-        _ => Mode::Legacy,
-    }
-}
-
-#[cfg(test)]
-thread_local! {
-    static MODE_OVERRIDE: std::cell::Cell<Option<Mode>> = const { std::cell::Cell::new(None) };
-}
-
-/// Run `f` with `mode` forced (tests only): lets the composition harness exercise
-/// engine-authoritative behavior before the default flips. Restored on drop (panic-safe).
-#[cfg(test)]
-pub(crate) fn with_mode<T>(mode: Mode, f: impl FnOnce() -> T) -> T {
-    struct Reset(Option<Mode>);
-    impl Drop for Reset {
-        fn drop(&mut self) {
-            MODE_OVERRIDE.with(|c| c.set(self.0));
-        }
-    }
-    let _reset = Reset(MODE_OVERRIDE.with(|c| c.replace(Some(mode))));
-    f()
-}
-
-/// The active engine mode (read once from `SAFE_CHAINS_ENGINE`, or a test override).
-pub fn mode() -> Mode {
-    #[cfg(test)]
-    if let Some(m) = MODE_OVERRIDE.with(std::cell::Cell::get) {
-        return m;
-    }
-    *MODE
-}
-
-/// Combine the legacy verdict with the engine's, per mode — the seam `cst::check`'s
-/// `leaf_verdict` calls. `legacy` is the classifier's verdict for the same tokens.
-pub fn apply_mode(mode: Mode, legacy: Verdict, tokens: &[Token]) -> Verdict {
-    match mode {
-        Mode::Legacy => legacy,
-        Mode::New => engine_verdict(tokens).unwrap_or(legacy),
-    }
-}
 
 /// The engine's verdict for a command whose resolver exists, or `None` if it has none
 /// (the caller keeps the legacy verdict).
@@ -161,27 +100,27 @@ mod tests {
         assert_eq!(project(&Profile::of(vec![])), Verdict::Denied);
     }
 
-    #[test]
-    fn parse_mode_reads_the_selector() {
-        assert_eq!(parse_mode(Some("new")), Mode::New);
-        assert_eq!(parse_mode(None), Mode::Legacy);
-        assert_eq!(parse_mode(Some("garbage")), Mode::Legacy);
-        assert_eq!(parse_mode(Some("")), Mode::Legacy);
+    /// The legacy classifier's leaf verdict for `cmd` — what the engine falls back to for a
+    /// command it can't resolve, and the baseline the never-looser gates compare against.
+    fn legacy(cmd: &str) -> Verdict {
+        crate::handlers::dispatch(&toks(&cmd.split_whitespace().collect::<Vec<_>>()))
     }
 
     #[test]
-    fn apply_mode_dispatches_the_leaf_by_mode() {
-        let cat = toks(&["cat", "./notes.md"]);
-        let legacy = Verdict::Allowed(SafetyLevel::Inert); // legacy classifies cat as inert
-        let engine = engine_verdict(&cat).expect("cat resolves"); // read-local → SafeRead
-        assert_ne!(engine, legacy, "cat: the engine tightens inert → read-local");
-
-        assert_eq!(apply_mode(Mode::Legacy, legacy, &cat), legacy, "legacy authoritative");
-        assert_eq!(apply_mode(Mode::New, legacy, &cat), engine, "new: engine authoritative");
-
-        // an unresolvable command → New falls back to legacy
-        let unresolved = toks(resolve::UNRESOLVED_CMD);
-        assert_eq!(apply_mode(Mode::New, legacy, &unresolved), legacy, "no resolver → legacy");
+    fn the_engine_is_authoritative_with_legacy_fallback() {
+        // a resolved command → the engine's (finer) verdict, end to end
+        assert_eq!(
+            crate::command_verdict("cat ./notes.md"),
+            Verdict::Allowed(SafetyLevel::SafeRead),
+            "cat resolves → engine tightens inert to read-local",
+        );
+        // an unresolvable command → the legacy classifier still decides
+        let unresolved = resolve::UNRESOLVED_CMD.join(" ");
+        assert_eq!(
+            crate::command_verdict(&unresolved),
+            legacy(&unresolved),
+            "no resolver → legacy verdict",
+        );
     }
 
     #[test]
@@ -221,12 +160,12 @@ mod tests {
             "grep", "grep -r", "grep -i", "grep -e foo", "grep -f patterns.txt",
         ];
         for cmd in cases {
-            let legacy = crate::command_verdict(cmd);
+            let base = legacy(cmd);
             let t = toks(&cmd.split_whitespace().collect::<Vec<_>>());
             let Some(engine) = engine_verdict(&t) else { continue };
             assert!(
-                not_looser(legacy, engine),
-                "engine LOOSER than legacy for `{cmd}`: legacy {legacy}, engine {engine}",
+                not_looser(base, engine),
+                "engine LOOSER than legacy for `{cmd}`: legacy {base}, engine {engine}",
             );
         }
     }
@@ -234,15 +173,14 @@ mod tests {
     /// The never-looser invariant above holds over the commands legacy *allowlisted*. The
     /// `developer` level is the deliberate exception: it admits well-modeled operations the
     /// hand-built allowlist could only DENY — e.g. deleting your own project files. This
-    /// test pins that divergence as intended, not a regression, and as the reason `new`
-    /// mode is opt-in (default `legacy` keeps the conservative behavior; §4.5).
+    /// test pins that divergence as intended, not a regression: it is exactly the kind of
+    /// finer classification the engine exists to make, now that it is authoritative.
     #[test]
     fn developer_intentionally_admits_worktree_destroy_that_legacy_denies() {
         let rm = "rm -rf ./node_modules";
-        assert_eq!(crate::command_verdict(rm), Verdict::Denied, "legacy allowlist denies rm deletion");
-        let engine = engine_verdict(&toks(&rm.split_whitespace().collect::<Vec<_>>())).expect("rm resolves");
-        assert_eq!(engine, Verdict::Allowed(SafetyLevel::SafeWrite), "developer admits it — intended");
-        assert!(!not_looser(Verdict::Denied, engine), "and it IS looser than legacy, by design");
+        assert_eq!(legacy(rm), Verdict::Denied, "legacy allowlist denies rm deletion");
+        assert_eq!(crate::command_verdict(rm), Verdict::Allowed(SafetyLevel::SafeWrite), "engine (developer) admits it — intended");
+        assert!(!not_looser(Verdict::Denied, Verdict::Allowed(SafetyLevel::SafeWrite)), "and it IS looser than legacy, by design");
     }
 
     /// The data-driven corpus gate (the systematic test C1 slipped past): run **every**
@@ -274,10 +212,10 @@ mod tests {
                 }
 
                 let engine = project(&profile);
-                let legacy = crate::command_verdict(ex);
+                let base = legacy(ex);
                 assert!(
-                    not_looser(legacy, engine),
-                    "engine LOOSER than legacy for `{ex}` ({name}): legacy {legacy}, engine {engine}",
+                    not_looser(base, engine),
+                    "engine LOOSER than legacy for `{ex}` ({name}): legacy {base}, engine {engine}",
                 );
             }
         }

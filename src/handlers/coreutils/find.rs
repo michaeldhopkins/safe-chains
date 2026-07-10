@@ -96,13 +96,15 @@ mod tests {
         find_execdir_grep: "find . -execdir grep pattern {} \\;",
         find_exec_grep_safe: "find . -name '*.py' -exec grep pattern {} +",
         find_exec_nested_bash_safe: "find . -exec bash -c 'git status' \\;",
+        // engine-authoritative: deleting WORKTREE files via -exec is admitted at developer
+        // ({} binds to the find path, so these stay inside the worktree).
+        find_exec_rm: "find . -exec rm {} \\;",
+        find_exec_rm_rf: "find . -exec rm -rf {} +",
+        find_execdir_unsafe: "find . -execdir rm {} \\;",
     }
 
     denied! {
         find_delete_denied: "find . -name '*.tmp' -delete",
-        find_exec_rm: "find . -exec rm {} \\;",
-        find_exec_rm_rf: "find . -exec rm -rf {} +",
-        find_execdir_unsafe_denied: "find . -execdir rm {} \\;",
         find_ok_denied: "find . -ok rm {} \\;",
         find_okdir_denied: "find . -okdir rm {} \\;",
         find_exec_nested_bash_chain_denied: "find . -exec bash -c 'ls && rm -rf /' \\;",

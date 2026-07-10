@@ -200,12 +200,12 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
     sub_v.combine(cmd_v).combine(redir_v)
 }
 
-/// The command leaf's verdict, gated by the engine mode (`…-engine` §4). In `legacy`
-/// (default) the legacy classifier is authoritative and the engine never runs; in `new`
-/// the engine is authoritative for commands it can resolve and legacy handles the rest.
+/// The command leaf's verdict. The behavioral-capability engine is authoritative for every
+/// command it can resolve; the legacy classifier handles the rest (`…-engine` §4). There is
+/// no opt-out — the engine is the default and only path.
 fn leaf_verdict(tokens: &[Token]) -> Verdict {
     let legacy = handlers::dispatch(tokens);
-    crate::engine::bridge::apply_mode(crate::engine::bridge::mode(), legacy, tokens)
+    crate::engine::bridge::engine_verdict(tokens).unwrap_or(legacy)
 }
 
 fn eval_verdict(cmd: &SimpleCmd) -> Verdict {

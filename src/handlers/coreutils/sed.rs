@@ -127,15 +127,20 @@ mod tests {
         sed_filename_1e_after_script: "sed 's/foo/bar/' 1e",
         sed_expression_flag_with_filename: "sed -e 's/foo/bar/' filename",
         sed_expression_flag_then_safe_filename: "sed -e 's/foo/bar/' 1e 2e",
+        // engine-authoritative: sed -i editing a WORKTREE file in place is admitted at
+        // write-local (a recoverable, bounded mutation). Editing a system/home file still
+        // denies by locus; the exec-modifier RCE vector below still denies.
+        sed_inplace: "sed -i 's/foo/bar/' file.txt",
+        sed_in_place_long: "sed --in-place 's/foo/bar/' file.txt",
+        sed_inplace_backup: "sed -i.bak 's/foo/bar/' file.txt",
+        sed_ni_combined: "sed -ni 's/foo/bar/p' file.txt",
+        sed_in_combined: "sed -in 's/foo/bar/' file.txt",
+        sed_in_place_eq: "sed --in-place=.bak 's/foo/bar/' file.txt",
+        sed_inplace_trailing_help: "sed -i 's/foo/bar/' file --help",
+        sed_inplace_trailing_version: "sed -i 's/foo/bar/' file --version",
     }
 
     denied! {
-        sed_inplace_denied: "sed -i 's/foo/bar/' file.txt",
-        sed_in_place_long_denied: "sed --in-place 's/foo/bar/' file.txt",
-        sed_inplace_backup_denied: "sed -i.bak 's/foo/bar/' file.txt",
-        sed_ni_combined_denied: "sed -ni 's/foo/bar/p' file.txt",
-        sed_in_combined_denied: "sed -in 's/foo/bar/' file.txt",
-        sed_in_place_eq_denied: "sed --in-place=.bak 's/foo/bar/' file.txt",
         sed_exec_modifier_denied: "sed 's/test/touch \\/tmp\\/pwned/e'",
         sed_exec_with_global_denied: "sed 's/foo/bar/ge'",
         sed_exec_alternate_delim_denied: "sed 's|test|touch /tmp/pwned|e'",
@@ -149,7 +154,5 @@ mod tests {
         sed_e_via_flag_denied: "sed -e e",
         sed_expression_flag_exec_denied: "sed -e 's/foo/bar/e'",
         sed_multiple_expressions_exec_denied: "sed -e 's/foo/bar/' -e 's/x/y/e'",
-        sed_inplace_trailing_help_denied: "sed -i 's/foo/bar/' file --help",
-        sed_inplace_trailing_version_denied: "sed -i 's/foo/bar/' file --version",
     }
 }

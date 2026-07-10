@@ -417,7 +417,9 @@ mod tests {
     #[test]
     fn safe_command_substitution_allowed_through_is_safe() {
         let p = empty();
-        assert!(is_covered(&cmd("echo $(cat /etc/shadow)"), &p));
+        // a SAFE inner command (worktree read) passes through; `cat /etc/shadow` would now
+        // correctly deny as a secret, so use a genuinely-safe substitution.
+        assert!(is_covered(&cmd("echo $(cat ./notes.txt)"), &p));
     }
 
     #[test]
