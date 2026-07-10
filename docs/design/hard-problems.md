@@ -258,6 +258,32 @@ touched-path role must deny.
    contract in TOML (alongside `positional_shape`) so declarative and Rust resolvers share
    one schema.
 
+### HP-19 · The classifier is blind to the real cwd — `status: open`
+A relative path is scored **worktree-local unconditionally** — `classify_locus` (and
+legacy's `is_safe_write_target`) never consult the actual working directory. So an agent
+that `cd`s out of the project launders past the locus gate: `cd /etc && echo x > ./x`
+writes `/etc/x`, which a direct `> /etc/x` denies. Proven at both layers by
+`gap_cwd_blind_classifier_…` (engine) and `gap_the_verdict_discards_the_harness_cwd` /
+`gap_intra_line_cd_…` (production). **This is NOT an accepted residual** — earlier notes
+that implied so were wrong. It is closeable; two independent halves:
+1. **Cross-invocation / persistent-shell** (agent `cd`'d in a prior turn; the hook fires
+   for a later command with `cwd = /etc`). The harness already sends `cwd` in the payload
+   and we parse it into `HookInput.cwd` — but `main.rs` computes
+   `command_verdict(&input.command)` and drops it. *Fix:* thread `cwd` into the classifier.
+2. **Intra-line** (`cd /etc && …` in one command). The payload `cwd` is the *pre-command*
+   directory, so it can't help; needs the CST to track `cd` across `&&`/`;` and reclassify
+   later relative operands. Independent of (1).
+*The load-bearing prerequisite for (1):* resolving `cwd + relative` only distinguishes
+"in the project" from "in `/etc`" if we know the **project root** — and safe-chains is a
+static string classifier that must **not** touch the filesystem (no `git rev-parse`), so
+the root must arrive as **input**. Today there is no root input: only cursor's payload even
+mentions `workspace_roots`, and no target parses it. Options: harness-provided root
+(`CLAUDE_PROJECT_DIR` env, cursor `workspace_roots`, spotty and per-harness);
+install-time-recorded root baked into the hook invocation (harness-agnostic, tamper-resistant
+if outside the repo); NOT a derived root (violates §0.2). When neither `cwd` nor root is
+available (e.g. opencode), fall back to today's relative-is-worktree assumption — use the
+signal when present, never regress usability.
+
 ---
 
 ## Parked policy decisions
