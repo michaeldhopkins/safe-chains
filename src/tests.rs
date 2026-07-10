@@ -1652,3 +1652,37 @@ safe_write! {
     hexo_render_with_output_promotes: "hexo render src/foo.md -o out.html",
     hexo_render_with_long_output_promotes: "hexo render src/foo.md --output out.html",
 }
+
+// ── cwd-blindness: PROOFS of a known gap (characterizations of current, UNSOUND behavior) ──
+//
+// The classifier assumes every relative path is worktree-local. It never consults the real
+// working directory, even though the harness supplies it. These tests pin the resulting
+// loophole at the PRODUCTION (legacy) layer; they flip once the classifier is cwd-aware.
+
+/// The harness sends `cwd` and we parse it into `HookInput.cwd` (proven in `targets::claude`
+/// tests), but the hook computes `command_verdict(&input.command)` (`main.rs`), dropping it.
+/// Persistent-shell case: the agent `cd`'d to /etc in a prior turn, so `cwd` is /etc — yet a
+/// relative redirect target is still scored worktree-local, so `/etc/x` becomes writable via
+/// `> ./x`. (Redirect targets are what legacy gates via `is_safe_write_target`.)
+#[test]
+fn gap_the_verdict_discards_the_harness_cwd() {
+    let input = crate::targets::HookInput { command: "echo pwned > ./x".into(), cwd: Some("/etc".into()) };
+    assert_eq!(input.cwd.as_deref(), Some("/etc"), "the harness told us the shell is in /etc");
+    // The verdict is a pure function of the command; the /etc cwd cannot influence it.
+    assert!(command_verdict(&input.command).is_allowed(), "redirect to ./x scored worktree → /etc/x writable");
+    // Redirecting to /etc directly IS denied — same effect, but the relative form launders past it.
+    assert!(!command_verdict("echo pwned > /etc/x").is_allowed(), "redirect to /etc/x denied directly");
+}
+
+/// An intra-line `cd` to a non-worktree directory is not tracked: `cd /etc` is itself Inert
+/// (allowed), and the later relative redirect target is still classified worktree, so the
+/// whole chain passes — writing `/etc/x` that a direct redirect would be denied.
+#[test]
+fn gap_intra_line_cd_does_not_reclassify_later_relative_writes() {
+    assert!(command_verdict("cd /etc").is_allowed(), "cd /etc is allowed (Inert)");
+    assert!(!command_verdict("echo pwned > /etc/x").is_allowed(), "direct redirect to /etc denied");
+    assert!(
+        command_verdict("cd /etc && echo pwned > ./x").is_allowed(),
+        "cd-then-relative-redirect launders past the locus gate: ./x still read as worktree",
+    );
+}
