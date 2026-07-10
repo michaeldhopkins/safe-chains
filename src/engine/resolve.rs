@@ -16,8 +16,8 @@ mod flags;
 mod locus;
 
 use capability::{
-    breadth_scale, creates, destroys, observes, overwrites, reads_content, reads_to_model,
-    relocates, transfer_profile, worst,
+    breadth_scale, creates, destroys, mutates, observes, overwrites, reads_content,
+    reads_to_model, relocates, transfer_profile, worst,
 };
 use flags::Flags;
 use locus::classify_locus;
@@ -84,6 +84,7 @@ const RESOLVERS: &[(&str, Resolver, Operands)] = &[
     ("ln", resolve_ln, Operands::Transfer),
     ("dd", resolve_dd, Operands::Custom(&[&["if=@", "of=./safe"], &["if=./safe", "of=@"]])),
     ("tar", resolve_tar, Operands::Custom(&[&["cf", "./s.tar", "@"], &["cf", "@", "./s"], &["tf", "@"]])),
+    ("sed", resolve_sed, Operands::Custom(&[&["s/x/y/", "@"], &["-i", "s/x/y/", "@"]])),
 ];
 
 /// A command name with no resolver and no plausible future one — the stable stand-in for
@@ -714,6 +715,137 @@ impl<'a> TarParse<'a> {
     }
 }
 
+/// `sed` — the read-becomes-WRITE breaker: `sed 's/…/…/' FILE` reads FILE and prints to the
+/// model, but `sed -i` edits the SAME file operands **in place** (a mutate), so a single
+/// flag flips the operation on the same slots. Two more wrinkles: `-i` takes an OPTIONAL
+/// glued suffix (`-i.bak`) the getopt walker can't express, and — like `grep` — the first
+/// positional is the SCRIPT unless `-e`/`-f` supplied it (`-f` also reads a script file).
+/// So `sed` parses its own flags.
+fn resolve_sed(tokens: &[Token]) -> Profile {
+    const BOOL: &[u8] = b"nrEsuz"; // no-value short flags
+    let mut in_place = false;
+    let mut script_from_flag = false;
+    let mut script_files: Vec<&str> = Vec::new(); // -f FILE — sed reads these
+    let mut files: Vec<&str> = Vec::new();
+    let mut flags_done = false;
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        let next = tokens.get(i + 1).map(Token::as_str);
+        if !flags_done && t == "--" {
+            flags_done = true;
+            i += 1;
+        } else if flags_done || t == "-" || !t.starts_with('-') {
+            files.push(t);
+            i += 1;
+        } else if let Some(long) = t.strip_prefix("--") {
+            match sed_long(long, next, &mut in_place, &mut script_from_flag, &mut script_files) {
+                Some(consumed) => i += consumed,
+                None => return worst("sed: unrecognized flag — worst-cased (§0)"),
+            }
+        } else {
+            match sed_cluster(&t[1..], next, BOOL) {
+                SedShort::Bad => return worst("sed: unrecognized flag — worst-cased (§0)"),
+                SedShort::InPlace => {
+                    in_place = true;
+                    i += 1;
+                }
+                SedShort::Standalone => i += 1,
+                SedShort::Script { consumes_next } => {
+                    script_from_flag = true;
+                    i += usize::from(consumes_next) + 1;
+                }
+                SedShort::ScriptFile { file, consumes_next } => {
+                    script_from_flag = true;
+                    script_files.extend(file);
+                    i += usize::from(consumes_next) + 1;
+                }
+                SedShort::SkipValue { consumes_next } => i += usize::from(consumes_next) + 1,
+            }
+        }
+    }
+    // Without -e/-f, the first positional is the SCRIPT, not a file.
+    if !script_from_flag && !files.is_empty() {
+        files.remove(0);
+    }
+    // Blast radius: a glob (`sed -i … *`) or several operands is bounded, not single — so a
+    // sweeping in-place edit is scored honestly (still worktree-bound by locus; a system or
+    // home path denies whatever the scale).
+    let scale = breadth_scale(&files, false);
+    let mut caps: Vec<Capability> =
+        script_files.iter().map(|f| observes(classify_locus(f), Scale::Single, "sed reads an -f script file")).collect();
+    if in_place {
+        caps.extend(files.iter().map(|f| mutates(classify_locus(f), scale, "sed -i edits the file in place")));
+    } else {
+        caps.extend(reads_to_model(&files, scale));
+    }
+    Profile::of(caps)
+}
+
+/// The outcome of parsing one `sed` short-option cluster.
+enum SedShort<'a> {
+    Bad,
+    Standalone,
+    InPlace,                                                    // -i (rest is the optional suffix)
+    Script { consumes_next: bool },                            // -e SCRIPT
+    ScriptFile { file: Option<&'a str>, consumes_next: bool }, // -f FILE
+    SkipValue { consumes_next: bool },                         // -l N
+}
+
+fn sed_cluster<'a>(cluster: &'a str, next: Option<&'a str>, boolset: &[u8]) -> SedShort<'a> {
+    let bytes = cluster.as_bytes();
+    let mut k = 0;
+    while k < bytes.len() {
+        let glued = &cluster[k + 1..];
+        let has = !glued.is_empty();
+        match bytes[k] {
+            b'i' => return SedShort::InPlace, // -i[SUFFIX]: the rest of the cluster is the suffix
+            b'e' => return SedShort::Script { consumes_next: !has },
+            b'f' => {
+                let file = if has { Some(glued) } else { next };
+                return SedShort::ScriptFile { file, consumes_next: !has };
+            }
+            b'l' if has || next.is_some() => return SedShort::SkipValue { consumes_next: !has }, // -l N
+            b if boolset.contains(&b) => k += 1,
+            _ => return SedShort::Bad,
+        }
+    }
+    SedShort::Standalone
+}
+
+/// Parse a `sed` long option, returning how many tokens it consumed, or `None` if unknown.
+fn sed_long<'a>(
+    long: &'a str,
+    next: Option<&'a str>,
+    in_place: &mut bool,
+    script_from_flag: &mut bool,
+    script_files: &mut Vec<&'a str>,
+) -> Option<usize> {
+    let name = long.split('=').next().unwrap_or(long);
+    match name {
+        "in-place" => *in_place = true, // --in-place[=SUFFIX] (glued only)
+        "expression" => {
+            *script_from_flag = true;
+            return Some(if long.contains('=') { 1 } else { 2 });
+        }
+        "file" => {
+            *script_from_flag = true;
+            match long.split_once('=') {
+                Some((_, v)) => script_files.push(v),
+                None => {
+                    script_files.extend(next);
+                    return Some(2);
+                }
+            }
+        }
+        "quiet" | "silent" | "regexp-extended" | "null-data" | "separate" | "unbuffered"
+        | "posix" | "help" | "version" | "debug" | "follow-symlinks" | "sandbox"
+        | "zero-terminated" | "line-length" => {}
+        _ => return None,
+    }
+    Some(1)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1206,6 +1338,48 @@ mod tests {
         assert_eq!(project(&resolve(&toks(&["tar", "-C", "/etc", "xf", "a.tar"])).expect("tar")), Verdict::Denied, "-C unmodeled");
         assert_eq!(project(&resolve(&toks(&["tar", "c"])).expect("tar")), Verdict::Denied, "create to stdout, no members");
         assert_eq!(project(&resolve(&toks(&["tar", "zf", "backup.tar"])).expect("tar")), Verdict::Denied, "no mode letter");
+    }
+
+    #[test]
+    fn sed_i_flips_read_to_write_and_locus_stops_system_wide_damage() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+
+        // -i turns the file operands from reads into in-place MUTATES.
+        let read = resolve(&toks(&["sed", "s/x/y/", "./foo"])).expect("sed");
+        assert_eq!(read.capabilities[0].operation, Operation::Observe, "no -i → read");
+        assert_eq!(project(&read), Verdict::Allowed(SafetyLevel::SafeRead), "sed read");
+        let edit = resolve(&toks(&["sed", "-i", "s/x/y/", "./foo"])).expect("sed");
+        assert_eq!(edit.capabilities[0].operation, Operation::Mutate, "-i → in-place write");
+        assert_eq!(project(&edit), Verdict::Allowed(SafetyLevel::SafeWrite), "sed -i worktree");
+
+        // THE CONCERN: a stray system-wide `sed -i` is stopped by LOCUS — a system, home, or
+        // unpinnable target denies whatever the scale. Damage needs a target above the
+        // worktree, and every such target is denied.
+        for cmd in [
+            vec!["sed", "-i", "s/a/b/", "/etc/passwd"],
+            vec!["sed", "-i", "s/a/b/", "/etc/hosts"],
+            vec!["sed", "-i", "s/a/b/", "~/.bashrc"],
+            vec!["sed", "-i", "s/a/b/", "$CONFIG"],      // unpinnable
+            vec!["sed", "-i", "s/a/b/", "../outside"],   // escapes the worktree
+            vec!["sed", "-i", "-e", "s/a/b/", "/etc/x"], // -e script, system file
+        ] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("sed")), Verdict::Denied, "{cmd:?} must deny");
+        }
+
+        // A worktree-scoped sweep IS allowed — bounded, recoverable, your own project files.
+        // The glob/multi-operand blast radius is scored as `bounded`, still write-local.
+        let glob = resolve(&toks(&["sed", "-i", "s/a/b/", "*"])).expect("sed");
+        assert_eq!(glob.capabilities[0].scale, Scale::Bounded, "a glob is a bounded blast radius");
+        assert_eq!(project(&glob), Verdict::Allowed(SafetyLevel::SafeWrite), "sed -i * (worktree)");
+        assert_eq!(project(&resolve(&toks(&["sed", "-i", "s/a/b/", "a", "b", "c"])).expect("sed")), Verdict::Allowed(SafetyLevel::SafeWrite), "multi-file");
+
+        // -i.bak (optional glued suffix) still parses as in-place; -f reads a script file.
+        assert_eq!(project(&resolve(&toks(&["sed", "-i.bak", "s/a/b/", "./foo"])).expect("sed")), Verdict::Allowed(SafetyLevel::SafeWrite), "-i.bak");
+        assert_eq!(project(&resolve(&toks(&["sed", "-f", "script.sed", "./foo"])).expect("sed")), Verdict::Allowed(SafetyLevel::SafeRead), "-f script");
+        // a home file read (no -i) still denies by locus, like cat.
+        assert_eq!(project(&resolve(&toks(&["sed", "s/a/b/", "~/.ssh/id_rsa"])).expect("sed")), Verdict::Denied, "read home secret");
+        assert_eq!(project(&resolve(&toks(&["sed", "-Q", "./foo"])).expect("sed")), Verdict::Denied, "unknown flag");
     }
 
     #[test]

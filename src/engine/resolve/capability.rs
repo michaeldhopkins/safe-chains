@@ -79,6 +79,14 @@ pub(super) fn overwrites(locus: LocalLocus, scale: Scale, no_clobber: bool) -> C
     writes(Operation::Create, locus, scale, reversibility, PersistenceLevel::Data, "writes the destination; may overwrite existing content unless --no-clobber")
 }
 
+/// An in-place edit of an existing file (`sed -i`): `mutate` at `locus`, `recoverable` (the
+/// old content is gone unless a backup was kept, but worktree content is repo-recoverable,
+/// HP-8), leaving data. Distinct from `overwrites` (a fresh dest) — the file is edited, not
+/// replaced wholesale.
+pub(super) fn mutates(locus: LocalLocus, scale: Scale, because: &str) -> Capability {
+    writes(Operation::Mutate, locus, scale, Reversibility::Recoverable, PersistenceLevel::Data, because)
+}
+
 /// A moved-from source (`mv` src): `mutate` at `locus` — the entry leaves that directory —
 /// `trivial` to undo (`mv` back), leaving nothing behind. NOT a destroy: the content
 /// survives at the destination, which is why `mv` stays at write-local and `rm` does not.
