@@ -83,6 +83,7 @@ const RESOLVERS: &[(&str, Resolver, Operands)] = &[
     ("mv", resolve_mv, Operands::Transfer),
     ("ln", resolve_ln, Operands::Transfer),
     ("dd", resolve_dd, Operands::Custom(&[&["if=@", "of=./safe"], &["if=./safe", "of=@"]])),
+    ("tar", resolve_tar, Operands::Custom(&[&["cf", "./s.tar", "@"], &["cf", "@", "./s"], &["tf", "@"]])),
 ];
 
 /// A command name with no resolver and no plausible future one — the stable stand-in for
@@ -599,6 +600,120 @@ fn resolve_dd(tokens: &[Token]) -> Profile {
     }
 }
 
+/// `tar` — the flag-SYNTAX breaker: its options may be written WITHOUT a leading dash
+/// (`tar czf` == `tar -czf`), so the getopt walker misreads the cluster as a positional; tar
+/// parses its own. The mode letter splits the profile sharply:
+///   - create/append (`c`/`r`/`u`): reads each member (source) + writes the archive (dest) —
+///     a bundler, so `tar czf - ~/.ssh` denies on the member locus (golden-set).
+///   - list (`t`): reads the archive, prints member names to the model.
+///   - extract (`x`) and the rarer modes: extraction writes an ARCHIVE-CONTROLLED set of
+///     paths that `..`-traversal can send anywhere — unknowable without opening the archive,
+///     so worst-case (§0). Any value-taking option we don't model (`-C`, `-T`, …) or an
+///     unknown letter also worst-cases.
+fn resolve_tar(tokens: &[Token]) -> Profile {
+    let mut p = TarParse::default();
+    for (idx, t) in tokens.iter().enumerate().skip(1) {
+        let t = t.as_str();
+        if let Some(long) = t.strip_prefix("--") {
+            p.long_option(long);
+        } else if let Some(cluster) = t.strip_prefix('-').filter(|c| !c.is_empty()) {
+            p.cluster(cluster);
+        } else if idx == 1 {
+            p.cluster(t); // dashless old-style option bundle (only the first argument)
+        } else {
+            p.positionals.push(t);
+        }
+    }
+    p.into_profile()
+}
+
+/// Accumulated `tar` parse: the mode, whether `-f` wants an archive, and `reject` — set by
+/// any option we can't model safely (an unknown letter, or a value-taking option like `-C`
+/// / `-T` whose ordered operand consumption we don't track), which forces worst-case.
+#[derive(Default)]
+struct TarParse<'a> {
+    mode: Option<u8>,
+    want_archive: bool,
+    reject: bool,
+    long_archive: Option<&'a str>,
+    positionals: Vec<&'a str>,
+}
+
+impl<'a> TarParse<'a> {
+    fn cluster(&mut self, cluster: &str) {
+        const NOVAL: &[u8] = b"vzjJZpkmOwhSlPa"; // benign no-value option letters
+        for b in cluster.bytes() {
+            match b {
+                b'c' | b'x' | b't' | b'r' | b'u' | b'A' | b'd' => self.mode = Some(b),
+                b'f' => self.want_archive = true,
+                b'C' | b'T' | b'X' | b'b' | b'H' | b'g' | b'K' | b'N' => self.reject = true,
+                x if NOVAL.contains(&x) => {}
+                _ => self.reject = true,
+            }
+        }
+    }
+
+    fn long_option(&mut self, long: &'a str) {
+        let name = long.split('=').next().unwrap_or(long);
+        match name {
+            "create" => self.mode = Some(b'c'),
+            "extract" | "get" => self.mode = Some(b'x'),
+            "list" => self.mode = Some(b't'),
+            "append" => self.mode = Some(b'r'),
+            "update" => self.mode = Some(b'u'),
+            "file" => match long.split_once('=') {
+                Some((_, v)) => self.long_archive = Some(v),
+                None => self.want_archive = true,
+            },
+            "gzip" | "bzip2" | "xz" | "zstd" | "compress" | "verbose" | "preserve-permissions"
+            | "same-permissions" | "to-stdout" | "help" | "version" | "dereference" | "totals" => {}
+            _ => self.reject = true,
+        }
+    }
+
+    fn into_profile(self) -> Profile {
+        let Some(mode) = self.mode.filter(|_| !self.reject) else {
+            return worst("tar: unrecognized/unmodeled option — worst-cased (§0)");
+        };
+        // Separate the archive from the members. `--file=X` names it directly; a bare `f`
+        // (dashless `czf` or dashed `-czf`) takes the FIRST positional as the archive.
+        let (archive, members): (Option<&str>, &[&str]) = if let Some(a) = self.long_archive {
+            (Some(a), &self.positionals)
+        } else if self.want_archive {
+            match self.positionals.split_first() {
+                Some((first, rest)) => (Some(*first), rest),
+                None => return worst("tar: -f without an archive — worst-cased (§0)"),
+            }
+        } else {
+            (None, &self.positionals) // archive is stdin/stdout
+        };
+        // A `-` archive (or none) is a stdout/stdin stream, not a file to gate.
+        let archive_file = archive.filter(|a| *a != "-");
+
+        match mode {
+            b'c' | b'r' | b'u' => {
+                let mut caps: Vec<Capability> = members
+                    .iter()
+                    .map(|m| observes(classify_locus(m), Scale::Bounded, "tar reads a member into the archive"))
+                    .collect();
+                if let Some(a) = archive_file {
+                    caps.push(overwrites(classify_locus(a), Scale::Single, false));
+                }
+                if caps.is_empty() {
+                    return worst("tar create with no members — worst-cased (§0)");
+                }
+                Profile::of(caps)
+            }
+            b't' => {
+                let loc = archive_file.map_or(LocalLocus::Process, classify_locus);
+                Profile::of(vec![reads_content(loc, Scale::Single, "tar lists the archive's members (names → the model)")])
+            }
+            // x (extract) and A/d: archive-controlled, ..-escapable writes → worst-case.
+            _ => worst("tar extract writes an archive-controlled, ..-escapable path set — worst-cased (§0)"),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1056,6 +1171,41 @@ mod tests {
         // fail-closed: a non key=value operand, or an unknown key, worst-cases.
         assert_eq!(project(&resolve(&toks(&["dd", "./file"])).expect("dd")), Verdict::Denied, "positional operand");
         assert_eq!(project(&resolve(&toks(&["dd", "exec=evil", "of=./x"])).expect("dd")), Verdict::Denied, "unknown key");
+    }
+
+    #[test]
+    fn tar_parses_dashless_bundles_and_splits_by_mode() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+
+        // dashless `czf` and dashed `-czf` and the long form all parse the same: a create is
+        // members-read + archive-write → write-local for a worktree backup.
+        for cmd in [
+            vec!["tar", "czf", "backup.tar", "./src"],
+            vec!["tar", "-czf", "backup.tar", "./src"],
+            vec!["tar", "--create", "--file=backup.tar", "./src"],
+        ] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("tar")), Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd:?}");
+        }
+        // list reads the archive → read-local.
+        assert_eq!(project(&resolve(&toks(&["tar", "tzf", "backup.tar"])).expect("tar")), Verdict::Allowed(SafetyLevel::SafeRead), "list");
+
+        // the bundler-exfil case (golden-set): a home member denies on the member locus,
+        // whether the archive goes to stdout or a file.
+        assert_eq!(project(&resolve(&toks(&["tar", "czf", "-", "~/.ssh"])).expect("tar")), Verdict::Denied, "bundle secret to stdout");
+        assert_eq!(project(&resolve(&toks(&["tar", "czf", "out.tar", "~/.aws"])).expect("tar")), Verdict::Denied, "bundle home member");
+        // a home/system ARCHIVE denies on the archive write locus.
+        assert_eq!(project(&resolve(&toks(&["tar", "cf", "~/backup.tar", "./src"])).expect("tar")), Verdict::Denied, "archive into home");
+
+        // extract is archive-controlled (..-escapable) → worst-case, even for a benign archive.
+        assert_eq!(project(&resolve(&toks(&["tar", "xzf", "release.tar"])).expect("tar")), Verdict::Denied, "extract");
+        // `tar cf backup.tar` with no members creates an empty archive — a benign worktree
+        // write, so SafeWrite (not a fail-closed case).
+        assert_eq!(project(&resolve(&toks(&["tar", "cf", "backup.tar"])).expect("tar")), Verdict::Allowed(SafetyLevel::SafeWrite), "empty archive");
+        // fail-closed: an unmodeled value option (-C), no mode, an empty profile, a bad letter.
+        assert_eq!(project(&resolve(&toks(&["tar", "-C", "/etc", "xf", "a.tar"])).expect("tar")), Verdict::Denied, "-C unmodeled");
+        assert_eq!(project(&resolve(&toks(&["tar", "c"])).expect("tar")), Verdict::Denied, "create to stdout, no members");
+        assert_eq!(project(&resolve(&toks(&["tar", "zf", "backup.tar"])).expect("tar")), Verdict::Denied, "no mode letter");
     }
 
     #[test]
