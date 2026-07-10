@@ -221,7 +221,7 @@ and HP-4. *Broader lead:* pursue **deeper harness integrations** to prototype th
 abstain→remember loop and a first-class session-grant channel — an easily-configurable
 harness like **`pi`** is a strong candidate to build this against.
 
-### HP-18 · Capability laundering — equivalent commands must gate equivalently — `status: partial`
+### HP-18 · Capability laundering — equivalent commands must gate equivalently — `status: guarded`
 Each command is resolved independently, but many reach the *same* capability by different
 means: `cp ~/.ssh/id_rsa ./x`, `ln ~/.ssh/id_rsa ./x` (alias), `install`, `dd if= of=`,
 `rsync`, `tar cf ./x ~/.ssh` all bridge a home file's content into the tree. If one
@@ -245,13 +245,15 @@ touched-path role must deny.
    already share `sources_and_dest` for *parsing*; share the *assembly* too). Every source
    maps through `per_source`, the dest through `per_dest`, by construction — the hand-written
    caps loop that dropped `ln`'s target can't recur. Backstop the irregular cases with (1).
-3. **Operand-role annotation + corpus sweep (general):** each resolver declares which
-   positional slots are touched paths and their role (read / write / bridge) — extending the
-   existing `positional_shape` TOML primitive so resolver *and* test share one source of
-   truth. A generic proptest then asserts the *conservation law* — ∀ touched path `p`, the
-   profile contains a cap at `classify_locus(p)` — across every resolver, catching a future
-   single-file reader that forgets its `observe`, not just transfers. Needs the annotation to
-   distinguish path slots from non-path ones (grep's pattern, head's count).
+3. **Operand-role annotation + corpus sweep (shipped, test-side):**
+   `every_touched_path_operand_is_gated` asserts the *conservation law* — a hot path in any
+   touched-path slot forces denial — across **every** resolver, catching a future single-file
+   reader that forgets its `observe`, not just transfers. The per-command slot knowledge
+   (which positionals are touched paths vs `grep`'s pattern / `head`'s count) lives in a
+   `PROBES` table, tied to the live dispatch (`RESOLVERS`) by a completeness check so a new
+   resolver without a probe fails. *Remaining refinement:* move that annotation resolver-side
+   (extend the `positional_shape` TOML primitive) so the resolver and the sweep share ONE
+   source of truth instead of a parallel test table — folds into the TOML-profile migration.
 
 ---
 
