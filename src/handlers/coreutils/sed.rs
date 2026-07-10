@@ -38,7 +38,10 @@ fn expr_has_exec(token: &Token) -> bool {
     flags_start.is_some_and(|start| start < bytes.len() && bytes[start..].contains(&b'e'))
 }
 
-fn sed_has_exec_modifier(tokens: &[Token]) -> bool {
+/// Whether a sed invocation's inline script contains the `e` command/modifier, which
+/// executes text as a shell command (RCE). Reused by the engine `sed` resolver so it is at
+/// least as strict as this legacy handler on the exec vector.
+pub(crate) fn sed_has_exec_modifier(tokens: &[Token]) -> bool {
     let mut i = 1;
     let mut saw_script = false;
 

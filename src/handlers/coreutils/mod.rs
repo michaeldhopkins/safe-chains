@@ -3,7 +3,7 @@ mod data;
 mod find;
 mod grep;
 mod net;
-mod sed;
+pub(crate) mod sed;
 mod tar;
 
 use crate::parse::Token;

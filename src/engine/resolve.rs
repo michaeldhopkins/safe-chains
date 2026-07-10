@@ -722,6 +722,12 @@ impl<'a> TarParse<'a> {
 /// positional is the SCRIPT unless `-e`/`-f` supplied it (`-f` also reads a script file).
 /// So `sed` parses its own flags.
 fn resolve_sed(tokens: &[Token]) -> Profile {
+    // HP-7: sed is a mini-language. Its `e` command/modifier executes text as a shell
+    // command (RCE), which flag parsing alone can't see. Inspect the script and worst-case
+    // it, matching the legacy handler's detector so the engine is never looser on this vector.
+    if crate::handlers::coreutils::sed::sed_has_exec_modifier(tokens) {
+        return worst("sed: script has an `e` exec command — worst-cased (§0, HP-7)");
+    }
     const BOOL: &[u8] = b"nrEsuz"; // no-value short flags
     let mut in_place = false;
     let mut script_from_flag = false;
@@ -1380,6 +1386,27 @@ mod tests {
         // a home file read (no -i) still denies by locus, like cat.
         assert_eq!(project(&resolve(&toks(&["sed", "s/a/b/", "~/.ssh/id_rsa"])).expect("sed")), Verdict::Denied, "read home secret");
         assert_eq!(project(&resolve(&toks(&["sed", "-Q", "./foo"])).expect("sed")), Verdict::Denied, "unknown flag");
+    }
+
+    #[test]
+    fn sed_exec_command_is_worst_cased_at_parity_with_legacy() {
+        use crate::engine::bridge::project;
+        use crate::verdict::Verdict;
+        // The `e` command/modifier executes text as a shell command (RCE). The resolver must
+        // worst-case it — flag parsing alone treated the script as opaque and let it through.
+        for cmd in [
+            vec!["sed", "s/test/touch tmp/e", "file"],   // s///e modifier
+            vec!["sed", "-e", "s/x/cmd/e", "file"],       // via -e
+            vec!["sed", "s/x/cmd/we", "file"],            // w + e
+            vec!["sed", "1e", "file"],                    // address + e
+            vec!["sed", "e"],                             // bare e
+            vec!["sed", "-e", "e"],
+        ] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("sed")), Verdict::Denied, "{cmd:?}: exec must deny");
+        }
+        // NB: `sed -e '1e reboot'` (address+e with the command as an argument, so the token
+        // doesn't end in `e`) is a KNOWN residual missed by both the legacy detector and this
+        // one — a pre-existing gap, not a regression (HP-7: strengthen the sed sub-parser).
     }
 
     /// HP-19 #1 (engine): `classify_locus` now resolves relative paths against the ambient
