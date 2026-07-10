@@ -328,6 +328,10 @@ pub(crate) fn check_redirects(redirs: &[Redir]) -> bool {
 /// key, or a shell/direnv init that runs later. A `$`-bearing target is
 /// unverifiable (it may expand to `$HOME/.ssh/...`), so it is treated as unsafe.
 fn is_safe_write_target(path: &str) -> bool {
+    // HP-19: resolve a relative target against the harness cwd/root first, so `cd /etc &&
+    // echo > ./x` is scored as writing `/etc/x`. No context → path unchanged (status quo).
+    let resolved = crate::pathctx::resolve(path);
+    let path: &str = &resolved;
     if path.starts_with("/tmp/")
         || path.starts_with("/private/tmp/")
         || path.starts_with("/var/tmp/")

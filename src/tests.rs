@@ -1659,30 +1659,37 @@ safe_write! {
 // working directory, even though the harness supplies it. These tests pin the resulting
 // loophole at the PRODUCTION (legacy) layer; they flip once the classifier is cwd-aware.
 
-/// The harness sends `cwd` and we parse it into `HookInput.cwd` (proven in `targets::claude`
-/// tests), but the hook computes `command_verdict(&input.command)` (`main.rs`), dropping it.
-/// Persistent-shell case: the agent `cd`'d to /etc in a prior turn, so `cwd` is /etc — yet a
-/// relative redirect target is still scored worktree-local, so `/etc/x` becomes writable via
-/// `> ./x`. (Redirect targets are what legacy gates via `is_safe_write_target`.)
+/// FIXED (HP-19 #1, cross-invocation): with the harness `cwd`/`root` supplied,
+/// `command_verdict_in` resolves a relative redirect target against the real directory.
+/// Persistent-shell case: the agent `cd`'d to /etc in a prior turn, so `cwd = /etc` — the
+/// relative `> ./x` now resolves to `/etc/x` and denies. Without a context (plain
+/// `command_verdict`) it stays worktree-local: use the signal when present, never regress.
 #[test]
-fn gap_the_verdict_discards_the_harness_cwd() {
-    let input = crate::targets::HookInput { command: "echo pwned > ./x".into(), cwd: Some("/etc".into()) };
-    assert_eq!(input.cwd.as_deref(), Some("/etc"), "the harness told us the shell is in /etc");
-    // The verdict is a pure function of the command; the /etc cwd cannot influence it.
-    assert!(command_verdict(&input.command).is_allowed(), "redirect to ./x scored worktree → /etc/x writable");
-    // Redirecting to /etc directly IS denied — same effect, but the relative form launders past it.
-    assert!(!command_verdict("echo pwned > /etc/x").is_allowed(), "redirect to /etc/x denied directly");
+fn cwd_context_closes_the_cross_invocation_write_hole() {
+    use crate::pathctx::PathCtx;
+    let outside = PathCtx { cwd: Some("/etc".into()), root: Some("/home/u/proj".into()) };
+    // The shell is really in /etc → `> ./x` is `/etc/x` → denied, like a direct `> /etc/x`.
+    assert!(!command_verdict_in("echo pwned > ./x", outside.clone()).is_allowed(), "cwd=/etc: ./x → /etc/x denied");
+    assert!(!command_verdict_in("echo pwned > passwd", outside).is_allowed(), "cwd=/etc: passwd → /etc/passwd denied");
+    // In the project, the same relative write is allowed.
+    let inside = PathCtx { cwd: Some("/home/u/proj".into()), root: Some("/home/u/proj".into()) };
+    assert!(command_verdict_in("echo ok > ./x", inside).is_allowed(), "cwd in project: ./x allowed");
+    // No context → today's behavior (relative = worktree), no regression.
+    assert!(command_verdict("echo ok > ./x").is_allowed(), "no ctx: ./x allowed (fallback)");
 }
 
-/// An intra-line `cd` to a non-worktree directory is not tracked: `cd /etc` is itself Inert
-/// (allowed), and the later relative redirect target is still classified worktree, so the
-/// whole chain passes — writing `/etc/x` that a direct redirect would be denied.
+/// STILL OPEN until HP-19 #2 (intra-line cd tracking). Here the `cd /etc` happens
+/// mid-command, so the harness's payload `cwd` is the *pre-command* project dir — the ctx
+/// from #1 can't help. The later `> ./x` still resolves against the project and passes. This
+/// characterization flips once the CST tracks `cd` across `&&` and updates the ambient cwd.
 #[test]
-fn gap_intra_line_cd_does_not_reclassify_later_relative_writes() {
-    assert!(command_verdict("cd /etc").is_allowed(), "cd /etc is allowed (Inert)");
-    assert!(!command_verdict("echo pwned > /etc/x").is_allowed(), "direct redirect to /etc denied");
+fn gap_intra_line_cd_not_yet_tracked() {
+    use crate::pathctx::PathCtx;
+    // The harness reports the project dir (the cd is inside the command, not yet run).
+    let ctx = PathCtx { cwd: Some("/home/u/proj".into()), root: Some("/home/u/proj".into()) };
+    assert!(!command_verdict_in("echo pwned > /etc/x", ctx.clone()).is_allowed(), "direct /etc redirect denied");
     assert!(
-        command_verdict("cd /etc && echo pwned > ./x").is_allowed(),
-        "cd-then-relative-redirect launders past the locus gate: ./x still read as worktree",
+        command_verdict_in("cd /etc && echo pwned > ./x", ctx).is_allowed(),
+        "intra-line cd not tracked yet: ./x still resolves against the project → passes",
     );
 }
