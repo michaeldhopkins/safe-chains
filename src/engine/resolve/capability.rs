@@ -3,7 +3,7 @@
 //! name the intent (`creates`/`overwrites`/`relocates`/`destroys`/`reads_*`/`worst`); the
 //! enum choices and `because` strings live here, in one place.
 
-use super::locus::classify_locus;
+use super::locus::{classify_locus, read_locus};
 use crate::engine::facet::*;
 
 /// One `observe · content-to-model` capability per path (empty list = reads stdin). A
@@ -18,7 +18,7 @@ pub(super) fn reads_to_model(paths: &[&str], scale: Scale) -> Vec<Capability> {
             if *p == "-" {
                 reads_content(LocalLocus::Process, scale, "reads stdin (-)")
             } else {
-                reads_content(classify_locus(p), scale, "reads file content to the model")
+                reads_content(read_locus(p), scale, "reads file content to the model")
             }
         })
         .collect()
@@ -140,7 +140,7 @@ pub(super) fn transfer_profile(
     per_dest: impl Fn(LocalLocus, Scale) -> Capability,
 ) -> Profile {
     let mut caps: Vec<Capability> =
-        sources.iter().map(|s| per_source(classify_locus(s), scale)).collect();
+        sources.iter().map(|s| per_source(read_locus(s), scale)).collect();
     caps.push(per_dest(classify_locus(dest), scale));
     Profile::of(caps)
 }

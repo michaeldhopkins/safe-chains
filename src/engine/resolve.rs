@@ -14,13 +14,16 @@ use crate::parse::{Token, has_flag};
 mod capability;
 mod flags;
 mod locus;
+pub(crate) mod regions;
+#[cfg(test)]
+mod scenarios;
 
 use capability::{
     breadth_scale, creates, destroys, mutates, observes, overwrites, reads_content,
     reads_to_model, relocates, transfer_profile, worst,
 };
 use flags::Flags;
-use locus::classify_locus;
+use locus::{classify_locus, read_locus};
 
 /// Resolve a command's leaf tokens to its behavior profile, or `None` if the command
 /// has no resolver yet (the caller then worst-cases / falls back to the legacy
@@ -290,7 +293,7 @@ fn resolve_grep(tokens: &[Token]) -> Profile {
 
     let mut caps: Vec<Capability> = pattern_files
         .iter()
-        .map(|f| reads_content(classify_locus(f), Scale::Single, "reads a grep -f pattern file"))
+        .map(|f| reads_content(read_locus(f), Scale::Single, "reads a grep -f pattern file"))
         .collect();
     caps.extend(reads_to_model(&files, scale));
     Profile::of(caps)
@@ -602,7 +605,7 @@ fn resolve_dd(tokens: &[Token]) -> Profile {
     // dd touches exactly one input and one output — a `single` blast radius, whatever the
     // data VOLUME. The disk-wipe danger of `of=/dev/rdisk0` is carried by its device locus,
     // not by scale.
-    let input_locus = input.map_or(LocalLocus::Process, classify_locus);
+    let input_locus = input.map_or(LocalLocus::Process, read_locus);
     match output {
         // of= names a sink: read the input into it (no model disclosure) + write the sink.
         Some(of) => Profile::of(vec![
@@ -712,7 +715,7 @@ impl<'a> TarParse<'a> {
             b'c' | b'r' | b'u' => {
                 let mut caps: Vec<Capability> = members
                     .iter()
-                    .map(|m| observes(classify_locus(m), Scale::Bounded, "tar reads a member into the archive"))
+                    .map(|m| observes(read_locus(m), Scale::Bounded, "tar reads a member into the archive"))
                     .collect();
                 if let Some(a) = archive_file {
                     caps.push(overwrites(classify_locus(a), Scale::Single, false));
@@ -796,7 +799,7 @@ fn resolve_sed(tokens: &[Token]) -> Profile {
     // home path denies whatever the scale).
     let scale = breadth_scale(&files, false);
     let mut caps: Vec<Capability> =
-        script_files.iter().map(|f| observes(classify_locus(f), Scale::Single, "sed reads an -f script file")).collect();
+        script_files.iter().map(|f| observes(read_locus(f), Scale::Single, "sed reads an -f script file")).collect();
     if in_place {
         caps.extend(files.iter().map(|f| mutates(classify_locus(f), scale, "sed -i edits the file in place")));
     } else {
@@ -928,9 +931,19 @@ mod tests {
 
     #[test]
     fn cat_beyond_the_worktree_is_denied_by_locus() {
-        for path in ["~/.ssh/id_rsa", "/etc/hosts", "$SECRET", "../outside"] {
+        // Secrets, private home, unpinnable, and unrecognized system paths stay denied…
+        for path in ["~/.ssh/id_rsa", "~/notes", "/etc/shadow", "$SECRET", "../outside", "/var/lib/mysql/data"] {
             let p = resolve(&toks(&["cat", path])).expect("cat");
             assert!(!read_local().admits(&p), "cat {path} is above read-local by locus");
+        }
+    }
+
+    #[test]
+    fn cat_of_a_recognized_public_system_file_is_read_local() {
+        // HP-20: reading a world-readable, non-secret system config is admitted at read-local.
+        for path in ["/etc/hosts", "/etc/os-release", "/usr/share/doc/x"] {
+            let p = resolve(&toks(&["cat", path])).expect("cat");
+            assert!(read_local().admits(&p), "cat {path} is a safe public read");
         }
     }
 
@@ -1125,10 +1138,15 @@ mod tests {
         cat.disclosure.audience = DisclosureAudience::LocalProcess;
         assert_eq!(one_cap(&["cat", "./notes.md"]), cat, "cat ./notes.md");
 
-        // cat of a home file — same, but locus rises to user (the only facet that moves).
+        // cat of a plain home file — same, but locus rises to user (the only facet that moves).
         let mut cat_home = cat.clone();
         cat_home.locus.local = LocalLocus::User;
-        assert_eq!(one_cap(&["cat", "~/.ssh/id_rsa"]), cat_home, "cat ~/.ssh/id_rsa");
+        assert_eq!(one_cap(&["cat", "~/notes.txt"]), cat_home, "cat ~/notes.txt");
+
+        // cat of a home CREDENTIAL store rises further, to machine (HP-20 credential role).
+        let mut cat_cred = cat.clone();
+        cat_cred.locus.local = LocalLocus::Machine;
+        assert_eq!(one_cap(&["cat", "~/.ssh/id_rsa"]), cat_cred, "cat ~/.ssh/id_rsa");
 
         // grep of a worktree file — like cat, bounded to the single searched file.
         assert_eq!(one_cap(&["grep", "foo", "file.txt"]), cat, "grep foo file.txt");
@@ -1313,10 +1331,13 @@ mod tests {
             assert_eq!(p.capabilities[0].operation, Operation::Observe, "target is a bridged read");
             assert_eq!(project(&p), Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd:?}");
         }
-        // the cp-bypass is closed: linking a home/system TARGET denies on the target locus,
-        // exactly as `cp` of it would (a link would otherwise alias the secret into the tree).
-        assert_eq!(project(&resolve(&toks(&["ln", "~/.ssh/id_rsa", "./x"])).expect("ln")), Verdict::Denied, "hard link to home");
-        assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/passwd", "./x"])).expect("ln")), Verdict::Denied, "symlink to system");
+        // the cp-bypass is closed: linking a SECRET/unreadable TARGET denies on the target
+        // locus, exactly as `cp` of it would (a link would otherwise alias the secret in).
+        assert_eq!(project(&resolve(&toks(&["ln", "~/.ssh/id_rsa", "./x"])).expect("ln")), Verdict::Denied, "hard link to home credential");
+        assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/shadow", "./x"])).expect("ln")), Verdict::Denied, "symlink to secret");
+        // HP-20: linking to a READABLE public target is allowed — you could `cat` it anyway,
+        // so aliasing it grants no new capability.
+        assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/hosts", "./x"])).expect("ln")), Verdict::Allowed(SafetyLevel::SafeWrite), "symlink to public config");
         // writing the LINK outside the worktree denies on the link locus.
         assert_eq!(project(&resolve(&toks(&["ln", "-s", "./a", "~/evil"])).expect("ln")), Verdict::Denied, "link into home");
         // -t DIR, lone operand, unknown flag.

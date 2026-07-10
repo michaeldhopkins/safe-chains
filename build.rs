@@ -41,6 +41,10 @@ fn main() {
             entry.display()
         );
     }
+
+    // The HP-20 region model is `include_str!`d by src/engine/resolve/regions.rs; track it so
+    // edits to the path classifier trigger a rebuild.
+    println!("cargo:rerun-if-changed=regions/default.toml");
 }
 
 fn collect_toml_files(
