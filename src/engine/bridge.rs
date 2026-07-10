@@ -20,8 +20,6 @@ use crate::verdict::{SafetyLevel, Verdict};
 pub enum Mode {
     /// Current classifier is authoritative; the engine does not run (default).
     Legacy,
-    /// Legacy is authoritative; the engine runs alongside and divergences are reported.
-    Shadow,
     /// The engine is authoritative for commands it can resolve; legacy for the rest.
     New,
 }
@@ -31,14 +29,36 @@ static MODE: LazyLock<Mode> =
 
 fn parse_mode(value: Option<&str>) -> Mode {
     match value {
-        Some("shadow") => Mode::Shadow,
         Some("new") => Mode::New,
         _ => Mode::Legacy,
     }
 }
 
-/// The active engine mode (read once from `SAFE_CHAINS_ENGINE`).
+#[cfg(test)]
+thread_local! {
+    static MODE_OVERRIDE: std::cell::Cell<Option<Mode>> = const { std::cell::Cell::new(None) };
+}
+
+/// Run `f` with `mode` forced (tests only): lets the composition harness exercise
+/// engine-authoritative behavior before the default flips. Restored on drop (panic-safe).
+#[cfg(test)]
+pub(crate) fn with_mode<T>(mode: Mode, f: impl FnOnce() -> T) -> T {
+    struct Reset(Option<Mode>);
+    impl Drop for Reset {
+        fn drop(&mut self) {
+            MODE_OVERRIDE.with(|c| c.set(self.0));
+        }
+    }
+    let _reset = Reset(MODE_OVERRIDE.with(|c| c.replace(Some(mode))));
+    f()
+}
+
+/// The active engine mode (read once from `SAFE_CHAINS_ENGINE`, or a test override).
 pub fn mode() -> Mode {
+    #[cfg(test)]
+    if let Some(m) = MODE_OVERRIDE.with(std::cell::Cell::get) {
+        return m;
+    }
     *MODE
 }
 
@@ -48,15 +68,6 @@ pub fn apply_mode(mode: Mode, legacy: Verdict, tokens: &[Token]) -> Verdict {
     match mode {
         Mode::Legacy => legacy,
         Mode::New => engine_verdict(tokens).unwrap_or(legacy),
-        Mode::Shadow => {
-            if let Some(engine) = engine_verdict(tokens)
-                && engine != legacy
-            {
-                let name = tokens.first().map_or("", |t| t.as_str());
-                eprintln!("safe-chains[shadow]: `{name}` legacy={legacy} engine={engine}");
-            }
-            legacy
-        }
     }
 }
 
@@ -152,7 +163,6 @@ mod tests {
 
     #[test]
     fn parse_mode_reads_the_selector() {
-        assert_eq!(parse_mode(Some("shadow")), Mode::Shadow);
         assert_eq!(parse_mode(Some("new")), Mode::New);
         assert_eq!(parse_mode(None), Mode::Legacy);
         assert_eq!(parse_mode(Some("garbage")), Mode::Legacy);
@@ -168,7 +178,6 @@ mod tests {
 
         assert_eq!(apply_mode(Mode::Legacy, legacy, &cat), legacy, "legacy authoritative");
         assert_eq!(apply_mode(Mode::New, legacy, &cat), engine, "new: engine authoritative");
-        assert_eq!(apply_mode(Mode::Shadow, legacy, &cat), legacy, "shadow: legacy still decides");
 
         // an unresolvable command → New falls back to legacy
         let unresolved = toks(resolve::UNRESOLVED_CMD);
@@ -278,63 +287,4 @@ mod tests {
         assert!(exercised >= 5, "corpus gate exercised only {exercised} engine resolutions — vacuous?");
     }
 
-    /// A broad corpus of single commands touching every resolver, in varied loci/forms, for
-    /// the shadow-validation sweep below. Single commands only (no chains) so
-    /// `command_verdict` equals the leaf verdict the engine would see.
-    const SHADOW_CORPUS: &[&str] = &[
-        // read family — engine tightens legacy's `inert` to `read-local`, and denies reads
-        // above the worktree (the intended locus tightening).
-        "cat notes.md", "cat /etc/hosts", "cat ~/.ssh/id_rsa", "cat -n src/main.rs",
-        "head -n 5 src/main.rs", "head -20 file", "tail -f app.log", "tail -n 100 log",
-        "wc -l notes.md", "wc /etc/passwd", "grep foo src/main.rs", "grep -r foo ~",
-        "grep -P foo file",
-        // create / mutate
-        "mkdir ./build", "mkdir -p a/b/c", "mkdir /etc/x", "touch ./f", "touch ~/.bashrc",
-        "touch /etc/cron.d/x",
-        // destroy
-        "rm ./stale.log", "rm -rf ./node_modules", "rm -rf /", "rm ~/x",
-        // transfer
-        "cp a b", "cp ~/.ssh/id_rsa ./x", "cp ./x ~/y", "mv a b", "mv ~/x ./y",
-        "ln -s ./t ./l", "ln -s /etc/hosts hosts", "ln ~/.ssh/id_rsa ./k",
-        // key=value / dashless / flag-flip
-        "dd if=./a of=./b", "dd if=./x of=/dev/rdisk0", "dd if=~/.ssh/id_rsa of=./x",
-        "tar czf out.tar ./src", "tar czf - ~/.ssh", "tar xzf archive.tar",
-        "sed s/a/b/ file", "sed -i s/a/b/ file", "sed -i s/a/b/ /etc/x",
-        "echo hi",
-    ];
-
-    /// Commands the engine INTENDS to allow at a level (or at all) that legacy blanket-denies
-    /// — the engine models a tool the coarse allowlist could only refuse (rm deletion, dd,
-    /// tar, sed). Every looser-than-legacy divergence must be listed here; an unlisted one is
-    /// a new engine bug. (Keep in sync as resolvers/levels evolve — that is the point.)
-    const INTENDED_LOOSER: &[&str] = &[
-        "rm ./stale.log", "rm -rf ./node_modules",
-        "dd if=./a of=./b", "dd --version",
-        "tar czf out.tar ./src",
-        "sed s/a/b/ file", "sed -i s/a/b/ file",
-    ];
-
-    /// Shadow validation (rerunnable, HP-19-adjacent): sweep `SHADOW_CORPUS`, comparing the
-    /// engine leaf verdict to legacy. The engine may be STRICTER (a higher level, or a deny)
-    /// — always fine — or INTENDED-looser, which must be enumerated in `INTENDED_LOOSER`. Any
-    /// *other* looser divergence is a regression and fails here. Re-run after touching a
-    /// resolver or a level to catch drift.
-    #[test]
-    fn shadow_validation_sweep() {
-        let mut resolved = 0usize;
-        for &cmd in SHADOW_CORPUS {
-            let t = toks(&cmd.split_whitespace().collect::<Vec<_>>());
-            let Some(engine) = engine_verdict(&t) else { continue };
-            resolved += 1;
-            let legacy = crate::command_verdict(cmd);
-            if !not_looser(legacy, engine) {
-                assert!(
-                    INTENDED_LOOSER.contains(&cmd),
-                    "UNEXPECTED engine-looser-than-legacy for `{cmd}`: legacy {legacy}, engine {engine} \
-                     — a new bug, or add to INTENDED_LOOSER if the engine is deliberately finer here",
-                );
-            }
-        }
-        assert!(resolved >= 30, "shadow sweep resolved only {resolved} — corpus went stale?");
-    }
 }
