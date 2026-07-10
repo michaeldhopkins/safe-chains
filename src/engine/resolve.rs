@@ -46,7 +46,9 @@ type Resolver = fn(&[Token]) -> Profile;
 /// A resolver's operand contract — which POSITIONAL slots (after flag parsing) are touched
 /// paths. Declared beside each resolver so the conservation sweep (HP-18 rung 3,
 /// `every_touched_path_operand_is_gated`) derives its probes from one source of truth,
-/// rather than a parallel test table that could drift from the resolvers.
+/// rather than a parallel test table that could drift from the resolvers. Its data is
+/// consumed only by that sweep, so non-test builds carry it inert.
+#[cfg_attr(not(test), allow(dead_code))]
 #[derive(Clone, Copy)]
 enum Operands {
     /// No path operands — only literal args (`echo`).
@@ -57,6 +59,10 @@ enum Operands {
     PatternThenPaths,
     /// Sources… then a destination, every positional a touched path — cp/mv/ln.
     Transfer,
+    /// Irregular operand syntax (not positional): explicit probe templates, one per touched
+    /// slot, with `@` marking where a hot path is substituted (may be inside a token, e.g.
+    /// `dd`'s `if=@`). The escape hatch for commands the positional shapes don't fit.
+    Custom(&'static [&'static [&'static str]]),
 }
 
 /// The dispatch table: every resolvable command, its resolver, and its operand contract. A
@@ -76,6 +82,7 @@ const RESOLVERS: &[(&str, Resolver, Operands)] = &[
     ("cp", resolve_cp, Operands::Transfer),
     ("mv", resolve_mv, Operands::Transfer),
     ("ln", resolve_ln, Operands::Transfer),
+    ("dd", resolve_dd, Operands::Custom(&[&["if=@", "of=./safe"], &["if=./safe", "of=@"]])),
 ];
 
 /// A command name with no resolver and no plausible future one — the stable stand-in for
@@ -545,6 +552,53 @@ fn resolve_ln(tokens: &[Token]) -> Profile {
     )
 }
 
+/// `dd if=IN of=OUT bs=… …` — the operand-model breaker: `dd` takes NO getopt flags or
+/// positionals, only `key=value` operands, so the shared `Flags`/`positionals` toolkit does
+/// not apply and it parses its own. `if=` reads (default stdin), `of=` writes (default
+/// stdout). It is still a transfer at the facet level — `dd if=~/.ssh/id_rsa of=./x` denies
+/// on the input locus, `dd if=./x of=/dev/rdisk0` denies on the output locus (a raw device
+/// is beneath the fs) — but the roles arrive inside `key=value`, not positional slots, which
+/// is why its conservation probe is `Operands::Custom`. `bs`/`count`/`conv`/… are benign
+/// transfer parameters; any other key, or a non-`key=value` operand, worst-cases (§0).
+fn resolve_dd(tokens: &[Token]) -> Profile {
+    const PARAMS: &[&str] = &[
+        "bs", "ibs", "obs", "cbs", "count", "skip", "seek", "conv", "iflag", "oflag", "status",
+    ];
+    let (mut input, mut output) = (None, None);
+    for t in &tokens[1..] {
+        let t = t.as_str();
+        if t == "--help" || t == "--version" {
+            continue;
+        }
+        let Some((key, val)) = t.split_once('=') else {
+            return worst("dd: non key=value operand — worst-cased (§0)");
+        };
+        match key {
+            "if" => input = Some(val),
+            "of" => output = Some(val),
+            k if PARAMS.contains(&k) => {}
+            _ => return worst("dd: unrecognized operand — worst-cased (§0)"),
+        }
+    }
+    // dd touches exactly one input and one output — a `single` blast radius, whatever the
+    // data VOLUME. The disk-wipe danger of `of=/dev/rdisk0` is carried by its device locus,
+    // not by scale.
+    let input_locus = input.map_or(LocalLocus::Process, classify_locus);
+    match output {
+        // of= names a sink: read the input into it (no model disclosure) + write the sink.
+        Some(of) => Profile::of(vec![
+            observes(input_locus, Scale::Single, "dd reads its input (if=) into the output"),
+            overwrites(classify_locus(of), Scale::Single, false),
+        ]),
+        // no of= → output is stdout, so the input content reaches the model (like `cat`).
+        None => Profile::of(vec![reads_content(
+            input_locus,
+            Scale::Single,
+            "dd copies its input to stdout (→ the model)",
+        )]),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -975,6 +1029,36 @@ mod tests {
     }
 
     #[test]
+    fn dd_parses_key_value_operands_and_gates_both_sides() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+
+        // a worktree-to-worktree copy → write-local; params (bs/count/conv) are ignored.
+        assert_eq!(
+            project(&resolve(&toks(&["dd", "if=./a", "of=./b", "bs=1M", "count=10"])).expect("dd")),
+            Verdict::Allowed(SafetyLevel::SafeWrite),
+            "dd worktree copy",
+        );
+        // input from stdout (no of=) discloses the input content to the model, like cat.
+        assert_eq!(project(&resolve(&toks(&["dd", "if=./notes"])).expect("dd")), Verdict::Allowed(SafetyLevel::SafeRead), "dd to stdout");
+        assert_eq!(project(&resolve(&toks(&["dd"])).expect("dd")), Verdict::Allowed(SafetyLevel::Inert), "bare dd is stdin→stdout");
+
+        // both sides gated by locus: a home INPUT or a device/home OUTPUT denies.
+        for cmd in [
+            vec!["dd", "if=~/.ssh/id_rsa", "of=./x"], // read a home secret
+            vec!["dd", "if=./x", "of=/dev/rdisk0"],   // write a raw device (disk wipe)
+            vec!["dd", "if=./x", "of=/dev/sda"],
+            vec!["dd", "if=./x", "of=~/backup"],      // write into home
+            vec!["dd", "if=~/.ssh/id_rsa"],           // home secret to stdout (→ model)
+        ] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("dd")), Verdict::Denied, "{cmd:?}");
+        }
+        // fail-closed: a non key=value operand, or an unknown key, worst-cases.
+        assert_eq!(project(&resolve(&toks(&["dd", "./file"])).expect("dd")), Verdict::Denied, "positional operand");
+        assert_eq!(project(&resolve(&toks(&["dd", "exec=evil", "of=./x"])).expect("dd")), Verdict::Denied, "unknown key");
+    }
+
+    #[test]
     fn touch_creates_in_the_worktree_and_skips_valued_flag_values() {
         use crate::engine::bridge::project;
         use crate::verdict::{SafetyLevel, Verdict};
@@ -1129,14 +1213,19 @@ mod tests {
     }
 
     /// The touched-path probe invocations for a resolver, derived from its declared
-    /// [`Operands`] contract: `hot` fills each touched slot in turn, other slots get a benign
-    /// path. Non-path slots (grep's pattern) are never filled with `hot`.
-    fn probes<'a>(cmd: &'a str, kind: Operands, hot: &'a str) -> Vec<Vec<&'a str>> {
+    /// [`Operands`] contract: `hot` fills each touched slot in turn (`@`, which may be inside
+    /// a token for `Custom`), other slots get a benign path. Non-path slots (grep's pattern)
+    /// are never filled with `hot`.
+    fn probes(cmd: &str, kind: Operands, hot: &str) -> Vec<Vec<String>> {
+        let inv = |slots: &[&str]| -> Vec<String> {
+            std::iter::once(cmd.to_string()).chain(slots.iter().map(|s| s.replace('@', hot))).collect()
+        };
         match kind {
             Operands::None => vec![],
-            Operands::Paths => vec![vec![cmd, hot]],
-            Operands::PatternThenPaths => vec![vec![cmd, "PATTERN", hot]],
-            Operands::Transfer => vec![vec![cmd, hot, "./safe"], vec![cmd, "./safe", hot]],
+            Operands::Paths => vec![inv(&["@"])],
+            Operands::PatternThenPaths => vec![inv(&["PATTERN", "@"])],
+            Operands::Transfer => vec![inv(&["@", "./safe"]), inv(&["./safe", "@"])],
+            Operands::Custom(templates) => templates.iter().map(|t| inv(t)).collect(),
         }
     }
 
@@ -1155,7 +1244,8 @@ mod tests {
         for (name, _, kind) in RESOLVERS {
             for hot in HOT_PATHS {
                 for cmd in probes(name, *kind, hot) {
-                    let profile = resolve(&toks(&cmd)).expect("resolves");
+                    let refs: Vec<&str> = cmd.iter().map(String::as_str).collect();
+                    let profile = resolve(&toks(&refs)).expect("resolves");
                     assert_eq!(project(&profile), Verdict::Denied, "{cmd:?}: touched hot path not gated");
                     exercised += 1;
                 }
