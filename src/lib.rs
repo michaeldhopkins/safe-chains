@@ -52,6 +52,8 @@ macro_rules! safe_write {
 }
 
 pub mod cli;
+#[cfg(test)]
+mod composition;
 pub mod cst;
 pub mod docs;
 pub mod engine;
