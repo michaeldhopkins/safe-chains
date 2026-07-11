@@ -4,6 +4,46 @@
 
 safe-chains knows {{#include includes/command-count.md}} commands. For each one it validates specific subcommands and flags, allowing `git log` but not `git push`, allowing `sed 's/foo/bar/'` but not `sed -i`.
 
+## Files by location
+
+Commands that read or write files are checked by *where* the file is, not only by which command it is. `cat`, `grep`, `head`, `cp`, `mv`, `tar`, `curl -o`, and the rest are approved inside your project and denied outside it:
+
+```bash
+cat src/main.rs           # approved — inside the project
+cat /etc/hosts            # approved — a world-readable system file
+cat ~/.ssh/id_rsa         # not approved — a credential
+cat /etc/shadow           # not approved — a system secret
+cp notes.txt /etc/x       # not approved — writes outside the project
+tar -cf out.tar src       # approved
+```
+
+The project directory and `/tmp` are read/write. World-readable system paths (`/etc/hosts`, `/usr/bin/*`) are readable but not writable. Your home directory, other users, and everything else are left for the normal permission flow.
+
+## Trusted directories
+
+Widen the file rules for directories you own by listing them in `~/.config/safe-chains.toml`. `read` and `write` are separate — grant read without write for a directory you look at but never edit.
+
+```toml
+# Work across every project under ~/projects, not just the current one
+[[grant]]
+path = "~/projects/"
+read = true
+write = true
+
+# A scripts directory the agent both runs and edits
+[[grant]]
+path = "~/.runner-scripts/"
+read = true
+write = true
+
+# Read a toolchain's install dir, but never let the agent write to it
+[[grant]]
+path = "~/.local/share/mise/"
+read = true
+```
+
+Grants only ever widen, and never expose a secret: `~/.ssh/id_rsa` stays denied even under a `~/` grant. Grant the directories you work in, not all of `~` — see [Best practices](security.md#best-practices).
+
 ## Parsing example
 
 Take this command from the introduction:
