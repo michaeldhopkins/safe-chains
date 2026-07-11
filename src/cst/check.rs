@@ -92,14 +92,23 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             }
             body_v.combine(redir_v)
         }
-        Cmd::For { items, body, redirs, .. } => {
+        Cmd::For { var, items, body, redirs } => {
             let redir_v = redirect_verdict(redirs);
             if let Verdict::Denied = redir_v {
                 return Verdict::Denied;
             }
-            words_sub_verdict(items)
-                .combine(script_verdict(body))
-                .combine(redir_v)
+            // Bind `$var` in the body to the loop list's locus (the `find … {}`→path binding,
+            // one layer up), so `for f in *.txt; do cat $f` reads the worktree instead of
+            // fail-closing on the bare `$f`.
+            let item_strs: Vec<String> = items.iter().map(Word::eval).collect();
+            let body_v = match crate::engine::resolve::loop_reprs(&item_strs) {
+                Some((read_repr, write_repr)) => {
+                    let _g = crate::pathctx::enter_loop_var(var.clone(), read_repr, write_repr);
+                    script_verdict(body)
+                }
+                None => script_verdict(body),
+            };
+            words_sub_verdict(items).combine(body_v).combine(redir_v)
         }
         Cmd::While { cond, body, redirs } | Cmd::Until { cond, body, redirs } => {
             let redir_v = redirect_verdict(redirs);
@@ -419,6 +428,37 @@ mod tests {
         is_safe_command(cmd)
     }
 
+    #[test]
+    fn loop_variable_inherits_the_list_locus() {
+        // A worktree `in`-list → the body reads/writes the worktree → allowed. The bare `$f`
+        // used to fail-closed to machine; now it binds to the list, like find's `{}`→path.
+        for cmd in [
+            "for f in *.txt; do cat $f; done",
+            "for f in *.txt; do rm $f; done",
+            "for f in src/*.rs; do grep foo $f; done",
+            "for f in *.log; do sed -i s/a/b/ $f; done",
+            "for f in a b c; do cat $f.bak; done",
+            "for x in 1 2 3; do rm $x; done",
+            "for d in a b; do for f in $d/x; do cat $f; done; done", // nested loops compose
+        ] {
+            assert!(check(cmd), "worktree loop should allow: {cmd}");
+        }
+        // A system / credential / unpinnable `in`-list → deny (the body could touch it).
+        for cmd in [
+            "for f in /etc/*; do cat $f; done",
+            "for f in /etc/*.conf; do rm $f; done",
+            "for f in ~/.ssh/*; do cat $f; done",
+            "for f in $LIST; do rm $f; done",
+            "for f in $(find / -name x); do rm -rf $f; done",
+            "for d in /etc; do for f in $d/x; do cat $f; done; done",
+            // read-worst ≠ write-worst: reading must worst-case ~/notes even though the
+            // write-worst item is /etc/hosts — a single representative would be unsound.
+            "for f in /etc/hosts ~/notes; do cat $f; done",
+        ] {
+            assert!(!check(cmd), "non-worktree loop should deny: {cmd}");
+        }
+    }
+
     safe! {
         grep_foo: "grep foo file.txt",
         cat_etc_hosts: "cat /etc/hosts",
@@ -587,7 +627,6 @@ mod tests {
         bg_rm: "cat file & rm -rf /",
         newline_rm: "echo foo\nrm -rf /",
 
-        for_rm: "for x in 1 2 3; do rm $x; done",
         for_unsafe_subst: "for x in $(rm -rf /); do echo $x; done",
         while_unsafe_body: "while true; do rm -rf /; done",
         while_unsafe_condition: "while python3 evil.py; do sleep 1; done",
