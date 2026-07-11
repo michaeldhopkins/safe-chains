@@ -181,11 +181,122 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
     }
 });
 
+// ── User trust grants ──────────────────────────────────────────────────────────────────────
+// A user WIDENS the default classification for directories they own by listing them in
+// `~/.config/safe-chains.toml`. A grant admits reads and/or writes under a subtree — the
+// read/write asymmetry is the point (`read = true, write = false` = a readable-but-not-written
+// install dir). Grants only ever widen, are user-level only (never a repo file — an agent
+// could drop one to escalate), and NEVER override a secret carve-out (`~/.ssh/id_rsa` stays
+// denied even under a `~/` grant).
+
+struct Grant {
+    matcher: Matcher,
+    read: bool,
+    write: bool,
+}
+
+#[derive(Deserialize)]
+struct GrantEntry {
+    path: String,
+    #[serde(default)]
+    read: bool,
+    #[serde(default)]
+    write: bool,
+}
+
+#[derive(Deserialize)]
+struct GrantFile {
+    #[serde(default)]
+    grant: Vec<GrantEntry>,
+}
+
+fn load_user_grants() -> Vec<Grant> {
+    if std::env::var_os("SAFE_CHAINS_NO_LOCAL").is_some() {
+        return Vec::new();
+    }
+    let Some(dir) = std::env::var_os("XDG_CONFIG_HOME")
+        .map(std::path::PathBuf::from)
+        .or_else(|| std::env::var_os("HOME").map(|h| std::path::PathBuf::from(h).join(".config")))
+    else {
+        return Vec::new();
+    };
+    let Ok(src) = std::fs::read_to_string(dir.join("safe-chains.toml")) else {
+        return Vec::new();
+    };
+    toml::from_str::<GrantFile>(&src)
+        .map(|f| f.grant)
+        .unwrap_or_default()
+        .into_iter()
+        .map(|g| Grant { matcher: Matcher::from_path(&g.path), read: g.read, write: g.write })
+        .collect()
+}
+
+#[cfg(not(test))]
+static USER_GRANTS: LazyLock<Vec<Grant>> = LazyLock::new(load_user_grants);
+
+#[cfg(test)]
+thread_local! {
+    static TEST_GRANTS: std::cell::RefCell<Vec<Grant>> = const { std::cell::RefCell::new(Vec::new()) };
+}
+
+/// Run `f` with the given grants active (tests only): `(path, read, write)`.
+#[cfg(test)]
+pub(crate) fn with_grants<T>(grants: &[(&str, bool, bool)], f: impl FnOnce() -> T) -> T {
+    let parsed = grants
+        .iter()
+        .map(|&(p, read, write)| Grant { matcher: Matcher::from_path(p), read, write })
+        .collect();
+    TEST_GRANTS.with(|g| *g.borrow_mut() = parsed);
+    let out = f();
+    TEST_GRANTS.with(|g| g.borrow_mut().clear());
+    out
+}
+
+/// The most-specific grant matching `path`, as `(read, write)`.
+fn best_grant(path: &str) -> Option<(bool, bool)> {
+    let pick = |grants: &[Grant]| {
+        grants
+            .iter()
+            .filter_map(|g| g.matcher.specificity(path).map(|s| (s, g.read, g.write)))
+            .max_by_key(|&(s, ..)| s)
+            .map(|(_, r, w)| (r, w))
+    };
+    #[cfg(test)]
+    {
+        TEST_GRANTS.with(|g| pick(&g.borrow()))
+    }
+    #[cfg(not(test))]
+    {
+        pick(&USER_GRANTS)
+    }
+}
+
+/// Widen `base` by a matching user grant. A grant never lowers a secret carve-out, and each
+/// face is admitted only if the grant grants it — `read`/`write` are independent.
+fn apply_grant(path: &str, base: Role) -> Role {
+    if base.reads_secret {
+        return base;
+    }
+    let Some((read, write)) = best_grant(path) else {
+        return base;
+    };
+    Role {
+        read_locus: if read { base.read_locus.min(LocalLocus::WorktreeTrusted) } else { base.read_locus },
+        write_locus: if write { base.write_locus.min(LocalLocus::Worktree) } else { base.write_locus },
+        reads_secret: base.reads_secret,
+    }
+}
+
 /// The role for `path`. Most-specific applicable node wins; ties break toward the more
 /// restrictive role (higher write locus, then read locus) — a safety backstop. No match →
 /// fail-closed default: an absolute or home path is `unknown` (deny), a relative one is
-/// `worktree`. `path` is expected already resolved and past the `$`/`..` guard.
+/// `worktree`. Then a user trust grant may widen the result. `path` is expected already
+/// resolved and past the `$`/`..` guard.
 pub(crate) fn classify_region(path: &str) -> Role {
+    apply_grant(path, base_region(path))
+}
+
+fn base_region(path: &str) -> Role {
     let r = &*REGIONS;
     let mut best: Option<(usize, Role)> = None;
     for node in &r.nodes {
@@ -247,6 +358,43 @@ mod tests {
         let hosts = classify_region("/etc/hosts");
         assert_eq!(hosts.read_locus, LocalLocus::WorktreeTrusted, "read is admitted at read-local");
         assert_eq!(hosts.write_locus, LocalLocus::Machine, "write reaches system → denied");
+    }
+
+    #[test]
+    fn user_grant_widens_read_and_write() {
+        with_grants(&[("~/projects/", true, true)], || {
+            let r = classify_region("~/projects/other/src/main.rs");
+            assert_eq!(r.write_locus, LocalLocus::Worktree, "write admitted");
+            assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "read admitted");
+        });
+        // grant gone → back to home default
+        assert_eq!(classify_region("~/projects/other/src/main.rs").write_locus, LocalLocus::User);
+    }
+
+    #[test]
+    fn read_only_grant_admits_read_but_not_write() {
+        with_grants(&[("~/.local/share/mise/", true, false)], || {
+            let r = classify_region("~/.local/share/mise/installs/python/bin/python");
+            assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "read admitted");
+            assert!(r.write_locus > LocalLocus::Worktree, "write NOT admitted");
+        });
+    }
+
+    #[test]
+    fn grant_never_widens_a_secret_carveout() {
+        with_grants(&[("~/", true, true)], || {
+            let r = classify_region("~/.ssh/id_rsa");
+            assert_eq!(r.read_locus, LocalLocus::Machine, "secret stays denied under a ~/ grant");
+            assert!(r.reads_secret);
+        });
+    }
+
+    #[test]
+    fn grant_takes_effect_end_to_end() {
+        with_grants(&[("~/projects/", true, true)], || {
+            assert!(crate::is_safe_command("cat ~/projects/sibling/notes.txt"));
+            assert!(crate::is_safe_command("cp ./a ~/projects/sibling/b"));
+        });
     }
 
     /// Provenance discipline (mirrors `researched_version`): no node may ship without a `note`

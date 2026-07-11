@@ -6,6 +6,8 @@ safe-chains is an allowlist-only command checker. It auto-approves bash commands
 
 Auto-approval of destructive, write, or state-changing commands. An agentic tool cannot use safe-chains to bypass permission prompts for `rm`, `git push`, `sed -i`, `curl -X POST`, or any command/flag combination not in the allowlist.
 
+Auto-approval of reads and writes outside your project. File commands are checked by location, so `cat ~/.ssh/id_rsa`, `cp secret /etc/x`, and writes to system paths are not approved. See [Files by location](how-it-works.md#files-by-location).
+
 ## Security properties
 
 - Allowlist-only: unrecognized commands are never approved.
@@ -20,9 +22,37 @@ Custom definitions outside of ~/.config and ~/.claude must be trusted. See [Trus
 
 ## What it does not prevent
 
-- Information disclosure: read-only commands can read sensitive files (`cat ~/.ssh/id_rsa`). Sensitive contents would be read by the model provider. We recommend pairing safe-chains with a hook to block reading `~/.ssh`, `../credentials` and similar directories.
+- Information disclosure inside your project: files in your project — and any [trusted directories](how-it-works.md#trusted-directories) you grant — are readable, so `cat .env` sends their contents to the model provider. safe-chains gates by location, not by content; it won't stop a read inside a directory you've allowed.
 - Unrecognized commands: commands safe-chains doesn't handle are passed through to the normal permission flow for your harness.
 - Chaining with broad approvals: if you add patterns like `Bash(bash *)` to your Claude Code settings, safe-chains will match them per-segment without recursive validation, matching Claude Code's own behavior. See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands).
+
+## Best practices
+
+**Don't run an agent from your home directory.** safe-chains treats your working directory as the project, and files under it are read/write. From `~`, a relative path like `cat .ssh/id_rsa` is indistinguishable from a project file — so your keys, credentials, and dotfiles are all exposed. Run agents from a project directory instead.
+
+**Grant narrowly.** A [trusted directory](how-it-works.md#trusted-directories) grant is a deliberate broad allow — the same broad access you get by running from a directory. Grant the specific directories you work in (`~/projects`), not all of `~`.
+
+**Deny the folders you never want touched.** safe-chains only ever *adds* approvals — it never blocks. For a hard block, pair it with a second hook that denies commands naming a protected path (Claude Code blocks the command if any hook denies it). A blunt backstop at `~/.claude/hooks/deny-paths.sh`:
+
+```bash
+#!/bin/bash
+cmd=$(jq -r '.tool_input.command // ""')
+case "$cmd" in
+  *.ssh/*|*.aws/*|*.gnupg/*|*/.env|*/secrets/*)
+    jq -n '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"deny",permissionDecisionReason:"protected path"}}' ;;
+esac
+```
+
+Register it alongside safe-chains in `~/.claude/settings.json`:
+
+```json
+"hooks": { "PreToolUse": [ { "matcher": "Bash", "hooks": [
+  { "type": "command", "command": "bash ~/.claude/hooks/deny-paths.sh" },
+  { "type": "command", "command": "safe-chains" }
+] } ] }
+```
+
+It's a string match, not a parser — a safety net for the obvious cases while safe-chains does the rigorous allow-listing.
 
 ## Testing approach
 
