@@ -751,6 +751,12 @@ safe! {
 
     for_echo: "for x in 1 2 3; do echo $x; done",
     for_empty_body: "for x in 1 2 3; do; done",
+    // loop-variable binding: `$f` inherits the `in`-list's worktree locus (the {}→path
+    // binding, one layer up), so a loop over a worktree glob reads/writes the worktree.
+    for_loop_variable_read: "for f in *.txt; do cat $f | grep pattern; done",
+    brace_group_variable_write: "for f in *.txt; do { echo $f; cat $f; } > combined.txt; done",
+    for_loop_worktree_rm_redirect: "for f in a b; do rm -rf $f; done 2>/dev/null",
+    for_rm_worktree: "for x in 1 2 3; do rm $x; done",
     // engine-authoritative: sed -i on a worktree file is write-local; piping to head is inert.
     pipeline_sed_inplace_worktree: "sed -i 's/foo/bar/' file | head",
     for_multiple: "for x in 1 2; do echo $x; done; for y in a b; do echo $y; done",
@@ -1064,9 +1070,6 @@ denied! {
     workon_destroy_no_save_denied: "workon destroy --no-save",
     workon_unknown_sub_denied: "workon frobnicate",
     for_redirect_target_cmdsub_denied: "for f in a b; do echo $f; done > $(evil)",
-    for_redirect_unsafe_body_denied: "for f in a b; do rm -rf $f; done 2>/dev/null",
-    for_loop_variable_path_denied: "for f in *.txt; do cat $f | grep pattern; done",
-    brace_group_variable_path_denied: "for f in *.txt; do { echo $f; cat $f; } > combined.txt; done",
     redirect_git_hook_denied: "echo x > .git/hooks/pre-commit",
     redirect_envrc_denied: "echo x > .envrc",
     redirect_ssh_authkeys_denied: "echo x > ~/.ssh/authorized_keys",
@@ -1395,7 +1398,6 @@ denied! {
 
     pipeline_find_delete: "find . -name '*.py' -delete | wc -l",
 
-    for_rm: "for x in 1 2 3; do rm $x; done",
     for_unsafe_subst: "for x in $(rm -rf /); do echo $x; done",
     while_unsafe_body: "while true; do rm -rf /; done",
     while_unsafe_condition: "while python3 evil.py; do sleep 1; done",

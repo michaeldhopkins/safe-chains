@@ -23,7 +23,36 @@ use capability::{
     reads_to_model, relocates, transfer_profile, worst,
 };
 use flags::Flags;
-use locus::{classify_locus, read_locus};
+use locus::{classify_locus, read_locus, write_locus};
+
+/// For `for VAR in ITEMS; do …$VAR…`, the representatives to bind `$VAR` to in the body: the
+/// worst-READ item and the worst-WRITE item of the list (they can differ, so a read and a
+/// write of `$VAR` each get their list's worst case). `$VAR` then inherits the list's locus
+/// per operation — the `find … {}`→path binding, one layer up. `None` for an empty list, which
+/// leaves `$VAR` fail-closed (machine). An item coming from a command substitution / arithmetic
+/// is unpinnable, so it worst-cases to machine via a `$`-carrying sentinel representative.
+pub(crate) fn loop_reprs(items: &[String]) -> Option<(String, String)> {
+    if items.is_empty() {
+        return None;
+    }
+    let faced: Vec<(String, LocalLocus, LocalLocus)> = items
+        .iter()
+        .map(|s| {
+            if s.contains("__SAFE_CHAINS_") {
+                ("$loop_sub".to_string(), LocalLocus::Machine, LocalLocus::Machine)
+            } else {
+                (s.clone(), read_locus(s), write_locus(s))
+            }
+        })
+        .collect();
+    let read_item = faced.iter().max_by_key(|(_, r, _)| *r).map(|(s, _, _)| s.clone())?;
+    let write_item = faced.iter().max_by_key(|(_, _, w)| *w).map(|(s, _, _)| s.clone())?;
+    // Freeze against the CURRENT (outer) loop bindings, so an inner representative like `$d/x`
+    // doesn't carry a stale outer variable into the body — nested loops compose.
+    let read_repr = crate::pathctx::expand_loop(&read_item, false).into_owned();
+    let write_repr = crate::pathctx::expand_loop(&write_item, true).into_owned();
+    Some((read_repr, write_repr))
+}
 
 /// Resolve a command's leaf tokens to its behavior profile, or `None` if the command
 /// has no resolver yet (the caller then worst-cases / falls back to the legacy

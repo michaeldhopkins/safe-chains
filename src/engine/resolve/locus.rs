@@ -16,21 +16,25 @@ use crate::engine::facet::LocalLocus;
 
 /// The locus a READ of `path` reaches (the read face of its region role).
 pub(crate) fn read_locus(path: &str) -> LocalLocus {
-    let resolved = crate::pathctx::resolve(path);
-    if is_unpinnable(&resolved) {
-        return LocalLocus::Machine;
-    }
-    classify_region(&resolved).read_locus
+    face(path, false)
 }
 
 /// The locus a WRITE of `path` reaches (the write face of its region role). The conservative
 /// face — a system path stays at `machine` even where its read face is lower.
 pub(crate) fn write_locus(path: &str) -> LocalLocus {
-    let resolved = crate::pathctx::resolve(path);
+    face(path, true)
+}
+
+fn face(path: &str, want_write: bool) -> LocalLocus {
+    // A bound `for`-loop variable expands to its list's representative item first (its read or
+    // write representative), so `$f` inherits the list's locus; then the ambient cwd/root.
+    let expanded = crate::pathctx::expand_loop(path, want_write);
+    let resolved = crate::pathctx::resolve(&expanded);
     if is_unpinnable(&resolved) {
         return LocalLocus::Machine;
     }
-    classify_region(&resolved).write_locus
+    let role = classify_region(&resolved);
+    if want_write { role.write_locus } else { role.read_locus }
 }
 
 /// The default (write) face — kept as `classify_locus` so every existing write-side call site
@@ -43,7 +47,8 @@ pub(crate) fn classify_locus(path: &str) -> LocalLocus {
 /// secret-facet enrichment (follow-on); today the read face already denies these by locus.
 #[allow(dead_code)]
 pub(crate) fn reads_secret(path: &str) -> bool {
-    let resolved = crate::pathctx::resolve(path);
+    let expanded = crate::pathctx::expand_loop(path, false);
+    let resolved = crate::pathctx::resolve(&expanded);
     !is_unpinnable(&resolved) && classify_region(&resolved).reads_secret
 }
 

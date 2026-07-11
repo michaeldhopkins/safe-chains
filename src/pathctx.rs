@@ -60,6 +60,105 @@ pub fn cwd() -> Option<String> {
     CURRENT.with(|c| c.borrow().cwd.clone())
 }
 
+/// A bound `for` loop variable: `$name` in the body inherits the loop's `in`-list locus (the
+/// `find … {}`→path binding, one layer up). Read and write representatives can differ — a list
+/// like `/etc/hosts ~/notes` reads worst at `~/notes` but writes worst at `/etc/hosts`.
+struct LoopVar {
+    name: String,
+    read_repr: String,
+    write_repr: String,
+}
+
+thread_local! {
+    static LOOP_VARS: RefCell<Vec<LoopVar>> = const { RefCell::new(Vec::new()) };
+}
+
+/// Bind loop variable `name` to its list's representative items for the duration of the guard
+/// (the loop body's classification). Nested loops stack; the innermost binding of a name wins.
+#[must_use]
+pub fn enter_loop_var(name: String, read_repr: String, write_repr: String) -> LoopGuard {
+    LOOP_VARS.with(|v| v.borrow_mut().push(LoopVar { name, read_repr, write_repr }));
+    LoopGuard
+}
+
+/// Pops the loop binding when dropped.
+pub struct LoopGuard;
+
+impl Drop for LoopGuard {
+    fn drop(&mut self) {
+        LOOP_VARS.with(|v| {
+            v.borrow_mut().pop();
+        });
+    }
+}
+
+/// Expand any bound loop variable (`$name` / `${name}`) in `path` to its representative list
+/// item — the read representative when `want_write` is false, the write representative when
+/// true. Unbound `$…` is left untouched (so it still fail-closes to machine). Returns `path`
+/// unchanged when nothing is bound.
+pub fn expand_loop(path: &str, want_write: bool) -> Cow<'_, str> {
+    if !path.contains('$') {
+        return Cow::Borrowed(path);
+    }
+    let replaced = LOOP_VARS.with(|v| {
+        let vars = v.borrow();
+        if vars.is_empty() {
+            None
+        } else {
+            expand_with(path, &vars, want_write)
+        }
+    });
+    replaced.map_or(Cow::Borrowed(path), Cow::Owned)
+}
+
+fn expand_with(path: &str, vars: &[LoopVar], want_write: bool) -> Option<String> {
+    let mut out = String::with_capacity(path.len());
+    let mut rest = path;
+    let mut replaced = false;
+    while let Some(dollar) = rest.find('$') {
+        out.push_str(&rest[..dollar]);
+        let after = &rest[dollar + 1..];
+        match parse_var(after) {
+            Some((name, consumed)) => {
+                if let Some(lv) = vars.iter().rev().find(|v| v.name == name) {
+                    out.push_str(if want_write { &lv.write_repr } else { &lv.read_repr });
+                    replaced = true;
+                } else {
+                    out.push('$');
+                    out.push_str(&after[..consumed]);
+                }
+                rest = &after[consumed..];
+            }
+            None => {
+                out.push('$');
+                rest = after;
+            }
+        }
+    }
+    out.push_str(rest);
+    replaced.then_some(out)
+}
+
+/// Parse a shell variable name immediately after a `$`: `name` or `{name}`. Returns the name
+/// and how many bytes of `after` it consumed, or `None` if it isn't a plain variable reference.
+fn parse_var(after: &str) -> Option<(&str, usize)> {
+    if let Some(braced) = after.strip_prefix('{') {
+        let close = braced.find('}')?;
+        let name = &braced[..close];
+        is_var_name(name).then_some((name, close + 2)) // '{' + name + '}'
+    } else {
+        let len = after.bytes().take_while(|&b| b.is_ascii_alphanumeric() || b == b'_').count();
+        let name = &after[..len];
+        is_var_name(name).then_some((name, len))
+    }
+}
+
+fn is_var_name(s: &str) -> bool {
+    let mut bytes = s.bytes();
+    matches!(bytes.next(), Some(b) if b.is_ascii_alphabetic() || b == b'_')
+        && bytes.all(|b| b.is_ascii_alphanumeric() || b == b'_')
+}
+
 /// Resolve a path argument for classification against the ambient `cwd`/`root`. Returns a
 /// path the *existing* classifiers (`classify_locus`, `is_safe_write_target`) can score
 /// unchanged:
@@ -172,6 +271,33 @@ mod tests {
         assert_eq!(resolve("/usr/bin/x"), "/usr/bin/x");
         assert_eq!(resolve("$HOME/x"), "$HOME/x");
         assert_eq!(resolve("~/x"), "~/x");
+    }
+
+    #[test]
+    fn loop_var_expands_to_its_representative_per_face() {
+        let _g = enter_loop_var("f".into(), "read_item".into(), "write_item".into());
+        assert_eq!(expand_loop("$f", false), "read_item");
+        assert_eq!(expand_loop("$f", true), "write_item");
+        assert_eq!(expand_loop("${f}", false), "read_item");
+        assert_eq!(expand_loop("$f.bak", false), "read_item.bak", "compound suffix");
+        assert_eq!(expand_loop("pre/$f", false), "pre/read_item");
+        assert_eq!(expand_loop("$foo", false), "$foo", "$foo is not $f");
+        assert_eq!(expand_loop("$g", false), "$g", "unbound var untouched");
+        assert_eq!(expand_loop("plain", false), "plain");
+    }
+
+    #[test]
+    fn loop_var_binding_is_scoped_and_nests() {
+        assert_eq!(expand_loop("$f", false), "$f", "no binding");
+        {
+            let _outer = enter_loop_var("f".into(), "outer".into(), "outer".into());
+            {
+                let _inner = enter_loop_var("f".into(), "inner".into(), "inner".into());
+                assert_eq!(expand_loop("$f", false), "inner", "innermost wins");
+            }
+            assert_eq!(expand_loop("$f", false), "outer", "inner popped on drop");
+        }
+        assert_eq!(expand_loop("$f", false), "$f", "all popped");
     }
 
     #[test]
