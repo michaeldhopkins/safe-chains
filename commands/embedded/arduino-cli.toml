@@ -5,6 +5,9 @@ url = "https://arduino.github.io/arduino-cli/latest/commands/arduino-cli/"
 researched_version = "arduino-cli 1.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
 
+[command.path_gate]
+flags = { "--input-file" = "read" }
+
 [[command.sub]]
 name = "version"
 standalone = ["--help", "-h"]

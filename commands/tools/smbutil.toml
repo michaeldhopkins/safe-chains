@@ -5,6 +5,10 @@ url = "https://keith.github.io/xcode-man-pages/smbutil.1.html"
 researched_version = "macOS 14 smbutil(1)"
 bare_flags = ["-h", "--help", "-v"]
 
+# -f is the mounted-share path that statshares/multichannel/snapshot/smbstat inspect.
+[command.path_gate]
+flags = { "-f" = "read" }
+
 [[command.sub]]
 name = "help"
 allow_all = true

@@ -1,9 +1,33 @@
 [[command]]
 name = "render"
-description = "Render's hosting platform CLI. Manages services, datastores, deployments, and workspaces on the Render PaaS. Read-only subcommands (whoami, workspaces, workspace current, projects, environments, services, services instances, deploys list, jobs list, logs, blueprints validate) issue API queries over HTTPS or validate a local YAML file without modifying remote state. login performs an OAuth-style browser flow and stores credentials under ~/.render/. Mutating operations include services create/update, deploys create/cancel, jobs create/cancel, restart (reboot a running service), ssh (open a shell on a running container), psql/pgcli/kv-cli (open interactive client sessions against managed databases — read-write), workflows (run platform workflows), and skills install/update/remove (modify local agent integration state). workspace set is recorded as out-of-coverage because it changes the account context all subsequent commands hit. The CLI iterates moderately frequently with new flag groups added when platform features ship; the global --output (interactive|json|yaml|text) and --confirm flags apply to most subs."
+description = "Render's hosting-platform CLI (render CLI v2.19.0) for managing services, datastores, deploys, jobs, blueprints, workflows, and workspaces on the Render PaaS via its HTTPS API. Structure is `render <group> <action>` with a global --output (interactive|json|yaml|text), --confirm, and per-command flags. OBSERVE subs query the control-plane API and return remote state without changing it: whoami, workspaces, projects, environments, services (+ instances), deploys list, jobs list, logs — plus workspace current (reads LOCAL config) and blueprints validate (checks a render.yaml before deploy). login runs a browser OAuth flow and writes the resulting token under ~/.render/ (stored locally, never printed to the caller). The state-changing surface talks to the production control plane: services create/update (provision or reconfigure a service), deploys create/cancel and restart (trigger or stop a deploy, reboot a running service), jobs create (runs a caller-supplied startCommand on a one-off job instance derived from the service — remote code execution), and jobs cancel. ssh opens a shell on a running instance; psql/pgcli/kv-cli open interactive client sessions (arbitrary read AND write, including DDL/DML) against a managed Postgres or Key Value datastore — all effectively remote command execution. workspace set rewrites the active-workspace pointer in local config, redirecting every subsequent command's account context. skills install/update/remove/list manage Render agent-skill files inside local AI coding tools. workflows is a group (create/start/cancel, tasks runs, versions release/list) that provisions and runs Render Workflows tasks on remote infra. Upstream note: `render pg get` and `render kv get` accept --include-sensitive-connection-info, which PRINTS datastore credentials — those subs are NOT in coverage and must not be added without a credential-read classification. The CLI iterates moderately frequently, adding flag groups as platform features ship."
 url = "https://render.com/docs/cli-reference"
-researched_version = "render.com/docs/cli-reference, current as of 2026-05-08"
+researched_version = "render CLI v2.19.0 (render.com/docs/cli-reference), 2026-07-16"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "render whoami",
+    "render workspaces",
+    "render workspace current",
+    "render projects",
+    "render services",
+    "render deploys list",
+    "render jobs list",
+    "render logs",
+    "render blueprints validate render.yaml",
+    "render whoami -o json",
+]
+examples_denied = [
+    "render services create my-service",
+    "render services update srv-abc",
+    "render deploys create srv-abc",
+    "render deploys cancel dep-abc",
+    "render jobs create srv-abc",
+    "render restart srv-abc",
+    "render ssh srv-abc",
+    "render psql dpg-abc",
+    "render kv-cli red-abc",
+    "render workspace set ws-abc",
+]
 
 [[command.sub]]
 name = "login"
@@ -52,10 +76,14 @@ standalone = ["--confirm", "--help", "-h"]
 valued = ["--output", "-o"]
 [[command.sub.sub]]
 name = "create"
-candidate = true
+profile = "remote-create"
+fact = "Creates a new service on Render (non-interactive mode), provisioning it on the control plane via the HTTPS API; the service is billed per its instance type."
+source = "https://render.com/docs/cli-reference — `render services create`"
 [[command.sub.sub]]
 name = "update"
-candidate = true
+profile = "remote-mutate"
+fact = "Updates configuration for an existing service on the Render control plane via the API."
+source = "https://render.com/docs/cli-reference — `render services update`"
 
 [[command.sub]]
 name = "deploys"
@@ -65,10 +93,14 @@ standalone = ["--confirm", "--help", "-h"]
 valued = ["--output", "-o"]
 [[command.sub.sub]]
 name = "create"
-candidate = true
+profile = "remote-control"
+fact = "Triggers a deploy for the specified service on Render and streams logs in real time; rolls new code/config to the running service."
+source = "https://render.com/docs/cli-reference — `render deploys create`"
 [[command.sub.sub]]
 name = "cancel"
-candidate = true
+profile = "remote-control"
+fact = "Cancels a running deploy for a service via the Render API."
+source = "https://render.com/docs/cli-reference — `render deploys cancel`"
 
 [[command.sub]]
 name = "jobs"
@@ -78,10 +110,15 @@ standalone = ["--confirm", "--help", "-h"]
 valued = ["--output", "-o"]
 [[command.sub.sub]]
 name = "create"
-candidate = true
+profile = "remote-exec"
+fact = "Creates a one-off job for a service; the required startCommand specifies the command Render runs on a job instance that inherits the base service's build artifact and environment variables."
+source = "https://render.com/docs/one-off-jobs — Create job (startCommand); https://render.com/docs/cli-reference — `render jobs create`"
+judgment = "Runs caller-supplied code on Render infra with the service's full environment — arbitrary remote command execution, not merely a control signal."
 [[command.sub.sub]]
 name = "cancel"
-candidate = true
+profile = "remote-control"
+fact = "Cancels a running one-off job for a service via the Render API."
+source = "https://render.com/docs/cli-reference — `render jobs cancel`"
 
 [[command.sub]]
 name = "logs"
@@ -104,23 +141,36 @@ valued = ["--output", "--workspace", "-o", "-w"]
 
 [[command.sub]]
 name = "restart"
-candidate = true
+profile = "remote-control"
+fact = "Restarts a running service by resource ID, rebooting it via the Render control plane."
+source = "https://render.com/docs/cli-reference — `render restart`"
 
 [[command.sub]]
 name = "ssh"
-candidate = true
+profile = "remote-exec"
+fact = "Opens an interactive SSH terminal session to a running service instance."
+source = "https://render.com/docs/cli — SSH into a service instance; https://render.com/docs/cli-reference — `render ssh`"
 
 [[command.sub]]
 name = "psql"
-candidate = true
+profile = "remote-exec"
+fact = "Opens an interactive psql session to a managed Render Postgres database; can run arbitrary SQL (read and write, including DDL/DML) and accepts --command to execute SQL non-interactively."
+source = "https://render.com/docs/cli — psql; https://render.com/docs/cli-reference — `render psql`"
+judgment = "An interactive DB shell against remote data is arbitrary remote read/write; classified as remote code execution against the datastore, not a mere read."
 
 [[command.sub]]
 name = "pgcli"
-candidate = true
+profile = "remote-exec"
+fact = "Opens an interactive pgcli session to a managed Render Postgres database; arbitrary SQL read/write against remote data."
+source = "https://render.com/docs/cli-reference — `render pgcli`"
+judgment = "Same as psql: interactive remote DB shell = arbitrary remote read/write."
 
 [[command.sub]]
 name = "kv-cli"
-candidate = true
+profile = "remote-exec"
+fact = "Opens an interactive redis-cli or valkey-cli session for a managed Render Key Value instance; arbitrary command read/write against the remote store."
+source = "https://render.com/docs/cli-reference — `render kv-cli`"
+judgment = "Interactive remote Key Value shell = arbitrary remote read/write."
 
 [[command.sub]]
 name = "skills"

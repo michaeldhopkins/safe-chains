@@ -234,8 +234,85 @@ fn has_substitution_eval(code: &str) -> bool {
     false
 }
 
+/// Perl double-quoted strings INTERPOLATE code — `@{[ EXPR ]}`, `${\ EXPR }`, `${ EXPR }`,
+/// `@{ EXPR }`, and array/hash SUBSCRIPTS (`$a[ EXPR ]`, `$h{ EXPR }`) all evaluate EXPR at
+/// runtime. Naively dropping the whole quoted string (the old `content_outside_double_quotes`)
+/// hid `print "@{[system(...)]}"`. This keeps interpolated EXPRESSION content for the allowlist
+/// walk while dropping inert literal text and simple value interpolation (`$name`/`@name`), so
+/// `"system is down"` stays safe but `"@{[system(...)]}"` is analyzed and denied. Single-quoted
+/// perl strings do not interpolate and are left as-is (a keyword inside them just over-denies).
+fn strip_inert_string_text(code: &str) -> String {
+    let bytes = code.as_bytes();
+    let mut out: Vec<u8> = Vec::with_capacity(bytes.len());
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] != b'"' {
+            out.push(bytes[i]);
+            i += 1;
+            continue;
+        }
+        out.push(b' '); // opening quote
+        i += 1;
+        while i < bytes.len() {
+            match bytes[i] {
+                b'\\' => {
+                    out.push(b' '); // an escaped char is inert
+                    i = (i + 2).min(bytes.len());
+                }
+                b'"' => {
+                    i += 1;
+                    break;
+                }
+                b'$' | b'@' => {
+                    out.push(b' ');
+                    i += 1;
+                    if bytes.get(i) == Some(&b'{') {
+                        // block interpolation `${…}` / `@{…}`: keep the inner expression
+                        if let Some(end) = skip_delimited(bytes, i) {
+                            out.extend_from_slice(&bytes[i + 1..end - 1]);
+                            i = end;
+                        } else {
+                            // Unbalanced (malformed) — copy the remainder for the walk and STOP,
+                            // rather than `i += 1` and re-scanning per `{` (O(n²) on `"@{@{@{…"`).
+                            out.extend_from_slice(&bytes[i..]);
+                            i = bytes.len();
+                        }
+                    } else {
+                        // `$name` / `@name`: the value read is inert — skip the name…
+                        while i < bytes.len()
+                            && (bytes[i] == b'_' || bytes[i] == b':' || bytes[i].is_ascii_alphanumeric())
+                        {
+                            i += 1;
+                        }
+                        // …but an array/hash SUBSCRIPT is EVALUATED — keep its content.
+                        while matches!(bytes.get(i), Some(b'[') | Some(b'{')) {
+                            match skip_delimited(bytes, i) {
+                                Some(end) => {
+                                    out.extend_from_slice(&bytes[i + 1..end - 1]);
+                                    i = end;
+                                }
+                                // Unbalanced — copy the rest and STOP (avoids O(n²) on `"$a[$a[…"`).
+                                None => {
+                                    out.extend_from_slice(&bytes[i..]);
+                                    i = bytes.len();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                _ => {
+                    out.push(b' '); // inert literal char
+                    i += 1;
+                }
+            }
+        }
+    }
+    String::from_utf8(out).unwrap_or_default()
+}
+
 fn perl_code_is_safe(token: &Token) -> bool {
-    let no_strings = token.content_outside_double_quotes();
+    let no_strings = strip_inert_string_text(token.as_str());
     if no_strings.contains('`') {
         return false;
     }
@@ -389,5 +466,11 @@ mod tests {
         perl_socket_denied: "perl -e 'socket(S, 2, 1, 0)'",
         perl_system_trailing_help_denied: "perl -e 'system(\"rm\")' --help",
         perl_system_trailing_version_denied: "perl -e 'system(\"rm\")' --version",
+        // Double-quote INTERPOLATION executes code — the string-stripping bypass class.
+        perl_interp_arrayref_system: "perl -e 'print \"@{[system(q(id))]}\"'",
+        perl_interp_scalarref_system: "perl -e 'print \"${\\ system(q(id))}\"'",
+        perl_interp_backtick: "perl -e 'print \"@{[`id`]}\"'",
+        perl_interp_hash_subscript: "perl -e 'print \"$h{`id`}\"'",
+        perl_interp_array_subscript: "perl -e 'print \"$a[`id`]\"'",
     }
 }

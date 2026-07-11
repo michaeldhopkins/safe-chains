@@ -129,6 +129,78 @@
 # valued = ["--jobs", "--target", "-j"]
 
 # ─────────────────────────────────────────────────────────────────────
+# ARCHETYPE-CLASSIFIED SUBCOMMAND — profile + research provenance
+# ─────────────────────────────────────────────────────────────────────
+#
+# The facet-derived successor to `candidate = true`, for subcommand tools whose subs are above the
+# auto-approve line (cloud/infra/remote CLIs). Instead of hand-marking, declare which recurring
+# capability profile the sub is (`archetypes.toml`); the engine DERIVES the verdict by projecting
+# that profile through the levels. See docs/design/behavioral-taxonomy-archetypes.md.
+#
+# `profile` requires research provenance — this is a HIGHER bar than the rest of the TOML, and it is
+# enforced (`registry::every_profiled_sub_has_provenance`). Three layers, so a future researcher can
+# act on each precisely:
+#   fact     — what the upstream tool DOCUMENTS (re-verify against `source` if upstream moves)
+#   profile  — OUR inference: which archetype it maps to (this field IS the classification)
+#   judgment — OUR stance where the source doesn't decide it (a policy call, may be revisited) [optional]
+# `source` cites the upstream doc/section. `fact` + `source` are REQUIRED whenever `profile` is set.
+#
+# [[command.sub]]
+# name = "delete"
+# profile = "remote-destroy-recoverable"
+# fact = "Deletes the named app and all its services from the control plane via the HTTPS API."
+# source = "https://.../docs/cli — `tool apps delete`"
+# judgment = "Recoverable, not irreversible: the app is redeployable from source; app-held DATA is a separate, higher sub."
+#
+# Per-FLAG escalation: a `[[command.sub.flag]]` ADDS a capability when present (the level algebra
+# takes the max), so a benign base + a dangerous flag lands at the flag's tier. `classifies` names an
+# archetype (or "unclassified" to fail-closed), and each flag cites its OWN research. Bare flags
+# (--force) escalate on presence; add `value_prefix` to escalate only when the flag's VALUE starts
+# with it (so one valued flag is benign for most values, dangerous for a specific key).
+#
+# [[command.sub]]
+# name = "push"
+# profile = "vcs-sync"
+# network_destination = true             # classify the first positional (the send TARGET) onto
+#                                        #   locus.provenance: a bare remote NAME → established, an
+#                                        #   inline URL / scp-path / filesystem path → literal, a
+#                                        #   $VAR → opaque; an `ext::<cmd>` transport → worst-cased
+#                                        #   as RCE (it runs a local command). Requires `profile`.
+#                                        #   For send commands (git push, scp, rsync, curl -d) where
+#                                        #   the destination's PROVENANCE decides trust, not the
+#                                        #   operation. See behavioral-taxonomy-exposure.md §4.
+# fact = "…"
+# source = "…"
+# [[command.sub.flag]]
+# name = "--force"                       # bare — escalates on presence
+# classifies = "remote-destroy-irreversible"
+# fact = "Overwrites the remote ref with no merge check, discarding remote-only commits."
+# source = "https://git-scm.com/docs/git-push — `--force`"
+# [[command.sub.flag]]
+# name = "-c"                            # valued — escalates only for this key's value
+# value_prefix = "core.sshCommand="
+# classifies = "unclassified"
+# fact = "Sets git's ssh command to an arbitrary program — command execution."
+# source = "https://git-scm.com/docs/git-config — `core.sshCommand`"
+#
+# Bulk data export (`profile = "data-export"`): a db dump / full export is a BULK remote read —
+# `scale = unbounded` records the volume, `disclosure = local-process` the destination (the two proxy
+# the data's unknowable sensitivity). Its OUTPUT-FILE flags add a SECOND, path-gated local write, so a
+# dump to the worktree stays local while one to a system path gates on locus. List every spelling of
+# the output flag (short and long); the glued short form `-fPATH` is matched too, so it can't slip the
+# gate. Absent (the export streams to stdout) → just the remote read. Requires `profile`.
+#
+# [[command.sub]]
+# name = "dump"
+# profile = "data-export"
+# output_path_flags = ["-f", "--file"]   # `-f ./out.sql` → worktree write (local); `-f /etc/x` → denied
+# fact = "Dumps the remote database (schema and, with --data-only, table data) to stdout or -f/--file."
+# source = "https://…/docs — `tool db dump`"
+#
+# Provenance is validated at BUILD time (build::assert_sub_provenance): a profiled sub or escalating
+# flag missing fact+source, or naming an unknown archetype, PANICS at registry load — fail-closed.
+
+# ─────────────────────────────────────────────────────────────────────
 # GUARDED SUBCOMMAND — requires a specific flag to be present
 # ─────────────────────────────────────────────────────────────────────
 #
@@ -245,6 +317,35 @@
 # # level = "Inert"                      # base level when write_flags absent
 # standalone = ["--help", "-h"]
 # valued = ["--history", "--query", "-q"]
+
+# ─────────────────────────────────────────────────────────────────────
+# PATH GATE — declare which flags/positionals are filesystem PATHS
+# ─────────────────────────────────────────────────────────────────────
+#
+# The command level (SafeRead/SafeWrite/Inert) says a command reads or writes,
+# but not WHICH path. `[command.path_gate]` declares the read/write role of each
+# path-bearing flag value and of bare positionals, so a `--output /etc/cron.d/job`
+# or `--input ~/.ssh/id_rsa` is gated by locus (a system/secret path denies; a
+# workspace path allows). Without it, a path-flag command auto-approves ANY path.
+#
+# Declare it on the command whose OWN flags carry paths — the gate then derives
+# from the command definition (you can't forget to also edit pathgates.toml).
+# Same grammar as pathgates.toml's [roles.X]:
+#   flags = { "-o" = "write", "--input" = "read" }
+#           the role of each flag's VALUE. List ONLY flags whose value is a real
+#           filesystem path — never a format name, URL, identity, or number.
+#   positional = "read" | "write"   role of bare positional paths (omit = ignore).
+#   shape = "last_write"            positionals are SOURCE… DEST (last one writes);
+#                                   pair with positional = "read".
+#
+# [[command]]
+# name = "iconutil"
+# level = "SafeWrite"
+# valued = ["--convert", "--output", "-c", "-o"]
+#
+# [command.path_gate]
+# positional = "read"                    # the .iconset/.car input
+# flags = { "-o" = "write", "--output" = "write" }
 
 # ─────────────────────────────────────────────────────────────────────
 # DELEGATION — subcommand wraps an inner command
@@ -402,11 +503,62 @@
 #                                       # accepts tokens shaped like a file
 #                                       # path (contain `/`, contain `.`, or
 #                                       # are `-` for stdin) and rejects flags
+# executor = "file"                     # the command runs code — gate the EXECUTOR
+#                                       # through the execution-origin engine instead
+#                                       # of the flat `level`: a WORKSPACE-local
+#                                       # executor allows (the dev loop), a foreign one
+#                                       # (/tmp, ~, absolute) or unpinnable one ($VAR,
+#                                       # glob) denies. Two forms:
+#                                       #  "file"    — the first positional is the
+#                                       #              executor path (python3 ./s.py,
+#                                       #              go run ./cmd). Tokens after it are
+#                                       #              the script's own args (not
+#                                       #              validated). No positional → the
+#                                       #              flat `level` (python3 --version).
+#                                       #  "project" — the current project is the
+#                                       #              executor, no path operand
+#                                       #              (cargo run). Also valid on a
+#                                       #              [[command.sub]] block.
+# executor_redirect_flag = "--manifest-path"  # (project only) a valued flag whose
+#                                       # value moves the executor OUT of the project
+#                                       # (cargo run --manifest-path DIR/Cargo.toml) —
+#                                       # that value is locus-gated, so a foreign
+#                                       # manifest denies. See
+#                                       # docs/design/behavioral-taxonomy-execution-origin.md.
 # standalone = ["--help", "--list", "-h", "-l"]
 # valued = ["--type", "-t"]
 # tolerate_unknown_short = false
 # tolerate_unknown_long = false
 # numeric_dash = false
+
+# ─────────────────────────────────────────────────────────────────────
+# VERB CHAIN — `CMD [main-flags] verb [args] then verb …` (e.g. mlr)
+# ─────────────────────────────────────────────────────────────────────
+#
+# `[command.verb_chain]` makes a command fully declarative (NO handler)
+# when its grammar is: a strict MAIN-flag region, then a `then`-chain of
+# allowlisted VERBS. Dispatched by `dispatch::dispatch_verb_chain`.
+#
+# The main region is a STRICT allowlist — an unlisted flag DENIES, so a
+# mutating flag (mlr's `-I`/`--in-place`), omitted, is caught by omission
+# with no denylist. The region ends at `--` or the first non-flag token,
+# which opens the verb chain: every `then`-segment's first token (the
+# verb NAME) must be on `verbs`; verb ARGS are open-ended and uninspected
+# (a pure read→stdout verb has no shell/file escape).
+#
+# SAFETY: every value-taking main flag MUST go in `main_valued`, never
+# `main_standalone` — else the walk mistakes its value for the verb
+# boundary and a later mutating flag slips past in verb-land.
+#
+# [command.verb_chain]
+# level = "Inert"                       # verdict for a matching invocation
+# separator = "then"                    # chain keyword (default "then")
+# main_standalone = ["--csv", "--json"] # boolean main flags
+# main_valued = ["--from", "--ifs"]     # value-taking main flags (--from FILE)
+# main_variadic = ["--mfrom"]           # consume input files until a `--` terminator
+# verbs = ["cat", "head", "sort", …]    # allowlisted verb names
+#
+# See commands/data/mlr.toml for a complete example.
 
 # ─────────────────────────────────────────────────────────────────────
 # HANDLER POLICIES / MATRIX — data the handler walks

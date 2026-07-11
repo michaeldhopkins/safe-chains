@@ -8,6 +8,11 @@ bare = false
 standalone = ["--check", "--help", "--version", "-c", "-h", "-v"]
 valued = ["--output", "-o"]
 
+# -o/--output writes the DER encoding; the positionals are the DEFINITIONS and ASSIGNMENTS input files.
+[command.path_gate]
+positional = "read"
+flags = { "-o" = "write", "--output" = "write" }
+
 [[command]]
 name = "asn1Decoding"
 description = "ASN.1 DER decoder from GNU Libtasn1. Reads an encoded DER file and an ASN.1 DEFINITIONS file, parses the data against the named ASN1TYPE element, and prints the decoded structure to stdout. Strictly read-only: no output file flag, no network, no side effects. The --strict and --no-time-strict flags tune DER strictness; --benchmark times the decode. Libtasn1's CLI surface is essentially frozen."
@@ -21,6 +26,10 @@ standalone = [
     "-b", "-h", "-s", "-t", "-v",
 ]
 
+# Both positionals are input files (the encoded DER file and the DEFINITIONS file).
+[command.path_gate]
+positional = "read"
+
 [[command]]
 name = "asn1Parser"
 description = "ASN.1 syntax-tree generator from GNU Libtasn1. Reads a file with ASN.1 DEFINITIONS and writes a C array suitable for use with libtasn1 functions, either to stdout or to a file via -o/--output. The --check/-c flag verifies syntax only. Strictly local: no network, no execution of arbitrary code. Libtasn1's CLI surface is essentially frozen."
@@ -30,3 +39,8 @@ level = "SafeWrite"
 bare = false
 standalone = ["--check", "--help", "--version", "-c", "-h", "-v"]
 valued = ["--name", "--output", "-n", "-o"]
+
+# -o/--output writes the C array; the positional is the DEFINITIONS input file. --name is an identifier.
+[command.path_gate]
+positional = "read"
+flags = { "-o" = "write", "--output" = "write" }

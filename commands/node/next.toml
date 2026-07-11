@@ -4,6 +4,9 @@ description = "CLI for the Next.js React framework. next info is a read-only com
 url = "https://nextjs.org/docs/api-reference/cli"
 bare_flags = ["--help", "--version", "-h"]
 
+[command.path_gate]
+flags = { "--output-file" = "write" }
+
 [[command.sub]]
 name = "info"
 standalone = ["--help", "-h"]

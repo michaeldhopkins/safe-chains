@@ -1,9 +1,35 @@
 [[command]]
 name = "python3"
-description = "CPython interpreter. With no positional arguments or code flags, only --help and --version are exposed here, making it purely informational. The interpreter can execute arbitrary code when given a file, -c, or -m flag, so restricting to version/help eliminates the execution surface. Python follows an annual release cycle with predictable cadence."
+description = "CPython interpreter. `python3 FILE` runs a script file; `-c CODE` runs inline code; `-m MODULE` runs a module; a bare invocation starts an interactive REPL. Each of those executes arbitrary code with the invoking user's permissions and full filesystem/network access. `--version`/`-V` and `--help`/`-h` are purely informational and run no user code. Python follows an annual release cycle with a stable, slow-moving command-line surface."
 url = "https://docs.python.org/3/using/cmdline.html"
+researched_version = "CPython 3.13"
+handler = "interpreter"
+aliases = ["python"]
+doc_body = "Allowed: `--version`/`--help` (informational), and running a WORKSPACE-local script (`python3 ./task.py`, `python3 scripts/build.py`) — the dev loop. The first positional is the script to run; further positionals are its arguments."
+examples_safe = [
+  "python3 --version",
+  "python3 --help",
+  "python --version",
+  "python3 ./task.py",
+  "python3 scripts/build.py",
+  "python3 ./task.py --flag arg",
+]
+examples_denied = [
+  "python3 /tmp/evil.py",
+  "python3 ~/Downloads/x.py",
+  "python3 -c 'import os'",
+  "python3 -m http.server",
+  "python3 *.py",
+  "python3",
+]
+
+# Interpreter fallback: `--version`/`--help` run no code (Inert); a first positional is a
+# SCRIPT gated as an executor (`executor = true`) — a workspace-local script is the dev loop
+# and is allowed, a foreign one (`/tmp`, `~`, absolute) denies. Inline (`-c`) and module
+# (`-m`) forms are absent from the allowlist, so they deny. No `max_positional`: a script may
+# take its own arguments (`python3 ./x.py a b`), which are data, not gated.
+[command.fallback]
+executor = "file"
 level = "Inert"
 bare = false
-max_positional = 0
 standalone = ["--help", "--version", "-V", "-h"]
-aliases = ["python"]

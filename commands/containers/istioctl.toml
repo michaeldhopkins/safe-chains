@@ -59,7 +59,10 @@ standalone = ["--help", "-h"]
 
 [[command.sub.sub]]
 name = "secret"
-standalone = ["--help", "-h"]
+profile = "credential-read"
+fact = "`istioctl proxy-config secret <pod>` fetches the Envoy SDS (TLS) config from a running proxy; the default is certificate metadata, but `-o json` dumps the TLS PRIVATE KEY material the proxy holds."
+source = "https://istio.io/latest/docs/reference/commands/istioctl/#istioctl-proxy-config-secret"
+judgment = "Conservatively credential-read (uniform): the command inspects TLS secret material and -o json exposes private keys. Batch 4 could flag-condition it (metadata default = remote-read, -o json = credential-read); note `proxy-config all -o json` also dumps secrets."
 
 [[command.sub]]
 name = "validate"

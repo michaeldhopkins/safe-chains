@@ -3,7 +3,8 @@
 Status: draft (2026-07-03; level set revised 2026-07-07). Stage 3 of the behavioral
 capability model (`behavioral-taxonomy-v1.1.md`, §4). Designs the concrete default
 levels as predicates over the 12 facets and measures them against today's behavior as
-an impact baseline (not a spec to reproduce). Not yet implemented.
+an impact baseline (not a spec to reproduce). The default ladder is now authored in
+`levels/default.toml` and enforced by the engine — see §0 for the finalized names and shape.
 
 > **Revised (2026-07-07, `…-refinements` §5–6, canon `v1.4` §4.3):** the level set is
 > now `inert ⊂ read-local ⊂ write-local ⊂ developer ⊂ yolo`, with `admin`/`infra` as
@@ -11,6 +12,77 @@ an impact baseline (not a spec to reproduce). Not yet implemented.
 > selected in a human-in-the-loop hook; its provenance-strictness became the opt-in
 > `pinned-provenance` *modifier*. **`yolo`** (§3.6) is the new opt-in top of the local
 > ladder. Read §3.5 as historical.
+
+---
+
+## 0. Finalized level model (2026-07-15)
+
+§2–3 remain authoritative on the *facet predicates*. This section fixes the **names and
+shape** decided 2026-07-15 and implemented in `levels/default.toml`. Levels are meant to
+be plain promises a human can choose between, so the engine-internal names are renamed to
+human ones: `inert → paranoid`, `read-local → reader`, `write-local → editor`;
+`developer`/`yolo` keep their names; the deny-by-default siblings `admin`/`infra` become
+first-class **`local-admin`** / **`network-admin`**.
+
+The ladder, locked → open:
+
+```
+paranoid → reader → editor → developer ─┬─→ local-admin ─┐
+                                        └─→ network-admin ┴─→ yolo
+```
+
+| Level | The promise a person is choosing |
+|---|---|
+| **paranoid** | Barely touches anything — `--version`, `--help`, arithmetic. Doesn't even open your files. The floor; the opposite pole from yolo. |
+| **reader** | Reads state — local *and* remote alike: files/listings/`git status`, plus a pure remote fetch (`curl` GET, `koyeb apps list`). A read is a read wherever the data lives; only paranoid blocks the network. Changes nothing, sends no host data out (exfil stays above it). |
+| **editor** | Creates and edits your files, but won't delete, run code, or hit the network — so nothing it does is hard to undo. |
+| **developer** | Runs your project and its pinned deps, edits/deletes your *own* files, uses your everyday tools. Stops short of anything stupidly destructive, privileged, or off-machine. |
+| **local-admin** | Developer + trusted to run *this machine*: `sudo`, services, `/etc`, mounts, system installs. Never reaches the network. |
+| **network-admin** | Developer + trusted to operate *your remotes*: deploy, push, provision, cloud APIs. Never `sudo`s the box. |
+| **yolo** | No limits. For throwaway VMs and living dangerously. |
+
+**Why the two flavors are *siblings*, not rungs.** A level is a predicate over
+capability-space, so two levels can be **incomparable** — neither more nor less
+permissive, opening *different* facet regions. local-admin flexes DOWN into this host
+(`authority`, `locus.local`, install `persistence`); network-admin flexes OUT to other
+hosts (`locus.remote`, `network`, `cost`). They light up disjoint columns:
+
+| axis | developer | **local-admin** | **network-admin** |
+|---|---|---|---|
+| authority | user | **≤ root** | user |
+| locus.local | ≤ worktree-trusted | **≤ device** | ≤ worktree-trusted |
+| locus.remote | none | none | **≤ arbitrary** |
+| network | none | none | **≤ outbound** |
+| persistence | ≤ data | **≤ installing** | ≤ reconfiguring |
+| cost | none | local-resource | **≤ quota** |
+
+This is precisely what a linear `Inert < SafeRead < SafeWrite` enum could not represent: a
+total order has no room for siblings. Offering two directions of extra permission *at the
+same trust tier* is a capability the facet model unlocks.
+
+**The reversibility spine.** Every level *below* yolo caps destruction at `reversibility
+≤ effortful` (recoverable with real work). **Only yolo lifts it to `irreversible`.** So
+`destroy · irreversible` — `terraform destroy`, `aws rds delete --skip-final-snapshot`,
+`mkfs`, `shred`, `rm -rf` on irreplaceable data — is reserved for yolo, on *any* locus,
+local or remote. One shared cap, inherited by both admin flavors, keeps permanent
+no-recovery-path destruction out of everything but the extreme option. (This converges
+with v1.4 §4.3's existing `infra: reversibility ≤ effortful`.) An *additive* irreversible
+like `npm publish` is a separate, lesser case — the reservation is specifically `destroy ·
+irreversible`, not irreversibility categorically.
+
+**Ceilings held back to yolo** from the two flavors: kernel-module load (`locus > device`),
+setuid / run-as-another-user (`authority > root`), inbound-listen servers, public
+disclosure, credential transmission, and network-sourced execution (a pulled container
+image — that awaits the supply-chain clause).
+
+**Mapping to the current 3-value ceiling.** The CLI still selects a threshold from the
+legacy `SafetyLevel` enum (`inert` / `safe-read` / `safe-write`). Until threshold-by-name
+lands, the engine (`bridge::project`) maps `paranoid → inert`, `reader → safe-read`,
+`editor` and `developer → safe-write`, and **`local-admin` / `network-admin` / `yolo →
+Denied`** — no legacy equivalent, so a command needing an upper level is never
+auto-approved (guarded by `bridge::profiles_needing_an_upper_level_project_to_denied_not_safewrite`).
+Making the upper levels threshold-selectable is the follow-up; the model itself is authored
+and enforced today.
 
 ---
 

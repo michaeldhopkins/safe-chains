@@ -7,3 +7,7 @@ level = "SafeRead"
 bare = false
 standalone = ["-v"]
 valued = ["-i", "-D"]
+
+# -i supplies the workflow input document. -D is a name=value variable assignment, not a path.
+[command.path_gate]
+flags = { "-i" = "read" }

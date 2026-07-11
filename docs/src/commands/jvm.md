@@ -71,6 +71,7 @@ Aliases: `gradlew`
 - **global**: Flags: --help, --unset, -h
 - **help**: Positional args accepted
 - **hooks**: Flags: --help, -h
+- **init** (requires -): Flags: -, --help, -h
 - **javahome**: Flags: --help, -h
 - **local**: Flags: --help, --unset, -h
 - **plugin list**: Flags: --help, -h

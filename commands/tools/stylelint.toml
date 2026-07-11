@@ -19,3 +19,6 @@ valued = [
     "--report-needless-disables",
     "-f", "-o",
 ]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }

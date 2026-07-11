@@ -5,6 +5,9 @@ url = "https://yardoc.org/guides/index.html"
 researched_version = "yard v0.9.43 (April 2026)"
 bare_flags = ["--help", "--version", "-h", "-v"]
 
+[command.path_gate]
+flags = { "--output-dir" = "write" }
+
 [[command.sub]]
 name = "list"
 level = "SafeRead"

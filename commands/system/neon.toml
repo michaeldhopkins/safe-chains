@@ -1,10 +1,69 @@
 [[command]]
 name = "neon"
 aliases = ["neonctl"]
-description = "Neon CLI — managed Postgres. Most subcommands contact Neon's API (network). Read-side: `version`, `me`, `auth`, `projects list/get`, `branches list/get`, `databases list`, `roles list`, `connection-string`, `endpoints list`, `set-context`. Write-side: `auth`, `projects create/delete/update`, `branches create/delete/reset/restore`, `databases create/delete`, `roles create/delete`, `endpoints create/delete/restart`, `org create/delete`, `set-context`."
-url = "https://neon.tech/docs/reference/neon-cli"
-researched_version = "neonctl 2.x"
+description = """
+Neon CLI — command-line control of Neon Serverless Postgres. Distributed on npm as `neon` (the older \
+`neonctl` name still works). Nearly every subcommand issues an authenticated call to Neon's HTTPS \
+control-plane API using an ambient credential (--api-key, NEON_API_KEY, or the cached \
+credentials.json from `neon auth`), so it reaches REMOTE infrastructure, not local state.
+
+Observe-only surface (reads remote state, results flow to the caller): `me`, `operations list`, \
+`orgs list`, `projects list/get`, `branches list/get/schema-diff`, `databases list`, `roles list`, \
+`ip-allow list`. These fetch metadata about the account, projects, branches, and schemas.
+
+Credential-exposing surface: `connection-string`/`cs` prints a Postgres connection URL that \
+"includes the password for the specified role" — a live credential value emitted to stdout. \
+`projects create` and `branches create` return `connection_uri`/`connection_parameters` in their \
+JSON output, which embed the role password; `roles create` provisions a login role whose generated \
+password can surface in API/JSON output.
+
+Provisioning / mutation surface: `projects create/update/delete/recover`, \
+`branches create/rename/reset/restore/delete/add-compute/set-default/set-expiration`, \
+`databases create/delete`, `roles create/delete` — all change remote state over the network, some \
+metered. `branches delete` and `branches reset` are documented as not reversible; `databases delete` \
+drops a database and its data; `projects delete` is recoverable only within a 7-day window via \
+`projects recover`. `ip-allow add/remove/reset` change the project's network access policy \
+(who may connect). `psql` opens an interactive session that runs arbitrary SQL against the remote \
+database. `auth`/`login` runs an interactive browser OAuth exchange and writes a credentials file.
+
+Local-only surface: `set-context` writes a `.neon` context file (project/branch/org IDs) in the \
+current directory — no network, and the docs state no auth tokens are saved to it.
+
+Active project (v2.27.0, June 2026); frequent releases, growing command surface (recent additions: \
+`link`, `checkout`, `psql`, `data-api`, `vpc`, `init`/`bootstrap`, config-as-code `neon.ts`). The \
+`neonctl` GitHub repo is archived with development moved to a monorepo, but the published CLI and \
+command surface are unchanged.
+"""
+url = "https://neon.com/docs/reference/neon-cli"
+researched_version = "neonctl/neon 2.27.0 (June 2026)"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+  "neon --version",
+  "neon me",
+  "neon projects list",
+  "neon projects get --project-id foo",
+  "neon branches list",
+  "neon branches schema-diff",
+  "neon databases list",
+  "neon roles list",
+  "neon operations list",
+  "neon orgs list",
+  "neon ip-allow list",
+  "neon set-context --project-id foo",
+]
+examples_denied = [
+  "neon connection-string",
+  "neon cs mybranch",
+  "neon projects create",
+  "neon projects delete foo",
+  "neon branches create",
+  "neon branches delete mybranch",
+  "neon branches reset mybranch",
+  "neon databases delete mydb",
+  "neon roles create --name admin",
+  "neon ip-allow add 1.2.3.4",
+  "neon auth",
+]
 
 [[command.sub]]
 name = "version"
@@ -23,56 +82,234 @@ allow_all = true
 
 [[command.sub]]
 name = "me"
-candidate = true
+profile = "remote-read"
+fact = "Shows the current authenticated user's account details, fetched from the Neon API."
+source = "https://neon.com/docs/reference/neon-cli — `neon me`"
 
 [[command.sub]]
 name = "auth"
 candidate = true
-
-[[command.sub]]
-name = "projects"
-candidate = true
-
-[[command.sub]]
-name = "ip-allow"
-candidate = true
+# Interactive browser OAuth login (alias `login`): reaches the network, exchanges a token, and
+# writes it to the local credentials.json store. Not an observe op and not a clean archetype
+# (it obtains/persists credential material without printing it), so it stays denied.
 
 [[command.sub]]
 name = "set-context"
-candidate = true
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+valued = ["--project-id", "--org-id", "--branch", "--context-file", "--api-host", "--api-key"]
+# Writes a local `.neon` context file (project/branch/org IDs) in the current directory. Docs:
+# "Neon does not save any confidential information to the context file (for example, auth tokens)."
+# No network, no secret exposure — a local worktree write.
+
+[[command.sub]]
+name = "projects"
+aliases = ["project"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists projects belonging to the account and projects shared with the user, from the Neon API."
+source = "https://neon.com/docs/reference/cli-projects — `neon projects list`"
+[[command.sub.sub]]
+name = "get"
+profile = "remote-read"
+fact = "Retrieves details about a Neon project by ID from the API."
+source = "https://neon.com/docs/reference/cli-projects — `neon projects get`"
+[[command.sub.sub]]
+name = "create"
+profile = "remote-create"
+fact = "Provisions a new Neon project (compute, database, role, endpoint) via the API. JSON output returns connection_uri/connection_parameters that embed the role password and host."
+source = "https://neon.com/docs/reference/cli-projects — `neon projects create`"
+judgment = "Classified remote-create for the provisioning it performs; note the create response also EXPOSES a role password. Above the auto-approve line on both counts."
+[[command.sub.sub]]
+name = "update"
+profile = "remote-mutate"
+fact = "Modifies project settings (name, compute units, connection restrictions) after creation via the API."
+source = "https://neon.com/docs/reference/cli-projects — `neon projects update`"
+[[command.sub.sub]]
+name = "delete"
+profile = "remote-destroy-recoverable"
+fact = "Deletes a project from the account. Recoverable via `neon projects recover` within a 7-day deletion-recovery window; permanent after 7 days."
+source = "https://neon.com/docs/reference/cli-projects — `neon projects delete` / `recover`"
+[[command.sub.sub]]
+name = "recover"
+profile = "remote-mutate"
+fact = "Restores a deleted project within the 7-day deletion-recovery period, re-provisioning it via the API."
+source = "https://neon.com/docs/reference/cli-projects — `neon projects recover`"
 
 [[command.sub]]
 name = "branches"
-candidate = true
+aliases = ["branch"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists branches in a Neon project from the API."
+source = "https://neon.com/docs/reference/cli-branches — `neon branches list`"
+[[command.sub.sub]]
+name = "get"
+profile = "remote-read"
+fact = "Retrieves details about a branch from the API."
+source = "https://neon.com/docs/reference/cli-branches — `neon branches get`"
+[[command.sub.sub]]
+name = "schema-diff"
+profile = "remote-read"
+fact = "Compares the latest schemas of two branches (or against a point in a branch's history) and prints the diff; read-only."
+source = "https://neon.com/docs/reference/cli-branches — `neon branches schema-diff`"
+[[command.sub.sub]]
+name = "create"
+profile = "remote-create"
+fact = "Creates a branch in a Neon project via the API. With --output json the response includes connection_uris whose connection_uri embeds the role password."
+source = "https://neon.com/docs/reference/cli-branches — `neon branches create`"
+judgment = "Classified remote-create; the JSON create response also EXPOSES a role password. Above the auto-approve line on both counts."
+[[command.sub.sub]]
+name = "add-compute"
+profile = "remote-create"
+fact = "Adds a compute endpoint (or read replica) to an existing branch via the API; provisions metered infrastructure."
+source = "https://neon.com/docs/reference/cli-branches — `neon branches add-compute`"
+[[command.sub.sub]]
+name = "rename"
+profile = "remote-mutate"
+fact = "Renames a branch via the API."
+source = "https://neon.com/docs/reference/cli-branches — `neon branches rename`"
+[[command.sub.sub]]
+name = "reset"
+profile = "remote-mutate"
+fact = "Resets a child branch to the latest data from its parent, overwriting the child's diverged data. Documented as not reversible."
+source = "https://neon.com/docs/reference/cli-branches — `neon branches reset`"
+judgment = "Overwrites data (a mutate/restore); classified remote-mutate rather than destroy because it re-derives state from the parent rather than deleting the branch. Above the auto-approve line either way."
+[[command.sub.sub]]
+name = "restore"
+profile = "remote-mutate"
+fact = "Restores a branch to a point in time from its own or another branch's history; --preserve-under-name can back up the prior state to a new branch first."
+source = "https://neon.com/docs/reference/cli-branches — `neon branches restore`"
+[[command.sub.sub]]
+name = "set-default"
+profile = "remote-mutate"
+fact = "Sets a branch as the project's default branch via the API."
+source = "https://neon.com/docs/reference/cli-branches — `neon branches set-default`"
+[[command.sub.sub]]
+name = "set-expiration"
+profile = "remote-mutate"
+fact = "Sets or updates the expiration date for a branch via the API."
+source = "https://neon.com/docs/reference/cli-branches — `neon branches set-expiration`"
+[[command.sub.sub]]
+name = "delete"
+profile = "remote-destroy-irreversible"
+fact = "Deletes a branch. Documented as not reversible — the branch is permanently deleted."
+source = "https://neon.com/docs/reference/cli-branches — `neon branches delete`"
 
 [[command.sub]]
 name = "databases"
-candidate = true
+aliases = ["database", "db"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists databases within a branch from the API."
+source = "https://neon.com/docs/reference/cli-databases — `neon databases list`"
+[[command.sub.sub]]
+name = "create"
+profile = "remote-create"
+fact = "Creates a database within a branch via the API."
+source = "https://neon.com/docs/reference/cli-databases — `neon databases create`"
+[[command.sub.sub]]
+name = "delete"
+profile = "remote-destroy-irreversible"
+fact = "Deletes a database within a branch, dropping the database and its contents via the API."
+source = "https://neon.com/docs/reference/cli-databases — `neon databases delete`"
+judgment = "Classified irreversible: dropping a database destroys its data with no dedicated recovery command (a branch-level PITR restore, if in retention, would revert unrelated data too)."
 
 [[command.sub]]
 name = "roles"
-candidate = true
+aliases = ["role"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists Postgres roles in a branch from the API."
+source = "https://neon.com/docs/reference/cli-roles — `neon roles list`"
+[[command.sub.sub]]
+name = "create"
+profile = "remote-create"
+fact = "Creates a Postgres role via the API. Neon generates the role's password; table output masks it, but the role is a new login credential provisioned server-side."
+source = "https://neon.com/docs/reference/cli-roles — `neon roles create`"
+judgment = "Classified remote-create; the generated password may surface in JSON/API output, an added credential-exposure concern. Above the auto-approve line."
+[[command.sub.sub]]
+name = "delete"
+profile = "remote-destroy-recoverable"
+fact = "Deletes a Postgres role from a branch via the API."
+source = "https://neon.com/docs/reference/cli-roles — `neon roles delete`"
+judgment = "Recoverable: a role can be recreated (a new password is then generated). No unique data is lost by removing the role itself."
 
 [[command.sub]]
 name = "operations"
-candidate = true
+aliases = ["operation"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists the history of system operations for a project (audit/inspection); read-only."
+source = "https://neon.com/docs/reference/cli-operations — `neon operations list`"
+
+[[command.sub]]
+name = "orgs"
+aliases = ["org"]
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists organizations the authenticated user belongs to, from the API."
+source = "https://neon.com/docs/reference/cli-orgs — `neon orgs list`"
+
+[[command.sub]]
+name = "ip-allow"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists the IP addresses in the project's IP allowlist, from the API."
+source = "https://neon.com/docs/reference/cli-ip-allow — `neon ip-allow list`"
+[[command.sub.sub]]
+name = "add"
+profile = "remote-authorize"
+fact = "Adds IP addresses to the project's IP allowlist, changing which hosts may connect. A --protected-only flag scopes the entry to protected branches."
+source = "https://neon.com/docs/reference/cli-ip-allow — `neon ip-allow add`"
+[[command.sub.sub]]
+name = "remove"
+profile = "remote-authorize"
+fact = "Removes IP addresses from the project's IP allowlist, changing the network access policy."
+source = "https://neon.com/docs/reference/cli-ip-allow — `neon ip-allow remove`"
+[[command.sub.sub]]
+name = "reset"
+profile = "remote-authorize"
+fact = "Replaces the entire IP allowlist with the specified addresses, or clears it if none are given — changes the network access policy wholesale."
+source = "https://neon.com/docs/reference/cli-ip-allow — `neon ip-allow reset`"
 
 [[command.sub]]
 name = "connection-string"
-candidate = true
+profile = "credential-read"
+fact = "Prints a Postgres connection URL that, per the docs, \"includes the password for the specified role\" — a live credential value emitted to stdout."
+source = "https://neon.com/docs/reference/cli-connection-string — `neon connection-string`"
 
 [[command.sub]]
 name = "cs"
-candidate = true
+profile = "credential-read"
+fact = "Alias of `connection-string`: prints a Postgres connection URL that includes the role password."
+source = "https://neon.com/docs/reference/cli-connection-string — `neon connection-string` (alias `cs`)"
 
 [[command.sub]]
 name = "endpoints"
 candidate = true
-
-[[command.sub]]
-name = "org"
-candidate = true
+# Legacy compute-endpoint management (list/create/delete/restart in older neonctl). The dedicated
+# CLI reference page now 404s and endpoint control has largely moved under `branches add-compute`;
+# the current CLI surface for this command is not determinable from upstream docs, so it stays
+# denied rather than guessed. Create/delete/restart would be remote-create/destroy/control if present.
 
 [[command.sub]]
 name = "create-app"
 candidate = true
+# Obsolete scaffolding command (superseded by `init`/`bootstrap`): generates a starter app, which
+# fetches templates and may run project setup code. Behavior/surface not confirmable against current
+# docs; stays denied.

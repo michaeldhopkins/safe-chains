@@ -988,8 +988,19 @@ Aliases: `g++`, `cc`, `c++`
 ### `node`
 <p class="cmd-url"><a href="https://nodejs.org/api/cli.html">https://nodejs.org/api/cli.html</a></p>
 
+- Allowed: `--version`/`--help` (informational), `--check`/`-c FILE` (parse-only syntax check, runs no code), and running a WORKSPACE-local script (`node server.js`, `node ./src/main.js`) — the dev loop. The first positional is the script to run; further positionals are its arguments.
+
+- **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -h, -v
 - Allowed valued flags: --check, -c
+
+**Examples:**
+
+- `node --version`
+- `node --help`
+- `node --check app.js`
+- `node server.js`
+- `node ./src/main.js`
 
 ### `nodemon`
 <p class="cmd-url"><a href="https://github.com/remy/nodemon">https://github.com/remy/nodemon</a></p>
@@ -1248,7 +1259,19 @@ Aliases: `run-p`, `run-s`
 
 Aliases: `python`
 
+- Allowed: `--version`/`--help` (informational), and running a WORKSPACE-local script (`python3 ./task.py`, `python3 scripts/build.py`) — the dev loop. The first positional is the script to run; further positionals are its arguments.
+
+- **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `python3 --version`
+- `python3 --help`
+- `python --version`
+- `python3 ./task.py`
+- `python3 scripts/build.py`
+- `python3 ./task.py --flag arg`
 
 ### `qsv`
 <p class="cmd-url"><a href="https://github.com/jqnatividad/qsv">https://github.com/jqnatividad/qsv</a></p>
@@ -1832,7 +1855,7 @@ Aliases: `python`
 - **kv list**: Flags: --help, --mount, -h. Valued: --address, --format, --namespace
 - **kv metadata**
 - **list**: Flags: --detailed, --help, --mount, -h. Valued: --address, --format, --namespace. Positional args accepted
-- **read**: Flags: --field, --help, --mount, -h. Valued: --address, --field, --format, --namespace. Positional args accepted
+- **read**
 - **status**: Flags: --format, --help, -h. Valued: --address, --format
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v

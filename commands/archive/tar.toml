@@ -1,0 +1,20 @@
+[[command]]
+name = "tar"
+aliases = ["gtar"]
+description = "Archives and extracts file trees. The leading operand is a dashless MODE bundle (`c` create, `x` extract, `t` list) plus modifiers (`f` names the archive, `v` verbose, `z`/`j` compress), which is not getopt syntax. CREATE (`cf a.tar files…`) READS the named files into the archive — reading a home/system path denies on the input locus. EXTRACT (`xf a.tar`) WRITES files out of the archive into the current tree (a path-traversal / overwrite surface). LIST (`tf a.tar`) reads the archive. No network in the base tool. The `--to-command`/`--use-compress-program` options run arbitrary programs (code execution) and are not benign. Part of GNU tar / bsdtar (libarchive); mode grammar frozen for decades."
+url = "https://www.gnu.org/software/tar/manual/tar.html"
+researched_version = "GNU tar 1.35 + bsdtar (macOS 15)"
+level = "SafeRead"
+bare = false
+examples_safe = ["tar cf ./out.tar ./src", "tar tf ./archive.tar"]
+examples_denied = ["tar cf ./out.tar ~/.ssh", "tar cf /etc/evil.tar ./src"]
+
+# Declarative facet behavior: tar's dashless mode bundle (`cf`/`xf`/`tf` + modifiers) and its
+# per-mode operand roles are irregular token logic, so a thin `tar` hook parses the mode and
+# gates each file operand at its locus — a `c`reate reads its inputs, an e`x`tract writes its
+# outputs, a lis`t` reads the archive; an unmodeled mode or option worst-cases. Replaces the
+# hardcoded `resolve_tar`.
+[command.behavior]
+operation = "create"
+positionals = "none"
+hook = "tar"

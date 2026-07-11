@@ -5,6 +5,11 @@ url = "https://restic.readthedocs.io/"
 researched_version = "restic 0.x"
 bare_flags = ["--help", "--version", "-h"]
 
+# The certificate/password files restic reads. --repo and --repo-file identify the repository
+# (local path or remote URL) and stay ungated; --password-command is a command, not a path.
+[command.path_gate]
+flags = { "--cacert" = "read", "--tls-client-cert" = "read", "--password-file" = "read" }
+
 [command.wrapper]
 standalone = ["--cleanup-cache", "--no-cache", "--no-lock", "--quiet", "--verbose"]
 valued = ["--cache-dir", "--cacert", "--insecure-tls", "--json", "--limit-download", "--limit-upload", "--option", "--password-command", "--password-file", "--repo", "--repo-file", "--retry-lock", "--tls-client-cert", "-o", "-p", "-r"]

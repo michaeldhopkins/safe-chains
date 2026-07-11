@@ -6,6 +6,49 @@ bare_flags = ["--help", "--version", "-V", "-h"]
 [command.wrapper]
 valued = ["-C"]
 
+# push — Phase-1 pilot for per-flag escalation. Base is a vcs-sync (egress to the configured remote
+# → network-admin, not auto-approved). Escalating flags ADD a capability: --force/--mirror can
+# irreversibly destroy remote refs → remote-destroy-irreversible (yolo). All Denied in the 3-value
+# projection today; the point is that the verdict is DERIVED and the flags carry their own research.
+# (A future refinement: `-c core.sshCommand=…` is an execution escalator, but it is a valued flag
+# matched by VALUE — the simple present/absent mechanism here doesn't cover it yet; the git handler's
+# `-c` filter still catches `git -c … push`.)
+[[command.sub]]
+name = "push"
+profile = "vcs-sync"
+network_destination = true
+destination_flag = "--repo"
+fact = "Transfers local commits to a remote repository over the network, updating the remote's refs; sends the committed content to the configured remote. The target may be a configured remote name, an inline URL, or an `ext::<cmd>` transport that runs a local command."
+source = "https://git-scm.com/docs/git-push"
+judgment = "The send target's provenance is classified onto locus.provenance: a bare remote name is `established`, an inline URL/scp-path is `literal`, a `$VAR` is `opaque`; `ext::<cmd>` runs a local command and worst-cases as RCE."
+[[command.sub.flag]]
+name = "--force"
+classifies = "remote-destroy-irreversible"
+fact = "Overwrites the remote ref with no merge check, discarding commits present only on the remote — can irreversibly destroy work not held locally."
+source = "https://git-scm.com/docs/git-push — `--force`"
+[[command.sub.flag]]
+name = "-f"
+classifies = "remote-destroy-irreversible"
+fact = "Short form of --force."
+source = "https://git-scm.com/docs/git-push — `-f`"
+[[command.sub.flag]]
+name = "--mirror"
+classifies = "remote-destroy-irreversible"
+fact = "Makes the remote match the local repo exactly, DELETING remote refs absent locally — mass irreversible remote deletion."
+source = "https://git-scm.com/docs/git-push — `--mirror`"
+# `--receive-pack`/`--exec` name the program git runs on the RECEIVING side — an arbitrary command
+# execution vector. Any value is out-of-bounds, so `classifies = "unclassified"` (fail-closed worst).
+[[command.sub.flag]]
+name = "--receive-pack"
+classifies = "unclassified"
+fact = "Names the git-receive-pack program run on the remote to receive the push — an arbitrary-program execution surface."
+source = "https://git-scm.com/docs/git-push — `--receive-pack`"
+[[command.sub.flag]]
+name = "--exec"
+classifies = "unclassified"
+fact = "Alias of --receive-pack: names the program run on the remote."
+source = "https://git-scm.com/docs/git-push — `--exec`"
+
 [[command.sub]]
 name = "blame"
 bare = false
@@ -23,6 +66,7 @@ standalone = [
 valued = [
     "--abbrev",
     "--contents",
+    "--date",
     "--ignore-rev", "--ignore-revs-file",
     "-C", "-L", "-M", "-S",
 ]
@@ -514,8 +558,24 @@ valued = [
 ]
 
 [[command.sub]]
+# `git remote` — READ-ONLY forms only (migrated from the `git_remote` Rust handler to declarative
+# subs; it was a pure read/mutate allowlist, no logic). bare / `-v` list configured remotes;
+# `get-url` / `show` query them. Mutating subs (add/remove/rename/set-url/set-head/prune/update) deny
+# by OMISSION — fail-closed, so a new or aliased mutating sub (`rm`) never slips through.
 name = "remote"
-handler = "git_remote"
+nested_bare = true
+standalone = ["-v", "--verbose", "-h", "--help"]
+[[command.sub.sub]]
+name = "get-url"
+level = "SafeRead"
+max_positional = 1
+standalone = ["--push", "--all", "-h", "--help"]
+# `git remote show [-n] <name>…` takes MULTIPLE remote names — positionals are harmless remote
+# names on a read-only sub, so they are left unbounded (matches the retired handler's any-args form).
+[[command.sub.sub]]
+name = "show"
+level = "SafeRead"
+standalone = ["-n", "-h", "--help"]
 
 [[command.sub]]
 name = "rev-parse"

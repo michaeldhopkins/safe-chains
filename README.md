@@ -33,12 +33,20 @@ safe-chains "ls -la | head -5"    # exit 0 = safe
 safe-chains "rm -rf /"            # exit 1 = unsafe
 ```
 
-Every allowed command is classified as `inert`, `safe-read`, or `safe-write`. Use `--level` to set a threshold:
+Use `--level` to set a threshold; only commands at or below it auto-approve. The levels, from
+most locked down to most open, are `paranoid` (barely reads), `reader` (reads your project),
+`editor` (edits it, no delete/run/network), `developer` (the everyday dev default — runs your
+project, deletes your own files), the two admin flavors `local-admin` (runs this machine) and
+`network-admin` (operates your remotes), and `yolo` (no limits — bar `rm -rf /`). Default:
+`developer`.
 
 ```bash
-safe-chains --level inert "cargo test"       # exit 1 (safe-read > inert)
-safe-chains --level safe-read "cargo test"   # exit 0
+safe-chains --level paranoid "cargo test"   # exit 1 (reads the tree — above paranoid)
+safe-chains --level reader "cargo test"     # exit 0
 ```
+
+The legacy names `inert` / `safe-read` / `safe-write` still work — they map to
+`paranoid` / `reader` / `developer` and print a one-line notice.
 
 ## Custom commands
 

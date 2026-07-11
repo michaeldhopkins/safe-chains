@@ -9,3 +9,12 @@ tolerate_unknown_short = true
 tolerate_unknown_long = true
 standalone = ["-E", "-e", "-n"]
 examples_safe = ["echo hello world", "echo -n done"]
+
+# Declarative facet behavior: echo OBSERVES nothing on the filesystem — it prints its literal
+# arguments to stdout (which reaches the model), touching no file, network, process, or secret.
+# A none-role emitter: its `-n`/`-e`/`-E` flags only format the output, and any other argument is
+# just printed. Redirection (`echo x > f`) is a separate capability the enclosing CST resolves.
+# Replaces `resolve_echo`.
+[command.behavior]
+operation = "observe"
+positionals = "none"

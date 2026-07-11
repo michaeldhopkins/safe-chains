@@ -5,6 +5,10 @@ url = "https://developer.apple.com/documentation/shazamkit"
 researched_version = "macOS 14 shazam(1)"
 bare_flags = ["--help", "-h"]
 
+# --output writes the generated signature; --input is the media/catalog source (used across subs).
+[command.path_gate]
+flags = { "--output" = "write", "--input" = "read" }
+
 [[command.sub]]
 name = "signature"
 level = "SafeWrite"

@@ -38,11 +38,14 @@ fn find_repo_custom() -> Option<PathBuf> {
     }
 }
 
-/// $XDG_CONFIG_HOME/safe-chains.toml, falling back to ~/.config/safe-chains.toml.
+/// `~/.config/safe-chains.toml` — the ONLY user-config location. `XDG_CONFIG_HOME` is
+/// deliberately NOT honored: it's an agent-mutable env var, and if a harness ever passed the
+/// agent's environment to the hook, a redirected `XDG_CONFIG_HOME` could point the trust root at
+/// an agent-writable directory (plant a "grant everything" config, load it as trusted). Reading
+/// only from the real home directory closes that off — a common stance for a security-sensitive
+/// CLI. Trades away XDG relocation until a protected third-party config location exists.
 fn find_user_custom() -> Option<PathBuf> {
-    let dir = env::var_os("XDG_CONFIG_HOME")
-        .map(PathBuf::from)
-        .or_else(|| env::var_os("HOME").map(|h| PathBuf::from(h).join(".config")))?;
+    let dir = env::var_os("HOME").map(|h| PathBuf::from(h).join(".config"))?;
     let candidate = dir.join(USER_FILENAME);
     candidate.is_file().then_some(candidate)
 }

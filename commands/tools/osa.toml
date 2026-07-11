@@ -7,6 +7,11 @@ level = "SafeWrite"
 standalone = ["-d", "-x", "-s", "-u"]
 valued = ["-l", "-e", "-o", "-r", "-t", "-c"]
 
+# -o writes the compiled script; the positional is the source file (a read). -e is inline source text, not a path.
+[command.path_gate]
+positional = "read"
+flags = { "-o" = "write" }
+
 [[command]]
 name = "osadecompile"
 description = "Writes the source text of a compiled AppleScript or OSA script file to standard output. Reads the script's compiled form; the correct language component is detected from the file contents. No options. Entirely local; no network."

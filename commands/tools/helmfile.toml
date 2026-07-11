@@ -5,6 +5,9 @@ url = "https://helmfile.readthedocs.io/"
 researched_version = "helmfile 1.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
 
+[command.path_gate]
+flags = { "--output-dir" = "write" }
+
 [command.wrapper]
 standalone = ["--allow-no-matching-release", "--debug", "--disable-force-update", "--enable-live-output", "--no-color", "--quiet", "--strict-parsing"]
 valued = ["--args", "--color", "--environment", "--file", "--helm-binary", "--helmfile", "--kube-context", "--log-level", "--namespace", "-b", "-e", "-f", "-l", "-n"]

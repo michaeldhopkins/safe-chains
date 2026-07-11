@@ -12,10 +12,18 @@ update both the relevant `targets/*.rs` and this file.
 
 ## The model we rely on
 
-safe-chains is **allowlist-only and abstaining**. On a safe command it emits an
-allow envelope; on anything else it emits *nothing* and exits 0, so the
-harness's normal permission flow (and the user's own allowlist) still applies.
-We never actively deny.
+safe-chains is **allowlist-only**; what it EMITS for a given command depends on the
+**harness's capabilities** (`docs/design/harness-capability-model.md`):
+
+- **Safe command** → `allow` where the harness supports granting (Claude), else *silent* (the
+  command just runs — e.g. Codex, which has no grant).
+- **Gated command** → *silent* where a human still reviews it (Claude's own prompt is the check),
+  else **`deny`** where the harness offers no interactive approval and no `ask` (Codex: staying
+  silent would just run it, and its sandbox permits broad reads). Exceptions on a deny-harness are
+  config-level (a custom command / grant), not per-invocation.
+
+So we *do* actively deny on some harnesses (Codex) — the flip from the old "never deny" is
+deliberate and capability-driven; see the design doc + the per-target table below.
 
 Two consequences that shape everything else:
 
@@ -39,7 +47,7 @@ run) while never actually auto-approving. Tests assert the exact field.
 | Target  | Tool / matcher          | Envelope shape                         | Decision field      | Values honored        | Timeout unit |
 |---------|-------------------------|----------------------------------------|---------------------|-----------------------|--------------|
 | Claude  | `Bash`                  | `{hookSpecificOutput: {...}}`          | `permissionDecision`| allow / deny / ask / (omit = defer) | — |
-| Codex   | `Bash` (self-filter)    | `{hookSpecificOutput: {...}}`          | `permissionDecision`| allow                 | — |
+| Codex   | `Bash`; config nests under top-level `hooks` | `{hookSpecificOutput: {...}}` | `permissionDecision`| **deny** (gated); *silent* (safe). `allow`/`ask` parsed-but-UNSUPPORTED on v0.144.3 | — |
 | Qwen    | `^Bash$`                | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | ms |
 | Droid   | `Execute`               | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | seconds |
 | Gemini  | `^run_shell_command$`   | `{decision: ...}`                      | `decision`          | allow / deny **only** | ms |
@@ -52,6 +60,78 @@ Notes:
 - **Copilot** today only acts on `deny`; for a safe command the honest answer is
   "no opinion" (empty), letting its allow-by-default apply. We still emit an
   allow-shaped envelope so future Copilot releases that honor allow can use it.
+
+### Codex — researched 2026-07-13, v0.144.3 (probe-verified)
+
+- **Official docs:** https://learn.chatgpt.com/docs/hooks · https://developers.openai.com/codex/concepts/sandboxing · https://developers.openai.com/codex/agent-approvals-security
+- **Config schema:** `~/.codex/hooks.json` must nest events under a top-level `hooks` object:
+  `{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"safe-chains hook codex"}]}]}}`.
+  A flat top-level `PreToolUse` (Claude's shape) is **rejected** — `unknown field PreToolUse` — and the
+  hook never loads. Codex prompts to *trust* a new/changed hook on first run.
+- **Input:** `tool_input.command` (Bash), `cwd`, plus `tool_name`/`model`/`permission_mode`/… (ignored).
+- **Decision values:** `deny` and (per docs) `allow`; but **`allow` errored on v0.144.3**
+  (`unsupported permissionDecision:allow`) — version drift. `ask` / legacy `approve` / `continue:false`
+  / `stopReason` / `suppressOutput` are **parsed but not supported**. An unsupported decision → Codex
+  "marks the hook failed, reports the error, and **continues the tool call**" (fail-open — emit only a
+  supported shape).
+- **Capabilities:** grant ❌ (allow unsupported here) · deny ✅ · escalate/`ask` ❌ · human-review-on-silence ❌
+  (only sandbox-*escape* prompts) · sandbox ✅ `workspace-write` (blocks out-of-workspace writes + network,
+  **permits broad reads**). → safe-chains emits **silent** for safe, **`deny`** for gated (`src/targets/codex.rs`).
+- **Verified end-to-end:** safe `cat README.md` runs clean; gated `cat /etc/hosts` (sandbox would allow
+  the read) is **blocked by the hook** with the config-exception reason.
+
+### Gemini → Antigravity — researched 2026-07-13
+
+- **Gemini CLI is RETIRED (2026-06-18)** for AI Pro/Ultra/free-tier users; it survives only under a
+  Gemini Code Assist Standard/Enterprise license. Our `gemini` target is therefore **DEPRECATED** —
+  keep it (enterprise remnant, can't become unsafe) but drop it from the active test matrix. Note:
+  the old `gemini` row above modeled a stdout `{decision}` shape, but Gemini actually blocked via
+  **shell exit codes** — an unverified assumption, now moot. Sources:
+  https://developers.googleblog.com/an-important-update-transitioning-gemini-cli-to-antigravity-cli/
+- **Successor: Antigravity CLI, command `agy`** (closed-source Go binary, multi-agent). It HAS
+  PreToolUse hooks. Config via `hooks.json` in a customization root — `.agents/hooks.json` per
+  project, `~/.gemini/config/hooks.json` globally (both merged). Top-level keys are hook *names*
+  (`safe-chains`), each mapping to `{ "PreToolUse": [ { "matcher": "...", "hooks": [ { "type":
+  "command", "command": "..." } ] } ] }`. `/hooks` inspects active hooks. Sources:
+  https://medium.com/google-cloud/a-developers-guide-to-agent-hooks-in-antigravity-cli-4c1440febd11 ·
+  the bundled `~/.gemini/antigravity-cli/builtin/skills/agy-customizations/docs/hooks.md`.
+
+#### Antigravity CLI (`agy`) — VERIFIED LIVE, v1.1.2, 2026-07-13
+
+Driven live via the TUI harness in `~/projects/safe-chains-harness-lab` (Gemini 3.5 Flash).
+
+- **Matcher target = the tool NAME `run_command`** (the shell tool). The UI/log label it "Bash", but
+  the payload's `toolCall.name` is `run_command`, and the matcher matches that. Verified: matcher
+  `run_command` fires (log `jsonhook.go:189 Loaded hooks.json … 1 named hooks` immediately before the
+  confirmation). `"*"` / `""` also match all tools.
+- **Input (stdin, protojson/camelCase):** shell command at `toolCall.args.CommandLine`; workspace at
+  `workspacePaths[0]` (used as both cwd and root). Also carries `conversationId`, `stepIdx`,
+  `modelName`, `transcriptPath`.
+- **Output (stdout):** `{ "decision": <d>, "reason": <str>, "permissionOverrides": [...] }`.
+  Decisions and their **observed** effect on v1.1.2 CLI:
+  - `"deny"` → **hard block**; the model is told "Tool call denied by pre-tool hook: <reason>". WORKS
+    (verified: `cat /etc/hosts` blocked, our reason shown).
+  - `"force_ask"` → **forces a human prompt**, ignoring the Always-Allow cache. WORKS (verified:
+    `cat /etc/hosts` surfaced the permission prompt).
+  - `"ask"` → prompts, but **respects the Always-Allow cache** (a prior "always allow commands
+    starting with cat" would auto-run a gated `cat …`). We use `force_ask` instead to close that hole.
+  - `"allow"` → does **NOT** suppress agy's own confirmation in the CLI. Verified twice: `decision:
+    allow` (with and without `permissionOverrides:["command(cat README.md)"]`) still surfaced the
+    prompt. **So there is no effective GRANT on agy 1.1.2** — a safe command can't skip the prompt.
+    We still emit `allow` (semantically correct, harmless, future-proof).
+  - `"permissionOverrides"` → does **NOT** register a session grant either. Tested with a stateful
+    hook: call 1 emitted `{allow, permissionOverrides:["command(echo hello)"]}`; call 2 (same command)
+    emitted a cache-respecting `ask` — and **still prompted**. So the hook has NO way, current-call or
+    future-call, to make a safe command auto-run. agy's own native allowlist ("always allow …",
+    persisted to settings.json) and permission modes are the ONLY auto-approval paths, and they are
+    user-driven — safe-chains can't feed them from the hook.
+- **Human review on silence: YES.** Default setting `toolPermission=request-review` prompts for
+  `run_command`. So agy has per-command human review even with no hook decision.
+- **Fails CLOSED** on a missing/malformed decision (prompts rather than runs) — the opposite of
+  Codex. Every response therefore carries an explicit `decision`.
+- **Capability summary:** grant ❌ · deny ✅ · escalate/`ask`+`force_ask` ✅ · human-review-on-silence
+  ✅ · fail-closed ✅. → gated command policy = **Ask** (escalate via `force_ask`), not Deny: agy has
+  human review, so we escalate rather than hard-block. See `src/targets/agy.rs`.
 
 ## Model-visible context injection (`additionalContext`)
 

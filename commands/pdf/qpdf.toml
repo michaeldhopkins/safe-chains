@@ -81,3 +81,6 @@ examples_safe = [
     "qpdf --show-pages --with-images in.pdf",
     "qpdf --json-key=pages --json-key=encrypt in.pdf",
 ]
+
+[command.path_gate]
+flags = { "--password-file" = "read" }

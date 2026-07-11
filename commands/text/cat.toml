@@ -10,4 +10,17 @@ standalone = [
     "--help", "--number", "--number-nonblank", "--show-all", "--show-ends",
     "--show-nonprinting", "--show-tabs", "--squeeze-blank", "--version",
 ]
-examples_safe = ["cat README.md", "cat src/main.rs", "cat /etc/hostname"]
+examples_safe = ["cat README.md", "cat src/main.rs", "cat ./notes.txt"]
+
+# Declarative facet behavior: cat OBSERVES each positional (a read whose content flows to the
+# model), gated per-operand by locus so `cat ~/.ssh/id_rsa` denies. No network, exec, or
+# secret write — those facets come from the `observe`/`reads_content` builder. Replaces the
+# hardcoded `resolve_cat`.
+[command.behavior]
+operation = "observe"
+positionals = "read"
+standalone = [
+    "-A", "-b", "-e", "-E", "-n", "-s", "-t", "-T", "-u", "-v",
+    "--number", "--number-nonblank", "--show-all", "--show-ends",
+    "--show-nonprinting", "--show-tabs", "--squeeze-blank", "--help", "--version",
+]

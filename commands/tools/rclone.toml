@@ -5,6 +5,9 @@ url = "https://rclone.org/commands/"
 researched_version = "rclone 1.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
 
+[command.path_gate]
+flags = { "--output-file" = "write" }
+
 [[command.sub]]
 name = "version"
 standalone = ["--check", "--deps", "--help", "-h"]

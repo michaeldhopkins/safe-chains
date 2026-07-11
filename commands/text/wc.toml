@@ -12,3 +12,16 @@ standalone = [
 ]
 valued = ["--files0-from"]
 examples_safe = ["wc -l src/main.rs", "wc -w README.md"]
+
+# Declarative facet behavior: wc OBSERVES each file to count it (content → the model), gated
+# per-operand by locus. `--files0-from` is deliberately OMITTED from the behavior grammar so it
+# hits an unrecognized flag and worst-cases — it reads an unpinnable set of files named by
+# another file, which locus gating can't bound. Replaces `resolve_wc`.
+[command.behavior]
+operation = "observe"
+positionals = "read"
+standalone = [
+    "-L", "-V", "-c", "-l", "-m", "-w",
+    "--bytes", "--chars", "--help", "--lines",
+    "--max-line-length", "--version", "--words", "--zero-terminated",
+]

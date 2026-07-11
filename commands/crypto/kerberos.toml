@@ -20,6 +20,9 @@ valued = [
     "-S",
 ]
 
+[command.path_gate]
+flags = { "--password-file" = "read" }
+
 [[command]]
 name = "klist"
 description = "List Kerberos credentials. Reads the current credential cache (or one specified via -c/--cache) and prints the stored tickets, optionally including flags (-f), AFS tokens (-T), or a cache list (-l/--list-caches). The -s/-t/--test forms exit silently with status 0 only if an active TGT exists. Strictly read-only: no network, no cache modification. Heimdal's surface has not changed in many years."

@@ -26,3 +26,6 @@ valued = [
     "--storage-layout", "-O", "-o",
     "-p", "--root-folder",
 ]
+
+[command.path_gate]
+flags = { "--output-dir" = "write" }

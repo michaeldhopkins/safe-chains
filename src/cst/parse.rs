@@ -7,6 +7,7 @@ use winnow::token::{any, take_while};
 
 pub fn parse(input: &str) -> Option<Script> {
     reset_heredoc_queue();
+    PARSE_DEPTH.with(|d| d.set(0));
     let result = script.parse(input).ok();
     reset_heredoc_queue();
     result
@@ -14,6 +15,44 @@ pub fn parse(input: &str) -> Option<Script> {
 
 fn backtrack<T>() -> ModalResult<T> {
     Err(ErrMode::Backtrack(ContextError::new()))
+}
+
+thread_local! {
+    static PARSE_DEPTH: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+}
+
+/// Nesting depth beyond which the parser bails instead of recursing further. EVERY recursion source
+/// — subshells `( )`, brace groups `{ }`, command/process substitutions `$( )`/`<( )`, and
+/// double-quote-nested subs — funnels through `script()`, so bounding it there caps stack depth. A
+/// deeply-nested adversarial input (`"$("` × 100 000) would otherwise overflow the stack and ABORT
+/// the process — a fail-open CRASH of the hook that `catch_unwind` cannot recover (a stack overflow
+/// is not an unwindable panic). 200 is far beyond any real command; past it the parse fails and the
+/// command is denied (fail closed). Found by `classifier_terminates_on_adversarial_input`. Kept
+/// LOW (winnow's combinator frames are fat — ~200 levels alone overflowed a 2 MB stack), yet still
+/// far beyond any real command, which nests a handful of levels at most.
+const MAX_PARSE_DEPTH: u32 = 48;
+
+/// RAII depth counter for the recursive descent — increments on `enter`, decrements on drop (winnow
+/// returns errors rather than panicking, so drops balance even on the bail path).
+struct DepthGuard;
+
+impl DepthGuard {
+    fn enter() -> Option<Self> {
+        PARSE_DEPTH.with(|d| {
+            if d.get() >= MAX_PARSE_DEPTH {
+                None
+            } else {
+                d.set(d.get() + 1);
+                Some(DepthGuard)
+            }
+        })
+    }
+}
+
+impl Drop for DepthGuard {
+    fn drop(&mut self) {
+        PARSE_DEPTH.with(|d| d.set(d.get().saturating_sub(1)));
+    }
 }
 
 fn comment(input: &mut &str) -> ModalResult<()> {
@@ -95,6 +134,11 @@ fn is_dq_literal(c: char) -> bool {
 // === Script ===
 
 fn script(input: &mut &str) -> ModalResult<Script> {
+    // Bound recursion depth: every nested `(`/`{`/`$(`/`<(`/`` ` `` funnels back through `script`,
+    // so this one guard caps stack depth against deeply-nested adversarial input (see MAX_PARSE_DEPTH).
+    let Some(_depth) = DepthGuard::enter() else {
+        return backtrack();
+    };
     sep.parse_next(input)?;
     let mut stmts = Vec::new();
     while let Some(pl) = opt(pipeline).parse_next(input)? {
@@ -952,7 +996,7 @@ mod tests {
     #[test]
     fn cmd_substitution() { assert!(matches!(&simple(&p("echo $(ls)")).words[1].0[0], WordPart::CmdSub(_))); }
     #[test]
-    fn backtick_substitution() { assert_eq!(simple(&p("ls `pwd`")).words[1].eval(), "__SAFE_CHAINS_SUB__"); }
+    fn backtick_substitution() { assert_eq!(simple(&p("ls `pwd`")).words[1].eval(), "__SAFE_CHAINS_CMDSUB__"); }
     #[test]
     fn nested_substitution() {
         if let WordPart::CmdSub(inner) = &simple(&p("echo $(echo $(ls))")).words[1].0[0] {

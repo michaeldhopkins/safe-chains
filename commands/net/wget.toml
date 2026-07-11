@@ -109,3 +109,6 @@ valued = [
     "-R", "-T", "-U", "-X", "-a", "-e",
     "-i", "-l", "-o", "-t", "-w",
 ]
+
+[command.path_gate]
+flags = { "--output-file" = "write", "--input-file" = "read" }

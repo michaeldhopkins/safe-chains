@@ -3,6 +3,24 @@ name = "go"
 description = "Go programming language toolchain. The go command has a large surface area covering compilation, testing, dependency management, and code generation. 'go build' compiles code and writes binaries to disk. 'go test' compiles and executes test code, which can have arbitrary side effects. 'go mod download' fetches modules from the network. Read-only subcommands like 'go doc', 'go env', 'go list', 'go version', and 'go vet' inspect code or configuration without filesystem writes (though vet does compile code). Go releases on a predictable 6-month cadence (February and August), with the CLI surface growing steadily."
 url = "https://pkg.go.dev/cmd/go"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+  "go run .",
+  "go run ./cmd/tool",
+  "go run -race ./cmd",
+  "go run main.go",
+  "go build ./...",
+  "go test ./...",
+]
+examples_denied = [
+  "go run ~/evil.go",
+  "go run /tmp/x.go",
+  "go run rsc.io/goversion@latest",
+  "go run github.com/evil/x@latest",
+  "go run bin/tool",
+]
+
+[command.path_gate]
+flags = { "-o" = "write" }
 
 [[command.sub]]
 name = "build"
@@ -46,6 +64,28 @@ valued = [
     "-coverpkg", "-f", "-gccgoflags", "-gcflags", "-installsuffix",
     "-json", "-ldflags", "-mod", "-modfile", "-overlay", "-p",
     "-pgo", "-pkgdir", "-reuse", "-tags",
+]
+
+# `go run PKG` compiles and runs a package — the executor is the PACKAGE PATH. `positional_shape`
+# requires a LOCAL path (`.`, `./cmd/tool`, `/abs`, `*.go`): a bare import path (`rsc.io/x@latest`,
+# `example.com/cmd`) is module-resolved and, with `@version`, DOWNLOADS AND RUNS remote code, so it
+# is not a worktree executor and denies. A local package is then locus-gated: worktree allows,
+# foreign (`go run ~/x.go`, `/tmp/x.go`) denies. Tokens after the package are the program's args.
+[[command.sub]]
+name = "run"
+executor = "file"
+positional_shape = "go-package"
+bare = false
+standalone = [
+    "--help",
+    "-a", "-asan", "-cover", "-h", "-linkshared", "-modcacherw",
+    "-msan", "-n", "-race", "-trimpath", "-v", "-work", "-x",
+]
+valued = [
+    "-asmflags", "-buildmode", "-buildvcs", "-compiler", "-covermode",
+    "-coverpkg", "-gccgoflags", "-gcflags", "-installsuffix",
+    "-ldflags", "-mod", "-modfile", "-overlay", "-p",
+    "-pgo", "-pkgdir", "-tags",
 ]
 
 [[command.sub]]

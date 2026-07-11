@@ -1,8 +1,38 @@
 [[command]]
 name = "cargo"
-description = "Rust package manager and build system with a very large subcommand surface. Build operations (build, test, check, clippy, doc, bench, run) execute build scripts (build.rs) from every crate in the dependency tree, which can run arbitrary code. install has two modes: `cargo install crate-name` downloads from crates.io (network), while `cargo install --path .` builds from local source only — we allow --path but block positional crate names, --git, --registry, and --index to prevent remote-source installs. fmt without --check rewrites files. publish without --dry-run uploads to a registry. Third-party subcommands (nextest, deny, clippy, etc.) are added via cargo plugins and each has its own flag surface. Cargo releases with each Rust edition (roughly every 6 weeks) and frequently adds new flags."
+description = "Rust package manager and build system with a very large subcommand surface. Build operations (build, test, check, clippy, doc, bench, run) execute build scripts (build.rs) from every crate in the dependency tree, which can run arbitrary code. `--manifest-path DIR/Cargo.toml` points any of these at a DIFFERENT project, so it selects whose code runs. The `--config KEY=VALUE` flag sets arbitrary Cargo config on the command line, including code-execution keys like `target.<cfg>.runner`, `build.rustc-wrapper`, and `[alias]` shell escapes — it is a general command-injection surface, so it is not exposed here (use `.cargo/config.toml` instead). install has two modes: `cargo install crate-name` downloads from crates.io (network), while `cargo install --path .` builds from local source only — we allow --path but block positional crate names, --git, --registry, and --index to prevent remote-source installs. fmt without --check rewrites files. publish without --dry-run uploads to a registry. Third-party subcommands (nextest, deny, clippy, etc.) are added via cargo plugins and each has its own flag surface. Cargo releases with each Rust edition (roughly every 6 weeks) and frequently adds new flags."
 url = "https://doc.rust-lang.org/cargo/commands/"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+  "cargo run",
+  "cargo run --release",
+  "cargo run --bin server",
+  "cargo build",
+  "cargo test",
+  "cargo fmt",
+  "cargo fmt --all",
+  "cargo fmt --check",
+  "cargo fmt --manifest-path ./crates/core/Cargo.toml",
+]
+examples_denied = [
+  "cargo run --manifest-path /tmp/evil/Cargo.toml",
+  "cargo run --manifest-path ~/x/Cargo.toml",
+  "cargo build --manifest-path ~/evil/Cargo.toml",
+  "cargo test --manifest-path /tmp/x/Cargo.toml",
+  "cargo fmt --manifest-path /tmp/other/Cargo.toml",
+  "cargo fmt --manifest-path ~/other/Cargo.toml",
+  "cargo fmt -- /tmp/evil.rs",
+  "cargo fmt /etc/passwd",
+  "cargo run --config target.x86_64-unknown-linux-gnu.runner='sh -c evil'",
+  "cargo build --config build.rustc-wrapper=/tmp/evil",
+]
+
+# `--manifest-path DIR/Cargo.toml` selects WHICH project cargo builds/tests/runs — a foreign one
+# runs foreign build.rs/tests/binary, so its value is gated by EXECUTOR locus (worktree allows,
+# `/tmp`/home/system deny) across every cargo sub that accepts it. See
+# docs/design/behavioral-taxonomy-execution-origin.md.
+[command.path_gate]
+flags = { "--output-dir" = "write", "--output-path" = "write", "--manifest-path" = "exec" }
 
 [[command.sub]]
 name = "audit"
@@ -20,6 +50,7 @@ valued = [
 name = "bench"
 level = "SafeRead"
 standalone = [
+    "--all", "--workspace",
     "--all-features", "--all-targets", "--benches", "--bins", "--doc",
     "--examples", "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--no-fail-fast",
@@ -27,7 +58,7 @@ standalone = [
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--bench", "--bin", "--color", "--config", "--example",
+    "--bench", "--bin", "--color", "--example",
     "--features", "--jobs", "--manifest-path", "--message-format",
     "--package", "--profile", "--target", "--target-dir", "--test",
     "-Z", "-j", "-p",
@@ -43,7 +74,7 @@ standalone = [
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--color", "--config", "--edition", "--name", "--registry", "--vcs",
+    "--color", "--edition", "--name", "--registry", "--vcs",
     "-Z",
 ]
 
@@ -57,7 +88,7 @@ standalone = [
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--color", "--config", "--edition", "--name", "--registry", "--vcs",
+    "--color", "--edition", "--name", "--registry", "--vcs",
     "-Z",
 ]
 
@@ -65,6 +96,7 @@ valued = [
 name = "build"
 level = "SafeWrite"
 standalone = [
+    "--all", "--workspace",
     "--all-features", "--all-targets", "--benches", "--bins", "--build-plan",
     "--examples", "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--offline",
@@ -72,7 +104,7 @@ standalone = [
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--bench", "--bin", "--color", "--config", "--example",
+    "--bench", "--bin", "--color", "--example",
     "--features", "--jobs", "--manifest-path", "--message-format",
     "--package", "--profile", "--target", "--target-dir", "--test",
     "-Z", "-j", "-p",
@@ -89,7 +121,7 @@ standalone = [
     "-V", "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--bench", "--bin", "--color", "--config", "--example",
+    "--bench", "--bin", "--color", "--example",
     "--exclude", "--features", "--jobs", "--manifest-path", "--message-format",
     "--package", "--profile", "--target", "--target-dir", "--test",
     "-Z", "-j", "-p",
@@ -106,7 +138,7 @@ standalone = [
     "--version", "--workspace", "-V", "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--bench", "--bin", "--color", "--config", "--example",
+    "--bench", "--bin", "--color", "--example",
     "--exclude", "--features", "--jobs", "--manifest-path", "--message-format",
     "--package", "--profile", "--target", "--target-dir", "--test",
     "-Z", "-j", "-p",
@@ -121,7 +153,7 @@ standalone = [
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--color", "--config", "--exclude", "--features",
+    "--color", "--exclude", "--features",
     "--format", "--manifest-path", "--target", "--workspace",
 ]
 
@@ -129,24 +161,33 @@ valued = [
 name = "doc"
 level = "SafeWrite"
 standalone = [
-    "--all-features", "--bins", "--document-private-items", "--examples",
+    "--all", "--all-features", "--bins", "--document-private-items", "--examples",
     "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--locked", "--no-default-features", "--no-deps",
-    "--offline", "--open", "--release", "--timings", "--unit-graph",
+    "--offline", "--open", "--release", "--timings", "--unit-graph", "--workspace",
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--bin", "--color", "--config", "--example",
+    "--bin", "--color", "--example",
     "--features", "--jobs", "--manifest-path", "--message-format",
     "--package", "--profile", "--target", "--target-dir",
     "-Z", "-j", "-p",
 ]
 
+# fmt rewrites the current package/workspace's own source in place — a recoverable, local,
+# no-exec/no-net worktree edit (SafeWrite). It runs no build script (rustfmt parses, it does not
+# compile), so it is NOT an executor: pointing `--manifest-path` at a FOREIGN project only rewrites
+# that project's files, gated by the command-level `--manifest-path = "exec"` locus gate (which
+# denies /tmp/home/system targets, stricter than a write gate). `--check` reports diffs without
+# writing; it rides the same SafeWrite sub (a threshold user wanting it distinctly read-only is the
+# only case a future per-flag split would refine).
 [[command.sub]]
 name = "fmt"
-guard = "--check"
-level = "Inert"
-bare = false
+level = "SafeWrite"
+# No positionals: `cargo fmt` selects its target by --package/--manifest-path, never by path. This
+# also denies the `cargo fmt -- <rustfmt args>` passthrough, whose trailing FILE args rustfmt would
+# rewrite at an arbitrary (possibly out-of-workspace) locus we can't gate through the opaque `--`.
+max_positional = 0
 standalone = ["--all", "--check", "--help", "-h", "--quiet", "-q", "-v"]
 valued = ["--manifest-path", "--message-format", "--package", "-p"]
 
@@ -162,7 +203,7 @@ name = "info"
 level = "Inert"
 bare = false
 standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
-valued = ["--color", "--config", "--index", "--registry"]
+valued = ["--color", "--index", "--registry"]
 
 [[command.sub]]
 name = "install"
@@ -178,7 +219,7 @@ standalone = [
     "-f", "-h", "-q", "-v",
 ]
 valued = [
-    "--bin", "--color", "--config", "--example",
+    "--bin", "--color", "--example",
     "--features", "--jobs", "--message-format",
     "--path", "--profile", "--root",
     "--target", "--target-dir",
@@ -189,13 +230,13 @@ valued = [
 name = "license"
 level = "Inert"
 standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
-valued = ["--color", "--config", "--manifest-path"]
+valued = ["--color", "--manifest-path"]
 
 [[command.sub]]
 name = "locate-project"
 level = "Inert"
 standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
-valued = ["--color", "--config", "--manifest-path"]
+valued = ["--color", "--manifest-path"]
 
 [[command.sub]]
 name = "metadata"
@@ -206,7 +247,7 @@ standalone = [
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--color", "--config", "--features", "--filter-platform",
+    "--color", "--features", "--filter-platform",
     "--format-version", "--manifest-path",
 ]
 
@@ -224,7 +265,7 @@ standalone = [
     "-h", "-l", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--color", "--config", "--exclude", "--features",
+    "--color", "--exclude", "--features",
     "--index", "--jobs", "--lockfile-path",
     "--manifest-path", "--message-format",
     "--package", "--registry", "--target", "--target-dir",
@@ -235,7 +276,7 @@ valued = [
 name = "pkgid"
 level = "Inert"
 standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
-valued = ["--color", "--config", "--manifest-path"]
+valued = ["--color", "--manifest-path"]
 
 [[command.sub]]
 name = "publish"
@@ -251,7 +292,7 @@ standalone = [
     "-h", "-n", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--color", "--config", "--exclude", "--features",
+    "--color", "--exclude", "--features",
     "--index", "--jobs", "--lockfile-path", "--manifest-path",
     "--package", "--registry", "--target", "--target-dir",
     "-F", "-Z", "-j", "-p",
@@ -261,26 +302,40 @@ valued = [
 name = "read-manifest"
 level = "Inert"
 standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
-valued = ["--color", "--config", "--manifest-path"]
+valued = ["--color", "--manifest-path"]
 
+# `cargo run` compiles and runs THIS project's binary — the executor is the current project
+# (the dev loop), so it is allowed just like `cargo build`/`cargo test`, which already compile
+# and run project code. `--manifest-path DIR/Cargo.toml` (a foreign project) is denied by the
+# command-level path_gate above, uniformly across the cargo family. Positionals after `--` are
+# the program's own arguments (data, not gated).
 [[command.sub]]
 name = "run"
-level = "Inert"
-bare = false
-max_positional = 0
-standalone = ["--help", "-h"]
+executor = "project"
+bare = true
+standalone = [
+    "--all-features", "--frozen", "--help", "--ignore-rust-version",
+    "--locked", "--no-default-features", "--offline", "--release",
+    "--timings", "--unit-graph", "-h", "--quiet", "-q", "-v",
+]
+valued = [
+    "--bin", "--color", "--example", "--features",
+    "--jobs", "--manifest-path", "--message-format", "--package",
+    "--profile", "--target", "--target-dir", "-Z", "-j", "-p",
+]
 
 [[command.sub]]
 name = "search"
 level = "Inert"
 bare = false
 standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
-valued = ["--color", "--config", "--index", "--limit", "--registry"]
+valued = ["--color", "--index", "--limit", "--registry"]
 
 [[command.sub]]
 name = "test"
 level = "SafeRead"
 standalone = [
+    "--all",
     "--all-features", "--all-targets", "--benches", "--bins", "--doc",
     "--examples", "--frozen", "--future-incompat-report", "--help", "--ignore-rust-version",
     "--keep-going", "--lib", "--locked", "--no-default-features", "--no-fail-fast",
@@ -288,7 +343,7 @@ standalone = [
     "--workspace", "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--bench", "--bin", "--color", "--config", "--example", "--exclude",
+    "--bench", "--bin", "--color", "--example", "--exclude",
     "--features", "--jobs", "--manifest-path", "--message-format",
     "--package", "--profile", "--target", "--target-dir", "--test",
     "-Z", "-j", "-p",
@@ -303,7 +358,7 @@ standalone = [
     "-d", "-e", "-h", "-i", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--charset", "--color", "--config", "--depth", "--edges",
+    "--charset", "--color", "--depth", "--edges",
     "--features", "--format", "--invert", "--manifest-path",
     "--package", "--prefix", "--prune", "--target",
     "-p",
@@ -313,7 +368,7 @@ valued = [
 name = "verify-project"
 level = "Inert"
 standalone = ["--frozen", "--help", "--locked", "--offline", "-h", "--quiet", "-q", "-v"]
-valued = ["--color", "--config", "--manifest-path"]
+valued = ["--color", "--manifest-path"]
 
 [[command.sub]]
 name = "nextest"
@@ -329,7 +384,7 @@ standalone = [
     "-h",
 ]
 valued = [
-    "--bin", "--cargo-profile", "--color", "--config",
+    "--bin", "--cargo-profile", "--color",
     "--exclude", "--features", "--jobs", "--manifest-path",
     "--package", "--partition", "--profile", "--retries",
     "--target", "--target-dir", "--test", "--test-threads",
@@ -344,7 +399,7 @@ standalone = [
     "-T", "-h",
 ]
 valued = [
-    "--bin", "--color", "--config", "--exclude",
+    "--bin", "--color", "--exclude",
     "--features", "--manifest-path", "--message-format",
     "--package", "--partition", "--profile",
     "--target", "--target-dir", "--test",
@@ -423,7 +478,7 @@ standalone = [
 ]
 valued = [
     "--bin", "--branch", "--codecov", "--cobertura",
-    "--color", "--config", "--example", "--exclude",
+    "--color", "--example", "--exclude",
     "--features", "--ignore-filename-regex", "--ignore-run-fail",
     "--jobs", "--manifest-path", "--output-dir", "--output-path",
     "--package", "--profile", "--target", "--target-dir", "--test",
@@ -439,7 +494,7 @@ standalone = [
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--color", "--config", "--manifest-path", "--package",
+    "--color", "--manifest-path", "--package",
     "--precise",
     "-p",
 ]
@@ -451,7 +506,7 @@ standalone = [
     "--frozen", "--help", "--locked", "--offline",
     "-h", "--quiet", "-q", "-v",
 ]
-valued = ["--color", "--config", "--manifest-path"]
+valued = ["--color", "--manifest-path"]
 
 [[command.sub]]
 name = "version"
@@ -483,7 +538,7 @@ standalone = [
     "-h", "-n", "--quiet", "-q", "-r", "-v",
 ]
 valued = [
-    "--color", "--config", "--lockfile-path", "--manifest-path",
+    "--color", "--lockfile-path", "--manifest-path",
     "--package", "--profile", "--target", "--target-dir",
     "-Z", "-p",
 ]
@@ -496,7 +551,7 @@ standalone = [
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--color", "--config", "--lockfile-path",
+    "--color", "--lockfile-path",
     "--manifest-path", "--target",
     "-Z",
 ]
@@ -511,7 +566,7 @@ standalone = [
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--color", "--config", "--lockfile-path",
+    "--color", "--lockfile-path",
     "--manifest-path", "--sync",
     "-Z", "-s",
 ]
@@ -529,7 +584,7 @@ standalone = [
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--color", "--config", "--format", "--merged",
+    "--color", "--format", "--merged",
     "-Z",
 ]
 
@@ -544,7 +599,7 @@ standalone = [
     "-h", "--quiet", "-q", "-v",
 ]
 valued = [
-    "--color", "--config", "--id", "--package",
+    "--color", "--id", "--package",
     "-Z", "-p",
 ]
 
@@ -669,7 +724,7 @@ standalone = [
     "-V", "-h",
 ]
 valued = [
-    "--color", "--config", "--features", "--format",
+    "--color", "--features", "--format",
     "--manifest-path", "--name", "--target", "--threshold",
     "-L", "-c", "-m", "-n",
 ]
@@ -818,7 +873,7 @@ standalone = [
 ]
 valued = [
     "--asm-style", "--bench", "--build-type",
-    "--config", "--manifest-path",
+    "--manifest-path",
     "--package", "--target",
     "--target-cpu", "--target-dir",
     "--unstable",

@@ -8,3 +8,7 @@ bare = false
 standalone = ["--pretty", "--raw", "--xml"]
 valued = ["-f", "-i", "-o", "-p"]
 tolerate_unknown_short = true
+
+# -o/-f write the extracted entitlements; -i is the input blob. Format is chosen by --raw/--xml.
+[command.path_gate]
+flags = { "-o" = "write", "-f" = "write", "-i" = "read" }

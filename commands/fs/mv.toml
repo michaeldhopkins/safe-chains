@@ -16,3 +16,22 @@ valued = [
     "--backup", "--suffix", "--target-directory",
     "-S", "-t",
 ]
+
+# Declarative facet behavior: mv RELOCATES each source (removes it from its old location —
+# trivially reversible by moving back) and CREATES the destination (overwriting unless
+# --no-clobber), gated at both loci so `mv ~/.aws/creds ./x` and `mv ./x /etc/y` both deny. A
+# directory move is one rename, so there is no recursion-into-scale flag. `--backup` takes an
+# optional glued arg → BOOLEAN here (distinct from the legacy `valued` above). Replaces
+# `resolve_mv`.
+[command.behavior]
+operation = "create"
+positionals = "transfer"
+standalone = [
+    "--backup", "--force", "--help", "--interactive", "--no-clobber",
+    "--no-target-directory", "--strip-trailing-slashes", "--update", "--verbose", "--version",
+    "-T", "-f", "-h", "-i", "-n", "-u", "-v",
+]
+valued = ["-S", "-t", "--suffix", "--target-directory"]
+[command.behavior.transfer]
+source = "relocate"
+no_clobber_flags = ["-n", "--no-clobber"]

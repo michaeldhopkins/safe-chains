@@ -17,3 +17,22 @@ valued = [
     "-S", "-t",
 ]
 examples_safe = ["ln -s ./target ./link", "ln ./a ./b"]
+
+# Declarative facet behavior: ln READS its target (the link bridges to the target's locus —
+# cp-by-reference, so a home/system target denies just as a cp source would) and CREATES the
+# link entry at the destination. Default is no-clobber; `-f`/`--force` overwrites an existing
+# entry (recoverable). `--backup` takes an optional glued arg → BOOLEAN here (distinct from the
+# legacy `valued` above). Replaces `resolve_ln`.
+[command.behavior]
+operation = "create"
+positionals = "transfer"
+standalone = [
+    "--backup", "--directory", "--force", "--help", "--interactive", "--logical",
+    "--no-dereference", "--no-target-directory", "--physical", "--relative", "--symbolic",
+    "--verbose", "--version",
+    "-F", "-L", "-P", "-T", "-d", "-f", "-h", "-i", "-n", "-r", "-s", "-v", "-w",
+]
+valued = ["-S", "-t", "--suffix", "--target-directory"]
+[command.behavior.transfer]
+source = "observe"
+clobber_flags = ["-f", "--force"]

@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use serde::Deserialize;
 use serde_json::{Map, Value, json};
 
-use super::{HookFormat, HookInput, HookResponse, InstallOutcome, ParseError, Target, allow_reason};
+use super::{HookFormat, HookInput, HookResponse, InstallOutcome, ParseError, Target};
 use crate::verdict::Verdict;
 
 pub struct CodexTarget;
@@ -91,25 +91,35 @@ impl HookFormat for CodexHookFormat {
         })
     }
 
-    fn render_response(&self, verdict: Verdict) -> HookResponse {
-        if verdict.is_allowed() {
-            let reason = allow_reason(verdict);
-            let body = json!({
-                "hookSpecificOutput": {
-                    "hookEventName": "PreToolUse",
-                    "permissionDecision": "allow",
-                    "permissionDecisionReason": reason,
-                }
-            });
-            HookResponse {
-                stdout: serde_json::to_string(&body).unwrap_or_default(),
-                exit_code: 0,
+    fn render_response(&self, _verdict: Verdict) -> HookResponse {
+        // SAFE command → emit nothing. Codex has no `grant`: `permissionDecision:"allow"` is
+        // rejected as unsupported on v0.144.3 (docs list it, but it errored — version drift), and
+        // Codex "continues on unsupported output" anyway. Silence lets the safe command run through
+        // Codex's own flow, version-robustly. (Gated commands go through `render_deny`, not here.)
+        HookResponse {
+            stdout: String::new(),
+            exit_code: 0,
+        }
+    }
+
+    // Codex has no human-review-on-silence (only sandbox-escape prompts) and no `ask`, but its
+    // sandbox permits BROAD READS (`cat /etc/shadow` runs), so a gated command must be denied by
+    // the hook. See docs/design/harness-capability-model.md. Verified against v0.144.3, 2026-07-13.
+    fn gated_policy(&self) -> super::GatedPolicy {
+        super::GatedPolicy::Deny
+    }
+
+    fn render_deny(&self, reason: &str) -> HookResponse {
+        let body = json!({
+            "hookSpecificOutput": {
+                "hookEventName": "PreToolUse",
+                "permissionDecision": "deny",
+                "permissionDecisionReason": reason,
             }
-        } else {
-            HookResponse {
-                stdout: String::new(),
-                exit_code: 0,
-            }
+        });
+        HookResponse {
+            stdout: serde_json::to_string(&body).unwrap_or_default(),
+            exit_code: 0,
         }
     }
 }
@@ -126,7 +136,8 @@ fn hook_entry(binary: &str) -> Value {
 
 fn has_safe_chains_hook(settings: &Value) -> bool {
     settings
-        .get("PreToolUse")
+        .get("hooks")
+        .and_then(|h| h.get("PreToolUse"))
         .and_then(|arr| arr.as_array())
         .is_some_and(|entries| {
             entries.iter().any(|entry| {
@@ -148,15 +159,25 @@ fn add_hook(settings: &mut Value, binary: &str) {
     if !settings.is_object() {
         *settings = json!({});
     }
-    let Some(obj) = settings.as_object_mut() else {
-        unreachable!("settings was just set to an object");
-    };
-    let pre_tool_use = obj
+    let obj = settings.as_object_mut().expect("settings was just set to an object");
+    // Codex nests lifecycle events under a top-level `hooks` object (NOT Claude's flat
+    // `PreToolUse` key) — a flat key makes Codex reject the whole file. See developers.openai.com/codex/hooks.
+    let hooks = obj.entry("hooks").or_insert_with(|| json!({}));
+    if !hooks.is_object() {
+        *hooks = json!({});
+    }
+    let pre_tool_use = hooks
+        .as_object_mut()
+        .expect("hooks was just set to an object")
         .entry("PreToolUse")
-        .or_insert_with(|| json!([]))
+        .or_insert_with(|| json!([]));
+    if !pre_tool_use.is_array() {
+        *pre_tool_use = json!([]);
+    }
+    pre_tool_use
         .as_array_mut()
-        .expect("PreToolUse key was created above as an array");
-    pre_tool_use.push(hook_entry(binary));
+        .expect("PreToolUse was just set to an array")
+        .push(hook_entry(binary));
 }
 
 #[cfg(test)]
@@ -184,6 +205,10 @@ mod tests {
         let contents = std::fs::read_to_string(dir.path().join(".codex/hooks.json")).unwrap();
         let settings: Value = serde_json::from_str(&contents).unwrap();
         assert!(has_safe_chains_hook(&settings));
+        // Codex nests events under a top-level `hooks` object; a flat top-level `PreToolUse`
+        // (Claude's shape) makes Codex reject the entire file (`unknown field PreToolUse`).
+        assert!(settings.get("hooks").and_then(|h| h.get("PreToolUse")).is_some());
+        assert!(settings.get("PreToolUse").is_none(), "must not use Claude's flat PreToolUse key");
     }
 
     #[test]
@@ -247,25 +272,28 @@ mod tests {
     }
 
     #[test]
-    fn render_response_allow_emits_allow_envelope() {
+    fn render_response_safe_emits_empty_body() {
+        // Codex has no `grant` — `permissionDecision:"allow"` is unsupported on v0.144.3. A safe
+        // command emits nothing (Codex continues → runs it); it must NOT emit an allow envelope.
         let r = CodexHookFormat.render_response(Verdict::Allowed(SafetyLevel::Inert));
-        let v: Value = serde_json::from_str(&r.stdout).unwrap();
-        assert_eq!(
-            v.pointer("/hookSpecificOutput/permissionDecision")
-                .and_then(|d| d.as_str()),
-            Some("allow"),
-        );
-        assert_eq!(
-            v.pointer("/hookSpecificOutput/hookEventName")
-                .and_then(|d| d.as_str()),
-            Some("PreToolUse"),
-        );
+        assert_eq!(r.stdout, "");
+        let r = CodexHookFormat.render_response(Verdict::Denied);
+        assert_eq!(r.stdout, "");
     }
 
     #[test]
-    fn render_response_deny_emits_empty_body() {
-        let r = CodexHookFormat.render_response(Verdict::Denied);
-        assert_eq!(r.stdout, "");
+    fn gated_command_is_denied_with_the_supported_shape() {
+        // Codex handles a gated command by DENYING (no interactive approval, sandbox permits reads).
+        assert_eq!(CodexHookFormat.gated_policy(), super::super::GatedPolicy::Deny);
+        let r = CodexHookFormat.render_deny("blocked: not on the allowlist");
+        let v: Value = serde_json::from_str(&r.stdout).unwrap();
+        assert_eq!(v.pointer("/hookSpecificOutput/permissionDecision").and_then(|d| d.as_str()), Some("deny"));
+        assert_eq!(v.pointer("/hookSpecificOutput/hookEventName").and_then(|d| d.as_str()), Some("PreToolUse"));
+        assert_eq!(
+            v.pointer("/hookSpecificOutput/permissionDecisionReason").and_then(|d| d.as_str()),
+            Some("blocked: not on the allowlist"),
+        );
+        assert_eq!(r.exit_code, 0);
     }
 
     #[test]

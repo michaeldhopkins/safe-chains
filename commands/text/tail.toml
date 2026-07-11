@@ -13,3 +13,17 @@ standalone = [
 ]
 valued = ["-b", "-c", "-n", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]
 examples_safe = ["tail -n 50 src/main.rs", "tail -f ./app.log"]
+
+# Declarative facet behavior: tail OBSERVES a bounded suffix of each file (content → the model),
+# gated per-operand by locus. `-f`/`--follow` keeps reading appended data but never writes.
+# Replaces `resolve_tail`.
+[command.behavior]
+operation = "observe"
+positionals = "read"
+numeric_shorthand = true
+standalone = [
+    "-F", "-V", "-f", "-h", "-q", "-r", "-v", "-z",
+    "--follow", "--help", "--quiet", "--retry", "--silent",
+    "--verbose", "--version", "--zero-terminated",
+]
+valued = ["-b", "-c", "-n", "--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"]

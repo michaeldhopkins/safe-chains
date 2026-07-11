@@ -7,3 +7,13 @@ level = "SafeWrite"
 bare = false
 standalone = ["--help", "-h"]
 valued = ["--convert", "--output", "-c", "-o"]
+examples_safe = ["iconutil -c iconset -o ./out.iconset app.icns"]
+examples_denied = [
+  "iconutil -c icns -o /etc/cron.d/job x.iconset",
+  "iconutil -c iconset -o ./out ~/.ssh/id_rsa",
+]
+
+# -o/--output writes the converted icon; the positional is the .iconset/.car source (a read).
+[command.path_gate]
+positional = "read"
+flags = { "-o" = "write", "--output" = "write" }

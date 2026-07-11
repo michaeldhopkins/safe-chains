@@ -25,6 +25,7 @@ pub mod android;
 pub mod coreutils;
 pub mod forges;
 pub mod fuzzy;
+pub mod interpreter;
 pub mod jvm;
 pub mod magick;
 pub mod network;
@@ -49,6 +50,7 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
     HashMap::from([
         ("gh", forges::gh::is_safe_gh as HandlerFn),
         ("glab", forges::glab::is_safe_glab as HandlerFn),
+        ("interpreter", interpreter::check_interpreter as HandlerFn),
         ("magick", magick::is_safe_magick as HandlerFn),
         ("php", php::is_safe_php as HandlerFn),
         ("ssh", system::ssh::check_ssh as HandlerFn),
@@ -63,7 +65,6 @@ pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
         ("bundle_config", ruby::bundle::check_bundle_config as HandlerFn),
         ("bundle_exec", ruby::bundle::check_bundle_exec as HandlerFn),
         ("gh_api", forges::gh::is_safe_gh_api as HandlerFn),
-        ("git_remote", vcs::git::check_git_remote as HandlerFn),
         ("laravel_cache_clear", php::check_laravel_cache_clear as HandlerFn),
         ("plutil_convert", system::plutil::check_plutil_convert as HandlerFn),
         ("plutil_extract", system::plutil::check_plutil_extract as HandlerFn),
@@ -72,7 +73,7 @@ pub fn custom_sub_handlers() -> HashMap<&'static str, HandlerFn> {
 
 pub fn dispatch(tokens: &[Token]) -> Verdict {
     let cmd = tokens[0].command_name();
-    None
+    let verdict = None
         .or_else(|| crate::registry::custom_dispatch(tokens))
         .or_else(|| shell::dispatch(cmd, tokens))
         .or_else(|| wrappers::dispatch(cmd, tokens))
@@ -86,7 +87,17 @@ pub fn dispatch(tokens: &[Token]) -> Verdict {
         .or_else(|| fuzzy::dispatch(cmd, tokens))
         .or_else(|| vcs::dispatch(cmd, tokens))
         .or_else(|| crate::registry::toml_dispatch(tokens))
-        .unwrap_or(Verdict::Denied)
+        .unwrap_or(Verdict::Denied);
+    // Cross-cutting path-operand gate (audit fix): a legacy content-reader/writer must not
+    // read/write a sensitive path just because its own handler ignored the operand's locus.
+    // Canonicalize through the alias map (`gtee` → `tee`) so a Homebrew g-alias hits the same
+    // role table its base name does — otherwise the alias sails past this gate (`gtee /etc/x`).
+    if verdict.is_allowed()
+        && crate::pathgate::should_deny(crate::registry::canonical_name(cmd), tokens)
+    {
+        return Verdict::Denied;
+    }
+    verdict
 }
 
 pub fn handler_docs() -> Vec<crate::docs::CommandDoc> {
@@ -182,7 +193,7 @@ mod tests {
 
     #[test]
     fn process_substitution_safe_inner() {
-        let safe = ["echo <(cat /etc/passwd)", "grep pattern <(ls)", "diff <(sort a.txt) <(sort b.txt)", "comm -23 file.txt <(sort other.txt)"];
+        let safe = ["echo <(cat ./data.txt)", "grep pattern <(ls)", "diff <(sort a.txt) <(sort b.txt)", "comm -23 file.txt <(sort other.txt)"];
         for cmd in &safe {
             assert!(crate::is_safe_command(cmd), "safe process substitution rejected: {cmd}");
         }

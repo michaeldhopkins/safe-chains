@@ -5,6 +5,9 @@ url = "https://gohugo.io/commands/hugo/"
 researched_version = "Hugo 0.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
 
+[command.path_gate]
+flags = { "--destination" = "write" }
+
 [[command.sub]]
 name = "version"
 standalone = ["--help", "-h"]

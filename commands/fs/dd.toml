@@ -1,0 +1,18 @@
+[[command]]
+name = "dd"
+description = "Low-level data copier/converter. Reads from `if=` (default stdin) and writes to `of=` (default stdout) in blocks, with `bs`/`count`/`skip`/`seek`/`conv`/… controlling sizing and transformation. It is a transfer at the facet level — the input is a read gated by its locus and the output a write gated by its locus — but the roles arrive inside `key=value` operands, not positional slots, so it needs a custom parser. Dangerous when the output is a raw block/char device (`of=/dev/rdisk0` overwrites a disk irreversibly) or a system/home path; both deny on the output locus, and reading a secret input (`if=~/.ssh/id_rsa`) denies on the input locus. No network, no code execution. Part of GNU/BSD coreutils; the operand set is long-frozen."
+url = "https://www.gnu.org/software/coreutils/manual/coreutils.html#dd-invocation"
+researched_version = "GNU coreutils 9.x + BSD dd (macOS 15)"
+level = "SafeRead"
+bare = false
+examples_safe = ["dd if=./in of=./out bs=1M"]
+examples_denied = ["dd if=~/.ssh/id_rsa of=./x", "dd if=./x of=/etc/hosts", "dd if=./x of=/dev/rdisk0"]
+
+# Declarative facet behavior: dd's `key=value` operand syntax (`if=`/`of=` plus benign params)
+# is not getopt-positional, so a thin `dd` hook parses it and builds the transfer profile — `if=`
+# reads at its locus, `of=` writes at its locus; an unknown key or a non-`key=value` operand
+# worst-cases. Replaces the hardcoded `resolve_dd`.
+[command.behavior]
+operation = "create"
+positionals = "none"
+hook = "dd"

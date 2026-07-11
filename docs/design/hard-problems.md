@@ -330,6 +330,42 @@ in at the capability-builder seam (`read_locus`/`write_locus`). `reads_secret`, 
 system-config writes, and a `trigger-surface` role are modeled in the region table and left as
 sequenced enrichments. Ships with the engine's go-live as the default.
 
+### HP-21 · The trust root sits in an agent-writable location — `status: partial`
+safe-chains reads its grants (and the repo-pinning `[[trusted]]` list) from
+`~/.config/safe-chains.toml`, and trusts that file *completely* — a grant there can open
+read/write anywhere. But nothing makes the file itself unwritable by the agent: it lives in an
+ordinary home path, no harness "blesses" a protected third-party config location (yet), and the
+write-block we apply is best-effort (a command-string classifier can't stop a `python`/editor
+write). If the agent can influence **what file gets loaded as the trust root**, every guarantee
+is theater — it just plants a "grant everything" config and runs. This is the same shape as an
+agent dropping a `.safe-chains.toml` to escalate its own trust (HP-17's forgeability problem) —
+a self-escalation of the config that governs the checker.
+*Attack surface narrowed (2026-07-12):* removed `XDG_CONFIG_HOME` support — the config is now read
+**only** from `~/.config/safe-chains.toml`. `XDG_CONFIG_HOME` is an agent-mutable env var, so
+honoring it meant an agent could point the trust root at a writable dir (e.g. scratch), plant a
+config there (a scratch write self-approves), and have safe-chains load it as fully trusted. The
+exploit was **latent for Claude Code** (its hook runs in the harness's process env, not the
+agent's mutable shell env, so `export XDG_CONFIG_HOME` never reaches the hook) — but we **must
+not depend on being run only in Claude Code**; other harnesses may pass the agent's environment
+to the hook, making it live. Dropping XDG is a cheap, self-contained closure of that vector, and
+losing user-selectable config locations is a common, acceptable stance for a security-sensitive
+CLI. *`HOME` is the same lever, deferred by decision (2026-07-12):* the config location is still
+derived from `$HOME` (`~/.config/safe-chains.toml`), and `$HOME` is itself an agent-mutable env
+var — a strictly MORE powerful one than XDG (a fake `$HOME` with a "grant everything" config loads
+as fully trusted; verified `HOME=$FAKE safe-chains "echo x > /etc/foo"` → ALLOW). The XDG-removal
+rationale applies to it verbatim. **Decision: do NOT switch to `getpwuid(getuid())` now.** Reasons:
+(1) `$HOME` is set by the OS login path (`login`/`sshd`/`launchd`+PAM) from the same user database
+`getpwuid` reads, so in the normal case they're identical — the "fix" re-derives the same value;
+(2) unlike XDG (a gratuitous, usually-unset extra lever), `$HOME` is the unavoidable Unix
+mechanism, and overriding it would BREAK legitimate custom-`$HOME` setups (containers, CI,
+multi-account, dotfile managers); (3) the exposure is the same latent "harness forwards
+agent-controlled env to the hook" case no current target does — and a harness that did has already
+handed over the keys, so `getpwuid` wouldn't save it. Tracked as a residual, not a fix. *Still open
+(the real fix):* a **protected config location** a harness guarantees the agent cannot write, or
+integrity-verifying the config the way repo `.safe-chains.toml` is SHA-pinned. Until one exists,
+the trust root remains best-effort protected. Connects to HP-17 (unforgeable human grants) and the
+config-write abstain decision.
+
 ---
 
 ## Parked policy decisions

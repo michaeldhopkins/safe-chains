@@ -5,6 +5,10 @@ url = "https://terragrunt.gruntwork.io/"
 researched_version = "terragrunt 0.x"
 bare_flags = ["--help", "--version", "-h"]
 
+# render-json writes the rendered config to --out.
+[command.path_gate]
+flags = { "--out" = "write" }
+
 [[command.sub]]
 name = "terragrunt-info"
 level = "SafeRead"

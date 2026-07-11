@@ -1,10 +1,33 @@
 [[command]]
 name = "ruby"
-description = "Ruby interpreter. `ruby script.rb` executes the script. `-c` is a parse-only syntax check — it does not execute the script body, BEGIN blocks, or END blocks; just prints `Syntax OK` or a parse error and exits. `-e CODE` runs inline code, `-r LIB` requires (loads and executes) a library, `-x` finds a `#!ruby` line in the file and starts execution from there. Ruby's CLI surface is very stable across major releases; flag semantics do not change between minor versions."
+description = "Ruby interpreter. `ruby script.rb` executes the script; `-e CODE` runs inline code; `-r LIB` requires (loads and executes) a library; `-x` finds a `#!ruby` line in the file and starts execution from there; a bare invocation reads a program from stdin. Each executes arbitrary code with the invoking user's permissions. `-c` is a parse-only syntax check — it does not execute the script body, BEGIN blocks, or END blocks; it prints `Syntax OK` or a parse error and exits. `--version`/`--help` are informational. Ruby's CLI surface is very stable across major releases; flag semantics do not change between minor versions."
 url = "https://www.ruby-lang.org/en/documentation/"
 researched_version = "Ruby 3.4.2 (2025-02-15)"
+handler = "interpreter"
+doc_body = "Allowed: `--version`/`--help` (informational), `-c FILE` (parse-only syntax check, runs no code), and running a WORKSPACE-local script (`ruby ./rakefile.rb`, `ruby task.rb`) — the dev loop. The first positional is the script to run; further positionals are its arguments."
+examples_safe = [
+  "ruby --version",
+  "ruby --help",
+  "ruby -c script.rb",
+  "ruby ./rakefile.rb",
+  "ruby task.rb",
+]
+examples_denied = [
+  "ruby /tmp/evil.rb",
+  "ruby ~/Downloads/x.rb",
+  "ruby -e 'x'",
+  "ruby -r ./evil",
+  "ruby ../x.rb",
+  "ruby",
+]
+
+# `-c` consumes the target file as its VALUE (parse-only syntax check, runs nothing), so that
+# form leaves no positional and stays Inert. A bare first positional is the SCRIPT, gated as an
+# executor (`executor = true`): workspace-local allows, foreign denies. Inline (`-e`),
+# require (`-r`), and `-x` are absent from the allowlist, so they deny.
+[command.fallback]
+executor = "file"
 level = "Inert"
 bare = false
-max_positional = 0
 standalone = ["--help", "--version", "-V", "-h", "-v"]
 valued = ["-c"]

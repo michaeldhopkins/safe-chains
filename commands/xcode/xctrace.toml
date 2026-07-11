@@ -4,6 +4,10 @@ description = "Command-line front-end to Instruments for recording, importing, e
 url = "https://keith.github.io/xcode-man-pages/xctrace.1.html"
 researched_version = "Xcode 15 / macOS 14 (man page dated 2023-01-03)"
 
+# --output is the written .trace/export; --input the source trace/foreign format (used across subs).
+[command.path_gate]
+flags = { "--output" = "write", "--input" = "read" }
+
 [[command.sub]]
 name = "help"
 allow_all = true

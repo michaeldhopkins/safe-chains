@@ -16,6 +16,12 @@ valued = [
     "--outfile", "--podpath", "--podroot", "--title",
 ]
 
+# --outfile writes HTML, --cachedir writes a cache file; --infile and the positional are POD sources.
+# --css/--htmlroot are stylesheet/URL references, --podpath/--podroot are colon-list search paths.
+[command.path_gate]
+positional = "read"
+flags = { "--outfile" = "write", "--cachedir" = "write", "--infile" = "read" }
+
 [[command]]
 name = "pod2man"
 description = "POD-to-*roff converter (Pod::Man frontend) for generating manual pages. Reads POD from a positional input file (or stdin) and writes nroff/troff to a positional output file or stdout. Accepts pairs of input/output for batch conversion. Defaults to stdout but writes files when output positionals are present; classified at the higher level. Bundled with Perl core (podlators distribution); active maintenance, occasional minor releases."
@@ -33,6 +39,11 @@ valued = [
     "--quotes", "--release", "--rquote", "--section",
     "-c", "-d", "-n", "-q", "-r", "-s",
 ]
+
+# Positionals are input/output pairs (SOURCE… DEST); the last one is the written *roff file.
+[command.path_gate]
+positional = "read"
+shape = "last_write"
 
 [[command]]
 name = "pod2text"
@@ -52,6 +63,11 @@ valued = [
     "-i", "-m", "-q", "-w",
 ]
 
+# Positionals are input/output pairs (SOURCE… DEST); the last one is the written text file.
+[command.path_gate]
+positional = "read"
+shape = "last_write"
+
 [[command]]
 name = "pod2usage"
 description = "Pod::Usage frontend that prints the SYNOPSIS / OPTIONS section of a POD document as a usage message. Reads from a positional input file or stdin and writes to --output or stdout. Bundled with Perl core (Pod-Usage distribution)."
@@ -61,6 +77,11 @@ level = "SafeWrite"
 bare = true
 standalone = ["-help", "-man", "-utf8"]
 valued = ["-exit", "-formatter", "-output", "-pathlist", "-verbose"]
+
+# -output writes the usage message; the positional is the POD input file. -formatter is a class, -pathlist a search list.
+[command.path_gate]
+positional = "read"
+flags = { "-output" = "write" }
 
 [[command]]
 name = "pod2readme"
@@ -74,6 +95,11 @@ standalone = [
     "-F", "-b", "-c", "-h",
 ]
 valued = ["--format", "--output", "--target", "-f", "-o", "-t"]
+
+# --output/-o writes the README; the positional is the module source file. --format/--target are format names.
+[command.path_gate]
+positional = "read"
+flags = { "--output" = "write", "-o" = "write" }
 
 [[command]]
 name = "podchecker"

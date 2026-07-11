@@ -17,3 +17,6 @@ valued = [
     "--output-file",
     "-o",
 ]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }

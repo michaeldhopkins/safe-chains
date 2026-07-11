@@ -5,6 +5,10 @@ url = "https://orm.drizzle.team/docs/kit-overview"
 researched_version = "drizzle-kit 0.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
 
+# --out is the migrations output directory generate writes to (also read by check/up).
+[command.path_gate]
+flags = { "--out" = "write" }
+
 [[command.sub]]
 name = "generate"
 level = "SafeWrite"

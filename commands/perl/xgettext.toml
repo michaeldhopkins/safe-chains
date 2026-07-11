@@ -15,3 +15,6 @@ valued = [
     "--output-dir", "--plugin",
     "-D", "-P", "-d", "-f", "-o", "-p",
 ]
+
+[command.path_gate]
+flags = { "--output-dir" = "write" }

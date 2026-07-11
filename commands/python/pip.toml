@@ -5,6 +5,9 @@ aliases = ["pip3"]
 url = "https://pip.pypa.io/en/stable/cli/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
+[command.path_gate]
+flags = { "--dest" = "write", "-d" = "write" }
+
 [[command.sub]]
 name = "list"
 standalone = [

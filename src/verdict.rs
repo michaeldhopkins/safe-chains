@@ -27,6 +27,34 @@ impl Verdict {
     }
 }
 
+impl SafetyLevel {
+    /// Resolve a `--level` threshold name to its ceiling. Accepts the current level names
+    /// (`paranoid`/`reader`/`editor`/`developer`/`local-admin`/`network-admin`/`yolo`) and the
+    /// three legacy names (`inert`/`safe-read`/`safe-write`). Returns the ceiling plus, for a
+    /// legacy name, the current name it maps to (so the CLI can print a migration notice).
+    /// `None` for an unknown name.
+    ///
+    /// The engine projects to this coarse 3-value ceiling today, so `editor`/`developer` and the
+    /// `local-admin`/`network-admin`/`yolo` levels all share the `SafeWrite` ceiling — they
+    /// become functionally distinct thresholds once the engine exposes per-level classification
+    /// (the `level.admits(profile)` check) rather than the 3-value projection.
+    pub fn resolve_threshold(name: &str) -> Option<(SafetyLevel, Option<&'static str>)> {
+        Some(match name {
+            "paranoid" => (SafetyLevel::Inert, None),
+            "reader" => (SafetyLevel::SafeRead, None),
+            "editor" | "developer" | "local-admin" | "network-admin" | "yolo" => {
+                (SafetyLevel::SafeWrite, None)
+            }
+            // Legacy names — kept working so existing setups/muscle-memory don't break; the CLI
+            // prints a one-line notice pointing at the current name.
+            "inert" => (SafetyLevel::Inert, Some("paranoid")),
+            "safe-read" => (SafetyLevel::SafeRead, Some("reader")),
+            "safe-write" => (SafetyLevel::SafeWrite, Some("developer")),
+            _ => return None,
+        })
+    }
+}
+
 impl fmt::Display for SafetyLevel {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -68,6 +96,27 @@ mod tests {
     fn level_ordering() {
         assert!(SafetyLevel::Inert < SafetyLevel::SafeRead);
         assert!(SafetyLevel::SafeRead < SafetyLevel::SafeWrite);
+    }
+
+    #[test]
+    fn threshold_names_map_new_and_legacy() {
+        // current names — no legacy notice
+        assert_eq!(SafetyLevel::resolve_threshold("paranoid"), Some((SafetyLevel::Inert, None)));
+        assert_eq!(SafetyLevel::resolve_threshold("reader"), Some((SafetyLevel::SafeRead, None)));
+        assert_eq!(SafetyLevel::resolve_threshold("editor"), Some((SafetyLevel::SafeWrite, None)));
+        assert_eq!(SafetyLevel::resolve_threshold("developer"), Some((SafetyLevel::SafeWrite, None)));
+        assert_eq!(SafetyLevel::resolve_threshold("yolo"), Some((SafetyLevel::SafeWrite, None)));
+
+        // legacy names — same ceiling as before, carrying the current name for the notice
+        assert_eq!(SafetyLevel::resolve_threshold("inert"), Some((SafetyLevel::Inert, Some("paranoid"))));
+        assert_eq!(SafetyLevel::resolve_threshold("safe-read"), Some((SafetyLevel::SafeRead, Some("reader"))));
+        assert_eq!(SafetyLevel::resolve_threshold("safe-write"), Some((SafetyLevel::SafeWrite, Some("developer"))));
+
+        // the legacy inputs preserve their historical ceiling exactly (no setup breaks)
+        assert_eq!(SafetyLevel::resolve_threshold("inert").unwrap().0, SafetyLevel::Inert);
+        assert_eq!(SafetyLevel::resolve_threshold("safe-write").unwrap().0, SafetyLevel::SafeWrite);
+
+        assert_eq!(SafetyLevel::resolve_threshold("nonsense"), None);
     }
 
     #[test]

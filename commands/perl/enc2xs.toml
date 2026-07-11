@@ -7,3 +7,7 @@ level = "SafeWrite"
 bare = false
 standalone = ["-Q", "-q", "-v"]
 valued = ["-M", "-f", "-o"]
+
+# -o names the output directory for the generated XS skeleton. -M is a module name, not a path.
+[command.path_gate]
+flags = { "-o" = "write" }

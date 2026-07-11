@@ -141,4 +141,13 @@ candidate = true
 
 [[command.sub]]
 name = "init"
-candidate = true
+level = "Inert"
+bare = false
+max_positional = 1
+standalone = ["-", "--help", "-h"]
+require_any = ["-"]
+# `eval "$(jenv init -)"` loads jenv's shell integration; `-` emits shell-init code to stdout.
+# `require_any = ["-"]` denies bare `jenv init`, which prints human-readable setup instructions
+# (not eval-able code) — so only the `-` form is eval-safe. Mirrors rbenv/pyenv `init`.
+eval_safe = true
+eval_safe_flags = ["-"]

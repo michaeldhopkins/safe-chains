@@ -2,8 +2,24 @@
 name = "porter"
 description = "Porter's PaaS CLI for deploying applications onto Porter-managed Kubernetes clusters. Authenticates against the Porter API via browser-based OAuth (`porter auth login`) or a long-lived API token (`PORTER_TOKEN` env var or `--token`); credentials and the active project/cluster pointer are persisted to `~/.porter/config.json`. Read-only operations issue HTTPS API queries that fetch project, cluster, target, and application metadata, list environment groups and their variable names (no values are printed without an explicit `pull`/`--show-token`), tail container logs, and dump the resolved porter.yaml for an app. Mutating operations include `porter apply` (build a container image and roll out a new revision from porter.yaml), `porter app build/push/create/update/update-tag/rollback` (image build, registry push, app creation, config edits, tag swap, revision revert), `porter app run` (provision a temporary replica in the remote cluster and execute a one-off command inside the application's environment — flags include `--cpu`, `--ram`, `--job`, `--allow-concurrent`, and a paired `porter app run cleanup` that deletes the leftover replicas; this is remote one-off process semantics, not a local env-loading wrapper), `porter env create/set/unset/pull` (write env-group variables and secrets, with `pull` exfiltrating remote secret values to a local .env file), `porter datastore connect` (open a localhost-bound TCP tunnel proxying to a Porter-managed database, intended for use with psql/redis-cli/mongosh against live data), and `porter config set-project`/`set-cluster` (rewrite the local active-context pointer in `~/.porter/config.json`). Written in Go at github.com/porter-dev/porter; minor releases land roughly weekly with frequent flag-surface churn on the app and apply commands."
 url = "https://docs.porter.run/standard/cli"
-researched_version = "github.com/porter-dev/porter @ master, 2026-05-08"
+researched_version = "docs.porter.run standard CLI command-reference, re-verified 2026-07-16 (github.com/porter-dev/porter source now private)"
 bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "porter app list",
+    "porter cluster list",
+    "porter project list",
+    "porter target list",
+    "porter env list",
+    "porter config",
+    "porter config set-project 123",
+]
+examples_denied = [
+    "porter config --show-token",
+    "porter app run web -- /bin/sh",
+    "porter app create",
+    "porter env pull -f .env",
+    "porter apply",
+]
 
 [[command.sub]]
 name = "app"
@@ -23,31 +39,46 @@ standalone = ["--helm-overrides", "--help", "-h"]
 valued = ["--cluster", "--project"]
 [[command.sub.sub]]
 name = "build"
-candidate = true
+profile = "remote-mutate"
+fact = "\"Builds a new version of the specified app. Attempts to use any build settings previously configured for the app.\" — produces a new app image version against the control plane over the API."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-app — `porter app build`"
 [[command.sub.sub]]
 name = "create"
-candidate = true
+profile = "remote-create"
+fact = "\"Creates and deploys a new app in your project.\" — provisions a new application on the Porter-managed cluster via the HTTPS API."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-app — `porter app create`"
 [[command.sub.sub]]
 name = "exec"
 candidate = true
 [[command.sub.sub]]
 name = "logs"
-candidate = true
+standalone = ["--help", "-h"]
+valued = ["--cluster", "--project"]
 [[command.sub.sub]]
 name = "push"
-candidate = true
+profile = "remote-mutate"
+fact = "\"Pushes the specified app to your default Porter registry. If no tag is specified, the latest commit SHA from the current branch will be used as the tag.\" — writes an image artifact into the remote registry."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-app — `porter app push`"
 [[command.sub.sub]]
 name = "rollback"
-candidate = true
+profile = "remote-control"
+fact = "\"Rolls back an application to the last successful revision.\" — changes the running deployment to a previous revision via the control plane."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-app — `porter app rollback`"
 [[command.sub.sub]]
 name = "run"
-candidate = true
+profile = "remote-exec"
+fact = "\"Runs a command inside your application's environment. By default, this spins up an ephemeral copy of your application\"; with `-e` it execs inside an existing running replica — arbitrary caller-supplied command execution inside a remote container."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-app — `porter app run`"
 [[command.sub.sub]]
 name = "update"
-candidate = true
+profile = "remote-mutate"
+fact = "\"Updates the specified app with the provided configuration. This command differs from `porter apply` in that it only updates the app, but does not attempt to build a new image.\" — mutates remote app config."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-app — `porter app update`"
 [[command.sub.sub]]
 name = "update-tag"
-candidate = true
+profile = "remote-mutate"
+fact = "\"Updates the image tag for an application. This is functionally equivalent to running `porter apply` or `porter app update` with the `--tag` flag.\" — swaps the deployed image, triggering a redeploy."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-app — `porter app update-tag`"
 
 [[command.sub]]
 name = "auth"
@@ -72,7 +103,7 @@ valued = ["--cluster", "--project"]
 [[command.sub]]
 name = "config"
 nested_bare = true
-standalone = ["--help", "--show-token", "-h"]
+standalone = ["--help", "-h"]
 valued = ["--cluster", "--project"]
 [[command.sub.sub]]
 name = "set-project"
@@ -95,16 +126,25 @@ standalone = ["--help", "-h"]
 valued = ["--cluster", "--project"]
 [[command.sub.sub]]
 name = "create"
-candidate = true
+profile = "remote-create"
+fact = "\"Establishes new environment groups with optional initial variables and secrets\" (flags --name, -v, -s) — creates a remote env group on the control plane."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-env — `porter env create`"
 [[command.sub.sub]]
 name = "pull"
-candidate = true
+profile = "credential-read"
+fact = "\"Pull environment variables from an environment group to your local machine.\" Retrieves both variables AND secret values by default and can write them to a local file (`-f`) — exposes remote secret VALUES to the caller."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-env — `porter env pull`"
+judgment = "The secret VALUES enter the agent's context / a local .env, so this is credential-read, not a plain remote-read — even though the transport is an env-group fetch."
 [[command.sub.sub]]
 name = "set"
-candidate = true
+profile = "remote-mutate"
+fact = "\"Add or update variables and secrets in an environment group. Automatically redeploys linked applications with new values.\" — mutates remote env-group state and rolls apps."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-env — `porter env set`"
 [[command.sub.sub]]
 name = "unset"
-candidate = true
+profile = "remote-mutate"
+fact = "\"Remove variables or secrets from an environment group. Takes comma-separated names to delete; also triggers automatic redeployment.\" — mutates remote env-group state and rolls apps."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-env — `porter env unset`"
 
 [[command.sub]]
 name = "project"
@@ -122,7 +162,9 @@ valued = ["--cluster", "--project"]
 
 [[command.sub]]
 name = "apply"
-candidate = true
+profile = "remote-control"
+fact = "Builds a new image and rolls out a new revision from porter.yaml; `porter app update` is documented as differing from `porter apply` \"in that it only updates the app, but does not attempt to build a new image\" — so apply builds AND deploys a new revision on the cluster."
+source = "https://docs.porter.run/standard/cli/command-reference/porter-app — `porter app update` (contrasts against `porter apply`)"
 [[command.sub]]
 name = "datastore"
 candidate = true

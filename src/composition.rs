@@ -121,10 +121,11 @@ mod tests {
         );
     }
 
-    /// `xargs` items come from stdin — unknowable and unbounded. Its honest reference is the
-    /// bare command (operand invisible): `xargs rm` ~ bare `rm` (denied), `xargs cat` ~ bare
-    /// `cat` (reads stdin, allowed). The `-I` replacement string must not smuggle in a fake
-    /// worktree operand.
+    /// `xargs` injects stdin items as the inner command's OPERANDS, whose locus is the pipe
+    /// source's (bound by the pipeline walker; unpinnable when the source is unknown). So xargs is
+    /// never LOOSER than the bare inner command — a file-reading inner with no known source
+    /// worst-cases to deny, and the `-I` replacement string can't smuggle in a fake worktree
+    /// operand. (Its precise flow-aware behavior is pinned in `tests::operand_injection_*`.)
     #[test]
     fn xargs_never_launders_stdin_items() {
         let mut violations = Vec::new();
@@ -212,10 +213,12 @@ mod tests {
         "time cat ./notes.md",
         "nice cat ./x",
         "env FOO=1 cat ./x",
-        "xargs -I {} cat {}",
         "xargs -I{} basename {}",
-        "xargs cat",
-        "xargs grep pattern",
+        // flow-aware: a workspace-bounded pipe source keeps a file-reading inner allowed
+        // (a BARE `xargs cat` — no source — now correctly denies; see the shell handler tests).
+        "find . | xargs cat",
+        "find ./src -name x | xargs grep foo",
+        "ls | xargs wc -l",
     ];
 
     #[test]

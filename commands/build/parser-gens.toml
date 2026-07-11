@@ -16,6 +16,9 @@ valued = [
     "-b", "-o", "-p",
 ]
 
+[command.path_gate]
+flags = { "--output-file" = "write" }
+
 [[command]]
 name = "yacc"
 description = "POSIX LALR(1) parser generator. On most modern systems yacc is a wrapper for bison -y or for Berkeley yacc (byacc). Reads a grammar file and writes y.tab.c (the parser) and optionally y.tab.h (the header) and y.output (a human-readable description) to the current directory. -o overrides the output filename."
@@ -71,6 +74,9 @@ valued = [
     "-D", "-P", "-S", "-o",
 ]
 
+[command.path_gate]
+flags = { "--outfile" = "write" }
+
 [[command]]
 name = "gperf"
 description = "GNU perfect hash function generator. Reads keyword input (default stdin or INPUT-FILE) and writes generated C/C++ lookup code to stdout or to the file given by --output-file. Many short flags accept values via short-attached syntax (e.g. -k1,2,4). Part of GNU; stable, slow-moving project."
@@ -99,3 +105,6 @@ valued = [
     "-F", "-H", "-K", "-L", "-N", "-Q", "-S", "-W", "-Z",
     "-e", "-i", "-j", "-k", "-m", "-s",
 ]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }

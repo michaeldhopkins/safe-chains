@@ -5,6 +5,9 @@ url = "https://oras.land/docs/category/cli-reference"
 researched_version = "ORAS 1.x"
 bare_flags = ["--help", "--version", "-h", "-v"]
 
+[command.path_gate]
+flags = { "--cert-file" = "read", "--key-file" = "read", "--ca-file" = "read" }
+
 [[command.sub]]
 name = "version"
 standalone = ["--help", "-h"]

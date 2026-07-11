@@ -1,15 +1,19 @@
 use crate::parse::{Token, WordSet};
-use crate::verdict::{SafetyLevel, Verdict};
+use crate::verdict::Verdict;
 
-static GIT_REMOTE_MUTATING: WordSet = WordSet::new(&[
-    "add", "prune", "remove", "rename", "set-branches", "set-url",
-]);
+// `git remote`'s read-only allowlist moved to declarative subs in commands/vcs/git.toml (it was pure
+// data, no logic). What stays here is the one piece the TOML shape can't express: the `-c
+// <key>=<value>` gate. `git -c` can set ANY config for a single invocation, so this is a strict
+// ALLOWLIST — only the settings enumerated below are permitted; every other `-c` (any key we have
+// not vetted as harmless) is not allowed, and denies by omission. It is deliberately a positive list
+// and not a list of blocked keys: an allowlist that omits a key is simply conservative, whereas a
+// denylist would fail OPEN the day git adds another config that runs code. That the safe set has to
+// be enumerated by hand, and grown as we vet more keys, is the cost of getting this right.
 
-pub fn check_git_remote(tokens: &[Token]) -> Verdict {
-    if tokens.get(1).is_none_or(|a| !GIT_REMOTE_MUTATING.contains(a)) { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied }
-}
-
-static GIT_C_KV_EXACT: WordSet = WordSet::new(&[
+/// Exact `key=value` settings permitted after `-c`: display/UX toggles and safe protocol/init
+/// settings that cannot run code, redirect trust, or reach a program path. Namespaces that are safe
+/// for ANY value are handled by prefix in `is_allowed_git_c`.
+static GIT_C_ALLOWED_KV: WordSet = WordSet::new(&[
     "core.askPass=",
     "core.askPass=false",
     "core.askpass=",
@@ -26,17 +30,18 @@ static GIT_C_KV_EXACT: WordSet = WordSet::new(&[
     "init.defaultBranch=trunk",
 ]);
 
-fn is_safe_git_c_kv(kv: &str) -> bool {
-    if GIT_C_KV_EXACT.contains(kv) {
+/// Whether a `-c key=value` is on the allowlist. Positive by construction: an exact setting above,
+/// or one of three namespaces safe for any value — `color.*` (output styling), `advice.*` (hint
+/// toggles), `safe.directory` (ownership exceptions). Anything else is not on the list.
+fn is_allowed_git_c(kv: &str) -> bool {
+    if GIT_C_ALLOWED_KV.contains(kv) {
         return true;
     }
     let Some((key, _)) = kv.split_once('=') else {
         return false;
     };
-    let key_lc = key.to_ascii_lowercase();
-    matches!(key_lc.as_str(), "safe.directory")
-        || key_lc.starts_with("advice.")
-        || key_lc.starts_with("color.")
+    let key = key.to_ascii_lowercase();
+    key == "safe.directory" || key.starts_with("advice.") || key.starts_with("color.")
 }
 
 pub fn is_safe_git(tokens: &[Token]) -> Verdict {
@@ -54,7 +59,7 @@ pub fn is_safe_git(tokens: &[Token]) -> Verdict {
             let Some(next) = tokens.get(i + 1) else {
                 return Verdict::Denied;
             };
-            if !is_safe_git_c_kv(next.as_str()) {
+            if !is_allowed_git_c(next.as_str()) {
                 return Verdict::Denied;
             }
             saw_c = true;
@@ -210,6 +215,13 @@ mod tests {
         git_remote_add_denied: "git remote add upstream https://github.com/foo/bar",
         git_remote_remove_denied: "git remote remove upstream",
         git_remote_rename_denied: "git remote rename origin upstream",
+        // Allowlist conversion closes the fail-open holes the old denylist had:
+        git_remote_rm_alias_denied: "git remote rm upstream",   // alias of `remove`, was allowed
+        git_remote_set_head_denied: "git remote set-head origin -a",
+        git_remote_set_url_denied: "git remote set-url origin https://x",
+        git_remote_prune_denied: "git remote prune origin",
+        git_remote_update_denied: "git remote update",
+        git_remote_unknown_sub_denied: "git remote frobnicate",
         git_config_flag_denied: "git -c user.name=foo log",
         git_config_editor_denied: "git -c core.editor=vim commit",
         git_config_ssh_command_denied: "git -c core.sshCommand=evil ls-remote origin",

@@ -4,6 +4,9 @@ description = "All-in-one JavaScript/TypeScript runtime, bundler, and package ma
 url = "https://bun.sh/docs/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
+[command.path_gate]
+flags = { "--outfile" = "write" }
+
 [[command.sub]]
 name = "build"
 level = "SafeWrite"

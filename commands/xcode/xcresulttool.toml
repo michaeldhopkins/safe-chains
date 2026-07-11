@@ -4,6 +4,10 @@ description = "Inspector for Xcode `.xcresult` result bundles produced by `xcode
 url = "https://keith.github.io/xcode-man-pages/xcresulttool.1.html"
 researched_version = "Xcode 16 / xcresulttool 16.x"
 
+# export/merge write extracted files or a merged bundle to --output-path (used across subs).
+[command.path_gate]
+flags = { "--output-path" = "write" }
+
 [[command.sub]]
 name = "get"
 level = "Inert"

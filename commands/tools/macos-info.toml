@@ -18,6 +18,11 @@ bare = false
 standalone = ["-V", "-I", "-Z", "-T"]
 valued = ["-i", "-s", "-p", "-M", "-g", "-h", "-t", "-c", "-o", "-n"]
 
+# -o writes the thinned catalog; the positional is the source .car. -i/-s/-p/-M/-g/-t/-n are asset-attribute filters, not paths.
+[command.path_gate]
+positional = "read"
+flags = { "-o" = "write" }
+
 [[command]]
 name = "fileproviderctl"
 description = "Introspects File Provider extensions. The enumerate/ls subcommands list provider contents; validate runs the validation suite against a provider; dump prints the state of the file-provider subsystem. materialize forces an item to be written to disk (downloads cloud content) and is excluded here. Entirely local."

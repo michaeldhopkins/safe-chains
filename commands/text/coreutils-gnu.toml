@@ -73,6 +73,11 @@ standalone = [
     "--print-ls-colors", "--sh", "--version",
     "-V", "-b", "-c", "-h", "-p",
 ]
+# `eval "$(dircolors)"` is the canonical way to load LS_COLORS; bare output and the shell-dialect
+# flags are shell-init code. `--print-database`/`-p` and `--print-ls-colors` emit the color DATABASE
+# (data, not shell) and are excluded; help/version too.
+eval_safe = true
+eval_safe_flags = ["--bourne-shell", "--sh", "-b", "--c-shell", "--csh", "-c"]
 
 [[command]]
 name = "shred"

@@ -104,6 +104,7 @@ fn build_clause(tc: TomlClause) -> Result<Clause, String> {
     if let Some(l) = tc.locus {
         c.local_locus = opt_bound(l.local.as_deref())?;
         c.remote_reach = opt_bound(l.remote.as_deref())?;
+        c.provenance = opt_bound(l.provenance.as_deref())?;
         if let Some(b) = l.binding {
             c.remote_binding = Some(parse_set(&b)?);
         }
@@ -162,20 +163,38 @@ fn opt_bound<T: FacetTerm + Ord>(s: Option<&str>) -> Result<Option<OrdBound<T>>,
     s.map(parse_bound).transpose()
 }
 
-/// Parse an ordinal constraint: `"<= term"`, `">= term"`, or `"term"` (exact).
+/// Parse an ordinal constraint: `"<= term"`, `">= term"`, `"term"` (exact), or a
+/// two-sided range `">= lo, <= hi"` (a comma-separated floor and ceiling, order
+/// insensitive). A range is the only form that pins both ends — needed where an
+/// admit set is an interior band of the ladder (e.g. an executor locus that is
+/// worktree-local but neither below it, `temp`, nor above it, `user`).
 fn parse_bound<T: FacetTerm + Ord>(s: &str) -> Result<OrdBound<T>, String> {
-    let s = s.trim();
-    let (make, rest): (fn(T) -> OrdBound<T>, &str) =
-        if let Some(rest) = s.strip_prefix("<=") {
-            (OrdBound::at_most, rest)
-        } else if let Some(rest) = s.strip_prefix(">=") {
-            (OrdBound::at_least, rest)
-        } else if let Some(rest) = s.strip_prefix('=') {
-            (OrdBound::exactly, rest)
+    let parts: Vec<&str> = s.split(',').map(str::trim).collect();
+    if parts.len() == 1 {
+        let p = parts[0];
+        return if let Some(rest) = p.strip_prefix("<=") {
+            Ok(OrdBound::at_most(parse_term(rest)?))
+        } else if let Some(rest) = p.strip_prefix(">=") {
+            Ok(OrdBound::at_least(parse_term(rest)?))
         } else {
-            (OrdBound::exactly, s)
+            Ok(OrdBound::exactly(parse_term(p.strip_prefix('=').unwrap_or(p))?))
         };
-    Ok(make(parse_term(rest)?))
+    }
+    let (mut min, mut max) = (None, None);
+    for p in parts {
+        if let Some(rest) = p.strip_prefix("<=") {
+            if max.replace(parse_term(rest)?).is_some() {
+                return Err(format!("bound `{s}` sets `<=` more than once"));
+            }
+        } else if let Some(rest) = p.strip_prefix(">=") {
+            if min.replace(parse_term(rest)?).is_some() {
+                return Err(format!("bound `{s}` sets `>=` more than once"));
+            }
+        } else {
+            return Err(format!("bound `{s}`: each part of a range must be `<=`/`>=`"));
+        }
+    }
+    Ok(OrdBound { min, max })
 }
 
 fn parse_set<T: FacetTerm>(v: &StringOrVec) -> Result<Vec<T>, String> {
@@ -248,6 +267,8 @@ struct TomlLocus {
     remote: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     binding: Option<StringOrVec>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    provenance: Option<String>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -346,22 +367,35 @@ mod tests {
     #[test]
     fn the_default_ladder_compiles() {
         let levels = default_levels();
-        let names: Vec<&str> = levels.iter().map(|l| l.name.as_str()).collect();
-        assert_eq!(names, ["inert", "read-local", "write-local", "developer"]);
+        let mut names: Vec<&str> = levels.iter().map(|l| l.name.as_str()).collect();
+        names.sort_unstable();
+        assert_eq!(
+            names,
+            ["developer", "editor", "local-admin", "network-admin", "paranoid", "reader", "yolo"],
+        );
+        // yolo is a base level (carries the catastrophe `deny`), so build order isn't the ladder
+        // order — but the mapped auto-approve band MUST stay ascending, since `bridge::project`
+        // returns the first admitting mapped level as the minimum.
+        let raw: Vec<&str> = levels.iter().map(|l| l.name.as_str()).collect();
+        let pos = |n| raw.iter().position(|&x| x == n).expect("level present");
+        assert!(
+            pos("paranoid") < pos("reader") && pos("reader") < pos("editor") && pos("editor") < pos("developer"),
+            "mapped band out of order: {raw:?}",
+        );
     }
 
     #[test]
     fn inert_admits_a_version_probe_but_not_reading_the_worktree() {
         let levels = default_levels();
-        let inert = level(levels, "inert");
+        let inert = level(levels, "paranoid");
         assert!(inert.admits(&observe_at(LocalLocus::Process)), "node --version");
-        assert!(!inert.admits(&observe_at(LocalLocus::Worktree)), "cat ./notes is above inert");
+        assert!(!inert.admits(&observe_at(LocalLocus::Worktree)), "cat ./notes is above paranoid");
     }
 
     #[test]
     fn read_local_reads_the_worktree_but_refuses_home_extraction_and_writes() {
         let levels = default_levels();
-        let read_local = level(levels, "read-local");
+        let read_local = level(levels, "reader");
         assert!(read_local.admits(&observe_at(LocalLocus::Worktree)), "cat ./notes");
         assert!(read_local.admits(&observe_at(LocalLocus::WorktreeTrusted)), "git status reads .git");
 
@@ -381,10 +415,49 @@ mod tests {
         assert!(!read_local.admits(&Profile::of(vec![Capability::new(Operation::Create)])), "a write");
     }
 
+    /// reader reads LOCAL and REMOTE alike (a pure fetch is a read), but the network read is a
+    /// pure fetch, never an egress: `sends-host-data` (exfil) and any remote WRITE stay above it.
+    #[test]
+    fn reader_admits_a_pure_remote_fetch_but_not_exfil_or_remote_writes() {
+        let reader = level(default_levels(), "reader");
+
+        let fetch = {
+            let mut c = Capability::new(Operation::Observe);
+            c.locus.remote = RemoteReach::Arbitrary;
+            c.network.direction = NetDirection::Outbound;
+            c.network.payload = NetPayload::Fetches;
+            c.disclosure.audience = DisclosureAudience::LocalProcess;
+            Profile::of(vec![c])
+        };
+        assert!(reader.admits(&fetch), "curl GET / koyeb list — a pure remote fetch");
+
+        // exfil: the request carries host data OUT — above reader
+        let exfil = {
+            let mut c = Capability::new(Operation::Observe);
+            c.locus.remote = RemoteReach::Arbitrary;
+            c.network.direction = NetDirection::Outbound;
+            c.network.payload = NetPayload::SendsHostData;
+            Profile::of(vec![c])
+        };
+        assert!(!reader.admits(&exfil), "sends-host-data (curl -d @secret) is not a read");
+
+        // a remote WRITE — above reader (this is the nuance that lives on the write side)
+        let remote_write = {
+            let mut c = Capability::new(Operation::Mutate);
+            c.locus.remote = RemoteReach::Fixed;
+            c.network.direction = NetDirection::Outbound;
+            Profile::of(vec![c])
+        };
+        assert!(!reader.admits(&remote_write), "a remote write is network-admin, not reader");
+
+        // paranoid still blocks the network entirely
+        assert!(!level(default_levels(), "paranoid").admits(&fetch), "paranoid blocks all network");
+    }
+
     #[test]
     fn write_local_writes_the_worktree_but_not_installs_or_mass_ops() {
         let levels = default_levels();
-        let write_local = level(levels, "write-local");
+        let write_local = level(levels, "editor");
 
         let touch = {
             let mut c = Capability::new(Operation::Create);
@@ -407,7 +480,7 @@ mod tests {
     #[test]
     fn developer_deletes_within_the_worktree_but_not_beyond_it() {
         let levels = default_levels();
-        let (write_local, developer) = (level(levels, "write-local"), level(levels, "developer"));
+        let (write_local, developer) = (level(levels, "editor"), level(levels, "developer"));
 
         let destroy_at = |local| {
             let mut c = Capability::new(Operation::Destroy);
@@ -447,12 +520,106 @@ mod tests {
     fn the_ladder_nests() {
         let levels = default_levels();
         let (inert, read, write) =
-            (level(levels, "inert"), level(levels, "read-local"), level(levels, "write-local"));
+            (level(levels, "paranoid"), level(levels, "reader"), level(levels, "editor"));
         // everything inert admits, read-local and write-local admit too
         for local in [LocalLocus::Process, LocalLocus::Temp] {
             let p = observe_at(local);
             assert!(inert.admits(&p) && read.admits(&p) && write.admits(&p));
         }
+    }
+
+    /// The two admin flavors are INCOMPARABLE siblings above developer — each flexes a
+    /// disjoint facet region (local-admin down into the machine, network-admin out to the
+    /// network), and BOTH keep developer's `reversibility <= effortful` cap. Only yolo lifts
+    /// it. This is the partial-order the old linear `SafetyLevel` enum could not express.
+    #[test]
+    fn the_admin_flavors_flex_disjoint_regions_and_only_yolo_is_irreversible() {
+        let levels = default_levels();
+        let developer = level(levels, "developer");
+        let local_admin = level(levels, "local-admin");
+        let network_admin = level(levels, "network-admin");
+        let yolo = level(levels, "yolo");
+
+        // sudo: elevated authority on the machine — local-admin admits, network-admin refuses
+        let sudo = {
+            let mut c = Capability::new(Operation::Mutate);
+            c.locus.local = LocalLocus::Machine;
+            c.authority = Authority::Root;
+            Profile::of(vec![c])
+        };
+        assert!(!developer.admits(&sudo), "sudo is above developer");
+        assert!(local_admin.admits(&sudo), "local-admin runs this machine");
+        assert!(!network_admin.admits(&sudo), "network-admin never sudo's the box");
+
+        // remote mutate over the network — network-admin admits, local-admin refuses
+        let remote = {
+            let mut c = Capability::new(Operation::Mutate);
+            c.locus.remote = RemoteReach::Arbitrary;
+            c.network.direction = NetDirection::Outbound;
+            Profile::of(vec![c])
+        };
+        assert!(!developer.admits(&remote), "remote reach is above developer");
+        assert!(network_admin.admits(&remote), "network-admin operates remotes");
+        assert!(!local_admin.admits(&remote), "local-admin never reaches the network");
+
+        // the reversibility spine: irreversible destroy is reserved for yolo, on ANY locus
+        let irreversible = |local, remote| {
+            let mut c = Capability::new(Operation::Destroy);
+            c.locus.local = local;
+            c.locus.remote = remote;
+            c.reversibility = Reversibility::Irreversible;
+            Profile::of(vec![c])
+        };
+        let mkfs = irreversible(LocalLocus::Device, RemoteReach::None); // disk wipe
+        let tf_destroy = irreversible(LocalLocus::Process, RemoteReach::Fixed); // terraform destroy
+        assert!(!local_admin.admits(&mkfs), "mkfs (irreversible) is above local-admin");
+        assert!(!network_admin.admits(&tf_destroy), "terraform destroy (irreversible) is above network-admin");
+        assert!(yolo.admits(&mkfs) && yolo.admits(&tf_destroy), "irreversible destroy is reserved for yolo");
+
+        // but recoverable/effortful destruction in each direction stays at the flavor
+        let effortful_machine = {
+            let mut c = Capability::new(Operation::Destroy);
+            c.locus.local = LocalLocus::Machine;
+            c.scale = Scale::Unbounded;
+            c.reversibility = Reversibility::Effortful;
+            Profile::of(vec![c])
+        };
+        assert!(local_admin.admits(&effortful_machine), "sudo rm -rf /var (recoverable) is local-admin");
+    }
+
+    /// yolo lifts every cap EXCEPT the one catastrophe corner, carved purely by facets:
+    /// `destroy · irreversible · unbounded` (rm -rf /). Everything adjacent — bounded or
+    /// single-target irreversible destroy, or recoverable mass destroy — stays admitted,
+    /// distinguished by facet alone, never by command name.
+    #[test]
+    fn yolo_denies_only_unbounded_irreversible_destroy() {
+        let levels = default_levels();
+        let yolo = level(levels, "yolo");
+
+        let destroy = |scale, rev| {
+            let mut c = Capability::new(Operation::Destroy);
+            c.scale = scale;
+            c.reversibility = rev;
+            c.locus.local = LocalLocus::Machine;
+            Profile::of(vec![c])
+        };
+        // the one refusal: rm -rf / — destroy the world, no recovery, no bound
+        assert!(
+            !yolo.admits(&destroy(Scale::Unbounded, Reversibility::Irreversible)),
+            "rm -rf / is denied even at yolo",
+        );
+        // everything one facet away stays yolo-allowed, by facet:
+        assert!(yolo.admits(&destroy(Scale::Bounded, Reversibility::Irreversible)), "terraform destroy (bounded)");
+        assert!(yolo.admits(&destroy(Scale::Single, Reversibility::Irreversible)), "mkfs (single device)");
+        assert!(yolo.admits(&destroy(Scale::Unbounded, Reversibility::Effortful)), "rm -rf ./x (recoverable)");
+        // and yolo still admits the non-destroy extremes it exists for
+        let wild = {
+            let mut c = Capability::new(Operation::Execute);
+            c.execution.trust = ExecutionTrust::NetworkSourced;
+            c.locus.local = LocalLocus::Kernel;
+            Profile::of(vec![c])
+        };
+        assert!(yolo.admits(&wild), "yolo still admits everything but the catastrophe corner");
     }
 
     #[test]
@@ -552,7 +719,7 @@ mod tests {
     // on a non-minimum term) would break this — the check exists to catch that in
     // hand-authored TOML.
 
-    use crate::engine::testgen::{arb_profile, lowered_variants};
+    use crate::engine::testgen::{arb_capability, arb_profile, lowered_variants};
     use proptest::prelude::*;
 
     fn assert_monotone_from(lvl: &Level, boundary: Capability) {
@@ -580,7 +747,7 @@ mod tests {
         inert_cap.locus.local = LocalLocus::Temp;
         inert_cap.disclosure.audience = DisclosureAudience::LocalProcess;
         inert_cap.execution.trust = ExecutionTrust::SelfCode;
-        assert_monotone_from(level(levels, "inert"), inert_cap);
+        assert_monotone_from(level(levels, "paranoid"), inert_cap);
 
         let mut read_cap = Capability::new(Operation::Observe);
         read_cap.locus.local = LocalLocus::WorktreeTrusted;
@@ -588,7 +755,7 @@ mod tests {
         read_cap.network.direction = NetDirection::Loopback;
         read_cap.disclosure.audience = DisclosureAudience::LocalProcess;
         read_cap.execution.trust = ExecutionTrust::SelfCode;
-        assert_monotone_from(level(levels, "read-local"), read_cap);
+        assert_monotone_from(level(levels, "reader"), read_cap);
 
         let mut write_cap = Capability::new(Operation::Mutate);
         write_cap.locus.local = LocalLocus::Worktree;
@@ -598,7 +765,40 @@ mod tests {
         write_cap.secret.level = SecretLevel::UsesAmbient;
         write_cap.disclosure.audience = DisclosureAudience::LocalProcess;
         write_cap.execution.trust = ExecutionTrust::CallerInline;
-        assert_monotone_from(level(levels, "write-local"), write_cap);
+        assert_monotone_from(level(levels, "editor"), write_cap);
+    }
+
+    // ── union-level completeness: flat DNF's failure mode is a silent gap ────────────
+    //
+    // A level authored as a UNION of allow clauses to mean "allow almost everything" must admit a
+    // capability IFF it is not in that level's ONE intended hole. A missing clause leaves an
+    // accidental gap (a benign capability nothing admits → over-deny); a too-wide clause leaks the
+    // hole (the corner slips in → fail-open). This proves the union has EXACTLY its declared gap —
+    // the guard flat DNF needs before we lean on union constructions. Table-driven: add a row when
+    // a new union-level is authored, and the whole class stays covered.
+    proptest! {
+        #[test]
+        fn union_levels_admit_everything_but_their_declared_gap(cap in arb_capability()) {
+            let gaps: &[(&str, fn(&Capability) -> bool)] = &[
+                // yolo withholds only `destroy · irreversible · unbounded` (rm -rf /), carved by
+                // the union of its allow clauses — never by a deny.
+                ("yolo", |c: &Capability| {
+                    c.operation == Operation::Destroy
+                        && c.reversibility == Reversibility::Irreversible
+                        && c.scale == Scale::Unbounded
+                }),
+            ];
+            let levels = default_levels();
+            for (name, gap) in gaps {
+                let lvl = levels.iter().find(|l| &l.name == name).expect("level present");
+                let admitted = lvl.admits(&Profile::of(vec![cap.clone()]));
+                prop_assert_eq!(
+                    admitted, !gap(&cap),
+                    "level `{}`: capability {:?} admitted={} but intended_admit={}",
+                    name, cap, admitted, !gap(&cap),
+                );
+            }
+        }
     }
 
     proptest! {
@@ -628,15 +828,16 @@ mod tests {
     // ── round-trip: Level -> TOML -> Level is identity ──────────────────────────────
     //
     // The reverse of build_clause: a compiled clause serializes back to equivalent
-    // TOML that recompiles to the same clause. Only the operators the parser produces
-    // (<=, >=, exact) occur; a two-sided range never comes from parsing.
+    // TOML that recompiles to the same clause. Mirrors every operator the parser
+    // produces (<=, >=, exact, and the two-sided range).
 
     fn bound_str<T: FacetTerm>(b: OrdBound<T>) -> String {
         match (b.min, b.max) {
             (Some(lo), Some(hi)) if lo == hi => lo.as_str().to_string(),
+            (Some(lo), Some(hi)) => format!(">= {}, <= {}", lo.as_str(), hi.as_str()),
             (None, Some(hi)) => format!("<= {}", hi.as_str()),
             (Some(lo), None) => format!(">= {}", lo.as_str()),
-            _ => panic!("non-representable bound (a parsed level never produces a two-sided range)"),
+            (None, None) => panic!("empty bound has no representation"),
         }
     }
 
@@ -651,11 +852,13 @@ mod tests {
     fn clause_to_toml(c: &Clause) -> TomlClause {
         let locus = (c.local_locus.is_some()
             || c.remote_reach.is_some()
-            || c.remote_binding.is_some())
+            || c.remote_binding.is_some()
+            || c.provenance.is_some())
         .then(|| TomlLocus {
             local: opt_bound_str(c.local_locus),
             remote: opt_bound_str(c.remote_reach),
             binding: c.remote_binding.as_deref().map(set_str),
+            provenance: opt_bound_str(c.provenance),
         });
         let persistence = (c.persistence_level.is_some()
             || c.trigger_escape.is_some()

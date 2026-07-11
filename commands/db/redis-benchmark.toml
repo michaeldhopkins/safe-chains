@@ -30,3 +30,6 @@ valued = [
     "-T", "-a", "-c", "-d", "-e", "-h",
     "-i", "-k", "-l", "-n", "-p", "-r", "-t", "-u",
 ]
+
+[command.path_gate]
+flags = { "--cacert" = "read" }
