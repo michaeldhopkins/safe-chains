@@ -3,7 +3,7 @@
 ### `basecamp`
 <p class="cmd-url"><a href="https://github.com/basecamp/basecamp-cli">https://github.com/basecamp/basecamp-cli</a></p>
 
-- **auth token**: Positional args accepted
+- **auth token**
 - **cards list**: Positional args accepted
 - **commands**: Positional args accepted
 - **doctor**: Positional args accepted

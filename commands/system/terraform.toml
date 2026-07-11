@@ -1,9 +1,9 @@
 [[command]]
 name = "terraform"
-description = "Infrastructure-as-code CLI that provisions and manages cloud resources via declarative configuration files. The full CLI has a very large blast radius: plan, apply, and destroy create, modify, or delete real infrastructure and can trigger arbitrary provider-defined operations. init downloads provider plugins from the network. Read-only subcommands (validate, output, show, state list/show, graph, providers, version) inspect local state and configuration without modifying infrastructure. fmt reformats files in place unless --check is passed, in which case it only reports drift. Terraform releases roughly quarterly with occasional new subcommands (e.g. terraform stacks in v1.13)."
+description = "Infrastructure-as-code CLI that provisions and manages cloud resources from declarative HCL. Behavior varies sharply by subcommand. OBSERVE: `validate`/`graph`/`providers` read local config; `plan` reads config and refreshes state by QUERYING the providers' remote APIs (network, authenticated) but changes no infrastructure — an authenticated remote read; `show`/`output`/`state list`/`state show`/`version` read the state (which may live in a REMOTE backend). MUTATE-LOCAL: `fmt` rewrites `.tf` files in place (unless `-check`/`-diff`, which only report drift) — a working-tree file edit, no network. MUTATE-REMOTE / EXECUTE: `apply`/`destroy` create, change, and delete real infrastructure IRREVERSIBLY over the network and run arbitrary provider operations; `import`/`refresh`/`state mv|rm|push|pull|replace-provider`/`taint`/`untaint` mutate the (possibly remote) state; `init`/`get` DOWNLOAD and load provider/module code from the network (supply-chain code execution); `console`/`test` execute expressions/test configs that reach data sources or apply; `login`/`logout` manage cloud credentials; `force-unlock` releases a remote state lock. Path flags: `-out`/`-state-out`/`-generate-config-out` write files, `-var-file`/`-state` read them. Go's flag parser accepts both `-foo` and `--foo`. Terraform releases roughly quarterly with occasional new subcommands (e.g. `stacks` in v1.13)."
 url = "https://developer.hashicorp.com/terraform/cli/commands"
+researched_version = "Terraform 1.9"
 bare_flags = ["--help", "--version", "-V", "-h"]
-
 examples_safe = [
   "terraform fmt",
   "terraform fmt -recursive",
@@ -11,59 +11,190 @@ examples_safe = [
   "terraform fmt --check",
   "terraform fmt -check -diff",
   "terraform validate",
+  "terraform validate -json",
   "terraform version",
+  "terraform plan",
+  "terraform plan -no-color",
+  "terraform plan -out=plan.tfout",
+  "terraform show -json",
+  "terraform output -json",
+  "terraform state list",
 ]
 examples_denied = [
   "terraform apply",
+  "terraform apply -auto-approve",
   "terraform destroy",
-  "terraform plan",
+  "terraform init",
+  "terraform import aws_instance.x i-123",
+  "terraform state rm aws_instance.x",
+  "terraform workspace new prod",
+  "terraform plan -out=/etc/evil",
 ]
 
-# `terraform fmt` rewrites `.tf` files in place (unless -check/-diff,
-# which only report drift). A local file rewrite in the working tree —
-# no network, no state. Go's flag parser accepts both `-foo` and `--foo`.
+# `-out`/`-state-out`/`-generate-config-out` write a file; `-var-file`/`-state` read one. Gated by
+# locus so a plan/show that writes or reads OUTSIDE the workspace denies (a plan file to /etc, a
+# var-file reading a home secret).
+[command.path_gate]
+flags = { "-out" = "write", "--out" = "write", "-state-out" = "write", "--state-out" = "write", "-generate-config-out" = "write", "--generate-config-out" = "write", "-var-file" = "read", "--var-file" = "read", "-state" = "read", "--state" = "read" }
+
+# ── OBSERVE ──────────────────────────────────────────────────────────────────────────────────────
+[[command.sub]]
+name = "version"
+level = "Inert"
+standalone = ["--help", "-help", "-h", "--json", "-json"]
+
+[[command.sub]]
+name = "validate"
+level = "SafeRead"
+standalone = ["--help", "-help", "-h", "--json", "-json", "--no-color", "-no-color"]
+
+# `plan` refreshes state against the providers' remote APIs (a read) but changes no infrastructure —
+# an authenticated remote read, classified like a cloud-CLI `describe`/`list`. `-out` writes a plan
+# file (locus-gated above). `-destroy`/`-refresh-only` are still read-only plans.
+[[command.sub]]
+name = "plan"
+level = "SafeRead"
+standalone = [
+  "--help", "-help", "-h", "--json", "-json", "--no-color", "-no-color",
+  "--compact-warnings", "-compact-warnings", "--concise", "-concise",
+  "--detailed-exitcode", "-detailed-exitcode", "--destroy", "-destroy",
+  "--refresh-only", "-refresh-only",
+]
+valued = [
+  "--out", "-out", "--var", "-var", "--var-file", "-var-file", "--target", "-target",
+  "--replace", "-replace", "--parallelism", "-parallelism", "--lock", "-lock",
+  "--lock-timeout", "-lock-timeout", "--refresh", "-refresh", "--input", "-input",
+  "--state", "-state", "--generate-config-out", "-generate-config-out",
+]
+
+[[command.sub]]
+name = "show"
+level = "SafeRead"
+standalone = ["--help", "-help", "-h", "--json", "-json", "--no-color", "-no-color"]
+
+[[command.sub]]
+name = "output"
+level = "SafeRead"
+standalone = ["--help", "-help", "-h", "--json", "-json", "--no-color", "-no-color", "--raw", "-raw"]
+valued = ["--state", "-state"]
+
+[[command.sub]]
+name = "graph"
+level = "SafeRead"
+standalone = ["--help", "-help", "-h", "--no-color", "-no-color", "--draw-cycles", "-draw-cycles"]
+valued = ["--type", "-type", "--plan", "-plan", "--module-depth", "-module-depth"]
+
+[[command.sub]]
+name = "providers"
+level = "SafeRead"
+standalone = ["--help", "-help", "-h", "--no-color", "-no-color"]
+# `schema` reads local config providers; `lock`/`mirror` DOWNLOAD provider code (network) → omitted.
+[[command.sub.sub]]
+name = "schema"
+level = "SafeRead"
+standalone = ["--help", "-help", "-h", "--json", "-json", "--no-color", "-no-color"]
+
+[[command.sub]]
+name = "state"
+# Read sub-subs only. The mutating ones (mv/rm/push/pull/replace-provider) change the possibly-remote
+# state and are deliberately NOT approved (candidates below).
+[[command.sub.sub]]
+name = "list"
+level = "SafeRead"
+standalone = ["--help", "-help", "-h", "--no-color", "-no-color"]
+valued = ["--id", "-id", "--state", "-state"]
+[[command.sub.sub]]
+name = "show"
+level = "SafeRead"
+standalone = ["--help", "-help", "-h", "--no-color", "-no-color"]
+valued = ["--state", "-state"]
+[[command.sub.sub]]
+name = "mv"
+candidate = true
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+[[command.sub.sub]]
+name = "push"
+candidate = true
+[[command.sub.sub]]
+name = "pull"
+candidate = true
+[[command.sub.sub]]
+name = "replace-provider"
+candidate = true
+
+[[command.sub]]
+name = "workspace"
+[[command.sub.sub]]
+name = "list"
+level = "SafeRead"
+standalone = ["--help", "-help", "-h", "--no-color", "-no-color"]
+[[command.sub.sub]]
+name = "show"
+level = "SafeRead"
+standalone = ["--help", "-help", "-h", "--no-color", "-no-color"]
+[[command.sub.sub]]
+name = "new"
+candidate = true
+[[command.sub.sub]]
+name = "select"
+candidate = true
+[[command.sub.sub]]
+name = "delete"
+candidate = true
+
+# ── MUTATE-LOCAL ─────────────────────────────────────────────────────────────────────────────────
+# `fmt` rewrites `.tf` files in the working directory (unless `-check`/`-diff`, which report drift).
 [[command.sub]]
 name = "fmt"
 level = "SafeWrite"
+max_positional = 0
 standalone = [
   "--check", "-check", "--diff", "-diff", "--help", "-help",
   "--no-color", "-no-color", "--recursive", "-recursive", "-h",
 ]
+valued = ["--list", "-list", "--write", "-write"]
 
+# ── MUTATE-REMOTE / EXECUTE — researched, deliberately NOT approved ───────────────────────────────
+# Each changes real infrastructure, mutates possibly-remote state, downloads+executes provider/module
+# code, or manages credentials — none of which is a local, auto-approvable operation.
 [[command.sub]]
-name = "graph"
-standalone = ["--draw-cycles", "--help", "-h"]
-valued = ["--plan", "--type"]
-
+name = "apply"
+candidate = true
 [[command.sub]]
-name = "output"
-standalone = ["--help", "--json", "--no-color", "--raw", "-h"]
-valued = ["--state"]
-
+name = "destroy"
+candidate = true
 [[command.sub]]
-name = "providers"
-standalone = ["--help", "-h"]
-
+name = "init"
+candidate = true
 [[command.sub]]
-name = "show"
-standalone = ["--help", "--json", "--no-color", "-h"]
-
+name = "get"
+candidate = true
 [[command.sub]]
-name = "state"
-[[command.sub.sub]]
-name = "list"
-standalone = ["--help", "-h"]
-valued = ["--id", "--state"]
-[[command.sub.sub]]
-name = "show"
-bare = false
-standalone = ["--help", "-h"]
-valued = ["--state"]
-
+name = "import"
+candidate = true
 [[command.sub]]
-name = "validate"
-standalone = ["--help", "--json", "--no-color", "-h"]
-
+name = "refresh"
+candidate = true
 [[command.sub]]
-name = "version"
-standalone = ["--help", "--json", "-h"]
+name = "console"
+candidate = true
+[[command.sub]]
+name = "test"
+candidate = true
+[[command.sub]]
+name = "taint"
+candidate = true
+[[command.sub]]
+name = "untaint"
+candidate = true
+[[command.sub]]
+name = "login"
+candidate = true
+[[command.sub]]
+name = "logout"
+candidate = true
+[[command.sub]]
+name = "force-unlock"
+candidate = true

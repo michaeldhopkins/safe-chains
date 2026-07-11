@@ -1,0 +1,183 @@
+# Path-operand gate (adversarial-review audit fix).
+#
+# The engine gates its 15 resolved commands' file reads/writes by locus (HP-20). The ~1600
+# LEGACY commands are a parallel surface: a content-reader like `od`/`base64`/`diff` or a
+# writer like `tee`/`shred` takes a file operand but its handler never checks the operand's
+# locus — so `base64 ~/.ssh/id_rsa` exfiltrates a key and `shred /etc/hosts` destroys a system
+# file, both without a prompt.
+#
+# This lists the legacy commands that READ or WRITE their path operands' content. A
+# cross-cutting gate (`pathgate::should_deny`, called from `handlers::dispatch`) then denies
+# any `looks_like_path` operand whose read/write locus is sensitive — the same locus gate the
+# engine applies, retrofitted onto legacy commands by name.
+#
+# NOT here: metadata-only commands (`ls`, `stat`, `file`, `readlink`, `du`, `find`) — they
+# reveal names/sizes, not content, and legitimately walk system paths. And `awk`, whose regex
+# programs contain `/` and `$` (they'd false-positive) — it is gated in its own handler, which
+# knows the program from the files. Commands that read STDIN only (`tr`) are not readers.
+#
+# A path operand appearing here is gated even if the command's own handler already allowed it.
+# Adding a command is safe (over-gating a non-path arg is a no-op; a system path denies).
+
+# ── Commands that READ their file operands' content → gated by read locus ──────────────────
+read = [
+  # hex / binary / text dumps
+  "od", "xxd", "hexdump", "hd", "strings", "tac", "nl", "rev", "fold", "fmt",
+  # (csplit is gated via [roles.csplit] below — first positional only, so its `/regex/`
+  #  split-patterns are not misread as paths.)
+  "expand", "unexpand", "colrm", "pr", "col", "column",
+  # pagers / viewers
+  "less", "more", "most", "bat", "cat",
+  # field / column / line tools
+  "cut", "paste", "join", "comm", "sort", "uniq", "tsort", "ptx", "shuf", "numsum", "datamash",
+  # encoding / format converters (read a file, emit transformed content)
+  "iconv", "recode", "pv", "pandoc", "xmllint", "xmlstarlet",
+  # CSV / structured-data tools (their positional after flags is a file)
+  "xsv", "qsv", "mlr", "csvtool", "jaq", "gojq", "pup", "yj",
+  # diff family
+  "diff", "diff3", "sdiff", "colordiff", "delta", "difft", "cmp",
+  # encoders / structured-data query (their FILTER positional classifies worktree, harmless)
+  "base64", "base32", "basenc", "jq", "yq", "xq", "tomlq", "dasel", "gron", "htmlq", "fx", "jless",
+  # crypto tools that read a key/cert/data file via a path arg (`openssl rsa -in ~/.ssh/id_rsa`)
+  "openssl",
+  # checksums / hashes (disclose a hash of the secret)
+  "md5", "md5sum", "sha1sum", "sha224sum", "sha256sum", "sha384sum", "sha512sum",
+  "shasum", "cksum", "sum", "b2sum", "b3sum", "xxhsum", "rhash",
+  # compressed-content viewers
+  "zcat", "gzcat", "bzcat", "xzcat", "lzcat", "zstdcat", "zless", "bzless", "xzless", "zmore",
+]
+
+# ── grep-like tools: `CMD [flags] PATTERN [flags] files…` — gate the FILE operands, skipping
+#    the first positional (the PATTERN, which may itself be a `/regex/`). Same shape as `awk`,
+#    which is gated in its own handler. (Plain `grep`/`sed` are the engine's job.)
+read_after_first = ["rg", "ag", "ack", "ugrep", "sift", "pt"]
+
+# ── Commands that WRITE / modify / destroy their file operands → gated by write locus ──────
+# (Every positional is a write-target. Tools whose args play mixed roles — an output flag, a
+#  URL, an identity, a transcode input — are in [roles.*] below, not here.)
+write = [
+  "tee", "shred", "sponge", "truncate",
+  # file/node creators + single-file removers: the positional is the path they create/destroy.
+  # (`gtruncate`/`gunlink`/`gmknod` are standalone GNU-form commands, not aliases, so they're
+  #  listed by their own names; `mkfifo`/`gmkfifo` share a spec via the alias map.)
+  "mkfifo", "gmkfifo", "mknod", "gmknod", "unlink", "gunlink", "gtruncate",
+  # in-place (re)compressors / optimizers that rewrite the file in its directory
+  "bzip2", "xz", "lzma", "zstd", "lz4", "brotli", "compress", "zip",
+  "pigz", "unpigz", "pbzip2", "plzip", "lzip", "optipng", "jpegoptim",
+  # sox: its output is a positional but EFFECTS follow it (`sox in out reverb`), so last_write
+  # can't find the output — gate every positional as a write. Cost: a home INPUT prompts (grant
+  # its dir to allow); effect args (`reverb`, `0.5`) aren't paths, so they're harmless.
+  "sox",
+  # archivers / sync that write extracted files by path (`7z a /etc/x.7z`, `cpio -F /etc/x`,
+  # `unzip -p ~/.ssh/id_rsa`). A remote spec (`host:/path`) classifies worktree.
+  "7z", "7za", "7zr", "cpio", "unzip",
+  # other HTTP downloaders (curl/wget have richer grammars in [roles.*]). The blanket write
+  # gate catches a `-o`/`-d`/`-P` path into a sensitive locus; a URL classifies worktree.
+  "aria2c", "http", "https", "xh", "httpie",
+]
+
+# ── Argument-role grammar: tools whose path arguments take DIFFERENT roles by flag/position,
+#    so a flat read/write list mis-gates them. `positional` is the role of bare operands
+#    (read | write | ignore); `flags` maps a path-bearing flag to its value's role; `shape`
+#    (plain | skip_first | last_write | remote) adjusts the positional policy. The walker in
+#    pathgate.rs interprets these. Role assignment is authored per the tool's real semantics. ──
+
+# HTTP downloaders: the URL operand is gated by read locus, but the locus layer is scheme-aware
+# — a network URL admits (so `curl https://x/a/../b` does NOT false-deny on the `..`) and a
+# `file:` URL classifies the local path it names (so `curl file:///etc/shadow` denies). The
+# output flag writes.
+[roles.curl]
+positional = "read"
+flags = { "-o" = "write", "--output" = "write", "--output-dir" = "write" }
+
+[roles.wget]
+positional = "ignore"
+flags = { "-O" = "write", "--output-document" = "write", "-P" = "write", "--directory-prefix" = "write", "--post-file" = "read", "-i" = "read", "--input-file" = "read" }
+
+# Remote copy/sync: a LOCAL source is a disclosing read (exfil), the destination is a write, a
+# `host:path` endpoint is ignored (remote writes are the tool's own concern), and an `-i`
+# identity / `-F` config / `-o` option / `-J` jump is auth plumbing, never a target.
+[roles.scp]
+positional = "read"
+shape = "remote"
+flags = { "-i" = "ignore", "-F" = "ignore", "-o" = "ignore", "-J" = "ignore", "-S" = "ignore" }
+
+[roles.sftp]
+positional = "read"
+shape = "remote"
+flags = { "-i" = "ignore", "-F" = "ignore", "-o" = "ignore", "-J" = "ignore", "-S" = "ignore", "-b" = "read" }
+
+[roles.rsync]
+positional = "read"
+shape = "remote"
+flags = { "-e" = "ignore", "--rsh" = "ignore" }
+
+# Converters whose OUTPUT is the last positional: the input is a non-disclosing transcode
+# (ignore, so a home input like ~/Downloads/x still allows), the last operand is the write.
+[roles.magick]
+positional = "ignore"
+shape = "last_write"
+[roles.convert]
+positional = "ignore"
+shape = "last_write"
+[roles.ffmpeg]
+positional = "ignore"
+shape = "last_write"
+[roles.pdftotext]
+positional = "ignore"
+shape = "last_write"
+[roles.pdftocairo]
+positional = "ignore"
+shape = "last_write"
+[roles.pdftoppm]
+positional = "ignore"
+shape = "last_write"
+[roles.pdfimages]
+positional = "ignore"
+shape = "last_write"
+[roles.pdfseparate]
+positional = "ignore"
+shape = "last_write"
+[roles.qpdf]
+positional = "ignore"
+shape = "last_write"
+[roles.pdftk]
+positional = "ignore"
+shape = "last_write"
+
+# Converters whose OUTPUT is a flag (input is the positional → ignore).
+[roles.cwebp]
+positional = "ignore"
+flags = { "-o" = "write", "--output" = "write" }
+[roles.mutool]
+positional = "ignore"
+flags = { "-o" = "write", "-O" = "write" }
+
+# Key / crypto tools with an identity flag: the `-f` key or `-o` output is a write; an `-i`
+# identity is auth plumbing (ignore), and the input/recipients are non-disclosing (ignore).
+[roles.ssh-keygen]
+positional = "ignore"
+flags = { "-f" = "write" }
+[roles.age]
+positional = "ignore"
+flags = { "-o" = "write", "--output" = "write", "-i" = "ignore", "--identity" = "ignore" }
+
+# pl (macOS plist checker): --input reads a file, --output writes the normalized form. Inert, but
+# both flag values are real paths, so a system-path read/write must gate.
+[roles.pl]
+positional = "ignore"
+flags = { "--input" = "read", "--output" = "write" }
+
+# csplit FILE /regex/… — the FIRST positional is the input FILE (a disclosing read); the
+# trailing `/regex/` split-patterns are positionals that look like absolute paths, so only the
+# first is gated (`first_only`). Chunk files are written under the `-f` prefix (a write-target).
+[roles.csplit]
+positional = "read"
+shape = "first_only"
+flags = { "-f" = "write", "--prefix" = "write" }
+
+# NOT here yet (documented follow-ups — policy calls, not detection):
+#   disclosure inspectors pdfinfo/pdffonts/ffprobe/mediainfo/exiftool (read-gating over-denies
+#   home-file inspection — a separate "should we gate metadata reads" decision); converter
+#   stdout disclosure (`pdftotext ~/x.pdf -`) and file:-protocol inputs, both consequences of
+#   the ignore-input policy that lets home transcodes through.

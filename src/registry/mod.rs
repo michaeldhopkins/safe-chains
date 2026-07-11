@@ -49,6 +49,208 @@ pub fn custom_dispatch(tokens: &[Token]) -> Option<Verdict> {
     CUSTOM_REGISTRY.get(cmd).map(|spec| dispatch_spec(tokens, spec))
 }
 
+/// The canonical command name `cmd` resolves to via the registry's alias map (`gcat` → `cat`,
+/// `glink` → `ln`). Returns `cmd` unchanged when it is already canonical or unknown, so callers
+/// can canonicalize unconditionally. This is what lets the engine's path-gate dispatch reach an
+/// aliased invocation: without it, `gcat /etc/shadow` misses every resolver and falls through to
+/// the (ungated) legacy classifier. Custom registry first (an override may rename), then TOML.
+pub fn canonical_name(cmd: &str) -> &str {
+    CUSTOM_REGISTRY
+        .get(cmd)
+        .or_else(|| TOML_REGISTRY.get(cmd))
+        .map_or(cmd, |spec| spec.name.as_str())
+}
+
+/// The command's own declared path-argument gate (`[command.path_gate]`), if any — consulted by
+/// `pathgate::should_deny` when a command isn't in `pathgates.toml`, so a path-bearing flag gates
+/// from the command's own definition. `cmd` is already canonicalized by the caller.
+pub(crate) fn command_path_gate(cmd: &str) -> Option<&'static crate::pathgate::RoleSpec> {
+    CUSTOM_REGISTRY
+        .get(cmd)
+        .or_else(|| TOML_REGISTRY.get(cmd))
+        .and_then(|spec| spec.path_gate.as_ref())
+}
+
+/// The command's declarative facet behavior (`[command.behavior]`), if any — the engine's
+/// non-legacy classification path and the ONLY thing `engine::resolve::resolve` consults (the
+/// hardcoded `RESOLVERS` table is gone; every facet-classified command declares behavior).
+/// `cmd` is already canonicalized by the caller.
+pub(crate) fn command_behavior(cmd: &str) -> Option<&'static crate::registry::types::BehaviorSpec> {
+    CUSTOM_REGISTRY
+        .get(cmd)
+        .or_else(|| TOML_REGISTRY.get(cmd))
+        .and_then(|spec| spec.behavior.as_ref())
+}
+
+/// The facet archetypes (`archetypes.toml`) the subcommand `tokens` resolve to — the Phase-1
+/// `profile = …` classification plus a capability for every present escalating `[[command.sub.flag]]`
+/// (`git push` → `[vcs-sync]`; `git push --force` → `[vcs-sync, remote-destroy-irreversible]`). The
+/// engine emits a Capability per name and the level algebra takes the max. Descends `Branching`/
+/// `Custom` subs to the DEEPEST profile-bearing sub (nested `<resource> <action>`). `None` when no
+/// matched sub declares a profile.
+pub(crate) fn sub_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
+    let cmd = canonical_name(tokens.first()?.command_name());
+    let spec = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd))?;
+    let sub = walk_to_profiled_sub(&tokens[1..], &spec.kind)?;
+    let mut out = vec![sub.profile.as_deref()?];
+    for flag in &sub.flags {
+        if flag_escalates(tokens, flag) {
+            out.push(flag.classifies.as_str());
+        }
+    }
+    Some(out)
+}
+
+/// Whether `flag` escalates given `tokens`. A bare flag (no `value_prefix`) escalates on presence; a
+/// value-matched flag escalates only when its VALUE starts with the prefix — the space form
+/// (`-c core.sshCommand=…`) or the glued form (`--flag=core.sshCommand=…`). Scans the whole line;
+/// an escalator counts wherever it sits.
+fn flag_escalates(tokens: &[Token], flag: &types::FlagProvenance) -> bool {
+    if flag.when_absent {
+        // A SAFETY flag whose ABSENCE is the escalation (`npm ci` without `--ignore-scripts`).
+        // It must be AFFIRMATIVELY set — `--ignore-scripts=false` / `--no-ignore-scripts` re-ENABLE
+        // scripts, so they escalate exactly like the flag being missing (a fail-open otherwise).
+        return !flag_is_affirmatively_set(tokens, &flag.name);
+    }
+    let Some(prefix) = flag.value_prefix.as_deref() else {
+        return flag_present(tokens, &flag.name);
+    };
+    // space form: `NAME VALUE`, VALUE starting with the prefix
+    tokens.windows(2).any(|w| w[0].as_str() == flag.name && w[1].as_str().starts_with(prefix))
+        // glued form: `NAME=VALUE`, VALUE starting with the prefix
+        || tokens.iter().any(|t| {
+            t.as_str()
+                .strip_prefix(flag.name.as_str())
+                .and_then(|r| r.strip_prefix('='))
+                .is_some_and(|v| v.starts_with(prefix))
+        })
+}
+
+/// Whether a boolean flag is AFFIRMATIVELY enabled: bare `--flag`, or `--flag=<truthy>`. A
+/// `--flag=false/0/no/off` or a `--no-flag` DISABLES it (returns false), as does absence. Last
+/// occurrence wins, the CLI convention. Used by the `when_absent` escalator so a re-enabling spelling
+/// can't masquerade as the safety flag being set.
+fn flag_is_affirmatively_set(tokens: &[Token], flag: &str) -> bool {
+    let neg = format!("--no-{}", flag.trim_start_matches('-'));
+    let mut set = false;
+    for t in tokens {
+        let s = t.as_str();
+        if s == flag {
+            set = true;
+        } else if let Some(v) = s.strip_prefix(flag).and_then(|r| r.strip_prefix('=')) {
+            set = !matches!(v.to_ascii_lowercase().as_str(), "false" | "0" | "no" | "off" | "");
+        } else if s == neg {
+            set = false;
+        }
+    }
+    set
+}
+
+fn walk_to_profiled_sub(
+    remaining: &[Token],
+    kind: &'static DispatchKind,
+) -> Option<&'static types::SubSpec> {
+    let subs = match kind {
+        DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
+        _ => return None,
+    };
+    let arg = remaining.first()?;
+    let sub = subs.iter().find(|s| s.name == arg.as_str())?;
+    // Deepest profiled match wins: a nested action's profile overrides its resource sub's.
+    walk_to_profiled_sub(&remaining[1..], &sub.kind).or_else(|| sub.profile.is_some().then_some(sub))
+}
+
+/// Like `walk_to_profiled_sub`, but also returns the tokens AFTER the matched sub's name — the
+/// operands the engine still needs to inspect (the destination positional, for `network_destination`).
+fn walk_to_profiled_sub_rest<'a>(
+    remaining: &'a [Token],
+    kind: &'static DispatchKind,
+) -> Option<(&'static types::SubSpec, &'a [Token])> {
+    let subs = match kind {
+        DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
+        _ => return None,
+    };
+    let arg = remaining.first()?;
+    let sub = subs.iter().find(|s| s.name == arg.as_str())?;
+    let rest = &remaining[1..];
+    walk_to_profiled_sub_rest(rest, &sub.kind).or_else(|| sub.profile.is_some().then_some((sub, rest)))
+}
+
+/// For a profiled sub declaring `network_destination`, the first positional after it — the send
+/// TARGET (`git push origin` → `origin`; bare `git push` → `None`, the configured default). `None`
+/// (outer) when the resolved sub does not classify a destination. The engine maps the token's
+/// PROVENANCE onto `locus.provenance` (`resolve::destination_provenance`).
+///
+/// "First non-`-` token" is a heuristic: a VALUED flag's value sitting before the target
+/// (`git push -o $VAR origin`) is read as the destination. That only ever misreads CONSERVATIVELY —
+/// a stray value classifies to `literal`/`opaque` (equal-or-stricter than the real `established`
+/// target), never looser — so it can over-deny a rare form but never under-approve.
+pub(crate) fn sub_destination_token(tokens: &[Token]) -> Option<Option<&str>> {
+    let cmd = canonical_name(tokens.first()?.command_name());
+    let spec = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd))?;
+    let (sub, rest) = walk_to_profiled_sub_rest(&tokens[1..], &spec.kind)?;
+    if !sub.network_destination {
+        return None;
+    }
+    // A destination-carrying flag (`git push --repo=<dest>`) OVERRIDES the positional — else a
+    // `--repo=ext::sh` RCE would slip past a benign positional (`origin`). Scanned across the whole
+    // line since the flag may sit anywhere.
+    if let Some(flag) = sub.destination_flag.as_deref()
+        && let Some(v) = flag_value(tokens, flag)
+    {
+        return Some(Some(v));
+    }
+    Some(rest.iter().map(Token::as_str).find(|t| !t.starts_with('-')))
+}
+
+/// A flag's value, glued (`--repo=VALUE`) or space-separated (`--repo VALUE`); `None` if absent.
+fn flag_value<'a>(tokens: &'a [Token], flag: &str) -> Option<&'a str> {
+    if let Some(v) = tokens.iter().find_map(|t| t.as_str().strip_prefix(flag).and_then(|r| r.strip_prefix('='))) {
+        return Some(v);
+    }
+    tokens.windows(2).find(|w| w[0].as_str() == flag).map(|w| w[1].as_str())
+}
+
+/// For a profiled `data-export` sub declaring `output_path_flags`, the output-file PATH one of them
+/// carries — or `None` when the export streams to stdout (no output flag present). The engine adds a
+/// path-gated write capability at this path's locus, so a dump to `/etc/cron.d/job` gates on locus
+/// exactly as a redirect there would. `None` (outer) when the resolved sub declares none.
+///
+/// Values are matched in every spelling the flag admits: `--file=X`, `--file X`, `-f X`, `-f=X`, and
+/// the glued short form `-fX` — the last mustn't be a bypass (`-f/etc/cron.d/job` reaching a system
+/// path would otherwise drop the write cap and auto-approve). A bare `-f` with no value is a
+/// malformed invocation the tool itself rejects, so a `None` there is harmless.
+pub(crate) fn sub_output_path_token(tokens: &[Token]) -> Option<&str> {
+    let cmd = canonical_name(tokens.first()?.command_name());
+    let spec = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd))?;
+    let (sub, _rest) = walk_to_profiled_sub_rest(&tokens[1..], &spec.kind)?;
+    sub.output_path_flags.iter().find_map(|f| output_flag_value(tokens, f))
+}
+
+/// `flag_value`, plus the glued short form `-fVALUE` (a two-char `-x` flag with the value fused on).
+/// Kept separate from `flag_value` because a glued short is only unambiguous for the single-letter
+/// output flags this classifies (`-f`, `-r`); the destination-flag path (`--repo`) never needs it.
+fn output_flag_value<'a>(tokens: &'a [Token], flag: &'a str) -> Option<&'a str> {
+    if let Some(v) = flag_value(tokens, flag) {
+        return Some(v);
+    }
+    if flag.len() == 2 && flag.starts_with('-') && !flag.starts_with("--") {
+        return tokens
+            .iter()
+            .find_map(|t| t.as_str().strip_prefix(flag).filter(|r| !r.is_empty()));
+    }
+    None
+}
+
+/// Whether `flag` appears anywhere in `tokens` — bare (`--force`) or glued (`--flag=v`). A flag is
+/// an escalator wherever it sits in the invocation, so this scans the whole line.
+fn flag_present(tokens: &[Token], flag: &str) -> bool {
+    tokens.iter().any(|t| {
+        let s = t.as_str();
+        s == flag || s.strip_prefix(flag).is_some_and(|rest| rest.starts_with('='))
+    })
+}
+
 pub fn toml_command_names() -> Vec<&'static str> {
     TOML_REGISTRY
         .keys()

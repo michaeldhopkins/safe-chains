@@ -4,6 +4,10 @@ description = "Builds online books from Markdown source files into HTML, PDF, or
 url = "https://rust-lang.github.io/mdBook/"
 bare_flags = ["--help", "--version", "-V", "-h"]
 
+# -d/--dest-dir is the output directory build/clean write to (used across subs).
+[command.path_gate]
+flags = { "-d" = "write", "--dest-dir" = "write" }
+
 [[command.sub]]
 name = "build"
 level = "SafeWrite"

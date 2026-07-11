@@ -92,6 +92,36 @@ impl Drop for LoopGuard {
     }
 }
 
+thread_local! {
+    static STDIN_REPR: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) };
+}
+
+/// Bind the representative PATH of the items arriving on stdin, for the duration of the guard —
+/// set by the pipeline walker to the previous stage's output-path locus. An operand-injecting
+/// consumer (`xargs`) reads it so `find / | xargs cat` gates the injected operand at `/`, while
+/// `find ./src | xargs cat` gates it at the workspace (mirrors `find -exec`'s `{}` binding).
+#[must_use]
+pub fn enter_stdin_repr(repr: String) -> StdinReprGuard {
+    STDIN_REPR.with(|v| v.borrow_mut().push(repr));
+    StdinReprGuard
+}
+
+/// The current stdin-item representative, or `None` when the source is unknown (no pipe / an
+/// unmodeled producer) — in which case the consumer worst-cases the injected operand.
+pub fn stdin_item_repr() -> Option<String> {
+    STDIN_REPR.with(|v| v.borrow().last().cloned())
+}
+
+pub struct StdinReprGuard;
+
+impl Drop for StdinReprGuard {
+    fn drop(&mut self) {
+        STDIN_REPR.with(|v| {
+            v.borrow_mut().pop();
+        });
+    }
+}
+
 /// Expand any bound loop variable (`$name` / `${name}`) in `path` to its representative list
 /// item — the read representative when `want_write` is false, the write representative when
 /// true. Unbound `$…` is left untouched (so it still fail-closes to machine). Returns `path`
@@ -161,24 +191,30 @@ fn is_var_name(s: &str) -> bool {
 
 /// Resolve a path argument for classification against the ambient `cwd`/`root`. Returns a
 /// path the *existing* classifiers (`classify_locus`, `is_safe_write_target`) can score
-/// unchanged:
-/// - an **absolute**, `~`, or `$`-unpinnable path → returned as-is (they already handle it);
-/// - a **relative** path, when `cwd` and `root` are both known and absolute → lexically
-///   joined onto `cwd` (no filesystem access). If the result is inside `root` it comes back
-///   as a **root-relative** path (so the classifiers see "worktree"); if it escaped `root`
-///   (e.g. `cwd` is `/etc`) it comes back **absolute** (so they see `machine`/etc.);
-/// - anything else (no context) → returned as-is (today's behavior).
+/// unchanged. When `cwd` and `root` are both known and absolute, a **relative** path is lexically
+/// joined onto `cwd` (no filesystem access) and an **absolute** path is normalized in place; then
+/// either way, if the result is inside `root` it comes back as a **root-relative** path (so the
+/// classifiers see "worktree"), and if it escaped `root` (e.g. `cwd` is `/etc`, or an absolute
+/// `/etc/hosts`) it comes back **absolute** (so they see `machine`/etc.). This makes the absolute
+/// and relative spellings of the SAME in-root file classify identically — safety on the OPERATION,
+/// not the SYNTAX. A `~` (home) or `$`-unpinnable path, or no context, is returned as-is.
 pub fn resolve(path: &str) -> Cow<'_, str> {
-    // Absolute / home / unpinnable: the classifiers already resolve these correctly, and a
-    // `$` path can't be joined at all. Leave them alone.
-    if path.is_empty() || path.starts_with('/') || path.starts_with('~') || path.contains('$') {
+    // Home (`~`) is handled by the classifiers directly; a `$` path can't be joined at all.
+    if path.is_empty() || path.starts_with('~') || path.contains('$') {
         return Cow::Borrowed(path);
     }
     let resolved = CURRENT.with(|c| {
         let ctx = c.borrow();
         match (ctx.cwd.as_deref(), ctx.root.as_deref()) {
             (Some(cwd), Some(root)) if cwd.starts_with('/') && root.starts_with('/') => {
-                Some(project_relative_or_absolute(cwd, root, path))
+                // Relative → join onto cwd; absolute → normalize in place. Then express relative
+                // to root if inside (worktree), else absolute.
+                let abs = if path.starts_with('/') {
+                    lexical_join("/", path)
+                } else {
+                    lexical_join(cwd, path)
+                };
+                Some(express_relative_to_root(&abs, root))
             }
             _ => None,
         }
@@ -200,19 +236,18 @@ pub fn join_cwd(cur: Option<&str>, target: &str) -> Option<String> {
     cur.filter(|c| c.starts_with('/')).map(|c| lexical_join(c, target)) // relative
 }
 
-/// Lexically join `rel` onto absolute `cwd`, resolving `.`/`..` without touching the disk,
-/// then express the result relative to `root` if it's inside, or absolute if it escaped.
-fn project_relative_or_absolute(cwd: &str, root: &str, rel: &str) -> String {
-    let abs = lexical_join(cwd, rel);
+/// Express an absolute `abs` path relative to `root`: `.` if it IS the root, a root-relative path
+/// if it's inside (classified as worktree), or the absolute path unchanged if it escaped (classified
+/// as machine/etc.). The `inside.starts_with('/')` guard prevents a sibling like `/proj-evil` from
+/// matching root `/proj` by bare string prefix.
+fn express_relative_to_root(abs: &str, root: &str) -> String {
     let root = root.trim_end_matches('/');
     if abs == root {
         return ".".to_string(); // the project root itself
     }
     match abs.strip_prefix(root) {
-        // inside the project → a root-relative path (classified as worktree)
         Some(inside) if inside.starts_with('/') => inside.trim_start_matches('/').to_string(),
-        // escaped the project (e.g. cwd is /etc) → the real absolute path
-        _ => abs,
+        _ => abs.to_string(),
     }
 }
 
@@ -266,9 +301,22 @@ mod tests {
     }
 
     #[test]
-    fn absolute_and_unpinnable_are_never_touched_even_with_context() {
-        let _g = enter(PathCtx { cwd: Some("/etc".into()), root: Some("/home/u/proj".into()) });
+    fn absolute_in_root_becomes_root_relative_outside_stays_absolute() {
+        let _g = enter(PathCtx { cwd: Some("/home/u/proj/sub".into()), root: Some("/home/u/proj".into()) });
+        // absolute INSIDE root → root-relative (worktree), matching the relative spelling
+        assert_eq!(resolve("/home/u/proj/main.rs"), "main.rs");
+        assert_eq!(resolve("/home/u/proj/sub/x"), "sub/x");
+        assert_eq!(resolve("/home/u/proj/a/../b"), "b", "normalized in place");
+        assert_eq!(resolve("/home/u/proj"), ".", "the project root itself");
+        // absolute OUTSIDE root → unchanged (classified as machine)
         assert_eq!(resolve("/usr/bin/x"), "/usr/bin/x");
+        assert_eq!(resolve("/home/u/proj/../../etc/x"), "/home/etc/x", "climbs to /home, still outside root");
+        assert_eq!(resolve("/home/u/proj/../../../etc/x"), "/etc/x", "escapes to /etc via ..");
+        assert_eq!(
+            resolve("/home/u/proj-evil/secret"), "/home/u/proj-evil/secret",
+            "a sibling dir is not confused for inside by bare string prefix",
+        );
+        // home / unpinnable → returned as-is (the classifiers handle these)
         assert_eq!(resolve("$HOME/x"), "$HOME/x");
         assert_eq!(resolve("~/x"), "~/x");
     }

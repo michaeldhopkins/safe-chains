@@ -88,3 +88,6 @@ valued = [
     "--temp-dir", "--timeout", "--write-batch",
     "-T", "-e", "-f",
 ]
+
+[command.path_gate]
+flags = { "--password-file" = "read" }

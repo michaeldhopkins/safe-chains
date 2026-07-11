@@ -17,15 +17,14 @@ valued = ["-p", "-s"]
 
 [[command.sub]]
 name = "find-generic-password"
-bare = false
-standalone = ["--help", "-h"]
-valued = ["-D", "-a", "-c", "-d", "-j", "-l", "-r", "-s", "-t"]
-
+profile = "credential-read"
+fact = "Searches the macOS keychain for a generic-password item and, with -w, prints the stored secret to stdout — a credential the caller can read."
+source = "https://ss64.com/mac/security.html — find-generic-password"
 [[command.sub]]
 name = "find-internet-password"
-bare = false
-standalone = ["--help", "-h"]
-valued = ["-D", "-a", "-c", "-d", "-j", "-l", "-r", "-s", "-t"]
+profile = "credential-read"
+fact = "Searches the macOS keychain for an internet-password item and, with -w, prints the stored secret to stdout — a credential the caller can read."
+source = "https://ss64.com/mac/security.html — find-internet-password"
 
 [[command.sub]]
 name = "list-keychains"

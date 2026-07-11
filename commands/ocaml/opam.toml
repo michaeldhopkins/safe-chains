@@ -46,6 +46,11 @@ level = "SafeRead"
 bare = true
 standalone = ["--csh", "--debug", "--fish", "--help", "--inplace-path", "--no-color", "--readonly", "--revert", "--safe", "--sexp", "--shell", "--sh", "--zsh", "-h"]
 valued = ["--shell", "--switch"]
+# `eval "$(opam env)"` is the canonical way to load the switch environment; output is shell-init
+# code (export/setenv lines) to stdout, errors to stderr. The shell-dialect flags keep it shell-init;
+# `--sexp` (S-expression data), the valued `--shell`/`--switch`, and `--debug` are excluded.
+eval_safe = true
+eval_safe_flags = ["--csh", "--fish", "--sh", "--zsh", "--no-color", "--revert", "--inplace-path"]
 
 [[command.sub]]
 name = "tree"

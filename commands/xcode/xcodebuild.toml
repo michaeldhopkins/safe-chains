@@ -130,3 +130,6 @@ examples_safe = [
     "xcodebuild -project Foo.xcodeproj -scheme Foo analyze",
     "xcodebuild -project Foo.xcodeproj -scheme Foo docbuild",
 ]
+
+[command.path_gate]
+flags = { "-destination" = "ignore", "-derivedDataPath" = "write", "-archivePath" = "write", "-resultBundlePath" = "write", "-exportPath" = "write", "-exportOptionsPlist" = "read", "-xcconfig" = "read" }

@@ -2,17 +2,35 @@
 # (docs/design/behavioral-taxonomy-v1.4.md §4.3). Authored from the spec and
 # compiled to `engine::level::Level` by `engine::authoring`.
 #
-# This file currently defines the three local, no-execution levels. The upper
-# levels (developer, admin, infra, yolo) gate on the supply-chain sub-facets and
-# the flow policy, which land in later commits; they are added here then.
+# The ladder, locked → open:
 #
-# A clause constrains only the facets that discriminate the level; an omitted
-# facet is unconstrained. Ordinal facets take "<= term" / ">= term" / "term"
-# (exact); categorical facets take a term or a list of terms.
+#   paranoid → reader → editor → developer ─┬─→ local-admin ─┐
+#                                           └─→ network-admin ┴─→ yolo
+#
+# The first four are a linear chain; local-admin and network-admin are INCOMPARABLE
+# siblings above developer — same trust tier, opposite directions. local-admin flexes
+# DOWN into this machine (elevated authority, machine/device locus, install/reconfigure);
+# network-admin flexes OUT to other hosts (remote reach, outbound network, metered cost).
+# Neither is "more permissive" than the other; they open disjoint facet regions. That is
+# the thing the old linear `Inert < SafeRead < SafeWrite` enum could not express — a
+# level is now a predicate over capability-space, so two levels can be siblings.
+#
+# The reversibility cap is the spine: every level BELOW yolo caps destruction at
+# `reversibility <= effortful` (recoverable with real work). Only yolo lifts it to
+# `irreversible` — so `destroy · irreversible` (terraform destroy, mkfs, aws rds delete)
+# is reserved for yolo, on any locus, local or remote. That single cap is what keeps
+# permanent, no-recovery-path destruction out of both admin flavors.
+#
+# A clause constrains only the facets that discriminate the level; an omitted facet is
+# unconstrained. Ordinal facets take "<= term" / ">= term" / "term" (exact); categorical
+# facets take a term or a list of terms. Allow clauses use ceilings (`<=`) and exact
+# bounds only at a ladder's minimum, so lowering any facet never flips admit→deny
+# (facet-monotonicity, checked by `authoring::authored_levels_are_facet_monotone`).
 
-[level.inert]
-# No real state read or changed: --version, --help, arithmetic, > /dev/null.
-[[level.inert.allow]]
+[level.paranoid]
+# Barely touches anything: --version, --help, arithmetic, > /dev/null. Doesn't even
+# open your files. The floor — maximally cautious; the opposite pole from yolo.
+[[level.paranoid.allow]]
 operation = ["observe"]
 locus = { local = "<= temp", remote = "none" }
 scale = "<= single"
@@ -25,30 +43,37 @@ execution = "<= self"
 authority = "user"
 cost = "none"
 
-[level.read-local]
-# Also observe worktree state: git status, ls, cat ./notes, grep -r src/. Content
-# reads are bounded by LOCUS (fail-closed, engine §0): worktree(-trusted) content
-# is trusted; home/absolute content (cat ~/.ssh/id_rsa) is above this level, denied
-# by locus, not by any secret list. `secret <= uses-ambient` still excludes
-# credential-EXTRACTION commands (keychain -> secret=reads). Machine-wide reads
-# (ps aux) are denied by their resolved locus, not a clause here.
-extends = "inert"
-[[level.read-local.allow]]
+[level.reader]
+# Observe state — LOCAL and REMOTE alike. Local: git status, ls, cat ./notes, grep -r src/.
+# Remote: a pure fetch (curl GET, `koyeb apps list`) — a read is a read regardless of where the
+# data lives, and the "network part" (an arbitrary endpoint, a response entering the model) is a
+# prompt-injection/model concern, out of scope here (like $PATH/sandbox). Only `paranoid` blocks
+# network. The read/write LOCUS distinction that DOES matter is on the WRITE side (editor/developer
+# stay local; remote writes are network-admin) — reads don't earn that friction.
+#
+# Bounds still hold, fail-closed: local content is bounded by LOCUS (home/absolute `cat ~/.ssh` is
+# above this level, denied by locus); `secret <= uses-ambient` excludes credential EXTRACTION;
+# `payload <= fetches` allows a GET but NOT `sends-host-data` — an exfil request (`curl -d @secret`)
+# carries host data OUT and is denied, and a fetch whose URL splices in a secret dies on the inner
+# secret read. So the network read is a pure fetch, never an egress.
+extends = "paranoid"
+[[level.reader.allow]]
 operation = ["observe"]
-locus = { local = "<= worktree-trusted", remote = "none" }
+locus = { local = "<= worktree-trusted", remote = "<= arbitrary" }
 reversibility = "none"
 persistence = { level = "transient" }
 disclosure = { audience = "<= local-process" }
 secret = { level = "<= uses-ambient" }
-network = { direction = "<= loopback" }
+network = { direction = "<= outbound", destination = "<= arbitrary", payload = "<= fetches" }
 execution = "<= self"
 authority = "user"
 
-[level.write-local]
-# Also create/mutate ordinary local data with no downstream execution: touch,
-# echo > file, git commit. No reconfiguring/installing, no mass ops, no network.
-extends = "read-local"
-[[level.write-local.allow]]
+[level.editor]
+# Also create/mutate ordinary local data with no downstream execution: touch, echo >
+# file, git commit. No reconfiguring/installing, no mass ops, no network. Nothing it does
+# is hard to undo.
+extends = "reader"
+[[level.editor.allow]]
 operation = ["observe", "create", "mutate"]
 locus = { local = "<= worktree", remote = "none" }
 scale = "<= bounded"
@@ -61,19 +86,20 @@ execution = "<= caller-inline"
 authority = "user"
 
 [level.developer]
-# The everyday dev-box default. So far only its local-write carve-in is authored:
-# the supply-chain build/install clause and the outbound-fetch clause land with
-# their resolvers (npm, cargo, git) in later commits, when they can be exercised.
-# The install clause, when it lands, will require BOTH a pinned source AND install
-# scripts disabled (tighter than the spec's floating+build-script default — a
-# deliberate nudge toward reproducible, script-free installs; see levels §3.4).
-extends = "write-local"
-# Delete your own project files: rm ./f, rm -rf ./node_modules. The golden-set
-# boundary is create/overwrite (write-local) vs DESTROY (developer) — overwriting
-# your own file (echo > f, cp ./a ./b) is recoverable and stays at write-local; only
-# deletion, effortful to undo, waits for developer. Recursive and effortful deletion
-# is admitted, but only WITHIN the worktree — .git/ and home/system sit at
-# worktree-trusted+ and stay denied by locus.
+# The everyday dev box. Runs your project and its pinned dependencies, edits and deletes
+# your OWN files, uses the tools you use — but stops short of anything stupidly
+# destructive (irreversible), privileged, or reaching off this machine. A developer knows
+# how to reverse an `rm -rf ./node_modules` or a `sed -i`; that's the trust this level
+# assumes. (The supply-chain build/install clause and the outbound-fetch clause land with
+# their resolvers — npm, cargo, git — in later commits, when they can be exercised; the
+# install clause will require BOTH a pinned source AND install scripts disabled.)
+extends = "editor"
+# Delete your own project files: rm ./f, rm -rf ./node_modules. The golden-set boundary is
+# create/overwrite (editor) vs DESTROY (developer) — overwriting your own file (echo > f,
+# cp ./a ./b) is recoverable and stays at editor; only deletion, effortful to undo, waits
+# for developer. Recursive and effortful deletion is admitted, but only WITHIN the worktree
+# — .git/ and home/system sit at worktree-trusted+ and stay denied by locus. IRREVERSIBLE
+# deletion (shred, mkfs) exceeds `<= effortful` and waits for yolo.
 [[level.developer.allow]]
 operation = ["destroy"]
 locus = { local = "<= worktree", remote = "none" }
@@ -85,3 +111,147 @@ secret = { level = "<= uses-ambient" }
 network = { direction = "none" }
 execution = "<= self"
 authority = "user"
+
+# Run the workspace's OWN code — the dev loop (cargo run, go run ., bash ./x.sh, python
+# ./s.py). The discriminator is the EXECUTOR LOCUS, not the effect: a range
+# `[sandbox-scope, worktree-trusted]` admits worktree-local code but excludes `temp`
+# (/tmp/x.sh is staged/downloaded, foreign) and `user`/`machine` (~/x.sh, /usr/local/bin/x).
+# Inline code carries no file locus (`process`, below the band) and so denies here; opaque
+# inline (python -c) is denied at the resolver too. `execution <= caller-file` keeps
+# ambient/network-sourced execution out of this clause. See
+# docs/design/behavioral-taxonomy-execution-origin.md.
+[[level.developer.allow]]
+operation = ["execute"]
+locus = { local = ">= sandbox-scope, <= worktree-trusted", remote = "none" }
+scale = "<= unbounded"
+reversibility = "<= effortful"
+persistence = { level = "<= data" }
+disclosure = { audience = "<= local-process" }
+secret = { level = "<= uses-ambient" }
+network = { direction = "none" }
+execution = "<= caller-file"
+authority = "user"
+
+# Install pinned dependencies WITHOUT running their code — the `npm ci --ignore-scripts` shape: a
+# lockfile-pinned, scripts-OFF install. It FETCHES packages (network) and WRITES them into the
+# worktree (node_modules) with `persistence = installing` — above editor's `data` ceiling, since a
+# future `node app` uses them — but it runs NO foreign code at install (`execution <= self`: npm
+# itself runs; the fetched code is inert data until you later run your own program, a separate
+# command). This is the "pinned source + scripts disabled" install the level's header promises. The
+# safety is enforced at the RESOLVER, which emits THIS shape only when the command is BOTH pinned AND
+# scripts-off; anything less — a floating version, OR install scripts enabled — emits `execution =
+# network-sourced` (the `supply-chain-build` archetype), which has no home below yolo. So the
+# reproducible no-code-runs install is a dev-loop staple here, while the supply-chain surface is not.
+# All `<=` ceilings (execution capped at `self`), so it stays facet-monotone — the scripts-ON install
+# is a DIFFERENT, higher region, not a floored corner of this one.
+# `<= worktree` (NOT worktree-trusted): the install writes node_modules / lockfiles, ordinary worktree
+# files. `.git/`, `.envrc`, and hooks are `worktree-trusted` — write-frozen (code injection) — and stay
+# denied here, exactly as for every other write clause.
+[[level.developer.allow]]
+operation = ["create", "mutate"]
+locus = { local = "<= worktree", remote = "none" }
+scale = "<= unbounded"
+authority = "user"
+reversibility = "<= effortful"
+persistence = { level = "<= installing" }
+disclosure = { audience = "<= local-process" }
+secret = { level = "<= uses-ambient" }
+network = { direction = "<= outbound", destination = "<= arbitrary", payload = "<= fetches" }
+execution = "<= self"
+cost = "<= local-resource"
+
+[level.local-admin]
+# Developer, but trusted to run THIS machine as an administrator. Flexes DOWN into the
+# box: elevated/root authority (sudo, doas), ORDINARY machine locus (/etc app config,
+# /usr/local, services, mounts), install/reconfigure persistence (systemctl enable, system
+# package installs, launchd). Blast radius = this host's everyday admin surface. It never
+# reaches the network. Held BACK to yolo: the SYSTEM-INTEGRITY substrate (identity/auth/
+# boot/loader — writing /etc/passwd, /etc/sudoers, /boot is compromise-complete, locus >
+# machine), raw devices and kernel-module load (locus > machine), setuid / run-as-another
+# user (authority > root), and irreversible destruction (reversibility > effortful — a disk
+# wipe is not "admin", it's yolo). The `machine`-vs-`system-integrity` split is the point: a
+# service restart or an app-config edit is admin; owning the machine's trust root is not.
+extends = "developer"
+# Privileged local state: sudo file edits under /etc, service control, package installs,
+# mounts. Destroy is admitted up to `machine` but only at `<= effortful` — the integrity
+# substrate, raw devices (`mkfs`/`shred`/`dd of=/dev/sdX`), and anything irreversible stay at yolo.
+[[level.local-admin.allow]]
+operation = ["observe", "create", "mutate", "destroy", "configure", "control", "authorize"]
+locus = { local = "<= machine", remote = "none" }
+scale = "<= unbounded"
+authority = "<= root"
+reversibility = "<= effortful"
+persistence = { level = "<= installing" }
+disclosure = { audience = "<= local-process" }
+secret = { level = "<= uses-ambient" }
+network = { direction = "none" }
+execution = "<= caller-file"
+cost = "<= local-resource"
+# Run system binaries and your own scripts AS root (sudo systemctl, sudo ./deploy.sh).
+# Executor locus up to `machine` (system binaries), still `execution <= caller-file`, so
+# running network-sourced code as root stays at yolo.
+[[level.local-admin.allow]]
+operation = ["execute"]
+locus = { local = "<= machine", remote = "none" }
+scale = "<= unbounded"
+authority = "<= root"
+reversibility = "<= effortful"
+persistence = { level = "<= installing" }
+disclosure = { audience = "<= local-process" }
+secret = { level = "<= uses-ambient" }
+network = { direction = "none" }
+execution = "<= caller-file"
+cost = "<= local-resource"
+
+[level.network-admin]
+# Developer, but trusted to operate YOUR remotes. Flexes OUT to other hosts: remote reach
+# (any host/cluster/cloud), outbound network carrying host data (push, deploy, upload),
+# metered/quota cost (provision billable resources). Blast radius = your cloud/clusters,
+# not this machine's system files — it runs as your plain local user and never sudo's the
+# box. Held BACK to yolo: IRREVERSIBLE remote destruction (terraform destroy, aws rds
+# delete, kubectl delete pvc — reversibility > effortful), inbound-listen servers,
+# TRANSMITTING A SECRET off-box (secret > uses-ambient — credential exfil), and running
+# network-sourced code (a pulled container image — that awaits the supply-chain clause).
+#
+# `disclosure.audience` is recorded up to `public`, NOT gated: publishing content you
+# authored (git push to a public repo you set up, npm publish) is the intended act of
+# someone operating their remotes, not a yolo-only recklessness. The confidentiality danger
+# is graded by CONTENT — the `secret` ceiling above — not by how public the destination is
+# (behavioral-taxonomy-exposure.md §3, §7). Destination-trust (established vs inline vs
+# dynamic target — §4) is a separate, resolver-side axis still to be designed.
+extends = "developer"
+[[level.network-admin.allow]]
+operation = ["observe", "create", "mutate", "destroy", "communicate", "configure", "control", "authorize"]
+locus = { local = "<= worktree-trusted", remote = "<= arbitrary", provenance = "<= literal" }
+scale = "<= unbounded"
+authority = "user"
+reversibility = "<= effortful"
+persistence = { level = "<= reconfiguring" }
+disclosure = { audience = "<= public" }
+secret = { level = "<= uses-ambient" }
+network = { direction = "<= outbound", destination = "<= arbitrary", payload = "<= sends-host-data" }
+execution = "<= caller-file"
+cost = "<= quota"
+
+[level.yolo]
+# No limits — it allows ALMOST everything, and it does so POSITIVELY, with no `deny`. yolo is a
+# base level (no `extends`). The one thing it withholds — unbounded irreversible destruction,
+# `rm -rf /` — is never carved IN, exactly the way every level below already excludes it (nothing
+# admits it). A UNION of allow clauses covers everything else; their only gap is the catastrophe
+# corner `destroy · irreversible · unbounded`. This is a union, not a subtraction: a capability is
+# admitted if ANY clause admits it, and no clause admits the corner. An omitted facet is
+# unconstrained (admits any value), so these three short clauses are as permissive as they read.
+#
+# Non-destroy operations: unrestricted — any locus, authority, network, execution, reversibility.
+[[level.yolo.allow]]
+operation = ["observe", "create", "mutate", "execute", "communicate", "configure", "authorize", "control"]
+# Destruction that is RECOVERABLE (at any scale) ...
+[[level.yolo.allow]]
+operation = ["destroy"]
+reversibility = "<= effortful"
+# ... OR BOUNDED (at any reversibility). The union of these two admits every destroy except the
+# one that is BOTH irreversible AND unbounded — terraform destroy (bounded) and mkfs (single
+# device) stay in, `rm -rf /` (irreversible + unbounded) is the sole capability nothing admits.
+[[level.yolo.allow]]
+operation = ["destroy"]
+scale = "<= bounded"

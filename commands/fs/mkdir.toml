@@ -14,3 +14,20 @@ valued = [
     "--context", "--mode",
     "-m",
 ]
+
+# Declarative facet behavior: mkdir CREATES each directory operand (trivially reversible —
+# rmdir removes a fresh empty dir), gated per-operand by locus so a worktree mkdir projects to
+# the dev level while `mkdir /etc/evil` denies. Scale widens on multiple operands/glob (breadth)
+# but mkdir has no recursion-into-scale flag. Replaces `resolve_mkdir`.
+[command.behavior]
+operation = "create"
+positionals = "write"
+scale = "breadth"
+standalone = [
+    "--help", "--parents", "--verbose", "--version",
+    "-Z", "-p", "-v",
+]
+valued = [
+    "--context", "--mode",
+    "-m",
+]

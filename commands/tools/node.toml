@@ -1,10 +1,32 @@
 [[command]]
 name = "node"
-description = "JavaScript runtime that executes arbitrary JavaScript with full access to the filesystem, network, child processes, and native addons. It is a general-purpose runtime — any script it runs operates with the invoking user's permissions. `--check`/`-c` is a parse-only syntax check: it reads the target file (or stdin), reports `SyntaxError` or exits cleanly, and does not execute the script, its top-level code, or any imports. Node.js ships new major versions yearly and adds CLI flags in minor releases (now at v25.x), so the flag surface is large and continuously growing."
+description = "JavaScript runtime that executes arbitrary JavaScript with full access to the filesystem, network, child processes, and native addons. `node FILE` runs a script; `-e CODE` / `-p CODE` run inline code; a bare invocation opens a REPL. Any script it runs operates with the invoking user's permissions. `--check`/`-c` is a parse-only syntax check: it reads the target file (or stdin), reports `SyntaxError` or exits cleanly, and does not execute the script, its top-level code, or any imports. Node.js ships new major versions yearly and adds CLI flags in minor releases (now at v25.x), so the flag surface is large and continuously growing."
 url = "https://nodejs.org/api/cli.html"
 researched_version = "Node.js 25.x"
+handler = "interpreter"
+doc_body = "Allowed: `--version`/`--help` (informational), `--check`/`-c FILE` (parse-only syntax check, runs no code), and running a WORKSPACE-local script (`node server.js`, `node ./src/main.js`) — the dev loop. The first positional is the script to run; further positionals are its arguments."
+examples_safe = [
+  "node --version",
+  "node --help",
+  "node --check app.js",
+  "node server.js",
+  "node ./src/main.js",
+]
+examples_denied = [
+  "node /tmp/evil.js",
+  "node ~/Downloads/x.js",
+  "node -e 'x()'",
+  "node *.js",
+  "node",
+]
+
+# `--check`/`-c` consume the target file as their VALUE (parse-only, runs nothing), so those
+# forms leave no positional and stay Inert. A bare first positional is the SCRIPT, gated as an
+# executor (`executor = true`): workspace-local allows, foreign denies. Inline (`-e`/`-p`) is
+# absent from the allowlist, so it denies.
+[command.fallback]
+executor = "file"
 level = "Inert"
 bare = false
-max_positional = 0
 standalone = ["--help", "--version", "-h", "-v"]
 valued = ["--check", "-c"]

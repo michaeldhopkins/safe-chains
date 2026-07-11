@@ -7,3 +7,7 @@ level = "SafeWrite"
 bare = true
 standalone = ["-c", "-d", "-h"]
 valued = ["-i", "-o"]
+
+# -o writes the new libnet.cfg; -i is the old config read from.
+[command.path_gate]
+flags = { "-o" = "write", "-i" = "read" }

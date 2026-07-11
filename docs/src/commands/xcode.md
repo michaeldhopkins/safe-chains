@@ -84,6 +84,10 @@
 - Allowed standalone flags: --help, -h
 - Allowed valued flags: --convert, --output, -c, -o
 
+**Examples:**
+
+- `iconutil -c iconset -o ./out.iconset app.icns`
+
 ### `layerutil`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/layerutil.1.html">https://keith.github.io/xcode-man-pages/layerutil.1.html</a></p>
 

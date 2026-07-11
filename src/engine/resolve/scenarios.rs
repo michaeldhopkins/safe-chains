@@ -30,40 +30,32 @@ mod tests {
     }
 
     #[test]
-    fn reads_public_configs_denies_secrets_and_private() {
+    fn reads_the_workspace_denies_everything_outside() {
         check(
             &[
-                "cat /etc/hosts",
-                "cat /etc/os-release",
-                "head -n 5 /etc/services",
-                "tail /etc/group",
-                "wc -l /etc/passwd",
-                "grep localhost /etc/hosts",
-                "grep -n foo /etc/protocols",
-                "cat /usr/bin/python3",
-                "cat /usr/share/doc/bash/README",
-                "cat /usr/local/lib/thing.so",
-                "cat /etc/ssl/certs/ca-certificates.crt",
+                // only the workspace and temp read
                 "cat ./notes.md",
                 "grep -r TODO ./src",
                 "cat /tmp/scratch.txt",
             ],
             &[
+                // the retreat: system paths are NO LONGER auto-read — they prompt (grant to allow)
+                "cat /etc/hosts",
+                "cat /etc/passwd",
+                "cat /usr/bin/python3",
+                "cat /etc/ssl/certs/ca-certificates.crt",
+                // secrets — denied and un-grantable (the shield)
                 "cat /etc/shadow",
-                "cat /etc/ssl/private/server.key",
                 "cat ~/.ssh/id_rsa",
                 "cat ~/.aws/credentials",
                 "cat ~/.gnupg/secring.gpg",
                 "cat ~/.netrc",
                 "cat ~/.kube/config",
                 "cat ~/.docker/config.json",
-                "grep token ~/.config/gh/hosts.yml",
+                // home is not admitted
                 "cat ~/notes.txt",
                 "cat ~/Documents/taxes.pdf",
                 "cat ~/.bashrc",
-                "cat /etc/sudoers",
-                "cat /var/lib/mysql/ibdata1",
-                "cat /srv/app/secret.db",
                 "cat /root/.bashrc",
                 "cat $SECRET",
                 "cat ../../../etc/shadow",
@@ -108,16 +100,16 @@ mod tests {
     fn transfer_and_devices() {
         check(
             &[
-                "cp /etc/hosts ./hosts.bak",
-                "cp /etc/os-release ./os.txt",
-                "ln -s /etc/hosts ./hosts",
-                "dd if=/etc/hosts of=/tmp/h",
+                // worktree→worktree / →temp transfers
+                "cp ./a ./b",
+                "cp ./a /tmp/b",
+                "dd if=./a of=/tmp/h",
             ],
             &[
+                // reading a system/secret source now denies (was the admit map)
+                "cp /etc/hosts ./hosts.bak",
                 "cp ~/.ssh/id_rsa ./stolen",
                 "cp /etc/shadow ./x",
-                "ln -s /etc/shadow ./x",
-                "ln ~/.aws/credentials ./x",
                 "dd if=~/.ssh/id_rsa of=./x",
                 "dd if=/dev/rdisk0 of=./image",
                 "dd if=./a of=/dev/sda",
@@ -142,64 +134,45 @@ mod tests {
     }
 
     #[test]
-    fn linux_kernel_info_logs_and_devices() {
+    fn linux_system_introspection_is_no_longer_auto_read() {
+        // the retreat removed the /proc, /sys, /var/log admit map — these now prompt (or grant)
         check_os(
             "linux",
+            &["cat ./notes.md", "cat /tmp/x"],
             &[
                 "cat /proc/cpuinfo",
-                "cat /proc/meminfo",
-                "cat /proc/loadavg",
-                "cat /proc/mounts",
                 "cat /proc/sys/net/ipv4/ip_forward",
                 "cat /sys/class/net/eth0/address",
                 "cat /var/log/syslog",
-                "tail -n 100 /var/log/dmesg",
-                "cat /etc/lsb-release",
-            ],
-            &[
                 "cat /proc/self/environ",
-                "cat /proc/1/mem",
-                "cat /proc/1/cmdline",
                 "cat /var/log/auth.log",
-                "cat /var/log/secure",
-                "grep root /var/log/audit/audit.log",
-                "sed -i s/0/1/ /proc/sys/net/ipv4/ip_forward",
                 "dd if=./a of=/dev/sda",
-                "dd if=/dev/nvme0n1 of=./img",
             ],
         );
     }
 
     #[test]
-    fn macos_system_trees_and_home() {
+    fn macos_system_and_home_are_not_auto_read() {
         check_os(
             "macos",
+            &["cat ./notes.md", "cat /private/tmp/x"],
             &[
                 "cat /System/Library/CoreServices/SystemVersion.plist",
                 "cat /Library/Preferences/com.apple.loginwindow.plist",
-                "cat /private/etc/hosts",
                 "cat /usr/bin/swift",
-            ],
-            &[
                 "cat ~/Library/Keychains/login.keychain-db",
-                "cat ~/Library/Preferences/secrets.plist",
-                "cat /Users/someone/notes.txt",
                 "cat /etc/master.passwd",
-                "cat /private/etc/master.passwd",
-                "rm /System/Library/x",
                 "touch /Library/LaunchDaemons/evil.plist",
                 "dd if=/dev/rdisk0 of=./img",
             ],
         );
     }
 
-    /// Sanity: `/proc` is linux-only. The SAME command flips by platform — proof the OS scope
-    /// is actually consulted, not incidental.
+    /// Sanity: `/private/tmp` is a macOS-only scratch node. The SAME write flips by platform —
+    /// proof the OS scope is actually consulted, not incidental.
     #[test]
     fn os_scope_is_load_bearing() {
-        assert!(allows_on("linux", "cat /proc/cpuinfo"), "linux: /proc readable");
-        assert!(!allows_on("macos", "cat /proc/cpuinfo"), "macos: /proc is unknown → deny");
-        assert!(allows_on("macos", "cat /System/Library/x"), "macos: /System readable");
-        assert!(!allows_on("linux", "cat /System/Library/x"), "linux: /System is unknown → deny");
+        assert!(allows_on("macos", "cp ./a /private/tmp/x"), "macos: /private/tmp is scratch");
+        assert!(!allows_on("linux", "cp ./a /private/tmp/x"), "linux: /private/tmp is unknown → deny");
     }
 }

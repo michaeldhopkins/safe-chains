@@ -103,7 +103,8 @@ ordinal_term! {
         Worktree => "worktree",
         WorktreeTrusted => "worktree-trusted",  // .git/, .envrc, hooks, CI configs
         User => "user",                         // ~, keychain
-        Machine => "machine",                   // /etc, services, other users
+        Machine => "machine",                   // services, /etc app config, /usr/local — ordinary admin
+        SystemIntegrity => "system-integrity",  // identity/auth/boot/loader/system binaries — compromise-complete
         Device => "device",                     // raw block/char devices
         Kernel => "kernel",                     // module/extension load
     }
@@ -125,6 +126,24 @@ categorical_term! {
         Na => "n/a",         // no remote reach
         Pinned => "pinned",  // host/context/profile explicit on the command line
         Ambient => "ambient",
+    }
+}
+
+ordinal_term! {
+    /// How the acted-on remote target was DESIGNATED — a *trust* ladder, orthogonal to
+    /// `RemoteReach` (breadth: one host vs any) and `RemoteBinding` (visibility: on the CLI
+    /// vs from session). Trust in a destination follows its provenance: what makes `git push`
+    /// safe is that the target is a pre-established root, not that data leaves. The
+    /// destination-aware resolver assigns it from the target argument (we do not read
+    /// `.git/config`); see `behavioral-taxonomy-exposure.md` §4.
+    Provenance {
+        Na => "n/a",                    // no designated remote target (a local op)
+        Established => "established",    // a stable handle set up by a prior deliberate act:
+                                         // a configured remote, a named context, a saved profile
+        Literal => "literal",           // spelled out in full at invocation (a URL/host typed
+                                         // now) — visible and reviewable, but injectable
+        Opaque => "opaque",             // from a variable / substitution — not visible in the
+                                         // command string, so unreviewable (fail-closed worst)
     }
 }
 
@@ -356,6 +375,7 @@ pub struct Locus {
     pub local: LocalLocus,
     pub remote: RemoteReach,
     pub binding: RemoteBinding,
+    pub provenance: Provenance,
 }
 
 /// Durability trigger — how far execution escapes, and (if recurring) what kind.
@@ -454,6 +474,7 @@ impl Capability {
                 local: LocalLocus::Kernel,
                 remote: RemoteReach::Arbitrary,
                 binding: RemoteBinding::Ambient,
+                provenance: Provenance::Opaque,
             },
             scale: Scale::Unbounded,
             authority: Authority::OtherUser,
@@ -535,6 +556,7 @@ mod tests {
         assert_term_strings_roundtrip::<LocalLocus>();
         assert_term_strings_roundtrip::<RemoteReach>();
         assert_term_strings_roundtrip::<RemoteBinding>();
+        assert_term_strings_roundtrip::<Provenance>();
         assert_term_strings_roundtrip::<Scale>();
         assert_term_strings_roundtrip::<Authority>();
         assert_term_strings_roundtrip::<Isolation>();
@@ -560,6 +582,7 @@ mod tests {
     fn ordinal_zero_terms_are_the_minimum() {
         assert_zero_is_minimum::<LocalLocus>();
         assert_zero_is_minimum::<RemoteReach>();
+        assert_zero_is_minimum::<Provenance>();
         assert_zero_is_minimum::<Scale>();
         assert_zero_is_minimum::<Authority>();
         assert_zero_is_minimum::<Isolation>();
@@ -580,7 +603,8 @@ mod tests {
     fn ordinal_ladders_match_the_spec() {
         assert!(LocalLocus::Process < LocalLocus::Worktree);
         assert!(LocalLocus::Worktree < LocalLocus::Machine);
-        assert!(LocalLocus::Machine < LocalLocus::Device);
+        assert!(LocalLocus::Machine < LocalLocus::SystemIntegrity);
+        assert!(LocalLocus::SystemIntegrity < LocalLocus::Device);
         assert!(LocalLocus::Device < LocalLocus::Kernel);
         assert!(Scale::Single < Scale::Bounded && Scale::Bounded < Scale::Unbounded);
         assert!(Authority::User < Authority::Root && Authority::Root < Authority::OtherUser);
@@ -588,6 +612,9 @@ mod tests {
         assert!(PersistenceLevel::Data < PersistenceLevel::Installing);
         assert!(TriggerEscape::Immediate < TriggerEscape::Boot);
         assert!(DisclosureAudience::LocalProcess < DisclosureAudience::Public);
+        assert!(Provenance::Na < Provenance::Established);
+        assert!(Provenance::Established < Provenance::Literal);
+        assert!(Provenance::Literal < Provenance::Opaque);
         assert!(SecretLevel::Reads < SecretLevel::Transmits);
         assert!(ExecutionTrust::SelfCode < ExecutionTrust::NetworkSourced);
         assert!(Pinning::Floating < Pinning::HashVerified);

@@ -1,122 +1,9 @@
-use crate::parse::{Token, WordSet};
-use crate::verdict::{SafetyLevel, Verdict};
+//! `tar` is owned by the ENGINE resolver (`engine::resolve::resolve_tar`), which is
+//! authoritative — it models tar's operation (list/create/extract), locus (which files the
+//! members and archive touch), and the cumulative `-C` chdir positively, so there is no legacy
+//! handler here (the old one was a fail-open flag DENYLIST, fully superseded). This module keeps
+//! only tar's DOCS and registry entry; the tests below are engine integration tests for tar.
 
-static TAR_DANGEROUS_LONG: WordSet = WordSet::new(&[
-    "--append", "--concatenate", "--create", "--delete",
-    "--extract", "--get", "--update",
-]);
-
-const TAR_DANGEROUS_SHORT: &[u8] = b"Acrux";
-
-const TAR_SAFE_SHORT: &[u8] = b"JfjtvzO";
-
-static TAR_SAFE_LONG: WordSet = WordSet::new(&[
-    "--bzip2", "--file", "--gzip", "--list", "--verbose", "--xz", "--zstd",
-]);
-
-fn is_old_style_flags(s: &str) -> bool {
-    !s.starts_with('-') && !s.is_empty() && s.bytes().all(|b| b.is_ascii_alphabetic())
-}
-
-fn has_list_mode(tokens: &[Token]) -> bool {
-    for (idx, t) in tokens[1..].iter().enumerate() {
-        if *t == "--list" {
-            return true;
-        }
-        let s = t.as_str();
-        if s.starts_with('-') && !s.starts_with("--")
-            && s.bytes().skip(1).any(|b| b == b't')
-        {
-            return true;
-        }
-        if idx == 0 && is_old_style_flags(s) && s.contains('t') {
-            return true;
-        }
-    }
-    false
-}
-
-fn has_dangerous_char(s: &str) -> bool {
-    s.bytes().skip(1).any(|b| TAR_DANGEROUS_SHORT.contains(&b))
-}
-
-fn all_chars_safe(s: &str) -> bool {
-    s.bytes().skip(1).all(|b| TAR_SAFE_SHORT.contains(&b) || b == b't')
-}
-
-fn check_short_bundle(s: &str) -> Option<usize> {
-    if has_dangerous_char(s) {
-        return None;
-    }
-    if !all_chars_safe(s) {
-        if s.contains('f') {
-            return Some(2);
-        }
-        return None;
-    }
-    if s.contains('f') { Some(2) } else { Some(1) }
-}
-
-fn is_safe_tar(tokens: &[Token]) -> Verdict {
-    if tokens.len() == 2 && (tokens[1] == "--help" || tokens[1] == "-h" || tokens[1] == "--version") {
-        return Verdict::Allowed(SafetyLevel::Inert);
-    }
-    if !has_list_mode(tokens) {
-        return Verdict::Denied;
-    }
-    let mut i = 1;
-    while i < tokens.len() {
-        let t = &tokens[i];
-        let s = t.as_str();
-        if TAR_DANGEROUS_LONG.contains(t) {
-            return Verdict::Denied;
-        }
-        if TAR_SAFE_LONG.contains(t) {
-            i += 1;
-            continue;
-        }
-        if s == "--file" || s == "-f" {
-            i += 2;
-            continue;
-        }
-        if s.starts_with('-') && !s.starts_with("--") && s.len() > 1 {
-            match check_short_bundle(s) {
-                Some(advance) => { i += advance; continue; }
-                None => return Verdict::Denied,
-            }
-        }
-        if i == 1 && is_old_style_flags(s) {
-            let dashed = format!("-{s}");
-            match check_short_bundle(&dashed) {
-                Some(advance) => { i += advance; continue; }
-                None => return Verdict::Denied,
-            }
-        }
-        if s.starts_with("--") {
-            return Verdict::Denied;
-        }
-        i += 1;
-    }
-    Verdict::Allowed(SafetyLevel::Inert)
-
-}
-
-pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
-    match cmd {
-        "tar" => Some(is_safe_tar(tokens)),
-        _ => None,
-    }
-}
-
-pub(in crate::handlers::coreutils) fn command_docs() -> Vec<crate::docs::CommandDoc> {
-    vec![
-        crate::docs::CommandDoc::handler("tar",
-            "https://man7.org/linux/man-pages/man1/tar.1.html",
-            "Listing mode only (requires -t or --list). Old-style flags accepted (e.g. tar tf, tar tzf).\n\
-             Flags: -f, -j, -J, -v, -z, -O, --bzip2, --file, --gzip, --xz, --zstd.",
-            "fs"),
-    ]
-}
 
 #[cfg(test)]
 pub(in crate::handlers::coreutils) const REGISTRY: &[crate::handlers::CommandEntry] = &[
@@ -150,10 +37,27 @@ mod tests {
         tar_update: "tar -uf archive.tar newfile",
         tar_bundled_create: "tar -tcf archive.tar",
         tar_old_style_cf: "tar cf archive.tar files/",
+        // -C DIR binds the members to DIR (like find {}→path): worktree members still allow.
+        tar_change_dir_worktree: "tar -cf out.tar -C ./src main.rs lib.rs",
+        tar_change_dir_long: "tar -cf out.tar --directory=./build a.o",
+        tar_change_dir_glued: "tar -cf out.tar -C./src main.rs",
     }
 
     denied! {
         tar_extract: "tar -xf archive.tar",
+        // -C into a system dir → the members are system paths → deny (a secret member here;
+        // note /etc/passwd|hosts are public-config and archiving THOSE is a legit read).
+        tar_change_dir_secret: "tar -cf out.tar -C /etc shadow",
+        tar_change_dir_home_key: "tar -cf out.tar -C ~/.ssh id_rsa",
+        tar_change_dir_absolute_member: "tar -cf out.tar -C /tmp /etc/shadow",
+        // still worst-cased: value-taking options we don't model.
+        tar_files_from_denied: "tar -cf out.tar -T /etc/shadow",
+        // tar applies -C CUMULATIVELY (chdir per -C): `-C / -C etc` resolves to /etc, so the
+        // member reads a system file — must deny (was a false-allow when -C was "last wins").
+        tar_cumulative_c_etc: "tar cf out.tar -C / -C etc shadow",
+        tar_cumulative_c_stream: "tar cf - -C / -C etc shadow",
+        tar_cumulative_c_home_key: "tar cf out.tar -C /home -C victim .ssh/id_rsa",
+        tar_cumulative_c_root_key: "tar cf out.tar -C / -C root -C .ssh id_rsa",
         tar_bare: "tar",
         tar_no_list: "tar -f archive.tar",
         tar_bundled_extract: "tar -txf archive.tar",

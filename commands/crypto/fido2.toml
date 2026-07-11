@@ -8,6 +8,10 @@ bare = false
 standalone = ["-G", "-V", "-b", "-d", "-h", "-p", "-r", "-u", "-v", "-w"]
 valued = ["-i", "-o", "-t"]
 
+# -i is the input file, -o the output file. -t is an algorithm type, not a path.
+[command.path_gate]
+flags = { "-o" = "write", "-i" = "read" }
+
 [[command]]
 name = "fido2-cred"
 description = "libfido2 credential tool. -M makes a new FIDO2 credential on a connected authenticator (private key stays on the device; only the public key and credential ID are returned); -V verifies a previously obtained credential. Reads parameters from stdin or -i input file; writes output to stdout or -o output file. Network is not involved; the operation is between the local process and a USB/NFC/BLE authenticator. Other flags toggle PIN prompts, the hmac-secret extension, the credProtect level, and resident/discoverable credentials. libfido2's CLI is stable across releases."
@@ -17,6 +21,10 @@ level = "SafeWrite"
 bare = false
 standalone = ["-M", "-V", "-b", "-d", "-h", "-q", "-r", "-u", "-v", "-w"]
 valued = ["-a", "-c", "-i", "-o", "-t"]
+
+# -i is the input file, -o the output file. -a/-c/-t are credential parameters, not paths.
+[command.path_gate]
+flags = { "-o" = "write", "-i" = "read" }
 
 [[command]]
 name = "fido2-token"

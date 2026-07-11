@@ -11,8 +11,9 @@ name = "auth"
 nested_bare = true
 [[command.sub.sub]]
 name = "token"
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+profile = "credential-read"
+fact = "`basecamp auth token` prints the account's OAuth 2.0 access token to stdout for use in scripts — a bearer credential that enters the caller's context."
+source = "https://github.com/basecamp/basecamp-cli"
 
 [[command.sub]]
 name = "cards"

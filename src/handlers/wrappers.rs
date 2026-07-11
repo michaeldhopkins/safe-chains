@@ -157,7 +157,7 @@ mod tests {
         time_git_push_denied: "time git push",
         env_rm_denied: "env rm -rf /",
         env_sh_denied: "env sh -c 'rm -rf /'",
-        env_python_denied: "env python3 evil.py",
+        env_python_denied: "env python3 /tmp/evil.py",
         env_var_rm_denied: "env FOO=bar rm -rf /",
         nice_rm_denied: "nice rm -rf /",
         nice_with_priority_rm_denied: "nice -n 10 rm -rf /",

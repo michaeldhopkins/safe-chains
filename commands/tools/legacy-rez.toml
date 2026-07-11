@@ -20,6 +20,12 @@ tolerate_unknown_short = true
 standalone = ["-a", "-align", "-append", "-m", "-modification", "-noResolve", "-ov", "-p", "-progress", "-rd", "-ro", "-useDF"]
 valued = ["-arch", "-c", "-creator", "-d", "-define", "-F", "-i", "-is", "-isysroot", "-o", "-s", "-script", "-t", "-type", "-u", "-undef"]
 
+# -o names the compiled resource output; the positional .r files are sources.
+# -i/-is/-isysroot/-F are include/SDK search directories (often system paths), left ungated.
+[command.path_gate]
+positional = "read"
+flags = { "-o" = "write" }
+
 [[command]]
 name = "ResMerger"
 description = "Merges Carbon resource forks (or data forks) from multiple input files into a single output resource file. Writes the destination given to -o. Part of the deprecated Carbon tooling chain — last meaningful change predates Xcode 6. Entirely local; no network."
@@ -30,6 +36,12 @@ bare = false
 standalone = ["-append", "-a"]
 valued = ["-fileCreator", "-fileType", "-srcIs", "-dstIs", "-skip", "-o"]
 
+# -o is the merged destination file; the positionals are input resource files.
+# -srcIs/-dstIs are fork selectors, -fileCreator/-fileType/-skip are codes — not paths.
+[command.path_gate]
+positional = "read"
+flags = { "-o" = "write" }
+
 [[command]]
 name = "SetFile"
 description = "Sets HFS+ file attributes (creator, type, creation/modification date, Finder attribute bits) on the named files. Modifies the files in place. Part of the deprecated Carbon tooling chain — last meaningful change predates Xcode 6. Entirely local; no network."
@@ -39,6 +51,11 @@ level = "SafeWrite"
 bare = false
 standalone = ["-P"]
 valued = ["-a", "-c", "-d", "-m", "-t"]
+
+# SetFile modifies the named files in place, so the positionals are write targets.
+# -a/-c/-d/-m/-t carry attribute-bit/creator/type/date values, not paths.
+[command.path_gate]
+positional = "write"
 
 [[command]]
 name = "SplitForks"

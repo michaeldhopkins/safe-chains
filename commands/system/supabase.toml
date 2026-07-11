@@ -1,17 +1,32 @@
 [[command]]
 name = "supabase"
-description = "Supabase CLI — managed Postgres + Auth + Storage + Edge Functions. Most subcommands contact Supabase Cloud or run a local stack via Docker. Read-side: `version`, `status`, `projects list`, `orgs list`, `domains get`, `migration list/squash`, `branches list/get`, `services list/show`, `inspect db`, `inspect db query`, `network-bans list`, `secrets list`. Write-side: `init`, `start`, `stop`, `link`, `unlink`, `login`, `logout`, `db push`, `db pull`, `db reset`, `db dump`, `db diff`, `migration new`, `secrets set/unset`, `functions deploy/serve/new/delete`, `storage cp`."
+description = "Supabase CLI (v2.x) — manages a Supabase project (managed Postgres + Auth + Storage + Edge Functions) both locally (a Docker stack) and against Supabase Cloud via its management API. Local-only: `init` scaffolds supabase/config.toml; `start`/`stop` run the Docker stack (pulling and running service images); `status` reports the local stack. Cloud reads (contact the management API or the linked database and return state to the caller): `projects/orgs/branches list|get`, `secrets list` (returns each secret's NAME + SHA-256 digest only, not the value), `migration list|fetch`, `functions list|download`, `db pull|dump|diff|lint`, `gen types`, `inspect db …` (read-only diagnostics), `services`, `snippets list|download`, `domains/vanity-subdomains get`, `sso list|show|info`, `network-bans/network-restrictions/ssl-enforcement/postgres-config get`. Cloud writes/control: `db push` and `migration repair` (mutate the remote database / migration-history table), `functions deploy|delete`, `branches create|update|delete|pause|unpause`, `projects create`, `projects delete` (permanent project + data teardown), `secrets set|unset`, `config push`, `postgres-config/network-restrictions/network-bans/ssl-enforcement update`, `domains create|activate|reverify|delete`, `sso add|update|remove`. Credential exposure: `projects api-keys` prints the anon and service_role API-key VALUES (service_role bypasses row-level security — full DB admin); `encryption get-root-key` prints the project's 64-char root encryption key; `gen keys` emits branch API keys; `gen signing-key` generates a private JWT signing key. Auth/link: `login`/`logout` store or remove a personal access token in native credential storage; `link`/`unlink` associate the working directory with a remote project (link may prompt for the database password). Ships continuous 2.x releases (multiple a month) and, since 2026, defaults to JSON output in detected coding-agent environments (override with --agent no)."
 url = "https://supabase.com/docs/reference/cli/introduction"
-researched_version = "supabase 1.x"
+researched_version = "v2.110.0-beta.30 (2026-07-16); Supabase CLI 2.x line"
 bare_flags = ["--help", "--version", "-h", "-v"]
 examples_safe = [
     "supabase status",
     "supabase version",
+    "supabase projects list",
+    "supabase branches list",
+    "supabase secrets list",
+    "supabase migration list",
+    "supabase functions list",
+    "supabase db diff --linked",
+    "supabase inspect db bloat --linked",
+    "supabase db dump --data-only",
+    "supabase db dump -f dump.sql --linked",
 ]
 examples_denied = [
     "supabase start",
-    "supabase db reset",
+    "supabase db dump -f /etc/passwd",
+    "supabase db push",
     "supabase functions deploy myfunc",
+    "supabase projects api-keys",
+    "supabase encryption get-root-key",
+    "supabase gen signing-key",
+    "supabase secrets set FOO=bar",
+    "supabase projects delete abcdefgh",
 ]
 
 [[command.sub]]
@@ -30,9 +45,22 @@ name = "help"
 allow_all = true
 
 [[command.sub]]
-name = "init"
-candidate = true
+name = "status"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
 
+[[command.sub]]
+name = "init"
+level = "SafeWrite"
+bare = true
+standalone = ["--help", "-h", "--force", "--with-intellij-settings", "--with-vscode-settings", "--use-orioledb"]
+
+# ── Auth / link / local-stack / bootstrap: above the auto-approve line, no matching remote
+# archetype. login/logout persist or clear a personal access token in native credential storage
+# (HOME/keychain, outside the worktree); link/unlink bind the working dir to a remote project (link
+# may prompt for the DB password); start/stop run a local Docker stack that pulls and executes service
+# images; bootstrap provisions a remote project and deploys a starter template. Left candidate.
 [[command.sub]]
 name = "login"
 candidate = true
@@ -58,95 +86,486 @@ name = "stop"
 candidate = true
 
 [[command.sub]]
-name = "status"
-level = "SafeRead"
-bare = true
-standalone = ["--help", "-h"]
+name = "bootstrap"
+candidate = true
 
+# ── inspect: read-only database diagnostics (bloat, blocking, locks, outliers, table/index/role
+# stats, replication-slots, …), against --local / --linked / --db-url. Entire subtree is inspection-
+# only per upstream. Classified as a leaf remote-read so the whole `inspect db …` surface auto-reads.
 [[command.sub]]
+name = "inspect"
+profile = "remote-read"
+fact = "`inspect db` runs read-only diagnostic queries (bloat, blocking, locks, calls, outliers, table/index/role/db stats, replication-slots, vacuum-stats, long-running-queries) against the local or linked (--linked/--db-url) database; no mutation."
+source = "https://supabase.com/docs/reference/cli/supabase-inspect-db"
+
+# ── services: reports the running/latest service image versions for the project.
+[[command.sub]]
+name = "services"
+profile = "remote-read"
+fact = "Lists the current and latest versions of the project's managed services; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-services"
+
+# ── db: schema/data operations spanning local and (via --linked/--db-url) the remote database.
+[[command.sub]]
+name = "db"
+nested_bare = true
+[[command.sub.sub]]
+name = "pull"
+profile = "remote-read"
+fact = "Reads the remote database schema and writes the diff as a new local migration file; the remote interaction is a read."
+source = "https://supabase.com/docs/reference/cli/supabase-db-pull"
+[[command.sub.sub]]
+name = "dump"
+profile = "data-export"
+output_path_flags = ["-f", "--file"]
+fact = "Dumps the remote database schema (and, with --data-only, table data) to stdout or, with -f/--file, a local file; reads remote state, no mutation."
+source = "https://supabase.com/docs/reference/cli/supabase-db-dump"
+judgment = "A BULK remote read (can export all row data to the caller) — data-export, not a point read: scale=unbounded records the volume, disclosure=local-process the destination (the two together proxy the data's unknowable sensitivity). The -f/--file output form adds a path-gated local write, so a dump to a system path gates on locus while one to the worktree stays local."
+[[command.sub.sub]]
+name = "diff"
+profile = "remote-read"
+fact = "Compares schemas (local containers or the linked remote database via --linked/--db-url) and prints the difference; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-db-diff"
+[[command.sub.sub]]
+name = "lint"
+profile = "remote-read"
+fact = "Checks the database (local or --linked) for schema errors and prints findings; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-db-lint"
+[[command.sub.sub]]
+name = "push"
+profile = "remote-mutate"
+fact = "Applies pending local migrations to the linked remote database, altering its schema."
+source = "https://supabase.com/docs/reference/cli/supabase-db-push"
+[[command.sub.sub]]
+name = "reset"
+candidate = true
+[[command.sub.sub]]
+name = "start"
+candidate = true
+
+# ── migration: version-controlled schema evolution.
+[[command.sub]]
+name = "migration"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Shows migration history for local and (when linked) remote databases; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-migration-list"
+[[command.sub.sub]]
+name = "fetch"
+profile = "remote-read"
+fact = "Fetches migration files from the remote history table into the local project; the remote interaction is a read."
+source = "https://supabase.com/docs/reference/cli/supabase-migration-fetch"
+[[command.sub.sub]]
+name = "new"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "repair"
+profile = "remote-mutate"
+fact = "Updates the remote migration-history table to mark migrations as applied or reverted, reconciling drift."
+source = "https://supabase.com/docs/reference/cli/supabase-migration-repair"
+[[command.sub.sub]]
+name = "up"
+candidate = true
+[[command.sub.sub]]
+name = "down"
+candidate = true
+[[command.sub.sub]]
+name = "squash"
+candidate = true
+
+# ── functions: Edge Functions lifecycle.
+[[command.sub]]
+name = "functions"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists the project's deployed Edge Functions; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-functions-list"
+[[command.sub.sub]]
+name = "download"
+profile = "remote-read"
+fact = "Downloads a deployed function's source from the project to the local project; the remote interaction is a read."
+source = "https://supabase.com/docs/reference/cli/supabase-functions-download"
+[[command.sub.sub]]
+name = "new"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "deploy"
+profile = "remote-control"
+fact = "Bundles and uploads function code to Supabase's edge runtime, activating it in production."
+source = "https://supabase.com/docs/reference/cli/supabase-functions-deploy"
+[[command.sub.sub]]
+name = "delete"
+profile = "remote-destroy-recoverable"
+fact = "Removes a deployed function from the project via the management API."
+source = "https://supabase.com/docs/reference/cli/supabase-functions-delete"
+judgment = "Recoverable: the function is redeployable from its local source."
+[[command.sub.sub]]
+name = "serve"
+candidate = true
+
+# ── orgs.
+[[command.sub]]
+name = "orgs"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists the organizations the caller belongs to; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-orgs-list"
+[[command.sub.sub]]
+name = "create"
+profile = "remote-create"
+fact = "Creates a new organization on the Supabase platform."
+source = "https://supabase.com/docs/reference/cli/supabase-orgs-create"
+
+# ── projects.
+[[command.sub]]
+name = "projects"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists the projects accessible to the caller; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-projects-list"
+[[command.sub.sub]]
+name = "create"
+profile = "remote-create"
+fact = "Provisions a new Supabase project (a managed Postgres instance); metered."
+source = "https://supabase.com/docs/reference/cli/supabase-projects-create"
+[[command.sub.sub]]
+name = "delete"
+profile = "remote-destroy-irreversible"
+fact = "Deletes a Supabase project, permanently tearing down its database and all stored data."
+source = "https://supabase.com/docs/reference/cli/supabase-projects-delete"
+judgment = "Classified irreversible: project deletion removes the managed database and its data with no CLI-side restore path."
+[[command.sub.sub]]
+name = "api-keys"
+profile = "credential-read"
+fact = "Prints the project's API keys, including the anon and service_role key VALUES; the service_role key bypasses row-level security (full database admin)."
+source = "https://supabase.com/docs/reference/cli/supabase-projects-api-keys"
+judgment = "Credential exposure: the printed key material enters the caller's context. This is the narrowing of the projects group's read surface — list is a benign remote-read, api-keys reveals live secrets."
+
+# ── branches: preview/database branches.
+[[command.sub]]
+name = "branches"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists the project's preview branches; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-branches-list"
+[[command.sub.sub]]
+name = "get"
+profile = "remote-read"
+fact = "Retrieves details of a specific preview branch; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-branches-get"
+[[command.sub.sub]]
+name = "create"
+profile = "remote-create"
+fact = "Provisions a new preview branch (an isolated database environment); metered."
+source = "https://supabase.com/docs/reference/cli/supabase-branches-create"
+[[command.sub.sub]]
+name = "update"
+profile = "remote-mutate"
+fact = "Updates a preview branch's configuration via the management API."
+source = "https://supabase.com/docs/reference/cli/supabase-branches-update"
+[[command.sub.sub]]
+name = "delete"
+profile = "remote-destroy-recoverable"
+fact = "Deletes a preview branch and its isolated environment."
+source = "https://supabase.com/docs/reference/cli/supabase-branches-delete"
+judgment = "Recoverable: a branch is recreatable from the parent project and migrations."
+[[command.sub.sub]]
+name = "pause"
+profile = "remote-control"
+fact = "Suspends a running preview branch."
+source = "https://supabase.com/docs/reference/cli/supabase-branches-update"
+[[command.sub.sub]]
+name = "unpause"
+profile = "remote-control"
+fact = "Resumes a paused preview branch."
+source = "https://supabase.com/docs/reference/cli/supabase-branches-update"
+
+# ── domains: custom hostnames.
+[[command.sub]]
+name = "domains"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+profile = "remote-read"
+fact = "Retrieves the custom hostname configuration stored for the project; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-domains-get"
+[[command.sub.sub]]
+name = "create"
+profile = "remote-mutate"
+fact = "Registers a custom hostname configuration for the project via the management API."
+source = "https://supabase.com/docs/reference/cli/supabase-domains-create"
+[[command.sub.sub]]
+name = "activate"
+profile = "remote-control"
+fact = "Reconfigures the project to serve requests on the custom hostname instead of the default subdomain."
+source = "https://supabase.com/docs/reference/cli/supabase-domains-activate"
+[[command.sub.sub]]
+name = "reverify"
+profile = "remote-mutate"
+fact = "Re-validates the custom hostname configuration on the platform."
+source = "https://supabase.com/docs/reference/cli/supabase-domains-reverify"
+[[command.sub.sub]]
+name = "delete"
+profile = "remote-destroy-recoverable"
+fact = "Removes the custom hostname configuration from the project."
+source = "https://supabase.com/docs/reference/cli/supabase-domains-delete"
+judgment = "Recoverable: the hostname can be re-created."
+
+# ── vanity-subdomains.
+[[command.sub]]
+name = "vanity-subdomains"
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+profile = "remote-read"
+fact = "Retrieves the project's current vanity subdomain configuration; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-get"
+[[command.sub.sub]]
+name = "check-availability"
+profile = "remote-read"
+fact = "Checks whether a desired vanity subdomain name is available; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-check-availability"
+[[command.sub.sub]]
+name = "activate"
+profile = "remote-mutate"
+fact = "Reconfigures the project to respond on the vanity subdomain."
+source = "https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-activate"
+[[command.sub.sub]]
+name = "delete"
+profile = "remote-destroy-recoverable"
+fact = "Deletes the vanity subdomain and reverts routing to the project ref."
+source = "https://supabase.com/docs/reference/cli/supabase-vanity-subdomains-delete"
+judgment = "Recoverable: the vanity subdomain can be re-activated."
+
+# ── secrets: Edge Function environment secrets.
+[[command.sub]]
+name = "secrets"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists the project's secrets returning each secret's NAME and a SHA-256 DIGEST only; the management API never returns plaintext secret values."
+source = "https://supabase.com/docs/reference/cli/supabase-secrets-list"
+judgment = "Not credential-read: the digest is a hash, not the secret value, so no credential material enters the caller's context."
+[[command.sub.sub]]
+name = "set"
+profile = "remote-mutate"
+fact = "Stores or updates secret values in the linked project, exposed to Edge Functions as environment variables."
+source = "https://supabase.com/docs/reference/cli/supabase-secrets-set"
+[[command.sub.sub]]
+name = "unset"
+profile = "remote-destroy-recoverable"
+fact = "Removes named secrets from the linked project."
+source = "https://supabase.com/docs/reference/cli/supabase-secrets-unset"
+judgment = "Recoverable: a secret can be re-set."
+
+# ── storage: object operations on Supabase Storage buckets.
+[[command.sub]]
+name = "storage"
+nested_bare = true
+[[command.sub.sub]]
+name = "ls"
+profile = "remote-read"
+fact = "Lists objects in a Storage bucket; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-storage-ls"
+[[command.sub.sub]]
+name = "cp"
+candidate = true
+[[command.sub.sub]]
+name = "mv"
+candidate = true
+[[command.sub.sub]]
+name = "rm"
+candidate = true
+
+# ── test.
+[[command.sub]]
+name = "test"
+nested_bare = true
+[[command.sub.sub]]
+name = "new"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
 name = "db"
 candidate = true
 
-[[command.sub]]
-name = "migration"
-candidate = true
-
-[[command.sub]]
-name = "functions"
-candidate = true
-
-[[command.sub]]
-name = "orgs"
-candidate = true
-
-[[command.sub]]
-name = "projects"
-candidate = true
-
-[[command.sub]]
-name = "branches"
-candidate = true
-
-[[command.sub]]
-name = "domains"
-candidate = true
-
-[[command.sub]]
-name = "secrets"
-candidate = true
-
-[[command.sub]]
-name = "storage"
-candidate = true
-
-[[command.sub]]
-name = "services"
-candidate = true
-
-[[command.sub]]
-name = "inspect"
-candidate = true
-
-[[command.sub]]
-name = "test"
-candidate = true
-
+# ── gen: code / key generation.
 [[command.sub]]
 name = "gen"
-candidate = true
+nested_bare = true
+[[command.sub.sub]]
+name = "types"
+profile = "remote-read"
+fact = "Connects to the database (local or --linked/--db-url/--project-id) and prints typed definitions (TypeScript/Go/Swift/Python) matching its schema; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-gen-types"
+[[command.sub.sub]]
+name = "keys"
+profile = "credential-read"
+fact = "Generates and prints the project/branch API keys (anon, service_role, and publishable/secret keys) derived from the JWT secret."
+source = "https://supabase.com/docs/reference/cli/supabase-gen-keys"
+judgment = "Credential exposure: the emitted API-key values enter the caller's context."
+[[command.sub.sub]]
+name = "signing-key"
+profile = "credential-mint"
+fact = "Generates a new private JWT signing key (ES256 or RS256) for import into the dashboard or CLI use."
+source = "https://supabase.com/docs/reference/cli/supabase-gen-signing-key"
+judgment = "Mints fresh private key material returned to the caller; classified credential-mint though generation is local."
 
+# ── snippets: saved SQL snippets.
 [[command.sub]]
 name = "snippets"
-candidate = true
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists the SQL snippets saved in the linked project; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-snippets-list"
+[[command.sub.sub]]
+name = "download"
+profile = "remote-read"
+fact = "Retrieves the SQL contents of a snippet by ID; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-snippets-download"
 
+# ── sso: enterprise SAML single sign-on.
+[[command.sub]]
+name = "sso"
+nested_bare = true
+[[command.sub.sub]]
+name = "list"
+profile = "remote-read"
+fact = "Lists the SSO identity providers configured for the project; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-sso-list"
+[[command.sub.sub]]
+name = "show"
+profile = "remote-read"
+fact = "Shows the configuration of a specific SSO provider; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-sso-show"
+[[command.sub.sub]]
+name = "info"
+profile = "remote-read"
+fact = "Prints the project's SAML SSO metadata (issuer/ACS URLs); read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-sso-info"
+[[command.sub.sub]]
+name = "add"
+profile = "remote-authorize"
+fact = "Registers a SAML identity provider for the project, changing who can authenticate."
+source = "https://supabase.com/docs/reference/cli/supabase-sso-add"
+[[command.sub.sub]]
+name = "update"
+profile = "remote-authorize"
+fact = "Modifies an existing SSO provider's settings, changing authentication trust."
+source = "https://supabase.com/docs/reference/cli/supabase-sso-update"
+[[command.sub.sub]]
+name = "remove"
+profile = "remote-destroy-recoverable"
+fact = "Disconnects a SAML identity provider from the project."
+source = "https://supabase.com/docs/reference/cli/supabase-sso-remove"
+judgment = "Recoverable: the provider can be re-added."
+
+# ── network-restrictions: database CIDR allowlist.
 [[command.sub]]
 name = "network-restrictions"
-candidate = true
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+profile = "remote-read"
+fact = "Displays the project's current database network restrictions; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-network-restrictions-get"
+[[command.sub.sub]]
+name = "update"
+profile = "remote-authorize"
+fact = "Changes which IP/CIDR ranges may connect to the database (append or overwrite the allowlist) — a network access-control policy change."
+source = "https://supabase.com/docs/reference/cli/supabase-network-restrictions-update"
 
+# ── network-bans: temporarily blocked IPs.
 [[command.sub]]
 name = "network-bans"
-candidate = true
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+profile = "remote-read"
+fact = "Lists the currently active network bans (temporarily blocked IPs); read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-network-bans-get"
+[[command.sub.sub]]
+name = "remove"
+profile = "remote-mutate"
+fact = "Unblocks (removes the ban on) specified IP addresses on the project."
+source = "https://supabase.com/docs/reference/cli/supabase-network-bans-remove"
 
+# ── config: project settings as code.
 [[command.sub]]
 name = "config"
-candidate = true
+nested_bare = true
+[[command.sub.sub]]
+name = "push"
+profile = "remote-mutate"
+fact = "Applies the local supabase/config.toml to the linked remote project, updating its settings."
+source = "https://supabase.com/docs/reference/cli/supabase-config-push"
 
+# ── encryption: project root encryption key.
 [[command.sub]]
 name = "encryption"
-candidate = true
+nested_bare = true
+[[command.sub.sub]]
+name = "get-root-key"
+profile = "credential-read"
+fact = "Retrieves and prints the project's 64-character hex root encryption key."
+source = "https://supabase.com/docs/reference/cli/supabase-encryption-get-root-key"
+judgment = "Credential exposure: the root encryption key is secret material that enters the caller's context."
+[[command.sub.sub]]
+name = "update-root-key"
+profile = "remote-mutate"
+fact = "Sets/rotates the project's root encryption key on the platform."
+source = "https://supabase.com/docs/reference/cli/supabase-encryption-update-root-key"
+judgment = "Writes secret material to the remote (secret-write); above the auto-approve line regardless of the exact archetype."
 
+# ── postgres-config: Postgres parameter overrides.
 [[command.sub]]
 name = "postgres-config"
-candidate = true
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+profile = "remote-read"
+fact = "Retrieves the project's current Postgres configuration overrides; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-postgres-config-get"
+[[command.sub.sub]]
+name = "update"
+profile = "remote-mutate"
+fact = "Overrides Postgres configuration on the remote database (may destabilize it or override compute add-on tuning)."
+source = "https://supabase.com/docs/reference/cli/supabase-postgres-config-update"
+[[command.sub.sub]]
+name = "delete"
+profile = "remote-mutate"
+fact = "Deletes specific Postgres config overrides, reverting them to defaults on the remote database."
+source = "https://supabase.com/docs/reference/cli/supabase-postgres-config-delete"
 
+# ── ssl-enforcement.
 [[command.sub]]
 name = "ssl-enforcement"
-candidate = true
-
-[[command.sub]]
-name = "vanity-subdomains"
-candidate = true
-
-[[command.sub]]
-name = "bootstrap"
-candidate = true
+nested_bare = true
+[[command.sub.sub]]
+name = "get"
+profile = "remote-read"
+fact = "Retrieves the project's current SSL enforcement configuration; read-only."
+source = "https://supabase.com/docs/reference/cli/supabase-ssl-enforcement-get"
+[[command.sub.sub]]
+name = "update"
+profile = "remote-authorize"
+fact = "Enables or disables the requirement that database connections use SSL — a connection-security policy change."
+source = "https://supabase.com/docs/reference/cli/supabase-ssl-enforcement-update"

@@ -280,6 +280,10 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
         } => {
             dispatch_wrapper(tokens, standalone, valued, *positional_skip, separator.as_deref(), *bare_ok)
         }
+        DispatchKind::VerbChain(spec) => dispatch_verb_chain(tokens, spec),
+        DispatchKind::Executor { policy, level, kind, redirect_flag, shape } => {
+            dispatch_executor(tokens, policy, *kind, *level, redirect_flag.as_deref(), *shape)
+        }
         DispatchKind::Custom { handler_name, .. } => {
             handlers
                 .get(handler_name.as_str())
@@ -315,9 +319,137 @@ pub(super) fn dispatch_matrix_action(
     }
 }
 
+/// A `verb-chain` grammar (`mlr`): `CMD [main-flags…] verb [args…] then verb …`. The main-flag
+/// region is a STRICT allowlist (standalone / valued / variadic) — an unlisted flag denies, so a
+/// mutating flag like mlr's `-I`/`--in-place` (omitted) is caught by omission. The region ends at
+/// `--` or the first non-flag token, which opens the verb chain: every `then`-segment's first token
+/// (the verb NAME) must be on the `verbs` allowlist; verb ARGS are open-ended (a pure verb has no
+/// shell/file escape). See `types::VerbChainSpec`.
+pub(super) fn dispatch_verb_chain(tokens: &[Token], spec: &VerbChainSpec) -> Verdict {
+    if tokens.len() == 1 {
+        return Verdict::Denied;
+    }
+    let has = |set: &[String], s: &str| set.iter().any(|f| f == s);
+    let mut i = 1;
+    while i < tokens.len() {
+        let s = tokens[i].as_str();
+        // `--` terminates the main region; the verb chain follows it.
+        if s == "--" {
+            return verb_chain_tail(&tokens[i + 1..], spec);
+        }
+        // The first non-flag token opens the verb chain.
+        if !tokens[i].starts_with('-') {
+            return verb_chain_tail(&tokens[i..], spec);
+        }
+        if has(&spec.main_standalone, s) {
+            i += 1;
+        } else if has(&spec.main_variadic, s) {
+            // Consume input files up to the `--` terminator (or end); the `--` is left for the
+            // loop to treat as the main/verb separator next iteration.
+            i += 1;
+            while i < tokens.len() && tokens[i].as_str() != "--" {
+                i += 1;
+            }
+        } else if has(&spec.main_valued, s) {
+            i += if crate::policy::consumes_next_value(tokens.get(i + 1)) { 2 } else { 1 };
+        } else if s.split_once('=').is_some_and(|(f, _)| has(&spec.main_valued, f)) {
+            i += 1;
+        } else {
+            return Verdict::Denied;
+        }
+    }
+    // Only allowlisted main flags, no verb (`mlr --version`, `mlr --csv`): nothing runs.
+    Verdict::Allowed(spec.level)
+}
+
+/// The verb region: a `then`-chain where every segment's first token must be an allowlisted verb.
+fn verb_chain_tail(region: &[Token], spec: &VerbChainSpec) -> Verdict {
+    let mut expect_verb = true;
+    for t in region {
+        if t.as_str() == spec.separator {
+            expect_verb = true;
+            continue;
+        }
+        if expect_verb {
+            if !spec.verbs.contains(t.as_str()) {
+                return Verdict::Denied;
+            }
+            expect_verb = false;
+        }
+    }
+    // An empty region or a dangling separator leaves `expect_verb` set — no valid verb ran.
+    if expect_verb { Verdict::Denied } else { Verdict::Allowed(spec.level) }
+}
+
+/// Gate a code-execution command through the execution-origin engine (worktree code allows,
+/// foreign denies) instead of a flat level. Shared by executor SUBS (`go run`, `cargo run`)
+/// and executor FALLBACKS (interpreters). See docs/design/behavioral-taxonomy-execution-origin.md.
+///
+/// - `File`: the first positional is the executor path — `bash x.sh`, `go run ./cmd`. Tokens
+///   AFTER it are the script's own arguments (data, not validated). With no positional, it's a
+///   flag-only invocation (`python3 --version`) validated by `policy` (denies a bare REPL).
+/// - `Project`: the current project is the executor — `cargo run`. A `redirect_flag` value
+///   (`--manifest-path DIR/Cargo.toml`) moves the executor OUT of the project and is locus-gated
+///   like a file executor; without it, the project (worktree) is the executor.
+pub(super) fn dispatch_executor(
+    tokens: &[Token],
+    policy: &OwnedPolicy,
+    kind: ExecutorKind,
+    level: SafetyLevel,
+    redirect_flag: Option<&str>,
+    shape: Option<crate::policy::PositionalShape>,
+) -> Verdict {
+    match kind {
+        ExecutorKind::File => match super::policy::first_positional(tokens, policy) {
+            // A declared shape the executor path must satisfy (`go run` → `go-package`):
+            // a remote import path is not a worktree executor, so it denies here.
+            Some(first) if shape.is_some_and(|s| !s.matches(first)) => Verdict::Denied,
+            Some(first) => crate::engine::resolve::execute_file_verdict(first),
+            None if check_owned(tokens, policy) => Verdict::Allowed(level),
+            None => Verdict::Denied,
+        },
+        ExecutorKind::Project => {
+            if !check_owned(tokens, policy) {
+                return Verdict::Denied;
+            }
+            match redirect_flag.and_then(|f| flag_value(tokens, f)) {
+                Some(redirected) => crate::engine::resolve::execute_file_verdict(redirected),
+                None => crate::engine::resolve::execute_project_verdict(),
+            }
+        }
+    }
+}
+
+/// The value of valued flag `flag` in `tokens` — the space form (`--manifest-path P`) or the
+/// glued `=` form (`--manifest-path=P`). Scans only up to a `--` terminator, so a program
+/// argument after `--` can't be mistaken for the flag's value. `None` if the flag is absent.
+fn flag_value<'a>(tokens: &'a [Token], flag: &str) -> Option<&'a str> {
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        if t == "--" {
+            return None;
+        }
+        if t == flag {
+            return tokens.get(i + 1).map(Token::as_str);
+        }
+        if let Some(rest) = t.strip_prefix(flag).and_then(|r| r.strip_prefix('=')) {
+            return Some(rest);
+        }
+        i += 1;
+    }
+    None
+}
+
 /// Applies a TOML-declared fallback grammar. Used by
 /// `registry::try_fallback_grammar()`.
 pub(super) fn dispatch_fallback(tokens: &[Token], spec: &FallbackSpec) -> Verdict {
+    if let Some(kind) = spec.executor {
+        return dispatch_executor(
+            tokens, &spec.policy, kind, spec.level,
+            spec.executor_redirect_flag.as_deref(), spec.positional_shape,
+        );
+    }
     if let Some(shape) = spec.positional_shape
         && let Some(first) = super::policy::first_positional(tokens, &spec.policy)
         && !shape.matches(first)

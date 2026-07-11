@@ -127,3 +127,6 @@ valued = [
     "-T", "-U", "-c", "-d", "-i", "-j",
     "-l", "-m", "-n", "-o", "-s", "-t", "-x",
 ]
+
+[command.path_gate]
+flags = { "--input-file" = "read" }

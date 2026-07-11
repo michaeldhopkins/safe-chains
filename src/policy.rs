@@ -57,21 +57,41 @@ pub enum PositionalShape {
     /// Looks like a file path: contains `/`, contains `.`, or is `-`
     /// (the conventional stdin marker). Rejects flag-shaped tokens.
     Path,
+    /// A go LOCAL package/file argument: `.`/`..`, a `./`-, `../`-, or
+    /// `/`-anchored path, or a `*.go` file. This is exactly Go's rule for
+    /// "this is a filesystem path, not an import path" — a BARE import path
+    /// (`rsc.io/x@latest`, `example.com/cmd`, `bin/tool`) is resolved via the
+    /// module system and, with `@version`, DOWNLOADS AND RUNS remote code, so
+    /// it must not be treated as a worktree-local executor.
+    GoPackage,
 }
 
 impl PositionalShape {
     pub fn matches(self, token: &str) -> bool {
         match self {
             Self::Path => looks_like_path(token),
+            Self::GoPackage => is_go_local_package(token),
         }
     }
 
     pub fn from_name(name: &str) -> Option<Self> {
         match name {
             "path" => Some(Self::Path),
+            "go-package" => Some(Self::GoPackage),
             _ => None,
         }
     }
+}
+
+/// Whether `token` is a go LOCAL package/file (a filesystem path), as opposed to a
+/// module import path. See [`PositionalShape::GoPackage`].
+pub fn is_go_local_package(token: &str) -> bool {
+    token == "."
+        || token == ".."
+        || token.starts_with("./")
+        || token.starts_with("../")
+        || token.starts_with('/')
+        || token.ends_with(".go")
 }
 
 /// Heuristic for "this token looks like a file path." Used by the
@@ -169,7 +189,7 @@ pub fn check(tokens: &[Token], policy: &FlagPolicy) -> bool {
     )
 }
 
-fn consumes_next_value(next: Option<&Token>) -> bool {
+pub(crate) fn consumes_next_value(next: Option<&Token>) -> bool {
     match next {
         None => false,
         Some(t) => {

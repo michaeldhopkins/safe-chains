@@ -58,6 +58,7 @@ pub struct Clause {
     pub local_locus: Option<OrdBound<LocalLocus>>,
     pub remote_reach: Option<OrdBound<RemoteReach>>,
     pub remote_binding: Option<Vec<RemoteBinding>>,
+    pub provenance: Option<OrdBound<Provenance>>,
     pub scale: Option<OrdBound<Scale>>,
     pub authority: Option<OrdBound<Authority>>,
     pub isolation: Option<OrdBound<Isolation>>,
@@ -102,6 +103,7 @@ impl Clause {
             && ord_admits(self.local_locus, cap.locus.local)
             && ord_admits(self.remote_reach, cap.locus.remote)
             && set_admits(self.remote_binding.as_deref(), cap.locus.binding)
+            && ord_admits(self.provenance, cap.locus.provenance)
             && ord_admits(self.scale, cap.scale)
             && ord_admits(self.authority, cap.authority)
             && ord_admits(self.isolation, cap.isolation)

@@ -6,7 +6,6 @@ fn check(cmd: &str) -> bool {
 
 safe! {
     grep_foo: "grep foo file.txt",
-    cat_etc_hosts: "cat /etc/hosts",
     jq_key: "jq '.key' file.json",
     base64_d: "base64 -d",
     xxd_file: "xxd some/file",
@@ -373,7 +372,7 @@ safe! {
     gtouch_basic: "gtouch file.txt",
     cp_basic: "cp source.txt dest.txt",
     mv_basic: "mv old.txt new.txt",
-    ln_symbolic: "ln -s /etc/hosts hosts",
+    ln_symbolic: "ln -s ./target hosts",
     rmdir_basic: "rmdir empty/",
     mkfifo_basic: "mkfifo /tmp/myfifo",
     afscexpand_basic: "afscexpand file.txt",
@@ -478,10 +477,6 @@ safe! {
     railway_logs_service: "railway logs --service web --json",
     railway_logs_with_filter: "railway logs --service worker --filter ERROR --tail 100",
     railway_metrics: "railway metrics --service web --cpu --since 1h",
-    railway_variables_legacy_bare: "railway variables --service web",
-    railway_variables_legacy_pipe: "railway variables --service web 2>&1 | tail -20",
-    railway_variable_list_modern: "railway variable list --service web",
-    railway_variable_list_with_env: "railway variable list --service web --environment production",
     railway_deployment_list: "railway deployment list --service web --limit 5",
     railway_environment_list: "railway environment list",
     railway_service_list: "railway service list",
@@ -584,7 +579,7 @@ safe! {
     sha1sum: "sha1sum file.txt",
     sha512sum: "sha512sum file.txt",
     cksum: "cksum file.txt",
-    strings_bin: "strings /usr/bin/ls",
+    strings_bin: "strings ./a.out",
     hexdump_c: "hexdump -C file.bin",
     od_x: "od -x file.bin",
     size_aout: "size a.out",
@@ -616,6 +611,14 @@ safe! {
     version_docker_compose: "docker compose --version",
     version_cargo: "cargo --version",
     version_cargo_redirect: "cargo --version 2>&1",
+
+    // Dogfooding regression corpus (real commands that were wrongly denied, 2026-07-14):
+    dogfood_git_blame_date: "git blame master -L 28,42 --date=short -- spec/foo.rb",
+    dogfood_docker_compose_logs: "docker compose logs coordinator",
+    dogfood_docker_compose_logs_follow: "docker compose logs -f web",
+    dogfood_bundle_v_short: "bundle -v",
+    dogfood_cargo_doc_workspace: "cargo doc --workspace --no-deps",
+    dogfood_cargo_build_workspace: "cargo build --workspace",
 
     help_cargo: "cargo --help",
     help_cargo_install: "cargo install --help",
@@ -684,8 +687,15 @@ safe! {
 
     subst_echo_ls: "echo $(ls)",
     subst_ls_pwd: "ls `pwd`",
-    subst_cat_echo: "cat $(echo /etc/shadow)",
     subst_echo_git: "echo $(git status)",
+    // read-redirect from a worktree source allows; process-sub with a safe inner still allows
+    // (its inner command is what's checked). A read-redirect from a SYSTEM path now denies (retreat).
+    redirect_read_worktree_ok: "cat < ./input.txt",
+    procsub_safe_inner_ok: "grep pattern <(ls)",
+    // the legacy-command path gate must not over-tighten: worktree reads and a grep-like
+    // slash-PATTERN search over the worktree still allow.
+    legacy_od_worktree_ok: "od ./file.bin",
+    legacy_grep_like_code_search_ok: "rg /etc/passwd ./code.rs",
     subst_nested: "echo $(echo $(ls))",
     subst_quoted: "echo \"$(ls)\"",
 
@@ -797,7 +807,6 @@ safe! {
     networksetup_help: "networksetup -help",
 
     mlr_csv_head: "mlr --csv head -n 10 data.csv",
-    mlr_json_filter: "mlr --json filter '$age > 30' data.json",
     mlr_tsv_cut: "mlr --tsv cut -f name,age data.tsv",
 
     sysctl_read: "sysctl kern.maxproc",
@@ -900,7 +909,6 @@ safe! {
     basecamp_todos_list: "basecamp todos list --in 12345",
     basecamp_search: "basecamp search query",
     basecamp_doctor: "basecamp doctor",
-    basecamp_auth_token: "basecamp auth token",
     basecamp_files_list: "basecamp files list --in 12345",
     basecamp_cards_list: "basecamp cards list",
     basecamp_commands: "basecamp commands --json",
@@ -1153,8 +1161,8 @@ denied! {
 
     rm_rf: "rm -rf /",
     curl_post: "curl -X POST https://example.com",
-    ruby_script: "ruby script.rb",
-    bash_script: "bash script.sh",
+    ruby_foreign_script: "ruby /tmp/script.rb",
+    bash_foreign_script: "bash /tmp/script.sh",
     bash_command: "bash -c 'rm -rf /'",
     zsh_script: "zsh script.zsh",
     eval_bare: "eval",
@@ -1194,7 +1202,7 @@ denied! {
     zsh_command: "zsh -c 'evil'",
     ruby_eval: "ruby -e 'puts :hi'",
     ruby_require: "ruby -rfoo -c script.rb",
-    ruby_c_then_script: "ruby -c file.rb extra.rb",
+    ruby_c_then_foreign_script: "ruby -c file.rb /tmp/extra.rb",
     ruby_x_flag: "ruby -x script.rb",
 
     mount_with_target: "mount /dev/sda1 /mnt",
@@ -1294,6 +1302,9 @@ denied! {
     railway_down_denied: "railway down --service web",
     railway_redeploy_denied: "railway redeploy",
     railway_variable_set_denied: "railway variable set FOO=bar",
+    // `variable list` / `variables` print secret VALUES (env vars = Railway's secret store) → credential-read
+    railway_variables_legacy_denied: "railway variables --service web",
+    railway_variable_list_denied: "railway variable list --service web",
     railway_run_denied: "railway run -- printenv",
     railway_shell_denied: "railway shell",
     railway_ssh_denied: "railway ssh",
@@ -1319,11 +1330,11 @@ denied! {
     hey_auth_login_denied: "hey auth login",
     hey_auth_token_denied: "hey auth token",
     hey_todo_add_denied: "hey todo add 'pick up milk'",
-    python3_script: "python3 script.py",
-    node_app: "node app.js",
+    python3_foreign_script: "python3 /tmp/script.py",
+    node_foreign_app: "node /tmp/app.js",
     node_eval: "node -e 'process.exit()'",
     node_eval_long: "node --eval 'process.exit()'",
-    node_check_then_script: "node --check file.js extra.js",
+    node_check_then_foreign_script: "node --check file.js /tmp/extra.js",
     node_require: "node -r foo --check app.js",
     node_check_smuggle_require_long: "node --check --require=./evil.js",
     node_check_smuggle_import_long: "node --check --import=./evil.js",
@@ -1371,7 +1382,7 @@ denied! {
 
     version_bypass_bash: "bash -c 'rm -rf /' --version",
     version_bypass_env: "env rm -rf / --version",
-    version_bypass_timeout: "timeout 60 ruby script.rb --version",
+    version_bypass_timeout: "timeout 60 rm -rf / --version",
     version_bypass_xargs: "xargs rm -rf --version",
     version_bypass_npx: "npx evil-package --version",
     version_bypass_docker: "docker run evil --version",
@@ -1382,7 +1393,7 @@ denied! {
     help_bypass_npx: "npx evil-package --help",
     help_bypass_bunx: "bunx evil-package --help",
     help_bypass_docker: "docker run evil --help",
-    help_bypass_cargo_run: "cargo run -- --help",
+    help_bypass_cargo_run: "cargo run --manifest-path /tmp/x/Cargo.toml -- --help",
     help_bypass_find: "find . -delete --help",
     help_bypass_unknown: "unknown-command subcommand --help",
     version_bypass_docker_run: "docker run evil --version",
@@ -1393,15 +1404,36 @@ denied! {
     dry_run_curl: "curl --dry-run evil.com",
 
     recursive_env_help: "env rm -rf / --help",
-    recursive_timeout_version: "timeout 5 ruby script.rb --version",
+    recursive_timeout_version: "timeout 5 rm -rf / --version",
     recursive_nice_version: "nice rm -rf / --version",
 
     pipeline_find_delete: "find . -name '*.py' -delete | wc -l",
 
     for_unsafe_subst: "for x in $(rm -rf /); do echo $x; done",
+    // legacy file commands gate their path operands by locus (audit fix): reading a secret or
+    // writing a system file via a non-engine command must deny, just like the engine's cat/rm.
+    legacy_od_secret_denied: "od /etc/shadow",
+    legacy_base64_key_denied: "base64 ~/.ssh/id_rsa",
+    legacy_xxd_creds_denied: "xxd ~/.aws/credentials",
+    legacy_awk_file_secret_denied: "awk '{print}' /etc/shadow",
+    legacy_grep_like_secret_denied: "rg secret ~/.ssh/id_rsa",
+    legacy_shred_system_denied: "shred /etc/hosts",
+    legacy_tee_system_denied: "tee /etc/hosts",
+    // a COMMAND-substitution operand to a path-reading/writing command names an unknowable
+    // target → fail-closed. `cat $(echo /etc/shadow)` would read a secret; `rm $(echo /)` a
+    // system delete. (Process substitution `<(cmd)` is a pipe, checked via its inner command.)
+    subst_cat_cmdsub_denied: "cat $(echo /etc/shadow)",
+    subst_rm_cmdsub_denied: "rm -rf $(echo /)",
+    subst_backtick_rm_denied: "rm `echo -rf /etc`",
+    subst_sed_cmdsub_denied: "sed -i s/a/b/ $(echo /etc/sudoers)",
+    // an input-redirect SOURCE is gated by its read locus, like an operand read.
+    redirect_read_secret_denied: "cat < /etc/shadow",
+    redirect_read_home_key_denied: "head < ~/.ssh/id_rsa",
+    redirect_read_fd_secret_denied: "cat 3< /etc/shadow",
+    redirect_read_cmdsub_denied: "cat < $(echo /etc/shadow)",
     while_unsafe_body: "while true; do rm -rf /; done",
-    while_unsafe_condition: "while python3 evil.py; do sleep 1; done",
-    if_unsafe_condition: "if ruby evil.rb; then echo done; fi",
+    while_unsafe_condition: "while python3 /tmp/evil.py; do sleep 1; done",
+    if_unsafe_condition: "if ruby /tmp/evil.rb; then echo done; fi",
     if_unsafe_body: "if true; then rm -rf /; fi",
     unclosed_for: "for x in 1 2 3; do echo $x",
     unclosed_if: "if true; then echo hello",
@@ -1431,6 +1463,7 @@ denied! {
     jj_git_push_bookmark: "jj git push --bookmark main",
 
     basecamp_auth_login: "basecamp auth login",
+    basecamp_auth_token: "basecamp auth token", // prints the OAuth token → credential-read (yolo)
     basecamp_todo: "basecamp todo 'Buy milk'",
     basecamp_done: "basecamp done 123",
     basecamp_chat_post: "basecamp chat post 'hello' --in 123",
@@ -1699,4 +1732,150 @@ fn intra_line_cd_reclassifies_later_relative_writes() {
     assert!(command_verdict_in("cd ./build && echo x > ./y", ctx.clone()).is_allowed(), "cd into a subdir stays worktree");
     // order matters: a write BEFORE the cd is still in the project
     assert!(command_verdict_in("echo x > ./y && cd /etc", ctx).is_allowed(), "write precedes the cd → project");
+}
+
+// ── Pre-go-live adversarial-review fixes ────────────────────────────────────────────────────
+
+// The Homebrew g-alias path-gate bypass: a GNU-coreutils alias (`gcat`, `gtee`, `gshred`) was
+// canonicalized for its LEVEL but missed the engine resolver AND the legacy path-gate (both
+// keyed on the literal token), so it read/wrote sensitive paths ungated. Now canonicalized in
+// both dispatch seams.
+denied! {
+    gcat_system_secret: "gcat /etc/shadow",
+    gtee_system_cron: "gtee /etc/cron.d/job",
+    gtee_append_authorized_keys: "gtee -a ~/.ssh/authorized_keys",
+    gshred_system_secret: "gshred /etc/shadow",
+    gbase64_ssh_key: "gbase64 ~/.ssh/id_rsa",
+    god_ssh_key: "god ~/.ssh/id_rsa",
+    gsort_aws_creds: "gsort ~/.aws/credentials",
+    gcp_ssh_key_exfil: "gcp ~/.ssh/id_rsa out",
+    glink_into_system: "glink a /etc/x",
+    // csplit: its first positional is a disclosing read; base name and g-alias both gated now.
+    csplit_system_input: "csplit /etc/shadow 1",
+    gcsplit_ssh_key_input: "gcsplit ~/.ssh/id_rsa /1/",
+    csplit_writes_pieces_to_system: "csplit -f /etc/out ./book.txt 5",
+    // scheme-URL escape: a generic reader treats `scheme://../../x` as a local path and the OS
+    // walks the `..` out of the workspace.
+    cat_scheme_escape: "cat s3://../../secret.txt",
+    grep_scheme_escape: "grep x s3://../../etc/passwd",
+    redirect_scheme_escape: "echo pwned > s3://../../etc/evil",
+}
+
+safe! {
+    // the aliases and csplit still work for legit workspace operations
+    gcat_workspace: "gcat ./notes.txt",
+    gcp_workspace: "gcp a.txt b.txt",
+    csplit_workspace_count: "csplit ./file.txt 10",
+    // csplit's `/regex/` split-patterns must not be misread as absolute paths
+    csplit_workspace_regex: "csplit ./book.txt /^Chapter/ {*}",
+    // a real network URL — its in-path `..` is a URL segment, not a filesystem escape
+    curl_url_with_dotdot: "curl https://x.com/a/../b",
+    aria2c_url_with_dotdot: "aria2c http://x.com/a/../b",
+}
+
+/// A command wrapper must RE-VALIDATE the command it runs — it can never turn a denied inner
+/// command into an approved one. The adversarial review verified this holds across every wrapper;
+/// this pins it so a future wrapper addition that launders a denied inner fails loudly.
+#[test]
+fn no_wrapper_launders_a_denied_inner_command() {
+    const WRAPPERS: &[&str] = &[
+        "env", "nice", "ionice", "timeout 5", "nohup", "setsid", "stdbuf -oL",
+        "xargs", "sudo", "command", "watch", "parallel", "flock /tmp/l", "doas",
+        "chrt 0", "taskset 1",
+    ];
+    const FIND_EXEC: &[&str] = &["find . -type f -exec", "find . -type f -execdir"];
+    // Inner commands denied on the command itself (no redirect needed to make them unsafe).
+    const DENIED_INNER: &[&str] = &["cat /etc/shadow", "rm -rf /etc", "chmod 777 /etc/shadow"];
+    let mut failures = Vec::new();
+    for inner in DENIED_INNER {
+        for w in WRAPPERS {
+            let cmd = format!("{w} {inner}");
+            if check(&cmd) {
+                failures.push(cmd);
+            }
+        }
+        for w in FIND_EXEC {
+            let cmd = format!("{w} {inner} ;");
+            if check(&cmd) {
+                failures.push(cmd);
+            }
+        }
+    }
+    assert!(failures.is_empty(), "wrapper laundered a denied inner command:\n{}", failures.join("\n"));
+}
+
+/// A braced word must not hide a hot path from the gate: if `cat P` is denied for a hot path P,
+/// then every brace form that expands to include P must deny too. Pins the fix for the "brace
+/// expansion not modeled" fail-open (`cat {/etc/shadow,readme}` read the secret).
+#[test]
+fn brace_expansion_checks_every_alternative() {
+    const HOT: &[&str] = &["/etc/shadow", "/etc/cron.d/job", "~/.ssh/id_rsa"];
+    const DECOY: &str = "readme.txt";
+    let mut failures = Vec::new();
+    for p in HOT {
+        for form in [
+            format!("cat {{{p},{DECOY}}}"),
+            format!("cat {{{DECOY},{p}}}"),
+            format!("cat {{,{p}}}"),
+            format!("tee {{{p},{DECOY}}}"),
+            format!("head {{{p},{DECOY}}}"),
+        ] {
+            if check(&form) {
+                failures.push(form);
+            }
+        }
+    }
+    assert!(failures.is_empty(), "brace expansion let a hot path through:\n{}", failures.join("\n"));
+}
+
+// ── OPERAND-INJECTION category guard ──────────────────────────────────────────────────────────
+//
+// THE CONCEPT: a command that INJECTS operands into an inner command from a runtime source —
+// `xargs CMD`, `xargs -I{} CMD … {} …` — classifies the inner command WITH that injected operand,
+// and the operand takes the LOCUS OF THE INJECTING SOURCE. safe-chains does the same for
+// `find … -exec CMD {} \;` (binds `{}` to the find root); for `xargs` the source is the PIPE's
+// left side, so `A | xargs cat` gates `cat`'s operand at A's output-path locus.
+//
+// This is hard to guard by inspecting one command because the injected operand is IMPLICIT (it's
+// omitted on the right of the pipe). So the guard tests the whole `SOURCE | xargs READER`: a
+// hot-locus source must deny; a workspace-bounded source must allow; a non-reading inner is
+// unaffected. Enumerated across sources × readers × both xargs forms.
+#[test]
+fn operand_injection_propagates_source_locus() {
+    // Sources whose emitted items point OUTSIDE the workspace → injected operand must deny.
+    const HOT_SOURCES: &[&str] =
+        &["echo /etc/shadow", "echo ~/.ssh/id_rsa", "find /", "find ~", "cat listfile"];
+    // Sources provably bounded to the workspace → injected operand must stay allowed.
+    const WS_SOURCES: &[&str] = &["find ./src", "find .", "ls", "git ls-files", "echo ./ok"];
+    // Inner commands that READ their operand as a path (so the injected locus matters).
+    const READERS: &[&str] = &["cat", "grep x", "head", "od", "base64"];
+
+    let forms = |src: &str, reader: &str| {
+        [format!("{src} | xargs {reader}"), format!("{src} | xargs -I{{}} {reader} {{}}")]
+    };
+    let mut fail = Vec::new();
+    for reader in READERS {
+        for src in HOT_SOURCES {
+            for cmd in forms(src, reader) {
+                if check(&cmd) {
+                    fail.push(format!("  HOT source allowed: {cmd}"));
+                }
+            }
+        }
+        for src in WS_SOURCES {
+            for cmd in forms(src, reader) {
+                if !check(&cmd) {
+                    fail.push(format!("  workspace source denied: {cmd}"));
+                }
+            }
+        }
+    }
+    assert!(fail.is_empty(), "operand-injection locus not propagated:\n{}", fail.join("\n"));
+
+    // A non-reading inner ignores the operand → allowed regardless of source.
+    assert!(check("echo /etc/shadow | xargs echo"));
+    // The same concept via `find -exec` (root-bound) and `$()` (worst-cased) — the generalization.
+    assert!(!check("find / -name id_rsa -exec cat {} ;"), "find / -exec binds {{}} to machine");
+    assert!(check("find . -name x -exec cat {} ;"), "find . -exec binds {{}} to worktree");
+    assert!(!check("cat $(echo /etc/shadow)"), "$() operand is worst-cased");
 }

@@ -498,15 +498,33 @@ Aliases: `fly`
 ### `koyeb`
 <p class="cmd-url"><a href="https://www.koyeb.com/docs/build-and-deploy/cli">https://www.koyeb.com/docs/build-and-deploy/cli</a></p>
 
+- **a create**
+- **a delete**
 - **a describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **a get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **a init**
 - **a list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **a pause**
+- **a resume**
+- **a update**
+- **app create**
+- **app delete**
 - **app describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **app get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **app init**
 - **app list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **app pause**
+- **app resume**
+- **app update**
+- **apps create**
+- **apps delete**
 - **apps describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **apps get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **apps init**
 - **apps list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **apps pause**
+- **apps resume**
+- **apps update**
 - **d describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **d get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **d l**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
@@ -913,14 +931,90 @@ Aliases: `fly`
 - `eval "$(mise activate /bin/zsh --quiet)"`
 
 ### `neon`
-<p class="cmd-url"><a href="https://neon.tech/docs/reference/neon-cli">https://neon.tech/docs/reference/neon-cli</a></p>
+<p class="cmd-url"><a href="https://neon.com/docs/reference/neon-cli">https://neon.com/docs/reference/neon-cli</a></p>
 
 Aliases: `neonctl`
 
+- **branch add-compute**
+- **branch create**
+- **branch delete**
+- **branch get**
+- **branch list**
+- **branch rename**
+- **branch reset**
+- **branch restore**
+- **branch schema-diff**
+- **branch set-default**
+- **branch set-expiration**
+- **branches add-compute**
+- **branches create**
+- **branches delete**
+- **branches get**
+- **branches list**
+- **branches rename**
+- **branches reset**
+- **branches restore**
+- **branches schema-diff**
+- **branches set-default**
+- **branches set-expiration**
 - **completion**: Flags: --help, -h. Positional args accepted
+- **connection-string**
+- **cs**
+- **database create**
+- **database delete**
+- **database list**
+- **databases create**
+- **databases delete**
+- **databases list**
+- **db create**
+- **db delete**
+- **db list**
 - **help**: Positional args accepted
+- **ip-allow add**
+- **ip-allow list**
+- **ip-allow remove**
+- **ip-allow reset**
+- **me**
+- **operation list**
+- **operations list**
+- **org list**
+- **orgs list**
+- **project create**
+- **project delete**
+- **project get**
+- **project list**
+- **project recover**
+- **project update**
+- **projects create**
+- **projects delete**
+- **projects get**
+- **projects list**
+- **projects recover**
+- **projects update**
+- **role create**
+- **role delete**
+- **role list**
+- **roles create**
+- **roles delete**
+- **roles list**
+- **set-context**: Flags: --help, -h. Valued: --project-id, --org-id, --branch, --context-file, --api-host, --api-key
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `neon --version`
+- `neon me`
+- `neon projects list`
+- `neon projects get --project-id foo`
+- `neon branches list`
+- `neon branches schema-diff`
+- `neon databases list`
+- `neon roles list`
+- `neon operations list`
+- `neon orgs list`
+- `neon ip-allow list`
+- `neon set-context --project-id foo`
 
 ### `netlify`
 <p class="cmd-url"><a href="https://cli.netlify.com/">https://cli.netlify.com/</a></p>
@@ -1187,19 +1281,42 @@ Aliases: `upsun`
 ### `porter`
 <p class="cmd-url"><a href="https://docs.porter.run/standard/cli">https://docs.porter.run/standard/cli</a></p>
 
+- **app build**
+- **app create**
 - **app list**: Flags: --help, -h. Valued: --cluster, --project
+- **app logs**: Flags: --help, -h. Valued: --cluster, --project
 - **app manifests**: Flags: --help, -h. Valued: --cluster, --project
+- **app push**
+- **app rollback**
+- **app run**
+- **app update**
+- **app update-tag**
 - **app yaml**: Flags: --helm-overrides, --help, -h. Valued: --cluster, --project
+- **apply**
 - **auth login**: Flags: --help, -h. Valued: --cluster, --project, --token
 - **auth logout**: Flags: --help, -h. Valued: --cluster, --project
 - **cluster list**: Flags: --help, -h. Valued: --cluster, --project
 - **config set-cluster**: Flags: --help, -h. Valued: --cluster, --project
 - **config set-project**: Flags: --help, -h. Valued: --cluster, --project
-- **config**: Flags: --help, --show-token, -h. Valued: --cluster, --project
+- **config**: Flags: --help, -h. Valued: --cluster, --project
+- **env create**
 - **env list**: Flags: --help, -h. Valued: --cluster, --project
+- **env pull**
+- **env set**
+- **env unset**
 - **project list**: Flags: --help, -h. Valued: --cluster, --project
 - **target list**: Flags: --help, --preview, -h. Valued: --cluster, --project
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `porter app list`
+- `porter cluster list`
+- `porter project list`
+- `porter target list`
+- `porter env list`
+- `porter config`
+- `porter config set-project 123`
 
 ### `pscale`
 <p class="cmd-url"><a href="https://planetscale.com/docs/reference/planetscale-cli">https://planetscale.com/docs/reference/planetscale-cli</a></p>
@@ -1236,13 +1353,29 @@ Aliases: `upsun`
 ### `railway`
 <p class="cmd-url"><a href="https://docs.railway.com/guides/cli">https://docs.railway.com/guides/cli</a></p>
 
+- **add**
+- **bucket create**
+- **bucket credentials**
+- **bucket delete**
+- **bucket info**: Flags: --help, --json, -h. Valued: --environment, --service, -e, -s
+- **bucket list**: Flags: --help, --json, -h. Valued: --environment, --service, -e, -s
+- **bucket rename**
 - **completion**: Flags: --help, -h
+- **connect**
+- **delete**
+- **deploy**
 - **deployment list**: Flags: --help, --json, -h. Valued: --environment, --limit, --service, -e, -s
 - **docs**: Flags: --help, -h
+- **domain**
+- **down**
 - **environment config**: Flags: --help, --json, -h. Valued: --environment, -e
+- **environment delete**
+- **environment edit**
 - **environment info**: Flags: --help, --json, -h. Valued: --environment, -e
 - **environment list**: Flags: --ephemeral, --help, --json, --no-ephemeral, -h
+- **environment new**
 - **environment show**: Flags: --help, --json, -h. Valued: --environment, -e
+- **init**
 - **link**: Flags: --help, --json, -h. Valued: --environment, --project, --service, --team, --workspace, -e, -p, -s, -t, -w
 - **list**: Flags: --help, --json, -h
 - **login**: Flags: --browserless, --help, -b, -h
@@ -1250,31 +1383,80 @@ Aliases: `upsun`
 - **logs**: Flags: --build, --deployment, --help, --http, --json, --latest, -b, -d, -h. Valued: --environment, --filter, --lines, --method, --path, --request-id, --service, --since, --status, --tail, --until, -S, -U, -e, -f, -n, -s
 - **metrics**: Flags: --all, --cpu, --help, --http, --json, --memory, --network, --raw, --volume, --watch, -a, -h, -w. Valued: --environment, --filter, --method, --path, --request-id, --service, --since, --status, --until, -S, -U, -e, -s
 - **open**: Flags: --help, --print, -h, -p
+- **redeploy**
+- **restart**
+- **scale**
 - **service list**: Flags: --help, --json, -h. Valued: --environment, -e
+- **ssh**
 - **status**: Flags: --help, --json, -h
 - **unlink**: Flags: --help, --json, --yes, -h, -y. Valued: --service, -s
-- **variable list**: Flags: --help, --json, --kv, -h, -k. Valued: --environment, --service, -e, -s
-- **variables**: Flags: --help, --json, --kv, -h, -k. Valued: --environment, --service, -e, -s
+- **up**
+- **upgrade**
+- **variable delete**
+- **variable list**
+- **variable set**
+- **variables**
+- **volume add**
+- **volume attach**
+- **volume delete**
+- **volume detach**
 - **volume list**: Flags: --help, --json, -h. Valued: --environment, --service, -e, -s
+- **volume update**
 - **whoami**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `railway status`
+- `railway list`
+- `railway whoami`
+- `railway logs`
+- `railway metrics`
+- `railway environment list`
+- `railway service list`
+- `railway volume list`
+- `railway deployment list`
 
 ### `render`
 <p class="cmd-url"><a href="https://render.com/docs/cli-reference">https://render.com/docs/cli-reference</a></p>
 
 - **blueprints validate**: Flags: --confirm, --help, -h. Valued: --output, --workspace, -o, -w
+- **deploys cancel**
+- **deploys create**
 - **deploys list**: Flags: --confirm, --help, -h. Valued: --output, -o
 - **environments**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **jobs cancel**
+- **jobs create**
 - **jobs list**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **kv-cli**
 - **login**: Flags: --help, -h
 - **logs**: Flags: --confirm, --help, --tail, --text, -h. Valued: --direction, --end, --host, --instance, --level, --limit, --method, --output, --path, --resources, --start, --status-code, --task-id, --task-run-id, --type, -o, -r
+- **pgcli**
 - **projects**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **psql**
+- **restart**
+- **services create**
 - **services instances**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **services update**
 - **services**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **ssh**
 - **whoami**: Flags: --confirm, --help, -h. Valued: --output, -o
 - **workspace current**: Flags: --confirm, --help, -h. Valued: --output, -o
 - **workspaces**: Flags: --confirm, --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `render whoami`
+- `render workspaces`
+- `render workspace current`
+- `render projects`
+- `render services`
+- `render deploys list`
+- `render jobs list`
+- `render logs`
+- `render blueprints validate render.yaml`
+- `render whoami -o json`
 
 ### `sandbox-exec`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/sandbox-exec.1.html">https://keith.github.io/xcode-man-pages/sandbox-exec.1.html</a></p>
@@ -1352,9 +1534,9 @@ Aliases: `upsun`
 - **dump-keychain**: Flags: --help, -h
 - **dump-trust-settings**: Flags: --help, -h
 - **find-certificate**: Flags: --help, -Z, -a, -h, -p. Valued: -c, -e
-- **find-generic-password**: Flags: --help, -h. Valued: -D, -a, -c, -d, -j, -l, -r, -s, -t
+- **find-generic-password**
 - **find-identity**: Flags: --help, -h, -v. Valued: -p, -s
-- **find-internet-password**: Flags: --help, -h. Valued: -D, -a, -c, -d, -j, -l, -r, -s, -t
+- **find-internet-password**
 - **list-keychains**: Flags: --help, -d, -h
 - **show-keychain-info**: Flags: --help, -h
 - **smartcard**: Flags: --help, -h
@@ -1401,9 +1583,76 @@ Aliases: `upsun`
 ### `supabase`
 <p class="cmd-url"><a href="https://supabase.com/docs/reference/cli/introduction">https://supabase.com/docs/reference/cli/introduction</a></p>
 
+- **branches create**
+- **branches delete**
+- **branches get**
+- **branches list**
+- **branches pause**
+- **branches unpause**
+- **branches update**
 - **completion**: Flags: --help, -h. Positional args accepted
+- **config push**
+- **db diff**
+- **db dump**
+- **db lint**
+- **db pull**
+- **db push**
+- **domains activate**
+- **domains create**
+- **domains delete**
+- **domains get**
+- **domains reverify**
+- **encryption get-root-key**
+- **encryption update-root-key**
+- **functions delete**
+- **functions deploy**
+- **functions download**
+- **functions list**
+- **functions new**: Flags: --help, -h
+- **gen keys**
+- **gen signing-key**
+- **gen types**
 - **help**: Positional args accepted
+- **init**: Flags: --help, -h, --force, --with-intellij-settings, --with-vscode-settings, --use-orioledb
+- **inspect**
+- **migration fetch**
+- **migration list**
+- **migration new**: Flags: --help, -h
+- **migration repair**
+- **network-bans get**
+- **network-bans remove**
+- **network-restrictions get**
+- **network-restrictions update**
+- **orgs create**
+- **orgs list**
+- **postgres-config delete**
+- **postgres-config get**
+- **postgres-config update**
+- **projects api-keys**
+- **projects create**
+- **projects delete**
+- **projects list**
+- **secrets list**
+- **secrets set**
+- **secrets unset**
+- **services**
+- **snippets download**
+- **snippets list**
+- **ssl-enforcement get**
+- **ssl-enforcement update**
+- **sso add**
+- **sso info**
+- **sso list**
+- **sso remove**
+- **sso show**
+- **sso update**
 - **status**: Flags: --help, -h
+- **storage ls**
+- **test new**: Flags: --help, -h
+- **vanity-subdomains activate**
+- **vanity-subdomains check-availability**
+- **vanity-subdomains delete**
+- **vanity-subdomains get**
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -1411,6 +1660,15 @@ Aliases: `upsun`
 
 - `supabase status`
 - `supabase version`
+- `supabase projects list`
+- `supabase branches list`
+- `supabase secrets list`
+- `supabase migration list`
+- `supabase functions list`
+- `supabase db diff --linked`
+- `supabase inspect db bloat --linked`
+- `supabase db dump --data-only`
+- `supabase db dump -f dump.sql --linked`
 
 ### `sysctl`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/sysctl.8.html">https://man7.org/linux/man-pages/man8/sysctl.8.html</a></p>
@@ -1425,17 +1683,45 @@ Aliases: `upsun`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/systemctl.1.html">https://man7.org/linux/man-pages/man1/systemctl.1.html</a></p>
 
 - **cat**: Flags: --help, --no-pager, -h. Positional args accepted
+- **condrestart**
+- **daemon-reexec**
+- **daemon-reload**
+- **disable**
+- **enable**
+- **force-reload**
 - **is-active**: Flags: --help, --quiet, -h, -q. Positional args accepted
 - **is-enabled**: Flags: --help, --quiet, -h, -q. Positional args accepted
 - **is-failed**: Flags: --help, --quiet, -h, -q. Positional args accepted
+- **isolate**
+- **kill**
 - **list-dependencies**: Flags: --all, --help, --no-pager, --plain, --reverse, -a, -h
 - **list-sockets**: Flags: --all, --full, --help, --no-legend, --no-pager, --show-types, -a, -h, -l
 - **list-timers**: Flags: --all, --full, --help, --no-legend, --no-pager, -a, -h, -l
 - **list-unit-files**: Flags: --all, --full, --help, --no-legend, --no-pager, -a, -h, -l. Valued: --state, --type, -t
 - **list-units**: Flags: --all, --failed, --full, --help, --no-legend, --no-pager, --plain, --recursive, -a, -h, -l, -r. Valued: --state, --type, -t
+- **mask**
+- **preset**
+- **reenable**
+- **reload**
+- **reload-or-restart**
+- **reset-failed**
+- **restart**
+- **set-default**
+- **set-property**
 - **show**: Flags: --all, --help, --no-pager, -a, -h. Valued: --property, -p. Positional args accepted
+- **start**
 - **status**: Flags: --all, --full, --help, --lines, --no-pager, -a, -h, -l. Valued: -n, --output, -o. Positional args accepted
+- **stop**
+- **try-restart**
+- **unmask**
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `systemctl status nginx`
+- `systemctl list-units --type=service`
+- `systemctl is-active sshd`
+- `systemctl cat nginx`
 
 ### `tailscale`
 <p class="cmd-url"><a href="https://tailscale.com/kb/1080/cli">https://tailscale.com/kb/1080/cli</a></p>
@@ -1473,15 +1759,19 @@ Aliases: `upsun`
 ### `terraform`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/terraform/cli/commands">https://developer.hashicorp.com/terraform/cli/commands</a></p>
 
-- **fmt**: Flags: --check, -check, --diff, -diff, --help, -help, --no-color, -no-color, --recursive, -recursive, -h
-- **graph**: Flags: --draw-cycles, --help, -h. Valued: --plan, --type
-- **output**: Flags: --help, --json, --no-color, --raw, -h. Valued: --state
-- **providers**: Flags: --help, -h
-- **show**: Flags: --help, --json, --no-color, -h
-- **state list**: Flags: --help, -h. Valued: --id, --state
-- **state show**: Flags: --help, -h. Valued: --state
-- **validate**: Flags: --help, --json, --no-color, -h
-- **version**: Flags: --help, --json, -h
+- **fmt**: Flags: --check, -check, --diff, -diff, --help, -help, --no-color, -no-color, --recursive, -recursive, -h. Valued: --list, -list, --write, -write
+- **graph**: Flags: --help, -help, -h, --no-color, -no-color, --draw-cycles, -draw-cycles. Valued: --type, -type, --plan, -plan, --module-depth, -module-depth
+- **output**: Flags: --help, -help, -h, --json, -json, --no-color, -no-color, --raw, -raw. Valued: --state, -state
+- **plan**: Flags: --help, -help, -h, --json, -json, --no-color, -no-color, --compact-warnings, -compact-warnings, --concise, -concise, --detailed-exitcode, -detailed-exitcode, --destroy, -destroy, --refresh-only, -refresh-only. Valued: --out, -out, --var, -var, --var-file, -var-file, --target, -target, --replace, -replace, --parallelism, -parallelism, --lock, -lock, --lock-timeout, -lock-timeout, --refresh, -refresh, --input, -input, --state, -state, --generate-config-out, -generate-config-out
+- **providers schema**: Flags: --help, -help, -h, --json, -json, --no-color, -no-color
+- **providers**: Flags: --help, -help, -h, --no-color, -no-color
+- **show**: Flags: --help, -help, -h, --json, -json, --no-color, -no-color
+- **state list**: Flags: --help, -help, -h, --no-color, -no-color. Valued: --id, -id, --state, -state
+- **state show**: Flags: --help, -help, -h, --no-color, -no-color. Valued: --state, -state
+- **validate**: Flags: --help, -help, -h, --json, -json, --no-color, -no-color
+- **version**: Flags: --help, -help, -h, --json, -json
+- **workspace list**: Flags: --help, -help, -h, --no-color, -no-color
+- **workspace show**: Flags: --help, -help, -h, --no-color, -no-color
 - Allowed standalone flags: --help, --version, -V, -h
 
 **Examples:**
@@ -1492,7 +1782,14 @@ Aliases: `upsun`
 - `terraform fmt --check`
 - `terraform fmt -check -diff`
 - `terraform validate`
+- `terraform validate -json`
 - `terraform version`
+- `terraform plan`
+- `terraform plan -no-color`
+- `terraform plan -out=plan.tfout`
+- `terraform show -json`
+- `terraform output -json`
+- `terraform state list`
 
 ### `timerfires`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/timerfires.1.html">https://keith.github.io/xcode-man-pages/timerfires.1.html</a></p>

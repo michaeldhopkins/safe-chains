@@ -11,6 +11,10 @@ standalone = [
 ]
 valued = ["-T", "-f"]
 
+# -f names the archive ptar creates in -c mode.
+[command.path_gate]
+flags = { "-f" = "write" }
+
 [[command]]
 name = "ptardiff"
 description = "Diff the contents of a tar archive against the corresponding extracted directory in the current working directory. Read-only; writes differences to stdout."

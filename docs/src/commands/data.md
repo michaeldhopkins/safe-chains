@@ -29,9 +29,13 @@ Aliases: `gcsplit`
 
 Aliases: `gecho`
 
-- Allowed standalone flags: -E, -e, -n
-- Bare invocation allowed
-- Hyphen-prefixed positional arguments accepted
+- Prints its arguments to stdout.
+- Bare invocation reads stdin
+
+**Examples:**
+
+- `echo hello world`
+- `echo -n done`
 
 ### `expr`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#expr-invocation</a></p>
@@ -96,7 +100,22 @@ Aliases: `gexpr`
 ### `mlr`
 <p class="cmd-url"><a href="https://miller.readthedocs.io/">https://miller.readthedocs.io/</a></p>
 
-- Data processing allowed. Verbs and file arguments accepted.
+- Read-only verb chain (`verb [args] then verb …`). Allowed verbs: altkv, bar, bootstrap, case, cat, check, clean-whitespace, count, count-distinct, count-similar, cut, decimate, describe, fill-down, fill-empty, flatten, format-values, fraction, gap, grep, group-by, group-like, gsub, having-fields, head, histogram, join, json-parse, json-stringify, label, latin1-to-utf8, least-frequent, merge-fields, most-frequent, nest, nothing, regularize, remove-empty-columns, rename, reorder, repeat, reshape, sample, sec2gmt, sec2gmtdate, seqgen, shuffle, skip-trivial-records, sort, sort-within-records, sparsify, ssub, stats1, stats2, step, sub, summary, surv, tac, tail, template, top, unflatten, uniq, unspace, unsparsify, utf8-to-latin1
+
+**Examples:**
+
+- `mlr --csv head -n 10 data.csv`
+- `mlr --tsv cut -f name,age data.tsv`
+- `mlr --version`
+- `mlr --help`
+- `mlr --ifs , cat data.dkvp`
+- `mlr --ifs=, cat data.dkvp`
+- `mlr --from data.csv cat`
+- `mlr --icsv --ojson cat data.csv`
+- `mlr --csv sort -nr value data.csv`
+- `mlr --csv cat then sort -f x then head -n 5 data.csv`
+- `mlr --csv step -a delta,shift -f x data.csv`
+- `mlr --mfrom a.csv b.csv -- cat`
 
 ### `numfmt`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/numfmt">https://www.gnu.org/software/coreutils/numfmt</a></p>

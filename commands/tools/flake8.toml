@@ -16,3 +16,6 @@ valued = [
     "--ignore", "--max-complexity", "--max-line-length",
     "--output-file", "--per-file-ignores", "--select",
 ]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }

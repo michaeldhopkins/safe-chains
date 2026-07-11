@@ -29,6 +29,9 @@ examples_denied = [
     "tuist cache warm",
 ]
 
+[command.path_gate]
+flags = { "--destination" = "ignore" }
+
 [[command.sub]]
 name = "dump"
 standalone = ["--help", "--json", "--verbose", "-h"]

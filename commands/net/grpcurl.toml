@@ -29,3 +29,6 @@ valued = [
     "-protoset-out", "-rpc-header", "-servername",
     "-unix", "-userconfig",
 ]
+
+[command.path_gate]
+flags = { "-cacert" = "read", "-cert" = "read", "-key" = "read" }

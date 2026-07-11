@@ -21,6 +21,9 @@ valued = [
     "-d", "-v",
 ]
 
+[command.path_gate]
+flags = { "--outfile" = "write", "--load-certificate" = "read", "--load-pubkey" = "read" }
+
 [[command]]
 name = "ocsptool"
 description = "GnuTLS OCSP CLI. Generates OCSP requests (--generate-request), parses and prints OCSP requests and responses (--request-info, --response-info), verifies responses against a signer or trust store (--verify-response), and queries OCSP servers over HTTP (--ask). All operations are read-only queries against either a local file or a remote OCSP responder. --outfile writes generated request/response data locally. Does not modify any remote state. GnuTLS ships ocsptool alongside the library; the CLI surface is stable."
@@ -43,6 +46,10 @@ valued = [
     "-Q", "-S", "-d", "-v",
 ]
 
+# --ask is a URL/hostname, not a path.
+[command.path_gate]
+flags = { "--outfile" = "write", "--infile" = "read", "--load-cert" = "read", "--load-chain" = "read", "--load-issuer" = "read", "--load-request" = "read", "--load-response" = "read", "--load-signer" = "read", "--load-trust" = "read" }
+
 [[command]]
 name = "p11tool"
 description = "GnuTLS PKCS #11 tool for operations on smart cards and HSM tokens. Has both read-only modes (list tokens, list certificates, list private keys, list mechanisms, --info) and destructive modes (--initialize, --initialize-pin, --initialize-so-pin, --generate-privkey, --delete, --write, --export) that are excluded here. Operates on hardware via the PKCS #11 API; some operations require a PIN supplied via the GNUTLS_PIN environment variable. GnuTLS releases p11tool on the GnuTLS cadence (roughly yearly)."
@@ -61,6 +68,9 @@ standalone = [
 ]
 valued = ["--debug", "--outfile", "--provider", "--version", "-d", "-v"]
 
+[command.path_gate]
+flags = { "--outfile" = "write" }
+
 [[command]]
 name = "psktool"
 description = "GnuTLS pre-shared key (PSK) generator. Creates random keys for use with TLS-PSK and appends them in hexadecimal form to a PSK file specified via -p/--pskfile, indexed by the -u/--username identity. Always writes to a local key file; does not query the network. The default key size is 32 bytes; -s/--keysize sets a different size up to 512. GnuTLS's CLI is stable."
@@ -73,6 +83,10 @@ valued = [
     "--debug", "--keysize", "--pskfile", "--username", "--version",
     "-d", "-p", "-s", "-u", "-v",
 ]
+
+# -p/--pskfile is the PSK key file the tool appends to.
+[command.path_gate]
+flags = { "-p" = "write", "--pskfile" = "write" }
 
 [[command]]
 name = "tpmtool"
@@ -91,6 +105,9 @@ valued = [
     "--version",
     "-d", "-v",
 ]
+
+[command.path_gate]
+flags = { "--outfile" = "write", "--infile" = "read" }
 
 [[command]]
 name = "gnutls-certtool"
@@ -125,3 +142,7 @@ valued = [
     "--verify-purpose", "--version",
     "-d", "-v",
 ]
+
+# --password is a passphrase, --seed is hex, --inder is a format toggle — none are paths.
+[command.path_gate]
+flags = { "--outfile" = "write", "--infile" = "read", "--template" = "read", "--load-ca-certificate" = "read", "--load-ca-privkey" = "read", "--load-certificate" = "read", "--load-crl" = "read", "--load-data" = "read", "--load-privkey" = "read", "--load-pubkey" = "read", "--load-request" = "read", "--load-sigfile" = "read" }

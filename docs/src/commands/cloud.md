@@ -8,10 +8,16 @@
 - **acm**: Allowed arguments: describe-*, get-*, list-*
 - **acm-pca**: Allowed arguments: describe-*, get-*, list-*
 - **amp**: Allowed arguments: describe-*, get-*, list-*
-- **amplify**: Allowed arguments: describe-*, get-*, list-*
-- **amplifybackend**: Allowed arguments: describe-*, get-*, list-*
+- **amplify get-app**
+- **amplify get-branch**
+- **amplify get-webhook**
+- **amplify list-apps**
+- **amplify list-branches**
+- **amplify list-webhooks**
+- **amplifybackend get-backend-auth**
 - **amplifyuibuilder**: Allowed arguments: describe-*, get-*, list-*
-- **apigateway**: Allowed arguments: get-*
+- **apigateway get-api-key**
+- **apigateway get-api-keys**
 - **apigatewayv2**: Allowed arguments: get-*
 - **appconfig**: Allowed arguments: describe-*, get-*, list-*
 - **appflow**: Allowed arguments: describe-*, get-*, list-*
@@ -20,11 +26,12 @@
 - **appmesh**: Allowed arguments: describe-*, get-*, list-*
 - **apprunner**: Allowed arguments: describe-*, get-*, list-*
 - **appstream**: Allowed arguments: describe-*, get-*, list-*
-- **appsync**: Allowed arguments: describe-*, get-*, list-*
+- **appsync get-graphql-api-environment-variables**
+- **appsync list-api-keys**
 - **artifact**: Allowed arguments: describe-*, get-*, list-*
 - **athena**: Allowed arguments: get-*, list-*
 - **auditmanager**: Allowed arguments: describe-*, get-*, list-*
-- **autoscaling**: Allowed arguments: describe-*
+- **autoscaling describe-launch-configurations**
 - **autoscaling-plans**: Allowed arguments: describe-*, get-*, list-*
 - **b2bi**: Allowed arguments: describe-*, get-*, list-*
 - **backup**: Allowed arguments: describe-*, get-*, list-*
@@ -38,7 +45,8 @@
 - **chatbot**: Allowed arguments: describe-*, get-*, list-*
 - **chime**: Allowed arguments: describe-*, get-*, list-*
 - **chime-sdk-identity**: Allowed arguments: describe-*, get-*, list-*
-- **chime-sdk-meetings**: Allowed arguments: describe-*, get-*, list-*
+- **chime-sdk-meetings get-attendee**
+- **chime-sdk-meetings list-attendees**
 - **chime-sdk-messaging**: Allowed arguments: describe-*, get-*, list-*
 - **chime-sdk-voice**: Allowed arguments: describe-*, get-*, list-*
 - **cleanrooms**: Allowed arguments: describe-*, get-*, list-*
@@ -50,37 +58,45 @@
 - **cloudsearch**: Allowed arguments: describe-*, get-*, list-*
 - **cloudtrail**: Allowed arguments: describe-*, get-*, list-*
 - **cloudwatch**: Allowed arguments: describe-*, get-*, list-*
-- **codeartifact**: Allowed arguments: describe-*, get-*, list-*
-- **codebuild**: Allowed arguments: batch-get-*, describe-*, list-*
+- **codeartifact get-authorization-token**
+- **codebuild batch-get-build-batches**
+- **codebuild batch-get-builds**
+- **codebuild batch-get-projects**
 - **codecatalyst**: Allowed arguments: describe-*, get-*, list-*
 - **codecommit**: Allowed arguments: describe-*, get-*, list-*
 - **codeguru-reviewer**: Allowed arguments: describe-*, get-*, list-*
 - **codeguruprofiler**: Allowed arguments: describe-*, get-*, list-*
-- **codepipeline**: Allowed arguments: get-*, list-*
+- **codepipeline get-job-details**
+- **codepipeline get-third-party-job-details**
 - **codestar-connections**: Allowed arguments: describe-*, get-*, list-*
 - **codestar-notifications**: Allowed arguments: describe-*, get-*, list-*
-- **cognito-identity**: Allowed arguments: describe-*, get-*, list-*
-- **cognito-idp**: Allowed arguments: describe-*, get-*, list-*
+- **cognito-identity get-credentials-for-identity**
+- **cognito-identity get-open-id-token**
+- **cognito-identity get-open-id-token-for-developer-identity**
+- **cognito-idp describe-identity-provider**
+- **cognito-idp describe-user-pool-client**
 - **comprehend**: Allowed arguments: describe-*, get-*, list-*
 - **compute-optimizer**: Allowed arguments: describe-*, get-*, list-*
 - **configservice**: Allowed arguments: describe-*, get-*, list-*
-- **configure export-credentials**: Flags: --help. Valued: --format, --profile
+- **configure export-credentials**
 - **configure get**: Flags: --help
 - **configure list**: Flags: --help
-- **connect**: Allowed arguments: describe-*, get-*, list-*
+- **connect get-federation-token**
 - **controltower**: Allowed arguments: describe-*, get-*, list-*
 - **cur**: Allowed arguments: describe-*, get-*, list-*
 - **databrew**: Allowed arguments: describe-*, get-*, list-*
 - **dataexchange**: Allowed arguments: describe-*, get-*, list-*
 - **datasync**: Allowed arguments: describe-*, get-*, list-*
-- **datazone**: Allowed arguments: describe-*, get-*, list-*
+- **datazone get-connection**
+- **datazone get-environment-credentials**
 - **dax**: Allowed arguments: describe-*, get-*, list-*
 - **deadline**: Allowed arguments: describe-*, get-*, list-*
 - **detective**: Allowed arguments: describe-*, get-*, list-*
 - **devicefarm**: Allowed arguments: describe-*, get-*, list-*
 - **devops-guru**: Allowed arguments: describe-*, get-*, list-*
-- **directconnect**: Allowed arguments: describe-*, get-*, list-*
-- **discovery**: Allowed arguments: describe-*, get-*, list-*
+- **directconnect describe-router-configuration**
+- **directconnect describe-virtual-interfaces**
+- **discovery describe-export-tasks**
 - **dlm**: Allowed arguments: describe-*, get-*, list-*
 - **dms**: Allowed arguments: describe-*, get-*, list-*
 - **docdb**: Allowed arguments: describe-*, get-*, list-*
@@ -88,10 +104,13 @@
 - **ds**: Allowed arguments: describe-*, get-*, list-*
 - **dynamodb**: Allowed arguments: describe-*, list-*
 - **dynamodbstreams**: Allowed arguments: describe-*, get-*, list-*
-- **ebs**: Allowed arguments: describe-*, get-*, list-*
-- **ec2**: Allowed arguments: describe-*
-- **ecr**: Allowed arguments: batch-get-*, describe-*, get-*, list-*
-- **ecr-public**: Allowed arguments: describe-*, get-*, list-*
+- **ebs get-snapshot-block**
+- **ec2 describe-instance-attribute**
+- **ec2 describe-launch-template-versions**
+- **ecr get-authorization-token**
+- **ecr get-login-password**
+- **ecr-public get-authorization-token**
+- **ecr-public get-login-password**
 - **ecs**: Allowed arguments: describe-*, list-*
 - **efs**: Allowed arguments: describe-*, get-*, list-*
 - **eks**: Allowed arguments: describe-*, list-*
@@ -100,23 +119,28 @@
 - **elastictranscoder**: Allowed arguments: describe-*, get-*, list-*
 - **elb**: Allowed arguments: describe-*
 - **elbv2**: Allowed arguments: describe-*
-- **emr**: Allowed arguments: describe-*, get-*, list-*
-- **emr-containers**: Allowed arguments: describe-*, get-*, list-*
+- **emr get-cluster-session-credentials**
+- **emr get-on-cluster-app-ui-presigned-url**
+- **emr get-persistent-app-ui-presigned-url**
+- **emr-containers get-managed-endpoint-session-credentials**
 - **emr-serverless**: Allowed arguments: describe-*, get-*, list-*
 - **entityresolution**: Allowed arguments: describe-*, get-*, list-*
 - **es**: Allowed arguments: describe-*, get-*, list-*
 - **events**: Allowed arguments: describe-*, list-*
-- **finspace**: Allowed arguments: describe-*, get-*, list-*
+- **finspace get-kx-connection-string**
 - **firehose**: Allowed arguments: describe-*, get-*, list-*
 - **fis**: Allowed arguments: describe-*, get-*, list-*
 - **fms**: Allowed arguments: describe-*, get-*, list-*
 - **forecast**: Allowed arguments: describe-*, get-*, list-*
 - **frauddetector**: Allowed arguments: describe-*, get-*, list-*
 - **fsx**: Allowed arguments: describe-*, get-*, list-*
-- **gamelift**: Allowed arguments: describe-*, get-*, list-*
-- **glacier**: Allowed arguments: describe-*, get-*, list-*
+- **gamelift get-compute-access**
+- **gamelift get-compute-auth-token**
+- **gamelift get-instance-access**
+- **glacier get-job-output**
 - **globalaccelerator**: Allowed arguments: describe-*, get-*, list-*
-- **glue**: Allowed arguments: get-*, list-*
+- **glue get-connection**
+- **glue get-connections**
 - **grafana**: Allowed arguments: describe-*, get-*, list-*
 - **greengrass**: Allowed arguments: describe-*, get-*, list-*
 - **greengrassv2**: Allowed arguments: describe-*, get-*, list-*
@@ -124,7 +148,7 @@
 - **guardduty**: Allowed arguments: describe-*, get-*, list-*
 - **health**: Allowed arguments: describe-*, get-*, list-*
 - **healthlake**: Allowed arguments: describe-*, get-*, list-*
-- **iam**: Allowed arguments: get-*, list-*
+- **iam get-credential-report**
 - **identitystore**: Allowed arguments: describe-*, get-*, list-*
 - **imagebuilder**: Allowed arguments: describe-*, get-*, list-*
 - **inspector2**: Allowed arguments: describe-*, get-*, list-*
@@ -133,7 +157,7 @@
 - **iotevents**: Allowed arguments: describe-*, get-*, list-*
 - **iotsitewise**: Allowed arguments: describe-*, get-*, list-*
 - **iottwinmaker**: Allowed arguments: describe-*, get-*, list-*
-- **ivs**: Allowed arguments: describe-*, get-*, list-*
+- **ivs get-stream-key**
 - **kafka**: Allowed arguments: describe-*, get-*, list-*
 - **kafkaconnect**: Allowed arguments: describe-*, get-*, list-*
 - **kendra**: Allowed arguments: describe-*, get-*, list-*
@@ -143,21 +167,28 @@
 - **kinesisanalyticsv2**: Allowed arguments: describe-*, get-*, list-*
 - **kinesisvideo**: Allowed arguments: describe-*, get-*, list-*
 - **kms**: Allowed arguments: describe-*, get-*, list-*
-- **lakeformation**: Allowed arguments: describe-*, get-*, list-*
-- **lambda**: Allowed arguments: get-*, list-*
-- **lex-models**: Allowed arguments: describe-*, get-*, list-*
+- **lakeformation get-temporary-data-location-credentials**
+- **lakeformation get-temporary-glue-partition-credentials**
+- **lakeformation get-temporary-glue-table-credentials**
+- **lambda get-function**
+- **lambda get-function-configuration**
+- **lambda list-functions**
+- **lex-models get-bot-channel-association**
+- **lex-models get-bot-channel-associations**
 - **lexv2-models**: Allowed arguments: describe-*, get-*, list-*
-- **license-manager**: Allowed arguments: describe-*, get-*, list-*
-- **lightsail**: Allowed arguments: describe-*, get-*, list-*
-- **location**: Allowed arguments: describe-*, get-*, list-*
+- **license-manager get-access-token**
+- **lightsail get-instance-access-details**
+- **lightsail get-relational-database-master-user-password**
+- **location describe-key**
 - **logs**: Allowed arguments: describe-*, filter-*, get-*, list-*
-- **m2**: Allowed arguments: describe-*, get-*, list-*
-- **macie2**: Allowed arguments: describe-*, get-*, list-*
-- **managedblockchain**: Allowed arguments: describe-*, get-*, list-*
+- **m2 get-signed-bluinsights-url**
+- **macie2 get-sensitive-data-occurrences**
+- **managedblockchain get-accessor**
 - **mediaconnect**: Allowed arguments: describe-*, get-*, list-*
 - **mediaconvert**: Allowed arguments: describe-*, get-*, list-*
 - **medialive**: Allowed arguments: describe-*, get-*, list-*
-- **mediapackage**: Allowed arguments: describe-*, get-*, list-*
+- **mediapackage describe-channel**
+- **mediapackage list-channels**
 - **mediastore**: Allowed arguments: describe-*, get-*, list-*
 - **mediatailor**: Allowed arguments: describe-*, get-*, list-*
 - **medical-imaging**: Allowed arguments: describe-*, get-*, list-*
@@ -172,26 +203,29 @@
 - **networkmanager**: Allowed arguments: describe-*, get-*, list-*
 - **notifications**: Allowed arguments: describe-*, get-*, list-*
 - **oam**: Allowed arguments: describe-*, get-*, list-*
-- **omics**: Allowed arguments: describe-*, get-*, list-*
+- **omics get-read-set**
 - **opensearch**: Allowed arguments: describe-*, get-*, list-*
 - **opensearchserverless**: Allowed arguments: describe-*, get-*, list-*
 - **organizations**: Allowed arguments: describe-*, get-*, list-*
 - **outposts**: Allowed arguments: describe-*, get-*, list-*
 - **personalize**: Allowed arguments: describe-*, get-*, list-*
 - **pi**: Allowed arguments: describe-*, get-*, list-*
-- **pinpoint**: Allowed arguments: describe-*, get-*, list-*
+- **pinpoint get-baidu-channel**
+- **pinpoint get-gcm-channel**
 - **pipes**: Allowed arguments: describe-*, get-*, list-*
 - **polly**: Allowed arguments: describe-*, get-*, list-*
 - **pricing**: Allowed arguments: describe-*, get-*, list-*
 - **proton**: Allowed arguments: describe-*, get-*, list-*
-- **quicksight**: Allowed arguments: describe-*, get-*, list-*
+- **quicksight get-dashboard-embed-url**
+- **quicksight get-session-embed-url**
 - **ram**: Allowed arguments: describe-*, get-*, list-*
 - **rbin**: Allowed arguments: describe-*, get-*, list-*
 - **rds**: Allowed arguments: describe-*, list-*
 - **rds-data**: Allowed arguments: describe-*, get-*, list-*
-- **redshift**: Allowed arguments: describe-*, get-*, list-*
+- **redshift get-cluster-credentials**
+- **redshift get-cluster-credentials-with-iam**
 - **redshift-data**: Allowed arguments: describe-*, get-*, list-*
-- **redshift-serverless**: Allowed arguments: describe-*, get-*, list-*
+- **redshift-serverless get-credentials**
 - **rekognition**: Allowed arguments: describe-*, get-*, list-*
 - **resiliencehub**: Allowed arguments: describe-*, get-*, list-*
 - **resource-explorer-2**: Allowed arguments: describe-*, get-*, list-*
@@ -206,13 +240,13 @@
 - **route53resolver**: Allowed arguments: describe-*, get-*, list-*
 - **rum**: Allowed arguments: describe-*, get-*, list-*
 - **s3**: Allowed arguments: ls
-- **s3api**: Allowed arguments: get-*, head-*, list-*
-- **s3control**: Allowed arguments: describe-*, get-*, list-*
+- **s3api get-object**
+- **s3control get-data-access**
 - **sagemaker**: Allowed arguments: describe-*, list-*
 - **savingsplans**: Allowed arguments: describe-*, get-*, list-*
 - **scheduler**: Allowed arguments: describe-*, get-*, list-*
 - **schemas**: Allowed arguments: describe-*, get-*, list-*
-- **secretsmanager**: Allowed arguments: describe-*, get-*, list-*
+- **secretsmanager**: Allowed arguments: describe-*, list-*
 - **securityhub**: Allowed arguments: describe-*, get-*, list-*
 - **securitylake**: Allowed arguments: describe-*, get-*, list-*
 - **serverlessrepo**: Allowed arguments: describe-*, get-*, list-*
@@ -225,13 +259,17 @@
 - **signer**: Allowed arguments: describe-*, get-*, list-*
 - **sns**: Allowed arguments: get-*, list-*
 - **sqs**: Allowed arguments: get-*, list-*
-- **ssm**: Allowed arguments: describe-*, get-*, list-*
+- **ssm get-access-token**
+- **ssm get-parameter**
+- **ssm get-parameter-history**
+- **ssm get-parameters**
+- **ssm get-parameters-by-path**
 - **ssm-contacts**: Allowed arguments: describe-*, get-*, list-*
 - **ssm-incidents**: Allowed arguments: describe-*, get-*, list-*
-- **sso**: Allowed arguments: describe-*, get-*, list-*
+- **sso get-role-credentials**
 - **sso-admin**: Allowed arguments: describe-*, get-*, list-*
-- **stepfunctions**: Allowed arguments: describe-*, get-*, list-*
-- **storagegateway**: Allowed arguments: describe-*, get-*, list-*
+- **stepfunctions get-activity-task**
+- **storagegateway describe-chap-credentials**
 - **sts get-caller-identity**: Flags: --help
 - **sts**: Allowed arguments: describe-*, get-*, list-*
 - **support**: Allowed arguments: describe-*, get-*, list-*
@@ -247,12 +285,12 @@
 - **vpc-lattice**: Allowed arguments: describe-*, get-*, list-*
 - **waf**: Allowed arguments: describe-*, get-*, list-*
 - **waf-regional**: Allowed arguments: describe-*, get-*, list-*
-- **wafv2**: Allowed arguments: describe-*, get-*, list-*
+- **wafv2 get-sampled-requests**
 - **wellarchitected**: Allowed arguments: describe-*, get-*, list-*
 - **workdocs**: Allowed arguments: describe-*, get-*, list-*
 - **workmail**: Allowed arguments: describe-*, get-*, list-*
 - **workspaces**: Allowed arguments: describe-*, get-*, list-*
-- **workspaces-web**: Allowed arguments: describe-*, get-*, list-*
+- **workspaces-web get-identity-provider**
 - **xray**: Allowed arguments: describe-*, get-*, list-*
 - Allowed standalone flags: --help, --version
 
@@ -260,12 +298,17 @@
 
 - `aws sts get-caller-identity`
 - `aws s3 ls`
-- `aws configure export-credentials`
-- `aws configure export-credentials --format env`
-- `aws configure export-credentials --format env --profile dev`
-- `eval "$(aws configure export-credentials --format env)"`
-- `eval "$(aws configure export-credentials --format env-no-export --profile dev)"`
-- `eval "$(aws configure export-credentials --format=fish)"`
+- `aws secretsmanager describe-secret --secret-id x`
+- `aws secretsmanager list-secrets`
+- `aws ecr describe-repositories`
+- `aws ecr list-images --repository-name r`
+- `aws ssm get-parameter --name x`
+- `aws ssm describe-parameters`
+- `aws ssm get-parameter-history --name x`
+- `aws lambda list-layers`
+- `aws apigateway get-api-key --api-key x`
+- `aws ec2 describe-instance-attribute --instance-id i --attribute instanceType`
+- `aws datazone get-connection --identifier x`
 
 ### `az`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/cli/azure/">https://learn.microsoft.com/en-us/cli/azure/</a></p>
@@ -434,8 +477,8 @@
 - **artifacts**: Allowed arguments: docker, files, packages, repositories, tags, versions
 - **assured**: Allowed arguments: operations, workloads
 - **auth list**: Flags: --filter-account, --help, -h
-- **auth print-access-token**: Flags: --help, -h
-- **auth print-identity-token**: Flags: --help, -h. Valued: --audiences, --include-email
+- **auth print-access-token**
+- **auth print-identity-token**
 - **batch**: Allowed arguments: jobs, tasks
 - **bigtable**: Allowed arguments: clusters, instances, operations
 - **billing**: Allowed arguments: accounts, budgets, projects
@@ -494,7 +537,7 @@
 - **run services**: Allowed arguments: describe, list
 - **scc**: Allowed arguments: assets, findings, notifications, operations, sources
 - **scheduler**: Allowed arguments: jobs
-- **secrets**: Allowed arguments: describe, list, versions
+- **secrets**: Allowed arguments: describe, list
 - **service-directory**: Allowed arguments: endpoints, namespaces, services
 - **services**: Allowed arguments: list
 - **source**: Allowed arguments: repos

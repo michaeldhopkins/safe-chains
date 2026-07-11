@@ -116,6 +116,8 @@ mod tests {
         bundle_install_with: "bundle install --with development",
         bundle_install_combined: "bundle install --quiet --jobs 4 --retry 3",
         bundle_exec_rspec: "bundle exec rspec spec/models/foo_spec.rb",
+        // dev loop: bundle exec running the project's OWN script (worktree executor).
+        bundle_exec_ruby_worktree: "bundle exec ruby ./task.rb",
         bundle_exec_standardrb: "bundle exec standardrb app/models/foo.rb",
         bundle_exec_standardrb_fix: "bundle exec standardrb --fix app/models/foo.rb",
         bundle_exec_cucumber: "bundle exec cucumber",
@@ -284,7 +286,7 @@ mod tests {
         bundle_exec_kamal_deploy_denied: "bundle exec kamal deploy",
         bundle_exec_danger_pr_denied: "bundle exec danger pr",
         bundle_exec_mutant_run_denied: "bundle exec mutant run -- Foo",
-        bundle_exec_ruby_denied: "bundle exec ruby script.rb",
+        bundle_exec_ruby_foreign_denied: "bundle exec ruby /tmp/script.rb",
         bundle_config_set_denied: "bundle config set path vendor/bundle",
         bundle_config_unset_denied: "bundle config unset path",
         bundle_config_old_set_denied: "bundle config path vendor/bundle",

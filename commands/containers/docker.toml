@@ -51,6 +51,14 @@ standalone = [
 ]
 valued = ["--filter", "--format", "--status"]
 [[command.sub.sub]]
+name = "logs"
+bare = true
+standalone = [
+    "--follow", "--help", "--no-color", "--no-log-prefix", "--timestamps",
+    "-f", "-h", "-t",
+]
+valued = ["--index", "--since", "--tail", "--until", "-n"]
+[[command.sub.sub]]
 name = "top"
 standalone = ["--help", "-h"]
 [[command.sub.sub]]

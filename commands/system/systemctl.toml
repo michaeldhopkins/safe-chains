@@ -1,8 +1,22 @@
 [[command]]
 name = "systemctl"
-description = "Primary management tool for systemd, Linux's init system and service manager. The full command can start, stop, restart, enable, disable, mask, and kill system services, and even reboot or power off the machine -- making it one of the most privileged system administration tools. The covered subcommands (status, show, is-active, is-enabled, is-failed, list-units, list-unit-files, list-sockets, list-timers, list-dependencies, cat) are strictly read-only inspection operations that report service states, unit configurations, dependency trees, and timer schedules without starting, stopping, or reconfiguring any services. The interface is tied to systemd releases and is very stable."
+researched_version = "systemd 257 (2024)"
+description = "Primary management tool for systemd, Linux's init system and service manager. Its subcommands split cleanly by behavior. READ-ONLY inspection (status, show, is-active, is-enabled, is-failed, list-units, list-unit-files, list-sockets, list-timers, list-dependencies, cat) reports service states, unit configurations, dependency trees, and timer schedules without changing anything. SERVICE MANAGEMENT (start, stop, restart, reload, try-restart, reload-or-restart, condrestart, force-reload, enable, disable, reenable, preset, mask, unmask, daemon-reload, daemon-reexec, isolate, set-default, kill, reset-failed, set-property) changes running and boot-time system state and requires root for system units: privileged, machine-scoped, persistent (enable/disable/mask write unit symlinks under /etc/systemd/system), but recoverable -- the inverse subcommand restores the prior state, so none of it is irreversible destruction. POWER-STATE control (reboot, poweroff, halt, kexec, suspend, hibernate, hybrid-sleep, emergency, rescue) takes the whole machine down and is the most disruptive surface -- deliberately not auto-classified here. The `edit` subcommand launches an editor (arbitrary unit config). The interface is tied to systemd releases and is very stable."
 url = "https://man7.org/linux/man-pages/man1/systemctl.1.html"
 bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "systemctl status nginx",
+    "systemctl list-units --type=service",
+    "systemctl is-active sshd",
+    "systemctl cat nginx",
+]
+examples_denied = [
+    "systemctl restart nginx",
+    "systemctl enable nginx",
+    "systemctl daemon-reload",
+    "systemctl reboot",
+    "systemctl edit nginx",
+]
 
 [[command.sub]]
 name = "status"
@@ -69,3 +83,118 @@ name = "cat"
 bare = false
 tolerate_unknown_short = true
 standalone = ["--help", "--no-pager", "-h"]
+
+# ── Service LIFECYCLE control — `profile = "privileged-control"`: root machine ops that act on
+# RUNNING state (start/stop/restart/reload/kill) using existing config. Transient, recoverable, no
+# durable change → the mildest root-machine point, but still local-admin (root authority). Power-state
+# subs (reboot/poweroff/halt/kexec/suspend/…) and `edit` (arbitrary config) are omitted → deny by
+# omission.
+[[command.sub]]
+name = "start"
+profile = "privileged-control"
+fact = "Activates (starts) one or more units; changes RUNNING system state, root for system units. No durable change."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit Commands"
+[[command.sub]]
+name = "stop"
+profile = "privileged-control"
+fact = "Deactivates (stops) one or more units; changes RUNNING system state, root. Reversible via start."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit Commands"
+[[command.sub]]
+name = "restart"
+profile = "privileged-control"
+fact = "Stops then starts one or more units on their EXISTING config; changes RUNNING state, root. Transient, recoverable."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit Commands"
+[[command.sub]]
+name = "reload"
+profile = "privileged-control"
+fact = "Asks units to reload their configuration without a full restart; changes RUNNING state, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit Commands"
+[[command.sub]]
+name = "try-restart"
+profile = "privileged-control"
+fact = "Restarts units only if already running; changes RUNNING state, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit Commands"
+[[command.sub]]
+name = "reload-or-restart"
+profile = "privileged-control"
+fact = "Reloads units, or restarts them if reload is unsupported; changes RUNNING state, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit Commands"
+[[command.sub]]
+name = "condrestart"
+profile = "privileged-control"
+fact = "Alias of try-restart: restarts units only if running; changes RUNNING state, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit Commands"
+[[command.sub]]
+name = "force-reload"
+profile = "privileged-control"
+fact = "Alias of reload-or-restart: reloads or restarts units; changes RUNNING state, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit Commands"
+[[command.sub]]
+name = "kill"
+profile = "privileged-control"
+fact = "Sends a signal to a unit's processes; root process control. Transient."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit Commands"
+[[command.sub]]
+name = "daemon-reload"
+profile = "privileged-control"
+fact = "Reloads systemd's own manager configuration (re-reads unit files); root manager-state change, transient."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Manager State Commands"
+[[command.sub]]
+name = "daemon-reexec"
+profile = "privileged-control"
+fact = "Re-executes the systemd manager while preserving state; root manager-state change, transient."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Manager State Commands"
+[[command.sub]]
+name = "reset-failed"
+profile = "privileged-control"
+fact = "Clears the failed state of one or more units; root manager-state change, transient."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Manager State Commands"
+
+# ── Persistent CONFIGURATION — `profile = "local-privileged"`: root machine ops that write DURABLE
+# state (boot symlinks under /etc/systemd/system, runtime properties, the default boot target). Still
+# local-admin (root, machine, recoverable), but persistent — distinct from the transient lifecycle subs.
+[[command.sub]]
+name = "enable"
+profile = "local-privileged"
+fact = "Creates start-on-boot symlinks under /etc/systemd/system; PERSISTS a boot-config change, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit File Commands"
+[[command.sub]]
+name = "disable"
+profile = "local-privileged"
+fact = "Removes a unit's start-on-boot symlinks; PERSISTS a boot-config change, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit File Commands"
+[[command.sub]]
+name = "reenable"
+profile = "local-privileged"
+fact = "Disables then re-enables a unit to refresh its symlinks; persistent boot-config change, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit File Commands"
+[[command.sub]]
+name = "preset"
+profile = "local-privileged"
+fact = "Applies a unit's vendor preset enable/disable policy; persistent boot-config change, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit File Commands"
+[[command.sub]]
+name = "mask"
+profile = "local-privileged"
+fact = "Symlinks a unit to /dev/null so it can never be started; persistent root service lockout, reversible via unmask."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit File Commands"
+[[command.sub]]
+name = "unmask"
+profile = "local-privileged"
+fact = "Removes a unit's mask symlink, reversing mask; persistent, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit File Commands"
+[[command.sub]]
+name = "set-property"
+profile = "local-privileged"
+fact = "Sets unit properties (persistent under /etc/systemd/system.control unless --runtime); root config change."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit Commands"
+[[command.sub]]
+name = "isolate"
+profile = "local-privileged"
+fact = "Switches to a target, stopping units not part of it; changes the machine run-state broadly, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Unit Commands"
+[[command.sub]]
+name = "set-default"
+profile = "local-privileged"
+fact = "Sets the default.target boot symlink; PERSISTS a default boot-target change, root."
+source = "https://man7.org/linux/man-pages/man1/systemctl.1.html — Manager State Commands"

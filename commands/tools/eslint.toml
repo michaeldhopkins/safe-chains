@@ -20,3 +20,6 @@ valued = [
     "--resolve-plugins-relative-to", "--rule", "--rulesdir",
     "-c", "-f", "-o",
 ]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }

@@ -17,3 +17,6 @@ valued = [
     "--libdir", "--output-dir",
     "-W", "-o",
 ]
+
+[command.path_gate]
+flags = { "--output-dir" = "write" }

@@ -26,11 +26,14 @@ name = "list"
 standalone = ["--filter-account", "--help", "-h"]
 [[command.sub.sub]]
 name = "print-access-token"
-standalone = ["--help", "-h"]
+profile = "credential-read"
+fact = "Prints a valid OAuth2 access token for the active account to stdout — a bearer credential the holder can use to call Google APIs."
+source = "https://cloud.google.com/sdk/gcloud/reference/auth/print-access-token"
 [[command.sub.sub]]
 name = "print-identity-token"
-standalone = ["--help", "-h"]
-valued = ["--audiences", "--include-email"]
+profile = "credential-read"
+fact = "Prints a valid OIDC identity token to stdout — a bearer credential asserting the account's identity to relying services."
+source = "https://cloud.google.com/sdk/gcloud/reference/auth/print-identity-token"
 
 [[command.sub]]
 name = "config"
@@ -297,8 +300,11 @@ tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
+# `versions` DROPPED: it admitted `gcloud secrets versions access`, which PRINTS the secret value.
+# Only `describe`/`list` (metadata) auto-approve now — fail-closed. Batch 1 (gcloud) restructures into
+# explicit sub-subs (`versions access` -> credential-read, `versions list`/`describe` -> remote-read).
 name = "secrets"
-first_arg = ["describe", "list", "versions"]
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 

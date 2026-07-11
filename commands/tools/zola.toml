@@ -5,6 +5,10 @@ url = "https://www.getzola.org/documentation/getting-started/cli-usage/"
 researched_version = "zola 0.x"
 bare_flags = ["--help", "--version", "-h", "-V"]
 
+# build writes the rendered site to -o/--output-dir; --config/--root point at input paths. --base-url is a URL.
+[command.path_gate]
+flags = { "-o" = "write", "--output-dir" = "write", "-c" = "read", "--config" = "read", "-r" = "read", "--root" = "read" }
+
 [[command.sub]]
 name = "init"
 level = "SafeWrite"

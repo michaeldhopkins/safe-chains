@@ -38,6 +38,9 @@ tolerate_unknown_long = true
 standalone = ["--help", "--version", "-h", "-V"]
 valued = ["--output-file", "--files-from", "-o", "-f", "-D"]
 
+[command.path_gate]
+flags = { "--output-file" = "write" }
+
 [[command]]
 name = "msgcmp"
 description = "Compares two PO files to verify all messages are translated. Read-only; writes diagnostics to stderr."
@@ -59,6 +62,9 @@ tolerate_unknown_long = true
 standalone = ["--help", "--version"]
 valued = ["--output-file", "-o", "-D"]
 
+[command.path_gate]
+flags = { "--output-file" = "write" }
+
 [[command]]
 name = "msgattrib"
 description = "Filters PO messages by attribute (translated/untranslated/fuzzy). Output to stdout or -o file. Local-only."
@@ -69,6 +75,9 @@ bare = false
 tolerate_unknown_long = true
 standalone = ["--help", "--version"]
 valued = ["--output-file", "-o"]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }
 
 [[command]]
 name = "msgconv"
@@ -81,6 +90,9 @@ tolerate_unknown_long = true
 standalone = ["--help", "--version"]
 valued = ["--output-file", "--to-code", "-o", "-t"]
 
+[command.path_gate]
+flags = { "--output-file" = "write" }
+
 [[command]]
 name = "msgen"
 description = "Creates an English PO file from a POT template. Output to stdout or -o file."
@@ -91,6 +103,9 @@ bare = false
 tolerate_unknown_long = true
 standalone = ["--help", "--version"]
 valued = ["--output-file", "-o"]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }
 
 [[command]]
 name = "msgexec"
@@ -121,6 +136,9 @@ tolerate_unknown_long = true
 standalone = ["--help", "--version", "-e", "-K", "-T", "-C", "-J", "-N"]
 valued = ["--output-file", "--regexp", "-o", "-E"]
 
+[command.path_gate]
+flags = { "--output-file" = "write" }
+
 [[command]]
 name = "msguniq"
 description = "Unifies duplicate translations in a PO file. Output to stdout or -o file."
@@ -131,6 +149,9 @@ bare = false
 tolerate_unknown_long = true
 standalone = ["--help", "--version", "--repeated", "--unique"]
 valued = ["--output-file", "-o"]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }
 
 [[command]]
 name = "msgfmt"
@@ -143,6 +164,9 @@ tolerate_unknown_long = true
 standalone = ["--help", "--version", "--check", "--statistics", "--verbose", "-c", "-v"]
 valued = ["--output-file", "--directory", "-o", "-d", "-D", "-l"]
 
+[command.path_gate]
+flags = { "--output-file" = "write" }
+
 [[command]]
 name = "msgunfmt"
 description = "Reverses msgfmt: decompiles a MO file back into a PO file. Writes local files only."
@@ -153,6 +177,9 @@ bare = false
 tolerate_unknown_long = true
 standalone = ["--help", "--version"]
 valued = ["--output-file", "-o"]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }
 
 [[command]]
 name = "msginit"
@@ -165,6 +192,9 @@ tolerate_unknown_long = true
 standalone = ["--help", "--version", "--no-translator"]
 valued = ["--input", "--output-file", "--locale", "-i", "-o", "-l"]
 
+[command.path_gate]
+flags = { "--output-file" = "write" }
+
 [[command]]
 name = "msgmerge"
 description = "Merges a new POT template into an existing PO file. Writes local files."
@@ -175,6 +205,9 @@ bare = false
 tolerate_unknown_long = true
 standalone = ["--help", "--version", "--update", "--backup", "-U", "-N"]
 valued = ["--output-file", "-o", "-D"]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }
 
 [[command]]
 name = "xgettext"
@@ -190,6 +223,9 @@ valued = [
     "--output-dir", "--language", "--from-code", "--keyword",
     "-d", "-D", "-f", "-o", "-p", "-L", "-k",
 ]
+
+[command.path_gate]
+flags = { "--output-dir" = "write" }
 
 [[command]]
 name = "gencat"

@@ -59,13 +59,23 @@ fn claude_default_invocation_allows_safe_command() {
 
 #[test]
 fn claude_default_invocation_denies_unsafe_command() {
-    let payload = r#"{"tool_input": {"command": "rm -rf /"}}"#;
+    // an unsafe command with no path operand → empty stdout + exit 0 means "no opinion",
+    // Claude falls back to its own rules. That's the contract, not an error. (A command that
+    // reaches OUTSIDE the workspace instead gets a nudge — see the test below.)
+    let payload = r#"{"tool_input": {"command": "git push"}}"#;
     let (stdout, _stderr, code) = run_hook(&[], payload);
-    // Hook protocol: empty stdout + exit 0 means "no opinion" → Claude
-    // Code falls back to its own permission rules. That's the contract,
-    // not an error.
     assert_eq!(code, 0);
     assert_eq!(stdout, "");
+}
+
+#[test]
+fn claude_nudges_when_a_command_reaches_outside_the_workspace() {
+    let payload = r#"{"tool_input": {"command": "cat /etc/hosts"}, "cwd": "/Users/me/proj"}"#;
+    let (stdout, _stderr, code) = run_hook(&[], payload);
+    assert_eq!(code, 0);
+    // reaches outside → an additionalContext nudge, but NO permission decision (Claude still decides)
+    assert!(stdout.contains("additionalContext"), "expected a nudge: {stdout}");
+    assert!(!stdout.contains("permissionDecision"), "the nudge must not decide: {stdout}");
 }
 
 #[test]
@@ -104,37 +114,40 @@ fn claude_safewrite_carries_appropriate_reason() {
 // ---------------------------------------------------------------
 
 #[test]
-fn codex_hook_allows_safe_command() {
+fn codex_hook_safe_command_emits_nothing() {
+    // Codex has no `grant` (`allow` is unsupported on v0.144.3), so a SAFE command emits nothing
+    // and Codex runs it through its own flow. See docs/design/harness-capability-model.md.
     let payload = r#"{"tool_name": "Bash", "tool_input": {"command": "ls -la"}}"#;
-    let (stdout, _stderr, code) = run_hook(&["hook", "codex"], payload);
-    assert_eq!(code, 0);
-    let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
-    assert_eq!(
-        v.pointer("/hookSpecificOutput/permissionDecision")
-            .and_then(|d| d.as_str()),
-        Some("allow"),
-    );
-    assert_eq!(
-        v.pointer("/hookSpecificOutput/hookEventName")
-            .and_then(|d| d.as_str()),
-        Some("PreToolUse"),
-    );
-}
-
-#[test]
-fn codex_hook_denies_unsafe_command() {
-    let payload = r#"{"tool_name": "Bash", "tool_input": {"command": "rm -rf /etc"}}"#;
     let (stdout, _stderr, code) = run_hook(&["hook", "codex"], payload);
     assert_eq!(code, 0);
     assert_eq!(stdout, "");
 }
 
 #[test]
+fn codex_hook_denies_gated_command() {
+    // Codex has no interactive approval and its sandbox permits broad reads, so a GATED command is
+    // vetoed by the hook (with a `deny` decision), not left silent.
+    let payload = r#"{"tool_name": "Bash", "tool_input": {"command": "rm -rf /etc"}}"#;
+    let (stdout, _stderr, code) = run_hook(&["hook", "codex"], payload);
+    assert_eq!(code, 0);
+    let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
+    assert_eq!(
+        v.pointer("/hookSpecificOutput/permissionDecision").and_then(|d| d.as_str()),
+        Some("deny"),
+    );
+    assert_eq!(
+        v.pointer("/hookSpecificOutput/hookEventName").and_then(|d| d.as_str()),
+        Some("PreToolUse"),
+    );
+}
+
+#[test]
 fn codex_hook_handles_optional_cwd() {
+    // A safe command with cwd present: parses fine and emits nothing (safe → run).
     let payload = r#"{"tool_input": {"command": "git status"}, "cwd": "/Users/me/project"}"#;
     let (stdout, _stderr, code) = run_hook(&["hook", "codex"], payload);
     assert_eq!(code, 0);
-    assert!(stdout.contains("\"permissionDecision\":\"allow\""));
+    assert_eq!(stdout, "");
 }
 
 #[test]
@@ -142,6 +155,86 @@ fn codex_hook_invalid_json_exits_zero_silently() {
     let (stdout, _stderr, code) = run_hook(&["hook", "codex"], "{");
     assert_eq!(code, 0);
     assert_eq!(stdout, "");
+}
+
+#[test]
+fn codex_hook_gated_overreach_reason_names_the_path() {
+    // A gated command that reaches OUTSIDE the workspace: the deny reason must name the path and say
+    // it's outside the working directory (not the generic "not on the allowlist" text). A Deny
+    // harness exits the gated match early, so this is the only place that specific reason reaches it.
+    let payload = r#"{"tool_input": {"command": "cat /etc/hosts"}, "cwd": "/tmp/proj"}"#;
+    let (stdout, _stderr, code) = run_hook(&["hook", "codex"], payload);
+    assert_eq!(code, 0);
+    let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
+    let reason = v
+        .pointer("/hookSpecificOutput/permissionDecisionReason")
+        .and_then(|d| d.as_str())
+        .unwrap_or_default();
+    assert!(reason.contains("/etc/hosts"), "reason should name the path: {reason}");
+    assert!(reason.contains("outside the working directory"), "reason: {reason}");
+}
+
+#[test]
+fn codex_hook_gated_non_overreach_uses_generic_reason() {
+    // Gated but NOT an overreach (an unknown command inside the workspace): the deny reason falls
+    // back to the generic "not on the allowlist" text, not the path-specific one.
+    let payload = r#"{"tool_input": {"command": "frobnicate --wizz"}, "cwd": "/tmp/proj"}"#;
+    let (stdout, _stderr, code) = run_hook(&["hook", "codex"], payload);
+    assert_eq!(code, 0);
+    let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
+    let reason = v
+        .pointer("/hookSpecificOutput/permissionDecisionReason")
+        .and_then(|d| d.as_str())
+        .unwrap_or_default();
+    assert!(reason.contains("not on the allowlist"), "reason: {reason}");
+    assert!(!reason.contains("outside the working directory"), "reason: {reason}");
+}
+
+// --- Antigravity (`agy`) hook subcommand ---
+
+#[test]
+fn antigravity_hook_safe_command_allows() {
+    let payload = r#"{"toolCall":{"name":"run_command","args":{"CommandLine":"git status"}},"workspacePaths":["/tmp/proj"]}"#;
+    let (stdout, _stderr, code) = run_hook(&["hook", "antigravity"], payload);
+    assert_eq!(code, 0);
+    let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
+    assert_eq!(v.get("decision").and_then(|d| d.as_str()), Some("allow"));
+}
+
+#[test]
+fn antigravity_hook_gated_command_force_asks() {
+    // Gated, non-overreach: escalate with `force_ask` (bypasses agy's Always-Allow cache) and the
+    // generic "stops flagging it" reason.
+    let payload = r#"{"toolCall":{"name":"run_command","args":{"CommandLine":"frobnicate --wizz"}},"workspacePaths":["/tmp/proj"]}"#;
+    let (stdout, _stderr, code) = run_hook(&["hook", "antigravity"], payload);
+    assert_eq!(code, 0);
+    let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
+    assert_eq!(v.get("decision").and_then(|d| d.as_str()), Some("force_ask"));
+    let reason = v.get("reason").and_then(|d| d.as_str()).unwrap_or_default();
+    assert!(reason.contains("stops flagging it"), "reason: {reason}");
+}
+
+#[test]
+fn antigravity_hook_gated_overreach_force_asks_with_path() {
+    let payload = r#"{"toolCall":{"name":"run_command","args":{"CommandLine":"cat /etc/hosts"}},"workspacePaths":["/tmp/proj"]}"#;
+    let (stdout, _stderr, code) = run_hook(&["hook", "antigravity"], payload);
+    assert_eq!(code, 0);
+    let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
+    assert_eq!(v.get("decision").and_then(|d| d.as_str()), Some("force_ask"));
+    let reason = v.get("reason").and_then(|d| d.as_str()).unwrap_or_default();
+    assert!(reason.contains("/etc/hosts"), "reason should name the path: {reason}");
+    assert!(reason.contains("outside the working directory"), "reason: {reason}");
+}
+
+#[test]
+fn antigravity_hook_credential_reach_names_credential_store() {
+    let payload = r#"{"toolCall":{"name":"run_command","args":{"CommandLine":"cat ~/.ssh/id_rsa"}},"workspacePaths":["/tmp/proj"]}"#;
+    let (stdout, _stderr, code) = run_hook(&["hook", "antigravity"], payload);
+    assert_eq!(code, 0);
+    let v: serde_json::Value = serde_json::from_str(stdout.trim()).unwrap();
+    assert_eq!(v.get("decision").and_then(|d| d.as_str()), Some("force_ask"));
+    let reason = v.get("reason").and_then(|d| d.as_str()).unwrap_or_default();
+    assert!(reason.contains("credential store"), "reason: {reason}");
 }
 
 // ---------------------------------------------------------------
@@ -346,4 +439,66 @@ fn copilot_hook_denies_unsafe_via_double_decode() {
     let (stdout, _stderr, code) = run_hook(&["hook", "copilot"], payload);
     assert_eq!(code, 0);
     assert_eq!(stdout, "");
+}
+
+/// Cross-target hook contract: for EVERY target with a runtime hook, the abstain path must be
+/// fail-safe and the nudge/context path must never carry a permission decision. safe-chains never
+/// denies — it emits empty output and lets the harness prompt — so any target that (a) emits an
+/// approval on `Denied`, or (b) leaks a decision field through `render_context` (which would
+/// override the user's own allowlist), is a silent fail-open. Only Claude asserted these before;
+/// this pins them for all targets so a new one can't regress uncaught (the qwen/droid
+/// `render_context` overrides had no such test).
+#[test]
+fn every_target_hook_contract_is_fail_safe() {
+    use safe_chains::Verdict;
+    let mut failures = Vec::new();
+    for target in safe_chains::targets::registry() {
+        let Some(fmt) = target.hook_format() else {
+            continue;
+        };
+        let name = target.name();
+        let denied = fmt.render_response(Verdict::Denied);
+        if !denied.stdout.trim().is_empty() {
+            failures.push(format!("{name}: render_response(Denied) emitted `{}`", denied.stdout));
+        }
+        let ctx = fmt.render_context("reaches /etc/x outside your workspace");
+        for key in ["\"permissionDecision\"", "\"decision\"", "\"permission\""] {
+            if ctx.stdout.contains(key) {
+                failures.push(format!("{name}: render_context leaked {key} -> `{}`", ctx.stdout));
+            }
+        }
+        if fmt.parse_input("this is not json {[").is_ok() {
+            failures.push(format!("{name}: parse_input accepted garbage as a command"));
+        }
+        // Capability ↔ emission consistency: a target's gated policy must match what it emits, and
+        // the unused render_* paths must stay empty (a stray call can't fail open).
+        use safe_chains::targets::GatedPolicy;
+        match fmt.gated_policy() {
+            GatedPolicy::Deny => {
+                if !fmt.render_deny("blocked").stdout.contains("\"deny\"") {
+                    failures.push(format!("{name}: Deny policy but render_deny has no deny decision"));
+                }
+                if !fmt.render_ask("x").stdout.trim().is_empty() {
+                    failures.push(format!("{name}: Deny policy but render_ask is non-empty"));
+                }
+            }
+            GatedPolicy::Ask => {
+                // An Ask target escalates to a human prompt: `ask` or `force_ask` (agy uses the
+                // latter to bypass its Always-Allow cache — see targets/agy.rs).
+                let ask = fmt.render_ask("confirm").stdout;
+                if !ask.contains("\"ask\"") && !ask.contains("\"force_ask\"") {
+                    failures.push(format!("{name}: Ask policy but render_ask has no ask decision"));
+                }
+                if !fmt.render_deny("x").stdout.trim().is_empty() {
+                    failures.push(format!("{name}: Ask policy but render_deny is non-empty"));
+                }
+            }
+            GatedPolicy::Defer => {
+                if !fmt.render_deny("x").stdout.trim().is_empty() || !fmt.render_ask("x").stdout.trim().is_empty() {
+                    failures.push(format!("{name}: Defer policy but a render_deny/ask emitted output"));
+                }
+            }
+        }
+    }
+    assert!(failures.is_empty(), "target hook contract violations:\n{}", failures.join("\n"));
 }

@@ -30,7 +30,7 @@
 - **install**: Flags: --clean, --deployment, --frozen, --full-index, --help, --local, --no-cache, --no-prune-sources, --prefer-local, --quiet, --redownload, --system, -h. Valued: --gemfile, --jobs, --path, --retry, --standalone, --trust-policy, --with, --without, -j
 - **list**: Flags: --help, --name-only, --paths, -h
 - **show**: Flags: --help, --paths, -h
-- Allowed standalone flags: --help, --version, -V, -h
+- Allowed standalone flags: --help, --version, -V, -h, -v
 
 ### `byebug`
 <p class="cmd-url"><a href="https://github.com/deivid-rodriguez/byebug">https://github.com/deivid-rodriguez/byebug</a></p>
@@ -383,8 +383,19 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 ### `ruby`
 <p class="cmd-url"><a href="https://www.ruby-lang.org/en/documentation/">https://www.ruby-lang.org/en/documentation/</a></p>
 
+- Allowed: `--version`/`--help` (informational), `-c FILE` (parse-only syntax check, runs no code), and running a WORKSPACE-local script (`ruby ./rakefile.rb`, `ruby task.rb`) — the dev loop. The first positional is the script to run; further positionals are its arguments.
+
+- **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -V, -h, -v
 - Allowed valued flags: -c
+
+**Examples:**
+
+- `ruby --version`
+- `ruby --help`
+- `ruby -c script.rb`
+- `ruby ./rakefile.rb`
+- `ruby task.rb`
 
 ### `rufo`
 <p class="cmd-url"><a href="https://github.com/ruby-formatter/rufo">https://github.com/ruby-formatter/rufo</a></p>

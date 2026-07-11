@@ -91,6 +91,7 @@
 - **compose --version**
 - **compose config**: Flags: --dry-run, --hash, --help, --images, --no-consistency, --no-interpolate, --no-normalize, --no-path-resolution, --profiles, --quiet, --resolve-image-digests, --services, --volumes, -h, -q. Valued: --format, --output, -o
 - **compose images**: Flags: --help, -h
+- **compose logs**: Flags: --follow, --help, --no-color, --no-log-prefix, --timestamps, -f, -h, -t. Valued: --index, --since, --tail, --until, -n
 - **compose ls**: Flags: --help, -h
 - **compose port**: Flags: --help, --index, --protocol, -h
 - **compose ps**: Flags: --all, --help, --no-trunc, --orphans, --quiet, --services, -a, -h, -q. Valued: --filter, --format, --status
@@ -217,7 +218,7 @@
 - **proxy-config endpoint**: Flags: --help, -h
 - **proxy-config listener**: Flags: --help, -h
 - **proxy-config route**: Flags: --help, -h
-- **proxy-config secret**: Flags: --help, -h
+- **proxy-config secret**
 - **proxy-status**: Flags: --file, --help, --multi-xds, --xds-via-agents, -f, -h. Valued: --file, --multi-xds, --output, --revision, -f, -o. Positional args accepted
 - **validate**: Flags: --help, --no-validate, --output, --quiet, --referential, -f, -h, -o, -q. Valued: --filename, --output, -f, -o. Positional args accepted
 - **version**: Flags: --help, --remote, --revision, --short, -h, -s. Valued: --filename, --output, --revision, -f, -o

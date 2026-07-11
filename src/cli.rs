@@ -1,5 +1,4 @@
 use clap::Parser;
-use crate::verdict::SafetyLevel;
 
 #[derive(Parser)]
 #[command(name = "safe-chains")]
@@ -10,9 +9,12 @@ pub struct Cli {
     /// Command string to check (omit for Claude hook mode via stdin)
     pub command: Option<String>,
 
-    /// Safety level threshold (inert, safe-read, safe-write). Only commands at or below this level pass.
-    #[arg(long, value_enum)]
-    pub level: Option<SafetyLevel>,
+    /// Safety level threshold; only commands at or below it auto-approve. Levels, locked → open:
+    /// paranoid, reader, editor, developer, local-admin, network-admin, yolo. The legacy names
+    /// inert / safe-read / safe-write still work (mapped to paranoid / reader / developer, with a
+    /// notice). Default: developer.
+    #[arg(long)]
+    pub level: Option<String>,
 
     /// Working directory to resolve relative paths against (as a harness hook would pass).
     /// Pair with --root so e.g. `cd`-relative writes classify against the real directory.

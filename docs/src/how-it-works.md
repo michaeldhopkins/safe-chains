@@ -6,22 +6,23 @@ safe-chains knows {{#include includes/command-count.md}} commands. For each one 
 
 ## Files by location
 
-Commands that read or write files are checked by *where* the file is, not only by which command it is. `cat`, `grep`, `head`, `cp`, `mv`, `tar`, `curl -o`, and the rest are approved inside your project and denied outside it:
+When you run a bash command, in addition to checking the safety of the actual command, safe-chains checks the directory the command wants to affect. Generally, commands are approved when they operate within the _current working directory_ (from where you are running the agent, like `~/projects/abc`). It also approves some read and write locations outside of that, like `/tmp`.
+
+If you run an agent from a high-level directory like `~/`, you give it a lot of power. This is the case whether or not you run safe-chains. Careful!
 
 ```bash
-cat src/main.rs           # approved — inside the project
-cat /etc/hosts            # approved — a world-readable system file
+cat ./src/main.rs         # approved — inside your working directory
+echo hi > ./out.txt       # approved — writing inside the project
+grep -r TODO ./src        # approved
+cat /tmp/scratch.txt      # approved — /tmp is scratch
+cat /etc/hosts            # not approved — outside the project; you're prompted
 cat ~/.ssh/id_rsa         # not approved — a credential
-cat /etc/shadow           # not approved — a system secret
-cp notes.txt /etc/x       # not approved — writes outside the project
-tar -cf out.tar src       # approved
+cp notes.txt /etc/x       # not approved — writing outside the project
 ```
-
-The project directory and `/tmp` are read/write. World-readable system paths (`/etc/hosts`, `/usr/bin/*`) are readable but not writable. Your home directory, other users, and everything else are left for the normal permission flow.
 
 ## Trusted directories
 
-Widen the file rules for directories you own by listing them in `~/.config/safe-chains.toml`. `read` and `write` are separate — grant read without write for a directory you look at but never edit.
+If you always want to allow reading and writing in additional directories, add them to `~/.config/safe-chains.toml` with `read = true` and/or `write = true`. The binary will pick up these preferences. safe-chains has a special block to not auto-allow writes to `~/.config/safe-chains.toml`. This is because currently, most harnesses don't have a protected way for third party hooks to store preferences.
 
 ```toml
 # Work across every project under ~/projects, not just the current one
@@ -42,7 +43,7 @@ path = "~/.local/share/mise/"
 read = true
 ```
 
-Grants only ever widen, and never expose a secret: `~/.ssh/id_rsa` stays denied even under a `~/` grant. Grant the directories you work in, not all of `~` — see [Best practices](security.md#best-practices).
+Certain dangerous directories aren't included when you allow `~/`: `~/.ssh`, `~/.git-credentials`, `~/.aws`, `~/.env`. These need explicit red/write grants.
 
 ## Parsing example
 

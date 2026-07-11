@@ -29,3 +29,6 @@ valued = [
     "--to", "--use-frontmatter", "--writer",
     "-c", "-y",
 ]
+
+[command.path_gate]
+flags = { "--output-dir" = "write" }

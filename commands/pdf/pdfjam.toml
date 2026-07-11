@@ -36,3 +36,6 @@ examples_denied = [
     "pdfjam --latexopts '-shell-escape' input.pdf",
     "pdfjam --preamble '\\\\immediate\\\\write18{rm -rf /}' input.pdf",
 ]
+
+[command.path_gate]
+flags = { "--outfile" = "write" }

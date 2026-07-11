@@ -8,6 +8,8 @@ Auto-approval of destructive, write, or state-changing commands. An agentic tool
 
 Auto-approval of reads and writes outside your project. File commands are checked by location, so `cat ~/.ssh/id_rsa`, `cp secret /etc/x`, and writes to system paths are not approved. See [Files by location](how-it-works.md#files-by-location).
 
+Auto-approval of writes to safe-chains' own config. See [Trusted directories](how-it-works.md#trusted-directories).
+
 ## Security properties
 
 - Allowlist-only: unrecognized commands are never approved.
@@ -23,6 +25,7 @@ Custom definitions outside of ~/.config and ~/.claude must be trusted. See [Trus
 ## What it does not prevent
 
 - Information disclosure inside your project: files in your project — and any [trusted directories](how-it-works.md#trusted-directories) you grant — are readable, so `cat .env` sends their contents to the model provider. safe-chains gates by location, not by content; it won't stop a read inside a directory you've allowed.
+- Filesystem confinement: safe-chains is NOT a sandbox. If you manually approve a dangerous command, safe-chains will not stop it. If you replace a safe binary with an evil binary, safe-chains will let it run. It only reads command strings, statically. For real confinement, pair it with an OS sandbox or the harness's own file controls. safe-chains' job is to auto-approve the safe commands so the prompts you DO get are meaningful.
 - Unrecognized commands: commands safe-chains doesn't handle are passed through to the normal permission flow for your harness.
 - Chaining with broad approvals: if you add patterns like `Bash(bash *)` to your Claude Code settings, safe-chains will match them per-segment without recursive validation, matching Claude Code's own behavior. See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands).
 

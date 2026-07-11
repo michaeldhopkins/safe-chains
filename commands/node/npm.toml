@@ -2,7 +2,21 @@
 name = "npm"
 description = "Node.js package manager and registry client. Inspection subcommands (list, ls, view, info, audit, outdated, explain, fund, why, doctor, prefix, root) are read-only, though audit contacts the npm registry over the network. npm test and npm run-script execute arbitrary shell commands defined in package.json. npm ci performs a clean install, downloading packages from the registry, modifying node_modules and package-lock.json, and running lifecycle scripts (install, postinstall) that can execute arbitrary code. config get/list are read-only. Mature, stable project maintained by npm, Inc."
 url = "https://docs.npmjs.com/cli"
+researched_version = "npm 10 (2024)"
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "npm ci --ignore-scripts",
+    "npm ls",
+    "npm view react",
+]
+# Above the auto-approve band: `npm ci` (runs lifecycle scripts) and `npm install`/`i` (floating +
+# scripts) are the supply-chain surface — classified `supply-chain-build` (yolo), denied at default.
+examples_denied = [
+    "npm ci",
+    "npm install",
+    "npm install left-pad",
+    "npm i react",
+]
 
 [[command.sub]]
 name = "list"
@@ -101,12 +115,35 @@ name = "run-script"
 first_arg = ["test", "test:*"]
 level = "SafeRead"
 
+# `npm ci` is the PINNED, reproducible install (installs exactly package-lock.json, fails if it
+# drifts). With `--ignore-scripts` it runs NO lifecycle code → `local-install-pinned` (developer).
+# WITHOUT `--ignore-scripts` it runs install/postinstall scripts from the fetched packages — arbitrary
+# code at install time → escalates to `supply-chain-build` (yolo). `npm install`/`i` are FLOATING
+# (they can update the lockfile / add deps), so they are always `supply-chain-build`, `--ignore-scripts`
+# or not.
 [[command.sub]]
 name = "ci"
-level = "SafeWrite"
-standalone = [
-    "--help", "--ignore-scripts", "--legacy-bundling",
-    "--no-audit", "--no-fund", "--no-optional",
-    "--production",
-    "-h",
-]
+profile = "local-install-pinned"
+fact = "`npm ci` installs exactly the versions in package-lock.json (a hash-pinned lockfile), failing if it is out of sync — a reproducible install."
+source = "https://docs.npmjs.com/cli/commands/npm-ci"
+judgment = "Pinned by definition (lockfile); the scripts-off form runs no foreign code, so it is the safe local-install-pinned shape."
+[[command.sub.flag]]
+name = "--ignore-scripts"
+when_absent = true
+classifies = "supply-chain-build"
+fact = "Without --ignore-scripts, npm runs each package's install/preinstall/postinstall lifecycle scripts — arbitrary code from fetched dependencies executes at install time."
+source = "https://docs.npmjs.com/cli/commands/npm-ci — Configuration, ignore-scripts"
+judgment = "Absence of --ignore-scripts is the supply-chain risk; its presence earns the safe pinned-install shape."
+
+[[command.sub]]
+name = "install"
+profile = "supply-chain-build"
+fact = "`npm install` resolves and installs dependencies, may UPDATE package-lock.json / add packages (floating, not reproducible), and runs lifecycle scripts by default — fetched code executes at install time."
+source = "https://docs.npmjs.com/cli/commands/npm-install"
+judgment = "Floating + script-running install = the supply-chain surface; not pinned like `ci`, so it stays supply-chain-build even with --ignore-scripts."
+[[command.sub]]
+name = "i"
+aliases = ["add", "isntall"]
+profile = "supply-chain-build"
+fact = "Alias of `npm install` — floating dependency install that runs lifecycle scripts by default."
+source = "https://docs.npmjs.com/cli/commands/npm-install"

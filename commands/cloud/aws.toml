@@ -7,19 +7,45 @@ bare_flags = ["--help", "--version"]
 examples_safe = [
     "aws sts get-caller-identity",
     "aws s3 ls",
+    "aws secretsmanager describe-secret --secret-id x",
+    "aws secretsmanager list-secrets",
+    "aws ecr describe-repositories",
+    "aws ecr list-images --repository-name r",
+    "aws ssm get-parameter --name x",
+    "aws ssm describe-parameters",
+    "aws ssm get-parameter-history --name x",
+    "aws lambda list-layers",
+    "aws apigateway get-api-key --api-key x",
+    "aws ec2 describe-instance-attribute --instance-id i --attribute instanceType",
+    "aws datazone get-connection --identifier x",
+]
+# `configure export-credentials` PRINTS live AWS credentials — reclassified `credential-read` (yolo),
+# so it and its eval forms are denied at the default band. `secretsmanager get-secret-value` reads the
+# secret value; dropped from the `get-*` glob.
+examples_denied = [
     "aws configure export-credentials",
     "aws configure export-credentials --format env",
-    "aws configure export-credentials --format env --profile dev",
     "eval \"$(aws configure export-credentials --format env)\"",
-    "eval \"$(aws configure export-credentials --format env-no-export --profile dev)\"",
-    "eval \"$(aws configure export-credentials --format=fish)\"",
-]
-examples_denied = [
-    "eval \"$(aws configure export-credentials)\"",
     "eval \"$(aws configure export-credentials --format json)\"",
-    "eval \"$(aws configure export-credentials --format process)\"",
-    "eval \"$(aws configure export-credentials --profile $VAR)\"",
+    "aws secretsmanager get-secret-value --secret-id x",
     "eval \"$(aws configure list)\"",
+    "aws ecr get-login-password",
+    "aws ecr get-authorization-token",
+    "aws ssm get-parameter --name x --with-decryption",
+    "aws ssm get-parameters --names x --with-decryption",
+    "aws ssm get-parameters-by-path --path / --with-decryption",
+    "aws s3api get-object --bucket b --key k out.json",
+    "aws glacier get-job-output --account-id - --vault-name v --job-id j out",
+    "aws ebs get-snapshot-block --snapshot-id s --block-index 0 --block-token t",
+    "aws omics get-read-set --id x --sequence-store-id y --part-number 1 out",
+    "aws redshift get-cluster-credentials --db-user u --cluster-identifier c",
+    "aws sso get-role-credentials --role-name r --account-id a --access-token t",
+    "aws lambda get-function --function-name x",
+    "aws iam get-credential-report",
+    "aws codeartifact get-authorization-token --domain d",
+    "aws apigateway get-api-key --api-key x --include-value",
+    "aws datazone get-connection --identifier x --with-secret",
+    "aws ec2 describe-instance-attribute --instance-id i --attribute userData",
 ]
 [command.wrapper]
 standalone = ["--debug", "--no-paginate", "--no-sign-request", "--no-verify-ssl"]
@@ -40,16 +66,10 @@ bare = false
 standalone = ["--help"]
 [[command.sub.sub]]
 name = "export-credentials"
-level = "Inert"
-max_positional = 0
-standalone = ["--help"]
-valued = ["--format", "--profile"]
-eval_safe = true
-eval_safe_flags = ["--format", "--profile"]
-eval_safe_required_flags = ["--format"]
-[command.sub.sub.eval_safe_flag_values]
---format = ["env", "env-no-export", "fish", "powershell", "windows-cmd"]
---profile = []
+profile = "credential-read"
+fact = "`aws configure export-credentials` resolves and PRINTS the active AWS credentials (access key id, secret access key, session token) to stdout in the requested format — the raw credential enters the caller's context (or, via `eval`, the shell environment)."
+source = "https://docs.aws.amazon.com/cli/latest/reference/configure/export-credentials.html"
+judgment = "Reclassified from Inert + eval-safe: printing live AWS credentials is credential exposure regardless of the eval convenience. The assume-role -> export -> use workflow now requires --level yolo. Revisit if the eval-into-env case warrants a narrower carve-out."
 
 [[command.sub]]
 name = "sts"
@@ -68,6 +88,12 @@ name = "s3api"
 first_arg = ["get-*", "head-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "get-object"
+profile = "bulk-object-read"
+fact = "Streams the full body of an arbitrary S3 object to a local file or stdout — the same effect as the not-allowlisted `aws s3 cp`; object content routinely includes stored keys, .env/credentials files, DB dumps, and PII."
+source = "https://docs.aws.amazon.com/cli/latest/reference/s3api/get-object.html"
+judgment = "Denied at the default band as arbitrary opaque content retrieval. Tier (yolo) is conservative and UNSETTLED — not every object is credential-grade; see the bulk-object-read archetype note."
 
 [[command.sub]]
 name = "ec2"
@@ -75,18 +101,55 @@ first_arg = ["describe-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "describe-launch-template-versions"
+profile = "credential-read"
+fact = "LaunchTemplateData including UserData (base64) returned by default; launch-template user data frequently embeds secrets/credentials"
+source = "https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-launch-template-versions.html"
+[[command.sub.sub]]
+name = "describe-instance-attribute"
+profile = "remote-read"
+fact = "Reads one instance attribute. With --attribute userData it returns the instance's UserData (base64), which routinely contains bootstrap secrets, credentials, and tokens; other attributes (instanceType, groupSet, …) are benign."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instance-attribute.html"
+judgment = "Base read auto-approves; only --attribute userData escalates to credential-read (returns bootstrap secrets)."
+[[command.sub.sub.flag]]
+name = "--attribute"
+value_prefix = "userData"
+classifies = "credential-read"
+fact = "Selecting the userData attribute returns the instance UserData (base64) — bootstrap secrets/credentials."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instance-attribute.html"
 [[command.sub]]
 name = "iam"
 first_arg = ["get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-credential-report"
+profile = "credential-read"
+fact = "account-wide credential inventory (CSV) for every IAM user: password/MFA state, access-key IDs, rotation and last-used dates, cert status — a bulk credential-posture export"
+source = "https://docs.aws.amazon.com/cli/latest/reference/iam/get-credential-report.html"
 [[command.sub]]
 name = "lambda"
 first_arg = ["get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-function"
+profile = "credential-read"
+fact = "secret — plaintext Environment.Variables (passwords/API keys) plus a presigned Code.Location URL to download the full deployment package (code export)"
+source = "https://docs.aws.amazon.com/cli/latest/reference/lambda/get-function.html"
+[[command.sub.sub]]
+name = "get-function-configuration"
+profile = "credential-read"
+fact = "secret — the function's Environment.Variables map returned in plaintext (commonly DB passwords, API keys, access tokens)"
+source = "https://docs.aws.amazon.com/cli/latest/reference/lambda/get-function-configuration.html"
+[[command.sub.sub]]
+name = "list-functions"
+profile = "credential-read"
+fact = "bulk data — array of FunctionConfiguration for every function in the account/region, each including its plaintext Environment.Variables (secrets), enabling account-wide secret harvest in one call"
+source = "https://docs.aws.amazon.com/cli/latest/reference/lambda/list-functions.html"
 [[command.sub]]
 name = "logs"
 first_arg = ["describe-*", "filter-*", "get-*", "list-*"]
@@ -146,10 +209,62 @@ name = "ssm"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "get-access-token"
+profile = "credential-mint"
+fact = "Returns a credentials set to be used with just-in-time node access (a temporary access credential)."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-access-token.html"
+[[command.sub.sub]]
+name = "get-parameter"
+profile = "remote-read"
+fact = "Reads a Parameter Store parameter. With --with-decryption a SecureString is DECRYPTED, returning the plaintext secret (password/API key/token)."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-parameter.html"
+judgment = "The base read auto-approves; --with-decryption escalates to credential-read since it reveals the encrypted secret value."
+[[command.sub.sub.flag]]
+name = "--with-decryption"
+classifies = "credential-read"
+fact = "Decrypts SecureString parameter values, returning the plaintext secret."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-parameter.html"
+[[command.sub.sub]]
+name = "get-parameters"
+profile = "remote-read"
+fact = "Reads multiple Parameter Store parameters. With --with-decryption SecureString values are DECRYPTED to plaintext secrets."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-parameters.html"
+judgment = "The base read auto-approves; --with-decryption escalates to credential-read."
+[[command.sub.sub.flag]]
+name = "--with-decryption"
+classifies = "credential-read"
+fact = "Decrypts SecureString parameter values, returning the plaintext secrets."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-parameters.html"
+[[command.sub.sub]]
+name = "get-parameter-history"
+profile = "remote-read"
+fact = "Reads the value history of a parameter. With --with-decryption SecureString values are DECRYPTED to plaintext secrets."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-parameter-history.html"
+judgment = "The base read auto-approves; --with-decryption escalates to credential-read."
+[[command.sub.sub.flag]]
+name = "--with-decryption"
+classifies = "credential-read"
+fact = "Decrypts the SecureString value history, returning plaintext secrets."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-parameter-history.html"
+[[command.sub.sub]]
+name = "get-parameters-by-path"
+profile = "remote-read"
+fact = "Reads all parameters under a path hierarchy. With --with-decryption SecureString values are DECRYPTED, bulk-exposing plaintext secrets."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-parameters-by-path.html"
+judgment = "The base read auto-approves; --with-decryption escalates to credential-read (a bulk secret read)."
+[[command.sub.sub.flag]]
+name = "--with-decryption"
+classifies = "credential-read"
+fact = "Decrypts all SecureString values under the path, returning plaintext secrets."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ssm/get-parameters-by-path.html"
 
 [[command.sub]]
+# `get-*` DROPPED: it admitted `get-secret-value` (reads the secret) and `get-random-password` (mints
+# one). Only metadata reads (describe/list) auto-approve now — fail-closed. Batch 1 (aws) restructures
+# this into explicit sub-subs (get-secret-value -> credential-read, get-resource-policy -> remote-read).
 name = "secretsmanager"
-first_arg = ["describe-*", "get-*", "list-*"]
+first_arg = ["describe-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
@@ -158,6 +273,16 @@ name = "ecr"
 first_arg = ["batch-get-*", "describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "get-login-password"
+profile = "credential-mint"
+fact = "Prints the decoded ECR registry password on stdout — the 'AWS' user's temporary docker-login credential for the registry."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ecr/get-login-password.html"
+[[command.sub.sub]]
+name = "get-authorization-token"
+profile = "credential-mint"
+fact = "Returns a base64 authorization token (a temporary registry credential) usable as the docker/oras login password for the ECR registry."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ecr/get-authorization-token.html"
 
 [[command.sub]]
 name = "eks"
@@ -189,6 +314,11 @@ first_arg = ["describe-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "describe-launch-configurations"
+profile = "credential-read"
+fact = "Each LaunchConfiguration includes the UserData field (base64 bootstrap script), which commonly embeds hardcoded credentials, secrets, and API keys used at instance boot."
+source = "https://docs.aws.amazon.com/cli/latest/reference/autoscaling/describe-launch-configurations.html"
 [[command.sub]]
 name = "kms"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -206,6 +336,28 @@ name = "apigateway"
 first_arg = ["get-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "get-api-key"
+profile = "remote-read"
+fact = "Reads an API key's metadata. With --include-value the response includes the API key VALUE — a usable API credential."
+source = "https://docs.aws.amazon.com/cli/latest/reference/apigateway/get-api-key.html"
+judgment = "Base read auto-approves; --include-value escalates to credential-read (returns the key value)."
+[[command.sub.sub.flag]]
+name = "--include-value"
+classifies = "credential-read"
+fact = "Includes the API key VALUE in the response — a usable credential."
+source = "https://docs.aws.amazon.com/cli/latest/reference/apigateway/get-api-key.html"
+[[command.sub.sub]]
+name = "get-api-keys"
+profile = "remote-read"
+fact = "Lists API keys. With --include-values the response includes the API key VALUES in bulk — usable API credentials."
+source = "https://docs.aws.amazon.com/cli/latest/reference/apigateway/get-api-keys.html"
+judgment = "Base list auto-approves; --include-values escalates to credential-read (bulk key values)."
+[[command.sub.sub.flag]]
+name = "--include-values"
+classifies = "credential-read"
+fact = "Includes API key VALUES in bulk — usable credentials."
+source = "https://docs.aws.amazon.com/cli/latest/reference/apigateway/get-api-keys.html"
 
 [[command.sub]]
 name = "apigatewayv2"
@@ -219,18 +371,53 @@ first_arg = ["batch-get-*", "describe-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "batch-get-build-batches"
+profile = "credential-read"
+fact = "Batch build details including environment variables (PLAINTEXT type) used in the builds, which can contain plaintext secrets"
+source = "https://docs.aws.amazon.com/cli/latest/reference/codebuild/batch-get-build-batches.html"
+[[command.sub.sub]]
+name = "batch-get-builds"
+profile = "credential-read"
+fact = "Build details including the resolved environment variables (PLAINTEXT type) used in the build and exportedEnvironmentVariables, which can contain plaintext secrets"
+source = "https://docs.aws.amazon.com/cli/latest/reference/codebuild/batch-get-builds.html"
+[[command.sub.sub]]
+name = "batch-get-projects"
+profile = "credential-read"
+fact = "Full project configuration including environment variables of type PLAINTEXT, whose values commonly hold secrets/tokens/passwords embedded directly in the project definition"
+source = "https://docs.aws.amazon.com/cli/latest/reference/codebuild/batch-get-projects.html"
 [[command.sub]]
 name = "codepipeline"
 first_arg = ["get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-job-details"
+profile = "credential-mint"
+fact = "JobData.artifactCredentials — temporary AWS session credentials (accessKeyId, secretAccessKey, sessionToken) for the pipeline artifact store"
+source = "https://docs.aws.amazon.com/cli/latest/reference/codepipeline/get-job-details.html"
+[[command.sub.sub]]
+name = "get-third-party-job-details"
+profile = "credential-mint"
+fact = "ThirdPartyJobData.artifactCredentials — temporary AWS session credentials (accessKeyId, secretAccessKey, sessionToken) for the pipeline artifact store"
+source = "https://docs.aws.amazon.com/cli/latest/reference/codepipeline/get-third-party-job-details.html"
 [[command.sub]]
 name = "cognito-idp"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "describe-identity-provider"
+profile = "credential-read"
+fact = "ProviderDetails returns the external IdP client_secret in plaintext (and private_key/key_id/team_id for SignInWithApple) — third-party OAuth/OIDC credentials."
+source = "https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/describe-identity-provider.html"
+[[command.sub.sub]]
+name = "describe-user-pool-client"
+profile = "credential-read"
+fact = "The app client secret (ClientSecret) for the user pool app client — a confidential OAuth client credential."
+source = "https://docs.aws.amazon.com/cli/latest/reference/cognito-idp/describe-user-pool-client.html"
 [[command.sub]]
 name = "elasticbeanstalk"
 first_arg = ["describe-*", "list-*"]
@@ -273,12 +460,27 @@ first_arg = ["get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-connection"
+profile = "credential-read"
+fact = "Connection PASSWORD in clear text (JDBC/data-store connection credentials) — returned by default since HidePassword defaults to false"
+source = "https://docs.aws.amazon.com/cli/latest/reference/glue/get-connection.html"
+[[command.sub.sub]]
+name = "get-connections"
+profile = "credential-read"
+fact = "ConnectionProperties for all connections including PASSWORD in clear text by default (HidePassword defaults to false) — bulk credential disclosure"
+source = "https://docs.aws.amazon.com/cli/latest/reference/glue/get-connections.html"
 [[command.sub]]
 name = "stepfunctions"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-activity-task"
+profile = "credential-mint"
+fact = "a taskToken capability token (authorizes SendTaskSuccess/SendTaskFailure/SendTaskHeartbeat for the polled task) plus the task input payload"
+source = "https://docs.aws.amazon.com/cli/latest/reference/stepfunctions/get-activity-task.html"
 [[command.sub]]
 name = "events"
 first_arg = ["describe-*", "list-*"]
@@ -291,6 +493,11 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-sampled-requests"
+profile = "credential-read"
+fact = "A sample of real inbound HTTP requests that matched a WAF rule, including full HTTP request Headers (Name/Value pairs). Live end-user/client header values can contain Authorization tokens, session cookies, and API keys captured from production traffic."
+source = "https://docs.aws.amazon.com/cli/latest/reference/wafv2/get-sampled-requests.html"
 [[command.sub]]
 name = "accessanalyzer"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -321,12 +528,47 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-app"
+profile = "credential-read"
+fact = "App.basicAuthCredentials (base64 user:password for HTTP basic auth) and environmentVariables map (routinely holds API keys / DB passwords / tokens); autoBranchCreationConfig repeats both"
+source = "https://docs.aws.amazon.com/cli/latest/reference/amplify/get-app.html"
+[[command.sub.sub]]
+name = "get-branch"
+profile = "credential-read"
+fact = "Branch.basicAuthCredentials (base64 user:password) and environmentVariables map (per-branch secrets: API keys, passwords, tokens)"
+source = "https://docs.aws.amazon.com/cli/latest/reference/amplify/get-branch.html"
+[[command.sub.sub]]
+name = "get-webhook"
+profile = "credential-read"
+fact = "Webhook.webhookUrl — a bearer-token trigger URL; anyone holding it can initiate builds/deployments of the app"
+source = "https://docs.aws.amazon.com/cli/latest/reference/amplify/get-webhook.html"
+[[command.sub.sub]]
+name = "list-apps"
+profile = "credential-read"
+fact = "Array of App objects each carrying basicAuthCredentials (base64 user:password) — bulk disclosure of basic-auth credentials across all Amplify apps."
+source = "https://docs.aws.amazon.com/cli/latest/reference/amplify/list-apps.html"
+[[command.sub.sub]]
+name = "list-branches"
+profile = "credential-read"
+fact = "Array of Branch objects each carrying basicAuthCredentials (base64 user:password) — bulk disclosure of branch basic-auth credentials."
+source = "https://docs.aws.amazon.com/cli/latest/reference/amplify/list-branches.html"
+[[command.sub.sub]]
+name = "list-webhooks"
+profile = "credential-read"
+fact = "Bulk list of webhook objects each including webhookUrl — the unauthenticated deployment-trigger capability URLs for the app"
+source = "https://docs.aws.amazon.com/cli/latest/reference/amplify/list-webhooks.html"
 [[command.sub]]
 name = "amplifybackend"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-backend-auth"
+profile = "credential-read"
+fact = "ResourceConfig.SocialProviderSettings containing OAuth ClientSecret values (Facebook/Google/LoginWithAmazon) and SignInWithApple.PrivateKey — third-party federation client secrets and an Apple signing private key"
+source = "https://docs.aws.amazon.com/cli/latest/reference/amplifybackend/get-backend-auth.html"
 [[command.sub]]
 name = "amplifyuibuilder"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -381,6 +623,16 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-graphql-api-environment-variables"
+profile = "credential-read"
+fact = "Bulk dump of the API's configured environment-variable key/value pairs (up to 50 entries, values up to 512 chars) — a common sink for secrets/tokens/passwords/endpoints developers stash in env config."
+source = "https://docs.aws.amazon.com/appsync/latest/APIReference/API_GetGraphqlApiEnvironmentVariables.html"
+[[command.sub.sub]]
+name = "list-api-keys"
+profile = "credential-read"
+fact = "The AppSync API key credential: each returned ApiKey object's `id` field is the actual usable x-api-key value that authenticates to the GraphQL API, not a pagination or opaque identifier."
+source = "https://docs.aws.amazon.com/appsync/latest/APIReference/API_ListApiKeys.html"
 [[command.sub]]
 name = "artifact"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -477,6 +729,16 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-attendee"
+profile = "credential-read"
+fact = "Attendee.JoinToken — a bearer credential that lets a client authenticate and join the meeting as the specified attendee"
+source = "https://docs.aws.amazon.com/chime-sdk/latest/APIReference/API_meeting-chime_Attendee.html"
+[[command.sub.sub]]
+name = "list-attendees"
+profile = "credential-read"
+fact = "Array of Attendee objects, each including JoinToken — bulk export of the join credential for every attendee in the meeting"
+source = "https://docs.aws.amazon.com/chime-sdk/latest/APIReference/API_meeting-chime_Attendee.html"
 [[command.sub]]
 name = "chime-sdk-messaging"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -537,6 +799,11 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-authorization-token"
+profile = "credential-mint"
+fact = "temporary authorization token used to authenticate to CodeArtifact package repositories (registry auth)"
+source = "https://docs.aws.amazon.com/cli/latest/reference/codeartifact/get-authorization-token.html"
 [[command.sub]]
 name = "codecatalyst"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -579,6 +846,21 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-credentials-for-identity"
+profile = "credential-mint"
+fact = "temporary AWS credentials (AccessKeyId, SecretKey, SessionToken) for the identity"
+source = "https://docs.aws.amazon.com/cli/latest/reference/cognito-identity/get-credentials-for-identity.html"
+[[command.sub.sub]]
+name = "get-open-id-token"
+profile = "credential-mint"
+fact = "OpenID Connect token exchangeable for AWS credentials (via GetCredentialsForIdentity / STS web identity)"
+source = "https://docs.aws.amazon.com/cli/latest/reference/cognito-identity/get-open-id-token.html"
+[[command.sub.sub]]
+name = "get-open-id-token-for-developer-identity"
+profile = "credential-mint"
+fact = "developer-authenticated OpenID Connect token exchangeable for AWS credentials"
+source = "https://docs.aws.amazon.com/cli/latest/reference/cognito-identity/get-open-id-token-for-developer-identity.html"
 [[command.sub]]
 name = "comprehend"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -603,6 +885,11 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-federation-token"
+profile = "credential-mint"
+fact = "federated access token and refresh token (Credentials) for the Amazon Connect instance"
+source = "https://docs.aws.amazon.com/cli/latest/reference/connect/get-federation-token.html"
 [[command.sub]]
 name = "controltower"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -639,6 +926,22 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-environment-credentials"
+profile = "credential-mint"
+fact = "temporary AWS credentials (accessKeyId, secretAccessKey, sessionToken) for the DataZone environment"
+source = "https://docs.aws.amazon.com/cli/latest/reference/datazone/get-environment-credentials.html"
+[[command.sub.sub]]
+name = "get-connection"
+profile = "remote-read"
+fact = "Reads a connection's metadata. With --with-secret the response includes connectionCredentials (accessKeyId, secretAccessKey, sessionToken) for the external connection."
+source = "https://docs.aws.amazon.com/cli/latest/reference/datazone/get-connection.html"
+judgment = "Base read auto-approves; --with-secret escalates to credential-read (returns the connection's credentials)."
+[[command.sub.sub.flag]]
+name = "--with-secret"
+classifies = "credential-read"
+fact = "Includes the connection's credential secret (accessKeyId/secretAccessKey/sessionToken) in the response."
+source = "https://docs.aws.amazon.com/cli/latest/reference/datazone/get-connection.html"
 [[command.sub]]
 name = "dax"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -675,12 +978,27 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "describe-router-configuration"
+profile = "credential-read"
+fact = "customerRouterConfig blob for the virtual interface, which embeds the BGP MD5 authentication key (bgp_auth_key) used to authenticate the customer-router-to-AWS BGP session"
+source = "https://docs.aws.amazon.com/cli/latest/reference/directconnect/describe-router-configuration.html"
+[[command.sub.sub]]
+name = "describe-virtual-interfaces"
+profile = "credential-read"
+fact = "BGP MD5 authentication key(s): the virtual-interface-level authKey field and each bgpPeers[].authKey (6-80 char shared secret), plus the same key embedded as <bgp_auth_key> inside the returned customerRouterConfig"
+source = "https://docs.aws.amazon.com/cli/latest/reference/directconnect/describe-virtual-interfaces.html"
 [[command.sub]]
 name = "discovery"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "describe-export-tasks"
+profile = "credential-read"
+fact = "presigned S3 download URL (configurationsDownloadUrl) granting access to the full exported on-premises infrastructure inventory (hostnames, IPs, MACs, OS, running processes, network dependencies, performance metrics)"
+source = "https://docs.aws.amazon.com/application-discovery/latest/APIReference/API_DescribeExportTasks.html"
 [[command.sub]]
 name = "dlm"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -722,6 +1040,12 @@ name = "ebs"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "get-snapshot-block"
+profile = "bulk-object-read"
+fact = "Returns the raw block data bytes of an EBS snapshot; iterating over list-snapshot-blocks exports the entire volume's contents as a streaming blob."
+source = "https://docs.aws.amazon.com/cli/latest/reference/ebs/get-snapshot-block.html"
+judgment = "Raw disk-block content retrieval; denied. Tier is conservative and unsettled — see the bulk-object-read archetype note."
 
 [[command.sub]]
 name = "ecr-public"
@@ -729,6 +1053,16 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-authorization-token"
+profile = "credential-mint"
+fact = "authorization token for authenticating to Public ECR"
+source = "https://docs.aws.amazon.com/cli/latest/reference/ecr-public/get-authorization-token.html"
+[[command.sub.sub]]
+name = "get-login-password"
+profile = "credential-mint"
+fact = "prints the Public ECR password/token to stdout for docker login"
+source = "https://docs.aws.amazon.com/cli/latest/reference/ecr-public/get-login-password.html"
 [[command.sub]]
 name = "efs"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -747,12 +1081,32 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-cluster-session-credentials"
+profile = "credential-mint"
+fact = "Temporary HTTP-basic username/password credentials (UsernamePassword {Username, Password}) tied to a runtime IAM role, used to authenticate to an EMR cluster endpoint"
+source = "https://docs.aws.amazon.com/cli/latest/reference/emr/get-cluster-session-credentials.html"
+[[command.sub.sub]]
+name = "get-on-cluster-app-ui-presigned-url"
+profile = "credential-mint"
+fact = "a presigned bearer-access URL granting authenticated access to on-cluster application UIs (Spark/YARN) without further auth"
+source = "https://docs.aws.amazon.com/cli/latest/reference/emr/get-on-cluster-app-ui-presigned-url.html"
+[[command.sub.sub]]
+name = "get-persistent-app-ui-presigned-url"
+profile = "credential-mint"
+fact = "a presigned bearer-access URL granting authenticated access to the persistent application UI (Spark History Server / YARN UI) without further auth"
+source = "https://docs.aws.amazon.com/cli/latest/reference/emr/get-persistent-app-ui-presigned-url.html"
 [[command.sub]]
 name = "emr-containers"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-managed-endpoint-session-credentials"
+profile = "credential-mint"
+fact = "A temporary session token (credentials.token / endpointCredentials.token) used to connect to an EMR-on-EKS managed endpoint"
+source = "https://docs.aws.amazon.com/cli/latest/reference/emr-containers/get-managed-endpoint-session-credentials.html"
 [[command.sub]]
 name = "emr-serverless"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -777,6 +1131,11 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-kx-connection-string"
+profile = "credential-mint"
+fact = "A signed connection string (signedConnectionString) embedding host, port, username, and an authentication token that grants access to a kdb Insights cluster"
+source = "https://docs.aws.amazon.com/cli/latest/reference/finspace/get-kx-connection-string.html"
 [[command.sub]]
 name = "firehose"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -819,11 +1178,32 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-compute-access"
+profile = "credential-mint"
+fact = "temporary AWS credentials (AccessKeyId, SecretAccessKey, SessionToken) for connecting to a fleet compute"
+source = "https://docs.aws.amazon.com/cli/latest/reference/gamelift/get-compute-access.html"
+[[command.sub.sub]]
+name = "get-compute-auth-token"
+profile = "credential-mint"
+fact = "AuthToken — an authentication token used to authenticate a compute resource with the Amazon GameLift service"
+source = "https://docs.aws.amazon.com/cli/latest/reference/gamelift/get-compute-auth-token.html"
+[[command.sub.sub]]
+name = "get-instance-access"
+profile = "credential-read"
+fact = "fleet instance login credentials — UserName plus Secret (the private key or password) for direct instance access"
+source = "https://docs.aws.amazon.com/cli/latest/reference/gamelift/get-instance-access.html"
 [[command.sub]]
 name = "glacier"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "get-job-output"
+profile = "bulk-object-read"
+fact = "Downloads the output of a completed retrieval job — the retrieved archive's raw content (or a full vault inventory) — as a streaming blob to the caller."
+source = "https://docs.aws.amazon.com/cli/latest/reference/glacier/get-job-output.html"
+judgment = "Arbitrary archive content retrieval; denied. Tier is conservative and unsettled — see the bulk-object-read archetype note."
 
 [[command.sub]]
 name = "globalaccelerator"
@@ -927,6 +1307,11 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-stream-key"
+profile = "credential-read"
+fact = "the IVS stream key secret value (streamKey.value) used to authenticate stream ingest"
+source = "https://docs.aws.amazon.com/cli/latest/reference/ivs/get-stream-key.html"
 [[command.sub]]
 name = "kafka"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -974,13 +1359,38 @@ name = "lakeformation"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "get-temporary-data-location-credentials"
+profile = "credential-mint"
+fact = "Returns temporary AWS credentials (AccessKeyId, SecretAccessKey, SessionToken) vended by Lake Formation for a registered data location."
+source = "https://docs.aws.amazon.com/cli/latest/reference/lakeformation/get-temporary-data-location-credentials.html"
 
+[[command.sub.sub]]
+name = "get-temporary-glue-partition-credentials"
+profile = "credential-mint"
+fact = "temporary AWS credentials (AccessKeyId, SecretAccessKey, SessionToken) for partition data access"
+source = "https://docs.aws.amazon.com/cli/latest/reference/lakeformation/get-temporary-glue-partition-credentials.html"
+[[command.sub.sub]]
+name = "get-temporary-glue-table-credentials"
+profile = "credential-mint"
+fact = "temporary AWS credentials (AccessKeyId, SecretAccessKey, SessionToken) for governed table data access"
+source = "https://docs.aws.amazon.com/cli/latest/reference/lakeformation/get-temporary-glue-table-credentials.html"
 [[command.sub]]
 name = "lex-models"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-bot-channel-association"
+profile = "credential-read"
+fact = "botConfiguration map holding the messaging-platform credentials/tokens needed to communicate with the bot (e.g. Facebook page access token and app secret, Slack client secret, Twilio-Sms auth token, Kik keys)"
+source = "https://docs.aws.amazon.com/cli/latest/reference/lex-models/get-bot-channel-association.html"
+[[command.sub.sub]]
+name = "get-bot-channel-associations"
+profile = "credential-read"
+fact = "Array of bot channel associations each with a botConfiguration map containing the messaging-platform credentials/tokens (Facebook, Slack, Twilio-Sms, Kik secrets) — bulk credential disclosure across all channels of a bot"
+source = "https://docs.aws.amazon.com/cli/latest/reference/lex-models/get-bot-channel-associations.html"
 [[command.sub]]
 name = "lexv2-models"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -993,36 +1403,71 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-access-token"
+profile = "credential-mint"
+fact = "A temporary access token (valid one hour) for use with AssumeRoleWithWebIdentity to obtain role credentials"
+source = "https://docs.aws.amazon.com/cli/latest/reference/license-manager/get-access-token.html"
 [[command.sub]]
 name = "lightsail"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-instance-access-details"
+profile = "credential-mint"
+fact = "SSH/RDP access credentials for a Lightsail instance — private key, password, and cert key"
+source = "https://docs.aws.amazon.com/cli/latest/reference/lightsail/get-instance-access-details.html"
+[[command.sub.sub]]
+name = "get-relational-database-master-user-password"
+profile = "credential-read"
+fact = "master user password of a Lightsail managed relational database"
+source = "https://docs.aws.amazon.com/cli/latest/reference/lightsail/get-relational-database-master-user-password.html"
 [[command.sub]]
 name = "location"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "describe-key"
+profile = "credential-read"
+fact = "The actual usable Amazon Location Service API key value (the `Key` field is the secret credential string itself, usable to authenticate requests)"
+source = "https://docs.aws.amazon.com/cli/latest/reference/location/describe-key.html"
 [[command.sub]]
 name = "m2"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-signed-bluinsights-url"
+profile = "credential-mint"
+fact = "A single sign-on (SSO) AWS Blu Insights URL (`signedBiUrl`) that authenticates the bearer into Blu Insights — a bearer access credential"
+source = "https://docs.aws.amazon.com/cli/latest/reference/m2/get-signed-bluinsights-url.html"
 [[command.sub]]
 name = "macie2"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-sensitive-data-occurrences"
+profile = "credential-read"
+fact = "The actual sensitive data values that Macie extracted from an S3 object for a finding (e.g. SSNs, credit card numbers, credentials, secret keys, PII) — the raw detected occurrences, not just metadata"
+source = "https://docs.aws.amazon.com/cli/latest/reference/macie2/get-sensitive-data-occurrences.html"
 [[command.sub]]
 name = "managedblockchain"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-accessor"
+profile = "credential-read"
+fact = "BillingToken — a 42-character token used to authenticate/sign JSON-RPC calls to the blockchain network (AMB Access Ethereum/Bitcoin/Polygon nodes)"
+source = "https://docs.aws.amazon.com/cli/latest/reference/managedblockchain/get-accessor.html"
 [[command.sub]]
 name = "mediaconnect"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -1047,6 +1492,16 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "describe-channel"
+profile = "credential-read"
+fact = "HLS ingest credentials — system-generated Username and Password in HlsIngest.IngestEndpoints"
+source = "https://docs.aws.amazon.com/cli/latest/reference/mediapackage/describe-channel.html"
+[[command.sub.sub]]
+name = "list-channels"
+profile = "credential-read"
+fact = "For every channel, the HLS ingest Username and Password in each channel's HlsIngest.IngestEndpoints — a bulk credential dump across all channels"
+source = "https://docs.aws.amazon.com/cli/latest/reference/mediapackage/list-channels.html"
 [[command.sub]]
 name = "mediastore"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -1136,6 +1591,12 @@ name = "omics"
 first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "get-read-set"
+profile = "bulk-object-read"
+fact = "Streams bulk raw genomic sequence read-set file data (BAM/CRAM/FASTQ payload) — sensitive human genomic / PHI content — directly to the caller."
+source = "https://docs.aws.amazon.com/cli/latest/reference/omics/get-read-set.html"
+judgment = "Raw genomic file content retrieval; denied. Tier is conservative and unsettled — see the bulk-object-read archetype note."
 
 [[command.sub]]
 name = "opensearch"
@@ -1179,6 +1640,16 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-baidu-channel"
+profile = "credential-read"
+fact = "credential — the Baidu Cloud Push API key in the BaiduChannelResponse.Credential field (required, always populated)"
+source = "https://docs.aws.amazon.com/pinpoint/latest/apireference/apps-application-id-channels-baidu.html"
+[[command.sub.sub]]
+name = "get-gcm-channel"
+profile = "credential-read"
+fact = "credential — the Google FCM/GCM Web API Key (aka API_KEY / server key) in the GCMChannelResponse.Credential field"
+source = "https://docs.aws.amazon.com/pinpoint/latest/apireference/apps-application-id-channels-gcm.html"
 [[command.sub]]
 name = "pipes"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -1209,6 +1680,16 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-dashboard-embed-url"
+profile = "credential-mint"
+fact = "A single-use EmbedUrl containing an auth_code that enables one sign-on to a dashboard user session valid for up to 10 hours (a temporary access credential)"
+source = "https://docs.aws.amazon.com/cli/latest/reference/quicksight/get-dashboard-embed-url.html"
+[[command.sub.sub]]
+name = "get-session-embed-url"
+profile = "credential-mint"
+fact = "A single-use EmbedUrl containing an auth_code that enables one sign-on to a QuickSight console user session valid for 10 hours (a temporary access credential)"
+source = "https://docs.aws.amazon.com/cli/latest/reference/quicksight/get-session-embed-url.html"
 [[command.sub]]
 name = "ram"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -1233,6 +1714,16 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-cluster-credentials"
+profile = "credential-mint"
+fact = "temporary database credentials (DbUser + DbPassword) for the cluster"
+source = "https://docs.aws.amazon.com/cli/latest/reference/redshift/get-cluster-credentials.html"
+[[command.sub.sub]]
+name = "get-cluster-credentials-with-iam"
+profile = "credential-mint"
+fact = "temporary database credentials (DbUser + DbPassword + Expiration) derived from IAM identity"
+source = "https://docs.aws.amazon.com/cli/latest/reference/redshift/get-cluster-credentials-with-iam.html"
 [[command.sub]]
 name = "redshift-data"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -1245,6 +1736,11 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-credentials"
+profile = "credential-mint"
+fact = "temporary database credentials (dbUser + dbPassword) for the serverless workgroup"
+source = "https://docs.aws.amazon.com/cli/latest/reference/redshift-serverless/get-credentials.html"
 [[command.sub]]
 name = "rekognition"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -1323,6 +1819,11 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-data-access"
+profile = "credential-mint"
+fact = "temporary S3 Access Grants credentials (AccessKeyId, SecretAccessKey, SessionToken) for the grantee to access S3 data"
+source = "https://docs.aws.amazon.com/cli/latest/reference/s3control/get-data-access.html"
 [[command.sub]]
 name = "savingsplans"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -1407,6 +1908,11 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-role-credentials"
+profile = "credential-mint"
+fact = "temporary AWS credentials (accessKeyId, secretAccessKey, sessionToken, expiration) for a role in an account"
+source = "https://docs.aws.amazon.com/cli/latest/reference/sso/get-role-credentials.html"
 [[command.sub]]
 name = "sso-admin"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -1419,6 +1925,11 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "describe-chap-credentials"
+profile = "credential-read"
+fact = "iSCSI CHAP authentication secrets (SecretToAuthenticateInitiator and SecretToAuthenticateTarget) used to authenticate initiators/targets against stored/cached volume targets"
+source = "https://docs.aws.amazon.com/cli/latest/reference/storagegateway/describe-chap-credentials.html"
 [[command.sub]]
 name = "sts"
 first_arg = ["describe-*", "get-*", "list-*"]
@@ -1533,6 +2044,11 @@ first_arg = ["describe-*", "get-*", "list-*"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
+[[command.sub.sub]]
+name = "get-identity-provider"
+profile = "credential-read"
+fact = "The identityProviderDetails map is returned in plaintext, including client_secret for OIDC/Google/Facebook/LoginWithAmazon providers and private_key for Sign in with Apple providers."
+source = "https://docs.aws.amazon.com/workspaces-web/latest/APIReference/API_IdentityProvider.html"
 [[command.sub]]
 name = "xray"
 first_arg = ["describe-*", "get-*", "list-*"]

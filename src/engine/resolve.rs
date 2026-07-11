@@ -1,6 +1,7 @@
 //! The profile resolver — turning a parsed command into its behavior profile
-//! (annex `behavioral-taxonomy-engine`). Runs via `engine::bridge` behind
-//! `SAFE_CHAINS_ENGINE` (default `legacy`, so it is not authoritative by default).
+//! (annex `behavioral-taxonomy-engine`). Runs via `engine::bridge`, which is
+//! AUTHORITATIVE for every command it can resolve (`engine_verdict(tokens).unwrap_or(legacy)`
+//! in `cst::check::leaf_verdict`) — there is no opt-out.
 //!
 //! This file holds the dispatch (`resolve`) and the per-command `resolve_*` functions;
 //! the shared toolkit they build on lives in submodules: [`flags`] (the getopt-style
@@ -19,11 +20,12 @@ pub(crate) mod regions;
 mod scenarios;
 
 use capability::{
-    breadth_scale, creates, destroys, mutates, observes, overwrites, reads_content,
-    reads_to_model, relocates, transfer_profile, worst,
+    breadth_scale, creates, destroys, executes, mutates, observes, overwrites, reads_content,
+    reads_to_model, relocates, transfer_profile, worst, writes_export_file,
 };
-use flags::Flags;
+use flags::{walk_positionals, walk_value};
 use locus::{classify_locus, read_locus, write_locus};
+pub(crate) use locus::reads_secret;
 
 /// For `for VAR in ITEMS; do …$VAR…`, the representatives to bind `$VAR` to in the body: the
 /// worst-READ item and the worst-WRITE item of the list (they can differ, so a read and a
@@ -54,70 +56,415 @@ pub(crate) fn loop_reprs(items: &[String]) -> Option<(String, String)> {
     Some((read_repr, write_repr))
 }
 
+/// The verdict for READING the content of `path` — used to gate an input-redirect source
+/// (`cmd < path`) by its read locus, exactly as an operand read is gated, so `cat < /etc/shadow`
+/// denies like `cat /etc/shadow`. `-` / stdin never reaches here (redirects always name a file).
+pub(crate) fn read_content_verdict(path: &str) -> crate::verdict::Verdict {
+    let cap = reads_content(read_locus(path), Scale::Single, "reads a redirect source");
+    crate::engine::bridge::project(&Profile::of(vec![cap]))
+}
+
+/// The verdict for WRITING/overwriting `path` — used to gate a legacy writer command's file
+/// operand (`tee`/`shred`/`bzip2`) by its write locus, so `shred /etc/hosts` denies.
+pub(crate) fn write_target_verdict(path: &str) -> crate::verdict::Verdict {
+    let cap = overwrites(write_locus(path), Scale::Single, false);
+    crate::engine::bridge::project(&Profile::of(vec![cap]))
+}
+
+/// The verdict for EXECUTING the code in file `path` — used to gate an interpreter/runner's
+/// script operand (`bash x.sh`, `python x.py`, `node x.js`, `go run pkg/`) by its EXECUTOR
+/// locus. A worktree-local script is the dev loop → admitted at `developer`; a foreign one
+/// (`/tmp/x.sh`, `~/x.py`, `/usr/local/bin/x`) or an unpinnable path (`$VAR`, glob, `..`
+/// beyond cwd → `machine`) denies. `CallerFile` trust (code from a named file). See
+/// docs/design/behavioral-taxonomy-execution-origin.md.
+pub(crate) fn execute_file_verdict(path: &str) -> crate::verdict::Verdict {
+    // A GLOB executor (`bash *.sh`) names no specific file — the matched code is unknown, so
+    // it cannot be pinned to a worktree executor; deny (design §6). ($VAR/../cmdsub are already
+    // worst-cased by classify_locus.) A glob stays fine as a read/write OPERAND, where every
+    // match is locus-gated; only as an EXECUTOR is the code it would run unknowable.
+    if path.contains(['*', '?', '[']) {
+        return crate::engine::bridge::project(&worst("glob executor — the code that would run is unknown (§6)"));
+    }
+    let cap = executes(classify_locus(path), ExecutionTrust::CallerFile, "runs code from a named file");
+    crate::engine::bridge::project(&Profile::of(vec![cap]))
+}
+
+/// The verdict for running the CURRENT PROJECT's own code — an implicit-project runner
+/// (`cargo run`, `dotnet run`, `swift run`) with no path operand and no redirect out of the
+/// worktree. `SelfCode` @ `Worktree` → admitted at `developer`. A runner redirected out of the
+/// project (`cargo run --manifest-path ~/o/Cargo.toml`) resolves that path through
+/// [`execute_file_verdict`] instead. See docs/design/behavioral-taxonomy-execution-origin.md.
+pub(crate) fn execute_project_verdict() -> crate::verdict::Verdict {
+    let cap = executes(LocalLocus::Worktree, ExecutionTrust::SelfCode, "runs the current project's own code");
+    crate::engine::bridge::project(&Profile::of(vec![cap]))
+}
+
 /// Resolve a command's leaf tokens to its behavior profile, or `None` if the command
 /// has no resolver yet (the caller then worst-cases / falls back to the legacy
 /// classifier — §0 fail-closed). Redirects, substitutions, and chain semantics are the
 /// surrounding CST's job, not this leaf's (annex `…-engine` §1).
 pub fn resolve(tokens: &[Token]) -> Option<Profile> {
     let arg0 = tokens.first()?;
-    let (_, resolver, _) = RESOLVERS.iter().find(|(name, _, _)| *name == arg0.command_name())?;
-    // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`,
-    // `~/bin/grep`) is not necessarily the real tool — a planted binary named `cat` would
-    // be certified as safe coreutils. Don't certify it; worst-case (§0). Bare names and
-    // standard bin paths are trusted. (Legacy classifies purely by basename and inherits
-    // the spoof; the engine is stricter here, which keeps it never-looser.)
+    // Canonicalize the invoked token through the registry's alias map (`gcat` → `cat`) BEFORE the
+    // resolver lookup: Homebrew installs GNU coreutils as g-prefixed aliases, and without this
+    // they'd miss every resolver and fall through to the ungated legacy classifier (a fail-open —
+    // `gtee /etc/cron.d/job`, `gcat /etc/shadow`). The `tokens` are passed through unchanged; the
+    // resolver gates operands by position, not by re-reading the command name.
+    let canonical = crate::registry::canonical_name(arg0.command_name());
+    // `sudo`/`doas` ELEVATE the wrapped command's authority — they are a delegating wrapper, not a
+    // command of their own. Resolve the inner command and lift its authority to root (or `other-user`
+    // for `-u`), so the safety of `sudo X` is the safety of `X` run privileged: `sudo cat ./notes`
+    // → a root READ (local-admin), `sudo rm -rf /` → the catastrophe corner (denied everywhere).
+    if matches!(canonical, "sudo" | "doas") {
+        return resolve_privilege_wrapper(arg0, tokens);
+    }
+    // Phase 1: a subcommand tagged with a facet archetype (`profile = …`) classifies as that
+    // archetype's static capability — the derived, self-documenting successor to `candidate = true`.
+    // Checked BEFORE command-level behavior, since a subcommand tool carries no `[command.behavior]`.
+    if let Some(names) = crate::registry::sub_archetypes(tokens) {
+        if !trusted_command_path(arg0.as_str()) {
+            return Some(worst("resolvable name invoked from a non-standard path — possible spoof (§0)"));
+        }
+        // One capability per archetype (the sub's profile + each present escalating flag); the level
+        // algebra takes the max. Fail-closed: an unknown archetype name → a worst capability, so a
+        // typo or `unclassified` can never silently pass (a proptest catches typos at test time).
+        let mut caps: Vec<Capability> = names
+            .iter()
+            .map(|n| {
+                crate::engine::archetype::archetype(n).cloned().unwrap_or_else(|| {
+                    Capability::worst("subcommand/flag declares an unknown archetype (§0)")
+                })
+            })
+            .collect();
+        // Destination-trust (exposure §4): a sub tagged `network_destination` gets its send TARGET
+        // classified onto the base archetype's `locus.provenance` — established remote / literal URL
+        // / opaque `$VAR` — or, for a command-transport form (`ext::…`), worst-cased as RCE.
+        if let Some(dest) = crate::registry::sub_destination_token(tokens) {
+            match destination_provenance(dest) {
+                Some(prov) => {
+                    if let Some(base) = caps.first_mut() {
+                        base.locus.provenance = prov;
+                    }
+                }
+                None => {
+                    return Some(worst(
+                        "send target is a command transport (ext::…) — runs a local command, RCE (§4)",
+                    ));
+                }
+            }
+        }
+        // A `data-export` sub with an OUTPUT-FILE flag (`db dump -f out.sql`) writes its bulk result
+        // to a local file — a SECOND capability beyond the remote read, gated at the file's locus
+        // (worktree write vs a system-path clobber). Absent → the export streams to stdout, so the
+        // profile is the remote read alone.
+        if let Some(path) = crate::registry::sub_output_path_token(tokens) {
+            caps.push(writes_export_file(classify_locus(path)));
+        }
+        return Some(Profile::of(caps));
+    }
+    // Every facet-classified command declares `[command.behavior]` (the coreutils are all ported;
+    // dd/tar/sed/grep declare a `hook`). No declaration → the command is unresearched for the
+    // engine, so return `None` (the caller falls back to the legacy classifier).
+    let spec = crate::registry::command_behavior(canonical)?;
+    // A resolvable basename reached via a NON-STANDARD path (`./cat`, `/tmp/cat`, `~/bin/grep`)
+    // is not necessarily the real tool — a planted binary named `cat` would be certified as safe
+    // coreutils. Don't certify it; worst-case (§0). Bare names and standard bin paths are
+    // trusted. (Legacy classifies purely by basename and inherits the spoof; the engine is
+    // stricter here, which keeps it never-looser.)
     if !trusted_command_path(arg0.as_str()) {
         return Some(worst("resolvable name invoked from a non-standard path — possible spoof (§0)"));
     }
-    Some(resolver(tokens))
+    Some(resolve_behavior(spec, tokens))
 }
 
-/// A per-command resolver: leaf tokens → behavior profile.
-type Resolver = fn(&[Token]) -> Profile;
-
-/// A resolver's operand contract — which POSITIONAL slots (after flag parsing) are touched
-/// paths. Declared beside each resolver so the conservation sweep (HP-18 rung 3,
-/// `every_touched_path_operand_is_gated`) derives its probes from one source of truth,
-/// rather than a parallel test table that could drift from the resolvers. Its data is
-/// consumed only by that sweep, so non-test builds carry it inert.
-#[cfg_attr(not(test), allow(dead_code))]
-#[derive(Clone, Copy)]
-enum Operands {
-    /// No path operands — only literal args (`echo`).
-    None,
-    /// Every positional is a touched path — cat/head/tail/wc/rm/mkdir/touch.
-    Paths,
-    /// Positional 0 is a pattern; the rest are touched paths (`grep`).
-    PatternThenPaths,
-    /// Sources… then a destination, every positional a touched path — cp/mv/ln.
-    Transfer,
-    /// Irregular operand syntax (not positional): explicit probe templates, one per touched
-    /// slot, with `@` marking where a hot path is substituted (may be inside a token, e.g.
-    /// `dd`'s `if=@`). The escape hatch for commands the positional shapes don't fit.
-    Custom(&'static [&'static [&'static str]]),
+/// `sudo`/`doas`: resolve the wrapped command and ELEVATE its authority. Authority is the axis every
+/// level below `local-admin` pins to `user`, so a root capability lands at `local-admin` (or `yolo`)
+/// — the projection does the rest. Fail-closed: an unknown sudo option, a root shell/editor
+/// (`-i`/`-s`/`-e`), or an inner command from a non-standard path worst-cases; an unresolved inner
+/// returns `None` so the caller's legacy fallback denies it (never *looser* than the bare command).
+fn resolve_privilege_wrapper(arg0: &Token, tokens: &[Token]) -> Option<Profile> {
+    if !trusted_command_path(arg0.as_str()) {
+        return Some(worst("sudo/doas invoked from a non-standard path — possible spoof (§0)"));
+    }
+    let mut i = 1;
+    let mut run_as_other = false;
+    'scan: while let Some(tok) = tokens.get(i) {
+        let t = tok.as_str();
+        if t == "--" {
+            i += 1;
+            break;
+        }
+        if !t.starts_with('-') || t == "-" {
+            break; // the inner command starts here
+        }
+        if let Some(long) = t.strip_prefix("--") {
+            let (name, glued_val) = match long.split_once('=') {
+                Some((n, _)) => (n, true),
+                None => (long, false),
+            };
+            match name {
+                "login" | "shell" | "edit" => {
+                    return Some(worst("sudo -i/-s/-e runs a root shell or editor — arbitrary code as root (§0)"));
+                }
+                "user" | "other-user" => {
+                    run_as_other = true;
+                    if !glued_val { i += 1; }
+                }
+                "group" | "prompt" | "close-from" | "host" | "role" | "type"
+                | "command-timeout" | "chroot" | "chdir" | "preserve-env" => {
+                    // `--preserve-env` is boolean OR `--preserve-env=list`; only the space form of the
+                    // others consumes a value. A bare `--preserve-env` just falls through (no skip).
+                    if !glued_val && name != "preserve-env" { i += 1; }
+                }
+                "background" | "stdin" | "non-interactive" | "reset-timestamp"
+                | "remove-timestamp" | "set-home" | "askpass" | "help" | "version"
+                | "validate" | "list" | "bell" => {}
+                _ => return Some(worst("sudo: unrecognized option — fail-closed (§0)")),
+            }
+        } else {
+            // A short cluster (`-EH`, `-u root`, `-uroot`). Consume char by char; a valued flag eats
+            // the rest of the token as its value, or the next token if the rest is empty.
+            let rest = &t[1..];
+            for (idx, c) in rest.char_indices() {
+                match c {
+                    'i' | 's' | 'e' => {
+                        return Some(worst("sudo -i/-s/-e runs a root shell or editor — arbitrary code as root (§0)"));
+                    }
+                    'u' | 'U' | 'g' | 'p' | 'C' | 'h' | 'r' | 't' | 'T' | 'R' | 'D' => {
+                        if c == 'u' || c == 'U' { run_as_other = true; }
+                        if idx + c.len_utf8() == rest.len() { i += 1; } // value is the next token
+                        i += 1;
+                        continue 'scan; // rest of the token was this flag's value
+                    }
+                    'E' | 'H' | 'k' | 'K' | 'n' | 'b' | 'A' | 'S' | 'P' | 'B' | 'v' | 'l' => {}
+                    _ => return Some(worst("sudo: unrecognized option — fail-closed (§0)")),
+                }
+            }
+        }
+        i += 1;
+    }
+    let inner = &tokens[i..];
+    if inner.is_empty() {
+        return None; // `sudo` / `sudo -v` / `sudo -l` — no command to elevate; legacy decides
+    }
+    let elevated = if run_as_other { Authority::OtherUser } else { Authority::Root };
+    let caps = resolve(inner)?
+        .capabilities
+        .into_iter()
+        .map(|mut c| {
+            c.authority = c.authority.max(elevated);
+            c
+        })
+        .collect();
+    Some(Profile::of(caps))
 }
 
-/// The dispatch table: every resolvable command, its resolver, and its operand contract. A
-/// data table (rather than a `match`) so the conservation sweep enumerates the full set and
-/// derives a probe per touched slot — adding a resolver means declaring its [`Operands`]
-/// here, and the sweep covers it automatically.
-const RESOLVERS: &[(&str, Resolver, Operands)] = &[
-    ("echo", resolve_echo, Operands::None),
-    ("cat", resolve_cat, Operands::Paths),
-    ("head", resolve_head, Operands::Paths),
-    ("tail", resolve_tail, Operands::Paths),
-    ("wc", resolve_wc, Operands::Paths),
-    ("grep", resolve_grep, Operands::PatternThenPaths),
-    ("rm", resolve_rm, Operands::Paths),
-    ("mkdir", resolve_mkdir, Operands::Paths),
-    ("touch", resolve_touch, Operands::Paths),
-    ("cp", resolve_cp, Operands::Transfer),
-    ("mv", resolve_mv, Operands::Transfer),
-    ("ln", resolve_ln, Operands::Transfer),
-    ("dd", resolve_dd, Operands::Custom(&[&["if=@", "of=./safe"], &["if=./safe", "of=@"]])),
-    ("tar", resolve_tar, Operands::Custom(&[&["cf", "./s.tar", "@"], &["cf", "@", "./s"], &["tf", "@"]])),
-    ("sed", resolve_sed, Operands::Custom(&[&["s/x/y/", "@"], &["-i", "s/x/y/", "@"]])),
-];
+/// Classify a network-destination token's PROVENANCE (exposure §4). `None` (a bare invocation) is
+/// the configured default → `Established`. A command-transport form (`ext::<cmd>`) is not a
+/// destination but LOCAL CODE, signalled by a `None` return so the caller worst-cases it as RCE.
+fn destination_provenance(dest: Option<&str>) -> Option<Provenance> {
+    let Some(tok) = dest else {
+        return Some(Provenance::Established);
+    };
+    if tok.starts_with("ext::") {
+        return None; // `git push ext::sh -c …` runs a local command — RCE, not egress
+    }
+    // A variable / substitution: the actual target is not in the command string, so it cannot be
+    // reviewed — the fail-closed case.
+    if tok.contains('$') || tok.contains('`') {
+        return Some(Provenance::Opaque);
+    }
+    // Spelled inline: a URL scheme, an scp-style `user@host:path`, or a filesystem path. Otherwise a
+    // bare word is a reference to a configured remote (established by a prior `clone`/`remote add`).
+    let literal = tok.contains("://")
+        || (tok.contains('@') && tok.contains(':'))
+        || tok.starts_with('/')
+        || tok.starts_with("./")
+        || tok.starts_with("../");
+    Some(if literal { Provenance::Literal } else { Provenance::Established })
+}
+
+/// The generic, declaration-driven resolver: build a `Profile` from a command's
+/// `[command.behavior]` (`BehaviorSpec`) and its tokens. This is the non-legacy classification
+/// path expressed in TOML — the operation + operand-role + flag grammar are data, and this one
+/// function replaces a hardcoded `resolve_*`. Irreducible token logic a declaration can't
+/// express is delegated to a named `hook`.
+fn resolve_behavior(spec: &crate::registry::types::BehaviorSpec, tokens: &[Token]) -> Profile {
+    use crate::registry::types::{BehaviorHook, PositionalRole};
+    if let Some(hook) = spec.hook {
+        return match hook {
+            // grep's hook supplies the operand set (the irreducible token logic); the declared
+            // operation + the builders supply the facets — the composition seam (§8). grep is
+            // observe-only, so its operands become content reads.
+            BehaviorHook::Grep => {
+                let Some(g) = grep_operands(tokens) else {
+                    return worst("grep: unrecognized flag or missing pattern — worst-cased (§0)");
+                };
+                let mut caps: Vec<Capability> = g
+                    .pattern_files
+                    .iter()
+                    .map(|f| reads_content(read_locus(f), Scale::Single, "reads a grep -f pattern file"))
+                    .collect();
+                caps.extend(reads_to_model(&g.files, g.scale));
+                Profile::of(caps)
+            }
+            // dd/tar/sed parse their own irregular operand syntax (`key=value`, dashless mode
+            // bundles, a mini-language script) AND build their own multi-role profiles, so their
+            // hook returns the full `Profile` — the parser and the facets are entangled with the
+            // parse and stay in Rust (their DATA — flag/param sets — is small and audited).
+            BehaviorHook::Dd => resolve_dd(tokens),
+            BehaviorHook::Tar => resolve_tar(tokens),
+            BehaviorHook::Sed => resolve_sed(tokens),
+        };
+    }
+    // No path operands (echo): a pure stdout emitter, handled BEFORE the flag walk — echo has no
+    // flag grammar (it prints any `-x` verbatim), so walking would wrongly reject it. `observe`
+    // with model disclosure and no fs/net/exec; its args touch nothing.
+    if matches!(spec.positionals, PositionalRole::None) {
+        return match spec.operation {
+            Operation::Observe => {
+                let mut c = Capability::new(Operation::Observe);
+                c.disclosure.audience = DisclosureAudience::LocalProcess;
+                c.because = "behavior: prints its arguments to stdout; no fs/net/exec/secret".to_string();
+                Profile::of(vec![c])
+            }
+            _ => worst("behavior: none-operand role supports only observe (§0)"),
+        };
+    }
+    let long: Vec<&str> = spec.long.iter().map(String::as_str).collect();
+    let valued_long: Vec<&str> = spec.valued_long.iter().map(String::as_str).collect();
+    let Some(operands) = walk_positionals(&spec.short, &spec.valued_short, &long, &valued_long, spec.numeric_shorthand, tokens) else {
+        return worst("behavior: unrecognized flag — worst-cased (§0)");
+    };
+    let scale = behavior_scale(spec, &operands, tokens);
+    // Path-flag values (e.g. `touch -r REF`) are gated alongside the positional operands.
+    let flag_caps = path_flag_caps(spec, tokens);
+    match spec.positionals {
+        PositionalRole::Read => {
+            let mut caps = reads_to_model(&operands, scale);
+            caps.extend(flag_caps);
+            Profile::of(caps)
+        }
+        PositionalRole::Write => {
+            if operands.is_empty() {
+                return worst("behavior: write operation with no operand — worst-cased (§0)");
+            }
+            let mut caps: Vec<Capability> = operands
+                .iter()
+                .map(|p| match spec.operation {
+                    Operation::Destroy => destroys(classify_locus(p), scale),
+                    Operation::Create => creates(classify_locus(p), scale),
+                    Operation::Mutate => mutates(classify_locus(p), scale, "behavior: in-place mutate"),
+                    _ => Capability::worst("behavior: unsupported write operation — worst-cased (§0)"),
+                })
+                .collect();
+            caps.extend(flag_caps);
+            Profile::of(caps)
+        }
+        PositionalRole::Transfer => resolve_transfer(spec, operands, flag_caps, tokens),
+        // None is handled above (before the flag walk); pattern-then-read routes through a hook
+        // (grep). Neither reaches here, so both fail closed.
+        PositionalRole::None | PositionalRole::PatternThenRead => {
+            worst("behavior: operand role not resolvable without a hook (§0)")
+        }
+    }
+}
+
+/// The transfer arm of `resolve_behavior` (cp/mv/ln): split the operands into sources and a
+/// destination (`-t`/`--target-directory` value, else the last operand), gate each at its locus
+/// — a relocate source at its WRITE face — and fold in any path-flag capabilities. Fails closed
+/// on a missing spec, a missing dest, or a `-t` dest with no sources.
+fn resolve_transfer(
+    spec: &crate::registry::types::BehaviorSpec,
+    operands: Vec<&str>,
+    flag_caps: Vec<Capability>,
+    tokens: &[Token],
+) -> Profile {
+    use crate::registry::types::TransferSource;
+    let Some(t) = &spec.transfer else {
+        return worst("behavior: transfer role without transfer spec — worst-cased (§0)");
+    };
+    let (sources, dest) = if let Some(d) = walk_value(&spec.valued_short, tokens, b't', "--target-directory") {
+        if operands.is_empty() {
+            return worst("behavior: transfer -t with no source operand — worst-cased (§0)");
+        }
+        (operands, d)
+    } else {
+        match operands.split_last() {
+            Some((last, rest)) if !rest.is_empty() => (rest.to_vec(), *last),
+            _ => return worst("behavior: transfer needs a source and a destination — worst-cased (§0)"),
+        }
+    };
+    let no_clobber = if t.clobber_flags.is_empty() {
+        t.no_clobber_flags.iter().any(|f| behavior_flag_present(tokens, f))
+    } else {
+        // A clobber flag PRESENT means overwrite; its absence is the no-clobber default.
+        !t.clobber_flags.iter().any(|f| behavior_flag_present(tokens, f))
+    };
+    let recursive = t.recursive_flags.iter().any(|f| behavior_flag_present(tokens, f));
+    let transfer_scale = breadth_scale(&sources, recursive);
+    // A relocate REMOVES its source (a write), so gate the source at its write face.
+    let source_writes = matches!(t.source, TransferSource::Relocate);
+    let mut prof = transfer_profile(
+        &sources,
+        dest,
+        transfer_scale,
+        source_writes,
+        |loc, sc| match t.source {
+            TransferSource::Observe => observes(loc, sc, "transfer reads the source at its locus"),
+            TransferSource::Relocate => relocates(loc, sc),
+        },
+        |loc, sc| overwrites(loc, sc, no_clobber),
+    );
+    prof.capabilities.extend(flag_caps);
+    prof
+}
+
+/// Capabilities for a command's declared PATH-FLAGS: a valued flag whose value is a path
+/// (`touch -r REF` reads REF's timestamp) is gated by its role's locus, exactly like an operand
+/// — so an out-of-workspace value denies. Folds the `[command.path_gate]` idea into behavior.
+fn path_flag_caps(spec: &crate::registry::types::BehaviorSpec, tokens: &[Token]) -> Vec<Capability> {
+    use crate::registry::types::PathRole;
+    let mut caps = Vec::new();
+    for pf in &spec.path_flags {
+        let short = pf.short.unwrap_or(0);
+        let long = pf.long.as_deref().unwrap_or("");
+        if let Some(v) = walk_value(&spec.valued_short, tokens, short, long) {
+            caps.push(match pf.role {
+                PathRole::Read => observes(read_locus(v), Scale::Single, "behavior: a flag value is a read path"),
+                PathRole::Write => mutates(write_locus(v), Scale::Single, "behavior: a flag value is a write path"),
+            });
+        }
+    }
+    caps
+}
+
+/// The `Scale` for a behavior resolution: `single` always yields one item; `breadth` widens on
+/// operand count, a glob, or a declared unbounded flag (`rm -r`) via `breadth_scale`.
+fn behavior_scale(
+    spec: &crate::registry::types::BehaviorSpec,
+    operands: &[&str],
+    tokens: &[Token],
+) -> Scale {
+    use crate::registry::types::ScaleModel;
+    match spec.scale {
+        ScaleModel::Single => Scale::Single,
+        ScaleModel::Breadth => {
+            let recursive = spec.unbounded_flags.iter().any(|f| behavior_flag_present(tokens, f));
+            breadth_scale(operands, recursive)
+        }
+    }
+}
+
+/// Whether a declared behavior flag (a bare token like `-r` or `--recursive`) is present,
+/// via the shared `has_flag` (which handles short clustering and `--flag=value`).
+fn behavior_flag_present(tokens: &[Token], flag: &str) -> bool {
+    if flag.starts_with("--") {
+        has_flag(tokens, None, Some(flag))
+    } else {
+        has_flag(tokens, Some(flag), None)
+    }
+}
 
 /// A command name with no resolver and no plausible future one — the stable stand-in for
 /// "unresearched" across engine tests. Using a real tool here is a trap: when `rm` gained
@@ -135,110 +482,21 @@ fn trusted_command_path(arg0: &str) -> bool {
     !arg0.contains('/') || STD_BINS.iter().any(|p| arg0.starts_with(p))
 }
 
-/// `echo` — the reference *structural* certification (§0): every facet is positively
-/// safe by the command's form. `echo` writes its literal arguments to stdout and does
-/// nothing else — no filesystem, network, execution, secret, or state change — and its
-/// only flags (`-n`/`-e`/`-E`) format the output. (A redirect like `echo x > f` or a
-/// substitution like `echo "$SECRET"` is a *separate* capability the enclosing CST
-/// resolves; this leaf is `echo`'s intrinsic behavior.)
-fn resolve_echo(_tokens: &[Token]) -> Profile {
-    let mut c = Capability::new(Operation::Observe);
-    c.disclosure.audience = DisclosureAudience::LocalProcess; // its output reaches the model
-    c.because = "echo prints its arguments to stdout; no fs/net/exec/secret".to_string();
-    Profile::of(vec![c])
+/// The classified operand set of a `grep` invocation: the positional file operands (read at
+/// `scale`, empty = stdin) and the `-f`/`--file` pattern files (each read once). This is the
+/// irreducible token logic a `[command.behavior]` declaration can't express — grep's
+/// pattern-vs-file disambiguation, `-e`/`-f` pattern flags, and the unknown-`--token`-is-a-
+/// pattern heuristic. The declared `operation` (observe) and the builders turn these operands
+/// into capabilities in `resolve_behavior`'s hook arm; this function assigns no facets.
+struct GrepOperands<'a> {
+    files: Vec<&'a str>,
+    pattern_files: Vec<&'a str>,
+    scale: Scale,
 }
 
-/// `cat FILE…` — reads each file's content to stdout (→ the model). Positive
-/// certification (§0): `operation = observe`, `secret = none` (a byte-reader extracts no
-/// credential — the sensitivity of the *content* is carried by `locus` + `disclosure`,
-/// not by detecting a secret path), no network/execution. `locus` per file is
-/// `classify_locus` (fail-closed: `$VAR`/`..` → `machine`). `cat`'s flags (`-n`/`-A`/…)
-/// only format output and take no values.
-fn resolve_cat(tokens: &[Token]) -> Profile {
-    const CAT: Flags = Flags {
-        short: b"AbeEnstTuv",
-        valued_short: &[],
-        long: &[
-            "--number", "--number-nonblank", "--show-all", "--show-ends", "--show-nonprinting",
-            "--show-tabs", "--squeeze-blank", "--help", "--version",
-        ],
-        valued_long: &[],
-        numeric_shorthand: false,
-    };
-    let Some(files) = CAT.positionals(tokens) else {
-        return worst("cat: unrecognized flag — worst-cased (§0)");
-    };
-    Profile::of(reads_to_model(&files, Scale::Single))
-}
-
-/// `head FILE…` / `tail FILE…` — read a bounded prefix/suffix of each file to the model.
-/// Same `observe · content-to-model` shape as `cat`; the only wrinkles are the value flags
-/// (`-n`/`-c`) and the obsolete `-NUM` count form (`head -20`), which `numeric_shorthand`
-/// recognizes. `tail -f`/`-F` follows appends — a streaming read of the *same* file's
-/// content, so it carries no extra capability (the locus already bounds what it can see).
-fn resolve_head(tokens: &[Token]) -> Profile {
-    const HEAD: Flags = Flags {
-        short: b"Vhqvz",
-        valued_short: b"cn",
-        long: &["--help", "--quiet", "--silent", "--verbose", "--version", "--zero-terminated"],
-        valued_long: &["--bytes", "--lines"],
-        numeric_shorthand: true,
-    };
-    let Some(files) = HEAD.positionals(tokens) else {
-        return worst("head: unrecognized flag — worst-cased (§0)");
-    };
-    Profile::of(reads_to_model(&files, Scale::Single))
-}
-
-fn resolve_tail(tokens: &[Token]) -> Profile {
-    const TAIL: Flags = Flags {
-        short: b"FVfhqrvz",
-        valued_short: b"bcn",
-        long: &[
-            "--follow", "--help", "--quiet", "--retry", "--silent", "--verbose", "--version",
-            "--zero-terminated",
-        ],
-        valued_long: &["--bytes", "--lines", "--max-unchanged-stats", "--pid", "--sleep-interval"],
-        numeric_shorthand: true,
-    };
-    let Some(files) = TAIL.positionals(tokens) else {
-        return worst("tail: unrecognized flag — worst-cased (§0)");
-    };
-    Profile::of(reads_to_model(&files, Scale::Single))
-}
-
-/// `wc FILE…` — reads each file's content (to count lines/words/bytes) and prints the
-/// counts. It reads the same content `cat` does, so it is gated identically by `locus`
-/// (only the *output* differs — counts, not content — which no facet distinguishes).
-/// `--files0-from=F` reads an arbitrary, unpinnable set of paths listed in `F` (or stdin
-/// with `-`), which cannot be classified → worst-case (§0).
-fn resolve_wc(tokens: &[Token]) -> Profile {
-    const WC: Flags = Flags {
-        short: b"LVclmw",
-        valued_short: &[],
-        long: &[
-            "--bytes", "--chars", "--help", "--lines", "--max-line-length", "--version",
-            "--words", "--zero-terminated",
-        ],
-        valued_long: &["--files0-from"],
-        numeric_shorthand: false,
-    };
-    if WC.value(tokens, 0, "--files0-from").is_some() {
-        return worst("wc --files0-from reads an unpinnable set of files — worst-cased (§0)");
-    }
-    let Some(files) = WC.positionals(tokens) else {
-        return worst("wc: unrecognized flag — worst-cased (§0)");
-    };
-    Profile::of(reads_to_model(&files, Scale::Single))
-}
-
-/// `grep PATTERN FILE…` — searches files and prints matching lines (file content) to the
-/// model. Like `cat` for its file operands, with three grep-specific twists: the first
-/// positional is the *pattern* (not a file) unless `-e`/`-f` supplied it; `-f FILE` names
-/// a pattern file grep also *reads*; and `-r`/`-R` searches recursively (`scale =
-/// unbounded`). Same positive certification as `cat` (observe, `secret = none`, no
-/// net/exec); `locus` per read is `classify_locus`.
-fn resolve_grep(tokens: &[Token]) -> Profile {
+/// Walk a `grep` command into its `GrepOperands`, or `None` to fail closed (unrecognized flag,
+/// or no pattern operand). The behavior hook (`BehaviorHook::Grep`) for `commands/text/grep.toml`.
+fn grep_operands(tokens: &[Token]) -> Option<GrepOperands<'_>> {
     // `-r` (or --recursive); `-R`/--dereference-recursive is not benign and worst-cases
     // in the walk below, so it needn't be detected here.
     let recursive = has_flag(tokens, Some("-r"), Some("--recursive"));
@@ -304,13 +562,13 @@ fn resolve_grep(tokens: &[Token]) -> Profile {
     }
 
     if unknown_flag {
-        return worst("grep: unrecognized flag — worst-cased (§0)");
+        return None; // unrecognized flag → fail closed (§0)
     }
     if files.is_empty() {
         // No positional operand → grep has no pattern (a `-e`/`-f` pattern still needs a
         // search target). This is a usage error; the legacy classifier denies it, so the
-        // engine must not be looser — worst-case (§0).
-        return worst("grep: no pattern operand — worst-cased (§0)");
+        // engine must not be looser — fail closed (§0).
+        return None;
     }
 
     if !pattern_from_flag {
@@ -320,17 +578,12 @@ fn resolve_grep(tokens: &[Token]) -> Profile {
         files.push("."); // grep -r with no path searches the cwd
     }
 
-    let mut caps: Vec<Capability> = pattern_files
-        .iter()
-        .map(|f| reads_content(read_locus(f), Scale::Single, "reads a grep -f pattern file"))
-        .collect();
-    caps.extend(reads_to_model(&files, scale));
-    Profile::of(caps)
+    Some(GrepOperands { files, pattern_files, scale })
 }
 
 /// The outcome of parsing one grep short-option cluster.
 enum GrepShort<'a> {
-    /// An unrecognized short (e.g. `-P`, code-executing PCRE) → the caller worst-cases.
+    /// An unrecognized short (e.g. `-R`, symlink-dereferencing recursive) → the caller worst-cases.
     Unrecognized,
     /// All chars benign; no value taken.
     Standalone,
@@ -345,8 +598,10 @@ enum GrepShort<'a> {
 /// value-taking short consumes the rest of its cluster (glued) or the next token.
 fn grep_short_cluster<'a>(cluster: &'a str, next: Option<&'a str>) -> GrepShort<'a> {
     // NB: `r` (recursive) is benign, but `R` (--dereference-recursive) follows symlinks
-    // and can escape the classified locus, so it is NOT benign — it worst-cases.
-    const BENIGN: &[u8] = b"ivnclLoqswxHhaIrzZEFGbU";
+    // and can escape the classified locus, so it is NOT benign — it worst-cases. `P`
+    // (PCRE, `--perl-regexp`) IS benign: GNU grep's PCRE2 does not implement Perl's
+    // `(?{code})` execution, so it runs no code — it's just another regex engine like `-E`/`-F`.
+    const BENIGN: &[u8] = b"ivnclLoqswxHhaIrzZEFGbUP";
     let bytes = cluster.as_bytes();
     let mut k = 1;
     while k < bytes.len() {
@@ -371,13 +626,13 @@ fn grep_short_cluster<'a>(cluster: &'a str, next: Option<&'a str>) -> GrepShort<
 }
 
 /// Whether a grep long flag (its `--name`, ignoring any `=value`) is recognized-benign.
-/// `--perl-regexp` and anything unlisted are not → worst-case (§0).
+/// `--dereference-recursive` and anything unlisted are not → worst-case (§0).
 fn grep_long_known(flag: &str) -> bool {
     const KNOWN: &[&str] = &[
         "--recursive", "--ignore-case", "--invert-match", // NB: --dereference-recursive
         // (symlink-following) is intentionally absent → worst-case (M2)
         "--line-number", "--count", "--files-with-matches", "--files-without-match",
-        "--only-matching", "--word-regexp", "--line-regexp", "--fixed-strings",
+        "--only-matching", "--perl-regexp", "--word-regexp", "--line-regexp", "--fixed-strings",
         "--extended-regexp", "--basic-regexp", "--with-filename", "--no-filename",
         "--quiet", "--silent", "--no-messages", "--null", "--byte-offset", "--text",
         "--color", "--colour", "--help", "--version", "--after-context", "--before-context",
@@ -388,223 +643,13 @@ fn grep_long_known(flag: &str) -> bool {
     KNOWN.contains(&name)
 }
 
-/// The long spellings of the dangerous grep shorts `-P`/`-R`: `--perl-regexp` (PCRE can
-/// execute code via `(?{...})`) and `--dereference-recursive` (follows symlinks out of the
-/// classified locus, M2). Recognized so both spellings worst-case; every OTHER unrecognized
-/// `--token` is a search pattern, not a flag.
+/// The long spelling of the dangerous grep short `-R`: `--dereference-recursive` (follows
+/// symlinks out of the classified locus, M2). Recognized so both spellings worst-case; every
+/// OTHER unrecognized `--token` is a search pattern, not a flag. (`--perl-regexp`/`-P` is NOT
+/// here — PCRE2 executes no code, so it is benign, like `-E`/`-F`.)
 fn grep_long_dangerous(flag: &str) -> bool {
     let name = flag.split('=').next().unwrap_or(flag);
-    matches!(name, "--perl-regexp" | "--dereference-recursive")
-}
-
-/// `rm FILE…` — deletes files. Positive certification (§0): `operation = destroy`, no
-/// network/execution/secret. `locus` per operand is `classify_locus`; `-r`/`-R` recurse
-/// (`scale = unbounded`). `reversibility = effortful` — a delete is recoverable only from
-/// out-of-band backups; we do NOT assume VCS/trash (fail-closed). NB: `-f` (--force) only
-/// suppresses prompts — it does NOT raise reversibility for `rm` (the danger of `rm -rf`
-/// is the *recursion*, not the force), so the generic "--force → irreversible" modifier
-/// is command-specific, not universal.
-fn resolve_rm(tokens: &[Token]) -> Profile {
-    // `--no-preserve-root` (which enables `rm -rf /`) is intentionally absent → worst-case.
-    const RM: Flags = Flags {
-        short: b"fiIrRdv",
-        valued_short: &[],
-        long: &[
-            "--force", "--interactive", "--recursive", "--dir", "--verbose",
-            "--one-file-system", "--preserve-root", "--help", "--version",
-        ],
-        valued_long: &[],
-        numeric_shorthand: false,
-    };
-    let Some(operands) = RM.positionals(tokens) else {
-        return worst("rm: unrecognized/dangerous flag — worst-cased (§0)");
-    };
-    if operands.is_empty() {
-        return worst("rm: no operand — worst-cased (§0)");
-    }
-    let recursive = has_flag(tokens, Some("-r"), Some("--recursive")) || has_flag(tokens, Some("-R"), None);
-    let scale = breadth_scale(&operands, recursive);
-    Profile::of(operands.iter().map(|p| destroys(classify_locus(p), scale)).collect())
-}
-
-/// `mkdir DIR…` — creates directories. Non-destructive (fails on an existing target; `-p`
-/// is idempotent), so reversibility is `trivial` — a fresh empty dir is `rmdir`-removable.
-/// `-m`/`--mode`/`--context` take a value; `locus` per operand is `classify_locus`.
-fn resolve_mkdir(tokens: &[Token]) -> Profile {
-    const MKDIR: Flags = Flags {
-        short: b"pvZ",
-        valued_short: b"m",
-        long: &["--parents", "--verbose", "--help", "--version"],
-        valued_long: &["--mode", "--context"],
-        numeric_shorthand: false,
-    };
-    let Some(dirs) = MKDIR.positionals(tokens) else {
-        return worst("mkdir: unrecognized flag — worst-cased (§0)");
-    };
-    if dirs.is_empty() {
-        return worst("mkdir: no operand — worst-cased (§0)");
-    }
-    let scale = breadth_scale(&dirs, false);
-    Profile::of(dirs.iter().map(|p| creates(classify_locus(p), scale)).collect())
-}
-
-/// `touch FILE…` — creates empty files or bumps timestamps. It never destroys content, so
-/// reversibility is `trivial`. `operation = create` covers both the create and the
-/// mtime-mutate case (both admit at `write-local`, so the create/mutate ambiguity a static
-/// classifier can't resolve is verdict-irrelevant). `-r`/`-t`/`-d` take a value; the `-r`
-/// reference is only an mtime read (metadata, not content) and carries no read capability.
-fn resolve_touch(tokens: &[Token]) -> Profile {
-    const TOUCH: Flags = Flags {
-        short: b"Aacmh",
-        valued_short: b"rtd",
-        long: &["--no-create", "--no-dereference", "--help", "--version"],
-        valued_long: &["--reference", "--date", "--time"],
-        numeric_shorthand: false,
-    };
-    let Some(files) = TOUCH.positionals(tokens) else {
-        return worst("touch: unrecognized flag — worst-cased (§0)");
-    };
-    if files.is_empty() {
-        return worst("touch: no operand — worst-cased (§0)");
-    }
-    let scale = breadth_scale(&files, false);
-    Profile::of(files.iter().map(|p| creates(classify_locus(p), scale)).collect())
-}
-
-/// `cp SRC… DEST` — the first resolver that both READS and WRITES, at potentially
-/// different loci. Each source is an `observe` at its own locus (content flows file→file,
-/// NOT to the model — no `local-process` disclosure); the destination is a `create` at its
-/// locus. Two things fall out of the locus model with no secret detection: `cp
-/// ~/.ssh/id_rsa ./x` denies because the SOURCE read is at `user` (above read-local), and
-/// `cp ./x ~/y` denies because the DEST write is at `user` (above write-local). Overwriting
-/// a worktree file is `recoverable` (the repo-recoverable assumption, HP-8) — the same
-/// write-local treatment the golden-set gives `echo > config.json`; `-n`/`--no-clobber`
-/// cannot overwrite at all, so it is `trivial`. Both land at write-local: unlike a delete,
-/// a copy is create/overwrite, not destroy.
-fn resolve_cp(tokens: &[Token]) -> Profile {
-    const CP: Flags = Flags {
-        short: b"HLNPRXacdfhilnprsuvx",
-        valued_short: b"tS",
-        // `--backup`/`--preserve`/`--reflink`/`--sparse` take OPTIONAL args (`--backup[=X]`)
-        // — only ever glued, never the next token — so they are boolean longs (a glued
-        // `=value` is tolerated by `classify`), not `valued_long`.
-        long: &[
-            "--archive", "--backup", "--force", "--help", "--interactive", "--no-clobber",
-            "--no-dereference", "--no-target-directory", "--one-file-system", "--parents",
-            "--preserve", "--recursive", "--reflink", "--remove-destination", "--sparse",
-            "--symbolic-link", "--update", "--verbose", "--version",
-        ],
-        valued_long: &["--suffix", "--target-directory"],
-        numeric_shorthand: false,
-    };
-    let (sources, dest) = match sources_and_dest(&CP, tokens, "cp") {
-        Ok(sd) => sd,
-        Err(profile) => return profile,
-    };
-    let recursive = has_flag(tokens, Some("-r"), Some("--recursive"))
-        || has_flag(tokens, Some("-R"), None)
-        || has_flag(tokens, Some("-a"), Some("--archive"));
-    let no_clobber = has_flag(tokens, Some("-n"), Some("--no-clobber"));
-    let scale = breadth_scale(&sources, recursive);
-    transfer_profile(
-        &sources,
-        dest,
-        scale,
-        |loc, sc| observes(loc, sc, "cp reads the source file"),
-        |loc, sc| overwrites(loc, sc, no_clobber),
-    )
-}
-
-/// Split a `SRC… DEST` invocation (`cp`/`mv`) into its sources and destination.
-/// `-t`/`--target-directory` names the dest explicitly (every operand is then a source);
-/// otherwise the last operand is the dest and the rest are sources. Fails closed (§0),
-/// returning the ready-to-return worst-case `Profile`, on an unrecognized flag or a missing
-/// source+dest pair.
-fn sources_and_dest<'a>(
-    flags: &Flags,
-    tokens: &'a [Token],
-    cmd: &str,
-) -> Result<(Vec<&'a str>, &'a str), Profile> {
-    let Some(operands) = flags.positionals(tokens) else {
-        return Err(worst(&format!("{cmd}: unrecognized flag — worst-cased (§0)")));
-    };
-    if let Some(dest) = flags.value(tokens, b't', "--target-directory") {
-        return Ok((operands, dest));
-    }
-    match operands.split_last() {
-        Some((last, rest)) if !rest.is_empty() => Ok((rest.to_vec(), *last)),
-        _ => Err(worst(&format!("{cmd}: needs a source and a destination — worst-cased (§0)"))),
-    }
-}
-
-/// `mv SRC… DEST` — `cp` + `rm` fused, but the source side is the interesting difference:
-/// `mv` *relocates* a file, it does not annihilate it. So the source is a **`mutate`** at
-/// its locus (the entry leaves that directory) with **`trivial`** reversibility — `mv` it
-/// back — NOT `rm`'s `effortful` `destroy`. That single facet keeps `mv ./a ./b` at
-/// write-local while `rm ./a` waits for developer. Both operands are gated by their locus:
-/// `mv ~/x ./y` denies on the source write (`user`), `mv ./x ~/y` on the dest write, and
-/// `mv .git/config ./x` denies on the source (worktree-*trusted*, above write-local) even
-/// though `cp .git/config ./x` is allowed — moving a trusted file mutates `.git`, copying
-/// only reads it. The dest is a `create`/overwrite exactly like `cp` (recoverable, or
-/// `trivial` under `-n`). `mv` has no recursion flag — a directory move is one rename.
-fn resolve_mv(tokens: &[Token]) -> Profile {
-    const MV: Flags = Flags {
-        short: b"Tfhinuv",
-        valued_short: b"tS",
-        // `--backup` takes an optional arg (glued only) → boolean long, not valued_long.
-        long: &[
-            "--backup", "--force", "--help", "--interactive", "--no-clobber",
-            "--no-target-directory", "--strip-trailing-slashes", "--update", "--verbose",
-            "--version",
-        ],
-        valued_long: &["--suffix", "--target-directory"],
-        numeric_shorthand: false,
-    };
-    let (sources, dest) = match sources_and_dest(&MV, tokens, "mv") {
-        Ok(sd) => sd,
-        Err(profile) => return profile,
-    };
-    let no_clobber = has_flag(tokens, Some("-n"), Some("--no-clobber"));
-    let scale = breadth_scale(&sources, false); // mv has no recursion flag; a dir move is one rename
-    transfer_profile(&sources, dest, scale, relocates, |loc, sc| overwrites(loc, sc, no_clobber))
-}
-
-/// `ln TARGET… LINK` — creates a link (hard, or symbolic with `-s`). It is **cp
-/// by reference**: the link makes the target's content reachable at the LINK's locus, so a
-/// link to a home/system target is the same bridge a `cp` of it would be. To stop `ln`
-/// being a `cp`-bypass, the target is gated on its own locus exactly like `cp`'s source
-/// (`observes`); `ln ~/.ssh/id_rsa ./x` denies just as `cp` does. The link itself is a
-/// `create`/overwrite at the LINK's locus — `trivial` (rm the link), or `recoverable` when
-/// `-f` clobbers an existing entry. Same `SRC… DEST` operand shape as `cp`/`mv`.
-///
-/// The target string is NOT followed (§0.2 scope): the bridge is caught only when we see
-/// the `ln`; a pre-existing symlink read is the documented HP-5 residual.
-fn resolve_ln(tokens: &[Token]) -> Profile {
-    const LN: Flags = Flags {
-        short: b"FLPTdfhinrsvw",
-        valued_short: b"St",
-        // `--backup` takes an optional arg (glued only) → boolean long, not valued_long.
-        long: &[
-            "--backup", "--directory", "--force", "--help", "--interactive", "--logical",
-            "--no-dereference", "--no-target-directory", "--physical", "--relative",
-            "--symbolic", "--verbose", "--version",
-        ],
-        valued_long: &["--suffix", "--target-directory"],
-        numeric_shorthand: false,
-    };
-    let (targets, link) = match sources_and_dest(&LN, tokens, "ln") {
-        Ok(sd) => sd,
-        Err(profile) => return profile,
-    };
-    let force = has_flag(tokens, Some("-f"), Some("--force"));
-    let scale = breadth_scale(&targets, false);
-    transfer_profile(
-        &targets,
-        link,
-        scale,
-        |loc, sc| observes(loc, sc, "ln bridges the link to its target's locus (cp-by-reference)"),
-        |loc, sc| overwrites(loc, sc, !force),
-    )
+    matches!(name, "--dereference-recursive")
 }
 
 /// `dd if=IN of=OUT bs=… …` — the operand-model breaker: `dd` takes NO getopt flags or
@@ -666,31 +711,71 @@ fn resolve_dd(tokens: &[Token]) -> Profile {
 ///     unknown letter also worst-cases.
 fn resolve_tar(tokens: &[Token]) -> Profile {
     let mut p = TarParse::default();
-    for (idx, t) in tokens.iter().enumerate().skip(1) {
-        let t = t.as_str();
+    // `-C DIR` changes the directory for the members that FOLLOW it, so a member's real locus
+    // is `DIR/member` — the same `find … {}`→path binding. tar applies `-C` CUMULATIVELY: each
+    // `-C` chdir's relative to the already-changed directory, so consecutive `-C /  -C etc`
+    // resolves to `/etc`, not `etc`. Compose relative values onto the active dir (via the same
+    // `tar_bound` join, which also lets an absolute value replace and routes any `..` through
+    // the unpinnable guard); stamp each positional with the accumulated dir.
+    let mut dir: Option<String> = None;
+    let mut i = 1;
+    while i < tokens.len() {
+        let t = tokens[i].as_str();
+        if t == "-C" || t == "--directory" {
+            dir = tokens.get(i + 1).map(|d| tar_bound(dir.as_deref(), d.as_str()));
+            i += 2;
+            continue;
+        }
+        if let Some(d) = t.strip_prefix("--directory=").or_else(|| t.strip_prefix("-C").filter(|d| !d.is_empty())) {
+            dir = Some(tar_bound(dir.as_deref(), d));
+            i += 1;
+            continue;
+        }
         if let Some(long) = t.strip_prefix("--") {
             p.long_option(long);
         } else if let Some(cluster) = t.strip_prefix('-').filter(|c| !c.is_empty()) {
             p.cluster(cluster);
-        } else if idx == 1 {
+        } else if i == 1 {
             p.cluster(t); // dashless old-style option bundle (only the first argument)
         } else {
-            p.positionals.push(t);
+            p.positionals.push((dir.clone(), t));
         }
+        i += 1;
     }
     p.into_profile()
 }
 
+/// A tar positional: a member/archive path with the accumulated `-C` directory active when it
+/// appeared (already composed across consecutive `-C` options).
+type TarPositional<'a> = (Option<String>, &'a str);
+
+/// A tar positional borrowed for classification: (`-C` dir, path).
+type TarRef<'a> = (Option<&'a str>, &'a str);
+
+/// A tar member/archive path resolved against an active `-C` directory: `DIR/path` for a
+/// relative path, or `path` unchanged when there is no `-C` or the path is absolute (an
+/// absolute member ignores `-C`).
+fn tar_bound(dir: Option<&str>, path: &str) -> String {
+    match dir {
+        Some(d) if !path.starts_with('/') && !path.starts_with('~') && !path.starts_with('-') => {
+            format!("{}/{}", d.trim_end_matches('/'), path)
+        }
+        _ => path.to_string(),
+    }
+}
+
 /// Accumulated `tar` parse: the mode, whether `-f` wants an archive, and `reject` — set by
-/// any option we can't model safely (an unknown letter, or a value-taking option like `-C`
-/// / `-T` whose ordered operand consumption we don't track), which forces worst-case.
+/// any option we can't model safely (an unknown letter, or a value-taking option like `-T`
+/// / `-X` whose ordered operand consumption we don't track). `-C` IS modeled (see
+/// `resolve_tar`); it only reaches `cluster` inside a mixed bundle, which still worst-cases.
 #[derive(Default)]
 struct TarParse<'a> {
     mode: Option<u8>,
     want_archive: bool,
     reject: bool,
     long_archive: Option<&'a str>,
-    positionals: Vec<&'a str>,
+    /// Each positional with the `-C` directory active when it appeared (`None` = cwd).
+    positionals: Vec<TarPositional<'a>>,
 }
 
 impl<'a> TarParse<'a> {
@@ -731,27 +816,28 @@ impl<'a> TarParse<'a> {
         };
         // Separate the archive from the members. `--file=X` names it directly; a bare `f`
         // (dashless `czf` or dashed `-czf`) takes the FIRST positional as the archive.
-        let (archive, members): (Option<&str>, &[&str]) = if let Some(a) = self.long_archive {
-            (Some(a), &self.positionals)
-        } else if self.want_archive {
-            match self.positionals.split_first() {
-                Some((first, rest)) => (Some(*first), rest),
-                None => return worst("tar: -f without an archive — worst-cased (§0)"),
-            }
-        } else {
-            (None, &self.positionals) // archive is stdin/stdout
-        };
+        let (archive, members): (Option<TarRef>, &[TarPositional]) =
+            if let Some(a) = self.long_archive {
+                (Some((None, a)), &self.positionals)
+            } else if self.want_archive {
+                match self.positionals.split_first() {
+                    Some((first, rest)) => (Some((first.0.as_deref(), first.1)), rest),
+                    None => return worst("tar: -f without an archive — worst-cased (§0)"),
+                }
+            } else {
+                (None, &self.positionals) // archive is stdin/stdout
+            };
         // A `-` archive (or none) is a stdout/stdin stream, not a file to gate.
-        let archive_file = archive.filter(|a| *a != "-");
+        let archive_file = archive.filter(|(_, a)| *a != "-");
 
         match mode {
             b'c' | b'r' | b'u' => {
                 let mut caps: Vec<Capability> = members
                     .iter()
-                    .map(|m| observes(read_locus(m), Scale::Bounded, "tar reads a member into the archive"))
+                    .map(|(dir, m)| observes(read_locus(&tar_bound(dir.as_deref(), m)), Scale::Bounded, "tar reads a member into the archive"))
                     .collect();
-                if let Some(a) = archive_file {
-                    caps.push(overwrites(classify_locus(a), Scale::Single, false));
+                if let Some((dir, a)) = archive_file {
+                    caps.push(overwrites(classify_locus(&tar_bound(dir, a)), Scale::Single, false));
                 }
                 if caps.is_empty() {
                     return worst("tar create with no members — worst-cased (§0)");
@@ -759,7 +845,7 @@ impl<'a> TarParse<'a> {
                 Profile::of(caps)
             }
             b't' => {
-                let loc = archive_file.map_or(LocalLocus::Process, classify_locus);
+                let loc = archive_file.map_or(LocalLocus::Process, |(dir, a)| classify_locus(&tar_bound(dir, a)));
                 Profile::of(vec![reads_content(loc, Scale::Single, "tar lists the archive's members (names → the model)")])
             }
             // x (extract) and A/d: archive-controlled, ..-escapable writes → worst-case.
@@ -775,11 +861,19 @@ impl<'a> TarParse<'a> {
 /// positional is the SCRIPT unless `-e`/`-f` supplied it (`-f` also reads a script file).
 /// So `sed` parses its own flags.
 fn resolve_sed(tokens: &[Token]) -> Profile {
-    // HP-7: sed is a mini-language. Its `e` command/modifier executes text as a shell
-    // command (RCE), which flag parsing alone can't see. Inspect the script and worst-case
-    // it, matching the legacy handler's detector so the engine is never looser on this vector.
-    if crate::handlers::coreutils::sed::sed_has_exec_modifier(tokens) {
-        return worst("sed: script has an `e` exec command — worst-cased (§0, HP-7)");
+    // HP-7: sed is a mini-language. Its `e` command/modifier executes text as a shell command
+    // (RCE), and its `w`/`W`/`r`/`R` commands write/read arbitrary files EMBEDDED in the script —
+    // both invisible to flag parsing. Scan the script(s): an `e`/unknown command worst-cases; the
+    // file commands' filenames get gated by locus below (a local write is fine, `/etc/cron.d/x` is
+    // not), exactly like the operand files.
+    let script = crate::handlers::coreutils::sed::scan_sed(tokens);
+    if script.exec || script.unknown {
+        return worst("sed: script has an `e` exec or unmodeled command — worst-cased (§0, HP-7)");
+    }
+    // A `-f`/`--file` script comes from a file we can't read — its `e`/`w`/`r` commands are invisible,
+    // so we can't verify it (like `awk -f`, `bash script.sh`, mlr `--load`). Worst-case it.
+    if script.script_file {
+        return worst("sed: -f runs a script file we can't inspect — worst-cased (§0)");
     }
     const BOOL: &[u8] = b"nrEsuz"; // no-value short flags
     let mut in_place = false;
@@ -833,6 +927,10 @@ fn resolve_sed(tokens: &[Token]) -> Profile {
     let scale = breadth_scale(&files, false);
     let mut caps: Vec<Capability> =
         script_files.iter().map(|f| observes(read_locus(f), Scale::Single, "sed reads an -f script file")).collect();
+    // Script-embedded file commands (`w`/`W` write, `r`/`R` read, `s///w` write) — gate each target
+    // by its locus, just like an operand file.
+    caps.extend(script.writes.iter().map(|f| mutates(classify_locus(f), Scale::Single, "sed w/W writes a file")));
+    caps.extend(script.reads.iter().map(|f| observes(read_locus(f), Scale::Single, "sed r/R reads a file")));
     if in_place {
         caps.extend(files.iter().map(|f| mutates(classify_locus(f), scale, "sed -i edits the file in place")));
     } else {
@@ -926,11 +1024,11 @@ mod tests {
     }
 
     fn inert() -> &'static crate::engine::level::Level {
-        level("inert")
+        level("paranoid")
     }
 
     fn read_local() -> &'static crate::engine::level::Level {
-        level("read-local")
+        level("reader")
     }
 
     #[test]
@@ -977,11 +1075,11 @@ mod tests {
     }
 
     #[test]
-    fn cat_of_a_recognized_public_system_file_is_read_local() {
-        // HP-20: reading a world-readable, non-secret system config is admitted at read-local.
+    fn cat_of_a_system_file_is_not_admitted() {
+        // the retreat: reading a system path is no longer admitted (it prompts, or the user grants).
         for path in ["/etc/hosts", "/etc/os-release", "/usr/share/doc/x"] {
             let p = resolve(&toks(&["cat", path])).expect("cat");
-            assert!(read_local().admits(&p), "cat {path} is a safe public read");
+            assert!(!read_local().admits(&p), "cat {path} is no longer auto-approved");
         }
     }
 
@@ -1107,9 +1205,9 @@ mod tests {
         let m = resolve(&toks(&["grep", "--max-count", "5", "foo", "f.txt"])).expect("grep");
         assert!(read_local().admits(&m), "--max-count 5 is fail-safe (imprecise)");
 
-        // a dangerous long flag (PCRE code-exec) worst-cases
-        let bad = resolve(&toks(&["grep", "--perl-regexp", "foo", "f"])).expect("grep");
-        assert!(!read_local().admits(&bad));
+        // --perl-regexp (PCRE2) runs no code — benign like any regex-engine flag; reads read-local.
+        let pcre = resolve(&toks(&["grep", "--perl-regexp", "foo", "f"])).expect("grep");
+        assert!(read_local().admits(&pcre), "grep --perl-regexp reads a file, it does not exec");
     }
 
     #[test]
@@ -1129,13 +1227,19 @@ mod tests {
             assert!(read_local().admits(&p), "dash-pattern should read-local: {args:?}");
             assert!(!inert().admits(&p), "it still reads a file: {args:?}");
         }
-        // but the genuinely-dangerous longs (the long spellings of -P/-R) still worst-case
-        for args in [
-            vec!["grep", "--perl-regexp", "foo", "f"],
-            vec!["grep", "--dereference-recursive", "foo", "dir"],
-        ] {
+        // but the genuinely-dangerous long (--dereference-recursive, symlink escape) worst-cases
+        for args in [vec!["grep", "--dereference-recursive", "foo", "dir"]] {
             let p = resolve(&toks(&args)).expect("grep");
             assert!(!read_local().admits(&p), "dangerous long must worst-case: {args:?}");
+        }
+        // PCRE flags now read-local (PCRE2 execs no code): -P short, --perl-regexp long, -oP combined.
+        for args in [
+            vec!["grep", "-P", "foo", "f"],
+            vec!["grep", "--perl-regexp", "foo", "f"],
+            vec!["grep", "-oP", "foo", "f"],
+        ] {
+            let p = resolve(&toks(&args)).expect("grep");
+            assert!(read_local().admits(&p), "grep PCRE flag should read-local: {args:?}");
         }
     }
 
@@ -1176,9 +1280,9 @@ mod tests {
         cat.disclosure.audience = DisclosureAudience::LocalProcess;
         assert_eq!(one_cap(&["cat", "./notes.md"]), cat, "cat ./notes.md");
 
-        // cat of a plain home file — same, but locus rises to user (the only facet that moves).
+        // cat of a plain home file — home is no longer admitted, so locus rises to machine (deny).
         let mut cat_home = cat.clone();
-        cat_home.locus.local = LocalLocus::User;
+        cat_home.locus.local = LocalLocus::Machine;
         assert_eq!(one_cap(&["cat", "~/notes.txt"]), cat_home, "cat ~/notes.txt");
 
         // cat of a home CREDENTIAL store rises further, to machine (HP-20 credential role).
@@ -1329,6 +1433,9 @@ mod tests {
         assert_eq!(resolve(&toks(&["cp", "-r", "./a", "./b"])).expect("cp").capabilities[0].scale, Scale::Unbounded);
         assert_eq!(project(&resolve(&toks(&["cp", "./only"])).expect("cp")), Verdict::Denied, "no dest");
         assert_eq!(project(&resolve(&toks(&["cp", "-Q", "./a", "./b"])).expect("cp")), Verdict::Denied, "unknown flag");
+        // -t naming a dest with NO source operands is a usage error → fail closed (not a lone,
+        // benign dest write).
+        assert_eq!(project(&resolve(&toks(&["cp", "-t", "./dest"])).expect("cp")), Verdict::Denied, "-t no source");
     }
 
     #[test]
@@ -1350,6 +1457,23 @@ mod tests {
         // allowed (cp only READS .git/config; the dest write puts cp at SafeWrite).
         assert_eq!(project(&resolve(&toks(&["mv", ".git/config", "./x"])).expect("mv")), Verdict::Denied, "mv .git/config");
         assert_eq!(project(&resolve(&toks(&["cp", ".git/config", "./x"])).expect("cp")), Verdict::Allowed(SafetyLevel::SafeWrite), "cp .git/config reads");
+
+        // The relocate source gates at its WRITE face, not its read face. safe-chains' own config
+        // READS at worktree-trusted but WRITES at machine (un-grantable): `mv`ing it REMOVES it,
+        // so the removal must gate at the write face (machine); a `cp` of it only READS
+        // (worktree-trusted). Both deny by verdict, so assert the source LOCUS to pin the face —
+        // this is the case a read-face relocate would fail open on.
+        let cfg = "~/.config/safe-chains.toml";
+        assert_eq!(
+            resolve(&toks(&["mv", cfg, "./x"])).expect("mv").capabilities[0].locus.local,
+            LocalLocus::Machine,
+            "mv source removal gates at the WRITE face",
+        );
+        assert_eq!(
+            resolve(&toks(&["cp", cfg, "./x"])).expect("cp").capabilities[0].locus.local,
+            LocalLocus::WorktreeTrusted,
+            "cp source read gates at the READ face",
+        );
 
         // -t DIR and glued forms; fail-closed on unknown flag / lone operand.
         let t = resolve(&toks(&["mv", "-t", "./dest", "./a", "./b"])).expect("mv -t");
@@ -1373,15 +1497,25 @@ mod tests {
         // locus, exactly as `cp` of it would (a link would otherwise alias the secret in).
         assert_eq!(project(&resolve(&toks(&["ln", "~/.ssh/id_rsa", "./x"])).expect("ln")), Verdict::Denied, "hard link to home credential");
         assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/shadow", "./x"])).expect("ln")), Verdict::Denied, "symlink to secret");
-        // HP-20: linking to a READABLE public target is allowed — you could `cat` it anyway,
-        // so aliasing it grants no new capability.
-        assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/hosts", "./x"])).expect("ln")), Verdict::Allowed(SafetyLevel::SafeWrite), "symlink to public config");
+        // the retreat: linking to a NON-workspace target denies on the target locus (as cp would).
+        assert_eq!(project(&resolve(&toks(&["ln", "-s", "/etc/hosts", "./x"])).expect("ln")), Verdict::Denied, "symlink to system path");
         // writing the LINK outside the worktree denies on the link locus.
         assert_eq!(project(&resolve(&toks(&["ln", "-s", "./a", "~/evil"])).expect("ln")), Verdict::Denied, "link into home");
         // -t DIR, lone operand, unknown flag.
         assert_eq!(resolve(&toks(&["ln", "-t", "./dir", "./a", "./b"])).expect("ln -t").capabilities.len(), 3);
         assert_eq!(project(&resolve(&toks(&["ln", "./only"])).expect("ln")), Verdict::Denied, "no link name");
         assert_eq!(project(&resolve(&toks(&["ln", "-Q", "./a", "./b"])).expect("ln")), Verdict::Denied, "unknown flag");
+        // -f (a clobber flag PRESENT) flips the link-create from the no-clobber default
+        // (`trivial`) to `recoverable` — still write-local. Exercises the `clobber_flags`-present
+        // branch of the transfer arm, the inverse of cp/mv's `no_clobber_flags`.
+        let forced = resolve(&toks(&["ln", "-f", "./a", "./b"])).expect("ln -f");
+        assert_eq!(project(&forced), Verdict::Allowed(SafetyLevel::SafeWrite), "ln -f worktree link");
+        assert_eq!(forced.capabilities.last().unwrap().reversibility, Reversibility::Recoverable, "ln -f overwrites → recoverable");
+        assert_eq!(
+            resolve(&toks(&["ln", "./a", "./b"])).expect("ln").capabilities.last().unwrap().reversibility,
+            Reversibility::Trivial,
+            "ln default no-clobber → trivial",
+        );
     }
 
     #[test]
@@ -1483,9 +1617,11 @@ mod tests {
         assert_eq!(project(&glob), Verdict::Allowed(SafetyLevel::SafeWrite), "sed -i * (worktree)");
         assert_eq!(project(&resolve(&toks(&["sed", "-i", "s/a/b/", "a", "b", "c"])).expect("sed")), Verdict::Allowed(SafetyLevel::SafeWrite), "multi-file");
 
-        // -i.bak (optional glued suffix) still parses as in-place; -f reads a script file.
+        // -i.bak (optional glued suffix) still parses as in-place.
         assert_eq!(project(&resolve(&toks(&["sed", "-i.bak", "s/a/b/", "./foo"])).expect("sed")), Verdict::Allowed(SafetyLevel::SafeWrite), "-i.bak");
-        assert_eq!(project(&resolve(&toks(&["sed", "-f", "script.sed", "./foo"])).expect("sed")), Verdict::Allowed(SafetyLevel::SafeRead), "-f script");
+        // -f runs a script file we can't inspect (its e/w/r commands are invisible) → denied, like
+        // `awk -f`, `bash script.sh`, mlr `--load`.
+        assert_eq!(project(&resolve(&toks(&["sed", "-f", "script.sed", "./foo"])).expect("sed")), Verdict::Denied, "-f script file unanalyzable");
         // a home file read (no -i) still denies by locus, like cat.
         assert_eq!(project(&resolve(&toks(&["sed", "s/a/b/", "~/.ssh/id_rsa"])).expect("sed")), Verdict::Denied, "read home secret");
         assert_eq!(project(&resolve(&toks(&["sed", "-Q", "./foo"])).expect("sed")), Verdict::Denied, "unknown flag");
@@ -1500,16 +1636,18 @@ mod tests {
         for cmd in [
             vec!["sed", "s/test/touch tmp/e", "file"],   // s///e modifier
             vec!["sed", "-e", "s/x/cmd/e", "file"],       // via -e
-            vec!["sed", "s/x/cmd/we", "file"],            // w + e
+            vec!["sed", "s/x/cmd/ew", "file"],            // e flag BEFORE the greedy w flag
             vec!["sed", "1e", "file"],                    // address + e
             vec!["sed", "e"],                             // bare e
             vec!["sed", "-e", "e"],
+            vec!["sed", "1e reboot", "file"],             // address + e WITH a command argument
+            vec!["sed", "p;e id", "file"],                // e after a `;` separator
         ] {
             assert_eq!(project(&resolve(&toks(&cmd)).expect("sed")), Verdict::Denied, "{cmd:?}: exec must deny");
         }
-        // NB: `sed -e '1e reboot'` (address+e with the command as an argument, so the token
-        // doesn't end in `e`) is a KNOWN residual missed by both the legacy detector and this
-        // one — a pre-existing gap, not a regression (HP-7: strengthen the sed sub-parser).
+        // `s/x/cmd/we` is NOT here: `w` is greedy-to-EOL, so `we` writes to a file named `e` (a
+        // local SafeWrite), not w-then-e exec. `sed '1e reboot'` — the former residual gap — is now
+        // caught by the sed sub-parser (`scan_sed`).
     }
 
     /// HP-19 #1 (engine): `classify_locus` now resolves relative paths against the ambient
@@ -1529,31 +1667,41 @@ mod tests {
 
         // Context says the shell is in /etc → relative operands are /etc/* → machine → deny.
         let _g = crate::pathctx::enter(PathCtx { cwd: Some("/etc".into()), root: Some("/home/u/proj".into()) });
-        for p in ["*", "passwd", "hosts", "config", "cron.d"] {
+        for p in ["*", "hosts", "config", "cron.d"] {
             assert_eq!(classify_locus(p), LocalLocus::Machine, "{p}: cwd=/etc → machine");
         }
+        // /etc/passwd is the identity substrate: its WRITE face worst-cases to system-integrity
+        // (above machine → above local-admin), even reached as a relative operand from cwd=/etc.
+        assert_eq!(classify_locus("passwd"), LocalLocus::SystemIntegrity, "passwd: cwd=/etc → system-integrity");
         assert_eq!(project(&resolve(&toks(&["sed", "-i", "s/a/b/", "*"])).expect("sed")), Verdict::Denied, "cwd=/etc: sed -i * denied");
         assert_eq!(project(&resolve(&toks(&["dd", "if=./x", "of=passwd"])).expect("dd")), Verdict::Denied, "cwd=/etc: dd of=passwd denied");
         assert_eq!(project(&resolve(&toks(&["cp", "./payload", "config"])).expect("cp")), Verdict::Denied, "cwd=/etc: cp denied");
     }
 
     #[test]
-    fn touch_creates_in_the_worktree_and_skips_valued_flag_values() {
+    fn touch_creates_in_the_worktree_and_gates_the_reference_path() {
         use crate::engine::bridge::project;
         use crate::verdict::{SafetyLevel, Verdict};
         for cmd in [
             vec!["touch", "./new.txt"],
             vec!["touch", "-c", "existing"],
-            vec!["touch", "-r", "ref.txt", "./out"], // -r consumes ref.txt as its value, not an operand
-            vec!["touch", "-d", "-1 day", "./out"],  // dash-leading value must not read as a flag
+            vec!["touch", "-r", "ref.txt", "./out"], // worktree reference: a read + a create, both worktree
+            vec!["touch", "-d", "-1 day", "./out"],  // -d takes a DATE literal (not a path), dash-leading value
         ] {
             assert_eq!(project(&resolve(&toks(&cmd)).expect("touch")), Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd:?}");
         }
-        // the -r reference value is consumed, so `./out` (worktree) is the only operand —
-        // a home reference file does NOT drag the whole command to the home locus.
-        let p = resolve(&toks(&["touch", "-r", "~/.bashrc", "./out"])).expect("touch");
-        assert_eq!(p.capabilities.len(), 1, "only ./out is an operand");
-        assert_eq!(p.capabilities[0].locus.local, LocalLocus::Worktree);
+        // `-r REF` reads REF's timestamp — a path-flag gated by REF's locus. A worktree ref is a
+        // worktree read (allowed, 2 caps), but an out-of-workspace reference DENIES (it would
+        // otherwise be an mtime/existence oracle for arbitrary paths).
+        let p = resolve(&toks(&["touch", "-r", "ref.txt", "./out"])).expect("touch");
+        assert_eq!(p.capabilities.len(), 2, "./out create + ref.txt read");
+        assert!(p.capabilities.iter().any(|c| c.operation == Operation::Observe), "the -r reference is a read");
+        assert_eq!(project(&resolve(&toks(&["touch", "-r", "~/.bashrc", "./out"])).expect("touch")), Verdict::Denied, "home reference");
+        assert_eq!(project(&resolve(&toks(&["touch", "-r", "/etc/shadow", "./out"])).expect("touch")), Verdict::Denied, "system reference");
+        assert_eq!(project(&resolve(&toks(&["touch", "--reference=/etc/shadow", "./out"])).expect("touch")), Verdict::Denied, "long glued reference");
+        assert_eq!(project(&resolve(&toks(&["touch", "--reference", "/etc/shadow", "./out"])).expect("touch")), Verdict::Denied, "long spaced reference");
+        // -d's dash-leading date literal is NOT a path and is NOT gated.
+        assert_eq!(project(&resolve(&toks(&["touch", "-d", "-1 day", "/tmp/../etc/x"])).expect("touch")), Verdict::Denied, "operand still gated");
         // beyond the worktree, and fail-closed cases
         assert_eq!(project(&resolve(&toks(&["touch", "/etc/x"])).expect("touch")), Verdict::Denied, "system path");
         assert_eq!(project(&resolve(&toks(&["touch", "-Z", "x"])).expect("touch")), Verdict::Denied, "unknown flag");
@@ -1598,6 +1746,252 @@ mod tests {
         // denied by locus — no clause admits a machine/user-scoped destroy.
         for cmd in [vec!["rm", "-rf", "/"], vec!["rm", "-rf", "~/notes"], vec!["rm", "/etc/hosts"]] {
             assert_eq!(project(&resolve(&toks(&cmd)).expect("rm")), Verdict::Denied, "{cmd:?} beyond worktree");
+        }
+    }
+
+    /// End-to-end: `rm -rf /` resolves to the `destroy · irreversible · unbounded` corner and
+    /// is the one thing even a maximally-permissive yolo refuses — by facet, not by name.
+    /// Everything one facet away stays yolo-admitted.
+    #[test]
+    fn rm_rf_root_is_the_one_thing_even_yolo_denies() {
+        let yolo = level("yolo");
+        let root = resolve(&toks(&["rm", "-rf", "/"])).expect("rm");
+        assert_eq!(root.capabilities[0].reversibility, Reversibility::Irreversible, "rm -rf / is irreversible");
+        assert_eq!(root.capabilities[0].scale, Scale::Unbounded);
+        assert!(!yolo.admits(&root), "rm -rf / denied even at yolo");
+        assert!(!yolo.admits(&resolve(&toks(&["rm", "-rf", "~/notes"])).expect("rm")), "rm -rf ~ likewise");
+        // adjacent-by-one-facet stays yolo-allowed:
+        assert!(yolo.admits(&resolve(&toks(&["rm", "-rf", "./node_modules"])).expect("rm")), "recoverable worktree");
+        assert!(yolo.admits(&resolve(&toks(&["rm", "/etc/hosts"])).expect("rm")), "single (bounded) system delete");
+    }
+
+    /// Phase 1 end-to-end: a subcommand tagged `profile = "<archetype>"` resolves (through the
+    /// nested `<resource> <action>` grammar) to that archetype's exact static capability, so its
+    /// verdict is DERIVED from facets, not hand-marked. Untagged sibling subs leave the engine
+    /// abstaining (→ legacy).
+    #[test]
+    fn a_subcommand_profile_resolves_to_its_archetype() {
+        let p = resolve(&toks(&["koyeb", "apps", "delete", "myapp"])).expect("koyeb apps delete resolves");
+        assert_eq!(p.capabilities.len(), 1);
+        assert_eq!(
+            &p.capabilities[0],
+            crate::engine::archetype::archetype("remote-destroy-recoverable").unwrap(),
+            "the sub resolves to its declared archetype's capability",
+        );
+        // a differently-tagged action gets a different archetype
+        let create = resolve(&toks(&["koyeb", "apps", "create", "myapp"])).expect("resolves");
+        assert_eq!(create.capabilities[0].operation, Operation::Create);
+        // an untagged read sub: no profile, no command behavior → the engine abstains (legacy decides)
+        assert!(resolve(&toks(&["koyeb", "apps", "list"])).is_none(), "untagged sub → engine abstains");
+    }
+
+    /// Per-flag escalation (Phase 1 layer): a dangerous flag ADDS a capability to the sub's profile,
+    /// and the level algebra takes the max — so a benign base + a destructive flag lands at the
+    /// flag's tier. `git push` is vcs-sync (network-admin); `git push --force` adds
+    /// remote-destroy-irreversible and escalates past it, to yolo.
+    #[test]
+    fn an_escalating_flag_adds_a_capability_and_raises_the_tier() {
+        let destroy = crate::engine::archetype::archetype("remote-destroy-irreversible").unwrap();
+        // The vcs-sync base now carries the destination's provenance (exposure §4): `origin` and the
+        // bare `--force` form (default remote) are both `established`.
+        let vcs_sync = {
+            let mut c = crate::engine::archetype::archetype("vcs-sync").unwrap().clone();
+            c.locus.provenance = Provenance::Established;
+            c
+        };
+
+        let base = resolve(&toks(&["git", "push", "origin", "main"])).expect("git push resolves");
+        assert_eq!(base.capabilities, vec![vcs_sync.clone()], "base is vcs-sync, established destination");
+
+        let forced = resolve(&toks(&["git", "push", "--force"])).expect("resolves");
+        assert_eq!(forced.capabilities.len(), 2);
+        assert!(forced.capabilities.contains(&vcs_sync) && forced.capabilities.contains(destroy),
+            "--force ADDS remote-destroy-irreversible to the vcs-sync base");
+
+        // the escalation MATTERS at the level layer: network-admin admits the base but not the
+        // forced push; the flag pushed it up to yolo.
+        let network_admin = level("network-admin");
+        assert!(network_admin.admits(&base), "git push is network-admin");
+        assert!(!network_admin.admits(&forced), "git push --force escalated past network-admin");
+        assert!(level("yolo").admits(&forced), "and lands at yolo");
+
+        // the -f short form escalates identically
+        assert_eq!(resolve(&toks(&["git", "push", "-f"])).unwrap().capabilities.len(), 2);
+    }
+
+    /// Destination-trust (exposure §4): `git push`'s send TARGET is classified onto
+    /// `locus.provenance`, and an `ext::` command-transport worst-cases as RCE. The one resolver
+    /// that makes the `locus.provenance` facet actually bind to a command.
+    #[test]
+    fn git_push_destination_provenance_is_classified() {
+        use crate::engine::bridge::project;
+        use crate::verdict::Verdict;
+
+        let prov = |cmd: &[&str]| resolve(&toks(cmd)).expect("push resolves").capabilities[0].locus.provenance;
+
+        // bare (configured default) and a bare remote NAME → established (a prior deliberate act).
+        assert_eq!(prov(&["git", "push"]), Provenance::Established, "bare push = default remote");
+        assert_eq!(prov(&["git", "push", "origin", "main"]), Provenance::Established, "remote name");
+        // a flag before the target doesn't hide it.
+        assert_eq!(prov(&["git", "push", "--force", "origin"]), Provenance::Established, "flag then name");
+        // spelled inline → literal (visible but injectable): URL, scp-path, filesystem path.
+        assert_eq!(prov(&["git", "push", "https://h/x.git", "main"]), Provenance::Literal, "url");
+        assert_eq!(prov(&["git", "push", "git@h:x.git"]), Provenance::Literal, "scp-style");
+        assert_eq!(prov(&["git", "push", "/srv/mirror.git"]), Provenance::Literal, "path");
+        // a variable / substitution → opaque (unreviewable).
+        assert_eq!(prov(&["git", "push", "$REMOTE"]), Provenance::Opaque, "variable");
+
+        // network-admin admits established + literal, refuses opaque; the ext:: transport is RCE.
+        let net = level("network-admin");
+        assert!(net.admits(&resolve(&toks(&["git", "push", "origin"])).unwrap()), "established at network-admin");
+        assert!(net.admits(&resolve(&toks(&["git", "push", "https://h/x.git"])).unwrap()), "literal URL at network-admin");
+        assert!(!net.admits(&resolve(&toks(&["git", "push", "$REMOTE"])).unwrap()), "opaque above network-admin");
+        // ext::<cmd> runs a local command — worst-cased, denied below yolo.
+        assert_eq!(project(&resolve(&toks(&["git", "push", "ext::sh"])).unwrap()), Verdict::Denied, "ext:: is RCE");
+        assert!(!net.admits(&resolve(&toks(&["git", "push", "ext::sh"])).unwrap()), "ext:: not at network-admin");
+
+        // `--repo=<dest>` OVERRIDES the positional (the fail-open the review found: `--repo=ext::sh`
+        // slipping past a benign `origin`). Glued and space forms; a bare remote name still allows.
+        assert_eq!(project(&resolve(&toks(&["git", "push", "--repo=ext::sh", "origin"])).unwrap()), Verdict::Denied, "--repo=ext:: is RCE");
+        assert!(!net.admits(&resolve(&toks(&["git", "push", "--repo", "$VAR", "origin"])).unwrap()), "--repo $VAR is opaque");
+        assert_eq!(prov(&["git", "push", "--repo=https://h/x.git", "main"]), Provenance::Literal, "--repo URL is literal");
+        assert!(net.admits(&resolve(&toks(&["git", "push", "--repo=upstream", "main"])).unwrap()), "--repo=<remote name> is established");
+    }
+
+    /// The `data-export` resolver: a bulk remote export (`supabase db dump`) is a read that
+    /// auto-approves to stdout, but its OUTPUT-FILE form (`-f path`) adds a SECOND, path-gated local
+    /// write — a dump to the worktree stays local (SafeWrite) while one to a system path gates on
+    /// locus (denied), and the glued short `-f/path` spelling can't slip that gate. The unbounded
+    /// `scale` records the volume without itself gating the read. See `behavioral-taxonomy-exposure.md`.
+    #[test]
+    fn data_export_gates_its_output_file() {
+        use crate::engine::bridge::project;
+        use crate::verdict::{SafetyLevel, Verdict};
+
+        // to stdout: the bulk remote read alone — one capability, auto-approves as a read.
+        let stdout = resolve(&toks(&["supabase", "db", "dump", "--data-only"])).expect("dump resolves");
+        assert_eq!(stdout.capabilities.len(), 1, "stdout dump = the remote read only");
+        assert_eq!(stdout.capabilities[0].scale, Scale::Unbounded, "a dump records its volume");
+        assert_eq!(project(&stdout), Verdict::Allowed(SafetyLevel::SafeRead), "bulk read auto-approves");
+
+        // -f into the worktree: read + a worktree write → still auto-approves (SafeWrite).
+        for cmd in [
+            vec!["supabase", "db", "dump", "-f", "dump.sql"],
+            vec!["supabase", "db", "dump", "--file=dump.sql", "--data-only"],
+        ] {
+            let p = resolve(&toks(&cmd)).expect("dump resolves");
+            assert_eq!(p.capabilities.len(), 2, "{cmd:?}: the remote read + a local write");
+            assert_eq!(project(&p), Verdict::Allowed(SafetyLevel::SafeWrite), "{cmd:?}");
+        }
+
+        // -f onto a system path: the write gates on locus → denied, in every spelling — space,
+        // glued `=`, AND the glued short `-f/path` that mustn't be a bypass.
+        for cmd in [
+            vec!["supabase", "db", "dump", "-f", "/etc/passwd"],
+            vec!["supabase", "db", "dump", "--file=/etc/passwd"],
+            vec!["supabase", "db", "dump", "-f/etc/passwd"],
+        ] {
+            assert_eq!(project(&resolve(&toks(&cmd)).expect("resolves")), Verdict::Denied, "{cmd:?} writes a system path");
+        }
+    }
+
+    /// `sudo`/`doas` elevate the wrapped command's AUTHORITY — the resolver that finally gives
+    /// `local-admin` something to admit. `sudo <safe cmd>` = a root op (above every user-authority
+    /// band); `sudo rm -rf /` stays the catastrophe corner; `-u`/`-i` and unknown options fail up.
+    #[test]
+    fn sudo_elevates_the_wrapped_commands_authority() {
+        use crate::engine::bridge::project;
+        use crate::verdict::Verdict;
+        let (dev, local, net, yolo) = (level("developer"), level("local-admin"), level("network-admin"), level("yolo"));
+
+        // sudo cat ./notes — a ROOT read. Authority lifts to root; every band below local-admin pins
+        // authority=user, so it lands at local-admin (and yolo), NOT developer/network-admin.
+        let read = resolve(&toks(&["sudo", "cat", "./notes.md"])).expect("sudo cat resolves");
+        assert_eq!(read.capabilities[0].authority, Authority::Root, "authority lifted to root");
+        assert!(!dev.admits(&read) && !net.admits(&read), "a root op is above the user-authority bands");
+        assert!(local.admits(&read) && yolo.admits(&read), "a root read is local-admin");
+
+        // benign flag clusters are skipped without losing the inner command (space + glued values too).
+        assert_eq!(resolve(&toks(&["sudo", "-EH", "cat", "./x"])).unwrap().capabilities[0].authority, Authority::Root);
+        assert_eq!(resolve(&toks(&["sudo", "-n", "-p", "pw", "cat", "./x"])).unwrap().capabilities[0].authority, Authority::Root);
+
+        // bumping authority does NOT rescue the catastrophe corner.
+        assert_eq!(project(&resolve(&toks(&["sudo", "rm", "-rf", "/"])).unwrap()), Verdict::Denied, "sudo rm -rf / denied everywhere");
+
+        // -u (run as another user) → other-user authority → yolo-only (identity confusion tops the ladder).
+        let other = resolve(&toks(&["sudo", "-u", "bob", "cat", "./x"])).expect("sudo -u resolves");
+        assert_eq!(other.capabilities[0].authority, Authority::OtherUser, "-u = run as other user");
+        assert!(!local.admits(&other) && yolo.admits(&other), "other-user is yolo-only");
+        assert_eq!(resolve(&toks(&["sudo", "-ubob", "cat", "./x"])).unwrap().capabilities[0].authority, Authority::OtherUser, "glued -ubob");
+
+        // -i / -s / -e launch a root shell or editor → arbitrary code, worst-cased.
+        assert_eq!(project(&resolve(&toks(&["sudo", "-i"])).unwrap()), Verdict::Denied, "sudo -i is a root shell");
+        assert!(!local.admits(&resolve(&toks(&["sudo", "-s", "bash"])).unwrap()), "root shell not local-admin");
+
+        // an UNRECOGNIZED sudo option fails closed.
+        assert_eq!(project(&resolve(&toks(&["sudo", "--nonsense", "cat", "./x"])).unwrap()), Verdict::Denied, "unknown option worst-cases");
+
+        // an UNRESOLVED inner → None, so the caller's legacy fallback denies (never looser than bare).
+        assert!(resolve(&toks(&["sudo", "totallyunknowncmd", "x"])).is_none(), "unresolved inner → legacy denies");
+        // `sudo` with no command → None (legacy decides).
+        assert!(resolve(&toks(&["sudo", "-v"])).is_none(), "no inner command");
+
+        // doas is the same wrapper.
+        assert_eq!(resolve(&toks(&["doas", "cat", "./x"])).unwrap().capabilities[0].authority, Authority::Root);
+
+        // NEVER LOOSER: at the default band every `sudo …` is denied (root authority is auto-approved
+        // by NO level below local-admin), exactly like the legacy classifier, which denies sudo whole.
+        for cmd in ["sudo cat ./notes.md", "sudo rm -rf ./build", "sudo -EH cat ./x", "sudo -u bob ls"] {
+            assert_eq!(crate::command_verdict(cmd), Verdict::Denied, "`{cmd}` must not auto-approve at the default band");
+        }
+    }
+
+    /// systemctl — the first REAL command user of the `local-privileged` archetype. Read subs stay
+    /// SafeRead (any band); service-management subs land at local-admin; and `sudo systemctl restart`
+    /// (previously fail-closed, since systemctl's inner sub was unmodeled) now resolves to local-admin.
+    #[test]
+    fn systemctl_service_management_is_local_admin() {
+        use crate::verdict::Verdict;
+        let (dev, local, net, yolo) = (level("developer"), level("local-admin"), level("network-admin"), level("yolo"));
+
+        // service management → local-privileged: local-admin and yolo admit; developer/network-admin don't.
+        for sub in ["restart", "start", "stop", "enable", "disable", "mask", "daemon-reload", "kill"] {
+            let p = resolve(&toks(&["systemctl", sub, "nginx"])).unwrap_or_else(|| panic!("systemctl {sub} resolves"));
+            assert!(!dev.admits(&p) && !net.admits(&p), "systemctl {sub} is above developer/network-admin");
+            assert!(local.admits(&p) && yolo.admits(&p), "systemctl {sub} is local-admin");
+        }
+        // reads stay auto-approvable (SafeRead), a power-state sub denies by omission (not modeled).
+        assert!(crate::command_verdict("systemctl status nginx").is_allowed(), "status reads");
+        assert_eq!(crate::command_verdict("systemctl reboot"), Verdict::Denied, "reboot omitted → denied");
+
+        // the fail-closed case is fixed: `sudo systemctl restart` resolves the inner sub (already root).
+        let sudo_restart = resolve(&toks(&["sudo", "systemctl", "restart", "nginx"])).expect("resolves");
+        assert!(local.admits(&sudo_restart), "sudo systemctl restart is local-admin");
+        assert_eq!(crate::command_verdict("sudo systemctl restart nginx"), Verdict::Denied, "still not auto-approved at default");
+    }
+
+    /// The flag-conditional-archetype resolver (the `when_absent` mechanism, npm exemplar):
+    /// `npm ci --ignore-scripts` is a PINNED, scripts-off install → `local-install-pinned`
+    /// (developer). Dropping `--ignore-scripts` escalates it to `supply-chain-build` (yolo — runs
+    /// fetched code at install). `npm install`/`i` are FLOATING → always `supply-chain-build`. This
+    /// is the pattern the package-manager fan-out replicates.
+    #[test]
+    fn npm_install_is_classified_by_pinning_and_scripts_off() {
+        let (dev, yolo) = (level("developer"), level("yolo"));
+
+        // pinned (ci) + scripts-off → developer.
+        let safe = resolve(&toks(&["npm", "ci", "--ignore-scripts"])).expect("npm ci --ignore-scripts");
+        assert!(dev.admits(&safe), "pinned, scripts-off ci is developer");
+
+        // pinned but scripts-ON → the --ignore-scripts ABSENCE escalates to supply-chain-build → yolo.
+        let scripts_on = resolve(&toks(&["npm", "ci"])).expect("npm ci");
+        assert!(!dev.admits(&scripts_on), "ci without --ignore-scripts runs fetched code → above developer");
+        assert!(yolo.admits(&scripts_on), "and lands at yolo");
+
+        // floating installs → supply-chain-build regardless of flags.
+        for c in [&["npm", "install"][..], &["npm", "install", "left-pad"], &["npm", "i", "react"], &["npm", "install", "--ignore-scripts"]] {
+            let p = resolve(&toks(c)).unwrap_or_else(|| panic!("{c:?} resolves"));
+            assert!(!dev.admits(&p) && yolo.admits(&p), "{c:?}: floating install → supply-chain (yolo)");
         }
     }
 
@@ -1646,9 +2040,7 @@ mod tests {
         for cmd in [
             vec!["cat", "-Z", "./x"],
             vec!["cat", "--wat", "./x"],
-            vec!["grep", "-P", "foo", "f"], // PCRE → (?{code}) executes; must not slip through
-            vec!["grep", "--perl-regexp", "foo", "f"],
-            vec!["grep", "-iP", "foo", "f"], // unknown char inside a cluster
+            vec!["grep", "-Q", "foo", "f"], // unknown grep short char (-Z is benign: --null)
             vec!["grep", "-R", "foo", "dir"], // -R follows symlinks → escapes locus (M2)
         ] {
             let p = resolve(&toks(&cmd)).expect("resolver");
@@ -1691,47 +2083,193 @@ mod tests {
         }
     }
 
-    /// The touched-path probe invocations for a resolver, derived from its declared
-    /// [`Operands`] contract: `hot` fills each touched slot in turn (`@`, which may be inside
-    /// a token for `Custom`), other slots get a benign path. Non-path slots (grep's pattern)
-    /// are never filled with `hot`.
-    fn probes(cmd: &str, kind: Operands, hot: &str) -> Vec<Vec<String>> {
+    /// The exact roster of commands classified by `[command.behavior]`. Pinning it turns a
+    /// DROPPED or typo'd behavior block into a test failure: `TomlCommand` deliberately lacks
+    /// `deny_unknown_fields` (it must tolerate `[[trusted]]`), so a mistyped top-level key
+    /// (`behaviour = …`) is silently dropped and the command reverts to its PERMISSIVE legacy
+    /// fallback — a fail-open the enumeration guards can't see (they `continue` on `None`). This
+    /// roster is that missing tripwire, and the guards below derive their non-vacuity floors from
+    /// it so the floors track reality. Update deliberately when porting a command. `echo` is a
+    /// none-role printer; `dd`/`tar`/`sed` are hook commands; `grep` is a hook + pattern-then-read;
+    /// the other 10 are the plain positional coreutils.
+    const EXPECTED_BEHAVIOR_COMMANDS: &[&str] = &[
+        "cat", "cp", "dd", "echo", "grep", "head", "ln", "mkdir", "mv", "rm", "sed", "tail",
+        "tar", "touch", "wc",
+    ];
+
+    /// The behavior roster is exactly `EXPECTED_BEHAVIOR_COMMANDS` — no command silently lost its
+    /// `[command.behavior]` (fail-open) and none was added without being pinned. Red→green: delete
+    /// one command's behavior block and this fails.
+    #[test]
+    fn behavior_command_roster_is_pinned() {
+        use std::collections::BTreeSet;
+        let actual: BTreeSet<&str> = crate::registry::toml_command_names()
+            .into_iter()
+            .filter(|n| crate::registry::command_behavior(n).is_some())
+            .collect();
+        let expected: BTreeSet<&str> = EXPECTED_BEHAVIOR_COMMANDS.iter().copied().collect();
+        assert_eq!(
+            actual, expected,
+            "behavior-command roster drifted — a [command.behavior] block was added, dropped, or \
+             typo'd. A dropped block silently reverts the command to its fail-open legacy path."
+        );
+    }
+
+    /// Hot-path probes for a `[command.behavior]` command, keyed on its declared operand role
+    /// (the parallel of `probes` for the `Operands` enum). A `@` in a slot is the hot path.
+    fn behavior_probes(cmd: &str, role: crate::registry::types::PositionalRole, hot: &str) -> Vec<Vec<String>> {
+        use crate::registry::types::PositionalRole;
         let inv = |slots: &[&str]| -> Vec<String> {
             std::iter::once(cmd.to_string()).chain(slots.iter().map(|s| s.replace('@', hot))).collect()
         };
-        match kind {
-            Operands::None => vec![],
-            Operands::Paths => vec![inv(&["@"])],
-            Operands::PatternThenPaths => vec![inv(&["PATTERN", "@"])],
-            Operands::Transfer => vec![inv(&["@", "./safe"]), inv(&["./safe", "@"])],
-            Operands::Custom(templates) => templates.iter().map(|t| inv(t)).collect(),
+        match role {
+            PositionalRole::None => vec![],
+            PositionalRole::Read | PositionalRole::Write => vec![inv(&["@"])],
+            PositionalRole::PatternThenRead => vec![inv(&["PATTERN", "@"])],
+            PositionalRole::Transfer => vec![inv(&["@", "./safe"]), inv(&["./safe", "@"])],
         }
     }
 
-    /// The conservation law (HP-18): every touched path operand must contribute a capability
-    /// at its own locus, so a hot path in ANY touched slot forces denial — no operand is
-    /// silently dropped. Generalizes the transfer differential to the whole corpus and would
-    /// catch a future single-file reader that forgets its `observe`. The probes are derived
-    /// from each resolver's [`Operands`] contract in `RESOLVERS` — one source of truth, so
-    /// adding a resolver (which must declare its `Operands`) is covered automatically.
+    /// Hot-path probes for a HOOK command, whose irregular operand syntax `behavior_probes`
+    /// (positional roles) can't express — dd's `key=value`, tar's dashless mode bundles, sed's
+    /// script. The `match` is EXHAUSTIVE, so a new `BehaviorHook` variant must declare its probe
+    /// rows here or the build breaks — restoring the "new entry covered automatically" property the
+    /// deleted `every_touched_path_operand_is_gated` had via `Operands::Custom`. `@` = the hot slot.
+    fn hook_probes(hook: crate::registry::types::BehaviorHook, cmd: &str, hot: &str) -> Vec<Vec<String>> {
+        use crate::registry::types::BehaviorHook;
+        let inv = |slots: &[&str]| -> Vec<String> {
+            std::iter::once(cmd.to_string()).chain(slots.iter().map(|s| s.replace('@', hot))).collect()
+        };
+        match hook {
+            // grep is pattern-then-read → already probed by `behavior_probes`; no extra rows.
+            BehaviorHook::Grep => vec![],
+            BehaviorHook::Dd => vec![inv(&["if=@", "of=./safe"]), inv(&["if=./safe", "of=@"])],
+            BehaviorHook::Tar => vec![inv(&["cf", "./s.tar", "@"]), inv(&["cf", "@", "./s"]), inv(&["tf", "@"])],
+            BehaviorHook::Sed => vec![inv(&["s/x/y/", "@"]), inv(&["-i", "s/x/y/", "@"])],
+        }
+    }
+
+    /// Fail-closed, enumerated over the REGISTRY: every `[command.behavior]` command denies an
+    /// operand on a hot path (a secret, home, system, or unpinnable locus), AND a write-role
+    /// command denies a write into the worktree-trusted rung (`.git/config`). Restores and
+    /// generalizes `every_touched_path_operand_is_gated` for the declarative path — a command
+    /// ported off Rust is covered automatically. Red→green: make `resolve_behavior` skip
+    /// `classify_locus` and this fails on the first probe.
     #[test]
-    fn every_touched_path_operand_is_gated() {
+    fn every_behavior_command_gates_hot_operands() {
         use crate::engine::bridge::project;
+        use crate::registry::types::PositionalRole;
         use crate::verdict::Verdict;
 
-        let mut exercised = 0usize;
-        for (name, _, kind) in RESOLVERS {
+        let deny = |cmd: &[String], why: &str| {
+            let refs: Vec<&str> = cmd.iter().map(String::as_str).collect();
+            let profile = resolve(&toks(&refs)).expect("behavior command resolves");
+            assert_eq!(project(&profile), Verdict::Denied, "{cmd:?}: {why}");
+        };
+
+        let mut path_bearing = 0usize;
+        let mut hook_bearing = 0usize;
+        for name in crate::registry::toml_command_names() {
+            let Some(b) = crate::registry::command_behavior(name) else { continue };
+            if !matches!(b.positionals, PositionalRole::None) {
+                path_bearing += 1;
+            }
+            if b.hook.is_some() {
+                hook_bearing += 1;
+            }
             for hot in HOT_PATHS {
-                for cmd in probes(name, *kind, hot) {
-                    let refs: Vec<&str> = cmd.iter().map(String::as_str).collect();
-                    let profile = resolve(&toks(&refs)).expect("resolves");
-                    assert_eq!(project(&profile), Verdict::Denied, "{cmd:?}: touched hot path not gated");
-                    exercised += 1;
+                for cmd in behavior_probes(name, b.positionals, hot) {
+                    deny(&cmd, "touched hot path not gated");
+                }
+                // Hook commands (dd/tar/sed) have irregular operand syntax, so they are swept by
+                // their own probe table — restoring the enumerated coverage the deleted RESOLVERS
+                // sweep gave them.
+                if let Some(hook) = b.hook {
+                    for cmd in hook_probes(hook, name, hot) {
+                        deny(&cmd, "hook: touched hot path not gated");
+                    }
                 }
             }
+            // Worktree-trusted is a WRITE boundary only: reading `.git/config` (cat/grep) is
+            // legitimately allowed, but a write/destroy/relocate into it must deny. Probe the
+            // write face — the destination slot for a transfer, the operand for a plain write.
+            let inv = |slots: &[&str]| -> Vec<String> {
+                std::iter::once(name.to_string()).chain(slots.iter().map(|s| s.to_string())).collect()
+            };
+            match b.positionals {
+                PositionalRole::Write => deny(&inv(&[".git/config"]), "write into worktree-trusted not gated"),
+                PositionalRole::Transfer => deny(&inv(&["./safe", ".git/config"]), "transfer dest into worktree-trusted not gated"),
+                _ => {}
+            }
         }
-        // Non-vacuity: every path-bearing resolver contributed at least one probe per hot path.
-        let path_bearing = RESOLVERS.iter().filter(|(_, _, k)| !matches!(k, Operands::None)).count();
-        assert!(exercised >= path_bearing * HOT_PATHS.len(), "sweep ran only {exercised}");
+        // Non-vacuity: every path-bearing AND every hook command on the roster was reached and
+        // probed. Derived from the roster (not a magic number) — none-role printers (echo) don't
+        // positionally gate; hook commands (dd/tar/sed) gate via `hook_probes`.
+        let count = |pred: fn(&crate::registry::types::BehaviorSpec) -> bool| {
+            EXPECTED_BEHAVIOR_COMMANDS
+                .iter()
+                .filter(|n| crate::registry::command_behavior(n).is_some_and(pred))
+                .count()
+        };
+        assert_eq!(
+            path_bearing,
+            count(|b| !matches!(b.positionals, PositionalRole::None)),
+            "path-bearing behavior commands: saw {path_bearing}"
+        );
+        assert_eq!(hook_bearing, count(|b| b.hook.is_some()), "hook behavior commands: saw {hook_bearing}");
+    }
+
+    /// Fail-closed on unknown flags, enumerated over the REGISTRY: every DECLARATIVE flag-walking
+    /// behavior command (a Read/Write/Transfer role, hookless) worst-cases an unrecognized flag —
+    /// the `walk_positionals` → `worst` path. Exempt: `grep` (its hook treats an unknown `--token`
+    /// as a search pattern — keyed on `BehaviorHook::Grep` SPECIFICALLY, not `hook.is_some()`, so a
+    /// future hook variant is not auto-exempted), and none-role commands (echo prints its args;
+    /// dd/tar/sed parse their own irregular syntax — all covered by their own resolver tests, and
+    /// none-role commands take no positional path operands, so an unknown flag can't unlock danger).
+    #[test]
+    fn every_hookless_behavior_command_worst_cases_unknown_flags() {
+        use crate::engine::bridge::project;
+        use crate::registry::types::{BehaviorHook, PositionalRole};
+        use crate::verdict::Verdict;
+
+        let exempt = |b: &crate::registry::types::BehaviorSpec| {
+            matches!(b.hook, Some(BehaviorHook::Grep)) || matches!(b.positionals, PositionalRole::None)
+        };
+        let mut checked = 0usize;
+        for name in crate::registry::toml_command_names() {
+            let Some(b) = crate::registry::command_behavior(name) else { continue };
+            if exempt(b) {
+                continue;
+            }
+            let profile = resolve(&toks(&[name, "--xyzzy-unknown-42", "./safe"])).expect("resolves");
+            assert_eq!(project(&profile), Verdict::Denied, "{name}: unknown flag not worst-cased");
+            checked += 1;
+        }
+        let expected = EXPECTED_BEHAVIOR_COMMANDS
+            .iter()
+            .filter(|n| crate::registry::command_behavior(n).is_some_and(|b| !exempt(b)))
+            .count();
+        assert_eq!(checked, expected, "declarative flag-walking behavior commands: saw {checked}");
+    }
+
+    /// Fail-closed authoring guard: `path_flag_caps` (which gates a valued flag's path VALUE, e.g.
+    /// `touch -r REF`) runs ONLY on the declarative Read/Write/Transfer path — the None arm (echo)
+    /// and the hook arm (grep/dd/tar/sed) both return before it. So a `[command.behavior.flags]`
+    /// path-role declared on a none-role or hook command would be SILENTLY UNGATED — a fail-open.
+    /// Assert no command does that. Red→green: add `kind = "read"` to a hook command's flags.
+    #[test]
+    fn no_none_or_hook_command_declares_ungated_path_flags() {
+        use crate::registry::types::PositionalRole;
+        for name in crate::registry::toml_command_names() {
+            let Some(b) = crate::registry::command_behavior(name) else { continue };
+            if b.path_flags.is_empty() {
+                continue;
+            }
+            assert!(
+                b.hook.is_none() && !matches!(b.positionals, PositionalRole::None),
+                "{name}: behavior path-flags are gated only on the Read/Write/Transfer path; on a \
+                 none-role or hook command they would be silently ungated (fail-open)"
+            );
+        }
     }
 }

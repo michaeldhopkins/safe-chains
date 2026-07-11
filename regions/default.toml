@@ -1,47 +1,43 @@
-# Filesystem region model (HP-20).
+# Filesystem region model (minimal, post-retreat).
 #
-# A positive, structured classifier over paths, the read/write analogue of the command
-# allowlist. Each [[region]] maps a path shape to a ROLE; each role projects to the existing
-# facets through TWO faces — a read face and a write face — plus a `reads_secret` bit. The
-# same path read is safe / written is denied, because the operation selects the face.
+# safe-chains classifies COMMANDS; it is deliberately NOT a filesystem trust database. Modeling
+# "what every path on every machine means" is unbounded, per-machine, and drifts — and an
+# adversarial audit of the old broad admit map (public /etc, /proc, /usr, /var/log, /Library)
+# found it leaking (macOS keychain, Homebrew service configs, auth logs). Filesystem enforcement
+# belongs to a sandbox / the OS / the harness, not a static string classifier (same scope stance
+# as $PATH and hostile checkouts — see AGENTS.md §0.2).
 #
-# Matching (runs AFTER the `$VAR` / `..` fail-closed guard in locus.rs, which already
-# worst-cases unpinnable paths to machine — so only pinned, escape-free paths reach here):
-#   • a `path` ending in `/`        → SUBTREE prefix   (`/proc/` matches everything under it)
-#   • a `path` ending in `*`        → STRING prefix    (`/dev/sd*` matches /dev/sda, /dev/sda1)
-#   • a `path` with no `/` at all   → SEGMENT match     (`.git` matches any path component ==.git)
-#   • otherwise                     → EXACT file        (`/etc/hosts`)
-#   • most-specific match wins (exact > longer prefix/segment > shorter); a sensitive
-#     carve-out is simply a deeper node than the region it sits in.
-#   • an absolute path matching NOTHING → the `unknown` role (deny read & write). Fail-closed.
+# So this file is TINY and does only what a static classifier can honestly do:
+#   • the WORKSPACE (relative paths under the harness cwd) is read/write — the agent was invited
+#     there. That's the default `worktree` role; no node needed.
+#   • a few `.git`/`.envrc`-style in-project files are read-safe but WRITE-frozen (a hook/direnv
+#     write is code-injection).
+#   • scratch (`/tmp`) and standard streams (`/dev/null`, fd pseudo-files) are read/write.
+#   • a small CREDENTIAL SHIELD (`.ssh`, `.aws`, …) is denied and — crucially — a user grant can
+#     NEVER widen it (see `apply_grant`), so `grant ~/` still can't hand over an SSH key.
+#   • EVERYTHING ELSE (any absolute or `~` path matching nothing) → `unknown` → deny/abstain.
+#     Reading `/etc/hosts` or `/usr/bin/python3` now prompts instead of auto-approving; a user
+#     who wants those adds a read grant to ~/.config/safe-chains.toml. This is the retreat: we
+#     stop guessing the filesystem and let the user's grants encode their own machine's truth.
 #
-# `os` scopes a node to a platform ("linux" | "macos"); omitted = all. Because the default is
-# deny, we almost only scope the *admit* nodes.
+# Matching (header rules unchanged): a `path` ending `/` = SUBTREE prefix; ending `*` = STRING
+# prefix; no `/` = SEGMENT (matches any path component == it, at any depth); else EXACT. Most
+# specific wins; fail-closed to `unknown`. Credential shields are SEGMENTS so they bite whatever
+# the spelling (`~/.ssh/id_rsa`, a relative `.ssh/id_rsa`, a `.ssh/` inside a granted tree).
 #
-# PROVENANCE (mirrors the command engine's `researched_version` discipline): every [[region]]
-# carries a `note` — an independent safety analysis of WHAT the path holds and WHY it earns
-# its role, written as if by someone who doesn't know how we'll use it — and a `researched`
-# date. The date is the re-verification tripwire: filesystem conventions drift (distros
-# relocate files, macOS reorganizes, a new secret lands inside a safe region), and the next
-# person re-researching a node diffs against what was true on that date. When you touch a
-# node, refresh both. Roles carry `description` (policy, stable); regions carry `note` +
-# `researched` (empirical claims about the filesystem, dated).
+# PROVENANCE: every node keeps a `note` (why it earns its role) and a dated `researched`.
 
 # ── Roles: role → { read face, write face, secret } ────────────────────────────────────────
-# read_locus / write_locus are LocalLocus rungs. read-local admits observe ≤ worktree-trusted;
-# write levels admit create/mutate/destroy ≤ worktree. So a read face of "worktree-trusted"
-# is admitted for READS and a write face of "machine" is DENIED for writes — the asymmetry.
-
 [role.worktree]
-description = "The project tree (relative paths)."
+description = "The project tree (relative paths under the workspace). Read + write."
 read_locus = "worktree"
 write_locus = "worktree"
 reads_secret = false
 
 [role.worktree-trusted]
-description = "Worktree files another tool auto-trusts/executes (.git internals, .envrc). Read-safe; writes frozen (a hook/config write is code-injection)."
+description = "In-project files another tool auto-executes (.git internals, .envrc). Read-safe; writes frozen (a hook/config write is code-injection)."
 read_locus = "worktree-trusted"
-write_locus = "worktree-trusted"   # above the worktree write ceiling → denied
+write_locus = "worktree-trusted"
 reads_secret = false
 
 [role.scratch]
@@ -56,483 +52,317 @@ read_locus = "process"
 write_locus = "process"
 reads_secret = false
 
-[role.public-config]
-description = "World-readable, non-secret system configuration. Safe to read; writing it reconfigures the machine."
-read_locus = "worktree-trusted"   # admitted at read-local
-write_locus = "machine"           # denied at local levels
-reads_secret = false
-
-[role.kernel-info]
-description = "Synthetic kernel/introspection filesystems (/proc, /sys). Reads are introspection; writes retune the kernel."
-read_locus = "worktree-trusted"
-write_locus = "machine"
-reads_secret = false
-
-[role.system-log]
-description = "Diagnostic logs. Readable; writing/rotating is a system op."
-read_locus = "worktree-trusted"
-write_locus = "machine"
-reads_secret = false
-
-[role.installed-software]
-description = "Installed binaries/libraries/shared data. Reading is fine; writing is install/tamper."
-read_locus = "worktree-trusted"
-write_locus = "machine"
-reads_secret = false
-
-[role.user-home-private]
-description = "The user's home — private data. Reads disclose personal content; denied by locus."
-read_locus = "user"
-write_locus = "user"
-reads_secret = false
-
 [role.credential-store]
-description = "Known credential/secret stores. Reading is credential extraction (fires the secret facet, follow-on); writing grants trust."
+description = "Known credential/secret stores. Denied, and a user grant may NOT widen them (the shield)."
 read_locus = "machine"
 write_locus = "machine"
 reads_secret = true
 
-[role.restricted]
-description = "Recognized-but-sensitive system paths (privileged config, auth logs) — denied, but named so --explain says why."
-read_locus = "machine"
+[role.safe-chains-config]
+description = "safe-chains' own config. Read-OK, but write DENIED and un-grantable — an agent must not rewrite the file that governs what it may do."
+read_locus = "worktree-trusted"
 write_locus = "machine"
 reads_secret = false
-
-[role.device]
-description = "Raw block/char devices — beneath the filesystem."
-read_locus = "device"
-write_locus = "device"
-reads_secret = false
+pinned = true
 
 [role.unknown]
-description = "Fail-closed default: any absolute path matching no region. Deny read & write."
+description = "Fail-closed default: any absolute/home path matching no region. Deny read & write (the harness then prompts)."
 read_locus = "machine"
 write_locus = "machine"
 reads_secret = false
 
-# ── Structural: worktree trust + scratch + streams ─────────────────────────────────────────
-
+# ── In-project trust carve-outs: read-safe, write-frozen (code-injection) ───────────────────
 [[region]]
 path = ".git"
 role = "worktree-trusted"
-note = "Git metadata dir; hooks/ and config execute code on git operations, so a write is code-injection. Nests at any depth. Long-stable git convention."
-researched = "2026-07-11"
-
+note = "Git metadata dir; hooks/ and config execute code on git operations, so a write is code-injection. Nests at any depth."
+researched = "2026-07-12"
 [[region]]
 path = ".envrc"
 role = "worktree-trusted"
-note = "direnv auto-executes .envrc on cd into its directory; a write plants code that runs on the next shell entry. Stable direnv convention."
-researched = "2026-07-11"
+note = "direnv auto-executes .envrc on cd into its directory; a write plants code that runs on the next shell entry."
+researched = "2026-07-12"
 
+# ── Scratch + standard streams: read/write ─────────────────────────────────────────────────
 [[region]]
 path = "/tmp/"
 role = "scratch"
-note = "FHS world-writable temp, conventionally cleared on boot; ephemeral scratch. Present on Linux and macOS (macOS /tmp symlinks to /private/tmp)."
-researched = "2026-07-11"
-
+note = "FHS world-writable temp; ephemeral scratch. Both OSes (macOS /tmp symlinks to /private/tmp)."
+researched = "2026-07-12"
 [[region]]
 path = "/var/tmp/"
 role = "scratch"
-note = "FHS temp preserved across reboots; still process-throwaway in intent. Both OSes."
-researched = "2026-07-11"
-
+note = "FHS temp preserved across reboots; still process-throwaway in intent."
+researched = "2026-07-12"
 [[region]]
 path = "/private/tmp/"
 role = "scratch"
 os = ["macos"]
-note = "macOS's real temp directory; /tmp is a symlink to here. Same ephemeral scratch role."
-researched = "2026-07-11"
-
+note = "macOS's real temp directory; /tmp is a symlink to here."
+researched = "2026-07-12"
 [[region]]
 path = "/private/var/tmp/"
 role = "scratch"
 os = ["macos"]
 note = "macOS real location of /var/tmp."
-researched = "2026-07-11"
-
+researched = "2026-07-12"
 [[region]]
 path = "/dev/null"
 role = "standard-stream"
-note = "POSIX bit-bucket; discards writes, empty on read. No filesystem object touched."
-researched = "2026-07-11"
+note = "POSIX bit-bucket; discards writes, empty on read."
+researched = "2026-07-12"
 [[region]]
 path = "/dev/stdout"
 role = "standard-stream"
 note = "POSIX stdout pseudo-file — the process's own output stream."
-researched = "2026-07-11"
+researched = "2026-07-12"
 [[region]]
 path = "/dev/stderr"
 role = "standard-stream"
 note = "POSIX stderr pseudo-file — the process's own error stream."
-researched = "2026-07-11"
+researched = "2026-07-12"
 [[region]]
 path = "/dev/tty"
 role = "standard-stream"
-note = "The controlling terminal; process-local I/O, no persistent fs object."
-researched = "2026-07-11"
+note = "The controlling terminal; process-local I/O."
+researched = "2026-07-12"
 [[region]]
 path = "/dev/fd/"
 role = "standard-stream"
 note = "Per-process file-descriptor pseudo-files (process substitution). Process-local."
-researched = "2026-07-11"
+researched = "2026-07-12"
 
-# ── Raw devices (mirrors locus.rs is_raw_device) ───────────────────────────────────────────
+# ── Credential shield: SEGMENT matches, denied everywhere, and NOT widenable by a grant. The
+#    only "denylist" we keep, and only because a broad grant (`grant ~/`) would otherwise hand
+#    over these. A project that literally contains one of these dirs is denied too — rare and
+#    acceptable. Everything else in home is already deny-by-default; these just can't be granted. ─
 [[region]]
-path = "/dev/disk*"
-role = "device"
-note = "Block storage device node (prefix, so /dev/disk0s1 etc.). A write bypasses the fs and can corrupt volumes; a read exposes raw storage. macOS + some Linux."
-researched = "2026-07-11"
+path = ".ssh"
+role = "credential-store"
+note = "SSH private keys / authorized_keys / known_hosts — credential + trust store."
+researched = "2026-07-12"
 [[region]]
-path = "/dev/rdisk*"
-role = "device"
-note = "macOS raw (unbuffered) disk device — dd's target for whole-disk images. Below the fs."
-researched = "2026-07-11"
+path = ".aws"
+role = "credential-store"
+note = "AWS access keys / session credentials."
+researched = "2026-07-12"
 [[region]]
-path = "/dev/sd*"
-role = "device"
-os = ["linux"]
-note = "Linux SCSI/SATA block devices (/dev/sda…). Raw storage, below the fs."
-researched = "2026-07-11"
+path = ".gnupg"
+role = "credential-store"
+note = "GnuPG private keyring and trust database."
+researched = "2026-07-12"
 [[region]]
-path = "/dev/nvme*"
-role = "device"
-note = "NVMe block devices. Raw storage, below the fs."
-researched = "2026-07-11"
+path = ".kube"
+role = "credential-store"
+note = "Kubernetes kubeconfig — cluster credentials and tokens."
+researched = "2026-07-12"
 [[region]]
-path = "/dev/mem*"
-role = "device"
-note = "Raw physical memory. Reading exposes arbitrary process/kernel memory; the deepest non-kernel reach."
-researched = "2026-07-11"
+path = ".docker"
+role = "credential-store"
+note = "Docker registry auth tokens / credential-helper config."
+researched = "2026-07-12"
 [[region]]
-path = "/dev/kmem*"
-role = "device"
-note = "Raw kernel virtual memory. Same exposure as /dev/mem."
-researched = "2026-07-11"
-[[region]]
-path = "/dev/hd*"
-role = "device"
-os = ["linux"]
-note = "Legacy IDE/PATA block devices (/dev/hda…). Raw storage."
-researched = "2026-07-11"
-[[region]]
-path = "/dev/vd*"
-role = "device"
-os = ["linux"]
-note = "virtio block devices (/dev/vda…) under virtualization. Raw storage."
-researched = "2026-07-11"
-[[region]]
-path = "/dev/mmcblk*"
-role = "device"
-os = ["linux"]
-note = "eMMC/SD block devices. Raw storage."
-researched = "2026-07-11"
-[[region]]
-path = "/dev/loop*"
-role = "device"
-os = ["linux"]
-note = "Loopback block devices. Raw storage."
-researched = "2026-07-11"
-[[region]]
-path = "/dev/port*"
-role = "device"
-os = ["linux"]
-note = "Raw I/O port access. Below the fs, hardware-level."
-researched = "2026-07-11"
-[[region]]
-path = "/dev/mtd*"
-role = "device"
-os = ["linux"]
-note = "Raw flash (memory-technology device). Below the fs."
-researched = "2026-07-11"
+path = ".netrc"
+role = "credential-store"
+note = "Plaintext machine login credentials for ftp/curl/git."
+researched = "2026-07-12"
 
-# ── /etc: NOT a blanket region (public configs + credential stores mixed). Enumerate. ──────
-[[region]]
-path = "/etc/hosts"
-role = "public-config"
-note = "Static hostname→IP map, conventionally world-readable (0644), holds no secrets. Present on Linux and macOS."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/os-release"
-role = "public-config"
-note = "freedesktop distro-identity file; world-readable, non-secret. Linux (some macOS tooling absent)."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/resolv.conf"
-role = "public-config"
-note = "DNS resolver config; world-readable. May reveal internal DNS server IPs — low sensitivity, not a secret."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/services"
-role = "public-config"
-note = "IANA port↔service-name map; static, public reference data."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/protocols"
-role = "public-config"
-note = "IP protocol-number map; static, public reference data."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/nsswitch.conf"
-role = "public-config"
-note = "Name-service lookup order; world-readable, non-secret."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/hostname"
-role = "public-config"
-note = "The machine's hostname; world-readable, non-secret."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/localtime"
-role = "public-config"
-note = "Timezone data (usually a symlink into zoneinfo); non-secret. Symlink target isn't followed (charter)."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/fstab"
-role = "public-config"
-note = "Static mount table; world-readable. Reveals disk/mount layout but no secrets."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/passwd"
-role = "public-config"
-note = "JUDGMENT CALL: world-readable by design; lists usernames/home dirs/shells but NO passwords (those are in shadow). Reading it is user-enumeration — benign and extremely common (getent-style)."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/group"
-role = "public-config"
-note = "World-readable group membership; no secrets (group passwords, if any, live in gshadow)."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/lsb-release"
-role = "public-config"
-os = ["linux"]
-note = "Distro release identity; non-secret."
-researched = "2026-07-11"
-
-# sensitive carve-outs inside /etc (deeper/exact → win over any future broadening)
+# ── System credential stores + other-user homes: absolute paths a broad grant (`grant /` or
+#    `grant /etc/`) would otherwise expose. Kept as un-grantable shields (the dotfile rule only
+#    covers hidden entries; these are not dotfiles). ──────────────────────────────────────────
 [[region]]
 path = "/etc/shadow"
 role = "credential-store"
 os = ["linux"]
-note = "Hashed user passwords — the credential store proper. Root-only (0640/0000). Reading it is credential extraction."
-researched = "2026-07-11"
+note = "Hashed user passwords — the credential store proper."
+researched = "2026-07-12"
 [[region]]
 path = "/etc/gshadow"
 role = "credential-store"
 os = ["linux"]
-note = "Hashed group passwords. Root-only. Credential store."
-researched = "2026-07-11"
+note = "Hashed group passwords."
+researched = "2026-07-12"
 [[region]]
 path = "/etc/master.passwd"
 role = "credential-store"
 os = ["macos"]
-note = "macOS shadow-equivalent — the real password hash store. Root-only."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/sudoers"
-role = "restricted"
-note = "Privilege-escalation policy; root-only. Not a secret, but reading/altering it is security-sensitive (controls who becomes root)."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/sudoers.d/"
-role = "restricted"
-note = "Drop-in sudoers fragments; same escalation sensitivity as /etc/sudoers."
-researched = "2026-07-11"
-[[region]]
-path = "/etc/ssh/"
-role = "restricted"
-note = "sshd config AND host PRIVATE keys (ssh_host_*_key). Blanket-denied because the private keys live here; a sshd_config-only public carve-out is a possible later refinement."
-researched = "2026-07-11"
+note = "macOS password hash store."
+researched = "2026-07-12"
 [[region]]
 path = "/etc/ssl/private/"
 role = "credential-store"
-note = "TLS/service private keys. Root-only. Credential store."
-researched = "2026-07-11"
+note = "TLS/service private keys."
+researched = "2026-07-12"
 [[region]]
-path = "/etc/ssl/certs/"
-role = "public-config"
-note = "Public CA and host CERTIFICATES (not keys); world-readable, non-secret. The safe sibling of ssl/private — demonstrates the same-parent read/deny split."
-researched = "2026-07-11"
-[[region]]
-path = "/private/etc/hosts"
-role = "public-config"
-os = ["macos"]
-note = "Resolved form of macOS /etc/hosts (/etc → /private/etc symlink). Same public map."
-researched = "2026-07-11"
-
-# ── /proc, /sys — kernel introspection (linux). /proc/<pid>/environ|mem leak, and wildcard
-#    segments aren't supported yet, so enumerate the uniformly-safe parts; /proc/<pid>/…
-#    falls through to unknown→deny until wildcard carve-outs land. ────────────────────────────
-[[region]]
-path = "/proc/sys/"
-role = "kernel-info"
-os = ["linux"]
-note = "Kernel tunables (sysctl view); readable introspection, non-secret. Writes retune the kernel (denied by the write face)."
-researched = "2026-07-11"
-[[region]]
-path = "/proc/cpuinfo"
-role = "kernel-info"
-os = ["linux"]
-note = "CPU topology/flags; non-secret introspection."
-researched = "2026-07-11"
-[[region]]
-path = "/proc/meminfo"
-role = "kernel-info"
-os = ["linux"]
-note = "Memory statistics; non-secret introspection."
-researched = "2026-07-11"
-[[region]]
-path = "/proc/loadavg"
-role = "kernel-info"
-os = ["linux"]
-note = "Load averages; non-secret."
-researched = "2026-07-11"
-[[region]]
-path = "/proc/mounts"
-role = "kernel-info"
-os = ["linux"]
-note = "Active mount table; non-secret (reveals mount layout, like fstab)."
-researched = "2026-07-11"
-[[region]]
-path = "/proc/version"
-role = "kernel-info"
-os = ["linux"]
-note = "Kernel version string; non-secret."
-researched = "2026-07-11"
-[[region]]
-path = "/sys/"
-role = "kernel-info"
-os = ["linux"]
-note = "BREADTH CALL: sysfs device/kernel attribute tree; non-secret in practice, but large and heterogeneous. Blanket-readable pending a reason to carve it."
-researched = "2026-07-11"
-
-# ── /var/log — logs generalize, BUT auth trails are sensitive. BREADTH CALL flagged. ───────
-[[region]]
-path = "/var/log/"
-role = "system-log"
-note = "BREADTH CALL: diagnostic log tree; generally readable output. Auth/audit trails carved out below as restricted. Both OSes (contents differ)."
-researched = "2026-07-11"
-[[region]]
-path = "/var/log/auth.log"
-role = "restricted"
-os = ["linux"]
-note = "Debian/Ubuntu authentication log — login/sudo/ssh history. Reveals auth activity (not passwords); root-readable. Deny."
-researched = "2026-07-11"
-[[region]]
-path = "/var/log/secure"
-role = "restricted"
-os = ["linux"]
-note = "RHEL/Fedora authentication log — the auth.log equivalent. Deny."
-researched = "2026-07-11"
-[[region]]
-path = "/var/log/audit/"
-role = "restricted"
-os = ["linux"]
-note = "auditd trail; security-sensitive syscall/access history. Root-only. Deny."
-researched = "2026-07-11"
-
-# ── Installed software — read-safe, write = install/tamper ─────────────────────────────────
-[[region]]
-path = "/usr/"
-role = "installed-software"
-note = "FHS installed binaries/libraries/shared data. Reading is public software content; writing is install/tamper. Both OSes."
-researched = "2026-07-11"
-[[region]]
-path = "/bin/"
-role = "installed-software"
-os = ["linux"]
-note = "Core system binaries (on modern Linux often a symlink to /usr/bin). Read-safe; write = tamper."
-researched = "2026-07-11"
-[[region]]
-path = "/sbin/"
-role = "installed-software"
-os = ["linux"]
-note = "System admin binaries. Read-safe; write = tamper."
-researched = "2026-07-11"
-[[region]]
-path = "/lib/"
-role = "installed-software"
-os = ["linux"]
-note = "Shared libraries. Read-safe; write = tamper."
-researched = "2026-07-11"
-[[region]]
-path = "/opt/"
-role = "installed-software"
-note = "Add-on software packages (FHS). Read-safe; write = install/tamper."
-researched = "2026-07-11"
-[[region]]
-path = "/System/"
-role = "installed-software"
-os = ["macos"]
-note = "macOS system files (SIP-protected, read-only at runtime). Read-safe public system content."
-researched = "2026-07-11"
-[[region]]
-path = "/Library/"
-role = "installed-software"
-os = ["macos"]
-note = "System-wide application support/config. Generally readable; write = system-level change. (Note: ~/Library is the private per-user tree, under ~/.)"
-researched = "2026-07-11"
-[[region]]
-path = "/Applications/"
-role = "installed-software"
-os = ["macos"]
-note = "Installed applications. Read-safe; write = install/tamper."
-researched = "2026-07-11"
-
-# ── User home — private by default; credential stores are deeper carve-outs ────────────────
-[[region]]
-path = "~"
-role = "user-home-private"
-note = "Bare home reference (`~`). Same private-tree role as ~/…."
-researched = "2026-07-11"
-[[region]]
-path = "~/"
-role = "user-home-private"
-note = "The user's home tree — arbitrary personal data. Reads disclose private content to the model; denied by the user locus. HP-20 does NOT loosen home reads."
-researched = "2026-07-11"
-[[region]]
-path = "~/.ssh/"
+path = "/root/"
 role = "credential-store"
-note = "SSH private keys, known_hosts, authorized_keys — credential + trust store. Reading a key is extraction; writing authorized_keys grants access."
-researched = "2026-07-11"
+os = ["linux"]
+note = "root's home — privileged private data + credentials."
+researched = "2026-07-12"
 [[region]]
-path = "~/.aws/"
+path = "/var/root/"
 role = "credential-store"
-note = "AWS access keys / session credentials (credentials, config)."
-researched = "2026-07-11"
-[[region]]
-path = "~/.gnupg/"
-role = "credential-store"
-note = "GnuPG private keyring and trust database."
-researched = "2026-07-11"
+os = ["macos"]
+note = "macOS root home."
+researched = "2026-07-12"
+# Well-known credential stores NESTED under ~/.config (non-hidden, so the dotfile rule can't
+# catch them under an explicit `grant ~/.config/`). Not exhaustive — an explicit grant of a
+# config dir can still expose an unlisted app's secrets; the docs advise granting narrowly.
 [[region]]
 path = "~/.config/gh/"
 role = "credential-store"
 note = "GitHub CLI OAuth token (hosts.yml)."
-researched = "2026-07-11"
+researched = "2026-07-12"
 [[region]]
-path = "~/.docker/config.json"
+path = "~/.config/gcloud/"
 role = "credential-store"
-note = "Docker registry auth tokens / credential-helper config."
-researched = "2026-07-11"
+note = "Google Cloud SDK credentials / tokens."
+researched = "2026-07-12"
 [[region]]
-path = "~/.netrc"
+path = "~/.config/rclone/"
 role = "credential-store"
-note = "Plaintext machine login credentials for ftp/curl/git."
-researched = "2026-07-11"
+note = "rclone remote credentials (rclone.conf)."
+researched = "2026-07-12"
 [[region]]
-path = "~/.kube/"
+path = "~/.config/git/"
 role = "credential-store"
-note = "Kubernetes kubeconfig — cluster credentials and tokens."
-researched = "2026-07-11"
+note = "git's `store` credential helper — plaintext https://user:token@host."
+researched = "2026-07-12"
+
+# ── macOS ~/Library credential stores. The dotfile rule keeps a broad `grant ~/` from widening
+#    HIDDEN entries, but on macOS the keychain, browser password stores, cookies, and the iMessage
+#    DB live under ~/Library — NOT dot-prefixed — so a broad grant would otherwise sweep them up.
+#    Shielded (un-grantable) like the credential dotdirs. Not exhaustive (Application Support holds
+#    countless app secrets); the docs advise granting narrowly. ─────────────────────────────────
 [[region]]
-path = "/root/"
-role = "restricted"
-os = ["linux"]
-note = "root's home directory — privileged private data. Deny."
-researched = "2026-07-11"
-[[region]]
-path = "/var/root/"
-role = "restricted"
+path = "~/Library/Keychains/"
+role = "credential-store"
 os = ["macos"]
-note = "macOS root home directory. Deny."
-researched = "2026-07-11"
+note = "macOS keychain databases (login.keychain-db)."
+researched = "2026-07-12"
+[[region]]
+path = "~/Library/Cookies/"
+role = "credential-store"
+os = ["macos"]
+note = "Per-app HTTP cookie stores (session tokens)."
+researched = "2026-07-12"
+[[region]]
+path = "~/Library/Safari/"
+role = "credential-store"
+os = ["macos"]
+note = "Safari history / autofill / per-site data."
+researched = "2026-07-12"
+[[region]]
+path = "~/Library/Messages/"
+role = "credential-store"
+os = ["macos"]
+note = "iMessage database (chat.db) — private message history."
+researched = "2026-07-12"
+[[region]]
+path = "~/Library/Application Support/Firefox/"
+role = "credential-store"
+os = ["macos"]
+note = "Firefox profiles: logins.json + key4.db (offline-decryptable saved passwords)."
+researched = "2026-07-12"
+[[region]]
+path = "~/Library/Application Support/Google/Chrome/"
+role = "credential-store"
+os = ["macos"]
+note = "Chrome profile: Login Data / Cookies stores."
+researched = "2026-07-12"
+[[region]]
+path = "~/Library/Application Support/Chromium/"
+role = "credential-store"
+os = ["macos"]
+note = "Chromium profile credential/cookie stores."
+researched = "2026-07-12"
+[[region]]
+path = "~/Library/Application Support/BraveSoftware/"
+role = "credential-store"
+os = ["macos"]
+note = "Brave profile credential/cookie stores."
+researched = "2026-07-12"
+[[region]]
+path = "~/Library/Application Support/Microsoft Edge/"
+role = "credential-store"
+os = ["macos"]
+note = "Edge profile credential/cookie stores."
+researched = "2026-07-12"
+
+# ── safe-chains' own config: read-OK, write-DENIED, un-grantable (the trust root). An
+#    UNPROTECTED path (no harness blesses a third-party config location) — a stopgap until one
+#    exists; a write here is best-effort caught (a python/editor write escapes the command
+#    classifier). This is the ONLY location safe-chains reads its config from — `XDG_CONFIG_HOME`
+#    is not honored (an agent-mutable env var must not relocate the trust root). See the
+#    protected-config research item. ────────────────────────────────────────────────────────────
+[[region]]
+path = "~/.config/safe-chains.toml"
+role = "safe-chains-config"
+note = "safe-chains' user config (grants). Writing it would let an agent grant itself permissions."
+researched = "2026-07-12"
+
+# ── System-integrity substrate: the machine's own identity/auth/boot/loader files, where a WRITE is
+#    compromise-complete — add a UID-0 user, grant yourself sudo, rewrite the auth/login path, redirect
+#    the dynamic loader, or change the boot path. The READ face is ordinary machine config; the WRITE
+#    face worst-cases to `system-integrity`, which sits ABOVE `machine` (and above local-admin), so
+#    owning the trust substrate is a yolo-level grant — distinct from ordinary machine admin (a service
+#    restart, an app-config edit). Deny-ward and fail-closed like the credential shield above: this is
+#    NOT an admit map (the auto-approve band already denies all of `machine`); it only splits the
+#    upper-level bands so "run the machine as admin" (local-admin) and "own the machine's trust root"
+#    (yolo) are different grants. The secret-READ stores (/etc/shadow, master.passwd) stay in the
+#    credential shield; these are the write-compromise files that are not themselves secrets. ────────
+[role.system-integrity]
+description = "The machine's identity/auth/boot/loader substrate. Readable as ordinary config; a WRITE is compromise-complete and worst-cases above local-admin (system-integrity)."
+read_locus = "machine"
+write_locus = "system-integrity"
+reads_secret = false
+
+[[region]]
+path = "/etc/passwd"
+role = "system-integrity"
+note = "System account database; a write can add a UID-0 user — full compromise."
+researched = "2026-07-16"
+[[region]]
+path = "/etc/group"
+role = "system-integrity"
+note = "System group database; a write can grant membership in privileged groups (wheel/sudo/admin)."
+researched = "2026-07-16"
+[[region]]
+path = "/etc/sudoers"
+role = "system-integrity"
+note = "sudo policy; a write grants arbitrary root — the ultimate escalation."
+researched = "2026-07-16"
+[[region]]
+path = "/etc/sudoers.d/"
+role = "system-integrity"
+note = "Drop-in sudo policy fragments; same grant-root power as /etc/sudoers."
+researched = "2026-07-16"
+[[region]]
+path = "/etc/pam.d/"
+role = "system-integrity"
+note = "PAM authentication stack (Linux and macOS); a write rewrites how every login authenticates."
+researched = "2026-07-16"
+[[region]]
+path = "/etc/ld.so.conf"
+role = "system-integrity"
+os = ["linux"]
+note = "Dynamic-loader search config; a write can redirect every program to attacker libraries."
+researched = "2026-07-16"
+[[region]]
+path = "/etc/ld.so.conf.d/"
+role = "system-integrity"
+os = ["linux"]
+note = "Dynamic-loader search drop-ins; same library-hijack power as ld.so.conf."
+researched = "2026-07-16"
+[[region]]
+path = "/etc/ld.so.preload"
+role = "system-integrity"
+os = ["linux"]
+note = "Force-loaded shared objects for every dynamically-linked program — a machine-wide code-injection hook."
+researched = "2026-07-16"
+[[region]]
+path = "/boot/"
+role = "system-integrity"
+os = ["linux"]
+note = "Kernel images, initramfs, and bootloader config; a write changes what the machine boots."
+researched = "2026-07-16"

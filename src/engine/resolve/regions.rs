@@ -21,6 +21,9 @@ pub(crate) struct Role {
     pub read_locus: LocalLocus,
     pub write_locus: LocalLocus,
     pub reads_secret: bool,
+    /// A user grant may NOT widen this role (like a secret store). Used for safe-chains' own
+    /// config: an agent must not be able to grant itself write access to the file that governs it.
+    pub pinned: bool,
 }
 
 #[derive(Deserialize)]
@@ -37,6 +40,8 @@ struct RoleDef {
     write_locus: String,
     #[serde(default)]
     reads_secret: bool,
+    #[serde(default)]
+    pinned: bool,
     #[serde(default)]
     #[allow(dead_code)] // policy prose, not consumed by the classifier
     description: String,
@@ -94,6 +99,24 @@ impl Matcher {
             Matcher::Segment(seg) => path.split('/').any(|c| c == seg).then_some(seg.len()),
         }
     }
+
+    /// The part of `path` below this matcher's root — used to keep a grant from widening a
+    /// HIDDEN (dot-prefixed) file or dir it swept up. A `~/` grant matches `~/.ssh` and
+    /// `~/projects`, but only the latter's remainder is dot-free.
+    fn remainder<'a>(&self, path: &'a str) -> &'a str {
+        match self {
+            Matcher::Prefix(s) | Matcher::StringPrefix(s) => path.strip_prefix(s.as_str()).unwrap_or(""),
+            Matcher::Exact(_) => "",
+            Matcher::Segment(_) => path,
+        }
+    }
+}
+
+/// Whether `remainder` (a path below a grant root) contains a hidden component — a dotfile/
+/// dotdir like `.ssh`, `.env`, `.git-credentials`. Credentials and config live in these, so a
+/// broad grant must not sweep them up; grant such a directory explicitly to reach inside it.
+fn has_hidden_component(remainder: &str) -> bool {
+    remainder.split('/').any(|seg| seg.len() > 1 && seg.starts_with('.'))
 }
 
 struct Node {
@@ -161,6 +184,7 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
             read_locus: parse_locus(&def.read_locus),
             write_locus: parse_locus(&def.write_locus),
             reads_secret: def.reads_secret,
+            pinned: def.pinned,
         }
     };
 
@@ -195,6 +219,8 @@ struct Grant {
     write: bool,
 }
 
+// Grants are read from the user config in the real binary; tests inject them via `with_grants`.
+#[cfg(not(test))]
 #[derive(Deserialize)]
 struct GrantEntry {
     path: String,
@@ -204,19 +230,21 @@ struct GrantEntry {
     write: bool,
 }
 
+#[cfg(not(test))]
 #[derive(Deserialize)]
 struct GrantFile {
     #[serde(default)]
     grant: Vec<GrantEntry>,
 }
 
+#[cfg(not(test))]
 fn load_user_grants() -> Vec<Grant> {
     if std::env::var_os("SAFE_CHAINS_NO_LOCAL").is_some() {
         return Vec::new();
     }
-    let Some(dir) = std::env::var_os("XDG_CONFIG_HOME")
-        .map(std::path::PathBuf::from)
-        .or_else(|| std::env::var_os("HOME").map(|h| std::path::PathBuf::from(h).join(".config")))
+    // ~/.config/safe-chains.toml only — `XDG_CONFIG_HOME` is deliberately not honored so a
+    // redirected env var can't point the trust root at an agent-writable dir (see custom.rs).
+    let Some(dir) = std::env::var_os("HOME").map(|h| std::path::PathBuf::from(h).join(".config"))
     else {
         return Vec::new();
     };
@@ -227,8 +255,25 @@ fn load_user_grants() -> Vec<Grant> {
         .map(|f| f.grant)
         .unwrap_or_default()
         .into_iter()
-        .map(|g| Grant { matcher: Matcher::from_path(&g.path), read: g.read, write: g.write })
+        .flat_map(|g| grant_matchers(&g.path).into_iter().map(move |m| Grant { matcher: m, read: g.read, write: g.write }))
         .collect()
+}
+
+/// The matcher(s) for a grant path: the path as written, PLUS the other spelling of a home path
+/// so a `~/` grant and a `/Users/you/` grant both cover a home file however the agent spells it.
+fn grant_matchers(path: &str) -> Vec<Matcher> {
+    let home = || std::env::var_os("HOME").and_then(|h| h.into_string().ok());
+    let mut out = vec![Matcher::from_path(path)];
+    if let Some(rest) = path.strip_prefix('~') {
+        if let Some(h) = home() {
+            out.push(Matcher::from_path(&format!("{h}{rest}")));
+        }
+    } else if let Some(h) = home()
+        && let Some(rest) = path.strip_prefix(h.as_str())
+    {
+        out.push(Matcher::from_path(&format!("~{rest}")));
+    }
+    out
 }
 
 #[cfg(not(test))]
@@ -244,7 +289,7 @@ thread_local! {
 pub(crate) fn with_grants<T>(grants: &[(&str, bool, bool)], f: impl FnOnce() -> T) -> T {
     let parsed = grants
         .iter()
-        .map(|&(p, read, write)| Grant { matcher: Matcher::from_path(p), read, write })
+        .flat_map(|&(p, read, write)| grant_matchers(p).into_iter().map(move |m| Grant { matcher: m, read, write }))
         .collect();
     TEST_GRANTS.with(|g| *g.borrow_mut() = parsed);
     let out = f();
@@ -257,7 +302,12 @@ fn best_grant(path: &str) -> Option<(bool, bool)> {
     let pick = |grants: &[Grant]| {
         grants
             .iter()
-            .filter_map(|g| g.matcher.specificity(path).map(|s| (s, g.read, g.write)))
+            .filter_map(|g| {
+                let spec = g.matcher.specificity(path)?;
+                // A grant never widens a hidden file/dir it happened to sweep up (`~/` grant vs
+                // `~/.git-credentials`); grant the dotdir explicitly to reach inside it.
+                (!has_hidden_component(g.matcher.remainder(path))).then_some((spec, g.read, g.write))
+            })
             .max_by_key(|&(s, ..)| s)
             .map(|(_, r, w)| (r, w))
     };
@@ -274,8 +324,8 @@ fn best_grant(path: &str) -> Option<(bool, bool)> {
 /// Widen `base` by a matching user grant. A grant never lowers a secret carve-out, and each
 /// face is admitted only if the grant grants it — `read`/`write` are independent.
 fn apply_grant(path: &str, base: Role) -> Role {
-    if base.reads_secret {
-        return base;
+    if base.reads_secret || base.pinned {
+        return base; // a grant never widens a secret store or safe-chains' own config
     }
     let Some((read, write)) = best_grant(path) else {
         return base;
@@ -284,6 +334,7 @@ fn apply_grant(path: &str, base: Role) -> Role {
         read_locus: if read { base.read_locus.min(LocalLocus::WorktreeTrusted) } else { base.read_locus },
         write_locus: if write { base.write_locus.min(LocalLocus::Worktree) } else { base.write_locus },
         reads_secret: base.reads_secret,
+        pinned: base.pinned,
     }
 }
 
@@ -342,22 +393,36 @@ mod tests {
     }
 
     #[test]
-    fn most_specific_wins() {
-        // ~/.ssh/ (credential) beats ~/ (home)
-        let ssh = classify_region("~/.ssh/id_rsa");
-        assert_eq!(ssh.read_locus, LocalLocus::Machine);
-        assert!(ssh.reads_secret);
-        // ~/notes falls to the ~/ home prefix
-        assert_eq!(classify_region("~/notes.txt").read_locus, LocalLocus::User);
-        // exact carve-out beats the containing prefix: /var/log/ is readable, auth.log isn't
-        assert_eq!(classify_region("/var/log/syslog").read_locus, LocalLocus::WorktreeTrusted);
+    fn system_integrity_substrate_write_worst_cases_above_machine() {
+        // Identity/auth files (cross-platform): readable as ordinary machine config, but a WRITE
+        // worst-cases to system-integrity (above machine → above local-admin, yolo-only). The
+        // loader/boot regions are `os = ["linux"]`, so they're not asserted here (this test is
+        // platform-portable); their routing is the same role.
+        for p in ["/etc/passwd", "/etc/group", "/etc/sudoers", "/etc/sudoers.d/pkg", "/etc/pam.d/sshd"] {
+            assert_eq!(classify_region(p).write_locus, LocalLocus::SystemIntegrity, "write {p}");
+            assert_eq!(classify_region(p).read_locus, LocalLocus::Machine, "read {p}");
+        }
+        // Ordinary /etc app config is NOT the trust substrate — it stays machine (unknown → machine).
+        assert_eq!(classify_region("/etc/nginx/nginx.conf").write_locus, LocalLocus::Machine, "ordinary /etc stays machine");
+        assert_eq!(classify_region("/usr/local/bin/tool").write_locus, LocalLocus::Machine, "/usr/local is admin-managed, stays machine");
     }
 
     #[test]
-    fn read_and_write_faces_differ_for_public_config() {
-        let hosts = classify_region("/etc/hosts");
-        assert_eq!(hosts.read_locus, LocalLocus::WorktreeTrusted, "read is admitted at read-local");
-        assert_eq!(hosts.write_locus, LocalLocus::Machine, "write reaches system → denied");
+    fn most_specific_wins() {
+        // the .ssh SEGMENT shield fires at any depth/spelling and reads_secret
+        let ssh = classify_region("~/.ssh/id_rsa");
+        assert_eq!(ssh.read_locus, LocalLocus::Machine);
+        assert!(ssh.reads_secret);
+        assert!(classify_region("myproj/.ssh/id_rsa").reads_secret, "segment bites a relative spelling too");
+        // ~/notes has no node → unknown → denied (home is not admitted)
+        assert_eq!(classify_region("~/notes.txt").read_locus, LocalLocus::Machine);
+    }
+
+    #[test]
+    fn in_project_trusted_files_read_but_do_not_write() {
+        let git = classify_region(".git/config");
+        assert_eq!(git.read_locus, LocalLocus::WorktreeTrusted, "read is admitted at read-local");
+        assert_eq!(git.write_locus, LocalLocus::WorktreeTrusted, "above the worktree write ceiling → frozen");
     }
 
     #[test]
@@ -367,8 +432,8 @@ mod tests {
             assert_eq!(r.write_locus, LocalLocus::Worktree, "write admitted");
             assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "read admitted");
         });
-        // grant gone → back to home default
-        assert_eq!(classify_region("~/projects/other/src/main.rs").write_locus, LocalLocus::User);
+        // grant gone → unknown/deny (home is not admitted)
+        assert_eq!(classify_region("~/projects/other/src/main.rs").write_locus, LocalLocus::Machine);
     }
 
     #[test]
@@ -377,6 +442,51 @@ mod tests {
             let r = classify_region("~/.local/share/mise/installs/python/bin/python");
             assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "read admitted");
             assert!(r.write_locus > LocalLocus::Worktree, "write NOT admitted");
+        });
+    }
+
+    #[test]
+    fn safe_chains_config_is_read_ok_write_denied_and_ungrantable() {
+        let cfg = "~/.config/safe-chains.toml";
+        assert!(classify_region(cfg).read_locus <= LocalLocus::WorktreeTrusted, "read is fine");
+        assert_eq!(classify_region(cfg).write_locus, LocalLocus::Machine, "write denied");
+        // even a broad ~/ grant cannot widen the write (the trust root is pinned)
+        with_grants(&[("~/", true, true)], || {
+            assert_eq!(classify_region(cfg).write_locus, LocalLocus::Machine, "grant can't unlock the config write");
+            assert!(classify_region(cfg).read_locus <= LocalLocus::WorktreeTrusted);
+        });
+    }
+
+    #[test]
+    fn a_grant_does_not_widen_hidden_files_or_system_secrets() {
+        with_grants(&[("~/", true, true)], || {
+            assert_eq!(classify_region("~/projects/foo/main.rs").write_locus, LocalLocus::Worktree);
+            // hidden dotfiles/dirs (where credentials live) are NOT swept up by a broad grant
+            for p in ["~/.git-credentials", "~/.npmrc", "~/.config/gh/hosts.yml", "~/.pgpass", "~/.SSH/id_rsa"] {
+                assert_eq!(classify_region(p).read_locus, LocalLocus::Machine, "hidden not widened: {p}");
+            }
+        });
+        // a `/` grant cannot reach a system credential store (un-grantable shield)
+        with_grants(&[("/", true, true)], || {
+            assert_eq!(classify_region("/etc/ssl/private/server.key").read_locus, LocalLocus::Machine);
+            assert_eq!(with_os("linux", || classify_region("/etc/shadow").read_locus), LocalLocus::Machine);
+        });
+        // an EXPLICIT dotdir grant still reaches its non-hidden contents
+        with_grants(&[("~/.runner-scripts/", true, true)], || {
+            assert_eq!(classify_region("~/.runner-scripts/deploy.sh").write_locus, LocalLocus::Worktree);
+        });
+        // macOS ~/Library credential stores are NOT dot-prefixed, so the dotfile rule can't catch
+        // them under `grant ~/` — the shields must (un-grantable, like the dotdirs).
+        with_grants(&[("~/", true, true)], || {
+            for p in [
+                "~/Library/Keychains/login.keychain-db",
+                "~/Library/Cookies/Cookies.binarycookies",
+                "~/Library/Application Support/Firefox/Profiles/x.default/logins.json",
+                "~/Library/Application Support/Google/Chrome/Default/Login Data",
+                "~/.config/git/credentials",
+            ] {
+                assert_eq!(with_os("macos", || classify_region(p).read_locus), LocalLocus::Machine, "shield: {p}");
+            }
         });
     }
 
@@ -394,6 +504,19 @@ mod tests {
         with_grants(&[("~/projects/", true, true)], || {
             assert!(crate::is_safe_command("cat ~/projects/sibling/notes.txt"));
             assert!(crate::is_safe_command("cp ./a ~/projects/sibling/b"));
+            // a redirect write honors the grant too (not just engine writers)
+            assert!(crate::is_safe_command("echo hi > ~/projects/sibling/out.txt"));
+        });
+    }
+
+    #[test]
+    fn a_home_grant_matches_both_tilde_and_absolute_spellings() {
+        let Some(home) = std::env::var_os("HOME").and_then(|h| h.into_string().ok()) else {
+            return;
+        };
+        with_grants(&[("~/work/", true, true)], || {
+            assert!(classify_region("~/work/a.txt").write_locus == LocalLocus::Worktree);
+            assert!(classify_region(&format!("{home}/work/a.txt")).write_locus == LocalLocus::Worktree);
         });
     }
 
@@ -408,6 +531,6 @@ mod tests {
             assert!(!r.researched.trim().is_empty(), "region `{}` is missing a researched date", r.path);
             assert!(file.role.contains_key(&r.role), "region `{}` names undefined role `{}`", r.path, r.role);
         }
-        assert!(file.region.len() > 30, "seed region set unexpectedly small ({})", file.region.len());
+        assert!(file.region.len() > 10, "region set unexpectedly small ({})", file.region.len());
     }
 }

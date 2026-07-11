@@ -1,0 +1,80 @@
+[[command]]
+name = "mlr"
+description = "Miller (mlr) processes name-indexed data (CSV/TSV/JSON/DKVP/…) as a stream of records, reading files or stdin and writing the transformed stream to stdout. An invocation is main (pre-verb) flags — I/O formats, separators, input files — followed by a `then`-chain of VERBS (`mlr --csv cat then sort -f x data.csv`). Most verbs are pure read→stdout transforms. The exceptions modify or execute: `-I`/`--in-place` (a main flag) overwrites the input files; `put`/`filter` run the Miller DSL, which can `system(...)`/`exec(...)` and redirect output to files or commands; `split`/`tee` write output files. Miller is stable and slow-moving; verbs and flags are added occasionally across minor releases."
+url = "https://miller.readthedocs.io/"
+researched_version = "Miller 6.x (reference-verbs, 2026-07-14)"
+examples_safe = [
+  "mlr --csv head -n 10 data.csv",
+  "mlr --tsv cut -f name,age data.tsv",
+  "mlr --version",
+  "mlr --help",
+  "mlr --ifs , cat data.dkvp",
+  "mlr --ifs=, cat data.dkvp",
+  "mlr --from data.csv cat",
+  "mlr --icsv --ojson cat data.csv",
+  "mlr --csv sort -nr value data.csv",
+  "mlr --csv cat then sort -f x then head -n 5 data.csv",
+  "mlr --csv step -a delta,shift -f x data.csv",
+  "mlr --mfrom a.csv b.csv -- cat",
+]
+examples_denied = [
+  "mlr",
+  "mlr -I --csv head -n 10 data.csv",
+  "mlr --in-place --csv head -n 10 data.csv",
+  "mlr --frobnicate cat data.csv",
+  "mlr --ifs -I cat data.csv",
+  "mlr --from data.csv -I cat",
+  "mlr put '$x=1' data.csv",
+  "mlr filter '$x>3' data.csv",
+  "mlr --csv cat then put '$y=2' data.csv",
+  "mlr cat then filter 'true' data.csv",
+  "mlr --csv tee out.csv then cat data.csv",
+  "mlr --csv split -n 100 data.csv",
+  "mlr --csv frobnicate data.csv",
+  "mlr --mfrom a.csv -- put '$x=1'",
+]
+
+# The verb-chain grammar. The MAIN region is a strict allowlist: every value-taking flag is in
+# `main_valued` (never `main_standalone`, or the walk would mistake its value for the verb
+# boundary and let a later `-I` slip past). `-I`/`--in-place` and other mutating/exotic main
+# flags are omitted → denied by omission (no denylist). The verb region is a `then`-chain; every
+# verb NAME must be on `verbs`. `put`/`filter`/`split`/`tee` are omitted (DSL/file-writing).
+# `step` IS listed: it applies fixed named steppers (delta/shift/ratio/ewma/…) via `-a`/`-f`/`-d`,
+# with no DSL expression.
+[command.verb_chain]
+level = "Inert"
+separator = "then"
+main_standalone = [
+  "--allow-ragged-csv-input", "--barred", "--csv", "--csvlite", "--dkvp",
+  "--headerless-csv-output", "--help", "--hi", "--ho",
+  "--icsv", "--icsvlite", "--idkvp", "--ijson", "--ijsonl", "--imarkdown",
+  "--implicit-csv-header", "--inidx", "--ipprint", "--itsv", "--ixtab",
+  "--json", "--jsonl", "--markdown", "--nidx",
+  "--no-auto-flatten", "--no-auto-unflatten",
+  "--ocsv", "--ocsvlite", "--odkvp", "--ojson", "--ojsonl", "--omarkdown",
+  "--onidx", "--opprint", "--otsv", "--oxtab",
+  "--pass-comments", "--pprint", "--ragged", "--right", "--skip-comments",
+  "--tsv", "--version", "--xtab",
+  "-A", "-C", "-M", "-N", "-O", "-S", "-h", "-n", "-x",
+]
+main_valued = [
+  "--files", "--fixed", "--flatsep", "--from", "--fs", "--fw",
+  "--ifs", "--ifs-regex", "--ips", "--ips-regex", "--irs",
+  "--nr-progress-mod", "--ofmt", "--ofmte", "--ofmtf", "--ofmtg",
+  "--ofs", "--ops", "--ors", "--ps", "--records-per-batch",
+  "--rs", "--seed", "--tz",
+]
+main_variadic = ["--mfrom"]
+verbs = [
+  "altkv", "bar", "bootstrap", "case", "cat", "check", "clean-whitespace",
+  "count", "count-distinct", "count-similar", "cut", "decimate", "describe",
+  "fill-down", "fill-empty", "flatten", "format-values", "fraction", "gap",
+  "grep", "group-by", "group-like", "gsub", "having-fields", "head", "histogram",
+  "join", "json-parse", "json-stringify", "label", "latin1-to-utf8",
+  "least-frequent", "merge-fields", "most-frequent", "nest", "nothing",
+  "regularize", "remove-empty-columns", "rename", "reorder", "repeat", "reshape",
+  "sample", "sec2gmt", "sec2gmtdate", "seqgen", "shuffle", "skip-trivial-records",
+  "sort", "sort-within-records", "sparsify", "ssub", "stats1", "stats2", "step",
+  "sub", "summary", "surv", "tac", "tail", "template", "top", "unflatten", "uniq",
+  "unspace", "unsparsify", "utf8-to-latin1",
+]

@@ -24,3 +24,8 @@ valued = [
     "-cert-file", "-client",
     "-csr", "-key-file", "-p12-file",
 ]
+
+# mkcert GENERATES the cert/key at these paths (output). Go-style flags accept single OR double
+# dash, and both spellings are in `valued`, so gate both.
+[command.path_gate]
+flags = { "--cert-file" = "write", "--key-file" = "write", "-cert-file" = "write", "-key-file" = "write" }

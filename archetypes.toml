@@ -1,0 +1,196 @@
+# Static capability archetypes — the recurring facet profiles the Phase-1 subcommand surface
+# classifies against (docs/design/behavioral-taxonomy-archetypes.md §2). Each archetype is a fixed
+# Capability; a subcommand references one by name (`profile = "remote-mutate"`) and the resolver
+# emits that capability. Facet fields take an EXACT term (a point in facet-space, not a bound —
+# these are capabilities, not level predicates). `operation` and `because` are required; every
+# other facet defaults to its zero term. The level each lands at is DERIVED by the algebra and
+# checked in `engine::archetype::tests::archetypes_land_where_the_catalog_says`.
+
+[archetype.remote-read]
+operation = "observe"
+locus = { remote = "fixed" }
+network = { direction = "outbound", payload = "fetches" }
+disclosure = { audience = "local-process" }
+because = "reads state from a remote system over the network; results flow to the caller/model"
+
+[archetype.data-export]
+operation = "observe"
+locus = { remote = "fixed" }
+scale = "unbounded"
+network = { direction = "outbound", payload = "fetches" }
+disclosure = { audience = "local-process" }
+because = "exports a BULK dataset from a remote system (a db dump / full export); the whole result flows to the caller/model. The data's SENSITIVITY is unknowable to a string classifier, so it is proxied by scale × disclosure — volume × destination = the blast radius. An output-FILE form (`-f path`) adds a path-gated local write, resolved separately."
+
+[archetype.remote-mutate]
+operation = "mutate"
+locus = { remote = "fixed" }
+network = { direction = "outbound", payload = "sends-host-data" }
+reversibility = "effortful"
+because = "changes remote state; recoverable with effort (re-apply or restore from backup)"
+
+[archetype.remote-create]
+operation = "create"
+locus = { remote = "fixed" }
+network = { direction = "outbound", payload = "sends-host-data" }
+reversibility = "effortful"
+cost = "metered"
+because = "provisions a remote resource; may incur metered cost; recoverable by tearing it down"
+
+[archetype.remote-destroy-recoverable]
+operation = "destroy"
+locus = { remote = "fixed" }
+network = { direction = "outbound" }
+reversibility = "effortful"
+because = "deletes a remote resource that can be rebuilt from config or a backup/snapshot"
+
+[archetype.remote-destroy-irreversible]
+operation = "destroy"
+locus = { remote = "fixed" }
+network = { direction = "outbound" }
+reversibility = "irreversible"
+scale = "bounded"
+because = "deletes remote data with no recovery path (no snapshot / versioning available)"
+
+[archetype.remote-authorize]
+# The general access-change: grant/revoke a role, set a policy, change trust — using ambient
+# credentials, not minting new credential material. A sub that WRITES a credential (vault token
+# create, an API-key mint) is `secret = "writes"`, which lands ABOVE network-admin — a distinct,
+# higher sub-case, classified explicitly rather than via this archetype.
+operation = "authorize"
+locus = { remote = "fixed" }
+network = { direction = "outbound" }
+reversibility = "effortful"
+because = "changes trust or access on a remote system using ambient credentials"
+
+[archetype.remote-control]
+operation = "control"
+locus = { remote = "fixed" }
+network = { direction = "outbound" }
+reversibility = "effortful"
+because = "starts, stops, or signals a remote service or deployment"
+
+# Run a CALLER-SUPPLIED command on a remote host or container — `kubectl exec`, `ssh host cmd`, `aws
+# ecs execute-command`, `gcloud compute ssh`. This is arbitrary REMOTE code execution: `operation =
+# execute`, which no level below yolo admits on a remote locus (network-admin operates remotes via
+# their APIs but does not shell into them; local-admin's execute clause is `remote = none`). Its blast
+# radius is whatever the target host/pod can do — effectively a remote shell. Lands at yolo.
+[archetype.remote-exec]
+operation = "execute"
+locus = { remote = "fixed" }
+network = { direction = "outbound" }
+execution = "caller-inline"
+because = "runs a caller-supplied command on a remote host or container (kubectl exec, ssh, ecs execute-command) — arbitrary remote code execution"
+
+# ── Credential material. The `secret` facet is `<= uses-ambient` on EVERY level below yolo (a command
+# may USE an ambient credential to authenticate, but must not READ, MINT, or EXPOSE credential
+# material), so both of these land at yolo — recognize-and-route: a raw credential entering the agent's
+# context, or a fresh one being minted, is the confidentiality surface that needs the highest trust.
+# Distinct from `remote-read` (an identity/state read like `aws sts get-caller-identity` is NOT a
+# secret) and `remote-authorize` (grants access using ambient creds, without minting new material).
+
+# Reads/prints EXISTING credential material to the caller — `gcloud auth print-access-token`, `gh auth
+# token`, `aws secretsmanager get-secret-value`, `vault read`, `kubectl get secret -o yaml`. The
+# material flows into the agent's context (`disclosure = local-process`) where it can be logged or
+# exfiltrated. `secret = reads`.
+[archetype.credential-read]
+operation = "observe"
+secret = { level = "reads" }
+disclosure = { audience = "local-process" }
+because = "reads and exposes EXISTING credential material to the caller (prints a token, fetches a secret value) — it enters the agent's context"
+
+# MINTS NEW credential material and returns it — `aws iam create-access-key`, `aws sts
+# get-session-token`, `kubectl create token`, `az account get-access-token`, `vault token create`. A
+# fresh access grant, exposed to the caller. `secret = writes` (the higher sub-case remote-authorize's
+# comment defers to).
+[archetype.bulk-object-read]
+operation = "observe"
+locus = { remote = "fixed" }
+scale = "unbounded"
+network = { direction = "outbound", payload = "fetches" }
+secret = { level = "reads" }
+disclosure = { audience = "local-process" }
+because = "retrieves the raw content of an ARBITRARY stored object (an S3 object, EBS block, Glacier archive, genomic read-set) — opaque bytes the classifier cannot assess, routinely a stored credentials file / private key / DB dump / PII. Like the deliberately-not-allowlisted `aws s3 cp`, it is NOT auto-approved. NUANCE (unsettled, see behavioral-taxonomy-archetypes.md §2): `secret = reads` is the only facet lever that denies a read, so this lands at yolo — the SAME tier as `credential-read`. That is arguably too strict: not every blob is credential-grade, and a middle tier (network-admin) would be more proportionate but has NO facet basis today (a remote fetch-read is reader-level on every axis we have). Revisit if a 'retrieves bulk content vs metadata' axis is added."
+
+[archetype.credential-mint]
+operation = "create"
+locus = { remote = "fixed" }
+network = { direction = "outbound" }
+secret = { level = "writes" }
+disclosure = { audience = "local-process" }
+because = "mints NEW credential material (access key, session token, service-account key) and returns it — a fresh, exposed access grant"
+
+[archetype.vcs-sync]
+operation = "communicate"
+locus = { remote = "fixed" }
+network = { direction = "outbound", payload = "sends-host-data" }
+reversibility = "effortful"
+because = "transfers repository history to or from a remote (push / pull / sync / clone)"
+
+# The UNSAFE install: fetches AND RUNS build/install code (scripts on, or a floating/unpinned source).
+# `execution = network-sourced` — foreign code runs at install/build — so it has no home below yolo.
+# A resolver emits THIS shape for `npm install`, `npm ci` (scripts on), `cargo build`/`install`
+# (build.rs always runs), `pip install` of an sdist, etc. Its SAFE sibling is `local-install-pinned`.
+[archetype.supply-chain-build]
+operation = "execute"
+locus = { local = "worktree-trusted" }
+network = { direction = "outbound", payload = "fetches" }
+execution = "network-sourced"
+persistence = { level = "installing" }
+reversibility = "effortful"
+because = "fetches and RUNS build/install code from a package source (scripts on or unpinned); installs artifacts"
+
+# The SAFE install: fetches pinned packages and writes them into the worktree, but runs NO foreign
+# code (`execution = self` — the package manager itself runs; the fetched code is inert data until
+# the program is later run). This is the `npm ci --ignore-scripts` shape — lockfile-pinned AND
+# scripts-off. Lands at DEVELOPER via the install clause (levels: create · worktree · installing ·
+# fetches · execution ≤ self). A resolver emits it ONLY when the command is BOTH pinned and
+# scripts-off; anything less falls back to `supply-chain-build` (yolo). The `execution = self`
+# modeling (rather than a guardrail-gated network-sourced) is deliberate — it keeps the install
+# clause all-`<=` and facet-monotone (see the level header + archetype test).
+[archetype.local-install-pinned]
+operation = "create"
+locus = { local = "worktree" }
+network = { direction = "outbound", payload = "fetches" }
+execution = "self"
+persistence = { level = "installing" }
+reversibility = "effortful"
+because = "installs pinned dependencies into the worktree WITHOUT running their code (lockfile-pinned, scripts-off); fetched code is inert data until the program is later run"
+
+[archetype.blockchain-txn]
+operation = "create"
+locus = { remote = "fixed" }
+network = { direction = "outbound", payload = "sends-host-data" }
+reversibility = "irreversible"
+scale = "bounded"
+cost = "metered"
+secret = { level = "uses-ambient" }
+because = "signs and submits an on-chain transaction; irreversible and metered"
+
+# local-vcs-write (git/hg commit/add/tag) is DEFERRED — it is a leaf-command concern, not the remote
+# candidate surface Phase 1 targets, and it needs a real decision first: `.git/` is worktree-trusted
+# (whole dir), so a commit writing `.git/objects` is technically a worktree-trusted write and lands
+# ABOVE editor. The honest discriminator is PERSISTENCE (a commit is `data`; a hook/config write is
+# `installing`/`reconfiguring`), not locus — so the fix is at the level/resolver, not an archetype.
+# See docs/design/behavioral-taxonomy-archetypes.md §5 (open questions).
+
+[archetype.local-privileged]
+operation = "configure"
+locus = { local = "machine" }
+authority = "root"
+reversibility = "effortful"
+persistence = { level = "installing" }
+because = "changes PERSISTENT machine-wide state as root — service enablement, system config, package installs (writes boot symlinks / config that alters future behavior)"
+
+# The transient sibling of local-privileged: CONTROLS running services (start/stop/restart/reload/
+# kill) rather than reconfiguring them. Same locus + authority (machine, root → local-admin), but it
+# writes nothing durable — `operation = control`, `persistence = transient`, `reversibility =
+# recoverable`, and it runs the EXISTING service binary with its EXISTING config (`execution` stays
+# `self`, the default). This is the facet-correct home for `systemctl restart nginx`: a root machine
+# op, but the mildest one — not the phantom "install" the flat local-privileged profile implied.
+[archetype.privileged-control]
+operation = "control"
+locus = { local = "machine" }
+authority = "root"
+reversibility = "recoverable"
+persistence = { level = "transient" }
+because = "controls the lifecycle of running machine services as root (start/stop/restart/reload/kill) using existing config; transient and recoverable, no durable change"

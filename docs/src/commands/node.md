@@ -116,14 +116,18 @@
 ### `npm`
 <p class="cmd-url"><a href="https://docs.npmjs.com/cli">https://docs.npmjs.com/cli</a></p>
 
+- **add**
 - **audit**: Flags: --help, --json, --omit, --production, -h. Valued: --audit-level
-- **ci**: Flags: --help, --ignore-scripts, --legacy-bundling, --no-audit, --no-fund, --no-optional, --production, -h
+- **ci**
 - **config get**: Flags: --help, --json, --long, -h, -l
 - **config list**: Flags: --help, --json, --long, -h, -l
 - **doctor**: Flags: --help, --json, -h
 - **explain**: Flags: --help, --json, -h
 - **fund**: Flags: --help, --json, -h
+- **i**
 - **info**: Flags: --help, --json, -h
+- **install**
+- **isntall**
 - **list**: Flags: --all, --help, --json, --link, --long, --omit, --parseable, --production, --unicode, -a, -h, -l. Valued: --depth, --prefix
 - **ls**: Flags: --all, --help, --json, --link, --long, --omit, --parseable, --production, --unicode, -a, -h, -l. Valued: --depth, --prefix
 - **outdated**: Flags: --help, --json, -h
@@ -135,6 +139,12 @@
 - **view**: Flags: --help, --json, -h
 - **why**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `npm ci --ignore-scripts`
+- `npm ls`
+- `npm view react`
 
 ### `npx`
 <p class="cmd-url"><a href="https://docs.npmjs.com/cli/commands/npx">https://docs.npmjs.com/cli/commands/npx</a></p>

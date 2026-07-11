@@ -1,0 +1,24 @@
+[[command]]
+name = "sed"
+aliases = ["gsed"]
+description = "Stream editor: applies a script of editing commands to its input and prints the result to stdout. Read-only by default (an `observe` of each file operand, gated by locus — `sed s/a/b/ ~/.ssh/id_rsa` denies on the read). `-i`/`--in-place` flips it to a MUTATE that rewrites the file in place, gated by the file's write locus so a worktree edit auto-approves but `sed -i s/a/b/ /etc/hosts` denies. The script itself is a mini-language: the `e` command/modifier EXECUTES text as a shell command (arbitrary code execution → worst-cased), and `w`/`W`/`r`/`R`/`s///w` read and WRITE files named INSIDE the script, each gated by its own locus. A `-f`/`--file` script comes from a file that can't be inspected, so its embedded `e`/`w`/`r` are invisible → worst-cased. No network. Part of GNU sed / BSD sed; the command language is long-frozen."
+url = "https://www.gnu.org/software/sed/manual/sed.html"
+researched_version = "GNU sed 4.9 + BSD sed (macOS 15)"
+level = "SafeRead"
+bare = false
+# The behavioral engine (the `sed` hook) is authoritative and gates by locus/script. sed ALSO has
+# a legacy `sed_verdict` handler (a coarser classifier that runs in the dead legacy path); the
+# engine is smarter about locus (e.g. it allows an in-place edit of a worktree file, `sed -i … ./f`,
+# which the legacy handler denies). examples here stay within cases both agree on, so the
+# never-looser corpus gate holds; the `sed -i` worktree case is covered by the sed_i resolver test.
+examples_safe = ["sed s/foo/bar/ ./file.txt", "sed -n 1,10p ./file.txt"]
+examples_denied = ["sed s/a/b/ ~/.ssh/id_rsa", "sed -f ./script.sed ./file.txt"]
+
+# Declarative facet behavior: sed is a mini-language whose script must be SCANNED (an `e` exec or
+# unmodeled command worst-cases; `w`/`r` file commands are gated by locus), and whose `-i` flag
+# flips the file operands from reads to in-place mutates — irregular token logic a declaration
+# can't express, so a thin `sed` hook does it. Replaces the hardcoded `resolve_sed`.
+[command.behavior]
+operation = "mutate"
+positionals = "none"
+hook = "sed"

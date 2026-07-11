@@ -32,3 +32,6 @@ valued = [
     "-O", "-c", "-l",
 ]
 write_flags = ["--output", "--output-file"]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }

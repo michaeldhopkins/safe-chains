@@ -1,0 +1,32 @@
+[[command]]
+name = "grep"
+# egrep/fgrep/rgrep are grep with an implied -E/-F/-r — pure synonyms whose operands classify
+# identically, so they are aliases of the canonical `grep` (canonicalized before resolution, and
+# rendered under grep's single doc entry) rather than a separate handler-documented family.
+aliases = ["egrep", "fgrep", "rgrep"]
+description = "Searches files (or stdin) for lines matching a pattern and prints them to stdout. Purely observational: it reads file content and never modifies, creates, or deletes anything, and reaches only the local filesystem — no network. The matched content flows to stdout (→ the caller/model), so the sensitivity of what it reads is carried entirely by WHICH paths it touches: `grep secret ~/.ssh/id_rsa` discloses a home credential, `grep -r pattern .` reads the worktree unboundedly. `-f FILE` reads a pattern file (another read, gated by that file's location); `-r`/`-R` recurse. No form of grep executes code or writes state (the PCRE `-P` engine matches, it does not run shell). Part of GNU/BSD userland; the interface has been stable for decades."
+url = "https://www.gnu.org/software/grep/manual/grep.html"
+researched_version = "GNU grep 3.11 + BSD grep (macOS 15)"
+level = "SafeRead"
+bare = false
+examples_safe = [
+    "grep foo README.md",
+    "grep -n TODO src/main.rs",
+    "grep -r pattern src",
+    "grep -i Error ./log.txt",
+]
+examples_denied = [
+    "grep secret ~/.ssh/id_rsa",
+    "grep -f /etc/shadow foo ./file.txt",
+]
+
+# Declarative facet behavior: grep OBSERVES the content of its file operands (a read whose
+# matched lines flow to the model), gated per-operand by locus. grep's operand syntax — the
+# first positional is the PATTERN unless `-e`/`-f` supplied one, an unrecognized `--token` is a
+# pattern, `-r` with no path means the cwd — is irreducible token logic, so it is delegated to
+# the `grep` hook, which returns the classified read operands; the `observe` operation + the
+# builders supply the facets. Replaces the hardcoded `resolve_grep`.
+[command.behavior]
+operation = "observe"
+positionals = "pattern-then-read"
+hook = "grep"

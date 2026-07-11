@@ -45,8 +45,15 @@
 
 Aliases: `gcat`
 
-- Allowed standalone flags: -A, -E, -T, -V, -b, -e, -h, -l, -n, -s, -t, -u, -v, --help, --number, --number-nonblank, --show-all, --show-ends, --show-nonprinting, --show-tabs, --squeeze-blank, --version
-- Bare invocation allowed
+- Reads its file operands to stdout within your workspace.
+- Allowed standalone flags: --help, --number, --number-nonblank, --show-all, --show-ends, --show-nonprinting, --show-tabs, --squeeze-blank, --version, -A, -E, -T, -b, -e, -n, -s, -t, -u, -v
+- Bare invocation reads stdin
+
+**Examples:**
+
+- `cat README.md`
+- `cat src/main.rs`
+- `cat ./notes.txt`
 
 ### `col`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/col.1.html">https://man7.org/linux/man-pages/man1/col.1.html</a></p>
@@ -171,15 +178,36 @@ Aliases: `gfold`
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
 
+### `grep`
+<p class="cmd-url"><a href="https://www.gnu.org/software/grep/manual/grep.html">https://www.gnu.org/software/grep/manual/grep.html</a></p>
+
+Aliases: `egrep`, `fgrep`, `rgrep`
+
+- Searches its file operands for a pattern within your workspace.
+- Flag handling follows the command's own grammar (see examples).
+
+**Examples:**
+
+- `grep foo README.md`
+- `grep -n TODO src/main.rs`
+- `grep -r pattern src`
+- `grep -i Error ./log.txt`
+
 ### `head`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#head-invocation</a></p>
 
 Aliases: `ghead`
 
-- Allowed standalone flags: -V, -h, -q, -v, -z, --help, --quiet, --silent, --verbose, --version, --zero-terminated
-- Allowed valued flags: -c, -n, --bytes, --lines
-- Bare invocation allowed
-- Numeric shorthand accepted (e.g. -20 for -n 20)
+- Reads its file operands to stdout within your workspace.
+- Allowed standalone flags: --help, --quiet, --silent, --verbose, --version, --zero-terminated, -V, -h, -q, -v, -z
+- Allowed valued flags: --bytes, --lines, -c, -n
+- Bare invocation reads stdin
+
+**Examples:**
+
+- `head README.md`
+- `head -n 20 src/main.rs`
+- `head -20 src/main.rs`
 
 ### `hunspell`
 <p class="cmd-url"><a href="https://hunspell.github.io/">https://hunspell.github.io/</a></p>
@@ -468,9 +496,15 @@ Aliases: `psed`
 ### `sed`
 <p class="cmd-url"><a href="https://www.gnu.org/software/sed/manual/sed.html">https://www.gnu.org/software/sed/manual/sed.html</a></p>
 
-- Allowed standalone flags: --debug, --help, --posix, --quiet, --sandbox, --silent, --unbuffered, --version, -E, -V, -h, -n, -r, -u, -z
-- Allowed valued flags: --expression, --file, --line-length, -e, -f, -l
-- Inline expressions validated for safety
+Aliases: `gsed`
+
+- Edits its file operands in place within your workspace.
+- Flag handling follows the command's own grammar (see examples).
+
+**Examples:**
+
+- `sed s/foo/bar/ ./file.txt`
+- `sed -n 1,10p ./file.txt`
 
 ### `shred`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#shred-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#shred-invocation</a></p>
@@ -511,10 +545,15 @@ Aliases: `gtac`
 
 Aliases: `gtail`
 
-- Allowed standalone flags: -F, -V, -f, -h, -q, -r, -v, -z, --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated
-- Allowed valued flags: -b, -c, -n, --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval
-- Bare invocation allowed
-- Numeric shorthand accepted (e.g. -20 for -n 20)
+- Reads its file operands to stdout within your workspace.
+- Allowed standalone flags: --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated, -F, -V, -f, -h, -q, -r, -v, -z
+- Allowed valued flags: --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval, -b, -c, -n
+- Bare invocation reads stdin
+
+**Examples:**
+
+- `tail -n 50 src/main.rs`
+- `tail -f ./app.log`
 
 ### `tee`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#tee-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#tee-invocation</a></p>
@@ -613,9 +652,14 @@ Aliases: `guniq`
 
 Aliases: `gwc`
 
-- Allowed standalone flags: -L, -V, -c, -h, -l, -m, -w, --bytes, --chars, --help, --lines, --max-line-length, --version, --words, --zero-terminated
-- Allowed valued flags: --files0-from
-- Bare invocation allowed
+- Reads its file operands to stdout within your workspace.
+- Allowed standalone flags: --bytes, --chars, --help, --lines, --max-line-length, --version, --words, --zero-terminated, -L, -V, -c, -l, -m, -w
+- Bare invocation reads stdin
+
+**Examples:**
+
+- `wc -l src/main.rs`
+- `wc -w README.md`
 
 ### `wdiff`
 <p class="cmd-url"><a href="https://www.gnu.org/software/wdiff/">https://www.gnu.org/software/wdiff/</a></p>

@@ -55,8 +55,10 @@ Aliases: `gbasename`
 
 Aliases: `gcp`
 
-- Allowed standalone flags: --archive, --force, --help, --interactive, --no-clobber, --no-dereference, --no-target-directory, --one-file-system, --parents, --recursive, --remove-destination, --symbolic-link, --update, --verbose, --version, -H, -L, -N, -P, -R, -S, -T, -X, -a, -c, -f, -h, -i, -l, -n, -p, -r, -s, -u, -v, -x
-- Allowed valued flags: --backup, --preserve, --reflink, --sparse, --suffix, --target-directory, -t
+- Reads each source and writes the destination within your workspace.
+- Allowed standalone flags: --archive, --backup, --force, --help, --interactive, --no-clobber, --no-dereference, --no-target-directory, --one-file-system, --parents, --preserve, --recursive, --reflink, --remove-destination, --sparse, --symbolic-link, --update, --verbose, --version, -H, -L, -N, -P, -R, -X, -a, -c, -d, -f, -h, -i, -l, -n, -p, -r, -s, -u, -v, -x
+- Allowed valued flags: --suffix, --target-directory, -S, -t
+- Recurses into directory trees with: --archive, --recursive, -R, -a, -r
 
 ### `date`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#date-invocation</a></p>
@@ -66,6 +68,16 @@ Aliases: `gdate`
 - Allowed standalone flags: --help, --rfc-2822, --rfc-email, --universal, --utc, --version, -R, -V, -h, -j, -n, -u
 - Allowed valued flags: --date, --iso-8601, --reference, --rfc-3339, -I, -d, -f, -r, -v, -z
 - Bare invocation allowed
+
+### `dd`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#dd-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#dd-invocation</a></p>
+
+- Creates or updates its file operands within your workspace.
+- Flag handling follows the command's own grammar (see examples).
+
+**Examples:**
+
+- `dd if=./in of=./out bs=1M`
 
 ### `delta`
 <p class="cmd-url"><a href="https://dandavison.github.io/delta/">https://dandavison.github.io/delta/</a></p>
@@ -147,7 +159,7 @@ Aliases: `exa`
 ### `find`
 <p class="cmd-url"><a href="https://www.gnu.org/software/findutils/manual/html_mono/find.html">https://www.gnu.org/software/findutils/manual/html_mono/find.html</a></p>
 
-- Positional predicates allowed. -exec/-execdir allowed when the executed command is itself safe.
+- Read-only predicates and actions allowed (tests like -name/-type/-size, -print/-ls/-prune, operators, positional and global options). -exec/-execdir allowed when the executed command is itself safe (each `{}` binds to the traversal path).
 
 ### `fs_usage`
 <p class="cmd-url"><a href="https://ss64.com/mac/fs_usage.html">https://ss64.com/mac/fs_usage.html</a></p>
@@ -190,8 +202,14 @@ Aliases: `exa`
 
 Aliases: `gln`, `link`, `glink`
 
-- Allowed standalone flags: --directory, --force, --help, --interactive, --logical, --no-dereference, --no-target-directory, --physical, --relative, --symbolic, --verbose, --version, -F, -L, -P, -T, -d, -f, -h, -i, -n, -r, -s, -v, -w
-- Allowed valued flags: --backup, --suffix, --target-directory, -S, -t
+- Reads each source and writes the destination within your workspace.
+- Allowed standalone flags: --backup, --directory, --force, --help, --interactive, --logical, --no-dereference, --no-target-directory, --physical, --relative, --symbolic, --verbose, --version, -F, -L, -P, -T, -d, -f, -h, -i, -n, -r, -s, -v, -w
+- Allowed valued flags: --suffix, --target-directory, -S, -t
+
+**Examples:**
+
+- `ln -s ./target ./link`
+- `ln ./a ./b`
 
 ### `lockf`
 <p class="cmd-url"><a href="https://man.freebsd.org/cgi/man.cgi?lockf">https://man.freebsd.org/cgi/man.cgi?lockf</a></p>
@@ -224,6 +242,7 @@ Aliases: `gls`, `gdir`, `gvdir`, `dir`, `vdir`
 
 Aliases: `gmkdir`
 
+- Creates or updates its file operands within your workspace.
 - Allowed standalone flags: --help, --parents, --verbose, --version, -Z, -p, -v
 - Allowed valued flags: --context, --mode, -m
 
@@ -261,8 +280,9 @@ Aliases: `gmktemp`
 
 Aliases: `gmv`
 
-- Allowed standalone flags: --force, --help, --interactive, --no-clobber, --no-target-directory, --strip-trailing-slashes, --update, --verbose, --version, -T, -f, -h, -i, -n, -u, -v
-- Allowed valued flags: --backup, --suffix, --target-directory, -S, -t
+- Moves each source to the destination within your workspace.
+- Allowed standalone flags: --backup, --force, --help, --interactive, --no-clobber, --no-target-directory, --strip-trailing-slashes, --update, --verbose, --version, -T, -f, -h, -i, -n, -u, -v
+- Allowed valued flags: --suffix, --target-directory, -S, -t
 
 ### `pathchk`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#pathchk-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#pathchk-invocation</a></p>
@@ -317,7 +337,9 @@ Aliases: `grealpath`
 
 Aliases: `grm`
 
-- Requires --help, --version. - Allowed standalone flags: --help, --version
+- Deletes its file operands within your workspace.
+- Allowed standalone flags: --dir, --force, --help, --interactive, --one-file-system, --preserve-root, --recursive, --verbose, --version, -I, -R, -d, -f, -i, -r, -v
+- Recurses into directory trees with: --recursive, -R, -r
 
 ### `rmdir`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#rmdir-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#rmdir-invocation</a></p>
@@ -348,17 +370,12 @@ Aliases: `gsync`
 - Allowed standalone flags: --data, --file-system, --help, --version, -d, -f
 - Bare invocation allowed
 
-### `tar`
-<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/tar.1.html">https://man7.org/linux/man-pages/man1/tar.1.html</a></p>
-
-- Listing mode only (requires -t or --list). Old-style flags accepted (e.g. tar tf, tar tzf).
-- Flags: -f, -j, -J, -v, -z, -O, --bzip2, --file, --gzip, --xz, --zstd.
-
 ### `touch`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#touch-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#touch-invocation</a></p>
 
 Aliases: `gtouch`
 
+- Creates or updates its file operands within your workspace.
 - Allowed standalone flags: --help, --no-create, --no-dereference, --version, -A, -a, -c, -h, -m
 - Allowed valued flags: --date, --reference, --time, -d, -r, -t
 

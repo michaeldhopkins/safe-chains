@@ -9,3 +9,24 @@ bare = false
 require_any = ["--help", "--version"]
 max_positional = 0
 standalone = ["--help", "--version"]
+
+# Declarative facet behavior: rm DESTROYS each positional (effortful reversibility — a delete
+# is recoverable only from out-of-band backups), gated per-operand by locus so a worktree
+# delete projects to the dev level while `rm -rf /etc` denies. `-r`/`-R`/`--recursive` widen
+# the scale to unbounded. The behavior grammar is the FULL destructive flag set — distinct from
+# the legacy `standalone` above, which stays restricted to `--help`/`--version` so the legacy
+# fallback can never fail-open on `rm -rf`. `--no-preserve-root` is intentionally absent, so
+# `rm -rf --no-preserve-root /` hits an unrecognized flag and worst-cases. Replaces `resolve_rm`.
+[command.behavior]
+operation = "destroy"
+positionals = "write"
+scale = "breadth"
+standalone = [
+    "-f", "-i", "-I", "-r", "-R", "-d", "-v",
+    "--force", "--interactive", "--recursive", "--dir", "--verbose",
+    "--one-file-system", "--preserve-root", "--help", "--version",
+]
+[command.behavior.flags]
+"-r" = { scale = "unbounded" }
+"-R" = { scale = "unbounded" }
+"--recursive" = { scale = "unbounded" }

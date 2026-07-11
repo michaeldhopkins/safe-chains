@@ -21,6 +21,9 @@ use crate::registry;
 use crate::verdict::Verdict;
 
 pub fn is_safe_magick(tokens: &[Token]) -> Verdict {
+    if tokens.len() < 2 {
+        return Verdict::Denied; // bare `magick` prints usage — nothing to classify (and `tokens[1]` below would panic)
+    }
     if tokens[1..].iter().any(|t| t.as_str() == "-script") {
         return Verdict::Denied;
     }
@@ -89,6 +92,7 @@ mod tests {
     }
 
     denied! {
+        magick_bare_no_args: "magick",
         magick_conjure_msl: "magick conjure script.msl",
         magick_display_window: "magick display photo.jpg",
         magick_animate_gif: "magick animate animation.gif",

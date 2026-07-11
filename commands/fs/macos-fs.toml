@@ -63,6 +63,12 @@ bare = false
 standalone = ["--help", "-h", "-s"]
 valued = ["-i"]
 
+# The last positional is the written .bom; -i is the lsbom-format file listing read as input.
+[command.path_gate]
+positional = "read"
+shape = "last_write"
+flags = { "-i" = "read" }
+
 [[command]]
 name = "vis"
 description = "Filter that converts non-printable characters in its input into a visible representation, in one of several formats (C-style, octal, URI percent-encoding, MIME quoted-printable, etc.). Strictly a stdin-to-stdout transform with optional file arguments read as input; no writes to the filesystem. BSD-derived utility, surface frozen."

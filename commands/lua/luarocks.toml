@@ -32,6 +32,11 @@ name = "path"
 level = "SafeRead"
 bare = true
 standalone = ["--bin", "--full", "--help", "--lr-bin", "--lr-cpath", "--lr-path", "--lua-path", "--lua-cpath", "-h"]
+# `eval "$(luarocks path)"` sets LUA_PATH/LUA_CPATH; bare output plus `--bin` (adds a PATH export) and
+# `--full` (adds default paths) stay shell-init. The `--lr-*`/`--lua-*` flags emit a RAW path fragment
+# (for embedding, not eval) and are excluded.
+eval_safe = true
+eval_safe_flags = ["--bin", "--full"]
 
 [[command.sub]]
 name = "which"

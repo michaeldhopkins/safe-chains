@@ -1016,10 +1016,16 @@ Aliases: `gas`
 - **acm**: Allowed arguments: describe-*, get-*, list-*
 - **acm-pca**: Allowed arguments: describe-*, get-*, list-*
 - **amp**: Allowed arguments: describe-*, get-*, list-*
-- **amplify**: Allowed arguments: describe-*, get-*, list-*
-- **amplifybackend**: Allowed arguments: describe-*, get-*, list-*
+- **amplify get-app**
+- **amplify get-branch**
+- **amplify get-webhook**
+- **amplify list-apps**
+- **amplify list-branches**
+- **amplify list-webhooks**
+- **amplifybackend get-backend-auth**
 - **amplifyuibuilder**: Allowed arguments: describe-*, get-*, list-*
-- **apigateway**: Allowed arguments: get-*
+- **apigateway get-api-key**
+- **apigateway get-api-keys**
 - **apigatewayv2**: Allowed arguments: get-*
 - **appconfig**: Allowed arguments: describe-*, get-*, list-*
 - **appflow**: Allowed arguments: describe-*, get-*, list-*
@@ -1028,11 +1034,12 @@ Aliases: `gas`
 - **appmesh**: Allowed arguments: describe-*, get-*, list-*
 - **apprunner**: Allowed arguments: describe-*, get-*, list-*
 - **appstream**: Allowed arguments: describe-*, get-*, list-*
-- **appsync**: Allowed arguments: describe-*, get-*, list-*
+- **appsync get-graphql-api-environment-variables**
+- **appsync list-api-keys**
 - **artifact**: Allowed arguments: describe-*, get-*, list-*
 - **athena**: Allowed arguments: get-*, list-*
 - **auditmanager**: Allowed arguments: describe-*, get-*, list-*
-- **autoscaling**: Allowed arguments: describe-*
+- **autoscaling describe-launch-configurations**
 - **autoscaling-plans**: Allowed arguments: describe-*, get-*, list-*
 - **b2bi**: Allowed arguments: describe-*, get-*, list-*
 - **backup**: Allowed arguments: describe-*, get-*, list-*
@@ -1046,7 +1053,8 @@ Aliases: `gas`
 - **chatbot**: Allowed arguments: describe-*, get-*, list-*
 - **chime**: Allowed arguments: describe-*, get-*, list-*
 - **chime-sdk-identity**: Allowed arguments: describe-*, get-*, list-*
-- **chime-sdk-meetings**: Allowed arguments: describe-*, get-*, list-*
+- **chime-sdk-meetings get-attendee**
+- **chime-sdk-meetings list-attendees**
 - **chime-sdk-messaging**: Allowed arguments: describe-*, get-*, list-*
 - **chime-sdk-voice**: Allowed arguments: describe-*, get-*, list-*
 - **cleanrooms**: Allowed arguments: describe-*, get-*, list-*
@@ -1058,37 +1066,45 @@ Aliases: `gas`
 - **cloudsearch**: Allowed arguments: describe-*, get-*, list-*
 - **cloudtrail**: Allowed arguments: describe-*, get-*, list-*
 - **cloudwatch**: Allowed arguments: describe-*, get-*, list-*
-- **codeartifact**: Allowed arguments: describe-*, get-*, list-*
-- **codebuild**: Allowed arguments: batch-get-*, describe-*, list-*
+- **codeartifact get-authorization-token**
+- **codebuild batch-get-build-batches**
+- **codebuild batch-get-builds**
+- **codebuild batch-get-projects**
 - **codecatalyst**: Allowed arguments: describe-*, get-*, list-*
 - **codecommit**: Allowed arguments: describe-*, get-*, list-*
 - **codeguru-reviewer**: Allowed arguments: describe-*, get-*, list-*
 - **codeguruprofiler**: Allowed arguments: describe-*, get-*, list-*
-- **codepipeline**: Allowed arguments: get-*, list-*
+- **codepipeline get-job-details**
+- **codepipeline get-third-party-job-details**
 - **codestar-connections**: Allowed arguments: describe-*, get-*, list-*
 - **codestar-notifications**: Allowed arguments: describe-*, get-*, list-*
-- **cognito-identity**: Allowed arguments: describe-*, get-*, list-*
-- **cognito-idp**: Allowed arguments: describe-*, get-*, list-*
+- **cognito-identity get-credentials-for-identity**
+- **cognito-identity get-open-id-token**
+- **cognito-identity get-open-id-token-for-developer-identity**
+- **cognito-idp describe-identity-provider**
+- **cognito-idp describe-user-pool-client**
 - **comprehend**: Allowed arguments: describe-*, get-*, list-*
 - **compute-optimizer**: Allowed arguments: describe-*, get-*, list-*
 - **configservice**: Allowed arguments: describe-*, get-*, list-*
-- **configure export-credentials**: Flags: --help. Valued: --format, --profile
+- **configure export-credentials**
 - **configure get**: Flags: --help
 - **configure list**: Flags: --help
-- **connect**: Allowed arguments: describe-*, get-*, list-*
+- **connect get-federation-token**
 - **controltower**: Allowed arguments: describe-*, get-*, list-*
 - **cur**: Allowed arguments: describe-*, get-*, list-*
 - **databrew**: Allowed arguments: describe-*, get-*, list-*
 - **dataexchange**: Allowed arguments: describe-*, get-*, list-*
 - **datasync**: Allowed arguments: describe-*, get-*, list-*
-- **datazone**: Allowed arguments: describe-*, get-*, list-*
+- **datazone get-connection**
+- **datazone get-environment-credentials**
 - **dax**: Allowed arguments: describe-*, get-*, list-*
 - **deadline**: Allowed arguments: describe-*, get-*, list-*
 - **detective**: Allowed arguments: describe-*, get-*, list-*
 - **devicefarm**: Allowed arguments: describe-*, get-*, list-*
 - **devops-guru**: Allowed arguments: describe-*, get-*, list-*
-- **directconnect**: Allowed arguments: describe-*, get-*, list-*
-- **discovery**: Allowed arguments: describe-*, get-*, list-*
+- **directconnect describe-router-configuration**
+- **directconnect describe-virtual-interfaces**
+- **discovery describe-export-tasks**
 - **dlm**: Allowed arguments: describe-*, get-*, list-*
 - **dms**: Allowed arguments: describe-*, get-*, list-*
 - **docdb**: Allowed arguments: describe-*, get-*, list-*
@@ -1096,10 +1112,13 @@ Aliases: `gas`
 - **ds**: Allowed arguments: describe-*, get-*, list-*
 - **dynamodb**: Allowed arguments: describe-*, list-*
 - **dynamodbstreams**: Allowed arguments: describe-*, get-*, list-*
-- **ebs**: Allowed arguments: describe-*, get-*, list-*
-- **ec2**: Allowed arguments: describe-*
-- **ecr**: Allowed arguments: batch-get-*, describe-*, get-*, list-*
-- **ecr-public**: Allowed arguments: describe-*, get-*, list-*
+- **ebs get-snapshot-block**
+- **ec2 describe-instance-attribute**
+- **ec2 describe-launch-template-versions**
+- **ecr get-authorization-token**
+- **ecr get-login-password**
+- **ecr-public get-authorization-token**
+- **ecr-public get-login-password**
 - **ecs**: Allowed arguments: describe-*, list-*
 - **efs**: Allowed arguments: describe-*, get-*, list-*
 - **eks**: Allowed arguments: describe-*, list-*
@@ -1108,23 +1127,28 @@ Aliases: `gas`
 - **elastictranscoder**: Allowed arguments: describe-*, get-*, list-*
 - **elb**: Allowed arguments: describe-*
 - **elbv2**: Allowed arguments: describe-*
-- **emr**: Allowed arguments: describe-*, get-*, list-*
-- **emr-containers**: Allowed arguments: describe-*, get-*, list-*
+- **emr get-cluster-session-credentials**
+- **emr get-on-cluster-app-ui-presigned-url**
+- **emr get-persistent-app-ui-presigned-url**
+- **emr-containers get-managed-endpoint-session-credentials**
 - **emr-serverless**: Allowed arguments: describe-*, get-*, list-*
 - **entityresolution**: Allowed arguments: describe-*, get-*, list-*
 - **es**: Allowed arguments: describe-*, get-*, list-*
 - **events**: Allowed arguments: describe-*, list-*
-- **finspace**: Allowed arguments: describe-*, get-*, list-*
+- **finspace get-kx-connection-string**
 - **firehose**: Allowed arguments: describe-*, get-*, list-*
 - **fis**: Allowed arguments: describe-*, get-*, list-*
 - **fms**: Allowed arguments: describe-*, get-*, list-*
 - **forecast**: Allowed arguments: describe-*, get-*, list-*
 - **frauddetector**: Allowed arguments: describe-*, get-*, list-*
 - **fsx**: Allowed arguments: describe-*, get-*, list-*
-- **gamelift**: Allowed arguments: describe-*, get-*, list-*
-- **glacier**: Allowed arguments: describe-*, get-*, list-*
+- **gamelift get-compute-access**
+- **gamelift get-compute-auth-token**
+- **gamelift get-instance-access**
+- **glacier get-job-output**
 - **globalaccelerator**: Allowed arguments: describe-*, get-*, list-*
-- **glue**: Allowed arguments: get-*, list-*
+- **glue get-connection**
+- **glue get-connections**
 - **grafana**: Allowed arguments: describe-*, get-*, list-*
 - **greengrass**: Allowed arguments: describe-*, get-*, list-*
 - **greengrassv2**: Allowed arguments: describe-*, get-*, list-*
@@ -1132,7 +1156,7 @@ Aliases: `gas`
 - **guardduty**: Allowed arguments: describe-*, get-*, list-*
 - **health**: Allowed arguments: describe-*, get-*, list-*
 - **healthlake**: Allowed arguments: describe-*, get-*, list-*
-- **iam**: Allowed arguments: get-*, list-*
+- **iam get-credential-report**
 - **identitystore**: Allowed arguments: describe-*, get-*, list-*
 - **imagebuilder**: Allowed arguments: describe-*, get-*, list-*
 - **inspector2**: Allowed arguments: describe-*, get-*, list-*
@@ -1141,7 +1165,7 @@ Aliases: `gas`
 - **iotevents**: Allowed arguments: describe-*, get-*, list-*
 - **iotsitewise**: Allowed arguments: describe-*, get-*, list-*
 - **iottwinmaker**: Allowed arguments: describe-*, get-*, list-*
-- **ivs**: Allowed arguments: describe-*, get-*, list-*
+- **ivs get-stream-key**
 - **kafka**: Allowed arguments: describe-*, get-*, list-*
 - **kafkaconnect**: Allowed arguments: describe-*, get-*, list-*
 - **kendra**: Allowed arguments: describe-*, get-*, list-*
@@ -1151,21 +1175,28 @@ Aliases: `gas`
 - **kinesisanalyticsv2**: Allowed arguments: describe-*, get-*, list-*
 - **kinesisvideo**: Allowed arguments: describe-*, get-*, list-*
 - **kms**: Allowed arguments: describe-*, get-*, list-*
-- **lakeformation**: Allowed arguments: describe-*, get-*, list-*
-- **lambda**: Allowed arguments: get-*, list-*
-- **lex-models**: Allowed arguments: describe-*, get-*, list-*
+- **lakeformation get-temporary-data-location-credentials**
+- **lakeformation get-temporary-glue-partition-credentials**
+- **lakeformation get-temporary-glue-table-credentials**
+- **lambda get-function**
+- **lambda get-function-configuration**
+- **lambda list-functions**
+- **lex-models get-bot-channel-association**
+- **lex-models get-bot-channel-associations**
 - **lexv2-models**: Allowed arguments: describe-*, get-*, list-*
-- **license-manager**: Allowed arguments: describe-*, get-*, list-*
-- **lightsail**: Allowed arguments: describe-*, get-*, list-*
-- **location**: Allowed arguments: describe-*, get-*, list-*
+- **license-manager get-access-token**
+- **lightsail get-instance-access-details**
+- **lightsail get-relational-database-master-user-password**
+- **location describe-key**
 - **logs**: Allowed arguments: describe-*, filter-*, get-*, list-*
-- **m2**: Allowed arguments: describe-*, get-*, list-*
-- **macie2**: Allowed arguments: describe-*, get-*, list-*
-- **managedblockchain**: Allowed arguments: describe-*, get-*, list-*
+- **m2 get-signed-bluinsights-url**
+- **macie2 get-sensitive-data-occurrences**
+- **managedblockchain get-accessor**
 - **mediaconnect**: Allowed arguments: describe-*, get-*, list-*
 - **mediaconvert**: Allowed arguments: describe-*, get-*, list-*
 - **medialive**: Allowed arguments: describe-*, get-*, list-*
-- **mediapackage**: Allowed arguments: describe-*, get-*, list-*
+- **mediapackage describe-channel**
+- **mediapackage list-channels**
 - **mediastore**: Allowed arguments: describe-*, get-*, list-*
 - **mediatailor**: Allowed arguments: describe-*, get-*, list-*
 - **medical-imaging**: Allowed arguments: describe-*, get-*, list-*
@@ -1180,26 +1211,29 @@ Aliases: `gas`
 - **networkmanager**: Allowed arguments: describe-*, get-*, list-*
 - **notifications**: Allowed arguments: describe-*, get-*, list-*
 - **oam**: Allowed arguments: describe-*, get-*, list-*
-- **omics**: Allowed arguments: describe-*, get-*, list-*
+- **omics get-read-set**
 - **opensearch**: Allowed arguments: describe-*, get-*, list-*
 - **opensearchserverless**: Allowed arguments: describe-*, get-*, list-*
 - **organizations**: Allowed arguments: describe-*, get-*, list-*
 - **outposts**: Allowed arguments: describe-*, get-*, list-*
 - **personalize**: Allowed arguments: describe-*, get-*, list-*
 - **pi**: Allowed arguments: describe-*, get-*, list-*
-- **pinpoint**: Allowed arguments: describe-*, get-*, list-*
+- **pinpoint get-baidu-channel**
+- **pinpoint get-gcm-channel**
 - **pipes**: Allowed arguments: describe-*, get-*, list-*
 - **polly**: Allowed arguments: describe-*, get-*, list-*
 - **pricing**: Allowed arguments: describe-*, get-*, list-*
 - **proton**: Allowed arguments: describe-*, get-*, list-*
-- **quicksight**: Allowed arguments: describe-*, get-*, list-*
+- **quicksight get-dashboard-embed-url**
+- **quicksight get-session-embed-url**
 - **ram**: Allowed arguments: describe-*, get-*, list-*
 - **rbin**: Allowed arguments: describe-*, get-*, list-*
 - **rds**: Allowed arguments: describe-*, list-*
 - **rds-data**: Allowed arguments: describe-*, get-*, list-*
-- **redshift**: Allowed arguments: describe-*, get-*, list-*
+- **redshift get-cluster-credentials**
+- **redshift get-cluster-credentials-with-iam**
 - **redshift-data**: Allowed arguments: describe-*, get-*, list-*
-- **redshift-serverless**: Allowed arguments: describe-*, get-*, list-*
+- **redshift-serverless get-credentials**
 - **rekognition**: Allowed arguments: describe-*, get-*, list-*
 - **resiliencehub**: Allowed arguments: describe-*, get-*, list-*
 - **resource-explorer-2**: Allowed arguments: describe-*, get-*, list-*
@@ -1214,13 +1248,13 @@ Aliases: `gas`
 - **route53resolver**: Allowed arguments: describe-*, get-*, list-*
 - **rum**: Allowed arguments: describe-*, get-*, list-*
 - **s3**: Allowed arguments: ls
-- **s3api**: Allowed arguments: get-*, head-*, list-*
-- **s3control**: Allowed arguments: describe-*, get-*, list-*
+- **s3api get-object**
+- **s3control get-data-access**
 - **sagemaker**: Allowed arguments: describe-*, list-*
 - **savingsplans**: Allowed arguments: describe-*, get-*, list-*
 - **scheduler**: Allowed arguments: describe-*, get-*, list-*
 - **schemas**: Allowed arguments: describe-*, get-*, list-*
-- **secretsmanager**: Allowed arguments: describe-*, get-*, list-*
+- **secretsmanager**: Allowed arguments: describe-*, list-*
 - **securityhub**: Allowed arguments: describe-*, get-*, list-*
 - **securitylake**: Allowed arguments: describe-*, get-*, list-*
 - **serverlessrepo**: Allowed arguments: describe-*, get-*, list-*
@@ -1233,13 +1267,17 @@ Aliases: `gas`
 - **signer**: Allowed arguments: describe-*, get-*, list-*
 - **sns**: Allowed arguments: get-*, list-*
 - **sqs**: Allowed arguments: get-*, list-*
-- **ssm**: Allowed arguments: describe-*, get-*, list-*
+- **ssm get-access-token**
+- **ssm get-parameter**
+- **ssm get-parameter-history**
+- **ssm get-parameters**
+- **ssm get-parameters-by-path**
 - **ssm-contacts**: Allowed arguments: describe-*, get-*, list-*
 - **ssm-incidents**: Allowed arguments: describe-*, get-*, list-*
-- **sso**: Allowed arguments: describe-*, get-*, list-*
+- **sso get-role-credentials**
 - **sso-admin**: Allowed arguments: describe-*, get-*, list-*
-- **stepfunctions**: Allowed arguments: describe-*, get-*, list-*
-- **storagegateway**: Allowed arguments: describe-*, get-*, list-*
+- **stepfunctions get-activity-task**
+- **storagegateway describe-chap-credentials**
 - **sts get-caller-identity**: Flags: --help
 - **sts**: Allowed arguments: describe-*, get-*, list-*
 - **support**: Allowed arguments: describe-*, get-*, list-*
@@ -1255,12 +1293,12 @@ Aliases: `gas`
 - **vpc-lattice**: Allowed arguments: describe-*, get-*, list-*
 - **waf**: Allowed arguments: describe-*, get-*, list-*
 - **waf-regional**: Allowed arguments: describe-*, get-*, list-*
-- **wafv2**: Allowed arguments: describe-*, get-*, list-*
+- **wafv2 get-sampled-requests**
 - **wellarchitected**: Allowed arguments: describe-*, get-*, list-*
 - **workdocs**: Allowed arguments: describe-*, get-*, list-*
 - **workmail**: Allowed arguments: describe-*, get-*, list-*
 - **workspaces**: Allowed arguments: describe-*, get-*, list-*
-- **workspaces-web**: Allowed arguments: describe-*, get-*, list-*
+- **workspaces-web get-identity-provider**
 - **xray**: Allowed arguments: describe-*, get-*, list-*
 - Allowed standalone flags: --help, --version
 
@@ -1268,12 +1306,17 @@ Aliases: `gas`
 
 - `aws sts get-caller-identity`
 - `aws s3 ls`
-- `aws configure export-credentials`
-- `aws configure export-credentials --format env`
-- `aws configure export-credentials --format env --profile dev`
-- `eval "$(aws configure export-credentials --format env)"`
-- `eval "$(aws configure export-credentials --format env-no-export --profile dev)"`
-- `eval "$(aws configure export-credentials --format=fish)"`
+- `aws secretsmanager describe-secret --secret-id x`
+- `aws secretsmanager list-secrets`
+- `aws ecr describe-repositories`
+- `aws ecr list-images --repository-name r`
+- `aws ssm get-parameter --name x`
+- `aws ssm describe-parameters`
+- `aws ssm get-parameter-history --name x`
+- `aws lambda list-layers`
+- `aws apigateway get-api-key --api-key x`
+- `aws ec2 describe-instance-attribute --instance-id i --attribute instanceType`
+- `aws datazone get-connection --identifier x`
 
 ### `az`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/cli/azure/">https://learn.microsoft.com/en-us/cli/azure/</a></p>
@@ -1398,7 +1441,7 @@ Aliases: `gbase64`
 ### `basecamp`
 <p class="cmd-url"><a href="https://github.com/basecamp/basecamp-cli">https://github.com/basecamp/basecamp-cli</a></p>
 
-- **auth token**: Positional args accepted
+- **auth token**
 - **cards list**: Positional args accepted
 - **commands**: Positional args accepted
 - **doctor**: Positional args accepted
@@ -1712,7 +1755,7 @@ Aliases: `@biomejs/biome`
 - **install**: Flags: --clean, --deployment, --frozen, --full-index, --help, --local, --no-cache, --no-prune-sources, --prefer-local, --quiet, --redownload, --system, -h. Valued: --gemfile, --jobs, --path, --retry, --standalone, --trust-policy, --with, --without, -j
 - **list**: Flags: --help, --name-only, --paths, -h
 - **show**: Flags: --help, --paths, -h
-- Allowed standalone flags: --help, --version, -V, -h
+- Allowed standalone flags: --help, --version, -V, -h, -v
 
 ### `bundler-audit`
 <p class="cmd-url"><a href="https://github.com/rubysec/bundler-audit">https://github.com/rubysec/bundler-audit</a></p>
@@ -1890,63 +1933,63 @@ Aliases: `capacitor`
 ### `cargo`
 <p class="cmd-url"><a href="https://doc.rust-lang.org/cargo/commands/">https://doc.rust-lang.org/cargo/commands/</a></p>
 
-- **about generate**: Flags: --all-features, --fail, --frozen, --help, --locked, --no-default-features, --offline, --workspace, -V, -h. Valued: --color, --config, --features, --format, --manifest-path, --name, --target, --threshold, -L, -c, -m, -n
+- **about generate**: Flags: --all-features, --fail, --frozen, --help, --locked, --no-default-features, --offline, --workspace, -V, -h. Valued: --color, --features, --format, --manifest-path, --name, --target, --threshold, -L, -c, -m, -n
 - **about**: Flags: --help, --version, -V, -h. Valued: --color, -L
-- **asm**: Flags: --all-features, --bin, --debug-info, --example, --features, --frozen, --full-name, --help, --lib, --locked, --no-color, --no-default-features, --offline, --release, --rust, --simplify, --source, --test, --verbose, --version, -V, -h. Valued: --asm-style, --bench, --build-type, --config, --manifest-path, --package, --target, --target-cpu, --target-dir, --unstable, -p
+- **asm**: Flags: --all-features, --bin, --debug-info, --example, --features, --frozen, --full-name, --help, --lib, --locked, --no-color, --no-default-features, --offline, --release, --rust, --simplify, --source, --test, --verbose, --version, -V, -h. Valued: --asm-style, --bench, --build-type, --manifest-path, --package, --target, --target-cpu, --target-dir, --unstable, -p
 - **audit**: Flags: --deny, --help, --json, --no-fetch, --stale, -h, -n, --quiet, -q, -v. Valued: --color, --db, --file, --ignore, --target-arch, --target-os, -f
-- **bench**: Flags: --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
+- **bench**: Flags: --all, --workspace, --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **bloat**: Flags: --crates, --filter, --help, --lib, --no-default-features, --release, --time, --wide, -h. Valued: --bin, --example, --features, --jobs, --manifest-path, --message-format, --package, --target, -j, -n, -p
-- **build**: Flags: --all-features, --all-targets, --benches, --bins, --build-plan, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
-- **check**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, --version, --workspace, -V, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
-- **clean**: Flags: --doc, --dry-run, --frozen, --help, --locked, --offline, --release, --workspace, -h, -n, --quiet, -q, -r, -v. Valued: --color, --config, --lockfile-path, --manifest-path, --package, --profile, --target, --target-dir, -Z, -p
-- **clippy**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-deps, --offline, --release, --tests, --timings, --unit-graph, --version, --workspace, -V, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
-- **config get**: Flags: --frozen, --help, --locked, --offline, --show-origin, -h, --quiet, -q, -v. Valued: --color, --config, --format, --merged, -Z
+- **build**: Flags: --all, --workspace, --all-features, --all-targets, --benches, --bins, --build-plan, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
+- **check**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --timings, --unit-graph, --version, --workspace, -V, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
+- **clean**: Flags: --doc, --dry-run, --frozen, --help, --locked, --offline, --release, --workspace, -h, -n, --quiet, -q, -r, -v. Valued: --color, --lockfile-path, --manifest-path, --package, --profile, --target, --target-dir, -Z, -p
+- **clippy**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-deps, --offline, --release, --tests, --timings, --unit-graph, --version, --workspace, -V, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
+- **config get**: Flags: --frozen, --help, --locked, --offline, --show-origin, -h, --quiet, -q, -v. Valued: --color, --format, --merged, -Z
 - **criterion**: Flags: --all, --all-features, --all-targets, --benches, --bins, --debug, --examples, --frozen, --help, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --tests, --verbose, --version, --workspace, -V, -h, -v. Valued: --bench, --bin, --color, --criterion-manifest-path, --example, --exclude, --features, --history-description, --history-id, --jobs, --manifest-path, --message-format, --output-format, --package, --plotting-backend, --target, --target-dir, --test, -Z, -j, -p
 - **cyclonedx**: Flags: --all, --all-features, --help, --license-strict, --no-default-features, --quiet, --target-in-filename, --top-level, --verbose, --version, -V, -a, -h, -q, -v. Valued: --describe, --features, --format, --license-accept-named, --manifest-path, --override-filename, --spec-version, --target, -F, -f
-- **deny**: Flags: --all-features, --help, --no-default-features, -h, --quiet, -q, -v. Valued: --color, --config, --exclude, --features, --format, --manifest-path, --target, --workspace
-- **doc**: Flags: --all-features, --bins, --document-private-items, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --locked, --no-default-features, --no-deps, --offline, --open, --release, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bin, --color, --config, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, -Z, -j, -p
+- **deny**: Flags: --all-features, --help, --no-default-features, -h, --quiet, -q, -v. Valued: --color, --exclude, --features, --format, --manifest-path, --target, --workspace
+- **doc**: Flags: --all, --all-features, --bins, --document-private-items, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --locked, --no-default-features, --no-deps, --offline, --open, --release, --timings, --unit-graph, --workspace, -h, --quiet, -q, -v. Valued: --bin, --color, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, -Z, -j, -p
 - **expand**: Flags: --all-features, --help, --lib, --no-default-features, --release, --tests, --ugly, -h. Valued: --bin, --color, --example, --features, --manifest-path, --package, --target, --theme, -p
-- **fetch**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --lockfile-path, --manifest-path, --target, -Z
-- **fmt** (requires --check): Flags: --all, --check, --help, -h, --quiet, -q, -v. Valued: --manifest-path, --message-format, --package, -p
+- **fetch**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --lockfile-path, --manifest-path, --target, -Z
+- **fmt**: Flags: --all, --check, --help, -h, --quiet, -q, -v. Valued: --manifest-path, --message-format, --package, -p
 - **geiger**: Flags: --all, --all-dependencies, --all-features, --all-targets, --build-dependencies, --dev-dependencies, --forbid-only, --frozen, --help, --include-tests, --invert, --locked, --no-default-features, --no-indent, --offline, --prefix-depth, --quiet, --verbose, --version, -V, -a, -f, -h, -i, -q, -v. Valued: --color, --features, --format, --manifest-path, --output-format, --package, --section-name, --target, -Z, -p
-- **generate-lockfile**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
+- **generate-lockfile**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
 - **help**: Positional args accepted
-- **info**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --index, --registry
-- **init**: Flags: --bin, --frozen, --help, --lib, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --edition, --name, --registry, --vcs, -Z
-- **install**: Flags: --all-features, --bins, --debug, --force, --frozen, --help, --ignore-rust-version, --keep-going, --locked, --no-default-features, --no-track, --offline, --quiet, --timings, --verbose, -f, -h, -q, -v. Valued: --bin, --color, --config, --example, --features, --jobs, --message-format, --path, --profile, --root, --target, --target-dir, -F, -Z, -j
-- **license**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
-- **llvm-cov**: Flags: --all-features, --all-targets, --help, --html, --json, --lcov, --lib, --locked, --no-cfg-coverage, --no-default-features, --no-fail-fast, --no-run, --open, --release, --text, -h. Valued: --bin, --branch, --codecov, --cobertura, --color, --config, --example, --exclude, --features, --ignore-filename-regex, --ignore-run-fail, --jobs, --manifest-path, --output-dir, --output-path, --package, --profile, --target, --target-dir, --test, -j, -p
-- **locate-project**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
+- **info**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --index, --registry
+- **init**: Flags: --bin, --frozen, --help, --lib, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --edition, --name, --registry, --vcs, -Z
+- **install**: Flags: --all-features, --bins, --debug, --force, --frozen, --help, --ignore-rust-version, --keep-going, --locked, --no-default-features, --no-track, --offline, --quiet, --timings, --verbose, -f, -h, -q, -v. Valued: --bin, --color, --example, --features, --jobs, --message-format, --path, --profile, --root, --target, --target-dir, -F, -Z, -j
+- **license**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
+- **llvm-cov**: Flags: --all-features, --all-targets, --help, --html, --json, --lcov, --lib, --locked, --no-cfg-coverage, --no-default-features, --no-fail-fast, --no-run, --open, --release, --text, -h. Valued: --bin, --branch, --codecov, --cobertura, --color, --example, --exclude, --features, --ignore-filename-regex, --ignore-run-fail, --jobs, --manifest-path, --output-dir, --output-path, --package, --profile, --target, --target-dir, --test, -j, -p
+- **locate-project**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
 - **machete**: Flags: --help, --skip-target-dir, --with-metadata, -V, -h
-- **metadata**: Flags: --all-features, --frozen, --help, --locked, --no-default-features, --no-deps, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --features, --filter-platform, --format-version, --manifest-path
+- **metadata**: Flags: --all-features, --frozen, --help, --locked, --no-default-features, --no-deps, --offline, -h, --quiet, -q, -v. Valued: --color, --features, --filter-platform, --format-version, --manifest-path
 - **modules**: Flags: --all-features, --cfg-test, --help, --no-default-features, --no-externs, --no-fns, --no-modules, --no-sysroot, --no-traits, --no-types, --no-uses, --orphans, --sort-by-name, --sort-by-visibility, --types, --uses, --verbose, -h. Valued: --bin, --example, --features, --lib, --manifest-path, --package, --target, -p
 - **msrv find**: Flags: --all-features, --bisect, --help, --ignore-lockfile, --include-all-patch-releases, --linear, --no-check-feedback, --no-default-features, --no-log, --no-user-output, -h. Valued: --component, --features, --log-level, --log-target, --manifest-path, --max, --maximum, --min, --minimum, --output-format, --path, --release-source, --target
 - **msrv list**: Flags: --help, --no-log, --no-user-output, -h. Valued: --log-level, --log-target, --manifest-path, --output-format, --path, --variant
 - **msrv show**: Flags: --help, --no-log, --no-user-output, -h. Valued: --log-level, --log-target, --manifest-path, --output-format, --path
 - **msrv verify**: Flags: --all-features, --help, --ignore-lockfile, --include-all-patch-releases, --no-check-feedback, --no-default-features, --no-log, --no-user-output, -h. Valued: --component, --features, --log-level, --log-target, --manifest-path, --max, --maximum, --min, --minimum, --output-format, --path, --release-source, --rust-version, --target
 - **msrv**: Flags: --help, --no-log, --no-user-output, --version, -V, -h. Valued: --log-level, --log-target, --manifest-path, --output-format, --path
-- **new**: Flags: --bin, --frozen, --help, --lib, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --edition, --name, --registry, --vcs, -Z
+- **new**: Flags: --bin, --frozen, --help, --lib, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --edition, --name, --registry, --vcs, -Z
 - **nextest archive**: Flags: --all-features, --help, --locked, --no-default-features, --release, -h. Valued: --archive-file, --archive-format, --cargo-profile, --features, --manifest-path, --package, --target, --target-dir, -p
-- **nextest list**: Flags: --all-features, --help, --lib, --locked, --no-default-features, --release, -T, -h. Valued: --bin, --color, --config, --exclude, --features, --manifest-path, --message-format, --package, --partition, --profile, --target, --target-dir, --test, -E, -p
-- **nextest run**: Flags: --all-features, --all-targets, --help, --lib, --locked, --no-capture, --no-default-features, --no-fail-fast, --release, --status-level, -h. Valued: --bin, --cargo-profile, --color, --config, --exclude, --features, --jobs, --manifest-path, --package, --partition, --profile, --retries, --target, --target-dir, --test, --test-threads, --threads, -E, -j, -p
+- **nextest list**: Flags: --all-features, --help, --lib, --locked, --no-default-features, --release, -T, -h. Valued: --bin, --color, --exclude, --features, --manifest-path, --message-format, --package, --partition, --profile, --target, --target-dir, --test, -E, -p
+- **nextest run**: Flags: --all-features, --all-targets, --help, --lib, --locked, --no-capture, --no-default-features, --no-fail-fast, --release, --status-level, -h. Valued: --bin, --cargo-profile, --color, --exclude, --features, --jobs, --manifest-path, --package, --partition, --profile, --retries, --target, --target-dir, --test, --test-threads, --threads, -E, -j, -p
 - **nextest show-config**: Flags: --help, -h
 - **nextest**: Flags: --help, --version, -V, -h
 - **outdated**: Flags: --aggressive, --color, --depth, --exit-code, --features, --help, --manifest-path, --packages, --root-deps-only, --verbose, --workspace, -R, -V, -d, -h, -n, --quiet, -q, -r, -v, -w. Valued: --color, --depth, --exclude, --features, --ignore, --manifest-path, --packages, -d, -e, -i, -p
-- **package** (requires --list, -l): Flags: --all-features, --allow-dirty, --exclude-lockfile, --frozen, --help, --keep-going, --list, --locked, --no-default-features, --no-metadata, --no-verify, --offline, --workspace, -h, -l, --quiet, -q, -v. Valued: --color, --config, --exclude, --features, --index, --jobs, --lockfile-path, --manifest-path, --message-format, --package, --registry, --target, --target-dir, -F, -Z, -j, -p
-- **pkgid**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
+- **package** (requires --list, -l): Flags: --all-features, --allow-dirty, --exclude-lockfile, --frozen, --help, --keep-going, --list, --locked, --no-default-features, --no-metadata, --no-verify, --offline, --workspace, -h, -l, --quiet, -q, -v. Valued: --color, --exclude, --features, --index, --jobs, --lockfile-path, --manifest-path, --message-format, --package, --registry, --target, --target-dir, -F, -Z, -j, -p
+- **pkgid**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
 - **public-api**: Flags: --all-features, --help, --no-default-features, --simplified, --version, -V, -h, -s. Valued: --color, --features, --manifest-path, --omit, --package, --target, -F, -p
-- **publish** (requires --dry-run, -n): Flags: --all-features, --allow-dirty, --dry-run, --frozen, --help, --keep-going, --locked, --no-default-features, --no-verify, --offline, --workspace, -h, -n, --quiet, -q, -v. Valued: --color, --config, --exclude, --features, --index, --jobs, --lockfile-path, --manifest-path, --package, --registry, --target, --target-dir, -F, -Z, -j, -p
-- **read-manifest**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
-- **report future-incompatibilities**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --id, --package, -Z, -p
-- **run**: Flags: --help, -h
-- **search**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --index, --limit, --registry
+- **publish** (requires --dry-run, -n): Flags: --all-features, --allow-dirty, --dry-run, --frozen, --help, --keep-going, --locked, --no-default-features, --no-verify, --offline, --workspace, -h, -n, --quiet, -q, -v. Valued: --color, --exclude, --features, --index, --jobs, --lockfile-path, --manifest-path, --package, --registry, --target, --target-dir, -F, -Z, -j, -p
+- **read-manifest**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
+- **report future-incompatibilities**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --id, --package, -Z, -p
+- **run**: Runs this project's own code. Flags: --all-features, --frozen, --help, --ignore-rust-version, --locked, --no-default-features, --offline, --release, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bin, --color, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, -Z, -j, -p
+- **search**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --index, --limit, --registry
 - **semver-checks check-release**: Flags: --all-features, --default-features, --help, --verbose, -h, -v. Valued: --baseline-rev, --baseline-root, --baseline-version, --color, --config-path, --current-rustdoc, --exclude, --features, --manifest-path, --package, --release-type, --target, -j, -p
-- **test**: Flags: --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, --workspace, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --config, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
-- **tree**: Flags: --all-features, --duplicates, --frozen, --help, --ignore-rust-version, --locked, --no-dedupe, --no-default-features, --offline, -d, -e, -h, -i, --quiet, -q, -v. Valued: --charset, --color, --config, --depth, --edges, --features, --format, --invert, --manifest-path, --package, --prefix, --prune, --target, -p
+- **test**: Flags: --all, --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, --workspace, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
+- **tree**: Flags: --all-features, --duplicates, --frozen, --help, --ignore-rust-version, --locked, --no-dedupe, --no-default-features, --offline, -d, -e, -h, -i, --quiet, -q, -v. Valued: --charset, --color, --depth, --edges, --features, --format, --invert, --manifest-path, --package, --prefix, --prune, --target, -p
 - **udeps**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --help, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --workspace, --version, -V, -h, --quiet, -q, -v. Valued: --backend, --bench, --bin, --color, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --output, --package, --profile, --target, --target-dir, --test, -j, -p
-- **update**: Flags: --aggressive, --dry-run, --frozen, --help, --locked, --offline, --recursive, --workspace, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path, --package, --precise, -p
-- **vendor**: Flags: --frozen, --help, --locked, --no-delete, --offline, --respect-source-config, --versioned-dirs, -h, --quiet, -q, -v. Valued: --color, --config, --lockfile-path, --manifest-path, --sync, -Z, -s
-- **verify-project**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --config, --manifest-path
+- **update**: Flags: --aggressive, --dry-run, --frozen, --help, --locked, --offline, --recursive, --workspace, -h, --quiet, -q, -v. Valued: --color, --manifest-path, --package, --precise, -p
+- **vendor**: Flags: --frozen, --help, --locked, --no-delete, --offline, --respect-source-config, --versioned-dirs, -h, --quiet, -q, -v. Valued: --color, --lockfile-path, --manifest-path, --sync, -Z, -s
+- **verify-project**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --manifest-path
 - **version**: Flags: --help, -h. Positional args accepted
 - **vet check**: Flags: --help, -h
 - **vet dump-graph**: Flags: --help, -h. Valued: --depth
@@ -1954,6 +1997,18 @@ Aliases: `capacitor`
 - **vet suggest**: Flags: --help, -h
 - **vet**: Flags: --frozen, --help, --locked, --no-all-features, --no-default-features, --no-minimize-exemptions, --no-registry-suggestions, --version, -V, -h. Valued: --cache-dir, --cargo-arg, --features, --filter-graph, --manifest-path, --output-format, --store-path, --verbose
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `cargo run`
+- `cargo run --release`
+- `cargo run --bin server`
+- `cargo build`
+- `cargo test`
+- `cargo fmt`
+- `cargo fmt --all`
+- `cargo fmt --check`
+- `cargo fmt --manifest-path ./crates/core/Cargo.toml`
 
 ### `carton`
 <p class="cmd-url"><a href="https://metacpan.org/pod/Carton">https://metacpan.org/pod/Carton</a></p>
@@ -2021,8 +2076,15 @@ Aliases: `capacitor`
 
 Aliases: `gcat`
 
-- Allowed standalone flags: -A, -E, -T, -V, -b, -e, -h, -l, -n, -s, -t, -u, -v, --help, --number, --number-nonblank, --show-all, --show-ends, --show-nonprinting, --show-tabs, --squeeze-blank, --version
-- Bare invocation allowed
+- Reads its file operands to stdout within your workspace.
+- Allowed standalone flags: --help, --number, --number-nonblank, --show-all, --show-ends, --show-nonprinting, --show-tabs, --squeeze-blank, --version, -A, -E, -T, -b, -e, -n, -s, -t, -u, -v
+- Bare invocation reads stdin
+
+**Examples:**
+
+- `cat README.md`
+- `cat src/main.rs`
+- `cat ./notes.txt`
 
 ### `cc_fips_test`
 <p class="cmd-url"><a href="https://developer.apple.com/security/">https://developer.apple.com/security/</a></p>
@@ -2615,8 +2677,10 @@ Aliases: `uncompress`
 
 Aliases: `gcp`
 
-- Allowed standalone flags: --archive, --force, --help, --interactive, --no-clobber, --no-dereference, --no-target-directory, --one-file-system, --parents, --recursive, --remove-destination, --symbolic-link, --update, --verbose, --version, -H, -L, -N, -P, -R, -S, -T, -X, -a, -c, -f, -h, -i, -l, -n, -p, -r, -s, -u, -v, -x
-- Allowed valued flags: --backup, --preserve, --reflink, --sparse, --suffix, --target-directory, -t
+- Reads each source and writes the destination within your workspace.
+- Allowed standalone flags: --archive, --backup, --force, --help, --interactive, --no-clobber, --no-dereference, --no-target-directory, --one-file-system, --parents, --preserve, --recursive, --reflink, --remove-destination, --sparse, --symbolic-link, --update, --verbose, --version, -H, -L, -N, -P, -R, -X, -a, -c, -d, -f, -h, -i, -l, -n, -p, -r, -s, -u, -v, -x
+- Allowed valued flags: --suffix, --target-directory, -S, -t
+- Recurses into directory trees with: --archive, --recursive, -R, -a, -r
 
 ### `cpan`
 <p class="cmd-url"><a href="https://metacpan.org/pod/cpan">https://metacpan.org/pod/cpan</a></p>
@@ -2988,6 +3052,16 @@ Aliases: `gdate`
 - **team report**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 
+### `dd`
+<p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#dd-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#dd-invocation</a></p>
+
+- Creates or updates its file operands within your workspace.
+- Flag handling follows the command's own grammar (see examples).
+
+**Examples:**
+
+- `dd if=./in of=./out bs=1M`
+
 ### `ddev`
 <p class="cmd-url"><a href="https://ddev.readthedocs.io/en/stable/users/usage/commands/">https://ddev.readthedocs.io/en/stable/users/usage/commands/</a></p>
 
@@ -3329,6 +3403,7 @@ Aliases: `gdirname`
 - **compose --version**
 - **compose config**: Flags: --dry-run, --hash, --help, --images, --no-consistency, --no-interpolate, --no-normalize, --no-path-resolution, --profiles, --quiet, --resolve-image-digests, --services, --volumes, -h, -q. Valued: --format, --output, -o
 - **compose images**: Flags: --help, -h
+- **compose logs**: Flags: --follow, --help, --no-color, --no-log-prefix, --timestamps, -f, -h, -t. Valued: --index, --since, --tail, --until, -n
 - **compose ls**: Flags: --help, -h
 - **compose port**: Flags: --help, --index, --protocol, -h
 - **compose ps**: Flags: --all, --help, --no-trunc, --orphans, --quiet, --services, -a, -h, -q. Valued: --filter, --format, --status
@@ -3817,9 +3892,13 @@ Aliases: `gdu`
 
 Aliases: `gecho`
 
-- Allowed standalone flags: -E, -e, -n
-- Bare invocation allowed
-- Hyphen-prefixed positional arguments accepted
+- Prints its arguments to stdout.
+- Bare invocation reads stdin
+
+**Examples:**
+
+- `echo hello world`
+- `echo -n done`
 
 ### `ecpg`
 <p class="cmd-url"><a href="https://www.postgresql.org/docs/current/app-ecpg.html">https://www.postgresql.org/docs/current/app-ecpg.html</a></p>
@@ -4209,7 +4288,7 @@ Aliases: `gfalse`
 ### `find`
 <p class="cmd-url"><a href="https://www.gnu.org/software/findutils/manual/html_mono/find.html">https://www.gnu.org/software/findutils/manual/html_mono/find.html</a></p>
 
-- Positional predicates allowed. -exec/-execdir allowed when the executed command is itself safe.
+- Read-only predicates and actions allowed (tests like -name/-type/-size, -print/-ls/-prune, operators, positional and global options). -exec/-execdir allowed when the executed command is itself safe (each `{}` binds to the traversal path).
 
 ### `findmnt`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/findmnt.8.html">https://man7.org/linux/man-pages/man8/findmnt.8.html</a></p>
@@ -4581,8 +4660,8 @@ Aliases: `g++`, `cc`, `c++`
 - **artifacts**: Allowed arguments: docker, files, packages, repositories, tags, versions
 - **assured**: Allowed arguments: operations, workloads
 - **auth list**: Flags: --filter-account, --help, -h
-- **auth print-access-token**: Flags: --help, -h
-- **auth print-identity-token**: Flags: --help, -h. Valued: --audiences, --include-email
+- **auth print-access-token**
+- **auth print-identity-token**
 - **batch**: Allowed arguments: jobs, tasks
 - **bigtable**: Allowed arguments: clusters, instances, operations
 - **billing**: Allowed arguments: accounts, budgets, projects
@@ -4641,7 +4720,7 @@ Aliases: `g++`, `cc`, `c++`
 - **run services**: Allowed arguments: describe, list
 - **scc**: Allowed arguments: assets, findings, notifications, operations, sources
 - **scheduler**: Allowed arguments: jobs
-- **secrets**: Allowed arguments: describe, list, versions
+- **secrets**: Allowed arguments: describe, list
 - **service-directory**: Allowed arguments: endpoints, namespaces, services
 - **services**: Allowed arguments: list
 - **source**: Allowed arguments: repos
@@ -4821,7 +4900,7 @@ Aliases: `g++`, `cc`, `c++`
 ### `git`
 <p class="cmd-url"><a href="https://git-scm.com/docs">https://git-scm.com/docs</a></p>
 
-- **blame**: Flags: --color-by-age, --color-lines, --help, --incremental, --line-porcelain, --minimal, --porcelain, --progress, --root, --show-email, --show-name, --show-number, --show-stats, -b, -c, -e, -f, -h, -k, -l, -n, -p, -s, -t, -w. Valued: --abbrev, --contents, --ignore-rev, --ignore-revs-file, -C, -L, -M, -S
+- **blame**: Flags: --color-by-age, --color-lines, --help, --incremental, --line-porcelain, --minimal, --porcelain, --progress, --root, --show-email, --show-name, --show-number, --show-stats, -b, -c, -e, -f, -h, -k, -l, -n, -p, -s, -t, -w. Valued: --abbrev, --contents, --date, --ignore-rev, --ignore-revs-file, -C, -L, -M, -S
 - **branch**: Flags: --all, --help, --ignore-case, --list, --no-abbrev, --no-color, --no-column, --omit-empty, --remotes, --show-current, --verbose, -a, -h, -i, -l, -r, -v, -vv. Valued: --abbrev, --color, --column, --contains, --format, --merged, --no-contains, --no-merged, --points-at, --sort
 - **cat-file**: Flags: --batch-all-objects, --buffer, --filters, --follow-symlinks, --help, --mailmap, --textconv, --unordered, --use-mailmap, -Z, -e, -h, -p, -s, -t. Valued: --batch, --batch-check, --batch-command, --filter, --path
 - **check-ignore**: Flags: --help, --no-index, --non-matching, --quiet, --stdin, --verbose, -h, -n, -q, -v, -z
@@ -4854,8 +4933,11 @@ Aliases: `g++`, `cc`, `c++`
 - **notes list**
 - **notes show**
 - **pull**: Flags: --all, --allow-unrelated-histories, --append, --autostash, --commit, --compact-summary, --dry-run, --edit, --ff, --ff-only, --force, --help, --ipv4, --ipv6, --keep, --no-autostash, --no-commit, --no-edit, --no-ff, --no-gpg-sign, --no-log, --no-rebase, --no-recurse-submodules, --no-show-forced-updates, --no-signoff, --no-squash, --no-stat, --no-tags, --no-verify, --no-verify-signatures, --progress, --prune, --quiet, --set-upstream, --show-forced-updates, --signoff, --squash, --stat, --tags, --verbose, --verify, --verify-signatures, -4, -6, -a, -e, -f, -h, -k, -n, -p, -q, -t, -v. Valued: --cleanup, --depth, --deepen, --filter, --gpg-sign, --jobs, --log, --rebase, --recurse-submodules, --refmap, --server-option, --shallow-exclude, --shallow-since, --strategy, --strategy-option, --upload-pack, -S, -X, -j, -o, -r, -s
+- **push**
 - **reflog**: Flags: --abbrev-commit, --all, --ancestry-path, --author-date-order, --bisect, --boundary, --branches, --cherry, --cherry-mark, --cherry-pick, --children, --clear-decorations, --compact-summary, --cumulative, --date-order, --dense, --do-walk, --early-output, --first-parent, --follow, --full-diff, --full-history, --graph, --help, --ignore-missing, --invert-grep, --left-only, --left-right, --log-size, --mailmap, --merges, --minimal, --name-only, --name-status, --no-abbrev-commit, --no-color, --no-decorate, --no-expand-tabs, --no-ext-diff, --no-merges, --no-notes, --no-patch, --no-prefix, --no-renames, --no-walk, --numstat, --oneline, --parents, --patch, --patch-with-raw, --patch-with-stat, --patience, --pickaxe-all, --pickaxe-regex, --raw, --reflog, --regexp-ignore-case, --relative-date, --remotes, --reverse, --shortstat, --show-linear-break, --show-notes, --show-pulls, --show-signature, --simplify-by-decoration, --simplify-merges, --source, --sparse, --stat, --stdin, --summary, --tags, --text, --topo-order, --use-mailmap, -0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -h, -i, -p, -q, -s, -u. Valued: --abbrev, --after, --author, --before, --color, --committer, --date, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --diff-merges, --encoding, --exclude, --format, --glob, --grep, --max-count, --max-parents, --min-parents, --pretty, --since, --skip, --until, -G, -L, -S, -n
-- **remote**
+- **remote get-url**: Flags: --push, --all, -h, --help
+- **remote show**: Flags: -n, -h, --help
+- **remote**: Flags: -v, --verbose, -h, --help
 - **rev-parse**: Flags: --absolute-git-dir, --all, --branches, --git-common-dir, --git-dir, --git-path, --help, --is-bare-repository, --is-inside-git-dir, --is-inside-work-tree, --is-shallow-repository, --local-env-vars, --quiet, --remotes, --shared-index-path, --show-cdup, --show-prefix, --show-superproject-working-tree, --show-toplevel, --symbolic, --symbolic-full-name, --tags, --verify, -h, -q. Valued: --abbrev-ref, --after, --before, --default, --exclude, --glob, --prefix, --resolve-git-dir, --short, --since, --until. Positional args accepted
 - **shortlog**: Flags: --committer, --email, --help, --numbered, --summary, -c, -e, -h, -n, -s. Valued: --format, --group
 - **show**: Flags: --abbrev-commit, --cc, --color-words, --combined-all-paths, --compact-summary, --cumulative, --expand-tabs, --find-copies, --find-renames, --full-index, --help, --histogram, --ignore-all-space, --ignore-blank-lines, --ignore-space-at-eol, --ignore-space-change, --mailmap, --minimal, --name-only, --name-status, --no-color, --no-ext-diff, --no-notes, --no-patch, --no-prefix, --no-renames, --no-textconv, --numstat, --oneline, --patch, --patch-with-raw, --patch-with-stat, --patience, --pickaxe-all, --pickaxe-regex, --raw, --shortstat, --show-notes, --show-signature, --source, --stat, --summary, --text, --textconv, --use-mailmap, -h, -p, -q, -s, -u, -w. Valued: --abbrev, --color, --color-moved, --decorate, --decorate-refs, --decorate-refs-exclude, --diff-algorithm, --diff-filter, --diff-merges, --encoding, --format, --notes, --pretty, --stat-count, --stat-graph-width, --stat-name-width, --submodule, --word-diff, --word-diff-regex, -G, -O, -S
@@ -4980,10 +5062,20 @@ Aliases: `gnatls`, `gnatchop`, `gnatpp`, `gnatkr`, `gnatxref`, `gnatfind`, `gnat
 - **env**: Flags: --help, -h, -json
 - **help**: Positional args accepted
 - **list**: Flags: --help, -a, -asan, -compiled, -cover, -deps, -e, -export, -find, -h, -linkshared, -m, -modcacherw, -msan, -n, -race, -retract, -test, -trimpath, -u, -v, -versions, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -f, -gccgoflags, -gcflags, -installsuffix, -json, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -reuse, -tags
+- **run**: Runs a workspace-local script/package (the first positional). Flags: --help, -a, -asan, -cover, -h, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -tags
 - **test**: Flags: --help, -a, -asan, -benchmem, -cover, -failfast, -h, -json, -linkshared, -modcacherw, -msan, -n, -race, -short, -trimpath, -v, -work, -x. Valued: -asmflags, -bench, -benchtime, -blockprofile, -blockprofilerate, -buildmode, -buildvcs, -compiler, -count, -covermode, -coverpkg, -coverprofile, -cpu, -cpuprofile, -fuzz, -fuzzminimizetime, -fuzztime, -gccgoflags, -gcflags, -installsuffix, -ldflags, -list, -memprofile, -memprofilerate, -mod, -modfile, -mutexprofile, -mutexprofilefraction, -o, -outputdir, -overlay, -p, -parallel, -pgo, -pkgdir, -run, -shuffle, -skip, -tags, -timeout, -trace
 - **version**: Flags: --help, -h, -m, -v
 - **vet**: Flags: --help, -a, -asan, -cover, -h, -json, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -c, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -tags
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `go run .`
+- `go run ./cmd/tool`
+- `go run -race ./cmd`
+- `go run main.go`
+- `go build ./...`
+- `go test ./...`
 
 ### `godot`
 <p class="cmd-url"><a href="https://docs.godotengine.org/en/stable/tutorials/editor/command_line_tutorial.html">https://docs.godotengine.org/en/stable/tutorials/editor/command_line_tutorial.html</a></p>
@@ -5149,12 +5241,20 @@ Aliases: `gradlew`
 - **plugins ls**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
-### `grep / egrep / fgrep / rgrep`
+### `grep`
 <p class="cmd-url"><a href="https://www.gnu.org/software/grep/manual/grep.html">https://www.gnu.org/software/grep/manual/grep.html</a></p>
 
-- Flags: --basic-regexp, --binary, --byte-offset, --color, --colour, --count, --dereference-recursive, --extended-regexp, --files-with-matches, --files-without-match, --fixed-strings, --help, --ignore-case, --initial-tab, --invert-match, --line-buffered, --line-number, --line-regexp, --no-filename, --no-messages, --null, --null-data, --only-matching, --perl-regexp, --quiet, --recursive, --silent, --text, --version, --with-filename, --word-regexp, -E, -F, -G, -H, -I, -J, -L, -P, -R, -S, -T, -U, -V, -Z, -a, -b, -c, -h, -i, -l, -n, -o, -p, -q, -r, -s, -v, -w, -x, -z
-- Allowed valued flags: --after-context, --before-context, --binary-files, --color, --colour, --context, --devices, --directories, --exclude, --exclude-dir, --exclude-from, --file, --group-separator, --include, --label, --max-count, --regexp, -A, -B, -C, -D, -d, -e, -f, -m
-- Pattern and file arguments accepted after flags
+Aliases: `egrep`, `fgrep`, `rgrep`
+
+- Searches its file operands for a pattern within your workspace.
+- Flag handling follows the command's own grammar (see examples).
+
+**Examples:**
+
+- `grep foo README.md`
+- `grep -n TODO src/main.rs`
+- `grep -r pattern src`
+- `grep -i Error ./log.txt`
 
 ### `gron`
 <p class="cmd-url"><a href="https://github.com/tomnomnom/gron">https://github.com/tomnomnom/gron</a></p>
@@ -5384,10 +5484,16 @@ Aliases: `ggroups`
 
 Aliases: `ghead`
 
-- Allowed standalone flags: -V, -h, -q, -v, -z, --help, --quiet, --silent, --verbose, --version, --zero-terminated
-- Allowed valued flags: -c, -n, --bytes, --lines
-- Bare invocation allowed
-- Numeric shorthand accepted (e.g. -20 for -n 20)
+- Reads its file operands to stdout within your workspace.
+- Allowed standalone flags: --help, --quiet, --silent, --verbose, --version, --zero-terminated, -V, -h, -q, -v, -z
+- Allowed valued flags: --bytes, --lines, -c, -n
+- Bare invocation reads stdin
+
+**Examples:**
+
+- `head README.md`
+- `head -n 20 src/main.rs`
+- `head -20 src/main.rs`
 
 ### `headerdoc2html`
 <p class="cmd-url"><a href="https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/">https://developer.apple.com/library/archive/documentation/DeveloperTools/Conceptual/HeaderDoc/</a></p>
@@ -5799,6 +5905,10 @@ Aliases: `hf`
 - Allowed standalone flags: --help, -h
 - Allowed valued flags: --convert, --output, -c, -o
 
+**Examples:**
+
+- `iconutil -c iconset -o ./out.iconset app.icns`
+
 ### `iconv`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/iconv.1.html">https://man7.org/linux/man-pages/man1/iconv.1.html</a></p>
 
@@ -6126,7 +6236,7 @@ Aliases: `iperf`
 - **proxy-config endpoint**: Flags: --help, -h
 - **proxy-config listener**: Flags: --help, -h
 - **proxy-config route**: Flags: --help, -h
-- **proxy-config secret**: Flags: --help, -h
+- **proxy-config secret**
 - **proxy-status**: Flags: --file, --help, --multi-xds, --xds-via-agents, -f, -h. Valued: --file, --multi-xds, --output, --revision, -f, -o. Positional args accepted
 - **validate**: Flags: --help, --no-validate, --output, --quiet, --referential, -f, -h, -o, -q. Valued: --filename, --output, -f, -o. Positional args accepted
 - **version**: Flags: --help, --remote, --revision, --short, -h, -s. Valued: --filename, --output, --revision, -f, -o
@@ -6227,6 +6337,7 @@ Aliases: `iperf`
 - **global**: Flags: --help, --unset, -h
 - **help**: Positional args accepted
 - **hooks**: Flags: --help, -h
+- **init** (requires -): Flags: -, --help, -h
 - **javahome**: Flags: --help, -h
 - **local**: Flags: --help, --unset, -h
 - **plugin list**: Flags: --help, -h
@@ -6634,15 +6745,33 @@ Aliases: `nbconvert`
 ### `koyeb`
 <p class="cmd-url"><a href="https://www.koyeb.com/docs/build-and-deploy/cli">https://www.koyeb.com/docs/build-and-deploy/cli</a></p>
 
+- **a create**
+- **a delete**
 - **a describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **a get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **a init**
 - **a list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **a pause**
+- **a resume**
+- **a update**
+- **app create**
+- **app delete**
 - **app describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **app get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **app init**
 - **app list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **app pause**
+- **app resume**
+- **app update**
+- **apps create**
+- **apps delete**
 - **apps describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **apps get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **apps init**
 - **apps list**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
+- **apps pause**
+- **apps resume**
+- **apps update**
 - **d describe**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **d get**: Flags: --help, -h. Valued: --organization, --output, --token, --url, -o
 - **d l**: Flags: --help, --tail, -h. Valued: --end-time, --order, --regex-search, --since, --start-time, --text-search, --type, -e, -s, -t
@@ -7411,8 +7540,14 @@ Aliases: `llvm-readelf`
 
 Aliases: `gln`, `link`, `glink`
 
-- Allowed standalone flags: --directory, --force, --help, --interactive, --logical, --no-dereference, --no-target-directory, --physical, --relative, --symbolic, --verbose, --version, -F, -L, -P, -T, -d, -f, -h, -i, -n, -r, -s, -v, -w
-- Allowed valued flags: --backup, --suffix, --target-directory, -S, -t
+- Reads each source and writes the destination within your workspace.
+- Allowed standalone flags: --backup, --directory, --force, --help, --interactive, --logical, --no-dereference, --no-target-directory, --physical, --relative, --symbolic, --verbose, --version, -F, -L, -P, -T, -d, -f, -h, -i, -n, -r, -s, -v, -w
+- Allowed valued flags: --suffix, --target-directory, -S, -t
+
+**Examples:**
+
+- `ln -s ./target ./link`
+- `ln ./a ./b`
 
 ### `lnav`
 <p class="cmd-url"><a href="https://docs.lnav.org/en/latest/cli.html">https://docs.lnav.org/en/latest/cli.html</a></p>
@@ -8045,6 +8180,7 @@ Aliases: `gmd5sum`
 
 Aliases: `gmkdir`
 
+- Creates or updates its file operands within your workspace.
 - Allowed standalone flags: --help, --parents, --verbose, --version, -Z, -p, -v
 - Allowed valued flags: --context, --mode, -m
 
@@ -8090,7 +8226,22 @@ Aliases: `gmktemp`
 ### `mlr`
 <p class="cmd-url"><a href="https://miller.readthedocs.io/">https://miller.readthedocs.io/</a></p>
 
-- Data processing allowed. Verbs and file arguments accepted.
+- Read-only verb chain (`verb [args] then verb …`). Allowed verbs: altkv, bar, bootstrap, case, cat, check, clean-whitespace, count, count-distinct, count-similar, cut, decimate, describe, fill-down, fill-empty, flatten, format-values, fraction, gap, grep, group-by, group-like, gsub, having-fields, head, histogram, join, json-parse, json-stringify, label, latin1-to-utf8, least-frequent, merge-fields, most-frequent, nest, nothing, regularize, remove-empty-columns, rename, reorder, repeat, reshape, sample, sec2gmt, sec2gmtdate, seqgen, shuffle, skip-trivial-records, sort, sort-within-records, sparsify, ssub, stats1, stats2, step, sub, summary, surv, tac, tail, template, top, unflatten, uniq, unspace, unsparsify, utf8-to-latin1
+
+**Examples:**
+
+- `mlr --csv head -n 10 data.csv`
+- `mlr --tsv cut -f name,age data.tsv`
+- `mlr --version`
+- `mlr --help`
+- `mlr --ifs , cat data.dkvp`
+- `mlr --ifs=, cat data.dkvp`
+- `mlr --from data.csv cat`
+- `mlr --icsv --ojson cat data.csv`
+- `mlr --csv sort -nr value data.csv`
+- `mlr --csv cat then sort -f x then head -n 5 data.csv`
+- `mlr --csv step -a delta,shift -f x data.csv`
+- `mlr --mfrom a.csv b.csv -- cat`
 
 ### `mocha`
 <p class="cmd-url"><a href="https://mochajs.org/">https://mochajs.org/</a></p>
@@ -8348,8 +8499,9 @@ Aliases: `gmktemp`
 
 Aliases: `gmv`
 
-- Allowed standalone flags: --force, --help, --interactive, --no-clobber, --no-target-directory, --strip-trailing-slashes, --update, --verbose, --version, -T, -f, -h, -i, -n, -u, -v
-- Allowed valued flags: --backup, --suffix, --target-directory, -S, -t
+- Moves each source to the destination within your workspace.
+- Allowed standalone flags: --backup, --force, --help, --interactive, --no-clobber, --no-target-directory, --strip-trailing-slashes, --update, --verbose, --version, -T, -f, -h, -i, -n, -u, -v
+- Allowed valued flags: --suffix, --target-directory, -S, -t
 
 ### `mvn / mvnw`
 <p class="cmd-url"><a href="https://maven.apache.org/ref/current/maven-embedder/cli.html">https://maven.apache.org/ref/current/maven-embedder/cli.html</a></p>
@@ -8467,14 +8619,90 @@ Aliases: `near-cli`
 - Allowed standalone flags: --help, --version, -h, -V
 
 ### `neon`
-<p class="cmd-url"><a href="https://neon.tech/docs/reference/neon-cli">https://neon.tech/docs/reference/neon-cli</a></p>
+<p class="cmd-url"><a href="https://neon.com/docs/reference/neon-cli">https://neon.com/docs/reference/neon-cli</a></p>
 
 Aliases: `neonctl`
 
+- **branch add-compute**
+- **branch create**
+- **branch delete**
+- **branch get**
+- **branch list**
+- **branch rename**
+- **branch reset**
+- **branch restore**
+- **branch schema-diff**
+- **branch set-default**
+- **branch set-expiration**
+- **branches add-compute**
+- **branches create**
+- **branches delete**
+- **branches get**
+- **branches list**
+- **branches rename**
+- **branches reset**
+- **branches restore**
+- **branches schema-diff**
+- **branches set-default**
+- **branches set-expiration**
 - **completion**: Flags: --help, -h. Positional args accepted
+- **connection-string**
+- **cs**
+- **database create**
+- **database delete**
+- **database list**
+- **databases create**
+- **databases delete**
+- **databases list**
+- **db create**
+- **db delete**
+- **db list**
 - **help**: Positional args accepted
+- **ip-allow add**
+- **ip-allow list**
+- **ip-allow remove**
+- **ip-allow reset**
+- **me**
+- **operation list**
+- **operations list**
+- **org list**
+- **orgs list**
+- **project create**
+- **project delete**
+- **project get**
+- **project list**
+- **project recover**
+- **project update**
+- **projects create**
+- **projects delete**
+- **projects get**
+- **projects list**
+- **projects recover**
+- **projects update**
+- **role create**
+- **role delete**
+- **role list**
+- **roles create**
+- **roles delete**
+- **roles list**
+- **set-context**: Flags: --help, -h. Valued: --project-id, --org-id, --branch, --context-file, --api-host, --api-key
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `neon --version`
+- `neon me`
+- `neon projects list`
+- `neon projects get --project-id foo`
+- `neon branches list`
+- `neon branches schema-diff`
+- `neon databases list`
+- `neon roles list`
+- `neon operations list`
+- `neon orgs list`
+- `neon ip-allow list`
+- `neon set-context --project-id foo`
 
 ### `nerdctl`
 <p class="cmd-url"><a href="https://github.com/containerd/nerdctl">https://github.com/containerd/nerdctl</a></p>
@@ -8754,8 +8982,19 @@ Aliases: `gnl`
 ### `node`
 <p class="cmd-url"><a href="https://nodejs.org/api/cli.html">https://nodejs.org/api/cli.html</a></p>
 
+- Allowed: `--version`/`--help` (informational), `--check`/`-c FILE` (parse-only syntax check, runs no code), and running a WORKSPACE-local script (`node server.js`, `node ./src/main.js`) — the dev loop. The first positional is the script to run; further positionals are its arguments.
+
+- **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -h, -v
 - Allowed valued flags: --check, -c
+
+**Examples:**
+
+- `node --version`
+- `node --help`
+- `node --check app.js`
+- `node server.js`
+- `node ./src/main.js`
 
 ### `nodemon`
 <p class="cmd-url"><a href="https://github.com/remy/nodemon">https://github.com/remy/nodemon</a></p>
@@ -8900,14 +9139,18 @@ Aliases: `gnohup`
 ### `npm`
 <p class="cmd-url"><a href="https://docs.npmjs.com/cli">https://docs.npmjs.com/cli</a></p>
 
+- **add**
 - **audit**: Flags: --help, --json, --omit, --production, -h. Valued: --audit-level
-- **ci**: Flags: --help, --ignore-scripts, --legacy-bundling, --no-audit, --no-fund, --no-optional, --production, -h
+- **ci**
 - **config get**: Flags: --help, --json, --long, -h, -l
 - **config list**: Flags: --help, --json, --long, -h, -l
 - **doctor**: Flags: --help, --json, -h
 - **explain**: Flags: --help, --json, -h
 - **fund**: Flags: --help, --json, -h
+- **i**
 - **info**: Flags: --help, --json, -h
+- **install**
+- **isntall**
 - **list**: Flags: --all, --help, --json, --link, --long, --omit, --parseable, --production, --unicode, -a, -h, -l. Valued: --depth, --prefix
 - **ls**: Flags: --all, --help, --json, --link, --long, --omit, --parseable, --production, --unicode, -a, -h, -l. Valued: --depth, --prefix
 - **outdated**: Flags: --help, --json, -h
@@ -8919,6 +9162,12 @@ Aliases: `gnohup`
 - **view**: Flags: --help, --json, -h
 - **why**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `npm ci --ignore-scripts`
+- `npm ls`
+- `npm view react`
 
 ### `npm-run-all`
 <p class="cmd-url"><a href="https://github.com/mysticatea/npm-run-all">https://github.com/mysticatea/npm-run-all</a></p>
@@ -10557,19 +10806,42 @@ Aliases: `upsun`
 ### `porter`
 <p class="cmd-url"><a href="https://docs.porter.run/standard/cli">https://docs.porter.run/standard/cli</a></p>
 
+- **app build**
+- **app create**
 - **app list**: Flags: --help, -h. Valued: --cluster, --project
+- **app logs**: Flags: --help, -h. Valued: --cluster, --project
 - **app manifests**: Flags: --help, -h. Valued: --cluster, --project
+- **app push**
+- **app rollback**
+- **app run**
+- **app update**
+- **app update-tag**
 - **app yaml**: Flags: --helm-overrides, --help, -h. Valued: --cluster, --project
+- **apply**
 - **auth login**: Flags: --help, -h. Valued: --cluster, --project, --token
 - **auth logout**: Flags: --help, -h. Valued: --cluster, --project
 - **cluster list**: Flags: --help, -h. Valued: --cluster, --project
 - **config set-cluster**: Flags: --help, -h. Valued: --cluster, --project
 - **config set-project**: Flags: --help, -h. Valued: --cluster, --project
-- **config**: Flags: --help, --show-token, -h. Valued: --cluster, --project
+- **config**: Flags: --help, -h. Valued: --cluster, --project
+- **env create**
 - **env list**: Flags: --help, -h. Valued: --cluster, --project
+- **env pull**
+- **env set**
+- **env unset**
 - **project list**: Flags: --help, -h. Valued: --cluster, --project
 - **target list**: Flags: --help, --preview, -h. Valued: --cluster, --project
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `porter app list`
+- `porter cluster list`
+- `porter project list`
+- `porter target list`
+- `porter env list`
+- `porter config`
+- `porter config set-project 123`
 
 ### `pp`
 <p class="cmd-url"><a href="https://metacpan.org/pod/pp">https://metacpan.org/pod/pp</a></p>
@@ -10958,7 +11230,19 @@ Aliases: `gpwd`
 
 Aliases: `python`
 
+- Allowed: `--version`/`--help` (informational), and running a WORKSPACE-local script (`python3 ./task.py`, `python3 scripts/build.py`) — the dev loop. The first positional is the script to run; further positionals are its arguments.
+
+- **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `python3 --version`
+- `python3 --help`
+- `python --version`
+- `python3 ./task.py`
+- `python3 scripts/build.py`
+- `python3 ./task.py --flag arg`
 
 ### `pyupgrade`
 <p class="cmd-url"><a href="https://github.com/asottile/pyupgrade">https://github.com/asottile/pyupgrade</a></p>
@@ -11093,13 +11377,29 @@ Aliases: `python`
 ### `railway`
 <p class="cmd-url"><a href="https://docs.railway.com/guides/cli">https://docs.railway.com/guides/cli</a></p>
 
+- **add**
+- **bucket create**
+- **bucket credentials**
+- **bucket delete**
+- **bucket info**: Flags: --help, --json, -h. Valued: --environment, --service, -e, -s
+- **bucket list**: Flags: --help, --json, -h. Valued: --environment, --service, -e, -s
+- **bucket rename**
 - **completion**: Flags: --help, -h
+- **connect**
+- **delete**
+- **deploy**
 - **deployment list**: Flags: --help, --json, -h. Valued: --environment, --limit, --service, -e, -s
 - **docs**: Flags: --help, -h
+- **domain**
+- **down**
 - **environment config**: Flags: --help, --json, -h. Valued: --environment, -e
+- **environment delete**
+- **environment edit**
 - **environment info**: Flags: --help, --json, -h. Valued: --environment, -e
 - **environment list**: Flags: --ephemeral, --help, --json, --no-ephemeral, -h
+- **environment new**
 - **environment show**: Flags: --help, --json, -h. Valued: --environment, -e
+- **init**
 - **link**: Flags: --help, --json, -h. Valued: --environment, --project, --service, --team, --workspace, -e, -p, -s, -t, -w
 - **list**: Flags: --help, --json, -h
 - **login**: Flags: --browserless, --help, -b, -h
@@ -11107,14 +11407,39 @@ Aliases: `python`
 - **logs**: Flags: --build, --deployment, --help, --http, --json, --latest, -b, -d, -h. Valued: --environment, --filter, --lines, --method, --path, --request-id, --service, --since, --status, --tail, --until, -S, -U, -e, -f, -n, -s
 - **metrics**: Flags: --all, --cpu, --help, --http, --json, --memory, --network, --raw, --volume, --watch, -a, -h, -w. Valued: --environment, --filter, --method, --path, --request-id, --service, --since, --status, --until, -S, -U, -e, -s
 - **open**: Flags: --help, --print, -h, -p
+- **redeploy**
+- **restart**
+- **scale**
 - **service list**: Flags: --help, --json, -h. Valued: --environment, -e
+- **ssh**
 - **status**: Flags: --help, --json, -h
 - **unlink**: Flags: --help, --json, --yes, -h, -y. Valued: --service, -s
-- **variable list**: Flags: --help, --json, --kv, -h, -k. Valued: --environment, --service, -e, -s
-- **variables**: Flags: --help, --json, --kv, -h, -k. Valued: --environment, --service, -e, -s
+- **up**
+- **upgrade**
+- **variable delete**
+- **variable list**
+- **variable set**
+- **variables**
+- **volume add**
+- **volume attach**
+- **volume delete**
+- **volume detach**
 - **volume list**: Flags: --help, --json, -h. Valued: --environment, --service, -e, -s
+- **volume update**
 - **whoami**: Flags: --help, --json, -h
 - Allowed standalone flags: --help, --version, -h, -V
+
+**Examples:**
+
+- `railway status`
+- `railway list`
+- `railway whoami`
+- `railway logs`
+- `railway metrics`
+- `railway environment list`
+- `railway service list`
+- `railway volume list`
+- `railway deployment list`
 
 ### `rake`
 <p class="cmd-url"><a href="https://github.com/ruby/rake">https://github.com/ruby/rake</a></p>
@@ -11373,18 +11698,42 @@ Aliases: `grealpath`
 <p class="cmd-url"><a href="https://render.com/docs/cli-reference">https://render.com/docs/cli-reference</a></p>
 
 - **blueprints validate**: Flags: --confirm, --help, -h. Valued: --output, --workspace, -o, -w
+- **deploys cancel**
+- **deploys create**
 - **deploys list**: Flags: --confirm, --help, -h. Valued: --output, -o
 - **environments**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **jobs cancel**
+- **jobs create**
 - **jobs list**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **kv-cli**
 - **login**: Flags: --help, -h
 - **logs**: Flags: --confirm, --help, --tail, --text, -h. Valued: --direction, --end, --host, --instance, --level, --limit, --method, --output, --path, --resources, --start, --status-code, --task-id, --task-run-id, --type, -o, -r
+- **pgcli**
 - **projects**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **psql**
+- **restart**
+- **services create**
 - **services instances**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **services update**
 - **services**: Flags: --confirm, --help, -h. Valued: --output, -o
+- **ssh**
 - **whoami**: Flags: --confirm, --help, -h. Valued: --output, -o
 - **workspace current**: Flags: --confirm, --help, -h. Valued: --output, -o
 - **workspaces**: Flags: --confirm, --help, -h. Valued: --output, -o
 - Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `render whoami`
+- `render workspaces`
+- `render workspace current`
+- `render projects`
+- `render services`
+- `render deploys list`
+- `render jobs list`
+- `render logs`
+- `render blueprints validate render.yaml`
+- `render whoami -o json`
 
 ### `reset`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/tput.1.html">https://keith.github.io/xcode-man-pages/tput.1.html</a></p>
@@ -11475,7 +11824,9 @@ Aliases: `grev`
 
 Aliases: `grm`
 
-- Requires --help, --version. - Allowed standalone flags: --help, --version
+- Deletes its file operands within your workspace.
+- Allowed standalone flags: --dir, --force, --help, --interactive, --one-file-system, --preserve-root, --recursive, --verbose, --version, -I, -R, -d, -f, -i, -r, -v
+- Recurses into directory trees with: --recursive, -R, -r
 
 ### `rmdir`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#rmdir-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#rmdir-invocation</a></p>
@@ -11552,8 +11903,19 @@ Aliases: `grmdir`
 ### `ruby`
 <p class="cmd-url"><a href="https://www.ruby-lang.org/en/documentation/">https://www.ruby-lang.org/en/documentation/</a></p>
 
+- Allowed: `--version`/`--help` (informational), `-c FILE` (parse-only syntax check, runs no code), and running a WORKSPACE-local script (`ruby ./rakefile.rb`, `ruby task.rb`) — the dev loop. The first positional is the script to run; further positionals are its arguments.
+
+- **Without a subcommand:**
 - Allowed standalone flags: --help, --version, -V, -h, -v
 - Allowed valued flags: -c
+
+**Examples:**
+
+- `ruby --version`
+- `ruby --help`
+- `ruby -c script.rb`
+- `ruby ./rakefile.rb`
+- `ruby task.rb`
 
 ### `ruby-audit`
 <p class="cmd-url"><a href="https://github.com/civisanalytics/ruby_audit">https://github.com/civisanalytics/ruby_audit</a></p>
@@ -11969,9 +12331,9 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 - **dump-keychain**: Flags: --help, -h
 - **dump-trust-settings**: Flags: --help, -h
 - **find-certificate**: Flags: --help, -Z, -a, -h, -p. Valued: -c, -e
-- **find-generic-password**: Flags: --help, -h. Valued: -D, -a, -c, -d, -j, -l, -r, -s, -t
+- **find-generic-password**
 - **find-identity**: Flags: --help, -h, -v. Valued: -p, -s
-- **find-internet-password**: Flags: --help, -h. Valued: -D, -a, -c, -d, -j, -l, -r, -s, -t
+- **find-internet-password**
 - **list-keychains**: Flags: --help, -d, -h
 - **show-keychain-info**: Flags: --help, -h
 - **smartcard**: Flags: --help, -h
@@ -11981,9 +12343,15 @@ Aliases: `salt-call`, `salt-master`, `salt-key`, `salt-run`, `salt-cloud`, `salt
 ### `sed`
 <p class="cmd-url"><a href="https://www.gnu.org/software/sed/manual/sed.html">https://www.gnu.org/software/sed/manual/sed.html</a></p>
 
-- Allowed standalone flags: --debug, --help, --posix, --quiet, --sandbox, --silent, --unbuffered, --version, -E, -V, -h, -n, -r, -u, -z
-- Allowed valued flags: --expression, --file, --line-length, -e, -f, -l
-- Inline expressions validated for safety
+Aliases: `gsed`
+
+- Edits its file operands in place within your workspace.
+- Flag handling follows the command's own grammar (see examples).
+
+**Examples:**
+
+- `sed s/foo/bar/ ./file.txt`
+- `sed -n 1,10p ./file.txt`
 
 ### `segedit`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/segedit.1.html">https://keith.github.io/xcode-man-pages/segedit.1.html</a></p>
@@ -12979,9 +13347,76 @@ Aliases: `gsum`
 ### `supabase`
 <p class="cmd-url"><a href="https://supabase.com/docs/reference/cli/introduction">https://supabase.com/docs/reference/cli/introduction</a></p>
 
+- **branches create**
+- **branches delete**
+- **branches get**
+- **branches list**
+- **branches pause**
+- **branches unpause**
+- **branches update**
 - **completion**: Flags: --help, -h. Positional args accepted
+- **config push**
+- **db diff**
+- **db dump**
+- **db lint**
+- **db pull**
+- **db push**
+- **domains activate**
+- **domains create**
+- **domains delete**
+- **domains get**
+- **domains reverify**
+- **encryption get-root-key**
+- **encryption update-root-key**
+- **functions delete**
+- **functions deploy**
+- **functions download**
+- **functions list**
+- **functions new**: Flags: --help, -h
+- **gen keys**
+- **gen signing-key**
+- **gen types**
 - **help**: Positional args accepted
+- **init**: Flags: --help, -h, --force, --with-intellij-settings, --with-vscode-settings, --use-orioledb
+- **inspect**
+- **migration fetch**
+- **migration list**
+- **migration new**: Flags: --help, -h
+- **migration repair**
+- **network-bans get**
+- **network-bans remove**
+- **network-restrictions get**
+- **network-restrictions update**
+- **orgs create**
+- **orgs list**
+- **postgres-config delete**
+- **postgres-config get**
+- **postgres-config update**
+- **projects api-keys**
+- **projects create**
+- **projects delete**
+- **projects list**
+- **secrets list**
+- **secrets set**
+- **secrets unset**
+- **services**
+- **snippets download**
+- **snippets list**
+- **ssl-enforcement get**
+- **ssl-enforcement update**
+- **sso add**
+- **sso info**
+- **sso list**
+- **sso remove**
+- **sso show**
+- **sso update**
 - **status**: Flags: --help, -h
+- **storage ls**
+- **test new**: Flags: --help, -h
+- **vanity-subdomains activate**
+- **vanity-subdomains check-availability**
+- **vanity-subdomains delete**
+- **vanity-subdomains get**
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
 
@@ -12989,6 +13424,15 @@ Aliases: `gsum`
 
 - `supabase status`
 - `supabase version`
+- `supabase projects list`
+- `supabase branches list`
+- `supabase secrets list`
+- `supabase migration list`
+- `supabase functions list`
+- `supabase db diff --linked`
+- `supabase inspect db bloat --linked`
+- `supabase db dump --data-only`
+- `supabase db dump -f dump.sql --linked`
 
 ### `svelte-check`
 <p class="cmd-url"><a href="https://svelte.dev/docs/cli/sv-check">https://svelte.dev/docs/cli/sv-check</a></p>
@@ -13146,17 +13590,45 @@ Aliases: `gsync`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/systemctl.1.html">https://man7.org/linux/man-pages/man1/systemctl.1.html</a></p>
 
 - **cat**: Flags: --help, --no-pager, -h. Positional args accepted
+- **condrestart**
+- **daemon-reexec**
+- **daemon-reload**
+- **disable**
+- **enable**
+- **force-reload**
 - **is-active**: Flags: --help, --quiet, -h, -q. Positional args accepted
 - **is-enabled**: Flags: --help, --quiet, -h, -q. Positional args accepted
 - **is-failed**: Flags: --help, --quiet, -h, -q. Positional args accepted
+- **isolate**
+- **kill**
 - **list-dependencies**: Flags: --all, --help, --no-pager, --plain, --reverse, -a, -h
 - **list-sockets**: Flags: --all, --full, --help, --no-legend, --no-pager, --show-types, -a, -h, -l
 - **list-timers**: Flags: --all, --full, --help, --no-legend, --no-pager, -a, -h, -l
 - **list-unit-files**: Flags: --all, --full, --help, --no-legend, --no-pager, -a, -h, -l. Valued: --state, --type, -t
 - **list-units**: Flags: --all, --failed, --full, --help, --no-legend, --no-pager, --plain, --recursive, -a, -h, -l, -r. Valued: --state, --type, -t
+- **mask**
+- **preset**
+- **reenable**
+- **reload**
+- **reload-or-restart**
+- **reset-failed**
+- **restart**
+- **set-default**
+- **set-property**
 - **show**: Flags: --all, --help, --no-pager, -a, -h. Valued: --property, -p. Positional args accepted
+- **start**
 - **status**: Flags: --all, --full, --help, --lines, --no-pager, -a, -h, -l. Valued: -n, --output, -o. Positional args accepted
+- **stop**
+- **try-restart**
+- **unmask**
 - Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `systemctl status nginx`
+- `systemctl list-units --type=service`
+- `systemctl is-active sshd`
+- `systemctl cat nginx`
 
 ### `systemstats`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/systemstats.8.html">https://keith.github.io/xcode-man-pages/systemstats.8.html</a></p>
@@ -13192,10 +13664,15 @@ Aliases: `gtac`
 
 Aliases: `gtail`
 
-- Allowed standalone flags: -F, -V, -f, -h, -q, -r, -v, -z, --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated
-- Allowed valued flags: -b, -c, -n, --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval
-- Bare invocation allowed
-- Numeric shorthand accepted (e.g. -20 for -n 20)
+- Reads its file operands to stdout within your workspace.
+- Allowed standalone flags: --follow, --help, --quiet, --retry, --silent, --verbose, --version, --zero-terminated, -F, -V, -f, -h, -q, -r, -v, -z
+- Allowed valued flags: --bytes, --lines, --max-unchanged-stats, --pid, --sleep-interval, -b, -c, -n
+- Bare invocation reads stdin
+
+**Examples:**
+
+- `tail -n 50 src/main.rs`
+- `tail -f ./app.log`
 
 ### `tailscale`
 <p class="cmd-url"><a href="https://tailscale.com/kb/1080/cli">https://tailscale.com/kb/1080/cli</a></p>
@@ -13229,10 +13706,17 @@ Aliases: `gtail`
 - Allowed standalone flags: --help, --version, -h, -V
 
 ### `tar`
-<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/tar.1.html">https://man7.org/linux/man-pages/man1/tar.1.html</a></p>
+<p class="cmd-url"><a href="https://www.gnu.org/software/tar/manual/tar.html">https://www.gnu.org/software/tar/manual/tar.html</a></p>
 
-- Listing mode only (requires -t or --list). Old-style flags accepted (e.g. tar tf, tar tzf).
-- Flags: -f, -j, -J, -v, -z, -O, --bzip2, --file, --gzip, --xz, --zstd.
+Aliases: `gtar`
+
+- Creates or updates its file operands within your workspace.
+- Flag handling follows the command's own grammar (see examples).
+
+**Examples:**
+
+- `tar cf ./out.tar ./src`
+- `tar tf ./archive.tar`
 
 ### `task`
 <p class="cmd-url"><a href="https://taskfile.dev/">https://taskfile.dev/</a></p>
@@ -13350,15 +13834,19 @@ Aliases: `gtee`
 ### `terraform`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/terraform/cli/commands">https://developer.hashicorp.com/terraform/cli/commands</a></p>
 
-- **fmt**: Flags: --check, -check, --diff, -diff, --help, -help, --no-color, -no-color, --recursive, -recursive, -h
-- **graph**: Flags: --draw-cycles, --help, -h. Valued: --plan, --type
-- **output**: Flags: --help, --json, --no-color, --raw, -h. Valued: --state
-- **providers**: Flags: --help, -h
-- **show**: Flags: --help, --json, --no-color, -h
-- **state list**: Flags: --help, -h. Valued: --id, --state
-- **state show**: Flags: --help, -h. Valued: --state
-- **validate**: Flags: --help, --json, --no-color, -h
-- **version**: Flags: --help, --json, -h
+- **fmt**: Flags: --check, -check, --diff, -diff, --help, -help, --no-color, -no-color, --recursive, -recursive, -h. Valued: --list, -list, --write, -write
+- **graph**: Flags: --help, -help, -h, --no-color, -no-color, --draw-cycles, -draw-cycles. Valued: --type, -type, --plan, -plan, --module-depth, -module-depth
+- **output**: Flags: --help, -help, -h, --json, -json, --no-color, -no-color, --raw, -raw. Valued: --state, -state
+- **plan**: Flags: --help, -help, -h, --json, -json, --no-color, -no-color, --compact-warnings, -compact-warnings, --concise, -concise, --detailed-exitcode, -detailed-exitcode, --destroy, -destroy, --refresh-only, -refresh-only. Valued: --out, -out, --var, -var, --var-file, -var-file, --target, -target, --replace, -replace, --parallelism, -parallelism, --lock, -lock, --lock-timeout, -lock-timeout, --refresh, -refresh, --input, -input, --state, -state, --generate-config-out, -generate-config-out
+- **providers schema**: Flags: --help, -help, -h, --json, -json, --no-color, -no-color
+- **providers**: Flags: --help, -help, -h, --no-color, -no-color
+- **show**: Flags: --help, -help, -h, --json, -json, --no-color, -no-color
+- **state list**: Flags: --help, -help, -h, --no-color, -no-color. Valued: --id, -id, --state, -state
+- **state show**: Flags: --help, -help, -h, --no-color, -no-color. Valued: --state, -state
+- **validate**: Flags: --help, -help, -h, --json, -json, --no-color, -no-color
+- **version**: Flags: --help, -help, -h, --json, -json
+- **workspace list**: Flags: --help, -help, -h, --no-color, -no-color
+- **workspace show**: Flags: --help, -help, -h, --no-color, -no-color
 - Allowed standalone flags: --help, --version, -V, -h
 
 **Examples:**
@@ -13369,7 +13857,14 @@ Aliases: `gtee`
 - `terraform fmt --check`
 - `terraform fmt -check -diff`
 - `terraform validate`
+- `terraform validate -json`
 - `terraform version`
+- `terraform plan`
+- `terraform plan -no-color`
+- `terraform plan -out=plan.tfout`
+- `terraform show -json`
+- `terraform output -json`
+- `terraform state list`
 
 ### `terraform-docs`
 <p class="cmd-url"><a href="https://terraform-docs.io/">https://terraform-docs.io/</a></p>
@@ -13766,6 +14261,7 @@ Aliases: `toolbx`
 
 Aliases: `gtouch`
 
+- Creates or updates its file operands within your workspace.
 - Allowed standalone flags: --help, --no-create, --no-dereference, --version, -A, -a, -c, -h, -m
 - Allowed valued flags: --date, --reference, --time, -d, -r, -t
 
@@ -14266,7 +14762,7 @@ Aliases: `gusers`
 - **kv list**: Flags: --help, --mount, -h. Valued: --address, --format, --namespace
 - **kv metadata**
 - **list**: Flags: --detailed, --help, --mount, -h. Valued: --address, --format, --namespace. Positional args accepted
-- **read**: Flags: --field, --help, --mount, -h. Valued: --address, --field, --format, --namespace. Positional args accepted
+- **read**
 - **status**: Flags: --format, --help, -h. Valued: --address, --format
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
@@ -14564,9 +15060,14 @@ Aliases: `vi`, `view`, `rvim`, `vimdiff`, `rview`, `ex`
 
 Aliases: `gwc`
 
-- Allowed standalone flags: -L, -V, -c, -h, -l, -m, -w, --bytes, --chars, --help, --lines, --max-line-length, --version, --words, --zero-terminated
-- Allowed valued flags: --files0-from
-- Bare invocation allowed
+- Reads its file operands to stdout within your workspace.
+- Allowed standalone flags: --bytes, --chars, --help, --lines, --max-line-length, --version, --words, --zero-terminated, -L, -V, -c, -l, -m, -w
+- Bare invocation reads stdin
+
+**Examples:**
+
+- `wc -l src/main.rs`
+- `wc -w README.md`
 
 ### `wdiff`
 <p class="cmd-url"><a href="https://www.gnu.org/software/wdiff/">https://www.gnu.org/software/wdiff/</a></p>

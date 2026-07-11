@@ -24,6 +24,9 @@ valued = [
     "--strategy", "--useragent", "--verbose",
 ]
 
+[command.path_gate]
+flags = { "--output-dir" = "write" }
+
 [[command]]
 name = "afhash"
 description = "macOS CoreAudio SHA-1 hash for audio file payloads. With -x prints the embedded hash; -c compares two files. -w writes a new hash into the file (mutates the audio file). Frozen surface."
@@ -102,6 +105,9 @@ valued = [
     "--audio-device",
 ]
 write_flags = ["-o", "--output-file"]
+
+[command.path_gate]
+flags = { "--output-file" = "write", "--input-file" = "read" }
 
 [[command]]
 name = "lame"

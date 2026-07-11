@@ -41,3 +41,6 @@ valued = [
     "--tool-config", "--vsval",
     "--xnamesep", "--xsuffix",
 ]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }

@@ -31,3 +31,6 @@ valued = [
     "--with-name-tag", "--with-tag",
     "--with-title-tag", "--with-types-tag",
 ]
+
+[command.path_gate]
+flags = { "--output-dir" = "write" }

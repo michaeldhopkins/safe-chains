@@ -39,3 +39,6 @@ valued = [
     "--supported", "--target",
     "--tsconfig", "--tsconfig-raw",
 ]
+
+[command.path_gate]
+flags = { "--outfile" = "write" }

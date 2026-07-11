@@ -24,3 +24,6 @@ valued = [
     "--output-path", "--output-public-path",
     "--source-map", "--stats",
 ]
+
+[command.path_gate]
+flags = { "--output-path" = "write" }

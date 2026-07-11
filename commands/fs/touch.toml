@@ -14,3 +14,25 @@ valued = [
     "--date", "--reference", "--time",
     "-d", "-r", "-t",
 ]
+
+# Declarative facet behavior: touch CREATES each file operand (or updates its timestamps),
+# trivially reversible, gated per-operand by locus. `-r`/`-t`/`-d` and their long forms take a
+# value. Replaces `resolve_touch`.
+[command.behavior]
+operation = "create"
+positionals = "write"
+scale = "breadth"
+standalone = [
+    "--help", "--no-create", "--no-dereference", "--version",
+    "-A", "-a", "-c", "-h", "-m",
+]
+valued = [
+    "--date", "--reference", "--time",
+    "-d", "-r", "-t",
+]
+# `-r`/`--reference REF` sets the target's timestamps from REF — a read of REF, gated by its
+# locus so `touch -r /etc/shadow ./x` denies (an out-of-workspace mtime oracle) while a worktree
+# reference is fine. `-d`/`-t` take a date/time literal, not a path, so they are not gated.
+[command.behavior.flags]
+"-r" = { kind = "read" }
+"--reference" = { kind = "read" }

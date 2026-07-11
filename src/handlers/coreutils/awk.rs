@@ -109,13 +109,43 @@ static AWK_POLICY: FlagPolicy = FlagPolicy {
     tolerance: FlagTolerance::strict(),
 };
 
+/// awk's FILE operands: the positionals AFTER the inline program (`awk 'prog' files…`). The
+/// program itself is skipped — it is a regex/action, not a path, and would false-positive the
+/// locus gate. (`-f progfile` is already denied by the flag policy, so no inline program means
+/// no positionals to skip.)
+fn awk_file_operands(tokens: &[Token]) -> Vec<&str> {
+    let mut positionals = Vec::new();
+    let mut i = 1;
+    while i < tokens.len() {
+        let s = tokens[i].as_str();
+        if matches!(s, "-F" | "-v" | "--assign" | "--field-separator") {
+            i += 2; // valued flag + its separate value
+            continue;
+        }
+        if s.starts_with('-') && s != "-" {
+            i += 1; // standalone flag, or a glued valued flag (`-F:`, `-vx=1`)
+            continue;
+        }
+        positionals.push(s);
+        i += 1;
+    }
+    positionals.into_iter().skip(1).collect() // skip the program
+}
+
 fn is_safe_awk(tokens: &[Token]) -> bool {
     for token in &tokens[1..] {
         if !token.starts_with("-") && awk_has_dangerous_construct(token) {
             return false;
         }
     }
-    policy::check(tokens, &AWK_POLICY)
+    if !policy::check(tokens, &AWK_POLICY) {
+        return false;
+    }
+    // Gate the FILE operands by read locus, so `awk '{print}' /etc/shadow` denies (audit fix).
+    !awk_file_operands(tokens).iter().any(|f| {
+        crate::policy::looks_like_path(f)
+            && crate::engine::resolve::read_content_verdict(f) == Verdict::Denied
+    })
 }
 
 pub(in crate::handlers::coreutils) fn dispatch(cmd: &str, tokens: &[Token]) -> Option<Verdict> {
@@ -150,7 +180,7 @@ mod tests {
     safe! {
         awk_print_field: "awk '{print $1}' file.txt",
         awk_print_multiple_fields: "awk '{print $1, $3}' file.txt",
-        awk_field_separator: "awk -F: '{print $1}' /etc/passwd",
+        awk_field_separator: "awk -F: '{print $1}' ./data.txt",
         awk_pattern: "awk '/error/ {print $0}' log.txt",
         awk_nr: "awk 'NR==5' file.txt",
         awk_begin_end_safe: "awk 'BEGIN{n=0} {n++} END{print n}' file.txt",

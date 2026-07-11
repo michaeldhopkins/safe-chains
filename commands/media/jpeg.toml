@@ -25,6 +25,9 @@ valued = [
     "-target", "-strict",
 ]
 
+[command.path_gate]
+flags = { "-outfile" = "write" }
+
 [[command]]
 name = "djpeg"
 description = "IJG/libjpeg-turbo JPEG decoder. Reads a JPEG and writes a PPM/PGM/BMP/Targa/PNG to stdout (default) or -outfile PATH. Flags select output format and scaling. No network. libjpeg-turbo 3.x surface; very stable."
@@ -48,6 +51,9 @@ valued = [
     "-scale",
     "-strict",
 ]
+
+[command.path_gate]
+flags = { "-outfile" = "write" }
 
 [[command]]
 name = "cjxl"
@@ -171,6 +177,9 @@ valued = [
     "-wipe",
 ]
 
+[command.path_gate]
+flags = { "-outfile" = "write" }
+
 [[command]]
 name = "rdjpgcom"
 description = "libjpeg comment reader. Prints any text comments (COM markers) embedded in a JPEG to stdout. Read-only."
@@ -189,3 +198,6 @@ level = "SafeWrite"
 bare = false
 standalone = ["-replace", "-help", "-h", "-?"]
 valued = ["-comment", "-cfile", "-outfile", "-o"]
+
+[command.path_gate]
+flags = { "-outfile" = "write" }

@@ -12,3 +12,16 @@ standalone = [
 ]
 valued = ["-c", "-n", "--bytes", "--lines"]
 examples_safe = ["head README.md", "head -n 20 src/main.rs", "head -20 src/main.rs"]
+
+# Declarative facet behavior: head OBSERVES a bounded prefix of each file (content → the model),
+# gated per-operand by locus. Same observe/read shape as cat; `-c`/`-n` and the obsolete `-NUM`
+# count form take a value. Replaces `resolve_head`.
+[command.behavior]
+operation = "observe"
+positionals = "read"
+numeric_shorthand = true
+standalone = [
+    "-V", "-h", "-q", "-v", "-z",
+    "--help", "--quiet", "--silent", "--verbose", "--version", "--zero-terminated",
+]
+valued = ["-c", "-n", "--bytes", "--lines"]

@@ -113,7 +113,7 @@ follow, and the honest posture is to name them:
 - **Command identity is name + path, never binary content (a deliberate scope boundary).**
   safe-chains classifies by a command's executable name and path; verifying that a binary
   is genuinely the tool it is named is *out of scope* — this is a string classifier, not
-  an integrity checker (see `CLAUDE.md` "Scope / trust model"). A bare `cat` trusts
+  an integrity checker (see `AGENTS.md` "Scope / trust model"). A bare `cat` trusts
   `$PATH` resolution to the real coreutils; a `$PATH` shadow is invisible. The resolver
   *does* worst-case a resolvable name reached via a non-standard path (`./cat`,
   `/tmp/cat`, `~/bin/grep`) — closing the planted-binary case — but a `$PATH`-shadowed

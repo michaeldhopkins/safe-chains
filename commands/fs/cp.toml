@@ -18,3 +18,26 @@ valued = [
     "--backup", "--preserve", "--reflink", "--sparse", "--suffix", "--target-directory",
     "-t",
 ]
+
+# Declarative facet behavior: cp both READS each source (at the source's locus — content flows
+# file→file, not to the model) and CREATES the destination (overwriting unless --no-clobber), so
+# `cp ~/.ssh/id_rsa ./x` denies on the source read and `cp ./x ~/y` denies on the dest write.
+# `-r`/`-R`/`-a` recurse (unbounded scale). NB: `--backup`/`--preserve`/`--reflink`/`--sparse`
+# take OPTIONAL glued args, so they are BOOLEAN here (distinct from the legacy `valued` above).
+# Replaces `resolve_cp`.
+[command.behavior]
+operation = "create"
+positionals = "transfer"
+standalone = [
+    "--archive", "--backup", "--force", "--help", "--interactive", "--no-clobber",
+    "--no-dereference", "--no-target-directory", "--one-file-system", "--parents",
+    "--preserve", "--recursive", "--reflink", "--remove-destination", "--sparse",
+    "--symbolic-link", "--update", "--verbose", "--version",
+    "-H", "-L", "-N", "-P", "-R", "-X", "-a", "-c", "-d", "-f", "-h", "-i", "-l",
+    "-n", "-p", "-r", "-s", "-u", "-v", "-x",
+]
+valued = ["-S", "-t", "--suffix", "--target-directory"]
+[command.behavior.transfer]
+source = "observe"
+no_clobber_flags = ["-n", "--no-clobber"]
+recursive_flags = ["-r", "-R", "-a", "--recursive", "--archive"]

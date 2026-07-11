@@ -7,6 +7,127 @@ use super::*;
         words.iter().map(|s| Token::from_test(s)).collect()
     }
 
+    // Provenance + archetype validity are enforced at BUILD time (build::assert_sub_provenance),
+    // reading the TOML — so the research is a validated part of the tree, and mis-authoring fails
+    // CLOSED at registry load rather than silently under-recording. (This supersedes the earlier
+    // runtime sweeps; every real command's subs pass this at load. The `should_panic`s below prove
+    // each arm of the check fires; the positive case proves a well-formed profiled sub builds.)
+
+    #[test]
+    fn a_profiled_sub_with_full_provenance_builds() {
+        let _ = load_one(
+            r#"
+            [[command]]
+            name = "tc"
+            [[command.sub]]
+            name = "delete"
+            profile = "remote-destroy-recoverable"
+            fact = "Deletes the remote resource via the API."
+            source = "https://example/docs"
+            "#,
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "requires a `fact`")]
+    fn a_profiled_sub_without_a_fact_panics_at_build() {
+        load_one(
+            "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"delete\"\n\
+             profile = \"remote-destroy-recoverable\"\nsource = \"https://example/docs\"\n",
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "is not a known archetype")]
+    fn a_sub_with_an_unknown_profile_panics_at_build() {
+        load_one(
+            "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"delete\"\n\
+             profile = \"remote-destroy-typo\"\nfact = \"x\"\nsource = \"y\"\n",
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "requires a `source`")]
+    fn an_escalating_flag_without_a_source_panics_at_build() {
+        load_one(
+            "[[command]]\nname = \"tc\"\n[[command.sub]]\nname = \"push\"\n\
+             profile = \"vcs-sync\"\nfact = \"x\"\nsource = \"y\"\n\
+             [[command.sub.flag]]\nname = \"--force\"\n\
+             classifies = \"remote-destroy-irreversible\"\nfact = \"z\"\n",
+        );
+    }
+
+    /// The valued-flag-by-value escalator: a `value_prefix` flag escalates ONLY when its value
+    /// matches — so one valued flag is benign for most values and dangerous for a specific key
+    /// (the `git -c core.sshCommand=…` = exec pattern). A bare flag still escalates on presence.
+    #[test]
+    fn value_prefix_flags_escalate_only_on_a_matching_value() {
+        use super::types::FlagProvenance;
+        let c_flag = FlagProvenance {
+            name: "-c".into(),
+            classifies: "unclassified".into(),
+            value_prefix: Some("core.sshCommand=".into()),
+            when_absent: false,
+        };
+        let esc = |words: &[&str]| super::flag_escalates(&toks(words), &c_flag);
+        assert!(esc(&["git", "-c", "core.sshCommand=evil", "push"]), "dangerous key → escalate");
+        assert!(!esc(&["git", "-c", "color.ui=false", "log"]), "benign key → no escalate");
+        assert!(!esc(&["git", "-c", "log"]), "flag without the matching value → no escalate");
+        assert!(!esc(&["git", "push"]), "flag absent → no escalate");
+
+        // glued `--flag=VALUE` form matches too
+        let glued = FlagProvenance {
+            name: "--conf".into(),
+            classifies: "unclassified".into(),
+            value_prefix: Some("exec=".into()),
+            when_absent: false,
+        };
+        assert!(super::flag_escalates(&toks(&["x", "--conf=exec=danger"]), &glued));
+        assert!(!super::flag_escalates(&toks(&["x", "--conf=safe=ok"]), &glued));
+
+        // a bare flag (no value_prefix) still escalates on mere presence
+        let bare = FlagProvenance {
+            name: "--force".into(),
+            classifies: "remote-destroy-irreversible".into(),
+            value_prefix: None,
+            when_absent: false,
+        };
+        assert!(super::flag_escalates(&toks(&["git", "push", "--force"]), &bare));
+        assert!(!super::flag_escalates(&toks(&["git", "push"]), &bare));
+
+        // `when_absent`: a SAFETY flag whose ABSENCE escalates (`npm ci` without `--ignore-scripts`).
+        let safety = FlagProvenance {
+            name: "--ignore-scripts".into(),
+            classifies: "supply-chain-build".into(),
+            value_prefix: None,
+            when_absent: true,
+        };
+        assert!(super::flag_escalates(&toks(&["npm", "ci"]), &safety), "flag ABSENT → escalate");
+        assert!(!super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts"]), &safety), "flag present → no escalate");
+        // a re-enabling spelling must NOT masquerade as the safety flag (the fail-open the review found).
+        assert!(super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=false"]), &safety), "=false re-enables → escalate");
+        assert!(super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=0"]), &safety), "=0 re-enables → escalate");
+        assert!(super::flag_escalates(&toks(&["npm", "ci", "--no-ignore-scripts"]), &safety), "--no- form → escalate");
+        assert!(!super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=true"]), &safety), "=true → no escalate");
+    }
+
+    /// Regression: a profiled sub must deny via the LEGACY path too, not just the engine. A global
+    /// flag before the subcommand (`git -c … push`, `git -C … push`) makes the engine's sub walk stop
+    /// early → it abstains → legacy dispatches the profiled sub, which MUST still deny (it's above the
+    /// auto-approve line). Was a fail-open: `git -c color.ui=false push` auto-approved.
+    #[test]
+    fn a_profiled_sub_denies_via_legacy_when_the_engine_abstains() {
+        for cmd in [
+            "git -c color.ui=false push",
+            "git -c color.ui=false push origin main",
+            "git -C /tmp push",
+        ] {
+            assert_eq!(crate::command_verdict(cmd), Verdict::Denied, "{cmd} must deny via legacy");
+        }
+        // a read sub with a benign global flag still auto-approves — the fix is scoped to profiled subs
+        assert!(crate::command_verdict("git -c color.ui=false log").is_allowed(), "reads unaffected");
+    }
+
     fn load_one(toml_str: &str) -> CommandSpec {
         let mut specs = load_toml(toml_str, "test");
         assert_eq!(specs.len(), 1);
@@ -1757,10 +1878,103 @@ use super::*;
     // Integration: TOML registry rejects unknown flags
     // ---------------------------------------------------------------
 
+    /// Whether `spec` is governed by the grep hook at runtime, **following an alias to its
+    /// canonical** — an alias entry carries `behavior: None` but `name = <canonical>`, so an alias
+    /// of grep (`egrep`/`fgrep`/`rgrep`) inherits the same pattern-lenient exemption grep itself
+    /// earns, exactly as the runtime does (it canonicalizes before the behavior lookup). Keyed on
+    /// `BehaviorHook::Grep` SPECIFICALLY, not `hook.is_some()`, so a future hook variant is not
+    /// auto-exempted — it fails the deny-unknown sweeps until consciously vetted.
+    fn is_grep_hook(spec: &CommandSpec) -> bool {
+        TOML_REGISTRY
+            .get(&spec.name)
+            .unwrap_or(spec)
+            .behavior
+            .as_ref()
+            .is_some_and(|b| b.hook == Some(crate::registry::types::BehaviorHook::Grep))
+    }
+
+    /// Credential-exposure ratchet (the `vault read` failure mode): a sub whose NAME reads/exposes
+    /// credential material must be `profile = "credential-read"`/`"credential-mint"`, or be
+    /// GRANDFATHERED with a reason (confirmed NOT an exposure). This is the guard that would have
+    /// caught `vault read` — it makes the class a finite, enforced worklist for the every-command
+    /// re-research: the grandfather set only SHRINKS, and a NEW smelling sub fails the build.
+    #[test]
+    fn credential_smelling_subs_are_classified_or_grandfathered() {
+        use super::types::{DispatchKind, SubSpec};
+        fn smells(name: &str) -> bool {
+            let n = name.to_ascii_lowercase();
+            ["token", "secret", "password", "credential", "private-key", "access-key", "apikey"]
+                .iter()
+                .any(|p| n.contains(p))
+        }
+        // Post-batch-0 worklist. Only SHRINKS as re-research classifies each; a NEW smelling sub that
+        // is neither here nor profile=credential-* FAILS the build. (`aws export-credentials`,
+        // `security find-*-password`, `gcloud auth print-*-token`, `vault read` are now
+        // profile=credential-read and no longer here.)
+        const GRANDFATHERED: &[(&str, &str)] = &[
+            // (a) CONFIRMED NOT an exposure — permanent, with reason:
+            ("caddy", "hash-password"),           // bcrypt-hashes an input; exposes no stored secret
+            ("platform", "auth:api-token-login"), // logs in USING a supplied token (consumes, ≠ exposes)
+            ("upsun", "auth:api-token-login"),    // same — token-based login, not a credential read
+            ("please", "static:recache-token"),   // Laravel: regenerates a cache token (mutate, no read)
+            ("rails", "secret"),                  // GENERATES a random secret_key_base (like openssl rand)
+            ("rake", "secret"),                   // same generator via rake
+            ("koyeb", "secret"),                  // group; secrets are write-only, get/list = metadata
+            ("koyeb", "secrets"),                 // alias of the above
+            ("wrangler", "secret"),               // group; CF secrets are write-only, `list` = names only
+            ("clever", "tokens"),                 // group; `create` is candidate (denied), rest = metadata
+            ("dcli", "credentials"),              // `dcli team credentials` = team credential-SHARING audit
+                                                  //   metadata; does NOT reveal vault secret values (docs)
+            ("supabase", "secrets"),              // group; `secrets list` = name + SHA-256 DIGEST only
+                                                  //   (mgmt API never returns plaintext, verified); set/unset = mutate
+            // (b) GROUP NAME contains a credential word, but its value-reading action is now CLOSED by
+            //     narrowing the first_arg glob (Batch 1 restructures into explicit sub-subs):
+            ("aws", "secretsmanager"),            // get-secret-value dropped from first_arg
+            ("gcloud", "secrets"),                // `versions access` dropped from first_arg
+            // (Batch-0 TODOs now CLASSIFIED, so gone from here: basecamp `auth token` -> credential-read;
+            //  istioctl `proxy-config secret` -> credential-read.)
+        ];
+        fn collect(cmd: &str, kind: &DispatchKind, out: &mut Vec<(String, String)>) {
+            let subs: &[SubSpec] = match kind {
+                DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
+                _ => return,
+            };
+            for sub in subs {
+                let classified = sub.profile.as_deref().is_some_and(|p| p.starts_with("credential-"));
+                if smells(&sub.name) && !classified {
+                    out.push((cmd.to_string(), sub.name.clone()));
+                }
+                collect(cmd, &sub.kind, out);
+            }
+        }
+        let mut found = Vec::new();
+        for (cmd, spec) in TOML_REGISTRY.iter() {
+            collect(cmd, &spec.kind, &mut found);
+        }
+        found.sort();
+        found.dedup();
+        let violations: Vec<_> = found
+            .into_iter()
+            .filter(|(c, s)| !GRANDFATHERED.iter().any(|(gc, gs)| gc == c && gs == s))
+            .collect();
+        assert!(
+            violations.is_empty(),
+            "credential-smelling subs neither classified (profile=credential-*) nor grandfathered — \
+             the vault-read failure mode. Classify or grandfather each:\n{violations:#?}",
+        );
+    }
+
     #[test]
     fn toml_registry_rejects_unknown_flags() {
         let mut failures = Vec::new();
         for (name, spec) in TOML_REGISTRY.iter() {
+            // grep owns its flag semantics (an unrecognized `--token` is a search PATTERN, not a
+            // flag — read-only, so it can't unlock danger); that leniency is covered by the grep_*
+            // resolver tests, not this generic deny-unknown sweep. Hookless behavior commands
+            // (cat/rm/…) are never skipped; the engine rejects their unknown flags.
+            if is_grep_hook(spec) {
+                continue;
+            }
             match &spec.kind {
                 DispatchKind::Policy { policy, .. } | DispatchKind::RequireAny { policy, .. }
                     // Skip only commands that explicitly accept double-dash
@@ -1807,6 +2021,56 @@ use super::*;
         }
         assert!(failures.is_empty(),
             "TOML examples drift from dispatcher:\n{}", failures.join("\n"));
+    }
+
+    /// GLOBAL guard for the `verb-chain` primitive — enumerated over the registry so any future
+    /// verb-chain command is covered automatically, not just mlr. For every such command:
+    ///   1. every allowlisted verb classifies safe (bare, and after the `then` separator);
+    ///   2. a non-allowlisted verb denies (bare, and after the separator) — the fail-closed rule
+    ///      that keeps `put`/`filter`/`split`/`tee` and any unknown/newer verb out;
+    ///   3. an UNKNOWN main flag denies at EVERY position in the main region. This is the
+    ///      generalized form of the `mlr --from data.csv -I cat` in-place hole: the strict
+    ///      allowlist catches ANY unlisted main flag (a future mutating flag included), wherever
+    ///      it sits, with no hand-maintained denylist.
+    #[test]
+    fn verb_chain_grammar_is_enforced_across_the_registry() {
+        const BOGUS_VERB: &str = "sc-nonexistent-verb-zzz";
+        const BOGUS_FLAG: &str = "--sc-nonexistent-main-flag-zzz";
+        let mut checked = 0;
+        for (name, spec) in TOML_REGISTRY.iter() {
+            if name != &spec.name {
+                continue; // canonical only
+            }
+            let DispatchKind::VerbChain(vc) = &spec.kind else {
+                continue;
+            };
+            checked += 1;
+            let cmd = &spec.name;
+            let sep = &vc.separator;
+            let first = vc.verbs.iter().next().expect("a verb-chain command declares ≥1 verb");
+
+            for verb in &vc.verbs {
+                assert!(crate::is_safe_command(&format!("{cmd} {verb}")),
+                    "{cmd}: allowlisted verb `{verb}` denied");
+                assert!(crate::is_safe_command(&format!("{cmd} {first} {sep} {verb}")),
+                    "{cmd}: allowlisted verb `{verb}` denied after `{sep}`");
+            }
+
+            assert!(!crate::is_safe_command(&format!("{cmd} {BOGUS_VERB}")),
+                "{cmd}: non-allowlisted verb allowed (bare)");
+            assert!(!crate::is_safe_command(&format!("{cmd} {first} {sep} {BOGUS_VERB}")),
+                "{cmd}: non-allowlisted verb allowed after `{sep}`");
+
+            let real: Vec<&str> = vc.main_standalone.iter().take(3).map(String::as_str).collect();
+            for at in 0..=real.len() {
+                let mut main = real.clone();
+                main.insert(at, BOGUS_FLAG);
+                let line = format!("{cmd} {} {first}", main.join(" "));
+                assert!(!crate::is_safe_command(&line),
+                    "{cmd}: unknown main flag allowed at position {at}: `{line}`");
+            }
+        }
+        assert!(checked >= 1, "no verb-chain commands exercised — vacuous guard");
     }
 
     /// Regression guard: `examples_safe`/`examples_denied` must appear
@@ -2433,6 +2697,15 @@ deny = true
         match kind {
             DispatchKind::Branching { subs, .. } => {
                 for sub in subs {
+                    // A PROFILED sub is engine-classified by its archetype and ignores its flags on
+                    // the engine path (its legacy kind is deny-all) — so the blanket "unknown flag
+                    // fails closed" net does not apply. A flag that changes the classification
+                    // (a read→write flag) is declared explicitly via `[[command.sub.flag]]`
+                    // escalation, and caught by the adversarial review, not this net. Same principle
+                    // as the corpus gate's profiled-sub skip.
+                    if sub.profile.is_some() {
+                        continue;
+                    }
                     check_toml_unknown(&format!("{prefix} {}", sub.name), &sub.kind, failures);
                 }
             }
@@ -2459,6 +2732,10 @@ deny = true
         let mut failures = Vec::new();
         for (name, spec) in super::TOML_REGISTRY.iter() {
             if name != &spec.name { continue; }
+            // See `toml_registry_rejects_unknown_flags`: grep owns its flag semantics.
+            if is_grep_hook(spec) {
+                continue;
+            }
             check_toml_unknown(&spec.name, &spec.kind, &mut failures);
         }
         assert!(failures.is_empty(), "TOML specs accepted unknown flags:\n{}", failures.join("\n"));
@@ -2468,6 +2745,11 @@ deny = true
         let mut paths = Vec::new();
         for (name, spec) in super::TOML_REGISTRY.iter() {
             if name != &spec.name { continue; }
+            // grep's hook treats an unrecognized `--token` as a search PATTERN (read-only), so it
+            // does not reject random flags — the same exemption the deny-unknown sweeps make.
+            if is_grep_hook(spec) {
+                continue;
+            }
             collect_strict_inner(&spec.name, &spec.kind, &mut paths);
         }
         paths
@@ -2477,6 +2759,14 @@ deny = true
         match kind {
             DispatchKind::Branching { subs, .. } => {
                 for sub in subs {
+                    // A PROFILED sub is engine-classified by its archetype (auto-approves, its legacy
+                    // kind is deny-all) — its strict flag policy is never the live contract, so the
+                    // random-flag fuzz does not apply. A flag that changes the classification is
+                    // declared via `[[command.sub.flag]]` / `output_path_flags` and caught by the
+                    // adversarial review. Same exemption as `check_toml_unknown` above.
+                    if sub.profile.is_some() {
+                        continue;
+                    }
                     collect_strict_inner(&format!("{prefix} {}", sub.name), &sub.kind, paths);
                 }
             }
@@ -2504,6 +2794,122 @@ deny = true
             let test = format!("{path} --xyzzy-{suffix}");
             proptest::prop_assert!(!crate::is_safe_command(&test),
                 "accepted random flag: {test}");
+        }
+    }
+
+    /// The invariant behind the AWS credential-glob carve-out batch (2026-07): a service that
+    /// auto-approves read verbs via a `first_arg` glob but carves specific dangerous actions out to
+    /// profiled sub-subs must (a) DENY every credential-/blob-profile carve-out, (b) still ALLOW the
+    /// base form of a `remote-read` carve-out (the flag-conditional ones), and (c) keep AUTO-APPROVING
+    /// a benign glob-sibling. Walks the real registry, so every AWS service with this shape — and any
+    /// future one — is covered automatically, not a hand-picked list. Guards against a carve-out that
+    /// silently fails to deny, and against a carve-out accidentally killing its service's glob.
+    #[test]
+    fn glob_carveouts_deny_while_the_glob_still_allows_siblings() {
+        use super::types::DispatchKind;
+        let Some(spec) = TOML_REGISTRY.get("aws") else { return };
+        let DispatchKind::Branching { subs: services, .. } = &spec.kind else {
+            panic!("aws is not Branching");
+        };
+        let mut deny_checks = 0;
+        let mut allow_checks = 0;
+        for svc in services {
+            let DispatchKind::Branching { subs: actions, first_arg, .. } = &svc.kind else { continue };
+            if first_arg.is_empty() || actions.is_empty() {
+                continue; // only the glob-plus-carve-out services
+            }
+            // (c) a benign action matching the glob is untouched by the carve-outs.
+            let prefix = first_arg[0].trim_end_matches('*');
+            let benign = format!("aws {} {prefix}zzz-benign-nonexistent", svc.name);
+            assert!(crate::is_safe_command(&benign), "carve-out killed the glob: `{benign}`");
+            allow_checks += 1;
+            for act in actions {
+                let Some(profile) = &act.profile else { continue };
+                let cmd = format!("aws {} {}", svc.name, act.name);
+                if profile.starts_with("credential-") || profile == "bulk-object-read" {
+                    // (a) a deny-tier carve-out must not auto-approve, in any form.
+                    assert!(!crate::is_safe_command(&cmd), "carve-out must deny: `{cmd}` (profile={profile})");
+                    deny_checks += 1;
+                } else if profile == "remote-read" {
+                    // (b) a flag-conditional carve-out's BASE read still auto-approves.
+                    assert!(crate::is_safe_command(&cmd), "base read must allow: `{cmd}`");
+                    allow_checks += 1;
+                }
+            }
+        }
+        // Non-vacuity: the AWS batch is substantial — a regression that drops the carve-outs entirely
+        // would sink these counts.
+        assert!(deny_checks >= 70, "expected the AWS carve-out batch covered; deny_checks={deny_checks}");
+        assert!(allow_checks >= 40, "expected glob-siblings covered; allow_checks={allow_checks}");
+    }
+
+    /// Deterministic residue guard for the AWS credential-glob class (the user's "write a test to flush
+    /// it out"). The fixture is every read-verb AWS action whose NAME smells of credentials/secrets/
+    /// tokens, extracted from the bundled botocore models. Invariant: each must DENY (carved out) or
+    /// appear in GRANDFATHER with a reason it is benign (returns only metadata / a public value / a
+    /// policy — verified against the botocore output shape). A NEW credential-returning action that
+    /// auto-approves is neither → the test fails and forces triage. This flushed `ssm get-access-token`
+    /// and `lakeformation get-temporary-data-location-credentials` that the LLM sweep missed. GRANDFATHER
+    /// shrinks only. Refresh the fixture when re-researching AWS (see RESEARCH-PLAN.md).
+    #[test]
+    fn aws_credential_smell_actions_deny_or_are_grandfathered() {
+        // (service, action, why-benign) — each verified to return NO usable secret value.
+        const GRANDFATHER: &[(&str, &str, &str)] = &[
+            ("apigateway", "get-api-key", "flag-conditional: base is metadata; the key VALUE needs --include-value, gated separately"),
+            ("apigateway", "get-api-keys", "flag-conditional: base is metadata; values need --include-values, gated separately"),
+            ("chime-sdk-voice", "list-voice-connector-termination-credentials", "output is Usernames only; passwords are write-only"),
+            ("codebuild", "list-source-credentials", "SourceCredentialsInfo (arn/type/authType); no token value"),
+            ("codecatalyst", "list-access-tokens", "PAT metadata (id/name/expiry); token value shown only at creation"),
+            ("cognito-idp", "list-user-pool-client-secrets", "doc: 'the response never reveals the actual secret' — metadata only"),
+            ("cognito-idp", "list-web-authn-credentials", "WebAuthn public-key credentials (public keys / IDs), not secrets"),
+            ("iam", "get-account-password-policy", "the account password POLICY (length/complexity), not any password"),
+            ("iam", "get-login-profile", "console-login metadata (exists/create-date/reset), not the password"),
+            ("iam", "get-open-id-connect-provider", "OIDC provider config (url/client-ids/public thumbprints)"),
+            ("iam", "list-open-id-connect-provider-tags", "tags on an OIDC provider"),
+            ("iam", "list-open-id-connect-providers", "OIDC provider ARNs"),
+            ("iam", "list-service-specific-credentials", "credential metadata (id/username/status); password shown only at creation"),
+            ("ivs", "list-stream-keys", "stream-key ARN summaries; the value is in get-stream-key (denied)"),
+            ("kafka", "list-scram-secrets", "Secrets Manager ARNs associated to the cluster, not the values"),
+            ("secretsmanager", "describe-secret", "secret metadata (name/rotation/ARN), not the value"),
+            ("secretsmanager", "list-secret-version-ids", "version IDs/stages, not values"),
+            ("secretsmanager", "list-secrets", "secret metadata list, not values"),
+            ("sso-admin", "describe-instance-access-control-attribute-configuration", "ABAC attribute-mapping config, not credentials"),
+            ("wafv2", "get-decrypted-api-key", "output is TokenDomains + CreationTimestamp; no usable key value"),
+            ("wafv2", "list-api-keys", "CAPTCHA client-integration tokens, embedded in public JS by design"),
+            ("workmail", "get-personal-access-token-metadata", "PAT metadata (name/expiry), not the token"),
+            ("workmail", "list-personal-access-tokens", "PAT metadata list, not the tokens"),
+        ];
+        let fixture = include_str!("../../tests/fixtures/aws_credential_smell_actions.tsv");
+        let grand: std::collections::HashSet<(&str, &str)> =
+            GRANDFATHER.iter().map(|(s, a, _)| (*s, *a)).collect();
+        let mut rows = 0;
+        let mut denied = 0;
+        let mut residue = Vec::new();
+        for line in fixture.lines().filter(|l| !l.trim().is_empty() && !l.starts_with('#')) {
+            let mut it = line.split('\t');
+            let (Some(svc), Some(act)) = (it.next(), it.next()) else { continue };
+            rows += 1;
+            if crate::is_safe_command(&format!("aws {svc} {act}")) {
+                if !grand.contains(&(svc, act)) {
+                    residue.push(format!("aws {svc} {act}"));
+                }
+            } else {
+                denied += 1;
+            }
+        }
+        assert!(
+            residue.is_empty(),
+            "credential-smell AWS actions auto-approve with no grandfather entry — carve them out, or \
+             GRANDFATHER with a verified reason (checked its botocore output shape):\n  {}",
+            residue.join("\n  "),
+        );
+        assert!(rows >= 50, "fixture shrank unexpectedly: {rows} rows");
+        assert!(denied >= 25, "too few denies — carve-outs may have regressed: {denied}");
+        for (s, a, _) in GRANDFATHER {
+            assert!(
+                fixture.lines().any(|l| l == format!("{s}\t{a}")),
+                "stale GRANDFATHER entry not in fixture: {s} {a}",
+            );
         }
     }
 
@@ -3779,4 +4185,433 @@ valued = ["--type"]
             "#);
         });
         assert!(result.is_err(), "matrix action with eval_safe should panic at parse time");
+    }
+
+    /// Conservation law for the legacy path-gate: a command exposing a flag whose NAME is
+    /// unambiguously a filesystem path (`--outfile`, `--keyout`, `--password-file`, …) must
+    /// declare that flag's read/write role — in its own `[command.path_gate]` or a central
+    /// `pathgates.toml [roles.X]` — so it can't read/write an arbitrary system/secret path
+    /// ungated. The ambiguous `-o`/`--output` set (usually an output FORMAT, not a path) is out
+    /// of scope BY DESIGN: no static rule tells `-o file` from `-o json`, so those rely on
+    /// adversarial review + co-located annotation. Adding an unambiguous flag name below, or a
+    /// new command that exposes one without a role, turns this test red.
+    #[test]
+    fn every_unambiguous_path_flag_declares_a_role() {
+        use super::types::{TomlFile, TomlSub};
+
+        const PATH_FLAG_NAMES: &[&str] = &[
+            "--outfile", "--output-file", "--output-dir", "--output-path",
+            "--dest-dir", "--destination", "--infile", "--input-file",
+            "--load-privkey", "--load-certificate", "--load-pubkey",
+            "--load-ca-certificate", "--load-request", "--pskfile",
+            "--password-file", "--cacert", "--keyout", "--tls-client-cert",
+            "--key-file", "--cert-file", "--ca-file",
+            // Single-dash Go-style spellings (mkcert `-cert-file`): the same name, one dash. A
+            // Go tool accepts both, so an undeclared single-dash path flag is a live bypass.
+            "-outfile", "-output-file", "-output-dir", "-output-path",
+            "-dest-dir", "-destination", "-infile", "-input-file",
+            "-pskfile", "-password-file", "-cacert", "-keyout",
+            "-tls-client-cert", "-key-file", "-cert-file", "-ca-file",
+        ];
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for entry in std::fs::read_dir(dir).unwrap() {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    toml_files(&path, out);
+                } else if path.extension().is_some_and(|e| e == "toml") {
+                    out.push(path);
+                }
+            }
+        }
+
+        // Every `valued` flag on a command and its (nested) subs — a path flag may sit on a sub.
+        fn collect_flags<'a>(valued: &'a [String], subs: &'a [TomlSub], out: &mut Vec<&'a str>) {
+            out.extend(valued.iter().map(String::as_str));
+            for s in subs {
+                collect_flags(&s.valued, &s.sub, out);
+            }
+        }
+
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+
+        let mut failures = Vec::new();
+        for file in &files {
+            let src = std::fs::read_to_string(file).unwrap();
+            let parsed: TomlFile =
+                toml::from_str(&src).unwrap_or_else(|e| panic!("{}: {e}", file.display()));
+            for cmd in &parsed.command {
+                let mut flags = Vec::new();
+                collect_flags(&cmd.valued, &cmd.sub, &mut flags);
+                for f in flags {
+                    if !PATH_FLAG_NAMES.contains(&f) {
+                        continue;
+                    }
+                    let covered = cmd.path_gate.as_ref().is_some_and(|pg| pg.declares_flag(f))
+                        || crate::pathgate::central_role_declares_flag(&cmd.name, f);
+                    if !covered {
+                        failures.push(format!(
+                            "  {} — flag `{f}` (in {})",
+                            cmd.name,
+                            file.file_name().unwrap().to_string_lossy()
+                        ));
+                    }
+                }
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "commands with an unambiguous path flag but no declared path-gate role — add \
+             `[command.path_gate]` with the flag's read/write role (see SAMPLE.toml):\n{}",
+            failures.join("\n"),
+        );
+    }
+
+    /// Behavioral guard over EVERY real `eval_safe` tag (the other eval_safe tests are build-time
+    /// schema checks on synthetic TOMLs). For each tag: (a) it TAKES EFFECT — `eval "$(cmd …)"` in
+    /// canonical form is allowed; and (b) it STAYS TIGHT — a flag the command itself accepts but that
+    /// is NOT in `eval_safe_flags` must break eval-safety (else the tag rubber-stamps everything).
+    /// Skips leaves needing a positional or a `eval_safe_flag_values` value we can't synthesize
+    /// (those bare forms aren't self-sufficiently eval-safe — e.g. `aws … export-credentials` whose
+    /// default `--format` is JSON, or `starship init <shell>`). Auto-covers every future tag.
+    #[test]
+    fn every_eval_safe_tag_takes_effect_and_stays_tight() {
+        use super::types::{TomlFile, TomlSub};
+        use crate::is_safe_command;
+
+        struct Leaf {
+            path: Vec<String>,
+            flags: Vec<String>,
+            required: Vec<String>,
+            require_any: Vec<String>,
+            has_values: bool,
+            standalone: Vec<String>,
+        }
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).unwrap() {
+                let p = e.unwrap().path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+
+        #[allow(clippy::too_many_arguments)]
+        fn walk(
+            path: &mut Vec<String>,
+            standalone: &[String],
+            eval_safe: Option<bool>,
+            flags: &[String],
+            required: &[String],
+            require_any: &[String],
+            has_values: bool,
+            subs: &[TomlSub],
+            out: &mut Vec<Leaf>,
+        ) {
+            if eval_safe == Some(true) {
+                out.push(Leaf {
+                    path: path.clone(),
+                    flags: flags.to_vec(),
+                    required: required.to_vec(),
+                    require_any: require_any.to_vec(),
+                    has_values,
+                    standalone: standalone.to_vec(),
+                });
+            }
+            for s in subs {
+                path.push(s.name.clone());
+                walk(
+                    path,
+                    &s.standalone,
+                    s.eval_safe,
+                    &s.eval_safe_flags,
+                    &s.eval_safe_required_flags,
+                    &s.require_any,
+                    !s.eval_safe_flag_values.is_empty(),
+                    &s.sub,
+                    out,
+                );
+                path.pop();
+            }
+        }
+
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+        let mut leaves = Vec::new();
+        for file in &files {
+            let src = std::fs::read_to_string(file).unwrap();
+            let parsed: TomlFile =
+                toml::from_str(&src).unwrap_or_else(|e| panic!("{}: {e}", file.display()));
+            for cmd in &parsed.command {
+                let mut path = vec![cmd.name.clone()];
+                walk(
+                    &mut path,
+                    &cmd.standalone,
+                    cmd.eval_safe,
+                    &cmd.eval_safe_flags,
+                    &cmd.eval_safe_required_flags,
+                    &cmd.require_any,
+                    !cmd.eval_safe_flag_values.is_empty(),
+                    &cmd.sub,
+                    &mut leaves,
+                );
+            }
+        }
+        assert!(!leaves.is_empty(), "expected the registry to contain eval_safe tags");
+
+        const HELP: &[&str] = &["--help", "-h", "--version", "-V"];
+        let mut failures = Vec::new();
+        for leaf in &leaves {
+            // Build the canonical eval-safe invocation: path + a required flag + an eval-safe
+            // `require_any` token (the `init -` shape: bare `jenv init` is denied by require_any, so
+            // the canonical must carry `-`). If require_any has no eval-safe member, no invocation can
+            // be both valid and eval-safe — skip rather than false-fail.
+            let mut tokens = leaf.path.clone();
+            let mut buildable = true;
+            if let Some(rf) = leaf.required.first() {
+                tokens.push(rf.clone());
+            }
+            if !leaf.require_any.is_empty() {
+                match leaf
+                    .require_any
+                    .iter()
+                    .find(|t| leaf.flags.contains(t) || leaf.required.contains(t))
+                {
+                    Some(ra) if !tokens.contains(ra) => tokens.push(ra.clone()),
+                    Some(_) => {}
+                    None => buildable = false,
+                }
+            }
+            if !buildable {
+                // require_any forces a token to be present for validity, but none of those tokens is
+                // eval-safe — so no invocation is ever both valid AND eval-safe. The tag is dead.
+                failures.push(format!(
+                    "dead tag: `{}` requires one of {:?} to be valid, but none is in eval_safe_flags — eval-safety can never take effect",
+                    leaf.path.join(" "),
+                    leaf.require_any,
+                ));
+                continue;
+            }
+            let canonical = tokens.join(" ");
+            // (a) TAKES EFFECT — only when canonical is a self-sufficient shell-init command (no
+            // value-gated flag needed, and the bare form is itself a valid command).
+            if !leaf.has_values && is_safe_command(&canonical) {
+                let eval_line = format!("eval \"$({canonical})\"");
+                if !is_safe_command(&eval_line) {
+                    failures.push(format!(
+                        "tag has no effect: `{eval_line}` denied though `{canonical}` is allowed"
+                    ));
+                }
+            }
+            // (b) STAYS TIGHT — a flag the command accepts but that isn't eval-safe breaks it.
+            if let Some(poison) = leaf.standalone.iter().find(|f| {
+                !leaf.flags.contains(f) && !leaf.required.contains(f) && !HELP.contains(&f.as_str())
+            }) {
+                let poison_cmd = format!("{canonical} {poison}");
+                if is_safe_command(&poison_cmd) {
+                    let eval_poison = format!("eval \"$({poison_cmd})\"");
+                    if is_safe_command(&eval_poison) {
+                        failures.push(format!(
+                            "allowlist not tight: `{eval_poison}` allowed but `{poison}` isn't in eval_safe_flags"
+                        ));
+                    }
+                }
+            }
+        }
+        assert!(failures.is_empty(), "eval_safe behavioral guard:\n{}", failures.join("\n"));
+    }
+
+    /// Flag parity across subcommand FAMILIES — sibling subs that genuinely share a core flag set
+    /// must ALL accept every flag in it, so one sub's list can't silently drift from the others.
+    /// Dogfooding found `cargo doc/build/bench --workspace` denied exactly this way. Adding a family
+    /// row LOCKS that family against future drift (even families with no current bug — go/kubectl were
+    /// already consistent, so pinning them keeps them so). Each (family, flag) is verified against the
+    /// live classifier; only add a row/flag that is genuinely shared by every listed sub, or the guard
+    /// false-fails. To EXTEND: append a `Family`, run the test, and treat any failure as a real drift
+    /// bug (fix the TOML) unless the flag isn't actually universal (then it doesn't belong in the row).
+    #[test]
+    fn subcommand_families_share_core_flags() {
+        use crate::is_safe_command;
+
+        struct Family {
+            command: &'static str,
+            subs: &'static [&'static str],
+            standalone: &'static [&'static str],
+            valued: &'static [(&'static str, &'static str)],
+        }
+
+        const FAMILIES: &[Family] = &[
+            // cargo's build-and-analyze subs share package-selection + compile flags. Excluded:
+            // `run` (executes the built binary — intentionally code-exec-restricted) and `fix`
+            // (rewrites source; not a sub).
+            Family {
+                command: "cargo",
+                subs: &["build", "check", "test", "doc", "clippy", "bench"],
+                standalone: &[
+                    "--workspace", "--all", "--release", "--offline", "--locked", "--frozen",
+                    "--all-features", "--no-default-features",
+                ],
+                valued: &[
+                    ("--features", "foo"),
+                    ("--target", "x86_64-unknown-linux-gnu"),
+                    ("--profile", "dev"),
+                    ("--manifest-path", "Cargo.toml"),
+                ],
+            },
+            // go build/test/vet share the build/module knobs (single-dash, value by space or `=`).
+            Family {
+                command: "go",
+                subs: &["build", "test", "vet"],
+                standalone: &["-v", "-x", "-n"],
+                valued: &[("-tags", "foo")],
+            },
+            // .NET's build-family subs share configuration/restore knobs. (`run` executes — excluded.)
+            Family {
+                command: "dotnet",
+                subs: &["build", "test", "publish"],
+                standalone: &["--no-restore", "--nologo"],
+                valued: &[("--configuration", "Release"), ("--framework", "net8.0")],
+            },
+            // swift build/test share the configuration selector. (`run` executes — excluded.)
+            Family {
+                command: "swift",
+                subs: &["build", "test"],
+                standalone: &[],
+                valued: &[("-c", "release"), ("--configuration", "release")],
+            },
+            // OpenTofu's LOCAL read/format subs share `-no-color`. (`plan`/`apply` reach remote state
+            // and are intentionally gated — not part of this family.)
+            Family {
+                command: "tofu",
+                subs: &["validate", "show", "fmt"],
+                standalone: &["-no-color"],
+                valued: &[],
+            },
+        ];
+
+        let mut failures = Vec::new();
+        for fam in FAMILIES {
+            for sub in fam.subs {
+                for f in fam.standalone {
+                    let cmd = format!("{} {sub} {f}", fam.command);
+                    if !is_safe_command(&cmd) {
+                        failures.push(cmd);
+                    }
+                }
+                for (f, v) in fam.valued {
+                    let cmd = format!("{} {sub} {f} {v}", fam.command);
+                    if !is_safe_command(&cmd) {
+                        failures.push(cmd);
+                    }
+                }
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "subcommand family flag drift — a sub is missing a flag its siblings share:\n  {}",
+            failures.join("\n  "),
+        );
+    }
+
+    /// Behavioral conservation: every path-flag DECLARED in a gate (central `[roles.X]` or a
+    /// command's own `[command.path_gate]`) must ACTUALLY deny a hot path. Catches a gate that is
+    /// shadowed (a central `[roles.X]` hid a co-located flag — the qpdf bug), mis-spelled (a
+    /// single-dash Go flag the double-dash gate missed — the mkcert bug), or otherwise non-firing.
+    /// Operates on `should_deny` directly, so command usage-validation can't hand it a false pass.
+    #[test]
+    fn every_declared_path_flag_actually_gates() {
+        use super::types::TomlFile;
+        use crate::pathgate::Role;
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).unwrap() {
+                let p = e.unwrap().path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+
+        let mut gates: Vec<(String, String, Role)> = crate::pathgate::central_flag_gates();
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+        for file in &files {
+            let src = std::fs::read_to_string(file).unwrap();
+            let parsed: TomlFile = toml::from_str(&src).unwrap();
+            for cmd in &parsed.command {
+                if let Some(pg) = &cmd.path_gate {
+                    for (f, r) in pg.flag_roles() {
+                        gates.push((cmd.name.clone(), f.to_string(), r));
+                    }
+                }
+            }
+        }
+
+        let mut failures = Vec::new();
+        for (cmd, flag, role) in gates {
+            let hot = match role {
+                Role::Write => "/etc/sc-probe-target",
+                Role::Read => "~/.ssh/id_rsa",
+                // A /tmp executor is the discriminating hot path: `write` would ALLOW it
+                // (Temp is writable), but `exec` must DENY it (running staged/foreign code).
+                Role::Exec => "/tmp/sc-probe/Cargo.toml",
+                Role::Ignore => continue,
+            };
+            // Probe the space form (`flag hot`) AND the `flag=hot` glued form. A path-flag must
+            // gate its value in EVERY spelling; the glued form is where single-dash-long flags
+            // (Go-flag tools like terraform's `-out=…`) previously slipped the gate.
+            let forms = [
+                vec![cmd.clone(), flag.clone(), hot.to_string()],
+                vec![cmd.clone(), format!("{flag}={hot}")],
+            ];
+            for form in forms {
+                let toks: Vec<_> = form.iter().map(|s| crate::parse::Token::from_test(s)).collect();
+                if !crate::pathgate::should_deny(&cmd, &toks) {
+                    failures.push(format!("  {cmd} `{flag}` ({role:?}) did NOT deny {hot} — form {form:?}"));
+                }
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "declared path-flag gates that don't actually fire (shadowed / mis-spelled / wrong):\n{}",
+            failures.join("\n")
+        );
+    }
+
+    /// An alias is a pure synonym: it MUST classify identically to its canonical name for every
+    /// input. A divergence is a bypass — the Homebrew g-alias path-gate hole was exactly this
+    /// (`gcat /etc/shadow` allowed while `cat /etc/shadow` denied).
+    #[test]
+    fn every_alias_matches_its_canonical_verdict() {
+        const TAILS: &[&str] = &[
+            "", "/etc/shadow", "~/.ssh/id_rsa", "--output /etc/x", "-o /etc/evil",
+            "--outfile /etc/evil in", "./local.txt", "--help", "x > /etc/evil",
+        ];
+        let mut failures = Vec::new();
+        for (key, spec) in super::TOML_REGISTRY.iter() {
+            if key == &spec.name {
+                continue;
+            }
+            for tail in TAILS {
+                let av = crate::command_verdict(&format!("{key} {tail}"));
+                let cv = crate::command_verdict(&format!("{} {tail}", spec.name));
+                if av != cv {
+                    failures.push(format!("  {key} vs {}: `{tail}` -> {av:?} != {cv:?}", spec.name));
+                }
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "alias/canonical verdict divergence (an alias must classify identically):\n{}",
+            failures.join("\n")
+        );
     }

@@ -46,3 +46,6 @@ valued = [
     "--via-ir", "--yul-dialect", "--yul-optimizations",
     "-o",
 ]
+
+[command.path_gate]
+flags = { "--output-dir" = "write", "--input-file" = "read" }

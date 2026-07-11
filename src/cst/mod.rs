@@ -126,6 +126,13 @@ impl Word {
         eval::eval_word(self)
     }
 
+    /// The set of literal words this word produces under UNQUOTED brace expansion (`{a,b}` → two
+    /// words). Every produced word must be classified, so a braced alternative can't hide a system
+    /// path from the gate (`cat {/etc/shadow,x}`). Non-braced words expand to `[self.eval()]`.
+    pub fn expand(&self) -> Vec<String> {
+        eval::expand_word(self)
+    }
+
     pub fn literal(s: &str) -> Self {
         Word(vec![WordPart::Lit(s.to_string())])
     }

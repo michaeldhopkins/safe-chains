@@ -44,6 +44,9 @@ standalone = [
 ]
 valued = ["--output-file", "--temp-path", "-O"]
 
+[command.path_gate]
+flags = { "--output-file" = "write" }
+
 [[command]]
 name = "zipnote"
 description = "Read or rewrite zipfile comments and entry names. Default mode dumps comments to stdout. -w reads a previously-dumped (and possibly edited) comment listing from stdin and rewrites the zipfile's comments and entry names accordingly."

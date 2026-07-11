@@ -29,3 +29,6 @@ valued = [
     "--upgrade-package",
     "-P",
 ]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }

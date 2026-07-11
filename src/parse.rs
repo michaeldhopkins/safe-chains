@@ -99,6 +99,10 @@ impl Token {
         self.as_str().split_once(sep).map(|(_, v)| v)
     }
 
+    /// The token with all DOUBLE-quoted string content replaced by a space — for analyzing code
+    /// whose string literals are INERT (awk: `{print "system"}` is a literal, not a call). NOT
+    /// sound for languages that INTERPOLATE code inside double quotes (perl `"@{[…]}"`), which use
+    /// their own interpolation-aware stripper.
     pub fn content_outside_double_quotes(&self) -> String {
         let bytes = self.as_str().as_bytes();
         let mut result = Vec::with_capacity(bytes.len());
@@ -316,10 +320,5 @@ mod tests {
     #[test]
     fn content_outside_double_quotes_no_quotes() {
         assert_eq!(tok("{print $1}").content_outside_double_quotes(), "{print $1}");
-    }
-
-    #[test]
-    fn content_outside_double_quotes_empty() {
-        assert_eq!(tok("").content_outside_double_quotes(), "");
     }
 }

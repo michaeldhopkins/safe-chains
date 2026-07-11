@@ -21,3 +21,6 @@ valued = [
     "--runtime", "--template",
     "-e", "-o",
 ]
+
+[command.path_gate]
+flags = { "--output-file" = "write" }

@@ -48,11 +48,12 @@ prop_compose! {
         ),
         g4 in (
             arb_term::<SupplySource>(), arb_term::<Pinning>(), arb_term::<ExecSurface>(),
+            arb_term::<Provenance>(),
         ),
     ) -> Capability {
         Capability {
             operation: g1.0,
-            locus: Locus { local: g1.1, remote: g1.2, binding: g1.3 },
+            locus: Locus { local: g1.1, remote: g1.2, binding: g1.3, provenance: g4.3 },
             scale: g1.4,
             authority: g1.5,
             isolation: g1.6,
@@ -96,9 +97,11 @@ prop_compose! {
             arb_opt_bound::<ExecutionTrust>(), arb_opt_bound::<Cost>(),
             arb_opt_set::<SupplySource>(), arb_opt_bound::<Pinning>(), arb_opt_set::<ExecSurface>(),
         ),
+        g4 in arb_opt_bound::<Provenance>(),
     ) -> Clause {
         Clause {
             operation: g1.0, local_locus: g1.1, remote_reach: g1.2, remote_binding: g1.3,
+            provenance: g4,
             scale: g1.4, authority: g1.5, isolation: g1.6, reversibility: g1.7,
             persistence_level: g2.0, trigger_escape: g2.1, trigger_kind: g2.2,
             disclosure_audience: g2.3, disclosure_channel: g2.4, disclosure_principal: g2.5,

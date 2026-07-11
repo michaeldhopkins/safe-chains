@@ -83,15 +83,28 @@ into this host" and "which other host"; `kernel` and `remote` are different plac
 not more/less of one thing.
 - **`local`** (ordinal depth): `process` → `temp` → `sandbox-scope` (§3.2) →
   `worktree` → `worktree-trusted` (`.git/`, `.envrc`, hooks, CI configs) → `user`
-  (`~`, keychain) → `machine` (`/etc`, services, other users) → **`device`** (raw
-  block/char devices, beneath the filesystem: `dd of=/dev/rdisk0`, `mount`) →
-  **`kernel`** (module/extension load: `kmutil load`). `device`/`kernel` (R18) void
+  (`~`, keychain) → `machine` (ORDINARY admin surface: services, `/etc` app config,
+  `/usr/local`) → **`system-integrity`** (the machine's own identity/auth/boot/loader
+  substrate — `/etc/passwd`, `/etc/sudoers`, `/etc/pam.d`, the loader, `/boot`: a WRITE
+  is compromise-complete, so it worst-cases above `machine`; the read face stays
+  `machine`) → **`device`** (raw block/char devices, beneath the filesystem: `dd
+  of=/dev/rdisk0`, `mount`) → **`kernel`** (module/extension load: `kmutil load`).
+  The `machine`/`system-integrity` split is the boundary between "run the machine as
+  admin" (local-admin) and "own its trust root" (yolo). `device`/`kernel` (R18) void
   the abstractions every higher fs rung assumes and are deny-by-default everywhere
   (§4.3).
 - **`remote`** (reach): `none` · `fixed` · `arbitrary`, plus a **pinned-vs-ambient**
   bit — whether the target host is named on the command line (`--context`,
   `--profile`, explicit host) or comes from session state. Same axis as
   Network.destination; the pinned bit is what `infra` gates on (HP-12, §4.3).
+- **`provenance`** (target trust): `na` · `established` · `literal` · `opaque` — how the
+  acted-on target was *designated*, a trust ladder orthogonal to reach (breadth) and the
+  pinned bit (visibility). `established` = a stable handle from a prior deliberate act (a
+  configured remote, a named context); `literal` = spelled inline (a URL typed now —
+  visible but injectable); `opaque` = from a variable/substitution (unreviewable →
+  fail-closed). What makes `git push` safe is an `established` target, not that data leaves;
+  `network-admin` caps `provenance ≤ literal`, `opaque` is yolo-only. See
+  `behavioral-taxonomy-exposure.md` §4.
 
 A predicate reads e.g. `locus.local ≤ worktree ∧ locus.remote = none`.
 
@@ -370,12 +383,16 @@ Ceilings + sets make the engine provable (type-directed generation over `Profile
 ⇒ superset** · **totality** · **round-trip** · **golden-set anchor**.
 
 ### 4.3 The default set
-Designed in `behavioral-taxonomy-levels.md` + `…-refinements.md`:
-`inert ⊂ read-local ⊂ write-local ⊂ developer ⊂ yolo`, with two deny-by-default
-siblings off `developer` — **`infra`** (remote-cloud operator: `terraform apply`,
-`kubectl apply`, `aws … create`) and **`admin`** (local privileged: `sudo apt`,
-`systemctl`, `/etc`). `infra` admits remote mutation only when `locus.remote = pinned`
-(HP-12) and caps `reversibility ≤ effortful` so irreversible remote destroy
+Designed in `behavioral-taxonomy-levels.md` + `…-refinements.md`. **Naming + shape
+finalized 2026-07-15 (`…-levels.md` §0), implemented in `levels/default.toml`:** the
+human ladder is `paranoid ⊂ reader ⊂ editor ⊂ developer ⊂ yolo` (renamed from
+`inert`/`read-local`/`write-local`), and the two siblings off `developer` are now
+first-class levels, **`network-admin`** (was `infra`; remote-cloud operator:
+`terraform apply`, `kubectl apply`, `aws … create`) and **`local-admin`** (was `admin`;
+local privileged: `sudo apt`, `systemctl`, `/etc`) — incomparable siblings that flex
+disjoint facet regions (network vs machine). `network-admin` admits remote mutation only
+when `locus.remote = pinned` (HP-12) and caps `reversibility ≤ effortful` so irreversible
+remote destroy
 (`terraform destroy`, `kubectl delete ns prod`) still prompts; `admin` admits
 root/machine and root supply-chain installs but never `device`/`kernel`, unbounded
 destroy, or `curl|sudo bash`. Both operator levels are opt-in and deliberately

@@ -42,6 +42,16 @@ const CURL_SAFE_HEADERS: &[&str] = &[
     "X-GitHub-Api-Version", "X-Request-ID", "X-Requested-With",
 ];
 
+/// curl's `--write-out` reads its format from a file when the value starts with `@` (`@-` =
+/// stdin), printing that file to stdout — an arbitrary-file disclosure. Admit only `@-`, a
+/// non-`@` literal format, or an `@path` whose read locus is admitted.
+fn write_out_admits(value: &str) -> bool {
+    match value.strip_prefix('@') {
+        None | Some("-") => true,
+        Some(path) => crate::engine::resolve::read_content_verdict(path).is_allowed(),
+    }
+}
+
 fn check_curl_valued(t: &Token, next: Option<&Token>, has_write: &mut bool) -> Option<Result<usize, ()>> {
     if t == "-o" || t == "--output" {
         *has_write = true;
@@ -50,11 +60,20 @@ fn check_curl_valued(t: &Token, next: Option<&Token>, has_write: &mut bool) -> O
     if t == "-H" || t == "--header" {
         return if next.is_some_and(|v| is_safe_curl_header(v)) { Some(Ok(2)) } else { Some(Err(())) };
     }
+    if t == "-w" || t == "--write-out" {
+        return Some(match next {
+            Some(v) if !write_out_admits(v.as_str()) => Err(()),
+            _ => Ok(2),
+        });
+    }
     if CURL_SAFE_VALUED.contains(t) {
         return Some(Ok(2));
     }
     if let Some(val) = t.split_value("=") {
         let flag = t.as_str().split_once('=').map_or(t.as_str(), |(k, _)| k);
+        if flag == "--write-out" {
+            return Some(if write_out_admits(val) { Ok(1) } else { Err(()) });
+        }
         if CURL_SAFE_VALUED.contains(flag) || flag == "--output" {
             if flag == "--output" { *has_write = true; }
             return Some(Ok(1));
@@ -80,6 +99,8 @@ pub fn is_safe_curl(tokens: &[Token]) -> Verdict {
         let t = &tokens[i];
 
         if !t.starts_with('-') {
+            // a URL operand — the pathgate locus-gates it (roles.curl positional = read), so a
+            // `file:` URL to a secret denies and a network URL admits, all in one place.
             i += 1;
             continue;
         }
@@ -130,6 +151,9 @@ pub fn is_safe_curl(tokens: &[Token]) -> Verdict {
                 if is_last && CURL_VALUED_SHORT.contains(&b) {
                     if b == b'o' {
                         has_write = true;
+                    }
+                    if b == b'w' && tokens.get(i + 1).is_some_and(|v| !write_out_admits(v.as_str())) {
+                        return Verdict::Denied;
                     }
                     i += 1;
                     break;
@@ -206,6 +230,8 @@ mod tests {
         curl_head_method: "curl -X HEAD https://example.com",
         curl_options_method: "curl -X OPTIONS https://example.com",
         curl_write_out: "curl -w '%{http_code}' -s https://example.com",
+        curl_write_out_at_worktree: "curl -w @./fmt.txt -s https://example.com",
+        curl_write_out_at_stdin: "curl -w @- -s https://example.com",
         curl_multiple_urls: "curl -s https://example.com https://example.org",
         curl_compressed: "curl --compressed -s https://example.com",
         curl_no_progress: "curl -sS --no-progress-meter https://example.com",
@@ -277,6 +303,20 @@ mod tests {
         curl_get_then_data: "curl -X GET -d 'payload' https://example.com",
         curl_xget_then_bad_header: "curl -XGET -H 'Content-Type: text/plain' https://example.com",
         curl_request_eq_get_then_data: "curl --request=GET -d 'payload' https://example.com",
+        // file: URLs read a LOCAL file to stdout — gated by read locus, so a secret denies.
+        curl_file_scheme_secret: "curl file:///etc/shadow",
+        curl_file_scheme_host: "curl file://localhost/etc/shadow",
+        curl_file_scheme_home_key: "curl file:///root/.ssh/id_rsa",
+        curl_file_single_slash: "curl file:/etc/shadow",
+        // schemes are case-insensitive — uppercase/mixed must not slip past the gate.
+        curl_file_scheme_upper: "curl FILE:///etc/shadow",
+        curl_file_scheme_mixed: "curl File:///etc/shadow",
+        curl_file_scheme_wild: "curl fIlE:///root/.ssh/id_rsa",
+        // --write-out @file reads that file to stdout — a secret there must deny, every form.
+        curl_write_out_at_secret: "curl -w @/etc/shadow https://x.com",
+        curl_write_out_at_secret_long: "curl --write-out @/etc/shadow https://x.com",
+        curl_write_out_at_secret_eq: "curl --write-out=@/root/.ssh/id_rsa https://x.com",
+        curl_write_out_at_secret_cluster: "curl -sw @/etc/shadow https://x.com",
     }
 
     inert! {
