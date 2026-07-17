@@ -553,7 +553,10 @@ fn build_sub_kind(
     if let Some(skip) = toml.delegate_skip {
         return DispatchKind::DelegateSkip { skip };
     }
-    if !toml.sub.is_empty() {
+    // A `credential_first_arg` gate forces the Branching path even with no sub-subs: only Branching
+    // runs `skip_pre_flags`, so the credential check sees the real resource arg (`get -o yaml secret`),
+    // not a leading flag — `FirstArg` reads `tokens[1]` verbatim and would be bypassed by a flag.
+    if !toml.sub.is_empty() || !toml.credential_first_arg.is_empty() {
         // A sub may carry BOTH explicit sub-subs AND a fallback `first_arg` glob (a service that
         // auto-approves its read verbs via `get-*`/`describe-*` but carves specific dangerous actions
         // out to profiled sub-subs). Dispatch checks the explicit subs FIRST, then the glob
@@ -571,6 +574,7 @@ fn build_sub_kind(
             pre_valued: toml.valued,
             first_arg: toml.first_arg,
             first_arg_level,
+            credential_first_arg: toml.credential_first_arg,
         };
     }
     build_policy_sub_kind(parent, toml, handler_policies)
@@ -1058,6 +1062,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                     bare_ok: toml.bare.unwrap_or(false),
                     first_arg: toml.first_arg,
                     first_arg_level,
+                    credential_first_arg: toml.credential_first_arg,
                 },
             };
         }
@@ -1114,6 +1119,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 bare_ok: toml.bare.unwrap_or(false),
                 first_arg: toml.first_arg,
                 first_arg_level,
+                credential_first_arg: toml.credential_first_arg,
             },
         };
     }

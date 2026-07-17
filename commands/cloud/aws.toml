@@ -63,6 +63,10 @@ standalone = ["--help"]
 [[command.sub.sub]]
 name = "get"
 bare = false
+# `aws configure get <key>` prints a stored config value. `region`/`output` are metadata; the
+# credential keys print the locally stored secret (the same material `cat ~/.aws/credentials` denies).
+first_arg = ["*"]
+credential_first_arg = ["aws_secret_access_key", "aws_session_token", "aws_security_token"]
 standalone = ["--help"]
 [[command.sub.sub]]
 name = "export-credentials"

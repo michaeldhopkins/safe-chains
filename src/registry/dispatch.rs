@@ -126,11 +126,12 @@ fn dispatch_branching(
     subs: &[SubSpec],
     bare_flags: &[String],
     bare_ok: bool,
-    pre_standalone: &[String],
-    pre_valued: &[String],
+    pre_flags: (&[String], &[String]),
     first_arg: &[String],
     first_arg_level: SafetyLevel,
+    credential_first_arg: &[String],
 ) -> Verdict {
+    let (pre_standalone, pre_valued) = pre_flags;
     let start = skip_pre_flags(tokens, pre_standalone, pre_valued, 1);
     if start >= tokens.len() {
         return if bare_ok { Verdict::Allowed(SafetyLevel::Inert) } else { Verdict::Denied };
@@ -150,17 +151,18 @@ fn dispatch_branching(
     if let Some(sub) = subs.iter().find(|s| s.name == arg) {
         return dispatch_kind(&tokens[start..], &sub.kind, &SUB_HANDLERS);
     }
-    if !first_arg.is_empty() {
-        let matches = first_arg.iter().any(|p| {
-            if let Some(prefix) = p.strip_suffix('*') {
-                arg.starts_with(prefix)
-            } else {
-                arg == p
-            }
-        });
-        if matches {
-            return Verdict::Allowed(first_arg_level);
-        }
+    let glob_match = |p: &str| match p.strip_suffix('*') {
+        Some(prefix) => arg.starts_with(prefix),
+        None => arg == p,
+    };
+    // A first positional naming secret material (`kubectl get secret`/`secret/x`, `aws configure get
+    // aws_secret_access_key`) is a CREDENTIAL-READ — deny before the allow-glob admits it. The
+    // value-dependent complement to `profile=credential-read`; `arg` is already flag-aware.
+    if credential_first_arg.iter().any(|p| glob_match(p)) {
+        return Verdict::Denied;
+    }
+    if !first_arg.is_empty() && first_arg.iter().any(|p| glob_match(p)) {
+        return Verdict::Allowed(first_arg_level);
     }
     Verdict::Denied
 }
@@ -237,10 +239,11 @@ fn dispatch_kind(tokens: &[Token], kind: &DispatchKind, handlers: &HandlerMap) -
         }
         DispatchKind::Branching {
             subs, bare_flags, bare_ok, pre_standalone, pre_valued, first_arg, first_arg_level,
+            credential_first_arg,
         } => {
             dispatch_branching(
-                tokens, subs, bare_flags, *bare_ok, pre_standalone, pre_valued,
-                first_arg, *first_arg_level,
+                tokens, subs, bare_flags, *bare_ok, (pre_standalone, pre_valued),
+                first_arg, *first_arg_level, credential_first_arg,
             )
         }
         DispatchKind::WriteFlagged { policy, base_level, write_flags } => {

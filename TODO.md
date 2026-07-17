@@ -23,14 +23,17 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
     get-secret-value / ecr get-login-password / sts get-session-token / ssm get-parameter
     --with-decryption, gcloud secrets versions access / auth print-*-token, az keyvault secret show, gh
     auth token, doctl auth init, security find-internet-password.
-  - kubectl `get secret`/`get secrets` — GATED (2026-07) via `first_arg = ["*"]` on `get` (glob admits
-    every resource incl. CRDs) plus explicit `secret`/`secrets` sub-subs `profile = "credential-read"`
-    that override the glob. `get pods`/CRDs/flag-first orderings stay read-only. RESIDUALS (need a
-    kubectl handler — sub-sub names match exactly, so declarative can't do prefix/precision): (a) the
-    SLASH form `kubectl get secret/<name> -o yaml` bypasses the exact match (a determined actor; the
-    canonical `get secret <name> -o yaml` IS gated); (b) conservative — gates `get secrets` (name list)
-    too, a minor over-deny; (c) `describe secret` REDACTS values so it stays allowed (correct). A handler
-    would match `secret`-prefixed resources and could scope to value-dumping `-o` forms.
+  - kubectl `get secret` — GATED (2026-07) via the new `credential_first_arg` mechanism (below): every
+    name form denies — exact `secret`/`secrets`, the slash shorthand `secret/<name>`, qualified
+    `secret.v1.core`, and flag-first `get -o yaml secret` — while pods/CRDs/`secretstore` stay read-only.
+    Residual (minor): conservative — gates `get secrets` (name list) too; `describe secret` stays allowed
+    (it redacts values).
+  - NEW MECHANISM `credential_first_arg` (2026-07) — the value-dependent credential gate. A glob list on
+    a Branching sub (dispatch_branching, flag-aware) that DENIES a first-positional match before the
+    first_arg allow-glob. The declarative complement to `profile=credential-read` for the "a specific
+    resource/key name discloses" class. Closes kubectl secret (all forms) AND `aws configure get
+    aws_secret_access_key`/`aws_session_token` (region/output stay allowed). Guarded by
+    `credential_first_arg_gates_every_secret_name_form`; documented in SAMPLE.toml.
   - Breadth sweep batch 1 (2026-07): gated `bw get`/`list` (Bitwarden), `pass show`/`grep`, `heroku
     config` (all profile=credential-read; conservative on the password managers). Verified already-safe:
     doppler, gopass, chamber, infisical, `az account get-access-token`, `gcloud auth print-*`, flyctl,
@@ -39,9 +42,10 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
     - `sops -d`/`--decrypt` / `exec-env` / `exec-file` — FLAG-triggered disclosure (decrypts + prints
       plaintext); like `sed -i`, the flag flips read→disclose. sops without -d encrypts (no disclosure),
       so a blanket candidate over-denies — needs a handler that denies the decrypt flags.
-    - `aws configure get aws_secret_access_key` / `aws_session_token` — VALUE-dependent (the config key
-      decides): `get region` is metadata, `get <secret-key>` prints the stored credential. Same shape as
-      kubectl secret — needs first_arg/sub-sub or a handler on `configure get`.
+    - `aws configure get aws_secret_access_key` / `aws_session_token` — GATED (2026-07) via
+      `credential_first_arg` on `configure get`; `get region`/`output` stay allowed. (Residual: the rare
+      profile-qualified key form `get profile.x.aws_secret_access_key` needs suffix-glob support — the
+      current globs are prefix-only.)
     - `terraform output -raw <name>` and `helm get values <release>` — VALUE-dependent: mostly non-secret
       outputs/config, but a sensitive output / a secret embedded in values discloses. Handler-class (can't
       gate the whole sub without over-denying the common read). Grouped with the value-dependent set.
