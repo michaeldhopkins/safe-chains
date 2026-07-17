@@ -69,12 +69,13 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
   Verified live: Codex, Antigravity `agy` (supersedes retired Gemini), Claude, Cursor. Assumed
   (Claude-mirror): Qwen, Droid. Remaining: **Copilot** (unverified, not installed here) + optionally
   exercise Qwen/Droid. opencode is static-config (no runtime hook).
-- **Cursor target — OPEN DESIGN DECISION (from the 2026-07 live drive).** cursor-agent v2026.07.16
-  honors a hook `deny` (blocks + shows our message) but IGNORES `allow` (its own command allowlist still
-  prompts). So `src/targets/cursor.rs` (allow-for-safe, abstain-for-gated) is INERT on the CLI — no
-  auto-approve, no block. To make safe-chains useful on Cursor we'd emit `deny` on gated commands (making
-  Cursor a deny-harness like Codex) — a shift from the allowlist-only abstain model. Or `allow` may work
-  in the Cursor IDE (untested). Decide before changing the target. Details in HARNESS-BEHAVIORS §Cursor.
+- **Cursor target — DECIDED (2026-07): Deny harness.** cursor-agent v2026.07.16 honors a hook `deny`
+  (blocks + shows our message) but IGNORES `allow` (a known cursor bug — forum.cursor.com/t/…/144244,
+  allowlist wins). So `src/targets/cursor.rs` now emits `deny` for gated commands (protective, like
+  Codex) and keeps `allow` for safe (inert until cursor honors it). REVISIT if the bug is fixed → switch
+  back to allow-for-safe + Defer. Trade-off: a Deny harness hard-blocks every not-allowlisted command
+  (escape = `~/.config/safe-chains.toml` grant), stricter than the prior abstain. See HARNESS-BEHAVIORS
+  §Cursor.
 - **`.safe-chains.toml` protected config location — WON'T-FIX before 1.0 (decided 2026-07).** Most
   harnesses do not expose a protected location, so there's nothing to implement. Best-effort holds: the
   command classifier denies every *command* write to the trust root (guarded); a non-command write
