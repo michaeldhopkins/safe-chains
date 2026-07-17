@@ -617,7 +617,7 @@ flags = { "--dangerous-emptied-output-directory" = "write", "--output-directory"
 flags = { "-o" = "write" }
 
 [roles."swc"]
-flags = { "-o" = "write" }
+flags = { "-o" = "write", "--out-dir" = "write" }
 
 [roles."syft"]
 flags = { "-o" = "write", "--output" = "write" }
@@ -631,4 +631,54 @@ flags = { "-w" = "write", "--write" = "write" }
 shape = "last_write"
 
 [roles."tiffcp"]
+shape = "last_write"
+
+# ── Adversarial-review residual follow-ups: handler/sub output flags, output-dirs, and positional
+#    last-arg writers the flag-focused output-flag sweep did not reach. ────────────────────────────
+[roles."gs"]
+flags = { "-o" = "write" }
+
+[roles."mkdocs"]
+flags = { "-d" = "write", "--site-dir" = "write" }
+
+[roles."pdfunite"]
+shape = "last_write"
+
+[roles."ps2pdf"]
+shape = "last_write"
+
+[roles."pdf2ps"]
+shape = "last_write"
+
+[roles."pdftops"]
+shape = "last_write"
+
+[roles."sphinx-build"]
+shape = "last_write"
+
+[roles."pdfcrop"]
+shape = "last_write"
+
+[roles."lame"]
+shape = "last_write"
+
+[roles."cargo"]
+flags = { "--target-dir" = "write", "--out-dir" = "write" }
+
+[roles."webpack"]
+flags = { "-o" = "write", "--output-path" = "write" }
+
+[roles."vite"]
+flags = { "--outDir" = "write" }
+
+[roles."esbuild"]
+flags = { "--outdir" = "write", "--outfile" = "write" }
+
+[roles."tsup"]
+flags = { "--out-dir" = "write", "-d" = "write" }
+
+[roles."cjxl"]
+shape = "last_write"
+
+[roles."djxl"]
 shape = "last_write"
