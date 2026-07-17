@@ -31,8 +31,18 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
     canonical `get secret <name> -o yaml` IS gated); (b) conservative — gates `get secrets` (name list)
     too, a minor over-deny; (c) `describe secret` REDACTS values so it stays allowed (correct). A handler
     would match `secret`-prefixed resources and could scope to value-dumping `-o` forms.
-  - Remaining sweep: continue researching secret-store / cloud CLIs (doppler, sops, doctl, azure/gcp
-    breadth, k8s) and add each credential read to the ratchet as it is gated.
+  - Breadth sweep batch 1 (2026-07): gated `bw get`/`list` (Bitwarden), `pass show`/`grep`, `heroku
+    config` (all profile=credential-read; conservative on the password managers). Verified already-safe:
+    doppler, gopass, chamber, infisical, `az account get-access-token`, `gcloud auth print-*`, flyctl,
+    step, kubeseal, gpg -d, `cat ~/.aws/credentials`. `wrangler secret list` = names-only (grandfathered).
+  - DEFERRED holes (still auto-approve — each needs a handler, not a sub profile):
+    - `sops -d`/`--decrypt` / `exec-env` / `exec-file` — FLAG-triggered disclosure (decrypts + prints
+      plaintext); like `sed -i`, the flag flips read→disclose. sops without -d encrypts (no disclosure),
+      so a blanket candidate over-denies — needs a handler that denies the decrypt flags.
+    - `aws configure get aws_secret_access_key` / `aws_session_token` — VALUE-dependent (the config key
+      decides): `get region` is metadata, `get <secret-key>` prints the stored credential. Same shape as
+      kubectl secret — needs first_arg/sub-sub or a handler on `configure get`.
+  - Remaining sweep: keep researching secret-store / cloud CLIs and add each credential read to the ratchet.
 - **Over-deny audit follow-ups — RESOLVED (2026-07).**
   - `terraform`: already fully covered (verified) — `plan`/`validate`/`show`/`fmt`/`output`/`state list`
     /`version` allow, `init`/`apply`/`destroy`/`import` deny. The old "not covered at all" note was stale.

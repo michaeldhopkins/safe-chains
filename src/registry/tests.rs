@@ -2028,6 +2028,12 @@ use super::*;
             // known residual (see TODO — needs a handler for prefix/name-form matching).
             "kubectl get secret db-creds -o yaml",
             "kubectl get secrets",
+            // Password managers / secret stores (retrieval subs return secret material)
+            "bw get password github",
+            "bw list items",
+            "pass show email/work",
+            "pass grep AWS_SECRET",
+            "heroku config",
             // credential-minting / password stores
             "gh auth token",
             "doctl auth init",

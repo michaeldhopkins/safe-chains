@@ -24,7 +24,10 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "list"
-level = "SafeRead"
+profile = "credential-read"
+fact = "`bw list items` returns the full vault items — including each login's `password`, TOTP seed, and secure-note contents — as JSON to stdout."
+source = "https://bitwarden.com/help/cli/#list"
+judgment = "Bitwarden is a password manager; `list` dumps vault item contents (credentials). Conservative: gated for all object types (listing folder/collection names is a minor over-deny)."
 bare = false
 tolerate_unknown_short = true
 standalone = ["--help", "--organizationid", "--pretty", "--quiet", "--raw", "--response", "--session", "--trash", "-h"]
@@ -32,7 +35,10 @@ valued = ["--collectionid", "--folderid", "--nointeraction", "--organizationid",
 
 [[command.sub]]
 name = "get"
-level = "SafeRead"
+profile = "credential-read"
+fact = "`bw get password`/`item`/`totp`/`notes` fetches a vault item's secret material (password, TOTP code, secure note) and prints it to stdout."
+source = "https://bitwarden.com/help/cli/#get"
+judgment = "Retrieving a vault item from a password manager is credential exposure. Conservative: gated for all object types (`get username`/`uri` are a minor over-deny)."
 bare = false
 tolerate_unknown_short = true
 standalone = ["--help", "--pretty", "--raw", "--response", "-h"]
