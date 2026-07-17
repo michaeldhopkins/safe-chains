@@ -28,7 +28,7 @@ independently exercised.
 | **Droid** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Same shape; shell tool is `Execute`, not `Bash`. |
 | **Cursor** | ✅ | ✅ **Verified live → DENY harness** (`cursor-agent` v2026.07.16) | `deny` works (blocks + shows our message); `allow` is ignored (a known cursor bug). Decision: emit `deny` for gated commands so safe-chains is protective (like Codex); keep `allow` for safe (inert until cursor honors it). Revisit if the bug is fixed. See §Cursor. |
 | **Copilot** | ✅ | ❌ **Unverified** | Flat envelope, `toolArgs` a nested JSON string; only `deny` acts today. |
-| **opencode** | ❌ (static config) | n/a — not a runtime hook | We render static config patterns; no per-command signal to verify. |
+| **opencode** | ❌ (static config) | ⚠️ **Inert — pattern generator is a STUB** (2026-07) | Static `permission.bash` config is the only path (opencode's plugin hook is broken, [#7006](https://github.com/anomalyco/opencode/issues/7006)). But `all_opencode_patterns()` returns EMPTY → the rendered config allowlists nothing. And the approach is fundamentally lossy (glob `"git *"` can't express `git status`-yes / `git push`-no). See §opencode. |
 
 **Remaining live-verification work:** Copilot (unverified); optionally exercise Qwen/Droid to upgrade
 "assumed"→"verified". Cursor is done — verified live and made a DENY harness (`allow` is ignored on the
@@ -198,6 +198,27 @@ each invocation. Config: `~/.cursor/hooks.json` → `hooks.beforeShellExecution[
   Cursor the veto is a hard block (no in-app "approve once"), so the escape valve is a
   `~/.config/safe-chains.toml` grant, not cursor's prompt. This is stricter than the prior abstain
   (which let cursor prompt); it is the price of protection while `allow` is broken.
+
+### opencode — INERT (pattern generator is a stub), 2026-07
+
+opencode has NO usable runtime hook: its `permission.ask` plugin hook is defined in the SDK but never
+fires ([#7006](https://github.com/anomalyco/opencode/issues/7006)), so the only integration is a static
+`opencode.json` `permission.bash` map (`"pattern" -> allow|ask|deny`, last match wins, `"*"` first).
+`safe-chains --opencode-config` renders that map. Two findings from the 2026-07 check:
+- **The generator is a NO-OP STUB.** `handlers::all_opencode_patterns()` builds an empty `Vec`,
+  sorts/dedups nothing, returns it. So the rendered config is just `{"bash": {"*": "ask"}}` — it
+  allowlists ZERO commands. safe-chains provides **no auto-approval** on opencode today. (No test
+  asserts the pattern set is non-empty, so it slipped through — a test gap.)
+- **Even filled in, the approach is FUNDAMENTALLY LOSSY.** opencode matches a command against glob
+  prefixes; safe-chains classifies per-argument. `"git *": "allow"` would allow `git push` (gated) as
+  well as `git status` (safe). The only SOUND patterns are commands safe for EVERY argument (the
+  always-inert set: `echo`, `pwd`, `date`, `whoami`, …) — a small subset. Anything richer over-allows.
+- **Options (see TODO):** (a) generate patterns only for the always-inert set (sound, low value); (b)
+  leave it documented as inert until opencode fixes the plugin hook (#7006), then build a real runtime
+  integration that can consult safe-chains per-command; (c) drop `--opencode-config` as misleading.
+  Did NOT change it here — surfacing the finding first. The live behavioral check (does opencode honor
+  `permission.bash`) was blocked by no AI provider configured, but that is opencode's own documented
+  feature; the gap is entirely on our generator.
 
 ## Model-visible context injection (`additionalContext`)
 

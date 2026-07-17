@@ -76,6 +76,14 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
   back to allow-for-safe + Defer. Trade-off: a Deny harness hard-blocks every not-allowlisted command
   (escape = `~/.config/safe-chains.toml` grant), stricter than the prior abstain. See HARNESS-BEHAVIORS
   §Cursor.
+- **opencode target — INERT (finding, 2026-07).** `handlers::all_opencode_patterns()` is a NO-OP stub
+  (returns an empty Vec), so `safe-chains --opencode-config` renders `{"bash":{"*":"ask"}}` — allowlists
+  NOTHING. opencode has no usable runtime hook (plugin hook broken, opencode #7006), and its glob
+  `permission.bash` can't faithfully represent per-arg classification (`"git *"` allows `git push`). No
+  test asserts the pattern set is non-empty (test gap). OPTIONS: (a) generate patterns only for the
+  always-inert set (echo/pwd/date/… — sound but low value) + a non-empty guard; (b) leave documented as
+  inert until opencode fixes #7006, then a real runtime integration; (c) drop `--opencode-config`. See
+  HARNESS-BEHAVIORS §opencode.
 - **`.safe-chains.toml` protected config location — WON'T-FIX before 1.0 (decided 2026-07).** Most
   harnesses do not expose a protected location, so there's nothing to implement. Best-effort holds: the
   command classifier denies every *command* write to the trust root (guarded); a non-command write
