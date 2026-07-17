@@ -110,13 +110,13 @@ pub fn upper_level_by_name(name: &str) -> Option<&'static engine::level::Level> 
 pub fn level_ceiling(name: &str) -> Option<(SafetyLevel, Option<&'static engine::level::Level>)> {
     let (ceiling, legacy_of) = verdict::SafetyLevel::resolve_threshold(name)?;
     let canonical = legacy_of.unwrap_or(name);
-    // The UPPER band classifies per-level via `admits` (git push, bulk-object-read, sudo — above the
-    // 3-band). `paranoid`/`reader` are pure ceilings (their inert/read bands need no `admits`, and the
-    // `<= threshold` gate does the tightening). `editor`/`developer` also stay on the 3-band: editor's
-    // finer rule (no destroy, no sibling write) is real in the engine but not yet expressible through
-    // the coverage fallback, so it would only half-apply — kept collapsed to developer for consistency.
+    // Levels whose rule the 3-band projection can't express classify per-level via `admits`:
+    // `editor` (no destroy, no sibling write — distinct from developer) and the UPPER band (git push,
+    // bulk-object-read, sudo — above the band). `paranoid`/`reader` are pure ceilings (their
+    // inert/read bands need no `admits`; the `<= threshold` gate tightens), and `developer` IS the
+    // default band — those carry no engine level.
     let engine_level = match canonical {
-        "local-admin" | "network-admin" | "yolo" => {
+        "editor" | "local-admin" | "network-admin" | "yolo" => {
             engine::authoring::default_levels().iter().find(|l| l.name == canonical)
         }
         _ => None,
@@ -142,6 +142,21 @@ pub fn command_verdict_ceilinged(
         Verdict::Allowed(level) if level <= threshold => Verdict::Allowed(level),
         _ => Verdict::Denied,
     }
+}
+
+/// The coverage-fallback explanation (built-in classifier + the user's `permissions.allow` patterns),
+/// computed UNDER the configured engine level so a covered command honors that level's rule — a
+/// worktree destroy an `editor` plan forbids classifies as denied here too, not re-admitted. `None`
+/// engine level → the plain 3-band coverage (paranoid/reader/default). The caller still gates the
+/// result's `overall <= threshold`; running under the level closes the last path a lower plan's
+/// tighter rule could leak through.
+pub fn explain_with_coverage_at_level(
+    command: &str,
+    engine_level: Option<&'static engine::level::Level>,
+) -> cst::Explanation {
+    let patterns = allowlist::Matcher::load();
+    let _guard = engine_level.map(engine::bridge::enter_eval_level);
+    cst::explain_with_coverage(command, &patterns)
 }
 
 /// The auto-approve ceiling the HOOK evaluates at, from the write-protected user config

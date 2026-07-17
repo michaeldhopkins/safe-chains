@@ -146,12 +146,12 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
     }
 
     // Coverage fallback: the built-in/pattern classifier (also honoring the user's own
-    // `~/.claude/settings.json` `permissions.allow` grants). It carries the command's REAL safety
-    // level in `overall`, which must be held under the SAME ceiling — else a lower `level` (reader)
-    // would be undone here, the write it just gated re-admitted. Gate `overall <= threshold`: at the
-    // default band this is a no-op (coverage is `<= SafeWrite`), and a raised ceiling only loosens.
-    let patterns = safe_chains::allowlist::Matcher::load();
-    let explanation = safe_chains::cst::explain_with_coverage(&input.command, &patterns);
+    // `~/.claude/settings.json` `permissions.allow` grants), computed UNDER the configured engine level
+    // so a covered command respects that level's rule (an `editor` plan's forbidden worktree destroy
+    // classifies denied here too). Its REAL level in `overall` is then held under the SAME `<=
+    // threshold` ceiling — so a lower `level` (reader) can't have the write it just gated re-admitted.
+    // At the default band both are no-ops (no engine level, coverage `<= SafeWrite`).
+    let explanation = safe_chains::explain_with_coverage_at_level(&input.command, engine_level);
 
     if let Verdict::Allowed(level) = explanation.overall
         && level <= threshold

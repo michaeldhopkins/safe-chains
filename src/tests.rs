@@ -1887,8 +1887,9 @@ fn level_ceiling_maps_names_to_ceiling_and_engine_level() {
     // pure-ceiling lower band: no engine level, the `<= threshold` gate does the tightening.
     assert_eq!(ceiling("paranoid"), Some((SafetyLevel::Inert, false)));
     assert_eq!(ceiling("reader"), Some((SafetyLevel::SafeRead, false)));
-    // editor/developer stay collapsed to the SafeWrite band (no engine level) — documented.
-    assert_eq!(ceiling("editor"), Some((SafetyLevel::SafeWrite, false)));
+    // editor classifies via `admits` (no destroy / no sibling write — distinct from developer), so it
+    // carries an engine level; developer IS the default band (no engine level).
+    assert_eq!(ceiling("editor"), Some((SafetyLevel::SafeWrite, true)));
     assert_eq!(ceiling("developer"), Some((SafetyLevel::SafeWrite, false)));
     // the UPPER band classifies via `admits` — carries an engine level, shared SafeWrite ceiling.
     assert_eq!(ceiling("network-admin"), Some((SafetyLevel::SafeWrite, true)));
