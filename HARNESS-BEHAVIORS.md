@@ -26,13 +26,13 @@ independently exercised.
 | **Gemini** | (exit codes) | ⚪ **Deprecated** — do not test | Gemini CLI retired 2026-06-18 → replaced by `agy` (above). Target kept as an enterprise remnant; dropped from the active matrix. |
 | **Qwen** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Declares Claude's `permissionDecision` shape; not independently exercised. |
 | **Droid** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Same shape; shell tool is `Execute`, not `Bash`. |
-| **Cursor** | ✅ | ⚠️ **Verified live — `allow` IGNORED** (`cursor-agent` v2026.07.16) | Hook fires (envelope matches our parser); `deny` works (blocks + shows our message); **`allow` is ignored** — the command still hits cursor's own allowlist prompt. So our allow-or-abstain target has **no effect** on the CLI. See §Cursor. |
+| **Cursor** | ✅ | ✅ **Verified live → DENY harness** (`cursor-agent` v2026.07.16) | `deny` works (blocks + shows our message); `allow` is ignored (a known cursor bug). Decision: emit `deny` for gated commands so safe-chains is protective (like Codex); keep `allow` for safe (inert until cursor honors it). Revisit if the bug is fixed. See §Cursor. |
 | **Copilot** | ✅ | ❌ **Unverified** | Flat envelope, `toolArgs` a nested JSON string; only `deny` acts today. |
 | **opencode** | ❌ (static config) | n/a — not a runtime hook | We render static config patterns; no per-command signal to verify. |
 
 **Remaining live-verification work:** Copilot (unverified); optionally exercise Qwen/Droid to upgrade
-"assumed"→"verified". Cursor is now tested (a finding: `allow` is ineffective on the CLI — see §Cursor);
-Gemini is closed out via `agy`; Claude/Codex/agy are done.
+"assumed"→"verified". Cursor is done — verified live and made a DENY harness (`allow` is ignored on the
+CLI; see §Cursor); Gemini is closed out via `agy`; Claude/Codex/agy are done.
 
 ## The model we rely on
 
@@ -75,7 +75,7 @@ run) while never actually auto-approving. Tests assert the exact field.
 | Qwen    | `^Bash$`                | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | ms |
 | Droid   | `Execute`               | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | seconds |
 | Gemini  | `^run_shell_command$`   | `{decision: ...}`                      | `decision`          | allow / deny **only** | ms |
-| Cursor  | (settings `version: 1`) | flat object                            | `permission`        | (cursor's set)        | — |
+| Cursor  | (settings `version: 1`) | flat object                            | `permission`        | **deny** honored; `allow`/`ask` IGNORED (allowlist wins — cursor bug) | — |
 | Copilot | (no matcher; self-filter on `toolName`) | flat object, `toolArgs` is a nested JSON string | `permissionDecision` | **only `deny` is currently processed** | — |
 
 Notes:
@@ -188,15 +188,16 @@ each invocation. Config: `~/.cursor/hooks.json` → `hooks.beforeShellExecution[
   *"Run this command? Not in allowlist: cat"*. Its own per-user command allowlist runs regardless of a
   hook `allow`. (Cursor's docs list `allow` as valid but don't say it bypasses the allowlist; live, it
   does not.) The in-app tip even says "/run-everything to skip all approvals" — hooks don't grant.
-- **Consequence for `src/targets/cursor.rs`:** the target emits `permission:"allow"` for safe and
-  ABSTAINS (empty) for gated — so on the cursor-agent CLI it has **no observable effect**: safe commands
-  aren't auto-approved (allow ignored) and gated ones aren't blocked (we abstain). It is neither wrong
-  nor harmful, just inert here.
-- **Design implication (open):** the only lever that works on cursor-agent is `deny`. To make
-  safe-chains useful on Cursor we'd emit `deny` on gated commands (deny blocks + shows our reason) —
-  a policy shift from the allowlist-only abstain model, and it would mean Cursor is a *deny-harness*
-  like Codex. Alternatively `allow` may behave differently in the Cursor **IDE** (untested). Tracked in
-  TODO — do not change the target until that call is made.
+- **DECISION (2026-07): Cursor is a DENY harness** (`gated_policy() = Deny`). Since `allow` is the only
+  broken lever and `deny` works, `src/targets/cursor.rs` now emits `permission:"deny"` (with our reason
+  in `user_message`/`agent_message`) for a gated command, and keeps `permission:"allow"` for a safe one
+  (inert until cursor honors it). The forum confirms the ignored-`allow` behaviour is a bug
+  (forum.cursor.com/t/…/144244), so this is REVISITABLE: if cursor starts honoring `allow`, switch back
+  to allow-for-safe + Defer (abstain) for gated. The Cursor IDE may already differ from the CLI (untested).
+- **TRADE-OFF to remember:** like Codex, a Deny harness VETOES every not-allowlisted command — and on
+  Cursor the veto is a hard block (no in-app "approve once"), so the escape valve is a
+  `~/.config/safe-chains.toml` grant, not cursor's prompt. This is stricter than the prior abstain
+  (which let cursor prompt); it is the price of protection while `allow` is broken.
 
 ## Model-visible context injection (`additionalContext`)
 

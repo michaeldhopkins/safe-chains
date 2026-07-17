@@ -373,10 +373,14 @@ fn cursor_hook_allows_safe_command() {
 
 #[test]
 fn cursor_hook_denies_unsafe_command() {
+    // cursor-agent ignores hook `allow` but HONORS `deny` (verified live), so Cursor is a Deny
+    // harness: a gated command is VETOED with `permission:"deny"` + our reason, not abstained.
     let payload = r#"{"command": "rm -rf /etc", "cwd": "/x"}"#;
     let (stdout, _stderr, code) = run_hook(&["hook", "cursor"], payload);
     assert_eq!(code, 0);
-    assert_eq!(stdout, "");
+    let v: serde_json::Value = serde_json::from_str(&stdout).unwrap();
+    assert_eq!(v.get("permission").and_then(|s| s.as_str()), Some("deny"));
+    assert!(v.get("user_message").and_then(|s| s.as_str()).is_some_and(|m| m.contains("safe-chains")));
 }
 
 // ---------------------------------------------------------------

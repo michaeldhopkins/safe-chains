@@ -91,6 +91,10 @@ impl HookFormat for CursorHookFormat {
     fn render_response(&self, verdict: Verdict) -> HookResponse {
         if verdict.is_allowed() {
             let reason = allow_reason(verdict);
+            // cursor-agent (v2026.07.16) IGNORES a hook `permission:"allow"` — its own command
+            // allowlist still prompts (a known bug: forum.cursor.com/t/…/144244, HARNESS-BEHAVIORS
+            // §Cursor). We keep emitting it anyway: it is harmless (cursor just prompts, as it would
+            // on silence) and becomes a real grant the moment cursor honors `allow`.
             let body = json!({
                 "permission": "allow",
                 "agent_message": reason,
@@ -104,6 +108,26 @@ impl HookFormat for CursorHookFormat {
                 stdout: String::new(),
                 exit_code: 0,
             }
+        }
+    }
+
+    // cursor-agent ignores hook `allow` (above) but HONORS `deny` — verified live: a `permission:
+    // "deny"` blocks the command and shows our message. Since `allow` is inert, `deny` is the only
+    // lever that adds protection, so Cursor is a DENY harness (like Codex). Revisit if cursor fixes
+    // `allow`, or if the Cursor IDE differs from the CLI. See HARNESS-BEHAVIORS §Cursor.
+    fn gated_policy(&self) -> super::GatedPolicy {
+        super::GatedPolicy::Deny
+    }
+
+    fn render_deny(&self, reason: &str) -> HookResponse {
+        let body = json!({
+            "permission": "deny",
+            "user_message": reason,
+            "agent_message": reason,
+        });
+        HookResponse {
+            stdout: serde_json::to_string(&body).unwrap_or_default(),
+            exit_code: 0,
         }
     }
 }
@@ -284,7 +308,29 @@ mod tests {
 
     #[test]
     fn render_response_deny_emits_empty_body() {
+        // render_response is only called for ALLOWED verdicts; the Denied branch is defensive.
         let r = CursorHookFormat.render_response(Verdict::Denied);
         assert_eq!(r.stdout, "");
+    }
+
+    #[test]
+    fn cursor_is_a_deny_harness() {
+        // cursor-agent honors `deny` (verified live) but ignores `allow`, so gated commands are
+        // VETOED rather than deferred — the only lever that adds protection.
+        assert_eq!(CursorHookFormat.gated_policy(), super::super::GatedPolicy::Deny);
+    }
+
+    #[test]
+    fn render_deny_emits_permission_deny_with_message() {
+        let r = CursorHookFormat.render_deny("safe-chains blocked this: not on the allowlist");
+        let v: Value = serde_json::from_str(&r.stdout).unwrap();
+        assert_eq!(v.get("permission").and_then(|s| s.as_str()), Some("deny"));
+        // Cursor renders `user_message` in the client and passes `agent_message` to the model.
+        assert_eq!(
+            v.get("user_message").and_then(|s| s.as_str()),
+            Some("safe-chains blocked this: not on the allowlist"),
+        );
+        assert!(v.get("agent_message").and_then(|s| s.as_str()).is_some());
+        assert!(v.get("permissionDecision").is_none());
     }
 }
