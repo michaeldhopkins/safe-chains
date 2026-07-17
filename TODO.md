@@ -329,17 +329,18 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
   legit glued/equals allow, hidden `w`/`e` in those forms deny.
 
 
-## Output-flag write sweep — DONE (residual + follow-up)
-The ungated-output-flag WRITE class (SSH-key / shell-code injection at the default band) is
-CLOSED: a 202-command multi-agent sweep gated ~156 real write-path flags via pathgates.toml
-[roles.X] blocks (asciidoctor/dot in their own TOML), verified behaviorally by
-every_declared_path_flag_actually_gates. The ratchet ambiguous_output_flags_do_not_write_sensitive_paths
-+ tests/fixtures/output_flag_worklist.tsv now holds ~65 VERIFIED format-only rows (an output FORMAT
-like -o json, a column list, a GHC option, a boolean, or a non-existent flag -- the tool errors, never
-writes). List shrinks only.
-FOLLOW-UP (separate, smaller classes the flag sweep did not target):
-  1. POSITIONAL last-arg writers (converters whose output is the last positional, not a flag) --
-     weasyprint/tiffcp fixed with shape="last_write"; audit for more (a `last_write` shape sweep).
-  2. Handler/sub-level output flags -- the guard walks only TOP-LEVEL TOML `valued` flags; gs/pdftk/qpdf
-     were probed ALLOW earlier but aren't top-level valued flags. Extend the guard's reach.
-  3. The -d/-O ambiguous set (dropped for noise in the guard) -- mkdocs -d / hugo -d output-dirs.
+## Output-flag write sweep — DONE + residual follow-ups DONE
+The ungated-output-flag WRITE class is CLOSED: the 202-command sweep gated ~156 flag writers
+(pathgates.toml [roles.X]); ~65 verified format-only rows remain on the ratchet worklist.
+Residual follow-ups (this pass) also done -- 16 more gates:
+  - handler/dir output flags: gs -o, mkdocs -d/--site-dir, cargo --target-dir/--out-dir,
+    webpack -o/--output-path, vite --outDir, esbuild --outdir/--outfile, swc --out-dir, tsup.
+  - positional last-arg writers (shape="last_write"): pdfunite, ps2pdf, pdf2ps, pdftops,
+    sphinx-build, weasyprint, tiffcp, pdfcrop, lame, cjxl, djxl.
+The ambiguous_output_flags guard's OUTPUT_FLAGS now also covers the unambiguous dir flags
+(--outdir/--out-dir/--outDir/--target-dir/--site-dir/--output-dir/--output-path/--destination/--dest),
+so those are enforced systematically; positional_and_output_dir_writers_gate_sensitive_paths regression-
+guards the shape gates (not covered by every_declared_path_flag_actually_gates).
+KNOWN SMALL TAIL (low severity, not blocking): obscure positional converters the flag guard can't
+enumerate (a dedicated last_write audit would catch more); the single-char -d/-O set (kept out of the
+guard for noise; specific ones gated); sub-positional writers like `hugo new site <path>`.

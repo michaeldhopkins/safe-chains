@@ -4704,6 +4704,10 @@ valued = ["--type"]
         use super::types::TomlFile;
         const OUTPUT_FLAGS: &[&str] = &[
             "-o", "--output", "--out", "--outfile", "--write", "--replace-input", "output",
+            // unambiguous output-DIRECTORY / output-path flags (low noise — these are paths, not
+            // formats): a build tool / bundler / generator writes its artifacts to this dir.
+            "--outdir", "--out-dir", "--outDir", "--target-dir", "--site-dir", "--output-dir",
+            "--output-path", "--destination", "--dest",
         ];
         const SENSITIVE: &str = "~/.ssh/authorized_keys"; // user-writable, compromise-grade
         // The acknowledged worklist (shrinks only). A tab-separated `<command>\t<flag>` per row.
@@ -4764,6 +4768,46 @@ valued = ["--type"]
             stale.len(),
             stale.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
         );
+    }
+
+    /// Regression corpus for the output-flag sweep's RESIDUAL classes (adversarial-review follow-ups):
+    /// positional last-arg writers (a converter whose output is the last positional, `shape =
+    /// "last_write"`) and output-DIRECTORY flags. These are NOT covered by
+    /// `every_declared_path_flag_actually_gates` (which probes only FLAG gates), so a shape gate could
+    /// silently regress. Each write of a sensitive target must deny; each benign worktree form allows.
+    #[test]
+    fn positional_and_output_dir_writers_gate_sensitive_paths() {
+        const S: &str = "~/.ssh/authorized_keys";
+        let deny = [
+            format!("pdfunite a.pdf b.pdf {S}"),
+            format!("ps2pdf in.ps {S}"),
+            format!("pdf2ps in.pdf {S}"),
+            format!("pdftops in.pdf {S}"),
+            format!("pdfcrop in.pdf {S}"),
+            format!("lame in.wav {S}"),
+            format!("cjxl in.png {S}"),
+            format!("djxl in.jxl {S}"),
+            format!("sphinx-build src {S}"),
+            format!("sphinx-build -M html src {S}"),
+            format!("weasyprint in.html {S}"),
+            format!("tiffcp in.tif {S}"),
+            format!("mkdocs build -d {S}"),
+            format!("mkdocs build --site-dir {S}"),
+            format!("gs -o {S} x.ps"),
+        ];
+        for c in &deny {
+            assert!(!crate::is_safe_command(c), "must deny a sensitive write: {c}");
+        }
+        for c in [
+            "pdfunite a.pdf b.pdf ./out.pdf",
+            "sphinx-build src ./_build",
+            "weasyprint in.html ./out.pdf",
+            "tiffcp in.tif ./out.tif",
+            "mkdocs build -d ./site",
+            "gs -o ./out.pdf x.ps",
+        ] {
+            assert!(crate::is_safe_command(c), "benign worktree write must allow: {c}");
+        }
     }
 
     /// An alias is a pure synonym: it MUST classify identically to its canonical name for every
