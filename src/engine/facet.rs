@@ -157,6 +157,23 @@ ordinal_term! {
 }
 
 ordinal_term! {
+    /// Granularity of what a READ retrieves — orthogonal to `scale` (which counts items) and
+    /// `secret` (which flags credentials). Distinguishes a metadata/descriptor read from the
+    /// retrieval of opaque STORED CONTENT the classifier cannot assess. `bulk-content` is a
+    /// stored blob (an S3 object, an EBS block, a Glacier archive) — routinely a secrets file,
+    /// private key, or DB dump, but unknowable statically — so it earns a proportionate tier
+    /// (network-admin: elevated remote egress) WITHOUT being conflated with a credential read
+    /// (`secret = reads` → yolo). `record` is structured data you asked for (query results, a
+    /// db dump); `metadata` is a descriptor (describe/list/get-config). See
+    /// docs/design/behavioral-taxonomy-archetypes.md §5 (#1).
+    RetrievalGranularity {
+        Metadata => "metadata",         // a descriptor: describe/list/get-config
+        Record => "record",             // structured data requested: query results, a db dump
+        BulkContent => "bulk-content",  // opaque stored bytes: an object/block/archive body
+    }
+}
+
+ordinal_term! {
     /// Privilege the capability runs with (v1.4 §2.2).
     Authority {
         User => "user",
@@ -443,6 +460,7 @@ pub struct Capability {
     pub operation: Operation,
     pub locus: Locus,
     pub scale: Scale,
+    pub retrieval: RetrievalGranularity,
     pub authority: Authority,
     pub isolation: Isolation,
     pub reversibility: Reversibility,
@@ -477,6 +495,7 @@ impl Capability {
                 provenance: Provenance::Opaque,
             },
             scale: Scale::Unbounded,
+            retrieval: RetrievalGranularity::BulkContent,
             authority: Authority::OtherUser,
             isolation: Isolation::None,
             reversibility: Reversibility::Irreversible,
@@ -558,6 +577,7 @@ mod tests {
         assert_term_strings_roundtrip::<RemoteBinding>();
         assert_term_strings_roundtrip::<Provenance>();
         assert_term_strings_roundtrip::<Scale>();
+        assert_term_strings_roundtrip::<RetrievalGranularity>();
         assert_term_strings_roundtrip::<Authority>();
         assert_term_strings_roundtrip::<Isolation>();
         assert_term_strings_roundtrip::<Reversibility>();
@@ -584,6 +604,7 @@ mod tests {
         assert_zero_is_minimum::<RemoteReach>();
         assert_zero_is_minimum::<Provenance>();
         assert_zero_is_minimum::<Scale>();
+        assert_zero_is_minimum::<RetrievalGranularity>();
         assert_zero_is_minimum::<Authority>();
         assert_zero_is_minimum::<Isolation>();
         assert_zero_is_minimum::<Reversibility>();
@@ -607,6 +628,8 @@ mod tests {
         assert!(LocalLocus::SystemIntegrity < LocalLocus::Device);
         assert!(LocalLocus::Device < LocalLocus::Kernel);
         assert!(Scale::Single < Scale::Bounded && Scale::Bounded < Scale::Unbounded);
+        assert!(RetrievalGranularity::Metadata < RetrievalGranularity::Record);
+        assert!(RetrievalGranularity::Record < RetrievalGranularity::BulkContent);
         assert!(Authority::User < Authority::Root && Authority::Root < Authority::OtherUser);
         assert!(Reversibility::Recoverable < Reversibility::Irreversible);
         assert!(PersistenceLevel::Data < PersistenceLevel::Installing);
@@ -627,6 +650,7 @@ mod tests {
         assert_eq!(cap.locus, Locus::default());
         assert_eq!(cap.locus.local, LocalLocus::Process);
         assert_eq!(cap.scale, Scale::Single);
+        assert_eq!(cap.retrieval, RetrievalGranularity::Metadata);
         assert_eq!(cap.authority, Authority::User);
         assert_eq!(cap.reversibility, Reversibility::None);
         assert_eq!(cap.secret.level, SecretLevel::None);

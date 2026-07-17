@@ -17,9 +17,10 @@ because = "reads state from a remote system over the network; results flow to th
 operation = "observe"
 locus = { remote = "fixed" }
 scale = "unbounded"
+retrieval = "record"
 network = { direction = "outbound", payload = "fetches" }
 disclosure = { audience = "local-process" }
-because = "exports a BULK dataset from a remote system (a db dump / full export); the whole result flows to the caller/model. The data's SENSITIVITY is unknowable to a string classifier, so it is proxied by scale × disclosure — volume × destination = the blast radius. An output-FILE form (`-f path`) adds a path-gated local write, resolved separately."
+because = "exports a BULK dataset from a remote system (a db dump / full export); the whole result flows to the caller/model. `retrieval = record` — structured data you ASKED for (query results, a table dump), NOT arbitrary opaque object bytes (`bulk-content`), so it stays reader-tier (auto-approves) while a `bulk-object-read` earns network-admin. The data's SENSITIVITY is unknowable to a string classifier, so it is proxied by scale × disclosure — volume × destination = the blast radius. An output-FILE form (`-f path`) adds a path-gated local write, resolved separately."
 
 [archetype.remote-mutate]
 operation = "mutate"
@@ -106,10 +107,10 @@ because = "reads and exposes EXISTING credential material to the caller (prints 
 operation = "observe"
 locus = { remote = "fixed" }
 scale = "unbounded"
+retrieval = "bulk-content"
 network = { direction = "outbound", payload = "fetches" }
-secret = { level = "reads" }
 disclosure = { audience = "local-process" }
-because = "retrieves the raw content of an ARBITRARY stored object (an S3 object, EBS block, Glacier archive, genomic read-set) — opaque bytes the classifier cannot assess, routinely a stored credentials file / private key / DB dump / PII. Like the deliberately-not-allowlisted `aws s3 cp`, it is NOT auto-approved. NUANCE (unsettled, see behavioral-taxonomy-archetypes.md §2): `secret = reads` is the only facet lever that denies a read, so this lands at yolo — the SAME tier as `credential-read`. That is arguably too strict: not every blob is credential-grade, and a middle tier (network-admin) would be more proportionate but has NO facet basis today (a remote fetch-read is reader-level on every axis we have). Revisit if a 'retrieves bulk content vs metadata' axis is added."
+because = "retrieves the raw content of an ARBITRARY stored object (an S3 object, EBS block, Glacier archive, genomic read-set) — opaque bytes the classifier cannot assess, routinely a stored credentials file / private key / DB dump / PII. Like the deliberately-not-allowlisted `aws s3 cp`, it is NOT auto-approved at the everyday band. Classified by the `retrieval = bulk-content` axis (§5 #1), it lands at NETWORK-ADMIN — the proportionate home for elevated bulk remote data egress — NOT at yolo. It is deliberately NOT `secret = reads`: an object MIGHT hold a secret but is not a credential store, so it earns the bulk-egress tier, not the credential tier (a real `credential-read` still lands at yolo)."
 
 [archetype.credential-mint]
 operation = "create"

@@ -153,6 +153,16 @@ are `none` — they move bytes and can neither certify nor detect that those byt
 credential. The sensitivity of *arbitrary file content* is **not** this facet; it is
 carried by `disclosure` + `locus` (below).
 
+**RetrievalGranularity** (ordinal): `metadata` → `record` → `bulk-content`. What a READ
+retrieves, orthogonal to `scale` (which counts items) and `secret` (which flags
+credentials). `metadata` is a descriptor (`describe`/`list`/`get-config`); `record` is
+structured data you asked for (query results, a db dump); `bulk-content` is an arbitrary
+opaque STORED blob (an S3 object body, an EBS block, a Glacier archive) — unassessable
+bytes that routinely hold a secrets file/key/dump but are not a credential *store*. This
+axis gives bulk-content a proportionate tier: capped at `reader` (`retrieval <= record`)
+and admitted at `network-admin` (elevated remote data egress), WITHOUT being forced to
+`secret=reads`→yolo. `bulk-object-read` = `bulk-content`; `data-export` = `record`.
+
 Both facets range over a **channel** and a **principal** (R17/R19, HP-13):
 - *Channels* are an **open set** — filesystem, stdout-to-model, network, clipboard
   (`pbcopy`/`pbpaste`), IPC, credential-store (keychain), cross-process
@@ -202,7 +212,7 @@ Populated for provisioning tools (`terraform apply`, `aws … create`).
 ### 2.8 The capability record
 ```
 capability {
-  operation · locus{local,remote} · scale · authority · isolation
+  operation · locus{local,remote} · scale · retrieval · authority · isolation
   reversibility · persistence{level, trigger{escape,kind}}
   disclosure{audience,channel,principal} · secret{level,channel,principal}
   network{direction,destination,payload} · execution(+supply_chain) · cost

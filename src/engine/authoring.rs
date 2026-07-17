@@ -110,6 +110,7 @@ fn build_clause(tc: TomlClause) -> Result<Clause, String> {
         }
     }
     c.scale = opt_bound(tc.scale.as_deref())?;
+    c.retrieval = opt_bound(tc.retrieval.as_deref())?;
     c.authority = opt_bound(tc.authority.as_deref())?;
     c.isolation = opt_bound(tc.isolation.as_deref())?;
     c.reversibility = opt_bound(tc.reversibility.as_deref())?;
@@ -236,6 +237,8 @@ struct TomlClause {
     locus: Option<TomlLocus>,
     #[serde(skip_serializing_if = "Option::is_none")]
     scale: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    retrieval: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     authority: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -906,6 +909,7 @@ mod tests {
             operation: c.operation.as_deref().map(set_str),
             locus,
             scale: opt_bound_str(c.scale),
+            retrieval: opt_bound_str(c.retrieval),
             authority: opt_bound_str(c.authority),
             isolation: opt_bound_str(c.isolation),
             reversibility: opt_bound_str(c.reversibility),
