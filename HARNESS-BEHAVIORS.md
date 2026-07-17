@@ -10,6 +10,29 @@ scattered comments each time.
 When a fact here disagrees with a harness's current docs, the harness wins —
 update both the relevant `targets/*.rs` and this file.
 
+## Verification scorecard (single source of truth)
+
+The one place the per-harness status is collected — update it whenever a target is tested or its
+support changes, so the status is never re-derived from the scattered sections below. "Verified live"
+= driven end-to-end against the running harness; "probe-verified" = confirmed by sending crafted
+envelopes to the harness's hook runner; "assumed" = declares a known-shape mirror but not
+independently exercised.
+
+| Harness  | Runtime hook | Status | Evidence / note |
+|----------|:------------:|--------|-----------------|
+| **Claude** | ✅ | ✅ **Verified live** (2026-07) + docs | Dogfooded — the allow envelope auto-approves, abstain→`additionalContext` surfaces the reason without blocking (this session). |
+| **Codex** | ✅ | ✅ **Probe-verified** (v0.144.3, 2026-07-13) | `deny` honored; `allow`/`ask` parsed-but-unsupported; config nests under top-level `hooks`. |
+| **Antigravity (`agy`)** | ✅ | ✅ **Verified live** (v1.1.2, 2026-07-13) | `deny`/`ask`/`force_ask` work; fails closed. **Supersedes Gemini.** |
+| **Gemini** | (exit codes) | ⚪ **Deprecated** — do not test | Gemini CLI retired 2026-06-18 → replaced by `agy` (above). Target kept as an enterprise remnant; dropped from the active matrix. |
+| **Qwen** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Declares Claude's `permissionDecision` shape; not independently exercised. |
+| **Droid** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Same shape; shell tool is `Execute`, not `Bash`. |
+| **Cursor** | ✅ | ❌ **Unverified** | Flat `permission` shape (`version: 1`); needs a live drive. |
+| **Copilot** | ✅ | ❌ **Unverified** | Flat envelope, `toolArgs` a nested JSON string; only `deny` acts today. |
+| **opencode** | ❌ (static config) | n/a — not a runtime hook | We render static config patterns; no per-command signal to verify. |
+
+**Remaining live-verification work:** Cursor and Copilot (unverified); optionally exercise Qwen/Droid
+to upgrade "assumed"→"verified". Gemini is closed out via `agy`; Claude/Codex/agy are done.
+
 ## The model we rely on
 
 safe-chains is **allowlist-only**; what it EMITS for a given command depends on the
@@ -157,12 +180,12 @@ flow is untouched.
 
 | Target  | `additionalContext` support | What we do |
 |---------|-----------------------------|------------|
-| Claude  | Yes (verified — Claude Code hooks docs) | emit on the mixed-chain case |
+| Claude  | Yes (verified LIVE this session + docs) | emit on the mixed-chain case |
 | Qwen    | Assumed (declares Claude-Code-mirror)   | emit on the mixed-chain case |
 | Droid   | Assumed (declares Claude-Code-mirror)   | emit on the mixed-chain case |
 | Codex   | Unverified                  | default abstain (emit nothing) |
 | Cursor  | Unverified / different shape | default abstain |
-| Gemini  | Unverified (decision-only contract) | default abstain |
+| Gemini  | Deprecated — retired, superseded by `agy` (decision-only contract, no context field) | n/a |
 | Copilot | Unverified / flat, deny-only | default abstain |
 
 Targets without verified support keep `HookFormat::render_context`'s default,
