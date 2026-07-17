@@ -26,12 +26,13 @@ independently exercised.
 | **Gemini** | (exit codes) | ⚪ **Deprecated** — do not test | Gemini CLI retired 2026-06-18 → replaced by `agy` (above). Target kept as an enterprise remnant; dropped from the active matrix. |
 | **Qwen** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Declares Claude's `permissionDecision` shape; not independently exercised. |
 | **Droid** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Same shape; shell tool is `Execute`, not `Bash`. |
-| **Cursor** | ✅ | ❌ **Unverified** | Flat `permission` shape (`version: 1`); needs a live drive. |
+| **Cursor** | ✅ | ⚠️ **Verified live — `allow` IGNORED** (`cursor-agent` v2026.07.16) | Hook fires (envelope matches our parser); `deny` works (blocks + shows our message); **`allow` is ignored** — the command still hits cursor's own allowlist prompt. So our allow-or-abstain target has **no effect** on the CLI. See §Cursor. |
 | **Copilot** | ✅ | ❌ **Unverified** | Flat envelope, `toolArgs` a nested JSON string; only `deny` acts today. |
 | **opencode** | ❌ (static config) | n/a — not a runtime hook | We render static config patterns; no per-command signal to verify. |
 
-**Remaining live-verification work:** Cursor and Copilot (unverified); optionally exercise Qwen/Droid
-to upgrade "assumed"→"verified". Gemini is closed out via `agy`; Claude/Codex/agy are done.
+**Remaining live-verification work:** Copilot (unverified); optionally exercise Qwen/Droid to upgrade
+"assumed"→"verified". Cursor is now tested (a finding: `allow` is ineffective on the CLI — see §Cursor);
+Gemini is closed out via `agy`; Claude/Codex/agy are done.
 
 ## The model we rely on
 
@@ -171,6 +172,31 @@ installed hook inside a live Claude Code session (this is the harness safe-chain
   safe-chains never emits them (allowlist-only, human keeps the review).
 - **Capability summary:** grant ✅ (allow) · deny (unused) · human-review-on-silence ✅ (abstain →
   Claude's own prompt) · additionalContext ✅. Matches `src/targets/claude.rs`.
+
+### Cursor CLI (`cursor-agent`) — VERIFIED LIVE, v2026.07.16, 2026-07 (with a finding)
+
+Driven end-to-end via TUI automation, with a logging wrapper around `safe-chains hook cursor` proving
+each invocation. Config: `~/.cursor/hooks.json` → `hooks.beforeShellExecution[].command`.
+- **Hook fires; envelope matches our parser.** cursor-agent sends the documented
+  `beforeShellExecution` payload — top-level `command`, `workspace_roots`, `cursor_version`, and
+  (observed) an EMPTY `cwd` (our parser already falls back to `workspace_roots[0]` for the root).
+- **`deny` WORKS.** A forced `{"permission":"deny", "user_message":...}` blocked even `echo`:
+  *"The command did not run. Cursor blocked it with this hook message: <our message>."* So cursor
+  honors `deny` and surfaces our text.
+- **`allow` is IGNORED (the finding).** With `{"permission":"allow"}` — both from real safe-chains
+  (`cat README.md`, a worktree read we allow) AND a forced always-allow wrapper — cursor STILL prompts
+  *"Run this command? Not in allowlist: cat"*. Its own per-user command allowlist runs regardless of a
+  hook `allow`. (Cursor's docs list `allow` as valid but don't say it bypasses the allowlist; live, it
+  does not.) The in-app tip even says "/run-everything to skip all approvals" — hooks don't grant.
+- **Consequence for `src/targets/cursor.rs`:** the target emits `permission:"allow"` for safe and
+  ABSTAINS (empty) for gated — so on the cursor-agent CLI it has **no observable effect**: safe commands
+  aren't auto-approved (allow ignored) and gated ones aren't blocked (we abstain). It is neither wrong
+  nor harmful, just inert here.
+- **Design implication (open):** the only lever that works on cursor-agent is `deny`. To make
+  safe-chains useful on Cursor we'd emit `deny` on gated commands (deny blocks + shows our reason) —
+  a policy shift from the allowlist-only abstain model, and it would mean Cursor is a *deny-harness*
+  like Codex. Alternatively `allow` may behave differently in the Cursor **IDE** (untested). Tracked in
+  TODO — do not change the target until that call is made.
 
 ## Model-visible context injection (`additionalContext`)
 

@@ -65,12 +65,16 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
   - Judgment calls MADE (keep denying — opaque/network-sourced code, the `./bill` line): `pnpm install`
     (postinstall) and `python3 -m <module>` deny. `npm run` already allowlists safe scripts via
     `first_arg` (`run test` allows, `run build` denies) — no change needed.
-- **Harness verification grid — finish live-testing the targets.** 2 of 9 are verified live (Codex
-  probe-verified v0.144.3; Antigravity `agy` v1.1.2); the other 7 (Claude, Cursor, Gemini, Copilot,
-  Droid, Qwen, opencode) are documented-from-docs but UNVERIFIED. Per HARNESS-BEHAVIORS.md, live-verify
-  each via the TUI-automation `cat /etc/hosts` workflow: (a) decision contract (does our deny block,
-  is our reason surfaced), (b) `additionalContext` injection (only Claude verified), (c) payload
-  cwd/root fields. Its own focused pass.
+- **Harness verification grid — see the scorecard at the top of HARNESS-BEHAVIORS.md (source of truth).**
+  Verified live: Codex, Antigravity `agy` (supersedes retired Gemini), Claude, Cursor. Assumed
+  (Claude-mirror): Qwen, Droid. Remaining: **Copilot** (unverified, not installed here) + optionally
+  exercise Qwen/Droid. opencode is static-config (no runtime hook).
+- **Cursor target — OPEN DESIGN DECISION (from the 2026-07 live drive).** cursor-agent v2026.07.16
+  honors a hook `deny` (blocks + shows our message) but IGNORES `allow` (its own command allowlist still
+  prompts). So `src/targets/cursor.rs` (allow-for-safe, abstain-for-gated) is INERT on the CLI — no
+  auto-approve, no block. To make safe-chains useful on Cursor we'd emit `deny` on gated commands (making
+  Cursor a deny-harness like Codex) — a shift from the allowlist-only abstain model. Or `allow` may work
+  in the Cursor IDE (untested). Decide before changing the target. Details in HARNESS-BEHAVIORS §Cursor.
 - **`.safe-chains.toml` protected config location — WON'T-FIX before 1.0 (decided 2026-07).** Most
   harnesses do not expose a protected location, so there's nothing to implement. Best-effort holds: the
   command classifier denies every *command* write to the trust root (guarded); a non-command write
