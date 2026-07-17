@@ -1,0 +1,26 @@
+[package]
+name = "safe-chains-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+
+[dependencies.safe-chains]
+path = ".."
+
+# Standalone workspace: this empty table SEVERS fuzz/ from the root workspace, so `cargo build` /
+# `cargo test` / `cargo clippy` / `cargo deny` at the repo root never see it. The fuzz crate builds
+# only under `cargo fuzz` (nightly, see rust-toolchain.toml) while the main crate stays on stable.
+[workspace]
+
+[[bin]]
+name = "parse"
+path = "fuzz_targets/parse.rs"
+test = false
+doc = false
+bench = false

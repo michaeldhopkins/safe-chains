@@ -1,0 +1,57 @@
+name: Fuzz
+
+# Overnight coverage-guided fuzzing of the command classifier. Runs on nightly Rust (cargo-fuzz
+# needs -Zsanitizer); the fuzz crate is a standalone workspace, so this never touches the stable CI.
+on:
+  schedule:
+    - cron: "0 7 * * *" # ~07:00 UTC nightly
+  workflow_dispatch:
+    inputs:
+      max_total_time:
+        description: "Fuzz duration in seconds (default 8h)"
+        default: "28800"
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  fuzz:
+    name: Fuzz (parse)
+    runs-on: ubuntu-latest
+    timeout-minutes: 540 # job cap comfortably above the 8h fuzz budget
+    steps:
+      - uses: actions/checkout@v5
+
+      # nightly + rust-src: cargo-fuzz builds std with the sanitizer instrumented.
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - uses: taiki-e/install-action@cargo-fuzz
+
+      # Coverage-guided fuzzing only pays off if the corpus PERSISTS and accumulates across runs.
+      # A unique key (run_id) always saves; restore-keys pulls the most recent prior corpus.
+      - name: Restore corpus
+        uses: actions/cache@v4
+        with:
+          path: fuzz/corpus/parse
+          key: fuzz-corpus-parse-${{ github.run_id }}
+          restore-keys: fuzz-corpus-parse-
+
+      # +nightly is explicit: cargo-fuzz runs cargo from the repo root, so a fuzz/ toolchain file
+      # would be ignored. (Pin a dated nightly here + in dtolnay above for reproducible runs.)
+      - name: Fuzz
+        run: |
+          cargo +nightly fuzz run parse -- \
+            -max_total_time=${{ github.event.inputs.max_total_time || '28800' }} \
+            -timeout=25 \
+            -rss_limit_mb=4096
+
+      # A crash writes the reproducing input to fuzz/artifacts/parse/; keep it for triage.
+      - name: Upload crash artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-crashes
+          path: fuzz/artifacts/
+          if-no-files-found: ignore
