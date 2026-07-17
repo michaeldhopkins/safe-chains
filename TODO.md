@@ -39,14 +39,20 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
   - Judgment calls MADE (keep denying — opaque/network-sourced code, the `./bill` line): `pnpm install`
     (postinstall) and `python3 -m <module>` deny. `npm run` already allowlists safe scripts via
     `first_arg` (`run test` allows, `run build` denies) — no change needed.
-- **`.safe-chains.toml` protected third-party config location** (open research item, noted in
-  `regions/default.toml`): the trust root lives at `~/.config/safe-chains.toml`, an UNPROTECTED path
-  (a python/editor write escapes the command classifier). A harness-blessed protected location would
-  close the residual. Until then it's best-effort — the command classifier denies every *command*
-  write (now guarded), but not a non-command write.
-- **(Optional) dedicated cargo-fuzz target.** The in-repo proptest + adversarial-corpus fuzzing now
-  covers panics/hangs and found two real bugs; a libFuzzer target would go deeper still, but needs
-  nightly + a `fuzz/` crate + CI wiring — a separate infra decision.
+- **Harness verification grid — finish live-testing the targets.** 2 of 9 are verified live (Codex
+  probe-verified v0.144.3; Antigravity `agy` v1.1.2); the other 7 (Claude, Cursor, Gemini, Copilot,
+  Droid, Qwen, opencode) are documented-from-docs but UNVERIFIED. Per HARNESS-BEHAVIORS.md, live-verify
+  each via the TUI-automation `cat /etc/hosts` workflow: (a) decision contract (does our deny block,
+  is our reason surfaced), (b) `additionalContext` injection (only Claude verified), (c) payload
+  cwd/root fields. Its own focused pass.
+- **`.safe-chains.toml` protected config location — WON'T-FIX before 1.0 (decided 2026-07).** Most
+  harnesses do not expose a protected location, so there's nothing to implement. Best-effort holds: the
+  command classifier denies every *command* write to the trust root (guarded); a non-command write
+  (editor/`python -c`) escaping it is an accepted residual, out of scope for a string classifier.
+- **cargo-fuzz — DONE (2026-07).** `fuzz/` standalone-workspace crate, `parse` target over
+  `is_safe_command`, seed corpus, nightly Linux CI (`.github/workflows/fuzz.yml`). Verified live:
+  builds under nightly + cargo-fuzz 0.13.2, 416k runs/26s clean. Run with `cargo +nightly fuzz run
+  parse`. Follow-ups: pin a dated nightly for CI reproducibility; add a `command_verdict` target.
 
 ---
 
