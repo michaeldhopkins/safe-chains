@@ -1,0 +1,144 @@
+# Positional last-arg writer worklist — acknowledged NON-writers.
+#
+# `positional_last_arg_writers_are_gated_or_acknowledged` (src/registry/tests.rs) walks the whole
+# registry and probes `<cmd> sc-probe-in.dat ~/.ssh/authorized_keys` for every command whose
+# researched description is writer-shaped (converts/encodes/writes …) and whose output is NOT a
+# declared write FLAG. A command that AUTO-APPROVES that probe is either:
+#   (a) a genuine positional / in-place writer — GATE it in pathgates.toml (`shape = "last_write"`,
+#       or `positional = "write"` for a multi-file in-place mutator), or
+#   (b) a false positive — its output is a flag / stdout / a derived sibling path, or it reads or
+#       ignores the extra positional — LIST it here (first token per line) as an acknowledged
+#       non-writer.
+#
+# The genuine writers found by this audit are gated in pathgates.toml (see TODO.md "Positional
+# last-arg writer audit"). Everything below was researched and confirmed NOT to write its last
+# positional. The ratchet is a best-effort discovery heuristic; the fail-closed guarantee for the
+# KNOWN writers is the corpus test `positional_and_output_dir_writers_gate_sensitive_paths`.
+
+# ── Readers / stdout filters — read input (or the arg as text), write to stdout ────────────────
+avbdiagnose
+echo
+expr
+journalctl
+kramdown
+lsblk
+pcre2grep
+@shopify/theme-check
+stern
+task
+test
+tokei
+xsel
+dc
+code
+fzf
+fzy
+glow
+jc
+json_pp
+json_xs
+mandoc
+nroff
+printf
+tput
+sync
+rs
+unvis
+vis
+wdiff
+xcbeautify
+xv
+dircolors
+dyld_usage
+pdfgrep
+idn
+idn2
+fix-qdf
+gsnd
+
+# ── Disassemblers / demanglers / extractors — read input, write to stdout ──────────────────────
+javap
+llvm-cxxfilt
+llvm-undname
+osadecompile
+sdef
+
+# ── Compilers / assemblers / linkers — output via -o / a.out; positionals are source inputs ────
+as
+emcc
+flang
+gfortran
+kotlinc
+llc
+lld
+mcs
+nasm
+yasm
+scalac
+llvm-mc
+llvm-dwp
+llvm-libtool-darwin
+csreq
+
+# ── Linters / formatters — report to stdout (in-place rewrite only via -w, absent from the probe) ─
+clang-tidy
+gofmt
+gomodifytags
+depcruise
+revive
+overcommit
+sphinx-apidoc
+
+# ── Test runners — the positionals are test files/names, executed or read ──────────────────────
+jest
+mocha
+prove
+pytest
+
+# ── Clipboard I/O — the system pasteboard, not a file ──────────────────────────────────────────
+pbcopy
+xclip
+
+# ── Output via a FLAG or stdout (positionals are inputs) ───────────────────────────────────────
+actool
+afhash
+fpm
+masscan
+mysqldump
+pg_dumpall
+pg_basebackup
+pg_receivewal
+pg_recvlogical
+streamzip
+tshark
+xsubpp
+segedit
+psicc
+logger
+lpoptions
+
+# ── Writes to CWD or a DERIVED sibling path (not the named positional) — see TODO derived-output ─
+autoheader
+autoscan
+cap_mkdb
+ctags
+doxygen
+h2ph
+pl2pm
+pdflatex
+rdfind
+pg_test_fsync
+mktemp
+znew
+zipnote
+textutil
+
+# ── Scaffolders — write a named project DIR and network-install (review as candidate; see TODO) ─
+create-next-app
+create-react-app
+create-vite
+degit
+h2xs
+
+# ── ar-family — output is the FIRST positional archive, not the last (see TODO first_write) ─────
+emar

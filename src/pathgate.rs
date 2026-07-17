@@ -74,11 +74,26 @@ pub(crate) struct RoleSpec {
     /// also declares it consumes a value (the arity the flat gate lacked).
     #[serde(default)]
     flags: HashMap<String, Role>,
+    /// An OPERATION-AWARE gate that the declarative walk can't express: a named Rust function
+    /// (`handlers::dispatch`) that reads the command's own grammar to assign roles per invocation.
+    /// Used when a positional's role depends on a mode selector — `ar`'s key-letter (`ar rcs a.a`
+    /// WRITES the archive, `ar t a.a` READS it) or `textutil`'s `-convert` vs `-info`. Read and
+    /// write both deny a sensitive locus, so this only changes the verdict at an in-workspace
+    /// protected-config path (`.git/config`: readable, write-denied). When set, it REPLACES the
+    /// positional/shape walk; `flags` are ignored (the handler parses them itself).
+    #[serde(default)]
+    handler: Option<String>,
 }
 
 impl RoleSpec {
     fn simple(positional: Role, shape: Shape) -> Self {
-        RoleSpec { positional, shape, flags: HashMap::new() }
+        RoleSpec { positional, shape, flags: HashMap::new(), handler: None }
+    }
+
+    /// The operation-aware handler name this gate delegates to, if any.
+    #[cfg(test)]
+    pub(crate) fn handler_name(&self) -> Option<&str> {
+        self.handler.as_deref()
     }
 
     /// Whether this gate declares a role for `flag` (any of read/write/ignore) — a declared flag
@@ -115,6 +130,19 @@ pub(crate) fn central_role_declares_flag(cmd: &str, flag: &str) -> bool {
     GATES.roles.get(cmd).is_some_and(|r| r.flags.contains_key(flag))
 }
 
+/// Whether `cmd` declares any WRITE-role FLAG (centrally or co-located) — i.e. its output is a
+/// named flag, so its positionals are inputs. The positional-writer ratchet uses this to exclude
+/// flag-output writers structurally: probing `-o <path>` cannot tell a gated output flag from an
+/// unknown-flag denial or a `last_write` positional catching the path, so it is done off the
+/// declared config, not by behavior. A `last_write` SHAPE (a positional writer like `cjxl`)
+/// declares no write flag, so it is NOT excluded — the ratchet still covers it.
+#[cfg(test)]
+pub(crate) fn declares_write_flag(cmd: &str) -> bool {
+    let has_write = |spec: &RoleSpec| spec.flags.values().any(|r| *r == Role::Write);
+    GATES.roles.get(cmd).is_some_and(has_write)
+        || crate::registry::command_path_gate(cmd).is_some_and(has_write)
+}
+
 #[derive(Deserialize)]
 struct Gates {
     #[serde(default)]
@@ -142,7 +170,7 @@ pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
     // `[roles.X]` (its positionals) plus a co-located flag gate must honor both, or the latter is
     // silently shadowed (e.g. `qpdf`'s `last_write` positionals + its `--password-file` read).
     let central = if let Some(spec) = gates.roles.get(cmd) {
-        walk(spec, tokens)
+        apply(spec, tokens)
     } else if gates.read.contains(cmd) {
         walk(&RoleSpec::simple(Role::Read, Shape::Plain), tokens)
     } else if gates.read_after_first.contains(cmd) {
@@ -152,8 +180,17 @@ pub fn should_deny(cmd: &str, tokens: &[Token]) -> bool {
     } else {
         false
     };
-    let own = crate::registry::command_path_gate(cmd).is_some_and(|spec| walk(spec, tokens));
+    let own = crate::registry::command_path_gate(cmd).is_some_and(|spec| apply(spec, tokens));
     central || own
+}
+
+/// Gate `tokens` against `spec`: an operation-aware `handler` (if declared) replaces the
+/// declarative walk, otherwise the positional/shape/flags walk runs.
+fn apply(spec: &RoleSpec, tokens: &[Token]) -> bool {
+    match &spec.handler {
+        Some(name) => handlers::dispatch(name, tokens),
+        None => walk(spec, tokens),
+    }
 }
 
 /// Walk the arguments once: gate each mapped flag's value by its role, then assign roles to the
@@ -247,6 +284,112 @@ fn gate(role: Role, path: &str) -> bool {
         Role::Exec => crate::engine::resolve::execute_file_verdict,
     };
     crate::policy::looks_like_path(path) && verdict(path) == Verdict::Denied
+}
+
+/// Operation-aware path gates: a command whose positional roles depend on a mode selector its own
+/// grammar carries. Declared in `pathgates.toml` as `handler = "name"`; the fn reads the tokens and
+/// gates each path by the role its operation implies. Every name here is asserted reachable from the
+/// TOML (and vice-versa) by `pathgate_handler_names_resolve` — an unknown name is a config bug, not
+/// a silent fail-open.
+mod handlers {
+    use super::{Role, gate};
+    use crate::parse::Token;
+
+    /// Names known to `dispatch` — the test guard checks the TOML uses exactly these.
+    #[cfg(test)]
+    pub(super) const NAMES: &[&str] = &["ar_archive", "textutil_mode"];
+
+    pub(super) fn dispatch(name: &str, tokens: &[Token]) -> bool {
+        match name {
+            "ar_archive" => ar_archive(tokens),
+            "textutil_mode" => textutil_mode(tokens),
+            // Unreachable in practice (guarded by pathgate_handler_names_resolve). Fail CLOSED on a
+            // misconfigured name so a typo can never silently ungate a command.
+            _ => true,
+        }
+    }
+
+    /// `ar KEYS ARCHIVE [MEMBERS…]` — the key-letter operation sets the archive's role: r/q/d/m/s
+    /// MUTATE the archive (write), t/p/x READ it (x extracts to cwd, a separate traversal concern).
+    /// The add operations r/q also read their member files (a disclosing read). KEYS is the first
+    /// token, either bare (`ar rcs`) or dash-led (`ar -rcs`); `--plugin`/`--target` take a value.
+    fn ar_archive(tokens: &[Token]) -> bool {
+        let mut positionals: Vec<&str> = Vec::new();
+        let mut keys: Option<&str> = None;
+        let mut it = tokens[1..].iter().map(Token::as_str);
+        while let Some(t) = it.next() {
+            if t == "--plugin" || t == "--target" {
+                it.next(); // consume the flag value so it is not mistaken for KEYS/archive
+                continue;
+            }
+            if let Some(rest) = t.strip_prefix('-') {
+                if keys.is_none() && !t.starts_with("--") && !rest.is_empty() {
+                    keys = Some(rest); // `-rcs` dash form of the key letters
+                }
+                continue; // any other flag never names a path
+            }
+            if keys.is_none() {
+                keys = Some(t); // bare `rcs` key letters
+                continue;
+            }
+            positionals.push(t);
+        }
+        let key_bytes = keys.map(str::as_bytes).unwrap_or_default();
+        let op = key_bytes.iter().copied().find(u8::is_ascii_alphabetic);
+        // The a/b/i positioning modifiers insert relative to a NAMED member, which appears BEFORE the
+        // archive (`ar rb existing.o lib.a new.o`) — skip it, or the archive (the real write target)
+        // would go ungated.
+        let archive_idx = usize::from(key_bytes.iter().any(|b| matches!(b, b'a' | b'b' | b'i')));
+        let Some(archive) = positionals.get(archive_idx) else { return false };
+        let archive_role = match op {
+            Some(b'r' | b'q' | b'd' | b'm' | b's') => Role::Write,
+            _ => Role::Read, // t / p / x read the archive
+        };
+        if gate(archive_role, archive) {
+            return true;
+        }
+        // r/q archive real files given as members — a sensitive member is a disclosing read.
+        matches!(op, Some(b'r' | b'q'))
+            && positionals.iter().skip(archive_idx + 1).any(|m| gate(Role::Read, m))
+    }
+
+    /// `textutil -MODE [opts] files…` — `-convert`/`-strip` WRITE (to `-output`/`-outputdir`, else a
+    /// sibling of each input, so the input's directory is written); `-info`/`-cat` READ the inputs.
+    /// `-output`/`-outputdir` are always write targets.
+    fn textutil_mode(tokens: &[Token]) -> bool {
+        const VALUED: &[&str] = &[
+            "-format", "-encoding", "-extension", "-fontname", "-fontsize", "-inputencoding",
+            "-output", "-outputdir",
+        ];
+        let args: Vec<&str> = tokens[1..].iter().map(Token::as_str).collect();
+        let writes = args.iter().any(|a| *a == "-convert" || *a == "-strip");
+        let has_output = args.iter().any(|a| *a == "-output" || *a == "-outputdir");
+        // With no explicit output, a convert/strip writes each input's sibling → gate inputs as
+        // write; otherwise (info/cat, or an explicit output flag) the inputs are read.
+        let input_role = if writes && !has_output { Role::Write } else { Role::Read };
+        let mut it = args.iter().copied();
+        while let Some(t) = it.next() {
+            if t == "-output" || t == "-outputdir" {
+                if let Some(v) = it.next()
+                    && gate(Role::Write, v)
+                {
+                    return true;
+                }
+                continue;
+            }
+            if VALUED.contains(&t) {
+                it.next(); // consume a non-path flag value
+                continue;
+            }
+            if t.starts_with('-') {
+                continue; // a mode / standalone flag
+            }
+            if gate(input_role, t) {
+                return true;
+            }
+        }
+        false
+    }
 }
 
 #[cfg(test)]
@@ -352,6 +495,82 @@ mod tests {
         assert!(GATES.read.contains("od") && GATES.write.contains("shred"));
         assert!(GATES.roles.contains_key("curl") && GATES.roles.contains_key("scp"));
     }
+
+    /// Every `handler = "X"` in the TOML dispatches to a real fn, and every fn is used — a typo can
+    /// never silently fail-open a gate, and a removed gate can't leave a dead handler.
+    #[test]
+    fn pathgate_handler_names_resolve() {
+        let declared: std::collections::HashSet<&str> =
+            GATES.roles.values().filter_map(RoleSpec::handler_name).collect();
+        for name in &declared {
+            assert!(handlers::NAMES.contains(name), "pathgates.toml uses unknown handler `{name}`");
+        }
+        for name in handlers::NAMES {
+            assert!(declared.contains(name), "handler `{name}` is defined but unused in pathgates.toml");
+        }
+    }
+
+    /// The operation-aware gate's whole reason for existing: a READ op allows an in-workspace
+    /// protected path (`.git/config`) that the WRITE op denies. If this ever collapses (read==write),
+    /// the handler is pointless and a plain `positional = "write"` would do.
+    #[test]
+    fn operation_aware_read_write_divergence_is_real() {
+        assert!(crate::is_safe_command("ar t ./.git/x.a"), "read op must allow a protected read");
+        assert!(!crate::is_safe_command("ar rcs ./.git/x.a a.o"), "write op must deny a protected write");
+        assert!(crate::is_safe_command("textutil -info ./.git/config"));
+        assert!(!crate::is_safe_command("textutil -convert html ./.git/config"));
+    }
+
+    /// A sampled locus corpus spanning every rung the model distinguishes — for the write-never-more-
+    /// permissive property below.
+    fn locus_corpus() -> impl proptest::strategy::Strategy<Value = &'static str> {
+        proptest::sample::select(vec![
+            "./lib.a", "./sub/dir/x.a", "./.git/x.a", "./.git/hooks/y.a", "/tmp/x.a",
+            "~/.ssh/x.a", "~/.config/x.a", "~/.bashrc", "/etc/evil.a", "/usr/lib/x.a", "~/Documents/x.a",
+        ])
+    }
+
+    proptest::proptest! {
+        /// SAFETY INVARIANT of the operation-aware split: a WRITE op must never be more permissive
+        /// than a READ op on the same path. If a read denies (sensitive/disclosing), the write MUST
+        /// deny too — the divergence may only go the other way (write stricter at protected paths).
+        #[test]
+        fn ar_write_never_more_permissive_than_read(path in locus_corpus()) {
+            let read_denies = !crate::is_safe_command(&format!("ar t {path}"));
+            let write_denies = !crate::is_safe_command(&format!("ar rcs {path} a.o"));
+            proptest::prop_assert!(
+                !read_denies || write_denies,
+                "read denies but write ALLOWS for {} — a write can never be more permissive", path,
+            );
+        }
+
+        /// Across the whole operation×modifier space: every WRITE op (with any modifier soup) denies a
+        /// sensitive archive, and every READ op allows a worktree archive. Guards that a stray modifier
+        /// letter can't flip the operation classification.
+        #[test]
+        fn ar_ops_classify_regardless_of_modifiers(
+            wop in proptest::sample::select(vec!['r', 'q', 'd', 'm', 's']),
+            rop in proptest::sample::select(vec!['t', 'p', 'x']),
+            mods in "[cvuoSTD]{0,3}",
+        ) {
+            let write_denies = !crate::is_safe_command(&format!("ar {}{} ~/.ssh/x.a a.o", wop, mods));
+            let read_allows = crate::is_safe_command(&format!("ar {}{} ./lib.a", rop, mods));
+            proptest::prop_assert!(write_denies, "write op {}{} allowed a sensitive archive", wop, mods);
+            proptest::prop_assert!(read_allows, "read op {}{} denied a worktree archive", rop, mods);
+        }
+
+        /// textutil's mode split obeys the same safety invariant: `-info` (read) is never stricter
+        /// than `-convert` (write) — i.e. if the read mode denies, the write mode denies too.
+        #[test]
+        fn textutil_convert_never_more_permissive_than_info(path in locus_corpus()) {
+            let info_denies = !crate::is_safe_command(&format!("textutil -info {path}"));
+            let convert_denies = !crate::is_safe_command(&format!("textutil -convert html {path}"));
+            proptest::prop_assert!(
+                !info_denies || convert_denies,
+                "info denies but convert ALLOWS for {} — a write can never be more permissive", path,
+            );
+        }
+    }
 }
 
 #[cfg(test)]
@@ -384,6 +603,20 @@ mod behavior_specs {
         spec_csplit_worktree: "csplit -f ./out file.txt /1/",
         spec_age_worktree: "age -o ./out -e x",
         spec_wget_cluster_stdout: "wget -qO- http://x",
+        // operation-aware gates: worktree forms allow, and READ ops allow even an in-workspace
+        // protected path (.git/config) that the corresponding WRITE op denies (see denied! block).
+        spec_ar_create_worktree: "ar rcs ./lib.a a.o b.o",
+        spec_ar_list_worktree: "ar t ./lib.a",
+        spec_ar_list_git_read: "ar t ./.git/x.a",
+        spec_ar_insert_modifier_worktree: "ar rb existing.o ./lib.a new.o",
+        spec_textutil_info_worktree: "textutil -info ./doc.txt",
+        spec_textutil_convert_worktree: "textutil -convert html ./doc.txt",
+        spec_textutil_info_git_read: "textutil -info ./.git/config",
+        // derived-output + scaffolder writes: worktree target allows
+        spec_cap_mkdb_worktree: "cap_mkdb ./caps",
+        spec_pl2pm_worktree: "pl2pm ./mod.pl",
+        spec_create_next_worktree: "create-next-app my-app --typescript",
+        spec_degit_worktree: "degit user/repo my-app",
     }
 
     denied! {
@@ -414,5 +647,28 @@ mod behavior_specs {
         spec_age_system_output: "age -o /etc/evil -e x",
         spec_csplit_system: "csplit -f /etc/evil file.txt /1/",
         spec_wget_cluster_glued: "wget -qO/etc/cron.d/job http://x",
+        // operation-aware ar: write ops deny a sensitive/protected archive; add-ops deny a secret
+        // member; the DIVERGENCE — a WRITE into .git denies where the read op (safe! block) allowed.
+        spec_ar_create_system: "ar rcs /etc/evil.a a.o",
+        spec_ar_create_ssh: "ar rcs ~/.ssh/x.a a.o",
+        spec_ar_create_dash_form: "ar -rcs /etc/evil.a a.o",
+        spec_ar_member_secret: "ar rcs ./lib.a ~/.ssh/id_rsa",
+        spec_ar_list_secret: "ar t ~/.ssh/x.a",
+        spec_ar_create_git_write: "ar rcs ./.git/x.a a.o",
+        // a/b/i insert modifier: the archive is the SECOND positional (a membername precedes it)
+        spec_ar_insert_modifier_archive: "ar rb existing.o ~/.ssh/x.a new.o",
+        // operation-aware textutil: convert writes a sibling → sensitive/protected input denies;
+        // -output/-outputdir are write targets; the DIVERGENCE — convert into .git denies.
+        spec_textutil_convert_ssh: "textutil -convert html ~/.ssh/x.txt",
+        spec_textutil_convert_system: "textutil -convert html /etc/x.txt",
+        spec_textutil_output_system: "textutil -convert html a.txt -output /etc/x.html",
+        spec_textutil_convert_git_write: "textutil -convert html ./.git/config",
+        // derived-output + scaffolder writes into a sensitive locus deny
+        spec_cap_mkdb_system: "cap_mkdb /etc/evil",
+        spec_znew_ssh: "znew ~/.ssh/x.Z",
+        spec_pl2pm_ssh: "pl2pm ~/.ssh/x.pl",
+        spec_create_next_ssh: "create-next-app ~/.ssh/evil",
+        spec_create_react_system: "create-react-app /etc/evil",
+        spec_degit_ssh: "degit user/repo ~/.ssh/evil",
     }
 }

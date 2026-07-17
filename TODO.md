@@ -344,3 +344,41 @@ guards the shape gates (not covered by every_declared_path_flag_actually_gates).
 KNOWN SMALL TAIL (low severity, not blocking): obscure positional converters the flag guard can't
 enumerate (a dedicated last_write audit would catch more); the single-char -d/-O set (kept out of the
 guard for noise; specific ones gated); sub-positional writers like `hugo new site <path>`.
+
+## Positional last-arg writer audit — DONE, with residual sub-classes
+`positional_last_arg_writers_are_gated_or_acknowledged` (src/registry/tests.rs) drove a full-registry
+audit of the last-positional / in-place WRITER class (the one the flag guard can't enumerate). Gated
+~40 genuine writers via pathgates.toml [roles.X]:
+  - converter families (shape="last_write"): the ghostscript wrappers (dvipdf, eps2eps, pdf2dsc,
+    pfbtopfa, ps2epsi, ps2pdf12/13/14, ps2pdfwr, ps2ps), libtiff (pal2rgb, ppm2tiff, rgb2ycbcr,
+    thumbnail, tiff2bw, tiff2icns, tiff2rgba, tiffcrop, tiffdither, tiffmedian), Little CMS
+    jpgicc/tificc (shape merged onto their -o=read profile gate), and heif-thumbnailer, wkhtmltopdf,
+    usdrecord, gdbm_dump, gdbm_load, pkgbuild, productbuild.
+  - in-place mutators (shape="last_write", or positional="write" for multi-file): llvm-objcopy,
+    llvm-strip, wasm-strip, install_name_tool, indent, resolveLinks, PlistBuddy, initdb,
+    gatherheaderdoc; nbstripout + afscexpand (multi-file → positional="write").
+The ~95 remaining auto-approvers are acknowledged NON-writers on tests/fixtures/positional_writer_worklist.tsv
+(compilers/linkers → -o/a.out output, readers/viewers → stdout, test runners, linters, clipboard, flag
+or derived output). The discovery ratchet is a description-heuristic best-effort (fail-OPEN on wording);
+the fail-CLOSED guarantee for the known writers is positional_and_output_dir_writers_gate_sensitive_paths.
+
+RESIDUAL SUB-CLASSES — RESOLVED (2026-07). On analysis none needed a brand-new primitive; each fit an
+existing one, and the value-add was the proptests + one operation-aware mechanism.
+  - ar-family (`ar`/`emar`/`llvm-ar`): NOT a first_write shape — a new pathgate `handler = "ar_archive"`
+    (pathgate::handlers) reads the key-letter so r/q/d/m/s WRITE the archive and t/p/x READ it, and the
+    add-ops read their members. Operation-awareness matters because read and write both deny a sensitive
+    locus but DIVERGE at an in-workspace protected path (`.git/config`: readable, write-denied) — so a
+    plain `positional = "write"` would over-deny `ar t ./.git/x.a`.
+  - derived-output (`textutil`/`cap_mkdb`/`znew`/`pl2pm`): a sibling write lands in the input's directory,
+    so write-gating the input path is locus-equivalent to gating the sibling. cap_mkdb/znew/pl2pm →
+    `positional = "write"`. textutil has read modes too (`-info`/`-cat`) so it uses `handler =
+    "textutil_mode"` (convert/strip write, info/cat read; -output/-outputdir are write targets).
+  - scaffolders (`create-*`/`degit`): FACET model — a scaffolder CREATEs INERT CODE (the template is
+    inert until the user runs it) into a NAMED directory. That is local SafeWrite; the axis to control is
+    the LOCUS, so gate the target dir (`positional = "write"`, or last_write for degit) to keep the write
+    in the workspace. Kept SafeWrite (not candidate) per the "inert code until run" nature; the npm-install
+    step runs in the now-workspace-gated dir. (If we later want the install-exec itself gated, that is an
+    execution-facet decision separate from this locus gate.)
+  The operation-aware `handler` mechanism is guarded by pathgate_handler_names_resolve (name ⟺ fn) and
+  proptests: ar/textutil "write is never more permissive than read" + "ops classify regardless of
+  modifiers", with operation_aware_read_write_divergence_is_real pinning the .git/config case.
