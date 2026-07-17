@@ -11,15 +11,24 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
 
 ## Pre-1.0 hardening
 
-- **FAN-OUT PRIORITY — credential-exposure audit (found in the pre-fanout adversarial review).** Many
-  cloud-CLI subs READ or MINT credentials but auto-approve at the default band, because they predate the
-  `credential-read`/`credential-mint` archetypes. Two vectors: (a) explicit subs classified SafeRead
-  (fixed exemplars: `gcloud auth print-access-token`/`print-identity-token`, `vault read`); (b) BROAD
-  glob read-patterns — `first_arg = ["get-*"]` admits `aws secretsmanager get-secret-value` and `aws ecr
-  get-login-password` (both confirmed auto-approving). The fan-out MUST, per cloud CLI: tag credential
-  read/mint subs `credential-read`/`credential-mint`, and audit every `get-*`/`describe-*` glob for
-  credential actions (get-secret-value, get-login-password, get-session-token, get-token, get-password).
-  This is the #1 correctness item before/within the fan-out.
+- **Credential-exposure audit — the #1 correctness item (the one class that escapes the SafeWrite-local
+  bound: a "read" that returns REMOTE secret material). SWEEP SPEC BUILT + partly gated.**
+  - Two guards enforce the class: `credential_smelling_subs_are_classified_or_grandfathered` (sub NAME
+    layer) and the new `credential_store_reads_are_denied` corpus ratchet (ARGUMENT / whole-tool layer).
+    IMPORTANT: the class CANNOT be swept generatively — a blind `<read-verb> <secret-word>` probe is
+    vacuous (1855 false hits: `alembic show secret` auto-approves because `show` takes any positional).
+    So the ratchet is a curated researched worklist that only grows as secret-store CLIs are researched.
+  - Gated this pass: `op item get`/`read`/`document get` (profile=credential-read; op is a whole secret
+    store), `vault kv get` (the KV-v2 sugar for `vault read`). Regression-covered: aws secretsmanager
+    get-secret-value / ecr get-login-password / sts get-session-token / ssm get-parameter
+    --with-decryption, gcloud secrets versions access / auth print-*-token, az keyvault secret show, gh
+    auth token, doctl auth init, security find-internet-password.
+  - KNOWN GAP (needs a bigger fix, allowlist-only so NOT a deny-secret denylist): `kubectl get secret
+    -o yaml` (and configmap/pod `-o yaml` that surface secret data) still auto-approve. The fix is to
+    give `kubectl get`/`describe` a `first_arg` ALLOWLIST of safe resource types so `secret` falls off —
+    a full kubectl resource re-research (campaign-scope). Tracked; add to the ratchet once gated.
+  - Remaining sweep: continue researching secret-store / cloud CLIs (doppler, sops, doctl, azure/gcp
+    breadth, k8s) and add each credential read to the ratchet as it is gated.
 - **Over-deny audit follow-ups — RESOLVED (2026-07).**
   - `terraform`: already fully covered (verified) — `plan`/`validate`/`show`/`fmt`/`output`/`state list`
     /`version` allow, `init`/`apply`/`destroy`/`import` deny. The old "not covered at all" note was stale.

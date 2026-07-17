@@ -52,6 +52,10 @@ valued = ["--account", "--categories", "--favorite", "--format", "--include-arch
 
 [[command.sub.sub]]
 name = "get"
+profile = "credential-read"
+fact = "`op item get` fetches a 1Password item over the network and prints its fields — passwords, TOTP secrets (`--otp`), and other secret values (`--reveal` unmasks concealed fields) enter the caller's context."
+source = "https://developer.1password.com/docs/cli/reference/management-commands/item/"
+judgment = "Retrieving a vault item is the secret-fetch of a password manager; conservative classification is credential exposure."
 standalone = ["--help", "-h"]
 valued = ["--account", "--fields", "--format", "--otp", "--reveal", "--vault"]
 
@@ -71,6 +75,10 @@ valued = ["--account", "--format", "--vault"]
 
 [[command.sub.sub]]
 name = "get"
+profile = "credential-read"
+fact = "`op document get` downloads the stored document's contents (often a private key, certificate, or other secret file) from the vault to stdout or `--out-file`."
+source = "https://developer.1password.com/docs/cli/reference/management-commands/document/"
+judgment = "A stored document in a password manager is secret material; fetching its contents is credential exposure."
 standalone = ["--force", "--help", "-h"]
 valued = ["--account", "--include-archive", "--out-file", "--vault"]
 write_flags = ["--out-file"]
@@ -113,7 +121,10 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "read"
-level = "SafeRead"
+profile = "credential-read"
+fact = "`op read` resolves a secret reference (`op://vault/item/field`) and prints the secret value it points to — the canonical way to pull a single credential into a shell."
+source = "https://developer.1password.com/docs/cli/reference/commands/read/"
+judgment = "Resolving a secret reference returns plaintext secret material; credential exposure."
 bare = false
 tolerate_unknown_short = true
 standalone = ["--force", "--help", "--no-newline", "-h", "-n"]
