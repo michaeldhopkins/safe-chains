@@ -47,6 +47,26 @@ use super::*;
     }
 
     #[test]
+    #[should_panic(expected = "AUTO-APPROVE")]
+    fn a_candidate_shadowed_by_a_sibling_glob_panics_at_build() {
+        // `get-secret-value` is candidate=true (meant to DENY) but matches the `get-*` glob → it
+        // would fall through the candidate filter and auto-approve. The #4 footgun; must fail closed.
+        load_one(
+            "[[command]]\nname = \"tc\"\nfirst_arg = [\"get-*\", \"list-*\"]\n\
+             [[command.sub]]\nname = \"get-secret-value\"\ncandidate = true\n",
+        );
+    }
+
+    #[test]
+    fn a_candidate_not_matching_the_glob_is_fine() {
+        // A candidate whose name does NOT match the glob is safe — it denies as intended.
+        load_one(
+            "[[command]]\nname = \"tc\"\nfirst_arg = [\"describe-*\"]\n\
+             [[command.sub]]\nname = \"delete-thing\"\ncandidate = true\n",
+        );
+    }
+
+    #[test]
     #[should_panic(expected = "requires a `source`")]
     fn an_escalating_flag_without_a_source_panics_at_build() {
         load_one(
@@ -1903,9 +1923,18 @@ use super::*;
         use super::types::{DispatchKind, SubSpec};
         fn smells(name: &str) -> bool {
             let n = name.to_ascii_lowercase();
-            ["token", "secret", "password", "credential", "private-key", "access-key", "apikey"]
-                .iter()
-                .any(|p| n.contains(p))
+            // Unambiguous credential-material tokens. NOTE (#3): a bare "key" is deliberately EXCLUDED —
+            // it is too noisy (keyring/keyvault/keyspace/key-handle are benign) to enforce as a ratchet.
+            // Key-material reads that don't hit these tokens (az `account keys`, `admin-key`) are caught
+            // instead by the STRUCTURAL layer (credential subgroups excluded when nesting, per the
+            // reference sweep) — a name heuristic can't be the whole story. See
+            // docs/design/behavioral-taxonomy-archetypes.md (credential detection).
+            [
+                "token", "secret", "password", "credential", "private-key", "access-key", "apikey",
+                "connection-string", "auth-string",
+            ]
+            .iter()
+            .any(|p| n.contains(p))
         }
         // Post-batch-0 worklist. Only SHRINKS as re-research classifies each; a NEW smelling sub that
         // is neither here nor profile=credential-* FAILS the build. (`aws export-credentials`,
@@ -2913,31 +2942,45 @@ deny = true
         }
     }
 
-    /// gcloud STRUCTURAL guard: a `first_arg` glob must contain ONLY vetted read verbs. gcloud dispatches
-    /// `gcloud <group> <subgroup> <verb>`, and a FirstArg glob matches the FIRST token and ignores the
-    /// rest — so a glob listing SUBGROUP names (`["instances", "keys", …]`) auto-approves EVERY verb under
-    /// them: create/delete/irreversible-destroy, `jobs submit` (remote code exec), `get-auth-string`
-    /// (a credential). The correct shape is a sub-sub per subgroup, each with its own read-verb glob. This
-    /// flags any glob token that is not a known safe read verb — either a subgroup name (→ make it a
-    /// sub-sub) or a mutating/data verb (→ drop it). Ratchet: to admit a genuinely-new safe read verb, add
-    /// it to READ_VERBS as a vetted decision. Walks the real registry, so new gcloud groups are covered.
+    /// UNIVERSAL structural guard for verb-glob CLIs (#5). A `first_arg` glob matches the FIRST token
+    /// and IGNORES the rest — correct for a VERB glob (`get-*`, `describe`), catastrophic for a glob
+    /// listing SUBGROUP names: `gcloud redis ["instances","operations"]` auto-approves EVERY verb under
+    /// `instances` (create, delete, irreversible-destroy, `get-auth-string`), because dispatch stops at
+    /// the first token. The primitive is sharp on purpose; this guard de-fangs its MISUSE across the
+    /// whole registry. Each hierarchical `<binary> <group> <subgroup…> <verb>` CLI registers its vetted
+    /// read-verb set in VERB_GLOB_CLIS; the guard walks that command's tree and fails on any glob token
+    /// outside the set (a subgroup name → make it a sub-sub; a mutating/credential verb → drop/carve).
+    /// Adding a new cloud CLI (oci, kubectl) is a ONE-ROW entry, not a new bespoke guard.
     #[test]
-    fn gcloud_globs_admit_only_read_verbs() {
+    fn verb_glob_clis_admit_only_read_verbs() {
         use super::types::DispatchKind;
-        fn walk(prefix: &str, kind: &DispatchKind, bad: &mut Vec<String>) {
-            // The only tokens safe to admit via a gcloud glob: they are READ operations, not subgroups
-            // (which hide their own verbs) and not mutations.
-            const READ_VERBS: &[&str] = &[
-                "describe", "list", "get-iam-policy", "get-ancestors-iam-policy", "log", "read", "ls",
-                // group-specific analysis reads (no state change), vetted:
-                "compute",              // essential-contacts compute (effective contacts)
-                "lint-condition",       // policy-intelligence — validate an IAM condition
-                "query-activity",       // policy-intelligence — read activity data
-                "troubleshoot-policy",  // policy-intelligence — analyze access (read)
-            ];
+        // (command, vetted read verbs — the ONLY tokens safe to admit via a first_arg glob for it).
+        let verb_glob_clis: &[(&str, &[&str])] = &[
+            (
+                "gcloud",
+                &[
+                    "describe", "list", "get-iam-policy", "get-ancestors-iam-policy", "log", "read", "ls",
+                    // group-specific analysis reads (no state change), vetted:
+                    "compute", "lint-condition", "query-activity", "troubleshoot-policy",
+                ],
+            ),
+            (
+                "az",
+                &[
+                    "show", "list",
+                    // vetted safe list-* variants (metadata, not credentials):
+                    "list-locations", "list-sizes", "list-ip-addresses", "list-instances", "list-skus",
+                    "list-usages", "list-service-tiers", "list-editions", "list-runtimes",
+                    "get-instance-view", "list-deleted", "wait",
+                    // group-specific reads (no state change), vetted:
+                    "query", "name-exists", "logs",
+                ],
+            ),
+        ];
+        fn walk(prefix: &str, kind: &DispatchKind, read_verbs: &[&str], bad: &mut Vec<String>) {
             let check = |pfx: &str, patterns: &[String], bad: &mut Vec<String>| {
                 for p in patterns {
-                    if !READ_VERBS.contains(&p.as_str()) {
+                    if !read_verbs.contains(&p.as_str()) {
                         bad.push(format!("{pfx}: `{p}`"));
                     }
                 }
@@ -2947,70 +2990,22 @@ deny = true
                 DispatchKind::Branching { subs, first_arg, .. } => {
                     check(prefix, first_arg, bad);
                     for s in subs {
-                        walk(&format!("{prefix} {}", s.name), &s.kind, bad);
+                        walk(&format!("{prefix} {}", s.name), &s.kind, read_verbs, bad);
                     }
                 }
                 _ => {}
             }
         }
-        let Some(spec) = TOML_REGISTRY.get("gcloud") else { return };
         let mut bad = Vec::new();
-        walk("gcloud", &spec.kind, &mut bad);
-        assert!(
-            bad.is_empty(),
-            "gcloud first_arg globs admit non-read tokens ({} — a subgroup name → make it a sub-sub with a \
-             read-verb glob; or a mutating/data verb → drop it):\n  {}",
-            bad.len(),
-            bad.join("\n  "),
-        );
-    }
-
-    /// az STRUCTURAL guard — the Azure twin of `gcloud_globs_admit_only_read_verbs`. `az <group>
-    /// <subgroup> <verb>` has the same shape: a glob listing SUBGROUP names auto-approves every verb
-    /// under them. Azure's read verbs are `show`/`list` (+ vetted safe `list-*` variants). A glob token
-    /// outside that set is a subgroup name (→ make it a sub-sub) or a CREDENTIAL verb (`list-keys`,
-    /// `get-credentials` → carve as credential-read). Ratchet: add a genuinely-new safe read to
-    /// READ_VERBS as a vetted decision.
-    #[test]
-    fn az_globs_admit_only_read_verbs() {
-        use super::types::DispatchKind;
-        fn walk(prefix: &str, kind: &DispatchKind, bad: &mut Vec<String>) {
-            const READ_VERBS: &[&str] = &[
-                "show", "list",
-                // vetted safe list-* variants (metadata, not credentials):
-                "list-locations", "list-sizes", "list-ip-addresses", "list-instances", "list-skus",
-                "list-usages", "list-service-tiers", "list-editions", "list-runtimes",
-                "get-instance-view", "list-deleted", "wait",
-                // group-specific reads (no state change), vetted:
-                "query",        // monitor log-analytics query — run a KQL read
-                "name-exists",  // cdn name-exists — name-availability check
-                "logs",         // container logs — read container logs
-            ];
-            let check = |pfx: &str, patterns: &[String], bad: &mut Vec<String>| {
-                for p in patterns {
-                    if !READ_VERBS.contains(&p.as_str()) {
-                        bad.push(format!("{pfx}: `{p}`"));
-                    }
-                }
-            };
-            match kind {
-                DispatchKind::FirstArg { patterns, .. } => check(prefix, patterns, bad),
-                DispatchKind::Branching { subs, first_arg, .. } => {
-                    check(prefix, first_arg, bad);
-                    for s in subs {
-                        walk(&format!("{prefix} {}", s.name), &s.kind, bad);
-                    }
-                }
-                _ => {}
+        for (cmd, read_verbs) in verb_glob_clis {
+            if let Some(spec) = TOML_REGISTRY.get(*cmd) {
+                walk(cmd, &spec.kind, read_verbs, &mut bad);
             }
         }
-        let Some(spec) = TOML_REGISTRY.get("az") else { return };
-        let mut bad = Vec::new();
-        walk("az", &spec.kind, &mut bad);
         assert!(
             bad.is_empty(),
-            "az first_arg globs admit non-read tokens ({} — a subgroup name → make it a sub-sub with a \
-             read-verb glob; a credential verb (list-keys/get-credentials) → carve as credential-read):\n  {}",
+            "verb-glob CLIs admit non-read tokens ({} — a subgroup name → make it a sub-sub with a \
+             read-verb glob; a mutating/credential verb → drop it or carve as credential-read):\n  {}",
             bad.len(),
             bad.join("\n  "),
         );
