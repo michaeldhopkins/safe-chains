@@ -147,6 +147,37 @@ fn filter_candidates(subs: Vec<TomlSub>) -> impl Iterator<Item = TomlSub> {
     subs.into_iter().filter(|s| !s.candidate.unwrap_or(false))
 }
 
+/// Whether `name` is matched by a `first_arg` pattern (`get-*` prefix glob, or an exact token).
+fn first_arg_matches(name: &str, patterns: &[String]) -> bool {
+    patterns.iter().any(|p| match p.strip_suffix('*') {
+        Some(prefix) => name.starts_with(prefix),
+        None => p == name,
+    })
+}
+
+/// Fail-closed guard for the `candidate`-under-glob footgun. A `candidate = true` sub is REMOVED from
+/// the registry (so an older client sees "not found" and denies) — but if a sibling `first_arg` glob
+/// would MATCH that removed name, the token falls through to the glob and AUTO-APPROVES, silently
+/// inverting the author's intent (a deny becomes an allow). This panics at load when it detects that
+/// shape, directing the author to a `profile`/explicit sub-sub instead. (The AWS blob-readers hit
+/// exactly this: a `candidate` under `get-*` would have auto-approved.)
+fn assert_no_candidate_shadowed_by_glob(parent: &str, subs: &[TomlSub], first_arg: &[String]) {
+    if first_arg.is_empty() {
+        return;
+    }
+    for s in subs {
+        if s.candidate.unwrap_or(false) && first_arg_matches(&s.name, first_arg) {
+            panic!(
+                "'{parent}' sub `{}` is `candidate = true` but its name is MATCHED by the sibling \
+                 first_arg glob {first_arg:?} — it would fall through the filter and AUTO-APPROVE \
+                 (a silent deny→allow inversion). Use `profile`/an explicit sub-sub to deny it, or \
+                 drop it from the glob.",
+                s.name,
+            );
+        }
+    }
+}
+
 /// Builds one SubSpec per alias (canonical name first, then each alias).
 /// All entries share the same kind via Clone — the dispatcher doesn't care
 /// which name the user invoked. `handler_policies` is consulted only by
@@ -248,6 +279,7 @@ pub(super) fn build_sub(
     let policy_ref = toml.policy.clone();
     let profile = toml.profile.clone();
     assert_sub_provenance(parent, &toml);
+    assert_no_candidate_shadowed_by_glob(&format!("{parent} {}", toml.name), &toml.sub, &toml.first_arg);
     let flags = std::mem::take(&mut toml.flag)
         .into_iter()
         .map(|f| crate::registry::types::FlagProvenance {
@@ -863,6 +895,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     assert_flat_or_structured(&toml);
     assert_fallback_requires_handler(&toml);
     assert_matrix_policy_keys_exist(&toml);
+    assert_no_candidate_shadowed_by_glob(&toml.name, &toml.sub, &toml.first_arg);
     assert_matrix_no_duplicate_parent_action(&toml);
     assert_command_eval_safe_only_on_leaf(&toml);
     assert_eval_safe_tagged_command_has_researched_version(&toml);

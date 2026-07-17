@@ -187,6 +187,51 @@ patterns (`chmod +s`, a `git push +refspec`) — the escalator matches flags, no
   scoring a `.github/workflows` or `.git/config` write as `reconfiguring`/`installing`, not `data`.
   This is a leaf-command (git/hg) concern, not the remote candidate surface, so it waits.
 
+- **(#1) `bulk-object-read` has no proportionate tier — a genuinely MISSING facet axis.** Retrieving
+  an arbitrary stored object (`aws s3api get-object`, `glacier get-job-output`) is a read; the ONLY
+  facet lever that denies a read is `secret = reads`, which lands it at **yolo** — the same tier as
+  reading a credential store. That is too strict: not every blob is credential-grade, but there is no
+  axis to say so. **Proposed axis: `retrieval-granularity` (`metadata < record < bulk-content`)** —
+  orthogonal to `scale` (which counts items) and to `secret` (which flags credentials). `metadata`/
+  `record` reads stay `reader`-level; `bulk-content` (opaque stored bytes we can't assess) earns a
+  *middle* tier — say `network-admin` — proportionate to "elevated remote data egress" without
+  equating it to a credential read. Until the axis exists, `bulk-object-read` overloads `secret=reads`
+  and sits at yolo (conservative, documented). Decision (user, 2026-07): ship the yolo placement now,
+  add the axis deliberately later — do not fudge a middle tier without the axis to justify it.
+
+- **(#2) Read-verb safety is a property of the RESOURCE, not the verb — the glob model assumes the
+  verb.** The whole `first_arg` model says "the verb decides safety" (`show`/`list`/`describe` = safe
+  read). Azure broke that: `az keyvault secret show`, `az vm secret list`, `az batch account keys
+  list` return CREDENTIALS through the exact same "safe" verbs. The model DOES express resource-based
+  credential denial — via the `credential_smelling_subs` ratchet guard (the canonical mechanism) plus
+  structural exclusion of credential subgroups when nesting — but that is a name-heuristic layer bolted
+  onto a verb-based model, not native vocabulary. Decision: the ratchet guard IS the resource-based
+  credential primitive; keep it as the enforced canonical mechanism, and exclude credential subgroups
+  structurally at nesting time. A first-class "this subtree returns credentials" facet is not worth the
+  complexity while the guard holds.
+
+- **(#3) Credential detection is a NAME heuristic — real ceiling.** For AWS we had botocore OUTPUT
+  SHAPES (ground truth: we could prove `chime list-attendees` returns only usernames). For gcloud/az we
+  relied on subgroup NAMES + the reference sweep, which is why `user-workloads-secrets` and
+  `get-credentials` slipped the first pass (the ratchet guard caught them). A subgroup returning
+  credentials under a BENIGN name would still slip. Mitigation is layered, not perfect: (a) the
+  `credential_smelling_subs` ratchet over an unambiguous token set (bare `key` is excluded as too
+  noisy); (b) structural exclusion at nesting; (c) output-shape verification where a machine-readable
+  API model exists (botocore; gcloud discovery docs, az swagger are candidates). Decision: accept the
+  ceiling, prefer output-shape ground truth where available, and treat the ratchet as the backstop.
+
+- **(#6) Deep hierarchies ENUMERATE rather than express — verb-classifier investigated, enumeration
+  kept.** Restoring deep reads for gcloud/az meant nesting `[[command.sub.sub.sub]]` for hundreds of
+  navigable nodes (discovered by a reference sweep). A *verb-classifier* dispatch ("scan for the first
+  token in a known verb-set; allow iff it is a read verb") would handle any depth with zero
+  enumeration. Investigated and NOT adopted, because of #2: a verb-classifier alone would ALLOW
+  `keyvault secret show` (the verb `show` is a read) — so it would still need an explicit
+  credential-subtree deny-list, which is *more* mechanism than the enumeration's "just don't nest the
+  credential subgroup." The enumeration also fails safe on drift (a new subgroup/verb → not matched →
+  deny). Decision: keep the enumeration + the universal structural guard (#5) + the candidate-shadow
+  guard (#4); the enumeration is data-heavy but sound, and the guards make its misuse a build failure.
+  Revisit the verb-classifier only if the enumeration's maintenance cost outgrows the guard's coverage.
+
 ## 4. Next
 
 Build the schema: the orthogonal-facet fields on `[[command.sub]]` (the archetype bundles as explicit
