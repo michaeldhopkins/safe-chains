@@ -92,7 +92,7 @@ flags = { "-o" = "write", "--output" = "write", "--output-dir" = "write" }
 
 [roles.wget]
 positional = "ignore"
-flags = { "-O" = "write", "--output-document" = "write", "-P" = "write", "--directory-prefix" = "write", "--post-file" = "read", "-i" = "read", "--input-file" = "read" }
+flags = { "-o" = "write", "-O" = "write", "--output-document" = "write", "-P" = "write", "--directory-prefix" = "write", "--post-file" = "read", "-i" = "read", "--input-file" = "read" }
 
 # Remote copy/sync: a LOCAL source is a disclosing read (exfil), the destination is a write, a
 # `host:path` endpoint is ignored (remote writes are the tool's own concern), and an `-i`
@@ -181,3 +181,454 @@ flags = { "-f" = "write", "--prefix" = "write" }
 #   home-file inspection — a separate "should we gate metadata reads" decision); converter
 #   stdout disclosure (`pdftotext ~/x.pdf -`) and file:-protocol inputs, both consequences of
 #   the ignore-input policy that lets home transcodes through.
+[roles."aclocal"]
+flags = { "--output" = "write" }
+
+[roles."afconvert"]
+flags = { "-o" = "write" }
+
+[roles."ameba"]
+flags = { "--out" = "write" }
+
+[roles."applesingle"]
+flags = { "--directory" = "write", "--rename" = "write", "-C" = "write", "-o" = "write" }
+
+[roles."autoconf"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."autom4te"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."automake"]
+flags = { "-o" = "write" }
+
+[roles."avbcapture"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."avconvert"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."b64decode"]
+flags = { "-o" = "write" }
+
+[roles."b64encode"]
+flags = { "-o" = "write" }
+
+[roles."bandit"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."binhex"]
+flags = { "--directory" = "write", "--rename" = "write", "-C" = "write", "-o" = "write" }
+
+[roles."binhex.pl"]
+flags = { "-o" = "write" }
+
+[roles."bintrans"]
+flags = { "-o" = "write" }
+
+[roles."bison"]
+flags = { "--file-prefix" = "write", "--output" = "write", "--output-file" = "write", "-b" = "write", "-o" = "write" }
+
+[roles."bitcode_strip"]
+flags = { "-o" = "write" }
+
+[roles."brakeman"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."bsqldb"]
+flags = { "-e" = "write", "-i" = "read", "-o" = "write" }
+
+[roles."bsqlodbc"]
+flags = { "-o" = "write" }
+
+[roles."byacc"]
+flags = { "-H" = "write", "-b" = "write", "-o" = "write" }
+
+[roles."cloc"]
+flags = { "--out" = "write", "--report-file" = "write", "--sql" = "write", "--write-lang-def" = "write" }
+
+[roles."codesign_allocate"]
+flags = { "-i" = "read", "-o" = "write" }
+
+[roles."compression_tool"]
+flags = { "-i" = "read", "-o" = "write" }
+
+[roles."coqc"]
+flags = { "-o" = "write" }
+
+[roles."ctf_insert"]
+flags = { "-o" = "write" }
+
+[roles."cucumber"]
+flags = { "--out" = "write", "-o" = "write" }
+
+[roles."debinhex.pl"]
+flags = { "-o" = "write" }
+
+[roles."defncopy"]
+flags = { "-i" = "read", "-o" = "write" }
+
+[roles."deptry"]
+flags = { "--json-output" = "write", "-o" = "write" }
+
+[roles."dotnet-symbol"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."dsymutil"]
+flags = { "--out" = "write", "-o" = "write" }
+
+[roles."dwarfdump"]
+flags = { "-o" = "write" }
+
+[roles."dwebp"]
+flags = { "-o" = "write" }
+
+[roles."ecpg"]
+flags = { "-o" = "write" }
+
+[roles."eleventy"]
+flags = { "--output" = "write" }
+
+[roles."eslint"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."eyapp"]
+flags = { "-o" = "write" }
+
+[roles."fantomas"]
+flags = { "--out" = "write" }
+
+[roles."fax2ps"]
+flags = { "-o" = "write" }
+
+[roles."fax2tiff"]
+flags = { "-o" = "write" }
+
+[roles."flex"]
+flags = { "--header-file" = "write", "--outfile" = "write", "--skel" = "read", "--tables-file" = "write", "-S" = "read", "-o" = "write" }
+
+[roles."frames"]
+flags = { "--assets" = "read", "--output" = "write", "--subfolder" = "write", "-o" = "write" }
+
+[roles."gcore"]
+flags = { "-c" = "write", "-o" = "write" }
+
+[roles."gen_bridge_metadata"]
+flags = { "--exception" = "read", "--framework" = "read", "--output" = "write", "-e" = "read", "-f" = "read", "-o" = "write" }
+
+[roles."genstrings"]
+flags = { "-o" = "write" }
+
+[roles."gif2webp"]
+flags = { "-o" = "write" }
+
+[roles."gifsicle"]
+flags = { "--output" = "write", "--use-colormap" = "read", "-o" = "write" }
+
+[roles."gosec"]
+flags = { "--out" = "write", "-out" = "write" }
+
+[roles."grype"]
+flags = { "--file" = "write", "--output" = "write", "-o" = "write" }
+
+[roles."headerdoc2html"]
+flags = { "-o" = "write" }
+
+[roles."heif-dec"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."heif-enc"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."hurl"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."ibtool"]
+flags = { "--write" = "write" }
+
+[roles."img2webp"]
+flags = { "-o" = "write" }
+
+[roles."iperf3"]
+flags = { "-o" = "write" }
+
+[roles."jasper"]
+flags = { "--output" = "write", "-F" = "write" }
+
+[roles."jbig2dec"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."jpgicc"]
+flags = { "-o" = "read" }
+
+[roles."jupyter-nbconvert"]
+flags = { "--output" = "write" }
+
+[roles."jupytext"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."layerutil"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."ld"]
+flags = { "-o" = "write" }
+
+[roles."lesskey"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."libtool"]
+flags = { "-filelist" = "read", "-o" = "write" }
+
+[roles."license-checker"]
+flags = { "--files" = "write", "--out" = "write" }
+
+[roles."linkicc"]
+flags = { "-o" = "write" }
+
+[roles."lockstat"]
+flags = { "-o" = "write" }
+
+[roles."macbinary"]
+flags = { "--directory" = "write", "--rename" = "write", "-C" = "write", "-o" = "write" }
+
+[roles."markdownlint"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."marp"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."mongodump"]
+flags = { "--archive" = "write", "--out" = "write", "-o" = "write" }
+
+[roles."mongoexport"]
+flags = { "--out" = "write", "-o" = "write" }
+
+[roles."msgattrib"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."msgcat"]
+flags = { "-o" = "write" }
+
+[roles."msgcomm"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."msgconv"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."msgen"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."msgfmt"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."msggrep"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."msginit"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."msgmerge"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."msgunfmt"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."msguniq"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."nano"]
+flags = { "--backupdir" = "write", "--operatingdir" = "write", "-C" = "write", "-o" = "write" }
+
+[roles."nmedit"]
+flags = { "-o" = "write" }
+
+[roles."ocamlformat"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."opj_compress"]
+flags = { "-o" = "write" }
+
+[roles."opj_decompress"]
+flags = { "-o" = "write" }
+
+[roles."opj_dump"]
+flags = { "-o" = "write" }
+
+[roles."pdfdetach"]
+flags = { "-o" = "write" }
+
+[roles."pdfjam"]
+flags = { "--builddir" = "write", "--outfile" = "write", "-o" = "write" }
+
+[roles."pg_combinebackup"]
+flags = { "--output" = "write", "--tablespace-mapping" = "write", "-T" = "write", "-o" = "write" }
+
+[roles."pip-audit"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."pngquant"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."pp"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."psicc"]
+flags = { "-o" = "read" }
+
+[roles."qlmanage"]
+flags = { "-o" = "write" }
+
+[roles."racc"]
+flags = { "--log-file" = "write", "--output-file" = "write", "-O" = "write", "-o" = "write" }
+
+[roles."raw2tiff"]
+flags = { "-o" = "write" }
+
+[roles."rdoc"]
+flags = { "--op" = "write", "-o" = "write" }
+
+[roles."re2c"]
+flags = { "--depfile" = "write", "--header" = "write", "--include" = "read", "--output" = "write", "--type-header" = "write", "-I" = "read", "-o" = "write", "-t" = "write" }
+
+[roles."rex"]
+flags = { "--output-file" = "write", "-o" = "write" }
+
+[roles."rollup"]
+flags = { "--dir" = "write", "--file" = "write", "--sourcemapFile" = "write", "-d" = "write", "-o" = "write" }
+
+[roles."rspec"]
+flags = { "--deprecation-out" = "write", "--out" = "write", "-o" = "write" }
+
+[roles."rubocop"]
+flags = { "--out" = "write", "-o" = "write" }
+
+[roles."say"]
+flags = { "-o" = "write" }
+
+[roles."sdp"]
+flags = { "-i" = "read", "-o" = "write" }
+
+[roles."solc"]
+flags = { "-o" = "write" }
+
+[roles."sops"]
+flags = { "--output" = "write" }
+
+[roles."spindump"]
+flags = { "-i" = "read", "-microstackshots_datastore" = "write", "-microstackshots_dsc_path" = "read", "-o" = "write" }
+
+[roles."stackprof"]
+flags = { "--out" = "write" }
+
+[roles."standardrb"]
+flags = { "--out" = "write", "-o" = "write" }
+
+[roles."strip"]
+flags = { "-o" = "write" }
+
+[roles."stylelint"]
+flags = { "-o" = "write" }
+
+[roles."terraform-docs"]
+flags = { "--output" = "write", "--output-file" = "write" }
+
+[roles."tfsec"]
+flags = { "--out" = "write", "-O" = "write" }
+
+[roles."tidy"]
+flags = { "-f" = "write", "-file" = "write", "-o" = "write", "-output" = "write" }
+
+[roles."tiff2pdf"]
+flags = { "-o" = "write" }
+
+[roles."tiff2ps"]
+flags = { "-O" = "write" }
+
+[roles."tificc"]
+flags = { "-o" = "read" }
+
+[roles."transicc"]
+flags = { "-o" = "read" }
+
+[roles."typedoc"]
+flags = { "--out" = "write" }
+
+[roles."typeprof"]
+flags = { "-o" = "write" }
+
+[roles."uconv"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."unbrotli"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."unifdef"]
+flags = { "-o" = "write" }
+
+[roles."usdcat"]
+flags = { "--out" = "write", "-o" = "write" }
+
+[roles."usdchecker"]
+flags = { "--out" = "write", "-o" = "write" }
+
+[roles."usdcrush"]
+flags = { "--out" = "write", "-o" = "write" }
+
+[roles."usdextract"]
+flags = { "--out" = "write", "-o" = "write" }
+
+[roles."uudecode"]
+flags = { "-o" = "write" }
+
+[roles."uuencode"]
+flags = { "-o" = "write" }
+
+[roles."wasm2wat"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."wat2wasm"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."webpmux"]
+flags = { "-o" = "write" }
+
+[roles."xgettext"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."xgettext.pl"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."xsltproc"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."yacc"]
+flags = { "-H" = "write", "-b" = "write", "-o" = "write" }
+
+[roles."yapp"]
+flags = { "-o" = "write" }
+
+[roles."yt-dlp"]
+flags = { "--output" = "write", "-o" = "write" }
+
+[roles."ytt"]
+flags = { "--dangerous-emptied-output-directory" = "write", "--output-directory" = "write", "--output-files" = "write", "--output-multi-files" = "write" }
+
+[roles."djpeg"]
+flags = { "-o" = "write" }
+
+[roles."swc"]
+flags = { "-o" = "write" }
+
+[roles."syft"]
+flags = { "-o" = "write", "--output" = "write" }
+
+[roles."vyper"]
+flags = { "-o" = "write" }
+
+[roles."shfmt"]
+flags = { "-w" = "write", "--write" = "write" }
+[roles."weasyprint"]
+shape = "last_write"
+
+[roles."tiffcp"]
+shape = "last_write"
