@@ -464,27 +464,127 @@
 ### `gcloud`
 <p class="cmd-url"><a href="https://cloud.google.com/sdk/gcloud/reference">https://cloud.google.com/sdk/gcloud/reference</a></p>
 
-- **access-context-manager**: Allowed arguments: levels, perimeters, policies
-- **ai**: Allowed arguments: custom-jobs, endpoints, hp-tuning-jobs, index-endpoints, indexes, models, operations, tensorboards
-- **ai-platform**: Allowed arguments: jobs, local, models, operations, versions
-- **alloydb**: Allowed arguments: clusters, instances, operations
-- **api-gateway**: Allowed arguments: apis, api-configs, gateways, operations
-- **apigee**: Allowed arguments: apis, applications, archives, deployments, developers, environments, operations, organizations, products
+- **access-context-manager authorized-orgs**: Allowed arguments: describe, list
+- **access-context-manager cloud-bindings**: Allowed arguments: describe, list
+- **access-context-manager levels conditions**: Allowed arguments: describe, list
+- **access-context-manager perimeters dry-run**: Allowed arguments: describe, list
+- **access-context-manager policies**: Allowed arguments: describe, list
+- **access-context-manager supported-permissions**: Allowed arguments: describe, list
+- **access-context-manager supported-services**: Allowed arguments: describe, list
+- **ai custom-jobs**: Allowed arguments: describe, list
+- **ai endpoints**: Allowed arguments: describe, list
+- **ai hp-tuning-jobs**: Allowed arguments: describe, list
+- **ai index-endpoints**: Allowed arguments: describe, list
+- **ai indexes**: Allowed arguments: describe, list
+- **ai model-garden models**: Allowed arguments: describe, list
+- **ai model-monitoring-jobs**: Allowed arguments: describe, list
+- **ai models**: Allowed arguments: describe, list
+- **ai operations**: Allowed arguments: describe, list
+- **ai persistent-resources**: Allowed arguments: describe, list
+- **ai tensorboards**: Allowed arguments: describe, list
+- **ai tuning-jobs**: Allowed arguments: describe, list
+- **ai-platform jobs**: Allowed arguments: describe, list
+- **ai-platform local**: Allowed arguments: describe, list
+- **ai-platform models**: Allowed arguments: describe, list
+- **ai-platform operations**: Allowed arguments: describe, list
+- **ai-platform versions**: Allowed arguments: describe, list
+- **alloydb backups**: Allowed arguments: describe, list
+- **alloydb clusters**: Allowed arguments: describe, list
+- **alloydb instances**: Allowed arguments: describe, list
+- **alloydb operations**: Allowed arguments: describe, list
+- **alloydb users**: Allowed arguments: describe, list
+- **api-gateway api-configs**: Allowed arguments: describe, list
+- **api-gateway apis**: Allowed arguments: describe, list
+- **api-gateway gateways**: Allowed arguments: describe, list
+- **api-gateway operations**: Allowed arguments: describe, list
+- **apigee apis**: Allowed arguments: describe, list
+- **apigee applications**: Allowed arguments: describe, list
+- **apigee deployments**: Allowed arguments: describe, list
+- **apigee developers**: Allowed arguments: describe, list
+- **apigee environments**: Allowed arguments: describe, list
+- **apigee organizations**: Allowed arguments: describe, list
+- **apigee products**: Allowed arguments: describe, list
 - **app instances**: Allowed arguments: describe, list
 - **app services**: Allowed arguments: describe, list
 - **app versions**: Allowed arguments: describe, list
+- **artifacts apt**: Allowed arguments: describe, list
+- **artifacts apt**: Allowed arguments: describe, list
+- **artifacts attachments**: Allowed arguments: describe, list
+- **artifacts attachments**: Allowed arguments: describe, list
+- **artifacts docker images**: Allowed arguments: describe, list
+- **artifacts docker images**: Allowed arguments: describe, list
+- **artifacts docker tags**: Allowed arguments: describe, list
+- **artifacts docker tags**: Allowed arguments: describe, list
+- **artifacts files**: Allowed arguments: describe, list
+- **artifacts files**: Allowed arguments: describe, list
+- **artifacts generic**: Allowed arguments: describe, list
+- **artifacts generic**: Allowed arguments: describe, list
+- **artifacts go**: Allowed arguments: describe, list
+- **artifacts go**: Allowed arguments: describe, list
+- **artifacts image-streaming-cache**: Allowed arguments: describe, list
+- **artifacts image-streaming-cache**: Allowed arguments: describe, list
+- **artifacts locations**: Allowed arguments: describe, list
+- **artifacts locations**: Allowed arguments: describe, list
+- **artifacts operations**: Allowed arguments: describe, list
+- **artifacts operations**: Allowed arguments: describe, list
+- **artifacts packages**: Allowed arguments: describe, list
+- **artifacts packages**: Allowed arguments: describe, list
+- **artifacts print-settings**: Allowed arguments: describe, list
+- **artifacts print-settings**: Allowed arguments: describe, list
+- **artifacts projects**: Allowed arguments: describe, list
+- **artifacts projects**: Allowed arguments: describe, list
 - **artifacts repositories**: Allowed arguments: describe, list
-- **artifacts**: Allowed arguments: docker, files, packages, repositories, tags, versions
-- **assured**: Allowed arguments: operations, workloads
+- **artifacts repositories**: Allowed arguments: describe, list
+- **artifacts rules**: Allowed arguments: describe, list
+- **artifacts rules**: Allowed arguments: describe, list
+- **artifacts sbom**: Allowed arguments: describe, list
+- **artifacts sbom**: Allowed arguments: describe, list
+- **artifacts settings**: Allowed arguments: describe, list
+- **artifacts settings**: Allowed arguments: describe, list
+- **artifacts tags**: Allowed arguments: describe, list
+- **artifacts tags**: Allowed arguments: describe, list
+- **artifacts versions**: Allowed arguments: describe, list
+- **artifacts versions**: Allowed arguments: describe, list
+- **artifacts vpcsc-config**: Allowed arguments: describe, list
+- **artifacts vpcsc-config**: Allowed arguments: describe, list
+- **artifacts vulnerabilities**: Allowed arguments: describe, list
+- **artifacts vulnerabilities**: Allowed arguments: describe, list
+- **artifacts yum**: Allowed arguments: describe, list
+- **artifacts yum**: Allowed arguments: describe, list
+- **assured operations**: Allowed arguments: describe, list
+- **assured workloads violations**: Allowed arguments: describe, list
 - **auth list**: Flags: --filter-account, --help, -h
 - **auth print-access-token**
 - **auth print-identity-token**
-- **batch**: Allowed arguments: jobs, tasks
-- **bigtable**: Allowed arguments: clusters, instances, operations
-- **billing**: Allowed arguments: accounts, budgets, projects
+- **batch jobs**: Allowed arguments: describe, list
+- **batch tasks**: Allowed arguments: describe, list
+- **bigtable app-profiles**: Allowed arguments: describe, list
+- **bigtable authorized-views**: Allowed arguments: describe, list
+- **bigtable backups**: Allowed arguments: describe, list
+- **bigtable clusters**: Allowed arguments: describe, list
+- **bigtable hot-tablets**: Allowed arguments: describe, list
+- **bigtable instances tables**: Allowed arguments: describe, list
+- **bigtable logical-views**: Allowed arguments: describe, list
+- **bigtable materialized-views**: Allowed arguments: describe, list
+- **bigtable operations**: Allowed arguments: describe, list
+- **bigtable schema-bundles**: Allowed arguments: describe, list
+- **bigtable tables**: Allowed arguments: describe, list
+- **billing accounts**: Allowed arguments: describe, list
+- **billing budgets**: Allowed arguments: describe, list
+- **billing projects**: Allowed arguments: describe, list
 - **builds**: Allowed arguments: describe, list, log
-- **certificate-manager**: Allowed arguments: certificates, dns-authorizations, maps, operations
-- **composer**: Allowed arguments: environments, operations
+- **certificate-manager certificates**: Allowed arguments: describe, list
+- **certificate-manager dns-authorizations**: Allowed arguments: describe, list
+- **certificate-manager issuance-configs**: Allowed arguments: describe, list
+- **certificate-manager maps entries**: Allowed arguments: describe, list
+- **certificate-manager operations**: Allowed arguments: describe, list
+- **certificate-manager trust-configs**: Allowed arguments: describe, list
+- **composer environments snapshots**: Allowed arguments: describe, list
+- **composer environments storage dags**: Allowed arguments: describe, list
+- **composer environments storage data**: Allowed arguments: describe, list
+- **composer environments storage plugins**: Allowed arguments: describe, list
+- **composer environments user-workloads-config-maps**: Allowed arguments: describe, list
+- **composer operations**: Allowed arguments: describe, list
 - **compute addresses**: Allowed arguments: describe, list
 - **compute disks**: Allowed arguments: describe, list
 - **compute firewall-rules**: Allowed arguments: describe, list
@@ -502,55 +602,224 @@
 - **container images**: Allowed arguments: describe, list
 - **container node-pools**: Allowed arguments: describe, list
 - **container operations**: Allowed arguments: describe, list
-- **dataflow**: Allowed arguments: jobs, logs, metrics, snapshots
-- **dataproc**: Allowed arguments: clusters, jobs, operations, workflow-templates
-- **deploy**: Allowed arguments: delivery-pipelines, releases, rollouts, targets
+- **dataflow flex-template**: Allowed arguments: describe, list
+- **dataflow jobs**: Allowed arguments: describe, list
+- **dataflow snapshots**: Allowed arguments: describe, list
+- **dataflow yaml**: Allowed arguments: describe, list
+- **dataproc autoscaling-policies**: Allowed arguments: describe, list
+- **dataproc batches**: Allowed arguments: describe, list
+- **dataproc clusters gke**: Allowed arguments: describe, list
+- **dataproc jobs**: Allowed arguments: describe, list
+- **dataproc node-groups**: Allowed arguments: describe, list
+- **dataproc operations**: Allowed arguments: describe, list
+- **dataproc workflow-templates**: Allowed arguments: describe, list
+- **deploy automation-runs**: Allowed arguments: describe, list
+- **deploy automations**: Allowed arguments: describe, list
+- **deploy custom-target-types**: Allowed arguments: describe, list
+- **deploy delivery-pipelines**: Allowed arguments: describe, list
+- **deploy deploy-policies**: Allowed arguments: describe, list
+- **deploy job-runs**: Allowed arguments: describe, list
+- **deploy releases**: Allowed arguments: describe, list
+- **deploy rollouts**: Allowed arguments: describe, list
+- **deploy targets**: Allowed arguments: describe, list
 - **dns managed-zones**: Allowed arguments: describe, list
 - **dns record-sets**: Allowed arguments: describe, list
 - **endpoints**: Allowed arguments: describe, list
 - **essential-contacts**: Allowed arguments: compute, list
-- **eventarc**: Allowed arguments: channels, providers, triggers
-- **filestore**: Allowed arguments: backups, instances, locations, operations
-- **firestore**: Allowed arguments: databases, indexes, operations
+- **eventarc audit-logs-provider method-names**: Allowed arguments: describe, list
+- **eventarc audit-logs-provider service-names**: Allowed arguments: describe, list
+- **eventarc channel-connections**: Allowed arguments: describe, list
+- **eventarc channels**: Allowed arguments: describe, list
+- **eventarc enrollments**: Allowed arguments: describe, list
+- **eventarc google-api-sources**: Allowed arguments: describe, list
+- **eventarc google-channels**: Allowed arguments: describe, list
+- **eventarc locations**: Allowed arguments: describe, list
+- **eventarc message-buses**: Allowed arguments: describe, list
+- **eventarc pipelines**: Allowed arguments: describe, list
+- **eventarc providers**: Allowed arguments: describe, list
+- **eventarc triggers**: Allowed arguments: describe, list
+- **filestore backups**: Allowed arguments: describe, list
+- **filestore instances snapshots**: Allowed arguments: describe, list
+- **filestore locations**: Allowed arguments: describe, list
+- **filestore operations**: Allowed arguments: describe, list
+- **filestore regions**: Allowed arguments: describe, list
+- **filestore zones**: Allowed arguments: describe, list
+- **firestore backups schedules**: Allowed arguments: describe, list
+- **firestore databases**: Allowed arguments: describe, list
+- **firestore fields ttls**: Allowed arguments: describe, list
+- **firestore indexes composite**: Allowed arguments: describe, list
+- **firestore indexes fields**: Allowed arguments: describe, list
+- **firestore locations**: Allowed arguments: describe, list
+- **firestore operations**: Allowed arguments: describe, list
 - **functions**: Allowed arguments: describe, list
-- **healthcare**: Allowed arguments: datasets, dicom-stores, fhir-stores, hl7v2-stores, operations
+- **healthcare consent-stores**: Allowed arguments: describe, list
+- **healthcare datasets**: Allowed arguments: describe, list
+- **healthcare dicom-stores**: Allowed arguments: describe, list
+- **healthcare fhir-stores**: Allowed arguments: describe, list
+- **healthcare hl7v2-stores**: Allowed arguments: describe, list
+- **healthcare operations**: Allowed arguments: describe, list
 - **iam roles**: Allowed arguments: describe, list
 - **iam service-accounts**: Allowed arguments: describe, get-iam-policy, list
-- **identity**: Allowed arguments: groups
+- **identity groups memberships**: Allowed arguments: describe, list
 - **info**: Flags: --anonymize, --help, --run-diagnostics, -h
-- **kms**: Allowed arguments: keys, keyrings, locations
+- **kms autokey-config**: Allowed arguments: describe, list
+- **kms ekm-config**: Allowed arguments: describe, list
+- **kms ekm-connections**: Allowed arguments: describe, list
+- **kms import-jobs**: Allowed arguments: describe, list
+- **kms inventory**: Allowed arguments: describe, list
+- **kms key-handles**: Allowed arguments: describe, list
+- **kms keyrings**: Allowed arguments: describe, list
+- **kms keys versions**: Allowed arguments: describe, list
+- **kms locations**: Allowed arguments: describe, list
+- **kms operations**: Allowed arguments: describe, list
+- **kms retired-resources**: Allowed arguments: describe, list
+- **kms single-tenant-hsm proposal**: Allowed arguments: describe, list
 - **logging logs**: Allowed arguments: describe, list
 - **logging read**: Positional args accepted
-- **memcache**: Allowed arguments: instances, operations, regions
-- **monitoring**: Allowed arguments: channels, dashboards, policies, snoozes
-- **network-management**: Allowed arguments: connectivity-tests, operations
-- **network-services**: Allowed arguments: endpoints, gateways, grpc-routes, http-routes, meshes
-- **notebooks**: Allowed arguments: environments, instances, locations
+- **memcache instances**: Allowed arguments: describe, list
+- **memcache operations**: Allowed arguments: describe, list
+- **memcache regions**: Allowed arguments: describe, list
+- **monitoring dashboards**: Allowed arguments: describe, list
+- **monitoring policies conditions**: Allowed arguments: describe, list
+- **monitoring snoozes**: Allowed arguments: describe, list
+- **monitoring uptime**: Allowed arguments: describe, list
+- **network-management connectivity-tests**: Allowed arguments: describe, list
+- **network-management network-monitoring-providers monitoring-points**: Allowed arguments: describe, list
+- **network-management network-monitoring-providers network-paths**: Allowed arguments: describe, list
+- **network-management network-monitoring-providers web-paths**: Allowed arguments: describe, list
+- **network-management operations**: Allowed arguments: describe, list
+- **network-management vpc-flow-logs-configs**: Allowed arguments: describe, list
+- **network-services agent-gateways**: Allowed arguments: describe, list
+- **network-services endpoint-policies**: Allowed arguments: describe, list
+- **network-services gateways**: Allowed arguments: describe, list
+- **network-services grpc-routes**: Allowed arguments: describe, list
+- **network-services http-routes**: Allowed arguments: describe, list
+- **network-services meshes**: Allowed arguments: describe, list
+- **network-services multicast-consumer-associations**: Allowed arguments: describe, list
+- **network-services multicast-domain-activations**: Allowed arguments: describe, list
+- **network-services multicast-domain-groups**: Allowed arguments: describe, list
+- **network-services multicast-domains**: Allowed arguments: describe, list
+- **network-services multicast-group-consumer-activations**: Allowed arguments: describe, list
+- **network-services multicast-group-producer-activations**: Allowed arguments: describe, list
+- **network-services multicast-group-range-activations**: Allowed arguments: describe, list
+- **network-services multicast-group-ranges**: Allowed arguments: describe, list
+- **network-services multicast-producer-associations**: Allowed arguments: describe, list
+- **network-services operations**: Allowed arguments: describe, list
+- **network-services route-views**: Allowed arguments: describe, list
+- **network-services service-bindings**: Allowed arguments: describe, list
+- **network-services service-lb-policies**: Allowed arguments: describe, list
+- **network-services tcp-routes**: Allowed arguments: describe, list
+- **network-services tls-routes**: Allowed arguments: describe, list
+- **notebooks environments**: Allowed arguments: describe, list
+- **notebooks instances**: Allowed arguments: describe, list
+- **notebooks locations**: Allowed arguments: describe, list
+- **notebooks runtimes**: Allowed arguments: describe, list
 - **organizations**: Allowed arguments: describe, list
 - **policy-intelligence**: Allowed arguments: lint-condition, query-activity, troubleshoot-policy
 - **projects**: Allowed arguments: describe, get-iam-policy, list
-- **pubsub**: Allowed arguments: subscriptions, topics, snapshots, schemas
-- **recaptcha**: Allowed arguments: keys
-- **recommender**: Allowed arguments: insights, recommendations
-- **redis**: Allowed arguments: instances, operations, regions
-- **resource-manager**: Allowed arguments: folders, liens, operations, org-policies
+- **pubsub lite-operations**: Allowed arguments: describe, list
+- **pubsub lite-reservations**: Allowed arguments: describe, list
+- **pubsub lite-subscriptions**: Allowed arguments: describe, list
+- **pubsub lite-topics**: Allowed arguments: describe, list
+- **pubsub message-transforms**: Allowed arguments: describe, list
+- **pubsub schemas**: Allowed arguments: describe, list
+- **pubsub snapshots**: Allowed arguments: describe, list
+- **pubsub subscriptions**: Allowed arguments: describe, list
+- **pubsub topics**: Allowed arguments: describe, list
+- **recaptcha firewall-policies**: Allowed arguments: describe, list
+- **recaptcha keys**: Allowed arguments: describe, list
+- **recommender insight-type-config**: Allowed arguments: describe, list
+- **recommender insights**: Allowed arguments: describe, list
+- **recommender recommendations**: Allowed arguments: describe, list
+- **recommender recommender-config**: Allowed arguments: describe, list
+- **redis acl-policies**: Allowed arguments: describe, list
+- **redis clusters backup-collections**: Allowed arguments: describe, list
+- **redis clusters backups**: Allowed arguments: describe, list
+- **redis instances**: Allowed arguments: describe, list
+- **redis operations**: Allowed arguments: describe, list
+- **redis regions**: Allowed arguments: describe, list
+- **redis zones**: Allowed arguments: describe, list
+- **resource-manager capabilities**: Allowed arguments: describe, list
+- **resource-manager folders**: Allowed arguments: describe, list
+- **resource-manager org-policies**: Allowed arguments: describe, list
+- **resource-manager tags bindings**: Allowed arguments: describe, list
+- **resource-manager tags holds**: Allowed arguments: describe, list
+- **resource-manager tags keys**: Allowed arguments: describe, list
+- **resource-manager tags values**: Allowed arguments: describe, list
 - **run services**: Allowed arguments: describe, list
-- **scc**: Allowed arguments: assets, findings, notifications, operations, sources
-- **scheduler**: Allowed arguments: jobs
+- **scc custom-modules sha**: Allowed arguments: describe, list
+- **scc manage custom-modules etd**: Allowed arguments: describe, list
+- **scc manage custom-modules sha**: Allowed arguments: describe, list
+- **scc manage services**: Allowed arguments: describe, list
+- **scheduler cmek-config**: Allowed arguments: describe, list
+- **scheduler jobs**: Allowed arguments: describe, list
+- **scheduler locations**: Allowed arguments: describe, list
+- **scheduler operations**: Allowed arguments: describe, list
 - **secrets**: Allowed arguments: describe, list
-- **service-directory**: Allowed arguments: endpoints, namespaces, services
+- **service-directory endpoints**: Allowed arguments: describe, list
+- **service-directory locations**: Allowed arguments: describe, list
+- **service-directory namespaces**: Allowed arguments: describe, list
+- **service-directory services**: Allowed arguments: describe, list
 - **services**: Allowed arguments: list
-- **source**: Allowed arguments: repos
-- **spanner**: Allowed arguments: databases, instances, operations
+- **source project-configs**: Allowed arguments: describe, list
+- **source repos**: Allowed arguments: describe, list
+- **spanner backup-schedules**: Allowed arguments: describe, list
+- **spanner backups**: Allowed arguments: describe, list
+- **spanner databases ddl**: Allowed arguments: describe, list
+- **spanner databases roles**: Allowed arguments: describe, list
+- **spanner databases sessions**: Allowed arguments: describe, list
+- **spanner databases splits**: Allowed arguments: describe, list
+- **spanner instance-configs**: Allowed arguments: describe, list
+- **spanner instance-partitions**: Allowed arguments: describe, list
+- **spanner instances**: Allowed arguments: describe, list
+- **spanner operations**: Allowed arguments: describe, list
+- **spanner rows**: Allowed arguments: describe, list
+- **spanner samples**: Allowed arguments: describe, list
 - **sql databases**: Allowed arguments: describe, list
 - **sql instances**: Allowed arguments: describe, list
 - **sql operations**: Allowed arguments: describe, list
-- **storage**: Allowed arguments: buckets, cp, ls, cat, objects
-- **tasks**: Allowed arguments: describe, list, locations, queues
-- **transfer**: Allowed arguments: agents, jobs, operations
+- **storage batch-operations bucket-operations**: Allowed arguments: describe, list
+- **storage batch-operations jobs**: Allowed arguments: describe, list
+- **storage buckets anywhere-caches**: Allowed arguments: describe, list
+- **storage buckets notifications**: Allowed arguments: describe, list
+- **storage folders**: Allowed arguments: describe, list
+- **storage hmac**: Allowed arguments: describe, list
+- **storage insights dataset-configs**: Allowed arguments: describe, list
+- **storage insights inventory-reports details**: Allowed arguments: describe, list
+- **storage intelligence-configs**: Allowed arguments: describe, list
+- **storage intelligence-findings revisions**: Allowed arguments: describe, list
+- **storage managed-folders**: Allowed arguments: describe, list
+- **storage objects**: Allowed arguments: describe, list
+- **storage operations**: Allowed arguments: describe, list
+- **tasks cmek-config**: Allowed arguments: describe, list
+- **tasks locations**: Allowed arguments: describe, list
+- **tasks queues**: Allowed arguments: describe, list
+- **transfer agent-pools**: Allowed arguments: describe, list
+- **transfer agents**: Allowed arguments: describe, list
+- **transfer jobs**: Allowed arguments: describe, list
+- **transfer operations**: Allowed arguments: describe, list
 - **version**: Positional args accepted
-- **vmware**: Allowed arguments: clusters, dns-bind-permission, external-addresses, hcx-activation-keys, locations, networks, node-types, operations, private-clouds, subnets
-- **workflows**: Allowed arguments: describe, executions, list
+- **vmware announcements**: Allowed arguments: describe, list
+- **vmware datastores**: Allowed arguments: describe, list
+- **vmware dns-bind-permission**: Allowed arguments: describe, list
+- **vmware locations**: Allowed arguments: describe, list
+- **vmware network-peerings routes**: Allowed arguments: describe, list
+- **vmware network-policies external-access-rules**: Allowed arguments: describe, list
+- **vmware networks**: Allowed arguments: describe, list
+- **vmware node-types**: Allowed arguments: describe, list
+- **vmware operations**: Allowed arguments: describe, list
+- **vmware private-clouds clusters nodes**: Allowed arguments: describe, list
+- **vmware private-clouds dns-forwarding**: Allowed arguments: describe, list
+- **vmware private-clouds external-addresses**: Allowed arguments: describe, list
+- **vmware private-clouds hcx activationkeys**: Allowed arguments: describe, list
+- **vmware private-clouds logging-servers**: Allowed arguments: describe, list
+- **vmware private-clouds management-dns-zone-bindings**: Allowed arguments: describe, list
+- **vmware private-clouds nsx**: Allowed arguments: describe, list
+- **vmware private-clouds subnets**: Allowed arguments: describe, list
+- **vmware private-clouds upgrades**: Allowed arguments: describe, list
+- **vmware private-clouds vcenter**: Allowed arguments: describe, list
+- **vmware private-connections routes**: Allowed arguments: describe, list
+- **workflows executions**: Allowed arguments: describe, list
 - Allowed standalone flags: --help, -h, --version
 
 ### `hcloud`
