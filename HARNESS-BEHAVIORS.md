@@ -133,6 +133,22 @@ Driven live via the TUI harness in `~/projects/safe-chains-harness-lab` (Gemini 
   ✅ · fail-closed ✅. → gated command policy = **Ask** (escalate via `force_ask`), not Deny: agy has
   human review, so we escalate rather than hard-block. See `src/targets/agy.rs`.
 
+### Claude Code — VERIFIED LIVE, 2026-07 (in a running session)
+
+Previously verified only from the Claude Code hooks docs; now confirmed end-to-end by running the
+installed hook inside a live Claude Code session (this is the harness safe-chains dogfoods on):
+- **Allow envelope works.** An allowlisted command (`cargo test`, `grep`, …) returns
+  `{hookSpecificOutput: {permissionDecision: "allow", permissionDecisionReason}}` and is **auto-approved
+  silently** — no prompt. Observed hundreds of times.
+- **Abstain + context works.** A non-allowlisted command returns `additionalContext` with NO
+  `permissionDecision`; Claude injects the "not auto-approved … This is not a block" text and the
+  command proceeds through the **normal permission flow** (the user's own allowlist / a prompt) —
+  exactly the abstain contract in `src/targets/claude.rs` (allow → `permissionDecision:"allow"`, else
+  `additionalContext` only). `permissionDecision: "deny"`/`"ask"` are supported by the shape but
+  safe-chains never emits them (allowlist-only, human keeps the review).
+- **Capability summary:** grant ✅ (allow) · deny (unused) · human-review-on-silence ✅ (abstain →
+  Claude's own prompt) · additionalContext ✅. Matches `src/targets/claude.rs`.
+
 ## Model-visible context injection (`additionalContext`)
 
 This is what powers the chain-explainer feedback (`cst::explain`). It injects
