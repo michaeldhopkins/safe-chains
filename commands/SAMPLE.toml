@@ -270,6 +270,22 @@
 # first_arg = ["test", "test:*"]         # "test" exact or "test:..." prefix
 # level = "SafeRead"
 
+# CREDENTIAL_FIRST_ARG — the value-dependent credential-read gate. Same glob
+# syntax as first_arg (exact or trailing-* prefix), but a MATCH DENIES the
+# invocation as a credential exposure instead of allowing it. Checked after
+# explicit sub-subs and BEFORE the first_arg allow-glob, and it is flag-aware
+# (skips leading flags to find the real first positional). Use it when a
+# specific resource/key name turns an otherwise-safe read into secret
+# disclosure — while every OTHER value stays a normal read via first_arg.
+# It is the value-dependent complement to `profile = "credential-read"`
+# (which classifies a WHOLE sub). Pairs with first_arg = ["*"] so non-secret
+# values still pass.
+# [[command.sub]]
+# name = "get"                                     # e.g. kubectl get
+# first_arg = ["*"]                                # any resource is a read…
+# credential_first_arg = ["secret", "secret/*"]    # …except the Secret resource
+# level = "SafeRead"
+
 # ─────────────────────────────────────────────────────────────────────
 # REQUIRE ANY — subcommand needs at least one of several flags
 # ─────────────────────────────────────────────────────────────────────

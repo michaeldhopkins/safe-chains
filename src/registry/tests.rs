@@ -2023,11 +2023,15 @@ use super::*;
             "gcloud auth print-identity-token",
             // Azure
             "az keyvault secret show --name x --vault-name v",
-            // Kubernetes (`get secret -o yaml/json` dumps the base64 `data` credential values). NOTE:
-            // the exact `secret`/`secrets` resource is gated; the slash form `get secret/<name>` is a
-            // known residual (see TODO — needs a handler for prefix/name-form matching).
+            // Kubernetes (`get secret -o yaml/json` dumps the base64 `data`). The credential_first_arg
+            // mechanism gates every name form: exact, the slash shorthand, qualified, and flag-first.
             "kubectl get secret db-creds -o yaml",
             "kubectl get secrets",
+            "kubectl get secret/db-creds -o yaml",
+            "kubectl get -o yaml secret db-creds",
+            // AWS stored credentials via the config store (value-dependent on the key)
+            "aws configure get aws_secret_access_key",
+            "aws configure get aws_session_token",
             // Password managers / secret stores (retrieval subs return secret material)
             "bw get password github",
             "bw list items",
@@ -2046,6 +2050,37 @@ use super::*;
              must deny (classify the sub `profile = \"credential-read\"`/`\"credential-mint\"`, or narrow \
              the read-verb glob to exclude the credential action):\n{leaks:#?}",
         );
+    }
+
+    /// The `credential_first_arg` mechanism (dispatch_branching): a first-positional glob classifies
+    /// the invocation as a credential-read (deny) while every other value falls through the allow-glob.
+    /// Guards the value-dependent credential class — every NAME FORM of the secret resource denies
+    /// (exact, plural, slash shorthand, qualified, flag-first), and lookalike/other resources allow.
+    #[test]
+    fn credential_first_arg_gates_every_secret_name_form() {
+        for c in [
+            "kubectl get secret db -o yaml",
+            "kubectl get secrets",
+            "kubectl get secret/db -o yaml",
+            "kubectl get secrets/db",
+            "kubectl get secret.v1.core db",
+            "kubectl get -o yaml secret db",
+            "kubectl get -n prod secret db",
+            "aws configure get aws_secret_access_key",
+            "aws configure get aws_session_token",
+        ] {
+            assert!(!crate::is_safe_command(c), "credential first-arg must deny: {c}");
+        }
+        for c in [
+            "kubectl get pods",
+            "kubectl get mycustomresource",
+            "kubectl get secretstore db", // a CRD whose name merely starts with "secret" — not gated
+            "kubectl get pod my-pod -o yaml",
+            "aws configure get region",
+            "aws configure get output",
+        ] {
+            assert!(crate::is_safe_command(c), "non-credential resource/key must allow: {c}");
+        }
     }
 
     #[test]

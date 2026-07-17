@@ -57,6 +57,8 @@ pub(super) struct TomlCommand {
     #[serde(default)]
     pub first_arg: Vec<String>,
     #[serde(default)]
+    pub credential_first_arg: Vec<String>,
+    #[serde(default)]
     pub wrapper: Option<TomlWrapper>,
     #[serde(default)]
     pub write_flags: Vec<String>,
@@ -469,6 +471,11 @@ pub(super) struct TomlSub {
     pub require_any: Vec<String>,
     #[serde(default)]
     pub first_arg: Vec<String>,
+    /// First-positional globs (`secret`, `secret/*`) that make this sub a CREDENTIAL-READ: matching
+    /// denies, before the allow-glob. The value-dependent complement to `profile=credential-read`
+    /// (whole sub) — `kubectl get secret/x`, `aws configure get aws_secret_access_key`.
+    #[serde(default)]
+    pub credential_first_arg: Vec<String>,
     #[serde(default)]
     pub write_flags: Vec<String>,
     #[serde(default)]
@@ -745,6 +752,9 @@ pub(super) enum DispatchKind {
         pre_valued: Vec<String>,
         first_arg: Vec<String>,
         first_arg_level: SafetyLevel,
+        /// First-positional globs that classify the invocation as a credential-read (deny), checked
+        /// after explicit subs and before the allow-glob. Empty for almost every command.
+        credential_first_arg: Vec<String>,
     },
     WriteFlagged {
         policy: OwnedPolicy,
