@@ -23,10 +23,14 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
     get-secret-value / ecr get-login-password / sts get-session-token / ssm get-parameter
     --with-decryption, gcloud secrets versions access / auth print-*-token, az keyvault secret show, gh
     auth token, doctl auth init, security find-internet-password.
-  - KNOWN GAP (needs a bigger fix, allowlist-only so NOT a deny-secret denylist): `kubectl get secret
-    -o yaml` (and configmap/pod `-o yaml` that surface secret data) still auto-approve. The fix is to
-    give `kubectl get`/`describe` a `first_arg` ALLOWLIST of safe resource types so `secret` falls off —
-    a full kubectl resource re-research (campaign-scope). Tracked; add to the ratchet once gated.
+  - kubectl `get secret`/`get secrets` — GATED (2026-07) via `first_arg = ["*"]` on `get` (glob admits
+    every resource incl. CRDs) plus explicit `secret`/`secrets` sub-subs `profile = "credential-read"`
+    that override the glob. `get pods`/CRDs/flag-first orderings stay read-only. RESIDUALS (need a
+    kubectl handler — sub-sub names match exactly, so declarative can't do prefix/precision): (a) the
+    SLASH form `kubectl get secret/<name> -o yaml` bypasses the exact match (a determined actor; the
+    canonical `get secret <name> -o yaml` IS gated); (b) conservative — gates `get secrets` (name list)
+    too, a minor over-deny; (c) `describe secret` REDACTS values so it stays allowed (correct). A handler
+    would match `secret`-prefixed resources and could scope to value-dumping `-o` forms.
   - Remaining sweep: continue researching secret-store / cloud CLIs (doppler, sops, doctl, azure/gcp
     breadth, k8s) and add each credential read to the ratchet as it is gated.
 - **Over-deny audit follow-ups — RESOLVED (2026-07).**
