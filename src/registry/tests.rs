@@ -2965,6 +2965,57 @@ deny = true
         );
     }
 
+    /// az STRUCTURAL guard — the Azure twin of `gcloud_globs_admit_only_read_verbs`. `az <group>
+    /// <subgroup> <verb>` has the same shape: a glob listing SUBGROUP names auto-approves every verb
+    /// under them. Azure's read verbs are `show`/`list` (+ vetted safe `list-*` variants). A glob token
+    /// outside that set is a subgroup name (→ make it a sub-sub) or a CREDENTIAL verb (`list-keys`,
+    /// `get-credentials` → carve as credential-read). Ratchet: add a genuinely-new safe read to
+    /// READ_VERBS as a vetted decision.
+    #[test]
+    fn az_globs_admit_only_read_verbs() {
+        use super::types::DispatchKind;
+        fn walk(prefix: &str, kind: &DispatchKind, bad: &mut Vec<String>) {
+            const READ_VERBS: &[&str] = &[
+                "show", "list",
+                // vetted safe list-* variants (metadata, not credentials):
+                "list-locations", "list-sizes", "list-ip-addresses", "list-instances", "list-skus",
+                "list-usages", "list-service-tiers", "list-editions", "list-runtimes",
+                "get-instance-view", "list-deleted", "wait",
+                // group-specific reads (no state change), vetted:
+                "query",        // monitor log-analytics query — run a KQL read
+                "name-exists",  // cdn name-exists — name-availability check
+                "logs",         // container logs — read container logs
+            ];
+            let check = |pfx: &str, patterns: &[String], bad: &mut Vec<String>| {
+                for p in patterns {
+                    if !READ_VERBS.contains(&p.as_str()) {
+                        bad.push(format!("{pfx}: `{p}`"));
+                    }
+                }
+            };
+            match kind {
+                DispatchKind::FirstArg { patterns, .. } => check(prefix, patterns, bad),
+                DispatchKind::Branching { subs, first_arg, .. } => {
+                    check(prefix, first_arg, bad);
+                    for s in subs {
+                        walk(&format!("{prefix} {}", s.name), &s.kind, bad);
+                    }
+                }
+                _ => {}
+            }
+        }
+        let Some(spec) = TOML_REGISTRY.get("az") else { return };
+        let mut bad = Vec::new();
+        walk("az", &spec.kind, &mut bad);
+        assert!(
+            bad.is_empty(),
+            "az first_arg globs admit non-read tokens ({} — a subgroup name → make it a sub-sub with a \
+             read-verb glob; a credential verb (list-keys/get-credentials) → carve as credential-read):\n  {}",
+            bad.len(),
+            bad.join("\n  "),
+        );
+    }
+
     #[test]
     fn all_toml_commands_have_description() {
         let mut missing = Vec::new();

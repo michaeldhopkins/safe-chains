@@ -313,7 +313,14 @@
 ### `az`
 <p class="cmd-url"><a href="https://learn.microsoft.com/en-us/cli/azure/">https://learn.microsoft.com/en-us/cli/azure/</a></p>
 
-- **account**: Allowed arguments: list, show, list-locations
+- **account alias**: Allowed arguments: show, list
+- **account lock**: Allowed arguments: show, list
+- **account management-group entities**: Allowed arguments: show, list
+- **account management-group hierarchy-settings**: Allowed arguments: show, list
+- **account management-group subscription**: Allowed arguments: show, list
+- **account management-group tenant-backfill**: Allowed arguments: show, list
+- **account subscription**: Allowed arguments: show, list
+- **account tenant**: Allowed arguments: show, list
 - **acr list**: Positional args accepted
 - **acr repository**: Allowed arguments: list, show
 - **acr show**: Positional args accepted
@@ -321,67 +328,549 @@
 - **ad group**: Allowed arguments: list, show
 - **ad sp**: Allowed arguments: list, show
 - **ad user**: Allowed arguments: list, show
-- **advisor**: Allowed arguments: configuration, recommendation
-- **aks**: Allowed arguments: list, show, get-credentials
-- **appservice**: Allowed arguments: list-locations, plan
-- **batch**: Allowed arguments: account, application, certificate, job, node, pool, task
-- **cdn**: Allowed arguments: custom-domain, edge-node, endpoint, name-exists, origin, profile, waf-policy
-- **cognitiveservices**: Allowed arguments: account, list, usage
-- **consumption**: Allowed arguments: budget, marketplace, pricesheet, reservation, usage
-- **container**: Allowed arguments: list, logs, show
+- **advisor configuration**: Allowed arguments: show, list
+- **advisor recommendation**: Allowed arguments: show, list
+- **aks addon**: Allowed arguments: show, list
+- **aks app**: Allowed arguments: show, list
+- **aks applicationloadbalancer**: Allowed arguments: show, list
+- **aks approuting defaultdomain**: Allowed arguments: show, list
+- **aks approuting gateway istio**: Allowed arguments: show, list
+- **aks approuting zone**: Allowed arguments: show, list
+- **aks check-network**: Allowed arguments: show, list
+- **aks command**: Allowed arguments: show, list
+- **aks connection**: Allowed arguments: show, list
+- **aks draft**: Allowed arguments: show, list
+- **aks egress-endpoints**: Allowed arguments: show, list
+- **aks extension type version**: Allowed arguments: show, list
+- **aks identity-binding**: Allowed arguments: show, list
+- **aks jwtauthenticator**: Allowed arguments: show, list
+- **aks loadbalancer**: Allowed arguments: show, list
+- **aks machine**: Allowed arguments: show, list
+- **aks maintenanceconfiguration**: Allowed arguments: show, list
+- **aks maintenancewindow**: Allowed arguments: show, list
+- **aks mesh upgrade**: Allowed arguments: show, list
+- **aks namespace**: Allowed arguments: show, list
+- **aks nodepool auto-scale**: Allowed arguments: show, list
+- **aks nodepool manual-scale**: Allowed arguments: show, list
+- **aks nodepool snapshot**: Allowed arguments: show, list
+- **aks oidc-issuer**: Allowed arguments: show, list
+- **aks operation**: Allowed arguments: show, list
+- **aks pod-identity exception**: Allowed arguments: show, list
+- **aks prepared-image-specification version**: Allowed arguments: show, list
+- **aks safeguards**: Allowed arguments: show, list
+- **aks snapshot**: Allowed arguments: show, list
+- **aks trustedaccess role**: Allowed arguments: show, list
+- **aks trustedaccess rolebinding**: Allowed arguments: show, list
+- **appservice ase**: Allowed arguments: show, list
+- **appservice domain**: Allowed arguments: show, list
+- **appservice hybrid-connection**: Allowed arguments: show, list
+- **appservice plan identity**: Allowed arguments: show, list
+- **appservice plan managed-instance install-script**: Allowed arguments: show, list
+- **appservice plan managed-instance instance**: Allowed arguments: show, list
+- **appservice plan managed-instance network**: Allowed arguments: show, list
+- **appservice plan managed-instance registry-adapter**: Allowed arguments: show, list
+- **appservice plan managed-instance storage-mount**: Allowed arguments: show, list
+- **appservice vnet-integration**: Allowed arguments: show, list
+- **batch account identity**: Allowed arguments: show, list
+- **batch account network-profile network-rule**: Allowed arguments: show, list
+- **batch application package**: Allowed arguments: show, list
+- **batch application summary**: Allowed arguments: show, list
+- **batch job prep-release-status**: Allowed arguments: show, list
+- **batch job task-counts**: Allowed arguments: show, list
+- **batch job-schedule**: Allowed arguments: show, list
+- **batch location quotas**: Allowed arguments: show, list
+- **batch node file**: Allowed arguments: show, list
+- **batch node remote-login-settings**: Allowed arguments: show, list
+- **batch node scheduling**: Allowed arguments: show, list
+- **batch node service-logs**: Allowed arguments: show, list
+- **batch node user**: Allowed arguments: show, list
+- **batch pool autoscale**: Allowed arguments: show, list
+- **batch pool node-counts**: Allowed arguments: show, list
+- **batch pool supported-images**: Allowed arguments: show, list
+- **batch pool usage-metrics**: Allowed arguments: show, list
+- **batch private-endpoint-connection**: Allowed arguments: show, list
+- **batch private-link-resource**: Allowed arguments: show, list
+- **batch task file**: Allowed arguments: show, list
+- **batch task subtask**: Allowed arguments: show, list
+- **cdn custom-domain**: Allowed arguments: show, list
+- **cdn edge-node**: Allowed arguments: show, list
+- **cdn endpoint rule action**: Allowed arguments: show, list
+- **cdn endpoint rule condition**: Allowed arguments: show, list
+- **cdn origin**: Allowed arguments: show, list
+- **cdn origin-group**: Allowed arguments: show, list
+- **cdn profile deployment-version**: Allowed arguments: show, list
+- **cdn profile-migration**: Allowed arguments: show, list
+- **cognitiveservices account commitment-plan**: Allowed arguments: show, list
+- **cognitiveservices account connection**: Allowed arguments: show, list
+- **cognitiveservices account deployment**: Allowed arguments: show, list
+- **cognitiveservices account identity**: Allowed arguments: show, list
+- **cognitiveservices account managed-compute-deployment**: Allowed arguments: show, list
+- **cognitiveservices account managed-network outbound-rule**: Allowed arguments: show, list
+- **cognitiveservices account network-rule**: Allowed arguments: show, list
+- **cognitiveservices account project connection**: Allowed arguments: show, list
+- **cognitiveservices agent logs**: Allowed arguments: show, list
+- **cognitiveservices commitment-tier**: Allowed arguments: show, list
+- **cognitiveservices model**: Allowed arguments: show, list
+- **cognitiveservices usage**: Allowed arguments: show, list
+- **consumption budget**: Allowed arguments: show, list
+- **consumption marketplace**: Allowed arguments: show, list
+- **consumption pricesheet**: Allowed arguments: show, list
+- **consumption reservation detail**: Allowed arguments: show, list
+- **consumption reservation summary**: Allowed arguments: show, list
+- **consumption usage**: Allowed arguments: show, list
+- **container app**: Allowed arguments: show, list
+- **container container-group-profile**: Allowed arguments: show, list
 - **containerapp**: Allowed arguments: list, show
 - **cosmosdb**: Allowed arguments: list, show
-- **deployment**: Allowed arguments: list, operation, show
+- **deployment group**: Allowed arguments: show, list
+- **deployment mg**: Allowed arguments: show, list
+- **deployment operation group**: Allowed arguments: show, list
+- **deployment operation mg**: Allowed arguments: show, list
+- **deployment operation sub**: Allowed arguments: show, list
+- **deployment operation tenant**: Allowed arguments: show, list
+- **deployment sub**: Allowed arguments: show, list
+- **deployment tenant**: Allowed arguments: show, list
 - **disk**: Allowed arguments: list, show
-- **dns**: Allowed arguments: record-set, zone
-- **eventhubs**: Allowed arguments: eventhub, namespace
+- **dns dnssec-config**: Allowed arguments: show, list
+- **dns record-set a**: Allowed arguments: show, list
+- **dns record-set aaaa**: Allowed arguments: show, list
+- **dns record-set caa**: Allowed arguments: show, list
+- **dns record-set cname**: Allowed arguments: show, list
+- **dns record-set ds**: Allowed arguments: show, list
+- **dns record-set mx**: Allowed arguments: show, list
+- **dns record-set naptr**: Allowed arguments: show, list
+- **dns record-set ns**: Allowed arguments: show, list
+- **dns record-set ptr**: Allowed arguments: show, list
+- **dns record-set soa**: Allowed arguments: show, list
+- **dns record-set srv**: Allowed arguments: show, list
+- **dns record-set tlsa**: Allowed arguments: show, list
+- **dns record-set txt**: Allowed arguments: show, list
+- **dns zone**: Allowed arguments: show, list
+- **eventhubs cluster namespace**: Allowed arguments: show, list
+- **eventhubs eventhub authorization-rule**: Allowed arguments: show, list
+- **eventhubs eventhub consumer-group**: Allowed arguments: show, list
+- **eventhubs georecovery-alias authorization-rule**: Allowed arguments: show, list
+- **eventhubs namespace application-group policy**: Allowed arguments: show, list
+- **eventhubs namespace authorization-rule**: Allowed arguments: show, list
+- **eventhubs namespace encryption**: Allowed arguments: show, list
+- **eventhubs namespace identity**: Allowed arguments: show, list
+- **eventhubs namespace network-rule-set ip-rule**: Allowed arguments: show, list
+- **eventhubs namespace network-rule-set virtual-network-rule**: Allowed arguments: show, list
+- **eventhubs namespace nsp-configuration**: Allowed arguments: show, list
+- **eventhubs namespace private-endpoint-connection**: Allowed arguments: show, list
+- **eventhubs namespace private-link-resource**: Allowed arguments: show, list
+- **eventhubs namespace replica**: Allowed arguments: show, list
+- **eventhubs namespace schema-registry**: Allowed arguments: show, list
 - **feature**: Allowed arguments: list, show
 - **functionapp**: Allowed arguments: list, show
 - **group**: Allowed arguments: list, show
 - **hdinsight**: Allowed arguments: list, show
 - **identity**: Allowed arguments: list, show
-- **iot**: Allowed arguments: central, dps, hub
+- **iot adr ns device**: Allowed arguments: show, list
+- **iot adr ns policy**: Allowed arguments: show, list
+- **iot central app identity**: Allowed arguments: show, list
+- **iot central app private-endpoint-connection**: Allowed arguments: show, list
+- **iot central app private-link-resource**: Allowed arguments: show, list
+- **iot central device attestation**: Allowed arguments: show, list
+- **iot central device c2d-message**: Allowed arguments: show, list
+- **iot central device command**: Allowed arguments: show, list
+- **iot central device edge children**: Allowed arguments: show, list
+- **iot central device edge manifest**: Allowed arguments: show, list
+- **iot central device edge module**: Allowed arguments: show, list
+- **iot central device telemetry**: Allowed arguments: show, list
+- **iot central device twin**: Allowed arguments: show, list
+- **iot central device-group**: Allowed arguments: show, list
+- **iot central device-template**: Allowed arguments: show, list
+- **iot central diagnostics**: Allowed arguments: show, list
+- **iot central enrollment-group**: Allowed arguments: show, list
+- **iot central export destination**: Allowed arguments: show, list
+- **iot central file-upload-config**: Allowed arguments: show, list
+- **iot central job**: Allowed arguments: show, list
+- **iot central organization**: Allowed arguments: show, list
+- **iot central role**: Allowed arguments: show, list
+- **iot central scheduled-job**: Allowed arguments: show, list
+- **iot central user**: Allowed arguments: show, list
+- **iot device c2d-message**: Allowed arguments: show, list
+- **iot device registration**: Allowed arguments: show, list
+- **iot dps certificate**: Allowed arguments: show, list
+- **iot dps enrollment registration**: Allowed arguments: show, list
+- **iot dps enrollment-group registration**: Allowed arguments: show, list
+- **iot dps identity**: Allowed arguments: show, list
+- **iot dps linked-hub**: Allowed arguments: show, list
+- **iot dps policy**: Allowed arguments: show, list
+- **iot du account private-endpoint-connection**: Allowed arguments: show, list
+- **iot du account private-link-resource**: Allowed arguments: show, list
+- **iot du device class**: Allowed arguments: show, list
+- **iot du device compliance**: Allowed arguments: show, list
+- **iot du device deployment**: Allowed arguments: show, list
+- **iot du device group**: Allowed arguments: show, list
+- **iot du device health**: Allowed arguments: show, list
+- **iot du device log**: Allowed arguments: show, list
+- **iot du device module**: Allowed arguments: show, list
+- **iot du instance**: Allowed arguments: show, list
+- **iot du update file**: Allowed arguments: show, list
+- **iot edge deployment**: Allowed arguments: show, list
+- **iot edge devices**: Allowed arguments: show, list
+- **iot hub certificate**: Allowed arguments: show, list
+- **iot hub configuration**: Allowed arguments: show, list
+- **iot hub consumer-group**: Allowed arguments: show, list
+- **iot hub device-identity children**: Allowed arguments: show, list
+- **iot hub device-identity parent**: Allowed arguments: show, list
+- **iot hub device-twin**: Allowed arguments: show, list
+- **iot hub devicestream**: Allowed arguments: show, list
+- **iot hub digital-twin**: Allowed arguments: show, list
+- **iot hub distributed-tracing**: Allowed arguments: show, list
+- **iot hub identity**: Allowed arguments: show, list
+- **iot hub job**: Allowed arguments: show, list
+- **iot hub message-endpoint**: Allowed arguments: show, list
+- **iot hub message-enrichment**: Allowed arguments: show, list
+- **iot hub message-route fallback**: Allowed arguments: show, list
+- **iot hub module-identity**: Allowed arguments: show, list
+- **iot hub module-twin**: Allowed arguments: show, list
+- **iot hub policy**: Allowed arguments: show, list
+- **iot hub state**: Allowed arguments: show, list
+- **iot ops asset dataset point**: Allowed arguments: show, list
+- **iot ops asset endpoint**: Allowed arguments: show, list
+- **iot ops asset event**: Allowed arguments: show, list
+- **iot ops broker authn method**: Allowed arguments: show, list
+- **iot ops broker authz**: Allowed arguments: show, list
+- **iot ops broker listener port**: Allowed arguments: show, list
+- **iot ops broker persist**: Allowed arguments: show, list
+- **iot ops connector opcua client**: Allowed arguments: show, list
+- **iot ops connector opcua issuer**: Allowed arguments: show, list
+- **iot ops connector opcua trust**: Allowed arguments: show, list
+- **iot ops connector template**: Allowed arguments: show, list
+- **iot ops dataflow endpoint**: Allowed arguments: show, list
+- **iot ops dataflow profile**: Allowed arguments: show, list
+- **iot ops dataflowgraph**: Allowed arguments: show, list
+- **iot ops identity**: Allowed arguments: show, list
+- **iot ops mgmt-actions**: Allowed arguments: show, list
+- **iot ops ns asset**: Allowed arguments: show, list
+- **iot ops ns device**: Allowed arguments: show, list
+- **iot ops ns mgmt-endpoint**: Allowed arguments: show, list
+- **iot ops registry**: Allowed arguments: show, list
+- **iot ops schema registry**: Allowed arguments: show, list
+- **iot ops schema version**: Allowed arguments: show, list
+- **iot ops support**: Allowed arguments: show, list
 - **keyvault**: Allowed arguments: list, show
 - **lock**: Allowed arguments: list, show
 - **logicapp**: Allowed arguments: list, show
-- **managed-cassandra**: Allowed arguments: cluster, datacenter
-- **maps**: Allowed arguments: account
-- **mariadb**: Allowed arguments: db, server
+- **managed-cassandra cluster backup**: Allowed arguments: show, list
+- **managed-cassandra datacenter**: Allowed arguments: show, list
+- **maps account**: Allowed arguments: show, list
+- **maps map**: Allowed arguments: show, list
+- **mariadb db**: Allowed arguments: show, list
+- **mariadb server configuration**: Allowed arguments: show, list
+- **mariadb server firewall-rule**: Allowed arguments: show, list
+- **mariadb server private-endpoint-connection**: Allowed arguments: show, list
+- **mariadb server private-link-resource**: Allowed arguments: show, list
+- **mariadb server replica**: Allowed arguments: show, list
+- **mariadb server vnet-rule**: Allowed arguments: show, list
+- **mariadb server-logs**: Allowed arguments: show, list
 - **monitor log-analytics**: Allowed arguments: query
 - **monitor metrics**: Allowed arguments: list
-- **mysql**: Allowed arguments: db, flexible-server, server
-- **netappfiles**: Allowed arguments: account, pool, snapshot, volume
+- **mysql db**: Allowed arguments: show, list
+- **mysql flexible-server ad-admin**: Allowed arguments: show, list
+- **mysql flexible-server advanced-threat-protection-setting**: Allowed arguments: show, list
+- **mysql flexible-server backup**: Allowed arguments: show, list
+- **mysql flexible-server db**: Allowed arguments: show, list
+- **mysql flexible-server firewall-rule**: Allowed arguments: show, list
+- **mysql flexible-server gtid**: Allowed arguments: show, list
+- **mysql flexible-server identity**: Allowed arguments: show, list
+- **mysql flexible-server maintenance**: Allowed arguments: show, list
+- **mysql flexible-server parameter**: Allowed arguments: show, list
+- **mysql flexible-server replica**: Allowed arguments: show, list
+- **mysql flexible-server server-logs**: Allowed arguments: show, list
+- **mysql server ad-admin**: Allowed arguments: show, list
+- **mysql server configuration**: Allowed arguments: show, list
+- **mysql server firewall-rule**: Allowed arguments: show, list
+- **mysql server private-endpoint-connection**: Allowed arguments: show, list
+- **mysql server private-link-resource**: Allowed arguments: show, list
+- **mysql server replica**: Allowed arguments: show, list
+- **mysql server vnet-rule**: Allowed arguments: show, list
+- **mysql server-logs**: Allowed arguments: show, list
+- **netappfiles account ad**: Allowed arguments: show, list
+- **netappfiles account backup-policy**: Allowed arguments: show, list
+- **netappfiles account backup-vault backup**: Allowed arguments: show, list
+- **netappfiles account identity**: Allowed arguments: show, list
+- **netappfiles account quota-limit**: Allowed arguments: show, list
+- **netappfiles cache**: Allowed arguments: show, list
+- **netappfiles pool**: Allowed arguments: show, list
+- **netappfiles quota-limit**: Allowed arguments: show, list
+- **netappfiles resource region-info default**: Allowed arguments: show, list
+- **netappfiles snapshot policy**: Allowed arguments: show, list
+- **netappfiles subvolume metadata**: Allowed arguments: show, list
+- **netappfiles usage**: Allowed arguments: show, list
+- **netappfiles volume bucket**: Allowed arguments: show, list
+- **netappfiles volume export-policy**: Allowed arguments: show, list
+- **netappfiles volume latest-backup-status current**: Allowed arguments: show, list
+- **netappfiles volume latest-restore-status current**: Allowed arguments: show, list
+- **netappfiles volume quota-rule**: Allowed arguments: show, list
+- **netappfiles volume ransomware-report**: Allowed arguments: show, list
+- **netappfiles volume replication**: Allowed arguments: show, list
+- **netappfiles volume-group**: Allowed arguments: show, list
 - **network nic**: Allowed arguments: list, show
 - **network nsg**: Allowed arguments: list, show
 - **network public-ip**: Allowed arguments: list, show
 - **network vnet**: Allowed arguments: list, show
-- **notification-hub**: Allowed arguments: authorization-rule, credential, list, namespace
-- **policy**: Allowed arguments: assignment, definition, set-definition, state
-- **postgres**: Allowed arguments: db, flexible-server, server
-- **provider**: Allowed arguments: list, operation, show
-- **redis**: Allowed arguments: list, list-keys, show
-- **relay**: Allowed arguments: hyco, namespace, wcfrelay
+- **notification-hub authorization-rule**: Allowed arguments: show, list
+- **notification-hub namespace authorization-rule**: Allowed arguments: show, list
+- **policy assignment identity**: Allowed arguments: show, list
+- **policy assignment non-compliance-message**: Allowed arguments: show, list
+- **policy attestation**: Allowed arguments: show, list
+- **policy definition version**: Allowed arguments: show, list
+- **policy enrollment**: Allowed arguments: show, list
+- **policy event**: Allowed arguments: show, list
+- **policy exemption**: Allowed arguments: show, list
+- **policy metadata**: Allowed arguments: show, list
+- **policy remediation deployment**: Allowed arguments: show, list
+- **policy set-definition version**: Allowed arguments: show, list
+- **policy state**: Allowed arguments: show, list
+- **postgres flexible-server advanced-threat-protection-setting**: Allowed arguments: show, list
+- **postgres flexible-server autonomous-tuning**: Allowed arguments: show, list
+- **postgres flexible-server backup**: Allowed arguments: show, list
+- **postgres flexible-server db**: Allowed arguments: show, list
+- **postgres flexible-server fabric-mirroring**: Allowed arguments: show, list
+- **postgres flexible-server firewall-rule**: Allowed arguments: show, list
+- **postgres flexible-server identity**: Allowed arguments: show, list
+- **postgres flexible-server maintenance-event**: Allowed arguments: show, list
+- **postgres flexible-server microsoft-entra-admin**: Allowed arguments: show, list
+- **postgres flexible-server migration**: Allowed arguments: show, list
+- **postgres flexible-server parameter**: Allowed arguments: show, list
+- **postgres flexible-server private-endpoint-connection**: Allowed arguments: show, list
+- **postgres flexible-server private-link-resource**: Allowed arguments: show, list
+- **postgres flexible-server replica**: Allowed arguments: show, list
+- **postgres flexible-server server-logs**: Allowed arguments: show, list
+- **postgres flexible-server virtual-endpoint**: Allowed arguments: show, list
+- **provider operation**: Allowed arguments: show, list
+- **provider permission**: Allowed arguments: show, list
+- **redis access-policy**: Allowed arguments: show, list
+- **redis access-policy-assignment**: Allowed arguments: show, list
+- **redis firewall-rules**: Allowed arguments: show, list
+- **redis identity**: Allowed arguments: show, list
+- **redis patch-schedule**: Allowed arguments: show, list
+- **redis server-link**: Allowed arguments: show, list
+- **relay hyco authorization-rule**: Allowed arguments: show, list
+- **relay namespace authorization-rule**: Allowed arguments: show, list
+- **relay wcfrelay authorization-rule**: Allowed arguments: show, list
 - **resource**: Allowed arguments: list, show
-- **role**: Allowed arguments: assignment, definition
-- **search**: Allowed arguments: admin-key, query-key, service
-- **security**: Allowed arguments: alert, assessment, contact, pricing, secure-score, setting, task
-- **servicebus**: Allowed arguments: namespace, queue, topic
-- **sf**: Allowed arguments: application, cluster, managed-application-type, managed-cluster, service
-- **sig**: Allowed arguments: image-definition, image-version, list, show
+- **role assignment**: Allowed arguments: show, list
+- **role definition**: Allowed arguments: show, list
+- **role deny-assignment**: Allowed arguments: show, list
+- **search offering**: Allowed arguments: show, list
+- **search private-endpoint-connection**: Allowed arguments: show, list
+- **search private-link-resource**: Allowed arguments: show, list
+- **search service network-security-perimeter-configuration**: Allowed arguments: show, list
+- **search service private-endpoint-connection**: Allowed arguments: show, list
+- **search service private-link-resource**: Allowed arguments: show, list
+- **search service shared-private-link-resource**: Allowed arguments: show, list
+- **search shared-private-link-resource**: Allowed arguments: show, list
+- **search usage**: Allowed arguments: show, list
+- **security adaptive-application-controls**: Allowed arguments: show, list
+- **security adaptive_network_hardenings**: Allowed arguments: show, list
+- **security alert**: Allowed arguments: show, list
+- **security alerts-suppression-rule**: Allowed arguments: show, list
+- **security allowed_connections**: Allowed arguments: show, list
+- **security api-collection apim**: Allowed arguments: show, list
+- **security assessment**: Allowed arguments: show, list
+- **security assessment-metadata**: Allowed arguments: show, list
+- **security atp cosmosdb**: Allowed arguments: show, list
+- **security atp storage**: Allowed arguments: show, list
+- **security auto-provisioning-setting**: Allowed arguments: show, list
+- **security automation**: Allowed arguments: show, list
+- **security automation-action-event-hub**: Allowed arguments: show, list
+- **security automation-action-logic-app**: Allowed arguments: show, list
+- **security automation-action-workspace**: Allowed arguments: show, list
+- **security automation-rule**: Allowed arguments: show, list
+- **security automation-rule-set**: Allowed arguments: show, list
+- **security automation-scope**: Allowed arguments: show, list
+- **security automation-source**: Allowed arguments: show, list
+- **security contact**: Allowed arguments: show, list
+- **security discovered-security-solution**: Allowed arguments: show, list
+- **security external-security-solution**: Allowed arguments: show, list
+- **security iot-alerts**: Allowed arguments: show, list
+- **security iot-analytics**: Allowed arguments: show, list
+- **security iot-recommendations**: Allowed arguments: show, list
+- **security iot-solution**: Allowed arguments: show, list
+- **security jit-policy**: Allowed arguments: show, list
+- **security location**: Allowed arguments: show, list
+- **security pricing**: Allowed arguments: show, list
+- **security regulatory-compliance-assessments**: Allowed arguments: show, list
+- **security regulatory-compliance-controls**: Allowed arguments: show, list
+- **security regulatory-compliance-standards**: Allowed arguments: show, list
+- **security secure-score-control-definitions**: Allowed arguments: show, list
+- **security secure-score-controls**: Allowed arguments: show, list
+- **security secure-scores**: Allowed arguments: show, list
+- **security security-connector devops azuredevopsorg project repo**: Allowed arguments: show, list
+- **security security-connector devops githubowner repo**: Allowed arguments: show, list
+- **security security-connector devops gitlabgroup project**: Allowed arguments: show, list
+- **security security-solutions**: Allowed arguments: show, list
+- **security security-solutions-reference-data**: Allowed arguments: show, list
+- **security setting**: Allowed arguments: show, list
+- **security sub-assessment**: Allowed arguments: show, list
+- **security task**: Allowed arguments: show, list
+- **security topology**: Allowed arguments: show, list
+- **security va sql baseline**: Allowed arguments: show, list
+- **security va sql results**: Allowed arguments: show, list
+- **security va sql scans scan-operation-result**: Allowed arguments: show, list
+- **security workspace-setting**: Allowed arguments: show, list
+- **servicebus georecovery-alias authorization-rule**: Allowed arguments: show, list
+- **servicebus migration**: Allowed arguments: show, list
+- **servicebus namespace authorization-rule**: Allowed arguments: show, list
+- **servicebus namespace encryption**: Allowed arguments: show, list
+- **servicebus namespace identity**: Allowed arguments: show, list
+- **servicebus namespace network-rule-set ip-rule**: Allowed arguments: show, list
+- **servicebus namespace network-rule-set virtual-network-rule**: Allowed arguments: show, list
+- **servicebus namespace private-endpoint-connection**: Allowed arguments: show, list
+- **servicebus namespace private-link-resource**: Allowed arguments: show, list
+- **servicebus namespace replica**: Allowed arguments: show, list
+- **servicebus queue authorization-rule**: Allowed arguments: show, list
+- **servicebus topic authorization-rule**: Allowed arguments: show, list
+- **servicebus topic subscription rule**: Allowed arguments: show, list
+- **sf application certificate**: Allowed arguments: show, list
+- **sf application-type version**: Allowed arguments: show, list
+- **sf cluster client-certificate**: Allowed arguments: show, list
+- **sf cluster durability**: Allowed arguments: show, list
+- **sf cluster node**: Allowed arguments: show, list
+- **sf cluster node-type**: Allowed arguments: show, list
+- **sf cluster reliability**: Allowed arguments: show, list
+- **sf cluster setting**: Allowed arguments: show, list
+- **sf cluster upgrade-type**: Allowed arguments: show, list
+- **sf managed-application**: Allowed arguments: show, list
+- **sf managed-application-type version**: Allowed arguments: show, list
+- **sf managed-cluster client-certificate**: Allowed arguments: show, list
+- **sf managed-cluster network-security-rule**: Allowed arguments: show, list
+- **sf managed-node-type node**: Allowed arguments: show, list
+- **sf managed-node-type vm-extension**: Allowed arguments: show, list
+- **sf managed-service correlation-scheme**: Allowed arguments: show, list
+- **sf managed-service load-metrics**: Allowed arguments: show, list
+- **sf service**: Allowed arguments: show, list
+- **sig gallery-application version**: Allowed arguments: show, list
+- **sig identity**: Allowed arguments: show, list
+- **sig image-definition**: Allowed arguments: show, list
+- **sig image-version**: Allowed arguments: show, list
+- **sig in-vm-access-control-profile**: Allowed arguments: show, list
+- **sig in-vm-access-control-profile-version**: Allowed arguments: show, list
+- **sig share**: Allowed arguments: show, list
 - **signalr**: Allowed arguments: list, show
-- **spring**: Allowed arguments: app, certificate, config-server, eureka-server, service-registry
+- **spring api-portal custom-domain**: Allowed arguments: show, list
+- **spring apm**: Allowed arguments: show, list
+- **spring app custom-domain**: Allowed arguments: show, list
+- **spring app deployment**: Allowed arguments: show, list
+- **spring app identity**: Allowed arguments: show, list
+- **spring app-insights**: Allowed arguments: show, list
+- **spring application-accelerator customized-accelerator**: Allowed arguments: show, list
+- **spring application-accelerator predefined-accelerator**: Allowed arguments: show, list
+- **spring application-configuration-service config**: Allowed arguments: show, list
+- **spring application-configuration-service git repo**: Allowed arguments: show, list
+- **spring application-live-view**: Allowed arguments: show, list
+- **spring build-service build result**: Allowed arguments: show, list
+- **spring build-service builder buildpack-binding**: Allowed arguments: show, list
+- **spring certificate**: Allowed arguments: show, list
+- **spring component instance**: Allowed arguments: show, list
+- **spring config-server git repo**: Allowed arguments: show, list
+- **spring connection**: Allowed arguments: show, list
+- **spring container-registry**: Allowed arguments: show, list
+- **spring dev-tool**: Allowed arguments: show, list
+- **spring eureka-server**: Allowed arguments: show, list
+- **spring gateway custom-domain**: Allowed arguments: show, list
+- **spring gateway route-config**: Allowed arguments: show, list
+- **spring job execution instance**: Allowed arguments: show, list
+- **spring private-dns-zone**: Allowed arguments: show, list
+- **spring service-registry**: Allowed arguments: show, list
+- **spring storage**: Allowed arguments: show, list
+- **spring test-endpoint**: Allowed arguments: show, list
 - **sql db**: Allowed arguments: list, show
 - **sql server**: Allowed arguments: list, show
 - **staticwebapp**: Allowed arguments: list, show
 - **storage account**: Allowed arguments: list, show
-- **synapse**: Allowed arguments: spark, sql, workspace
+- **synapse activity-run**: Allowed arguments: show, list
+- **synapse ad-only-auth**: Allowed arguments: show, list
+- **synapse data-flow**: Allowed arguments: show, list
+- **synapse dataset**: Allowed arguments: show, list
+- **synapse integration-runtime managed**: Allowed arguments: show, list
+- **synapse integration-runtime self-hosted**: Allowed arguments: show, list
+- **synapse integration-runtime-node**: Allowed arguments: show, list
+- **synapse kql-script**: Allowed arguments: show, list
+- **synapse kusto attached-database-configuration**: Allowed arguments: show, list
+- **synapse kusto data-connection event-grid**: Allowed arguments: show, list
+- **synapse kusto data-connection event-hub**: Allowed arguments: show, list
+- **synapse kusto data-connection iot-hub**: Allowed arguments: show, list
+- **synapse kusto database**: Allowed arguments: show, list
+- **synapse kusto database-principal-assignment**: Allowed arguments: show, list
+- **synapse kusto pool**: Allowed arguments: show, list
+- **synapse kusto pool-principal-assignment**: Allowed arguments: show, list
+- **synapse kusto-operation**: Allowed arguments: show, list
+- **synapse link-connection**: Allowed arguments: show, list
+- **synapse linked-service**: Allowed arguments: show, list
+- **synapse managed-private-endpoints**: Allowed arguments: show, list
+- **synapse notebook**: Allowed arguments: show, list
+- **synapse pipeline**: Allowed arguments: show, list
+- **synapse pipeline-run**: Allowed arguments: show, list
+- **synapse role assignment**: Allowed arguments: show, list
+- **synapse role definition**: Allowed arguments: show, list
+- **synapse role scope**: Allowed arguments: show, list
+- **synapse spark job**: Allowed arguments: show, list
+- **synapse spark pool**: Allowed arguments: show, list
+- **synapse spark session**: Allowed arguments: show, list
+- **synapse spark statement**: Allowed arguments: show, list
+- **synapse spark-job-definition**: Allowed arguments: show, list
+- **synapse sql ad-admin**: Allowed arguments: show, list
+- **synapse sql audit-policy**: Allowed arguments: show, list
+- **synapse sql pool audit-policy**: Allowed arguments: show, list
+- **synapse sql pool classification recommendation**: Allowed arguments: show, list
+- **synapse sql pool tde**: Allowed arguments: show, list
+- **synapse sql pool threat-policy**: Allowed arguments: show, list
+- **synapse sql-script**: Allowed arguments: show, list
+- **synapse trigger**: Allowed arguments: show, list
+- **synapse trigger-run**: Allowed arguments: show, list
+- **synapse workspace firewall-rule**: Allowed arguments: show, list
+- **synapse workspace managed-identity**: Allowed arguments: show, list
+- **synapse workspace-package**: Allowed arguments: show, list
 - **tag**: Allowed arguments: list
 - **ts**: Allowed arguments: list, show
 - **version**: Positional args accepted
-- **vm**: Allowed arguments: list, show, list-sizes, list-ip-addresses
-- **vmss**: Allowed arguments: list, list-instances, show
+- **vm aem**: Allowed arguments: show, list
+- **vm application**: Allowed arguments: show, list
+- **vm availability-set**: Allowed arguments: show, list
+- **vm boot-diagnostics**: Allowed arguments: show, list
+- **vm diagnostics**: Allowed arguments: show, list
+- **vm disk**: Allowed arguments: show, list
+- **vm encryption**: Allowed arguments: show, list
+- **vm extension image**: Allowed arguments: show, list
+- **vm host group**: Allowed arguments: show, list
+- **vm identity**: Allowed arguments: show, list
+- **vm image terms**: Allowed arguments: show, list
+- **vm monitor log**: Allowed arguments: show, list
+- **vm monitor metrics**: Allowed arguments: show, list
+- **vm nic**: Allowed arguments: show, list
+- **vm repair**: Allowed arguments: show, list
+- **vm run-command**: Allowed arguments: show, list
+- **vm unmanaged-disk**: Allowed arguments: show, list
+- **vm user**: Allowed arguments: show, list
+- **vmss application**: Allowed arguments: show, list
+- **vmss diagnostics**: Allowed arguments: show, list
+- **vmss disk**: Allowed arguments: show, list
+- **vmss encryption**: Allowed arguments: show, list
+- **vmss extension image**: Allowed arguments: show, list
+- **vmss identity**: Allowed arguments: show, list
+- **vmss nic**: Allowed arguments: show, list
+- **vmss rolling-upgrade**: Allowed arguments: show, list
+- **vmss run-command**: Allowed arguments: show, list
 - **webapp**: Allowed arguments: list, show
 - Allowed standalone flags: --help, -h, --version
+
+**Examples:**
+
+- `az mysql server show --name n --resource-group g`
+- `az servicebus namespace list`
+- `az batch pool show --pool-id p`
+- `az container logs --name n --resource-group g`
+- `az cdn name-exists --name n`
+- `az search service show --name n --resource-group g`
+- `az vm nic list --vm-name v --resource-group g`
+- `az batch node list --pool-id p`
+- `az eventhubs namespace authorization-rule list --namespace-name n --resource-group g`
 
 ### `doctl`
 <p class="cmd-url"><a href="https://docs.digitalocean.com/reference/doctl/">https://docs.digitalocean.com/reference/doctl/</a></p>
