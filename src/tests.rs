@@ -1879,3 +1879,33 @@ fn operand_injection_propagates_source_locus() {
     assert!(check("find . -name x -exec cat {} ;"), "find . -exec binds {{}} to worktree");
     assert!(!check("cat $(echo /etc/shadow)"), "$() operand is worst-cased");
 }
+
+#[test]
+fn level_ceiling_maps_names_to_ceiling_and_engine_level() {
+    use crate::verdict::SafetyLevel;
+    let ceiling = |n: &str| level_ceiling(n).map(|(c, l)| (c, l.is_some()));
+    // pure-ceiling lower band: no engine level, the `<= threshold` gate does the tightening.
+    assert_eq!(ceiling("paranoid"), Some((SafetyLevel::Inert, false)));
+    assert_eq!(ceiling("reader"), Some((SafetyLevel::SafeRead, false)));
+    // editor/developer stay collapsed to the SafeWrite band (no engine level) — documented.
+    assert_eq!(ceiling("editor"), Some((SafetyLevel::SafeWrite, false)));
+    assert_eq!(ceiling("developer"), Some((SafetyLevel::SafeWrite, false)));
+    // the UPPER band classifies via `admits` — carries an engine level, shared SafeWrite ceiling.
+    assert_eq!(ceiling("network-admin"), Some((SafetyLevel::SafeWrite, true)));
+    assert_eq!(ceiling("yolo"), Some((SafetyLevel::SafeWrite, true)));
+    // legacy alias canonicalizes.
+    assert_eq!(ceiling("safe-read"), Some((SafetyLevel::SafeRead, false)));
+    // unknown → None (the caller fails safe to the default band).
+    assert_eq!(ceiling("banana"), None);
+}
+
+#[test]
+fn command_verdict_ceilinged_gates_by_threshold() {
+    use crate::verdict::{SafetyLevel, Verdict};
+    // A read is SafeRead: admitted at the reader ceiling, refused at paranoid (inert-only).
+    assert!(matches!(command_verdict_ceilinged("cat README.md", SafetyLevel::SafeRead, None), Verdict::Allowed(_)));
+    assert_eq!(command_verdict_ceilinged("cat README.md", SafetyLevel::Inert, None), Verdict::Denied);
+    // A worktree write projects to SafeWrite: refused at the reader ceiling, admitted at developer.
+    assert_eq!(command_verdict_ceilinged("touch newfile", SafetyLevel::SafeRead, None), Verdict::Denied);
+    assert!(matches!(command_verdict_ceilinged("touch newfile", SafetyLevel::SafeWrite, None), Verdict::Allowed(_)));
+}

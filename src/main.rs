@@ -24,20 +24,10 @@ fn print_opencode_config() {
 fn run_cli(
     command: &str,
     threshold: SafetyLevel,
-    upper_level: Option<&'static safe_chains::engine::level::Level>,
+    engine_level: Option<&'static safe_chains::engine::level::Level>,
 ) {
-    // Upper-band levels (local-admin/network-admin/yolo) have no 3-value ceiling, so they classify
-    // per-level via `admits`; the lower band keeps the existing projection. Both funnel into the
-    // same `<= threshold` gate (upper levels share the `SafeWrite` ceiling).
-    let verdict = match upper_level {
-        Some(level) => safe_chains::command_verdict_at_level(command, level),
-        None => safe_chains::command_verdict(command),
-    };
-    let ok = match verdict {
-        Verdict::Allowed(level) => level <= threshold,
-        Verdict::Denied => false,
-    };
-    process::exit(i32::from(!ok));
+    let verdict = safe_chains::command_verdict_ceilinged(command, threshold, engine_level);
+    process::exit(i32::from(!verdict.is_allowed()));
 }
 
 fn run_explain(command: &str) -> ! {
@@ -143,25 +133,30 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
         root: input.root.clone().or_else(|| input.cwd.clone()),
     });
     // The auto-approve ceiling comes from the write-protected user config (`~/.config/safe-chains.toml`,
-    // `level = "…"`). Absent → the default band (developer/SafeWrite). A configured level runs the real
-    // engine rule via `admits`, so an UPPER level (network-admin) makes git push / bulk-object-read
-    // reachable, and a LOWER level (editor/reader) tightens below the default — distinctions the coarse
-    // 3-band projection can't express. The pathctx (cwd/root) is already installed above.
-    let verdict = match safe_chains::configured_hook_level() {
-        Some(level) => safe_chains::command_verdict_at_level(&input.command, level),
-        None => safe_chains::command_verdict(&input.command),
-    };
+    // `level = "…"`). Absent → the default developer band. An UPPER level (network-admin) RAISES it —
+    // git push / bulk-object-read become reachable; a LOWER level (reader/editor) TIGHTENS it — a read-
+    // only or no-destroy plan, gating writes the default would allow. Both funnel through the same
+    // `<= threshold` gate as the CLI's `--level`. The pathctx (cwd/root) is already installed above.
+    let (threshold, engine_level) = safe_chains::configured_hook_ceiling();
+    let verdict = safe_chains::command_verdict_ceilinged(&input.command, threshold, engine_level);
     if verdict.is_allowed() {
         let response = format.render_response(verdict);
         let _ = io::stdout().write_all(response.stdout.as_bytes());
         process::exit(response.exit_code);
     }
 
+    // Coverage fallback: the built-in/pattern classifier (also honoring the user's own
+    // `~/.claude/settings.json` `permissions.allow` grants). It carries the command's REAL safety
+    // level in `overall`, which must be held under the SAME ceiling — else a lower `level` (reader)
+    // would be undone here, the write it just gated re-admitted. Gate `overall <= threshold`: at the
+    // default band this is a no-op (coverage is `<= SafeWrite`), and a raised ceiling only loosens.
     let patterns = safe_chains::allowlist::Matcher::load();
     let explanation = safe_chains::cst::explain_with_coverage(&input.command, &patterns);
 
-    if explanation.is_allowed() {
-        let response = format.render_response(Verdict::Allowed(SafetyLevel::Inert));
+    if let Verdict::Allowed(level) = explanation.overall
+        && level <= threshold
+    {
+        let response = format.render_response(Verdict::Allowed(level));
         let _ = io::stdout().write_all(response.stdout.as_bytes());
         process::exit(response.exit_code);
     }
@@ -279,32 +274,30 @@ fn main() {
                 if cli.explain {
                     run_explain(&command);
                 }
-                let (threshold, upper_level) = match cli.level.as_deref() {
+                let (threshold, engine_level) = match cli.level.as_deref() {
                     None => (SafetyLevel::SafeWrite, None), // default: developer
-                    Some(name) => match SafetyLevel::resolve_threshold(name) {
-                        Some((ceiling, legacy_of)) => {
-                            if let Some(current) = legacy_of {
-                                eprintln!(
-                                    "note: '--level {name}' is a legacy level name — mapping to \
-                                     '{current}'. Current levels: paranoid, reader, editor, \
-                                     developer, local-admin, network-admin, yolo."
-                                );
-                            }
-                            // A legacy alias maps to its current name before the upper-band lookup.
-                            let canonical = legacy_of.unwrap_or(name);
-                            (ceiling, safe_chains::upper_level_by_name(canonical))
-                        }
-                        None => {
+                    Some(name) => {
+                        if let Some((_, Some(current))) = SafetyLevel::resolve_threshold(name) {
                             eprintln!(
-                                "Error: unknown --level '{name}'. Levels: paranoid, reader, editor, \
-                                 developer, local-admin, network-admin, yolo (legacy: inert, \
-                                 safe-read, safe-write)."
+                                "note: '--level {name}' is a legacy level name — mapping to \
+                                 '{current}'. Current levels: paranoid, reader, editor, \
+                                 developer, local-admin, network-admin, yolo."
                             );
-                            process::exit(2);
                         }
-                    },
+                        match safe_chains::level_ceiling(name) {
+                            Some(pair) => pair,
+                            None => {
+                                eprintln!(
+                                    "Error: unknown --level '{name}'. Levels: paranoid, reader, editor, \
+                                     developer, local-admin, network-admin, yolo (legacy: inert, \
+                                     safe-read, safe-write)."
+                                );
+                                process::exit(2);
+                            }
+                        }
+                    }
                 };
-                run_cli(&command, threshold, upper_level);
+                run_cli(&command, threshold, engine_level);
             } else if io::stdin().is_terminal() {
                 Cli::command().print_help().ok();
                 println!();

@@ -101,22 +101,57 @@ pub fn upper_level_by_name(name: &str) -> Option<&'static engine::level::Level> 
     engine::authoring::default_levels().iter().find(|l| l.name == name)
 }
 
-/// The RAISED auto-approve ceiling the hook should evaluate at, from the write-protected user config
-/// (`~/.config/safe-chains.toml`, `level = "network-admin"`). Only UPPER levels
-/// (`local-admin`/`network-admin`/`yolo`) are honored — they RAISE the ceiling above the default
-/// `developer` band, activating the engine's above-the-line model (git push, bulk-object-read, sudo).
-/// `None` (no config, the default `developer`, a LOWER level, or an unknown name) → the caller uses
-/// the default-band `command_verdict`. LOWERING the ceiling below developer (a stricter `reader`/
-/// `editor` plan) is deferred: it needs the hook's legacy-coverage fallback gated too (see TODO.md).
-/// The config file is write-denied and un-grantable, so an agent cannot raise its own ceiling.
-pub fn configured_hook_level() -> Option<&'static engine::level::Level> {
-    let name = registry::user_config_level()?;
-    // Accept a legacy alias (`safe-write` → `developer`) by canonicalizing first; a real level name
-    // passes through unchanged, and anything unrecognized resolves to `None` below (fail-safe).
-    let canonical = verdict::SafetyLevel::resolve_threshold(&name)
-        .and_then(|(_, legacy_of)| legacy_of)
-        .unwrap_or(name.as_str());
-    upper_level_by_name(canonical)
+/// Resolve a level NAME to its `(3-band ceiling, engine level for admits)`, or `None` for an unknown
+/// name. The ceiling gates the projected verdict; the engine level (when present) classifies per-level
+/// via `admits`, exposing distinctions the 3-band projection flattens — `editor` (no destroy, no
+/// sibling write) vs `developer`, and the upper band (git push, bulk-object-read, sudo). `paranoid`/
+/// `reader` are pure ceilings (their read/inert bands need no `admits`), and `developer` IS the default
+/// band, so those carry no engine level. Legacy aliases (`safe-write`) canonicalize first.
+pub fn level_ceiling(name: &str) -> Option<(SafetyLevel, Option<&'static engine::level::Level>)> {
+    let (ceiling, legacy_of) = verdict::SafetyLevel::resolve_threshold(name)?;
+    let canonical = legacy_of.unwrap_or(name);
+    // The UPPER band classifies per-level via `admits` (git push, bulk-object-read, sudo — above the
+    // 3-band). `paranoid`/`reader` are pure ceilings (their inert/read bands need no `admits`, and the
+    // `<= threshold` gate does the tightening). `editor`/`developer` also stay on the 3-band: editor's
+    // finer rule (no destroy, no sibling write) is real in the engine but not yet expressible through
+    // the coverage fallback, so it would only half-apply — kept collapsed to developer for consistency.
+    let engine_level = match canonical {
+        "local-admin" | "network-admin" | "yolo" => {
+            engine::authoring::default_levels().iter().find(|l| l.name == canonical)
+        }
+        _ => None,
+    };
+    Some((ceiling, engine_level))
+}
+
+/// The ceilinged verdict: classify `command` at `(threshold, engine_level)`, gating the projected
+/// level `<= threshold`. The single seam both the CLI (`--level`) and the hook (configured `level`)
+/// funnel through. `engine_level = Some` classifies via `Level::admits` (the fine per-level model);
+/// `None` uses the 3-band projection. Either way the result is gated to `threshold`, so a legacy leaf
+/// that bypasses the engine (a redirect write → `SafeWrite`) is still held under a lower ceiling.
+pub fn command_verdict_ceilinged(
+    command: &str,
+    threshold: SafetyLevel,
+    engine_level: Option<&'static engine::level::Level>,
+) -> Verdict {
+    let verdict = match engine_level {
+        Some(level) => command_verdict_at_level(command, level),
+        None => command_verdict(command),
+    };
+    match verdict {
+        Verdict::Allowed(level) if level <= threshold => Verdict::Allowed(level),
+        _ => Verdict::Denied,
+    }
+}
+
+/// The auto-approve ceiling the HOOK evaluates at, from the write-protected user config
+/// (`~/.config/safe-chains.toml`, `level = "…"`). No config, or an unknown name → the default
+/// `developer` band (`SafeWrite`, no engine level) — fail-safe. Honored ONLY from the user config,
+/// never a repo `.safe-chains.toml`; the file is write-denied, so an agent cannot set its own ceiling.
+pub fn configured_hook_ceiling() -> (SafetyLevel, Option<&'static engine::level::Level>) {
+    registry::user_config_level()
+        .and_then(|name| level_ceiling(&name))
+        .unwrap_or((SafetyLevel::SafeWrite, None))
 }
 
 /// Classify `command` with the harness-supplied directory context installed (HP-19), so

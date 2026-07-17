@@ -328,14 +328,14 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
   tripped the new unknown-command deny (`sed -eS file` wrongly denied). Both directions tested:
   legit glued/equals allow, hidden `w`/`e` in those forms deny.
 
-## Hook level: support LOWERING the ceiling (stricter than developer)
-`configured_hook_level` today honors only UPPER levels (raise the ceiling). A configured
-`reader`/`editor` is a request for a STRICTER auto-approve band, but the hook can't honor it
-yet: the CLI's `command_verdict` + `<= threshold` gate handles the engine verdict correctly
-(a redirect write projects to SafeWrite → gated at SafeRead), but the hook's extra
-`explain_with_coverage` legacy-coverage fallback would re-admit a write the ceiling denied
-(it flattens covered commands to `Inert`). To support lowering: mirror `run_cli`'s
-`(threshold, upper_level)` + gate in the hook AND gate/skip the legacy fallback when the
-configured ceiling is below developer. Then `level = "editor"` would gate a sibling write
-through the hook (the engine already distinguishes editor≠developer; only the projection
-can't yet) — closing the editor/developer collapse for lower plans too.
+## Hook level: full `editor` distinction (partial follow-up)
+Lowering the ceiling is DONE for `reader`/`paranoid` (`command_verdict_ceilinged` +
+gating the coverage fallback by the real level, both CLI and hook). `editor` still
+collapses to `developer`: its finer rule (no destroy, no sibling write) is real in the
+engine (`level("editor").admits`), and stage 1 (`command_verdict_at_level`) would honor
+it, but the stage-2 coverage fallback (`explain_with_coverage`) is 3-band only — it would
+re-admit a worktree destroy (SafeWrite ≤ editor's SafeWrite ceiling), half-applying the
+distinction. To finish: make the coverage fallback engine-level-aware (classify covered
+commands under the configured `Level` too, not just the 3-band), then route `editor`
+(and re-check the upper band) through it. Only then is `level = "editor"` a true
+no-destroy/no-sibling-write plan through the hook.

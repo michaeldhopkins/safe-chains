@@ -40,6 +40,68 @@ fn run_hook(args: &[&str], stdin_payload: &str) -> (String, String, i32) {
     )
 }
 
+/// Run the claude hook with a temp `$HOME` carrying `level = "<level>"` in the user config, and
+/// `cwd` set to that home so a relative `./f` classifies as a worktree path. Returns (stdout, exit).
+fn hook_at_level(level: &str, command: &str) -> (String, i32) {
+    use std::sync::atomic::{AtomicU32, Ordering};
+    static N: AtomicU32 = AtomicU32::new(0);
+    let home = std::env::temp_dir()
+        .join(format!("sc-lvl-{}-{}", std::process::id(), N.fetch_add(1, Ordering::Relaxed)));
+    std::fs::create_dir_all(home.join(".config")).unwrap();
+    std::fs::write(home.join(".config/safe-chains.toml"), format!("level = \"{level}\"\n")).unwrap();
+    let payload =
+        format!(r#"{{"tool_input": {{"command": "{command}"}}, "cwd": "{}"}}"#, home.display());
+    let mut child = Command::new(binary())
+        .args(["hook", "claude"])
+        .env("HOME", &home)
+        .stdin(Stdio::piped())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .expect("spawn");
+    let _ = child.stdin.as_mut().unwrap().write_all(payload.as_bytes());
+    let out = child.wait_with_output().expect("wait");
+    let _ = std::fs::remove_dir_all(&home);
+    (String::from_utf8_lossy(&out.stdout).into_owned(), out.status.code().unwrap_or(-1))
+}
+
+fn decides_allow(stdout: &str) -> bool {
+    serde_json::from_str::<serde_json::Value>(stdout.trim())
+        .ok()
+        .and_then(|v| {
+            v.pointer("/hookSpecificOutput/permissionDecision")
+                .and_then(|d| d.as_str())
+                .map(|s| s == "allow")
+        })
+        .unwrap_or(false)
+}
+
+#[test]
+fn configured_level_network_admin_raises_the_ceiling() {
+    // git push gates at the default band; network-admin (from the write-protected config) approves it.
+    let (stdout, code) = hook_at_level("network-admin", "git push origin main");
+    assert_eq!(code, 0);
+    assert!(decides_allow(&stdout), "network-admin approves git push: {stdout}");
+}
+
+#[test]
+fn configured_level_reader_lowers_the_ceiling_and_gates_writes() {
+    // A read approves; a WRITE gates — even though the built-in coverage fallback would otherwise
+    // re-admit it. This is the lowering fix: the fallback is held under the same `reader` ceiling.
+    assert!(decides_allow(&hook_at_level("reader", "cat ./notes.txt").0), "reader approves a read");
+    let (stdout, code) = hook_at_level("reader", "echo hi > ./notes.txt");
+    assert_eq!(code, 0);
+    assert!(!decides_allow(&stdout), "reader gates a worktree write: {stdout}");
+}
+
+#[test]
+fn configured_level_unknown_name_falls_back_to_the_default_band() {
+    // A garbled level must not open OR over-tighten — it fails safe to developer: a worktree write
+    // approves (default), git push still gates.
+    assert!(decides_allow(&hook_at_level("banana", "echo hi > ./notes.txt").0), "unknown → default allows a write");
+    assert!(!decides_allow(&hook_at_level("banana", "git push origin main").0), "unknown → default still gates git push");
+}
+
 // ---------------------------------------------------------------
 // Claude Code format (default for bare invocation + `hook claude`)
 // ---------------------------------------------------------------

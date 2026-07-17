@@ -29,9 +29,9 @@ The boundary holds only while home config and the hook registration are outside 
 ## Config schema (home `~/.config/safe-chains.toml`)
 
 ```toml
-# Raise the auto-approve ceiling above the default `developer` band. Honored ONLY from this
+# Set the auto-approve ceiling. Default (no key) is `developer`. Honored ONLY from this
 # write-protected user file — never a repo `.safe-chains.toml` (which the agent can write).
-level = "network-admin"   # local-admin | network-admin | yolo
+level = "network-admin"   # paranoid | reader | developer | local-admin | network-admin | yolo
 
 [[trusted]]
 path = "/abs/path/to/repo"
@@ -40,13 +40,17 @@ sha256 = "…"   # sha256 of <repo>/.safe-chains.toml; `shasum -a 256`
 
 - `path` is an absolute directory path. A `<repo>/.safe-chains.toml` is honored only if `<repo>` (or an ancestor that owns the file) matches a `path`.
 - `sha256` is required. Mismatch → the project file is ignored.
-- `level` sets the hook's auto-approve ceiling (`configured_hook_level`). Only the UPPER levels
-  (`local-admin`/`network-admin`/`yolo`) are honored — they RAISE the ceiling, activating the engine's
-  above-the-line model (git push, `s3api get-object`, `sudo systemctl`) while the tier structure still
-  holds (a credential read stays yolo-only; the `rm -rf /` corner is refused even at yolo). An unknown
-  name or a lower level (`reader`/`editor`) falls back to the default band — LOWERING the ceiling below
-  developer is deferred (it needs the hook's legacy-coverage fallback gated too; see TODO.md). The file
-  is write-denied and un-grantable, so an agent cannot raise its own ceiling.
+- `level` sets the hook's auto-approve ceiling (`configured_hook_ceiling` → `command_verdict_ceilinged`),
+  the same seam the CLI `--level` uses. It works in BOTH directions and the tier structure always holds:
+  - **RAISE** — `local-admin`/`network-admin`/`yolo` activate the above-the-line model (git push,
+    `s3api get-object`, `sudo systemctl`), classified per-level via `admits`. A credential read stays
+    yolo-only; the `rm -rf /` corner is refused even at yolo; an unlisted command stays gated (allowlist-only).
+  - **LOWER** — `reader` (reads only) / `paranoid` (inert only) tighten below the default; the ceiling
+    is applied to BOTH the built-in verdict AND the coverage fallback (so a gated write isn't re-admitted).
+  - `editor` currently collapses to `developer` (its finer no-destroy/no-sibling-write rule is real in
+    the engine but not yet expressible through the coverage fallback — see TODO.md).
+  - An unknown name falls back to the default band (fail-safe — never opens, never over-tightens).
+  - The file is write-denied and un-grantable, so an agent cannot change its own ceiling.
 
 ## Code changes
 
