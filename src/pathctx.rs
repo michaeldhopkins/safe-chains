@@ -60,6 +60,15 @@ pub fn cwd() -> Option<String> {
     CURRENT.with(|c| c.borrow().cwd.clone())
 }
 
+/// The workspace ROOT (project dir), if known — falling back to `cwd` (the hook defaults root to
+/// cwd). Used by the adjacent-sibling classifier to find the workspace's parent.
+pub fn root() -> Option<String> {
+    CURRENT.with(|c| {
+        let b = c.borrow();
+        b.root.clone().or_else(|| b.cwd.clone())
+    })
+}
+
 /// A bound `for` loop variable: `$name` in the body inherits the loop's `in`-list locus (the
 /// `find … {}`→path binding, one layer up). Read and write representatives can differ — a list
 /// like `/etc/hosts ~/notes` reads worst at `~/notes` but writes worst at `/etc/hosts`.

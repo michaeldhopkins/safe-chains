@@ -369,10 +369,59 @@ fn base_region(path: &str) -> Role {
         return role;
     }
     if path.starts_with('/') || path.starts_with('~') {
-        r.unknown
+        // A specific region (credential shield, .git freeze) already won above; only a path matching
+        // NOTHING reaches here. If it is a SIBLING of the workspace, it earns `adjacent` (a peer
+        // project) rather than the `unknown`/machine deny — the co-located-repo pattern.
+        adjacent_role(path).unwrap_or(r.unknown)
     } else {
         r.worktree
     }
+}
+
+/// Classify `path` as a direct SIBLING of the workspace — a peer project under the same parent
+/// (`../branchdiff/src/x`) — earning the `adjacent` role (reads at reader, create/mutate at
+/// developer; DESTROY stays worktree-only via the levels). `None` (→ `unknown`, denied) unless every
+/// guard holds:
+///  - the workspace root sits at depth >= 2 below `$HOME`, so its parent is never `$HOME` itself
+///    (else a workspace at `~/work` would make `~/.ssh` a "sibling"); outside `$HOME`, no adjacency.
+///  - the path is strictly UNDER the parent and NOT under the workspace itself.
+///  - no HIDDEN (dot) component in the remainder below the parent — mirrors the grant shield
+///    (`has_hidden_component`): a peer project's `.env`/`.git`/`.aws` stays denied, never adjacent.
+///
+/// `path` is already canonicalized to `~`-form; the workspace root is normalized to match.
+fn adjacent_role(path: &str) -> Option<Role> {
+    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/'))?;
+    let root_raw = crate::pathctx::root()?;
+    let root = if root_raw == home {
+        "~".to_string()
+    } else if let Some(rest) = root_raw.strip_prefix(&home).filter(|r| r.starts_with('/')) {
+        format!("~{rest}")
+    } else if root_raw.starts_with('~') {
+        root_raw
+    } else {
+        return None; // workspace outside $HOME (e.g. /opt/app) — conservative, no adjacency
+    };
+    let root = root.trim_end_matches('/');
+    // depth >= 2 below home: root = "~/a/b…" with >= 2 components after "~".
+    let comps: Vec<&str> = root.strip_prefix("~/")?.split('/').filter(|s| !s.is_empty()).collect();
+    let last = comps.last().filter(|_| comps.len() >= 2)?;
+    let parent = &root[..root.len() - last.len() - 1]; // strip the trailing "/<last>"
+    // strictly under the parent …
+    let under_parent = path.strip_prefix(parent).filter(|r| r.starts_with('/'))?;
+    // … but NOT the workspace itself or inside it.
+    if path == root || path.strip_prefix(root).is_some_and(|r| r.starts_with('/')) {
+        return None;
+    }
+    // a peer project's hidden files (.env/.git/.aws/.npmrc) are secrets/config — denied, not adjacent.
+    if has_hidden_component(under_parent.trim_start_matches('/')) {
+        return None;
+    }
+    Some(Role {
+        read_locus: LocalLocus::Adjacent,
+        write_locus: LocalLocus::Adjacent,
+        reads_secret: false,
+        pinned: false,
+    })
 }
 
 fn more_restrictive(a: Role, b: Role) -> bool {
@@ -405,6 +454,49 @@ mod tests {
         // Ordinary /etc app config is NOT the trust substrate — it stays machine (unknown → machine).
         assert_eq!(classify_region("/etc/nginx/nginx.conf").write_locus, LocalLocus::Machine, "ordinary /etc stays machine");
         assert_eq!(classify_region("/usr/local/bin/tool").write_locus, LocalLocus::Machine, "/usr/local is admin-managed, stays machine");
+    }
+
+    /// The sibling-workspace (`adjacent`) classifier and its guards — the edge cases that make it
+    /// safe rather than a home-wide hole.
+    #[test]
+    fn adjacent_sibling_classification() {
+        use crate::pathctx::{enter, PathCtx};
+        let ws = |root: &str, path: &str| {
+            let _g = enter(PathCtx { cwd: Some(root.to_string()), root: Some(root.to_string()) });
+            classify_region(path)
+        };
+        const WS: &str = "~/projects/safe-chains";
+
+        // A sibling's ORDINARY files → adjacent (peer project the agent reaches into).
+        assert_eq!(ws(WS, "~/projects/branchdiff/src/main.rs").read_locus, LocalLocus::Adjacent);
+        assert_eq!(ws(WS, "~/projects/branchdiff/src/main.rs").write_locus, LocalLocus::Adjacent);
+        assert_eq!(ws(WS, "~/projects/notes.txt").read_locus, LocalLocus::Adjacent, "a file peer to the workspace dir");
+
+        // A sibling's HIDDEN files (.env/.git/.aws/.npmrc) are peer secrets/config → NOT adjacent.
+        // (.git/.ssh are also caught by the segment shields; a bare .env has no shield node, so the
+        // hidden-component guard is what protects it — the key edge case.)
+        assert_ne!(ws(WS, "~/projects/branchdiff/.env").read_locus, LocalLocus::Adjacent, "peer .env stays denied");
+        assert_ne!(ws(WS, "~/projects/branchdiff/.npmrc").read_locus, LocalLocus::Adjacent, "peer .npmrc stays denied");
+        assert_eq!(ws(WS, "~/projects/branchdiff/.git/hooks/pre-commit").write_locus, LocalLocus::WorktreeTrusted, "peer .git hook stays frozen");
+
+        // THE danger case: a workspace at `~/work` (depth 1) must NOT make `~/.ssh` / `~/x` siblings.
+        assert_ne!(ws("~/work", "~/.ssh/id_rsa").read_locus, LocalLocus::Adjacent, "~/.ssh is never adjacent");
+        assert_ne!(ws("~/work", "~/other-notes.txt").read_locus, LocalLocus::Adjacent, "depth-1 workspace has no siblings");
+        // …nor a workspace at `~` itself (depth 0).
+        assert_ne!(ws("~", "~/anything.txt").read_locus, LocalLocus::Adjacent);
+
+        // A COUSIN (different parent) is not adjacent.
+        assert_ne!(ws(WS, "~/other/thing.txt").read_locus, LocalLocus::Adjacent, "different parent → not a sibling");
+        // A prefix-collision sibling name is a real sibling (peer dir), not the workspace.
+        assert_eq!(ws(WS, "~/projects/safe-chains-fork/x").read_locus, LocalLocus::Adjacent);
+        // The workspace's own absolute spelling is not "adjacent" (it's the workspace).
+        assert_ne!(ws(WS, "~/projects/safe-chains/x").read_locus, LocalLocus::Adjacent);
+
+        // A workspace OUTSIDE $HOME (e.g. /opt) gets no adjacency — conservative.
+        assert_ne!(ws("/opt/app", "/opt/other/x").read_locus, LocalLocus::Adjacent);
+
+        // No workspace context → no adjacency (fail-closed).
+        assert_ne!(classify_region("~/projects/branchdiff/src/main.rs").read_locus, LocalLocus::Adjacent);
     }
 
     #[test]

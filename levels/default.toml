@@ -59,6 +59,12 @@ cost = "none"
 extends = "paranoid"
 [[level.reader.allow]]
 operation = ["observe"]
+# `<= worktree-trusted` already admits a SIBLING project read: `adjacent` sits just BELOW
+# worktree-trusted in the ladder, so `cat ../branchdiff/x` (a peer repo under the same parent) reads
+# here without widening the cap. A sibling's own hidden files (.env/.git/.aws) never classify
+# `adjacent` (region shield + hidden-component guard), so only ordinary peer source is read. `user`
+# (~, keychain) and above stay denied. Sibling-ness is a structural resolver test, NOT a named
+# directory list — so it doesn't reintroduce a region admit-map.
 locus = { local = "<= worktree-trusted", remote = "<= arbitrary" }
 reversibility = "none"
 persistence = { level = "transient" }
@@ -109,6 +115,25 @@ extends = "editor"
 [[level.developer.allow]]
 operation = ["destroy"]
 locus = { local = "<= worktree", remote = "none" }
+scale = "<= unbounded"
+reversibility = "<= effortful"
+persistence = { level = "<= data" }
+disclosure = { audience = "<= local-process" }
+secret = { level = "<= uses-ambient" }
+network = { direction = "none" }
+execution = "<= self"
+authority = "user"
+
+# Patch a SIBLING project — create/mutate (NOT destroy) up to the `adjacent` locus: the common
+# cross-repo move (`echo >> ../branchdiff/fix.rs`, `sed -i ../branchdiff/x`). A developer trusted to
+# edit their own tree is trusted to patch a co-located peer repo. DESTROY is deliberately withheld —
+# `rm -rf ../otherrepo` is not a "quick patch"; the destroy clause above stays `<= worktree`, so a
+# sibling delete denies (waits for a higher level / explicit grant). Sibling hidden files (.env/.git)
+# never classify `adjacent` (region shield), so a hook/secret write stays frozen. editor does NOT
+# inherit this (its writes stay `<= worktree`) — sibling writes begin at developer.
+[[level.developer.allow]]
+operation = ["create", "mutate"]
+locus = { local = "<= adjacent", remote = "none" }
 scale = "<= unbounded"
 reversibility = "<= effortful"
 persistence = { level = "<= data" }

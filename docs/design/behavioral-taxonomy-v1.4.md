@@ -82,7 +82,11 @@ future commands) · `authorize` (change credentials/trust/access) · `control`
 into this host" and "which other host"; `kernel` and `remote` are different places,
 not more/less of one thing.
 - **`local`** (ordinal depth): `process` → `temp` → `sandbox-scope` (§3.2) →
-  `worktree` → `worktree-trusted` (`.git/`, `.envrc`, hooks, CI configs) → `user`
+  `worktree` → **`adjacent`** (a SIBLING project's ordinary files — a peer repo under the
+  workspace's parent, `../branchdiff/x`; reads at reader, create/mutate at developer, DESTROY
+  withheld; ordered BELOW `worktree-trusted` so a `<= adjacent` write clause can't reach the
+  frozen `.git`/hook tier, and a peer's own hidden files never classify here) → `worktree-trusted`
+  (`.git/`, `.envrc`, hooks, CI configs) → `user`
   (`~`, keychain) → `machine` (ORDINARY admin surface: services, `/etc` app config,
   `/usr/local`) → **`system-integrity`** (the machine's own identity/auth/boot/loader
   substrate — `/etc/passwd`, `/etc/sudoers`, `/etc/pam.d`, the loader, `/boot`: a WRITE
