@@ -327,3 +327,15 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
   exact-match `-e` check let a glued form fall through, so the input FILE was scanned as a script and
   tripped the new unknown-command deny (`sed -eS file` wrongly denied). Both directions tested:
   legit glued/equals allow, hidden `w`/`e` in those forms deny.
+
+## Hook level: support LOWERING the ceiling (stricter than developer)
+`configured_hook_level` today honors only UPPER levels (raise the ceiling). A configured
+`reader`/`editor` is a request for a STRICTER auto-approve band, but the hook can't honor it
+yet: the CLI's `command_verdict` + `<= threshold` gate handles the engine verdict correctly
+(a redirect write projects to SafeWrite → gated at SafeRead), but the hook's extra
+`explain_with_coverage` legacy-coverage fallback would re-admit a write the ceiling denied
+(it flattens covered commands to `Inert`). To support lowering: mirror `run_cli`'s
+`(threshold, upper_level)` + gate in the hook AND gate/skip the legacy fallback when the
+configured ceiling is below developer. Then `level = "editor"` would gate a sibling write
+through the hook (the engine already distinguishes editor≠developer; only the projection
+can't yet) — closing the editor/developer collapse for lower plans too.

@@ -595,9 +595,11 @@ fn no_new_denylist_named_constants_in_handlers() {
 }
 
 /// SELF-ESCALATION DEFENSE (systemic, command-level lock). safe-chains' TRUST ROOT —
-/// `~/.config/safe-chains.toml`, the user config that grants what commands may run and pins which
-/// repo `.safe-chains.toml` files are honored — must be UNWRITABLE by any auto-approved command.
-/// If an agent could write it, it would grant itself everything (or pin a malicious repo config).
+/// `~/.config/safe-chains.toml`, the user config that grants what commands may run, pins which
+/// repo `.safe-chains.toml` files are honored, AND sets the auto-approve `level` ceiling
+/// (`configured_hook_level`) — must be UNWRITABLE by any auto-approved command. If an agent could
+/// write it, it would grant itself everything, pin a malicious repo config, OR raise its own level
+/// ceiling to yolo. This lock is precisely what lets the hook trust the configured level.
 /// This enumerates the WRITE VECTORS (redirects, tee, cp/mv/install, dd, truncate, ln, in-place
 /// editors) × PATH SPELLINGS (tilde, `$HOME`, absolute, `/./` dodge) and asserts every one DENIES —
 /// pinning end-to-end what `regions::…safe_chains_config_is_read_ok_write_denied_and_ungrantable`

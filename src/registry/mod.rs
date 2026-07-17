@@ -12,6 +12,7 @@ use crate::parse::Token;
 use crate::verdict::Verdict;
 
 pub use build::{build_registry, load_toml};
+pub(crate) use custom::user_config_level;
 pub use dispatch::dispatch_spec;
 pub use types::{CommandSpec, OwnedPolicy};
 

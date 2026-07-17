@@ -101,6 +101,24 @@ pub fn upper_level_by_name(name: &str) -> Option<&'static engine::level::Level> 
     engine::authoring::default_levels().iter().find(|l| l.name == name)
 }
 
+/// The RAISED auto-approve ceiling the hook should evaluate at, from the write-protected user config
+/// (`~/.config/safe-chains.toml`, `level = "network-admin"`). Only UPPER levels
+/// (`local-admin`/`network-admin`/`yolo`) are honored — they RAISE the ceiling above the default
+/// `developer` band, activating the engine's above-the-line model (git push, bulk-object-read, sudo).
+/// `None` (no config, the default `developer`, a LOWER level, or an unknown name) → the caller uses
+/// the default-band `command_verdict`. LOWERING the ceiling below developer (a stricter `reader`/
+/// `editor` plan) is deferred: it needs the hook's legacy-coverage fallback gated too (see TODO.md).
+/// The config file is write-denied and un-grantable, so an agent cannot raise its own ceiling.
+pub fn configured_hook_level() -> Option<&'static engine::level::Level> {
+    let name = registry::user_config_level()?;
+    // Accept a legacy alias (`safe-write` → `developer`) by canonicalizing first; a real level name
+    // passes through unchanged, and anything unrecognized resolves to `None` below (fail-safe).
+    let canonical = verdict::SafetyLevel::resolve_threshold(&name)
+        .and_then(|(_, legacy_of)| legacy_of)
+        .unwrap_or(name.as_str());
+    upper_level_by_name(canonical)
+}
+
 /// Classify `command` with the harness-supplied directory context installed (HP-19), so
 /// relative paths resolve against the real `cwd`/`root`. `command_verdict(cmd)` is the
 /// no-context form (`PathCtx::default()`), preserving every existing caller.

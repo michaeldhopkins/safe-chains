@@ -22,6 +22,12 @@ struct TrustedEntry {
 struct TrustedConfig {
     #[serde(default)]
     trusted: Vec<TrustedEntry>,
+    /// The user's chosen auto-approve CEILING (`level = "network-admin"`). Read ONLY from the
+    /// write-protected user config (`~/.config/safe-chains.toml`) — never from a repo
+    /// `.safe-chains.toml`, which the agent can write (raising a ceiling from a checked-out repo is
+    /// exactly the self-escalation the config-write freeze prevents). Absent → the default band.
+    #[serde(default)]
+    level: Option<String>,
 }
 
 /// Walk up from CWD looking for a project-level custom TOML.
@@ -54,6 +60,24 @@ fn parse_trusted(source: &str) -> Vec<TrustedEntry> {
     toml::from_str::<TrustedConfig>(source)
         .map(|c| c.trusted)
         .unwrap_or_default()
+}
+
+fn parse_level(source: &str) -> Option<String> {
+    toml::from_str::<TrustedConfig>(source).ok()?.level
+}
+
+/// The `level = "…"` ceiling from the USER config (`~/.config/safe-chains.toml`) only — the
+/// write-protected location an agent cannot rewrite. Returns the raw name (the caller validates it
+/// against the known levels; an unknown name falls back to the default band). `None` when no config,
+/// no `level`, or local config is disabled (`SAFE_CHAINS_NO_LOCAL`). The repo file (`find_repo_custom`)
+/// is NEVER consulted here — a repo `.safe-chains.toml` cannot raise the ceiling (the agent writes it).
+pub(crate) fn user_config_level() -> Option<String> {
+    if env::var_os("SAFE_CHAINS_NO_LOCAL").is_some() {
+        return None;
+    }
+    let path = find_user_custom()?;
+    let source = fs::read_to_string(&path).ok()?;
+    parse_level(&source)
 }
 
 fn sha256_hex(bytes: &[u8]) -> String {
@@ -140,6 +164,20 @@ mod tests {
         assert_eq!(t.len(), 2);
         assert_eq!(t[0].path, "/a/b");
         assert_eq!(t[1].sha256, "def456");
+    }
+
+    #[test]
+    fn parse_level_reads_the_ceiling() {
+        assert_eq!(parse_level("level = \"network-admin\"").as_deref(), Some("network-admin"));
+        // alongside trusted/commands still parses.
+        assert_eq!(
+            parse_level("level = \"yolo\"\n[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n").as_deref(),
+            Some("yolo"),
+        );
+        // absent / malformed / empty → None (fail-safe to the default band).
+        assert!(parse_level("[[trusted]]\npath = \"/a\"\nsha256 = \"x\"\n").is_none());
+        assert!(parse_level("not valid toml {{{").is_none());
+        assert!(parse_level("").is_none());
     }
 
     #[test]

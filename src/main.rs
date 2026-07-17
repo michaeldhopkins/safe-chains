@@ -142,7 +142,15 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
         cwd: input.cwd.clone(),
         root: input.root.clone().or_else(|| input.cwd.clone()),
     });
-    let verdict = safe_chains::command_verdict(&input.command);
+    // The auto-approve ceiling comes from the write-protected user config (`~/.config/safe-chains.toml`,
+    // `level = "…"`). Absent → the default band (developer/SafeWrite). A configured level runs the real
+    // engine rule via `admits`, so an UPPER level (network-admin) makes git push / bulk-object-read
+    // reachable, and a LOWER level (editor/reader) tightens below the default — distinctions the coarse
+    // 3-band projection can't express. The pathctx (cwd/root) is already installed above.
+    let verdict = match safe_chains::configured_hook_level() {
+        Some(level) => safe_chains::command_verdict_at_level(&input.command, level),
+        None => safe_chains::command_verdict(&input.command),
+    };
     if verdict.is_allowed() {
         let response = format.render_response(verdict);
         let _ = io::stdout().write_all(response.stdout.as_bytes());
