@@ -42,7 +42,15 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
     - `aws configure get aws_secret_access_key` / `aws_session_token` — VALUE-dependent (the config key
       decides): `get region` is metadata, `get <secret-key>` prints the stored credential. Same shape as
       kubectl secret — needs first_arg/sub-sub or a handler on `configure get`.
+    - `terraform output -raw <name>` and `helm get values <release>` — VALUE-dependent: mostly non-secret
+      outputs/config, but a sensitive output / a secret embedded in values discloses. Handler-class (can't
+      gate the whole sub without over-denying the common read). Grouped with the value-dependent set.
+  - INTENTIONALLY ALLOWED (verified, not holes): `kubectl get configmap -o yaml` (ConfigMaps are officially
+    non-secret; gating over-denies config reads); `cat .env` (worktree-local — the workspace-boundary model
+    lets the agent read its own project files; a remote EXFIL of it still denies).
   - Remaining sweep: keep researching secret-store / cloud CLIs and add each credential read to the ratchet.
+    The value-dependent class (sops -d, aws/terraform/helm/kubectl-configmap) wants a shared "flag/first-arg
+    triggers credential-read" mechanism — worth designing once rather than per-tool handlers.
 - **Over-deny audit follow-ups — RESOLVED (2026-07).**
   - `terraform`: already fully covered (verified) — `plan`/`validate`/`show`/`fmt`/`output`/`state list`
     /`version` allow, `init`/`apply`/`destroy`/`import` deny. The old "not covered at all" note was stale.
