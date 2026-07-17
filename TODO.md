@@ -328,3 +328,18 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
   tripped the new unknown-command deny (`sed -eS file` wrongly denied). Both directions tested:
   legit glued/equals allow, hidden `w`/`e` in those forms deny.
 
+
+## Output-flag write sweep — DONE (residual + follow-up)
+The ungated-output-flag WRITE class (SSH-key / shell-code injection at the default band) is
+CLOSED: a 202-command multi-agent sweep gated ~156 real write-path flags via pathgates.toml
+[roles.X] blocks (asciidoctor/dot in their own TOML), verified behaviorally by
+every_declared_path_flag_actually_gates. The ratchet ambiguous_output_flags_do_not_write_sensitive_paths
++ tests/fixtures/output_flag_worklist.tsv now holds ~65 VERIFIED format-only rows (an output FORMAT
+like -o json, a column list, a GHC option, a boolean, or a non-existent flag -- the tool errors, never
+writes). List shrinks only.
+FOLLOW-UP (separate, smaller classes the flag sweep did not target):
+  1. POSITIONAL last-arg writers (converters whose output is the last positional, not a flag) --
+     weasyprint/tiffcp fixed with shape="last_write"; audit for more (a `last_write` shape sweep).
+  2. Handler/sub-level output flags -- the guard walks only TOP-LEVEL TOML `valued` flags; gs/pdftk/qpdf
+     were probed ALLOW earlier but aren't top-level valued flags. Extend the guard's reach.
+  3. The -d/-O ambiguous set (dropped for noise in the guard) -- mkdocs -d / hugo -d output-dirs.
