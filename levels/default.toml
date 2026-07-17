@@ -67,6 +67,12 @@ secret = { level = "<= uses-ambient" }
 network = { direction = "<= outbound", destination = "<= arbitrary", payload = "<= fetches" }
 execution = "<= self"
 authority = "user"
+# A read returns metadata (describe/list) or structured records (a query result / db dump) — NOT
+# arbitrary opaque STORED CONTENT. `retrieval <= record` denies `bulk-content` (an S3 object body, an
+# EBS block, a Glacier archive): unassessable bytes that routinely hold a secrets file / key / dump.
+# That bulk egress earns network-admin (elevated remote data flow), not the everyday reader tier —
+# the proportionate middle the `bulk-object-read` archetype needs. See archetypes.md §5 (#1).
+retrieval = "<= record"
 
 [level.editor]
 # Also create/mutate ordinary local data with no downstream execution: touch, echo >
@@ -224,6 +230,10 @@ extends = "developer"
 operation = ["observe", "create", "mutate", "destroy", "communicate", "configure", "control", "authorize"]
 locus = { local = "<= worktree-trusted", remote = "<= arbitrary", provenance = "<= literal" }
 scale = "<= unbounded"
+# Admits `bulk-content` retrieval (an object/block/archive body) — the proportionate home for bulk
+# remote data egress that reader/editor/developer refuse (`retrieval <= record`). Elevated, but NOT
+# credential-grade (`secret <= uses-ambient` still holds, so a credential read stays yolo). See #1.
+retrieval = "<= bulk-content"
 authority = "user"
 reversibility = "<= effortful"
 persistence = { level = "<= reconfiguring" }

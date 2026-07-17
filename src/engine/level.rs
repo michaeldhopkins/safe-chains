@@ -60,6 +60,7 @@ pub struct Clause {
     pub remote_binding: Option<Vec<RemoteBinding>>,
     pub provenance: Option<OrdBound<Provenance>>,
     pub scale: Option<OrdBound<Scale>>,
+    pub retrieval: Option<OrdBound<RetrievalGranularity>>,
     pub authority: Option<OrdBound<Authority>>,
     pub isolation: Option<OrdBound<Isolation>>,
     pub reversibility: Option<OrdBound<Reversibility>>,
@@ -105,6 +106,7 @@ impl Clause {
             && set_admits(self.remote_binding.as_deref(), cap.locus.binding)
             && ord_admits(self.provenance, cap.locus.provenance)
             && ord_admits(self.scale, cap.scale)
+            && ord_admits(self.retrieval, cap.retrieval)
             && ord_admits(self.authority, cap.authority)
             && ord_admits(self.isolation, cap.isolation)
             && ord_admits(self.reversibility, cap.reversibility)

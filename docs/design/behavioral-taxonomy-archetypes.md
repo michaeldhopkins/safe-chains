@@ -187,17 +187,20 @@ patterns (`chmod +s`, a `git push +refspec`) — the escalator matches flags, no
   scoring a `.github/workflows` or `.git/config` write as `reconfiguring`/`installing`, not `data`.
   This is a leaf-command (git/hg) concern, not the remote candidate surface, so it waits.
 
-- **(#1) `bulk-object-read` has no proportionate tier — a genuinely MISSING facet axis.** Retrieving
-  an arbitrary stored object (`aws s3api get-object`, `glacier get-job-output`) is a read; the ONLY
-  facet lever that denies a read is `secret = reads`, which lands it at **yolo** — the same tier as
-  reading a credential store. That is too strict: not every blob is credential-grade, but there is no
-  axis to say so. **Proposed axis: `retrieval-granularity` (`metadata < record < bulk-content`)** —
-  orthogonal to `scale` (which counts items) and to `secret` (which flags credentials). `metadata`/
-  `record` reads stay `reader`-level; `bulk-content` (opaque stored bytes we can't assess) earns a
-  *middle* tier — say `network-admin` — proportionate to "elevated remote data egress" without
-  equating it to a credential read. Until the axis exists, `bulk-object-read` overloads `secret=reads`
-  and sits at yolo (conservative, documented). Decision (user, 2026-07): ship the yolo placement now,
-  add the axis deliberately later — do not fudge a middle tier without the axis to justify it.
+- **(#1) `retrieval-granularity` axis — BUILT (2026-07).** Retrieving an arbitrary stored object
+  (`aws s3api get-object`, `glacier get-job-output`) is a read; the only facet lever that denied a read
+  was `secret = reads`, which put it at **yolo** — the same tier as reading a credential store, too
+  strict (not every blob is credential-grade). Resolved by a new ordinal facet
+  **`RetrievalGranularity` (`metadata < record < bulk-content`)** — orthogonal to `scale` (counts
+  items) and `secret` (flags credentials). `metadata` (describe/list/get-config) and `record`
+  (structured data you asked for — query results, a db dump) stay `reader`-tier; `bulk-content` (opaque
+  stored bytes) is capped at `reader` (`retrieval <= record`) and admitted at **network-admin**
+  (`retrieval <= bulk-content`) — the proportionate "elevated remote data egress" home, WITHOUT
+  conflation with a credential read (`secret <= uses-ambient` still holds, so `credential-read` stays
+  yolo). `bulk-object-read` now carries `retrieval = bulk-content` (no longer `secret = reads`) and
+  lands at network-admin; `data-export` carries `retrieval = record` and stays reader (db dump
+  auto-approves, unchanged). Verified end-to-end: `s3api get-object` denies at the default band, allows
+  at `--level network-admin`, while `secretsmanager get-secret-value` denies at both.
 
 - **(#2) Read-verb safety is a property of the RESOURCE, not the verb — the glob model assumes the
   verb.** The whole `first_arg` model says "the verb decides safety" (`show`/`list`/`describe` = safe

@@ -51,6 +51,7 @@ fn build_capability(name: &str, tc: TomlCapability) -> Result<Capability, String
         set_term(name, "locus.provenance", l.provenance.as_deref(), &mut c.locus.provenance)?;
     }
     set_term(name, "scale", tc.scale.as_deref(), &mut c.scale)?;
+    set_term(name, "retrieval", tc.retrieval.as_deref(), &mut c.retrieval)?;
     set_term(name, "authority", tc.authority.as_deref(), &mut c.authority)?;
     set_term(name, "reversibility", tc.reversibility.as_deref(), &mut c.reversibility)?;
     if let Some(p) = &tc.persistence {
@@ -101,6 +102,8 @@ struct TomlCapability {
     locus: Option<TomlLocus>,
     #[serde(default)]
     scale: Option<String>,
+    #[serde(default)]
+    retrieval: Option<String>,
     #[serde(default)]
     authority: Option<String>,
     #[serde(default)]
@@ -212,10 +215,11 @@ mod tests {
             // Credential material read/mint → yolo (secret > uses-ambient everywhere below yolo).
             ("credential-read", "yolo", "network-admin"),
             ("credential-mint", "yolo", "network-admin"),
-            // Arbitrary stored-object retrieval (s3 get-object): denies via secret=reads, so it lands
-            // at yolo like credential-read. The tier is deliberately conservative (unsettled — see the
-            // archetype's `because`); a less-strict middle tier has no facet basis today.
-            ("bulk-object-read", "yolo", "network-admin"),
+            // Arbitrary stored-object retrieval (s3 get-object): classified by `retrieval =
+            // bulk-content` (§5 #1), it lands at NETWORK-ADMIN — the proportionate bulk-egress tier —
+            // refused by developer. NOT yolo (it is not a credential read) and NOT reader (opaque bulk
+            // content is above the everyday read band).
+            ("bulk-object-read", "network-admin", "developer"),
         ];
         for (name, admitted_by, refused_by) in cases {
             let p = Profile::of(vec![archetype(name).expect("archetype exists").clone()]);
