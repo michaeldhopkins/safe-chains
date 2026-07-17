@@ -4685,6 +4685,87 @@ valued = ["--type"]
         );
     }
 
+    /// SWEEP DRIVER + regression ratchet for the ambiguous-output-flag WRITE hole. A valued flag like
+    /// `-o`/`--output`/`-d`/`--write` that is a WRITE PATH (`asciidoctor -o`, `dot -o`, `gs -o`) but is
+    /// NOT a declared path-gate lets an auto-approved command overwrite `~/.ssh/authorized_keys` /
+    /// `.git/hooks/*` — SSH-key / shell-code injection at the default band. The
+    /// `every_unambiguous_path_flag_declares_a_role` guard deliberately SKIPS these names ("usually a
+    /// format, not a path"), which is wrong for the doc/image/diagram/build-tool class.
+    ///
+    /// Behavioral: for every top-level command declaring one of these flags, `<cmd> <flag>
+    /// ~/.ssh/authorized_keys` must NOT auto-approve — either the flag GATES the path (a real writer →
+    /// add `[command.path_gate]` write role) or it is GRANDFATHERED (a verified format-only flag,
+    /// `-o json`, whose value is an enum not a path — a harmless permanent exemption). The grandfather
+    /// set only SHRINKS as the sweep gates the real writers; a NEW output-flag command that
+    /// auto-approves a sensitive write fails until resolved. Directly tests the security property, so a
+    /// gated flag flips it green — the sweep's per-command confirmation.
+    #[test]
+    fn ambiguous_output_flags_do_not_write_sensitive_paths() {
+        use super::types::TomlFile;
+        const OUTPUT_FLAGS: &[&str] = &[
+            "-o", "--output", "--out", "--outfile", "--write", "--replace-input", "output",
+        ];
+        const SENSITIVE: &str = "~/.ssh/authorized_keys"; // user-writable, compromise-grade
+        // The acknowledged worklist (shrinks only). A tab-separated `<command>\t<flag>` per row.
+        let worklist: std::collections::HashSet<(String, String)> =
+            include_str!("../../tests/fixtures/output_flag_worklist.tsv")
+                .lines()
+                .filter(|l| !l.trim().is_empty() && !l.starts_with('#'))
+                .filter_map(|l| l.split_once('\t').map(|(c, f)| (c.to_string(), f.to_string())))
+                .collect();
+
+        fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {
+            for e in std::fs::read_dir(dir).unwrap() {
+                let p = e.unwrap().path();
+                if p.is_dir() {
+                    toml_files(&p, out);
+                } else if p.extension().is_some_and(|x| x == "toml") {
+                    out.push(p);
+                }
+            }
+        }
+
+        let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("commands");
+        let mut files = Vec::new();
+        toml_files(&root, &mut files);
+        let mut holes = std::collections::HashSet::new();
+        for file in &files {
+            let src = std::fs::read_to_string(file).unwrap();
+            let parsed: TomlFile = toml::from_str(&src).unwrap();
+            for cmd in &parsed.command {
+                for flag in &cmd.valued {
+                    if OUTPUT_FLAGS.contains(&flag.as_str())
+                        && crate::is_safe_command(&format!("{} {flag} {SENSITIVE} in", cmd.name))
+                    {
+                        holes.insert((cmd.name.clone(), flag.clone()));
+                    }
+                }
+            }
+        }
+
+        // (a) A hole NOT on the worklist is a new/unacknowledged ungated write flag — fail closed.
+        let mut unlisted: Vec<_> = holes.difference(&worklist).collect();
+        unlisted.sort();
+        assert!(
+            unlisted.is_empty(),
+            "NEW ungated output-flag writes ({}) — GATE (add a `[command.path_gate]` write role) or add \
+             to tests/fixtures/output_flag_worklist.tsv with a verified format-only reason:\n{}",
+            unlisted.len(),
+            unlisted.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
+        );
+        // (b) A worklist entry that is NO LONGER a hole has been gated — remove it (the fix
+        // confirmation; keeps the ratchet shrinking and the worklist honest).
+        let mut stale: Vec<_> = worklist.difference(&holes).collect();
+        stale.sort();
+        assert!(
+            stale.is_empty(),
+            "worklist entries no longer auto-approve — they are GATED now; remove them from \
+             tests/fixtures/output_flag_worklist.tsv ({} stale):\n{}",
+            stale.len(),
+            stale.iter().map(|(c, f)| format!("  {c} `{f}`")).collect::<Vec<_>>().join("\n"),
+        );
+    }
+
     /// An alias is a pure synonym: it MUST classify identically to its canonical name for every
     /// input. A divergence is a bypass — the Homebrew g-alias path-gate hole was exactly this
     /// (`gcat /etc/shadow` allowed while `cat /etc/shadow` denied).

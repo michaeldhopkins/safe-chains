@@ -22,3 +22,7 @@ valued = [
     "--safe-mode", "--source-dir",
     "-B", "-D", "-R", "-S", "-a", "-b", "-d", "-o",
 ]
+# The output-path flags write the converted document — gate them so a converted file can't land on
+# ~/.ssh/authorized_keys, .git/hooks, or any out-of-workspace path.
+[command.path_gate]
+flags = { "-o" = "write", "--out-file" = "write", "-D" = "write", "--destination-dir" = "write" }
