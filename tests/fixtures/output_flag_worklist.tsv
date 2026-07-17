@@ -15,7 +15,6 @@ bombardier	-o
 cjpeg	-o
 df	--output
 duf	--output
-fd	-o
 findmnt	--output
 findmnt	-o
 fourmolu	-o

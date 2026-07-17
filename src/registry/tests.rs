@@ -2523,13 +2523,19 @@ deny = true
 
     #[test]
     fn toml_fd_denied() {
-        assert!(!crate::is_safe_command("fd pattern --exec rm"));
-        assert!(!crate::is_safe_command("fd pattern -x rm"));
-        assert!(!crate::is_safe_command("fd -t f pattern --exec-batch rm"));
-        assert!(!crate::is_safe_command("fd pattern -X rm"));
+        // -x/--exec now DELEGATE to the inner command (like `find -exec`), so danger tracks the inner
+        // command's locus: an exec into a SYSTEM search path denies through the delegated verdict.
+        assert!(!crate::is_safe_command("fd /etc --exec cat {}"));
+        assert!(!crate::is_safe_command("fd /etc -x od {}"));
+        assert!(!crate::is_safe_command("fd /etc -X cat"));
+        assert!(!crate::is_safe_command("fd -x cat /etc/{}"));
+        // A clustered short flag that isn't a real fd flag (`-xH`/`-HX`) is not the exec flag — it
+        // fails the flag grammar and denies.
         assert!(!crate::is_safe_command("fd -xH pattern"));
         assert!(!crate::is_safe_command("fd -HX pattern"));
-        assert!(!crate::is_safe_command("fd"));
+        // Unknown search flag, and a dangling exec with no command.
+        assert!(!crate::is_safe_command("fd --evil"));
+        assert!(!crate::is_safe_command("fd -x"));
     }
 
     #[test]

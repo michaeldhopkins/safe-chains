@@ -1,9 +1,28 @@
 [[command]]
 name = "fd"
-description = "Fast file finder alternative to find; full flag support for searching by name, type, size, and modification time."
+description = "Fast file finder alternative to find; searches by name, type, size, and modification time. The `-x/--exec` and `-X/--exec-batch` flags run a command for each result (or once for all results), substituting the matched path into `{}` / `{.}` / `{/}` / `{//}` / `{/.}` placeholders — an arbitrary-command entry point, exactly like `find -exec`."
 url = "https://github.com/sharkdp/fd#readme"
+researched_version = "fd 10.x"
+handler = "fd"
+doc_body = "Search flags allowed; `-x/--exec` and `-X/--exec-batch` delegate to the inner command bound to each search path (like `find -exec`)."
+examples_safe = [
+    "fd pattern",
+    "fd -e rs",
+    "fd --type f --hidden pattern",
+    "fd pattern src",
+    "fd -x echo {}",
+    "fd pattern -x wc -l {}",
+    "fd -X cat",
+]
+examples_denied = [
+    "fd -x rm /etc/{}",
+    "fd /etc -x cat {}",
+    "fd --evil",
+]
+
+[command.fallback]
 level = "Inert"
-bare = false
+bare = true
 standalone = [
     "--absolute-path", "--case-sensitive", "--fixed-strings", "--follow",
     "--full-path", "--glob", "--has-results", "--help", "--hidden",

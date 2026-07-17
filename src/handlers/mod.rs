@@ -23,6 +23,7 @@ macro_rules! handler_module {
 
 pub mod android;
 pub mod coreutils;
+pub mod fd;
 pub mod forges;
 pub mod fuzzy;
 pub mod interpreter;
@@ -52,6 +53,7 @@ pub fn custom_cmd_handlers() -> HashMap<&'static str, HandlerFn> {
         ("glab", forges::glab::is_safe_glab as HandlerFn),
         ("interpreter", interpreter::check_interpreter as HandlerFn),
         ("magick", magick::is_safe_magick as HandlerFn),
+        ("fd", fd::check_fd as HandlerFn),
         ("php", php::is_safe_php as HandlerFn),
         ("ssh", system::ssh::check_ssh as HandlerFn),
         ("sysctl", system::sysctl::is_safe_sysctl as HandlerFn),

@@ -20,13 +20,16 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
   read/mint subs `credential-read`/`credential-mint`, and audit every `get-*`/`describe-*` glob for
   credential actions (get-secret-value, get-login-password, get-session-token, get-token, get-password).
   This is the #1 correctness item before/within the fan-out.
-- **Over-deny audit follow-ups.** A real one was found+fixed (grep `-P`/`--perl-regexp`, DONE below).
-  Remaining, from the real-world sweep — coverage GAPS (not false-denies of covered ops):
-  - `terraform` isn't covered at all — add read-only subs (`plan`/`validate`/`show`/`fmt`/`output`
-    /`state list`), deny `apply`/`destroy`.
-  - `fd -x <safecmd>` doesn't delegate its exec flag the way `find -exec` does — add delegation.
-  - Judgment calls (running opaque code — same "vettable vs opaque" line as `./bill`, likely keep
-    denying): `npm run <script>`, `pnpm install` (postinstall), `python3 -m <module>`.
+- **Over-deny audit follow-ups — RESOLVED (2026-07).**
+  - `terraform`: already fully covered (verified) — `plan`/`validate`/`show`/`fmt`/`output`/`state list`
+    /`version` allow, `init`/`apply`/`destroy`/`import` deny. The old "not covered at all" note was stale.
+  - `fd -x`/`--exec` / `-X`/`--exec-batch`: NOW delegates to the inner command like `find -exec`
+    (`handler = "fd"`, `src/handlers/fd.rs`), bound to each search path (deny-absorbing); the no-`{}`
+    batch form appends the match so `fd /etc -X cat` can't leak. Proptest `fd_exec_follows_the_inner_
+    command_locus` guards the class.
+  - Judgment calls MADE (keep denying — opaque/network-sourced code, the `./bill` line): `pnpm install`
+    (postinstall) and `python3 -m <module>` deny. `npm run` already allowlists safe scripts via
+    `first_arg` (`run test` allows, `run build` denies) — no change needed.
 - **`.safe-chains.toml` protected third-party config location** (open research item, noted in
   `regions/default.toml`): the trust root lives at `~/.config/safe-chains.toml`, an UNPROTECTED path
   (a python/editor write escapes the command classifier). A harness-blessed protected location would
