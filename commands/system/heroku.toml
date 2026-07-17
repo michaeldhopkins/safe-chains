@@ -26,6 +26,10 @@ valued = ["--app", "-a"]
 
 [[command.sub]]
 name = "config"
+profile = "credential-read"
+fact = "`heroku config` prints ALL of an app's config vars (key=value) — the place Heroku apps store secrets: DATABASE_URL, API keys, SECRET_KEY_BASE, OAuth tokens — in plaintext to stdout."
+source = "https://devcenter.heroku.com/articles/config-vars"
+judgment = "Config vars are an app's secret store; dumping them all is credential exposure. (`config:get <KEY>` and `config:set` are already uncovered/denied.)"
 standalone = ["--help", "--json", "--shell", "-h", "-j", "-s"]
 valued = ["--app", "-a"]
 

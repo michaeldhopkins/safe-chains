@@ -7,7 +7,10 @@ bare_flags = ["--help", "--version", "-h", "-V"]
 
 [[command.sub]]
 name = "show"
-level = "SafeRead"
+profile = "credential-read"
+fact = "`pass show <name>` decrypts the GPG-encrypted password file and prints the stored password (the first line) to stdout (or the clipboard with -c)."
+source = "https://www.passwordstore.org/"
+judgment = "The whole point of `pass show` is to reveal a stored secret; credential exposure."
 bare = false
 tolerate_unknown_short = true
 standalone = ["--clip", "--help", "--qrcode", "-c", "-h", "-q"]
@@ -42,7 +45,10 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "grep"
-level = "SafeRead"
+profile = "credential-read"
+fact = "`pass grep` decrypts EVERY password file in the store and greps their plaintext contents — surfacing stored secrets that match the pattern."
+source = "https://www.passwordstore.org/"
+judgment = "Searching decrypted password contents discloses secret material; credential exposure (unlike `ls`/`find`, which only match entry NAMES)."
 bare = false
 tolerate_unknown_short = true
 standalone = ["--extended-regexp", "--help", "--ignore-case", "-E", "-h", "-i"]
