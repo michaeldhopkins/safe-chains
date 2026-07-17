@@ -47,8 +47,9 @@ sha256 = "…"   # sha256 of <repo>/.safe-chains.toml; `shasum -a 256`
     yolo-only; the `rm -rf /` corner is refused even at yolo; an unlisted command stays gated (allowlist-only).
   - **LOWER** — `reader` (reads only) / `paranoid` (inert only) tighten below the default; the ceiling
     is applied to BOTH the built-in verdict AND the coverage fallback (so a gated write isn't re-admitted).
-  - `editor` currently collapses to `developer` (its finer no-destroy/no-sibling-write rule is real in
-    the engine but not yet expressible through the coverage fallback — see TODO.md).
+  - `editor` is a distinct plan (not a synonym for developer): create/mutate your worktree, but NO
+    destroy and NO sibling-project write. Classified per-level via `admits` in both the primary verdict
+    and the coverage fallback (which runs under the configured level).
   - An unknown name falls back to the default band (fail-safe — never opens, never over-tightens).
   - The file is write-denied and un-grantable, so an agent cannot change its own ceiling.
 

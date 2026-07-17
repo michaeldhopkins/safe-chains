@@ -328,14 +328,3 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
   tripped the new unknown-command deny (`sed -eS file` wrongly denied). Both directions tested:
   legit glued/equals allow, hidden `w`/`e` in those forms deny.
 
-## Hook level: full `editor` distinction (partial follow-up)
-Lowering the ceiling is DONE for `reader`/`paranoid` (`command_verdict_ceilinged` +
-gating the coverage fallback by the real level, both CLI and hook). `editor` still
-collapses to `developer`: its finer rule (no destroy, no sibling write) is real in the
-engine (`level("editor").admits`), and stage 1 (`command_verdict_at_level`) would honor
-it, but the stage-2 coverage fallback (`explain_with_coverage`) is 3-band only — it would
-re-admit a worktree destroy (SafeWrite ≤ editor's SafeWrite ceiling), half-applying the
-distinction. To finish: make the coverage fallback engine-level-aware (classify covered
-commands under the configured `Level` too, not just the 3-band), then route `editor`
-(and re-check the upper band) through it. Only then is `level = "editor"` a true
-no-destroy/no-sibling-write plan through the hook.

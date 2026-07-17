@@ -95,6 +95,20 @@ fn configured_level_reader_lowers_the_ceiling_and_gates_writes() {
 }
 
 #[test]
+fn configured_level_editor_gates_destroys_but_not_writes() {
+    // editor ≠ developer: create/mutate a worktree file approves, but a DESTROY gates — a distinction
+    // the 3-band projection flattens, honored through the hook via the engine level in BOTH the primary
+    // verdict and the coverage fallback. (developer, the default, allows the destroy — see the write/rm
+    // asymmetry against the reader/default tests above.)
+    assert!(decides_allow(&hook_at_level("editor", "echo hi > ./notes.txt").0), "editor writes a worktree file");
+    let (stdout, code) = hook_at_level("editor", "rm ./notes.txt");
+    assert_eq!(code, 0);
+    assert!(!decides_allow(&stdout), "editor gates a worktree destroy: {stdout}");
+    // the same destroy approves at the default developer band.
+    assert!(decides_allow(&hook_at_level("developer", "rm ./notes.txt").0), "developer allows the destroy");
+}
+
+#[test]
 fn configured_level_unknown_name_falls_back_to_the_default_band() {
     // A garbled level must not open OR over-tighten — it fails safe to developer: a worktree write
     // approves (default), git push still gates.
