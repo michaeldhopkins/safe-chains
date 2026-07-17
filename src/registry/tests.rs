@@ -2023,6 +2023,11 @@ use super::*;
             "gcloud auth print-identity-token",
             // Azure
             "az keyvault secret show --name x --vault-name v",
+            // Kubernetes (`get secret -o yaml/json` dumps the base64 `data` credential values). NOTE:
+            // the exact `secret`/`secrets` resource is gated; the slash form `get secret/<name>` is a
+            // known residual (see TODO — needs a handler for prefix/name-form matching).
+            "kubectl get secret db-creds -o yaml",
+            "kubectl get secrets",
             // credential-minting / password stores
             "gh auth token",
             "doctl auth init",

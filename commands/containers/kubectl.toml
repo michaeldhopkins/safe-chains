@@ -61,6 +61,7 @@ valued = ["--api-version"]
 [[command.sub]]
 name = "get"
 bare = false
+first_arg = ["*"]
 standalone = [
     "--all-namespaces", "--help", "--no-headers", "--show-labels", "--watch",
     "-A", "-h", "-w",
@@ -70,6 +71,20 @@ valued = [
     "--output", "--selector", "--sort-by",
     "-l", "-n", "-o",
 ]
+
+[[command.sub.sub]]
+name = "secret"
+profile = "credential-read"
+fact = "`kubectl get secret <name> -o yaml/json` prints the Secret object including its base64-encoded `data` field — the credential values (passwords, tokens, TLS private keys, kubeconfigs) it stores."
+source = "https://kubernetes.io/docs/concepts/configuration/secret/"
+judgment = "A Kubernetes Secret holds credential material; `get secret` can dump the values (`-o yaml`), so it is credential exposure. Conservative: gated for every output form (listing names is a minor over-deny). Other resources (pods, CRDs) stay read-only via the `*` glob."
+
+[[command.sub.sub]]
+name = "secrets"
+profile = "credential-read"
+fact = "Plural form of `kubectl get secret` — the same Secret resource whose `data` holds base64-encoded credential values."
+source = "https://kubernetes.io/docs/concepts/configuration/secret/"
+judgment = "Kubernetes Secrets hold credential material; reading them is credential exposure. Conservative gate (see `secret`)."
 
 [[command.sub]]
 name = "logs"
