@@ -37,6 +37,10 @@ nested_bare = false
 
 [[command.sub.sub]]
 name = "get"
+profile = "credential-read"
+fact = "`vault kv get` reads and prints the secret at a KV-v2 path — the same secret material as `vault read`, just the KV-v2 sugar; the value enters the caller's context."
+source = "https://developer.hashicorp.com/vault/docs/commands/kv/get"
+judgment = "KV get is the secret-fetch of a secrets manager (`--field` extracts a single secret value); conservative classification is credential exposure, matching `vault read`."
 standalone = ["--field", "--help", "--mount", "-h"]
 valued = ["--address", "--field", "--format", "--namespace", "--version"]
 

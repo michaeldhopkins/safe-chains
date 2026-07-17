@@ -1993,6 +1993,50 @@ use super::*;
         );
     }
 
+    /// Credential-EXPOSURE corpus ratchet — the ARGUMENT-layer complement to
+    /// `credential_smelling_subs_are_classified_or_grandfathered` (which guards sub NAMES). A
+    /// secret-store read whose credential signal lives in the ARGUMENT (`vault kv get secret/x`) or in
+    /// the tool's whole purpose (`op item get`) is invisible to the name guard, and CANNOT be found
+    /// generatively: a blind `<read-verb> <secret-word>` probe is vacuous — every positional-accepting
+    /// sub auto-approves `show secret` (a revision literally named "secret"), 1855 false hits. So the
+    /// sweep is necessarily a CURATED, researched worklist of credential reads that MUST deny; it only
+    /// grows as secret-store CLIs are researched, and a gate silently reverting to auto-approve fails
+    /// here. See docs/design/behavioral-taxonomy-archetypes.md (credential detection).
+    #[test]
+    fn credential_store_reads_are_denied() {
+        const MUST_DENY: &[&str] = &[
+            // 1Password (whole tool is a secret store; item/document get + read return secret material)
+            "op item get login",
+            "op read op://vault/item/field",
+            "op document get key.pem",
+            // HashiCorp Vault (read + the KV-v2 sugar kv get)
+            "vault read secret/data/x",
+            "vault kv get secret/x",
+            // AWS (explicit secret/token subs; the get-*/describe-* globs must exclude these)
+            "aws secretsmanager get-secret-value --secret-id x",
+            "aws ecr get-login-password",
+            "aws sts get-session-token",
+            "aws ssm get-parameter --name x --with-decryption",
+            // GCP
+            "gcloud secrets versions access latest --secret=x",
+            "gcloud auth print-access-token",
+            "gcloud auth print-identity-token",
+            // Azure
+            "az keyvault secret show --name x --vault-name v",
+            // credential-minting / password stores
+            "gh auth token",
+            "doctl auth init",
+            "security find-internet-password -s example.com",
+        ];
+        let leaks: Vec<_> = MUST_DENY.iter().filter(|c| crate::is_safe_command(c)).collect();
+        assert!(
+            leaks.is_empty(),
+            "credential-store reads AUTO-APPROVING (secret disclosure to the caller's context) — each \
+             must deny (classify the sub `profile = \"credential-read\"`/`\"credential-mint\"`, or narrow \
+             the read-verb glob to exclude the credential action):\n{leaks:#?}",
+        );
+    }
+
     #[test]
     fn toml_registry_rejects_unknown_flags() {
         let mut failures = Vec::new();
