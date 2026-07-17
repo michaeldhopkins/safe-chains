@@ -170,6 +170,36 @@ mod tests {
         default_levels().iter().find(|l| l.name == name).expect("level exists")
     }
 
+    /// The `adjacent` (sibling-workspace) locus lands where the design says, INDEPENDENT of the legacy
+    /// 3-band CLI projection (which collapses editor/developer to SafeWrite). A sibling READ auto-
+    /// approves from reader up; a sibling create/mutate (a "quick patch") is admitted at developer but
+    /// NOT editor (editor's writes stay `<= worktree`); a sibling DESTROY is withheld even at developer
+    /// (conservative — `rm -rf ../otherrepo` is not a patch).
+    #[test]
+    fn sibling_adjacent_locus_reads_at_reader_writes_at_developer_not_editor() {
+        use crate::engine::facet::{Capability, LocalLocus, Operation, PersistenceLevel, Reversibility};
+        let at_adjacent = |op: Operation| {
+            let mut c = Capability::new(op);
+            c.locus.local = LocalLocus::Adjacent;
+            c
+        };
+        let read = Profile::of(vec![at_adjacent(Operation::Observe)]);
+        let patch = Profile::of(vec![{
+            let mut c = at_adjacent(Operation::Mutate);
+            c.reversibility = Reversibility::Recoverable;
+            c.persistence.level = PersistenceLevel::Data;
+            c
+        }]);
+        let destroy = Profile::of(vec![at_adjacent(Operation::Destroy)]);
+
+        assert!(level("reader").admits(&read), "a sibling READ auto-approves from reader");
+        assert!(level("developer").admits(&read), "…and higher");
+        assert!(!level("editor").admits(&patch), "editor does NOT write a sibling (writes stay worktree)");
+        assert!(level("developer").admits(&patch), "developer patches a sibling (create/mutate)");
+        assert!(!level("editor").admits(&destroy), "editor does NOT destroy a sibling");
+        assert!(!level("developer").admits(&destroy), "developer does NOT destroy a sibling (conservative — its destroy clause stays `<= worktree`)");
+    }
+
     #[test]
     fn archetypes_toml_compiles_and_every_capability_is_justified() {
         // LazyLock forces the parse; a bad term / missing `because` would have panicked.

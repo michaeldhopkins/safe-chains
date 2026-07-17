@@ -101,7 +101,13 @@ ordinal_term! {
         Temp => "temp",
         SandboxScope => "sandbox-scope",
         Worktree => "worktree",
-        WorktreeTrusted => "worktree-trusted",  // .git/, .envrc, hooks, CI configs
+        Adjacent => "adjacent",                 // a SIBLING project's ORDINARY files (peer of the
+                                                // workspace under the same parent) — a co-located repo
+                                                // the agent reaches into. BELOW worktree-trusted: a peer
+                                                // source write (dev-loop) is LESS dangerous than a
+                                                // .git/hook write (which auto-executes), so a developer
+                                                // write clause `<= adjacent` must NOT reach the frozen tier.
+        WorktreeTrusted => "worktree-trusted",  // .git/, .envrc, hooks, CI configs — read-ok, WRITE-frozen
         User => "user",                         // ~, keychain
         Machine => "machine",                   // services, /etc app config, /usr/local — ordinary admin
         SystemIntegrity => "system-integrity",  // identity/auth/boot/loader/system binaries — compromise-complete
@@ -623,6 +629,9 @@ mod tests {
     #[test]
     fn ordinal_ladders_match_the_spec() {
         assert!(LocalLocus::Process < LocalLocus::Worktree);
+        assert!(LocalLocus::Worktree < LocalLocus::Adjacent);
+        assert!(LocalLocus::Adjacent < LocalLocus::WorktreeTrusted);
+        assert!(LocalLocus::WorktreeTrusted < LocalLocus::User);
         assert!(LocalLocus::Worktree < LocalLocus::Machine);
         assert!(LocalLocus::Machine < LocalLocus::SystemIntegrity);
         assert!(LocalLocus::SystemIntegrity < LocalLocus::Device);
