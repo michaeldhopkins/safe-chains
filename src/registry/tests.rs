@@ -4770,6 +4770,70 @@ valued = ["--type"]
         );
     }
 
+    /// DISCOVERY ratchet for POSITIONAL last-arg writers — the class the flag-based
+    /// `ambiguous_output_flags_do_not_write_sensitive_paths` guard cannot enumerate (a converter whose
+    /// output is the LAST positional, not a flag: `cjxl in out`, `pdfunite a b out`). Signal: probe
+    /// every command `<cmd> <benign-input> ~/.ssh/authorized_keys`. A READER of that last positional
+    /// already denies (its read-gate blocks the sensitive read), so a command that AUTO-APPROVES is
+    /// either an ungated last-positional WRITER (gate it `shape = "last_write"`) or one that ignores
+    /// the extra arg (harmless — acknowledge on the worklist).
+    ///
+    /// WHY a description heuristic, and what it does NOT promise. Behaviorally, a positional WRITER and
+    /// a command that IGNORES a trailing arg are indistinguishable — both auto-approve — so the raw
+    /// probe surfaces ~600 commands, ~99% harmless ignorers (`basename`, `date`, `bc`). The only signal
+    /// that separates them is the researched description (a writer's says it "converts/encodes/writes a
+    /// file"). So this ratchet is a best-effort DISCOVERY driver over the writer-shaped descriptions,
+    /// NOT a completeness proof: a writer whose description dodges every trigger word is missed here.
+    /// The fail-CLOSED guarantee for the writers we KNOW is the corpus test below
+    /// (`positional_and_output_dir_writers_gate_sensitive_paths`) — this test keeps NEW writer-shaped
+    /// commands from shipping ungated. The `declares_write_flag` exclusion is structural (not an `-o`
+    /// probe, which is confounded by unknown-flag denials and the `last_write` positional gate itself):
+    /// a command whose output is a declared write FLAG has input positionals, so its probe is a false
+    /// positive already covered by the flag guard; a `last_write` SHAPE declares no write flag, so
+    /// positional writers like `cjxl` are still covered.
+    #[test]
+    fn positional_last_arg_writers_are_gated_or_acknowledged() {
+        const SENSITIVE: &str = "sc-probe-in.dat ~/.ssh/authorized_keys";
+        let acknowledged: std::collections::HashSet<&str> =
+            include_str!("../../tests/fixtures/positional_writer_worklist.tsv")
+                .lines()
+                .map(|l| l.trim())
+                .filter(|l| !l.is_empty() && !l.starts_with('#'))
+                .filter_map(|l| l.split_whitespace().next())
+                .collect();
+        // A last-positional writer's researched description says it PRODUCES a file (converts/encodes/
+        // decodes/renders/writes …). Kept deliberately broad on the object side ("output"/"file"/"to
+        // …") so "writes a .jxl file" (cjxl) matches — an earlier narrow form that required "output"
+        // silently skipped it. False positives just land on the worklist; the risk is a missed writer,
+        // so err toward matching.
+        fn writes_output(d: &str) -> bool {
+            let d = d.to_ascii_lowercase();
+            let action = ["convert", "render", "encode", "decode", "transcode", "compress",
+                "writes", "produces", "emits"];
+            let object = ["output", "writes a", "writes the", "creates a", "produces a",
+                "to the file", "to a file", "to a new", "you name", "you supply",
+                "last positional", "named output"];
+            action.iter().any(|a| d.contains(a)) && object.iter().any(|o| d.contains(o))
+        }
+        let mut candidates: Vec<&str> = super::TOML_REGISTRY
+            .iter()
+            .filter(|(name, spec)| *name == &spec.name && writes_output(&spec.description))
+            .map(|(name, _)| name.as_str())
+            .filter(|name| crate::is_safe_command(&format!("{name} {SENSITIVE}")))
+            .filter(|name| !crate::pathgate::declares_write_flag(name))
+            .filter(|name| !acknowledged.contains(name))
+            .collect();
+        candidates.sort();
+        assert!(
+            candidates.is_empty(),
+            "commands auto-approving a sensitive LAST-positional write ({}) — GATE the writers \
+             (`shape = \"last_write\"`) or add the harmless ones (ignores the arg) to \
+             tests/fixtures/positional_writer_worklist.tsv:\n  {}",
+            candidates.len(),
+            candidates.join("\n  "),
+        );
+    }
+
     /// Regression corpus for the output-flag sweep's RESIDUAL classes (adversarial-review follow-ups):
     /// positional last-arg writers (a converter whose output is the last positional, `shape =
     /// "last_write"`) and output-DIRECTORY flags. These are NOT covered by
@@ -4794,6 +4858,30 @@ valued = ["--type"]
             format!("mkdocs build -d {S}"),
             format!("mkdocs build --site-dir {S}"),
             format!("gs -o {S} x.ps"),
+            // Positional last-arg writer audit (converters + in-place mutators):
+            format!("dvipdf in.dvi {S}"),
+            format!("eps2eps in.eps {S}"),
+            format!("ps2pdfwr in.ps {S}"),
+            format!("pfbtopfa in.pfb {S}"),
+            format!("tiff2bw in.tif {S}"),
+            format!("tiffcrop in.tif {S}"),
+            format!("pal2rgb in.tif {S}"),
+            format!("jpgicc in.jpg {S}"),
+            format!("tificc in.tif {S}"),
+            format!("heif-thumbnailer in.heic {S}"),
+            format!("wkhtmltopdf in.html {S}"),
+            format!("gdbm_dump db.gdbm {S}"),
+            format!("pkgbuild --root ./r {S}"),
+            // in-place mutators: sensitive as the sole/last positional …
+            format!("wasm-strip {S}"),
+            format!("llvm-strip {S}"),
+            format!("llvm-objcopy in.o {S}"),
+            format!("install_name_tool -id x {S}"),
+            format!("indent {S}"),
+            format!("PlistBuddy {S}"),
+            // … and multi-file in-place (`positional = "write"`) must gate a NON-last sensitive arg:
+            format!("nbstripout {S} ok.ipynb"),
+            format!("afscexpand {S} ./b"),
         ];
         for c in &deny {
             assert!(!crate::is_safe_command(c), "must deny a sensitive write: {c}");
@@ -4805,6 +4893,11 @@ valued = ["--type"]
             "tiffcp in.tif ./out.tif",
             "mkdocs build -d ./site",
             "gs -o ./out.pdf x.ps",
+            "dvipdf in.dvi ./out.pdf",
+            "tiff2bw in.tif ./out.tif",
+            "jpgicc in.jpg ./out.jpg",
+            "wasm-strip ./mod.wasm",
+            "nbstripout ./a.ipynb ./b.ipynb",
         ] {
             assert!(crate::is_safe_command(c), "benign worktree write must allow: {c}");
         }

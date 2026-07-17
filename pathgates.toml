@@ -359,6 +359,7 @@ flags = { "--output" = "write", "-F" = "write" }
 flags = { "--output" = "write", "-o" = "write" }
 
 [roles."jpgicc"]
+shape = "last_write"
 flags = { "-o" = "read" }
 
 [roles."jupyter-nbconvert"]
@@ -545,6 +546,7 @@ flags = { "-o" = "write" }
 flags = { "-O" = "write" }
 
 [roles."tificc"]
+shape = "last_write"
 flags = { "-o" = "read" }
 
 [roles."transicc"]
@@ -678,6 +680,131 @@ flags = { "--outdir" = "write", "--outfile" = "write" }
 flags = { "--out-dir" = "write", "-d" = "write" }
 
 [roles."cjxl"]
+shape = "last_write"
+
+# Positional last-arg CONVERTERS surfaced by `positional_last_arg_writers_are_gated_or_acknowledged`:
+# each reads an input and writes its output to the LAST positional (`<in> <out>`), so a sensitive
+# last positional (`~/.ssh/authorized_keys`, `.git/hooks/…`) must not be an auto-approved write.
+# Ghostscript wrapper scripts (`in.[e]ps out.pdf`):
+[roles."dvipdf"]
+shape = "last_write"
+[roles."eps2eps"]
+shape = "last_write"
+[roles."pdf2dsc"]
+shape = "last_write"
+[roles."pfbtopfa"]
+shape = "last_write"
+[roles."ps2epsi"]
+shape = "last_write"
+[roles."ps2pdf12"]
+shape = "last_write"
+[roles."ps2pdf13"]
+shape = "last_write"
+[roles."ps2pdf14"]
+shape = "last_write"
+[roles."ps2pdfwr"]
+shape = "last_write"
+[roles."ps2ps"]
+shape = "last_write"
+# libtiff converters (`in.tif out.tif` — tiffcrop's own docs call the last arg the destination):
+[roles."pal2rgb"]
+shape = "last_write"
+[roles."ppm2tiff"]
+shape = "last_write"
+[roles."rgb2ycbcr"]
+shape = "last_write"
+[roles."thumbnail"]
+shape = "last_write"
+[roles."tiff2bw"]
+shape = "last_write"
+[roles."tiff2icns"]
+shape = "last_write"
+[roles."tiff2rgba"]
+shape = "last_write"
+[roles."tiffcrop"]
+shape = "last_write"
+[roles."tiffdither"]
+shape = "last_write"
+[roles."tiffmedian"]
+shape = "last_write"
+# (Little CMS jpgicc/tificc gain shape=last_write merged into their existing -o=read blocks below;
+#  psicc's output is its already-gated -o flag, so it is a non-writer acknowledged on the worklist.)
+# Misc converters whose output is the last positional:
+[roles."heif-thumbnailer"]
+shape = "last_write"
+[roles."wkhtmltopdf"]
+shape = "last_write"
+[roles."usdrecord"]
+shape = "last_write"
+[roles."gdbm_dump"]
+shape = "last_write"
+[roles."gdbm_load"]
+shape = "last_write"
+# Package builders whose output archive is the last positional (`pkgbuild [opts] out.pkg`):
+[roles."pkgbuild"]
+shape = "last_write"
+[roles."productbuild"]
+shape = "last_write"
+# In-place binary/text mutators and in→out rewriters: the file they rewrite is the last positional
+# (or their sole positional), so an out-of-workspace target must gate. `last_write` covers both the
+# `in out` and single-file in-place forms (the sole positional is the last).
+[roles."llvm-objcopy"]
+shape = "last_write"
+[roles."llvm-strip"]
+shape = "last_write"
+[roles."wasm-strip"]
+shape = "last_write"
+[roles."install_name_tool"]
+shape = "last_write"
+[roles."indent"]
+shape = "last_write"
+[roles."resolveLinks"]
+shape = "last_write"
+[roles."PlistBuddy"]
+shape = "last_write"
+[roles."initdb"]
+shape = "last_write"
+[roles."gatherheaderdoc"]
+shape = "last_write"
+# Multi-file in-place mutators: EVERY positional is rewritten in place, so `last_write` (which gates
+# only the final arg) would miss the others — gate every positional as a write.
+[roles."nbstripout"]
+positional = "write"
+[roles."afscexpand"]
+positional = "write"
+
+# ── Operation-aware gates (the archive/mode selector decides read vs write; see pathgate::handlers).
+#    r/q/d/m/s write the .a, t/p/x read it — matters at an in-workspace protected path (.git/config:
+#    readable, write-denied), where an all-write gate would over-deny the read ops.
+[roles."ar"]
+handler = "ar_archive"
+[roles."emar"]
+handler = "ar_archive"
+[roles."llvm-ar"]
+handler = "ar_archive"
+# textutil -convert/-strip write (a sibling of each input, or -output/-outputdir); -info/-cat read.
+[roles."textutil"]
+handler = "textutil_mode"
+
+# ── Derived-output writers: the output is a SIBLING of the input (same directory), so write-gating
+#    the input path is locus-equivalent to gating the sibling. No read mode, so a plain write gate.
+[roles."cap_mkdb"]
+positional = "write"
+[roles."znew"]
+positional = "write"
+[roles."pl2pm"]
+positional = "write"
+
+# ── Scaffolders: a scaffolder CREATEs inert code into a named target directory. That write is local
+#    SafeWrite, but the target must stay in the workspace — a scaffold into ~/.ssh or an arbitrary
+#    out-of-workspace dir is out of scope. Gate the target dir; the inert-code create stays SafeWrite.
+[roles."create-next-app"]
+positional = "write"
+[roles."create-react-app"]
+positional = "write"
+[roles."create-vite"]
+positional = "write"
+[roles."degit"]
 shape = "last_write"
 
 [roles."djxl"]
