@@ -1,4 +1,9 @@
 /target
+/fuzz/target
+/fuzz/artifacts
+# Keep the committed seed corpus; ignore libFuzzer's hash-named generated entries.
+/fuzz/corpus/parse/*
+!/fuzz/corpus/parse/seed-*
 .claude
 docs/src/commands/
 docs/src/includes/command-count.md
