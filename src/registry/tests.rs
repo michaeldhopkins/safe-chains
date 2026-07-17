@@ -2913,6 +2913,58 @@ deny = true
         }
     }
 
+    /// gcloud STRUCTURAL guard: a `first_arg` glob must contain ONLY vetted read verbs. gcloud dispatches
+    /// `gcloud <group> <subgroup> <verb>`, and a FirstArg glob matches the FIRST token and ignores the
+    /// rest — so a glob listing SUBGROUP names (`["instances", "keys", …]`) auto-approves EVERY verb under
+    /// them: create/delete/irreversible-destroy, `jobs submit` (remote code exec), `get-auth-string`
+    /// (a credential). The correct shape is a sub-sub per subgroup, each with its own read-verb glob. This
+    /// flags any glob token that is not a known safe read verb — either a subgroup name (→ make it a
+    /// sub-sub) or a mutating/data verb (→ drop it). Ratchet: to admit a genuinely-new safe read verb, add
+    /// it to READ_VERBS as a vetted decision. Walks the real registry, so new gcloud groups are covered.
+    #[test]
+    fn gcloud_globs_admit_only_read_verbs() {
+        use super::types::DispatchKind;
+        fn walk(prefix: &str, kind: &DispatchKind, bad: &mut Vec<String>) {
+            // The only tokens safe to admit via a gcloud glob: they are READ operations, not subgroups
+            // (which hide their own verbs) and not mutations.
+            const READ_VERBS: &[&str] = &[
+                "describe", "list", "get-iam-policy", "get-ancestors-iam-policy", "log", "read", "ls",
+                // group-specific analysis reads (no state change), vetted:
+                "compute",              // essential-contacts compute (effective contacts)
+                "lint-condition",       // policy-intelligence — validate an IAM condition
+                "query-activity",       // policy-intelligence — read activity data
+                "troubleshoot-policy",  // policy-intelligence — analyze access (read)
+            ];
+            let check = |pfx: &str, patterns: &[String], bad: &mut Vec<String>| {
+                for p in patterns {
+                    if !READ_VERBS.contains(&p.as_str()) {
+                        bad.push(format!("{pfx}: `{p}`"));
+                    }
+                }
+            };
+            match kind {
+                DispatchKind::FirstArg { patterns, .. } => check(prefix, patterns, bad),
+                DispatchKind::Branching { subs, first_arg, .. } => {
+                    check(prefix, first_arg, bad);
+                    for s in subs {
+                        walk(&format!("{prefix} {}", s.name), &s.kind, bad);
+                    }
+                }
+                _ => {}
+            }
+        }
+        let Some(spec) = TOML_REGISTRY.get("gcloud") else { return };
+        let mut bad = Vec::new();
+        walk("gcloud", &spec.kind, &mut bad);
+        assert!(
+            bad.is_empty(),
+            "gcloud first_arg globs admit non-read tokens ({} — a subgroup name → make it a sub-sub with a \
+             read-verb glob; or a mutating/data verb → drop it):\n  {}",
+            bad.len(),
+            bad.join("\n  "),
+        );
+    }
+
     #[test]
     fn all_toml_commands_have_description() {
         let mut missing = Vec::new();

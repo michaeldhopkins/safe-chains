@@ -228,71 +228,608 @@ tolerate_unknown_long = true
 [[command.sub]]
 name = "artifacts"
 [[command.sub.sub]]
+name = "apt"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "attachments"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "docker"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "images"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "tags"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "files"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "generic"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "go"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "image-streaming-cache"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "locations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "packages"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "print-settings"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "projects"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
 name = "repositories"
 first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "rules"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "sbom"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "settings"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "tags"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "versions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "vpcsc-config"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "vulnerabilities"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "yum"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "storage"
-first_arg = ["buckets", "cp", "ls", "cat", "objects"]
+first_arg = ["ls"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "batch-operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "bucket-operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "jobs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "buckets"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "anywhere-caches"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "notifications"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "folders"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "hmac"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "insights"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "dataset-configs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "inventory-reports"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub.sub]]
+name = "details"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "intelligence-configs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "intelligence-findings"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "revisions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "managed-folders"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "objects"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "pubsub"
-first_arg = ["subscriptions", "topics", "snapshots", "schemas"]
+[[command.sub.sub]]
+name = "lite-operations"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "lite-reservations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "lite-subscriptions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "lite-topics"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "message-transforms"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "schemas"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "snapshots"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "subscriptions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "topics"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "spanner"
-first_arg = ["databases", "instances", "operations"]
+[[command.sub.sub]]
+name = "backup-schedules"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "backups"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "databases"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "ddl"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "roles"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "sessions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "splits"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "instance-configs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "instance-partitions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "instances"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "rows"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "samples"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "redis"
-first_arg = ["instances", "operations", "regions"]
+[[command.sub.sub]]
+name = "acl-policies"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "clusters"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "backup-collections"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "backups"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "instances"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "regions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "zones"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "memcache"
-first_arg = ["instances", "operations", "regions"]
+[[command.sub.sub]]
+name = "instances"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "regions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "bigtable"
-first_arg = ["clusters", "instances", "operations"]
+[[command.sub.sub]]
+name = "app-profiles"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "authorized-views"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "backups"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "clusters"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "hot-tablets"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "instances"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "tables"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "logical-views"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "materialized-views"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "schema-bundles"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "tables"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "firestore"
-first_arg = ["databases", "indexes", "operations"]
+[[command.sub.sub]]
+name = "backups"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub.sub]]
+name = "schedules"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "databases"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "fields"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "ttls"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "indexes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "composite"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "fields"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "locations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "dataflow"
-first_arg = ["jobs", "logs", "metrics", "snapshots"]
+[[command.sub.sub]]
+name = "flex-template"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "jobs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "snapshots"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "yaml"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "dataproc"
-first_arg = ["clusters", "jobs", "operations", "workflow-templates"]
+[[command.sub.sub]]
+name = "autoscaling-policies"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "batches"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "clusters"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "gke"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "jobs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "node-groups"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "workflow-templates"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "composer"
-first_arg = ["environments", "operations"]
+[[command.sub.sub]]
+name = "environments"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub.sub]]
+name = "snapshots"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "storage"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub.sub]]
+name = "dags"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub.sub]]
+name = "data"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub.sub]]
+name = "plugins"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "user-workloads-config-maps"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "builds"
 first_arg = ["describe", "list", "log"]
@@ -316,16 +853,118 @@ tolerate_unknown_long = true
 
 [[command.sub]]
 name = "kms"
-first_arg = ["keys", "keyrings", "locations"]
+[[command.sub.sub]]
+name = "autokey-config"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "ekm-config"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "ekm-connections"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "import-jobs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "inventory"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "key-handles"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "keyrings"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "keys"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "versions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "locations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "retired-resources"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "single-tenant-hsm"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "proposal"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "resource-manager"
-first_arg = ["folders", "liens", "operations", "org-policies"]
+[[command.sub.sub]]
+name = "capabilities"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "folders"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "org-policies"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "tags"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "bindings"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "holds"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "keys"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "values"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "organizations"
 first_arg = ["describe", "list"]
@@ -334,172 +973,1069 @@ tolerate_unknown_long = true
 
 [[command.sub]]
 name = "billing"
-first_arg = ["accounts", "budgets", "projects"]
+[[command.sub.sub]]
+name = "accounts"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "budgets"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "projects"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "monitoring"
-first_arg = ["channels", "dashboards", "policies", "snoozes"]
+[[command.sub.sub]]
+name = "dashboards"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "policies"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "conditions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "snoozes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "uptime"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "deploy"
-first_arg = ["delivery-pipelines", "releases", "rollouts", "targets"]
+[[command.sub.sub]]
+name = "automation-runs"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "automations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "custom-target-types"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "delivery-pipelines"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "deploy-policies"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "job-runs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "releases"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "rollouts"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "targets"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "network-management"
-first_arg = ["connectivity-tests", "operations"]
+[[command.sub.sub]]
+name = "connectivity-tests"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "network-monitoring-providers"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "monitoring-points"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "network-paths"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "web-paths"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "vpc-flow-logs-configs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "network-services"
-first_arg = ["endpoints", "gateways", "grpc-routes", "http-routes", "meshes"]
+[[command.sub.sub]]
+name = "agent-gateways"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "endpoint-policies"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "gateways"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "grpc-routes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "http-routes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "meshes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "multicast-consumer-associations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "multicast-domain-activations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "multicast-domain-groups"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "multicast-domains"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "multicast-group-consumer-activations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "multicast-group-producer-activations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "multicast-group-range-activations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "multicast-group-ranges"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "multicast-producer-associations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "route-views"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "service-bindings"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "service-lb-policies"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "tcp-routes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "tls-routes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "certificate-manager"
-first_arg = ["certificates", "dns-authorizations", "maps", "operations"]
+[[command.sub.sub]]
+name = "certificates"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "dns-authorizations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "issuance-configs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "maps"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "entries"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "trust-configs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "access-context-manager"
-first_arg = ["levels", "perimeters", "policies"]
+[[command.sub.sub]]
+name = "authorized-orgs"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "cloud-bindings"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "levels"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "conditions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "perimeters"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "dry-run"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "policies"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "supported-permissions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "supported-services"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "recaptcha"
-first_arg = ["keys"]
+[[command.sub.sub]]
+name = "firewall-policies"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "keys"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "alloydb"
-first_arg = ["clusters", "instances", "operations"]
+[[command.sub.sub]]
+name = "backups"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "clusters"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "instances"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "users"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "vmware"
-first_arg = ["clusters", "dns-bind-permission", "external-addresses", "hcx-activation-keys", "locations", "networks", "node-types", "operations", "private-clouds", "subnets"]
+[[command.sub.sub]]
+name = "announcements"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "datastores"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "dns-bind-permission"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "locations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "network-peerings"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "routes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "network-policies"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "external-access-rules"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "networks"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "node-types"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "private-clouds"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "clusters"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub.sub]]
+name = "nodes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "dns-forwarding"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "external-addresses"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "hcx"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub.sub]]
+name = "activationkeys"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "logging-servers"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "management-dns-zone-bindings"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "nsx"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "subnets"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "upgrades"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "vcenter"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "private-connections"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "routes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "notebooks"
-first_arg = ["environments", "instances", "locations"]
+[[command.sub.sub]]
+name = "environments"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "instances"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "locations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "runtimes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "ai"
-first_arg = ["custom-jobs", "endpoints", "hp-tuning-jobs", "index-endpoints", "indexes", "models", "operations", "tensorboards"]
+[[command.sub.sub]]
+name = "custom-jobs"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "endpoints"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "hp-tuning-jobs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "index-endpoints"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "indexes"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "model-garden"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "models"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "model-monitoring-jobs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "models"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "persistent-resources"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "tensorboards"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "tuning-jobs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "ai-platform"
-first_arg = ["jobs", "local", "models", "operations", "versions"]
+[[command.sub.sub]]
+name = "jobs"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "local"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "models"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "versions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "healthcare"
-first_arg = ["datasets", "dicom-stores", "fhir-stores", "hl7v2-stores", "operations"]
+[[command.sub.sub]]
+name = "consent-stores"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "datasets"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "dicom-stores"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "fhir-stores"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "hl7v2-stores"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "filestore"
-first_arg = ["backups", "instances", "locations", "operations"]
+[[command.sub.sub]]
+name = "backups"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "instances"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "snapshots"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "locations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "regions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "zones"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "transfer"
-first_arg = ["agents", "jobs", "operations"]
+[[command.sub.sub]]
+name = "agent-pools"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "agents"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "jobs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "eventarc"
-first_arg = ["channels", "providers", "triggers"]
+[[command.sub.sub]]
+name = "audit-logs-provider"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub.sub]]
+name = "method-names"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "service-names"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "channel-connections"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "channels"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "enrollments"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "google-api-sources"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "google-channels"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "locations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "message-buses"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "pipelines"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "providers"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "triggers"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "workflows"
-first_arg = ["describe", "executions", "list"]
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "executions"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
 
 [[command.sub]]
 name = "scheduler"
-first_arg = ["jobs"]
+[[command.sub.sub]]
+name = "cmek-config"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "jobs"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "locations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "tasks"
-first_arg = ["describe", "list", "locations", "queues"]
+[[command.sub.sub]]
+name = "cmek-config"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "locations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "queues"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "apigee"
-first_arg = ["apis", "applications", "archives", "deployments", "developers", "environments", "operations", "organizations", "products"]
+[[command.sub.sub]]
+name = "apis"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "applications"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "deployments"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "developers"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "environments"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "organizations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "products"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "api-gateway"
-first_arg = ["apis", "api-configs", "gateways", "operations"]
+[[command.sub.sub]]
+name = "api-configs"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "apis"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "gateways"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "assured"
-first_arg = ["operations", "workloads"]
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "workloads"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "violations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "batch"
-first_arg = ["jobs", "tasks"]
+[[command.sub.sub]]
+name = "jobs"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "tasks"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "artifacts"
-first_arg = ["docker", "files", "packages", "repositories", "tags", "versions"]
+[[command.sub.sub]]
+name = "apt"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "attachments"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "docker"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "images"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "tags"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "files"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "generic"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "go"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "image-streaming-cache"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "locations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "operations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "packages"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "print-settings"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "projects"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "repositories"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "rules"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "sbom"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "settings"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "tags"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "versions"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "vpcsc-config"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "vulnerabilities"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "yum"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "source"
-first_arg = ["repos"]
+[[command.sub.sub]]
+name = "project-configs"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "repos"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "service-directory"
-first_arg = ["endpoints", "namespaces", "services"]
+[[command.sub.sub]]
+name = "endpoints"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub]]
+name = "locations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "namespaces"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "services"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "identity"
-first_arg = ["groups"]
+[[command.sub.sub]]
+name = "groups"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub.sub]]
+name = "memberships"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "essential-contacts"
 first_arg = ["compute", "list"]
@@ -514,12 +2050,60 @@ tolerate_unknown_long = true
 
 [[command.sub]]
 name = "scc"
-first_arg = ["assets", "findings", "notifications", "operations", "sources"]
+[[command.sub.sub]]
+name = "custom-modules"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
-
+[[command.sub.sub.sub]]
+name = "sha"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "manage"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "custom-modules"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub.sub]]
+name = "etd"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub.sub]]
+name = "sha"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub.sub]]
+name = "services"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
 [[command.sub]]
 name = "recommender"
-first_arg = ["insights", "recommendations"]
+[[command.sub.sub]]
+name = "insight-type-config"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "insights"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "recommendations"
+first_arg = ["describe", "list"]
+tolerate_unknown_short = true
+tolerate_unknown_long = true
+[[command.sub.sub]]
+name = "recommender-config"
+first_arg = ["describe", "list"]
 tolerate_unknown_short = true
 tolerate_unknown_long = true
