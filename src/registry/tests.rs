@@ -2155,6 +2155,64 @@ use super::*;
         }
     }
 
+    /// Corpus ratchet — known decrypt-to-screen invocations that MUST deny at the auto-approve band.
+    /// The registry-walking guard above proves DECLARED decrypt-read classifications work; this catches
+    /// an UNCLASSIFIED sibling shipping open, which is exactly how `ansible-vault decrypt` slipped
+    /// (gated `view` but not `decrypt`). Hand-curated on purpose — a real disclosure form per tool, so a
+    /// regression on any specific spelling trips even though the registry walk can't see an unclassified
+    /// sub. Add a line here whenever a new decrypt surface is researched.
+    #[test]
+    fn decrypt_to_screen_corpus_denies() {
+        for c in [
+            "sops -d secrets.yaml",
+            "sops --decrypt secrets.yaml",
+            "sops decrypt secrets.yaml",
+            "age -d secrets.age",
+            "age --decrypt -i k secrets.age",
+            "gpg -d secret.gpg",
+            "gpg --decrypt secret.gpg",
+            "ansible-vault view vault.yml",
+            "ansible-vault decrypt vault.yml",
+            "ansible-vault decrypt --output - vault.yml",
+            "openssl enc -d -in x.enc -k p",
+            "openssl smime -decrypt -in m.p7 -inkey k.pem",
+            "openssl cms -decrypt -in m -inkey k",
+        ] {
+            assert!(!crate::is_safe_command(c), "decrypt-to-screen must deny at the band: {c}");
+        }
+    }
+
+    /// Fail-closed guard for the `walk_to_classified_sub` footgun (review finding): a profiled sub with
+    /// a FLAG-bearing DESCENDANT sub would let the deepest-match walk descend to the flags-only sub and,
+    /// if no flag fires, drop the outer profile to the legacy classifier. No such structure exists today
+    /// (openssl/sops flag-subs are single-level under a non-profiled parent). If one is added, handle the
+    /// ancestor-profile fallback in `sub_archetypes` before relaxing this.
+    #[test]
+    fn no_profiled_sub_has_flag_bearing_descendants() {
+        fn check(prefix: &str, kind: &DispatchKind, under_profile: bool, bad: &mut Vec<String>) {
+            let subs = match kind {
+                DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
+                _ => return,
+            };
+            for s in subs {
+                let path = format!("{prefix} {}", s.name);
+                if under_profile && !s.flags.is_empty() {
+                    bad.push(path.clone());
+                }
+                check(&path, &s.kind, under_profile || s.profile.is_some(), bad);
+            }
+        }
+        let mut bad = Vec::new();
+        for (name, spec) in TOML_REGISTRY.iter() {
+            check(name, &spec.kind, false, &mut bad);
+        }
+        assert!(
+            bad.is_empty(),
+            "profiled subs with flag-bearing descendants (handle the ancestor-profile fallback in \
+             sub_archetypes first): {bad:?}",
+        );
+    }
+
     #[test]
     fn toml_registry_rejects_unknown_flags() {
         let mut failures = Vec::new();
