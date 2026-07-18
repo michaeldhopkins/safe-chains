@@ -2184,6 +2184,9 @@ use super::*;
             "openssl rsa -in enc.pem -passin pass:x",
             "openssl rsa -in priv.pem -out /dev/stdout", // -out value is stdout → still a disclosure
             "openssl rsa -in priv.pem -out -",           // "-" is stdout on modern openssl
+            "openssl rsa -in priv.pem -out //dev/stdout", // path-normalization evasion (fail-closed)
+            "openssl rsa -in priv.pem -out /dev/stderr",  // stderr reaches the model in merged-output harnesses
+            "openssl rsa -in priv.pem -out safe.pem -out /dev/stdout", // duplicate -out (openssl: last-wins)
             "openssl rsa -in priv.pem -noout -text",     // -text dumps private components past -noout
             "openssl rsa -in priv.pem -pubout -text",    // -text dumps private components past -pubout too
             "openssl pkey -in priv.pem -pubout -text",
