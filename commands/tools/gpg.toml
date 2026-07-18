@@ -48,3 +48,9 @@ name = "--decrypt"
 classifies = "decrypt-read"
 fact = "`gpg --decrypt` decrypts the input and writes the PLAINTEXT to stdout — the decrypted content enters the caller's context."
 source = "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html (--decrypt)"
+
+[[command.flag]]
+name = "--decrypt-files"
+classifies = "decrypt-read"
+fact = "`gpg --decrypt-files` decrypts each named file — a batch decrypt of secret material, classified like `--decrypt` for consistency (it was already denied as a non-inspection command)."
+source = "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html (--decrypt-files)"
