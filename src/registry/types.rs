@@ -58,6 +58,14 @@ pub(super) struct TomlCommand {
     pub first_arg: Vec<String>,
     #[serde(default)]
     pub credential_first_arg: Vec<String>,
+    /// Top-level classifying flags (`[[command.flag]]`): a flag whose PRESENCE classifies the WHOLE
+    /// invocation as an archetype — the flat-command analog of `[[command.sub.flag]]`. For a bimodal
+    /// tool where a mode flag flips the operation: `age -d` / `sops --decrypt` reveal plaintext to the
+    /// model (`decrypt-read`), while the bare/encrypt form is an ordinary local write. Resolved by
+    /// `engine::resolve` via `registry::command_flag_archetypes`; each flag's `classifies` must name a
+    /// known archetype and carry `fact`/`source` provenance (the `assert_command_flag_provenance` guard).
+    #[serde(default)]
+    pub flag: Vec<TomlSubFlag>,
     #[serde(default)]
     pub wrapper: Option<TomlWrapper>,
     #[serde(default)]
@@ -576,6 +584,10 @@ pub struct CommandSpec {
     /// The command's own path-argument gate (`[command.path_gate]`), if declared. Read by
     /// `registry::command_path_gate` → `pathgate::should_deny`.
     pub(super) path_gate: Option<crate::pathgate::RoleSpec>,
+    /// Top-level classifying flags (`[[command.flag]]`), lowered from `TomlSubFlag`. A present flag
+    /// classifies the whole invocation as its archetype — read by `registry::command_flag_archetypes`
+    /// → `engine::resolve::resolve` (the flat-command analog of a profiled sub's escalating flags).
+    pub(super) archetype_flags: Vec<FlagProvenance>,
     /// Declarative facet behavior (`[command.behavior]`), lowered to typed facet enums. Read
     /// by `registry::command_behavior` → `engine::resolve::resolve_behavior`. When present,
     /// the engine classifies this command from its declared facets instead of a Rust resolver.

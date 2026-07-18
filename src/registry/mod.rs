@@ -102,6 +102,23 @@ pub(crate) fn sub_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
     Some(out)
 }
 
+/// The facet archetypes a flat command's PRESENT top-level classifying flags (`[[command.flag]]`)
+/// resolve to — the command-level analog of `sub_archetypes` for a flag-triggered mode (`age -d` →
+/// `[decrypt-read]`, `sops --decrypt` → `[decrypt-read]`). `None` when the command declares none or
+/// none are present, so `engine::resolve` falls through to the command's ordinary resolution (the
+/// bare/encrypt form of a bimodal tool). Uses the same `flag_escalates` predicate as the sub flags.
+pub(crate) fn command_flag_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
+    let cmd = canonical_name(tokens.first()?.command_name());
+    let spec = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd))?;
+    let present: Vec<&'static str> = spec
+        .archetype_flags
+        .iter()
+        .filter(|f| flag_escalates(tokens, f))
+        .map(|f| f.classifies.as_str())
+        .collect();
+    (!present.is_empty()).then_some(present)
+}
+
 /// Whether `flag` escalates given `tokens`. A bare flag (no `value_prefix`) escalates on presence; a
 /// value-matched flag escalates only when its VALUE starts with the prefix — the space form
 /// (`-c core.sshCommand=…`) or the glued form (`--flag=core.sshCommand=…`). Scans the whole line;
