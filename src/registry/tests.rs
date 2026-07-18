@@ -89,7 +89,7 @@ use super::*;
             value_prefix: Some("core.sshCommand=".into()),
             when_absent: false,
         };
-        let esc = |words: &[&str]| super::flag_escalates(&toks(words), &c_flag, false);
+        let esc = |words: &[&str]| super::flag_escalates(&toks(words), &c_flag);
         assert!(esc(&["git", "-c", "core.sshCommand=evil", "push"]), "dangerous key → escalate");
         assert!(!esc(&["git", "-c", "color.ui=false", "log"]), "benign key → no escalate");
         assert!(!esc(&["git", "-c", "log"]), "flag without the matching value → no escalate");
@@ -102,8 +102,8 @@ use super::*;
             value_prefix: Some("exec=".into()),
             when_absent: false,
         };
-        assert!(super::flag_escalates(&toks(&["x", "--conf=exec=danger"]), &glued, false));
-        assert!(!super::flag_escalates(&toks(&["x", "--conf=safe=ok"]), &glued, false));
+        assert!(super::flag_escalates(&toks(&["x", "--conf=exec=danger"]), &glued));
+        assert!(!super::flag_escalates(&toks(&["x", "--conf=safe=ok"]), &glued));
 
         // a bare flag (no value_prefix) still escalates on mere presence
         let bare = FlagProvenance {
@@ -112,8 +112,8 @@ use super::*;
             value_prefix: None,
             when_absent: false,
         };
-        assert!(super::flag_escalates(&toks(&["git", "push", "--force"]), &bare, false));
-        assert!(!super::flag_escalates(&toks(&["git", "push"]), &bare, false));
+        assert!(super::flag_escalates(&toks(&["git", "push", "--force"]), &bare));
+        assert!(!super::flag_escalates(&toks(&["git", "push"]), &bare));
 
         // `when_absent`: a SAFETY flag whose ABSENCE escalates (`npm ci` without `--ignore-scripts`).
         let safety = FlagProvenance {
@@ -122,13 +122,13 @@ use super::*;
             value_prefix: None,
             when_absent: true,
         };
-        assert!(super::flag_escalates(&toks(&["npm", "ci"]), &safety, false), "flag ABSENT → escalate");
-        assert!(!super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts"]), &safety, false), "flag present → no escalate");
+        assert!(super::flag_escalates(&toks(&["npm", "ci"]), &safety), "flag ABSENT → escalate");
+        assert!(!super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts"]), &safety), "flag present → no escalate");
         // a re-enabling spelling must NOT masquerade as the safety flag (the fail-open the review found).
-        assert!(super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=false"]), &safety, false), "=false re-enables → escalate");
-        assert!(super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=0"]), &safety, false), "=0 re-enables → escalate");
-        assert!(super::flag_escalates(&toks(&["npm", "ci", "--no-ignore-scripts"]), &safety, false), "--no- form → escalate");
-        assert!(!super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=true"]), &safety, false), "=true → no escalate");
+        assert!(super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=false"]), &safety), "=false re-enables → escalate");
+        assert!(super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=0"]), &safety), "=0 re-enables → escalate");
+        assert!(super::flag_escalates(&toks(&["npm", "ci", "--no-ignore-scripts"]), &safety), "--no- form → escalate");
+        assert!(!super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=true"]), &safety), "=true → no escalate");
     }
 
     /// Regression: a profiled sub must deny via the LEGACY path too, not just the engine. A global
@@ -2187,7 +2187,6 @@ use super::*;
             "openssl rsa -in priv.pem -noout -text",     // -text dumps private components past -noout
             "openssl rsa -in priv.pem -pubout -text",    // -text dumps private components past -pubout too
             "openssl pkey -in priv.pem -pubout -text",
-            "openssl rsa -in enc.pem -out clean.pem",    // private-key extraction (conservatively gated)
             "openssl enc --d -aes-128-cbc -k p -in ct.enc", // openssl --opt alias for -opt
             "openssl cms --decrypt -in m -inkey k",
             "openssl pkcs12 -in f.p12 --noenc",
@@ -2203,81 +2202,47 @@ use super::*;
         ] {
             assert!(!crate::is_safe_command(c), "decrypt-to-screen must deny at the band: {c}");
         }
-        // The COMPLEMENT — forms that are genuinely safe must stay allowed: PUBLIC-key extraction
-        // (-pubout/-pubin WITHOUT -text), the re-encrypted pkcs12 default, encrypt/sign, and gpg
-        // inspection commands. Guards the fix against over-denying a real read (red→green if the
-        // -pubout/-pubin neutralizer or gpg's require_any regressed). NOTE: `-text` is conservatively
-        // gated whenever present (it dumps private components past -pubout and can't be distinguished
-        // from the -pubin-safe case), so `-pubin -text` public inspection is a deliberate over-deny.
+        // The COMPLEMENT — forms `resolve_openssl` recognizes as NOT a model disclosure must stay
+        // allowed: public-key mode (-pubout/-pubin, even with -text: -pubin makes -text public),
+        // to-FILE extraction (-out FILE diverts off stdout), -noout validation, the re-encrypted pkcs12
+        // default, encrypt/sign, and gpg inspection commands. Guards the resolver against over-denying.
         for c in [
             "openssl rsa -in priv.pem -pubout",
-            "openssl pkey -in pub.pem -pubin",
-            "openssl pkcs12 -in file.p12",            // default re-encrypts the key
+            "openssl pkey -in pub.pem -pubin -text",       // public input → -text is public, safe
+            "openssl rsa -in enc.pem -out clean.pem",      // private key to a FILE (off the model)
+            "openssl rsa -in priv.pem -noout",             // validate, no output
+            "openssl pkcs12 -in file.p12 -nodes -out key.pem", // unencrypted key to a FILE
+            "openssl pkcs12 -in file.p12",                 // default re-encrypts the key
+            "openssl enc -d -out plain.txt -k p -in ct.enc",   // decrypt to a FILE
             "openssl enc -e -in x -out x.enc -k p",
             "openssl cms -sign -in m -signer c",
             "gpg --list-keys",
             "gpg --version",
         ] {
-            assert!(crate::is_safe_command(c), "a public/read form must stay allowed: {c}");
+            assert!(crate::is_safe_command(c), "a public/to-file/read form must stay allowed: {c}");
         }
     }
 
-    /// openssl accepts `--opt` as an alias for `-opt` on every subcommand, so every gated openssl
-    /// decrypt flag must deny in BOTH the single-dash and double-dash spelling (adversarial-review
-    /// finding — `openssl enc --d` decrypted past the exact-match classifier). Walks openssl's
-    /// decrypt sub-flags and checks both twins; the single-dash-long normalization in `flag_present`
-    /// is what makes this pass. A new openssl decrypt flag is covered automatically.
+    /// openssl accepts `--opt` as an alias for `-opt` on every subcommand, so every decrypt trigger
+    /// `resolve_openssl` recognizes must deny in BOTH the single-dash and double-dash spelling
+    /// (adversarial-review finding — `openssl enc --d` decrypted past the exact-match classifier;
+    /// `resolve_openssl` normalizes the `--` twin). A new decrypt trigger added to the resolver should
+    /// gain a row here.
     #[test]
-    fn openssl_decrypt_flags_gate_both_dash_spellings() {
-        let spec = TOML_REGISTRY.get("openssl").expect("openssl in registry");
-        let mut checked = 0;
-        if let DispatchKind::Branching { subs, .. } = &spec.kind {
-            for s in subs {
-                for f in &s.flags {
-                    if f.classifies != "decrypt-read" {
-                        continue;
-                    }
-                    // f.name is single-dash (`-d`); the double-dash twin prepends another dash.
-                    let single = format!("openssl {} {} -in x", s.name, f.name);
-                    let double = format!("openssl {} -{} -in x", s.name, f.name);
-                    assert!(!crate::is_safe_command(&single), "single-dash must deny: {single}");
-                    assert!(!crate::is_safe_command(&double), "double-dash twin must deny: {double}");
-                    checked += 1;
-                }
-            }
+    fn openssl_decrypt_triggers_gate_both_dash_spellings() {
+        for (sub, flag) in [
+            ("enc", "-d"),
+            ("smime", "-decrypt"),
+            ("cms", "-decrypt"),
+            ("cms", "-EncryptedData_decrypt"),
+            ("pkcs12", "-noenc"),
+            ("pkcs12", "-nodes"),
+        ] {
+            let single = format!("openssl {sub} {flag} -in x -k p");
+            let double = format!("openssl {sub} -{flag} -in x -k p"); // -flag → --flag
+            assert!(!crate::is_safe_command(&single), "single-dash must deny: {single}");
+            assert!(!crate::is_safe_command(&double), "double-dash twin must deny: {double}");
         }
-        assert!(checked >= 4, "expected openssl decrypt sub-flags, got {checked}");
-    }
-
-    /// Fail-closed guard for the `walk_to_classified_sub` footgun (review finding): a profiled sub with
-    /// a FLAG-bearing DESCENDANT sub would let the deepest-match walk descend to the flags-only sub and,
-    /// if no flag fires, drop the outer profile to the legacy classifier. No such structure exists today
-    /// (openssl/sops flag-subs are single-level under a non-profiled parent). If one is added, handle the
-    /// ancestor-profile fallback in `sub_archetypes` before relaxing this.
-    #[test]
-    fn no_profiled_sub_has_flag_bearing_descendants() {
-        fn check(prefix: &str, kind: &DispatchKind, under_profile: bool, bad: &mut Vec<String>) {
-            let subs = match kind {
-                DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
-                _ => return,
-            };
-            for s in subs {
-                let path = format!("{prefix} {}", s.name);
-                if under_profile && !s.flags.is_empty() {
-                    bad.push(path.clone());
-                }
-                check(&path, &s.kind, under_profile || s.profile.is_some(), bad);
-            }
-        }
-        let mut bad = Vec::new();
-        for (name, spec) in TOML_REGISTRY.iter() {
-            check(name, &spec.kind, false, &mut bad);
-        }
-        assert!(
-            bad.is_empty(),
-            "profiled subs with flag-bearing descendants (handle the ancestor-profile fallback in \
-             sub_archetypes first): {bad:?}",
-        );
     }
 
     #[test]

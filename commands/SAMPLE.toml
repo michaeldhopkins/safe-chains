@@ -200,23 +200,10 @@
 # Provenance is validated at BUILD time (build::assert_sub_provenance): a profiled sub or escalating
 # flag missing fact+source, or naming an unknown archetype, PANICS at registry load — fail-closed.
 #
-# NEUTRALIZING flags (`unless_flags`): a profiled sub dangerous BY DEFAULT but safe in a switched mode.
-# When any listed flag is present, the `profile` does NOT apply and the sub falls through to its
-# ordinary `level`/`allow_all`. `openssl rsa -in priv.pem` dumps the private key to stdout (decrypt-read),
-# but `-pubout`/`-pubin` switch it to PUBLIC-key output → SafeWrite. Only flags that make the WHOLE
-# operation safe belong here — NOT an output-redirect like `-out`/`-noout`, whose value can still be
-# stdout (`-out -`) or be defeated by a side-channel (`-text`). Unlike a plain profiled sub (legacy kind
-# razed to deny-on-abstain), an `unless_flags` sub KEEPS its `level`/`allow_all`. Requires `profile`.
-#
-# [[command.sub]]
-# name = "rsa"
-# allow_all = true
-# level = "SafeWrite"
-# profile = "decrypt-read"
-# unless_flags = ["-pubout", "-pubin", "-out", "-noout"]
-# fact = "…dumps the private key to stdout unless the output is diverted…"
-# source = "…"
-# judgment = "…"
+# For a command whose disclosure logic is too conditional for these declarative primitives (openssl's
+# private-key subs: `--`/`-` flag equivalence, the `-text` side channel, an `-out` whose VALUE can be
+# stdout), write a per-command ENGINE RESOLVER instead (`resolve_openssl` in src/engine/resolve.rs),
+# which returns a Profile from arbitrary Rust and stays yolo-reachable.
 #
 # TOP-LEVEL classifying flag (`[[command.flag]]`): the FLAT-command analog of `[[command.sub.flag]]`.
 # A flag whose PRESENCE classifies the WHOLE invocation as an archetype — for a bimodal tool where a
