@@ -369,8 +369,13 @@ fn openssl_output_reaches_model(args: &[Token]) -> bool {
 /// redundant `/`, `.`, and `..` segments first so alternate spellings can't evade. Fail-closed: `-`,
 /// empty, or any `/dev/…` or `/proc/…/fd/…` path is NOT a plain file. (Symlinks are classified by their
 /// literal spelling — out of scope for a static classifier, per AGENTS.md.)
+///
+/// A value that is itself a FLAG token (starts with `-`) is NOT proof of diversion: openssl's own
+/// parser lets a preceding valued flag SWALLOW the `-out` token as its value (`-provider-path -out
+/// -provider-path f.pem` leaves openssl with no `-out` → stdout), and our scan then misreads the next
+/// flag as the filename. The tell in every such bypass is a dash-leading `-out` value — reject it.
 fn out_value_is_plain_file(value: &str) -> bool {
-    if value.is_empty() || value == "-" {
+    if value.is_empty() || value.starts_with('-') {
         return false;
     }
     let norm = collapse_path(value).to_ascii_lowercase();
@@ -1266,6 +1271,11 @@ mod tests {
             &["-out", "/foo/../dev/stdout"],
             &["-out", "dup.pem", "-out", "/dev/stdout"], // last-wins
             &["-out", "-"],
+            // openssl's parser lets `-provider-path` swallow the `-out` token → openssl writes to
+            // stdout; our scan then misreads the trailing flag as the filename. A dash-leading `-out`
+            // value is the tell → fail closed.
+            &["-provider-path", "-out", "-provider-path", "safe.pem"],
+            &["-out", "-anything"],
         ] {
             assert!(reaches_model(evasion), "must read as model-reaching: {evasion:?}");
         }
