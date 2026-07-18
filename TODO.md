@@ -52,21 +52,24 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
     - `gpg -d`/`--decrypt` → decrypt-read (top-level flag). Also `gpg secret.gpg` (bare-file IMPLICIT
       decrypt) now denies: gpg requires an inspection command (`require_any`), so a positional-only
       invocation can't auto-approve an implicit decrypt/verify.
-    - `openssl enc -d` / `smime -decrypt` / `cms -decrypt` → decrypt-read (was allow_all=SafeWrite —
-      real auto-approve holes). Needed flag escalation on a bimodal sub with NO base profile (safe by
-      default, dangerous only in the `-d`/`-decrypt` mode).
-    - `openssl rsa`/`pkey`/`ec`/`dsa`/`pkcs8 -in priv.pem` → decrypt-read (dumps the private key to
-      stdout). Needed the `unless_flags` primitive (an AND-of-absences): decrypt-read UNLESS the output
-      is diverted by `-pubout`/`-pubin`/`-out`/`-noout`, in which case it stays SafeWrite.
-    - `openssl pkcs12 -in file.p12 -nodes` → decrypt-read (exports the UNENCRYPTED key to stdout). Uses a
-      bimodal-sub `-nodes` flag with `unless_flags = ["-out"]` (extended so a neutralizer suppresses an
-      escalating flag, not just a base profile); the default (re-encrypted) and `-out FILE` forms stay
-      SafeWrite.
+    - `openssl` (all disclosure subs: rsa/pkey/ec/dsa/pkcs8/pkcs12/enc/smime/cms) → an ENGINE RESOLVER
+      `resolve_openssl` (src/engine/resolve.rs), NOT declarative. openssl's flag grammar (single-dash
+      long opts `--d`==`-d`, the `-text` side channel that dumps private components past `-pubout`/
+      `-noout`, an `-out` whose VALUE can be stdout, parser token-swallow) defeated declarative
+      matching over 3 review rounds. The resolver emits decrypt-read (→ yolo) only when private/
+      decrypted material reaches the MODEL (stdout), and abstains for public-key mode, to-FILE
+      extraction, `-noout` validate, and encrypt/sign. `openssl_output_reaches_model` is FAIL-CLOSED
+      (model-reaching unless a single plain-file `-out`). The superseded declarative scaffolding
+      (`unless_flags`, bimodal-sub walk, single-dash-long flag normalization) was REMOVED. A glued
+      `-flag=path` pathgate gap (out-of-workspace read via `-in=~/.ssh/id_rsa`) was fixed generally in
+      `pathgate::walk`. Key GENERATION (genrsa/genpkey/req -newkey) stays SafeWrite — the threat model
+      is exfil of EXISTING secrets, not fresh keys (user-confirmed).
     Guarded by `decrypt_read_denies_at_the_band_and_is_a_secret_read` (registry-walking) +
     `decrypt_to_screen_corpus_denies` (MUST_DENY corpus + a complement of diverted/read forms that must
-    stay allowed) + `no_profiled_sub_has_flag_bearing_descendants` (fail-closed footgun guard). The
-    user's rule: decrypt-to-screen is NOT auto-approved below local-admin (it
-    lands at yolo, refused below).
+    stay allowed) + `openssl_output_destination_is_fail_closed` + `openssl_resolver_gates_model_
+    disclosure_only` (golden) + `openssl_decrypt_triggers_gate_both_dash_spellings`. The user's rule:
+    decrypt-to-screen is NOT auto-approved below local-admin (lands at yolo, refused below). CONVERGED
+    after 7 adversarial-review rounds (the last comprehensive pass: clean, fail-closed by construction).
     - `aws configure get aws_secret_access_key` / `aws_session_token` — GATED (2026-07) via
       `credential_first_arg` on `configure get`; `get region`/`output` stay allowed. (Residual: the rare
       profile-qualified key form `get profile.x.aws_secret_access_key` needs suffix-glob support — the
