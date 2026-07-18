@@ -2083,6 +2083,70 @@ use super::*;
         }
     }
 
+    /// Decrypt-to-screen — a top-level `[[command.flag]] classifies="decrypt-read"` or a sub
+    /// `profile="decrypt-read"` — must (1) DENY at the auto-approve band, so a decrypted secret never
+    /// silently enters the model's context, and (2) resolve to a `secret = reads` capability (the
+    /// yolo-only credential tier, reachable only above local-admin — the user's "not below local
+    /// admin" rule). Walks the registry, so a NEW decrypt tool is covered the instant it declares the
+    /// classification. Original bug class: `sops -d`, `age -d`, `ansible-vault view`, and the
+    /// `sops decrypt` subcommand each auto-approved before this.
+    #[test]
+    fn decrypt_read_denies_at_the_band_and_is_a_secret_read() {
+        use crate::engine::facet::SecretLevel;
+
+        fn collect_profiled_sub_paths(prefix: &str, kind: &DispatchKind, out: &mut Vec<String>) {
+            let subs = match kind {
+                DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
+                _ => return,
+            };
+            for s in subs {
+                let path = format!("{prefix} {}", s.name);
+                if s.profile.as_deref() == Some("decrypt-read") {
+                    out.push(path.clone());
+                }
+                collect_profiled_sub_paths(&path, &s.kind, out);
+            }
+        }
+
+        // Every invocation prefix that should classify as decrypt-read: `<cmd> <flag>` (top-level
+        // classifying flag) and `<cmd> <sub-path>` (a profiled subcommand).
+        let mut prefixes = Vec::new();
+        for (name, spec) in TOML_REGISTRY.iter() {
+            for f in &spec.archetype_flags {
+                if f.classifies == "decrypt-read" {
+                    prefixes.push(format!("{name} {}", f.name));
+                }
+            }
+            collect_profiled_sub_paths(name, &spec.kind, &mut prefixes);
+        }
+
+        assert!(
+            prefixes.len() >= 5,
+            "expected the known decrypt-read set (sops -d/--decrypt/decrypt, age -d/--decrypt, \
+             ansible-vault view), got {}: {prefixes:?}",
+            prefixes.len(),
+        );
+
+        for prefix in &prefixes {
+            let inv = format!("{prefix} ./secrets.file");
+            // (1) Denied at the auto-approve band — the safety property.
+            assert_eq!(
+                crate::command_verdict(&inv), Verdict::Denied,
+                "decrypt-read must deny at the default band: {inv}",
+            );
+            // (2) Resolves to a secret=reads capability — proves it is CLASSIFIED as decrypt-read
+            // (yolo-reachable), not merely denied by some unrelated flag rejection.
+            let mut parts: Vec<&str> = prefix.split(' ').collect();
+            parts.push("./secrets.file");
+            let profile = crate::engine::resolve::resolve(&toks(&parts))
+                .unwrap_or_else(|| panic!("decrypt-read invocation must resolve via the engine: {inv}"));
+            assert!(
+                profile.capabilities.iter().any(|c| c.secret.level == SecretLevel::Reads),
+                "decrypt-read invocation must carry a secret=reads capability: {inv}",
+            );
+        }
+    }
+
     #[test]
     fn toml_registry_rejects_unknown_flags() {
         let mut failures = Vec::new();
