@@ -10336,7 +10336,6 @@ Aliases: `god`
 - `openssl x509 -in c.pem -noout -text`
 - `openssl genrsa 2048`
 - `openssl rsa -in priv.pem -pubout`
-- `openssl rsa -in enc.pem -out clean.pem`
 
 ### `opj_compress`
 <p class="cmd-url"><a href="https://github.com/uclouvain/openjpeg">https://github.com/uclouvain/openjpeg</a></p>
