@@ -662,6 +662,12 @@ Aliases: `g++`, `cc`, `c++`
 - Allowed standalone flags: --check-sigs, --check-trustdb, --fingerprint, --help, --list-config, --list-keys, --list-options, --list-public-keys, --list-secret-keys, --list-sigs, --list-trustdb, --no-tty, --print-md, --quiet, --show-keys, --show-sigs, --verbose, --version, -K, -h, -k, -q, -v
 - Allowed valued flags: --digest-algo, --homedir, --keyring
 
+**Examples:**
+
+- `gpg --list-keys`
+- `gpg -k`
+- `gpg --fingerprint`
+
 ### `gron`
 <p class="cmd-url"><a href="https://github.com/tomnomnom/gron">https://github.com/tomnomnom/gron</a></p>
 
