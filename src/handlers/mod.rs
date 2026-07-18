@@ -126,12 +126,6 @@ pub(crate) enum CommandEntry {
     Paths { cmd: &'static str, bare_ok: bool, paths: &'static [&'static str] },
 }
 
-pub fn all_opencode_patterns() -> Vec<String> {
-    let mut patterns = Vec::new();
-    patterns.sort();
-    patterns.dedup();
-    patterns
-}
 
 #[cfg(test)]
 fn full_registry() -> Vec<&'static CommandEntry> {

@@ -1239,7 +1239,6 @@ denied! {
     stapler_staple_two_paths: "stapler staple a.app b.app",
 
     safe_chains_bare: "safe-chains",
-    safe_chains_opencode_config: "safe-chains --opencode-config",
     safe_chains_generate_book: "safe-chains --generate-book",
     safe_chains_three_positionals: "safe-chains 'foo' 'bar' 'baz'",
 

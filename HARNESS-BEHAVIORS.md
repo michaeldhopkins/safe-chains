@@ -28,7 +28,7 @@ independently exercised.
 | **Droid** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Same shape; shell tool is `Execute`, not `Bash`. |
 | **Cursor** | ✅ | ✅ **Verified live → DENY harness** (`cursor-agent` v2026.07.16) | `deny` works (blocks + shows our message); `allow` is ignored (a known cursor bug). Decision: emit `deny` for gated commands so safe-chains is protective (like Codex); keep `allow` for safe (inert until cursor honors it). Revisit if the bug is fixed. See §Cursor. |
 | **Copilot** | ✅ | ❌ **Unverified** | Flat envelope, `toolArgs` a nested JSON string; only `deny` acts today. |
-| **opencode** | ❌ (static config) | ⚠️ **Inert — pattern generator is a STUB** (2026-07) | Static `permission.bash` config is the only path (opencode's plugin hook is broken, [#7006](https://github.com/anomalyco/opencode/issues/7006)). But `all_opencode_patterns()` returns EMPTY → the rendered config allowlists nothing. And the approach is fundamentally lossy (glob `"git *"` can't express `git status`-yes / `git push`-no). See §opencode. |
+| **opencode** | ❌ | 🚫 **Not integrated — `--opencode-config` DROPPED** (2026-07) | No usable hook (plugin hook broken, [#7006](https://github.com/anomalyco/opencode/issues/7006)); a static glob allowlist can't express per-arg safety. The flag/stub/renderer were removed; the target stays for detection only. **Watch #7006** to revisit. See §opencode. |
 
 **Remaining live-verification work:** Copilot (unverified); optionally exercise Qwen/Droid to upgrade
 "assumed"→"verified". Cursor is done — verified live and made a DENY harness (`allow` is ignored on the
@@ -213,12 +213,13 @@ fires ([#7006](https://github.com/anomalyco/opencode/issues/7006)), so the only 
   prefixes; safe-chains classifies per-argument. `"git *": "allow"` would allow `git push` (gated) as
   well as `git status` (safe). The only SOUND patterns are commands safe for EVERY argument (the
   always-inert set: `echo`, `pwd`, `date`, `whoami`, …) — a small subset. Anything richer over-allows.
-- **Options (see TODO):** (a) generate patterns only for the always-inert set (sound, low value); (b)
-  leave it documented as inert until opencode fixes the plugin hook (#7006), then build a real runtime
-  integration that can consult safe-chains per-command; (c) drop `--opencode-config` as misleading.
-  Did NOT change it here — surfacing the finding first. The live behavioral check (does opencode honor
-  `permission.bash`) was blocked by no AI provider configured, but that is opencode's own documented
-  feature; the gap is entirely on our generator.
+- **DECISION (2026-07): dropped `--opencode-config`.** It advertised an allowlist it never produced, so
+  it was removed (flag, the `all_opencode_patterns()` stub, and the `render_opencode_json_in` renderer).
+  `OpenCodeTarget` stays for DETECTION only: `install()` now returns a Skip that explains opencode has no
+  usable hook yet (see the reason string). REVISIT when opencode ships a real runtime hook (#7006) — then
+  a proper per-command integration (like the other targets) becomes possible; a static glob allowlist
+  never can. **Watch [opencode #7006](https://github.com/anomalyco/opencode/issues/7006)** and opencode's
+  permissions/plugin docs for that change.
 
 ## Model-visible context injection (`additionalContext`)
 

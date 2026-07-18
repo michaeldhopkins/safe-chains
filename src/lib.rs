@@ -60,7 +60,6 @@ mod handler_property_tests;
 pub mod docs;
 pub mod engine;
 mod handlers;
-pub use handlers::all_opencode_patterns;
 pub mod parse;
 pub mod pathctx;
 pub mod pathgate;
