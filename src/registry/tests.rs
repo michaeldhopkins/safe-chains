@@ -2177,8 +2177,31 @@ use super::*;
             "openssl enc -d -in x.enc -k p",
             "openssl smime -decrypt -in m.p7 -inkey k.pem",
             "openssl cms -decrypt -in m -inkey k",
+            // private-key-to-stdout (decrypt-read UNLESS the output is diverted)
+            "openssl rsa -in enc.pem -passin pass:x",
+            "openssl pkey -in priv.pem",
+            "openssl ec -in priv.pem",
+            "openssl pkcs8 -in priv.pem",
+            // gpg implicit decrypt (bare positional, no inspection command)
+            "gpg secret.gpg",
+            "gpg --verbose secret.gpg",
         ] {
             assert!(!crate::is_safe_command(c), "decrypt-to-screen must deny at the band: {c}");
+        }
+        // The COMPLEMENT — forms that divert the disclosure away from the model (openssl `unless_flags`)
+        // or are a genuine read (gpg inspection commands) must stay allowed. Guards against the fix
+        // over-denying: an unrecognized neutralizer / a real read would fail here (red→green if
+        // `unless_flags` or gpg's `require_any` regressed).
+        for c in [
+            "openssl rsa -in priv.pem -pubout",
+            "openssl rsa -in enc.pem -out clean.pem",
+            "openssl rsa -in priv.pem -noout -text",
+            "openssl pkey -in pub.pem -pubin -text",
+            "openssl pkcs8 -in priv.pem -out out.pem",
+            "gpg --list-keys",
+            "gpg --version",
+        ] {
+            assert!(crate::is_safe_command(c), "a diverted/read form must stay allowed: {c}");
         }
     }
 
