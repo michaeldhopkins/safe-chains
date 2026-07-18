@@ -115,6 +115,9 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
     // command of their own. Resolve the inner command and lift its authority to root (or `other-user`
     // for `-u`), so the safety of `sudo X` is the safety of `X` run privileged: `sudo cat ./notes`
     // → a root READ (local-admin), `sudo rm -rf /` → the catastrophe corner (denied everywhere).
+    if canonical == "openssl" {
+        return resolve_openssl(arg0, tokens);
+    }
     if matches!(canonical, "sudo" | "doas") {
         return resolve_privilege_wrapper(arg0, tokens);
     }
@@ -276,6 +279,106 @@ fn resolve_privilege_wrapper(arg0: &Token, tokens: &[Token]) -> Option<Profile> 
         })
         .collect();
     Some(Profile::of(caps))
+}
+
+/// openssl decrypt / private-key disclosure resolver. openssl's flag grammar defeats declarative
+/// flag-gating — it accepts `--opt` as an alias for `-opt` on every subcommand, `-text` dumps the
+/// PRIVATE key components to stdout past `-pubout`/`-noout`, and `-out`'s VALUE can itself be stdout
+/// (`-out -`, `-out /dev/stdout`) — so the disclosure-prone subs are classified here in Rust. Returns
+/// `decrypt-read` (→ yolo, denied below) only when private/decrypted material reaches the MODEL
+/// (stdout); returns `None` for public-key ops, to-FILE extraction, encrypt/sign, and the ~30 benign
+/// subs, which fall through to openssl's declarative (allow_all) classification. Fail-closed: a spoofed
+/// path worst-cases; a disclosure sub always yields a verdict rather than abstaining to the permissive
+/// legacy default.
+fn resolve_openssl(arg0: &Token, tokens: &[Token]) -> Option<Profile> {
+    if !trusted_command_path(arg0.as_str()) {
+        return Some(worst("openssl invoked from a non-standard path — possible spoof (§0)"));
+    }
+    let sub = tokens.get(1)?.as_str();
+    let args = &tokens[2..];
+    let discloses = match sub {
+        // Private-key subs: private material reaches the model UNLESS the input is public (`-pubin`),
+        // or it's public-key output (`-pubout`) with no `-text` side channel — and then only if the
+        // (private-key) output actually goes to stdout, not a file.
+        "rsa" | "pkey" | "ec" | "dsa" => {
+            if openssl_flag(args, "-pubin") {
+                false
+            } else if openssl_flag(args, "-text") {
+                true // dumps the private exponent/primes to stdout regardless of -out/-noout/-pubout
+            } else if openssl_flag(args, "-pubout") {
+                false // public-key PEM out, no -text
+            } else {
+                openssl_output_is_stdout(args)
+            }
+        }
+        // PKCS#8 is a private-key format with no public mode; disclosed if it reaches stdout.
+        "pkcs8" => openssl_flag(args, "-text") || openssl_output_is_stdout(args),
+        // Unencrypted key export (`-nodes`/`-noenc`, OpenSSL 3.0 spelling); disclosed if it hits stdout.
+        "pkcs12" => {
+            (openssl_flag(args, "-nodes") || openssl_flag(args, "-noenc"))
+                && openssl_output_is_stdout(args)
+        }
+        // Symmetric decrypt: plaintext to the model only when it goes to stdout.
+        "enc" => openssl_flag(args, "-d") && openssl_output_is_stdout(args),
+        "smime" => openssl_flag(args, "-decrypt") && openssl_output_is_stdout(args),
+        "cms" => {
+            (openssl_flag(args, "-decrypt") || openssl_flag(args, "-EncryptedData_decrypt"))
+                && openssl_output_is_stdout(args)
+        }
+        _ => return None, // benign subs — openssl's declarative (allow_all) classification
+    };
+    if discloses {
+        let cap = crate::engine::archetype::archetype("decrypt-read")
+            .cloned()
+            .unwrap_or_else(|| Capability::worst("decrypt-read archetype missing (§0)"));
+        Some(Profile::of(vec![cap]))
+    } else {
+        None // public / to-file / encrypt / benign → legacy allow_all classification
+    }
+}
+
+/// Whether an openssl BOOLEAN flag (`-d`, `-text`, `-pubout`) is present, accepting the `--` twin
+/// openssl honors on every subcommand (`--d`, `--text`). Value flags use [`openssl_flag_value`].
+fn openssl_flag(args: &[Token], flag: &str) -> bool {
+    args.iter().any(|t| {
+        let s = t.as_str();
+        s == flag || (s.starts_with("--") && s.len() > 2 && &s[1..] == flag)
+    })
+}
+
+/// Whether the sub's OUTPUT reaches stdout → the model: no `-out` (openssl defaults to stdout), or
+/// `-out`'s value is a stdout device. `-noout` suppresses the PEM output entirely (a validate), and a
+/// `-out FILE` diverts the material to disk — neither reaches the model. (`-text` is checked by the
+/// caller BEFORE this, since it dumps to stdout past both `-noout` and `-out`.)
+fn openssl_output_is_stdout(args: &[Token]) -> bool {
+    if openssl_flag(args, "-noout") {
+        return false;
+    }
+    match openssl_flag_value(args, "-out") {
+        None => true,
+        Some(v) => matches!(v, "-" | "/dev/stdout" | "/dev/fd/1" | "/proc/self/fd/1"),
+    }
+}
+
+/// The value of a valued openssl flag (`-out file` / `--out file` / `-out=file` / `--out=file`),
+/// accepting the `--` twin; `None` if absent.
+fn openssl_flag_value<'a>(args: &'a [Token], flag: &str) -> Option<&'a str> {
+    let twin = format!("-{flag}"); // `-out` → `--out`
+    for t in args {
+        let s = t.as_str();
+        if let Some(v) = s.strip_prefix(flag).and_then(|r| r.strip_prefix('=')) {
+            return Some(v);
+        }
+        if let Some(v) = s.strip_prefix(twin.as_str()).and_then(|r| r.strip_prefix('=')) {
+            return Some(v);
+        }
+    }
+    args.windows(2)
+        .find(|w| {
+            let n = w[0].as_str();
+            n == flag || n == twin
+        })
+        .map(|w| w[1].as_str())
 }
 
 /// Classify a network-destination token's PROVENANCE (exposure §4). `None` (a bare invocation) is
@@ -1048,6 +1151,43 @@ mod tests {
 
     fn read_local() -> &'static crate::engine::level::Level {
         level("reader")
+    }
+
+    /// `resolve_openssl` contract: a private-key/decrypt form reaching the MODEL classifies as
+    /// decrypt-read (secret=reads → refused by developer, admitted only by yolo); a public/to-file/
+    /// validate form ABSTAINS (None → openssl's legacy allow_all); a spoofed path worst-cases.
+    #[test]
+    fn openssl_resolver_gates_model_disclosure_only() {
+        let (dev, yolo) = (level("developer"), level("yolo"));
+        for parts in [
+            &["openssl", "rsa", "-in", "priv.pem"][..],
+            &["openssl", "rsa", "-in", "priv.pem", "-pubout", "-text"], // -text past -pubout
+            &["openssl", "rsa", "-in", "priv.pem", "-out", "/dev/stdout"], // -out value is stdout
+            &["openssl", "rsa", "-in", "priv.pem", "-noout", "-text"],
+            &["openssl", "pkcs8", "-in", "priv.pem"],
+            &["openssl", "enc", "--d", "-k", "p", "-in", "c"], // --opt alias
+            &["openssl", "cms", "-EncryptedData_decrypt", "-in", "m"],
+            &["openssl", "pkcs12", "-in", "f.p12", "-noenc"],
+        ] {
+            let p = resolve(&toks(parts)).unwrap_or_else(|| panic!("resolves: {parts:?}"));
+            assert!(
+                p.capabilities.iter().any(|c| c.secret.level == SecretLevel::Reads),
+                "secret=reads: {parts:?}",
+            );
+            assert!(!dev.admits(&p), "developer refuses: {parts:?}");
+            assert!(yolo.admits(&p), "yolo admits: {parts:?}");
+        }
+        for parts in [
+            &["openssl", "rsa", "-in", "priv.pem", "-pubout"][..],
+            &["openssl", "rsa", "-in", "priv.pem", "-noout"],       // validate, no output
+            &["openssl", "rsa", "-in", "enc.pem", "-out", "clean.pem"], // to a FILE, off the model
+            &["openssl", "pkey", "-in", "pub.pem", "-pubin", "-text"], // public input → public text
+            &["openssl", "pkcs12", "-in", "f.p12", "-nodes", "-out", "k.pem"],
+            &["openssl", "enc", "-e", "-in", "x", "-out", "x.enc", "-k", "p"],
+            &["openssl", "x509", "-in", "c", "-noout", "-text"],
+        ] {
+            assert!(resolve(&toks(parts)).is_none(), "resolver abstains (→ legacy): {parts:?}");
+        }
     }
 
     #[test]
