@@ -131,6 +131,26 @@ use super::*;
         assert!(!super::flag_escalates(&toks(&["npm", "ci", "--ignore-scripts=true"]), &safety), "=true → no escalate");
     }
 
+    /// `flag_present` must be CLUSTER-aware for short flags — the flag allowlist cluster-expands, so a
+    /// classifying short flag hidden in `-da`/`-vd` must still be seen (else a clustering tool with a
+    /// `[[command.flag]]` classifier could evade). But a glued VALUE (`-o=decrypted`) must NOT match
+    /// the flag char, so only the boolean-letter run before `=` is scanned. Long flags don't cluster.
+    #[test]
+    fn flag_present_is_cluster_aware_for_short_flags() {
+        let p = |words: &[&str], flag: &str| super::flag_present(&toks(words), flag);
+        // exact + cluster hits
+        assert!(p(&["age", "-d", "f"], "-d"));
+        assert!(p(&["age", "-da", "f"], "-d"), "cluster -da contains -d");
+        assert!(p(&["age", "-vd", "f"], "-d"), "cluster -vd contains -d");
+        assert!(p(&["gpg", "-vdk", "f"], "-d"));
+        // a glued VALUE containing the char must NOT match (only the pre-`=` run is scanned)
+        assert!(!p(&["age", "-o=decrypted.age", "-e"], "-d"), "value after = is not the flag run");
+        assert!(!p(&["age", "-e", "-a", "f"], "-d"), "no d in the cluster");
+        // long flags never cluster-match
+        assert!(!p(&["x", "-abc"], "--decrypt"));
+        assert!(p(&["x", "--decrypt", "f"], "--decrypt"));
+    }
+
     /// Regression: a profiled sub must deny via the LEGACY path too, not just the engine. A global
     /// flag before the subcommand (`git -c … push`, `git -C … push`) makes the engine's sub walk stop
     /// early → it abstains → legacy dispatches the profiled sub, which MUST still deny (it's above the

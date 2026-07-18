@@ -8,10 +8,13 @@ bare = false
 examples_safe = [
     "age -e -r RECIP -o out.age plain.txt",
     "age --encrypt -o out.age plain.txt",
+    "age -ea -r RECIP -o out.age plain.txt",
 ]
 examples_denied = [
     "age -d secrets.age",
     "age --decrypt -i key.txt secrets.age",
+    "age -da secrets.age",
+    "age -vd secrets.age",
 ]
 standalone = [
     "--armor", "--decrypt", "--encrypt",
