@@ -398,7 +398,7 @@ Aliases: `fly`
 - **apps**: Flags: --all, --help, --json, -a, -h. Valued: --space, --team, -s, -t
 - **apps:info**: Flags: --help, --json, --shell, -h, -s. Valued: --app, -a
 - **buildpacks**: Flags: --help, -h. Valued: --app, -a
-- **config**: Flags: --help, --json, --shell, -h, -j, -s. Valued: --app, -a
+- **config**
 - **logs**: Flags: --force-colors, --help, --tail, -h, -t. Valued: --app, --dyno, --num, --source, -a, -d, -n, -s
 - **ps**: Flags: --help, --json, -h, -j. Valued: --app, -a
 - **regions**: Flags: --help, --json, -h

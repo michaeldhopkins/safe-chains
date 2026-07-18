@@ -304,9 +304,9 @@ Aliases: `bundle-audit`
 - **completion**: Flags: --help, -h. Valued: --shell
 - **encode**: Flags: --help, -h
 - **fingerprint**: Flags: --help, -h. Positional args accepted
-- **get**: Flags: --help, --pretty, --raw, --response, -h. Valued: --itemid, --organizationid, --output, --session. Positional args accepted
+- **get**: Positional args accepted
 - **help**: Positional args accepted
-- **list**: Flags: --help, --organizationid, --pretty, --quiet, --raw, --response, --session, --trash, -h. Valued: --collectionid, --folderid, --nointeraction, --organizationid, --search, --session, --url. Positional args accepted
+- **list**: Positional args accepted
 - **pending**: Flags: --help, -h. Positional args accepted
 - **status**: Flags: --help, -h
 - **template**: Flags: --help, --pretty, -h. Positional args accepted
@@ -1067,17 +1067,17 @@ Aliases: `run-p`, `run-s`
 - **account get**: Flags: --help, -h. Valued: --account, --format
 - **account list**: Flags: --help, --format, -h. Valued: --format
 - **completion**: Flags: --help, -h. Positional args accepted
-- **document get**: Flags: --force, --help, -h. Valued: --account, --include-archive, --out-file, --vault
+- **document get**
 - **document list**: Flags: --help, --include-archive, -h. Valued: --account, --format, --vault
 - **group get**: Flags: --help, -h. Valued: --account, --format
 - **group list**: Flags: --help, -h. Valued: --account, --format, --user, --vault
 - **group list-groups**: Flags: --help, -h
 - **group list-users**: Flags: --help, -h
 - **help**: Positional args accepted
-- **item get**: Flags: --help, -h. Valued: --account, --fields, --format, --otp, --reveal, --vault
+- **item get**
 - **item list**: Flags: --help, --include-archive, -h. Valued: --account, --categories, --favorite, --format, --include-archive, --long, --tags, --vault
 - **item template**: Flags: --help, -h. Valued: --account, --format
-- **read**: Flags: --force, --help, --no-newline, -h, -n. Valued: --account, --out-file. Positional args accepted
+- **read**: Positional args accepted
 - **user get**: Flags: --help, --me, -h. Valued: --account, --format, --fingerprint, --public-key
 - **user list**: Flags: --help, -h. Valued: --account, --format, --group, --vault
 - **vault get**: Flags: --help, -h. Valued: --account, --format
@@ -1144,12 +1144,12 @@ Aliases: `run-p`, `run-s`
 <p class="cmd-url"><a href="https://www.passwordstore.org/">https://www.passwordstore.org/</a></p>
 
 - **find**: Flags: --help, -h. Positional args accepted
-- **grep**: Flags: --extended-regexp, --help, --ignore-case, -E, -h, -i. Positional args accepted
+- **grep**: Positional args accepted
 - **help**: Positional args accepted
 - **list**: Flags: --help, -h. Positional args accepted
 - **ls**: Flags: --help, -h. Positional args accepted
 - **search**: Flags: --help, -h. Positional args accepted
-- **show**: Flags: --clip, --help, --qrcode, -c, -h, -q. Positional args accepted
+- **show**: Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
@@ -1851,7 +1851,7 @@ Aliases: `python`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/vault/docs/commands">https://developer.hashicorp.com/vault/docs/commands</a></p>
 
 - **help**: Positional args accepted
-- **kv get**: Flags: --field, --help, --mount, -h. Valued: --address, --field, --format, --namespace, --version
+- **kv get**
 - **kv list**: Flags: --help, --mount, -h. Valued: --address, --format, --namespace
 - **kv metadata**
 - **list**: Flags: --detailed, --help, --mount, -h. Valued: --address, --format, --namespace. Positional args accepted

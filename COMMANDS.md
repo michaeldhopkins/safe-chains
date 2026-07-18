@@ -2280,9 +2280,9 @@ Aliases: `bundle-audit`
 - **completion**: Flags: --help, -h. Valued: --shell
 - **encode**: Flags: --help, -h
 - **fingerprint**: Flags: --help, -h. Positional args accepted
-- **get**: Flags: --help, --pretty, --raw, --response, -h. Valued: --itemid, --organizationid, --output, --session. Positional args accepted
+- **get**: Positional args accepted
 - **help**: Positional args accepted
-- **list**: Flags: --help, --organizationid, --pretty, --quiet, --raw, --response, --session, --trash, -h. Valued: --collectionid, --folderid, --nointeraction, --organizationid, --search, --session, --url. Positional args accepted
+- **list**: Positional args accepted
 - **pending**: Flags: --help, -h. Positional args accepted
 - **status**: Flags: --help, -h
 - **template**: Flags: --help, --pretty, -h. Positional args accepted
@@ -4716,8 +4716,22 @@ Aliases: `gfalse`
 ### `fd`
 <p class="cmd-url"><a href="https://github.com/sharkdp/fd#readme">https://github.com/sharkdp/fd#readme</a></p>
 
+- Search flags allowed; `-x/--exec` and `-X/--exec-batch` delegate to the inner command bound to each search path (like `find -exec`).
+
+- **Without a subcommand:**
+- Bare invocation allowed
 - Allowed standalone flags: --absolute-path, --case-sensitive, --fixed-strings, --follow, --full-path, --glob, --has-results, --help, --hidden, --ignore, --ignore-case, --ignore-vcs, --list-details, --no-follow, --no-hidden, --no-ignore, --no-ignore-parent, --no-ignore-vcs, --no-require-git, --one-file-system, --print0, --prune, --quiet, --regex, --relative-path, --require-git, --show-errors, --unrestricted, --version, -0, -1, -F, -H, -I, -L, -V, -a, -g, -h, -i, -l, -p, -q, -s, -u
 - Allowed valued flags: --and, --base-directory, --batch-size, --change-newer-than, --change-older-than, --changed-after, --changed-before, --changed-within, --color, --exact-depth, --exclude, --extension, --format, --hyperlink, --ignore-file, --max-depth, --max-results, --min-depth, --newer, --older, --owner, --path-separator, --search-path, --size, --strip-cwd-prefix, --threads, --type, -E, -S, -c, -d, -e, -j, -o, -t
+
+**Examples:**
+
+- `fd pattern`
+- `fd -e rs`
+- `fd --type f --hidden pattern`
+- `fd pattern src`
+- `fd -x echo {}`
+- `fd pattern -x wc -l {}`
+- `fd -X cat`
 
 ### `ffmpeg`
 <p class="cmd-url"><a href="https://ffmpeg.org/ffmpeg.html">https://ffmpeg.org/ffmpeg.html</a></p>
@@ -6346,7 +6360,7 @@ Aliases: `ghead`
 - **apps**: Flags: --all, --help, --json, -a, -h. Valued: --space, --team, -s, -t
 - **apps:info**: Flags: --help, --json, --shell, -h, -s. Valued: --app, -a
 - **buildpacks**: Flags: --help, -h. Valued: --app, -a
-- **config**: Flags: --help, --json, --shell, -h, -j, -s. Valued: --app, -a
+- **config**
 - **logs**: Flags: --force-colors, --help, --tail, -h, -t. Valued: --app, --dyno, --num, --source, -a, -d, -n, -s
 - **ps**: Flags: --help, --json, -h, -j. Valued: --app, -a
 - **regions**: Flags: --help, --json, -h
@@ -10200,17 +10214,17 @@ Aliases: `god`
 - **account get**: Flags: --help, -h. Valued: --account, --format
 - **account list**: Flags: --help, --format, -h. Valued: --format
 - **completion**: Flags: --help, -h. Positional args accepted
-- **document get**: Flags: --force, --help, -h. Valued: --account, --include-archive, --out-file, --vault
+- **document get**
 - **document list**: Flags: --help, --include-archive, -h. Valued: --account, --format, --vault
 - **group get**: Flags: --help, -h. Valued: --account, --format
 - **group list**: Flags: --help, -h. Valued: --account, --format, --user, --vault
 - **group list-groups**: Flags: --help, -h
 - **group list-users**: Flags: --help, -h
 - **help**: Positional args accepted
-- **item get**: Flags: --help, -h. Valued: --account, --fields, --format, --otp, --reveal, --vault
+- **item get**
 - **item list**: Flags: --help, --include-archive, -h. Valued: --account, --categories, --favorite, --format, --include-archive, --long, --tags, --vault
 - **item template**: Flags: --help, -h. Valued: --account, --format
-- **read**: Flags: --force, --help, --no-newline, -h, -n. Valued: --account, --out-file. Positional args accepted
+- **read**: Positional args accepted
 - **user get**: Flags: --help, --me, -h. Valued: --account, --format, --fingerprint, --public-key
 - **user list**: Flags: --help, -h. Valued: --account, --format, --group, --vault
 - **vault get**: Flags: --help, -h. Valued: --account, --format
@@ -10578,12 +10592,12 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 <p class="cmd-url"><a href="https://www.passwordstore.org/">https://www.passwordstore.org/</a></p>
 
 - **find**: Flags: --help, -h. Positional args accepted
-- **grep**: Flags: --extended-regexp, --help, --ignore-case, -E, -h, -i. Positional args accepted
+- **grep**: Positional args accepted
 - **help**: Positional args accepted
 - **list**: Flags: --help, -h. Positional args accepted
 - **ls**: Flags: --help, -h. Positional args accepted
 - **search**: Flags: --help, -h. Positional args accepted
-- **show**: Flags: --clip, --help, --qrcode, -c, -h, -q. Positional args accepted
+- **show**: Positional args accepted
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -V
 
@@ -15516,7 +15530,7 @@ Aliases: `gusers`
 <p class="cmd-url"><a href="https://developer.hashicorp.com/vault/docs/commands">https://developer.hashicorp.com/vault/docs/commands</a></p>
 
 - **help**: Positional args accepted
-- **kv get**: Flags: --field, --help, --mount, -h. Valued: --address, --field, --format, --namespace, --version
+- **kv get**
 - **kv list**: Flags: --help, --mount, -h. Valued: --address, --format, --namespace
 - **kv metadata**
 - **list**: Flags: --detailed, --help, --mount, -h. Valued: --address, --format, --namespace. Positional args accepted

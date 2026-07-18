@@ -23,8 +23,22 @@ Aliases: `whatis`
 ### `fd`
 <p class="cmd-url"><a href="https://github.com/sharkdp/fd#readme">https://github.com/sharkdp/fd#readme</a></p>
 
+- Search flags allowed; `-x/--exec` and `-X/--exec-batch` delegate to the inner command bound to each search path (like `find -exec`).
+
+- **Without a subcommand:**
+- Bare invocation allowed
 - Allowed standalone flags: --absolute-path, --case-sensitive, --fixed-strings, --follow, --full-path, --glob, --has-results, --help, --hidden, --ignore, --ignore-case, --ignore-vcs, --list-details, --no-follow, --no-hidden, --no-ignore, --no-ignore-parent, --no-ignore-vcs, --no-require-git, --one-file-system, --print0, --prune, --quiet, --regex, --relative-path, --require-git, --show-errors, --unrestricted, --version, -0, -1, -F, -H, -I, -L, -V, -a, -g, -h, -i, -l, -p, -q, -s, -u
 - Allowed valued flags: --and, --base-directory, --batch-size, --change-newer-than, --change-older-than, --changed-after, --changed-before, --changed-within, --color, --exact-depth, --exclude, --extension, --format, --hyperlink, --ignore-file, --max-depth, --max-results, --min-depth, --newer, --older, --owner, --path-separator, --search-path, --size, --strip-cwd-prefix, --threads, --type, -E, -S, -c, -d, -e, -j, -o, -t
+
+**Examples:**
+
+- `fd pattern`
+- `fd -e rs`
+- `fd --type f --hidden pattern`
+- `fd pattern src`
+- `fd -x echo {}`
+- `fd pattern -x wc -l {}`
+- `fd -X cat`
 
 ### `locate`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/locate.1.html">https://man7.org/linux/man-pages/man1/locate.1.html</a></p>
