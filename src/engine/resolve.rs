@@ -308,22 +308,22 @@ fn resolve_openssl(arg0: &Token, tokens: &[Token]) -> Option<Profile> {
             } else if openssl_flag(args, "-pubout") {
                 false // public-key PEM out, no -text
             } else {
-                openssl_output_is_stdout(args)
+                openssl_output_reaches_model(args)
             }
         }
         // PKCS#8 is a private-key format with no public mode; disclosed if it reaches stdout.
-        "pkcs8" => openssl_flag(args, "-text") || openssl_output_is_stdout(args),
+        "pkcs8" => openssl_flag(args, "-text") || openssl_output_reaches_model(args),
         // Unencrypted key export (`-nodes`/`-noenc`, OpenSSL 3.0 spelling); disclosed if it hits stdout.
         "pkcs12" => {
             (openssl_flag(args, "-nodes") || openssl_flag(args, "-noenc"))
-                && openssl_output_is_stdout(args)
+                && openssl_output_reaches_model(args)
         }
         // Symmetric decrypt: plaintext to the model only when it goes to stdout.
-        "enc" => openssl_flag(args, "-d") && openssl_output_is_stdout(args),
-        "smime" => openssl_flag(args, "-decrypt") && openssl_output_is_stdout(args),
+        "enc" => openssl_flag(args, "-d") && openssl_output_reaches_model(args),
+        "smime" => openssl_flag(args, "-decrypt") && openssl_output_reaches_model(args),
         "cms" => {
             (openssl_flag(args, "-decrypt") || openssl_flag(args, "-EncryptedData_decrypt"))
-                && openssl_output_is_stdout(args)
+                && openssl_output_reaches_model(args)
         }
         _ => return None, // benign subs — openssl's declarative (allow_all) classification
     };
@@ -346,39 +346,86 @@ fn openssl_flag(args: &[Token], flag: &str) -> bool {
     })
 }
 
-/// Whether the sub's OUTPUT reaches stdout → the model: no `-out` (openssl defaults to stdout), or
-/// `-out`'s value is a stdout device. `-noout` suppresses the PEM output entirely (a validate), and a
-/// `-out FILE` diverts the material to disk — neither reaches the model. (`-text` is checked by the
-/// caller BEFORE this, since it dumps to stdout past both `-noout` and `-out`.)
-fn openssl_output_is_stdout(args: &[Token]) -> bool {
+/// Whether the sub's OUTPUT reaches the model. FAIL-CLOSED (a path string cannot be soundly matched
+/// against a denylist of device spellings — the OS collapses `//dev/stdout`, `/dev/./stdout`,
+/// `/dev/fd//1` to the same device, and openssl honors the LAST of duplicate `-out`s): the output
+/// reaches the model UNLESS it is provably diverted to a single plain FILE. So it's model-reaching
+/// when `-noout` is absent AND NOT (exactly one `-out` whose value is a plain file). `-noout`
+/// suppresses the PEM output (a validate); `-text` is checked by the caller BEFORE this, since it
+/// dumps to stdout past both `-noout` and `-out`.
+fn openssl_output_reaches_model(args: &[Token]) -> bool {
     if openssl_flag(args, "-noout") {
         return false;
     }
-    match openssl_flag_value(args, "-out") {
-        None => true,
-        Some(v) => matches!(v, "-" | "/dev/stdout" | "/dev/fd/1" | "/proc/self/fd/1"),
-    }
+    let outs = openssl_flag_values(args, "-out");
+    // Diverted to disk ONLY when there is exactly one `-out` naming a plain file. No `-out` (default
+    // stdout), a duplicate `-out` (last-wins — the first is untrustworthy), or a device/`-` value all
+    // reach the model.
+    !matches!(outs.as_slice(), [only] if out_value_is_plain_file(only))
 }
 
-/// The value of a valued openssl flag (`-out file` / `--out file` / `-out=file` / `--out=file`),
-/// accepting the `--` twin; `None` if absent.
-fn openssl_flag_value<'a>(args: &'a [Token], flag: &str) -> Option<&'a str> {
-    let twin = format!("-{flag}"); // `-out` → `--out`
-    for t in args {
-        let s = t.as_str();
-        if let Some(v) = s.strip_prefix(flag).and_then(|r| r.strip_prefix('=')) {
-            return Some(v);
-        }
-        if let Some(v) = s.strip_prefix(twin.as_str()).and_then(|r| r.strip_prefix('=')) {
-            return Some(v);
+/// Whether an `-out` value names a plain FILE (a safe diversion), as opposed to stdout/`-`, or a
+/// device / fd / console path (`/dev/stdout`, `/dev/stderr`, `/dev/fd/1`, `/proc/self/fd/1`). Collapses
+/// redundant `/`, `.`, and `..` segments first so alternate spellings can't evade. Fail-closed: `-`,
+/// empty, or any `/dev/…` or `/proc/…/fd/…` path is NOT a plain file. (Symlinks are classified by their
+/// literal spelling — out of scope for a static classifier, per AGENTS.md.)
+fn out_value_is_plain_file(value: &str) -> bool {
+    if value.is_empty() || value == "-" {
+        return false;
+    }
+    let norm = collapse_path(value).to_ascii_lowercase();
+    let device_or_fd =
+        norm == "/dev" || norm.starts_with("/dev/") || (norm.starts_with("/proc/") && norm.contains("/fd/"));
+    !device_or_fd
+}
+
+/// Collapse a path's redundant `/` / `.` / `..` segments (what the kernel does before opening it), so
+/// `//dev/stdout`, `/dev/./stdout`, `/dev/fd//1`, `/foo/../dev/stdout` all normalize to the device
+/// path. A leading `..` on a relative path is kept (can't resolve above an unknown cwd).
+fn collapse_path(p: &str) -> String {
+    let absolute = p.starts_with('/');
+    let mut stack: Vec<&str> = Vec::new();
+    for seg in p.split('/') {
+        match seg {
+            "" | "." => {}
+            ".." => {
+                if matches!(stack.last(), Some(&s) if s != "..") {
+                    stack.pop();
+                } else if !absolute {
+                    stack.push("..");
+                }
+            }
+            s => stack.push(s),
         }
     }
-    args.windows(2)
-        .find(|w| {
-            let n = w[0].as_str();
-            n == flag || n == twin
-        })
-        .map(|w| w[1].as_str())
+    let joined = stack.join("/");
+    if absolute { format!("/{joined}") } else { joined }
+}
+
+/// Every value of a valued openssl flag (`-out file` / `--out file` / `-out=file` / `--out=file`),
+/// accepting the `--` twin — ALL occurrences, in order (openssl honors the last; the caller fails
+/// closed on duplicates).
+fn openssl_flag_values<'a>(args: &'a [Token], flag: &str) -> Vec<&'a str> {
+    let twin = format!("-{flag}"); // `-out` → `--out`
+    let mut out = Vec::new();
+    let mut i = 0;
+    while i < args.len() {
+        let s = args[i].as_str();
+        if let Some(v) = s
+            .strip_prefix(flag)
+            .or_else(|| s.strip_prefix(twin.as_str()))
+            .and_then(|r| r.strip_prefix('='))
+        {
+            out.push(v);
+        } else if (s == flag || s == twin)
+            && let Some(next) = args.get(i + 1)
+        {
+            out.push(next.as_str());
+            i += 1;
+        }
+        i += 1;
+    }
+    out
 }
 
 /// Classify a network-destination token's PROVENANCE (exposure §4). `None` (a bare invocation) is
@@ -1187,6 +1234,49 @@ mod tests {
             &["openssl", "x509", "-in", "c", "-noout", "-text"],
         ] {
             assert!(resolve(&toks(parts)).is_none(), "resolver abstains (→ legacy): {parts:?}");
+        }
+    }
+
+    /// The output-destination check is FAIL-CLOSED: only a single plain-file `-out` diverts the key
+    /// off the model. Path-normalization spellings, `/dev/stderr`, and duplicate `-out` (openssl honors
+    /// the last) must all read as model-reaching — the sign-off review found the old device-spelling
+    /// denylist let these through.
+    #[test]
+    fn openssl_output_destination_is_fail_closed() {
+        let dev = level("developer");
+        let reaches_model = |args: &[&str]| {
+            let mut parts = vec!["openssl", "rsa", "-in", "priv.pem"];
+            parts.extend_from_slice(args);
+            // decrypt-read (secret=reads, refused by developer) ⇔ the output reached the model; a
+            // diverted output makes the resolver ABSTAIN (None → openssl's benign legacy).
+            match resolve(&toks(&parts)) {
+                None => false,
+                Some(p) => {
+                    p.capabilities.iter().any(|c| c.secret.level == SecretLevel::Reads) && !dev.admits(&p)
+                }
+            }
+        };
+        for evasion in [
+            &["-out", "//dev/stdout"][..],
+            &["-out", "/dev/./stdout"],
+            &["-out", "//dev/fd/1"],
+            &["-out", "/dev/fd//1"],
+            &["-out=//dev/stdout"],
+            &["-out", "/dev/stderr"],
+            &["-out", "/foo/../dev/stdout"],
+            &["-out", "dup.pem", "-out", "/dev/stdout"], // last-wins
+            &["-out", "-"],
+        ] {
+            assert!(reaches_model(evasion), "must read as model-reaching: {evasion:?}");
+        }
+        for diverted in [
+            &["-out", "clean.pem"][..],
+            &["-out", "./sub/key.pem"],
+            &["-out", "devnotes.pem"], // "dev" prefix on a filename is not the /dev device
+            &["-out", "/home/u/key.pem"],
+            &["-noout"],
+        ] {
+            assert!(!reaches_model(diverted), "must divert off the model: {diverted:?}");
         }
     }
 
