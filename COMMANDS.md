@@ -5985,7 +5985,7 @@ Aliases: `godot4`
 ### `gpg`
 <p class="cmd-url"><a href="https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html">https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html</a></p>
 
-- Allowed standalone flags: --check-sigs, --check-trustdb, --fingerprint, --help, --list-config, --list-keys, --list-options, --list-public-keys, --list-secret-keys, --list-sigs, --list-trustdb, --no-tty, --print-md, --quiet, --show-keys, --show-sigs, --verbose, --version, -K, -h, -k, -q, -v
+- Requires --check-sigs, --check-trustdb, --fingerprint, --list-config, --list-keys, --list-public-keys, --list-secret-keys, --list-sigs, --list-trustdb, --print-md, --show-keys, --show-sigs, --version, -K, -k. - Allowed standalone flags: --check-sigs, --check-trustdb, --fingerprint, --help, --list-config, --list-keys, --list-options, --list-public-keys, --list-secret-keys, --list-sigs, --list-trustdb, --no-tty, --print-md, --quiet, --show-keys, --show-sigs, --verbose, --version, -K, -h, -k, -q, -v
 - Allowed valued flags: --digest-algo, --homedir, --keyring
 
 **Examples:**
@@ -5993,6 +5993,7 @@ Aliases: `godot4`
 - `gpg --list-keys`
 - `gpg -k`
 - `gpg --fingerprint`
+- `gpg --version`
 
 ### `gpustat`
 <p class="cmd-url"><a href="https://github.com/wookayin/gpustat">https://github.com/wookayin/gpustat</a></p>
@@ -10334,6 +10335,8 @@ Aliases: `god`
 - `openssl enc -e -in x -out x.enc -k p`
 - `openssl x509 -in c.pem -noout -text`
 - `openssl genrsa 2048`
+- `openssl rsa -in priv.pem -pubout`
+- `openssl rsa -in enc.pem -out clean.pem`
 
 ### `opj_compress`
 <p class="cmd-url"><a href="https://github.com/uclouvain/openjpeg">https://github.com/uclouvain/openjpeg</a></p>

@@ -47,15 +47,22 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
       `updatekeys` → candidate (remote KMS / interactive / decrypt+execute). Closed BOTH the `-d` flag
       hole AND the newly-found subcommand hole (`sops decrypt FILE` was read as a filename → SafeWrite).
     - `age -d`/`--decrypt` → decrypt-read (encrypt stays SafeWrite).
-    - `ansible-vault view` → decrypt-read (was SafeRead).
-    - `gpg -d`/`--decrypt` → decrypt-read (top-level flag; was an incidental unknown-flag deny, now a
-      consistent facet classification, yolo-reachable).
+    - `ansible-vault view` AND `decrypt` → decrypt-read (`decrypt --output -` streamed plaintext to the
+      model — a bypass caught by adversarial review; `view` was gated but `decrypt` was left SafeWrite).
+    - `gpg -d`/`--decrypt` → decrypt-read (top-level flag). Also `gpg secret.gpg` (bare-file IMPLICIT
+      decrypt) now denies: gpg requires an inspection command (`require_any`), so a positional-only
+      invocation can't auto-approve an implicit decrypt/verify.
     - `openssl enc -d` / `smime -decrypt` / `cms -decrypt` → decrypt-read (was allow_all=SafeWrite —
-      real auto-approve holes). Needed a new engine capability: flag escalation on a bimodal sub with
-      NO base profile (safe by default, dangerous only in the `-d`/`-decrypt` mode).
-    Guarded by `decrypt_read_denies_at_the_band_and_is_a_secret_read` (registry-walking over top-level
-    flags, profiled subs, AND bimodal-sub flags; a new decrypt tool is covered the instant it declares
-    the classification). The user's rule: decrypt-to-screen is NOT auto-approved below local-admin (it
+      real auto-approve holes). Needed flag escalation on a bimodal sub with NO base profile (safe by
+      default, dangerous only in the `-d`/`-decrypt` mode).
+    - `openssl rsa`/`pkey`/`ec`/`dsa`/`pkcs8 -in priv.pem` → decrypt-read (dumps the private key to
+      stdout). Needed the `unless_flags` primitive (an AND-of-absences): decrypt-read UNLESS the output
+      is diverted by `-pubout`/`-pubin`/`-out`/`-noout`, in which case it stays SafeWrite.
+    Guarded by `decrypt_read_denies_at_the_band_and_is_a_secret_read` (registry-walking) +
+    `decrypt_to_screen_corpus_denies` (MUST_DENY corpus + a complement of diverted/read forms that must
+    stay allowed) + `no_profiled_sub_has_flag_bearing_descendants` (fail-closed footgun guard). Residual:
+    openssl `pkcs12` (multi-modal `-nodes`/`-nocerts`/`-nokeys`) is not yet gated — a follow-up. The
+    user's rule: decrypt-to-screen is NOT auto-approved below local-admin (it
     lands at yolo, refused below).
     - `aws configure get aws_secret_access_key` / `aws_session_token` — GATED (2026-07) via
       `credential_first_arg` on `configure get`; `get region`/`output` stay allowed. (Residual: the rare
