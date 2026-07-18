@@ -197,6 +197,7 @@ pub(super) fn build_subs(
             policy_ref: canonical.policy_ref.clone(),
             profile: canonical.profile.clone(),
             flags: canonical.flags.clone(),
+            unless_flags: canonical.unless_flags.clone(),
             eval_safe: canonical.eval_safe,
             eval_safe_flags: canonical.eval_safe_flags.clone(),
             eval_safe_flag_values: canonical.eval_safe_flag_values.clone(),
@@ -278,6 +279,11 @@ pub(super) fn build_sub(
     let name = toml.name.clone();
     let policy_ref = toml.policy.clone();
     let profile = toml.profile.clone();
+    let unless_flags = std::mem::take(&mut toml.unless_flags);
+    assert!(
+        unless_flags.is_empty() || profile.is_some(),
+        "{parent} sub `{name}`: `unless_flags` requires a `profile` (it neutralizes the profile)",
+    );
     assert_sub_provenance(parent, &toml);
     assert_no_candidate_shadowed_by_glob(&format!("{parent} {}", toml.name), &toml.sub, &toml.first_arg);
     let flags = std::mem::take(&mut toml.flag)
@@ -293,8 +299,10 @@ pub(super) fn build_sub(
     // reached only when the engine ABSTAINS — e.g. a global flag (`git -c …`, `git -C …`) intervenes
     // before the subcommand, so `sub_archetypes`'s walk stops early. In that case the legacy kind
     // MUST deny outright (fail-closed), never fall through to a permissive default: force bare off,
-    // no flags, no positionals.
-    if profile.is_some() {
+    // no flags, no positionals. A sub with `unless_flags` is EXEMPT: when a neutralizing flag is
+    // present the engine deliberately abstains so the sub's real (`level`/`allow_all`) classification
+    // applies (`openssl rsa -pubout` is a safe SafeWrite), so its legacy kind must be kept, not razed.
+    if profile.is_some() && unless_flags.is_empty() {
         toml.bare = Some(false);
         toml.standalone = Vec::new();
         toml.valued = Vec::new();
@@ -319,6 +327,7 @@ pub(super) fn build_sub(
         policy_ref,
         profile,
         flags,
+        unless_flags,
         eval_safe,
         eval_safe_flags,
         eval_safe_flag_values,

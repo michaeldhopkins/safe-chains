@@ -8,11 +8,15 @@ examples_safe = [
     "openssl enc -e -in x -out x.enc -k p",
     "openssl x509 -in c.pem -noout -text",
     "openssl genrsa 2048",
+    "openssl rsa -in priv.pem -pubout",
+    "openssl rsa -in enc.pem -out clean.pem",
 ]
 examples_denied = [
     "openssl enc -d -in x.enc -k p",
     "openssl smime -decrypt -in m.p7 -inkey k.pem",
     "openssl cms -decrypt -in m -inkey k",
+    "openssl rsa -in enc.pem -passin pass:x",
+    "openssl pkey -in priv.pem",
 ]
 
 [[command.sub]]
@@ -49,25 +53,49 @@ name = "req"
 allow_all = true
 level = "SafeWrite"
 
+# The private-key subs (pkey/rsa/ec/dsa) dump the private key — decrypting a passphrase-protected one —
+# to stdout BY DEFAULT, a secret disclosure to the model. Classified decrypt-read UNLESS the output is
+# diverted away from the model: `-pubout` (public key only), `-pubin` (public input → public output),
+# `-out FILE` (to disk), or `-noout` (no output). With any of those, the sub is its ordinary SafeWrite.
 [[command.sub]]
 name = "pkey"
 allow_all = true
 level = "SafeWrite"
+profile = "decrypt-read"
+unless_flags = ["-pubout", "-pubin", "-out", "-noout"]
+fact = "`openssl pkey -in priv.pem` reads a private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; `-pubout`/`-pubin`/`-out`/`-noout` divert it."
+source = "https://docs.openssl.org/master/man1/openssl-pkey/"
+judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
 
 [[command.sub]]
 name = "rsa"
 allow_all = true
 level = "SafeWrite"
+profile = "decrypt-read"
+unless_flags = ["-pubout", "-pubin", "-out", "-noout"]
+fact = "`openssl rsa -in priv.pem` reads an RSA private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; `-pubout`/`-pubin`/`-out`/`-noout` divert it."
+source = "https://docs.openssl.org/master/man1/openssl-rsa/"
+judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
 
 [[command.sub]]
 name = "ec"
 allow_all = true
 level = "SafeWrite"
+profile = "decrypt-read"
+unless_flags = ["-pubout", "-pubin", "-out", "-noout"]
+fact = "`openssl ec -in priv.pem` reads an EC private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; `-pubout`/`-pubin`/`-out`/`-noout` divert it."
+source = "https://docs.openssl.org/master/man1/openssl-ec/"
+judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
 
 [[command.sub]]
 name = "dsa"
 allow_all = true
 level = "SafeWrite"
+profile = "decrypt-read"
+unless_flags = ["-pubout", "-pubin", "-out", "-noout"]
+fact = "`openssl dsa -in priv.pem` reads a DSA private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; `-pubout`/`-pubin`/`-out`/`-noout` divert it."
+source = "https://docs.openssl.org/master/man1/openssl-dsa/"
+judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
 
 [[command.sub]]
 name = "dh"
@@ -124,10 +152,18 @@ name = "pkcs7"
 allow_all = true
 level = "SafeWrite"
 
+# `pkcs8` reads/converts a private key, writing it to stdout by default (decrypting a passphrase-
+# protected one) — a disclosure unless `-out FILE` or `-noout` diverts it. (No `-pubout`: PKCS#8 is a
+# private-key format.)
 [[command.sub]]
 name = "pkcs8"
 allow_all = true
 level = "SafeWrite"
+profile = "decrypt-read"
+unless_flags = ["-out", "-noout"]
+fact = "`openssl pkcs8 -in priv.pem` reads a private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; `-out`/`-noout` divert it."
+source = "https://docs.openssl.org/master/man1/openssl-pkcs8/"
+judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
 
 [[command.sub]]
 name = "pkcs12"

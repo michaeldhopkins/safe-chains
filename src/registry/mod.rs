@@ -99,7 +99,11 @@ pub(crate) fn sub_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
     // it returns None so the caller falls through to the sub's ordinary (legacy) classification.
     let mut out = Vec::new();
     if let Some(p) = sub.profile.as_deref() {
-        out.push(p);
+        // `unless_flags` NEUTRALIZE the base profile: a safe-output flag (`openssl rsa -pubout`/`-out`/
+        // `-noout`) diverts the disclosure, so the sub falls through to its ordinary classification.
+        if !sub.unless_flags.iter().any(|f| flag_present(tokens, f)) {
+            out.push(p);
+        }
     }
     for flag in &sub.flags {
         if flag_escalates(tokens, flag) {
