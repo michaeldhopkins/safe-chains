@@ -27,12 +27,13 @@ independently exercised.
 | **Qwen** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Declares Claude's `permissionDecision` shape; not independently exercised. |
 | **Droid** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Same shape; shell tool is `Execute`, not `Bash`. |
 | **Cursor** | ✅ | ✅ **Verified live → DENY harness** (`cursor-agent` v2026.07.16) | `deny` works (blocks + shows our message); `allow` is ignored (a known cursor bug). Decision: emit `deny` for gated commands so safe-chains is protective (like Codex); keep `allow` for safe (inert until cursor honors it). Revisit if the bug is fixed. See §Cursor. |
-| **Copilot** | ✅ | ❌ **Unverified** | Flat envelope, `toolArgs` a nested JSON string; only `deny` acts today. |
+| **Copilot** | ✅ | ✅ **Verified live** (v1.0.71) | Hook FIRES (per-repo `.github/hooks/*.json`); allow AND deny BOTH honored (allow auto-runs + suppresses copilot's own prompt; deny blocks + shows our reason). Fixed two bugs: user path `~/.github/hooks` → **`~/.copilot/hooks`**, and the stale "deny-only" note. See §Copilot. |
 | **opencode** | ❌ | 🚫 **Not integrated — `--opencode-config` DROPPED** (2026-07) | No usable hook (plugin hook broken, [#7006](https://github.com/anomalyco/opencode/issues/7006)); a static glob allowlist can't express per-arg safety. The flag/stub/renderer were removed; the target stays for detection only. **Watch #7006** to revisit. See §opencode. |
 
-**Remaining live-verification work:** Copilot (unverified); optionally exercise Qwen/Droid to upgrade
-"assumed"→"verified". Cursor is done — verified live and made a DENY harness (`allow` is ignored on the
-CLI; see §Cursor); Gemini is closed out via `agy`; Claude/Codex/agy are done.
+**Remaining live-verification work:** only Qwen/Droid (both "assumed" Claude-Code mirrors) — optionally
+exercise to upgrade to "verified". Copilot is now verified live (allow+deny both honored — see §Copilot);
+Cursor is done (a DENY harness, `allow` ignored on the CLI); Gemini is closed out via `agy`;
+Claude/Codex/agy done; opencode not integrable.
 
 ## The model we rely on
 
@@ -76,7 +77,7 @@ run) while never actually auto-approving. Tests assert the exact field.
 | Droid   | `Execute`               | `{hookSpecificOutput: {...}}` (mirrors Claude) | `permissionDecision` | allow          | seconds |
 | Gemini  | `^run_shell_command$`   | `{decision: ...}`                      | `decision`          | allow / deny **only** | ms |
 | Cursor  | (settings `version: 1`) | flat object                            | `permission`        | **deny** honored; `allow`/`ask` IGNORED (allowlist wins — cursor bug) | — |
-| Copilot | (no matcher; self-filter on `toolName`) | flat object, `toolArgs` is a nested JSON string | `permissionDecision` | **only `deny` is currently processed** | — |
+| Copilot | (no matcher; self-filter on `toolName`) | flat object, `toolArgs` is a nested JSON string | `permissionDecision` | **allow AND deny honored** (v1.0.71; was thought deny-only) | `timeoutSec` |
 
 Notes:
 - **Droid**'s shell tool is `Execute`, not `Bash` — a `Bash` matcher never fires.
@@ -221,6 +222,29 @@ fires ([#7006](https://github.com/anomalyco/opencode/issues/7006)), so the only 
   never can. **Watch [opencode #7006](https://github.com/anomalyco/opencode/issues/7006)** and opencode's
   permissions/plugin docs for that change.
 
+### GitHub Copilot CLI — VERIFIED LIVE, v1.0.71, 2026-07
+
+Driven end-to-end via TUI with a logging wrapper around `safe-chains hook copilot`, using a per-repo
+`.github/hooks/safe-chains.json` (`{version, hooks.preToolUse[]}`, field `bash` = the script, no matcher).
+- **Hook FIRES.** Despite the reports about `hooks.json` not firing ([#2540](https://github.com/github/copilot-cli/issues/2540)),
+  the per-repo `.github/hooks/*.json` config fired on every bash tool call. The envelope matches our
+  parser: `{"toolName":"bash","toolArgs":"{…command…}","cwd":…}` with `toolArgs` a JSON-encoded STRING
+  (double-decode), and a flat response (no `hookSpecificOutput`).
+- **BOTH `allow` and `deny` are honored** (the "deny-only" belief was wrong): a forced `deny` blocked
+  `echo` — *"Denied by preToolUse hook: BLOCKED BY SAFE-CHAINS TEST"* — and a forced `allow` auto-ran
+  `cat /etc/hosts` with NO prompt, where our abstaining hook had made copilot show its own directory-access
+  prompt. So `allow` is a real grant and even suppresses copilot's own prompts.
+- **Two BUGS fixed in `src/targets/copilot.rs`:** (1) the user-global install path was `~/.github/hooks/`,
+  which does not exist — copilot's config root is **`~/.copilot/`**. The live drive used the per-repo
+  `.github/hooks/` config; the user-global path our installer writes, **`~/.copilot/hooks/`** (or
+  `$COPILOT_HOME/hooks/`), is confirmed by upstream's hooks-configuration docs, which state both the
+  per-repo `.github/hooks/*.json` and `~/.copilot/hooks/*.json` are loaded and "all hook entries from all
+  sources are run." (2) the `render_response` "only deny is processed" comment was stale.
+- **Model:** Copilot is a Defer/grant harness like Claude — safe → `allow` (a real grant), gated →
+  ABSTAIN (empty) → copilot's own per-command prompt (it has interactive review, so we don't hard-deny).
+  Current `targets/copilot.rs` already does exactly this. (`additionalContext` on gated is still not
+  wired — copilot may not pass it, [#2585](https://github.com/github/copilot-cli/issues/2585) — untested.)
+
 ## Model-visible context injection (`additionalContext`)
 
 This is what powers the chain-explainer feedback (`cst::explain`). It injects
@@ -235,7 +259,7 @@ flow is untouched.
 | Codex   | Unverified                  | default abstain (emit nothing) |
 | Cursor  | Unverified / different shape | default abstain |
 | Gemini  | Deprecated — retired, superseded by `agy` (decision-only contract, no context field) | n/a |
-| Copilot | Unverified / flat, deny-only | default abstain |
+| Copilot | Decision contract verified live (allow+deny); `additionalContext` likely not passed ([#2585](https://github.com/github/copilot-cli/issues/2585)) | default abstain |
 
 Targets without verified support keep `HookFormat::render_context`'s default,
 which emits an empty body — i.e. exactly the prior abstain behavior, no
