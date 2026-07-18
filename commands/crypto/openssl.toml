@@ -69,7 +69,12 @@ profile = "decrypt-read"
 unless_flags = ["-pubout", "-pubin"]
 fact = "`openssl pkey -in priv.pem` reads a private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; only `-pubout`/`-pubin` (public-key mode) divert it."
 source = "https://docs.openssl.org/master/man1/openssl-pkey/"
-judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
+judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless switched to public-key mode."
+[[command.sub.flag]]
+name = "-text"
+classifies = "decrypt-read"
+fact = "`-text` prints the key's components — including the PRIVATE exponent and primes — to stdout regardless of `-out`/`-noout`, and even alongside `-pubout`; so it discloses the private key (conservatively gated whenever present)."
+source = "https://docs.openssl.org/master/man1/openssl-rsa/ (-text)"
 
 [[command.sub]]
 name = "rsa"
@@ -79,7 +84,12 @@ profile = "decrypt-read"
 unless_flags = ["-pubout", "-pubin"]
 fact = "`openssl rsa -in priv.pem` reads an RSA private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; only `-pubout`/`-pubin` (public-key mode) divert it."
 source = "https://docs.openssl.org/master/man1/openssl-rsa/"
-judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
+judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless switched to public-key mode."
+[[command.sub.flag]]
+name = "-text"
+classifies = "decrypt-read"
+fact = "`-text` prints the key's components — including the PRIVATE exponent and primes — to stdout regardless of `-out`/`-noout`, and even alongside `-pubout`; so it discloses the private key (conservatively gated whenever present)."
+source = "https://docs.openssl.org/master/man1/openssl-rsa/ (-text)"
 
 [[command.sub]]
 name = "ec"
@@ -89,7 +99,12 @@ profile = "decrypt-read"
 unless_flags = ["-pubout", "-pubin"]
 fact = "`openssl ec -in priv.pem` reads an EC private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; only `-pubout`/`-pubin` (public-key mode) divert it."
 source = "https://docs.openssl.org/master/man1/openssl-ec/"
-judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
+judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless switched to public-key mode."
+[[command.sub.flag]]
+name = "-text"
+classifies = "decrypt-read"
+fact = "`-text` prints the key's components — including the PRIVATE exponent and primes — to stdout regardless of `-out`/`-noout`, and even alongside `-pubout`; so it discloses the private key (conservatively gated whenever present)."
+source = "https://docs.openssl.org/master/man1/openssl-rsa/ (-text)"
 
 [[command.sub]]
 name = "dsa"
@@ -99,7 +114,12 @@ profile = "decrypt-read"
 unless_flags = ["-pubout", "-pubin"]
 fact = "`openssl dsa -in priv.pem` reads a DSA private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; only `-pubout`/`-pubin` (public-key mode) divert it."
 source = "https://docs.openssl.org/master/man1/openssl-dsa/"
-judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
+judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless switched to public-key mode."
+[[command.sub.flag]]
+name = "-text"
+classifies = "decrypt-read"
+fact = "`-text` prints the key's components — including the PRIVATE exponent and primes — to stdout regardless of `-out`/`-noout`, and even alongside `-pubout`; so it discloses the private key (conservatively gated whenever present)."
+source = "https://docs.openssl.org/master/man1/openssl-rsa/ (-text)"
 
 [[command.sub]]
 name = "dh"
