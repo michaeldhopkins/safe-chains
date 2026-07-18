@@ -5,8 +5,18 @@ url = "https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html"
 researched_version = "GnuPG 2.x"
 level = "SafeRead"
 bare = false
-examples_safe = ["gpg --list-keys", "gpg -k", "gpg --fingerprint"]
-examples_denied = ["gpg -d secret.gpg", "gpg --decrypt secret.gpg"]
+examples_safe = ["gpg --list-keys", "gpg -k", "gpg --fingerprint", "gpg --version"]
+examples_denied = ["gpg -d secret.gpg", "gpg --decrypt secret.gpg", "gpg secret.gpg", "gpg --verbose secret.gpg"]
+# gpg with a positional file but NO inspection command is an IMPLICIT decrypt/verify (`gpg secret.gpg`
+# default-decrypts the file) — not a read. Require one of the inspection commands (or --version); a
+# positional-only invocation then denies. `--help`/`-h` are accepted bare by the dispatcher.
+require_any = [
+    "--check-sigs", "--check-trustdb", "--fingerprint",
+    "--list-config", "--list-keys", "--list-public-keys",
+    "--list-secret-keys", "--list-sigs", "--list-trustdb",
+    "--print-md", "--show-keys", "--show-sigs", "--version",
+    "-K", "-k",
+]
 standalone = [
     "--check-sigs", "--check-trustdb",
     "--fingerprint", "--help",
