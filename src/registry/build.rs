@@ -894,6 +894,43 @@ fn split_flag_forms(tokens: &[String]) -> (Vec<u8>, Vec<String>) {
     (short, long)
 }
 
+/// Validate and lower a top-level command's `[[command.flag]]` classifying flags — the flat-command
+/// analog of a profiled sub's escalating flags. Each must name a known archetype (or `unclassified`)
+/// and cite `fact`/`source`; `when_absent`/`value_prefix` are mutually exclusive. Mirrors the per-sub
+/// check in `assert_sub_provenance`.
+fn build_command_archetype_flags(
+    cmd: &str,
+    flags: Vec<TomlSubFlag>,
+) -> Vec<crate::registry::types::FlagProvenance> {
+    let cited = |o: &Option<String>| o.as_deref().is_some_and(|s| !s.trim().is_empty());
+    let judged = |o: &Option<String>| o.as_deref().is_none_or(|s| !s.trim().is_empty());
+    flags
+        .into_iter()
+        .map(|f| {
+            assert!(
+                f.classifies == "unclassified"
+                    || crate::engine::archetype::archetype(&f.classifies).is_some(),
+                "command `{cmd}` flag `{}`: classifies `{}` is not a known archetype",
+                f.name, f.classifies,
+            );
+            assert!(cited(&f.fact), "command `{cmd}` flag `{}`: requires a `fact`", f.name);
+            assert!(cited(&f.source), "command `{cmd}` flag `{}`: requires a `source`", f.name);
+            assert!(judged(&f.judgment), "command `{cmd}` flag `{}`: `judgment`, if given, must not be blank", f.name);
+            assert!(
+                !(f.when_absent == Some(true) && f.value_prefix.is_some()),
+                "command `{cmd}` flag `{}`: `when_absent` and `value_prefix` are mutually exclusive",
+                f.name,
+            );
+            crate::registry::types::FlagProvenance {
+                name: f.name,
+                classifies: f.classifies,
+                value_prefix: f.value_prefix,
+                when_absent: f.when_absent.unwrap_or(false),
+            }
+        })
+        .collect()
+}
+
 #[allow(clippy::too_many_lines)]
 pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
     assert_flat_or_structured(&toml);
@@ -941,6 +978,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         &eval_safe_required_flags,
     );
     let behavior = lower_behavior(&toml.name, toml.behavior.as_ref());
+    let archetype_flags = build_command_archetype_flags(&toml.name, toml.flag);
     if toml.deny.unwrap_or(false) {
         return CommandSpec {
             name: toml.name,
@@ -956,6 +994,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe_flag_values: eval_safe_flag_values.clone(),
             eval_safe_required_flags: eval_safe_required_flags.clone(),
             path_gate: toml.path_gate,
+            archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             kind: DispatchKind::Policy {
                 policy: OwnedPolicy {
@@ -984,6 +1023,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe_flag_values: eval_safe_flag_values.clone(),
             eval_safe_required_flags: eval_safe_required_flags.clone(),
             path_gate: toml.path_gate,
+            archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             kind: DispatchKind::VerbChain(build_verb_chain(vc)),
         };
@@ -1021,6 +1061,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe_flag_values: eval_safe_flag_values.clone(),
             eval_safe_required_flags: eval_safe_required_flags.clone(),
             path_gate: toml.path_gate,
+            archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             kind: DispatchKind::Custom {
                 handler_name,
@@ -1051,7 +1092,8 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
                 eval_safe_flag_values: eval_safe_flag_values.clone(),
                 eval_safe_required_flags: eval_safe_required_flags.clone(),
                 path_gate: toml.path_gate,
-            behavior: behavior.clone(),
+                archetype_flags: archetype_flags.clone(),
+                behavior: behavior.clone(),
                 kind: DispatchKind::Branching {
                     bare_flags: toml.bare_flags,
                     subs: filter_candidates(toml.sub)
@@ -1080,6 +1122,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe_flag_values: eval_safe_flag_values.clone(),
             eval_safe_required_flags: eval_safe_required_flags.clone(),
             path_gate: toml.path_gate,
+            archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             kind: DispatchKind::Wrapper {
                 standalone: w.standalone,
@@ -1108,6 +1151,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe_flag_values: eval_safe_flag_values.clone(),
             eval_safe_required_flags: eval_safe_required_flags.clone(),
             path_gate: toml.path_gate,
+            archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             kind: DispatchKind::Branching {
                 bare_flags: toml.bare_flags,
@@ -1151,6 +1195,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe_flag_values: eval_safe_flag_values.clone(),
             eval_safe_required_flags: eval_safe_required_flags.clone(),
             path_gate: toml.path_gate,
+            archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             kind: DispatchKind::FirstArg {
                 patterns: toml.first_arg,
@@ -1174,6 +1219,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe_flag_values: eval_safe_flag_values.clone(),
             eval_safe_required_flags: eval_safe_required_flags.clone(),
             path_gate: toml.path_gate,
+            archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             kind: DispatchKind::WriteFlagged {
                 policy,
@@ -1198,6 +1244,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
             eval_safe_flag_values: eval_safe_flag_values.clone(),
             eval_safe_required_flags: eval_safe_required_flags.clone(),
             path_gate: toml.path_gate,
+            archetype_flags: archetype_flags.clone(),
             behavior: behavior.clone(),
             kind: DispatchKind::RequireAny {
                 require_any: toml.require_any,
@@ -1222,6 +1269,7 @@ pub(super) fn build_command(toml: TomlCommand, category: &str) -> CommandSpec {
         eval_safe_flag_values,
         eval_safe_required_flags,
         path_gate: toml.path_gate,
+        archetype_flags,
         behavior,
         kind: DispatchKind::Policy {
             policy,
@@ -1277,6 +1325,7 @@ pub fn insert_spec(map: &mut HashMap<String, CommandSpec>, spec: CommandSpec) {
             // before the engine's behavior lookup, so the canonical spec's `path_gate` /
             // `behavior` is what's consulted — the alias entry never needs either.
             path_gate: None,
+            archetype_flags: Vec::new(),
             behavior: None,
             kind: spec.kind.clone(),
         });

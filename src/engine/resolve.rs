@@ -162,6 +162,25 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
         }
         return Some(Profile::of(caps));
     }
+    // A flat command whose top-level classifying flag (`[[command.flag]]`) is present resolves to
+    // that flag's archetype — the flag-triggered mode of a bimodal tool: `age -d` / `sops --decrypt`
+    // reveal plaintext to the model (`decrypt-read`), while the bare/encrypt form falls through to
+    // ordinary resolution below. Checked after the profiled-sub walk (a sub match wins) so a
+    // subcommand form (`sops decrypt`) and the flag form (`sops -d`) both classify.
+    if let Some(names) = crate::registry::command_flag_archetypes(tokens) {
+        if !trusted_command_path(arg0.as_str()) {
+            return Some(worst("resolvable name invoked from a non-standard path — possible spoof (§0)"));
+        }
+        let caps: Vec<Capability> = names
+            .iter()
+            .map(|n| {
+                crate::engine::archetype::archetype(n).cloned().unwrap_or_else(|| {
+                    Capability::worst("command flag declares an unknown archetype (§0)")
+                })
+            })
+            .collect();
+        return Some(Profile::of(caps));
+    }
     // Every facet-classified command declares `[command.behavior]` (the coreutils are all ported;
     // dd/tar/sed/grep declare a `hook`). No declaration → the command is unresearched for the
     // engine, so return `None` (the caller falls back to the legacy classifier).

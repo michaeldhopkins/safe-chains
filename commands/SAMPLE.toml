@@ -199,6 +199,25 @@
 #
 # Provenance is validated at BUILD time (build::assert_sub_provenance): a profiled sub or escalating
 # flag missing fact+source, or naming an unknown archetype, PANICS at registry load — fail-closed.
+#
+# TOP-LEVEL classifying flag (`[[command.flag]]`): the FLAT-command analog of `[[command.sub.flag]]`.
+# A flag whose PRESENCE classifies the WHOLE invocation as an archetype — for a bimodal tool where a
+# mode flag flips the operation. The bare/other form falls through to ordinary resolution (its own
+# `level`/behavior); only the listed flag switches the classification. Same fields and build-time
+# provenance check as a sub flag (`name`, `classifies`, optional `value_prefix`/`when_absent`,
+# `fact`/`source`). List every spelling (short and long). Example — `age -d`/`--decrypt` reveals
+# plaintext to the model (`decrypt-read`, yolo) while the bare/encrypt form stays SafeWrite:
+#
+# [[command.flag]]
+# name = "-d"
+# classifies = "decrypt-read"
+# fact = "`age -d` decrypts the input and writes the PLAINTEXT to stdout — it enters the caller's context."
+# source = "https://age-encryption.org/ (age(1) — decryption mode)"
+# [[command.flag]]
+# name = "--decrypt"
+# classifies = "decrypt-read"
+# fact = "…"
+# source = "…"
 
 # ─────────────────────────────────────────────────────────────────────
 # GUARDED SUBCOMMAND — requires a specific flag to be present

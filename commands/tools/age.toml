@@ -5,6 +5,14 @@ url = "https://age-encryption.org/"
 researched_version = "age 1.x"
 level = "SafeWrite"
 bare = false
+examples_safe = [
+    "age -e -r RECIP -o out.age plain.txt",
+    "age --encrypt -o out.age plain.txt",
+]
+examples_denied = [
+    "age -d secrets.age",
+    "age --decrypt -i key.txt secrets.age",
+]
 standalone = [
     "--armor", "--decrypt", "--encrypt",
     "--help", "--passphrase", "--version",
@@ -15,3 +23,19 @@ valued = [
     "--recipient", "--recipients-file",
     "-R", "-i", "-o", "-r",
 ]
+
+# Decryption reveals the plaintext of an encrypted file to the caller — a secret disclosure to the
+# model. The bare/encrypt form produces ciphertext (an ordinary local write); only `-d`/`--decrypt`
+# flips age into the disclosure mode, so it classifies as `decrypt-read` (yolo) while encrypt stays
+# SafeWrite. Both spellings are listed so either triggers it.
+[[command.flag]]
+name = "-d"
+classifies = "decrypt-read"
+fact = "`age -d`/`--decrypt` decrypts the input and writes the PLAINTEXT to stdout (or to `-o FILE`) — the decrypted content enters the caller's context."
+source = "https://age-encryption.org/ (age(1) — decryption mode)"
+
+[[command.flag]]
+name = "--decrypt"
+classifies = "decrypt-read"
+fact = "`age --decrypt` decrypts the input and writes the PLAINTEXT to stdout (or to `-o FILE`) — the decrypted content enters the caller's context."
+source = "https://age-encryption.org/ (age(1) — decryption mode)"
