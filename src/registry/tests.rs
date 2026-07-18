@@ -2094,22 +2094,30 @@ use super::*;
     fn decrypt_read_denies_at_the_band_and_is_a_secret_read() {
         use crate::engine::facet::SecretLevel;
 
-        fn collect_profiled_sub_paths(prefix: &str, kind: &DispatchKind, out: &mut Vec<String>) {
+        fn collect_decrypt_sub_paths(prefix: &str, kind: &DispatchKind, out: &mut Vec<String>) {
             let subs = match kind {
                 DispatchKind::Branching { subs, .. } | DispatchKind::Custom { subs, .. } => subs,
                 _ => return,
             };
             for s in subs {
                 let path = format!("{prefix} {}", s.name);
+                // A sub classified as decrypt-read by its base `profile` (`sops decrypt`)...
                 if s.profile.as_deref() == Some("decrypt-read") {
                     out.push(path.clone());
                 }
-                collect_profiled_sub_paths(&path, &s.kind, out);
+                // ...or by an escalating flag on a bimodal sub (`openssl enc -d`).
+                for f in &s.flags {
+                    if f.classifies == "decrypt-read" {
+                        out.push(format!("{path} {}", f.name));
+                    }
+                }
+                collect_decrypt_sub_paths(&path, &s.kind, out);
             }
         }
 
         // Every invocation prefix that should classify as decrypt-read: `<cmd> <flag>` (top-level
-        // classifying flag) and `<cmd> <sub-path>` (a profiled subcommand).
+        // classifying flag), `<cmd> <sub-path>` (a profiled subcommand), and `<cmd> <sub> <flag>`
+        // (a flag-classified bimodal sub).
         let mut prefixes = Vec::new();
         for (name, spec) in TOML_REGISTRY.iter() {
             for f in &spec.archetype_flags {
@@ -2117,7 +2125,7 @@ use super::*;
                     prefixes.push(format!("{name} {}", f.name));
                 }
             }
-            collect_profiled_sub_paths(name, &spec.kind, &mut prefixes);
+            collect_decrypt_sub_paths(name, &spec.kind, &mut prefixes);
         }
 
         assert!(

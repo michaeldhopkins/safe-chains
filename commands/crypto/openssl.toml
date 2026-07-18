@@ -4,6 +4,16 @@ description = "OpenSSL — cryptography toolkit. Sub-driven CLI with a separate 
 url = "https://docs.openssl.org/master/man1/openssl/"
 researched_version = "OpenSSL 3.x"
 bare_flags = ["--help", "-help", "-version", "version"]
+examples_safe = [
+    "openssl enc -e -in x -out x.enc -k p",
+    "openssl x509 -in c.pem -noout -text",
+    "openssl genrsa 2048",
+]
+examples_denied = [
+    "openssl enc -d -in x.enc -k p",
+    "openssl smime -decrypt -in m.p7 -inkey k.pem",
+    "openssl cms -decrypt -in m -inkey k",
+]
 
 [[command.sub]]
 name = "version"
@@ -134,10 +144,18 @@ name = "dgst"
 allow_all = true
 level = "SafeWrite"
 
+# `enc` is bimodal: it encrypts by default (ciphertext out — an ordinary local write) and decrypts
+# with `-d`, writing the PLAINTEXT to stdout/-out. The `-d` flag flips it to a secret disclosure, so it
+# classifies as decrypt-read (yolo); without `-d`, encrypt stays SafeWrite.
 [[command.sub]]
 name = "enc"
 allow_all = true
 level = "SafeWrite"
+[[command.sub.flag]]
+name = "-d"
+classifies = "decrypt-read"
+fact = "`openssl enc -d` decrypts the input with the given cipher and writes the PLAINTEXT to stdout (or -out) — the decrypted content enters the caller's context."
+source = "https://docs.openssl.org/master/man1/openssl-enc/ (-d)"
 
 [[command.sub]]
 name = "rand"
@@ -149,15 +167,27 @@ name = "rehash"
 allow_all = true
 level = "SafeWrite"
 
+# `smime`/`cms` decrypt an encrypted message with `-decrypt`, writing the PLAINTEXT out — a secret
+# disclosure to the model (decrypt-read, yolo). The other modes (sign/verify/encrypt) stay SafeWrite.
 [[command.sub]]
 name = "smime"
 allow_all = true
 level = "SafeWrite"
+[[command.sub.flag]]
+name = "-decrypt"
+classifies = "decrypt-read"
+fact = "`openssl smime -decrypt` decrypts an S/MIME message and writes the PLAINTEXT to stdout (or -out) — the decrypted content enters the caller's context."
+source = "https://docs.openssl.org/master/man1/openssl-smime/ (-decrypt)"
 
 [[command.sub]]
 name = "cms"
 allow_all = true
 level = "SafeWrite"
+[[command.sub.flag]]
+name = "-decrypt"
+classifies = "decrypt-read"
+fact = "`openssl cms -decrypt` decrypts a CMS message and writes the PLAINTEXT to stdout (or -out) — the decrypted content enters the caller's context."
+source = "https://docs.openssl.org/master/man1/openssl-cms/ (-decrypt)"
 
 [[command.sub]]
 name = "ts"

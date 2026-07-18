@@ -92,14 +92,21 @@ pub(crate) fn command_behavior(cmd: &str) -> Option<&'static crate::registry::ty
 pub(crate) fn sub_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
     let cmd = canonical_name(tokens.first()?.command_name());
     let spec = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd))?;
-    let sub = walk_to_profiled_sub(&tokens[1..], &spec.kind)?;
-    let mut out = vec![sub.profile.as_deref()?];
+    let sub = walk_to_classified_sub(&tokens[1..], &spec.kind)?;
+    // A sub with a base `profile` classifies as that archetype; each present escalating flag ADDS one.
+    // A sub with NO base profile but escalating flags (`openssl enc -d`: bimodal — encrypt by default,
+    // decrypt only with `-d`) contributes ONLY the flags that fire; if none fires (`openssl enc -e`),
+    // it returns None so the caller falls through to the sub's ordinary (legacy) classification.
+    let mut out = Vec::new();
+    if let Some(p) = sub.profile.as_deref() {
+        out.push(p);
+    }
     for flag in &sub.flags {
         if flag_escalates(tokens, flag) {
             out.push(flag.classifies.as_str());
         }
     }
-    Some(out)
+    (!out.is_empty()).then_some(out)
 }
 
 /// The facet archetypes a flat command's PRESENT top-level classifying flags (`[[command.flag]]`)
@@ -164,7 +171,7 @@ fn flag_is_affirmatively_set(tokens: &[Token], flag: &str) -> bool {
     set
 }
 
-fn walk_to_profiled_sub(
+fn walk_to_classified_sub(
     remaining: &[Token],
     kind: &'static DispatchKind,
 ) -> Option<&'static types::SubSpec> {
@@ -174,8 +181,11 @@ fn walk_to_profiled_sub(
     };
     let arg = remaining.first()?;
     let sub = subs.iter().find(|s| s.name == arg.as_str())?;
-    // Deepest profiled match wins: a nested action's profile overrides its resource sub's.
-    walk_to_profiled_sub(&remaining[1..], &sub.kind).or_else(|| sub.profile.is_some().then_some(sub))
+    // Deepest classified match wins: a nested action's profile overrides its resource sub's. A sub is
+    // "classified" if it declares a base `profile` OR any escalating `flag` (`openssl enc` has flags
+    // but no base profile — bimodal, decrypt only with `-d`).
+    walk_to_classified_sub(&remaining[1..], &sub.kind)
+        .or_else(|| (sub.profile.is_some() || !sub.flags.is_empty()).then_some(sub))
 }
 
 /// Like `walk_to_profiled_sub`, but also returns the tokens AFTER the matched sub's name — the
