@@ -93,6 +93,9 @@ pub(crate) fn sub_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
     let cmd = canonical_name(tokens.first()?.command_name());
     let spec = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd))?;
     let sub = walk_to_classified_sub(&tokens[1..], &spec.kind)?;
+    // openssl accepts `--opt` as an alias for `-opt` on every subcommand, so gated flags and their
+    // neutralizers must match the `--` twin too (`openssl enc --d`, `rsa --pubout`).
+    let single_dash_long = cmd == "openssl";
     // A sub with a base `profile` classifies as that archetype; each present escalating flag ADDS one.
     // A sub with NO base profile but escalating flags (`openssl enc -d`: bimodal — encrypt by default,
     // decrypt only with `-d`) contributes ONLY the flags that fire; if none fires (`openssl enc -e`),
@@ -103,12 +106,12 @@ pub(crate) fn sub_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
     // neutralized — a flag that CLASSIFIES a disclosure (`openssl pkcs12 -noenc`) always fires.
     let mut out = Vec::new();
     if let Some(p) = sub.profile.as_deref()
-        && !sub.unless_flags.iter().any(|f| flag_present(tokens, f))
+        && !sub.unless_flags.iter().any(|f| flag_present(tokens, f, single_dash_long))
     {
         out.push(p);
     }
     for flag in &sub.flags {
-        if flag_escalates(tokens, flag) {
+        if flag_escalates(tokens, flag, single_dash_long) {
             out.push(flag.classifies.as_str());
         }
     }
@@ -123,10 +126,12 @@ pub(crate) fn sub_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
 pub(crate) fn command_flag_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
     let cmd = canonical_name(tokens.first()?.command_name());
     let spec = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd))?;
+    // Top-level classifying flags are on flat tools (age/gpg/sops) that enumerate their spellings and
+    // don't accept arbitrary `--` synonyms, so no single-dash-long normalization here.
     let present: Vec<&'static str> = spec
         .archetype_flags
         .iter()
-        .filter(|f| flag_escalates(tokens, f))
+        .filter(|f| flag_escalates(tokens, f, false))
         .map(|f| f.classifies.as_str())
         .collect();
     (!present.is_empty()).then_some(present)
@@ -136,7 +141,7 @@ pub(crate) fn command_flag_archetypes(tokens: &[Token]) -> Option<Vec<&'static s
 /// value-matched flag escalates only when its VALUE starts with the prefix — the space form
 /// (`-c core.sshCommand=…`) or the glued form (`--flag=core.sshCommand=…`). Scans the whole line;
 /// an escalator counts wherever it sits.
-fn flag_escalates(tokens: &[Token], flag: &types::FlagProvenance) -> bool {
+fn flag_escalates(tokens: &[Token], flag: &types::FlagProvenance, single_dash_long: bool) -> bool {
     if flag.when_absent {
         // A SAFETY flag whose ABSENCE is the escalation (`npm ci` without `--ignore-scripts`).
         // It must be AFFIRMATIVELY set — `--ignore-scripts=false` / `--no-ignore-scripts` re-ENABLE
@@ -144,7 +149,7 @@ fn flag_escalates(tokens: &[Token], flag: &types::FlagProvenance) -> bool {
         return !flag_is_affirmatively_set(tokens, &flag.name);
     }
     let Some(prefix) = flag.value_prefix.as_deref() else {
-        return flag_present(tokens, &flag.name);
+        return flag_present(tokens, &flag.name, single_dash_long);
     };
     // space form: `NAME VALUE`, VALUE starting with the prefix
     tokens.windows(2).any(|w| w[0].as_str() == flag.name && w[1].as_str().starts_with(prefix))
@@ -278,10 +283,22 @@ fn output_flag_value<'a>(tokens: &'a [Token], flag: &'a str) -> Option<&'a str> 
 
 /// Whether `flag` appears anywhere in `tokens` — bare (`--force`) or glued (`--flag=v`). A flag is
 /// an escalator wherever it sits in the invocation, so this scans the whole line.
-fn flag_present(tokens: &[Token], flag: &str) -> bool {
+fn flag_present(tokens: &[Token], flag: &str, single_dash_long: bool) -> bool {
     tokens.iter().any(|t| {
         let s = t.as_str();
-        s == flag || s.strip_prefix(flag).is_some_and(|rest| rest.starts_with('='))
+        if s == flag || s.strip_prefix(flag).is_some_and(|rest| rest.starts_with('=')) {
+            return true;
+        }
+        // openssl (and other single-dash-long-opt tools) accept `--opt` as an alias for `-opt` on
+        // every subcommand, so a gated flag's `--` twin must classify identically. Drop one redundant
+        // leading dash from a `--word` token and re-compare (`--decrypt` → `-decrypt`, `--d` → `-d`).
+        single_dash_long
+            && s.starts_with("--")
+            && s.len() > 2 // at least one char after `--` (excludes the bare `--` separator)
+            && {
+                let one_less = &s[1..];
+                one_less == flag || one_less.strip_prefix(flag).is_some_and(|rest| rest.starts_with('='))
+            }
     })
 }
 
