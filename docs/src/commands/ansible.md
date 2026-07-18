@@ -44,7 +44,7 @@
 - **encrypt**: Flags: --ask-vault-pass, --ask-vault-password, --encrypt-vault-id, --help, -h. Valued: --encrypt-vault-id, --output, --vault-id, --vault-password-file. Positional args accepted
 - **encrypt_string**: Flags: --ask-vault-pass, --ask-vault-password, --help, --show-input, --stdin-name, -h, -n. Valued: --encrypt-vault-id, --name, --stdin-name, --vault-id, --vault-password-file
 - **help**: Positional args accepted
-- **view**: Flags: --ask-vault-pass, --ask-vault-password, --help, -h, --vault-password-file. Valued: --vault-id, --vault-password-file, --ask-vault-pass-file. Positional args accepted
+- **view**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `molecule`
