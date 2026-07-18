@@ -99,6 +99,19 @@ secret = { level = "reads" }
 disclosure = { audience = "local-process" }
 because = "reads and exposes EXISTING credential material to the caller (prints a token, fetches a secret value) — it enters the agent's context"
 
+# Decrypts secret material and reveals the PLAINTEXT to the caller — `sops -d secrets.yaml`,
+# `sops decrypt`, `age -d`, `ansible-vault view`. The decrypted content (a secrets file, a private
+# key, credentials, config) flows into the agent's context (`disclosure = local-process`) where it
+# can be logged or exfiltrated — the same model-disclosure danger as reading a credential store, so
+# it shares `secret = reads` and lands at the same tier (yolo). Unlike `bulk-object-read` (an
+# ARBITRARY remote object that MIGHT be a secret → bulk-egress tier), a `-d`/`view` on a secrets tool
+# is a deliberate reveal of encrypted-at-rest secret material, classified at the credential tier.
+[archetype.decrypt-read]
+operation = "observe"
+secret = { level = "reads" }
+disclosure = { audience = "local-process" }
+because = "decrypts secret material and reveals the plaintext to the caller — the decrypted content (a secrets file, private key, or credentials) enters the agent's context where it can be logged or exfiltrated"
+
 # MINTS NEW credential material and returns it — `aws iam create-access-key`, `aws sts
 # get-session-token`, `kubectl create token`, `az account get-access-token`, `vault token create`. A
 # fresh access grant, exposed to the caller. `secret = writes` (the higher sub-case remote-authorize's
