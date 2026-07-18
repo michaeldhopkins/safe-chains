@@ -58,10 +58,13 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
     - `openssl rsa`/`pkey`/`ec`/`dsa`/`pkcs8 -in priv.pem` → decrypt-read (dumps the private key to
       stdout). Needed the `unless_flags` primitive (an AND-of-absences): decrypt-read UNLESS the output
       is diverted by `-pubout`/`-pubin`/`-out`/`-noout`, in which case it stays SafeWrite.
+    - `openssl pkcs12 -in file.p12 -nodes` → decrypt-read (exports the UNENCRYPTED key to stdout). Uses a
+      bimodal-sub `-nodes` flag with `unless_flags = ["-out"]` (extended so a neutralizer suppresses an
+      escalating flag, not just a base profile); the default (re-encrypted) and `-out FILE` forms stay
+      SafeWrite.
     Guarded by `decrypt_read_denies_at_the_band_and_is_a_secret_read` (registry-walking) +
     `decrypt_to_screen_corpus_denies` (MUST_DENY corpus + a complement of diverted/read forms that must
-    stay allowed) + `no_profiled_sub_has_flag_bearing_descendants` (fail-closed footgun guard). Residual:
-    openssl `pkcs12` (multi-modal `-nodes`/`-nocerts`/`-nokeys`) is not yet gated — a follow-up. The
+    stay allowed) + `no_profiled_sub_has_flag_bearing_descendants` (fail-closed footgun guard). The
     user's rule: decrypt-to-screen is NOT auto-approved below local-admin (it
     lands at yolo, refused below).
     - `aws configure get aws_secret_access_key` / `aws_session_token` — GATED (2026-07) via
