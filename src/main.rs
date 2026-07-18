@@ -12,15 +12,6 @@ fn print_docs() {
     print!("{}", safe_chains::docs::render_markdown(&docs));
 }
 
-fn print_opencode_config() {
-    let patterns = safe_chains::all_opencode_patterns();
-    let cwd = std::env::current_dir().unwrap_or_else(|_| std::path::PathBuf::from("."));
-    print!(
-        "{}",
-        safe_chains::targets::opencode::render_opencode_json_in(&cwd, &patterns)
-    );
-}
-
 fn run_cli(
     command: &str,
     threshold: SafetyLevel,
@@ -264,8 +255,6 @@ fn main() {
             } else if cli.generate_book {
                 let docs = safe_chains::docs::all_command_docs();
                 safe_chains::docs::render_book(&docs, std::path::Path::new("docs"));
-            } else if cli.opencode_config {
-                print_opencode_config();
             } else if let Some(command) = cli.command {
                 let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
                     cwd: cli.cwd,

@@ -34,10 +34,6 @@ pub struct Cli {
     #[arg(long)]
     pub list_commands: bool,
 
-    /// Generate OpenCode permission config (merges with existing opencode.json)
-    #[arg(long)]
-    pub opencode_config: bool,
-
     /// Generate mdBook command reference pages in docs/src/commands/
     #[arg(long)]
     pub generate_book: bool,
