@@ -659,7 +659,7 @@ Aliases: `g++`, `cc`, `c++`
 ### `gpg`
 <p class="cmd-url"><a href="https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html">https://www.gnupg.org/documentation/manuals/gnupg/Invoking-GPG.html</a></p>
 
-- Allowed standalone flags: --check-sigs, --check-trustdb, --fingerprint, --help, --list-config, --list-keys, --list-options, --list-public-keys, --list-secret-keys, --list-sigs, --list-trustdb, --no-tty, --print-md, --quiet, --show-keys, --show-sigs, --verbose, --version, -K, -h, -k, -q, -v
+- Requires --check-sigs, --check-trustdb, --fingerprint, --list-config, --list-keys, --list-public-keys, --list-secret-keys, --list-sigs, --list-trustdb, --print-md, --show-keys, --show-sigs, --version, -K, -k. - Allowed standalone flags: --check-sigs, --check-trustdb, --fingerprint, --help, --list-config, --list-keys, --list-options, --list-public-keys, --list-secret-keys, --list-sigs, --list-trustdb, --no-tty, --print-md, --quiet, --show-keys, --show-sigs, --verbose, --version, -K, -h, -k, -q, -v
 - Allowed valued flags: --digest-algo, --homedir, --keyring
 
 **Examples:**
@@ -667,6 +667,7 @@ Aliases: `g++`, `cc`, `c++`
 - `gpg --list-keys`
 - `gpg -k`
 - `gpg --fingerprint`
+- `gpg --version`
 
 ### `gron`
 <p class="cmd-url"><a href="https://github.com/tomnomnom/gron">https://github.com/tomnomnom/gron</a></p>
