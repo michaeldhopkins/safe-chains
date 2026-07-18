@@ -1,37 +1,85 @@
 [[command]]
 name = "sops"
-description = "Mozilla SOPS — secrets-as-code editor that encrypts/decrypts YAML/JSON/ENV files in place using configurable KMS providers (AWS KMS, GCP KMS, Azure Key Vault, age, PGP). `--decrypt` reads an encrypted file and writes plaintext (to stdout by default, or in place with --in-place). `--encrypt` is the reverse. `--rotate` re-encrypts with a new data key. `edit` opens an interactive editor. `exec-env` / `exec-file` decrypt and run a child process with the decrypted secrets in the environment. `updatekeys` rewrites the metadata. KMS calls are network. Active project."
+description = "Mozilla/getSOPS — secrets-as-code editor that encrypts/decrypts YAML/JSON/ENV/binary files using configurable key providers (AWS KMS, GCP KMS, Azure Key Vault, HashiCorp Vault, age, PGP). Modern sops exposes explicit subcommands alongside the legacy `-e`/`-d`/`-r` flags: `encrypt` writes ciphertext; `decrypt` reads an encrypted file and writes the PLAINTEXT (to stdout, or in place with `--in-place`) — the secret material enters the caller's context; `edit` opens the decrypted content in an interactive `$EDITOR`; `rotate` re-encrypts with a fresh data key; `set`/`unset` change a value inside an encrypted document; `exec-env`/`exec-file` decrypt the secrets and run a CHILD PROCESS with them in the environment (decrypt + arbitrary execution); `updatekeys` rewrites the key metadata; `filestatus` reports only whether a file is encrypted (a metadata read). Every provider except age/PGP performs NETWORK key-management calls (KMS/Key Vault/Vault). `decrypt`, the `-d`/`--decrypt` flag, and `exec-env`/`exec-file` disclose or run secret material; `encrypt`/`rotate`/`set`/`updatekeys` reach remote KMS. Active project."
 url = "https://github.com/getsops/sops"
-researched_version = "sops 3.x"
-level = "SafeWrite"
+researched_version = "sops 3.13.2"
+bare_flags = ["--help", "--version", "-h", "-v"]
+examples_safe = [
+    "sops --version",
+    "sops filestatus secrets.yaml",
+]
+examples_denied = [
+    "sops -d secrets.yaml",
+    "sops --decrypt secrets.yaml",
+    "sops decrypt secrets.yaml",
+    "sops encrypt secrets.yaml",
+]
+
+# `decrypt` reveals the plaintext of an encrypted secrets file to the caller — a secret disclosure to
+# the model, the same tier as reading a credential store (yolo). Covers `sops decrypt FILE` and, via
+# the legacy flag form below, `sops -d FILE` / `sops --decrypt FILE`.
+[[command.sub]]
+name = "decrypt"
+profile = "decrypt-read"
+fact = "`sops decrypt FILE` decrypts the file and writes its PLAINTEXT to stdout (or in place with `--in-place`) — the decrypted secrets (keys, tokens, passwords) enter the caller's context."
+source = "https://github.com/getsops/sops#22encrypting-using-age"
+judgment = "Revealing a secrets file's decrypted contents to the model is a secret disclosure; conservative classification is decrypt-to-screen (credential exposure)."
+
+# `filestatus` reports only whether a file is already encrypted — a local metadata read, no plaintext.
+[[command.sub]]
+name = "filestatus"
+level = "SafeRead"
 bare = false
-standalone = [
-    "--decrypt", "--decrypt-only-mac-mismatch",
-    "--encrypt", "--encrypt-only-empty-keys",
-    "--enable-local-keyservice", "--help",
-    "--ignore-mac", "--in-place",
-    "--mac-only-encrypted", "--rotate",
-    "--show-master-keys", "--show-trace",
-    "--unencrypted-fields-no-mac",
-    "--verbose", "--version",
-    "-d", "-e", "-h", "-i", "-r", "-s", "-v",
-]
-valued = [
-    "--add-age", "--add-azure-kv", "--add-gcp-kms",
-    "--add-hc-vault-transit", "--add-kms",
-    "--add-pgp", "--age", "--aws-profile",
-    "--azure-kv", "--config", "--decryption-order",
-    "--encrypted-comment-regex", "--encrypted-regex",
-    "--encrypted-suffix", "--extract", "--filename-override",
-    "--gcp-kms", "--hc-vault-transit",
-    "--input-type", "--keyservice",
-    "--kms", "--mac-only-encrypted",
-    "--output", "--output-type",
-    "--pgp", "--rm-age", "--rm-azure-kv",
-    "--rm-gcp-kms", "--rm-hc-vault-transit",
-    "--rm-kms", "--rm-pgp",
-    "--set", "--shamir-secret-sharing-quorum",
-    "--shamir-secret-sharing-threshold",
-    "--unencrypted-comment-regex",
-    "--unencrypted-regex", "--unencrypted-suffix",
-]
+standalone = ["--help", "-h"]
+valued = ["--input-type"]
+
+# The mutating / interactive / execute subcommands reach remote KMS, open an interactive editor, or
+# decrypt-and-execute a child process — none is auto-approvable (SafeWrite is local-only; exec-env/
+# exec-file also run arbitrary code with the secrets). Kept as candidates: they carry a real behavior
+# reason so a future contributor need not re-evaluate, and users on older sops get a no-op, not a gap.
+[[command.sub]]
+name = "encrypt"
+candidate = true
+
+[[command.sub]]
+name = "edit"
+candidate = true
+
+[[command.sub]]
+name = "rotate"
+candidate = true
+
+[[command.sub]]
+name = "set"
+candidate = true
+
+[[command.sub]]
+name = "unset"
+candidate = true
+
+[[command.sub]]
+name = "exec-env"
+candidate = true
+
+[[command.sub]]
+name = "exec-file"
+candidate = true
+
+[[command.sub]]
+name = "updatekeys"
+candidate = true
+
+# Legacy flag form (still supported in 3.13): `sops -d FILE` / `sops --decrypt FILE` decrypt to the
+# model exactly like the `decrypt` subcommand, so they classify identically. The bare/`-e`/`-r` forms
+# are not decryption and fall through to ordinary dispatch (denied — they reach remote KMS).
+[[command.flag]]
+name = "-d"
+classifies = "decrypt-read"
+fact = "`sops -d FILE` decrypts the file and writes its PLAINTEXT to stdout (the legacy spelling of `sops decrypt`) — the decrypted secrets enter the caller's context."
+source = "https://github.com/getsops/sops#usage"
+
+[[command.flag]]
+name = "--decrypt"
+classifies = "decrypt-read"
+fact = "`sops --decrypt FILE` decrypts the file and writes its PLAINTEXT to stdout (the legacy spelling of `sops decrypt`) — the decrypted secrets enter the caller's context."
+source = "https://github.com/getsops/sops#usage"
