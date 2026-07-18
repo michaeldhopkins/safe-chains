@@ -208,6 +208,20 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
             continue;
         }
         if t.starts_with('-') && t != "-" {
+            // A whole-command file gate (the simple read/write lists — `openssl`, etc. — map no
+            // specific flags) reads/writes EVERY path argument, including one hidden in a glued
+            // `-flag=path` token (`openssl asn1parse -in=~/.ssh/id_rsa`). The space form is already
+            // caught as a positional; gate the glued value the same way so it can't evade. Skip an
+            // all-slashes value — that's a DELIMITER, not a file (`sort --field-separator=/`), and
+            // `looks_like_path` alone would misread `/` as the root path. A specific flag spec gates
+            // its OWN mapped flags above and leaves other flags alone (unchanged).
+            if spec.flags.is_empty()
+                && let Some((_, v)) = t.split_once('=')
+                && !v.trim_matches('/').is_empty()
+                && gate(spec.positional, v)
+            {
+                return true;
+            }
             i += 1; // an unmapped flag — assume boolean and skip it
             continue;
         }
@@ -586,6 +600,8 @@ mod behavior_specs {
         spec_curl_output_worktree: "curl -o ./out.json https://x.com",
         spec_sort_delimiter_slash_long: "sort --field-separator=/ file.txt",
         spec_sort_delimiter_slash_short: "sort -t/ -k1 file.txt",
+        // the glued-flag gate must NOT over-deny a worktree path or a non-path delimiter value
+        spec_openssl_glued_in_worktree: "openssl asn1parse -in=./cert.pem",
         spec_scp_identity_download: "scp -i ~/.ssh/key host:f ./",
         spec_rsync_worktree: "rsync ./src/ ./dst/",
         spec_openssl_worktree_cert: "openssl x509 -in ./cert.pem -noout",
@@ -633,6 +649,11 @@ mod behavior_specs {
         spec_wget_dir_prefix_system: "wget --directory-prefix=/etc http://x",
         spec_curl_output_system: "curl -o /etc/x https://x",
         spec_curl_output_glued_eq: "curl --output=/etc/x https://x",
+        // simple whole-command file gate (openssl): a sensitive path hidden in a GLUED `-flag=path`
+        // token must deny just like the space form (openssl accepts `-in=path` — verified vs 3.6.3).
+        spec_openssl_glued_in_home_key: "openssl asn1parse -in=~/.ssh/id_rsa",
+        spec_openssl_glued_in_system_key: "openssl dgst -in=/etc/ssl/private/x.key",
+        spec_openssl_glued_in_double_dash: "openssl asn1parse --in=/root/.ssh/id_ed25519",
         spec_pigz_system: "pigz /etc/hosts",
         spec_od_secret: "od /etc/shadow",
         spec_tee_system: "tee /etc/hosts",
