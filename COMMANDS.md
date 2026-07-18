@@ -306,6 +306,11 @@ Aliases: `7zz`, `7za`
 - Allowed standalone flags: --armor, --decrypt, --encrypt, --help, --passphrase, --version, -a, -d, -e, -h, -p
 - Allowed valued flags: --identity, --output, --recipient, --recipients-file, -R, -i, -o, -r
 
+**Examples:**
+
+- `age -e -r RECIP -o out.age plain.txt`
+- `age --encrypt -o out.age plain.txt`
+
 ### `agvtool`
 <p class="cmd-url"><a href="https://developer.apple.com/library/archive/qa/qa1827/_index.html">https://developer.apple.com/library/archive/qa/qa1827/_index.html</a></p>
 
@@ -519,7 +524,7 @@ Aliases: `muse`
 - **encrypt**: Flags: --ask-vault-pass, --ask-vault-password, --encrypt-vault-id, --help, -h. Valued: --encrypt-vault-id, --output, --vault-id, --vault-password-file. Positional args accepted
 - **encrypt_string**: Flags: --ask-vault-pass, --ask-vault-password, --help, --show-input, --stdin-name, -h, -n. Valued: --encrypt-vault-id, --name, --stdin-name, --vault-id, --vault-password-file
 - **help**: Positional args accepted
-- **view**: Flags: --ask-vault-pass, --ask-vault-password, --help, -h, --vault-password-file. Valued: --vault-id, --vault-password-file, --ask-vault-pass-file. Positional args accepted
+- **view**: Positional args accepted
 - Allowed standalone flags: --help, --version, -h, -v
 
 ### `anvil`
@@ -13704,8 +13709,14 @@ Aliases: `serverless`
 ### `sops`
 <p class="cmd-url"><a href="https://github.com/getsops/sops">https://github.com/getsops/sops</a></p>
 
-- Allowed standalone flags: --decrypt, --decrypt-only-mac-mismatch, --encrypt, --encrypt-only-empty-keys, --enable-local-keyservice, --help, --ignore-mac, --in-place, --mac-only-encrypted, --rotate, --show-master-keys, --show-trace, --unencrypted-fields-no-mac, --verbose, --version, -d, -e, -h, -i, -r, -s, -v
-- Allowed valued flags: --add-age, --add-azure-kv, --add-gcp-kms, --add-hc-vault-transit, --add-kms, --add-pgp, --age, --aws-profile, --azure-kv, --config, --decryption-order, --encrypted-comment-regex, --encrypted-regex, --encrypted-suffix, --extract, --filename-override, --gcp-kms, --hc-vault-transit, --input-type, --keyservice, --kms, --mac-only-encrypted, --output, --output-type, --pgp, --rm-age, --rm-azure-kv, --rm-gcp-kms, --rm-hc-vault-transit, --rm-kms, --rm-pgp, --set, --shamir-secret-sharing-quorum, --shamir-secret-sharing-threshold, --unencrypted-comment-regex, --unencrypted-regex, --unencrypted-suffix
+- **decrypt**
+- **filestatus**: Flags: --help, -h. Valued: --input-type
+- Allowed standalone flags: --help, --version, -h, -v
+
+**Examples:**
+
+- `sops --version`
+- `sops filestatus secrets.yaml`
 
 ### `sort`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#sort-invocation</a></p>
