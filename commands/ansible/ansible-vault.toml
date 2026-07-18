@@ -7,7 +7,10 @@ bare_flags = ["--help", "--version", "-h", "-v"]
 
 [[command.sub]]
 name = "view"
-level = "SafeRead"
+profile = "decrypt-read"
+fact = "`ansible-vault view` decrypts an encrypted vault file with the configured password and prints its PLAINTEXT to stdout — the decrypted secrets (passwords, keys, tokens) enter the caller's context."
+source = "https://docs.ansible.com/ansible/latest/cli/ansible-vault.html"
+judgment = "Revealing a vault's decrypted contents to the model is a secret disclosure; conservative classification is decrypt-to-screen (credential exposure)."
 bare = false
 tolerate_unknown_short = true
 standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "-h", "--vault-password-file"]

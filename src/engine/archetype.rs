@@ -245,6 +245,9 @@ mod tests {
             // Credential material read/mint → yolo (secret > uses-ambient everywhere below yolo).
             ("credential-read", "yolo", "network-admin"),
             ("credential-mint", "yolo", "network-admin"),
+            // Decrypt-to-screen (sops -d, age -d, ansible-vault view): a secret read that flows to the
+            // model — same `secret = reads` tier as a credential-store read → yolo, refused below.
+            ("decrypt-read", "yolo", "network-admin"),
             // Arbitrary stored-object retrieval (s3 get-object): classified by `retrieval =
             // bulk-content` (§5 #1), it lands at NETWORK-ADMIN — the proportionate bulk-egress tier —
             // refused by developer. NOT yolo (it is not a credential read) and NOT reader (opaque bulk
