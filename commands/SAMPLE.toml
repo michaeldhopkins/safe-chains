@@ -200,6 +200,23 @@
 # Provenance is validated at BUILD time (build::assert_sub_provenance): a profiled sub or escalating
 # flag missing fact+source, or naming an unknown archetype, PANICS at registry load — fail-closed.
 #
+# NEUTRALIZING flags (`unless_flags`): a profiled sub that is dangerous BY DEFAULT but safe when the
+# output is diverted. When any listed flag is present, the `profile` does NOT apply and the sub falls
+# through to its ordinary `level`/`allow_all` classification. `openssl rsa -in priv.pem` dumps the
+# private key to stdout (decrypt-read), but `-pubout`/`-out`/`-noout` divert it → the sub keeps its
+# SafeWrite. Unlike a plain profiled sub (whose legacy kind is razed to deny-on-abstain), an
+# `unless_flags` sub KEEPS its `level`/`allow_all` for the neutralized case. Requires `profile`.
+#
+# [[command.sub]]
+# name = "rsa"
+# allow_all = true
+# level = "SafeWrite"
+# profile = "decrypt-read"
+# unless_flags = ["-pubout", "-pubin", "-out", "-noout"]
+# fact = "…dumps the private key to stdout unless the output is diverted…"
+# source = "…"
+# judgment = "…"
+#
 # TOP-LEVEL classifying flag (`[[command.flag]]`): the FLAT-command analog of `[[command.sub.flag]]`.
 # A flag whose PRESENCE classifies the WHOLE invocation as an archetype — for a bimodal tool where a
 # mode flag flips the operation. The bare/other form falls through to ordinary resolution (its own
