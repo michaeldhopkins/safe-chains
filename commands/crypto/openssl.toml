@@ -165,10 +165,24 @@ fact = "`openssl pkcs8 -in priv.pem` reads a private key (decrypting it if passp
 source = "https://docs.openssl.org/master/man1/openssl-pkcs8/"
 judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
 
+# `pkcs12 -in file.p12 -noenc` (OpenSSL 3.0 spelling; `-nodes` is the deprecated alias) exports the
+# UNENCRYPTED private key to stdout — a disclosure — while the default re-encrypts it with a passphrase.
+# `-noenc`/`-nodes` trigger the reveal; `-out FILE` diverts it to disk, so it neutralizes the classification.
 [[command.sub]]
 name = "pkcs12"
 allow_all = true
 level = "SafeWrite"
+unless_flags = ["-out"]
+[[command.sub.flag]]
+name = "-noenc"
+classifies = "decrypt-read"
+fact = "`openssl pkcs12 -in file.p12 -noenc` exports the private key WITHOUT encryption, writing the plaintext key to stdout — it enters the caller's context; `-out FILE` diverts it to disk."
+source = "https://docs.openssl.org/master/man1/openssl-pkcs12/ (-noenc)"
+[[command.sub.flag]]
+name = "-nodes"
+classifies = "decrypt-read"
+fact = "`openssl pkcs12 -in file.p12 -nodes` (deprecated alias of `-noenc`) exports the private key WITHOUT encryption to stdout — it enters the caller's context; `-out FILE` diverts it to disk."
+source = "https://docs.openssl.org/master/man1/openssl-pkcs12/ (-nodes, deprecated alias of -noenc)"
 
 [[command.sub]]
 name = "asn1parse"

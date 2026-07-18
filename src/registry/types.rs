@@ -411,13 +411,14 @@ pub(super) struct TomlSub {
     pub source: Option<String>,
     #[serde(default)]
     pub judgment: Option<String>,
-    /// Flags that NEUTRALIZE this sub's `profile`: when any is present, the profile does NOT apply and
-    /// the sub falls through to its ordinary (`level`/`allow_all`) classification. For a sub that is
-    /// dangerous BY DEFAULT but safe when the output is diverted — `openssl rsa -in priv.pem` dumps the
-    /// private key to stdout (a disclosure), but `-pubout` (public only), `-out FILE` (to disk), or
-    /// `-noout` (no output) redirect it away from the model. Requires `profile`; the sub must also keep
-    /// a `level`/`allow_all` for the neutralized case (a profiled sub without `unless_flags` force-denies
-    /// its legacy kind, but one WITH them needs the real classification for when a neutralizer is present).
+    /// Flags that NEUTRALIZE this sub's engine classification — its base `profile` AND its escalating
+    /// `flag`s: when any is present, none applies and the sub falls through to its ordinary
+    /// (`level`/`allow_all`) classification. For a sub dangerous BY DEFAULT (or in one flag mode) but
+    /// safe when the output is diverted — `openssl rsa -in priv.pem` dumps the private key to stdout (a
+    /// disclosure), but `-pubout`/`-out`/`-noout` divert it; `openssl pkcs12 -nodes` dumps the key, but
+    /// `-out FILE` sends it to disk. Requires a `profile` or a `flag`; the sub keeps its `level`/
+    /// `allow_all` for the neutralized case (a plain profiled sub force-denies its legacy kind, but an
+    /// `unless_flags` sub needs the real classification for when a neutralizer is present).
     #[serde(default)]
     pub unless_flags: Vec<String>,
     #[serde(default)]
@@ -721,8 +722,9 @@ pub(super) struct SubSpec {
     pub profile: Option<String>,
     /// Escalating flags: each, when present, adds `classifies`'s capability to the resolved profile.
     pub flags: Vec<FlagProvenance>,
-    /// Flags that NEUTRALIZE `profile` (`unless_flags`): when any is present, `sub_archetypes` drops the
-    /// base profile so the sub falls through to its legacy classification (`openssl rsa -pubout`).
+    /// Flags that NEUTRALIZE this sub's engine classification (`unless_flags`): when any is present,
+    /// `sub_archetypes` drops BOTH the base `profile` and the escalating `flags`, so the sub falls
+    /// through to its legacy classification (`openssl rsa -pubout`, `openssl pkcs12 -nodes -out`).
     pub unless_flags: Vec<String>,
     /// If this sub was declared with `policy = "key"`, the referenced
     /// handler_policy name is preserved for docs rendering so a sub

@@ -281,8 +281,8 @@ pub(super) fn build_sub(
     let profile = toml.profile.clone();
     let unless_flags = std::mem::take(&mut toml.unless_flags);
     assert!(
-        unless_flags.is_empty() || profile.is_some(),
-        "{parent} sub `{name}`: `unless_flags` requires a `profile` (it neutralizes the profile)",
+        unless_flags.is_empty() || profile.is_some() || !toml.flag.is_empty(),
+        "{parent} sub `{name}`: `unless_flags` requires a `profile` or escalating `flag` (it neutralizes them)",
     );
     assert_sub_provenance(parent, &toml);
     assert_no_candidate_shadowed_by_glob(&format!("{parent} {}", toml.name), &toml.sub, &toml.first_arg);
