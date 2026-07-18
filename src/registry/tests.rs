@@ -2182,6 +2182,8 @@ use super::*;
             "openssl pkey -in priv.pem",
             "openssl ec -in priv.pem",
             "openssl pkcs8 -in priv.pem",
+            "openssl pkcs12 -in file.p12 -noenc",
+            "openssl pkcs12 -in file.p12 -nodes",
             // gpg implicit decrypt (bare positional, no inspection command)
             "gpg secret.gpg",
             "gpg --verbose secret.gpg",
@@ -2198,6 +2200,8 @@ use super::*;
             "openssl rsa -in priv.pem -noout -text",
             "openssl pkey -in pub.pem -pubin -text",
             "openssl pkcs8 -in priv.pem -out out.pem",
+            "openssl pkcs12 -in file.p12 -nodes -out key.pem",
+            "openssl pkcs12 -in file.p12",
             "gpg --list-keys",
             "gpg --version",
         ] {
