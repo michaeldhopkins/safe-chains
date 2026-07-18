@@ -18,15 +18,17 @@ impl Target for CopilotTarget {
     }
 
     fn detect_paths(&self, home: &Path) -> Vec<PathBuf> {
-        // Copilot's canonical hook location is per-repo
-        // (`<repo>/.github/hooks/*.json`), but the docs also document a
-        // user-global path at `~/.github/hooks/`. Probe the user-global
-        // dir for detection; per-repo install would need a project path.
-        vec![home.join(".github").join("hooks")]
+        // Copilot reads hooks from per-repo `<repo>/.github/hooks/*.json` OR the user-global
+        // `~/.copilot/hooks/` (or `$COPILOT_HOME/hooks/`); upstream's hooks-configuration docs say
+        // both are loaded and all entries run. We install to the user-global dir; a per-repo install
+        // would need a project path. The live drive (v1.0.71) fired the per-repo `.github/hooks/`
+        // config and confirmed `~/.copilot/` is the real config root — the earlier `~/.github/hooks/`
+        // guess was wrong and never fired.
+        vec![home.join(".copilot").join("hooks")]
     }
 
     fn install(&self, home: &Path) -> Result<InstallOutcome, String> {
-        let dir = home.join(".github").join("hooks");
+        let dir = home.join(".copilot").join("hooks");
         if let Err(e) = std::fs::create_dir_all(&dir) {
             return Err(format!("Could not create {}: {e}", dir.display()));
         }
@@ -115,15 +117,12 @@ impl HookFormat for CopilotHookFormat {
     }
 
     fn render_response(&self, verdict: Verdict) -> HookResponse {
-        // Copilot's effective decision space is *only* "deny" right
-        // now (per docs: "only `deny` is currently processed"). For
-        // allowed commands, the right answer is "no opinion" — empty
-        // body, exit 0 — letting Copilot's own permission system fall
-        // through to its allow-by-default for safe tools.
-        //
-        // We DO emit an allow-shaped envelope anyway so future Copilot
-        // releases that honor allow/ask see our reasoning. Today it's
-        // a no-op; tomorrow it's free upgrade.
+        // Copilot honors BOTH `allow` and `deny` — VERIFIED LIVE (v1.0.71): a hook `allow` auto-runs
+        // the command and even suppresses copilot's own directory-access prompt; a hook `deny` blocks
+        // it and surfaces our `permissionDecisionReason`. (The earlier "only deny is processed" note
+        // is stale.) So a safe command gets `allow` (a real grant) and a gated one ABSTAINS (empty),
+        // deferring to copilot's own per-command prompt — copilot has interactive review, so we don't
+        // hard-deny. Copilot's response is a FLAT object (no `hookSpecificOutput` wrapper).
         if verdict.is_allowed() {
             let reason = allow_reason(verdict);
             let body = json!({
@@ -205,7 +204,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let outcome = target().install(dir.path()).unwrap();
         assert!(matches!(outcome, InstallOutcome::Installed { .. }));
-        let path = dir.path().join(".github/hooks/safe-chains.json");
+        let path = dir.path().join(".copilot/hooks/safe-chains.json");
         assert!(path.exists());
         let contents = std::fs::read_to_string(&path).unwrap();
         let settings: Value = serde_json::from_str(&contents).unwrap();
@@ -219,7 +218,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         target().install(dir.path()).unwrap();
         let contents = std::fs::read_to_string(
-            dir.path().join(".github/hooks/safe-chains.json"),
+            dir.path().join(".copilot/hooks/safe-chains.json"),
         )
         .unwrap();
         let settings: Value = serde_json::from_str(&contents).unwrap();
@@ -233,7 +232,7 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         target().install(dir.path()).unwrap();
         let contents = std::fs::read_to_string(
-            dir.path().join(".github/hooks/safe-chains.json"),
+            dir.path().join(".copilot/hooks/safe-chains.json"),
         )
         .unwrap();
         assert!(contents.contains("hook copilot"));
