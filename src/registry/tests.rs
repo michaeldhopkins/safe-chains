@@ -2177,35 +2177,42 @@ use super::*;
             "openssl enc -d -in x.enc -k p",
             "openssl smime -decrypt -in m.p7 -inkey k.pem",
             "openssl cms -decrypt -in m -inkey k",
-            // private-key-to-stdout (decrypt-read UNLESS the output is diverted)
+            "openssl cms -EncryptedData_decrypt -in m -secretkey ABCD", // sibling decrypt spelling
+            // private-key-to-stdout — decrypt-read unless switched to PUBLIC mode (-pubout/-pubin).
+            // -out/-noout are NOT neutralizers: -out's value can be stdout, and -text dumps the private
+            // components regardless — so these disclosure/extraction forms all deny (review findings 1+2).
             "openssl rsa -in enc.pem -passin pass:x",
+            "openssl rsa -in priv.pem -out /dev/stdout", // -out value is stdout → still a disclosure
+            "openssl rsa -in priv.pem -out -",           // "-" is stdout on modern openssl
+            "openssl rsa -in priv.pem -noout -text",     // -text dumps private components past -noout
+            "openssl rsa -in enc.pem -out clean.pem",    // private-key extraction (conservatively gated)
             "openssl pkey -in priv.pem",
             "openssl ec -in priv.pem",
             "openssl pkcs8 -in priv.pem",
             "openssl pkcs12 -in file.p12 -noenc",
             "openssl pkcs12 -in file.p12 -nodes",
+            "openssl pkcs12 -in file.p12 -nodes -out /dev/stdout",
             // gpg implicit decrypt (bare positional, no inspection command)
             "gpg secret.gpg",
             "gpg --verbose secret.gpg",
         ] {
             assert!(!crate::is_safe_command(c), "decrypt-to-screen must deny at the band: {c}");
         }
-        // The COMPLEMENT — forms that divert the disclosure away from the model (openssl `unless_flags`)
-        // or are a genuine read (gpg inspection commands) must stay allowed. Guards against the fix
-        // over-denying: an unrecognized neutralizer / a real read would fail here (red→green if
-        // `unless_flags` or gpg's `require_any` regressed).
+        // The COMPLEMENT — forms that are genuinely safe must stay allowed: PUBLIC-key mode
+        // (-pubout/-pubin, even with -text), the re-encrypted pkcs12 default, encrypt/sign, and gpg
+        // inspection commands. Guards the fix against over-denying a real read (red→green if the
+        // -pubout/-pubin neutralizer or gpg's require_any regressed).
         for c in [
             "openssl rsa -in priv.pem -pubout",
-            "openssl rsa -in enc.pem -out clean.pem",
-            "openssl rsa -in priv.pem -noout -text",
+            "openssl rsa -in priv.pem -pubout -text", // public-key text is not a private disclosure
             "openssl pkey -in pub.pem -pubin -text",
-            "openssl pkcs8 -in priv.pem -out out.pem",
-            "openssl pkcs12 -in file.p12 -nodes -out key.pem",
-            "openssl pkcs12 -in file.p12",
+            "openssl pkcs12 -in file.p12",            // default re-encrypts the key
+            "openssl enc -e -in x -out x.enc -k p",
+            "openssl cms -sign -in m -signer c",
             "gpg --list-keys",
             "gpg --version",
         ] {
-            assert!(crate::is_safe_command(c), "a diverted/read form must stay allowed: {c}");
+            assert!(crate::is_safe_command(c), "a public/read form must stay allowed: {c}");
         }
     }
 

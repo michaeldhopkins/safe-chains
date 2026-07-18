@@ -9,13 +9,14 @@ examples_safe = [
     "openssl x509 -in c.pem -noout -text",
     "openssl genrsa 2048",
     "openssl rsa -in priv.pem -pubout",
-    "openssl rsa -in enc.pem -out clean.pem",
 ]
 examples_denied = [
     "openssl enc -d -in x.enc -k p",
     "openssl smime -decrypt -in m.p7 -inkey k.pem",
     "openssl cms -decrypt -in m -inkey k",
     "openssl rsa -in enc.pem -passin pass:x",
+    "openssl rsa -in priv.pem -out /dev/stdout",
+    "openssl rsa -in priv.pem -noout -text",
     "openssl pkey -in priv.pem",
 ]
 
@@ -53,17 +54,20 @@ name = "req"
 allow_all = true
 level = "SafeWrite"
 
-# The private-key subs (pkey/rsa/ec/dsa) dump the private key — decrypting a passphrase-protected one —
-# to stdout BY DEFAULT, a secret disclosure to the model. Classified decrypt-read UNLESS the output is
-# diverted away from the model: `-pubout` (public key only), `-pubin` (public input → public output),
-# `-out FILE` (to disk), or `-noout` (no output). With any of those, the sub is its ordinary SafeWrite.
+# The private-key subs (pkey/rsa/ec/dsa) emit private-key material — decrypting a passphrase-protected
+# key — to stdout BY DEFAULT, a secret disclosure to the model. Classified decrypt-read UNLESS the sub
+# is switched to PUBLIC-key mode by `-pubout` (output the public key) or `-pubin` (input is public), the
+# only two flags that unconditionally divert ALL private material away from the model. `-out`/`-noout`
+# are deliberately NOT neutralizers: `-out`'s value can be stdout (`-out -`, `-out /dev/stdout`), and
+# `-text` dumps the private components to stdout regardless of `-out`/`-noout` — so the conservative cut
+# gates key-to-file extraction and validate/`-text` forms too (reachable at a yolo ceiling).
 [[command.sub]]
 name = "pkey"
 allow_all = true
 level = "SafeWrite"
 profile = "decrypt-read"
-unless_flags = ["-pubout", "-pubin", "-out", "-noout"]
-fact = "`openssl pkey -in priv.pem` reads a private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; `-pubout`/`-pubin`/`-out`/`-noout` divert it."
+unless_flags = ["-pubout", "-pubin"]
+fact = "`openssl pkey -in priv.pem` reads a private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; only `-pubout`/`-pubin` (public-key mode) divert it."
 source = "https://docs.openssl.org/master/man1/openssl-pkey/"
 judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
 
@@ -72,8 +76,8 @@ name = "rsa"
 allow_all = true
 level = "SafeWrite"
 profile = "decrypt-read"
-unless_flags = ["-pubout", "-pubin", "-out", "-noout"]
-fact = "`openssl rsa -in priv.pem` reads an RSA private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; `-pubout`/`-pubin`/`-out`/`-noout` divert it."
+unless_flags = ["-pubout", "-pubin"]
+fact = "`openssl rsa -in priv.pem` reads an RSA private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; only `-pubout`/`-pubin` (public-key mode) divert it."
 source = "https://docs.openssl.org/master/man1/openssl-rsa/"
 judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
 
@@ -82,8 +86,8 @@ name = "ec"
 allow_all = true
 level = "SafeWrite"
 profile = "decrypt-read"
-unless_flags = ["-pubout", "-pubin", "-out", "-noout"]
-fact = "`openssl ec -in priv.pem` reads an EC private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; `-pubout`/`-pubin`/`-out`/`-noout` divert it."
+unless_flags = ["-pubout", "-pubin"]
+fact = "`openssl ec -in priv.pem` reads an EC private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; only `-pubout`/`-pubin` (public-key mode) divert it."
 source = "https://docs.openssl.org/master/man1/openssl-ec/"
 judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
 
@@ -92,8 +96,8 @@ name = "dsa"
 allow_all = true
 level = "SafeWrite"
 profile = "decrypt-read"
-unless_flags = ["-pubout", "-pubin", "-out", "-noout"]
-fact = "`openssl dsa -in priv.pem` reads a DSA private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; `-pubout`/`-pubin`/`-out`/`-noout` divert it."
+unless_flags = ["-pubout", "-pubin"]
+fact = "`openssl dsa -in priv.pem` reads a DSA private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; only `-pubout`/`-pubin` (public-key mode) divert it."
 source = "https://docs.openssl.org/master/man1/openssl-dsa/"
 judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
 
@@ -153,35 +157,35 @@ allow_all = true
 level = "SafeWrite"
 
 # `pkcs8` reads/converts a private key, writing it to stdout by default (decrypting a passphrase-
-# protected one) — a disclosure unless `-out FILE` or `-noout` diverts it. (No `-pubout`: PKCS#8 is a
-# private-key format.)
+# protected one) — a disclosure. PKCS#8 is a private-key format with no public-key mode, and `-out`/
+# `-noout` are not safe neutralizers (stdout-valued `-out`, `-text`), so it is decrypt-read outright
+# (key-to-file conversion / validate are gated too, reachable at a yolo ceiling).
 [[command.sub]]
 name = "pkcs8"
 allow_all = true
 level = "SafeWrite"
 profile = "decrypt-read"
-unless_flags = ["-out", "-noout"]
-fact = "`openssl pkcs8 -in priv.pem` reads a private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context; `-out`/`-noout` divert it."
+fact = "`openssl pkcs8 -in priv.pem` reads a private key (decrypting it if passphrase-protected) and writes it in plaintext to stdout — the key enters the caller's context."
 source = "https://docs.openssl.org/master/man1/openssl-pkcs8/"
-judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen unless the output is diverted."
+judgment = "A private key streamed to the model is a secret disclosure; conservative classification is decrypt-to-screen."
 
 # `pkcs12 -in file.p12 -noenc` (OpenSSL 3.0 spelling; `-nodes` is the deprecated alias) exports the
 # UNENCRYPTED private key to stdout — a disclosure — while the default re-encrypts it with a passphrase.
-# `-noenc`/`-nodes` trigger the reveal; `-out FILE` diverts it to disk, so it neutralizes the classification.
+# `-noenc`/`-nodes` trigger the reveal. `-out` is NOT a neutralizer (its value can be stdout), so the
+# `-nodes -out FILE` extraction is gated too (reachable at a yolo ceiling).
 [[command.sub]]
 name = "pkcs12"
 allow_all = true
 level = "SafeWrite"
-unless_flags = ["-out"]
 [[command.sub.flag]]
 name = "-noenc"
 classifies = "decrypt-read"
-fact = "`openssl pkcs12 -in file.p12 -noenc` exports the private key WITHOUT encryption, writing the plaintext key to stdout — it enters the caller's context; `-out FILE` diverts it to disk."
+fact = "`openssl pkcs12 -in file.p12 -noenc` exports the private key WITHOUT encryption, writing the plaintext key to stdout — it enters the caller's context."
 source = "https://docs.openssl.org/master/man1/openssl-pkcs12/ (-noenc)"
 [[command.sub.flag]]
 name = "-nodes"
 classifies = "decrypt-read"
-fact = "`openssl pkcs12 -in file.p12 -nodes` (deprecated alias of `-noenc`) exports the private key WITHOUT encryption to stdout — it enters the caller's context; `-out FILE` diverts it to disk."
+fact = "`openssl pkcs12 -in file.p12 -nodes` (deprecated alias of `-noenc`) exports the private key WITHOUT encryption to stdout — it enters the caller's context."
 source = "https://docs.openssl.org/master/man1/openssl-pkcs12/ (-nodes, deprecated alias of -noenc)"
 
 [[command.sub]]
@@ -236,8 +240,13 @@ level = "SafeWrite"
 [[command.sub.flag]]
 name = "-decrypt"
 classifies = "decrypt-read"
-fact = "`openssl cms -decrypt` decrypts a CMS message and writes the PLAINTEXT to stdout (or -out) — the decrypted content enters the caller's context."
+fact = "`openssl cms -decrypt` decrypts a CMS EnvelopedData message and writes the PLAINTEXT to stdout (or -out) — the decrypted content enters the caller's context."
 source = "https://docs.openssl.org/master/man1/openssl-cms/ (-decrypt)"
+[[command.sub.flag]]
+name = "-EncryptedData_decrypt"
+classifies = "decrypt-read"
+fact = "`openssl cms -EncryptedData_decrypt` decrypts a CMS EncryptedData object with a symmetric key and writes the PLAINTEXT to stdout — the decrypted content enters the caller's context (a sibling decrypt spelling of -decrypt)."
+source = "https://docs.openssl.org/master/man1/openssl-cms/ (-EncryptedData_decrypt)"
 
 [[command.sub]]
 name = "ts"

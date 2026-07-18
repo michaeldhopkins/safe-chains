@@ -97,22 +97,19 @@ pub(crate) fn sub_archetypes(tokens: &[Token]) -> Option<Vec<&'static str>> {
     // A sub with NO base profile but escalating flags (`openssl enc -d`: bimodal — encrypt by default,
     // decrypt only with `-d`) contributes ONLY the flags that fire; if none fires (`openssl enc -e`),
     // it returns None so the caller falls through to the sub's ordinary (legacy) classification.
-    // `unless_flags` NEUTRALIZE this sub's engine classification — a safe-output flag diverts the
-    // disclosure away from the model, so the sub falls through to its ordinary (`level`/`allow_all`)
-    // classification. It applies to BOTH the base `profile` (`openssl rsa -pubout`) and the escalating
-    // flags (`openssl pkcs12 -nodes -out key.pem`: `-nodes` dumps the key, `-out` sends it to disk).
-    let neutralized = sub.unless_flags.iter().any(|f| flag_present(tokens, f));
+    // `unless_flags` NEUTRALIZE the base `profile`: a flag that switches the sub to a safe mode
+    // (`openssl rsa -pubout`/`-pubin` → public-key output) diverts the disclosure, so the sub falls
+    // through to its ordinary (`level`/`allow_all`) classification. Escalating `flag`s are NOT
+    // neutralized — a flag that CLASSIFIES a disclosure (`openssl pkcs12 -noenc`) always fires.
     let mut out = Vec::new();
     if let Some(p) = sub.profile.as_deref()
-        && !neutralized
+        && !sub.unless_flags.iter().any(|f| flag_present(tokens, f))
     {
         out.push(p);
     }
-    if !neutralized {
-        for flag in &sub.flags {
-            if flag_escalates(tokens, flag) {
-                out.push(flag.classifies.as_str());
-            }
+    for flag in &sub.flags {
+        if flag_escalates(tokens, flag) {
+            out.push(flag.classifies.as_str());
         }
     }
     (!out.is_empty()).then_some(out)
