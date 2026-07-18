@@ -48,13 +48,15 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
       hole AND the newly-found subcommand hole (`sops decrypt FILE` was read as a filename → SafeWrite).
     - `age -d`/`--decrypt` → decrypt-read (encrypt stays SafeWrite).
     - `ansible-vault view` → decrypt-read (was SafeRead).
-    Guarded by `decrypt_read_denies_at_the_band_and_is_a_secret_read` (registry-walking; a new decrypt
-    tool is covered the instant it declares the classification). The user's rule: decrypt-to-screen is
-    NOT auto-approved below local-admin (it lands at yolo, refused below).
-    - OPEN CONSISTENCY QUESTION: `gpg -d` / `openssl enc -d` are general-crypto decrypt-to-screen too,
-      but were previously "verified already-safe" and are high-frequency in pipes (`gpg -d f | tar x` —
-      plaintext goes to the next command, not the model). Extending decrypt-read to them is faithful to
-      the principle but noisy; deferred as a user call (the mechanism makes it a 4-line TOML change each).
+    - `gpg -d`/`--decrypt` → decrypt-read (top-level flag; was an incidental unknown-flag deny, now a
+      consistent facet classification, yolo-reachable).
+    - `openssl enc -d` / `smime -decrypt` / `cms -decrypt` → decrypt-read (was allow_all=SafeWrite —
+      real auto-approve holes). Needed a new engine capability: flag escalation on a bimodal sub with
+      NO base profile (safe by default, dangerous only in the `-d`/`-decrypt` mode).
+    Guarded by `decrypt_read_denies_at_the_band_and_is_a_secret_read` (registry-walking over top-level
+    flags, profiled subs, AND bimodal-sub flags; a new decrypt tool is covered the instant it declares
+    the classification). The user's rule: decrypt-to-screen is NOT auto-approved below local-admin (it
+    lands at yolo, refused below).
     - `aws configure get aws_secret_access_key` / `aws_session_token` — GATED (2026-07) via
       `credential_first_arg` on `configure get`; `get region`/`output` stay allowed. (Residual: the rare
       profile-qualified key form `get profile.x.aws_secret_access_key` needs suffix-glob support — the

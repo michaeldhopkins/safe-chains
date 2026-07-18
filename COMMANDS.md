@@ -5988,6 +5988,12 @@ Aliases: `godot4`
 - Allowed standalone flags: --check-sigs, --check-trustdb, --fingerprint, --help, --list-config, --list-keys, --list-options, --list-public-keys, --list-secret-keys, --list-sigs, --list-trustdb, --no-tty, --print-md, --quiet, --show-keys, --show-sigs, --verbose, --version, -K, -h, -k, -q, -v
 - Allowed valued flags: --digest-algo, --homedir, --keyring
 
+**Examples:**
+
+- `gpg --list-keys`
+- `gpg -k`
+- `gpg --fingerprint`
+
 ### `gpustat`
 <p class="cmd-url"><a href="https://github.com/wookayin/gpustat">https://github.com/wookayin/gpustat</a></p>
 
@@ -10322,6 +10328,12 @@ Aliases: `god`
 - **version**: Positional args accepted
 - **x509**: Positional args accepted
 - Allowed standalone flags: --help, -help, -version, version
+
+**Examples:**
+
+- `openssl enc -e -in x -out x.enc -k p`
+- `openssl x509 -in c.pem -noout -text`
+- `openssl genrsa 2048`
 
 ### `opj_compress`
 <p class="cmd-url"><a href="https://github.com/uclouvain/openjpeg">https://github.com/uclouvain/openjpeg</a></p>
