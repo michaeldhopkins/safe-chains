@@ -18,11 +18,10 @@ valued = ["--vault-id", "--vault-password-file", "--ask-vault-pass-file"]
 
 [[command.sub]]
 name = "decrypt"
-level = "SafeWrite"
-bare = false
-tolerate_unknown_short = true
-standalone = ["--ask-vault-pass", "--ask-vault-password", "--help", "-h"]
-valued = ["--output", "--vault-id", "--vault-password-file"]
+profile = "decrypt-read"
+fact = "`ansible-vault decrypt` decrypts an encrypted vault file — with `--output -` it streams the PLAINTEXT to stdout (into the caller's context); otherwise it rewrites the file to plaintext on disk (unencrypted secret material persisted)."
+source = "https://docs.ansible.com/ansible/latest/cli/ansible-vault.html"
+judgment = "Revealing or materializing a vault's decrypted secrets is a secret disclosure; conservative classification is decrypt-to-screen, matching the sibling `view` sub."
 
 [[command.sub]]
 name = "encrypt"
