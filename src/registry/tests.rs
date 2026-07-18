@@ -2187,6 +2187,7 @@ use super::*;
             "openssl rsa -in priv.pem -out //dev/stdout", // path-normalization evasion (fail-closed)
             "openssl rsa -in priv.pem -out /dev/stderr",  // stderr reaches the model in merged-output harnesses
             "openssl rsa -in priv.pem -out safe.pem -out /dev/stdout", // duplicate -out (openssl: last-wins)
+            "openssl rsa -in k.pem -provider-path -out -provider-path safe.pem", // valued flag swallows -out
             "openssl rsa -in priv.pem -noout -text",     // -text dumps private components past -noout
             "openssl rsa -in priv.pem -pubout -text",    // -text dumps private components past -pubout too
             "openssl pkey -in priv.pem -pubout -text",
