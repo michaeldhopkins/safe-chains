@@ -223,7 +223,15 @@ fn walk(spec: &RoleSpec, tokens: &[Token]) -> bool {
                 let value = if let Some((_, after)) = t.split_once('=') {
                     Some(after)
                 } else if !t.starts_with("--") {
-                    t.find(['/', '~']).map(|p| &t[p..])
+                    // Short `-Xpath` / `-clusterX/abspath`: skip the flag LETTERS after `-`; an
+                    // absolute/home path value begins at the following `/` or `~`. A dot-relative value
+                    // (`-o./sub/x`) or a numeric option value (`-w0`) starts with a non-`/`/`~` char and
+                    // is left alone. A letter-started relative value (`-osub/x`) is string-ambiguous
+                    // with a cluster `-o -s -u -b /x`, so it fail-closes (gated as absolute).
+                    let tail = &t[1..];
+                    let vstart = tail.find(|c: char| !c.is_ascii_alphabetic()).unwrap_or(tail.len());
+                    let rest = &tail[vstart..];
+                    (rest.starts_with('/') || rest.starts_with('~')).then_some(rest)
                 } else {
                     None
                 };
@@ -425,6 +433,52 @@ mod tests {
 
     fn toks(parts: &[&str]) -> Vec<Token> {
         parts.iter().map(|p| Token::from_test(p)).collect()
+    }
+
+    /// THE invariant the glued-flag handling kept breaking: for a whole-command file gate
+    /// (`RoleSpec::simple`), a PATH operand must classify IDENTICALLY however it is attached to a flag
+    /// — bare positional, `-o path`, `-o=path`, `--output=path`, or short-glued `-opath`. Spelling must
+    /// not change the verdict. This single property catches the whole class: a sensitive path evading
+    /// in one spelling (security bypass — the `=` and short-glued bugs) OR a worktree path over-denying
+    /// in another (correctness). Proven per path × spelling, for both Read and Write gates.
+    ///
+    /// The one string-irreducible exception is a glued `-<letters>/relpath` (`-osub/x`): it is
+    /// genuinely ambiguous with a cluster `-o -s -u -b /x`, so a static classifier CANNOT tell a
+    /// relative worktree path from a clustered absolute one. That form fail-CLOSES (denies), which is
+    /// the correct security posture; it is asserted separately below, not held to invariance.
+    #[test]
+    fn simple_gate_path_classification_is_spelling_invariant() {
+        fn deny(spec: &RoleSpec, words: &[String]) -> bool {
+            let t: Vec<Token> = words.iter().map(|w| Token::from_test(w)).collect();
+            walk(spec, &t)
+        }
+        // Spellings of `path` attached to short `-o` / long `--output`, all naming the SAME operand.
+        fn spellings(path: &str) -> Vec<Vec<String>> {
+            vec![
+                vec!["cmd".into(), path.into()],                 // bare positional
+                vec!["cmd".into(), "-o".into(), path.into()],    // -o path
+                vec!["cmd".into(), format!("-o={path}")],       // -o=path
+                vec!["cmd".into(), format!("--output={path}")], // --output=path
+                vec!["cmd".into(), format!("-o{path}")],        // -opath (short glued)
+            ]
+        }
+        for role in [Role::Read, Role::Write] {
+            let spec = RoleSpec::simple(role, Shape::Plain);
+            // SENSITIVE (out-of-workspace / system) — must DENY in EVERY spelling. No evasion.
+            for path in ["/etc/cron.d/job", "/etc/ssl/private/x.key", "~/.ssh/id_rsa", "/root/.ssh/id_ed25519"] {
+                for s in spellings(path) {
+                    assert!(deny(&spec, &s), "SENSITIVE must deny [{role:?}]: {s:?}");
+                }
+            }
+            // WORKTREE (bare filename or DOT-relative) — must ALLOW in every spelling. No over-deny.
+            for path in ["out.zip", "./out.zip", "./sub/nested/out.zip"] {
+                for s in spellings(path) {
+                    assert!(!deny(&spec, &s), "WORKTREE must allow [{role:?}]: {s:?}");
+                }
+            }
+            // The ambiguous glued `-<letters>/relpath` fail-closes (documented exception).
+            assert!(deny(&spec, &["cmd".into(), "-odata/file.txt".into()]), "ambiguous glued relpath fails closed");
+        }
     }
 
     #[test]
