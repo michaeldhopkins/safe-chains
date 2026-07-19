@@ -92,7 +92,7 @@ flags = { "-o" = "write", "--output" = "write", "--output-dir" = "write" }
 
 [roles.wget]
 positional = "ignore"
-flags = { "-o" = "write", "-O" = "write", "--output-document" = "write", "-P" = "write", "--directory-prefix" = "write", "--post-file" = "read", "-i" = "read", "--input-file" = "read" }
+flags = { "-o" = "write", "-O" = "write", "--output-document" = "write", "-P" = "write", "--directory-prefix" = "write", "--save-cookies" = "write", "--warc-file" = "write", "--warc-tempdir" = "write", "--post-file" = "read", "-i" = "read", "--input-file" = "read" }
 
 # Remote copy/sync: a LOCAL source is a disclosing read (exfil), the destination is a write, a
 # `host:path` endpoint is ignored (remote writes are the tool's own concern), and an `-i`
