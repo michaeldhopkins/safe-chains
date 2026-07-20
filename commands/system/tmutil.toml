@@ -1,0 +1,64 @@
+[[command]]
+name = "tmutil"
+description = "macOS Time Machine utility (the CLI counterpart of the Time Machine preference pane). The covered subcommands are strictly read-only queries over local backup and snapshot state: listlocalsnapshots and listlocalsnapshotdates enumerate a volume's APFS Time Machine snapshots and their creation dates; listbackups and latestbackup report completed backups on a destination; machinedirectory and destinationinfo print the machine directory path and describe configured backup destinations; calculatedrift analyzes how much data changed between backups; and isexcluded reports whether given paths are excluded from backups. None of these read arbitrary file contents or modify any state — they query Time Machine metadata for the local machine. The mutating and destructive subcommands are out of coverage: enable/disable toggle Time Machine, startbackup/stopbackup control the backup engine, setdestination/removedestination/addexclusion/removeexclusion reconfigure backups, localsnapshot creates a snapshot, inheritbackup/associatedisk claim or re-link backups, restore writes files back to disk (overwriting), and delete/deleteinprogress/deletelocalsnapshots/thinlocalsnapshots permanently and irreversibly remove backups or snapshots. compare and verifychecksums read backup and file data to diff or checksum it, so they are also out of the read-only set. tmutil ships with macOS and its interface changes only with OS releases; several subcommands require root."
+url = "https://ss64.com/mac/tmutil.html"
+researched_version = "tmutil on macOS 15 (man page, 2026)"
+examples_safe = [
+    "tmutil listlocalsnapshots /",
+    "tmutil listlocalsnapshotdates",
+    "tmutil latestbackup",
+    "tmutil destinationinfo -X",
+]
+examples_denied = [
+    "tmutil deletelocalsnapshots /",
+    "tmutil delete -d /Volumes/Backup -t 2026-01-01-000000",
+    "tmutil restore /backup/file /file",
+    "tmutil startbackup",
+]
+
+[[command.sub]]
+name = "listlocalsnapshots"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "listlocalsnapshotdates"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "listbackups"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h", "-m", "-t"]
+valued = ["-d"]
+
+[[command.sub]]
+name = "latestbackup"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h", "-m", "-t"]
+valued = ["-d"]
+
+[[command.sub]]
+name = "machinedirectory"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "destinationinfo"
+level = "SafeRead"
+bare = true
+standalone = ["--help", "-h", "-X"]
+
+[[command.sub]]
+name = "calculatedrift"
+level = "SafeRead"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "isexcluded"
+level = "SafeRead"
+standalone = ["--help", "-h", "-X", "-p", "-v"]
