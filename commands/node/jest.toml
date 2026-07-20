@@ -22,3 +22,11 @@ valued = [
     "--testRunner", "--testTimeout",
     "-c", "-t",
 ]
+
+# Flags whose value is a MODULE jest loads and executes in-process (config, custom runner,
+# reporter, filter) are gated as executors: a worktree module runs (the dev loop), a foreign or
+# /tmp one denies — where a plain read gate would wrongly admit /tmp. A bare builtin name
+# (`--reporters default`) isn't path-shaped, so it passes untouched. --outputFile/--coverageDirectory
+# are out-of-workspace WRITES (the camelCase spellings the hyphenated conservation guard missed).
+[command.path_gate]
+flags = { "--config" = "exec", "-c" = "exec", "--testRunner" = "exec", "--reporters" = "exec", "--filter" = "exec", "--outputFile" = "write", "--coverageDirectory" = "write" }

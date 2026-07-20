@@ -1803,6 +1803,65 @@ fn no_wrapper_launders_a_denied_inner_command() {
     assert!(failures.is_empty(), "wrapper laundered a denied inner command:\n{}", failures.join("\n"));
 }
 
+/// `yarn <runner>` delegates to the named test runner, so the runner's OWN gates must survive the
+/// wrapper — the `first_arg`-blanket form that predated this test laundered them (`yarn jest
+/// --outputFile /etc/x` auto-approved because the whole `yarn jest …` was waved through at SafeRead,
+/// bypassing jest's path gate on `--outputFile`). This pins the delegate: a runner invocation denied
+/// directly must be denied through `yarn`, and a safe one must stay allowed both ways.
+#[test]
+fn yarn_delegates_runner_gates_without_laundering() {
+    // (direct form, must-deny-both, must-allow-both)
+    const CASES: &[(&str, &str)] = &[
+        ("jest --outputFile /etc/cron.d/x.json", "yarn jest --outputFile /etc/cron.d/x.json"),
+        ("jest --coverageDirectory /etc/cron.d", "yarn jest --coverageDirectory /etc/cron.d"),
+        ("jest --outputFile ~/.ssh/authorized_keys", "yarn jest --outputFile ~/.ssh/authorized_keys"),
+        ("karma start /etc/cron.d/evil.conf.js", "yarn karma start /etc/cron.d/evil.conf.js"),
+    ];
+    const ALLOWED: &[(&str, &str)] = &[
+        ("jest spec/foo.test.js", "yarn jest spec/foo.test.js"),
+        ("jest --outputFile ./results.json", "yarn jest --outputFile ./results.json"),
+        ("karma start --single-run", "yarn karma start --single-run"),
+        ("vitest run", "yarn vitest run"),
+    ];
+    for (direct, wrapped) in CASES {
+        assert!(!check(direct), "direct runner call should deny: {direct}");
+        assert!(!check(wrapped), "yarn laundered a denied runner call: {wrapped}");
+    }
+    for (direct, wrapped) in ALLOWED {
+        assert!(check(direct), "direct runner call should allow: {direct}");
+        assert!(check(wrapped), "yarn over-denied a safe runner call: {wrapped}");
+    }
+}
+
+/// JS test runners load and execute a module named by a flag (config, require, custom
+/// reporter/runner). A FOREIGN one (`/tmp`, `~`, absolute, `../..`) is foreign code execution and
+/// must deny; a WORKTREE module and a bare BUILTIN NAME (`--reporter spec`) must stay allowed. The
+/// gate is `executor` locus, not a read gate — a read gate would wrongly admit `/tmp` (scratch).
+/// Every runner×code-flag pair is enumerated so a new such flag added without a gate is caught.
+#[test]
+fn test_runner_code_load_flags_gate_foreign_executors() {
+    // (command, flag) pairs whose value is a module the runner executes in-process.
+    const CODE_FLAGS: &[(&str, &str)] = &[
+        ("jest", "--config"), ("jest", "-c"), ("jest", "--testRunner"),
+        ("jest", "--reporters"), ("jest", "--filter"),
+        ("vitest", "--config"), ("vitest", "-c"),
+        ("mocha", "--config"), ("mocha", "--require"), ("mocha", "-r"),
+        ("mocha", "--file"), ("mocha", "--reporter"), ("mocha", "--ui"),
+    ];
+    for (cmd, flag) in CODE_FLAGS {
+        // Foreign executors must deny — /tmp is the one a read gate would wrongly admit.
+        for foreign in ["/tmp/evil.js", "/etc/x.js", "~/x.js", "../../../etc/x.js"] {
+            let c = format!("{cmd} {flag} {foreign}");
+            assert!(!check(&c), "foreign code-load must deny: {c}");
+        }
+        // A worktree module and a bare builtin name must stay allowed (no over-deny).
+        for ok in ["./cfg.js", "builtinname"] {
+            let c = format!("{cmd} {flag} {ok}");
+            assert!(check(&c), "worktree/builtin code-load must allow: {c}");
+        }
+    }
+}
+
 /// A braced word must not hide a hot path from the gate: if `cat P` is denied for a hot path P,
 /// then every brace form that expands to include P must deny too. Pins the fix for the "brace
 /// expansion not modeled" fail-open (`cat {/etc/shadow,readme}` read the secret).

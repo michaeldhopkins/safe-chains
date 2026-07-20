@@ -1,0 +1,53 @@
+[[command]]
+name = "karma"
+description = "JavaScript test runner (Testacular's successor) that launches browsers, serves the project's test files over a local loopback HTTP server, and reports results. start runs the suite (with --single-run it runs once and exits; otherwise it watches and re-runs), executing arbitrary user-authored test and config code in the browser and in the Node config; the config file (karma.conf.js, passed as a positional or discovered) is loaded and executed, so it can do anything the test setup does. run triggers a run against an already-running server and stop shuts one down, both over loopback. completion prints a shell-completion script. init interactively scaffolds a karma.conf.js in the working directory (a local file write). No subcommand reaches a remote host or installs anything; output files (coverage, reports) are produced only where the config directs, not via a CLI path flag. The project entered maintenance/deprecation in 2023 but remains widely used; the CLI surface is frozen."
+url = "https://karma-runner.github.io/latest/index.html"
+researched_version = "karma 6.4.x (final major; project deprecated 2023, CLI frozen)"
+bare_flags = ["--help", "--version", "-h"]
+examples_safe = [
+    "karma start --single-run",
+    "karma start karma.conf.js --single-run --browsers ChromeHeadless",
+    "karma run",
+]
+examples_denied = [
+    "karma init",
+]
+
+[[command.sub]]
+name = "start"
+level = "SafeRead"
+executor = "file"
+bare = true
+max_positional = 1
+standalone = [
+    "--auto-watch", "--colors", "--detached", "--fail-on-empty-test-suite",
+    "--fail-on-failing-test-suite", "--help", "--no-auto-watch", "--no-colors",
+    "--no-fail-on-empty-test-suite", "--no-fail-on-failing-test-suite",
+    "--no-single-run", "--single-run", "-h",
+]
+valued = [
+    "--browsers", "--format-error", "--hostname", "--log-level", "--port",
+    "--protocol", "--report-slower-than", "--reporters",
+]
+
+[[command.sub]]
+name = "run"
+level = "SafeRead"
+bare = true
+max_positional = 0
+standalone = ["--fail-on-empty-test-suite", "--help", "--no-refresh", "-h"]
+valued = ["--port"]
+
+[[command.sub]]
+name = "stop"
+level = "SafeRead"
+bare = true
+max_positional = 0
+standalone = ["--help", "-h"]
+valued = ["--port"]
+
+[[command.sub]]
+name = "completion"
+level = "Inert"
+max_positional = 0
+standalone = ["--help", "-h"]
