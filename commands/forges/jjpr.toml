@@ -1,9 +1,18 @@
 [[command]]
 name = "jjpr"
-description = "Manages stacked pull requests for Jujutsu repositories on GitHub, GitLab, and Forgejo. The submit subcommand pushes branches and creates/updates PRs via forge APIs over the network. The merge subcommand merges PRs from the bottom of a stack upward, modifying remote repository state. The status subcommand is read-only, querying PR status from the forge API. The --dry-run flag on submit and merge simulates the operation without making changes. The auth subcommand manages API tokens locally."
+description = "Manages stacked pull requests for Jujutsu repositories on GitHub, GitLab, and Forgejo. The submit subcommand pushes branches and creates/updates PRs via forge APIs over the network. The merge subcommand merges PRs from the bottom of a stack upward, modifying remote repository state. The status subcommand is read-only, querying PR status from the forge API. The --dry-run flag on submit and merge simulates the operation without making changes. The watch subcommand runs an always-on loop that polls the forge every 30 seconds and drives the full PR lifecycle — creating draft PRs, marking them ready when CI passes, and merging bottom-up — all of which mutate remote state; it has no --dry-run. The auth subcommand manages API tokens locally."
 url = "https://github.com/michaeldhopkins/jjpr"
 bare = true
 bare_flags = ["--help", "--version", "-V", "-h"]
+examples_safe = [
+    "jjpr watch --help",
+    "jjpr status",
+]
+examples_denied = [
+    "jjpr watch",
+    "jjpr watch auth",
+    "jjpr submit",
+]
 
 [[command.sub]]
 name = "help"
@@ -58,3 +67,13 @@ name = "config"
 [[command.sub.sub]]
 name = "help"
 allow_all = true
+
+# `watch` is an always-on loop that polls the forge every 30s and drives the full PR
+# lifecycle — creating draft PRs, marking them ready when CI passes, and merging bottom-up.
+# Every one of those mutates remote repository state, and it has no --dry-run (the loop is
+# always live). So only its help output is safe to surface; the loop itself is out of coverage.
+[[command.sub]]
+name = "watch"
+bare = false
+standalone = ["--help", "-h"]
+max_positional = 0
