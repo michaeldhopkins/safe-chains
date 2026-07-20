@@ -1,10 +1,23 @@
 [[command]]
 name = "yarn"
-description = "Node.js package manager. list, ls, info, and why are read-only inspection commands that query the local dependency tree or the npm registry (info makes network requests). yarn test and yarn test:* execute arbitrary shell commands defined in package.json's scripts field; safety depends entirely on what those scripts do. Mature project; Yarn Classic (v1) is in maintenance mode, while Yarn Berry (v2+) is actively developed."
+description = "Node.js package manager. list, ls, info, and why are read-only inspection commands that query the local dependency tree or the npm registry (info makes network requests). yarn test and yarn test:* execute arbitrary shell commands defined in package.json's scripts field; safety depends entirely on what those scripts do. yarn jest, karma, mocha, and vitest run the locally installed test runner of that name; each is validated as if the runner were invoked directly, so the runner's own flag rules apply (a runner's write flags stay path-gated through the wrapper). Mature project; Yarn Classic (v1) is in maintenance mode, while Yarn Berry (v2+) is actively developed."
 url = "https://yarnpkg.com/cli"
 bare_flags = ["--help", "--version", "-V", "-h"]
 first_arg = ["test", "test:*"]
 level = "SafeRead"
+examples_safe = [
+    "yarn test",
+    "yarn jest spec/date_range_filter_controller.test.js",
+    "yarn karma start --single-run",
+    "yarn vitest run",
+    "yarn list",
+]
+examples_denied = [
+    "yarn publish",
+    "yarn add left-pad",
+    "yarn dlx cowsay",
+    "yarn jest --outputFile /etc/cron.d/x",
+]
 
 [[command.sub]]
 name = "list"
@@ -23,3 +36,23 @@ standalone = ["--help", "--json", "-h"]
 [[command.sub]]
 name = "why"
 standalone = ["--help", "--json", "-h"]
+
+# `yarn <runner>` runs the locally installed test runner. Delegate the tail to the runner's
+# own definition (skip the `yarn` token) so the runner's grammar and path gates apply through
+# the wrapper — `yarn jest --outputFile /etc/x` is validated as `jest --outputFile /etc/x` and
+# denies, exactly as the direct call does. Blanket-allowing here (first_arg) would launder those.
+[[command.sub]]
+name = "jest"
+delegate_skip = 0
+
+[[command.sub]]
+name = "karma"
+delegate_skip = 0
+
+[[command.sub]]
+name = "mocha"
+delegate_skip = 0
+
+[[command.sub]]
+name = "vitest"
+delegate_skip = 0

@@ -4621,6 +4621,10 @@ valued = ["--type"]
             "-dest-dir", "-destination", "-infile", "-input-file",
             "-pskfile", "-password-file", "-cacert", "-keyout",
             "-tls-client-cert", "-key-file", "-cert-file", "-ca-file",
+            // camelCase output-path spellings (jest `--outputFile`): the hyphenated list above
+            // missed these, so `jest --outputFile /etc/cron.d/x` was an ungated out-of-workspace
+            // write until this row forced the gate. Any new command with one of these must gate it.
+            "--outputFile", "--outputDir", "--outFile",
         ];
 
         fn toml_files(dir: &std::path::Path, out: &mut Vec<std::path::PathBuf>) {

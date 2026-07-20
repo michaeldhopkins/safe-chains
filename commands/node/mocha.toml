@@ -18,3 +18,11 @@ valued = [
     "--slow", "--spec", "--timeout", "--ui",
     "-f", "-g", "-j", "-n", "-r", "-s", "-t", "-u",
 ]
+
+# Flags whose value is a module mocha loads and executes in-process before/around the tests:
+# --require/-r (the classic mocha RCE vector), --config, --file (a setup file loaded before the
+# root suite), and the custom --reporter/--ui modules. Gated as executors — a worktree module runs,
+# a foreign or /tmp one denies; a bare builtin name (--reporter spec, --ui bdd) passes untouched.
+# Test-file SELECTION (--spec, positionals) is left ungated: running the project's tests is mocha's job.
+[command.path_gate]
+flags = { "--require" = "exec", "-r" = "exec", "--config" = "exec", "--file" = "exec", "--reporter" = "exec", "--ui" = "exec" }
