@@ -240,6 +240,8 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - **db:setup**: Flags: --help, -h
 - **db:structure:dump**: Flags: --help, -h
 - **db:structure:load**: Flags: --help, -h
+- **db:test:load**: Flags: --help, -h
+- **db:test:prepare**: Flags: --help, -h
 - **db:version**: Flags: --help, -h
 - **g**: Positional args accepted
 - **generate**: Positional args accepted
@@ -263,6 +265,12 @@ Aliases: `parallel_rspec`, `parallel_cucumber`, `parallel_spinach`
 - **tmp:create**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h, -v
+
+**Examples:**
+
+- `rails db:test:prepare`
+- `rails db:test:load`
+- `bin/rails db:test:prepare`
 
 ### `rake`
 <p class="cmd-url"><a href="https://github.com/ruby/rake">https://github.com/ruby/rake</a></p>

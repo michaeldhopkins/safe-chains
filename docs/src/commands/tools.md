@@ -148,6 +148,7 @@
 
 - `age -e -r RECIP -o out.age plain.txt`
 - `age --encrypt -o out.age plain.txt`
+- `age -ea -r RECIP -o out.age plain.txt`
 
 ### `allume`
 <p class="cmd-url"><a href="https://museapp.com/cli-setup/">https://museapp.com/cli-setup/</a></p>
@@ -1432,8 +1433,8 @@ Aliases: `python`
 ### `safe-chains`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/safe-chains">https://github.com/michaeldhopkins/safe-chains</a></p>
 
-- Allowed standalone flags: --help, --list-commands, --list-tools, --version, -V, -h
-- Allowed valued flags: --level
+- Allowed standalone flags: --explain, --help, --list-commands, --list-tools, --version, -V, -h
+- Allowed valued flags: --cwd, --level, --root
 
 **Examples:**
 
@@ -1442,6 +1443,8 @@ Aliases: `python`
 - `safe-chains --list-commands`
 - `safe-chains 'pod install'`
 - `safe-chains --level safe-write 'pod install'`
+- `safe-chains --explain 'cat foo'`
+- `safe-chains --cwd /w --root /w --level reader 'cat ../peer/src/main.rs'`
 - `safe-chains hook claude`
 - `safe-chains hook codex`
 - `safe-chains hook cursor`
