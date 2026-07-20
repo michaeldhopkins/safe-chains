@@ -310,6 +310,7 @@ Aliases: `7zz`, `7za`
 
 - `age -e -r RECIP -o out.age plain.txt`
 - `age --encrypt -o out.age plain.txt`
+- `age -ea -r RECIP -o out.age plain.txt`
 
 ### `agvtool`
 <p class="cmd-url"><a href="https://developer.apple.com/library/archive/qa/qa1827/_index.html">https://developer.apple.com/library/archive/qa/qa1827/_index.html</a></p>
@@ -2503,6 +2504,9 @@ Aliases: `capacitor`
 - `cargo fmt --all`
 - `cargo fmt --check`
 - `cargo fmt --manifest-path ./crates/core/Cargo.toml`
+- `cargo about --version`
+- `cargo about --help`
+- `cargo about generate about.hbs`
 
 ### `carton`
 <p class="cmd-url"><a href="https://metacpan.org/pod/Carton">https://metacpan.org/pod/Carton</a></p>
@@ -7230,8 +7234,14 @@ Aliases: `iperf`
 - **merge** (requires --dry-run): Flags: --dry-run, --help, --no-ci-check, --no-fetch, --watch, -h. Valued: --base, --merge-method, --reconcile-strategy, --remote, --required-approvals
 - **status**: Flags: --dry-run, --help, --no-fetch, -h
 - **submit** (requires --dry-run): Flags: --draft, --dry-run, --help, --no-fetch, --ready, -h. Valued: --base, --remote, --reviewer
+- **watch**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
+
+**Examples:**
+
+- `jjpr watch --help`
+- `jjpr status`
 
 ### `jless`
 <p class="cmd-url"><a href="https://github.com/PaulJuliusMartinez/jless">https://github.com/PaulJuliusMartinez/jless</a></p>
@@ -7396,6 +7406,21 @@ Aliases: `nbconvert`
 - **list**: Flags: --all-namespaces, --help, --namespace, -A, -h, -n. Valued: --namespace, -n
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h, -v
+
+### `karma`
+<p class="cmd-url"><a href="https://karma-runner.github.io/latest/index.html">https://karma-runner.github.io/latest/index.html</a></p>
+
+- **completion**: Flags: --help, -h
+- **run**: Flags: --fail-on-empty-test-suite, --help, --no-refresh, -h. Valued: --port
+- **start**: Runs a workspace-local script/package (the first positional). Flags: --auto-watch, --colors, --detached, --fail-on-empty-test-suite, --fail-on-failing-test-suite, --help, --no-auto-watch, --no-colors, --no-fail-on-empty-test-suite, --no-fail-on-failing-test-suite, --no-single-run, --single-run, -h. Valued: --browsers, --format-error, --hostname, --log-level, --port, --protocol, --report-slower-than, --reporters
+- **stop**: Flags: --help, -h. Valued: --port
+- Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `karma start --single-run`
+- `karma start karma.conf.js --single-run --browsers ChromeHeadless`
+- `karma run`
 
 ### `kcc`
 <p class="cmd-url"><a href="https://www.h5l.org/manual/HEAD/info/heimdal/kcc.html">https://www.h5l.org/manual/HEAD/info/heimdal/kcc.html</a></p>
@@ -12141,6 +12166,8 @@ Aliases: `python`
 - **db:setup**: Flags: --help, -h
 - **db:structure:dump**: Flags: --help, -h
 - **db:structure:load**: Flags: --help, -h
+- **db:test:load**: Flags: --help, -h
+- **db:test:prepare**: Flags: --help, -h
 - **db:version**: Flags: --help, -h
 - **g**: Positional args accepted
 - **generate**: Positional args accepted
@@ -12164,6 +12191,12 @@ Aliases: `python`
 - **tmp:create**: Flags: --help, -h
 - **version**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h, -v
+
+**Examples:**
+
+- `rails db:test:prepare`
+- `rails db:test:load`
+- `bin/rails db:test:prepare`
 
 ### `railway`
 <p class="cmd-url"><a href="https://docs.railway.com/guides/cli">https://docs.railway.com/guides/cli</a></p>
@@ -12819,8 +12852,8 @@ Aliases: `psed`
 ### `safe-chains`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/safe-chains">https://github.com/michaeldhopkins/safe-chains</a></p>
 
-- Allowed standalone flags: --help, --list-commands, --list-tools, --version, -V, -h
-- Allowed valued flags: --level
+- Allowed standalone flags: --explain, --help, --list-commands, --list-tools, --version, -V, -h
+- Allowed valued flags: --cwd, --level, --root
 
 **Examples:**
 
@@ -12829,6 +12862,8 @@ Aliases: `psed`
 - `safe-chains --list-commands`
 - `safe-chains 'pod install'`
 - `safe-chains --level safe-write 'pod install'`
+- `safe-chains --explain 'cat foo'`
+- `safe-chains --cwd /w --root /w --level reader 'cat ../peer/src/main.rs'`
 - `safe-chains hook claude`
 - `safe-chains hook codex`
 - `safe-chains hook cursor`
@@ -14925,6 +14960,25 @@ Aliases: `gtimeout`
 - Allowed valued flags: --language, --platform, -L, -p
 - Hyphen-prefixed positional arguments accepted
 
+### `tmutil`
+<p class="cmd-url"><a href="https://ss64.com/mac/tmutil.html">https://ss64.com/mac/tmutil.html</a></p>
+
+- **calculatedrift**: Flags: --help, -h
+- **destinationinfo**: Flags: --help, -h, -X
+- **isexcluded**: Flags: --help, -h, -X, -p, -v
+- **latestbackup**: Flags: --help, -h, -m, -t. Valued: -d
+- **listbackups**: Flags: --help, -h, -m, -t. Valued: -d
+- **listlocalsnapshotdates**: Flags: --help, -h
+- **listlocalsnapshots**: Flags: --help, -h
+- **machinedirectory**: Flags: --help, -h
+
+**Examples:**
+
+- `tmutil listlocalsnapshots /`
+- `tmutil listlocalsnapshotdates`
+- `tmutil latestbackup`
+- `tmutil destinationinfo -X`
+
 ### `tmux`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/tmux.1.html">https://man7.org/linux/man-pages/man1/tmux.1.html</a></p>
 
@@ -16368,11 +16422,23 @@ Aliases: `xzmore`, `lzless`, `lzmore`
 <p class="cmd-url"><a href="https://yarnpkg.com/cli">https://yarnpkg.com/cli</a></p>
 
 - **info**: Flags: --help, --json, -h
+- **jest**: delegates to inner command
+- **karma**: delegates to inner command
 - **list**: Flags: --help, --json, --long, --production, -h. Valued: --depth, --pattern
 - **ls**: Flags: --help, --json, --long, --production, -h. Valued: --depth, --pattern
+- **mocha**: delegates to inner command
+- **vitest**: delegates to inner command
 - **why**: Flags: --help, --json, -h
 - Allowed arguments: test, test:*
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `yarn test`
+- `yarn jest spec/date_range_filter_controller.test.js`
+- `yarn karma start --single-run`
+- `yarn vitest run`
+- `yarn list`
 
 ### `yasm`
 <p class="cmd-url"><a href="https://yasm.tortall.net/">https://yasm.tortall.net/</a></p>

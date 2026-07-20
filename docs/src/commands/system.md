@@ -1797,6 +1797,25 @@ Aliases: `upsun`
 - Allowed standalone flags: -a, -g, -s, -v
 - Allowed valued flags: -n, -p, -t
 
+### `tmutil`
+<p class="cmd-url"><a href="https://ss64.com/mac/tmutil.html">https://ss64.com/mac/tmutil.html</a></p>
+
+- **calculatedrift**: Flags: --help, -h
+- **destinationinfo**: Flags: --help, -h, -X
+- **isexcluded**: Flags: --help, -h, -X, -p, -v
+- **latestbackup**: Flags: --help, -h, -m, -t. Valued: -d
+- **listbackups**: Flags: --help, -h, -m, -t. Valued: -d
+- **listlocalsnapshotdates**: Flags: --help, -h
+- **listlocalsnapshots**: Flags: --help, -h
+- **machinedirectory**: Flags: --help, -h
+
+**Examples:**
+
+- `tmutil listlocalsnapshots /`
+- `tmutil listlocalsnapshotdates`
+- `tmutil latestbackup`
+- `tmutil destinationinfo -X`
+
 ### `tmux`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/tmux.1.html">https://man7.org/linux/man-pages/man1/tmux.1.html</a></p>
 

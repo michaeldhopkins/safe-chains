@@ -1,6 +1,6 @@
 # Command Reference
 
-safe-chains knows 1614 commands across 75 categories.
+safe-chains knows 1616 commands across 75 categories.
 
 ## Glossary
 
@@ -66,7 +66,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Niche / Esoteric](niche.md) (3 commands)
 - [Nim](nim.md) (2 commands)
 - [Nix](nix.md) (12 commands)
-- [Node.js](node.md) (18 commands)
+- [Node.js](node.md) (19 commands)
 - [OCaml](ocaml.md) (3 commands)
 - [PDF / Document](pdf.md) (38 commands)
 - [Perl](perl.md) (40 commands)
@@ -84,7 +84,7 @@ Unlisted flags, subcommands, and commands are not allowed.
 - [Serverless / IaC](serverless.md) (7 commands)
 - [Swift](swift.md) (1 commands)
 - [System Info](sysinfo.md) (54 commands)
-- [System](system.md) (115 commands)
+- [System](system.md) (116 commands)
 - [TeX / LaTeX](tex.md) (3 commands)
 - [Text Processing](text.md) (96 commands)
 - [Developer Tools](tools.md) (236 commands)

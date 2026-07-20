@@ -70,6 +70,21 @@
 - Allowed valued flags: --changedSince, --collectCoverageFrom, --config, --coverageDirectory, --coverageProvider, --filter, --maxConcurrency, --maxWorkers, --outputFile, --projects, --reporters, --roots, --shard, --testMatch, --testNamePattern, --testPathPattern, --testRunner, --testTimeout, -c, -t
 - Bare invocation allowed
 
+### `karma`
+<p class="cmd-url"><a href="https://karma-runner.github.io/latest/index.html">https://karma-runner.github.io/latest/index.html</a></p>
+
+- **completion**: Flags: --help, -h
+- **run**: Flags: --fail-on-empty-test-suite, --help, --no-refresh, -h. Valued: --port
+- **start**: Runs a workspace-local script/package (the first positional). Flags: --auto-watch, --colors, --detached, --fail-on-empty-test-suite, --fail-on-failing-test-suite, --help, --no-auto-watch, --no-colors, --no-fail-on-empty-test-suite, --no-fail-on-failing-test-suite, --no-single-run, --single-run, -h. Valued: --browsers, --format-error, --hostname, --log-level, --port, --protocol, --report-slower-than, --reporters
+- **stop**: Flags: --help, -h. Valued: --port
+- Allowed standalone flags: --help, --version, -h
+
+**Examples:**
+
+- `karma start --single-run`
+- `karma start karma.conf.js --single-run --browsers ChromeHeadless`
+- `karma run`
+
 ### `mocha`
 <p class="cmd-url"><a href="https://mochajs.org/">https://mochajs.org/</a></p>
 
@@ -212,9 +227,21 @@
 <p class="cmd-url"><a href="https://yarnpkg.com/cli">https://yarnpkg.com/cli</a></p>
 
 - **info**: Flags: --help, --json, -h
+- **jest**: delegates to inner command
+- **karma**: delegates to inner command
 - **list**: Flags: --help, --json, --long, --production, -h. Valued: --depth, --pattern
 - **ls**: Flags: --help, --json, --long, --production, -h. Valued: --depth, --pattern
+- **mocha**: delegates to inner command
+- **vitest**: delegates to inner command
 - **why**: Flags: --help, --json, -h
 - Allowed arguments: test, test:*
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `yarn test`
+- `yarn jest spec/date_range_filter_controller.test.js`
+- `yarn karma start --single-run`
+- `yarn vitest run`
+- `yarn list`
 

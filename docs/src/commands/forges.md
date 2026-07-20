@@ -98,8 +98,14 @@
 - **merge** (requires --dry-run): Flags: --dry-run, --help, --no-ci-check, --no-fetch, --watch, -h. Valued: --base, --merge-method, --reconcile-strategy, --remote, --required-approvals
 - **status**: Flags: --dry-run, --help, --no-fetch, -h
 - **submit** (requires --dry-run): Flags: --draft, --dry-run, --help, --no-fetch, --ready, -h. Valued: --base, --remote, --reviewer
+- **watch**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -V, -h
 - Bare invocation allowed
+
+**Examples:**
+
+- `jjpr watch --help`
+- `jjpr status`
 
 ### `tea`
 <p class="cmd-url"><a href="https://gitea.com/gitea/tea">https://gitea.com/gitea/tea</a></p>

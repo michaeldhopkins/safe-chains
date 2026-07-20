@@ -111,6 +111,9 @@
 - `cargo fmt --all`
 - `cargo fmt --check`
 - `cargo fmt --manifest-path ./crates/core/Cargo.toml`
+- `cargo about --version`
+- `cargo about --help`
+- `cargo about generate about.hbs`
 
 ### `diesel`
 <p class="cmd-url"><a href="https://diesel.rs/guides/getting-started">https://diesel.rs/guides/getting-started</a></p>
