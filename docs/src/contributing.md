@@ -4,7 +4,7 @@ Most commands are defined as TOML in the `commands/` directory. See [`commands/S
 
 ## Steps
 
-1. Add the command to the appropriate `commands/*.toml` file (or create a new one — `build.rs` auto-discovers any `*.toml` under `commands/`)
+1. Add the command to the appropriate `commands/*.toml` file (or create a new one; `build.rs` auto-discovers any `*.toml` under `commands/`)
 2. Run `cargo test` and `cargo clippy -- -D warnings`
 3. Run `./generate-docs.sh` to regenerate documentation
 4. Run `cargo install --path .` to update the installed binary

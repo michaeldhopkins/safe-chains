@@ -11,14 +11,16 @@ When you run a bash command, in addition to checking the safety of the actual co
 If you run an agent from a high-level directory like `~/`, you give it a lot of power. This is the case whether or not you run safe-chains. Careful!
 
 ```bash
-cat ./src/main.rs         # approved — inside your working directory
-echo hi > ./out.txt       # approved — writing inside the project
+cat ./src/main.rs         # approved: inside your working directory
+echo hi > ./out.txt       # approved: writing inside the project
 grep -r TODO ./src        # approved
-cat /tmp/scratch.txt      # approved — /tmp is scratch
-cat /etc/hosts            # not approved — outside the project; you're prompted
-cat ~/.ssh/id_rsa         # not approved — a credential
-cp notes.txt /etc/x       # not approved — writing outside the project
+cat /tmp/scratch.txt      # approved: /tmp is scratch
+cat /etc/hosts            # not approved: outside the project; you're prompted
+cat ~/.ssh/id_rsa         # not approved: a credential
+cp notes.txt /etc/x       # not approved: writing outside the project
 ```
+
+safe-chains allows reaching into sibling directories of the current working directory. E.g., when working in `~/projects/webapp`, otherwise safe commands in `~/projects/mobileapp` would be auto-approved, except deleting a sibling's files. "Nephew" directories (e.g. `~/projects/mobileapp/android/config`) are also approved. This does not apply when you're working in children of user folders, root, etc.
 
 ## Trusted directories
 
@@ -43,7 +45,7 @@ path = "~/.local/share/mise/"
 read = true
 ```
 
-Certain dangerous directories aren't included when you allow `~/`: `~/.ssh`, `~/.git-credentials`, `~/.aws`, `~/.env`. These need explicit red/write grants.
+Dot files are generally not part of allowlisted target directories. You'll need to grant access to these directories explicitly. Credential stores like `.ssh`/`.aws` stay protected regardless.
 
 ## Parsing example
 
@@ -61,7 +63,7 @@ Running [from a hook](#installation.md), safe-chains parses this and validates e
    - `find` is allowed with positional predicates
    - `-exec` triggers delegation: the inner command `grep -l "TODO" {}` is extracted and validated separately
    - `grep -l` passes (`-l` is an allowed flag)
-2. **Pipeline segment 2:** `sort` passes (safe with any arguments)
+2. **Pipeline segment 2:** `sort` passes
 3. **Pipeline segment 3:** `while read f; do ...; done` is a compound command, parsed recursively:
    - `read f` passes (shell builtin)
    - `echo "=== $f ==="` passes
@@ -73,11 +75,11 @@ Every leaf is safe, so the entire command is auto-approved without over-extendin
 
 safe-chains runs as a pre-hook. If it approves, Claude Code skips the prompt. If it doesn't recognize the command, Claude Code's normal permission flow takes over (checking your `Bash(...)` patterns in settings, or prompting).
 
-Where this gets interesting is chained commands. Claude Code matches approved patterns against the full command string. If you approved `Bash(cargo test:*)` and Claude runs `cargo test && ./generate-docs.sh`, Claude Code won't match — the full string isn't just `cargo test`.
+Where this gets interesting is chained commands. Claude Code matches approved patterns against the full command string. If you approved `Bash(cargo test:*)` and Claude runs `cargo test && ./generate-docs.sh`, Claude Code won't match, since the full string isn't just `cargo test`.
 
 safe-chains splits the chain and checks each segment independently. `cargo test` passes built-in rules. `./generate-docs.sh` matches `Bash(./generate-docs.sh:*)` from your settings. Both segments covered, chain auto-approved.
 
-Once safe-chains is handling your safe commands, most of your existing approved patterns are redundant. Strip them down to project-specific scripts and tools safe-chains doesn't know about — or write a [Custom Command](custom-commands.md) for those scripts and let safe-chains validate them with the same flag-level rules it applies to built-ins. See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands).
+Once safe-chains is handling your safe commands, most of your existing approved patterns are redundant. Strip them down to project-specific scripts and tools safe-chains doesn't know about, or write a [Custom Command](custom-commands.md) for those scripts and let safe-chains validate them with the same flag-level rules it applies to built-ins. See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands).
 
 For example, given `cargo test && npm run build && ./generate-docs.sh`:
 

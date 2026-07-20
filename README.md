@@ -2,7 +2,7 @@
 
 A command safety checker that auto-allows safe bash commands without prompting. Works as a Claude Code pre-hook, a CLI tool, or an OpenCode plugin.
 
-safe-chains knows 450+ commands. For each one it validates specific subcommands and flags — allowing `git log` but not `git push`, allowing `sed 's/foo/bar/'` but not `sed -i`. Commands in piped chains, `&&`, and `;` sequences are each validated independently. Compound commands (`for`, `while`, `if`) are parsed recursively.
+safe-chains knows 450+ commands. For each one it validates specific subcommands and flags: allowing `git log` but not `git push`, allowing `sed 's/foo/bar/'` but not `sed -i`. Commands in piped chains, `&&`, and `;` sequences are each validated independently. Compound commands (`for`, `while`, `if`) are parsed recursively.
 
 [Documentation and supported command reference](https://www.michaeldhopkins.com/docs/safe-chains/)
 
@@ -24,7 +24,7 @@ This adds the Claude Code pre-hook to `~/.claude/settings.json`. Restart Claude 
 
 ## Usage
 
-With the hook configured, safe-chains runs automatically. No interaction needed — safe commands are approved, everything else goes through the normal permission prompt.
+With the hook configured, safe-chains runs automatically. No interaction needed. Safe commands are approved, everything else goes through the normal permission prompt.
 
 As a CLI tool:
 
@@ -35,17 +35,17 @@ safe-chains "rm -rf /"            # exit 1 = unsafe
 
 Use `--level` to set a threshold; only commands at or below it auto-approve. The levels, from
 most locked down to most open, are `paranoid` (barely reads), `reader` (reads your project),
-`editor` (edits it, no delete/run/network), `developer` (the everyday dev default — runs your
+`editor` (edits it, no delete/run/network), `developer` (the everyday dev default, runs your
 project, deletes your own files), the two admin flavors `local-admin` (runs this machine) and
-`network-admin` (operates your remotes), and `yolo` (no limits — bar `rm -rf /`). Default:
+`network-admin` (operates your remotes), and `yolo` (no limits except `rm -rf /`). Default:
 `developer`.
 
 ```bash
-safe-chains --level paranoid "cargo test"   # exit 1 (reads the tree — above paranoid)
+safe-chains --level paranoid "cargo test"   # exit 1 (reads the tree, above paranoid)
 safe-chains --level reader "cargo test"     # exit 0
 ```
 
-The legacy names `inert` / `safe-read` / `safe-write` still work — they map to
+The legacy names `inert` / `safe-read` / `safe-write` still work. They map to
 `paranoid` / `reader` / `developer` and print a one-line notice.
 
 ## Custom commands

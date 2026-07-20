@@ -20,22 +20,22 @@ Settings guardrails: when matching commands against your Claude Code settings pa
 
 ## Trusted configuration
 
-Custom definitions outside of ~/.config and ~/.claude must be trusted. See [Trusted configuration](#trusted-configuration).
+A project's `.safe-chains.toml` must be trusted before safe-chains honors it. See [Custom Commands](custom-commands.md#project-files-must-be-trusted).
 
 ## What it does not prevent
 
-- Information disclosure inside your project: files in your project — and any [trusted directories](how-it-works.md#trusted-directories) you grant — are readable, so `cat .env` sends their contents to the model provider. safe-chains gates by location, not by content; it won't stop a read inside a directory you've allowed.
+- Information disclosure inside your project: files in your project (and any [trusted directories](how-it-works.md#trusted-directories) you grant) are readable, so `cat .env` sends their contents to the model provider. safe-chains gates by location, not by content; it won't stop a read inside a directory you've allowed.
 - Filesystem confinement: safe-chains is NOT a sandbox. If you manually approve a dangerous command, safe-chains will not stop it. If you replace a safe binary with an evil binary, safe-chains will let it run. It only reads command strings, statically. For real confinement, pair it with an OS sandbox or the harness's own file controls. safe-chains' job is to auto-approve the safe commands so the prompts you DO get are meaningful.
 - Unrecognized commands: commands safe-chains doesn't handle are passed through to the normal permission flow for your harness.
 - Chaining with broad approvals: if you add patterns like `Bash(bash *)` to your Claude Code settings, safe-chains will match them per-segment without recursive validation, matching Claude Code's own behavior. See [Cleaning up approved commands](configuration.md#cleaning-up-approved-commands).
 
 ## Best practices
 
-**Don't run an agent from your home directory.** safe-chains treats your working directory as the project, and files under it are read/write. From `~`, a relative path like `cat .ssh/id_rsa` is indistinguishable from a project file — so your keys, credentials, and dotfiles are all exposed. Run agents from a project directory instead.
+**Don't run an agent from your home directory.** safe-chains treats your working directory as the project, and files under it are read/write. From `~`, a relative path like `cat Documents/finances.csv` is indistinguishable from a project file, so files throughout your home directory are exposed. Run agents from a project directory instead.
 
-**Grant narrowly.** A [trusted directory](how-it-works.md#trusted-directories) grant is a deliberate broad allow — the same broad access you get by running from a directory. Grant the specific directories you work in (`~/projects`), not all of `~`.
+**Grant narrowly.** A [trusted directory](how-it-works.md#trusted-directories) grant is a deliberate broad allow, the same broad access you get by running from a directory. Grant the specific directories you work in (`~/projects`), not all of `~`.
 
-**Deny the folders you never want touched.** safe-chains only ever *adds* approvals — it never blocks. For a hard block, pair it with a second hook that denies commands naming a protected path (Claude Code blocks the command if any hook denies it). A blunt backstop at `~/.claude/hooks/deny-paths.sh`:
+**Deny the folders you never want touched.** On Claude Code, safe-chains only ever *approves*. It never denies, so a command it doesn't recognize just falls through to Claude's normal prompt. For a hard block on paths you never want touched, pair it with a second hook that denies them (Claude Code blocks the command if any hook denies it). A blunt backstop at `~/.claude/hooks/deny-paths.sh`:
 
 ```bash
 #!/bin/bash
@@ -55,7 +55,7 @@ Register it alongside safe-chains in `~/.claude/settings.json`:
 ] } ] }
 ```
 
-It's a string match, not a parser — a safety net for the obvious cases while safe-chains does the rigorous allow-listing.
+It's a string match, not a parser: a safety net for the obvious cases while safe-chains does the rigorous allow-listing.
 
 ## Testing approach
 

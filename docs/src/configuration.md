@@ -40,14 +40,14 @@ Restart your Claude Code sessions to activate the hook. Updating the `safe-chain
 
 Once safe-chains is active, most of your existing `Bash(...)` approved commands in `~/.claude/settings.json` and `.claude/settings.local.json` are redundant. safe-chains already handles them with stricter, flag-level validation.
 
-More importantly, broad patterns can weaken your security. A pattern like `Bash(bash *)` will approve `bash -c "rm -rf /"` — Claude Code matches the pattern before safe-chains gets a chance to recursively validate the inner command.
+More importantly, broad patterns can weaken your security. A pattern like `Bash(bash *)` will approve `bash -c "rm -rf /"`, because Claude Code matches the pattern before safe-chains gets a chance to recursively validate the inner command.
 
-For project-specific scripts or in-house CLIs safe-chains doesn't ship a definition for, [Custom Commands](custom-commands.md) are an alternative to broad `Bash(...)` approvals — same flag-level validation as built-ins.
+For project-specific scripts or in-house CLIs safe-chains doesn't ship a definition for, [Custom Commands](custom-commands.md) are an alternative to broad `Bash(...)` approvals: same flag-level validation as built-ins.
 
 Review your approved commands and remove any that safe-chains covers. A good prompt for this:
 
 ```
-Find every .claude folder on my system — ~/.claude, any .claude
+Find every .claude folder on my system: ~/.claude, any .claude
 folders at the top of my projects directory, and .claude folders
 inside individual repos. For each settings.json and
 settings.local.json, check every Bash(...) pattern against
@@ -101,7 +101,7 @@ Restart your Codex sessions after the first install. Updating the `safe-chains` 
 
 ## Cursor CLI
 
-Cursor exposes a dedicated `beforeShellExecution` event that fires only on shell calls — cleaner than a generic pre-tool hook. Run `safe-chains --setup --tool=cursor` to install. The config goes to `~/.cursor/hooks.json`:
+Cursor exposes a dedicated `beforeShellExecution` event that fires only on shell calls, cleaner than a generic pre-tool hook. Run `safe-chains --setup --tool=cursor` to install. The config goes to `~/.cursor/hooks.json`:
 
 ```json
 {
@@ -119,30 +119,27 @@ Cursor exposes a dedicated `beforeShellExecution` event that fires only on shell
 
 Cursor hooks fail-open by default. If you want safe-chains failures to block (rather than silently letting commands through), add `"failClosed": true` to the entry.
 
-## Gemini CLI
+## Antigravity CLI (`agy`)
 
-Run `safe-chains --setup --tool=gemini` to write `~/.gemini/settings.json`. Gemini's hook event is `BeforeTool` (PascalCase) and the response key is `decision` (`allow` / `deny` — there's no `ask`). Manual config:
+Run `safe-chains --setup --tool=antigravity` to write `~/.gemini/config/hooks.json`. Antigravity matches its shell tool by the name `run_command`. Manual config:
 
 ```json
 {
-  "hooks": {
-    "BeforeTool": [
-      {
-        "matcher": "^run_shell_command$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "safe-chains hook gemini",
-            "timeout": 60000
-          }
-        ]
-      }
-    ]
-  }
+  "PreToolUse": [
+    {
+      "matcher": "run_command",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "safe-chains hook antigravity"
+        }
+      ]
+    }
+  ]
 }
 ```
 
-Note Gemini's `timeout` is in milliseconds (other vendors use seconds).
+> **Note:** Google sunset the Gemini CLI on June 18, 2026 and directs users to the Antigravity CLI (`agy`).
 
 ## Qwen Code
 
@@ -169,7 +166,7 @@ Run `safe-chains --setup --tool=qwen` to write `~/.qwen/settings.json`. Qwen mir
 
 ## Factory Droid
 
-Run `safe-chains --setup --tool=droid` to write `~/.factory/settings.json`. Droid's bash tool is named `Execute` (not `Bash`), and Droid requires absolute paths for hook commands — the installer resolves the safe-chains binary's absolute path at install time. Manual config (substitute the absolute path of your `safe-chains` binary):
+Run `safe-chains --setup --tool=droid` to write `~/.factory/settings.json`. Droid's bash tool is named `Execute` (not `Bash`), and Droid requires absolute paths for hook commands, so the installer resolves the safe-chains binary's absolute path at install time. Manual config (substitute the absolute path of your `safe-chains` binary):
 
 ```json
 {
@@ -192,7 +189,7 @@ Run `safe-chains --setup --tool=droid` to write `~/.factory/settings.json`. Droi
 
 ## GitHub Copilot CLI
 
-Copilot's hook config lives in `.github/hooks/*.json` (per-repo) or `~/.github/hooks/*.json` (user-global, files merge). Run `safe-chains --setup --tool=copilot` to write `~/.github/hooks/safe-chains.json`. Copilot's quirks: the response is a flat object (no `hookSpecificOutput` wrapper), the script-path field is `bash` (not `command`), and `toolArgs` is a JSON-encoded *string* on stdin (the safe-chains adapter double-decodes it). Manual config (substitute absolute path):
+Copilot's hook config lives in `~/.copilot/hooks/*.json` (user-global, files merge). Run `safe-chains --setup --tool=copilot` to write `~/.copilot/hooks/safe-chains.json`. Copilot's quirks: the response is a flat object (no `hookSpecificOutput` wrapper), the script-path field is `bash` (not `command`), and `toolArgs` is a JSON-encoded *string* on stdin (the safe-chains adapter double-decodes it). Manual config (substitute absolute path):
 
 ```json
 {
@@ -210,12 +207,8 @@ Copilot's hook config lives in `.github/hooks/*.json` (per-repo) or `~/.github/h
 }
 ```
 
-As of late 2025 only `permissionDecision: "deny"` is honored by Copilot's permission system; safe-chains emits `"allow"` envelopes anyway so future Copilot releases that honor the full schema get the upgrade for free.
+As of v1.0.71, Copilot honors both `permissionDecision: "allow"` and `"deny"`.
 
-## OpenCode (experimental)
+## OpenCode
 
-Generate OpenCode `permission.bash` rules from safe-chains' command list:
-
-```bash
-safe-chains --opencode-config > opencode.json
-```
+We'd love to support OpenCode, but it currently has no way to run this kind of hook. You could hand-build a static `permission.bash` allowlist from safe-chains' command list, but we don't recommend it: a fixed list is brittle, inflexible, and by now impractically long. If OpenCode's hook situation changes, please [open an issue](https://github.com/michaeldhopkins/safe-chains/issues/new) and we'll take a look.

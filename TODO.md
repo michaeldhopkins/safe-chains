@@ -94,9 +94,9 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
     (postinstall) and `python3 -m <module>` deny. `npm run` already allowlists safe scripts via
     `first_arg` (`run test` allows, `run build` denies) — no change needed.
 - **Harness verification grid — see the scorecard at the top of HARNESS-BEHAVIORS.md (source of truth).**
-  Verified live: Codex, Antigravity `agy` (supersedes retired Gemini), Claude, Cursor. Assumed
-  (Claude-mirror): Qwen, Droid. Remaining: **Copilot** (unverified, not installed here) + optionally
-  exercise Qwen/Droid. opencode is static-config (no runtime hook).
+  Verified live: Codex, Antigravity `agy` (supersedes retired Gemini), Claude, Cursor, Copilot
+  (v1.0.71, allow+deny both honored). Assumed (Claude-mirror): Qwen, Droid. opencode is static-config
+  (no runtime hook).
 - **Cursor target — DECIDED (2026-07): Deny harness.** cursor-agent v2026.07.16 honors a hook `deny`
   (blocks + shows our message) but IGNORES `allow` (a known cursor bug — forum.cursor.com/t/…/144244,
   allowlist wins). So `src/targets/cursor.rs` now emits `deny` for gated commands (protective, like
@@ -119,6 +119,18 @@ slice)** — classify the 17 subs on the `credential_smelling_subs_*` guard's gr
   `is_safe_command`, seed corpus, nightly Linux CI (`.github/workflows/fuzz.yml`). Verified live:
   builds under nightly + cargo-fuzz 0.13.2, 416k runs/26s clean. Run with `cargo +nightly fuzz run
   parse`. Follow-ups: pin a dated nightly for CI reproducibility; add a `command_verdict` target.
+
+---
+
+## Post-1.0 (deferred, not blocking 1.0)
+
+- **Em-dash sweep of command descriptions.** The hand-written guide docs (`docs/src/*.md`) and
+  `README.md` are em-dash-free (done 2026-07). The generated Command Reference still carries them: 26
+  em-dashes surface in `COMMANDS.md`, sourced from the `description` field of ~560 of 1257 command
+  TOMLs. Sweep them context-aware (colon / comma / period / parens per usage, not a blind `sed`), then
+  regenerate `COMMANDS.md` + the book. Also add a "no em-dashes in descriptions" note to the
+  description-writing guidance in `AGENTS.md` so new commands don't reintroduce them. Deferred by user
+  decision — not needed for 1.0.
 
 ---
 

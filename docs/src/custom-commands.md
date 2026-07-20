@@ -2,8 +2,8 @@
 
 safe-chains ships definitions for hundreds of tools. To add an in-house CLI or disallow a built-in command, write a TOML file in one of two places:
 
-- **`~/.config/safe-chains.toml`** — applies everywhere, trusted automatically.
-- **`.safe-chains.toml`** in a repo (or any parent directory) — applies to that project, once you trust the directory.
+- **`~/.config/safe-chains.toml`**: applies everywhere, trusted automatically.
+- **`.safe-chains.toml`** in a repo (or any parent directory): applies to that project, once you trust the directory.
 
 When a command is defined in both, a trusted project definition overrides the user-level one.
 
@@ -55,7 +55,7 @@ valued = ["--service", "--since", "--lines"]
 
 This allows `myco --help`, `myco deploy --dry-run staging`, `myco status --env prod`, and so on. Anything outside the listed flags or subcommands is denied.
 
-The schema mirrors the built-in TOMLs — every field documented in [`commands/SAMPLE.toml`](https://github.com/michaeldhopkins/safe-chains/blob/main/commands/SAMPLE.toml) works in custom files.
+The schema mirrors the built-in TOMLs. Every field documented in [`commands/SAMPLE.toml`](https://github.com/michaeldhopkins/safe-chains/blob/main/commands/SAMPLE.toml) works in custom files.
 
 ## A shell script
 
@@ -78,7 +78,7 @@ name = "gh"
 deny = true
 ```
 
-Three lines and `gh` is denied in this project — bare invocation, subcommands, and every flag.
+Three lines and `gh` is denied in this project: bare invocation, subcommands, and every flag.
 
 ## Generate one with an AI
 
