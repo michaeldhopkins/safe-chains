@@ -1,8 +1,18 @@
 [[command]]
 name = "rails"
-description = "Ruby on Rails CLI. Loaded with the application's Rakefile + Bundler config; many subcommands boot the full Rails app, running initializers and any side effects defined there. Read-only commands (about, version, routes, notes, stats, db:version, db:migrate:status) display information without modifying state, though some require a live DB connection. Database schema/data commands (db:create, db:migrate, db:seed, db:prepare, db:setup, db:fixtures:load, db:schema:load, db:schema:dump) modify the connected database — typically a local development DB, but they connect to whatever config/database.yml or DATABASE_URL points at; for a local invocation to reach prod, the local app would have to be configured with prod's database coordinates, the same anti-pattern that gates Laravel's cache:clear. tmp:clear, log:clear, assets:precompile, and assets:clean write inside the project tree. cache:clear is a recreatable-derived-state operation and follows the same SafeWrite reasoning that applies to Laravel cache:clear. console/c is a REPL with the full app loaded, runner executes arbitrary Ruby code in app context, server/s starts a long-running HTTP server, new scaffolds an entire project (and fetches gems from rubygems.org), destroy/d removes generated code, credentials:edit and secrets:edit open $EDITOR, dbconsole/db opens an interactive DB shell, and db:drop/db:reset/db:rollback/db:purge destroy schema or data — each of these is out of coverage. Rails ships a major release roughly every 1-2 years with active maintenance and security backports; the CLI surface is highly stable across versions."
+description = "Ruby on Rails CLI. Loaded with the application's Rakefile + Bundler config; many subcommands boot the full Rails app, running initializers and any side effects defined there. Read-only commands (about, version, routes, notes, stats, db:version, db:migrate:status) display information without modifying state, though some require a live DB connection. Database schema/data commands (db:create, db:migrate, db:seed, db:prepare, db:setup, db:fixtures:load, db:schema:load, db:schema:dump) modify the connected database; db:test:prepare and db:test:load rebuild the TEST database from the current schema (recreatable derived state, regenerated on demand from schema.rb/structure.sql) — typically a local development DB, but they connect to whatever config/database.yml or DATABASE_URL points at; for a local invocation to reach prod, the local app would have to be configured with prod's database coordinates, the same anti-pattern that gates Laravel's cache:clear. tmp:clear, log:clear, assets:precompile, and assets:clean write inside the project tree. cache:clear is a recreatable-derived-state operation and follows the same SafeWrite reasoning that applies to Laravel cache:clear. console/c is a REPL with the full app loaded, runner executes arbitrary Ruby code in app context, server/s starts a long-running HTTP server, new scaffolds an entire project (and fetches gems from rubygems.org), destroy/d removes generated code, credentials:edit and secrets:edit open $EDITOR, dbconsole/db opens an interactive DB shell, and db:drop/db:reset/db:rollback/db:purge destroy schema or data — each of these is out of coverage. Rails ships a major release roughly every 1-2 years with active maintenance and security backports; the CLI surface is highly stable across versions."
 url = "https://guides.rubyonrails.org/command_line.html"
 bare_flags = ["--help", "--version", "-V", "-h", "-v"]
+examples_safe = [
+    "rails db:test:prepare",
+    "rails db:test:load",
+    "bin/rails db:test:prepare",
+]
+examples_denied = [
+    "rails db:migrate:redo VERSION=1",
+    "rails db:drop",
+    "rails db:rollback",
+]
 
 [[command.sub]]
 name = "about"
@@ -88,6 +98,16 @@ standalone = ["--help", "-h"]
 
 [[command.sub]]
 name = "db:setup"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:test:prepare"
+level = "SafeWrite"
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "db:test:load"
 level = "SafeWrite"
 standalone = ["--help", "-h"]
 
