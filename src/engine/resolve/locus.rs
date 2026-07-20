@@ -13,7 +13,7 @@
 
 use std::borrow::Cow;
 
-use super::regions::classify_region;
+use super::regions::{classify_region, is_hidden_peer};
 use crate::engine::facet::LocalLocus;
 
 /// The locus a READ of `path` reaches (the read face of its region role).
@@ -153,6 +153,17 @@ pub(crate) fn reads_secret(path: &str) -> bool {
     let expanded = crate::pathctx::expand_loop(path, false);
     let resolved = crate::pathctx::resolve(&expanded);
     !is_unpinnable(&resolved) && classify_region(&resolved).reads_secret
+}
+
+/// Whether `path` reaches a HIDDEN file inside a co-located peer project — a would-be-`adjacent`
+/// path frozen only by the dot-shield. Drives the overreach nudge so it can explain the shield
+/// instead of the generic "outside the working directory". Mirrors `classify_local`'s front-end so
+/// it sees the same `~`-form path `adjacent_role` classifies.
+pub(crate) fn hidden_peer_reach(path: &str) -> bool {
+    let expanded = crate::pathctx::expand_loop(path, false);
+    let resolved = crate::pathctx::resolve(&expanded);
+    let canonical = canonicalize(&resolved);
+    is_hidden_peer(&canonical)
 }
 
 /// Fail-closed guard (§0): a `$VAR` expansion, a `..` escape, or a COMMAND-substitution result
