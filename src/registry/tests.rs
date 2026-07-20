@@ -2247,6 +2247,35 @@ use super::*;
         }
     }
 
+    /// A command-substitution operand (`$(…)` / backtick) evaluates to the CST placeholder
+    /// `__SAFE_CHAINS_CMDSUB__` — an UNPINNABLE value the static classifier cannot resolve. The
+    /// verdict layer already worst-cases it (`is_unpinnable` → Machine → Denied), but the simple
+    /// path gate's `looks_like_path` pre-filter used to reject it (no `/` or `.`) and short-circuit
+    /// BEFORE the verdict ran, so `shred $(…)`, `base64 $(…)`, `od $(…)`, `tee $(…)` auto-approved
+    /// with a substituted target the caller controls. The engine-resolved readers (`cat`, `head`)
+    /// already denied it — this closes the same hole in the legacy pathgate. The invariant: an
+    /// unpinnable operand is gated identically whether it is a bare positional or glued to a path
+    /// flag, across every simple-gate reader/writer/destroyer/exec role.
+    #[test]
+    fn command_substitution_operand_is_gated_across_simple_gates() {
+        for c in [
+            "od $(echo /etc/shadow)",              // reader
+            "base64 $(echo ~/.ssh/id_rsa)",        // reader (exfil surface)
+            "base64 `echo ~/.ssh/id_rsa`",         // backtick spelling of the same
+            "shred $(echo /etc/hosts)",            // destroyer
+            "tee $(echo /etc/hosts)",              // writer
+            "cpio -O$(echo /etc/cron.d/x)",        // glued write flag
+            "cpio -O $(echo /etc/cron.d/x)",       // separate write flag
+        ] {
+            assert!(!crate::is_safe_command(c), "unpinnable cmdsub operand must be gated: {c}");
+        }
+        // Non-vacuity floor: the SAME commands on a plain worktree path stay allowed, so the guard
+        // asserts the cmdsub gate, not a blanket deny of these tools.
+        for c in ["od ./notes.txt", "base64 ./data.bin", "tee ./out.log"] {
+            assert!(crate::is_safe_command(c), "plain worktree operand must stay allowed: {c}");
+        }
+    }
+
     /// openssl accepts `--opt` as an alias for `-opt` on every subcommand, so every decrypt trigger
     /// `resolve_openssl` recognizes must deny in BOTH the single-dash and double-dash spelling
     /// (adversarial-review finding — `openssl enc --d` decrypted past the exact-match classifier;

@@ -161,7 +161,7 @@ pub(crate) fn reads_secret(path: &str) -> bool {
 /// Without the substitution case, `rm $(echo /)` classifies the placeholder as a worktree path
 /// and auto-approves `rm -rf /`. (Process substitution is a pipe whose inner command is checked
 /// separately, so its distinct placeholder is NOT worst-cased here.)
-fn is_unpinnable(path: &str) -> bool {
+pub(crate) fn is_unpinnable(path: &str) -> bool {
     path.contains('$') || path.contains("__SAFE_CHAINS_CMDSUB__") || is_parent_escape(path)
 }
 

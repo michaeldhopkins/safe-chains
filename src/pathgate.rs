@@ -315,7 +315,13 @@ fn gate(role: Role, path: &str) -> bool {
         Role::Write => crate::engine::resolve::write_target_verdict,
         Role::Exec => crate::engine::resolve::execute_file_verdict,
     };
-    crate::policy::looks_like_path(path) && verdict(path) == Verdict::Denied
+    // The pre-filter skips flags/bare keywords so verdict runs only on operands. An UNPINNABLE
+    // token (`$VAR`, `$(…)`/backtick → `__SAFE_CHAINS_CMDSUB__`) carries no `/` or `.`, so
+    // `looks_like_path` alone would short-circuit it — yet it is exactly an operand of unknown
+    // value the verdict layer already worst-cases to Denied. Admit it here so the gate matches the
+    // verdict layer's unpinnable notion (`shred $(…)`, `base64 $(…)` must gate, not auto-approve).
+    (crate::policy::looks_like_path(path) || crate::engine::resolve::is_unpinnable(path))
+        && verdict(path) == Verdict::Denied
 }
 
 /// Operation-aware path gates: a command whose positional roles depend on a mode selector its own
