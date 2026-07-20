@@ -390,8 +390,42 @@ fn base_region(path: &str) -> Role {
 ///
 /// `path` is already canonicalized to `~`-form; the workspace root is normalized to match.
 fn adjacent_role(path: &str) -> Option<Role> {
-    let home = std::env::var("HOME").ok().filter(|h| h.starts_with('/'))?;
-    let root_raw = crate::pathctx::root()?;
+    matches!(peer_kind(path), PeerKind::Ordinary).then_some(Role {
+        read_locus: LocalLocus::Adjacent,
+        write_locus: LocalLocus::Adjacent,
+        reads_secret: false,
+        pinned: false,
+    })
+}
+
+/// Whether `path` is a peer path that would be `adjacent` EXCEPT that a hidden (dot) component
+/// shields it (`../peer/.github/…`, `../peer/sub/.env`). This is NOT a deny reason of its own — the
+/// shield already denies it — but it lets the overreach nudge say *why* a peer path is frozen
+/// (hidden-in-peer) instead of the misleading generic "outside the working directory". `path` is in
+/// the same `~`-form `adjacent_role` sees.
+pub(crate) fn is_hidden_peer(path: &str) -> bool {
+    matches!(peer_kind(path), PeerKind::Hidden)
+}
+
+enum PeerKind {
+    /// A peer project's ordinary file — earns `adjacent`.
+    Ordinary,
+    /// Under the common parent, would be `adjacent`, but a hidden component shields it.
+    Hidden,
+    /// Not a co-located peer at all (fails a structural guard).
+    NotPeer,
+}
+
+/// The single structural truth behind both `adjacent_role` and `is_hidden_peer`: is `path` a
+/// co-located peer of the workspace, and if so is it shielded by a hidden component? Every guard is
+/// shared so the two callers can never drift.
+fn peer_kind(path: &str) -> PeerKind {
+    let Some(home) = std::env::var("HOME").ok().filter(|h| h.starts_with('/')) else {
+        return PeerKind::NotPeer;
+    };
+    let Some(root_raw) = crate::pathctx::root() else {
+        return PeerKind::NotPeer;
+    };
     let root = if root_raw == home {
         "~".to_string()
     } else if let Some(rest) = root_raw.strip_prefix(&home).filter(|r| r.starts_with('/')) {
@@ -399,29 +433,31 @@ fn adjacent_role(path: &str) -> Option<Role> {
     } else if root_raw.starts_with('~') {
         root_raw
     } else {
-        return None; // workspace outside $HOME (e.g. /opt/app) — conservative, no adjacency
+        return PeerKind::NotPeer; // workspace outside $HOME (e.g. /opt/app) — conservative
     };
     let root = root.trim_end_matches('/');
     // depth >= 2 below home: root = "~/a/b…" with >= 2 components after "~".
-    let comps: Vec<&str> = root.strip_prefix("~/")?.split('/').filter(|s| !s.is_empty()).collect();
-    let last = comps.last().filter(|_| comps.len() >= 2)?;
+    let Some(stripped) = root.strip_prefix("~/") else {
+        return PeerKind::NotPeer;
+    };
+    let comps: Vec<&str> = stripped.split('/').filter(|s| !s.is_empty()).collect();
+    let Some(last) = comps.last().filter(|_| comps.len() >= 2) else {
+        return PeerKind::NotPeer;
+    };
     let parent = &root[..root.len() - last.len() - 1]; // strip the trailing "/<last>"
     // strictly under the parent …
-    let under_parent = path.strip_prefix(parent).filter(|r| r.starts_with('/'))?;
+    let Some(under_parent) = path.strip_prefix(parent).filter(|r| r.starts_with('/')) else {
+        return PeerKind::NotPeer;
+    };
     // … but NOT the workspace itself or inside it.
     if path == root || path.strip_prefix(root).is_some_and(|r| r.starts_with('/')) {
-        return None;
+        return PeerKind::NotPeer;
     }
-    // a peer project's hidden files (.env/.git/.aws/.npmrc) are secrets/config — denied, not adjacent.
+    // a peer project's hidden files (.env/.git/.aws/.npmrc) are secrets/config — shielded, not adjacent.
     if has_hidden_component(under_parent.trim_start_matches('/')) {
-        return None;
+        return PeerKind::Hidden;
     }
-    Some(Role {
-        read_locus: LocalLocus::Adjacent,
-        write_locus: LocalLocus::Adjacent,
-        reads_secret: false,
-        pinned: false,
-    })
+    PeerKind::Ordinary
 }
 
 fn more_restrictive(a: Role, b: Role) -> bool {
@@ -497,6 +533,31 @@ mod tests {
 
         // No workspace context → no adjacency (fail-closed).
         assert_ne!(classify_region("~/projects/branchdiff/src/main.rs").read_locus, LocalLocus::Adjacent);
+    }
+
+    #[test]
+    fn hidden_peer_predicate_tracks_the_dot_shield() {
+        use crate::pathctx::{enter, PathCtx};
+        let hp = |root: &str, path: &str| {
+            let _g = enter(PathCtx { cwd: Some(root.to_string()), root: Some(root.to_string()) });
+            is_hidden_peer(path)
+        };
+        const WS: &str = "~/projects/safe-chains";
+        // A hidden file in a peer project — would be adjacent but for the dot-shield → HiddenPeer.
+        assert!(hp(WS, "~/projects/branchdiff/.env"));
+        assert!(hp(WS, "~/projects/branchdiff/.github/workflows/ci.yml"));
+        assert!(hp(WS, "~/projects/branchdiff/sub/.config/app.toml"), "hidden component anywhere in the remainder");
+        // Ordinary peer files ARE adjacent, so NOT hidden-peer — this is the pair that must never
+        // collapse (else the nudge would call readable peer source a shielded path, or vice-versa).
+        assert!(!hp(WS, "~/projects/branchdiff/src/main.rs"));
+        // The workspace's OWN hidden file is in-workspace, not a peer.
+        assert!(!hp(WS, "~/projects/safe-chains/.env"));
+        // A cousin (different parent) is not a peer at all — it's genuinely outside.
+        assert!(!hp(WS, "~/other/.env"));
+        // Depth-1 workspace has no peers → never hidden-peer (the ~/.ssh danger case).
+        assert!(!hp("~/work", "~/.ssh/id_rsa"));
+        // No workspace context → not a peer (fail-closed, mirrors adjacency).
+        assert!(!is_hidden_peer("~/projects/branchdiff/.env"));
     }
 
     #[test]

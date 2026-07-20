@@ -1733,6 +1733,58 @@ fn intra_line_cd_reclassifies_later_relative_writes() {
     assert!(command_verdict_in("echo x > ./y && cd /etc", ctx).is_allowed(), "write precedes the cd → project");
 }
 
+/// The dot-shield nudge: a HIDDEN file in a peer project must produce its OWN explanation, not the
+/// generic "outside the working directory" (which reads as "directory parsing is broken" right after
+/// the peer's ordinary source read fine). Pins the wording so it can't silently regress to the
+/// generic clause. Message-only — no context needed.
+#[test]
+fn reach_reason_message_wording_is_pinned() {
+    use crate::ReachReason;
+    let cred = ReachReason::Credential.message("~/.aws/credentials");
+    assert!(cred.contains("credential store"), "{cred}");
+
+    let peer = ReachReason::HiddenPeer.message("../peer/.github/ci.yml");
+    // The three things that turn "looks broken" into "it's a shield": name the peer, say the
+    // ordinary source is readable, and give the two remedies (grant / run from the parent).
+    assert!(peer.contains("peer project"), "{peer}");
+    assert!(peer.contains("ordinary source is readable"), "{peer}");
+    assert!(peer.contains("shielded"), "{peer}");
+    assert!(peer.contains("parent directory"), "{peer}");
+    // …and it must NOT masquerade as the generic reason.
+    assert!(!peer.contains("outside the working directory"), "{peer}");
+
+    let out = ReachReason::OutsideWorkspace.message("/etc/hosts");
+    assert!(out.contains("outside the working directory"), "{out}");
+}
+
+/// End-to-end: `workspace_overreach` tags a peer's hidden file `HiddenPeer`, a path above the parent
+/// `OutsideWorkspace`, and does NOT flag a peer's ordinary source at all (it's adjacent → allowed).
+/// Uses the real `$HOME` so the depth-≥2 workspace guard and `~`-canonicalization run for real.
+#[test]
+fn workspace_overreach_distinguishes_hidden_peer_from_outside() {
+    use crate::pathctx::{enter, PathCtx};
+    use crate::ReachReason;
+    let Ok(home) = std::env::var("HOME") else { return }; // skip safely if unset
+    if !home.starts_with('/') {
+        return;
+    }
+    let ws = format!("{home}/projects/scproj"); // depth-2 workspace → parent is ~/projects
+    let _g = enter(PathCtx { cwd: Some(ws.clone()), root: Some(ws) });
+
+    // Ordinary peer source is adjacent → allowed → not an overreach at all.
+    assert_eq!(
+        crate::workspace_overreach(&format!("cat {home}/projects/peer/src/main.rs")),
+        None,
+        "ordinary peer source is adjacent, must not be flagged as a reach"
+    );
+    // A peer's HIDDEN file → flagged, reason = HiddenPeer.
+    let hidden = crate::workspace_overreach(&format!("cat {home}/projects/peer/.github/ci.yml"));
+    assert!(matches!(hidden, Some((_, ReachReason::HiddenPeer))), "peer .github → HiddenPeer, got {hidden:?}");
+    // Above the parent → the generic OutsideWorkspace reason.
+    let outside = crate::workspace_overreach(&format!("cat {home}/unrelated/x.txt"));
+    assert!(matches!(outside, Some((_, ReachReason::OutsideWorkspace))), "above parent → OutsideWorkspace, got {outside:?}");
+}
+
 // ── Pre-go-live adversarial-review fixes ────────────────────────────────────────────────────
 
 // The Homebrew g-alias path-gate bypass: a GNU-coreutils alias (`gcat`, `gtee`, `gshred`) was

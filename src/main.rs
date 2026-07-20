@@ -98,13 +98,6 @@ fn run_hook_for(target_name: &str) -> ! {
 /// directory MISMATCH (the agent was launched from the wrong repo, a common and easy-to-forget
 /// mistake) is visible in the message. Without naming it, the user can't tell "I meant to be
 /// elsewhere" from "this command genuinely overreaches".
-fn outside_workspace_clause() -> String {
-    match safe_chains::pathctx::cwd() {
-        Some(cwd) => format!("outside the working directory `{cwd}`"),
-        None => "outside the working directory".to_string(),
-    }
-}
-
 fn run_hook_format(format: &dyn HookFormat) -> ! {
     let mut buf = String::new();
     if io::stdin().read_to_string(&mut buf).is_err() {
@@ -163,19 +156,12 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
     // below, but Deny/Ask exit here, so without this they'd get only the generic reason.
     const DOCS_URL: &str = "https://www.michaeldhopkins.com/docs/safe-chains/how-it-works.html";
     let overreach = safe_chains::workspace_overreach(&input.command);
-    let overreach_why = overreach.as_ref().map(|(path, is_credential)| {
-        if *is_credential {
-            format!("it reaches `{path}`, a credential store the agent should almost certainly not touch")
-        } else {
-            format!("it reaches `{path}`, {}", outside_workspace_clause())
-        }
-    });
+    let overreach_why = overreach.as_ref().map(|(path, reason)| reason.message(path));
     match format.gated_policy() {
         safe_chains::targets::GatedPolicy::Deny => {
             let reason = match &overreach_why {
                 Some(why) => format!(
-                    "safe-chains blocked this: {why}. This harness has no interactive approval; to \
-                     allow it, add a custom command or a grant to ~/.config/safe-chains.toml. {DOCS_URL}"
+                    "safe-chains blocked this: {why}. This harness has no interactive approval. {DOCS_URL}"
                 ),
                 None => format!(
                     "safe-chains blocked this: it is not on the allowlist and this harness has no \
@@ -212,22 +198,11 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
     // The retreat's nudge: if the command wasn't auto-approved because it reaches outside the
     // workspace, say so (and how to allow it) instead of a silent prompt. Degrades to a plain
     // prompt on harnesses without additionalContext.
-    if let Some((path, is_credential)) = overreach {
-        let nudge = if is_credential {
-            format!(
-                "safe-chains did not auto-approve this: it reaches `{path}`, a credential store \
-                 the agent should almost certainly not touch. If this was not intended, stop it. \
-                 {DOCS_URL}"
-            )
-        } else {
-            format!(
-                "safe-chains did not auto-approve this: it reaches `{path}`, {}. If the agent is \
-                 running from the wrong directory — an easy thing to forget — relaunch it where you \
-                 meant to be; to allow it from here, grant that path in ~/.config/safe-chains.toml — \
-                 otherwise reconsider whether the agent should reach there. {DOCS_URL}",
-                outside_workspace_clause(),
-            )
-        };
+    if let Some((path, reason)) = overreach {
+        let nudge = format!(
+            "safe-chains did not auto-approve this: {}. {DOCS_URL}",
+            reason.message(&path)
+        );
         let response = format.render_context(&nudge);
         let _ = io::stdout().write_all(response.stdout.as_bytes());
         process::exit(response.exit_code);

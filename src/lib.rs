@@ -176,11 +176,60 @@ pub fn command_verdict_in(command: &str, ctx: pathctx::PathCtx) -> Verdict {
     cst::command_verdict(command)
 }
 
+/// Why a not-auto-approved command's path reach was flagged — so the nudge can explain the actual
+/// reason instead of a one-size-fits-all "outside the working directory". A peer's hidden file and a
+/// path genuinely above cwd both deny, but the remedy differs, and conflating them is what reads as
+/// "directory parsing is broken".
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ReachReason {
+    /// A known credential store (`.ssh`, `.aws`, keychain…).
+    Credential,
+    /// A HIDDEN file inside a co-located peer project — the peer's ordinary source is readable as
+    /// `adjacent`, but its dotfiles/dotdirs are shielded.
+    HiddenPeer,
+    /// Genuinely above/outside the working directory.
+    OutsideWorkspace,
+}
+
+impl ReachReason {
+    /// The self-contained nudge body ("it reaches `X`, …") including the reason-appropriate remedy.
+    /// Callers add their own framing (block / please-confirm) and the docs link.
+    pub fn message(self, path: &str) -> String {
+        match self {
+            ReachReason::Credential => format!(
+                "it reaches `{path}`, a credential store the agent should almost certainly not touch. \
+                 If this was not intended, stop it"
+            ),
+            ReachReason::HiddenPeer => format!(
+                "it reaches `{path}`, a HIDDEN file inside a co-located peer project. The peer's \
+                 ordinary source is readable, but its hidden files (`.env`, `.git`, `.aws`, …) are \
+                 shielded — this is a deliberate guard, not a path error. To reach it, grant that \
+                 path in ~/.config/safe-chains.toml, or run the agent from the peer's parent \
+                 directory so the peer counts as in-workspace"
+            ),
+            ReachReason::OutsideWorkspace => match pathctx::cwd() {
+                Some(cwd) => format!(
+                    "it reaches `{path}`, outside the working directory `{cwd}`. If the agent is \
+                     running from the wrong directory — an easy thing to forget — relaunch it where \
+                     you meant to be; to allow it from here, grant that path in \
+                     ~/.config/safe-chains.toml"
+                ),
+                None => format!(
+                    "it reaches `{path}`, outside the working directory. To allow it, grant that \
+                     path in ~/.config/safe-chains.toml"
+                ),
+            },
+        }
+    }
+}
+
 /// If a NOT-auto-approved command reaches a path OUTSIDE the workspace, return that path (its
-/// original spelling) so the hook can nudge instead of silently prompting. Resolves against the
-/// ambient `cwd`/`root`: relative worktree paths, `/tmp`, and `/dev` streams are admitted and
-/// skipped; an absolute or home path that isn't admitted for read *or* write is the reach.
-pub fn workspace_overreach(command: &str) -> Option<(String, bool)> {
+/// original spelling) and WHY, so the hook can nudge instead of silently prompting. Resolves against
+/// the ambient `cwd`/`root`: relative worktree paths, `/tmp`, and `/dev` streams are admitted and
+/// skipped; an absolute or home path that isn't admitted for read *or* write is the reach. A
+/// credential store outranks the hidden-peer wording; a hidden peer path outranks the generic
+/// outside-workspace reason.
+pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
     let tokens = shell_words::split(command).ok()?;
     tokens.into_iter().find_map(|t| {
         if !policy::looks_like_path(&t) {
@@ -190,7 +239,17 @@ pub fn workspace_overreach(command: &str) -> Option<(String, bool)> {
         let outside = (resolved.starts_with('/') || resolved.starts_with('~'))
             && (!engine::resolve::read_content_verdict(&resolved).is_allowed()
                 || !engine::resolve::write_target_verdict(&resolved).is_allowed());
-        outside.then(|| (t, engine::resolve::reads_secret(&resolved)))
+        if !outside {
+            return None;
+        }
+        let reason = if engine::resolve::reads_secret(&resolved) {
+            ReachReason::Credential
+        } else if engine::resolve::hidden_peer_reach(&t) {
+            ReachReason::HiddenPeer
+        } else {
+            ReachReason::OutsideWorkspace
+        };
+        Some((t, reason))
     })
 }
 
