@@ -13,6 +13,9 @@ examples_safe = [
   "cargo fmt --all",
   "cargo fmt --check",
   "cargo fmt --manifest-path ./crates/core/Cargo.toml",
+  "cargo about --version",
+  "cargo about --help",
+  "cargo about generate about.hbs",
 ]
 examples_denied = [
   "cargo run --manifest-path /tmp/evil/Cargo.toml",
@@ -707,6 +710,7 @@ valued = [
 
 [[command.sub]]
 name = "about"
+nested_bare = true
 standalone = [
     "--help", "--version",
     "-V", "-h",
