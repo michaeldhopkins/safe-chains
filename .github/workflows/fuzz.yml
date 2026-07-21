@@ -42,9 +42,12 @@ jobs:
 
       # +nightly is explicit: cargo-fuzz runs cargo from the repo root, so a fuzz/ toolchain file
       # would be ignored. (Pin a dated nightly here + in dtolnay above for reproducible runs.)
+      # --target is pinned to the gnu host triple: cargo-fuzz is installed as a prebuilt musl
+      # static binary and otherwise defaults the fuzz target to its own musl triple, whose static
+      # libc can't carry AddressSanitizer ("sanitizer is incompatible with statically linked libc").
       - name: Fuzz
         run: |
-          cargo +nightly fuzz run parse -- \
+          cargo +nightly fuzz run parse --target x86_64-unknown-linux-gnu -- \
             -max_total_time=${{ github.event.inputs.max_total_time || '28800' }} \
             -timeout=25 \
             -rss_limit_mb=4096
