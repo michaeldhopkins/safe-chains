@@ -27,7 +27,9 @@ jobs:
         with:
           components: rust-src
 
-      - uses: taiki-e/install-action@cargo-fuzz
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-fuzz
 
       # Coverage-guided fuzzing only pays off if the corpus PERSISTS and accumulates across runs.
       # A unique key (run_id) always saves; restore-keys pulls the most recent prior corpus.
