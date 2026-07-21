@@ -32,13 +32,23 @@ pub fn expand_word(word: &Word) -> Vec<String> {
         if alts.len() > BRACE_EXPANSION_CAP || acc.len().saturating_mul(alts.len()) > BRACE_EXPANSION_CAP {
             return vec![UNPINNABLE.to_string()];
         }
-        let mut next = Vec::with_capacity(acc.len() * alts.len());
-        for a in &acc {
-            for b in &alts {
-                next.push(format!("{a}{b}"));
+        if let [b] = alts.as_slice() {
+            // No brace fan-out (the common case — every substitution/quoted part yields one
+            // alternative): append in place. Rebuilding via `format!("{a}{b}")` per part re-copies
+            // the whole growing accumulator each time, which is O(n²) on a word of many parts
+            // (50 000 backticks → a 1.2 MB string built in ~0.6 s). push_str keeps it linear.
+            for a in &mut acc {
+                a.push_str(b);
             }
+        } else {
+            let mut next = Vec::with_capacity(acc.len() * alts.len());
+            for a in &acc {
+                for b in &alts {
+                    next.push(format!("{a}{b}"));
+                }
+            }
+            acc = next;
         }
-        acc = next;
     }
     acc
 }
