@@ -8,6 +8,9 @@ use winnow::token::{any, take_while};
 pub fn parse(input: &str) -> Option<Script> {
     reset_heredoc_queue();
     PARSE_DEPTH.with(|d| d.set(0));
+    PARSE_WORK.with(|w| w.set(0));
+    PARSE_WORK_LIMIT
+        .with(|l| l.set(MAX_PARSE_WORK_BASE + MAX_PARSE_WORK_PER_BYTE * input.len() as u64));
     let result = script.parse(input).ok();
     reset_heredoc_queue();
     result
@@ -19,6 +22,11 @@ fn backtrack<T>() -> ModalResult<T> {
 
 thread_local! {
     static PARSE_DEPTH: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+    /// MONOTONIC work counter for one `parse()` call — every `script()` entry bumps it and it is
+    /// never decremented (unlike `PARSE_DEPTH`), so it counts total recursive-descent work, not
+    /// concurrent depth. Reset per parse; compared against `PARSE_WORK_LIMIT`.
+    static PARSE_WORK: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+    static PARSE_WORK_LIMIT: std::cell::Cell<u64> = const { std::cell::Cell::new(u64::MAX) };
 }
 
 /// Nesting depth beyond which the parser bails instead of recursing further. EVERY recursion source
@@ -32,12 +40,31 @@ thread_local! {
 /// far beyond any real command, which nests a handful of levels at most.
 const MAX_PARSE_DEPTH: u32 = 48;
 
+/// Cumulative `script()` entries allowed per parse, as `BASE + PER_BYTE * input.len()`. A correct
+/// recursive-descent parse is linear in input length, so this bound is loose for every real command
+/// yet trips fast on combinator BACKTRACKING blow-up — inputs where nested constructs make winnow
+/// re-parse overlapping tails super-linearly (the `a$(a<(a` × N interleaved-substitution class the
+/// depth cap misses because its nesting stays shallow). The balanced-scan in `cmd_sub`/`proc_sub`
+/// removes the known source; this is the belt-and-suspenders backstop that fails ANY future
+/// exponential closed rather than hanging the hook. Found by `classifier_terminates_on_adversarial_input`.
+const MAX_PARSE_WORK_BASE: u64 = 16_384;
+const MAX_PARSE_WORK_PER_BYTE: u64 = 512;
+
 /// RAII depth counter for the recursive descent — increments on `enter`, decrements on drop (winnow
-/// returns errors rather than panicking, so drops balance even on the bail path).
+/// returns errors rather than panicking, so drops balance even on the bail path). `enter` also bumps
+/// the monotonic work counter and bails (→ fail closed) once it exceeds the per-parse work budget.
 struct DepthGuard;
 
 impl DepthGuard {
     fn enter() -> Option<Self> {
+        let over_budget = PARSE_WORK.with(|w| {
+            let n = w.get().saturating_add(1);
+            w.set(n);
+            n > PARSE_WORK_LIMIT.with(|l| l.get())
+        });
+        if over_budget {
+            return None;
+        }
         PARSE_DEPTH.with(|d| {
             if d.get() >= MAX_PARSE_DEPTH {
                 None
@@ -470,20 +497,120 @@ fn double_quoted(input: &mut &str) -> ModalResult<WordPart> {
         .parse_next(input)
 }
 
+/// Byte offset of the `)` that closes a substitution body starting at `body[0]` — the first `)` at
+/// paren-depth zero — or `None` if it is never closed. Quote (`'…'`, `"…"`), backtick, and backslash
+/// spans are skipped so a `)` inside them does not count, mirroring how the grammar's own
+/// `single_quoted`/`double_quoted`/`backtick`/`escaped` parsers treat those regions. This is what
+/// keeps `cmd_sub`/`proc_sub` linear: the interior is parsed only once, over a bounded slice, instead
+/// of the old `delimited(script, ')')` shape that recursed into the tail BEFORE knowing a close even
+/// existed — the source of the `a$(a<(a` × N exponential.
+fn find_sub_close(body: &str) -> Option<usize> {
+    let b = body.as_bytes();
+    let mut i = 0;
+    let mut depth: usize = 0;
+    while i < b.len() {
+        match b[i] {
+            b'\\' => i += 1, // escape: skip the next byte too (the trailing `+= 1` handles it)
+            b'\'' => {
+                i += 1;
+                while i < b.len() && b[i] != b'\'' {
+                    i += 1;
+                }
+                if i >= b.len() {
+                    return None;
+                }
+            }
+            b'"' => {
+                i += 1;
+                while i < b.len() && b[i] != b'"' {
+                    i += if b[i] == b'\\' { 2 } else { 1 };
+                }
+                if i >= b.len() {
+                    return None;
+                }
+            }
+            b'`' => {
+                i += 1;
+                while i < b.len() && b[i] != b'`' {
+                    // `bt_escape` treats `\<any>` inside backticks as a literal, so an escaped
+                    // backtick does NOT close the span — skip the escaped byte too.
+                    i += if b[i] == b'\\' { 2 } else { 1 };
+                }
+                if i >= b.len() {
+                    return None;
+                }
+            }
+            b'(' => depth += 1,
+            b')' => {
+                if depth == 0 {
+                    return Some(i);
+                }
+                depth -= 1;
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+    None
+}
+
+/// Parse a substitution body (`$( … )`, `<( … )`, `>( … )`) as a full script.
+///
+/// FAST PATH: `find_sub_close` locates the matching `)` and we parse only the bounded interior, so
+/// nested substitutions stay linear instead of the old `delimited(script, ')')` shape that recursed
+/// into the tail before knowing a close existed (the `a$(a<(a` × N exponential).
+///
+/// FALLBACK: a few grammar constructs move the real close PAST that first balanced `)` — chiefly a
+/// heredoc body, whose text (including any `)`) is consumed out-of-band by `drain_pending_heredocs`
+/// and which `find_sub_close` does not model. When the bounded interior does not parse cleanly we
+/// re-run the EXACT old grammar over the full body, preserving classification for those inputs. The
+/// fallback is the recursive shape, but the per-parse work budget (`MAX_PARSE_WORK_*`) bounds it, so
+/// it cannot reintroduce the hang. A `None` from `find_sub_close` means no unquoted `)` exists at all
+/// — the grammar could not close the sub either — so we fail fast without the fallback.
+fn sub_body(input: &mut &str, open_len: usize) -> ModalResult<Script> {
+    let body = &input[open_len..];
+    let Some(rel) = find_sub_close(body) else {
+        return backtrack();
+    };
+    // A heredoc body is drained out-of-band (`drain_pending_heredocs`) and can run PAST `rel`, so the
+    // bounded interior would be truncated mid-heredoc and still parse "clean" — the fast path is
+    // unreliable whenever the interior holds a heredoc operator. Skip straight to the grammar fallback
+    // there. `<<` covers `<<`, `<<-`, and `<<<`; the latter (herestring) is inline and would be fine,
+    // but taking the fallback for it is merely slower, never wrong.
+    let interior = &body[..rel];
+    if !interior.contains("<<") {
+        let mut fast: &str = interior;
+        if let Ok(parsed) = script.parse_next(&mut fast) {
+            ws.parse_next(&mut fast)?;
+            if fast.is_empty() {
+                *input = &body[rel + 1..];
+                return Ok(parsed);
+            }
+        }
+    }
+    let mut rest: &str = body;
+    ws.parse_next(&mut rest)?;
+    let parsed = script.parse_next(&mut rest)?;
+    ws.parse_next(&mut rest)?;
+    if !rest.starts_with(')') {
+        return backtrack();
+    }
+    *input = &rest[1..];
+    Ok(parsed)
+}
+
 fn cmd_sub(input: &mut &str) -> ModalResult<WordPart> {
-    delimited(("$(", ws), script, (ws, ')'))
-        .map(WordPart::CmdSub)
-        .parse_next(input)
+    if !input.starts_with("$(") {
+        return backtrack();
+    }
+    sub_body(input, 2).map(WordPart::CmdSub)
 }
 
 fn proc_sub(input: &mut &str) -> ModalResult<WordPart> {
     if !(input.starts_with("<(") || input.starts_with(">(")) {
         return backtrack();
     }
-    *input = &input[1..];
-    delimited(('(', ws), script, (ws, ')'))
-        .map(WordPart::ProcSub)
-        .parse_next(input)
+    sub_body(input, 2).map(WordPart::ProcSub)
 }
 
 fn arith_sub(input: &mut &str) -> ModalResult<WordPart> {
@@ -1160,5 +1287,86 @@ mod tests {
             if parse(cmd).is_none() { failures.push(*cmd); }
         }
         assert!(failures.is_empty(), "failed on {} commands:\n{}", failures.len(), failures.join("\n"));
+    }
+
+    // === Balanced-scan divergence guards ===
+    // `cmd_sub`/`proc_sub` find their closing `)` with `find_sub_close`, then parse the bounded
+    // interior. The `roundtrip` proptest exercises this, but its `arb_shell_word` is paren-free, so
+    // these lock the case it can't reach: a `)` inside a quote / escape / backtick / nested sub must
+    // NOT be mistaken for the substitution's own close.
+    fn inner_sub(s: &Script) -> &Script {
+        match &simple(s).words[1].0[0] {
+            WordPart::CmdSub(inner) | WordPart::ProcSub(inner) => inner,
+            other => panic!("expected a substitution, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn cmd_sub_squote_paren_is_not_close() {
+        assert_eq!(words(inner_sub(&p("echo $(echo ')')"))), ["echo", ")"]);
+    }
+    #[test]
+    fn cmd_sub_dquote_paren_is_not_close() {
+        assert_eq!(words(inner_sub(&p("echo $(echo \")\")"))), ["echo", ")"]);
+    }
+    #[test]
+    fn cmd_sub_escaped_paren_is_not_close() {
+        assert_eq!(words(inner_sub(&p("echo $(echo \\))"))), ["echo", ")"]);
+    }
+    #[test]
+    fn cmd_sub_backtick_paren_is_not_close() {
+        // the ) lives inside a backtick span in the sub body; the real close is the final ).
+        let s = p("echo $(x `)` y)");
+        let inner = simple(inner_sub(&s));
+        assert_eq!(inner.words.len(), 3);
+        assert!(matches!(&inner.words[1].0[0], WordPart::Backtick(_)));
+    }
+    #[test]
+    fn cmd_sub_escaped_backtick_does_not_end_span() {
+        // The `\` escapes the next backtick, so the span — and the ) inside it — belong to the sub
+        // body; the real close is the final ). Until find_sub_close honored backtick escapes it
+        // mis-placed the span boundary and rejected this (a fail-closed divergence from the grammar).
+        let s = p("echo $(`\\`)`)");
+        assert!(matches!(&simple(&s).words[1].0[0], WordPart::CmdSub(_)));
+    }
+    #[test]
+    fn proc_sub_squote_paren_is_not_close() {
+        assert_eq!(words(inner_sub(&p("cat <(grep ')' f)"))), ["grep", ")", "f"]);
+    }
+    #[test]
+    fn proc_sub_out_squote_paren_is_not_close() {
+        assert_eq!(words(inner_sub(&p("tee >(grep ')' f)"))), ["grep", ")", "f"]);
+    }
+    #[test]
+    fn cmd_sub_nested_picks_outer_close() {
+        let s = p("echo $(a $(b) c)");
+        let inner = simple(inner_sub(&s));
+        assert_eq!(inner.words.len(), 3);
+        assert!(matches!(&inner.words[1].0[0], WordPart::CmdSub(_)));
+    }
+    #[test]
+    fn cmd_sub_literal_after_close_stays_in_outer_word() {
+        let s = p("echo $(ls)tail");
+        let w = &simple(&s).words[1];
+        assert_eq!(w.0.len(), 2);
+        assert!(matches!(&w.0[0], WordPart::CmdSub(_)));
+        assert!(matches!(&w.0[1], WordPart::Lit(s) if s == "tail"));
+    }
+    #[test]
+    fn cmd_sub_heredoc_body_paren_does_not_close() {
+        // The ) sits in the heredoc body (drained out-of-band), so it must not close the sub — the
+        // real close is the final ). find_sub_close can't see heredocs, so sub_body falls back to the
+        // full grammar here. This parsed before the balanced-scan rewrite and must keep parsing.
+        let s = p("x=$(cat <<EOF\na)b\nEOF\n)");
+        assert!(matches!(&simple(&s).env[0].1.0[0], WordPart::CmdSub(_)));
+    }
+    #[test]
+    fn cmd_sub_with_only_a_quoted_paren_is_unclosed() {
+        // the sole ) is single-quoted, so the sub never closes → whole parse fails (fail closed).
+        assert!(parse("echo $(echo ')").is_none());
+    }
+    #[test]
+    fn proc_sub_with_only_a_quoted_paren_is_unclosed() {
+        assert!(parse("cat <(grep ')").is_none());
     }
 }

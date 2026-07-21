@@ -160,6 +160,15 @@ fn classifier_terminates_on_adversarial_input() {
         format!("awk '{}'", "{print}".repeat(n / 8)),
         format!("git -c {} log", "a=b ".repeat(n / 8)),
         "a\"b'c`d$e(f)g{h}[i]|j".repeat(n / 20),
+        // Interleaved UNCLOSED command/process substitutions with word chars between the openers.
+        // `cmd_sub`/`proc_sub` used to recurse into the inner script BEFORE checking for a close, so
+        // every opener re-parsed the whole remaining tail and winnow's alt/repeat retried overlapping
+        // work at each level — exponential (a$(a<(a × 14 already ran >30s). Found by the parse fuzzer.
+        "a$(a<(a".repeat(25),
+        "a<(a$(a".repeat(25),
+        "a$(a`a".repeat(25),
+        "a$((a$(a".repeat(25),
+        "a$(b<(c$(d`e".repeat(20),
     ];
     let mut slow = Vec::new();
     for input in &corpus {
@@ -169,6 +178,31 @@ fn classifier_terminates_on_adversarial_input() {
         }
     }
     assert!(slow.is_empty(), "classifier hung/panicked (>{budget:?}) on:\n  {}", slow.join("\n  "));
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(400))]
+
+    /// GENERALIZES `classifier_terminates_on_adversarial_input` beyond its fixed corpus: a random walk
+    /// over the substitution alphabet (openers, closers, quotes, escape, word chars) must classify
+    /// within a tight budget. The `a$(a<(a` exponential lived in exactly this alphabet, and the class
+    /// — not that one string — is what must stay dead as new constructs are added to the grammar.
+    #[test]
+    fn substitution_salad_terminates_fast(
+        toks in proptest::collection::vec(
+            prop_oneof![
+                Just("a"), Just("$("), Just("<("), Just(">("), Just("$(("),
+                Just("`"), Just("'"), Just("\""), Just(")"), Just("\\"), Just(" "),
+            ],
+            0..40,
+        ),
+    ) {
+        let input: String = toks.concat();
+        prop_assert!(
+            finishes_within(&input, std::time::Duration::from_millis(500)),
+            "classifier hung on substitution salad: {:?}", input
+        );
+    }
 }
 
 // The refined poison-token guard. Each template writes to a `{p}` slot — via a write-enabling FLAG
