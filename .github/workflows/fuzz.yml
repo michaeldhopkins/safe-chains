@@ -2,13 +2,18 @@ name: Fuzz
 
 # Overnight coverage-guided fuzzing of the command classifier. Runs on nightly Rust (cargo-fuzz
 # needs -Zsanitizer); the fuzz crate is a standalone workspace, so this never touches the stable CI.
+#
+# Shape: fan out to N parallel shards, each fuzzing independently from the same restored corpus,
+# then a single merge job unions + minimizes all shard corpora back into one canonical corpus for
+# the next run to build on. Parallel shards multiply crash-finding; the merge is what makes their
+# coverage compound instead of being dropped (only one cache entry is ever restored).
 on:
   schedule:
     - cron: "0 7 * * *" # ~07:00 UTC nightly
   workflow_dispatch:
     inputs:
       max_total_time:
-        description: "Fuzz duration in seconds (default 8h)"
+        description: "Fuzz duration in seconds, per shard (default 8h)"
         default: "28800"
 
 env:
@@ -16,9 +21,13 @@ env:
 
 jobs:
   fuzz:
-    name: Fuzz (parse)
+    name: Fuzz (parse) shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
     timeout-minutes: 540 # job cap comfortably above the 8h fuzz budget
+    strategy:
+      fail-fast: false # one shard finding a crash must not cancel the others (or the merge)
+      matrix:
+        shard: [1, 2, 3]
     steps:
       - uses: actions/checkout@v5
 
@@ -31,13 +40,14 @@ jobs:
         with:
           tool: cargo-fuzz
 
-      # Coverage-guided fuzzing only pays off if the corpus PERSISTS and accumulates across runs.
-      # A unique key (run_id) always saves; restore-keys pulls the most recent prior corpus.
+      # Every shard restores the same latest canonical corpus, then diverges (libFuzzer seeds its
+      # RNG randomly, so shards explore different regions). Restore-only: shards hand their findings
+      # to the merge job as artifacts, they do not write the cache themselves.
       - name: Restore corpus
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: fuzz/corpus/parse
-          key: fuzz-corpus-parse-${{ github.run_id }}
+          key: fuzz-corpus-parse-
           restore-keys: fuzz-corpus-parse-
 
       # +nightly is explicit: cargo-fuzz runs cargo from the repo root, so a fuzz/ toolchain file
@@ -52,11 +62,72 @@ jobs:
             -timeout=25 \
             -rss_limit_mb=4096
 
+      # Hand this shard's corpus to the merge job even if the fuzz step failed on a crash — the
+      # inputs discovered before the crash are still worth keeping. Files are content-hash named,
+      # so the merge can union across shards by filename with no collisions.
+      - name: Upload shard corpus
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: corpus-shard-${{ matrix.shard }}
+          path: fuzz/corpus/parse
+          if-no-files-found: ignore
+
       # A crash writes the reproducing input to fuzz/artifacts/parse/; keep it for triage.
       - name: Upload crash artifacts
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: fuzz-crashes
+          name: fuzz-crashes-shard-${{ matrix.shard }}
           path: fuzz/artifacts/
           if-no-files-found: ignore
+
+  merge:
+    name: Merge corpus
+    needs: fuzz
+    if: ${{ !cancelled() }} # merge even when a shard went red on a crash, so its corpus is preserved
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rust-src
+
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-fuzz
+
+      # Seed the merge with the prior canonical corpus, then fold every shard on top of it.
+      - name: Restore prior corpus
+        uses: actions/cache/restore@v4
+        with:
+          path: fuzz/corpus/parse
+          key: fuzz-corpus-parse-
+          restore-keys: fuzz-corpus-parse-
+
+      - name: Download shard corpora
+        uses: actions/download-artifact@v4
+        with:
+          pattern: corpus-shard-*
+          path: incoming
+
+      # Union then minimize: libFuzzer names corpus files by content hash, so copying every shard's
+      # files into one directory dedups automatically; `cmin` then drops inputs that add no coverage,
+      # keeping the saved corpus bounded rather than growing without limit across nights.
+      - name: Union and minimize
+        run: |
+          mkdir -p fuzz/corpus/parse
+          find incoming -type f -exec cp -n {} fuzz/corpus/parse/ \;
+          echo "Union corpus size: $(find fuzz/corpus/parse -type f | wc -l) inputs"
+          cargo +nightly fuzz cmin parse --target x86_64-unknown-linux-gnu
+          echo "Minimized corpus size: $(find fuzz/corpus/parse -type f | wc -l) inputs"
+
+      # Save under a unique (always-miss) key so the merged corpus becomes the newest entry the next
+      # run's restore-keys prefix match will pull.
+      - name: Save merged corpus
+        uses: actions/cache/save@v4
+        with:
+          path: fuzz/corpus/parse
+          key: fuzz-corpus-parse-${{ github.run_id }}
