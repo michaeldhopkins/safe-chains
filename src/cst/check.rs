@@ -3,7 +3,54 @@ use crate::handlers;
 use crate::parse::Token;
 use crate::verdict::{SafetyLevel, Verdict};
 
+thread_local! {
+    /// Total (re-)classifications spent on one top-level `command_verdict`. Delegating handlers
+    /// (`fd -x`, `find -exec`, `xargs`, `sudo`) re-enter here on the wrapped command, and a command
+    /// that NESTS them — `fd a b -x fd c d -x …` — branches multiplicatively (one re-check per
+    /// pre-exec base × per nesting level), i.e. exponentially. This monotonic counter caps the total
+    /// so any such blow-up fails CLOSED (Denied) in bounded time instead of hanging the hook. A depth
+    /// cap alone can't help: 3^depth calls explode long before any depth limit bites.
+    static CLASSIFY_WORK: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+    static CLASSIFY_DEPTH: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+}
+
+/// Far above any real command's handful of delegations (a `&&` chain of 50 `fd -x`s spends ~100),
+/// far below the exponential explosion. Found by the parse fuzzer (`fd -x fd -x …`).
+const MAX_CLASSIFY_WORK: u32 = 4096;
+
+/// RAII budget guard for the classifier recursion. `enter` resets the budget at the OUTERMOST call
+/// and charges one unit per (re-)entry; `None` means the budget is spent and the caller must fail
+/// closed. Depth is bumped only on a successful enter, so it stays balanced with the `Drop`.
+struct ClassifyGuard;
+
+impl ClassifyGuard {
+    fn enter() -> Option<Self> {
+        if CLASSIFY_DEPTH.with(|d| d.get()) == 0 {
+            CLASSIFY_WORK.with(|w| w.set(0));
+        }
+        let spent = CLASSIFY_WORK.with(|w| {
+            let n = w.get().saturating_add(1);
+            w.set(n);
+            n
+        });
+        if spent > MAX_CLASSIFY_WORK {
+            return None;
+        }
+        CLASSIFY_DEPTH.with(|d| d.set(d.get() + 1));
+        Some(ClassifyGuard)
+    }
+}
+
+impl Drop for ClassifyGuard {
+    fn drop(&mut self) {
+        CLASSIFY_DEPTH.with(|d| d.set(d.get().saturating_sub(1)));
+    }
+}
+
 pub fn command_verdict(input: &str) -> Verdict {
+    let Some(_guard) = ClassifyGuard::enter() else {
+        return Verdict::Denied; // classification budget spent — fail closed
+    };
     let Some(script) = parse(input) else {
         return Verdict::Denied;
     };
