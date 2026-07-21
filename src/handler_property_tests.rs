@@ -169,6 +169,13 @@ fn classifier_terminates_on_adversarial_input() {
         "a$(a`a".repeat(25),
         "a$((a$(a".repeat(25),
         "a$(b<(c$(d`e".repeat(20),
+        // Nested exec-delegation: `fd -x`/`find -exec` re-classify the wrapped command, and NESTING
+        // them branches multiplicatively (one re-check per pre-exec base × per level) — exponential
+        // at the CLASSIFY layer, past what the parser's own budget sees. Found by the parse fuzzer.
+        "fd fd -x ".repeat(40),
+        "fd a b -x ".repeat(30),
+        "find . -exec find . -exec ".repeat(20),
+        format!("{}echo hi", "fd a -x fd b -x ".repeat(30)),
     ];
     let mut slow = Vec::new();
     for input in &corpus {
