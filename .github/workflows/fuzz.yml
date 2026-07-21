@@ -55,16 +55,23 @@ jobs:
       # --target is pinned to the gnu host triple: cargo-fuzz is installed as a prebuilt musl
       # static binary and otherwise defaults the fuzz target to its own musl triple, whose static
       # libc can't carry AddressSanitizer ("sanitizer is incompatible with statically linked libc").
+      # Fork mode (-fork=1) + -ignore_crashes: a crash/timeout kills only the child; the parent keeps
+      # fuzzing to -max_total_time and SAVES every finding to fuzz/artifacts/ instead of libFuzzer's
+      # default of aborting on the first. That is what lets a run enumerate the whole crash set (and
+      # use its full time budget) rather than dying minutes in on the nearest shallow bug — every shard
+      # otherwise trips the same shallow crash from the shared corpus and exits, wasting the parallelism.
+      # The step stays green even with findings; "Fail on crashes" below turns any into a red run.
       - name: Fuzz
         run: |
           cargo +nightly fuzz run parse --target x86_64-unknown-linux-gnu -- \
+            -fork=1 -ignore_crashes=1 \
             -max_total_time=${{ github.event.inputs.max_total_time || '28800' }} \
             -timeout=25 \
             -rss_limit_mb=4096
 
-      # Hand this shard's corpus to the merge job even if the fuzz step failed on a crash — the
-      # inputs discovered before the crash are still worth keeping. Files are content-hash named,
-      # so the merge can union across shards by filename with no collisions.
+      # Hand this shard's corpus to the merge job regardless of outcome — every explored input is
+      # worth keeping. Files are content-hash named, so the merge unions across shards with no
+      # collisions.
       - name: Upload shard corpus
         if: always()
         uses: actions/upload-artifact@v4
@@ -73,14 +80,29 @@ jobs:
           path: fuzz/corpus/parse
           if-no-files-found: ignore
 
-      # A crash writes the reproducing input to fuzz/artifacts/parse/; keep it for triage.
+      # Reproducing inputs land in fuzz/artifacts/parse/ (crash-*, timeout-*, oom-*, slow-unit-*).
+      # Upload always — in fork mode the fuzz step is green, so failure() would never fire.
       - name: Upload crash artifacts
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: fuzz-crashes-shard-${{ matrix.shard }}
           path: fuzz/artifacts/
           if-no-files-found: ignore
+
+      # Fork mode swallows the non-zero exit, so surface findings explicitly: any crash/timeout/oom
+      # makes the shard (and the run) red, so a regression can't hide behind a green fork-mode run.
+      # slow-unit is uploaded above for triage but is not fatal on its own.
+      - name: Fail on crashes
+        if: always()
+        run: |
+          hits=$(find fuzz/artifacts -type f \( -name 'crash-*' -o -name 'timeout-*' -o -name 'oom-*' \) 2>/dev/null || true)
+          if [ -n "$hits" ]; then
+            echo "::error::fuzzing saved crash/timeout artifacts (see fuzz-crashes-shard-${{ matrix.shard }})"
+            printf '%s\n' "$hits"
+            exit 1
+          fi
+          echo "no crash/timeout/oom artifacts"
 
   merge:
     name: Merge corpus
