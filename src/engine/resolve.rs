@@ -265,7 +265,10 @@ fn resolve_privilege_wrapper(arg0: &Token, tokens: &[Token]) -> Option<Profile> 
         }
         i += 1;
     }
-    let inner = &tokens[i..];
+    // A valued short flag at end-of-input (`sudo -u`, `doas -r`) consumes a "next token" that isn't
+    // there, pushing `i` one past the end — clamp so the slice can't panic (fail-OPEN crash of the
+    // hook). An overshoot means no command was left to elevate, same as the empty case below.
+    let inner = &tokens[i.min(tokens.len())..];
     if inner.is_empty() {
         return None; // `sudo` / `sudo -v` / `sudo -l` — no command to elevate; legacy decides
     }
@@ -2198,6 +2201,12 @@ mod tests {
         // doas is the same wrapper.
         assert_eq!(resolve(&toks(&["doas", "cat", "./x"])).unwrap().capabilities[0].authority, Authority::Root);
 
+        // A valued short flag at end-of-input has no next-token value: `i` overshot the slice and
+        // PANICKED (fail-open hook crash, found by the parse fuzzer). Now clamps → no inner → None.
+        assert!(resolve(&toks(&["doas", "-r"])).is_none(), "doas -r must not panic");
+        assert!(resolve(&toks(&["sudo", "-u"])).is_none(), "sudo -u must not panic");
+        assert_eq!(crate::command_verdict("doas -r"), Verdict::Denied, "doas -r denied, not crashed");
+
         // NEVER LOOSER: at the default band every `sudo …` is denied (root authority is auto-approved
         // by NO level below local-admin), exactly like the legacy classifier, which denies sudo whole.
         for cmd in ["sudo cat ./notes.md", "sudo rm -rf ./build", "sudo -EH cat ./x", "sudo -u bob ls"] {
@@ -2339,6 +2348,32 @@ mod tests {
             prop_assert_eq!(project(&hot_source), Verdict::Denied, "{} hot SOURCE ({})", cmd, hot);
             let hot_dest = resolve(&toks(&[cmd, "./safe", hot])).expect("resolves");
             prop_assert_eq!(project(&hot_dest), Verdict::Denied, "{} hot DEST ({})", cmd, hot);
+        }
+
+        /// The sudo/doas flag walk must never panic (a panic in the resolver is a fail-OPEN hook
+        /// crash) nor depend on evaluation order, for ANY flag salad — crucially a valued short flag
+        /// at end-of-input (`doas -r`, `sudo -u`), which consumes a "next token" that isn't there and
+        /// pushed `i` one past the end. That `&tokens[i..]` out-of-range is what the parse fuzzer hit
+        /// on `doas -r`; uniform command sampling never lands on this resolver often enough to find it.
+        #[test]
+        fn sudo_family_flag_walk_never_panics(
+            head in prop::sample::select(vec!["sudo", "doas"]),
+            args in prop::collection::vec(
+                prop_oneof![
+                    Just("-u".to_string()), Just("-r".to_string()), Just("-g".to_string()),
+                    Just("-i".to_string()), Just("-EH".to_string()), Just("-uEH".to_string()),
+                    Just("-uroot".to_string()), Just("--".to_string()), Just("-".to_string()),
+                    Just("root".to_string()), Just("cat".to_string()), Just("./x".to_string()),
+                    "-[a-zA-Z]{1,4}",
+                ],
+                0..6,
+            ),
+        ) {
+            let parts: Vec<&str> =
+                std::iter::once(head).chain(args.iter().map(String::as_str)).collect();
+            let a = resolve(&toks(&parts)).is_some();
+            let b = resolve(&toks(&parts)).is_some();
+            prop_assert_eq!(a, b, "nondeterministic verdict for {:?}", parts);
         }
     }
 

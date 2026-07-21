@@ -5,3 +5,4 @@
 # It is recommended to check this file in to source control so that
 # everyone who runs the test benefits from these saved cases.
 cc aa3500811cb6bd602756aeba11b91efc0a2e1d382d92ee01a1c35d49b8bacc46 # shrinks to cmd = "ln", hot = "/etc/shadow"
+cc f1790e181264686cd27d68cd2d0bd86b083f75ac0b3de82e097f75dc2064d43a # shrinks to head = "sudo", args = ["-u"]
