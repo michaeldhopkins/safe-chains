@@ -30,6 +30,11 @@ pub struct Cli {
     #[arg(long)]
     pub explain: bool,
 
+    /// For a command safe-chains doesn't recognize, generate the `.safe-chains.toml` needed to
+    /// support it, and print the `[[trusted]]` pin to add to ~/.config/safe-chains.toml.
+    #[arg(long)]
+    pub suggest: bool,
+
     /// List all supported commands in Markdown format
     #[arg(long)]
     pub list_commands: bool,

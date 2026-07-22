@@ -27,6 +27,110 @@ fn run_explain(command: &str) -> ! {
     process::exit(i32::from(!explanation.is_allowed()));
 }
 
+/// `--suggest`: help a user support a command safe-chains doesn't recognize. OPT-IN — reached only
+/// by the explicit flag, never mentioned in any deny/hook output. Writes/updates a project
+/// `.safe-chains.toml` and prints the `[[trusted]]` pin the user hand-adds to ~/ to approve it.
+fn run_suggest(command: &str) -> ! {
+    use safe_chains::suggest::{self, Outcome};
+    const DOCS: &str = "https://www.michaeldhopkins.com/docs/safe-chains/custom-commands.html";
+
+    match suggest::analyze(command) {
+        Outcome::AlreadyAllowed => {
+            println!("safe-chains already auto-approves this command — nothing to add.");
+            process::exit(0);
+        }
+        Outcome::Unparseable => {
+            eprintln!(
+                "safe-chains couldn't parse this command, so a command definition can't help — \
+                 check the quoting."
+            );
+            process::exit(1);
+        }
+        Outcome::RecognizedButDenied { names } => {
+            eprintln!(
+                "Every command here is one safe-chains already recognizes ({}). It isn't \
+                 auto-approving because of HOW it's used — a flag, subcommand, or path — not because \
+                 the command is unknown, so --suggest won't generate an override. See {DOCS}.",
+                names.join(", ")
+            );
+            process::exit(1);
+        }
+        Outcome::Generated { entries, also_recognized } => {
+            emit_suggestion(&entries, &also_recognized);
+        }
+    }
+}
+
+/// Locate the project `.safe-chains.toml` (nearest one walking up from the cwd), or the path where
+/// one would be created in the cwd if none exists yet.
+fn repo_config_path() -> std::path::PathBuf {
+    const REPO_FILENAME: &str = ".safe-chains.toml";
+    let Ok(start) = std::env::current_dir() else {
+        return std::path::PathBuf::from(REPO_FILENAME);
+    };
+    let mut dir = start.clone();
+    loop {
+        let candidate = dir.join(REPO_FILENAME);
+        if candidate.is_file() {
+            return candidate;
+        }
+        if !dir.pop() {
+            return start.join(REPO_FILENAME);
+        }
+    }
+}
+
+fn emit_suggestion(
+    entries: &[safe_chains::suggest::GeneratedEntry],
+    also_recognized: &[String],
+) -> ! {
+    use safe_chains::suggest;
+
+    let target = repo_config_path();
+    let existing = std::fs::read_to_string(&target).unwrap_or_default();
+    let merged = suggest::merged_content(&existing, entries);
+    let hash = suggest::config_hash(merged.as_bytes());
+    let block = suggest::render_toml(entries);
+
+    let dir = target.parent().unwrap_or_else(|| std::path::Path::new("."));
+    let canonical = std::fs::canonicalize(dir).unwrap_or_else(|_| dir.to_path_buf());
+    let pin = suggest::pin_block(&canonical.to_string_lossy(), &hash);
+
+    match std::fs::write(&target, &merged) {
+        Ok(()) => {
+            println!("Added this to {}:\n\n{block}", target.display());
+            println!(
+                "That file does nothing until you approve it. Add this to ~/.config/safe-chains.toml \
+                 (which safe-chains never edits):\n\n{pin}"
+            );
+            println!(
+                "The level defaults to \"SafeWrite\" — edit it to \"SafeRead\" (runs code, no \
+                 artifacts) or \"Inert\" (read-only) if that fits the tool. Any later edit to \
+                 {} changes its hash: recompute with `shasum -a 256 {}` and update the pin.",
+                target.display(),
+                target.display(),
+            );
+            if !also_recognized.is_empty() {
+                println!(
+                    "\nHeads up: this command also uses commands safe-chains already recognizes \
+                     ({}). The entry above only covers the unrecognized one(s), so if the whole \
+                     command still isn't approved, one of those is why.",
+                    also_recognized.join(", ")
+                );
+            }
+            process::exit(0);
+        }
+        Err(e) => {
+            eprintln!(
+                "Couldn't write {} ({e}). Add this block to a `.safe-chains.toml` yourself:\n\n{block}\n\
+                 then pin it in ~/.config/safe-chains.toml:\n\n{pin}",
+                target.display()
+            );
+            process::exit(1);
+        }
+    }
+}
+
 fn run_setup(name: Option<String>, auto_detect: bool) -> ! {
     let Some(home) = std::env::var_os("HOME") else {
         eprintln!("Error: HOME environment variable not set");
@@ -237,6 +341,9 @@ fn main() {
                 });
                 if cli.explain {
                     run_explain(&command);
+                }
+                if cli.suggest {
+                    run_suggest(&command);
                 }
                 let (threshold, engine_level) = match cli.level.as_deref() {
                     None => (SafetyLevel::SafeWrite, None), // default: developer

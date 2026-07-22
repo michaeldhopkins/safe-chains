@@ -57,6 +57,18 @@ This allows `myco --help`, `myco deploy --dry-run staging`, `myco status --env p
 
 The schema mirrors the built-in TOMLs. Every field documented in [`commands/SAMPLE.toml`](https://github.com/michaeldhopkins/safe-chains/blob/main/commands/SAMPLE.toml) works in custom files.
 
+## Let safe-chains write it: `--suggest`
+
+For a command safe-chains doesn't recognize, `--suggest` writes the entry for you:
+
+```sh
+safe-chains --suggest "acmedeploy --env prod ./service"
+```
+
+It writes a scoped `[[command]]` to `.safe-chains.toml` — allowing exactly the flags and positional count you ran, nothing more — and prints the `[[trusted]]` pin to paste into `~/.config/safe-chains.toml`. safe-chains never edits your user config, so the command stays inert until you add that pin by hand.
+
+The generated `level` defaults to `"SafeWrite"`; change it to `"SafeRead"` or `"Inert"` if the tool is lighter, then re-hash. `--suggest` only helps with commands safe-chains doesn't know — for a recognized command that's denied by a flag, subcommand, or path, it says so rather than generating a bypass.
+
 ## A shell script
 
 ```toml
