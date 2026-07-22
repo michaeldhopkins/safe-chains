@@ -65,6 +65,7 @@ pub mod pathctx;
 pub mod pathgate;
 pub mod policy;
 pub mod registry;
+pub mod suggest;
 pub mod allowlist;
 pub mod targets;
 pub mod verdict;
