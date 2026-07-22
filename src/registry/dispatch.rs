@@ -157,8 +157,18 @@ fn dispatch_branching(
     };
     // A first positional naming secret material (`kubectl get secret`/`secret/x`, `aws configure get
     // aws_secret_access_key`) is a CREDENTIAL-READ — deny before the allow-glob admits it. The
-    // value-dependent complement to `profile=credential-read`; `arg` is already flag-aware.
-    if credential_first_arg.iter().any(|p| glob_match(p)) {
+    // value-dependent complement to `profile=credential-read`; `arg` is already flag-aware. Matched
+    // CASE-INSENSITIVELY: kubectl resource kinds are case-insensitive (`get Secret`/`SECRET` reads
+    // secrets), so a case-variant must not slip past the deny into the `*` allow. The allow-glob
+    // below stays case-sensitive — a case-insensitive ALLOW would be fail-open.
+    let glob_match_ci = |p: &str| match p.strip_suffix('*') {
+        Some(prefix) => {
+            arg.len() >= prefix.len()
+                && arg.as_bytes()[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes())
+        }
+        None => arg.eq_ignore_ascii_case(p),
+    };
+    if credential_first_arg.iter().any(|p| glob_match_ci(p)) {
         return Verdict::Denied;
     }
     if !first_arg.is_empty() && first_arg.iter().any(|p| glob_match(p)) {
