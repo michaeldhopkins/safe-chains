@@ -242,20 +242,99 @@ fn load_user_grants() -> Vec<Grant> {
     if std::env::var_os("SAFE_CHAINS_NO_LOCAL").is_some() {
         return Vec::new();
     }
-    // ~/.config/safe-chains.toml only — `XDG_CONFIG_HOME` is deliberately not honored so a
-    // redirected env var can't point the trust root at an agent-writable dir (see custom.rs).
-    let Some(dir) = std::env::var_os("HOME").map(|h| std::path::PathBuf::from(h).join(".config"))
+    let Some(home) = std::env::var_os("HOME").map(std::path::PathBuf::from) else {
+        return Vec::new();
+    };
+    let mut grants = Vec::new();
+    // ~/.config/safe-chains.toml — safe-chains' own grant list (read and/or write). XDG is
+    // deliberately not honored so a redirected env var can't point the trust root at an
+    // agent-writable dir (see custom.rs).
+    if let Ok(src) = std::fs::read_to_string(home.join(".config/safe-chains.toml")) {
+        grants.extend(
+            toml::from_str::<GrantFile>(&src)
+                .map(|f| f.grant)
+                .unwrap_or_default()
+                .into_iter()
+                .flat_map(|g| {
+                    grant_matchers(&g.path)
+                        .into_iter()
+                        .map(move |m| Grant { matcher: m, read: g.read, write: g.write })
+                }),
+        );
+    }
+    // ~/.claude/settings.json Read(...) rules — the harness's own read approvals, honored
+    // read-only (an Edit()/Write() rule never becomes a write grant). The command-grant
+    // analogue lives in `allowlist.rs`.
+    grants.extend(claude_settings_read_grants(&home));
+    grants
+}
+
+/// A Claude Code `Read(<pattern>)` permission rule translated into a grant-path prefix — or
+/// `None` when the pattern can't be a clean prefix. Only ABSOLUTE (`//…`) and HOME (`~/…`)
+/// patterns become grants: a relative / gitignore-style rule describes a workspace-local read
+/// that is already auto-approved, so there is nothing to widen. The result is trimmed to a
+/// glob-free prefix; a mid-path glob (`//Users/*/x`) or a bare filesystem/home root is refused
+/// (fail closed — a "read anything" harness rule does not turn into a filesystem free pass; the
+/// user can still grant that explicitly in `~/.config/safe-chains.toml`).
+fn translate_read_pattern(inner: &str) -> Option<String> {
+    let inner = inner.trim();
+    let base = if let Some(rest) = inner.strip_prefix("//") {
+        format!("/{rest}")
+    } else if inner == "~" || inner.starts_with("~/") {
+        inner.to_string()
+    } else {
+        return None;
+    };
+    // Strip a trailing directory glob; remember we did, so the grant becomes a subtree Prefix
+    // (trailing slash) rather than an Exact single-path match — see `Matcher::from_path`.
+    let mut prefix = base.as_str();
+    let mut had_glob = false;
+    while let Some(p) = prefix.strip_suffix("/**").or_else(|| prefix.strip_suffix("/*")) {
+        prefix = p;
+        had_glob = true;
+    }
+    let prefix = prefix.strip_suffix('/').unwrap_or(prefix);
+    if prefix.contains(['*', '?']) || prefix.is_empty() || prefix == "/" || prefix == "~" {
+        return None;
+    }
+    Some(if had_glob { format!("{prefix}/") } else { prefix.to_string() })
+}
+
+/// Grant-path prefixes derived from `Read(...)` allow-rules in a Claude Code `settings.json`
+/// body. Only `permissions.allow` is consulted — the same trusted field the command allowlist
+/// reads (see `allowlist.rs`).
+fn claude_read_grant_paths(settings_json: &str) -> Vec<String> {
+    let Ok(value) = serde_json::from_str::<serde_json::Value>(settings_json) else {
+        return Vec::new();
+    };
+    let Some(arr) = value
+        .get("permissions")
+        .and_then(|v| v.get("allow"))
+        .and_then(|v| v.as_array())
     else {
         return Vec::new();
     };
-    let Ok(src) = std::fs::read_to_string(dir.join("safe-chains.toml")) else {
+    arr.iter()
+        .filter_map(|e| e.as_str())
+        .filter_map(|entry| entry.strip_prefix("Read(").and_then(|s| s.strip_suffix(')')))
+        .filter_map(translate_read_pattern)
+        .collect()
+}
+
+/// Read-only grants sourced from `~/.claude/settings.json`. Only the user-global home settings
+/// are trusted; a project's `.claude/settings.json` lives in the tree the agent edits and is
+/// never read (mirrors `allowlist.rs`).
+fn claude_settings_read_grants(home: &std::path::Path) -> Vec<Grant> {
+    let Ok(src) = std::fs::read_to_string(home.join(".claude/settings.json")) else {
         return Vec::new();
     };
-    toml::from_str::<GrantFile>(&src)
-        .map(|f| f.grant)
-        .unwrap_or_default()
+    claude_read_grant_paths(&src)
         .into_iter()
-        .flat_map(|g| grant_matchers(&g.path).into_iter().map(move |m| Grant { matcher: m, read: g.read, write: g.write }))
+        .flat_map(|p| {
+            grant_matchers(&p)
+                .into_iter()
+                .map(|m| Grant { matcher: m, read: true, write: false })
+        })
         .collect()
 }
 
@@ -596,6 +675,88 @@ mod tests {
             assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "read admitted");
             assert!(r.write_locus > LocalLocus::Worktree, "write NOT admitted");
         });
+    }
+
+    #[test]
+    fn translate_read_pattern_only_honors_absolute_and_home_prefixes() {
+        // a directory glob (`/**`, `/*`) becomes a subtree Prefix (trailing slash)
+        assert_eq!(translate_read_pattern("//Users/me/x/**"), Some("/Users/me/x/".into()));
+        assert_eq!(translate_read_pattern("~/.gem/**"), Some("~/.gem/".into()));
+        assert_eq!(translate_read_pattern("//Users/me/x/*"), Some("/Users/me/x/".into()));
+        // a glob-free path stays an exact match (a single file or dir entry)
+        assert_eq!(translate_read_pattern("~/.gem"), Some("~/.gem".into()));
+        assert_eq!(translate_read_pattern("//etc/hosts"), Some("/etc/hosts".into()));
+        // relative / gitignore-style / settings-dir-relative → workspace-local, not a grant
+        assert_eq!(translate_read_pattern("src/**"), None);
+        assert_eq!(translate_read_pattern("/logs/**"), None);
+        // a mid-path glob can't be represented as a prefix
+        assert_eq!(translate_read_pattern("//Users/*/mise/**"), None);
+        assert_eq!(translate_read_pattern("~/**/*.pem"), None);
+        // a bare filesystem / home root is too broad to honor
+        assert_eq!(translate_read_pattern("//**"), None);
+        assert_eq!(translate_read_pattern("~/**"), None);
+        assert_eq!(translate_read_pattern("~/"), None);
+        assert_eq!(translate_read_pattern(""), None);
+    }
+
+    #[test]
+    fn claude_read_grant_paths_extracts_only_read_allow_rules() {
+        let paths = claude_read_grant_paths(
+            r#"{"permissions":{"allow":[
+                "Bash(ls)","Edit(~/x/**)","Write(~/y/**)","Read(~/z/**)","WebFetch"
+            ]}}"#,
+        );
+        assert_eq!(paths, vec!["~/z/".to_string()]);
+        // malformed / missing structure → empty, never a panic
+        assert!(claude_read_grant_paths("not json").is_empty());
+        assert!(claude_read_grant_paths("{}").is_empty());
+        assert!(claude_read_grant_paths(r#"{"permissions":{}}"#).is_empty());
+        // deny/ask rules are not allow-grants
+        assert!(claude_read_grant_paths(r#"{"permissions":{"deny":["Read(~/z/**)"]}}"#).is_empty());
+    }
+
+    #[test]
+    fn claude_read_rule_admits_read_but_never_write() {
+        let paths = claude_read_grant_paths(
+            r#"{"permissions":{"allow":["Read(~/.local/share/mise/**)","Edit(~/.local/share/mise/**)"]}}"#,
+        );
+        assert_eq!(paths, vec!["~/.local/share/mise/".to_string()]);
+        let grants: Vec<(&str, bool, bool)> = paths.iter().map(|p| (p.as_str(), true, false)).collect();
+        with_grants(&grants, || {
+            let r = classify_region("~/.local/share/mise/installs/python/bin/python");
+            assert!(r.read_locus <= LocalLocus::WorktreeTrusted, "read admitted");
+            assert!(r.write_locus > LocalLocus::Worktree, "the Edit() rule is ignored — write stays denied");
+        });
+    }
+
+    #[test]
+    fn a_claude_read_grant_still_respects_the_dot_rule_and_shields() {
+        let paths = claude_read_grant_paths(r#"{"permissions":{"allow":["Read(~/work/**)"]}}"#);
+        assert_eq!(paths, vec!["~/work/".to_string()]);
+        let grants: Vec<(&str, bool, bool)> = paths.iter().map(|p| (p.as_str(), true, false)).collect();
+        with_grants(&grants, || {
+            assert!(classify_region("~/work/notes.txt").read_locus <= LocalLocus::WorktreeTrusted, "granted read admitted");
+            // a hidden credential swept under the grant is still not widened
+            assert_eq!(classify_region("~/work/.ssh/id_rsa").read_locus, LocalLocus::Machine, "hidden cred not widened");
+        });
+    }
+
+    #[test]
+    fn claude_settings_read_grants_reads_home_settings_only() {
+        let home = tempfile::tempdir().unwrap();
+        let claude = home.path().join(".claude");
+        std::fs::create_dir_all(&claude).unwrap();
+        std::fs::write(
+            claude.join("settings.json"),
+            r#"{"permissions":{"allow":["Read(~/.gem/**)","Edit(~/.gem/**)"]}}"#,
+        )
+        .unwrap();
+        let grants = claude_settings_read_grants(home.path());
+        assert!(!grants.is_empty());
+        assert!(grants.iter().all(|g| g.read && !g.write), "Read() rules are read-only");
+        // no settings file → empty, no panic
+        let empty = tempfile::tempdir().unwrap();
+        assert!(claude_settings_read_grants(empty.path()).is_empty());
     }
 
     #[test]

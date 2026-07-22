@@ -47,6 +47,10 @@ read = true
 
 Dot files are generally not part of allowlisted target directories. You'll need to grant access to these directories explicitly. Credential stores like `.ssh`/`.aws` stay protected regardless.
 
+### Read approvals from `~/.claude/settings.json`
+
+If you use Claude Code, safe-chains also honors the file-**read** approvals already in your `~/.claude/settings.json`. A `permissions.allow` entry such as `Read(//Users/you/.local/share/mise/**)` or `Read(~/.gem/**)` becomes a read-only trusted directory — the same effect as a `[[grant]]` with `read = true`, so you don't have to declare a directory in two places. Only absolute (`//…`) and home (`~/…`) paths are honored; a bare "read anything" rule is not (grant that explicitly in `safe-chains.toml` if you really want it). `Edit(…)`/`Write(…)` rules are deliberately **not** turned into write grants — reads only — and the credential shields and dotfile rule above still apply, so a broad read rule can't reach `.ssh`. Only your user-level `~/.claude/settings.json` is read, never a project's `.claude/settings.json`.
+
 ## Parsing example
 
 Take this command from the introduction:
