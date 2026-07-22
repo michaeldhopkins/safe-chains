@@ -90,6 +90,7 @@ impl fmt::Display for Cmd {
                 }
                 Ok(())
             }
+            Cmd::FunctionDef { name, body } => write!(f, "{name}() {{ {body}; }}"),
             Cmd::For { var, items, body, redirs } => {
                 write!(f, "for {var}")?;
                 if !items.is_empty() {

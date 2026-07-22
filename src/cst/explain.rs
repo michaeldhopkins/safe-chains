@@ -59,11 +59,12 @@ fn explain_inner(input: &str, covered: impl Fn(&Cmd) -> bool) -> Explanation {
         };
     };
 
-    let segments: Vec<SegmentReport> = script
-        .0
-        .iter()
-        .map(|stmt| segment_report(stmt, &covered))
-        .collect();
+    // Walk with the SAME accumulated scope as `script_verdict` (cwd + `VAR=` bindings + function
+    // definitions), so each segment is judged in the context of the ones before it. Without this the
+    // per-segment view — and the hook's coverage fallback built on it — would re-allow a call whose
+    // definition shadows a builtin (`ls(){ rm; }; ls`) that the whole-command verdict denies.
+    let segments: Vec<SegmentReport> =
+        super::check::walk_with_scope(&script, |stmt| segment_report(stmt, &covered));
     let overall = segments
         .iter()
         .map(|s| s.verdict)

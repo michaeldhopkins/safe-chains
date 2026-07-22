@@ -228,9 +228,74 @@ fn command(input: &mut &str) -> ModalResult<Cmd> {
         until_cmd,
         if_cmd,
         double_bracket_cmd,
+        function_def,
         simple_cmd.map(Cmd::Simple),
     ))
     .parse_next(input)
+}
+
+/// `name() { body }` / `name() ( body )` (POSIX form) or `function name [()] { body }` (bash form).
+/// Tried before `simple_cmd`; a bare `name` with no `()` and no `function` keyword backtracks so an
+/// ordinary command is not misread as a definition.
+fn function_def(input: &mut &str) -> ModalResult<Cmd> {
+    let had_keyword = opt_function_keyword(input);
+    let name = function_name(input)?;
+    ws.parse_next(input)?;
+    let has_parens = opt_paren_pair(input);
+    if !had_keyword && !has_parens {
+        return backtrack();
+    }
+    // The body may sit on the next line (`foo()\n{ … }`); consume ws/newlines but not `;`.
+    take_while(0.., [' ', '\t', '\n']).void().parse_next(input)?;
+    let body = function_body(input)?;
+    Ok(Cmd::FunctionDef { name, body })
+}
+
+/// Consume a leading `function` keyword (must be followed by whitespace, else it's a command named
+/// `function`). Returns whether it was present; only commits `*input` when it was.
+fn opt_function_keyword(input: &mut &str) -> bool {
+    let mut probe = *input;
+    if eat_keyword(&mut probe, "function").is_ok()
+        && probe.starts_with([' ', '\t', '\n'])
+        && ws.parse_next(&mut probe).is_ok()
+    {
+        *input = probe;
+        return true;
+    }
+    false
+}
+
+/// Consume a `(` ws `)` function-def paren pair. Commits `*input` only on a full match.
+fn opt_paren_pair(input: &mut &str) -> bool {
+    let mut probe = *input;
+    if let Some(rest) = probe.strip_prefix('(') {
+        probe = rest;
+        if ws.parse_next(&mut probe).is_ok()
+            && let Some(rest) = probe.strip_prefix(')')
+        {
+            *input = rest;
+            return true;
+        }
+    }
+    false
+}
+
+fn function_name(input: &mut &str) -> ModalResult<String> {
+    take_while(1.., |c: char| c.is_ascii_alphanumeric() || matches!(c, '_' | '-' | '.' | ':' | '+'))
+        .map(|s: &str| s.to_string())
+        .parse_next(input)
+}
+
+/// The compound body of a function — `{ …; }` or `( … )`. Redirects attached to the definition
+/// itself (rare) are dropped, which is conservative for a construct classified Inert anyway.
+fn function_body(input: &mut &str) -> ModalResult<Script> {
+    if let Some(Cmd::BraceGroup { body, .. }) = opt(brace_group).parse_next(input)? {
+        return Ok(body);
+    }
+    if let Some(Cmd::Subshell { body, .. }) = opt(subshell).parse_next(input)? {
+        return Ok(body);
+    }
+    backtrack()
 }
 
 fn trailing_redirs(input: &mut &str) -> ModalResult<Vec<Redir>> {
@@ -1195,6 +1260,52 @@ mod tests {
         let cmd = simple(&s);
         assert_eq!(cmd.words.len(), 2);
         assert!(matches!(&cmd.words[1].0[0], WordPart::ProcSub(_)));
+    }
+
+    // === Function definitions ===
+    fn func_def(s: &Script) -> (&str, &Script) {
+        match &s.0[0].pipeline.commands[0] {
+            Cmd::FunctionDef { name, body } => (name.as_str(), body),
+            other => panic!("expected FunctionDef, got {other:?}"),
+        }
+    }
+    #[test]
+    fn function_def_posix_form() {
+        let s = p("probe(){ echo hi; }");
+        let (name, body) = func_def(&s);
+        assert_eq!(name, "probe");
+        assert_eq!(words(body), ["echo", "hi"]);
+    }
+    #[test]
+    fn function_def_spaced_and_keyword_forms() {
+        assert_eq!(func_def(&p("foo () { echo hi; }")).0, "foo");
+        assert_eq!(func_def(&p("function foo { echo hi; }")).0, "foo");
+        assert_eq!(func_def(&p("function foo () { echo hi; }")).0, "foo");
+    }
+    #[test]
+    fn function_def_subshell_body() {
+        let s = p("foo() ( echo sub )");
+        assert_eq!(func_def(&s).0, "foo");
+    }
+    #[test]
+    fn function_def_body_on_next_line() {
+        assert_eq!(func_def(&p("foo()\n{\n  echo hi\n}")).0, "foo");
+    }
+    #[test]
+    fn function_def_name_with_dashes_and_dots() {
+        assert_eq!(func_def(&p("my-func.v2(){ echo hi; }")).0, "my-func.v2");
+    }
+    #[test]
+    fn plain_command_is_not_a_function_def() {
+        // A bare `name` with no `()` must NOT be read as a definition.
+        assert!(matches!(&p("ls -la").0[0].pipeline.commands[0], Cmd::Simple(_)));
+        assert!(matches!(&p("echo foo bar").0[0].pipeline.commands[0], Cmd::Simple(_)));
+    }
+    #[test]
+    fn function_def_roundtrips() {
+        let rendered = p("greet(){ echo hi; }").to_string();
+        assert!(parse(&rendered).is_some(), "did not reparse: {rendered}");
+        assert_eq!(func_def(&p(&rendered)).0, "greet");
     }
     #[test]
     fn comment_only() {

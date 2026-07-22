@@ -64,25 +64,115 @@ pub fn is_safe_command(input: &str) -> bool {
     command_verdict(input).is_allowed()
 }
 
+thread_local! {
+    /// Functions DEFINED so far in the current classification, so a later call resolves to its body
+    /// (and a definition SHADOWS a same-named built-in — `ls(){ rm -rf /; }; ls` runs rm). Owned
+    /// clones (small); a thread-local can't borrow the CST. Latest definition wins.
+    static FUNCTIONS: std::cell::RefCell<Vec<(String, Script)>> =
+        const { std::cell::RefCell::new(Vec::new()) };
+    /// Names currently being resolved — bounds recursion (direct AND mutual) and total call depth,
+    /// so `f(){ f; }` or a deep chain can't blow the stack; hitting the bound denies (fail-closed).
+    static RESOLVING: std::cell::RefCell<Vec<String>> = const { std::cell::RefCell::new(Vec::new()) };
+}
+
+const MAX_FUNC_DEPTH: usize = 32;
+
+/// The value a `$VAR`/`$1` binds to when the assigned/argument value is UNCERTAIN (a substitution,
+/// an unbound var, a reassignment to same). It looks like a path AND is unpinnable, so `$VAR/x`
+/// fail-closes in both gate layers rather than resolving to a stale or dropped value.
+const UNCERTAIN_VALUE: &str = "/__SAFE_CHAINS_CMDSUB__";
+
+struct FuncScope;
+impl Drop for FuncScope {
+    fn drop(&mut self) {
+        FUNCTIONS.with(|f| {
+            f.borrow_mut().pop();
+        });
+    }
+}
+
+fn define_function(name: String, body: Script) -> FuncScope {
+    FUNCTIONS.with(|f| f.borrow_mut().push((name, body)));
+    FuncScope
+}
+
+fn lookup_function(name: &str) -> Option<Script> {
+    FUNCTIONS.with(|f| f.borrow().iter().rev().find(|(n, _)| n == name).map(|(_, b)| b.clone()))
+}
+
+struct ResolveScope;
+impl Drop for ResolveScope {
+    fn drop(&mut self) {
+        RESOLVING.with(|r| {
+            r.borrow_mut().pop();
+        });
+    }
+}
+
+/// Begin resolving a call to `name`, unless it recurses, exceeds the depth cap, or exhausts the
+/// per-invocation classification budget — then return `None` and the caller treats it as an ordinary
+/// (unknown) command, which denies. The budget is what stops exponential FAN-OUT (`f(){ f2; f2; };
+/// f2(){ f3; f3; }; …`): the depth cap alone bounds a linear chain, but branching multiplies, so each
+/// resolution charges the shared `CLASSIFY_WORK` counter that also caps delegating-handler recursion.
+fn begin_resolving(name: &str) -> Option<ResolveScope> {
+    let over_budget = CLASSIFY_WORK.with(|w| {
+        let n = w.get().saturating_add(1);
+        w.set(n);
+        n > MAX_CLASSIFY_WORK
+    });
+    if over_budget {
+        return None;
+    }
+    RESOLVING.with(|r| {
+        let mut stack = r.borrow_mut();
+        if stack.len() >= MAX_FUNC_DEPTH || stack.iter().any(|n| n == name) {
+            None
+        } else {
+            stack.push(name.to_string());
+            Some(ResolveScope)
+        }
+    })
+}
+
 fn script_verdict(script: &Script) -> Verdict {
-    // HP-19 #2: track cwd across statements. Each statement is evaluated with the current
-    // running cwd installed (so a later relative path resolves against it), and a `cd DIR`
-    // statement updates that running cwd for the statements after it. Fail-open: an
-    // unresolvable `cd` (bare / `~` / `$VAR`) leaves the running cwd unchanged.
+    walk_with_scope(script, |stmt| pipeline_verdict(&stmt.pipeline))
+        .into_iter()
+        .fold(Verdict::Allowed(SafetyLevel::Inert), Verdict::combine)
+}
+
+/// Walk `script`'s statements IN ORDER, running `per_stmt` on each with the accumulated scope
+/// installed, and return the per-statement results.
+///
+/// The scope is: the running `cwd` (HP-19 — a later relative path resolves against a prior `cd`),
+/// plus `VAR=value` bindings and function definitions from EARLIER statements (bash semantics;
+/// released when this returns). Fail-open on cwd: an unresolvable `cd` leaves it unchanged.
+///
+/// Shared by `script_verdict` AND the explainer so both see the SAME scope. This is load-bearing for
+/// security: a definition that shadows a builtin (`ls(){ rm -rf /; }; ls`) must deny in BOTH — if the
+/// per-segment explain classified the `ls` call without the definition in scope, the hook's coverage
+/// fallback (which uses the explainer) would re-allow the very thing the whole-command verdict denied.
+pub(crate) fn walk_with_scope<T>(script: &Script, mut per_stmt: impl FnMut(&Stmt) -> T) -> Vec<T> {
     let mut running = crate::pathctx::cwd();
-    let mut verdict = Verdict::Allowed(SafetyLevel::Inert);
+    let mut _vars: Vec<crate::pathctx::VarGuard> = Vec::new();
+    let mut _funcs: Vec<FuncScope> = Vec::new();
+    let mut out = Vec::with_capacity(script.0.len());
     for stmt in &script.0 {
-        let v = {
+        out.push({
             let _cwd = crate::pathctx::enter_cwd(running.clone());
-            pipeline_verdict(&stmt.pipeline)
-        };
-        verdict = verdict.combine(v);
+            per_stmt(stmt)
+        });
         let next = cd_target(&stmt.pipeline).and_then(|t| crate::pathctx::join_cwd(running.as_deref(), &t));
         if next.is_some() {
             running = next;
         }
+        for (name, value) in statement_assignments(&stmt.pipeline) {
+            _vars.push(crate::pathctx::enter_var(name, value));
+        }
+        if let [Cmd::FunctionDef { name, body }] = stmt.pipeline.commands.as_slice() {
+            _funcs.push(define_function(name.clone(), body.clone()));
+        }
     }
-    verdict
+    out
 }
 
 /// The target of a statement-level `cd DIR` (a single simple command named `cd`), for cwd
@@ -97,6 +187,50 @@ fn cd_target(pipeline: &Pipeline) -> Option<String> {
     s.words.iter().skip(1).map(|w| w.eval()).find(|a| !a.starts_with('-'))
 }
 
+/// The variables a `while`/`until` condition of the form `read VAR…` (incl. `IFS= read -r VAR`) binds
+/// from stdin — its non-flag positionals — so the body's `$VAR` can be gated at the pipe's item locus.
+/// Empty for any other condition. (An exotic valued read flag's value may be over-included as a var
+/// name; harmless — it just binds a never-referenced name to the same workspace locus.)
+fn read_loop_vars(cond: &Script) -> Vec<String> {
+    let [stmt] = cond.0.as_slice() else {
+        return Vec::new();
+    };
+    let [Cmd::Simple(s)] = stmt.pipeline.commands.as_slice() else {
+        return Vec::new();
+    };
+    let words: Vec<String> = s.words.iter().map(Word::eval).collect();
+    if words.first().map(String::as_str) != Some("read") {
+        return Vec::new();
+    }
+    words[1..].iter().filter(|w| !w.starts_with('-')).cloned().collect()
+}
+
+/// The persistent bindings a STATEMENT establishes: a pure assignment `VAR=value` (a simple command
+/// with env and NO words). A prefix `VAR=x cmd` is excluded — per bash it doesn't persist and
+/// doesn't even affect `$VAR` in `cmd`'s own args. Each value is resolved against the bindings so far
+/// (so `B=$A/x` chains); a CERTAIN literal binds verbatim, an uncertain one binds the sentinel.
+fn statement_assignments(pipeline: &Pipeline) -> Vec<(String, String)> {
+    let [Cmd::Simple(s)] = pipeline.commands.as_slice() else {
+        return Vec::new();
+    };
+    if !s.words.is_empty() {
+        return Vec::new();
+    }
+    s.env.iter().map(|(name, value)| (name.clone(), certain_value(value))).collect()
+}
+
+/// A word's CERTAIN literal value for binding, or the unpinnable sentinel when uncertain. Resolves
+/// `$refs` against the current scope first, then requires no residual `$` and no substitution
+/// sentinel — a substitution (`$(…)`), an unbound var, or a reassignment-to-uncertain all fail here.
+fn certain_value(word: &Word) -> String {
+    let raw = crate::pathctx::expand_vars(&word.eval(), false).into_owned();
+    if raw.contains('$') || raw.contains("__SAFE_CHAINS_") {
+        UNCERTAIN_VALUE.to_string()
+    } else {
+        raw
+    }
+}
+
 #[cfg(test)]
 pub(crate) fn is_safe_script(script: &Script) -> bool {
     script_verdict(script).is_allowed()
@@ -104,14 +238,16 @@ pub(crate) fn is_safe_script(script: &Script) -> bool {
 
 pub(crate) fn pipeline_verdict(pipeline: &Pipeline) -> Verdict {
     let mut acc = Verdict::Allowed(SafetyLevel::Inert);
-    let mut prev: Option<&Cmd> = None;
+    // The representative path-locus of the CURRENT stream (the previous stage's stdout), threaded so
+    // a line-preserving filter carries the producer's locus THROUGH it: in `find ./src | head | xargs
+    // cat`, `head`'s output items are still `find`'s worktree paths, so `xargs` gates them there
+    // instead of worst-casing. In `A | xargs CMD`, xargs injects A's items as CMD's operands (the
+    // same idea as `find -exec`'s `{}` binding, sourced from the pipe).
+    let mut stream: Option<String> = None;
     for cmd in &pipeline.commands {
-        // In `A | xargs CMD`, xargs injects A's stdout items as CMD's operands. Bind the
-        // stdin-item representative to A's output-path locus so the injected operand is gated
-        // there (the same idea as `find -exec`'s `{}` binding, sourced from the pipe instead).
-        let _stdin = prev.map(|p| crate::pathctx::enter_stdin_repr(pipe_source_repr(p)));
+        let _stdin = stream.clone().map(crate::pathctx::enter_stdin_repr);
         acc = acc.combine(cmd_verdict(cmd));
-        prev = Some(cmd);
+        stream = Some(stage_output_repr(cmd, stream.as_deref()));
     }
     acc
 }
@@ -122,10 +258,11 @@ pub(crate) fn pipeline_verdict(pipeline: &Pipeline) -> Verdict {
 /// must deny in BOTH gate layers.
 const UNKNOWN_ITEM: &str = "/__SAFE_CHAINS_CMDSUB__";
 
-/// A representative PATH for the items `cmd` emits on stdout, used to gate an operand-injecting
-/// consumer downstream (`… | xargs cat`). Only producers that PROVABLY emit workspace-bounded
-/// paths yield a worktree representative; everything else worst-cases to `UNKNOWN_ITEM`.
-fn pipe_source_repr(cmd: &Cmd) -> String {
+/// A representative PATH for the items `cmd` emits on stdout given the stream repr it RECEIVED
+/// (`input`), used to gate an operand-injecting consumer downstream (`… | xargs cat`). A PRODUCER
+/// that provably emits workspace-bounded paths yields a worktree representative; a line-preserving
+/// FILTER carries `input` through unchanged; everything else worst-cases to `UNKNOWN_ITEM`.
+fn stage_output_repr(cmd: &Cmd, input: Option<&str>) -> String {
     let Cmd::Simple(s) = cmd else {
         return UNKNOWN_ITEM.to_string();
     };
@@ -135,6 +272,7 @@ fn pipe_source_repr(cmd: &Cmd) -> String {
     };
     let name = Token::from_raw(first.clone()).command_name().to_string();
     let args: Vec<&str> = words[1..].iter().map(String::as_str).collect();
+    let through = || input.unwrap_or(UNKNOWN_ITEM).to_string();
     match name.as_str() {
         // find/fd emit paths UNDER their roots — the child of the worst root carries its locus.
         "find" | "fd" | "fdfind" => {
@@ -157,8 +295,53 @@ fn pipe_source_repr(cmd: &Cmd) -> String {
             Some(&"ls-files") | Some(&"diff") | Some(&"status") | Some(&"grep") => "sc_item".to_string(),
             _ => UNKNOWN_ITEM.to_string(),
         },
+        // Line-preserving FILTERS: each output line is a WHOLE, unchanged input line, so the stream's
+        // item locus is unchanged — carry `input` through. Only when reading stdin (no file operand)
+        // and not byte-slicing (`head -c`, which can split a path); NOT `grep -o`/`sed`/`awk`/`cut`/`tr`
+        // (they can rewrite a line to ANY path — treating those as passthrough would be a bypass).
+        "sort" | "uniq" | "cat" | "tac" if !reads_a_file(&args) => through(),
+        "head" | "tail"
+            if !reads_a_file_after_count(&args)
+                && !args.iter().any(|a| *a == "-c" || a.starts_with("--bytes")) =>
+        {
+            through()
+        }
+        // tee always forwards stdin→stdout (its file args are extra WRITES, gated elsewhere).
+        "tee" => through(),
         _ => UNKNOWN_ITEM.to_string(),
     }
+}
+
+/// Whether a filter reads a FILE rather than stdin (so it is NOT a stdin passthrough): a
+/// positional operand, or `sort`'s `--files0-from=F` / `--files0-from F`, which redirects it to
+/// emit the CONTENTS of the files listed in `F` — arbitrary file-derived output, not the piped
+/// stream. A lone `-` (explicit stdin) doesn't count. The `=`-glued flag form is a single token
+/// starting with `-`, so it must be matched explicitly or it would masquerade as a passthrough.
+fn reads_a_file(args: &[&str]) -> bool {
+    args.iter().any(|a| {
+        (!a.starts_with('-') && *a != "-")
+            || *a == "--files0-from"
+            || a.starts_with("--files0-from=")
+    })
+}
+
+/// Like `reads_a_file`, but skips the VALUE of `head`/`tail`'s count flags (`-n N`, `-c N`) so
+/// `head -n 5` (stdin) isn't mistaken for reading a file named `5`.
+fn reads_a_file_after_count(args: &[&str]) -> bool {
+    let mut i = 0;
+    while i < args.len() {
+        let a = args[i];
+        if matches!(a, "-n" | "-c" | "--lines" | "--bytes") {
+            i += 2; // flag + its value
+            continue;
+        }
+        if a.starts_with('-') || a == "-" {
+            i += 1;
+            continue;
+        }
+        return true; // a bare positional → a file operand
+    }
+    false
 }
 
 /// Whether reading `path` is admitted — i.e. it is a workspace-bounded source (worktree, `/tmp`,
@@ -255,9 +438,19 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
             if let Verdict::Denied = redir_v {
                 return Verdict::Denied;
             }
-            script_verdict(cond)
-                .combine(script_verdict(body))
-                .combine(redir_v)
+            let cond_v = script_verdict(cond);
+            // `while read VAR; do … "$VAR" …` — bind each read var to the piped stdin's item locus,
+            // exactly as the `for`-loop binds its list var, so `find ./src | while read f; do cat "$f"`
+            // reads the worktree instead of fail-closing on the bare `$f`. Only when a modeled source
+            // set the stdin repr; otherwise the vars stay unbound (fail-closed).
+            let _binds: Vec<crate::pathctx::LoopGuard> = match crate::pathctx::stdin_item_repr() {
+                Some(repr) => read_loop_vars(cond)
+                    .into_iter()
+                    .map(|v| crate::pathctx::enter_loop_var(v, repr.clone(), repr.clone()))
+                    .collect(),
+                None => Vec::new(),
+            };
+            cond_v.combine(script_verdict(body)).combine(redir_v)
         }
         Cmd::If {
             branches,
@@ -280,6 +473,10 @@ pub(crate) fn cmd_verdict(cmd: &Cmd) -> Verdict {
         Cmd::DoubleBracket { words, redirs } => {
             words_sub_verdict(words).combine(redirect_verdict(redirs))
         }
+        // Defining a function has NO effect — Inert regardless of the body. The body's safety is
+        // evaluated only when the function is CALLED (resolved in `simple_verdict`), so an UNCALLED
+        // definition never denies on its body.
+        Cmd::FunctionDef { .. } => Verdict::Allowed(SafetyLevel::Inert),
     }
 }
 
@@ -336,7 +533,28 @@ fn simple_verdict(cmd: &SimpleCmd) -> Verdict {
         return sub_v.combine(redir_v);
     }
 
-    if cmd.words[0].eval() == "eval" {
+    let name = cmd.words[0].eval();
+
+    // Function CALL: a user function SHADOWS everything it names, INCLUDING builtins like `eval`
+    // (`eval(){ rm -rf /; }; eval "echo hi"` runs the function, not eval) — so resolve a defined name
+    // FIRST, before the eval special-case and the leaf dispatch. Classify its BODY with $1..$N bound
+    // to the call's args (certain literals; uncertain → unpinnable). The shadow is UNCONDITIONAL: if
+    // resolution is blocked (recursion / depth / budget) we FAIL CLOSED, never fall through to the
+    // real command — otherwise `…512 calls…; ls(){ rm -rf /; }; ls` would exhaust the budget and then
+    // run the real `ls` for the rebound name, a bypass.
+    if let Some(body) = lookup_function(&name) {
+        let Some(_resolving) = begin_resolving(&name) else {
+            return Verdict::Denied;
+        };
+        let _args: Vec<crate::pathctx::VarGuard> = cmd.words[1..]
+            .iter()
+            .enumerate()
+            .map(|(i, w)| crate::pathctx::enter_var((i + 1).to_string(), certain_value(w)))
+            .collect();
+        return sub_v.combine(script_verdict(&body)).combine(redir_v);
+    }
+
+    if name == "eval" {
         return eval_verdict(cmd).combine(sub_v).combine(redir_v);
     }
 

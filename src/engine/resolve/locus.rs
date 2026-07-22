@@ -76,7 +76,7 @@ fn url_escapes_cwd(url: &str) -> bool {
 fn classify_local(path: &str, want_write: bool) -> LocalLocus {
     // A bound `for`-loop variable expands to its list's representative item first (its read or
     // write representative), so `$f` inherits the list's locus; then the ambient cwd/root.
-    let expanded = crate::pathctx::expand_loop(path, want_write);
+    let expanded = crate::pathctx::expand_vars(path, want_write);
     let resolved = crate::pathctx::resolve(&expanded);
     let canonical = canonicalize(&resolved);
     if is_unpinnable(&canonical) {
@@ -150,7 +150,7 @@ pub(crate) fn classify_locus(path: &str) -> LocalLocus {
 /// Whether reading `path` extracts a secret (a known credential store). Consumed by the
 /// secret-facet enrichment (follow-on); also drives the overreach nudge's credential-store wording.
 pub(crate) fn reads_secret(path: &str) -> bool {
-    let expanded = crate::pathctx::expand_loop(path, false);
+    let expanded = crate::pathctx::expand_vars(path, false);
     let resolved = crate::pathctx::resolve(&expanded);
     !is_unpinnable(&resolved) && classify_region(&resolved).reads_secret
 }
@@ -160,7 +160,7 @@ pub(crate) fn reads_secret(path: &str) -> bool {
 /// instead of the generic "outside the working directory". Mirrors `classify_local`'s front-end so
 /// it sees the same `~`-form path `adjacent_role` classifies.
 pub(crate) fn hidden_peer_reach(path: &str) -> bool {
-    let expanded = crate::pathctx::expand_loop(path, false);
+    let expanded = crate::pathctx::expand_vars(path, false);
     let resolved = crate::pathctx::resolve(&expanded);
     let canonical = canonicalize(&resolved);
     is_hidden_peer(&canonical)

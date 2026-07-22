@@ -176,6 +176,7 @@ fn collect_cmd<'a>(cmd: &'a Cmd, out: &mut Vec<&'a SimpleCmd>) {
                 collect_word(word, out);
             }
         }
+        Cmd::FunctionDef { body, .. } => collect_script(body, out),
     }
 }
 
