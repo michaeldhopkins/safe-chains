@@ -2088,6 +2088,14 @@ use super::*;
             "kubectl get -n prod secret db",
             "aws configure get aws_secret_access_key",
             "aws configure get aws_session_token",
+            // kubectl resource kinds are case-INSENSITIVE upstream (`get Secret` reads secrets), so
+            // every case-variant must deny too — matched via `secret`/`first_arg=["*"]` otherwise.
+            "kubectl get Secret db -o yaml",
+            "kubectl get SECRET",
+            "kubectl get Secrets",
+            "kubectl get Secret/db -o yaml",
+            "kubectl get SECRET.v1.core db",
+            "aws configure get AWS_SECRET_ACCESS_KEY",
         ] {
             assert!(!crate::is_safe_command(c), "credential first-arg must deny: {c}");
         }
@@ -2095,6 +2103,7 @@ use super::*;
             "kubectl get pods",
             "kubectl get mycustomresource",
             "kubectl get secretstore db", // a CRD whose name merely starts with "secret" — not gated
+            "kubectl get SecretStore db", // …and the case-insensitive deny must not over-gate it
             "kubectl get pod my-pod -o yaml",
             "aws configure get region",
             "aws configure get output",
