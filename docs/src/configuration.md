@@ -119,6 +119,38 @@ Cursor exposes a dedicated `beforeShellExecution` event that fires only on shell
 
 Cursor hooks fail-open by default. If you want safe-chains failures to block (rather than silently letting commands through), add `"failClosed": true` to the entry.
 
+## Grok CLI (xAI)
+
+Run `safe-chains --setup --tool=grok` to write `~/.grok/hooks/safe-chains.json`. Grok's shell tool is `run_terminal_command`, matched by `Bash`. Manual config:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "safe-chains hook grok",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+A Grok hook can only *block* a command — an allowing hook "declines to deny" rather than granting it, so safe-chains vetoes commands it doesn't recognize and leaves safe ones to Grok's own approval flow (same as Cursor and Codex).
+
+**One extra setup step.** Grok auto-loads your `~/.claude/settings.json` hooks for Claude compatibility. If safe-chains is also installed for Claude Code, Grok will *additionally* run the Claude hook on every command — it can't read Grok's request format, so it does nothing (harmless, but noisy). Silence it by adding to `~/.grok/config.toml`:
+
+```toml
+[compat.claude]
+hooks = false
+```
+
 ## Antigravity CLI (`agy`)
 
 Run `safe-chains --setup --tool=antigravity` to write `~/.gemini/config/hooks.json`. Antigravity matches its shell tool by the name `run_command`. Manual config:

@@ -9,6 +9,7 @@ pub mod copilot;
 pub mod cursor;
 pub mod droid;
 pub mod gemini;
+pub mod grok;
 pub mod opencode;
 pub mod qwen;
 
@@ -144,6 +145,7 @@ pub fn registry() -> Vec<Box<dyn Target>> {
         Box::new(agy::AntigravityTarget),
         Box::new(cursor::CursorTarget),
         Box::new(gemini::GeminiTarget),
+        Box::new(grok::GrokTarget),
         Box::new(copilot::CopilotTarget),
         Box::new(qwen::QwenTarget),
         Box::new(droid::DroidTarget),

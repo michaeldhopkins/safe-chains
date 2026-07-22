@@ -28,12 +28,13 @@ independently exercised.
 | **Droid** | ✅ | ◻️ **Assumed** (Claude-Code mirror) | Same shape; shell tool is `Execute`, not `Bash`. |
 | **Cursor** | ✅ | ✅ **Verified live → DENY harness** (`cursor-agent` v2026.07.16) | `deny` works (blocks + shows our message); `allow` is ignored (a known cursor bug). Decision: emit `deny` for gated commands so safe-chains is protective (like Codex); keep `allow` for safe (inert until cursor honors it). Revisit if the bug is fixed. See §Cursor. |
 | **Copilot** | ✅ | ✅ **Verified live** (v1.0.71) | Hook FIRES (per-repo `.github/hooks/*.json`); allow AND deny BOTH honored (allow auto-runs + suppresses copilot's own prompt; deny blocks + shows our reason). Fixed two bugs: user path `~/.github/hooks` → **`~/.copilot/hooks`**, and the stale "deny-only" note. See §Copilot. |
+| **Grok** | ✅ | ✅ **Verified live → DENY harness** (`grok` v0.2.106, 2026-07) | Native `~/.grok/hooks/safe-chains.json`; **camelCase** envelope (`toolInput.command`, `workspaceRoot`); top-level `decision` + exit 2. Drove the TUI: `cat /etc/hosts` **blocked** (didn't run; reason shown to UI *and* model), `ls -la` ran. `allow` only "declines to deny" (not a grant — like Cursor/Codex). ⚠ grok auto-loads the Claude hook via compat and fails open on it — set `[compat.claude] hooks=false`. See §Grok. |
 | **opencode** | ❌ | 🚫 **Not integrated — `--opencode-config` DROPPED** (2026-07) | No usable hook (plugin hook broken, [#7006](https://github.com/anomalyco/opencode/issues/7006)); a static glob allowlist can't express per-arg safety. The flag/stub/renderer were removed; the target stays for detection only. **Watch #7006** to revisit. See §opencode. |
 
 **Remaining live-verification work:** only Qwen/Droid (both "assumed" Claude-Code mirrors) — optionally
-exercise to upgrade to "verified". Copilot is now verified live (allow+deny both honored — see §Copilot);
-Cursor is done (a DENY harness, `allow` ignored on the CLI); Gemini is closed out via `agy`;
-Claude/Codex/agy done; opencode not integrable.
+exercise to upgrade to "verified". Grok is now verified live (a DENY harness — see §Grok); Copilot is
+verified live (allow+deny both honored — see §Copilot); Cursor is done (a DENY harness, `allow` ignored
+on the CLI); Gemini is closed out via `agy`; Claude/Codex/agy done; opencode not integrable.
 
 ## The model we rely on
 
@@ -78,6 +79,7 @@ run) while never actually auto-approving. Tests assert the exact field.
 | Gemini  | `^run_shell_command$`   | `{decision: ...}`                      | `decision`          | allow / deny **only** | ms |
 | Cursor  | (settings `version: 1`) | flat object                            | `permission`        | **deny** honored; `allow`/`ask` IGNORED (allowlist wins — cursor bug) | — |
 | Copilot | (no matcher; self-filter on `toolName`) | flat object, `toolArgs` is a nested JSON string | `permissionDecision` | **allow AND deny honored** (v1.0.71; was thought deny-only) | `timeoutSec` |
+| Grok    | `Bash` (aliases grok's `run_terminal_command`); config nests under top-level `hooks` | `{toolInput: {command}, workspaceRoot}` **camelCase** | top-level `decision` (+ exit **2** = deny) | **deny** honored (gated); `allow` "declines to deny" (safe, inert) | seconds |
 
 Notes:
 - **Droid**'s shell tool is `Execute`, not `Bash` — a `Bash` matcher never fires.
@@ -85,6 +87,17 @@ Notes:
 - **Copilot** today only acts on `deny`; for a safe command the honest answer is
   "no opinion" (empty), letting its allow-by-default apply. We still emit an
   allow-shaped envelope so future Copilot releases that honor allow can use it.
+
+### Grok — verified live 2026-07, `grok` v0.2.106
+
+- **What it is:** xAI's official Grok CLI ("Grok Build"), a closed-source Rust binary (`~/.local/bin/grok`), config root `~/.grok/`. Heavily Claude-compatible (`--allow`/`--deny`, `--permission-mode`, reads `.claude/settings.json`).
+- **Docs:** `~/.grok/docs/user-guide/10-hooks.md` (hooks), `22-permissions-and-safety.md` (the permission gauntlet).
+- **Config:** hooks are discovered from every `~/.grok/hooks/*.json` (global, **always trusted** — no folder-trust). We own a dedicated `~/.grok/hooks/safe-chains.json`, nested `{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"safe-chains hook grok"}]}]}}` (same nesting as Codex; a flat `PreToolUse` key would be rejected). `matcher:"Bash"` matches grok's real tool `run_terminal_command`.
+- **Input envelope (camelCase — differs from Claude/Codex snake_case):** command at `toolInput.command`, project root at `workspaceRoot` (also env `GROK_WORKSPACE_ROOT` / `CLAUDE_PROJECT_DIR`), `cwd`, `sessionId`. Getting the casing wrong parses to nothing and fails OPEN — pinned by `parse_input_rejects_snake_case_envelope`.
+- **Decision contract:** top-level **`decision`** (`"allow"`/`"deny"`), NOT `hookSpecificOutput`. Exit codes: 0=allow, **2=deny**, anything-else=fail-OPEN. A `deny` in stdout is honored regardless of exit code; we emit both (JSON + exit 2).
+- **Capability → DENY harness (like Cursor/Codex).** A hook `allow` is **not a grant**: `22-permissions-and-safety.md` — "a hook that allows a call does not skip the checks below; it only declines to deny." So safe-chains **cannot auto-approve** safe commands on grok (they still run grok's own gauntlet / prompt); its only lever is **deny**, and a gated command must be vetoed (else `bypassPermissions`/`dontAsk` mode runs it). No `additionalContext` channel → `render_context` stays abstain.
+- **Live verification (drove the TUI, 2026-07):** `cat /etc/hosts` → grok showed `⚠ run_terminal_command blocked by hook global/safe-chains…`, the command did **not** run, and our reason reached both the UI and the model. `ls -la` → ran (safe, not over-blocked).
+- **⚠ Compat trap:** grok auto-loads `~/.claude/settings.json` hooks by default (Claude compat), so with safe-chains installed as the Claude hook, grok also runs `safe-chains hook claude` on its **camelCase** envelope — the Claude parser can't read it and it fails OPEN (harmless, since our native grok hook's deny wins, but it's noise). The native `grok` target is required regardless. Silence the duplicate with `[compat.claude] hooks = false` in `~/.grok/config.toml`.
 
 ### Codex — researched 2026-07-13, v0.144.3 (probe-verified)
 
