@@ -131,6 +131,12 @@ Aliases: `gdircolors`
 - Allowed standalone flags: --bourne-shell, --c-shell, --csh, --help, --print-database, --print-ls-colors, --sh, --version, -V, -b, -c, -h, -p
 - Bare invocation allowed
 
+### `envsubst`
+<p class="cmd-url"><a href="https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html">https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html</a></p>
+
+- Allowed standalone flags: --help, --variables, --version, -V, -h, -v
+- Bare invocation allowed
+
 ### `expand`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#expand-invocation</a></p>
 

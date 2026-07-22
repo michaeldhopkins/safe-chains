@@ -43,6 +43,9 @@
 - **env**: Flags: --help, -h, -json
 - **help**: Positional args accepted
 - **list**: Flags: --help, -a, -asan, -compiled, -cover, -deps, -e, -export, -find, -h, -linkshared, -m, -modcacherw, -msan, -n, -race, -retract, -test, -trimpath, -u, -v, -versions, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -f, -gccgoflags, -gcflags, -installsuffix, -json, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -reuse, -tags
+- **mod graph**: Flags: --help, -h
+- **mod verify**: Flags: --help, -h
+- **mod why**: Flags: --help, --m, --vendor, -h. Positional args accepted
 - **run**: Runs a workspace-local script/package (the first positional). Flags: --help, -a, -asan, -cover, -h, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -tags
 - **test**: Flags: --help, -a, -asan, -benchmem, -cover, -failfast, -h, -json, -linkshared, -modcacherw, -msan, -n, -race, -short, -trimpath, -v, -work, -x. Valued: -asmflags, -bench, -benchtime, -blockprofile, -blockprofilerate, -buildmode, -buildvcs, -compiler, -count, -covermode, -coverpkg, -coverprofile, -cpu, -cpuprofile, -fuzz, -fuzzminimizetime, -fuzztime, -gccgoflags, -gcflags, -installsuffix, -ldflags, -list, -memprofile, -memprofilerate, -mod, -modfile, -mutexprofile, -mutexprofilefraction, -o, -outputdir, -overlay, -p, -parallel, -pgo, -pkgdir, -run, -shuffle, -skip, -tags, -timeout, -trace
 - **version**: Flags: --help, -h, -m, -v

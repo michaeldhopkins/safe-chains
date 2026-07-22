@@ -17,13 +17,3 @@ level = "Inert"
 bare = false
 max_positional = 0
 standalone = ["--help", "--version", "-v"]
-
-[[command]]
-name = "as"
-description = "macOS assembler. As of recent toolchains the standalone `as` binary is deprecated and delegates to clang's integrated assembler. Invocation compiles `.s` source into a `.o` object file (or whatever -o names). Identical execution-risk profile to clang itself: the produced object is later linked and run."
-url = "https://keith.github.io/xcode-man-pages/as.1.html"
-researched_version = "macOS 14 / Xcode 15 (man page dated 2023-08-23)"
-level = "Inert"
-bare = false
-max_positional = 0
-standalone = ["--help", "--version", "-v"]

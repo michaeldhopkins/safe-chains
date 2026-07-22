@@ -20,11 +20,12 @@ valued = ["--domain", "--env", "-d", "-e"]
 
 [[command]]
 name = "envsubst"
-description = "Substitutes environment variable references in stdin and writes the result to stdout. Pure filter; no filesystem writes. GNU gettext."
+description = "GNU gettext's variable-substitution filter. In normal mode it copies standard input to standard output, replacing $VAR / ${VAR} references with the corresponding environment-variable values; a SHELL-FORMAT operand restricts substitution to the variables named in it. With --variables/-v it instead prints, one per line, the variable names referenced in SHELL-FORMAT (standard input is ignored). Pure reader plus stdin transform: it observes environment variables and stdin only and writes to stdout -- it never reads or writes the filesystem, runs no external code, and touches no network. As with printenv, output may surface sensitive values (API keys, tokens) that happen to be present in the environment. Stable for decades; unchanged flag surface through gettext 1.0."
 url = "https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html"
-researched_version = "GNU gettext 0.23"
+researched_version = "GNU gettext 1.0"
 level = "Inert"
 bare = true
+max_positional = 1
 standalone = ["--help", "--variables", "--version", "-V", "-h", "-v"]
 
 [[command]]

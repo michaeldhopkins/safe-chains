@@ -1,17 +1,22 @@
 [[command]]
 name = "pgrep"
-description = "Searches for processes by name or attribute; supported with match, filter, and output flags."
+description = "Read-only process lookup: scans the live process table for processes whose name (or, with -f, whole command line) matches a pattern, and prints their PIDs — optionally with the process name (-l) or full argv (-a). It is the observe-only companion to pkill(1) and never sends a signal or changes any process state. Selection flags only NARROW which matching processes are listed: by real/effective uid (-U/-u), group (-G/-g), parent (-P), session (-s), controlling terminal (-t), pid file contents (-F, reads the named file), and — on the procps-ng flavor — control group (--cgroup), namespaces (--ns/--nslist), run state (-r), and age (-O). On the FreeBSD/macOS flavor the same selection role is served by login class (-c), jail (-j), and a core/namelist source (-M/-N) that reads the named file; all are pure reads of process or file metadata. Two flavors share the name: procps-ng on Linux (long forms, --count, -w/--lightweight, -A/--ignore-ancestors) and FreeBSD/macOS (adds -q to suppress output, -S to include system processes). Note -c differs: procps-ng -c/--count prints a count, FreeBSD/macOS -c takes a login-class value — both remain read-only. No network, no code execution, no persistence."
 url = "https://man7.org/linux/man-pages/man1/pgrep.1.html"
+researched_version = "procps-ng 4.0.6 (pgrep(1)); FreeBSD 14 / macOS 14 pgrep(1)"
 level = "Inert"
 bare = false
 standalone = [
-    "--count", "--delimiter", "--full", "--help", "--inverse",
-    "--lightweight", "--list-full", "--list-name",
+    "--count", "--exact", "--full", "--help",
+    "--ignore-ancestors", "--ignore-case", "--inverse",
+    "--lightweight", "--list-full", "--list-name", "--logpidfile",
     "--newest", "--oldest", "--version",
-    "-L", "-V", "-a", "-c", "-f", "-h", "-i", "-l", "-n", "-o", "-v", "-w", "-x",
+    "-A", "-L", "-S", "-V", "-a", "-c", "-f", "-h", "-i", "-l",
+    "-n", "-o", "-q", "-v", "-w", "-x",
 ]
 valued = [
-    "--euid", "--group", "--parent", "--pgroup", "--pidfile",
+    "--cgroup", "--delimiter", "--euid", "--group", "--ns", "--nslist",
+    "--older", "--parent", "--pgroup", "--pidfile", "--runstates",
     "--session", "--terminal", "--uid",
-    "-F", "-G", "-P", "-U", "-d", "-g", "-s", "-t", "-u",
+    "-F", "-G", "-M", "-N", "-O", "-P", "-U", "-d", "-g", "-j",
+    "-r", "-s", "-t", "-u",
 ]

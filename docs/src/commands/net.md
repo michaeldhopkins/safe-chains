@@ -514,6 +514,30 @@ Aliases: `traceroute6`
 - Allowed standalone flags: -h, -v, -d, -D, -r, -4, -6
 - Allowed valued flags: -c, -t, -y, -f, -F, -C
 
+### `wg`
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/wg.8.html">https://man7.org/linux/man-pages/man8/wg.8.html</a></p>
+
+- **genkey**: Flags: --help, -h
+- **genpsk**: Flags: --help, -h
+- **help**: Flags: --help, -h
+- **pubkey**: Flags: --help, -h
+- **show**: Flags: --help, all, interfaces, allowed-ips, dump, endpoints, fwmark, latest-handshakes, listen-port, peers, persistent-keepalive, preshared-keys, private-key, public-key, transfer, -h
+- **showconf**: Flags: --help, -h
+- Allowed standalone flags: --help, --version, -h
+- Bare invocation allowed
+
+**Examples:**
+
+- `wg`
+- `wg show`
+- `wg show all`
+- `wg show wg0`
+- `wg show wg0 endpoints`
+- `wg showconf wg0`
+- `wg genkey`
+- `wg genpsk`
+- `wg pubkey`
+
 ### `wget`
 <p class="cmd-url"><a href="https://www.gnu.org/software/wget/">https://www.gnu.org/software/wget/</a></p>
 
