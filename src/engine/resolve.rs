@@ -51,8 +51,8 @@ pub(crate) fn loop_reprs(items: &[String]) -> Option<(String, String)> {
     let write_item = faced.iter().max_by_key(|(_, _, w)| *w).map(|(s, _, _)| s.clone())?;
     // Freeze against the CURRENT (outer) loop bindings, so an inner representative like `$d/x`
     // doesn't carry a stale outer variable into the body — nested loops compose.
-    let read_repr = crate::pathctx::expand_loop(&read_item, false).into_owned();
-    let write_repr = crate::pathctx::expand_loop(&write_item, true).into_owned();
+    let read_repr = crate::pathctx::expand_vars(&read_item, false).into_owned();
+    let write_repr = crate::pathctx::expand_vars(&write_item, true).into_owned();
     Some((read_repr, write_repr))
 }
 

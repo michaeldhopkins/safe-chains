@@ -65,6 +65,13 @@ pub enum Cmd {
         words: Vec<Word>,
         redirs: Vec<Redir>,
     },
+    /// `name() { body }` (or `function name { body }`). Defining a function has NO effect — it is
+    /// classified Inert. The body's safety matters only when the function is CALLED (resolved in
+    /// `check`), so it is stored, not flattened.
+    FunctionDef {
+        name: String,
+        body: Script,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -237,6 +244,10 @@ impl Cmd {
             Cmd::DoubleBracket { words, redirs } => Cmd::DoubleBracket {
                 words: words.iter().map(|w| w.normalize()).collect(),
                 redirs: normalize_redirs(redirs),
+            },
+            Cmd::FunctionDef { name, body } => Cmd::FunctionDef {
+                name: name.clone(),
+                body: body.normalize_as_body(),
             },
         }
     }

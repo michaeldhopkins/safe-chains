@@ -132,8 +132,34 @@ fn arb_cmd(depth: u32) -> BoxedStrategy<Cmd> {
         ).prop_map(|(branches, else_body)| Cmd::If { branches, else_body, redirs: vec![] }),
         1 => prop::collection::vec(arb_word(0), 1..4)
             .prop_map(|words| Cmd::DoubleBracket { words, redirs: vec![] }),
+        1 => (arb_func_name(), arb_script(depth - 1))
+            .prop_map(|(name, body)| Cmd::FunctionDef { name, body }),
     ]
     .boxed()
+}
+
+/// A function name: an identifier that isn't a shell keyword (so `for(){…}` isn't generated, keeping
+/// the roundtrip unambiguous with the keyword-compound parsers).
+fn arb_func_name() -> impl Strategy<Value = String> {
+    prop::string::string_regex("[a-z][a-z0-9_]{0,7}")
+        .expect("valid regex")
+        .prop_filter("not a shell keyword", |s| !starts_with_keyword(s))
+}
+
+/// A path value spanning safe (in-workspace) and hot (system/home/parent/credential) loci, with no
+/// `$` or shell-special chars so it drops cleanly into both the `VAR=…` and the expanded command.
+fn arb_locus_value() -> impl Strategy<Value = String> {
+    prop_oneof![
+        Just("./data".to_string()),
+        Just("sub/dir".to_string()),
+        Just("/work/inside".to_string()),
+        Just("/etc".to_string()),
+        Just("/var/log".to_string()),
+        Just("../outside".to_string()),
+        Just("~/.ssh".to_string()),
+        Just("/Users/x/.aws".to_string()),
+        prop::string::string_regex("[a-z][a-z0-9_./-]{0,10}").expect("valid regex"),
+    ]
 }
 
 fn arb_pipeline(depth: u32) -> BoxedStrategy<Pipeline> {
@@ -259,6 +285,66 @@ proptest! {
         let a = word.eval();
         let b = word.eval();
         prop_assert_eq!(a, b);
+    }
+
+    /// A function DEFINITION has no effect, so it is Inert/allowed for ANY body — even one that, run,
+    /// would be denied (`f(){ rm -rf /; }`). Safety comes from classifying the CALL, not the def.
+    #[test]
+    fn function_definition_is_always_inert(script in arb_script(1), pos in 0..8usize) {
+        let unsafe_body = inject_unsafe_into_script(&script, pos);
+        let def = Cmd::FunctionDef { name: "f".into(), body: unsafe_body };
+        prop_assert_eq!(
+            check::cmd_verdict(&def),
+            crate::verdict::Verdict::Allowed(crate::verdict::SafetyLevel::Inert),
+            "a function definition must classify Inert regardless of its body"
+        );
+    }
+
+    /// FAITHFULNESS (the security crux): binding a CERTAIN literal is EXACTLY manual substitution —
+    /// `VAR=<lit>; cmd $VAR/<suf>` must classify identically to `cmd <lit>/<suf>`. If these ever
+    /// disagree, resolution has under- or over-approved relative to what bash actually runs. Covers
+    /// safe (`./data`) and hot (`/etc`, `~/.ssh`, `../out`) values, and read (`cat`) and write (`tee`).
+    #[test]
+    fn var_substitution_matches_manual_expansion(
+        value in arb_locus_value(),
+        suffix in "[a-z][a-z0-9_./]{0,10}",
+        // Span the classifier paths: engine readers/writers (cat/tee/grep), a legacy pathgate reader
+        // (od) and in-place writer (sed -i), and a coreutil (head) — substitution must be consistent
+        // across ALL of them, or a bound var to a hot path could slip a layer that doesn't expand.
+        reader in prop_oneof![
+            Just("cat"), Just("tee"), Just("grep x"), Just("od"), Just("head -1"),
+            Just("sed -i s/a/b/"),
+        ],
+    ) {
+        let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some("/work".into()), root: Some("/work".into()),
+        });
+        let with_var = format!("VAR={value}; {reader} $VAR/{suffix}");
+        let expanded = format!("{reader} {value}/{suffix}");
+        prop_assert_eq!(
+            crate::is_safe_command(&with_var),
+            crate::is_safe_command(&expanded),
+            "resolution disagreed with expansion:\n  `{}`\n  `{}`", with_var, expanded
+        );
+    }
+
+    /// FAITHFULNESS for function args: `f(){ cmd "$1"; }; f <lit>` must classify identically to
+    /// `cmd <lit>` — the call resolves to its body with $1 bound to the literal arg.
+    #[test]
+    fn function_arg_binding_matches_direct_call(
+        value in arb_locus_value(),
+        reader in prop_oneof![Just("cat"), Just("tee")],
+    ) {
+        let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some("/work".into()), root: Some("/work".into()),
+        });
+        let via_fn = format!("f(){{ {reader} \"$1\"; }}; f {value}");
+        let direct = format!("{reader} {value}");
+        prop_assert_eq!(
+            crate::is_safe_command(&via_fn),
+            crate::is_safe_command(&direct),
+            "arg binding disagreed:\n  `{}`\n  `{}`", via_fn, direct
+        );
     }
 
     #[test]
@@ -519,5 +605,116 @@ proptest! {
         let mangled = format!("{cmd}{suffix} --version");
         prop_assert!(!crate::is_safe_command(&mangled),
             "Unicode-suffixed command was approved: {}", mangled);
+    }
+}
+
+// ── Function/variable resolution: concrete cases ────────────────────────────────────────────────
+#[cfg(test)]
+mod resolution {
+    use super::super::*;
+
+    fn workspace() -> crate::pathctx::Guard {
+        crate::pathctx::enter(crate::pathctx::PathCtx {
+            cwd: Some("/work".into()),
+            root: Some("/work".into()),
+        })
+    }
+    fn allowed(cmd: &str) -> bool {
+        crate::is_safe_command(cmd)
+    }
+
+    #[test]
+    fn a_definition_shadows_a_builtin_so_the_call_is_the_body() {
+        // The security case Phase 1 alone opened: a function redefines a safe builtin. The CALL must
+        // classify the BODY, not the real command.
+        assert!(!allowed("ls(){ rm -rf /; }; ls"), "rebound ls to rm must DENY");
+        assert!(allowed("ls(){ echo hi; }; ls"), "rebound ls to echo must ALLOW");
+        // …and only AFTER the definition — a call before it is still the real command.
+        assert!(allowed("ls; ls(){ rm -rf /; }"), "ls before its definition is the real ls");
+    }
+
+    #[test]
+    fn call_resolves_body_and_binds_args() {
+        let _w = workspace();
+        assert!(allowed("greet(){ echo hi; }; greet"), "no-arg safe body");
+        assert!(allowed("greet(){ cat \"$1\"; }; greet ./notes.txt"), "$1 = in-workspace read");
+        assert!(!allowed("greet(){ cat \"$1\"; }; greet /etc/shadow"), "$1 = system read denies");
+        assert!(!allowed("greet(){ rm -rf \"$1\"; }; greet /"), "$1 into rm -rf / denies");
+    }
+
+    #[test]
+    fn var_assignment_substitutes_by_locus() {
+        let _w = workspace();
+        assert!(allowed("GEM=./data; cat $GEM/notes.txt"), "in-workspace resolves + allows");
+        assert!(!allowed("GEM=/etc; cat $GEM/hosts"), "system path resolves + denies");
+        assert!(allowed("A=./d; B=$A/sub; cat $B/x"), "chained certain assignments resolve");
+    }
+
+    #[test]
+    fn uncertain_and_unbound_fail_closed() {
+        let _w = workspace();
+        assert!(!allowed("GEM=$(evilcmd); cat $GEM/x"), "cmd-sub value is uncertain → deny");
+        assert!(!allowed("cat $UNDEFINED/x"), "unbound var → untouched → deny");
+        // reassignment to uncertain must not leave the earlier certain value live.
+        assert!(!allowed("GEM=./safe; GEM=$(x); cat $GEM/f"), "stale certain value must not survive");
+        // last CERTAIN assignment wins — here to a system path.
+        assert!(!allowed("GEM=./safe; GEM=/etc; cat $GEM/f"), "last assignment (/etc) wins → deny");
+    }
+
+    #[test]
+    fn a_shadowed_builtin_never_falls_through_when_resolution_is_blocked() {
+        // A defined function shadows the builtin UNCONDITIONALLY. If resolution is blocked — by the
+        // classification budget (exhaust it with harmless calls first) or by recursion — the call
+        // must FAIL CLOSED, never run the real command. Else the rebound name is a bypass.
+        let exhaust = "g;".repeat(600);
+        let budget = format!("g(){{ echo hi; }}; ls(){{ rm -rf /; }}; {exhaust} ls");
+        assert!(!allowed(&budget), "budget-blocked rebind must not fall through to real ls");
+        assert!(!allowed("ls(){ ls; }; ls"), "recursion-blocked rebind must not fall through to real ls");
+    }
+
+    #[test]
+    fn a_function_shadows_the_eval_builtin() {
+        // A user function named `eval` shadows the eval builtin (`eval(){ rm; }; eval "echo hi"` runs
+        // the function). Resolution must run BEFORE the eval special-case, or the rebind is a bypass.
+        assert!(!allowed(r#"eval(){ rm -rf /; }; eval "echo hi""#), "rebound eval to rm must DENY");
+        assert!(allowed("eval(){ echo hi; }; eval x"), "rebound eval to echo must ALLOW");
+    }
+
+    #[test]
+    fn passthrough_filters_carry_the_pipe_locus() {
+        let _w = workspace();
+        // A line-preserving filter (head/tail/sort/uniq/cat/tee) between a producer and an injecting
+        // consumer must carry the producer's item locus THROUGH — else xargs worst-cases and denies.
+        assert!(allowed("find /work -type f | head -1 | xargs cat"), "head passes find's locus");
+        assert!(allowed("find ./src | sort | uniq | xargs cat"), "sort|uniq chain passes through");
+        // …but a TRANSFORMING filter must NOT (it can rewrite a line to any path — a bypass).
+        assert!(!allowed("find ./src | sed s@.*@/etc/shadow@ | xargs cat"), "sed rewrite must not pass through");
+        assert!(!allowed("find ./src | head -1 realfile | xargs cat"), "head reading a FILE isn't a stdin passthrough");
+        assert!(!allowed("find /etc | head -1 | xargs cat"), "system source propagates → deny");
+        // `sort --files0-from=F` emits the CONTENTS of the files listed in F — file-derived output,
+        // not the piped stream — so it must NOT launder a safe upstream locus onto a destroyer. The
+        // `=`-glued form is a lone `-`-prefixed token that would otherwise masquerade as passthrough.
+        assert!(!allowed("echo x | sort --files0-from=./list.txt | xargs rm"), "=-glued files0-from is not a passthrough");
+        assert!(!allowed("echo x | sort --files0-from ./list.txt | xargs rm"), "space files0-from is not a passthrough");
+        assert!(!allowed("echo x | sort --files0-from=./list.txt | while read f; do rm \"$f\"; done"), "files0-from into while-read must not launder");
+    }
+
+    #[test]
+    fn while_read_binds_the_loop_var_to_the_pipe_locus() {
+        let _w = workspace();
+        assert!(allowed("find ./src -type f | while read f; do cat \"$f\"; done"), "read var reads worktree");
+        assert!(allowed("find /work | head | while IFS= read -r f; do cat \"$f\"; done"), "passthrough + read compose");
+        assert!(!allowed("find /etc -type f | while read f; do cat \"$f\"; done"), "system source → deny");
+        assert!(!allowed("find /etc | while read f; do rm \"$f\"; done"), "system write via read var → deny");
+        assert!(!allowed("while read f; do cat \"$f\"; done"), "no pipe source → unbound → fail closed");
+    }
+
+    #[test]
+    fn recursion_and_depth_terminate_and_deny() {
+        // Direct and mutual recursion must terminate (bounded) and deny — no hang, no stack blow-up.
+        assert!(!allowed("f(){ f; }; f"), "direct recursion");
+        assert!(!allowed("f(){ g; }; g(){ f; }; f"), "mutual recursion");
+        let deep = (0..80).map(|i| format!("f{i}(){{ f{}; }}; ", i + 1)).collect::<String>() + "f0";
+        assert!(!allowed(&deep), "deep non-recursive chain past the depth cap denies, not overflows");
     }
 }

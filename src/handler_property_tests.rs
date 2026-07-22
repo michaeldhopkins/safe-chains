@@ -176,6 +176,14 @@ fn classifier_terminates_on_adversarial_input() {
         "fd a b -x ".repeat(30),
         "find . -exec find . -exec ".repeat(20),
         format!("{}echo hi", "fd a -x fd b -x ".repeat(30)),
+        // Function-resolution blow-ups: exponential FAN-OUT (each fn calls the next twice), deep
+        // linear chains, direct/mutual recursion, and long assignment chains. Bounded by the depth
+        // cap + the shared classification budget, so they fail closed rather than hang.
+        (0..40).map(|i| format!("f{i}(){{ f{}; f{}; }}; ", i + 1, i + 1)).collect::<String>() + "f0",
+        (0..2000).map(|i| format!("f{i}(){{ f{}; }}; ", i + 1)).collect::<String>() + "f0",
+        "r(){ r; }; ".to_string() + &"r; ".repeat(2000),
+        "a(){ b; }; b(){ a; }; ".to_string() + &"a; ".repeat(1000),
+        (0..3000).map(|i| format!("V{i}=$V{}; ", i + 1)).collect::<String>() + "cat $V0",
     ];
     let mut slow = Vec::new();
     for input in &corpus {
