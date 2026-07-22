@@ -1138,12 +1138,6 @@ Aliases: `neonctl`
 - Allowed valued flags: --dbname, --host, --port, --timeout, --username, -U, -d, -h, -p, -t
 - Bare invocation allowed
 
-### `pgrep`
-<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/pgrep.1.html">https://man7.org/linux/man-pages/man1/pgrep.1.html</a></p>
-
-- Allowed standalone flags: --help, -L, -a, -f, -i, -l, -n, -o, -q, -v, -x
-- Allowed valued flags: -F, -G, -P, -U, -d, -g, -t, -u
-
 ### `pkill`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/pkill.1.html">https://man7.org/linux/man-pages/man1/pkill.1.html</a></p>
 
@@ -1926,17 +1920,6 @@ Aliases: `upsun`
 <p class="cmd-url"><a href="https://keith.github.io/xcode-man-pages/vmmap.1.html">https://keith.github.io/xcode-man-pages/vmmap.1.html</a></p>
 
 - Allowed standalone flags: --allSplitLibs, --attributes, --interleaved, --noCoalesce, --pages, --sortBySize, --submap, --summary, --verbose, --wide, -h, -s, -v, -w
-
-### `wg`
-<p class="cmd-url"><a href="https://www.wireguard.com/quickstart/">https://www.wireguard.com/quickstart/</a></p>
-
-- **genkey**: Flags: --help, -h
-- **genpsk**: Flags: --help, -h
-- **help**: Flags: --help, -h
-- **pubkey**: Flags: --help, -h
-- **show**: Flags: --help, -h. Positional args accepted
-- **showconf**: Flags: --help, -h
-- Allowed standalone flags: --help, --version, -h
 
 ### `wrangler`
 <p class="cmd-url"><a href="https://developers.cloudflare.com/workers/wrangler/">https://developers.cloudflare.com/workers/wrangler/</a></p>

@@ -519,13 +519,6 @@ Aliases: `@11ty/eleventy`
 
 - Allowed standalone flags: --help, --version, -h
 
-### `envsubst`
-<p class="cmd-url"><a href="https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html">https://www.gnu.org/software/gettext/manual/html_node/envsubst-Invocation.html</a></p>
-
-- Allowed standalone flags: --help, --variables, --version, -V, -h, -v
-- Bare invocation allowed
-- Hyphen-prefixed positional arguments accepted
-
 ### `erb_lint`
 <p class="cmd-url"><a href="https://github.com/Shopify/erb_lint">https://github.com/Shopify/erb_lint</a></p>
 

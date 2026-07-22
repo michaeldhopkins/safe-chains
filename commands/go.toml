@@ -2,6 +2,7 @@
 name = "go"
 description = "Go programming language toolchain. The go command has a large surface area covering compilation, testing, dependency management, and code generation. 'go build' compiles code and writes binaries to disk. 'go test' compiles and executes test code, which can have arbitrary side effects. 'go mod download' fetches modules from the network. Read-only subcommands like 'go doc', 'go env', 'go list', 'go version', and 'go vet' inspect code or configuration without filesystem writes (though vet does compile code). Go releases on a predictable 6-month cadence (February and August), with the CLI surface growing steadily."
 url = "https://pkg.go.dev/cmd/go"
+researched_version = "go1.26.5"
 bare_flags = ["--help", "--version", "-V", "-h"]
 examples_safe = [
   "go run .",
@@ -65,6 +66,20 @@ valued = [
     "-json", "-ldflags", "-mod", "-modfile", "-overlay", "-p",
     "-pgo", "-pkgdir", "-reuse", "-tags",
 ]
+
+[[command.sub]]
+name = "mod"
+[[command.sub.sub]]
+name = "graph"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "verify"
+standalone = ["--help", "-h"]
+[[command.sub.sub]]
+name = "why"
+bare = false
+tolerate_unknown_short = true
+standalone = ["--help", "--m", "--vendor", "-h"]
 
 # `go run PKG` compiles and runs a package — the executor is the PACKAGE PATH. `positional_shape`
 # requires a LOCAL path (`.`, `./cmd/tool`, `/abs`, `*.go`): a bare import path (`rsc.io/x@latest`,

@@ -2494,6 +2494,63 @@ use super::*;
         );
     }
 
+    /// No two `[[command]]` blocks across all TOMLs may share a `name`. A duplicate is silently
+    /// deduped at build time (one definition wins, order-dependently), so a second entry can
+    /// shadow a carefully-scoped one with NO warning — exactly how a full path-gated `sips` in
+    /// `media/` once collided with an older Inert-only `sips` in `binary/`. Walks every
+    /// `commands/**/*.toml` and fails on any name defined more than once.
+    #[test]
+    fn no_command_name_is_defined_twice() {
+        use std::collections::HashMap;
+        use std::fs;
+        use std::path::PathBuf;
+
+        fn walk(dir: &std::path::Path, out: &mut Vec<PathBuf>) {
+            for entry in fs::read_dir(dir).unwrap() {
+                let path = entry.unwrap().path();
+                if path.is_dir() {
+                    walk(&path, out);
+                } else if path.extension().and_then(|e| e.to_str()) == Some("toml")
+                    && path.file_name().and_then(|n| n.to_str()) != Some("SAMPLE.toml")
+                {
+                    out.push(path);
+                }
+            }
+        }
+
+        let mut files = Vec::new();
+        walk(std::path::Path::new("commands"), &mut files);
+        assert!(!files.is_empty(), "expected commands/ to contain TOML files");
+        files.sort();
+
+        let mut owner: HashMap<String, PathBuf> = HashMap::new();
+        let mut dups = Vec::new();
+        for path in &files {
+            let src = fs::read_to_string(path).unwrap();
+            let parsed: toml::Value = toml::from_str(&src)
+                .unwrap_or_else(|e| panic!("{}: parse error: {e}", path.display()));
+            let Some(cmds) = parsed.get("command").and_then(|v| v.as_array()) else {
+                continue;
+            };
+            for cmd in cmds {
+                let Some(name) = cmd.get("name").and_then(|v| v.as_str()) else {
+                    continue;
+                };
+                match owner.get(name) {
+                    Some(prev) => dups.push(format!(
+                        "`{name}` defined in both {} and {}",
+                        prev.display(),
+                        path.display()
+                    )),
+                    None => {
+                        owner.insert(name.to_string(), path.clone());
+                    }
+                }
+            }
+        }
+        assert!(dups.is_empty(), "duplicate command names:\n{}", dups.join("\n"));
+    }
+
     #[test]
     fn handler_with_subs_and_fallback_builds_custom_kind() {
         // Verify that a handler-using TOML carries its [[command.sub]]

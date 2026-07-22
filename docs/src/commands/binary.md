@@ -34,12 +34,6 @@ Aliases: `god`
 - Allowed standalone flags: -D, -I, -L, -V, -X, -a, -c, -d, -f, -h, -l, -o, -r, -t, -v, -x, --help, --version
 - Allowed valued flags: -p, -s
 
-### `sips`
-<p class="cmd-url"><a href="https://ss64.com/mac/sips.html">https://ss64.com/mac/sips.html</a></p>
-
-- Allowed standalone flags: -V, -h, --help, --version
-- Allowed valued flags: -g, --getProperty
-
 ### `size`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/size.1.html">https://man7.org/linux/man-pages/man1/size.1.html</a></p>
 

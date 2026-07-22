@@ -702,9 +702,15 @@ Aliases: `whatis`
 
 Aliases: `gas`
 
-- Allowed standalone flags: --help, --version, -?, -h, -v
+- Allowed standalone flags: --32, --64, --alternate, --compress-debug-sections, --dump-config, --fatal-warnings, --gdwarf-2, --gdwarf-3, --gdwarf-4, --gdwarf-5, --gdwarf-sections, --gen-debug, --gsframe, --gstabs, --gstabs+, --help, --info, --keep-locals, --mri, --no-info, --no-pad-sections, --no-warn, --nocompress-debug-sections, --reduce-memory-overheads, --sectname-subst, --statistics, --target-help, --traditional-format, --verbose, --version, --warn, --x32, -?, -D, -J, -K, -L, -M, -Q, -R, -V, -W, -Z, -arch_multiple, -dynamic, -f, -force_cpusubtype_ALL, -g, -h, -n, -nocpp, -q, -static, -v, -version, -w, -x
+- Allowed valued flags: --MD, --debug-prefix-map, --defsym, --elf-stt-common, --emulation, --gdwarf-cie-version, --generate-missing-build-notes, --hash-size, --listing-cont-lines, --listing-lhs-width, --listing-lhs-width2, --listing-rhs-width, --multibyte-handling, --scfi, --size-check, -I, -arch, -o
 - Bare invocation allowed
 - Hyphen-prefixed positional arguments accepted
+
+**Examples:**
+
+- `as foo.s -o foo.o`
+- `as -g main.s -o ./build/main.o`
 
 ### `asciidoctor`
 <p class="cmd-url"><a href="https://docs.asciidoctor.org/asciidoctor/latest/cli/">https://docs.asciidoctor.org/asciidoctor/latest/cli/</a></p>
@@ -4510,7 +4516,6 @@ Aliases: `emmake`, `emranlib`, `emstrip`, `emrun`
 
 - Allowed standalone flags: --help, --variables, --version, -V, -h, -v
 - Bare invocation allowed
-- Hyphen-prefixed positional arguments accepted
 
 ### `eps2eps`
 <p class="cmd-url"><a href="https://ghostscript.readthedocs.io/en/latest/">https://ghostscript.readthedocs.io/en/latest/</a></p>
@@ -5843,6 +5848,9 @@ Aliases: `gnatls`, `gnatchop`, `gnatpp`, `gnatkr`, `gnatxref`, `gnatfind`, `gnat
 - **env**: Flags: --help, -h, -json
 - **help**: Positional args accepted
 - **list**: Flags: --help, -a, -asan, -compiled, -cover, -deps, -e, -export, -find, -h, -linkshared, -m, -modcacherw, -msan, -n, -race, -retract, -test, -trimpath, -u, -v, -versions, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -f, -gccgoflags, -gcflags, -installsuffix, -json, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -reuse, -tags
+- **mod graph**: Flags: --help, -h
+- **mod verify**: Flags: --help, -h
+- **mod why**: Flags: --help, --m, --vendor, -h. Positional args accepted
 - **run**: Runs a workspace-local script/package (the first positional). Flags: --help, -a, -asan, -cover, -h, -linkshared, -modcacherw, -msan, -n, -race, -trimpath, -v, -work, -x. Valued: -asmflags, -buildmode, -buildvcs, -compiler, -covermode, -coverpkg, -gccgoflags, -gcflags, -installsuffix, -ldflags, -mod, -modfile, -overlay, -p, -pgo, -pkgdir, -tags
 - **test**: Flags: --help, -a, -asan, -benchmem, -cover, -failfast, -h, -json, -linkshared, -modcacherw, -msan, -n, -race, -short, -trimpath, -v, -work, -x. Valued: -asmflags, -bench, -benchtime, -blockprofile, -blockprofilerate, -buildmode, -buildvcs, -compiler, -count, -covermode, -coverpkg, -coverprofile, -cpu, -cpuprofile, -fuzz, -fuzzminimizetime, -fuzztime, -gccgoflags, -gcflags, -installsuffix, -ldflags, -list, -memprofile, -memprofilerate, -mod, -modfile, -mutexprofile, -mutexprofilefraction, -o, -outputdir, -overlay, -p, -parallel, -pgo, -pkgdir, -run, -shuffle, -skip, -tags, -timeout, -trace
 - **version**: Flags: --help, -h, -m, -v
@@ -11055,8 +11063,8 @@ Aliases: `xelatex`, `lualatex`, `latex`
 ### `pgrep`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/pgrep.1.html">https://man7.org/linux/man-pages/man1/pgrep.1.html</a></p>
 
-- Allowed standalone flags: --help, -L, -a, -f, -i, -l, -n, -o, -q, -v, -x
-- Allowed valued flags: -F, -G, -P, -U, -d, -g, -t, -u
+- Allowed standalone flags: --count, --exact, --full, --help, --ignore-ancestors, --ignore-case, --inverse, --lightweight, --list-full, --list-name, --logpidfile, --newest, --oldest, --version, -A, -L, -S, -V, -a, -c, -f, -h, -i, -l, -n, -o, -q, -v, -w, -x
+- Allowed valued flags: --cgroup, --delimiter, --euid, --group, --ns, --nslist, --older, --parent, --pgroup, --pidfile, --runstates, --session, --terminal, --uid, -F, -G, -M, -N, -O, -P, -U, -d, -g, -j, -r, -s, -t, -u
 
 ### `php`
 <p class="cmd-url"><a href="https://www.php.net/manual/en/features.commandline.options.php">https://www.php.net/manual/en/features.commandline.options.php</a></p>
@@ -13517,8 +13525,14 @@ Aliases: `gshuf`
 ### `sips`
 <p class="cmd-url"><a href="https://ss64.com/mac/sips.html">https://ss64.com/mac/sips.html</a></p>
 
-- Allowed standalone flags: -V, -h, --help, --version
-- Allowed valued flags: -g, --getProperty
+- Allowed standalone flags: -h, --help, -H, --helpProperties, -v, --version, --formats, --man, --debug, --verify, -1, --oneLine, --repair, --deleteColorManagementProperties, -i, --addIcon, --optimizeColorForSharing
+- Allowed valued flags: -g, --getProperty, -s, --setProperty, -d, --deleteProperty, --deleteTag, --copyTag, --loadTag, -e, --embedProfile, -E, --embedProfileIfNone, -m, --matchTo, -M, --matchToWithIntent, -r, --rotate, -f, --flip, -c, --cropToHeightWidth, --cropOffset, -p, --padToHeightWidth, --padColor, -z, --resampleHeightWidth, --resampleWidth, --resampleHeight, -Z, --resampleHeightWidthMax, -x, --extractProfile, -X, --extractTag, -o, --out
+
+**Examples:**
+
+- `sips -s format png input.pdf --out output.png`
+- `sips -Z 640 ./photo.jpg`
+- `sips -g pixelWidth -g pixelHeight ./img.png`
 
 ### `size`
 <p class="cmd-url"><a href="https://man7.org/linux/man-pages/man1/size.1.html">https://man7.org/linux/man-pages/man1/size.1.html</a></p>
@@ -15973,15 +15987,28 @@ Aliases: `gwc`
 - Allowed standalone flags: --help, --version, -h, -V
 
 ### `wg`
-<p class="cmd-url"><a href="https://www.wireguard.com/quickstart/">https://www.wireguard.com/quickstart/</a></p>
+<p class="cmd-url"><a href="https://man7.org/linux/man-pages/man8/wg.8.html">https://man7.org/linux/man-pages/man8/wg.8.html</a></p>
 
 - **genkey**: Flags: --help, -h
 - **genpsk**: Flags: --help, -h
 - **help**: Flags: --help, -h
 - **pubkey**: Flags: --help, -h
-- **show**: Flags: --help, -h. Positional args accepted
+- **show**: Flags: --help, all, interfaces, allowed-ips, dump, endpoints, fwmark, latest-handshakes, listen-port, peers, persistent-keepalive, preshared-keys, private-key, public-key, transfer, -h
 - **showconf**: Flags: --help, -h
 - Allowed standalone flags: --help, --version, -h
+- Bare invocation allowed
+
+**Examples:**
+
+- `wg`
+- `wg show`
+- `wg show all`
+- `wg show wg0`
+- `wg show wg0 endpoints`
+- `wg showconf wg0`
+- `wg genkey`
+- `wg genpsk`
+- `wg pubkey`
 
 ### `wget`
 <p class="cmd-url"><a href="https://www.gnu.org/software/wget/">https://www.gnu.org/software/wget/</a></p>

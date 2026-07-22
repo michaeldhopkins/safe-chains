@@ -3,6 +3,7 @@ name = "wg"
 description = "WireGuard configuration utility. The read-only subcommands cover: `show` prints interface status and peer endpoints; `showconf` dumps the in-kernel config in CONFIGURATION FILE FORMAT; `genkey` / `genpsk` print fresh base64 private / preshared keys to stdout; `pubkey` reads a private key from stdin and prints its public key. Note that `wg show <iface> private-key` and `wg show <iface> preshared-keys` print the in-kernel SECRET material to stdout — these field selectors are intended for scripted backup but expose secrets to whatever consumes the output. The state-modifying subcommands (`set`, `setconf`, `addconf`, `syncconf`) require root and write to the kernel interface — they are not in scope. Active project; the wireguard-tools surface is byte-for-byte stable across the v1.0.x line."
 url = "https://man7.org/linux/man-pages/man8/wg.8.html"
 researched_version = "wireguard-tools v1.0.20260223"
+bare = true
 bare_flags = ["--help", "--version", "-h"]
 examples_safe = [
     "wg",
@@ -58,6 +59,12 @@ standalone = ["--help", "-h"]
 [[command.sub]]
 name = "pubkey"
 level = "SafeRead"
+bare = true
+standalone = ["--help", "-h"]
+
+[[command.sub]]
+name = "help"
+level = "Inert"
 bare = true
 standalone = ["--help", "-h"]
 

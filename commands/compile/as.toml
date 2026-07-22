@@ -1,10 +1,41 @@
 [[command]]
 name = "as"
 aliases = ["gas"]
-description = "GNU assembler — translates assembly source into object files. The canonical `as` binary on Linux is GNU binutils; on macOS it forwards to the Clang integrated assembler. Reads the input assembly; writes the object output to the path given by `-o` (default `a.out`). Project-local SafeWrite. Most often invoked transitively by `gcc` / `clang` but also reachable directly from build scripts."
+description = "System assembler. Translates assembly source (`.s`/`.asm`) into a relocatable object file. On Linux `as` is GNU binutils; on macOS the `as` binary is a deprecated shim that forwards to Clang's integrated assembler — this one name covers both flavors. Behavior: it reads the named source files (or standard input) and writes a single object file — `a.out` by default, or the path given by `-o` — into the working tree. `-I` adds directories searched for `.include` files (read), `--MD` writes a make-dependency file, and the `-a…=file` listing forms write an assembly listing. No network access, no credential access, and no code execution of its own: the emitted object is inert until a separate link/run step. Debug-info flags (`-g`, `--gstabs`, `--gdwarf-N`, SFrame), listing and format flags, warning controls, and target-selection flags (`-arch` on Apple; `--32`/`--64`/`-march=`/`-mcpu=` on GNU) are pure toggles over that same read-source / write-object operation. The object output is an ordinary local file write, reversible by overwrite or delete. Most often invoked transitively by `gcc`/`clang`, but reachable directly from build scripts and Makefiles. Both flavors are slow-moving: the GNU option surface is stable across binutils releases, and Apple's standalone `as` is frozen in favor of the clang path."
 url = "https://sourceware.org/binutils/docs/as/"
-researched_version = "GNU binutils 2.43.x"
+researched_version = "GNU binutils 2.46 (Feb 2026); Apple as via Xcode 16 (deprecated shim to clang integrated assembler, cctools)"
 level = "SafeWrite"
 bare = true
 tolerate_unknown_short = true
-standalone = ["--help", "--version", "-?", "-h", "-v"]
+standalone = [
+    "--32", "--64", "--alternate", "--compress-debug-sections", "--dump-config",
+    "--fatal-warnings", "--gdwarf-2", "--gdwarf-3", "--gdwarf-4", "--gdwarf-5",
+    "--gdwarf-sections", "--gen-debug", "--gsframe", "--gstabs", "--gstabs+",
+    "--help", "--info", "--keep-locals", "--mri", "--no-info", "--no-pad-sections",
+    "--no-warn", "--nocompress-debug-sections", "--reduce-memory-overheads",
+    "--sectname-subst", "--statistics", "--target-help", "--traditional-format",
+    "--verbose", "--version", "--warn", "--x32",
+    "-?", "-D", "-J", "-K", "-L", "-M", "-Q", "-R", "-V", "-W", "-Z",
+    "-arch_multiple", "-dynamic", "-f", "-force_cpusubtype_ALL", "-g", "-h",
+    "-n", "-nocpp", "-q", "-static", "-v", "-version", "-w", "-x",
+]
+valued = [
+    "--MD", "--debug-prefix-map", "--defsym", "--elf-stt-common", "--emulation",
+    "--gdwarf-cie-version", "--generate-missing-build-notes", "--hash-size",
+    "--listing-cont-lines", "--listing-lhs-width", "--listing-lhs-width2",
+    "--listing-rhs-width", "--multibyte-handling", "--scfi", "--size-check",
+    "-I", "-arch", "-o",
+]
+examples_safe = [
+    "as foo.s -o foo.o",
+    "as -g main.s -o ./build/main.o",
+]
+examples_denied = [
+    "as foo.s -o /etc/cron.d/job",
+    "as -o ~/.ssh/authorized_keys foo.s",
+]
+
+# The source operands are reads; -o and --MD write; -I is a read search path.
+[command.path_gate]
+positional = "read"
+flags = { "-o" = "write", "--MD" = "write", "-I" = "read" }
