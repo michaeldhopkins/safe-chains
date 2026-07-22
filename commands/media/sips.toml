@@ -1,0 +1,63 @@
+[[command]]
+name = "sips"
+description = "macOS scriptable image processing system (`sips`), for querying and transforming raster images and ICC colour profiles. Query functions — `-g/--getProperty`, `-x/--extractProfile`, `-X/--extractTag`, `--verify`, `-1/--oneLine` — observe an image or profile; a few of them extract data to a new file on disk. Modification functions rewrite the image IN PLACE by default — `-s/--setProperty` (e.g. format, dpiWidth), `-r/--rotate`, `-f/--flip`, `-c/--cropToHeightWidth`, `-p/--padToHeightWidth`, `-z/-Z/--resample*`, `-e/--embedProfile`, `-m/--matchTo`, `-i/--addIcon` — unless `-o/--out` redirects the result to a separate file or directory. All effects are local to the filesystem; there is no network access. The in-place rewrites are irreversible except via a backup or version control. One flag stands apart: `-j/--js file` executes an arbitrary JavaScript file through sips's scripting bridge — that is code execution, not image processing. macOS-only; the tool surface is effectively frozen."
+url = "https://ss64.com/mac/sips.html"
+researched_version = "macOS 14 (sips 10.x; surface frozen)"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "-h", "--help",
+    "-H", "--helpProperties",
+    "-v", "--version",
+    "--formats",
+    "--man",
+    "--debug",
+    "--verify",
+    "-1", "--oneLine",
+    "--repair",
+    "--deleteColorManagementProperties",
+    "-i", "--addIcon",
+    "--optimizeColorForSharing",
+]
+valued = [
+    "-g", "--getProperty",
+    "-s", "--setProperty",
+    "-d", "--deleteProperty",
+    "--deleteTag",
+    "--copyTag",
+    "--loadTag",
+    "-e", "--embedProfile",
+    "-E", "--embedProfileIfNone",
+    "-m", "--matchTo",
+    "-M", "--matchToWithIntent",
+    "-r", "--rotate",
+    "-f", "--flip",
+    "-c", "--cropToHeightWidth",
+    "--cropOffset",
+    "-p", "--padToHeightWidth",
+    "--padColor",
+    "-z", "--resampleHeightWidth",
+    "--resampleWidth",
+    "--resampleHeight",
+    "-Z", "--resampleHeightWidthMax",
+    "-x", "--extractProfile",
+    "-X", "--extractTag",
+    "-o", "--out",
+]
+examples_safe = [
+    "sips -s format png input.pdf --out output.png",
+    "sips -Z 640 ./photo.jpg",
+    "sips -g pixelWidth -g pixelHeight ./img.png",
+]
+examples_denied = [
+    "sips -j /tmp/evil.js ./img.png",
+    "sips -s format png ./img.png --out /etc/cron.d/job",
+    "sips -r 90 ~/.ssh/known_hosts",
+]
+
+# The named image is rewritten in place (a write); -o/--out and -x/--extractProfile
+# emit files; the profile-matching flags read a profile file. -j/--js is code
+# execution and is intentionally absent.
+[command.path_gate]
+positional = "write"
+flags = { "-o" = "write", "--out" = "write", "-x" = "write", "--extractProfile" = "write", "-e" = "read", "--embedProfile" = "read", "-E" = "read", "--embedProfileIfNone" = "read", "-m" = "read", "--matchTo" = "read", "-M" = "read", "--matchToWithIntent" = "read" }
