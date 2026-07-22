@@ -15,8 +15,11 @@ thread_local! {
 }
 
 /// Far above any real command's handful of delegations (a `&&` chain of 50 `fd -x`s spends ~100),
-/// far below the exponential explosion. Found by the parse fuzzer (`fd -x fd -x …`).
-const MAX_CLASSIFY_WORK: u32 = 4096;
+/// far below the exponential explosion. Found by the parse fuzzer (`fd -x fd -x …`). Kept modest so
+/// the worst-case CUTOFF is also cheap in wall-clock terms — each unit is a full re-classification
+/// (parse + dispatch), so a high ceiling would let a crafted command burn hundreds of ms in the hook
+/// (and blow the debug-mode timing of `classifier_terminates_on_adversarial_input`).
+const MAX_CLASSIFY_WORK: u32 = 512;
 
 /// RAII budget guard for the classifier recursion. `enter` resets the budget at the OUTERMOST call
 /// and charges one unit per (re-)entry; `None` means the budget is spent and the caller must fail
