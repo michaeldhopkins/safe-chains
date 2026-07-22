@@ -87,16 +87,21 @@ impl Matcher {
     }
 
     /// Specificity of a match against `path`, or `None` if it doesn't match. Higher = more
-    /// specific: exact ≫ any prefix ≫ any segment, and within a kind, longer wins.
-    fn specificity(&self, path: &str) -> Option<usize> {
+    /// specific: exact ≫ any prefix ≫ any segment, and within a kind, longer wins. When `fold`,
+    /// comparisons are ASCII-case-insensitive — used for DENY-shield nodes on a case-insensitive
+    /// filesystem (macOS), so a case-variant spelling (`~/.AWS`, `.GIT/hooks`) can't evade a
+    /// credential store or a write-freeze that, on that filesystem, names the very same file.
+    fn specificity(&self, path: &str, fold: bool) -> Option<usize> {
+        let eq = |a: &str, b: &str| if fold { a.eq_ignore_ascii_case(b) } else { a == b };
+        let starts = |h: &str, p: &str| if fold { ci_starts_with(h, p) } else { h.starts_with(p) };
         match self {
-            Matcher::Exact(s) => (path == s).then_some(1_000_000 + s.len()),
+            Matcher::Exact(s) => eq(path, s).then_some(1_000_000 + s.len()),
             Matcher::Prefix(s) => {
                 let dir = s.strip_suffix('/').unwrap_or(s);
-                (path.starts_with(s.as_str()) || path == dir).then_some(1_000 + s.len())
+                (starts(path, s.as_str()) || eq(path, dir)).then_some(1_000 + s.len())
             }
-            Matcher::StringPrefix(s) => path.starts_with(s.as_str()).then_some(1_000 + s.len()),
-            Matcher::Segment(seg) => path.split('/').any(|c| c == seg).then_some(seg.len()),
+            Matcher::StringPrefix(s) => starts(path, s.as_str()).then_some(1_000 + s.len()),
+            Matcher::Segment(seg) => path.split('/').any(|c| eq(c, seg)).then_some(seg.len()),
         }
     }
 
@@ -119,10 +124,31 @@ fn has_hidden_component(remainder: &str) -> bool {
     remainder.split('/').any(|seg| seg.len() > 1 && seg.starts_with('.'))
 }
 
+/// ASCII-case-insensitive `starts_with`, zero-alloc (for case-folded shield matching).
+fn ci_starts_with(haystack: &str, prefix: &str) -> bool {
+    haystack.len() >= prefix.len()
+        && haystack.as_bytes()[..prefix.len()].eq_ignore_ascii_case(prefix.as_bytes())
+}
+
+/// Whether a role is a PROTECTION (a credential/secret shield, the pinned config, or a
+/// write-freeze) rather than an admit — it makes some face stricter than an ordinary worktree.
+/// Only protection nodes are matched case-insensitively on a case-insensitive filesystem: folding
+/// an ADMIT (`/tmp`, worktree) could admit a case-variant that is a DIFFERENT path on a
+/// case-sensitive volume (fail-open), whereas folding a protection only ever denies more.
+fn role_is_protective(role: &Role) -> bool {
+    role.reads_secret
+        || role.pinned
+        || role.write_locus > LocalLocus::Worktree
+        || role.read_locus > LocalLocus::WorktreeTrusted
+}
+
 struct Node {
     matcher: Matcher,
     role: Role,
     os: Option<Vec<String>>,
+    /// Match this node's path case-insensitively on a case-insensitive filesystem — set for
+    /// protection nodes only (see `role_is_protective`).
+    fold: bool,
 }
 
 impl Node {
@@ -191,10 +217,14 @@ static REGIONS: LazyLock<Regions> = LazyLock::new(|| {
     let nodes = file
         .region
         .iter()
-        .map(|r| Node {
-            matcher: Matcher::from_path(&r.path),
-            role: role_of(&r.role),
-            os: r.os.clone(),
+        .map(|r| {
+            let role = role_of(&r.role);
+            Node {
+                matcher: Matcher::from_path(&r.path),
+                role,
+                os: r.os.clone(),
+                fold: role_is_protective(&role),
+            }
         })
         .collect();
 
@@ -382,7 +412,7 @@ fn best_grant(path: &str) -> Option<(bool, bool)> {
         grants
             .iter()
             .filter_map(|g| {
-                let spec = g.matcher.specificity(path)?;
+                let spec = g.matcher.specificity(path, false)?;
                 // A grant never widens a hidden file/dir it happened to sweep up (`~/` grant vs
                 // `~/.git-credentials`); grant the dotdir explicitly to reach inside it.
                 (!has_hidden_component(g.matcher.remainder(path))).then_some((spec, g.read, g.write))
@@ -428,12 +458,20 @@ pub(crate) fn classify_region(path: &str) -> Role {
 
 fn base_region(path: &str) -> Role {
     let r = &*REGIONS;
+    // macOS's default filesystem (APFS) is case-insensitive, so `~/.AWS` and `.GIT/hooks` name the
+    // same files as `~/.aws`/`.git` — a shield must fire on the case-variant too. Admit nodes are
+    // never folded (a case-variant of `/tmp` on a case-sensitive volume is a different dir).
+    // Best-effort by OS, not by volume: safe-chains never inspects the filesystem (§0.2, TOCTOU), so
+    // a NON-default case-insensitive Linux mount (ext4 `casefold`, ciopfs, vfat) is not covered, and
+    // a case-sensitive macOS volume over-denies a genuinely-distinct `.GIT` (fail-safe). Matching the
+    // OS is the honest proxy for the default case.
+    let fold_shields = current_os() == "macos";
     let mut best: Option<(usize, Role)> = None;
     for node in &r.nodes {
         if !node.applies_here() {
             continue;
         }
-        let Some(spec) = node.matcher.specificity(path) else {
+        let Some(spec) = node.matcher.specificity(path, node.fold && fold_shields) else {
             continue;
         };
         let take = match best {
@@ -757,6 +795,50 @@ mod tests {
         // no settings file → empty, no panic
         let empty = tempfile::tempdir().unwrap();
         assert!(claude_settings_read_grants(empty.path()).is_empty());
+    }
+
+    #[test]
+    fn shields_fold_case_on_macos_so_a_case_variant_cannot_evade_them() {
+        // On APFS (case-insensitive) a case-variant names the SAME file, so every protection —
+        // credential stores AND the `.git`/`.envrc` write-freeze — must fire on the variant.
+        with_os("macos", || {
+            assert!(classify_region("~/.AWS/credentials").reads_secret, ".AWS folds to the .aws secret");
+            assert!(classify_region("~/.SSH/id_rsa").reads_secret, ".SSH folds to the .ssh secret");
+            assert_eq!(classify_region("~/.AWS/credentials").read_locus, LocalLocus::Machine);
+            assert_eq!(classify_region("/etc/Master.Passwd").read_locus, LocalLocus::Machine, "system secret folds");
+            // the agent-injectable one: a case-variant .git/.envrc WRITE stays frozen
+            assert!(classify_region(".GIT/hooks/pre-commit").write_locus > LocalLocus::Worktree, ".GIT write frozen");
+            assert!(classify_region(".Git/hooks/pre-commit").write_locus > LocalLocus::Worktree, "mixed-case .Git frozen");
+            assert!(classify_region(".ENVRC").write_locus > LocalLocus::Worktree, ".ENVRC write frozen");
+            // and a case-variant credential store stays un-grantable even under an explicit grant
+            with_grants(&[("~/.AWS/", true, false)], || {
+                assert_eq!(classify_region("~/.AWS/credentials").read_locus, LocalLocus::Machine, "explicit grant cannot unlock a folded secret");
+            });
+        });
+    }
+
+    #[test]
+    fn case_folding_is_macos_only_so_linux_keeps_distinct_paths() {
+        // On a case-sensitive fs `.GIT` and `~/.AWS` are DIFFERENT files, not the shielded ones —
+        // folding there would be a false-deny. The canonical spelling is shielded on every OS.
+        with_os("linux", || {
+            assert_eq!(classify_region(".GIT/hooks/pre-commit").write_locus, LocalLocus::Worktree, "linux: .GIT is an ordinary worktree path");
+            assert!(!classify_region("~/.AWS/credentials").reads_secret, "linux: .AWS is not the .aws secret");
+        });
+        for os in ["macos", "linux"] {
+            assert!(with_os(os, || classify_region("~/.aws/credentials").reads_secret), "{os}: canonical .aws shielded");
+            assert!(with_os(os, || classify_region(".git/hooks/pre-commit").write_locus > LocalLocus::Worktree), "{os}: canonical .git frozen");
+        }
+    }
+
+    #[test]
+    fn admit_nodes_never_fold_so_a_case_variant_is_not_widened() {
+        // Folding an ADMIT would be fail-OPEN on a case-sensitive volume (`/TMP` ≠ `/tmp`). So even
+        // on macOS `/TMP` is NOT admitted as scratch — it fails closed to unknown.
+        with_os("macos", || {
+            assert!(classify_region("/tmp/x").write_locus <= LocalLocus::Worktree, "/tmp is scratch (admitted)");
+            assert_eq!(classify_region("/TMP/x").write_locus, LocalLocus::Machine, "/TMP is not folded into the scratch admit");
+        });
     }
 
     #[test]
