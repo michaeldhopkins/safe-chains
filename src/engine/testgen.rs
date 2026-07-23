@@ -143,8 +143,7 @@ pub(crate) fn lowered_variants(cap: &Capability) -> Vec<Capability> {
         set(&mut c, p);
         Some(c)
     }
-    [
-        lower(cap, |c| c.locus.local, |c, v| c.locus.local = v),
+    let mut variants: Vec<Capability> = [
         lower(cap, |c| c.locus.remote, |c, v| c.locus.remote = v),
         lower(cap, |c| c.scale, |c, v| c.scale = v),
         lower(cap, |c| c.authority, |c, v| c.authority = v),
@@ -165,5 +164,17 @@ pub(crate) fn lowered_variants(cap: &Capability) -> Vec<Capability> {
     ]
     .into_iter()
     .flatten()
-    .collect()
+    .collect();
+
+    // `locus.local` IS a reach facet for effect operations (lower = more contained = safer), so it
+    // is lowered — EXCEPT under `execute`, where it is the executor-ORIGIN band, not a reach ladder:
+    // `temp`/`process` below the band are FOREIGN / inline code (MORE severe, not less), so a level
+    // FLOORS it (the deliberate interior band `>= sandbox-scope`; see levels/default.toml and
+    // authoring::parse_bound's "interior band" note). Lowering it under execute crosses that floor
+    // and would falsely flag the coherent band as non-monotone — the same inverted-polarity reason
+    // pinning/isolation are skipped above.
+    if cap.operation != Operation::Execute {
+        variants.extend(lower(cap, |c| c.locus.local, |c, v| c.locus.local = v));
+    }
+    variants
 }
