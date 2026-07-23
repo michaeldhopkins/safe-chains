@@ -59,7 +59,7 @@ The schema mirrors the built-in TOMLs. Every field documented in [`commands/SAMP
 
 ## Let safe-chains write it: `--suggest`
 
-For a command safe-chains doesn't recognize, `--suggest` writes the entry for you:
+For a command safe-chains doesn't recognize, `--suggest` writes (or upgrades) your local `.safe-chains.toml` for you. Pass the command you want to support as the argument:
 
 ```sh
 safe-chains --suggest "acmedeploy --env prod ./service"
