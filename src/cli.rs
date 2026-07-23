@@ -1,9 +1,24 @@
 use clap::Parser;
 
+const EXAMPLES: &str = "\
+EXAMPLES:
+  # Check whether a command would auto-approve (exit 0 = allowed):
+  safe-chains \"git status\"
+
+  # See a per-segment breakdown of why a command does or doesn't approve:
+  safe-chains --explain \"grep foo . && ./deploy.sh\"
+
+  # Offer to support a command safe-chains doesn't recognize. This writes or
+  # upgrades the local .safe-chains.toml, then prints the pin to hand-add to
+  # ~/.config/safe-chains.toml so the definition takes effect:
+  safe-chains --suggest \"mytool sync --dry-run\"
+";
+
 #[derive(Parser)]
 #[command(name = "safe-chains")]
 #[command(about = "Auto-allow safe bash commands in agentic coding tools")]
 #[command(version, disable_version_flag = true)]
+#[command(after_help = EXAMPLES)]
 #[allow(clippy::struct_excessive_bools)]
 pub struct Cli {
     /// Command string to check (omit for Claude hook mode via stdin)
@@ -34,8 +49,10 @@ pub struct Cli {
     #[arg(long)]
     pub explain: bool,
 
-    /// For a command safe-chains doesn't recognize, generate the `.safe-chains.toml` needed to
-    /// support it, and print the `[[trusted]]` pin to add to ~/.config/safe-chains.toml.
+    /// Offer to support a command safe-chains doesn't recognize yet. Pass the command as the
+    /// argument: `safe-chains --suggest "<command>"`. It writes (or upgrades) the project's local
+    /// `.safe-chains.toml` with a definition for the unrecognized command, then prints the
+    /// `[[trusted]]` pin for you to add to ~/.config/safe-chains.toml so that file takes effect.
     #[arg(long)]
     pub suggest: bool,
 
