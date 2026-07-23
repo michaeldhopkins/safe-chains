@@ -86,6 +86,9 @@
 - **run**: Runs this project's own code. Flags: --all-features, --frozen, --help, --ignore-rust-version, --locked, --no-default-features, --offline, --release, --timings, --unit-graph, -h, --quiet, -q, -v. Valued: --bin, --color, --example, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, -Z, -j, -p
 - **search**: Flags: --frozen, --help, --locked, --offline, -h, --quiet, -q, -v. Valued: --color, --index, --limit, --registry
 - **semver-checks check-release**: Flags: --all-features, --default-features, --help, --verbose, -h, -v. Valued: --baseline-rev, --baseline-root, --baseline-version, --color, --config-path, --current-rustdoc, --exclude, --features, --manifest-path, --package, --release-type, --target, -j, -p
+- **swift init**: Flags: --accept-all, --help, --macro, --plain, --silent, -h, -s, -y. Valued: --lib-type, --vcs
+- **swift package**: Flags: --accept-all, --all-features, --help, --no-default-features, --release, --silent, --skip-toolchains-check, --suppress-warnings, -h, -r, -s, -y. Valued: --features, --lib-type, --name, --platforms, -F, -n, -p
+- **swift**: Flags: --accept-all, --help, --silent, --version, -V, -h, -s, -y
 - **test**: Flags: --all, --all-features, --all-targets, --benches, --bins, --doc, --examples, --frozen, --future-incompat-report, --help, --ignore-rust-version, --keep-going, --lib, --locked, --no-default-features, --no-fail-fast, --no-run, --offline, --release, --tests, --timings, --unit-graph, --workspace, -h, --quiet, -q, -v. Valued: --bench, --bin, --color, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --package, --profile, --target, --target-dir, --test, -Z, -j, -p
 - **tree**: Flags: --all-features, --duplicates, --frozen, --help, --ignore-rust-version, --locked, --no-dedupe, --no-default-features, --offline, -d, -e, -h, -i, --quiet, -q, -v. Valued: --charset, --color, --depth, --edges, --features, --format, --invert, --manifest-path, --package, --prefix, --prune, --target, -p
 - **udeps**: Flags: --all, --all-features, --all-targets, --benches, --bins, --examples, --frozen, --help, --keep-going, --lib, --locked, --no-default-features, --offline, --release, --tests, --workspace, --version, -V, -h, --quiet, -q, -v. Valued: --backend, --bench, --bin, --color, --example, --exclude, --features, --jobs, --manifest-path, --message-format, --output, --package, --profile, --target, --target-dir, --test, -j, -p
@@ -114,6 +117,13 @@
 - `cargo about --version`
 - `cargo about --help`
 - `cargo about generate about.hbs`
+- `cargo swift --version`
+- `cargo swift package --help`
+- `cargo swift init KeelFFI`
+- `cargo swift init KeelFFI --lib-type static --vcs git`
+- `cargo swift package --platforms ios --name KeelFFI --release --accept-all`
+- `cargo swift package -p ios -p macos --name Foo`
+- `cargo swift package --features foo --all-features`
 
 ### `diesel`
 <p class="cmd-url"><a href="https://diesel.rs/guides/getting-started">https://diesel.rs/guides/getting-started</a></p>
