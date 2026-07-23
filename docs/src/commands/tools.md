@@ -1426,12 +1426,13 @@ Aliases: `python`
 ### `safe-chains`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/safe-chains">https://github.com/michaeldhopkins/safe-chains</a></p>
 
-- Allowed standalone flags: --explain, --help, --list-commands, --list-tools, --version, -V, -h
+- Allowed standalone flags: --explain, --help, --list-commands, --list-tools, --version, -V, -h, -v
 - Allowed valued flags: --cwd, --level, --root
 
 **Examples:**
 
 - `safe-chains --version`
+- `safe-chains -v`
 - `safe-chains --list-tools`
 - `safe-chains --list-commands`
 - `safe-chains 'pod install'`

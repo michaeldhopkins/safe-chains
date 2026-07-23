@@ -50,11 +50,14 @@ fn cli_gate_fails_closed_on_malformed_invocation() {
     // the fail-open: a TYPO'd flag must NOT exit 0 (it used to, via the hook fallback).
     assert_ne!(exit_code(&["rm -rf /", "--levle", "inert"]), 0, "typo'd flag must FAIL CLOSED");
     // an unknown flag likewise fails closed.
-    assert_ne!(exit_code(&["-v"]), 0, "unknown flag must fail closed");
+    assert_ne!(exit_code(&["-z"]), 0, "unknown flag must fail closed");
     assert_ne!(exit_code(&["rm -rf /", "--nonsense"]), 0, "unknown long flag must fail closed");
 
-    // --version / --help remain exit 0 (they are not gate decisions).
+    // --version / --help remain exit 0 (they are not gate decisions), and the short
+    // spellings -v / -V behave identically.
     assert_eq!(exit_code(&["--version"]), 0, "--version prints and exits 0");
+    assert_eq!(exit_code(&["-v"]), 0, "-v prints version and exits 0");
+    assert_eq!(exit_code(&["-V"]), 0, "-V prints version and exits 0");
 }
 
 /// The upper-band `--level` thresholds (`local-admin`/`network-admin`/`yolo`) classify per-level

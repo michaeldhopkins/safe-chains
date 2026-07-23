@@ -3,11 +3,15 @@ use clap::Parser;
 #[derive(Parser)]
 #[command(name = "safe-chains")]
 #[command(about = "Auto-allow safe bash commands in agentic coding tools")]
-#[command(version)]
+#[command(version, disable_version_flag = true)]
 #[allow(clippy::struct_excessive_bools)]
 pub struct Cli {
     /// Command string to check (omit for Claude hook mode via stdin)
     pub command: Option<String>,
+
+    /// Print version information.
+    #[arg(short = 'v', short_alias = 'V', long, action = clap::ArgAction::Version)]
+    pub version: Option<bool>,
 
     /// Safety level threshold; only commands at or below it auto-approve. Levels, locked → open:
     /// paranoid, reader, editor, developer, local-admin, network-admin, yolo. The legacy names
