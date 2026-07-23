@@ -13,8 +13,8 @@ on:
   workflow_dispatch:
     inputs:
       max_total_time:
-        description: "Fuzz duration in seconds, per shard (default 8h)"
-        default: "28800"
+        description: "Fuzz duration in seconds, per shard (default 5h)"
+        default: "18000"
 
 env:
   CARGO_TERM_COLOR: always
@@ -23,7 +23,11 @@ jobs:
   fuzz:
     name: Fuzz (parse) shard ${{ matrix.shard }}
     runs-on: ubuntu-latest
-    timeout-minutes: 540 # job cap comfortably above the 8h fuzz budget
+    # GitHub-hosted jobs are force-cancelled at a 6h hard cap — which shows as "cancelled" and
+    # SWALLOWS the "Fail on crashes" red signal, so an 8h budget silently hid crashes every night.
+    # Keep the fuzz budget (5h) + setup under 6h so the job COMPLETES: findings then surface as a
+    # red run, and the merge sees clean shard outcomes. This timeout is a backstop below the cap.
+    timeout-minutes: 350
     strategy:
       fail-fast: false # one shard finding a crash must not cancel the others (or the merge)
       matrix:
@@ -65,7 +69,7 @@ jobs:
         run: |
           cargo +nightly fuzz run parse --target x86_64-unknown-linux-gnu -- \
             -fork=1 -ignore_crashes=1 \
-            -max_total_time=${{ github.event.inputs.max_total_time || '28800' }} \
+            -max_total_time=${{ github.event.inputs.max_total_time || '18000' }} \
             -timeout=25 \
             -rss_limit_mb=4096
 
