@@ -16,6 +16,13 @@ examples_safe = [
   "cargo about --version",
   "cargo about --help",
   "cargo about generate about.hbs",
+  "cargo swift --version",
+  "cargo swift package --help",
+  "cargo swift init KeelFFI",
+  "cargo swift init KeelFFI --lib-type static --vcs git",
+  "cargo swift package --platforms ios --name KeelFFI --release --accept-all",
+  "cargo swift package -p ios -p macos --name Foo",
+  "cargo swift package --features foo --all-features",
 ]
 examples_denied = [
   "cargo run --manifest-path /tmp/evil/Cargo.toml",
@@ -28,6 +35,7 @@ examples_denied = [
   "cargo fmt /etc/passwd",
   "cargo run --config target.x86_64-unknown-linux-gnu.runner='sh -c evil'",
   "cargo build --config build.rustc-wrapper=/tmp/evil",
+  "cargo swift package --platforms ios macos",
 ]
 
 # `--manifest-path DIR/Cargo.toml` selects WHICH project cargo builds/tests/runs — a foreign one
@@ -454,6 +462,36 @@ valued = [
     "--package", "--release-type", "--target",
     "-j", "-p",
 ]
+
+# swift = the cargo-swift plugin (0.7.1), building Swift packages from Rust via UniFFI.
+# `init` scaffolds a new library crate (local worktree writes, like `cargo init`). `package`
+# compiles the crate and generates a Swift package — the same build-script-executing, dependency-
+# and target-toolchain-fetching profile as `cargo build` (SafeWrite), plus local Swift-package
+# output. `--accept-all`/`-y` only auto-confirms `rustup target add` (official Rust std, reversible),
+# so it stays within the build profile. `--platforms`/`--features` accept one value per occurrence;
+# the space-separated multi-value form (`--platforms ios macos`) falls to manual approval.
+[[command.sub]]
+name = "swift"
+nested_bare = true
+standalone = ["--accept-all", "--help", "--silent", "--version", "-V", "-h", "-s", "-y"]
+[[command.sub.sub]]
+name = "init"
+level = "SafeWrite"
+bare = false
+max_positional = 1
+standalone = ["--accept-all", "--help", "--macro", "--plain", "--silent", "-h", "-s", "-y"]
+valued = ["--lib-type", "--vcs"]
+[[command.sub.sub]]
+name = "package"
+level = "SafeWrite"
+bare = true
+max_positional = 0
+standalone = [
+    "--accept-all", "--all-features", "--help", "--no-default-features",
+    "--release", "--silent", "--skip-toolchains-check", "--suppress-warnings",
+    "-h", "-r", "-s", "-y",
+]
+valued = ["--features", "--lib-type", "--name", "--platforms", "-F", "-n", "-p"]
 
 [[command.sub]]
 name = "expand"
