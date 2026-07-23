@@ -519,6 +519,40 @@ mod tests {
         assert!(developer.admits(&touch), "developer ⊇ write-local");
     }
 
+    // Running code: the discriminator is the EXECUTOR-ORIGIN band, not blast radius. developer runs
+    // code that LIVES in the worktree (bash ./x.sh) but refuses FOREIGN code below the band
+    // (/tmp/x.sh, inline `python -c`) and SYSTEM code above it (~/x.sh, /usr/local/bin/x). The band's
+    // FLOOR (`>= sandbox-scope`) makes locus.local non-monotone for execute, so the coherence
+    // generator skips lowering it there (testgen::lowered_variants); this pins the band's exact edges
+    // so a future mis-authoring can't drop the floor or slide the ceiling undetected — the coverage
+    // gap that let the monotonicity break hide from the deterministic ceiling test.
+    #[test]
+    fn developer_runs_worktree_code_but_not_foreign_or_system() {
+        let levels = default_levels();
+        let developer = level(levels, "developer");
+        let exec_at = |local| {
+            let mut c = Capability::new(Operation::Execute);
+            c.locus.local = local;
+            c.execution.trust = ExecutionTrust::CallerFile; // bash ./x.sh — code from a named file
+            Profile::of(vec![c])
+        };
+        // In the band [sandbox-scope, worktree-trusted]: worktree-local (and sibling) code runs.
+        for local in [
+            LocalLocus::SandboxScope,
+            LocalLocus::Worktree,
+            LocalLocus::Adjacent,
+            LocalLocus::WorktreeTrusted,
+        ] {
+            assert!(developer.admits(&exec_at(local)), "developer runs worktree-scope code: {local:?}");
+        }
+        // Below the band: foreign/downloaded (temp) or inline (process) code is denied.
+        assert!(!developer.admits(&exec_at(LocalLocus::Temp)), "bash /tmp/x.sh is foreign");
+        assert!(!developer.admits(&exec_at(LocalLocus::Process)), "inline `python -c` is below the band");
+        // Above the band: home/system executables are denied.
+        assert!(!developer.admits(&exec_at(LocalLocus::User)), "~/x.sh waits for a higher level");
+        assert!(!developer.admits(&exec_at(LocalLocus::Machine)), "/usr/local/bin/x waits for a higher level");
+    }
+
     #[test]
     fn the_ladder_nests() {
         let levels = default_levels();
@@ -722,7 +756,7 @@ mod tests {
     // on a non-minimum term) would break this — the check exists to catch that in
     // hand-authored TOML.
 
-    use crate::engine::testgen::{arb_capability, arb_profile, lowered_variants};
+    use crate::engine::testgen::{arb_capability, arb_profile, lowered_variants, predecessor};
     use proptest::prelude::*;
 
     fn assert_monotone_from(lvl: &Level, boundary: Capability) {
@@ -823,6 +857,50 @@ mod tests {
                             lvl.name,
                         );
                     }
+                }
+            }
+        }
+    }
+
+    // execute·locus is the single facet `lowered_variants` skips (the executor-origin band), so the
+    // proptest above cannot see a non-monotone execute band added to another level. This guard closes
+    // that gap DIRECTLY at the level: for every level, admitting execute at a locus must admit it one
+    // rung lower — checking the level as a whole, so a floored clause that a WIDER clause covers (a
+    // level that `extend`s developer and re-admits below the band) is correctly monotone. Only the
+    // levels whose executor-origin band is intentionally floored are exempt; a new non-monotone
+    // execute band on any other level fails CLOSED here.
+    #[test]
+    fn execute_locus_is_monotone_except_the_intended_origin_bands() {
+        // Only developer AUTHORS an execute·locus floor (`>= sandbox-scope`: temp/process below are
+        // foreign code). network-admin `extend`s developer and inherits that clause verbatim without
+        // re-admitting below it, so it shares developer's exact band. That is safe by construction:
+        // `extend` only ADDS allow clauses, which only WIDEN the admit set — an extender can fill the
+        // band's floor (local-admin does, via `<= machine`, and is monotone) but can never introduce a
+        // floor worse than the one developer authored. So the shared band is fully pinned by
+        // developer's edge test (`developer_runs_worktree_code_but_not_foreign_or_system`); any level
+        // NOT listed here must be fully monotone in execute·locus, and a new base-level floor fails
+        // closed until it is declared here with its own edge test.
+        let intended: &[&str] = &["developer", "network-admin"];
+        for lvl in default_levels() {
+            if intended.contains(&lvl.name.as_str()) {
+                continue;
+            }
+            let exec_at = |local| {
+                let mut c = Capability::new(Operation::Execute);
+                c.locus.local = local;
+                c.execution.trust = ExecutionTrust::CallerFile;
+                Profile::of(vec![c])
+            };
+            for local in LocalLocus::all() {
+                let Some(lower) = predecessor(*local) else { continue };
+                if lvl.admits(&exec_at(*local)) {
+                    assert!(
+                        lvl.admits(&exec_at(lower)),
+                        "level `{}`: admits execute at {:?} but denies it one rung lower at {:?} — a \
+                         non-monotone execute band. If deliberate, add `{}` to `intended` WITH an edge \
+                         test; otherwise widen or remove the floor.",
+                        lvl.name, local, lower, lvl.name,
+                    );
                 }
             }
         }
