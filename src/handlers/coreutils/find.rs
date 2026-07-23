@@ -67,7 +67,11 @@ pub(in crate::handlers::coreutils) fn is_safe_find(tokens: &[Token]) -> Verdict 
                 _ => break,
             }
         }
-        let leading: Vec<&str> = tokens[i..]
+        // `-D` advances by 2 (option + debugopts arg); a TRAILING `-D` with no arg pushes `i` past
+        // the end, so slice with `get` rather than `tokens[i..]` (which would panic out of range).
+        let leading: Vec<&str> = tokens
+            .get(i..)
+            .unwrap_or(&[])
             .iter()
             .take_while(|t| !t.as_str().starts_with('-'))
             .map(Token::as_str)
@@ -185,6 +189,12 @@ mod tests {
         // A filename that looks like an action is just the value of `-name` (the old denylist
         // false-DENIED this; the allowlist skips the value correctly).
         find_name_dash_delete_value: "find . -name -delete",
+        // Regression (fuzzer, crash-*): a TRAILING `-D` (advances the leading-option scan by 2)
+        // overran `tokens[i..]` and panicked the hook. All 6 crash inputs minimize to a bare `-D`
+        // (or global opts) as the last token; each is a harmless no-op find that must not panic.
+        find_trailing_D: "find -D",
+        find_global_L_trailing_D: "find -L -D",
+        find_global_H_P_trailing_D: "find -H -P -D",
     }
 
     denied! {
