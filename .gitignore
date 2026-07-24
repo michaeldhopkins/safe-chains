@@ -1,6 +1,8 @@
 /target
 /fuzz/target
 /fuzz/artifacts
+# `cargo fuzz coverage` output: multi-MB .profraw/.profdata build artifacts.
+/fuzz/coverage
 # Keep the committed seed corpus; ignore libFuzzer's hash-named generated entries.
 /fuzz/corpus/parse/*
 !/fuzz/corpus/parse/seed-*
