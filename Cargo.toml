@@ -11,6 +11,17 @@ repository = "https://github.com/michaeldhopkins/safe-chains"
 name = "safe-chains"
 path = "src/main.rs"
 
+# Registry-derived fuzz dictionary + seed corpus generator. Feature-gated so `cargo install` never
+# ships it; it reads commands/**/*.toml, which aren't in the published crate anyway.
+[[bin]]
+name = "gen-fuzz-corpus"
+path = "src/bin/gen_fuzz_corpus.rs"
+required-features = ["fuzz-gen"]
+
+[features]
+# Enables the gen-fuzz-corpus bin. No extra deps — it reuses toml + sha2 from the main build.
+fuzz-gen = []
+
 [dependencies]
 clap = { version = "4", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
