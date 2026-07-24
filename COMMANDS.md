@@ -16050,6 +16050,40 @@ Aliases: `gwc`
 
 - Allowed standalone flags: --all, --help, --version, -V, -a, -h, -s
 
+### `whisper`
+<p class="cmd-url"><a href="https://github.com/openai/whisper">https://github.com/openai/whisper</a></p>
+
+- Allowed standalone flags: --help, -h
+- Allowed valued flags: --append_punctuations, --beam_size, --best_of, --clip_timestamps, --compression_ratio_threshold, --condition_on_previous_text, --device, --fp16, --hallucination_silence_threshold, --highlight_words, --initial_prompt, --language, --length_penalty, --logprob_threshold, --max_line_count, --max_line_width, --max_words_per_line, --model, --model_dir, --no_speech_threshold, --output_dir, --output_format, --patience, --prepend_punctuations, --suppress_tokens, --task, --temperature, --temperature_increment_on_fallback, --threads, --verbose, --word_timestamps, -f, -o
+
+**Examples:**
+
+- `whisper meeting.wav`
+- `whisper meeting.wav --model small.en --language en`
+- `whisper meeting.wav --model turbo --output_format txt --output_dir .`
+- `whisper audio.mp3 --task translate --language ja`
+- `whisper meeting.wav --model small.en --word_timestamps True --output_format srt`
+- `whisper meeting.wav --device cpu --fp16 False --beam_size 5`
+- `whisper --help`
+
+### `whisper-cpp`
+<p class="cmd-url"><a href="https://github.com/ggml-org/whisper.cpp">https://github.com/ggml-org/whisper.cpp</a></p>
+
+Aliases: `whisper-cli`
+
+- Allowed standalone flags: --debug-mode, --detect-language, --diarize, --help, --log-score, --no-fallback, --no-gpu, --no-prints, --no-timestamps, --output-csv, --output-json, --output-json-full, --output-lrc, --output-srt, --output-txt, --output-vtt, --output-words, --print-colors, --print-progress, --print-special, --split-on-word, --tinydiarize, --translate, -debug, -di, -dl, -h, -ls, -nf, -ng, -nt, -ocsv, -oj, -ojf, -olrc, -osrt, -otxt, -ovtt, -owts, -pc, -pp, -ps, -sow, -tdrz, -tr
+- Allowed valued flags: --beam-size, --best-of, --duration, --entropy-thold, --file, --font-path, --language, --logprob-thold, --max-context, --max-len, --model, --offset-n, --offset-t, --output-file, --ov-e-device, --processors, --prompt, --temperature, --temperature-inc, --threads, -bo, -bs, -d, -et, -f, -fp, -l, -lpt, -mc, -ml, -m, -of, -on, -ot, -oved, -p, -t, -tp, -tpi
+
+**Examples:**
+
+- `whisper-cpp -m models/ggml-base.en.bin -f meeting.wav`
+- `whisper-cpp --model models/ggml-small.bin --file audio.wav --output-txt`
+- `whisper-cpp -m models/ggml-base.en.bin -f a.wav -osrt -of out/transcript`
+- `whisper-cpp -m models/ggml-base.en.bin -f a.wav --language en --threads 8`
+- `whisper-cpp -m models/ggml-base.en.bin -f a.wav --translate --no-gpu`
+- `whisper-cli -m models/ggml-base.en.bin -f a.wav`
+- `whisper-cpp --help`
+
 ### `who`
 <p class="cmd-url"><a href="https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation">https://www.gnu.org/software/coreutils/manual/coreutils.html#who-invocation</a></p>
 

@@ -1,0 +1,99 @@
+[[command]]
+name = "whisper"
+description = "OpenAI's reference speech-to-text CLI (the `openai-whisper` Python package). Reads one or more local audio/video files, runs a Whisper model locally, and writes a transcript. Nothing about the transcription reaches a remote system — inference is entirely local. Two behaviors decide its risk profile, and both are path-shaped. (1) OUTPUT: `--output_dir`/`-o` chooses where transcripts land, defaulting to the CURRENT directory, and `--output_format`/`-f` picks txt/vtt/srt/tsv/json/all — a local file write per input. (2) MODEL LOADING: `--model` takes either a well-known size name (tiny/base/small/medium/large/large-v3/turbo, with .en variants) or a FILESYSTEM PATH to a checkpoint, and `--model_dir` overrides the search directory. Checkpoints are PyTorch archives loaded via torch.load, which is a deserialization surface — pointing either flag at a file the user did not produce is materially different from naming a stock model, so both are treated as executor paths rather than opaque strings. On first use of a stock model name the package downloads the weights (~75 MB to ~3 GB) over HTTPS from OpenAI's CDN into ~/.cache/whisper and verifies a SHA-256; subsequent runs are offline and cache-only. `--device` selects cpu/cuda and `--threads` sets torch thread count; the remaining flags (--task, --language, --temperature, --beam_size, --best_of, --patience, --length_penalty, --initial_prompt, --word_timestamps, the *_threshold tuning knobs, and the line/word formatting options) shape decoding and output text only. Stable CLI surface — the flag set has changed little across releases; the model roster grows (large-v3, then turbo)."
+url = "https://github.com/openai/whisper"
+researched_version = "openai-whisper (turbo model line); docs read 2026-07"
+level = "SafeWrite"
+bare = false
+standalone = ["--help", "-h"]
+valued = [
+    "--append_punctuations", "--beam_size", "--best_of",
+    "--clip_timestamps", "--compression_ratio_threshold",
+    "--condition_on_previous_text", "--device", "--fp16",
+    "--hallucination_silence_threshold", "--highlight_words",
+    "--initial_prompt", "--language", "--length_penalty",
+    "--logprob_threshold", "--max_line_count", "--max_line_width",
+    "--max_words_per_line", "--model", "--model_dir",
+    "--no_speech_threshold", "--output_dir", "--output_format",
+    "--patience", "--prepend_punctuations", "--suppress_tokens", "--task",
+    "--temperature", "--temperature_increment_on_fallback", "--threads",
+    "--verbose", "--word_timestamps",
+    "-f", "-o",
+]
+
+examples_safe = [
+    "whisper meeting.wav",
+    "whisper meeting.wav --model small.en --language en",
+    "whisper meeting.wav --model turbo --output_format txt --output_dir .",
+    "whisper audio.mp3 --task translate --language ja",
+    "whisper meeting.wav --model small.en --word_timestamps True --output_format srt",
+    "whisper meeting.wav --device cpu --fp16 False --beam_size 5",
+    "whisper --help",
+]
+examples_denied = [
+    "whisper meeting.wav --output_dir /etc",
+    "whisper meeting.wav -o ~/.ssh",
+    "whisper meeting.wav --model /tmp/evil.pt",
+    "whisper meeting.wav --model_dir /tmp/models",
+    "whisper /etc/shadow",
+]
+
+# The audio inputs are reads; the transcript destination is a write. `--model`/`--model_dir` are
+# gated as EXECUTOR paths, not ordinary reads: a checkpoint is unpickled by torch.load, so loading
+# one from /tmp or ~/Downloads is closer to running foreign code than to reading a file. A stock
+# model NAME (`--model small`) is not a path, classifies as an ordinary relative operand, and is
+# unaffected by the gate.
+[command.path_gate]
+positional = "read"
+flags = { "--model" = "exec", "--model_dir" = "exec", "--output_dir" = "write", "-o" = "write" }
+
+[[command]]
+name = "whisper-cpp"
+aliases = ["whisper-cli"]
+description = "whisper.cpp — the C/C++ port of Whisper (upstream binary `whisper-cli`, installed by Homebrew as `whisper-cpp`). Reads local audio, runs inference locally, writes transcripts. Materially LOWER risk than the Python CLI on the two axes that matter: it never downloads anything (the GGML model is a required local `-m/--model` argument, fetched out of band by the project's own download script), and a GGML checkpoint is a plain binary tensor container rather than a pickle, so loading one is a file READ, not a deserialization/code surface. Output is opt-in per format: `-otxt/-ovtt/-osrt/-olrc/-ocsv/-oj/-ojf/-owts` each emit a file alongside the input, and `-of/--output-file` sets the output base path. `-f/--file` names the input; `--font-path` points at a font for karaoke-style output; both are reads. The remaining flags are decode/compute tuning (`-t/--threads`, `-p/--processors`, `-bs/--beam-size`, `-bo/--best-of`, offsets, thresholds, `-ng/--no-gpu`) or display toggles (`-pc/--print-colors`, `-pp/--print-progress`, `-nt/--no-timestamps`), plus `-tr/--translate`, `-dl/--detect-language`, and the diarization switches. No network, no code execution, no credential access. Active project tracking upstream ggml; the flag surface is stable and additive."
+url = "https://github.com/ggml-org/whisper.cpp"
+researched_version = "whisper.cpp (whisper-cli); docs read 2026-07"
+level = "SafeWrite"
+bare = false
+standalone = [
+    "--debug-mode", "--detect-language", "--diarize", "--help",
+    "--log-score", "--no-fallback", "--no-gpu", "--no-prints",
+    "--no-timestamps", "--output-csv", "--output-json",
+    "--output-json-full", "--output-lrc", "--output-srt", "--output-txt",
+    "--output-vtt", "--output-words", "--print-colors", "--print-progress",
+    "--print-special", "--split-on-word", "--tinydiarize", "--translate",
+    "-debug", "-di", "-dl", "-h", "-ls", "-nf", "-ng", "-nt", "-ocsv",
+    "-oj", "-ojf", "-olrc", "-osrt", "-otxt", "-ovtt", "-owts", "-pc",
+    "-pp", "-ps", "-sow", "-tdrz", "-tr",
+]
+valued = [
+    "--beam-size", "--best-of", "--duration", "--entropy-thold",
+    "--file", "--font-path", "--language", "--logprob-thold",
+    "--max-context", "--max-len", "--model", "--offset-n", "--offset-t",
+    "--output-file", "--ov-e-device", "--processors", "--prompt",
+    "--temperature", "--temperature-inc", "--threads",
+    "-bo", "-bs", "-d", "-et", "-f", "-fp", "-l", "-lpt", "-mc", "-ml",
+    "-m", "-of", "-on", "-ot", "-oved", "-p", "-t", "-tp", "-tpi",
+]
+
+examples_safe = [
+    "whisper-cpp -m models/ggml-base.en.bin -f meeting.wav",
+    "whisper-cpp --model models/ggml-small.bin --file audio.wav --output-txt",
+    "whisper-cpp -m models/ggml-base.en.bin -f a.wav -osrt -of out/transcript",
+    "whisper-cpp -m models/ggml-base.en.bin -f a.wav --language en --threads 8",
+    "whisper-cpp -m models/ggml-base.en.bin -f a.wav --translate --no-gpu",
+    "whisper-cli -m models/ggml-base.en.bin -f a.wav",
+    "whisper-cpp --help",
+]
+examples_denied = [
+    "whisper-cpp -m models/ggml-base.en.bin -f /etc/shadow",
+    "whisper-cpp -m models/ggml-base.en.bin -f a.wav -of /etc/cron.d/job",
+    "whisper-cpp -m models/ggml-base.en.bin -f a.wav --output-file ~/.ssh/authorized_keys",
+]
+
+# Inputs (positionals, -f/--file) and the model/font are reads — a GGML model is inert data, so
+# unlike the Python CLI's pickled checkpoint it needs no executor gate. -of/--output-file is the
+# write destination.
+[command.path_gate]
+positional = "read"
+flags = { "--file" = "read", "-f" = "read", "--model" = "read", "-m" = "read", "--font-path" = "read", "-fp" = "read", "--output-file" = "write", "-of" = "write" }
