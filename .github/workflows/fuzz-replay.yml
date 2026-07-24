@@ -6,8 +6,8 @@ name: Fuzz replay
 # gate: replay every input the nightly has already accumulated against the code as it stands now.
 # It is deterministic (same corpus, same answer every run, no "it got lucky on push #47"), it takes
 # minutes rather than hours, and it answers the question a per-push job should answer — "did this
-# change break a path we already explored?" A short mutation burst rides along afterwards; anything
-# it finds is a genuine bug, it just arrives on a random push.
+# change break a path we already explored?" A short mutation burst is available on manual dispatch,
+# but deliberately does NOT run per push — see the note on that step for the measured cost.
 #
 # Read-only with respect to the corpus cache: the nightly owns the canonical corpus, so nothing here
 # writes it back. On a cache miss (a branch with no nightly cache yet) the replay is a no-op and the
@@ -75,9 +75,13 @@ jobs:
             -artifact_prefix=fuzz/artifacts/parse/ \
             fuzz/corpus/parse
 
-      # Bonus exploration. Fork mode so one shallow crash doesn't end the burst early; the explicit
-      # check below is what turns any finding red.
+      # Opt-in only (manual dispatch), NOT on every push. Measured: a nominal 60s burst cost ~275s,
+      # because in fork mode each child reloads the whole 12.6k corpus before it mutates and loading
+      # dominates at the runner's ~46 exec/s. That is a bad trade for ~60s of mutation when the
+      # nightly already runs 3x5h of exploration — and it would make a deterministic gate randomly
+      # red. Per push we replay only; exploration stays nightly's job.
       - name: Short mutation burst
+        if: github.event_name == 'workflow_dispatch'
         run: |
           set -euo pipefail
           BIN="fuzz/target/$TRIPLE/release/parse"
