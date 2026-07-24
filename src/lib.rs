@@ -190,6 +190,11 @@ pub enum ReachReason {
     HiddenPeer,
     /// Genuinely above/outside the working directory.
     OutsideWorkspace,
+    /// A temp path that is NOT this session's scratchpad. Reading and writing it is fine; RUNNING
+    /// code from it is not, because anonymous `/tmp` is where downloaded/foreign code lands. This
+    /// is the one reach whose remedy is usually "that IS my working directory" — so the nudge says
+    /// how to bless it rather than implying the agent did something wrong.
+    ForeignTemp,
 }
 
 impl ReachReason {
@@ -207,6 +212,14 @@ impl ReachReason {
                  shielded — this is a deliberate guard, not a path error. To reach it, grant that \
                  path in ~/.config/safe-chains.toml, or run the agent from the peer's parent \
                  directory so the peer counts as in-workspace"
+            ),
+            ReachReason::ForeignTemp => format!(
+                "it runs code from `{path}`, a temporary directory that is not this session's \
+                 scratchpad. Temp files can be read and written freely, but code there is treated \
+                 as FOREIGN (a downloaded script lands in the same place), so running it is not \
+                 auto-approved. If this is a working directory you trust, grant it in \
+                 ~/.config/safe-chains.toml; a scratchpad the harness reports for this session is \
+                 recognized automatically and needs no grant"
             ),
             ReachReason::OutsideWorkspace => match pathctx::cwd() {
                 Some(cwd) => format!(
@@ -237,6 +250,13 @@ pub fn workspace_overreach(command: &str) -> Option<(String, ReachReason)> {
             return None;
         }
         let resolved = pathctx::resolve(&t).into_owned();
+        // A temp path is READ/WRITE admitted, so the outside-test below never fires on it — but it
+        // is not EXECUTABLE unless it is this session's scratchpad. When the command was denied,
+        // that is the likely reason, and it is the one case where the fix is a grant rather than a
+        // correction, so surface it with those instructions.
+        if pathctx::under_temp_root(&resolved) && !pathctx::in_session_scratchpad(&resolved) {
+            return Some((t, ReachReason::ForeignTemp));
+        }
         let outside = (resolved.starts_with('/') || resolved.starts_with('~'))
             && (!engine::resolve::read_content_verdict(&resolved).is_allowed()
                 || !engine::resolve::write_target_verdict(&resolved).is_allowed());
