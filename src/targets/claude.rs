@@ -77,6 +77,10 @@ struct ClaudeHookEnvelope {
     tool_input: ToolInput,
     #[serde(default)]
     cwd: Option<String>,
+    /// Claude Code's per-session UUID. Used only as the unforgeable anchor for recognizing this
+    /// session's scratchpad (`pathctx::session_scratchpad`); absent → nothing is recognized.
+    #[serde(default)]
+    session_id: Option<String>,
 }
 
 impl HookFormat for ClaudeHookFormat {
@@ -88,6 +92,7 @@ impl HookFormat for ClaudeHookFormat {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
             root: super::env_root("CLAUDE_PROJECT_DIR"),
+            session_id: envelope.session_id,
         })
     }
 

@@ -103,6 +103,8 @@ impl HookFormat for GeminiHookFormat {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
             root: super::env_root("GEMINI_PROJECT_DIR"),
+            // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
+            session_id: None,
         })
     }
 

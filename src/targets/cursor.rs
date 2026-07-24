@@ -85,6 +85,8 @@ impl HookFormat for CursorHookFormat {
             cwd: envelope.cwd,
             // cursor sends the project root(s) in the payload; take the first.
             root: (!envelope.workspace_roots.is_empty()).then(|| envelope.workspace_roots.swap_remove(0)),
+            // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
+            session_id: None,
         })
     }
 

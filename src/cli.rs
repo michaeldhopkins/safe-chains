@@ -45,6 +45,11 @@ pub struct Cli {
     #[arg(long)]
     pub root: Option<String>,
 
+    /// The harness session id (as a hook would pass), used to recognize this session's scratchpad
+    /// under a temp root as a trusted working area rather than anonymous `/tmp`.
+    #[arg(long, value_name = "ID")]
+    pub session_id: Option<String>,
+
     /// Print a per-segment breakdown of why a command would or would not auto-approve.
     #[arg(long)]
     pub explain: bool,

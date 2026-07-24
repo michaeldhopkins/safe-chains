@@ -88,6 +88,8 @@ impl HookFormat for CodexHookFormat {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
             root: None, // codex sends cwd but no distinct project root (HARNESS-BEHAVIORS.md)
+            // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
+            session_id: None,
         })
     }
 

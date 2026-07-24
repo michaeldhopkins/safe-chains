@@ -113,6 +113,8 @@ impl HookFormat for CopilotHookFormat {
             command: inner.command.unwrap_or_default(),
             cwd: envelope.cwd,
             root: None, // copilot sends cwd but no documented project root
+            // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
+            session_id: None,
         })
     }
 

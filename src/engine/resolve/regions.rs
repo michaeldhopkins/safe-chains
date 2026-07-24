@@ -453,7 +453,36 @@ fn apply_grant(path: &str, base: Role) -> Role {
 /// `worktree`. Then a user trust grant may widen the result. `path` is expected already
 /// resolved and past the `$`/`..` guard.
 pub(crate) fn classify_region(path: &str) -> Role {
+    if let Some(role) = scratchpad_role(path) {
+        return role;
+    }
     apply_grant(path, base_region(path))
+}
+
+/// This session's SCRATCHPAD — the harness's own per-session working directory — earns
+/// `sandbox-scope`: a trusted working area that is not the worktree.
+///
+/// Why a distinct rung rather than just `temp`: the scratchpad is where an agent stages its OWN
+/// work (a generated script, an extracted archive, intermediate data). Classified `temp` it is read-
+/// and write-able but **not executable**, because `temp` sits BELOW the execute clause's
+/// `>= sandbox-scope` floor — the floor that (correctly) treats `/tmp/x.sh` as downloaded, foreign
+/// code. That floor is right for anonymous `/tmp` and wrong for the agent's own workspace, and
+/// `sandbox-scope` is precisely the rung the level model reserved for "trusted, not the worktree"
+/// (levels/default.toml, the executor-origin band). So a recognized scratchpad becomes runnable
+/// while every other `/tmp` path stays foreign.
+///
+/// Recognition is anchored on the unforgeable session id, never on a guessable layout — see
+/// `pathctx::in_session_scratchpad` for why that is both safe and durable. This runs BEFORE the
+/// region table so the scratchpad is not first captured by the generic `/tmp` node; it deliberately
+/// does NOT bypass anything else, because a non-matching path falls straight through to the normal
+/// classification.
+fn scratchpad_role(path: &str) -> Option<Role> {
+    crate::pathctx::in_session_scratchpad(path).then_some(Role {
+        read_locus: LocalLocus::SandboxScope,
+        write_locus: LocalLocus::SandboxScope,
+        reads_secret: false,
+        pinned: false,
+    })
 }
 
 fn base_region(path: &str) -> Role {
@@ -615,7 +644,7 @@ mod tests {
     fn adjacent_sibling_classification() {
         use crate::pathctx::{enter, PathCtx};
         let ws = |root: &str, path: &str| {
-            let _g = enter(PathCtx { cwd: Some(root.to_string()), root: Some(root.to_string()) });
+            let _g = enter(PathCtx { cwd: Some(root.to_string()), root: Some(root.to_string()), ..Default::default() });
             classify_region(path)
         };
         const WS: &str = "~/projects/safe-chains";
@@ -656,7 +685,7 @@ mod tests {
     fn hidden_peer_predicate_tracks_the_dot_shield() {
         use crate::pathctx::{enter, PathCtx};
         let hp = |root: &str, path: &str| {
-            let _g = enter(PathCtx { cwd: Some(root.to_string()), root: Some(root.to_string()) });
+            let _g = enter(PathCtx { cwd: Some(root.to_string()), root: Some(root.to_string()), ..Default::default() });
             is_hidden_peer(path)
         };
         const WS: &str = "~/projects/safe-chains";

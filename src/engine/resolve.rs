@@ -1928,7 +1928,7 @@ mod tests {
         assert_eq!(project(&resolve(&toks(&["sed", "-i", "s/a/b/", "*"])).expect("sed")), Verdict::Allowed(SafetyLevel::SafeWrite), "no ctx: sed -i *");
 
         // Context says the shell is in /etc → relative operands are /etc/* → machine → deny.
-        let _g = crate::pathctx::enter(PathCtx { cwd: Some("/etc".into()), root: Some("/home/u/proj".into()) });
+        let _g = crate::pathctx::enter(PathCtx { cwd: Some("/etc".into()), root: Some("/home/u/proj".into()), ..Default::default() });
         for p in ["*", "hosts", "config", "cron.d"] {
             assert_eq!(classify_locus(p), LocalLocus::Machine, "{p}: cwd=/etc → machine");
         }

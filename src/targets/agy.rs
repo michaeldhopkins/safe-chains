@@ -107,7 +107,7 @@ impl HookFormat for AntigravityHookFormat {
             .and_then(|a| a.command_line)
             .ok_or_else(|| ParseError { message: "no toolCall.args.CommandLine".into() })?;
         let cwd = env.workspace_paths.into_iter().next();
-        Ok(HookInput { command, root: cwd.clone(), cwd })
+        Ok(HookInput { command, root: cwd.clone(), cwd, session_id: None })
     }
 
     fn render_response(&self, verdict: Verdict) -> HookResponse {

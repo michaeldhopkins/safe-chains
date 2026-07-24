@@ -317,7 +317,7 @@ proptest! {
         ],
     ) {
         let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
-            cwd: Some("/work".into()), root: Some("/work".into()),
+            cwd: Some("/work".into()), root: Some("/work".into()), ..Default::default()
         });
         let with_var = format!("VAR={value}; {reader} $VAR/{suffix}");
         let expanded = format!("{reader} {value}/{suffix}");
@@ -336,7 +336,7 @@ proptest! {
         reader in prop_oneof![Just("cat"), Just("tee")],
     ) {
         let _ctx = crate::pathctx::enter(crate::pathctx::PathCtx {
-            cwd: Some("/work".into()), root: Some("/work".into()),
+            cwd: Some("/work".into()), root: Some("/work".into()), ..Default::default()
         });
         let via_fn = format!("f(){{ {reader} \"$1\"; }}; f {value}");
         let direct = format!("{reader} {value}");
@@ -617,6 +617,7 @@ mod resolution {
         crate::pathctx::enter(crate::pathctx::PathCtx {
             cwd: Some("/work".into()),
             root: Some("/work".into()),
+            ..Default::default()
         })
     }
     fn allowed(cmd: &str) -> bool {

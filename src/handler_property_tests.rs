@@ -22,7 +22,7 @@ use crate::pathctx::PathCtx;
 use crate::{command_verdict, command_verdict_in, is_safe_command};
 
 fn workspace() -> PathCtx {
-    PathCtx { cwd: Some("/work".into()), root: Some("/work".into()) }
+    PathCtx { cwd: Some("/work".into()), root: Some("/work".into()), ..Default::default() }
 }
 
 /// EVERY command the classifier knows — handler-backed AND the full TOML registry (~1200+). New

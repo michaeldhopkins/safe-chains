@@ -88,6 +88,8 @@ impl HookFormat for QwenHookFormat {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
             root: super::env_root("QWEN_PROJECT_DIR"),
+            // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
+            session_id: None,
         })
     }
 
