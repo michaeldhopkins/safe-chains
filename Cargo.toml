@@ -7,6 +7,10 @@ license = "MIT OR Apache-2.0"
 description = "Auto-allow safe bash commands in agentic coding tools"
 repository = "https://github.com/michaeldhopkins/safe-chains"
 
+# The crate ships a second, feature-gated binary (gen-fuzz-corpus), which makes a bare `cargo run`
+# ambiguous — CI's "Verify COMMANDS.md is up to date" step runs exactly that. Name the default.
+default-run = "safe-chains"
+
 [[bin]]
 name = "safe-chains"
 path = "src/main.rs"
