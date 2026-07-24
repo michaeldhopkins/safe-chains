@@ -60,6 +60,35 @@ The existing guards live in `tests/`, `src/handler_property_tests.rs`, `src/regi
 (the `every_*` guards), and `src/engine/testgen.rs` (the level-algebra proptests). Read them before
 adding a new one — extend a corpus/table where one already fits rather than starting a fresh test.
 
+### Fuzzing (project specifics)
+
+General fuzzing method — the two budgets, the seeding ladder, coverage, CI shape, the gotchas — is
+in the `rust-project` skill. This section is only what is specific to safe-chains.
+
+- **Target:** `fuzz/fuzz_targets/parse.rs` runs `is_safe_command(&String::from_utf8_lossy(data))` —
+  the never-panics/never-hangs contract on the whole classifier (parse → CST → engine → handlers).
+  It **discards the verdict**, so it finds availability bugs only; a wrong *classification* (a
+  fail-open) is out of scope for this target and would need an invariant target instead.
+- **Seeding is registry-derived.** `src/bin/gen_fuzz_corpus.rs` (feature `fuzz-gen`,
+  `cargo run --bin gen-fuzz-corpus --features fuzz-gen`) reads `commands/**/*.toml` and emits the
+  `examples_safe`/`examples_denied` invocations as seeds and the command/subcommand/flag vocabulary
+  as a `-dict`. New commands are covered automatically — **no hand-maintained fuzz corpus.** The
+  nightly (`.github/workflows/fuzz.yml`) regenerates and merges them in; the per-push replay is
+  `fuzz-replay.yml`. Generated `gen-*` seeds and `fuzz/dict/` are git-ignored.
+- **Measured coverage** (region, authored source): mutation corpus alone ~26%, registry seeds alone
+  ~37%, **combined ~61%**. The two are complementary — seeds unlock the per-command grammars,
+  mutation covers parser byte-paths.
+- **Two kinds of coverage hole, and what each means:**
+  - **Un-exampled commands** — a handler at ~0% (e.g. `glab`, `magick`, `sysctl`) almost always has
+    NO `examples_safe`/`examples_denied`, so nothing seeds it and byte mutation never synthesizes
+    `glab mr list`. Adding examples is the **cheapest coverage win** and doubles as a
+    `toml_examples_match_dispatch` guard. Prefer this before anything fancier.
+  - **Out-of-scope layers** — `targets/*` (hook-envelope I/O), `cst/explain.rs` + `cst/display.rs`
+    (the `--explain` renderer), `docs.rs`/`registry/docs.rs`, and `suggest.rs` sit at ~0% because
+    `is_safe_command` never calls them. They are not blind spots of the `parse` target; reaching
+    them needs a **new** target (a hook-envelope target for `targets/`, an `explain` target for the
+    CST renderer). Don't chase these by seeding `parse`.
+
 ## Linting
 
 ```bash
