@@ -249,28 +249,31 @@ jobs:
         run: cargo +nightly fuzz coverage parse --target "$TRIPLE"
 
       # Don't hardcode cargo-fuzz's layout — it differs with/without --target and has moved between
-      # releases, and a plain `find` can land on a STALE NON-instrumented `parse` from an earlier
-      # build (observed locally). Probe each candidate and keep the first one llvm-cov accepts.
+      # releases. The `coverage` build lands under the WORKSPACE-ROOT `target/`, NOT `fuzz/target/`,
+      # in a nested `<triple>/coverage/<triple>/release/` path (verified on this runner). Search both
+      # roots for the coverage build, then PROBE each candidate and keep the first llvm-cov accepts —
+      # the probe, not the path, is the real check (guards against a stale non-instrumented binary).
       - name: Render report
         run: |
           set -euo pipefail
           LLVM_COV="$(rustc +nightly --print sysroot)/lib/rustlib/$TRIPLE/bin/llvm-cov"
           PROF=fuzz/coverage/parse/coverage.profdata
           BIN=""
-          for cand in $(find fuzz/target -name parse -type f -perm -u+x 2>/dev/null); do
+          for cand in $(find target fuzz/target -path '*coverage*release*' -name parse -type f 2>/dev/null); do
             if "$LLVM_COV" report "$cand" -instr-profile="$PROF" >/dev/null 2>&1; then
               BIN="$cand"; break
             fi
           done
           if [ -z "$BIN" ]; then
             echo "::error::no INSTRUMENTED parse binary matched $PROF (cargo-fuzz layout changed?)"
-            find fuzz/target -name parse -type f -perm -u+x 2>/dev/null || true
+            find target fuzz/target -name parse -type f 2>/dev/null || true
             exit 1
           fi
           echo "llvm-cov: $LLVM_COV"
           echo "instrumented binary: $BIN"
-          # Report safe-chains' OWN source only — not deps, std, or the fuzz shim.
-          IGNORE='(/\.cargo/|/rustc/|/fuzz/)'
+          # Report safe-chains' OWN authored source only — not deps, std, the fuzz shim, or
+          # build-script-GENERATED files (build/*/out/*, e.g. the compiled command registry).
+          IGNORE='(/\.cargo/|/rustc/|/fuzz/|/out/)'
           {
             echo '## Fuzz coverage (`parse` target)'
             echo
