@@ -50,6 +50,23 @@ impl Drop for ClassifyGuard {
     }
 }
 
+/// Charge `units` of extra work to the shared per-classification budget; `false` once it is spent
+/// and the caller must fail closed.
+///
+/// Brace expansion charges here so its fan-out draws from the SAME pool as delegation and function
+/// resolution. Otherwise the two caps MULTIPLY rather than add: a word may expand to
+/// `BRACE_EXPANSION_CAP` (256) alternatives and each delegated re-classification re-expands it, so
+/// 512 delegations × 256 words is ~131k word checks — seconds of wall clock from a ~200-byte input
+/// (found by the nightly fuzzer as a timeout). Neither cap is unreasonable alone; only their product
+/// is. Charging fan-out here makes the total additive and keeps the worst case bounded.
+pub(crate) fn charge_classify_work(units: u32) -> bool {
+    CLASSIFY_WORK.with(|w| {
+        let n = w.get().saturating_add(units);
+        w.set(n);
+        n <= MAX_CLASSIFY_WORK
+    })
+}
+
 pub fn command_verdict(input: &str) -> Verdict {
     let Some(_guard) = ClassifyGuard::enter() else {
         return Verdict::Denied; // classification budget spent — fail closed
