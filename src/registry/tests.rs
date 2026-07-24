@@ -2366,6 +2366,67 @@ use super::*;
             "TOML examples drift from dispatcher:\n{}", failures.join("\n"));
     }
 
+    /// safe-chains must know its OWN command-line surface. Every flag clap defines is enumerated
+    /// from the parser itself, so a flag added to `cli.rs` and forgotten in
+    /// `commands/tools/safe-chains.toml` fails here instead of silently denying the tool's own
+    /// invocation (which is exactly what happened when `--session-id` was added).
+    ///
+    /// Fail-closed by construction: a NEW flag must either classify safe or be declared in
+    /// `NOT_AUTO_APPROVED` with a reason. Doing nothing is not an option the guard permits.
+    #[test]
+    fn safe_chains_knows_its_own_cli_flags() {
+        use clap::CommandFactory;
+
+        // Flags whose effect is deliberately NOT auto-approved: they write another tool's config
+        // (`--setup`/`--tool`/`--auto-detect`), generate files (`--generate-book`), or write the
+        // very file that grants trust (`--suggest` creates/extends `.safe-chains.toml`, which an
+        // agent must never be able to author unprompted). Listing them here records the intent, so
+        // a flag is never merely *forgotten*.
+        const NOT_AUTO_APPROVED: &[&str] =
+            &["setup", "tool", "auto-detect", "generate-book", "suggest"];
+
+        let cmd = crate::cli::Cli::command();
+        let mut failures = Vec::new();
+        for arg in cmd.get_arguments() {
+            // A short-only flag must NOT be skipped — silently passing over an unclassified flag
+            // is the exact fail-open this guard exists to prevent, so spell it as `-x`.
+            let spelling = match (arg.get_long(), arg.get_short()) {
+                (Some(long), _) => format!("--{long}"),
+                (None, Some(short)) => format!("-{short}"),
+                (None, None) => continue, // a positional, not a flag
+            };
+            // --help/--version short-circuit in clap before classification is meaningful.
+            if spelling == "--help" || spelling == "--version" {
+                continue;
+            }
+            let long = spelling.trim_start_matches('-');
+            let takes_value = arg.get_num_args().is_none_or(|r| r.takes_values());
+            let invocation = if takes_value {
+                format!("safe-chains {spelling} X 'ls'")
+            } else {
+                format!("safe-chains {spelling} 'ls'")
+            };
+            let allowed = crate::is_safe_command(&invocation);
+            let intended = !NOT_AUTO_APPROVED.contains(&long);
+            if allowed != intended {
+                failures.push(format!(
+                    "--{long}: classifies {} but {} ({invocation:?})",
+                    if allowed { "SAFE" } else { "denied" },
+                    if intended {
+                        "commands/tools/safe-chains.toml does not list it"
+                    } else {
+                        "it is declared NOT_AUTO_APPROVED"
+                    },
+                ));
+            }
+        }
+        assert!(
+            failures.is_empty(),
+            "safe-chains' own CLI flags drift from its command spec:\n{}",
+            failures.join("\n"),
+        );
+    }
+
     /// GLOBAL guard for the `verb-chain` primitive — enumerated over the registry so any future
     /// verb-chain command is covered automatically, not just mlr. For every such command:
     ///   1. every allowlisted verb classifies safe (bare, and after the `then` separator);
