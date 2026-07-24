@@ -12871,7 +12871,7 @@ Aliases: `psed`
 <p class="cmd-url"><a href="https://github.com/michaeldhopkins/safe-chains">https://github.com/michaeldhopkins/safe-chains</a></p>
 
 - Allowed standalone flags: --explain, --help, --list-commands, --list-tools, --version, -V, -h, -v
-- Allowed valued flags: --cwd, --level, --root
+- Allowed valued flags: --cwd, --level, --root, --session-id
 
 **Examples:**
 
@@ -12883,6 +12883,7 @@ Aliases: `psed`
 - `safe-chains --level safe-write 'pod install'`
 - `safe-chains --explain 'cat foo'`
 - `safe-chains --cwd /w --root /w --level reader 'cat ../peer/src/main.rs'`
+- `safe-chains --session-id abc12345 'cat foo'`
 - `safe-chains hook claude`
 - `safe-chains hook codex`
 - `safe-chains hook cursor`
