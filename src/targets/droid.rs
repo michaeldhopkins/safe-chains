@@ -97,6 +97,8 @@ impl HookFormat for DroidHookFormat {
             command: envelope.tool_input.command,
             cwd: envelope.cwd,
             root: super::env_root("FACTORY_PROJECT_DIR"),
+            // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
+            session_id: None,
         })
     }
 

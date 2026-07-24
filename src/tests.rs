@@ -1705,12 +1705,12 @@ safe_write! {
 #[test]
 fn cwd_context_closes_the_cross_invocation_write_hole() {
     use crate::pathctx::PathCtx;
-    let outside = PathCtx { cwd: Some("/etc".into()), root: Some("/home/u/proj".into()) };
+    let outside = PathCtx { cwd: Some("/etc".into()), root: Some("/home/u/proj".into()), ..Default::default() };
     // The shell is really in /etc → `> ./x` is `/etc/x` → denied, like a direct `> /etc/x`.
     assert!(!command_verdict_in("echo pwned > ./x", outside.clone()).is_allowed(), "cwd=/etc: ./x → /etc/x denied");
     assert!(!command_verdict_in("echo pwned > passwd", outside).is_allowed(), "cwd=/etc: passwd → /etc/passwd denied");
     // In the project, the same relative write is allowed.
-    let inside = PathCtx { cwd: Some("/home/u/proj".into()), root: Some("/home/u/proj".into()) };
+    let inside = PathCtx { cwd: Some("/home/u/proj".into()), root: Some("/home/u/proj".into()), ..Default::default() };
     assert!(command_verdict_in("echo ok > ./x", inside).is_allowed(), "cwd in project: ./x allowed");
     // No context → today's behavior (relative = worktree), no regression.
     assert!(command_verdict("echo ok > ./x").is_allowed(), "no ctx: ./x allowed (fallback)");
@@ -1723,7 +1723,7 @@ fn cwd_context_closes_the_cross_invocation_write_hole() {
 #[test]
 fn intra_line_cd_reclassifies_later_relative_writes() {
     use crate::pathctx::PathCtx;
-    let ctx = PathCtx { cwd: Some("/home/u/proj".into()), root: Some("/home/u/proj".into()) };
+    let ctx = PathCtx { cwd: Some("/home/u/proj".into()), root: Some("/home/u/proj".into()), ..Default::default() };
     assert!(!command_verdict_in("cd /etc && echo pwned > ./x", ctx.clone()).is_allowed(), "cd /etc → ./x is /etc/x, denied");
     assert!(!command_verdict_in("cd /etc && echo pwned > passwd", ctx.clone()).is_allowed(), "cd /etc → passwd denied");
     assert!(!command_verdict_in("cd ../../etc && echo x > ./y", ctx.clone()).is_allowed(), "cd .. escaping the project denied");
@@ -1769,7 +1769,7 @@ fn workspace_overreach_distinguishes_hidden_peer_from_outside() {
         return;
     }
     let ws = format!("{home}/projects/scproj"); // depth-2 workspace → parent is ~/projects
-    let _g = enter(PathCtx { cwd: Some(ws.clone()), root: Some(ws) });
+    let _g = enter(PathCtx { cwd: Some(ws.clone()), root: Some(ws), ..Default::default() });
 
     // Ordinary peer source is adjacent → allowed → not an overreach at all.
     assert_eq!(

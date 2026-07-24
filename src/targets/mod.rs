@@ -103,6 +103,11 @@ pub struct HookInput {
     /// The project root, when the harness supplies one (HP-19) — a `*_PROJECT_DIR` env var
     /// for most, `workspace_roots` in the payload for cursor. Absent for codex/copilot.
     pub root: Option<String>,
+    /// The harness's session/conversation id, when it supplies one (`session_id` for
+    /// Claude/Gemini/Qwen/Droid, `sessionId` for grok, `conversation_id` for cursor). It comes from
+    /// the harness's own envelope, so the agent cannot forge it — which is what makes it usable as
+    /// the anchor for recognizing the session's scratchpad (see `pathctx::session_scratchpad`).
+    pub session_id: Option<String>,
 }
 
 /// Read a harness project-root env var from the hook process environment (set by the

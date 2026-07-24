@@ -219,6 +219,7 @@ fn run_hook_format(format: &dyn HookFormat) -> ! {
     let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
         cwd: input.cwd.clone(),
         root: input.root.clone().or_else(|| input.cwd.clone()),
+        session_id: input.session_id.clone(),
     });
     // The auto-approve ceiling comes from the write-protected user config (`~/.config/safe-chains.toml`,
     // `level = "…"`). Absent → the default developer band. An UPPER level (network-admin) RAISES it —
@@ -338,6 +339,7 @@ fn main() {
                 let _ctx = safe_chains::pathctx::enter(safe_chains::pathctx::PathCtx {
                     cwd: cli.cwd,
                     root: cli.root,
+                    session_id: cli.session_id,
                 });
                 if cli.explain {
                     run_explain(&command);

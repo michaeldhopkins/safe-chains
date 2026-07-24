@@ -23,6 +23,9 @@ use std::cell::RefCell;
 pub struct PathCtx {
     pub cwd: Option<String>,
     pub root: Option<String>,
+    /// The harness's session id, when it supplies one. Only used to recognize this session's
+    /// SCRATCHPAD — see [`in_session_scratchpad`].
+    pub session_id: Option<String>,
 }
 
 thread_local! {
@@ -51,7 +54,13 @@ impl Drop for Guard {
 pub fn enter_cwd(cwd: Option<String>) -> Guard {
     Guard(CURRENT.with(|c| {
         let mut b = c.borrow_mut();
-        PathCtx { cwd: std::mem::replace(&mut b.cwd, cwd), root: b.root.clone() }
+        // `session_id` is carried through unchanged: a `cd` mid-chain must not drop scratchpad
+        // recognition (the session is the same session whatever directory it walks into).
+        PathCtx {
+            cwd: std::mem::replace(&mut b.cwd, cwd),
+            root: b.root.clone(),
+            session_id: b.session_id.clone(),
+        }
     }))
 }
 
@@ -66,6 +75,54 @@ pub fn root() -> Option<String> {
     CURRENT.with(|c| {
         let b = c.borrow();
         b.root.clone().or_else(|| b.cwd.clone())
+    })
+}
+
+/// Whether `path` lies inside THIS session's scratchpad — the harness's own per-session working
+/// directory (e.g. Claude Code's `/private/tmp/claude-<uid>/<project-slug>/<session-id>/scratchpad`).
+///
+/// The anchor is the **session id as a whole path component**, not the surrounding layout. That is
+/// deliberate and is what makes this safe *and* durable:
+///
+/// - **Unforgeable.** The session id arrives in the harness's own hook envelope, never from the
+///   agent's shell. An attacker cannot pre-plant `/tmp/<this-session-id>/evil.sh` because the id is
+///   unknown until the session exists (and it is unique per session). Compare a *layout* pattern
+///   ("anything under `/tmp/claude-*`"), which anyone can create.
+/// - **Durable.** It survives the harness reorganizing the parts around the id — the uid suffix,
+///   the slug, `/tmp` vs `/private/tmp`, the trailing directory name. Those are internal details
+///   (Claude Code does not document or expose the scratchpad path, and declined to; see
+///   docs/design/agent-scratchpad.md), so matching them exactly would be brittle.
+/// - **Fail-closed.** No session id, or a path that does not contain it, simply does not match:
+///   the path keeps its ordinary classification (`/tmp` → `temp`, i.e. foreign). A harness that
+///   supplies no id, or whose scratchpad omits it, is exactly as restricted as before — never worse.
+///
+/// Requiring a TEMP-root prefix as well keeps the id from blessing something outside the scratch
+/// area on a harness that happens to embed the id elsewhere (a log path under `$HOME`, say).
+pub fn in_session_scratchpad(path: &str) -> bool {
+    let Some(id) = CURRENT.with(|c| c.borrow().session_id.clone()) else {
+        return false;
+    };
+    // A short or trivial id could collide with an ordinary directory name; require something
+    // id-shaped before trusting it as an anchor.
+    if id.len() < 8 || !id.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_') {
+        return false;
+    }
+    if !under_temp_root(path) {
+        return false;
+    }
+    path.split('/').any(|seg| seg == id)
+}
+
+/// Whether `path` is under a temporary-filesystem root. macOS's `/tmp` is a symlink to
+/// `/private/tmp`, and harnesses report either spelling, so both are accepted (as is `$TMPDIR`).
+pub fn under_temp_root(path: &str) -> bool {
+    const ROOTS: &[&str] = &["/tmp/", "/private/tmp/", "/var/tmp/", "/private/var/tmp/"];
+    if ROOTS.iter().any(|r| path.starts_with(r)) {
+        return true;
+    }
+    std::env::var("TMPDIR").ok().is_some_and(|t| {
+        let t = t.trim_end_matches('/');
+        !t.is_empty() && t.starts_with('/') && path.starts_with(&format!("{t}/"))
     })
 }
 
@@ -331,6 +388,76 @@ fn lexical_join(base: &str, rel: &str) -> String {
 mod tests {
     use super::*;
 
+    const SID: &str = "7676dbc5-a265-43b3-a0f8-49666792bd9b";
+
+    fn with_session<T>(id: Option<&str>, f: impl FnOnce() -> T) -> T {
+        let _g = enter(PathCtx {
+            cwd: Some("/home/u/proj".into()),
+            root: Some("/home/u/proj".into()),
+            session_id: id.map(str::to_string),
+        });
+        f()
+    }
+
+    /// The recognition rule is a SECURITY boundary: matching a path that is not really this
+    /// session's scratchpad would hand `sandbox-scope` (and therefore EXECUTE) to foreign code. So
+    /// enumerate the spoofing class rather than one example — every way a hostile or unrelated path
+    /// could try to look like the scratchpad must fail, and every legitimate spelling must match.
+    #[test]
+    fn only_this_sessions_scratchpad_is_recognized() {
+        let scratch = format!("/private/tmp/claude-501/-Users-u-proj/{SID}/scratchpad");
+        let matching: &[String] = &[
+            format!("{scratch}/build.sh"),
+            format!("{scratch}/nested/deep/gen.py"),
+            scratch.clone(),
+            // layout around the id varies by harness/platform — the id is the anchor, not the shape
+            format!("/tmp/{SID}/x.sh"),
+            format!("/tmp/some-other-harness/{SID}/work/x.sh"),
+            format!("/var/tmp/{SID}/x.sh"),
+        ];
+        let rejected: &[String] = &[
+            // a DIFFERENT session's scratchpad — same layout, wrong id
+            "/private/tmp/claude-501/-Users-u-proj/00000000-1111-2222-3333-444444444444/scratchpad/x.sh".into(),
+            // the id as a SUBSTRING of a component, not a component (the prefix/suffix attack)
+            format!("/tmp/{SID}-evil/x.sh"),
+            format!("/tmp/evil-{SID}/x.sh"),
+            format!("/tmp/a{SID}/x.sh"),
+            // right id, but OUTSIDE any temp root — the id must not bless arbitrary locations
+            format!("/home/u/{SID}/x.sh"),
+            format!("~/.ssh/{SID}/id_rsa"),
+            format!("/etc/{SID}/passwd"),
+            // anonymous temp files carry no id at all
+            "/tmp/evil.sh".into(),
+            "/private/tmp/downloaded.sh".into(),
+        ];
+        with_session(Some(SID), || {
+            for p in matching {
+                assert!(in_session_scratchpad(p), "should be recognized: {p}");
+            }
+            for p in rejected {
+                assert!(!in_session_scratchpad(p), "must NOT be recognized: {p}");
+            }
+        });
+    }
+
+    /// Fail closed on every degenerate session id: no harness id, or one too short/odd to be a
+    /// trustworthy anchor, must recognize NOTHING — never widen a path.
+    #[test]
+    fn a_missing_or_unusable_session_id_recognizes_nothing() {
+        let path = format!("/tmp/{SID}/x.sh");
+        with_session(None, || {
+            assert!(!in_session_scratchpad(&path), "no session id → no recognition");
+        });
+        for weak in ["", "abc", "1234567", "..", "/", "a/b", "id with space", "x*y"] {
+            with_session(Some(weak), || {
+                assert!(
+                    !in_session_scratchpad(&format!("/tmp/{weak}/x.sh")),
+                    "weak id {weak:?} must not anchor recognition",
+                );
+            });
+        }
+    }
+
     #[test]
     fn no_context_leaves_paths_unchanged() {
         assert_eq!(resolve("./x"), "./x");
@@ -340,7 +467,7 @@ mod tests {
 
     #[test]
     fn relative_inside_the_project_stays_worktree_relative() {
-        let _g = enter(PathCtx { cwd: Some("/home/u/proj/sub".into()), root: Some("/home/u/proj".into()) });
+        let _g = enter(PathCtx { cwd: Some("/home/u/proj/sub".into()), root: Some("/home/u/proj".into()), ..Default::default() });
         assert_eq!(resolve("x"), "sub/x", "cwd under root → root-relative");
         assert_eq!(resolve("./y"), "sub/y");
         assert_eq!(resolve("../z"), "z", ".. that stays inside root");
@@ -348,7 +475,7 @@ mod tests {
 
     #[test]
     fn relative_outside_the_project_becomes_absolute() {
-        let _g = enter(PathCtx { cwd: Some("/etc".into()), root: Some("/home/u/proj".into()) });
+        let _g = enter(PathCtx { cwd: Some("/etc".into()), root: Some("/home/u/proj".into()), ..Default::default() });
         assert_eq!(resolve("x"), "/etc/x", "cd /etc → the real target");
         assert_eq!(resolve("passwd"), "/etc/passwd");
         assert_eq!(resolve("*"), "/etc/*");
@@ -356,13 +483,13 @@ mod tests {
 
     #[test]
     fn dotdot_escaping_the_project_becomes_absolute() {
-        let _g = enter(PathCtx { cwd: Some("/home/u/proj".into()), root: Some("/home/u/proj".into()) });
+        let _g = enter(PathCtx { cwd: Some("/home/u/proj".into()), root: Some("/home/u/proj".into()), ..Default::default() });
         assert_eq!(resolve("../../../etc/x"), "/etc/x");
     }
 
     #[test]
     fn absolute_in_root_becomes_root_relative_outside_stays_absolute() {
-        let _g = enter(PathCtx { cwd: Some("/home/u/proj/sub".into()), root: Some("/home/u/proj".into()) });
+        let _g = enter(PathCtx { cwd: Some("/home/u/proj/sub".into()), root: Some("/home/u/proj".into()), ..Default::default() });
         // absolute INSIDE root → root-relative (worktree), matching the relative spelling
         assert_eq!(resolve("/home/u/proj/main.rs"), "main.rs");
         assert_eq!(resolve("/home/u/proj/sub/x"), "sub/x");
@@ -411,7 +538,7 @@ mod tests {
     #[test]
     fn the_guard_restores_on_drop() {
         {
-            let _g = enter(PathCtx { cwd: Some("/etc".into()), root: Some("/r".into()) });
+            let _g = enter(PathCtx { cwd: Some("/etc".into()), root: Some("/r".into()), ..Default::default() });
             assert_eq!(resolve("x"), "/etc/x");
         }
         assert_eq!(resolve("x"), "x", "context cleared after the guard drops");

@@ -91,6 +91,8 @@ impl HookFormat for GrokHookFormat {
                 .workspace_root
                 .or_else(|| super::env_root("GROK_WORKSPACE_ROOT"))
                 .or_else(|| super::env_root("CLAUDE_PROJECT_DIR")),
+            // No scratchpad layout researched for this harness yet (see docs/design/agent-scratchpad.md).
+            session_id: None,
         })
     }
 
