@@ -60,6 +60,26 @@ jobs:
           path: fuzz/target/${{ env.TRIPLE }}/release/parse
           if-no-files-found: error
 
+      # Registry-derived seeds + dictionary. Byte mutation barely reaches the per-command grammars
+      # (~26% region); the examples_safe/denied invocations as seeds plus the command/flag vocabulary
+      # as a dictionary more than DOUBLE it (measured ~61% combined). Generated fresh each run so new
+      # commands are covered automatically; the seeds are absorbed into the canonical corpus by the
+      # merge job, so this compounds rather than repeating work.
+      - name: Generate seeds + dictionary
+        run: |
+          cargo run --bin gen-fuzz-corpus --features fuzz-gen
+          test -s fuzz/dict/parse.dict
+          test "$(find fuzz/corpus/parse -name 'gen-*' | wc -l)" -gt 0
+
+      - name: Upload seeds + dictionary
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzz-seeds
+          path: |
+            fuzz/dict/parse.dict
+            fuzz/corpus/parse
+          if-no-files-found: error
+
   fuzz:
     name: Fuzz (parse) shard ${{ matrix.shard }}
     needs: build
@@ -96,17 +116,27 @@ jobs:
           key: fuzz-corpus-parse-
           restore-keys: fuzz-corpus-parse-
 
+      # Registry seeds (gen-*) land alongside the restored corpus; the dictionary feeds -dict below.
+      # Downloading into the same corpus dir unions with the cache (both are present when fuzzing).
+      - name: Download seeds + dictionary
+        uses: actions/download-artifact@v4
+        with:
+          name: fuzz-seeds
+          path: fuzz
+
       # Fork mode (-fork=1) + -ignore_crashes: a crash/timeout kills only the child; the parent keeps
       # fuzzing to -max_total_time and SAVES every finding to fuzz/artifacts/ instead of libFuzzer's
       # default of aborting on the first. That is what lets a run enumerate the whole crash set (and
       # use its full time budget) rather than dying minutes in on the nearest shallow bug — every shard
       # otherwise trips the same shallow crash from the shared corpus and exits, wasting the parallelism.
+      # -dict feeds the registry vocabulary so the mutator splices real command/flag tokens.
       # The step stays green even with findings; "Fail on crashes" below turns any into a red run.
       - name: Fuzz
         run: |
           mkdir -p fuzz/corpus/parse fuzz/artifacts/parse
           ./bin/parse \
             -fork=1 -ignore_crashes=1 \
+            -dict=fuzz/dict/parse.dict \
             -max_total_time=${{ github.event.inputs.max_total_time || '18000' }} \
             -timeout=25 \
             -rss_limit_mb=4096 \
