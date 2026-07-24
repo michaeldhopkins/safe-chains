@@ -50,6 +50,15 @@ pub fn expand_word(word: &Word) -> Vec<String> {
             acc = next;
         }
     }
+    // Charge only the EXTRA words this expansion created (`acc.len() - 1`), against the same budget
+    // delegation and function resolution use. An ordinary word yields one alternative and charges
+    // nothing, so normal commands are untouched; a fanned-out word charges its fan-out, so expansion
+    // and delegation ADD instead of multiplying. Over budget → the unpinnable sentinel (deny), the
+    // same fail-closed result BRACE_EXPANSION_CAP already produces.
+    let extra = u32::try_from(acc.len().saturating_sub(1)).unwrap_or(u32::MAX);
+    if extra > 0 && !crate::cst::check::charge_classify_work(extra) {
+        return vec![UNPINNABLE.to_string()];
+    }
     acc
 }
 

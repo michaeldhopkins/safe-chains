@@ -195,6 +195,41 @@ fn classifier_terminates_on_adversarial_input() {
     assert!(slow.is_empty(), "classifier hung/panicked (>{budget:?}) on:\n  {}", slow.join("\n  "));
 }
 
+/// The same termination contract, enforced over the COMMITTED fuzz corpus (`fuzz/corpus/parse/seed-*`)
+/// rather than a hand-written list. The nightly fuzzer finds real pathological inputs that nobody
+/// would think to write down — the `seed-slow-*` entries took 1.2s, 1.5s and 5.8s before brace-
+/// expansion fan-out was charged to the shared classification budget (it multiplied with the
+/// delegation cap instead of adding). Enumerating the directory means every input a future nightly
+/// promotes to a committed seed is covered here automatically, with no list to remember to extend.
+///
+/// Skips cleanly when the corpus is absent (a source checkout without the fuzz dir), and says so.
+#[test]
+fn classifier_terminates_on_the_committed_fuzz_corpus() {
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("fuzz/corpus/parse");
+    let Ok(entries) = std::fs::read_dir(&dir) else {
+        eprintln!("skipped: no corpus at {} (nothing to replay)", dir.display());
+        return;
+    };
+    let budget = std::time::Duration::from_millis(1500);
+    let (mut checked, mut slow) = (0usize, Vec::new());
+    for entry in entries.flatten() {
+        let path = entry.path();
+        // Only the COMMITTED seeds: generated `gen-*` seeds and libFuzzer's hash-named entries are
+        // git-ignored, so they are absent in CI and must not make this test environment-dependent.
+        if !path.file_name().and_then(|n| n.to_str()).is_some_and(|n| n.starts_with("seed-")) {
+            continue;
+        }
+        let Ok(bytes) = std::fs::read(&path) else { continue };
+        checked += 1;
+        let input = String::from_utf8_lossy(&bytes).into_owned();
+        if !finishes_within(&input, budget) {
+            slow.push(format!("{} ({} bytes)", path.display(), bytes.len()));
+        }
+    }
+    assert!(slow.is_empty(), "classifier hung/panicked (>{budget:?}) on committed seeds:\n  {}", slow.join("\n  "));
+    eprintln!("replayed {checked} committed seed(s) within {budget:?}");
+}
+
 proptest! {
     #![proptest_config(ProptestConfig::with_cases(400))]
 
