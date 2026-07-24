@@ -130,10 +130,14 @@ jobs:
       # use its full time budget) rather than dying minutes in on the nearest shallow bug — every shard
       # otherwise trips the same shallow crash from the shared corpus and exits, wasting the parallelism.
       # -dict feeds the registry vocabulary so the mutator splices real command/flag tokens.
+      #
+      # Two corpus dirs: libFuzzer WRITES new units only to the FIRST (`new/`) and reads the rest as
+      # read-only input, so the shard uploads only what it DISCOVERED — not a copy of the ~14k it
+      # restored. That keeps the merge's incoming set (and its file I/O) from scaling with shard count.
       # The step stays green even with findings; "Fail on crashes" below turns any into a red run.
       - name: Fuzz
         run: |
-          mkdir -p fuzz/corpus/parse fuzz/artifacts/parse
+          mkdir -p fuzz/corpus/parse fuzz/corpus/new fuzz/artifacts/parse
           ./bin/parse \
             -fork=1 -ignore_crashes=1 \
             -dict=fuzz/dict/parse.dict \
@@ -141,17 +145,16 @@ jobs:
             -timeout=25 \
             -rss_limit_mb=4096 \
             -artifact_prefix=fuzz/artifacts/parse/ \
-            fuzz/corpus/parse
+            fuzz/corpus/new fuzz/corpus/parse
 
-      # Hand this shard's corpus to the merge job regardless of outcome — every explored input is
-      # worth keeping. Files are content-hash named, so the merge unions across shards with no
-      # collisions.
-      - name: Upload shard corpus
+      # Only this shard's NEW finds. The prior corpus + registry seeds reach the merge via the cache
+      # and the fuzz-seeds artifact, not re-uploaded per shard. Content-hash named, so no collisions.
+      - name: Upload shard finds
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: corpus-shard-${{ matrix.shard }}
-          path: fuzz/corpus/parse
+          path: fuzz/corpus/new
           if-no-files-found: ignore
 
       # Reproducing inputs land in fuzz/artifacts/parse/ (crash-*, timeout-*, oom-*, slow-unit-*).
@@ -198,7 +201,8 @@ jobs:
       - name: Make executable
         run: chmod +x bin/parse
 
-      # Seed the merge with the prior canonical corpus, then fold every shard on top of it.
+      # Seed the merge with the prior canonical corpus, then fold the registry seeds and every
+      # shard's NEW finds on top of it.
       - name: Restore prior corpus
         uses: actions/cache/restore@v4
         with:
@@ -206,21 +210,31 @@ jobs:
           key: fuzz-corpus-parse-
           restore-keys: fuzz-corpus-parse-
 
-      - name: Download shard corpora
+      # Shards no longer re-upload the seeds, so fold them in here (into the prior corpus dir) — this
+      # is what bakes the registry-example coverage into the canonical corpus the per-push replay reads.
+      - name: Download seeds
+        uses: actions/download-artifact@v4
+        with:
+          name: fuzz-seeds
+          path: fuzz
+
+      - name: Download shard finds
         uses: actions/download-artifact@v4
         with:
           pattern: corpus-shard-*
           path: incoming
 
       # `-merge=1 DST SRC...` unions and minimizes in ONE step: libFuzzer copies into DST only the
-      # inputs that add coverage, so starting from an empty DST over [prior corpus, every shard]
-      # yields exactly the minimized union — no separate copy-then-cmin pass, and no rebuild.
+      # inputs that add coverage, so starting from an empty DST over [prior corpus + seeds, every
+      # shard's finds] yields exactly the minimized union — no separate copy-then-cmin pass, no rebuild.
+      # Incoming is now just the shards' NEW finds, so the file count read scales with discovery, not
+      # with 3x the whole corpus.
       - name: Union and minimize
         run: |
           set -euo pipefail
           mkdir -p fuzz/corpus/parse minimized
-          echo "Prior corpus: $(find fuzz/corpus/parse -type f | wc -l) inputs"
-          echo "Incoming shard inputs: $(find incoming -type f 2>/dev/null | wc -l)"
+          echo "Prior corpus + seeds: $(find fuzz/corpus/parse -type f | wc -l) inputs"
+          echo "Incoming shard finds: $(find incoming -type f 2>/dev/null | wc -l)"
           # Unquoted on purpose: each shard dir is a separate SRC argument to -merge=1.
           shards=$(find incoming -mindepth 1 -maxdepth 1 -type d 2>/dev/null || true)
           ./bin/parse -merge=1 minimized fuzz/corpus/parse $shards
