@@ -31,6 +31,35 @@ static ARCHETYPES: LazyLock<BTreeMap<String, Capability>> = LazyLock::new(|| {
     build_archetypes(include_str!("../../archetypes.toml")).expect("embedded archetypes.toml must compile")
 });
 
+/// How an archetype is told apart from a confusable neighbour.
+#[derive(Debug, Clone, Deserialize)]
+struct TomlDistinction {
+    #[allow(dead_code)] // authoring metadata, read by the near-neighbour guards
+    archetype: String,
+    /// The dotted facet name that differs, as `Capability::set_facets` spells it.
+    #[allow(dead_code)] // authoring metadata, read by the near-neighbour guards
+    by: String,
+}
+
+/// `(name, distinguished_from, same_point_as)` for every archetype — the authored disambiguation,
+/// checked against the facets themselves by `near_neighbours_are_declared`.
+#[cfg(test)]
+fn declared_distinctions() -> Vec<(String, Vec<(String, String)>, Option<String>)> {
+    let set: TomlArchetypeSet =
+        toml::from_str(include_str!("../../archetypes.toml")).expect("archetypes.toml parses");
+    set.archetype
+        .into_iter()
+        .map(|(name, tc)| {
+            let d = tc
+                .distinguished_from
+                .into_iter()
+                .map(|x| (x.archetype, x.by))
+                .collect();
+            (name, d, tc.same_point_as)
+        })
+        .collect()
+}
+
 fn build_archetypes(src: &str) -> Result<BTreeMap<String, Capability>, String> {
     let set: TomlArchetypeSet = toml::from_str(src).map_err(|e| e.to_string())?;
     set.archetype
@@ -98,6 +127,16 @@ struct TomlArchetypeSet {
 struct TomlCapability {
     operation: String,
     because: String,
+    /// Archetypes this one is easily confused with, and the axis that separates them. Required
+    /// (both ways) for any pair differing on a single facet — see `near_neighbours_are_declared`.
+    #[serde(default)]
+    #[allow(dead_code)] // authoring metadata, read by the near-neighbour guards
+    distinguished_from: Vec<TomlDistinction>,
+    /// An archetype occupying the SAME point in facet space, declared deliberately. The two
+    /// classify identically and differ only in the prose `--explain` shows.
+    #[serde(default)]
+    #[allow(dead_code)] // authoring metadata, read by the near-neighbour guards
+    same_point_as: Option<String>,
     #[serde(default)]
     locus: Option<TomlLocus>,
     #[serde(default)]
@@ -432,5 +471,115 @@ mod tests {
         let opaque = Profile::of(vec![send_to(Provenance::Opaque)]);
         assert!(!level("network-admin").admits(&opaque), "an opaque (variable) destination is held above network-admin");
         assert!(level("yolo").admits(&opaque), "yolo leaves provenance unconstrained");
+    }
+}
+
+#[cfg(test)]
+mod neighbour_tests {
+    use super::*;
+    use std::collections::BTreeMap;
+
+    /// The facets on which two archetypes differ. `set_facets` omits terms sitting at their zero,
+    /// so a facet present in one map and absent from the other IS a difference (present vs default).
+    fn differing_facets(a: &Capability, b: &Capability) -> Vec<&'static str> {
+        let am: BTreeMap<_, _> = a.set_facets().into_iter().collect();
+        let bm: BTreeMap<_, _> = b.set_facets().into_iter().collect();
+        let mut keys: Vec<_> = am.keys().chain(bm.keys()).copied().collect();
+        keys.sort_unstable();
+        keys.dedup();
+        keys.into_iter().filter(|k| am.get(k) != bm.get(k)).collect()
+    }
+
+    /// Any two archetypes within ONE facet of each other must say so, both ways, naming the axis
+    /// that separates them.
+    ///
+    /// Choosing an archetype fixes 27 facets at once and is the most consequential authoring act in
+    /// the repo — yet it is done by picking a name from a flat list of 23, with the differences
+    /// buried in prose. That is not a theoretical hazard: `dynamodb scan` was classified
+    /// `bulk-object-read` when it is a `data-export`, because the two differ ONLY on `retrieval`
+    /// and the sentence saying so lived inside the OTHER archetype's `because`, invisible to
+    /// someone reading this one.
+    ///
+    /// Detection is mechanical rather than authored, so a confusable pair introduced later is
+    /// caught the moment it appears — nobody has to notice it first.
+    #[test]
+    fn near_neighbours_are_declared() {
+        let declared = declared_distinctions();
+        let dist_of = |n: &str| -> Vec<(String, String)> {
+            declared.iter().find(|(name, ..)| name == n).map(|(_, d, _)| d.clone()).unwrap_or_default()
+        };
+        let same_of = |n: &str| -> Option<String> {
+            declared.iter().find(|(name, ..)| name == n).and_then(|(_, _, s)| s.clone())
+        };
+
+        let names: Vec<&str> = names().collect();
+        let mut problems = Vec::new();
+        for (i, a) in names.iter().enumerate() {
+            for b in &names[i + 1..] {
+                let d = differing_facets(archetype(a).unwrap(), archetype(b).unwrap());
+                match d.len() {
+                    0 => {
+                        // Same point in facet space: they classify identically, so the choice is
+                        // pure prose. Legitimate, but it has to be deliberate — otherwise an author
+                        // picks by coin-flip and a later facet edit to one silently diverges them.
+                        if same_of(a).as_deref() != Some(*b) || same_of(b).as_deref() != Some(*a) {
+                            problems.push(format!(
+                                "`{a}` and `{b}` are facet-IDENTICAL; both must declare \
+                                 `same_point_as` naming the other, or be given a real difference",
+                            ));
+                        }
+                    }
+                    1 => {
+                        let axis = d[0];
+                        for (x, y) in [(a, b), (b, a)] {
+                            if !dist_of(x).iter().any(|(n, by)| n == *y && by == axis) {
+                                problems.push(format!(
+                                    "`{x}` must declare `distinguished_from = [{{ archetype = \"{y}\", \
+                                     by = \"{axis}\" }}]` — they differ on that axis alone",
+                                ));
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+        assert!(problems.is_empty(), "confusable archetypes:\n  {}", problems.join("\n  "));
+    }
+
+    /// A declared distinction must be TRUE: the named axis is really where the two differ. A stale
+    /// annotation is worse than none — it points an author at the wrong facet with authority.
+    #[test]
+    fn declared_distinctions_are_accurate() {
+        let mut problems = Vec::new();
+        for (name, dists, same) in declared_distinctions() {
+            let Some(a) = archetype(&name) else { continue };
+            for (other, by) in dists {
+                let Some(b) = archetype(&other) else {
+                    problems.push(format!("`{name}` names unknown archetype `{other}`"));
+                    continue;
+                };
+                let d = differing_facets(a, b);
+                if !d.contains(&by.as_str()) {
+                    problems.push(format!(
+                        "`{name}` claims it differs from `{other}` by `{by}`, but they differ on {d:?}",
+                    ));
+                }
+            }
+            if let Some(other) = same {
+                match archetype(&other) {
+                    None => problems.push(format!("`{name}` names unknown archetype `{other}`")),
+                    Some(b) => {
+                        let d = differing_facets(a, b);
+                        if !d.is_empty() {
+                            problems.push(format!(
+                                "`{name}` claims `same_point_as = \"{other}\"`, but they differ on {d:?}",
+                            ));
+                        }
+                    }
+                }
+            }
+        }
+        assert!(problems.is_empty(), "inaccurate distinctions:\n  {}", problems.join("\n  "));
     }
 }
