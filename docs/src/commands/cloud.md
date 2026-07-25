@@ -246,7 +246,11 @@
 - **savingsplans**: Allowed arguments: describe-*, get-*, list-*
 - **scheduler**: Allowed arguments: describe-*, get-*, list-*
 - **schemas**: Allowed arguments: describe-*, get-*, list-*
-- **secretsmanager**: Allowed arguments: describe-*, list-*
+- **secretsmanager batch-get-secret-value**
+- **secretsmanager describe-secret**
+- **secretsmanager get-secret-value**
+- **secretsmanager list-secret-version-ids**
+- **secretsmanager list-secrets**
 - **securityhub**: Allowed arguments: describe-*, get-*, list-*
 - **securitylake**: Allowed arguments: describe-*, get-*, list-*
 - **serverlessrepo**: Allowed arguments: describe-*, get-*, list-*
@@ -300,6 +304,8 @@
 - `aws s3 ls`
 - `aws secretsmanager describe-secret --secret-id x`
 - `aws secretsmanager list-secrets`
+- `aws secretsmanager list-secrets --profile prod --region us-east-1`
+- `aws secretsmanager list-secret-version-ids --secret-id x`
 - `aws ecr describe-repositories`
 - `aws ecr list-images --repository-name r`
 - `aws ssm get-parameter --name x`
@@ -1244,7 +1250,11 @@
 - **scheduler jobs**: Allowed arguments: describe, list
 - **scheduler locations**: Allowed arguments: describe, list
 - **scheduler operations**: Allowed arguments: describe, list
-- **secrets**: Allowed arguments: describe, list
+- **secrets describe**
+- **secrets list**
+- **secrets versions access**
+- **secrets versions describe**
+- **secrets versions list**
 - **service-directory endpoints**: Allowed arguments: describe, list
 - **service-directory locations**: Allowed arguments: describe, list
 - **service-directory namespaces**: Allowed arguments: describe, list
