@@ -12333,6 +12333,7 @@ Aliases: `python`
 - **assets:reveal**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **assets:reveal:full**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **cache:clear**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
+- **compile**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **db:create**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **db:fixtures:load**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **db:migrate**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
@@ -12364,6 +12365,13 @@ Aliases: `python`
 - **tmp:clear**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - **tmp:create**: Flags: --help, --quiet, --silent, --trace, -h, -q, -s
 - Allowed standalone flags: --help, --version, -V, -h
+
+**Examples:**
+
+- `rake compile`
+- `rake compile --trace`
+- `rake routes`
+- `rake db:migrate`
 
 ### `raw2tiff`
 <p class="cmd-url"><a href="https://libtiff.gitlab.io/libtiff/tools/raw2tiff.html">https://libtiff.gitlab.io/libtiff/tools/raw2tiff.html</a></p>
@@ -13969,6 +13977,11 @@ Aliases: `gsort`
 <p class="cmd-url"><a href="https://www.sqlite.org/cli.html">https://www.sqlite.org/cli.html</a></p>
 
 - Allowed standalone flags: --help, --version, -help, -version
+
+**Examples:**
+
+- `sqlite3 --version`
+- `sqlite3 --help`
 
 ### `sqlx`
 <p class="cmd-url"><a href="https://github.com/launchbadge/sqlx/tree/main/sqlx-cli">https://github.com/launchbadge/sqlx/tree/main/sqlx-cli</a></p>
