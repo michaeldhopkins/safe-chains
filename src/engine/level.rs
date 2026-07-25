@@ -62,6 +62,14 @@ pub struct FacetMismatch {
     pub actual: &'static str,
     /// The constraint it failed (`<= fetches`, `one of [pinned, na]`).
     pub bound: String,
+    /// How many of that axis's terms the bound DOES admit — how close this clause came.
+    ///
+    /// Used to rank clauses, not shown. A level inherits its ancestors' clauses (`developer`
+    /// carries `paranoid`'s `observe` clause), so several can match on operation and the first is
+    /// often the strictest. Reporting that one names a bound the author never intended for this
+    /// capability: a `cat` of a machine-locus path was blamed on `<= temp` (paranoid's read floor)
+    /// when the read bound that actually matters is `<= worktree-trusted`.
+    pub admits_count: usize,
 }
 
 impl std::fmt::Display for FacetMismatch {
@@ -85,7 +93,8 @@ fn ord_mismatch<T: Ord + Copy + FacetTerm>(
         (Some(lo), Some(hi)) => format!("{}..={}", lo.as_str(), hi.as_str()),
         (None, None) => "any".to_string(),
     };
-    Some(FacetMismatch { facet, actual: term.as_str(), bound })
+    let admits_count = T::all().iter().filter(|t| b.admits(**t)).count();
+    Some(FacetMismatch { facet, actual: term.as_str(), bound, admits_count })
 }
 
 fn set_mismatch<T: PartialEq + Copy + FacetTerm>(
@@ -101,7 +110,7 @@ fn set_mismatch<T: PartialEq + Copy + FacetTerm>(
         "one of [{}]",
         s.iter().map(|t| t.as_str()).collect::<Vec<_>>().join(", "),
     );
-    Some(FacetMismatch { facet, actual: term.as_str(), bound })
+    Some(FacetMismatch { facet, actual: term.as_str(), bound, admits_count: s.len() })
 }
 
 /// A conjunction of per-facet constraints. A default (all-`None`) clause admits every
@@ -230,6 +239,7 @@ impl Clause {
                 actual: "absent",
                 bound: "this clause constrains the supply chain, which this capability has none of"
                     .to_string(),
+                admits_count: 0,
             });
         };
         set_mismatch("supply_chain.source", self.supply_source.as_deref(), sc.source)
@@ -310,6 +320,7 @@ impl Level {
                 facet: "deny-clause",
                 actual: "matched",
                 bound: "removed by an explicit deny clause".to_string(),
+                admits_count: 0,
             });
         }
         if self.allow.is_empty() {
@@ -317,16 +328,30 @@ impl Level {
                 facet: "level",
                 actual: "any capability",
                 bound: "nothing — this level declares no allow clause".to_string(),
+                admits_count: 0,
             });
         }
         let on_topic = |c: &&Clause| {
             c.operation.as_ref().is_none_or(|ops| ops.contains(&cap.operation))
         };
-        self.allow
+        // Among the clauses that could plausibly have admitted this capability, report the one that
+        // came CLOSEST — the largest `admits_count` on the facet that stopped it. Taking the first
+        // match instead named an inherited ancestor clause's much tighter bound, which points the
+        // reader at a rule that was never meant to cover this capability.
+        let mut candidates: Vec<FacetMismatch> = self
+            .allow
             .iter()
             .filter(on_topic)
-            .chain(self.allow.iter())
-            .find_map(|c| c.first_mismatch(cap, Role::Allow))
+            .filter_map(|c| c.first_mismatch(cap, Role::Allow))
+            .collect();
+        if candidates.is_empty() {
+            candidates = self
+                .allow
+                .iter()
+                .filter_map(|c| c.first_mismatch(cap, Role::Allow))
+                .collect();
+        }
+        candidates.into_iter().max_by_key(|m| m.admits_count)
     }
 
     pub fn admits_capability(&self, cap: &Capability) -> bool {
@@ -371,6 +396,37 @@ mod tests {
         // both admit the empty profile vacuously
         assert!(all.admits(&Profile::default()));
         assert!(nothing.admits(&Profile::default()));
+    }
+
+    /// A level INHERITS its ancestors' clauses, so several can match on `operation` and the
+    /// STRICTEST is often first. Reporting that one names a bound never meant for this capability:
+    /// `cat ~/Library/...` was blamed on `<= temp` — paranoid's read floor, inherited by developer —
+    /// when developer's actual read bound is `<= worktree-trusted`. The diagnostic must name the
+    /// clause that came closest, or it sends the reader to fix the wrong rule.
+    #[test]
+    fn nearest_miss_reports_the_clause_that_came_closest_not_the_first() {
+        let strict = Clause {
+            operation: Some(vec![Operation::Observe]),
+            local_locus: Some(OrdBound::at_most(LocalLocus::Temp)),
+            ..Default::default()
+        };
+        let loose = Clause {
+            operation: Some(vec![Operation::Observe]),
+            local_locus: Some(OrdBound::at_most(LocalLocus::WorktreeTrusted)),
+            ..Default::default()
+        };
+        // Strict first, mirroring the inherited-ancestor ordering that produced the bad report.
+        let level = Level::new("two-reads").allowing(strict).allowing(loose);
+        let mut cap = Capability::new(Operation::Observe);
+        cap.locus.local = LocalLocus::Machine;
+
+        let m = level.nearest_miss(&cap).expect("machine locus exceeds both clauses");
+        assert_eq!(m.facet, "locus.local");
+        assert!(
+            m.bound.contains("worktree-trusted"),
+            "named the strictest clause (`{}`); the closest one allows <= worktree-trusted",
+            m.bound,
+        );
     }
 
     #[test]
