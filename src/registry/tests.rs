@@ -24,6 +24,7 @@ use super::*;
             profile = "remote-destroy-recoverable"
             fact = "Deletes the remote resource via the API."
             source = "https://example/docs"
+            standalone = ["--help"]
             "#,
         );
     }
@@ -1978,7 +1979,15 @@ use super::*;
                                                   //   (mgmt API never returns plaintext, verified); set/unset = mutate
             // (b) GROUP NAME contains a credential word, but its value-reading action is now CLOSED by
             //     narrowing the first_arg glob (Batch 1 restructures into explicit sub-subs):
-            ("aws", "secretsmanager"),            // get-secret-value dropped from first_arg
+            // aws secretsmanager (Batch 1): the describe-*/list-* glob became explicit sub-subs, so
+            // the metadata reads are now visible to this guard by name. Each is confirmed by the API
+            // reference to return METADATA only — the value requires GetSecretValue, which is
+            // profiled credential-read (as is batch-get-secret-value). The group name stays listed
+            // because it, too, merely contains a credential word.
+            ("aws", "secretsmanager"),            // group name only; every value-returning op is classified
+            ("aws", "describe-secret"),           // ARN/name/rotation/tags/version stages — no SecretString
+            ("aws", "list-secrets"),              // secret metadata list; API never returns values
+            ("aws", "list-secret-version-ids"),   // version ids + staging labels; no value
             ("gcloud", "secrets"),                // `versions access` dropped from first_arg
             // (Batch-0 TODOs now CLASSIFIED, so gone from here: basecamp `auth token` -> credential-read;
             //  istioctl `proxy-config secret` -> credential-read.)
@@ -2364,6 +2373,81 @@ use super::*;
         }
         assert!(failures.is_empty(),
             "TOML examples drift from dispatcher:\n{}", failures.join("\n"));
+    }
+
+    /// A flag is researched FOR A COMMAND, never in general. The same spelling means opposite things
+    /// on different commands — `--api-key` NAMES the key to read on `aws apigateway get-api-key`,
+    /// but SUPPLIES the caller's credential on `neon`. So a flag may only be accepted where it was
+    /// declared, and the guard walks the REAL registry so every present and future profiled sub is
+    /// covered without anyone remembering to extend a list.
+    ///
+    /// This exists because the opposite practice was shipped and had to be reverted: one generic
+    /// "global options" list pasted into every sub of a CLI, which asserted ~200 flags as researched
+    /// that nobody had looked at — including endpoint-redirect (`--endpoint-url`) and credential-
+    /// substitution (`--profile`) flags on subs that auto-approve. An omitted flag merely denies; a
+    /// wrongly-asserted one claims research that never happened.
+    #[test]
+    fn a_profiled_sub_accepts_only_flags_declared_for_that_sub() {
+        // Spellings that are plausible on SOME command, so a stray acceptance means the sub is not
+        // really consulting its own declaration.
+        const PROBES: &[&str] = &[
+            "--frobnicate", "--endpoint-url", "--profile", "--api-key", "--token", "--host",
+            "--no-verify-ssl", "--force", "--exec", "--output", "--all",
+        ];
+        let mut leaks = Vec::new();
+        for (name, spec) in TOML_REGISTRY.iter() {
+            if name != &spec.name {
+                continue; // alias entries share the canonical spec
+            }
+            walk_profiled(&spec.kind, &mut vec![spec.name.clone()], &mut |path, sub| {
+                // A sub that explicitly declares unbounded tolerance is opting out BY DECLARATION;
+                // that is the (a)-class problem tracked in TODO.md, not this guard's business.
+                if !matches!(sub.allowed_unknown, crate::policy::UnknownTolerance::Strict) {
+                    return;
+                }
+                for probe in PROBES {
+                    let declared = sub.allowed_standalone.iter().any(|f| f == probe)
+                        || sub.allowed_valued.iter().any(|f| f == probe)
+                        || sub.flags.iter().any(|f| f.name == *probe)
+                        || sub.output_path_flags.iter().any(|f| f == probe)
+                        || sub.destination_flag.as_deref() == Some(*probe);
+                    if declared {
+                        continue;
+                    }
+                    let cmd = format!("{} {probe} x", path.join(" "));
+                    if crate::is_safe_command(&cmd) {
+                        leaks.push(format!("{cmd:?} — `{probe}` is not declared for this sub"));
+                    }
+                }
+            });
+        }
+        assert!(
+            leaks.is_empty(),
+            "profiled sub accepted a flag it never declared ({} case(s)):\n  {}",
+            leaks.len(),
+            leaks.join("\n  "),
+        );
+    }
+
+    /// Visit every profiled sub, carrying the token path that reaches it.
+    fn walk_profiled(
+        kind: &'static crate::registry::types::DispatchKind,
+        path: &mut Vec<String>,
+        f: &mut impl FnMut(&[String], &'static crate::registry::types::SubSpec),
+    ) {
+        use crate::registry::types::DispatchKind as D;
+        let subs = match kind {
+            D::Branching { subs, .. } | D::Custom { subs, .. } => subs,
+            _ => return,
+        };
+        for sub in subs {
+            path.push(sub.name.clone());
+            if sub.profile.is_some() {
+                f(path, sub);
+            }
+            walk_profiled(&sub.kind, path, f);
+            path.pop();
+        }
     }
 
     /// safe-chains must know its OWN command-line surface. Every flag clap defines is enumerated
