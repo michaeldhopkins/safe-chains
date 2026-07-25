@@ -60,6 +60,7 @@ mod handler_property_tests;
 pub mod docs;
 pub mod engine;
 mod handlers;
+pub mod netloc;
 pub mod parse;
 pub mod pathctx;
 pub mod pathgate;
