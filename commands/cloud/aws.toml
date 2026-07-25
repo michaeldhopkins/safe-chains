@@ -98,8 +98,23 @@ tolerate_unknown_long = true
 [[command.sub]]
 name = "s3api"
 first_arg = ["get-*", "head-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# Researched for S3 metadata/listing reads: bucket and key selection, the paging cursors (each
+# listing API spells its own — `--marker`, `--continuation-token`, `--key-marker`,
+# `--upload-id-marker`, `--part-number-marker`), conditional-read headers, and response shaping.
+# DELIBERATELY ABSENT: `--endpoint-url` (retargets the authenticated request — the flag that made
+# this glob a live exfil path), `--profile`, `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`,
+# and the `--sse-customer-*` family (supplies caller-held key material to decrypt SSE-C objects;
+# object-body reads are classified by the explicit `get-object` sub-sub below, not here).
+first_arg_standalone = ["--debug", "--fetch-owner", "--help", "--no-cli-pager", "--no-paginate"]
+first_arg_valued = [
+  "--bucket", "--checksum-mode", "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout",
+  "--color", "--continuation-token", "--delimiter", "--encoding-type", "--expected-bucket-owner",
+  "--if-match", "--if-modified-since", "--if-none-match", "--if-unmodified-since", "--key",
+  "--key-marker", "--marker", "--max-items", "--max-keys", "--max-parts", "--max-uploads",
+  "--object-attributes", "--output", "--page-size", "--part-number", "--part-number-marker",
+  "--prefix", "--query", "--region", "--request-payer", "--start-after", "--starting-token",
+  "--upload-id", "--upload-id-marker", "--version-id", "--version-id-marker",
+]
 [[command.sub.sub]]
 name = "get-object"
 profile = "bulk-object-read"
@@ -197,8 +212,25 @@ valued = ["--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", 
 [[command.sub]]
 name = "logs"
 first_arg = ["describe-*", "filter-*", "get-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# Researched for CloudWatch Logs reads: log-group/stream selection, the time window, filter patterns,
+# paging and ordering. DELIBERATELY ABSENT beyond the usual transport set (`--endpoint-url`,
+# `--profile`, `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`): `--unmask`, which returns
+# data-protection-masked log content in the CLEAR. CloudWatch masks matched sensitive data (keys,
+# tokens, PII) precisely so a log read is not a credential read; `--unmask` reverses that and turns
+# `get-log-events` into a disclosure of the masked material, so it is not part of the read surface.
+first_arg_standalone = [
+  "--debug", "--descending", "--help", "--interleaved", "--no-cli-pager", "--no-descending",
+  "--no-paginate", "--no-start-from-head", "--start-from-head",
+]
+first_arg_valued = [
+  "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
+  "--destination-name-prefix", "--end-time", "--filter-name-prefix", "--filter-pattern", "--limit",
+  "--log-group-identifier", "--log-group-name", "--log-group-name-prefix", "--log-record-pointer",
+  "--log-stream-name", "--log-stream-name-prefix", "--log-stream-names", "--max-items",
+  "--metric-name", "--metric-namespace", "--next-token", "--order-by", "--output", "--page-size",
+  "--policy-type", "--query", "--query-id", "--region", "--resource-arn", "--start-time",
+  "--starting-token", "--status", "--task-id", "--time",
+]
 
 [[command.sub]]
 name = "ecs"
@@ -1054,8 +1086,23 @@ tolerate_unknown_long = true
 [[command.sub]]
 name = "cloudtrail"
 first_arg = ["describe-*", "get-*", "list-*"]
-tolerate_unknown_short = true
-tolerate_unknown_long = true
+# Researched for CloudTrail reads: trail/event-data-store selection, the audit-event query surface
+# (`lookup-events` attributes, Lake query IDs), and paging. These read the audit record itself, which
+# is the point — an agent inspecting what happened is a legitimate read. DELIBERATELY ABSENT:
+# `--endpoint-url`, `--profile`, `--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`. Redirecting
+# an audit-log read matters twice over: the response is a record of account activity, so a retargeted
+# endpoint both leaks it and returns attacker-chosen history.
+first_arg_standalone = [
+  "--debug", "--help", "--include-shadow-trails", "--no-cli-pager", "--no-include-shadow-trails",
+  "--no-paginate",
+]
+first_arg_valued = [
+  "--channel", "--cli-binary-format", "--cli-connect-timeout", "--cli-read-timeout", "--color",
+  "--end-time", "--event-category", "--event-data-store", "--import-id", "--lookup-attributes",
+  "--max-items", "--max-results", "--name", "--next-token", "--output", "--page-size", "--query",
+  "--query-alias", "--query-id", "--region", "--resource-arn", "--resource-id-list", "--start-time",
+  "--starting-token", "--trail-name", "--trail-name-list",
+]
 
 [[command.sub]]
 name = "codeartifact"
