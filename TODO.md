@@ -1,5 +1,23 @@
 # TODO
 
+## `Capability::worst()` leaves `persistence.trigger.kind` benign
+
+Found 2026-07-25 while writing `every_axis_index_is_reachable`, which assumed worst() differs from
+default on every axis. It does not, on two:
+
+- `isolation = None` — **correct**. The ladder runs from no isolation to ocap, so least-isolated IS
+  the worst term; it merely coincides with the zero.
+- `persistence.trigger.kind = None` — **inconsistent**. `None` means "not recurring"; the hazardous
+  terms are `Clock` (cron) and `Event` (hooks, `.envrc`). worst()'s own documented pattern is to
+  pick the hazardous term for a categorical, which it does for `Channel::Unknown` and
+  `Principal::Cross`.
+
+Not exploitable today: worst()'s deny guarantee rests on `locus.local = kernel`, which no
+well-formed level admits regardless of the other axes, so a clause constraining `trigger_kind` to
+`[none]` cannot rescue it. Left as-is rather than changed mid-review — altering the fail-closed
+sentinel every unresolvable command falls back to deserves its own change, with the level-algebra
+proptests re-run against it.
+
 ## Loopback destinations — remaining work
 
 Shipped 2026-07-25: `netloc::is_loopback` recognizes a local destination, `loopback_valued` gates a

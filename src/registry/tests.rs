@@ -5730,3 +5730,98 @@ fn the_loopback_delta_applies_only_for_a_local_host() {
                    "--endpoint-url", "http://localhost:8000"];
     assert!(!sub(&destroy), "a destroy sub never localizes, whatever its endpoint says");
 }
+
+/// Every sub that localizes on a loopback endpoint must refuse a GENERATED hostile host, not just
+/// the handful in the table above.
+///
+/// The delta is the only place in the classifier where a value makes a command MORE permissive, so
+/// its host check is the one that has to hold against inputs nobody thought to list. The generator
+/// composes the shapes that have actually fooled URL parsers — a local-looking name in userinfo, as
+/// a subdomain label, behind a path/query/fragment, and the numeric encodings of 127.0.0.1 — rather
+/// than sampling random strings, which would almost never land near the boundary.
+mod loopback_host_properties {
+    use super::*;
+
+    fn hostile_host() -> impl proptest::strategy::Strategy<Value = String> {
+        use proptest::prelude::*;
+        let local_looking = prop::sample::select(vec!["localhost", "127.0.0.1", "app.localhost", "[::1]"]);
+        let real = prop::sample::select(vec!["evil.com", "attacker.net", "10.0.0.1", "example.org"]);
+        let shape = 0usize..6;
+        (local_looking, real, shape).prop_map(|(l, r, shape)| match shape {
+            // userinfo: the host is what follows the LAST `@`
+            0 => format!("http://{l}@{r}"),
+            1 => format!("http://a@{l}@{r}"),
+            // the local-looking name as a mere label of someone else's domain
+            2 => format!("http://{}.{r}", l.trim_matches(['[', ']'])),
+            // the authority ends at the path/query/fragment, so these are not the host
+            3 => format!("http://{r}/{l}"),
+            4 => format!("http://{r}#@{l}"),
+            _ => format!("http://{r}?@{l}"),
+        })
+    }
+
+    /// Numeric spellings that ARE 127.0.0.1 but that `netloc` declines to recognize. They must deny
+    /// — being denied for a genuinely local endpoint is an inconvenience; the reverse is not.
+    fn unrecognized_local_spelling() -> impl proptest::strategy::Strategy<Value = String> {
+        use proptest::prelude::*;
+        prop::sample::select(vec![
+            "http://2130706433", "http://0x7f000001", "http://0177.0.0.1",
+            "http://127.1", "http://127.0.0.01", "http://[::ffff:127.0.0.1]",
+        ])
+        .prop_map(String::from)
+    }
+
+    fn localizing_subs() -> Vec<(String, String)> {
+        use super::super::types::{DispatchKind, LoopbackEffect};
+        fn walk(prefix: &str, kind: &DispatchKind, out: &mut Vec<(String, String)>) {
+            if let DispatchKind::Branching { subs, .. } = kind {
+                for s in subs {
+                    let path = format!("{prefix} {}", s.name);
+                    if s.loopback_effect == LoopbackEffect::Localizes
+                        && let Some(flag) = s.loopback_valued.first()
+                    {
+                        out.push((path.clone(), flag.clone()));
+                    }
+                    walk(&path, &s.kind, out);
+                }
+            }
+        }
+        let mut out = Vec::new();
+        for (name, spec) in TOML_REGISTRY.iter() {
+            walk(name, &spec.kind, &mut out);
+        }
+        out
+    }
+
+    proptest::proptest! {
+        #![proptest_config(proptest::test_runner::Config::with_cases(500))]
+
+        #[test]
+        fn a_localizing_sub_refuses_every_hostile_host(host in hostile_host()) {
+            let subs = localizing_subs();
+            proptest::prop_assert!(!subs.is_empty(), "no localizing sub — this property would be vacuous");
+            for (path, flag) in subs {
+                for cmd in [
+                    format!("{path} {flag} '{host}'"),
+                    format!("{path} {flag}='{host}'"),
+                ] {
+                    proptest::prop_assert!(
+                        !crate::is_safe_command(&cmd),
+                        "localized on a host that is not this machine: {}", cmd,
+                    );
+                }
+            }
+        }
+
+        #[test]
+        fn an_unrecognized_local_spelling_denies(host in unrecognized_local_spelling()) {
+            for (path, flag) in localizing_subs() {
+                let cmd = format!("{path} {flag} '{host}'");
+                proptest::prop_assert!(
+                    !crate::is_safe_command(&cmd),
+                    "recognized a spelling netloc deliberately declines: {}", cmd,
+                );
+            }
+        }
+    }
+}

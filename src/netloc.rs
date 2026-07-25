@@ -168,6 +168,112 @@ fn is_loopback_v4(host: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proptest::prelude::*;
+
+    /// Hosts this module is meant to recognize, in the spellings a developer actually types.
+    const LOCAL: &[&str] = &[
+        "localhost", "LOCALHOST", "localhost.", "app.localhost",
+        "127.0.0.1", "127.1.2.3", "127.0.0.255", "[::1]",
+    ];
+    /// Hosts it must not, including the ones built to look local.
+    const REMOTE: &[&str] = &[
+        "evil.com", "example.org", "192.168.1.1", "10.0.0.1", "169.254.169.254",
+        "localhost.evil.com", "127.0.0.1.evil.com", "notlocalhost", "localhostx",
+        "2130706433", "0177.0.0.1", "0.0.0.0",
+    ];
+
+    proptest! {
+        #![proptest_config(ProptestConfig::with_cases(4000))]
+
+        /// The verdict depends on the HOST COMPONENT and nothing else.
+        ///
+        /// Every bypass this module has faced is a way to smuggle a local-looking string into some
+        /// other part of the URL — userinfo, path, query, fragment — and have a careless parser read
+        /// it as the host. Rather than enumerate those tricks one at a time, assemble URLs from
+        /// parts and assert the answer tracks the host alone, whatever surrounds it.
+        #[test]
+        fn only_the_host_component_decides(
+            scheme in prop::sample::select(vec!["", "http", "https", "tcp", "HTTP"]),
+            userinfo in prop::sample::select(vec!["", "user", "user:pass", "localhost", "127.0.0.1", "a@b"]),
+            local in any::<bool>(),
+            idx in 0usize..32,
+            port in prop::sample::select(vec!["", ":1", ":8000", ":65535"]),
+            tail in prop::sample::select(vec!["", "/", "/p", "/p?q=1", "?q=1", "#f", "/@localhost", "#@localhost", "?@localhost"]),
+        ) {
+            let pool = if local { LOCAL } else { REMOTE };
+            let host = pool[idx % pool.len()];
+            let mut s = String::new();
+            if !scheme.is_empty() {
+                s.push_str(&format!("{scheme}://"));
+            }
+            if !userinfo.is_empty() {
+                s.push_str(&format!("{userinfo}@"));
+            }
+            s.push_str(host);
+            s.push_str(&port);
+            s.push_str(&tail);
+            prop_assert_eq!(
+                is_loopback(&s),
+                local,
+                "host `{}` decides, but `{}` said otherwise", host, s,
+            );
+        }
+
+        /// Hostnames are case-insensitive, so case must never change the verdict. A missed
+        /// lowercase would make `LOCALHOST` deny (an annoyance) or, in a future spelling, make a
+        /// case variant slip past a check that only matched lowercase.
+        #[test]
+        fn case_never_changes_the_verdict(
+            local in any::<bool>(),
+            idx in 0usize..32,
+            port in prop::sample::select(vec!["", ":8000"]),
+        ) {
+            let pool = if local { LOCAL } else { REMOTE };
+            let host = format!("http://{}{}", pool[idx % pool.len()], port);
+            prop_assert_eq!(is_loopback(&host), is_loopback(&host.to_uppercase()));
+            prop_assert_eq!(is_loopback(&host), is_loopback(&host.to_lowercase()));
+        }
+
+        /// A recognized host stops being recognized the moment it becomes a LABEL of some other
+        /// domain. This is the `localhost.evil.com` class, stated for arbitrary suffixes rather
+        /// than the three the table happens to list.
+        #[test]
+        fn a_local_host_under_another_domain_is_remote(
+            idx in 0usize..32,
+            suffix in "[a-z][a-z0-9-]{0,20}\\.[a-z]{2,6}",
+        ) {
+            let host = LOCAL[idx % LOCAL.len()];
+            // A bracketed IPv6 cannot take a suffix; `[::1].evil.com` is malformed, not a spoof.
+            if host.starts_with('[') {
+                return Ok(());
+            }
+            let spoof = format!("http://{}.{}", host.trim_end_matches('.'), suffix);
+            prop_assert!(!is_loopback(&spoof), "expected remote: {}", spoof);
+        }
+
+        /// Never panics, whatever bytes arrive. `--endpoint-url` takes an attacker-influenced value
+        /// and a panic in the classifier is an availability bug in every harness hook that calls it.
+        #[test]
+        fn never_panics_on_any_input(s in ".*") {
+            let _ = is_loopback(&s);
+        }
+
+        /// Adding a valid port never changes the verdict — the host decides, the port is noise.
+        #[test]
+        fn a_port_never_changes_the_verdict(
+            local in any::<bool>(),
+            idx in 0usize..32,
+            port in 1u32..65535,
+        ) {
+            let pool = if local { LOCAL } else { REMOTE };
+            let host = pool[idx % pool.len()];
+            prop_assert_eq!(
+                is_loopback(&format!("http://{host}")),
+                is_loopback(&format!("http://{host}:{port}")),
+            );
+        }
+    }
+
 
     #[test]
     fn recognizes_the_vetted_loopback_spellings() {
