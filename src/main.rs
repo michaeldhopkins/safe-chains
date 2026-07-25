@@ -24,6 +24,10 @@ fn run_cli(
 fn run_explain(command: &str) -> ! {
     let explanation = safe_chains::cst::explain(command);
     print!("{}", explanation.render());
+    // The facet breakdown is CLI-only. `render()` also feeds the hook's injected context, where an
+    // agent mid-chain needs the verdict and nothing else; a 27-axis dump there would be noise it
+    // cannot act on. Someone who typed `--explain` is asking why, so they get why.
+    print!("{}", safe_chains::facet_breakdown(command));
     process::exit(i32::from(!explanation.is_allowed()));
 }
 

@@ -485,6 +485,54 @@ impl Capability {
         Self { operation, ..Self::default() }
     }
 
+    /// The facets this capability actually SETS, as `(dotted name, term)` pairs.
+    ///
+    /// Only non-default terms: a capability is a point in 27-dimensional space and almost all of
+    /// those dimensions sit at their zero term, so printing every one buries the four or five that
+    /// characterize it. `because` carries the prose; this carries the point.
+    pub fn set_facets(&self) -> Vec<(&'static str, &'static str)> {
+        let d = Self::default();
+        let mut out: Vec<(&'static str, &'static str)> = Vec::new();
+        macro_rules! push {
+            ($name:literal, $field:expr, $dflt:expr) => {
+                if $field != $dflt {
+                    out.push(($name, $field.as_str()));
+                }
+            };
+        }
+        // `operation` is always shown: it is what the capability IS, even at the zero term.
+        out.push(("operation", self.operation.as_str()));
+        push!("locus.local", self.locus.local, d.locus.local);
+        push!("locus.remote", self.locus.remote, d.locus.remote);
+        push!("locus.binding", self.locus.binding, d.locus.binding);
+        push!("locus.provenance", self.locus.provenance, d.locus.provenance);
+        push!("scale", self.scale, d.scale);
+        push!("retrieval", self.retrieval, d.retrieval);
+        push!("authority", self.authority, d.authority);
+        push!("isolation", self.isolation, d.isolation);
+        push!("reversibility", self.reversibility, d.reversibility);
+        push!("persistence.level", self.persistence.level, d.persistence.level);
+        push!("persistence.trigger.escape", self.persistence.trigger.escape, d.persistence.trigger.escape);
+        push!("persistence.trigger.kind", self.persistence.trigger.kind, d.persistence.trigger.kind);
+        push!("disclosure.audience", self.disclosure.audience, d.disclosure.audience);
+        push!("disclosure.channel", self.disclosure.channel, d.disclosure.channel);
+        push!("disclosure.principal", self.disclosure.principal, d.disclosure.principal);
+        push!("secret.level", self.secret.level, d.secret.level);
+        push!("secret.channel", self.secret.channel, d.secret.channel);
+        push!("secret.principal", self.secret.principal, d.secret.principal);
+        push!("network.direction", self.network.direction, d.network.direction);
+        push!("network.destination", self.network.destination, d.network.destination);
+        push!("network.payload", self.network.payload, d.network.payload);
+        push!("execution.trust", self.execution.trust, d.execution.trust);
+        push!("cost", self.cost, d.cost);
+        if let Some(sc) = self.execution.supply_chain {
+            out.push(("supply_chain.source", sc.source.as_str()));
+            out.push(("supply_chain.pinning", sc.pinning.as_str()));
+            out.push(("supply_chain.exec_surface", sc.exec_surface.as_str()));
+        }
+        out
+    }
+
     /// A maximally-severe capability — every axis at its worst term, so no well-formed
     /// level admits it (`locus.local = kernel` alone denies it everywhere, v1.4 §4.3).
     /// The resolver returns this when it cannot certify something (§0), keeping the

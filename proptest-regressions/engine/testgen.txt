@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 7870b60c9408408687902414fe8e7ef4326cf2efa94496a1babcb4f1eb8c1d6f # shrinks to level = Level { name: "generated", allow: [], deny: [] }, cap = Capability { operation: Observe, locus: Locus { local: Process, remote: None, binding: Na, provenance: Na }, scale: Single, retrieval: Metadata, authority: User, isolation: None, reversibility: None, persistence: Persistence { level: Transient, trigger: Trigger { escape: Immediate, kind: None } }, disclosure: Disclosure { audience: None, channel: None, principal: Own }, secret: Secret { level: None, channel: None, principal: Own }, network: Network { direction: None, destination: Na, payload: None }, execution: Execution { trust: None, supply_chain: None }, cost: None, because: "" }

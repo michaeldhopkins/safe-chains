@@ -202,6 +202,10 @@ pub fn resolve(tokens: &[Token]) -> Option<Profile> {
                 c.network.direction = NetDirection::Loopback;
                 c.network.payload = NetPayload::None;
                 c.cost = Cost::None;
+                // The archetype's prose describes the cloud call and is now half wrong; say so,
+                // or `--explain` prints "changes remote state" over a profile that reaches no
+                // remote. The facets carry the classification, but the prose is what a human reads.
+                c.because = format!("{} — but the endpoint names this machine, so no remote is reached", c.because);
             }
         }
         return Some(Profile::of(caps));
