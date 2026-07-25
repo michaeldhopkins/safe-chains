@@ -70,7 +70,7 @@ const fn const_less(a: &[u8], b: &[u8]) -> bool {
 }
 
 impl Token {
-    pub(crate) fn from_raw(s: String) -> Self {
+    pub fn from_raw(s: String) -> Self {
         Self(s)
     }
 

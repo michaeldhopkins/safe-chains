@@ -178,3 +178,58 @@ pub(crate) fn lowered_variants(cap: &Capability) -> Vec<Capability> {
     }
     variants
 }
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(2000))]
+
+    /// The diagnostic and the predicate are the same walk, so they must never disagree: a clause
+    /// admits a capability EXACTLY when it reports no mismatch.
+    ///
+    /// `check` is literally `first_mismatch(..).is_none()`, so this looks tautological — it is not.
+    /// It pins the property against a future refactor that reintroduces a separate `&&` chain "for
+    /// speed", which is precisely how an explain feature rots into lying. A diagnostic that names
+    /// the wrong axis is worse than none: it sends an author to fix a facet that was never the
+    /// problem.
+    #[test]
+    fn clause_diagnostic_agrees_with_admits(clause in arb_clause(), cap in arb_capability()) {
+        prop_assert_eq!(clause.admits(&cap), clause.first_mismatch_for_test(&cap, false).is_none());
+    }
+
+    /// A reported mismatch is a REAL one: the facet it names, at the term it names, is genuinely
+    /// outside the clause's bound. Guards against a diagnostic that fires on the wrong axis while
+    /// still agreeing about yes/no.
+    #[test]
+    fn a_reported_mismatch_names_a_facet_that_actually_fails(
+        clause in arb_clause(),
+        cap in arb_capability(),
+    ) {
+        if let Some(m) = clause.first_mismatch_for_test(&cap, false) {
+            prop_assert!(!clause.admits(&cap), "reported {m} but the clause admits the capability");
+            prop_assert!(!m.facet.is_empty());
+            prop_assert!(!m.bound.is_empty());
+        }
+    }
+
+    /// The same equivalence for the DENY role. Separate because the supply-chain facet is the one
+    /// place allow and deny disagree, so an allow-only check cannot see an inversion there — and
+    /// did not: a `?` returning "no complaint" for a definitely-failing deny survived it.
+    #[test]
+    fn clause_diagnostic_agrees_with_matches_as_deny(
+        clause in arb_clause(),
+        cap in arb_capability(),
+    ) {
+        prop_assert_eq!(
+            clause.matches_as_deny_for_test(&cap),
+            clause.first_mismatch_for_test(&cap, true).is_none(),
+        );
+    }
+
+    /// A level admits a capability exactly when it reports no nearest miss.
+    #[test]
+    fn level_nearest_miss_agrees_with_admits_capability(
+        level in arb_level(),
+        cap in arb_capability(),
+    ) {
+        prop_assert_eq!(level.admits_capability(&cap), level.nearest_miss(&cap).is_none());
+    }
+}

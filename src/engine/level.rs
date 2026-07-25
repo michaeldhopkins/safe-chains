@@ -48,6 +48,62 @@ fn set_admits<T: Eq + Copy>(set: Option<&[T]>, term: T) -> bool {
     set.is_none_or(|s| s.contains(&term))
 }
 
+/// The single facet constraint a capability failed, named in the taxonomy's own vocabulary.
+///
+/// Exists because the engine was write-only: `admits` answered yes/no and nothing reported WHICH
+/// axis said no, so both a user asking "why was this denied" and an author debugging a resolver had
+/// to bisect by editing facets and re-running. That is not a hypothetical cost — it is how an
+/// incomplete loopback delta got mistaken for a flawed approach.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FacetMismatch {
+    /// Dotted facet path as the taxonomy spells it (`network.payload`, `locus.remote`).
+    pub facet: &'static str,
+    /// The capability's term (`sends-host-data`).
+    pub actual: &'static str,
+    /// The constraint it failed (`<= fetches`, `one of [pinned, na]`).
+    pub bound: String,
+}
+
+impl std::fmt::Display for FacetMismatch {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} = {} (allowed: {})", self.facet, self.actual, self.bound)
+    }
+}
+
+fn ord_mismatch<T: Ord + Copy + FacetTerm>(
+    facet: &'static str,
+    bound: Option<OrdBound<T>>,
+    term: T,
+) -> Option<FacetMismatch> {
+    let b = bound?;
+    if b.admits(term) {
+        return None;
+    }
+    let bound = match (b.min, b.max) {
+        (None, Some(hi)) => format!("<= {}", hi.as_str()),
+        (Some(lo), None) => format!(">= {}", lo.as_str()),
+        (Some(lo), Some(hi)) => format!("{}..={}", lo.as_str(), hi.as_str()),
+        (None, None) => "any".to_string(),
+    };
+    Some(FacetMismatch { facet, actual: term.as_str(), bound })
+}
+
+fn set_mismatch<T: PartialEq + Copy + FacetTerm>(
+    facet: &'static str,
+    set: Option<&[T]>,
+    term: T,
+) -> Option<FacetMismatch> {
+    let s = set?;
+    if s.contains(&term) {
+        return None;
+    }
+    let bound = format!(
+        "one of [{}]",
+        s.iter().map(|t| t.as_str()).collect::<Vec<_>>().join(", "),
+    );
+    Some(FacetMismatch { facet, actual: term.as_str(), bound })
+}
+
 /// A conjunction of per-facet constraints. A default (all-`None`) clause admits every
 /// capability. Each ordinal facet takes an [`OrdBound`]; each categorical facet an
 /// allowed set. Fields are flattened per axis — a compound facet is never a single
@@ -100,37 +156,87 @@ impl Clause {
     }
 
     fn check(&self, cap: &Capability, role: Role) -> bool {
-        set_admits(self.operation.as_deref(), cap.operation)
-            && ord_admits(self.local_locus, cap.locus.local)
-            && ord_admits(self.remote_reach, cap.locus.remote)
-            && set_admits(self.remote_binding.as_deref(), cap.locus.binding)
-            && ord_admits(self.provenance, cap.locus.provenance)
-            && ord_admits(self.scale, cap.scale)
-            && ord_admits(self.retrieval, cap.retrieval)
-            && ord_admits(self.authority, cap.authority)
-            && ord_admits(self.isolation, cap.isolation)
-            && ord_admits(self.reversibility, cap.reversibility)
-            && ord_admits(self.persistence_level, cap.persistence.level)
-            && ord_admits(self.trigger_escape, cap.persistence.trigger.escape)
-            && set_admits(self.trigger_kind.as_deref(), cap.persistence.trigger.kind)
-            && ord_admits(self.disclosure_audience, cap.disclosure.audience)
-            && set_admits(self.disclosure_channel.as_deref(), cap.disclosure.channel)
-            && set_admits(self.disclosure_principal.as_deref(), cap.disclosure.principal)
-            && ord_admits(self.secret_level, cap.secret.level)
-            && set_admits(self.secret_channel.as_deref(), cap.secret.channel)
-            && set_admits(self.secret_principal.as_deref(), cap.secret.principal)
-            && ord_admits(self.net_direction, cap.network.direction)
-            && ord_admits(self.net_destination, cap.network.destination)
-            && ord_admits(self.net_payload, cap.network.payload)
-            && ord_admits(self.execution_trust, cap.execution.trust)
-            && self.supply_chain_admits(cap.execution.supply_chain, role)
-            && ord_admits(self.cost, cap.cost)
+        self.first_mismatch(cap, role).is_none()
+    }
+
+    /// The first facet constraint `cap` fails, or `None` if this clause admits it.
+    ///
+    /// `check` is defined in terms of THIS rather than the other way round. A parallel
+    /// "explain" walk beside a separate `&&` chain would drift the moment a facet is added, and a
+    /// diagnostic that disagrees with the predicate is worse than none — it would send an author
+    /// chasing the wrong axis. `clause_diagnostic_agrees_with_admits` pins the equivalence.
+    ///
+    /// Order is the taxonomy's axis order, not severity: it reports A failing facet, not the most
+    /// important one, since a clause is a conjunction and every failure is disqualifying.
+    /// Test-only view of `first_mismatch`. Takes the ROLE: the allow/deny asymmetry on the supply
+    /// chain means an allow-only equivalence proptest cannot see a deny-side inversion (it did not
+    /// — a `?` that reported "no complaint" for a definitely-failing deny got through it).
+    #[cfg(test)]
+    pub(crate) fn first_mismatch_for_test(
+        &self,
+        cap: &Capability,
+        deny_role: bool,
+    ) -> Option<FacetMismatch> {
+        self.first_mismatch(cap, if deny_role { Role::Deny } else { Role::Allow })
+    }
+
+    #[cfg(test)]
+    pub(crate) fn matches_as_deny_for_test(&self, cap: &Capability) -> bool {
+        self.matches_as_deny(cap)
+    }
+
+    fn first_mismatch(&self, cap: &Capability, role: Role) -> Option<FacetMismatch> {
+        set_mismatch("operation", self.operation.as_deref(), cap.operation)
+            .or_else(|| ord_mismatch("locus.local", self.local_locus, cap.locus.local))
+            .or_else(|| ord_mismatch("locus.remote", self.remote_reach, cap.locus.remote))
+            .or_else(|| set_mismatch("locus.binding", self.remote_binding.as_deref(), cap.locus.binding))
+            .or_else(|| ord_mismatch("locus.provenance", self.provenance, cap.locus.provenance))
+            .or_else(|| ord_mismatch("scale", self.scale, cap.scale))
+            .or_else(|| ord_mismatch("retrieval", self.retrieval, cap.retrieval))
+            .or_else(|| ord_mismatch("authority", self.authority, cap.authority))
+            .or_else(|| ord_mismatch("isolation", self.isolation, cap.isolation))
+            .or_else(|| ord_mismatch("reversibility", self.reversibility, cap.reversibility))
+            .or_else(|| ord_mismatch("persistence.level", self.persistence_level, cap.persistence.level))
+            .or_else(|| ord_mismatch("persistence.trigger.escape", self.trigger_escape, cap.persistence.trigger.escape))
+            .or_else(|| set_mismatch("persistence.trigger.kind", self.trigger_kind.as_deref(), cap.persistence.trigger.kind))
+            .or_else(|| ord_mismatch("disclosure.audience", self.disclosure_audience, cap.disclosure.audience))
+            .or_else(|| set_mismatch("disclosure.channel", self.disclosure_channel.as_deref(), cap.disclosure.channel))
+            .or_else(|| set_mismatch("disclosure.principal", self.disclosure_principal.as_deref(), cap.disclosure.principal))
+            .or_else(|| ord_mismatch("secret.level", self.secret_level, cap.secret.level))
+            .or_else(|| set_mismatch("secret.channel", self.secret_channel.as_deref(), cap.secret.channel))
+            .or_else(|| set_mismatch("secret.principal", self.secret_principal.as_deref(), cap.secret.principal))
+            .or_else(|| ord_mismatch("network.direction", self.net_direction, cap.network.direction))
+            .or_else(|| ord_mismatch("network.destination", self.net_destination, cap.network.destination))
+            .or_else(|| ord_mismatch("network.payload", self.net_payload, cap.network.payload))
+            .or_else(|| ord_mismatch("execution.trust", self.execution_trust, cap.execution.trust))
+            .or_else(|| self.supply_chain_mismatch(cap.execution.supply_chain, role))
+            .or_else(|| ord_mismatch("cost", self.cost, cap.cost))
     }
 
     /// Supply-chain constraints apply only to network-sourced code. For an **allow**, a
     /// capability with no supply chain (`None`) satisfies them vacuously. For a **deny**,
     /// a clause that constrains the supply chain does **not** match a `None` capability —
     /// it is not in the denied corner — while an unconstrained deny is unaffected.
+    fn supply_chain_mismatch(&self, sc: Option<SupplyChain>, role: Role) -> Option<FacetMismatch> {
+        if self.supply_chain_admits(sc, role) {
+            return None;
+        }
+        let Some(sc) = sc else {
+            // A DENY constrained on the supply chain does not match a capability that has none.
+            // `?` here would report "no complaint", which `check` reads as ADMITS — inverting the
+            // rule for exactly the case the asymmetry exists to handle.
+            return Some(FacetMismatch {
+                facet: "execution.supply_chain",
+                actual: "absent",
+                bound: "this clause constrains the supply chain, which this capability has none of"
+                    .to_string(),
+            });
+        };
+        set_mismatch("supply_chain.source", self.supply_source.as_deref(), sc.source)
+            .or_else(|| ord_mismatch("supply_chain.pinning", self.pinning, sc.pinning))
+            .or_else(|| set_mismatch("supply_chain.exec_surface", self.exec_surface.as_deref(), sc.exec_surface))
+    }
+
     fn supply_chain_admits(&self, sc: Option<SupplyChain>, role: Role) -> bool {
         match sc {
             None => match role {
@@ -189,6 +295,40 @@ impl Level {
 
     /// Whether a single capability is admissible: some allow clause admits it and no
     /// deny clause matches it.
+    /// Why this level does not admit `cap`, or `None` if it does.
+    ///
+    /// A level is a DISJUNCTION of allow clauses, so a rejected capability failed all of them and
+    /// there is a choice of which complaint to report. Clauses are usually split by operation
+    /// (`editor` allows observes under one clause and mutates under another), so the first clause's
+    /// gripe is frequently "operation = mutate, allowed: [observe]" — true, useless, and it hides
+    /// the facet the author actually needs to change. Preferring a clause whose OPERATION already
+    /// matches surfaces the real blocker.
+    pub fn nearest_miss(&self, cap: &Capability) -> Option<FacetMismatch> {
+        if self.allow.iter().any(|c| c.admits(cap)) {
+            // Admitted by an allow, so if the level still rejects it a deny clause removed it.
+            return self.deny.iter().find(|c| c.matches_as_deny(cap)).map(|_| FacetMismatch {
+                facet: "deny-clause",
+                actual: "matched",
+                bound: "removed by an explicit deny clause".to_string(),
+            });
+        }
+        if self.allow.is_empty() {
+            return Some(FacetMismatch {
+                facet: "level",
+                actual: "any capability",
+                bound: "nothing — this level declares no allow clause".to_string(),
+            });
+        }
+        let on_topic = |c: &&Clause| {
+            c.operation.as_ref().is_none_or(|ops| ops.contains(&cap.operation))
+        };
+        self.allow
+            .iter()
+            .filter(on_topic)
+            .chain(self.allow.iter())
+            .find_map(|c| c.first_mismatch(cap, Role::Allow))
+    }
+
     pub fn admits_capability(&self, cap: &Capability) -> bool {
         self.allow.iter().any(|c| c.admits(cap)) && !self.deny.iter().any(|c| c.matches_as_deny(cap))
     }

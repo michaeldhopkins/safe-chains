@@ -73,6 +73,42 @@ pub mod verdict;
 
 pub use verdict::{SafetyLevel, Verdict};
 
+/// The facet profile behind a verdict, rendered for `--explain`.
+///
+/// Answers the question the boolean cannot: not "is this allowed" but "on which axis was it
+/// refused". Empty when no resolver claims the command — that is the answer too, since it means the
+/// legacy classifier decided and there are no facets to show.
+pub fn facet_breakdown(command: &str) -> String {
+    // One simple command only. A chain has a profile PER segment, and merging them would invent a
+    // capability set no resolver ever produced; `render()` above already breaks the chain down.
+    let Ok(words) = shell_words::split(command) else {
+        return String::new();
+    };
+    if words.is_empty() {
+        return String::new();
+    }
+    let tokens: Vec<parse::Token> = words.into_iter().map(parse::Token::from_raw).collect();
+    let Some(ex) = engine::bridge::explain_profile(&tokens) else {
+        return String::new();
+    };
+    let mut out = String::from("\n  resolved profile:\n");
+    for (because, facets) in &ex.capabilities {
+        out.push_str(&format!("    · {because}\n"));
+        for (name, term) in facets {
+            out.push_str(&format!("        {name:<28} {term}\n"));
+        }
+    }
+    match &ex.blocked_by {
+        Some((level, mismatch)) => {
+            out.push_str(&format!(
+                "\n  refused by `{level}` (the most permissive auto-approving level):\n    {mismatch}\n",
+            ));
+        }
+        None => out.push_str("\n  admitted by the auto-approve band.\n"),
+    }
+    out
+}
+
 pub fn is_safe_command(command: &str) -> bool {
     command_verdict(command).is_allowed()
 }
