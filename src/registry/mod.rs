@@ -370,23 +370,29 @@ fn flag_value<'a>(tokens: &'a [Token], flag: &str) -> Option<&'a str> {
 /// the glued short form `-fX` — the last mustn't be a bypass (`-f/etc/cron.d/job` reaching a system
 /// path would otherwise drop the write cap and auto-approve). A bare `-f` with no value is a
 /// malformed invocation the tool itself rejects, so a `None` there is harmless.
-/// The archetype this invocation becomes because a declared endpoint flag names THIS machine —
-/// `Some("local-mutate-recoverable")` for `put-item --endpoint-url http://localhost:8000`, `None`
-/// when no endpoint flag is present, it points elsewhere, or the sub declares no substitute.
+/// Whether this invocation's declared endpoint flag names THIS machine, so `resolve` should clear
+/// the facets the destination determines. `false` covers "no endpoint flag", "points elsewhere",
+/// and "the sub never opted in".
 ///
-/// Returning `None` for a non-loopback value is what keeps this independent of the admission check:
-/// even if `presents_unlisted_flag` were bypassed, the remote archetype would still be the one that
-/// classifies.
-pub(crate) fn sub_loopback_profile(tokens: &[Token]) -> Option<&'static str> {
-    let cmd = canonical_name(tokens.first()?.command_name());
-    let spec = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd))?;
-    let (sub, _rest) = walk_to_profiled_sub_rest(&tokens[1..], &spec.kind)?;
-    let local = sub.loopback_profile.as_ref()?;
-    sub.loopback_valued
-        .iter()
-        .filter_map(|f| flag_value(tokens, f))
-        .any(crate::netloc::is_loopback)
-        .then_some(local.as_str())
+/// Returning `false` for a non-loopback value is what keeps this independent of the admission
+/// check: even if `presents_unlisted_flag` were bypassed, the remote facets would still be the ones
+/// that classify.
+pub(crate) fn sub_loopback_localizes(tokens: &[Token]) -> bool {
+    let Some(cmd) = tokens.first().map(|t| canonical_name(t.command_name())) else {
+        return false;
+    };
+    let Some(spec) = CUSTOM_REGISTRY.get(cmd).or_else(|| TOML_REGISTRY.get(cmd)) else {
+        return false;
+    };
+    let Some((sub, _rest)) = walk_to_profiled_sub_rest(&tokens[1..], &spec.kind) else {
+        return false;
+    };
+    sub.loopback_effect == types::LoopbackEffect::Localizes
+        && sub
+            .loopback_valued
+            .iter()
+            .filter_map(|f| flag_value(tokens, f))
+            .any(crate::netloc::is_loopback)
 }
 
 pub(crate) fn sub_output_path_token(tokens: &[Token]) -> Option<&str> {

@@ -209,7 +209,7 @@ pub(super) fn build_subs(
             network_destination: canonical.network_destination,
             destination_flag: canonical.destination_flag.clone(),
         loopback_valued: canonical.loopback_valued.clone(),
-        loopback_profile: canonical.loopback_profile.clone(),
+        loopback_effect: canonical.loopback_effect,
             output_path_flags: canonical.output_path_flags.clone(),
         });
     }
@@ -291,34 +291,30 @@ fn assert_sub_provenance(parent: &str, toml: &TomlSub) {
     }
 }
 
-/// A `loopback_profile` says "pointed at this machine, the sub is THIS archetype instead". Two
-/// things must hold or the substitution is incoherent:
+/// `loopback_localizes` says "pointed at this machine, clear the facets the destination decides".
+/// Two things must hold or the claim is incoherent:
 ///
 /// - it needs a `loopback_valued` flag, since nothing else can establish that the destination IS
 ///   this machine;
-/// - a DESTROY archetype may not declare one. The emulator claim is unverifiable — `ssh -L
-///   8000:dynamodb.us-east-1.amazonaws.com:443` makes `localhost:8000` production — and a wrong
-///   guess is recoverable for a read or a write and not for a delete. Enforcing it here rather than
-///   with a runtime `if` means no future sub can opt out by accident.
-fn assert_loopback_profile_is_coherent(parent: &str, name: &str, toml: &TomlSub) {
-    let Some(local) = toml.loopback_profile.as_deref() else {
+/// - a DESTROY archetype may not set it. The emulator claim is unverifiable — `ssh -L
+///   8000:dynamodb.<region>.amazonaws.com:443` makes `localhost:8000` production — and a wrong
+///   guess costs a stray write for a mutate and the data for a delete. Refusing it here rather than
+///   relying on the resolver's runtime skip means no future sub opts out by accident.
+fn assert_loopback_localizes_is_coherent(parent: &str, name: &str, toml: &TomlSub) {
+    if !toml.loopback_localizes.unwrap_or(false) {
         return;
-    };
+    }
     assert!(
         !toml.loopback_valued.is_empty(),
-        "{parent} sub `{name}`: `loopback_profile` requires a `loopback_valued` flag — without one \
-         nothing can establish that the destination is this machine",
+        "{parent} sub `{name}`: `loopback_localizes` requires a `loopback_valued` flag — without \
+         one nothing can establish that the destination is this machine",
     );
     let profile = toml.profile.as_deref().unwrap_or_default();
     assert!(
         !profile.contains("destroy"),
-        "{parent} sub `{name}`: `profile = \"{profile}\"` is a destroy archetype and may not \
-         declare `loopback_profile` — a loopback endpoint cannot be verified (an SSH tunnel makes \
+        "{parent} sub `{name}`: `profile = \"{profile}\"` is a destroy archetype and may not set \
+         `loopback_localizes` — a loopback endpoint cannot be verified (an SSH tunnel makes \
          localhost mean production), and that is only unrecoverable for destroy",
-    );
-    assert!(
-        !local.contains("destroy"),
-        "{parent} sub `{name}`: `loopback_profile = \"{local}\"` must not be a destroy archetype",
     );
 }
 
@@ -371,8 +367,12 @@ pub(super) fn build_sub(
     let destination_flag = toml.destination_flag.clone();
     let output_path_flags = toml.output_path_flags.clone();
     let loopback_valued = toml.loopback_valued.clone();
-    let loopback_profile = toml.loopback_profile.clone();
-    assert_loopback_profile_is_coherent(parent, &name, &toml);
+    let loopback_effect = if toml.loopback_localizes.unwrap_or(false) {
+        LoopbackEffect::Localizes
+    } else {
+        LoopbackEffect::AdmitOnly
+    };
+    assert_loopback_localizes_is_coherent(parent, &name, &toml);
     let valued_for_check = toml.valued.clone();
     assert_eval_safe_flags_require_tag(parent, &name, eval_safe, &eval_safe_flags);
     assert_eval_safe_flag_values_consistent(parent, &name, &eval_safe_flags, &eval_safe_flag_values);
@@ -395,7 +395,7 @@ pub(super) fn build_sub(
         network_destination,
         destination_flag,
         loopback_valued,
-        loopback_profile,
+        loopback_effect,
         output_path_flags,
     }
 }
