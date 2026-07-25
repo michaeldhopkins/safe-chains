@@ -1,22 +1,31 @@
 # TODO
 
-## `Capability::worst()` leaves `persistence.trigger.kind` benign
+## Eleven facet axes have no authored level constraint
 
-Found 2026-07-25 while writing `every_axis_index_is_reachable`, which assumed worst() differs from
-default on every axis. It does not, on two:
+Surfaced 2026-07-25 by `a_declared_hazard_is_the_term_authored_levels_reject`, which verifies each
+axis's declared `hazard` against the levels that actually reject it. It can only check an axis some
+authored clause constrains, and it reports the ones it cannot:
 
-- `isolation = None` — **correct**. The ladder runs from no isolation to ocap, so least-isolated IS
-  the worst term; it merely coincides with the zero.
-- `persistence.trigger.kind = None` — **inconsistent**. `None` means "not recurring"; the hazardous
-  terms are `Clock` (cron) and `Event` (hooks, `.envrc`). worst()'s own documented pattern is to
-  pick the hazardous term for a categorical, which it does for `Channel::Unknown` and
-  `Principal::Cross`.
+    isolation, persistence.trigger.escape, supply_chain.pinning, locus.binding,
+    persistence.trigger.kind, disclosure.channel, disclosure.principal,
+    secret.channel, secret.principal, supply_chain.source, supply_chain.exec_surface
 
-Not exploitable today: worst()'s deny guarantee rests on `locus.local = kernel`, which no
-well-formed level admits regardless of the other axes, so a clause constraining `trigger_kind` to
-`[none]` cannot rescue it. Left as-is rather than changed mid-review — altering the fail-closed
-sentinel every unresolvable command falls back to deserves its own change, with the level-algebra
-proptests re-run against it.
+Two consequences worth separating.
+
+**The hazard declarations for these axes rest on their doc comments alone.** That includes both trust
+ladders — `isolation` and `supply_chain.pinning` — whose direction is inverted (higher is safer, so
+the hazard is the FLOOR). Their doc comments say a level "floors it (`>= version`)", but no level
+does yet, so the claim is unexercised. Mis-declaring `Pinning::hazard = digest` today would go
+unnoticed by that test; only `the_sentinel_is_denied_even_with_any_one_axis_relaxed` would still
+hold, and only because other axes carry the denial.
+
+**The whole supply-chain group is unconstrained**, which is consistent with the developer install
+clause (pinned AND scripts-off) not having landed — see the facet-authoring notes. When it lands,
+four of these axes become verifiable for free and this list should shrink; check the test's
+`unverifiable` output at that point rather than assuming.
+
+Not a correctness bug today: `Capability::worst()` is denied by every level below yolo, and that is
+now over-determined rather than resting on `locus.local` alone.
 
 ## Loopback destinations — remaining work
 
@@ -38,7 +47,8 @@ mechanism is generic but each service has to earn it.
   needs one.
 - **The tunnel caveat is structural, not a bug.** `ssh -L 8000:<service>.amazonaws.com:443` makes
   `localhost:8000` production and no static classifier can see it. This is why destroy archetypes
-  may not declare `loopback_profile`, enforced at build time.
+  may not set `loopback_localizes`, enforced at build time against the archetype's
+  `operation` facet rather than its name.
 
 ## Retire blanket flag tolerance (`tolerate_unknown_short/long`)
 

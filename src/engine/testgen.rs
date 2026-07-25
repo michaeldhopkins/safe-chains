@@ -246,17 +246,13 @@ pub(crate) const AXIS_COUNT: usize = 24;
 
 /// A capability with EVERY axis off its zero term — the donor for reachability checking.
 ///
-/// Not `Capability::worst()`, which leaves two axes at their default. For `isolation` that is
-/// correct (least isolation IS the worst). For `persistence.trigger.kind` it is `None` meaning "not
-/// recurring", while the hazardous terms are `Clock`/`Event` — inconsistent with `worst()`'s own
-/// pattern of choosing the hazardous term for a categorical (it does pick `Channel::Unknown` and
-/// `Principal::Cross`). Not exploitable: `worst()`'s deny guarantee rests on `locus.local = kernel`,
-/// which no level admits regardless. Recorded in TODO.md rather than changed here, since altering
-/// the fail-closed sentinel is not a test-fixture-sized decision.
+/// Not `Capability::worst()`, whose `isolation` sits at its default — correctly, since `Isolation`
+/// is a TRUST ladder (least isolation IS the worst), so its declared hazard is the ladder floor,
+/// which happens to be the zero term. Overridden here only so every axis is off its zero and each
+/// index is demonstrably reachable.
 pub(crate) fn all_axes_non_default() -> Capability {
     let mut c = Capability::worst("every axis off its zero term");
     c.isolation = Isolation::Ocap;
-    c.persistence.trigger.kind = TriggerKind::Clock;
     c
 }
 
@@ -403,4 +399,223 @@ fn axis_count_matches_what_set_facets_reports() {
          the completeness property samples 0..AXIS_COUNT, so any excess axis is never witnessed",
         cap.set_facets().len() - supply_rows,
     );
+}
+
+/// `Capability::worst()` must carry the DECLARED hazard on every axis.
+///
+/// worst() is the fail-closed sentinel: `resolve` returns it whenever it cannot certify what a
+/// command does, so it is the last thing standing between an unrecognized form and an auto-approval.
+/// Its guarantee is "no well-formed level admits this", and that guarantee is only as good as the
+/// weakest axis — a benign term on any one of them means a clause constraining that axis admits the
+/// sentinel there, and the denial then rests entirely on the OTHER axes happening to be constrained.
+///
+/// Hand-writing 24 terms is how it drifted. Checked here axis by axis so a future facet cannot be
+/// added to worst() with a plausible-looking but benign term.
+#[test]
+fn worst_carries_the_declared_hazard_on_every_axis() {
+    let w = Capability::worst("under test");
+    let mut wrong = Vec::new();
+    macro_rules! check {
+        ($name:literal, $actual:expr, $ty:ty) => {
+            let want = <$ty as FacetTerm>::hazard();
+            if $actual != want {
+                wrong.push(format!(
+                    "{} = {} but the declared hazard is {}",
+                    $name,
+                    $actual.as_str(),
+                    want.as_str(),
+                ));
+            }
+        };
+    }
+    check!("operation", w.operation, Operation);
+    check!("locus.local", w.locus.local, LocalLocus);
+    check!("locus.remote", w.locus.remote, RemoteReach);
+    check!("locus.binding", w.locus.binding, RemoteBinding);
+    check!("locus.provenance", w.locus.provenance, Provenance);
+    check!("scale", w.scale, Scale);
+    check!("retrieval", w.retrieval, RetrievalGranularity);
+    check!("authority", w.authority, Authority);
+    check!("isolation", w.isolation, Isolation);
+    check!("reversibility", w.reversibility, Reversibility);
+    check!("persistence.level", w.persistence.level, PersistenceLevel);
+    check!("persistence.trigger.escape", w.persistence.trigger.escape, TriggerEscape);
+    check!("persistence.trigger.kind", w.persistence.trigger.kind, TriggerKind);
+    check!("disclosure.audience", w.disclosure.audience, DisclosureAudience);
+    check!("disclosure.channel", w.disclosure.channel, Channel);
+    check!("disclosure.principal", w.disclosure.principal, Principal);
+    check!("secret.level", w.secret.level, SecretLevel);
+    check!("secret.channel", w.secret.channel, Channel);
+    check!("secret.principal", w.secret.principal, Principal);
+    check!("network.direction", w.network.direction, NetDirection);
+    check!("network.destination", w.network.destination, NetDestination);
+    check!("network.payload", w.network.payload, NetPayload);
+    check!("execution.trust", w.execution.trust, ExecutionTrust);
+    check!("cost", w.cost, Cost);
+
+    // A supply chain that is ABSENT satisfies every supply-chain constraint vacuously on the allow
+    // path (`supply_chain_admits` returns true for `None`), so the sentinel must carry one rather
+    // than skip the axis entirely — otherwise the install/RCE surface is the one place worst() is
+    // not worst.
+    match w.execution.supply_chain {
+        None => wrong.push(
+            "execution.supply_chain is absent, which satisfies every supply-chain constraint \
+             vacuously on an allow clause"
+                .to_string(),
+        ),
+        Some(sc) => {
+            check!("supply_chain.source", sc.source, SupplySource);
+            check!("supply_chain.pinning", sc.pinning, Pinning);
+            check!("supply_chain.exec_surface", sc.exec_surface, ExecSurface);
+        }
+    }
+    assert!(wrong.is_empty(), "worst() is not worst on:\n  {}", wrong.join("\n  "));
+}
+
+proptest! {
+    #![proptest_config(ProptestConfig::with_cases(200))]
+
+    /// No authored level admits the sentinel even with ANY ONE axis relaxed to its benign term.
+    ///
+    /// This is the property the hazard declarations exist to buy. worst()'s doc has always claimed
+    /// "`locus.local = kernel` alone denies it everywhere" — true, but it means the guarantee rested
+    /// on ONE axis, and a level whose clauses do not constrain `locus.local` would have admitted the
+    /// sentinel outright. Relaxing each axis in turn and finding it still denied shows the denial is
+    /// over-determined rather than balanced on a single term.
+    ///
+    /// It is also what makes the two fixes load-bearing rather than cosmetic: before them,
+    /// `persistence.trigger.kind` and the absent supply chain were already benign, so those axes
+    /// contributed nothing to the denial at all.
+    #[test]
+    fn the_sentinel_is_denied_even_with_any_one_axis_relaxed(i in 0..AXIS_COUNT) {
+        let mut relaxed = with_axis_from(&Capability::worst("relaxed sentinel"), &Capability::default(), i);
+        // The supply chain is an `Option`, not one of `with_axis_from`'s axes, so relaxing it means
+        // REMOVING it — which is exactly the shape the sentinel used to ship with, and which an
+        // allow clause satisfies vacuously. Folded in here so the one axis that cannot be relaxed
+        // by index is not the one axis left untested.
+        if i % 2 == 0 {
+            relaxed.execution.supply_chain = None;
+        }
+        let profile = Profile::of(vec![relaxed.clone()]);
+        // `yolo` is excluded because it admits the sentinel outright, by design: it is the level
+        // that means "auto-approve everything", so a user who selects it has opted out of the
+        // question this sentinel answers. Every level whose JOB is to deny is covered.
+        for level in crate::engine::authoring::default_levels().iter().filter(|l| l.name != "yolo") {
+            prop_assert!(
+                !level.admits(&profile),
+                "level `{}` admits the sentinel with axis {} relaxed to {:?}",
+                level.name, i, relaxed.set_facets(),
+            );
+        }
+    }
+}
+
+/// A declared `hazard` must be the term the authored levels actually reject.
+///
+/// `worst_carries_the_declared_hazard_on_every_axis` cannot check this: `worst()` is DERIVED from
+/// `hazard()`, so changing a declaration moves both sides and the comparison stays true. Verified by
+/// red demo — mis-declaring `Pinning`'s hazard as `digest` (the SAFEST term on that trust ladder)
+/// left it green. The declarations are the single point of truth, so something has to check them
+/// against evidence outside themselves.
+///
+/// The evidence is the authored levels. If a clause is selective on an axis — admits some terms and
+/// not others — then the term it rejects is the hazardous one. So: no authored allow clause may
+/// admit the hazard while rejecting some other term of that axis. `Pinning >= version` rejects
+/// `floating` and admits `digest`, which pins the direction of that trust ladder from the level
+/// authoring rather than from a comment.
+#[test]
+fn a_declared_hazard_is_the_term_authored_levels_reject() {
+    let mut wrong = Vec::new();
+    let mut unconstrained = Vec::new();
+
+    macro_rules! ord_axis {
+        ($name:literal, $field:ident, $ty:ty) => {
+            let mut seen = false;
+            for level in crate::engine::authoring::default_levels().iter().filter(|l| l.name != "yolo") {
+                for c in &level.allow {
+                    let Some(bound) = c.$field else { continue };
+                    seen = true;
+                    let hz = <$ty as FacetTerm>::hazard();
+                    let admits_hazard = bound.admits(hz);
+                    let rejects_something = <$ty>::all().iter().any(|t| !bound.admits(*t));
+                    if admits_hazard && rejects_something {
+                        wrong.push(format!(
+                            "{}: `{}` admits the declared hazard `{}` while rejecting other terms — \
+                             the hazard is pointed the wrong way on this axis",
+                            $name, level.name, hz.as_str(),
+                        ));
+                    }
+                }
+            }
+            if !seen {
+                unconstrained.push($name);
+            }
+        };
+    }
+    macro_rules! set_axis {
+        ($name:literal, $field:ident, $ty:ty) => {
+            let mut seen = false;
+            for level in crate::engine::authoring::default_levels().iter().filter(|l| l.name != "yolo") {
+                for c in &level.allow {
+                    let Some(set) = c.$field.as_ref() else { continue };
+                    seen = true;
+                    let hz = <$ty as FacetTerm>::hazard();
+                    if set.contains(&hz) && <$ty>::all().iter().any(|t| !set.contains(t)) {
+                        wrong.push(format!(
+                            "{}: `{}` admits the declared hazard `{}` while rejecting other terms",
+                            $name, level.name, hz.as_str(),
+                        ));
+                    }
+                }
+            }
+            if !seen {
+                unconstrained.push($name);
+            }
+        };
+    }
+
+    ord_axis!("locus.local", local_locus, LocalLocus);
+    ord_axis!("locus.remote", remote_reach, RemoteReach);
+    ord_axis!("locus.provenance", provenance, Provenance);
+    ord_axis!("scale", scale, Scale);
+    ord_axis!("retrieval", retrieval, RetrievalGranularity);
+    ord_axis!("authority", authority, Authority);
+    ord_axis!("isolation", isolation, Isolation);
+    ord_axis!("reversibility", reversibility, Reversibility);
+    ord_axis!("persistence.level", persistence_level, PersistenceLevel);
+    ord_axis!("persistence.trigger.escape", trigger_escape, TriggerEscape);
+    ord_axis!("disclosure.audience", disclosure_audience, DisclosureAudience);
+    ord_axis!("secret.level", secret_level, SecretLevel);
+    ord_axis!("network.direction", net_direction, NetDirection);
+    ord_axis!("network.destination", net_destination, NetDestination);
+    ord_axis!("network.payload", net_payload, NetPayload);
+    ord_axis!("execution.trust", execution_trust, ExecutionTrust);
+    ord_axis!("supply_chain.pinning", pinning, Pinning);
+    ord_axis!("cost", cost, Cost);
+    set_axis!("locus.binding", remote_binding, RemoteBinding);
+    set_axis!("persistence.trigger.kind", trigger_kind, TriggerKind);
+    set_axis!("disclosure.channel", disclosure_channel, Channel);
+    set_axis!("disclosure.principal", disclosure_principal, Principal);
+    set_axis!("secret.channel", secret_channel, Channel);
+    set_axis!("secret.principal", secret_principal, Principal);
+    set_axis!("supply_chain.source", supply_source, SupplySource);
+    set_axis!("supply_chain.exec_surface", exec_surface, ExecSurface);
+
+    assert!(wrong.is_empty(), "hazard declared against the evidence:\n  {}", wrong.join("\n  "));
+    // `operation` is deliberately absent above. Levels PARTITION their allow clauses by operation
+    // — one clause for observes, another for mutates — so every operation is admitted by some
+    // clause and rejected by others, and "the term levels reject" is not a well-defined question
+    // on that axis. Its declaration is held instead by
+    // `the_sentinel_is_denied_even_with_any_one_axis_relaxed`, which checks the thing that actually
+    // matters: that relaxing `operation` to `observe` still leaves the sentinel denied.
+    //
+    // Reported, not asserted: an axis no level constrains has no evidence either way, so its
+    // declaration rests on the doc comment alone. Naming them keeps that visible instead of letting
+    // the test look more thorough than it is.
+    if !unconstrained.is_empty() {
+        eprintln!(
+            "hazard unverifiable (no authored clause constrains these axes): {}",
+            unconstrained.join(", "),
+        );
+    }
 }
