@@ -14,15 +14,26 @@ Two consequences worth separating.
 
 **The hazard declarations for these axes rest on their doc comments alone.** That includes both trust
 ladders — `isolation` and `supply_chain.pinning` — whose direction is inverted (higher is safer, so
-the hazard is the FLOOR). Their doc comments say a level "floors it (`>= version`)", but no level
-does yet, so the claim is unexercised. Mis-declaring `Pinning::hazard = digest` today would go
-unnoticed by that test; only `the_sentinel_is_denied_even_with_any_one_axis_relaxed` would still
-hold, and only because other axes carry the denial.
+the hazard is the FLOOR). `Pinning`'s doc says a level "floors it (`>= version`)"; no level does,
+and per the next paragraph none is expected to. Mis-declaring `Pinning::hazard = digest` (the SAFEST
+term on that ladder) would go unnoticed by that test — verified by red demo; only
+`the_sentinel_is_denied_even_with_any_one_axis_relaxed` would still hold, and only because the other
+axes carry the denial.
 
-**The whole supply-chain group is unconstrained**, which is consistent with the developer install
-clause (pinned AND scripts-off) not having landed — see the facet-authoring notes. When it lands,
-four of these axes become verifiable for free and this list should shrink; check the test's
-`unverifiable` output at that point rather than assuming.
+**The whole supply-chain group is unconstrained BY DESIGN, and will likely stay that way.** The
+developer install clause (`levels/default.toml`, the `npm ci --ignore-scripts` shape) has landed, and
+it deliberately does NOT use the supply-chain facets: it models a pinned, scripts-off install as
+`execution <= self` / `persistence = installing` / `network = fetches`, because a clause admitting
+`execution = network-sourced` cannot be expressed cleanly — a `<=` ceiling loosens unguarded
+`ambient-config` (Makefiles and hooks slip into developer) and an exact/floor bound breaks facet
+monotonicity. The pinned/scripts-off distinction is enforced at the RESOLVER, which emits the safe
+shape only for that exact form; anything less emits `supply-chain-build`, which has no home below
+yolo.
+
+So `supply_source`/`pinning`/`exec_surface` are not awaiting authoring — nothing is expected to
+constrain them, and their hazard declarations rest on doc comments permanently unless the level model
+changes. That makes them structurally unverifiable by this test rather than temporarily so, which is
+the more useful thing to know.
 
 Not a correctness bug today: `Capability::worst()` is denied by every level below yolo, and that is
 now over-determined rather than resting on `locus.local` alone.
