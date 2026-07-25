@@ -5629,3 +5629,96 @@ fn every_loopback_gated_flag_rejects_a_spoofed_host() {
     }
     assert!(wrong.is_empty(), "loopback gate wrong at dispatch level:\n{}", wrong.join("\n"));
 }
+
+/// Every sub that substitutes a local archetype when pointed at this machine must do so ONLY for a
+/// destination `netloc` positively recognizes. Enumerates the registry, so a service researched
+/// later is covered without touching this test.
+///
+/// The substitution is the one place a value makes a command MORE permissive, so the spoofs matter
+/// more here than anywhere else: if `http://localhost@evil.com` selected the local archetype, a
+/// write to an attacker's host would classify as a local edit.
+#[test]
+fn a_loopback_substitute_applies_only_to_a_recognized_local_destination() {
+    use super::types::DispatchKind;
+
+    fn walk(prefix: &str, kind: &DispatchKind, out: &mut Vec<(String, String)>) {
+        if let DispatchKind::Branching { subs, .. } = kind {
+            for s in subs {
+                let path = format!("{prefix} {}", s.name);
+                if s.loopback_profile.is_some()
+                    && let Some(flag) = s.loopback_valued.first()
+                {
+                    out.push((path.clone(), flag.clone()));
+                }
+                walk(&path, &s.kind, out);
+            }
+        }
+    }
+
+    let mut subs = Vec::new();
+    for (name, spec) in TOML_REGISTRY.iter() {
+        walk(name, &spec.kind, &mut subs);
+    }
+    assert!(!subs.is_empty(), "no loopback substitute declared — this guard would be vacuous");
+
+    let mut wrong = Vec::new();
+    for (path, flag) in &subs {
+        // With no endpoint flag at all the sub keeps its remote archetype, so a write that is
+        // allowed locally must NOT be allowed against the real service. That is the property the
+        // whole feature rests on: the destination, and only the destination, moves the verdict.
+        if crate::is_safe_command(path) {
+            wrong.push(format!("{path} (no endpoint) => ALLOWED, want DENIED"));
+        }
+        for host in [
+            "http://localhost@evil.com",
+            "http://evil.com",
+            "http://localhost.evil.com",
+            "http://2130706433",
+        ] {
+            let cmd = format!("{path} {flag} '{host}'");
+            if crate::is_safe_command(&cmd) {
+                wrong.push(format!("{cmd} => ALLOWED, want DENIED"));
+            }
+        }
+    }
+    assert!(
+        wrong.is_empty(),
+        "a loopback substitute applied to a destination that is not this machine:\n{}",
+        wrong.join("\n"),
+    );
+}
+
+/// `sub_loopback_profile` decided directly, not through `is_safe_command`.
+///
+/// End-to-end the substitution is masked: `presents_unlisted_flag` denies a non-loopback endpoint
+/// before the archetype is ever chosen, so an end-to-end test passes even if the substitution
+/// itself matched hosts naively. The two layers share `netloc::is_loopback` and must stay
+/// INDEPENDENTLY correct — if a future change relaxes admission (a service where a remote endpoint
+/// is legitimately allowed), this is what still keeps the LOCAL archetype off a remote call.
+#[test]
+fn the_loopback_substitute_is_chosen_only_for_a_local_host() {
+    let sub = |args: &[&str]| -> Option<&'static str> {
+        let tokens: Vec<Token> = args.iter().map(|s| Token::from_test(s)).collect();
+        super::sub_loopback_profile(&tokens)
+    };
+
+    let base = ["aws", "dynamodb", "put-item", "--table-name", "t"];
+    let with = |endpoint: &str| {
+        let mut v = base.to_vec();
+        v.push("--endpoint-url");
+        v.push(endpoint);
+        sub(&v).is_some()
+    };
+
+    assert!(with("http://localhost:8000"), "a local endpoint selects the local archetype");
+    assert!(with("http://127.0.0.1:8000"), "dotted-quad loopback likewise");
+    assert!(!with("http://evil.com"), "a remote endpoint keeps the remote archetype");
+    assert!(!with("http://localhost@evil.com"), "userinfo must not select the local archetype");
+    assert!(!with("http://localhost.evil.com"), "a subdomain must not select it");
+    assert!(!sub(&base).is_some(), "no endpoint flag at all keeps the remote archetype");
+
+    // A sub declaring no substitute never gets one, whatever its endpoint says.
+    let no_substitute = ["aws", "dynamodb", "delete-table", "--table-name", "t",
+                         "--endpoint-url", "http://localhost:8000"];
+    assert!(sub(&no_substitute).is_none(), "a destroy sub declares no substitute and gets none");
+}

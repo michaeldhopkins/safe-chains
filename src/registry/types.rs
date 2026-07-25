@@ -486,6 +486,18 @@ pub(super) struct TomlSub {
     /// `behavioral-taxonomy-exposure.md`.
     #[serde(default)]
     pub output_path_flags: Vec<String>,
+    /// Flags naming a network endpoint that must be on THIS machine (`--endpoint-url
+    /// http://localhost:8000`). Two effects, both keyed on `netloc::is_loopback`: the flag is
+    /// admitted only with a loopback value, and a loopback value re-classifies the sub's
+    /// non-destroy capabilities as local (`resolve`'s loopback modifier). Declare only where a
+    /// local emulator is a researched workflow for that service.
+    #[serde(default)]
+    pub loopback_valued: Vec<String>,
+    /// The archetype this sub becomes when a `loopback_valued` flag points it at this machine.
+    /// Substituted for `profile` by `resolve`. Absent = the sub keeps its remote classification
+    /// whatever the destination; that is mandatory for destroy archetypes and the build enforces it.
+    #[serde(default)]
+    pub loopback_profile: Option<String>,
     #[serde(default)]
     pub nested_bare: Option<bool>,
     #[serde(default)]
@@ -778,6 +790,11 @@ pub(super) struct SubSpec {
     /// Output-file flags for a `data-export` sub; a present one adds a path-gated write capability
     /// at the file's locus (see `TomlSub::output_path_flags`).
     pub output_path_flags: Vec<String>,
+    /// Endpoint flags gated on naming this machine; see `TomlSub::loopback_valued`.
+    pub loopback_valued: Vec<String>,
+    /// Archetype substituted when a `loopback_valued` flag names this machine; see
+    /// `TomlSub::loopback_profile`.
+    pub loopback_profile: Option<String>,
 }
 
 #[derive(Debug, Clone)]
