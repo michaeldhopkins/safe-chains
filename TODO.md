@@ -17,15 +17,44 @@ systemctl to a REMOTE host over SSH, turning a local read into an operation on a
 
 Two distinct shapes, both bypassing per-sub enforcement:
 1. **A profiled sub that declares tolerance** — enumerates flags, then accepts anything anyway.
+   Still open.
 2. **A `first_arg` GLOB family** — `aws s3api` matches `get-*`/`head-*`/`list-*`, so those actions are
-   never profiled subs at all and never reach the flag check. Verified: `aws s3api list-buckets
-   --frobnicate` and `aws s3api get-bucket-policy --frobnicate` both auto-approve. This is the wider
-   of the two: the guard cannot see these because there is no sub to attach to.
+   never profiled subs at all and never reach the flag check. **Mechanism fixed 2026-07-25; migration
+   in progress — see below.**
 
 Why it is deferred, not skipped: retiring it means enumerating thousands of per-service flags, and
 until a command is done its invocations start denying. Needs planning and batching like the
 re-research campaign — not a cleanup. The build already REFUSES a profiled sub that declares neither
 a flag list nor an explicit tolerance, so new subs cannot quietly join this pile.
+
+### Glob-family flag migration (shape 2) — in progress
+
+Decision (2026-07-25): keep the verb glob, gate its flags. The `describe-*`/`get-*`/`list-*` claim is
+a real, durable statement about the CLI's verb convention — it keeps covering read APIs the provider
+ships tomorrow, which a hand-enumerated operation list does not. What the glob lacked was a flag
+list, so it decided on the first positional and never examined the rest of the line.
+
+`first_arg_standalone` / `first_arg_valued` (see SAMPLE.toml) now gate an admitted verb's flags.
+An UNDECLARED family stays permissive — ~250 service groups can't be researched at once and denying
+them wholesale would break every cloud read — and `no_new_unresearched_first_arg_family` ratchets the
+remaining set so it can only shrink.
+
+**Remaining: 237** (was 250). Migrate high-blast-radius services first; the ratchet count in that
+test is the running total.
+
+Done: aws iam, s3api, logs, cloudtrail, ec2, rds, lambda, ecs, ssm, dynamodb, cloudformation, sns,
+sqs. Converted to explicit sub-subs instead (more precise, worth it for credential stores): aws
+secretsmanager, aws kms, gcloud secrets.
+
+Next by blast radius: aws eks, ecr, apigateway, route53, organizations, sts-adjacent identity
+services; then az (~700 tolerances) and gcloud (~389), which also still need the structural
+subgroup-glob fix tracked in the cloud-CLI notes.
+
+The per-service payoff is in the flags each service withholds, which is why this can't be done
+generically. Real examples found so far: `logs --unmask` (returns data-protection-masked log content
+in the clear), `ssm --with-decryption` (decrypts SecureString values), `s3api --sse-customer-*`
+(supplies caller-held key material). Every family also withholds `--endpoint-url`, `--profile`,
+`--ca-bundle`, `--no-verify-ssl`, `--no-sign-request`.
 
 ## THE campaign — re-research every command (see RESEARCH-PLAN.md)
 
